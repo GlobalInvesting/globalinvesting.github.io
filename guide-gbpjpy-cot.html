@@ -3,21 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GBP/JPY Bias Factors: COT Positioning, Rate Differentials, and Cross-Asset Signals — Global Investing</title>
-<meta name="description" content="What drives GBP/JPY directional bias: how to combine CFTC COT data for GBP and JPY futures, BoE vs BoJ rate differentials, cross-asset risk regime, and retail sentiment to read medium-term currency bias.">
-<meta name="robots" content="index, follow">
+<title>GBP/JPY Bias Factors: COT, Rate Differential &amp; Risk Regime Explained</title>
+<meta name="description" content="What drives GBP/JPY directional bias and what can change it: CFTC COT positioning for GBP and JPY futures, BoE vs BoJ rate differential, cross-asset risk regime, and retail sentiment — combined into a multi-factor framework.">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-gbpjpy-cot.html">
 <meta name="google-adsense-account" content="ca-pub-7977942731354565">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:url" content="https://globalinvesting.github.io/guide-gbpjpy-cot.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
-<meta property="og:title" content="GBP/JPY Bias Factors: COT Positioning, Rate Differentials, and Cross-Asset Signals — Global Investing">
-<meta property="og:description" content="What drives GBP/JPY directional bias: how to combine CFTC COT data for GBP and JPY futures, BoE vs BoJ rate differentials, cross-asset risk regime, and retail sentiment to read medium-term currency bias.">
+<meta property="og:title" content="GBP/JPY Bias Factors: COT, Rate Differential &amp; Risk Regime Explained">
+<meta property="og:description" content="What drives GBP/JPY directional bias and what can change it: CFTC COT positioning for GBP and JPY futures, BoE vs BoJ rate differential, cross-asset risk regime, and retail sentiment — combined into a multi-factor framework.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-03-01T00:00:00Z">
+<meta property="article:modified_time" content="2026-05-02T00:00:00Z">
+<meta property="article:section" content="Market Research">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="GBP/JPY Bias Factors: COT Positioning, Rate Differentials, and Cross-Asset Signals — Global Investing">
+<meta name="twitter:title" content="GBP/JPY Bias Factors: COT, Rate Differential &amp; Risk Regime Explained">
+<meta name="twitter:description" content="What drives GBP/JPY directional bias and what can change it: CFTC COT, BoE vs BoJ rate differential, cross-asset risk regime, and retail sentiment.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "GBP/JPY Bias Factors: COT, Rate Differential and Risk Regime Explained",
+  "description": "What drives GBP/JPY directional bias and what can change it: CFTC COT positioning for GBP and JPY futures, BoE vs BoJ rate differential, cross-asset risk regime, and retail sentiment — combined into a multi-factor framework.",
+  "image": "https://globalinvesting.github.io/og-image.png",
+  "datePublished": "2026-03-01T00:00:00Z",
+  "dateModified": "2026-05-02T00:00:00Z",
+  "author": {
+    "@type": "Organization",
+    "name": "Global Investing FX Terminal",
+    "url": "https://globalinvesting.github.io/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Global Investing FX Terminal",
+    "url": "https://globalinvesting.github.io/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/apple-touch-icon.png"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://globalinvesting.github.io/guide-gbpjpy-cot.html"
+  },
+  "about": {
+    "@type": "Thing",
+    "name": "GBP/JPY currency pair"
+  },
+  "keywords": "GBP/JPY bias factors, gbpjpy COT positioning, BoE BoJ rate differential, what changes gbpjpy bias, CFTC COT gbp jpy, gbpjpy bullish bearish factors"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "FX Terminal",
+      "item": "https://globalinvesting.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Market Research",
+      "item": "https://globalinvesting.github.io/guide-gbpjpy-cot.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "GBP/JPY Bias Factors",
+      "item": "https://globalinvesting.github.io/guide-gbpjpy-cot.html"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What are the main factors that drive GBP/JPY directional bias?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "GBP/JPY bias is determined by four factors combined: GBP COT positioning (net contracts, WoW change, LF/AM alignment), JPY COT positioning (inverted — net short JPY is bullish GBP/JPY), the BoE vs BoJ rate differential trend (OIS-implied forward bias), and the cross-asset risk regime (VIX, MOVE, SPX). A signal from any single factor in isolation is insufficient."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What can change GBP/JPY bias?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The five main catalysts that can change GBP/JPY bias are: (1) a BoJ rate hike or unexpected hawkish communication, which compresses the rate differential and triggers rapid JPY short liquidation; (2) a UK CPI or employment data surprise that shifts BoE cut expectations; (3) a VIX spike above 25, which triggers JPY short covering regardless of structural bias; (4) a COT WoW delta reversal at an extreme net position, signaling institutional positioning reversal; (5) a Tokyo CPI print above expectations, which increases BoJ hike probability."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why does JPY COT positioning need to be inverted when reading GBP/JPY?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "JPY futures (6J) on the CME are quoted as USD per JPY, so a net long JPY futures position means institutions expect JPY to strengthen — which pushes GBP/JPY lower. A net short JPY position means institutions expect JPY weakness — which supports GBP/JPY higher. This inversion is the most common error in reading GBP/JPY COT data."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What GBP COT data is most important for GBP/JPY analysis?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The most important COT fields for GBP/JPY are: (1) Net contracts — absolute long or short bias of Leveraged Funds; (2) WoW delta — direction of change matters as much as the absolute level; (3) Net%OI — net position as a percentage of total open interest, the standard institutional normalization; (4) LF/AM dot — alignment between Leveraged Funds and Asset Managers, where a green dot means both are net long GBP, the highest-conviction bullish signal."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the cross-asset risk regime affect GBP/JPY?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In a RISK-ON regime, carry trades are rewarded and GBP/JPY tends to trend in the direction of the COT bias. In CAUTION (VIX 18–30), carry unwind risk is elevated and COT directional signals are less reliable. In RISK-OFF (VIX 30+), JPY strength dominates all other signals — COT data loses predictive relevance and the most important variable is the pace of JPY short liquidation. GBP/JPY has historically dropped hundreds of pips in a single session during a RISK-OFF regime."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does GBP/JPY do during the Asian session?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "During the Asian (Tokyo) session (approximately 00:00–09:00 UTC), GBP/JPY trades effectively as a proxy for USD/JPY plus a GBP/USD carry that is not actively managed, since London desks are offline. Large moves in the Asian session are almost always JPY-driven. The full GBP/JPY directional bias becomes active at London open (08:00 UTC), when GBP institutional order flow resumes."
+      }
+    }
+  ]
+}
+</script>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
