@@ -5332,6 +5332,35 @@ async function fetchCarryRanking() {
         : 'G8 · CB rate differential';
     }
 
+    // Attach explanatory tooltip to the panel header (once — guard against re-attach on refresh)
+    const sbHead = container.closest('.sb-section')?.querySelector('.sb-head');
+    if (sbHead && !sbHead._carryTipAttached) {
+      sbHead._carryTipAttached = true;
+      sbHead.style.cursor = 'help';
+      const tipTitle = 'Carry-to-Vol Ratio';
+      const tipBody  = hasVolData
+        ? 'Rate differential ÷ HV30 (30-day realised vol). Ranks pairs by carry earned per unit of vol risk — the higher the ratio, the more carry you collect relative to the pair\'s typical daily movement.'
+        : 'CB rate differential (%) between the long and short leg. Carry-to-vol ranking requires HV30 data (unavailable).';
+      const tipEx = hasVolData
+        ? 'Example: AUD/CHF +4.75% diff ÷ 8.0% HV30 = 0.59. Earns 0.59% of carry per 1% of annualised vol — strong relative to most G8 crosses.'
+        : 'Example: AUD 4.35% − CHF 0.00% = +4.35% raw differential.';
+
+      sbHead.addEventListener('mouseenter', ev => {
+        const tt = document.getElementById('fx-tt');
+        if (!tt) return;
+        document.getElementById('fx-tt-title').textContent = tipTitle;
+        document.getElementById('fx-tt-body').textContent  = tipBody;
+        const exEl = document.getElementById('fx-tt-ex');
+        exEl.textContent = tipEx; exEl.style.display = 'block';
+        tt.style.display = 'block';
+        requestAnimationFrame(() => window._fxTTPos && window._fxTTPos(ev.clientX, ev.clientY));
+      });
+      sbHead.addEventListener('mouseleave', () => {
+        const tt = document.getElementById('fx-tt');
+        if (tt) tt.style.display = 'none';
+      });
+    }
+
     container.innerHTML = top.map((p, idx) => {
       const sym  = carryTV(p.long, p.short);
       // Bar width represents the vol-adjusted carry (or gross diff as fallback)
