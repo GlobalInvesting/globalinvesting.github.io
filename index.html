@@ -529,9 +529,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">INDICATORS</span>
         <div id="lw-ma-bar" style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;"></div>
         <span class="lw-tb-sep" style="flex-shrink:0;"></span>
-        <button class="lw-tb-btn" id="lw-rsi-btn"  aria-label="Toggle RSI indicator"        aria-pressed="false" title="Relative Strength Index (14)" style="flex-shrink:0;">RSI</button>
-        <button class="lw-tb-btn" id="lw-stoch-btn" aria-label="Toggle Stochastic indicator" aria-pressed="false" title="Stochastic Oscillator (14,3,3)" style="margin-left:2px;flex-shrink:0;">STOCH</button>
-        <button class="lw-tb-btn" id="lw-macd-btn"  aria-label="Toggle MACD indicator"       aria-pressed="false" title="MACD (12,26,9)" style="margin-left:2px;flex-shrink:0;">MACD</button>
+        <button class="lw-tb-btn" id="lw-ind-btn" aria-label="Open indicators menu" aria-haspopup="true" aria-expanded="false" title="Add indicator" style="flex-shrink:0;padding:1px 8px;">Indicators &#9662;</button>
+        <div id="lw-ind-pills" style="display:inline-flex;align-items:center;gap:3px;flex-shrink:0;flex-wrap:nowrap;"></div>
       </div>
       <!-- Symbol legend bar — shown only when LW chart is active (mirrors TV widget legend) -->
       <div id="lw-chart-header" aria-live="polite">
