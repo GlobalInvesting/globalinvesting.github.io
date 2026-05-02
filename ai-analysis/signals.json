@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-05-02T04:25:41Z",
+  "generated_at": "2026-05-02T04:49:29Z",
   "signals": [
     {
       "time": "21:19",
       "priority": "critical",
-      "title": "EUR/USD — Trump Auto Tariff Escalation",
-      "text": "Trump's announcement of a 25% tariff on European autos drives immediate downside pressure on EUR/USD from its 1.1723 Friday close. This trade protectionism reduces European export competitiveness and outweighs the current EUR COT short position of -18.3k which already reflects bearish sentiment. The next ECB meeting on 30 April is the catalyst for assessing the central bank's response to these trade-induced growth risks.",
+      "title": "EUR/USD — Trump Tariff Escalation",
+      "text": "Trump's announcement of 25% tariffs on European autos sets up immediate downside pressure on EUR/USD toward the 1.1600 handle. This trade protectionism reduces European export competitiveness and reinforces the EUR COT net short of -18,293 contracts. The next ECB meeting (mkt: 100% hold priced) remains a hold, providing no hawkish offset to the trade-driven weakness.",
       "evidence": [
-        "Trump: Tariffs on European cars and trucks to increase to 25%",
+        "Trump 25% tariffs on EU autos",
         "EUR COT net short -18,293",
         "EUR/USD Friday close 1.1723"
       ],
@@ -17,48 +17,48 @@
       "time": "21:14",
       "priority": "critical",
       "title": "USD/JPY — G8 Bilateral Theme + Intervention Risk",
-      "text": "JPY's 1W momentum of +1.08% runs against the 300bp USD-JPY carry advantage following confirmed $34.5 billion yen intervention. The JPY COT net short of -88.5k creates significant squeeze risk if the pair breaks below the 157.03 Friday close as speculators are forced to cover. The next BoJ meeting is the catalyst for determining if a rate hike will support the intervention-led JPY recovery.",
+      "text": "JPY's 1W momentum (+1.08%) runs against the 300bp US-JPY yield gap, but confirmed $34.5 billion in yen intervention creates a floor for JPY strength. The JPY COT net short of -88,543 (30.6% long) presents a massive short-squeeze risk if USD/JPY breaks below recent support. The next BoJ meeting (mkt: 40% hike priced) is the catalyst for resolving whether the 0.75% rate will be hiked to further compress the carry advantage.",
       "evidence": [
         "JPY 1W avg: +1.081% (n=7)",
-        "USD 1W avg: -0.874% (n=7)",
-        "G8 spread: 1.955%",
+        "USD 1W avg: -0.879% (n=7)",
+        "G8 spread: 1.960%",
         "JPY COT net short -88,543"
       ],
       "_source": "gemini"
     },
     {
-      "time": "16:53",
+      "time": "21:14",
       "priority": "warning",
       "title": "AUD/USD — Crowded Long Unwind Risk",
-      "text": "AUD COT LF net long +48.3k (74.8% long) creates a crowded-long unwind risk despite the RBA's 4.10% rate and hike bias. While retail sentiment is 90% short, the institutional long exposure is vulnerable to a risk-off shift if US-Iran peace talks fail or oil prices spike. The next RBA meeting on 5 May is the catalyst for confirming the hawkish path required to sustain these long positions.",
+      "text": "AUD COT net long +48,299 (74.8% long) creates a significant crowded-long unwind risk despite the +35bp carry advantage over USD. While the RBA maintains a hike bias at 4.10%, the extreme retail short positioning (90% short) suggests a contrarian risk that could exacerbate a move if the 0.7200 level fails. The next RBA meeting (mkt: 0% hike priced) on 5 May determines if the hawkish bias can sustain the current bid.",
       "evidence": [
-        "AUD COT net long +48,299 (74.8% long)",
-        "RBA at 4.10% with hike bias",
-        "Retail sentiment 90% short (contrarian signal)"
+        "AUD COT net long +48,299",
+        "Retail sentiment 90% short AUD/USD",
+        "RBA 4.10% with hike bias"
       ],
       "_source": "gemini"
     },
     {
-      "time": "16:30",
+      "time": "16:28",
       "priority": "warning",
-      "title": "GBP/USD — Positioning Overstretch vs Geopolitical Risk",
-      "text": "GBP COT net long +32.6k (67.3% long) faces downside risk as US-Iran tensions and failed deal proposals drive a flight to the USD. The BoE's active hold at 3.75% limits further upside momentum for the pair which closed Friday at 1.3575. The next BoE meeting on 30 April is the catalyst for resolving whether the central bank will pivot toward June easing.",
+      "title": "USD/CAD — Oil Price Compression",
+      "text": "WTI Crude's 2.98% drop to $101.9 on US-Iran peace talk hopes weakens the CAD's fundamental support, targeting a move back toward 1.3650. The CAD COT net short of -54,703 reinforces the bearish bias as the 150bp carry advantage for USD persists. The next BoC meeting (mkt: 100% hold priced) serves as the resolution point for the current neutral policy stance.",
       "evidence": [
-        "GBP COT net long +32,637",
-        "Trump: Not satisfied with latest Iran proposal",
-        "BoE Active Hold at 3.75%"
+        "WTI Crude -2.98% ($101.9)",
+        "CAD COT net short -54,703",
+        "USD/CAD carry +150bp"
       ],
       "_source": "gemini"
     },
     {
       "time": "15:45",
       "priority": "info",
-      "title": "USD/CAD — Oil Price Compression",
-      "text": "WTI crude's 2.45% decline to $102.5 weighs on the Loonie, supporting USD/CAD upside from the 1.3586 level. CAD COT net short of -54.7k reinforces the bearish bias as the 150bp carry advantage in favor of the USD persists. The next BoC meeting on 29 April is the catalyst for determining if the central bank will address the impact of volatile energy prices on the inflation outlook.",
+      "title": "GBP/USD — Positioning Overstretch",
+      "text": "GBP COT net long +32,637 (67.3% long) suggests the 1W rally of +0.81% is reaching a point of exhaustion near 1.3600. The BoE's active hold signals June risks, which limits further upside as the carry spread remains neutral at 0bp. The next BoE meeting (mkt: 100% hold priced) is the catalyst for any shift in the current hold bias.",
       "evidence": [
-        "WTI Oil 1D: -2.45% ($102.5)",
-        "CAD COT net short -54,703",
-        "USD/CAD carry spread +150bp"
+        "GBP COT net long +32,637",
+        "GBP/USD 1W +0.81%",
+        "BoE/Fed carry spread 0bp"
       ],
       "_source": "gemini"
     }
