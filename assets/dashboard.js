@@ -2403,7 +2403,12 @@ async function renderRiskData(byId) {
       const narrTsLabel = _narrativeGeneratedAt
         ? ` · AI narrative: ${new Date(_narrativeGeneratedAt).toUTCString().slice(17, 22)} UTC`
         : '';
-      narrRegEl.title = `Live assessment · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}${narrTsLabel}`;
+      // Show AI regime mismatch in tooltip when live score differs from the regime
+      // the narrative was written under — explains why narrative tone may not match the badge.
+      const aiMismatchNote = (_narrativeAiRegime && _narrativeAiRegime !== regime)
+        ? ` · Narrative written under ${_narrativeAiRegime} (conditions changed since generation)`
+        : '';
+      narrRegEl.title = `Live assessment · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}${narrTsLabel}${aiMismatchNote}`;
     }
   }
 
@@ -6090,6 +6095,7 @@ async function buildRichNarrative() {
       baseNarrative = d.narrative || '';
       regime = d.regime || 'RISK-OFF';
       _narrativeGeneratedAt = d.generated_at || null;
+      _narrativeAiRegime   = regime.replace(/^__STALE__/, '') || null; // store raw AI regime for mismatch note
 
       // Staleness check — if the AI JSON is older than 4 hours, mark regime badge as stale
       // so users know it may not reflect current market conditions
@@ -6555,6 +6561,7 @@ let _liqData     = null;
 let _liqBaseline = null;
 let _liqSource   = null;
 let _narrativeGeneratedAt = null; // ISO timestamp of last AI narrative — written by loadAIRegime() and buildRichNarrative()
+let _narrativeAiRegime   = null; // Regime label from AI JSON (may differ from live score when market conditions changed since generation)
 
 // Interpolate a 24-hour array to 48 half-hour slots
 function _liqTo48(arr24) {
