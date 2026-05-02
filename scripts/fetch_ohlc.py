@@ -375,9 +375,15 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     "close":  round(c, dec),
                     "volume": vol,
                 })
-            # Apply prev_close open correction to legacy 1D bars
+            # Apply prev_close open correction to legacy 1D bars.
+            # After overriding the open, clamp H/L so OHLC integrity holds:
+            # H must be >= the new open; L must be <= the new open.
+            # Gap days (e.g. large overnight moves) otherwise produce H < O or L > O.
             for i in range(1, len(bars_1d_old)):
                 bars_1d_old[i]["open"] = bars_1d_old[i - 1]["close"]
+                new_o = bars_1d_old[i]["open"]
+                bars_1d_old[i]["high"] = max(bars_1d_old[i]["high"], new_o)
+                bars_1d_old[i]["low"]  = min(bars_1d_old[i]["low"],  new_o)
 
         # ── Merge: legacy 1D + 1H-aggregated (chronological) ─────────────────────
         combined = bars_1d_old + bars_1h
@@ -397,8 +403,18 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         # Apply prev_close as open across the full series.
         # Bloomberg and TradingView FX daily convention: open = prior session's close.
         # This guarantees candle body color always matches the daily pct sign.
+        # After overriding the open, clamp H/L to maintain OHLC integrity:
+        #   H = max(H, open)  — gap-up open: the open IS the session low wick anchor
+        #   L = min(L, open)  — gap-down open: the open IS the session high wick anchor
+        # Without this clamp, a gap-down session (e.g. USD/JPY on May 1 2026 where
+        # the pair opened at 160.18 per prev_close but the 1H session high was only
+        # 157.33) produces H=157.33 < O=160.18, an impossible candle that Lightweight
+        # Charts renders as a zero-body or inverted candle.
         for i in range(1, len(deduped)):
             deduped[i]["open"] = deduped[i - 1]["close"]
+            new_o = deduped[i]["open"]
+            deduped[i]["high"] = max(deduped[i]["high"], new_o)
+            deduped[i]["low"]  = min(deduped[i]["low"],  new_o)
 
         return deduped
 
