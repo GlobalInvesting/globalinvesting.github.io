@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-02T01:16:11Z",
+  "generated_at": "2026-05-02T01:26:28Z",
   "signals": [
     {
-      "time": "01:15",
+      "time": "01:26",
       "priority": "critical",
       "title": "USD/JPY — G8 Bilateral Theme + Yield Dis",
-      "text": "JPY 1W avg +1.081% (n=7) outperforms USD 1W avg -0.872% (n=7) with a G8 spread of 1.953%; the 290bp US-JGB yield gap creates USD/JPY upside pressure. Crowded JPY short -88.5k sets up squeeze risk for JPY, reinforcing USD/JPY upside. The next BoJ meeting may resolve the yield disadvantage and squeeze risk.",
+      "text": "JPY 1W avg +1.081% (n=7) outperforms USD 1W avg -0.872% (n=7), creating a 1.953% spread; the 290bp US-JGB yield gap runs against JPY momentum, setting up a potential squeeze risk due to crowded short -88.5k positions. The next BoJ meeting on 28 Apr may resolve this setup, especially considering the yield disadvantage and the strong G8 theme. ",
       "evidence": [
         "JPY 1W avg: +1.081% (n=7)",
         "USD 1W avg: -0.872% (n=7)",
@@ -13,54 +13,52 @@
       ]
     },
     {
-      "time": "01:11",
+      "time": "01:21",
       "priority": "warning",
       "title": "AUD/USD — RBA Hike Bias",
-      "text": "AUD COT LF long +48.3k (74% long) creates crowded-long unwind risk — AUD/USD closed 0.7208 Friday; RBA at 4.10% with hike bias (0% priced) sustains the bid but any disappointment triggers the unwind. The RBA meeting on 5 May determines direction in resolving this setup. Carry of +35bp for AUD vs USD may also support the pair.",
+      "text": "AUD COT LF long +48.3k (74% long) creates crowded-long unwind risk — AUD/USD closed 0.7208 Friday; RBA at 4.10% with a hike bias (0% priced) sustains the bid but any disappointment triggers the unwind. The +35bp carry advantage from RBA 4.10% vs Fed 3.75% supports the pair. The next RBA meeting on 5 May determines direction in resolving this setup.",
       "evidence": [
         "AUD COT: +48.3k (74% long)",
-        "RBA hike bias: 40% priced",
-        "AUD/USD: 0.7208"
+        "RBA rate: 4.10%",
+        "Fed rate: 3.75%"
       ]
     },
     {
-      "time": "01:10",
+      "time": "01:20",
       "priority": "warning",
       "title": "EUR/USD — Trump Tariff Escalation",
-      "text": "EUR/USD closed Friday at 1.1723; Trump tariff escalation on EU autos sets up downside pressure toward 1.16 — EUR COT short -18.3k reinforces the bias. The next ECB meeting is likely to influence the pair, but the primary driver is the tariff escalation. The carry disadvantage of -175bp for EUR vs USD also weighs on the pair.",
+      "text": "EUR/USD closed Friday at 1.1723; Trump tariff escalation on EU autos sets up downside pressure toward 1.16 — EUR COT short -18.3k reinforces the bias. The ECB rate at 2.00% and the Fed rate at 3.75% create a -175bp carry disadvantage for EUR. The next ECB meeting is likely to influence the pair's direction.",
       "evidence": [
-        "EUR/USD: 1.1723",
-        "Trump tariff escalation",
-        "EUR COT: -18.3k"
+        "EUR COT: -18.3k",
+        "ECB rate: 2.00%",
+        "Fed rate: 3.75%"
       ]
     },
     {
-      "time": "01:03",
+      "time": "01:13",
       "priority": "info",
       "title": "GBP/USD — BoE Hold",
-      "text": "GBP/USD closed Friday at 1.3575; BoE at 3.75% with Hold bias is likely to sustain the pair, but the strong long positioning of +32.6k (67.3% long) creates unwind risk. The next BoE meeting determines direction in resolving this setup. Carry of 0bp for GBP vs USD is neutral.",
+      "text": "GBP/USD closed Friday at 1.3575; BoE at 3.75% with a Hold bias (next meeting) is likely to sustain the pair, considering the +133bp carry advantage over the BoJ (BoE 3.75% vs BoJ 0.75%). However, the GBP COT long +32.6k (67.3% long) indicates potential long unwind risk if the BoE surprises with a hike.",
       "evidence": [
-        "GBP/USD: 1.3575",
-        "BoE hold: 3.75%",
-        "GBP COT: +32.6k (67.3% long)"
+        "GBP COT: +32.6k (67.3% long)",
+        "BoE rate: 3.75%"
       ]
     },
     {
-      "time": "01:02",
+      "time": "01:12",
       "priority": "info",
       "title": "USD/CAD — Oil Price Impact",
-      "text": "USD/CAD closed Friday at 1.3588; WTI crude oil price drop is likely to pressure USD/CAD, but the CAD COT short -54.7k (23.8% long) creates a potential squeeze. The next BoC meeting is likely to influence the pair, and the carry disadvantage of -150bp for CAD vs USD also affects the pair.",
+      "text": "USD/CAD closed Friday at 1.3588; WTI crude oil price movements is likely to influence the pair, especially considering the -150bp carry disadvantage from BoC 2.25% vs Fed 3.75%. The next BoC meeting will be important for resolving the pair's direction.",
       "evidence": [
-        "USD/CAD: 1.3588",
-        "WTI crude oil price drop",
-        "CAD COT: -54.7k (23.8% long)"
+        "WTI crude oil price: $102.5",
+        "BoC rate: 2.25%"
       ]
     },
     {
-      "time": "01:07",
+      "time": "01:17",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "With NZD/USD at 0.5898, the -150bp carry differential favors the USD, but specs short −16.8k sets up a notable divergence with the RBNZ's hike bias, where 40% of a hike is priced. This creates a short-squeeze risk as the market is positioned against the direction the RBNZ is signalling. The unwind of these positions is likely to be catalyzed by the RBNZ meeting on 27 May.",
+      "text": "With NZD/USD at 0.5898, the -150bp carry differential favors the USD, but specs are short −16.8k, positioning against the RBNZ's hike bias, where 40% of a hike is priced. This sets up a short-squeeze risk as the market is positioned against the direction the RBNZ is signalling, creating an asymmetric squeeze risk. The next RBNZ meeting on 27 May is likely to be the catalyst for this unwind.",
       "evidence": [
         "COT LF net: -16.8k",
         "RBNZ bias: hike (40% priced)",
