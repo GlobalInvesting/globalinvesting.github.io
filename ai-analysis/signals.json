@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-02T00:57:59Z",
+  "generated_at": "2026-05-02T01:02:09Z",
   "signals": [
     {
-      "time": "00:58",
+      "time": "01:00",
       "priority": "critical",
       "title": "USD/JPY — G8 Bilateral Theme + Yield Dis",
-      "text": "JPY 1W avg +1.081% (n=7) outperforms USD 1W avg -0.872% (n=7) with a G8 spread of 1.953%; the 290bp US-JGB yield gap runs against JPY momentum, but crowded short -88.5k sets up squeeze risk. The yield disadvantage for JPY is likely to be offset by its strong performance, setting up a potential squeeze. Next BoJ meeting is on 28 Apr, which may resolve this setup.",
+      "text": "JPY 1W avg +1.081% (n=7) vs USD -0.872% (n=7) sets up a strong bilateral theme; the 1.953% G8 spread and USD's 290bp yield advantage over JPY create a complex setup — JPY's 1W momentum runs against the yield gap, setting up squeeze risk if USD/JPY falls. The next BoJ meeting is on 28 Apr, which may resolve this setup.",
       "evidence": [
         "JPY 1W avg: +1.081% (n=7)",
         "USD 1W avg: -0.872% (n=7)",
@@ -13,54 +13,50 @@
       ]
     },
     {
-      "time": "00:51",
+      "time": "00:56",
       "priority": "warning",
-      "title": "AUD/USD — RBA Hike Bias",
-      "text": "AUD COT LF long +48.3k (74% long) creates crowded-long unwind risk — AUD/USD closed 0.7208 Friday; RBA hike bias (40% priced) sustains the bid but any disappointment triggers the unwind. The RBA meeting on 5 May determines direction in resolving this setup, with a potential hike supporting the AUD. Carry of +35bp for AUD vs USD may also sustain the bid.",
-      "evidence": [
-        "AUD COT: +48.3k (74% long)",
-        "RBA hike bias: 40% priced",
-        "AUD/USD: 0.7208"
-      ]
-    },
-    {
-      "time": "00:50",
-      "priority": "warning",
-      "title": "EUR/USD — Trump Tariff Escalation",
-      "text": "EUR/USD closed Friday at 1.1723; Trump tariff escalation on EU autos sets up downside pressure toward 1.16 — EUR COT short -18.3k reinforces the bias. The ECB meeting on 30 Apr may provide further direction, but the immediate focus is on the tariff escalation's impact on the EUR. Carry of -175bp for EUR vs USD may exacerbate the downside.",
+      "title": "EUR/USD — Tariff Escalation + ECB Hold",
+      "text": "Trump's tariff escalation on EU autos sets up downside pressure on EUR/USD toward 1.16; EUR COT short -18.3k reinforces this bias. The ECB's next meeting on 30 Apr, with a market bias toward hold, may further influence this setup, especially if the ECB maintains its current stance.",
       "evidence": [
         "EUR/USD: 1.1723",
-        "Trump tariff escalation",
-        "EUR COT: -18.3k"
+        "ECB next meeting: 30 Apr"
       ]
     },
     {
-      "time": "00:43",
-      "priority": "info",
-      "title": "GBP/USD — BoE Hold",
-      "text": "GBP/USD closed Friday at 1.3575; BoE closed at 3.75% with no change in hike bias sustains the current range — GBP COT long +32.6k supports the upside. The BoE meeting on 30 Apr is expected to be a non-event, but any surprise change in stance could impact the GBP. Carry of 0bp for GBP vs USD keeps the pair range-bound.",
+      "time": "00:55",
+      "priority": "warning",
+      "title": "AUD/USD — RBA Hike Bias + Carry",
+      "text": "AUD COT LF long +48.3k (74% long) creates crowded-long unwind risk — AUD/USD closed 0.7208 Friday; RBA hike bias (40% priced) sustains the bid, and the +35bp carry advantage over USD is likely to support AUD/USD, but any disappointment in the RBA's next meeting on 5 May triggers the unwind.",
       "evidence": [
-        "GBP/USD: 1.3575",
-        "BoE hold: 3.75%",
-        "GBP COT: +32.6k"
+        "AUD/USD: 0.7208",
+        "RBA next meeting: 5 May"
       ]
     },
     {
-      "time": "00:42",
+      "time": "00:48",
       "priority": "info",
-      "title": "USD/CAD — Oil Price Impact",
-      "text": "USD/CAD closed Friday at 1.3588; WTI crude oil price drop is likely to support the CAD, but USD/CAD remains range-bound — CAD COT short -54.7k suggests downside risk. The next BoC meeting on 29 Apr may provide further direction, but the immediate focus is on the oil price's impact on the CAD. Carry of -50bp for CAD vs USD may exacerbate the downside.",
+      "title": "USD/CAD — BoC Hold + Oil Price",
+      "text": "USD/CAD closed at 1.3588 Friday, with CAD COT short -54.7k; the next BoC meeting on 29 Apr, with a market bias toward hold, and the recent drop in WTI oil price is likely to influence USD/CAD, especially if the BoC maintains its current stance.",
       "evidence": [
         "USD/CAD: 1.3588",
-        "WTI crude oil price drop",
-        "CAD COT: -54.7k"
+        "BoC next meeting: 29 Apr"
       ]
     },
     {
       "time": "00:47",
+      "priority": "info",
+      "title": "GBP/USD — BoE Hold + Logan Comments",
+      "text": "GBP/USD closed at 1.3575 Friday, with GBP COT long +32.6k; Fed's Logan comments on the potential for a rate cut or hike, and the next BoE meeting on 30 Apr, with a market bias toward hold, is likely to influence GBP/USD, particularly if the BoE's stance aligns with market expectations.",
+      "evidence": [
+        "GBP/USD: 1.3575",
+        "BoE next meeting: 30 Apr"
+      ]
+    },
+    {
+      "time": "00:52",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "With NZD/USD trading at 0.5898, the -150bp carry differential favors the USD, but the fundamental backdrop sets up an interesting dynamic. Specs are short −16.8k, while the RBNZ's bias is towards a hike, with 40% of a hike priced in. This divergence creates risk of a short-squeeze, as the market is positioned against the direction the RBNZ is signaling. The next RBNZ meeting on 27 May is likely to be the catalyst for this unwind, pointing to a potential reversal in the pair's recent move.",
+      "text": "With NZD/USD at 0.5898, the -150bp carry differential favors the USD, but specs are short −16.8k, setting up a divergence with the RBNZ's hike bias, where 40% of a hike is priced. This creates a short-squeeze risk, as the market is positioned against the direction the RBNZ is signaling. The unwind of these positions is likely to be catalyzed by the next RBNZ meeting on 27 May.",
       "evidence": [
         "COT LF net: -16.8k",
         "RBNZ bias: hike (40% priced)",
