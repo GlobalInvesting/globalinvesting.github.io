@@ -3747,6 +3747,279 @@ async function _renderLWChart(ohlcId, label) {
   }
   _applyMarkers();
 
+  // ── Oscillator sub-panes: RSI, Stochastic, MACD ─────────────────────────────
+  // Industry standard: oscillators rendered in separate panes below the main price chart.
+  // Bloomberg, Eikon, TradingView all use this layout for RSI, MACD and Stochastics.
+  // LWC v5 supports createPane() for true multi-pane layouts on the same time axis.
+
+  // ── Calculation helpers ──────────────────────────────────────────────────────
+
+  function _calcRSI(bars, period) {
+    if (period === undefined) period = 14;
+    const out = [];
+    if (bars.length < period + 1) return out;
+    let gains = 0, losses = 0;
+    for (let i = 1; i <= period; i++) {
+      const d = bars[i].close - bars[i - 1].close;
+      if (d >= 0) gains += d; else losses -= d;
+    }
+    let avgGain = gains / period;
+    let avgLoss = losses / period;
+    for (let i = period; i < bars.length; i++) {
+      if (i > period) {
+        const d = bars[i].close - bars[i - 1].close;
+        avgGain = (avgGain * (period - 1) + (d >= 0 ? d : 0)) / period;
+        avgLoss = (avgLoss * (period - 1) + (d <  0 ? -d : 0)) / period;
+      }
+      const rs  = avgLoss === 0 ? Infinity : avgGain / avgLoss;
+      const rsi = avgLoss === 0 ? 100 : 100 - 100 / (1 + rs);
+      out.push({ time: bars[i].time, value: parseFloat(rsi.toFixed(2)) });
+    }
+    return out;
+  }
+
+  function _calcEMA(values, period) {
+    const k = 2 / (period + 1);
+    const out = [];
+    let ema = values[0];
+    out.push(ema);
+    for (let i = 1; i < values.length; i++) {
+      ema = values[i] * k + ema * (1 - k);
+      out.push(ema);
+    }
+    return out;
+  }
+
+  function _calcMACD(bars, fast, slow, signal) {
+    if (fast === undefined)   fast   = 12;
+    if (slow === undefined)   slow   = 26;
+    if (signal === undefined) signal = 9;
+    const closes = bars.map(b => b.close);
+    if (closes.length < slow) return { macd: [], signal: [], hist: [] };
+    const emaFast = _calcEMA(closes, fast);
+    const emaSlow = _calcEMA(closes, slow);
+    const macdLine = emaFast.map((v, i) => v - emaSlow[i]);
+    // Signal line is EMA of macd starting from index (slow-1)
+    const macdFromSlow = macdLine.slice(slow - 1);
+    const signalLine  = _calcEMA(macdFromSlow, signal);
+    const out = { macd: [], signal: [], hist: [] };
+    const offset = slow - 1 + signal - 1;
+    for (let i = offset; i < bars.length; i++) {
+      const si  = i - (slow - 1);       // index into macdFromSlow
+      const sgi = si - (signal - 1);    // index into signalLine
+      const m   = macdLine[i];
+      const s   = signalLine[sgi];
+      const h   = m - s;
+      out.macd.push(  { time: bars[i].time, value: parseFloat(m.toFixed(6)) });
+      out.signal.push({ time: bars[i].time, value: parseFloat(s.toFixed(6)) });
+      out.hist.push(  { time: bars[i].time, value: parseFloat(h.toFixed(6)),
+                        color: h >= 0 ? 'rgba(38,166,154,0.7)' : 'rgba(239,83,80,0.7)' });
+    }
+    return out;
+  }
+
+  function _calcStochastic(bars, kPeriod, smoothK, smoothD) {
+    if (kPeriod === undefined) kPeriod = 14;
+    if (smoothK === undefined) smoothK = 3;
+    if (smoothD === undefined) smoothD = 3;
+    const rawK = [];
+    for (let i = kPeriod - 1; i < bars.length; i++) {
+      const slice = bars.slice(i - kPeriod + 1, i + 1);
+      const high  = Math.max(...slice.map(b => b.high));
+      const low   = Math.min(...slice.map(b => b.low));
+      const close = bars[i].close;
+      const k = high === low ? 50 : ((close - low) / (high - low)) * 100;
+      rawK.push({ time: bars[i].time, value: k });
+    }
+    // Smooth %K
+    function _sma(arr, n) {
+      const out = [];
+      for (let i = n - 1; i < arr.length; i++) {
+        const s = arr.slice(i - n + 1, i + 1).reduce((a, b) => a + b.value, 0) / n;
+        out.push({ time: arr[i].time, value: parseFloat(s.toFixed(2)) });
+      }
+      return out;
+    }
+    const kSmoothed = _sma(rawK, smoothK);
+    const dLine     = _sma(kSmoothed, smoothD);
+    return { k: kSmoothed, d: dLine };
+  }
+
+  // ── Oscillator state (persist across symbol switches like _lwMaState) ────────
+  if (typeof window._lwOscState === 'undefined') {
+    window._lwOscState = { rsi: false, stoch: false, macd: false };
+  }
+
+  // Pane refs — reset on every chart render (chart was destroyed)
+  let _rsiPane   = null, _rsiSeries  = null;
+  let _stochPane = null, _stochK = null, _stochD = null;
+  let _macdPane  = null, _macdLine = null, _macdSignal = null, _macdHist = null;
+
+  // Small legend div injected into each oscillator pane
+  function _makePaneLegend(paneEl, id) {
+    const el = document.createElement('div');
+    el.id  = id;
+    el.style.cssText = 'position:absolute;top:4px;left:8px;z-index:3;pointer-events:none;'
+      + 'font-size:10px;font-family:var(--font-mono,monospace);line-height:1.3;user-select:none;color:#d1d4dc;';
+    paneEl.appendChild(el);
+    return el;
+  }
+
+  function _buildRSIPane() {
+    if (!window._lwOscState.rsi) { if (_rsiPane) { try { _lwChart.removePane(_rsiPane); } catch(_) {} _rsiPane = null; _rsiSeries = null; } return; }
+    try {
+      const rsiData = _calcRSI(bars, 14);
+      if (rsiData.length === 0) return;
+      _rsiPane = _lwChart.addPane({ height: 80 });
+      _rsiSeries = _rsiPane.addSeries(LWC.LineSeries, {
+        color: '#9c27b0', lineWidth: 1,
+        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: true,
+        priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
+      });
+      _rsiSeries.setData(rsiData);
+      // Overbought/sold reference lines
+      [30, 50, 70].forEach(level => {
+        _rsiPane.addSeries(LWC.LineSeries, {
+          color: level === 50 ? 'rgba(120,123,134,0.3)' : 'rgba(239,83,80,0.25)',
+          lineWidth: 1, lineStyle: 2, // dashed
+          priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+          priceFormat: { type: 'price', precision: 0, minMove: 1 },
+        }).setData(bars.map(b => ({ time: b.time, value: level })).slice(-rsiData.length - 1));
+      });
+      // Pane label
+      const paneDiv = _rsiPane.getElement ? _rsiPane.getElement() : null;
+      if (paneDiv) {
+        paneDiv.style.position = 'relative';
+        _makePaneLegend(paneDiv, '_lw-rsi-legend').textContent = 'RSI(14)';
+      }
+    } catch(e) { console.warn('[LW] RSI pane error:', e); }
+  }
+
+  function _buildStochPane() {
+    if (!window._lwOscState.stoch) { if (_stochPane) { try { _lwChart.removePane(_stochPane); } catch(_) {} _stochPane = null; _stochK = null; _stochD = null; } return; }
+    try {
+      const st = _calcStochastic(bars, 14, 3, 3);
+      if (st.k.length === 0) return;
+      _stochPane = _lwChart.addPane({ height: 80 });
+      _stochK = _stochPane.addSeries(LWC.LineSeries, {
+        color: '#2196f3', lineWidth: 1,
+        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: true,
+        priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
+      });
+      _stochK.setData(st.k);
+      _stochD = _stochPane.addSeries(LWC.LineSeries, {
+        color: '#ff9800', lineWidth: 1,
+        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+        priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
+      });
+      _stochD.setData(st.d);
+      // 20/80 reference lines
+      [20, 50, 80].forEach(level => {
+        _stochPane.addSeries(LWC.LineSeries, {
+          color: level === 50 ? 'rgba(120,123,134,0.3)' : 'rgba(239,83,80,0.25)',
+          lineWidth: 1, lineStyle: 2,
+          priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+          priceFormat: { type: 'price', precision: 0, minMove: 1 },
+        }).setData(bars.map(b => ({ time: b.time, value: level })).slice(-st.k.length - 10));
+      });
+      const paneDiv = _stochPane.getElement ? _stochPane.getElement() : null;
+      if (paneDiv) {
+        paneDiv.style.position = 'relative';
+        _makePaneLegend(paneDiv, '_lw-stoch-legend').innerHTML =
+          '<span style="color:#2196f3">%K(14,3)</span> <span style="color:#ff9800">%D(3)</span>';
+      }
+    } catch(e) { console.warn('[LW] Stoch pane error:', e); }
+  }
+
+  function _buildMACDPane() {
+    if (!window._lwOscState.macd) { if (_macdPane) { try { _lwChart.removePane(_macdPane); } catch(_) {} _macdPane = null; _macdLine = null; _macdSignal = null; _macdHist = null; } return; }
+    try {
+      const md = _calcMACD(bars, 12, 26, 9);
+      if (md.macd.length === 0) return;
+      _macdPane = _lwChart.addPane({ height: 90 });
+      // Histogram
+      _macdHist = _macdPane.addSeries(
+        typeof LWC.HistogramSeries !== 'undefined' ? LWC.HistogramSeries : null, {
+          priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+          priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
+        });
+      if (!_macdHist && typeof _macdPane.addHistogramSeries === 'function') {
+        _macdHist = _macdPane.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false });
+      }
+      if (_macdHist) _macdHist.setData(md.hist);
+      // MACD line
+      _macdLine = _macdPane.addSeries(LWC.LineSeries, {
+        color: '#2196f3', lineWidth: 1,
+        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: true,
+        priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
+      });
+      _macdLine.setData(md.macd);
+      // Signal line
+      _macdSignal = _macdPane.addSeries(LWC.LineSeries, {
+        color: '#ff9800', lineWidth: 1,
+        priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+        priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
+      });
+      _macdSignal.setData(md.signal);
+      const paneDiv = _macdPane.getElement ? _macdPane.getElement() : null;
+      if (paneDiv) {
+        paneDiv.style.position = 'relative';
+        _makePaneLegend(paneDiv, '_lw-macd-legend').innerHTML =
+          'MACD(12,26,9) <span style="color:#2196f3">MACD</span> <span style="color:#ff9800">Signal</span>';
+      }
+    } catch(e) { console.warn('[LW] MACD pane error:', e); }
+  }
+
+  function _syncOscBtns() {
+    const rsiBtn   = document.getElementById('lw-rsi-btn');
+    const stochBtn = document.getElementById('lw-stoch-btn');
+    const macdBtn  = document.getElementById('lw-macd-btn');
+    if (rsiBtn)   { rsiBtn.classList.toggle('on', window._lwOscState.rsi);   rsiBtn.setAttribute('aria-pressed', window._lwOscState.rsi   ? 'true' : 'false'); }
+    if (stochBtn) { stochBtn.classList.toggle('on', window._lwOscState.stoch); stochBtn.setAttribute('aria-pressed', window._lwOscState.stoch ? 'true' : 'false'); }
+    if (macdBtn)  { macdBtn.classList.toggle('on', window._lwOscState.macd);  macdBtn.setAttribute('aria-pressed', window._lwOscState.macd  ? 'true' : 'false'); }
+  }
+
+  // Build whichever oscillators are currently enabled
+  _buildRSIPane();
+  _buildStochPane();
+  _buildMACDPane();
+  _syncOscBtns();
+
+  // Toggle handlers (delegated via document to survive chart re-renders)
+  function _handleOscToggle(e) {
+    if (!_lwChart) return;
+    const id = e.currentTarget ? e.currentTarget.id : e.target.id;
+    if (id === 'lw-rsi-btn') {
+      window._lwOscState.rsi = !window._lwOscState.rsi;
+      if (_rsiPane) { try { _lwChart.removePane(_rsiPane); } catch(_) {} _rsiPane = null; _rsiSeries = null; }
+      _buildRSIPane();
+      _syncOscBtns();
+    } else if (id === 'lw-stoch-btn') {
+      window._lwOscState.stoch = !window._lwOscState.stoch;
+      if (_stochPane) { try { _lwChart.removePane(_stochPane); } catch(_) {} _stochPane = null; _stochK = null; _stochD = null; }
+      _buildStochPane();
+      _syncOscBtns();
+    } else if (id === 'lw-macd-btn') {
+      window._lwOscState.macd = !window._lwOscState.macd;
+      if (_macdPane) { try { _lwChart.removePane(_macdPane); } catch(_) {} _macdPane = null; _macdLine = null; _macdSignal = null; _macdHist = null; }
+      _buildMACDPane();
+      _syncOscBtns();
+    }
+  }
+
+  // Attach handlers — re-attach each render (fresh buttons after toolbar re-render)
+  ['lw-rsi-btn', 'lw-stoch-btn', 'lw-macd-btn'].forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      // Clone to remove any prior listeners from previous chart renders
+      const fresh = btn.cloneNode(true);
+      btn.parentNode.replaceChild(fresh, btn);
+      fresh.addEventListener('click', _handleOscToggle);
+    }
+  });
+  // Re-sync styles after clone
+  _syncOscBtns();
+
   // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
   function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '\u2014'; }
 
