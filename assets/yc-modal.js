@@ -168,7 +168,7 @@ function openYCModal(tenorData) {
   if (!Array.isArray(tenorData) || tenorData.length === 0) return;
 
   const shape    = _ycShape(tenorData);
-  const shapeColors = { Inverted: '#ef4444', Flat: '#f59e0b', Normal: '#22c55e', Steep: '#4f7fff' };
+  const shapeColors = { Inverted: '#ef4444', Flat: '#f59e0b', Normal: '#26a69a', Steep: '#4f7fff' };
   const shapeCol = shapeColors[shape] || 'var(--text3)';
 
   const labels    = tenorData.map(t => t.label);
