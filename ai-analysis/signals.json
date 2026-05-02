@@ -1,33 +1,22 @@
 {
-  "generated_at": "2026-05-02T00:37:43Z",
+  "generated_at": "2026-05-02T00:47:39Z",
   "signals": [
     {
-      "time": "00:37",
+      "time": "00:47",
       "priority": "critical",
-      "title": "AUD/USD — RBA Hike Bias",
-      "text": "AUD COT LF long +48.3k (74% long) creates crowded-long unwind risk — AUD/USD closed 0.7208 Friday; RBA hike bias (0% priced) sustains the bid but any disappointment triggers the unwind. The RBA's 4.10% rate with a hike bias supports the Aussie, while the +35bp carry advantage over the Fed's 3.75% rate adds to the upside pressure. The next RBA meeting on May 5 will be the catalyst to resolve this setup.",
+      "title": "AUD/USD — Trump Tariff Escalation",
+      "text": "AUD COT LF long +48.3k (74% long) creates crowded-long unwind risk — AUD/USD closed 0.7208 Friday; RBA hike bias (0% priced) sustains the bid but any disappointment triggers the unwind. The unwind mechanism is driven by the potential disappointment from the RBA meeting. The catalyst for this setup is the next RBA meeting on 5 May.",
       "evidence": [
         "AUD COT LF long +48.3k",
-        "RBA hike bias (40% priced)",
+        "RBA hike bias 40% priced",
         "AUD/USD closed 0.7208 Friday"
       ]
     },
     {
-      "time": "00:31",
+      "time": "00:41",
       "priority": "warning",
-      "title": "JPY/USD — G8 Bilateral Theme + Yield Disadvantage",
-      "text": "JPY's 1W momentum (+1.08%) runs against the 290bp US-JGB yield gap, setting up a yield-driven unwind. The JPY's recent strength, with a 1W average of +1.081% (n=7 pairs), contrasts with the USD's weakness, averaging -0.872% (n=7 pairs), resulting in a G8 spread of 1.953%. The next BoJ meeting will be the catalyst to resolve this yield disadvantage-driven setup.",
-      "evidence": [
-        "JPY 1W avg: +1.081% (n=7)",
-        "USD 1W avg: -0.872% (n=7)",
-        "G8 spread: 1.953%"
-      ]
-    },
-    {
-      "time": "00:30",
-      "priority": "warning",
-      "title": "EUR/USD — Tariff Escalation",
-      "text": "EUR/USD closed Friday at 1.1723; Trump tariff escalation on EU autos sets up downside pressure toward 1.16 — EUR COT short -18.3k reinforces the bias. The tariff escalation acts as a catalyst for the EUR/USD move, driven by the mechanism of trade tensions impacting the euro. The next ECB meeting on April 30 will influence the euro's direction.",
+      "title": "EUR/USD — Trump Tariff Escalation",
+      "text": "EUR/USD closed Friday at 1.1723; Trump tariff escalation on EU autos sets up downside pressure toward 1.16 — EUR COT short -18.3k reinforces the bias. The downside pressure is driven by the tariff escalation, which may weaken the euro. The catalyst for this setup is the upcoming ECB meeting on 30 Apr.",
       "evidence": [
         "EUR/USD closed 1.1723 Friday",
         "Trump tariff escalation on EU autos",
@@ -35,37 +24,47 @@
       ]
     },
     {
-      "time": "00:23",
-      "priority": "info",
-      "text": "The current regime is mixed, with the VIX at 17.0 and the SPX up 0.29%, indicating a neutral market environment. The AUD/USD and AUD/NZD pairs show extreme short positioning among retail traders, with 90% short, which could lead to a contrarian reversal. The G8 currency strength scorecard shows the JPY as the leader, with a 1W average of +1.081%, while the USD is the laggard, with a 1W average of -0.872%.",
+      "time": "00:40",
+      "priority": "warning",
+      "title": "JPY/USD — G8 Bilateral Theme + Yield Advantage",
+      "text": "JPY 1W avg +1.081% (n=7) outperforms USD 1W avg -0.872% (n=7) with a G8 spread of 1.953%, setting up a strong bilateral theme. The yield advantage of USD over JPY by approximately 340bp is likely to sustain the USD bid. The catalyst for this setup is the next BoJ meeting.",
       "evidence": [
-        "VIX: 17.0",
-        "SPX: +0.29%",
-        "AUD/USD: 90% short",
-        "G8 scorecard: JPY +1.081%, USD -0.872%"
-      ],
-      "title": ""
-    },
-    {
-      "time": "00:22",
-      "priority": "info",
-      "title": "GBP/USD — BoE Hold",
-      "text": "GBP/USD closed Friday at 1.3575, with the BoE holding its rate at 3.75% and a market bias towards a hold. The GBP COT long position of +32.6k (67.3% long) supports the pound, but the lack of a rate hike may lead to a unwind of long positions. The next BoE meeting on April 30 will provide clarity on the BoE's stance.",
-      "evidence": [
-        "GBP/USD closed 1.3575 Friday",
-        "BoE hold at 3.75%",
-        "GBP COT long +32.6k"
+        "JPY 1W avg: +1.081% (n=7)",
+        "USD 1W avg: -0.872% (n=7)",
+        "G8 spread: 1.953%"
       ]
     },
     {
-      "time": "00:27",
+      "time": "00:33",
+      "priority": "info",
+      "title": "USD/CHF — Carry Context",
+      "text": "The USD/CHF pair has a carry advantage of approximately 375bp, with the Fed rate at 3.75% and the SNB rate at 0%. This is likely to sustain the USD bid. The catalyst for this setup is the next SNB meeting on 18 Jun. The CHF/JPY pair has a strong short bias in retail sentiment, which may lead to a contrarian reversal risk.",
+      "evidence": [
+        "USD/CHF carry: +375bp",
+        "Fed rate: 3.75%",
+        "SNB rate: 0%"
+      ]
+    },
+    {
+      "time": "00:38",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "With NZD/USD at 0.5898, the -150bp carry differential favors the USD, but specs are short -16.8k contracts, which sets up a short-squeeze risk as the RBNZ's forward bias points to a hike, with 40% of a hike priced in. This divergence creates risk of a sharp unwind, likely to pressure the pair higher. The next RBNZ meeting on 27 May is a key catalyst as the key catalyst.",
+      "text": "With NZD/USD at 0.5898, the -150bp carry differential favors the USD, but specs are short -16.8k contracts, which sets up a short-squeeze risk as the RBNZ's forward bias points to a hike, with 40% of a hike priced in. This divergence creates risk of a sharp unwind, likely to propel NZD/USD higher. The next RBNZ meeting on 27 May is a key catalyst as the key catalyst.",
       "evidence": [
         "COT LF net: -16.8k",
         "RBNZ bias: hike (40% priced)",
         "NZD/USD at 0.5898"
+      ]
+    },
+    {
+      "time": "00:37",
+      "priority": "warning",
+      "title": "USD/JPY — COT vs OIS Divergence + BoJ",
+      "text": "With the USD/JPY carry differential at +300bp, favoring the USD, and the pair currently trading at 157.03, specs short −88.5k sets up a notable divergence with the BoJ's forward bias, which has a 40% hike priced in. This creates a short-squeeze risk, as the market is positioned against the direction the BoJ is signaling. The unwind of these positions is likely to be catalyzed by the next BoJ meeting on 28 Apr.",
+      "evidence": [
+        "COT LF net: -88.5k",
+        "BoJ bias: hike (40% priced)",
+        "USD/JPY at 157.03"
       ]
     }
   ]
