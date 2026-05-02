@@ -1,9 +1,9 @@
 {
-  "updated_utc": "2026-05-02T00:03:04.925681+00:00",
-  "updated_label": "00:03 UTC",
+  "updated_utc": "2026-05-02T03:47:23.123350+00:00",
+  "updated_label": "03:47 UTC",
   "total": 52,
-  "total_high": 52,
-  "total_med": 0,
+  "total_high": 49,
+  "total_med": 3,
   "sources_active": [
     "ActionForex",
     "BabyPips",
@@ -13,10 +13,11 @@
     "InvestingLive",
     "Marc to Market",
     "MarketPulse",
+    "NewsData AUD",
     "NewsData CHF",
     "NewsData EUR",
     "NewsData GBP",
-    "NewsData NZD"
+    "NewsData USD"
   ],
   "lang_counts": {
     "es": 0,
@@ -33,7 +34,7 @@
       "link": "https://investinglive.com/news/investinglive-americas-market-news-wrap-trump-raises-tariffs-on-european-autos-20260501/",
       "time": "21:19",
       "ts": 1777670395000,
-      "featured": true,
+      "featured": false,
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T21:19:55+00:00",
@@ -49,7 +50,7 @@
       "link": "https://www.babypips.com/analysis/forex-weekly-recap-2026-05-01-yen-intervention-fomc-split-vote",
       "time": "21:14",
       "ts": 1777670040000,
-      "featured": true,
+      "featured": false,
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T21:14:00+00:00",
@@ -104,6 +105,38 @@
       "recent": true
     },
     {
+      "id": "f21aabdf821e",
+      "cur": "USD",
+      "impact": "high",
+      "title": "US warns of sanctions on ships paying Iran for Strait of Hormuz passage",
+      "expand": "The Strait of Hormuz remains one of the world’s most critical maritime routes, handling nearly 20% of global seaborne crude oil and liquefied natural gas flows.",
+      "source": "NewsData USD",
+      "link": "https://www.moneycontrol.com/world/us-warns-of-sanctions-on-ships-paying-iran-for-strait-of-hormuz-passage-article-13905666.html",
+      "time": "15:45",
+      "ts": 1777650357000,
+      "featured": false,
+      "lang": "en",
+      "date": "01 May",
+      "datetime": "2026-05-01T15:45:57+00:00",
+      "recent": true
+    },
+    {
+      "id": "eba0547eb1b4",
+      "cur": "EUR",
+      "impact": "high",
+      "title": "Bank of England Active Hold Signals June Risks: Rabobank Analysis",
+      "expand": "BitcoinWorld Bank of England Active Hold Signals June Risks: Rabobank Analysis The Bank of England maintains an active hold on interest rates, but Rabobank analysts warn of significant risks emerging in June. This stance reflects a delicate balancing act between controlling inflation and supporting economic growth. Understanding these dynamics is c...",
+      "source": "NewsData EUR",
+      "link": "https://bitcoinworld.co.in/bank-of-england-active-hold-risks/",
+      "time": "15:45",
+      "ts": 1777650311000,
+      "featured": false,
+      "lang": "en",
+      "date": "01 May",
+      "datetime": "2026-05-01T15:45:11+00:00",
+      "recent": true
+    },
+    {
       "id": "36ed1855622c",
       "cur": "EUR",
       "impact": "high",
@@ -117,6 +150,22 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T15:18:45+00:00",
+      "recent": true
+    },
+    {
+      "id": "41e21b88401c",
+      "cur": "AUD",
+      "impact": "high",
+      "title": "AUD/USD Holds Steady Near Recent Highs as Anticipated RBA Rate Hike Looms",
+      "expand": "BitcoinWorld AUD/USD Holds Steady Near Recent Highs as Anticipated RBA Rate Hike Looms The Australian dollar held steady against its US counterpart on Wednesday, trading near recent highs as markets widely anticipate a rate hike from the Reserve Bank of Australia. The AUD/USD pair remains supported by strong commodity prices and a hawkish RBA stanc...",
+      "source": "NewsData AUD",
+      "link": "https://bitcoinworld.co.in/aud-usd-rba-rate-hike/",
+      "time": "14:35",
+      "ts": 1777646111000,
+      "featured": false,
+      "lang": "en",
+      "date": "01 May",
+      "datetime": "2026-05-01T14:35:11+00:00",
       "recent": true
     },
     {
@@ -152,6 +201,22 @@
       "recent": true
     },
     {
+      "id": "465dd4e7de78",
+      "cur": "CHF",
+      "impact": "med",
+      "title": "USD/CHF Forecast 01/05: US Dollar Drops As Rates Fall",
+      "expand": "(MENAFN - Daily Forex) The US dollar has fallen against the Swiss Franc pretty significantly during the early hours on Thursday but has since shown signs of bouncing from a previous resistance ...",
+      "source": "NewsData CHF",
+      "link": "https://menafn.com/1111059745/USDCHF-Forecast-0105-US-Dollar-Drops-As-Rates-Fall",
+      "time": "14:11",
+      "ts": 1777644709000,
+      "featured": false,
+      "lang": "en",
+      "date": "01 May",
+      "datetime": "2026-05-01T14:11:49+00:00",
+      "recent": true
+    },
+    {
       "id": "46539d20e90f",
       "cur": "NZD",
       "impact": "high",
@@ -165,6 +230,22 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T14:08:20+00:00",
+      "recent": true
+    },
+    {
+      "id": "c90024405d64",
+      "cur": "GBP",
+      "impact": "high",
+      "title": "‘Temu Range Rover’: what the best-selling Jaecoo 7 says about China’s electric car ascendancy",
+      "expand": "Loaded with extras and produced at a cut price, the crossover SUV has overtaken rival cars from US, Japanese and Korean firms The UK is no stranger to foreign cars. The bestseller lists in recent years have been dominated by the US’s Ford Puma, Japan’s Nissan Qashqai, Korea’s Kia Sportage and occasionally even Tesla’s Model Y. But in March the top ...",
+      "source": "NewsData GBP",
+      "link": "https://www.theguardian.com/business/2026/may/01/jaecoo-7-china-electric-car-chery-price-temu-range-rover",
+      "time": "14:00",
+      "ts": 1777644000000,
+      "featured": false,
+      "lang": "en",
+      "date": "01 May",
+      "datetime": "2026-05-01T14:00:00+00:00",
       "recent": true
     },
     {
@@ -200,6 +281,22 @@
       "recent": true
     },
     {
+      "id": "2dcd635f33d9",
+      "cur": "CHF",
+      "impact": "med",
+      "title": "Week in Focus: US NFP, ISM Services PMI, RBA, Canadian Jobs and OPEC+",
+      "expand": "Market Analysis by covering: Euro US Dollar, British Pound US Dollar, US Dollar Japanese Yen, US Dollar Canadian Dollar. Read 's Market Analysis on Investing.com NG.",
+      "source": "NewsData CHF",
+      "link": "https://ng.investing.com/analysis/week-in-focus-us-nfp-ism-services-pmi-rba-canadian-jobs-and-opec-215826",
+      "time": "13:33",
+      "ts": 1777642380000,
+      "featured": false,
+      "lang": "en",
+      "date": "01 May",
+      "datetime": "2026-05-01T13:33:00+00:00",
+      "recent": true
+    },
+    {
       "id": "5b859e2694a9",
       "cur": "AUD",
       "impact": "high",
@@ -213,6 +310,22 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T13:30:19+00:00",
+      "recent": true
+    },
+    {
+      "id": "475741ce1621",
+      "cur": "AUD",
+      "impact": "high",
+      "title": "Transcript: Cboe Global Markets Q1 2026 Earnings Conference Call",
+      "expand": "Cboe Global Markets (BATS: CBOE ) released first-quarter financial results and hosted an earnings call on Friday. Read the complete transcript below. This transcript is brought to you by Benzinga APIs. For real-time access to our entire catalog, please visit https://www.benzinga.com/apis/ for a consultation. View the webcast at https://events.q4inc...",
+      "source": "NewsData AUD",
+      "link": "https://www.benzinga.com/insights/news/26/05/52211619/transcript-cboe-global-markets-q1-2026-earnings-conference-call",
+      "time": "13:28",
+      "ts": 1777642123000,
+      "featured": false,
+      "lang": "en",
+      "date": "01 May",
+      "datetime": "2026-05-01T13:28:43+00:00",
       "recent": true
     },
     {
@@ -328,70 +441,6 @@
       "recent": true
     },
     {
-      "id": "8e23a123a081",
-      "cur": "EUR",
-      "impact": "high",
-      "title": "Fed's Beth Hammack explains her dissent over central bank's bias toward cutting rates",
-      "expand": "Cleveland Fed president Beth Hammack said Friday that while she supported holding interest rates steady at this week’s Fed policy meeting, she dissented...",
-      "source": "NewsData EUR",
-      "link": "https://ca.finance.yahoo.com/news/feds-beth-hammack-explains-her-dissent-over-central-banks-bias-toward-cutting-rates-120208714.html",
-      "time": "12:02",
-      "ts": 1777636928000,
-      "featured": false,
-      "lang": "en",
-      "date": "01 May",
-      "datetime": "2026-05-01T12:02:08+00:00",
-      "recent": true
-    },
-    {
-      "id": "e83b96a70026",
-      "cur": "EUR",
-      "impact": "high",
-      "title": "Fed dissenters speak out: 'The next rate change could be either a cut or a hike'",
-      "expand": "Cleveland Fed president Beth Hammack said Friday that while she supported holding interest rates steady at this week's Fed policy meeting, she dissented...",
-      "source": "NewsData EUR",
-      "link": "https://finance.yahoo.com/economy/policy/article/fed-dissenters-speak-out-the-next-rate-change-could-be-either-a-cut-or-a-hike-120208774.html",
-      "time": "12:02",
-      "ts": 1777636928000,
-      "featured": false,
-      "lang": "en",
-      "date": "01 May",
-      "datetime": "2026-05-01T12:02:08+00:00",
-      "recent": true
-    },
-    {
-      "id": "81a0e62f7776",
-      "cur": "NZD",
-      "impact": "high",
-      "title": "From banking to AI, these are the key international economic bodies based in China",
-      "expand": "The recent launch of the World Data Organization in Beijing added another node to a growing network of bodies headquartered in China with international participation and cross-border mandates. China is fostering these lenders, institutions and intergovernmental organisations as President Xi Jinping pushes for improved “global governance”. The move ...",
-      "source": "NewsData NZD",
-      "link": "https://www.scmp.com/economy/china-economy/article/3350687/banking-ai-these-are-key-international-economic-bodies-based-china",
-      "time": "12:00",
-      "ts": 1777636808000,
-      "featured": false,
-      "lang": "en",
-      "date": "01 May",
-      "datetime": "2026-05-01T12:00:08+00:00",
-      "recent": true
-    },
-    {
-      "id": "cb292efd1c4e",
-      "cur": "GBP",
-      "impact": "high",
-      "title": "Heartbreak for punters as 366 pubs are WIPED OUT in 2025 with map of misery showing the worst hotspots for closures",
-      "expand": "BRITAIN is facing a pint-sized crisis as local boozers are being torn down at a rate of one every single day. Shocking new figures have revealed that 366 beloved pubs were wiped off the map in 2025 as the industry battles a perfect storm of soaring costs and dwindling margins. Grim new date by global...",
-      "source": "NewsData GBP",
-      "link": "https://www.thesun.co.uk/money/38986659/heartbreak-punters-366-pubs-wiped-out-map-misery/",
-      "time": "11:45",
-      "ts": 1777635938000,
-      "featured": false,
-      "lang": "en",
-      "date": "01 May",
-      "datetime": "2026-05-01T11:45:38+00:00",
-      "recent": true
-    },
-    {
       "id": "0ca98b8870b1",
       "cur": "EUR",
       "impact": "high",
@@ -405,22 +454,6 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T11:20:13+00:00",
-      "recent": true
-    },
-    {
-      "id": "912fb72408bd",
-      "cur": "GBP",
-      "impact": "high",
-      "title": "Pound holds near 10-week high as BoE stays on hold",
-      "expand": "The British pound held close to a 10-week high against the US dollar on Friday. Traders assessed a week dominated by central bank decisions. The Bank of England (BoE) kept interest rates unchanged. It also warned about inflation risks linked to the Iran war. Sterling was little changed at $1.3606. It was slightly weaker against the euro at 86.32 pe...",
-      "source": "NewsData GBP",
-      "link": "https://invezz.com/news/2026/05/01/pound-holds-near-10-week-high-as-boe-stays-on-hold/",
-      "time": "11:13",
-      "ts": 1777633989000,
-      "featured": false,
-      "lang": "en",
-      "date": "01 May",
-      "datetime": "2026-05-01T11:13:09+00:00",
       "recent": true
     },
     {
@@ -440,51 +473,19 @@
       "recent": true
     },
     {
-      "id": "bd0a22417c71",
+      "id": "06ffecf6fa12",
       "cur": "CHF",
-      "impact": "high",
-      "title": "USD/CHF Remains Stronger Above 0.7900 as Hawkish Fed Shocks Markets",
-      "expand": "BitcoinWorld USD/CHF Remains Stronger Above 0.7900 as Hawkish Fed Shocks Markets The USD/CHF pair continues to trade stronger above the 0.7900 mark on Thursday, driven by a resolute hawkish tone from the Federal Reserve. This move underscores the ongoing divergence in monetary policy between the U.S. and Switzerland, as the dollar finds fresh suppo...",
-      "source": "NewsData CHF",
-      "link": "https://bitcoinworld.co.in/usd-chf-stronger-above-07900/",
-      "time": "10:45",
-      "ts": 1777632311000,
+      "impact": "med",
+      "title": "USD/CHF Forecast: US Dollar Drops as Rates Fall - 01 May 2026",
+      "expand": "USD/CHF dipped sharply before bouncing off the 0.7825 support level, with analysts favoring long positions on dips as the wide interest rate differential and an eventual Swiss franc weakening support a bullish longer-term outlook.",
+      "source": "DailyForex TA",
+      "link": "https://www.dailyforex.com/forex-technical-analysis/2026/05/usdchf-forex-forecast-1-may-2026/244682",
+      "time": "10:18",
+      "ts": 1777630680000,
       "featured": false,
       "lang": "en",
       "date": "01 May",
-      "datetime": "2026-05-01T10:45:11+00:00",
-      "recent": true
-    },
-    {
-      "id": "8698462f0658",
-      "cur": "CHF",
-      "impact": "high",
-      "title": "Rate hikes are getting closer, big central banks say",
-      "expand": "Major central banks left interest rates unchanged this week but warned that they could raise them soon to prevent a jump in energy prices, caused by the U.S.-Israeli war with Iran,...",
-      "source": "NewsData CHF",
-      "link": "https://www.dailysabah.com/business/economy/rate-hikes-are-getting-closer-big-central-banks-say",
-      "time": "09:19",
-      "ts": 1777627140000,
-      "featured": false,
-      "lang": "en",
-      "date": "01 May",
-      "datetime": "2026-05-01T09:19:00+00:00",
-      "recent": true
-    },
-    {
-      "id": "cda39ef204fe",
-      "cur": "CHF",
-      "impact": "high",
-      "title": "USD/CHF Hesitates Above 0.7800: Weak Swiss Retail Sales Data Stuns Markets",
-      "expand": "BitcoinWorld USD/CHF Hesitates Above 0.7800: Weak Swiss Retail Sales Data Stuns Markets The USD/CHF currency pair trades with a cautious tone above the 0.7800 mark. This hesitation follows the release of disappointing Swiss Retail Sales data. Investors now reassess the Swiss National Bank’s (SNB) monetary policy outlook. The market reaction remains...",
-      "source": "NewsData CHF",
-      "link": "https://bitcoinworld.co.in/usd-chf-hesitates-swiss-retail-sales/",
-      "time": "09:15",
-      "ts": 1777626911000,
-      "featured": false,
-      "lang": "en",
-      "date": "01 May",
-      "datetime": "2026-05-01T09:15:11+00:00",
+      "datetime": "2026-05-01T10:18:00+00:00",
       "recent": true
     },
     {
@@ -536,22 +537,6 @@
       "recent": true
     },
     {
-      "id": "6954674e23fe",
-      "cur": "USD",
-      "impact": "high",
-      "title": "investingLive Asia-Pacific FX news wrap: Japan warns of more intervention if needed",
-      "expand": "Japan intervenes to defend yen and warns of further action over Golden Week Axios:Trump received briefing on plans for possible military action against Iran ASEAN ministers warn Middle East war threatens energy security and regional growth May meeting, RBA set for third straight hike as Hormuz closure drives inflation surge Japan manufacturing PMI ...",
-      "source": "ForexLive",
-      "link": "https://investinglive.com/news/investinglive-asia-pacific-fx-news-wrap-japan-warns-of-more-intervention-if-needed-20260501/",
-      "time": "03:37",
-      "ts": 1777606669000,
-      "featured": false,
-      "lang": "en",
-      "date": "01 May",
-      "datetime": "2026-05-01T03:37:49+00:00",
-      "recent": true
-    },
-    {
       "id": "b64a57ab87f6",
       "cur": "EUR",
       "impact": "high",
@@ -565,7 +550,7 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T03:33:00+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "a463535f129f",
@@ -581,7 +566,7 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T02:57:00+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "0bb97fafd171",
@@ -597,7 +582,7 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T02:01:47+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "e343f7b6c7a1",
@@ -613,7 +598,7 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T00:54:23+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "0d625b15f649",
@@ -629,7 +614,7 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T00:38:11+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "6bb84dc1a47c",
@@ -645,7 +630,7 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T00:15:54+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "93d6c22650ed",
@@ -661,7 +646,7 @@
       "lang": "en",
       "date": "01 May",
       "datetime": "2026-05-01T00:08:32+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "e17b4eb1eec0",
@@ -741,6 +726,22 @@
       "lang": "en",
       "date": "30 Apr",
       "datetime": "2026-04-30T21:59:52+00:00",
+      "recent": false
+    },
+    {
+      "id": "7b121c942dec",
+      "cur": "EUR",
+      "impact": "high",
+      "title": "Deutsche Bank sees ECB leaving door open to hike in June as inflation expectations surge",
+      "expand": "ECB holds rates as expected; June hike fully priced by markets. Deutsche Bank flags upside inflation risk and downside growth risk. Eurozone 1yr inflation expectations jump to 4.0%, highest since 2023. Credit conditions tightest since early 2024. Summary: The ECB kept policy rates unchanged at its latest meeting, a decision in line with market expe...",
+      "source": "ForexLive",
+      "link": "https://investinglive.com/centralbank/deutsche-bank-sees-ecb-leaving-door-open-to-hike-in-june-as-inflation-expectations-surge-20260430/",
+      "time": "21:30",
+      "ts": 1777584632000,
+      "featured": false,
+      "lang": "en",
+      "date": "30 Apr",
+      "datetime": "2026-04-30T21:30:32+00:00",
       "recent": false
     },
     {
