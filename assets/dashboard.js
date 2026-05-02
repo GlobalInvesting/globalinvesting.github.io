@@ -1390,39 +1390,6 @@ async function fetchCommodityQuotes() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
-async function fetchCryptoQuotes() {
-  // CoinGecko — used ONLY as a DOM fallback when yfinance has not yet populated BTC data.
-  // STOOQ_RT_CACHE['btc'] is exclusively written by fetchCrossAssetData (yfinance intraday JSON).
-  // Mixing CoinGecko (rolling 24h reference) with yfinance (day-over-day prev_close reference)
-  // produces a % mismatch between the chart header and the cross-asset panel.
-  try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
-    if (!r.ok) return;
-    const data = await r.json();
-    if (data.bitcoin) {
-      const price  = data.bitcoin.usd;
-      const chg24  = data.bitcoin.usd_24h_change;
-      const priceEl = document.getElementById('q-btcusd');
-      const chgEl   = document.getElementById('qc-btcusd');
-      // Only update DOM when yfinance has not yet provided values (showing '—')
-      if (priceEl && priceEl.textContent === '—') {
-        priceEl.textContent = price.toLocaleString();
-        priceEl.className   = 'q-price ' + clsDir(chg24);
-      }
-      if (chgEl && chgEl.textContent === '—') {
-        chgEl.textContent = pctStr(chg24);
-        chgEl.className   = 'q-chg ' + clsDir(chg24);
-      }
-      // DO NOT write to STOOQ_RT_CACHE['btc'] — that is yfinance-only territory.
-      // Writing CoinGecko's rolling 24h price here would decouple the chart's
-      // today-bar close from the yfinance prev_close used as its open,
-      // producing a % divergence vs the cross-asset panel.
-    }
-  } catch(e) {}
-}
-
-// ═══════════════════════════════════════════════════════════════════
 // MARKET SENTIMENT — Dukascopy (free, CORS-allowed)
 // ═══════════════════════════════════════════════════════════════════
 // COT-derived sentiment cache
@@ -6501,7 +6468,6 @@ async function boot() {
   fetchRiskData();
   fetchCrossAssetData();
   fetchCommodityQuotes();
-  fetchCryptoQuotes();               // BTC from CoinGecko
   buildRichNarrative();              // AI narrative full build (non-blocking, fills narrative text)
   setTimeout(fetchSentiment, 800);   // Dukascopy sentiment (last, non-critical)
 }
@@ -6945,8 +6911,6 @@ window.addEventListener('resize', drawLiquidityChart);
 
 // Risk + Cross-Asset run in parallel every 2 min — same as boot() — no chaining
 setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes(); fetchOptionSkew().then(() => attachRiskMonitorTooltips()); }, 2 * 60 * 1000);
-// Crypto: every 90 seconds
-setInterval(fetchCryptoQuotes, 90 * 1000);
 setInterval(fetchCarryData,    30 * 60 * 1000);
 setInterval(fetchCarryRanking, 30 * 60 * 1000);
 // Refresh sentiment every 30 seconds
