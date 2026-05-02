@@ -37,6 +37,9 @@ on:
     - cron: '0 23 * * *'   # 23:00 UTC daily — 30min after update-ohlc (22:30 UTC)
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
 concurrency:
   group: update-bond-yields
   cancel-in-progress: false
