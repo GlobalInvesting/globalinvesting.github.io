@@ -3747,278 +3747,709 @@ async function _renderLWChart(ohlcId, label) {
   }
   _applyMarkers();
 
-  // ── Oscillator sub-panes: RSI, Stochastic, MACD ─────────────────────────────
-  // Industry standard: oscillators rendered in separate panes below the main price chart.
-  // Bloomberg, Eikon, TradingView all use this layout for RSI, MACD and Stochastics.
-  // LWC v5 supports createPane() for true multi-pane layouts on the same time axis.
+  // ── Full Indicator Library — Bloomberg/Eikon/TradingView standard set ───────
+  // Indicators are rendered in separate sub-panes (oscillators) or overlaid on
+  // the main price pane (overlays). All calculations are deterministic — no
+  // Math.random(). State persists across symbol switches via window._lwIndState.
 
-  // ── Calculation helpers ──────────────────────────────────────────────────────
+  // ── Shared math helpers ─────────────────────────────────────────────────────
 
-  function _calcRSI(bars, period) {
-    if (period === undefined) period = 14;
+  function _iSMA(src, n) {
     const out = [];
-    if (bars.length < period + 1) return out;
-    let gains = 0, losses = 0;
-    for (let i = 1; i <= period; i++) {
-      const d = bars[i].close - bars[i - 1].close;
-      if (d >= 0) gains += d; else losses -= d;
-    }
-    let avgGain = gains / period;
-    let avgLoss = losses / period;
-    for (let i = period; i < bars.length; i++) {
-      if (i > period) {
-        const d = bars[i].close - bars[i - 1].close;
-        avgGain = (avgGain * (period - 1) + (d >= 0 ? d : 0)) / period;
-        avgLoss = (avgLoss * (period - 1) + (d <  0 ? -d : 0)) / period;
-      }
-      const rs  = avgLoss === 0 ? Infinity : avgGain / avgLoss;
-      const rsi = avgLoss === 0 ? 100 : 100 - 100 / (1 + rs);
-      out.push({ time: bars[i].time, value: parseFloat(rsi.toFixed(2)) });
+    for (let i = n - 1; i < src.length; i++) {
+      let s = 0; for (let j = 0; j < n; j++) s += src[i - j];
+      out.push(s / n);
     }
     return out;
   }
-
-  function _calcEMA(values, period) {
-    const k = 2 / (period + 1);
-    const out = [];
-    let ema = values[0];
-    out.push(ema);
-    for (let i = 1; i < values.length; i++) {
-      ema = values[i] * k + ema * (1 - k);
-      out.push(ema);
+  function _iEMA(src, n) {
+    const k = 2 / (n + 1); const out = [src[0]];
+    for (let i = 1; i < src.length; i++) out.push(src[i] * k + out[i - 1] * (1 - k));
+    return out;
+  }
+  function _iWMA(src, n) {
+    const out = []; const denom = n * (n + 1) / 2;
+    for (let i = n - 1; i < src.length; i++) {
+      let s = 0; for (let j = 0; j < n; j++) s += src[i - j] * (n - j);
+      out.push(s / denom);
     }
     return out;
   }
+  function _iStdev(src, n) {
+    const out = [];
+    for (let i = n - 1; i < src.length; i++) {
+      const slice = src.slice(i - n + 1, i + 1);
+      const mean = slice.reduce((a, b) => a + b, 0) / n;
+      const variance = slice.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+      out.push(Math.sqrt(variance));
+    }
+    return out;
+  }
+  function _iRMA(src, n) { // Wilder smoothing (RMA)
+    const k = 1 / n; const out = [src[0]];
+    for (let i = 1; i < src.length; i++) out.push(src[i] * k + out[i - 1] * (1 - k));
+    return out;
+  }
+  function _iTR(bars) { // True Range
+    return bars.map((b, i) => {
+      if (i === 0) return b.high - b.low;
+      const pc = bars[i - 1].close;
+      return Math.max(b.high - b.low, Math.abs(b.high - pc), Math.abs(b.low - pc));
+    });
+  }
+  // Align a calculated array (shorter) to bars by padding NaN at the start
+  function _iAlign(arr, bars, offset) {
+    const pad = bars.length - arr.length - (offset || 0);
+    return bars.map((b, i) => {
+      const v = arr[i - pad];
+      return { time: b.time, value: (v != null && !isNaN(v)) ? v : NaN };
+    }).filter(d => !isNaN(d.value));
+  }
+  // Merge two aligned arrays into { time, value } pairs starting at the later offset
+  function _iZip(timesA, valA, valB) {
+    return timesA.map((t, i) => ({ time: t, value: valB[i] })).filter(d => !isNaN(d.value));
+  }
 
-  function _calcMACD(bars, fast, slow, signal) {
-    if (fast === undefined)   fast   = 12;
-    if (slow === undefined)   slow   = 26;
-    if (signal === undefined) signal = 9;
+  // ── Indicator definitions catalogue ────────────────────────────────────────
+  // Each entry: { id, label, group, desc, defaultParams, type }
+  // type: 'overlay' = drawn on main price pane; 'oscillator' = sub-pane below
+  const _IND_CATALOGUE = [
+    // ── Overlays ──────────────────────────────────────────────────────────────
+    { id:'ema20',   group:'Overlays', label:'EMA 20',       desc:'Exponential Moving Average · 20 periods',       type:'overlay',    defaultParams:{ period:20 } },
+    { id:'ema50',   group:'Overlays', label:'EMA 50',       desc:'Exponential Moving Average · 50 periods',       type:'overlay',    defaultParams:{ period:50 } },
+    { id:'ema200',  group:'Overlays', label:'EMA 200',      desc:'Exponential Moving Average · 200 periods',      type:'overlay',    defaultParams:{ period:200 } },
+    { id:'wma',     group:'Overlays', label:'WMA 20',       desc:'Weighted Moving Average · 20 periods',          type:'overlay',    defaultParams:{ period:20 } },
+    { id:'hma',     group:'Overlays', label:'HMA 20',       desc:'Hull Moving Average · 20 periods',              type:'overlay',    defaultParams:{ period:20 } },
+    { id:'vwap',    group:'Overlays', label:'VWAP',         desc:'Volume-Weighted Avg Price (daily sessions)',     type:'overlay',    defaultParams:{} },
+    { id:'bb',      group:'Overlays', label:'Bollinger Bands', desc:'Bollinger Bands · 20 SMA ± 2σ',              type:'overlay',    defaultParams:{ period:20, mult:2 } },
+    { id:'keltner', group:'Overlays', label:'Keltner Channel', desc:'Keltner Channel · 20 EMA ± 1.5×ATR(10)',    type:'overlay',    defaultParams:{ period:20, mult:1.5 } },
+    { id:'donchian',group:'Overlays', label:'Donchian Channel',desc:'Donchian Channel · 20-period high/low band', type:'overlay',    defaultParams:{ period:20 } },
+    { id:'psar',    group:'Overlays', label:'Parabolic SAR',desc:'Parabolic SAR · step 0.02 · max 0.2',           type:'overlay',    defaultParams:{ step:0.02, max:0.2 } },
+    { id:'ichimoku',group:'Overlays', label:'Ichimoku Cloud',desc:'Ichimoku Kinko Hyo · 9/26/52',                type:'overlay',    defaultParams:{} },
+    // ── Oscillators ───────────────────────────────────────────────────────────
+    { id:'rsi',     group:'Oscillators', label:'RSI',        desc:'Relative Strength Index · 14 periods',         type:'oscillator', defaultParams:{ period:14 } },
+    { id:'stoch',   group:'Oscillators', label:'Stochastic', desc:'Stochastic Oscillator · 14,3,3',               type:'oscillator', defaultParams:{ k:14, d:3, smooth:3 } },
+    { id:'macd',    group:'Oscillators', label:'MACD',       desc:'MACD · 12,26,9',                               type:'oscillator', defaultParams:{ fast:12, slow:26, signal:9 } },
+    { id:'cci',     group:'Oscillators', label:'CCI',        desc:'Commodity Channel Index · 20 periods',         type:'oscillator', defaultParams:{ period:20 } },
+    { id:'willr',   group:'Oscillators', label:'Williams %R',desc:'Williams %R · 14 periods',                     type:'oscillator', defaultParams:{ period:14 } },
+    { id:'roc',     group:'Oscillators', label:'ROC',        desc:'Rate of Change · 12 periods',                  type:'oscillator', defaultParams:{ period:12 } },
+    { id:'mom',     group:'Oscillators', label:'Momentum',   desc:'Momentum · 10 periods',                        type:'oscillator', defaultParams:{ period:10 } },
+    { id:'mfi',     group:'Oscillators', label:'MFI',        desc:'Money Flow Index · 14 periods (uses volume)',  type:'oscillator', defaultParams:{ period:14 } },
+    { id:'ao',      group:'Oscillators', label:'Awesome Oscillator', desc:'Awesome Oscillator · 5/34 SMA midpoints', type:'oscillator', defaultParams:{} },
+    { id:'trix',    group:'Oscillators', label:'TRIX',       desc:'Triple Smoothed EMA oscillator · 18 periods',  type:'oscillator', defaultParams:{ period:18 } },
+    { id:'dpo',     group:'Oscillators', label:'DPO',        desc:'Detrended Price Oscillator · 21 periods',      type:'oscillator', defaultParams:{ period:21 } },
+    { id:'uo',      group:'Oscillators', label:'Ultimate Osc.',desc:'Ultimate Oscillator · 7/14/28',              type:'oscillator', defaultParams:{} },
+    // ── Volatility ────────────────────────────────────────────────────────────
+    { id:'atr',     group:'Volatility', label:'ATR',         desc:'Average True Range · 14 periods',              type:'oscillator', defaultParams:{ period:14 } },
+    { id:'adx',     group:'Volatility', label:'ADX / DMI',   desc:'Average Directional Index + DI± · 14 periods', type:'oscillator', defaultParams:{ period:14 } },
+    { id:'aroon',   group:'Volatility', label:'Aroon',       desc:'Aroon Up/Down · 25 periods',                   type:'oscillator', defaultParams:{ period:25 } },
+    { id:'chop',    group:'Volatility', label:'Choppiness', desc:'Choppiness Index · 14 periods',                 type:'oscillator', defaultParams:{ period:14 } },
+    // ── Volume ────────────────────────────────────────────────────────────────
+    { id:'obv',     group:'Volume', label:'OBV',             desc:'On-Balance Volume',                            type:'oscillator', defaultParams:{} },
+    { id:'cmf',     group:'Volume', label:'CMF',             desc:'Chaikin Money Flow · 20 periods',              type:'oscillator', defaultParams:{ period:20 } },
+  ];
+
+  // ── Active indicator state (persists across symbol switches) ─────────────────
+  if (typeof window._lwIndState === 'undefined') window._lwIndState = {}; // id → true/false
+  // Active pane refs — keyed by indicator id, reset each render (chart destroyed)
+  const _indPanes   = {}; // id → pane object
+  const _indSeries  = {}; // id → array of series objects
+
+  // ── Calculation functions — one per indicator id ───────────────────────────
+
+  function _calcIndData(id, bars) {
     const closes = bars.map(b => b.close);
-    if (closes.length < slow) return { macd: [], signal: [], hist: [] };
-    const emaFast = _calcEMA(closes, fast);
-    const emaSlow = _calcEMA(closes, slow);
-    const macdLine = emaFast.map((v, i) => v - emaSlow[i]);
-    // Signal line is EMA of macd starting from index (slow-1)
-    const macdFromSlow = macdLine.slice(slow - 1);
-    const signalLine  = _calcEMA(macdFromSlow, signal);
-    const out = { macd: [], signal: [], hist: [] };
-    const offset = slow - 1 + signal - 1;
-    for (let i = offset; i < bars.length; i++) {
-      const si  = i - (slow - 1);       // index into macdFromSlow
-      const sgi = si - (signal - 1);    // index into signalLine
-      const m   = macdLine[i];
-      const s   = signalLine[sgi];
-      const h   = m - s;
-      out.macd.push(  { time: bars[i].time, value: parseFloat(m.toFixed(6)) });
-      out.signal.push({ time: bars[i].time, value: parseFloat(s.toFixed(6)) });
-      out.hist.push(  { time: bars[i].time, value: parseFloat(h.toFixed(6)),
-                        color: h >= 0 ? 'rgba(38,166,154,0.7)' : 'rgba(239,83,80,0.7)' });
-    }
-    return out;
-  }
+    const highs  = bars.map(b => b.high);
+    const lows   = bars.map(b => b.low);
+    const vols   = bars.map(b => b.volume || 0);
 
-  function _calcStochastic(bars, kPeriod, smoothK, smoothD) {
-    if (kPeriod === undefined) kPeriod = 14;
-    if (smoothK === undefined) smoothK = 3;
-    if (smoothD === undefined) smoothD = 3;
-    const rawK = [];
-    for (let i = kPeriod - 1; i < bars.length; i++) {
-      const slice = bars.slice(i - kPeriod + 1, i + 1);
-      const high  = Math.max(...slice.map(b => b.high));
-      const low   = Math.min(...slice.map(b => b.low));
-      const close = bars[i].close;
-      const k = high === low ? 50 : ((close - low) / (high - low)) * 100;
-      rawK.push({ time: bars[i].time, value: k });
-    }
-    // Smooth %K
-    function _sma(arr, n) {
-      const out = [];
-      for (let i = n - 1; i < arr.length; i++) {
-        const s = arr.slice(i - n + 1, i + 1).reduce((a, b) => a + b.value, 0) / n;
-        out.push({ time: arr[i].time, value: parseFloat(s.toFixed(2)) });
+    switch (id) {
+      case 'ema20':  { const v = _iEMA(closes, 20);  return [{ data: _iAlign(v, bars, 0), color:'#2196f3', lineWidth:1, label:'EMA 20' }]; }
+      case 'ema50':  { const v = _iEMA(closes, 50);  return [{ data: _iAlign(v, bars, 0), color:'#ff9800', lineWidth:1, label:'EMA 50' }]; }
+      case 'ema200': { const v = _iEMA(closes, 200); return [{ data: _iAlign(v, bars, 0), color:'#e91e63', lineWidth:1, label:'EMA 200' }]; }
+      case 'wma':    { const v = _iWMA(closes, 20);  return [{ data: _iAlign(v, bars, 19), color:'#00bcd4', lineWidth:1, label:'WMA 20' }]; }
+      case 'hma': {
+        const p = 20; const half = Math.round(p / 2); const sqrtp = Math.round(Math.sqrt(p));
+        const wmaH = _iWMA(closes, half); const wmaP = _iWMA(closes, p);
+        const offset = p - half;
+        const raw = wmaH.slice(offset).map((v, i) => 2 * v - wmaP[i + offset]);
+        const hma = _iWMA(raw, sqrtp);
+        return [{ data: _iAlign(hma, bars, p - 1 + sqrtp - 1), color:'#8bc34a', lineWidth:1, label:'HMA 20' }];
       }
-      return out;
+      case 'vwap': {
+        // Session VWAP reset: approximate per-year (full history = one session for simplicity)
+        const typicals = bars.map((b, i) => ({
+          t: b.time, tp: (b.high + b.low + b.close) / 3, v: vols[i]
+        }));
+        let cumTPV = 0, cumV = 0;
+        const data = typicals.map(({ t, tp, v }) => {
+          cumTPV += tp * v; cumV += v;
+          return { time: t, value: cumV > 0 ? cumTPV / cumV : tp };
+        });
+        return [{ data, color:'#ff5722', lineWidth:1, label:'VWAP', dashed: true }];
+      }
+      case 'bb': {
+        const n = 20, mult = 2;
+        const sma  = _iSMA(closes, n);
+        const stdev = _iStdev(closes, n);
+        const offset = n - 1;
+        const mid   = _iAlign(sma,                  bars, offset);
+        const upper = _iAlign(sma.map((v,i) => v + mult * stdev[i]), bars, offset);
+        const lower = _iAlign(sma.map((v,i) => v - mult * stdev[i]), bars, offset);
+        return [
+          { data: mid,   color:'rgba(33,150,243,0.5)',  lineWidth:1, label:'BB Mid' },
+          { data: upper, color:'rgba(33,150,243,0.8)',  lineWidth:1, label:'BB Upper' },
+          { data: lower, color:'rgba(33,150,243,0.8)',  lineWidth:1, label:'BB Lower' },
+        ];
+      }
+      case 'keltner': {
+        const n = 20, mult = 1.5;
+        const ema = _iEMA(closes, n);
+        const tr  = _iTR(bars);
+        const atr = _iRMA(tr, 10);
+        const upper = ema.map((v, i) => v + mult * atr[i]);
+        const lower = ema.map((v, i) => v - mult * atr[i]);
+        return [
+          { data: _iAlign(ema,   bars, 0), color:'rgba(255,152,0,0.5)', lineWidth:1, label:'KC Mid' },
+          { data: _iAlign(upper, bars, 0), color:'rgba(255,152,0,0.8)', lineWidth:1, label:'KC Upper' },
+          { data: _iAlign(lower, bars, 0), color:'rgba(255,152,0,0.8)', lineWidth:1, label:'KC Lower' },
+        ];
+      }
+      case 'donchian': {
+        const n = 20;
+        const upper = [], lower = [], mid = [];
+        for (let i = n - 1; i < bars.length; i++) {
+          const slice = bars.slice(i - n + 1, i + 1);
+          const h = Math.max(...slice.map(b => b.high));
+          const l = Math.min(...slice.map(b => b.low));
+          upper.push({ time: bars[i].time, value: h });
+          lower.push({ time: bars[i].time, value: l });
+          mid.push(  { time: bars[i].time, value: (h + l) / 2 });
+        }
+        return [
+          { data: upper, color:'rgba(156,39,176,0.7)', lineWidth:1, label:'DC Upper' },
+          { data: lower, color:'rgba(156,39,176,0.7)', lineWidth:1, label:'DC Lower' },
+          { data: mid,   color:'rgba(156,39,176,0.4)', lineWidth:1, label:'DC Mid', dashed:true },
+        ];
+      }
+      case 'psar': {
+        const step = 0.02, maxAF = 0.2;
+        let bull = true, ep = bars[0].high, af = step, sar = bars[0].low;
+        const data = [];
+        for (let i = 1; i < bars.length; i++) {
+          const prev = bars[i - 1];
+          sar = sar + af * (ep - sar);
+          if (bull) {
+            if (bars[i].low < sar) { bull = false; sar = ep; ep = bars[i].low; af = step; }
+            else { if (bars[i].high > ep) { ep = bars[i].high; af = Math.min(af + step, maxAF); } }
+            sar = Math.min(sar, prev.low, bars[Math.max(0,i-2)].low);
+          } else {
+            if (bars[i].high > sar) { bull = true; sar = ep; ep = bars[i].high; af = step; }
+            else { if (bars[i].low < ep) { ep = bars[i].low; af = Math.min(af + step, maxAF); } }
+            sar = Math.max(sar, prev.high, bars[Math.max(0,i-2)].high);
+          }
+          data.push({ time: bars[i].time, value: parseFloat(sar.toFixed(dec)) });
+        }
+        return [{ data, color:'#f44336', lineWidth:0, label:'PSAR', markers:true }];
+      }
+      case 'ichimoku': {
+        function tenkan(i, n) { const s = bars.slice(Math.max(0,i-n+1),i+1); return (Math.max(...s.map(b=>b.high))+Math.min(...s.map(b=>b.low)))/2; }
+        const TK=9,KJ=26,SB2=52,DISP=26;
+        const tLine=[],kLine=[],sa=[],sb=[],cl=[];
+        for(let i=0;i<bars.length;i++){
+          const tk=tenkan(i,TK), kj=tenkan(i,KJ);
+          if(i>=TK-1) tLine.push({time:bars[i].time,value:tk});
+          if(i>=KJ-1){ kLine.push({time:bars[i].time,value:kj}); sa.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:(tk+kj)/2}); }
+          if(i>=SB2-1){ sb.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:tenkan(i,SB2)}); }
+          if(i>=KJ-1)  cl.push({time:bars[Math.max(0,i-DISP)].time,value:bars[i].close});
+        }
+        return [
+          { data:tLine, color:'#26a69a', lineWidth:1, label:'Tenkan' },
+          { data:kLine, color:'#ef5350', lineWidth:1, label:'Kijun' },
+          { data:sa,    color:'rgba(38,166,154,0.3)', lineWidth:1, label:'Span A' },
+          { data:sb,    color:'rgba(239,83,80,0.3)',  lineWidth:1, label:'Span B' },
+          { data:cl,    color:'rgba(120,123,134,0.4)', lineWidth:1, label:'Chikou', dashed:true },
+        ];
+      }
+      // ── Oscillators ─────────────────────────────────────────────────────────
+      case 'rsi': {
+        const n = 14;
+        const gains = [], losses = [];
+        for (let i = 1; i < closes.length; i++) {
+          const d = closes[i] - closes[i-1];
+          gains.push(d > 0 ? d : 0); losses.push(d < 0 ? -d : 0);
+        }
+        const avgG = _iRMA(gains, n), avgL = _iRMA(losses, n);
+        const data = avgG.map((g, i) => {
+          const l = avgL[i]; const rs = l === 0 ? Infinity : g / l;
+          return { time: bars[i + 1].time, value: parseFloat((l === 0 ? 100 : 100 - 100/(1+rs)).toFixed(2)) };
+        });
+        return [{ data, color:'#9c27b0', lineWidth:1, label:'RSI(14)',
+          refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}] }];
+      }
+      case 'stoch': {
+        const rawK = [];
+        for (let i = 13; i < bars.length; i++) {
+          const s = bars.slice(i-13, i+1);
+          const h = Math.max(...s.map(b=>b.high)), l = Math.min(...s.map(b=>b.low));
+          rawK.push(h===l?50:((bars[i].close-l)/(h-l))*100);
+        }
+        const sK = _iSMA(rawK, 3), sD = _iSMA(sK, 3);
+        const off = bars.length - rawK.length;
+        const kData = sK.map((v,i) => ({ time: bars[off+i+2].time, value: parseFloat(v.toFixed(2)) }));
+        const dData = sD.map((v,i) => ({ time: bars[off+i+4].time, value: parseFloat(v.toFixed(2)) }));
+        return [
+          { data: kData, color:'#2196f3', lineWidth:1, label:'%K(14,3)', refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}] },
+          { data: dData, color:'#ff9800', lineWidth:1, label:'%D(3)' },
+        ];
+      }
+      case 'macd': {
+        const fast=12,slow=26,sig=9;
+        const ef=_iEMA(closes,fast), es=_iEMA(closes,slow);
+        const ml=ef.map((v,i)=>v-es[i]);
+        const sl2=_iEMA(ml.slice(slow-1),sig);
+        const offset=slow-1+sig-1;
+        const macdD=[], sigD=[], histD=[];
+        for(let i=offset;i<bars.length;i++){
+          const si=i-(slow-1),sgi=si-(sig-1);
+          const m=ml[i],s=sl2[sgi],h=m-s;
+          macdD.push({time:bars[i].time,value:parseFloat(m.toFixed(6))});
+          sigD.push( {time:bars[i].time,value:parseFloat(s.toFixed(6))});
+          histD.push({time:bars[i].time,value:parseFloat(h.toFixed(6)),color:h>=0?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'});
+        }
+        return [
+          { data:histD, color:'#26a69a', lineWidth:0, label:'Hist', histogram:true, refs:[{v:0,color:'rgba(120,123,134,0.2)'}] },
+          { data:macdD, color:'#2196f3', lineWidth:1, label:'MACD' },
+          { data:sigD,  color:'#ff9800', lineWidth:1, label:'Signal' },
+        ];
+      }
+      case 'cci': {
+        const n = 20;
+        const tp = bars.map(b => (b.high+b.low+b.close)/3);
+        const sma = _iSMA(tp, n);
+        const data = sma.map((avg, i) => {
+          const slice = tp.slice(i, i + n);
+          const meanDev = slice.reduce((s, v) => s + Math.abs(v - avg), 0) / n;
+          return { time: bars[i + n - 1].time, value: parseFloat((meanDev === 0 ? 0 : (tp[i+n-1] - avg) / (0.015 * meanDev)).toFixed(2)) };
+        });
+        return [{ data, color:'#00bcd4', lineWidth:1, label:'CCI(20)',
+          refs:[{v:-100,color:'rgba(239,83,80,0.3)'},{v:0,color:'rgba(120,123,134,0.2)'},{v:100,color:'rgba(239,83,80,0.3)'}] }];
+      }
+      case 'willr': {
+        const n = 14;
+        const data = [];
+        for (let i = n - 1; i < bars.length; i++) {
+          const sl = bars.slice(i-n+1, i+1);
+          const h = Math.max(...sl.map(b=>b.high)), l = Math.min(...sl.map(b=>b.low));
+          data.push({ time: bars[i].time, value: parseFloat((h===l?-50:((h-bars[i].close)/(h-l))*-100).toFixed(2)) });
+        }
+        return [{ data, color:'#ff5722', lineWidth:1, label:'%R(14)',
+          refs:[{v:-80,color:'rgba(239,83,80,0.3)'},{v:-50,color:'rgba(120,123,134,0.2)'},{v:-20,color:'rgba(239,83,80,0.3)'}] }];
+      }
+      case 'roc': {
+        const n = 12;
+        const data = bars.slice(n).map((b,i) => ({ time:b.time, value:parseFloat(((b.close-bars[i].close)/bars[i].close*100).toFixed(4)) }));
+        return [{ data, color:'#4caf50', lineWidth:1, label:'ROC(12)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+      }
+      case 'mom': {
+        const n = 10;
+        const data = bars.slice(n).map((b,i) => ({ time:b.time, value:parseFloat((b.close-bars[i].close).toFixed(dec)) }));
+        return [{ data, color:'#9c27b0', lineWidth:1, label:'Mom(10)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+      }
+      case 'mfi': {
+        const n = 14;
+        const data = [];
+        for (let i = n; i < bars.length; i++) {
+          let pmf = 0, nmf = 0;
+          for (let j = i - n + 1; j <= i; j++) {
+            const tp = (bars[j].high+bars[j].low+bars[j].close)/3;
+            const prevTp = (bars[j-1].high+bars[j-1].low+bars[j-1].close)/3;
+            const mf = tp * (bars[j].volume || 1);
+            if (tp > prevTp) pmf += mf; else nmf += mf;
+          }
+          const mfi = nmf === 0 ? 100 : 100 - 100/(1+pmf/nmf);
+          data.push({ time:bars[i].time, value:parseFloat(mfi.toFixed(2)) });
+        }
+        return [{ data, color:'#03a9f4', lineWidth:1, label:'MFI(14)',
+          refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}] }];
+      }
+      case 'ao': {
+        const mid = bars.map(b => (b.high+b.low)/2);
+        const s5 = _iSMA(mid, 5), s34 = _iSMA(mid, 34);
+        const off = 34 - 1;
+        const data = s34.map((v, i) => {
+          const ao = s5[i + (34-5)] - v;
+          return { time: bars[off+i].time, value: parseFloat(ao.toFixed(6)),
+            color: (i === 0 || ao >= s34[i-1] + (s5[i+(34-5)-1]||0) - (s34[i-1]||0) ? 'rgba(38,166,154,0.7)' : 'rgba(239,83,80,0.7)') };
+        });
+        return [{ data, color:'#26a69a', lineWidth:0, label:'AO', histogram:true, refs:[{v:0,color:'rgba(120,123,134,0.2)'}] }];
+      }
+      case 'trix': {
+        const n = 18;
+        const e1=_iEMA(closes,n), e2=_iEMA(e1,n), e3=_iEMA(e2,n);
+        const data = e3.slice(1).map((v,i) => ({ time:bars[bars.length-e3.length+i+1].time, value:parseFloat(((v-e3[i])/e3[i]*100).toFixed(6)) }));
+        return [{ data, color:'#673ab7', lineWidth:1, label:'TRIX(18)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+      }
+      case 'dpo': {
+        const n = 21; const disp = Math.floor(n/2)+1;
+        const sma = _iSMA(closes, n);
+        const data = sma.map((v, i) => {
+          const barIdx = i + n - 1 - disp;
+          if (barIdx < 0) return null;
+          return { time: bars[i + n - 1].time, value: parseFloat((closes[barIdx] - v).toFixed(dec)) };
+        }).filter(Boolean);
+        return [{ data, color:'#ff9800', lineWidth:1, label:'DPO(21)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+      }
+      case 'uo': {
+        const data = [];
+        for (let i = 28; i < bars.length; i++) {
+          function _uoBP(j) { return bars[j].close - Math.min(bars[j].low, bars[j-1].close); }
+          function _uoTR(j) { return Math.max(bars[j].high,bars[j-1].close)-Math.min(bars[j].low,bars[j-1].close); }
+          let [bp7,tr7,bp14,tr14,bp28,tr28]=[0,0,0,0,0,0];
+          for(let j=i-6;j<=i;j++){bp7+=_uoBP(j);tr7+=_uoTR(j);}
+          for(let j=i-13;j<=i;j++){bp14+=_uoBP(j);tr14+=_uoTR(j);}
+          for(let j=i-27;j<=i;j++){bp28+=_uoBP(j);tr28+=_uoTR(j);}
+          const uo=100*(4*(bp7/tr7)+2*(bp14/tr14)+(bp28/tr28))/7;
+          data.push({time:bars[i].time,value:parseFloat(uo.toFixed(2))});
+        }
+        return [{ data, color:'#8bc34a', lineWidth:1, label:'UO(7,14,28)',
+          refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}] }];
+      }
+      case 'atr': {
+        const n = 14;
+        const tr = _iTR(bars);
+        const atr = _iRMA(tr, n);
+        return [{ data: bars.map((b,i) => ({ time:b.time, value:parseFloat(atr[i].toFixed(dec)) })), color:'#ff9800', lineWidth:1, label:'ATR(14)' }];
+      }
+      case 'adx': {
+        const n = 14;
+        const plusDM=[], minusDM=[], tr=_iTR(bars);
+        for(let i=1;i<bars.length;i++){
+          const upMove=bars[i].high-bars[i-1].high, downMove=bars[i-1].low-bars[i].low;
+          plusDM.push(upMove>downMove&&upMove>0?upMove:0);
+          minusDM.push(downMove>upMove&&downMove>0?downMove:0);
+        }
+        const atr=_iRMA(tr.slice(1),n);
+        const pDI=_iRMA(plusDM,n).map((v,i)=>100*v/atr[i]);
+        const mDI=_iRMA(minusDM,n).map((v,i)=>100*v/atr[i]);
+        const dx=pDI.map((p,i)=>{const s=p+mDI[i];return s===0?0:100*Math.abs(p-mDI[i])/s;});
+        const adx=_iRMA(dx,n);
+        const off=bars.length-adx.length;
+        return [
+          { data:adx.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})), color:'#f44336', lineWidth:1, label:'ADX', refs:[{v:25,color:'rgba(239,83,80,0.3)'}] },
+          { data:pDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})), color:'#26a69a', lineWidth:1, label:'+DI' },
+          { data:mDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})), color:'#ef5350', lineWidth:1, label:'-DI' },
+        ];
+      }
+      case 'aroon': {
+        const n = 25;
+        const up=[], dn=[];
+        for(let i=n;i<bars.length;i++){
+          const sl=bars.slice(i-n,i+1);
+          const hiIdx=sl.reduce((mi,b,j)=>b.high>sl[mi].high?j:mi,0);
+          const loIdx=sl.reduce((mi,b,j)=>b.low<sl[mi].low?j:mi,0);
+          up.push({time:bars[i].time,value:parseFloat(((hiIdx/n)*100).toFixed(2))});
+          dn.push({time:bars[i].time,value:parseFloat(((loIdx/n)*100).toFixed(2))});
+        }
+        return [
+          { data:up, color:'#26a69a', lineWidth:1, label:'Aroon Up', refs:[{v:50,color:'rgba(120,123,134,0.2)'}] },
+          { data:dn, color:'#ef5350', lineWidth:1, label:'Aroon Down' },
+        ];
+      }
+      case 'chop': {
+        const n = 14;
+        const tr=_iTR(bars);
+        const data=[];
+        for(let i=n-1;i<bars.length;i++){
+          const atrSum=tr.slice(i-n+1,i+1).reduce((s,v)=>s+v,0);
+          const sl=bars.slice(i-n+1,i+1);
+          const hl=Math.max(...sl.map(b=>b.high))-Math.min(...sl.map(b=>b.low));
+          data.push({time:bars[i].time,value:parseFloat(hl===0?100:(100*Math.log10(atrSum/hl)/Math.log10(n)).toFixed(2))});
+        }
+        return [{ data, color:'#607d8b', lineWidth:1, label:'Choppiness(14)',
+          refs:[{v:38.2,color:'rgba(38,166,154,0.3)'},{v:61.8,color:'rgba(239,83,80,0.3)'}] }];
+      }
+      case 'obv': {
+        let obv=0;
+        const data=bars.map((b,i)=>{
+          if(i>0){ if(b.close>bars[i-1].close) obv+=b.volume||0; else if(b.close<bars[i-1].close) obv-=b.volume||0; }
+          return {time:b.time,value:obv};
+        });
+        return [{ data, color:'#3f51b5', lineWidth:1, label:'OBV' }];
+      }
+      case 'cmf': {
+        const n=20;
+        const mfv=bars.map(b=>{const hl=b.high-b.low;return hl===0?0:((b.close-b.low)-(b.high-b.close))/hl*(b.volume||0);});
+        const data=[];
+        for(let i=n-1;i<bars.length;i++){
+          const volSum=bars.slice(i-n+1,i+1).reduce((s,b)=>s+(b.volume||0),0);
+          const mfvSum=mfv.slice(i-n+1,i+1).reduce((s,v)=>s+v,0);
+          data.push({time:bars[i].time,value:parseFloat((volSum===0?0:mfvSum/volSum).toFixed(4))});
+        }
+        return [{ data, color:'#00acc1', lineWidth:1, label:'CMF(20)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+      }
+      default: return [];
     }
-    const kSmoothed = _sma(rawK, smoothK);
-    const dLine     = _sma(kSmoothed, smoothD);
-    return { k: kSmoothed, d: dLine };
   }
 
-  // ── Oscillator state (persist across symbol switches like _lwMaState) ────────
-  if (typeof window._lwOscState === 'undefined') {
-    window._lwOscState = { rsi: false, stoch: false, macd: false };
-  }
+  // ── Pane / series rendering helpers ─────────────────────────────────────────
 
-  // Pane refs — reset on every chart render (chart was destroyed)
-  let _rsiPane   = null, _rsiSeries  = null;
-  let _stochPane = null, _stochK = null, _stochD = null;
-  let _macdPane  = null, _macdLine = null, _macdSignal = null, _macdHist = null;
-
-  // Small legend div injected into each oscillator pane
-  function _makePaneLegend(paneEl, id) {
+  function _addPaneLegend(paneEl, id, html) {
+    if (!paneEl) return;
+    paneEl.style.position = 'relative';
     const el = document.createElement('div');
-    el.id  = id;
+    el.id = id;
     el.style.cssText = 'position:absolute;top:4px;left:8px;z-index:3;pointer-events:none;'
       + 'font-size:10px;font-family:var(--font-mono,monospace);line-height:1.3;user-select:none;color:#d1d4dc;';
+    el.innerHTML = html;
     paneEl.appendChild(el);
-    return el;
   }
 
-  function _buildRSIPane() {
-    if (!window._lwOscState.rsi) { if (_rsiPane) { try { _lwChart.removePane(_rsiPane); } catch(_) {} _rsiPane = null; _rsiSeries = null; } return; }
-    try {
-      const rsiData = _calcRSI(bars, 14);
-      if (rsiData.length === 0) return;
-      _rsiPane = _lwChart.addPane({ height: 80 });
-      _rsiSeries = _rsiPane.addSeries(LWC.LineSeries, {
-        color: '#9c27b0', lineWidth: 1,
-        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: true,
-        priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
-      });
-      _rsiSeries.setData(rsiData);
-      // Overbought/sold reference lines
-      [30, 50, 70].forEach(level => {
-        _rsiPane.addSeries(LWC.LineSeries, {
-          color: level === 50 ? 'rgba(120,123,134,0.3)' : 'rgba(239,83,80,0.25)',
-          lineWidth: 1, lineStyle: 2, // dashed
+  function _addRefLines(pane, refs, barData, n) {
+    if (!refs || !pane) return;
+    refs.forEach(ref => {
+      try {
+        pane.addSeries(LWC.LineSeries, {
+          color: ref.color, lineWidth: 1, lineStyle: 2,
           priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
-          priceFormat: { type: 'price', precision: 0, minMove: 1 },
-        }).setData(bars.map(b => ({ time: b.time, value: level })).slice(-rsiData.length - 1));
-      });
-      // Pane label
-      const paneDiv = _rsiPane.getElement ? _rsiPane.getElement() : null;
-      if (paneDiv) {
-        paneDiv.style.position = 'relative';
-        _makePaneLegend(paneDiv, '_lw-rsi-legend').textContent = 'RSI(14)';
-      }
-    } catch(e) { console.warn('[LW] RSI pane error:', e); }
+          priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
+        }).setData(barData.map(b => ({ time: b.time, value: ref.v })).slice(-n));
+      } catch(_) {}
+    });
   }
 
-  function _buildStochPane() {
-    if (!window._lwOscState.stoch) { if (_stochPane) { try { _lwChart.removePane(_stochPane); } catch(_) {} _stochPane = null; _stochK = null; _stochD = null; } return; }
+  function _buildIndicatorPane(id) {
+    const cfg = _IND_CATALOGUE.find(c => c.id === id);
+    if (!cfg || !window._lwIndState[id]) return;
+
+    // Destroy old pane if exists
+    _destroyIndicatorPane(id);
+
     try {
-      const st = _calcStochastic(bars, 14, 3, 3);
-      if (st.k.length === 0) return;
-      _stochPane = _lwChart.addPane({ height: 80 });
-      _stochK = _stochPane.addSeries(LWC.LineSeries, {
-        color: '#2196f3', lineWidth: 1,
-        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: true,
-        priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
-      });
-      _stochK.setData(st.k);
-      _stochD = _stochPane.addSeries(LWC.LineSeries, {
-        color: '#ff9800', lineWidth: 1,
-        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-        priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
-      });
-      _stochD.setData(st.d);
-      // 20/80 reference lines
-      [20, 50, 80].forEach(level => {
-        _stochPane.addSeries(LWC.LineSeries, {
-          color: level === 50 ? 'rgba(120,123,134,0.3)' : 'rgba(239,83,80,0.25)',
-          lineWidth: 1, lineStyle: 2,
-          priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
-          priceFormat: { type: 'price', precision: 0, minMove: 1 },
-        }).setData(bars.map(b => ({ time: b.time, value: level })).slice(-st.k.length - 10));
-      });
-      const paneDiv = _stochPane.getElement ? _stochPane.getElement() : null;
-      if (paneDiv) {
-        paneDiv.style.position = 'relative';
-        _makePaneLegend(paneDiv, '_lw-stoch-legend').innerHTML =
-          '<span style="color:#2196f3">%K(14,3)</span> <span style="color:#ff9800">%D(3)</span>';
+      const seriesList = _calcIndData(id, bars);
+      if (!seriesList || seriesList.length === 0) return;
+
+      let pane;
+      const isOverlay = cfg.type === 'overlay';
+
+      if (isOverlay) {
+        // Add series to main price pane
+        pane = _lwChart.panes()[0];
+      } else {
+        // Create new sub-pane
+        const paneH = (id === 'macd' || id === 'adx') ? 90 : 80;
+        pane = _lwChart.addPane({ height: paneH });
+        _indPanes[id] = pane;
       }
-    } catch(e) { console.warn('[LW] Stoch pane error:', e); }
+
+      _indSeries[id] = [];
+
+      seriesList.forEach((s, si) => {
+        try {
+          let series;
+          if (s.histogram) {
+            series = pane.addSeries(LWC.HistogramSeries, {
+              priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+              priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
+            });
+          } else if (s.markers) {
+            // Point series (e.g. PSAR) — use LineSeries with lineWidth:0, markers
+            series = pane.addSeries(LWC.LineSeries, {
+              color: s.color, lineWidth: 0,
+              priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: true,
+              priceFormat: { type: 'price', precision: dec, minMove },
+            });
+          } else {
+            series = pane.addSeries(LWC.LineSeries, {
+              color: s.color, lineWidth: s.lineWidth || 1,
+              lineStyle: s.dashed ? 2 : 0,
+              priceLineVisible: false, lastValueVisible: si === 0, crosshairMarkerVisible: si === 0,
+              priceFormat: { type: 'price', precision: (isOverlay ? dec : 2), minMove: (isOverlay ? minMove : 0.01) },
+            });
+          }
+          series.setData(s.data);
+          _indSeries[id].push(series);
+
+          // Reference lines — only for first series in a sub-pane
+          if (!isOverlay && si === 0 && s.refs) {
+            _addRefLines(pane, s.refs, bars, s.data.length + 10);
+          }
+        } catch(serErr) { console.warn('[LW] series error for', id, serErr); }
+      });
+
+      // Pane legend
+      if (!isOverlay && _indPanes[id]) {
+        const paneEl = _indPanes[id].getElement ? _indPanes[id].getElement() : null;
+        const labelHtml = seriesList.map(s => `<span style="color:${s.color}">${s.label}</span>`).join(' ');
+        _addPaneLegend(paneEl, '_lw-ind-legend-' + id, labelHtml);
+      }
+    } catch(e) { console.warn('[LW] indicator build error for', id, e); }
   }
 
-  function _buildMACDPane() {
-    if (!window._lwOscState.macd) { if (_macdPane) { try { _lwChart.removePane(_macdPane); } catch(_) {} _macdPane = null; _macdLine = null; _macdSignal = null; _macdHist = null; } return; }
-    try {
-      const md = _calcMACD(bars, 12, 26, 9);
-      if (md.macd.length === 0) return;
-      _macdPane = _lwChart.addPane({ height: 90 });
-      // Histogram
-      _macdHist = _macdPane.addSeries(
-        typeof LWC.HistogramSeries !== 'undefined' ? LWC.HistogramSeries : null, {
-          priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
-          priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
-        });
-      if (!_macdHist && typeof _macdPane.addHistogramSeries === 'function') {
-        _macdHist = _macdPane.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false });
-      }
-      if (_macdHist) _macdHist.setData(md.hist);
-      // MACD line
-      _macdLine = _macdPane.addSeries(LWC.LineSeries, {
-        color: '#2196f3', lineWidth: 1,
-        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: true,
-        priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
+  function _destroyIndicatorPane(id) {
+    if (_indPanes[id]) {
+      try { _lwChart.removePane(_indPanes[id]); } catch(_) {}
+      _indPanes[id] = null;
+    }
+    if (_indSeries[id]) {
+      (_indSeries[id] || []).forEach(s => {
+        // Overlay series must be removed from main pane series list
+        const cfg = _IND_CATALOGUE.find(c => c.id === id);
+        if (cfg && cfg.type === 'overlay') {
+          try { _lwChart.panes()[0].removeSeries(s); } catch(_) {}
+        }
       });
-      _macdLine.setData(md.macd);
-      // Signal line
-      _macdSignal = _macdPane.addSeries(LWC.LineSeries, {
-        color: '#ff9800', lineWidth: 1,
-        priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
-        priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
-      });
-      _macdSignal.setData(md.signal);
-      const paneDiv = _macdPane.getElement ? _macdPane.getElement() : null;
-      if (paneDiv) {
-        paneDiv.style.position = 'relative';
-        _makePaneLegend(paneDiv, '_lw-macd-legend').innerHTML =
-          'MACD(12,26,9) <span style="color:#2196f3">MACD</span> <span style="color:#ff9800">Signal</span>';
-      }
-    } catch(e) { console.warn('[LW] MACD pane error:', e); }
-  }
-
-  function _syncOscBtns() {
-    const rsiBtn   = document.getElementById('lw-rsi-btn');
-    const stochBtn = document.getElementById('lw-stoch-btn');
-    const macdBtn  = document.getElementById('lw-macd-btn');
-    if (rsiBtn)   { rsiBtn.classList.toggle('on', window._lwOscState.rsi);   rsiBtn.setAttribute('aria-pressed', window._lwOscState.rsi   ? 'true' : 'false'); }
-    if (stochBtn) { stochBtn.classList.toggle('on', window._lwOscState.stoch); stochBtn.setAttribute('aria-pressed', window._lwOscState.stoch ? 'true' : 'false'); }
-    if (macdBtn)  { macdBtn.classList.toggle('on', window._lwOscState.macd);  macdBtn.setAttribute('aria-pressed', window._lwOscState.macd  ? 'true' : 'false'); }
-  }
-
-  // Build whichever oscillators are currently enabled
-  _buildRSIPane();
-  _buildStochPane();
-  _buildMACDPane();
-  _syncOscBtns();
-
-  // Toggle handlers (delegated via document to survive chart re-renders)
-  function _handleOscToggle(e) {
-    if (!_lwChart) return;
-    const id = e.currentTarget ? e.currentTarget.id : e.target.id;
-    if (id === 'lw-rsi-btn') {
-      window._lwOscState.rsi = !window._lwOscState.rsi;
-      if (_rsiPane) { try { _lwChart.removePane(_rsiPane); } catch(_) {} _rsiPane = null; _rsiSeries = null; }
-      _buildRSIPane();
-      _syncOscBtns();
-    } else if (id === 'lw-stoch-btn') {
-      window._lwOscState.stoch = !window._lwOscState.stoch;
-      if (_stochPane) { try { _lwChart.removePane(_stochPane); } catch(_) {} _stochPane = null; _stochK = null; _stochD = null; }
-      _buildStochPane();
-      _syncOscBtns();
-    } else if (id === 'lw-macd-btn') {
-      window._lwOscState.macd = !window._lwOscState.macd;
-      if (_macdPane) { try { _lwChart.removePane(_macdPane); } catch(_) {} _macdPane = null; _macdLine = null; _macdSignal = null; _macdHist = null; }
-      _buildMACDPane();
-      _syncOscBtns();
+      _indSeries[id] = null;
     }
   }
 
-  // Attach handlers — re-attach each render (fresh buttons after toolbar re-render)
-  ['lw-rsi-btn', 'lw-stoch-btn', 'lw-macd-btn'].forEach(btnId => {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      // Clone to remove any prior listeners from previous chart renders
-      const fresh = btn.cloneNode(true);
-      btn.parentNode.replaceChild(fresh, btn);
-      fresh.addEventListener('click', _handleOscToggle);
-    }
+  // Build all currently-active indicators on this chart render
+  _IND_CATALOGUE.forEach(cfg => {
+    if (window._lwIndState[cfg.id]) _buildIndicatorPane(cfg.id);
   });
-  // Re-sync styles after clone
-  _syncOscBtns();
+
+  // ── Active pills bar — shows which indicators are on, with × to remove ──────
+  function _renderIndPills() {
+    const pillBar = document.getElementById('lw-ind-pills');
+    if (!pillBar) return;
+    pillBar.innerHTML = '';
+    _IND_CATALOGUE.filter(c => window._lwIndState[c.id]).forEach(cfg => {
+      const pill = document.createElement('span');
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:#1e222d;border:1px solid #2a2e39;border-radius:3px;padding:1px 5px;font-size:9px;font-family:var(--font-ui,sans-serif);white-space:nowrap;';
+      pill.innerHTML = `<span style="color:#787b86">${cfg.label}</span>`;
+      const rm = document.createElement('span');
+      rm.textContent = '\u00d7';
+      rm.style.cssText = 'color:#4a5060;cursor:pointer;font-size:10px;margin-left:1px;';
+      rm.title = 'Remove ' + cfg.label;
+      rm.addEventListener('click', e => {
+        e.stopPropagation();
+        window._lwIndState[cfg.id] = false;
+        _destroyIndicatorPane(cfg.id);
+        _renderIndPills();
+        _updateIndBtn();
+      });
+      pill.appendChild(rm);
+      pillBar.appendChild(pill);
+    });
+  }
+
+  function _updateIndBtn() {
+    const btn = document.getElementById('lw-ind-btn');
+    if (!btn) return;
+    const anyOn = _IND_CATALOGUE.some(c => window._lwIndState[c.id]);
+    btn.classList.toggle('on', anyOn);
+  }
+
+  // ── Indicators dropdown menu ─────────────────────────────────────────────────
+  let _indDropdownOpen = false;
+
+  function _closeIndDropdown() {
+    const pop = document.getElementById('_lw-ind-dropdown');
+    if (pop) pop.remove();
+    _indDropdownOpen = false;
+    const btn = document.getElementById('lw-ind-btn');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function _openIndDropdown() {
+    if (_indDropdownOpen) { _closeIndDropdown(); return; }
+    _closeIndDropdown();
+    _indDropdownOpen = true;
+
+    const btn = document.getElementById('lw-ind-btn');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+
+    const pop = document.createElement('div');
+    pop.id = '_lw-ind-dropdown';
+    pop.style.cssText = [
+      'position:fixed;z-index:9999;background:#1a1d29;border:1px solid #2a2e39;',
+      'border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.6);',
+      'font-size:11px;font-family:var(--font-ui,sans-serif);',
+      'min-width:260px;max-height:440px;overflow-y:auto;',
+      'scrollbar-width:thin;scrollbar-color:#2a2e39 transparent;',
+    ].join('');
+
+    // Group indicators by category
+    const groups = {};
+    _IND_CATALOGUE.forEach(cfg => {
+      if (!groups[cfg.group]) groups[cfg.group] = [];
+      groups[cfg.group].push(cfg);
+    });
+
+    Object.entries(groups).forEach(([groupName, items]) => {
+      // Group header
+      const header = document.createElement('div');
+      header.textContent = groupName.toUpperCase();
+      header.style.cssText = 'padding:8px 12px 4px;color:#4a5060;font-size:9px;letter-spacing:.08em;font-weight:700;border-top:1px solid #2a2e39;';
+      if (Object.keys(groups)[0] === groupName) header.style.borderTop = 'none';
+      pop.appendChild(header);
+
+      items.forEach(cfg => {
+        const row = document.createElement('div');
+        const isOn = !!window._lwIndState[cfg.id];
+        row.style.cssText = `display:flex;align-items:center;justify-content:space-between;padding:6px 12px;cursor:pointer;background:${isOn?'rgba(79,127,255,0.08)':'transparent'};`;
+        row.addEventListener('mouseenter', () => { if (!isOn) row.style.background = 'rgba(255,255,255,0.04)'; });
+        row.addEventListener('mouseleave', () => { row.style.background = isOn ? 'rgba(79,127,255,0.08)' : 'transparent'; });
+
+        const left = document.createElement('div');
+        left.innerHTML = `<div style="color:${isOn?'#d1d4dc':'#9da5b4'};font-weight:${isOn?'600':'400'}">${cfg.label}</div>`
+          + `<div style="color:#4a5060;font-size:9px;margin-top:1px">${cfg.desc}</div>`;
+
+        const check = document.createElement('div');
+        check.style.cssText = `width:14px;height:14px;border-radius:3px;border:1px solid ${isOn?'#4f7fff':'#3a3f52'};background:${isOn?'#4f7fff':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;`;
+        if (isOn) check.innerHTML = '<svg width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1,3 3,5 7,1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+        row.appendChild(left);
+        row.appendChild(check);
+
+        row.addEventListener('click', e => {
+          e.stopPropagation();
+          window._lwIndState[cfg.id] = !window._lwIndState[cfg.id];
+          if (window._lwIndState[cfg.id]) {
+            _buildIndicatorPane(cfg.id);
+          } else {
+            _destroyIndicatorPane(cfg.id);
+          }
+          _renderIndPills();
+          _updateIndBtn();
+          // Re-render dropdown to reflect new state
+          pop.remove();
+          _indDropdownOpen = false;
+          _openIndDropdown();
+        });
+
+        pop.appendChild(row);
+      });
+    });
+
+    document.body.appendChild(pop);
+
+    // Position below the button
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      const popH = Math.min(440, pop.scrollHeight || 400);
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const top = spaceBelow >= 80 ? rect.bottom + 4 : rect.top - popH - 4;
+      pop.style.top  = Math.max(8, top) + 'px';
+      pop.style.left = Math.max(8, rect.left) + 'px';
+    }
+
+    setTimeout(() => {
+      document.addEventListener('click', _closeIndDropdown, { once: true });
+    }, 0);
+  }
+
+  // Attach dropdown handler — clone to clear prior listeners
+  (function _attachIndBtn() {
+    const btn = document.getElementById('lw-ind-btn');
+    if (!btn) return;
+    const fresh = btn.cloneNode(true);
+    btn.parentNode.replaceChild(fresh, btn);
+    fresh.addEventListener('click', e => { e.stopPropagation(); _openIndDropdown(); });
+  })();
+
+  _renderIndPills();
+  _updateIndBtn();
 
   // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
   function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '\u2014'; }
