@@ -1,60 +1,66 @@
 {
-  "generated_at": "2026-05-02T03:59:22Z",
+  "generated_at": "2026-05-02T04:25:41Z",
   "signals": [
     {
-      "time": "03:59",
+      "time": "21:19",
       "priority": "critical",
-      "title": "USD/JPY — G8 Bilateral Theme + Yield Dis",
-      "text": "JPY 1W avg +1.08% (n=7) outperforms USD 1W avg -0.87% (n=7) with a G8 spread of 1.95%; the 196bp US-JGB yield gap runs against JPY momentum — crowded short -88.5k sets up squeeze risk. The next BoJ meeting is the catalyst for resolving the yield gap. Trump's tariff escalation on European autos may further impact USD direction.",
+      "title": "EUR/USD — Trump Auto Tariff Escalation",
+      "text": "Trump's announcement of a 25% tariff on European autos drives immediate downside pressure on EUR/USD from its 1.1723 Friday close. This trade protectionism reduces European export competitiveness and outweighs the current EUR COT short position of -18.3k which already reflects bearish sentiment. The next ECB meeting on 30 April is the catalyst for assessing the central bank's response to these trade-induced growth risks.",
+      "evidence": [
+        "Trump: Tariffs on European cars and trucks to increase to 25%",
+        "EUR COT net short -18,293",
+        "EUR/USD Friday close 1.1723"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "21:14",
+      "priority": "critical",
+      "title": "USD/JPY — G8 Bilateral Theme + Intervention Risk",
+      "text": "JPY's 1W momentum of +1.08% runs against the 300bp USD-JPY carry advantage following confirmed $34.5 billion yen intervention. The JPY COT net short of -88.5k creates significant squeeze risk if the pair breaks below the 157.03 Friday close as speculators are forced to cover. The next BoJ meeting is the catalyst for determining if a rate hike will support the intervention-led JPY recovery.",
       "evidence": [
         "JPY 1W avg: +1.081% (n=7)",
         "USD 1W avg: -0.874% (n=7)",
-        "G8 spread: 1.955%"
-      ]
+        "G8 spread: 1.955%",
+        "JPY COT net short -88,543"
+      ],
+      "_source": "gemini"
     },
     {
-      "time": "03:51",
+      "time": "16:53",
       "priority": "warning",
-      "title": "EUR/USD — Tariff Escalation and ECB Hold",
-      "text": "EUR/USD closed Friday at 1.1723; Trump tariff escalation on EU autos sets up downside pressure toward 1.16 — EUR COT short -18.3k reinforces the bias. The ECB at 2.00% with next ECB meeting may further influence EUR/USD direction. Geopolitical risk premium is secondary to the 175bp USD-EUR carry advantage.",
+      "title": "AUD/USD — Crowded Long Unwind Risk",
+      "text": "AUD COT LF net long +48.3k (74.8% long) creates a crowded-long unwind risk despite the RBA's 4.10% rate and hike bias. While retail sentiment is 90% short, the institutional long exposure is vulnerable to a risk-off shift if US-Iran peace talks fail or oil prices spike. The next RBA meeting on 5 May is the catalyst for confirming the hawkish path required to sustain these long positions.",
       "evidence": [
-        "EUR/USD: 1.1723",
-        "EUR COT short: -18,293",
-        "ECB rate: 2.00%"
-      ]
+        "AUD COT net long +48,299 (74.8% long)",
+        "RBA at 4.10% with hike bias",
+        "Retail sentiment 90% short (contrarian signal)"
+      ],
+      "_source": "gemini"
     },
     {
-      "time": "03:50",
+      "time": "16:30",
       "priority": "warning",
-      "title": "AUD/USD — RBA Hike Bias and Carry Advant",
-      "text": "AUD COT LF long +48.3k (74% long) creates crowded-long unwind risk — AUD/USD closed 0.7208 Friday; RBA at 4.10% with Hold bias (0% priced) sustains the bid but any disappointment triggers the unwind. The 35bp AUD-USD carry advantage supports the AUD bid.",
+      "title": "GBP/USD — Positioning Overstretch vs Geopolitical Risk",
+      "text": "GBP COT net long +32.6k (67.3% long) faces downside risk as US-Iran tensions and failed deal proposals drive a flight to the USD. The BoE's active hold at 3.75% limits further upside momentum for the pair which closed Friday at 1.3575. The next BoE meeting on 30 April is the catalyst for resolving whether the central bank will pivot toward June easing.",
       "evidence": [
-        "AUD/USD: 0.7208",
-        "AUD COT LF long: +48,299",
-        "RBA rate: 4.10%"
-      ]
+        "GBP COT net long +32,637",
+        "Trump: Not satisfied with latest Iran proposal",
+        "BoE Active Hold at 3.75%"
+      ],
+      "_source": "gemini"
     },
     {
-      "time": "03:43",
+      "time": "15:45",
       "priority": "info",
-      "title": "GBP/USD — BoE Hold and Cross-Asset Corre",
-      "text": "GBP/USD closed Friday at 1.3575; the BoE at 3.75% with next BoE meeting is likely to limit GBP/USD upside. The positive correlation between GBP/USD and FTSE 100, currently at +0.325, supports the pair's direction.",
+      "title": "USD/CAD — Oil Price Compression",
+      "text": "WTI crude's 2.45% decline to $102.5 weighs on the Loonie, supporting USD/CAD upside from the 1.3586 level. CAD COT net short of -54.7k reinforces the bearish bias as the 150bp carry advantage in favor of the USD persists. The next BoC meeting on 29 April is the catalyst for determining if the central bank will address the impact of volatile energy prices on the inflation outlook.",
       "evidence": [
-        "GBP/USD: 1.3575",
-        "BoE rate: 3.75%",
-        "GBP/USD vs FTSE 100 correlation: +0.325"
-      ]
-    },
-    {
-      "time": "03:42",
-      "priority": "info",
-      "title": "NZD/USD — RBNZ Hike Bias and Retail Sent",
-      "text": "NZD/USD closed Friday at 0.5898; RBNZ hike bias (next meeting on 27 May) is likely to support NZD/USD. However, retail sentiment shows 61% of traders are short, which is likely to indicate a contrarian reversal risk.",
-      "evidence": [
-        "NZD/USD: 0.5898",
-        "RBNZ rate: 2.25%",
-        "NZD/USD retail sentiment: 39% long, 61% short"
-      ]
+        "WTI Oil 1D: -2.45% ($102.5)",
+        "CAD COT net short -54,703",
+        "USD/CAD carry spread +150bp"
+      ],
+      "_source": "gemini"
     }
   ]
 }
