@@ -3671,14 +3671,32 @@ async function _renderLWChart(ohlcId, label) {
   ];
 
   // ── Active indicator state (persists across symbol switches) ─────────────────
-  if (typeof window._lwIndState  === 'undefined') window._lwIndState  = {}; // id → bool
-  if (typeof window._lwIndParams === 'undefined') window._lwIndParams = {}; // id → {param:value}
-  // MA list: array of { uid, type, period, color, lineWidth, lineStyle }
-  if (typeof window._lwMaList    === 'undefined') window._lwMaList = [
-    { uid:'ma_ema20',  type:'EMA', period:20,  color:'#2196f3', lineWidth:1, lineStyle:0 },
-    { uid:'ma_ema50',  type:'EMA', period:50,  color:'#ff9800', lineWidth:1, lineStyle:0 },
-    { uid:'ma_ema200', type:'EMA', period:200, color:'#e91e63', lineWidth:1, lineStyle:0 },
+  // ── Persistent state — survives page reloads via localStorage ────────────────
+  const _LS_IND   = 'gi_ind_state';   // { id: bool }
+  const _LS_PARAMS = 'gi_ind_params'; // { id: { param: val } }
+  const _LS_MA    = 'gi_ma_list';     // [ { uid, type, period, color, lineWidth, lineStyle } ]
+
+  const _DEFAULT_MA_LIST = [
+    { uid:'ma_sma20',  type:'SMA', period:20,  color:'#f5c518', lineWidth:1, lineStyle:0 },
   ];
+
+  function _lsGet(key, fallback) {
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch(_) { return fallback; }
+  }
+  function _lsSet(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch(_) {}
+  }
+
+  // Load persisted state (first run uses defaults)
+  if (typeof window._lwIndState  === 'undefined') window._lwIndState  = _lsGet(_LS_IND,    {});
+  if (typeof window._lwIndParams === 'undefined') window._lwIndParams = _lsGet(_LS_PARAMS,  {});
+  if (typeof window._lwMaList    === 'undefined') window._lwMaList    = _lsGet(_LS_MA,      _DEFAULT_MA_LIST);
+
+  // Save helpers — call after any mutation
+  function _saveIndState()  { _lsSet(_LS_IND,    window._lwIndState);  }
+  function _saveIndParams() { _lsSet(_LS_PARAMS,  window._lwIndParams); }
+  function _saveMaList()    { _lsSet(_LS_MA,      window._lwMaList);    }
+
   const _maSeries = {}; // uid → series object
   // Active pane indices — keyed by indicator id, reset each render (chart destroyed)
   const _indPaneIndex = {}; // id → pane index number (oscillators only)
@@ -4202,6 +4220,7 @@ async function _renderLWChart(ohlcId, label) {
       rm.addEventListener('click', e => {
         e.stopPropagation();
         window._lwMaList = window._lwMaList.filter(m => m.uid !== ma.uid);
+        _saveMaList();
         _destroyMaSeries(ma.uid);
         _renderIndPills();
         _updateIndBtn();
@@ -4221,6 +4240,7 @@ async function _renderLWChart(ohlcId, label) {
       rm.addEventListener('click', e => {
         e.stopPropagation();
         window._lwIndState[cfg.id] = false;
+        _saveIndState();
         _destroyIndicatorPane(cfg.id);
         _renderIndPills();
         _updateIndBtn();
@@ -4290,6 +4310,7 @@ async function _renderLWChart(ohlcId, label) {
       e.stopPropagation();
       const newMa = { uid: _genMaUid(), type:'EMA', period:20, color:_nextColor(), lineWidth:1, lineStyle:0 };
       window._lwMaList.push(newMa);
+      _saveMaList();
       _buildMaSeries(newMa);
       _renderIndPills();
       _updateIndBtn();
@@ -4322,6 +4343,7 @@ async function _renderLWChart(ohlcId, label) {
         ma.color = e.target.value;
         colorSwatch.style.background = ma.color;
         if (_maSeries[ma.uid]) { try { _maSeries[ma.uid].applyOptions({ color: ma.color }); } catch(_) {} }
+        _saveMaList();
         _renderIndPills();
       });
       colorWrap.appendChild(colorSwatch);
@@ -4340,6 +4362,7 @@ async function _renderLWChart(ohlcId, label) {
       typeSelect.addEventListener('change', e => {
         e.stopPropagation();
         ma.type = e.target.value;
+        _saveMaList();
         _buildMaSeries(ma);
         _renderIndPills();
       });
@@ -4353,7 +4376,7 @@ async function _renderLWChart(ohlcId, label) {
       periodInput.addEventListener('change', e => {
         e.stopPropagation();
         const v = parseInt(e.target.value);
-        if (v > 0 && v <= 500) { ma.period = v; _buildMaSeries(ma); _renderIndPills(); }
+        if (v > 0 && v <= 500) { ma.period = v; _saveMaList(); _buildMaSeries(ma); _renderIndPills(); }
       });
       row.appendChild(periodInput);
 
@@ -4369,6 +4392,7 @@ async function _renderLWChart(ohlcId, label) {
       styleSelect.addEventListener('change', e => {
         e.stopPropagation();
         ma.lineStyle = parseInt(e.target.value);
+        _saveMaList();
         if (_maSeries[ma.uid]) { try { _maSeries[ma.uid].applyOptions({ lineStyle: ma.lineStyle }); } catch(_) {} }
       });
       row.appendChild(styleSelect);
@@ -4385,6 +4409,7 @@ async function _renderLWChart(ohlcId, label) {
       widthSelect.addEventListener('change', e => {
         e.stopPropagation();
         ma.lineWidth = parseInt(e.target.value);
+        _saveMaList();
         if (_maSeries[ma.uid]) { try { _maSeries[ma.uid].applyOptions({ lineWidth: ma.lineWidth }); } catch(_) {} }
       });
       row.appendChild(widthSelect);
@@ -4399,6 +4424,7 @@ async function _renderLWChart(ohlcId, label) {
       rmBtn.addEventListener('click', e => {
         e.stopPropagation();
         window._lwMaList = window._lwMaList.filter(m => m.uid !== ma.uid);
+        _saveMaList();
         _destroyMaSeries(ma.uid);
         _renderIndPills(); _updateIndBtn();
         pop.remove(); _indDropdownOpen = false; _openIndDropdown();
@@ -4442,6 +4468,7 @@ async function _renderLWChart(ohlcId, label) {
         row.addEventListener('click', e => {
           e.stopPropagation();
           window._lwIndState[cfg.id] = !window._lwIndState[cfg.id];
+          _saveIndState();
           if (window._lwIndState[cfg.id]) { _buildIndicatorPane(cfg.id); } else { _destroyIndicatorPane(cfg.id); }
           _renderIndPills(); _updateIndBtn();
           pop.remove(); _indDropdownOpen = false; _openIndDropdown();
