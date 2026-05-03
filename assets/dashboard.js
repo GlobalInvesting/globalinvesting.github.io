@@ -3677,7 +3677,7 @@ async function _renderLWChart(ohlcId, label) {
   const _LS_MA    = 'gi_ma_list';     // [ { uid, type, period, color, lineWidth, lineStyle } ]
 
   const _DEFAULT_MA_LIST = [
-    { uid:'ma_sma20',  type:'SMA', period:20,  color:'#f5c518', lineWidth:1, lineStyle:0 },
+    { uid:'ma_sma20',  type:'SMA', period:20,  color:'#2196f3', lineWidth:1, lineStyle:0 },
   ];
 
   function _lsGet(key, fallback) {
