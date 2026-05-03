@@ -3638,36 +3638,38 @@ async function _renderLWChart(ohlcId, label) {
   // ── Indicator definitions catalogue ────────────────────────────────────────
   // Each entry: { id, label, group, desc, defaultParams, type }
   // type: 'overlay' = drawn on main price pane; 'oscillator' = sub-pane below
+  // paramDefs: array of { key, label, type:'int'|'float', min, max, step }
+  // colors: array of hex colors — one per series returned by _calcIndData
   const _IND_CATALOGUE = [
     // ── Overlays ──────────────────────────────────────────────────────────────
-    { id:'ma',      group:'Moving Averages', label:'Moving Average', desc:'Add configurable MAs (SMA/EMA/WMA/HMA/DEMA/TEMA/VWMA)', type:'overlay', defaultParams:{} },
-    { id:'vwap',    group:'Overlays', label:'VWAP',         desc:'Volume-Weighted Avg Price (daily sessions)',     type:'overlay',    defaultParams:{} },
-    { id:'bb',      group:'Overlays', label:'Bollinger Bands', desc:'Bollinger Bands · 20 SMA ± 2σ',              type:'overlay',    defaultParams:{ period:20, mult:2 } },
-    { id:'keltner', group:'Overlays', label:'Keltner Channel', desc:'Keltner Channel · 20 EMA ± 1.5×ATR(10)',    type:'overlay',    defaultParams:{ period:20, mult:1.5 } },
-    { id:'donchian',group:'Overlays', label:'Donchian Channel',desc:'Donchian Channel · 20-period high/low band', type:'overlay',    defaultParams:{ period:20 } },
-    { id:'psar',    group:'Overlays', label:'Parabolic SAR',desc:'Parabolic SAR · step 0.02 · max 0.2',           type:'overlay',    defaultParams:{ step:0.02, max:0.2 } },
-    { id:'ichimoku',group:'Overlays', label:'Ichimoku Cloud',desc:'Ichimoku Kinko Hyo · 9/26/52',                type:'overlay',    defaultParams:{} },
+    { id:'ma',       group:'Moving Averages', label:'Moving Average',    desc:'Add configurable MAs (SMA/EMA/WMA/HMA/DEMA/TEMA/VWMA)', type:'overlay',    defaultParams:{},                              paramDefs:[], colors:[] },
+    { id:'vwap',     group:'Overlays',        label:'VWAP',              desc:'Volume-Weighted Avg Price (daily sessions)',             type:'overlay',    defaultParams:{},                              paramDefs:[], colors:['#ff5722'] },
+    { id:'bb',       group:'Overlays',        label:'Bollinger Bands',   desc:'Bollinger Bands',                                        type:'overlay',    defaultParams:{ period:20, mult:2 },           paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:500,step:1},{key:'mult',label:'Mult',type:'float',min:0.1,max:10,step:0.1}], colors:['rgba(33,150,243,0.5)','rgba(33,150,243,0.9)','rgba(33,150,243,0.9)'] },
+    { id:'keltner',  group:'Overlays',        label:'Keltner Channel',   desc:'Keltner Channel',                                        type:'overlay',    defaultParams:{ period:20, mult:1.5 },         paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:500,step:1},{key:'mult',label:'Mult',type:'float',min:0.1,max:10,step:0.1}], colors:['rgba(255,152,0,0.5)','rgba(255,152,0,0.9)','rgba(255,152,0,0.9)'] },
+    { id:'donchian', group:'Overlays',        label:'Donchian Channel',  desc:'Donchian Channel',                                       type:'overlay',    defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:500,step:1}], colors:['rgba(156,39,176,0.8)','rgba(156,39,176,0.8)','rgba(156,39,176,0.4)'] },
+    { id:'psar',     group:'Overlays',        label:'Parabolic SAR',     desc:'Parabolic SAR',                                          type:'overlay',    defaultParams:{ step:0.02, max:0.2 },          paramDefs:[{key:'step',label:'Step',type:'float',min:0.001,max:0.1,step:0.001},{key:'max',label:'Max AF',type:'float',min:0.01,max:0.5,step:0.01}], colors:['#f44336'] },
+    { id:'ichimoku', group:'Overlays',        label:'Ichimoku Cloud',    desc:'Ichimoku Kinko Hyo · 9/26/52',                          type:'overlay',    defaultParams:{},                              paramDefs:[], colors:['#26a69a','#ef5350','rgba(38,166,154,0.3)','rgba(239,83,80,0.3)','rgba(120,123,134,0.4)'] },
     // ── Oscillators ───────────────────────────────────────────────────────────
-    { id:'rsi',     group:'Oscillators', label:'RSI',        desc:'Relative Strength Index · 14 periods',         type:'oscillator', defaultParams:{ period:14 } },
-    { id:'stoch',   group:'Oscillators', label:'Stochastic', desc:'Stochastic Oscillator · 14,3,3',               type:'oscillator', defaultParams:{ k:14, d:3, smooth:3 } },
-    { id:'macd',    group:'Oscillators', label:'MACD',       desc:'MACD · 12,26,9',                               type:'oscillator', defaultParams:{ fast:12, slow:26, signal:9 } },
-    { id:'cci',     group:'Oscillators', label:'CCI',        desc:'Commodity Channel Index · 20 periods',         type:'oscillator', defaultParams:{ period:20 } },
-    { id:'willr',   group:'Oscillators', label:'Williams %R',desc:'Williams %R · 14 periods',                     type:'oscillator', defaultParams:{ period:14 } },
-    { id:'roc',     group:'Oscillators', label:'ROC',        desc:'Rate of Change · 12 periods',                  type:'oscillator', defaultParams:{ period:12 } },
-    { id:'mom',     group:'Oscillators', label:'Momentum',   desc:'Momentum · 10 periods',                        type:'oscillator', defaultParams:{ period:10 } },
-    { id:'mfi',     group:'Oscillators', label:'MFI',        desc:'Money Flow Index · 14 periods (uses volume)',  type:'oscillator', defaultParams:{ period:14 } },
-    { id:'ao',      group:'Oscillators', label:'Awesome Oscillator', desc:'Awesome Oscillator · 5/34 SMA midpoints', type:'oscillator', defaultParams:{} },
-    { id:'trix',    group:'Oscillators', label:'TRIX',       desc:'Triple Smoothed EMA oscillator · 18 periods',  type:'oscillator', defaultParams:{ period:18 } },
-    { id:'dpo',     group:'Oscillators', label:'DPO',        desc:'Detrended Price Oscillator · 21 periods',      type:'oscillator', defaultParams:{ period:21 } },
-    { id:'uo',      group:'Oscillators', label:'Ultimate Osc.',desc:'Ultimate Oscillator · 7/14/28',              type:'oscillator', defaultParams:{} },
+    { id:'rsi',      group:'Oscillators',     label:'RSI',               desc:'Relative Strength Index',                                type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#9c27b0'] },
+    { id:'stoch',    group:'Oscillators',     label:'Stochastic',        desc:'Stochastic Oscillator',                                  type:'oscillator', defaultParams:{ k:14, d:3, smooth:3 },         paramDefs:[{key:'k',label:'%K',type:'int',min:1,max:100,step:1},{key:'smooth',label:'Smooth',type:'int',min:1,max:20,step:1},{key:'d',label:'%D',type:'int',min:1,max:20,step:1}], colors:['#2196f3','#ff9800'] },
+    { id:'macd',     group:'Oscillators',     label:'MACD',              desc:'MACD',                                                   type:'oscillator', defaultParams:{ fast:12, slow:26, signal:9 },  paramDefs:[{key:'fast',label:'Fast',type:'int',min:2,max:100,step:1},{key:'slow',label:'Slow',type:'int',min:2,max:200,step:1},{key:'signal',label:'Signal',type:'int',min:1,max:50,step:1}], colors:['#26a69a','#2196f3','#ff9800'] },
+    { id:'cci',      group:'Oscillators',     label:'CCI',               desc:'Commodity Channel Index',                                type:'oscillator', defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#00bcd4'] },
+    { id:'willr',    group:'Oscillators',     label:'Williams %R',       desc:'Williams %R',                                            type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#ff5722'] },
+    { id:'roc',      group:'Oscillators',     label:'ROC',               desc:'Rate of Change',                                         type:'oscillator', defaultParams:{ period:12 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#4caf50'] },
+    { id:'mom',      group:'Oscillators',     label:'Momentum',          desc:'Momentum',                                               type:'oscillator', defaultParams:{ period:10 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#9c27b0'] },
+    { id:'mfi',      group:'Oscillators',     label:'MFI',               desc:'Money Flow Index (uses volume)',                         type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#03a9f4'] },
+    { id:'ao',       group:'Oscillators',     label:'Awesome Oscillator',desc:'Awesome Oscillator · 5/34',                              type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#26a69a'] },
+    { id:'trix',     group:'Oscillators',     label:'TRIX',              desc:'Triple Smoothed EMA',                                    type:'oscillator', defaultParams:{ period:18 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#673ab7'] },
+    { id:'dpo',      group:'Oscillators',     label:'DPO',               desc:'Detrended Price Oscillator',                             type:'oscillator', defaultParams:{ period:21 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#ff9800'] },
+    { id:'uo',       group:'Oscillators',     label:'Ultimate Osc.',     desc:'Ultimate Oscillator · 7/14/28',                          type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#8bc34a'] },
     // ── Volatility ────────────────────────────────────────────────────────────
-    { id:'atr',     group:'Volatility', label:'ATR',         desc:'Average True Range · 14 periods',              type:'oscillator', defaultParams:{ period:14 } },
-    { id:'adx',     group:'Volatility', label:'ADX / DMI',   desc:'Average Directional Index + DI± · 14 periods', type:'oscillator', defaultParams:{ period:14 } },
-    { id:'aroon',   group:'Volatility', label:'Aroon',       desc:'Aroon Up/Down · 25 periods',                   type:'oscillator', defaultParams:{ period:25 } },
-    { id:'chop',    group:'Volatility', label:'Choppiness', desc:'Choppiness Index · 14 periods',                 type:'oscillator', defaultParams:{ period:14 } },
+    { id:'atr',      group:'Volatility',      label:'ATR',               desc:'Average True Range',                                     type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#ff9800'] },
+    { id:'adx',      group:'Volatility',      label:'ADX / DMI',         desc:'Average Directional Index + DI±',                        type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#f44336','#26a69a','#ef5350'] },
+    { id:'aroon',    group:'Volatility',      label:'Aroon',             desc:'Aroon Up/Down',                                          type:'oscillator', defaultParams:{ period:25 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#26a69a','#ef5350'] },
+    { id:'chop',     group:'Volatility',      label:'Choppiness',        desc:'Choppiness Index',                                       type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#607d8b'] },
     // ── Volume ────────────────────────────────────────────────────────────────
-    { id:'obv',     group:'Volume', label:'OBV',             desc:'On-Balance Volume',                            type:'oscillator', defaultParams:{} },
-    { id:'cmf',     group:'Volume', label:'CMF',             desc:'Chaikin Money Flow · 20 periods',              type:'oscillator', defaultParams:{ period:20 } },
+    { id:'obv',      group:'Volume',          label:'OBV',               desc:'On-Balance Volume',                                      type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#3f51b5'] },
+    { id:'cmf',      group:'Volume',          label:'CMF',               desc:'Chaikin Money Flow',                                     type:'oscillator', defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#00acc1'] },
   ];
 
   // ── Active indicator state (persists across symbol switches) ─────────────────
@@ -3700,13 +3702,20 @@ async function _renderLWChart(ohlcId, label) {
   const _maSeries = {}; // uid → series object
   // Active pane indices — keyed by indicator id, reset each render (chart destroyed)
   const _indPaneIndex = {}; // id → pane index number (oscillators only)
-  const _indSeries    = {}; // id → array of series objects
+  window._indSeries = {}; const _indSeries = window._indSeries;
   const _indRefSeries = {}; // paneIndex → array of ref-line series
 
   // Get effective params for an indicator (custom overrides defaultParams)
   function _iP(id) {
     const cfg = _IND_CATALOGUE.find(c => c.id === id);
     return Object.assign({}, cfg?.defaultParams || {}, window._lwIndParams[id] || {});
+  }
+  // Get effective color for indicator id, series index i
+  function _iC(id, i) {
+    const cfg = _IND_CATALOGUE.find(c => c.id === id);
+    const defaults = cfg?.colors || [];
+    const custom   = (window._lwIndParams[id] || {}).colors || [];
+    return custom[i] || defaults[i] || '#787b86';
   }
 
   // ── Calculation functions — one per indicator id ───────────────────────────
@@ -3728,7 +3737,7 @@ async function _renderLWChart(ohlcId, label) {
         const typicals = bars.map((b, i) => ({ t: b.time, tp: (b.high+b.low+b.close)/3, v: vols[i] }));
         let cumTPV = 0, cumV = 0;
         const data = typicals.map(({ t, tp, v }) => { cumTPV += tp*v; cumV += v; return { time:t, value: cumV>0 ? cumTPV/cumV : tp }; });
-        return [{ data, color:'#ff5722', lineWidth:1, label:'VWAP', dashed:true }];
+        return [{ data, color:_iC(id,0), lineWidth:1, label:'VWAP', dashed:true }];
       }
       case 'bb': {
         const { period:n, mult } = p;
@@ -3738,9 +3747,9 @@ async function _renderLWChart(ohlcId, label) {
         const upper = _iAlign(sma.map((v,i) => v + mult * stdev[i]), bars);
         const lower = _iAlign(sma.map((v,i) => v - mult * stdev[i]), bars);
         return [
-          { data: mid,   color:'rgba(33,150,243,0.5)',  lineWidth:1, label:`BB(${n}) Mid` },
-          { data: upper, color:'rgba(33,150,243,0.8)',  lineWidth:1, label:`+${mult}σ` },
-          { data: lower, color:'rgba(33,150,243,0.8)',  lineWidth:1, label:`-${mult}σ` },
+          { data: mid,   color:_iC(id,0), lineWidth:1, label:`BB(${n}) Mid` },
+          { data: upper, color:_iC(id,1), lineWidth:1, label:`+${mult}σ` },
+          { data: lower, color:_iC(id,2), lineWidth:1, label:`-${mult}σ` },
         ];
       }
       case 'keltner': {
@@ -3751,9 +3760,9 @@ async function _renderLWChart(ohlcId, label) {
         const upper = ema.map((v,i) => v + mult * atr[i]);
         const lower = ema.map((v,i) => v - mult * atr[i]);
         return [
-          { data: _iAlign(ema,   bars), color:'rgba(255,152,0,0.5)', lineWidth:1, label:`KC(${n}) Mid` },
-          { data: _iAlign(upper, bars), color:'rgba(255,152,0,0.8)', lineWidth:1, label:`+${mult}×ATR` },
-          { data: _iAlign(lower, bars), color:'rgba(255,152,0,0.8)', lineWidth:1, label:`-${mult}×ATR` },
+          { data: _iAlign(ema,   bars), color:_iC(id,0), lineWidth:1, label:`KC(${n}) Mid` },
+          { data: _iAlign(upper, bars), color:_iC(id,1), lineWidth:1, label:`+${mult}×ATR` },
+          { data: _iAlign(lower, bars), color:_iC(id,2), lineWidth:1, label:`-${mult}×ATR` },
         ];
       }
       case 'donchian': {
@@ -3767,9 +3776,9 @@ async function _renderLWChart(ohlcId, label) {
           mid.push(  { time:bars[i].time, value:(h+l)/2 });
         }
         return [
-          { data:upper, color:'rgba(156,39,176,0.7)', lineWidth:1, label:`DC(${n}) Upper` },
-          { data:lower, color:'rgba(156,39,176,0.7)', lineWidth:1, label:`DC Lower` },
-          { data:mid,   color:'rgba(156,39,176,0.4)', lineWidth:1, label:`DC Mid`, dashed:true },
+          { data:upper, color:_iC(id,0), lineWidth:1, label:`DC(${n}) Upper` },
+          { data:lower, color:_iC(id,1), lineWidth:1, label:`DC Lower` },
+          { data:mid,   color:_iC(id,2), lineWidth:1, label:`DC Mid`, dashed:true },
         ];
       }
       case 'psar': {
@@ -3790,7 +3799,7 @@ async function _renderLWChart(ohlcId, label) {
           }
           data.push({time:bars[i].time,value:parseFloat(sar.toFixed(dec))});
         }
-        return [{ data, color:'#f44336', lineWidth:0, label:'PSAR', markers:true }];
+        return [{ data, color:_iC(id,0), lineWidth:0, label:'PSAR', markers:true }];
       }
       case 'ichimoku': {
         function tenkan(i,n){const s=bars.slice(Math.max(0,i-n+1),i+1);return(Math.max(...s.map(b=>b.high))+Math.min(...s.map(b=>b.low)))/2;}
@@ -3804,11 +3813,11 @@ async function _renderLWChart(ohlcId, label) {
           if(i>=KJ-1)  cl.push({time:bars[Math.max(0,i-DISP)].time,value:bars[i].close});
         }
         return [
-          { data:tLine, color:'#26a69a', lineWidth:1, label:'Tenkan' },
-          { data:kLine, color:'#ef5350', lineWidth:1, label:'Kijun' },
-          { data:sa,    color:'rgba(38,166,154,0.3)', lineWidth:1, label:'Span A' },
-          { data:sb,    color:'rgba(239,83,80,0.3)',  lineWidth:1, label:'Span B' },
-          { data:cl,    color:'rgba(120,123,134,0.4)',lineWidth:1, label:'Chikou', dashed:true },
+          { data:tLine, color:_iC(id,0), lineWidth:1, label:'Tenkan' },
+          { data:kLine, color:_iC(id,1), lineWidth:1, label:'Kijun' },
+          { data:sa,    color:_iC(id,2), lineWidth:1, label:'Span A' },
+          { data:sb,    color:_iC(id,3), lineWidth:1, label:'Span B' },
+          { data:cl,    color:_iC(id,4), lineWidth:1, label:'Chikou', dashed:true },
         ];
       }
       // ── Oscillators ─────────────────────────────────────────────────────────
@@ -3818,7 +3827,7 @@ async function _renderLWChart(ohlcId, label) {
         for(let i=1;i<closes.length;i++){const d=closes[i]-closes[i-1];gains.push(d>0?d:0);losses.push(d<0?-d:0);}
         const avgG=_iRMA(gains,n), avgL=_iRMA(losses,n);
         const data=avgG.map((g,i)=>{const l=avgL[i];const rs=l===0?Infinity:g/l;return{time:bars[i+1].time,value:parseFloat((l===0?100:100-100/(1+rs)).toFixed(2))};});
-        return [{data,color:'#9c27b0',lineWidth:1,label:`RSI(${n})`,
+        return [{data,color:_iC(id,0),lineWidth:1,label:`RSI(${n})`,
           refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'stoch': {
@@ -3834,8 +3843,8 @@ async function _renderLWChart(ohlcId, label) {
         const kData=sK.map((v,i)=>({time:bars[off+i+smooth-1].time,value:parseFloat(v.toFixed(2))}));
         const dData=sD.map((v,i)=>({time:bars[off+i+smooth-1+dPer-1].time,value:parseFloat(v.toFixed(2))}));
         return [
-          {data:kData,color:'#2196f3',lineWidth:1,label:`%K(${kPer},${smooth})`,refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}]},
-          {data:dData,color:'#ff9800',lineWidth:1,label:`%D(${dPer})`},
+          {data:kData,color:_iC(id,0),lineWidth:1,label:`%K(${kPer},${smooth})`,refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}]},
+          {data:dData,color:_iC(id,1),lineWidth:1,label:`%D(${dPer})`},
         ];
       }
       case 'macd': {
@@ -3853,9 +3862,9 @@ async function _renderLWChart(ohlcId, label) {
           histD.push({time:bars[i].time,value:parseFloat(h.toFixed(6)),color:h>=0?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'});
         }
         return [
-          {data:histD,color:'#26a69a',lineWidth:0,label:'Hist',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]},
-          {data:macdD,color:'#2196f3',lineWidth:1,label:`MACD(${fast},${slow})`},
-          {data:sigD, color:'#ff9800',lineWidth:1,label:`Sig(${sig})`},
+          {data:histD,color:_iC(id,0),lineWidth:0,label:'Hist',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]},
+          {data:macdD,color:_iC(id,1),lineWidth:1,label:`MACD(${fast},${slow})`},
+          {data:sigD, color:_iC(id,2),lineWidth:1,label:`Sig(${sig})`},
         ];
       }
       case 'cci': {
@@ -3867,7 +3876,7 @@ async function _renderLWChart(ohlcId, label) {
           const meanDev=slice.reduce((s,v)=>s+Math.abs(v-avg),0)/n;
           return{time:bars[i+n-1].time,value:parseFloat((meanDev===0?0:(tp[i+n-1]-avg)/(0.015*meanDev)).toFixed(2))};
         });
-        return [{data,color:'#00bcd4',lineWidth:1,label:`CCI(${n})`,
+        return [{data,color:_iC(id,0),lineWidth:1,label:`CCI(${n})`,
           refs:[{v:-100,color:'rgba(239,83,80,0.3)'},{v:0,color:'rgba(120,123,134,0.2)'},{v:100,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'willr': {
@@ -3878,18 +3887,18 @@ async function _renderLWChart(ohlcId, label) {
           const h=Math.max(...sl.map(b=>b.high)),l=Math.min(...sl.map(b=>b.low));
           data.push({time:bars[i].time,value:parseFloat((h===l?-50:((h-bars[i].close)/(h-l))*-100).toFixed(2))});
         }
-        return [{data,color:'#ff5722',lineWidth:1,label:`%R(${n})`,
+        return [{data,color:_iC(id,0),lineWidth:1,label:`%R(${n})`,
           refs:[{v:-80,color:'rgba(239,83,80,0.3)'},{v:-50,color:'rgba(120,123,134,0.2)'},{v:-20,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'roc': {
         const n = p.period;
         const data=bars.slice(n).map((b,i)=>({time:b.time,value:parseFloat(((b.close-bars[i].close)/bars[i].close*100).toFixed(4))}));
-        return [{data,color:'#4caf50',lineWidth:1,label:`ROC(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`ROC(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       case 'mom': {
         const n = p.period;
         const data=bars.slice(n).map((b,i)=>({time:b.time,value:parseFloat((b.close-bars[i].close).toFixed(dec))}));
-        return [{data,color:'#9c27b0',lineWidth:1,label:`Mom(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`Mom(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       case 'mfi': {
         const n = p.period;
@@ -3904,7 +3913,7 @@ async function _renderLWChart(ohlcId, label) {
           }
           data.push({time:bars[i].time,value:parseFloat((nmf===0?100:100-100/(1+pmf/nmf)).toFixed(2))});
         }
-        return [{data,color:'#03a9f4',lineWidth:1,label:`MFI(${n})`,
+        return [{data,color:_iC(id,0),lineWidth:1,label:`MFI(${n})`,
           refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'ao': {
@@ -3916,13 +3925,13 @@ async function _renderLWChart(ohlcId, label) {
           const prev=i>0?s34[i-1]+s5[i+(34-5)-1]-s34[i-1]:ao;
           return{time:bars[off+i].time,value:parseFloat(ao.toFixed(6)),color:ao>=prev?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'};
         });
-        return [{data,color:'#26a69a',lineWidth:0,label:'AO',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:0,label:'AO',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]}];
       }
       case 'trix': {
         const n = p.period;
         const e1=_iEMA(closes,n),e2=_iEMA(e1,n),e3=_iEMA(e2,n);
         const data=e3.slice(1).map((v,i)=>({time:bars[bars.length-e3.length+i+1].time,value:parseFloat(((v-e3[i])/e3[i]*100).toFixed(6))}));
-        return [{data,color:'#673ab7',lineWidth:1,label:`TRIX(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`TRIX(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       case 'dpo': {
         const n = p.period; const disp=Math.floor(n/2)+1;
@@ -3932,7 +3941,7 @@ async function _renderLWChart(ohlcId, label) {
           if(barIdx<0) return null;
           return{time:bars[i+n-1].time,value:parseFloat((closes[barIdx]-v).toFixed(dec))};
         }).filter(Boolean);
-        return [{data,color:'#ff9800',lineWidth:1,label:`DPO(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`DPO(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       case 'uo': {
         const data=[];
@@ -3945,14 +3954,14 @@ async function _renderLWChart(ohlcId, label) {
           for(let j=i-27;j<=i;j++){bp28+=_uoBP(j);tr28+=_uoTR(j);}
           data.push({time:bars[i].time,value:parseFloat((100*(4*(bp7/tr7)+2*(bp14/tr14)+(bp28/tr28))/7).toFixed(2))});
         }
-        return [{data,color:'#8bc34a',lineWidth:1,label:'UO(7,14,28)',
+        return [{data,color:_iC(id,0),lineWidth:1,label:'UO(7,14,28)',
           refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'atr': {
         const n = p.period;
         const tr=_iTR(bars);
         const atr=_iRMA(tr,n);
-        return [{data:bars.map((b,i)=>({time:b.time,value:parseFloat(atr[i].toFixed(dec))})),color:'#ff9800',lineWidth:1,label:`ATR(${n})`}];
+        return [{data:bars.map((b,i)=>({time:b.time,value:parseFloat(atr[i].toFixed(dec))})),color:_iC(id,0),lineWidth:1,label:`ATR(${n})`}];
       }
       case 'adx': {
         const n = p.period;
@@ -3969,9 +3978,9 @@ async function _renderLWChart(ohlcId, label) {
         const adx=_iRMA(dx,n);
         const off=bars.length-adx.length;
         return [
-          {data:adx.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:'#f44336',lineWidth:1,label:`ADX(${n})`,refs:[{v:25,color:'rgba(239,83,80,0.3)'}]},
-          {data:pDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:'#26a69a',lineWidth:1,label:'+DI'},
-          {data:mDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:'#ef5350',lineWidth:1,label:'-DI'},
+          {data:adx.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,0),lineWidth:1,label:`ADX(${n})`,refs:[{v:25,color:'rgba(239,83,80,0.3)'}]},
+          {data:pDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,1),lineWidth:1,label:'+DI'},
+          {data:mDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,2),lineWidth:1,label:'-DI'},
         ];
       }
       case 'aroon': {
@@ -3985,8 +3994,8 @@ async function _renderLWChart(ohlcId, label) {
           dn.push({time:bars[i].time,value:parseFloat(((loIdx/n)*100).toFixed(2))});
         }
         return [
-          {data:up,color:'#26a69a',lineWidth:1,label:`Aroon Up(${n})`,refs:[{v:50,color:'rgba(120,123,134,0.2)'}]},
-          {data:dn,color:'#ef5350',lineWidth:1,label:`Aroon Down`},
+          {data:up,color:_iC(id,0),lineWidth:1,label:`Aroon Up(${n})`,refs:[{v:50,color:'rgba(120,123,134,0.2)'}]},
+          {data:dn,color:_iC(id,1),lineWidth:1,label:`Aroon Down`},
         ];
       }
       case 'chop': {
@@ -3999,7 +4008,7 @@ async function _renderLWChart(ohlcId, label) {
           const hl=Math.max(...sl.map(b=>b.high))-Math.min(...sl.map(b=>b.low));
           data.push({time:bars[i].time,value:parseFloat((hl===0?100:(100*Math.log10(atrSum/hl)/Math.log10(n))).toFixed(2))});
         }
-        return [{data,color:'#607d8b',lineWidth:1,label:`Chop(${n})`,
+        return [{data,color:_iC(id,0),lineWidth:1,label:`Chop(${n})`,
           refs:[{v:38.2,color:'rgba(38,166,154,0.3)'},{v:61.8,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'obv': {
@@ -4008,7 +4017,7 @@ async function _renderLWChart(ohlcId, label) {
           if(i>0){if(b.close>bars[i-1].close)obv+=b.volume||0;else if(b.close<bars[i-1].close)obv-=b.volume||0;}
           return{time:b.time,value:obv};
         });
-        return [{data,color:'#3f51b5',lineWidth:1,label:'OBV'}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:'OBV'}];
       }
       case 'cmf': {
         const n = p.period;
@@ -4019,7 +4028,7 @@ async function _renderLWChart(ohlcId, label) {
           const mfvSum=mfv.slice(i-n+1,i+1).reduce((s,v)=>s+v,0);
           data.push({time:bars[i].time,value:parseFloat((volSum===0?0:mfvSum/volSum).toFixed(4))});
         }
-        return [{data,color:'#00acc1',lineWidth:1,label:`CMF(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`CMF(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       default: return [];
     }
@@ -4441,6 +4450,37 @@ async function _renderLWChart(ohlcId, label) {
       groups[cfg.group].push(cfg);
     });
 
+    // Helper: build a color swatch + hidden input that updates _lwIndParams[id].colors[i]
+    function _makeColorSwatch(id, i, label) {
+      const wrap = document.createElement('label');
+      wrap.title = label;
+      wrap.style.cssText = 'position:relative;cursor:pointer;flex-shrink:0;display:flex;align-items:center;gap:3px;';
+      const swatch = document.createElement('span');
+      const curColor = _iC(id, i);
+      swatch.style.cssText = `display:inline-block;width:10px;height:10px;border-radius:2px;background:${curColor};border:1px solid rgba(255,255,255,0.15);cursor:pointer;`;
+      const inp = document.createElement('input');
+      inp.type = 'color';
+      // Normalise to 6-digit hex (strip alpha if needed)
+      const hexOnly = curColor.replace(/^rgba?\([^)]+\)$/, '#888888').replace(/^(#[0-9a-fA-F]{6}).*/, '$1');
+      inp.value = hexOnly.startsWith('#') ? hexOnly : '#888888';
+      inp.style.cssText = 'position:absolute;opacity:0;width:0;height:0;';
+      inp.addEventListener('input', e => {
+        e.stopPropagation();
+        if (!window._lwIndParams[id]) window._lwIndParams[id] = {};
+        if (!window._lwIndParams[id].colors) window._lwIndParams[id].colors = [...((_IND_CATALOGUE.find(c=>c.id===id)||{}).colors||[])];
+        window._lwIndParams[id].colors[i] = e.target.value;
+        swatch.style.background = e.target.value;
+        _saveIndParams();
+        // Live-update series color if active
+        if (window._lwIndState[id] && window._indSeries && window._indSeries[id] && window._indSeries[id][i]) {
+          try { window._indSeries[id][i].applyOptions({ color: e.target.value }); } catch(_) {}
+        }
+      });
+      wrap.appendChild(swatch);
+      wrap.appendChild(inp);
+      return wrap;
+    }
+
     Object.entries(groups).forEach(([groupName, items]) => {
       const header = document.createElement('div');
       header.textContent = groupName.toUpperCase();
@@ -4448,23 +4488,32 @@ async function _renderLWChart(ohlcId, label) {
       pop.appendChild(header);
 
       items.forEach(cfg => {
-        const row = document.createElement('div');
         const isOn = !!window._lwIndState[cfg.id];
-        row.style.cssText = `display:flex;align-items:center;justify-content:space-between;padding:6px 12px;cursor:pointer;background:${isOn?'rgba(79,127,255,0.08)':'transparent'};`;
-        row.addEventListener('mouseenter', () => { if (!isOn) row.style.background = 'rgba(255,255,255,0.04)'; });
-        row.addEventListener('mouseleave', () => { row.style.background = isOn ? 'rgba(79,127,255,0.08)' : 'transparent'; });
+        const hasParams = cfg.paramDefs.length > 0;
+        const hasColors = cfg.colors.length > 0;
+        const expandable = isOn && (hasParams || hasColors);
 
-        const left = document.createElement('div');
-        left.innerHTML = `<div style="color:${isOn?'#d1d4dc':'#9da5b4'};font-weight:${isOn?'600':'400'}">${cfg.label}</div>`
-          + `<div style="color:#4a5060;font-size:9px;margin-top:1px">${cfg.desc}</div>`;
+        // ── Main toggle row ────────────────────────────────────
+        const row = document.createElement('div');
+        row.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;background:${isOn?'rgba(79,127,255,0.08)':'transparent'};border-bottom:${expandable?'none':'1px solid rgba(42,46,57,0.3)'};`;
+        row.addEventListener('mouseenter', () => { if (!isOn) row.style.background='rgba(255,255,255,0.04)'; });
+        row.addEventListener('mouseleave', () => { row.style.background=isOn?'rgba(79,127,255,0.08)':'transparent'; });
 
+        // Checkbox
         const check = document.createElement('div');
         check.style.cssText = `width:14px;height:14px;border-radius:3px;border:1px solid ${isOn?'#4f7fff':'#3a3f52'};background:${isOn?'#4f7fff':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;`;
         if (isOn) check.innerHTML = '<svg width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1,3 3,5 7,1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-        row.appendChild(left);
-        row.appendChild(check);
+        // Label + desc
+        const left = document.createElement('div');
+        left.style.cssText = 'flex:1;min-width:0;';
+        left.innerHTML = `<div style="color:${isOn?'#d1d4dc':'#9da5b4'};font-weight:${isOn?'600':'400'};font-size:11px">${cfg.label}</div>`
+          + `<div style="color:#4a5060;font-size:9px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${cfg.desc}</div>`;
 
+        row.appendChild(check);
+        row.appendChild(left);
+
+        // Toggle click
         row.addEventListener('click', e => {
           e.stopPropagation();
           window._lwIndState[cfg.id] = !window._lwIndState[cfg.id];
@@ -4475,6 +4524,83 @@ async function _renderLWChart(ohlcId, label) {
         });
 
         pop.appendChild(row);
+
+        // ── Inline param/color row (only when indicator is ON) ────
+        if (expandable) {
+          const paramRow = document.createElement('div');
+          paramRow.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:5px;padding:4px 12px 7px 34px;background:rgba(79,127,255,0.05);border-bottom:1px solid rgba(42,46,57,0.5);';
+
+          // Numeric params
+          cfg.paramDefs.forEach(pd => {
+            const lbl = document.createElement('label');
+            lbl.style.cssText = 'display:flex;align-items:center;gap:3px;color:#6b7280;font-size:9px;font-weight:600;letter-spacing:.03em;';
+            lbl.textContent = pd.label;
+
+            const inp = document.createElement('input');
+            inp.type = 'number';
+            inp.value = _iP(cfg.id)[pd.key];
+            inp.min = pd.min; inp.max = pd.max; inp.step = pd.step || 1;
+            inp.style.cssText = 'width:46px;background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;text-align:center;';
+            inp.addEventListener('click', e => e.stopPropagation());
+            inp.addEventListener('change', e => {
+              e.stopPropagation();
+              const raw = pd.type === 'float' ? parseFloat(e.target.value) : parseInt(e.target.value);
+              if (isNaN(raw) || raw < pd.min || raw > pd.max) return;
+              if (!window._lwIndParams[cfg.id]) window._lwIndParams[cfg.id] = {};
+              window._lwIndParams[cfg.id][pd.key] = raw;
+              _saveIndParams();
+              // Rebuild indicator with new params
+              if (window._lwIndState[cfg.id]) {
+                _destroyIndicatorPane(cfg.id);
+                _buildIndicatorPane(cfg.id);
+              }
+            });
+            lbl.appendChild(inp);
+            paramRow.appendChild(lbl);
+          });
+
+          // Color swatches (with series labels from catalogue)
+          const seriesLabels = {
+            vwap:    ['Line'],
+            bb:      ['Mid','Upper','Lower'],
+            keltner: ['Mid','Upper','Lower'],
+            donchian:['Upper','Lower','Mid'],
+            psar:    ['Dots'],
+            ichimoku:['Tenkan','Kijun','Span A','Span B','Chikou'],
+            rsi:     ['Line'],
+            stoch:   ['%K','%D'],
+            macd:    ['Hist','MACD','Signal'],
+            cci:     ['Line'],
+            willr:   ['Line'],
+            roc:     ['Line'],
+            mom:     ['Line'],
+            mfi:     ['Line'],
+            ao:      ['Hist'],
+            trix:    ['Line'],
+            dpo:     ['Line'],
+            uo:      ['Line'],
+            atr:     ['Line'],
+            adx:     ['ADX','+DI','-DI'],
+            aroon:   ['Up','Down'],
+            chop:    ['Line'],
+            obv:     ['Line'],
+            cmf:     ['Line'],
+          };
+          const labels = seriesLabels[cfg.id] || cfg.colors.map((_,i) => `S${i+1}`);
+          cfg.colors.forEach((_, ci) => {
+            const sw = _makeColorSwatch(cfg.id, ci, labels[ci] || `Series ${ci+1}`);
+            const lbl = document.createElement('span');
+            lbl.style.cssText = 'color:#6b7280;font-size:9px;';
+            lbl.textContent = labels[ci] || `S${ci+1}`;
+            const wrap2 = document.createElement('div');
+            wrap2.style.cssText = 'display:flex;align-items:center;gap:2px;';
+            wrap2.appendChild(sw);
+            wrap2.appendChild(lbl);
+            paramRow.appendChild(wrap2);
+          });
+
+          pop.appendChild(paramRow);
+        }
       });
     });
 
