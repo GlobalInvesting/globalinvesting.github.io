@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-03T21:05:25Z",
+  "updated": "2026-05-03T21:10:20Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -203,35 +203,35 @@
       "pct1w_date": "2026-04-24"
     },
     "btc": {
-      "close": 78886.75,
+      "close": 79005.03,
       "prev_close": 78669.555,
-      "chg": 217.195,
-      "pct": 0.2761,
+      "chg": 335.475,
+      "pct": 0.4264,
       "high": 79040.46,
       "low": 78093.305,
       "open": 78669.555,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1777842322,
+      "market_time": 1777842623,
       "source": "yfinance",
-      "pct1w": 1.8481,
+      "pct1w": 2.0008,
       "pct1w_date": "2026-04-24"
     },
     "eth": {
-      "close": 2327.8,
+      "close": 2331.61,
       "prev_close": 2316.6477,
-      "chg": 11.1523,
-      "pct": 0.4814,
+      "chg": 14.9623,
+      "pct": 0.6459,
       "high": 2339.0889,
       "low": 2297.5532,
       "open": 2316.6477,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1777842326,
+      "market_time": 1777842621,
       "source": "yfinance",
-      "pct1w": 0.5229,
+      "pct1w": 0.6875,
       "pct1w_date": "2026-04-24"
     },
     "nasdaq": {
@@ -314,7 +314,7 @@
       "pct1w": 0.3376,
       "pct1w_date": "2026-04-24",
       "hv30": 6.72,
-      "pct1m": 1.4549,
+      "pct1m": 1.2884,
       "pct1m_date": "2026-04-01"
     },
     "gbpusd": {
@@ -370,8 +370,8 @@
       "source": "yfinance",
       "pct1w": 1.1029,
       "pct1w_date": "2026-04-24",
-      "hv30": 10.99,
-      "pct1m": 4.3985,
+      "hv30": 10.97,
+      "pct1m": 4.1577,
       "pct1m_date": "2026-04-01"
     },
     "usdchf": {
@@ -835,7 +835,7 @@
     "eurusd": 6.72,
     "gbpusd": 7.51,
     "usdjpy": 8.0,
-    "audusd": 10.99,
+    "audusd": 10.97,
     "usdchf": 7.65,
     "usdcad": 4.88,
     "nzdusd": 10.36,
@@ -1326,14 +1326,14 @@
     {
       "a": "AUD/USD",
       "b": "Gold",
-      "corr30": 0.52,
+      "corr30": 0.524,
       "n30": 30,
-      "corr": 0.279,
+      "corr": 0.283,
       "n": 60,
-      "corr90": 0.58,
+      "corr90": 0.581,
       "n90": 90,
       "norm": 0.302,
-      "z_score": 0.45,
+      "z_score": 0.46,
       "std": 0.4836,
       "history": [
         0.117,
@@ -1557,7 +1557,7 @@
         0.548,
         0.571,
         0.547,
-        0.52
+        0.524
       ],
       "hist_dates": [
         "2025-06-25",
@@ -3637,14 +3637,14 @@
     {
       "a": "AUD/USD",
       "b": "ASX 200",
-      "corr30": 0.683,
+      "corr30": 0.688,
       "n30": 30,
-      "corr": 0.464,
+      "corr": 0.468,
       "n": 60,
-      "corr90": 0.325,
+      "corr90": 0.326,
       "n90": 90,
-      "norm": 0.157,
-      "z_score": 1.18,
+      "norm": 0.158,
+      "z_score": 1.19,
       "std": 0.4441,
       "history": [
         0.635,
@@ -3869,7 +3869,7 @@
         0.744,
         0.735,
         0.709,
-        0.683
+        0.688
       ],
       "hist_dates": [
         "2025-06-24",
