@@ -4463,8 +4463,13 @@ async function _renderLWChart(ohlcId, label) {
       pop.style.left = Math.max(8, rect.left) + 'px';
     }
 
+    // Stop ALL clicks inside the popup from bubbling to document
+    pop.addEventListener('click',     e => e.stopPropagation());
+    pop.addEventListener('mousedown', e => e.stopPropagation());
+
+    // Close when user clicks/mousedowns outside the popup
     setTimeout(() => {
-      document.addEventListener('click', _closeIndDropdown, { once: true });
+      document.addEventListener('mousedown', _closeIndDropdown, { once: true });
     }, 0);
   }
 
