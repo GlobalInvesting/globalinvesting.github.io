@@ -3560,6 +3560,45 @@ async function _renderLWChart(ohlcId, label) {
     }
     return out;
   }
+  function _iDEMA(src, n) { // Double EMA
+    const e1 = _iEMA(src, n);
+    const e2 = _iEMA(e1, n);
+    return e1.slice(e1.length - e2.length).map((v, i) => 2 * v - e2[i]);
+  }
+  function _iTEMA(src, n) { // Triple EMA
+    const e1 = _iEMA(src, n);
+    const e2 = _iEMA(e1, n);
+    const e3 = _iEMA(e2, n);
+    const off1 = e1.length - e3.length;
+    const off2 = e2.length - e3.length;
+    return e3.map((v3, i) => 3 * e1[off1 + i] - 3 * e2[off2 + i] + v3);
+  }
+  function _iVWMA(bars, n) { // Volume-Weighted MA
+    const out = [];
+    for (let i = n - 1; i < bars.length; i++) {
+      let sumPV = 0, sumV = 0;
+      for (let j = 0; j < n; j++) { sumPV += bars[i-j].close * (bars[i-j].volume||1); sumV += (bars[i-j].volume||1); }
+      out.push(sumPV / sumV);
+    }
+    return out;
+  }
+  // Compute any MA type from closes (and bars for VWMA) — returns raw array
+  function _iMA(type, closes, bars, n) {
+    switch (type) {
+      case 'SMA':  return _iSMA(closes, n);
+      case 'EMA':  return _iEMA(closes, n);
+      case 'WMA':  return _iWMA(closes, n);
+      case 'HMA': { const half=Math.round(n/2),sqrtp=Math.round(Math.sqrt(n));
+                    const wH=_iWMA(closes,half),wP=_iWMA(closes,n);
+                    const off=n-half;
+                    const raw=wH.slice(off).map((v,i)=>2*v-wP[i+off]);
+                    return _iWMA(raw,sqrtp); }
+      case 'DEMA': return _iDEMA(closes, n);
+      case 'TEMA': return _iTEMA(closes, n);
+      case 'VWMA': return _iVWMA(bars, n);
+      default:     return _iEMA(closes, n);
+    }
+  }
   function _iStdev(src, n) {
     const out = [];
     for (let i = n - 1; i < src.length; i++) {
@@ -3582,9 +3621,10 @@ async function _renderLWChart(ohlcId, label) {
       return Math.max(b.high - b.low, Math.abs(b.high - pc), Math.abs(b.low - pc));
     });
   }
-  // Align a calculated array (shorter) to bars by padding NaN at the start
-  function _iAlign(arr, bars, offset) {
-    const pad = bars.length - arr.length - (offset || 0);
+  // Align a calculated array (shorter) to bars — pad = bars.length - arr.length
+  // No offset param: the array's own length determines the correct alignment automatically.
+  function _iAlign(arr, bars) {
+    const pad = bars.length - arr.length;
     return bars.map((b, i) => {
       const v = arr[i - pad];
       return { time: b.time, value: (v != null && !isNaN(v)) ? v : NaN };
@@ -3600,11 +3640,7 @@ async function _renderLWChart(ohlcId, label) {
   // type: 'overlay' = drawn on main price pane; 'oscillator' = sub-pane below
   const _IND_CATALOGUE = [
     // ── Overlays ──────────────────────────────────────────────────────────────
-    { id:'ema20',   group:'Overlays', label:'EMA 20',       desc:'Exponential Moving Average · 20 periods',       type:'overlay',    defaultParams:{ period:20 } },
-    { id:'ema50',   group:'Overlays', label:'EMA 50',       desc:'Exponential Moving Average · 50 periods',       type:'overlay',    defaultParams:{ period:50 } },
-    { id:'ema200',  group:'Overlays', label:'EMA 200',      desc:'Exponential Moving Average · 200 periods',      type:'overlay',    defaultParams:{ period:200 } },
-    { id:'wma',     group:'Overlays', label:'WMA 20',       desc:'Weighted Moving Average · 20 periods',          type:'overlay',    defaultParams:{ period:20 } },
-    { id:'hma',     group:'Overlays', label:'HMA 20',       desc:'Hull Moving Average · 20 periods',              type:'overlay',    defaultParams:{ period:20 } },
+    { id:'ma',      group:'Moving Averages', label:'Moving Average', desc:'Add configurable MAs (SMA/EMA/WMA/HMA/DEMA/TEMA/VWMA)', type:'overlay', defaultParams:{} },
     { id:'vwap',    group:'Overlays', label:'VWAP',         desc:'Volume-Weighted Avg Price (daily sessions)',     type:'overlay',    defaultParams:{} },
     { id:'bb',      group:'Overlays', label:'Bollinger Bands', desc:'Bollinger Bands · 20 SMA ± 2σ',              type:'overlay',    defaultParams:{ period:20, mult:2 } },
     { id:'keltner', group:'Overlays', label:'Keltner Channel', desc:'Keltner Channel · 20 EMA ± 1.5×ATR(10)',    type:'overlay',    defaultParams:{ period:20, mult:1.5 } },
@@ -3635,11 +3671,25 @@ async function _renderLWChart(ohlcId, label) {
   ];
 
   // ── Active indicator state (persists across symbol switches) ─────────────────
-  if (typeof window._lwIndState === 'undefined') window._lwIndState = {}; // id → true/false
+  if (typeof window._lwIndState  === 'undefined') window._lwIndState  = {}; // id → bool
+  if (typeof window._lwIndParams === 'undefined') window._lwIndParams = {}; // id → {param:value}
+  // MA list: array of { uid, type, period, color, lineWidth, lineStyle }
+  if (typeof window._lwMaList    === 'undefined') window._lwMaList = [
+    { uid:'ma_ema20',  type:'EMA', period:20,  color:'#2196f3', lineWidth:1, lineStyle:0 },
+    { uid:'ma_ema50',  type:'EMA', period:50,  color:'#ff9800', lineWidth:1, lineStyle:0 },
+    { uid:'ma_ema200', type:'EMA', period:200, color:'#e91e63', lineWidth:1, lineStyle:0 },
+  ];
+  const _maSeries = {}; // uid → series object
   // Active pane indices — keyed by indicator id, reset each render (chart destroyed)
   const _indPaneIndex = {}; // id → pane index number (oscillators only)
   const _indSeries    = {}; // id → array of series objects
   const _indRefSeries = {}; // paneIndex → array of ref-line series
+
+  // Get effective params for an indicator (custom overrides defaultParams)
+  function _iP(id) {
+    const cfg = _IND_CATALOGUE.find(c => c.id === id);
+    return Object.assign({}, cfg?.defaultParams || {}, window._lwIndParams[id] || {});
+  }
 
   // ── Calculation functions — one per indicator id ───────────────────────────
 
@@ -3648,105 +3698,91 @@ async function _renderLWChart(ohlcId, label) {
     const highs  = bars.map(b => b.high);
     const lows   = bars.map(b => b.low);
     const vols   = bars.map(b => b.volume || 0);
+    const p      = _iP(id); // effective params (defaults + user overrides)
 
     switch (id) {
-      case 'ema20':  { const v = _iEMA(closes, 20);  return [{ data: _iAlign(v, bars, 0), color:'#2196f3', lineWidth:1, label:'EMA 20' }]; }
-      case 'ema50':  { const v = _iEMA(closes, 50);  return [{ data: _iAlign(v, bars, 0), color:'#ff9800', lineWidth:1, label:'EMA 50' }]; }
-      case 'ema200': { const v = _iEMA(closes, 200); return [{ data: _iAlign(v, bars, 0), color:'#e91e63', lineWidth:1, label:'EMA 200' }]; }
-      case 'wma':    { const v = _iWMA(closes, 20);  return [{ data: _iAlign(v, bars, 19), color:'#00bcd4', lineWidth:1, label:'WMA 20' }]; }
-      case 'hma': {
-        const p = 20; const half = Math.round(p / 2); const sqrtp = Math.round(Math.sqrt(p));
-        const wmaH = _iWMA(closes, half); const wmaP = _iWMA(closes, p);
-        const offset = p - half;
-        const raw = wmaH.slice(offset).map((v, i) => 2 * v - wmaP[i + offset]);
-        const hma = _iWMA(raw, sqrtp);
-        return [{ data: _iAlign(hma, bars, p - 1 + sqrtp - 1), color:'#8bc34a', lineWidth:1, label:'HMA 20' }];
+      case 'ma': {
+        // MA indicator now renders via _buildMaSeries, not _calcIndData
+        // Return an empty stub so _buildIndicatorPane doesn't fail
+        return [];
       }
       case 'vwap': {
-        // Session VWAP reset: approximate per-year (full history = one session for simplicity)
-        const typicals = bars.map((b, i) => ({
-          t: b.time, tp: (b.high + b.low + b.close) / 3, v: vols[i]
-        }));
+        const typicals = bars.map((b, i) => ({ t: b.time, tp: (b.high+b.low+b.close)/3, v: vols[i] }));
         let cumTPV = 0, cumV = 0;
-        const data = typicals.map(({ t, tp, v }) => {
-          cumTPV += tp * v; cumV += v;
-          return { time: t, value: cumV > 0 ? cumTPV / cumV : tp };
-        });
-        return [{ data, color:'#ff5722', lineWidth:1, label:'VWAP', dashed: true }];
+        const data = typicals.map(({ t, tp, v }) => { cumTPV += tp*v; cumV += v; return { time:t, value: cumV>0 ? cumTPV/cumV : tp }; });
+        return [{ data, color:'#ff5722', lineWidth:1, label:'VWAP', dashed:true }];
       }
       case 'bb': {
-        const n = 20, mult = 2;
-        const sma  = _iSMA(closes, n);
+        const { period:n, mult } = p;
+        const sma   = _iSMA(closes, n);
         const stdev = _iStdev(closes, n);
-        const offset = n - 1;
-        const mid   = _iAlign(sma,                  bars, offset);
-        const upper = _iAlign(sma.map((v,i) => v + mult * stdev[i]), bars, offset);
-        const lower = _iAlign(sma.map((v,i) => v - mult * stdev[i]), bars, offset);
+        const mid   = _iAlign(sma, bars);
+        const upper = _iAlign(sma.map((v,i) => v + mult * stdev[i]), bars);
+        const lower = _iAlign(sma.map((v,i) => v - mult * stdev[i]), bars);
         return [
-          { data: mid,   color:'rgba(33,150,243,0.5)',  lineWidth:1, label:'BB Mid' },
-          { data: upper, color:'rgba(33,150,243,0.8)',  lineWidth:1, label:'BB Upper' },
-          { data: lower, color:'rgba(33,150,243,0.8)',  lineWidth:1, label:'BB Lower' },
+          { data: mid,   color:'rgba(33,150,243,0.5)',  lineWidth:1, label:`BB(${n}) Mid` },
+          { data: upper, color:'rgba(33,150,243,0.8)',  lineWidth:1, label:`+${mult}σ` },
+          { data: lower, color:'rgba(33,150,243,0.8)',  lineWidth:1, label:`-${mult}σ` },
         ];
       }
       case 'keltner': {
-        const n = 20, mult = 1.5;
-        const ema = _iEMA(closes, n);
-        const tr  = _iTR(bars);
-        const atr = _iRMA(tr, 10);
-        const upper = ema.map((v, i) => v + mult * atr[i]);
-        const lower = ema.map((v, i) => v - mult * atr[i]);
+        const { period:n, mult } = p;
+        const ema   = _iEMA(closes, n);
+        const tr    = _iTR(bars);
+        const atr   = _iRMA(tr, 10);
+        const upper = ema.map((v,i) => v + mult * atr[i]);
+        const lower = ema.map((v,i) => v - mult * atr[i]);
         return [
-          { data: _iAlign(ema,   bars, 0), color:'rgba(255,152,0,0.5)', lineWidth:1, label:'KC Mid' },
-          { data: _iAlign(upper, bars, 0), color:'rgba(255,152,0,0.8)', lineWidth:1, label:'KC Upper' },
-          { data: _iAlign(lower, bars, 0), color:'rgba(255,152,0,0.8)', lineWidth:1, label:'KC Lower' },
+          { data: _iAlign(ema,   bars), color:'rgba(255,152,0,0.5)', lineWidth:1, label:`KC(${n}) Mid` },
+          { data: _iAlign(upper, bars), color:'rgba(255,152,0,0.8)', lineWidth:1, label:`+${mult}×ATR` },
+          { data: _iAlign(lower, bars), color:'rgba(255,152,0,0.8)', lineWidth:1, label:`-${mult}×ATR` },
         ];
       }
       case 'donchian': {
-        const n = 20;
+        const n = p.period;
         const upper = [], lower = [], mid = [];
-        for (let i = n - 1; i < bars.length; i++) {
-          const slice = bars.slice(i - n + 1, i + 1);
-          const h = Math.max(...slice.map(b => b.high));
-          const l = Math.min(...slice.map(b => b.low));
-          upper.push({ time: bars[i].time, value: h });
-          lower.push({ time: bars[i].time, value: l });
-          mid.push(  { time: bars[i].time, value: (h + l) / 2 });
+        for (let i = n-1; i < bars.length; i++) {
+          const sl = bars.slice(i-n+1, i+1);
+          const h = Math.max(...sl.map(b=>b.high)), l = Math.min(...sl.map(b=>b.low));
+          upper.push({ time:bars[i].time, value:h });
+          lower.push({ time:bars[i].time, value:l });
+          mid.push(  { time:bars[i].time, value:(h+l)/2 });
         }
         return [
-          { data: upper, color:'rgba(156,39,176,0.7)', lineWidth:1, label:'DC Upper' },
-          { data: lower, color:'rgba(156,39,176,0.7)', lineWidth:1, label:'DC Lower' },
-          { data: mid,   color:'rgba(156,39,176,0.4)', lineWidth:1, label:'DC Mid', dashed:true },
+          { data:upper, color:'rgba(156,39,176,0.7)', lineWidth:1, label:`DC(${n}) Upper` },
+          { data:lower, color:'rgba(156,39,176,0.7)', lineWidth:1, label:`DC Lower` },
+          { data:mid,   color:'rgba(156,39,176,0.4)', lineWidth:1, label:`DC Mid`, dashed:true },
         ];
       }
       case 'psar': {
-        const step = 0.02, maxAF = 0.2;
-        let bull = true, ep = bars[0].high, af = step, sar = bars[0].low;
-        const data = [];
-        for (let i = 1; i < bars.length; i++) {
-          const prev = bars[i - 1];
-          sar = sar + af * (ep - sar);
-          if (bull) {
-            if (bars[i].low < sar) { bull = false; sar = ep; ep = bars[i].low; af = step; }
-            else { if (bars[i].high > ep) { ep = bars[i].high; af = Math.min(af + step, maxAF); } }
-            sar = Math.min(sar, prev.low, bars[Math.max(0,i-2)].low);
+        const { step, max:maxAF } = p;
+        let bull=true, ep=bars[0].high, af=step, sar=bars[0].low;
+        const data=[];
+        for(let i=1;i<bars.length;i++){
+          const prev=bars[i-1];
+          sar = sar + af*(ep-sar);
+          if(bull){
+            if(bars[i].low<sar){bull=false;sar=ep;ep=bars[i].low;af=step;}
+            else{if(bars[i].high>ep){ep=bars[i].high;af=Math.min(af+step,maxAF);}}
+            sar=Math.min(sar,prev.low,bars[Math.max(0,i-2)].low);
           } else {
-            if (bars[i].high > sar) { bull = true; sar = ep; ep = bars[i].high; af = step; }
-            else { if (bars[i].low < ep) { ep = bars[i].low; af = Math.min(af + step, maxAF); } }
-            sar = Math.max(sar, prev.high, bars[Math.max(0,i-2)].high);
+            if(bars[i].high>sar){bull=true;sar=ep;ep=bars[i].high;af=step;}
+            else{if(bars[i].low<ep){ep=bars[i].low;af=Math.min(af+step,maxAF);}}
+            sar=Math.max(sar,prev.high,bars[Math.max(0,i-2)].high);
           }
-          data.push({ time: bars[i].time, value: parseFloat(sar.toFixed(dec)) });
+          data.push({time:bars[i].time,value:parseFloat(sar.toFixed(dec))});
         }
         return [{ data, color:'#f44336', lineWidth:0, label:'PSAR', markers:true }];
       }
       case 'ichimoku': {
-        function tenkan(i, n) { const s = bars.slice(Math.max(0,i-n+1),i+1); return (Math.max(...s.map(b=>b.high))+Math.min(...s.map(b=>b.low)))/2; }
+        function tenkan(i,n){const s=bars.slice(Math.max(0,i-n+1),i+1);return(Math.max(...s.map(b=>b.high))+Math.min(...s.map(b=>b.low)))/2;}
         const TK=9,KJ=26,SB2=52,DISP=26;
         const tLine=[],kLine=[],sa=[],sb=[],cl=[];
         for(let i=0;i<bars.length;i++){
-          const tk=tenkan(i,TK), kj=tenkan(i,KJ);
+          const tk=tenkan(i,TK),kj=tenkan(i,KJ);
           if(i>=TK-1) tLine.push({time:bars[i].time,value:tk});
-          if(i>=KJ-1){ kLine.push({time:bars[i].time,value:kj}); sa.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:(tk+kj)/2}); }
-          if(i>=SB2-1){ sb.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:tenkan(i,SB2)}); }
+          if(i>=KJ-1){kLine.push({time:bars[i].time,value:kj});sa.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:(tk+kj)/2});}
+          if(i>=SB2-1) sb.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:tenkan(i,SB2)});
           if(i>=KJ-1)  cl.push({time:bars[Math.max(0,i-DISP)].time,value:bars[i].close});
         }
         return [
@@ -3754,48 +3790,43 @@ async function _renderLWChart(ohlcId, label) {
           { data:kLine, color:'#ef5350', lineWidth:1, label:'Kijun' },
           { data:sa,    color:'rgba(38,166,154,0.3)', lineWidth:1, label:'Span A' },
           { data:sb,    color:'rgba(239,83,80,0.3)',  lineWidth:1, label:'Span B' },
-          { data:cl,    color:'rgba(120,123,134,0.4)', lineWidth:1, label:'Chikou', dashed:true },
+          { data:cl,    color:'rgba(120,123,134,0.4)',lineWidth:1, label:'Chikou', dashed:true },
         ];
       }
       // ── Oscillators ─────────────────────────────────────────────────────────
       case 'rsi': {
-        const n = 14;
-        const gains = [], losses = [];
-        for (let i = 1; i < closes.length; i++) {
-          const d = closes[i] - closes[i-1];
-          gains.push(d > 0 ? d : 0); losses.push(d < 0 ? -d : 0);
-        }
-        const avgG = _iRMA(gains, n), avgL = _iRMA(losses, n);
-        const data = avgG.map((g, i) => {
-          const l = avgL[i]; const rs = l === 0 ? Infinity : g / l;
-          return { time: bars[i + 1].time, value: parseFloat((l === 0 ? 100 : 100 - 100/(1+rs)).toFixed(2)) };
-        });
-        return [{ data, color:'#9c27b0', lineWidth:1, label:'RSI(14)',
-          refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}] }];
+        const n = p.period;
+        const gains=[], losses=[];
+        for(let i=1;i<closes.length;i++){const d=closes[i]-closes[i-1];gains.push(d>0?d:0);losses.push(d<0?-d:0);}
+        const avgG=_iRMA(gains,n), avgL=_iRMA(losses,n);
+        const data=avgG.map((g,i)=>{const l=avgL[i];const rs=l===0?Infinity:g/l;return{time:bars[i+1].time,value:parseFloat((l===0?100:100-100/(1+rs)).toFixed(2))};});
+        return [{data,color:'#9c27b0',lineWidth:1,label:`RSI(${n})`,
+          refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'stoch': {
-        const rawK = [];
-        for (let i = 13; i < bars.length; i++) {
-          const s = bars.slice(i-13, i+1);
-          const h = Math.max(...s.map(b=>b.high)), l = Math.min(...s.map(b=>b.low));
+        const { k:kPer, d:dPer, smooth } = p;
+        const rawK=[];
+        for(let i=kPer-1;i<bars.length;i++){
+          const s=bars.slice(i-kPer+1,i+1);
+          const h=Math.max(...s.map(b=>b.high)),l=Math.min(...s.map(b=>b.low));
           rawK.push(h===l?50:((bars[i].close-l)/(h-l))*100);
         }
-        const sK = _iSMA(rawK, 3), sD = _iSMA(sK, 3);
-        const off = bars.length - rawK.length;
-        const kData = sK.map((v,i) => ({ time: bars[off+i+2].time, value: parseFloat(v.toFixed(2)) }));
-        const dData = sD.map((v,i) => ({ time: bars[off+i+4].time, value: parseFloat(v.toFixed(2)) }));
+        const sK=_iSMA(rawK,smooth), sD=_iSMA(sK,dPer);
+        const off=bars.length-rawK.length;
+        const kData=sK.map((v,i)=>({time:bars[off+i+smooth-1].time,value:parseFloat(v.toFixed(2))}));
+        const dData=sD.map((v,i)=>({time:bars[off+i+smooth-1+dPer-1].time,value:parseFloat(v.toFixed(2))}));
         return [
-          { data: kData, color:'#2196f3', lineWidth:1, label:'%K(14,3)', refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}] },
-          { data: dData, color:'#ff9800', lineWidth:1, label:'%D(3)' },
+          {data:kData,color:'#2196f3',lineWidth:1,label:`%K(${kPer},${smooth})`,refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}]},
+          {data:dData,color:'#ff9800',lineWidth:1,label:`%D(${dPer})`},
         ];
       }
       case 'macd': {
-        const fast=12,slow=26,sig=9;
+        const { fast, slow, signal:sig } = p;
         const ef=_iEMA(closes,fast), es=_iEMA(closes,slow);
         const ml=ef.map((v,i)=>v-es[i]);
         const sl2=_iEMA(ml.slice(slow-1),sig);
         const offset=slow-1+sig-1;
-        const macdD=[], sigD=[], histD=[];
+        const macdD=[],sigD=[],histD=[];
         for(let i=offset;i<bars.length;i++){
           const si=i-(slow-1),sgi=si-(sig-1);
           const m=ml[i],s=sl2[sgi],h=m-s;
@@ -3804,114 +3835,112 @@ async function _renderLWChart(ohlcId, label) {
           histD.push({time:bars[i].time,value:parseFloat(h.toFixed(6)),color:h>=0?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'});
         }
         return [
-          { data:histD, color:'#26a69a', lineWidth:0, label:'Hist', histogram:true, refs:[{v:0,color:'rgba(120,123,134,0.2)'}] },
-          { data:macdD, color:'#2196f3', lineWidth:1, label:'MACD' },
-          { data:sigD,  color:'#ff9800', lineWidth:1, label:'Signal' },
+          {data:histD,color:'#26a69a',lineWidth:0,label:'Hist',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]},
+          {data:macdD,color:'#2196f3',lineWidth:1,label:`MACD(${fast},${slow})`},
+          {data:sigD, color:'#ff9800',lineWidth:1,label:`Sig(${sig})`},
         ];
       }
       case 'cci': {
-        const n = 20;
-        const tp = bars.map(b => (b.high+b.low+b.close)/3);
-        const sma = _iSMA(tp, n);
-        const data = sma.map((avg, i) => {
-          const slice = tp.slice(i, i + n);
-          const meanDev = slice.reduce((s, v) => s + Math.abs(v - avg), 0) / n;
-          return { time: bars[i + n - 1].time, value: parseFloat((meanDev === 0 ? 0 : (tp[i+n-1] - avg) / (0.015 * meanDev)).toFixed(2)) };
+        const n = p.period;
+        const tp=bars.map(b=>(b.high+b.low+b.close)/3);
+        const sma=_iSMA(tp,n);
+        const data=sma.map((avg,i)=>{
+          const slice=tp.slice(i,i+n);
+          const meanDev=slice.reduce((s,v)=>s+Math.abs(v-avg),0)/n;
+          return{time:bars[i+n-1].time,value:parseFloat((meanDev===0?0:(tp[i+n-1]-avg)/(0.015*meanDev)).toFixed(2))};
         });
-        return [{ data, color:'#00bcd4', lineWidth:1, label:'CCI(20)',
-          refs:[{v:-100,color:'rgba(239,83,80,0.3)'},{v:0,color:'rgba(120,123,134,0.2)'},{v:100,color:'rgba(239,83,80,0.3)'}] }];
+        return [{data,color:'#00bcd4',lineWidth:1,label:`CCI(${n})`,
+          refs:[{v:-100,color:'rgba(239,83,80,0.3)'},{v:0,color:'rgba(120,123,134,0.2)'},{v:100,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'willr': {
-        const n = 14;
-        const data = [];
-        for (let i = n - 1; i < bars.length; i++) {
-          const sl = bars.slice(i-n+1, i+1);
-          const h = Math.max(...sl.map(b=>b.high)), l = Math.min(...sl.map(b=>b.low));
-          data.push({ time: bars[i].time, value: parseFloat((h===l?-50:((h-bars[i].close)/(h-l))*-100).toFixed(2)) });
+        const n = p.period;
+        const data=[];
+        for(let i=n-1;i<bars.length;i++){
+          const sl=bars.slice(i-n+1,i+1);
+          const h=Math.max(...sl.map(b=>b.high)),l=Math.min(...sl.map(b=>b.low));
+          data.push({time:bars[i].time,value:parseFloat((h===l?-50:((h-bars[i].close)/(h-l))*-100).toFixed(2))});
         }
-        return [{ data, color:'#ff5722', lineWidth:1, label:'%R(14)',
-          refs:[{v:-80,color:'rgba(239,83,80,0.3)'},{v:-50,color:'rgba(120,123,134,0.2)'},{v:-20,color:'rgba(239,83,80,0.3)'}] }];
+        return [{data,color:'#ff5722',lineWidth:1,label:`%R(${n})`,
+          refs:[{v:-80,color:'rgba(239,83,80,0.3)'},{v:-50,color:'rgba(120,123,134,0.2)'},{v:-20,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'roc': {
-        const n = 12;
-        const data = bars.slice(n).map((b,i) => ({ time:b.time, value:parseFloat(((b.close-bars[i].close)/bars[i].close*100).toFixed(4)) }));
-        return [{ data, color:'#4caf50', lineWidth:1, label:'ROC(12)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+        const n = p.period;
+        const data=bars.slice(n).map((b,i)=>({time:b.time,value:parseFloat(((b.close-bars[i].close)/bars[i].close*100).toFixed(4))}));
+        return [{data,color:'#4caf50',lineWidth:1,label:`ROC(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       case 'mom': {
-        const n = 10;
-        const data = bars.slice(n).map((b,i) => ({ time:b.time, value:parseFloat((b.close-bars[i].close).toFixed(dec)) }));
-        return [{ data, color:'#9c27b0', lineWidth:1, label:'Mom(10)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+        const n = p.period;
+        const data=bars.slice(n).map((b,i)=>({time:b.time,value:parseFloat((b.close-bars[i].close).toFixed(dec))}));
+        return [{data,color:'#9c27b0',lineWidth:1,label:`Mom(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       case 'mfi': {
-        const n = 14;
-        const data = [];
-        for (let i = n; i < bars.length; i++) {
-          let pmf = 0, nmf = 0;
-          for (let j = i - n + 1; j <= i; j++) {
-            const tp = (bars[j].high+bars[j].low+bars[j].close)/3;
-            const prevTp = (bars[j-1].high+bars[j-1].low+bars[j-1].close)/3;
-            const mf = tp * (bars[j].volume || 1);
-            if (tp > prevTp) pmf += mf; else nmf += mf;
+        const n = p.period;
+        const data=[];
+        for(let i=n;i<bars.length;i++){
+          let pmf=0,nmf=0;
+          for(let j=i-n+1;j<=i;j++){
+            const tp=(bars[j].high+bars[j].low+bars[j].close)/3;
+            const prevTp=(bars[j-1].high+bars[j-1].low+bars[j-1].close)/3;
+            const mf=tp*(bars[j].volume||1);
+            if(tp>prevTp) pmf+=mf; else nmf+=mf;
           }
-          const mfi = nmf === 0 ? 100 : 100 - 100/(1+pmf/nmf);
-          data.push({ time:bars[i].time, value:parseFloat(mfi.toFixed(2)) });
+          data.push({time:bars[i].time,value:parseFloat((nmf===0?100:100-100/(1+pmf/nmf)).toFixed(2))});
         }
-        return [{ data, color:'#03a9f4', lineWidth:1, label:'MFI(14)',
-          refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}] }];
+        return [{data,color:'#03a9f4',lineWidth:1,label:`MFI(${n})`,
+          refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'ao': {
-        const mid = bars.map(b => (b.high+b.low)/2);
-        const s5 = _iSMA(mid, 5), s34 = _iSMA(mid, 34);
-        const off = 34 - 1;
-        const data = s34.map((v, i) => {
-          const ao = s5[i + (34-5)] - v;
-          return { time: bars[off+i].time, value: parseFloat(ao.toFixed(6)),
-            color: (i === 0 || ao >= s34[i-1] + (s5[i+(34-5)-1]||0) - (s34[i-1]||0) ? 'rgba(38,166,154,0.7)' : 'rgba(239,83,80,0.7)') };
+        const midAO=bars.map(b=>(b.high+b.low)/2);
+        const s5=_iSMA(midAO,5),s34=_iSMA(midAO,34);
+        const off=34-1;
+        const data=s34.map((v,i)=>{
+          const ao=s5[i+(34-5)]-v;
+          const prev=i>0?s34[i-1]+s5[i+(34-5)-1]-s34[i-1]:ao;
+          return{time:bars[off+i].time,value:parseFloat(ao.toFixed(6)),color:ao>=prev?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'};
         });
-        return [{ data, color:'#26a69a', lineWidth:0, label:'AO', histogram:true, refs:[{v:0,color:'rgba(120,123,134,0.2)'}] }];
+        return [{data,color:'#26a69a',lineWidth:0,label:'AO',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]}];
       }
       case 'trix': {
-        const n = 18;
-        const e1=_iEMA(closes,n), e2=_iEMA(e1,n), e3=_iEMA(e2,n);
-        const data = e3.slice(1).map((v,i) => ({ time:bars[bars.length-e3.length+i+1].time, value:parseFloat(((v-e3[i])/e3[i]*100).toFixed(6)) }));
-        return [{ data, color:'#673ab7', lineWidth:1, label:'TRIX(18)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+        const n = p.period;
+        const e1=_iEMA(closes,n),e2=_iEMA(e1,n),e3=_iEMA(e2,n);
+        const data=e3.slice(1).map((v,i)=>({time:bars[bars.length-e3.length+i+1].time,value:parseFloat(((v-e3[i])/e3[i]*100).toFixed(6))}));
+        return [{data,color:'#673ab7',lineWidth:1,label:`TRIX(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       case 'dpo': {
-        const n = 21; const disp = Math.floor(n/2)+1;
-        const sma = _iSMA(closes, n);
-        const data = sma.map((v, i) => {
-          const barIdx = i + n - 1 - disp;
-          if (barIdx < 0) return null;
-          return { time: bars[i + n - 1].time, value: parseFloat((closes[barIdx] - v).toFixed(dec)) };
+        const n = p.period; const disp=Math.floor(n/2)+1;
+        const sma=_iSMA(closes,n);
+        const data=sma.map((v,i)=>{
+          const barIdx=i+n-1-disp;
+          if(barIdx<0) return null;
+          return{time:bars[i+n-1].time,value:parseFloat((closes[barIdx]-v).toFixed(dec))};
         }).filter(Boolean);
-        return [{ data, color:'#ff9800', lineWidth:1, label:'DPO(21)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+        return [{data,color:'#ff9800',lineWidth:1,label:`DPO(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       case 'uo': {
-        const data = [];
-        for (let i = 28; i < bars.length; i++) {
-          function _uoBP(j) { return bars[j].close - Math.min(bars[j].low, bars[j-1].close); }
-          function _uoTR(j) { return Math.max(bars[j].high,bars[j-1].close)-Math.min(bars[j].low,bars[j-1].close); }
+        const data=[];
+        for(let i=28;i<bars.length;i++){
+          function _uoBP(j){return bars[j].close-Math.min(bars[j].low,bars[j-1].close);}
+          function _uoTR(j){return Math.max(bars[j].high,bars[j-1].close)-Math.min(bars[j].low,bars[j-1].close);}
           let [bp7,tr7,bp14,tr14,bp28,tr28]=[0,0,0,0,0,0];
           for(let j=i-6;j<=i;j++){bp7+=_uoBP(j);tr7+=_uoTR(j);}
           for(let j=i-13;j<=i;j++){bp14+=_uoBP(j);tr14+=_uoTR(j);}
           for(let j=i-27;j<=i;j++){bp28+=_uoBP(j);tr28+=_uoTR(j);}
-          const uo=100*(4*(bp7/tr7)+2*(bp14/tr14)+(bp28/tr28))/7;
-          data.push({time:bars[i].time,value:parseFloat(uo.toFixed(2))});
+          data.push({time:bars[i].time,value:parseFloat((100*(4*(bp7/tr7)+2*(bp14/tr14)+(bp28/tr28))/7).toFixed(2))});
         }
-        return [{ data, color:'#8bc34a', lineWidth:1, label:'UO(7,14,28)',
-          refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}] }];
+        return [{data,color:'#8bc34a',lineWidth:1,label:'UO(7,14,28)',
+          refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'atr': {
-        const n = 14;
-        const tr = _iTR(bars);
-        const atr = _iRMA(tr, n);
-        return [{ data: bars.map((b,i) => ({ time:b.time, value:parseFloat(atr[i].toFixed(dec)) })), color:'#ff9800', lineWidth:1, label:'ATR(14)' }];
+        const n = p.period;
+        const tr=_iTR(bars);
+        const atr=_iRMA(tr,n);
+        return [{data:bars.map((b,i)=>({time:b.time,value:parseFloat(atr[i].toFixed(dec))})),color:'#ff9800',lineWidth:1,label:`ATR(${n})`}];
       }
       case 'adx': {
-        const n = 14;
-        const plusDM=[], minusDM=[], tr=_iTR(bars);
+        const n = p.period;
+        const plusDM=[],minusDM=[],tr=_iTR(bars);
         for(let i=1;i<bars.length;i++){
-          const upMove=bars[i].high-bars[i-1].high, downMove=bars[i-1].low-bars[i].low;
+          const upMove=bars[i].high-bars[i-1].high,downMove=bars[i-1].low-bars[i].low;
           plusDM.push(upMove>downMove&&upMove>0?upMove:0);
           minusDM.push(downMove>upMove&&downMove>0?downMove:0);
         }
@@ -3922,14 +3951,14 @@ async function _renderLWChart(ohlcId, label) {
         const adx=_iRMA(dx,n);
         const off=bars.length-adx.length;
         return [
-          { data:adx.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})), color:'#f44336', lineWidth:1, label:'ADX', refs:[{v:25,color:'rgba(239,83,80,0.3)'}] },
-          { data:pDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})), color:'#26a69a', lineWidth:1, label:'+DI' },
-          { data:mDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})), color:'#ef5350', lineWidth:1, label:'-DI' },
+          {data:adx.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:'#f44336',lineWidth:1,label:`ADX(${n})`,refs:[{v:25,color:'rgba(239,83,80,0.3)'}]},
+          {data:pDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:'#26a69a',lineWidth:1,label:'+DI'},
+          {data:mDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:'#ef5350',lineWidth:1,label:'-DI'},
         ];
       }
       case 'aroon': {
-        const n = 25;
-        const up=[], dn=[];
+        const n = p.period;
+        const up=[],dn=[];
         for(let i=n;i<bars.length;i++){
           const sl=bars.slice(i-n,i+1);
           const hiIdx=sl.reduce((mi,b,j)=>b.high>sl[mi].high?j:mi,0);
@@ -3938,33 +3967,33 @@ async function _renderLWChart(ohlcId, label) {
           dn.push({time:bars[i].time,value:parseFloat(((loIdx/n)*100).toFixed(2))});
         }
         return [
-          { data:up, color:'#26a69a', lineWidth:1, label:'Aroon Up', refs:[{v:50,color:'rgba(120,123,134,0.2)'}] },
-          { data:dn, color:'#ef5350', lineWidth:1, label:'Aroon Down' },
+          {data:up,color:'#26a69a',lineWidth:1,label:`Aroon Up(${n})`,refs:[{v:50,color:'rgba(120,123,134,0.2)'}]},
+          {data:dn,color:'#ef5350',lineWidth:1,label:`Aroon Down`},
         ];
       }
       case 'chop': {
-        const n = 14;
+        const n = p.period;
         const tr=_iTR(bars);
         const data=[];
         for(let i=n-1;i<bars.length;i++){
           const atrSum=tr.slice(i-n+1,i+1).reduce((s,v)=>s+v,0);
           const sl=bars.slice(i-n+1,i+1);
           const hl=Math.max(...sl.map(b=>b.high))-Math.min(...sl.map(b=>b.low));
-          data.push({time:bars[i].time,value:parseFloat(hl===0?100:(100*Math.log10(atrSum/hl)/Math.log10(n)).toFixed(2))});
+          data.push({time:bars[i].time,value:parseFloat((hl===0?100:(100*Math.log10(atrSum/hl)/Math.log10(n))).toFixed(2))});
         }
-        return [{ data, color:'#607d8b', lineWidth:1, label:'Choppiness(14)',
-          refs:[{v:38.2,color:'rgba(38,166,154,0.3)'},{v:61.8,color:'rgba(239,83,80,0.3)'}] }];
+        return [{data,color:'#607d8b',lineWidth:1,label:`Chop(${n})`,
+          refs:[{v:38.2,color:'rgba(38,166,154,0.3)'},{v:61.8,color:'rgba(239,83,80,0.3)'}]}];
       }
       case 'obv': {
         let obv=0;
         const data=bars.map((b,i)=>{
-          if(i>0){ if(b.close>bars[i-1].close) obv+=b.volume||0; else if(b.close<bars[i-1].close) obv-=b.volume||0; }
-          return {time:b.time,value:obv};
+          if(i>0){if(b.close>bars[i-1].close)obv+=b.volume||0;else if(b.close<bars[i-1].close)obv-=b.volume||0;}
+          return{time:b.time,value:obv};
         });
-        return [{ data, color:'#3f51b5', lineWidth:1, label:'OBV' }];
+        return [{data,color:'#3f51b5',lineWidth:1,label:'OBV'}];
       }
       case 'cmf': {
-        const n=20;
+        const n = p.period;
         const mfv=bars.map(b=>{const hl=b.high-b.low;return hl===0?0:((b.close-b.low)-(b.high-b.close))/hl*(b.volume||0);});
         const data=[];
         for(let i=n-1;i<bars.length;i++){
@@ -3972,7 +4001,7 @@ async function _renderLWChart(ohlcId, label) {
           const mfvSum=mfv.slice(i-n+1,i+1).reduce((s,v)=>s+v,0);
           data.push({time:bars[i].time,value:parseFloat((volSum===0?0:mfvSum/volSum).toFixed(4))});
         }
-        return [{ data, color:'#00acc1', lineWidth:1, label:'CMF(20)', refs:[{v:0,color:'rgba(120,123,134,0.3)'}] }];
+        return [{data,color:'#00acc1',lineWidth:1,label:`CMF(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
       }
       default: return [];
     }
@@ -4007,6 +4036,37 @@ async function _renderLWChart(ohlcId, label) {
       } catch(_) {}
     });
   }
+
+  // ── MA series management ─────────────────────────────────────────────────────
+  function _calcMaData(cfg) {
+    if (!bars || bars.length < 2) return [];
+    const closes = bars.map(b => b.close);
+    const raw = _iMA(cfg.type, closes, bars, cfg.period);
+    return _iAlign(raw, bars);
+  }
+  function _buildMaSeries(cfg) {
+    _destroyMaSeries(cfg.uid);
+    if (!_lwChart) return;
+    try {
+      const s = _lwChart.addSeries(LWC.LineSeries, {
+        color: cfg.color, lineWidth: cfg.lineWidth || 1, lineStyle: cfg.lineStyle || 0,
+        priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+        priceFormat: { type: 'price', precision: dec, minMove },
+      }, 0);
+      s.setData(_calcMaData(cfg));
+      _maSeries[cfg.uid] = s;
+    } catch(e) { console.warn('MA series error', e); }
+  }
+  function _destroyMaSeries(uid) {
+    if (_maSeries[uid]) { try { _lwChart.removeSeries(_maSeries[uid]); } catch(_) {} _maSeries[uid] = null; }
+  }
+  function _buildAllMaSeries() {
+    Object.keys(_maSeries).forEach(uid => {
+      if (!window._lwMaList.find(m => m.uid === uid)) _destroyMaSeries(uid);
+    });
+    window._lwMaList.forEach(cfg => _buildMaSeries(cfg));
+  }
+  function _genMaUid() { return 'ma_' + Date.now() + '_' + Math.floor(Math.random()*1000); }
 
   function _buildIndicatorPane(id) {
     const cfg = _IND_CATALOGUE.find(c => c.id === id);
@@ -4051,7 +4111,7 @@ async function _renderLWChart(ohlcId, label) {
             series = _lwChart.addSeries(LWC.LineSeries, {
               color: s.color, lineWidth: s.lineWidth || 1,
               lineStyle: s.dashed ? 2 : 0,
-              priceLineVisible: false, lastValueVisible: si === 0, crosshairMarkerVisible: si === 0,
+              priceLineVisible: false, lastValueVisible: si === 0, crosshairMarkerVisible: false,
               priceFormat: { type: 'price', precision: (isOverlay ? dec : 2), minMove: (isOverlay ? minMove : 0.01) },
             }, paneIndex);
           }
@@ -4121,13 +4181,36 @@ async function _renderLWChart(ohlcId, label) {
   _IND_CATALOGUE.forEach(cfg => {
     if (window._lwIndState[cfg.id]) _buildIndicatorPane(cfg.id);
   });
+  // Build all active MA series
+  _buildAllMaSeries();
 
   // ── Active pills bar — shows which indicators are on, with × to remove ──────
   function _renderIndPills() {
     const pillBar = document.getElementById('lw-ind-pills');
     if (!pillBar) return;
     pillBar.innerHTML = '';
-    _IND_CATALOGUE.filter(c => window._lwIndState[c.id]).forEach(cfg => {
+    // MA pills
+    window._lwMaList.forEach(ma => {
+      const pill = document.createElement('span');
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:#1e222d;border:1px solid #2a2e39;border-radius:3px;padding:1px 5px;font-size:9px;font-family:var(--font-ui,sans-serif);white-space:nowrap;';
+      const dot = `<span style="width:6px;height:6px;border-radius:50%;background:${ma.color};display:inline-block;flex-shrink:0"></span>`;
+      pill.innerHTML = `${dot}<span style="color:#787b86">${ma.type} ${ma.period}</span>`;
+      const rm = document.createElement('span');
+      rm.textContent = '\u00d7';
+      rm.style.cssText = 'color:#4a5060;cursor:pointer;font-size:10px;margin-left:1px;';
+      rm.title = `Remove ${ma.type} ${ma.period}`;
+      rm.addEventListener('click', e => {
+        e.stopPropagation();
+        window._lwMaList = window._lwMaList.filter(m => m.uid !== ma.uid);
+        _destroyMaSeries(ma.uid);
+        _renderIndPills();
+        _updateIndBtn();
+      });
+      pill.appendChild(rm);
+      pillBar.appendChild(pill);
+    });
+    // Other indicator pills
+    _IND_CATALOGUE.filter(c => c.id !== 'ma' && window._lwIndState[c.id]).forEach(cfg => {
       const pill = document.createElement('span');
       pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:#1e222d;border:1px solid #2a2e39;border-radius:3px;padding:1px 5px;font-size:9px;font-family:var(--font-ui,sans-serif);white-space:nowrap;';
       pill.innerHTML = `<span style="color:#787b86">${cfg.label}</span>`;
@@ -4150,7 +4233,7 @@ async function _renderLWChart(ohlcId, label) {
   function _updateIndBtn() {
     const btn = document.getElementById('lw-ind-btn');
     if (!btn) return;
-    const anyOn = _IND_CATALOGUE.some(c => window._lwIndState[c.id]);
+    const anyOn = window._lwMaList.length > 0 || _IND_CATALOGUE.some(c => c.id !== 'ma' && window._lwIndState[c.id]);
     btn.classList.toggle('on', anyOn);
   }
 
@@ -4177,25 +4260,165 @@ async function _renderLWChart(ohlcId, label) {
     pop.id = '_lw-ind-dropdown';
     pop.style.cssText = [
       'position:fixed;z-index:9999;background:#1a1d29;border:1px solid #2a2e39;',
-      'border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.6);',
+      'border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,.7);',
       'font-size:11px;font-family:var(--font-ui,sans-serif);',
-      'min-width:260px;max-height:440px;overflow-y:auto;',
+      'min-width:300px;max-height:520px;overflow-y:auto;',
       'scrollbar-width:thin;scrollbar-color:#2a2e39 transparent;',
     ].join('');
 
-    // Group indicators by category
+    // ── MA SECTION ────────────────────────────────────────────────────────────
+    const MA_TYPES  = ['SMA','EMA','WMA','HMA','DEMA','TEMA','VWMA'];
+    const MA_COLORS = ['#2196f3','#ff9800','#e91e63','#4caf50','#9c27b0','#00bcd4','#ff5722','#607d8b','#795548'];
+    const LINE_STYLES = [ {v:0,l:'Solid'}, {v:1,l:'Dotted'}, {v:2,l:'Dashed'} ];
+
+    function _nextColor() {
+      const used = new Set(window._lwMaList.map(m => m.color));
+      return MA_COLORS.find(c => !used.has(c)) || MA_COLORS[window._lwMaList.length % MA_COLORS.length];
+    }
+
+    // MA group header
+    const maHeader = document.createElement('div');
+    maHeader.style.cssText = 'padding:8px 12px 4px;color:#4a5060;font-size:9px;letter-spacing:.08em;font-weight:700;border-bottom:1px solid #2a2e39;display:flex;align-items:center;justify-content:space-between;';
+    maHeader.innerHTML = '<span>MOVING AVERAGES</span>';
+
+    const addMaBtn = document.createElement('button');
+    addMaBtn.textContent = '+ Add MA';
+    addMaBtn.style.cssText = 'background:#4f7fff;color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:600;cursor:pointer;letter-spacing:.04em;';
+    addMaBtn.addEventListener('mouseenter', () => addMaBtn.style.background = '#5f8fff');
+    addMaBtn.addEventListener('mouseleave', () => addMaBtn.style.background = '#4f7fff');
+    addMaBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const newMa = { uid: _genMaUid(), type:'EMA', period:20, color:_nextColor(), lineWidth:1, lineStyle:0 };
+      window._lwMaList.push(newMa);
+      _buildMaSeries(newMa);
+      _renderIndPills();
+      _updateIndBtn();
+      pop.remove(); _indDropdownOpen = false; _openIndDropdown();
+    });
+    maHeader.appendChild(addMaBtn);
+    pop.appendChild(maHeader);
+
+    if (window._lwMaList.length === 0) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'padding:10px 12px;color:#4a5060;font-size:10px;font-style:italic;';
+      empty.textContent = 'No moving averages — click "+ Add MA" to add one.';
+      pop.appendChild(empty);
+    }
+
+    window._lwMaList.forEach((ma, idx) => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:5px 10px 5px 12px;border-bottom:1px solid rgba(42,46,57,0.5);';
+
+      // Color swatch + picker
+      const colorWrap = document.createElement('label');
+      colorWrap.style.cssText = 'position:relative;cursor:pointer;flex-shrink:0;';
+      const colorSwatch = document.createElement('span');
+      colorSwatch.style.cssText = `display:inline-block;width:12px;height:12px;border-radius:50%;background:${ma.color};border:1px solid rgba(255,255,255,0.15);cursor:pointer;`;
+      const colorInput = document.createElement('input');
+      colorInput.type = 'color'; colorInput.value = ma.color;
+      colorInput.style.cssText = 'position:absolute;opacity:0;width:0;height:0;';
+      colorInput.addEventListener('input', e => {
+        e.stopPropagation();
+        ma.color = e.target.value;
+        colorSwatch.style.background = ma.color;
+        if (_maSeries[ma.uid]) { try { _maSeries[ma.uid].applyOptions({ color: ma.color }); } catch(_) {} }
+        _renderIndPills();
+      });
+      colorWrap.appendChild(colorSwatch);
+      colorWrap.appendChild(colorInput);
+      row.appendChild(colorWrap);
+
+      // MA type selector
+      const typeSelect = document.createElement('select');
+      typeSelect.style.cssText = 'background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;';
+      MA_TYPES.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t; opt.textContent = t;
+        if (t === ma.type) opt.selected = true;
+        typeSelect.appendChild(opt);
+      });
+      typeSelect.addEventListener('change', e => {
+        e.stopPropagation();
+        ma.type = e.target.value;
+        _buildMaSeries(ma);
+        _renderIndPills();
+      });
+      row.appendChild(typeSelect);
+
+      // Period input
+      const periodInput = document.createElement('input');
+      periodInput.type = 'number'; periodInput.value = ma.period; periodInput.min = 1; periodInput.max = 500;
+      periodInput.style.cssText = 'width:44px;background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;text-align:center;';
+      periodInput.addEventListener('click', e => e.stopPropagation());
+      periodInput.addEventListener('change', e => {
+        e.stopPropagation();
+        const v = parseInt(e.target.value);
+        if (v > 0 && v <= 500) { ma.period = v; _buildMaSeries(ma); _renderIndPills(); }
+      });
+      row.appendChild(periodInput);
+
+      // Line style selector
+      const styleSelect = document.createElement('select');
+      styleSelect.style.cssText = 'background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;';
+      LINE_STYLES.forEach(ls => {
+        const opt = document.createElement('option');
+        opt.value = ls.v; opt.textContent = ls.l;
+        if (ls.v === ma.lineStyle) opt.selected = true;
+        styleSelect.appendChild(opt);
+      });
+      styleSelect.addEventListener('change', e => {
+        e.stopPropagation();
+        ma.lineStyle = parseInt(e.target.value);
+        if (_maSeries[ma.uid]) { try { _maSeries[ma.uid].applyOptions({ lineStyle: ma.lineStyle }); } catch(_) {} }
+      });
+      row.appendChild(styleSelect);
+
+      // Line width selector
+      const widthSelect = document.createElement('select');
+      widthSelect.style.cssText = 'background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;width:36px;';
+      [1,2,3].forEach(w => {
+        const opt = document.createElement('option');
+        opt.value = w; opt.textContent = w + 'px';
+        if (w === (ma.lineWidth||1)) opt.selected = true;
+        widthSelect.appendChild(opt);
+      });
+      widthSelect.addEventListener('change', e => {
+        e.stopPropagation();
+        ma.lineWidth = parseInt(e.target.value);
+        if (_maSeries[ma.uid]) { try { _maSeries[ma.uid].applyOptions({ lineWidth: ma.lineWidth }); } catch(_) {} }
+      });
+      row.appendChild(widthSelect);
+
+      // Remove button
+      const rmBtn = document.createElement('button');
+      rmBtn.innerHTML = '&times;';
+      rmBtn.style.cssText = 'background:none;border:none;color:#4a5060;cursor:pointer;font-size:14px;margin-left:auto;padding:0 2px;line-height:1;flex-shrink:0;';
+      rmBtn.title = `Remove ${ma.type} ${ma.period}`;
+      rmBtn.addEventListener('mouseenter', () => rmBtn.style.color = '#ef5350');
+      rmBtn.addEventListener('mouseleave', () => rmBtn.style.color = '#4a5060');
+      rmBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        window._lwMaList = window._lwMaList.filter(m => m.uid !== ma.uid);
+        _destroyMaSeries(ma.uid);
+        _renderIndPills(); _updateIndBtn();
+        pop.remove(); _indDropdownOpen = false; _openIndDropdown();
+      });
+      row.appendChild(rmBtn);
+
+      pop.appendChild(row);
+    });
+
+    // ── OTHER INDICATOR GROUPS ────────────────────────────────────────────────
     const groups = {};
-    _IND_CATALOGUE.forEach(cfg => {
+    _IND_CATALOGUE.filter(c => c.id !== 'ma').forEach(cfg => {
       if (!groups[cfg.group]) groups[cfg.group] = [];
       groups[cfg.group].push(cfg);
     });
 
     Object.entries(groups).forEach(([groupName, items]) => {
-      // Group header
       const header = document.createElement('div');
       header.textContent = groupName.toUpperCase();
       header.style.cssText = 'padding:8px 12px 4px;color:#4a5060;font-size:9px;letter-spacing:.08em;font-weight:700;border-top:1px solid #2a2e39;';
-      if (Object.keys(groups)[0] === groupName) header.style.borderTop = 'none';
       pop.appendChild(header);
 
       items.forEach(cfg => {
@@ -4219,17 +4442,9 @@ async function _renderLWChart(ohlcId, label) {
         row.addEventListener('click', e => {
           e.stopPropagation();
           window._lwIndState[cfg.id] = !window._lwIndState[cfg.id];
-          if (window._lwIndState[cfg.id]) {
-            _buildIndicatorPane(cfg.id);
-          } else {
-            _destroyIndicatorPane(cfg.id);
-          }
-          _renderIndPills();
-          _updateIndBtn();
-          // Re-render dropdown to reflect new state
-          pop.remove();
-          _indDropdownOpen = false;
-          _openIndDropdown();
+          if (window._lwIndState[cfg.id]) { _buildIndicatorPane(cfg.id); } else { _destroyIndicatorPane(cfg.id); }
+          _renderIndPills(); _updateIndBtn();
+          pop.remove(); _indDropdownOpen = false; _openIndDropdown();
         });
 
         pop.appendChild(row);
@@ -4241,7 +4456,7 @@ async function _renderLWChart(ohlcId, label) {
     // Position below the button
     if (btn) {
       const rect = btn.getBoundingClientRect();
-      const popH = Math.min(440, pop.scrollHeight || 400);
+      const popH = Math.min(520, pop.scrollHeight || 450);
       const spaceBelow = window.innerHeight - rect.bottom;
       const top = spaceBelow >= 80 ? rect.bottom + 4 : rect.top - popH - 4;
       pop.style.top  = Math.max(8, top) + 'px';
