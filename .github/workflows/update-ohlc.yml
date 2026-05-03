@@ -9,11 +9,17 @@ name: Update OHLC Chart Data
 #
 # Files are REPLACED on every run — repo size stays fixed (~1.7 MB raw).
 #
-# Schedule: single run at 22:30 UTC Mon–Fri (after NY equity close, before Sydney open).
-#   Previously ran twice (21:35 + 22:30 UTC) but the early run is redundant:
-#   dashboard.js injects the live today-bar directly from quotes.json (refreshed
-#   every 5 min via fetch_intraday_quotes.py). The 21:00–22:30 UTC window is fully
-#   covered by that live injection for all connected users. Removed 21:35 run.
+# Schedule:
+#   Mon–Fri 22:30 UTC — after NY equity close, before Sydney open. Covers all
+#     non-crypto symbols (FX, Gold, WTI, indices, yields). dashboard.js injects
+#     the live today-bar from quotes.json (refreshed every 5 min) so the
+#     21:00–22:30 UTC window is covered without a second weekday run.
+#   Sat–Sun 23:30 UTC — crypto-only run. BTC and ETH trade 24/7; without a
+#     weekend run, the Friday script would write a partial Saturday bar (~22.5h)
+#     that persists all weekend with truncated H/L wicks. The 23:30 UTC timing
+#     ensures the UTC calendar day (00:00–24:00 UTC) is nearly complete before
+#     fetch_ohlc.py strips the in-progress today-bar and writes the final JSON.
+#     All non-crypto symbols are also refreshed (no-op cost — same script).
 #
 # Placement: PUBLIC repo — yfinance only, no API keys, no proprietary logic.
 # Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
@@ -22,8 +28,7 @@ name: Update OHLC Chart Data
 on:
   schedule:
     - cron: '30 22 * * 1-5'   # 22:30 UTC Mon–Fri — authoritative daily close (after NY close, before Sydney open)
-                               # dashboard.js injects the live today-bar from quotes.json (refreshed every 5 min)
-                               # so the 21:00–22:30 UTC window is covered without a second workflow run.
+    - cron: '30 23 * * 0,6'   # 23:30 UTC Sat–Sun  — crypto weekend bars (BTC, ETH trade 24/7)
   workflow_dispatch:             # manual trigger for backfill / testing
 
 concurrency:
