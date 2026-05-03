@@ -3403,224 +3403,9 @@ async function _renderLWChart(ohlcId, label) {
     } catch(_) {}
   }
 
-  // ── Multi-MA overlay — up to 3 simultaneous MAs, each with its own period + color ──
-  // Colors cycle: blue, orange, purple. User can change period via toolbar.
-  const _MA_PALETTE = ['#1565c0', '#e65100', '#6a1b9a']; // blue, orange, purple
-  const _MA_MAX = 3;
-
-  // State: array of { period, color, series } — persists across symbol switches via global
-  if (!window._lwMaState) {
-    window._lwMaState = [{ period: 20, color: _MA_PALETTE[0], series: null }];
-  }
-  // Clear any stale series refs from previous chart (chart was destroyed)
-  window._lwMaState.forEach(m => { m.series = null; });
-
-  if (typeof window._lwShowMa === 'undefined') window._lwShowMa = true;
-
-  function _buildAllMAs() {
-    // Remove existing series
-    window._lwMaState.forEach(m => {
-      if (m.series) { try { _lwChart.removeSeries(m.series); } catch(_) {} m.series = null; }
-    });
-    if (!window._lwShowMa) { _renderMaToolbar(); return; }
-    // Rebuild
-    window._lwMaState.forEach(m => {
-      if (m.period < 1) return;
-      const maData = _calcMA(bars, m.period);
-      if (maData.length === 0) return;
-      m.series = (typeof LWC.LineSeries !== 'undefined'
-        ? _lwChart.addSeries(LWC.LineSeries, {
-            color: m.color, lineWidth: 1,
-            priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-            priceFormat: { type: 'price', precision: dec, minMove },
-          })
-        : _lwChart.addLineSeries({
-            color: m.color, lineWidth: 1,
-            priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-            priceFormat: { type: 'price', precision: dec, minMove },
-          }));
-      m.series.setData(maData);
-    });
-    _renderMaToolbar();
-  }
-
-  // ── Custom MA period dropdown (replaces native <select> which shows white in dark theme) ──
-  const _MA_PERIODS = [5, 10, 20, 50, 100, 200];
-  let _maDropdownOpen = null; // idx of currently open dropdown, or null
-
-  function _closeMaDropdown() {
-    const existing = document.getElementById('_ma-dropdown-popover');
-    if (existing) existing.remove();
-    _maDropdownOpen = null;
-  }
-
-  function _openMaDropdown(pill, m, idx) {
-    _closeMaDropdown();
-    _maDropdownOpen = idx;
-
-    const pop = document.createElement('div');
-    pop.id = '_ma-dropdown-popover';
-    pop.style.cssText = 'position:fixed;z-index:9999;background:#1e222d;border:1px solid #2a2e39;border-radius:3px;box-shadow:0 4px 12px rgba(0,0,0,.5);overflow:hidden;font-size:9px;font-family:var(--font-ui,sans-serif);min-width:56px;';
-
-    _MA_PERIODS.forEach(p => {
-      const item = document.createElement('div');
-      item.textContent = 'MA ' + p;
-      item.style.cssText = `padding:3px 8px;cursor:pointer;color:${p === m.period ? '#d1d4dc' : '#848ea0'};background:${p === m.period ? '#2a2e39' : 'transparent'};white-space:nowrap;`;
-      item.addEventListener('mouseenter', () => { item.style.background = '#2a2e39'; item.style.color = '#d1d4dc'; });
-      item.addEventListener('mouseleave', () => { item.style.background = p === m.period ? '#2a2e39' : 'transparent'; item.style.color = p === m.period ? '#d1d4dc' : '#848ea0'; });
-      item.addEventListener('click', e => {
-        e.stopPropagation();
-        m.period = p;
-        if (m.series) { try { _lwChart.removeSeries(m.series); } catch(_) {} m.series = null; }
-        if (m.period >= 1) {
-          const maData = _calcMA(bars, m.period);
-          if (maData.length > 0) {
-            m.series = (typeof LWC.LineSeries !== 'undefined'
-              ? _lwChart.addSeries(LWC.LineSeries, {
-                  color: m.color, lineWidth: 1,
-                  priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-                  priceFormat: { type: 'price', precision: dec, minMove },
-                })
-              : _lwChart.addLineSeries({
-                  color: m.color, lineWidth: 1,
-                  priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-                  priceFormat: { type: 'price', precision: dec, minMove },
-                }));
-            m.series.setData(maData);
-          }
-        }
-        _closeMaDropdown();
-        _renderMaToolbar();
-        _updateAllMALegend(null);
-      });
-      pop.appendChild(item);
-    });
-
-    // Position below the pill
-    document.body.appendChild(pop);
-    const rect = pill.getBoundingClientRect();
-    const popH = pop.offsetHeight || (_MA_PERIODS.length * 20);
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const top = spaceBelow >= popH ? rect.bottom + 2 : rect.top - popH - 2;
-    pop.style.top  = top + 'px';
-    pop.style.left = rect.left + 'px';
-
-    // Close on outside click
-    setTimeout(() => {
-      document.addEventListener('click', _closeMaDropdown, { once: true });
-    }, 0);
-  }
-
-  function _renderMaToolbar() {
-    const bar = document.getElementById('lw-ma-bar');
-    if (!bar) return;
-    bar.innerHTML = '';
-    _closeMaDropdown();
-
-    window._lwMaState.forEach((m, idx) => {
-      const pill = document.createElement('span');
-      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:#1e222d;border:1px solid #2a2e39;border-radius:3px;padding:2px 5px;font-size:9px;font-family:var(--font-ui,sans-serif);cursor:default;';
-
-      // Color swatch (clickable to cycle color)
-      const swatch = document.createElement('span');
-      swatch.style.cssText = `display:inline-block;width:8px;height:8px;border-radius:50%;background:${m.color};cursor:pointer;flex-shrink:0;`;
-      swatch.title = 'Click to change color';
-      swatch.addEventListener('click', e => {
-        e.stopPropagation();
-        const ci = _MA_PALETTE.indexOf(m.color);
-        m.color = _MA_PALETTE[(ci + 1) % _MA_PALETTE.length];
-        if (m.series) { try { m.series.applyOptions({ color: m.color }); } catch(_) {} }
-        _renderMaToolbar();
-        _updateAllMALegend(null);
-      });
-
-      // Period label (clickable to open custom dropdown)
-      const lbl = document.createElement('span');
-      lbl.textContent = 'MA ' + m.period;
-      lbl.style.cssText = 'color:#848ea0;cursor:pointer;user-select:none;';
-      lbl.title = 'Click to change period';
-      lbl.addEventListener('click', e => {
-        e.stopPropagation();
-        if (_maDropdownOpen === idx) { _closeMaDropdown(); return; }
-        _openMaDropdown(pill, m, idx);
-      });
-
-      // Chevron
-      const chev = document.createElement('span');
-      chev.textContent = '▾';
-      chev.style.cssText = 'color:#4a5060;font-size:7px;cursor:pointer;line-height:1;';
-      chev.addEventListener('click', e => {
-        e.stopPropagation();
-        if (_maDropdownOpen === idx) { _closeMaDropdown(); return; }
-        _openMaDropdown(pill, m, idx);
-      });
-
-      // Remove button (only if more than 1 MA)
-      const rm = document.createElement('span');
-      rm.textContent = '\u00d7';
-      rm.style.cssText = 'color:#4a5060;cursor:pointer;font-size:10px;line-height:1;padding-left:1px;';
-      rm.title = 'Remove this MA';
-      rm.addEventListener('click', e => {
-        e.stopPropagation();
-        if (m.series) { try { _lwChart.removeSeries(m.series); } catch(_) {} }
-        window._lwMaState.splice(idx, 1);
-        if (window._lwMaState.length === 0) {
-          // All MAs removed — keep state empty, no forced fallback
-        }
-        _renderMaToolbar();
-        _updateAllMALegend(null);
-      });
-
-      pill.appendChild(swatch);
-      pill.appendChild(lbl);
-      pill.appendChild(chev);
-      pill.appendChild(rm);
-      bar.appendChild(pill);
-    });
-
-    // Add MA button (up to max)
-    if (window._lwMaState.length < _MA_MAX) {
-      const addBtn = document.createElement('button');
-      addBtn.textContent = '+ MA';
-      addBtn.style.cssText = 'background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#848ea0;font-size:9px;font-family:var(--font-ui,sans-serif);padding:2px 6px;cursor:pointer;';
-      addBtn.addEventListener('click', () => {
-        const usedColors = window._lwMaState.map(m => m.color);
-        const nextColor = _MA_PALETTE.find(c => !usedColors.includes(c)) || _MA_PALETTE[window._lwMaState.length % _MA_PALETTE.length];
-        const newMA = { period: 50, color: nextColor, series: null };
-        window._lwMaState.push(newMA);
-        const maData = _calcMA(bars, newMA.period);
-        if (maData.length > 0) {
-          newMA.series = (typeof LWC.LineSeries !== 'undefined'
-            ? _lwChart.addSeries(LWC.LineSeries, {
-                color: newMA.color, lineWidth: 1,
-                priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-                priceFormat: { type: 'price', precision: dec, minMove },
-              })
-            : _lwChart.addLineSeries({
-                color: newMA.color, lineWidth: 1,
-                priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-                priceFormat: { type: 'price', precision: dec, minMove },
-              }));
-          newMA.series.setData(maData);
-        }
-        _renderMaToolbar();
-      });
-      bar.appendChild(addBtn);
-    }
-  }
-
-  _buildAllMAs();
-  // Sync MA button state
-  const _maBtn = document.getElementById('lw-ma-btn');
-  if (_maBtn) {
-    _maBtn.classList.toggle('on', window._lwShowMa);
-    _maBtn.setAttribute('aria-pressed', window._lwShowMa ? 'true' : 'false');
-  }
-
-  // ── CB Meeting markers — industry standard: annotate central bank decision dates on chart ──
-  // Bloomberg, Reuters, and all institutional charting platforms mark CB meeting dates visually.
-  // LWC v5: createSeriesMarkers(series, markers) — LWC v4: series.setMarkers(markers)
-  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = false;
+  // ── Multi-MA legacy state cleanup — MA overlays now handled by Full Indicator Library ──
+  // Clear any stale series refs from previous chart renders
+  if (window._lwMaState) window._lwMaState.forEach(m => { m.series = null; });
 
   // ── CB Meeting markers — Bloomberg/Reuters standard: vertical dashed lines with label ──
   // Industry standard: thin vertical line at CB decision date, labeled with the bank acronym
@@ -3851,9 +3636,10 @@ async function _renderLWChart(ohlcId, label) {
 
   // ── Active indicator state (persists across symbol switches) ─────────────────
   if (typeof window._lwIndState === 'undefined') window._lwIndState = {}; // id → true/false
-  // Active pane refs — keyed by indicator id, reset each render (chart destroyed)
-  const _indPanes   = {}; // id → pane object
-  const _indSeries  = {}; // id → array of series objects
+  // Active pane indices — keyed by indicator id, reset each render (chart destroyed)
+  const _indPaneIndex = {}; // id → pane index number (oscillators only)
+  const _indSeries    = {}; // id → array of series objects
+  const _indRefSeries = {}; // paneIndex → array of ref-line series
 
   // ── Calculation functions — one per indicator id ───────────────────────────
 
@@ -4205,15 +3991,19 @@ async function _renderLWChart(ohlcId, label) {
     paneEl.appendChild(el);
   }
 
-  function _addRefLines(pane, refs, barData, n) {
-    if (!refs || !pane) return;
+  function _addRefLines(paneIndex, refs, barData, n) {
+    if (!refs || paneIndex === null) return;
     refs.forEach(ref => {
       try {
-        pane.addSeries(LWC.LineSeries, {
+        const s = _lwChart.addSeries(LWC.LineSeries, {
           color: ref.color, lineWidth: 1, lineStyle: 2,
           priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
           priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
-        }).setData(barData.map(b => ({ time: b.time, value: ref.v })).slice(-n));
+        }, paneIndex);
+        s.setData(barData.map(b => ({ time: b.time, value: ref.v })).slice(-n));
+        // Track ref-line series so they are removed when the indicator is destroyed
+        if (!_indRefSeries[paneIndex]) _indRefSeries[paneIndex] = [];
+        _indRefSeries[paneIndex].push(s);
       } catch(_) {}
     });
   }
@@ -4222,24 +4012,22 @@ async function _renderLWChart(ohlcId, label) {
     const cfg = _IND_CATALOGUE.find(c => c.id === id);
     if (!cfg || !window._lwIndState[id]) return;
 
-    // Destroy old pane if exists
+    // Destroy old series for this indicator first
     _destroyIndicatorPane(id);
 
     try {
       const seriesList = _calcIndData(id, bars);
       if (!seriesList || seriesList.length === 0) return;
 
-      let pane;
       const isOverlay = cfg.type === 'overlay';
+      let paneIndex;
 
       if (isOverlay) {
-        // Add series to main price pane
-        pane = _lwChart.panes()[0];
+        paneIndex = 0; // main price pane
       } else {
-        // Create new sub-pane
-        const paneH = (id === 'macd' || id === 'adx') ? 90 : 80;
-        pane = _lwChart.addPane({ height: paneH });
-        _indPanes[id] = pane;
+        // LWC v5: addSeries with paneIndex >= current pane count auto-creates a new pane
+        paneIndex = _lwChart.panes().length;
+        _indPaneIndex[id] = paneIndex;
       }
 
       _indSeries[id] = [];
@@ -4248,58 +4036,84 @@ async function _renderLWChart(ohlcId, label) {
         try {
           let series;
           if (s.histogram) {
-            series = pane.addSeries(LWC.HistogramSeries, {
+            series = _lwChart.addSeries(LWC.HistogramSeries, {
               priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
               priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
-            });
+            }, paneIndex);
           } else if (s.markers) {
-            // Point series (e.g. PSAR) — use LineSeries with lineWidth:0, markers
-            series = pane.addSeries(LWC.LineSeries, {
+            // Point series (e.g. PSAR) — LineSeries with lineWidth:0
+            series = _lwChart.addSeries(LWC.LineSeries, {
               color: s.color, lineWidth: 0,
               priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: true,
               priceFormat: { type: 'price', precision: dec, minMove },
-            });
+            }, paneIndex);
           } else {
-            series = pane.addSeries(LWC.LineSeries, {
+            series = _lwChart.addSeries(LWC.LineSeries, {
               color: s.color, lineWidth: s.lineWidth || 1,
               lineStyle: s.dashed ? 2 : 0,
               priceLineVisible: false, lastValueVisible: si === 0, crosshairMarkerVisible: si === 0,
               priceFormat: { type: 'price', precision: (isOverlay ? dec : 2), minMove: (isOverlay ? minMove : 0.01) },
-            });
+            }, paneIndex);
           }
           series.setData(s.data);
           _indSeries[id].push(series);
 
+          // Set oscillator pane height after first series is added (triggers pane creation)
+          if (!isOverlay && si === 0) {
+            try {
+              const paneH = (id === 'macd' || id === 'adx') ? 90 : 80;
+              _lwChart.panes()[paneIndex]?.setHeight(paneH);
+            } catch(_) {}
+          }
+
           // Reference lines — only for first series in a sub-pane
           if (!isOverlay && si === 0 && s.refs) {
-            _addRefLines(pane, s.refs, bars, s.data.length + 10);
+            _addRefLines(paneIndex, s.refs, bars, s.data.length + 10);
           }
         } catch(serErr) { console.warn('[LW] series error for', id, serErr); }
       });
 
-      // Pane legend
-      if (!isOverlay && _indPanes[id]) {
-        const paneEl = _indPanes[id].getElement ? _indPanes[id].getElement() : null;
-        const labelHtml = seriesList.map(s => `<span style="color:${s.color}">${s.label}</span>`).join(' ');
-        _addPaneLegend(paneEl, '_lw-ind-legend-' + id, labelHtml);
+      // Pane legend for oscillators
+      if (!isOverlay && _indPaneIndex[id] != null) {
+        try {
+          const paneEl = _lwChart.panes()[_indPaneIndex[id]]?.getHTMLElement();
+          if (paneEl) {
+            const labelHtml = seriesList.map(s => `<span style="color:${s.color}">${s.label}</span>`).join(' ');
+            _addPaneLegend(paneEl, '_lw-ind-legend-' + id, labelHtml);
+          }
+        } catch(_) {}
       }
     } catch(e) { console.warn('[LW] indicator build error for', id, e); }
   }
 
   function _destroyIndicatorPane(id) {
-    if (_indPanes[id]) {
-      try { _lwChart.removePane(_indPanes[id]); } catch(_) {}
-      _indPanes[id] = null;
-    }
+    const cfg = _IND_CATALOGUE.find(c => c.id === id);
+    const isOverlay = cfg && cfg.type === 'overlay';
+
+    // Remove all series for this indicator (works for both overlays and oscillators)
     if (_indSeries[id]) {
-      (_indSeries[id] || []).forEach(s => {
-        // Overlay series must be removed from main pane series list
-        const cfg = _IND_CATALOGUE.find(c => c.id === id);
-        if (cfg && cfg.type === 'overlay') {
-          try { _lwChart.panes()[0].removeSeries(s); } catch(_) {}
-        }
+      _indSeries[id].forEach(s => {
+        try { _lwChart.removeSeries(s); } catch(_) {}
       });
       _indSeries[id] = null;
+    }
+
+    // Remove ref lines for oscillator panes
+    if (!isOverlay && _indPaneIndex[id] != null) {
+      const refs = _indRefSeries[_indPaneIndex[id]];
+      if (refs) {
+        refs.forEach(s => { try { _lwChart.removeSeries(s); } catch(_) {} });
+        _indRefSeries[_indPaneIndex[id]] = null;
+      }
+      // Remove the pane itself if it still exists and is empty
+      try {
+        const panes = _lwChart.panes();
+        const pane = panes[_indPaneIndex[id]];
+        if (pane && pane.getSeries().length === 0) {
+          _lwChart.removePane(_indPaneIndex[id]);
+        }
+      } catch(_) {}
+      _indPaneIndex[id] = null;
     }
   }
 
@@ -4454,49 +4268,9 @@ async function _renderLWChart(ohlcId, label) {
   // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
   function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '\u2014'; }
 
-  // MA legend overlay — inside the chart, top-left, one line per active MA
-  const maLegendEl = document.createElement('div');
-  maLegendEl.id = 'lw-ma-legend';
-  maLegendEl.style.cssText = [
-    'position:absolute;top:6px;left:8px;z-index:3;pointer-events:none;',
-    'font-size:11px;font-family:var(--font-mono,monospace);',
-    'line-height:1.4;user-select:none;',
-  ].join('');
-  wrap.appendChild(maLegendEl);
-
-  function _updateAllMALegend(seriesDataMap) {
-    if (!maLegendEl) return;
-    const lines = window._lwMaState
-      .filter(m => m.series && m.period >= 1)
-      .map(m => {
-        let val = null;
-        if (seriesDataMap) {
-          const d = seriesDataMap.get(m.series);
-          val = d ? d.value : null;
-        }
-        const txt = val != null ? 'MA\u00a0' + m.period + '\u00a0\u00a0' + _fmtHdrVal(val) : '';
-        return `<span style="color:${m.color}">${txt}</span>`;
-      })
-      .filter(s => s.includes('MA'));
-    maLegendEl.innerHTML = lines.join('<br>');
-  }
-
-  // Compatibility shim: _updateMALegend used by _updateLWHeader — pass first MA val
-  function _updateMALegend(maVal) {
-    // Called from _updateLWHeader — build legend from seriesDataMap when available
-    // When maVal is passed directly (crosshair), show it for the first MA
-    if (maVal != null && window._lwMaState[0]?.series) {
-      const lines = window._lwMaState
-        .filter(m => m.series && m.period >= 1)
-        .map((m, i) => {
-          const v = i === 0 ? maVal : null;
-          return v != null ? `<span style="color:${m.color}">MA\u00a0${m.period}\u00a0\u00a0${_fmtHdrVal(v)}</span>` : '';
-        }).filter(Boolean);
-      maLegendEl.innerHTML = lines.join('<br>');
-    } else {
-      maLegendEl.innerHTML = '';
-    }
-  }
+  // MA legend removed — MAs are now shown via the indicator pills bar
+  function _updateAllMALegend() {}   // no-op shim — referenced by crosshair handler
+  function _updateMALegend() {}      // no-op shim
 
   // prevClose map: date → prev bar's close, for day-over-day % change in header
   const _prevCloseMap = new Map();
@@ -4637,10 +4411,8 @@ async function _renderLWChart(ohlcId, label) {
              low: _rawSeriesData.value, close: _rawSeriesData.value })
       : null;
     if (candleData) _updateAllMALegend(param.seriesData);
-    const firstMaSeries = window._lwMaState[0]?.series;
-    const firstMaData = firstMaSeries ? param.seriesData.get(firstMaSeries) : null;
     const isCurrentBar = lastBar && candleData && candleData.time === lastBar.time;
-    if (candleData) _updateLWHeader(candleData, firstMaData ? firstMaData.value : null, isCurrentBar ? _getRtOverride() : null);
+    if (candleData) _updateLWHeader(candleData, null, isCurrentBar ? _getRtOverride() : null);
 
     // ── CB floating tooltip ──
     const dateStr = typeof param.time === 'string' ? param.time
