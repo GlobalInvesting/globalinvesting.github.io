@@ -784,8 +784,16 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
 
       Non-FX native (8):  native yfinance 1D bars.
                           Nikkei, SPX, Nasdaq, Stoxx, US10Y, VIX, BTC, ETH.
-                          Native 1D includes the in-progress today bar; dashboard.js strips
-                          it and replaces with live data from quotes.json.
+                          For equity/index/yield symbols: native 1D includes the in-progress
+                          today bar; dashboard.js strips it and replaces with live data from
+                          quotes.json.
+                          For crypto (BTC, ETH): the in-progress today-bar is stripped HERE
+                          in the Python script (not left for JS) because the workflow runs
+                          Mon–Fri only. A partial Friday bar (22.5h of data) would persist
+                          in the JSON all weekend with truncated H/L, producing buggy candle
+                          wicks on Saturday and Sunday. Additionally, prev_close open
+                          correction is applied to guarantee candle body color always matches
+                          the net daily direction.
     """
     if id_ in FX_SYMBOLS:
         return fetch_fx_ohlc_from_1h(id_, ticker_sym)
@@ -885,8 +893,50 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
         # we KEEP the today-bar in the JSON so the JS can strip it and replace
         # with the live feed. This is the correct pipeline architecture.
         #
-        # No FX open correction here — handled by fetch_fx_ohlc_from_1h.
+        # Exception — crypto (BTC, ETH):
+        #   The workflow runs Mon–Fri only. For crypto, yfinance returns an
+        #   in-progress bar for the current UTC day (00:00–22:30 UTC, ~22.5h of
+        #   data). Unlike equity indices (where dashboard.js strips and replaces
+        #   the today-bar with live data from quotes.json on every page load),
+        #   the partial crypto bar from a Friday run persists in the JSON all
+        #   weekend with truncated H/L — producing visibly wrong candle wicks on
+        #   Saturday and Sunday when the workflow does not run.
+        #
+        #   Fix: drop the in-progress today-bar for crypto. Crypto trades 24/7 so
+        #   the UTC calendar day (00:00–24:00 UTC) is the correct "session".
+        #   The bar is complete only after 24:00 UTC (i.e. today < tomorrow).
+        #   dashboard.js injects the live today-bar from quotes.json as usual.
+        #
+        # No FX open correction here for non-crypto — handled by fetch_fx_ohlc_from_1h.
         # No back-adjustment for futures — removed v7.47.19.
+        if id_ in CRYPTO_SYMBOLS:
+            today_str = _today_utc.strftime("%Y-%m-%d")
+            deduped = [b for b in deduped if b["time"] < today_str]
+            if len(deduped) < 30:
+                print(f"  WARN [{id_}]: only {len(deduped)} valid bars after today-bar strip - skipping")
+                return None
+
+        # ── Crypto prev_close open correction ─────────────────────────────────
+        # Crypto trades 24/7 on a UTC calendar day (00:00–24:00 UTC).
+        # yfinance native 1D uses the first tick of the UTC day as "open", which
+        # is also the close of the previous bar — making open == prev_close by
+        # definition. However in practice yfinance sometimes returns a slightly
+        # different first-tick value due to exchange aggregation, causing the
+        # candle body to contradict the net daily direction.
+        #
+        # Applying prev_close as open (same convention as FX) guarantees:
+        #   • candle body color (green/red) always matches the daily pct sign
+        #   • no gap between consecutive candle bodies (consistent with how
+        #     Bloomberg, CoinMarketCap, and TradingView render crypto daily candles)
+        # After overriding the open, clamp H/L to maintain OHLC integrity:
+        #   H = max(H, open)  — gap-up open: the gap IS the session's new floor
+        #   L = min(L, open)  — gap-down open: the gap IS the session's new ceiling
+        if id_ in CRYPTO_SYMBOLS and len(deduped) > 1:
+            for i in range(1, len(deduped)):
+                deduped[i]["open"] = deduped[i - 1]["close"]
+                new_o = deduped[i]["open"]
+                deduped[i]["high"] = max(deduped[i]["high"], new_o)
+                deduped[i]["low"]  = min(deduped[i]["low"],  new_o)
 
         return deduped
 
