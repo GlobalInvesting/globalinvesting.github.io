@@ -1,64 +1,51 @@
 {
-  "generated_at": "2026-05-02T05:18:23Z",
+  "generated_at": "2026-05-03T22:35:55Z",
   "signals": [
     {
-      "time": "21:19",
+      "time": "22:35",
       "priority": "critical",
-      "title": "EUR/USD — Trump Tariff Escalation",
-      "text": "Trump's announcement of 25% tariffs on European autos sets up immediate downside pressure toward the 1.1600 handle. This trade protectionism reduces European export competitiveness and weighs on the Euro, while the EUR COT net short position of -18.3k reinforces the bearish bias. The next ECB meeting (mkt: 100% hold priced) remains the catalyst for assessing the central bank's response to trade-induced growth risks.",
-      "evidence": [
-        "EUR/USD Friday Close: 1.1723",
-        "Trump 25% auto tariff headline",
-        "EUR COT net short: -18,293"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "21:19",
-      "priority": "critical",
-      "title": "USD/JPY — G8 Bilateral Theme + Intervention Risk",
-      "text": "JPY 1W momentum (+1.08%) and confirmed $34.5 billion intervention drive a sharp reversal against the 300bp US-JPY carry advantage. JPY COT net short -88.5k (30.6% long) creates short-squeeze risk (USD/JPY downside if shorts cover) if the pair breaks below Friday's 157.03 close. The next BoJ meeting (mkt: 40% hike priced) is the catalyst for determining if a rate hike will fundamentally support the yen's recovery.",
+      "title": "JPY/USD — G8 Bilateral Theme + Intervention",
+      "text": "JPY 1W avg +1.081% vs USD 1W avg -0.880% (spread 1.961%) — JPY outperformance is critical following Japan’s $35B intervention which erased the FOMC-driven dollar rally. USD/JPY at 157.03 remains under pressure despite a 300bp Fed-BoJ carry advantage as market participants price intervention risk over yield differentials. JPY COT LF net short -88,543 (30.6% long) indicates a crowded short position vulnerable to further unwinds during Japan's Golden Week holidays.",
       "evidence": [
         "JPY 1W avg: +1.081% (n=7)",
-        "USD 1W avg: -0.879% (n=7)",
-        "G8 spread: 1.960%",
-        "JPY COT net short: -88,543"
+        "USD 1W avg: -0.880% (n=7)",
+        "G8 spread: 1.961%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "21:14",
+      "time": "22:32",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Unwind Risk",
-      "text": "AUD COT net long +48.3k (74.8% long) creates a significant crowded-long unwind risk despite the RBA's 4.10% rate and hike bias. While retail sentiment is 90% short, the heavy speculative positioning suggests any shift in global risk appetite or commodity weakness triggers a sharp correction from 0.7208. The next RBA meeting (mkt: 100% hold priced) on 5 May is the catalyst for confirming the hawkish trajectory.",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD/USD at 0.7208 testing upper range as COT LF net long reaches +48,299 (74.8% long) while retail sentiment hits an extreme 90% short. This institutional vs retail divergence at the 0.7200 handle suggests retail is fading a fundamentally backed trend. RBA 4.10% vs Fed 3.75% provides a 35bp carry premium supporting the AUD bid. Retail capitulation risk is elevated if price sustains above 0.7210.",
       "evidence": [
-        "AUD COT net long: +48,299",
-        "Retail sentiment: 90% short",
-        "RBA rate: 4.10%"
+        "AUD COT LF net: +48,299",
+        "Retail Sentiment: 90% short",
+        "RBA 4.10% vs Fed 3.75% — -35bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "16:30",
+      "time": "22:30",
       "priority": "warning",
-      "title": "NZD/USD — Geopolitical Risk + Carry Disadvantage",
-      "text": "Trump's dissatisfaction with the Iran proposal and the resulting 150bp carry advantage for USD puts the 0.5900 level under immediate threat. NZD COT net short -16.8k aligns with the bearish technical close as geopolitical tensions favor the greenback's safe-haven status. The next RBNZ meeting (mkt: 40% hike priced) on 27 May is the catalyst for determining if the hike bias can offset external headwinds.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -16,833 (23.0% long) shows speculators are heavily fading the RBNZ despite a hawkish market bias. With the RBNZ on hold at 2.25% but a hike bias persisting, the pair faces significant short-squeeze risk if the May 27 meeting confirms tightening. NZD/USD at 0.5900 is currently supported by this positioning imbalance despite the 150bp carry deficit vs USD.",
       "evidence": [
-        "NZD/USD Friday Close: 0.5900",
-        "NZD COT net short: -16,833",
-        "USD/NZD carry: +150bp"
+        "NZD COT LF net: -16,833",
+        "RBNZ: 2.25% (Hike Bias)",
+        "NZD/USD: 0.5900"
       ],
       "_source": "gemini"
     },
     {
-      "time": "15:45",
+      "time": "22:25",
       "priority": "info",
-      "title": "GBP/USD — Positioning Overstretch",
-      "text": "GBP COT net long +32.6k (67.3% long) limits further upside potential despite the 5.01% UK 10Y yield advantage. The BoE's active hold signals risks to the current bullish momentum, especially as the pair faces resistance near 1.3575. The next BoE meeting (mkt: 100% hold priced) is the catalyst for resolving the neutral carry spread against the Fed.",
+      "title": "EUR/USD — Correlation Break + G8 Laggard",
+      "text": "EUR/USD vs EuroStoxx correlation at +0.727 vs 252d norm of -0.138 (z=+1.89σ) — the pair is trading as a pure risk proxy rather than reflecting its 200bp carry disadvantage vs USD. EUR 1W avg -0.529% confirms broad Euro weakness as the second-worst G8 performer. Watch for a return to mean correlation or a break of 1.1700 to signal a shift back to carry-driven pricing.",
       "evidence": [
-        "GBP COT net long: +32,637",
-        "UK 10Y yield: 5.01%",
-        "USD/GBP carry: +0bp"
+        "EUR/USD vs EuroStoxx z-score: +1.89σ",
+        "EUR 1W avg: -0.529% (n=7)",
+        "ECB 2% vs Fed 3.75% — +175bp"
       ],
       "_source": "gemini"
     }
