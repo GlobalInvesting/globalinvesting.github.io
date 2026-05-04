@@ -2966,6 +2966,20 @@ function _lwBuildTodayBar(ohlcId) {
   }
   const h = q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c);
   const l = q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c);
+
+  // ── FX stale-quote guard ─────────────────────────────────────────────────
+  // At the very start of the FX week (Sunday 21:00 UTC – Monday ~02:00 UTC),
+  // yfinance sometimes returns Friday's closing price as the "live" quote
+  // because no real trades have been reported yet in the new session.
+  // When that happens, open == high == low == close == prev_close, producing a
+  // flat phantom doji that visually duplicates the last completed Friday bar.
+  // Guard: if the bar is a pure doji (o == h == l == c) AND it falls on the
+  // same calendar date as the latest completed OHLC bar, skip it entirely.
+  // (LightweightCharts silently overwrites any bar with the same date, so even
+  // if dateStr differs the doji is harmless — but we still skip it to keep the
+  // chart clean and avoid confusing "no change" labels.)
+  if (isFxBar && o === h && h === l && l === c) return null;
+
   return { time: dateStr, open: o, high: h, low: l, close: c };
 }
 
