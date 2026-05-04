@@ -2930,9 +2930,16 @@ function _lwBuildTodayBar(ohlcId) {
   // yesterday's closing price (e.g. an SPX bar dated 2026-05-01 at 01:00 UTC).
   // Use market_state + market_time from quotes.json (populated by
   // fetch_intraday_quotes.py via ticker.info) to detect this precisely.
+  //
+  // Known non-trading states returned by Yahoo: CLOSED, POSTPOST, PREPRE (and PRE/POST
+  // for pre/after-hours — those still have same-day market_time so the date guard is safe).
+  // Rather than enumerating every closed-state string (which risks missing future ones
+  // like PREPRE was missed), we apply the date check for any state that is not REGULAR.
+  // If the last trade date is the same as dateStr the bar is allowed through regardless;
+  // if it's an earlier date the exchange hasn't opened yet and the bar is suppressed.
   if (!isFxBar && q.market_state != null && q.market_time != null) {
-    const isClosed = (q.market_state === 'CLOSED' || q.market_state === 'POSTPOST');
-    if (isClosed) {
+    const isActiveSession = (q.market_state === 'REGULAR');
+    if (!isActiveSession) {
       // market_time is a Unix timestamp in seconds
       const lastTradeDate = new Date(q.market_time * 1000).toISOString().slice(0, 10);
       if (lastTradeDate < dateStr) {
