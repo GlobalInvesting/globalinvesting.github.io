@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-05-04T05:41:20Z",
+  "generated_at": "2026-05-04T08:44:42Z",
   "signals": [
     {
-      "time": "05:40",
+      "time": "08:44",
       "priority": "critical",
-      "title": "AUD/USD — RBA Policy + Inflation + Retail Divergence",
-      "text": "AUD/USD at 0.7207 faces immediate volatility as CBA and markets price a 25bp hike to 4.35% at the May 5 meeting. April Monthly Inflation Gauge held steady at 4.3% y/y, confirming persistent price pressure. COT LF net long +48,299 (74.8% long) indicates heavy institutional backing, while retail sentiment is 90% short—a massive institutional vs. retail divergence. Fed 3.75% vs RBA 4.10% provides a -35bp carry advantage to AUD, which expands if RBA hikes. Retail capitulation risk is high if price clears 0.7250.",
+      "title": "USD/JPY — Geopolitical + Carry + Intervention Risk",
+      "text": "USD/JPY at 156.92 — Iran's threat to the Strait of Hormuz introduces acute geopolitical tension, yet the 300bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 0.75%) sustains the pair's floor. JPY COT LF net short -88,543 (30.6% long) remains a crowded carry trade. While VIX at 17.5 indicates normal volatility, a break above 160.00 remains the key level for BoJ intervention risk. Carry dominates the regime until VIX exceeds 25.",
       "evidence": [
-        "RBA hike bias: May 5 meeting",
-        "COT LF net long: +48,299",
-        "Retail sentiment: 90% short"
+        "USD/JPY carry: +300bp",
+        "JPY COT LF net: -88,543",
+        "VIX: 17.5"
       ],
       "_source": "gemini"
     },
     {
-      "time": "05:37",
+      "time": "08:41",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + Geopolitical Headline",
-      "text": "NZD/USD at 0.5918 shows a sharp divergence between speculative positioning and central bank bias. COT LF net short -16,833 (specs fading the RBNZ) contradicts the RBNZ hike bias priced for the May 27 meeting. While RBNZ's Gai suggests the Hormuz supply shock does not warrant reflexive hikes, any hawkish confirmation at the meeting introduces significant short-squeeze risk for crowded spec shorts. Fed 3.75% vs RBNZ 2.25% maintains a +150bp USD carry advantage, but the positioning imbalance favors an NZD relief rally on hawkish hold.",
+      "title": "AUD/USD — COT vs Retail Divergence + RBA",
+      "text": "AUD/USD at 0.7200 — COT LF net long +48,299 (74.8% long) vs retail 90% short creates a massive institutional vs retail divergence. Retail is aggressively fading the uptrend ahead of the RBA meeting on 5 May. With RBA at 4.10% vs Fed 3.75% providing a 35bp carry premium and a hike bias in place, retail capitulation risk is high if the RBA delivers a hawkish surprise. Watch for a sustained break above 0.7250 to trigger a short squeeze.",
+      "evidence": [
+        "AUD COT LF net: +48,299",
+        "Retail Sentiment: 90% Short",
+        "AUD/USD carry: +35bp"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "08:39",
+      "priority": "warning",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -16,833 (23.0% long) shows speculators are heavily fading the RBNZ's hawkish bias. With the RBNZ next meeting on 27 May and a hike bias active, the pair faces significant long-unwind or short-squeeze risk depending on upcoming data. NZD/USD at 0.5902 is currently supported by a 150bp USD carry advantage (Fed 3.75% vs RBNZ 2.25%), but the crowded spec short position leaves the pair vulnerable to any hawkish RBNZ rhetoric.",
       "evidence": [
         "NZD COT LF net: -16,833",
-        "RBNZ bias: Hike",
-        "NZD/USD: 0.5918"
+        "RBNZ Bias: Hike",
+        "NZD/USD: 0.5902"
       ],
       "_source": "gemini"
     },
     {
-      "time": "05:35",
-      "priority": "warning",
-      "title": "USD/JPY — Carry + Geopolitical Risk",
-      "text": "USD/JPY at 156.80 remains supported by the +300bp Fed-BoJ carry differential (Fed 3.75% vs BoJ 0.75%). JPY COT LF net short -88,543 reflects a crowded carry trade. While Trump's plan for the Strait of Hormuz introduces geopolitical tension, the VIX at 17.0 (normal volatility) suggests safe-haven JPY demand remains secondary to carry. Intervention risk remains the primary ceiling; watch for verbal warnings if price tests 160.00. Carry dominance persists unless VIX exceeds 25.",
-      "evidence": [
-        "Fed 3.75% vs BoJ 0.75%: +300bp",
-        "JPY COT LF net: -88,543",
-        "VIX: 17.0 (normal)"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "05:32",
+      "time": "08:36",
       "priority": "info",
-      "title": "EUR/USD — Correlation Break + Positioning",
-      "text": "EUR/USD at 1.1732 exhibits a significant correlation break with EuroStoxx (corr=+0.727 vs norm=-0.138, z=+1.89σ), indicating EUR is currently trading as a risk-on proxy rather than its historical inverse relationship with equities. COT LF net short -18,293 shows specs are positioned for downside, yet price has gained 1.22% over the last month. Fed 3.75% vs ECB 2.0% (+175bp USD advantage) structurally limits upside, but the correlation shift suggests EUR may remain bid alongside equity strength in the near term.",
+      "title": "EUR/USD — Correlation Break + ECB Bias",
+      "text": "EUR/USD vs EuroStoxx correlation at +0.726 vs 252d norm of -0.142 (z=+1.90σ) indicates a significant regime shift where EUR is trading as a proxy for European equity beta rather than a safe-haven or funding currency. ECB's Muller warns of accelerating inflation, supporting the ECB hold at 2.0%. However, the 175bp carry deficit vs the Fed (3.75%) keeps upside capped at 1.1800. Watch for the final Eurozone PMIs today to confirm if the equity-FX link holds.",
       "evidence": [
-        "EUR/USD vs EuroStoxx z-score: +1.89σ",
-        "EUR COT LF net: -18,293",
-        "USD/EUR carry: +175bp"
+        "EUR/USD vs EuroStoxx z-score: +1.90σ",
+        "Fed-ECB spread: 175bp",
+        "EUR/USD: 1.1723"
       ],
       "_source": "gemini"
     }
