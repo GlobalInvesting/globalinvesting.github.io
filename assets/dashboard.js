@@ -2926,25 +2926,24 @@ function _lwBuildTodayBar(ohlcId) {
 
   // ── Non-FX: guard against phantom bars on closed exchanges ─────────────────
   // When a non-FX exchange is CLOSED and its last trade was on a prior calendar
-  // date, injecting a bar dated today creates a phantom candle built from
-  // yesterday's closing price (e.g. an SPX bar dated 2026-05-01 at 01:00 UTC).
-  // Use market_state + market_time from quotes.json (populated by
-  // fetch_intraday_quotes.py via ticker.info) to detect this precisely.
+  // date, injecting a bar creates a phantom candle at the wrong date.
+  // Use market_state + market_time from quotes.json to detect this precisely.
   //
-  // Known non-trading states returned by Yahoo: CLOSED, POSTPOST, PREPRE (and PRE/POST
-  // for pre/after-hours — those still have same-day market_time so the date guard is safe).
-  // Rather than enumerating every closed-state string (which risks missing future ones
-  // like PREPRE was missed), we apply the date check for any state that is not REGULAR.
-  // If the last trade date is the same as dateStr the bar is allowed through regardless;
-  // if it's an earlier date the exchange hasn't opened yet and the bar is suppressed.
-  if (!isFxBar && q.market_state != null && q.market_time != null) {
+  // Known non-trading states: CLOSED, POSTPOST, PREPRE (European indices Sunday night),
+  // PRE, POST. Rather than maintaining an allowlist of closed states, we check any
+  // state that is not REGULAR (active session).
+  //
+  // IMPORTANT: dateStr for non-FX is derived from market_time itself (so lastTradeDate
+  // would always equal dateStr — useless for comparison). Instead we compare dateStr
+  // against today's UTC clock date. If the exchange's last session date is before today
+  // and the market is not actively trading, suppress the today-bar.
+  if (!isFxBar && q.market_state != null) {
     const isActiveSession = (q.market_state === 'REGULAR');
     if (!isActiveSession) {
-      // market_time is a Unix timestamp in seconds
-      const lastTradeDate = new Date(q.market_time * 1000).toISOString().slice(0, 10);
-      if (lastTradeDate < dateStr) {
-        // Last trade was on a previous date — exchange hasn't opened yet today.
-        // Don't inject a phantom bar; the chart ends correctly at the last closed bar.
+      const todayUTC = nowUTC.toISOString().slice(0, 10);
+      if (dateStr < todayUTC) {
+        // The last completed session was on a prior calendar date and the exchange
+        // is not currently in a REGULAR session — don't inject a phantom bar.
         return null;
       }
     }
