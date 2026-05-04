@@ -2926,24 +2926,19 @@ function _lwBuildTodayBar(ohlcId) {
 
   // ── Non-FX: guard against phantom bars on closed exchanges ─────────────────
   // When a non-FX exchange is CLOSED and its last trade was on a prior calendar
-  // date, injecting a bar creates a phantom candle at the wrong date.
-  // Use market_state + market_time from quotes.json to detect this precisely.
-  //
-  // Known non-trading states: CLOSED, POSTPOST, PREPRE (European indices Sunday night),
-  // PRE, POST. Rather than maintaining an allowlist of closed states, we check any
-  // state that is not REGULAR (active session).
-  //
-  // IMPORTANT: dateStr for non-FX is derived from market_time itself (so lastTradeDate
-  // would always equal dateStr — useless for comparison). Instead we compare dateStr
-  // against today's UTC clock date. If the exchange's last session date is before today
-  // and the market is not actively trading, suppress the today-bar.
-  if (!isFxBar && q.market_state != null) {
-    const isActiveSession = (q.market_state === 'REGULAR');
-    if (!isActiveSession) {
-      const todayUTC = nowUTC.toISOString().slice(0, 10);
-      if (dateStr < todayUTC) {
-        // The last completed session was on a prior calendar date and the exchange
-        // is not currently in a REGULAR session — don't inject a phantom bar.
+  // date, injecting a bar dated today creates a phantom candle built from
+  // yesterday's closing price (e.g. an SPX bar dated 2026-05-01 at 01:00 UTC).
+  // Use market_state + market_time from quotes.json (populated by
+  // fetch_intraday_quotes.py via ticker.info) to detect this precisely.
+  if (!isFxBar && q.market_state != null && q.market_time != null) {
+    const isClosed = (q.market_state === 'CLOSED' || q.market_state === 'POSTPOST'
+                   || q.market_state === 'PREPRE');
+    if (isClosed) {
+      // market_time is a Unix timestamp in seconds
+      const lastTradeDate = new Date(q.market_time * 1000).toISOString().slice(0, 10);
+      if (lastTradeDate < dateStr) {
+        // Last trade was on a previous date — exchange hasn't opened yet today.
+        // Don't inject a phantom bar; the chart ends correctly at the last closed bar.
         return null;
       }
     }
