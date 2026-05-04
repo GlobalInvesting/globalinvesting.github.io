@@ -1220,6 +1220,8 @@ async function fetchQuoteBarRT() {
         pct:   hasPrev ? (q.pct  ?? null) : null,
         high:  (q.high  != null && q.high  > 0) ? q.high  : null,
         low:   (q.low   != null && q.low   > 0) ? q.low   : null,
+        session_high: (q.session_high != null && q.session_high > 0) ? q.session_high : null,
+        session_low:  (q.session_low  != null && q.session_low  > 0) ? q.session_low  : null,
         hv30:  (q.hv30  != null) ? q.hv30 : (intradayData.hv30?.[pair.id] ?? null),
         pct1w: (q.pct1w != null) ? q.pct1w : null,
         pct1w_date: q.pct1w_date ?? null,
@@ -2964,8 +2966,26 @@ function _lwBuildTodayBar(ohlcId) {
       ? parseFloat(q.open.toFixed(dec))
       : (q.prev_close != null && q.prev_close > 0 ? parseFloat(q.prev_close.toFixed(dec)) : c);
   }
-  const h = q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c);
-  const l = q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c);
+  let h, l;
+  if (isFxBar) {
+    // For FX, prefer the session H/L (computed from 1H bars over the 21:00 UTC boundary)
+    // over Yahoo's dayHigh/dayLow (which uses a UTC-midnight cutoff and, critically,
+    // is NOT cleared at the FX session open — Yahoo keeps serving Friday's H/L range
+    // through the early hours of Monday UTC until real intraday ticks accumulate).
+    // If session H/L are unavailable (e.g. at session open when 0 bars have been
+    // aggregated yet), fall back to the o/c range only — never to stale dayH/dayL.
+    if (q.session_high != null && q.session_high > 0 &&
+        q.session_low  != null && q.session_low  > 0) {
+      h = parseFloat(q.session_high.toFixed(dec));
+      l = parseFloat(q.session_low.toFixed(dec));
+    } else {
+      h = Math.max(o, c);
+      l = Math.min(o, c);
+    }
+  } else {
+    h = q.high != null && q.high > 0 ? parseFloat(q.high.toFixed(dec)) : Math.max(o, c);
+    l = q.low  != null && q.low  > 0 ? parseFloat(q.low.toFixed(dec))  : Math.min(o, c);
+  }
 
   // ── FX stale-quote guard ─────────────────────────────────────────────────
   // At the very start of the FX week (Sunday 21:00 UTC – Monday ~02:00 UTC),
