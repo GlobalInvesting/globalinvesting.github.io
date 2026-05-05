@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-05-05T20:54:59Z",
+  "generated_at": "2026-05-05T22:51:56Z",
   "signals": [
     {
-      "time": "20:54",
+      "time": "22:51",
       "priority": "critical",
-      "title": "GBP/USD — Gilt Yield Shock + Geopolitical Risk",
-      "text": "UK 30-year gilts hit 5.78%, the highest since 1998, while 10-year yields trade at 5.09%. Despite the massive yield surge, GBP/USD remains under pressure at 1.3541 as Middle East tensions escalate following reports of Iranian long-range missile development. The 0bp carry spread (Fed 3.75% vs BoE 3.75%) provides no structural buffer against safe-haven USD demand. Market is pricing fiscal instability rather than rate-driven support.",
+      "title": "AUD/USD — RBA Hike + Positioning + Retail Divergence",
+      "text": "RBA raised the cash rate 25bps to 4.35% in an 8-1 vote, creating a -60bp carry deficit for USD. AUD COT LF net long +48,299 (74.8% long) while retail sentiment is 86% short. This extreme institutional vs retail divergence at 0.7186 suggests retail is fading the hawkish shift; a sustained break higher triggers a retail short-squeeze. Westpac flags further upside inflation risks, supporting the AUD carry advantage.",
       "evidence": [
-        "UK 30Y Gilt: 5.78%",
-        "Fed-BoE Spread: 0bp",
-        "GBP/USD: 1.3541"
+        "RBA: 4.35% (HIKING) vs Fed 3.75% — -60bp",
+        "AUD COT LF net: +48,299 (74.8% long)",
+        "Retail Sentiment: 86% short"
       ],
       "_source": "gemini"
     },
     {
-      "time": "20:51",
+      "time": "22:47",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -16,833 (long% 23.0%) shows speculators heavily fading the RBNZ's hawkish bias. With the RBNZ signaling a hike and the next meeting on 27 May, the pair faces significant short-squeeze risk if the central bank delivers. NZD/USD at 0.5888 is currently supported by a 150bp carry deficit vs USD, but crowded spec shorts are vulnerable to a hawkish surprise.",
+      "text": "NZD/USD COT LF net short -16,833 (23.0% long) shows speculators are heavily fading the RBNZ's hawkish bias. With the RBNZ signaling a hike bias for the 27 May meeting and citing financial system resilience despite Middle East tensions, the pair faces significant long-unwind risk for shorts if the hike is delivered. NZD/USD at 0.5889 remains supported by the 2.25% rate floor despite the 150bp USD carry advantage.",
       "evidence": [
-        "NZD COT LF Net: -16,833",
-        "RBNZ Bias: Hike",
-        "NZD/USD: 0.5888"
+        "NZD COT LF net: -16,833 (23.0% long)",
+        "RBNZ Bias: Hike (Next meeting 27 May)",
+        "USD/NZD Carry: +150bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "20:49",
+      "time": "22:43",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Retail Divergence",
-      "text": "AUD/USD at 0.7185 following the RBA hike to 4.35%. COT LF net long +48,299 (74.8% long) indicates institutional conviction, while retail sentiment is 86% short. This extreme divergence suggests retail is aggressively fading the trend; a continuation higher triggers retail capitulation. The 60bp AUD carry premium over the Fed supports the bullish institutional stance.",
+      "title": "USD/JPY — Geopolitical Risk + Carry",
+      "text": "USD/JPY at 157.89 is supported by a 300bp Fed-BoJ carry advantage, but rising Middle East tensions and Rubio's warnings on Iranian missile capabilities introduce intervention risk as price tests the 160.00 threshold. JPY COT LF net short -88,543 (30.6% long) reflects a crowded carry trade. Carry remains the dominant driver while VIX stays at 17.4 (normal volatility), but geopolitical escalation favors JPY safe-haven bids.",
       "evidence": [
-        "AUD COT LF Long%: 74.8%",
-        "Retail Sentiment: 86% Short",
-        "RBA: 4.35% vs Fed: 3.75%"
+        "Fed 3.75% vs BoJ 0.75% — 300bp",
+        "JPY COT LF net: -88,543",
+        "VIX: 17.4 (normal volatility)"
       ],
       "_source": "gemini"
     },
     {
-      "time": "20:46",
+      "time": "22:38",
       "priority": "info",
-      "title": "USD/JPY — Carry vs Intervention Risk",
-      "text": "USD/JPY at 157.87 remains supported by the 300bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 0.75%). While JPY COT LF net short -88,543 remains crowded, the pair is holding below the 160.00 psychological level where BoJ intervention risk historically intensifies. VIX at 17.4 (normal volatility) suggests carry remains the dominant regime driver over safe-haven flows for now.",
+      "title": "EUR/USD — Correlation Break + Yield Spread",
+      "text": "EUR/USD vs EuroStoxx correlation at +0.709 vs -0.154 norm (z=+2.01σ) indicates a significant regime break where EUR is tracking equity strength rather than traditional yield differentials. Despite a 175bp carry advantage for USD (Fed 3.75% vs ECB 2.0%), EUR/USD at 1.1697 remains bid alongside the STOXX 50 (+1.84%). Watch for a normalization of the correlation or a break in equity momentum to re-establish USD carry dominance.",
       "evidence": [
-        "Fed-BoJ Spread: +300bp",
-        "JPY COT LF Net: -88,543",
-        "VIX: 17.4"
+        "EUR/USD vs EuroStoxx z-score: +2.01σ",
+        "Fed 3.75% vs ECB 2.0% — 175bp",
+        "STOXX 50: +1.84% (1D)"
       ],
       "_source": "gemini"
     }
