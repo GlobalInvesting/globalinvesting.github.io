@@ -281,17 +281,43 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         )
 
         # Session-complete guard: only include a session bar if the session has closed.
-        # FX session closes at 21:00 UTC. The scheduled run at 22:30 UTC always runs
-        # AFTER the close — session_date == run_date_utc is the fully-completed bar.
+        # FX session closes at 21:00 UTC. The scheduled weekday run at 22:30 UTC always
+        # runs AFTER the close — session_date == run_date_utc is the fully-completed bar.
         # session_date > run_date_utc is tomorrow's partial session (~1.5h) — discard.
-        # If triggered via workflow_dispatch before 21:00 UTC (mid-session), today's
-        # bucket is still open — discard it by treating yesterday as the effective cutoff.
+        # If triggered before 21:00 UTC (mid-session), today's bucket is still open —
+        # discard it by treating yesterday as the effective cutoff.
+        #
+        # Weekend special case (v7.58.7):
+        #   The weekend run (Sat/Sun 23:30 UTC) runs AFTER 21:00 UTC, so the naive
+        #   "_fx_session_closed = hour >= 21" branch sets run_date_utc to "today + 1"
+        #   (i.e. Monday), which is the session that just opened 2.5h ago.
+        #   That bar is partially built (only 2.5h of data) but passes the guard
+        #   because session_date == run_date_utc → not discarded.
+        #   The partial Monday bar is then written to the JSON and persists until the
+        #   22:30 UTC Monday run overwrites it ~23h later — showing wrong OHLC all day.
+        #
+        #   Fix: when the script runs on a weekend day (Sat=5, Sun=6) after 21:00 UTC,
+        #   the FX session that just opened is for the NEXT weekday (Monday). That session
+        #   is not complete. The last COMPLETED session is Friday. Set run_date_utc to
+        #   the most recent Friday by walking back from today's UTC date.
         _now_utc = datetime.now(timezone.utc)
-        _fx_session_closed = _now_utc.hour >= 21   # FX closes 21:00 UTC
-        if _fx_session_closed:
-            run_date_utc = (_end_1h - timedelta(days=1)).date()  # today UTC = last complete session
+        _dow_utc = _now_utc.weekday()   # 0=Mon … 4=Fri, 5=Sat, 6=Sun
+        _fx_session_closed = _now_utc.hour >= 21   # FX session boundary: 21:00 UTC
+        _is_weekend = _dow_utc >= 5     # Saturday or Sunday
+
+        if _is_weekend and _fx_session_closed:
+            # Running on Sat/Sun after 21:00 UTC: the session that just opened belongs
+            # to Monday — it is NOT complete. Walk back to the most recent Friday.
+            # On Sunday: _dow_utc=6 → days_since_friday = 2 → subtract 2 days
+            # On Saturday: _dow_utc=5 → days_since_friday = 1 → subtract 1 day
+            _days_since_friday = _dow_utc - 4   # Fri=4 → 0 offset base
+            run_date_utc = (_now_utc - timedelta(days=_days_since_friday)).date()
+        elif _fx_session_closed:
+            # Weekday, after 21:00 UTC: today's session just closed — it is complete.
+            run_date_utc = (_end_1h - timedelta(days=1)).date()
         else:
-            run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday UTC (today's session still open)
+            # Before 21:00 UTC (any day): today's session is still open — use yesterday.
+            run_date_utc = (_end_1h - timedelta(days=2)).date()
 
         day_buckets: dict[str, dict] = {}
         if not hist_1h.empty:
@@ -486,9 +512,27 @@ def fetch_cme_ice_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         # If triggered via workflow_dispatch before 22:00 UTC (mid-session), today's
         # partial bucket (only a few hours of data) must be discarded — it would write
         # a tiny bar with an artificial range and cause visual inconsistency.
+        #
+        # Weekend special case (v7.58.7): same issue as FX guard.
+        # The weekend run (Sun 23:30 UTC) sees hour=23 >= 22 → _gold_session_closed=True
+        # → run_date_utc = Monday. But CME Gold reopened Sunday 22:00 UTC (18:00 ET),
+        # so the bar assigned to Monday has only ~1.5h of data. That partial bar would
+        # be written to JSON and persist until the Monday 22:30 UTC run (~23h later).
+        # Fix: on Sunday post-22:00 UTC, walk back run_date_utc to Friday.
+        # Saturday has no CME trading (filtered below), so the last complete session
+        # is always Friday.
         _now_utc = datetime.now(timezone.utc)
+        _dow_utc = _now_utc.weekday()  # 0=Mon … 4=Fri, 5=Sat, 6=Sun
         _gold_session_closed = _now_utc.hour >= 22  # CME Gold closes 22:00 UTC
-        if _gold_session_closed:
+        _is_weekend = _dow_utc >= 5
+
+        if _is_weekend and _gold_session_closed:
+            # Sunday post-22:00 UTC: the session that just opened is Monday's — not complete.
+            # On Sunday: _dow_utc=6 → days_since_friday = 2
+            # On Saturday: _dow_utc=5 → days_since_friday = 1 (unlikely: Saturday closes at 22:00)
+            _days_since_friday = _dow_utc - 4
+            run_date_utc = (_now_utc - timedelta(days=_days_since_friday)).date()
+        elif _gold_session_closed:
             run_date_utc = (_end_1h - timedelta(days=1)).date()  # today UTC = last complete session
         else:
             run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday UTC (today's session still open)
