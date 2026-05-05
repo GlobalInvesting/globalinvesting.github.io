@@ -1,56 +1,55 @@
 {
-  "generated_at": "2026-05-05T02:37:01Z",
+  "generated_at": "2026-05-05T05:20:30Z",
   "signals": [
     {
-      "time": "02:36",
+      "time": "05:20",
       "priority": "critical",
-      "title": "AUD/USD — Geopolitical Shock + RBA Policy + Retail Divergence",
-      "text": "AUD/USD at 0.7169 facing acute volatility as WTI crude surges +4.39% on Iran tensions. While RBA (4.10%) vs Fed (3.75%) provides a +35bp carry advantage, the inflationary shock from energy prices reinforces hawkish expectations for today's RBA meeting. COT LF net long +48,299 (74.8% long) shows institutional backing, while retail sentiment is 80% short—a significant divergence. Institutional positioning and carry favor the upside, but geopolitical risk-off flows to the USD (DXY 98.48) create a friction point. Implication: Retail capitulation risk is high if RBA delivers a hawkish surprise amid energy-driven inflation.",
+      "title": "AUD/USD — RBA Decision + Geopolitical Inflation + Positioning",
+      "text": "AUD/USD at 0.7151 testing minor support at 0.7130 ahead of the RBA meeting. Markets fully price a 25bp hike to 4.35% as US-Iran tensions in the Strait of Hormuz drive crude oil +4.39%, fueling global inflation expectations. AUD COT LF net long +48,299 (74.8% long) indicates a crowded bullish consensus; if the RBA fails to signal a peak rate near 4.6% as expected by NAB, a long-unwind risk is elevated. Retail sentiment at 80% short diverges from institutional longs, suggesting retail is fading the trend into the event risk.",
       "evidence": [
-        "RBA 4.10% vs Fed 3.75%: -35bp",
-        "WTI Oil: $105.2 (+4.39%)",
-        "Retail Sentiment: 80% Short"
+        "RBA hike prob: 100%",
+        "AUD COT LF long%: 74.8%",
+        "WTI Oil: $104.4 (+4.39%)"
       ],
-      "watch_level": "RBA interest rate decision today",
       "_source": "gemini"
     },
     {
-      "time": "02:32",
+      "time": "05:17",
+      "priority": "warning",
+      "title": "USD/NZD — G8 Bilateral Theme + Carry",
+      "text": "USD/NZD at 0.5862 reflects a 1.026% G8 performance spread as USD outperforms while NZD lags peers. The +150bp Fed-RBNZ carry advantage (Fed 3.75% vs RBNZ 2.25%) supports USD dominance despite the RBNZ's hawkish hike bias. NZD COT LF net short -16,833 (23% long) shows speculators are already positioned for weakness, though the G8 laggard status suggests further downside if risk-off sentiment from Middle East tensions persists. Watch for the RBNZ meeting on 27 May to challenge this divergence.",
+      "evidence": [
+        "USD 1W avg: +0.489% (n=7)",
+        "NZD 1W avg: -0.537% (n=4)",
+        "G8 spread: 1.026%"
+      ],
+      "watch level": "RBNZ meeting on 27 May",
+      "_source": "gemini"
+    },
+    {
+      "time": "05:15",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -16,833 (long% 23.0%) shows speculators heavily fading the kiwi despite a hawkish RBNZ market bias. With RBNZ at 2.25% and the market pricing a hike for the May 27 meeting, a clear divergence exists between bearish spec positioning and hawkish central bank pricing. NZD/USD at 0.5873 remains under pressure from the USD carry advantage (+150bp), but the crowded spec short creates elevated short-squeeze risk if RBNZ rhetoric remains aggressive. Implication: Speculative unwind targets 0.6000 if RBNZ confirms hike path.",
+      "text": "NZD/USD COT LF net short -16,833 (specs fading the CB) vs RBNZ hike bias priced for 27 May. With NZD long% at an extreme low of 23.0%, a hawkish RBNZ delivery or signal creates significant short-squeeze risk toward 0.6000. Current NZD/USD price at 0.5862 remains pressured by the 150bp carry deficit against the USD, but the positioning extreme suggests the move is overextended relative to the interest rate outlook.",
       "evidence": [
         "NZD COT LF net: -16,833",
-        "Fed 3.75% vs RBNZ 2.25%: +150bp",
-        "NZD/USD: 0.5873"
+        "NZD long%: 23.0%",
+        "USD/NZD carry: +150bp"
       ],
-      "watch_level": "RBNZ meeting on 27 May",
+      "watch level": "RBNZ meeting on 27 May",
       "_source": "gemini"
     },
     {
-      "time": "02:28",
-      "priority": "warning",
-      "title": "EUR/USD — Correlation Break + Energy Shock",
-      "text": "EUR/USD vs EuroStoxx correlation at +0.709 vs 252d norm of -0.154 (z=+2.01σ) signals a regime shift where EUR is trading as a pure proxy for European risk assets. ECB forecasters raising inflation outlook to 2.7% while slashing growth due to energy shocks weighs on the pair. EUR/USD at 1.1693 is holding below the 1.1700 handle as the Fed-ECB +175bp carry spread favors the USD. Implication: EUR/USD upside is structurally limited by the growth-inflation trade-off; the pair remains a sell-on-rallies candidate while the energy shock persists.",
-      "evidence": [
-        "EUR/USD vs EuroStoxx: z=+2.01σ",
-        "Fed 3.75% vs ECB 2.0%: +175bp",
-        "EUR COT long%: 45.4%"
-      ],
-      "watch_level": "Next ECB meeting on 11 Jun",
-      "_source": "gemini"
-    },
-    {
-      "time": "02:21",
+      "time": "05:10",
       "priority": "info",
-      "title": "USD/JPY — Carry vs Intervention Risk",
-      "text": "USD/JPY at 157.24 supported by a +300bp Fed-BoJ carry premium. JPY COT LF net short -88,543 (30.6% long) remains crowded, reflecting the dominant carry trade. Despite Middle East tensions, VIX at 18.3 (normal volatility) suggests safe-haven JPY demand is not yet displacing carry flows. However, the MOVE index rising +10.58% to 77.9 indicates increasing bond market volatility which typically precedes JPY volatility. Implication: Carry remains the primary driver until VIX > 25, but 160.00 remains the critical watch level for BoJ verbal intervention.",
+      "title": "EUR/USD — Correlation Break + Yield Spread",
+      "text": "EUR/USD at 1.1682 vs EuroStoxx 50 correlation at +0.710 (z=+2.01σ) indicates a significant decoupling from historical norms (norm=-0.154). The pair is trading as a pro-cyclical risk asset rather than its typical inverse relationship with European equities. Fed 3.75% vs ECB 2.0% creates a +175bp carry advantage for the USD, keeping upside capped at 1.1750. Bear steepener regime in US yields (2s10s +56.6bp) further supports USD funding demand over EUR.",
       "evidence": [
-        "Fed 3.75% vs BoJ 0.75%: +300bp",
-        "JPY COT LF net: -88,543",
-        "MOVE Index: 77.9 (+10.58%)"
+        "EUR/USD vs EuroStoxx z-score: +2.01σ",
+        "Fed-ECB spread: 175bp",
+        "2s10s spread: +56.6bp"
       ],
-      "watch_level": "160.00 psychological resistance",
+      "watch level": "ECB meeting on 11 Jun",
       "_source": "gemini"
     }
   ]
