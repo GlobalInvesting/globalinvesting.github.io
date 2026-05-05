@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-05-05T17:11:02Z",
+  "generated_at": "2026-05-05T19:22:35Z",
   "signals": [
     {
-      "time": "17:10",
+      "time": "19:22",
       "priority": "critical",
       "title": "AUD/USD — RBA Hike + Positioning + Retail Divergence",
-      "text": "AUD/USD testing 0.7191 following RBA's rate hike to 4.35%. COT LF net long +48,299 (74.8% long) indicates institutional backing for the move, while retail sentiment is at an 85% short extreme. This institutional vs. retail divergence at a 1-month high suggests a high-conviction trend; retail capitulation risk provides further fuel for upside momentum. RBA 4.35% vs Fed 3.75% provides a +60bp carry advantage for AUD, supporting structural bids.",
+      "text": "AUD/USD at 0.7189 following RBA rate hike to 4.35%. COT LF net long +48,299 (74.8% long) while retail sentiment is 86% short—a sharp institutional vs. retail divergence. Fed 3.75% vs RBA 4.35% creates a -60bp carry spread favoring AUD. Institutional length is building momentum into the hike while retail fades the move; retail capitulation risk supports a move toward 0.7250 if upside persists.",
       "evidence": [
         "RBA Rate: 4.35% (HIKING)",
         "COT LF Net: +48,299 (74.8% long)",
-        "Retail Sentiment: 85% Short"
+        "Retail Sentiment: 86% Short"
       ],
       "_source": "gemini"
     },
     {
-      "time": "17:07",
+      "time": "19:18",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -16,833 (23% long) shows speculators are heavily fading the RBNZ despite a hawkish market bias and a 'Hike' signal for the May 27 meeting. With NZD/USD at 0.5894 and a +150bp carry deficit vs USD, any hawkish delivery or signal from the RBNZ creates significant short-squeeze risk as crowded speculative shorts are forced to unwind. Watch for a break above 0.5950 to confirm the squeeze.",
+      "text": "NZD/USD COT LF net short -16,833 (long% 23.0%) vs RBNZ hawkish bias with a hike priced for the 27 May meeting. Specs are heavily fading a central bank that remains in a tightening bias. Fed 3.75% vs RBNZ 2.25% provides a +150bp USD carry advantage, but crowded spec shorts face squeeze risk if RBNZ confirms the hike path. NZD/USD at 0.5891.",
       "evidence": [
         "NZD COT LF Net: -16,833",
-        "RBNZ Bias: Hike (May 27)",
-        "USD/NZD Carry: +150bp (favors USD)"
+        "RBNZ Bias: Hike (27 May)",
+        "USD/NZD Carry: +150bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "17:05",
+      "time": "19:15",
       "priority": "warning",
-      "title": "USD/JPY — Geopolitical + Carry + Intervention Risk",
-      "text": "USD/JPY at 157.81 remains supported by a +300bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 0.75%). While Trump-Xi headlines regarding Iran introduce geopolitical noise, JPY safe-haven demand remains marginal with VIX at 17.4 (normal volatility). JPY COT LF net short -88,543 (30.6% long) remains a crowded carry trade; intervention risk rises significantly if price tests the 160.00 psychological handle.",
+      "title": "USD/JPY — Carry + Intervention Risk",
+      "text": "USD/JPY at 157.88 supported by +300bp Fed-BoJ carry (Fed 3.75% vs BoJ 0.75%). JPY COT LF net short -88,543 (30.6% long) remains crowded. While VIX at 17.2 (normal volatility) keeps carry trades active, 160.00 remains the critical watch level for BoJ verbal warnings or direct intervention. Oil shock headlines introduce JPY weakness via trade balance concerns, offsetting safe-haven bids unless VIX exceeds 25.",
       "evidence": [
-        "Fed 3.75% vs BoJ 0.75%: +300bp",
+        "USD/JPY Carry: +300bp",
         "JPY COT LF Net: -88,543",
-        "VIX: 17.4 (normal volatility)"
+        "VIX: 17.2 (normal)"
       ],
       "_source": "gemini"
     },
     {
-      "time": "17:02",
+      "time": "19:10",
       "priority": "info",
       "title": "EUR/USD — Correlation Break + ECB Stance",
-      "text": "EUR/USD vs EuroStoxx correlation at +0.731 vs norm of -0.138 (z=+1.86σ) indicates a significant regime break where EUR is tracking equity strength rather than traditional macro drivers. ECB's Villeroy confirms no immediate signs to raise rates (ECB 2% ON HOLD), maintaining a -175bp carry disadvantage vs USD. Price at 1.1704 remains range-bound; the correlation break suggests EUR upside is currently a proxy for European risk-on sentiment rather than rate expectations.",
+      "text": "EUR/USD vs EuroStoxx correlation at +0.731 vs 252d norm of -0.138 (z=+1.86σ). This significant decoupling suggests EUR is trading as a proxy for European equity beta rather than rate differentials. ECB's Villeroy confirms no immediate signs to raise rates (ECB 2% vs Fed 3.75%), maintaining a +175bp USD carry advantage. EUR/USD holding at 1.1700; watch for a return to negative equity correlation to signal a shift back to macro fundamentals.",
       "evidence": [
-        "EUR/USD vs EuroStoxx: z=+1.86σ",
-        "Fed 3.75% vs ECB 2.0%: +175bp",
-        "ECB Bias: Hold (Villeroy)"
+        "EUR/USD vs EuroStoxx z-score: +1.86σ",
+        "USD/EUR Carry: +175bp",
+        "ECB Rate: 2.0% (ON HOLD)"
       ],
       "_source": "gemini"
     }
