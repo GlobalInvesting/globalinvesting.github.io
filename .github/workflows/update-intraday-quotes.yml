@@ -47,15 +47,26 @@ on:
   repository_dispatch:
     types: [trigger-intraday-quotes]   # ← disparado por cron-job.org cada 5 min exactos
 
-  # schedule eliminado (v7.14.4): el cron de GitHub cada 15 min colisionaba con
-  # cron-job.org cada 5 min → dos runs simultáneos intentaban push al mismo
-  # quotes.json → git rebase fallaba las 4 veces → exit 1 → email de fallo repetido.
-  # cron-job.org es suficiente como reloj primario. Si falla, el gap máximo es
-  # el intervalo configurado en cron-job.org (5 min) — completamente aceptable.
+  # schedule: RED DE SEGURIDAD (v7.58.6) — solo actúa cuando cron-job.org está caído.
   #
-  # (v7.14.5): el exit 1 del paso de push fue reemplazado por exit 0.
-  # Un fallo de push no es fatal: el siguiente run (5 min) trae datos frescos.
-  # exit 1 → GitHub envía email de fallo; exit 0 → silencioso. Sin impacto en datos.
+  # Historial:
+  #   v7.14.4: schedule eliminado porque el cron de GitHub colisionaba con cron-job.org
+  #            → dos runs simultáneos → git rebase fallaba → email de fallo repetido.
+  #   v7.14.5: exit 1 del push reemplazado por exit 0. Runs simultáneos ya no causan fallos.
+  #   v7.58.6: schedule restaurado como fallback. El push-loop + concurrency:
+  #            cancel-in-progress:false ya serializa runs simultáneos sin errores.
+  #            Si cron-job.org cae (PAT expirado, cuenta suspendida, etc.), quotes.json
+  #            se congela indefinidamente — el dashboard muestra datos viejos para siempre.
+  #            El schedule de GitHub cubre ese gap: máximo ~15 min de datos viejos
+  #            en vez de horas o días. No envía emails de fallo (exit 0 en push-loop).
+  #
+  # Frecuencia: */5 es el mínimo permitido por GitHub. En la práctica corre cada 5–15 min
+  # bajo carga, lo cual es aceptable como fallback (no como reloj primario).
+  # Fuera de horario FX (sábado 21:00 UTC – domingo 21:00 UTC) las ejecuciones corren
+  # pero fetch_intraday_quotes.py escribe datos de fin de semana sin cambios reales —
+  # el push-loop detecta "No changes vs remote HEAD" y hace exit 0 sin commit.
+  schedule:
+    - cron: '*/5 * * * *'             # fallback: corre cada 5 min si cron-job.org cae
 
   workflow_dispatch:                   # trigger manual desde GitHub UI
 
