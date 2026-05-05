@@ -3030,13 +3030,8 @@ function _lwUpdateTodayBar() {
     if (rt?.pct != null && rt.pct !== undefined && _lwActivePrevCloseMap) {
       // Inject the yfinance-authoritative prevClose so _updateLWHeader calculates
       // the correct % when called for crosshair hover on today's bar too.
-      // For FX: use prev_close (regularMarketPreviousClose) — the official previous-session
-      // close used to compute the 1D %. For non-FX: also prefer prev_close; fall back to
-      // open only when prev_close is absent.
-      const _pcVal = (rt.prev_close != null && rt.prev_close > 0) ? rt.prev_close
-                   : (rt.open != null && rt.open > 0 ? rt.open : null);
-      if (_pcVal != null) {
-        _lwActivePrevCloseMap.set(bar.time, _pcVal);
+      if (rt.open != null && rt.open > 0) {
+        _lwActivePrevCloseMap.set(bar.time, rt.open);
       }
       // Override the header % display directly with yfinance values
       _lwActiveUpdateHeader(bar, null, { pct: rt.pct, chg: rt.chg });
@@ -3392,32 +3387,7 @@ async function _renderLWChart(ohlcId, label) {
   // Always visible by default, toggle via PC button
   if (typeof window._lwShowPc === 'undefined') window._lwShowPc = true;
   let _prevCloseLine = null;
-  // Prev C price: for FX pairs, prefer the yfinance-authoritative prev_close from
-  // STOOQ_RT_CACHE (= regularMarketPreviousClose from quotes.json). This is Yahoo's
-  // official previous-session close — the same value used to compute the 1D chg/pct
-  // shown in the ticker and FX table.
-  //
-  // Why not bars[bars.length-1].close?
-  //   After the strip, bars[] ends at the last COMPLETED session bar from the OHLC JSON.
-  //   For FX, once the new session starts (21:00 UTC), _stripFrom advances to tomorrow,
-  //   so bars[] ends at the bar dated TODAY (the session that just closed at 21:00 UTC).
-  //   Its close becomes the "prev session" close — and that value may differ from
-  //   regularMarketPreviousClose because:
-  //     • The OHLC JSON fetch_ohlc.py may have written the bar mid-session (partial data).
-  //     • Rounding differences between the 1H aggregation and Yahoo's official close.
-  //   The RT cache prev_close is always correct because it comes directly from Yahoo's
-  //   own regularMarketPreviousClose, the same authoritative value TradingView uses for
-  //   its "Prev C" reference line.
-  //
-  // Non-FX fallback: no boundary ambiguity — bars[bars.length-1].close is reliable.
-  const _rtCacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
-  const _rtQ = STOOQ_RT_CACHE[_rtCacheKey];
-  const _lastHistClose = (() => {
-    if (_LW_FX_IDS.has(ohlcId) && _rtQ?.prev_close != null && _rtQ.prev_close > 0) {
-      return parseFloat(_rtQ.prev_close.toFixed(dec));
-    }
-    return bars.length > 1 ? bars[bars.length - 1].close : null;
-  })();
+  const _lastHistClose = bars.length > 1 ? bars[bars.length - 1].close : null;
   function _applyPrevClose() {
     if (_prevCloseLine) { try { candleSeries.removePriceLine(_prevCloseLine); } catch(_) {} _prevCloseLine = null; }
     if (!window._lwShowPc || _lastHistClose == null) return;
