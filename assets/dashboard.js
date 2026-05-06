@@ -1180,6 +1180,11 @@ function intradayQuote(cache, id) {
     // open: real intraday open (regularMarketOpen) when available — used for candle body color.
     // Falls back to prev_close so the candle open is at yesterday's close (correct fallback).
     open:         (q.open != null && q.open > 0) ? q.open : (q.prev_close ?? q.close),
+    // high/low: Yahoo dayHigh/dayLow — used by _lwBuildTodayBar for non-FX candle wicks.
+    // Without these, _lwBuildTodayBar falls back to max(o,c)/min(o,c) producing H==O and L==C
+    // (no wicks at all), which was the root cause of flat WTI and DXY today-bars.
+    high:         (q.high != null && q.high > 0) ? q.high : null,
+    low:          (q.low  != null && q.low  > 0) ? q.low  : null,
     chg:          hasPrev ? (q.chg  ?? null) : null,
     pct:          hasPrev ? (q.pct  ?? null) : null,
     fromIntraday: true,
