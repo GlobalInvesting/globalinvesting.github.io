@@ -208,23 +208,31 @@ HL_MAX_SPREAD: dict[str, float] = {
 # Result: open/high/low/close exactly match what Yahoo Finance shows on its own
 # 4H chart, and match TradingView and Bloomberg FX daily candles.
 NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'eth', 'dxy', 'gold'}
-# All non-FX symbols use native yfinance 1D bars (same path as WTI).
+# Symbols routed to fetch_gold_ohlc_from_1h (CME 22:00/23:00 UTC session boundary).
+# Gold is pulled OUT of native 1D because yfinance 1D for GC=F uses UTC midnight
+# as its cutoff: the CME session runs 22:00/23:00 UTC → next day 21:00/22:00 UTC,
+# spanning two UTC calendar days. Native 1D therefore produces bars where
+# open ≈ prev_close (no real session boundary gap) and H/L miss the first hour of
+# trading (23:00–00:00 UTC). 1H aggregation over the CME boundary produces
+# correct session opens, proper H/L ranges, and real overnight gaps — matching
+# Bloomberg and TradingView CME Gold daily candles.
+CME_SYMBOLS = {'gold'}
 #
-# Routing rationale — two paths only:
-#   FX pairs (28):  1H aggregation over the 21:00 UTC NY session boundary.
-#                   Required because yfinance native 1D FX bars use UTC midnight as their
-#                   cutoff, producing materially wrong H/L and unreliable opens.
-#                   1H aggregation matches Bloomberg, TradingView and Reuters FX candles.
+# Routing rationale — three paths:
+#   FX pairs (28):    1H aggregation over the 21:00 UTC NY session boundary.
+#                     Required because yfinance native 1D FX bars use UTC midnight as
+#                     their cutoff, producing materially wrong H/L and unreliable opens.
+#                     1H aggregation matches Bloomberg, TradingView and Reuters FX candles.
 #
-#   Non-FX (11):    Native yfinance 1D — identical to the WTI approach that has always worked.
-#                   1H aggregation with any fixed UTC session boundary drops today's bar:
-#                   at the 22:30 UTC run, any 1H bucket for today has session_date = today,
-#                   which exceeds run_date_utc = yesterday, so it is discarded by the guard.
-#                   Native 1D includes the in-progress or just-completed today bar directly.
-#                   The intraday today-bar injection in dashboard.js updates it with live
-#                   data from quotes.json — the same proven pattern WTI has always used.
-#                   Gold stub-bar quality (previous reason for 1H aggregation): accepted
-#                   tradeoff — the intraday injection overwrites today's bar with real H/L.
+#   CME instruments:  1H aggregation over the DST-aware CME session boundary
+#   (gold only now)   (22:00 UTC in EDT, 23:00 UTC in EST). Same hybrid approach as FX:
+#                     1H for recent 730 days, native 1D for older history.
+#                     dashboard.js strips the last bar and injects the live today-bar
+#                     from quotes.json, so the in-progress session is always current.
+#
+#   Non-FX (10):      Native yfinance 1D — identical to the WTI approach that has
+#                     always worked. The intraday today-bar injection in dashboard.js
+#                     updates it with live data from quotes.json.
 FX_SYMBOLS = set(SYMBOLS.keys()) - NON_FX_SYMBOLS
 
 # Crypto trades 24/7 — yfinance only returns Saturday/Sunday bars when an explicit
@@ -383,21 +391,6 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars after 1H aggregation - skipping")
             return None
 
-        # NOTE: prev_close open correction is intentionally NOT applied to Part A (1H-aggregated) bars.
-        #
-        # The 1H aggregation sets open = the real first-tick open of each FX session
-        # (the Open of the first 1H bar at or after 21:00 UTC). This IS the correct NY-session open —
-        # it's the same value Bloomberg and TradingView show for FX daily opens.
-        #
-        # Overwriting it with prior_close (as was done previously) causes a systematic visual artifact:
-        # when a session opens with a gap, setting open=prior_close moves it outside the real intraday
-        # range, producing bars where open==high (gap-down sessions) or open==low (gap-up sessions).
-        # This affected ~57% of all 1H-aggregated bars — the candle wicks and bodies were wrong.
-        #
-        # prev_close correction is still applied to Part B (legacy native 1D bars) above, because
-        # Yahoo's native 1D FX open field uses UTC-midnight as its reference and is unreliable.
-        # For Part A, the 1H open is already faithful to the real session open.
-
         return deduped
 
     except Exception as exc:
@@ -414,12 +407,19 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
     CME Gold (GC=F) trades Sunday 18:00 ET to Friday 17:00 ET with a 60-minute daily
     maintenance break (17:00–18:00 ET). The session boundary for daily bar construction
-    is therefore 22:00 UTC (17:00 ET in standard EST/winter time), consistent with how
-    Bloomberg, CME Group charts, and TradingView construct Gold daily candles.
+    is 17:00 ET, which converts to:
+      22:00 UTC during EDT (UTC−4, April–October)
+      23:00 UTC during EST (UTC−5, November–March)
 
-    yfinance native 1D bars for GC=F are severely degraded (~46% of bars have O==H or
-    O==L) because Yahoo constructs them from settlement ticks, not from the full COMEX
-    electronic session. 1H aggregation produces faithful intraday H/L ranges.
+    The boundary is computed dynamically from the New York UTC offset to remain
+    correct across DST transitions — avoiding the winter/summer mismatch that would
+    cause bars at the boundary hour to be assigned to the wrong session.
+
+    yfinance native 1D bars for GC=F are severely degraded because Yahoo constructs
+    them using a UTC midnight cutoff, not the CME session boundary. This causes:
+      - open ≈ prev_close on most bars (no real session gap visible)
+      - H/L missing the first hour of each session (23:00–00:00 UTC)
+    1H aggregation over the correct CME boundary produces faithful session OHLC.
 
     Hybrid approach (same as FX):
     - 1H bars cover the most recent 730 days (yfinance limit) with correct H/L.
@@ -446,19 +446,27 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
             auto_adjust=True,
         )
 
-        # Session-complete guard: only include a session bar if the session has closed.
-        # CME Gold session closes at 22:00 UTC (17:00 ET, EST fixed). The scheduled run
-        # at 22:30 UTC always runs AFTER the close — session_date == run_date_utc is safe.
-        # session_date > run_date_utc = tomorrow's partial session (~30 min) — discard.
-        # If triggered via workflow_dispatch before 22:00 UTC (mid-session), today's
-        # partial bucket (only a few hours of data) must be discarded — it would write
-        # a tiny bar with an artificial range and cause visual inconsistency.
+        # ── DST-aware CME session boundary ────────────────────────────────────
+        # CME Gold closes at 17:00 ET and reopens at 18:00 ET.
+        # In EDT (UTC−4, Apr–Oct): close = 21:00 UTC, reopen = 22:00 UTC.
+        # In EST (UTC−5, Nov–Mar): close = 22:00 UTC, reopen = 23:00 UTC.
+        # Using a hardcoded boundary causes bars in the boundary hour to be
+        # misassigned across DST transitions. Compute from the NY UTC offset.
+        try:
+            from zoneinfo import ZoneInfo
+        except ImportError:
+            from backports.zoneinfo import ZoneInfo
+        _ny_now = datetime.now(ZoneInfo("America/New_York"))
+        _ny_offset_h = int(_ny_now.utcoffset().total_seconds() / 3600)  # −4 EDT, −5 EST
+        _cme_close_utc  = 17 + (-_ny_offset_h)   # 21 UTC in EDT, 22 UTC in EST
+        _cme_reopen_utc = 18 + (-_ny_offset_h)   # 22 UTC in EDT, 23 UTC in EST
+
         _now_utc = datetime.now(timezone.utc)
-        _gold_session_closed = _now_utc.hour >= 22  # CME Gold closes 22:00 UTC
+        _gold_session_closed = _now_utc.hour >= _cme_close_utc
         if _gold_session_closed:
             run_date_utc = (_end_1h - timedelta(days=1)).date()  # today UTC = last complete session
         else:
-            run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday UTC (today's session still open)
+            run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday (today's session still open)
 
         day_buckets: dict[str, dict] = {}
         if not hist_1h.empty:
@@ -468,10 +476,10 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                 else:
                     ts_utc = ts.astimezone(timezone.utc)
 
-                # CME session boundary: 22:00 UTC (17:00 ET EST).
-                # Hours 00–21 belong to the session closing today.
-                # Hours 22–23 open a new session that closes tomorrow.
-                if ts_utc.hour < 22:
+                # CME session boundary: 17:00 ET (DST-aware UTC hour = _cme_reopen_utc).
+                # Hours 00–(_cme_reopen_utc−1) belong to the session closing today.
+                # Hours _cme_reopen_utc–23 open a new session that closes tomorrow.
+                if ts_utc.hour < _cme_reopen_utc:
                     session_date = ts_utc.date()
                 else:
                     session_date = (ts_utc + timedelta(days=1)).date()
@@ -748,6 +756,8 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     """
     if id_ in FX_SYMBOLS:
         return fetch_fx_ohlc_from_1h(id_, ticker_sym)
+    if id_ in CME_SYMBOLS:
+        return fetch_gold_ohlc_from_1h(id_, ticker_sym)
 
     try:
         ticker = yf.Ticker(ticker_sym)
