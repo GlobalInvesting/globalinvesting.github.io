@@ -2883,10 +2883,24 @@ function _lwBuildTodayBar(ohlcId) {
   // Session-boundary UTC hour for instruments that reopen before calendar midnight.
   // FX OTC: 21:00 UTC (17:00 EDT) / 22:00 UTC (17:00 EST)
   // DXY (ICE): 22:00 UTC (17:00 EDT) / 23:00 UTC (17:00 EST) — same as FX but 1h later
-  // CME Gold/WTI: 23:00 UTC (18:00 EDT) / 00:00 UTC (next day, EST) — no pre-midnight issue in EST
-  // The boundary below is the UTC hour at or after which the live data belongs to the NEXT session.
-  // Beyond this hour, dateStr must advance by 1 day to match what fetch_ohlc assigns to that session.
-  const _NON_FX_BOUNDARIES = { gold: 23, wti: 23, dxy: 22 };  // UTC hour of session reopen (EDT)
+  // CME Gold/WTI: DST-aware — 22:00 UTC in EDT (Apr–Oct), 23:00 UTC in EST (Nov–Mar).
+  //   Using a fixed EST-only boundary of 23 causes the 22:00–23:00 UTC window (EDT) to
+  //   be misclassified: a market_time of 22:xx UTC (new session in EDT) would not trigger
+  //   the date advance, injecting the today-bar at yesterday's date and overwriting the
+  //   completed bar. Compute the boundary from the current NY UTC offset instead.
+  const _nyOffsetH = (() => {
+    try {
+      const nyParts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', timeZoneName: 'shortOffset' })
+        .formatToParts(new Date());
+      const tzPart = nyParts.find(p => p.type === 'timeZoneName')?.value ?? '';
+      // shortOffset returns e.g. "GMT-4" (EDT) or "GMT-5" (EST)
+      const m = tzPart.match(/GMT([+-]\d+)/);
+      return m ? parseInt(m[1], 10) : -5;
+    } catch (_) { return -5; }
+  })();
+  // CME close = 17:00 ET; reopen = 18:00 ET.  Boundary = reopen hour in UTC.
+  const _cmeBoundaryUTC = 18 + (-_nyOffsetH);   // 22 in EDT (offset −4), 23 in EST (offset −5)
+  const _NON_FX_BOUNDARIES = { gold: _cmeBoundaryUTC, wti: _cmeBoundaryUTC, dxy: 22 };
   let dateStr;
   if (isFxBar) {
     const hourUTC = nowUTC.getUTCHours();
@@ -2950,17 +2964,14 @@ function _lwBuildTodayBar(ohlcId) {
                 audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
                 gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
   const c = parseFloat(q.close.toFixed(dec));
-  // Candle open convention for the live today-bar only:
-  //   FX pairs  → prev_close. Yahoo's regularMarketOpen for FX uses a UTC-midnight cutoff,
-  //               NOT the real 21:00 UTC NY-session open. It is unreliable as the today-bar open.
-  //               Using prev_close anchors the body so green/red matches the pct sign.
-  //               NOTE: historical FX bars in ohlc-data/*.json use the real 1H session open
-  //               (fetch_ohlc.py 1H aggregation). The today-bar is the exception.
+  // Candle open convention:
+  //   FX pairs  → prev_close (open = last bar's close, consistent with Yahoo daily FX data
+  //               convention; ensures candle color always matches the pct sign)
   //   Non-FX    → regularMarketOpen (exchanges have a real session open; use it so the
   //               candle body reflects intraday movement, as TradingView does for BTC/SPX)
   let o;
   if (isFxBar) {
-    // FX today-bar: prev_close as open — Yahoo regularMarketOpen is unreliable for FX intraday
+    // FX: anchor candle body to prev_close so green/red == pct direction
     o = q.prev_close != null && q.prev_close > 0
       ? parseFloat(q.prev_close.toFixed(dec))
       : (q.open != null && q.open > 0 ? parseFloat(q.open.toFixed(dec)) : c);
@@ -3117,7 +3128,18 @@ async function _renderLWChart(ohlcId, label) {
     const _isFxStrip = _LW_FX_IDS.has(ohlcId);
     const _nowUTC    = new Date();
     const _hourUTC   = _nowUTC.getUTCHours();
-    const _NON_FX_BD = { gold: 23, wti: 23, dxy: 22 };  // same as _lwBuildTodayBar
+    const _NON_FX_BD = (() => {
+      let _nyOff = -5;
+      try {
+        const _p = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', timeZoneName: 'shortOffset' })
+          .formatToParts(new Date());
+        const _tz = _p.find(x => x.type === 'timeZoneName')?.value ?? '';
+        const _m  = _tz.match(/GMT([+-]\d+)/);
+        if (_m) _nyOff = parseInt(_m[1], 10);
+      } catch (_) {}
+      const _cmeBd = 18 + (-_nyOff);  // 22 in EDT, 23 in EST
+      return { gold: _cmeBd, wti: _cmeBd, dxy: 22 };
+    })();
     let   _stripFrom;
     if (_isFxStrip && _hourUTC >= 21) {
       // FX: new session already started — strip tomorrow's bars
