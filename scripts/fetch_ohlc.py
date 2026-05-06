@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_ohlc.py  v1.6 — Daily OHLC history for Lightweight Charts
+fetch_ohlc.py  v1.5 — Daily OHLC history for Lightweight Charts
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Downloads 3 years of daily OHLC bars via yfinance for all symbols
 used by the Lightweight Charts panel (replaces TradingView widget).
@@ -208,35 +208,24 @@ HL_MAX_SPREAD: dict[str, float] = {
 # Result: open/high/low/close exactly match what Yahoo Finance shows on its own
 # 4H chart, and match TradingView and Bloomberg FX daily candles.
 NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'eth', 'dxy', 'gold'}
-# All non-FX symbols. Routing within this group:
+# All non-FX symbols use native yfinance 1D bars (same path as WTI).
 #
-#   CME/ICE futures (gold, wti, dxy):
-#     1H aggregation over the CME/ICE session boundary: 22:00 UTC → 22:00 UTC
-#     (17:00 ET, EST convention — same boundary used by Bloomberg and CME Group charts).
-#     Required because yfinance native 1D bars for these futures are labeled by the
-#     calendar date of the OPEN tick (not the close). The session that closes Apr 30
-#     opens Apr 29 evening → labeled '2026-04-29' by yfinance, showing in the chart
-#     one day early. 1H aggregation with the correct 22:00 UTC boundary assigns each
-#     1H bar to the session that closes on its date — producing dates that match
-#     Yahoo Finance, Bloomberg, and TradingView daily candles.
-#     The session-complete guard (session_date <= run_date_utc) ensures the in-progress
-#     today-bar is never written to JSON; dashboard.js injects it from quotes.json.
+# Routing rationale — two paths only:
+#   FX pairs (28):  1H aggregation over the 21:00 UTC NY session boundary.
+#                   Required because yfinance native 1D FX bars use UTC midnight as their
+#                   cutoff, producing materially wrong H/L and unreliable opens.
+#                   1H aggregation matches Bloomberg, TradingView and Reuters FX candles.
 #
-#   Equity indices + US10Y + VIX — Nikkei only (nikkei):
-#     1H aggregation over NYSE 21:00 UTC boundary.
-#     See fetch_equity_ohlc_from_1h() for full rationale.
-#
-#   All others (btc, eth, spx, nasdaq, stoxx, vix, us10y):
-#     Native yfinance 1D bars. Their sessions close at or before 21:00 UTC;
-#     yfinance includes the in-progress today bar in the native 1D feed, which
-#     dashboard.js strips and replaces with live data from quotes.json.
+#   Non-FX (11):    Native yfinance 1D — identical to the WTI approach that has always worked.
+#                   1H aggregation with any fixed UTC session boundary drops today's bar:
+#                   at the 22:30 UTC run, any 1H bucket for today has session_date = today,
+#                   which exceeds run_date_utc = yesterday, so it is discarded by the guard.
+#                   Native 1D includes the in-progress or just-completed today bar directly.
+#                   The intraday today-bar injection in dashboard.js updates it with live
+#                   data from quotes.json — the same proven pattern WTI has always used.
+#                   Gold stub-bar quality (previous reason for 1H aggregation): accepted
+#                   tradeoff — the intraday injection overwrites today's bar with real H/L.
 FX_SYMBOLS = set(SYMBOLS.keys()) - NON_FX_SYMBOLS
-
-# CME/ICE futures: use 1H aggregation with 22:00 UTC session boundary.
-# Gold (GC=F), WTI (CL=F): CME — session closes 22:00 UTC (17:00 ET).
-# DXY (DX-Y.NYB): ICE — session closes 21:00 UTC (17:00 ET EDT) / 22:00 UTC (17:00 ET EST).
-# Using 22:00 UTC for all three is the safe conservative choice that works year-round.
-CME_ICE_SYMBOLS = {'gold', 'wti', 'dxy'}
 
 # Crypto trades 24/7 — yfinance only returns Saturday/Sunday bars when an explicit
 # start/end date range is passed. Using period="3y" silently omits weekends because
@@ -281,43 +270,17 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         )
 
         # Session-complete guard: only include a session bar if the session has closed.
-        # FX session closes at 21:00 UTC. The scheduled weekday run at 22:30 UTC always
-        # runs AFTER the close — session_date == run_date_utc is the fully-completed bar.
+        # FX session closes at 21:00 UTC. The scheduled run at 22:30 UTC always runs
+        # AFTER the close — session_date == run_date_utc is the fully-completed bar.
         # session_date > run_date_utc is tomorrow's partial session (~1.5h) — discard.
-        # If triggered before 21:00 UTC (mid-session), today's bucket is still open —
-        # discard it by treating yesterday as the effective cutoff.
-        #
-        # Weekend special case (v7.58.7):
-        #   The weekend run (Sat/Sun 23:30 UTC) runs AFTER 21:00 UTC, so the naive
-        #   "_fx_session_closed = hour >= 21" branch sets run_date_utc to "today + 1"
-        #   (i.e. Monday), which is the session that just opened 2.5h ago.
-        #   That bar is partially built (only 2.5h of data) but passes the guard
-        #   because session_date == run_date_utc → not discarded.
-        #   The partial Monday bar is then written to the JSON and persists until the
-        #   22:30 UTC Monday run overwrites it ~23h later — showing wrong OHLC all day.
-        #
-        #   Fix: when the script runs on a weekend day (Sat=5, Sun=6) after 21:00 UTC,
-        #   the FX session that just opened is for the NEXT weekday (Monday). That session
-        #   is not complete. The last COMPLETED session is Friday. Set run_date_utc to
-        #   the most recent Friday by walking back from today's UTC date.
+        # If triggered via workflow_dispatch before 21:00 UTC (mid-session), today's
+        # bucket is still open — discard it by treating yesterday as the effective cutoff.
         _now_utc = datetime.now(timezone.utc)
-        _dow_utc = _now_utc.weekday()   # 0=Mon … 4=Fri, 5=Sat, 6=Sun
-        _fx_session_closed = _now_utc.hour >= 21   # FX session boundary: 21:00 UTC
-        _is_weekend = _dow_utc >= 5     # Saturday or Sunday
-
-        if _is_weekend and _fx_session_closed:
-            # Running on Sat/Sun after 21:00 UTC: the session that just opened belongs
-            # to Monday — it is NOT complete. Walk back to the most recent Friday.
-            # On Sunday: _dow_utc=6 → days_since_friday = 2 → subtract 2 days
-            # On Saturday: _dow_utc=5 → days_since_friday = 1 → subtract 1 day
-            _days_since_friday = _dow_utc - 4   # Fri=4 → 0 offset base
-            run_date_utc = (_now_utc - timedelta(days=_days_since_friday)).date()
-        elif _fx_session_closed:
-            # Weekday, after 21:00 UTC: today's session just closed — it is complete.
-            run_date_utc = (_end_1h - timedelta(days=1)).date()
+        _fx_session_closed = _now_utc.hour >= 21   # FX closes 21:00 UTC
+        if _fx_session_closed:
+            run_date_utc = (_end_1h - timedelta(days=1)).date()  # today UTC = last complete session
         else:
-            # Before 21:00 UTC (any day): today's session is still open — use yesterday.
-            run_date_utc = (_end_1h - timedelta(days=2)).date()
+            run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday UTC (today's session still open)
 
         day_buckets: dict[str, dict] = {}
         if not hist_1h.empty:
@@ -401,15 +364,9 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     "close":  round(c, dec),
                     "volume": vol,
                 })
-            # Apply prev_close open correction to legacy 1D bars.
-            # After overriding the open, clamp H/L so OHLC integrity holds:
-            # H must be >= the new open; L must be <= the new open.
-            # Gap days (e.g. large overnight moves) otherwise produce H < O or L > O.
+            # Apply prev_close open correction to legacy 1D bars
             for i in range(1, len(bars_1d_old)):
                 bars_1d_old[i]["open"] = bars_1d_old[i - 1]["close"]
-                new_o = bars_1d_old[i]["open"]
-                bars_1d_old[i]["high"] = max(bars_1d_old[i]["high"], new_o)
-                bars_1d_old[i]["low"]  = min(bars_1d_old[i]["low"],  new_o)
 
         # ── Merge: legacy 1D + 1H-aggregated (chronological) ─────────────────────
         combined = bars_1d_old + bars_1h
@@ -426,21 +383,20 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars after 1H aggregation - skipping")
             return None
 
-        # Apply prev_close as open across the full series.
-        # Bloomberg and TradingView FX daily convention: open = prior session's close.
-        # This guarantees candle body color always matches the daily pct sign.
-        # After overriding the open, clamp H/L to maintain OHLC integrity:
-        #   H = max(H, open)  — gap-up open: the open IS the session low wick anchor
-        #   L = min(L, open)  — gap-down open: the open IS the session high wick anchor
-        # Without this clamp, a gap-down session (e.g. USD/JPY on May 1 2026 where
-        # the pair opened at 160.18 per prev_close but the 1H session high was only
-        # 157.33) produces H=157.33 < O=160.18, an impossible candle that Lightweight
-        # Charts renders as a zero-body or inverted candle.
-        for i in range(1, len(deduped)):
-            deduped[i]["open"] = deduped[i - 1]["close"]
-            new_o = deduped[i]["open"]
-            deduped[i]["high"] = max(deduped[i]["high"], new_o)
-            deduped[i]["low"]  = min(deduped[i]["low"],  new_o)
+        # NOTE: prev_close open correction is intentionally NOT applied to Part A (1H-aggregated) bars.
+        #
+        # The 1H aggregation sets open = the real first-tick open of each FX session
+        # (the Open of the first 1H bar at or after 21:00 UTC). This IS the correct NY-session open —
+        # it's the same value Bloomberg and TradingView show for FX daily opens.
+        #
+        # Overwriting it with prior_close (as was done previously) causes a systematic visual artifact:
+        # when a session opens with a gap, setting open=prior_close moves it outside the real intraday
+        # range, producing bars where open==high (gap-down sessions) or open==low (gap-up sessions).
+        # This affected ~57% of all 1H-aggregated bars — the candle wicks and bodies were wrong.
+        #
+        # prev_close correction is still applied to Part B (legacy native 1D bars) above, because
+        # Yahoo's native 1D FX open field uses UTC-midnight as its reference and is unreliable.
+        # For Part A, the 1H open is already faithful to the real session open.
 
         return deduped
 
@@ -449,47 +405,32 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         return None
 
 
-# ── CME/ICE futures 1H → daily aggregation (Gold, WTI, DXY) ─────────────────
+# ── Gold CME 1H → daily aggregation ─────────────────────────────────────────
 
-def fetch_cme_ice_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
+def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
     """
-    Build daily bars for CME/ICE futures (Gold GC=F, WTI CL=F, DXY DX-Y.NYB) by
-    aggregating 1H bars over the CME/ICE session boundary: 22:00 UTC → 22:00 UTC
-    (17:00 New York → 17:00 New York, EST fixed convention).
+    Build Gold daily bars by aggregating 1H bars over the CME COMEX session boundary:
+    22:00 UTC → 22:00 UTC (17:00 New York → 17:00 New York, EST fixed).
 
-    Why 1H aggregation for these futures?
-    yfinance native 1D bars are labeled by the OPEN date of the session tick, not the
-    close date. The session that opens Apr 29 evening (22:00 UTC) and closes Apr 30
-    (22:00 UTC) is labeled '2026-04-29' in yfinance, making it appear one day early
-    in the chart. The session that opens Apr 30 22:00 UTC (a ~30-min in-progress bar
-    at the 22:30 UTC workflow run) also gets date '2026-04-30', so dedup cannot
-    distinguish the completed session from the partial one. The result is that
-    yfinance 1D never provides the correct Apr 30 data — it is absorbed into the
-    Apr 29 aggregation window or returned as a stub bar.
+    CME Gold (GC=F) trades Sunday 18:00 ET to Friday 17:00 ET with a 60-minute daily
+    maintenance break (17:00–18:00 ET). The session boundary for daily bar construction
+    is therefore 22:00 UTC (17:00 ET in standard EST/winter time), consistent with how
+    Bloomberg, CME Group charts, and TradingView construct Gold daily candles.
 
-    1H aggregation with the 22:00 UTC session boundary cleanly solves this:
-    each 1H bar is assigned to the session that CLOSES on its date (hours 00-21 UTC
-    belong to today's session; hours 22-23 open tomorrow's session). The session
-    guard (session_date <= run_date_utc) discards the in-progress today-bar from
-    the JSON entirely. dashboard.js injects it from quotes.json as usual.
-
-    Session boundaries:
-      Gold (GC=F):      CME COMEX — closes 22:00 UTC (17:00 ET EST)
-      WTI  (CL=F):      CME NYMEX — closes 22:00 UTC (17:00 ET EST)
-      DXY  (DX-Y.NYB):  ICE       — closes 21:00 UTC (17:00 ET EDT) /
-                                     22:00 UTC (17:00 ET EST)
-    Using 22:00 UTC for all three is conservative and correct year-round (during EDT
-    the DXY session ends 1h before the boundary, but that merely means the last 1h
-    bar of the DXY session is always included — no data is lost).
+    yfinance native 1D bars for GC=F are severely degraded (~46% of bars have O==H or
+    O==L) because Yahoo constructs them from settlement ticks, not from the full COMEX
+    electronic session. 1H aggregation produces faithful intraday H/L ranges.
 
     Hybrid approach (same as FX):
-    - 1H bars cover the most recent 730 days with correct H/L.
-    - Native 1D bars cover the period older than 730 days (adequate for historical
-      context; the open-date labeling issue is less visually impactful on older bars
-      since the intraday today-bar injection is not applied to them).
-    - No prev_close open correction: futures have a genuine electronic session open,
-      not a continuous market like FX. The first 1H bar open is the real market open.
-    - No back-adjustment: roll gaps appear as-is (institutional front-month standard).
+    - 1H bars cover the most recent 730 days (yfinance limit) with correct H/L.
+    - Native 1D bars cover the period older than 730 days (adequate for historical context;
+      the artifact rate is lower in older data since the pattern worsened with the 2024–2026
+      gold volatility regime).
+    - No prev_close open correction: Gold futures have a genuine electronic session open
+      at 18:00 ET, not a continuous market like FX. The open from the first 1H bar of
+      each session is the real market open — no correction needed.
+    - No back-adjustment: roll gaps appear as-is (institutional standard for front-month
+      futures where absolute price level matters for spread and carry analysis).
     """
     try:
         ticker = yf.Ticker(ticker_sym)
@@ -512,27 +453,9 @@ def fetch_cme_ice_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         # If triggered via workflow_dispatch before 22:00 UTC (mid-session), today's
         # partial bucket (only a few hours of data) must be discarded — it would write
         # a tiny bar with an artificial range and cause visual inconsistency.
-        #
-        # Weekend special case (v7.58.7): same issue as FX guard.
-        # The weekend run (Sun 23:30 UTC) sees hour=23 >= 22 → _gold_session_closed=True
-        # → run_date_utc = Monday. But CME Gold reopened Sunday 22:00 UTC (18:00 ET),
-        # so the bar assigned to Monday has only ~1.5h of data. That partial bar would
-        # be written to JSON and persist until the Monday 22:30 UTC run (~23h later).
-        # Fix: on Sunday post-22:00 UTC, walk back run_date_utc to Friday.
-        # Saturday has no CME trading (filtered below), so the last complete session
-        # is always Friday.
         _now_utc = datetime.now(timezone.utc)
-        _dow_utc = _now_utc.weekday()  # 0=Mon … 4=Fri, 5=Sat, 6=Sun
         _gold_session_closed = _now_utc.hour >= 22  # CME Gold closes 22:00 UTC
-        _is_weekend = _dow_utc >= 5
-
-        if _is_weekend and _gold_session_closed:
-            # Sunday post-22:00 UTC: the session that just opened is Monday's — not complete.
-            # On Sunday: _dow_utc=6 → days_since_friday = 2
-            # On Saturday: _dow_utc=5 → days_since_friday = 1 (unlikely: Saturday closes at 22:00)
-            _days_since_friday = _dow_utc - 4
-            run_date_utc = (_now_utc - timedelta(days=_days_since_friday)).date()
-        elif _gold_session_closed:
+        if _gold_session_closed:
             run_date_utc = (_end_1h - timedelta(days=1)).date()  # today UTC = last complete session
         else:
             run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday UTC (today's session still open)
@@ -810,40 +733,21 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     Returns a list of {time, open, high, low, close} dicts sorted oldest to newest,
     or None on failure.
 
-    Three paths:
-      FX pairs (28):      delegates to fetch_fx_ohlc_from_1h() — 1H aggregation over the
-                          21:00 UTC NY session boundary. H/L match Bloomberg, TradingView,
-                          Reuters FX daily candles. Required because native 1D FX bars use
-                          UTC midnight cutoff, producing wrong H/L and unreliable opens.
+    Two paths:
+      FX pairs (28):  delegates to fetch_fx_ohlc_from_1h() — 1H aggregation over the
+                      21:00 UTC NY session boundary. H/L match Bloomberg, TradingView,
+                      Reuters FX daily candles. Required because native 1D FX bars use
+                      UTC midnight cutoff, producing wrong H/L and unreliable opens.
 
-      CME/ICE (3):        delegates to fetch_cme_ice_ohlc_from_1h() — 1H aggregation over
-                          the 22:00 UTC CME/ICE session boundary. Covers Gold (GC=F),
-                          WTI (CL=F), DXY (DX-Y.NYB). Required because yfinance native 1D
-                          bars for these futures are labeled by session OPEN date, not close
-                          date: the Apr 30 session (opens Apr 29 22:00–23:00 UTC) is returned
-                          as '2026-04-29', making bars appear one day early and making Apr 30
-                          a stub bar from the new partial session. 1H aggregation with the
-                          22:00 UTC boundary assigns each bar to the date the session CLOSES,
-                          producing correct date labels and clean OHLC.
-
-      Non-FX native (8):  native yfinance 1D bars.
-                          Nikkei, SPX, Nasdaq, Stoxx, US10Y, VIX, BTC, ETH.
-                          For equity/index/yield symbols: native 1D includes the in-progress
-                          today bar; dashboard.js strips it and replaces with live data from
-                          quotes.json.
-                          For crypto (BTC, ETH): the in-progress today-bar is stripped HERE
-                          in the Python script (not left for JS) because the workflow runs
-                          Mon–Fri only. A partial Friday bar (22.5h of data) would persist
-                          in the JSON all weekend with truncated H/L, producing buggy candle
-                          wicks on Saturday and Sunday. Additionally, prev_close open
-                          correction is applied to guarantee candle body color always matches
-                          the net daily direction.
+      Non-FX (11):    native yfinance 1D bars — same path as WTI (always worked).
+                      Gold, Nikkei, SPX, Nasdaq, Stoxx, US10Y, VIX, BTC, ETH, DXY, WTI.
+                      1H aggregation was removed: the session guard discards today's bar
+                      at any fixed UTC boundary, leaving the JSON one day behind. Native
+                      1D includes the in-progress today bar. The intraday today-bar
+                      injection in dashboard.js updates it with live data from quotes.json.
     """
     if id_ in FX_SYMBOLS:
         return fetch_fx_ohlc_from_1h(id_, ticker_sym)
-
-    if id_ in CME_ICE_SYMBOLS:
-        return fetch_cme_ice_ohlc_from_1h(id_, ticker_sym)
 
     try:
         ticker = yf.Ticker(ticker_sym)
@@ -905,17 +809,22 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                 "volume": vol,
             })
 
-        # Dedup: one bar per date, keep FIRST occurrence (oldest-to-newest iteration).
-        # CME/ICE futures (Gold, WTI, DXY) are routed to fetch_cme_ice_ohlc_from_1h
-        # which handles their session-boundary complexity. The remaining non-FX symbols
-        # (Nikkei, SPX, Nasdaq, Stoxx, US10Y, VIX, BTC, ETH) produce at most one bar
-        # per calendar date in the yfinance 1D feed.
+        # Keep FIRST bar per date (not last/reversed).
+        # For instruments that reopen before UTC midnight (DXY 22:00 UTC, Gold/WTI 23:00 UTC),
+        # yfinance can return TWO rows with the same calendar date:
+        #   Row 1 (earlier):  completed session, correct full-day OHLC  ← KEEP THIS
+        #   Row 2 (later):    new in-progress session, partial/wrong data ← DISCARD
+        # dashboard.js strips the JSON's last bar and replaces it with the live today-bar
+        # from quotes.json, so the in-progress row is not needed in the JSON at all.
+        # Iterating forward and keeping the first occurrence preserves the completed session.
+        # For all other symbols (one bar per date) behaviour is unchanged.
         seen: set[str] = set()
         deduped: list[dict] = []
         for bar in bars:
             if bar["time"] not in seen:
                 seen.add(bar["time"])
                 deduped.append(bar)
+        # bars is already oldest-to-newest; no reverse needed.
 
         if len(deduped) < 30:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars - skipping")
@@ -937,50 +846,8 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
         # we KEEP the today-bar in the JSON so the JS can strip it and replace
         # with the live feed. This is the correct pipeline architecture.
         #
-        # Exception — crypto (BTC, ETH):
-        #   The workflow runs Mon–Fri only. For crypto, yfinance returns an
-        #   in-progress bar for the current UTC day (00:00–22:30 UTC, ~22.5h of
-        #   data). Unlike equity indices (where dashboard.js strips and replaces
-        #   the today-bar with live data from quotes.json on every page load),
-        #   the partial crypto bar from a Friday run persists in the JSON all
-        #   weekend with truncated H/L — producing visibly wrong candle wicks on
-        #   Saturday and Sunday when the workflow does not run.
-        #
-        #   Fix: drop the in-progress today-bar for crypto. Crypto trades 24/7 so
-        #   the UTC calendar day (00:00–24:00 UTC) is the correct "session".
-        #   The bar is complete only after 24:00 UTC (i.e. today < tomorrow).
-        #   dashboard.js injects the live today-bar from quotes.json as usual.
-        #
-        # No FX open correction here for non-crypto — handled by fetch_fx_ohlc_from_1h.
+        # No FX open correction here — handled by fetch_fx_ohlc_from_1h.
         # No back-adjustment for futures — removed v7.47.19.
-        if id_ in CRYPTO_SYMBOLS:
-            today_str = _today_utc.strftime("%Y-%m-%d")
-            deduped = [b for b in deduped if b["time"] < today_str]
-            if len(deduped) < 30:
-                print(f"  WARN [{id_}]: only {len(deduped)} valid bars after today-bar strip - skipping")
-                return None
-
-        # ── Crypto prev_close open correction ─────────────────────────────────
-        # Crypto trades 24/7 on a UTC calendar day (00:00–24:00 UTC).
-        # yfinance native 1D uses the first tick of the UTC day as "open", which
-        # is also the close of the previous bar — making open == prev_close by
-        # definition. However in practice yfinance sometimes returns a slightly
-        # different first-tick value due to exchange aggregation, causing the
-        # candle body to contradict the net daily direction.
-        #
-        # Applying prev_close as open (same convention as FX) guarantees:
-        #   • candle body color (green/red) always matches the daily pct sign
-        #   • no gap between consecutive candle bodies (consistent with how
-        #     Bloomberg, CoinMarketCap, and TradingView render crypto daily candles)
-        # After overriding the open, clamp H/L to maintain OHLC integrity:
-        #   H = max(H, open)  — gap-up open: the gap IS the session's new floor
-        #   L = min(L, open)  — gap-down open: the gap IS the session's new ceiling
-        if id_ in CRYPTO_SYMBOLS and len(deduped) > 1:
-            for i in range(1, len(deduped)):
-                deduped[i]["open"] = deduped[i - 1]["close"]
-                new_o = deduped[i]["open"]
-                deduped[i]["high"] = max(deduped[i]["high"], new_o)
-                deduped[i]["low"]  = min(deduped[i]["low"],  new_o)
 
         return deduped
 
