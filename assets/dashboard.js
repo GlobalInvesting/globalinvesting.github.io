@@ -2950,14 +2950,17 @@ function _lwBuildTodayBar(ohlcId) {
                 audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
                 gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
   const c = parseFloat(q.close.toFixed(dec));
-  // Candle open convention:
-  //   FX pairs  → prev_close (open = last bar's close, consistent with Yahoo daily FX data
-  //               convention; ensures candle color always matches the pct sign)
+  // Candle open convention for the live today-bar only:
+  //   FX pairs  → prev_close. Yahoo's regularMarketOpen for FX uses a UTC-midnight cutoff,
+  //               NOT the real 21:00 UTC NY-session open. It is unreliable as the today-bar open.
+  //               Using prev_close anchors the body so green/red matches the pct sign.
+  //               NOTE: historical FX bars in ohlc-data/*.json use the real 1H session open
+  //               (fetch_ohlc.py 1H aggregation). The today-bar is the exception.
   //   Non-FX    → regularMarketOpen (exchanges have a real session open; use it so the
   //               candle body reflects intraday movement, as TradingView does for BTC/SPX)
   let o;
   if (isFxBar) {
-    // FX: anchor candle body to prev_close so green/red == pct direction
+    // FX today-bar: prev_close as open — Yahoo regularMarketOpen is unreliable for FX intraday
     o = q.prev_close != null && q.prev_close > 0
       ? parseFloat(q.prev_close.toFixed(dec))
       : (q.open != null && q.open > 0 ? parseFloat(q.open.toFixed(dec)) : c);
