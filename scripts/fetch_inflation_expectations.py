@@ -1,5 +1,5 @@
 """
-fetch_inflation_expectations.py  v1.0
+fetch_inflation_expectations.py  v1.1
 ──────────────────────────────────────
 Fetches inflation expectations for all G8 currencies and writes
 inflationExpectations into extended-data/{CCY}.json (non-destructive patch).
@@ -20,20 +20,32 @@ every open. But this workflow serves two additional purposes:
 
 SOURCE CASCADE PER CURRENCY
 ────────────────────────────
+For non-USD/EUR currencies the cascade is tried in this order:
+  1. economic-data/{CCY}.json  — calendar actuals written daily by
+     update_pmi_from_calendar.py (ForexFactory CPI YoY releases). Freshest source.
+  2. FRED CPI index series → YoY calculation. Often 1–18 months lag for
+     OECD international series (MINMEI/QINMEI).
+  3. World Bank FP.CPI.TOTL.ZG — annual, last resort.
+
   USD  → FRED T5YIE    (5Y breakeven inflation, daily, market-implied)
   EUR  → FRED T5YIFR   (EUR 5Y5Y inflation swap, daily, market-implied)
-  GBP  → FRED GBRCPIALLMINMEI  (ONS CPIH monthly index → YoY calc)
+  GBP  → economic-data/GBP.json (calendar CPI YoY, daily) [primary]
+           FRED GBRCPIALLMINMEI  (ONS CPIH monthly index → YoY calc)
            FRED CPALTT01GBM661N (CPI monthly → YoY) [fallback]
            World Bank FP.CPI.TOTL.ZG [final fallback]
-  JPY  → FRED JPNCPIALLMINMEI  (MIC monthly index → YoY)
-           World Bank FP.CPI.TOTL.ZG [fallback — FRED JPY series may lag]
-  AUD  → FRED AUSCPIALLQINMEI  (ABS quarterly index → YoY)
+  JPY  → economic-data/JPY.json (calendar CPI YoY, daily) [primary]
+           World Bank FP.CPI.TOTL.ZG [fallback — both FRED JPY series ended 2021]
+  AUD  → economic-data/AUD.json (calendar CPI YoY, daily) [primary]
+           FRED AUSCPIALLQINMEI  (ABS quarterly index → YoY)
            World Bank FP.CPI.TOTL.ZG [fallback]
-  CAD  → FRED CANCPIALLMINMEI  (StatsCan monthly index → YoY)
+  CAD  → economic-data/CAD.json (calendar CPI YoY, daily) [primary]
+           FRED CANCPIALLMINMEI  (StatsCan monthly index → YoY)
            World Bank FP.CPI.TOTL.ZG [fallback]
-  CHF  → FRED CHECPIALLMINMEI  (FSO monthly index → YoY)
+  CHF  → economic-data/CHF.json (calendar CPI YoY, daily) [primary]
+           FRED CHECPIALLMINMEI  (FSO monthly index → YoY)
            World Bank FP.CPI.TOTL.ZG [fallback]
-  NZD  → FRED NZLCPIALLQINMEI  (Stats NZ quarterly index → YoY)
+  NZD  → economic-data/NZD.json (calendar CPI YoY, daily) [primary]
+           FRED NZLCPIALLQINMEI  (Stats NZ quarterly index → YoY)
            World Bank FP.CPI.TOTL.ZG [fallback]
 
 USD and EUR use live daily market-implied series (breakeven / swap rate) — not
@@ -73,8 +85,10 @@ except ImportError:
 
 # ── Config ─────────────────────────────────────────────────────────────────
 
-SITE_DIR     = os.environ.get("SITE_DIR", ".")
-OUT_DIR      = os.path.join(SITE_DIR, "extended-data")
+SITE_DIR      = os.environ.get("SITE_DIR", ".")
+OUT_DIR       = os.path.join(SITE_DIR, "extended-data")
+ECON_DATA_DIR = os.environ.get("ECON_DATA_DIR",
+                                os.path.join(SITE_DIR, "economic-data"))
 os.makedirs(OUT_DIR, exist_ok=True)
 
 HEADERS = {
@@ -94,6 +108,32 @@ def _gha_error(msg: str) -> None:
     print(f"::error::{msg}", flush=True)
 
 MAX_AGE_DAYS = 120   # skip writing if observation is older than this
+
+# ── economic-data/{CCY}.json reader ─────────────────────────────────────────
+
+def read_econ_data(ccy: str) -> tuple[str | None, float | None]:
+    """
+    Read CPI YoY from economic-data/{CCY}.json — maintained daily by
+    update_pmi_from_calendar.py (from ForexFactory calendar actuals).
+    This is the freshest source: calendar actuals within days of release.
+
+    Returns (date_str YYYY-MM-DD, value) or (None, None).
+    """
+    path = os.path.join(ECON_DATA_DIR, f"{ccy}.json")
+    if not os.path.exists(path):
+        return None, None
+    try:
+        with open(path) as f:
+            d = json.load(f)
+        # Structure: {"data": {"inflation": 3.0}, "dates": {"inflation": "2026-03-25"}}
+        val = d.get("data", {}).get("inflation")
+        dt  = d.get("dates", {}).get("inflation")
+        if val is not None and dt:
+            return dt[:10], round(float(val), 4)
+    except Exception as e:
+        print(f"    read_econ_data {ccy}: {e}")
+    return None, None
+
 
 # ── Source catalogue ────────────────────────────────────────────────────────
 # format: (ccy, mode, series_or_sources, wb_iso2)
@@ -265,7 +305,17 @@ def fetch_one(ccy: str, mode: str, series_list: list[str],
         return None, None
 
     # ── index modes — compute YoY from index observations
+    # Primary: economic-data/{CCY}.json (daily calendar actuals — freshest source)
     freq = "m" if mode == "index_m" else "q"
+    econ_dt, econ_val = read_econ_data(ccy)
+    if econ_val is not None:
+        if not (-5.0 < econ_val < 30.0):
+            print(f"    ✗ {ccy}: econ-data value {econ_val:.4f}% out of plausible range [-5%, 30%]")
+        else:
+            print(f"    ✓ {ccy}: {econ_val:.4f}% CPI YoY ({econ_dt}) [economic-data/calendar]")
+            return econ_dt, econ_val
+
+    # Secondary: FRED CPI index series → YoY calculation
     for sid in series_list:
         rows = fred_csv(sid)
         if rows:
