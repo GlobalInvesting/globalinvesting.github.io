@@ -17,17 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout PUBLIC site repo
+      - name: Checkout public site repo
         uses: actions/checkout@v4
-        with:
-          repository: GlobalInvesting/globalinvesting.github.io
-          token: ${{ secrets.PAT_TOKEN }}
-          path: site
-
-      - name: Checkout THIS private repo (scripts)
-        uses: actions/checkout@v4
-        with:
-          path: engine
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -38,7 +29,7 @@ jobs:
         run: pip install requests --break-system-packages
 
       - name: Create extended-data directory
-        run: mkdir -p site/extended-data
+        run: mkdir -p extended-data
 
       - name: Fetch inflation expectations
         # Sources (v4.2):
@@ -51,12 +42,13 @@ jobs:
         #        Fallback: FRED OECD MEI index series (~12-14m structural lag)
         #        Last resort: World Bank annual (>12m lag)
         #
+        # Script lives at scripts/fetch_inflation_expectations.py in this repo.
         # Patches extended-data/{CCY}.json updating only:
         #   data.inflationExpectations  and  dates.inflationExpectations
         # All other fields in each file are preserved unchanged.
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-        run: python engine/scripts/fetch_inflation_expectations.py site
+        run: python scripts/fetch_inflation_expectations.py .
 
       - name: Display summary
         if: always()
@@ -66,7 +58,7 @@ jobs:
           echo "   INFLATION EXPECTATIONS SUMMARY"
           echo "========================================"
           for ccy in USD EUR GBP JPY AUD CAD CHF NZD; do
-            file="site/extended-data/${ccy}.json"
+            file="extended-data/${ccy}.json"
             if [ -f "$file" ]; then
               val=$(jq -r '.data.inflationExpectations // "n/a"' "$file")
               dt=$(jq -r '.dates.inflationExpectations // "?"' "$file")
@@ -77,7 +69,6 @@ jobs:
           done
 
       - name: Commit and push
-        working-directory: site
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
