@@ -6266,11 +6266,11 @@ async function fetchCarryRanking() {
       sbHead.style.cursor = 'help';
       const tipTitle = 'Carry-to-Vol Ratio';
       const tipBody  = hasVolData
-        ? 'Rate differential ÷ HV30 (30-day realised vol). Ranks pairs by carry earned per unit of vol risk — the higher the ratio, the more carry you collect relative to the pair\'s typical daily movement.'
-        : 'CB rate differential (%) between the long and short leg. Carry-to-vol ranking requires HV30 data (unavailable).';
+        ? 'Rate differential / HV30 (30-day realised vol). Ranks pairs by carry earned per unit of vol risk. Click any row to open the Real Rate Carry Analysis — real carry = nominal spread minus inflation expectations.'
+        : 'CB rate differential (%) between the long and short leg. Carry-to-vol ranking requires HV30 data (unavailable). Click any row for real rate analysis.';
       const tipEx = hasVolData
-        ? 'Example: AUD/CHF +4.75% diff ÷ 8.0% HV30 = 0.59. Earns 0.59% of carry per 1% of annualised vol — strong relative to most G8 crosses.'
-        : 'Example: AUD 4.35% − CHF 0.00% = +4.35% raw differential.';
+        ? 'Example: AUD/CHF +4.75% diff / 8.0% HV30 = 0.59. Click to compare real rates (nominal minus inflation expectations) — the institutional carry metric.'
+        : 'Example: AUD 4.35% − CHF 0.00% = +4.35% raw differential. Click for real rate breakdown.';
 
       sbHead.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('fx-tt');
@@ -6306,7 +6306,7 @@ async function fetchCarryRanking() {
       // Tooltip: full institutional detail (rates, vol, carry-to-vol, regime)
       const cvStr  = p.carryVol != null ? p.carryVol.toFixed(2) : 'n/a';
       const hvStr  = p.hv30     != null ? p.hv30.toFixed(1) + '%' : 'n/a';
-      const tip = `${p.long}/${p.short} · Long ${p.rLong.toFixed(2)}% / Short ${p.rShort.toFixed(2)}% · Diff ${p.diff.toFixed(2)}bp · HV30 ${hvStr} · Carry/Vol ${cvStr}`;
+      const tip = `${p.long}/${p.short} · Long ${p.rLong.toFixed(2)}% / Short ${p.rShort.toFixed(2)}% · Diff ${p.diff.toFixed(2)}% · HV30 ${hvStr} · Carry/Vol ${cvStr} — Click for real rate analysis`;
 
       // Display: show carry-to-vol when available, gross diff otherwise
       const displayVal = hasVolData && p.carryVol != null
@@ -6317,7 +6317,7 @@ async function fetchCarryRanking() {
       // for carry screens (Bloomberg/Refinitiv show rate spread, not CB trend arrows)
       const spreadLabel = (p.diff >= 0 ? '+' : '') + p.diff.toFixed(2) + '%';
 
-      return `<div class="carry-rank-row" data-sym="${sym}" title="${tip}">
+      return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
         <span class="cr-pair">${p.long}/${p.short}</span>
         <span class="cr-spread">${spreadLabel}</span>
@@ -6326,8 +6326,18 @@ async function fetchCarryRanking() {
       </div>`;
     }).join('');
 
-    container.querySelectorAll('.carry-rank-row[data-sym]').forEach(row => {
-      row.addEventListener('click', () => loadTVChart(row.dataset.sym));
+    // Click: open real rate carry modal for the selected pair
+    // Falls back to TradingView chart if modal function unavailable
+    container.querySelectorAll('.carry-rank-row[data-long]').forEach(row => {
+      row.addEventListener('click', () => {
+        const longCcy  = row.dataset.long;
+        const shortCcy = row.dataset.short;
+        if (typeof openRealCarryModal === 'function') {
+          openRealCarryModal(longCcy, shortCcy);
+        } else {
+          loadTVChart(row.dataset.sym);
+        }
+      });
     });
   } catch(e) {
     console.warn('[CarryRanking]', e);
