@@ -949,17 +949,44 @@
       : null;
 
     if (groqSessions && Object.keys(groqSessions).length >= 3) {
-      // Render Groq session notes in the same style as the model
+      // Classify each session as 'active', 'past', or 'upcoming' based on current UTC hour.
+      // Bloomberg/Eikon convention: past sessions show results (dimmed), the active session
+      // is highlighted, upcoming sessions show the outlook note in a visually distinct state.
+      // This prevents AI-generated notes for future sessions from reading as accomplished facts.
+      const h = new Date().getUTCHours();
+      function getSessionState(sName) {
+        if (activeSessions.has(sName)) return 'active';
+        const closeUtc = { 'Sydney': 6, 'Tokyo': 9, 'London': 16, 'New York': 21 };
+        if (sName === 'Sydney') return (h >= 6 && h < 21) ? 'past' : 'upcoming';
+        return h >= closeUtc[sName] ? 'past' : 'upcoming';
+      }
+
       const sessOrder = ['Sydney', 'Tokyo', 'London', 'New York'];
       notes.innerHTML = sessOrder.map(sName => {
-        const isActive = activeSessions.has(sName);
-        const note = convertUtcTimesInNote(groqSessions[sName] || '—');
+        const state = getSessionState(sName);
+        const note  = convertUtcTimesInNote(groqSessions[sName] || '\u2014');
+        // Color scheme mirrors Bloomberg session pane:
+        //   active   — blue label + full-brightness text
+        //   past     — muted label + muted text (session closed, result is fact)
+        //   upcoming — amber label + slightly muted text + UPCOMING badge
+        const labelColor = state === 'active'   ? 'var(--blue,#4f7fff)'
+                         : state === 'past'      ? 'var(--text3,#6b7280)'
+                         :                         'var(--amber,#b87333)';
+        const textColor  = state === 'active'   ? 'var(--text,#d1d4dc)'
+                         : state === 'past'      ? 'var(--text3,#6b7280)'
+                         :                         'var(--text2,#9598a1)';
+        const labelSuffix = state === 'active'   ? ' \u25CF'
+                          : state === 'upcoming'  ? ' \u25CB'
+                          :                         '';
+        const badge = state === 'upcoming'
+          ? '<span style="font-size:8px;color:var(--amber,#b87333);opacity:.7;margin-left:4px;letter-spacing:.05em;">UPCOMING</span>'
+          : '';
         return (
-          '<div style="margin-bottom:4px' + (isActive ? ';color:var(--text,#d1d4dc)' : '') + '">' +
-          '<span style="color:' + (isActive ? 'var(--blue,#4f7fff)' : 'var(--text3,#6b7280)') + ';' +
-          'min-width:72px;display:inline-block;font-weight:' + (isActive ? '600' : '400') + '">' +
-          sName.toUpperCase() + (isActive ? ' \u25CF' : '') +
-          '</span> ' + note + '</div>'
+          '<div style="margin-bottom:4px;color:' + textColor + '">' +
+          '<span style="color:' + labelColor + ';min-width:72px;display:inline-block;' +
+          'font-weight:' + (state === 'active' ? '600' : '400') + '">' +
+          sName.toUpperCase() + labelSuffix +
+          '</span> ' + note + badge + '</div>'
         );
       }).join('') +
       '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
