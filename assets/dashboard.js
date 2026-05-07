@@ -2794,6 +2794,7 @@ let _chartMode = 'lw'; // default: LW chart (FX pairs load first)
 let _lwActiveOhlcId = null;   // ohlcId currently displayed
 let _lwActiveUpdateHeader = null; // ref to _updateLWHeader of the active chart (for RT header refresh)
 let _lwActivePrevCloseMap = null; // ref to _prevCloseMap of the active chart (for today-bar % calc)
+let _lwLastJsonBarDate   = null; // ISO date string of the last bar in the loaded OHLC JSON (before strip)
 
 // Ensure the Lightweight Charts library is loaded (lazy, once)
 let _lwLibPromise = null;
@@ -2818,6 +2819,7 @@ function _destroyLWChart() {
   _lwActiveOhlcId = null;
   _lwActiveUpdateHeader = null;
   _lwActivePrevCloseMap = null;
+  _lwLastJsonBarDate   = null;
 }
 
 // Compute MA(n) over close prices
@@ -2910,9 +2912,33 @@ function _lwBuildTodayBar(ohlcId) {
   if (isFxBar) {
     const hourUTC = nowUTC.getUTCHours();
     if (hourUTC >= 21) {
-      const tomorrow = new Date(nowUTC);
-      tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-      dateStr = tomorrow.toISOString().slice(0, 10);
+      // The FX session boundary is 21:00 UTC. A bar at or after 21:00 UTC belongs to
+      // the session that will be dated TOMORROW in fetch_ohlc.py.
+      //
+      // Gap-window fix (21:00–22:30 UTC):
+      // The OHLC workflow runs at 22:30 UTC. Between 21:00 and 22:30 UTC the OHLC JSON
+      // was written by YESTERDAY's run, so it ends at the session dated (yesterday) — the
+      // session that closed just now at 21:00 UTC today is NOT yet in the JSON.
+      // Injecting a today-bar dated tomorrow creates a visual gap (missing today bar).
+      //
+      // Detection: if the last JSON bar date < today UTC, the JSON is stale and the
+      // just-closed session is missing. In that case, date the today-bar TODAY so it
+      // fills the gap, representing the closed session via session_high/session_low
+      // (which fetch_intraday_quotes.py computes over the full 21:00→21:00 window).
+      //
+      // After 22:30 UTC, the OHLC workflow writes the completed today bar into the JSON.
+      // _lwLastJsonBarDate then equals today, the condition is false, and the tomorrow
+      // date is used correctly for the new live session.
+      const todayUtcStr = nowUTC.toISOString().slice(0, 10);
+      const jsonIsStale = _lwLastJsonBarDate != null && _lwLastJsonBarDate < todayUtcStr;
+      if (jsonIsStale) {
+        // JSON doesn't have today's completed session yet — use today's date to fill the gap.
+        dateStr = todayUtcStr;
+      } else {
+        const tomorrow = new Date(nowUTC);
+        tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+        dateStr = tomorrow.toISOString().slice(0, 10);
+      }
     } else {
       dateStr = nowUTC.toISOString().slice(0, 10);
     }
@@ -3118,6 +3144,11 @@ async function _renderLWChart(ohlcId, label) {
   let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
 
+  // Record the last bar date from the raw JSON (before any strip) so _lwBuildTodayBar
+  // can detect the 21:00–22:30 UTC gap window where the just-closed session bar is
+  // not yet present in the JSON (the OHLC workflow only runs at 22:30 UTC).
+  _lwLastJsonBarDate = bars[bars.length - 1]?.time ?? null;
+
   // ── Strip today-bar from JSON before setData ────────────────────────────────
   // fetch_ohlc.py keeps today's in-progress bar in the JSON. dashboard.js replaces
   // it with the live price via candleSeries.update(todayBar). Without stripping,
@@ -3147,10 +3178,22 @@ async function _renderLWChart(ohlcId, label) {
     })();
     let   _stripFrom;
     if (_isFxStrip && _hourUTC >= 21) {
-      // FX: new session already started — strip tomorrow's bars
-      const _tom = new Date(_nowUTC);
-      _tom.setUTCDate(_tom.getUTCDate() + 1);
-      _stripFrom = _tom.toISOString().slice(0, 10);
+      // FX: new session started at 21:00 UTC.
+      // _stripFrom must match _lwBuildTodayBar's dateStr exactly.
+      // Gap-window: if the JSON is stale (last bar < today), today-bar is dated TODAY.
+      //   → strip bars >= today (i.e. _stripFrom = today). In practice the JSON ends at
+      //   yesterday, so nothing is stripped — the today-bar fills the gap cleanly.
+      // Normal: JSON has today's bar, today-bar is dated tomorrow.
+      //   → strip bars >= tomorrow (i.e. _stripFrom = tomorrow).
+      const _todayStr = _nowUTC.toISOString().slice(0, 10);
+      const _jsonStale = _lwLastJsonBarDate != null && _lwLastJsonBarDate < _todayStr;
+      if (_jsonStale) {
+        _stripFrom = _todayStr;
+      } else {
+        const _tom = new Date(_nowUTC);
+        _tom.setUTCDate(_tom.getUTCDate() + 1);
+        _stripFrom = _tom.toISOString().slice(0, 10);
+      }
     } else if (!_isFxStrip) {
       // Non-FX: use market_time from STOOQ_RT_CACHE if available, with boundary adjustment
       const _ck = ohlcId === 'gold' ? 'xauusd' : ohlcId;
