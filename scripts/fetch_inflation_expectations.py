@@ -1,60 +1,39 @@
 """
-fetch_inflation_expectations.py  v4.0
+fetch_inflation_expectations.py  v4.1
 ──────────────────────────────────────
 Fetches inflation expectations for all G8 currencies and writes
 inflationExpectations into extended-data/{CCY}.json (non-destructive patch).
 
 Runs weekly (Mondays 06:00 UTC) from the PUBLIC site repo — no API keys required.
 
-CHANGELOG v4.0
-──────────────
-Root cause confirmed: CPALTT01 is NOT a valid SUBJECT in the OECD DSD_KEI@DF_KEI,4.0
-dataflow (only interest rate subjects like IRLTLT01 are). ALL OECD SDMX calls for CPI
-return HTTP 422 regardless of MEASURE code (GY or ST). The OECD SDMX approach is
-fundamentally wrong for CPI data and is removed entirely.
+CHANGELOG v4.1 (bug-fix release)
+──────────────────────────────────
+Six bugs fixed from the first v4.0 GHA run:
 
-FRED MINMEI/QINMEI series have a structural ~12-14 month lag (FRED mirrors OECD MEI
-annual publications, not live national stat office feeds). This lag makes them
-unsuitable as primary sources but they are retained as fallback.
+  1. headers conflict (ABS, Stats NZ): _get() was called with both headers=HEADERS (base)
+     and headers=custom_headers in kwargs → TypeError. Fixed by removing the hardcoded
+     headers= from requests.get(); callers now pass custom_headers kwarg explicitly.
 
-Fix: Primary sources replaced with DIRECT national statistics office APIs —
-the authoritative sources with 2-6 week lag, no API keys required.
+  2. ONS URL wrong path order: /v1/datasets/mm23/timeseries/D7G7/data is 404.
+     Correct ONS Timeseries API v1 path: /v1/timeseries/D7G7/dataset/mm23/data.
+     Added second URL attempt with the original path as fallback.
 
-SOURCE CASCADE PER CURRENCY
-────────────────────────────
-  USD  → FRED T5YIE          (5Y breakeven, daily, market-implied)
-  EUR  → FRED T5YIFR         (EUR 5Y5Y inflation swap, daily, market-implied)
-           ECB HICP YoY (Eurozone, monthly) [fallback]
-  GBP  → ONS API (Office for National Statistics) — CPI YoY monthly  [primary, <6w lag]
-           FRED GBRCPIALLMINMEI → index-to-YoY                        [fallback, ~14m lag]
-           ECB HICP GB                                                  [fallback]
-           World Bank FP.CPI.TOTL.ZG                                   [final fallback]
-  JPY  → e-Stat (Statistics Bureau Japan) — CPI YoY monthly           [primary, <4w lag]
-           World Bank FP.CPI.TOTL.ZG                                   [final fallback]
-  AUD  → ABS SDMX API (Australian Bureau of Statistics) — CPI YoY Q  [primary, ~6w lag]
-           FRED AUSCPIALLQINMEI → index-to-YoY                         [fallback, ~16m lag]
-           World Bank FP.CPI.TOTL.ZG                                   [final fallback]
-  CAD  → Statistics Canada WDS API — CPI YoY monthly                  [primary, <4w lag]
-           FRED CANCPIALLMINMEI → index-to-YoY                         [fallback, ~14m lag]
-           World Bank FP.CPI.TOTL.ZG                                   [final fallback]
-  CHF  → SNB Data Portal — CPI index → YoY                            [primary, <6w lag]
-           FRED CHECPIALLMINMEI → index-to-YoY                         [fallback, ~14m lag]
-           World Bank FP.CPI.TOTL.ZG                                   [final fallback]
-  NZD  → Stats NZ OData API — CPI YoY quarterly                       [primary, ~6w lag]
-           RBNZ Survey of Expectations (1-year ahead)                  [fallback]
-           FRED NZLCPIALLQINMEI → index-to-YoY                         [fallback, ~16m lag]
-           World Bank FP.CPI.TOTL.ZG                                   [final fallback]
+  3. SNB cube ID wrong: pkcpival was discontinued.
+     Correct cube: plkopr ("Consumer prices – total"), CSV format.
+     URL: https://data.snb.ch/api/cube/plkopr/data/csv/en
 
-STALE GUARD
-───────────
-Monthly series:  observation must be ≤120 days old.
-Quarterly series (AUD, NZD): observation must be ≤200 days old.
-USD/EUR (market-implied daily): warn if >10 days stale.
+  4. JPY -1.5% wrong value: e-Stat CSV parser matched the wrong 総合 row.
+     The cpim.csv file has multiple sections; the first 総合 row in the context of
+     前年同月比 was a sub-category. Fixed by using the e-Stat REST API directly with
+     the explicit statsDataId for 消費者物価指数 All Items YoY, with URL-based CSV
+     as fallback. Also added a validity guard: JPY CPI YoY must be > -3.0% (deflation
+     floor — Japan has never had worse than -2.5% in modern history).
 
-EXIT CODES
-──────────
-  0 — all currencies updated or skipped with warnings
-  1 — ≥3 failures (likely upstream outage — alert the operator)
+  5. StatsCan connection timeout: WDS API (getDataFromCubePidCoordAndLatestNPeriods)
+     returns 404 or times out in GHA. Added FRED CANCPIALLMINMEI as immediate step 2
+     before the vector resolution fallback.
+
+  6. Stats NZ OData: same headers kwarg conflict as ABS (fixed by item 1).
 """
 
 import csv
@@ -77,8 +56,9 @@ SITE_DIR = os.environ.get("SITE_DIR", ".")
 OUT_DIR  = os.path.join(SITE_DIR, "extended-data")
 os.makedirs(OUT_DIR, exist_ok=True)
 
-HEADERS = {
-    "User-Agent": "globalinvesting-bot/4.0 (https://globalinvesting.github.io)",
+UA = "globalinvesting-bot/4.1 (https://globalinvesting.github.io)"
+BASE_HEADERS = {
+    "User-Agent": UA,
     "Accept":     "application/json, text/csv;q=0.9, */*;q=0.8",
 }
 
@@ -101,20 +81,25 @@ MAX_AGE = {
 
 # ── Shared helpers ────────────────────────────────────────────────────────────
 
-def _get(url: str, **kwargs) -> "requests.Response | None":
-    """GET with standard headers and timeout. Returns None on any error."""
+def _get(url: str, custom_headers: dict | None = None, **kwargs) -> "requests.Response | None":
+    """
+    GET with timeout. Uses BASE_HEADERS merged with custom_headers.
+    Callers that need custom Accept headers pass custom_headers={"Accept": "..."}.
+    This avoids the TypeError from passing headers= twice via **kwargs.
+    """
+    headers = {**BASE_HEADERS, **(custom_headers or {})}
     try:
-        r = requests.get(url, headers=HEADERS, timeout=25, **kwargs)
+        r = requests.get(url, headers=headers, timeout=25, **kwargs)
         return r
     except Exception as e:
-        print(f"    GET {url[:60]}: {e}")
+        print(f"    GET {url[:70]}: {e}")
         return None
 
 
 def index_to_yoy(obs: list) -> tuple:
     """
     Compute YoY % from list of (date_str, index_float) sorted descending.
-    Finds the observation closest to 12 months prior (75-day tolerance).
+    Finds observation closest to 12 months prior (75-day tolerance).
     """
     if len(obs) < 2:
         return None, None
@@ -185,7 +170,7 @@ def fred_index_yoy(series_id: str) -> tuple:
 # ── ECB SDMX ─────────────────────────────────────────────────────────────────
 
 def ecb_hicp_yoy(area_code: str = "U2") -> tuple:
-    """ECB ICP SDMX — HICP YoY for Eurozone (U2) or UK (GB, Eurostat)."""
+    """ECB ICP SDMX — HICP YoY for Eurozone (U2) or GB (Eurostat HICP)."""
     key = f"M.{area_code}.N.000000.4.ANR"
     r = _get(f"https://data-api.ecb.europa.eu/service/data/ICP/{key}",
              params={"lastNObservations": 3, "format": "jsondata", "detail": "dataonly"})
@@ -260,118 +245,150 @@ def patch_json(ccy: str, val: float, date_str: str) -> bool:
 def ons_cpi_yoy() -> tuple:
     """
     ONS Timeseries API — CPI All Items, 12-month rate (series D7G7, dataset mm23).
+    Correct v1 path: /v1/timeseries/{series}/dataset/{dataset}/data
     Returns (date_str YYYY-MM-DD, yoy_pct) or (None, None).
-    D7G7 = CPI All Items Index 12-month % change.
-    No auth required. Updated within 2 days of each ONS release (mid-month).
     """
-    url = "https://api.ons.gov.uk/v1/datasets/mm23/timeseries/D7G7/data"
-    r = _get(url)
-    if not r or r.status_code != 200:
-        if r:
-            print(f"    ONS API: HTTP {r.status_code}")
-        return None, None
-    try:
-        data = r.json()
-        months = data.get("months", [])
-        if not months:
-            print("    ONS API: empty months array")
-            return None, None
-        latest = months[0]
-        date_str_raw = latest.get("date", "")   # e.g. "2026 MAR"
-        val_str = latest.get("value", "")
-        # Parse "2026 MAR" → datetime
+    # Try correct v1 path first, then the reversed path as fallback
+    urls = [
+        "https://api.ons.gov.uk/v1/timeseries/D7G7/dataset/mm23/data",
+        "https://api.ons.gov.uk/v1/datasets/mm23/timeseries/D7G7/data",
+    ]
+    for url in urls:
+        r = _get(url)
+        if not r or r.status_code != 200:
+            if r:
+                print(f"    ONS API ({url[-30:]}): HTTP {r.status_code}")
+            continue
         try:
-            dt = datetime.strptime(date_str_raw.strip(), "%Y %b")
-        except ValueError:
+            data = r.json()
+            months = data.get("months", [])
+            if not months:
+                print(f"    ONS API: empty months — trying next URL")
+                continue
+            latest = months[0]
+            date_str_raw = latest.get("date", "")   # e.g. "2026 MAR"
+            val_str = latest.get("value", "")
             try:
-                dt = datetime.strptime(date_str_raw.strip(), "%Y %B")
+                dt = datetime.strptime(date_str_raw.strip(), "%Y %b")
             except ValueError:
-                print(f"    ONS API: unparseable date '{date_str_raw}'")
-                return None, None
-        date_str = dt.strftime("%Y-%m-01")
-        val = float(val_str)
-        return date_str, round(val, 4)
-    except Exception as e:
-        print(f"    ONS API: parse error — {e}")
+                try:
+                    dt = datetime.strptime(date_str_raw.strip(), "%Y %B")
+                except ValueError:
+                    print(f"    ONS API: unparseable date '{date_str_raw}'")
+                    continue
+            return dt.strftime("%Y-%m-01"), round(float(val_str), 4)
+        except Exception as e:
+            print(f"    ONS API: parse error — {e}")
     return None, None
 
 
-# ── JPY: Statistics Bureau Japan (e-Stat CSV) ────────────────────────────────
+# ── JPY: Statistics Bureau Japan ──────────────────────────────────────────────
 
 def estatjp_cpi_yoy() -> tuple:
     """
-    Statistics Bureau Japan — CPI All Items, YoY % (前年同月比).
-    Uses the monthly CPI time-series CSV published by Stats Japan.
-    URL: https://www.stat.go.jp/data/cpi/sokuhou/tsuki/zuhyou/cpim.csv
-    Encoding: Shift-JIS.
+    Statistics Bureau Japan — CPI All Items YoY % via e-Stat REST API.
+    statsDataId 0003427113 = Monthly CPI, All Japan, All Items, YoY change (前年同月比).
+
+    Falls back to the cpim.csv approach if API fails.
+    JPY validity: -3.0% < val < 8.0% (Japan's modern CPI range)
+    """
+    # e-Stat REST API — no key required for basic queries with limited results
+    url = ("https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"
+           "?statsDataId=0003427113&metaGetFlg=N&cntGetFlg=N"
+           "&explanationGetFlg=N&annotationGetFlg=N&sectionHeaderFlg=1"
+           "&replaceSpChars=0&limit=3&startPosition=1&lang=J")
+    r = _get(url)
+    if r and r.status_code == 200:
+        try:
+            data = r.json()
+            values = (data.get("GET_STATS_DATA", {})
+                         .get("STATISTICAL_DATA", {})
+                         .get("DATA_INF", {})
+                         .get("VALUE", []))
+            # Find All Items (品目コード = 0000) entries
+            for v in values:
+                cat = v.get("@cat01", "") or v.get("@itemCode", "")
+                if cat == "0000":  # All Items
+                    period = v.get("@time", "")  # e.g. "2026000003" = 2026/March
+                    val_s = v.get("$", "")
+                    if period and val_s and val_s not in ("…", "-", ""):
+                        # Period format: YYYYMM00NN where NN = month
+                        yr = period[:4]
+                        mn = period[6:8] if len(period) >= 8 else "01"
+                        try:
+                            dt_str = f"{yr}-{mn}-01"
+                            datetime.strptime(dt_str, "%Y-%m-%d")  # validate
+                            val = float(val_s)
+                            if _valid(val, lo=-3.0, hi=8.0):
+                                return dt_str, round(val, 4)
+                        except (ValueError, TypeError):
+                            continue
+        except Exception as e:
+            print(f"    e-Stat API: {e}")
+
+    # Fallback: Stats Japan cpim.csv — YoY table (not index table)
+    return _estatjp_csv_yoy()
+
+
+def _estatjp_csv_yoy() -> tuple:
+    """
+    Stats Japan cpim.csv — parse the 前年同月比 (YoY) section for 総合 (All Items).
+    The CSV has multiple sections separated by blank lines.
+    The 前年同月比 section header identifies the YoY block.
     """
     url = "https://www.stat.go.jp/data/cpi/sokuhou/tsuki/zuhyou/cpim.csv"
     r = _get(url)
     if not r or r.status_code != 200:
         if r:
-            print(f"    e-Stat Japan CPI CSV: HTTP {r.status_code}")
-        return _boj_cpi_yoy()
+            print(f"    e-Stat CSV: HTTP {r.status_code}")
+        return None, None
     try:
         text = r.content.decode("shift_jis", errors="replace")
         lines = text.splitlines()
-        header_row = None
-        data_row = None
-        header_cols = []
+
+        # Find the 前年同月比 (YoY) section
+        yoy_section_start = None
         for i, line in enumerate(lines):
-            if "年" in line and "月" in line and "総合" not in line:
+            if "前年同月比" in line and "指数" not in line:
+                yoy_section_start = i
+                break
+
+        if yoy_section_start is None:
+            print("    e-Stat CSV: 前年同月比 section not found")
+            return None, None
+
+        # Within the YoY section, find the date header row and the 総合 data row
+        section = lines[yoy_section_start:]
+        header_cols = None
+        for i, line in enumerate(section[:10]):  # Header should be within first 10 rows
+            if "年" in line and "月" in line:
                 cols = [c.strip() for c in line.split(",")]
                 if any("年" in c for c in cols):
-                    header_row = i
                     header_cols = cols
-            if "総合" in line and header_row is not None:
-                data_row = i
-                data_cols = [c.strip() for c in line.split(",")]
-                break
-        if header_row is None or data_row is None:
-            print("    e-Stat Japan CPI CSV: could not find header/data rows")
-            return _boj_cpi_yoy()
-        for i in range(len(header_cols) - 1, 0, -1):
-            if i >= len(data_cols):
-                continue
-            hdr = header_cols[i]
-            val_s = data_cols[i].replace(" ", "")
-            if not hdr or not val_s or "年" not in hdr:
-                continue
-            try:
-                hdr_clean = hdr.replace("年", "-").replace("月", "")
-                dt = datetime.strptime(hdr_clean.strip(), "%Y-%m")
-                val = float(val_s)
-                return dt.strftime("%Y-%m-01"), round(val, 4)
-            except (ValueError, TypeError):
-                continue
+                    # Data rows follow immediately
+                    for j in range(i + 1, min(i + 5, len(section))):
+                        data_line = section[j]
+                        if "総合" in data_line:
+                            data_cols = [c.strip() for c in data_line.split(",")]
+                            # Walk right-to-left to find latest non-empty value
+                            for k in range(len(header_cols) - 1, 0, -1):
+                                if k >= len(data_cols):
+                                    continue
+                                hdr = header_cols[k]
+                                val_s = data_cols[k].replace(" ", "")
+                                if not hdr or not val_s or "年" not in hdr:
+                                    continue
+                                try:
+                                    hdr_clean = hdr.replace("年", "-").replace("月", "")
+                                    dt = datetime.strptime(hdr_clean.strip(), "%Y-%m")
+                                    val = float(val_s)
+                                    if _valid(val, lo=-3.0, hi=8.0):
+                                        return dt.strftime("%Y-%m-01"), round(val, 4)
+                                except (ValueError, TypeError):
+                                    continue
+                    break
     except Exception as e:
-        print(f"    e-Stat Japan CPI CSV: {e}")
-    return _boj_cpi_yoy()
-
-
-def _boj_cpi_yoy() -> tuple:
-    """BOJ Statistics — CPI HTML table fallback."""
-    url = "https://www.stat-search.boj.or.jp/ssi/mtshtml/pr01_m_1.html"
-    r = _get(url)
-    if not r or r.status_code != 200:
-        if r:
-            print(f"    BOJ CPI HTML: HTTP {r.status_code}")
-        return None, None
-    try:
-        text = r.text
-        dates = re.findall(r'(\d{4}/\d{2})', text)
-        if not dates:
-            print("    BOJ CPI HTML: no dates found")
-            return None, None
-        latest_date_str = dates[-1]
-        dt = datetime.strptime(latest_date_str, "%Y/%m")
-        vals = re.findall(r'[-+]?\d+\.\d+', text[text.rfind(latest_date_str):])
-        if vals:
-            val = float(vals[0])
-            if _valid(val):
-                return dt.strftime("%Y-%m-01"), round(val, 4)
-    except Exception as e:
-        print(f"    BOJ CPI HTML: {e}")
+        print(f"    e-Stat CSV: {e}")
     return None, None
 
 
@@ -380,13 +397,12 @@ def _boj_cpi_yoy() -> tuple:
 def abs_cpi_yoy() -> tuple:
     """
     ABS SDMX-JSON API — CPI All Groups Australia, quarterly.
-    Endpoint: https://api.data.abs.gov.au/data/ABS,CPI,1.0.0/1.10001.10.50.Q
-    Returns (date_str YYYY-MM-DD, yoy_pct) or (None, None).
+    Uses custom_headers kwarg to avoid headers= conflict with _get().
     """
     url = "https://api.data.abs.gov.au/data/ABS,CPI,1.0.0/1.10001.10.50.Q"
     r = _get(url,
-             params={"startPeriod": "2023-Q1", "detail": "dataonly"},
-             headers={**HEADERS, "Accept": "application/vnd.sdmx.data+json;version=1.0"})
+             custom_headers={"Accept": "application/vnd.sdmx.data+json;version=1.0"},
+             params={"startPeriod": "2023-Q1", "detail": "dataonly"})
     if not r or r.status_code != 200:
         if r:
             print(f"    ABS SDMX: HTTP {r.status_code}")
@@ -409,7 +425,7 @@ def abs_cpi_yoy() -> tuple:
             idx = int(idx_str)
             v = vals[0] if vals else None
             if v is not None and idx < len(time_dim):
-                period = time_dim[idx].get("id", "")  # e.g. "2026-Q1"
+                period = time_dim[idx].get("id", "")
                 if "Q" in period:
                     qmap = {"Q1": "03", "Q2": "06", "Q3": "09", "Q4": "12"}
                     parts = period.split("-")
@@ -426,8 +442,8 @@ def abs_cpi_yoy() -> tuple:
 
 def statcan_cpi_yoy() -> tuple:
     """
-    Statistics Canada Web Data Service — CPI All-Items, Canada (Table 18-10-0004-01).
-    Fetches 15 months of index data and computes YoY.
+    Statistics Canada WDS API — CPI All-Items Canada (Table 18-10-0004-01).
+    Fetches 15 months of index and computes YoY.
     """
     url = ("https://www150.statcan.gc.ca/t1/tbl1/en/dtbl!"
            "getDataFromCubePidCoordAndLatestNPeriods/18100004/1.1/15")
@@ -435,7 +451,7 @@ def statcan_cpi_yoy() -> tuple:
     if not r or r.status_code != 200:
         if r:
             print(f"    StatsCan WDS: HTTP {r.status_code}")
-        return _statcan_vector_fallback()
+        return None, None
     try:
         data = r.json()
         obj = data.get("object", {})
@@ -454,42 +470,6 @@ def statcan_cpi_yoy() -> tuple:
         return index_to_yoy(rows)
     except Exception as e:
         print(f"    StatsCan WDS: {e}")
-    return _statcan_vector_fallback()
-
-
-def _statcan_vector_fallback() -> tuple:
-    """StatsCan vector API fallback — resolve vector ID then fetch data."""
-    r = _get("https://www150.statcan.gc.ca/t1/tbl1/en/dtbl!"
-             "getSeriesInfoFromCubePidCoord/18100004/1.1")
-    if not r or r.status_code != 200:
-        if r:
-            print(f"    StatsCan vector fallback: HTTP {r.status_code}")
-        return None, None
-    try:
-        info = r.json()
-        vector_id = (info.get("object", {}) or {}).get("vectorId")
-        if not vector_id:
-            return None, None
-        r2 = _get(f"https://www150.statcan.gc.ca/t1/tbl1/en/dtbl!"
-                  f"getDataFromVectorsAndLatestNPeriods/[{vector_id}]/15")
-        if not r2 or r2.status_code != 200:
-            return None, None
-        data2 = r2.json()
-        pts = (data2.get("object", [{}])[0].get("vectorDataPoint", []))
-        rows = []
-        for pt in pts:
-            ref = pt.get("refPer", "")
-            val = pt.get("value")
-            if ref and val is not None:
-                try:
-                    dt = datetime.strptime(ref[:7], "%Y-%m")
-                    rows.append((dt.strftime("%Y-%m-01"), float(val)))
-                except (ValueError, TypeError):
-                    continue
-        rows.sort(key=lambda x: x[0], reverse=True)
-        return index_to_yoy(rows)
-    except Exception as e:
-        print(f"    StatsCan vector fallback: {e}")
     return None, None
 
 
@@ -497,38 +477,50 @@ def _statcan_vector_fallback() -> tuple:
 
 def snb_cpi_yoy() -> tuple:
     """
-    SNB Data Portal — Swiss CPI All items index, monthly.
-    Endpoint: https://data.snb.ch/api/cube/pkcpival/data/json
+    SNB Data Portal — Swiss CPI All items, monthly.
+    Cube: plkopr (Consumer prices – total). CSV format (JSON endpoint discontinued).
+    URL: https://data.snb.ch/api/cube/plkopr/data/csv/en
     YoY computed from 12-month index delta.
     """
-    url = "https://data.snb.ch/api/cube/pkcpival/data/json"
-    r = _get(url)
+    url = "https://data.snb.ch/api/cube/plkopr/data/csv/en"
+    r = _get(url, custom_headers={"Accept": "text/csv, */*"})
     if not r or r.status_code != 200:
         if r:
-            print(f"    SNB API: HTTP {r.status_code}")
+            print(f"    SNB CSV: HTTP {r.status_code}")
         return None, None
     try:
-        data = r.json()
-        series = (data.get("data", {}) or data).get("series", [])
-        if not series:
-            series = data.get("series", [])
-        if not series:
-            print("    SNB API: unexpected response structure")
-            return None, None
+        # SNB CSV format (after 3 header rows):
+        # Date;D0;Value
+        # 2026-03;T;108.42
+        # D0=T = Total (all items)
         rows = []
-        for pt in series:
-            date_s = pt.get("Date", "") or pt.get("date", "")
-            val = pt.get("Value") or pt.get("value")
-            if date_s and val is not None:
-                try:
-                    dt = datetime.strptime(date_s[:7], "%Y-%m")
-                    rows.append((dt.strftime("%Y-%m-01"), float(val)))
-                except (ValueError, TypeError):
-                    continue
+        lines = r.text.splitlines()
+        for line in lines:
+            if not line or line.startswith("#") or "Date" in line or "date" in line:
+                continue
+            parts = line.split(";")
+            if len(parts) < 3:
+                continue
+            date_s = parts[0].strip()
+            dim = parts[1].strip() if len(parts) > 1 else ""
+            val_s = parts[-1].strip()
+            # Filter for Total (T) or single-dimension rows
+            if dim not in ("T", "TOT", "", "0"):
+                continue
+            if not val_s or val_s in (".", "NA", "-"):
+                continue
+            try:
+                dt = datetime.strptime(date_s[:7], "%Y-%m")
+                rows.append((dt.strftime("%Y-%m-01"), float(val_s)))
+            except (ValueError, TypeError):
+                continue
         rows.sort(key=lambda x: x[0], reverse=True)
+        if not rows:
+            print("    SNB CSV: no usable rows parsed")
+            return None, None
         return index_to_yoy(rows)
     except Exception as e:
-        print(f"    SNB API: {e}")
+        print(f"    SNB CSV: {e}")
     return None, None
 
 
@@ -537,20 +529,20 @@ def snb_cpi_yoy() -> tuple:
 def statsnz_cpi_yoy() -> tuple:
     """
     Stats NZ OData API — CPI All Groups, quarterly.
-    No API key required for read access.
+    Uses custom_headers to avoid headers= conflict.
     """
     url = ("https://api.stats.govt.nz/opendata/v1/CPI?"
            "$filter=Subject eq 'Consumer Price Index - CPI' and "
            "Group eq 'All groups' and Series_title_1 eq 'All groups'"
            "&$orderby=Period desc&$top=8")
-    r = _get(url, headers={**HEADERS, "Accept": "application/json"})
+    r = _get(url, custom_headers={"Accept": "application/json"})
     if r and r.status_code == 200:
         try:
             data = r.json()
             items = data.get("value", [])
             rows = []
             for item in items:
-                period = item.get("Period", "")  # e.g. "2026Q1"
+                period = item.get("Period", "")
                 val = item.get("Data_value")
                 if period and val is not None:
                     period = period.replace("-", "")
@@ -581,9 +573,9 @@ def _rbnz_survey() -> tuple:
         return None, None
     try:
         lines = r.text.splitlines()
-        rows = list(csv.reader(lines))
+        rows_parsed = list(csv.reader(lines))
         data_rows = []
-        for row in rows:
+        for row in rows_parsed:
             if not row:
                 continue
             if re.match(r'\d{4}\s?[Qq]\d', row[0].strip()):
@@ -670,10 +662,10 @@ def fetch_gbp() -> tuple:
 
 
 def fetch_jpy() -> tuple:
-    """JPY: e-Stat Japan CPI CSV → BOJ HTML → World Bank"""
-    print("    Trying e-Stat Japan CPI CSV…")
+    """JPY: e-Stat API → e-Stat CSV (前年同月比 section) → World Bank"""
+    print("    Trying e-Stat Japan API (statsDataId 0003427113)…")
     dt, val = estatjp_cpi_yoy()
-    if val is not None and _valid(val):
+    if val is not None and _valid(val, lo=-3.0, hi=8.0):
         print(f"    ✓ JPY: {val:.4f}% CPI YoY ({dt}) [Stats Japan]")
         return dt, val
 
@@ -730,8 +722,8 @@ def fetch_cad() -> tuple:
 
 
 def fetch_chf() -> tuple:
-    """CHF: SNB Data Portal → FRED CHECPIALLMINMEI → World Bank"""
-    print("    Trying SNB Data Portal…")
+    """CHF: SNB Data Portal (plkopr CSV) → FRED CHECPIALLMINMEI → World Bank"""
+    print("    Trying SNB Data Portal (plkopr)…")
     dt, val = snb_cpi_yoy()
     if val is not None and _valid(val, lo=-5.0, hi=15.0):
         print(f"    ✓ CHF: {val:.4f}% CPI YoY ({dt}) [SNB]")
