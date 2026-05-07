@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-05-07T10:39:56Z",
+  "generated_at": "2026-05-07T12:16:44Z",
   "signals": [
     {
-      "time": "10:39",
+      "time": "12:16",
       "priority": "critical",
-      "title": "NZD/CAD — G8 Bilateral Theme + RBNZ Bias",
-      "text": "NZD/CAD at 0.4390 (implied) — NZD dominates as the G8 leader while CAD lags, creating a 1.464% spread. The divergence is driven by RBNZ hike bias vs BoC hold stance, alongside optimism for an Iran peace deal which supports risk-sensitive NZD over oil-linked CAD. NZD COT LF net short -16,833 (23% long) vs RBNZ hike bias indicates significant short-squeeze risk if the May 27 meeting confirms hawkishness.",
+      "title": "NZD/CAD — G8 Bilateral Theme + Geopolitical Shift",
+      "text": "NZD/CAD at 0.8190 — NZD outperformance (1W avg +0.931%) vs CAD weakness (-0.605%) creates a 1.536% G8 spread, the widest in the complex. Peace hopes in the Middle East drive a -3.43% drop in WTI Oil ($91.8), stripping the CAD of its energy-linked risk premium while boosting high-beta NZD risk appetite. RBNZ hike bias (2.25%, market bias: Hike) vs BoC hold (2.25%) provides a structural tailwind for NZD as oil-driven CAD selling accelerates. Implication: NZD/CAD remains bid as long as oil prices retreat and risk-on sentiment persists.",
       "evidence": [
-        "NZD 1W avg: +0.888% (n=4)",
-        "CAD 1W avg: -0.576% (n=3)",
-        "G8 spread: 1.464%"
+        "NZD 1W avg: +0.931% (n=4)",
+        "CAD 1W avg: -0.605% (n=3)",
+        "G8 spread: 1.536%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:36",
-      "priority": "critical",
-      "title": "AUD/USD — Positioning + Retail Divergence + Geopolitical",
-      "text": "AUD/USD at 0.7262 — COT LF net long +48,299 (74.8% long) vs retail 90% short creates a massive institutional vs retail divergence. Retail is aggressively fading the risk-on rotation triggered by Iran peace deal hopes and the 4.35% RBA carry advantage (-60bp vs Fed). Extreme retail short positioning suggests a capitulation squeeze toward multi-year tops if peace talks progress.",
-      "evidence": [
-        "COT LF net long: +48,299",
-        "Retail sentiment: 90% short",
-        "Fed 3.75% vs RBA 4.35% — -60bp"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "10:34",
+      "time": "12:13",
       "priority": "warning",
-      "title": "USD/CHF — Retail Extreme + Carry Divergence",
-      "text": "USD/CHF at 0.7773 — Retail 85% long (extreme) vs COT LF net short -6,117 (33.6% long). While the 375bp Fed-SNB carry premium structurally favors USD, the retail crowd is caught long during a 2.99% monthly decline. Peace deal optimism reduces safe-haven CHF demand, but retail over-concentration long suggests further downside before a sustainable carry-driven reversal.",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD/USD at 0.7260 — COT LF net long +48,299 (74.8% long) vs retail 90% short. Institutional positioning is heavily long while retail is aggressively fading the 1M +5.43% rally. RBA 4.35% vs Fed 3.75% provides a +60bp carry advantage for AUD, further supported by the risk-on shift following US-Iran peace headlines. Implication: Extreme retail short positioning suggests a capitulation risk that could fuel a squeeze toward 0.7350 if price holds above 0.7200.",
       "evidence": [
-        "Retail sentiment: 85% long",
-        "COT LF net short: -6,117",
-        "Fed 3.75% vs SNB 0% — +375bp"
+        "AUD COT LF net: +48,299",
+        "Retail Sentiment: 90% short",
+        "AUD/USD carry: +60bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:31",
+      "time": "12:11",
       "priority": "warning",
-      "title": "EUR/USD — Correlation Break + ECB Stance",
-      "text": "EUR/USD at 1.1776 — Correlation with EuroStoxx at +0.729 vs norm -0.130 (z=+1.84σ) indicates EUR is trading as a pure risk-on proxy rather than a funding currency. ECB’s Villeroy emphasizes data-dependence, keeping the vs USD relevant. Watch for a break in equity momentum to test if the EUR/USD 1W +0.40% gain can sustain without risk-on tailwinds.",
+      "title": "EUR/USD — Correlation Break + Geopolitical Reversal",
+      "text": "EUR/USD at 1.1774 — EUR/USD vs EuroStoxx correlation at +0.729 vs norm of -0.130 (z=+1.84σ). The pair is decoupling from traditional equity drivers, instead tracking the reversal of war-related risk premiums. Fed 3.75% vs ECB 2.0% maintains a 175bp USD carry advantage, but DXY weakness (-0.16%) on peace hopes allows EUR to test upside levels. Implication: EUR/USD strength is a function of USD liquidation rather than EUR conviction; watch for 1.1800 resistance to hold unless ECB bias shifts hawkish.",
       "evidence": [
         "EUR/USD vs EuroStoxx z-score: +1.84σ",
-        "Fed 3.75% vs ECB 2% — +175bp",
-        "EUR/USD 1W: +0.40%"
+        "Fed 3.75% vs ECB 2.0% — 175bp",
+        "WTI Oil: $91.8 (-3.43%)"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:25",
+      "time": "12:05",
       "priority": "info",
       "title": "USD/JPY — Carry vs Intervention Risk",
-      "text": "USD/JPY at 156.36 — 300bp Fed-BoJ carry sustains the bid, but JPY COT LF net short -88,543 (30.6% long) remains crowded. 160.00 remains the key level for BoJ verbal warnings. Peace deal headlines and falling WTI oil ($92.4) provide a breather for JPY, but the carry advantage dominates until VIX exceeds 25. Watch the next BoJ meeting (mkt: 40% hike priced) for a shift in the 0.75% policy rate.",
+      "text": "USD/JPY at 156.38 — Fed 3.75% vs BoJ 0.75% provides a 300bp carry premium supporting the USD. JPY COT LF net short -88,543 (30.6% long) remains crowded, but the MOVE index drop (-8.00% to 70.6) suggests reduced volatility stress. 160.00 remains the key level for BoJ verbal warnings; intervention risk rises on a sustained break above that threshold. Implication: Carry remains the dominant driver while VIX stays at 17.4 (normal volatility), keeping the pair bid on dips.",
       "evidence": [
-        "Fed 3.75% vs BoJ 0.75% — +300bp",
-        "JPY COT LF net short: -88,543",
-        "WTI Oil: $92.4 (-2.83%)"
+        "Fed 3.75% vs BoJ 0.75% — 300bp",
+        "JPY COT LF net: -88,543",
+        "MOVE Index: 70.6 (-8.00%)"
       ],
       "_source": "gemini"
     }
