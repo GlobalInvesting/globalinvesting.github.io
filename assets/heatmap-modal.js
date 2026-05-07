@@ -1031,7 +1031,15 @@
         );
       }).join('') +
       '<div style="margin-top:6px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;border-top:1px solid rgba(255,255,255,.05);padding-top:6px">' +
-      'AI Analytics \xb7 Generated at 06:00 UTC daily &nbsp;|&nbsp; ' + tzAbbr + ' ' + localStr + '</div>';
+      'AI Analytics \xb7 ' + (_sessionCtxCache && _sessionCtxCache.generated_at
+        ? (() => {
+            const d = new Date(_sessionCtxCache.generated_at);
+            const hh = String(d.getUTCHours()).padStart(2,'0');
+            const mm = String(d.getUTCMinutes()).padStart(2,'0');
+            return 'Updated ' + hh + ':' + mm + ' UTC';
+          })()
+        : '~2h refresh') +
+      ' &nbsp;|&nbsp; ' + tzAbbr + ' ' + localStr + '</div>';
     } else {
       // Fallback: basic intraday stats (no Groq data yet)
       notes.innerHTML =
