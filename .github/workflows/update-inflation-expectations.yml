@@ -46,14 +46,14 @@ jobs:
         #   EUR: FRED T5YIFR (EUR 5Y5Y breakeven, market-implied, daily)
         #   G6:  OECD Data Explorer SDMX API (sdmx.oecd.org)
         #          Dataflow: OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0
-        #          Key: {country}.{M|Q}.N.CPI.PA._T.N.GY
-        #          Format: csvfilewithlabels
-        #          Lag: ~4-6 weeks from national CPI release
-        #        → FRED OECD MEI index series (structural ~12-14m lag — stale guard fallback)
-        #        → World Bank annual (>12m lag — last resort)
+        #          Key: {country}.{M|Q}.N.CPI.PA._T.N.GY (TRANSFORMATION=GY = annual pct change)
+        #          Format: csvfilewithlabels -- lag ~4-6 weeks from national CPI release
+        #        Fallback: FRED OECD MEI index series (~12-14m structural lag)
+        #        Last resort: World Bank annual (>12m lag)
         #
-        # Patches extended-data/{CCY}.json: inflationExpectations + dates.inflationExpectations
-        # All other fields in extended-data/{CCY}.json are preserved unchanged.
+        # Patches extended-data/{CCY}.json updating only:
+        #   data.inflationExpectations  and  dates.inflationExpectations
+        # All other fields in each file are preserved unchanged.
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python engine/scripts/fetch_inflation_expectations.py site
@@ -65,22 +65,14 @@ jobs:
           echo "========================================"
           echo "   INFLATION EXPECTATIONS SUMMARY"
           echo "========================================"
-          for currency in USD EUR GBP JPY AUD CAD CHF NZD; do
-            if [ -f "site/extended-data/$currency.json" ]; then
-              val=$(python3 -c "
-import json, sys
-try:
-    with open('site/extended-data/$currency.json') as f:
-        d = json.load(f)
-    v = d.get('data',{}).get('inflationExpectations')
-    dt = d.get('dates',{}).get('inflationExpectations','?')
-    print(f'  $currency  {v:+.4f}%  ({dt})' if v is not None else '  $currency  —')
-except Exception as e:
-    print(f'  $currency  ERROR: {e}')
-")
-              echo "$val"
+          for ccy in USD EUR GBP JPY AUD CAD CHF NZD; do
+            file="site/extended-data/${ccy}.json"
+            if [ -f "$file" ]; then
+              val=$(jq -r '.data.inflationExpectations // "n/a"' "$file")
+              dt=$(jq -r '.dates.inflationExpectations // "?"' "$file")
+              echo "  ${ccy}  ${val}%  (${dt})"
             else
-              echo "  $currency  (file not found)"
+              echo "  ${ccy}  (file not found)"
             fi
           done
 
@@ -94,11 +86,11 @@ except Exception as e:
             echo "No changes to commit"
             exit 0
           fi
-          git commit -m "📊 Inflation expectations $(date +'%Y-%m-%d') — OECD Data Explorer / FRED breakevens"
+          git commit -m "Inflation expectations $(date +'%Y-%m-%d') -- OECD Data Explorer / FRED breakevens"
           for i in 1 2 3; do
-            git push && echo "✅ Push succeeded" && exit 0
-            echo "Push rejected (attempt $i) — rebasing..."
+            git push && echo "Push succeeded" && exit 0
+            echo "Push rejected (attempt $i) -- rebasing..."
             git pull --rebase origin main
           done
-          echo "❌ All push attempts failed — data not published."
+          echo "All push attempts failed -- data not published."
           exit 1
