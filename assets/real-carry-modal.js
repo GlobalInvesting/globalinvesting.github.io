@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// REAL RATE CARRY MODAL  v1.2
+// REAL RATE CARRY MODAL  v1.3
 // File: assets/real-carry-modal.js
 //
 // Architecture:
@@ -19,16 +19,16 @@
 // Inflation expectation sources (in priority order):
 //   USD: FRED T5YIE   — 5Y breakeven inflation, market-derived, daily
 //   EUR: FRED T5YIFR  — EUR 5Y5Y inflation swap rate, daily
-//   GBP: extended-data/GBP.json — CPI YoY (ForexFactory calendar actuals, weekly batch)
-//   JPY: extended-data/JPY.json — CPI YoY (ForexFactory calendar actuals, weekly batch)
-//   AUD: extended-data/AUD.json — CPI YoY (ForexFactory calendar actuals, weekly batch)
-//   CAD: extended-data/CAD.json — CPI YoY (ForexFactory calendar actuals, weekly batch)
-//   CHF: extended-data/CHF.json — CPI YoY (ForexFactory calendar actuals, weekly batch)
-//   NZD: extended-data/NZD.json — CPI YoY (ForexFactory calendar actuals, weekly batch)
+//   GBP: extended-data/GBP.json — CPI YoY (OECD SDMX MEI, weekly batch)
+//   JPY: extended-data/JPY.json — CPI YoY (OECD SDMX MEI, weekly batch)
+//   AUD: extended-data/AUD.json — CPI YoY (OECD SDMX MEI, weekly batch)
+//   CAD: extended-data/CAD.json — CPI YoY (OECD SDMX MEI, weekly batch)
+//   CHF: extended-data/CHF.json — CPI YoY (OECD SDMX MEI, weekly batch)
+//   NZD: extended-data/NZD.json — CPI YoY (OECD SDMX MEI, weekly batch)
 //
 // Note: extended-data/{CCY}.json is written weekly by update-inflation-expectations.yml
-// (runs Mondays 06:00 UTC). G6 data comes from economic-data/ calendar actuals
-// (update_pmi_from_calendar.py). USD/EUR use live FRED breakevens at open.
+// (runs Mondays 06:00 UTC). G6 data sourced from OECD SDMX MEI (CPALTT01 YoY).
+// USD/EUR use live FRED breakevens at open.
 // ═══════════════════════════════════════════════════════════════════════════
 
 (function () {
@@ -133,12 +133,12 @@ const _RCM_CB = { USD: 'Fed', EUR: 'ECB', GBP: 'BoE', JPY: 'BoJ', AUD: 'RBA', CA
 const _RCM_IE_SRC = {
   USD: 'FRED T5YIE · 5Y breakeven',
   EUR: 'FRED T5YIFR · EUR 5Y5Y swap',
-  GBP: 'CPI YoY · calendar actuals',
-  JPY: 'CPI YoY · calendar actuals',
-  AUD: 'CPI YoY · calendar actuals',
-  CAD: 'CPI YoY · calendar actuals',
-  CHF: 'CPI YoY · calendar actuals',
-  NZD: 'CPI YoY · calendar actuals',
+  GBP: 'CPI YoY · OECD SDMX',
+  JPY: 'CPI YoY · OECD SDMX',
+  AUD: 'CPI YoY · OECD SDMX',
+  CAD: 'CPI YoY · OECD SDMX',
+  CHF: 'CPI YoY · OECD SDMX',
+  NZD: 'CPI YoY · OECD SDMX',
 };
 
 // ── State ───────────────────────────────────────────────────────────────────
@@ -192,7 +192,7 @@ async function _rcmFetchData() {
     // 2. Inflation expectations
     //    USD: FRED T5YIE (5Y breakeven — market-implied, daily)
     //    EUR: FRED T5YIFR (EUR 5Y5Y inflation swap — market-implied, daily)
-    //    Rest: extended-data/*.json (weekly batch — ForexFactory calendar CPI YoY actuals)
+    //    Rest: extended-data/*.json (weekly batch — OECD SDMX MEI CPI YoY)
     const inflExp = {};
 
     const [fredUSD, fredEUR] = await Promise.all([
@@ -334,7 +334,7 @@ function _rcmRenderBreakdown() {
     </tr>`;
   }).join('');
 
-  const liveNote = 'USD/EUR: FRED market-implied breakeven (live, daily). GBP/JPY/AUD/CAD/CHF/NZD: CPI YoY actuals (ForexFactory calendar, weekly batch — updated Mondays). ' +
+  const liveNote = 'USD/EUR: FRED market-implied breakeven (live, daily). GBP/JPY/AUD/CAD/CHF/NZD: CPI YoY (OECD SDMX MEI, weekly batch — updated Mondays). ' +
     'CPI YoY and 5Y breakeven are different methodologies — cross-currency real rate comparisons carry wider uncertainty for non-USD/EUR legs. ' +
     'Data age column shows observation date — treat figures older than 6 months as indicative only.';
 
