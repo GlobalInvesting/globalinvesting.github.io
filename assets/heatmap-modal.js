@@ -793,60 +793,80 @@
     });
   }
 
-  // Returns true if a session has already opened today (UTC day boundary).
-  // Sydney spans midnight — treat as always opened.
-  function sessionHasOpened(sess) {
+  // Returns the temporal state of a session at the current UTC hour:
+  //   'active'   — session is currently open
+  //   'past'     — session opened and closed earlier today (result is real)
+  //   'upcoming' — session has not yet opened today
+  // Industry convention (Bloomberg FXGO, Refinitiv Eikon):
+  //   Bars and values are shown for active and past sessions only.
+  //   Upcoming sessions show a placeholder track — no fabricated data.
+  function getBarSessionState(sess) {
+    if (isMarketWeekend()) return 'past'; // weekend: all bars show last-close (dimmed)
     const h = new Date().getUTCHours();
-    if (sess.name === 'Sydney') return true; // always show — spans midnight
-    return h >= sess.utcStart;
+    const isActive = getActiveSessions().has(sess.name);
+    if (isActive) return 'active';
+    // Sydney crosses midnight: closed when 06:00 <= h < 21:00
+    if (sess.name === 'Sydney') return (h >= 6 && h < 21) ? 'past' : 'upcoming';
+    // All other sessions: past if current hour is past their close, upcoming if before their open
+    return h >= sess.utcEnd ? 'past' : 'upcoming';
   }
 
   function populateSession(ccy, rtCache) {
     const tzAbbr   = localTzAbbr();
     const weekend  = isMarketWeekend();
     document.getElementById('hm-sess-title').textContent =
-      ccy + ' COMPOSITE STRENGTH BY SESSION · ' + tzAbbr + ' REFERENCE';
+      ccy + ' INTRADAY COMPOSITE · SESSION WINDOW STATUS · ' + tzAbbr;
 
     const myPairs      = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
     const activeSessions = getActiveSessions();   // empty Set on weekends
     const activeSess   = currentSessionName();    // legacy fallback text
 
-    // ── Weekend: show all bars dimmed with last-close values (Bloomberg convention) ──
-    // On weekdays, only sessions that have already opened receive a value;
-    // UPCOMING sessions show "—" to avoid fabricating future data.
-    const weights = { 'New York': 0.38, 'London': 0.35, 'Tokyo': 0.18, 'Sydney': 0.09 };
+    // Compute the single intraday composite once — this is the day % vs prev close
+    // weighted equally across all direct pairs. Bloomberg convention: when session-specific
+    // OHLC is not available, show the full-day composite alongside session window status
+    // rather than fabricating per-session values from volume weights.
+    let compositeSum = 0, compositeCnt = 0;
+    myPairs.forEach(p => {
+      const d = rtCache[p.id];
+      if (!d || d.pct == null) return;
+      compositeSum += d.pct * p.sign * (p.base === ccy ? 1 : -1);
+      compositeCnt++;
+    });
+    const dayComposite = compositeCnt > 0 ? compositeSum / compositeCnt : null;
+
+    // Volume share labels — used as context markers, not bar values
+    const volShare = { 'New York': '38%', 'London': '35%', 'Tokyo': '18%', 'Sydney': '9%' };
+
+    // Session bar data: active and past sessions show the day composite (honest label).
+    // Upcoming sessions show no bar — Bloomberg/Eikon do not fabricate forward values.
     const sessionData = SESSIONS.map(sess => {
-      // On weekends all sessions show last-close values; on weekdays only opened sessions do
-      const opened = weekend || sessionHasOpened(sess);
-      const isActive = activeSessions.has(sess.name);
-      let pct = null;
-      if (opened) {
-        let sum = 0;
-        myPairs.forEach(p => {
-          const d = rtCache[p.id];
-          if (!d || d.pct == null) return;
-          const impact = d.pct * p.sign * (p.base === ccy ? 1 : -1);
-          sum += impact * (weights[sess.name] || 0.1);
-        });
-        pct = myPairs.length > 0 ? sum / myPairs.length : 0;
-      }
-      return { ...sess, pct, isActive, opened };
+      const barState = getBarSessionState(sess);
+      const showBar  = barState === 'active' || barState === 'past';
+      // All shown sessions display the same day composite — this is transparent about
+      // data availability. The session window context is conveyed by the state indicator
+      // and AI notes, not by fabricated per-session performance figures.
+      const pct = showBar ? dayComposite : null;
+      return { ...sess, pct, barState, isActive: barState === 'active' };
     });
 
-    const openedPcts = sessionData.filter(s => s.opened && s.pct != null).map(s => Math.abs(s.pct));
-    const maxAbs = openedPcts.length > 0 ? Math.max(...openedPcts, 0.001) : 0.001;
-    const grid   = document.createElement('div');
+    const grid = document.createElement('div');
     grid.className = 'sess-grid';
+
+    // Since quotes.json provides full-day pct only (no session-specific OHLC),
+    // all open/past session rows show the same day composite value.
+    // The state indicator (active/past/upcoming) conveys session timing.
+    const compositePos = dayComposite != null && dayComposite >= 0;
+    const compositeClr = compositePos ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
 
     sessionData.forEach(s => {
       const lbl = document.createElement('div');
-      lbl.className = 'sess-lbl';  // never .hl during weekend — no active session
+      lbl.className = 'sess-lbl';
 
       let labelText = s.name.toUpperCase();
-      if (s.isActive) {
-        labelText += ' \u25CF';
-      } else if (!s.opened && !weekend) {
-        labelText += ' \xb7 opens ' + utcHourToLocalStr(s.utcStart);
+      if (s.barState === 'active') {
+        labelText += ' \u25CF';        // ● active
+      } else if (s.barState === 'upcoming' && !weekend) {
+        labelText += ' \u25CB';        // ○ upcoming
       }
       lbl.textContent = labelText;
 
@@ -855,27 +875,27 @@
 
       const val = document.createElement('div');
 
-      if (!s.opened || s.pct == null) {
-        lbl.style.opacity = '0.45';
-        track.style.opacity = '0.2';
+      if (s.barState === 'upcoming' || s.pct == null) {
+        // Upcoming: empty track, no value — Bloomberg/Eikon show no forward bar
+        lbl.style.cssText = 'opacity:.35;color:var(--orange,#f6941c)';
+        track.style.opacity = '0.08';
         val.className = 'sess-val flat';
-        val.textContent = '\u2014';
-        val.style.opacity = '0.45';
+        val.style.cssText = 'opacity:.35;font-size:9px;color:var(--text3,#6b7280)';
+        val.textContent = utcHourToLocalStr(s.utcStart);  // show open time as hint
       } else {
-        const pos = s.pct >= 0;
-        const cls = pos ? 'up' : 'down';
-        const clr = pos ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
-        const w   = Math.round(Math.abs(s.pct) / maxAbs * 100);
         const fill = document.createElement('div');
         fill.className = 'sess-fill';
-        // Dim all bars on weekends (last-close convention, same as dashboard.js panels)
-        fill.style.cssText = 'width:' + w + '%;background:' + clr +
-          (weekend ? ';opacity:.45' : '');
+        // Active: full-width bar at 75% opacity (live session — result in progress)
+        // Past: dimmed bar — closed session result (Bloomberg convention)
+        // Weekend: all bars dimmed (last-close convention)
+        const isActive = s.barState === 'active' && !weekend;
+        const dimBar   = !isActive;
+        fill.style.cssText = 'width:100%;background:' + compositeClr +
+          (dimBar ? ';opacity:.30' : ';opacity:.70');
         track.appendChild(fill);
-        val.className = 'sess-val ' + cls;
+        val.className = 'sess-val ' + (compositePos ? 'up' : 'down');
         val.textContent = fmt2(s.pct);
-        // Dim value labels on weekends
-        if (weekend) {
+        if (dimBar) {
           val.style.opacity = '0.55';
           lbl.style.opacity = '0.55';
         }
@@ -886,10 +906,16 @@
       grid.appendChild(val);
     });
 
+    // Data note: explain the bars represent full-day composite (institutional transparency)
+    const dataNote = document.createElement('div');
+    dataNote.style.cssText = 'font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,\'JetBrains Mono\',\'Courier New\',monospace);letter-spacing:.02em;margin-top:6px;opacity:.7';
+    dataNote.textContent = 'Day % vs prev close \xb7 session-specific OHLC not available';
+
     // Weekend: no banner, no status line — dimmed bars only (Bloomberg/Eikon convention)
     const content = document.getElementById('hm-sess-content');
     content.innerHTML = '';
     content.appendChild(grid);
+    content.appendChild(dataNote);
 
     // Session context notes — suspended on weekends; otherwise show Groq or fallback
     const notes = document.getElementById('hm-sess-notes');
@@ -949,50 +975,63 @@
       : null;
 
     if (groqSessions && Object.keys(groqSessions).length >= 3) {
-      // Classify each session as 'active', 'past', or 'upcoming' based on current UTC hour.
-      // Bloomberg/Eikon convention: past sessions show results (dimmed), the active session
-      // is highlighted, upcoming sessions show the outlook note in a visually distinct state.
-      // This prevents AI-generated notes for future sessions from reading as accomplished facts.
-      const h = new Date().getUTCHours();
-      function getSessionState(sName) {
-        if (activeSessions.has(sName)) return 'active';
-        const closeUtc = { 'Sydney': 6, 'Tokyo': 9, 'London': 16, 'New York': 21 };
-        if (sName === 'Sydney') return (h >= 6 && h < 21) ? 'past' : 'upcoming';
-        return h >= closeUtc[sName] ? 'past' : 'upcoming';
-      }
-
+      // Render session notes using getBarSessionState for consistent classification
+      // with the bar section above (same UTC boundary logic, single source of truth).
+      // Industry convention (Bloomberg FXGO, Refinitiv Eikon):
+      //   active   — blue label + ● + full-brightness AI note (live session)
+      //   past     — gray label + AI note dimmed + CLOSED badge (result, historical fact)
+      //   upcoming — amber label + ○ + "opens HH:MM" placeholder, no AI note
+      //              AI-generated text for a future session is an outlook written at
+      //              06:00 UTC; showing it at full brightness before the session opens
+      //              makes a forward projection read as an accomplished result.
+      // Session notes: state-first layout (Bloomberg convention)
+      //   LIVE chip     — blue, session currently open
+      //   CLOSED chip   — muted gray on its own line above note (result is historical fact)
+      //   UPCOMING chip — amber, session not yet open; AI note suppressed to prevent
+      //                   outlook text from reading as accomplished result
       const sessOrder = ['Sydney', 'Tokyo', 'London', 'New York'];
       notes.innerHTML = sessOrder.map(sName => {
-        const state = getSessionState(sName);
-        const note  = convertUtcTimesInNote(groqSessions[sName] || '\u2014');
-        // Color scheme mirrors Bloomberg session pane:
-        //   active   — blue label + ● dot + full-brightness text
-        //   past     — muted gray label + muted text + CLOSED badge (session result, historical)
-        //   upcoming — amber label + ○ dot + slightly muted text + UPCOMING badge
+        const sess  = SESSIONS.find(s => s.name === sName);
+        const state = getBarSessionState(sess);
+        const aiNote = convertUtcTimesInNote(groqSessions[sName] || '\u2014');
+
         const labelColor = state === 'active'   ? 'var(--blue,#4f7fff)'
                          : state === 'past'      ? 'var(--text3,#6b7280)'
-                         :                         'var(--amber,#b87333)';
+                         :                         'var(--orange,#f6941c)';
         const textColor  = state === 'active'   ? 'var(--text,#d1d4dc)'
                          : state === 'past'      ? 'var(--text3,#6b7280)'
-                         :                         'var(--text2,#9598a1)';
-        const labelSuffix = state === 'active'   ? ' \u25CF'
-                          : state === 'upcoming'  ? ' \u25CB'
-                          :                         '';
-        const badge = state === 'upcoming'
-          ? '<span style="font-size:8px;color:var(--amber,#b87333);opacity:.7;margin-left:4px;letter-spacing:.05em;">UPCOMING</span>'
+                         :                         'var(--text3,#6b7280)';
+        const labelDot   = state === 'active'   ? ' \u25CF'    // ●
+                         : state === 'upcoming' ? ' \u25CB'    // ○
+                         :                        '';
+
+        // State chip on the header line: unambiguous before reading the note text
+        const stateChip  = state === 'active'
+          ? '<span style="font-size:8px;background:rgba(79,127,255,.15);color:var(--blue,#4f7fff);border-radius:2px;padding:1px 4px;letter-spacing:.07em;font-weight:700;margin-left:6px;vertical-align:middle">LIVE</span>'
           : state === 'past'
-          ? '<span style="font-size:8px;color:var(--text3,#6b7280);opacity:.6;margin-left:4px;letter-spacing:.05em;">CLOSED</span>'
-          : '';
+          ? '<span style="font-size:8px;color:var(--text3,#6b7280);letter-spacing:.07em;opacity:.6;margin-left:6px;vertical-align:middle">CLOSED</span>'
+          : '<span style="font-size:8px;background:rgba(246,148,28,.10);color:var(--orange,#f6941c);border-radius:2px;padding:1px 4px;letter-spacing:.07em;opacity:.8;margin-left:6px;vertical-align:middle">UPCOMING</span>';
+
+        // Upcoming: replace AI outlook with open time — AI note suppressed
+        // (generated at 06:00 UTC; showing it before open reads as accomplished fact)
+        const displayNote = state === 'upcoming'
+          ? '<span style="color:var(--text3,#6b7280);font-style:italic">Opens ' + utcHourToLocalStr(sess.utcStart) + ' \u2014 context generated daily at 06:00 UTC</span>'
+          : aiNote;
+
         return (
-          '<div style="margin-bottom:4px;color:' + textColor + '">' +
-          '<span style="color:' + labelColor + ';min-width:72px;display:inline-block;' +
-          'font-weight:' + (state === 'active' ? '600' : '400') + '">' +
-          sName.toUpperCase() + labelSuffix +
-          '</span> ' + note + badge + '</div>'
+          '<div style="margin-bottom:7px">' +
+          '<div style="margin-bottom:2px">' +
+          '<span style="color:' + labelColor + ';font-weight:' + (state === 'active' ? '700' : '500') + ';letter-spacing:.04em;font-size:10px">' +
+          sName.toUpperCase() + labelDot + '</span>' + stateChip +
+          '</div>' +
+          '<div style="color:' + textColor + ';padding-left:2px;font-size:11px;' + (state === 'upcoming' ? 'opacity:.6' : '') + '">' +
+          displayNote +
+          '</div>' +
+          '</div>'
         );
       }).join('') +
-      '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
-      'AI Analytics \xb7 ~5min delay &nbsp;|&nbsp; ' + tzAbbr + ' ' + localStr + '</div>';
+      '<div style="margin-top:6px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;border-top:1px solid rgba(255,255,255,.05);padding-top:6px">' +
+      'AI Analytics \xb7 Generated at 06:00 UTC daily &nbsp;|&nbsp; ' + tzAbbr + ' ' + localStr + '</div>';
     } else {
       // Fallback: basic intraday stats (no Groq data yet)
       notes.innerHTML =
