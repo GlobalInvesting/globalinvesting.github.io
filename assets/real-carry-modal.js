@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// REAL RATE CARRY MODAL  v1.0
+// REAL RATE CARRY MODAL  v1.1
 // File: assets/real-carry-modal.js
 //
 // Architecture:
@@ -335,7 +335,9 @@ function _rcmRenderBreakdown() {
     </tr>`;
   }).join('');
 
-  const liveNote = 'USD/EUR: FRED market-implied breakeven (live). Others: CPI YoY proxy (batch). Date shown is observation date.';
+  const liveNote = 'USD/EUR: FRED market-implied breakeven (live, daily). GBP/JPY/AUD/CAD/CHF/NZD: CPI YoY proxy (static batch). ' +
+    'CPI YoY and 5Y breakeven are different methodologies — cross-currency real rate comparisons carry wider uncertainty for non-USD/EUR legs. ' +
+    'Data age column shows observation date — treat figures older than 6 months as indicative only.';
 
   return `<div class="rcm-cw" style="flex:1;min-height:0;overflow:auto;">
     <div class="rcm-ct">Real Rate Carry Ranking — G8 Central Banks · sorted by real rate descending</div>
@@ -446,12 +448,23 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   const realSpread = (rrL  != null && rrS  != null) ? rrL  - rrS  : null;
 
   // HV30 for the pair
+  // Uses FX market convention lookup table matching HV30_FX_PAIRS in fetch_intraday_quotes.py.
+  // Pure alphabetical is WRONG for crosses: EUR/AUD key is 'euraud' not 'audeur',
+  // GBP/CHF is 'gbpchf' not 'chfgbp', NZD/JPY is 'nzdjpy' not 'jpynzd'.
   function pairId(a, b) {
-    const USD_MAJORS = { 'EURUSD':1,'GBPUSD':1,'AUDUSD':1,'NZDUSD':1,'USDJPY':1,'USDCHF':1,'USDCAD':1 };
-    const c1 = a + b, c2 = b + a;
-    if (USD_MAJORS[c1]) return c1.toLowerCase();
-    if (USD_MAJORS[c2]) return c2.toLowerCase();
-    return (a < b ? a + b : b + a).toLowerCase();
+    const HV30_PAIRS = new Set([
+      'eurusd','gbpusd','usdjpy','audusd','usdchf','usdcad','nzdusd',
+      'eurgbp','eurjpy','eurchf','eurcad','euraud',
+      'gbpjpy','gbpchf','gbpcad',
+      'audjpy','audnzd','audchf',
+      'cadjpy','chfjpy','nzdjpy',
+      'eurnzd','gbpaud','gbpnzd','audcad','cadchf','nzdcad','nzdchf',
+    ]);
+    const c1 = (a + b).toLowerCase();
+    const c2 = (b + a).toLowerCase();
+    if (HV30_PAIRS.has(c1)) return c1;
+    if (HV30_PAIRS.has(c2)) return c2;
+    return a < b ? c1 : c2;
   }
   const pid  = pairId(longCcy, shortCcy);
   const hv30 = d.hv30Map[pid] ?? null;
