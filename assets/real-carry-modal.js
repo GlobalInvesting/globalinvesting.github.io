@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// REAL RATE CARRY MODAL  v1.3
+// REAL RATE CARRY MODAL  v1.4
 // File: assets/real-carry-modal.js
 //
 // Architecture:
@@ -19,15 +19,15 @@
 // Inflation expectation sources (in priority order):
 //   USD: FRED T5YIE   — 5Y breakeven inflation, market-derived, daily
 //   EUR: FRED T5YIFR  — EUR 5Y5Y inflation swap rate, daily
-//   GBP: extended-data/GBP.json — CPI YoY (OECD SDMX MEI, weekly batch)
-//   JPY: extended-data/JPY.json — CPI YoY (OECD SDMX MEI, weekly batch)
-//   AUD: extended-data/AUD.json — CPI YoY (OECD SDMX MEI, weekly batch)
-//   CAD: extended-data/CAD.json — CPI YoY (OECD SDMX MEI, weekly batch)
-//   CHF: extended-data/CHF.json — CPI YoY (OECD SDMX MEI, weekly batch)
-//   NZD: extended-data/NZD.json — CPI YoY (OECD SDMX MEI, weekly batch)
+//   GBP: extended-data/GBP.json — CPI YoY (OECD SDMX MEI CPALTT01.ST → index-to-YoY, weekly batch)
+//   JPY: extended-data/JPY.json — CPI YoY (OECD SDMX MEI CPALTT01.ST → index-to-YoY, weekly batch)
+//   AUD: extended-data/AUD.json — CPI YoY (OECD SDMX MEI CPALTT01.ST → index-to-YoY, weekly batch)
+//   CAD: extended-data/CAD.json — CPI YoY (OECD SDMX MEI CPALTT01.ST → index-to-YoY, weekly batch)
+//   CHF: extended-data/CHF.json — CPI YoY (OECD SDMX MEI CPALTT01.ST → index-to-YoY, weekly batch)
+//   NZD: extended-data/NZD.json — CPI YoY (OECD SDMX MEI CPALTT01.ST → index-to-YoY, weekly batch)
 //
 // Note: extended-data/{CCY}.json is written weekly by update-inflation-expectations.yml
-// (runs Mondays 06:00 UTC). G6 data sourced from OECD SDMX MEI (CPALTT01 YoY).
+// (runs Mondays 06:00 UTC). G6 data sourced from OECD SDMX MEI (CPALTT01.ST index → YoY).
 // USD/EUR use live FRED breakevens at open.
 // ═══════════════════════════════════════════════════════════════════════════
 
