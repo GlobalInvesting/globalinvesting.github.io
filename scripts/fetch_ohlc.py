@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_ohlc.py  v1.5 — Daily OHLC history for Lightweight Charts
+fetch_ohlc.py  v1.7 — Daily OHLC history for Lightweight Charts
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Downloads 3 years of daily OHLC bars via yfinance for all symbols
 used by the Lightweight Charts panel (replaces TradingView widget).
@@ -216,7 +216,7 @@ NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vi
 # trading (23:00–00:00 UTC). 1H aggregation over the CME boundary produces
 # correct session opens, proper H/L ranges, and real overnight gaps — matching
 # Bloomberg and TradingView CME Gold daily candles.
-CME_SYMBOLS = {'gold'}
+CME_SYMBOLS = {'gold', 'wti', 'dxy'}
 #
 # Routing rationale — three paths:
 #   FX pairs (28):    1H aggregation over the 21:00 UTC NY session boundary.
@@ -224,15 +224,19 @@ CME_SYMBOLS = {'gold'}
 #                     their cutoff, producing materially wrong H/L and unreliable opens.
 #                     1H aggregation matches Bloomberg, TradingView and Reuters FX candles.
 #
-#   CME instruments:  1H aggregation over the DST-aware CME session boundary
-#   (gold only now)   (22:00 UTC in EDT, 23:00 UTC in EST). Same hybrid approach as FX:
-#                     1H for recent 730 days, native 1D for older history.
-#                     dashboard.js strips the last bar and injects the live today-bar
-#                     from quotes.json, so the in-progress session is always current.
+#   CME/ICE instruments: 1H aggregation over the DST-aware session boundary.
+#   (gold, wti, dxy)  Gold/WTI: CME boundary = 17:00 ET (21:00 UTC EDT / 22:00 UTC EST).
+#                     DXY: ICE boundary = 17:00 ET — identical to CME in practice.
+#                     Both WTI and DXY were previously on native 1D which used UTC
+#                     midnight as its cutoff, producing bars with wrong session opens,
+#                     compressed H/L, and "ayer y hoy" mismatches vs TradingView.
+#                     Same hybrid approach as FX and Gold: 1H for recent 730 days,
+#                     native 1D for older history. dashboard.js strips the last bar
+#                     and injects the live today-bar from quotes.json.
 #
-#   Non-FX (10):      Native yfinance 1D — identical to the WTI approach that has
-#                     always worked. The intraday today-bar injection in dashboard.js
-#                     updates it with live data from quotes.json.
+#   Non-FX (8):       Native yfinance 1D — BTC, ETH, US10Y, SPX, Nasdaq, Stoxx,
+#                     Nikkei (via equity 1H), VIX. Their session boundaries coincide
+#                     closely enough with UTC midnight that native 1D is adequate.
 FX_SYMBOLS = set(SYMBOLS.keys()) - NON_FX_SYMBOLS
 
 # Crypto trades 24/7 — yfinance only returns Saturday/Sunday bars when an explicit
@@ -577,6 +581,174 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         return None
 
 
+# ── WTI crude oil + DXY dollar index: 1H → daily aggregation (CME/ICE boundary) ──
+
+def fetch_wti_dxy_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
+    """
+    Build WTI and DXY daily bars by aggregating 1H bars over the DST-aware CME/ICE
+    session boundary (17:00 ET = 21:00 UTC in EDT / 22:00 UTC in EST).
+
+    WTI (CME CL=F): trades Sunday 18:00 ET – Friday 17:00 ET. Session closes daily at
+    17:00 ET. yfinance native 1D uses UTC midnight, producing bars that mix two
+    consecutive sessions — open ≈ prev_close, H/L wrong relative to TradingView.
+
+    DXY (ICE DX-Y.NYB): same 17:00 ET daily boundary. Same UTC-midnight artifact.
+    At the 22:30 UTC OHLC run, native 1D for DXY returns a bar that starts at 00:00
+    UTC (mid-session) instead of at the 22:00/23:00 UTC session open — the opens are
+    systematically wrong and H/L exclude the early post-midnight session movement.
+
+    Hybrid approach (identical to Gold):
+    - 1H bars cover the most recent 730 days with correct session OHLC.
+    - Native 1D bars cover history older than 730 days (legacy; artifact rate lower).
+    - No prev_close open correction: futures have a genuine electronic session open.
+    - No back-adjustment: roll gaps appear as-is (front-month convention).
+
+    Weekend handling:
+    - WTI: Saturday has no trading session → Saturday bars dropped.
+    - DXY: Same — Saturday dropped.
+    - Sunday bars (from 18:00 ET Sunday open) fold into Monday's session_date.
+    """
+    try:
+        ticker = yf.Ticker(ticker_sym)
+        dec = DECIMALS.get(id_, 2)
+
+        # ── PART A: 1H bars → aggregate to daily (CME/ICE 17:00 ET boundary) ──
+        _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
+        _start_1h = _end_1h - timedelta(days=730)
+        hist_1h = ticker.history(
+            start=_start_1h.strftime("%Y-%m-%d"),
+            end=_end_1h.strftime("%Y-%m-%d"),
+            interval="1h",
+            auto_adjust=True,
+        )
+
+        # ── DST-aware session boundary (identical to Gold) ────────────────────
+        # CME WTI and ICE DXY both close at 17:00 ET daily.
+        # EDT (UTC−4, Apr–Oct): close = 21:00 UTC, reopen = 22:00 UTC.
+        # EST (UTC−5, Nov–Mar): close = 22:00 UTC, reopen = 23:00 UTC.
+        try:
+            from zoneinfo import ZoneInfo
+        except ImportError:
+            from backports.zoneinfo import ZoneInfo
+        _ny_now      = datetime.now(ZoneInfo("America/New_York"))
+        _ny_offset_h = int(_ny_now.utcoffset().total_seconds() / 3600)  # −4 EDT, −5 EST
+        _close_utc   = 17 + (-_ny_offset_h)   # 21 UTC in EDT, 22 UTC in EST
+        _reopen_utc  = 18 + (-_ny_offset_h)   # 22 UTC in EDT, 23 UTC in EST
+
+        _now_utc = datetime.now(timezone.utc)
+        _session_closed = _now_utc.hour >= _close_utc
+        if _session_closed:
+            run_date_utc = (_end_1h - timedelta(days=1)).date()  # today = last complete session
+        else:
+            run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday (today still open)
+
+        day_buckets: dict[str, dict] = {}
+        if not hist_1h.empty:
+            for ts, row in hist_1h.iterrows():
+                if ts.tzinfo is None:
+                    ts_utc = ts.replace(tzinfo=timezone.utc)
+                else:
+                    ts_utc = ts.astimezone(timezone.utc)
+
+                # Session boundary: 17:00 ET (DST-aware UTC hour = _reopen_utc).
+                # Hours 00–(_reopen_utc−1) belong to the session closing today.
+                # Hours _reopen_utc–23 open a new session that closes tomorrow.
+                if ts_utc.hour < _reopen_utc:
+                    session_date = ts_utc.date()
+                else:
+                    session_date = (ts_utc + timedelta(days=1)).date()
+
+                if session_date > run_date_utc:
+                    continue
+
+                date_str = session_date.strftime("%Y-%m-%d")
+                o = float(row["Open"])
+                h = float(row["High"])
+                l = float(row["Low"])
+                c = float(row["Close"])
+
+                if not (_guard(id_, c) and _guard(id_, o) and h >= l):
+                    continue
+                if o == h == l == c:
+                    continue
+                if id_ in HL_MAX_SPREAD and l > 0:
+                    if (h - l) / l > HL_MAX_SPREAD[id_]:
+                        continue
+
+                if date_str not in day_buckets:
+                    day_buckets[date_str] = {"open": o, "high": h, "low": l, "close": c}
+                else:
+                    b = day_buckets[date_str]
+                    b["high"]  = max(b["high"], h)
+                    b["low"]   = min(b["low"],  l)
+                    b["close"] = c
+
+        bars_1h: list[dict] = []
+        for date_str in sorted(day_buckets.keys()):
+            b = day_buckets[date_str]
+            d = datetime.strptime(date_str, "%Y-%m-%d")
+            if d.weekday() == 5:  # Saturday — no CME/ICE session
+                continue
+            if not _guard(id_, b["close"]):
+                continue
+            bars_1h.append({
+                "time":   date_str,
+                "open":   round(b["open"],  dec),
+                "high":   round(b["high"],  dec),
+                "low":    round(b["low"],   dec),
+                "close":  round(b["close"], dec),
+                "volume": 0,
+            })
+
+        # ── PART B: native 1D bars for period older than 730-day 1H limit ────
+        hist_1d = ticker.history(period=PERIOD, interval=INTERVAL, auto_adjust=True)
+        bars_1d_old: list[dict] = []
+        earliest_1h = bars_1h[0]["time"] if bars_1h else None
+
+        if not hist_1d.empty:
+            for ts, row in hist_1d.iterrows():
+                date_str = ts.strftime("%Y-%m-%d")
+                if earliest_1h and date_str >= earliest_1h:
+                    continue
+                o, h, l, c = float(row["Open"]), float(row["High"]), float(row["Low"]), float(row["Close"])
+                if not (_guard(id_, c) and _guard(id_, o) and h >= l and h >= c and l <= c):
+                    continue
+                if o == h == l == c:
+                    continue
+                if id_ in HL_MAX_SPREAD and l > 0:
+                    if (h - l) / l > HL_MAX_SPREAD[id_]:
+                        continue
+                vol = int(row["Volume"]) if "Volume" in row and not (row["Volume"] != row["Volume"]) else 0
+                bars_1d_old.append({
+                    "time":   date_str,
+                    "open":   round(o, dec),
+                    "high":   round(h, dec),
+                    "low":    round(l, dec),
+                    "close":  round(c, dec),
+                    "volume": vol,
+                })
+
+        # ── Merge: legacy 1D + 1H-aggregated (chronological) ─────────────────
+        combined = bars_1d_old + bars_1h
+        seen: set[str] = set()
+        deduped: list[dict] = []
+        for bar in reversed(combined):
+            if bar["time"] not in seen:
+                seen.add(bar["time"])
+                deduped.append(bar)
+        deduped.reverse()  # oldest to newest
+
+        if len(deduped) < 30:
+            print(f"  WARN [{id_}]: only {len(deduped)} valid bars after 1H aggregation - skipping")
+            return None
+
+        return deduped
+
+    except Exception as exc:
+        print(f"  ERROR [{id_}] (wti/dxy 1H agg): {exc}")
+        return None
+
+
 # ── Equity indices + US10Y + VIX: 1H → daily aggregation (NYSE 21:00 UTC) ───
 
 def fetch_equity_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
@@ -757,7 +929,9 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     if id_ in FX_SYMBOLS:
         return fetch_fx_ohlc_from_1h(id_, ticker_sym)
     if id_ in CME_SYMBOLS:
-        return fetch_gold_ohlc_from_1h(id_, ticker_sym)
+        if id_ == 'gold':
+            return fetch_gold_ohlc_from_1h(id_, ticker_sym)
+        return fetch_wti_dxy_ohlc_from_1h(id_, ticker_sym)
 
     try:
         ticker = yf.Ticker(ticker_sym)
