@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-05-07T06:34:21Z",
+  "generated_at": "2026-05-07T09:09:29Z",
   "signals": [
     {
-      "time": "06:33",
+      "time": "09:09",
       "priority": "critical",
-      "title": "NZD/CAD — G8 Bilateral Theme + Energy Shock",
-      "text": "NZD/CAD spread hits 1.265% as NZD leads G8 performance while CAD lags. Divergence is driven by BoC Governor Macklem's warning of consecutive hikes due to energy shocks, which is currently being outweighed by broader CAD weakness and NZD's hawkish RBNZ bias (hike priced for 27 May). NZD/USD carry at +150bp vs CAD's -150bp deficit against USD further separates the pair. Implication: NZD outperformance persists until RBNZ meeting or oil price stabilization.",
+      "title": "NZD/CAD — G8 Bilateral Theme + Peace Optimism",
+      "text": "NZD/CAD leads G8 performance as geopolitical de-escalation in the Middle East and falling oil prices ($93.2, -1.98%) punish the CAD laggard while supporting risk-sensitive NZD. The 1.393% spread between the G8 leader and laggard confirms a strong bilateral theme. Despite NZD's 1W outperformance, RBNZ 2.25% vs BoC 2.25% remains carry-neutral (0bp), suggesting the move is driven by commodity-linkage divergence and shifting risk sentiment rather than rate differentials. NZD/USD at 0.5976, USD/CAD at 1.3623.",
       "evidence": [
-        "NZD 1W avg: +0.632% (n=4)",
-        "CAD 1W avg: -0.633% (n=3)",
-        "G8 spread: 1.265%"
+        "NZD 1W avg: +0.819% (n=4)",
+        "CAD 1W avg: -0.574% (n=3)",
+        "G8 spread: 1.393%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "06:30",
+      "time": "09:06",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry + Intervention",
-      "text": "USD/JPY at 156.39 holding below the mid-156.00s as hopes for an imminent end to the US-Iran war weigh on the Dollar. Despite the 300bp Fed-BoJ carry supporting USD, JPY COT LF net short -88,543 (30.6% long) remains a crowded trade vulnerable to short-covering if geopolitical de-escalation continues. BoJ intervention risk remains the primary ceiling. Implication: Carry remains the structural bid, but headline-driven JPY covering limits upside ahead of US NFP.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -16,833 (long% 23.0%) represents a crowded spec fade against a hawkish RBNZ bias. While recent soft labor data caps tightening expectations, the RBNZ remains in a 'Hike' bias for the 27 May meeting. If the central bank maintains its hawkish stance, the extreme spec short positioning faces a significant unwind risk. NZD/USD at 0.5976 is testing the upper bound of recent ranges as USD funding stress eases (DXY -0.17%).",
+      "evidence": [
+        "NZD COT LF net: -16,833",
+        "RBNZ bias: Hike",
+        "NZD/USD: 0.5976"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "09:04",
+      "priority": "warning",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD/USD COT LF net long +48,299 (74.8% long) shows institutional conviction in the AUD carry story (RBA 4.35% vs Fed 3.75% — +60bp AUD premium). This diverges sharply from retail sentiment, where 89% of traders are short. This institutional vs retail divergence at an extreme level suggests retail capitulation risk if AUD/USD extends above 0.7260. Peace optimism and falling energy costs further support the AUD/CAD parity target mentioned in recent headlines.",
+      "evidence": [
+        "AUD COT LF net: +48,299",
+        "Retail sentiment: 89% short",
+        "AUD/USD: 0.726"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "09:01",
+      "priority": "warning",
+      "title": "EUR/USD — Correlation Break + Carry",
+      "text": "EUR/USD vs EuroStoxx correlation at +0.729 vs norm of -0.130 (z=+1.84σ) indicates a significant regime shift where the Euro is trading as a pure risk-on proxy rather than its historical inverse relationship with equities. Despite the 1W gain (+0.39%), EUR/USD upside is structurally limited by the -175bp carry deficit (ECB 2% vs Fed 3.75%). The pair at 1.1774 remains sensitive to US NFP data which determines if the Fed maintains its 'higher-for-longer' stance.",
+      "evidence": [
+        "EUR/USD vs EuroStoxx z-score: +1.84σ",
+        "Fed 3.75% vs ECB 2.0% — 175bp",
+        "EUR/USD: 1.1774"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "08:55",
+      "priority": "info",
+      "title": "USD/JPY — Carry vs Intervention Risk",
+      "text": "USD/JPY at 156.37 is supported by the 300bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 0.75%). While VIX at 17.5 (normal volatility) keeps carry trades attractive, the 160.00 level remains the critical watch zone for BoJ verbal warnings or physical intervention. JPY COT LF net short -88,543 (30.6% long) reflects a crowded carry trade that is vulnerable to rapid unwinds only if VIX spikes above 25 or the 16 June BoJ meeting delivers a hawkish surprise.",
       "evidence": [
         "Fed 3.75% vs BoJ 0.75% — 300bp",
         "JPY COT LF net: -88,543",
-        "USD/JPY: 156.39"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "06:28",
-      "priority": "warning",
-      "title": "AUD/USD — Positioning + Retail Divergence",
-      "text": "AUD/USD at 0.7245 shows a sharp divergence between institutional and retail sentiment. COT LF net long +48,299 (74.8% long) indicates heavy institutional backing, while retail is 89% short, fading the 1M +5.23% rally. RBA 4.35% vs Fed 3.75% provides a +60bp carry premium for AUD. Implication: Extreme retail short positioning suggests a potential 'pain trade' higher if NFP data underwhelms, targeting 0.7300.",
-      "evidence": [
-        "AUD COT LF net: +48,299",
-        "Retail: 89% short",
-        "RBA 4.35% vs Fed 3.75% — +60bp"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "06:25",
-      "priority": "warning",
-      "title": "EUR/USD — Correlation Break + US NFP",
-      "text": "EUR/USD at 1.1749 vs EuroStoxx correlation at +0.720 (z=+1.96σ) marks a significant break from the -0.145 norm. EUR is currently trading as a high-beta risk asset rather than a funding currency. With the Fed on hold at 3.75% and ECB at 2.0% (+175bp USD advantage), the pair's 1M +2.08% gain faces a reality check at today's US NFP release. Implication: EUR/USD upside is structurally limited by the carry deficit unless NFP triggers a broad USD liquidation.",
-      "evidence": [
-        "EUR/USD vs EuroStoxx z-score: +1.96σ",
-        "Fed 3.75% vs ECB 2.0% — +175bp",
-        "EUR/USD: 1.1749"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "06:20",
-      "priority": "info",
-      "title": "USD/CHF — Carry vs Safe-Haven Flow",
-      "text": "USD/CHF at 0.7792 remains supported by a massive +375bp carry advantage (Fed 3.75% vs SNB 0.0%). VIX at 17.4 (normal volatility) suggests safe-haven demand for CHF is marginal, leaving the pair sensitive to US yield shifts. Bull Flattener regime (2s10s +42.6bp) indicates tightening cycle dominance. Implication: USD/CHF remains a carry-positive long while VIX stays below 25, with watch level at 0.7850.",
-      "evidence": [
-        "Fed 3.75% vs SNB 0.0% — +375bp",
-        "VIX: 17.4 (normal volatility)",
-        "USD/CHF: 0.7792"
+        "USD/JPY: 156.369"
       ],
       "_source": "gemini"
     }
