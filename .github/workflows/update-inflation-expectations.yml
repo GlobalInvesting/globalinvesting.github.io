@@ -11,6 +11,12 @@ name: Update Inflation Expectations
 #   extended-data/{USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD}.json
 #   inflationExpectations field only (non-destructive patch — all other fields preserved).
 #
+# Source cascade per currency:
+#   USD / EUR  FRED breakeven (T5YIE / T5YIFR) — market-implied, daily
+#   G6 others  1. economic-data/{CCY}.json (calendar actuals — daily, freshest)
+#              2. FRED CPI index → YoY  (1–18 month lag — OECD series)
+#              3. World Bank FP.CPI.TOTL.ZG  (annual, last resort)
+#
 # Data sources (all public, no API keys required):
 #   USD  FRED T5YIE    (5Y breakeven, daily — market-implied)
 #   EUR  FRED T5YIFR   (EUR 5Y5Y swap, daily — market-implied)
@@ -69,6 +75,7 @@ jobs:
       - name: Fetch inflation expectations
         env:
           SITE_DIR: .
+          ECON_DATA_DIR: ./economic-data   # read by read_econ_data() — freshest CPI source
         run: python3 scripts/fetch_inflation_expectations.py
 
       - name: Display summary
@@ -115,7 +122,7 @@ jobs:
               echo "No changes vs remote HEAD — skipping commit."
               exit 0
             fi
-            git commit -m "Inflation expectations ${TIMESTAMP} — G8 (FRED/WB)"
+            git commit -m "Inflation expectations ${TIMESTAMP} — G8 (FRED/WB/calendar)"
             if git push origin main; then
               echo "✅ Push succeeded on attempt $i."
               exit 0
