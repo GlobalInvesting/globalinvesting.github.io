@@ -1,0 +1,127 @@
+name: Update Inflation Expectations
+
+# Runs weekly on Mondays at 06:00 UTC.
+#
+# Why Monday 06:00 UTC:
+#   FRED CPI releases happen mid-month. A weekly Monday run picks up any prior-week
+#   release within 7 days — acceptable for monthly/quarterly CPI data.
+#   06:00 UTC is off-peak for FRED and World Bank APIs.
+#
+# What this writes:
+#   extended-data/{USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD}.json
+#   inflationExpectations field only (non-destructive patch — all other fields preserved).
+#
+# Data sources (all public, no API keys required):
+#   USD  FRED T5YIE    (5Y breakeven, daily — market-implied)
+#   EUR  FRED T5YIFR   (EUR 5Y5Y swap, daily — market-implied)
+#   GBP  FRED GBRCPIALLMINMEI → YoY (monthly)
+#   JPY  FRED JPNCPIALLMINMEI → YoY (monthly)
+#   AUD  FRED AUSCPIALLQINMEI → YoY (quarterly)
+#   CAD  FRED CANCPIALLMINMEI → YoY (monthly)
+#   CHF  FRED CHECPIALLMINMEI → YoY (monthly)
+#   NZD  FRED NZLCPIALLQINMEI → YoY (quarterly)
+#   All currencies fall back to World Bank FP.CPI.TOTL.ZG when FRED fails.
+#
+# Relationship to the Real Rate Carry modal:
+#   The modal fetches T5YIE / T5YIFR live (USD/EUR). For the remaining 6 currencies
+#   the modal reads extended-data (this workflow's output).
+#   USD/EUR are also included here so extended-data stays fresh as a fallback when
+#   the live FRED fetch fails, and as an independent weekly audit baseline.
+#
+# Placement: PUBLIC repo — no API keys, no proprietary logic.
+# Public repos have unlimited GitHub Actions minutes.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # Monday 06:00 UTC
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
+concurrency:
+  group: update-inflation-expectations
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-inflation-expectations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p extended-data
+
+      - name: Fetch inflation expectations
+        env:
+          SITE_DIR: .
+        run: python3 scripts/fetch_inflation_expectations.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "   INFLATION EXPECTATIONS SUMMARY"
+          echo "========================================"
+          for ccy in USD EUR GBP JPY AUD CAD CHF NZD; do
+            if [ -f "extended-data/${ccy}.json" ]; then
+              python3 -c "
+          import json
+          with open('extended-data/${ccy}.json') as f:
+              d = json.load(f)
+          ie_val  = d.get('data',  {}).get('inflationExpectations')
+          ie_date = d.get('dates', {}).get('inflationExpectations')
+          if ie_val is not None:
+              print(f'  ${ccy}  {ie_val:+.4f}%  ({ie_date})')
+          else:
+              print(f'  ${ccy}  — (no inflationExpectations field)')
+          "
+            fi
+          done
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp -r extended-data/ /tmp/ie_fresh/
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp -r /tmp/ie_fresh/. extended-data/
+            git add extended-data/USD.json extended-data/EUR.json \
+                    extended-data/GBP.json extended-data/JPY.json \
+                    extended-data/AUD.json extended-data/CAD.json \
+                    extended-data/CHF.json extended-data/NZD.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "Inflation expectations ${TIMESTAMP} — G8 (FRED/WB)"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0
