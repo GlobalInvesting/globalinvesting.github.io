@@ -2907,7 +2907,9 @@ function _lwBuildTodayBar(ohlcId) {
   })();
   // CME close = 17:00 ET; reopen = 18:00 ET.  Boundary = reopen hour in UTC.
   const _cmeBoundaryUTC = 18 + (-_nyOffsetH);   // 22 in EDT (offset −4), 23 in EST (offset −5)
-  const _NON_FX_BOUNDARIES = { gold: _cmeBoundaryUTC, wti: _cmeBoundaryUTC, dxy: 22 };
+  // DXY (ICE) has the same 17:00 ET daily boundary as CME Gold/WTI — make it DST-aware too.
+  // Previously hardcoded to 22, which was wrong in EST (should be 23).
+  const _NON_FX_BOUNDARIES = { gold: _cmeBoundaryUTC, wti: _cmeBoundaryUTC, dxy: _cmeBoundaryUTC };
   let dateStr;
   if (isFxBar) {
     const hourUTC = nowUTC.getUTCHours();
@@ -3174,7 +3176,8 @@ async function _renderLWChart(ohlcId, label) {
         if (_m) _nyOff = parseInt(_m[1], 10);
       } catch (_) {}
       const _cmeBd = 18 + (-_nyOff);  // 22 in EDT, 23 in EST
-      return { gold: _cmeBd, wti: _cmeBd, dxy: 22 };
+      // DXY (ICE) same 17:00 ET boundary as CME — make it DST-aware (was hardcoded 22).
+      return { gold: _cmeBd, wti: _cmeBd, dxy: _cmeBd };
     })();
     let   _stripFrom;
     if (_isFxStrip && _hourUTC >= 21) {
