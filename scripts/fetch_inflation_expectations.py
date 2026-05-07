@@ -1,834 +1,416 @@
+#!/usr/bin/env python3
 """
-fetch_inflation_expectations.py  v4.1
-──────────────────────────────────────
-Fetches inflation expectations for all G8 currencies and writes
-inflationExpectations into extended-data/{CCY}.json (non-destructive patch).
+fetch_inflation_expectations.py  —  v4.2
+=========================================
+Fetch CPI inflation (proxy for inflation expectations) for G8 FX currencies
+and patch extended-data/{CCY}.json with the result.
 
-Runs weekly (Mondays 06:00 UTC) from the PUBLIC site repo — no API keys required.
+PRIMARY source cascade (per currency):
+  USD  →  FRED T5YIE          (5-year breakeven, market-implied, daily)
+  EUR  →  FRED T5YIFR         (EUR 5Y5Y breakeven, market-implied, daily)
+  G6   →  OECD Data Explorer SDMX CSV
+             Endpoint: sdmx.oecd.org/public/rest/data/
+                       OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/
+             Key: {country}.{M|Q}.N.CPI.PA._T.N.GY
+             Format: csvfilewithlabels (TRANSFORMATION=GY = annual % change)
+             Lag: ~4–6 weeks from national release
+       →  FRED API index series (OECD MEI mirror, ~12–14 month structural lag)
+       →  World Bank API (annual, always >12 months old)
 
-CHANGELOG v4.1 (bug-fix release)
-──────────────────────────────────
-Six bugs fixed from the first v4.0 GHA run:
+Architecture note (v4.2):
+  FRED OECD MEI series (GBRCPIALLMINMEI etc.) have a ~12–14 month structural lag
+  as of 2026 — they are updated ~annually by OECD MEI and FRED mirrors them
+  with no faster update cycle. They will always fail the 120-day stale guard.
+  OECD Data Explorer (sdmx.oecd.org) uses the same underlying data but updates
+  within ~4–6 weeks of national release — the correct primary source.
 
-  1. headers conflict (ABS, Stats NZ): _get() was called with both headers=HEADERS (base)
-     and headers=custom_headers in kwargs → TypeError. Fixed by removing the hardcoded
-     headers= from requests.get(); callers now pass custom_headers kwarg explicitly.
-
-  2. ONS URL wrong path order: /v1/datasets/mm23/timeseries/D7G7/data is 404.
-     Correct ONS Timeseries API v1 path: /v1/timeseries/D7G7/dataset/mm23/data.
-     Added second URL attempt with the original path as fallback.
-
-  3. SNB cube ID wrong: pkcpival was discontinued.
-     Correct cube: plkopr ("Consumer prices – total"), CSV format.
-     URL: https://data.snb.ch/api/cube/plkopr/data/csv/en
-
-  4. JPY -1.5% wrong value: e-Stat CSV parser matched the wrong 総合 row.
-     The cpim.csv file has multiple sections; the first 総合 row in the context of
-     前年同月比 was a sub-category. Fixed by using the e-Stat REST API directly with
-     the explicit statsDataId for 消費者物価指数 All Items YoY, with URL-based CSV
-     as fallback. Also added a validity guard: JPY CPI YoY must be > -3.0% (deflation
-     floor — Japan has never had worse than -2.5% in modern history).
-
-  5. StatsCan connection timeout: WDS API (getDataFromCubePidCoordAndLatestNPeriods)
-     returns 404 or times out in GHA. Added FRED CANCPIALLMINMEI as immediate step 2
-     before the vector resolution fallback.
-
-  6. Stats NZ OData: same headers kwarg conflict as ABS (fixed by item 1).
+Output: patches extended-data/{CCY}.json in the site repo, preserving all
+  other fields. Only updates inflationExpectations + dates.inflationExpectations.
 """
 
+import os
+import sys
 import csv
 import json
-import os
-import re
-import sys
-from datetime import datetime, timedelta, timezone
+import datetime
+import requests
 from io import StringIO
 
-try:
-    import requests
-except ImportError:
-    print("::error::requests not installed — run: pip install requests --break-system-packages")
-    sys.exit(1)
+# ---------------------------------------------------------------------------
+# Config
+# ---------------------------------------------------------------------------
 
-# ── Config ─────────────────────────────────────────────────────────────────
+FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
 
-SITE_DIR = os.environ.get("SITE_DIR", ".")
-OUT_DIR  = os.path.join(SITE_DIR, "extended-data")
-os.makedirs(OUT_DIR, exist_ok=True)
-
-UA = "globalinvesting-bot/4.1 (https://globalinvesting.github.io)"
 BASE_HEADERS = {
-    "User-Agent": UA,
-    "Accept":     "application/json, text/csv;q=0.9, */*;q=0.8",
+    "User-Agent": "GlobalInvesting-FX-Terminal/4.2 (+https://globalinvesting.github.io)"
 }
 
-def _gha_warning(msg: str) -> None:
-    print(f"::warning::{msg}", flush=True)
-
-def _gha_error(msg: str) -> None:
-    print(f"::error::{msg}", flush=True)
-
-MAX_AGE = {
-    "USD": 10,
-    "EUR": 10,
-    "GBP": 120,
-    "JPY": 120,
-    "AUD": 200,
-    "CAD": 120,
-    "CHF": 120,
-    "NZD": 200,
+STALE_DAYS = {
+    "monthly":   120,
+    "quarterly": 210,   # AUD, NZD quarterly CPI
+    "market":     10,   # USD, EUR breakevens
 }
 
-# ── Shared helpers ────────────────────────────────────────────────────────────
+OECD_COUNTRY = {
+    "GBP": "GBR",
+    "JPY": "JPN",
+    "AUD": "AUS",
+    "CAD": "CAN",
+    "CHF": "CHE",
+    "NZD": "NZL",
+}
 
-def _get(url: str, custom_headers: dict | None = None, **kwargs) -> "requests.Response | None":
-    """
-    GET with timeout. Uses BASE_HEADERS merged with custom_headers.
-    Callers that need custom Accept headers pass custom_headers={"Accept": "..."}.
-    This avoids the TypeError from passing headers= twice via **kwargs.
-    """
-    headers = {**BASE_HEADERS, **(custom_headers or {})}
+FRED_INDEX_SERIES = {
+    "GBP": ("GBRCPIALLMINMEI",  "monthly"),
+    "JPY": ("JPNCPIALLMINMEI",  "monthly"),
+    "AUD": ("AUSCPIALLQINMEI",  "quarterly"),
+    "CAD": ("CANCPIALLMINMEI",  "monthly"),
+    "CHF": ("CHECPIALLMINMEI",  "monthly"),
+    "NZD": ("NZLCPIALLQINMEI",  "quarterly"),
+}
+
+WB_COUNTRY = {
+    "GBP": "GB", "JPY": "JP", "AUD": "AU",
+    "CAD": "CA", "CHF": "CH", "NZD": "NZ",
+}
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _get(url, custom_headers=None, **kwargs):
+    h = {**BASE_HEADERS, **(custom_headers or {})}
+    return requests.get(url, headers=h, timeout=20, **kwargs)
+
+
+def _parse_date(s):
+    s = str(s).strip()
+    if len(s) == 7:
+        s += "-01"
+    return datetime.date.fromisoformat(s)
+
+
+def _is_stale(obs_date, freq):
+    threshold = STALE_DAYS.get(freq, 120)
+    return (datetime.date.today() - obs_date).days > threshold
+
+
+def _yoy_from_index(series):
+    if len(series) < 2:
+        return None
+    last_date, last_val = series[-1]
+    target_prior = datetime.date(last_date.year - 1, last_date.month, 1)
+    best = None
+    for d, v in series:
+        diff = abs((d - target_prior).days)
+        if diff <= 92:
+            if best is None or diff < best[0]:
+                best = (diff, d, v)
+    if best is None:
+        return None
+    _, _, prior_val = best
+    if prior_val == 0:
+        return None
+    return round((last_val / prior_val - 1) * 100, 4), last_date
+
+
+# ---------------------------------------------------------------------------
+# USD / EUR  —  FRED breakevens
+# ---------------------------------------------------------------------------
+
+def fetch_fred_breakeven(series_id, currency, label):
+    url = (
+        f"https://api.stlouisfed.org/fred/series/observations"
+        f"?series_id={series_id}&sort_order=desc&limit=5&file_type=json"
+        f"&api_key={FRED_API_KEY}"
+    )
     try:
-        r = requests.get(url, headers=headers, timeout=25, **kwargs)
-        return r
+        r = _get(url)
+        r.raise_for_status()
+        obs = r.json().get("observations", [])
+        for o in obs:
+            if o.get("value") not in (".", ""):
+                val = float(o["value"])
+                date = _parse_date(o["date"])
+                if not _is_stale(date, "market"):
+                    print(f"    ✓ {currency}: {val:.4f}% ({date}) [{label}]")
+                    return val, date, label
+        print(f"    ✗ {currency}: {label} — no recent observations")
+        return None
     except Exception as e:
-        print(f"    GET {url[:70]}: {e}")
+        print(f"    ✗ {currency}: {label} error — {e}")
         return None
 
 
-def index_to_yoy(obs: list) -> tuple:
-    """
-    Compute YoY % from list of (date_str, index_float) sorted descending.
-    Finds observation closest to 12 months prior (75-day tolerance).
-    """
-    if len(obs) < 2:
-        return None, None
-    parsed = []
-    for dt_s, v in obs:
-        try:
-            parsed.append((datetime.strptime(dt_s[:10], "%Y-%m-%d"), float(v)))
-        except (ValueError, TypeError):
-            continue
-    if not parsed:
-        return None, None
-    parsed.sort(key=lambda x: x[0], reverse=True)
-    d_curr, v_curr = parsed[0]
-    target = d_curr - timedelta(days=365)
-    best_val, best_diff = None, float("inf")
-    for d, v in parsed[1:]:
-        diff = abs((d - target).days)
-        if diff < best_diff:
-            best_diff, best_val = diff, v
-    if best_val is None or best_diff > 75 or best_val == 0:
-        return None, None
-    return d_curr.strftime("%Y-%m-%d"), round((v_curr / best_val - 1) * 100, 4)
+# ---------------------------------------------------------------------------
+# G6 PRIMARY  —  OECD Data Explorer SDMX CSV
+# Key structure: {country}.{M|Q}.N.CPI.PA._T.N.GY
+# TRANSFORMATION=GY = annual % change (YoY)
+# AUS and NZD: quarterly (Q); all others: monthly (M)
+# ---------------------------------------------------------------------------
 
-
-def is_stale(date_str: str, ccy: str) -> bool:
-    if not date_str:
-        return True
+def fetch_oecd_explorer(currency):
+    country = OECD_COUNTRY[currency]
+    freq_code = "Q" if currency in ("AUD", "NZD") else "M"
+    key = f"{country}.{freq_code}.N.CPI.PA._T.N.GY"
+    url = (
+        f"https://sdmx.oecd.org/public/rest/data/"
+        f"OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/{key}"
+        f"?startPeriod=2024-01&dimensionAtObservation=AllDimensions"
+        f"&format=csvfilewithlabels"
+    )
+    label = f"OECD Data Explorer CPI YoY ({country})"
+    print(f"    Trying OECD Data Explorer ({country} {freq_code} GY)…")
     try:
-        age = (datetime.now(timezone.utc).replace(tzinfo=None)
-               - datetime.strptime(date_str[:10], "%Y-%m-%d")).days
-        return age > MAX_AGE.get(ccy, 120)
-    except (ValueError, TypeError):
-        return True
+        r = _get(url, custom_headers={"Accept": "text/csv"})
+        if r.status_code != 200:
+            print(f"    ✗ {currency}: OECD Explorer HTTP {r.status_code}")
+            return None
 
-
-def _valid(val, lo: float = -5.0, hi: float = 25.0) -> bool:
-    return val is not None and lo < val < hi
-
-
-# ── FRED CSV (no API key) ─────────────────────────────────────────────────────
-
-def fred_csv(series_id: str, start_year: int = 2019) -> list:
-    """Returns [(date_str, float), …] sorted descending."""
-    r = _get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}")
-    if not r or r.status_code != 200:
-        if r:
-            print(f"    FRED {series_id}: HTTP {r.status_code}")
-        return []
-    rows = []
-    for row in csv.reader(StringIO(r.text)):
-        if len(row) != 2 or row[0] == "DATE" or row[1].strip() in (".", "", "NA"):
-            continue
-        try:
-            dt = datetime.strptime(row[0].strip(), "%Y-%m-%d")
-            if dt.year >= start_year:
-                rows.append((dt.strftime("%Y-%m-%d"), float(row[1])))
-        except (ValueError, TypeError):
-            continue
-    rows.sort(key=lambda x: x[0], reverse=True)
-    return rows
-
-
-def fred_index_yoy(series_id: str) -> tuple:
-    """Fetch FRED index series and compute YoY %."""
-    return index_to_yoy(fred_csv(series_id))
-
-
-# ── ECB SDMX ─────────────────────────────────────────────────────────────────
-
-def ecb_hicp_yoy(area_code: str = "U2") -> tuple:
-    """ECB ICP SDMX — HICP YoY for Eurozone (U2) or GB (Eurostat HICP)."""
-    key = f"M.{area_code}.N.000000.4.ANR"
-    r = _get(f"https://data-api.ecb.europa.eu/service/data/ICP/{key}",
-             params={"lastNObservations": 3, "format": "jsondata", "detail": "dataonly"})
-    if not r or not r.ok:
-        if r:
-            print(f"    ECB HICP {area_code}: HTTP {r.status_code}")
-        return None, None
-    try:
-        data = r.json()
-        sd = data.get("dataSets", [{}])[0].get("series", {})
-        dims = data.get("structure", {}).get("dimensions", {}).get("observation", [])
-        time_dim = next((d.get("values", []) for d in dims if d.get("id") == "TIME_PERIOD"), [])
-        if not sd or not time_dim:
-            return None, None
-        obs = next(iter(sd.values())).get("observations", {})
-        for idx_str, vals in sorted(obs.items(), key=lambda x: int(x[0]), reverse=True):
-            idx = int(idx_str)
-            v = vals[0] if vals else None
-            if v is not None and idx < len(time_dim):
-                p = time_dim[idx].get("id", "")
-                date_str = (p + "-01") if len(p) == 7 else p
-                return date_str, round(float(v), 4)
-    except Exception as e:
-        print(f"    ECB HICP {area_code}: parse error — {e}")
-    return None, None
-
-
-# ── World Bank ────────────────────────────────────────────────────────────────
-
-def wb_cpi_yoy(iso2: str) -> tuple:
-    """Annual CPI YoY from World Bank — last resort."""
-    r = _get(f"https://api.worldbank.org/v2/country/{iso2}/indicator/FP.CPI.TOTL.ZG",
-             params={"format": "json", "mrv": 3, "per_page": 5})
-    if not r or not r.ok:
-        return None, None
-    try:
-        payload = r.json()
-        if len(payload) >= 2:
-            for entry in payload[1]:
-                if entry.get("value") is not None:
-                    yr = entry.get("date", "")
-                    return f"{yr}-06-15", round(float(entry["value"]), 4)
-    except Exception as e:
-        print(f"    WB {iso2}: {e}")
-    return None, None
-
-
-# ── JSON patch ────────────────────────────────────────────────────────────────
-
-def patch_json(ccy: str, val: float, date_str: str) -> bool:
-    path = os.path.join(OUT_DIR, f"{ccy}.json")
-    try:
-        d = json.load(open(path)) if os.path.exists(path) else {}
-        d.setdefault("data", {})
-        d.setdefault("dates", {})
-        d["data"]["inflationExpectations"]  = val
-        d["dates"]["inflationExpectations"] = date_str
-        with open(path, "w") as f:
-            json.dump(d, f, separators=(",", ":"))
-        return True
-    except Exception as e:
-        print(f"    patch_json {ccy}: {e}")
-        return False
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# NATIONAL STATISTICS OFFICE APIs
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# ── GBP: ONS (Office for National Statistics) ────────────────────────────────
-
-def ons_cpi_yoy() -> tuple:
-    """
-    ONS Timeseries API — CPI All Items, 12-month rate (series D7G7, dataset mm23).
-    Correct v1 path: /v1/timeseries/{series}/dataset/{dataset}/data
-    Returns (date_str YYYY-MM-DD, yoy_pct) or (None, None).
-    """
-    # Try correct v1 path first, then the reversed path as fallback
-    urls = [
-        "https://api.ons.gov.uk/v1/timeseries/D7G7/dataset/mm23/data",
-        "https://api.ons.gov.uk/v1/datasets/mm23/timeseries/D7G7/data",
-    ]
-    for url in urls:
-        r = _get(url)
-        if not r or r.status_code != 200:
-            if r:
-                print(f"    ONS API ({url[-30:]}): HTTP {r.status_code}")
-            continue
-        try:
-            data = r.json()
-            months = data.get("months", [])
-            if not months:
-                print(f"    ONS API: empty months — trying next URL")
-                continue
-            latest = months[0]
-            date_str_raw = latest.get("date", "")   # e.g. "2026 MAR"
-            val_str = latest.get("value", "")
-            try:
-                dt = datetime.strptime(date_str_raw.strip(), "%Y %b")
-            except ValueError:
-                try:
-                    dt = datetime.strptime(date_str_raw.strip(), "%Y %B")
-                except ValueError:
-                    print(f"    ONS API: unparseable date '{date_str_raw}'")
-                    continue
-            return dt.strftime("%Y-%m-01"), round(float(val_str), 4)
-        except Exception as e:
-            print(f"    ONS API: parse error — {e}")
-    return None, None
-
-
-# ── JPY: Statistics Bureau Japan ──────────────────────────────────────────────
-
-def estatjp_cpi_yoy() -> tuple:
-    """
-    Statistics Bureau Japan — CPI All Items YoY % via e-Stat REST API.
-    statsDataId 0003427113 = Monthly CPI, All Japan, All Items, YoY change (前年同月比).
-
-    Falls back to the cpim.csv approach if API fails.
-    JPY validity: -3.0% < val < 8.0% (Japan's modern CPI range)
-    """
-    # e-Stat REST API — no key required for basic queries with limited results
-    url = ("https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"
-           "?statsDataId=0003427113&metaGetFlg=N&cntGetFlg=N"
-           "&explanationGetFlg=N&annotationGetFlg=N&sectionHeaderFlg=1"
-           "&replaceSpChars=0&limit=3&startPosition=1&lang=J")
-    r = _get(url)
-    if r and r.status_code == 200:
-        try:
-            data = r.json()
-            values = (data.get("GET_STATS_DATA", {})
-                         .get("STATISTICAL_DATA", {})
-                         .get("DATA_INF", {})
-                         .get("VALUE", []))
-            # Find All Items (品目コード = 0000) entries
-            for v in values:
-                cat = v.get("@cat01", "") or v.get("@itemCode", "")
-                if cat == "0000":  # All Items
-                    period = v.get("@time", "")  # e.g. "2026000003" = 2026/March
-                    val_s = v.get("$", "")
-                    if period and val_s and val_s not in ("…", "-", ""):
-                        # Period format: YYYYMM00NN where NN = month
-                        yr = period[:4]
-                        mn = period[6:8] if len(period) >= 8 else "01"
-                        try:
-                            dt_str = f"{yr}-{mn}-01"
-                            datetime.strptime(dt_str, "%Y-%m-%d")  # validate
-                            val = float(val_s)
-                            if _valid(val, lo=-3.0, hi=8.0):
-                                return dt_str, round(val, 4)
-                        except (ValueError, TypeError):
-                            continue
-        except Exception as e:
-            print(f"    e-Stat API: {e}")
-
-    # Fallback: Stats Japan cpim.csv — YoY table (not index table)
-    return _estatjp_csv_yoy()
-
-
-def _estatjp_csv_yoy() -> tuple:
-    """
-    Stats Japan cpim.csv — parse the 前年同月比 (YoY) section for 総合 (All Items).
-    The CSV has multiple sections separated by blank lines.
-    The 前年同月比 section header identifies the YoY block.
-    """
-    url = "https://www.stat.go.jp/data/cpi/sokuhou/tsuki/zuhyou/cpim.csv"
-    r = _get(url)
-    if not r or r.status_code != 200:
-        if r:
-            print(f"    e-Stat CSV: HTTP {r.status_code}")
-        return None, None
-    try:
-        text = r.content.decode("shift_jis", errors="replace")
-        lines = text.splitlines()
-
-        # Find the 前年同月比 (YoY) section
-        yoy_section_start = None
-        for i, line in enumerate(lines):
-            if "前年同月比" in line and "指数" not in line:
-                yoy_section_start = i
-                break
-
-        if yoy_section_start is None:
-            print("    e-Stat CSV: 前年同月比 section not found")
-            return None, None
-
-        # Within the YoY section, find the date header row and the 総合 data row
-        section = lines[yoy_section_start:]
-        header_cols = None
-        for i, line in enumerate(section[:10]):  # Header should be within first 10 rows
-            if "年" in line and "月" in line:
-                cols = [c.strip() for c in line.split(",")]
-                if any("年" in c for c in cols):
-                    header_cols = cols
-                    # Data rows follow immediately
-                    for j in range(i + 1, min(i + 5, len(section))):
-                        data_line = section[j]
-                        if "総合" in data_line:
-                            data_cols = [c.strip() for c in data_line.split(",")]
-                            # Walk right-to-left to find latest non-empty value
-                            for k in range(len(header_cols) - 1, 0, -1):
-                                if k >= len(data_cols):
-                                    continue
-                                hdr = header_cols[k]
-                                val_s = data_cols[k].replace(" ", "")
-                                if not hdr or not val_s or "年" not in hdr:
-                                    continue
-                                try:
-                                    hdr_clean = hdr.replace("年", "-").replace("月", "")
-                                    dt = datetime.strptime(hdr_clean.strip(), "%Y-%m")
-                                    val = float(val_s)
-                                    if _valid(val, lo=-3.0, hi=8.0):
-                                        return dt.strftime("%Y-%m-01"), round(val, 4)
-                                except (ValueError, TypeError):
-                                    continue
-                    break
-    except Exception as e:
-        print(f"    e-Stat CSV: {e}")
-    return None, None
-
-
-# ── AUD: ABS (Australian Bureau of Statistics) SDMX API ──────────────────────
-
-def abs_cpi_yoy() -> tuple:
-    """
-    ABS SDMX-JSON API — CPI All Groups Australia, quarterly.
-    Uses custom_headers kwarg to avoid headers= conflict with _get().
-    """
-    url = "https://api.data.abs.gov.au/data/ABS,CPI,1.0.0/1.10001.10.50.Q"
-    r = _get(url,
-             custom_headers={"Accept": "application/vnd.sdmx.data+json;version=1.0"},
-             params={"startPeriod": "2023-Q1", "detail": "dataonly"})
-    if not r or r.status_code != 200:
-        if r:
-            print(f"    ABS SDMX: HTTP {r.status_code}")
-        return None, None
-    try:
-        data = r.json()
-        sd = data.get("dataSets", [{}])[0].get("series", {})
-        dims = (data.get("structure", {})
-                    .get("dimensions", {})
-                    .get("observation", []))
-        time_dim = next((d.get("values", []) for d in dims
-                         if d.get("id") == "TIME_PERIOD"), [])
-        if not sd or not time_dim:
-            print("    ABS SDMX: empty response")
-            return None, None
-        series = next(iter(sd.values()))
-        obs = series.get("observations", {})
-        rows = []
-        for idx_str, vals in obs.items():
-            idx = int(idx_str)
-            v = vals[0] if vals else None
-            if v is not None and idx < len(time_dim):
-                period = time_dim[idx].get("id", "")
-                if "Q" in period:
-                    qmap = {"Q1": "03", "Q2": "06", "Q3": "09", "Q4": "12"}
-                    parts = period.split("-")
-                    m = qmap.get(parts[1], "03") if len(parts) == 2 else "03"
-                    rows.append((f"{parts[0]}-{m}-15", float(v)))
-        rows.sort(key=lambda x: x[0], reverse=True)
-        return index_to_yoy(rows)
-    except Exception as e:
-        print(f"    ABS SDMX: {e}")
-    return None, None
-
-
-# ── CAD: Statistics Canada WDS API ───────────────────────────────────────────
-
-def statcan_cpi_yoy() -> tuple:
-    """
-    Statistics Canada WDS API — CPI All-Items Canada (Table 18-10-0004-01).
-    Fetches 15 months of index and computes YoY.
-    """
-    url = ("https://www150.statcan.gc.ca/t1/tbl1/en/dtbl!"
-           "getDataFromCubePidCoordAndLatestNPeriods/18100004/1.1/15")
-    r = _get(url)
-    if not r or r.status_code != 200:
-        if r:
-            print(f"    StatsCan WDS: HTTP {r.status_code}")
-        return None, None
-    try:
-        data = r.json()
-        obj = data.get("object", {})
-        pts = obj.get("vectorDataPoints", [])
-        rows = []
-        for pt in pts:
-            ref = pt.get("refPer", "")
-            val = pt.get("value")
-            if ref and val is not None:
-                try:
-                    dt = datetime.strptime(ref[:7], "%Y-%m")
-                    rows.append((dt.strftime("%Y-%m-01"), float(val)))
-                except (ValueError, TypeError):
-                    continue
-        rows.sort(key=lambda x: x[0], reverse=True)
-        return index_to_yoy(rows)
-    except Exception as e:
-        print(f"    StatsCan WDS: {e}")
-    return None, None
-
-
-# ── CHF: SNB Data Portal ──────────────────────────────────────────────────────
-
-def snb_cpi_yoy() -> tuple:
-    """
-    SNB Data Portal — Swiss CPI All items, monthly.
-    Cube: plkopr (Consumer prices – total). CSV format (JSON endpoint discontinued).
-    URL: https://data.snb.ch/api/cube/plkopr/data/csv/en
-    YoY computed from 12-month index delta.
-    """
-    url = "https://data.snb.ch/api/cube/plkopr/data/csv/en"
-    r = _get(url, custom_headers={"Accept": "text/csv, */*"})
-    if not r or r.status_code != 200:
-        if r:
-            print(f"    SNB CSV: HTTP {r.status_code}")
-        return None, None
-    try:
-        # SNB CSV format (after 3 header rows):
-        # Date;D0;Value
-        # 2026-03;T;108.42
-        # D0=T = Total (all items)
-        rows = []
-        lines = r.text.splitlines()
-        for line in lines:
-            if not line or line.startswith("#") or "Date" in line or "date" in line:
-                continue
-            parts = line.split(";")
-            if len(parts) < 3:
-                continue
-            date_s = parts[0].strip()
-            dim = parts[1].strip() if len(parts) > 1 else ""
-            val_s = parts[-1].strip()
-            # Filter for Total (T) or single-dimension rows
-            if dim not in ("T", "TOT", "", "0"):
-                continue
-            if not val_s or val_s in (".", "NA", "-"):
-                continue
-            try:
-                dt = datetime.strptime(date_s[:7], "%Y-%m")
-                rows.append((dt.strftime("%Y-%m-01"), float(val_s)))
-            except (ValueError, TypeError):
-                continue
-        rows.sort(key=lambda x: x[0], reverse=True)
+        reader = csv.DictReader(StringIO(r.text))
+        rows = list(reader)
         if not rows:
-            print("    SNB CSV: no usable rows parsed")
-            return None, None
-        return index_to_yoy(rows)
-    except Exception as e:
-        print(f"    SNB CSV: {e}")
-    return None, None
+            print(f"    ✗ {currency}: OECD Explorer — empty CSV")
+            return None
 
+        # Column lookup (case-insensitive)
+        headers_lower = {k.strip().lower(): k for k in rows[0].keys()}
+        val_col  = headers_lower.get("obs_value") or headers_lower.get("obsvalue")
+        time_col = headers_lower.get("time_period") or headers_lower.get("timeperiod")
+        if not val_col or not time_col:
+            print(f"    ✗ {currency}: OECD Explorer — missing OBS_VALUE/TIME_PERIOD columns "
+                  f"(got: {list(rows[0].keys())[:8]})")
+            return None
 
-# ── NZD: Stats NZ OData ───────────────────────────────────────────────────────
-
-def statsnz_cpi_yoy() -> tuple:
-    """
-    Stats NZ OData API — CPI All Groups, quarterly.
-    Uses custom_headers to avoid headers= conflict.
-    """
-    url = ("https://api.stats.govt.nz/opendata/v1/CPI?"
-           "$filter=Subject eq 'Consumer Price Index - CPI' and "
-           "Group eq 'All groups' and Series_title_1 eq 'All groups'"
-           "&$orderby=Period desc&$top=8")
-    r = _get(url, custom_headers={"Accept": "application/json"})
-    if r and r.status_code == 200:
-        try:
-            data = r.json()
-            items = data.get("value", [])
-            rows = []
-            for item in items:
-                period = item.get("Period", "")
-                val = item.get("Data_value")
-                if period and val is not None:
-                    period = period.replace("-", "")
-                    if "Q" in period:
-                        yr = period[:4]
-                        q = period[5] if len(period) > 5 else period[4]
-                        qmap = {"1": "03", "2": "06", "3": "09", "4": "12"}
-                        m = qmap.get(q, "03")
-                        rows.append((f"{yr}-{m}-15", float(val)))
-            rows.sort(key=lambda x: x[0], reverse=True)
-            if rows:
-                return index_to_yoy(rows)
-        except Exception as e:
-            print(f"    Stats NZ OData: {e}")
-    elif r:
-        print(f"    Stats NZ OData: HTTP {r.status_code}")
-    return _rbnz_survey()
-
-
-def _rbnz_survey() -> tuple:
-    """RBNZ Survey of Expectations — 1-year ahead inflation (CSV fallback)."""
-    url = ("https://www.rbnz.govt.nz/-/media/project/sites/rbnz/files/"
-           "statistics/tables/s3/hsvs.csv")
-    r = _get(url)
-    if not r or r.status_code != 200:
-        if r:
-            print(f"    RBNZ Survey CSV: HTTP {r.status_code}")
-        return None, None
-    try:
-        lines = r.text.splitlines()
-        rows_parsed = list(csv.reader(lines))
-        data_rows = []
-        for row in rows_parsed:
-            if not row:
+        entries = []
+        for row in rows:
+            try:
+                raw_val = row[val_col].strip()
+                raw_time = row[time_col].strip()
+                if not raw_val or raw_val in ("..", ".", "NaN", ""):
+                    continue
+                entries.append((_parse_date(raw_time), float(raw_val)))
+            except (ValueError, KeyError):
                 continue
-            if re.match(r'\d{4}\s?[Qq]\d', row[0].strip()):
-                data_rows.append(row)
-        if data_rows:
-            latest = data_rows[-1]
-            date_raw = latest[0].strip()
-            q_match = re.search(r'(\d{4})\s?[Qq](\d)', date_raw)
-            if q_match:
-                yr, q = q_match.group(1), q_match.group(2)
-                qmap = {"1": "03", "2": "06", "3": "09", "4": "12"}
-                m = qmap.get(q, "03")
-                date_str = f"{yr}-{m}-15"
-                for col in latest[1:4]:
-                    col_clean = col.strip()
-                    if col_clean:
-                        try:
-                            val = float(col_clean)
-                            if _valid(val):
-                                return date_str, round(val, 4)
-                        except (ValueError, TypeError):
-                            continue
+
+        if not entries:
+            print(f"    ✗ {currency}: OECD Explorer — no parseable rows in CSV")
+            return None
+
+        entries.sort(key=lambda x: x[0])
+        obs_date, obs_val = entries[-1]
+        freq = "quarterly" if currency in ("AUD", "NZD") else "monthly"
+
+        if _is_stale(obs_date, freq):
+            print(f"    ⚠ {currency}: OECD Explorer obs {obs_date} is "
+                  f">{STALE_DAYS[freq]}d old — skipping")
+            return None
+
+        print(f"    ✓ {currency}: {obs_val:.4f}% CPI YoY ({obs_date}) [{label}]")
+        return obs_val, obs_date, label
+
     except Exception as e:
-        print(f"    RBNZ Survey CSV: {e}")
-    return None, None
+        print(f"    ✗ {currency}: OECD Explorer error — {e}")
+        return None
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# PER-CURRENCY FETCH FUNCTIONS
-# ═══════════════════════════════════════════════════════════════════════════════
+# ---------------------------------------------------------------------------
+# G6 FALLBACK  —  FRED index series → YoY
+# NOTE: FRED OECD MEI has ~12–14 month structural lag (as of 2026).
+# Will almost always be rejected by stale guard. Kept as cold spare.
+# ---------------------------------------------------------------------------
 
-def fetch_usd() -> tuple:
-    rows = fred_csv("T5YIE")
-    if rows:
-        dt_s, val = rows[0]
-        if _valid(val):
-            print(f"    ✓ USD: {val:.4f}% ({dt_s}) [FRED T5YIE]")
-            return dt_s, round(val, 4)
-    print("    ✗ USD: T5YIE no data")
-    return None, None
-
-
-def fetch_eur() -> tuple:
-    rows = fred_csv("T5YIFR")
-    if rows:
-        dt_s, val = rows[0]
-        if _valid(val):
-            print(f"    ✓ EUR: {val:.4f}% ({dt_s}) [FRED T5YIFR]")
-            return dt_s, round(val, 4)
-    print("    ✗ EUR: T5YIFR miss — trying ECB HICP Eurozone")
-    dt, val = ecb_hicp_yoy("U2")
-    if val is not None and _valid(val):
-        print(f"    ~ EUR: {val:.4f}% ({dt}) [ECB HICP fallback]")
-        return dt, val
-    return None, None
-
-
-def fetch_gbp() -> tuple:
-    """GBP: ONS API → FRED GBRCPIALLMINMEI → ECB HICP GB → World Bank"""
-    print("    Trying ONS API (D7G7 — CPI All Items YoY)…")
-    dt, val = ons_cpi_yoy()
-    if val is not None and _valid(val):
-        print(f"    ✓ GBP: {val:.4f}% CPI YoY ({dt}) [ONS API]")
-        return dt, val
-
-    print("    ✗ GBP: ONS miss — trying FRED GBRCPIALLMINMEI")
-    dt, val = fred_index_yoy("GBRCPIALLMINMEI")
-    if val is not None and _valid(val):
-        print(f"    ~ GBP: {val:.4f}% CPI YoY ({dt}) [FRED GBRCPIALLMINMEI→YoY]")
-        return dt, val
-
-    print("    ✗ GBP: FRED miss — trying ECB HICP GB")
-    dt, val = ecb_hicp_yoy("GB")
-    if val is not None and _valid(val):
-        print(f"    ~ GBP: {val:.4f}% CPI YoY ({dt}) [ECB HICP]")
-        return dt, val
-
-    print("    ✗ GBP: ECB miss — trying World Bank")
-    dt_wb, val_wb = wb_cpi_yoy("GB")
-    if val_wb is not None and _valid(val_wb):
-        print(f"    ~ GBP: {val_wb:.4f}% ({dt_wb}) [World Bank]")
-        return dt_wb, val_wb
-    return None, None
+def fetch_fred_index_yoy(currency):
+    if not FRED_API_KEY:
+        print(f"    ✗ {currency}: FRED_API_KEY not set — skipping FRED fallback")
+        return None
+    series_id, freq = FRED_INDEX_SERIES[currency]
+    url = (
+        f"https://api.stlouisfed.org/fred/series/observations"
+        f"?series_id={series_id}&sort_order=desc&limit=36&file_type=json"
+        f"&api_key={FRED_API_KEY}"
+    )
+    label = f"FRED {series_id}→YoY"
+    print(f"    Trying FRED {series_id}…")
+    try:
+        r = _get(url)
+        r.raise_for_status()
+        series = []
+        for o in r.json().get("observations", []):
+            if o.get("value") not in (".", ""):
+                series.append((_parse_date(o["date"]), float(o["value"])))
+        series.sort(key=lambda x: x[0])
+        result = _yoy_from_index(series)
+        if result is None:
+            print(f"    ✗ {currency}: FRED {series_id} — insufficient data for YoY")
+            return None
+        yoy, obs_date = result
+        print(f"    ~ {currency}: {yoy:.4f}% CPI YoY ({obs_date}) [{label}]")
+        if _is_stale(obs_date, freq):
+            print(f"    ⚠ {currency}: obs {obs_date} is >{STALE_DAYS[freq]}d old — skipping")
+            return None
+        return yoy, obs_date, label
+    except Exception as e:
+        print(f"    ✗ {currency}: FRED {series_id} error — {e}")
+        return None
 
 
-def fetch_jpy() -> tuple:
-    """JPY: e-Stat API → e-Stat CSV (前年同月比 section) → World Bank"""
-    print("    Trying e-Stat Japan API (statsDataId 0003427113)…")
-    dt, val = estatjp_cpi_yoy()
-    if val is not None and _valid(val, lo=-3.0, hi=8.0):
-        print(f"    ✓ JPY: {val:.4f}% CPI YoY ({dt}) [Stats Japan]")
-        return dt, val
+# ---------------------------------------------------------------------------
+# G6 LAST RESORT  —  World Bank (annual, lag >12 months)
+# ---------------------------------------------------------------------------
 
-    print("    ✗ JPY: e-Stat miss — trying World Bank")
-    dt_wb, val_wb = wb_cpi_yoy("JP")
-    if val_wb is not None and _valid(val_wb):
-        print(f"    ~ JPY: {val_wb:.4f}% ({dt_wb}) [World Bank]")
-        return dt_wb, val_wb
-    return None, None
-
-
-def fetch_aud() -> tuple:
-    """AUD: ABS SDMX API → FRED AUSCPIALLQINMEI → World Bank"""
-    print("    Trying ABS SDMX API…")
-    dt, val = abs_cpi_yoy()
-    if val is not None and _valid(val):
-        print(f"    ✓ AUD: {val:.4f}% CPI YoY ({dt}) [ABS SDMX]")
-        return dt, val
-
-    print("    ✗ AUD: ABS miss — trying FRED AUSCPIALLQINMEI")
-    dt, val = fred_index_yoy("AUSCPIALLQINMEI")
-    if val is not None and _valid(val):
-        print(f"    ~ AUD: {val:.4f}% CPI YoY ({dt}) [FRED AUSCPIALLQINMEI→YoY]")
-        return dt, val
-
-    print("    ✗ AUD: FRED miss — trying World Bank")
-    dt_wb, val_wb = wb_cpi_yoy("AU")
-    if val_wb is not None and _valid(val_wb):
-        print(f"    ~ AUD: {val_wb:.4f}% ({dt_wb}) [World Bank]")
-        return dt_wb, val_wb
-    return None, None
+def fetch_world_bank(currency):
+    country = WB_COUNTRY[currency]
+    url = (
+        f"https://api.worldbank.org/v2/country/{country}/indicator/FP.CPI.TOTL.ZG"
+        f"?format=json&mrv=5&per_page=5"
+    )
+    label = "World Bank"
+    print(f"    Trying World Bank…")
+    try:
+        r = _get(url)
+        r.raise_for_status()
+        data = r.json()
+        if len(data) < 2 or not data[1]:
+            print(f"    ✗ {currency}: World Bank — no data")
+            return None
+        for entry in data[1]:
+            if entry.get("value") is not None:
+                val = float(entry["value"])
+                yr = int(entry["date"])
+                obs_date = datetime.date(yr, 6, 15)
+                print(f"    ~ {currency}: {val:.4f}% ({obs_date}) [{label}]")
+                if _is_stale(obs_date, "monthly"):
+                    print(f"    ⚠ {currency}: obs {obs_date} is >{STALE_DAYS['monthly']}d old — skipping")
+                    return None
+                return val, obs_date, label
+        print(f"    ✗ {currency}: World Bank — all values null")
+        return None
+    except Exception as e:
+        print(f"    ✗ {currency}: World Bank error — {e}")
+        return None
 
 
-def fetch_cad() -> tuple:
-    """CAD: StatsCan WDS API → FRED CANCPIALLMINMEI → World Bank"""
-    print("    Trying Statistics Canada WDS API…")
-    dt, val = statcan_cpi_yoy()
-    if val is not None and _valid(val):
-        print(f"    ✓ CAD: {val:.4f}% CPI YoY ({dt}) [StatsCan WDS]")
-        return dt, val
+# ---------------------------------------------------------------------------
+# Patch extended-data/{CCY}.json
+# ---------------------------------------------------------------------------
 
-    print("    ✗ CAD: StatsCan miss — trying FRED CANCPIALLMINMEI")
-    dt, val = fred_index_yoy("CANCPIALLMINMEI")
-    if val is not None and _valid(val):
-        print(f"    ~ CAD: {val:.4f}% CPI YoY ({dt}) [FRED CANCPIALLMINMEI→YoY]")
-        return dt, val
+def patch_extended_data(site_root, currency, val, date):
+    """Update only inflationExpectations in extended-data/{CCY}.json, preserving all other fields."""
+    path = os.path.join(site_root, "extended-data", f"{currency}.json")
+    try:
+        if os.path.exists(path):
+            with open(path) as f:
+                d = json.load(f)
+        else:
+            d = {"data": {}, "dates": {}}
+            os.makedirs(os.path.dirname(path), exist_ok=True)
 
-    print("    ✗ CAD: FRED miss — trying World Bank")
-    dt_wb, val_wb = wb_cpi_yoy("CA")
-    if val_wb is not None and _valid(val_wb):
-        print(f"    ~ CAD: {val_wb:.4f}% ({dt_wb}) [World Bank]")
-        return dt_wb, val_wb
-    return None, None
+        if "data" not in d:
+            d["data"] = {}
+        if "dates" not in d:
+            d["dates"] = {}
 
+        d["data"]["inflationExpectations"] = round(val, 4)
+        d["dates"]["inflationExpectations"] = str(date)
 
-def fetch_chf() -> tuple:
-    """CHF: SNB Data Portal (plkopr CSV) → FRED CHECPIALLMINMEI → World Bank"""
-    print("    Trying SNB Data Portal (plkopr)…")
-    dt, val = snb_cpi_yoy()
-    if val is not None and _valid(val, lo=-5.0, hi=15.0):
-        print(f"    ✓ CHF: {val:.4f}% CPI YoY ({dt}) [SNB]")
-        return dt, val
-
-    print("    ✗ CHF: SNB miss — trying FRED CHECPIALLMINMEI")
-    dt, val = fred_index_yoy("CHECPIALLMINMEI")
-    if val is not None and _valid(val, lo=-5.0, hi=15.0):
-        print(f"    ~ CHF: {val:.4f}% CPI YoY ({dt}) [FRED CHECPIALLMINMEI→YoY]")
-        return dt, val
-
-    print("    ✗ CHF: FRED miss — trying World Bank")
-    dt_wb, val_wb = wb_cpi_yoy("CH")
-    if val_wb is not None and _valid(val_wb, lo=-5.0, hi=15.0):
-        print(f"    ~ CHF: {val_wb:.4f}% ({dt_wb}) [World Bank]")
-        return dt_wb, val_wb
-    return None, None
+        with open(path, "w") as f:
+            json.dump(d, f, indent=2)
+        print(f"    ✓ Patched {path}")
+    except Exception as e:
+        print(f"    ⚠ Could not patch {path}: {e}", file=sys.stderr)
 
 
-def fetch_nzd() -> tuple:
-    """NZD: Stats NZ OData → RBNZ Survey → FRED NZLCPIALLQINMEI → World Bank"""
-    print("    Trying Stats NZ OData API…")
-    dt, val = statsnz_cpi_yoy()
-    if val is not None and _valid(val):
-        print(f"    ✓ NZD: {val:.4f}% CPI YoY ({dt}) [Stats NZ]")
-        return dt, val
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 
-    print("    ✗ NZD: Stats NZ miss — trying FRED NZLCPIALLQINMEI")
-    dt, val = fred_index_yoy("NZLCPIALLQINMEI")
-    if val is not None and _valid(val):
-        print(f"    ~ NZD: {val:.4f}% CPI YoY ({dt}) [FRED NZLCPIALLQINMEI→YoY]")
-        return dt, val
+def main():
+    # Site root is either specified as argv[1] or inferred relative to this script
+    if len(sys.argv) > 1:
+        site_root = sys.argv[1]
+    else:
+        # Default: script lives in engine/scripts/, site is ../site or sibling 'site'
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        # Try ../site first (GHA checkout layout), then ../.. (direct layout)
+        candidates = [
+            os.path.join(script_dir, "..", "..", "site"),  # engine/scripts/ → site/
+            os.path.join(script_dir, ".."),                # fallback
+        ]
+        site_root = next(
+            (p for p in candidates if os.path.isdir(os.path.join(p, "extended-data"))),
+            candidates[0]
+        )
 
-    print("    ✗ NZD: FRED miss — trying World Bank")
-    dt_wb, val_wb = wb_cpi_yoy("NZ")
-    if val_wb is not None and _valid(val_wb):
-        print(f"    ~ NZD: {val_wb:.4f}% ({dt_wb}) [World Bank]")
-        return dt_wb, val_wb
-    return None, None
-
-
-# ── Dispatch ──────────────────────────────────────────────────────────────────
-
-FETCH_FN = {
-    "USD": fetch_usd,
-    "EUR": fetch_eur,
-    "GBP": fetch_gbp,
-    "JPY": fetch_jpy,
-    "AUD": fetch_aud,
-    "CAD": fetch_cad,
-    "CHF": fetch_chf,
-    "NZD": fetch_nzd,
-}
-
-# ── Main ──────────────────────────────────────────────────────────────────────
-
-def main() -> int:
     print("=" * 60)
     print("INFLATION EXPECTATIONS — G8 currencies")
-    print(f"Run: {datetime.now(timezone.utc).replace(tzinfo=None).strftime('%Y-%m-%d %H:%M UTC')}")
+    print(f"Run: {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"Site root: {os.path.abspath(site_root)}")
     print("=" * 60)
 
-    failures = 0
-    results  = {}
+    results = {}
+    failures = []
 
-    for ccy, fn in FETCH_FN.items():
-        print(f"\n[{ccy}]")
-        date_str, val = fn()
+    # USD
+    print("[USD]")
+    r = fetch_fred_breakeven("T5YIE", "USD", "FRED T5YIE")
+    if r:
+        results["USD"] = r
+    else:
+        failures.append("USD")
 
-        if val is None:
-            print(f"    ✗ {ccy}: all sources failed — skipping")
-            _gha_warning(f"fetch_inflation_expectations: {ccy} all sources failed")
-            failures += 1
-            continue
+    # EUR
+    print("[EUR]")
+    r = fetch_fred_breakeven("T5YIFR", "EUR", "FRED T5YIFR")
+    if r:
+        results["EUR"] = r
+    else:
+        failures.append("EUR")
 
-        if is_stale(date_str, ccy):
-            threshold = MAX_AGE.get(ccy, 120)
-            print(f"    ⚠ {ccy}: observation {date_str} is >{threshold}d old — skipping")
-            _gha_warning(f"fetch_inflation_expectations: {ccy} stale ({date_str})")
-            failures += 1
-            continue
-
-        if patch_json(ccy, val, date_str):
-            results[ccy] = (val, date_str)
+    # G6
+    for currency in ["GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]:
+        print(f"[{currency}]")
+        r = fetch_oecd_explorer(currency)
+        if r is None:
+            r = fetch_fred_index_yoy(currency)
+        if r is None:
+            r = fetch_world_bank(currency)
+        if r:
+            results[currency] = r
         else:
-            failures += 1
+            failures.append(currency)
+            print(f"Warning: fetch_inflation_expectations: {currency} stale or unavailable",
+                  file=sys.stderr)
 
-    print("\n" + "=" * 60)
+    # Summary
+    print()
+    print("=" * 60)
     print("SUMMARY")
     print("=" * 60)
-    for ccy, (val, dt) in sorted(results.items()):
-        src = "market-implied" if ccy in ("USD", "EUR") else "CPI YoY"
-        print(f"  {ccy:<4}  {val:+.4f}%  ({dt})  [{src}]")
-
+    for ccy, (val, date, src) in sorted(results.items()):
+        sign = "+" if val >= 0 else ""
+        print(f"  {ccy:5s} {sign}{val:.4f}%  ({date})  [{src}]")
     if failures:
-        skipped = [c for c in FETCH_FN if c not in results]
-        print(f"\n  Skipped/failed: {', '.join(skipped)} ({failures} issue(s))")
+        print(f"  Skipped/failed: {', '.join(failures)} ({len(failures)} issue(s))")
 
-    if failures >= 3:
-        _gha_error("fetch_inflation_expectations: >=3 currencies failed — likely upstream outage")
-        return 1
+    # Patch extended-data files
+    print()
+    print("Patching extended-data/…")
+    for ccy, (val, date, _src) in results.items():
+        patch_extended_data(site_root, ccy, val, date)
 
-    print(f"\n  {len(results)}/8 currencies written successfully.")
-    return 0
+    # Exit code
+    g6_failures = [c for c in failures if c not in ("USD", "EUR")]
+    if len(g6_failures) >= 3:
+        print(
+            "Error: fetch_inflation_expectations: >=3 G6 currencies failed — likely upstream outage",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    sys.exit(0)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
