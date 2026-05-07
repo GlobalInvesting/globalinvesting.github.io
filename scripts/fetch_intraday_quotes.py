@@ -933,12 +933,20 @@ def fetch_fx_session_hl(fx_pairs_map: dict) -> dict:
 
     now_utc = datetime.now(timezone.utc)
 
-    # Session start = 21:00 UTC yesterday (or 2 days ago on Monday, since
-    # Sunday 21:00 UTC is the weekly re-open — still valid to include).
-    # We fetch 30h of 1H bars to safely cover the full session + some overlap.
+    # Session start = 21:00 UTC of the most recently opened session.
+    #
+    # The FX session boundary is 21:00 UTC. Two cases:
+    #   hour < 21:  Current session opened at 21:00 UTC YESTERDAY.
+    #   hour >= 21: New session just opened at 21:00 UTC TODAY.
+    #               The OHLC workflow won't write the completed session bar until
+    #               22:30 UTC. During 21:00–22:30 UTC, session_high/low MUST cover
+    #               the completed session (yesterday 21:00 → today 21:00 UTC) so the
+    #               gap-window today-bar injected by dashboard.js shows the full range.
+    # In both cases the formula is identical: now.replace(hour=21) − 1 day.
     session_start = now_utc.replace(hour=21, minute=0, second=0, microsecond=0) - timedelta(days=1)
     fetch_start   = session_start - timedelta(hours=1)  # 1h overlap for safety
     fetch_end     = now_utc + timedelta(hours=1)         # include current partial bar
+
 
     tickers = list(fx_pairs_map.values())
     pair_ids = list(fx_pairs_map.keys())
