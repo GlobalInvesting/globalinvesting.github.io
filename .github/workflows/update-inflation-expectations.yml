@@ -3,32 +3,42 @@ name: Update Inflation Expectations
 # Runs weekly on Mondays at 06:00 UTC.
 #
 # Why Monday 06:00 UTC:
-#   FRED CPI releases happen mid-month. A weekly Monday run picks up any prior-week
-#   release within 7 days — acceptable for monthly/quarterly CPI data.
-#   06:00 UTC is off-peak for FRED and World Bank APIs.
+#   National stat office releases happen throughout the month. A weekly Monday run
+#   picks up any prior-week release within 7 days — acceptable for monthly/quarterly
+#   CPI data with 2-6 week publication lag.
+#   06:00 UTC is off-peak for all primary APIs.
 #
 # What this writes:
 #   extended-data/{USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD}.json
 #   inflationExpectations field only (non-destructive patch — all other fields preserved).
 #
-# Source cascade per currency (v3.0 — OECD SDMX ST measure, index-to-YoY):
+# Source cascade per currency (v4.0 — national stat office APIs as primary):
 #   USD / EUR  FRED breakeven (T5YIE / T5YIFR) — market-implied, daily
-#   G6 others  1. OECD SDMX CPALTT01.ST → index-to-YoY  (sdmx.oecd.org — same domain as fetch_bond_yields.py)
-#                 v2.0 used CPALTT01.GY (wrong: GY is a transformation, not a MEASURE code → 422)
-#                 v3.0 uses CPALTT01.ST (standardised index) then computes YoY from 12-month delta
-#              2. FRED MINMEI/QINMEI → index-to-YoY       (active OECD MEI equivalents, public CSV)
-#              3. ECB HICP YoY                             (GBP/EUR fallback — data-api.ecb.europa.eu)
-#              4. World Bank FP.CPI.TOTL.ZG               (annual, last resort)
+#   GBP  1. ONS API (api.ons.gov.uk) — D7G7 CPI All Items YoY, monthly  [<6w lag]
+#            2. FRED GBRCPIALLMINMEI → index-to-YoY                       [~14m lag]
+#            3. ECB HICP GB                                                [fallback]
+#            4. World Bank FP.CPI.TOTL.ZG                                 [annual]
+#   JPY  1. e-Stat Japan CSV (stat.go.jp) — CPI All Items YoY            [<4w lag]
+#            2. BOJ HTML table                                              [fallback]
+#            3. World Bank FP.CPI.TOTL.ZG                                 [annual]
+#   AUD  1. ABS SDMX API (api.data.abs.gov.au) — CPI All Groups, quarterly [~6w lag]
+#            2. FRED AUSCPIALLQINMEI → index-to-YoY                        [~16m lag]
+#            3. World Bank FP.CPI.TOTL.ZG                                  [annual]
+#   CAD  1. Statistics Canada WDS API — CPI All-Items, monthly            [<4w lag]
+#            2. FRED CANCPIALLMINMEI → index-to-YoY                        [~14m lag]
+#            3. World Bank FP.CPI.TOTL.ZG                                  [annual]
+#   CHF  1. SNB Data Portal (data.snb.ch) — CPI index → YoY               [<6w lag]
+#            2. FRED CHECPIALLMINMEI → index-to-YoY                        [~14m lag]
+#            3. World Bank FP.CPI.TOTL.ZG                                  [annual]
+#   NZD  1. Stats NZ OData API — CPI All Groups, quarterly                [~6w lag]
+#            2. RBNZ Survey of Expectations CSV                            [quarterly]
+#            3. FRED NZLCPIALLQINMEI → index-to-YoY                        [~16m lag]
+#            4. World Bank FP.CPI.TOTL.ZG                                  [annual]
 #
-# Data sources (all public, no API keys required):
-#   USD  FRED T5YIE    (5Y breakeven, daily — market-implied)
-#   EUR  FRED T5YIFR   (EUR 5Y5Y swap, daily — market-implied)
-#   GBP  OECD SDMX CPALTT01.ST → YoY; fallback: FRED GBRCPIALLMINMEI → YoY; ECB HICP GB; WB
-#   JPY  OECD SDMX CPALTT01.ST → YoY; fallback: World Bank (JPNCPIALLMINMEI ended Jun-2021)
-#   AUD  OECD SDMX CPALTT01.ST (Q then M) → YoY; fallback: FRED AUSCPIALLQINMEI → YoY; WB
-#   CAD  OECD SDMX CPALTT01.ST → YoY; fallback: FRED CANCPIALLMINMEI → YoY; WB
-#   CHF  OECD SDMX CPALTT01.ST → YoY; fallback: FRED CHECPIALLMINMEI → YoY; WB
-#   NZD  OECD SDMX CPALTT01.ST (Q then M) → YoY; fallback: FRED NZLCPIALLQINMEI → YoY; WB
+# Why OECD SDMX was removed (v4.0):
+#   CPALTT01 is not a valid SUBJECT in the DSD_KEI@DF_KEI,4.0 dataflow.
+#   All OECD SDMX CPI requests return HTTP 422 regardless of MEASURE code.
+#   This is a fundamental endpoint incompatibility, not a parameter issue.
 #
 # Relationship to the Real Rate Carry modal:
 #   The modal fetches T5YIE / T5YIFR live (USD/EUR). For the remaining 6 currencies
@@ -123,7 +133,7 @@ jobs:
               echo "No changes vs remote HEAD — skipping commit."
               exit 0
             fi
-            git commit -m "Inflation expectations ${TIMESTAMP} — G8 (FRED/OECD-SDMX-ST/ECB/WB)"
+            git commit -m "Inflation expectations ${TIMESTAMP} — G8 (ONS/e-Stat/ABS/StatsCan/SNB/StatsNZ)"
             if git push origin main; then
               echo "✅ Push succeeded on attempt $i."
               exit 0
