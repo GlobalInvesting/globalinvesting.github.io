@@ -966,9 +966,9 @@
         const state = getSessionState(sName);
         const note  = convertUtcTimesInNote(groqSessions[sName] || '\u2014');
         // Color scheme mirrors Bloomberg session pane:
-        //   active   — blue label + full-brightness text
-        //   past     — muted label + muted text (session closed, result is fact)
-        //   upcoming — amber label + slightly muted text + UPCOMING badge
+        //   active   — blue label + ● dot + full-brightness text
+        //   past     — muted gray label + muted text + CLOSED badge (session result, historical)
+        //   upcoming — amber label + ○ dot + slightly muted text + UPCOMING badge
         const labelColor = state === 'active'   ? 'var(--blue,#4f7fff)'
                          : state === 'past'      ? 'var(--text3,#6b7280)'
                          :                         'var(--amber,#b87333)';
@@ -980,6 +980,8 @@
                           :                         '';
         const badge = state === 'upcoming'
           ? '<span style="font-size:8px;color:var(--amber,#b87333);opacity:.7;margin-left:4px;letter-spacing:.05em;">UPCOMING</span>'
+          : state === 'past'
+          ? '<span style="font-size:8px;color:var(--text3,#6b7280);opacity:.6;margin-left:4px;letter-spacing:.05em;">CLOSED</span>'
           : '';
         return (
           '<div style="margin-bottom:4px;color:' + textColor + '">' +
