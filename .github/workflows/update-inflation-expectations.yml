@@ -11,23 +11,24 @@ name: Update Inflation Expectations
 #   extended-data/{USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD}.json
 #   inflationExpectations field only (non-destructive patch — all other fields preserved).
 #
-# Source cascade per currency:
+# Source cascade per currency (v3.0 — OECD SDMX ST measure, index-to-YoY):
 #   USD / EUR  FRED breakeven (T5YIE / T5YIFR) — market-implied, daily
-#   G6 others  1. OECD SDMX MEI CPALTT01 YoY  (sdmx.oecd.org — same domain as fetch_bond_yields.py)
-#              2. ECB HICP YoY              (GBP/EUR fallback — data-api.ecb.europa.eu)
-#              3. FRED CPALTT01{CC}M659N   (YoY direct series — fallback, may 403)
-#              4. World Bank FP.CPI.TOTL.ZG (annual, last resort)
+#   G6 others  1. OECD SDMX CPALTT01.ST → index-to-YoY  (sdmx.oecd.org — same domain as fetch_bond_yields.py)
+#                 v2.0 used CPALTT01.GY (wrong: GY is a transformation, not a MEASURE code → 422)
+#                 v3.0 uses CPALTT01.ST (standardised index) then computes YoY from 12-month delta
+#              2. FRED MINMEI/QINMEI → index-to-YoY       (active OECD MEI equivalents, public CSV)
+#              3. ECB HICP YoY                             (GBP/EUR fallback — data-api.ecb.europa.eu)
+#              4. World Bank FP.CPI.TOTL.ZG               (annual, last resort)
 #
 # Data sources (all public, no API keys required):
 #   USD  FRED T5YIE    (5Y breakeven, daily — market-implied)
 #   EUR  FRED T5YIFR   (EUR 5Y5Y swap, daily — market-implied)
-#   GBP  FRED GBRCPIALLMINMEI → YoY (monthly)
-#   JPY  FRED JPNCPIALLMINMEI → YoY (monthly)
-#   AUD  FRED AUSCPIALLQINMEI → YoY (quarterly)
-#   CAD  FRED CANCPIALLMINMEI → YoY (monthly)
-#   CHF  FRED CHECPIALLMINMEI → YoY (monthly)
-#   NZD  FRED NZLCPIALLQINMEI → YoY (quarterly)
-#   All currencies fall back to World Bank FP.CPI.TOTL.ZG when FRED fails.
+#   GBP  OECD SDMX CPALTT01.ST → YoY; fallback: FRED GBRCPIALLMINMEI → YoY; ECB HICP GB; WB
+#   JPY  OECD SDMX CPALTT01.ST → YoY; fallback: World Bank (JPNCPIALLMINMEI ended Jun-2021)
+#   AUD  OECD SDMX CPALTT01.ST (Q then M) → YoY; fallback: FRED AUSCPIALLQINMEI → YoY; WB
+#   CAD  OECD SDMX CPALTT01.ST → YoY; fallback: FRED CANCPIALLMINMEI → YoY; WB
+#   CHF  OECD SDMX CPALTT01.ST → YoY; fallback: FRED CHECPIALLMINMEI → YoY; WB
+#   NZD  OECD SDMX CPALTT01.ST (Q then M) → YoY; fallback: FRED NZLCPIALLQINMEI → YoY; WB
 #
 # Relationship to the Real Rate Carry modal:
 #   The modal fetches T5YIE / T5YIFR live (USD/EUR). For the remaining 6 currencies
@@ -122,7 +123,7 @@ jobs:
               echo "No changes vs remote HEAD — skipping commit."
               exit 0
             fi
-            git commit -m "Inflation expectations ${TIMESTAMP} — G8 (FRED/OECD-SDMX/ECB/WB)"
+            git commit -m "Inflation expectations ${TIMESTAMP} — G8 (FRED/OECD-SDMX-ST/ECB/WB)"
             if git push origin main; then
               echo "✅ Push succeeded on attempt $i."
               exit 0
