@@ -208,6 +208,13 @@ HL_MAX_SPREAD: dict[str, float] = {
 # Result: open/high/low/close exactly match what Yahoo Finance shows on its own
 # 4H chart, and match TradingView and Bloomberg FX daily candles.
 NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'eth', 'dxy', 'gold'}
+# Equity indices routed to fetch_equity_ohlc_from_1h (1H aggregation over 21:00 UTC boundary).
+# These instruments close well before the 22:30 UTC workflow run, so their 1H bars are fully
+# available. Nikkei: TSE closes ~06:00 UTC. EuroStoxx: Euronext closes ~15:30 UTC.
+# EuroStoxx was moved here because yfinance native-1D has a data-availability lag for
+# European exchanges when the workflow runs at 22:30 UTC (= next calendar day in CEST),
+# causing the most recent session bar to be excluded from period="3y" results.
+EQUITY_1H_SYMBOLS = {'nikkei', 'stoxx'}
 # Symbols routed to fetch_gold_ohlc_from_1h (CME 22:00/23:00 UTC session boundary).
 # Gold is pulled OUT of native 1D because yfinance 1D for GC=F uses UTC midnight
 # as its cutoff: the CME session runs 22:00/23:00 UTC → next day 21:00/22:00 UTC,
@@ -753,24 +760,36 @@ def fetch_wti_dxy_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
 def fetch_equity_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
     """
-    Build daily bars for Nikkei 225 (^N225) by aggregating 1H bars over the NYSE
-    session boundary: 21:00 UTC.
+    Build daily bars for early-closing equity indices (Nikkei 225, EuroStoxx 50) by
+    aggregating 1H bars over the 21:00 UTC session boundary.
 
-    Why 1H aggregation for Nikkei only?
-    TSE closes at ~06:00 UTC — well before the 22:30 UTC workflow run. This means
-    the complete Nikkei bar for the current trading day is always present in the
-    yfinance 1H feed when the script runs. 1H aggregation gives faithful H/L.
+    Why 1H aggregation for these instruments?
 
-    SPX, Nasdaq, Stoxx, US10Y, and VIX are intentionally excluded and routed to
-    native 1D yfinance (same path as WTI). Their NYSE/CBOE sessions close at
-    20:00-21:00 UTC, and yfinance's native 1D feed already includes the in-progress
-    today bar by 22:30 UTC. Routing them through 1H aggregation caused the session
-    guard to drop today's bar (the 1H buckets for Apr 30 aggregate into session_date
-    Apr 30, which is > run_date_utc Apr 29 at the 22:30 UTC run), leaving the JSON
-    ending at Apr 29 and forcing 100% reliance on the intraday today-bar injection.
+    Nikkei 225 (TSE): closes ~06:00 UTC — well before the 22:30 UTC workflow run.
+    EuroStoxx 50 (Euronext): closes ~15:30 UTC — also well before the 22:30 UTC run.
 
-    Session boundary: 21:00 UTC -> 21:00 UTC
-      * Nikkei 225 (TSE):           close ~06:00 UTC -> fully included before run
+    Both instruments are fully traded out before the run executes. 1H aggregation
+    gives faithful H/L and avoids a yfinance native-1D data-availability lag that
+    affects European exchanges specifically:
+
+      Root cause (EuroStoxx): yfinance.history(period="3y") computes its end-date in
+      UTC. The workflow runs at 22:30 UTC which is already the NEXT calendar day in
+      CEST (UTC+2). yfinance can exclude the current UTC-date's bar for a European
+      exchange even when the session completed hours earlier (15:30 UTC), returning
+      data only through the prior calendar day. 1H bars have no such lag — they are
+      available immediately after each candle closes. This made stoxx.json end at
+      2026-05-05 when it should end at 2026-05-06 after the May 6 run.
+
+    SPX, Nasdaq, US10Y, and VIX are intentionally excluded and routed to native 1D
+    yfinance. Their NYSE/CBOE sessions close at 20:00-21:00 UTC, and yfinance's
+    native 1D feed already includes the in-progress today bar by 22:30 UTC. Routing
+    them through 1H aggregation caused the session guard to drop today's bar (the 1H
+    buckets for the current day aggregate into session_date = today, which is >
+    run_date_utc = yesterday at a 22:30 UTC run), leaving the JSON one day behind.
+
+    Session boundary: 21:00 UTC → 21:00 UTC
+      * Nikkei 225 (TSE):     close ~06:00 UTC → fully included before run
+      * EuroStoxx 50 (ENX):   close ~15:30 UTC → fully included before run
 
     Hybrid approach (same as FX / Gold):
     - 1H bars cover the most recent 730 days with correct H/L.
@@ -913,18 +932,24 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     Returns a list of {time, open, high, low, close} dicts sorted oldest to newest,
     or None on failure.
 
-    Two paths:
-      FX pairs (28):  delegates to fetch_fx_ohlc_from_1h() — 1H aggregation over the
-                      21:00 UTC NY session boundary. H/L match Bloomberg, TradingView,
-                      Reuters FX daily candles. Required because native 1D FX bars use
-                      UTC midnight cutoff, producing wrong H/L and unreliable opens.
+    Three paths:
+      FX pairs (28):      delegates to fetch_fx_ohlc_from_1h() — 1H aggregation over the
+                          21:00 UTC NY session boundary. H/L match Bloomberg, TradingView,
+                          Reuters FX daily candles. Required because native 1D FX bars use
+                          UTC midnight cutoff, producing wrong H/L and unreliable opens.
 
-      Non-FX (11):    native yfinance 1D bars — same path as WTI (always worked).
-                      Gold, Nikkei, SPX, Nasdaq, Stoxx, US10Y, VIX, BTC, ETH, DXY, WTI.
-                      1H aggregation was removed: the session guard discards today's bar
-                      at any fixed UTC boundary, leaving the JSON one day behind. Native
-                      1D includes the in-progress today bar. The intraday today-bar
-                      injection in dashboard.js updates it with live data from quotes.json.
+      Equity 1H (2):      Nikkei 225 (TSE) and EuroStoxx 50 (Euronext) via
+                          fetch_equity_ohlc_from_1h(). Both close well before the 22:30 UTC
+                          run. EuroStoxx is here because yfinance native-1D has a data-
+                          availability lag for European exchanges at 22:30 UTC (which is
+                          already the next calendar day in CEST), causing the most recent
+                          completed bar to be excluded. 1H bars have no such lag.
+
+      Non-FX (9):         native yfinance 1D bars — BTC, ETH, SPX, Nasdaq, US10Y, VIX,
+                          WTI, DXY, Gold. SPX/Nasdaq/US10Y/VIX close at 20:00–21:00 UTC;
+                          native 1D includes their in-progress today bar at 22:30 UTC.
+                          dashboard.js strips the today bar and re-injects it live from
+                          quotes.json.
     """
     if id_ in FX_SYMBOLS:
         return fetch_fx_ohlc_from_1h(id_, ticker_sym)
@@ -932,6 +957,8 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
         if id_ == 'gold':
             return fetch_gold_ohlc_from_1h(id_, ticker_sym)
         return fetch_wti_dxy_ohlc_from_1h(id_, ticker_sym)
+    if id_ in EQUITY_1H_SYMBOLS:
+        return fetch_equity_ohlc_from_1h(id_, ticker_sym)
 
     try:
         ticker = yf.Ticker(ticker_sym)
