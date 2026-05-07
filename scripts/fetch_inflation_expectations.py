@@ -1,70 +1,63 @@
 """
-fetch_inflation_expectations.py  v2.0
+fetch_inflation_expectations.py  v3.0
 ──────────────────────────────────────
 Fetches inflation expectations for all G8 currencies and writes
 inflationExpectations into extended-data/{CCY}.json (non-destructive patch).
 
 Runs weekly (Mondays 06:00 UTC) from the PUBLIC site repo — no API keys required.
 
-CHANGELOG v2.0
+CHANGELOG v3.0
 ──────────────
-Root cause fixed: The v1.1 cascade relied on economic-data/{CCY}.json as its
-primary source for G6. That file was maintained by update_pmi_from_calendar.py,
-which in turn depended on calendar.json — a file produced by update-extended-data.yml
-(disabled in v7.50.0). calendar.json froze at 2026-03-28, causing economic-data/ to
-freeze too. Result: 0.3–2.3pp stale values in the modal for GBP/JPY/AUD/CAD/CHF/NZD.
+Root cause fixed (v2.0 regression):
 
-Fix: replaced the broken economic-data/ dependency with DIRECT API calls to
-authoritative stat offices for each G6 currency via OECD SDMX REST API:
-  GBP  → OECD SDMX MEI CPI YoY monthly (GBR) — same API domain as fetch_bond_yields.py
-  JPY  → OECD SDMX MEI CPI YoY monthly (JPN)
-  AUD  → OECD SDMX MEI CPI YoY quarterly (AUS) → monthly fallback
-  CAD  → OECD SDMX MEI CPI YoY monthly (CAN)
-  CHF  → OECD SDMX MEI CPI YoY monthly (CHE)
-  NZD  → OECD SDMX MEI CPI YoY quarterly (NZL) → monthly fallback
+v2.0 used OECD SDMX key CPALTT01.GY — but GY is a TRANSFORMATION code, not a
+MEASURE code. The DSD_KEI@DF_KEI,4.0 dataflow has a MEASURE dimension, not a
+TRANSFORMATION dimension. The correct measure code for the standardised series
+is ST (same as IRLTLT01.ST for bond yields — confirmed working in GHA).
 
-The OECD SDMX endpoint (sdmx.oecd.org/public/rest/) is confirmed working in
-GitHub Actions — same domain used successfully by fetch_bond_yields.py for JPY 10Y.
+Fix: changed OECD SDMX key from CPALTT01.GY → CPALTT01.ST and added
+index_to_yoy() to compute YoY % from the raw CPI index observations.
+This is identical to what update_extended_data.py v13.0 does with FRED MINMEI/QINMEI.
 
-WHY ALL 8 (INCLUDING USD AND EUR)
-──────────────────────────────────
-The Real Rate Carry modal fetches T5YIE (USD) and T5YIFR (EUR) live from FRED on
-every open. This workflow serves two additional purposes:
-  1. Fallback: if the live FRED fetch fails, the modal falls back to extended-data.
-  2. Audit trail: weekly batch values provide a second independent data point.
+Additional fixes vs v2.0:
+  • Added FRED MINMEI/QINMEI public CSV as cascade step 2 (before World Bank).
+    These series are the active OECD MEI equivalents — CPALTT01*M659N ended 2021.
+  • Fixed AUD/NZD fallback: CPALTT01AUM659N and CPALTT01NZM659N return 404 because
+    they never existed. Replaced with AUSCPIALLQINMEI / NZLCPIALLQINMEI (index-to-YoY).
+  • Per-currency stale thresholds: quarterly series (AUD, NZD) get 200d; all others 120d.
 
 SOURCE CASCADE PER CURRENCY
 ────────────────────────────
-  USD  → FRED T5YIE    (5Y breakeven, daily, market-implied)
-  EUR  → FRED T5YIFR   (EUR 5Y5Y inflation swap, daily, market-implied)
-           ECB HICP YoY (Eurozone flash, monthly) [fallback]
-  GBP  → OECD SDMX MEI CPALTT01 monthly (GBR)   [primary — <30d lag]
-           ECB HICP flash YoY (GB area)           [fallback]
-           FRED CPGRLE01GBM659N YoY direct        [fallback]
-           World Bank FP.CPI.TOTL.ZG              [final fallback]
-  JPY  → OECD SDMX MEI CPALTT01 monthly (JPN)   [primary]
-           FRED CPALTT01JPM659N YoY direct        [fallback]
-           World Bank FP.CPI.TOTL.ZG              [final fallback]
-  AUD  → OECD SDMX MEI CPALTT01 quarterly (AUS) [primary]
-           OECD SDMX MEI CPALTT01 monthly (AUS)  [fallback]
-           FRED CPALTT01AUM659N YoY direct        [fallback]
-           World Bank FP.CPI.TOTL.ZG              [final fallback]
-  CAD  → OECD SDMX MEI CPALTT01 monthly (CAN)   [primary]
-           FRED CPALTT01CAM659N YoY direct        [fallback]
-           World Bank FP.CPI.TOTL.ZG              [final fallback]
-  CHF  → OECD SDMX MEI CPALTT01 monthly (CHE)   [primary]
-           FRED CPALTT01CHM659N YoY direct        [fallback]
-           World Bank FP.CPI.TOTL.ZG              [final fallback]
-  NZD  → OECD SDMX MEI CPALTT01 quarterly (NZL) [primary]
-           OECD SDMX MEI CPALTT01 monthly (NZL)  [fallback]
-           FRED CPALTT01NZM659N YoY direct        [fallback]
-           World Bank FP.CPI.TOTL.ZG              [final fallback]
+  USD  → FRED T5YIE          (5Y breakeven, daily, market-implied)
+  EUR  → FRED T5YIFR         (EUR 5Y5Y inflation swap, daily, market-implied)
+           ECB HICP YoY      (Eurozone flash, monthly) [fallback]
+  GBP  → OECD SDMX CPALTT01.ST monthly (GBR) → index-to-YoY  [primary, <4w lag]
+           FRED GBRCPIALLMINMEI → index-to-YoY                 [fallback]
+           ECB HICP flash YoY (GB area)                        [fallback]
+           World Bank FP.CPI.TOTL.ZG                           [final fallback]
+  JPY  → OECD SDMX CPALTT01.ST monthly (JPN) → index-to-YoY  [primary]
+           World Bank FP.CPI.TOTL.ZG                           [final fallback]
+           (JPNCPIALLMINMEI ended Jun-2021 — not used)
+  AUD  → OECD SDMX CPALTT01.ST quarterly (AUS) → index-to-YoY [primary, ~6w lag]
+           OECD SDMX CPALTT01.ST monthly (AUS) → index-to-YoY  [fallback]
+           FRED AUSCPIALLQINMEI → index-to-YoY                  [fallback]
+           World Bank FP.CPI.TOTL.ZG                            [final fallback]
+  CAD  → OECD SDMX CPALTT01.ST monthly (CAN) → index-to-YoY  [primary]
+           FRED CANCPIALLMINMEI → index-to-YoY                  [fallback]
+           World Bank FP.CPI.TOTL.ZG                            [final fallback]
+  CHF  → OECD SDMX CPALTT01.ST monthly (CHE) → index-to-YoY  [primary]
+           FRED CHECPIALLMINMEI → index-to-YoY                  [fallback]
+           World Bank FP.CPI.TOTL.ZG                            [final fallback]
+  NZD  → OECD SDMX CPALTT01.ST quarterly (NZL) → index-to-YoY [primary]
+           OECD SDMX CPALTT01.ST monthly (NZL) → index-to-YoY  [fallback]
+           FRED NZLCPIALLQINMEI → index-to-YoY                  [fallback]
+           World Bank FP.CPI.TOTL.ZG                            [final fallback]
 
 STALE GUARD
 ───────────
-If the freshest observation for a currency is older than 120 days, the script
-emits ::warning and skips that currency (preserves existing data rather than
-overwriting with clearly outdated values).
+Monthly series:  observation must be ≤120 days old.
+Quarterly series (AUD, NZD): observation must be ≤200 days old (Q4 release ≈ Jan,
+  meaning May run sees Jan data → ~120d; some years slip to Feb → 150d; buffer added).
 
 EXIT CODES
 ──────────
@@ -92,7 +85,7 @@ OUT_DIR  = os.path.join(SITE_DIR, "extended-data")
 os.makedirs(OUT_DIR, exist_ok=True)
 
 HEADERS = {
-    "User-Agent": "globalinvesting-bot/2.0 (https://globalinvesting.github.io)",
+    "User-Agent": "globalinvesting-bot/3.0 (https://globalinvesting.github.io)",
     "Accept":     "application/json, text/csv;q=0.9, */*;q=0.8",
 }
 
@@ -104,18 +97,68 @@ def _gha_warning(msg: str) -> None:
 def _gha_error(msg: str) -> None:
     print(f"::error::{msg}", flush=True)
 
-MAX_AGE_DAYS = 120   # skip writing if observation is older than this
+# Per-currency stale thresholds (days)
+MAX_AGE = {
+    "USD": 10,    # market-implied daily — warn if >10 days stale
+    "EUR": 10,
+    "GBP": 120,
+    "JPY": 120,
+    "AUD": 200,   # quarterly CPI: Q4→Jan release, May run = ~120d; buffer to 200d
+    "CAD": 120,
+    "CHF": 120,
+    "NZD": 200,   # quarterly CPI: same as AUD
+}
+
+# ── Index-to-YoY helper ───────────────────────────────────────────────────────
+
+def index_to_yoy(obs: list) -> tuple:
+    """
+    Compute CPI YoY % from a list of (date_str, index_value) sorted descending.
+    Requires enough observations spanning ~12 months.
+
+    Returns (date_str, yoy_pct) or (None, None).
+    """
+    if len(obs) < 2:
+        return None, None
+
+    parsed = []
+    for dt_s, v in obs:
+        try:
+            parsed.append((datetime.strptime(dt_s[:10], "%Y-%m-%d"), float(v)))
+        except (ValueError, TypeError):
+            continue
+
+    if not parsed:
+        return None, None
+
+    parsed.sort(key=lambda x: x[0], reverse=True)
+    d_curr, v_curr = parsed[0]
+
+    # Find observation closest to 12 months prior (75-day tolerance for quarterly)
+    target = d_curr - timedelta(days=365)
+    best_val, best_diff = None, float("inf")
+    for d, v in parsed[1:]:
+        diff = abs((d - target).days)
+        if diff < best_diff:
+            best_diff, best_val = diff, v
+
+    if best_val is None or best_diff > 75 or best_val == 0:
+        return None, None
+
+    yoy = round((v_curr / best_val - 1) * 100, 4)
+    return d_curr.strftime("%Y-%m-%d"), yoy
+
 
 # ── FRED CSV helper (no API key) ─────────────────────────────────────────────
 
-def fred_csv(series_id: str) -> list:
+def fred_csv_series(series_id: str, start_year: int = 2019) -> list:
     """
-    Fetch FRED series via public CSV endpoint (no API key required).
-    Returns list of (datetime, float) sorted descending (newest first).
+    Fetch FRED series via public CSV (no API key required).
+    Returns list of (date_str, float) sorted descending (newest first).
     """
     url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
     try:
-        r = requests.get(url, headers=HEADERS, timeout=20)
+        r = requests.get(url, headers=HEADERS, timeout=25)
         if r.status_code != 200:
             print(f"    FRED {series_id}: HTTP {r.status_code}")
             return []
@@ -124,7 +167,10 @@ def fred_csv(series_id: str) -> list:
             if len(row) != 2 or row[0] == "DATE" or row[1].strip() in (".", "", "NA"):
                 continue
             try:
-                rows.append((datetime.strptime(row[0].strip(), "%Y-%m-%d"), float(row[1])))
+                dt = datetime.strptime(row[0].strip(), "%Y-%m-%d")
+                if dt.year < start_year:
+                    continue
+                rows.append((dt.strftime("%Y-%m-%d"), float(row[1])))
             except (ValueError, TypeError):
                 continue
         rows.sort(key=lambda x: x[0], reverse=True)
@@ -134,30 +180,41 @@ def fred_csv(series_id: str) -> list:
         return []
 
 
-# ── OECD SDMX CPI YoY helper ─────────────────────────────────────────────────
+def fred_index_to_yoy(series_id: str) -> tuple:
+    """Fetch FRED index series, compute YoY %."""
+    rows = fred_csv_series(series_id, start_year=2019)
+    if not rows:
+        return None, None
+    return index_to_yoy(rows)
 
-def oecd_cpi_yoy(country_code: str, freq: str = "M"):
+
+# ── OECD SDMX CPI Index helper ───────────────────────────────────────────────
+
+def oecd_cpi_index(country_code: str, freq: str = "M") -> list:
     """
-    Fetch CPI YoY % from OECD SDMX REST API.
-    Uses MEI (Main Economic Indicators) CPALTT01 series = CPI all items YoY.
+    Fetch CPI standardised index (CPALTT01.ST) from OECD SDMX REST API.
     Dataflow: OECD.SDD.STES,DSD_KEI@DF_KEI,4.0
+    MEASURE=ST: standardised series value (index, base 2015=100).
+
+    The v2.0 key CPALTT01.GY was wrong: GY is a transformation code, not a
+    MEASURE code. ST is the correct measure for the index series.
 
     country_code: GBR, JPN, AUS, CAN, CHE, NZL
     freq: 'M' (monthly) or 'Q' (quarterly)
 
-    Returns (date_str YYYY-MM-DD, value) or (None, None).
+    Returns list of (date_str, float) sorted descending (newest first).
     """
-    key = f"OECD.SDD.STES,DSD_KEI@DF_KEI,4.0/{freq}.{country_code}.CPALTT01.GY"
+    key = f"OECD.SDD.STES,DSD_KEI@DF_KEI,4.0/{freq}.{country_code}.CPALTT01.ST"
     try:
         r = requests.get(
             f"https://sdmx.oecd.org/public/rest/data/{key}",
-            params={"lastNObservations": 3, "format": "jsondata", "detail": "dataonly"},
+            params={"lastNObservations": 16, "format": "jsondata", "detail": "dataonly"},
             headers=HEADERS,
-            timeout=20,
+            timeout=25,
         )
         if not r.ok:
             print(f"    OECD SDMX {country_code} ({freq}): HTTP {r.status_code}")
-            return None, None
+            return []
         data = r.json()
         series_dict = data.get("dataSets", [{}])[0].get("series", {})
         dims = data.get("structure", {}).get("dimensions", {}).get("observation", [])
@@ -166,40 +223,46 @@ def oecd_cpi_yoy(country_code: str, freq: str = "M"):
         )
         if not series_dict or not time_dim:
             print(f"    OECD SDMX {country_code} ({freq}): empty response")
-            return None, None
+            return []
         series = next(iter(series_dict.values()))
         obs = series.get("observations", {})
-        for idx_str, vals in sorted(obs.items(), key=lambda x: int(x[0]), reverse=True):
+        rows = []
+        for idx_str, vals in obs.items():
             idx = int(idx_str)
             val = vals[0] if vals else None
             if val is not None and idx < len(time_dim):
                 period = time_dim[idx].get("id", "")
-                # Handle quarterly period strings like "2026-Q1"
                 if "Q" in period:
                     qmap = {"Q1": "03", "Q2": "06", "Q3": "09", "Q4": "12"}
                     parts = period.split("-")
-                    if len(parts) == 2:
-                        month = qmap.get(parts[1], "03")
-                        date_str = f"{parts[0]}-{month}-15"
-                    else:
-                        date_str = period
-                elif len(period) == 7:  # YYYY-MM
+                    month = qmap.get(parts[1], "03") if len(parts) == 2 else "03"
+                    date_str = f"{parts[0]}-{month}-15"
+                elif len(period) == 7:
                     date_str = period + "-01"
                 else:
                     date_str = period
                 try:
-                    return date_str, round(float(val), 4)
+                    rows.append((date_str, float(val)))
                 except (ValueError, TypeError):
                     continue
-        return None, None
+        rows.sort(key=lambda x: x[0], reverse=True)
+        return rows
     except Exception as e:
         print(f"    OECD SDMX {country_code} ({freq}): {e}")
+        return []
+
+
+def oecd_cpi_yoy(country_code: str, freq: str = "M") -> tuple:
+    """Fetch OECD SDMX CPI index and compute YoY %."""
+    rows = oecd_cpi_index(country_code, freq)
+    if not rows:
         return None, None
+    return index_to_yoy(rows)
 
 
 # ── ECB SDMX HICP helper ─────────────────────────────────────────────────────
 
-def ecb_hicp_yoy(area_code: str = "U2"):
+def ecb_hicp_yoy(area_code: str = "U2") -> tuple:
     """
     Fetch HICP YoY % from ECB SDMX (ICP dataset).
     area_code: U2 = Eurozone, GB = UK (Eurostat HICP)
@@ -211,7 +274,7 @@ def ecb_hicp_yoy(area_code: str = "U2"):
             f"https://data-api.ecb.europa.eu/service/data/ICP/{key}",
             params={"lastNObservations": 3, "format": "jsondata", "detail": "dataonly"},
             headers={**HEADERS, "Accept": "application/json"},
-            timeout=20,
+            timeout=25,
         )
         if not r.ok:
             print(f"    ECB HICP {area_code}: HTTP {r.status_code}")
@@ -244,7 +307,7 @@ def ecb_hicp_yoy(area_code: str = "U2"):
 
 # ── World Bank fallback ───────────────────────────────────────────────────────
 
-def wb_cpi_yoy(iso2: str):
+def wb_cpi_yoy(iso2: str) -> tuple:
     """
     CPI YoY % from World Bank (FP.CPI.TOTL.ZG). Annual — last resort only.
     Returns (date_str YYYY-MM-DD, value) or (None, None).
@@ -255,7 +318,7 @@ def wb_cpi_yoy(iso2: str):
             url,
             params={"format": "json", "mrv": 3, "per_page": 5},
             headers=HEADERS,
-            timeout=20,
+            timeout=25,
         )
         if not r.ok:
             return None, None
@@ -273,7 +336,7 @@ def wb_cpi_yoy(iso2: str):
 
 # ── Stale guard ───────────────────────────────────────────────────────────────
 
-def is_stale(date_str):
+def is_stale(date_str: str, ccy: str) -> bool:
     if not date_str:
         return True
     try:
@@ -281,7 +344,7 @@ def is_stale(date_str):
             datetime.now(timezone.utc).replace(tzinfo=None)
             - datetime.strptime(date_str[:10], "%Y-%m-%d")
         ).days
-        return age > MAX_AGE_DAYS
+        return age > MAX_AGE.get(ccy, 120)
     except (ValueError, TypeError):
         return True
 
@@ -289,10 +352,6 @@ def is_stale(date_str):
 # ── JSON patch ────────────────────────────────────────────────────────────────
 
 def patch_json(ccy: str, ie_val: float, ie_date: str) -> bool:
-    """
-    Non-destructive update: read existing {CCY}.json, update only the
-    inflationExpectations field in data{} and dates{}, write back.
-    """
     path = os.path.join(OUT_DIR, f"{ccy}.json")
     try:
         d = json.load(open(path)) if os.path.exists(path) else {}
@@ -308,209 +367,184 @@ def patch_json(ccy: str, ie_val: float, ie_date: str) -> bool:
         return False
 
 
+# ── Sanity check ─────────────────────────────────────────────────────────────
+
+def _valid(val, ccy: str) -> bool:
+    """Reject obviously wrong values."""
+    if val is None:
+        return False
+    return -5.0 < val < 25.0
+
+
 # ── Per-currency fetch functions ──────────────────────────────────────────────
 
-def fetch_usd():
-    """USD: FRED T5YIE (5Y breakeven inflation rate, daily, market-implied)."""
-    rows = fred_csv("T5YIE")
+def fetch_usd() -> tuple:
+    rows = fred_csv_series("T5YIE")
     if rows:
-        dt, val = rows[0]
-        if -2.0 < val < 15.0:
-            print(f"    ✓ USD: {val:.4f}% ({dt.date()}) [T5YIE]")
-            return dt.strftime("%Y-%m-%d"), round(val, 4)
-        print(f"    ✗ USD: T5YIE value {val:.4f}% out of range")
-    print("    ✗ USD: T5YIE returned no data")
+        dt_s, val = rows[0]
+        if _valid(val, "USD"):
+            print(f"    ✓ USD: {val:.4f}% ({dt_s}) [T5YIE]")
+            return dt_s, round(val, 4)
+    print("    ✗ USD: T5YIE no data")
     return None, None
 
 
-def fetch_eur():
-    """EUR: FRED T5YIFR (5Y5Y EUR inflation swap, daily, market-implied).
-    Fallback: ECB HICP flash YoY (Eurozone).
-    """
-    rows = fred_csv("T5YIFR")
+def fetch_eur() -> tuple:
+    rows = fred_csv_series("T5YIFR")
     if rows:
-        dt, val = rows[0]
-        if -2.0 < val < 15.0:
-            print(f"    ✓ EUR: {val:.4f}% ({dt.date()}) [T5YIFR]")
-            return dt.strftime("%Y-%m-%d"), round(val, 4)
-        print(f"    ✗ EUR: T5YIFR value {val:.4f}% out of range")
+        dt_s, val = rows[0]
+        if _valid(val, "EUR"):
+            print(f"    ✓ EUR: {val:.4f}% ({dt_s}) [T5YIFR]")
+            return dt_s, round(val, 4)
     print("    ✗ EUR: T5YIFR miss — trying ECB HICP Eurozone")
     dt_ecb, val_ecb = ecb_hicp_yoy("U2")
-    if val_ecb is not None and -5.0 < val_ecb < 25.0:
+    if val_ecb is not None and _valid(val_ecb, "EUR"):
         print(f"    ~ EUR: {val_ecb:.4f}% ({dt_ecb}) [ECB HICP fallback]")
         return dt_ecb, val_ecb
     return None, None
 
 
-def fetch_gbp():
+def fetch_gbp() -> tuple:
     """
-    GBP CPI YoY cascade:
-      1. OECD SDMX MEI CPALTT01 monthly (GBR)
-      2. ECB HICP flash (GB area)
-      3. FRED CPGRLE01GBM659N YoY direct
-      4. World Bank
+    GBP: OECD SDMX CPALTT01.ST monthly → FRED GBRCPIALLMINMEI → ECB HICP GB → WB
     """
     dt, val = oecd_cpi_yoy("GBR", "M")
-    if val is not None and -5.0 < val < 25.0:
-        print(f"    ✓ GBP: {val:.4f}% CPI YoY ({dt}) [OECD SDMX]")
+    if val is not None and _valid(val, "GBP"):
+        print(f"    ✓ GBP: {val:.4f}% CPI YoY ({dt}) [OECD SDMX ST→YoY]")
         return dt, val
-    print("    ✗ GBP: OECD miss — trying ECB HICP GB")
+
+    print("    ✗ GBP: OECD miss — trying FRED GBRCPIALLMINMEI")
+    dt, val = fred_index_to_yoy("GBRCPIALLMINMEI")
+    if val is not None and _valid(val, "GBP"):
+        print(f"    ~ GBP: {val:.4f}% CPI YoY ({dt}) [FRED GBRCPIALLMINMEI→YoY]")
+        return dt, val
+
+    print("    ✗ GBP: FRED miss — trying ECB HICP GB")
     dt, val = ecb_hicp_yoy("GB")
-    if val is not None and -5.0 < val < 25.0:
+    if val is not None and _valid(val, "GBP"):
         print(f"    ~ GBP: {val:.4f}% CPI YoY ({dt}) [ECB HICP]")
         return dt, val
-    print("    ✗ GBP: ECB miss — trying FRED CPGRLE01GBM659N")
-    rows = fred_csv("CPGRLE01GBM659N")
-    if rows:
-        dt_f, val_f = rows[0]
-        if -5.0 < val_f < 25.0:
-            print(f"    ~ GBP: {val_f:.4f}% ({dt_f.date()}) [FRED YoY direct]")
-            return dt_f.strftime("%Y-%m-%d"), round(val_f, 4)
-    print("    ✗ GBP: FRED miss — trying World Bank")
+
+    print("    ✗ GBP: ECB miss — trying World Bank")
     dt_wb, val_wb = wb_cpi_yoy("GB")
-    if val_wb is not None and -5.0 < val_wb < 25.0:
+    if val_wb is not None and _valid(val_wb, "GBP"):
         print(f"    ~ GBP: {val_wb:.4f}% ({dt_wb}) [World Bank]")
         return dt_wb, val_wb
     return None, None
 
 
-def fetch_jpy():
+def fetch_jpy() -> tuple:
     """
-    JPY CPI YoY cascade:
-      1. OECD SDMX MEI CPALTT01 monthly (JPN)
-      2. FRED CPALTT01JPM659N YoY direct
-      3. World Bank
+    JPY: OECD SDMX CPALTT01.ST monthly → WB
+    (JPNCPIALLMINMEI ended Jun-2021 — not in cascade)
     """
     dt, val = oecd_cpi_yoy("JPN", "M")
-    if val is not None and -5.0 < val < 25.0:
-        print(f"    ✓ JPY: {val:.4f}% CPI YoY ({dt}) [OECD SDMX]")
+    if val is not None and _valid(val, "JPY"):
+        print(f"    ✓ JPY: {val:.4f}% CPI YoY ({dt}) [OECD SDMX ST→YoY]")
         return dt, val
-    print("    ✗ JPY: OECD miss — trying FRED CPALTT01JPM659N")
-    rows = fred_csv("CPALTT01JPM659N")
-    if rows:
-        dt_f, val_f = rows[0]
-        if -5.0 < val_f < 25.0:
-            print(f"    ~ JPY: {val_f:.4f}% ({dt_f.date()}) [FRED YoY direct]")
-            return dt_f.strftime("%Y-%m-%d"), round(val_f, 4)
-    print("    ✗ JPY: FRED miss — trying World Bank")
+
+    print("    ✗ JPY: OECD miss — trying World Bank (FRED JPY series ended 2021)")
     dt_wb, val_wb = wb_cpi_yoy("JP")
-    if val_wb is not None and -5.0 < val_wb < 25.0:
+    if val_wb is not None and _valid(val_wb, "JPY"):
         print(f"    ~ JPY: {val_wb:.4f}% ({dt_wb}) [World Bank]")
         return dt_wb, val_wb
     return None, None
 
 
-def fetch_aud():
+def fetch_aud() -> tuple:
     """
-    AUD CPI YoY cascade (ABS is quarterly):
-      1. OECD SDMX MEI CPALTT01 quarterly (AUS)
-      2. OECD SDMX MEI CPALTT01 monthly (AUS)   — monthly ABS gauge
-      3. FRED CPALTT01AUM659N YoY direct
-      4. World Bank
+    AUD: OECD SDMX quarterly → OECD monthly → FRED AUSCPIALLQINMEI → WB
+    (CPALTT01AUM659N series never existed — not in cascade)
     """
     dt, val = oecd_cpi_yoy("AUS", "Q")
-    if val is not None and -5.0 < val < 25.0:
-        print(f"    ✓ AUD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX quarterly]")
+    if val is not None and _valid(val, "AUD"):
+        print(f"    ✓ AUD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX Q ST→YoY]")
         return dt, val
+
     print("    ✗ AUD: OECD quarterly miss — trying OECD monthly")
     dt, val = oecd_cpi_yoy("AUS", "M")
-    if val is not None and -5.0 < val < 25.0:
-        print(f"    ~ AUD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX monthly]")
+    if val is not None and _valid(val, "AUD"):
+        print(f"    ~ AUD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX M ST→YoY]")
         return dt, val
-    print("    ✗ AUD: OECD monthly miss — trying FRED CPALTT01AUM659N")
-    rows = fred_csv("CPALTT01AUM659N")
-    if rows:
-        dt_f, val_f = rows[0]
-        if -5.0 < val_f < 25.0:
-            print(f"    ~ AUD: {val_f:.4f}% ({dt_f.date()}) [FRED YoY direct]")
-            return dt_f.strftime("%Y-%m-%d"), round(val_f, 4)
+
+    print("    ✗ AUD: OECD monthly miss — trying FRED AUSCPIALLQINMEI")
+    dt, val = fred_index_to_yoy("AUSCPIALLQINMEI")
+    if val is not None and _valid(val, "AUD"):
+        print(f"    ~ AUD: {val:.4f}% CPI YoY ({dt}) [FRED AUSCPIALLQINMEI→YoY]")
+        return dt, val
+
     print("    ✗ AUD: FRED miss — trying World Bank")
     dt_wb, val_wb = wb_cpi_yoy("AU")
-    if val_wb is not None and -5.0 < val_wb < 25.0:
+    if val_wb is not None and _valid(val_wb, "AUD"):
         print(f"    ~ AUD: {val_wb:.4f}% ({dt_wb}) [World Bank]")
         return dt_wb, val_wb
     return None, None
 
 
-def fetch_cad():
-    """
-    CAD CPI YoY cascade:
-      1. OECD SDMX MEI CPALTT01 monthly (CAN)
-      2. FRED CPALTT01CAM659N YoY direct
-      3. World Bank
-    """
+def fetch_cad() -> tuple:
+    """CAD: OECD SDMX monthly → FRED CANCPIALLMINMEI → WB"""
     dt, val = oecd_cpi_yoy("CAN", "M")
-    if val is not None and -5.0 < val < 25.0:
-        print(f"    ✓ CAD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX]")
+    if val is not None and _valid(val, "CAD"):
+        print(f"    ✓ CAD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX ST→YoY]")
         return dt, val
-    print("    ✗ CAD: OECD miss — trying FRED CPALTT01CAM659N")
-    rows = fred_csv("CPALTT01CAM659N")
-    if rows:
-        dt_f, val_f = rows[0]
-        if -5.0 < val_f < 25.0:
-            print(f"    ~ CAD: {val_f:.4f}% ({dt_f.date()}) [FRED YoY direct]")
-            return dt_f.strftime("%Y-%m-%d"), round(val_f, 4)
+
+    print("    ✗ CAD: OECD miss — trying FRED CANCPIALLMINMEI")
+    dt, val = fred_index_to_yoy("CANCPIALLMINMEI")
+    if val is not None and _valid(val, "CAD"):
+        print(f"    ~ CAD: {val:.4f}% CPI YoY ({dt}) [FRED CANCPIALLMINMEI→YoY]")
+        return dt, val
+
     print("    ✗ CAD: FRED miss — trying World Bank")
     dt_wb, val_wb = wb_cpi_yoy("CA")
-    if val_wb is not None and -5.0 < val_wb < 25.0:
+    if val_wb is not None and _valid(val_wb, "CAD"):
         print(f"    ~ CAD: {val_wb:.4f}% ({dt_wb}) [World Bank]")
         return dt_wb, val_wb
     return None, None
 
 
-def fetch_chf():
-    """
-    CHF CPI YoY cascade:
-      1. OECD SDMX MEI CPALTT01 monthly (CHE)
-      2. FRED CPALTT01CHM659N YoY direct
-      3. World Bank
-    """
+def fetch_chf() -> tuple:
+    """CHF: OECD SDMX monthly → FRED CHECPIALLMINMEI → WB"""
     dt, val = oecd_cpi_yoy("CHE", "M")
-    if val is not None and -5.0 < val < 25.0:
-        print(f"    ✓ CHF: {val:.4f}% CPI YoY ({dt}) [OECD SDMX]")
+    if val is not None and _valid(val, "CHF"):
+        print(f"    ✓ CHF: {val:.4f}% CPI YoY ({dt}) [OECD SDMX ST→YoY]")
         return dt, val
-    print("    ✗ CHF: OECD miss — trying FRED CPALTT01CHM659N")
-    rows = fred_csv("CPALTT01CHM659N")
-    if rows:
-        dt_f, val_f = rows[0]
-        if -5.0 < val_f < 25.0:
-            print(f"    ~ CHF: {val_f:.4f}% ({dt_f.date()}) [FRED YoY direct]")
-            return dt_f.strftime("%Y-%m-%d"), round(val_f, 4)
+
+    print("    ✗ CHF: OECD miss — trying FRED CHECPIALLMINMEI")
+    dt, val = fred_index_to_yoy("CHECPIALLMINMEI")
+    if val is not None and _valid(val, "CHF"):
+        print(f"    ~ CHF: {val:.4f}% CPI YoY ({dt}) [FRED CHECPIALLMINMEI→YoY]")
+        return dt, val
+
     print("    ✗ CHF: FRED miss — trying World Bank")
     dt_wb, val_wb = wb_cpi_yoy("CH")
-    if val_wb is not None and -5.0 < val_wb < 25.0:
+    if val_wb is not None and _valid(val_wb, "CHF"):
         print(f"    ~ CHF: {val_wb:.4f}% ({dt_wb}) [World Bank]")
         return dt_wb, val_wb
     return None, None
 
 
-def fetch_nzd():
-    """
-    NZD CPI YoY cascade (Stats NZ is quarterly):
-      1. OECD SDMX MEI CPALTT01 quarterly (NZL)
-      2. OECD SDMX MEI CPALTT01 monthly (NZL)
-      3. FRED CPALTT01NZM659N YoY direct
-      4. World Bank
-    """
+def fetch_nzd() -> tuple:
+    """NZD: OECD SDMX quarterly → OECD monthly → FRED NZLCPIALLQINMEI → WB"""
     dt, val = oecd_cpi_yoy("NZL", "Q")
-    if val is not None and -5.0 < val < 25.0:
-        print(f"    ✓ NZD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX quarterly]")
+    if val is not None and _valid(val, "NZD"):
+        print(f"    ✓ NZD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX Q ST→YoY]")
         return dt, val
+
     print("    ✗ NZD: OECD quarterly miss — trying OECD monthly")
     dt, val = oecd_cpi_yoy("NZL", "M")
-    if val is not None and -5.0 < val < 25.0:
-        print(f"    ~ NZD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX monthly]")
+    if val is not None and _valid(val, "NZD"):
+        print(f"    ~ NZD: {val:.4f}% CPI YoY ({dt}) [OECD SDMX M ST→YoY]")
         return dt, val
-    print("    ✗ NZD: OECD monthly miss — trying FRED CPALTT01NZM659N")
-    rows = fred_csv("CPALTT01NZM659N")
-    if rows:
-        dt_f, val_f = rows[0]
-        if -5.0 < val_f < 25.0:
-            print(f"    ~ NZD: {val_f:.4f}% ({dt_f.date()}) [FRED YoY direct]")
-            return dt_f.strftime("%Y-%m-%d"), round(val_f, 4)
+
+    print("    ✗ NZD: OECD monthly miss — trying FRED NZLCPIALLQINMEI")
+    dt, val = fred_index_to_yoy("NZLCPIALLQINMEI")
+    if val is not None and _valid(val, "NZD"):
+        print(f"    ~ NZD: {val:.4f}% CPI YoY ({dt}) [FRED NZLCPIALLQINMEI→YoY]")
+        return dt, val
+
     print("    ✗ NZD: FRED miss — trying World Bank")
     dt_wb, val_wb = wb_cpi_yoy("NZ")
-    if val_wb is not None and -5.0 < val_wb < 25.0:
+    if val_wb is not None and _valid(val_wb, "NZD"):
         print(f"    ~ NZD: {val_wb:.4f}% ({dt_wb}) [World Bank]")
         return dt_wb, val_wb
     return None, None
@@ -550,8 +584,9 @@ def main() -> int:
             failures += 1
             continue
 
-        if is_stale(date_str):
-            print(f"    ⚠ {ccy}: observation {date_str} is >{MAX_AGE_DAYS}d old — skipping")
+        if is_stale(date_str, ccy):
+            threshold = MAX_AGE.get(ccy, 120)
+            print(f"    ⚠ {ccy}: observation {date_str} is >{threshold}d old — skipping")
             _gha_warning(f"fetch_inflation_expectations: {ccy} stale ({date_str})")
             failures += 1
             continue
@@ -561,7 +596,6 @@ def main() -> int:
         else:
             failures += 1
 
-    # ── Summary ───────────────────────────────────────────────────────────────
     print("\n" + "=" * 60)
     print("SUMMARY")
     print("=" * 60)
@@ -574,7 +608,7 @@ def main() -> int:
         print(f"\n  Skipped/failed: {', '.join(skipped)} ({failures} issue(s))")
 
     if failures >= 3:
-        _gha_error("fetch_inflation_expectations: ≥3 currencies failed — likely upstream outage")
+        _gha_error("fetch_inflation_expectations: >=3 currencies failed — likely upstream outage")
         return 1
 
     print(f"\n  {len(results)}/8 currencies written successfully.")
