@@ -6149,18 +6149,24 @@ async function fetchCarryRanking() {
     return 'FX_IDC:' + long + short;
   }
 
-  // Canonical pair ID used in quotes.json / hv30 map (always alphabetical
-  // except USD-majors which follow market convention — same as HV30_FX_PAIRS)
+  // Canonical pair ID used in quotes.json / hv30 map — matches HV30_FX_PAIRS in
+  // fetch_intraday_quotes.py (FX market convention, not alphabetical for crosses).
+  // e.g. EUR/AUD = 'euraud' (not 'audeur'), GBP/CHF = 'gbpchf' (not 'chfgbp'),
+  //      NZD/JPY = 'nzdjpy' (not 'jpynzd').
   function pairId(a, b) {
-    const USD_MAJORS = {
-      'EURUSD':1,'GBPUSD':1,'AUDUSD':1,'NZDUSD':1,
-      'USDJPY':1,'USDCHF':1,'USDCAD':1,
-    };
-    const c1 = a + b, c2 = b + a;
-    if (USD_MAJORS[c1]) return c1.toLowerCase();
-    if (USD_MAJORS[c2]) return c2.toLowerCase();
-    // Cross pairs: alphabetical
-    return (a < b ? a + b : b + a).toLowerCase();
+    const HV30_PAIRS = new Set([
+      'eurusd','gbpusd','usdjpy','audusd','usdchf','usdcad','nzdusd',
+      'eurgbp','eurjpy','eurchf','eurcad','euraud',
+      'gbpjpy','gbpchf','gbpcad',
+      'audjpy','audnzd','audchf',
+      'cadjpy','chfjpy','nzdjpy',
+      'eurnzd','gbpaud','gbpnzd','audcad','cadchf','nzdcad','nzdchf',
+    ]);
+    const c1 = (a + b).toLowerCase();
+    const c2 = (b + a).toLowerCase();
+    if (HV30_PAIRS.has(c1)) return c1;
+    if (HV30_PAIRS.has(c2)) return c2;
+    return a < b ? c1 : c2;
   }
 
   // Rate-cycle regime arrow for a currency, derived from STATE.cbRates trend
