@@ -61,7 +61,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | `calendar-data/` | Economic calendar events — `calendar.json` consumed by `update_extended_data.py` for PMI/CPI enrichment; `ff_calendar.json` (ForexFactory, G8 high-impact, this week + next) consumed by `generate_narrative_signals.py` → `build_calendar_block()` to ground session context notes in real catalysts | Engine — daily |
 | `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer) + 26-week `history[]` rolling window | Engine — weekly (Saturday) |
 | `economic-data/` | Macro indicators | Engine — daily |
-| `extended-data/` | IV, carry, cross-asset fallback | Engine — daily |
+| `extended-data/` | IV, carry, cross-asset fallback, inflation expectations | Engine — daily / Site — weekly (inflation expectations) |
 | `fx-data/` | `frankfurter.json` (ECB rates cache) + `fx-liquidity.json` | Engine — daily |
 | `intraday-data/` | `quotes.json` — primary intraday source for cross-asset panels; `iv_history.json` — rolling 52-week IV snapshots per FX pair for IV Rank calculation | Engine — every 5 min (quotes); weekly append (iv_history) |
 | `meetings-data/` | CB meeting schedules | Engine — weekly |
@@ -69,6 +69,13 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | `rates/` | FX rates cache | Engine — daily |
 | `rr-data/` | `rr.json` — 25-delta Risk Reversal quotes (4 G8 pairs, 1M tenor) from Saxo Bank | Engine — Mon–Fri daily |
 | `sentiment-data/` | `myfxbook.json` — retail positioning | Engine — hourly |
+
+### Site repo workflows
+
+| Workflow | Schedule (UTC) | Output |
+|---|---|---|
+| `update-bond-yields.yml` | 23:00 daily | `extended-data/{USD,EUR,GBP,JPY}.json` — bond10y, bond2y, bond5y, vix (FRED + ECB + BOE) |
+| `update-inflation-expectations.yml` | Monday 06:00 | `extended-data/{USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD}.json` — inflationExpectations (FRED + World Bank) |
 
 ---
 
