@@ -22,6 +22,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GI Terminal">
 <link rel="canonical" href="https://globalinvesting.github.io/">
+<link rel="alternate" type="application/rss+xml"  title="Global Investing FX Terminal — AI Market Narrative" href="https://globalinvesting.github.io/feed.xml">
+<link rel="alternate" type="application/feed+json" title="Global Investing FX Terminal — AI Market Narrative" href="https://globalinvesting.github.io/feed.json">
 <link rel="sitemap" type="application/xml" href="https://globalinvesting.github.io/sitemap.xml">
 
 <!-- ═══════════════════════════════════════
@@ -926,6 +928,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div class="footer-copy">&#169; 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
 
+    <!-- RSS FEED BUTTON -->
+    <div id="rss-anchor" style="position:relative;">
+      <button class="kb-hint-btn" id="rss-btn" onclick="toggleRssPopover()" title="Subscribe to AI narrative feed" aria-label="Subscribe to market narrative feed" aria-haspopup="true" aria-expanded="false">
+        rss
+      </button>
+      <!-- RSS POPOVER -->
+      <div id="rss-popover" role="dialog" aria-label="Subscribe to market narrative feed" style="display:none;"></div>
+    </div>
+
     <!-- ALERTS BELL -->
     <div id="alerts-anchor" style="position:relative;">
       <button class="kb-hint-btn" id="alerts-bell-btn" onclick="toggleAlertsPopover()" title="Configure price alerts" aria-label="Price alerts" aria-haspopup="true" aria-expanded="false">
@@ -1036,6 +1047,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <script src="assets/yc-modal.js?v=1.2.0" defer></script>
 <script src="assets/heatmap-modal.js?v=1.0.0" defer></script>
 <script src="assets/onboarding.js?v=1.0.0" defer></script>
+<script src="assets/feed.js?v=1.0.0" defer></script>
 
 <div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
