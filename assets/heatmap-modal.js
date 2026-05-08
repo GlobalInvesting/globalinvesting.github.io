@@ -180,24 +180,33 @@
 .sess-val { text-align:right; }
 
 /* Correlations tab — Bloomberg-style compact rectangular grid */
+/* Correlations matrix — Proposal A palette (Bloomberg density, cohesive with Real Carry Modal) */
+.corr-wrap {
+  overflow:auto;
+  scrollbar-width:thin;
+  scrollbar-color:#444c56 transparent;
+}
+.corr-wrap::-webkit-scrollbar { height:4px;width:4px; }
+.corr-wrap::-webkit-scrollbar-thumb { background:#444c56;border-radius:2px; }
 .corr-grid {
   display:grid;
-  grid-template-columns:30px repeat(8,1fr) 42px;
+  grid-template-columns:34px repeat(8,1fr) 46px;
   gap:2px;
-  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  font-family:'IBM Plex Mono',var(--font-mono,'JetBrains Mono','Courier New',monospace);
   font-size:9px;
+  min-width:520px;
 }
 .corr-hdr {
   display:flex;align-items:center;justify-content:center;
-  color:var(--text3,#6b7280);font-size:8px;font-weight:600;
+  color:#6e7681;font-size:8px;font-weight:600;
   letter-spacing:.04em;height:18px;
 }
 .corr-hdr.row-lbl {
   justify-content:flex-end;padding-right:4px;
-  color:var(--text2,#787b86);font-size:8px;font-weight:700;
+  color:#8b949e;font-size:8px;font-weight:700;
 }
-.corr-hdr.comp { color:var(--blue,#4f7fff);font-weight:700; }
-.corr-hdr.comp.row-lbl { color:var(--blue,#4f7fff); }
+.corr-hdr.focal { color:#388bfd;font-weight:700; }
+.corr-hdr.focal.row-lbl { color:#388bfd; }
 .corr-cell {
   height:24px;
   border-radius:2px;
@@ -205,10 +214,8 @@
   font-size:9px;font-weight:600;
   letter-spacing:.02em;
 }
-.corr-cell.comp {
-  border-radius:2px;
-  font-weight:700;
-}
+.corr-cell.focal { border-radius:2px;font-weight:700; }
+.corr-cell.diag  { background:#21262d;color:#8b949e;font-weight:400; }
 
 /* Footer */
 #hm-footer {
@@ -1077,6 +1084,8 @@
     strengths.forEach(s => { pctMap[s.ccy] = s.pct; });
 
     const matrix = document.getElementById('hm-corr-matrix');
+    const wrap   = document.createElement('div');
+    wrap.className = 'corr-wrap';
     const grid   = document.createElement('div');
     grid.className = 'corr-grid';
 
@@ -1086,61 +1095,56 @@
 
     ccys.forEach(c => {
       const h = document.createElement('div');
-      h.className = 'corr-hdr' + (c === ccy ? ' comp' : '');
+      h.className = 'corr-hdr' + (c === ccy ? ' focal' : '');
       h.textContent = c;
       grid.appendChild(h);
     });
 
     // Composite column header
     const compHdr = document.createElement('div');
-    compHdr.className = 'corr-hdr comp';
+    compHdr.className = 'corr-hdr focal';
     compHdr.textContent = 'Comp.';
     compHdr.title = 'Equal-weighted composite — avg % vs all 7 G8 peers';
     grid.appendChild(compHdr);
 
     // ── Rows 1–8: data ────────────────────────────────────────────────────
-    // Compute max abs diff for normalization (saturates at 0.6%)
-    const SAT = 0.6; // saturation point — diffs >= this get max colour
+    // Saturates at 0.6% — Proposal A palette: #3fb950 (up) / #f85149 (down)
+    const SAT = 0.6;
 
     ccys.forEach(rowCcy => {
       // Row label
       const rLbl = document.createElement('div');
-      rLbl.className = 'corr-hdr row-lbl' + (rowCcy === ccy ? ' comp' : '');
+      rLbl.className = 'corr-hdr row-lbl' + (rowCcy === ccy ? ' focal' : '');
       rLbl.textContent = rowCcy;
       grid.appendChild(rLbl);
 
       ccys.forEach(colCcy => {
         const cell = document.createElement('div');
-        cell.className = 'corr-cell';
 
         if (rowCcy === colCcy) {
-          cell.style.background = 'rgba(255,255,255,.06)';
+          cell.className = 'corr-cell diag';
           cell.textContent = '—';
-          cell.style.color = 'var(--text3,#6b7280)';
-          cell.style.fontWeight = '400';
         } else {
           const diff  = (pctMap[rowCcy] ?? 0) - (pctMap[colCcy] ?? 0);
           const abs   = Math.abs(diff);
-          // Alpha: 0.15 baseline → 0.85 max, saturates at SAT%
-          const alpha = 0.15 + Math.min(abs / SAT, 1) * 0.70;
-          const isHL  = rowCcy === ccy || colCcy === ccy;
+          // Alpha: 0.12 baseline → 0.82 max, saturates at SAT%
+          const alpha = 0.12 + Math.min(abs / SAT, 1) * 0.70;
+          const isFocal = rowCcy === ccy || colCcy === ccy;
+          cell.className = 'corr-cell' + (isFocal ? ' focal' : '');
 
           if (diff > 0.02) {
-            cell.style.background  = `rgba(38,166,154,${alpha.toFixed(2)})`;
-            // Text: white when background is dark enough, coloured otherwise
-            cell.style.color = alpha > 0.50 ? '#fff' : 'var(--up,#26a69a)';
+            cell.style.background = `rgba(63,185,80,${alpha.toFixed(2)})`;
+            cell.style.color      = alpha > 0.50 ? '#fff' : '#3fb950';
           } else if (diff < -0.02) {
-            cell.style.background  = `rgba(239,83,80,${alpha.toFixed(2)})`;
-            cell.style.color = alpha > 0.50 ? '#fff' : 'var(--down,#ef5350)';
+            cell.style.background = `rgba(248,81,73,${alpha.toFixed(2)})`;
+            cell.style.color      = alpha > 0.50 ? '#fff' : '#f85149';
           } else {
-            // Effectively flat — neutral cell
             cell.style.background = 'rgba(255,255,255,.04)';
-            cell.style.color = 'var(--text3,#6b7280)';
+            cell.style.color      = '#6e7681';
             cell.style.fontWeight = '400';
           }
-          if (isHL) cell.style.outline = '1px solid rgba(79,127,255,.4)';
+          if (isFocal) cell.style.outline = '1px solid rgba(56,139,253,.4)';
 
-          // Format: show one decimal, always with sign
           const label = (diff >= 0 ? '+' : '') + diff.toFixed(1);
           cell.textContent = label;
           cell.title = `${rowCcy} vs ${colCcy}: ${fmt2(diff)}`;
@@ -1148,25 +1152,25 @@
         grid.appendChild(cell);
       });
 
-      // Composite cell (rightmost column) — green/red matching matrix convention, border-left separator
-      const rowComp  = pctMap[rowCcy] ?? 0;
-      const compCell = document.createElement('div');
-      compCell.className = 'corr-cell comp';
-      const compAbs   = Math.abs(rowComp);
-      const compAlpha = 0.12 + Math.min(compAbs / 0.4, 1) * 0.60;
+      // Composite cell (rightmost column) — Proposal A palette, border-left separator
+      const rowComp    = pctMap[rowCcy] ?? 0;
+      const compCell   = document.createElement('div');
+      compCell.className = 'corr-cell focal';
+      const compAbs    = Math.abs(rowComp);
+      const compAlpha  = 0.12 + Math.min(compAbs / 0.4, 1) * 0.60;
       const isFocusRow = rowCcy === ccy;
       if (rowComp > 0.01) {
-        compCell.style.background = `rgba(38,166,154,${compAlpha.toFixed(2)})`;
-        compCell.style.color      = compAlpha > 0.45 ? '#fff' : 'var(--up,#26a69a)';
+        compCell.style.background = `rgba(63,185,80,${compAlpha.toFixed(2)})`;
+        compCell.style.color      = compAlpha > 0.45 ? '#fff' : '#3fb950';
       } else if (rowComp < -0.01) {
-        compCell.style.background = `rgba(239,83,80,${compAlpha.toFixed(2)})`;
-        compCell.style.color      = compAlpha > 0.45 ? '#fff' : 'var(--down,#ef5350)';
+        compCell.style.background = `rgba(248,81,73,${compAlpha.toFixed(2)})`;
+        compCell.style.color      = compAlpha > 0.45 ? '#fff' : '#f85149';
       } else {
         compCell.style.background = 'rgba(255,255,255,.04)';
-        compCell.style.color      = 'var(--text3,#6b7280)';
+        compCell.style.color      = '#6e7681';
       }
-      compCell.style.fontWeight   = '700';
-      compCell.style.borderLeft   = '2px solid rgba(255,255,255,.10)';
+      compCell.style.fontWeight = '700';
+      compCell.style.borderLeft = '2px solid rgba(255,255,255,.10)';
       if (isFocusRow) compCell.style.outline = '1px solid rgba(255,255,255,.30)';
       compCell.textContent = rowComp >= 0 ? '+' + rowComp.toFixed(2) : rowComp.toFixed(2);
       compCell.title = `${rowCcy} composite vs G8 peers: ${fmt2(rowComp)}`;
@@ -1175,7 +1179,7 @@
 
     // ── Footer row: column composite values ───────────────────────────────
     const footLbl = document.createElement('div');
-    footLbl.className = 'corr-hdr comp row-lbl';
+    footLbl.className = 'corr-hdr focal row-lbl';
     footLbl.textContent = 'Comp.';
     footLbl.style.fontSize = '8px';
     grid.appendChild(footLbl);
@@ -1183,21 +1187,21 @@
     ccys.forEach(colCcy => {
       const cv       = pctMap[colCcy] ?? 0;
       const footCell = document.createElement('div');
-      footCell.className = 'corr-cell comp';
+      footCell.className = 'corr-cell focal';
       const cvAbs   = Math.abs(cv);
       const cvAlpha = 0.12 + Math.min(cvAbs / 0.4, 1) * 0.60;
       if (cv > 0.01) {
-        footCell.style.background = `rgba(38,166,154,${cvAlpha.toFixed(2)})`;
-        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : 'var(--up,#26a69a)';
+        footCell.style.background = `rgba(63,185,80,${cvAlpha.toFixed(2)})`;
+        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : '#3fb950';
       } else if (cv < -0.01) {
-        footCell.style.background = `rgba(239,83,80,${cvAlpha.toFixed(2)})`;
-        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : 'var(--down,#ef5350)';
+        footCell.style.background = `rgba(248,81,73,${cvAlpha.toFixed(2)})`;
+        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : '#f85149';
       } else {
         footCell.style.background = 'rgba(255,255,255,.04)';
-        footCell.style.color      = 'var(--text3,#6b7280)';
+        footCell.style.color      = '#6e7681';
       }
-      footCell.style.fontWeight  = '700';
-      footCell.style.borderTop   = '2px solid rgba(255,255,255,.10)';
+      footCell.style.fontWeight = '700';
+      footCell.style.borderTop  = '2px solid rgba(255,255,255,.10)';
       if (colCcy === ccy) footCell.style.outline = '1px solid rgba(255,255,255,.30)';
       footCell.textContent = cv >= 0 ? '+' + cv.toFixed(2) : cv.toFixed(2);
       footCell.title = `${colCcy} composite vs G8 peers: ${fmt2(cv)}`;
@@ -1206,16 +1210,17 @@
 
     // Corner cell (Comp. × Comp. intersection)
     const corner = document.createElement('div');
-    corner.className = 'corr-cell comp';
-    corner.style.background  = 'rgba(79,127,255,.05)';
-    corner.style.border      = '1px solid rgba(79,127,255,.15)';
-    corner.textContent       = '—';
-    corner.style.color       = 'var(--text3,#6b7280)';
-    corner.style.fontSize    = '8px';
+    corner.className = 'corr-cell focal';
+    corner.style.background = 'rgba(56,139,253,.05)';
+    corner.style.border     = '1px solid rgba(56,139,253,.15)';
+    corner.textContent      = '—';
+    corner.style.color      = '#6e7681';
+    corner.style.fontSize   = '8px';
     grid.appendChild(corner);
 
+    wrap.appendChild(grid);
     matrix.innerHTML = '';
-    matrix.appendChild(grid);
+    matrix.appendChild(wrap);
 
     // Top 3 drivers
     const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
