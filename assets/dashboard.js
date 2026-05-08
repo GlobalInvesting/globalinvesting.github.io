@@ -6653,7 +6653,7 @@ async function fetchFedExpectations() {
       const current = parseFloat(obs[0].value);
 
       const meetings = meetingsRes?.meetings?.[ccy];
-      const nextMtg  = meetings?.allMeetingsFormatted?.[0] || '—';
+      const nextMtg  = meetings?.nextMeeting || '—';
 
       // ── Bias: prefer explicit market-consensus field from meetings.json ──
       // meetings.bias       = 'cut' | 'hold' | 'hike' — OIS/overnight rate implied direction
