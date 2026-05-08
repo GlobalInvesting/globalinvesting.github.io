@@ -18,7 +18,7 @@
   const STEPS = [
     {
       title: 'AI Market Narrative',
-      body:  'Every 15 minutes, the terminal reads COT positioning, central bank rates, yield spreads, and cross-asset risk to produce a single market narrative — what the macro environment looks like right now.',
+      body:  'At each major session transition — Asia open, London open, NY overlap, and others — the terminal reads COT positioning, central bank rates, yield spreads, and cross-asset risk to produce a single market narrative: what the macro environment looks like right now.',
       target: 'narrative',
     },
     {
