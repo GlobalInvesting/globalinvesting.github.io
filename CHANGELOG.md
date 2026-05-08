@@ -1,10 +1,39 @@
-## v7.64.8 (2026-05-07) — Fix DXY/Gold/WTI duplicate bar in post-reopen window
+## v7.64.10 (2026-05-07) — Real Rate Carry Modal: fix loading latency
 
-### Site — assets/dashboard.js
-- **Root cause:** `_lwBuildTodayBar()` and the strip block both applied a +1 day advance when `market_time` UTC hour ≥ the session reopen boundary (22 UTC for DXY/Gold/WTI in EDT). The intent was to match `fetch_ohlc.py`'s historical-bar convention, where `session_date` = the calendar date of the session CLOSE. For the live today-bar this was wrong: at 22:57 UTC May 7 (DXY reopened at 22:00), both assigned `dateStr = '2026-05-08'` while the JSON still contained the completed `'2026-05-07'` bar — producing two visible candles that looked like a duplicate today-bar. TradingView correctly shows a single candle because it dates the live session bar by its OPEN date, not its close date.
-- **Fix:** Removed the +1 day boundary advance from `_lwBuildTodayBar` (non-FX branch) and from the strip block. Both now use the raw `market_time` UTC calendar date with no adjustment. `dateStr = _mtDate.toISOString().slice(0, 10)`. This is the session-open date convention, which matches TradingView (ICE/CME instruments) and ensures `_stripFrom === todayBar.time` — the JSON bar for that date is stripped and `update()` replaces it with live data. No second candle appears.
-- **Cleanup:** Removed orphaned `_nyOffsetH`, `_cmeBoundaryUTC`, and `_NON_FX_BOUNDARIES` calculation from `_lwBuildTodayBar` (no longer needed) and `_NON_FX_BD` from the strip block (also no longer needed).
-- **Scope:** Affects DXY, Gold, and WTI charts in the 22:00–00:00 UTC window (EDT) when the new session has just opened. FX pair logic is unchanged.
+### Frontend — assets/real-carry-modal.js
+- **Root cause (P1 — main bottleneck):** `_rcmFetchData()` fetched FRED T5YIE and T5YIFR as a blocking `await` *before* fetching the 6 remaining `extended-data/*.json` files. FRED is a cross-origin CSV endpoint that returns the full historical dataset (~several hundred KB). From South America, round-trip latency is 800–2500ms. Because `extended-data/USD.json` and `extended-data/EUR.json` already contain fresh `inflationExpectations` (written by the weekly engine pipeline), the FRED fetch was blocking the modal for 1–2.5 seconds to obtain data that was already available same-origin.
+- **Root cause (P2 — serial await chain):** Steps 3 (extended-data), 4 (meetings.json), 5 (quotes.json) were serial `await` calls that queued behind step 2 (FRED). All four could run in parallel; none depends on the others.
+- **Root cause (P3 — blind cache invalidation):** The 15-minute `setInterval` unconditionally set `_rcmData = null` even when the modal was closed. A user opening the modal at T+14:59 after the last interval always got a cold start (full re-fetch + spinner), even though the data was only 14:59 stale.
+- **Root cause (P4 — in-flight dedup):** `_rcmFetching` was a boolean flag that returned `void` on concurrent calls. Rapid double-clicks spawned two parallel fetch trees that both tried to write `_rcmData`.
+- **Root cause (P5 — no-store cache header):** FRED fetches used `cache:'no-store'`, bypassing the browser HTTP cache. Each modal open downloaded the full FRED CSV from scratch, even within the same browser session.
+- **Fix — Phase 1/2 architecture:** `_rcmFetchData()` now runs all same-origin fetches (8×rates + 8×extended-data + meetings.json + quotes.json = 18 requests) in a single `Promise.all`. Phase 1 completes in ~40-80ms (HTTP/2 multiplexed, same-origin). The modal renders immediately from Phase 1 data. FRED T5YIE/T5YIFR is now a non-blocking Phase 2 fire-and-forget that upgrades USD/EUR `infl.exp` to live market-implied values and silently re-renders the metrics bar if/when it resolves. Typical perceived open time: <100ms (cache hit) or ~80ms (cold Phase 1).
+- **Fix — TTL-based cache:** `_rcmFetchedAt` timestamp replaces blind nulling. Cache is valid for `_RCM_TTL` (15 min). The interval now fires every 60s but only triggers a re-fetch when the cache is actually stale. `_rcmData` is never nulled before new data is committed — a user opening the modal mid-background-refresh sees the previous data instantly.
+- **Fix — in-flight dedup:** `_rcmFetchPromise` stores the active `Promise`. Concurrent `openRealCarryModal` calls or rapid tab switches share one fetch tree.
+- **Fix — cache header:** Removed `cache:'no-store'` from FRED fetch. Browser HTTP cache now reused within session (FRED responses typically cached 5–30 min by CDN headers), eliminating redundant full-CSV downloads.
+- **Fix — spinner suppressed on cache hit:** `openRealCarryModal` only shows "Fetching…" on a true cold start (`_rcmData` is null). Subsequent opens within the TTL window render instantly without flashing the loading state.
+
+## v7.64.9 (2026-05-07) — Guide: document Real Rate Carry Modal (3 tabs, sources, mocks)
+
+### Guides — guide-dashboard.html
+- **New section under "Carry Trade — Top Pairs":** Added full documentation of the Real Rate Carry Analysis modal (`real-carry-modal.js`), which was previously undocumented in the guide.
+- **Modal overview:** Describes the header metrics bar (best/worst real rate, max spread, data source status) and the three-tab structure.
+- **Tab 1 — Rates Breakdown:** Documents all six columns (Nominal, Infl. Exp., Data Age, Real Rate, OIS Bias), the star marker for the top real rate, the green dot live-source indicator for USD/EUR FRED breakevens, and the color coding scale (matching Bloomberg FXFR convention).
+- **Tab 2 — Real Rate Matrix:** Documents the 8×8 differential matrix, cell = row real rate − column real rate convention, diagonal = absolute real rate, and the two-tier shading (≥1.5% high intensity, ≥0.15% standard).
+- **Tab 3 — Pair Detail:** Documents all eight KV metrics (nominal carry, real carry, per-leg real rates, nominal carry/vol, real carry/vol, OIS bias per leg), the three-tier sustainability assessment (Sustainable / Moderate / Carry trap risk), and the carry/vol calculation (|spread| / HV30).
+- **Inflation source table:** Added a reference table listing source, type, and cadence for all eight G8 currencies — USD/EUR (FRED daily market-implied breakevens), GBP/JPY/AUD/CAD/CHF (IMF SDMX 3.0 CPI YoY weekly), NZD (OECD Data Explorer weekly).
+- **Mocks added:** Header+metrics bar mock, Rates Breakdown table mock (8 rows with realistic rates/real rates), condensed Real Rate Matrix mock (3×5 excerpt), Pair Detail mock (USD/JPY with sustainability assessment).
+- **Click behavior corrected:** Guide previously stated clicking a carry row opens the price chart. Corrected: clicking opens the Real Rate Carry Modal on the Pair Detail tab for that pair.
+
+---
+
+## v7.64.8 (2026-05-07) — CB Rate Expectations: fix stale meeting dates across all 8 banks
+
+### Frontend — assets/dashboard.js
+- **Root cause:** `fetchFedExpectations()` was reading `meetings?.allMeetingsFormatted?.[0]` to display the next meeting date in the CB Rate Expectations panel. This always shows the *first* entry of the full calendar list (e.g. "29 Jan"), which is a past date once any meeting has elapsed. The `meetings.json` engine already computes and stores the correct upcoming date in the `nextMeeting` field — the frontend was simply ignoring it.
+- **Fix:** Changed line 6656 to read `meetings?.nextMeeting` instead of `meetings?.allMeetingsFormatted?.[0]`. All 8 banks now display the actual next upcoming meeting date.
+
+### Data — meetings-data/meetings.json
+- **AUD stale nextMeeting:** The RBA meeting of 5 May 2026 has already passed (today is 7 May 2026). Updated `nextMeeting` → "16 Jun" and `nextMeetingISO` → "2026-06-16" (next scheduled RBA meeting per rba.gov.au).
 
 ---
 
