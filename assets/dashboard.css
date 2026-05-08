@@ -418,6 +418,44 @@
     opacity: 0.6;
   }
 
+  /* ── Narrative share ghost button — visible on #narrative hover only ── */
+  .narr-share-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    color: var(--text3);
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity .18s, border-color .15s, color .15s;
+    pointer-events: none;
+  }
+  #narrative:hover .narr-share-btn,
+  #narrative:focus-within .narr-share-btn {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .narr-share-btn:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+  .narr-share-btn:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* Copied confirmation state */
+  .narr-share-btn.copied {
+    border-color: var(--up) !important;
+    color: var(--up) !important;
+    opacity: 1;
+    pointer-events: none;
+  }
+
   /* TABLE */
   table { width: 100%; border-collapse: collapse; }
   th {
