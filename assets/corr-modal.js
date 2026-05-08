@@ -30,7 +30,7 @@
   s.textContent = `
 #cm-bd {
   position:fixed;inset:0;z-index:9200;
-  background:rgba(0,0,0,.78);
+  background:rgba(0,0,0,.85);
   display:flex;align-items:center;justify-content:center;
   padding:12px;
   animation:cm-fi .15s ease;
@@ -39,82 +39,93 @@
 @keyframes cm-su { from{transform:translateY(12px);opacity:0} to{transform:none;opacity:1} }
 
 #cm-modal {
-  background:var(--bg,#131722);
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:10px;
+  background:#161b22;
+  border:1px solid #30363d;
+  border-radius:8px;
   width:min(800px,100%);
   max-height:90vh;
   display:flex;flex-direction:column;
   overflow:hidden;
-  animation:cm-su .2s ease;
+  box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
+  animation:cm-su .18s cubic-bezier(.16,1,.3,1);
   font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);
-  color:var(--text,#d1d4dc);
+  color:#e6edf3;
+  position:relative;
+}
+#cm-modal::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#1f6feb 0%,#58a6ff 50%,#26a69a 100%);
+  border-radius:8px 8px 0 0;z-index:1;
 }
 
 #cm-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:13px 18px 11px;
-  border-bottom:1px solid rgba(255,255,255,.07);
-  flex-shrink:0;
+  padding:14px 18px 12px;
+  border-bottom:1px solid #30363d;
+  flex-shrink:0;background:#161b22;
 }
-#cm-title { font-size:14px;font-weight:600;color:var(--text,#d1d4dc);letter-spacing:.01em; }
-#cm-sub   { font-size:10px;color:var(--text3,#6b7280);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+#cm-title { font-size:14px;font-weight:600;color:#e6edf3;letter-spacing:-.01em; }
+#cm-sub   { font-size:10px;color:#6e7681;margin-top:2px;font-family:'IBM Plex Mono',var(--font-mono,monospace);letter-spacing:.02em; }
 #cm-close {
-  background:none;border:none;color:var(--text3,#6b7280);font-size:20px;
-  cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1;
+  background:none;border:none;color:#6e7681;font-size:18px;
+  cursor:pointer;padding:5px 7px;border-radius:5px;line-height:1;
   transition:color .1s,background .1s;
 }
-#cm-close:hover { color:var(--text,#d1d4dc);background:rgba(255,255,255,.08); }
+#cm-close:hover { color:#e6edf3;background:#21262d; }
 
 #cm-strip {
   display:flex;
-  gap:1px;background:rgba(255,255,255,.05);
-  border-bottom:1px solid rgba(255,255,255,.07);
+  gap:0;background:#0d1117;
+  border-bottom:1px solid #30363d;
   flex-shrink:0;overflow-x:auto;
 }
 .cm-metric {
-  flex:1;min-width:90px;padding:10px 14px;
-  background:var(--bg,#131722);
+  flex:1;min-width:90px;padding:9px 16px;
+  background:#0d1117;border-right:1px solid #30363d;
 }
-.cm-m-lbl { font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:var(--font-mono,'JetBrains Mono',monospace); }
+.cm-metric:last-child { border-right:none; }
+.cm-m-lbl { font-size:9px;color:#6e7681;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
 .cm-m-val {
   font-size:20px;font-weight:600;
-  font-family:var(--font-mono,'JetBrains Mono',monospace);
-  line-height:1;color:var(--text,#d1d4dc);
+  font-family:'IBM Plex Mono',var(--font-mono,monospace);
+  line-height:1;color:#e6edf3;
 }
-.cm-m-val.up   { color:var(--up,#26a69a); }
-.cm-m-val.down { color:var(--down,#ef5350); }
-.cm-m-val.warn { color:var(--orange,#f6941c); }
-.cm-m-sub { font-size:9px;color:var(--text3,#6b7280);margin-top:3px;font-family:var(--font-mono,'JetBrains Mono',monospace); }
+.cm-m-val.up   { color:#26a69a; }
+.cm-m-val.down { color:#ef5350; }
+.cm-m-val.warn { color:#f6941c; }
+.cm-m-sub { font-size:9px;color:#6e7681;margin-top:3px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
 
 #cm-body {
   flex:1;overflow-y:auto;padding:16px 18px 20px;
   min-height:0;display:flex;flex-direction:column;gap:16px;
+  background:#0d1117;
+  scrollbar-width:thin;scrollbar-color:#444c56 transparent;
 }
-#cm-body::-webkit-scrollbar { width:5px; }
-#cm-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12);border-radius:3px; }
+#cm-body::-webkit-scrollbar { width:4px; }
+#cm-body::-webkit-scrollbar-track { background:transparent; }
+#cm-body::-webkit-scrollbar-thumb { background:#444c56;border-radius:2px; }
 
 .cm-section-title {
-  font-size:9px;color:var(--text3,#6b7280);
+  font-size:9px;color:#6e7681;
   text-transform:uppercase;letter-spacing:.08em;
-  margin-bottom:10px;
+  margin-bottom:10px;font-family:'IBM Plex Mono',var(--font-mono,monospace);
 }
 
 #cm-chart-wrap {
   position:relative;height:220px;
-  background:var(--bg2,#1e222d);
-  border:1px solid rgba(255,255,255,.07);
+  background:#161b22;
+  border:1px solid #30363d;
   border-radius:6px;overflow:hidden;
 }
 #cm-lwc-container { width:100%;height:100%; }
 
 #cm-tooltip {
   position:absolute;top:8px;left:12px;
-  background:rgba(19,23,34,.95);
-  border:1px solid rgba(255,255,255,.12);
+  background:#161b22;
+  border:1px solid #30363d;
   border-radius:4px;padding:5px 9px;
-  font-size:10px;font-family:var(--font-mono,'JetBrains Mono',monospace);
-  color:var(--text,#d1d4dc);pointer-events:none;
+  font-size:10px;font-family:'IBM Plex Mono',var(--font-mono,monospace);
+  color:#e6edf3;pointer-events:none;
   display:none;z-index:10;white-space:nowrap;
 }
 
@@ -123,11 +134,11 @@
 }
 .cm-leg-item {
   display:flex;align-items:center;gap:5px;
-  font-size:9px;color:var(--text2,#787b86);
-  font-family:var(--font-mono,'JetBrains Mono',monospace);
+  font-size:9px;color:#6e7681;
+  font-family:'IBM Plex Mono',var(--font-mono,monospace);
 }
 .cm-leg-swatch { width:18px;height:2px;border-radius:1px;flex-shrink:0; }
-.cm-leg-swatch.solid-blue { background:var(--blue,#4f7fff); }
+.cm-leg-swatch.solid-blue { background:#388bfd; }
 .cm-leg-swatch.dash-white {
   background:repeating-linear-gradient(90deg,rgba(255,255,255,.5) 0,rgba(255,255,255,.5) 3px,transparent 3px,transparent 6px);
 }
@@ -139,44 +150,45 @@
 }
 
 .cm-regime-card {
-  background:rgba(255,255,255,.02);
-  border:1px solid rgba(255,255,255,.06);
+  background:#161b22;
+  border:1px solid #30363d;
   border-radius:6px;padding:12px 14px;
   display:flex;flex-direction:column;gap:7px;
 }
 .cm-regime-row { display:flex;justify-content:space-between;align-items:baseline; }
-.cm-regime-key { font-size:10px;color:var(--text2,#787b86); }
+.cm-regime-key { font-size:10px;color:#8b949e;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
 .cm-regime-val {
   font-size:11px;font-weight:600;
-  font-family:var(--font-mono,'JetBrains Mono',monospace);
-  color:var(--text,#d1d4dc);
+  font-family:'IBM Plex Mono',var(--font-mono,monospace);
+  color:#e6edf3;
 }
-.cm-regime-val.up   { color:var(--up,#26a69a); }
-.cm-regime-val.down { color:var(--down,#ef5350); }
-.cm-regime-val.warn { color:var(--orange,#f6941c); }
-.cm-regime-val.flat { color:var(--text2,#787b86); }
+.cm-regime-val.up   { color:#26a69a; }
+.cm-regime-val.down { color:#ef5350; }
+.cm-regime-val.warn { color:#f6941c; }
+.cm-regime-val.flat { color:#8b949e; }
 
-.cm-trend-rising  { color:var(--up,#26a69a); }
-.cm-trend-falling { color:var(--down,#ef5350); }
-.cm-trend-stable  { color:var(--text2,#787b86); }
+.cm-trend-rising  { color:#26a69a; }
+.cm-trend-falling { color:#ef5350; }
+.cm-trend-stable  { color:#8b949e; }
 
 .cm-signal {
   margin-top:8px;
   display:flex;align-items:baseline;gap:10px;
   padding:6px 10px;
-  border-left:2px solid rgba(255,255,255,.12);
+  border-left:2px solid #30363d;
   font-size:10px;line-height:1.5;
-  color:var(--text2,#787b86);
+  color:#8b949e;
+  font-family:'IBM Plex Mono',var(--font-mono,monospace);
 }
-.cm-signal.warn { border-left-color:var(--down,#ef5350); }
-.cm-signal.ok   { border-left-color:var(--up,#26a69a); }
+.cm-signal.warn { border-left-color:#ef5350; }
+.cm-signal.ok   { border-left-color:#26a69a; }
 .cm-signal-tag {
   font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
-  font-family:var(--font-mono,'JetBrains Mono',monospace);white-space:nowrap;flex-shrink:0;
+  font-family:'IBM Plex Mono',var(--font-mono,monospace);white-space:nowrap;flex-shrink:0;
 }
-.cm-signal.warn .cm-signal-tag { color:var(--down,#ef5350); }
-.cm-signal.ok   .cm-signal-tag { color:var(--up,#26a69a); }
-.cm-signal-body { color:var(--text2,#787b86); }
+.cm-signal.warn .cm-signal-tag { color:#ef5350; }
+.cm-signal.ok   .cm-signal-tag { color:#26a69a; }
+.cm-signal-body { color:#8b949e; }
 
 @media(max-width:600px){
   #cm-modal{border-radius:12px 12px 0 0;position:fixed;bottom:0;left:0;right:0;width:100%;max-height:88vh;}
@@ -249,8 +261,8 @@ function _cmDrawChart(container, history, histDates, norm, std) {
   _cmChart = LWC.createChart(container, {
     autoSize: true,
     layout: {
-      background: { type: 'solid', color: '#1e222d' },
-      textColor: '#6b7280',
+      background: { type: 'solid', color: '#161b22' },
+      textColor: '#6e7681',
       fontSize: 10,
       fontFamily: "'JetBrains Mono','Courier New',monospace",
       attributionLogo: false,
@@ -333,7 +345,7 @@ function _cmDrawChart(container, history, histDates, norm, std) {
     priceLineVisible: false,
     crosshairMarkerRadius: 4,
     crosshairMarkerBackgroundColor: '#4f7fff',
-    crosshairMarkerBorderColor: '#1e222d',
+    crosshairMarkerBorderColor: '#161b22',
     priceFormat: { type: 'custom', formatter: fmt },
   });
   mainSer.setData(history.map((v, i) => mkPt(i, v)));
@@ -463,7 +475,7 @@ function openCorrModal(corrObj) {
     '<div id="cm-modal">' +
       '<div id="cm-hd">' +
         '<div>' +
-          '<div id="cm-title">' + a + ' <span style="color:var(--text3,#6b7280);font-weight:400">vs</span> ' + b + '</div>' +
+          '<div id="cm-title">' + a + ' <span style="color:#6e7681;font-weight:400">vs</span> ' + b + '</div>' +
           '<div id="cm-sub">Rolling Pearson \u00b7 yfinance \u00b7 252-day history \u00b7 z-score = 30d vs 30d-rolling norm</div>' +
         '</div>' +
         '<button id="cm-close" onclick="closeCorrModal()" aria-label="Close">\u00d7</button>' +

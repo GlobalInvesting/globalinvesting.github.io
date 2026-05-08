@@ -7,47 +7,50 @@
   if(document.getElementById('cbr-modal-css'))return;
   const s=document.createElement('style');s.id='cbr-modal-css';
   s.textContent=`
-#cbr-bd{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:12px;animation:cbr-fi .15s ease;}
+#cbr-bd{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:12px;animation:cbr-fi .15s ease;}
 @keyframes cbr-fi{from{opacity:0}to{opacity:1}}
-@keyframes cbr-su{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
-#cbr-modal{background:var(--bg,#131722);border:1px solid rgba(255,255,255,.1);border-radius:10px;width:min(860px,100%);height:min(600px,90vh);display:flex;flex-direction:column;overflow:hidden;animation:cbr-su .2s ease;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text,#d1d4dc);}
-#cbr-m-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 18px 11px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
-#cbr-m-title{font-size:14px;font-weight:600;color:var(--text,#d1d4dc);letter-spacing:.01em;}
-#cbr-m-sub{font-size:10px;color:var(--text3,#6b7280);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-#cbr-m-close{background:none;border:none;color:var(--text3,#6b7280);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1;transition:color .1s,background .1s;}
-#cbr-m-close:hover{color:var(--text,#d1d4dc);background:rgba(255,255,255,.08);}
-#cbr-m-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
-.cbr-mm{background:var(--bg,#131722);padding:9px 14px;display:flex;flex-direction:column;gap:2px;}
-.cbr-mm-lbl{font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.cbr-mm-val{font-size:14px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.cbr-mm-sub{font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-#cbr-m-tabs{display:flex;padding:0 18px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;overflow-x:auto;scrollbar-width:none;}
+@keyframes cbr-su{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+#cbr-modal{background:#161b22;border:1px solid #30363d;border-radius:8px;width:min(860px,100%);height:min(600px,90vh);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);animation:cbr-su .18s cubic-bezier(.16,1,.3,1);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:#e6edf3;position:relative;}
+#cbr-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#1f6feb 0%,#58a6ff 50%,#26a69a 100%);border-radius:8px 8px 0 0;z-index:1;}
+#cbr-m-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid #30363d;flex-shrink:0;background:#161b22;}
+#cbr-m-title{font-size:14px;font-weight:600;color:#e6edf3;letter-spacing:-.01em;}
+#cbr-m-sub{font-size:10px;color:#6e7681;margin-top:2px;font-family:'IBM Plex Mono',var(--font-mono,monospace);letter-spacing:.02em;}
+#cbr-m-close{background:none;border:none;color:#6e7681;font-size:18px;cursor:pointer;padding:5px 7px;border-radius:5px;line-height:1;transition:color .1s,background .1s;}
+#cbr-m-close:hover{color:#e6edf3;background:#21262d;}
+#cbr-m-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:0;background:#0d1117;border-bottom:1px solid #30363d;flex-shrink:0;}
+.cbr-mm{background:#0d1117;padding:9px 16px;display:flex;flex-direction:column;gap:2px;border-right:1px solid #30363d;}
+.cbr-mm:last-child{border-right:none;}
+.cbr-mm-lbl{font-size:9px;color:#6e7681;text-transform:uppercase;letter-spacing:.06em;font-family:'IBM Plex Mono',var(--font-mono,monospace);}
+.cbr-mm-val{font-size:14px;font-weight:600;font-family:'IBM Plex Mono',var(--font-mono,monospace);}
+.cbr-mm-sub{font-size:9px;color:#6e7681;font-family:'IBM Plex Mono',var(--font-mono,monospace);}
+#cbr-m-tabs{display:flex;padding:0 18px;border-bottom:1px solid #30363d;flex-shrink:0;overflow-x:auto;scrollbar-width:none;background:#161b22;}
 #cbr-m-tabs::-webkit-scrollbar{display:none;}
-.cbr-tab{font-size:11px;padding:9px 13px;cursor:pointer;color:var(--text3,#6b7280);border-bottom:2px solid transparent;transition:color .1s;white-space:nowrap;user-select:none;}
-.cbr-tab:hover{color:var(--text2,#9096a0);}
-.cbr-tab.on{color:var(--text,#d1d4dc);border-bottom-color:var(--blue,#4f7fff);}
-#cbr-m-body{flex:1;min-height:0;overflow-y:hidden;padding:14px 16px;display:flex;flex-direction:column;}
+.cbr-tab{font-size:11px;padding:9px 13px;cursor:pointer;color:#6e7681;border-bottom:2px solid transparent;transition:color .1s;white-space:nowrap;user-select:none;}
+.cbr-tab:hover{color:#8b949e;}
+.cbr-tab.on{color:#e6edf3;border-bottom-color:#388bfd;}
+#cbr-m-body{flex:1;min-height:0;overflow-y:hidden;padding:14px 16px;display:flex;flex-direction:column;background:#0d1117;scrollbar-width:thin;scrollbar-color:#444c56 transparent;}
 #cbr-m-body.cbr-body--history{overflow-y:auto;}
-#cbr-m-body::-webkit-scrollbar{width:5px;}
-#cbr-m-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
+#cbr-m-body::-webkit-scrollbar{width:4px;}
+#cbr-m-body::-webkit-scrollbar-track{background:transparent;}
+#cbr-m-body::-webkit-scrollbar-thumb{background:#444c56;border-radius:2px;}
 .cbr-panel{display:none;}
 .cbr-panel.on{display:flex;flex:1;flex-direction:column;min-height:0;}
 #cbr-p-decisions.on{display:block;flex:none;}
-.cbr-cw{background:#1e222d;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:12px 14px;margin-bottom:10px;display:flex;flex-direction:column;}
+.cbr-cw{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px 14px;margin-bottom:10px;display:flex;flex-direction:column;}
 .cbr-cw.fill{flex:1;min-height:0;}
-.cbr-ct{font-size:10px;color:var(--text2,#9096a0);margin-bottom:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.03em;}
+.cbr-ct{font-size:9.5px;color:#6e7681;margin-bottom:8px;font-family:'IBM Plex Mono',var(--font-mono,monospace);letter-spacing:.04em;padding-bottom:8px;border-bottom:1px solid #30363d;text-transform:uppercase;}
 .cbr-chart-area{flex:1;min-height:0;height:100%;position:relative;}
 .cbr-lw-wrap{width:100%;height:100%;min-height:200px;position:relative;}
-.cbr-lw-tooltip{position:absolute;display:none;pointer-events:none;background:#1e222d;border:1px solid #363c4e;border-radius:4px;padding:7px 11px;font-size:11px;line-height:1.55;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#d1d4dc;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.6);white-space:nowrap;}
-.cbr-tbl{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.cbr-tbl th{text-align:right;color:var(--text3,#6b7280);font-weight:400;font-size:9px;text-transform:uppercase;letter-spacing:.05em;padding:5px 8px 4px;border-bottom:1px solid rgba(255,255,255,.07);}
+.cbr-lw-tooltip{position:absolute;display:none;pointer-events:none;background:#161b22;border:1px solid #30363d;border-radius:4px;padding:7px 11px;font-size:11px;line-height:1.55;font-family:'IBM Plex Mono',var(--font-mono,monospace);color:#e6edf3;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.7);white-space:nowrap;}
+.cbr-tbl{width:100%;border-collapse:collapse;font-size:11px;font-family:'IBM Plex Mono',var(--font-mono,monospace);}
+.cbr-tbl th{text-align:right;color:#6e7681;font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:5px 8px 4px;border-bottom:1px solid #30363d;}
 .cbr-tbl th:first-child{text-align:left;}
-.cbr-tbl td{text-align:right;padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04);}
-.cbr-tbl td:first-child{text-align:left;color:var(--text2,#9096a0);}
+.cbr-tbl td{text-align:right;padding:5px 8px;border-bottom:1px solid rgba(48,54,61,.6);}
+.cbr-tbl td:first-child{text-align:left;color:#8b949e;}
 .cbr-tbl tr:last-child td{border-bottom:none;}
 .cbr-tbl tr:hover td{background:rgba(255,255,255,.03);}
-.cbr-tbl .now-row td{background:rgba(79,127,255,.06);}
-.cu{color:var(--up,#26a69a);}.cd{color:var(--down,#ef5350);}.cf{color:var(--text2,#9096a0);}
+.cbr-tbl .now-row td{background:rgba(56,139,253,.06);}
+.cu{color:#26a69a;}.cd{color:#ef5350;}.cf{color:#8b949e;}
 @media(max-width:600px){
   #cbr-bd{padding:0;align-items:flex-end;}
   #cbr-modal{width:100%;height:93vh;border-radius:12px 12px 0 0;border-bottom:none;}
@@ -79,7 +82,7 @@ function _processCBRateData(obs){
 function _cbrLwOptions(W,H){
   return{
     width:W,height:H,
-    layout:{background:{type:'solid',color:'#1e222d'},textColor:'#787b86',fontFamily:_cbrMonoF,fontSize:10,attributionLogo:false},
+    layout:{background:{type:'solid',color:'#161b22'},textColor:'#6e7681',fontFamily:_cbrMonoF,fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:window.LightweightCharts?.CrosshairMode?.Normal??1,vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.15,bottom:0.1}},
@@ -125,10 +128,10 @@ function _attachCBRTooltip(container,lwChart,mainSeries,fwdSeries,decisions){
     if(!param?.point||!param.seriesData){tip.style.display='none';return;}
     const mv=param.seriesData.get(mainSeries);if(!mv){tip.style.display='none';return;}
     const timeStr=typeof param.time==='string'?param.time:'',dec=decMap[timeStr],rate=mv.value,mon=timeStr.slice(0,7);
-    let html=`<div style="font-size:9px;color:#6b7280;letter-spacing:.05em;margin-bottom:4px;">${mon}</div>`;
+    let html=`<div style="font-size:9px;color:#6e7681;letter-spacing:.05em;margin-bottom:4px;">${mon}</div>`;
     html+=`<div>Rate &nbsp;<span style="color:#4f7fff;font-weight:700;">${rate.toFixed(2)}%</span></div>`;
     if(dec){const col=dec.delta>0?'#26a69a':'#ef5350',sign=dec.delta>0?'+':'';html+=`<div style="margin-top:3px;color:${col};font-weight:600;">${sign}${Math.round(dec.delta*100)}bp decision</div>`;}
-    if(fwdSeries){const fv=param.seriesData.get(fwdSeries);if(fv)html+=`<div style="color:#787b86;">OIS fwd ${fv.value.toFixed(2)}%</div>`;}
+    if(fwdSeries){const fv=param.seriesData.get(fwdSeries);if(fv)html+=`<div style="color:#8b949e;">OIS fwd ${fv.value.toFixed(2)}%</div>`;}
     tip.innerHTML=html;tip.style.display='block';
     const cW=container.offsetWidth,cx=param.point.x,cy=param.point.y,th=tip.offsetHeight||60;
     const tx=(cx+TM+TW<=cW-4)?cx+TM:cx-TM-TW,ty=(cy-th-TM>=4)?cy-th-TM:cy+TM;
@@ -143,14 +146,14 @@ function _buildCBRChart(data){
   const W=container.offsetWidth||600,H=container.offsetHeight||240;
   _cbrLwChart=LWC.createChart(container,_cbrLwOptions(W,H));
   const{chronData,decisions,fwdRate,bias}=data;
-  const mainSeries=_cbrLwChart.addSeries(LWC.AreaSeries,{lineColor:'#4f7fff',topColor:'rgba(79,127,255,0.18)',bottomColor:'rgba(79,127,255,0.01)',lineWidth:2,lineType:LWC.LineType?.WithSteps??1,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#1e222d',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:true});
+  const mainSeries=_cbrLwChart.addSeries(LWC.AreaSeries,{lineColor:'#4f7fff',topColor:'rgba(79,127,255,0.18)',bottomColor:'rgba(79,127,255,0.01)',lineWidth:2,lineType:LWC.LineType?.WithSteps??1,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#161b22',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:true});
   mainSeries.setData(chronData);
   let fwdSeries=null;
   if(fwdRate!=null&&chronData.length>0){
     const last=chronData[chronData.length-1],ld=new Date(last.time);
     ld.setMonth(ld.getMonth()+1);
     const fwdTime=ld.toISOString().slice(0,10);
-    const fwdCol=bias==='cut'?'#ef5350':bias==='hike'?'#26a69a':'#787b86';
+    const fwdCol=bias==='cut'?'#ef5350':bias==='hike'?'#26a69a':'#6e7681';
     fwdSeries=_cbrLwChart.addSeries(LWC.LineSeries,{color:fwdCol,lineWidth:1,lineStyle:LWC.LineStyle?.Dashed??1,crosshairMarkerVisible:true,crosshairMarkerRadius:4,priceLineVisible:false,lastValueVisible:true});
     fwdSeries.setData([{time:last.time,value:last.value},{time:fwdTime,value:fwdRate}]);
   }
@@ -192,14 +195,14 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   }
   const trend=!lastDec||pauseDetected?'flat':lastDec.delta>0?'hiking':'cutting';
   const trendLabel=trend==='hiking'?'↑ Hiking cycle':trend==='cutting'?'↓ Cutting cycle':'— On hold';
-  const trendCol=trend==='hiking'?'var(--up,#26a69a)':trend==='cutting'?'var(--down,#ef5350)':'var(--text2,#9096a0)';
+  const trendCol=trend==='hiking'?'var(--up,#26a69a)':trend==='cutting'?'var(--down,#ef5350)':'#8b949e';
   const lastDir=lastDec?Math.sign(lastDec.delta):0;
   let cycleCum=0;
   for(let i=decisions.length-1;i>=0;i--){if(Math.sign(decisions[i].delta)===lastDir)cycleCum+=decisions[i].delta;else break;}
   const cycleStr=lastDir!==0?(lastDir>0?'+':'')+Math.round(cycleCum*100)+'bp this cycle':'—';
   const bias=meetingData?.bias??null,nextMtg=meetingData?.nextMeeting??'—';
   const biasLabel=bias==='cut'?'↓ Cut':bias==='hike'?'↑ Hike':'→ Hold';
-  const biasCol=bias==='cut'?'var(--down,#ef5350)':bias==='hike'?'var(--up,#26a69a)':'var(--text2,#9096a0)';
+  const biasCol=bias==='cut'?'var(--down,#ef5350)':bias==='hike'?'var(--up,#26a69a)':'#8b949e';
   let fwdRate=null,fwdDisplay='—',fwdIsEst=false;
   if(meetingData?.fwdRate!=null&&!isNaN(meetingData.fwdRate)&&meetingData.fwdRate>0){
     fwdRate=parseFloat(meetingData.fwdRate);fwdDisplay=fwdRate.toFixed(2)+'%';
@@ -262,9 +265,9 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
       <div class="cbr-cw" style="margin-top:4px;">
         <div class="cbr-ct">RATE PROFILE · ${rateStart.toFixed(2)}% → ${currentRate.toFixed(2)}%</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;">
-          <div style="background:var(--bg,#131722);padding:10px 14px;"><div style="font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:${_cbrMonoF}">Period High</div><div style="font-size:18px;font-weight:600;font-family:${_cbrMonoF};color:var(--up,#26a69a)">${Math.max(...rates).toFixed(2)}%</div></div>
-          <div style="background:var(--bg,#131722);padding:10px 14px;"><div style="font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:${_cbrMonoF}">Period Low</div><div style="font-size:18px;font-weight:600;font-family:${_cbrMonoF};color:var(--down,#ef5350)">${Math.min(...rates).toFixed(2)}%</div></div>
-          <div style="background:var(--bg,#131722);padding:10px 14px;"><div style="font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:${_cbrMonoF}">Decisions</div><div style="font-size:18px;font-weight:600;font-family:${_cbrMonoF};color:var(--text,#d1d4dc)">${nDecisions}</div></div>
+          <div style="background:#161b22;padding:10px 14px;"><div style="font-size:9px;color:#6e7681;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:${_cbrMonoF}">Period High</div><div style="font-size:18px;font-weight:600;font-family:${_cbrMonoF};color:var(--up,#26a69a)">${Math.max(...rates).toFixed(2)}%</div></div>
+          <div style="background:#161b22;padding:10px 14px;"><div style="font-size:9px;color:#6e7681;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:${_cbrMonoF}">Period Low</div><div style="font-size:18px;font-weight:600;font-family:${_cbrMonoF};color:var(--down,#ef5350)">${Math.min(...rates).toFixed(2)}%</div></div>
+          <div style="background:#161b22;padding:10px 14px;"><div style="font-size:9px;color:#6e7681;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:${_cbrMonoF}">Decisions</div><div style="font-size:18px;font-weight:600;font-family:${_cbrMonoF};color:#e6edf3">${nDecisions}</div></div>
         </div>
       </div>
     </div>
@@ -283,7 +286,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
       const chgBp=Math.round(d.delta*100),cumBp=Math.round(d.cumul*100);
       return`<tr${i===0?' class="now-row"':''}><td>${d.time.slice(0,7)}${i===0?' <span style="color:var(--up,#26a69a);font-size:9px">latest</span>':''}</td><td>${before}%</td><td>${after}%</td><td class="${chgBp>0?'cu':chgBp<0?'cd':'cf'}">${chgBp>0?'+':''}${chgBp}bp</td><td class="${cumBp>0?'cu':cumBp<0?'cd':'cf'}">${cumBp>0?'+':''}${cumBp}bp</td></tr>`;
     }).join('');
-  }else if(dBody){dBody.innerHTML=`<tr><td colspan="5" style="color:var(--text3,#6b7280);padding:12px 8px;">No rate changes in the available history.</td></tr>`;}
+  }else if(dBody){dBody.innerHTML=`<tr><td colspan="5" style="color:#6e7681;padding:12px 8px;">No rate changes in the available history.</td></tr>`;}
 
   bd.addEventListener('click',e=>{if(e.target===bd)closeCBRatesModal();});
   const esc=e=>{if(e.key==='Escape')closeCBRatesModal();};

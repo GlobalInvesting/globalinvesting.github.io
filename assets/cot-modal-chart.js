@@ -11,70 +11,81 @@
   s.textContent = `
 #cot-bd {
   position:fixed;inset:0;z-index:9100;
-  background:rgba(0,0,0,.78);
+  background:rgba(0,0,0,.85);
   display:flex;align-items:center;justify-content:center;
   padding:12px;
   animation:cot-fi .15s ease;
 }
 @keyframes cot-fi { from{opacity:0} to{opacity:1} }
-@keyframes cot-su { from{transform:translateY(14px);opacity:0} to{transform:none;opacity:1} }
+@keyframes cot-su { from{transform:translateY(12px);opacity:0} to{transform:none;opacity:1} }
 #cot-modal {
-  background:var(--bg,#131722);
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:10px;
+  background:#161b22;
+  border:1px solid #30363d;
+  border-radius:8px;
   width:min(920px,100%);
   height:min(680px,90vh);
   display:flex;flex-direction:column;
   overflow:hidden;
-  animation:cot-su .2s ease;
+  box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
+  animation:cot-su .18s cubic-bezier(.16,1,.3,1);
   font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);
-  color:var(--text,#d1d4dc);
+  color:#e6edf3;
+  position:relative;
+}
+#cot-modal::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#1f6feb 0%,#58a6ff 50%,#26a69a 100%);
+  border-radius:8px 8px 0 0;z-index:1;
 }
 #cot-m-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:13px 18px 11px;
-  border-bottom:1px solid rgba(255,255,255,.07);
-  flex-shrink:0;
+  padding:14px 18px 12px;
+  border-bottom:1px solid #30363d;
+  flex-shrink:0;background:#161b22;
 }
-#cot-m-title { font-size:14px;font-weight:600;color:var(--text,#d1d4dc);letter-spacing:.01em; }
-#cot-m-sub   { font-size:10px;color:var(--text3,#6b7280);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+#cot-m-title { font-size:14px;font-weight:600;color:#e6edf3;letter-spacing:-.01em; }
+#cot-m-sub   { font-size:10px;color:#6e7681;margin-top:2px;font-family:'IBM Plex Mono',var(--font-mono,monospace);letter-spacing:.02em; }
 #cot-m-close {
-  background:none;border:none;color:var(--text3,#6b7280);font-size:20px;
-  cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1;
+  background:none;border:none;color:#6e7681;font-size:18px;
+  cursor:pointer;padding:5px 7px;border-radius:5px;line-height:1;
   transition:color .1s,background .1s;
 }
-#cot-m-close:hover { color:var(--text,#d1d4dc);background:rgba(255,255,255,.08); }
+#cot-m-close:hover { color:#e6edf3;background:#21262d; }
 #cot-m-metrics {
   display:grid;grid-template-columns:repeat(6,1fr);
-  gap:1px;background:rgba(255,255,255,.05);
-  border-bottom:1px solid rgba(255,255,255,.07);
+  gap:0;background:#0d1117;
+  border-bottom:1px solid #30363d;
   flex-shrink:0;
 }
-.cot-mm { background:var(--bg,#131722);padding:9px 14px;display:flex;flex-direction:column;gap:2px; }
-.cot-mm-lbl { font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
-.cot-mm-val { font-size:13px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
-.cot-mm-sub { font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+.cot-mm { background:#0d1117;padding:9px 14px;display:flex;flex-direction:column;gap:2px;border-right:1px solid #30363d; }
+.cot-mm:last-child { border-right:none; }
+.cot-mm-lbl { font-size:9px;color:#6e7681;text-transform:uppercase;letter-spacing:.06em;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.cot-mm-val { font-size:13px;font-weight:600;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.cot-mm-sub { font-size:9px;color:#6e7681;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
 #cot-m-tabs {
   display:flex;padding:0 18px;
-  border-bottom:1px solid rgba(255,255,255,.07);
+  border-bottom:1px solid #30363d;
   flex-shrink:0;overflow-x:auto;scrollbar-width:none;
+  background:#161b22;
 }
 #cot-m-tabs::-webkit-scrollbar { display:none; }
 .cot-tab {
   font-size:11px;padding:9px 13px;cursor:pointer;
-  color:var(--text3,#6b7280);border-bottom:2px solid transparent;
+  color:#6e7681;border-bottom:2px solid transparent;
   transition:color .1s;white-space:nowrap;user-select:none;
 }
-.cot-tab:hover { color:var(--text2,#9096a0); }
-.cot-tab.on { color:var(--text,#d1d4dc);border-bottom-color:var(--blue,#4f7fff); }
+.cot-tab:hover { color:#8b949e; }
+.cot-tab.on { color:#e6edf3;border-bottom-color:#388bfd; }
 #cot-m-body {
   flex:1;min-height:0;overflow-y:auto;
   padding:14px 16px;
   display:flex;flex-direction:column;
-  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;
+  background:#0d1117;
+  scrollbar-width:thin;scrollbar-color:#444c56 transparent;
 }
-#cot-m-body::-webkit-scrollbar { width:5px; }
-#cot-m-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12);border-radius:3px; }
+#cot-m-body::-webkit-scrollbar { width:4px; }
+#cot-m-body::-webkit-scrollbar-track { background:transparent; }
+#cot-m-body::-webkit-scrollbar-thumb { background:#444c56;border-radius:2px; }
 #cot-m-body.cot-body--chart,
 #cot-m-body.cot-body--overview { overflow-y:hidden; }
 .cot-panel { display:none; }
@@ -95,49 +106,49 @@
 .cot-lw-wrap { width:100%;height:100%;min-height:180px;position:relative; }
 .cot-lw-tooltip {
   position:absolute;display:none;pointer-events:none;
-  background:#1e222d;border:1px solid #363c4e;border-radius:4px;
+  background:#161b22;border:1px solid #30363d;border-radius:4px;
   padding:7px 11px;font-size:11px;line-height:1.55;
-  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
-  color:#d1d4dc;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.6);white-space:nowrap;
+  font-family:'IBM Plex Mono',var(--font-mono,monospace);
+  color:#e6edf3;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.7);white-space:nowrap;
 }
 .cot-cw {
-  background:#1e222d;border:1px solid rgba(255,255,255,.06);
+  background:#161b22;border:1px solid #30363d;
   border-radius:6px;padding:12px 14px;margin-bottom:10px;
   display:flex;flex-direction:column;
 }
 .cot-ct {
-  font-size:10px;color:var(--text2,#9096a0);margin-bottom:8px;
-  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
-  letter-spacing:.03em;flex-shrink:0;
+  font-size:9.5px;color:#6e7681;margin-bottom:8px;
+  font-family:'IBM Plex Mono',var(--font-mono,monospace);
+  letter-spacing:.04em;flex-shrink:0;padding-bottom:8px;border-bottom:1px solid #30363d;text-transform:uppercase;
 }
-.cot-gauge-track { height:6px;background:rgba(255,255,255,.1);border-radius:3px;position:relative;margin:10px 0 6px; }
-.cot-gauge-fill { position:absolute;left:0;top:0;height:100%;border-radius:3px;background:linear-gradient(90deg,#ef5350 0%,#ff9800 35%,#4f7fff 50%,#ff9800 65%,#26a69a 100%);width:100%; }
+.cot-gauge-track { height:6px;background:rgba(255,255,255,.06);border-radius:3px;position:relative;margin:10px 0 6px; }
+.cot-gauge-fill { position:absolute;left:0;top:0;height:100%;border-radius:3px;background:linear-gradient(90deg,#ef5350 0%,#ff9800 35%,#388bfd 50%,#ff9800 65%,#26a69a 100%);width:100%; }
 .cot-gauge-pin {
   position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;
-  background:#d1d4dc;border:2px solid var(--bg,#131722);
+  background:#e6edf3;border:2px solid #161b22;
   box-shadow:0 0 0 1px rgba(255,255,255,.2);
   transition:left .4s cubic-bezier(.25,.46,.45,.94);transform:translateX(-50%);
 }
-.cot-gauge-lbls { display:flex;justify-content:space-between;font-size:8px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
-.cot-ov-bignum { font-size:24px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin:4px 0 2px; }
-.cot-ov-sub { font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+.cot-gauge-lbls { display:flex;justify-content:space-between;font-size:8px;color:#6e7681;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.cot-ov-bignum { font-size:24px;font-weight:700;font-family:'IBM Plex Mono',var(--font-mono,monospace);margin:4px 0 2px; }
+.cot-ov-sub { font-size:9px;color:#6e7681;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
 .cot-ls-row { display:flex;justify-content:space-between;align-items:center;gap:12px;margin:4px 0; }
-.cot-ls-num { font-size:18px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
-.cot-ls-vs { font-size:11px;color:var(--text3,#6b7280);flex-shrink:0; }
-.cot-ls-bar { height:4px;background:rgba(255,255,255,.08);border-radius:2px;position:relative;overflow:hidden;margin-top:8px; }
+.cot-ls-num { font-size:18px;font-weight:600;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.cot-ls-vs { font-size:11px;color:#6e7681;flex-shrink:0; }
+.cot-ls-bar { height:4px;background:rgba(255,255,255,.06);border-radius:2px;position:relative;overflow:hidden;margin-top:8px; }
 .cot-ls-bar-fill { height:100%;border-radius:2px; }
 .cot-sig-dot { display:inline-block;border-radius:50%;width:8px;height:8px;flex-shrink:0; }
 .cot-spark { display:block;width:100%;max-width:200px;overflow:visible; }
-.cot-tbl { width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
-.cot-tbl th { text-align:right;color:var(--text3,#6b7280);font-weight:400;font-size:9px;text-transform:uppercase;letter-spacing:.05em;padding:5px 8px 4px;border-bottom:1px solid rgba(255,255,255,.07); }
+.cot-tbl { width:100%;border-collapse:collapse;font-size:11px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.cot-tbl th { text-align:right;color:#6e7681;font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:5px 8px 4px;border-bottom:1px solid #30363d; }
 .cot-tbl th:first-child { text-align:left; }
-.cot-tbl td { text-align:right;padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04); }
-.cot-tbl td:first-child { text-align:left;color:var(--text2,#9096a0); }
+.cot-tbl td { text-align:right;padding:5px 8px;border-bottom:1px solid rgba(48,54,61,.6); }
+.cot-tbl td:first-child { text-align:left;color:#8b949e; }
 .cot-tbl tr:last-child td { border-bottom:none; }
 .cot-tbl tr:hover td { background:rgba(255,255,255,.03); }
-.cu { color:var(--up,#26a69a); }
-.cd { color:var(--down,#ef5350); }
-.cn { color:var(--text2,#9096a0); }
+.cu { color:#26a69a; }
+.cd { color:#ef5350; }
+.cn { color:#8b949e; }
 @media(max-width:600px){
   #cot-bd{padding:0;align-items:flex-end;}
   #cot-modal{width:100%;height:93vh;border-radius:12px 12px 0 0;border-bottom:none;}
@@ -195,7 +206,7 @@ function _posLabel(z) {
   if (z >  2)   return {txt:'Extreme Long',  col:'#ef5350'};
   if (z >  1.5) return {txt:'Crowded Long',  col:'#ff9800'};
   if (z >  0.5) return {txt:'Long',          col:'#26a69a'};
-  if (z > -0.5) return {txt:'Neutral',        col:'#9096a0'};
+  if (z > -0.5) return {txt:'Neutral',        col:'#8b949e'};
   if (z > -1.5) return {txt:'Short',          col:'#26a69a'};
   if (z > -2)   return {txt:'Crowded Short',  col:'#ff9800'};
   return {txt:'Extreme Short',col:'#ef5350'};
@@ -204,7 +215,7 @@ function _posLabel(z) {
 // ── Overview helpers ──────────────────────────────────────────────────────────
 function _cotSparkline(history, nWeeks) {
   const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0)));
-  if (vals.length < 2) return '<div style="height:44px;display:flex;align-items:center;font-size:9px;color:var(--text3,#6b7280)">Insufficient data</div>';
+  if (vals.length < 2) return '<div style="height:44px;display:flex;align-items:center;font-size:9px;color:#6e7681">Insufficient data</div>';
   const mn = Math.min(...vals), mx = Math.max(...vals), range = mx-mn||1;
   const W=200,H=44,pad=4;
   const x = i => (pad+(i/(vals.length-1))*(W-pad*2)).toFixed(1);
@@ -236,16 +247,16 @@ function _cotTrendLabel(history) {
 
 function _cotRangeCard(history, current) {
   const vals = history.map(h=>h.levNet??((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
-  if (vals.length<2) return '<div style="font-size:9px;color:var(--text3,#6b7280)">Insufficient data</div>';
+  if (vals.length<2) return '<div style="font-size:9px;color:#6e7681">Insufficient data</div>';
   const hi=Math.max(...vals),lo=Math.min(...vals);
   const pct = hi!==lo?Math.round((current-lo)/(hi-lo)*100):50;
-  const bar=`<div style="margin:10px 0 8px;height:6px;background:rgba(255,255,255,.08);border-radius:3px;position:relative;">
+  const bar=`<div style="margin:10px 0 8px;height:6px;background:rgba(255,255,255,.06);border-radius:3px;position:relative;">
     <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:var(--up,#26a69a);border-radius:3px;"></div>
-    <div style="position:absolute;top:-4px;left:calc(${pct}% - 5px);width:10px;height:10px;border-radius:50%;background:#d1d4dc;border:2px solid var(--bg,#131722);box-shadow:0 0 0 1px rgba(255,255,255,.2)"></div>
+    <div style="position:absolute;top:-4px;left:calc(${pct}% - 5px);width:10px;height:10px;border-radius:50%;background:#e6edf3;border:2px solid #161b22;box-shadow:0 0 0 1px rgba(255,255,255,.2)"></div>
   </div>`;
   const rows=[{label:vals.length+'w High',val:hi,cls:'cu'},{label:'Current',val:current,cls:_cotCls(current)},{label:vals.length+'w Low',val:lo,cls:'cd'}];
   return bar+rows.map(r=>`<div style="display:flex;justify-content:space-between;align-items:baseline;font-family:${_monoF};padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">
-    <span style="font-size:11px;color:var(--text3,#6b7280)">${r.label}</span>
+    <span style="font-size:11px;color:#6e7681">${r.label}</span>
     <span style="font-size:14px;font-weight:600" class="${r.cls}">${_cotFmt(r.val)}</span>
   </div>`).join('');
 }
@@ -254,7 +265,7 @@ function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded) {
   const signals=[];
   if(net>0) signals.push({col:'#26a69a',text:'LF net long — bullish signal'});
   else if(net<0) signals.push({col:'#ef5350',text:'LF net short — bearish signal'});
-  else signals.push({col:'#9096a0',text:'LF neutral'});
+  else signals.push({col:'#8b949e',text:'LF neutral'});
   if(amNet!=null){
     if(aligned) signals.push({col:'#26a69a',text:'LF/AM aligned — reinforced'});
     else signals.push({col:'#ff9800',text:'LF/AM diverging — exercise caution'});
@@ -264,11 +275,11 @@ function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded) {
   if(ddNet!=null){
     const contra=(net>0&&ddNet<0)||(net<0&&ddNet>0);
     if(contra) signals.push({col:'#ff9800',text:'Dealers contra-positioned'});
-    else signals.push({col:'#9096a0',text:'Dealers aligned with LF'});
+    else signals.push({col:'#8b949e',text:'Dealers aligned with LF'});
   }
   return signals.map(s=>`<div style="display:flex;align-items:center;gap:8px;font-size:11px;font-family:${_monoF};padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">
     <span class="cot-sig-dot" style="background:${s.col}"></span>
-    <span style="color:var(--text2,#9096a0)">${s.text}</span>
+    <span style="color:#8b949e">${s.text}</span>
   </div>`).join('');
 }
 
@@ -282,7 +293,7 @@ function _destroyCOTCharts(){
 function _lwOpts(W,H){
   return {
     width:W,height:H,
-    layout:{background:{type:'solid',color:'#1e222d'},textColor:'#787b86',fontFamily:_monoF,fontSize:10,attributionLogo:false},
+    layout:{background:{type:'solid',color:'#161b22'},textColor:'#6e7681',fontFamily:_monoF,fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{
       mode:window.LightweightCharts?.CrosshairMode?.Normal??1,
@@ -333,7 +344,7 @@ function _buildNetChart(container,dates,netData,ccy){
     const v=param.seriesData.get(hist);if(!v)return null;
     const mon=typeof param.time==='string'?param.time.slice(0,7):'';
     const col=v.value>=0?'#26a69a':'#ef5350';
-    return `<div style="font-size:9px;color:#6b7280;margin-bottom:4px;">${mon}</div><div>${ccy} LF Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
+    return `<div style="font-size:9px;color:#6e7681;margin-bottom:4px;">${mon}</div><div>${ccy} LF Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
   });
   return chart;
 }
@@ -350,7 +361,7 @@ function _buildSplitChart(container,dates,lngData,shrtData,ccy){
   _mkTooltip(container,chart,()=>lS,param=>{
     const lv=param.seriesData.get(lS),sv=param.seriesData.get(sS);if(!lv)return null;
     const mon=typeof param.time==='string'?param.time.slice(0,7):'';
-    return `<div style="font-size:9px;color:#6b7280;margin-bottom:4px;">${mon}</div>`+
+    return `<div style="font-size:9px;color:#6e7681;margin-bottom:4px;">${mon}</div>`+
       `<div>Long &nbsp;<span style="color:#26a69a;font-weight:700">${lv.value!=null?Math.round(lv.value).toLocaleString():'—'}</span></div>`+
       (sv?`<div>Short<span style="color:#ef5350;font-weight:700"> ${sv.value!=null?Math.round(sv.value).toLocaleString():'—'}</span></div>`:'');
   });
@@ -382,7 +393,7 @@ function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy){
   _mkTooltip(container,chart,()=>lfS,param=>{
     const lf=param.seriesData.get(lfS);if(!lf)return null;
     const mon=typeof param.time==='string'?param.time.slice(0,7):'';
-    let html=`<div style="font-size:9px;color:#6b7280;margin-bottom:4px;">${mon}</div>`;
+    let html=`<div style="font-size:9px;color:#6e7681;margin-bottom:4px;">${mon}</div>`;
     html+=`<div style="color:#4f7fff">LF &nbsp;&nbsp;${_cotFmt(lf.value)}</div>`;
     if(amS){const av=param.seriesData.get(amS);if(av)html+=`<div style="color:#ff9800">AM &nbsp;&nbsp;${_cotFmt(av.value)}</div>`;}
     if(ddS){const dv=param.seriesData.get(ddS);if(dv)html+=`<div style="color:#ef5350">DD &nbsp;&nbsp;${_cotFmt(dv.value)}</div>`;}
@@ -405,7 +416,7 @@ function openCOTModal(ccy,data){
   const netPctStr=netPctOI!=null?(netPctOI>0?'+':'')+netPctOI.toFixed(1)+'%':'—';
   const zStr=zScore!=null?(zScore>0?'+':'')+zScore.toFixed(2):'—';
   const pStr=pctHist!=null?pctHist+'%':'—';
-  const zCol=isCrowded?'#ff9800':'var(--text,#d1d4dc)';
+  const zCol=isCrowded?'#ff9800':'#e6edf3';
   const lfDir=Math.sign(net),amDir=amNet!=null?Math.sign(amNet):0,aligned=lfDir!==0&&amDir!==0&&lfDir===amDir;
   const gaugeLeft=zScore!=null?((Math.max(-3,Math.min(3,zScore))+3)/6*90+5).toFixed(1)+'%':'50%';
   const dates=history.map(h=>{const d=h.weekEnding||'';return d.length===10?d:d.slice(0,10);});
@@ -459,7 +470,7 @@ function openCOTModal(ccy,data){
             <div style="text-align:right"><div class="cot-ls-num cd">${short_.toLocaleString()}</div><div class="cot-ov-sub">Shorts</div></div>
           </div>
           <div class="cot-ls-bar"><div class="cot-ls-bar-fill" style="width:100%;background:linear-gradient(90deg,#26a69a ${lPct}%,#ef5350 ${lPct}%)"></div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:var(--text3,#6b7280)"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:#6e7681"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
         </div>
         <div class="cot-cw">
           <div class="cot-ct">12-WEEK NET TREND</div>
@@ -493,13 +504,13 @@ function openCOTModal(ccy,data){
     <div id="p-participants" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">LF vs AM vs DEALER · NET BY CATEGORY</div>
-        <div id="cot-part-legend" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:8px;font-size:10px;font-family:${_monoF};color:var(--text2,#9096a0)"></div>
+        <div id="cot-part-legend" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:8px;font-size:10px;font-family:${_monoF};color:#8b949e"></div>
         <div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-part"></div></div>
       </div>
-      <div class="cot-cw"><div style="font-size:10px;color:var(--text3,#6b7280);font-family:${_monoF};line-height:1.7">
-        <strong style="color:var(--text2,#9096a0)">LF (Leveraged Funds):</strong> Hedge funds and CTAs. Primary speculative momentum signal.<br>
-        <strong style="color:var(--text2,#9096a0)">AM (Asset Managers):</strong> Mutual funds and pensions. Slow trend-followers. Confluence with LF = stronger signal.<br>
-        <strong style="color:var(--text2,#9096a0)">DD (Dealers):</strong> Market-makers. Typically contra-positioned to speculators. Useful contrarian signal.
+      <div class="cot-cw"><div style="font-size:10px;color:#6e7681;font-family:${_monoF};line-height:1.7">
+        <strong style="color:#8b949e">LF (Leveraged Funds):</strong> Hedge funds and CTAs. Primary speculative momentum signal.<br>
+        <strong style="color:#8b949e">AM (Asset Managers):</strong> Mutual funds and pensions. Slow trend-followers. Confluence with LF = stronger signal.<br>
+        <strong style="color:#8b949e">DD (Dealers):</strong> Market-makers. Typically contra-positioned to speculators. Useful contrarian signal.
       </div></div>
     </div>
     <div id="p-history" class="cot-panel">
