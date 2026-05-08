@@ -229,6 +229,7 @@
 .hm-rank-fill.down { background:rgba(239,83,80,.30); }
 .hm-rank-fill.flat { background:rgba(139,148,158,.20); }
 .hm-rank-val { width:56px;text-align:right;font-size:10px;font-family:'IBM Plex Mono',var(--font-mono,monospace);color:#8b949e; }
+.hm-rank-sublbl { font-size:8.5px;font-family:'IBM Plex Mono',var(--font-mono,monospace);color:#6e7681;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px; }
 
 /* ── Session tab ── */
 .sess-grid { display:grid;grid-template-columns:80px 1fr 60px;align-items:center;gap:5px 8px;font-family:'IBM Plex Mono',var(--font-mono,monospace);font-size:10px; }
@@ -255,36 +256,33 @@
 .sess-note-body { font-size:10.5px;font-family:'IBM Plex Mono',var(--font-mono,monospace);color:#8b949e;line-height:1.6;padding-left:2px; }
 
 /* ── Correlations — Proposal A ── */
-.corr-wrap {
-  overflow:auto;
-  scrollbar-width:thin;
-  scrollbar-color:#444c56 transparent;
-}
-.corr-wrap::-webkit-scrollbar { height:4px;width:4px; }
+/* ── Correlations matrix — rcm-matrix aesthetic ── */
+.corr-wrap { overflow:auto;flex:1;min-height:0;scrollbar-width:thin;scrollbar-color:#444c56 transparent; }
+.corr-wrap::-webkit-scrollbar { width:4px;height:4px; }
+.corr-wrap::-webkit-scrollbar-track { background:transparent; }
 .corr-wrap::-webkit-scrollbar-thumb { background:#444c56;border-radius:2px; }
-.corr-grid {
-  display:grid;
-  grid-template-columns:34px repeat(8,1fr) 46px;
-  gap:2px;
-  font-family:'IBM Plex Mono',var(--font-mono,monospace);
-  font-size:9px;
-  min-width:520px;
-}
-.corr-hdr {
-  display:flex;align-items:center;justify-content:center;
-  color:#6e7681;font-size:8px;font-weight:600;
-  letter-spacing:.04em;height:18px;
-}
-.corr-hdr.row-lbl { justify-content:flex-end;padding-right:4px;color:#8b949e;font-size:8px;font-weight:700; }
-.corr-hdr.focal { color:#388bfd;font-weight:700; }
-.corr-hdr.focal.row-lbl { color:#388bfd; }
-.corr-cell {
-  height:24px;border-radius:2px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-weight:600;letter-spacing:.02em;
-}
-.corr-cell.focal { border-radius:2px;font-weight:700; }
-.corr-cell.diag  { background:#21262d;color:#8b949e;font-weight:400; }
+.corr-wrap::-webkit-scrollbar-thumb:hover { background:#6e7681; }
+.corr-matrix { border-collapse:collapse;font-size:10.5px;font-family:'IBM Plex Mono',var(--font-mono,monospace);width:100%; }
+.corr-matrix th { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:6px 8px;color:#6e7681;text-align:center;white-space:nowrap;background:#161b22;position:sticky;top:0;z-index:2;border-bottom:1px solid #30363d; }
+.corr-matrix th.row-head { text-align:left;min-width:46px; }
+.corr-matrix th.focal { color:#388bfd; }
+.corr-matrix td { padding:5px 8px;text-align:center;border:1px solid rgba(255,255,255,.04);font-size:10.5px;min-width:52px;transition:filter .1s; }
+.corr-matrix td:hover { filter:brightness(1.4); }
+.corr-matrix td.diag { background:#2d333b;color:#8b949e;font-size:10px;font-weight:600; }
+.corr-matrix td.row-head { text-align:left;color:#8b949e;font-weight:700;font-size:10.5px;background:#161b22;border:none;position:sticky;left:0;z-index:1; }
+.corr-matrix td.row-head.focal { color:#388bfd; }
+.corr-matrix td.empty { background:transparent;border:none; }
+.corr-matrix td.comp-col { border-left:2px solid rgba(255,255,255,.10); }
+.corr-matrix tr.comp-row td { border-top:2px solid rgba(255,255,255,.10); }
+/* cell shading — terminal palette */
+.corr-cell-pos-hi { background:rgba(38,166,154,.25);color:#26a69a;font-weight:700; }
+.corr-cell-pos    { background:rgba(38,166,154,.10);color:#26a69a; }
+.corr-cell-neg-hi { background:rgba(239,83,80,.25);color:#ef5350;font-weight:700; }
+.corr-cell-neg    { background:rgba(239,83,80,.10);color:#ef5350; }
+.corr-cell-flat   { color:#6e7681; }
+.corr-cell-focal  { outline:1px solid rgba(56,139,253,.35); }
+/* legend */
+.corr-legend { display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:'IBM Plex Mono',var(--font-mono,monospace);color:#6e7681;margin-top:10px;padding-top:10px;border-top:1px solid #30363d;align-items:center; }
 
 /* ── Top-3 drivers ── */
 .driver-row { display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
@@ -627,9 +625,16 @@
       </div>
       <div class="hm-cw">
         <div class="hm-ct">FULL RANKING · ALL 8 G8 CURRENCIES · COMPOSITE STRENGTH</div>
-        <div id="hm-ranking-rows"></div>
-        <div class="hm-ct" style="margin-top:14px">1W RANKING · ALL 8 G8 CURRENCIES · AVG vs PEERS · Mon–Fri</div>
-        <div id="hm-ranking-1w-rows"></div>
+        <div style="display:flex;gap:16px;">
+          <div style="flex:1;">
+            <div class="hm-rank-sublbl">Day %</div>
+            <div id="hm-ranking-rows"></div>
+          </div>
+          <div style="flex:1;">
+            <div class="hm-rank-sublbl">1W % · Mon–Fri</div>
+            <div id="hm-ranking-1w-rows"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="hm-panel" id="hm-p-session">
@@ -1188,135 +1193,77 @@
     const pctMap = {};
     strengths.forEach(s => { pctMap[s.ccy] = s.pct; });
 
+    // ── Helper: classify diff into CSS class (mirrors rcm-matrix logic, terminal palette) ──
+    function corrCellClass(diff) {
+      if (diff == null) return 'corr-cell-flat';
+      if (diff >=  0.40) return 'corr-cell-pos-hi';
+      if (diff >=  0.06) return 'corr-cell-pos';
+      if (diff <= -0.40) return 'corr-cell-neg-hi';
+      if (diff <= -0.06) return 'corr-cell-neg';
+      return 'corr-cell-flat';
+    }
+    function corrFmt(v) {
+      if (v == null) return '—';
+      if (Math.abs(v) < 0.005) return '0';
+      return (v > 0 ? '+' : '') + v.toFixed(2);
+    }
+
+    // ── Build <table> identical in structure to rcm-matrix ───────────────
     const matrix = document.getElementById('hm-corr-matrix');
     const wrap   = document.createElement('div');
     wrap.className = 'corr-wrap';
-    const grid   = document.createElement('div');
-    grid.className = 'corr-grid';
 
-    // ── Row 0: column headers ────────────────────────────────────────────
-    grid.appendChild(document.createElement('div'));
+    // Header row
+    const headerCells = `<th class="row-head" scope="col">Strength ↓ / vs →</th>` +
+      ccys.map(c => `<th scope="col"${c === ccy ? ' class="focal"' : ''}>${c}</th>`).join('') +
+      `<th scope="col" class="focal" title="Equal-weighted composite — avg % vs all 7 G8 peers">Comp.</th>`;
 
-    ccys.forEach(c => {
-      const h = document.createElement('div');
-      h.className = 'corr-hdr' + (c === ccy ? ' focal' : '');
-      h.textContent = c;
-      grid.appendChild(h);
-    });
-
-    const compHdr = document.createElement('div');
-    compHdr.className = 'corr-hdr focal';
-    compHdr.textContent = 'Comp.';
-    compHdr.title = 'Equal-weighted composite — avg % vs all 7 G8 peers';
-    grid.appendChild(compHdr);
-
-    // ── Rows 1–8: data ────────────────────────────────────────────────────
-    const SAT = 0.6;
-
-    ccys.forEach(rowCcy => {
-      const rLbl = document.createElement('div');
-      rLbl.className = 'corr-hdr row-lbl' + (rowCcy === ccy ? ' focal' : '');
-      rLbl.textContent = rowCcy;
-      grid.appendChild(rLbl);
-
-      ccys.forEach(colCcy => {
-        const cell = document.createElement('div');
-
+    // Data rows
+    const bodyRows = ccys.map(rowCcy => {
+      const isFocalRow = rowCcy === ccy;
+      const cells = ccys.map(colCcy => {
         if (rowCcy === colCcy) {
-          cell.className = 'corr-cell diag';
-          cell.textContent = '—';
-        } else {
-          const diff  = (pctMap[rowCcy] ?? 0) - (pctMap[colCcy] ?? 0);
-          const abs   = Math.abs(diff);
-          const alpha = 0.12 + Math.min(abs / SAT, 1) * 0.70;
-          const isFocal = rowCcy === ccy || colCcy === ccy;
-          cell.className = 'corr-cell' + (isFocal ? ' focal' : '');
-
-          if (diff > 0.02) {
-            cell.style.background = `rgba(38,166,154,${alpha.toFixed(2)})`;
-            cell.style.color      = alpha > 0.50 ? '#fff' : '#26a69a';
-          } else if (diff < -0.02) {
-            cell.style.background = `rgba(239,83,80,${alpha.toFixed(2)})`;
-            cell.style.color      = alpha > 0.50 ? '#fff' : '#ef5350';
-          } else {
-            cell.style.background = 'rgba(255,255,255,.04)';
-            cell.style.color      = '#6e7681';
-            cell.style.fontWeight = '400';
-          }
-          if (isFocal) cell.style.outline = '1px solid rgba(56,139,253,.4)';
-
-          const label = (diff >= 0 ? '+' : '') + diff.toFixed(1);
-          cell.textContent = label;
-          cell.title = `${rowCcy} vs ${colCcy}: ${fmt2(diff)}`;
+          // Diagonal: absolute composite strength
+          const abs = pctMap[rowCcy] ?? 0;
+          return `<td class="diag" title="${rowCcy} composite: ${corrFmt(abs)}">${corrFmt(abs)}</td>`;
         }
-        grid.appendChild(cell);
-      });
+        const diff = (pctMap[rowCcy] ?? 0) - (pctMap[colCcy] ?? 0);
+        const cls  = corrCellClass(diff);
+        const focalCls = (isFocalRow || colCcy === ccy) ? ' corr-cell-focal' : '';
+        return `<td class="${cls}${focalCls}" title="${rowCcy} vs ${colCcy}: ${corrFmt(diff)}">${corrFmt(diff)}</td>`;
+      }).join('');
 
-      const rowComp    = pctMap[rowCcy] ?? 0;
-      const compCell   = document.createElement('div');
-      compCell.className = 'corr-cell focal';
-      const compAbs    = Math.abs(rowComp);
-      const compAlpha  = 0.12 + Math.min(compAbs / 0.4, 1) * 0.60;
-      const isFocusRow = rowCcy === ccy;
-      if (rowComp > 0.01) {
-        compCell.style.background = `rgba(38,166,154,${compAlpha.toFixed(2)})`;
-        compCell.style.color      = compAlpha > 0.45 ? '#fff' : '#26a69a';
-      } else if (rowComp < -0.01) {
-        compCell.style.background = `rgba(239,83,80,${compAlpha.toFixed(2)})`;
-        compCell.style.color      = compAlpha > 0.45 ? '#fff' : '#ef5350';
-      } else {
-        compCell.style.background = 'rgba(255,255,255,.04)';
-        compCell.style.color      = '#6e7681';
-      }
-      compCell.style.fontWeight = '700';
-      compCell.style.borderLeft = '2px solid rgba(255,255,255,.10)';
-      if (isFocusRow) compCell.style.outline = '1px solid rgba(255,255,255,.30)';
-      compCell.textContent = rowComp >= 0 ? '+' + rowComp.toFixed(2) : rowComp.toFixed(2);
-      compCell.title = `${rowCcy} composite vs G8 peers: ${fmt2(rowComp)}`;
-      grid.appendChild(compCell);
-    });
+      // Comp. column (row composite)
+      const rowComp = pctMap[rowCcy] ?? 0;
+      const compCls = corrCellClass(rowComp);
+      const compFocalCls = isFocalRow ? ' corr-cell-focal' : '';
+      const compCell = `<td class="${compCls} comp-col${compFocalCls}" style="font-weight:700" title="${rowCcy} composite vs G8 peers: ${corrFmt(rowComp)}">${corrFmt(rowComp)}</td>`;
 
-    // ── Footer row ────────────────────────────────────────────────────────
-    const footLbl = document.createElement('div');
-    footLbl.className = 'corr-hdr focal row-lbl';
-    footLbl.textContent = 'Comp.';
-    footLbl.style.fontSize = '8px';
-    grid.appendChild(footLbl);
+      return `<tr><td class="row-head${isFocalRow ? ' focal' : ''}">${rowCcy}</td>${cells}${compCell}</tr>`;
+    }).join('');
 
-    ccys.forEach(colCcy => {
-      const cv       = pctMap[colCcy] ?? 0;
-      const footCell = document.createElement('div');
-      footCell.className = 'corr-cell focal';
-      const cvAbs   = Math.abs(cv);
-      const cvAlpha = 0.12 + Math.min(cvAbs / 0.4, 1) * 0.60;
-      if (cv > 0.01) {
-        footCell.style.background = `rgba(38,166,154,${cvAlpha.toFixed(2)})`;
-        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : '#26a69a';
-      } else if (cv < -0.01) {
-        footCell.style.background = `rgba(239,83,80,${cvAlpha.toFixed(2)})`;
-        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : '#ef5350';
-      } else {
-        footCell.style.background = 'rgba(255,255,255,.04)';
-        footCell.style.color      = '#6e7681';
-      }
-      footCell.style.fontWeight = '700';
-      footCell.style.borderTop  = '2px solid rgba(255,255,255,.10)';
-      if (colCcy === ccy) footCell.style.outline = '1px solid rgba(255,255,255,.30)';
-      footCell.textContent = cv >= 0 ? '+' + cv.toFixed(2) : cv.toFixed(2);
-      footCell.title = `${colCcy} composite vs G8 peers: ${fmt2(cv)}`;
-      grid.appendChild(footCell);
-    });
+    // Footer row (column composites)
+    const footCells = ccys.map(colCcy => {
+      const cv  = pctMap[colCcy] ?? 0;
+      const cls = corrCellClass(cv);
+      const focalCls = colCcy === ccy ? ' corr-cell-focal' : '';
+      return `<td class="${cls}${focalCls}" style="font-weight:700" title="${colCcy} composite vs G8 peers: ${corrFmt(cv)}">${corrFmt(cv)}</td>`;
+    }).join('');
+    const footRow = `<tr class="comp-row"><td class="row-head focal" style="font-size:9px">Comp.</td>${footCells}<td class="diag" style="font-size:9px">—</td></tr>`;
 
-    const corner = document.createElement('div');
-    corner.className = 'corr-cell focal';
-    corner.style.background = 'rgba(56,139,253,.05)';
-    corner.style.border     = '1px solid rgba(56,139,253,.15)';
-    corner.textContent      = '—';
-    corner.style.color      = '#6e7681';
-    corner.style.fontSize   = '8px';
-    grid.appendChild(corner);
+    const legend = `<div class="corr-legend">
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.25);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong outperformance</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.10);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Mild outperformance</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.10);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Mild underperformance</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.25);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong underperformance</span>
+      <span>Diagonal = composite strength</span>
+    </div>`;
 
-    wrap.appendChild(grid);
+    wrap.innerHTML = `<table class="corr-matrix" aria-label="Intraday strength differential matrix G8 currencies">
+      <thead><tr>${headerCells}</tr></thead>
+      <tbody>${bodyRows}${footRow}</tbody>
+    </table>${legend}`;
+
     matrix.innerHTML = '';
     matrix.appendChild(wrap);
 
