@@ -84,8 +84,19 @@
     if (!tbody) return;
     const firstRow = tbody.querySelector('tr[data-sym]');
     if (!firstRow) return;
+
+    // Scroll the row into view manually — avoids triggering loadTVChart's
+    // own scrollIntoView which causes a layout collapse in Firefox when
+    // combined with TradingView iframe rendering.
     firstRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => { firstRow.click(); }, 350);
+
+    // Call toggleInlineDetail directly instead of .click() so we open the
+    // inline data panel without also firing loadTVChart + its scroll.
+    setTimeout(function() {
+      if (typeof toggleInlineDetail === 'function') {
+        toggleInlineDetail(firstRow);
+      }
+    }, 400);
   }
 
   function dismiss() {
