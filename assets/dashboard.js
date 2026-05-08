@@ -9086,6 +9086,8 @@ const GI_OB_KEY = 'gi_ob_done';
 function giOnboardShouldShow() {
   // Already dismissed or acted upon
   if (localStorage.getItem(GI_OB_KEY)) return false;
+  // Welcome tour must complete first — don't compete visually with the 3-step tour
+  try { if (!localStorage.getItem('gi_welcome_done')) return false; } catch { /* ignore */ }
   // User already has alerts configured — they know the feature exists
   try {
     const existing = JSON.parse(localStorage.getItem('gi_alerts') || '[]');
