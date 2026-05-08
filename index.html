@@ -237,6 +237,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #main.split-layout .panel,#main.split-layout #split-upper>div{min-width:0;max-width:100%}
 #main.split-layout #split-upper .panel table,#main.split-layout #split-lower table{width:100%}
 #main.split-layout #tv-chart-wrap{height:300px;min-height:300px}
+/* Split layout: stack share btn above badge, center badge vertically */
+#main.split-layout #narrative .narr-meta{flex-direction:column-reverse;align-items:center;justify-content:center;gap:4px}
 /* drag handle — vertical bar between left and right */
 .split-drag-handle{width:2px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .15s;position:relative;height:100%}
 .split-drag-handle:hover,.split-drag-handle.dragging{background:var(--blue)}
@@ -458,7 +460,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="narrative" role="region" aria-label="Market Narrative" aria-live="polite" aria-atomic="false">
       <div class="narr-label">Narrative</div>
       <div class="narr-text" id="narrative-text" aria-label="Narrative text">Loading market narrative…</div>
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+      <div class="narr-meta" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
         <div class="narr-regime" id="narrative-regime">—</div>
         <button class="narr-share-btn" id="narr-share-btn" onclick="shareNarrative()" title="Share narrative" aria-label="Share market narrative">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
