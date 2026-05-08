@@ -6495,6 +6495,10 @@ async function fetchCrossAssetData() {
     // Seed STOOQ_RT_CACHE early so the chart has yfinance data immediately
     STOOQ_RT_CACHE['btc'] = _caBtcEarly;
   }
+  // ETH inmediato desde JSON — same early-seed pattern as BTC so the LW chart
+  // today-bar is available as soon as the modal opens (before STEP 2 completes).
+  const _caEthEarly = _caIntraday ? intradayQuote(_caIntraday, 'eth') : null;
+  if (_caEthEarly) STOOQ_RT_CACHE['eth'] = _caEthEarly;
 
   // ── STEP 2: All cross-asset data from intraday quotes.json (yfinance) ──
   // Stooq and Yahoo removed — both blocked by CORS in production.
@@ -6539,6 +6543,8 @@ async function fetchCrossAssetData() {
   const qBtcC = document.getElementById('qc-btcusd');
   const _btcIntraday = _caIntraday ? intradayQuote(_caIntraday, 'btc') : null;
   if (_btcIntraday) STOOQ_RT_CACHE['btc'] = _btcIntraday;  // feed LW chart live bar (yfinance)
+  const _ethIntraday = _caIntraday ? intradayQuote(_caIntraday, 'eth') : null;
+  if (_ethIntraday) STOOQ_RT_CACHE['eth'] = _ethIntraday;  // feed LW chart live bar (yfinance)
   if (_btcIntraday && btcEl) {
     const btcFmt = _btcIntraday.close.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     btcEl.textContent  = btcFmt;
