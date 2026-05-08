@@ -2856,6 +2856,13 @@ function _lwBuildTodayBar(ohlcId) {
   // injecting a flat open=close phantom doji after the last real bar.
   if (_LW_FX_IDS.has(ohlcId) && (dowUTC === 0 || dowUTC === 6)) return null;
 
+  // FX Friday-after-close guard: after 21:00 UTC on Friday the session boundary
+  // logic (hourUTC >= 21 → use tomorrow's date) produces dateStr = Saturday.
+  // No FX session opens on Saturday — returning that bar creates a phantom May 9-type
+  // candle that should not exist. The weekend guard above only catches Sat/Sun UTC days;
+  // this closes the Friday-night gap window (21:00 UTC Fri → 00:00 UTC Sat).
+  if (_LW_FX_IDS.has(ohlcId) && dowUTC === 5 && nowUTC.getUTCHours() >= 21) return null;
+
   // STOOQ_RT_CACHE key for this ohlcId
   const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
   const q = STOOQ_RT_CACHE[cacheKey];
