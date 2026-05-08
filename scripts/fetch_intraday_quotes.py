@@ -937,13 +937,28 @@ def fetch_fx_session_hl(fx_pairs_map: dict) -> dict:
     #
     # The FX session boundary is 21:00 UTC. Two cases:
     #   hour < 21:  Current session opened at 21:00 UTC YESTERDAY.
+    #               session_start = yesterday 21:00 UTC.
     #   hour >= 21: New session just opened at 21:00 UTC TODAY.
+    #               session_start = today 21:00 UTC.
     #               The OHLC workflow won't write the completed session bar until
-    #               22:30 UTC. During 21:00–22:30 UTC, session_high/low MUST cover
-    #               the completed session (yesterday 21:00 → today 21:00 UTC) so the
-    #               gap-window today-bar injected by dashboard.js shows the full range.
-    # In both cases the formula is identical: now.replace(hour=21) − 1 day.
-    session_start = now_utc.replace(hour=21, minute=0, second=0, microsecond=0) - timedelta(days=1)
+    #               22:30 UTC. During 21:00–22:30 UTC the gap-window today-bar
+    #               in dashboard.js uses session_high/low for its wicks — these
+    #               must reflect the NEW (just opened) session, not the prior one.
+    #
+    # BUG FIX (v7.60.2): the old formula always subtracted 1 day regardless of
+    # the current hour. At hour >= 21 this set session_start to YESTERDAY 21:00
+    # instead of TODAY 21:00, causing the function to aggregate 25 hours of 1H
+    # bars (the entire prior session + the first few hours of the new session)
+    # instead of just the bars since the new session opened (~1–3 hours).
+    # Result: session_high/low spanned the previous session's full range, producing
+    # absurdly long wicks on the live today-bar candle every night between
+    # 21:00 UTC and 00:00 UTC — exactly the "deformed candles at night" bug.
+    if now_utc.hour >= 21:
+        # New session opened today at 21:00 UTC
+        session_start = now_utc.replace(hour=21, minute=0, second=0, microsecond=0)
+    else:
+        # Session opened yesterday at 21:00 UTC
+        session_start = now_utc.replace(hour=21, minute=0, second=0, microsecond=0) - timedelta(days=1)
     fetch_start   = session_start - timedelta(hours=1)  # 1h overlap for safety
     fetch_end     = now_utc + timedelta(hours=1)         # include current partial bar
 
