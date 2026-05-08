@@ -21,7 +21,7 @@
   s.textContent = `
 /* ── Proposal A — Bloomberg Density · cohesive with Real Carry Modal ── */
 /* Palette: #0d1117/#161b22/#1c2128/#21262d  Fonts: IBM Plex Mono/Sans     */
-/* Accent gradient: #1f6feb→#58a6ff→#3fb950  Scrollbars: 4px #444c56       */
+/* Accent gradient: #1f6feb→#58a6ff→#26a69a  Scrollbars: 4px #444c56       */
 
 #hm-bd {
   position:fixed;inset:0;z-index:9300;
@@ -51,7 +51,7 @@
 #hm-modal::before {
   content:'';
   position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,#1f6feb 0%,#58a6ff 50%,#3fb950 100%);
+  background:linear-gradient(90deg,#1f6feb 0%,#58a6ff 50%,#26a69a 100%);
   border-radius:8px 8px 0 0;
 }
 
@@ -110,15 +110,15 @@
   color:#e6edf3;line-height:1;margin-top:2px;
 }
 .hm-mm-val.sm   { font-size:12px; }
-.hm-mm-val.up   { color:#3fb950; }
-.hm-mm-val.down { color:#f85149; }
+.hm-mm-val.up   { color:#26a69a; }
+.hm-mm-val.down { color:#ef5350; }
 .hm-mm-val.flat { color:#8b949e; }
 .hm-mm-sub {
   font-size:9px;font-family:'IBM Plex Mono',var(--font-mono,monospace);
   color:#6e7681;margin-top:1px;
 }
-.hm-mm-sub.up   { color:#3fb950; }
-.hm-mm-sub.down { color:#f85149; }
+.hm-mm-sub.up   { color:#26a69a; }
+.hm-mm-sub.down { color:#ef5350; }
 
 /* ── Tabs ── */
 #hm-tabs {
@@ -202,8 +202,8 @@
 }
 .hm-tbl td:first-child { text-align:left; }
 .hm-tbl tr:last-child td { border-bottom:none; }
-.hm-tbl td.up   { color:#3fb950; }
-.hm-tbl td.down { color:#f85149; }
+.hm-tbl td.up   { color:#26a69a; }
+.hm-tbl td.down { color:#ef5350; }
 .hm-tbl td.flat { color:#6e7681; }
 .hm-tbl .sym,.hm-tbl .hm-sym { font-weight:600;color:#e6edf3; }
 .imp-wrap { display:flex;align-items:center;gap:6px;justify-content:flex-end; }
@@ -211,8 +211,8 @@
 .imp-bar-fill { height:100%;border-radius:2px; }
 
 /* ── Color classes ── */
-.up   { color:#3fb950; }
-.down,.dn { color:#f85149; }
+.up   { color:#26a69a; }
+.down,.dn { color:#ef5350; }
 .flat { color:#6e7681; }
 
 /* ── Ranking bars ── */
@@ -225,8 +225,8 @@
 .hm-rank-bg { flex:1;height:14px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden; }
 .hm-rank-fill { height:100%;border-radius:2px;transition:width .35s ease; }
 .hm-rank-fill.hl   { background:#388bfd; }
-.hm-rank-fill.up   { background:rgba(63,185,80,.35); }
-.hm-rank-fill.down { background:rgba(248,81,73,.30); }
+.hm-rank-fill.up   { background:rgba(38,166,154,.35); }
+.hm-rank-fill.down { background:rgba(239,83,80,.30); }
 .hm-rank-fill.flat { background:rgba(139,148,158,.20); }
 .hm-rank-val { width:56px;text-align:right;font-size:10px;font-family:'IBM Plex Mono',var(--font-mono,monospace);color:#8b949e; }
 
@@ -1233,11 +1233,11 @@
           cell.className = 'corr-cell' + (isFocal ? ' focal' : '');
 
           if (diff > 0.02) {
-            cell.style.background = `rgba(63,185,80,${alpha.toFixed(2)})`;
-            cell.style.color      = alpha > 0.50 ? '#fff' : '#3fb950';
+            cell.style.background = `rgba(38,166,154,${alpha.toFixed(2)})`;
+            cell.style.color      = alpha > 0.50 ? '#fff' : '#26a69a';
           } else if (diff < -0.02) {
-            cell.style.background = `rgba(248,81,73,${alpha.toFixed(2)})`;
-            cell.style.color      = alpha > 0.50 ? '#fff' : '#f85149';
+            cell.style.background = `rgba(239,83,80,${alpha.toFixed(2)})`;
+            cell.style.color      = alpha > 0.50 ? '#fff' : '#ef5350';
           } else {
             cell.style.background = 'rgba(255,255,255,.04)';
             cell.style.color      = '#6e7681';
@@ -1259,11 +1259,11 @@
       const compAlpha  = 0.12 + Math.min(compAbs / 0.4, 1) * 0.60;
       const isFocusRow = rowCcy === ccy;
       if (rowComp > 0.01) {
-        compCell.style.background = `rgba(63,185,80,${compAlpha.toFixed(2)})`;
-        compCell.style.color      = compAlpha > 0.45 ? '#fff' : '#3fb950';
+        compCell.style.background = `rgba(38,166,154,${compAlpha.toFixed(2)})`;
+        compCell.style.color      = compAlpha > 0.45 ? '#fff' : '#26a69a';
       } else if (rowComp < -0.01) {
-        compCell.style.background = `rgba(248,81,73,${compAlpha.toFixed(2)})`;
-        compCell.style.color      = compAlpha > 0.45 ? '#fff' : '#f85149';
+        compCell.style.background = `rgba(239,83,80,${compAlpha.toFixed(2)})`;
+        compCell.style.color      = compAlpha > 0.45 ? '#fff' : '#ef5350';
       } else {
         compCell.style.background = 'rgba(255,255,255,.04)';
         compCell.style.color      = '#6e7681';
@@ -1290,11 +1290,11 @@
       const cvAbs   = Math.abs(cv);
       const cvAlpha = 0.12 + Math.min(cvAbs / 0.4, 1) * 0.60;
       if (cv > 0.01) {
-        footCell.style.background = `rgba(63,185,80,${cvAlpha.toFixed(2)})`;
-        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : '#3fb950';
+        footCell.style.background = `rgba(38,166,154,${cvAlpha.toFixed(2)})`;
+        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : '#26a69a';
       } else if (cv < -0.01) {
-        footCell.style.background = `rgba(248,81,73,${cvAlpha.toFixed(2)})`;
-        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : '#f85149';
+        footCell.style.background = `rgba(239,83,80,${cvAlpha.toFixed(2)})`;
+        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : '#ef5350';
       } else {
         footCell.style.background = 'rgba(255,255,255,.04)';
         footCell.style.color      = '#6e7681';
