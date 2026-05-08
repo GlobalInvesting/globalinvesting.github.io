@@ -101,23 +101,69 @@ function _buildDecisionOverlay(container,lwChart,decisions){
   svg.classList.add('cbr-decision-svg');
   svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible;';
   container.appendChild(svg);
+
+  // Bloomberg-style staggered decision markers:
+  // Labels are placed at multiple vertical tiers so nearby decisions don't overlap.
+  // Each label gets a thin vertical stem from its tier down to the chart line.
+  // Tiers are assigned greedily: for each marker, pick the lowest tier whose last
+  // placed label ended at least MIN_GAP_PX to the left of this marker's x position.
+  const LABEL_W=32,LABEL_H=14,LABEL_PAD=4,MIN_GAP_PX=6;
+  // Three tiers: top row, mid row, lower row (Bloomberg typically uses 2-3)
+  const TIERS=[6,24,42]; // y offset from top of chart area
+
   function redraw(){
     const ts=lwChart.timeScale(),H=container.offsetHeight,W=container.offsetWidth;
-    let html='';
+    if(!H||!W)return;
+
+    // Collect visible decisions with their x coordinates
+    const visible=[];
     decisions.forEach(d=>{
       try{
         const x=ts.timeToCoordinate(d.time);
-        if(x==null||x<0||x>W)return;
-        const col=d.delta>0?'#26a69a':'#ef5350',colA=d.delta>0?'rgba(38,166,154,0.45)':'rgba(239,83,80,0.45)';
-        const sign=d.delta>0?'+':'',label=sign+Math.round(d.delta*100)+'bp';
-        html+=`<line x1="${x.toFixed(1)}" y1="18" x2="${x.toFixed(1)}" y2="${H-20}" stroke="${colA}" stroke-width="1" stroke-dasharray="2,3"/>`;
-        html+=`<rect x="${(x-14).toFixed(1)}" y="3" width="28" height="13" rx="2" fill="${col}22"/>`;
-        html+=`<text x="${x.toFixed(1)}" y="13" text-anchor="middle" font-size="9" font-family="${_cbrMonoF}" fill="${col}" font-weight="600">${label}</text>`;
+        if(x==null||x<-LABEL_W||x>W+LABEL_W)return;
+        visible.push({...d,x});
       }catch(_){}
+    });
+
+    // Assign tiers greedily left→right
+    // tierEnd[i] tracks the rightmost x used in tier i
+    const tierEnd=TIERS.map(()=>-Infinity);
+    const assigned=visible.map(d=>{
+      // Find the first tier where the label fits without overlapping
+      let tier=0;
+      for(let t=0;t<TIERS.length;t++){
+        if(d.x-LABEL_W/2 >= tierEnd[t]+MIN_GAP_PX){tier=t;break;}
+        // If no tier fits cleanly, pick the one with oldest end (most space)
+        if(t===TIERS.length-1){
+          tier=tierEnd.indexOf(Math.min(...tierEnd));
+        }
+      }
+      tierEnd[tier]=d.x+LABEL_W/2;
+      return{...d,tier};
+    });
+
+    let html='';
+    assigned.forEach(d=>{
+      const x=d.x,col=d.delta>0?'#26a69a':'#ef5350';
+      const colA=d.delta>0?'rgba(38,166,154,0.35)':'rgba(239,83,80,0.35)';
+      const colB=d.delta>0?'rgba(38,166,154,0.12)':'rgba(239,83,80,0.12)';
+      const sign=d.delta>0?'+':'',label=sign+Math.round(d.delta*100)+'bp';
+      const ty=TIERS[d.tier];
+      const labelMidY=ty+LABEL_H/2+1;
+      const stemTop=ty+LABEL_H+2;
+
+      // Vertical dashed line from bottom of label tier down to chart area
+      html+=`<line x1="${x.toFixed(1)}" y1="${stemTop}" x2="${x.toFixed(1)}" y2="${(H-16).toFixed(1)}" stroke="${colA}" stroke-width="1" stroke-dasharray="2,3"/>`;
+      // Pill background
+      html+=`<rect x="${(x-LABEL_W/2).toFixed(1)}" y="${ty}" width="${LABEL_W}" height="${LABEL_H}" rx="3" fill="${colB}" stroke="${col}" stroke-width="0.5" stroke-opacity="0.6"/>`;
+      // Label text
+      html+=`<text x="${x.toFixed(1)}" y="${(ty+LABEL_H-3).toFixed(1)}" text-anchor="middle" font-size="8.5" font-family="${_cbrMonoF}" fill="${col}" font-weight="700">${label}</text>`;
     });
     svg.innerHTML=html;
   }
-  redraw();lwChart.timeScale().subscribeVisibleTimeRangeChange(redraw);
+
+  redraw();
+  lwChart.timeScale().subscribeVisibleTimeRangeChange(redraw);
   svg._cleanup=()=>{try{lwChart.timeScale().unsubscribeVisibleTimeRangeChange(redraw);}catch(_){}};
 }
 
