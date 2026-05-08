@@ -1052,6 +1052,29 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars - skipping")
             return None
 
+        # ── Crypto gap-fill guard ──────────────────────────────────────────────
+        # Root cause: GitHub Actions can be delayed past midnight UTC. When the workflow
+        # runs after midnight ET (04:00 UTC), yfinance returns the new day's in-progress
+        # bar but the PREVIOUS day's completed bar may not yet be in the feed (yfinance
+        # has a ~1-day finalization lag for crypto daily bars in some edge cases).
+        # Result: the completed bar is absent, replaced by the new in-progress bar.
+        # dashboard.js strips the latest bar (which IS the current in-progress session),
+        # but the prior completed day's bar is still missing, leaving a 1-day gap.
+        #
+        # Fix: after dedup, check if the second-to-last bar is >= 2 days behind the
+        # last bar. If so, emit a warning. The gap itself is not correctable here
+        # without an additional yfinance call — but the warning helps diagnose it.
+        # The correct fix is to look at the existing JSON file and preserve any bars
+        # that are absent from the new yfinance response.
+        if id_ in CRYPTO_SYMBOLS and len(deduped) >= 2:
+            from datetime import date as _date
+            _last_date = _date.fromisoformat(deduped[-1]["time"])
+            _prev_date = _date.fromisoformat(deduped[-2]["time"])
+            _gap = (_last_date - _prev_date).days
+            if _gap >= 2:
+                print(f"  WARN [{id_}]: {_gap}-day gap between {deduped[-2]['time']} and {deduped[-1]['time']} — "
+                      f"yfinance may have skipped a completed bar. Check manually.")
+
         # ── Today-bar partial-data guard ───────────────────────────────────────
         # fetch_ohlc runs at 22:30 UTC. For most non-FX symbols the last bar in
         # the yfinance response is today's in-progress bar (volume will be partial
