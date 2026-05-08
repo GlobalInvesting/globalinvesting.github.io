@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-05-08T14:22:01Z",
+  "generated_at": "2026-05-08T15:57:05Z",
   "signals": [
     {
-      "time": "14:21",
+      "time": "15:56",
       "priority": "critical",
-      "title": "NZD/CAD — G8 Bilateral Theme + RBNZ Bias",
-      "text": "NZD/CAD exhibits extreme G8 divergence as NZD leads the scorecard (+0.611%) while CAD lags (-1.076%). The 1.687% spread is driven by the RBNZ 2.25% hawkish bias (hike expected 27 May) vs BoC 2.25% neutral stance. NZD/USD COT LF net short -16,833 vs hike bias confirms a structural short-squeeze risk in NZD crosses. NZD/CAD upside remains the path of least resistance until the BoC meeting on 10 June.",
+      "title": "NZD/CAD — G8 Bilateral Theme + Macro Divergence",
+      "text": "NZD/CAD at 0.4355 (implied) — NZD outperformance vs CAD weakness creates a 1.551% G8 spread, the widest in the complex. NZD is supported by a hawkish RBNZ bias (hike priced for 27 May) while CAD faces pressure from softer April employment data and an on-hold BoC. The +0bp carry neutralizes the rate advantage, but the policy divergence drives the trend. Watch for the RBNZ decision on 27 May to confirm the long-term decoupling.",
       "evidence": [
-        "NZD 1W avg: +0.611% (n=4)",
-        "CAD 1W avg: -1.076% (n=3)",
-        "G8 spread: 1.687%"
+        "NZD 1W avg: +0.581% (n=4)",
+        "CAD 1W avg: -0.971% (n=3)",
+        "G8 spread: 1.551%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "14:18",
-      "priority": "critical",
-      "title": "USD/JPY — Fed Dovish Shift + NFP Risk",
-      "text": "USD/JPY at 156.61 faces immediate pressure as Fed Governor Miran explicitly calls for rate cuts, contradicting the 'extended pause' narrative. This dovish pivot arrives ahead of April NFP (exp. +62k), threatening the 300bp Fed-BoJ carry advantage. JPY COT LF net short -88,543 remains a crowded trade vulnerable to a rapid unwind if US jobs data underwhelms. Watch for a break of 155.50 to confirm a trend reversal.",
-      "evidence": [
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "JPY COT LF net: -88,543",
-        "NFP Forecast: +62k"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "14:15",
+      "time": "15:53",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Retail Divergence",
-      "text": "AUD/USD at 0.7245 shows a significant institutional vs retail divergence. COT LF net long +48,299 (74.8% long) indicates professional conviction, while retail sentiment is at an 88% short extreme. This contrarian setup suggests retail is unsuccessfully fading the 60bp AUD carry premium (RBA 4.35% vs Fed 3.75%). Retail capitulation risk accelerates the move toward 0.7350 if NFP triggers broad USD weakness.",
+      "text": "AUD/USD at 0.7246 — COT LF net long +48,299 (74.8% long) indicates institutional conviction, while retail sentiment is at an extreme 88% short. This 76-point divergence suggests retail is aggressively fading the trend, increasing the risk of a short-squeeze if price holds above 0.7250. RBA at 4.35% (HIKING) vs Fed 3.75% (ON HOLD) provides a -60bp AUD carry premium supporting the upside. Watch for retail capitulation to accelerate the move toward 0.7300.",
       "evidence": [
-        "AUD COT LF net: +48,299",
-        "Retail Sentiment: 88% Short",
+        "AUD COT LF net long: +48,299",
+        "Retail sentiment: 88% short",
         "RBA 4.35% vs Fed 3.75% — -60bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "14:10",
+      "time": "15:51",
       "priority": "warning",
-      "title": "EUR/USD — Correlation Break + ECB Neutrality",
-      "text": "EUR/USD vs EuroStoxx correlation has shifted to +0.721 (z=+1.78σ), breaking the historical inverse relationship. EUR/USD at 1.1779 is now trading as a pro-cyclical asset rather than a funding currency. Despite the 175bp carry deficit (Fed 3.75% vs ECB 2.0%), EUR is catching a bid on equity strength. The move is capped by the ECB's hold bias; watch the 1.1850 resistance level ahead of the 11 June ECB meeting.",
+      "title": "EUR/USD — Headline + Correlation Break",
+      "text": "EUR/USD at 1.1780 — ECB's Lagarde warns that climbing energy costs from Strait of Hormuz tensions will push up input prices, keeping hikes in focus despite the current hold. EUR/USD vs EuroStoxx correlation has shifted to +0.720 (z=+1.78σ), breaking the historical norm of -0.125. This indicates EUR is trading as a 'risk-on' proxy for European equity recovery rather than a safe-haven. Fed 3.75% vs ECB 2.0% maintains a +175bp spread favoring USD, capping upside unless energy shocks force an ECB pivot.",
       "evidence": [
         "EUR/USD vs EuroStoxx z-score: +1.78σ",
         "Fed 3.75% vs ECB 2.0% — +175bp",
-        "EUR/USD: 1.1779"
+        "WTI Oil: $96.0"
       ],
       "_source": "gemini"
     },
     {
-      "time": "14:05",
+      "time": "15:48",
       "priority": "info",
-      "title": "USD/CHF — Retail Extreme + Carry Support",
-      "text": "USD/CHF at 0.7779 is testing retail patience with 85% of community traders positioned long. While the 375bp carry advantage (Fed 3.75% vs SNB 0.0%) structurally supports the pair, the extreme retail long concentration suggests a lack of fresh buyers. VIX at 17.1 (normal volatility) keeps safe-haven CHF demand dormant, but any spike in geopolitical tension would trigger a sharp long-liquidation toward 0.7650.",
+      "title": "USD/JPY — Carry vs Intervention Risk",
+      "text": "USD/JPY at 156.65 — Fed 3.75% vs BoJ 0.75% provides a +300bp carry advantage that sustains the bid despite VIX at 17.3 (normal volatility). JPY COT LF net short -88,543 remains crowded, leaving the pair vulnerable to rapid unwinds if geopolitical tensions in the Middle East escalate further. 160.00 remains the critical watch level for BoJ verbal or physical intervention. Carry dominates the regime until VIX exceeds 25.",
       "evidence": [
-        "Retail Sentiment: 85% Long",
-        "Fed 3.75% vs SNB 0.0% — +375bp",
-        "VIX: 17.1"
+        "Fed 3.75% vs BoJ 0.75% — +300bp",
+        "JPY COT LF net short: -88,543",
+        "VIX: 17.3"
       ],
       "_source": "gemini"
     }
