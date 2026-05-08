@@ -335,7 +335,12 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     continue
 
                 if date_str not in day_buckets:
-                    day_buckets[date_str] = {"open": o, "high": h, "low": l, "close": c}
+                    # Include open in H/L so the session open price is always within range.
+                    # yfinance 1H high/low reflect ticks WITHIN that hour, not the open tick
+                    # itself. If the open is above the hour's high (gap-up open) or below
+                    # the hour's low (gap-down open), ignoring it produces H < O or L > O —
+                    # structurally impossible bars that render as deformed candles.
+                    day_buckets[date_str] = {"open": o, "high": max(o, h), "low": min(o, l), "close": c}
                 else:
                     b = day_buckets[date_str]
                     b["high"]  = max(b["high"], h)
@@ -513,7 +518,9 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     continue
 
                 if date_str not in day_buckets:
-                    day_buckets[date_str] = {"open": o, "high": h, "low": l, "close": c}
+                    # Include open in H/L: same fix as FX — yfinance 1H H/L excludes the
+                    # open tick, so O can exceed H or fall below L on the first bar.
+                    day_buckets[date_str] = {"open": o, "high": max(o, h), "low": min(o, l), "close": c}
                 else:
                     b = day_buckets[date_str]
                     b["high"]  = max(b["high"], h)
@@ -683,7 +690,9 @@ def fetch_wti_dxy_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                         continue
 
                 if date_str not in day_buckets:
-                    day_buckets[date_str] = {"open": o, "high": h, "low": l, "close": c}
+                    # Include open in H/L: same fix as FX — yfinance 1H H/L excludes the
+                    # open tick, so O can exceed H or fall below L on the first bar.
+                    day_buckets[date_str] = {"open": o, "high": max(o, h), "low": min(o, l), "close": c}
                 else:
                     b = day_buckets[date_str]
                     b["high"]  = max(b["high"], h)
@@ -860,7 +869,9 @@ def fetch_equity_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     continue
 
                 if date_str not in day_buckets:
-                    day_buckets[date_str] = {"open": o, "high": h, "low": l, "close": c}
+                    # Include open in H/L: same fix as FX — yfinance 1H H/L excludes the
+                    # open tick, so O can exceed H or fall below L on the first bar.
+                    day_buckets[date_str] = {"open": o, "high": max(o, h), "low": min(o, l), "close": c}
                 else:
                     b = day_buckets[date_str]
                     b["high"]  = max(b["high"], h)
