@@ -281,8 +281,8 @@
 .corr-cell-neg    { background:rgba(239,83,80,.10);color:#ef5350; }
 .corr-cell-flat   { color:#6e7681; }
 .corr-cell-focal  { outline:1px solid rgba(56,139,253,.35); }
-/* legend */
-.corr-legend { display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:'IBM Plex Mono',var(--font-mono,monospace);color:#6e7681;margin-top:10px;padding-top:10px;border-top:1px solid #30363d;align-items:center; }
+/* legend — mirrors rcm-matrix-legend */
+.corr-legend { display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:'IBM Plex Mono',var(--font-mono,monospace);color:#6e7681;margin-top:10px;padding-top:10px;border-top:1px solid #30363d;align-items:center;flex-shrink:0; }
 
 /* ── Top-3 drivers ── */
 .driver-row { display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
@@ -648,9 +648,9 @@
       </div>
     </div>
     <div class="hm-panel" id="hm-p-correlations">
-      <div class="hm-cw">
+      <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
         <div class="hm-ct">INTRADAY STRENGTH DIFFERENTIAL · ALL G8 PAIRS · % CHG vs PREV CLOSE</div>
-        <div id="hm-corr-matrix"></div>
+        <div id="hm-corr-matrix" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;"></div>
       </div>
       <div class="hm-cw">
         <div class="hm-ct" id="hm-drivers-title">STRENGTH DRIVERS · TOP 3 PAIRS BY CONTRIBUTION</div>
@@ -972,8 +972,10 @@
     // Since quotes.json provides full-day pct only (no session-specific OHLC),
     // all open/past session rows show the same day composite value.
     // The state indicator (active/past/upcoming) conveys session timing.
+    // Bar color is always #388bfd (blue) — active at full opacity, past dimmed.
+    // This matches Proposal A: bars represent session window status, not directional sign.
     const compositePos = dayComposite != null && dayComposite >= 0;
-    const compositeClr = compositePos ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
+    const barClr = '#388bfd';
 
     sessionData.forEach(s => {
       const lbl = document.createElement('div');
@@ -1007,7 +1009,7 @@
         // Weekend: all bars dimmed (last-close convention)
         const isActive = s.barState === 'active' && !weekend;
         const dimBar   = !isActive;
-        fill.style.cssText = 'width:100%;background:' + compositeClr +
+        fill.style.cssText = 'width:100%;background:' + barClr +
           (dimBar ? ';opacity:.30' : ';opacity:.70');
         track.appendChild(fill);
         val.className = 'sess-val ' + (compositePos ? 'up' : 'down');
@@ -1262,10 +1264,11 @@
     wrap.innerHTML = `<table class="corr-matrix" aria-label="Intraday strength differential matrix G8 currencies">
       <thead><tr>${headerCells}</tr></thead>
       <tbody>${bodyRows}${footRow}</tbody>
-    </table>${legend}`;
+    </table>`;
 
     matrix.innerHTML = '';
     matrix.appendChild(wrap);
+    matrix.insertAdjacentHTML('beforeend', legend);
 
     // Top 3 drivers
     const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
