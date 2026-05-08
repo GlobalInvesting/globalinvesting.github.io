@@ -962,6 +962,11 @@ def fetch_fx_session_hl(fx_pairs_map: dict) -> dict:
     fetch_start   = session_start - timedelta(hours=1)  # 1h overlap for safety
     fetch_end     = now_utc + timedelta(hours=1)         # include current partial bar
 
+    # yfinance date parser only accepts "%Y-%m-%d" — passing "%Y-%m-%d %H:%M" raises
+    # ValueError("unconverted data remains:  HH:MM") in all recent yfinance versions.
+    # Use date-only strings. fetch_end gets +1 day so the exclusive end covers today fully.
+    fetch_start_str = fetch_start.strftime("%Y-%m-%d")
+    fetch_end_str   = (fetch_end + timedelta(days=1)).strftime("%Y-%m-%d")
 
     tickers = list(fx_pairs_map.values())
     pair_ids = list(fx_pairs_map.keys())
@@ -971,8 +976,8 @@ def fetch_fx_session_hl(fx_pairs_map: dict) -> dict:
         import yfinance as yf
         raw = yf.download(
             tickers,
-            start=fetch_start.strftime("%Y-%m-%d %H:%M"),
-            end=fetch_end.strftime("%Y-%m-%d %H:%M"),
+            start=fetch_start_str,
+            end=fetch_end_str,
             interval="1h",
             auto_adjust=True,
             group_by="ticker",
