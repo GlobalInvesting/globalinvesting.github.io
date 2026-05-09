@@ -1552,3 +1552,83 @@ a:focus-visible,
   font-size: 9px; color: var(--text3);
   border-top: 1px solid var(--border);
 }
+
+/* ── LAYOUT RESIZE HANDLES (v7.71.0) ────────────────────────────────────
+ * Drag handles inserted between grid columns by layout-resizer.js.
+ * Only visible on desktop (> 900px) — hidden via display:none on mobile.
+ * ─────────────────────────────────────────────────────────────────────── */
+@media (min-width: 901px) {
+  .gi-layout-handle {
+    position: relative;
+    z-index: 100;
+    width: 4px;
+    cursor: col-resize;
+    background: transparent;
+    transition: background 0.15s ease;
+    flex-shrink: 0;
+    /* Expand hit area without affecting layout width */
+    margin: 0 -3px;
+    padding: 0 3px;
+    box-sizing: content-box;
+  }
+  .gi-layout-handle:hover,
+  .gi-layout-handle:active {
+    background: var(--blue);
+    opacity: 0.5;
+  }
+  /* Subtle indicator line at rest */
+  .gi-layout-handle::after {
+    content: '';
+    position: absolute;
+    top: 30%;
+    bottom: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    background: var(--border2);
+    border-radius: 1px;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  .gi-layout-handle:hover::after {
+    opacity: 0;
+  }
+
+  /* Prevent text selection while dragging */
+  body.gi-resizing {
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: col-resize !important;
+  }
+  body.gi-resizing * {
+    cursor: col-resize !important;
+  }
+  body.gi-resizing iframe {
+    pointer-events: none;
+  }
+
+  /* Toast for reset feedback */
+  #gi-layout-toast {
+    position: fixed;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    padding: 5px 14px;
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 4000;
+    white-space: nowrap;
+  }
+  #gi-layout-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
