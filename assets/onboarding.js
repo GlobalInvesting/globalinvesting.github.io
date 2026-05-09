@@ -43,8 +43,8 @@
     },
     {
       title:   'COT Positioning & Pair Bias',
-      body:    'The COT section shows institutional positioning in each G8 currency. Combined with rate differentials, it produces the directional bias per pair — the same multi-factor framework used in the GBP/JPY guide. Click "Get started" to open the first pair now.',
-      target:  null,
+      body:    'The COT section shows institutional positioning in each G8 currency. Combined with rate differentials, it produces the directional bias per pair — the core multi-factor framework behind every macro trade setup. Click "Get started" to open the first pair now.',
+      target:  'section-positioning',
       dynamic: null,
     }
   ];
