@@ -2784,7 +2784,7 @@ const _TV_TO_OHLC = {
   // Volatility
   'CBOE:VIX':             'vix',
   'FRED:VIXCLS':          'vix',
-  'CBOE:MOVE':            'move',
+  'TVC:MOVE':             'move',
 };
 
 // Human-readable labels for the chart source footer
@@ -5622,7 +5622,7 @@ document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('cl
 
 // ── Risk Monitor MOVE cell: click to open chart ──
 document.getElementById('risk-move')?.closest('.risk-cell')?.addEventListener('click', () => {
-  loadTVChart('CBOE:MOVE');
+  loadTVChart('TVC:MOVE');
 });
 
 // ═══════════════════════════════════════════════════════════════════
