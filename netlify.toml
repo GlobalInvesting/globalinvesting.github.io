@@ -38,7 +38,6 @@
     Content-Security-Policy = """
       default-src 'self';
       script-src 'self'
-        'unsafe-inline'
         cdn.jsdelivr.net unpkg.com
         www.googletagmanager.com
         s3.tradingview.com widgets.tradingview-widget.com
@@ -47,12 +46,12 @@
       font-src fonts.gstatic.com;
       img-src 'self' data: https: flagcdn.com;
       connect-src 'self'
-        https://globalinvesting.github.io https://api.frankfurter.app
-        https://api.worldbank.org https://api.stlouisfed.org
+        https://globalinvesting.github.io
+        https://api.worldbank.org https://api.stlouisfed.org https://fred.stlouisfed.org
         https://api.exchangerate-api.com https://open.er-api.com
         https://sdmx.oecd.org
         https://freeserv.dukascopy.com https://www.myfxbook.com
-        https://www.google-analytics.com https://region1.google-analytics.com;
+        https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com;
       frame-src googleads.g.doubleclick.net tpc.googlesyndication.com s3.tradingview.com widgets.tradingview-widget.com;
       frame-ancestors 'self';
       upgrade-insecure-requests
