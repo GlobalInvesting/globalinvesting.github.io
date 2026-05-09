@@ -33,13 +33,15 @@
       'width:260px',
       'max-width:calc(100vw - 16px)',
       'box-sizing:border-box',
+      'overflow:hidden',
+      'word-wrap:break-word',
       'background:var(--head-bg,#161b22)',
       'border:1px solid var(--border,#30363d)',
       'border-radius:6px',
       'padding:12px 14px',
       'box-shadow:0 8px 24px rgba(0,0,0,.45)',
       'z-index:9999',
-      'font-family:var(--font-mono,"IBM Plex Mono",monospace)',
+      'font-family:var(--font-ui,system-ui,sans-serif)',
     ].join(';');
     positionPopover(container);
 
@@ -48,7 +50,7 @@
         <span style="font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--blue,#388bfd);text-transform:uppercase;">Subscribe</span>
         <button id="rss-close" aria-label="Close feed popover" style="background:none;border:none;cursor:pointer;color:var(--text-dim,#8b949e);font-size:14px;padding:0;line-height:1;">&#x2715;</button>
       </div>
-      <p style="font-size:11px;color:var(--text-dim,#8b949e);margin:0 0 10px;line-height:1.5;">
+      <p style="font-size:11px;color:var(--text-dim,#8b949e);margin:0 0 10px;line-height:1.5;white-space:normal;word-wrap:break-word;">
         AI market narrative &amp; signals, updated at each major session transition.
       </p>
       <div style="display:flex;flex-direction:column;gap:6px;">
@@ -56,7 +58,7 @@
            href="${FEED_XML}"
            target="_blank"
            rel="noopener noreferrer"
-           style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--panel-bg,#1c2128);border:1px solid var(--border,#30363d);border-radius:4px;text-decoration:none;color:var(--text,#e6edf3);font-size:11px;transition:border-color .15s;">
+           style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--panel-bg,#1c2128);border:1px solid var(--border,#30363d);border-radius:4px;text-decoration:none;color:var(--text,#e6edf3);font-size:11px;font-family:var(--font-mono,monospace);transition:border-color .15s;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
           RSS 2.0 — feed.xml
         </a>
@@ -64,12 +66,12 @@
            href="${FEED_JSON}"
            target="_blank"
            rel="noopener noreferrer"
-           style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--panel-bg,#1c2128);border:1px solid var(--border,#30363d);border-radius:4px;text-decoration:none;color:var(--text,#e6edf3);font-size:11px;transition:border-color .15s;">
+           style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--panel-bg,#1c2128);border:1px solid var(--border,#30363d);border-radius:4px;text-decoration:none;color:var(--text,#e6edf3);font-size:11px;font-family:var(--font-mono,monospace);transition:border-color .15s;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           JSON Feed 1.1 — feed.json
         </a>
       </div>
-      <p style="font-size:10px;color:var(--text-dim,#8b949e);margin:10px 0 0;line-height:1.4;">
+      <p style="font-size:10px;color:var(--text-dim,#8b949e);margin:10px 0 0;line-height:1.4;white-space:normal;word-wrap:break-word;">
         Paste either URL into Feedly, NetNewsWire, Reeder, or any RSS reader.
       </p>
     `;
