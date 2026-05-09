@@ -35,7 +35,7 @@
     {
       target:  null,
       side:    'bottom',
-      title:   'Institutional-grade FX data — free.',
+      title:   'Institutional-grade FX data, in one place.',
       body:    'Most retail traders operate blind to what institutions are doing. This terminal changes that: live G8 rates, CFTC positioning, central bank policy, yield curves, cross-asset risk — and an AI that reads it all and tells you what it means right now.',
       dynamic: null,
     },
