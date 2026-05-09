@@ -14,11 +14,22 @@
 
   // ── Build popover DOM once ───────────────────────────────────────────────
 
+  function positionPopover(container) {
+    const btn  = document.getElementById('rss-btn');
+    const rect = btn ? btn.getBoundingClientRect() : null;
+    const GAP  = 8;
+    if (rect) {
+      container.style.bottom = (window.innerHeight - rect.top + GAP) + 'px';
+      container.style.right  = (window.innerWidth  - rect.right)     + 'px';
+    } else {
+      container.style.bottom = '36px';
+      container.style.right  = '16px';
+    }
+  }
+
   function buildPopover(container) {
     container.style.cssText = [
-      'position:absolute',
-      'bottom:calc(100% + 8px)',
-      'right:0',
+      'position:fixed',
       'width:260px',
       'background:var(--head-bg,#161b22)',
       'border:1px solid var(--border,#30363d)',
@@ -28,6 +39,7 @@
       'z-index:9999',
       'font-family:var(--font-mono,"IBM Plex Mono",monospace)',
     ].join(';');
+    positionPopover(container);
 
     container.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -114,6 +126,9 @@
       popover._built = true;
     }
 
+    // Re-position on every open so the popover tracks the button
+    // correctly after any window resize since the last open.
+    positionPopover(popover);
     popover.style.display = 'block';
     if (btn) btn.setAttribute('aria-expanded', 'true');
 
