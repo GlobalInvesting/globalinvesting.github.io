@@ -240,7 +240,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 /* Split layout: stack share btn above badge, center badge vertically */
 #main.split-layout #narrative{position:relative}
 #main.split-layout #narrative .narr-text{padding-right:70px}
-#main.split-layout #narrative .narr-meta{position:absolute;right:10px;top:50%;transform:translateY(-50%);flex-direction:column-reverse;align-items:center;gap:4px}
+#main.split-layout #narrative .narr-meta{position:absolute;right:10px;top:50%;transform:translateY(-50%);flex-direction:column-reverse;align-items:center;gap:0}
+#main.split-layout #narrative .narr-share-btn{height:0;overflow:hidden;margin:0;padding:0;border:none;opacity:0;pointer-events:none;transition:height .18s,opacity .18s}
+#main.split-layout #narrative:hover .narr-share-btn,#main.split-layout #narrative:focus-within .narr-share-btn{height:22px;overflow:visible;opacity:1;pointer-events:auto;margin-bottom:4px;border:1px solid transparent}
 /* drag handle — vertical bar between left and right */
 .split-drag-handle{width:2px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .15s;position:relative;height:100%}
 .split-drag-handle:hover,.split-drag-handle.dragging{background:var(--blue)}
