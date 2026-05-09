@@ -31,6 +31,8 @@
     container.style.cssText = [
       'position:fixed',
       'width:260px',
+      'max-width:calc(100vw - 16px)',
+      'box-sizing:border-box',
       'background:var(--head-bg,#161b22)',
       'border:1px solid var(--border,#30363d)',
       'border-radius:6px',
