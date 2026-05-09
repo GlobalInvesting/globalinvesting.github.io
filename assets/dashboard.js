@@ -2771,13 +2771,14 @@ const _TV_TO_OHLC = {
   // Volatility
   'CBOE:VIX':             'vix',
   'FRED:VIXCLS':          'vix',
+  'CBOE:MOVE':            'move',
 };
 
 // Human-readable labels for the chart source footer
 const _OHLC_LABELS = {
   gold: 'GC=F', wti: 'CL=F', btc: 'BTC-USD', us10y: '^TNX',
   spx: '^GSPC', nasdaq: '^IXIC', nikkei: '^N225', stoxx: '^STOXX50E',
-  eth: 'ETH-USD', dxy: 'DX-Y.NYB', vix: '^VIX',
+  eth: 'ETH-USD', dxy: 'DX-Y.NYB', vix: '^VIX', move: '^MOVE',
 };
 
 // Active LW chart instance — destroyed before each new render
@@ -5604,6 +5605,11 @@ document.querySelectorAll('#cross-asset-grid .ca-cell[data-sym]').forEach(cell =
 // ── Risk Monitor VIX cell: click to open chart ──
 document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('click', () => {
   loadTVChart('CBOE:VIX');
+});
+
+// ── Risk Monitor MOVE cell: click to open chart ──
+document.getElementById('risk-move')?.closest('.risk-cell')?.addEventListener('click', () => {
+  loadTVChart('CBOE:MOVE');
 });
 
 // ═══════════════════════════════════════════════════════════════════
