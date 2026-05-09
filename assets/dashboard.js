@@ -2171,6 +2171,19 @@ async function renderRiskData(byId) {
       const arrow = move.chg > 0 ? '▲' : move.chg < 0 ? '▼' : '→';
       const chgStr = (move.chg >= 0 ? ' +' : ' ') + move.chg.toFixed(1);
       setEl('risk-move-sub', arrow + chgStr + ' · ' + signal + ' · ICE BofA');
+      // Seed STOOQ_RT_CACHE so LW chart today-bar works for MOVE tab
+      STOOQ_RT_CACHE['move'] = {
+        close:        move.close,
+        open:         move.open  ?? (move.prev_close ?? move.close),
+        high:         move.high  ?? move.close,
+        low:          move.low   ?? move.close,
+        prev_close:   move.prev_close ?? null,
+        chg:          move.chg  ?? null,
+        pct:          move.pct  ?? null,
+        market_state: move.market_state ?? null,
+        market_time:  move.market_time  ?? null,
+      };
+      _lwUpdateTodayBar();
     } else if (byId.us10y) {
       // Proxy: MOVE ≈ VIX-like measure from 10Y move
       const vixLevel = byId.vix ? byId.vix.close : 20;
