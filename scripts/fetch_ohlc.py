@@ -127,6 +127,7 @@ SYMBOLS: dict[str, str] = {
     "nikkei": "^N225",     # Nikkei 225
     "stoxx":  "^STOXX50E", # EuroStoxx 50
     "vix":    "^VIX",      # CBOE Volatility Index
+    "move":   "^MOVE",     # ICE BofA MOVE Index — bond market volatility (Treasury options)
     # Crypto
     "eth":   "ETH-USD",    # Ethereum vs USD
     # FX Index
@@ -144,6 +145,7 @@ DECIMALS: dict[str, int] = {
     "nzdjpy": 3, "chfjpy": 3,
     "gold":  2, "wti": 2, "btc": 2, "us10y": 4,
     "spx": 2, "nasdaq": 2, "nikkei": 2, "stoxx": 2, "vix": 2,
+    "move": 2,
     "eth": 2, "dxy": 3,
 }
 
@@ -158,6 +160,7 @@ GUARDS: dict[str, tuple[float, float]] = {
     "nikkei":(5000.0,  80000.0),
     "stoxx": (1000.0,  8000.0),
     "vix":   (5.0,     90.0),      # VIX historically ranges 5-90
+    "move":  (20.0,    400.0),     # MOVE Index historically ranges ~30–200; headroom for spikes
     "eth":   (10.0,    20000.0),
     "dxy":   (60.0,    150.0),
     # JPY pairs — quoted in yen, must not use FX_GUARD (0.1–50)
@@ -207,7 +210,7 @@ HL_MAX_SPREAD: dict[str, float] = {
 # Fix: download 1H bars and aggregate them over the 21:00 UTC → 21:00 UTC window.
 # Result: open/high/low/close exactly match what Yahoo Finance shows on its own
 # 4H chart, and match TradingView and Bloomberg FX daily candles.
-NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'eth', 'dxy', 'gold'}
+NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'move', 'eth', 'dxy', 'gold'}
 # Equity indices routed to fetch_equity_ohlc_from_1h (1H aggregation over 21:00 UTC boundary).
 # These instruments close well before the 22:30 UTC workflow run, so their 1H bars are fully
 # available. Nikkei: TSE closes ~06:00 UTC. EuroStoxx: Euronext closes ~15:30 UTC.
