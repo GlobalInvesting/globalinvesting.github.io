@@ -146,3 +146,30 @@
   to = "https://globalinvesting.github.io/:splat"
   status = 301
   force = true
+
+# Ghost pages — redirect indexed-but-deleted URLs to avoid crawl budget waste
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/news.html"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/en.html"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/guia-cot.html"
+  to = "/guide-cot.html"
+  status = 301
+
+[[redirects]]
+  from = "/tecnico-vs-fundamental.html"
+  to = "/guide-dashboard.html"
+  status = 301

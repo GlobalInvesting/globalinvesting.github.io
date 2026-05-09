@@ -6,12 +6,12 @@
 <script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Investing FX Terminal | Professional Forex Dashboard</title>
+<title>FX Terminal — Live G8 Rates, COT Positioning &amp; Market Snapshot</title>
 
 <!-- ═══════════════════════════════════════
      SEO — Core
      ═══════════════════════════════════════ -->
-<meta name="description" content="Institutional-grade FX dashboard: G8 live rates, CFTC COT positioning, G8 central bank rates, US yield curve, cross-asset risk monitor, session liquidity map, and AI market narrative — updated every 15 minutes.">
+<meta name="description" content="Live FX market snapshot: G8 rates updated every 15 min, CFTC COT positioning, central bank rate expectations, US yield curve, cross-asset risk regime and AI market narrative. USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
 <meta name="keywords" content="fx terminal, forex dashboard 2026, real-time forex rates, currency strength meter, yield curve monitor, cross asset risk, COT positioning CFTC, central bank rates live, FX liquidity sessions, DXY dollar index, forex spread monitor, VIX MOVE index, forex market signals, professional forex tools, global investing fx">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <meta name="author" content="Santiago Plá Casuriaga — Global Investing">
@@ -38,8 +38,8 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://globalinvesting.github.io/">
 <meta property="og:site_name" content="Global Investing FX Terminal">
-<meta property="og:title" content="Global Investing FX Terminal | Professional Forex Dashboard">
-<meta property="og:description" content="Institutional-grade FX dashboard: G8 live rates, CFTC COT positioning, G8 central bank rates, US yield curve, cross-asset risk monitor, session liquidity map, and AI market narrative — updated every 15 minutes.">
+<meta property="og:title" content="FX Terminal — Live G8 Rates, COT Positioning &amp; Market Snapshot">
+<meta property="og:description" content="Live FX market snapshot: G8 rates updated every 15 min, CFTC COT positioning, central bank rate expectations, US yield curve, cross-asset risk regime and AI market narrative. USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -51,8 +51,8 @@
      ═══════════════════════════════════════ -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://globalinvesting.github.io/">
-<meta name="twitter:title" content="Global Investing FX Terminal | Professional Forex Dashboard">
-<meta name="twitter:description" content="G8 live rates, CFTC COT positioning, central bank rates, yield curve, cross-asset risk and AI market narrative — updated every 15 minutes.">
+<meta name="twitter:title" content="FX Terminal — Live G8 Rates, COT Positioning &amp; Market Snapshot">
+<meta name="twitter:description" content="Live G8 FX rates every 15 min, CFTC COT positioning, central bank rate expectations, yield curve, cross-asset risk regime and AI market narrative. USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <meta name="twitter:image:alt" content="Global Investing FX Terminal">
 
@@ -462,7 +462,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- NARRATIVE (AI-powered from ai-analysis/index.json) -->
     <div id="narrative" role="region" aria-label="Market Narrative" aria-live="polite" aria-atomic="false">
-      <div class="narr-label">Narrative</div>
+      <div class="narr-label">Narrative <button onclick="toggleRssPopover()" title="Subscribe to session updates via RSS" aria-label="Subscribe to session updates via RSS" style="background:none;border:none;cursor:pointer;font-family:var(--font-ui,sans-serif);font-size:10px;color:var(--blue);padding:0 0 0 6px;letter-spacing:.02em;vertical-align:middle;">Subscribe</button></div>
       <div class="narr-text" id="narrative-text" aria-label="Narrative text">Loading market narrative…</div>
       <div class="narr-meta" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
         <div class="narr-regime" id="narrative-regime">—</div>
