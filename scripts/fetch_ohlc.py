@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_ohlc.py  v1.7 — Daily OHLC history for Lightweight Charts
+fetch_ohlc.py  v1.8 — Daily OHLC history for Lightweight Charts
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Downloads 3 years of daily OHLC bars via yfinance for all symbols
 used by the Lightweight Charts panel (replaces TradingView widget).
@@ -1056,19 +1056,25 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
             return None
 
         # ── Crypto gap-fill guard ──────────────────────────────────────────────
-        # Root cause: GitHub Actions can be delayed past midnight UTC. When the workflow
-        # runs after midnight ET (04:00 UTC), yfinance returns the new day's in-progress
-        # bar but the PREVIOUS day's completed bar may not yet be in the feed (yfinance
-        # has a ~1-day finalization lag for crypto daily bars in some edge cases).
-        # Result: the completed bar is absent, replaced by the new in-progress bar.
-        # dashboard.js strips the latest bar (which IS the current in-progress session),
-        # but the prior completed day's bar is still missing, leaving a 1-day gap.
+        # Root cause: yfinance has a finalization lag for crypto daily bars. The
+        # weekend run (Sat/Sun 23:30 UTC) requests bars with an explicit start/end
+        # range. yfinance returns the new day's in-progress bar (e.g. 2026-05-09)
+        # but may omit the just-completed prior bar (e.g. 2026-05-08) because it
+        # has not yet been finalized in the Yahoo Finance data feed.
+        # Result: the completed bar is absent from deduped, replaced only by the
+        # new in-progress bar. dashboard.js strips the in-progress bar and injects
+        # a live today-bar — but the prior completed bar is still missing, leaving
+        # a 1-day gap in the chart (07/05 → 09/05, skipping 08/05).
         #
-        # Fix: after dedup, check if the second-to-last bar is >= 2 days behind the
-        # last bar. If so, emit a warning. The gap itself is not correctable here
-        # without an additional yfinance call — but the warning helps diagnose it.
-        # The correct fix is to look at the existing JSON file and preserve any bars
-        # that are absent from the new yfinance response.
+        # Fix: when a gap of >= 2 days is detected between the last two bars in the
+        # new yfinance response, read the EXISTING JSON file from disk and backfill
+        # any bars that fall within the gap but are present in the prior JSON.
+        # This preserves correctly finalized bars that yfinance temporarily omits.
+        #
+        # Safety: bars backfilled from the existing JSON are inserted verbatim (they
+        # were written by a prior run that did pass all guards). The new yfinance
+        # data takes priority for any date present in both sources — the backfill
+        # only fills dates that are ABSENT from the new response.
         if id_ in CRYPTO_SYMBOLS and len(deduped) >= 2:
             from datetime import date as _date
             _last_date = _date.fromisoformat(deduped[-1]["time"])
@@ -1076,7 +1082,40 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
             _gap = (_last_date - _prev_date).days
             if _gap >= 2:
                 print(f"  WARN [{id_}]: {_gap}-day gap between {deduped[-2]['time']} and {deduped[-1]['time']} — "
-                      f"yfinance may have skipped a completed bar. Check manually.")
+                      f"attempting backfill from existing JSON.")
+                # Backfill from existing JSON on disk
+                _existing_path = OUT_DIR / f"{id_}.json"
+                if _existing_path.exists():
+                    try:
+                        with open(_existing_path, "r", encoding="utf-8") as _ef:
+                            _existing_bars: list[dict] = json.load(_ef)
+                        # Build a set of dates already present in the new deduped list
+                        _new_dates: set[str] = {b["time"] for b in deduped}
+                        # Collect bars from the existing JSON that fall within the gap
+                        # (strictly between _prev_date and _last_date, exclusive) and
+                        # are absent from the new yfinance response.
+                        _gap_start = deduped[-2]["time"]  # exclusive lower bound
+                        _gap_end   = deduped[-1]["time"]  # exclusive upper bound
+                        _recovered: list[dict] = [
+                            b for b in _existing_bars
+                            if _gap_start < b["time"] < _gap_end
+                            and b["time"] not in _new_dates
+                        ]
+                        if _recovered:
+                            print(f"  INFO [{id_}]: backfilled {len(_recovered)} bar(s) from existing JSON: "
+                                  + ", ".join(b["time"] for b in _recovered))
+                            # Merge: deduped (without last bar) + recovered + last bar
+                            deduped = deduped[:-1] + _recovered + [deduped[-1]]
+                            # Re-sort chronologically (recovered bars should already be in order,
+                            # but sort defensively to guarantee oldest-to-newest invariant)
+                            deduped.sort(key=lambda b: b["time"])
+                        else:
+                            print(f"  WARN [{id_}]: no recoverable bars found in existing JSON for gap "
+                                  f"{_gap_start} → {_gap_end}.")
+                    except Exception as _gfe:
+                        print(f"  WARN [{id_}]: backfill failed ({_gfe}) — gap remains.")
+                else:
+                    print(f"  WARN [{id_}]: no existing JSON at {_existing_path} — gap cannot be filled.")
 
         # ── Today-bar partial-data guard ───────────────────────────────────────
         # fetch_ohlc runs at 22:30 UTC. For most non-FX symbols the last bar in
