@@ -1555,122 +1555,94 @@ a:focus-visible,
 
 /* ── LAYOUT RESIZE HANDLES + PANEL COLLAPSE (v7.72.0) ───────────────────── */
 
-/* ── Horizontal column handles ── */
+/* ── Horizontal column handles (.gi-hh) ── */
 @media (min-width: 901px) {
-  .gi-layout-handle--h {
+  .gi-hh {
     position: relative;
     z-index: 100;
     width: 4px;
     cursor: col-resize;
     background: transparent;
-    transition: background 0.15s ease;
     flex-shrink: 0;
+    /* Widen hit area without affecting layout */
     margin: 0 -3px;
     padding: 0 3px;
     box-sizing: content-box;
+    transition: background .15s;
   }
-  .gi-layout-handle--h:hover,
-  .gi-layout-handle--h:active {
-    background: var(--blue);
-    opacity: 0.45;
-  }
-  .gi-layout-handle--h::after {
+  .gi-hh:hover, .gi-hh:active { background: var(--blue); opacity: .45; }
+  .gi-hh::after {
     content: '';
     position: absolute;
-    top: 20%; bottom: 20%;
-    left: 50%;
+    top: 20%; bottom: 20%; left: 50%;
     transform: translateX(-50%);
     width: 1px;
     background: var(--border2);
     border-radius: 1px;
     pointer-events: none;
-    transition: opacity 0.15s;
+    transition: opacity .15s;
   }
-  .gi-layout-handle--h:hover::after { opacity: 0; }
+  .gi-hh:hover::after { opacity: 0; }
 
-  /* Vertical chart handle */
-  .gi-layout-handle--v {
+  /* ── Vertical chart handle (.gi-vh) ── */
+  .gi-vh {
     display: block;
     height: 4px;
     cursor: row-resize;
     background: transparent;
-    transition: background 0.15s ease;
     margin: -3px 0;
     padding: 3px 0;
     box-sizing: content-box;
     position: relative;
     z-index: 100;
+    transition: background .15s;
   }
-  .gi-layout-handle--v:hover,
-  .gi-layout-handle--v:active {
-    background: var(--blue);
-    opacity: 0.45;
-  }
-  .gi-layout-handle--v::after {
+  .gi-vh:hover, .gi-vh:active { background: var(--blue); opacity: .45; }
+  .gi-vh::after {
     content: '';
     position: absolute;
-    left: 20%; right: 20%;
-    top: 50%;
+    left: 20%; right: 20%; top: 50%;
     transform: translateY(-50%);
     height: 1px;
     background: var(--border2);
     border-radius: 1px;
     pointer-events: none;
-    transition: opacity 0.15s;
+    transition: opacity .15s;
   }
-  .gi-layout-handle--v:hover::after { opacity: 0; }
+  .gi-vh:hover::after { opacity: 0; }
 
-  /* Drag state — global */
-  body.gi-resizing {
-    user-select: none;
-    -webkit-user-select: none;
-    cursor: col-resize !important;
-  }
+  /* ── Drag body states ── */
+  body.gi-resizing   { user-select: none; -webkit-user-select: none; cursor: col-resize !important; }
   body.gi-resizing * { cursor: col-resize !important; }
   body.gi-resizing iframe { pointer-events: none; }
 
-  body.gi-resizing-v {
-    user-select: none;
-    -webkit-user-select: none;
-    cursor: row-resize !important;
-  }
+  body.gi-resizing-v   { user-select: none; -webkit-user-select: none; cursor: row-resize !important; }
   body.gi-resizing-v * { cursor: row-resize !important; }
   body.gi-resizing-v iframe { pointer-events: none; }
 }
 
-/* ── Panel collapse button — visible all viewports ── */
+/* ── Collapse button — all viewports ── */
 .gi-collapse-btn {
   background: none;
   border: none;
   color: var(--text3);
   font-size: 10px;
-  cursor: pointer;
-  padding: 0 4px;
   line-height: 1;
+  padding: 0 4px;
   margin-left: auto;
   flex-shrink: 0;
-  opacity: 0.5;
-  transition: opacity 0.15s, color 0.15s;
+  cursor: pointer;
+  opacity: .5;
+  transition: opacity .15s, color .15s;
   font-family: var(--font-ui);
 }
-.gi-collapse-btn:hover {
-  color: var(--text);
-  opacity: 1;
-}
+.gi-collapse-btn:hover { color: var(--text); opacity: 1; }
 
-/* Collapsed panel: hide border-bottom to save vertical space */
-.gi-collapsed {
-  border-bottom-width: 0 !important;
-}
+/* Collapsed panel: remove border-bottom to reclaim space */
+.gi-collapsed { border-bottom-width: 0 !important; }
 
-/* panel-head needs flex so the collapse button can sit at the far right */
-.panel-head {
-  display: flex !important;
-  align-items: center;
-}
-
-/* Toast */
-#gi-layout-toast {
+/* ── Toast ── */
+#gi-toast {
   position: fixed;
   bottom: 36px;
   left: 50%;
@@ -1682,14 +1654,11 @@ a:focus-visible,
   font-size: 11px;
   padding: 5px 14px;
   border-radius: 4px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity .2s, transform .2s;
   z-index: 4000;
   white-space: nowrap;
 }
-#gi-layout-toast.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+#gi-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
