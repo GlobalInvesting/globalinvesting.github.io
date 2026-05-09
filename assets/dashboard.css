@@ -543,7 +543,7 @@
 
   /* CROSS ASSET */
   .ca-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
-  .ca-cell  { background: var(--bg); padding: 7px 8px; cursor: pointer; transition: background .1s; border-bottom: 1px solid var(--border); }
+  .ca-cell  { background: var(--bg); padding: 7px 8px; cursor: pointer; transition: background .1s; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; }
   .ca-cell:hover { background: var(--bg3); }
   .ca-cell:nth-child(odd) { border-right: 1px solid var(--border); }
   .ca-name  { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; font-family: var(--font-ui); }
