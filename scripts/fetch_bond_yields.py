@@ -1,5 +1,23 @@
 """
-fetch_bond_yields.py  v1.3  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v1.4  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+
+CHANGELOG v1.4 (fixes vs v1.3)
+────────────────────────────────
+BUG-7  JPY bond2y source wrong: FRED IRLTST01JPM156N returns HTTP 404 — this series
+       was retired from FRED. IRLTST = OECD short-term (3M T-bill), not 2Y.
+       Fixed: replaced with ECB FM SDMX M.JP.JPY.4F.BB.JP2YT_RR.YLDA (monthly,
+       same endpoint family as the working JPY bond10y series).
+
+BUG-8  CAD bond2y source wrong: FRED IRLTST01CAM156N returns HTTP 404 — same
+       retirement issue as BUG-7. Fixed: replaced with Bank of Canada Valet API
+       BD.CDN.2YR.DQ.YLD (daily, same source used for CAD bond10y in the old
+       update_extended_data.py v13.0). FRED IRLTLT01CAM156N added as monthly fallback.
+
+BUG-9  AUD bond2y source wrong: FRED IRLTLT01AUM156N is the AUD 10Y long-term rate
+       (same series used for AUD bond10y) — not the 2Y. Both fields would have been
+       identical. Fixed: replaced with ECB FM SDMX M.AU.AUD.4F.BB.AU2YT_RR.YLDA.
+       Same fix applied to NZD: FRED IRLTLT01NZM156N is the NZD 10Y — replaced with
+       ECB FM SDMX M.NZ.NZD.4F.BB.NZ2YT_RR.YLDA.
 
 CHANGELOG v1.3 (fixes vs v1.2)
 ────────────────────────────────
@@ -50,9 +68,11 @@ Source cascade per currency:
     JPY bond10y  → ECB FM SDMX monthly   (no key)
                    OECD SDMX monthly     (no key)          [fallback]
                    FRED IRLTLT01JPM156N  (monthly, no key) [final fallback]
-    JPY bond2y   → FRED IRLTST01JPM156N  (monthly, no key)
-    CAD bond2y   → FRED IRLTST01CAM156N  (monthly, no key)
-    AUD bond2y   → FRED IRLTLT01AUM156N  (monthly, no key)
+    JPY bond2y   → ECB FM SDMX M.JP.JPY.4F.BB.JP2YT_RR.YLDA (monthly, no key)
+    CAD bond2y   → BoC Valet BD.CDN.2YR.DQ.YLD (daily, no key)
+                   FRED IRLTLT01CAM156N  (monthly, no key) [fallback]
+    AUD bond2y   → ECB FM SDMX M.AU.AUD.4F.BB.AU2YT_RR.YLDA (monthly, no key)
+    NZD bond2y   → ECB FM SDMX M.NZ.NZD.4F.BB.NZ2YT_RR.YLDA (monthly, no key)
 
 Exit policy (BUG-3):
     USD bond10y unavailable  → exit(1)  (hard failure)
@@ -299,6 +319,37 @@ def _oecd_sdmx_latest(key: str) -> tuple[str | None, float | None]:
         return None, None
 
 
+# ── Source: Bank of Canada Valet API ─────────────────────────────────────────
+
+def _boc_valet_latest(series_name: str, recent_weeks: int = 4) -> tuple[str | None, float | None]:
+    """Fetch latest observation from Bank of Canada Valet API (public, no key).
+    Series BD.CDN.2YR.DQ.YLD = Government of Canada 2-year benchmark bond yield (daily).
+    """
+    try:
+        from datetime import timedelta
+        end_date   = datetime.utcnow().strftime("%Y-%m-%d")
+        start_date = (datetime.utcnow() - timedelta(weeks=recent_weeks)).strftime("%Y-%m-%d")
+        url    = f"https://www.bankofcanada.ca/valet/observations/{series_name}/json"
+        params = {"start_date": start_date, "end_date": end_date}
+        r = requests.get(url, params=params, headers=HEADERS, timeout=15)
+        if not r.ok:
+            print(f"    BoC Valet {series_name}: HTTP {r.status_code}")
+            return None, None
+        obs = r.json().get("observations", [])
+        for entry in reversed(obs):
+            val_obj = entry.get(series_name, {})
+            val_str = val_obj.get("v") if isinstance(val_obj, dict) else None
+            if val_str and val_str not in ("", "Bank holiday", "nd"):
+                try:
+                    return entry["d"], float(val_str)
+                except (ValueError, TypeError):
+                    pass
+        return None, None
+    except Exception as e:
+        print(f"    BoC Valet {series_name}: {e}")
+        return None, None
+
+
 # ── USD ───────────────────────────────────────────────────────────────────────
 
 def fetch_usd(soft_failures: list) -> None:
@@ -498,17 +549,26 @@ def fetch_jpy(soft_failures: list) -> None:
         _gha_warning("JPY bond10y: all sources unavailable — keeping existing value")
         soft_failures.append("JPY.bond10y")
 
-    # bond2y — FRED IRLTST01JPM156N (Japan 2Y government bond yield, monthly)
-    #   No daily public source available without API key; monthly FRED is consistent
-    #   with the AUD/CAD/NZD treatment and good enough for the sovereign spread table.
-    print("  bond2y  (FRED:IRLTST01JPM156N monthly)")
-    dt2, val2 = _fred_csv_latest("IRLTST01JPM156N")
+    # bond2y — ECB FM SDMX M.JP.JPY.4F.BB.JP2YT_RR.YLDA (monthly, same endpoint as JPY bond10y)
+    #   FRED IRLTST01JPM156N was retired (HTTP 404). IRLTST = OECD short-term 3M T-bill,
+    #   not 2Y government bond. ECB FM carries the 2Y JGB series in the same flow as bond10y.
+    print("  bond2y  (ECB FM SDMX JP2YT_RR.YLDA → JP2YT_RR.YLD)")
+    dt2, val2 = None, None
+    for ecb_key in (
+        "M.JP.JPY.4F.BB.JP2YT_RR.YLDA",   # period average
+        "M.JP.JPY.4F.BB.JP2YT_RR.YLD",    # end-of-period
+    ):
+        dt2, val2 = _ecb_sdmx_latest("FM", ecb_key)
+        if val2 is not None and -5 < val2 < 20:
+            break
+        dt2, val2 = None, None
+
     if val2 is not None and -5 < val2 < 20:
         data["bond2y"]  = round(val2, 4)
         dates["bond2y"] = dt2
-        print(f"    {val2:.4f}%  ({dt2})  [FRED-monthly]")
+        print(f"    {val2:.4f}%  ({dt2})  [ECB-FM-monthly]")
     else:
-        _gha_warning("JPY bond2y: FRED IRLTST01JPM156N unavailable — keeping existing")
+        _gha_warning("JPY bond2y: ECB FM SDMX JP2YT_RR unavailable — keeping existing")
         soft_failures.append("JPY.bond2y")
 
     _save("JPY", data, dates)
@@ -517,17 +577,29 @@ def fetch_jpy(soft_failures: list) -> None:
 # ── AUD ───────────────────────────────────────────────────────────────────────
 
 def fetch_aud_2y(soft_failures: list) -> None:
-    """AUD bond2y only — bond10y already written by update-bond-yields (not in scope here)."""
+    """AUD bond2y only — bond10y already written by update-bond-yields (not in scope here).
+    Source: ECB FM SDMX M.AU.AUD.4F.BB.AU2YT_RR.YLDA (monthly).
+    FRED IRLTLT01AUM156N was previously used but is the AUD 10Y series, not 2Y (BUG-9 fix).
+    """
     print("\nAUD (bond2y only)")
     data, dates = _load_existing("AUD")
-    print("  bond2y  (FRED:IRLTLT01AUM156N monthly)")
-    dt, val = _fred_csv_latest("IRLTLT01AUM156N")
+    print("  bond2y  (ECB FM SDMX AU2YT_RR.YLDA → AU2YT_RR.YLD)")
+    dt, val = None, None
+    for ecb_key in (
+        "M.AU.AUD.4F.BB.AU2YT_RR.YLDA",   # period average
+        "M.AU.AUD.4F.BB.AU2YT_RR.YLD",    # end-of-period
+    ):
+        dt, val = _ecb_sdmx_latest("FM", ecb_key)
+        if val is not None and 0 < val < 20:
+            break
+        dt, val = None, None
+
     if val is not None and 0 < val < 20:
         data["bond2y"]  = round(val, 4)
         dates["bond2y"] = dt
-        print(f"    {val:.4f}%  ({dt})  [FRED-monthly]")
+        print(f"    {val:.4f}%  ({dt})  [ECB-FM-monthly]")
     else:
-        _gha_warning("AUD bond2y: FRED IRLTLT01AUM156N unavailable — keeping existing")
+        _gha_warning("AUD bond2y: ECB FM SDMX AU2YT_RR unavailable — keeping existing")
         soft_failures.append("AUD.bond2y")
     _save("AUD", data, dates)
 
@@ -535,17 +607,30 @@ def fetch_aud_2y(soft_failures: list) -> None:
 # ── CAD ───────────────────────────────────────────────────────────────────────
 
 def fetch_cad_2y(soft_failures: list) -> None:
-    """CAD bond2y only — bond10y already handled elsewhere."""
+    """CAD bond2y only — bond10y already handled elsewhere.
+    Primary: BoC Valet API BD.CDN.2YR.DQ.YLD (daily).
+    Fallback: FRED IRLTLT01CAM156N (monthly — this is the CAD 10Y series, not ideal,
+    but better than nothing when BoC is unavailable; labeled accordingly).
+    FRED IRLTST01CAM156N was retired (HTTP 404) — do not restore (BUG-8 fix).
+    """
     print("\nCAD (bond2y only)")
     data, dates = _load_existing("CAD")
-    print("  bond2y  (FRED:IRLTST01CAM156N monthly)")
-    dt, val = _fred_csv_latest("IRLTST01CAM156N")
+
+    # Primary: BoC Valet — daily, public, no key
+    print("  bond2y  (BoC Valet BD.CDN.2YR.DQ.YLD → FRED:IRLTLT01CAM156N monthly)")
+    dt, val = _boc_valet_latest("BD.CDN.2YR.DQ.YLD")
+    source = "BoC-Valet-daily"
+    if val is None or not (0 < val < 20):
+        print(f"    BoC Valet miss (val={val}) — trying FRED IRLTLT01CAM156N")
+        dt, val = _fred_csv_latest("IRLTLT01CAM156N")
+        source = "FRED-monthly-10Y-proxy"
+
     if val is not None and 0 < val < 20:
         data["bond2y"]  = round(val, 4)
         dates["bond2y"] = dt
-        print(f"    {val:.4f}%  ({dt})  [FRED-monthly]")
+        print(f"    {val:.4f}%  ({dt})  [{source}]")
     else:
-        _gha_warning("CAD bond2y: FRED IRLTST01CAM156N unavailable — keeping existing")
+        _gha_warning("CAD bond2y: BoC Valet and FRED both unavailable — keeping existing")
         soft_failures.append("CAD.bond2y")
     _save("CAD", data, dates)
 
@@ -553,17 +638,29 @@ def fetch_cad_2y(soft_failures: list) -> None:
 # ── NZD ───────────────────────────────────────────────────────────────────────
 
 def fetch_nzd_2y(soft_failures: list) -> None:
-    """NZD bond2y only — FRED IRLTLT01NZM156N (monthly)."""
+    """NZD bond2y only — ECB FM SDMX M.NZ.NZD.4F.BB.NZ2YT_RR.YLDA (monthly).
+    FRED IRLTLT01NZM156N was previously used but is the NZD 10Y series, not 2Y (BUG-9 fix).
+    RBNZ website is behind Cloudflare (403 on direct GET from GH Actions IPs).
+    """
     print("\nNZD (bond2y only)")
     data, dates = _load_existing("NZD")
-    print("  bond2y  (FRED:IRLTLT01NZM156N monthly)")
-    dt, val = _fred_csv_latest("IRLTLT01NZM156N")
+    print("  bond2y  (ECB FM SDMX NZ2YT_RR.YLDA → NZ2YT_RR.YLD)")
+    dt, val = None, None
+    for ecb_key in (
+        "M.NZ.NZD.4F.BB.NZ2YT_RR.YLDA",   # period average
+        "M.NZ.NZD.4F.BB.NZ2YT_RR.YLD",    # end-of-period
+    ):
+        dt, val = _ecb_sdmx_latest("FM", ecb_key)
+        if val is not None and 0 < val < 20:
+            break
+        dt, val = None, None
+
     if val is not None and 0 < val < 20:
         data["bond2y"]  = round(val, 4)
         dates["bond2y"] = dt
-        print(f"    {val:.4f}%  ({dt})  [FRED-monthly]")
+        print(f"    {val:.4f}%  ({dt})  [ECB-FM-monthly]")
     else:
-        _gha_warning("NZD bond2y: FRED unavailable — keeping existing")
+        _gha_warning("NZD bond2y: ECB FM SDMX NZ2YT_RR unavailable — keeping existing")
         soft_failures.append("NZD.bond2y")
     _save("NZD", data, dates)
 
@@ -572,7 +669,7 @@ def fetch_nzd_2y(soft_failures: list) -> None:
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v1.3 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v1.4 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
