@@ -5171,8 +5171,13 @@ function toggleInlineDetail(row) {
   // Always remove any existing expand row first
   if (existingExpand) {
     const inner = existingExpand.querySelector('td > div');
-    if (inner) inner.style.maxHeight = '0';
-    setTimeout(() => existingExpand.remove(), 180);
+    if (inner) {
+      // Snap to scrollHeight first so CSS transition can animate from a numeric value → 0
+      inner.style.maxHeight = inner.scrollHeight + 'px';
+      inner.style.overflow = 'hidden';
+      requestAnimationFrame(() => { inner.style.maxHeight = '0'; });
+    }
+    setTimeout(() => existingExpand.remove(), 200);
     tbody.querySelector('tr.pd-selected')?.classList.remove('pd-selected');
   }
 
@@ -9276,11 +9281,11 @@ async function renderCIPForwards() {
       if (!el) return;
       if (fwd != null && spot != null) {
         el.textContent = fwd.toFixed(dec);
-        const isUsdBase = cfg.base === 'USD';
         const diff = fwd - spot;
-        const atPremium = isUsdBase ? diff < 0 : diff > 0;
+        // fwd > spot: left-hand currency (EUR in EUR/USD, USD in USD/JPY) at forward premium → green
+        const atPremium = diff > 0;
         el.style.color = atPremium ? 'var(--up)' : 'var(--down)';
-        el.title = `CIP ${T === 1/12 ? '1M' : '3M'} forward · r${cfg.base}=${rBase?.toFixed(2)}% vs r${cfg.quote}=${rQuote?.toFixed(2)}% · ${atPremium ? 'base at premium' : 'base at discount'}`;
+        el.title = `CIP ${T === 1/12 ? '1M' : '3M'} forward · r${cfg.base}=${rBase?.toFixed(2)}% vs r${cfg.quote}=${rQuote?.toFixed(2)}% · ${atPremium ? 'LH ccy at premium' : 'LH ccy at discount'}`;
       } else {
         el.textContent = fwd != null ? fwd.toFixed(dec) : '—';
         el.style.color = 'var(--text3)';
@@ -9446,34 +9451,53 @@ async function renderDerivativesSection() {
     });
   }
 
-  // ── HV Term Structure table ──
-  // quotes.json only provides hv30 — hv10/hv21/hv60 columns show — until pipeline is extended
+  // ── HV Term Structure table — 4 columns: Pair | HV 30d | RR 1M | RR/HV ──
   const hvTermTbody = document.getElementById('hv-term-tbody');
-  if (hvTermTbody && intraday?.quotes) {
+  if (hvTermTbody) {
     const rows = hvTermTbody.querySelectorAll('tr');
-    pairs.forEach((pair, idx) => {
+    const termPairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD'];
+    termPairs.forEach((pair, idx) => {
       const row = rows[idx];
       if (!row) return;
       const pairId = pair.replace('/','').toLowerCase();
-      const q = intraday.quotes[pairId];
+      const q = intraday?.quotes?.[pairId];
       const tds = row.querySelectorAll('td');
 
       const hv30 = q?.hv30 ?? STOOQ_RT_CACHE[pairId]?.hv30 ?? null;
-      const rrKey = rrKeys[pair];
+      const rrKey = rrKeys[pair] ?? pair.replace('/','');
       const rr1m = rrMap[rrKey]?.rr25d ?? null;
 
-      // td[1]=HV10 (n/a), td[2]=HV21 (n/a), td[3]=HV30, td[4]=HV60 (n/a)
-      if (tds[1]) { tds[1].textContent = '—'; tds[1].style.color = 'var(--text3)'; tds[1].title = 'Not computed by pipeline'; }
-      if (tds[2]) { tds[2].textContent = '—'; tds[2].style.color = 'var(--text3)'; tds[2].title = 'Not computed by pipeline'; }
-      if (tds[3]) {
-        tds[3].textContent = hv30 != null ? hv30.toFixed(1) + '%' : '—';
-        tds[3].style.color = hv30 != null ? (hv30 > 12 ? 'var(--down)' : hv30 < 5 ? 'var(--up)' : 'var(--text)') : 'var(--text3)';
-        if (hv30 != null) tds[3].title = 'Annualized 30d HV · std(log returns)×√252 · yfinance OHLC';
+      // td[1] = HV 30d
+      if (tds[1]) {
+        tds[1].textContent = hv30 != null ? hv30.toFixed(1) + '%' : '—';
+        tds[1].style.textAlign = 'right';
+        tds[1].style.color = hv30 != null ? (hv30 > 12 ? 'var(--down)' : hv30 < 5 ? 'var(--up)' : 'var(--text)') : 'var(--text3)';
+        tds[1].style.fontFamily = 'var(--font-mono)';
+        tds[1].style.fontSize = '10px';
       }
-      if (tds[4]) { tds[4].textContent = '—'; tds[4].style.color = 'var(--text3)'; tds[4].title = 'Not computed by pipeline'; }
-
-      // Vol trend: not available without HV10
-      if (tds[5]) { tds[5].textContent = '—'; tds[5].style.color = 'var(--text3)'; }
+      // td[2] = RR 1M
+      if (tds[2]) {
+        tds[2].textContent = rr1m != null ? (rr1m >= 0 ? '+' : '') + rr1m.toFixed(2) : '—';
+        tds[2].style.textAlign = 'right';
+        tds[2].style.color = rr1m != null ? (rr1m > 0.1 ? 'var(--up)' : rr1m < -0.1 ? 'var(--down)' : 'var(--text2)') : 'var(--text3)';
+        tds[2].style.fontFamily = 'var(--font-mono)';
+        tds[2].style.fontSize = '10px';
+      }
+      // td[3] = RR/HV ratio — skew premium relative to realized vol
+      if (tds[3]) {
+        if (rr1m != null && hv30 != null && hv30 > 0) {
+          const ratio = (rr1m / hv30) * 100;
+          tds[3].textContent = (ratio >= 0 ? '+' : '') + ratio.toFixed(0) + '%';
+          tds[3].style.color = ratio > 5 ? 'var(--up)' : ratio < -5 ? 'var(--down)' : 'var(--text3)';
+          tds[3].title = `RR 1M (${rr1m.toFixed(2)}) ÷ HV30 (${hv30.toFixed(1)}%) — options skew premium vs realized vol`;
+        } else {
+          tds[3].textContent = '—';
+          tds[3].style.color = 'var(--text3)';
+        }
+        tds[3].style.textAlign = 'right';
+        tds[3].style.fontFamily = 'var(--font-mono)';
+        tds[3].style.fontSize = '10px';
+      }
 
       // RR - HV30 (skew premium vs realized)
       if (tds[6]) {
