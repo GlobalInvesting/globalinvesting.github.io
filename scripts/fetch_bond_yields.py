@@ -1,65 +1,28 @@
 """
-fetch_bond_yields.py  v1.5  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v1.6  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+
+CHANGELOG v1.6 (fixes vs v1.5)
+────────────────────────────────
+IMPROVE-1  JPY bond2y: added FRED INTGSBJPM193N (IMF International Financial
+           Statistics, Government Securities Yields 2Y, monthly) as primary source.
+           Follows the same INTGSB*193N series family confirmed working for EUR
+           (INTGSBEAM193N) and GBP (INTGSBGBM193N). If 404/unavailable, falls
+           back to None (soft optional failure, no exit(1)).
+
+IMPROVE-2  NZD bond2y: added FRED INTGSBNZM193N (same IMF IFS family, NZ 2Y monthly).
+           RBNZ remains blocked (Cloudflare 403 from GH Actions), but IMF IFS
+           collects NZGB yields. If unavailable, falls back to None.
 
 CHANGELOG v1.5 (fixes vs v1.4)
 ────────────────────────────────
 BUG-10  JPY/AUD/NZD bond2y: ECB FM SDMX series JP2YT_RR, AU2YT_RR, NZ2YT_RR
-        return HTTP 404 from the GitHub Actions runner — these series do not exist
-        in the ECB Financial Markets dataflow for non-European sovereigns.
-        Root cause confirmed: ECB FM carries non-EU sovereign data for 10Y benchmarks
-        only (e.g. JP10YT_RR), not for shorter maturities.
+        return HTTP 404 from the GH Actions runner — these series do not exist
+        in ECB FM for non-European sovereigns. Exit policy overhauled (BUG-11).
 
-        Resolution per currency:
-          JPY bond2y → no accessible public source from GH Actions IPs:
-                       MOF Japan CSV (403 from runner), ECB FM (series absent),
-                       FRED IRLTST01JPM156N (retired), yfinance (no JGB 2Y ticker).
-                       Field marked as OPTIONAL: None accepted without triggering exit(1).
-          AUD bond2y → Australia does not issue a 2-year government bond benchmark.
-                       The Reserve Bank of Australia's shortest benchmark is the 3-year ACGB.
-                       Field marked as OPTIONAL: None is the correct/expected value.
-          NZD bond2y → New Zealand does issue 2Y government bonds, but RBNZ is behind
-                       Cloudflare (403 from GH Actions IPs), ECB FM has no NZ2YT_RR series,
-                       and FRED carries no NZD 2Y series. Field marked as OPTIONAL.
-          CAD bond2y → BoC Valet BD.CDN.2YR.DQ.YLD confirmed working from GH Actions.
-                       Kept as REQUIRED (contributes to failure counter if unavailable).
+BUG-11  Exit policy over-sensitive: separated REQUIRED vs OPTIONAL failure counters.
+        Only ≥2 REQUIRED failures → exit(1). Optional failures emit ::notice::.
 
-BUG-11  Exit policy was over-sensitive: ≥2 soft failures → exit(1). With JPY/AUD/NZD
-        bond2y now classified as optional (no source exists), 3 expected-None fields
-        were reliably triggering the degraded-run guard. Fixed: separate counters for
-        REQUIRED fields (USD/EUR/GBP bonds, CAD bond2y) and OPTIONAL fields (JPY/AUD/NZD
-        bond2y). Only ≥2 REQUIRED failures → exit(1). Optional failures are logged as
-        ::notice:: not ::warning:: to avoid noise in the GitHub Actions summary.
-
-CHANGELOG v1.4 (fixes vs v1.3)
-────────────────────────────────
-BUG-7  JPY bond2y source wrong: FRED IRLTST01JPM156N returns HTTP 404 — this series
-       was retired from FRED. IRLTST = OECD short-term (3M T-bill), not 2Y.
-       Fixed: replaced with ECB FM SDMX M.JP.JPY.4F.BB.JP2YT_RR.YLDA (monthly,
-       same endpoint family as the working JPY bond10y series).
-
-BUG-8  CAD bond2y source wrong: FRED IRLTST01CAM156N returns HTTP 404 — same
-       retirement issue as BUG-7. Fixed: replaced with Bank of Canada Valet API
-       BD.CDN.2YR.DQ.YLD (daily, same source used for CAD bond10y in the old
-       update_extended_data.py v13.0). FRED IRLTLT01CAM156N added as monthly fallback.
-
-BUG-9  AUD bond2y source wrong: FRED IRLTLT01AUM156N is the AUD 10Y long-term rate
-       (same series used for AUD bond10y) — not the 2Y. Both fields would have been
-       identical. Fixed: replaced with ECB FM SDMX M.AU.AUD.4F.BB.AU2YT_RR.YLDA.
-       Same fix applied to NZD: FRED IRLTLT01NZM156N is the NZD 10Y — replaced with
-       ECB FM SDMX M.NZ.NZD.4F.BB.NZ2YT_RR.YLDA.
-       (These ECB FM series were found to not exist in v1.5 — see BUG-10 above.)
-
-CHANGELOG v1.3 (fixes vs v1.2)
-────────────────────────────────
-BUG-5  JPY bond2y was never fetched (v1.2). fetch_jpy() only produced bond10y.
-BUG-6  AUD/CAD/NZD bond2y was computed but not committed (git add gap in workflow).
-
-CHANGELOG v1.2 (fixes vs v1.0)
-────────────────────────────────
-BUG-1  EUR/GBP/JPY had no fallbacks.
-BUG-2  GBP BOE endpoint wrong (HTML endpoint vs CSV endpoint).
-BUG-3  Silent failure paths didn't emit GH Actions annotations or set exit code.
-BUG-4  EUR ECB SDMX fails on EU public holidays — added FRED fallback.
+CHANGELOG v1.4 / v1.3 / v1.2 — see git history.
 
 Source cascade per currency:
     USD bond10y  → ohlc-data/us10y.json  (update-ohlc, daily)
@@ -77,11 +40,11 @@ Source cascade per currency:
     JPY bond10y  → ECB FM SDMX monthly   (no key)                  [REQUIRED]
                    OECD SDMX monthly     (no key)          [fallback]
                    FRED IRLTLT01JPM156N  (monthly, no key) [final fallback]
-    JPY bond2y   → No accessible public source from GH Actions IPs [OPTIONAL → None expected]
+    JPY bond2y   → FRED INTGSBJPM193N    (monthly, IMF IFS, no key)[OPTIONAL]
     CAD bond2y   → BoC Valet BD.CDN.2YR.DQ.YLD (daily, no key)    [REQUIRED]
                    FRED IRLTLT01CAM156N  (monthly, no key) [fallback]
-    AUD bond2y   → Australia has no 2Y government bond benchmark   [OPTIONAL → None expected]
-    NZD bond2y   → No accessible public source from GH Actions IPs [OPTIONAL → None expected]
+    AUD bond2y   → Australia has no 2Y government bond benchmark   [OPTIONAL → None]
+    NZD bond2y   → FRED INTGSBNZM193N    (monthly, IMF IFS, no key)[OPTIONAL]
 
 Exit policy:
     USD bond10y unavailable     → exit(1)  (hard failure, most critical field)
@@ -511,18 +474,28 @@ def fetch_jpy(req_failures: list, opt_failures: list) -> None:
         _gha_warning("JPY bond10y: all sources unavailable — keeping existing value")
         req_failures.append("JPY.bond10y")
 
-    # bond2y — OPTIONAL: no accessible public source from GH Actions IPs.
-    # ECB FM JP2YT_RR series does not exist (HTTP 404 confirmed on runner).
-    # MOF Japan CSV returns 403. FRED series retired. yfinance has no JGB 2Y ticker.
-    # Preserve any existing cached value; do not overwrite with None.
-    existing_2y = data.get("bond2y")
-    if existing_2y is not None:
-        print(f"  bond2y  (no live source — keeping cached {existing_2y}%)")
+    # bond2y — OPTIONAL: try FRED INTGSBJPM193N (IMF IFS 2Y via FRED, monthly).
+    # INTGSB series = IMF International Financial Statistics government securities yields.
+    # Pattern: INTGSB + country_code + M + 193N. Known working: INTGSBEAM193N (EUR),
+    # INTGSBGBM193N (GBP). JP equivalent: INTGSBJPM193N. Falls back to None if absent.
+    # ECB FM JP2YT_RR: series doesn't exist (404 confirmed). MOF Japan: 403 from runner.
+    # FRED IRLTST01JPM156N: retired. yfinance: no JGB 2Y ticker.
+    print("  bond2y  (FRED:INTGSBJPM193N monthly [IMF IFS])")
+    dt2, val2 = _fred_csv_latest("INTGSBJPM193N")
+    if val2 is not None and -5 < val2 < 20:
+        data["bond2y"]  = round(val2, 4)
+        dates["bond2y"] = dt2
+        print(f"    {val2:.4f}%  ({dt2})  [FRED-IMF-IFS-monthly]")
     else:
-        print("  bond2y  (no accessible source for JPY 2Y — field left as None)")
-        _gha_notice("JPY bond2y: no accessible public source from GH Actions IPs — "
-                    "ECB FM JP2YT_RR does not exist, MOF 403, FRED retired. Expected None.")
-        opt_failures.append("JPY.bond2y")
+        # No live source available — preserve any existing cached value
+        existing_2y = data.get("bond2y")
+        if existing_2y is not None:
+            print(f"    FRED miss — keeping cached {existing_2y}%")
+        else:
+            print("    FRED miss — no cached value; field remains None")
+            _gha_notice("JPY bond2y: FRED INTGSBJPM193N unavailable; no accessible source "
+                        "from GH Actions IPs. ECB FM JP2YT_RR absent, MOF 403, FRED IRLTST retired.")
+            opt_failures.append("JPY.bond2y")
 
     _save("JPY", data, dates)
 
@@ -595,14 +568,25 @@ def fetch_nzd_2y(opt_failures: list) -> None:
     print("\nNZD (bond2y only)")
     data, dates = _load_existing("NZD")
 
-    existing_2y = data.get("bond2y")
-    if existing_2y is not None:
-        print(f"  bond2y  (no accessible source — keeping cached {existing_2y}%)")
+    # Try FRED INTGSBNZM193N (IMF IFS 2Y via FRED, monthly).
+    # NZ issues 2Y government bonds (NZGB). RBNZ blocked (Cloudflare 403 from runner).
+    # ECB FM NZ2YT_RR: series doesn't exist. INTGSBNZM193N follows same IMF IFS pattern
+    # as INTGSBJPM193N (JP) / INTGSBEAM193N (EUR) / INTGSBGBM193N (GBP).
+    print("  bond2y  (FRED:INTGSBNZM193N monthly [IMF IFS])")
+    dt_nz, val_nz = _fred_csv_latest("INTGSBNZM193N")
+    if val_nz is not None and 0 < val_nz < 20:
+        data["bond2y"]  = round(val_nz, 4)
+        dates["bond2y"] = dt_nz
+        print(f"    {val_nz:.4f}%  ({dt_nz})  [FRED-IMF-IFS-monthly]")
     else:
-        print("  bond2y  (no accessible source for NZD 2Y — RBNZ blocked, ECB FM series absent)")
-        _gha_notice("NZD bond2y: RBNZ behind Cloudflare (403), ECB FM NZ2YT_RR absent, "
-                    "no FRED NZD 2Y series. Field correctly None.")
-        opt_failures.append("NZD.bond2y")
+        existing_2y = data.get("bond2y")
+        if existing_2y is not None:
+            print(f"    FRED miss — keeping cached {existing_2y}%")
+        else:
+            print("    FRED miss — no cached value; field remains None")
+            _gha_notice("NZD bond2y: FRED INTGSBNZM193N unavailable; RBNZ blocked (Cloudflare), "
+                        "ECB FM NZ2YT_RR absent. Field correctly None.")
+            opt_failures.append("NZD.bond2y")
 
     _save("NZD", data, dates)
 
@@ -611,7 +595,7 @@ def fetch_nzd_2y(opt_failures: list) -> None:
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v1.5 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v1.6 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
