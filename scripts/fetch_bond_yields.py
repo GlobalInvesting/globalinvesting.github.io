@@ -1,5 +1,5 @@
 """
-fetch_bond_yields.py  v1.6  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v1.7  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
 
 CHANGELOG v1.6 (fixes vs v1.5)
 ────────────────────────────────
@@ -128,6 +128,21 @@ def _fred_csv_latest(series_id: str) -> tuple[str | None, float | None]:
     except Exception as e:
         print(f"    FRED CSV {series_id}: {e}")
         return None, None
+
+
+def _is_stale(date_str: str | None, max_months: int = 18) -> bool:
+    """Return True if date_str is more than max_months before today.
+    Used to reject discontinued FRED series that return an old final observation
+    instead of 404 — e.g. INTGSBJPM193N last published 2017-05-01.
+    """
+    if date_str is None:
+        return True
+    try:
+        obs = datetime.strptime(date_str, "%Y-%m-%d")
+        cutoff = datetime.utcnow() - timedelta(days=max_months * 31)
+        return obs < cutoff
+    except ValueError:
+        return True
 
 
 # ── Source: ohlc-data/<symbol>.json ──────────────────────────────────────────
@@ -482,19 +497,21 @@ def fetch_jpy(req_failures: list, opt_failures: list) -> None:
     # FRED IRLTST01JPM156N: retired. yfinance: no JGB 2Y ticker.
     print("  bond2y  (FRED:INTGSBJPM193N monthly [IMF IFS])")
     dt2, val2 = _fred_csv_latest("INTGSBJPM193N")
-    if val2 is not None and -5 < val2 < 20:
+    if val2 is not None and -5 < val2 < 20 and not _is_stale(dt2):
         data["bond2y"]  = round(val2, 4)
         dates["bond2y"] = dt2
         print(f"    {val2:.4f}%  ({dt2})  [FRED-IMF-IFS-monthly]")
     else:
+        if val2 is not None and _is_stale(dt2):
+            print(f"    FRED INTGSBJPM193N: series discontinued — last obs {dt2} is stale (>18 months)")
         # No live source available — preserve any existing cached value
         existing_2y = data.get("bond2y")
         if existing_2y is not None:
-            print(f"    FRED miss — keeping cached {existing_2y}%")
+            print(f"    keeping cached {existing_2y}%")
         else:
-            print("    FRED miss — no cached value; field remains None")
-            _gha_notice("JPY bond2y: FRED INTGSBJPM193N unavailable; no accessible source "
-                        "from GH Actions IPs. ECB FM JP2YT_RR absent, MOF 403, FRED IRLTST retired.")
+            print("    no live source and no cached value; field remains None")
+            _gha_notice("JPY bond2y: FRED INTGSBJPM193N discontinued (last obs 2017). "
+                        "ECB FM JP2YT_RR absent, MOF 403, FRED IRLTST retired. Field correctly None.")
             opt_failures.append("JPY.bond2y")
 
     _save("JPY", data, dates)
@@ -574,18 +591,20 @@ def fetch_nzd_2y(opt_failures: list) -> None:
     # as INTGSBJPM193N (JP) / INTGSBEAM193N (EUR) / INTGSBGBM193N (GBP).
     print("  bond2y  (FRED:INTGSBNZM193N monthly [IMF IFS])")
     dt_nz, val_nz = _fred_csv_latest("INTGSBNZM193N")
-    if val_nz is not None and 0 < val_nz < 20:
+    if val_nz is not None and 0 < val_nz < 20 and not _is_stale(dt_nz):
         data["bond2y"]  = round(val_nz, 4)
         dates["bond2y"] = dt_nz
         print(f"    {val_nz:.4f}%  ({dt_nz})  [FRED-IMF-IFS-monthly]")
     else:
+        if val_nz is not None and _is_stale(dt_nz):
+            print(f"    FRED INTGSBNZM193N: series discontinued — last obs {dt_nz} is stale (>18 months)")
         existing_2y = data.get("bond2y")
         if existing_2y is not None:
-            print(f"    FRED miss — keeping cached {existing_2y}%")
+            print(f"    keeping cached {existing_2y}%")
         else:
-            print("    FRED miss — no cached value; field remains None")
-            _gha_notice("NZD bond2y: FRED INTGSBNZM193N unavailable; RBNZ blocked (Cloudflare), "
-                        "ECB FM NZ2YT_RR absent. Field correctly None.")
+            print("    no live source and no cached value; field remains None")
+            _gha_notice("NZD bond2y: FRED INTGSBNZM193N unavailable or discontinued; "
+                        "RBNZ blocked (Cloudflare), ECB FM NZ2YT_RR absent. Field correctly None.")
             opt_failures.append("NZD.bond2y")
 
     _save("NZD", data, dates)
@@ -595,7 +614,7 @@ def fetch_nzd_2y(opt_failures: list) -> None:
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v1.6 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v1.7 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
