@@ -9,19 +9,20 @@
   s.textContent = `
 #ycm-bd {
   display:block!important;
-  position:fixed!important;
-  top:92px!important;
-  height:calc(100vh - 92px)!important;
+  position:absolute!important;
+  top:0!important; bottom:0!important;
+  left:50%!important; right:0!important;
   overflow-y:auto!important;
   z-index:500!important;
   background:var(--bg)!important;
   border-left:1px solid var(--border2)!important;
-  border-right:1px solid var(--border2)!important;
   scrollbar-width:thin;
   scrollbar-color:var(--border2) transparent;
 }
 #ycm-bd::-webkit-scrollbar { width:3px; }
 #ycm-bd::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+/* #main needs position:relative to contain the absolute modal */
+#main { position:relative; }
 #ycm-modal {
   width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
   border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;
@@ -134,18 +135,6 @@ function openYCModal(tenorData) {
   bd.setAttribute('role', 'dialog');
   bd.setAttribute('aria-modal', 'true');
   bd.setAttribute('aria-label', 'US Treasury Yield Curve');
-  // Cover the right half of #main — read live positions to respect layout-resizer state
-  const mainEl = document.getElementById('main');
-  const rp     = document.getElementById('rightpanel');
-  const rpW    = rp     ? rp.offsetWidth     : 220;
-  if (mainEl) {
-    const r = mainEl.getBoundingClientRect();
-    bd.style.left  = Math.round(r.left + r.width / 2) + 'px';
-  } else {
-    const sbW = (document.getElementById('sidebar')?.offsetWidth ?? 180);
-    bd.style.left = Math.round(sbW + (window.innerWidth - sbW - rpW) / 2) + 'px';
-  }
-  bd.style.right = rpW + 'px';
   bd.innerHTML = `
 <div id="ycm-modal">
   <div id="ycm-hd">
@@ -169,7 +158,7 @@ function openYCModal(tenorData) {
   </div>
 </div>`;
 
-  document.body.appendChild(bd);
+  (document.getElementById('main') || document.body).appendChild(bd);
   bd.addEventListener('click', e => { if (e.target === bd) closeYCModal(); });
   document.addEventListener('keydown', _ycKeydown);
   requestAnimationFrame(() => _ycDrawChart(labels, todayVals, priorVals));
