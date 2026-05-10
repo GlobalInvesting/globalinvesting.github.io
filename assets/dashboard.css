@@ -772,14 +772,16 @@
   .sb-sym { flex-shrink: 0; }
 
   /* ── CARRY TRADE RANKING — table layout ──────────────────────── */
-  .carry-rank-hdr { display:grid; grid-template-columns:52px 1fr 1fr 56px; align-items:center; gap:0; padding:3px 8px 4px; border-bottom:1px solid var(--border2); font-size:8px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text3); font-family:var(--font-mono); }
-  .carry-rank-row { display:grid; grid-template-columns:52px 1fr 1fr 56px; align-items:center; gap:0; padding:4px 8px; border-bottom:1px solid var(--border); font-size:11px; cursor:pointer; transition:background .1s; }
+  .carry-rank-hdr { display:grid; grid-template-columns:46px 1fr 1fr 68px; align-items:center; gap:0; padding:3px 8px 4px; border-bottom:1px solid var(--border2); font-size:8px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text3); font-family:var(--font-mono); }
+  .carry-rank-row { display:grid; grid-template-columns:46px 1fr 1fr 68px; align-items:center; gap:0; padding:4px 8px; border-bottom:1px solid var(--border); font-size:11px; cursor:pointer; transition:background .1s; }
   .carry-rank-row:hover { background:var(--bg3); }
   .carry-rank-row:last-child { border-bottom:none; }
   .crh-pair,.cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; font-size:10.5px; font-family:var(--font-ui); }
-  .crh-nom,.cr-nom   { font-family:var(--font-mono); font-size:10px; color:var(--text2); text-align:right; white-space:nowrap; padding-right:6px; }
-  .crh-cip,.cr-cip   { font-family:var(--font-mono); font-size:10px; text-align:right; white-space:nowrap; padding-right:6px; }
-  .crh-sig,.cr-sig   { font-size:9px; text-align:right; white-space:nowrap; }
+  .crh-nom,.cr-nom   { font-family:var(--font-mono); font-size:10px; color:var(--text2); text-align:right; white-space:nowrap; padding-right:4px; }
+  .crh-cip,.cr-cip   { font-family:var(--font-mono); font-size:10px; text-align:right; white-space:nowrap; padding-right:4px; }
+  /* SIGNAL: flex so nested spans align right correctly */
+  .crh-sig { font-size:8px; display:flex; justify-content:flex-end; align-items:center; white-space:nowrap; }
+  .cr-sig  { display:flex; justify-content:flex-end; align-items:center; white-space:nowrap; }
   /* Signal chips */
   .cr-sig-strong { color:var(--up); font-weight:700; font-size:9px; }
   .cr-sig-pos    { color:var(--up); font-size:9px; }
