@@ -776,7 +776,7 @@
   .carry-rank-row:hover { background:var(--bg3); }
   .carry-rank-row:last-child { border-bottom:none; }
   .cr-rank { font-size:9px; color:var(--text3); font-family:var(--font-mono); text-align:left; }
-  .cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; font-size:10.5px; }
+  .cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; font-size:10px; }
   .cr-spread { font-family:var(--font-mono); font-size:8px; color:var(--text2); white-space:nowrap; }
   .cr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; min-width:8px; }
   .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
@@ -796,7 +796,7 @@
     gap: 0;
   }
   .carry-rank-hdr {
-    padding: 3px 8px 4px;
+    padding: 3px 4px;
     border-bottom: 1px solid var(--border2);
     font-size: 8px;
     font-weight: 600;
@@ -805,15 +805,15 @@
     color: var(--text3);
     font-family: var(--font-mono);
   }
-  #carry-rank-rows:has(> .carry-rank-hdr) .carry-rank-row { padding: 4px 8px; }
+  #carry-rank-rows:has(> .carry-rank-hdr) .carry-rank-row { padding: 2px 4px; }
   .crh-pair { font-family:var(--font-ui); font-size:8px; }
-  .crh-nom  { font-family:var(--font-mono); font-size:8px; text-align:right; padding-right:6px; }
-  .crh-cip  { font-family:var(--font-mono); font-size:8px; text-align:right; padding-right:6px; }
+  .crh-nom  { font-family:var(--font-mono); font-size:8px; text-align:right; padding-right:4px; }
+  .crh-cip  { font-family:var(--font-mono); font-size:8px; text-align:right; padding-right:4px; }
   .crh-sig  { font-size:8px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  /* v2 row cells — cr-pair already defined in v1; nom/cip/sig are new */
-  .cr-nom   { font-family:var(--font-mono); font-size:10px; color:var(--text2); text-align:right; white-space:nowrap; padding-right:6px; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; }
-  .cr-cip   { font-family:var(--font-mono); font-size:10px; text-align:right; white-space:nowrap; padding-right:6px; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; }
-  .cr-sig   { font-size:9px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* v2 row cells — font-size:10px matches Key Correlations td; cr-pair defined in v1 */
+  .cr-nom   { font-family:var(--font-mono); font-size:10px; color:var(--text2); text-align:right; white-space:nowrap; padding-right:4px; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; }
+  .cr-cip   { font-family:var(--font-mono); font-size:10px; text-align:right; white-space:nowrap; padding-right:4px; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; }
+  .cr-sig   { font-size:10px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .cr-sig-strong { color:var(--up);   font-weight:700; }
   .cr-sig-pos    { color:var(--up); }
   .cr-sig-neu    { color:var(--text3); }
