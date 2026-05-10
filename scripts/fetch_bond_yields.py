@@ -1,5 +1,5 @@
 """
-fetch_bond_yields.py  v1.7  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v1.8  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
 
 CHANGELOG v1.6 (fixes vs v1.5)
 ────────────────────────────────
@@ -503,16 +503,17 @@ def fetch_jpy(req_failures: list, opt_failures: list) -> None:
         print(f"    {val2:.4f}%  ({dt2})  [FRED-IMF-IFS-monthly]")
     else:
         if val2 is not None and _is_stale(dt2):
+            # Series is confirmed discontinued — evict any cached value sourced from
+            # this same discontinued series (v1.6 may have written the 2017 stale obs).
+            # Cache-preservation only makes sense for transient network failures, not
+            # for a series whose last observation is ~9 years old.
             print(f"    FRED INTGSBJPM193N: series discontinued — last obs {dt2} is stale (>18 months)")
-        # No live source available — preserve any existing cached value
-        existing_2y = data.get("bond2y")
-        if existing_2y is not None:
-            print(f"    keeping cached {existing_2y}%")
-        else:
-            print("    no live source and no cached value; field remains None")
-            _gha_notice("JPY bond2y: FRED INTGSBJPM193N discontinued (last obs 2017). "
-                        "ECB FM JP2YT_RR absent, MOF 403, FRED IRLTST retired. Field correctly None.")
-            opt_failures.append("JPY.bond2y")
+            data.pop("bond2y", None)
+            dates.pop("bond2y", None)
+        # No live source available — field is None
+        _gha_notice("JPY bond2y: FRED INTGSBJPM193N discontinued (last obs 2017). "
+                    "ECB FM JP2YT_RR absent, MOF 403, FRED IRLTST retired. Field correctly None.")
+        opt_failures.append("JPY.bond2y")
 
     _save("JPY", data, dates)
 
@@ -597,15 +598,14 @@ def fetch_nzd_2y(opt_failures: list) -> None:
         print(f"    {val_nz:.4f}%  ({dt_nz})  [FRED-IMF-IFS-monthly]")
     else:
         if val_nz is not None and _is_stale(dt_nz):
+            # Series discontinued — evict any stale cached value
             print(f"    FRED INTGSBNZM193N: series discontinued — last obs {dt_nz} is stale (>18 months)")
-        existing_2y = data.get("bond2y")
-        if existing_2y is not None:
-            print(f"    keeping cached {existing_2y}%")
-        else:
-            print("    no live source and no cached value; field remains None")
-            _gha_notice("NZD bond2y: FRED INTGSBNZM193N unavailable or discontinued; "
-                        "RBNZ blocked (Cloudflare), ECB FM NZ2YT_RR absent. Field correctly None.")
-            opt_failures.append("NZD.bond2y")
+            data.pop("bond2y", None)
+            dates.pop("bond2y", None)
+        # No live source available — field is None
+        _gha_notice("NZD bond2y: FRED INTGSBNZM193N unavailable or discontinued; "
+                    "RBNZ blocked (Cloudflare), ECB FM NZ2YT_RR absent. Field correctly None.")
+        opt_failures.append("NZD.bond2y")
 
     _save("NZD", data, dates)
 
@@ -614,7 +614,7 @@ def fetch_nzd_2y(opt_failures: list) -> None:
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v1.7 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v1.8 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
