@@ -8233,9 +8233,23 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     m: 'section-econmap',
     y: 'section-cbrates',
     k: 'section-tvcalendar',
+    d: 'section-derivatives',
   };
 
   function navTo(target) {
+    if (target === 'section-derivatives') {
+      // Derivatives uses a custom show/hide toggle, not scroll-into-view
+      const derivSection = window._derivNavSection;
+      if (!derivSection) return;
+      if (derivSection.style.display === 'none' || derivSection.style.display === '') {
+        // If currently hidden, show it
+        if (typeof window._derivNavShow === 'function') window._derivNavShow();
+      } else {
+        // Already visible — treat D as a toggle back to Overview
+        if (typeof window._derivNavHide === 'function') window._derivNavHide();
+      }
+      return;
+    }
     const link = document.querySelector(`.top-nav a[data-target="${target}"]`);
     if (link) link.click();
   }
@@ -8279,6 +8293,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
           <span class="kbl-key">M</span><span class="kbl-desc">Macro map</span>
           <span class="kbl-key">Y</span><span class="kbl-desc">Rates &amp; Yield Curve</span>
           <span class="kbl-key">K</span><span class="kbl-desc">Economic Calendar</span>
+          <span class="kbl-key">D</span><span class="kbl-desc">Derivatives (toggle)</span>
           <span class="kbl-key">&uarr;&darr;</span><span class="kbl-desc">Navigate FX rows</span>
           <span class="kbl-key">?</span><span class="kbl-desc">Close this panel</span>
         </div>
@@ -9342,7 +9357,24 @@ async function renderRRInFXTable() {
 async function renderDerivativesSection() {
   const ratesCache = window._CB_RATES_CACHE;
   const intraday = await loadIntradayQuotes().catch(() => null);
-  const rrMap = window.RR_DATA_CACHE || {};
+
+  // Guarantee RR data is available — fetch directly if cache is still empty
+  let rrMap = window.RR_DATA_CACHE || {};
+  if (Object.keys(rrMap).length === 0) {
+    try {
+      const res = await fetch('./rr-data/rr.json').catch(() => null);
+      if (res?.ok) {
+        const j = await res.json();
+        if (j?.pairs) {
+          rrMap = j.pairs;
+          if (!window.RR_DATA_CACHE) window.RR_DATA_CACHE = {};
+          Object.assign(window.RR_DATA_CACHE, rrMap);
+        }
+      }
+    } catch { /* leave empty, cells show — */ }
+  } else {
+    rrMap = window.RR_DATA_CACHE;
+  }
 
   // Load rr2.json if available (multi-tenor from fetch_saxo_rr2.py)
   let rr2Map = {};
@@ -9514,34 +9546,6 @@ async function renderDerivativesSection() {
   }
 }
 
-// ── HV Multi-Window table in Risk Monitor ──
-async function renderHVMultiWindow() {
-  const tbody = document.getElementById('hv-multitf-tbody');
-  if (!tbody) return;
-  const intraday = await loadIntradayQuotes().catch(() => null);
-  const rrMap = window.RR_DATA_CACHE || {};
-  const rrKeys = {
-    'eurusd':'EURUSD','gbpusd':'GBPUSD','usdjpy':'USDJPY','audusd':'AUDUSD'
-  };
-  const pairs = ['eurusd','gbpusd','usdjpy','audusd'];
-  const labels = {'eurusd':'EUR/USD','gbpusd':'GBP/USD','usdjpy':'USD/JPY','audusd':'AUD/USD'};
-  // quotes.json only provides hv30; hv10/hv60 are not computed by the pipeline
-  const rows = pairs.map(pairId => {
-    const q = intraday?.quotes?.[pairId];
-    const hv30 = q?.hv30 ?? STOOQ_RT_CACHE[pairId]?.hv30 ?? null;
-    const rr1m = rrMap[rrKeys[pairId]]?.rr25d ?? null;
-    const hv30Color = hv30 != null ? (hv30 > 12 ? 'var(--down)' : hv30 < 5 ? 'var(--up)' : 'var(--text)') : 'var(--text3)';
-    const fmtRR = v => v != null ? (v>=0?'+':'')+v.toFixed(2) : '—';
-    const rrColor = rr1m != null ? (rr1m > 0.1 ? 'var(--up)' : rr1m < -0.1 ? 'var(--down)' : 'var(--text2)') : 'var(--text3)';
-    return `<tr>
-      <td style="font-family:var(--font-mono);font-size:10px;">${labels[pairId]}</td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:10px;color:${hv30Color};">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:10px;color:${rrColor};">${fmtRR(rr1m)}</td>
-      <td style="text-align:right;font-size:10px;color:var(--text3);">—</td>
-    </tr>`;
-  });
-  tbody.innerHTML = rows.join('');
-}
 
 // ── G8 Rates Tabs ──
 function initG8RatesTabs() {
@@ -9823,7 +9827,9 @@ function initDerivativesNavFixed() {
   function showDerivatives() {
     Array.from(splitLowerRight.children).forEach(el => {
       if (el.id !== 'section-derivatives') {
-        el.dataset.derivHidden = '1';
+        // Store original computed display so we can restore it exactly
+        const originalDisplay = el.style.display || window.getComputedStyle(el).display;
+        el.dataset.derivHidden = originalDisplay === 'none' ? 'none' : (el.style.display || '');
         el.style.display = 'none';
       }
     });
@@ -9832,13 +9838,14 @@ function initDerivativesNavFixed() {
     const splitLower = document.getElementById('split-lower');
     if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
     renderDerivativesSection();
-    renderHVMultiWindow();
   }
 
   function hideDerivatives() {
     derivSection.style.display = 'none';
     splitLowerRight.querySelectorAll('[data-deriv-hidden]').forEach(el => {
-      el.style.display = '';
+      // Restore the exact inline display value that was set before hiding
+      const saved = el.dataset.derivHidden;
+      el.style.display = saved === '' ? '' : saved;
       delete el.dataset.derivHidden;
     });
   }
@@ -9860,6 +9867,11 @@ function initDerivativesNavFixed() {
       });
     }
   });
+
+  // Expose for keyboard shortcut
+  window._derivNavShow = showDerivatives;
+  window._derivNavHide = hideDerivatives;
+  window._derivNavSection = derivSection;
 }
 
 (function bootNewFeatures() {
@@ -9882,7 +9894,6 @@ function initDerivativesNavFixed() {
     // Initial render
     await renderCIPForwards();
     await renderRRInFXTable();
-    await renderHVMultiWindow();
     await renderEconSurprises();
 
     // Refresh every 5 min
@@ -9890,7 +9901,6 @@ function initDerivativesNavFixed() {
       await loadCBRatesCache();
       await renderCIPForwards();
       await renderRRInFXTable();
-      await renderHVMultiWindow();
     }, 5 * 60 * 1000);
   };
 
