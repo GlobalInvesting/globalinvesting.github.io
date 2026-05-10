@@ -5,9 +5,12 @@ name: Update Bond Yields
 #
 # Writes to THIS (public) repo:
 #   extended-data/USD.json  → bond10y (US 10Y), bond2y (US 2Y), bond5y (US 5Y), vix
-#   extended-data/EUR.json  → bond10y (DE 10Y / Bund)
-#   extended-data/GBP.json  → bond10y (UK 10Y / Gilt)
-#   extended-data/JPY.json  → bond10y (JP 10Y / JGB)
+#   extended-data/EUR.json  → bond10y (DE 10Y / Bund), bond2y (DE 2Y)
+#   extended-data/GBP.json  → bond10y (UK 10Y / Gilt), bond2y (UK 2Y)
+#   extended-data/JPY.json  → bond10y (JP 10Y / JGB), bond2y (JP 2Y)
+#   extended-data/AUD.json  → bond2y (AU 2Y)
+#   extended-data/CAD.json  → bond2y (CA 2Y)
+#   extended-data/NZD.json  → bond2y (NZ 2Y)
 #
 # Consumed by:
 #   generate_narrative_signals.py  → bond10y (USD/EUR/GBP/JPY), bond2y, bond5y (LLM context)
@@ -109,7 +112,9 @@ jobs:
             git reset --hard origin/main
             cp -r /tmp/bond_yields_fresh/. extended-data/
             git add extended-data/USD.json extended-data/EUR.json \
-                    extended-data/GBP.json extended-data/JPY.json
+                    extended-data/GBP.json extended-data/JPY.json \
+                    extended-data/AUD.json extended-data/CAD.json \
+                    extended-data/NZD.json
             if git diff --quiet && git diff --staged --quiet; then
               echo "No changes vs remote HEAD — skipping commit."
               exit 0
