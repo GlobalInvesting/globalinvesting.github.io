@@ -6268,14 +6268,10 @@ async function fetchCarryRanking() {
     const maxDiff = Math.max(...top.map(p => p.diff)) || 1;
     const maxCV   = hasVolData ? (Math.max(...top.map(p => p.carryVol ?? 0)) || 1) : 1;
 
-    // Update panel subtitle to reflect sort method
+    // Update panel subtitle
     const headSpan = container.closest('.sb-section')
       ?.querySelector('.sb-head span');
-    if (headSpan) {
-      headSpan.textContent = hasVolData
-        ? 'G8 · carry-to-vol ratio'
-        : 'G8 · CB rate differential';
-    }
+    if (headSpan) headSpan.textContent = 'G8 · CIP-adjusted · annualised';
 
     // Attach explanatory tooltip to the panel header (once — guard against re-attach on refresh)
     const sbHead = container.closest('.sb-section')?.querySelector('.sb-head');
@@ -6306,41 +6302,54 @@ async function fetchCarryRanking() {
       });
     }
 
-    container.innerHTML = top.map((p, idx) => {
-      const sym  = carryTV(p.long, p.short);
-      // Bar width represents the vol-adjusted carry (or gross diff as fallback)
-      const barVal = hasVolData && p.carryVol != null ? p.carryVol / maxCV : p.diff / maxDiff;
-      // Bar width: percentage of the bar-wrap container (proportional to top pair)
-      const barPct = Math.round(barVal * 100);
+    // Build CIP-adjusted (real carry) lookup from _rcmData if the modal has run.
+    // _rcmData.realRates[ccy] = real rate for that currency (nominal − infl.exp.)
+    // CIP ADJ. for a pair = realRates[long] − realRates[short]
+    const rcm = (typeof _rcmData !== 'undefined' && _rcmData?.realRates) ? _rcmData.realRates : null;
 
-      // Color: strong carry-to-vol (>0.3) = green; moderate = neutral; weak = dim
-      const cls = hasVolData && p.carryVol != null
-        ? (p.carryVol > 0.30 ? 'pd-up' : p.carryVol > 0.12 ? '' : 'pd-dim')
-        : (p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim');
+    // Header row
+    container.innerHTML = `<div class="carry-rank-hdr">
+      <span class="crh-pair">PAIR</span>
+      <span class="crh-nom">NOMINAL</span>
+      <span class="crh-cip">CIP ADJ.</span>
+      <span class="crh-sig">SIGNAL</span>
+    </div>` + top.map((p) => {
+      const sym = carryTV(p.long, p.short);
 
-      const rArrowL = regimeArrow(p.long);
-      const rArrowS = regimeArrow(p.short);
+      // Nominal: signed rate differential (long − short)
+      const nomSign = p.diff >= 0 ? '+' : '−';
+      const nomStr  = nomSign + p.diff.toFixed(2) + '%';
 
-      // Tooltip: full institutional detail (rates, vol, carry-to-vol, regime)
-      const cvStr  = p.carryVol != null ? p.carryVol.toFixed(2) : 'n/a';
-      const hvStr  = p.hv30     != null ? p.hv30.toFixed(1) + '%' : 'n/a';
-      const tip = `${p.long}/${p.short} · Long ${p.rLong.toFixed(2)}% / Short ${p.rShort.toFixed(2)}% · Diff ${p.diff.toFixed(2)}% · HV30 ${hvStr} · Carry/Vol ${cvStr} — Click for real rate analysis`;
+      // CIP ADJ. = real carry when _rcmData available; else null
+      let cipVal = null;
+      if (rcm && rcm[p.long] != null && rcm[p.short] != null) {
+        cipVal = rcm[p.long] - rcm[p.short];
+      }
+      const cipStr = cipVal != null
+        ? (cipVal >= 0 ? '+' : '') + cipVal.toFixed(2) + '%'
+        : nomStr; // fall back to nominal when real rates unavailable
 
-      // Display: show carry-to-vol when available, gross diff otherwise
-      const displayVal = hasVolData && p.carryVol != null
-        ? p.carryVol.toFixed(2)
-        : '+' + p.diff.toFixed(2) + '%';
+      // Signal derived from CIP ADJ. (or nominal as fallback)
+      const sigVal = cipVal ?? p.diff;
+      let sigHtml;
+      if      (sigVal >= 2.0)  sigHtml = '<span class="cr-sig-strong">▲ Strong</span>';
+      else if (sigVal >= 0.5)  sigHtml = '<span class="cr-sig-pos">▲ Positive</span>';
+      else if (sigVal > -0.5)  sigHtml = '<span class="cr-sig-neu">— Neutral</span>';
+      else if (sigVal > -2.0)  sigHtml = '<span class="cr-sig-weak">▼ Weak</span>';
+      else                      sigHtml = '<span class="cr-sig-neg">▼ Negative</span>';
 
-      // Spread label: show gross rate differential (e.g. +4.00%) — industry standard
-      // for carry screens (Bloomberg/Refinitiv show rate spread, not CB trend arrows)
-      const spreadLabel = (p.diff >= 0 ? '+' : '') + p.diff.toFixed(2) + '%';
+      // CIP value coloring
+      const cipCls = cipVal != null
+        ? (cipVal >= 0.5 ? 'pd-up' : cipVal <= -0.5 ? 'down' : '')
+        : '';
+
+      const tip = `${p.long}/${p.short} · Nominal ${nomStr} · CIP Adj. ${cipStr} · HV30 ${p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a'} — Click for real rate analysis`;
 
       return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
-        <span class="cr-rank">${idx + 1}</span>
         <span class="cr-pair">${p.long}/${p.short}</span>
-        <span class="cr-spread">${spreadLabel}</span>
-        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
-        <span class="cr-diff ${cls}">${displayVal}</span>
+        <span class="cr-nom">${nomStr}</span>
+        <span class="cr-cip ${cipCls}">${cipStr}</span>
+        <span class="cr-sig">${sigHtml}</span>
       </div>`;
     }).join('');
 
@@ -9693,12 +9702,12 @@ function initG8RatesTabs() {
 
 // Map country code to extended-data file key and yield tickers
 const G8_YIELD_MAP = {
-  de: { file: 'EUR', label: 'Germany', tenors: [{ k: 'bond2y', label: '2Y Bund' }, { k: 'bond10y', label: '10Y Bund' }] },
-  gb: { file: 'GBP', label: 'UK', tenors: [{ k: 'bond2y', label: '2Y Gilt' }, { k: 'bond10y', label: '10Y Gilt' }] },
-  jp: { file: 'JPY', label: 'Japan', tenors: [{ k: 'bond10y', label: '10Y JGB' }] },
-  au: { file: 'AUD', label: 'Australia', tenors: [{ k: 'bond10y', label: '10Y ACGB' }] },
-  ca: { file: 'CAD', label: 'Canada', tenors: [{ k: 'bond10y', label: '10Y CGB' }] },
-  nz: { file: 'NZD', label: 'New Zealand', tenors: [{ k: 'bond10y', label: '10Y NZGB' }] },
+  de: { file: 'EUR', label: 'Germany', subtitle: 'GERMANY · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond2y', label: '2Y Bund' }, { k: 'bond10y', label: '10Y Bund' }] },
+  gb: { file: 'GBP', label: 'UK',      subtitle: 'UK · SOVEREIGN BOND YIELDS',      tenors: [{ k: 'bond2y', label: '2Y Gilt' }, { k: 'bond10y', label: '10Y Gilt' }] },
+  jp: { file: 'JPY', label: 'Japan',   subtitle: 'JAPAN · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond10y', label: '10Y JGB' }] },
+  au: { file: 'AUD', label: 'Australia', subtitle: 'AUSTRALIA · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond10y', label: '10Y ACGB' }] },
+  ca: { file: 'CAD', label: 'Canada',  subtitle: 'CANADA · SOVEREIGN BOND YIELDS',  tenors: [{ k: 'bond2y', label: '2Y CGB' }, { k: 'bond10y', label: '10Y CGB' }] },
+  nz: { file: 'NZD', label: 'New Zealand', subtitle: 'NEW ZEALAND · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond10y', label: '10Y NZGB' }] },
 };
 
 async function renderG8YieldPane(cty) {
@@ -9714,16 +9723,28 @@ async function renderG8YieldPane(cty) {
     const ext = await fetch('./extended-data/' + cfg.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
     if (!ext) { contentEl.textContent = 'Data unavailable — extended-data/' + cfg.file + '.json'; return; }
 
-    let html = `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">${cfg.label} · Sovereign Bond Yields</div>`;
-    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;">';
+    const d = ext.data ?? ext;
+    // Subtitle row
+    let html = `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${cfg.subtitle}</div>`;
+    // Tile grid — matches US tile format: label / value / change row
+    html += '<div class="rates-grid" style="margin-bottom:6px;">';
     cfg.tenors.forEach(t => {
-      const val = (ext.data ?? ext)[t.k];
-      const valStr = val != null ? (val * (val > 1 ? 1 : 100)).toFixed(2) + '%' : '—';
-      html += `<div class="rate-cell" style="min-width:90px;"><div class="rate-cty">${t.label}</div><div class="rate-val">${valStr}</div></div>`;
+      const val = d[t.k];
+      // Values in extended-data are stored as percentages (e.g. 3.04 = 3.04%)
+      // US tiles use same scale. No conversion needed.
+      const valStr = val != null ? val.toFixed(2) + '%' : '—';
+      // Change indicator: extended-data has no intraday delta — show "—" in flat style
+      // consistent with how US tiles show "—" when fromRepo=true
+      html += `<div class="rate-cell">` +
+        `<div class="rate-cty">${t.label}</div>` +
+        `<div class="rate-val">${valStr}</div>` +
+        `<div class="rate-chg flat">—</div>` +
+        `</div>`;
     });
     html += '</div>';
-    const dateLbl = ext?.dates?.bond10y ? ` · ${ext.dates.bond10y}` : '';
-    html += `<div style="font-size:9px;color:var(--text3);">Daily sovereign yield pipeline${dateLbl}</div>`;
+    // Source attribution
+    const dateLbl = ext?.dates?.bond10y ? ext.dates.bond10y : '';
+    html += `<div style="font-size:9px;color:var(--text3);">Daily sovereign yield pipeline${dateLbl ? ' · ' + dateLbl : ''}</div>`;
     contentEl.innerHTML = html;
     contentEl.dataset.loaded = '1';
   } catch {
