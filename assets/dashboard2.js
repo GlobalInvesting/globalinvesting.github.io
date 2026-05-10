@@ -394,7 +394,7 @@ async function populateCorrelations() {
       return `<tr
         style="cursor:pointer;"
         title="Click to view correlation detail · ${c.a} vs ${c.b}"
-        onclick="(function(el){ var idx=+el.dataset.corrIdx; var d=window._corrDataCache&&window._corrDataCache[idx]; if(d&&typeof openCorrModal==='function') openCorrModal(d); })(this)"
+        onclick="(function(el){ var idx=+el.dataset.corrIdx; var d=window._corrDataCache&&window._corrDataCache[idx]; if(d&&typeof window.openCorrModal==='function') window.openCorrModal(d); })(this)"
         data-corr-idx="${corrIdx}"
       ><td>${c.a}</td><td>${c.b}</td>${corrCell}${normCell}</tr>`;
     }).join('');
@@ -719,10 +719,10 @@ async function fetchCBRates() {
           var id  = el.dataset.cbrId;
           var st  = window._STATE_cbRates;
           var r   = st && st[id];
-          if (!r || typeof openCBRatesModal !== 'function') return;
+          if (!r || typeof window.openCBRatesModal !== 'function') return;
           var bi  = (window._STATE_bankInfo && window._STATE_bankInfo[id]) || {};
           var mtg = window._STATE_meetings && window._STATE_meetings.meetings && window._STATE_meetings.meetings[id.toUpperCase()];
-          openCBRatesModal(id.toUpperCase(), r.obs, bi, mtg);
+          window.openCBRatesModal(id.toUpperCase(), r.obs, bi, mtg);
         })(this)"
       >
         <td style="white-space:nowrap;">${flag}<span style="font-size:10px;">${info.short}</span></td>
@@ -931,8 +931,8 @@ async function fetchCOTData() {
     row.addEventListener('click', () => {
       const ccy  = row.dataset.ccy;
       const data = window.COT_DATA_STORE && window.COT_DATA_STORE[ccy];
-      if (ccy && data && typeof openCOTModal === 'function') {
-        openCOTModal(ccy, data);
+      if (ccy && data && typeof window.openCOTModal === 'function') {
+        window.openCOTModal(ccy, data);
       } else {
         const sym = row.dataset.sym;
         if (sym) loadCOTChart(sym);
@@ -6328,8 +6328,8 @@ async function fetchCarryRanking() {
     // Header row
     container.innerHTML = `<div class="carry-rank-hdr">
       <span class="crh-pair">PAIR</span>
-      <span class="crh-nom">NOMINAL</span>
-      <span class="crh-cip">CIP ADJ.</span>
+      <span class="crh-nom">NOM.</span>
+      <span class="crh-cip">CIP</span>
       <span class="crh-sig">SIGNAL</span>
     </div>` + top.map((p) => {
       const sym = carryTV(p.long, p.short);
@@ -6380,8 +6380,8 @@ async function fetchCarryRanking() {
       row.addEventListener('click', () => {
         const longCcy  = row.dataset.long;
         const shortCcy = row.dataset.short;
-        if (typeof openRealCarryModal === 'function') {
-          openRealCarryModal(longCcy, shortCcy);
+        if (typeof window.openRealCarryModal === 'function') {
+          window.openRealCarryModal(longCcy, shortCcy);
         } else {
           loadTVChart(row.dataset.sym);
         }
