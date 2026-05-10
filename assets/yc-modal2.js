@@ -11,13 +11,12 @@
   display:block!important;
   position:fixed!important;
   top:92px!important;
-  right:0!important;
-  width:220px!important;
   height:calc(100vh - 92px)!important;
   overflow-y:auto!important;
   z-index:500!important;
   background:var(--bg)!important;
   border-left:1px solid var(--border2)!important;
+  border-right:1px solid var(--border2)!important;
   scrollbar-width:thin;
   scrollbar-color:var(--border2) transparent;
 }
@@ -135,9 +134,14 @@ function openYCModal(tenorData) {
   bd.setAttribute('role', 'dialog');
   bd.setAttribute('aria-modal', 'true');
   bd.setAttribute('aria-label', 'US Treasury Yield Curve');
-  // Match actual rightpanel width (may have been resized by layout-resizer.js)
+  // Overlay #main (center column) — read actual sidebar and rightpanel widths
+  // in case layout-resizer.js has moved them from their defaults
+  const sidebar = document.getElementById('sidebar');
   const rp = document.getElementById('rightpanel');
-  if (rp) bd.style.width = rp.offsetWidth + 'px';
+  const sbW = sidebar ? sidebar.offsetWidth : 180;
+  const rpW = rp ? rp.offsetWidth : 220;
+  bd.style.left  = sbW + 'px';
+  bd.style.right = rpW + 'px';
   bd.innerHTML = `
 <div id="ycm-modal">
   <div id="ycm-hd">
@@ -182,12 +186,26 @@ function _ycDrawChart(labels, todayVals, priorVals) {
   const blue = cs.getPropertyValue('--blue').trim() || '#4f7fff';
   const text2 = cs.getPropertyValue('--text2').trim() || '#9096a0';
   const ctx = canvas.getContext('2d');
+
+  const chartH = canvas.offsetHeight || document.getElementById('ycm-canvas-wrap')?.offsetHeight || 200;
+  // Convert hex #rrggbb or CSS var value to rgba(r,g,b,a)
+  function hexAlpha(hex, a) {
+    const h = hex.replace('#','');
+    const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+    return isNaN(r) ? `rgba(79,127,255,${a})` : `rgba(${r},${g},${b},${a})`;
+  }
+  // Build top-to-bottom gradient: blue with opacity → transparent
+  const grad = ctx.createLinearGradient(0, 0, 0, chartH);
+  grad.addColorStop(0,   hexAlpha(blue, 0.35));
+  grad.addColorStop(0.6, hexAlpha(blue, 0.08));
+  grad.addColorStop(1,   hexAlpha(blue, 0.00));
+
   _ycChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels,
       datasets: [
-        { label:'Today', data:todayVals, borderColor:blue, backgroundColor:blue.replace(')',',0.08)').replace('rgb','rgba'), fill:true, tension:0.35, borderWidth:2, pointRadius:4, pointHoverRadius:6, pointBackgroundColor:blue, pointBorderColor:bg, pointBorderWidth:2 },
+        { label:'Today', data:todayVals, borderColor:blue, backgroundColor:grad, fill:true, tension:0.35, borderWidth:2, pointRadius:4, pointHoverRadius:6, pointBackgroundColor:blue, pointBorderColor:bg, pointBorderWidth:2 },
         { label:'Prior close', data:priorVals, borderColor:text2+'88', backgroundColor:'transparent', fill:false, tension:0.35, borderWidth:1.5, borderDash:[4,4], pointRadius:3, pointHoverRadius:5, pointBackgroundColor:text2+'88', pointBorderColor:bg, pointBorderWidth:1 }
       ]
     },
