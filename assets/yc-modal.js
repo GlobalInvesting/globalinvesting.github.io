@@ -16,109 +16,119 @@
   s.id = 'ycm-css';
   s.textContent = `
 #ycm-bd {
-  display:block!important;
-  position:absolute!important;
-  top:0!important; bottom:0!important;
-  left:50%!important; right:0!important;
-  overflow-y:auto!important;
-  z-index:500!important;
-  background:var(--bg,#0d1117)!important;
-  border-left:1px solid var(--border2,#30363d)!important;
-  scrollbar-width:thin;
-  scrollbar-color:var(--border2,#30363d) transparent;
+  position:fixed;inset:0;z-index:9200;
+  background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;
+  padding:12px;
+  animation:ycm-fi .15s ease;
 }
-#ycm-bd::-webkit-scrollbar { width:3px; }
-#ycm-bd::-webkit-scrollbar-thumb { background:var(--border2,#30363d); border-radius:2px; }
-/* #main needs position:relative to contain the absolute modal */
-#main { position:relative; }
+@keyframes ycm-fi { from{opacity:0} to{opacity:1} }
+@keyframes ycm-su { from{transform:translateY(12px);opacity:0} to{transform:none;opacity:1} }
 
 #ycm-modal {
-  width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
-  border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;
-  background:var(--bg,#0d1117)!important;position:static!important;
-  font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);
-  color:var(--text,#e6edf3);
+  background:#161b22;
+  border:1px solid #30363d;
+  border-radius:8px;
+  width:min(800px,100%);
+  height:min(560px,90vh);
   display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
+  animation:ycm-su .18s cubic-bezier(.16,1,.3,1);
+  font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);
+  color:#e6edf3;
+  position:relative;
 }
-#ycm-modal::before { display:none; }
+#ycm-modal::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#1f6feb 0%,#58a6ff 50%,#26a69a 100%);
+  border-radius:8px 8px 0 0;z-index:1;
+}
 
 #ycm-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px 8px;
-  border-bottom:1px solid var(--border2,#30363d);
-  flex-shrink:0;background:var(--bg2,#161b22);
+  padding:14px 18px 12px;
+  border-bottom:1px solid #30363d;
+  flex-shrink:0;background:#161b22;
 }
-#ycm-title { font-size:12px;font-weight:600;letter-spacing:-.01em;color:var(--text,#e6edf3); }
-#ycm-sub   { font-size:9px;color:var(--text2,#6e7681);margin-top:1px;font-family:var(--font-mono,monospace);letter-spacing:.02em; }
+#ycm-title { font-size:14px;font-weight:600;letter-spacing:-.01em;color:#e6edf3; }
+#ycm-sub   { font-size:10px;color:#6e7681;margin-top:2px;font-family:'IBM Plex Mono',var(--font-mono,monospace);letter-spacing:.02em; }
 #ycm-close {
-  background:none;border:none;color:var(--text2,#6e7681);font-size:16px;
-  cursor:pointer;padding:3px 6px;border-radius:4px;line-height:1;
+  background:none;border:none;color:#6e7681;font-size:18px;
+  cursor:pointer;padding:5px 7px;border-radius:5px;line-height:1;
   transition:color .1s,background .1s;
 }
-#ycm-close:hover { color:var(--text,#e6edf3);background:var(--bg3,#21262d); }
+#ycm-close:hover { color:#e6edf3;background:#21262d; }
 
 #ycm-strip {
-  display:flex;border-bottom:1px solid var(--border2,#30363d);
-  flex-shrink:0;overflow-x:auto;background:var(--bg,#0d1117);
-  scrollbar-width:none;
+  display:flex;border-bottom:1px solid #30363d;
+  flex-shrink:0;overflow-x:auto;
+  background:#0d1117;
 }
-#ycm-strip::-webkit-scrollbar { display:none; }
 .ycm-metric {
-  flex:1;min-width:60px;padding:7px 10px;
-  border-right:1px solid var(--border2,#30363d);
-  background:var(--bg,#0d1117);text-align:center;
+  flex:1;min-width:70px;padding:9px 12px;
+  border-right:1px solid #30363d;
+  background:#0d1117;
+  text-align:center;
 }
 .ycm-metric:last-child { border-right:none; }
-.ycm-m-lbl { font-size:8px;color:var(--text2,#6e7681);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;font-family:var(--font-mono,monospace); }
-.ycm-m-val { font-size:13px;font-weight:600;font-family:var(--font-mono,monospace);color:var(--text,#e6edf3); }
-.ycm-m-val.up { color:var(--up,#26a69a); } .ycm-m-val.down { color:var(--down,#ef5350); }
-.ycm-m-chg { font-size:8px;margin-top:1px;font-family:var(--font-mono,monospace);color:var(--text2,#6e7681); }
-.ycm-m-chg.up { color:var(--up,#26a69a); } .ycm-m-chg.down { color:var(--down,#ef5350); }
+.ycm-m-lbl { font-size:9px;color:#6e7681;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.ycm-m-val { font-size:15px;font-weight:600;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.ycm-m-chg { font-size:9px;margin-top:2px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
 
 #ycm-chart-wrap {
-  flex:1;position:relative;padding:12px 14px 10px;
+  flex:1;position:relative;padding:16px 18px 12px;
   display:flex;flex-direction:column;
-  min-height:200px;background:var(--bg,#0d1117);
+  min-height:0;background:#0d1117;
 }
 #ycm-legend {
-  display:flex;gap:14px;margin-bottom:8px;flex-shrink:0;flex-wrap:wrap;
+  display:flex;gap:16px;margin-bottom:10px;flex-shrink:0;
 }
-.ycm-leg-item { display:flex;align-items:center;gap:4px;font-size:8.5px;color:var(--text2,#6e7681);font-family:var(--font-mono,monospace); }
-.ycm-leg-dot  { width:16px;height:2px;border-radius:1px;flex-shrink:0; }
+.ycm-leg-item { display:flex;align-items:center;gap:5px;font-size:9px;color:#6e7681;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.ycm-leg-dot  { width:20px;height:2px;border-radius:1px;flex-shrink:0; }
 .ycm-leg-dot.dashed { background:repeating-linear-gradient(90deg,currentColor 0,currentColor 4px,transparent 4px,transparent 8px); }
 
-#ycm-canvas-wrap { flex:1;position:relative;min-height:160px; }
+#ycm-canvas-wrap { flex:1;position:relative;min-height:0; }
 #ycm-canvas { width:100%!important;height:100%!important; }
 
+/* Shape label badges */
 #ycm-shape {
-  position:absolute;top:4px;right:4px;
+  position:absolute;top:6px;right:6px;
   background:rgba(255,255,255,.04);
-  border:1px solid var(--border2,#30363d);
-  border-radius:4px;padding:2px 7px;
-  font-size:8.5px;color:var(--text2,#8b949e);
-  font-family:var(--font-mono,monospace);
+  border:1px solid #30363d;
+  border-radius:4px;padding:3px 8px;
+  font-size:9px;color:#8b949e;
+  font-family:'IBM Plex Mono',var(--font-mono,monospace);
   pointer-events:none;
 }
 
+/* Tenor table at bottom */
 #ycm-table-wrap {
-  flex-shrink:0;border-top:1px solid var(--border2,#30363d);
-  overflow-x:auto;background:var(--bg2,#161b22);
+  flex-shrink:0;border-top:1px solid #30363d;
+  overflow-x:auto;background:#161b22;
 }
 #ycm-table {
   width:100%;border-collapse:collapse;font-size:10px;
-  font-family:var(--font-mono,monospace);
+  font-family:'IBM Plex Mono',var(--font-mono,monospace);
 }
 #ycm-table th {
-  padding:4px 8px;text-align:right;color:var(--text2,#6e7681);
-  font-weight:500;font-size:8px;text-transform:uppercase;letter-spacing:.08em;
-  border-bottom:1px solid var(--border2,#30363d);background:var(--bg2,#161b22);
+  padding:5px 10px;text-align:right;color:#6e7681;
+  font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;
+  border-bottom:1px solid #30363d;background:#161b22;
 }
 #ycm-table th:first-child { text-align:left; }
 #ycm-table td {
-  padding:4px 8px;text-align:right;border-top:1px solid rgba(54,60,78,.4);color:var(--text,#e6edf3);
+  padding:5px 10px;text-align:right;border-top:1px solid rgba(48,54,61,.6);
 }
-#ycm-table td:first-child { text-align:left;color:var(--text2,#8b949e); }
+#ycm-table td:first-child { text-align:left;color:#8b949e; }
 #ycm-table tr:hover td { background:rgba(255,255,255,.03); }
+
+@media(max-width:600px){
+  #ycm-modal{border-radius:12px 12px 0 0;position:fixed;bottom:0;left:0;right:0;width:100%;height:88vh;}
+  #ycm-bd{align-items:flex-end;padding:0;}
+  .ycm-metric{min-width:55px;padding:7px 8px;}
+  .ycm-m-val{font-size:12px;}
+}
 `;
   document.head.appendChild(s);
 })();
@@ -267,7 +277,7 @@ function openYCModal(tenorData) {
       </div>
     </div>`;
 
-  (document.getElementById('main') || document.body).appendChild(bd);
+  document.body.appendChild(bd);
   bd.addEventListener('click', e => { if (e.target === bd) closeYCModal(); });
   document.addEventListener('keydown', _ycKeydown);
 
