@@ -698,7 +698,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- RATES & YIELD CURVE — G8 multi-country -->
     <div class="panel" id="section-rates">
-      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve</span><span class="panel-sub" id="yield-panel-sub">Nominal yields · yfinance · extended-data</span></div>
+      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve</span><span class="panel-sub" id="yield-panel-sub">Nominal yields · yfinance · daily pipeline</span></div>
 
       <!-- Country tab bar -->
       <div id="rates-country-tabs" role="tablist" aria-label="Select country yield curve" style="display:flex;gap:2px;padding:0 8px 4px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);">
@@ -1005,6 +1005,33 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div style="font-size:9px;color:var(--text3);margin-top:3px;">Annualized std(log returns) · sample variance n−1 · ×√252 · yfinance OHLC via quotes.json · Trend = HV 10d vs HV 30d</div>
       </div>
+
+      <!-- Cross-Pair Vol Monitor -->
+      <div style="padding:8px 10px 2px;border-top:1px solid var(--border);">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Cross-Pair Vol Monitor · HV 30d · yfinance</div>
+        <div style="overflow-x:auto;">
+          <table id="cross-vol-table" aria-label="Cross-pair volatility monitor" style="width:100%;min-width:380px;">
+            <thead>
+              <tr>
+                <th style="text-align:left;font-size:9px;" scope="col">Pair</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="30-day realized volatility annualized">HV 30d</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="10-day realized volatility">HV 10d</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="Vol trend: HV 10d vs HV 30d. ↑ expanding, ↓ contracting, → stable">Trend</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="1-day price change %">1D Δ%</th>
+              </tr>
+            </thead>
+            <tbody id="cross-vol-tbody">
+              <tr><td>EUR/GBP</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>EUR/JPY</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>GBP/JPY</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>AUD/JPY</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>EUR/AUD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>EUR/NZD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px;">yfinance OHLC via quotes.json · Trend = HV 10d vs HV 30d · complements major-pair vol surface</div>
+      </div>
     </div><!-- /#section-derivatives -->
 
       </div><!-- /#split-lower-right -->
@@ -1098,7 +1125,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <tr><td>CAD</td><td style="text-align:right;color:var(--text3);">—</td><td style="text-align:right;color:var(--text3);">—</td></tr>
         </tbody>
       </table>
-      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">ff_calendar.json · price Δ post-release via yfinance · est.</div>
+      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">ForexFactory · calendar beat/miss vs consensus · 21d rolling</div>
     </div>
 
     <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
