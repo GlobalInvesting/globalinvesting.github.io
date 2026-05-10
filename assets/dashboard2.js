@@ -9249,31 +9249,24 @@ window._CB_RATES_CACHE = window._CB_RATES_CACHE || {};
 // F = S × ((1 + r_base × T) / (1 + r_quote × T))
 // r_base = rate of base currency, r_quote = rate of quote currency
 // T in years (1M=1/12, 3M=1/4, 6M=1/2, 1Y=1)
-function computeCIPForward(spot, rBase, rQuote, T) {
-  if (spot == null || rBase == null || rQuote == null) return null;
-  const rB = rBase / 100;
-  const rQ = rQuote / 100;
-  return spot * ((1 + rB * T) / (1 + rQ * T));
+function computeCIPForward(spot, rLeft, rRight, T) {
+  // CIP: F = S × (1 + r_right × T) / (1 + r_left × T)
+  // Left-hand currency at forward discount when r_left > r_right (IRP).
+  // Source: BIS FX conventions; Bloomberg forward point methodology.
+  if (spot == null || rLeft == null || rRight == null) return null;
+  const rL = rLeft  / 100;
+  const rR = rRight / 100;
+  return spot * ((1 + rR * T) / (1 + rL * T));
 }
 
 // ── Rate map: which CB rate applies to which currency ──
-const CIP_CCY_RATES = {
-  // Major USD pairs
-  'EUR/USD': { base: 'USD', quote: 'EUR', invert: false },
-  'GBP/USD': { base: 'USD', quote: 'GBP', invert: false },
-  'USD/JPY': { base: 'USD', quote: 'JPY', invert: true  },
-  'AUD/USD': { base: 'USD', quote: 'AUD', invert: false },
-  'USD/CHF': { base: 'USD', quote: 'CHF', invert: true  },
-  'USD/CAD': { base: 'USD', quote: 'CAD', invert: true  },
-  'NZD/USD': { base: 'USD', quote: 'NZD', invert: false },
-  // Cross pairs — both legs have CB rates in rates/*.json
-  'EUR/GBP': { base: 'GBP', quote: 'EUR', invert: false },
-  'EUR/JPY': { base: 'JPY', quote: 'EUR', invert: true  },
-  'GBP/JPY': { base: 'JPY', quote: 'GBP', invert: true  },
-  'AUD/JPY': { base: 'JPY', quote: 'AUD', invert: true  },
-  'EUR/AUD': { base: 'AUD', quote: 'EUR', invert: false },
-  'EUR/CHF': { base: 'CHF', quote: 'EUR', invert: false },
-};
+// CIP-eligible pairs — both legs have CB policy rates in rates/*.json
+// Formula: F = S × (1 + r_RIGHT × T) / (1 + r_LEFT × T)
+// Left-hand currency at forward discount when its rate exceeds the right-hand rate.
+const CIP_CCY_RATES = new Set([
+  'EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD',
+  'EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CHF',
+]);
 
 // ── Render CIP Forwards in main FX Pairs table (tds[7]=Fwd1M, tds[8]=Fwd3M) ──
 async function renderCIPForwards() {
@@ -9286,15 +9279,15 @@ async function renderCIPForwards() {
     const symCell = row.querySelector('td.sym');
     if (!symCell) return;
     const pair = symCell.textContent.trim();
-    const cfg = CIP_CCY_RATES[pair];
-    if (!cfg) return;
+    if (!CIP_CCY_RATES.has(pair)) return;
     const tds = row.querySelectorAll('td');
     if (tds.length < 12) return;
 
+    const [leftCcy, rightCcy] = pair.split('/');
     const pairId = pair.replace('/', '').toLowerCase();
-    const spot = STOOQ_RT_CACHE[pairId]?.close ?? null;
-    const rBase  = ratesCache[cfg.base]  ?? null;
-    const rQuote = ratesCache[cfg.quote] ?? null;
+    const spot  = STOOQ_RT_CACHE[pairId]?.close ?? null;
+    const rLeft  = ratesCache[leftCcy]  ?? null;
+    const rRight = ratesCache[rightCcy] ?? null;
 
     const tenors = [1/12, 3/12];
     const indices = [7, 8];
@@ -9302,18 +9295,17 @@ async function renderCIPForwards() {
     const dec = pairCfg?.dec ?? 4;
 
     tenors.forEach((T, i) => {
-      const fwd = computeCIPForward(spot, rBase, rQuote, T);
+      const fwd = computeCIPForward(spot, rLeft, rRight, T);
       const el = tds[indices[i]];
       if (!el) return;
       if (fwd != null && spot != null) {
         el.textContent = fwd.toFixed(dec);
-        const diff = fwd - spot;
-        // fwd > spot: left-hand currency (EUR in EUR/USD, USD in USD/JPY) at forward premium → green
-        const atPremium = diff > 0;
-        el.style.color = atPremium ? 'var(--up)' : 'var(--down)';
-        el.title = `CIP ${T === 1/12 ? '1M' : '3M'} forward · r${cfg.base}=${rBase?.toFixed(2)}% vs r${cfg.quote}=${rQuote?.toFixed(2)}% · ${atPremium ? 'LH ccy at premium' : 'LH ccy at discount'}`;
+        // fwd < spot: left-hand ccy at forward discount (higher rate → IRP discount)
+        const atDiscount = fwd < spot;
+        el.style.color = atDiscount ? 'var(--down)' : 'var(--up)';
+        el.title = `CIP ${T === 1/12 ? '1M' : '3M'} fwd · r${leftCcy}=${rLeft?.toFixed(2)}% vs r${rightCcy}=${rRight?.toFixed(2)}% · ${leftCcy} at forward ${atDiscount ? 'discount' : 'premium'}`;
       } else {
-        el.textContent = fwd != null ? fwd.toFixed(dec) : '—';
+        el.textContent = '—';
         el.style.color = 'var(--text3)';
       }
     });
@@ -9410,44 +9402,42 @@ async function renderDerivativesSection() {
     pairs.forEach((pair, idx) => {
       const row = rows[idx];
       if (!row) return;
-      const cfg = CIP_CCY_RATES[pair];
-      if (!cfg) return;
+      if (!CIP_CCY_RATES.has(pair)) return;
+      const [leftCcy, rightCcy] = pair.split('/');
       const pairId = pair.replace('/','').toLowerCase();
       const pairCfg = PAIRS.find(p => p.id === pairId);
       const dec = pairCfg?.dec ?? 4;
-      const spot = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
-      const rBase  = ratesCache[cfg.base]  ?? null;
-      const rQuote = ratesCache[cfg.quote] ?? null;
+      const spot  = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
+      const rLeft  = ratesCache[leftCcy]  ?? null;
+      const rRight = ratesCache[rightCcy] ?? null;
       const tds = row.querySelectorAll('td');
 
       // Spot
       if (tds[1]) tds[1].textContent = spot != null ? spot.toFixed(dec) : '—';
 
-      // Forwards: 1M, 3M, 6M, 1Y — color by direction vs spot
-      const isUsdBase = cfg.base === 'USD';
+      // Forwards: 1M, 3M, 6M, 1Y
       const tenors = [1/12, 3/12, 6/12, 1];
       tenors.forEach((T, ti) => {
-        const fwd = computeCIPForward(spot, rBase, rQuote, T);
+        const fwd = computeCIPForward(spot, rLeft, rRight, T);
         const el = tds[2 + ti];
         if (!el) return;
         if (fwd != null && spot != null) {
           el.textContent = fwd.toFixed(dec);
-          const diff = fwd - spot;
-          const atPremium = diff > 0;
-          el.style.color = atPremium ? 'var(--up)' : 'var(--down)';
+          const atDiscount = fwd < spot; // left-hand ccy at discount
+          el.style.color = atDiscount ? 'var(--down)' : 'var(--up)';
         } else {
           el.textContent = '—';
           el.style.color = 'var(--text3)';
         }
       });
 
-      // Rate diff
+      // Rate Diff — r_left minus r_right (positive = left has more carry → forward discount)
       if (tds[6]) {
-        const diff = (rBase != null && rQuote != null) ? (rBase - rQuote) : null;
+        const diff = (rLeft != null && rRight != null) ? (rLeft - rRight) : null;
         if (diff != null) {
           tds[6].textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + '%';
-          tds[6].style.color = diff > 0.1 ? 'var(--up)' : diff < -0.1 ? 'var(--down)' : 'var(--text2)';
-          tds[6].title = `r${cfg.base}=${rBase?.toFixed(2)}% minus r${cfg.quote}=${rQuote?.toFixed(2)}%`;
+          tds[6].style.color = diff > 0.1 ? 'var(--down)' : diff < -0.1 ? 'var(--up)' : 'var(--text2)';
+          tds[6].title = `r${leftCcy}=${rLeft?.toFixed(2)}% minus r${rightCcy}=${rRight?.toFixed(2)}% · positive = ${leftCcy} at forward discount`;
         } else {
           tds[6].textContent = '—';
         }
@@ -9459,27 +9449,26 @@ async function renderDerivativesSection() {
     crossFwdPairs.forEach(pair => {
       const row = fwdTbody.querySelector(`tr[data-pair="${pair}"]`);
       if (!row) return;
-      const cfg = CIP_CCY_RATES[pair];
-      if (!cfg) return;
+      const [leftCcy, rightCcy] = pair.split('/');
       const pairId = pair.replace('/','').toLowerCase();
       const pairCfg = PAIRS.find(p => p.id === pairId);
       const dec = pairCfg?.dec ?? 5;
-      const spot = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
-      const rBase  = ratesCache[cfg.base]  ?? null;
-      const rQuote = ratesCache[cfg.quote] ?? null;
+      const spot  = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
+      const rLeft  = ratesCache[leftCcy]  ?? null;
+      const rRight = ratesCache[rightCcy] ?? null;
       const tds = row.querySelectorAll('td');
 
       if (tds[1]) tds[1].textContent = spot != null ? spot.toFixed(dec) : '—';
 
       const tenors = [1/12, 3/12, 6/12, 1];
       tenors.forEach((T, ti) => {
-        const fwd = computeCIPForward(spot, rBase, rQuote, T);
+        const fwd = computeCIPForward(spot, rLeft, rRight, T);
         const el = tds[2 + ti];
         if (!el) return;
         if (fwd != null && spot != null) {
           el.textContent = fwd.toFixed(dec);
-          const atPremium = (fwd - spot) > 0;
-          el.style.color = atPremium ? 'var(--up)' : 'var(--down)';
+          const atDiscount = fwd < spot;
+          el.style.color = atDiscount ? 'var(--down)' : 'var(--up)';
         } else {
           el.textContent = '—';
           el.style.color = 'var(--text3)';
@@ -9487,11 +9476,11 @@ async function renderDerivativesSection() {
       });
 
       if (tds[6]) {
-        const diff = (rBase != null && rQuote != null) ? (rBase - rQuote) : null;
+        const diff = (rLeft != null && rRight != null) ? (rLeft - rRight) : null;
         if (diff != null) {
           tds[6].textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + '%';
-          tds[6].style.color = diff > 0.1 ? 'var(--up)' : diff < -0.1 ? 'var(--down)' : 'var(--text2)';
-          tds[6].title = `r${cfg.base}=${rBase?.toFixed(2)}% minus r${cfg.quote}=${rQuote?.toFixed(2)}%`;
+          tds[6].style.color = diff > 0.1 ? 'var(--down)' : diff < -0.1 ? 'var(--up)' : 'var(--text2)';
+          tds[6].title = `r${leftCcy}=${rLeft?.toFixed(2)}% minus r${rightCcy}=${rRight?.toFixed(2)}% · positive = ${leftCcy} at forward discount`;
         } else {
           tds[6].textContent = '—';
         }
