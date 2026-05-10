@@ -34,8 +34,8 @@
   --font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --font-mono:'JetBrains Mono','Courier New',monospace;
   /* Tile system */
-  --tile-min-w:280px;
-  --tile-min-h:180px;
+  --tile-min-w:120px;
+  --tile-min-h:90px;
   --tile-head-h:30px;
   --grid-gap:4px;
 }
@@ -104,7 +104,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #ws-canvas{
   flex:1;
   position:relative;
-  overflow:hidden;
+  overflow:auto;
   background:var(--bg);
   /* Subtle grid overlay */
   background-image:radial-gradient(circle,var(--border2) 1px,transparent 1px);
@@ -645,27 +645,28 @@ const LAYOUT_TEMPLATES = {
   terminal: {
     name: 'Terminal layout',
     tiles: [
-      /* Left column: Liquidity + Crosses + Carry (mirrors sidebar) */
+      /* ── Col 0 (x=0, w=160): Liquidity + Crosses + Carry ── */
+      /* Row heights: 180 + 330 + 246 = 756 (matches col1/col2 total) */
       { id:'liquidity',      x:0,   y:0,   w:160, h:180 },
-      { id:'crosses',        x:0,   y:184, w:160, h:330 },
-      { id:'carry',          x:0,   y:518, w:160, h:260 },
-      /* Centre-left: Narrative + Chart + FX Pairs + COT + News */
-      { id:'narrative',      x:164, y:0,   w:380, h:100 },
-      { id:'chart',          x:164, y:104, w:380, h:290 },
-      { id:'fxpairs',        x:164, y:398, w:380, h:220 },
-      { id:'cot',            x:164, y:622, w:380, h:230 },
-      { id:'news',           x:164, y:856, w:380, h:200 },
-      /* Centre-right: Risk + Cross-Asset + Yields + Sessions + Signals */
-      { id:'risk',           x:548, y:0,   w:280, h:100 },
-      { id:'crossasset',     x:548, y:104, w:280, h:290 },
-      { id:'yields',         x:548, y:398, w:280, h:220 },
-      { id:'sessions',       x:548, y:622, w:280, h:230 },
-      { id:'signals',        x:548, y:856, w:280, h:200 },
-      /* Right column: CB Rates + Correlations + Expectations + Positioning Bias */
-      { id:'cbrates',        x:832, y:0,   w:200, h:230 },
-      { id:'correlations',   x:832, y:234, w:200, h:310 },
-      { id:'expectations',   x:832, y:548, w:200, h:260 },
-      { id:'positioningbias',x:832, y:812, w:200, h:180 },
+      { id:'crosses',        x:0,   y:180, w:160, h:330 },
+      { id:'carry',          x:0,   y:510, w:160, h:246 },
+      /* ── Col 1 (x=160, w=376): Narrative + Chart + FX Pairs + COT + News ── */
+      /* Row heights: 96 + 290 + 180 + 190 = 756 */
+      { id:'narrative',      x:160, y:0,   w:376, h:96  },
+      { id:'chart',          x:160, y:96,  w:376, h:290 },
+      { id:'fxpairs',        x:160, y:386, w:376, h:180 },
+      { id:'cot',            x:160, y:566, w:376, h:190 },
+      /* ── Col 2 (x=536, w:280): Risk + Cross-Asset + Yields + Sessions + Signals ── */
+      /* Row heights: 96 + 290 + 180 + 190 = 756 */
+      { id:'risk',           x:536, y:0,   w:280, h:96  },
+      { id:'crossasset',     x:536, y:96,  w:280, h:290 },
+      { id:'yields',         x:536, y:386, w:280, h:180 },
+      { id:'sessions',       x:536, y:566, w:280, h:190 },
+      /* ── Col 3 (x=816, w=212): CB Rates + Correlations + Expectations + Pos. Bias ── */
+      /* Row heights: 226 + 284 + 246 = 756 */
+      { id:'cbrates',        x:816, y:0,   w:212, h:226 },
+      { id:'correlations',   x:816, y:226, w:212, h:284 },
+      { id:'expectations',   x:816, y:510, w:212, h:246 },
     ]
   },
   focus: {
@@ -1253,7 +1254,7 @@ function onResize(e) {
   const { id, startX, startY, startW, startH } = wsState.resizing;
   const entry = wsState.tiles[id];
   if (!entry) return;
-  const MIN_W = 280, MIN_H = 180;
+  const MIN_W = 120, MIN_H = 90;
   const newW = Math.max(MIN_W, startW + (e.clientX - startX));
   const newH = Math.max(MIN_H, startH + (e.clientY - startY));
   entry.el.style.width  = newW + 'px';
@@ -1289,15 +1290,17 @@ function applyLayout(name) {
 
   // Scale tiles to current canvas width
   const canvas = document.getElementById('ws-canvas');
-  const cw = canvas.clientWidth;
+  const cw = canvas.clientWidth || canvas.offsetWidth || 1028;
   const templateMaxX = Math.max(...template.tiles.map(t => t.x + t.w));
-  const scale = templateMaxX > 0 ? Math.min(1, cw / (templateMaxX + 20)) : 1;
+  // Use floor for x/w to prevent sub-pixel gaps; add 8px gutter on each side
+  const availW = cw - 16;
+  const scale = templateMaxX > 0 ? Math.min(1, availW / templateMaxX) : 1;
 
   template.tiles.forEach(t => {
     addTile(t.id, {
-      x: Math.round(t.x * scale),
+      x: Math.floor(t.x * scale) + 8,
       y: t.y,
-      w: Math.round(t.w * scale),
+      w: Math.floor(t.w * scale),
       h: t.h,
     });
   });
@@ -1320,10 +1323,21 @@ function applyLayout(name) {
 function reconnectDataSources() {
   // dashboard.js renders to fixed DOM IDs.
   // After tiles rebuild, trigger a refresh so all functions find their target elements.
-  setTimeout(() => {
-    const safe = (fn) => { try { if (typeof window[fn] === 'function') window[fn](); } catch(e){} };
+  // Use a polling approach to handle the defer-load timing of dashboard.js.
+  const safe = (fn, ...args) => { try { if (typeof window[fn] === 'function') window[fn](...args); } catch(e){} };
+
+  function doReconnect() {
+    // If boot() hasn't run yet (dashboard.js not ready), poll until it is.
+    if (typeof window.boot !== 'function') {
+      setTimeout(doReconnect, 100);
+      return;
+    }
+    // Kick all data-fetching functions dashboard.js exposes.
+    // These are safe to call even if boot() already ran — each function
+    // updates the DOM IDs that now exist inside the freshly-rendered tiles.
     safe('fetchRiskData');
     safe('fetchCrossAssetData');
+    safe('fetchCommodityQuotes');
     safe('populateFxPairsTable');
     safe('populateCorrelations');
     safe('renderCOTRows');
@@ -1331,19 +1345,27 @@ function reconnectDataSources() {
     safe('fetchReferenceSpreads');
     safe('fetchSentiment');
     safe('fetchNewsData');
-    safe('renderRates');
     safe('fetchCBRates');
     safe('fetchFedExpectations');
     safe('fetchOptionSkew');
     safe('fetchCarryRanking');
     safe('fetchCarryData');
     safe('computeSessionVol');
+    safe('drawYieldCurve');
     // Re-init liquidity canvas if the tile is present
     if (document.getElementById('liquidity-canvas')) {
-      safe('initLiquidityCanvas');
-      safe('drawLiquidityCanvas');
+      requestAnimationFrame(() => {
+        safe('initLiquidityCanvas');
+        safe('drawLiquidityCanvas');
+      });
     }
-  }, 150);
+    // Re-render narrative badge and sessions
+    safe('renderSessions');
+    safe('renderCarryRows');
+  }
+
+  // Small delay so newly-added tile DOM is in the document before functions run
+  setTimeout(doReconnect, 200);
 }
 
 /* ── LAYOUT SAVE / LOAD ────────────────────────────────────── */
@@ -1551,10 +1573,16 @@ setInterval(updateClock, 1000);
 updateClock();
 
 /* ── INIT ──────────────────────────────────────────────────── */
+// Build tiles immediately (synchronous) so DOM IDs exist when dashboard.js's
+// deferred boot() executes. DOMContentLoaded fires before defer scripts run,
+// but inline scripts in <body> also run before defer — we use DOMContentLoaded
+// here only to ensure the ws-canvas element is in the DOM.
 window.addEventListener('DOMContentLoaded', () => {
-  // Apply default or saved layout
+  // Apply default or saved layout — must run BEFORE dashboard.js boot()
   const loaded = loadSavedLayout();
   if (!loaded) applyLayout('terminal');
+  // Mark workspace as ready so dashboard.js can detect it
+  window._wsLayoutReady = true;
 });
 
 /* ── EXPOSE HELPERS ─────────────────────────────────────────── */
