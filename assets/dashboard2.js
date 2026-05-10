@@ -6226,6 +6226,29 @@ async function fetchCarryRanking() {
       if (entry?.hv30 != null && hv30Map[id] == null) hv30Map[id] = entry.hv30;
     }
 
+    // ── 2b. Inflation expectations from extended-data ─────────────
+    // Same source as real-carry-modal.js Phase 1: extended-data/{CCY}.json
+    // inflationExpectations field is written weekly by update-inflation-expectations.yml
+    // Real rate = nominal CB rate − inflationExpectations
+    // USD/EUR breakevens come from extended-data fallback here (FRED live upgrade
+    // is done by the modal; not needed for the ranking table).
+    const EXT_FILE = { USD:'USD', EUR:'EUR', GBP:'GBP', JPY:'JPY', AUD:'AUD', CHF:'CHF', CAD:'CAD', NZD:'NZD' };
+    const inflExp = {};
+    await Promise.all(G8.map(async ccy => {
+      // If _rcmData is already populated (modal opened earlier), reuse it
+      if (typeof _rcmData !== 'undefined' && _rcmData?.inflExp?.[ccy]?.val != null) {
+        inflExp[ccy] = _rcmData.inflExp[ccy].val;
+        return;
+      }
+      try {
+        const r = await fetch('./extended-data/' + EXT_FILE[ccy] + '.json');
+        if (!r.ok) return;
+        const d = await r.json();
+        const ie = d?.data?.inflationExpectations;
+        if (ie != null && ie > 0 && ie < 20) inflExp[ccy] = ie;
+      } catch {}
+    }));
+
     // ── 3. Build all 28 G8 pairs ─────────────────────────────────
     const allPairs = [];
     for (let i = 0; i < G8.length; i++) {
@@ -6302,11 +6325,6 @@ async function fetchCarryRanking() {
       });
     }
 
-    // Build CIP-adjusted (real carry) lookup from _rcmData if the modal has run.
-    // _rcmData.realRates[ccy] = real rate for that currency (nominal − infl.exp.)
-    // CIP ADJ. for a pair = realRates[long] − realRates[short]
-    const rcm = (typeof _rcmData !== 'undefined' && _rcmData?.realRates) ? _rcmData.realRates : null;
-
     // Header row
     container.innerHTML = `<div class="carry-rank-hdr">
       <span class="crh-pair">PAIR</span>
@@ -6317,17 +6335,20 @@ async function fetchCarryRanking() {
       const sym = carryTV(p.long, p.short);
 
       // Nominal: signed rate differential (long − short)
-      const nomSign = p.diff >= 0 ? '+' : '−';
-      const nomStr  = nomSign + p.diff.toFixed(2) + '%';
+      const nomStr = '+' + p.diff.toFixed(2) + '%';
 
-      // CIP ADJ. = real carry when _rcmData available; else null
+      // CIP ADJ. = real carry: (nomLong − inflLong) − (nomShort − inflShort)
+      // = (nomLong − nomShort) − (inflLong − inflShort) = nomDiff − inflDiff
+      // Uses inflExp loaded from extended-data above (same source as real-carry-modal).
       let cipVal = null;
-      if (rcm && rcm[p.long] != null && rcm[p.short] != null) {
-        cipVal = rcm[p.long] - rcm[p.short];
+      const ieLong  = inflExp[p.long]  ?? null;
+      const ieShort = inflExp[p.short] ?? null;
+      if (ieLong != null && ieShort != null) {
+        cipVal = p.diff - (ieLong - ieShort); // real carry differential
       }
       const cipStr = cipVal != null
         ? (cipVal >= 0 ? '+' : '') + cipVal.toFixed(2) + '%'
-        : nomStr; // fall back to nominal when real rates unavailable
+        : '—'; // show dash when infl.exp. unavailable (not misleading fallback)
 
       // Signal derived from CIP ADJ. (or nominal as fallback)
       const sigVal = cipVal ?? p.diff;
