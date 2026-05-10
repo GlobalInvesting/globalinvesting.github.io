@@ -1,7 +1,20 @@
 """
-fetch_bond_yields.py  v1.2  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v1.3  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
 
-CHANGELOG v1.1 (fixes vs v1.0)
+CHANGELOG v1.3 (fixes vs v1.2)
+────────────────────────────────
+BUG-5  JPY bond2y was never fetched. fetch_jpy() only produced bond10y, leaving
+       JPY.bond2y = None in all extended-data/JPY.json files and causing the sovereign
+       spreads table (dashboard2.js renderSovereignSpreads) to show — in the 2Y column
+       for JP. Fixed: added FRED IRLTST01JPM156N (Japan 2Y government bond, monthly)
+       as the JPY bond2y source — consistent with the AUD/CAD/NZD treatment.
+
+BUG-6  AUD/CAD/NZD bond2y was computed correctly by fetch_aud_2y/cad_2y/nzd_2y but
+       the workflow update-bond-yields.yml only git-added USD/EUR/GBP/JPY.json, so the
+       AUD/CAD/NZD values were discarded on every run without ever reaching the repo.
+       Fixed in update-bond-yields.yml: expanded git add to include AUD/CAD/NZD.json.
+
+CHANGELOG v1.2 (fixes vs v1.0)
 ────────────────────────────────
 BUG-1  EUR / GBP / JPY had no fallbacks despite being specified in CHANGELOG v7.50.0.
        Now every currency has a full cascade with at least 2 independent sources.
@@ -37,6 +50,7 @@ Source cascade per currency:
     JPY bond10y  → ECB FM SDMX monthly   (no key)
                    OECD SDMX monthly     (no key)          [fallback]
                    FRED IRLTLT01JPM156N  (monthly, no key) [final fallback]
+    JPY bond2y   → FRED IRLTST01JPM156N  (monthly, no key)
     CAD bond2y   → FRED IRLTST01CAM156N  (monthly, no key)
     AUD bond2y   → FRED IRLTLT01AUM156N  (monthly, no key)
 
@@ -484,6 +498,19 @@ def fetch_jpy(soft_failures: list) -> None:
         _gha_warning("JPY bond10y: all sources unavailable — keeping existing value")
         soft_failures.append("JPY.bond10y")
 
+    # bond2y — FRED IRLTST01JPM156N (Japan 2Y government bond yield, monthly)
+    #   No daily public source available without API key; monthly FRED is consistent
+    #   with the AUD/CAD/NZD treatment and good enough for the sovereign spread table.
+    print("  bond2y  (FRED:IRLTST01JPM156N monthly)")
+    dt2, val2 = _fred_csv_latest("IRLTST01JPM156N")
+    if val2 is not None and -5 < val2 < 20:
+        data["bond2y"]  = round(val2, 4)
+        dates["bond2y"] = dt2
+        print(f"    {val2:.4f}%  ({dt2})  [FRED-monthly]")
+    else:
+        _gha_warning("JPY bond2y: FRED IRLTST01JPM156N unavailable — keeping existing")
+        soft_failures.append("JPY.bond2y")
+
     _save("JPY", data, dates)
 
 
@@ -545,7 +572,7 @@ def fetch_nzd_2y(soft_failures: list) -> None:
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v1.2 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v1.3 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
