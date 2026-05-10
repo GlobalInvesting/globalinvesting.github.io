@@ -40,8 +40,6 @@
   s.id = 'rcm-modal2-css';
   s.textContent = `
 /* ── Animations ── */
-@keyframes rcm-fi{from{opacity:0}to{opacity:1}}
-@keyframes rcm-su{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 @keyframes rcm-pulse{0%,100%{opacity:1}50%{opacity:.4}}
 /* ── Backdrop ── */
 #rcm-bd{display:block!important;overflow:hidden;}
@@ -49,77 +47,78 @@
 #rcm-modal{width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text);display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
 #rcm-modal::before{display:none;}
 /* ── Header ── */
-#rcm-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);}
-#rcm-hd-left{display:flex;flex-direction:column;gap:2px;}
-.rcm-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:2px;}
-.rcm-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;}
-#rcm-title{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em;}
-#rcm-sub{font-size:10px;color:var(--text2);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.02em;}
-#rcm-close{background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:5px 7px;border-radius:5px;line-height:1;transition:color .1s,background .1s;font-family:inherit;}
+#rcm-hd{display:flex;align-items:center;justify-content:space-between;padding:7px 12px 6px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2);gap:8px;}
+#rcm-hd-left{display:flex;flex-direction:column;gap:1px;}
+.rcm-badge{font-size:7.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:4px;}
+.rcm-badge::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+#rcm-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.01em;}
+#rcm-sub{font-size:8px;color:var(--text2);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.015em;margin-top:1px;}
+#rcm-close{background:none;border:none;color:var(--text2);font-size:14px;cursor:pointer;padding:2px 5px;border-radius:2px;line-height:1;transition:color .1s,background .1s;font-family:inherit;flex-shrink:0;}
 #rcm-close:hover{color:var(--text);background:var(--bg3);}
 /* ── Metrics strip ── */
-#rcm-metrics{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg);}
-.rcm-mm{padding:8px 12px;border-right:1px solid var(--border2);display:flex;flex-direction:column;gap:1px;}
+#rcm-metrics{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg);}
+.rcm-mm{padding:5px 8px;border-right:1px solid var(--border2);min-width:0;}
 .rcm-mm:last-child{border-right:none;}
-.rcm-mm-lbl{font-size:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.09em;}
-.rcm-mm-val{font-size:18px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text);line-height:1;margin-top:3px;}
-.rcm-mm-sub{font-size:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:2px;}
+.rcm-mm-lbl{font-size:6.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.09em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rcm-mm-val{font-size:18px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text);line-height:1;margin-top:1px;}
+.rcm-mm-sub{font-size:7px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:1px;}
 /* ── Tabs ── */
-#rcm-tabs{display:flex;padding:0 14px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);overflow-x:auto;scrollbar-width:none;}
+#rcm-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2);overflow-x:auto;scrollbar-width:none;}
 #rcm-tabs::-webkit-scrollbar{display:none;}
-.rcm-tab{font-size:10px;font-weight:600;letter-spacing:.04em;padding:8px 12px 7px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:color .12s;white-space:nowrap;user-select:none;text-transform:uppercase;}
-.rcm-tab:hover:not(.on){color:var(--text2);}
+.rcm-tab{font-size:8px;font-weight:700;letter-spacing:.09em;padding:5px 11px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:color .12s;white-space:nowrap;user-select:none;text-transform:uppercase;margin-bottom:-1px;}
+.rcm-tab:hover:not(.on){color:var(--text);}
 .rcm-tab.on{color:var(--blue);border-bottom-color:var(--blue);}
 /* ── Body ── */
-#rcm-body{flex:1;min-height:0;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:#444c56 transparent;}
-#rcm-body::-webkit-scrollbar{width:4px;}
+#rcm-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+#rcm-body::-webkit-scrollbar{width:3px;}
 #rcm-body::-webkit-scrollbar-track{background:transparent;}
-#rcm-body::-webkit-scrollbar-thumb{background:#444c56;border-radius:2px;}
+#rcm-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 #rcm-body::-webkit-scrollbar-thumb:hover{background:var(--text2);}
-.rcm-panel{display:none;}
-.rcm-panel.on{display:flex;flex:1;flex-direction:column;min-height:0;}
-/* ── Card wrapper ── */
-.rcm-cw{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:12px 14px;margin-bottom:10px;}
-.rcm-cw:last-child{margin-bottom:0;}
-.rcm-ct{font-size:9.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);letter-spacing:.04em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border2);text-transform:uppercase;}
+.rcm-panel{display:none;width:100%;box-sizing:border-box;}
+.rcm-panel.on{display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto;overflow-x:hidden;}
+/* ── Section header (replaces card title) ── */
+.rcm-cw{background:transparent;border:none;border-radius:0;padding:0;margin-bottom:0;}
+.rcm-ct{font-size:7px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;padding:4px 10px 3px;border-bottom:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.rcm-src-note{font-size:7px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);line-height:1.5;padding:5px 10px;background:var(--bg2);border-top:1px solid var(--border);}
 /* ── Table ── */
 .rcm-tbl{width:100%;border-collapse:collapse;font-size:11.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.rcm-tbl thead th{text-align:right;color:var(--text2);font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:0 10px 7px;border-bottom:1px solid var(--border2);}
+.rcm-tbl thead th{text-align:right;color:var(--text2);font-weight:600;font-size:7px;text-transform:uppercase;letter-spacing:.07em;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg2);}
 .rcm-tbl thead th:first-child{text-align:left;}
 .rcm-tbl tbody tr{transition:background .08s;}
-.rcm-tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.015);}
-.rcm-tbl tbody tr:hover td{background:rgba(88,166,255,.05);}
-.rcm-tbl td{text-align:right;padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+.rcm-tbl tbody tr:hover td{background:rgba(88,166,255,.04);}
+.rcm-tbl td{text-align:right;padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
 .rcm-tbl td:first-child{text-align:left;}
 .rcm-tbl tr:last-child td{border-bottom:none;}
-/* #1 badge on best row */
-.rcm-tbl .rcm-best td:first-child::before{content:'#1';display:inline-block;margin-right:7px;font-size:8px;font-weight:700;background:#26a69a;color:var(--bg);padding:1px 4px;border-radius:3px;vertical-align:middle;}
+/* rank number inline */
+.rcm-rn{display:inline-block;width:13px;font-size:7.5px;color:var(--text2);font-weight:400;margin-right:2px;}
+.rcm-rn1{color:var(--up,#26a69a);font-weight:700;}
+/* best row left accent */
+.rcm-tbl .rcm-best td:first-child{border-left:2px solid var(--up,#26a69a);padding-left:6px;}
 /* ── Real rate coloring ── */
 .rr-pos2{color:#26a69a;font-weight:700;}
-.rr-pos1{color:#26a641;}
-.rr-neg1{color:#e07070;}
+.rr-pos1{color:#26a69a;}
+.rr-neg1{color:#ef5350;}
 .rr-neg2{color:#ef5350;font-weight:700;}
 .rr-flat{color:var(--text2);}
 /* ── OIS bias chip ── */
-.rcm-bias{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.04em;white-space:nowrap;}
+.rcm-bias{display:inline-flex;align-items:center;font-size:7.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;padding:1px 4px;border-radius:2px;letter-spacing:.03em;white-space:nowrap;}
 .rcm-bias-hike{background:rgba(38,166,154,.15);color:#26a69a;border:1px solid rgba(38,166,154,.25);}
 .rcm-bias-cut{background:rgba(239,83,80,.15);color:#ef5350;border:1px solid rgba(239,83,80,.25);}
 .rcm-bias-hold{background:rgba(139,148,158,.10);color:var(--text2);border:1px solid rgba(139,148,158,.18);}
 /* ── Live dot ── */
-.rcm-live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#26a69a;margin-left:3px;vertical-align:middle;animation:rcm-pulse 2s ease-in-out infinite;}
+.rcm-live-dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:#26a69a;margin-left:3px;vertical-align:middle;animation:rcm-pulse 2s ease-in-out infinite;}
 /* ── Real Rate Matrix ── */
-#rcm-matrix-wrap{overflow:auto;flex:1;min-height:0;scrollbar-width:thin;scrollbar-color:#444c56 transparent;}
-#rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
+#rcm-matrix-wrap{overflow:auto;flex:1;min-height:0;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+#rcm-matrix-wrap::-webkit-scrollbar{width:3px;height:3px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
-#rcm-matrix-wrap::-webkit-scrollbar-thumb{background:#444c56;border-radius:2px;}
-#rcm-matrix-wrap::-webkit-scrollbar-thumb:hover{background:var(--text2);}
-.rcm-matrix{border-collapse:collapse;font-size:10.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);width:100%;}
-.rcm-matrix th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:6px 8px;color:var(--text2);text-align:center;white-space:nowrap;background:var(--bg2);position:sticky;top:0;z-index:2;border-bottom:1px solid var(--border2);}
-.rcm-matrix th.row-head{text-align:left;min-width:46px;}
-.rcm-matrix td{padding:5px 8px;text-align:center;border:1px solid rgba(255,255,255,.04);font-size:10.5px;min-width:58px;transition:filter .1s;}
-.rcm-matrix td:hover{filter:brightness(1.4);}
-.rcm-matrix td.diag{background:#2d333b;color:var(--text2);font-size:10px;font-weight:600;}
-.rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;font-size:10.5px;background:var(--bg2);border:none;position:sticky;left:0;z-index:1;}
+#rcm-matrix-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.rcm-matrix{border-collapse:collapse;font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);width:100%;}
+.rcm-matrix th{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 7px;color:var(--text2);text-align:center;white-space:nowrap;background:var(--bg2);position:sticky;top:0;z-index:2;border-bottom:1px solid var(--border);}
+.rcm-matrix th.row-head{text-align:left;min-width:36px;}
+.rcm-matrix td{padding:3px 7px;text-align:center;border:1px solid rgba(255,255,255,.035);font-size:8.5px;min-width:48px;transition:filter .1s;}
+.rcm-matrix td:hover{filter:brightness(1.35);}
+.rcm-matrix td.diag{background:var(--bg3);color:var(--text2);font-size:8px;font-weight:600;}
+.rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;font-size:8px;background:var(--bg2);border:none;position:sticky;left:0;z-index:1;}
 .rcm-matrix td.empty{background:transparent;border:none;}
 /* matrix cell shading */
 .rcm-cell-pos-hi{background:rgba(38,166,154,.25);color:#26a69a;font-weight:700;}
@@ -128,73 +127,59 @@
 .rcm-cell-neg{background:rgba(239,83,80,.10);color:#ef5350;}
 .rcm-cell-flat{color:var(--text2);}
 /* matrix legend */
-.rcm-matrix-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);align-items:center;}
-.rcm-legend-sw{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;margin-right:5px;}
-/* ── Pair detail — redesigned ── */
-.rcm-pd-header{padding:10px 14px 9px;background:var(--bg2);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.rcm-matrix-legend{display:flex;gap:8px;flex-wrap:wrap;font-size:7px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);padding:4px 9px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0;}
+.rcm-legend-sw{display:inline-block;width:7px;height:7px;border-radius:1px;vertical-align:middle;margin-right:2px;}
+/* ── Pair detail ── */
+.rcm-pd-header{padding:4px 10px 3px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .rcm-pd-pair{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.01em;}
-.rcm-pd-dir{font-size:10px;color:var(--text2);}
-.rcm-pd-row-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border2);}
-.rcm-pd-cell{padding:10px 14px;border-right:1px solid var(--border2);}
+.rcm-pd-dir{font-size:8px;color:var(--text2);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-pd-row-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);}
+.rcm-pd-cell{padding:6px 8px;border-right:1px solid var(--border2);}
 .rcm-pd-cell:last-child{border-right:none;}
-.rcm-pd-cell-lbl{font-size:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);margin-bottom:3px;}
+.rcm-pd-cell-lbl{font-size:6.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);margin-bottom:1px;}
 .rcm-pd-cell-val{font-size:18px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1;}
-.rcm-pd-cell-sub{font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:2px;}
+.rcm-pd-cell-sub{font-size:7px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:1px;}
 /* Rate bars */
-.rcm-rate-bars{padding:10px 14px 4px;border-bottom:1px solid var(--border2);overflow:hidden;}
-.rcm-rb-title{font-size:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:8px;}
-.rcm-rb-row{display:grid;grid-template-columns:32px 1fr 46px;align-items:center;gap:8px;margin-bottom:5px;}
-.rcm-rb-label{font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;color:var(--text2);}
-.rcm-rb-track{position:relative;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:visible;}
-.rcm-rb-zero{position:absolute;top:-3px;bottom:-3px;width:1px;background:rgba(255,255,255,.15);}
-.rcm-rb-fill{position:absolute;top:0;height:100%;border-radius:3px;transition:width .3s;}
-.rcm-rb-val{font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;text-align:right;}
+.rcm-rate-bars{padding:6px 9px 5px;border-bottom:1px solid var(--border);overflow:hidden;flex-shrink:0;}
+.rcm-rb-title{font-size:6.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:4px;}
+.rcm-rb-row{display:grid;grid-template-columns:26px 1fr 38px;align-items:center;gap:5px;margin-bottom:2px;}
+.rcm-rb-label{font-size:7.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;color:var(--text2);}
+.rcm-rb-track{position:relative;height:4px;background:rgba(255,255,255,.05);border-radius:2px;}
+.rcm-rb-zero{position:absolute;top:-2px;bottom:-2px;width:1px;background:rgba(255,255,255,.18);left:50%;}
+.rcm-rb-fill{position:absolute;top:0;height:100%;border-radius:2px;transition:width .3s;}
+.rcm-rb-val{font-size:7.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;text-align:right;}
 /* Vol / OIS row */
-.rcm-vol-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border2);}
-.rcm-vol-cell{padding:8px 14px;border-right:1px solid var(--border2);}
+.rcm-vol-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);}
+.rcm-vol-cell{padding:5px 8px;border-right:1px solid var(--border2);}
 .rcm-vol-cell:last-child{border-right:none;}
-.rcm-vol-lbl{font-size:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
+.rcm-vol-lbl{font-size:6.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px;}
 .rcm-vol-val{font-size:13px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text);line-height:1;}
-.rcm-vol-sub{font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:2px;}
-.rcm-ois-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border2);}
-.rcm-ois-cell{padding:8px 14px;border-right:1px solid var(--border2);}
+.rcm-vol-sub{font-size:7px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:1px;}
+.rcm-ois-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);}
+.rcm-ois-cell{padding:5px 8px;border-right:1px solid var(--border2);}
 .rcm-ois-cell:last-child{border-right:none;}
-.rcm-ois-lbl{font-size:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
-.rcm-ois-sub{font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:2px;}
-/* Keep old grid for backward compat */
+.rcm-ois-lbl{font-size:6.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
+.rcm-ois-sub{font-size:7px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:2px;}
+/* compat */
 .rcm-pd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
 .rcm-pd-kv{display:flex;flex-direction:column;gap:3px;}
-.rcm-sustain{border-radius:0;padding:10px 14px;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.6;display:flex;gap:8px;align-items:flex-start;border-bottom:1px solid var(--border2);}
-.rcm-sustain-ok{background:rgba(38,166,154,.06);border-left:3px solid rgba(38,166,154,.5);color:var(--text);}
-.rcm-sustain-warn{background:rgba(210,153,34,.06);border-left:3px solid rgba(210,153,34,.5);color:var(--text);}
-.rcm-sustain-bad{background:rgba(239,83,80,.06);border-left:3px solid rgba(239,83,80,.5);color:var(--text);}
+/* Sustain banner */
+.rcm-sustain{padding:6px 8px;font-size:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.5;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rcm-sustain-ok{background:rgba(38,166,154,.04);border-left:3px solid rgba(38,166,154,.45);color:var(--text);}
+.rcm-sustain-warn{background:rgba(210,153,34,.04);border-left:3px solid rgba(210,153,34,.45);color:var(--text);}
+.rcm-sustain-bad{background:rgba(239,83,80,.04);border-left:3px solid rgba(239,83,80,.45);color:var(--text);}
 .rcm-loading{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text2);font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.06em;}
-/* ── Responsive breakpoints ── */
-@media(max-width:900px){
-  .rcm-pd-row-grid{grid-template-columns:1fr 1fr;}
-  .rcm-vol-row{grid-template-columns:1fr 1fr;}
-}
+/* ── Responsive ── */
 @media(max-width:640px){
   #rcm-metrics{grid-template-columns:repeat(3,1fr);}
-  .rcm-mm-val{font-size:14px;}
   .rcm-pd-row-grid{grid-template-columns:1fr 1fr;}
-  .rcm-pd-cell-val{font-size:15px;}
   .rcm-vol-row{grid-template-columns:1fr 1fr;}
-  .rcm-ois-row{grid-template-columns:1fr 1fr;}
-  #rcm-body{padding:8px;}
-  .rcm-rate-bars{padding:8px 10px 4px;}
-  .rcm-pd-header{padding:8px 10px;}
-  .rcm-pd-cell{padding:8px 10px;}
-  .rcm-vol-cell{padding:6px 10px;}
-  .rcm-ois-cell{padding:6px 10px;}
 }
 @media(max-width:420px){
+  #rcm-metrics{grid-template-columns:repeat(2,1fr);}
   .rcm-pd-row-grid{grid-template-columns:1fr;}
   .rcm-vol-row{grid-template-columns:1fr;}
   .rcm-ois-row{grid-template-columns:1fr;}
-  #rcm-metrics{grid-template-columns:repeat(2,1fr);}
-  .rcm-pd-cell:last-child{border-right:none;border-bottom:none;}
-  .rcm-vol-cell{border-bottom:1px solid var(--border2);}
 }
 `;
   document.head.appendChild(s);
@@ -441,16 +426,17 @@ function _rcmRenderBreakdown() {
     const nomFmt = nom != null ? nom.toFixed(2) + '%' : '—';
     const ieFmt  = ie  ? ie.val.toFixed(2) + '%' : '—';
     const rrFmt  = _rcmRrFmt(rr);
-    const isLive  = ie?.live ? '<span title="Market-implied (FRED breakeven)" style="color:var(--up,#26a69a);font-size:8px;">&#x25CF;</span>' : '';
+    const isLive  = ie?.live ? `<span class="rcm-live-dot" title="Market-implied (FRED breakeven)"></span>` : '';
     const dateAge = _rcmDateAge(ie?.date);
     const srcLabel = _RCM_IE_SRC[ccy] || '';
     const srcTitle = `${srcLabel}${ie?.date ? ' · ' + ie.date : ''}`;
-    const isTR = idx === 0 ? ' class="rcm-best"' : '';
+    const rankCls = idx === 0 ? 'rcm-rn rcm-rn1' : 'rcm-rn';
+    const isBest = idx === 0 ? ' class="rcm-best"' : '';
 
-    return `<tr${isTR} title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
-      <td style="font-weight:700;color:var(--text,#d1d4dc);">${_RCM_CB[ccy]} (${ccy})</td>
+    return `<tr${isBest} title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
+      <td><span class="${rankCls}">${idx + 1}</span><strong>${_RCM_CB[ccy]}</strong> <span style="color:var(--text2);font-weight:400">${ccy}</span></td>
       <td>${nomFmt}</td>
-      <td title="${srcTitle}">${ieFmt} ${isLive}</td>
+      <td title="${srcTitle}">${ieFmt}${isLive}</td>
       <td title="${srcTitle}">${dateAge}</td>
       <td class="${rrCls}" style="font-weight:600;">${rrFmt}</td>
       <td>${_rcmBiasChip(bias)}</td>
@@ -461,8 +447,8 @@ function _rcmRenderBreakdown() {
     'CPI YoY and 5Y breakeven are different methodologies — cross-currency real rate comparisons carry wider uncertainty for non-USD/EUR legs. ' +
     'Data age column shows observation date — treat figures older than 6 months as indicative only.';
 
-  return `<div class="rcm-cw" style="flex:1;min-height:0;overflow:auto;">
-    <div class="rcm-ct">Real Rate Carry Ranking — G8 Central Banks · sorted by real rate descending</div>
+  return `<div style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:auto;">
+    <div class="rcm-ct">Real Rate Carry Ranking — G8 Central Banks · Sorted by real rate descending</div>
     <table class="rcm-tbl" aria-label="Real rate carry ranking by currency">
       <thead>
         <tr>
@@ -476,7 +462,7 @@ function _rcmRenderBreakdown() {
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    <div class="rcm-src-note">${liveNote}</div>
+    <div class="rcm-src-note" style="margin-top:auto;">${liveNote}</div>
   </div>`;
 }
 
@@ -528,24 +514,21 @@ function _rcmRenderMatrix() {
     return `<tr><td class="row-head">${rowCcy}</td>${cells}</tr>`;
   }).join('');
 
-  const legend = `
-    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text3,#6b7280);margin-top:8px;">
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.28);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong real carry (&ge;1.5%)</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.14);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Positive real spread</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.14);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Negative real spread</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.28);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong real drag (&le;-1.5%)</span>
-      <span>Diagonal = absolute real rate</span>
-    </div>`;
-
-  return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-    <div class="rcm-ct">Real Rate Differential Matrix · Long row / Short column · Cell = Row real rate − Column real rate</div>
+  return `<div style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+    <div class="rcm-ct">Real Rate Differential Matrix · Long row / Short column · Cell = Row − Column · Diagonal = absolute real rate</div>
     <div id="rcm-matrix-wrap" style="overflow:auto;flex:1;">
       <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
         <thead>${header}</thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
-    ${legend}
+    <div class="rcm-matrix-legend">
+      <span><span class="rcm-legend-sw" style="background:rgba(38,166,154,.28)"></span>Strong carry &ge;1.5%</span>
+      <span><span class="rcm-legend-sw" style="background:rgba(38,166,154,.14)"></span>+ve spread</span>
+      <span><span class="rcm-legend-sw" style="background:rgba(239,83,80,.14)"></span>&minus;ve spread</span>
+      <span><span class="rcm-legend-sw" style="background:rgba(239,83,80,.28)"></span>Strong drag &le;&minus;1.5%</span>
+      <span style="margin-left:auto;">Diagonal = absolute real rate</span>
+    </div>
     <div class="rcm-src-note">Real rate = Nominal CB rate − Inflation Expectation. Positive cell = long row currency earns higher real carry vs short column currency.</div>
   </div>`;
 }
@@ -642,41 +625,43 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   }).join('');
 
   return `
-  <div style="width:100%;box-sizing:border-box;overflow-x:hidden;">
+  return `
   <div class="rcm-pd-header">
-    <div class="rcm-pd-pair">${longCcy} / ${shortCcy}</div>
-    <div class="rcm-pd-dir">—</div>
+    <div>
+      <div class="rcm-pd-dir" style="margin-bottom:1px;">Pair Detail</div>
+      <div class="rcm-pd-pair">${longCcy} <span style="color:var(--up,#26a69a);font-size:12px;">▲</span> / ${shortCcy} <span style="color:var(--down,#ef5350);font-size:12px;">▼</span></div>
+    </div>
     <div class="rcm-pd-dir">Long ${longCcy} / Short ${shortCcy}</div>
   </div>
   <div class="rcm-pd-row-grid">
     <div class="rcm-pd-cell">
       <div class="rcm-pd-cell-lbl">Nominal carry</div>
       <div class="rcm-pd-cell-val ${_rcmRrClass(nomSpread)}">${fmt(nomSpread, '%')}</div>
-      <div class="rcm-pd-cell-sub">${_RCM_CB[longCcy]} ${nomL != null ? nomL.toFixed(2) + '%' : '—'} − ${_RCM_CB[shortCcy]} ${nomS != null ? nomS.toFixed(2) + '%' : '—'}</div>
+      <div class="rcm-pd-cell-sub">${nomL != null ? nomL.toFixed(2) + '%' : '—'} − ${nomS != null ? nomS.toFixed(2) + '%' : '—'}</div>
     </div>
     <div class="rcm-pd-cell">
       <div class="rcm-pd-cell-lbl">Real carry</div>
       <div class="rcm-pd-cell-val ${_rcmRrClass(realSpread)}">${fmt(realSpread, '%')}</div>
-      <div class="rcm-pd-cell-sub">After inflation expectations</div>
+      <div class="rcm-pd-cell-sub">After infl. expectations</div>
     </div>
     <div class="rcm-pd-cell">
-      <div class="rcm-pd-cell-lbl">Long real rate (${longCcy})</div>
+      <div class="rcm-pd-cell-lbl">Long real (${longCcy})</div>
       <div class="rcm-pd-cell-val ${_rcmRrClass(rrL)}">${_rcmRrFmt(rrL)}</div>
-      <div class="rcm-pd-cell-sub">${nomL != null ? nomL.toFixed(2) + '%' : '—'} nom − ${ieL != null ? ieL.toFixed(2) + '%' : '—'} infl.exp</div>
+      <div class="rcm-pd-cell-sub">${nomL != null ? nomL.toFixed(2) + '%' : '—'} nom − ${ieL != null ? ieL.toFixed(2) + '%' : '—'} IE</div>
     </div>
   </div>
   <div class="rcm-rate-bars">
-    <div class="rcm-rb-title">Real rate positioning — G8 (long ${longCcy} highlighted)</div>
+    <div class="rcm-rb-title">Real rate positioning G8 — ▲ long / ▼ short highlighted</div>
     ${barRows}
   </div>
   <div class="rcm-vol-row">
     <div class="rcm-vol-cell">
-      <div class="rcm-vol-lbl">Short real rate (${shortCcy})</div>
+      <div class="rcm-vol-lbl">Short real (${shortCcy})</div>
       <div class="rcm-vol-val ${_rcmRrClass(rrS)}">${_rcmRrFmt(rrS)}</div>
-      <div class="rcm-vol-sub">${nomS != null ? nomS.toFixed(2) + '%' : '—'} nom − ${ieS != null ? ieS.toFixed(2) + '%' : '—'} infl.exp</div>
+      <div class="rcm-vol-sub">${nomS != null ? nomS.toFixed(2) + '%' : '—'} nom − ${ieS != null ? ieS.toFixed(2) + '%' : '—'} IE</div>
     </div>
     <div class="rcm-vol-cell">
-      <div class="rcm-vol-lbl">Nominal carry / vol</div>
+      <div class="rcm-vol-lbl">Nom carry / vol</div>
       <div class="rcm-vol-val">${nomCarryVol ?? '—'}</div>
       <div class="rcm-vol-sub">HV30 ${hv30 ? hv30.toFixed(1) + '%' : 'n/a'}</div>
     </div>
@@ -699,10 +684,9 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
     </div>
   </div>
   ${sustainText ? `<div class="rcm-sustain ${sustainCls}">${sustainText}</div>` : ''}
-  <div class="rcm-src-note" style="padding:8px 14px;font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);line-height:1.6;border-top:1px solid var(--border2);">
-    Infl. Exp. source — ${longCcy}: ${_RCM_IE_SRC[longCcy] || '—'} · ${shortCcy}: ${_RCM_IE_SRC[shortCcy] || '—'}<br>
-    Real carry/vol = |real spread| / HV30 (30-day realised vol, annualised)
-  </div>
+  <div class="rcm-src-note">
+    IE source — ${longCcy}: ${_RCM_IE_SRC[longCcy] || '—'} · ${shortCcy}: ${_RCM_IE_SRC[shortCcy] || '—'}<br>
+    Carry/vol = |spread| / HV30 (30-day realised vol, annualised)
   </div>`;
 }
 
@@ -720,7 +704,7 @@ function _rcmRender() {
     content = _rcmRenderPairDetail(l, s);
   }
 
-  modal.innerHTML = `<div class="rcm-panel on" style="overflow-y:auto;overflow-x:hidden;width:100%;box-sizing:border-box;">${content}</div>`;
+  modal.innerHTML = `<div class="rcm-panel on">${content}</div>`;
 
   // Update header pair name
   const titleEl = document.getElementById('rcm-title');
@@ -827,8 +811,9 @@ function _rcmBuildDOM() {
   <div id="rcm-modal" role="document">
     <div id="rcm-hd">
       <div id="rcm-hd-left">
+        <div class="rcm-badge">Real Rate Carry</div>
         <div id="rcm-title">Real Rate Carry Analysis</div>
-        <div id="rcm-sub">Nominal CB rate &minus; Inflation Expectation (breakeven / CPI proxy) &middot; G8</div>
+        <div id="rcm-sub">Nominal CB rate &minus; Inflation Expectation (breakeven / CPI proxy) &middot; G8 &middot; click ranking row to build pair</div>
       </div>
       <button id="rcm-close" aria-label="Close real rate carry modal">&times;</button>
     </div>
@@ -849,9 +834,9 @@ function _rcmBuildDOM() {
         <div class="rcm-mm-sub">—</div>
       </div>
       <div class="rcm-mm" id="rcm-mm-positive">
-        <div class="rcm-mm-lbl">Pairs w/ + real</div>
+        <div class="rcm-mm-lbl">Positive real</div>
         <div class="rcm-mm-val" style="color:var(--text2);">—</div>
-        <div class="rcm-mm-sub">G8 currencies</div>
+        <div class="rcm-mm-sub">positive real rate</div>
       </div>
       <div class="rcm-mm" id="rcm-mm-src">
         <div class="rcm-mm-lbl">Data source</div>
