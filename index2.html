@@ -658,40 +658,39 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <div class="risk-cell"><div class="risk-lbl">EUR/USD HV 30d</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Hist. volatility</div></div>
             <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px" aria-live="assertive" aria-label="Regime">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
           </div>
-          <!-- HV table + Indicators side-by-side -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);">
-            <div style="padding:4px 8px 4px;border-right:1px solid var(--border);">
-              <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Realized Vol — HV (yfinance OHLC)</div>
-              <table id="hv-multitf-table" aria-label="Historical volatility multi-window" style="width:100%;">
-                <thead>
-                  <tr>
-                    <th style="text-align:left;font-size:9px;" scope="col">Pair</th>
-                    <th style="font-size:9px;text-align:right;" scope="col" title="30-day HV annualized — only window from pipeline">HV 30d</th>
-                    <th style="font-size:9px;text-align:right;" scope="col" title="25d Risk Reversal 1M from Saxo">RR 1M</th>
-                    <th style="font-size:9px;text-align:right;color:var(--text3);" scope="col">Trend</th>
-                  </tr>
-                </thead>
-                <tbody id="hv-multitf-tbody">
-                  <tr><td colspan="4" style="color:var(--text3);padding:6px 0;font-size:10px;">Loading…</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div style="padding:4px 8px 4px;overflow-x:auto;">
-              <table aria-label="Risk indicators" style="width:100%;">
-                <thead><tr><th style="text-align:left;font-size:9px;" scope="col">Indicator</th><th style="font-size:9px;" scope="col">Value</th><th style="font-size:9px;" class="signal-col" scope="col">Signal</th></tr></thead>
-                <tbody id="risk-indicators-tbody">
-                  <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
-                  <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
-                  <tr><td>USD/JPY vs VIX 60d</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
-                  <tr><td>DXY vs SPX 60d</td><td id="ri-dxy-spx">—</td><td id="ri-dxy-spx-sig" class="flat">—</td></tr>
-                  <tr><td>Gold vs DXY 60d</td><td id="ri-gold-dxy">—</td><td id="ri-gold-dxy-sig" class="flat">—</td></tr>
-                </tbody>
-              </table>
-            </div>
+          <!-- Risk Indicators — full width below VIX/MOVE/Regime grid -->
+          <div style="padding:4px 8px 4px;border-top:1px solid var(--border);overflow-x:auto;">
+            <table aria-label="Risk indicators" style="width:100%;">
+              <thead><tr><th style="text-align:left;font-size:9px;" scope="col">Indicator</th><th style="font-size:9px;" scope="col">Value</th><th style="font-size:9px;" class="signal-col" scope="col">Signal</th></tr></thead>
+              <tbody id="risk-indicators-tbody">
+                <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
+                <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
+                <tr><td>USD/JPY vs VIX 60d</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
+                <tr><td>DXY vs SPX 60d</td><td id="ri-dxy-spx">—</td><td id="ri-dxy-spx-sig" class="flat">—</td></tr>
+                <tr><td>Gold vs DXY 60d</td><td id="ri-gold-dxy">—</td><td id="ri-gold-dxy-sig" class="flat">—</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-      <!-- VaR / CVaR Panel — full width below both columns -->
+      <!-- Realized Vol HV table — full width, above VaR -->
+      <div style="padding:4px 8px 4px;border-bottom:1px solid var(--border);">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Realized Vol — HV (yfinance OHLC)</div>
+        <table id="hv-multitf-table" aria-label="Historical volatility multi-window" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="text-align:left;font-size:9px;" scope="col">Pair</th>
+              <th style="font-size:9px;text-align:right;" scope="col" title="30-day HV annualized — only window computed by pipeline">HV 30d</th>
+              <th style="font-size:9px;text-align:right;" scope="col" title="25d Risk Reversal 1M from Saxo">RR 1M</th>
+              <th style="font-size:9px;text-align:right;color:var(--text3);" scope="col">Trend</th>
+            </tr>
+          </thead>
+          <tbody id="hv-multitf-tbody">
+            <tr><td colspan="4" style="color:var(--text3);padding:6px 0;font-size:10px;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- VaR / CVaR Panel — full width below HV table -->
       <div style="padding:4px 8px 6px;">
         <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
           <span>Historical VaR 95% · 1-day · 252d window</span>
