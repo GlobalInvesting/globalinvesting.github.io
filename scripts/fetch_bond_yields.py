@@ -1,5 +1,5 @@
 """
-fetch_bond_yields.py  v1.1  —  Bond yields for USD / EUR / GBP / JPY
+fetch_bond_yields.py  v1.2  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
 
 CHANGELOG v1.1 (fixes vs v1.0)
 ────────────────────────────────
@@ -29,11 +29,16 @@ Source cascade per currency:
     USD bond5y   → FRED DGS5  public CSV (daily, no key)
     EUR bond10y  → ECB SDMX YC daily     (no key)
                    FRED IRLTLT01EZM156N  (monthly, no key) [fallback]
+    EUR bond2y   → ECB SDMX YC daily SR_2Y (no key)
     GBP bond10y  → BOE SDIE _iadb CSV    (daily, no key)   ← BUG-2 fixed endpoint
                    FRED IRLTLT01GBM156N  (monthly, no key) [fallback]
+    GBP bond2y   → BOE SDIE _iadb CSV IUDMNPY (daily, no key)
+                   FRED IRLTST01GBM156N  (monthly, no key) [fallback]
     JPY bond10y  → ECB FM SDMX monthly   (no key)
                    OECD SDMX monthly     (no key)          [fallback]
                    FRED IRLTLT01JPM156N  (monthly, no key) [final fallback]
+    CAD bond2y   → FRED IRLTST01CAM156N  (monthly, no key)
+    AUD bond2y   → FRED IRLTLT01AUM156N  (monthly, no key)
 
 Exit policy (BUG-3):
     USD bond10y unavailable  → exit(1)  (hard failure)
@@ -366,6 +371,17 @@ def fetch_eur(soft_failures: list) -> None:
         _gha_warning("EUR bond10y: all sources unavailable — keeping existing value")
         soft_failures.append("EUR.bond10y")
 
+    # bond2y — ECB SDMX YC SR_2Y (same cascade as 10Y)
+    print("  bond2y  (ECB SDMX YC SR_2Y)")
+    dt, val = _ecb_sdmx_latest("YC", "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y")
+    if val is not None and 0 < val < 20:
+        data["bond2y"]  = round(val, 4)
+        dates["bond2y"] = dt
+        print(f"    {val:.4f}%  ({dt})  [ECB-SDMX-daily]")
+    else:
+        _gha_warning("EUR bond2y: ECB SDMX SR_2Y unavailable — keeping existing")
+        soft_failures.append("EUR.bond2y")
+
     _save("EUR", data, dates)
 
 
@@ -394,6 +410,23 @@ def fetch_gbp(soft_failures: list) -> None:
     else:
         _gha_warning("GBP bond10y: all sources unavailable — keeping existing value")
         soft_failures.append("GBP.bond10y")
+
+    # bond2y — BOE SDIE IUDMNPY (2Y nominal par yield, same endpoint as 10Y)
+    #   Fallback: FRED IRLTST01GBM156N (monthly)
+    print("  bond2y  (BOE SDIE IUDMNPY → FRED:IRLTST01GBM156N)")
+    dt, val = _boe_latest("IUDMNPY")
+    source = "BOE-SDIE-daily"
+    if val is None or not (0 < val < 20):
+        print(f"    BOE SDIE IUDMNPY miss (val={val}) — trying FRED IRLTST01GBM156N")
+        dt, val = _fred_csv_latest("IRLTST01GBM156N")
+        source = "FRED-monthly"
+    if val is not None and 0 < val < 20:
+        data["bond2y"]  = round(val, 4)
+        dates["bond2y"] = dt
+        print(f"    {val:.4f}%  ({dt})  [{source}]")
+    else:
+        _gha_warning("GBP bond2y: all sources unavailable — keeping existing")
+        soft_failures.append("GBP.bond2y")
 
     _save("GBP", data, dates)
 
@@ -454,11 +487,65 @@ def fetch_jpy(soft_failures: list) -> None:
     _save("JPY", data, dates)
 
 
+# ── AUD ───────────────────────────────────────────────────────────────────────
+
+def fetch_aud_2y(soft_failures: list) -> None:
+    """AUD bond2y only — bond10y already written by update-bond-yields (not in scope here)."""
+    print("\nAUD (bond2y only)")
+    data, dates = _load_existing("AUD")
+    print("  bond2y  (FRED:IRLTLT01AUM156N monthly)")
+    dt, val = _fred_csv_latest("IRLTLT01AUM156N")
+    if val is not None and 0 < val < 20:
+        data["bond2y"]  = round(val, 4)
+        dates["bond2y"] = dt
+        print(f"    {val:.4f}%  ({dt})  [FRED-monthly]")
+    else:
+        _gha_warning("AUD bond2y: FRED IRLTLT01AUM156N unavailable — keeping existing")
+        soft_failures.append("AUD.bond2y")
+    _save("AUD", data, dates)
+
+
+# ── CAD ───────────────────────────────────────────────────────────────────────
+
+def fetch_cad_2y(soft_failures: list) -> None:
+    """CAD bond2y only — bond10y already handled elsewhere."""
+    print("\nCAD (bond2y only)")
+    data, dates = _load_existing("CAD")
+    print("  bond2y  (FRED:IRLTST01CAM156N monthly)")
+    dt, val = _fred_csv_latest("IRLTST01CAM156N")
+    if val is not None and 0 < val < 20:
+        data["bond2y"]  = round(val, 4)
+        dates["bond2y"] = dt
+        print(f"    {val:.4f}%  ({dt})  [FRED-monthly]")
+    else:
+        _gha_warning("CAD bond2y: FRED IRLTST01CAM156N unavailable — keeping existing")
+        soft_failures.append("CAD.bond2y")
+    _save("CAD", data, dates)
+
+
+# ── NZD ───────────────────────────────────────────────────────────────────────
+
+def fetch_nzd_2y(soft_failures: list) -> None:
+    """NZD bond2y only — FRED IRLTLT01NZM156N (monthly)."""
+    print("\nNZD (bond2y only)")
+    data, dates = _load_existing("NZD")
+    print("  bond2y  (FRED:IRLTLT01NZM156N monthly)")
+    dt, val = _fred_csv_latest("IRLTLT01NZM156N")
+    if val is not None and 0 < val < 20:
+        data["bond2y"]  = round(val, 4)
+        dates["bond2y"] = dt
+        print(f"    {val:.4f}%  ({dt})  [FRED-monthly]")
+    else:
+        _gha_warning("NZD bond2y: FRED unavailable — keeping existing")
+        soft_failures.append("NZD.bond2y")
+    _save("NZD", data, dates)
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v1.1 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v1.2 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
@@ -466,8 +553,9 @@ def main() -> None:
     soft_failures: list[str] = []
     hard_errors:   list[str] = []
 
-    for ccy, fn in [("USD", fetch_usd), ("EUR", fetch_eur),
-                    ("GBP", fetch_gbp), ("JPY", fetch_jpy)]:
+    for ccy, fn in [("USD", fetch_usd), ("EUR", fetch_eur), ("GBP", fetch_gbp),
+                    ("JPY", fetch_jpy), ("AUD", fetch_aud_2y),
+                    ("CAD", fetch_cad_2y), ("NZD", fetch_nzd_2y)]:
         try:
             fn(soft_failures)
         except SystemExit:
@@ -477,7 +565,7 @@ def main() -> None:
             print(f"  ERROR [{ccy}]: {exc}")
             hard_errors.append(ccy)
 
-    print(f"\nDone — {4 - len(hard_errors)}/4 currencies processed.")
+    print(f"\nDone — {7 - len(hard_errors)}/7 currencies processed.")
 
     if soft_failures:
         print(f"Soft failures (kept existing value): {', '.join(soft_failures)}")
