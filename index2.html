@@ -52,7 +52,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #ws-shell{
   display:flex;
   flex-direction:row;
-  height:calc(100vh - 92px); /* topbar 36 + quotebar 34 + newsticker 22 */
+  height:calc(100vh - 122px); /* topbar 36 + quotebar 34 + newsticker 22 + toolbar 30 */
   overflow:hidden;
 }
 
@@ -98,17 +98,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .ws-save-btn.saved{border-color:var(--up);color:var(--up)}
 #ws-layout-name{font-size:10px;color:var(--text3);font-family:var(--font-mono);}
 
-/* ── WORKSPACE MAIN AREA (sidebar + canvas) ── */
-#ws-sidebar{
-  background:var(--bg2);border-right:1px solid var(--border);
-  overflow-y:auto;font-size:11px;scrollbar-width:thin;
-  scrollbar-color:var(--border2) transparent;
-  width:180px;flex-shrink:0;
-  display:flex;flex-direction:column;
-}
-#ws-sidebar::-webkit-scrollbar{width:3px}
-#ws-sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-
+/* ── WORKSPACE MAIN AREA (canvas only — sidebar & rightpanel are tiles) ── */
 #ws-main-col{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden;}
 
 #ws-canvas{
@@ -122,14 +112,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   background-position:0 0;
 }
 
-/* ── RIGHT PANEL (identical to index.html) ── */
-#ws-rightpanel{
-  background:var(--bg2);border-left:1px solid var(--border);
-  width:220px;flex-shrink:0;overflow-y:auto;font-size:11px;
-  scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
-}
-#ws-rightpanel::-webkit-scrollbar{width:3px}
-#ws-rightpanel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+/* Tile inner sidebar/rightpanel styles */
+.tile-sidebar{overflow-y:auto;font-size:11px;height:100%;}
 
 /* ── TILE ── */
 .ws-tile{
@@ -359,25 +343,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .tile-body .carry-bar-inner{height:100%;border-radius:3px;}
 .tile-body .carry-val{font-size:9px;font-family:var(--font-mono);min-width:38px;text-align:right;}
 
-/* CB rates in tile use rightpanel styling */
-#ws-rightpanel .sb-head{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:6px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);}
-#ws-rightpanel table{width:100%;border-collapse:collapse;}
-#ws-rightpanel th,#ws-rightpanel td{padding:3px 6px;font-size:10px;border-bottom:1px solid var(--border);text-align:right;color:var(--text2);}
-#ws-rightpanel th{text-align:right;color:var(--text3);font-size:8.5px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);}
-#ws-rightpanel td:first-child,#ws-rightpanel th:first-child{text-align:left;}
-#ws-rightpanel tr:last-child td{border-bottom:none;}
-#ws-rightpanel .up{color:var(--up)}
-#ws-rightpanel .down{color:var(--down)}
-#ws-rightpanel .flat{color:var(--text3)}
+/* CB rates and rightpanel-style panels inside tiles */
+.tile-body .sb-head{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:5px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);}
+.tile-body .rp-source{padding:3px 8px 4px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);}
 
-/* Sidebar in workspace */
-#ws-sidebar .sb-section{border-bottom:1px solid var(--border);}
-#ws-sidebar .sb-head{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:6px 8px 4px;background:var(--head-bg);border-bottom:1px solid var(--border);}
-#ws-sidebar .sb-row{display:flex;align-items:center;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
-#ws-sidebar .sb-row:hover{background:var(--bg3)}
-#ws-sidebar .sb-sym{font-size:10px;font-family:var(--font-mono);color:var(--text);font-weight:600;}
-#ws-sidebar .sb-price{font-size:10px;font-family:var(--font-mono);color:var(--text);}
-#ws-sidebar .sb-chg{font-size:9px;font-family:var(--font-mono);min-width:44px;text-align:right;}
+/* Sidebar in workspace tile */
+.tile-body .sb-section{border-bottom:1px solid var(--border);}
+.tile-body .sb-head{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:5px 8px 4px;background:var(--head-bg);border-bottom:1px solid var(--border);}
+.tile-body .sb-row{display:flex;align-items:center;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.tile-body .sb-row:hover{background:var(--bg3)}
+.tile-body .sb-sym{font-size:10px;font-family:var(--font-mono);color:var(--text);font-weight:600;}
+.tile-body .sb-price{font-size:10px;font-family:var(--font-mono);color:var(--text);}
+.tile-body .sb-chg{font-size:9px;font-family:var(--font-mono);min-width:44px;text-align:right;}
 
 /* Chart tile */
 .tile-chart-inner{width:100%;height:100%;position:relative;overflow:hidden;}
@@ -585,50 +562,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <!-- WORKSPACE SHELL -->
 <div id="ws-shell" role="main" aria-label="Workspace">
 
-  <!-- SIDEBAR (FX pairs / liquidity / carry) -->
-  <aside id="ws-sidebar" aria-label="FX pairs sidebar">
-    <div class="sb-section">
-      <div class="sb-head">FX Liquidity</div>
-      <div id="ws-liq-canvas-wrap">
-        <canvas id="liquidity-canvas" height="100" style="display:block;width:100%;cursor:crosshair;"></canvas>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
-          <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">--:--</span>
-          <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
-        </div>
-        <div style="display:flex;gap:6px;margin-top:3px;">
-          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:7px;height:7px;background:rgba(79,127,255,0.35);border-radius:1px;"></span>Tok</span>
-          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:7px;height:7px;background:rgba(38,166,154,0.45);border-radius:1px;"></span>Lon</span>
-          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:7px;height:7px;background:rgba(246,148,28,0.4);border-radius:1px;"></span>NY</span>
-        </div>
-        <div style="margin-top:2px;"><span id="liq-source-label" style="font-size:7.5px;color:var(--text3);font-family:var(--font-mono);">Historical avg · fixed reference</span></div>
-        <div id="liq-tooltip" style="display:none;position:fixed;z-index:999;background:var(--bg2);border:1px solid var(--border2);border-radius:3px;padding:4px 7px;font-family:var(--font-mono);font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);"><span id="liq-tt-time" style="color:var(--text3);"></span><br><span id="liq-tt-session" style="color:var(--orange);font-size:8px;"></span><br><span id="liq-tt-vol" style="color:var(--blue);font-weight:600;"></span></div>
-      </div>
-    </div>
-    <div class="sb-section">
-      <div class="sb-head">Crosses</div>
-      <div style="overflow-y:auto;max-height:280px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;">
-        <div class="sb-row" data-sym="FX_IDC:EURGBP" style="cursor:pointer;"><span class="sb-sym">EUR/GBP</span><span class="sb-price" id="sb-eurgbp">—</span><span class="sb-chg" id="sbc-eurgbp">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:EURJPY" style="cursor:pointer;"><span class="sb-sym">EUR/JPY</span><span class="sb-price" id="sb-eurjpy">—</span><span class="sb-chg" id="sbc-eurjpy">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:EURCHF" style="cursor:pointer;"><span class="sb-sym">EUR/CHF</span><span class="sb-price" id="sb-eurchf">—</span><span class="sb-chg" id="sbc-eurchf">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:EURCAD" style="cursor:pointer;"><span class="sb-sym">EUR/CAD</span><span class="sb-price" id="sb-eurcad">—</span><span class="sb-chg" id="sbc-eurcad">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:GBPJPY" style="cursor:pointer;"><span class="sb-sym">GBP/JPY</span><span class="sb-price" id="sb-gbpjpy">—</span><span class="sb-chg" id="sbc-gbpjpy">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:GBPCHF" style="cursor:pointer;"><span class="sb-sym">GBP/CHF</span><span class="sb-price" id="sb-gbpchf">—</span><span class="sb-chg" id="sbc-gbpchf">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:AUDJPY" style="cursor:pointer;"><span class="sb-sym">AUD/JPY</span><span class="sb-price" id="sb-audjpy">—</span><span class="sb-chg" id="sbc-audjpy">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:AUDNZD" style="cursor:pointer;"><span class="sb-sym">AUD/NZD</span><span class="sb-price" id="sb-audnzd">—</span><span class="sb-chg" id="sbc-audnzd">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:NZDJPY" style="cursor:pointer;"><span class="sb-sym">NZD/JPY</span><span class="sb-price" id="sb-nzdjpy">—</span><span class="sb-chg" id="sbc-nzdjpy">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:CADJPY" style="cursor:pointer;"><span class="sb-sym">CAD/JPY</span><span class="sb-price" id="sb-cadjpy">—</span><span class="sb-chg" id="sbc-cadjpy">—</span></div>
-        <div class="sb-row" data-sym="FX_IDC:CHFJPY" style="cursor:pointer;"><span class="sb-sym">CHF/JPY</span><span class="sb-price" id="sb-chfjpy">—</span><span class="sb-chg" id="sbc-chfjpy">—</span></div>
-      </div>
-    </div>
-    <div class="sb-section">
-      <div class="sb-head">Carry Ranking</div>
-      <div id="carry-rank-rows">
-        <div style="padding:4px 8px;font-size:10px;color:var(--text3);">Loading…</div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN WORKSPACE COLUMN -->
+  <!-- MAIN WORKSPACE COLUMN — takes full width, tiles are absolutely positioned -->
   <div id="ws-main-col">
     <!-- WORKSPACE CANVAS — tiles are absolutely positioned here -->
     <div id="ws-canvas" role="region" aria-label="Workspace canvas" tabindex="0">
@@ -636,81 +570,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
   </div>
 
-  <!-- RIGHT PANEL — CB Rates, Correlations, Expectations, Positioning Bias -->
-  <aside id="ws-rightpanel" aria-label="Market data panels">
-    <div id="section-cbrates" class="sb-head">Central Bank Rates</div>
-    <table id="cbrates-table" aria-label="Central bank interest rates">
-      <thead><tr><th style="text-align:left" scope="col">Bank</th><th scope="col">Rate</th><th scope="col">Trend</th></tr></thead>
-      <tbody id="cbrates-tbody">
-        <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">Fed</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-eu" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">ECB</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-gb" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">BoE</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-jp" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">BoJ</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-au" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">RBA</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-ch" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">SNB</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-ca" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">BoC</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-nz" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">RBNZ</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
-      </tbody>
-    </table>
-
-    <div class="sb-head" style="margin-top:2px;display:flex;align-items:center;justify-content:space-between;">
-      <span>Key Correlations</span>
-      <span id="corr-window-btns" style="display:flex;gap:2px;" role="group" aria-label="Correlation window">
-        <button id="corr-btn-30" onclick="setCorrWindow(30)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;">30d</button>
-        <button id="corr-btn-60" onclick="setCorrWindow(60)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:#fff;border-radius:2px;cursor:pointer;">60d</button>
-        <button id="corr-btn-90" onclick="setCorrWindow(90)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;">90d</button>
-      </span>
-    </div>
-    <table aria-label="Key FX correlations">
-      <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col" id="corr-th-window">60d</th><th scope="col" title="Z-score vs 252-day norm · |z|>1.5 = correlation break">vs norm</th></tr></thead>
-      <tbody id="correlations-tbody">
-        <tr><td>EUR/USD</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>AUD/USD</td><td>Gold</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>USD/JPY</td><td>US 10Y</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>USD/JPY</td><td>VIX</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>USD/CAD</td><td>WTI Oil</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>GBP/USD</td><td>FTSE 100</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>AUD/USD</td><td>ASX 200</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>NZD/USD</td><td>NZX 50</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>EUR/USD</td><td>EuroStoxx</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>GBP/USD</td><td>Gold</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>DXY</td><td>SPX</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>Gold</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
-      </tbody>
-    </table>
-    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling Pearson · yfinance · vs norm = z-score vs 252d</div>
-
-    <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
-    <table aria-label="Central bank rate expectations" style="table-layout:fixed;width:100%;">
-      <colgroup><col style="width:42%;"><col style="width:33%;"><col style="width:25%;"></colgroup>
-      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col">Bias</th><th scope="col">Impl.</th></tr></thead>
-      <tbody id="fed-exp-tbody">
-        <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">Fed</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-eu" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">ECB</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-gb" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">BoE</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-jp" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">BoJ</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-au" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">RBA</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-ca" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">BoC</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-ch" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">SNB</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
-        <tr><td style="white-space:nowrap;"><span class="fi fi-nz" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">RBNZ</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
-      </tbody>
-    </table>
-
-    <div class="sb-head" style="margin-top:2px;">Positioning Bias <span style="font-size:9px;color:var(--text3);font-weight:normal;" id="skew-source-label">ETF IV · COT · 25d RR</span></div>
-    <table aria-label="Directional positioning bias per pair">
-      <thead><tr><th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th></tr></thead>
-      <tbody id="skew-tbody">
-        <tr><td>EUR/USD</td><td>—</td><td>—</td><td>—</td></tr>
-        <tr><td>GBP/USD</td><td>—</td><td>—</td><td>—</td></tr>
-        <tr><td>USD/JPY</td><td>—</td><td>—</td><td>—</td></tr>
-        <tr><td>AUD/USD</td><td>—</td><td>—</td><td>—</td></tr>
-      </tbody>
-    </table>
-
-    <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
-      ECB · CFTC · yfinance · Myfxbook · TradingView · AI
-    </div>
-  </aside>
+  </div><!-- /#ws-main-col -->
 
 </div><!-- /#ws-shell -->
 
@@ -756,21 +616,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 /* ── TILE REGISTRY ─────────────────────────────────────────── */
 const TILE_CATALOG = [
-  { id:'narrative',   label:'Market Narrative',     sub:'AI · updated 12×/day',     desc:'AI-generated market analysis and regime context derived from live data.', tag:'AI · Narrative' },
-  { id:'chart',       label:'Price Chart',          sub:'TradingView · live',        desc:'Interactive price chart with 22+ FX and cross-asset symbols.', tag:'Charting' },
-  { id:'fxpairs',     label:'FX Pairs — Majors',    sub:'yfinance · ~5min delay',    desc:'Bid/Ask, spread, 1D/1W change, HV30 and session range for G8 majors.', tag:'FX · Rates' },
-  { id:'heatmap',     label:'Currency Strength',    sub:'ECB ref rates · Stooq',     desc:'Relative performance heatmap across the G8 currency basket.', tag:'FX · Strength' },
-  { id:'crossasset',  label:'Cross-Asset',          sub:'Multi-source · daily',      desc:'S&P 500, Gold, WTI, BTC, Nikkei, EuroStoxx, DXY, US 10Y.', tag:'Cross-Asset' },
-  { id:'risk',        label:'Risk Monitor',         sub:'VIX · MOVE · HV30',        desc:'VIX, MOVE index, EUR/USD HV30 and stress regime score.', tag:'Risk' },
-  { id:'yields',      label:'Rates & Yield Curve',  sub:'yfinance · FRED',           desc:'US Treasury yields (3M–30Y) with spread analysis and yield curve chart.', tag:'Rates' },
-  { id:'cot',         label:'CFTC Positioning',     sub:'CFTC.gov · weekly',         desc:'COT leveraged fund net positioning with WoW delta and Net%OI.', tag:'Positioning' },
-  { id:'sessions',    label:'Market Sessions',      sub:'UTC reference',             desc:'Session open/close times and historical volatility by session.', tag:'Sessions' },
-  { id:'spreads',     label:'Reference Spreads',    sub:'ECN est. · model-derived',  desc:'Model-derived indicative spreads — not live quoted prices.', tag:'FX · Execution' },
-  { id:'sentiment',   label:'Retail Positioning',   sub:'Myfxbook · live',           desc:'Retail FX positioning from Myfxbook — long/short percentages.', tag:'Positioning' },
-  { id:'news',        label:'News Feed',            sub:'FX-relevant · impact sort', desc:'FX-relevant headlines sorted by market impact.', tag:'News' },
-  { id:'signals',     label:'Alerts & Signals',     sub:'AI · signals.json',         desc:'AI-generated market signals and configurable price alerts.', tag:'AI · Signals' },
-  { id:'calendar',    label:'Economic Calendar',    sub:'Myfxbook · hourly',         desc:'G8 macroeconomic event calendar with impact levels.', tag:'Calendar' },
-  { id:'econmap',     label:'Economic Map',         sub:'TradingView',               desc:'World economic data visualization from TradingView.', tag:'Macro' },
+  { id:'narrative',      label:'Market Narrative',       sub:'AI · updated 12×/day',     desc:'AI-generated market analysis and regime context derived from live data.', tag:'AI · Narrative' },
+  { id:'chart',          label:'Price Chart',            sub:'TradingView · live',        desc:'Interactive price chart with 22+ FX and cross-asset symbols.', tag:'Charting' },
+  { id:'fxpairs',        label:'FX Pairs — Majors',      sub:'yfinance · ~5min delay',    desc:'Bid/Ask, spread, 1D/1W change, HV30 and session range for G8 majors.', tag:'FX · Rates' },
+  { id:'heatmap',        label:'Currency Strength',      sub:'ECB ref rates · Stooq',     desc:'Relative performance heatmap across the G8 currency basket.', tag:'FX · Strength' },
+  { id:'crossasset',     label:'Cross-Asset',            sub:'Multi-source · daily',      desc:'S&P 500, Gold, WTI, BTC, Nikkei, EuroStoxx, DXY, US 10Y.', tag:'Cross-Asset' },
+  { id:'risk',           label:'Risk Monitor',           sub:'VIX · MOVE · HV30',        desc:'VIX, MOVE index, EUR/USD HV30 and stress regime score.', tag:'Risk' },
+  { id:'yields',         label:'Rates & Yield Curve',    sub:'yfinance · FRED',           desc:'US Treasury yields (3M–30Y) with spread analysis and yield curve chart.', tag:'Rates' },
+  { id:'cot',            label:'CFTC Positioning',       sub:'CFTC.gov · weekly',         desc:'COT leveraged fund net positioning with WoW delta and Net%OI.', tag:'Positioning' },
+  { id:'sessions',       label:'Market Sessions',        sub:'UTC reference',             desc:'Session open/close times and historical volatility by session.', tag:'Sessions' },
+  { id:'spreads',        label:'Reference Spreads',      sub:'ECN est. · model-derived',  desc:'Model-derived indicative spreads — not live quoted prices.', tag:'FX · Execution' },
+  { id:'sentiment',      label:'Retail Positioning',     sub:'Myfxbook · live',           desc:'Retail FX positioning from Myfxbook — long/short percentages.', tag:'Positioning' },
+  { id:'news',           label:'News Feed',              sub:'FX-relevant · impact sort', desc:'FX-relevant headlines sorted by market impact.', tag:'News' },
+  { id:'signals',        label:'Alerts & Signals',       sub:'AI · signals.json',         desc:'AI-generated market signals and configurable price alerts.', tag:'AI · Signals' },
+  { id:'calendar',       label:'Economic Calendar',      sub:'Myfxbook · hourly',         desc:'G8 macroeconomic event calendar with impact levels.', tag:'Calendar' },
+  { id:'econmap',        label:'Economic Map',           sub:'TradingView',               desc:'World economic data visualization from TradingView.', tag:'Macro' },
+  { id:'liquidity',      label:'FX Liquidity',           sub:'yfinance · H-L range proxy',desc:'Session liquidity canvas showing Tokyo, London and New York activity.', tag:'Sessions' },
+  { id:'crosses',        label:'FX Crosses',             sub:'yfinance · ~5min delay',    desc:'EUR, GBP, AUD, NZD and CAD crosses with live price and % change.', tag:'FX · Rates' },
+  { id:'carry',          label:'Carry Ranking',          sub:'CIP-adjusted · FRED',       desc:'G8 carry ranking ordered by real interest rate differential.', tag:'FX · Rates' },
+  { id:'cbrates',        label:'Central Bank Rates',     sub:'ECB · BIS · central banks', desc:'G8 policy rates with trend direction and rate cycle context.', tag:'Macro · CB' },
+  { id:'correlations',   label:'Key Correlations',       sub:'yfinance · Rolling Pearson',desc:'FX/asset rolling correlations with z-score vs 252-day norm.', tag:'Cross-Asset' },
+  { id:'expectations',   label:'CB Rate Expectations',   sub:'OIS · futures implied',     desc:'Forward market consensus for the next G8 central bank meeting.', tag:'Macro · CB' },
+  { id:'positioningbias',label:'Positioning Bias',       sub:'CBOE/CME · COT · 25d RR',  desc:'Directional bias combining options skew, COT and risk reversals.', tag:'Positioning' },
 ];
 
 /* ── LAYOUT TEMPLATES ──────────────────────────────────────── */
@@ -778,53 +645,59 @@ const LAYOUT_TEMPLATES = {
   terminal: {
     name: 'Terminal layout',
     tiles: [
-      /* Top row: Narrative (wide) + Risk Monitor */
-      { id:'narrative',   x:0,   y:0,   w:460, h:100 },
-      { id:'risk',        x:464, y:0,   w:320, h:100 },
-      /* Second row: Chart (wide) */
-      { id:'chart',       x:0,   y:104, w:460, h:290 },
-      /* Second row right: Cross-Asset */
-      { id:'crossasset',  x:464, y:104, w:320, h:290 },
-      /* Third row: FX Pairs + Yield Curve */
-      { id:'fxpairs',     x:0,   y:398, w:460, h:210 },
-      { id:'yields',      x:464, y:398, w:320, h:210 },
-      /* Fourth row: COT + Sessions */
-      { id:'cot',         x:0,   y:612, w:460, h:230 },
-      { id:'sessions',    x:464, y:612, w:320, h:230 },
-      /* Fifth row: Signals + News */
-      { id:'news',        x:0,   y:846, w:380, h:220 },
-      { id:'signals',     x:384, y:846, w:400, h:220 },
+      /* Left column: Liquidity + Crosses + Carry (mirrors sidebar) */
+      { id:'liquidity',      x:0,   y:0,   w:160, h:180 },
+      { id:'crosses',        x:0,   y:184, w:160, h:330 },
+      { id:'carry',          x:0,   y:518, w:160, h:260 },
+      /* Centre-left: Narrative + Chart + FX Pairs + COT + News */
+      { id:'narrative',      x:164, y:0,   w:380, h:100 },
+      { id:'chart',          x:164, y:104, w:380, h:290 },
+      { id:'fxpairs',        x:164, y:398, w:380, h:220 },
+      { id:'cot',            x:164, y:622, w:380, h:230 },
+      { id:'news',           x:164, y:856, w:380, h:200 },
+      /* Centre-right: Risk + Cross-Asset + Yields + Sessions + Signals */
+      { id:'risk',           x:548, y:0,   w:280, h:100 },
+      { id:'crossasset',     x:548, y:104, w:280, h:290 },
+      { id:'yields',         x:548, y:398, w:280, h:220 },
+      { id:'sessions',       x:548, y:622, w:280, h:230 },
+      { id:'signals',        x:548, y:856, w:280, h:200 },
+      /* Right column: CB Rates + Correlations + Expectations + Positioning Bias */
+      { id:'cbrates',        x:832, y:0,   w:200, h:230 },
+      { id:'correlations',   x:832, y:234, w:200, h:310 },
+      { id:'expectations',   x:832, y:548, w:200, h:260 },
+      { id:'positioningbias',x:832, y:812, w:200, h:180 },
     ]
   },
   focus: {
     name: 'Focus layout',
     tiles: [
-      { id:'narrative',  x:0,   y:0,   w:380, h:90  },
-      { id:'risk',       x:384, y:0,   w:220, h:90  },
-      { id:'chart',      x:0,   y:94,  w:600, h:350 },
-      { id:'fxpairs',    x:0,   y:448, w:380, h:200 },
-      { id:'signals',    x:384, y:448, w:220, h:200 },
+      { id:'narrative',      x:0,   y:0,   w:380, h:90  },
+      { id:'risk',           x:384, y:0,   w:220, h:90  },
+      { id:'chart',          x:0,   y:94,  w:600, h:350 },
+      { id:'fxpairs',        x:0,   y:448, w:380, h:200 },
+      { id:'signals',        x:384, y:448, w:220, h:200 },
     ]
   },
   grid: {
     name: 'Grid layout',
     tiles: [
-      { id:'chart',      x:0,   y:0,   w:380, h:260 },
-      { id:'crossasset', x:384, y:0,   w:300, h:260 },
-      { id:'fxpairs',    x:0,   y:264, w:380, h:260 },
-      { id:'risk',       x:384, y:264, w:300, h:260 },
-      { id:'cot',        x:0,   y:528, w:380, h:260 },
-      { id:'yields',     x:384, y:528, w:300, h:260 },
+      { id:'chart',          x:0,   y:0,   w:380, h:260 },
+      { id:'crossasset',     x:384, y:0,   w:300, h:260 },
+      { id:'fxpairs',        x:0,   y:264, w:380, h:260 },
+      { id:'risk',           x:384, y:264, w:300, h:260 },
+      { id:'cot',            x:0,   y:528, w:380, h:260 },
+      { id:'yields',         x:384, y:528, w:300, h:260 },
     ]
   },
   macro: {
     name: 'Macro layout',
     tiles: [
-      { id:'narrative',  x:0,   y:0,   w:690, h:90  },
-      { id:'yields',     x:0,   y:94,  w:340, h:260 },
-      { id:'crossasset', x:344, y:94,  w:346, h:260 },
-      { id:'cot',        x:0,   y:358, w:690, h:230 },
-      { id:'signals',    x:0,   y:592, w:690, h:200 },
+      { id:'narrative',      x:0,   y:0,   w:690, h:90  },
+      { id:'cbrates',        x:0,   y:94,  w:220, h:260 },
+      { id:'expectations',   x:224, y:94,  w:220, h:260 },
+      { id:'yields',         x:448, y:94,  w:242, h:260 },
+      { id:'cot',            x:0,   y:358, w:690, h:230 },
+      { id:'signals',        x:0,   y:592, w:690, h:200 },
     ]
   }
 };
@@ -1063,6 +936,144 @@ const TILE_CONTENT = {
       <div id="tv-econmap-placeholder" style="width:100%;height:100%;min-height:300px;background:var(--bg);"></div>
     </div>`;
   },
+  liquidity() {
+    return `<div style="height:100%;display:flex;flex-direction:column;padding:6px 8px;">
+      <canvas id="liquidity-canvas" height="100" style="display:block;width:100%;cursor:crosshair;flex-shrink:0;"></canvas>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
+        <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">--:--</span>
+        <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:3px;">
+        <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:7px;height:7px;background:rgba(79,127,255,0.35);border-radius:1px;"></span>Tok</span>
+        <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:7px;height:7px;background:rgba(38,166,154,0.45);border-radius:1px;"></span>Lon</span>
+        <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:7px;height:7px;background:rgba(246,148,28,0.4);border-radius:1px;"></span>NY</span>
+      </div>
+      <div style="margin-top:2px;"><span id="liq-source-label" style="font-size:7.5px;color:var(--text3);font-family:var(--font-mono);">Historical avg · fixed reference</span></div>
+      <div id="liq-tooltip" style="display:none;position:fixed;z-index:999;background:var(--bg2);border:1px solid var(--border2);border-radius:3px;padding:4px 7px;font-family:var(--font-mono);font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);"><span id="liq-tt-time" style="color:var(--text3);"></span><br><span id="liq-tt-session" style="color:var(--orange);font-size:8px;"></span><br><span id="liq-tt-vol" style="color:var(--blue);font-weight:600;"></span></div>
+    </div>`;
+  },
+  crosses() {
+    return `<div id="sidebar" style="height:100%;overflow-y:auto;">
+      <div class="sb-row" data-sym="FX_IDC:EURGBP" style="cursor:pointer;"><span class="sb-sym">EUR/GBP</span><span class="sb-price" id="sb-eurgbp">—</span><span class="sb-chg" id="sbc-eurgbp">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:EURJPY" style="cursor:pointer;"><span class="sb-sym">EUR/JPY</span><span class="sb-price" id="sb-eurjpy">—</span><span class="sb-chg" id="sbc-eurjpy">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:EURCHF" style="cursor:pointer;"><span class="sb-sym">EUR/CHF</span><span class="sb-price" id="sb-eurchf">—</span><span class="sb-chg" id="sbc-eurchf">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:EURCAD" style="cursor:pointer;"><span class="sb-sym">EUR/CAD</span><span class="sb-price" id="sb-eurcad">—</span><span class="sb-chg" id="sbc-eurcad">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:EURAUD" style="cursor:pointer;"><span class="sb-sym">EUR/AUD</span><span class="sb-price" id="sb-euraud">—</span><span class="sb-chg" id="sbc-euraud">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:EURNZD" style="cursor:pointer;"><span class="sb-sym">EUR/NZD</span><span class="sb-price" id="sb-eurnzd">—</span><span class="sb-chg" id="sbc-eurnzd">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:GBPJPY" style="cursor:pointer;"><span class="sb-sym">GBP/JPY</span><span class="sb-price" id="sb-gbpjpy">—</span><span class="sb-chg" id="sbc-gbpjpy">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:GBPCHF" style="cursor:pointer;"><span class="sb-sym">GBP/CHF</span><span class="sb-price" id="sb-gbpchf">—</span><span class="sb-chg" id="sbc-gbpchf">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:GBPCAD" style="cursor:pointer;"><span class="sb-sym">GBP/CAD</span><span class="sb-price" id="sb-gbpcad">—</span><span class="sb-chg" id="sbc-gbpcad">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:GBPAUD" style="cursor:pointer;"><span class="sb-sym">GBP/AUD</span><span class="sb-price" id="sb-gbpaud">—</span><span class="sb-chg" id="sbc-gbpaud">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:AUDJPY" style="cursor:pointer;"><span class="sb-sym">AUD/JPY</span><span class="sb-price" id="sb-audjpy">—</span><span class="sb-chg" id="sbc-audjpy">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:AUDNZD" style="cursor:pointer;"><span class="sb-sym">AUD/NZD</span><span class="sb-price" id="sb-audnzd">—</span><span class="sb-chg" id="sbc-audnzd">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:AUDCHF" style="cursor:pointer;"><span class="sb-sym">AUD/CHF</span><span class="sb-price" id="sb-audchf">—</span><span class="sb-chg" id="sbc-audchf">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:AUDCAD" style="cursor:pointer;"><span class="sb-sym">AUD/CAD</span><span class="sb-price" id="sb-audcad">—</span><span class="sb-chg" id="sbc-audcad">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:NZDJPY" style="cursor:pointer;"><span class="sb-sym">NZD/JPY</span><span class="sb-price" id="sb-nzdjpy">—</span><span class="sb-chg" id="sbc-nzdjpy">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:NZDCAD" style="cursor:pointer;"><span class="sb-sym">NZD/CAD</span><span class="sb-price" id="sb-nzdcad">—</span><span class="sb-chg" id="sbc-nzdcad">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:CADJPY" style="cursor:pointer;"><span class="sb-sym">CAD/JPY</span><span class="sb-price" id="sb-cadjpy">—</span><span class="sb-chg" id="sbc-cadjpy">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:CHFJPY" style="cursor:pointer;"><span class="sb-sym">CHF/JPY</span><span class="sb-price" id="sb-chfjpy">—</span><span class="sb-chg" id="sbc-chfjpy">—</span></div>
+    </div>`;
+  },
+  carry() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <div id="carry-rank-rows" style="padding:0;">
+        <div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading…</div>
+      </div>
+    </div>`;
+  },
+  cbrates() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <table id="cbrates-table" aria-label="Central bank interest rates" style="width:100%;border-collapse:collapse;">
+        <thead><tr><th style="text-align:left;padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);" scope="col">Bank</th><th scope="col" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;">Rate</th><th scope="col" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;">Trend</th></tr></thead>
+        <tbody id="cbrates-tbody">
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-us" style="margin-right:5px;border-radius:2px;"></span>Fed</td><td class="up" style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">—</span></td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-eu" style="margin-right:5px;border-radius:2px;"></span>ECB</td><td class="up" style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">—</span></td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-gb" style="margin-right:5px;border-radius:2px;"></span>BoE</td><td class="up" style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">—</span></td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-jp" style="margin-right:5px;border-radius:2px;"></span>BoJ</td><td class="up" style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">—</span></td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-au" style="margin-right:5px;border-radius:2px;"></span>RBA</td><td class="up" style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">—</span></td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-ch" style="margin-right:5px;border-radius:2px;"></span>SNB</td><td class="up" style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">—</span></td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-ca" style="margin-right:5px;border-radius:2px;"></span>BoC</td><td class="up" style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">—</span></td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;"><span class="fi fi-nz" style="margin-right:5px;border-radius:2px;"></span>RBNZ</td><td class="up" style="text-align:right;padding:3px 8px;font-size:10px;">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;"><span class="flat">—</span></td></tr>
+        </tbody>
+      </table>
+    </div>`;
+  },
+  correlations() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);">
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Key Correlations</span>
+        <span id="corr-window-btns" style="display:flex;gap:2px;" role="group" aria-label="Correlation window">
+          <button id="corr-btn-30" onclick="setCorrWindow(30)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;">30d</button>
+          <button id="corr-btn-60" onclick="setCorrWindow(60)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:#fff;border-radius:2px;cursor:pointer;">60d</button>
+          <button id="corr-btn-90" onclick="setCorrWindow(90)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;">90d</button>
+        </span>
+      </div>
+      <table aria-label="Key FX correlations" style="width:100%;border-collapse:collapse;">
+        <thead><tr>
+          <th style="text-align:left;padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);" scope="col">Pair A</th>
+          <th scope="col" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;">Pair B</th>
+          <th scope="col" id="corr-th-window" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;">60d</th>
+          <th scope="col" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;" title="Z-score vs 252-day norm">vs norm</th>
+        </tr></thead>
+        <tbody id="correlations-tbody">
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">EUR/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">DXY</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">AUD/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">Gold</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">USD/JPY</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">US 10Y</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">USD/JPY</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">VIX</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">USD/CAD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">WTI Oil</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">GBP/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">FTSE 100</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">AUD/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">ASX 200</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">NZD/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">NZX 50</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">EUR/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">EuroStoxx</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">GBP/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">Gold</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">DXY</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">SPX</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text3)">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;">Gold</td><td style="text-align:right;padding:3px 8px;font-size:10px;">DXY</td><td style="text-align:right;padding:3px 8px;font-size:10px;color:var(--text3)">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;color:var(--text3)">—</td></tr>
+        </tbody>
+      </table>
+      <div style="padding:3px 8px 4px;font-size:9px;color:var(--text3);">Rolling Pearson · yfinance · vs norm = z-score vs 252d</div>
+    </div>`;
+  },
+  expectations() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <table aria-label="Central bank rate expectations" style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <colgroup><col style="width:44%;"><col style="width:32%;"><col style="width:24%;"></colgroup>
+        <thead><tr>
+          <th style="text-align:left;padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);" scope="col">Bank · Meeting</th>
+          <th scope="col" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;">Bias</th>
+          <th scope="col" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;">Impl.</th>
+        </tr></thead>
+        <tbody id="fed-exp-tbody">
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-us" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>Fed <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">→ —</span></td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text2);font-family:var(--font-mono);">—</td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-eu" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>ECB <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">→ —</span></td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text2);font-family:var(--font-mono);">—</td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-gb" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>BoE <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">→ —</span></td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text2);font-family:var(--font-mono);">—</td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-jp" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>BoJ <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">→ —</span></td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text2);font-family:var(--font-mono);">—</td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-au" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>RBA <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">→ —</span></td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text2);font-family:var(--font-mono);">—</td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-ca" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>BoC <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">→ —</span></td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text2);font-family:var(--font-mono);">—</td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="fi fi-ch" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>SNB <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);"><span class="flat">→ —</span></td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);color:var(--text2);font-family:var(--font-mono);">—</td></tr>
+          <tr><td style="white-space:nowrap;padding:3px 8px;font-size:10px;"><span class="fi fi-nz" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>RBNZ <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;text-align:right;padding:3px 8px;font-size:10px;"><span class="flat">→ —</span></td><td style="text-align:right;padding:3px 8px;font-size:10px;color:var(--text2);font-family:var(--font-mono);">—</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+  },
+  positioningbias() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <table aria-label="Directional positioning bias per pair" style="width:100%;border-collapse:collapse;">
+        <thead><tr>
+          <th style="text-align:left;padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);" scope="col">Pair</th>
+          <th scope="col" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;">1W</th>
+          <th scope="col" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;">1M</th>
+          <th scope="col" style="padding:3px 8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);border-bottom:1px solid var(--border);text-align:right;">Bias</th>
+        </tr></thead>
+        <tbody id="skew-tbody">
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">EUR/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">GBP/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">USD/JPY</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);">—</td></tr>
+          <tr><td style="padding:3px 8px;font-size:10px;">AUD/USD</td><td style="text-align:right;padding:3px 8px;font-size:10px;">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;">—</td><td style="text-align:right;padding:3px 8px;font-size:10px;">—</td></tr>
+        </tbody>
+      </table>
+      <div style="padding:3px 8px 4px;font-size:9px;color:var(--text3);" id="skew-source-label">CBOE/CME Vol Index · 25d RR · Saxo Bank</div>
+    </div>`;
+  },
 };
 
 /* ── TILE FACTORY ──────────────────────────────────────────── */
@@ -1118,6 +1129,14 @@ function addTile(tileId, config) {
   // Initialize chart tile
   if (tileId === 'chart') initChartTile();
   if (tileId === 'econmap') initEconmap();
+  // Liquidity canvas needs a redraw trigger after DOM insertion
+  if (tileId === 'liquidity') {
+    requestAnimationFrame(() => {
+      const safe = (fn) => { try { if (typeof window[fn] === 'function') window[fn](); } catch(e){} };
+      safe('initLiquidityCanvas');
+      safe('drawLiquidityCanvas');
+    });
+  }
 }
 
 function closeTile(id) {
@@ -1299,21 +1318,32 @@ function applyLayout(name) {
 }
 
 function reconnectDataSources() {
-  // dashboard.js renders to fixed IDs in the DOM.
-  // After tiles rebuild, we trigger a refresh if the main module is loaded.
-  if (typeof window.fetchCrossAssetData === 'function') {
-    setTimeout(() => {
-      try { window.fetchRiskData(); } catch(e){}
-      try { window.fetchCrossAssetData(); } catch(e){}
-      try { window.renderFxPairsTable(); } catch(e){}
-      try { window.renderCOTRows(); } catch(e){}
-      try { window.buildRichNarrative(); } catch(e){}
-      try { window.fetchSpreadsData(); } catch(e){}
-      try { window.fetchSentiment(); } catch(e){}
-      try { window.fetchNewsItems(); } catch(e){}
-      try { window.renderRates(); } catch(e){}
-    }, 100);
-  }
+  // dashboard.js renders to fixed DOM IDs.
+  // After tiles rebuild, trigger a refresh so all functions find their target elements.
+  setTimeout(() => {
+    const safe = (fn) => { try { if (typeof window[fn] === 'function') window[fn](); } catch(e){} };
+    safe('fetchRiskData');
+    safe('fetchCrossAssetData');
+    safe('populateFxPairsTable');
+    safe('populateCorrelations');
+    safe('renderCOTRows');
+    safe('buildRichNarrative');
+    safe('fetchReferenceSpreads');
+    safe('fetchSentiment');
+    safe('fetchNewsData');
+    safe('renderRates');
+    safe('fetchCBRates');
+    safe('fetchFedExpectations');
+    safe('fetchOptionSkew');
+    safe('fetchCarryRanking');
+    safe('fetchCarryData');
+    safe('computeSessionVol');
+    // Re-init liquidity canvas if the tile is present
+    if (document.getElementById('liquidity-canvas')) {
+      safe('initLiquidityCanvas');
+      safe('drawLiquidityCanvas');
+    }
+  }, 150);
 }
 
 /* ── LAYOUT SAVE / LOAD ────────────────────────────────────── */
