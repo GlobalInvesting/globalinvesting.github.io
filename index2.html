@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CJLGQET9KJ"></script>
+<script src="assets/analytics.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FX Terminal — Workspace · Global Investing</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://globalinvesting.github.io/">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.69.1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
+
+<style>
+/* ═══════════════════════════════════════════════════════
+   WORKSPACE TILES — Critical inline CSS
+   All color references use CSS variables from dashboard.css
+   ═══════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;
+  --border:#2a2e39;--border2:#363c4e;
+  --text:#d1d4dc;--text2:#9096a0;--text3:#8290a0;
+  --up:#26a69a;--down:#ef5350;--blue:#4f7fff;--orange:#f6941c;
+  --head-bg:#1a1d29;
+  --font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono','Courier New',monospace;
+  /* Tile system */
+  --tile-min-w:280px;
+  --tile-min-h:180px;
+  --tile-head-h:30px;
+  --grid-gap:4px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:12px;line-height:1.4;height:100vh;overflow:hidden;}
+
+/* ── TOPBAR (identical to index.html) ── */
+#topbar{background:var(--head-bg);border-bottom:1px solid var(--border);height:36px;display:flex;align-items:center;padding:0 10px;position:sticky;top:0;z-index:300}
+#tv-ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:34px;flex-shrink:0}
+#news-ticker{background:var(--head-bg);border-bottom:1px solid var(--border);height:22px;display:flex;align-items:center;overflow:hidden;flex-shrink:0}
+.skip-link{position:absolute;left:-9999px;top:8px;z-index:9999;padding:4px 8px;background:var(--blue);color:#fff;font-size:12px;border-radius:3px}
+.skip-link:focus{left:8px}
+
+/* ── WORKSPACE SHELL ── */
+#ws-shell{
+  display:flex;
+  flex-direction:row;
+  height:calc(100vh - 92px); /* topbar 36 + quotebar 34 + newsticker 22 */
+  overflow:hidden;
+}
+
+/* ── WORKSPACE TOOLBAR ── */
+#ws-toolbar{
+  background:var(--head-bg);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:0 10px;
+  height:30px;
+  flex-shrink:0;
+  position:relative;
+  z-index:200;
+}
+.ws-toolbar-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-right:2px;}
+.ws-layout-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  background:transparent;border:1px solid var(--border2);border-radius:3px;
+  color:var(--text2);font-size:10px;font-family:var(--font-ui);
+  padding:2px 8px;cursor:pointer;transition:border-color .15s,color .15s,background .15s;
+  white-space:nowrap;
+}
+.ws-layout-btn:hover{border-color:var(--blue);color:var(--text)}
+.ws-layout-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(79,127,255,.09)}
+.ws-sep{width:1px;height:16px;background:var(--border2);margin:0 4px;flex-shrink:0}
+.ws-add-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(79,127,255,.1);border:1px solid var(--blue);border-radius:3px;
+  color:var(--blue);font-size:10px;font-family:var(--font-ui);font-weight:500;
+  padding:2px 9px;cursor:pointer;transition:background .15s;letter-spacing:.03em;
+}
+.ws-add-btn:hover{background:rgba(79,127,255,.2)}
+.ws-save-btn{
+  margin-left:auto;
+  display:inline-flex;align-items:center;gap:4px;
+  background:transparent;border:1px solid var(--border2);border-radius:3px;
+  color:var(--text3);font-size:10px;font-family:var(--font-ui);
+  padding:2px 8px;cursor:pointer;transition:border-color .15s,color .15s;
+}
+.ws-save-btn:hover{border-color:var(--text2);color:var(--text2)}
+.ws-save-btn.saved{border-color:var(--up);color:var(--up)}
+#ws-layout-name{font-size:10px;color:var(--text3);font-family:var(--font-mono);}
+
+/* ── WORKSPACE MAIN AREA (sidebar + canvas) ── */
+#ws-sidebar{
+  background:var(--bg2);border-right:1px solid var(--border);
+  overflow-y:auto;font-size:11px;scrollbar-width:thin;
+  scrollbar-color:var(--border2) transparent;
+  width:180px;flex-shrink:0;
+  display:flex;flex-direction:column;
+}
+#ws-sidebar::-webkit-scrollbar{width:3px}
+#ws-sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+#ws-main-col{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden;}
+
+#ws-canvas{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+  background:var(--bg);
+  /* Subtle grid overlay */
+  background-image:radial-gradient(circle,var(--border2) 1px,transparent 1px);
+  background-size:24px 24px;
+  background-position:0 0;
+}
+
+/* ── RIGHT PANEL (identical to index.html) ── */
+#ws-rightpanel{
+  background:var(--bg2);border-left:1px solid var(--border);
+  width:220px;flex-shrink:0;overflow-y:auto;font-size:11px;
+  scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
+}
+#ws-rightpanel::-webkit-scrollbar{width:3px}
+#ws-rightpanel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── TILE ── */
+.ws-tile{
+  position:absolute;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:3px;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 1px 6px rgba(0,0,0,.35);
+  transition:box-shadow .12s, border-color .12s;
+  min-width:var(--tile-min-w);
+  min-height:var(--tile-min-h);
+  will-change:transform;
+}
+.ws-tile:hover{box-shadow:0 2px 12px rgba(0,0,0,.5)}
+.ws-tile.dragging{
+  box-shadow:0 8px 32px rgba(0,0,0,.65);
+  border-color:var(--border2);
+  opacity:.95;
+  z-index:500!important;
+}
+.ws-tile.resizing{
+  border-color:var(--blue);
+  box-shadow:0 0 0 1px rgba(79,127,255,.4), 0 4px 24px rgba(0,0,0,.5);
+  z-index:500!important;
+}
+
+/* Tile header */
+.tile-head{
+  background:var(--head-bg);
+  border-bottom:1px solid var(--border);
+  height:var(--tile-head-h);
+  display:flex;align-items:center;
+  padding:0 8px;
+  cursor:grab;
+  user-select:none;
+  flex-shrink:0;
+  gap:6px;
+}
+.tile-head:active{cursor:grabbing}
+.tile-title{
+  font-size:10px;font-weight:700;
+  color:var(--text);text-transform:uppercase;letter-spacing:.07em;
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.tile-sub{
+  font-size:8.5px;color:var(--text3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:120px;
+}
+.tile-controls{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.tile-ctrl-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;border-radius:2px;
+  background:transparent;border:none;
+  color:var(--text3);cursor:pointer;
+  transition:background .12s,color .12s;
+  font-size:10px;line-height:1;
+  font-family:var(--font-ui);
+}
+.tile-ctrl-btn:hover{background:var(--bg3);color:var(--text)}
+.tile-ctrl-btn.close:hover{background:rgba(239,83,80,.2);color:var(--down)}
+
+/* Tile body */
+.tile-body{
+  flex:1;overflow:auto;min-height:0;
+  scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
+}
+.tile-body::-webkit-scrollbar{width:3px}
+.tile-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Resize handle */
+.tile-resize{
+  position:absolute;right:0;bottom:0;
+  width:12px;height:12px;cursor:se-resize;
+  display:flex;align-items:flex-end;justify-content:flex-end;
+  padding:2px;z-index:10;
+}
+.tile-resize::after{
+  content:'';display:block;
+  width:7px;height:7px;
+  border-right:2px solid var(--border2);
+  border-bottom:2px solid var(--border2);
+  border-radius:0 0 2px 0;
+  transition:border-color .12s;
+}
+.ws-tile:hover .tile-resize::after{border-color:var(--text3)}
+.ws-tile.resizing .tile-resize::after{border-color:var(--blue)}
+
+/* ── PANEL CATALOG OVERLAY ── */
+#ws-catalog{
+  display:none;
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(2px);
+  align-items:flex-start;justify-content:center;
+  padding-top:80px;
+}
+#ws-catalog.open{display:flex;}
+#ws-catalog-box{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:5px;width:560px;max-height:70vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 12px 48px rgba(0,0,0,.7);
+}
+#ws-catalog-head{
+  background:var(--head-bg);border-bottom:1px solid var(--border);
+  padding:10px 14px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;border-radius:5px 5px 0 0;
+}
+#ws-catalog-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text);}
+#ws-catalog-close{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0;line-height:1;}
+#ws-catalog-close:hover{color:var(--text)}
+#ws-catalog-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  padding:14px;overflow-y:auto;
+}
+.cat-item{
+  background:var(--bg);border:1px solid var(--border2);border-radius:4px;
+  padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s;
+  display:flex;flex-direction:column;gap:3px;position:relative;
+}
+.cat-item:hover{border-color:var(--blue);background:rgba(79,127,255,.05)}
+.cat-item.active-panel{opacity:.45;cursor:not-allowed;pointer-events:none;}
+.cat-item.active-panel::after{content:'Active';position:absolute;top:8px;right:8px;font-size:8px;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em;}
+.cat-name{font-size:11px;font-weight:600;color:var(--text);}
+.cat-desc{font-size:10px;color:var(--text3);line-height:1.4;}
+.cat-tag{font-size:8px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin-top:2px;}
+
+/* Layout preset icons (SVG inline buttons) */
+.layout-icon{display:inline-block;vertical-align:middle;margin-right:4px}
+
+/* ── STATUSBAR (identical) ── */
+#statusbar{background:var(--head-bg);border-top:1px solid var(--border);height:24px;display:flex;align-items:center;padding:0 10px;gap:12px;font-size:10px;font-family:var(--font-mono);flex-shrink:0;position:relative;z-index:100;}
+.sb-k{color:var(--text3);letter-spacing:.05em}
+.sb-v{color:var(--text2)}
+.footer-copy{font-size:9px;color:var(--text3);}
+
+/* Reuse dashboard.css panel/table styles inside tiles */
+.tile-body .panel-head{display:none} /* suppress redundant header inside tile body */
+.tile-body table{width:100%;border-collapse:collapse}
+.tile-body th,.tile-body td{padding:3px 8px;font-size:10px;border-bottom:1px solid var(--border);text-align:right;color:var(--text2)}
+.tile-body th{text-align:right;color:var(--text3);font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);}
+.tile-body td:first-child,.tile-body th:first-child{text-align:left}
+.tile-body tr:last-child td{border-bottom:none}
+.tile-body .up{color:var(--up)}
+.tile-body .down{color:var(--down)}
+.tile-body .flat{color:var(--text3)}
+.tile-body .sym{font-family:var(--font-mono);font-weight:600;color:var(--text);font-size:10px;}
+
+/* Heatmap in tile */
+.tile-body .heatmap{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:6px}
+.tile-body .hm-cell{padding:6px 4px;border-radius:3px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.tile-body .hm-sym{font-size:10px;font-weight:600;color:var(--text)}
+.tile-body .hm-val{font-size:11px;font-family:var(--font-mono);font-weight:600}
+.tile-body .hm-val.up{color:var(--up)}.tile-body .hm-val.down{color:var(--down)}.tile-body .hm-val.flat{color:var(--text3)}
+
+/* Cross asset in tile */
+.tile-body .ca-cell{padding:6px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.tile-body .ca-cell:last-child{border-bottom:none}
+.tile-body .ca-name{font-size:10px;color:var(--text2)}
+.tile-body .ca-val{font-size:11px;font-family:var(--font-mono);font-weight:600;color:var(--text)}
+.tile-body .ca-chg{font-size:10px;font-family:var(--font-mono);min-width:54px;text-align:right}
+
+/* Risk grid in tile */
+.tile-body .risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.tile-body .risk-cell{padding:8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);}
+.tile-body .risk-cell:nth-child(2n){border-right:none}
+.tile-body .risk-cell:nth-last-child(-n+2){border-bottom:none}
+.tile-body .risk-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.tile-body .risk-val{font-size:18px;font-family:var(--font-mono);font-weight:700;color:var(--text);line-height:1.1}
+.tile-body .risk-sub{font-size:9px;color:var(--text3);margin-top:2px}
+
+/* COT rows in tile */
+.tile-body .cot-row{display:grid;grid-template-columns:28px 1fr 38px 50px 42px 14px 40px 36px;gap:2px;align-items:center;padding:3px 8px;border-bottom:1px solid var(--border);font-size:9.5px;}
+.tile-body .cot-row:last-child{border-bottom:none}
+.tile-body .cot-header{display:grid;grid-template-columns:28px 1fr 38px 50px 42px 14px 40px 36px;gap:2px;padding:3px 8px 3px;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);background:var(--head-bg);}
+.tile-body .cot-scroll-wrap{overflow-x:auto}
+
+/* Narrative tile */
+.tile-narr{padding:8px 10px;font-size:11px;line-height:1.6;color:var(--text2);overflow-y:auto;height:100%}
+.tile-narr .narr-regime-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.08em;margin-bottom:6px;font-family:var(--font-mono);}
+
+/* Alert rows in tile */
+.tile-body .alert-row{padding:5px 8px;border-bottom:1px solid var(--border);font-size:10px;display:flex;gap:8px;align-items:flex-start;}
+.tile-body .alert-row:last-child{border-bottom:none}
+.tile-body .alert-badge{font-size:8px;padding:1px 5px;border-radius:2px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;font-family:var(--font-mono);}
+.tile-body .badge-up{background:rgba(38,166,154,.18);color:var(--up)}
+.tile-body .badge-down{background:rgba(239,83,80,.18);color:var(--down)}
+.tile-body .badge-neutral{background:var(--bg3);color:var(--text3)}
+
+/* Session rows in tile */
+.tile-body .session-row{display:flex;gap:6px;padding:5px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tile-body .sess{font-size:9px;padding:2px 6px;border-radius:2px;border:1px solid var(--border2);color:var(--text3);}
+.tile-body .sess.open{border-color:var(--up);color:var(--up);background:rgba(38,166,154,.08);}
+
+/* Spread bar in tile */
+.tile-body .spread-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-bottom:1px solid var(--border);}
+.tile-body .spread-row:last-child{border-bottom:none}
+.tile-body .spr-sym{width:56px;font-size:9.5px;color:var(--text2);flex-shrink:0;font-family:var(--font-mono);}
+.tile-body .spr-bar{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.tile-body .spr-fill{height:100%;border-radius:2px;}
+.tile-body .spr-val{font-size:9.5px;font-family:var(--font-mono);min-width:40px;text-align:right;flex-shrink:0;}
+
+/* News items in tile */
+.tile-body .news-item{padding:5px 8px;border-bottom:1px solid var(--border);cursor:pointer;}
+.tile-body .news-item:last-child{border-bottom:none}
+.tile-body .news-item:hover{background:var(--bg3)}
+.tile-body .news-hl{font-size:10px;color:var(--text);line-height:1.4}
+.tile-body .news-meta{font-size:8.5px;color:var(--text3);margin-top:2px;font-family:var(--font-mono);}
+
+/* Myfxbook sentiment in tile */
+.tile-body .sent-row{display:flex;align-items:center;gap:8px;padding:4px 8px;border-bottom:1px solid var(--border);}
+.tile-body .sent-sym{width:56px;font-size:9.5px;color:var(--text);flex-shrink:0;font-family:var(--font-mono);}
+.tile-body .sent-bar-wrap{flex:1;display:flex;flex-direction:column;gap:2px}
+.tile-body .sent-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;position:relative}
+.tile-body .sent-long{position:absolute;left:0;top:0;height:100%;background:var(--up);border-radius:2px;}
+.tile-body .sent-short{position:absolute;right:0;top:0;height:100%;background:var(--down);border-radius:2px;}
+.tile-body .sent-pct{display:flex;justify-content:space-between;font-size:8px;color:var(--text3);font-family:var(--font-mono);}
+
+/* Carry rank in tile */
+.tile-body .carry-row{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;border-bottom:1px solid var(--border);font-size:10px;}
+.tile-body .carry-row:last-child{border-bottom:none}
+.tile-body .carry-ccy{font-family:var(--font-mono);font-weight:600;color:var(--text);width:28px;}
+.tile-body .carry-bar-outer{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin:0 8px;}
+.tile-body .carry-bar-inner{height:100%;border-radius:3px;}
+.tile-body .carry-val{font-size:9px;font-family:var(--font-mono);min-width:38px;text-align:right;}
+
+/* CB rates in tile use rightpanel styling */
+#ws-rightpanel .sb-head{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:6px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);}
+#ws-rightpanel table{width:100%;border-collapse:collapse;}
+#ws-rightpanel th,#ws-rightpanel td{padding:3px 6px;font-size:10px;border-bottom:1px solid var(--border);text-align:right;color:var(--text2);}
+#ws-rightpanel th{text-align:right;color:var(--text3);font-size:8.5px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;background:var(--head-bg);}
+#ws-rightpanel td:first-child,#ws-rightpanel th:first-child{text-align:left;}
+#ws-rightpanel tr:last-child td{border-bottom:none;}
+#ws-rightpanel .up{color:var(--up)}
+#ws-rightpanel .down{color:var(--down)}
+#ws-rightpanel .flat{color:var(--text3)}
+
+/* Sidebar in workspace */
+#ws-sidebar .sb-section{border-bottom:1px solid var(--border);}
+#ws-sidebar .sb-head{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:6px 8px 4px;background:var(--head-bg);border-bottom:1px solid var(--border);}
+#ws-sidebar .sb-row{display:flex;align-items:center;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+#ws-sidebar .sb-row:hover{background:var(--bg3)}
+#ws-sidebar .sb-sym{font-size:10px;font-family:var(--font-mono);color:var(--text);font-weight:600;}
+#ws-sidebar .sb-price{font-size:10px;font-family:var(--font-mono);color:var(--text);}
+#ws-sidebar .sb-chg{font-size:9px;font-family:var(--font-mono);min-width:44px;text-align:right;}
+
+/* Chart tile */
+.tile-chart-inner{width:100%;height:100%;position:relative;overflow:hidden;}
+.tile-chart-tabs{display:flex;overflow-x:auto;background:var(--head-bg);border-bottom:1px solid var(--border);scrollbar-width:none;flex-shrink:0;}
+.tile-chart-tabs::-webkit-scrollbar{display:none}
+.tv-tab-sm{background:none;border:none;border-right:1px solid var(--border);color:var(--text3);font-size:9px;padding:3px 8px;cursor:pointer;white-space:nowrap;font-family:var(--font-ui);}
+.tv-tab-sm:hover{color:var(--text);background:var(--bg3)}
+.tv-tab-sm.active{color:var(--blue);background:rgba(79,127,255,.08);}
+
+/* ── Quotebar (shared with index.html) ── */
+#tv-ticker{display:flex;align-items:center;flex:1;overflow:hidden;position:relative;}
+#quotebar-inner{display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;padding:0 4px;}
+#quotebar-inner::-webkit-scrollbar{display:none}
+.q-item{display:flex;align-items:center;gap:5px;padding:0 10px;border-right:1px solid var(--border);height:34px;cursor:pointer;transition:background .1s;white-space:nowrap;flex-shrink:0;}
+.q-item:hover{background:var(--bg3)}
+.q-sym{font-size:10px;font-weight:600;color:var(--text);font-family:var(--font-mono);}
+.q-price{font-size:11px;font-family:var(--font-mono);color:var(--text);}
+.q-chg{font-size:9px;font-family:var(--font-mono);}
+.q-chg.up{color:var(--up)}.q-chg.down{color:var(--down)}.q-chg.flat{color:var(--text3)}
+.qb-arrow{background:var(--bg2);border:none;border-right:1px solid var(--border);color:var(--text2);width:20px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;height:34px;}
+.qb-arrow:last-child{border-right:none;border-left:1px solid var(--border);}
+#qb-source-label{font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;}
+
+/* News ticker */
+.ticker-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:0 8px;flex-shrink:0;border-right:1px solid var(--border2);}
+.ticker-track{display:flex;animation:ticker-scroll 80s linear infinite;white-space:nowrap;}
+.ticker-item{display:inline-block;padding:0 30px;font-size:10px;color:var(--text2);}
+@keyframes ticker-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* Topbar shared styles */
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;margin-right:12px;flex-shrink:0;}
+.logo-text{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.01em;}
+.logo-sub{font-size:9px;color:var(--text3);display:block;letter-spacing:.05em;text-transform:uppercase;}
+.top-nav{display:flex;align-items:center;gap:0;height:36px;overflow-x:auto;scrollbar-width:none;}
+.top-nav::-webkit-scrollbar{display:none}
+.top-nav a{color:var(--text3);text-decoration:none;font-size:10.5px;padding:0 10px;height:36px;display:flex;align-items:center;border-right:1px solid var(--border);transition:color .12s,background .12s;white-space:nowrap;}
+.top-nav a:hover{color:var(--text);background:var(--bg3)}
+.top-nav a.active{color:var(--text);border-bottom:2px solid var(--blue);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--up);display:inline-block;margin-right:4px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+#session-label{font-size:10px;font-family:var(--font-mono);color:var(--text3);padding:0 8px;border-right:1px solid var(--border2);}
+#clock{font-size:10px;font-family:var(--font-mono);color:var(--text2);}
+.site-menu{position:relative;}
+.site-menu-btn{background:none;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:10px;font-family:var(--font-ui);padding:3px 8px;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.site-menu-btn:hover{border-color:var(--text2);color:var(--text)}
+.site-menu-panel{display:none;position:absolute;right:0;top:calc(100% + 6px);background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:6px 0;min-width:200px;box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:500;}
+.site-menu:hover .site-menu-panel{display:block}
+.site-menu-panel a{display:block;padding:5px 14px;font-size:11px;color:var(--text2);text-decoration:none;}
+.site-menu-panel a:hover{color:var(--text);background:var(--bg3)}
+.site-menu-section{display:block;padding:6px 14px 3px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);}
+.site-menu-divider{height:1px;background:var(--border);margin:4px 0;}
+
+/* Workspace nav link style */
+.ws-nav-link{display:flex;align-items:center;gap:5px;padding:0 10px;height:36px;font-size:10.5px;color:var(--text3);text-decoration:none;border-right:1px solid var(--border);transition:color .12s,background .12s;white-space:nowrap;}
+.ws-nav-link:hover{color:var(--text);background:var(--bg3)}
+.ws-nav-link.ws-active{color:var(--blue);background:rgba(79,127,255,.06);}
+.ws-nav-badge{font-size:8px;padding:1px 4px;border-radius:2px;background:rgba(79,127,255,.2);color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+
+/* ── Sidebar FX Liquidity canvas ── */
+#ws-liq-canvas-wrap{padding:6px 8px 4px;position:relative}
+
+/* ── YIELD CANVAS ── */
+#ws-yield-canvas-wrap{padding:0 8px 6px;cursor:pointer;}
+
+/* Tile loading state */
+.tile-loading{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:10px;font-family:var(--font-mono);}
+
+/* ── RESPONSIVE: disable workspace on mobile, show notice ── */
+@media(max-width:900px){
+  #ws-shell{display:none}
+  #ws-mobile-notice{display:flex}
+}
+#ws-mobile-notice{
+  display:none;
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:12px;
+  padding:30px;height:calc(100vh - 92px);
+  text-align:center;
+}
+#ws-mobile-notice p{font-size:12px;color:var(--text3);max-width:300px;line-height:1.6}
+</style>
+
+<script src="assets/sw-register.js" defer></script>
+</head>
+<body>
+
+<a href="#ws-canvas" class="skip-link">Skip to workspace</a>
+
+<!-- ═══════════════════════════════════════
+     TOPBAR — identical to index.html
+     ═══════════════════════════════════════ -->
+<header id="topbar" role="banner" aria-label="Global Investing FX Terminal">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="logo-56.png" alt="Global Investing" width="28" height="28" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;" fetchpriority="high">
+    <span>
+      <span class="logo-text">Global Investing</span>
+      <span class="logo-sub">FX Terminal</span>
+    </span>
+  </a>
+  <nav class="top-nav" aria-label="Dashboard sections">
+    <a href="index.html" title="Standard terminal view">Standard</a>
+    <a href="index2.html" class="active ws-nav-link ws-active" title="Workspace tiles view">
+      Workspace
+      <span class="ws-nav-badge">Beta</span>
+    </a>
+  </nav>
+  <div class="topbar-right">
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu" aria-expanded="false" aria-controls="site-menu-dropdown">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/>
+          <rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/>
+          <rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/>
+        </svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="terms.html">Terms of Use</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html">How to Use the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html">Retail FX Positioning</a>
+        <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html">COT / CFTC Positioning</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Market Research</span>
+        <a href="guide-gbpjpy-cot.html">GBP/JPY Bias Factors</a>
+      </div>
+    </div>
+    <span id="session-label">DETECTING...</span>
+    <span><span class="live-dot"></span><span id="clock">--:--:-- UTC</span></span>
+  </div>
+</header>
+
+<!-- QUOTE BAR -->
+<div id="tv-ticker-wrap">
+  <button id="qb-prev" class="qb-arrow" aria-label="Scroll quotes left">&#8249;</button>
+  <div id="tv-ticker">
+    <div id="quotebar-inner">
+      <div class="q-item" data-sym="FX_IDC:EURUSD" style="cursor:pointer;" title="Click: chart"><span class="q-sym">EUR/USD</span><span class="q-price" id="q-eurusd">—</span><span class="q-chg" id="qc-eurusd">—</span></div>
+      <div class="q-item" data-sym="FX_IDC:USDJPY" style="cursor:pointer;" title="Click: chart"><span class="q-sym">USD/JPY</span><span class="q-price" id="q-usdjpy">—</span><span class="q-chg" id="qc-usdjpy">—</span></div>
+      <div class="q-item" data-sym="FX_IDC:GBPUSD" style="cursor:pointer;" title="Click: chart"><span class="q-sym">GBP/USD</span><span class="q-price" id="q-gbpusd">—</span><span class="q-chg" id="qc-gbpusd">—</span></div>
+      <div class="q-item" data-sym="FX_IDC:AUDUSD" style="cursor:pointer;" title="Click: chart"><span class="q-sym">AUD/USD</span><span class="q-price" id="q-audusd">—</span><span class="q-chg" id="qc-audusd">—</span></div>
+      <div class="q-item" data-sym="FX_IDC:USDCAD" style="cursor:pointer;" title="Click: chart"><span class="q-sym">USD/CAD</span><span class="q-price" id="q-usdcad">—</span><span class="q-chg" id="qc-usdcad">—</span></div>
+      <div class="q-item" data-sym="FX_IDC:USDCHF" style="cursor:pointer;" title="Click: chart"><span class="q-sym">USD/CHF</span><span class="q-price" id="q-usdchf">—</span><span class="q-chg" id="qc-usdchf">—</span></div>
+      <div class="q-item" data-sym="FX_IDC:NZDUSD" style="cursor:pointer;" title="Click: chart"><span class="q-sym">NZD/USD</span><span class="q-price" id="q-nzdusd">—</span><span class="q-chg" id="qc-nzdusd">—</span></div>
+      <div class="q-item" data-sym="CMCMARKETS:GOLDM2026" style="cursor:pointer;" title="Gold front-month futures"><span class="q-sym">GOLD FUT</span><span class="q-price" id="q-xauusd">—</span><span class="q-chg" id="qc-xauusd">—</span></div>
+      <div class="q-item" data-sym="FPMARKETS:WTI" style="cursor:pointer;" title="WTI Crude front-month futures"><span class="q-sym">WTI FUT</span><span class="q-price" id="q-wti">—</span><span class="q-chg" id="qc-wti">—</span></div>
+      <div class="q-item" data-sym="COINBASE:BTCUSD" style="cursor:pointer;" title="Click: chart"><span class="q-sym">BTC/USD</span><span class="q-price" id="q-btcusd">—</span><span class="q-chg" id="qc-btcusd">—</span></div>
+      <div class="q-item" data-sym="FRED:DGS10" style="cursor:pointer;" title="Click: chart"><span class="q-sym">US 10Y</span><span class="q-price" id="q-us10y">—</span><span class="q-chg" id="qc-us10y">—</span></div>
+      <div class="q-item" data-sym="PEPPERSTONE:USDX" style="cursor:pointer;" title="Click: chart"><span class="q-sym">DXY</span><span class="q-price" id="q-dxy">—</span><span class="q-chg" id="qc-dxy">—</span></div>
+    </div>
+    <span id="qb-source-label">yfinance</span>
+  </div>
+  <button id="qb-next" class="qb-arrow" aria-label="Scroll quotes right">&#8250;</button>
+</div>
+
+<!-- NEWS TICKER -->
+<div id="news-ticker">
+  <div class="ticker-label">HEADLINES</div>
+  <div style="flex:1;overflow:hidden;">
+    <div class="ticker-track" id="ticker-track">
+      <span class="ticker-item" style="color:var(--text3);">Loading headlines…</span>
+    </div>
+  </div>
+</div>
+
+<!-- WORKSPACE TOOLBAR -->
+<div id="ws-toolbar" role="toolbar" aria-label="Workspace controls">
+  <span class="ws-toolbar-label">Layout</span>
+  <button class="ws-layout-btn active" id="ws-btn-terminal" onclick="applyLayout('terminal')" title="Terminal layout — mirrors current standard view" aria-pressed="true">
+    <svg width="12" height="10" viewBox="0 0 12 10" fill="currentColor" aria-hidden="true"><rect x="0" y="0" width="5" height="10" rx="1" opacity=".8"/><rect x="6" y="0" width="3" height="5" rx="1" opacity=".8"/><rect x="6" y="6" width="3" height="4" rx="1" opacity=".8"/><rect x="10" y="0" width="2" height="10" rx="1" opacity=".5"/></svg>
+    Terminal
+  </button>
+  <button class="ws-layout-btn" id="ws-btn-focus" onclick="applyLayout('focus')" title="Focus layout — chart + key signals" aria-pressed="false">
+    <svg width="12" height="10" viewBox="0 0 12 10" fill="currentColor" aria-hidden="true"><rect x="0" y="0" width="7" height="10" rx="1" opacity=".8"/><rect x="8" y="0" width="4" height="4" rx="1" opacity=".8"/><rect x="8" y="5" width="4" height="5" rx="1" opacity=".8"/></svg>
+    Focus
+  </button>
+  <button class="ws-layout-btn" id="ws-btn-grid" onclick="applyLayout('grid')" title="Grid layout — equal tiles" aria-pressed="false">
+    <svg width="12" height="10" viewBox="0 0 12 10" fill="currentColor" aria-hidden="true"><rect x="0" y="0" width="5" height="4" rx="1" opacity=".8"/><rect x="6" y="0" width="6" height="4" rx="1" opacity=".8"/><rect x="0" y="5" width="5" height="5" rx="1" opacity=".8"/><rect x="6" y="5" width="6" height="5" rx="1" opacity=".8"/></svg>
+    Grid
+  </button>
+  <button class="ws-layout-btn" id="ws-btn-macro" onclick="applyLayout('macro')" title="Macro layout — rates, CB, positioning" aria-pressed="false">
+    <svg width="12" height="10" viewBox="0 0 12 10" fill="currentColor" aria-hidden="true"><rect x="0" y="0" width="3" height="10" rx="1" opacity=".6"/><rect x="4" y="0" width="8" height="3" rx="1" opacity=".8"/><rect x="4" y="4" width="8" height="3" rx="1" opacity=".8"/><rect x="4" y="8" width="8" height="2" rx="1" opacity=".8"/></svg>
+    Macro
+  </button>
+  <div class="ws-sep" aria-hidden="true"></div>
+  <button class="ws-add-btn" onclick="openCatalog()" aria-label="Add panel to workspace" aria-haspopup="dialog">
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><rect x="4" y="0" width="2" height="10" rx="1"/><rect x="0" y="4" width="10" height="2" rx="1"/></svg>
+    Add Panel
+  </button>
+  <span id="ws-layout-name" aria-live="polite">Terminal layout</span>
+  <button class="ws-save-btn" id="ws-save-btn" onclick="saveLayout()" aria-label="Save current layout">
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 1h6l2 2v6H1z"/><rect x="3" y="6" width="4" height="4" fill="currentColor" stroke="none" rx=".5"/><rect x="3" y="1" width="4" height="3" fill="currentColor" stroke="none" rx=".5"/></svg>
+    Save Layout
+  </button>
+</div>
+
+<!-- WORKSPACE SHELL -->
+<div id="ws-shell" role="main" aria-label="Workspace">
+
+  <!-- SIDEBAR (FX pairs / liquidity / carry) -->
+  <aside id="ws-sidebar" aria-label="FX pairs sidebar">
+    <div class="sb-section">
+      <div class="sb-head">FX Liquidity</div>
+      <div id="ws-liq-canvas-wrap">
+        <canvas id="liquidity-canvas" height="100" style="display:block;width:100%;cursor:crosshair;"></canvas>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
+          <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">--:--</span>
+          <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:3px;">
+          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:7px;height:7px;background:rgba(79,127,255,0.35);border-radius:1px;"></span>Tok</span>
+          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:7px;height:7px;background:rgba(38,166,154,0.45);border-radius:1px;"></span>Lon</span>
+          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:7px;height:7px;background:rgba(246,148,28,0.4);border-radius:1px;"></span>NY</span>
+        </div>
+        <div style="margin-top:2px;"><span id="liq-source-label" style="font-size:7.5px;color:var(--text3);font-family:var(--font-mono);">Historical avg · fixed reference</span></div>
+        <div id="liq-tooltip" style="display:none;position:fixed;z-index:999;background:var(--bg2);border:1px solid var(--border2);border-radius:3px;padding:4px 7px;font-family:var(--font-mono);font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);"><span id="liq-tt-time" style="color:var(--text3);"></span><br><span id="liq-tt-session" style="color:var(--orange);font-size:8px;"></span><br><span id="liq-tt-vol" style="color:var(--blue);font-weight:600;"></span></div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-head">Crosses</div>
+      <div style="overflow-y:auto;max-height:280px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;">
+        <div class="sb-row" data-sym="FX_IDC:EURGBP" style="cursor:pointer;"><span class="sb-sym">EUR/GBP</span><span class="sb-price" id="sb-eurgbp">—</span><span class="sb-chg" id="sbc-eurgbp">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:EURJPY" style="cursor:pointer;"><span class="sb-sym">EUR/JPY</span><span class="sb-price" id="sb-eurjpy">—</span><span class="sb-chg" id="sbc-eurjpy">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:EURCHF" style="cursor:pointer;"><span class="sb-sym">EUR/CHF</span><span class="sb-price" id="sb-eurchf">—</span><span class="sb-chg" id="sbc-eurchf">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:EURCAD" style="cursor:pointer;"><span class="sb-sym">EUR/CAD</span><span class="sb-price" id="sb-eurcad">—</span><span class="sb-chg" id="sbc-eurcad">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:GBPJPY" style="cursor:pointer;"><span class="sb-sym">GBP/JPY</span><span class="sb-price" id="sb-gbpjpy">—</span><span class="sb-chg" id="sbc-gbpjpy">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:GBPCHF" style="cursor:pointer;"><span class="sb-sym">GBP/CHF</span><span class="sb-price" id="sb-gbpchf">—</span><span class="sb-chg" id="sbc-gbpchf">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:AUDJPY" style="cursor:pointer;"><span class="sb-sym">AUD/JPY</span><span class="sb-price" id="sb-audjpy">—</span><span class="sb-chg" id="sbc-audjpy">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:AUDNZD" style="cursor:pointer;"><span class="sb-sym">AUD/NZD</span><span class="sb-price" id="sb-audnzd">—</span><span class="sb-chg" id="sbc-audnzd">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:NZDJPY" style="cursor:pointer;"><span class="sb-sym">NZD/JPY</span><span class="sb-price" id="sb-nzdjpy">—</span><span class="sb-chg" id="sbc-nzdjpy">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:CADJPY" style="cursor:pointer;"><span class="sb-sym">CAD/JPY</span><span class="sb-price" id="sb-cadjpy">—</span><span class="sb-chg" id="sbc-cadjpy">—</span></div>
+        <div class="sb-row" data-sym="FX_IDC:CHFJPY" style="cursor:pointer;"><span class="sb-sym">CHF/JPY</span><span class="sb-price" id="sb-chfjpy">—</span><span class="sb-chg" id="sbc-chfjpy">—</span></div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-head">Carry Ranking</div>
+      <div id="carry-rank-rows">
+        <div style="padding:4px 8px;font-size:10px;color:var(--text3);">Loading…</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN WORKSPACE COLUMN -->
+  <div id="ws-main-col">
+    <!-- WORKSPACE CANVAS — tiles are absolutely positioned here -->
+    <div id="ws-canvas" role="region" aria-label="Workspace canvas" tabindex="0">
+      <!-- Tiles injected by JS -->
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL — CB Rates, Correlations, Expectations, Positioning Bias -->
+  <aside id="ws-rightpanel" aria-label="Market data panels">
+    <div id="section-cbrates" class="sb-head">Central Bank Rates</div>
+    <table id="cbrates-table" aria-label="Central bank interest rates">
+      <thead><tr><th style="text-align:left" scope="col">Bank</th><th scope="col">Rate</th><th scope="col">Trend</th></tr></thead>
+      <tbody id="cbrates-tbody">
+        <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">Fed</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-eu" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">ECB</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-gb" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">BoE</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-jp" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">BoJ</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-au" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">RBA</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-ch" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">SNB</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-ca" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">BoC</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-nz" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">RBNZ</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="sb-head" style="margin-top:2px;display:flex;align-items:center;justify-content:space-between;">
+      <span>Key Correlations</span>
+      <span id="corr-window-btns" style="display:flex;gap:2px;" role="group" aria-label="Correlation window">
+        <button id="corr-btn-30" onclick="setCorrWindow(30)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;">30d</button>
+        <button id="corr-btn-60" onclick="setCorrWindow(60)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:#fff;border-radius:2px;cursor:pointer;">60d</button>
+        <button id="corr-btn-90" onclick="setCorrWindow(90)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;">90d</button>
+      </span>
+    </div>
+    <table aria-label="Key FX correlations">
+      <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col" id="corr-th-window">60d</th><th scope="col" title="Z-score vs 252-day norm · |z|>1.5 = correlation break">vs norm</th></tr></thead>
+      <tbody id="correlations-tbody">
+        <tr><td>EUR/USD</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>AUD/USD</td><td>Gold</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>USD/JPY</td><td>US 10Y</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>USD/JPY</td><td>VIX</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>USD/CAD</td><td>WTI Oil</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>GBP/USD</td><td>FTSE 100</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>AUD/USD</td><td>ASX 200</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>NZD/USD</td><td>NZX 50</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>EUR/USD</td><td>EuroStoxx</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>GBP/USD</td><td>Gold</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>DXY</td><td>SPX</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>Gold</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+      </tbody>
+    </table>
+    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling Pearson · yfinance · vs norm = z-score vs 252d</div>
+
+    <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
+    <table aria-label="Central bank rate expectations" style="table-layout:fixed;width:100%;">
+      <colgroup><col style="width:42%;"><col style="width:33%;"><col style="width:25%;"></colgroup>
+      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col">Bias</th><th scope="col">Impl.</th></tr></thead>
+      <tbody id="fed-exp-tbody">
+        <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">Fed</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-eu" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">ECB</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-gb" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">BoE</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-jp" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">BoJ</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-au" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">RBA</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-ca" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">BoC</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-ch" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">SNB</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-nz" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">RBNZ</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="sb-head" style="margin-top:2px;">Positioning Bias <span style="font-size:9px;color:var(--text3);font-weight:normal;" id="skew-source-label">ETF IV · COT · 25d RR</span></div>
+    <table aria-label="Directional positioning bias per pair">
+      <thead><tr><th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th></tr></thead>
+      <tbody id="skew-tbody">
+        <tr><td>EUR/USD</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>GBP/USD</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>USD/JPY</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>AUD/USD</td><td>—</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
+      ECB · CFTC · yfinance · Myfxbook · TradingView · AI
+    </div>
+  </aside>
+
+</div><!-- /#ws-shell -->
+
+<!-- MOBILE NOTICE -->
+<div id="ws-mobile-notice" aria-label="Workspace unavailable on mobile" role="alert">
+  <p>The workspace view requires a wider screen. Use the <a href="index.html" style="color:var(--blue);">standard terminal</a> for the best mobile experience.</p>
+</div>
+
+<!-- STATUS BAR -->
+<footer id="statusbar" role="contentinfo" aria-label="Status bar">
+  <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB · CFTC · YF · TV</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">DELAY</span><span class="sb-v" style="color:var(--orange);">~5 MIN</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
+  <div class="footer-copy">&copy; 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <span class="sb-v">Workspace v1.0 · FX Terminal v7.52.0</span>
+  </div>
+</footer>
+
+<!-- PANEL CATALOG OVERLAY -->
+<div id="ws-catalog" role="dialog" aria-modal="true" aria-label="Add panel to workspace" aria-labelledby="ws-catalog-title">
+  <div id="ws-catalog-box">
+    <div id="ws-catalog-head">
+      <span id="ws-catalog-title">Add Panel</span>
+      <button id="ws-catalog-close" onclick="closeCatalog()" aria-label="Close panel catalog">&#x2715;</button>
+    </div>
+    <div id="ws-catalog-grid" role="list">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- PAIR DETAIL POPOVER -->
+<div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
+<div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+<!-- ═══════════════════════════════════════
+     WORKSPACE ENGINE
+     ═══════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── TILE REGISTRY ─────────────────────────────────────────── */
+const TILE_CATALOG = [
+  { id:'narrative',   label:'Market Narrative',     sub:'AI · updated 12×/day',     desc:'AI-generated market analysis and regime context derived from live data.', tag:'AI · Narrative' },
+  { id:'chart',       label:'Price Chart',          sub:'TradingView · live',        desc:'Interactive price chart with 22+ FX and cross-asset symbols.', tag:'Charting' },
+  { id:'fxpairs',     label:'FX Pairs — Majors',    sub:'yfinance · ~5min delay',    desc:'Bid/Ask, spread, 1D/1W change, HV30 and session range for G8 majors.', tag:'FX · Rates' },
+  { id:'heatmap',     label:'Currency Strength',    sub:'ECB ref rates · Stooq',     desc:'Relative performance heatmap across the G8 currency basket.', tag:'FX · Strength' },
+  { id:'crossasset',  label:'Cross-Asset',          sub:'Multi-source · daily',      desc:'S&P 500, Gold, WTI, BTC, Nikkei, EuroStoxx, DXY, US 10Y.', tag:'Cross-Asset' },
+  { id:'risk',        label:'Risk Monitor',         sub:'VIX · MOVE · HV30',        desc:'VIX, MOVE index, EUR/USD HV30 and stress regime score.', tag:'Risk' },
+  { id:'yields',      label:'Rates & Yield Curve',  sub:'yfinance · FRED',           desc:'US Treasury yields (3M–30Y) with spread analysis and yield curve chart.', tag:'Rates' },
+  { id:'cot',         label:'CFTC Positioning',     sub:'CFTC.gov · weekly',         desc:'COT leveraged fund net positioning with WoW delta and Net%OI.', tag:'Positioning' },
+  { id:'sessions',    label:'Market Sessions',      sub:'UTC reference',             desc:'Session open/close times and historical volatility by session.', tag:'Sessions' },
+  { id:'spreads',     label:'Reference Spreads',    sub:'ECN est. · model-derived',  desc:'Model-derived indicative spreads — not live quoted prices.', tag:'FX · Execution' },
+  { id:'sentiment',   label:'Retail Positioning',   sub:'Myfxbook · live',           desc:'Retail FX positioning from Myfxbook — long/short percentages.', tag:'Positioning' },
+  { id:'news',        label:'News Feed',            sub:'FX-relevant · impact sort', desc:'FX-relevant headlines sorted by market impact.', tag:'News' },
+  { id:'signals',     label:'Alerts & Signals',     sub:'AI · signals.json',         desc:'AI-generated market signals and configurable price alerts.', tag:'AI · Signals' },
+  { id:'calendar',    label:'Economic Calendar',    sub:'Myfxbook · hourly',         desc:'G8 macroeconomic event calendar with impact levels.', tag:'Calendar' },
+  { id:'econmap',     label:'Economic Map',         sub:'TradingView',               desc:'World economic data visualization from TradingView.', tag:'Macro' },
+];
+
+/* ── LAYOUT TEMPLATES ──────────────────────────────────────── */
+const LAYOUT_TEMPLATES = {
+  terminal: {
+    name: 'Terminal layout',
+    tiles: [
+      /* Top row: Narrative (wide) + Risk Monitor */
+      { id:'narrative',   x:0,   y:0,   w:460, h:100 },
+      { id:'risk',        x:464, y:0,   w:320, h:100 },
+      /* Second row: Chart (wide) */
+      { id:'chart',       x:0,   y:104, w:460, h:290 },
+      /* Second row right: Cross-Asset */
+      { id:'crossasset',  x:464, y:104, w:320, h:290 },
+      /* Third row: FX Pairs + Yield Curve */
+      { id:'fxpairs',     x:0,   y:398, w:460, h:210 },
+      { id:'yields',      x:464, y:398, w:320, h:210 },
+      /* Fourth row: COT + Sessions */
+      { id:'cot',         x:0,   y:612, w:460, h:230 },
+      { id:'sessions',    x:464, y:612, w:320, h:230 },
+      /* Fifth row: Signals + News */
+      { id:'news',        x:0,   y:846, w:380, h:220 },
+      { id:'signals',     x:384, y:846, w:400, h:220 },
+    ]
+  },
+  focus: {
+    name: 'Focus layout',
+    tiles: [
+      { id:'narrative',  x:0,   y:0,   w:380, h:90  },
+      { id:'risk',       x:384, y:0,   w:220, h:90  },
+      { id:'chart',      x:0,   y:94,  w:600, h:350 },
+      { id:'fxpairs',    x:0,   y:448, w:380, h:200 },
+      { id:'signals',    x:384, y:448, w:220, h:200 },
+    ]
+  },
+  grid: {
+    name: 'Grid layout',
+    tiles: [
+      { id:'chart',      x:0,   y:0,   w:380, h:260 },
+      { id:'crossasset', x:384, y:0,   w:300, h:260 },
+      { id:'fxpairs',    x:0,   y:264, w:380, h:260 },
+      { id:'risk',       x:384, y:264, w:300, h:260 },
+      { id:'cot',        x:0,   y:528, w:380, h:260 },
+      { id:'yields',     x:384, y:528, w:300, h:260 },
+    ]
+  },
+  macro: {
+    name: 'Macro layout',
+    tiles: [
+      { id:'narrative',  x:0,   y:0,   w:690, h:90  },
+      { id:'yields',     x:0,   y:94,  w:340, h:260 },
+      { id:'crossasset', x:344, y:94,  w:346, h:260 },
+      { id:'cot',        x:0,   y:358, w:690, h:230 },
+      { id:'signals',    x:0,   y:592, w:690, h:200 },
+    ]
+  }
+};
+
+/* ── STATE ─────────────────────────────────────────────────── */
+const wsState = {
+  tiles: {},       // id → { el, config }
+  dragging: null,
+  resizing: null,
+  zMax: 10,
+  activeLayout: 'terminal',
+};
+
+/* ── TILE CONTENT BUILDERS ─────────────────────────────────── */
+const TILE_CONTENT = {
+  narrative() {
+    return `<div class="tile-narr" id="ws-narr-body">
+      <div id="ws-narrative-regime" class="narr-regime-badge" style="background:var(--bg3);">—</div>
+      <div id="ws-narrative-text" style="font-size:11px;line-height:1.6;color:var(--text2);">Loading market narrative…</div>
+      <div style="margin-top:6px;font-size:8.5px;color:var(--text3);font-family:var(--font-mono);" id="ws-narr-ts">AI · updated 12×/day</div>
+    </div>`;
+  },
+  chart() {
+    return `<div style="display:flex;flex-direction:column;height:100%;">
+      <div class="tile-chart-tabs" id="ws-chart-tabs">
+        <button class="tv-tab-sm active" data-sym="FX_IDC:EURUSD">EUR/USD</button>
+        <button class="tv-tab-sm" data-sym="FX_IDC:GBPUSD">GBP/USD</button>
+        <button class="tv-tab-sm" data-sym="FX_IDC:USDJPY">USD/JPY</button>
+        <button class="tv-tab-sm" data-sym="FX_IDC:AUDUSD">AUD/USD</button>
+        <button class="tv-tab-sm" data-sym="FX_IDC:USDCAD">USD/CAD</button>
+        <button class="tv-tab-sm" data-sym="FX_IDC:USDCHF">USD/CHF</button>
+        <button class="tv-tab-sm" data-sym="FX_IDC:NZDUSD">NZD/USD</button>
+        <button class="tv-tab-sm" data-sym="FX_IDC:EURGBP">EUR/GBP</button>
+        <button class="tv-tab-sm" data-sym="FX_IDC:EURJPY">EUR/JPY</button>
+        <button class="tv-tab-sm" data-sym="FX_IDC:GBPJPY">GBP/JPY</button>
+        <button class="tv-tab-sm" data-sym="CMCMARKETS:GOLDM2026">Gold FUT</button>
+        <button class="tv-tab-sm" data-sym="FPMARKETS:WTI">WTI FUT</button>
+        <button class="tv-tab-sm" data-sym="PEPPERSTONE:USDX">DXY</button>
+        <button class="tv-tab-sm" data-sym="CMCMARKETS:SPX500">S&amp;P 500</button>
+        <button class="tv-tab-sm" data-sym="CBOE:VIX">VIX</button>
+        <button class="tv-tab-sm" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
+      </div>
+      <div id="ws-tv-chart-container" style="flex:1;position:relative;overflow:hidden;min-height:0;">
+        <div class="tradingview-widget-container" style="height:100%;width:100%;">
+          <div id="ws-tv-chart-widget" class="tradingview-widget-container__widget" style="height:100%;width:100%;background:var(--bg);"></div>
+        </div>
+      </div>
+    </div>`;
+  },
+  fxpairs() {
+    return `<div style="overflow-x:auto;height:100%;">
+      <table aria-label="FX Pairs — Majors">
+        <thead>
+          <tr>
+            <th style="text-align:left;position:sticky;top:0;z-index:1;background:var(--head-bg);" scope="col">Pair</th>
+            <th scope="col" style="position:sticky;top:0;z-index:1;background:var(--head-bg);">Bid</th>
+            <th scope="col" style="position:sticky;top:0;z-index:1;background:var(--head-bg);">Ask</th>
+            <th scope="col" style="position:sticky;top:0;z-index:1;background:var(--head-bg);">Spread</th>
+            <th scope="col" style="position:sticky;top:0;z-index:1;background:var(--head-bg);">1D</th>
+            <th scope="col" style="position:sticky;top:0;z-index:1;background:var(--head-bg);">1W</th>
+            <th scope="col" style="position:sticky;top:0;z-index:1;background:var(--head-bg);" title="Historical Volatility 30d">HV 30d</th>
+            <th scope="col" style="position:sticky;top:0;z-index:1;background:var(--head-bg);">Sess H</th>
+            <th scope="col" style="position:sticky;top:0;z-index:1;background:var(--head-bg);">Sess L</th>
+          </tr>
+        </thead>
+        <tbody id="fx-pairs-tbody">
+          <tr><td class="sym">EUR/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">GBP/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">AUD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">NZD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+  },
+  heatmap() {
+    return `<div class="heatmap" id="heatmap-grid" style="height:100%;align-content:start;">
+      <div class="hm-cell h-flat"><span class="hm-sym">EUR</span><span class="hm-val flat">—</span></div>
+      <div class="hm-cell h-flat"><span class="hm-sym">USD</span><span class="hm-val flat">—</span></div>
+      <div class="hm-cell h-flat"><span class="hm-sym">GBP</span><span class="hm-val flat">—</span></div>
+      <div class="hm-cell h-flat"><span class="hm-sym">JPY</span><span class="hm-val flat">—</span></div>
+      <div class="hm-cell h-flat"><span class="hm-sym">AUD</span><span class="hm-val flat">—</span></div>
+      <div class="hm-cell h-flat"><span class="hm-sym">CAD</span><span class="hm-val flat">—</span></div>
+      <div class="hm-cell h-flat"><span class="hm-sym">CHF</span><span class="hm-val flat">—</span></div>
+      <div class="hm-cell h-flat"><span class="hm-sym">NZD</span><span class="hm-val flat">—</span></div>
+    </div>`;
+  },
+  crossasset() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <div id="cross-asset-grid">
+        <div class="ca-cell" data-sym="CMCMARKETS:SPX500" style="cursor:pointer;"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
+        <div class="ca-cell" data-sym="CMCMARKETS:GOLDM2026" style="cursor:pointer;"><div class="ca-name">Gold Futures</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
+        <div class="ca-cell" data-sym="FPMARKETS:WTI" style="cursor:pointer;"><div class="ca-name">WTI Futures</div><div class="ca-val" id="ca-wti">—</div><div class="ca-chg" id="cac-wti">loading</div></div>
+        <div class="ca-cell" data-sym="BITSTAMP:BTCUSD" style="cursor:pointer;"><div class="ca-name">BTC/USD</div><div class="ca-val" id="ca-btc">—</div><div class="ca-chg" id="cac-btc">loading</div></div>
+        <div class="ca-cell" data-sym="OSE:NK2251!" style="cursor:pointer;"><div class="ca-name">Nikkei 225</div><div class="ca-val" id="ca-nikkei">—</div><div class="ca-chg" id="cac-nikkei">loading</div></div>
+        <div class="ca-cell" data-sym="GOMARKETS:STOXX50" style="cursor:pointer;"><div class="ca-name">EUR Stoxx 50</div><div class="ca-val" id="ca-stoxx">—</div><div class="ca-chg" id="cac-stoxx">loading</div></div>
+        <div class="ca-cell" data-sym="PEPPERSTONE:USDX" style="cursor:pointer;"><div class="ca-name">DXY Index</div><div class="ca-val" id="ca-dxy">—</div><div class="ca-chg" id="cac-dxy">loading</div></div>
+        <div class="ca-cell" data-sym="FRED:DGS10" style="cursor:pointer;"><div class="ca-name">US 10Y Yield</div><div class="ca-val" id="ca-us10y">—</div><div class="ca-chg" id="cac-us10y">loading</div></div>
+      </div>
+    </div>`;
+  },
+  risk() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <div class="risk-grid" aria-live="polite" aria-atomic="false">
+        <div class="risk-cell" style="cursor:pointer;"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
+        <div class="risk-cell" style="cursor:pointer;"><div class="risk-lbl">MOVE Index</div><div class="risk-val" id="risk-move">—</div><div class="risk-sub" id="risk-move-sub">Bond vol</div></div>
+        <div class="risk-cell"><div class="risk-lbl">EUR/USD HV 30d</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Hist. volatility</div></div>
+        <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px;" aria-live="assertive">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
+      </div>
+      <div style="padding:4px 8px 0;border-top:1px solid var(--border);overflow-x:auto;">
+        <table aria-label="Risk indicators" style="width:100%;">
+          <thead><tr><th style="text-align:left" scope="col">Indicator</th><th scope="col">Value</th><th scope="col">Signal</th></tr></thead>
+          <tbody id="risk-indicators-tbody">
+            <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
+            <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
+            <tr><td>USD/JPY vs VIX 60d</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
+            <tr><td>DXY vs SPX 60d</td><td id="ri-dxy-spx">—</td><td id="ri-dxy-spx-sig" class="flat">—</td></tr>
+            <tr><td>Gold vs DXY 60d</td><td id="ri-gold-dxy">—</td><td id="ri-gold-dxy-sig" class="flat">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  },
+  yields() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <div id="rates-grid-wrap" class="rates-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:6px 0;">
+        <div class="rate-cell" style="padding:6px 8px;"><div style="font-size:9px;color:var(--text3);">3M T-Bill</div><div class="rate-val" id="rate-3m" style="font-size:16px;font-family:var(--font-mono);font-weight:700;">—</div><div class="rate-chg flat" id="rate-3m-chg" style="font-size:9px;">—</div></div>
+        <div class="rate-cell" style="padding:6px 8px;"><div style="font-size:9px;color:var(--text3);">2Y Note</div><div class="rate-val" id="rate-2y" style="font-size:16px;font-family:var(--font-mono);font-weight:700;">—</div><div class="rate-chg flat" id="rate-2y-chg" style="font-size:9px;">—</div></div>
+        <div class="rate-cell" style="padding:6px 8px;"><div style="font-size:9px;color:var(--text3);">5Y Note</div><div class="rate-val" id="rate-5y" style="font-size:16px;font-family:var(--font-mono);font-weight:700;">—</div><div class="rate-chg flat" id="rate-5y-chg" style="font-size:9px;">—</div></div>
+        <div class="rate-cell" style="padding:6px 8px;"><div style="font-size:9px;color:var(--text3);">10Y Bond</div><div class="rate-val" id="rate-10y" style="font-size:16px;font-family:var(--font-mono);font-weight:700;">—</div><div class="rate-chg flat" id="rate-10y-chg" style="font-size:9px;">—</div></div>
+      </div>
+      <div id="ws-yield-canvas-wrap"><canvas id="yield-canvas" height="90" style="pointer-events:none;width:100%;"></canvas></div>
+      <div style="padding:0 10px 6px;overflow-x:auto;">
+        <table aria-label="Yield spreads">
+          <thead><tr><th style="text-align:left" scope="col">Spread</th><th scope="col">Value</th><th scope="col">Signal</th></tr></thead>
+          <tbody id="yield-spreads-tbody">
+            <tr><td>2Y–10Y</td><td class="down" id="ys-2-10">—</td><td id="ys-2-10-sig">—</td></tr>
+            <tr><td>US–DE 10Y</td><td id="ys-usde">—</td><td id="ys-usde-sig">—</td></tr>
+            <tr><td>US–JP 10Y</td><td id="ys-usjp">—</td><td id="ys-usjp-sig">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  },
+  cot() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <div style="overflow-x:auto;">
+        <div class="cot-scroll-wrap">
+          <div class="cot-header">
+            <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span style="text-align:right">WoW</span><span>Aln</span><span style="text-align:right">Net%OI</span><span style="text-align:right">OI</span>
+          </div>
+          <div id="cot-rows">
+            <div class="cot-row" style="color:var(--text3);grid-column:1/-1;"><span>Loading COT data…</span></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  },
+  sessions() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <div class="session-row" style="padding:5px 8px;display:flex;gap:6px;border-bottom:1px solid var(--border);">
+        <span class="sess" id="sess-sydney">Sydney</span>
+        <span class="sess" id="sess-tokyo">Tokyo</span>
+        <span class="sess" id="sess-london">London</span>
+        <span class="sess" id="sess-newyork">New York</span>
+      </div>
+      <table aria-label="Trading sessions">
+        <thead><tr><th style="text-align:left" scope="col">Session</th><th scope="col">Open</th><th scope="col">Close</th><th scope="col">Status</th></tr></thead>
+        <tbody>
+          <tr><td>Sydney</td><td id="sess-open-sydney">22:00</td><td id="sess-close-sydney">07:00</td><td class="flat" id="status-sydney">—</td></tr>
+          <tr><td>Tokyo</td><td id="sess-open-tokyo">00:00</td><td id="sess-close-tokyo">09:00</td><td class="flat" id="status-tokyo">—</td></tr>
+          <tr><td>London</td><td id="sess-open-london">08:00</td><td id="sess-close-london">17:00</td><td class="flat" id="status-london">—</td></tr>
+          <tr><td>New York</td><td id="sess-open-newyork">13:00</td><td id="sess-close-newyork">22:00</td><td class="flat" id="status-newyork">—</td></tr>
+        </tbody>
+      </table>
+      <div style="padding:4px 8px;border-top:1px solid var(--border);">
+        <table aria-label="Session volatility">
+          <thead><tr><th style="text-align:left" scope="col">Vol</th><th scope="col">EUR/USD</th><th scope="col">USD/JPY</th></tr></thead>
+          <tbody>
+            <tr><td>Sydney</td><td id="svol-syd-eur" class="flat">±18p</td><td id="svol-syd-jpy" class="flat">±22p</td></tr>
+            <tr><td>Tokyo</td><td id="svol-tok-eur" class="flat">±28p</td><td id="svol-tok-jpy" class="up">±44p</td></tr>
+            <tr><td>London</td><td id="svol-lon-eur" class="up">±62p</td><td id="svol-lon-jpy" class="up">±58p</td></tr>
+            <tr><td>New York</td><td id="svol-ny-eur" class="up">±71p</td><td id="svol-ny-jpy" class="up">±66p</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:2px 0 2px;font-size:9px;color:var(--text3);">5yr historical avg · fixed reference</div>
+      </div>
+    </div>`;
+  },
+  spreads() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <div id="spreads-rows" style="padding:4px 0;">
+        <div class="spread-row"><span class="spr-sym">EUR/USD</span><div class="spr-bar"><div class="spr-fill" style="width:20%;background:var(--up)"></div></div><span class="spr-val up" id="spr-eurusd">0.9 pip</span></div>
+        <div class="spread-row"><span class="spr-sym">GBP/USD</span><div class="spr-bar"><div class="spr-fill" style="width:24%;background:var(--up)"></div></div><span class="spr-val up" id="spr-gbpusd">1.1 pip</span></div>
+        <div class="spread-row"><span class="spr-sym">USD/JPY</span><div class="spr-bar"><div class="spr-fill" style="width:36%;background:var(--orange)"></div></div><span class="spr-val" id="spr-usdjpy" style="color:var(--orange)">2.0 pip</span></div>
+        <div class="spread-row"><span class="spr-sym">AUD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:40%;background:var(--orange)"></div></div><span class="spr-val" id="spr-audusd" style="color:var(--orange)">2.0 pip</span></div>
+        <div class="spread-row"><span class="spr-sym">USD/CHF</span><div class="spr-bar"><div class="spr-fill" style="width:44%;background:var(--orange)"></div></div><span class="spr-val" id="spr-usdchf" style="color:var(--orange)">2.0 pip</span></div>
+        <div class="spread-row"><span class="spr-sym">USD/CAD</span><div class="spr-bar"><div class="spr-fill" style="width:52%;background:var(--down)"></div></div><span class="spr-val down" id="spr-usdcad">2.5 pip</span></div>
+        <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down" id="spr-nzdusd">3.0 pip</span></div>
+      </div>
+      <div style="padding:3px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);" id="spreads-sub">ECN est. · model-derived · not a tradeable quote</div>
+    </div>`;
+  },
+  sentiment() {
+    return `<div style="height:100%;overflow-y:auto;">
+      <div id="sent-rows" style="padding:0;">
+        <div style="padding:8px;font-size:10px;color:var(--text3);">Loading positioning…</div>
+      </div>
+      <div id="sent-general" style="padding:0 8px 4px;font-size:10px;color:var(--text3);border-top:1px solid var(--border);"></div>
+      <div style="font-size:9px;color:var(--text3);padding:2px 8px 4px;" id="sent-updated"></div>
+    </div>`;
+  },
+  news() {
+    return `<div id="news-feed-items" style="height:100%;overflow-y:auto;" class="thin-scroll">
+      <div class="news-item" style="color:var(--text3);">Loading news…</div>
+    </div>`;
+  },
+  signals() {
+    return `<div id="alerts-container" role="log" aria-live="polite" aria-label="Alerts and Market Signals" aria-relevant="additions" style="height:100%;overflow-y:auto;">
+      <div class="alert-row" style="color:var(--text3);">Fetching AI-generated market signals…</div>
+    </div>`;
+  },
+  calendar() {
+    return `<div id="tvcal-inner" style="height:100%;overflow:hidden;">
+      <div style="width:100%;height:100%;filter:invert(0.90) hue-rotate(180deg) brightness(0.93);">
+        <iframe src="https://widget.myfxbook.com/widget/calendar.html?lang=en&impacts=0,1,2,3&symbols=AUD,CAD,CHF,EUR,GBP,JPY,NZD,USD"
+                style="border:0;width:100%;height:100%;display:block;"
+                title="Economic Calendar — Myfxbook" loading="lazy"></iframe>
+      </div>
+    </div>`;
+  },
+  econmap() {
+    return `<div style="height:100%;overflow:hidden;background:var(--bg);">
+      <div id="tv-econmap-placeholder" style="width:100%;height:100%;min-height:300px;background:var(--bg);"></div>
+    </div>`;
+  },
+};
+
+/* ── TILE FACTORY ──────────────────────────────────────────── */
+function createTile(tileDef, config) {
+  const { id, label, sub } = tileDef;
+  const { x, y, w, h } = config;
+
+  const el = document.createElement('div');
+  el.className = 'ws-tile';
+  el.id = 'tile-' + id;
+  el.setAttribute('role', 'region');
+  el.setAttribute('aria-label', label);
+  el.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;z-index:${++wsState.zMax};`;
+
+  const content = TILE_CONTENT[id] ? TILE_CONTENT[id]() : `<div class="tile-loading">Panel unavailable</div>`;
+
+  el.innerHTML = `
+    <div class="tile-head" title="Drag to move">
+      <span class="tile-title">${label}</span>
+      <span class="tile-sub">${sub}</span>
+      <div class="tile-controls">
+        <button class="tile-ctrl-btn" onclick="expandTile('${id}')" title="Maximize / restore" aria-label="Toggle maximize">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="0.5" y="0.5" width="9" height="9" rx="1"/><path d="M3 5h4M5 3v4"/></svg>
+        </button>
+        <button class="tile-ctrl-btn close" onclick="closeTile('${id}')" title="Close panel" aria-label="Close ${label}">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="tile-body">${content}</div>
+    <div class="tile-resize" title="Drag to resize" aria-hidden="true"></div>
+  `;
+
+  // Drag
+  el.querySelector('.tile-head').addEventListener('mousedown', e => startDrag(e, id));
+  // Resize
+  el.querySelector('.tile-resize').addEventListener('mousedown', e => startResize(e, id));
+  // Bring to front on click
+  el.addEventListener('mousedown', () => bringToFront(id));
+
+  return el;
+}
+
+/* ── TILE MANAGEMENT ───────────────────────────────────────── */
+function addTile(tileId, config) {
+  const def = TILE_CATALOG.find(t => t.id === tileId);
+  if (!def) return;
+  const canvas = document.getElementById('ws-canvas');
+  const el = createTile(def, config);
+  canvas.appendChild(el);
+  wsState.tiles[tileId] = { el, config: { ...config } };
+
+  // Initialize chart tile
+  if (tileId === 'chart') initChartTile();
+  if (tileId === 'econmap') initEconmap();
+}
+
+function closeTile(id) {
+  const entry = wsState.tiles[id];
+  if (!entry) return;
+  entry.el.remove();
+  delete wsState.tiles[id];
+}
+
+function bringToFront(id) {
+  const entry = wsState.tiles[id];
+  if (!entry) return;
+  entry.el.style.zIndex = ++wsState.zMax;
+}
+
+let expandedState = null;
+function expandTile(id) {
+  const entry = wsState.tiles[id];
+  if (!entry) return;
+  const canvas = document.getElementById('ws-canvas');
+  const cw = canvas.clientWidth;
+  const ch = canvas.clientHeight;
+
+  if (expandedState && expandedState.id === id) {
+    // Restore
+    const { x, y, w, h } = expandedState.prev;
+    entry.el.style.left = x + 'px';
+    entry.el.style.top = y + 'px';
+    entry.el.style.width = w + 'px';
+    entry.el.style.height = h + 'px';
+    entry.el.style.zIndex = ++wsState.zMax;
+    expandedState = null;
+  } else {
+    expandedState = {
+      id,
+      prev: {
+        x: parseInt(entry.el.style.left),
+        y: parseInt(entry.el.style.top),
+        w: parseInt(entry.el.style.width),
+        h: parseInt(entry.el.style.height),
+      }
+    };
+    entry.el.style.left = '0px';
+    entry.el.style.top = '0px';
+    entry.el.style.width = cw + 'px';
+    entry.el.style.height = ch + 'px';
+    entry.el.style.zIndex = ++wsState.zMax;
+  }
+}
+
+/* ── DRAG ──────────────────────────────────────────────────── */
+function startDrag(e, id) {
+  if (e.target.closest('.tile-controls')) return;
+  e.preventDefault();
+  const entry = wsState.tiles[id];
+  if (!entry) return;
+  bringToFront(id);
+  const el = entry.el;
+  const startX = e.clientX - parseInt(el.style.left);
+  const startY = e.clientY - parseInt(el.style.top);
+  el.classList.add('dragging');
+  wsState.dragging = { id, startX, startY };
+  document.addEventListener('mousemove', onDrag, { passive: true });
+  document.addEventListener('mouseup', stopDrag);
+}
+
+function onDrag(e) {
+  if (!wsState.dragging) return;
+  const { id, startX, startY } = wsState.dragging;
+  const entry = wsState.tiles[id];
+  if (!entry) return;
+  const canvas = document.getElementById('ws-canvas');
+  const cw = canvas.clientWidth;
+  const ch = canvas.clientHeight;
+  const el = entry.el;
+  const newX = Math.max(0, Math.min(e.clientX - startX, cw - parseInt(el.style.width)));
+  const newY = Math.max(0, Math.min(e.clientY - startY, ch - parseInt(el.style.height)));
+  el.style.left = newX + 'px';
+  el.style.top  = newY + 'px';
+}
+
+function stopDrag() {
+  if (!wsState.dragging) return;
+  const { id } = wsState.dragging;
+  const entry = wsState.tiles[id];
+  if (entry) {
+    entry.el.classList.remove('dragging');
+    entry.config.x = parseInt(entry.el.style.left);
+    entry.config.y = parseInt(entry.el.style.top);
+  }
+  wsState.dragging = null;
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('mouseup', stopDrag);
+}
+
+/* ── RESIZE ────────────────────────────────────────────────── */
+function startResize(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  const entry = wsState.tiles[id];
+  if (!entry) return;
+  bringToFront(id);
+  const el = entry.el;
+  const startW = parseInt(el.style.width);
+  const startH = parseInt(el.style.height);
+  el.classList.add('resizing');
+  wsState.resizing = { id, startX: e.clientX, startY: e.clientY, startW, startH };
+  document.addEventListener('mousemove', onResize, { passive: true });
+  document.addEventListener('mouseup', stopResize);
+}
+
+function onResize(e) {
+  if (!wsState.resizing) return;
+  const { id, startX, startY, startW, startH } = wsState.resizing;
+  const entry = wsState.tiles[id];
+  if (!entry) return;
+  const MIN_W = 280, MIN_H = 180;
+  const newW = Math.max(MIN_W, startW + (e.clientX - startX));
+  const newH = Math.max(MIN_H, startH + (e.clientY - startY));
+  entry.el.style.width  = newW + 'px';
+  entry.el.style.height = newH + 'px';
+}
+
+function stopResize() {
+  if (!wsState.resizing) return;
+  const { id } = wsState.resizing;
+  const entry = wsState.tiles[id];
+  if (entry) {
+    entry.el.classList.remove('resizing');
+    entry.config.w = parseInt(entry.el.style.width);
+    entry.config.h = parseInt(entry.el.style.height);
+  }
+  wsState.resizing = null;
+  document.removeEventListener('mousemove', onResize);
+  document.removeEventListener('mouseup', stopResize);
+}
+
+/* ── LAYOUT APPLICATION ────────────────────────────────────── */
+function applyLayout(name) {
+  const template = LAYOUT_TEMPLATES[name];
+  if (!template) return;
+
+  // Remove all existing tiles
+  Object.keys(wsState.tiles).forEach(id => {
+    wsState.tiles[id].el.remove();
+    delete wsState.tiles[id];
+  });
+  expandedState = null;
+  wsState.zMax = 10;
+
+  // Scale tiles to current canvas width
+  const canvas = document.getElementById('ws-canvas');
+  const cw = canvas.clientWidth;
+  const templateMaxX = Math.max(...template.tiles.map(t => t.x + t.w));
+  const scale = templateMaxX > 0 ? Math.min(1, cw / (templateMaxX + 20)) : 1;
+
+  template.tiles.forEach(t => {
+    addTile(t.id, {
+      x: Math.round(t.x * scale),
+      y: t.y,
+      w: Math.round(t.w * scale),
+      h: t.h,
+    });
+  });
+
+  // Update layout button states
+  document.querySelectorAll('.ws-layout-btn').forEach(b => {
+    b.classList.toggle('active', b.id === 'ws-btn-' + name);
+    b.setAttribute('aria-pressed', b.id === 'ws-btn-' + name ? 'true' : 'false');
+  });
+
+  wsState.activeLayout = name;
+  document.getElementById('ws-layout-name').textContent = template.name;
+  wsState.saved = false;
+  document.getElementById('ws-save-btn').classList.remove('saved');
+
+  // Reconnect dashboard.js data sources after tile DOM rebuild
+  reconnectDataSources();
+}
+
+function reconnectDataSources() {
+  // dashboard.js renders to fixed IDs in the DOM.
+  // After tiles rebuild, we trigger a refresh if the main module is loaded.
+  if (typeof window.fetchCrossAssetData === 'function') {
+    setTimeout(() => {
+      try { window.fetchRiskData(); } catch(e){}
+      try { window.fetchCrossAssetData(); } catch(e){}
+      try { window.renderFxPairsTable(); } catch(e){}
+      try { window.renderCOTRows(); } catch(e){}
+      try { window.buildRichNarrative(); } catch(e){}
+      try { window.fetchSpreadsData(); } catch(e){}
+      try { window.fetchSentiment(); } catch(e){}
+      try { window.fetchNewsItems(); } catch(e){}
+      try { window.renderRates(); } catch(e){}
+    }, 100);
+  }
+}
+
+/* ── LAYOUT SAVE / LOAD ────────────────────────────────────── */
+function saveLayout() {
+  const snapshot = {};
+  Object.entries(wsState.tiles).forEach(([id, { el }]) => {
+    snapshot[id] = {
+      x: parseInt(el.style.left),
+      y: parseInt(el.style.top),
+      w: parseInt(el.style.width),
+      h: parseInt(el.style.height),
+    };
+  });
+  try {
+    localStorage.setItem('gi-workspace-layout-v1', JSON.stringify({
+      name: wsState.activeLayout,
+      tiles: snapshot,
+      ts: Date.now(),
+    }));
+  } catch(e) {}
+  const btn = document.getElementById('ws-save-btn');
+  btn.classList.add('saved');
+  btn.textContent = 'Layout saved';
+  setTimeout(() => {
+    btn.classList.remove('saved');
+    btn.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 1h6l2 2v6H1z"/><rect x="3" y="6" width="4" height="4" fill="currentColor" stroke="none" rx=".5"/><rect x="3" y="1" width="4" height="3" fill="currentColor" stroke="none" rx=".5"/></svg> Save Layout`;
+  }, 2000);
+}
+
+function loadSavedLayout() {
+  try {
+    const raw = localStorage.getItem('gi-workspace-layout-v1');
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data || !data.tiles) return false;
+    // Remove defaults, apply saved
+    Object.keys(wsState.tiles).forEach(id => {
+      wsState.tiles[id].el.remove();
+      delete wsState.tiles[id];
+    });
+    Object.entries(data.tiles).forEach(([id, config]) => addTile(id, config));
+    wsState.activeLayout = data.name || 'terminal';
+    document.getElementById('ws-layout-name').textContent = 'Saved layout';
+    reconnectDataSources();
+    return true;
+  } catch(e) { return false; }
+}
+
+/* ── CATALOG ───────────────────────────────────────────────── */
+function openCatalog() {
+  const grid = document.getElementById('ws-catalog-grid');
+  const active = new Set(Object.keys(wsState.tiles));
+  grid.innerHTML = TILE_CATALOG.map(t => `
+    <div class="cat-item${active.has(t.id) ? ' active-panel' : ''}" role="listitem"
+         onclick="${active.has(t.id) ? '' : `addFromCatalog('${t.id}')`}"
+         title="${t.desc}">
+      <div class="cat-name">${t.label}</div>
+      <div class="cat-desc">${t.desc}</div>
+      <div class="cat-tag">${t.tag}</div>
+    </div>
+  `).join('');
+  document.getElementById('ws-catalog').classList.add('open');
+}
+
+function closeCatalog() {
+  document.getElementById('ws-catalog').classList.remove('open');
+}
+
+function addFromCatalog(id) {
+  const canvas = document.getElementById('ws-canvas');
+  const cw = canvas.clientWidth;
+  const ch = canvas.clientHeight;
+  const config = {
+    x: Math.max(0, Math.min(60, cw - 380)),
+    y: Math.max(0, Math.min(60, ch - 280)),
+    w: 380, h: 280,
+  };
+  addTile(id, config);
+  closeCatalog();
+  reconnectDataSources();
+}
+
+// Close catalog on overlay click
+document.getElementById('ws-catalog').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeCatalog();
+});
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeCatalog();
+});
+
+/* ── TRADINGVIEW CHART TILE ────────────────────────────────── */
+let tvChartSym = 'FX_IDC:EURUSD';
+let tvScriptLoaded = false;
+
+function initChartTile() {
+  const tabs = document.getElementById('ws-chart-tabs');
+  if (tabs) {
+    tabs.querySelectorAll('.tv-tab-sm').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.querySelectorAll('.tv-tab-sm').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadTVChart(btn.dataset.sym);
+      });
+    });
+  }
+  loadTVChart(tvChartSym);
+}
+
+function loadTVChart(sym) {
+  tvChartSym = sym;
+  const wrap = document.getElementById('ws-tv-chart-widget');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const script = document.createElement('script');
+  script.src = 'https://s3.tradingview.com/tv.js';
+  script.async = true;
+  script.onload = () => buildTVWidget(sym, wrap);
+  if (!tvScriptLoaded) {
+    wrap.parentElement.parentElement.appendChild(script);
+    tvScriptLoaded = true;
+    setTimeout(() => buildTVWidget(sym, wrap), 800);
+  } else {
+    buildTVWidget(sym, wrap);
+  }
+}
+
+function buildTVWidget(sym, wrap) {
+  if (typeof TradingView === 'undefined') return;
+  const container = document.getElementById('ws-tv-chart-widget');
+  if (!container) return;
+  container.innerHTML = '';
+  try {
+    new TradingView.widget({
+      autosize: true,
+      symbol: sym,
+      interval: 'D',
+      timezone: 'UTC',
+      theme: 'dark',
+      style: '1',
+      locale: 'en',
+      toolbar_bg: '#1a1d29',
+      hide_top_toolbar: false,
+      hide_side_toolbar: true,
+      save_image: false,
+      container_id: 'ws-tv-chart-widget',
+    });
+  } catch(e) {}
+}
+
+/* ── ECONOMIC MAP TILE ─────────────────────────────────────── */
+function initEconmap() {
+  const placeholder = document.getElementById('tv-econmap-placeholder');
+  if (!placeholder || window._econmapLoaded) return;
+  window._econmapLoaded = true;
+  const script = document.createElement('script');
+  script.src = 'https://s3.tradingview.com/tv.js';
+  script.async = true;
+  placeholder.parentElement.appendChild(script);
+  script.onload = () => {
+    if (typeof TradingView === 'undefined') return;
+    const div = document.createElement('div');
+    div.className = 'tradingview-widget-container__widget';
+    div.style.cssText = 'height:100%;width:100%;';
+    placeholder.replaceWith(div);
+    try {
+      new TradingView.EconomicCalendar({ autosize: true, colorTheme: 'dark', isTransparent: false, locale: 'en', container_id: div.id = 'tv-econmap-widget' });
+    } catch(e) {}
+  };
+}
+
+/* ── QUOTE BAR SCROLL ──────────────────────────────────────── */
+(function() {
+  const qbPrev = document.getElementById('qb-prev');
+  const qbNext = document.getElementById('qb-next');
+  const inner  = document.getElementById('quotebar-inner');
+  if (qbPrev && qbNext && inner) {
+    qbPrev.addEventListener('click', () => inner.scrollBy({ left: -200, behavior: 'smooth' }));
+    qbNext.addEventListener('click', () => inner.scrollBy({ left:  200, behavior: 'smooth' }));
+  }
+})();
+
+/* ── CLOCK & SESSION ───────────────────────────────────────── */
+function updateClock() {
+  const now = new Date();
+  const utc = now.toUTCString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, '$1');
+  const clockEl = document.getElementById('clock');
+  const footerEl = document.getElementById('footer-clock');
+  const localStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  if (clockEl) clockEl.textContent = utc + ' UTC';
+  if (footerEl) footerEl.textContent = localStr;
+  // Simple session detection
+  const h = now.getUTCHours();
+  let sess = 'OFF';
+  if (h >= 22 || h < 7) sess = 'TOKYO/SYDNEY';
+  else if (h >= 7 && h < 13) sess = 'LONDON';
+  else if (h >= 13 && h < 17) sess = 'LONDON/NEW YORK';
+  else if (h >= 17 && h < 22) sess = 'NEW YORK';
+  const sessEl = document.getElementById('session-label');
+  const sessStatusEl = document.getElementById('session-status');
+  if (sessEl) sessEl.textContent = sess;
+  if (sessStatusEl) sessStatusEl.textContent = sess;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ── INIT ──────────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  // Apply default or saved layout
+  const loaded = loadSavedLayout();
+  if (!loaded) applyLayout('terminal');
+});
+
+/* ── EXPOSE HELPERS ─────────────────────────────────────────── */
+// dashboard.js expects these in global scope — pass-through stubs
+// so its render functions target the correct DOM IDs once tiles exist.
+window.setCorrWindow = window.setCorrWindow || function(w) {
+  ['30','60','90'].forEach(n => {
+    const b = document.getElementById('corr-btn-'+n);
+    if (b) b.style.color = n == w ? '#fff' : 'var(--text3)';
+  });
+  const th = document.getElementById('corr-th-window');
+  if (th) th.textContent = w + 'd';
+};
+</script>
+
+<!-- DASHBOARD.JS — reuse all data-fetching logic from the main terminal -->
+<!-- The script targets fixed DOM IDs that exist in the right panel and tiles above -->
+<script src="assets/dashboard.js?v=7.69.1" defer></script>
+<script src="assets/cot-modal-chart.js?v=2.0.0" defer></script>
+<script src="assets/cb-rates-modal.js?v=2.0.0" defer></script>
+<script src="assets/real-carry-modal.js?v=1.4.1" defer></script>
+<script src="assets/corr-modal.js?v=1.0.0" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+<script src="assets/yc-modal.js?v=1.2.0" defer></script>
+<script src="assets/heatmap-modal.js?v=1.0.0" defer></script>
+
+</body>
+</html>
