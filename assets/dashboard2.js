@@ -6272,13 +6272,29 @@ async function fetchCarryRanking() {
         // Primary ranking metric for carry panels
         const carryVol = (hv30 != null && hv30 > 0) ? absDiff / hv30 : null;
 
-        allPairs.push({ long, short, diff: absDiff, rLong, rShort, hv30, carryVol, pid });
+        // CIP-adjusted carry: real carry = nominal diff − inflation expectations diff
+        // Computed here (not in render) so it's available as the primary sort key
+        const ieLong  = inflExp[long]  ?? null;
+        const ieShort = inflExp[short] ?? null;
+        const cipVal  = (ieLong != null && ieShort != null)
+          ? absDiff - (ieLong - ieShort)   // real carry differential
+          : null;
+
+        allPairs.push({ long, short, diff: absDiff, rLong, rShort, hv30, carryVol, cipVal, pid });
       }
     }
 
-    // ── 4. Sort by carry-to-vol (primary); fall back to gross diff ─
+    // ── 4. Sort by CIP-adjusted real carry (primary — industry standard)
+    //       tiebreak: carry-to-vol (carry per unit of vol risk)
+    //       last fallback: gross nominal diff (when no infl. expectations data)
+    const hasCipData = allPairs.some(p => p.cipVal != null);
     const hasVolData = allPairs.some(p => p.carryVol != null);
     allPairs.sort((a, b) => {
+      if (hasCipData) {
+        const cipA = a.cipVal ?? -Infinity;
+        const cipB = b.cipVal ?? -Infinity;
+        if (cipB !== cipA) return cipB - cipA;
+      }
       if (hasVolData) {
         const cvA = a.carryVol ?? -Infinity;
         const cvB = b.carryVol ?? -Infinity;
@@ -6303,7 +6319,7 @@ async function fetchCarryRanking() {
       sbHead.style.cursor = 'help';
       const tipTitle = 'Carry-to-Vol Ratio';
       const tipBody  = hasVolData
-        ? 'Rate differential / HV30 (30-day realised vol). Ranks pairs by carry earned per unit of vol risk. Click any row to open the Real Rate Carry Analysis — real carry = nominal spread minus inflation expectations.'
+        ? 'Ranked by CIP-adjusted real carry (nominal rate differential minus inflation expectations). Tiebreak: carry-to-vol ratio (carry per unit of HV30 risk). Industry standard — click any row for full real rate breakdown.'
         : 'CB rate differential (%) between the long and short leg. Carry-to-vol ranking requires HV30 data (unavailable). Click any row for real rate analysis.';
       const tipEx = hasVolData
         ? 'Example: AUD/CHF +4.75% diff / 8.0% HV30 = 0.59. Click to compare real rates (nominal minus inflation expectations) — the institutional carry metric.'
@@ -6337,15 +6353,8 @@ async function fetchCarryRanking() {
       // Nominal: signed rate differential (long − short)
       const nomStr = '+' + p.diff.toFixed(2) + '%';
 
-      // CIP ADJ. = real carry: (nomLong − inflLong) − (nomShort − inflShort)
-      // = (nomLong − nomShort) − (inflLong − inflShort) = nomDiff − inflDiff
-      // Uses inflExp loaded from extended-data above (same source as real-carry-modal).
-      let cipVal = null;
-      const ieLong  = inflExp[p.long]  ?? null;
-      const ieShort = inflExp[p.short] ?? null;
-      if (ieLong != null && ieShort != null) {
-        cipVal = p.diff - (ieLong - ieShort); // real carry differential
-      }
+      // CIP ADJ. — already computed at build time and used for sorting; reuse here
+      const cipVal = p.cipVal;
       const cipStr = cipVal != null
         ? (cipVal >= 0 ? '+' : '') + cipVal.toFixed(2) + '%'
         : '—'; // show dash when infl.exp. unavailable (not misleading fallback)
