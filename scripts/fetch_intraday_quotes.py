@@ -250,6 +250,28 @@ def compute_hv30(closes_series):
         return None
 
 
+def compute_hv10(closes_series):
+    """
+    Historical Volatility 10d anualizada — misma metodología que compute_hv30
+    (std de log-returns, varianza muestral n−1, ×√252) usando los últimos 11 cierres.
+    Bloomberg usa HV 10d para el trend arrow: HV10 > HV30 → vol expandiendo.
+    Retorna el valor en porcentaje o None si hay pocos datos.
+    """
+    try:
+        prices = [float(c) for c in closes_series if c is not None and float(c) > 0]
+        if len(prices) < 12:  # mínimo 12 cierres → 11 retornos
+            return None
+        window = prices[-12:]
+        returns = [math.log(window[i] / window[i - 1]) for i in range(1, len(window))]
+        n = len(returns)
+        mean = sum(returns) / n
+        variance = sum((r - mean) ** 2 for r in returns) / (n - 1)
+        hv_annual = math.sqrt(variance) * math.sqrt(252) * 100
+        return round(hv_annual, 2)
+    except Exception:
+        return None
+
+
 def compute_var_cvar(closes_series, confidence=0.95, lookback=252):
     """
     Historical VaR and CVaR from daily log-returns.
@@ -578,13 +600,15 @@ def fetch_hv30_fx(fx_pairs):
             hist = ticker.history(period="3mo", interval="1d", auto_adjust=True)
             if hist.empty or len(hist) < 22:
                 print(f"[HV30] {pair_id}: insuficientes datos ({len(hist)} días)")
-                hv30_results[pair_id] = {"hv30": None, "pct1m": None, "pct1m_date": None}
+                hv30_results[pair_id] = {"hv30": None, "hv10": None, "pct1m": None, "pct1m_date": None}
                 continue
 
             closes = hist["Close"].dropna()
             hv = compute_hv30(closes.tolist())
+            hv10 = compute_hv10(closes.tolist())
             status = f"{hv:.2f}%" if hv is not None else "N/A"
-            print(f"[HV30] ✓ {pair_id:8s} ({yf_sym}): {status}  ({len(closes)} cierres)")
+            hv10_status = f" HV10:{hv10:.2f}%" if hv10 is not None else ""
+            print(f"[HV30] ✓ {pair_id:8s} ({yf_sym}): {status}{hv10_status}  ({len(closes)} cierres)")
 
             # ── pct1m: cierre de hace ~30 días naturales ──────────────────────
             # Busca el primer cierre disponible en la ventana [today-32d, today-28d].
@@ -614,11 +638,11 @@ def fetch_hv30_fx(fx_pairs):
             except Exception as _e1m:
                 print(f"[1M] ⚠ {pair_id:8s}: {_e1m}")
 
-            hv30_results[pair_id] = {"hv30": hv, "pct1m": pct1m, "pct1m_date": pct1m_date}
+            hv30_results[pair_id] = {"hv30": hv, "hv10": hv10, "pct1m": pct1m, "pct1m_date": pct1m_date}
 
         except Exception as e:
             print(f"[HV30] Error en {pair_id}: {e}")
-            hv30_results[pair_id] = {"hv30": None, "pct1m": None, "pct1m_date": None}
+            hv30_results[pair_id] = {"hv30": None, "hv10": None, "pct1m": None, "pct1m_date": None}
 
     return hv30_results
 
@@ -1447,17 +1471,20 @@ def main():
             quotes[pair_id]["session_high"] = hl["session_high"]
             quotes[pair_id]["session_low"]  = hl["session_low"]
 
-    # PASO 5: Calcular HV30 + pct1m para pares FX e inyectar en cada quote
+    # PASO 5: Calcular HV30 + HV10 + pct1m para pares FX e inyectar en cada quote
     hv30_data = fetch_hv30_fx(HV30_FX_PAIRS)
     hv30_output = {}
     for pair_id, result in hv30_data.items():
         hv       = result.get("hv30")
+        hv10     = result.get("hv10")
         p1m      = result.get("pct1m")
         p1m_date = result.get("pct1m_date")
         hv30_output[pair_id] = hv  # None si no se pudo calcular
         if pair_id in quotes:
             if hv is not None:
                 quotes[pair_id]["hv30"] = hv
+            if hv10 is not None:
+                quotes[pair_id]["hv10"] = hv10
             if p1m is not None:
                 quotes[pair_id]["pct1m"]      = p1m
                 quotes[pair_id]["pct1m_date"] = p1m_date
