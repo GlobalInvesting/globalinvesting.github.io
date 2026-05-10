@@ -9408,7 +9408,7 @@ async function renderDerivativesSection() {
       const pairId = pair.replace('/','').toLowerCase();
       const pairCfg = PAIRS.find(p => p.id === pairId);
       const dec = pairCfg?.dec ?? 4;
-      const spot = STOOQ_RT_CACHE[pairId]?.close ?? null;
+      const spot = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
       const rBase  = ratesCache[cfg.base]  ?? null;
       const rQuote = ratesCache[cfg.quote] ?? null;
       const tds = row.querySelectorAll('td');
