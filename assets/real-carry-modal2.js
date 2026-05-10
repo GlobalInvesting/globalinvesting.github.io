@@ -44,13 +44,13 @@
 @keyframes rcm-su{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 @keyframes rcm-pulse{0%,100%{opacity:1}50%{opacity:.4}}
 /* ── Backdrop ── */
-#rcm-bd{display:block!important;}
+#rcm-bd{display:block!important;overflow:hidden;}
 /* ── Modal shell ── */
-#rcm-modal{width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text);display:flex;flex-direction:column;}
+#rcm-modal{width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text);display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
 #rcm-modal::before{display:none;}
 /* ── Header ── */
 #rcm-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);}
-#rcm-hd-left{display:flex;flex-direction:column;gap:3px;}
+#rcm-hd-left{display:flex;flex-direction:column;gap:2px;}
 .rcm-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:2px;}
 .rcm-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;}
 #rcm-title{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em;}
@@ -141,7 +141,7 @@
 .rcm-pd-cell-val{font-size:18px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1;}
 .rcm-pd-cell-sub{font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);margin-top:2px;}
 /* Rate bars */
-.rcm-rate-bars{padding:10px 14px 4px;border-bottom:1px solid var(--border2);}
+.rcm-rate-bars{padding:10px 14px 4px;border-bottom:1px solid var(--border2);overflow:hidden;}
 .rcm-rb-title{font-size:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:8px;}
 .rcm-rb-row{display:grid;grid-template-columns:32px 1fr 46px;align-items:center;gap:8px;margin-bottom:5px;}
 .rcm-rb-label{font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;color:var(--text2);}
@@ -169,12 +169,32 @@
 .rcm-sustain-warn{background:rgba(210,153,34,.06);border-left:3px solid rgba(210,153,34,.5);color:var(--text);}
 .rcm-sustain-bad{background:rgba(239,83,80,.06);border-left:3px solid rgba(239,83,80,.5);color:var(--text);}
 .rcm-loading{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text2);font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.06em;}
+/* ── Responsive breakpoints ── */
+@media(max-width:900px){
+  .rcm-pd-row-grid{grid-template-columns:1fr 1fr;}
+  .rcm-vol-row{grid-template-columns:1fr 1fr;}
+}
 @media(max-width:640px){
   #rcm-metrics{grid-template-columns:repeat(3,1fr);}
   .rcm-mm-val{font-size:14px;}
   .rcm-pd-row-grid{grid-template-columns:1fr 1fr;}
+  .rcm-pd-cell-val{font-size:15px;}
   .rcm-vol-row{grid-template-columns:1fr 1fr;}
-  #rcm-body{padding:10px;}
+  .rcm-ois-row{grid-template-columns:1fr 1fr;}
+  #rcm-body{padding:8px;}
+  .rcm-rate-bars{padding:8px 10px 4px;}
+  .rcm-pd-header{padding:8px 10px;}
+  .rcm-pd-cell{padding:8px 10px;}
+  .rcm-vol-cell{padding:6px 10px;}
+  .rcm-ois-cell{padding:6px 10px;}
+}
+@media(max-width:420px){
+  .rcm-pd-row-grid{grid-template-columns:1fr;}
+  .rcm-vol-row{grid-template-columns:1fr;}
+  .rcm-ois-row{grid-template-columns:1fr;}
+  #rcm-metrics{grid-template-columns:repeat(2,1fr);}
+  .rcm-pd-cell:last-child{border-right:none;border-bottom:none;}
+  .rcm-vol-cell{border-bottom:1px solid var(--border2);}
 }
 `;
   document.head.appendChild(s);
@@ -622,6 +642,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   }).join('');
 
   return `
+  <div style="width:100%;box-sizing:border-box;overflow-x:hidden;">
   <div class="rcm-pd-header">
     <div class="rcm-pd-pair">${longCcy} / ${shortCcy}</div>
     <div class="rcm-pd-dir">—</div>
@@ -681,6 +702,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   <div class="rcm-src-note" style="padding:8px 14px;font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);line-height:1.6;border-top:1px solid var(--border2);">
     Infl. Exp. source — ${longCcy}: ${_RCM_IE_SRC[longCcy] || '—'} · ${shortCcy}: ${_RCM_IE_SRC[shortCcy] || '—'}<br>
     Real carry/vol = |real spread| / HV30 (30-day realised vol, annualised)
+  </div>
   </div>`;
 }
 
@@ -698,7 +720,7 @@ function _rcmRender() {
     content = _rcmRenderPairDetail(l, s);
   }
 
-  modal.innerHTML = `<div class="rcm-panel on" style="overflow:auto;">${content}</div>`;
+  modal.innerHTML = `<div class="rcm-panel on" style="overflow-y:auto;overflow-x:hidden;width:100%;box-sizing:border-box;">${content}</div>`;
 
   // Update header pair name
   const titleEl = document.getElementById('rcm-title');
@@ -805,7 +827,6 @@ function _rcmBuildDOM() {
   <div id="rcm-modal" role="document">
     <div id="rcm-hd">
       <div id="rcm-hd-left">
-        <span class="rcm-badge">Real Rate Carry</span>
         <div id="rcm-title">Real Rate Carry Analysis</div>
         <div id="rcm-sub">Nominal CB rate &minus; Inflation Expectation (breakeven / CPI proxy) &middot; G8</div>
       </div>
