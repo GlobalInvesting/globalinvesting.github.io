@@ -1,52 +1,51 @@
 {
-  "generated_at": "2026-05-09T14:41:51Z",
+  "generated_at": "2026-05-10T22:41:24Z",
   "signals": [
     {
-      "time": "11:05",
+      "time": "22:41",
       "priority": "critical",
-      "title": "NZD/CAD — G8 Bilateral Theme + Trade Optimism",
-      "text": "NZD outperformance (+0.710% avg) against CAD weakness (-0.920% avg) creates a 1.631% G8 spread, further supported by forecast-beating China trade data which bolsters the NZD proxy bid. The for USD/CAD is offset by CAD's status as the G8 laggard, while NZD COT net short -19.2k sets up a short-covering squeeze if the China-driven risk-on sentiment persists. The next BoC meeting (mkt: 100% hold priced) on 10 Jun is the catalyst for assessing if CAD can recover from its current trend.",
+      "title": "NZD/CAD — G8 Bilateral Theme + China Trade Shock",
+      "text": "NZD/CAD at 0.4348 (implied) — NZD leads G8 performance following China's 14.1% export surge, which bolsters proxy demand for the Kiwi. CAD remains the G8 laggard as Rabobank warns of war-related growth reshuffling despite WTI at $97.9. RBNZ 2.25% vs BoC 2.25% (0bp) carry neutrality shifts focus entirely to the growth divergence. Strong bilateral theme confirms NZD outperformance across the complex.",
       "evidence": [
-        "NZD 1W avg: +0.710% (n=4)",
+        "NZD 1W avg: +0.533% (n=4)",
         "CAD 1W avg: -0.920% (n=3)",
-        "G8 spread: 1.631%",
-        "China April trade figures beat forecasts"
+        "G8 spread: 1.453%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "11:05",
+      "time": "22:38",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Unwind Risk",
-      "text": "AUD COT LF long +58.9k (78.3% long) creates a significant crowded-long unwind risk despite the pair closing Friday at 0.725. While the -60bp carry disadvantage against USD and retail sentiment at 88% short suggest a contrarian bid, the heavy spec positioning leaves the pair vulnerable to any disappointment in upcoming US-China trade talks. The next RBA meeting (mkt: 100% hold priced) on 16 Jun determines if the current hiking bias can sustain these overextended long positions.",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD/USD at 0.7235 — COT LF net long +58,994 (78.3% long) indicates heavy institutional backing for the RBA's hiking cycle. Retail sentiment at 88% short creates a massive contrarian divergence; retail is aggressively fading the institutional trend. RBA 4.35% vs Fed 3.75% (+60bp) carry premium supports the long bias. Retail capitulation risk is high if price tests the 0.7300 handle.",
       "evidence": [
-        "AUD COT net long +58.9k (78.3% long)",
-        "Retail sentiment: 88% short (contrarian long)",
-        "AUD/USD Friday close: 0.725"
+        "AUD COT LF net: +58,994",
+        "Retail Sentiment: 88% short",
+        "RBA 4.35% vs Fed 3.75% — +60bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "22:40",
+      "time": "22:36",
       "priority": "warning",
-      "title": "GBP/JPY — Speculative Long Overhang + Carry Demand",
-      "text": "GBP COT net long +31.2k (65.3% long) reinforces the upside bias in GBP/JPY following the Friday close above 213.00. The 300bp carry advantage for GBP over JPY continues to drive demand despite JPY's 1W momentum, while JPY COT net short -61.3k highlights a persistent spec bias against the Yen. The next BoJ meeting (mkt: 40% hike priced) on 16 Jun is the catalyst for determining if a hawkish shift can trigger a JPY short-squeeze.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD at 0.5952 — COT LF net short -19,294 (specs short) contradicts the RBNZ hike bias ahead of the 27 May meeting. With NZD long% at an extreme low of 18.5%, the pair is highly sensitive to hawkish RBNZ rhetoric. A hawkish hold or explicit hike signal triggers a crowded spec short unwind. Watch for a break above 0.6000 to confirm the squeeze.",
       "evidence": [
-        "GBP COT net long +31.2k",
-        "JPY COT net short -61.3k",
-        "GBP/JPY carry: +300bp"
+        "NZD COT LF net: -19,294",
+        "NZD long%: 18.5%",
+        "RBNZ bias: Hike"
       ],
       "_source": "gemini"
     },
     {
-      "time": "11:05",
+      "time": "22:32",
       "priority": "info",
-      "title": "EUR/USD — Speculative Short Pressure",
-      "text": "EUR COT net short -21.0k maintains downside pressure on EUR/USD as the pair faces a 175bp carry disadvantage against the Fed. While the pair gained +0.52% last week to close at 1.179, the heavy spec shorting and neutral ECB bias limit the scope for a sustained breakout. The next ECB meeting (mkt: 100% hold priced) on 11 Jun serves as the catalyst for any shift in the current hold regime.",
+      "title": "EUR/USD — Correlation Break + Carry",
+      "text": "EUR/USD at 1.1766 — Correlation with EuroStoxx 50 at +0.708 (z=+1.86σ) marks a significant break from the -0.135 norm. EUR is trading as a pro-cyclical risk asset rather than a funding currency despite the -175bp carry deficit vs USD. Fed 3.75% vs ECB 2.0% remains the structural ceiling. Watch US CPI on 12 May to see if the correlation realigns with yield differentials.",
       "evidence": [
-        "EUR COT net short -21.0k",
-        "USD/EUR carry: +175bp favors USD",
-        "EUR/USD Friday close: 1.179"
+        "EUR/USD vs EuroStoxx corr: +0.708",
+        "Fed 3.75% vs ECB 2.0% — +175bp",
+        "EUR/USD: 1.1766"
       ],
       "_source": "gemini"
     }
