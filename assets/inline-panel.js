@@ -290,6 +290,41 @@
     document.body.style.overflow = '';
   };
 
+  // ═══════════════════════════════════════════════════════════════════
+  // INTERCEPT: YC Modal → #split-lower (RIGHT)
+  // ═══════════════════════════════════════════════════════════════════
+  var _origOpenYC = window.openYCModal;
+
+  window.openYCModal = function(tenorData) {
+    var panels = _ensureSplit();
+    if (!panels) { _origOpenYC && _origOpenYC(tenorData); return; }
+
+    var body = _makeShell(panels.lower, 'Yield Curve · US Treasury', function() {
+      if (typeof window.closeYCModal === 'function') window.closeYCModal();
+    });
+
+    var bdPre = document.getElementById('ycm-bd');
+    if (bdPre) { bdPre.style.display = 'none'; }
+
+    _origOpenYC && _origOpenYC(tenorData);
+
+    var ycBd    = document.getElementById('ycm-bd');
+    var ycModal = document.getElementById('ycm-modal');
+    if (!ycBd || !ycModal) {
+      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Yield curve data unavailable.</div>';
+      return;
+    }
+
+    ycBd.style.cssText    = 'display:block!important;position:static!important;background:none!important;padding:0!important;z-index:auto!important;border:none!important;';
+    ycModal.style.cssText = 'width:100%!important;max-width:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;height:auto!important;max-height:none!important;display:flex!important;flex-direction:column!important;';
+
+    var oc = document.getElementById('ycm-close');
+    if (oc) oc.style.display = 'none';
+
+    body.appendChild(ycBd);
+    document.body.style.overflow = '';
+  };
+
   window._showInlinePanel   = _makeShell;
   window._ensureInlineSplit = _ensureSplit;
 
