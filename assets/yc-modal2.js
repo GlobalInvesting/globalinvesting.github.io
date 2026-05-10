@@ -134,13 +134,17 @@ function openYCModal(tenorData) {
   bd.setAttribute('role', 'dialog');
   bd.setAttribute('aria-modal', 'true');
   bd.setAttribute('aria-label', 'US Treasury Yield Curve');
-  // Overlay #main (center column) — read actual sidebar and rightpanel widths
-  // in case layout-resizer.js has moved them from their defaults
-  const sidebar = document.getElementById('sidebar');
-  const rp = document.getElementById('rightpanel');
-  const sbW = sidebar ? sidebar.offsetWidth : 180;
-  const rpW = rp ? rp.offsetWidth : 220;
-  bd.style.left  = sbW + 'px';
+  // Cover the right half of #main — read live positions to respect layout-resizer state
+  const mainEl = document.getElementById('main');
+  const rp     = document.getElementById('rightpanel');
+  const rpW    = rp     ? rp.offsetWidth     : 220;
+  if (mainEl) {
+    const r = mainEl.getBoundingClientRect();
+    bd.style.left  = Math.round(r.left + r.width / 2) + 'px';
+  } else {
+    const sbW = (document.getElementById('sidebar')?.offsetWidth ?? 180);
+    bd.style.left = Math.round(sbW + (window.innerWidth - sbW - rpW) / 2) + 'px';
+  }
   bd.style.right = rpW + 'px';
   bd.innerHTML = `
 <div id="ycm-modal">
