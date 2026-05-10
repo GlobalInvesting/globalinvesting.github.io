@@ -9496,6 +9496,7 @@ async function renderDerivativesSection() {
       const tds = row.querySelectorAll('td');
 
       const hv30 = q?.hv30 ?? STOOQ_RT_CACHE[pairId]?.hv30 ?? null;
+      const hv10 = q?.hv10 ?? null;
       const rrKey = rrKeys[pair] ?? pair.replace('/','');
       const rr1m = rrMap[rrKey]?.rr25d ?? null;
 
@@ -9530,17 +9531,32 @@ async function renderDerivativesSection() {
         tds[3].style.fontFamily = 'var(--font-mono)';
         tds[3].style.fontSize = '10px';
       }
-
-      // RR - HV30 (skew premium vs realized)
-      if (tds[6]) {
-        if (rr1m != null && hv30 != null) {
-          // RR is vol units already; compare magnitude of RR vs HV30 level
-          // Proxy: if |RR| > 10% of HV30 → notable skew premium
-          const premium = Math.abs(rr1m) - hv30 * 0.1;
-          tds[6].textContent = (rr1m >= 0 ? '+' : '') + rr1m.toFixed(2);
-          tds[6].style.color = rr1m > 0.3 ? 'var(--up)' : rr1m < -0.3 ? 'var(--down)' : 'var(--text2)';
-          tds[6].title = `RR 1M (${(rr1m>=0?'+':'')+rr1m.toFixed(2)}) vs HV30 (${hv30.toFixed(1)}%) — negative RR with elevated HV = market pricing downside risk`;
-        } else { tds[6].textContent = '—'; tds[6].style.color = 'var(--text3)'; }
+      // td[4] = Vol Trend — Bloomberg convention: HV 10d vs HV 30d
+      // ↑ expanding (HV10 > HV30 + 1pp), ↓ contracting (HV10 < HV30 − 1pp), → neutral
+      if (tds[4]) {
+        if (hv10 != null && hv30 != null) {
+          const diff = hv10 - hv30;
+          let arrow, color, tip;
+          if (diff > 1) {
+            arrow = '↑'; color = 'var(--down)';  // expanding vol = risk-off color (red)
+            tip = `HV10 (${hv10.toFixed(1)}%) > HV30 (${hv30.toFixed(1)}%) — short-term vol expanding`;
+          } else if (diff < -1) {
+            arrow = '↓'; color = 'var(--up)';    // contracting vol = green
+            tip = `HV10 (${hv10.toFixed(1)}%) < HV30 (${hv30.toFixed(1)}%) — short-term vol contracting`;
+          } else {
+            arrow = '→'; color = 'var(--text3)';
+            tip = `HV10 (${hv10.toFixed(1)}%) ≈ HV30 (${hv30.toFixed(1)}%) — vol stable (within 1pp)`;
+          }
+          tds[4].textContent = arrow;
+          tds[4].style.color = color;
+          tds[4].title = tip;
+        } else {
+          tds[4].textContent = '—';
+          tds[4].style.color = 'var(--text3)';
+          tds[4].title = 'HV 10d not yet available — pipeline computes on next run';
+        }
+        tds[4].style.textAlign = 'right';
+        tds[4].style.fontSize = '11px';
       }
     });
   }
