@@ -779,6 +779,10 @@
   .crh-pair,.cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; font-size:10.5px; font-family:var(--font-ui); }
   .crh-nom,.cr-nom   { font-family:var(--font-mono); font-size:10px; color:var(--text2); text-align:right; white-space:nowrap; padding-right:4px; }
   .crh-cip,.cr-cip   { font-family:var(--font-mono); font-size:10px; text-align:right; white-space:nowrap; padding-right:4px; }
+  /* Header cells: reset inherited letter-spacing (.07em from .carry-rank-hdr makes labels
+     wider than the data values, causing visual misalignment) */
+  .crh-nom,.crh-cip  { letter-spacing:0; display:block; }
+  .crh-pair          { letter-spacing:0; }
   /* SIGNAL: flex so nested spans align right correctly */
   .crh-sig { font-size:8px; display:flex; justify-content:flex-end; align-items:center; white-space:nowrap; }
   .cr-sig  { display:flex; justify-content:flex-end; align-items:center; white-space:nowrap; }

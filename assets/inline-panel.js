@@ -1,26 +1,30 @@
 // ═══════════════════════════════════════════════════════════════════
-// INLINE PANEL SYSTEM  v1.0.0
+// INLINE PANEL SYSTEM  v1.2.0
 // File: assets/inline-panel.js
-// Loaded AFTER all modal scripts (see index.html)
+// Loaded AFTER all modal scripts (see index2.html)
 //
 // Intercepts modal open calls and renders content inline inside the
 // split-layout center columns instead of floating overlays:
 //
 //   LEFT center  (#split-upper):  Carry Trade · Heatmap
 //   RIGHT center (#split-lower):  Correlations · CB Rates · COT
+//
+// v1.2.0: Synchronous transplant strategy — pre-hide bd BEFORE calling
+//         orig so display:'flex' is invisible, then steal the element
+//         in the same JS tick. Zero flicker.
 // ═══════════════════════════════════════════════════════════════════
 
 (function () {
   'use strict';
 
-  const LS_KEY  = 'gi_split_layout';
-  const IP_ATTR = 'data-inline-panel';
+  var LS_KEY  = 'gi_split_layout';
+  var IP_ATTR = 'data-inline-panel';
 
-  // ── Ensure split-layout is active ─────────────────────────────────
+  // ── Ensure split-layout is active, return {upper, lower} ──────────
   function _ensureSplit() {
-    var main   = document.getElementById('main');
-    var upper  = document.getElementById('split-upper');
-    var lower  = document.getElementById('split-lower');
+    var main  = document.getElementById('main');
+    var upper = document.getElementById('split-upper');
+    var lower = document.getElementById('split-lower');
     if (!main || !upper || !lower) return null;
 
     if (!main.classList.contains('split-layout')) {
@@ -29,7 +33,7 @@
       var alerts = document.getElementById('section-macro');
 
       main.classList.add('split-layout');
-      if (btn)    { btn.classList.remove('active'); btn.setAttribute('aria-pressed','true'); }
+      if (btn)    { btn.classList.add('active'); btn.setAttribute('aria-pressed','true'); }
       if (handle) handle.style.display = '';
       upper.style.width = '55%';
       upper.style.flex  = 'none';
@@ -40,22 +44,15 @@
     return { upper: upper, lower: lower };
   }
 
-  // ── Core: inject content into target panel ─────────────────────────
-  function showInlinePanel(target, renderFn, title, onClose) {
-    if (!target) return;
-
-    // Remove any existing inline panel in this target
-    var existing = target.querySelector('[' + IP_ATTR + ']');
-    if (existing) {
-      // Trigger its onClose cleanup if needed before replacing
-      existing.remove();
-    }
+  // ── Create inline shell: header bar + scrollable body ─────────────
+  function _makeShell(target, title, onClose) {
+    var old = target.querySelector('[' + IP_ATTR + ']');
+    if (old) old.remove();
 
     var wrap = document.createElement('div');
     wrap.setAttribute(IP_ATTR, '1');
     wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;height:100%;min-height:0;background:var(--bg);overflow:hidden;';
 
-    // Header bar
     var hd = document.createElement('div');
     hd.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:5px 10px 4px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);';
 
@@ -66,117 +63,105 @@
     var closeBtn = document.createElement('button');
     closeBtn.textContent = '✕';
     closeBtn.setAttribute('aria-label', 'Close panel');
-    closeBtn.style.cssText = 'background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;line-height:1;padding:2px 5px;border-radius:3px;';
-    closeBtn.addEventListener('mouseenter', function() { closeBtn.style.color = 'var(--text)'; });
-    closeBtn.addEventListener('mouseleave', function() { closeBtn.style.color = 'var(--text3)'; });
-    closeBtn.addEventListener('click', function() {
+    closeBtn.style.cssText = 'background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;line-height:1;padding:2px 5px;border-radius:3px;transition:color .1s;';
+    closeBtn.onmouseenter = function() { closeBtn.style.color = 'var(--text)'; };
+    closeBtn.onmouseleave = function() { closeBtn.style.color = 'var(--text3)'; };
+    closeBtn.onclick = function() {
       wrap.remove();
       if (typeof onClose === 'function') onClose();
-    });
+    };
 
     hd.appendChild(titleEl);
     hd.appendChild(closeBtn);
 
-    // Content body
     var body = document.createElement('div');
-    body.style.cssText = 'flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;';
+    body.style.cssText = 'flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;display:flex;flex-direction:column;';
 
     wrap.appendChild(hd);
     wrap.appendChild(body);
-
-    // Prepend so it appears at top of target
     target.prepend(wrap);
     target.scrollTop = 0;
 
-    // Render
-    Promise.resolve().then(function() {
-      try { renderFn(body); }
-      catch(e) {
-        body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Error loading panel.</div>';
-        console.warn('[InlinePanel]', e);
-      }
-    });
+    return body;
   }
 
-  // ── Helper: transplant a modal's inner element into an inline body ──
-  // Resets positioning styles so it flows naturally in the panel.
-  function _transplant(body, bdId, modalId, closeId, extraStyles) {
-    var bd = document.getElementById(bdId);
+  // ── Synchronously transplant modal into inline body ────────────────
+  // Strips backdrop and modal chrome so it flows naturally in the panel.
+  function _transplant(body, bdId, modalId, closeId, modalExtraCSS) {
+    var bd    = document.getElementById(bdId);
     var modal = document.getElementById(modalId);
     if (!bd || !modal) return false;
 
-    // Hide the fixed-overlay backdrop
-    bd.style.cssText = 'position:relative;inset:auto;z-index:1;padding:0;display:block;animation:none;background:none;';
+    // Keep bd in DOM so modal's internal JS still finds it — just make it inert
+    bd.style.cssText = 'display:block!important;position:static!important;background:none!important;padding:0!important;animation:none!important;z-index:auto!important;';
 
-    // Strip modal chrome styles, apply inline-friendly overrides
-    var base = 'width:100%;max-width:none;border-radius:0;border:none;box-shadow:none;animation:none;background:var(--bg);height:auto;max-height:none;';
-    modal.style.cssText = base + (extraStyles || '');
+    // Strip modal chrome
+    var base = 'width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;';
+    modal.style.cssText = base + (modalExtraCSS || '');
 
     // Hide the modal's own close button
     if (closeId) {
-      var origClose = document.getElementById(closeId);
-      if (origClose) origClose.style.display = 'none';
+      var oc = document.getElementById(closeId);
+      if (oc) oc.style.display = 'none';
     }
 
-    body.style.overflow = 'hidden';
     body.appendChild(bd);
     return true;
   }
 
-  // ── Helper: restore modal back to body after inline panel closes ────
-  function _restore(bdId, modalId, closeId, originalStyles) {
+  // ── Restore modal back to document.body on panel close ────────────
+  function _restore(bdId, closeId, bdOrigCSS, modalId) {
     var bd = document.getElementById(bdId);
-    var modal = document.getElementById(modalId);
     if (!bd) return;
-
-    // Move back to body
     if (bd.parentNode !== document.body) document.body.appendChild(bd);
-
-    // Restore overlay backdrop
-    bd.style.cssText = originalStyles || '';
-
-    if (modal) modal.style.cssText = '';
-
+    bd.style.cssText = bdOrigCSS || 'display:none;';
     if (closeId) {
-      var origClose = document.getElementById(closeId);
-      if (origClose) origClose.style.display = '';
+      var oc = document.getElementById(closeId);
+      if (oc) oc.style.display = '';
+    }
+    if (modalId) {
+      var modal = document.getElementById(modalId);
+      if (modal) modal.style.cssText = '';
     }
   }
 
   // ═══════════════════════════════════════════════════════════════════
   // INTERCEPT: Real Carry Modal → #split-upper (LEFT)
+  //
+  // openRealCarryModal sets bd.style.display='flex' synchronously,
+  // then optionally awaits _rcmFetchData(). Strategy:
+  //   1. Pre-hide bd BEFORE calling orig → flex is never visible
+  //   2. Call orig (DOM builds, fetch starts in background)
+  //   3. SYNCHRONOUSLY transplant — same JS tick, no paint yet
+  //   4. orig's async _rcmRender() updates #rcm-body which is now
+  //      inside our panel → content appears naturally, zero flicker
   // ═══════════════════════════════════════════════════════════════════
   var _origOpenRCM = window.openRealCarryModal;
 
-  window.openRealCarryModal = async function(longCcy, shortCcy) {
+  window.openRealCarryModal = function(longCcy, shortCcy) {
     var panels = _ensureSplit();
     if (!panels) { _origOpenRCM && _origOpenRCM(longCcy, shortCcy); return; }
 
-    var target = panels.upper;
-
-    // Build the title
-    var pairLabel = (longCcy && shortCcy) ? (longCcy + '/' + shortCcy) : 'G8';
-
-    showInlinePanel(target, async function(body) {
-      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Loading real carry data…</div>';
-
-      // Call original — it populates #rcm-bd
-      if (_origOpenRCM) {
-        var bd = document.getElementById('rcm-bd');
-        if (bd) bd.style.display = 'none'; // suppress fixed overlay while loading
-        await _origOpenRCM(longCcy, shortCcy);
-        if (bd) bd.style.display = 'none'; // keep suppressed
-      }
-
-      body.innerHTML = '';
-      var ok = _transplant(body, 'rcm-bd', 'rcm-modal', 'rcm-close',
-        'display:flex;flex-direction:column;overflow:hidden;');
-
-      if (!ok) body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Real carry data unavailable.</div>';
-    }, 'Real Rate Carry · ' + pairLabel, function() {
-      _restore('rcm-bd', 'rcm-modal', 'rcm-close',
-        'position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:16px;');
+    var label = (longCcy && shortCcy) ? longCcy + '/' + shortCcy : 'G8';
+    var body  = _makeShell(panels.upper, 'Real Rate Carry · ' + label, function() {
+      _restore('rcm-bd', 'rcm-close',
+        'position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:16px;',
+        'rcm-modal');
     });
+
+    // 1. Pre-hide
+    var bdPre = document.getElementById('rcm-bd');
+    if (bdPre) bdPre.style.display = 'none';
+
+    // 2. Call orig (sync part: builds DOM if needed, sets display:flex — but we pre-hid it)
+    _origOpenRCM && _origOpenRCM(longCcy, shortCcy);
+
+    // 3. Synchronous transplant
+    if (!_transplant(body, 'rcm-bd', 'rcm-modal', 'rcm-close',
+        'display:flex!important;flex-direction:column!important;overflow:hidden!important;')) {
+      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Carry data unavailable.</div>';
+    }
+    document.body.style.overflow = '';
   };
 
   // ═══════════════════════════════════════════════════════════════════
@@ -188,32 +173,27 @@
     var panels = _ensureSplit();
     if (!panels) { _origOpenHM && _origOpenHM(ccy, strengths, rtCache); return; }
 
-    var target = panels.upper;
-
-    showInlinePanel(target, function(body) {
-      // Call original — populates #hm-bd
-      if (_origOpenHM) {
-        var bd = document.getElementById('hm-bd');
-        if (bd) bd.style.display = 'none';
-        _origOpenHM(ccy, strengths, rtCache);
-        if (bd) bd.style.display = 'none';
-      }
-
-      var ok = _transplant(body, 'hm-bd', 'hm-modal', 'hm-close',
-        'display:flex;flex-direction:column;overflow:hidden;');
-
-      if (!ok) body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Heatmap data unavailable.</div>';
-    }, 'Currency Strength · ' + (ccy || ''), function() {
-      // Destroy and re-create on next open (heatmap has a Lightweight Charts instance that must be remounted)
+    var body = _makeShell(panels.upper, 'Currency Strength · ' + (ccy || ''), function() {
+      // Destroy chart instance so it remounts correctly on next open
       var hmBd = document.getElementById('hm-bd');
       if (hmBd) hmBd.remove();
-      // The next call to openHeatmapModal will rebuild via buildModal()
     });
+
+    var bdPre = document.getElementById('hm-bd');
+    if (bdPre) bdPre.style.display = 'none';
+
+    _origOpenHM && _origOpenHM(ccy, strengths, rtCache);
+
+    if (!_transplant(body, 'hm-bd', 'hm-modal', 'hm-close',
+        'display:flex!important;flex-direction:column!important;overflow:hidden!important;')) {
+      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Heatmap unavailable.</div>';
+    }
+    document.body.style.overflow = '';
   };
 
   // ═══════════════════════════════════════════════════════════════════
   // INTERCEPT: Correlation Modal → #split-lower (RIGHT)
-  // openCorrModal creates a fresh #cm-bd each call (closeCorrModal removes it)
+  // openCorrModal appends a fresh #cm-bd to document.body each call.
   // ═══════════════════════════════════════════════════════════════════
   var _origOpenCorr = window.openCorrModal;
 
@@ -221,34 +201,32 @@
     var panels = _ensureSplit();
     if (!panels) { _origOpenCorr && _origOpenCorr(corrObj); return; }
 
-    var target = panels.lower;
     var a = corrObj ? corrObj.a : '';
     var b = corrObj ? corrObj.b : '';
-
-    showInlinePanel(target, function(body) {
-      // openCorrModal does document.body.appendChild → fresh element each time
-      _origOpenCorr && _origOpenCorr(corrObj);
-
-      var cmBd    = document.getElementById('cm-bd');
-      var cmModal = document.getElementById('cm-modal');
-      if (!cmBd || !cmModal) {
-        body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Correlation data unavailable.</div>';
-        return;
-      }
-
-      // Neutralise the backdrop
-      cmBd.style.cssText = 'position:relative;inset:auto;z-index:1;padding:0;display:block;animation:none;background:none;';
-      // Neutralise modal chrome
-      cmModal.style.cssText = 'width:100%;max-width:none;border-radius:0;border:none;box-shadow:none;animation:none;background:var(--bg);height:auto;max-height:none;position:static;bottom:auto;left:auto;right:auto;';
-
-      var origClose = document.getElementById('cm-close');
-      if (origClose) origClose.style.display = 'none';
-
-      body.appendChild(cmBd);
-    }, 'Correlations · ' + a + ' / ' + b, function() {
-      // closeCorrModal removes #cm-bd from DOM — just call it
+    var body = _makeShell(panels.lower, 'Correlations · ' + a + ' / ' + b, function() {
       if (typeof window.closeCorrModal === 'function') window.closeCorrModal();
     });
+
+    var bdPre = document.getElementById('cm-bd');
+    if (bdPre) bdPre.style.display = 'none';
+
+    _origOpenCorr && _origOpenCorr(corrObj);
+
+    var cmBd    = document.getElementById('cm-bd');
+    var cmModal = document.getElementById('cm-modal');
+    if (!cmBd || !cmModal) {
+      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Correlation data unavailable.</div>';
+      return;
+    }
+
+    cmBd.style.cssText    = 'display:block!important;position:static!important;background:none!important;padding:0!important;animation:none!important;z-index:auto!important;';
+    cmModal.style.cssText = 'width:100%!important;max-width:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;height:auto!important;max-height:none!important;position:static!important;';
+
+    var oc = document.getElementById('cm-close');
+    if (oc) oc.style.display = 'none';
+
+    body.appendChild(cmBd);
+    document.body.style.overflow = '';
   };
 
   // ═══════════════════════════════════════════════════════════════════
@@ -256,30 +234,25 @@
   // ═══════════════════════════════════════════════════════════════════
   var _origOpenCBR = window.openCBRatesModal;
 
-  window.openCBRatesModal = async function(ccy, obs, bankInfo, meetingData) {
+  window.openCBRatesModal = function(ccy, obs, bankInfo, meetingData) {
     var panels = _ensureSplit();
     if (!panels) { _origOpenCBR && _origOpenCBR(ccy, obs, bankInfo, meetingData); return; }
 
-    var target = panels.lower;
-
-    showInlinePanel(target, async function(body) {
-      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Loading rate data…</div>';
-
-      if (_origOpenCBR) {
-        var bd = document.getElementById('cbr-bd');
-        if (bd) bd.style.display = 'none';
-        await _origOpenCBR(ccy, obs, bankInfo, meetingData);
-        if (bd) bd.style.display = 'none';
-      }
-
-      body.innerHTML = '';
-      var ok = _transplant(body, 'cbr-bd', 'cbr-modal', 'cbr-m-close', '');
-
-      if (!ok) body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">CB rate data unavailable.</div>';
-    }, 'CB Rates · ' + (ccy || ''), function() {
-      _restore('cbr-bd', 'cbr-modal', 'cbr-m-close',
-        'position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:12px;');
+    var body = _makeShell(panels.lower, 'CB Rates · ' + (ccy || ''), function() {
+      _restore('cbr-bd', 'cbr-m-close',
+        'position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:12px;',
+        'cbr-modal');
     });
+
+    var bdPre = document.getElementById('cbr-bd');
+    if (bdPre) bdPre.style.display = 'none';
+
+    _origOpenCBR && _origOpenCBR(ccy, obs, bankInfo, meetingData);
+
+    if (!_transplant(body, 'cbr-bd', 'cbr-modal', 'cbr-m-close', '')) {
+      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">CB rate data unavailable.</div>';
+    }
+    document.body.style.overflow = '';
   };
 
   // ═══════════════════════════════════════════════════════════════════
@@ -291,27 +264,25 @@
     var panels = _ensureSplit();
     if (!panels) { _origOpenCOT && _origOpenCOT(ccy, data); return; }
 
-    var target = panels.lower;
-
-    showInlinePanel(target, function(body) {
-      if (_origOpenCOT) {
-        var bd = document.getElementById('cot-bd');
-        if (bd) bd.style.display = 'none';
-        _origOpenCOT(ccy, data);
-        if (bd) bd.style.display = 'none';
-      }
-
-      var ok = _transplant(body, 'cot-bd', 'cot-modal', 'cot-m-close', '');
-
-      if (!ok) body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">COT data unavailable.</div>';
-    }, 'COT Positioning · ' + (ccy || ''), function() {
-      _restore('cot-bd', 'cot-modal', 'cot-m-close',
-        'position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:12px;');
+    var body = _makeShell(panels.lower, 'COT Positioning · ' + (ccy || ''), function() {
+      _restore('cot-bd', 'cot-m-close',
+        'position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:12px;',
+        'cot-modal');
     });
+
+    var bdPre = document.getElementById('cot-bd');
+    if (bdPre) bdPre.style.display = 'none';
+
+    _origOpenCOT && _origOpenCOT(ccy, data);
+
+    if (!_transplant(body, 'cot-bd', 'cot-modal', 'cot-m-close', '')) {
+      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">COT data unavailable.</div>';
+    }
+    document.body.style.overflow = '';
   };
 
   // ── Expose internals ────────────────────────────────────────────────
-  window._showInlinePanel    = showInlinePanel;
-  window._ensureInlineSplit  = _ensureSplit;
+  window._showInlinePanel   = _makeShell;
+  window._ensureInlineSplit = _ensureSplit;
 
 })();
