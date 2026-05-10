@@ -482,6 +482,9 @@ function populateFxPairsTable() {
       <td class="${cls1d}">${chg1d}</td>
       <td class="${cls1w}">${chg1w}</td>
       <td style="color:var(--text2);font-size:10px">${ivStr}</td>
+      <td style="color:var(--text3);font-size:10px">—</td>
+      <td style="color:var(--text3);font-size:10px">—</td>
+      <td style="color:var(--text3);font-size:10px">—</td>
       <td style="${sessStyle}">${sessH}</td>
       <td style="${sessStyle}">${sessL}</td>
     </tr>`;
@@ -5183,7 +5186,7 @@ function toggleInlineDetail(row) {
   expandRow.className = 'pd-expand-row';
   expandRow.dataset.forSym = tvSym;
   const td = document.createElement('td');
-  td.colSpan = 9;
+  td.colSpan = 12; // FX table has 12 columns
   const inner = document.createElement('div');
   inner.innerHTML = '<div style="padding:6px 10px;font-size:10px;color:var(--text3);">Loading…</div>';
   td.appendChild(inner);
@@ -6888,7 +6891,7 @@ async function fetchOptionSkew() {
     // Update thead to reflect what's actually showing
     const hasAnyEtfIv = pairs.some(p => etfIvMap[p.etfId]?.iv != null);
     const hasIvRank   = pairs.some(p => etfIvMap[p.etfId]?.iv_rank != null);
-    const thead = tbody.closest('table')?.querySelector('thead tr');
+    const thead = tbody ? tbody.closest('table')?.querySelector('thead tr') : null;
     if (thead) {
       if (hasAnyEtfIv) {
         // IV Rank column shown when history is available (≥4 weeks)
@@ -6911,7 +6914,7 @@ async function fetchOptionSkew() {
       'NZD/USD': { body: 'NZD/USD bias from CFTC Leveraged Funds net NZD positioning. NZD is a high-beta risk/commodity proxy — positive bias aligns with global risk appetite and dairy/agricultural strength.', ex: 'NZD often moves in tandem with AUD. Divergence between the two — e.g. NZD negative while AUD positive — can signal idiosyncratic NZ macro risk (RBNZ, trade data).' },
     };
 
-    tbody.innerHTML = pairs.map(p => {
+    if (tbody) tbody.innerHTML = pairs.map(p => {
       const cotData = cotMap[p.cot];
       const etfIv   = etfIvMap[p.etfId];
       const invert  = p.pair.startsWith('USD/');
@@ -9255,7 +9258,7 @@ async function renderCIPForwards() {
     const cfg = CIP_CCY_RATES[pair];
     if (!cfg) return;
     const tds = row.querySelectorAll('td');
-    if (tds.length < 10) return;
+    if (tds.length < 12) return;
 
     const pairId = pair.replace('/', '').toLowerCase();
     const spot = STOOQ_RT_CACHE[pairId]?.close ?? null;
@@ -9271,12 +9274,15 @@ async function renderCIPForwards() {
       const fwd = computeCIPForward(spot, rBase, rQuote, T);
       const el = tds[indices[i]];
       if (!el) return;
-      if (fwd != null) {
+      if (fwd != null && spot != null) {
         el.textContent = fwd.toFixed(dec);
-        el.style.color = 'var(--text2)';
-        el.title = `CIP ${T === 1/12 ? '1M' : '3M'} forward · r${cfg.base}=${rBase?.toFixed(2)}% vs r${cfg.quote}=${rQuote?.toFixed(2)}%`;
+        const isUsdBase = cfg.base === 'USD';
+        const diff = fwd - spot;
+        const atPremium = isUsdBase ? diff < 0 : diff > 0;
+        el.style.color = atPremium ? 'var(--up)' : 'var(--down)';
+        el.title = `CIP ${T === 1/12 ? '1M' : '3M'} forward · r${cfg.base}=${rBase?.toFixed(2)}% vs r${cfg.quote}=${rQuote?.toFixed(2)}% · ${atPremium ? 'base at premium' : 'base at discount'}`;
       } else {
-        el.textContent = '—';
+        el.textContent = fwd != null ? fwd.toFixed(dec) : '—';
         el.style.color = 'var(--text3)';
       }
     });
@@ -9369,14 +9375,22 @@ async function renderDerivativesSection() {
       // Spot
       if (tds[1]) tds[1].textContent = spot != null ? spot.toFixed(dec) : '—';
 
-      // Forwards: 1M, 3M, 6M, 1Y
+      // Forwards: 1M, 3M, 6M, 1Y — color by direction vs spot
+      const isUsdBase = cfg.base === 'USD';
       const tenors = [1/12, 3/12, 6/12, 1];
       tenors.forEach((T, ti) => {
         const fwd = computeCIPForward(spot, rBase, rQuote, T);
         const el = tds[2 + ti];
         if (!el) return;
-        el.textContent = fwd != null ? fwd.toFixed(dec) : '—';
-        el.style.color = fwd != null ? 'var(--text2)' : 'var(--text3)';
+        if (fwd != null && spot != null) {
+          el.textContent = fwd.toFixed(dec);
+          const diff = fwd - spot;
+          const atPremium = diff > 0;
+          el.style.color = atPremium ? 'var(--up)' : 'var(--down)';
+        } else {
+          el.textContent = '—';
+          el.style.color = 'var(--text3)';
+        }
       });
 
       // Rate diff
@@ -9433,6 +9447,7 @@ async function renderDerivativesSection() {
   }
 
   // ── HV Term Structure table ──
+  // quotes.json only provides hv30 — hv10/hv21/hv60 columns show — until pipeline is extended
   const hvTermTbody = document.getElementById('hv-term-tbody');
   if (hvTermTbody && intraday?.quotes) {
     const rows = hvTermTbody.querySelectorAll('tr');
@@ -9443,29 +9458,22 @@ async function renderDerivativesSection() {
       const q = intraday.quotes[pairId];
       const tds = row.querySelectorAll('td');
 
-      const hv10 = q?.hv10 ?? null;
-      const hv21 = q?.hv21 ?? null;
       const hv30 = q?.hv30 ?? STOOQ_RT_CACHE[pairId]?.hv30 ?? null;
-      const hv60 = q?.hv60 ?? null;
       const rrKey = rrKeys[pair];
       const rr1m = rrMap[rrKey]?.rr25d ?? null;
 
-      const hvVals = [hv10, hv21, hv30, hv60];
-      hvVals.forEach((v, vi) => {
-        const el = tds[1 + vi];
-        if (!el) return;
-        el.textContent = v != null ? v.toFixed(1) + '%' : '—';
-        el.style.color = v != null ? 'var(--text)' : 'var(--text3)';
-      });
-
-      // Vol trend: HV10 vs HV30
-      if (tds[5]) {
-        if (hv10 != null && hv30 != null) {
-          const diff = hv10 - hv30;
-          tds[5].textContent = diff > 1.5 ? 'Rising' : diff < -1.5 ? 'Falling' : 'Stable';
-          tds[5].style.color = diff > 1.5 ? 'var(--down)' : diff < -1.5 ? 'var(--up)' : 'var(--text3)';
-        } else { tds[5].textContent = '—'; tds[5].style.color = 'var(--text3)'; }
+      // td[1]=HV10 (n/a), td[2]=HV21 (n/a), td[3]=HV30, td[4]=HV60 (n/a)
+      if (tds[1]) { tds[1].textContent = '—'; tds[1].style.color = 'var(--text3)'; tds[1].title = 'Not computed by pipeline'; }
+      if (tds[2]) { tds[2].textContent = '—'; tds[2].style.color = 'var(--text3)'; tds[2].title = 'Not computed by pipeline'; }
+      if (tds[3]) {
+        tds[3].textContent = hv30 != null ? hv30.toFixed(1) + '%' : '—';
+        tds[3].style.color = hv30 != null ? (hv30 > 12 ? 'var(--down)' : hv30 < 5 ? 'var(--up)' : 'var(--text)') : 'var(--text3)';
+        if (hv30 != null) tds[3].title = 'Annualized 30d HV · std(log returns)×√252 · yfinance OHLC';
       }
+      if (tds[4]) { tds[4].textContent = '—'; tds[4].style.color = 'var(--text3)'; tds[4].title = 'Not computed by pipeline'; }
+
+      // Vol trend: not available without HV10
+      if (tds[5]) { tds[5].textContent = '—'; tds[5].style.color = 'var(--text3)'; }
 
       // RR - HV30 (skew premium vs realized)
       if (tds[6]) {
@@ -9493,28 +9501,19 @@ async function renderHVMultiWindow() {
   };
   const pairs = ['eurusd','gbpusd','usdjpy','audusd'];
   const labels = {'eurusd':'EUR/USD','gbpusd':'GBP/USD','usdjpy':'USD/JPY','audusd':'AUD/USD'};
-
+  // quotes.json only provides hv30; hv10/hv60 are not computed by the pipeline
   const rows = pairs.map(pairId => {
     const q = intraday?.quotes?.[pairId];
-    const hv10 = q?.hv10 ?? null;
     const hv30 = q?.hv30 ?? STOOQ_RT_CACHE[pairId]?.hv30 ?? null;
-    const hv60 = q?.hv60 ?? null;
     const rr1m = rrMap[rrKeys[pairId]]?.rr25d ?? null;
-    const trend = (hv10 != null && hv30 != null)
-      ? (hv10 - hv30 > 1.5 ? '<span style="color:var(--down)">Rising</span>'
-        : hv10 - hv30 < -1.5 ? '<span style="color:var(--up)">Falling</span>'
-        : '<span style="color:var(--text3)">Stable</span>')
-      : '—';
-    const fmtV = v => v != null ? v.toFixed(1)+'%' : '—';
+    const hv30Color = hv30 != null ? (hv30 > 12 ? 'var(--down)' : hv30 < 5 ? 'var(--up)' : 'var(--text)') : 'var(--text3)';
     const fmtRR = v => v != null ? (v>=0?'+':'')+v.toFixed(2) : '—';
-    const rrCls = rr1m != null ? (rr1m > 0.1 ? 'style="color:var(--up)"' : rr1m < -0.1 ? 'style="color:var(--down)"' : '') : '';
+    const rrColor = rr1m != null ? (rr1m > 0.1 ? 'var(--up)' : rr1m < -0.1 ? 'var(--down)' : 'var(--text2)') : 'var(--text3)';
     return `<tr>
       <td style="font-family:var(--font-mono);font-size:10px;">${labels[pairId]}</td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:10px;">${fmtV(hv10)}</td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:10px;">${fmtV(hv30)}</td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:10px;">${fmtV(hv60)}</td>
-      <td style="text-align:right;font-family:var(--font-mono);font-size:10px;" ${rrCls}>${fmtRR(rr1m)}</td>
-      <td style="text-align:right;font-size:10px;">${trend}</td>
+      <td style="text-align:right;font-family:var(--font-mono);font-size:10px;color:${hv30Color};">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</td>
+      <td style="text-align:right;font-family:var(--font-mono);font-size:10px;color:${rrColor};">${fmtRR(rr1m)}</td>
+      <td style="text-align:right;font-size:10px;color:var(--text3);">—</td>
     </tr>`;
   });
   tbody.innerHTML = rows.join('');
@@ -9789,39 +9788,53 @@ async function loadCBRatesCache() {
   }));
 }
 
-// ── Section visibility: show/hide panels when nav tabs are clicked ──
+// ── Section visibility: Derivatives panel toggle ──
 function initDerivativesNavFixed() {
-  const allNavLinks = document.querySelectorAll('.top-nav a[data-target]');
-
-  // Map of which sections to show/hide per nav target
-  // Derivatives replaces Cross-Asset + Risk in the lower-right column when active
   const derivSection = document.getElementById('section-derivatives');
-  const normalSections = [
-    document.getElementById('section-crossasset'),
-    document.getElementById('section-risk'),
-    document.getElementById('section-rates'),
-    document.getElementById('section-positioning'),
-    document.getElementById('section-macro'),
-  ].filter(Boolean);
-
   if (!derivSection) return;
 
-  allNavLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      const target = link.dataset.target;
-      if (target === 'section-derivatives') {
-        // Show Derivatives, hide the normal lower-right panels
-        derivSection.style.display = '';
-        normalSections.forEach(s => { s.style.display = 'none'; });
-        // Trigger render
-        renderDerivativesSection();
-        renderHVMultiWindow();
-      } else {
-        // Restore normal sections, hide Derivatives
-        derivSection.style.display = 'none';
-        normalSections.forEach(s => { s.style.display = ''; });
+  const splitLowerRight = document.getElementById('split-lower-right');
+  if (!splitLowerRight) return;
+
+  function showDerivatives() {
+    Array.from(splitLowerRight.children).forEach(el => {
+      if (el.id !== 'section-derivatives') {
+        el.dataset.derivHidden = '1';
+        el.style.display = 'none';
       }
     });
+    derivSection.style.display = '';
+    // Scroll split-lower to top so derivatives is visible
+    const splitLower = document.getElementById('split-lower');
+    if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
+    renderDerivativesSection();
+    renderHVMultiWindow();
+  }
+
+  function hideDerivatives() {
+    derivSection.style.display = 'none';
+    splitLowerRight.querySelectorAll('[data-deriv-hidden]').forEach(el => {
+      el.style.display = '';
+      delete el.dataset.derivHidden;
+    });
+  }
+
+  // Use capture phase on Derivatives link to run before the main nav scroll handler
+  const derivLink = document.querySelector('.top-nav a[data-target="section-derivatives"]');
+  if (derivLink) {
+    derivLink.addEventListener('click', (e) => {
+      e.stopImmediatePropagation();
+      showDerivatives();
+    }, true);
+  }
+
+  // Restore on any other nav click
+  document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
+    if (link.dataset.target !== 'section-derivatives') {
+      link.addEventListener('click', () => {
+        if (derivSection.style.display !== 'none') hideDerivatives();
+      });
+    }
   });
 }
 
