@@ -998,28 +998,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
       <!-- HV Term Structure -->
       <div style="padding:8px 10px 2px;border-top:1px solid var(--border);">
-        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Realized Vol Term Structure · yfinance OHLC</div>
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Realized Vol · yfinance OHLC · HV 30d vs RR Skew</div>
         <div style="overflow-x:auto;">
-          <table id="hv-term-table" aria-label="Historical volatility term structure" style="width:100%;min-width:420px;">
+          <table id="hv-term-table" aria-label="Historical volatility term structure" style="width:100%;">
             <thead>
               <tr>
-                <th style="text-align:left" scope="col">Pair</th>
-                <th scope="col" title="10-day HV annualized">HV 10d</th>
-                <th scope="col" title="21-day HV annualized">HV 21d</th>
-                <th scope="col" title="30-day HV annualized">HV 30d</th>
-                <th scope="col" title="60-day HV annualized">HV 60d</th>
-                <th scope="col" title="Vol trend: HV10 vs HV30 — rising or falling short-term vol">Vol Trend</th>
-                <th scope="col" title="25d RR 1M minus HV30 — positive = options expensive vs realized">RR-HV</th>
+                <th style="text-align:left;font-size:9px;" scope="col">Pair</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="30-day HV annualized · only window computed by pipeline · std(log returns)×√252">HV 30d</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="25d Risk Reversal 1M from Saxo Bank — negative = put skew (downside hedging demand)">RR 1M</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="RR 1M expressed as % of HV 30d — measures implied skew premium vs realized vol">RR / HV</th>
               </tr>
             </thead>
             <tbody id="hv-term-tbody">
-              <tr><td>EUR/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td><td>—</td></tr>
-              <tr><td>GBP/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td><td>—</td></tr>
-              <tr><td>USD/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td><td>—</td></tr>
-              <tr><td>AUD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td><td>—</td></tr>
-              <tr><td>USD/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td><td>—</td></tr>
-              <tr><td>USD/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td><td>—</td></tr>
-              <tr><td>NZD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td><td>—</td></tr>
+              <tr><td>EUR/USD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>GBP/USD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>USD/JPY</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>AUD/USD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>USD/CHF</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>USD/CAD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>NZD/USD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
             </tbody>
           </table>
         </div>
