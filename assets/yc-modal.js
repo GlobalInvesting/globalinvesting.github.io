@@ -17,74 +17,64 @@
   s.textContent = `
 #ycm-bd {
   position:fixed;inset:0;z-index:9200;
-  background:rgba(0,0,0,.85);
+  background:rgba(0,0,0,.78);
   display:flex;align-items:center;justify-content:center;
   padding:12px;
   animation:ycm-fi .15s ease;
 }
 @keyframes ycm-fi { from{opacity:0} to{opacity:1} }
-@keyframes ycm-su { from{transform:translateY(12px);opacity:0} to{transform:none;opacity:1} }
+@keyframes ycm-su { from{transform:translateY(14px);opacity:0} to{transform:none;opacity:1} }
 
 #ycm-modal {
-  background:#161b22;
-  border:1px solid #30363d;
-  border-radius:8px;
+  background:var(--bg,#131722);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;
   width:min(800px,100%);
   height:min(560px,90vh);
   display:flex;flex-direction:column;
   overflow:hidden;
-  box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
-  animation:ycm-su .18s cubic-bezier(.16,1,.3,1);
+  animation:ycm-su .2s ease;
   font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);
-  color:#e6edf3;
-  position:relative;
-}
-#ycm-modal::before {
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,#1f6feb 0%,#58a6ff 50%,#26a69a 100%);
-  border-radius:8px 8px 0 0;z-index:1;
+  color:var(--text,#d1d4dc);
 }
 
 #ycm-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px 12px;
-  border-bottom:1px solid #30363d;
-  flex-shrink:0;background:#161b22;
+  padding:13px 18px 11px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;
 }
-#ycm-title { font-size:14px;font-weight:600;letter-spacing:-.01em;color:#e6edf3; }
-#ycm-sub   { font-size:10px;color:#6e7681;margin-top:2px;font-family:'IBM Plex Mono',var(--font-mono,monospace);letter-spacing:.02em; }
+#ycm-title { font-size:14px;font-weight:600;letter-spacing:.01em; }
+#ycm-sub   { font-size:10px;color:var(--text3,#6b7280);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
 #ycm-close {
-  background:none;border:none;color:#6e7681;font-size:18px;
-  cursor:pointer;padding:5px 7px;border-radius:5px;line-height:1;
-  transition:color .1s,background .1s;
+  background:none;border:none;color:var(--text3,#6b7280);font-size:20px;
+  cursor:pointer;padding:0 4px;line-height:1;
 }
-#ycm-close:hover { color:#e6edf3;background:#21262d; }
+#ycm-close:hover { color:var(--text,#d1d4dc); }
 
 #ycm-strip {
-  display:flex;border-bottom:1px solid #30363d;
+  display:flex;border-bottom:1px solid rgba(255,255,255,.07);
   flex-shrink:0;overflow-x:auto;
-  background:#0d1117;
 }
 .ycm-metric {
   flex:1;min-width:70px;padding:9px 12px;
-  border-right:1px solid #30363d;
-  background:#0d1117;
+  border-right:1px solid rgba(255,255,255,.06);
   text-align:center;
 }
 .ycm-metric:last-child { border-right:none; }
-.ycm-m-lbl { font-size:9px;color:#6e7681;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
-.ycm-m-val { font-size:15px;font-weight:600;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
-.ycm-m-chg { font-size:9px;margin-top:2px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.ycm-m-lbl { font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px; }
+.ycm-m-val { font-size:15px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono',monospace); }
+.ycm-m-chg { font-size:9px;margin-top:2px;font-family:var(--font-mono,'JetBrains Mono',monospace); }
 
 #ycm-chart-wrap {
   flex:1;position:relative;padding:16px 18px 12px;
   display:flex;flex-direction:column;
-  min-height:0;background:#0d1117;
+  min-height:0;
 }
 #ycm-legend {
   display:flex;gap:16px;margin-bottom:10px;flex-shrink:0;
 }
-.ycm-leg-item { display:flex;align-items:center;gap:5px;font-size:9px;color:#6e7681;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.ycm-leg-item { display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2,#9ca3af); }
 .ycm-leg-dot  { width:20px;height:2px;border-radius:1px;flex-shrink:0; }
 .ycm-leg-dot.dashed { background:repeating-linear-gradient(90deg,currentColor 0,currentColor 4px,transparent 4px,transparent 8px); }
 
@@ -94,34 +84,32 @@
 /* Shape label badges */
 #ycm-shape {
   position:absolute;top:6px;right:6px;
-  background:rgba(255,255,255,.04);
-  border:1px solid #30363d;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
   border-radius:4px;padding:3px 8px;
-  font-size:9px;color:#8b949e;
-  font-family:'IBM Plex Mono',var(--font-mono,monospace);
+  font-size:9px;color:var(--text2,#9ca3af);
+  font-family:var(--font-mono,'JetBrains Mono',monospace);
   pointer-events:none;
 }
 
 /* Tenor table at bottom */
 #ycm-table-wrap {
-  flex-shrink:0;border-top:1px solid #30363d;
-  overflow-x:auto;background:#161b22;
+  flex-shrink:0;border-top:1px solid rgba(255,255,255,.07);
+  overflow-x:auto;
 }
 #ycm-table {
   width:100%;border-collapse:collapse;font-size:10px;
-  font-family:'IBM Plex Mono',var(--font-mono,monospace);
+  font-family:var(--font-mono,'JetBrains Mono',monospace);
 }
 #ycm-table th {
-  padding:5px 10px;text-align:right;color:#6e7681;
-  font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;
-  border-bottom:1px solid #30363d;background:#161b22;
+  padding:5px 10px;text-align:right;color:var(--text3,#6b7280);
+  font-weight:400;font-size:9px;text-transform:uppercase;letter-spacing:.05em;
 }
 #ycm-table th:first-child { text-align:left; }
 #ycm-table td {
-  padding:5px 10px;text-align:right;border-top:1px solid rgba(48,54,61,.6);
+  padding:5px 10px;text-align:right;border-top:1px solid rgba(255,255,255,.04);
 }
-#ycm-table td:first-child { text-align:left;color:#8b949e; }
-#ycm-table tr:hover td { background:rgba(255,255,255,.03); }
+#ycm-table td:first-child { text-align:left;color:var(--text2,#9ca3af); }
 
 @media(max-width:600px){
   #ycm-modal{border-radius:12px 12px 0 0;position:fixed;bottom:0;left:0;right:0;width:100%;height:88vh;}
@@ -197,7 +185,7 @@ function openYCModal(tenorData) {
     const priorVal = (aT.prev_close != null && bT.prev_close != null)
       ? (aT.prev_close - bT.prev_close) * 100 : null;
     const chgBp = priorVal != null ? val - priorVal : null;
-    const valCol = val < 0 ? 'var(--down,#ef5350)' : val > 0 ? 'var(--up,#26a69a)' : '#8b949e';
+    const valCol = val < 0 ? 'var(--down,#ef5350)' : val > 0 ? 'var(--up,#26a69a)' : 'var(--text2,#9096a0)';
     const chgTxt = chgBp != null ? (chgBp > 0 ? '+' : '') + chgBp.toFixed(1) + 'bp' : '—';
     const chgCls = chgBp != null ? (chgBp > 0.5 ? 'up' : chgBp < -0.5 ? 'down' : '') : '';
     return `<div class="ycm-metric">
@@ -253,8 +241,8 @@ function openYCModal(tenorData) {
             <div class="ycm-leg-dot" style="background:#4f7fff;height:2px;"></div>
             Today
           </div>
-          <div class="ycm-leg-item" style="color:#6e7681;">
-            <div class="ycm-leg-dot dashed" style="color:#6e7681;"></div>
+          <div class="ycm-leg-item" style="color:var(--text3,#6b7280);">
+            <div class="ycm-leg-dot dashed" style="color:#6b7280;"></div>
             Prior close
           </div>
           ${shape ? `<div class="ycm-leg-item" style="margin-left:auto;color:${shapeCol};font-weight:600;">${shape}</div>` : ''}
@@ -320,7 +308,7 @@ function _ycDrawChart(labels, todayVals, priorVals) {
           pointRadius: 4,
           pointHoverRadius: 6,
           pointBackgroundColor: '#4f7fff',
-          pointBorderColor: '#161b22',
+          pointBorderColor: '#131722',
           pointBorderWidth: 2,
         },
         {
@@ -335,7 +323,7 @@ function _ycDrawChart(labels, todayVals, priorVals) {
           pointRadius: 3,
           pointHoverRadius: 5,
           pointBackgroundColor: 'rgba(107,114,128,.55)',
-          pointBorderColor: '#161b22',
+          pointBorderColor: '#131722',
           pointBorderWidth: 1,
         }
       ]
@@ -374,14 +362,14 @@ function _ycDrawChart(labels, todayVals, priorVals) {
         x: {
           grid: { color: 'rgba(255,255,255,.05)' },
           ticks: {
-            color: '#6e7681',
+            color: '#6b7280',
             font: { family: "'JetBrains Mono','Courier New',monospace", size: 10 }
           }
         },
         y: {
           grid: { color: 'rgba(255,255,255,.05)' },
           ticks: {
-            color: '#6e7681',
+            color: '#6b7280',
             font: { family: "'JetBrains Mono','Courier New',monospace", size: 10 },
             callback: v => v.toFixed(2) + '%'
           },
