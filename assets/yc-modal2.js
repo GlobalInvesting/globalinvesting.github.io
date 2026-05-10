@@ -7,7 +7,22 @@
   const s = document.createElement('style');
   s.id = 'ycm-css';
   s.textContent = `
-#ycm-bd { display:block!important; }
+#ycm-bd {
+  display:block!important;
+  position:fixed!important;
+  top:92px!important;
+  right:0!important;
+  width:220px!important;
+  height:calc(100vh - 92px)!important;
+  overflow-y:auto!important;
+  z-index:500!important;
+  background:var(--bg)!important;
+  border-left:1px solid var(--border2)!important;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border2) transparent;
+}
+#ycm-bd::-webkit-scrollbar { width:3px; }
+#ycm-bd::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
 #ycm-modal {
   width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
   border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;
@@ -120,6 +135,9 @@ function openYCModal(tenorData) {
   bd.setAttribute('role', 'dialog');
   bd.setAttribute('aria-modal', 'true');
   bd.setAttribute('aria-label', 'US Treasury Yield Curve');
+  // Match actual rightpanel width (may have been resized by layout-resizer.js)
+  const rp = document.getElementById('rightpanel');
+  if (rp) bd.style.width = rp.offsetWidth + 'px';
   bd.innerHTML = `
 <div id="ycm-modal">
   <div id="ycm-hd">
