@@ -772,15 +772,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             </tr>
           </thead>
           <tbody id="sovereign-spreads-tbody">
-            <tr><td>DE</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>GB</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>JP</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>AU</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>CA</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>NZ</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Germany</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>UK</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Japan</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Australia</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Canada</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>New Zealand</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
           </tbody>
         </table>
-        <div style="font-size:9px;color:var(--text3);margin-top:4px;">extended-data/*.json · daily batch · yfinance</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:4px;">Daily sovereign yield pipeline · yfinance · FRED · ECB · BOE</div>
       </div>
     </div>
 
@@ -936,13 +936,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               </tr>
             </thead>
             <tbody id="fwd-tbody">
-              <tr><td>EUR/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
-              <tr><td>GBP/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
-              <tr><td>USD/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
-              <tr><td>AUD/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
-              <tr><td>USD/CHF</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
-              <tr><td>USD/CAD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
-              <tr><td>NZD/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="EUR/USD"><td>EUR/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="GBP/USD"><td>GBP/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="USD/JPY"><td>USD/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="AUD/USD"><td>AUD/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="USD/CHF"><td>USD/CHF</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="USD/CAD"><td>USD/CAD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="NZD/USD"><td>NZD/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr style="border-top:1px solid var(--border2);"><td style="color:var(--text3);font-size:9px;padding-top:4px;" colspan="7">Cross pairs</td></tr>
+              <tr data-pair="EUR/GBP"><td>EUR/GBP</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="EUR/JPY"><td>EUR/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="GBP/JPY"><td>GBP/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="AUD/JPY"><td>AUD/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="EUR/AUD"><td>EUR/AUD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="EUR/CHF"><td>EUR/CHF</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
             </tbody>
           </table>
         </div>
@@ -1006,32 +1013,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="font-size:9px;color:var(--text3);margin-top:3px;">Annualized std(log returns) · sample variance n−1 · ×√252 · yfinance OHLC via quotes.json · Trend = HV 10d vs HV 30d</div>
       </div>
 
-      <!-- Cross-Pair Vol Monitor -->
-      <div style="padding:8px 10px 2px;border-top:1px solid var(--border);">
-        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Cross-Pair Vol Monitor · HV 30d · yfinance</div>
-        <div style="overflow-x:auto;">
-          <table id="cross-vol-table" aria-label="Cross-pair volatility monitor" style="width:100%;min-width:380px;">
-            <thead>
-              <tr>
-                <th style="text-align:left;font-size:9px;" scope="col">Pair</th>
-                <th style="font-size:9px;text-align:right;" scope="col" title="30-day realized volatility annualized">HV 30d</th>
-                <th style="font-size:9px;text-align:right;" scope="col" title="10-day realized volatility">HV 10d</th>
-                <th style="font-size:9px;text-align:right;" scope="col" title="Vol trend: HV 10d vs HV 30d. ↑ expanding, ↓ contracting, → stable">Trend</th>
-                <th style="font-size:9px;text-align:right;" scope="col" title="1-day price change %">1D Δ%</th>
-              </tr>
-            </thead>
-            <tbody id="cross-vol-tbody">
-              <tr><td>EUR/GBP</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
-              <tr><td>EUR/JPY</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
-              <tr><td>GBP/JPY</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
-              <tr><td>AUD/JPY</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
-              <tr><td>EUR/AUD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
-              <tr><td>EUR/NZD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div style="font-size:9px;color:var(--text3);margin-top:3px;">yfinance OHLC via quotes.json · Trend = HV 10d vs HV 30d · complements major-pair vol surface</div>
-      </div>
     </div><!-- /#section-derivatives -->
 
       </div><!-- /#split-lower-right -->
