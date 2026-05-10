@@ -34,10 +34,7 @@
   --font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --font-mono:'JetBrains Mono','Courier New',monospace;
   /* Tile system */
-  --tile-min-w:120px;
-  --tile-min-h:90px;
-  --tile-head-h:30px;
-  --grid-gap:4px;
+  --tile-head-h:28px;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:12px;line-height:1.4;height:100vh;overflow:hidden;}
 
@@ -51,8 +48,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 /* ── WORKSPACE SHELL ── */
 #ws-shell{
   display:flex;
-  flex-direction:row;
-  height:calc(100vh - 122px); /* topbar 36 + quotebar 34 + newsticker 22 + toolbar 30 */
+  flex-direction:column;
+  height:calc(100vh - 122px);
   overflow:hidden;
 }
 
@@ -98,55 +95,42 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .ws-save-btn.saved{border-color:var(--up);color:var(--up)}
 #ws-layout-name{font-size:10px;color:var(--text3);font-family:var(--font-mono);}
 
-/* ── WORKSPACE MAIN AREA (canvas only — sidebar & rightpanel are tiles) ── */
-#ws-main-col{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden;}
-
+/* ── WORKSPACE CANVAS — CSS Grid ── */
 #ws-canvas{
   flex:1;
-  position:relative;
-  overflow:auto;
-  background:var(--bg);
-  /* Subtle grid overlay */
-  background-image:radial-gradient(circle,var(--border2) 1px,transparent 1px);
-  background-size:24px 24px;
-  background-position:0 0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border2) transparent;
 }
+#ws-canvas::-webkit-scrollbar{width:3px}
+#ws-canvas::-webkit-scrollbar-thumb{background:var(--border2)}
 
-/* Tile inner sidebar/rightpanel styles */
-.tile-sidebar{overflow-y:auto;font-size:11px;height:100%;}
+/* ── CSS GRID ── */
+#ws-grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:1px;
+  background:var(--border);
+  min-height:100%;
+}
 
 /* ── TILE ── */
 .ws-tile{
-  position:absolute;
   background:var(--bg2);
-  border:1px solid var(--border);
-  border-radius:3px;
   display:flex;flex-direction:column;
   overflow:hidden;
-  box-shadow:0 1px 6px rgba(0,0,0,.35);
-  transition:box-shadow .12s, border-color .12s;
-  min-width:var(--tile-min-w);
-  min-height:var(--tile-min-h);
-  will-change:transform;
+  transition:opacity .15s;
+  min-height:160px;
 }
-.ws-tile:hover{box-shadow:0 2px 12px rgba(0,0,0,.5)}
-.ws-tile.dragging{
-  box-shadow:0 8px 32px rgba(0,0,0,.65);
-  border-color:var(--border2);
-  opacity:.95;
-  z-index:500!important;
-}
-.ws-tile.resizing{
-  border-color:var(--blue);
-  box-shadow:0 0 0 1px rgba(79,127,255,.4), 0 4px 24px rgba(0,0,0,.5);
-  z-index:500!important;
-}
+.ws-tile.dragging{opacity:.4;}
+.ws-tile.drag-over{box-shadow:inset 0 0 0 2px var(--blue);}
 
 /* Tile header */
 .tile-head{
   background:var(--head-bg);
   border-bottom:1px solid var(--border);
-  height:var(--tile-head-h);
+  height:28px;
   display:flex;align-items:center;
   padding:0 8px;
   cursor:grab;
@@ -163,7 +147,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .tile-sub{
   font-size:8.5px;color:var(--text3);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  max-width:120px;
+  max-width:160px;
 }
 .tile-controls{display:flex;align-items:center;gap:3px;flex-shrink:0;}
 .tile-ctrl-btn{
@@ -186,23 +170,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .tile-body::-webkit-scrollbar{width:3px}
 .tile-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-/* Resize handle */
-.tile-resize{
-  position:absolute;right:0;bottom:0;
-  width:12px;height:12px;cursor:se-resize;
-  display:flex;align-items:flex-end;justify-content:flex-end;
-  padding:2px;z-index:10;
+/* Span helpers */
+.ws-tile.expanded{
+  position:fixed;inset:0;z-index:800;margin:0!important;
 }
-.tile-resize::after{
-  content:'';display:block;
-  width:7px;height:7px;
-  border-right:2px solid var(--border2);
-  border-bottom:2px solid var(--border2);
-  border-radius:0 0 2px 0;
-  transition:border-color .12s;
-}
-.ws-tile:hover .tile-resize::after{border-color:var(--text3)}
-.ws-tile.resizing .tile-resize::after{border-color:var(--blue)}
 
 /* ── PANEL CATALOG OVERLAY ── */
 #ws-catalog{
@@ -561,17 +532,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 <!-- WORKSPACE SHELL -->
 <div id="ws-shell" role="main" aria-label="Workspace">
-
-  <!-- MAIN WORKSPACE COLUMN — takes full width, tiles are absolutely positioned -->
-  <div id="ws-main-col">
-    <!-- WORKSPACE CANVAS — tiles are absolutely positioned here -->
-    <div id="ws-canvas" role="region" aria-label="Workspace canvas" tabindex="0">
+  <div id="ws-canvas" role="region" aria-label="Workspace canvas" tabindex="0">
+    <div id="ws-grid">
       <!-- Tiles injected by JS -->
     </div>
   </div>
-
-  </div><!-- /#ws-main-col -->
-
 </div><!-- /#ws-shell -->
 
 <!-- MOBILE NOTICE -->
@@ -615,6 +580,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 'use strict';
 
 /* ── TILE REGISTRY ─────────────────────────────────────────── */
+
 const TILE_CATALOG = [
   { id:'narrative',      label:'Market Narrative',       sub:'AI · updated 12×/day',     desc:'AI-generated market analysis and regime context derived from live data.', tag:'AI · Narrative' },
   { id:'chart',          label:'Price Chart',            sub:'TradingView · live',        desc:'Interactive price chart with 22+ FX and cross-asset symbols.', tag:'Charting' },
@@ -641,78 +607,7 @@ const TILE_CATALOG = [
 ];
 
 /* ── LAYOUT TEMPLATES ──────────────────────────────────────── */
-const LAYOUT_TEMPLATES = {
-  terminal: {
-    name: 'Terminal layout',
-    tiles: [
-      /* ── Col 0 (x=0, w=160): Liquidity + Crosses + Carry ── */
-      /* Row heights: 180 + 330 + 246 = 756 (matches col1/col2 total) */
-      { id:'liquidity',      x:0,   y:0,   w:160, h:180 },
-      { id:'crosses',        x:0,   y:180, w:160, h:330 },
-      { id:'carry',          x:0,   y:510, w:160, h:246 },
-      /* ── Col 1 (x=160, w=376): Narrative + Chart + FX Pairs + COT + News ── */
-      /* Row heights: 96 + 290 + 180 + 190 = 756 */
-      { id:'narrative',      x:160, y:0,   w:376, h:96  },
-      { id:'chart',          x:160, y:96,  w:376, h:290 },
-      { id:'fxpairs',        x:160, y:386, w:376, h:180 },
-      { id:'cot',            x:160, y:566, w:376, h:190 },
-      /* ── Col 2 (x=536, w:280): Risk + Cross-Asset + Yields + Sessions + Signals ── */
-      /* Row heights: 96 + 290 + 180 + 190 = 756 */
-      { id:'risk',           x:536, y:0,   w:280, h:96  },
-      { id:'crossasset',     x:536, y:96,  w:280, h:290 },
-      { id:'yields',         x:536, y:386, w:280, h:180 },
-      { id:'sessions',       x:536, y:566, w:280, h:190 },
-      /* ── Col 3 (x=816, w=212): CB Rates + Correlations + Expectations + Pos. Bias ── */
-      /* Row heights: 226 + 284 + 246 = 756 */
-      { id:'cbrates',        x:816, y:0,   w:212, h:226 },
-      { id:'correlations',   x:816, y:226, w:212, h:284 },
-      { id:'expectations',   x:816, y:510, w:212, h:246 },
-    ]
-  },
-  focus: {
-    name: 'Focus layout',
-    tiles: [
-      { id:'narrative',      x:0,   y:0,   w:380, h:90  },
-      { id:'risk',           x:384, y:0,   w:220, h:90  },
-      { id:'chart',          x:0,   y:94,  w:600, h:350 },
-      { id:'fxpairs',        x:0,   y:448, w:380, h:200 },
-      { id:'signals',        x:384, y:448, w:220, h:200 },
-    ]
-  },
-  grid: {
-    name: 'Grid layout',
-    tiles: [
-      { id:'chart',          x:0,   y:0,   w:380, h:260 },
-      { id:'crossasset',     x:384, y:0,   w:300, h:260 },
-      { id:'fxpairs',        x:0,   y:264, w:380, h:260 },
-      { id:'risk',           x:384, y:264, w:300, h:260 },
-      { id:'cot',            x:0,   y:528, w:380, h:260 },
-      { id:'yields',         x:384, y:528, w:300, h:260 },
-    ]
-  },
-  macro: {
-    name: 'Macro layout',
-    tiles: [
-      { id:'narrative',      x:0,   y:0,   w:690, h:90  },
-      { id:'cbrates',        x:0,   y:94,  w:220, h:260 },
-      { id:'expectations',   x:224, y:94,  w:220, h:260 },
-      { id:'yields',         x:448, y:94,  w:242, h:260 },
-      { id:'cot',            x:0,   y:358, w:690, h:230 },
-      { id:'signals',        x:0,   y:592, w:690, h:200 },
-    ]
-  }
-};
 
-/* ── STATE ─────────────────────────────────────────────────── */
-const wsState = {
-  tiles: {},       // id → { el, config }
-  dragging: null,
-  resizing: null,
-  zMax: 10,
-  activeLayout: 'terminal',
-};
-
-/* ── TILE CONTENT BUILDERS ─────────────────────────────────── */
 const TILE_CONTENT = {
   narrative() {
     return `<div class="tile-narr" id="ws-narr-body">
@@ -1077,27 +972,98 @@ const TILE_CONTENT = {
   },
 };
 
-/* ── TILE FACTORY ──────────────────────────────────────────── */
-function createTile(tileDef, config) {
-  const { id, label, sub } = tileDef;
-  const { x, y, w, h } = config;
+/* ── LAYOUT TEMPLATES — CSS Grid (12 columns) ── */
+const LAYOUT_TEMPLATES = {
+  terminal: {
+    name: 'Terminal layout',
+    tiles: [
+      /* Row 1: narrow sidebar + narrative + risk + cb rates */
+      { id:'liquidity',    span:2, rows:2 },
+      { id:'narrative',    span:5 },
+      { id:'risk',         span:3 },
+      { id:'cbrates',      span:2, rows:2 },
+      /* Row 2: (liquidity continues) + chart + cross-asset + (cbrates continues) */
+      { id:'chart',        span:5 },
+      { id:'crossasset',   span:3 },
+      /* Row 3: crosses + fxpairs + yields + correlations */
+      { id:'crosses',      span:2 },
+      { id:'fxpairs',      span:5 },
+      { id:'yields',       span:3 },
+      { id:'correlations', span:2 },
+      /* Row 4: carry + cot + sessions + expectations */
+      { id:'carry',        span:2 },
+      { id:'cot',          span:5 },
+      { id:'sessions',     span:3 },
+      { id:'expectations', span:2 },
+    ]
+  },
+  focus: {
+    name: 'Focus layout',
+    tiles: [
+      { id:'narrative',  span:8 },
+      { id:'risk',       span:4 },
+      { id:'chart',      span:8 },
+      { id:'signals',    span:4 },
+      { id:'fxpairs',    span:6 },
+      { id:'yields',     span:6 },
+    ]
+  },
+  grid: {
+    name: 'Grid layout',
+    tiles: [
+      { id:'chart',        span:4 },
+      { id:'crossasset',   span:4 },
+      { id:'risk',         span:4 },
+      { id:'fxpairs',      span:4 },
+      { id:'yields',       span:4 },
+      { id:'cot',          span:4 },
+      { id:'sessions',     span:4 },
+      { id:'correlations', span:4 },
+      { id:'signals',      span:4 },
+    ]
+  },
+  macro: {
+    name: 'Macro layout',
+    tiles: [
+      { id:'narrative',    span:12 },
+      { id:'cbrates',      span:3 },
+      { id:'expectations', span:3 },
+      { id:'yields',       span:6 },
+      { id:'cot',          span:8 },
+      { id:'signals',      span:4 },
+    ]
+  }
+};
+
+/* ── STATE ── */
+const wsState = {
+  activeLayout: 'terminal',
+  tiles: {},   // id → el
+  saved: false,
+};
+let dragSrc = null;
+
+/* ── TILE FACTORY ── */
+function createTile(def, span, rows) {
+  const { id, label, sub } = def;
+  const content = TILE_CONTENT[id] ? TILE_CONTENT[id]() : '<div class="tile-body" style="padding:8px;color:var(--text3);">Panel unavailable</div>';
 
   const el = document.createElement('div');
   el.className = 'ws-tile';
   el.id = 'tile-' + id;
   el.setAttribute('role', 'region');
   el.setAttribute('aria-label', label);
-  el.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;z-index:${++wsState.zMax};`;
-
-  const content = TILE_CONTENT[id] ? TILE_CONTENT[id]() : `<div class="tile-loading">Panel unavailable</div>`;
+  el.setAttribute('draggable', 'true');
+  el.style.gridColumn = 'span ' + span;
+  if (rows && rows > 1) el.style.gridRow = 'span ' + rows;
 
   el.innerHTML = `
-    <div class="tile-head" title="Drag to move">
+    <div class="tile-head" title="Drag to reorder">
       <span class="tile-title">${label}</span>
       <span class="tile-sub">${sub}</span>
       <div class="tile-controls">
         <button class="tile-ctrl-btn" onclick="expandTile('${id}')" title="Maximize / restore" aria-label="Toggle maximize">
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="0.5" y="0.5" width="9" height="9" rx="1"/><path d="M3 5h4M5 3v4"/></svg>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="0.5" y="0.5" width="9" height="9" rx="1"/></svg>
         </button>
         <button class="tile-ctrl-btn close" onclick="closeTile('${id}')" title="Close panel" aria-label="Close ${label}">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg>
@@ -1105,35 +1071,55 @@ function createTile(tileDef, config) {
       </div>
     </div>
     <div class="tile-body">${content}</div>
-    <div class="tile-resize" title="Drag to resize" aria-hidden="true"></div>
   `;
 
-  // Drag
-  el.querySelector('.tile-head').addEventListener('mousedown', e => startDrag(e, id));
-  // Resize
-  el.querySelector('.tile-resize').addEventListener('mousedown', e => startResize(e, id));
-  // Bring to front on click
-  el.addEventListener('mousedown', () => bringToFront(id));
+  /* HTML5 drag-and-drop: swap tiles */
+  el.addEventListener('dragstart', e => {
+    dragSrc = el;
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', id);
+  });
+  el.addEventListener('dragend', () => {
+    el.classList.remove('dragging');
+    document.querySelectorAll('.ws-tile').forEach(t => t.classList.remove('drag-over'));
+    dragSrc = null;
+  });
+  el.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragSrc && dragSrc !== el) el.classList.add('drag-over');
+  });
+  el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+  el.addEventListener('drop', e => {
+    e.preventDefault();
+    el.classList.remove('drag-over');
+    if (!dragSrc || dragSrc === el) return;
+    const grid = document.getElementById('ws-grid');
+    const all = [...grid.children];
+    const si = all.indexOf(dragSrc), ti = all.indexOf(el);
+    if (si < ti) el.after(dragSrc); else el.before(dragSrc);
+    wsState.saved = false;
+    document.getElementById('ws-save-btn').classList.remove('saved');
+  });
 
   return el;
 }
 
-/* ── TILE MANAGEMENT ───────────────────────────────────────── */
-function addTile(tileId, config) {
+/* ── ADD / CLOSE / EXPAND ── */
+function addTile(tileId, span, rows) {
   const def = TILE_CATALOG.find(t => t.id === tileId);
   if (!def) return;
-  const canvas = document.getElementById('ws-canvas');
-  const el = createTile(def, config);
-  canvas.appendChild(el);
-  wsState.tiles[tileId] = { el, config: { ...config } };
+  const grid = document.getElementById('ws-grid');
+  const el = createTile(def, span || 4, rows);
+  grid.appendChild(el);
+  wsState.tiles[tileId] = el;
 
-  // Initialize chart tile
   if (tileId === 'chart') initChartTile();
   if (tileId === 'econmap') initEconmap();
-  // Liquidity canvas needs a redraw trigger after DOM insertion
   if (tileId === 'liquidity') {
     requestAnimationFrame(() => {
-      const safe = (fn) => { try { if (typeof window[fn] === 'function') window[fn](); } catch(e){} };
+      const safe = fn => { try { if (typeof window[fn]==='function') window[fn](); } catch(e){} };
       safe('initLiquidityCanvas');
       safe('drawLiquidityCanvas');
     });
@@ -1141,200 +1127,48 @@ function addTile(tileId, config) {
 }
 
 function closeTile(id) {
-  const entry = wsState.tiles[id];
-  if (!entry) return;
-  entry.el.remove();
+  const el = document.getElementById('tile-' + id);
+  if (el) el.remove();
   delete wsState.tiles[id];
 }
 
-function bringToFront(id) {
-  const entry = wsState.tiles[id];
-  if (!entry) return;
-  entry.el.style.zIndex = ++wsState.zMax;
-}
-
-let expandedState = null;
 function expandTile(id) {
-  const entry = wsState.tiles[id];
-  if (!entry) return;
-  const canvas = document.getElementById('ws-canvas');
-  const cw = canvas.clientWidth;
-  const ch = canvas.clientHeight;
-
-  if (expandedState && expandedState.id === id) {
-    // Restore
-    const { x, y, w, h } = expandedState.prev;
-    entry.el.style.left = x + 'px';
-    entry.el.style.top = y + 'px';
-    entry.el.style.width = w + 'px';
-    entry.el.style.height = h + 'px';
-    entry.el.style.zIndex = ++wsState.zMax;
-    expandedState = null;
-  } else {
-    expandedState = {
-      id,
-      prev: {
-        x: parseInt(entry.el.style.left),
-        y: parseInt(entry.el.style.top),
-        w: parseInt(entry.el.style.width),
-        h: parseInt(entry.el.style.height),
-      }
-    };
-    entry.el.style.left = '0px';
-    entry.el.style.top = '0px';
-    entry.el.style.width = cw + 'px';
-    entry.el.style.height = ch + 'px';
-    entry.el.style.zIndex = ++wsState.zMax;
-  }
+  const el = document.getElementById('tile-' + id);
+  if (!el) return;
+  el.classList.toggle('expanded');
 }
 
-/* ── DRAG ──────────────────────────────────────────────────── */
-function startDrag(e, id) {
-  if (e.target.closest('.tile-controls')) return;
-  e.preventDefault();
-  const entry = wsState.tiles[id];
-  if (!entry) return;
-  bringToFront(id);
-  const el = entry.el;
-  const startX = e.clientX - parseInt(el.style.left);
-  const startY = e.clientY - parseInt(el.style.top);
-  el.classList.add('dragging');
-  wsState.dragging = { id, startX, startY };
-  document.addEventListener('mousemove', onDrag, { passive: true });
-  document.addEventListener('mouseup', stopDrag);
-}
-
-function onDrag(e) {
-  if (!wsState.dragging) return;
-  const { id, startX, startY } = wsState.dragging;
-  const entry = wsState.tiles[id];
-  if (!entry) return;
-  const canvas = document.getElementById('ws-canvas');
-  const cw = canvas.clientWidth;
-  const ch = canvas.clientHeight;
-  const el = entry.el;
-  const newX = Math.max(0, Math.min(e.clientX - startX, cw - parseInt(el.style.width)));
-  const newY = Math.max(0, Math.min(e.clientY - startY, ch - parseInt(el.style.height)));
-  el.style.left = newX + 'px';
-  el.style.top  = newY + 'px';
-}
-
-function stopDrag() {
-  if (!wsState.dragging) return;
-  const { id } = wsState.dragging;
-  const entry = wsState.tiles[id];
-  if (entry) {
-    entry.el.classList.remove('dragging');
-    entry.config.x = parseInt(entry.el.style.left);
-    entry.config.y = parseInt(entry.el.style.top);
-  }
-  wsState.dragging = null;
-  document.removeEventListener('mousemove', onDrag);
-  document.removeEventListener('mouseup', stopDrag);
-}
-
-/* ── RESIZE ────────────────────────────────────────────────── */
-function startResize(e, id) {
-  e.preventDefault();
-  e.stopPropagation();
-  const entry = wsState.tiles[id];
-  if (!entry) return;
-  bringToFront(id);
-  const el = entry.el;
-  const startW = parseInt(el.style.width);
-  const startH = parseInt(el.style.height);
-  el.classList.add('resizing');
-  wsState.resizing = { id, startX: e.clientX, startY: e.clientY, startW, startH };
-  document.addEventListener('mousemove', onResize, { passive: true });
-  document.addEventListener('mouseup', stopResize);
-}
-
-function onResize(e) {
-  if (!wsState.resizing) return;
-  const { id, startX, startY, startW, startH } = wsState.resizing;
-  const entry = wsState.tiles[id];
-  if (!entry) return;
-  const MIN_W = 120, MIN_H = 90;
-  const newW = Math.max(MIN_W, startW + (e.clientX - startX));
-  const newH = Math.max(MIN_H, startH + (e.clientY - startY));
-  entry.el.style.width  = newW + 'px';
-  entry.el.style.height = newH + 'px';
-}
-
-function stopResize() {
-  if (!wsState.resizing) return;
-  const { id } = wsState.resizing;
-  const entry = wsState.tiles[id];
-  if (entry) {
-    entry.el.classList.remove('resizing');
-    entry.config.w = parseInt(entry.el.style.width);
-    entry.config.h = parseInt(entry.el.style.height);
-  }
-  wsState.resizing = null;
-  document.removeEventListener('mousemove', onResize);
-  document.removeEventListener('mouseup', stopResize);
-}
-
-/* ── LAYOUT APPLICATION ────────────────────────────────────── */
+/* ── LAYOUT APPLICATION ── */
 function applyLayout(name) {
   const template = LAYOUT_TEMPLATES[name];
   if (!template) return;
 
-  // Remove all existing tiles
-  Object.keys(wsState.tiles).forEach(id => {
-    wsState.tiles[id].el.remove();
-    delete wsState.tiles[id];
-  });
-  expandedState = null;
-  wsState.zMax = 10;
-
-  // Scale tiles to current canvas width
-  const canvas = document.getElementById('ws-canvas');
-  const cw = canvas.clientWidth || canvas.offsetWidth || 1028;
-  const templateMaxX = Math.max(...template.tiles.map(t => t.x + t.w));
-  // Use floor for x/w to prevent sub-pixel gaps; add 8px gutter on each side
-  const availW = cw - 16;
-  const scale = templateMaxX > 0 ? Math.min(1, availW / templateMaxX) : 1;
+  const grid = document.getElementById('ws-grid');
+  grid.innerHTML = '';
+  wsState.tiles = {};
 
   template.tiles.forEach(t => {
-    addTile(t.id, {
-      x: Math.floor(t.x * scale) + 8,
-      y: t.y,
-      w: Math.floor(t.w * scale),
-      h: t.h,
-    });
+    addTile(t.id, t.span, t.rows);
   });
 
-  // Update layout button states
   document.querySelectorAll('.ws-layout-btn').forEach(b => {
-    b.classList.toggle('active', b.id === 'ws-btn-' + name);
-    b.setAttribute('aria-pressed', b.id === 'ws-btn-' + name ? 'true' : 'false');
+    const active = b.id === 'ws-btn-' + name;
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
-
   wsState.activeLayout = name;
   document.getElementById('ws-layout-name').textContent = template.name;
   wsState.saved = false;
   document.getElementById('ws-save-btn').classList.remove('saved');
 
-  // Reconnect dashboard.js data sources after tile DOM rebuild
   reconnectDataSources();
 }
 
 function reconnectDataSources() {
-  // dashboard.js renders to fixed DOM IDs.
-  // After tiles rebuild, trigger a refresh so all functions find their target elements.
-  // Use a polling approach to handle the defer-load timing of dashboard.js.
-  const safe = (fn, ...args) => { try { if (typeof window[fn] === 'function') window[fn](...args); } catch(e){} };
+  const safe = (fn) => { try { if (typeof window[fn]==='function') window[fn](); } catch(e){} };
 
   function doReconnect() {
-    // If boot() hasn't run yet (dashboard.js not ready), poll until it is.
-    if (typeof window.boot !== 'function') {
-      setTimeout(doReconnect, 100);
-      return;
-    }
-    // Kick all data-fetching functions dashboard.js exposes.
-    // These are safe to call even if boot() already ran — each function
-    // updates the DOM IDs that now exist inside the freshly-rendered tiles.
+    if (typeof window.boot !== 'function') { setTimeout(doReconnect, 100); return; }
     safe('fetchRiskData');
     safe('fetchCrossAssetData');
     safe('fetchCommodityQuotes');
@@ -1351,39 +1185,28 @@ function reconnectDataSources() {
     safe('fetchCarryRanking');
     safe('fetchCarryData');
     safe('computeSessionVol');
-    safe('drawYieldCurve');
-    // Re-init liquidity canvas if the tile is present
-    if (document.getElementById('liquidity-canvas')) {
-      requestAnimationFrame(() => {
-        safe('initLiquidityCanvas');
-        safe('drawLiquidityCanvas');
-      });
-    }
-    // Re-render narrative badge and sessions
     safe('renderSessions');
-    safe('renderCarryRows');
+    if (document.getElementById('liquidity-canvas')) {
+      requestAnimationFrame(() => { safe('initLiquidityCanvas'); safe('drawLiquidityCanvas'); });
+    }
   }
-
-  // Small delay so newly-added tile DOM is in the document before functions run
   setTimeout(doReconnect, 200);
 }
 
-/* ── LAYOUT SAVE / LOAD ────────────────────────────────────── */
+/* ── SAVE / LOAD ── */
 function saveLayout() {
-  const snapshot = {};
-  Object.entries(wsState.tiles).forEach(([id, { el }]) => {
-    snapshot[id] = {
-      x: parseInt(el.style.left),
-      y: parseInt(el.style.top),
-      w: parseInt(el.style.width),
-      h: parseInt(el.style.height),
+  const grid = document.getElementById('ws-grid');
+  const snapshot = [...grid.children].map(el => {
+    const id = el.id.replace('tile-', '');
+    return {
+      id,
+      span: parseInt(el.style.gridColumn.replace('span ', '')) || 4,
+      rows: el.style.gridRow ? parseInt(el.style.gridRow.replace('span ', '')) : 1,
     };
   });
   try {
-    localStorage.setItem('gi-workspace-layout-v1', JSON.stringify({
-      name: wsState.activeLayout,
-      tiles: snapshot,
-      ts: Date.now(),
+    localStorage.setItem('gi-workspace-layout-v2', JSON.stringify({
+      name: wsState.activeLayout, tiles: snapshot, ts: Date.now()
     }));
   } catch(e) {}
   const btn = document.getElementById('ws-save-btn');
@@ -1393,20 +1216,19 @@ function saveLayout() {
     btn.classList.remove('saved');
     btn.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 1h6l2 2v6H1z"/><rect x="3" y="6" width="4" height="4" fill="currentColor" stroke="none" rx=".5"/><rect x="3" y="1" width="4" height="3" fill="currentColor" stroke="none" rx=".5"/></svg> Save Layout`;
   }, 2000);
+  wsState.saved = true;
 }
 
 function loadSavedLayout() {
   try {
-    const raw = localStorage.getItem('gi-workspace-layout-v1');
+    const raw = localStorage.getItem('gi-workspace-layout-v2');
     if (!raw) return false;
     const data = JSON.parse(raw);
-    if (!data || !data.tiles) return false;
-    // Remove defaults, apply saved
-    Object.keys(wsState.tiles).forEach(id => {
-      wsState.tiles[id].el.remove();
-      delete wsState.tiles[id];
-    });
-    Object.entries(data.tiles).forEach(([id, config]) => addTile(id, config));
+    if (!data || !data.tiles || !data.tiles.length) return false;
+    const grid = document.getElementById('ws-grid');
+    grid.innerHTML = '';
+    wsState.tiles = {};
+    data.tiles.forEach(t => addTile(t.id, t.span || 4, t.rows || 1));
     wsState.activeLayout = data.name || 'terminal';
     document.getElementById('ws-layout-name').textContent = 'Saved layout';
     reconnectDataSources();
@@ -1414,7 +1236,7 @@ function loadSavedLayout() {
   } catch(e) { return false; }
 }
 
-/* ── CATALOG ───────────────────────────────────────────────── */
+/* ── CATALOG ── */
 function openCatalog() {
   const grid = document.getElementById('ws-catalog-grid');
   const active = new Set(Object.keys(wsState.tiles));
@@ -1435,27 +1257,18 @@ function closeCatalog() {
 }
 
 function addFromCatalog(id) {
-  const canvas = document.getElementById('ws-canvas');
-  const cw = canvas.clientWidth;
-  const ch = canvas.clientHeight;
-  const config = {
-    x: Math.max(0, Math.min(60, cw - 380)),
-    y: Math.max(0, Math.min(60, ch - 280)),
-    w: 380, h: 280,
-  };
-  addTile(id, config);
+  addTile(id, 4, 1);
   closeCatalog();
   reconnectDataSources();
 }
 
-// Close catalog on overlay click
 document.getElementById('ws-catalog').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeCatalog();
 });
-// Close on Escape
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeCatalog();
 });
+
 
 /* ── TRADINGVIEW CHART TILE ────────────────────────────────── */
 let tvChartSym = 'FX_IDC:EURUSD';
@@ -1596,6 +1409,7 @@ window.setCorrWindow = window.setCorrWindow || function(w) {
   const th = document.getElementById('corr-th-window');
   if (th) th.textContent = w + 'd';
 };
+
 </script>
 
 <!-- DASHBOARD.JS — reuse all data-fetching logic from the main terminal -->
