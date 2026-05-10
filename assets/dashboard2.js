@@ -9258,7 +9258,7 @@ function computeCIPForward(spot, rBase, rQuote, T) {
 
 // ── Rate map: which CB rate applies to which currency ──
 const CIP_CCY_RATES = {
-  // For USD/XXX pairs: base=USD, quote=XXX
+  // Major USD pairs
   'EUR/USD': { base: 'USD', quote: 'EUR', invert: false },
   'GBP/USD': { base: 'USD', quote: 'GBP', invert: false },
   'USD/JPY': { base: 'USD', quote: 'JPY', invert: true  },
@@ -9266,6 +9266,13 @@ const CIP_CCY_RATES = {
   'USD/CHF': { base: 'USD', quote: 'CHF', invert: true  },
   'USD/CAD': { base: 'USD', quote: 'CAD', invert: true  },
   'NZD/USD': { base: 'USD', quote: 'NZD', invert: false },
+  // Cross pairs — both legs have CB rates in rates/*.json
+  'EUR/GBP': { base: 'GBP', quote: 'EUR', invert: false },
+  'EUR/JPY': { base: 'JPY', quote: 'EUR', invert: true  },
+  'GBP/JPY': { base: 'JPY', quote: 'GBP', invert: true  },
+  'AUD/JPY': { base: 'JPY', quote: 'AUD', invert: true  },
+  'EUR/AUD': { base: 'AUD', quote: 'EUR', invert: false },
+  'EUR/CHF': { base: 'CHF', quote: 'EUR', invert: false },
 };
 
 // ── Render CIP Forwards in main FX Pairs table (tds[7]=Fwd1M, tds[8]=Fwd3M) ──
@@ -9435,6 +9442,50 @@ async function renderDerivativesSection() {
       });
 
       // Rate diff
+      if (tds[6]) {
+        const diff = (rBase != null && rQuote != null) ? (rBase - rQuote) : null;
+        if (diff != null) {
+          tds[6].textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + '%';
+          tds[6].style.color = diff > 0.1 ? 'var(--up)' : diff < -0.1 ? 'var(--down)' : 'var(--text2)';
+          tds[6].title = `r${cfg.base}=${rBase?.toFixed(2)}% minus r${cfg.quote}=${rQuote?.toFixed(2)}%`;
+        } else {
+          tds[6].textContent = '—';
+        }
+      }
+    });
+
+    // ── Cross pairs CIP forwards ──
+    const crossFwdPairs = ['EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CHF'];
+    crossFwdPairs.forEach(pair => {
+      const row = fwdTbody.querySelector(`tr[data-pair="${pair}"]`);
+      if (!row) return;
+      const cfg = CIP_CCY_RATES[pair];
+      if (!cfg) return;
+      const pairId = pair.replace('/','').toLowerCase();
+      const pairCfg = PAIRS.find(p => p.id === pairId);
+      const dec = pairCfg?.dec ?? 5;
+      const spot = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
+      const rBase  = ratesCache[cfg.base]  ?? null;
+      const rQuote = ratesCache[cfg.quote] ?? null;
+      const tds = row.querySelectorAll('td');
+
+      if (tds[1]) tds[1].textContent = spot != null ? spot.toFixed(dec) : '—';
+
+      const tenors = [1/12, 3/12, 6/12, 1];
+      tenors.forEach((T, ti) => {
+        const fwd = computeCIPForward(spot, rBase, rQuote, T);
+        const el = tds[2 + ti];
+        if (!el) return;
+        if (fwd != null && spot != null) {
+          el.textContent = fwd.toFixed(dec);
+          const atPremium = (fwd - spot) > 0;
+          el.style.color = atPremium ? 'var(--up)' : 'var(--down)';
+        } else {
+          el.textContent = '—';
+          el.style.color = 'var(--text3)';
+        }
+      });
+
       if (tds[6]) {
         const diff = (rBase != null && rQuote != null) ? (rBase - rQuote) : null;
         if (diff != null) {
@@ -9695,15 +9746,15 @@ async function renderG8YieldPane(cty) {
 async function renderSovereignSpreads() {
   const tbody = document.getElementById('sovereign-spreads-tbody');
   if (!tbody) return;
-  if (tbody.dataset.loaded) return;
+  if (tbody.dataset.loaded === '2') return; // already rendered with flag spans
 
   const countries = [
-    { code: 'de', file: 'EUR', label: 'DE', flag: '🇩🇪' },
-    { code: 'gb', file: 'GBP', label: 'GB', flag: '🇬🇧' },
-    { code: 'jp', file: 'JPY', label: 'JP', flag: '🇯🇵' },
-    { code: 'au', file: 'AUD', label: 'AU', flag: '🇦🇺' },
-    { code: 'ca', file: 'CAD', label: 'CA', flag: '🇨🇦' },
-    { code: 'nz', file: 'NZD', label: 'NZ', flag: '🇳🇿' },
+    { code: 'de', file: 'EUR', label: 'DE' },
+    { code: 'gb', file: 'GBP', label: 'GB' },
+    { code: 'jp', file: 'JPY', label: 'JP' },
+    { code: 'au', file: 'AUD', label: 'AU' },
+    { code: 'ca', file: 'CAD', label: 'CA' },
+    { code: 'nz', file: 'NZD', label: 'NZ' },
   ];
 
   // Load US first
@@ -9732,7 +9783,7 @@ async function renderSovereignSpreads() {
       const us2  = norm(us2y);
 
       // Country flag + label
-      if (tds[0]) { tds[0].textContent = (c.flag ? c.flag + ' ' : '') + c.label; }
+      if (tds[0]) { tds[0].innerHTML = `<span class="fi fi-${c.code}" style="margin-right:4px;border-radius:1px;vertical-align:middle;"></span><span>${c.label}</span>`; }
       // 10Y value
       if (tds[1]) { tds[1].textContent = n10 != null ? n10.toFixed(2) + '%' : '—'; }
 
@@ -9761,7 +9812,7 @@ async function renderSovereignSpreads() {
       tds.forEach((td, i) => { if (i > 0) td.textContent = '—'; });
     }
   }));
-  tbody.dataset.loaded = '1';
+  tbody.dataset.loaded = '2';
 }
 
 // ── Economic Surprises — derived from ff_calendar.json + yfinance price reaction ──
