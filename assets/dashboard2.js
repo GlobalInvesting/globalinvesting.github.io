@@ -2041,6 +2041,7 @@ function attachRiskMonitorTooltips() {
     'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) — nearest expiry ≥4 days. ETF IV is the closest free proxy for OTC interbank implied vol (not publicly available). COT bias from CFTC Disaggregated TFF · Leveraged Funds · Options+Futures Combined. 25-delta Risk Reversal from Saxo Bank public options page (1M tenor, indicative mid) — positive = calls bid over puts (upside skew on base currency); negative = puts bid (downside protection dominant).',
     'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels. RR from Saxo is indicative mid-market, updated during European hours; treat as directional context, not a tradeable quote. Direction signal always comes from Leveraged Funds net positioning (most reactive speculative category in CFTC data).'
   );
+  // skew-tbody may be absent (Positioning Bias panel removed) — safe to skip
   const skewRows = document.querySelectorAll('#skew-tbody tr');
   skewRows.forEach(row => {
     // Attach tooltip to each <td> individually — tooltip changes per cell hovered
@@ -6831,8 +6832,9 @@ async function fetchFedExpectations() {
 // ═══════════════════════════════════════════════════════════════════
 async function fetchOptionSkew() {
   try {
+    // skew-tbody may be absent if Positioning Bias panel was removed;
+    // RR fetch must still run so RR_DATA_CACHE is populated for other panels.
     const tbody = document.getElementById('skew-tbody');
-    if (!tbody) return;
 
     const pairs = [
       { pair:'EUR/USD', cot:'EUR', etfId:'eurusd', rrKey:'EURUSD' },
@@ -9283,7 +9285,17 @@ async function renderCIPForwards() {
 
 // ── Render RR 1M in main FX Pairs table (tds[9]) ──
 async function renderRRInFXTable() {
-  const rrMap = window.RR_DATA_CACHE || {};
+  // RR_DATA_CACHE is populated by fetchOptionSkew — but also fetch directly as fallback
+  let rrMap = window.RR_DATA_CACHE || {};
+  if (Object.keys(rrMap).length === 0) {
+    try {
+      const res = await fetch('./rr-data/rr.json').catch(() => null);
+      if (res?.ok) {
+        const j = await res.json();
+        if (j?.pairs) { rrMap = j.pairs; Object.assign(window.RR_DATA_CACHE, rrMap); }
+      }
+    } catch { /* leave empty */ }
+  }
   const fxTbody = document.getElementById('fx-pairs-tbody');
   if (!fxTbody) return;
 
@@ -9651,39 +9663,44 @@ async function renderEconSurprises() {
   if (!tbody) return;
 
   // Load ForexFactory calendar (same-origin)
+  // ff_calendar.json uses: { events: [{ title, currency, dateISO, timeUTC, impact, forecast, previous, actual, released }] }
   let calData = null;
   try {
     const res = await fetch('./calendar-data/ff_calendar.json').catch(() => null);
     if (res?.ok) calData = await res.json();
   } catch { /* no cal data */ }
 
-  if (!calData?.events?.length) {
-    // Show placeholder note — no calendar available
-    const rows = tbody.querySelectorAll('tr');
-    rows.forEach(row => {
-      const tds = row.querySelectorAll('td');
-      if (tds[1]) { tds[1].textContent = '—'; tds[1].style.color = 'var(--text3)'; }
-      if (tds[2]) { tds[2].textContent = 'Pending'; tds[2].style.color = 'var(--text3)'; }
-    });
-    return;
-  }
-
   // Build surprise score per currency:
-  // For each past event with actual & forecast: beat = actual > forecast (or < for inverse indicators like unemployment)
+  // For each past released event with actual & forecast: beat = actual > forecast
+  // Fallback: if no released events, use upcoming high-impact events to show schedule
   const inverseIndicators = ['unemployment', 'jobless', 'claims', 'deficit'];
   const ccyScores = {};
+  const ccyUpcoming = {}; // count of high-impact events in next 7 days
   const now = Date.now();
-  const windowMs = 14 * 24 * 60 * 60 * 1000; // 14-day lookback
+  const windowMs = 21 * 24 * 60 * 60 * 1000; // 21-day lookback
+  const fwdWindowMs = 7 * 24 * 60 * 60 * 1000; // 7-day forward
 
-  calData.events.forEach(ev => {
-    const evTime = new Date(ev.date || ev.datetime).getTime();
-    if (isNaN(evTime) || evTime > now || now - evTime > windowMs) return;
+  (calData?.events || []).forEach(ev => {
+    // Correct field names: dateISO (not date), title (not event), currency (correct)
+    const evTime = new Date(ev.dateISO || ev.date || ev.datetime).getTime();
+    if (isNaN(evTime)) return;
     const ccy = ev.currency;
     if (!ccy) return;
-    const actual = parseFloat(ev.actual);
-    const forecast = parseFloat(ev.forecast);
+
+    // Forward-looking: count high-impact upcoming events per currency
+    if (evTime > now && evTime - now <= fwdWindowMs) {
+      if (ev.impact === 'high' || ev.impact === 'medium') {
+        ccyUpcoming[ccy] = (ccyUpcoming[ccy] || 0) + 1;
+      }
+    }
+
+    // Past events: score actual vs forecast
+    if (evTime > now || now - evTime > windowMs) return;
+    if (!ev.released || ev.actual == null) return;
+    const actual = parseFloat(String(ev.actual).replace('%',''));
+    const forecast = parseFloat(String(ev.forecast || ev.previous || '').replace('%',''));
     if (isNaN(actual) || isNaN(forecast)) return;
-    const isInverse = inverseIndicators.some(kw => (ev.event || '').toLowerCase().includes(kw));
+    const isInverse = inverseIndicators.some(kw => (ev.title || '').toLowerCase().includes(kw));
     const beat = isInverse ? actual < forecast : actual > forecast;
     const miss = isInverse ? actual > forecast : actual < forecast;
     if (!ccyScores[ccy]) ccyScores[ccy] = { beats: 0, misses: 0, total: 0 };
@@ -9699,9 +9716,16 @@ async function renderEconSurprises() {
     if (!row) return;
     const tds = row.querySelectorAll('td');
     const s = ccyScores[ccy];
+    const upcoming = ccyUpcoming[ccy] || 0;
     if (!s || s.total === 0) {
-      if (tds[1]) { tds[1].textContent = '—'; tds[1].style.color = 'var(--text3)'; }
-      if (tds[2]) { tds[2].textContent = 'No data'; tds[2].style.color = 'var(--text3)'; }
+      // No released data yet — show upcoming event count as context
+      if (tds[1]) {
+        tds[1].textContent = upcoming > 0 ? `${upcoming} due` : '—';
+        tds[1].style.color = 'var(--text3)';
+        tds[1].style.textAlign = 'right';
+        tds[1].title = upcoming > 0 ? `${upcoming} medium/high impact events due in next 7 days` : 'No released data in last 21 days';
+      }
+      if (tds[2]) { tds[2].textContent = upcoming > 0 ? 'Watch' : '—'; tds[2].style.color = 'var(--text3)'; tds[2].style.textAlign = 'right'; }
       return;
     }
     const score = s.beats - s.misses;
@@ -9710,7 +9734,7 @@ async function renderEconSurprises() {
       tds[1].textContent = (score >= 0 ? '+' : '') + score + ' (' + pct + '%)';
       tds[1].style.color = score > 0 ? 'var(--up)' : score < 0 ? 'var(--down)' : 'var(--text2)';
       tds[1].style.textAlign = 'right';
-      tds[1].title = `${s.beats} beat, ${s.misses} miss, ${s.total - s.beats - s.misses} in-line · last 14 days`;
+      tds[1].title = `${s.beats} beat, ${s.misses} miss, ${s.total - s.beats - s.misses} in-line · last 21 days`;
     }
     if (tds[2]) {
       const bias = score > 1 ? 'Positive' : score < -1 ? 'Negative' : 'Neutral';
@@ -9741,44 +9765,103 @@ function initDerivativesNav() {
 }
 
 // ── Bootstrap all new features ──
+// ── Load CB rates from rates/*.json directly (reliable, not DOM-dependent) ──
+async function loadCBRatesCache() {
+  // rates/*.json files: observations array, most recent first.
+  // Schema: { observations: [{ date: "YYYY-MM-DD", value: "3.75" }, ...], ... }
+  const ccyFiles = {
+    USD: 'rates/USD.json', EUR: 'rates/EUR.json', GBP: 'rates/GBP.json',
+    JPY: 'rates/JPY.json', AUD: 'rates/AUD.json', CAD: 'rates/CAD.json',
+    CHF: 'rates/CHF.json', NZD: 'rates/NZD.json',
+  };
+  await Promise.all(Object.entries(ccyFiles).map(async ([ccy, path]) => {
+    try {
+      const r = await fetch('./' + path);
+      if (!r.ok) return;
+      const d = await r.json();
+      // Use most recent observation (observations[0].value is a string like "3.75")
+      const obs = d.observations;
+      const raw = Array.isArray(obs) && obs.length > 0
+        ? obs[0].value           // observations array format
+        : (d.rate ?? d.value ?? null); // fallback for other shapes
+      if (raw != null && !isNaN(+raw)) window._CB_RATES_CACHE[ccy] = +raw;
+    } catch { /* graceful — leave missing */ }
+  }));
+}
+
+// ── Section visibility: show/hide panels when nav tabs are clicked ──
+function initDerivativesNavFixed() {
+  const allNavLinks = document.querySelectorAll('.top-nav a[data-target]');
+
+  // Map of which sections to show/hide per nav target
+  // Derivatives replaces Cross-Asset + Risk in the lower-right column when active
+  const derivSection = document.getElementById('section-derivatives');
+  const normalSections = [
+    document.getElementById('section-crossasset'),
+    document.getElementById('section-risk'),
+    document.getElementById('section-rates'),
+    document.getElementById('section-positioning'),
+    document.getElementById('section-macro'),
+  ].filter(Boolean);
+
+  if (!derivSection) return;
+
+  allNavLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      const target = link.dataset.target;
+      if (target === 'section-derivatives') {
+        // Show Derivatives, hide the normal lower-right panels
+        derivSection.style.display = '';
+        normalSections.forEach(s => { s.style.display = 'none'; });
+        // Trigger render
+        renderDerivativesSection();
+        renderHVMultiWindow();
+      } else {
+        // Restore normal sections, hide Derivatives
+        derivSection.style.display = 'none';
+        normalSections.forEach(s => { s.style.display = ''; });
+      }
+    });
+  });
+}
+
 (function bootNewFeatures() {
-  document.addEventListener('DOMContentLoaded', () => {
+  const run = async () => {
     initG8RatesTabs();
-    initDerivativesNav();
+    initDerivativesNavFixed();
 
-    // After initial data loads, render the new panels
-    // Use a short delay so main dashboard.js boot() completes first
-    setTimeout(async () => {
-      // Populate CB rates cache from cbrates-tbody (already rendered by dashboard.js)
-      const cbRows = document.querySelectorAll('#cbrates-tbody tr');
-      cbRows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length < 3) return;
-        const flag = cells[0].querySelector('.fi');
-        if (!flag) return;
-        // Match flag class to currency
-        const cls = [...flag.classList].find(c => c.startsWith('fi-'));
-        const ctyMap = { 'fi-us':'USD','fi-eu':'EUR','fi-gb':'GBP','fi-jp':'JPY','fi-au':'AUD','fi-ca':'CAD','fi-ch':'CHF','fi-nz':'NZD' };
-        const ccy = ctyMap[cls];
-        if (!ccy) return;
-        const rateStr = cells[2]?.textContent?.replace('%','').trim();
-        const rate = parseFloat(rateStr);
-        if (!isNaN(rate)) window._CB_RATES_CACHE[ccy] = rate;
-      });
+    // Load CB rates from files (reliable source, no DOM dependency)
+    await loadCBRatesCache();
 
-      // Run new renderers
-      await renderCIPForwards();
-      await renderRRInFXTable();
-      await renderHVMultiWindow();
-      await renderEconSurprises();
-    }, 3000);
+    // Populate RR cache by piggybacking on existing rr.json fetch
+    // (fetchOptionSkew already calls this — we wait for it to be available)
+    // Small poll: wait up to 8s for RR_DATA_CACHE to be populated by main dashboard.js
+    let rrWait = 0;
+    while (Object.keys(window.RR_DATA_CACHE || {}).length === 0 && rrWait < 8000) {
+      await new Promise(r => setTimeout(r, 500));
+      rrWait += 500;
+    }
 
-    // Refresh every 5 minutes alongside main data
+    // Initial render
+    await renderCIPForwards();
+    await renderRRInFXTable();
+    await renderHVMultiWindow();
+    await renderEconSurprises();
+
+    // Refresh every 5 min
     setInterval(async () => {
+      await loadCBRatesCache();
       await renderCIPForwards();
       await renderRRInFXTable();
       await renderHVMultiWindow();
     }, 5 * 60 * 1000);
-  });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    // DOMContentLoaded already fired (dashboard.js is deferred — this runs after)
+    run();
+  }
 })();
 
