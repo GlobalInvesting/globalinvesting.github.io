@@ -1,17 +1,14 @@
 // ═══════════════════════════════════════════════════════════════════
-// INLINE PANEL SYSTEM  v1.2.0
+// INLINE PANEL SYSTEM  v1.3.0
 // File: assets/inline-panel.js
-// Loaded AFTER all modal scripts (see index2.html)
-//
-// Intercepts modal open calls and renders content inline inside the
-// split-layout center columns instead of floating overlays:
 //
 //   LEFT center  (#split-upper):  Carry Trade · Heatmap
 //   RIGHT center (#split-lower):  Correlations · CB Rates · COT
 //
-// v1.2.0: Synchronous transplant strategy — pre-hide bd BEFORE calling
-//         orig so display:'flex' is invisible, then steal the element
-//         in the same JS tick. Zero flicker.
+// v1.3.0: Fix height:0 bug. Instead of prepending with height:100%
+//         (which resolves to 0 in a scrollable flex container), we
+//         now HIDE existing children and insert the panel as the sole
+//         visible child, sized with min-height to fill the container.
 // ═══════════════════════════════════════════════════════════════════
 
 (function () {
@@ -19,8 +16,9 @@
 
   var LS_KEY  = 'gi_split_layout';
   var IP_ATTR = 'data-inline-panel';
+  var HIDDEN_ATTR = 'data-ip-hidden';
 
-  // ── Ensure split-layout is active, return {upper, lower} ──────────
+  // ── Ensure split-layout is active ─────────────────────────────────
   function _ensureSplit() {
     var main  = document.getElementById('main');
     var upper = document.getElementById('split-upper');
@@ -30,29 +28,56 @@
     if (!main.classList.contains('split-layout')) {
       var btn    = document.getElementById('split-layout-btn');
       var handle = document.getElementById('split-drag-handle');
-      var alerts = document.getElementById('section-macro');
 
       main.classList.add('split-layout');
       if (btn)    { btn.classList.add('active'); btn.setAttribute('aria-pressed','true'); }
       if (handle) handle.style.display = '';
       upper.style.width = '55%';
       upper.style.flex  = 'none';
-      if (alerts && alerts.parentNode !== upper) upper.appendChild(alerts);
 
       try { localStorage.setItem(LS_KEY, JSON.stringify({ active: true, leftPct: 55 })); } catch(e) {}
     }
     return { upper: upper, lower: lower };
   }
 
-  // ── Create inline shell: header bar + scrollable body ─────────────
+  // ── Hide existing children of target, return restore function ─────
+  function _hideChildren(target) {
+    var hidden = [];
+    Array.from(target.children).forEach(function(child) {
+      if (!child.hasAttribute(IP_ATTR)) {
+        hidden.push({ el: child, display: child.style.display });
+        child.style.display = 'none';
+        child.setAttribute(HIDDEN_ATTR, '1');
+      }
+    });
+    return function restore() {
+      hidden.forEach(function(item) {
+        item.el.style.display = item.display;
+        item.el.removeAttribute(HIDDEN_ATTR);
+      });
+    };
+  }
+
+  // ── Create inline shell ────────────────────────────────────────────
   function _makeShell(target, title, onClose) {
+    // Remove any existing inline panel in this target first
     var old = target.querySelector('[' + IP_ATTR + ']');
     if (old) old.remove();
+    // Restore any previously hidden children
+    Array.from(target.querySelectorAll('[' + HIDDEN_ATTR + ']')).forEach(function(el) {
+      el.style.display = '';
+      el.removeAttribute(HIDDEN_ATTR);
+    });
+
+    // Hide existing children so the panel can take full height
+    var restoreChildren = _hideChildren(target);
 
     var wrap = document.createElement('div');
     wrap.setAttribute(IP_ATTR, '1');
-    wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;height:100%;min-height:0;background:var(--bg);overflow:hidden;';
+    // Use min-height instead of height:100% — works correctly in scrollable flex containers
+    wrap.style.cssText = 'display:flex;flex-direction:column;min-height:calc(100vh - 100px);background:var(--bg);overflow:hidden;';
 
+    // Header bar
     var hd = document.createElement('div');
     hd.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:5px 10px 4px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);';
 
@@ -68,6 +93,7 @@
     closeBtn.onmouseleave = function() { closeBtn.style.color = 'var(--text3)'; };
     closeBtn.onclick = function() {
       wrap.remove();
+      restoreChildren();
       if (typeof onClose === 'function') onClose();
     };
 
@@ -75,7 +101,7 @@
     hd.appendChild(closeBtn);
 
     var body = document.createElement('div');
-    body.style.cssText = 'flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;display:flex;flex-direction:column;';
+    body.style.cssText = 'flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;display:flex;flex-direction:column;';
 
     wrap.appendChild(hd);
     wrap.appendChild(body);
@@ -86,20 +112,16 @@
   }
 
   // ── Synchronously transplant modal into inline body ────────────────
-  // Strips backdrop and modal chrome so it flows naturally in the panel.
   function _transplant(body, bdId, modalId, closeId, modalExtraCSS) {
     var bd    = document.getElementById(bdId);
     var modal = document.getElementById(modalId);
     if (!bd || !modal) return false;
 
-    // Keep bd in DOM so modal's internal JS still finds it — just make it inert
     bd.style.cssText = 'display:block!important;position:static!important;background:none!important;padding:0!important;animation:none!important;z-index:auto!important;';
 
-    // Strip modal chrome
     var base = 'width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;';
     modal.style.cssText = base + (modalExtraCSS || '');
 
-    // Hide the modal's own close button
     if (closeId) {
       var oc = document.getElementById(closeId);
       if (oc) oc.style.display = 'none';
@@ -127,14 +149,6 @@
 
   // ═══════════════════════════════════════════════════════════════════
   // INTERCEPT: Real Carry Modal → #split-upper (LEFT)
-  //
-  // openRealCarryModal sets bd.style.display='flex' synchronously,
-  // then optionally awaits _rcmFetchData(). Strategy:
-  //   1. Pre-hide bd BEFORE calling orig → flex is never visible
-  //   2. Call orig (DOM builds, fetch starts in background)
-  //   3. SYNCHRONOUSLY transplant — same JS tick, no paint yet
-  //   4. orig's async _rcmRender() updates #rcm-body which is now
-  //      inside our panel → content appears naturally, zero flicker
   // ═══════════════════════════════════════════════════════════════════
   var _origOpenRCM = window.openRealCarryModal;
 
@@ -149,14 +163,11 @@
         'rcm-modal');
     });
 
-    // 1. Pre-hide
     var bdPre = document.getElementById('rcm-bd');
     if (bdPre) bdPre.style.display = 'none';
 
-    // 2. Call orig (sync part: builds DOM if needed, sets display:flex — but we pre-hid it)
     _origOpenRCM && _origOpenRCM(longCcy, shortCcy);
 
-    // 3. Synchronous transplant
     if (!_transplant(body, 'rcm-bd', 'rcm-modal', 'rcm-close',
         'display:flex!important;flex-direction:column!important;overflow:hidden!important;')) {
       body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Carry data unavailable.</div>';
@@ -174,7 +185,6 @@
     if (!panels) { _origOpenHM && _origOpenHM(ccy, strengths, rtCache); return; }
 
     var body = _makeShell(panels.upper, 'Currency Strength · ' + (ccy || ''), function() {
-      // Destroy chart instance so it remounts correctly on next open
       var hmBd = document.getElementById('hm-bd');
       if (hmBd) hmBd.remove();
     });
@@ -193,7 +203,6 @@
 
   // ═══════════════════════════════════════════════════════════════════
   // INTERCEPT: Correlation Modal → #split-lower (RIGHT)
-  // openCorrModal appends a fresh #cm-bd to document.body each call.
   // ═══════════════════════════════════════════════════════════════════
   var _origOpenCorr = window.openCorrModal;
 
@@ -281,7 +290,6 @@
     document.body.style.overflow = '';
   };
 
-  // ── Expose internals ────────────────────────────────────────────────
   window._showInlinePanel   = _makeShell;
   window._ensureInlineSplit = _ensureSplit;
 
