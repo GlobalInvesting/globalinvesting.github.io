@@ -2588,6 +2588,10 @@ function drawYieldCurve(points, priorPoints) {
   if (!canvas) return;
   const wrap = canvas.parentElement;
   const W = wrap.clientWidth - 20, H = 100;
+  // Guard: if the panel is hidden (display:none), clientWidth is 0.
+  // Setting canvas.width=0 clears it permanently. Abort and let the next
+  // rAF pass (triggered by hideDerivatives double-rAF) redraw correctly.
+  if (W <= 0) return;
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
@@ -9618,7 +9622,7 @@ async function renderG8YieldPane(cty) {
     let html = `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">${cfg.label} — extended-data/${cfg.file}.json</div>`;
     html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;">';
     cfg.tenors.forEach(t => {
-      const val = ext[t.k];
+      const val = (ext.data ?? ext)[t.k];
       const valStr = val != null ? (val * (val > 1 ? 1 : 100)).toFixed(2) + '%' : '—';
       html += `<div class="rate-cell" style="min-width:90px;"><div class="rate-cty">${t.label}</div><div class="rate-val">${valStr}</div></div>`;
     });
@@ -9648,8 +9652,9 @@ async function renderSovereignSpreads() {
 
   // Load US first
   const usExt = await fetch('./extended-data/USD.json').then(r => r.ok ? r.json() : null).catch(() => null);
-  const us10y = usExt?.bond10y ?? null;
-  const us2y  = usExt?.bond2y  ?? null;
+  const _usData = usExt?.data ?? usExt;
+  const us10y = _usData?.bond10y ?? null;
+  const us2y  = _usData?.bond2y  ?? null;
 
   const rows = tbody.querySelectorAll('tr');
   await Promise.all(countries.map(async (c, idx) => {
@@ -9659,8 +9664,9 @@ async function renderSovereignSpreads() {
 
     try {
       const ext = await fetch('./extended-data/' + c.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
-      const cty10y = ext?.bond10y ?? null;
-      const cty2y  = ext?.bond2y  ?? null;
+      const _extData = ext?.data ?? ext;
+      const cty10y = _extData?.bond10y ?? null;
+      const cty2y  = _extData?.bond2y  ?? null;
 
       // Normalise: extended-data stores some yields as 0.04 (4%) and some as 4.0
       const norm = v => v != null ? (v < 1 ? v * 100 : v) : null;
@@ -9865,27 +9871,31 @@ function initDerivativesNavFixed() {
       delete el.dataset.derivHidden;
     });
     // Canvas and lazy-loaded G8 panes need a repaint after display is restored.
-    // Use rAF so the browser has applied layout before we read clientWidth.
+    // Double rAF: split-lower-right uses display:contents which requires two frames
+    // for the browser to commit the layout change and expose correct clientWidth values.
+    // (Same pattern as the ticker strip — 'Double rAF ensures layout before we measure'.)
     requestAnimationFrame(() => {
-      // Yield curve canvas: redraws using cached data (_lastDrawnYields / _lastDrawnPrior)
-      if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
-        drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
-      }
-      // Re-trigger whichever Rates tab is currently active so G8/Spreads panes re-render
-      const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
-      if (activeRatesTab) {
-        const cty = activeRatesTab.dataset.cty;
-        if (cty && cty !== 'us') {
-          if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
-            renderSovereignSpreads();
-          } else if (typeof renderG8YieldPane === 'function') {
-            // Reset loaded flag so the pane re-renders with correct dimensions
-            const contentEl = document.getElementById('rates-g8-content-' + cty);
-            if (contentEl) delete contentEl.dataset.loaded;
-            renderG8YieldPane(cty);
+      requestAnimationFrame(() => {
+        // Yield curve canvas: redraws using cached data (_lastDrawnYields / _lastDrawnPrior)
+        if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
+          drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
+        }
+        // Re-trigger whichever Rates tab is currently active so G8/Spreads panes re-render
+        const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
+        if (activeRatesTab) {
+          const cty = activeRatesTab.dataset.cty;
+          if (cty && cty !== 'us') {
+            if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
+              renderSovereignSpreads();
+            } else if (typeof renderG8YieldPane === 'function') {
+              // Reset loaded flag so the pane re-renders with correct dimensions
+              const contentEl = document.getElementById('rates-g8-content-' + cty);
+              if (contentEl) delete contentEl.dataset.loaded;
+              renderG8YieldPane(cty);
+            }
           }
         }
-      }
+      });
     });
   }
 
