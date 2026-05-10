@@ -322,7 +322,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <a href="#section-positioning" data-target="section-positioning">Positioning</a>
     <a href="#section-sessions" data-target="section-sessions">Sessions</a>
     <a href="#section-tvcalendar" data-target="section-tvcalendar">Calendar</a>
-    <a href="#section-derivatives" data-target="section-derivatives" style="color:var(--blue);font-weight:600;" title="Implied forwards, RR surface, realized volatility">Derivatives ★</a>
+    <a href="#section-derivatives" data-target="section-derivatives" title="Implied forwards, RR surface, realized volatility · Shortcut: D">Derivatives</a>
   </nav>
   <div class="topbar-right">
     <!-- Site menu dropdown -->
@@ -673,24 +673,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </div>
         </div>
       </div>
-      <!-- Realized Vol HV table — full width, above VaR -->
-      <div style="padding:4px 8px 4px;border-bottom:1px solid var(--border);">
-        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Realized Vol — HV (yfinance OHLC)</div>
-        <table id="hv-multitf-table" aria-label="Historical volatility multi-window" style="width:100%;">
-          <thead>
-            <tr>
-              <th style="text-align:left;font-size:9px;" scope="col">Pair</th>
-              <th style="font-size:9px;text-align:right;" scope="col" title="30-day HV annualized — only window computed by pipeline">HV 30d</th>
-              <th style="font-size:9px;text-align:right;" scope="col" title="25d Risk Reversal 1M from Saxo">RR 1M</th>
-              <th style="font-size:9px;text-align:right;color:var(--text3);" scope="col">Trend</th>
-            </tr>
-          </thead>
-          <tbody id="hv-multitf-tbody">
-            <tr><td colspan="4" style="color:var(--text3);padding:6px 0;font-size:10px;">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- VaR / CVaR Panel — full width below HV table -->
+      <!-- VaR / CVaR Panel — full width -->
       <div style="padding:4px 8px 6px;">
         <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
           <span>Historical VaR 95% · 1-day · 252d window</span>
