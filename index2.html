@@ -932,7 +932,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
                 <th scope="col" title="3-month forward via CIP">3M Fwd</th>
                 <th scope="col" title="6-month forward via CIP">6M Fwd</th>
                 <th scope="col" title="1-year forward via CIP">1Y Fwd</th>
-                <th scope="col" title="Annualized interest rate differential driving forward premium/discount">Rate Diff</th>
+                <th scope="col" title="r(left) minus r(right) · annualized · positive = left-hand currency at forward discount per CIP">Rate Diff</th>
               </tr>
             </thead>
             <tbody id="fwd-tbody">
@@ -953,7 +953,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             </tbody>
           </table>
         </div>
-        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Formula: F = S × ((1 + r_base × T) / (1 + r_quote × T)) · CB rates via rates/*.json · extended-data/*.json</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Covered Interest Parity · CB policy rates · G8 central banks · Not a live quoted price</div>
       </div>
 
       <!-- RR Term Structure table -->
@@ -982,7 +982,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             </tbody>
           </table>
         </div>
-        <div style="font-size:9px;color:var(--text3);margin-top:3px;">1M from rr-data/rr.json (daily) · other tenors require rr2.json from fetch_saxo_rr2.py · negative = put skew</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Saxo Bank · indicative mid · daily · negative = put skew (downside hedging premium)</div>
       </div>
 
       <!-- HV Term Structure -->
@@ -1010,7 +1010,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             </tbody>
           </table>
         </div>
-        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Annualized std(log returns) · sample variance n−1 · ×√252 · yfinance OHLC via quotes.json · Trend = HV 10d vs HV 30d</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Realized volatility · annualized · yfinance OHLC · Trend: HV 10d vs HV 30d</div>
       </div>
 
     </div><!-- /#section-derivatives -->
