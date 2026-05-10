@@ -9564,6 +9564,61 @@ async function renderDerivativesSection() {
       }
     });
   }
+
+  // ── Cross-Pair Vol Monitor ──
+  const crossVolTbody = document.getElementById('cross-vol-tbody');
+  if (crossVolTbody && intraday) {
+    const crossPairs = [
+      { label: 'EUR/GBP', id: 'eurgbp' },
+      { label: 'EUR/JPY', id: 'eurjpy' },
+      { label: 'GBP/JPY', id: 'gbpjpy' },
+      { label: 'AUD/JPY', id: 'audjpy' },
+      { label: 'EUR/AUD', id: 'euraud' },
+      { label: 'EUR/NZD', id: 'eurnzd' },
+    ];
+    const rows = crossVolTbody.querySelectorAll('tr');
+    crossPairs.forEach((cp, idx) => {
+      const row = rows[idx];
+      if (!row) return;
+      const q = intraday?.quotes?.[cp.id];
+      const tds = row.querySelectorAll('td');
+      const hv30 = q?.hv30 ?? null;
+      const hv10 = q?.hv10 ?? null;
+      const pct  = q?.pct  ?? null;
+
+      // HV 30d
+      if (tds[1]) {
+        tds[1].textContent = hv30 != null ? hv30.toFixed(1) + '%' : '—';
+        tds[1].style.color = hv30 != null ? (hv30 > 10 ? 'var(--down)' : hv30 < 4 ? 'var(--up)' : 'var(--text)') : 'var(--text3)';
+        tds[1].style.fontFamily = 'var(--font-mono)'; tds[1].style.fontSize = '10px';
+      }
+      // HV 10d
+      if (tds[2]) {
+        tds[2].textContent = hv10 != null ? hv10.toFixed(1) + '%' : '—';
+        tds[2].style.color = 'var(--text2)';
+        tds[2].style.fontFamily = 'var(--font-mono)'; tds[2].style.fontSize = '10px';
+      }
+      // Vol Trend
+      if (tds[3]) {
+        if (hv10 != null && hv30 != null) {
+          const diff = hv10 - hv30;
+          const arrow = diff > 1 ? '↑' : diff < -1 ? '↓' : '→';
+          const color = diff > 1 ? 'var(--down)' : diff < -1 ? 'var(--up)' : 'var(--text3)';
+          tds[3].textContent = arrow; tds[3].style.color = color;
+          tds[3].title = `HV10 ${hv10.toFixed(1)}% vs HV30 ${hv30.toFixed(1)}%`;
+        } else {
+          tds[3].textContent = '—'; tds[3].style.color = 'var(--text3)';
+        }
+        tds[3].style.fontSize = '11px';
+      }
+      // 1D Δ%
+      if (tds[4]) {
+        tds[4].textContent = pct != null ? (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%' : '—';
+        tds[4].style.color = pct != null ? (pct > 0 ? 'var(--up)' : pct < 0 ? 'var(--down)' : 'var(--text3)') : 'var(--text3)';
+        tds[4].style.fontFamily = 'var(--font-mono)'; tds[4].style.fontSize = '10px';
+      }
+    });
+  }
 }
 
 
@@ -9619,7 +9674,7 @@ async function renderG8YieldPane(cty) {
     const ext = await fetch('./extended-data/' + cfg.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
     if (!ext) { contentEl.textContent = 'Data unavailable — extended-data/' + cfg.file + '.json'; return; }
 
-    let html = `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">${cfg.label} — extended-data/${cfg.file}.json</div>`;
+    let html = `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">${cfg.label} · Sovereign Bond Yields</div>`;
     html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;">';
     cfg.tenors.forEach(t => {
       const val = (ext.data ?? ext)[t.k];
@@ -9627,7 +9682,8 @@ async function renderG8YieldPane(cty) {
       html += `<div class="rate-cell" style="min-width:90px;"><div class="rate-cty">${t.label}</div><div class="rate-val">${valStr}</div></div>`;
     });
     html += '</div>';
-    html += `<div style="font-size:9px;color:var(--text3);">Source: extended-data/${cfg.file}.json · daily batch · yfinance</div>`;
+    const dateLbl = ext?.dates?.bond10y ? ` · ${ext.dates.bond10y}` : '';
+    html += `<div style="font-size:9px;color:var(--text3);">Daily sovereign yield pipeline${dateLbl}</div>`;
     contentEl.innerHTML = html;
     contentEl.dataset.loaded = '1';
   } catch {
@@ -9642,12 +9698,12 @@ async function renderSovereignSpreads() {
   if (tbody.dataset.loaded) return;
 
   const countries = [
-    { code: 'de', file: 'EUR', label: 'DE' },
-    { code: 'gb', file: 'GBP', label: 'GB' },
-    { code: 'jp', file: 'JPY', label: 'JP' },
-    { code: 'au', file: 'AUD', label: 'AU' },
-    { code: 'ca', file: 'CAD', label: 'CA' },
-    { code: 'nz', file: 'NZD', label: 'NZ' },
+    { code: 'de', file: 'EUR', label: 'DE', flag: '🇩🇪' },
+    { code: 'gb', file: 'GBP', label: 'GB', flag: '🇬🇧' },
+    { code: 'jp', file: 'JPY', label: 'JP', flag: '🇯🇵' },
+    { code: 'au', file: 'AUD', label: 'AU', flag: '🇦🇺' },
+    { code: 'ca', file: 'CAD', label: 'CA', flag: '🇨🇦' },
+    { code: 'nz', file: 'NZD', label: 'NZ', flag: '🇳🇿' },
   ];
 
   // Load US first
@@ -9675,6 +9731,8 @@ async function renderSovereignSpreads() {
       const us10 = norm(us10y);
       const us2  = norm(us2y);
 
+      // Country flag + label
+      if (tds[0]) { tds[0].textContent = (c.flag ? c.flag + ' ' : '') + c.label; }
       // 10Y value
       if (tds[1]) { tds[1].textContent = n10 != null ? n10.toFixed(2) + '%' : '—'; }
 
@@ -9711,13 +9769,67 @@ async function renderEconSurprises() {
   const tbody = document.getElementById('econ-surprise-tbody');
   if (!tbody) return;
 
-  // Load ForexFactory calendar (same-origin)
-  // ff_calendar.json uses: { events: [{ title, currency, dateISO, timeUTC, impact, forecast, previous, actual, released }] }
+  // Load ForexFactory calendar — primary: ff_calendar.json, fallback: calendar.json
+  // ff_calendar.json: { events: [{ title, currency, dateISO, timeUTC, impact, forecast, previous, actual, released }] }
+  // calendar.json:    { events: [{ event, currency, dateISO, impact, actual, forecast, previous }] }
   let calData = null;
+  let calSource = 'ForexFactory';
+  let calMaxDate = '';
   try {
     const res = await fetch('./calendar-data/ff_calendar.json').catch(() => null);
-    if (res?.ok) calData = await res.json();
-  } catch { /* no cal data */ }
+    if (res?.ok) {
+      const ffj = await res.json();
+      // Only use ff_calendar if it has released events with actuals in last 21 days
+      const nowMs = Date.now();
+      const win21 = 21 * 24 * 60 * 60 * 1000;
+      const hasReleased = (ffj?.events || []).some(ev => {
+        const t = new Date(ev.dateISO || '').getTime();
+        return !isNaN(t) && nowMs - t <= win21 && ev.released && ev.actual != null;
+      });
+      if (hasReleased) { calData = ffj; calSource = 'ForexFactory'; }
+    }
+  } catch { /* ignore */ }
+
+  // Fallback to calendar.json (broader history, different schema)
+  if (!calData) {
+    try {
+      const res2 = await fetch('./calendar-data/calendar.json').catch(() => null);
+      if (res2?.ok) {
+        const calj = await res2.json();
+        // Normalize to ff_calendar schema
+        const normalised = (calj?.events || []).map(ev => ({
+          title:    ev.event || ev.title || '',
+          currency: ev.currency,
+          dateISO:  ev.dateISO || '',
+          timeUTC:  ev.timeUTC || '00:00',
+          impact:   ev.impact || 'low',
+          forecast: ev.forecast || null,
+          previous: ev.previous || null,
+          actual:   ev.actual || null,
+          released: !!(ev.actual && ev.actual !== '' && ev.actual !== '-'),
+        }));
+        if (normalised.some(ev => ev.released && ev.actual)) {
+          calData = { events: normalised };
+          calSource = 'calendar';
+          calMaxDate = normalised
+            .filter(ev => ev.released)
+            .reduce((acc, ev) => ev.dateISO > acc ? ev.dateISO : acc, '');
+        }
+      }
+    } catch { /* no fallback */ }
+  }
+
+  // Update source footer
+  const srcEl = document.getElementById('econ-surprise-source');
+  if (srcEl) {
+    if (calSource === 'calendar' && calMaxDate) {
+      srcEl.textContent = `Economic calendar · beat/miss vs consensus · through ${calMaxDate}`;
+    } else if (calSource === 'ForexFactory') {
+      srcEl.textContent = 'ForexFactory · calendar beat/miss vs consensus · 21d rolling';
+    } else {
+      srcEl.textContent = 'Calendar data unavailable';
+    }
+  }
 
   // Build surprise score per currency:
   // For each past released event with actual & forecast: beat = actual > forecast
