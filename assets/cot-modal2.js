@@ -86,11 +86,11 @@
 #p-overview.on::-webkit-scrollbar { width:3px!important; }
 #p-overview.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
 /* Top row: Gauge (left) | LS-split + Signal stacked (right) */
-#p-overview .cot-ov-top { display:grid;grid-template-columns:1fr 1fr;flex-shrink:0; }
-#p-overview .cot-ov-top > .cot-cw { border-right:1px solid var(--border,#252d3d);border-bottom:1px solid var(--border,#252d3d); }
-#p-overview .cot-ov-top > .cot-cw:last-child { border-right:none; }
+#p-overview .cot-ov-top { display:grid;grid-template-columns:1fr 1fr;flex-shrink:0;border-bottom:1px solid var(--border,#252d3d); }
+/* Gauge card: left child (.cot-cw), right divider */
+#p-overview .cot-ov-top > .cot-cw { border-right:1px solid var(--border,#252d3d);border-bottom:none; }
 /* Right column: LS-split on top + Signal Summary below */
-#p-overview .cot-ov-right { display:flex;flex-direction:column;border-bottom:1px solid var(--border,#252d3d); }
+#p-overview .cot-ov-right { display:flex;flex-direction:column; }
 #p-overview .cot-ov-right > .cot-cw { border-bottom:1px solid var(--border,#252d3d);border-right:none; }
 #p-overview .cot-ov-right > .cot-cw:last-child { border-bottom:none; }
 /* Bottom row: Trend | 52w Range | Participants */
@@ -98,9 +98,11 @@
 #p-overview .cot-ov-bottom > .cot-cw { border-right:1px solid var(--border,#252d3d);border-bottom:none; }
 #p-overview .cot-ov-bottom > .cot-cw:last-child { border-right:none; }
 #p-net.on .cot-cw,
-#p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none; }
+#p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
 #p-net.on .cot-cw > .cot-chart-area,
-#p-split.on .cot-cw > .cot-chart-area { flex:1;min-height:0; }
+#p-split.on .cot-cw > .cot-chart-area { flex:1;min-height:0;display:flex;flex-direction:column; }
+#p-net.on .cot-cw > .cot-chart-area > .cot-lw-wrap,
+#p-split.on .cot-cw > .cot-chart-area > .cot-lw-wrap { flex:1;min-height:0;height:100%; }
 #p-participants .cot-chart-area { height:300px;position:relative; }
 #p-participants.on { overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
 #p-participants.on::-webkit-scrollbar { width:3px!important; }
@@ -339,12 +341,14 @@ function _mkTooltip(container,lwChart,getSeries,fmtFn){
 
 function _lwResize(container,lwChart){
   const apply=()=>{
-    const h=container.offsetHeight||container.parentElement?.offsetHeight||240;
-    if(lwChart&&container.offsetWidth>0)lwChart.applyOptions({width:container.offsetWidth,height:h});
+    const rect=container.getBoundingClientRect();
+    const h=Math.round(rect.height)||container.offsetHeight||container.parentElement?.getBoundingClientRect().height||240;
+    const w=Math.round(rect.width)||container.offsetWidth||600;
+    if(lwChart&&w>0&&h>10)lwChart.applyOptions({width:w,height:h});
   };
   if(window.ResizeObserver){const ro=new ResizeObserver(()=>apply());ro.observe(container);container._lwRo=ro;}
   window.addEventListener('resize',apply);container._lwResize=apply;
-  setTimeout(apply,60);setTimeout(apply,200);
+  setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);
   return apply;
 }
 
@@ -588,9 +592,11 @@ function cotTab(el,tabId){
   const bd=document.getElementById('cot-bd');if(!bd?._cotData)return;
   const d=bd._cotData;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    if(tabId==='net'){const w=document.getElementById('cot-lw-net');if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}}
-    if(tabId==='split'){const w=document.getElementById('cot-lw-split');if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}}
-    if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}}
+    if(tabId==='net'){const w=document.getElementById('cot-lw-net');if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
+    if(tabId==='split'){const w=document.getElementById('cot-lw-split');if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
+    if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
+    // Force resize after layout settles
+    setTimeout(()=>{['cot-lw-net','cot-lw-split','cot-lw-part'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
   }));
 }
 
