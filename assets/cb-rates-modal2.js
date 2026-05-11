@@ -156,17 +156,35 @@ function _attachCBRTooltip(container,lwChart,mainSeries,fwdSeries,decisions){
   });
 }
 
+function _cbrAvailableH(){
+  // Calculate available chart height by subtracting all fixed-height elements from the modal
+  const modal=document.getElementById('cbr-modal');
+  if(!modal)return 300;
+  const totalH=modal.offsetHeight;
+  const hd=document.getElementById('cbr-m-hd');
+  const metrics=document.getElementById('cbr-m-metrics');
+  const tabs=document.getElementById('cbr-m-tabs');
+  // The info bar (next meeting + fwd rate) is flex-shrink:0, find it
+  const infoBar=document.querySelector('#cbr-p-chart [style*="grid-template-columns:1fr 1fr"]');
+  const hdH=hd?hd.offsetHeight:0;
+  const metH=metrics?metrics.offsetHeight:0;
+  const tabH=tabs?tabs.offsetHeight:0;
+  const infoH=infoBar?infoBar.offsetHeight:0;
+  // 12px top + 8px bottom padding inside cbr-chart-area
+  const padH=20;
+  const available=totalH-hdH-metH-tabH-infoH-padH;
+  return Math.max(available,180);
+}
+
 function _buildCBRChart(data){
   const container=document.querySelector('.cbr-lw-wrap');if(!container)return;
   const LWC=window.LightweightCharts;if(!LWC)return;
   _destroyCBRChart();
-  // Measure available space from the parent (.cbr-chart-area) before creating the chart
   const parent=container.parentElement;
   const initW=parent?.offsetWidth||container.offsetWidth||600;
-  const modalBody=document.getElementById('cbr-m-body');
-  const initH=parent?.offsetHeight||container.offsetHeight||(modalBody?Math.max(modalBody.offsetHeight-60,180):300);
+  const initH=_cbrAvailableH();
   const opts=_cbrLwOptions();
-  opts.width=initW;opts.height=Math.max(initH,120);
+  opts.width=initW;opts.height=initH;
   _cbrLwChart=LWC.createChart(container,opts);
   const{chronData,decisions,fwdRate,bias}=data;
   const blue=getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()||'#4f7fff';
@@ -186,15 +204,14 @@ function _buildCBRChart(data){
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
   const apply=()=>{
     requestAnimationFrame(()=>{
-      const rect=container.getBoundingClientRect();
-      const h=Math.round(rect.height)||container.offsetHeight||parent?.getBoundingClientRect().height||300;
-      const w=Math.round(rect.width)||container.offsetWidth||600;
+      const w=parent?.offsetWidth||container.offsetWidth||600;
+      const h=_cbrAvailableH();
       if(_cbrLwChart&&w>0&&h>10){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
     });
   };
   if(window.ResizeObserver){const ro=new ResizeObserver(()=>apply());ro.observe(container);container._cbrRo=ro;}
   window.addEventListener('resize',apply);container._cbrResize=apply;
-  setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);setTimeout(apply,1000);
+  setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);
 }
 
 async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
@@ -300,7 +317,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   const esc=e=>{if(e.key==='Escape')closeCBRatesModal();};
   document.addEventListener('keydown',esc);bd._esc=esc;
   bd._chartData={chronData,decisions,fwdRate,bias,currentRate};
-  setTimeout(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)),0);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)));
 }
 
 function cbRatesTab(el,tabId){
