@@ -18,7 +18,7 @@
 #cm-modal::before { display:none; }
 #cm-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px 8px;border-bottom:1px solid var(--border2);flex-shrink:0;
+  padding:10px 14px 8px;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;
   background:var(--bg2);
 }
 #cm-title { font-size:12px;font-weight:600;color:var(--text);letter-spacing:-.01em; }
@@ -27,9 +27,9 @@
 #cm-close:hover { color:var(--text);background:var(--bg3); }
 #cm-strip {
   display:grid;grid-template-columns:repeat(5,1fr);
-  background:var(--bg);border-bottom:1px solid var(--border2);flex-shrink:0;
+  background:var(--bg);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;
 }
-.cm-metric { padding:7px 10px;background:var(--bg);border-right:1px solid var(--border2); }
+.cm-metric { padding:7px 10px;background:var(--bg);border-right:1px solid var(--border,#252d3d); }
 .cm-metric:last-child { border-right:none; }
 .cm-m-lbl { font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono); }
 .cm-m-val { font-size:14px;font-weight:600;font-family:var(--font-mono);line-height:1;color:var(--text); }
@@ -38,25 +38,27 @@
 .cm-m-val.warn { color:var(--orange); }
 .cm-m-sub { font-size:8px;color:var(--text2);margin-top:2px;font-family:var(--font-mono); }
 #cm-body {
-  flex:1;overflow-y:auto;padding:12px 14px 16px;
-  display:flex;flex-direction:column;gap:12px;
-  background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--bg3) transparent;
+  flex:1;overflow-y:auto;padding:0;
+  display:flex;flex-direction:column;
+  background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;
 }
-#cm-body::-webkit-scrollbar { width:4px; }
-#cm-body::-webkit-scrollbar-thumb { background:var(--bg3);border-radius:2px; }
-.cm-section-title { font-size:8.5px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:var(--font-mono); }
-#cm-chart-wrap { position:relative;height:180px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;overflow:hidden; }
-#cm-lwc-container { width:100%;height:100%; }
-#cm-tooltip { position:absolute;top:6px;left:10px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:9px;font-family:var(--font-mono);color:var(--text);pointer-events:none;display:none;z-index:10;white-space:nowrap; }
-#cm-legend { display:flex;gap:12px;flex-wrap:wrap;margin-top:6px; }
+#cm-body::-webkit-scrollbar { width:3px!important; }
+#cm-body::-webkit-scrollbar-track { background:transparent; }
+#cm-body::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
+#cm-body::-webkit-scrollbar-thumb:hover { background:var(--text2); }
+.cm-section-title { display:none; }
+#cm-chart-wrap { position:relative;flex-shrink:0;border-bottom:1px solid var(--border,#252d3d); }
+#cm-lwc-container { width:100%;height:200px; }
+#cm-tooltip { position:absolute;top:6px;left:10px;background:var(--bg2);border:1px solid var(--border,#252d3d);border-radius:4px;padding:4px 8px;font-size:9px;font-family:var(--font-mono);color:var(--text);pointer-events:none;display:none;z-index:10;white-space:nowrap; }
+#cm-legend { display:flex;gap:12px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid var(--border,#252d3d); }
 .cm-leg-item { display:flex;align-items:center;gap:4px;font-size:8.5px;color:var(--text2);font-family:var(--font-mono); }
 .cm-leg-swatch { width:14px;height:2px;border-radius:1px;flex-shrink:0; }
 .cm-leg-swatch.solid-blue { background:var(--blue); }
 .cm-leg-swatch.dash-white { background:repeating-linear-gradient(90deg,rgba(209,212,220,.5) 0,rgba(209,212,220,.5) 3px,transparent 3px,transparent 6px); }
 .cm-leg-swatch.dash-amber { background:repeating-linear-gradient(90deg,rgba(246,148,28,.8) 0,rgba(246,148,28,.8) 3px,transparent 3px,transparent 6px); }
 .cm-leg-swatch.dash-red   { background:repeating-linear-gradient(90deg,rgba(239,83,80,.8) 0,rgba(239,83,80,.8) 3px,transparent 3px,transparent 6px); }
-.cm-regime-card { background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:6px; }
-.cm-regime-row { display:flex;justify-content:space-between;align-items:baseline; }
+.cm-regime-row { display:flex;justify-content:space-between;align-items:baseline;padding:8px 14px;border-bottom:1px solid var(--border,#252d3d); }
+.cm-regime-row:last-child { border-bottom:none; }
 .cm-regime-key { font-size:9.5px;color:var(--text2);font-family:var(--font-mono); }
 .cm-regime-val { font-size:10px;font-weight:600;font-family:var(--font-mono);color:var(--text); }
 .cm-regime-val.up   { color:var(--up); }
@@ -66,7 +68,7 @@
 .cm-trend-rising  { color:var(--up); }
 .cm-trend-falling { color:var(--down); }
 .cm-trend-stable  { color:var(--text2); }
-.cm-signal { margin-top:6px;display:flex;align-items:baseline;gap:8px;padding:5px 8px;border-left:2px solid var(--border2);font-size:9.5px;line-height:1.5;color:var(--text2);font-family:var(--font-mono); }
+.cm-signal { display:flex;align-items:baseline;gap:8px;padding:8px 14px;border-top:1px solid var(--border,#252d3d);border-left:3px solid var(--border,#252d3d);font-size:9.5px;line-height:1.5;color:var(--text2);font-family:var(--font-mono);margin:0; }
 .cm-signal.warn { border-left-color:var(--down); }
 .cm-signal.ok   { border-left-color:var(--up); }
 .cm-signal-tag { font-size:8.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;flex-shrink:0; }
@@ -98,7 +100,6 @@ function _cmDrawChart(container, history, histDates, norm, std) {
   const text2 = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim() || '#9096a0';
 
   _cmChart = LWC.createChart(container, {
-    autoSize: true,
     layout: { background: { type: 'solid', color: bg }, textColor: text2, fontSize: 9, fontFamily: "'JetBrains Mono','Courier New',monospace", attributionLogo: false },
     grid: { vertLines: { color: 'rgba(255,255,255,.04)' }, horzLines: { color: 'rgba(255,255,255,.04)' } },
     crosshair: { mode: LWC.CrosshairMode.Magnet, vertLine: { color: 'rgba(255,255,255,.25)', width: 1, style: 2, labelBackgroundColor: '#2a2e39' }, horzLine: { color: 'rgba(255,255,255,.25)', width: 1, style: 2, labelBackgroundColor: '#2a2e39' } },
@@ -143,6 +144,17 @@ function _cmDrawChart(container, history, histDates, norm, std) {
       tooltip.textContent = fmt(val.value) + (dateLabel ? '  \u00b7  ' + dateLabel : '');
     });
   }
+
+  const applySize = () => {
+    requestAnimationFrame(() => {
+      const w = container.offsetWidth || 600;
+      const h = container.offsetHeight || 200;
+      if (_cmChart && w > 0 && h > 10) _cmChart.applyOptions({ width: w, height: h });
+    });
+  };
+  if (window.ResizeObserver) { const ro = new ResizeObserver(applySize); ro.observe(container); container._cmRo = ro; }
+  window.addEventListener('resize', applySize); container._cmResize = applySize;
+  setTimeout(applySize, 60); setTimeout(applySize, 250);
 }
 
 function openCorrModal(corrObj) {
@@ -190,22 +202,16 @@ function openCorrModal(corrObj) {
         '<div class="cm-metric"><div class="cm-m-lbl">Z-Score</div><div class="cm-m-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</div><div class="cm-m-sub">30d vs norm</div></div>' +
       '</div>' +
       '<div id="cm-body">' +
-        '<div><div class="cm-section-title">Rolling 30d correlation' + dateRangeLabel + '</div>' +
-          '<div id="cm-chart-wrap"><div id="cm-lwc-container"></div><div id="cm-tooltip"></div></div>' +
-          '<div id="cm-legend">' +
-            '<div class="cm-leg-item"><div class="cm-leg-swatch solid-blue"></div>30d</div>' +
-            '<div class="cm-leg-item"><div class="cm-leg-swatch dash-white"></div>252d norm (' + _cmFmt(norm) + ')</div>' +
-            (std != null ? '<div class="cm-leg-item"><div class="cm-leg-swatch dash-amber"></div>\u00b11.5\u03c3</div><div class="cm-leg-item"><div class="cm-leg-swatch dash-red"></div>\u00b12.5\u03c3</div>' : '') +
-          '</div>' +
+        '<div id="cm-chart-wrap"><div id="cm-lwc-container"></div><div id="cm-tooltip"></div></div>' +
+        '<div id="cm-legend">' +
+          '<div class="cm-leg-item"><div class="cm-leg-swatch solid-blue"></div>30d</div>' +
+          '<div class="cm-leg-item"><div class="cm-leg-swatch dash-white"></div>252d norm (' + _cmFmt(norm) + ')</div>' +
+          (std != null ? '<div class="cm-leg-item"><div class="cm-leg-swatch dash-amber"></div>\u00b11.5\u03c3</div><div class="cm-leg-item"><div class="cm-leg-swatch dash-red"></div>\u00b12.5\u03c3</div>' : '') +
         '</div>' +
-        '<div><div class="cm-section-title">Regime</div>' +
-          '<div class="cm-regime-card">' +
-            '<div class="cm-regime-row"><span class="cm-regime-key">Trend</span><span class="cm-regime-val">' + trendHtml + '</span></div>' +
-            '<div class="cm-regime-row"><span class="cm-regime-key">30d vs norm</span><span class="cm-regime-val ' + (normDelta != null ? _cmCls(normDelta) : '') + '">' + (normDelta != null ? _cmFmt(normDelta) : '\u2014') + '</span></div>' +
-            '<div class="cm-regime-row"><span class="cm-regime-key">Z-score</span><span class="cm-regime-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</span></div>' +
-            (sigTxt ? '<div class="cm-signal ' + sigCls + '"><span class="cm-signal-tag">' + sigTag + '</span><span class="cm-signal-body">' + sigTxt + '</span></div>' : '') +
-          '</div>' +
-        '</div>' +
+        '<div class="cm-regime-row"><span class="cm-regime-key">Trend</span><span class="cm-regime-val">' + trendHtml + '</span></div>' +
+        '<div class="cm-regime-row"><span class="cm-regime-key">30d vs norm</span><span class="cm-regime-val ' + (normDelta != null ? _cmCls(normDelta) : '') + '">' + (normDelta != null ? _cmFmt(normDelta) : '\u2014') + '</span></div>' +
+        '<div class="cm-regime-row"><span class="cm-regime-key">Z-score</span><span class="cm-regime-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</span></div>' +
+        (sigTxt ? '<div class="cm-signal ' + sigCls + '"><span class="cm-signal-tag">' + sigTag + '</span><span class="cm-signal-body">' + sigTxt + '</span></div>' : '') +
       '</div>' +
     '</div>';
 
@@ -227,6 +233,9 @@ function closeCorrModal() {
   if (_cmChart) { try { _cmChart.remove(); } catch (_) {} _cmChart = null; }
   const bd = document.getElementById('cm-bd');
   if (bd) bd.remove();
+  const container = document.getElementById('cm-lwc-container');
+  if (container?._cmResize) window.removeEventListener('resize', container._cmResize);
+  if (container?._cmRo) container._cmRo.disconnect();
   document.removeEventListener('keydown', _cmKeydown);
 }
 window.openCorrModal  = openCorrModal;
