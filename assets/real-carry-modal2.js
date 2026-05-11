@@ -175,9 +175,9 @@
 #rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
 #rcm-matrix-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
-.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:auto;width:max-content;}
-.rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;width:72px;}
-.rcm-matrix td{width:72px;height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
+.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;width:100%;}
+.rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;}
+.rcm-matrix td{height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
 .rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
 .rcm-matrix td.row-head{text-align:left;color:var(--text3,#4e5c70);font-weight:700;padding:0 8px 0 8px;white-space:nowrap;width:52px;background:var(--bg2);border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;letter-spacing:.04em;}
 .rcm-matrix td.diag{background:var(--bg2);color:var(--text2);font-size:10.5px;font-weight:600;}
@@ -595,7 +595,7 @@ function _rcmRenderMatrix() {
   }).join('');
 
   return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;overflow-x:auto;">
-    <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;padding-right:20px;">
+    <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;">
       <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
         <thead>${header}</thead>
         <tbody>${rows}</tbody>
