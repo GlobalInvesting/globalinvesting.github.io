@@ -178,6 +178,29 @@ function openCorrModal(corrObj) {
   const normDelta = corr30 != null && norm != null ? corr30 - norm : null;
   const hist = Array.isArray(history) ? history : [];
   const dates = Array.isArray(hist_dates) ? hist_dates : [];
+
+  // Regime label — qualitative description of current 30d correlation
+  let regimeLabel = '\u2014', regimeCls = '';
+  if (corr30 != null) {
+    const v = corr30;
+    if      (v >=  0.70) { regimeLabel = 'Strong positive'; regimeCls = 'up'; }
+    else if (v >=  0.40) { regimeLabel = 'Moderate positive'; regimeCls = 'up'; }
+    else if (v >=  0.10) { regimeLabel = 'Weak positive'; regimeCls = ''; }
+    else if (v >  -0.10) { regimeLabel = 'Decorrelated'; regimeCls = 'flat'; }
+    else if (v >  -0.40) { regimeLabel = 'Weak inverse'; regimeCls = ''; }
+    else if (v >  -0.70) { regimeLabel = 'Moderate inverse'; regimeCls = 'down'; }
+    else                  { regimeLabel = 'Strong inverse'; regimeCls = 'down'; }
+  }
+
+  // 252d range from history array
+  let rangeHtml = '\u2014';
+  if (hist.length > 0) {
+    const hi = Math.max(...hist), lo = Math.min(...hist);
+    const hiCls = _cmCls(hi), loCls = _cmCls(lo);
+    rangeHtml = '<span class="' + hiCls + '">' + _cmFmt(hi) + '</span>'
+      + '<span style="color:var(--text2);margin:0 4px;">\u00b7</span>'
+      + '<span class="' + loCls + '">' + _cmFmt(lo) + '</span>';
+  }
   let dateRangeLabel = '';
   if (dates.length >= 2) dateRangeLabel = ' \u00b7 ' + _cmFmtDate(dates[0]) + ' \u2013 ' + _cmFmtDate(dates[dates.length - 1]);
 
@@ -208,9 +231,11 @@ function openCorrModal(corrObj) {
           '<div class="cm-leg-item"><div class="cm-leg-swatch dash-white"></div>252d norm (' + _cmFmt(norm) + ')</div>' +
           (std != null ? '<div class="cm-leg-item"><div class="cm-leg-swatch dash-amber"></div>\u00b11.5\u03c3</div><div class="cm-leg-item"><div class="cm-leg-swatch dash-red"></div>\u00b12.5\u03c3</div>' : '') +
         '</div>' +
+        '<div class="cm-regime-row"><span class="cm-regime-key">Regime</span><span class="cm-regime-val ' + regimeCls + '">' + regimeLabel + ' &thinsp;· ' + _cmFmt(corr30) + '</span></div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">Trend</span><span class="cm-regime-val">' + trendHtml + '</span></div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">30d vs norm</span><span class="cm-regime-val ' + (normDelta != null ? _cmCls(normDelta) : '') + '">' + (normDelta != null ? _cmFmt(normDelta) : '\u2014') + '</span></div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">Z-score</span><span class="cm-regime-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</span></div>' +
+        '<div class="cm-regime-row"><span class="cm-regime-key">252d range</span><span class="cm-regime-val">' + rangeHtml + '</span></div>' +
         (sigTxt ? '<div class="cm-signal ' + sigCls + '"><span class="cm-signal-tag">' + sigTag + '</span><span class="cm-signal-body">' + sigTxt + '</span></div>' : '') +
       '</div>' +
     '</div>';
