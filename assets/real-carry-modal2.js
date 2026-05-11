@@ -46,18 +46,18 @@
 /* ── Backdrop ── */
 #rcm-bd{display:block!important;overflow:hidden;}
 /* ── Modal shell ── */
-#rcm-modal{width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text);display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;font-size:11px;}
+#rcm-modal{width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);color:var(--text);display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;font-size:11px;}
 #rcm-modal::before{display:none;}
 
 /* ── Header ── */
 #rcm-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 9px;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;background:var(--bg2);}
 #rcm-hd-left{display:flex;align-items:center;gap:10px;}
 #rcm-hd-text{display:flex;flex-direction:column;gap:1px;}
-.rcm-badge{font-size:8px;font-weight:700;letter-spacing:.10em;color:var(--blue,#4d7cfe);text-transform:uppercase;display:flex;align-items:center;gap:4px;}
+.rcm-badge{font-size:8px;font-weight:700;letter-spacing:.10em;color:var(--blue,#4d7cfe);text-transform:uppercase;display:flex;align-items:center;gap:4px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .rcm-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--blue,#4d7cfe);flex-shrink:0;}
-#rcm-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.01em;line-height:1.2;}
-#rcm-sub{font-size:9px;color:var(--text3,#4e5c70);letter-spacing:.04em;margin-top:1px;}
-#rcm-close{background:none;border:none;color:var(--text3,#4e5c70);font-size:16px;cursor:pointer;padding:3px 6px;border-radius:3px;line-height:1;transition:color .1s,background .1s;font-family:inherit;}
+#rcm-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.01em;line-height:1.2;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+#rcm-sub{font-size:9px;color:var(--text3,#4e5c70);letter-spacing:.04em;margin-top:1px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+#rcm-close{background:none;border:none;color:var(--text3,#4e5c70);font-size:16px;cursor:pointer;padding:3px 6px;border-radius:3px;line-height:1;transition:color .1s,background .1s;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 #rcm-close:hover{color:var(--text);background:var(--bg3);}
 
 /* ── Metrics strip ── */
@@ -71,7 +71,7 @@
 /* ── Tabs ── */
 #rcm-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;padding:0 14px;overflow-x:auto;scrollbar-width:none;}
 #rcm-tabs::-webkit-scrollbar{display:none;}
-.rcm-tab{font-size:10px;font-weight:600;letter-spacing:.04em;padding:8px 12px 7px;cursor:pointer;color:var(--text3,#4e5c70);border-bottom:2px solid transparent;transition:color .1s;white-space:nowrap;user-select:none;text-transform:uppercase;}
+.rcm-tab{font-size:10px;font-weight:600;letter-spacing:.04em;padding:8px 12px 7px;cursor:pointer;color:var(--text3,#4e5c70);border-bottom:2px solid transparent;transition:color .1s;white-space:nowrap;user-select:none;text-transform:uppercase;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .rcm-tab:hover:not(.on){color:var(--text2);}
 .rcm-tab.on{color:var(--blue,#4d7cfe);border-bottom-color:var(--blue,#4d7cfe);}
 
@@ -88,44 +88,43 @@
 .rcm-cw{background:var(--bg);border:none;border-radius:0;padding:0;margin-bottom:0;flex:1;display:flex;flex-direction:column;overflow:auto;}
 .rcm-ct{display:none;}
 
-/* ── Breakdown table ── */
+/* ── Breakdown table — Bloomberg-style: UI font for labels, mono for numbers ── */
 .rcm-tbl{width:100%;border-collapse:collapse;}
-.rcm-tbl thead th{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);font-weight:600;padding:7px 12px;text-align:right;border-bottom:1px solid var(--border,#252d3d);background:var(--bg2);}
+.rcm-tbl thead th{font-size:8.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3,#4e5c70);font-weight:600;padding:7px 14px;text-align:right;border-bottom:1px solid var(--border,#252d3d);background:var(--bg2);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .rcm-tbl thead th:first-child{text-align:left;}
-.rcm-tbl tbody td{padding:7px 12px;font-size:10px;text-align:right;border-bottom:1px solid var(--border,#252d3d);color:var(--text);}
-.rcm-tbl tbody td:first-child{text-align:left;color:var(--text2);font-weight:600;}
+.rcm-tbl tbody td{padding:8px 14px;font-size:11px;text-align:right;border-bottom:1px solid var(--border,#252d3d);color:var(--text);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-tbl tbody td:first-child{text-align:left;color:var(--text);font-weight:700;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-tbl tbody td.rcm-td-cb{color:var(--text2);font-size:9px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-weight:400;}
 .rcm-tbl tbody tr:hover td{background:rgba(77,124,254,.04);}
 .rcm-tbl tbody tr:last-child td{border-bottom:none;}
-/* worst row badge */
-.rcm-tbl .rcm-worst td:first-child::before{content:'1';display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:var(--up,#26c9a0);color:var(--bg);border-radius:2px;font-size:8px;font-weight:700;margin-right:6px;vertical-align:middle;}
 
-/* ── Real rate coloring ── */
-.rr-pos2{color:var(--up,#26c9a0);font-weight:700;}
-.rr-pos1{color:var(--up,#26c9a0);}
-.rr-neg1{color:var(--dn,#e05252);}
-.rr-neg2{color:var(--dn,#e05252);font-weight:700;}
+/* ── Real rate coloring — terminal vars (--up / --down = #26a69a / #ef5350) ── */
+.rr-pos2{color:var(--up,#26a69a);font-weight:700;}
+.rr-pos1{color:var(--up,#26a69a);}
+.rr-neg1{color:var(--down,#ef5350);}
+.rr-neg2{color:var(--down,#ef5350);font-weight:700;}
 .rr-flat{color:var(--text2);}
 
 /* ── OIS bias chip ── */
-.rcm-bias{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;}
-.rcm-bias-hike{background:rgba(38,201,160,.12);color:var(--up,#26c9a0);border:1px solid rgba(38,201,160,.25);}
-.rcm-bias-cut{background:rgba(224,82,82,.12);color:var(--dn,#e05252);border:1px solid rgba(224,82,82,.25);}
+.rcm-bias{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:2px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-bias-hike{background:rgba(38,166,154,.15);color:var(--up,#26a69a);border:1px solid rgba(38,166,154,.30);}
+.rcm-bias-cut{background:rgba(239,83,80,.12);color:var(--down,#ef5350);border:1px solid rgba(239,83,80,.25);}
 .rcm-bias-hold{background:rgba(122,135,153,.10);color:var(--text2);border:1px solid rgba(122,135,153,.20);}
 
 /* ── Live dot ── */
-.rcm-live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--up,#26c9a0);margin-left:3px;vertical-align:middle;animation:rcm-pulse 2s ease-in-out infinite;}
+.rcm-live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--up,#26a69a);margin-left:3px;vertical-align:middle;animation:rcm-pulse 2s ease-in-out infinite;}
 
 /* ── Pair detail ── */
-.rcm-pd-header{padding:10px 14px 9px;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3,#4e5c70);display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.rcm-pd-pair{color:var(--text);font-size:10px;font-weight:700;}
+.rcm-pd-header{padding:10px 14px 9px;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3,#4e5c70);display:flex;align-items:center;gap:6px;flex-shrink:0;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-pd-pair{color:var(--text);font-size:10px;font-weight:700;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .rcm-pd-dir{color:var(--text3,#4e5c70);}
 
 .rcm-pd-row-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border,#252d3d);}
 .rcm-pd-cell{padding:10px 14px;border-right:1px solid var(--border,#252d3d);}
 .rcm-pd-cell:last-child{border-right:none;}
-.rcm-pd-cell-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);margin-bottom:4px;}
-.rcm-pd-cell-val{font-size:20px;font-weight:700;line-height:1;}
-.rcm-pd-cell-sub{font-size:9px;color:var(--text2);margin-top:3px;}
+.rcm-pd-cell-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);margin-bottom:4px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-pd-cell-val{font-size:20px;font-weight:700;line-height:1;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-pd-cell-sub{font-size:9px;color:var(--text2);margin-top:3px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 
 /* ── Rate bars ── */
 .rcm-rate-bars{padding:10px 14px;border-bottom:1px solid var(--border,#252d3d);}
@@ -141,52 +140,52 @@
 .rcm-vol-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border,#252d3d);}
 .rcm-vol-cell{padding:8px 14px;border-right:1px solid var(--border,#252d3d);}
 .rcm-vol-cell:last-child{border-right:none;}
-.rcm-vol-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3,#4e5c70);margin-bottom:3px;}
-.rcm-vol-val{font-size:14px;font-weight:700;color:var(--text);}
-.rcm-vol-sub{font-size:8px;color:var(--text2);margin-top:2px;}
+.rcm-vol-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3,#4e5c70);margin-bottom:3px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-vol-val{font-size:14px;font-weight:700;color:var(--text);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-vol-sub{font-size:8px;color:var(--text2);margin-top:2px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 
 .rcm-ois-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border,#252d3d);}
 .rcm-ois-cell{padding:8px 14px;border-right:1px solid var(--border,#252d3d);}
 .rcm-ois-cell:last-child{border-right:none;}
-.rcm-ois-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3,#4e5c70);margin-bottom:4px;}
-.rcm-ois-sub{font-size:8px;color:var(--text3,#4e5c70);margin-top:3px;}
+.rcm-ois-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3,#4e5c70);margin-bottom:4px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-ois-sub{font-size:8px;color:var(--text3,#4e5c70);margin-top:3px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 
 /* ── Sustainability ── */
 .rcm-sustain{padding:8px 14px;border-bottom:1px solid var(--border,#252d3d);display:flex;align-items:flex-start;gap:8px;}
 .rcm-sustain-icon{width:3px;flex-shrink:0;align-self:stretch;border-radius:2px;}
-.rcm-sustain-ok   .rcm-sustain-icon{background:var(--up,#26c9a0);}
+.rcm-sustain-ok   .rcm-sustain-icon{background:var(--up,#26a69a);}
 .rcm-sustain-warn .rcm-sustain-icon{background:var(--orange,#f59e0b);}
-.rcm-sustain-bad  .rcm-sustain-icon{background:var(--dn,#e05252);}
-.rcm-sustain-body{font-size:9.5px;color:var(--text2);line-height:1.55;}
+.rcm-sustain-bad  .rcm-sustain-icon{background:var(--down,#ef5350);}
+.rcm-sustain-body{font-size:9.5px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .rcm-sustain-body strong{color:var(--text);font-weight:700;}
 
 /* ── Source note ── */
-.rcm-src-note{padding:8px 14px;font-size:8px;color:var(--text3,#4e5c70);line-height:1.6;border-top:1px solid var(--border,#252d3d);}
+.rcm-src-note{padding:8px 14px;font-size:8px;color:var(--text3,#4e5c70);line-height:1.6;border-top:1px solid var(--border,#252d3d);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 
-/* ── Real Rate Matrix ── */
+/* ── Real Rate Matrix — Bloomberg style: full 8×8, colored cells, mono values ── */
 #rcm-matrix-wrap{overflow:auto;padding:14px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
 #rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
 #rcm-matrix-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
-.rcm-matrix{border-collapse:collapse;font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.rcm-matrix th{font-weight:700;letter-spacing:.04em;padding:5px 8px;color:var(--text2);text-align:center;white-space:nowrap;}
-.rcm-matrix td{width:64px;height:32px;text-align:center;vertical-align:middle;font-weight:700;font-size:10px;border:1px solid var(--border,#252d3d);}
-.rcm-matrix td:hover{filter:brightness(1.35);}
-.rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;padding:0 10px 0 4px;white-space:nowrap;width:auto;background:transparent;border:none;}
-.rcm-matrix td.diag{background:var(--bg2);color:var(--text3,#4e5c70);font-size:8px;}
-/* matrix cell shading */
-.rcm-cell-pos-hi{background:rgba(38,201,160,.22);color:var(--up,#26c9a0);}
-.rcm-cell-pos{background:rgba(38,201,160,.10);color:var(--up,#26c9a0);}
-.rcm-cell-neg-hi{background:rgba(224,82,82,.22);color:var(--dn,#e05252);}
-.rcm-cell-neg{background:rgba(224,82,82,.10);color:var(--dn,#e05252);}
+.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 10px;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;}
+.rcm-matrix td{width:68px;height:34px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);}
+.rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
+.rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;padding:0 12px 0 4px;white-space:nowrap;width:auto;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9.5px;}
+.rcm-matrix td.diag{background:var(--bg2);color:var(--text3,#4e5c70);font-size:9px;}
+/* matrix cell shading — terminal standard colors (--up=#26a69a / --down=#ef5350) */
+.rcm-cell-pos-hi{background:rgba(38,166,154,.26);color:var(--up,#26a69a);}
+.rcm-cell-pos{background:rgba(38,166,154,.12);color:var(--up,#26a69a);}
+.rcm-cell-neg-hi{background:rgba(239,83,80,.26);color:var(--down,#ef5350);}
+.rcm-cell-neg{background:rgba(239,83,80,.12);color:var(--down,#ef5350);}
 .rcm-cell-flat{background:rgba(122,135,153,.07);color:var(--text3,#4e5c70);}
 /* matrix legend */
 .rcm-matrix-legend{margin-top:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
-.rcm-matrix-legend span{font-size:8px;display:flex;align-items:center;gap:4px;color:var(--text2);}
+.rcm-matrix-legend span{font-size:8px;display:flex;align-items:center;gap:4px;color:var(--text2);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .rcm-legend-sw{width:10px;height:10px;display:inline-block;flex-shrink:0;}
 
 /* ── Loading ── */
-.rcm-loading{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text2);font-size:11px;letter-spacing:.06em;padding:40px;}
+.rcm-loading{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text2);font-size:11px;letter-spacing:.06em;padding:40px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 
 /* ── Keep old grid for backward compat ── */
 .rcm-pd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
@@ -443,11 +442,13 @@ function _rcmDateAge(dateStr) {
 }
 
 // ── Tab 1: Rates Breakdown ───────────────────────────────────────────────────
+// Bloomberg-style: rank · CENTRAL BANK · NOMINAL · INFL.EXP. · REAL RATE · OIS BIAS
+// Sorted by real rate descending (highest real carry at top)
 function _rcmRenderBreakdown() {
   const d = _rcmData;
   if (!d) return '<div class="rcm-loading">Loading...</div>';
 
-  // Sort currencies by real rate descending (carry attractiveness)
+  // Sort by real rate descending
   const sorted = [..._RCM_G8].sort((a, b) => {
     const ra = d.realRates[a] ?? -99;
     const rb = d.realRates[b] ?? -99;
@@ -463,35 +464,41 @@ function _rcmRenderBreakdown() {
     const nomFmt = nom != null ? nom.toFixed(2) + '%' : '—';
     const ieFmt  = ie  ? ie.val.toFixed(2) + '%' : '—';
     const rrFmt  = _rcmRrFmt(rr);
-    const isLive  = ie?.live ? '<span title="Market-implied (FRED breakeven)" style="color:var(--up,#26a69a);font-size:8px;">&#x25CF;</span>' : '';
-    const dateAge = _rcmDateAge(ie?.date);
-    const srcLabel = _RCM_IE_SRC[ccy] || '';
-    const srcTitle = `${srcLabel}${ie?.date ? ' · ' + ie.date : ''}`;
-    const isTR = idx === 0 ? ' class="rcm-best"' : '';
+    const isLive = ie?.live
+      ? `<span class="rcm-live-dot" title="Market-implied (FRED breakeven)"></span>`
+      : '';
+    const srcTitle = `${_RCM_IE_SRC[ccy] || ''}${ie?.date ? ' · ' + ie.date : ''}`;
 
-    return `<tr${isTR} title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
-      <td style="font-weight:700;color:var(--text,#d1d4dc);">${_RCM_CB[ccy]} (${ccy})</td>
+    // Left border accent on top row (highest real rate) — green accent like Bloomberg
+    const rowStyle = idx === 0
+      ? ' style="border-left:3px solid var(--up,#26a69a);"'
+      : (idx === sorted.length - 1 ? ' style="border-left:3px solid var(--down,#ef5350);"' : '');
+
+    return `<tr${rowStyle} title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
+      <td style="color:var(--text3);font-size:9px;text-align:center;width:20px;padding:8px 4px 8px 14px;">${idx + 1}</td>
+      <td style="text-align:left;">
+        <span style="font-weight:700;color:var(--text);">${_RCM_CB[ccy]}</span>
+        <span style="color:var(--text3);font-size:9px;margin-left:4px;">${ccy}</span>
+      </td>
       <td>${nomFmt}</td>
-      <td title="${srcTitle}">${ieFmt} ${isLive}</td>
-      <td title="${srcTitle}">${dateAge}</td>
-      <td class="${rrCls}" style="font-weight:600;">${rrFmt}</td>
-      <td>${_rcmBiasChip(bias)}</td>
+      <td title="${srcTitle}">${ieFmt}${isLive}</td>
+      <td class="${rrCls}" style="font-weight:700;">${rrFmt}</td>
+      <td style="text-align:right;">${_rcmBiasChip(bias)}</td>
     </tr>`;
   }).join('');
 
-  const liveNote = 'USD/EUR: FRED market-implied breakeven (live, daily). GBP/JPY/AUD/CAD/CHF: CPI YoY (IMF SDMX 3.0, weekly batch — updated Wednesdays). NZD: OECD Data Explorer (weekly batch). ' +
-    'CPI YoY and 5Y breakeven are different methodologies — cross-currency real rate comparisons carry wider uncertainty for non-USD/EUR legs. ' +
-    'Data age column shows observation date — treat figures older than 6 months as indicative only.';
+  const liveNote = 'USD/EUR: FRED 5Y breakeven inflation (market-implied, daily). ' +
+    'GBP/JPY/AUD/CAD/CHF: CPI YoY (IMF SDMX 3.0, weekly). NZD: OECD Data Explorer (weekly). ' +
+    'Real rate = Nominal CB rate − Inflation Expectation. OIS Bias reflects forward market consensus at next CB meeting.';
 
   return `<div class="rcm-cw" style="flex:1;min-height:0;overflow:auto;">
-    <div class="rcm-ct">Real Rate Carry Ranking — G8 Central Banks · sorted by real rate descending</div>
     <table class="rcm-tbl" aria-label="Real rate carry ranking by currency">
       <thead>
         <tr>
+          <th scope="col" style="text-align:center;width:20px;padding:7px 4px 7px 14px;">#</th>
           <th scope="col" style="text-align:left;">Central Bank</th>
           <th scope="col">Nominal</th>
           <th scope="col">Infl. Exp.</th>
-          <th scope="col">Data Age</th>
           <th scope="col">Real Rate</th>
           <th scope="col">OIS Bias</th>
         </tr>
@@ -503,9 +510,10 @@ function _rcmRenderBreakdown() {
 }
 
 // ── Tab 2: Real Rate Matrix ──────────────────────────────────────────────────
-// Upper triangle: real rate of ROW minus real rate of COLUMN (long row, short col)
-// Positive = row currency has higher real rate (carry advantage long row / short col)
-// Diagonal: absolute real rate of the currency
+// Full 8×8 symmetric matrix: cell (row, col) = real rate of ROW minus real rate of COLUMN
+// Long row / Short column → positive = row currency has higher real rate
+// Diagonal: absolute real rate of the currency (greyed out)
+// Matches image: all cells filled, strong green/red shading, signed percentages
 function _rcmRenderMatrix() {
   const d = _rcmData;
   if (!d) return '<div class="rcm-loading">Loading...</div>';
@@ -514,60 +522,64 @@ function _rcmRenderMatrix() {
 
   function cellClass(diff) {
     if (diff == null) return 'rcm-cell-flat';
-    if (diff >= 1.5)  return 'rcm-cell-pos-hi';
-    if (diff >= 0.15) return 'rcm-cell-pos';
-    if (diff <= -1.5) return 'rcm-cell-neg-hi';
-    if (diff <= -0.15)return 'rcm-cell-neg';
+    if (diff >= 1.5)   return 'rcm-cell-pos-hi';
+    if (diff >= 0.10)  return 'rcm-cell-pos';
+    if (diff <= -1.5)  return 'rcm-cell-neg-hi';
+    if (diff <= -0.10) return 'rcm-cell-neg';
     return 'rcm-cell-flat';
   }
 
   function cellFmt(diff) {
     if (diff == null) return '—';
-    if (Math.abs(diff) < 0.01) return '0';
+    if (Math.abs(diff) < 0.005) return '0';
     return (diff > 0 ? '+' : '') + diff.toFixed(2) + '%';
   }
 
-  const header = `<tr><th class="row-head" scope="col">Long ↓ / Short →</th>${G8.map(c => `<th scope="col">${c}</th>`).join('')}</tr>`;
+  // Column headers
+  const header = `<tr>
+    <td class="row-head" style="font-size:8.5px;color:var(--text3);padding:4px 12px 4px 4px;font-family:var(--font-ui,'Inter',sans-serif);">L↓ / S→</td>
+    ${G8.map(c => `<th scope="col" style="font-size:9px;padding:5px 6px;font-weight:700;color:var(--text2);text-align:center;">${c}</th>`).join('')}
+  </tr>`;
 
   const rows = G8.map(rowCcy => {
+    const rrRow = d.realRates[rowCcy];
     const cells = G8.map(colCcy => {
       if (rowCcy === colCcy) {
-        // Diagonal: absolute real rate
+        // Diagonal: absolute real rate of the currency
         const rr = d.realRates[rowCcy];
         const fmt = rr != null ? (rr >= 0 ? '+' : '') + rr.toFixed(2) + '%' : '—';
-        return `<td class="diag" title="${rowCcy} real rate: ${fmt}">${fmt}</td>`;
+        const diagCls = rr != null && rr >= 0 ? 'color:var(--up,#26a69a)' : rr != null ? 'color:var(--down,#ef5350)' : '';
+        return `<td class="diag" style="${diagCls};font-size:9.5px;" title="${rowCcy} real rate: ${fmt}">${fmt}</td>`;
       }
-      const rrRow = d.realRates[rowCcy];
       const rrCol = d.realRates[colCcy];
       const diff  = (rrRow != null && rrCol != null) ? parseFloat((rrRow - rrCol).toFixed(3)) : null;
       const cls   = cellClass(diff);
       const fmt   = cellFmt(diff);
       const tip   = diff != null
-        ? `Long ${rowCcy} (${_rcmRrFmt(rrRow)}) / Short ${colCcy} (${_rcmRrFmt(rrCol)}) — real spread: ${cellFmt(diff)}`
+        ? `Long ${rowCcy} (${_rcmRrFmt(rrRow)}) / Short ${colCcy} (${_rcmRrFmt(rrCol)}) = ${cellFmt(diff)}`
         : `${rowCcy}/${colCcy} — insufficient data`;
       return `<td class="${cls}" title="${tip}">${fmt}</td>`;
     }).join('');
-    return `<tr><td class="row-head">${rowCcy}</td>${cells}</tr>`;
+    return `<tr>
+      <td class="row-head">${rowCcy}</td>
+      ${cells}
+    </tr>`;
   }).join('');
 
-  const legend = `
-    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text3,#6b7280);margin-top:8px;">
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.28);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong real carry (&ge;1.5%)</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.14);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Positive real spread</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.14);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Negative real spread</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.28);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong real drag (&le;-1.5%)</span>
-      <span>Diagonal = absolute real rate</span>
-    </div>`;
-
   return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-    <div class="rcm-ct">Real Rate Differential Matrix · Long row / Short column · Cell = Row real rate − Column real rate</div>
-    <div id="rcm-matrix-wrap" style="overflow:auto;flex:1;">
+    <div id="rcm-matrix-wrap" style="overflow:auto;flex:1;padding:14px;">
       <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
         <thead>${header}</thead>
         <tbody>${rows}</tbody>
       </table>
+      <div style="margin-top:10px;display:flex;gap:14px;flex-wrap:wrap;font-size:8px;color:var(--text3);font-family:var(--font-ui,'Inter',sans-serif);">
+        <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.26);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Strong real carry (≥+1.5%)</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.12);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Positive real spread</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.12);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Negative real spread</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.26);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Strong real drag (≤−1.5%)</span>
+        <span style="color:var(--text3);">Diagonal = absolute real rate · Cell = Row real rate − Column real rate</span>
+      </div>
     </div>
-    ${legend}
     <div class="rcm-src-note">Real rate = Nominal CB rate − Inflation Expectation. Positive cell = long row currency earns higher real carry vs short column currency.</div>
   </div>`;
 }
