@@ -118,7 +118,6 @@
 #p-overview .cot-ov-spark-top { display:flex;justify-content:space-between;margin-bottom:8px;padding:0 14px; }
 #p-overview .cot-ov-spark-trend { font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
 #p-overview .cot-ov-spark-row .cot-spark { max-width:100%;width:100%;height:72px;display:block; }
-#cot-ov-spark-lw canvas { background:var(--bg2,#161b22)!important; }
 
 #p-net.on .cot-cw,
 #p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
@@ -264,12 +263,10 @@ function _buildSparklineChart(container, history, nWeeks) {
   const botFill  = isPos ? 'rgba(38,198,176,0.0)'  : 'rgba(239,83,80,0.0)';
 
   const W = container.offsetWidth || 300;
-  // Use a concrete dark colour — CSS var resolution on freshly-appended elements is unreliable
-  const bgColor = '#161b22';
   const chart = LWC.createChart(container, {
     width: W, height: 72,
     layout: {
-      background: { type: 'solid', color: bgColor },
+      background: { type: 'solid', color: '#0d1117' },
       textColor: '#6e7681',
       attributionLogo: false,
     },
@@ -279,7 +276,7 @@ function _buildSparklineChart(container, history, nWeeks) {
       vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
       horzLine: { visible: false, labelVisible: false },
     },
-    rightPriceScale: { visible: false, scaleMargins: { top: 0.1, bottom: 0.1 } },
+    rightPriceScale: { visible: false },
     leftPriceScale:  { visible: false },
     timeScale: { visible: false, borderVisible: false },
     handleScroll: false,
@@ -309,22 +306,16 @@ function _buildSparklineChart(container, history, nWeeks) {
   });
   area.setData(times.map((t, i) => ({ time: t, value: vals[i] })));
   chart.timeScale().fitContent();
-  // Force price scale to recalculate after data is set
-  chart.priceScale('right').applyOptions({ autoScale: true });
 
   // Tooltip
   _mkTooltip(container, chart, () => area, param => {
     const v = param.seriesData.get(area);
     if (!v) return null;
-    const col = v.value >= 0 ? '#26a69a' : '#ef5350';
     return `<div>${_cotFmt(v.value)}</div>`;
   });
 
-  // Resize observer — extra ticks to ensure chart renders after layout settles
+  // Resize observer
   _lwResize(container, chart);
-  // Kick fitContent again after layout is fully stable
-  setTimeout(() => { try { chart.timeScale().fitContent(); } catch(_) {} }, 80);
-  setTimeout(() => { try { chart.timeScale().fitContent(); } catch(_) {} }, 300);
 }
 
 function _cotTrendLabel(history) {
