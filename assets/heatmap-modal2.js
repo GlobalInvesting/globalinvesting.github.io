@@ -160,12 +160,12 @@
 .hm-tbl thead th {
   text-align:right;color:var(--text2);font-weight:500;
   font-size:9px;text-transform:uppercase;letter-spacing:.08em;
-  padding:0 10px 7px;
+  padding:7px 10px;
   border-bottom:1px solid var(--border2);
   white-space:nowrap;
 }
 .hm-tbl thead th:first-child { text-align:left; }
-.hm-tbl th { text-align:right;color:var(--text2);font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:0 10px 7px;border-bottom:1px solid var(--border2);white-space:nowrap; }
+.hm-tbl th { text-align:right;color:var(--text2);font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:7px 10px;border-bottom:1px solid var(--border2);white-space:nowrap; }
 .hm-tbl th:first-child { text-align:left; }
 .hm-tbl tbody tr { transition:background .08s; }
 .hm-tbl tbody tr:nth-child(even) td { background:rgba(255,255,255,.015); }
