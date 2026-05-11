@@ -245,54 +245,78 @@ function _posLabel(z) {
 
 // ── Overview helpers ──────────────────────────────────────────────────────────
 function _cotSparkline(history, nWeeks) {
+  // Returns a placeholder div; the LWC chart is built post-render by _buildSparklineChart()
   const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0)));
   if (vals.length < 2) return '<div style="height:72px;display:flex;align-items:center;font-size:9px;color:#6e7681">Insufficient data</div>';
-  const mn = Math.min(...vals), mx = Math.max(...vals), range = mx-mn||1;
-  const W=400, H=72, padX=2, padY=6;
-  const x = i => (padX + (i/(vals.length-1)) * (W-padX*2)).toFixed(2);
-  const y = v => (H-padY - ((v-mn)/range) * (H-padY*2)).toFixed(2);
-  const last = vals[vals.length-1];
+  return '<div id="cot-ov-spark-lw" class="cot-spark" style="height:72px;position:relative;"></div>';
+}
+
+function _buildSparklineChart(container, history, nWeeks) {
+  const LWC = window.LightweightCharts;
+  if (!LWC || !container) return;
+  const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0)));
+  if (vals.length < 2) return;
+  const last = vals[vals.length - 1];
   const isPos = last >= 0;
-  // color tokens
-  const col     = isPos ? '#26c6b0' : '#ef5350';
-  const colDim  = isPos ? '#26a69a' : '#c62828';
-  const glowRgb = isPos ? '38,198,176' : '239,83,80';
-  // build path data (smooth via polyline points → convert to path)
-  const pts = vals.map((v,i) => `${x(i)},${y(v)}`).join(' ');
-  // area fill path: line points + close to bottom
-  const lx0 = x(0), lxN = x(vals.length-1);
-  const areaPath = `M ${pts.split(' ').join(' L ')} L ${lxN},${H} L ${lx0},${H} Z`;
-  // zero line
-  const zeroY = H-padY - ((0-mn)/range)*(H-padY*2);
-  const zeroLine = (zeroY >= padY && zeroY <= H-padY)
-    ? `<line x1="${padX}" y1="${zeroY.toFixed(2)}" x2="${W-padX}" y2="${zeroY.toFixed(2)}" stroke="rgba(255,255,255,0.08)" stroke-width="0.5" stroke-dasharray="4,4"/>`
-    : '';
-  const uid = isPos ? 'spk-g-u' : 'spk-g-d';
-  const lxNf = parseFloat(lxN), lyNf = parseFloat(y(last));
-  return `<svg viewBox="0 0 ${W} ${H}" class="cot-spark" aria-hidden="true" style="overflow:visible">
-  <defs>
-    <linearGradient id="${uid}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="${col}" stop-opacity="0.22"/>
-      <stop offset="60%"  stop-color="${col}" stop-opacity="0.06"/>
-      <stop offset="100%" stop-color="${col}" stop-opacity="0"/>
-    </linearGradient>
-    <filter id="spk-glow" x="-10%" y="-80%" width="120%" height="260%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="spk-dot-glow" x="-200%" y="-200%" width="500%" height="500%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  ${zeroLine}
-  <path d="${areaPath}" fill="url(#${uid})"/>
-  <polyline points="${pts}" fill="none" stroke="${colDim}" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity="0.5"/>
-  <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" filter="url(#spk-glow)"/>
-  <circle cx="${lxNf}" cy="${lyNf}" r="5" fill="rgba(${glowRgb},0.2)" filter="url(#spk-dot-glow)"/>
-  <circle cx="${lxNf}" cy="${lyNf}" r="2.8" fill="${col}"/>
-  <circle cx="${lxNf}" cy="${lyNf}" r="1.4" fill="#e6edf3"/>
-</svg>`;
+  const lineCol  = isPos ? '#26c6b0' : '#ef5350';
+  const topFill  = isPos ? 'rgba(38,198,176,0.18)' : 'rgba(239,83,80,0.18)';
+  const botFill  = isPos ? 'rgba(38,198,176,0.0)'  : 'rgba(239,83,80,0.0)';
+
+  const W = container.offsetWidth || 300;
+  const chart = LWC.createChart(container, {
+    width: W, height: 72,
+    layout: {
+      background: { type: 'solid', color: 'transparent' },
+      textColor: '#6e7681',
+      attributionLogo: false,
+    },
+    grid: { vertLines: { visible: false }, horzLines: { visible: false } },
+    crosshair: {
+      mode: LWC.CrosshairMode?.Normal ?? 1,
+      vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
+      horzLine: { visible: false, labelVisible: false },
+    },
+    rightPriceScale: { visible: false },
+    leftPriceScale:  { visible: false },
+    timeScale: { visible: false, borderVisible: false },
+    handleScroll: false,
+    handleScale:  false,
+  });
+  _cotLwCharts.push(chart);
+
+  // Synthesise weekly dates — work backwards from today
+  const today = new Date();
+  const times = vals.map((_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (vals.length - 1 - i) * 7);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  });
+
+  const area = chart.addSeries(LWC.AreaSeries, {
+    lineColor: lineCol,
+    topColor:    topFill,
+    bottomColor: botFill,
+    lineWidth: 2,
+    priceLineVisible: false,
+    lastValueVisible: false,
+    crosshairMarkerRadius: 4,
+    crosshairMarkerBorderWidth: 1,
+    crosshairMarkerBorderColor: '#131722',
+    crosshairMarkerBackgroundColor: lineCol,
+  });
+  area.setData(times.map((t, i) => ({ time: t, value: vals[i] })));
+  chart.timeScale().fitContent();
+
+  // Tooltip
+  _mkTooltip(container, chart, () => area, param => {
+    const v = param.seriesData.get(area);
+    if (!v) return null;
+    const col = v.value >= 0 ? '#26a69a' : '#ef5350';
+    return `<div>${_cotFmt(v.value)}</div>`;
+  });
+
+  // Resize observer
+  _lwResize(container, chart);
 }
 
 function _cotTrendLabel(history) {
@@ -661,7 +685,12 @@ function openCOTModal(ccy,data){
 </div>`;
 
   document.body.appendChild(bd);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{const pin=document.getElementById('cot-pin');if(pin)pin.style.left=gaugeLeft;}));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const pin=document.getElementById('cot-pin');if(pin)pin.style.left=gaugeLeft;
+    // Build LWC sparkline in Overview tab (visible on open)
+    const sparkEl=document.getElementById('cot-ov-spark-lw');
+    if(sparkEl&&!sparkEl._built){sparkEl._built=true;_buildSparklineChart(sparkEl,history,12);}
+  }));
 
   const tbody=document.getElementById('cot-hist-body');
   if(tbody){
@@ -690,7 +719,7 @@ function openCOTModal(ccy,data){
   bd.addEventListener('click',e=>{if(e.target===bd)closeCOTModal();});
   const esc=e=>{if(e.key==='Escape')closeCOTModal();};
   document.addEventListener('keydown',esc);bd._esc=esc;
-  bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy};
+  bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy,history};
 }
 
 function cotTab(el,tabId){
@@ -706,8 +735,9 @@ function cotTab(el,tabId){
     if(tabId==='net'){const w=document.getElementById('cot-lw-net');if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
     if(tabId==='split'){const w=document.getElementById('cot-lw-split');if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
     if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
+    if(tabId==='overview'){const w=document.getElementById('cot-ov-spark-lw');if(w&&!w._built){w._built=true;_buildSparklineChart(w,d.history,12);}else if(w&&w._lwResize)w._lwResize();}
     // Force resize after layout settles
-    setTimeout(()=>{['cot-lw-net','cot-lw-split','cot-lw-part'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
+    setTimeout(()=>{['cot-lw-net','cot-lw-split','cot-lw-part','cot-ov-spark-lw'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
   }));
 }
 
@@ -715,7 +745,7 @@ function closeCOTModal(){
   const bd=document.getElementById('cot-bd');
   if(bd){
     if(bd._esc)document.removeEventListener('keydown',bd._esc);
-    document.querySelectorAll('.cot-lw-wrap').forEach(w=>{if(w._lwResize)window.removeEventListener('resize',w._lwResize);if(w._lwRo)w._lwRo.disconnect();});
+    document.querySelectorAll('.cot-lw-wrap, #cot-ov-spark-lw').forEach(w=>{if(w._lwResize)window.removeEventListener('resize',w._lwResize);if(w._lwRo)w._lwRo.disconnect();});
     bd.remove();
   }
   _destroyCOTCharts();
