@@ -110,7 +110,7 @@
   font-family:var(--font-ui,sans-serif);
 }
 .hm-tab:hover { color:var(--text2); }
-.hm-tab.on { color:var(--text);border-bottom-color:var(--text); }
+.hm-tab.on { color:var(--text);border-bottom-color:var(--blue); }
 
 /* ── Body ── */
 #hm-body {
