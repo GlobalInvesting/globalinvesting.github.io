@@ -300,7 +300,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   const esc=e=>{if(e.key==='Escape')closeCBRatesModal();};
   document.addEventListener('keydown',esc);bd._esc=esc;
   bd._chartData={chronData,decisions,fwdRate,bias,currentRate};
-  requestAnimationFrame(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)));
+  setTimeout(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)),0);
 }
 
 function cbRatesTab(el,tabId){
