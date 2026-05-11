@@ -117,6 +117,7 @@
 #p-overview .cot-ov-spark-row { padding:8px 14px 10px;flex-shrink:0; }
 #p-overview .cot-ov-spark-top { display:flex;justify-content:space-between;margin-bottom:6px; }
 #p-overview .cot-ov-spark-trend { font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+#p-overview .cot-ov-spark-row .cot-spark { max-width:100%;width:100%; }
 
 #p-net.on .cot-cw,
 #p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
