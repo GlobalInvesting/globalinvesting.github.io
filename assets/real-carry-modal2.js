@@ -13,8 +13,7 @@
 //   OIS Bias       : ./meetings-data/meetings.json
 //
 // Real rate = Nominal CB rate − Inflation Expectation (breakeven / CPI proxy)
-// This is the standard used by Bloomberg FXFR, Refinitiv FX carry screens,
-// and institutional macro PM morning packets.
+// This is the standard used by institutional FX carry screens and macro PM morning packets.
 //
 // Inflation expectation sources (in priority order):
 //   USD: FRED T5YIE   — 5Y breakeven inflation, market-derived, daily
@@ -96,7 +95,7 @@
 .rcm-cw::-webkit-scrollbar-thumb:hover{background:var(--text2);}
 .rcm-ct{display:none;}
 
-/* ── Breakdown table — Bloomberg-style: UI font for labels, mono for numbers ── */
+/* ── Breakdown table — UI font for labels, mono for numbers ── */
 .rcm-tbl{width:100%;border-collapse:collapse;}
 .rcm-tbl thead th{font-size:8.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3,#4e5c70);font-weight:600;padding:7px 14px;text-align:right;border-bottom:1px solid var(--border,#252d3d);background:var(--bg2);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .rcm-tbl thead th:first-child{text-align:left;}
@@ -171,7 +170,7 @@
 /* ── Source note ── */
 .rcm-src-note{padding:8px 14px;font-size:10px;color:var(--text3,#4e5c70);line-height:1.6;border-top:1px solid var(--border,#252d3d);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 
-/* ── Real Rate Matrix — Bloomberg style: full 8×8, colored cells, mono values ── */
+/* ── Real Rate Matrix — full 8×8, colored cells, mono values ── */
 #rcm-matrix-wrap{overflow:auto;padding:14px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;width:100%;min-width:0;box-sizing:border-box;}
 #rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
@@ -195,6 +194,13 @@
 
 /* ── Loading ── */
 .rcm-loading{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text2);font-size:11px;letter-spacing:.06em;padding:40px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+
+/* ── Pair detail wrapper ── */
+.rcm-pd-wrap{width:100%;box-sizing:border-box;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+.rcm-pd-wrap::-webkit-scrollbar{width:3px!important;}
+.rcm-pd-wrap::-webkit-scrollbar-track{background:transparent;}
+.rcm-pd-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.rcm-pd-wrap::-webkit-scrollbar-thumb:hover{background:var(--text2);}
 
 /* ── Keep old grid for backward compat ── */
 .rcm-pd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
@@ -465,7 +471,7 @@ function _rcmDateAge(dateStr) {
 }
 
 // ── Tab 1: Rates Breakdown ───────────────────────────────────────────────────
-// Bloomberg-style: rank · CENTRAL BANK · NOMINAL · INFL.EXP. · REAL RATE · OIS BIAS
+// rank · CENTRAL BANK · NOMINAL · INFL.EXP. · REAL RATE · OIS BIAS
 // Sorted by real rate descending (highest real carry at top)
 function _rcmRenderBreakdown() {
   const d = _rcmData;
@@ -492,7 +498,7 @@ function _rcmRenderBreakdown() {
       : '';
     const srcTitle = `${_RCM_IE_SRC[ccy] || ''}${ie?.date ? ' · ' + ie.date : ''}`;
 
-    // Left border accent on top row (highest real rate) — green accent like Bloomberg
+    // Left border accent on top row (highest real rate)
     const rowStyle = idx === 0
       ? ' style="border-left:3px solid var(--up,#26a69a);"'
       : (idx === sorted.length - 1 ? ' style="border-left:3px solid var(--down,#ef5350);"' : '');
@@ -698,7 +704,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   }).join('');
 
   return `
-  <div style="width:100%;box-sizing:border-box;overflow-x:hidden;">
+  <div class="rcm-pd-wrap">
   <div class="rcm-pd-header">
     <div class="rcm-pd-pair">${longCcy} / ${shortCcy}</div>
     <div class="rcm-pd-dir">—</div>
