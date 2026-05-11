@@ -85,7 +85,7 @@ function _cbrLwOptions(){
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:window.LightweightCharts?.CrosshairMode?.Normal??1,vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.15,bottom:0.1}},
-    timeScale:{borderVisible:false,timeVisible:false},
+    timeScale:{borderVisible:false,timeVisible:false,fixLeftEdge:false,fixRightEdge:false,animation:{duration:0}},
     handleScroll:{mouseWheel:true,pressedMouseMove:true},
     handleScale:{mouseWheel:true,pinch:true},
     localization:{priceFormatter:v=>v!=null?v.toFixed(2)+'%':'—'},
@@ -156,24 +156,23 @@ function _attachCBRTooltip(container,lwChart,mainSeries,fwdSeries,decisions){
   });
 }
 
-function _cbrAvailableH(){
-  // Calculate available chart height by subtracting all fixed-height elements from the modal
+function _cbrDims(){
   const modal=document.getElementById('cbr-modal');
-  if(!modal)return 300;
+  if(!modal)return{w:600,h:300};
   const totalH=modal.offsetHeight;
   const hd=document.getElementById('cbr-m-hd');
   const metrics=document.getElementById('cbr-m-metrics');
   const tabs=document.getElementById('cbr-m-tabs');
-  // The info bar (next meeting + fwd rate) is flex-shrink:0, find it
   const infoBar=document.querySelector('#cbr-p-chart [style*="grid-template-columns:1fr 1fr"]');
   const hdH=hd?hd.offsetHeight:0;
   const metH=metrics?metrics.offsetHeight:0;
   const tabH=tabs?tabs.offsetHeight:0;
   const infoH=infoBar?infoBar.offsetHeight:0;
-  // 12px top + 8px bottom padding inside cbr-chart-area
-  const padH=20;
-  const available=totalH-hdH-metH-tabH-infoH-padH;
-  return Math.max(available,180);
+  const padH=20; // 12px top + 8px bottom padding inside cbr-chart-area
+  const h=Math.max(totalH-hdH-metH-tabH-infoH-padH,180);
+  // Width: modal width minus price scale area padding (14px each side)
+  const w=Math.max(modal.offsetWidth-28,200);
+  return{w,h};
 }
 
 function _buildCBRChart(data){
@@ -181,10 +180,10 @@ function _buildCBRChart(data){
   const LWC=window.LightweightCharts;if(!LWC)return;
   _destroyCBRChart();
   const parent=container.parentElement;
-  const initW=parent?.offsetWidth||container.offsetWidth||600;
-  const initH=_cbrAvailableH();
+  const{w:initW,h:initH}=_cbrDims();
   const opts=_cbrLwOptions();
   opts.width=initW;opts.height=initH;
+  opts.kineticScroll={touch:false,mouse:false};
   _cbrLwChart=LWC.createChart(container,opts);
   const{chronData,decisions,fwdRate,bias}=data;
   const blue=getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()||'#4f7fff';
@@ -203,14 +202,13 @@ function _buildCBRChart(data){
   _buildDecisionOverlay(container,_cbrLwChart,decisions);
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
   const apply=()=>{
-    const w=parent?.offsetWidth||container.offsetWidth||600;
-    const h=_cbrAvailableH();
+    const{w,h}=_cbrDims();
     if(_cbrLwChart&&w>0&&h>10){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
   };
-  // No ResizeObserver — the modal has fixed height; observing the canvas causes infinite loops.
-  // window.resize covers viewport changes; setTimeouts cover first-open flex timing.
+  // No ResizeObserver — modal is fixed height; canvas observation causes infinite loops.
+  // Single setTimeout covers first-open flex timing; window.resize handles viewport changes.
   window.addEventListener('resize',apply);container._cbrResize=apply;
-  setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);
+  setTimeout(apply,50);
 }
 
 async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
