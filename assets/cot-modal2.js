@@ -266,7 +266,7 @@ function _buildSparklineChart(container, history, nWeeks) {
   const chart = LWC.createChart(container, {
     width: W, height: 72,
     layout: {
-      background: { type: 'solid', color: '#0d1117' },
+      background: { type: 'solid', color: '#131722' },
       textColor: '#6e7681',
       attributionLogo: false,
     },
