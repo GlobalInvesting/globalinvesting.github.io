@@ -85,14 +85,38 @@
 #p-overview.on { display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
 #p-overview.on::-webkit-scrollbar { width:3px!important; }
 #p-overview.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
-/* Top row: 3 cols — Gauge | L/S Split | Signal Summary */
-#p-overview .cot-ov-grid { display:grid;grid-template-columns:1fr 1fr;min-width:0;flex-shrink:0; }
-#p-overview .cot-ov-grid > .cot-cw { min-width:0;border-bottom:1px solid var(--border,#252d3d);overflow:visible; }
-#p-overview .cot-ov-grid > .cot-cw:nth-child(odd) { border-right:1px solid var(--border,#252d3d); }
-#p-overview .cot-ov-grid > .cot-cw:nth-last-child(-n+2) { border-bottom:none; }
-#p-overview .cot-ov-grid .cot-tbl thead th { padding:4px 8px; }
-#p-overview .cot-ov-grid .cot-tbl td { padding:5px 8px; }
-/* Bottom row: Trend | 52w Range | Participants */
+/* Overview — KFV single-column layout */
+#p-overview .cot-ov-sec {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 14px 5px;
+  border-top:1px solid var(--border2,#1e2636);
+  border-bottom:1px solid var(--border2,#1e2636);
+  background:var(--bg,#0d1117);
+  flex-shrink:0;
+}
+#p-overview .cot-ov-sec:first-child { border-top:none; }
+#p-overview .cot-ov-sec-lbl { font-size:8.5px;font-weight:600;color:var(--text3,#4e5c70);text-transform:uppercase;letter-spacing:.1em;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+#p-overview .cot-ov-sec-note { font-size:8.5px;color:var(--text3,#4e5c70);opacity:.6;letter-spacing:.02em;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+/* Top row: Positioning + L/S side by side */
+#p-overview .cot-ov-top-row { display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0; }
+#p-overview .cot-ov-top-row > .cot-ov-half { padding:12px 14px; }
+#p-overview .cot-ov-top-row > .cot-ov-half:first-child { border-right:1px solid var(--border,#252d3d); }
+/* KFV rows */
+#p-overview .cot-kfv { display:flex;align-items:center;padding:5px 14px;border-bottom:1px solid rgba(255,255,255,.04);min-height:28px;flex-shrink:0; }
+#p-overview .cot-kfv:last-child { border-bottom:none; }
+#p-overview .cot-kfv-key { font-size:10px;color:var(--text2,#8b949e);flex:1;min-width:0;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+#p-overview .cot-kfv-bar { flex:0 0 80px;margin:0 10px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;position:relative;flex-shrink:0; }
+#p-overview .cot-kfv-bar-fill { position:absolute;left:0;top:0;height:100%;border-radius:2px; }
+#p-overview .cot-kfv-val { font-size:11px;font-weight:600;text-align:right;flex-shrink:0;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+#p-overview .cot-kfv-badge { font-size:8px;font-weight:700;letter-spacing:.06em;padding:2px 6px;border-radius:2px;margin-left:8px;flex-shrink:0;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+.cot-badge-l { background:rgba(38,166,154,.15);color:#26a69a; }
+.cot-badge-s { background:rgba(239,83,80,.15);color:#ef5350; }
+.cot-badge-n { background:rgba(88,166,255,.1);color:#58a6ff; }
+.cot-badge-w { background:rgba(243,156,18,.12);color:#f39c12; }
+/* Spark row */
+#p-overview .cot-ov-spark-row { padding:8px 14px 10px;flex-shrink:0; }
+#p-overview .cot-ov-spark-top { display:flex;justify-content:space-between;margin-bottom:6px; }
+#p-overview .cot-ov-spark-trend { font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
 
 #p-net.on .cot-cw,
 #p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
@@ -165,14 +189,9 @@
   .cot-mm{padding:6px 10px;}.cot-mm-val{font-size:11px;}
   #cot-m-tabs{padding:0 8px;}.cot-tab{font-size:10px;padding:8px 8px;}
   #cot-m-body{padding:0;}.cot-cw{padding:10px 12px;}
-  #p-overview .cot-ov-grid{grid-template-columns:1fr;}
-  #p-overview .cot-ov-grid > .cot-cw:nth-child(odd){border-right:none;}
-  #p-overview .cot-ov-grid > .cot-cw{border-bottom:1px solid var(--border,#252d3d);}
-  #p-overview .cot-ov-grid > .cot-cw:last-child{border-bottom:none;}
-  #p-overview .cot-ov-grid .cot-ct{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  #p-overview .cot-tbl th:last-child,#p-overview .cot-tbl td:last-child{display:none;}
-  #p-overview .cot-ls-row{display:grid !important;grid-template-columns:1fr auto 1fr !important;align-items:center !important;gap:4px !important;}
-  #p-overview .cot-ls-row > div:last-child{text-align:right;}
+  #p-overview .cot-ov-top-row{grid-template-columns:1fr;}
+  #p-overview .cot-ov-top-row > .cot-ov-half:first-child{border-right:none;border-bottom:1px solid var(--border,#252d3d);}
+  #p-overview .cot-kfv-bar{flex:0 0 50px;}
   .cot-ls-vs{display:block !important;text-align:center;}
   #p-history .cot-cw > div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   #p-history .cot-tbl{min-width:540px;font-size:9px;}
@@ -475,47 +494,110 @@ function openCOTModal(ccy,data){
   </div>
   <div id="cot-m-body" class="cot-body--overview">
     <div id="p-overview" class="cot-panel on">
-      <div class="cot-ov-grid">
-        <!-- Row 1: Gauge | L/S Split -->
-        <div class="cot-cw">
-          <div class="cot-ct">POSITIONING GAUGE · Z-SCORE</div>
-          <div class="cot-ov-bignum" style="color:${zCol}">${zStr}σ</div>
-          <div class="cot-ov-sub">${zInfo.txt} · ${pStr} pctile · ${nWks}w</div>
+
+      <!-- TOP ROW: Positioning Gauge + L/S Split side by side -->
+      <div class="cot-ov-top-row">
+        <div class="cot-ov-half">
+          <div class="cot-ct">POSITIONING · Z-SCORE</div>
+          <div class="cot-ov-bignum" style="color:${zCol}">${zStr}σ <span style="font-size:12px;color:var(--text2);font-weight:400">· ${pStr} pctile</span></div>
+          <div class="cot-ov-sub" style="margin-bottom:8px">${zInfo.txt} · ${nWks}w window</div>
           <div class="cot-gauge-track"><div class="cot-gauge-fill"></div><div id="cot-pin" class="cot-gauge-pin" style="left:50%"></div></div>
           <div class="cot-gauge-lbls"><span>Extreme Short</span><span>Neutral</span><span>Extreme Long</span></div>
         </div>
-        <div class="cot-cw">
-            <div class="cot-ct">LONG / SHORT SPLIT</div>
-            <div class="cot-ls-row">
-              <div><div class="cot-ls-num cu">${long_.toLocaleString()}</div><div class="cot-ov-sub">Longs</div></div>
-              <div class="cot-ls-vs">vs</div>
-              <div style="text-align:right"><div class="cot-ls-num cd">${short_.toLocaleString()}</div><div class="cot-ov-sub">Shorts</div></div>
-            </div>
-            <div class="cot-ls-bar"><div class="cot-ls-bar-fill" style="width:100%;background:linear-gradient(90deg,#26a69a ${lPct}%,#ef5350 ${lPct}%)"></div></div>
-            <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:#6e7681"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
+        <div class="cot-ov-half">
+          <div class="cot-ct">LONG / SHORT SPLIT</div>
+          <div class="cot-ls-row">
+            <div><div class="cot-ls-num cu">${long_.toLocaleString()}</div><div class="cot-ov-sub">Longs</div></div>
+            <div class="cot-ls-vs">vs</div>
+            <div style="text-align:right"><div class="cot-ls-num cd">${short_.toLocaleString()}</div><div class="cot-ov-sub">Shorts</div></div>
           </div>
-        <!-- Row 2: 12-Week Trend | Signal Summary -->
-        <div class="cot-cw">
-          <div class="cot-ct">12-WEEK NET TREND</div>
-          ${_cotSparkline(history,12)}
-          <div class="cot-ov-sub" style="margin-top:6px">${_cotTrendLabel(history)}</div>
-        </div>
-        <div class="cot-cw" style="justify-content:space-between">
-          <div class="cot-ct">SIGNAL SUMMARY</div>
-          <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net,amNet,ddNet,aligned,isCrowded)}</div>
-        </div>
-        <!-- Row 3: 52-Week Range | Participants -->
-        <div class="cot-cw"><div class="cot-ct">52-WEEK RANGE</div>${_cotRangeCard(history,net)}</div>
-        <div class="cot-cw">
-          <div class="cot-ct">PARTICIPANTS · CURRENT WEEK</div>
-          <table class="cot-tbl"><thead><tr><th style="text-align:left">Category</th><th>Net Contracts</th><th>Direction</th></tr></thead>
-          <tbody>
-            <tr><td>Leveraged Funds</td><td class="${_cotCls(net)}">${_cotFmt(net)}</td><td class="${_cotCls(net)}">${net>0?'Long':net<0?'Short':'Flat'}</td></tr>
-            ${amNet!=null?`<tr><td>Asset Managers</td><td class="${_cotCls(amNet)}">${_cotFmt(amNet)}</td><td class="${_cotCls(amNet)}">${amNet>0?'Long':amNet<0?'Short':'Flat'}</td></tr>`:''}
-            ${ddNet!=null?`<tr><td>Dealers</td><td class="${_cotCls(-ddNet)}">${_cotFmt(ddNet)}</td><td class="${_cotCls(-ddNet)}">${ddNet>0?'Long':ddNet<0?'Short':'Flat'}</td></tr>`:''}
-          </tbody></table>
+          <div class="cot-ls-bar"><div class="cot-ls-bar-fill" style="width:100%;background:linear-gradient(90deg,#26a69a ${lPct}%,#ef5350 ${lPct}%)"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:#6e7681"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
         </div>
       </div>
+
+      <!-- SECTION: KEY METRICS -->
+      <div class="cot-ov-sec">
+        <span class="cot-ov-sec-lbl">Key Metrics</span>
+      </div>
+      <div class="cot-kfv">
+        <span class="cot-kfv-key">Net as % of Open Interest</span>
+        <span class="cot-kfv-val ${_cotCls(netPctOI)}">${netPctStr}</span>
+        ${Math.abs(netPctOI||0)>15?'<span class="cot-kfv-badge cot-badge-w">ELEVATED</span>':''}
+      </div>
+      <div class="cot-kfv">
+        <span class="cot-kfv-key">Week-on-Week Change</span>
+        <span class="cot-kfv-val ${_cotCls(wow)}">${_cotFmt(wow)}</span>
+        ${wow!=null&&wow>0?'<span class="cot-kfv-badge cot-badge-l">BUYING</span>':wow!=null&&wow<0?'<span class="cot-kfv-badge cot-badge-s">SELLING</span>':''}
+      </div>
+      <div class="cot-kfv">
+        <span class="cot-kfv-key">Crowd Alignment (LF + AM)</span>
+        <span class="cot-kfv-val ${aligned?_cotCls(net):'cn'}">${aligned?(net>0?'Both Long':'Both Short'):'Diverging'}</span>
+        ${isCrowded?'<span class="cot-kfv-badge cot-badge-w">CROWDED</span>':aligned?'<span class="cot-kfv-badge cot-badge-l">ALIGNED</span>':'<span class="cot-kfv-badge cot-badge-n">MIXED</span>'}
+      </div>
+      <div class="cot-kfv">
+        <span class="cot-kfv-key">Trend Pattern (last 4w)</span>
+        <span class="cot-kfv-val" style="color:var(--text)">${_cotTrendLabel(history).split(' · ')[0]}</span>
+      </div>
+
+      <!-- SECTION: PARTICIPANTS -->
+      <div class="cot-ov-sec">
+        <span class="cot-ov-sec-lbl">Participants · Current Week</span>
+        <span class="cot-ov-sec-note">Net contracts by category</span>
+      </div>
+      ${(()=>{
+        const maxAbs = Math.max(Math.abs(net), Math.abs(amNet||0), Math.abs(ddNet||0), 1);
+        const pRow = (label, val) => {
+          if (val == null) return '';
+          const pct = Math.round(Math.abs(val) / maxAbs * 100);
+          const col = val >= 0 ? '#26a69a' : '#ef5350';
+          const dir = val > 0 ? 'LONG' : val < 0 ? 'SHORT' : 'FLAT';
+          const badgeCls = val > 0 ? 'cot-badge-l' : val < 0 ? 'cot-badge-s' : 'cot-badge-n';
+          return `<div class="cot-kfv">
+            <span class="cot-kfv-key">${label}</span>
+            <div class="cot-kfv-bar"><div class="cot-kfv-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+            <span class="cot-kfv-val ${_cotCls(val)}">${_cotFmt(val)}</span>
+            <span class="cot-kfv-badge ${badgeCls}">${dir}</span>
+          </div>`;
+        };
+        return pRow('Leveraged Funds', net) +
+               pRow('Asset Managers', amNet) +
+               pRow('Dealers / Intermediaries', ddNet!=null ? -ddNet : null);
+      })()}
+
+      <!-- SECTION: 52-WEEK RANGE -->
+      <div class="cot-ov-sec">
+        <span class="cot-ov-sec-lbl">52-Week Range</span>
+      </div>
+      ${(()=>{
+        const vals = history.map(h=>h.levNet??((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
+        if (vals.length < 2) return '<div class="cot-kfv"><span class="cot-kfv-key" style="color:var(--text3)">Insufficient data</span></div>';
+        const hi = Math.max(...vals), lo = Math.min(...vals);
+        const pct = hi !== lo ? Math.round((net - lo) / (hi - lo) * 100) : 50;
+        const rangeBar = `<div style="margin:6px 14px 2px;height:5px;background:rgba(255,255,255,.06);border-radius:3px;position:relative;">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:var(--up,#26a69a);border-radius:3px;"></div>
+          <div style="position:absolute;top:-3px;left:calc(${pct}% - 4px);width:8px;height:8px;border-radius:50%;background:var(--text,#e6edf3);border:2px solid var(--bg2,#161b22);box-shadow:0 0 0 1px rgba(255,255,255,.2)"></div>
+        </div>`;
+        return rangeBar +
+          `<div class="cot-kfv"><span class="cot-kfv-key">${vals.length}w High</span><span class="cot-kfv-val cu">${_cotFmt(hi)}</span></div>` +
+          `<div class="cot-kfv"><span class="cot-kfv-key">Current</span><span class="cot-kfv-val ${_cotCls(net)}">${_cotFmt(net)}</span><span class="cot-kfv-badge cot-badge-n">${pct}th PCTILE</span></div>` +
+          `<div class="cot-kfv"><span class="cot-kfv-key">${vals.length}w Low</span><span class="cot-kfv-val cd">${_cotFmt(lo)}</span></div>`;
+      })()}
+
+      <!-- SECTION: 12-WEEK TREND -->
+      <div class="cot-ov-sec">
+        <span class="cot-ov-sec-lbl">12-Week Net Trend</span>
+        <span class="cot-ov-sec-note">Leveraged Funds · weekly snapshot</span>
+      </div>
+      <div class="cot-ov-spark-row">
+        <div class="cot-ov-spark-top">
+          <span class="cot-ct" style="margin-bottom:0">Net contracts — last 12 weeks</span>
+          <span class="cot-ov-spark-trend ${_cotCls(net)}">${_cotTrendLabel(history)}</span>
+        </div>
+        ${_cotSparkline(history,12)}
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:8.5px;color:var(--text3,#4e5c70);font-family:${_monoF}"><span>12w ago</span><span>Now · ${_cotFmt(net)}</span></div>
+      </div>
+
     </div>
     <div id="p-net" class="cot-panel">
       <div class="cot-cw"><div class="cot-ct">NET POSITION · LEVERAGED FUNDS · WEEKLY CONTRACTS</div><div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-net"></div></div></div>
