@@ -264,8 +264,8 @@ function _buildSparklineChart(container, history, nWeeks) {
   const botFill  = isPos ? 'rgba(38,198,176,0.0)'  : 'rgba(239,83,80,0.0)';
 
   const W = container.offsetWidth || 300;
-  // Resolve the actual rendered bg so the canvas never bleed white on crosshair hover
-  const bgColor = getComputedStyle(container).getPropertyValue('--bg2').trim() || '#161b22';
+  // Use a concrete dark colour — CSS var resolution on freshly-appended elements is unreliable
+  const bgColor = '#161b22';
   const chart = LWC.createChart(container, {
     width: W, height: 72,
     layout: {
@@ -500,6 +500,21 @@ function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy){
 }
 
 // ── Main open function ────────────────────────────────────────────────────────
+// Ensure LightweightCharts is loaded (mirrors dashboard.js loader — idempotent)
+let _cotLwLibPromise = null;
+function _cotEnsureLWLib() {
+  if (window.LightweightCharts) return Promise.resolve();
+  if (_cotLwLibPromise) return _cotLwLibPromise;
+  _cotLwLibPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
+    s.onload  = resolve;
+    s.onerror = () => { _cotLwLibPromise = null; reject(new Error('LW lib load failed')); };
+    document.head.appendChild(s);
+  });
+  return _cotLwLibPromise;
+}
+
 function openCOTModal(ccy,data){
   closeCOTModal();
   const history=Array.isArray(data.history)?[...data.history]:[];
@@ -692,7 +707,10 @@ function openCOTModal(ccy,data){
     const pin=document.getElementById('cot-pin');if(pin)pin.style.left=gaugeLeft;
     // Build LWC sparkline in Overview tab (visible on open)
     const sparkEl=document.getElementById('cot-ov-spark-lw');
-    if(sparkEl&&!sparkEl._built){sparkEl._built=true;_buildSparklineChart(sparkEl,history,12);}
+    if(sparkEl&&!sparkEl._built){
+      sparkEl._built=true;
+      _cotEnsureLWLib().then(()=>_buildSparklineChart(sparkEl,history,12)).catch(()=>{});
+    }
   }));
 
   const tbody=document.getElementById('cot-hist-body');
@@ -738,7 +756,7 @@ function cotTab(el,tabId){
     if(tabId==='net'){const w=document.getElementById('cot-lw-net');if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
     if(tabId==='split'){const w=document.getElementById('cot-lw-split');if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
     if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
-    if(tabId==='overview'){const w=document.getElementById('cot-ov-spark-lw');if(w&&!w._built){w._built=true;_buildSparklineChart(w,d.history,12);}else if(w&&w._lwResize)w._lwResize();}
+    if(tabId==='overview'){const w=document.getElementById('cot-ov-spark-lw');if(w&&!w._built){w._built=true;_cotEnsureLWLib().then(()=>_buildSparklineChart(w,d.history,12)).catch(()=>{});}else if(w&&w._lwResize)w._lwResize();}
     // Force resize after layout settles
     setTimeout(()=>{['cot-lw-net','cot-lw-split','cot-lw-part','cot-ov-spark-lw'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
   }));
