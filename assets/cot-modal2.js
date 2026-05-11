@@ -157,6 +157,7 @@
 .cd { color:#ef5350; }
 .cn { color:var(--text2); }
 
+@media (max-width:480px){
   #cot-modal{width:100%;height:93vh;border-radius:12px 12px 0 0;border-bottom:none;}
   #cot-m-metrics{grid-template-columns:repeat(3,1fr);}
   .cot-mm{padding:6px 10px;}.cot-mm-val{font-size:11px;}
