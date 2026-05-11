@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-05-11T17:09:14Z",
+  "generated_at": "2026-05-11T17:48:10Z",
   "signals": [
     {
-      "time": "17:07",
+      "time": "17:47",
       "priority": "critical",
-      "title": "AUD/USD — Geopolitical Headline + Positioning + Retail",
-      "text": "AUD/USD at 0.7252 testing the 0.7260 resistance zone as Trump signals an end to Iran naval hostilities, easing immediate energy supply fears. AUD COT LF net long +58,994 (78.3% long) indicates heavy institutional backing, while retail sentiment is 89% short—a massive institutional vs. retail divergence. This extreme retail fade suggests a potential capitulation squeeze if price clears 0.7260. Fed 3.75% vs RBA 4.35% provides a -60bp carry advantage to AUD, further supporting the bid. Watch for US CPI data to confirm the USD depreciation path.",
+      "title": "AUD/USD — Geopolitical + Positioning + Retail",
+      "text": "AUD/USD at 0.7257 testing the 0.7260 region as Trump rejects the Iran deal, driving a 3.13% surge in WTI Oil ($98.4). AUD COT LF net long +58,994 (78.3% long) indicates heavy institutional backing, while retail sentiment is 89% short. This extreme institutional vs retail divergence suggests a high-conviction trend; retail capitulation risk accelerates if price clears 0.7260. RBA 4.35% vs Fed 3.75% provides a +60bp carry tailwind for AUD.",
       "evidence": [
+        "WTI Oil: $98.4 (+3.13%)",
         "AUD COT LF net: +58,994 (78.3% long)",
-        "Retail Sentiment: 89% short",
-        "Fed 3.75% vs RBA 4.35%: -60bp"
+        "Retail Sentiment: 89% short"
       ],
       "_source": "gemini"
     },
     {
-      "time": "17:04",
+      "time": "17:44",
       "priority": "warning",
       "title": "GBP/JPY — G8 Bilateral Theme + Carry",
-      "text": "GBP/JPY at 214.39 reflects a dominant G8 bilateral theme as GBP outperforms (+0.512%) and JPY lags (-0.553%) across the G8 complex. BoE 3.75% vs BoJ 0.75% provides a +300bp carry premium, sustaining the pair's bid despite normal volatility (VIX 18.1). JPY COT LF net short -61,340 confirms a crowded carry trade; however, the 1.065% G8 spread suggests the move is stretched. Watch for BoJ verbal intervention if JPY weakness accelerates toward the 160.00 psychological level in USD/JPY.",
+      "text": "GBP/JPY at 214.342 reflects a dominant G8 bilateral theme as GBP outperforms (+0.505%) and JPY lags (-0.542%). BoE 3.75% vs BoJ 0.75% provides a +300bp carry premium, supporting the pair in a normal volatility regime (VIX 18.1). JPY COT LF net short -61,340 shows crowded carry positioning, leaving the pair vulnerable only if VIX spikes above 25. Watch for BoJ verbal intervention if JPY weakness accelerates toward the next psychological level.",
       "evidence": [
-        "GBP 1W avg: +0.512% (n=4)",
-        "JPY 1W avg: -0.553% (n=7)",
-        "G8 spread: 1.065%"
+        "GBP 1W avg: +0.505% (n=4)",
+        "JPY 1W avg: -0.542% (n=7)",
+        "G8 spread: 1.047%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "17:02",
+      "time": "17:42",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -19,294 (long% at 18.5% extreme) shows speculators are heavily fading the New Zealand Dollar despite a hawkish RBNZ market bias. With the RBNZ next meeting on 27 May and a market bias toward a hike, a significant short-squeeze risk exists if the central bank reaffirms its tightening stance. NZD/USD at 0.5963 remains vulnerable to a sharp move higher as crowded spec shorts unwind. Fed 3.75% vs RBNZ 2.25% currently provides a +150bp USD carry advantage, but the positioning extreme outweighs the carry deficit.",
+      "text": "NZD/USD COT LF net short -19,294 (long% at 18.5% extreme) shows speculators heavily fading the currency despite a hawkish RBNZ market bias (Hike). With the RBNZ meeting on 27 May, a hawkish delivery or signal triggers a significant short-squeeze risk as crowded speculative shorts unwind. NZD/USD at 0.5967 remains supported by the broader commodity bid despite the +150bp Fed-RBNZ carry deficit.",
       "evidence": [
         "NZD COT LF net: -19,294 (18.5% long)",
         "RBNZ Bias: Hike",
-        "NZD/USD: 0.5963"
+        "NZD/USD: 0.5967"
       ],
       "_source": "gemini"
     },
     {
-      "time": "16:58",
-      "priority": "info",
+      "time": "17:38",
+      "priority": "warning",
       "title": "USD/CHF — Technical + Retail Divergence",
-      "text": "USD/CHF at 0.7779 continues to hold below its 100-hour moving average following a 1.71% decline over the last month. Retail sentiment is 87% long, attempting to catch the falling knife against a clear institutional trend (COT LF net short -7,392). Fed 3.75% vs SNB 0% offers a massive +375bp carry advantage for USD, yet the pair remains under pressure, indicating that safe-haven flows or technical momentum are overriding the interest rate differential. Watch for a break above the 100-hour MA to invalidate the bearish bias.",
+      "text": "USD/CHF at 0.7777 holding below the 100-hour moving average as key resistance. Retail sentiment is 87% long, diverging from the COT LF net short of -7,392. This extreme retail long positioning against institutional shorts suggests further downside pressure; a failure to reclaim the 100-hour MA targets a move toward 0.7750. Fed 3.75% vs SNB 0% (+375bp) carry is currently secondary to technical resistance and safe-haven CHF demand amid Iran tensions.",
       "evidence": [
-        "USD/CHF 1M: -1.71%",
+        "USD/CHF: 0.7777",
         "Retail Sentiment: 87% long",
-        "Fed 3.75% vs SNB 0%: +375bp"
+        "CHF COT LF net: -7,392"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "17:32",
+      "priority": "info",
+      "title": "USD/JPY — Correlation Break + Yields",
+      "text": "USD/JPY vs US 10Y correlation has shifted to +0.642 (z=-2.08σ from 0.153 norm), indicating the pair is now hyper-sensitive to US Treasury moves rather than broader risk sentiment. US 10Y at 4.404% (+0.92%) keeps USD/JPY bid at 157.12. Fed 3.75% vs BoJ 0.75% (+300bp) carry remains the structural floor. Watch US CPI on Wednesday to confirm if the yield-driven bid extends toward 158.00.",
+      "evidence": [
+        "USD/JPY vs US 10Y z-score: -2.08σ",
+        "US 10Y Yield: 4.404%",
+        "Fed-BoJ Spread: +300bp"
       ],
       "_source": "gemini"
     }
