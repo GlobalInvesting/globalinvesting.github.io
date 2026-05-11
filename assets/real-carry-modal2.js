@@ -64,9 +64,9 @@
 #rcm-metrics{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;}
 .rcm-mm{padding:8px 12px;border-right:1px solid var(--border,#252d3d);display:flex;flex-direction:column;}
 .rcm-mm:last-child{border-right:none;}
-.rcm-mm-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);margin-bottom:3px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.rcm-mm-val{font-size:13px;font-weight:600;line-height:1;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.rcm-mm-sub{font-size:8px;color:var(--text2);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-mm-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);margin-bottom:3px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-mm-val{font-size:18px;font-weight:700;line-height:1;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-mm-sub{font-size:8px;color:var(--text2);margin-top:2px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 
 /* ── Tabs ── */
 #rcm-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;padding:0 14px;overflow-x:auto;scrollbar-width:none;}
@@ -168,11 +168,11 @@
 #rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
 #rcm-matrix-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
-.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 10px;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;}
-.rcm-matrix td{width:68px;height:34px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);}
+.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;width:620px;}
+.rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;width:72px;}
+.rcm-matrix td{width:72px;height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
 .rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
-.rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;padding:0 12px 0 4px;white-space:nowrap;width:auto;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9.5px;}
+.rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;padding:0 8px 0 4px;white-space:nowrap;width:44px;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9.5px;}
 .rcm-matrix td.diag{background:var(--bg2);font-size:10.5px;font-weight:700;}/* color set inline by JS (green if +, red if -) */
 /* matrix cell shading — terminal standard colors (--up=#26a69a / --down=#ef5350) */
 .rcm-cell-pos-hi{background:rgba(38,166,154,.26);color:var(--up,#26a69a);}
@@ -199,7 +199,7 @@
 }
 @media(max-width:640px){
   #rcm-metrics{grid-template-columns:repeat(3,1fr);}
-  .rcm-mm-val{font-size:11px;}
+  .rcm-mm-val{font-size:14px;}
   .rcm-pd-row-grid{grid-template-columns:1fr 1fr;}
   .rcm-pd-cell-val{font-size:16px;}
   .rcm-vol-row{grid-template-columns:1fr 1fr;}
@@ -538,8 +538,8 @@ function _rcmRenderMatrix() {
 
   // Column headers
   const header = `<tr>
-    <td class="row-head" style="font-size:8.5px;color:var(--text3);padding:4px 12px 4px 4px;font-family:var(--font-ui,'Inter',sans-serif);">L↓ / S→</td>
-    ${G8.map(c => `<th scope="col" style="font-size:9px;padding:5px 6px;font-weight:700;color:var(--text2);text-align:center;">${c}</th>`).join('')}
+    <td class="row-head" style="font-size:8.5px;color:var(--text3);font-family:var(--font-ui,'Inter',sans-serif);">L↓/S→</td>
+    ${G8.map(c => `<th scope="col">${c}</th>`).join('')}
   </tr>`;
 
   const rows = G8.map(rowCcy => {
