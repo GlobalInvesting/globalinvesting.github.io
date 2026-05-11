@@ -87,9 +87,11 @@
 #p-overview.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
 /* Top row: 3 cols — Gauge | L/S Split | Signal Summary */
 #p-overview .cot-ov-grid { display:grid;grid-template-columns:1fr 1fr;min-width:0;flex-shrink:0; }
-#p-overview .cot-ov-grid > .cot-cw { min-width:0;border-bottom:1px solid var(--border,#252d3d); }
+#p-overview .cot-ov-grid > .cot-cw { min-width:0;border-bottom:1px solid var(--border,#252d3d);overflow:visible; }
 #p-overview .cot-ov-grid > .cot-cw:nth-child(odd) { border-right:1px solid var(--border,#252d3d); }
 #p-overview .cot-ov-grid > .cot-cw:nth-last-child(-n+2) { border-bottom:none; }
+#p-overview .cot-ov-grid .cot-tbl thead th { padding:4px 8px; }
+#p-overview .cot-ov-grid .cot-tbl td { padding:5px 8px; }
 /* Bottom row: Trend | 52w Range | Participants */
 
 #p-net.on .cot-cw,
