@@ -85,17 +85,17 @@
 #p-overview.on { display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
 #p-overview.on::-webkit-scrollbar { width:3px!important; }
 #p-overview.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
-/* Top row: Gauge (left) | LS-split + Signal stacked (right) */
-#p-overview .cot-ov-top { display:grid;grid-template-columns:1fr 1fr;flex-shrink:0;border-bottom:1px solid var(--border,#252d3d); }
-/* Gauge card: left child (.cot-cw), right divider */
-#p-overview .cot-ov-top > .cot-cw { border-right:1px solid var(--border,#252d3d);border-bottom:none; }
-/* Right column: LS-split on top + Signal Summary below */
-#p-overview .cot-ov-right { display:flex;flex-direction:column; }
-#p-overview .cot-ov-right > .cot-cw { border-bottom:1px solid var(--border,#252d3d);border-right:none; }
+/* Top row: Gauge (left col) | LS-Split + Signal stacked (right col) */
+#p-overview .cot-ov-top { display:grid;grid-template-columns:1fr 1fr;min-width:0;flex-shrink:0;border-bottom:1px solid var(--border,#252d3d); }
+/* Gauge card: first grid child */
+#p-overview .cot-ov-top > .cot-cw { min-width:0;border-right:1px solid var(--border,#252d3d);border-bottom:none; }
+/* Right flex-column: second grid child (contains LS-Split + Signal) */
+#p-overview .cot-ov-right { display:flex;flex-direction:column;min-width:0;overflow:hidden; }
+#p-overview .cot-ov-right > .cot-cw { min-width:0;border-bottom:1px solid var(--border,#252d3d);border-right:none; }
 #p-overview .cot-ov-right > .cot-cw:last-child { border-bottom:none; }
 /* Bottom row: Trend | 52w Range | Participants */
-#p-overview .cot-ov-bottom { display:grid;grid-template-columns:1fr 1fr 1fr;flex-shrink:0; }
-#p-overview .cot-ov-bottom > .cot-cw { border-right:1px solid var(--border,#252d3d);border-bottom:none; }
+#p-overview .cot-ov-bottom { display:grid;grid-template-columns:1fr 1fr 1fr;min-width:0;flex-shrink:0; }
+#p-overview .cot-ov-bottom > .cot-cw { min-width:0;border-right:1px solid var(--border,#252d3d);border-bottom:none; }
 #p-overview .cot-ov-bottom > .cot-cw:last-child { border-right:none; }
 #p-net.on .cot-cw,
 #p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
@@ -108,7 +108,7 @@
 #p-participants.on::-webkit-scrollbar { width:3px!important; }
 #p-participants.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
 .cot-chart-area { position:relative;flex:1;min-height:0;display:flex;flex-direction:column; }
-.cot-lw-wrap { width:100%;flex:1;min-height:180px;position:relative; }
+.cot-lw-wrap { width:100%;flex:1;min-height:180px;position:relative;min-width:0; }
 .cot-lw-tooltip {
   position:absolute;display:none;pointer-events:none;
   background:var(--bg2);border:1px solid var(--border2);border-radius:4px;
@@ -341,10 +341,12 @@ function _mkTooltip(container,lwChart,getSeries,fmtFn){
 
 function _lwResize(container,lwChart){
   const apply=()=>{
-    const rect=container.getBoundingClientRect();
-    const h=Math.round(rect.height)||container.offsetHeight||container.parentElement?.getBoundingClientRect().height||240;
-    const w=Math.round(rect.width)||container.offsetWidth||600;
-    if(lwChart&&w>0&&h>10)lwChart.applyOptions({width:w,height:h});
+    requestAnimationFrame(()=>{
+      const rect=container.getBoundingClientRect();
+      const h=Math.round(rect.height)||container.offsetHeight||container.parentElement?.getBoundingClientRect().height||240;
+      const w=Math.round(rect.width)||container.offsetWidth||600;
+      if(lwChart&&w>0&&h>10)lwChart.applyOptions({width:w,height:h});
+    });
   };
   if(window.ResizeObserver){const ro=new ResizeObserver(()=>apply());ro.observe(container);container._lwRo=ro;}
   window.addEventListener('resize',apply);container._lwResize=apply;
