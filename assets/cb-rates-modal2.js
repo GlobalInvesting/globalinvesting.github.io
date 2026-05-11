@@ -81,7 +81,6 @@ function _cbrLwOptions(){
   const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#131722';
   const text2=getComputedStyle(document.documentElement).getPropertyValue('--text2').trim()||'#9096a0';
   return{
-    autoSize:true,
     layout:{background:{type:'solid',color:bg},textColor:text2,fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:9,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:window.LightweightCharts?.CrosshairMode?.Normal??1,vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true}},
@@ -178,8 +177,17 @@ function _buildCBRChart(data){
   _cbrLwChart.timeScale().fitContent();
   _buildDecisionOverlay(container,_cbrLwChart,decisions);
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
-  const resize=()=>{if(_cbrLwChart&&container.offsetWidth>0)_cbrLwChart.applyOptions({width:container.offsetWidth,height:container.offsetHeight});};
-  window.addEventListener('resize',resize);container._cbrResize=resize;
+  const apply=()=>{
+    requestAnimationFrame(()=>{
+      const rect=container.getBoundingClientRect();
+      const h=Math.round(rect.height)||container.offsetHeight||container.parentElement?.getBoundingClientRect().height||300;
+      const w=Math.round(rect.width)||container.offsetWidth||600;
+      if(_cbrLwChart&&w>0&&h>10){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
+    });
+  };
+  if(window.ResizeObserver){const ro=new ResizeObserver(apply);ro.observe(container);container._cbrRo=ro;}
+  window.addEventListener('resize',apply);container._cbrResize=apply;
+  setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);
 }
 
 async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
@@ -303,6 +311,7 @@ function closeCBRatesModal(){
   if(bd){if(bd._esc)document.removeEventListener('keydown',bd._esc);bd.remove();}
   const wrap=document.querySelector('.cbr-lw-wrap');
   if(wrap?._cbrResize)window.removeEventListener('resize',wrap._cbrResize);
+  if(wrap?._cbrRo)wrap._cbrRo.disconnect();
   const svg=wrap?.querySelector('.cbr-decision-svg');if(svg?._cleanup)svg._cleanup();
   _destroyCBRChart();
 }
