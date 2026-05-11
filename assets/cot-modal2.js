@@ -279,7 +279,7 @@ function _buildSparklineChart(container, history, nWeeks) {
       vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
       horzLine: { visible: false, labelVisible: false },
     },
-    rightPriceScale: { visible: false },
+    rightPriceScale: { visible: false, scaleMargins: { top: 0.1, bottom: 0.1 } },
     leftPriceScale:  { visible: false },
     timeScale: { visible: false, borderVisible: false },
     handleScroll: false,
@@ -309,6 +309,8 @@ function _buildSparklineChart(container, history, nWeeks) {
   });
   area.setData(times.map((t, i) => ({ time: t, value: vals[i] })));
   chart.timeScale().fitContent();
+  // Force price scale to recalculate after data is set
+  chart.priceScale('right').applyOptions({ autoScale: true });
 
   // Tooltip
   _mkTooltip(container, chart, () => area, param => {
@@ -318,8 +320,11 @@ function _buildSparklineChart(container, history, nWeeks) {
     return `<div>${_cotFmt(v.value)}</div>`;
   });
 
-  // Resize observer
+  // Resize observer — extra ticks to ensure chart renders after layout settles
   _lwResize(container, chart);
+  // Kick fitContent again after layout is fully stable
+  setTimeout(() => { try { chart.timeScale().fitContent(); } catch(_) {} }, 80);
+  setTimeout(() => { try { chart.timeScale().fitContent(); } catch(_) {} }, 300);
 }
 
 function _cotTrendLabel(history) {
