@@ -77,7 +77,7 @@
 
 /* ── Body ── */
 #rcm-body{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
-#rcm-body::-webkit-scrollbar{width:3px;}
+#rcm-body::-webkit-scrollbar{width:3px!important;}
 #rcm-body::-webkit-scrollbar-track{background:transparent;}
 #rcm-body::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
 #rcm-body::-webkit-scrollbar-thumb:hover{background:var(--text2);}
@@ -168,11 +168,11 @@
 #rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
 #rcm-matrix-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
-.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;width:100%;min-width:580px;}
+.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;width:625px;}
 .rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;width:72px;}
 .rcm-matrix td{width:72px;height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
 .rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
-.rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;padding:0 8px 0 4px;white-space:nowrap;width:44px;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9.5px;}
+.rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;padding:0 8px 0 4px;white-space:nowrap;width:44px;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;letter-spacing:.04em;}
 .rcm-matrix td.diag{background:var(--bg2);color:var(--text2);font-size:10.5px;font-weight:600;}
 /* matrix cell shading — terminal standard colors (--up=#26a69a / --down=#ef5350) */
 .rcm-cell-pos-hi{background:rgba(38,166,154,.26);color:var(--up,#26a69a);}
@@ -196,11 +196,10 @@
 @media(max-width:900px){
   .rcm-pd-row-grid{grid-template-columns:1fr 1fr;}
   .rcm-vol-row{grid-template-columns:1fr 1fr;}
-  /* Matrix: shrink cells to fit smaller screens */
-  .rcm-matrix{font-size:9px;min-width:460px;}
-  .rcm-matrix td{height:30px;font-size:9px;}
-  .rcm-matrix td.diag{font-size:9px;}
-  .rcm-matrix th{font-size:8px;}
+  /* Matrix: slightly smaller on mid-size screens */
+  .rcm-matrix{font-size:9.5px;}
+  .rcm-matrix td{height:32px;font-size:9.5px;}
+  .rcm-matrix td.diag{font-size:9.5px;}
   #rcm-matrix-wrap{padding:10px;}
 }
 @media(max-width:640px){
@@ -215,14 +214,15 @@
   .rcm-pd-cell{padding:8px 10px;}
   .rcm-vol-cell{padding:6px 10px;}
   .rcm-ois-cell{padding:6px 10px;}
-  /* Matrix: further compact + hide scrollbar to save space */
-  .rcm-matrix{font-size:8.5px;min-width:400px;}
-  .rcm-matrix td{height:26px;font-size:8.5px;}
-  .rcm-matrix td.diag{font-size:8.5px;}
-  .rcm-matrix th{font-size:7.5px;}
-  .rcm-matrix td.row-head{font-size:8.5px;padding:0 6px 0 2px;}
+  /* Matrix: compact cells, scrolls horizontally */
+  .rcm-matrix{font-size:9px;}
+  .rcm-matrix td{height:28px;font-size:9px;}
+  .rcm-matrix td.diag{font-size:9px;}
+  .rcm-matrix th{font-size:8px;}
+  .rcm-matrix td.row-head{font-size:8px;}
+  /* Hide body scrollbar on small screens to reclaim space */
   #rcm-body{scrollbar-width:none;}
-  #rcm-body::-webkit-scrollbar{display:none;}
+  #rcm-body::-webkit-scrollbar{display:none!important;}
 }
 @media(max-width:420px){
   .rcm-pd-row-grid{grid-template-columns:1fr;}
@@ -552,7 +552,7 @@ function _rcmRenderMatrix() {
 
   // Column headers
   const header = `<tr>
-    <td class="row-head" style="font-size:8.5px;color:var(--text3);font-family:var(--font-ui,'Inter',sans-serif);">L↓/S→</td>
+    <td class="row-head" style="font-size:8.5px;font-family:var(--font-ui,'Inter',sans-serif);">L↓/S→</td>
     ${G8.map(c => `<th scope="col">${c}</th>`).join('')}
   </tr>`;
 
@@ -581,7 +581,7 @@ function _rcmRenderMatrix() {
   }).join('');
 
   return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-    <div id="rcm-matrix-wrap" style="flex:1;overflow:auto;padding:14px;box-sizing:border-box;">
+    <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;padding:14px;">
       <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
         <thead>${header}</thead>
         <tbody>${rows}</tbody>
