@@ -82,10 +82,14 @@
 #rcm-body::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
 #rcm-body::-webkit-scrollbar-thumb:hover{background:var(--text2);}
 .rcm-panel{display:none;}
-.rcm-panel.on{display:flex;flex:1;flex-direction:column;min-height:0;}
+.rcm-panel.on{display:flex;flex:1;flex-direction:column;min-height:0;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+.rcm-panel.on::-webkit-scrollbar{width:3px!important;}
+.rcm-panel.on::-webkit-scrollbar-track{background:transparent;}
+.rcm-panel.on::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.rcm-panel.on::-webkit-scrollbar-thumb:hover{background:var(--text2);}
 
 /* ── Card wrapper (legacy compat) ── */
-.rcm-cw{background:var(--bg);border:none;border-radius:0;padding:0;margin-bottom:0;flex:1;display:flex;flex-direction:column;overflow:auto;}
+.rcm-cw{background:var(--bg);border:none;border-radius:0;padding:0;margin-bottom:0;flex:1;display:flex;flex-direction:column;overflow:auto;min-width:0;}
 .rcm-ct{display:none;}
 
 /* ── Breakdown table — Bloomberg-style: UI font for labels, mono for numbers ── */
@@ -164,15 +168,15 @@
 .rcm-src-note{padding:8px 14px;font-size:10px;color:var(--text3,#4e5c70);line-height:1.6;border-top:1px solid var(--border,#252d3d);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 
 /* ── Real Rate Matrix — Bloomberg style: full 8×8, colored cells, mono values ── */
-#rcm-matrix-wrap{overflow:auto;padding:14px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+#rcm-matrix-wrap{overflow:auto;padding:14px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;width:100%;min-width:0;box-sizing:border-box;}
 #rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
 #rcm-matrix-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
-.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;width:625px;}
+.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;min-width:520px;width:max-content;}
 .rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;width:72px;}
 .rcm-matrix td{width:72px;height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
 .rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
-.rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;padding:0 8px 0 4px;white-space:nowrap;width:44px;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;letter-spacing:.04em;}
+.rcm-matrix td.row-head{text-align:left;color:var(--text3,#4e5c70);font-weight:700;padding:0 8px 0 4px;white-space:nowrap;width:44px;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;letter-spacing:.04em;}
 .rcm-matrix td.diag{background:var(--bg2);color:var(--text2);font-size:10.5px;font-weight:600;}
 /* matrix cell shading — terminal standard colors (--up=#26a69a / --down=#ef5350) */
 .rcm-cell-pos-hi{background:rgba(38,166,154,.26);color:var(--up,#26a69a);}
@@ -768,7 +772,7 @@ function _rcmRender() {
     content = _rcmRenderPairDetail(l, s);
   }
 
-  modal.innerHTML = `<div class="rcm-panel on" style="overflow-y:auto;overflow-x:hidden;width:100%;box-sizing:border-box;">${content}</div>`;
+  modal.innerHTML = `<div class="rcm-panel on" style="overflow-y:visible;overflow-x:hidden;width:100%;box-sizing:border-box;">${content}</div>`;
 
   // Update header pair name
   const titleEl = document.getElementById('rcm-title');
