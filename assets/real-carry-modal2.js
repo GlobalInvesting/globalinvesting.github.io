@@ -180,7 +180,7 @@
 .rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;width:72px;}
 .rcm-matrix td{width:72px;height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
 .rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
-.rcm-matrix td.row-head{text-align:left;color:var(--text3,#4e5c70);font-weight:700;padding:0 8px 0 4px;white-space:nowrap;width:44px;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;letter-spacing:.04em;}
+.rcm-matrix td.row-head{text-align:left;color:var(--text3,#4e5c70);font-weight:700;padding:0 8px 0 4px;white-space:nowrap;width:44px;background:var(--bg2);border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;letter-spacing:.04em;}
 .rcm-matrix td.diag{background:var(--bg2);color:var(--text2);font-size:10.5px;font-weight:600;}
 /* matrix cell shading — terminal standard colors (--up=#26a69a / --down=#ef5350) */
 .rcm-cell-pos-hi{background:rgba(38,166,154,.26);color:var(--up,#26a69a);}
