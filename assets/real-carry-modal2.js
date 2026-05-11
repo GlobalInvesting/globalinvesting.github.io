@@ -175,7 +175,7 @@
 #rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
 #rcm-matrix-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
-.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;min-width:520px;width:max-content;}
+.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:auto;width:max-content;}
 .rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;width:72px;}
 .rcm-matrix td{width:72px;height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
 .rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
@@ -499,12 +499,12 @@ function _rcmRenderBreakdown() {
     const srcTitle = `${_RCM_IE_SRC[ccy] || ''}${ie?.date ? ' · ' + ie.date : ''}`;
 
     // Left border accent on top row (highest real rate)
-    const rowStyle = idx === 0
-      ? ' style="border-left:3px solid var(--up,#26a69a);"'
-      : (idx === sorted.length - 1 ? ' style="border-left:3px solid var(--down,#ef5350);"' : ' style="border-left:3px solid transparent;"');
 
-    return `<tr${rowStyle} title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
-      <td style="color:var(--text3);font-size:9px;text-align:center;width:20px;padding:8px 4px 8px 14px;">${idx + 1}</td>
+    const firstTdBorder = idx === 0
+      ? 'border-left:3px solid var(--up,#26a69a);'
+      : (idx === sorted.length - 1 ? 'border-left:3px solid var(--down,#ef5350);' : 'border-left:3px solid transparent;');
+    return `<tr title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
+      <td style="color:var(--text3);font-size:9px;text-align:center;width:20px;padding:8px 4px 8px 11px;${firstTdBorder}">${idx + 1}</td>
       <td style="text-align:left;">
         <span style="font-weight:700;color:var(--text);">${_RCM_CB[ccy]}</span>
         <span style="color:var(--text3);font-size:9px;margin-left:4px;">${ccy}</span>
@@ -523,8 +523,8 @@ function _rcmRenderBreakdown() {
   return `<div class="rcm-cw" style="flex:1;min-height:0;overflow:auto;">
     <table class="rcm-tbl" aria-label="Real rate carry ranking by currency">
       <thead>
-        <tr style="border-left:3px solid transparent;">
-          <th scope="col" style="text-align:center;width:20px;padding:7px 4px 7px 14px;">#</th>
+        <tr>
+          <th scope="col" style="text-align:center;width:20px;padding:7px 4px 7px 11px;border-left:3px solid transparent;">#</th>
           <th scope="col" style="text-align:left;">Central Bank</th>
           <th scope="col">Nominal</th>
           <th scope="col">Infl. Exp.</th>
@@ -594,7 +594,7 @@ function _rcmRenderMatrix() {
     </tr>`;
   }).join('');
 
-  return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;">
+  return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;overflow-x:auto;">
     <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;">
       <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
         <thead>${header}</thead>
