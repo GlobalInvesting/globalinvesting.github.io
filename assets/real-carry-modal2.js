@@ -625,7 +625,6 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   }).join('');
 
   return `
-  return `
   <div class="rcm-pd-header">
     <div>
       <div class="rcm-pd-dir" style="margin-bottom:1px;">Pair Detail</div>
