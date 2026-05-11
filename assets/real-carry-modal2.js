@@ -513,7 +513,7 @@ function _rcmRenderBreakdown() {
   return `<div class="rcm-cw" style="flex:1;min-height:0;overflow:auto;">
     <table class="rcm-tbl" aria-label="Real rate carry ranking by currency">
       <thead>
-        <tr>
+        <tr style="border-left:3px solid transparent;">
           <th scope="col" style="text-align:center;width:20px;padding:7px 4px 7px 14px;">#</th>
           <th scope="col" style="text-align:left;">Central Bank</th>
           <th scope="col">Nominal</th>
