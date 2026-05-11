@@ -203,13 +203,12 @@ function _buildCBRChart(data){
   _buildDecisionOverlay(container,_cbrLwChart,decisions);
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
   const apply=()=>{
-    requestAnimationFrame(()=>{
-      const w=parent?.offsetWidth||container.offsetWidth||600;
-      const h=_cbrAvailableH();
-      if(_cbrLwChart&&w>0&&h>10){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
-    });
+    const w=parent?.offsetWidth||container.offsetWidth||600;
+    const h=_cbrAvailableH();
+    if(_cbrLwChart&&w>0&&h>10){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
   };
-  if(window.ResizeObserver){const ro=new ResizeObserver(()=>apply());ro.observe(container);container._cbrRo=ro;}
+  // No ResizeObserver — the modal has fixed height; observing the canvas causes infinite loops.
+  // window.resize covers viewport changes; setTimeouts cover first-open flex timing.
   window.addEventListener('resize',apply);container._cbrResize=apply;
   setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);
 }
