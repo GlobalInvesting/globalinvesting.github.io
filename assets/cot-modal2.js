@@ -118,6 +118,7 @@
 #p-overview .cot-ov-spark-top { display:flex;justify-content:space-between;margin-bottom:8px;padding:0 14px; }
 #p-overview .cot-ov-spark-trend { font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
 #p-overview .cot-ov-spark-row .cot-spark { max-width:100%;width:100%;height:72px;display:block; }
+#cot-ov-spark-lw canvas { background:var(--bg2,#161b22)!important; }
 
 #p-net.on .cot-cw,
 #p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
@@ -263,10 +264,12 @@ function _buildSparklineChart(container, history, nWeeks) {
   const botFill  = isPos ? 'rgba(38,198,176,0.0)'  : 'rgba(239,83,80,0.0)';
 
   const W = container.offsetWidth || 300;
+  // Resolve the actual rendered bg so the canvas never bleed white on crosshair hover
+  const bgColor = getComputedStyle(container).getPropertyValue('--bg2').trim() || '#161b22';
   const chart = LWC.createChart(container, {
     width: W, height: 72,
     layout: {
-      background: { type: 'solid', color: 'transparent' },
+      background: { type: 'solid', color: bgColor },
       textColor: '#6e7681',
       attributionLogo: false,
     },
