@@ -163,7 +163,8 @@ function _buildCBRChart(data){
   // Measure available space from the parent (.cbr-chart-area) before creating the chart
   const parent=container.parentElement;
   const initW=parent?.offsetWidth||container.offsetWidth||600;
-  const initH=parent?.offsetHeight||container.offsetHeight||300;
+  const modalBody=document.getElementById('cbr-m-body');
+  const initH=parent?.offsetHeight||container.offsetHeight||(modalBody?Math.max(modalBody.offsetHeight-60,180):300);
   const opts=_cbrLwOptions();
   opts.width=initW;opts.height=Math.max(initH,120);
   _cbrLwChart=LWC.createChart(container,opts);
@@ -183,20 +184,17 @@ function _buildCBRChart(data){
   _cbrLwChart.timeScale().fitContent();
   _buildDecisionOverlay(container,_cbrLwChart,decisions);
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
-  let _applyRaf=null;
   const apply=()=>{
-    if(_applyRaf)cancelAnimationFrame(_applyRaf);
-    _applyRaf=requestAnimationFrame(()=>{
-      _applyRaf=null;
-      const w=parent?parent.offsetWidth:container.offsetWidth||600;
-      const h=parent?parent.offsetHeight:container.offsetHeight||300;
-      if(_cbrLwChart&&w>50&&h>50){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
+    requestAnimationFrame(()=>{
+      const rect=container.getBoundingClientRect();
+      const h=Math.round(rect.height)||container.offsetHeight||parent?.getBoundingClientRect().height||300;
+      const w=Math.round(rect.width)||container.offsetWidth||600;
+      if(_cbrLwChart&&w>0&&h>10){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
     });
   };
-  const stableAnchor=document.getElementById('cbr-m-body')||parent||container;
-  if(window.ResizeObserver){const ro=new ResizeObserver(apply);ro.observe(stableAnchor);container._cbrRo=ro;}
+  if(window.ResizeObserver){const ro=new ResizeObserver(()=>apply());ro.observe(container);container._cbrRo=ro;}
   window.addEventListener('resize',apply);container._cbrResize=apply;
-  setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);
+  setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);setTimeout(apply,1000);
 }
 
 async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
