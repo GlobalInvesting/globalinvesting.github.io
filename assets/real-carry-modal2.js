@@ -179,7 +179,7 @@
 .rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;width:72px;}
 .rcm-matrix td{width:72px;height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
 .rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
-.rcm-matrix td.row-head{text-align:left;color:var(--text3,#4e5c70);font-weight:700;padding:0 8px 0 4px;white-space:nowrap;width:44px;background:var(--bg2);border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;letter-spacing:.04em;}
+.rcm-matrix td.row-head{text-align:left;color:var(--text3,#4e5c70);font-weight:700;padding:0 8px 0 8px;white-space:nowrap;width:52px;background:var(--bg2);border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;letter-spacing:.04em;}
 .rcm-matrix td.diag{background:var(--bg2);color:var(--text2);font-size:10.5px;font-weight:600;}
 /* matrix cell shading — terminal standard colors (--up=#26a69a / --down=#ef5350) */
 .rcm-cell-pos-hi{background:rgba(38,166,154,.26);color:var(--up,#26a69a);}
@@ -501,7 +501,7 @@ function _rcmRenderBreakdown() {
     // Left border accent on top row (highest real rate)
     const rowStyle = idx === 0
       ? ' style="border-left:3px solid var(--up,#26a69a);"'
-      : (idx === sorted.length - 1 ? ' style="border-left:3px solid var(--down,#ef5350);"' : '');
+      : (idx === sorted.length - 1 ? ' style="border-left:3px solid var(--down,#ef5350);"' : ' style="border-left:3px solid transparent;"');
 
     return `<tr${rowStyle} title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
       <td style="color:var(--text3);font-size:9px;text-align:center;width:20px;padding:8px 4px 8px 14px;">${idx + 1}</td>
@@ -566,7 +566,7 @@ function _rcmRenderMatrix() {
 
   // Column headers
   const header = `<tr>
-    <td class="row-head" style="font-size:8.5px;font-family:var(--font-ui,'Inter',sans-serif);">L↓/S→</td>
+    <td class="row-head" style="font-size:8.5px;font-family:var(--font-ui,'Inter',sans-serif);padding:0 8px 0 8px;">L↓/S→</td>
     ${G8.map(c => `<th scope="col">${c}</th>`).join('')}
   </tr>`;
 
