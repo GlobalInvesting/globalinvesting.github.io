@@ -86,13 +86,12 @@
 #p-overview.on::-webkit-scrollbar { width:3px!important; }
 #p-overview.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
 /* Top row: 3 cols — Gauge | L/S Split | Signal Summary */
-#p-overview .cot-ov-top { display:grid;grid-template-columns:1fr 1fr 1fr;min-width:0;flex-shrink:0;border-bottom:1px solid var(--border,#252d3d); }
-#p-overview .cot-ov-top > .cot-cw { min-width:0;border-right:1px solid var(--border,#252d3d);border-bottom:none; }
-#p-overview .cot-ov-top > .cot-cw:last-child { border-right:none; }
+#p-overview .cot-ov-grid { display:grid;grid-template-columns:1fr 1fr;min-width:0;flex-shrink:0; }
+#p-overview .cot-ov-grid > .cot-cw { min-width:0;border-bottom:1px solid var(--border,#252d3d); }
+#p-overview .cot-ov-grid > .cot-cw:nth-child(odd) { border-right:1px solid var(--border,#252d3d); }
+#p-overview .cot-ov-grid > .cot-cw:nth-last-child(-n+2) { border-bottom:none; }
 /* Bottom row: Trend | 52w Range | Participants */
-#p-overview .cot-ov-bottom { display:grid;grid-template-columns:1fr 1fr 1fr;min-width:0;flex-shrink:0; }
-#p-overview .cot-ov-bottom > .cot-cw { min-width:0;border-right:1px solid var(--border,#252d3d);border-bottom:none; }
-#p-overview .cot-ov-bottom > .cot-cw:last-child { border-right:none; }
+
 #p-net.on .cot-cw,
 #p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
 #p-net.on .cot-cw > .cot-chart-area,
@@ -163,9 +162,11 @@
   .cot-mm{padding:6px 10px;}.cot-mm-val{font-size:11px;}
   #cot-m-tabs{padding:0 8px;}.cot-tab{font-size:10px;padding:8px 8px;}
   #cot-m-body{padding:0;}.cot-cw{padding:10px 12px;}
-  #p-overview .cot-ov-top{grid-template-columns:1fr;}
-  #p-overview .cot-ov-bottom{grid-template-columns:1fr;}
-  #p-overview .cot-ov-top .cot-ct{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #p-overview .cot-ov-grid{grid-template-columns:1fr;}
+  #p-overview .cot-ov-grid > .cot-cw:nth-child(odd){border-right:none;}
+  #p-overview .cot-ov-grid > .cot-cw{border-bottom:1px solid var(--border,#252d3d);}
+  #p-overview .cot-ov-grid > .cot-cw:last-child{border-bottom:none;}
+  #p-overview .cot-ov-grid .cot-ct{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   #p-overview .cot-tbl th:last-child,#p-overview .cot-tbl td:last-child{display:none;}
   #p-overview .cot-ls-row{display:grid !important;grid-template-columns:1fr auto 1fr !important;align-items:center !important;gap:4px !important;}
   #p-overview .cot-ls-row > div:last-child{text-align:right;}
@@ -174,7 +175,7 @@
   #p-history .cot-tbl{min-width:540px;font-size:9px;}
   #p-history .cot-tbl th,#p-history .cot-tbl td{padding:4px 5px;}
   #p-participants .cot-chart-area{height:260px;}
-  #p-overview{flex:none;}#p-overview .cot-ov-bottom{flex:none;}
+  #p-overview{flex:none;}
   #p-overview .cot-ov-bignum{font-size:20px !important;}
   .cot-gauge-lbls{font-size:7.5px;}.cot-ls-num{font-size:16px !important;}
   .cot-tbl{min-width:0;}.cot-tbl td,.cot-tbl th{font-size:9px;padding:4px 5px;white-space:nowrap;}
@@ -471,7 +472,8 @@ function openCOTModal(ccy,data){
   </div>
   <div id="cot-m-body" class="cot-body--overview">
     <div id="p-overview" class="cot-panel on">
-      <div class="cot-ov-top">
+      <div class="cot-ov-grid">
+        <!-- Row 1: Gauge | L/S Split -->
         <div class="cot-cw">
           <div class="cot-ct">POSITIONING GAUGE · Z-SCORE</div>
           <div class="cot-ov-bignum" style="color:${zCol}">${zStr}σ</div>
@@ -489,17 +491,17 @@ function openCOTModal(ccy,data){
             <div class="cot-ls-bar"><div class="cot-ls-bar-fill" style="width:100%;background:linear-gradient(90deg,#26a69a ${lPct}%,#ef5350 ${lPct}%)"></div></div>
             <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:#6e7681"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
           </div>
-          <div class="cot-cw" style="justify-content:space-between">
-            <div class="cot-ct">SIGNAL SUMMARY</div>
-            <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net,amNet,ddNet,aligned,isCrowded)}</div>
-          </div>
-      </div>
-      <div class="cot-ov-bottom">
+        <!-- Row 2: 12-Week Trend | Signal Summary -->
         <div class="cot-cw">
           <div class="cot-ct">12-WEEK NET TREND</div>
           ${_cotSparkline(history,12)}
           <div class="cot-ov-sub" style="margin-top:6px">${_cotTrendLabel(history)}</div>
         </div>
+        <div class="cot-cw" style="justify-content:space-between">
+          <div class="cot-ct">SIGNAL SUMMARY</div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net,amNet,ddNet,aligned,isCrowded)}</div>
+        </div>
+        <!-- Row 3: 52-Week Range | Participants -->
         <div class="cot-cw"><div class="cot-ct">52-WEEK RANGE</div>${_cotRangeCard(history,net)}</div>
         <div class="cot-cw">
           <div class="cot-ct">PARTICIPANTS · CURRENT WEEK</div>
