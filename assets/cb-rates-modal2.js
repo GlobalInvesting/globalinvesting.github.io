@@ -160,7 +160,13 @@ function _buildCBRChart(data){
   const container=document.querySelector('.cbr-lw-wrap');if(!container)return;
   const LWC=window.LightweightCharts;if(!LWC)return;
   _destroyCBRChart();
-  _cbrLwChart=LWC.createChart(container,_cbrLwOptions());
+  // Measure available space from the parent (.cbr-chart-area) before creating the chart
+  const parent=container.parentElement;
+  const initW=parent?.offsetWidth||container.offsetWidth||600;
+  const initH=parent?.offsetHeight||container.offsetHeight||300;
+  const opts=_cbrLwOptions();
+  opts.width=initW;opts.height=Math.max(initH,120);
+  _cbrLwChart=LWC.createChart(container,opts);
   const{chronData,decisions,fwdRate,bias}=data;
   const blue=getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()||'#4f7fff';
   const mainSeries=_cbrLwChart.addSeries(LWC.AreaSeries,{lineColor:blue,topColor:'rgba(79,127,255,0.16)',bottomColor:'rgba(79,127,255,0.01)',lineWidth:2,lineType:LWC.LineType?.WithSteps??1,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'rgba(0,0,0,.5)',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:true});
@@ -179,13 +185,13 @@ function _buildCBRChart(data){
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
   const apply=()=>{
     requestAnimationFrame(()=>{
-      const rect=container.getBoundingClientRect();
-      const h=Math.round(rect.height)||container.offsetHeight||container.parentElement?.getBoundingClientRect().height||300;
-      const w=Math.round(rect.width)||container.offsetWidth||600;
+      const src=container.parentElement||container;
+      const h=Math.round(src.getBoundingClientRect().height)||src.offsetHeight||300;
+      const w=Math.round(src.getBoundingClientRect().width)||src.offsetWidth||600;
       if(_cbrLwChart&&w>0&&h>10){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
     });
   };
-  if(window.ResizeObserver){const ro=new ResizeObserver(apply);ro.observe(container);container._cbrRo=ro;}
+  if(window.ResizeObserver){const ro=new ResizeObserver(apply);ro.observe(parent||container);container._cbrRo=ro;}
   window.addEventListener('resize',apply);container._cbrResize=apply;
   setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);
 }
