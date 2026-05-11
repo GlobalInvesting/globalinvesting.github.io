@@ -595,7 +595,7 @@ function _rcmRenderMatrix() {
   }).join('');
 
   return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;overflow-x:auto;">
-    <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;">
+    <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;padding-right:20px;">
       <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
         <thead>${header}</thead>
         <tbody>${rows}</tbody>
