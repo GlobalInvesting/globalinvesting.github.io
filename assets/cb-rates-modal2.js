@@ -31,7 +31,7 @@
 .cbr-tab{font-size:11px;font-weight:500;padding:9px 13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:color .12s;white-space:nowrap;user-select:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .cbr-tab:hover{color:var(--text2);}
 .cbr-tab.on{color:var(--text);border-bottom-color:var(--blue);}
-#cbr-m-body{flex:1;min-height:0;overflow-y:auto;padding:0;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+#cbr-m-body{flex:1;min-height:0;overflow-y:hidden;padding:0;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
 #cbr-m-body::-webkit-scrollbar{width:3px!important;}
 #cbr-m-body::-webkit-scrollbar-track{background:transparent;}
 #cbr-m-body::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
@@ -293,6 +293,8 @@ function cbRatesTab(el,tabId){
   document.querySelectorAll('.cbr-panel').forEach(p=>p.classList.remove('on'));
   el.classList.add('on');el.setAttribute('aria-selected','true');
   const panel=document.getElementById('cbr-p-'+tabId);if(panel)panel.classList.add('on');
+  const body=document.getElementById('cbr-m-body');
+  if(body)body.style.overflowY=tabId==='decisions'?'auto':'hidden';
   if(tabId==='chart'){const bd=document.getElementById('cbr-bd');if(bd?._chartData)requestAnimationFrame(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)));}
 }
 
