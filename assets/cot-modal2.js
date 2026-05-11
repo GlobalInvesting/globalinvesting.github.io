@@ -85,9 +85,15 @@
 #p-overview.on { display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
 #p-overview.on::-webkit-scrollbar { width:3px!important; }
 #p-overview.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
-#p-overview .cot-ov-grid { display:grid;grid-template-columns:repeat(3,1fr);flex-shrink:0; }
-#p-overview .cot-ov-grid > .cot-cw { border-right:1px solid var(--border,#252d3d);border-bottom:1px solid var(--border,#252d3d); }
-#p-overview .cot-ov-grid > .cot-cw:last-child { border-right:none; }
+/* Top row: Gauge (left) | LS-split + Signal stacked (right) */
+#p-overview .cot-ov-top { display:grid;grid-template-columns:1fr 1fr;flex-shrink:0; }
+#p-overview .cot-ov-top > .cot-cw { border-right:1px solid var(--border,#252d3d);border-bottom:1px solid var(--border,#252d3d); }
+#p-overview .cot-ov-top > .cot-cw:last-child { border-right:none; }
+/* Right column: LS-split on top + Signal Summary below */
+#p-overview .cot-ov-right { display:flex;flex-direction:column;border-bottom:1px solid var(--border,#252d3d); }
+#p-overview .cot-ov-right > .cot-cw { border-bottom:1px solid var(--border,#252d3d);border-right:none; }
+#p-overview .cot-ov-right > .cot-cw:last-child { border-bottom:none; }
+/* Bottom row: Trend | 52w Range | Participants */
 #p-overview .cot-ov-bottom { display:grid;grid-template-columns:1fr 1fr 1fr;flex-shrink:0; }
 #p-overview .cot-ov-bottom > .cot-cw { border-right:1px solid var(--border,#252d3d);border-bottom:none; }
 #p-overview .cot-ov-bottom > .cot-cw:last-child { border-right:none; }
@@ -159,9 +165,11 @@
   .cot-mm{padding:6px 10px;}.cot-mm-val{font-size:11px;}
   #cot-m-tabs{padding:0 8px;}.cot-tab{font-size:10px;padding:8px 8px;}
   #cot-m-body{padding:0;}.cot-cw{padding:10px 12px;}
-  #p-overview .cot-ov-grid{grid-template-columns:1fr 1fr;}
+  #p-overview .cot-ov-top{grid-template-columns:1fr;}
+  #p-overview .cot-ov-right{flex-direction:row;flex-wrap:wrap;}
+  #p-overview .cot-ov-right>.cot-cw{flex:1;min-width:0;}
   #p-overview .cot-ov-bottom{grid-template-columns:1fr;}
-  #p-overview .cot-ov-grid .cot-ct{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #p-overview .cot-ov-top .cot-ct{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   #p-overview .cot-tbl th:last-child,#p-overview .cot-tbl td:last-child{display:none;}
   #p-overview .cot-ls-row{display:grid !important;grid-template-columns:1fr auto 1fr !important;align-items:center !important;gap:4px !important;}
   #p-overview .cot-ls-row > div:last-child{text-align:right;}
@@ -330,11 +338,14 @@ function _mkTooltip(container,lwChart,getSeries,fmtFn){
 }
 
 function _lwResize(container,lwChart){
-  const fn=()=>{
+  const apply=()=>{
     const h=container.offsetHeight||container.parentElement?.offsetHeight||240;
     if(lwChart&&container.offsetWidth>0)lwChart.applyOptions({width:container.offsetWidth,height:h});
   };
-  window.addEventListener('resize',fn);container._lwResize=fn;return fn;
+  if(window.ResizeObserver){const ro=new ResizeObserver(()=>apply());ro.observe(container);container._lwRo=ro;}
+  window.addEventListener('resize',apply);container._lwResize=apply;
+  setTimeout(apply,60);setTimeout(apply,200);
+  return apply;
 }
 
 // ── Chart builders ────────────────────────────────────────────────────────────
@@ -460,7 +471,7 @@ function openCOTModal(ccy,data){
   </div>
   <div id="cot-m-body" class="cot-body--overview">
     <div id="p-overview" class="cot-panel on">
-      <div class="cot-ov-grid">
+      <div class="cot-ov-top">
         <div class="cot-cw">
           <div class="cot-ct">POSITIONING GAUGE · Z-SCORE</div>
           <div class="cot-ov-bignum" style="color:${zCol}">${zStr}σ</div>
@@ -468,23 +479,29 @@ function openCOTModal(ccy,data){
           <div class="cot-gauge-track"><div class="cot-gauge-fill"></div><div id="cot-pin" class="cot-gauge-pin" style="left:50%"></div></div>
           <div class="cot-gauge-lbls"><span>Extreme Short</span><span>Neutral</span><span>Extreme Long</span></div>
         </div>
-        <div class="cot-cw">
-          <div class="cot-ct">LONG / SHORT SPLIT</div>
-          <div class="cot-ls-row">
-            <div><div class="cot-ls-num cu">${long_.toLocaleString()}</div><div class="cot-ov-sub">Longs</div></div>
-            <div class="cot-ls-vs">vs</div>
-            <div style="text-align:right"><div class="cot-ls-num cd">${short_.toLocaleString()}</div><div class="cot-ov-sub">Shorts</div></div>
+        <div class="cot-ov-right">
+          <div class="cot-cw">
+            <div class="cot-ct">LONG / SHORT SPLIT</div>
+            <div class="cot-ls-row">
+              <div><div class="cot-ls-num cu">${long_.toLocaleString()}</div><div class="cot-ov-sub">Longs</div></div>
+              <div class="cot-ls-vs">vs</div>
+              <div style="text-align:right"><div class="cot-ls-num cd">${short_.toLocaleString()}</div><div class="cot-ov-sub">Shorts</div></div>
+            </div>
+            <div class="cot-ls-bar"><div class="cot-ls-bar-fill" style="width:100%;background:linear-gradient(90deg,#26a69a ${lPct}%,#ef5350 ${lPct}%)"></div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:#6e7681"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
           </div>
-          <div class="cot-ls-bar"><div class="cot-ls-bar-fill" style="width:100%;background:linear-gradient(90deg,#26a69a ${lPct}%,#ef5350 ${lPct}%)"></div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:#6e7681"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
+          <div class="cot-cw" style="justify-content:space-between">
+            <div class="cot-ct">SIGNAL SUMMARY</div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net,amNet,ddNet,aligned,isCrowded)}</div>
+          </div>
         </div>
+      </div>
+      <div class="cot-ov-bottom">
         <div class="cot-cw">
           <div class="cot-ct">12-WEEK NET TREND</div>
           ${_cotSparkline(history,12)}
           <div class="cot-ov-sub" style="margin-top:6px">${_cotTrendLabel(history)}</div>
         </div>
-      </div>
-      <div class="cot-ov-bottom">
         <div class="cot-cw"><div class="cot-ct">52-WEEK RANGE</div>${_cotRangeCard(history,net)}</div>
         <div class="cot-cw">
           <div class="cot-ct">PARTICIPANTS · CURRENT WEEK</div>
@@ -494,10 +511,6 @@ function openCOTModal(ccy,data){
             ${amNet!=null?`<tr><td>Asset Managers</td><td class="${_cotCls(amNet)}">${_cotFmt(amNet)}</td><td class="${_cotCls(amNet)}">${amNet>0?'Long':amNet<0?'Short':'Flat'}</td></tr>`:''}
             ${ddNet!=null?`<tr><td>Dealers</td><td class="${_cotCls(-ddNet)}">${_cotFmt(ddNet)}</td><td class="${_cotCls(-ddNet)}">${ddNet>0?'Long':ddNet<0?'Short':'Flat'}</td></tr>`:''}
           </tbody></table>
-        </div>
-        <div class="cot-cw" style="justify-content:space-between">
-          <div class="cot-ct">SIGNAL SUMMARY</div>
-          <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net,amNet,ddNet,aligned,isCrowded)}</div>
         </div>
       </div>
     </div>
@@ -585,7 +598,7 @@ function closeCOTModal(){
   const bd=document.getElementById('cot-bd');
   if(bd){
     if(bd._esc)document.removeEventListener('keydown',bd._esc);
-    document.querySelectorAll('.cot-lw-wrap').forEach(w=>{if(w._lwResize)window.removeEventListener('resize',w._lwResize);});
+    document.querySelectorAll('.cot-lw-wrap').forEach(w=>{if(w._lwResize)window.removeEventListener('resize',w._lwResize);if(w._lwRo)w._lwRo.disconnect();});
     bd.remove();
   }
   _destroyCOTCharts();
