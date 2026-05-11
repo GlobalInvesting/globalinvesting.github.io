@@ -64,9 +64,9 @@
 #rcm-metrics{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;}
 .rcm-mm{padding:8px 12px;border-right:1px solid var(--border,#252d3d);display:flex;flex-direction:column;}
 .rcm-mm:last-child{border-right:none;}
-.rcm-mm-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);margin-bottom:3px;}
-.rcm-mm-val{font-size:18px;font-weight:700;line-height:1;}
-.rcm-mm-sub{font-size:8px;color:var(--text2);margin-top:2px;}
+.rcm-mm-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);margin-bottom:3px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-mm-val{font-size:13px;font-weight:600;line-height:1;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-mm-sub{font-size:8px;color:var(--text2);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
 
 /* ── Tabs ── */
 #rcm-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;padding:0 14px;overflow-x:auto;scrollbar-width:none;}
@@ -99,10 +99,11 @@
 .rcm-tbl tbody tr:last-child td{border-bottom:none;}
 
 /* ── Real rate coloring — terminal vars (--up / --down = #26a69a / #ef5350) ── */
-.rr-pos2{color:var(--up,#26a69a);font-weight:700;}
-.rr-pos1{color:var(--up,#26a69a);}
-.rr-neg1{color:var(--down,#ef5350);}
-.rr-neg2{color:var(--down,#ef5350);font-weight:700;}
+/* More specific selectors override .rcm-tbl tbody td { color:var(--text) } */
+.rcm-tbl tbody td.rr-pos2,.rr-pos2{color:var(--up,#26a69a)!important;font-weight:700;}
+.rcm-tbl tbody td.rr-pos1,.rr-pos1{color:var(--up,#26a69a)!important;}
+.rcm-tbl tbody td.rr-neg1,.rr-neg1{color:var(--down,#ef5350)!important;}
+.rcm-tbl tbody td.rr-neg2,.rr-neg2{color:var(--down,#ef5350)!important;font-weight:700;}
 .rr-flat{color:var(--text2);}
 
 /* ── OIS bias chip ── */
@@ -172,7 +173,7 @@
 .rcm-matrix td{width:68px;height:34px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);}
 .rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
 .rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;padding:0 12px 0 4px;white-space:nowrap;width:auto;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9.5px;}
-.rcm-matrix td.diag{background:var(--bg2);color:var(--text3,#4e5c70);font-size:9px;}
+.rcm-matrix td.diag{background:var(--bg2);font-size:10.5px;font-weight:700;}/* color set inline by JS (green if +, red if -) */
 /* matrix cell shading — terminal standard colors (--up=#26a69a / --down=#ef5350) */
 .rcm-cell-pos-hi{background:rgba(38,166,154,.26);color:var(--up,#26a69a);}
 .rcm-cell-pos{background:rgba(38,166,154,.12);color:var(--up,#26a69a);}
@@ -198,7 +199,7 @@
 }
 @media(max-width:640px){
   #rcm-metrics{grid-template-columns:repeat(3,1fr);}
-  .rcm-mm-val{font-size:14px;}
+  .rcm-mm-val{font-size:11px;}
   .rcm-pd-row-grid{grid-template-columns:1fr 1fr;}
   .rcm-pd-cell-val{font-size:16px;}
   .rcm-vol-row{grid-template-columns:1fr 1fr;}
@@ -549,7 +550,7 @@ function _rcmRenderMatrix() {
         const rr = d.realRates[rowCcy];
         const fmt = rr != null ? (rr >= 0 ? '+' : '') + rr.toFixed(2) + '%' : '—';
         const diagCls = rr != null && rr >= 0 ? 'color:var(--up,#26a69a)' : rr != null ? 'color:var(--down,#ef5350)' : '';
-        return `<td class="diag" style="${diagCls};font-size:9.5px;" title="${rowCcy} real rate: ${fmt}">${fmt}</td>`;
+        return `<td class="diag" style="${diagCls}" title="${rowCcy} real rate: ${fmt}">${fmt}</td>`;
       }
       const rrCol = d.realRates[colCcy];
       const diff  = (rrRow != null && rrCol != null) ? parseFloat((rrRow - rrCol).toFixed(3)) : null;
@@ -806,8 +807,9 @@ function _rcmUpdateMetrics() {
   }
   if (elSrc) {
     const usdFresh = d.inflExp['USD']?.live;
-    elSrc.querySelector('.rcm-mm-val').textContent = usdFresh ? 'Live' : 'Batch';
-    elSrc.querySelector('.rcm-mm-sub').textContent = usdFresh ? 'USD/EUR: FRED live' : 'extended-data batch';
+    elSrc.querySelector('.rcm-mm-lbl').textContent = 'Infl. Exp.';
+    elSrc.querySelector('.rcm-mm-val').textContent = usdFresh ? 'FRED · IMF' : 'IMF · OECD';
+    elSrc.querySelector('.rcm-mm-sub').textContent = usdFresh ? 'USD/EUR: live breakeven' : 'CPI proxy · weekly';
   }
 
   const elPos = document.getElementById('rcm-mm-positive');
@@ -888,8 +890,8 @@ function _rcmBuildDOM() {
         <div class="rcm-mm-sub">G8 currencies</div>
       </div>
       <div class="rcm-mm" id="rcm-mm-src">
-        <div class="rcm-mm-lbl">Data source</div>
-        <div class="rcm-mm-val" style="font-size:12px;margin-top:3px;">—</div>
+        <div class="rcm-mm-lbl">Infl. Exp.</div>
+        <div class="rcm-mm-val">—</div>
         <div class="rcm-mm-sub">—</div>
       </div>
     </div>
