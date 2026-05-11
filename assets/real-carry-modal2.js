@@ -253,7 +253,7 @@
 // ── Constants ───────────────────────────────────────────────────────────────
 const _RCM_G8 = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD'];
 const _RCM_CB = { USD: 'Fed', EUR: 'ECB', GBP: 'BoE', JPY: 'BoJ', AUD: 'RBA', CAD: 'BoC', CHF: 'SNB', NZD: 'RBNZ' };
-const _RCM_FLAG = { USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', JPY: '🇯🇵', AUD: '🇦🇺', CAD: '🇨🇦', CHF: '🇨🇭', NZD: '🇳🇿' };
+const _RCM_FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CAD: 'ca', CHF: 'ch', NZD: 'nz' };
 
 // Inflation expectation source labels — shown in the source column for transparency
 const _RCM_IE_SRC = {
@@ -507,7 +507,7 @@ function _rcmRenderBreakdown() {
     return `<tr title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
       <td style="color:var(--text3);font-size:9px;text-align:center;width:20px;padding:8px 4px 8px 11px;${firstTdBorder}">${idx + 1}</td>
       <td style="text-align:left;">
-        <span style="font-size:13px;margin-right:5px;vertical-align:middle;">${_RCM_FLAG[ccy]}</span><span style="font-weight:700;color:var(--text);">${_RCM_CB[ccy]}</span>
+        <span class="fi fi-${_RCM_FLAG[ccy]}" style="margin-right:6px;border-radius:2px;font-size:14px;vertical-align:middle;flex-shrink:0;"></span><span style="font-weight:700;color:var(--text);">${_RCM_CB[ccy]}</span>
         <span style="color:var(--text3);font-size:9px;margin-left:4px;">${ccy}</span>
       </td>
       <td>${nomFmt}</td>
