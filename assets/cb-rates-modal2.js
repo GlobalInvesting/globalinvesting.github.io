@@ -183,15 +183,18 @@ function _buildCBRChart(data){
   _cbrLwChart.timeScale().fitContent();
   _buildDecisionOverlay(container,_cbrLwChart,decisions);
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
+  let _applyRaf=null;
   const apply=()=>{
-    requestAnimationFrame(()=>{
-      const src=container.parentElement||container;
-      const h=Math.round(src.getBoundingClientRect().height)||src.offsetHeight||300;
-      const w=Math.round(src.getBoundingClientRect().width)||src.offsetWidth||600;
-      if(_cbrLwChart&&w>0&&h>10){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
+    if(_applyRaf)cancelAnimationFrame(_applyRaf);
+    _applyRaf=requestAnimationFrame(()=>{
+      _applyRaf=null;
+      const w=parent?parent.offsetWidth:container.offsetWidth||600;
+      const h=parent?parent.offsetHeight:container.offsetHeight||300;
+      if(_cbrLwChart&&w>50&&h>50){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
     });
   };
-  if(window.ResizeObserver){const ro=new ResizeObserver(apply);ro.observe(parent||container);container._cbrRo=ro;}
+  const stableAnchor=document.getElementById('cbr-m-body')||parent||container;
+  if(window.ResizeObserver){const ro=new ResizeObserver(apply);ro.observe(stableAnchor);container._cbrRo=ro;}
   window.addEventListener('resize',apply);container._cbrResize=apply;
   setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);
 }
