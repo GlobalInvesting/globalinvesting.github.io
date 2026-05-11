@@ -131,11 +131,11 @@
 .rcm-rate-bars{padding:10px 14px;border-bottom:1px solid var(--border,#252d3d);}
 .rcm-rb-title{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);margin-bottom:8px;}
 .rcm-rb-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
-.rcm-rb-label{font-size:9px;color:var(--text2);width:36px;flex-shrink:0;}
+.rcm-rb-label{font-size:10px;color:var(--text2);width:36px;flex-shrink:0;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
 .rcm-rb-track{flex:1;height:4px;background:var(--bg3,#1e2433);border-radius:0;position:relative;}
 .rcm-rb-zero{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--border2,#2e3a50);}
 .rcm-rb-fill{height:100%;border-radius:0;position:absolute;top:0;}
-.rcm-rb-val{font-size:9px;font-weight:700;width:36px;text-align:right;flex-shrink:0;}
+.rcm-rb-val{font-size:10px;font-weight:700;width:36px;text-align:right;flex-shrink:0;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
 
 /* ── Vol / OIS row ── */
 .rcm-vol-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border,#252d3d);}
@@ -161,19 +161,19 @@
 .rcm-sustain-body strong{color:var(--text);font-weight:700;}
 
 /* ── Source note ── */
-.rcm-src-note{padding:8px 14px;font-size:8px;color:var(--text3,#4e5c70);line-height:1.6;border-top:1px solid var(--border,#252d3d);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-src-note{padding:8px 14px;font-size:10px;color:var(--text3,#4e5c70);line-height:1.6;border-top:1px solid var(--border,#252d3d);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 
 /* ── Real Rate Matrix — Bloomberg style: full 8×8, colored cells, mono values ── */
 #rcm-matrix-wrap{overflow:auto;padding:14px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
 #rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
 #rcm-matrix-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
-.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;width:620px;}
+.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;width:100%;min-width:580px;}
 .rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;width:72px;}
 .rcm-matrix td{width:72px;height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
 .rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
 .rcm-matrix td.row-head{text-align:left;color:var(--text2);font-weight:700;padding:0 8px 0 4px;white-space:nowrap;width:44px;background:transparent;border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9.5px;}
-.rcm-matrix td.diag{background:var(--bg2);font-size:10.5px;font-weight:700;}/* color set inline by JS (green if +, red if -) */
+.rcm-matrix td.diag{background:var(--bg2);color:var(--text2);font-size:10.5px;font-weight:600;}
 /* matrix cell shading — terminal standard colors (--up=#26a69a / --down=#ef5350) */
 .rcm-cell-pos-hi{background:rgba(38,166,154,.26);color:var(--up,#26a69a);}
 .rcm-cell-pos{background:rgba(38,166,154,.12);color:var(--up,#26a69a);}
@@ -182,7 +182,7 @@
 .rcm-cell-flat{background:rgba(122,135,153,.07);color:var(--text3,#4e5c70);}
 /* matrix legend */
 .rcm-matrix-legend{margin-top:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
-.rcm-matrix-legend span{font-size:8px;display:flex;align-items:center;gap:4px;color:var(--text2);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-matrix-legend span{font-size:10px;display:flex;align-items:center;gap:4px;color:var(--text2);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .rcm-legend-sw{width:10px;height:10px;display:inline-block;flex-shrink:0;}
 
 /* ── Loading ── */
@@ -546,11 +546,10 @@ function _rcmRenderMatrix() {
     const rrRow = d.realRates[rowCcy];
     const cells = G8.map(colCcy => {
       if (rowCcy === colCcy) {
-        // Diagonal: absolute real rate of the currency
+        // Diagonal: absolute real rate — neutral grey, no color coding (see legend)
         const rr = d.realRates[rowCcy];
         const fmt = rr != null ? (rr >= 0 ? '+' : '') + rr.toFixed(2) + '%' : '—';
-        const diagCls = rr != null && rr >= 0 ? 'color:var(--up,#26a69a)' : rr != null ? 'color:var(--down,#ef5350)' : '';
-        return `<td class="diag" style="${diagCls}" title="${rowCcy} real rate: ${fmt}">${fmt}</td>`;
+        return `<td class="diag" title="${rowCcy} real rate: ${fmt}">${fmt}</td>`;
       }
       const rrCol = d.realRates[colCcy];
       const diff  = (rrRow != null && rrCol != null) ? parseFloat((rrRow - rrCol).toFixed(3)) : null;
@@ -568,12 +567,12 @@ function _rcmRenderMatrix() {
   }).join('');
 
   return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-    <div id="rcm-matrix-wrap" style="overflow:auto;flex:1;padding:14px;">
+    <div id="rcm-matrix-wrap" style="flex:1;overflow:auto;padding:14px;box-sizing:border-box;">
       <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
         <thead>${header}</thead>
         <tbody>${rows}</tbody>
       </table>
-      <div style="margin-top:10px;display:flex;gap:14px;flex-wrap:wrap;font-size:8px;color:var(--text3);font-family:var(--font-ui,'Inter',sans-serif);">
+      <div style="margin-top:10px;display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--text3);font-family:var(--font-ui,'Inter',sans-serif);">
         <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.26);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Strong real carry (≥+1.5%)</span>
         <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.12);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Positive real spread</span>
         <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.12);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Negative real spread</span>
