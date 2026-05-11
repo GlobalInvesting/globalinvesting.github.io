@@ -26,21 +26,25 @@
 .cbr-mm-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-mono);}
 .cbr-mm-val{font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text);}
 .cbr-mm-sub{font-size:8px;color:var(--text2);font-family:var(--font-mono);}
-#cbr-m-tabs{display:flex;padding:0 14px;border-bottom:1px solid var(--border2);flex-shrink:0;overflow-x:auto;scrollbar-width:none;background:var(--bg2);}
+#cbr-m-tabs{display:flex;padding:0 14px;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;overflow-x:auto;scrollbar-width:none;background:var(--bg2);}
 #cbr-m-tabs::-webkit-scrollbar{display:none;}
-.cbr-tab{font-size:10px;padding:8px 11px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:color .1s;white-space:nowrap;user-select:none;}
-.cbr-tab:hover{color:var(--text);}
+.cbr-tab{font-size:11px;font-weight:500;padding:9px 13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:color .12s;white-space:nowrap;user-select:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.cbr-tab:hover{color:var(--text2);}
 .cbr-tab.on{color:var(--text);border-bottom-color:var(--blue);}
-#cbr-m-body{flex:1;min-height:0;overflow-y:hidden;padding:10px 12px;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--bg3) transparent;}
-#cbr-m-body.cbr-body--history{overflow-y:auto;}
-#cbr-m-body::-webkit-scrollbar{width:4px;}
-#cbr-m-body::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px;}
+#cbr-m-body{flex:1;min-height:0;overflow-y:auto;padding:0;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+#cbr-m-body::-webkit-scrollbar{width:3px!important;}
+#cbr-m-body::-webkit-scrollbar-track{background:transparent;}
+#cbr-m-body::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+#cbr-m-body::-webkit-scrollbar-thumb:hover{background:var(--text2);}
 .cbr-panel{display:none;}
 .cbr-panel.on{display:flex;flex:1;flex-direction:column;min-height:0;}
-#cbr-p-decisions.on{display:block;flex:none;}
-.cbr-cw{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:10px 12px;margin-bottom:8px;display:flex;flex-direction:column;}
+#cbr-p-chart.on{overflow-y:hidden;}
+#cbr-p-decisions.on{display:flex;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+#cbr-p-decisions.on::-webkit-scrollbar{width:3px!important;}
+#cbr-p-decisions.on::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.cbr-cw{background:var(--bg);border:none;border-radius:0;padding:0;margin-bottom:0;display:flex;flex-direction:column;}
 .cbr-cw.fill{flex:1;min-height:0;}
-.cbr-ct{font-size:8.5px;color:var(--text2);margin-bottom:8px;font-family:var(--font-mono);letter-spacing:.04em;padding-bottom:6px;border-bottom:1px solid var(--border2);text-transform:uppercase;}
+.cbr-ct{display:none;}
 .cbr-chart-area{flex:1;min-height:0;height:100%;position:relative;}
 .cbr-lw-wrap{width:100%;height:100%;min-height:180px;position:relative;}
 .cbr-lw-tooltip{position:absolute;display:none;pointer-events:none;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:6px 10px;font-size:10px;line-height:1.5;font-family:var(--font-mono);color:var(--text);z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.4);white-space:nowrap;}
@@ -238,17 +242,15 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
     <div id="cbr-p-chart" class="cbr-panel on">
       <div class="cbr-cw fill">
         <div class="cbr-ct">POLICY RATE \u00b7 MONTHLY \u00b7 STEP CHART \u00b7 DECISION MARKERS</div>
-        <div class="cbr-chart-area"><div class="cbr-lw-wrap"></div></div>
+        <div class="cbr-chart-area" style="padding:12px 12px 8px;"><div class="cbr-lw-wrap"></div></div>
       </div>
-      <div class="cbr-cw" style="margin-top:8px;flex-shrink:0;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border2);border-radius:4px;overflow:hidden;">
-          <div style="background:var(--bg);padding:8px 10px;"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Next Meeting</div><div style="font-size:12px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nextMtg}</div><div style="font-size:8px;font-family:var(--font-mono);color:${biasCol};margin-top:2px;">${biasLabel}</div></div>
-          <div style="background:var(--bg);padding:8px 10px;" title="${fwdIsEst?'Bias-only estimate — no OIS probability data.':'OIS-implied forward rate (CIP convention)'}"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Fwd Rate</div><div style="font-size:12px;font-weight:600;font-family:var(--font-mono);color:${bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text)'}">${fwdDisplay}</div><div style="font-size:8px;font-family:var(--font-mono);color:var(--text2);margin-top:2px;">${fwdIsEst?'~ est \u00b7 bias only':'OIS implied \u00b7 CIP'}</div></div>
-        </div>
+      <div style="flex-shrink:0;border-top:1px solid var(--border,#252d3d);display:grid;grid-template-columns:1fr 1fr;">
+        <div style="padding:10px 14px;border-right:1px solid var(--border,#252d3d);"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Next Meeting</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nextMtg}</div><div style="font-size:9px;font-family:var(--font-mono);color:${biasCol};margin-top:2px;">${biasLabel}</div></div>
+        <div style="padding:10px 14px;" title="${fwdIsEst?'Bias-only estimate — no OIS probability data.':'OIS-implied forward rate (CIP convention)'}"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Fwd Rate</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:${bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text)'}">${fwdDisplay}</div><div style="font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:2px;">${fwdIsEst?'~ est \u00b7 bias only':'OIS implied \u00b7 CIP'}</div></div>
       </div>
     </div>
     <div id="cbr-p-decisions" class="cbr-panel">
-      <div class="cbr-cw">
+      <div class="cbr-cw" style="flex:1;min-height:0;overflow:auto;">
         <div class="cbr-ct">RATE DECISIONS \u00b7 ${nDecisions} CHANGES IN ${nMonths} MONTHS</div>
         <div style="overflow-x:auto;">
           <table class="cbr-tbl" aria-label="Rate decisions table">
@@ -257,13 +259,10 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
           </table>
         </div>
       </div>
-      <div class="cbr-cw">
-        <div class="cbr-ct">RATE PROFILE \u00b7 ${rateStart.toFixed(2)}% \u2192 ${currentRate.toFixed(2)}%</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border2);border-radius:4px;overflow:hidden;">
-          <div style="background:var(--bg);padding:8px 10px;"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Period High</div><div style="font-size:16px;font-weight:600;font-family:var(--font-mono);color:var(--up)">${Math.max(...rates).toFixed(2)}%</div></div>
-          <div style="background:var(--bg);padding:8px 10px;"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Period Low</div><div style="font-size:16px;font-weight:600;font-family:var(--font-mono);color:var(--down)">${Math.min(...rates).toFixed(2)}%</div></div>
-          <div style="background:var(--bg);padding:8px 10px;"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Decisions</div><div style="font-size:16px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nDecisions}</div></div>
-        </div>
+      <div style="flex-shrink:0;border-top:1px solid var(--border,#252d3d);display:grid;grid-template-columns:1fr 1fr 1fr;">
+        <div style="padding:10px 14px;border-right:1px solid var(--border,#252d3d);"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Period High</div><div style="font-size:16px;font-weight:600;font-family:var(--font-mono);color:var(--up)">${Math.max(...rates).toFixed(2)}%</div></div>
+        <div style="padding:10px 14px;border-right:1px solid var(--border,#252d3d);"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Period Low</div><div style="font-size:16px;font-weight:600;font-family:var(--font-mono);color:var(--down)">${Math.min(...rates).toFixed(2)}%</div></div>
+        <div style="padding:10px 14px;"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Decisions</div><div style="font-size:16px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nDecisions}</div></div>
       </div>
     </div>
   </div>
@@ -294,7 +293,6 @@ function cbRatesTab(el,tabId){
   document.querySelectorAll('.cbr-panel').forEach(p=>p.classList.remove('on'));
   el.classList.add('on');el.setAttribute('aria-selected','true');
   const panel=document.getElementById('cbr-p-'+tabId);if(panel)panel.classList.add('on');
-  const body=document.getElementById('cbr-m-body');if(body)body.classList.toggle('cbr-body--history',tabId==='decisions');
   if(tabId==='chart'){const bd=document.getElementById('cbr-bd');if(bd?._chartData)requestAnimationFrame(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)));}
 }
 
