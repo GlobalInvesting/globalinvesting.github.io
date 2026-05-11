@@ -19,9 +19,7 @@
   const s = document.createElement('style');
   s.id = 'hm-modal2-css';
   s.textContent = `
-/* ── Proposal A — Bloomberg Density · cohesive with Real Carry Modal ── */
-/* Palette: var(--bg)/var(--bg2)/var(--bg3)/var(--bg3)  Fonts: IBM Plex Mono/Sans     */
-/* Accent gradient: #1f6feb→#58a6ff→var(--up)  Scrollbars: 4px #444c56       */
+/* ── Heatmap Modal — cohesive with Real Carry Modal ── */
 
 #hm-bd {
   display:block!important;
@@ -36,7 +34,7 @@
   font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text);
   display:flex;flex-direction:column;
 }
-/* accent gradient line — same as Real Carry modal */
+
 #hm-modal::before {
   display:none;
 }
@@ -44,33 +42,22 @@
 /* ── Header ── */
 #hm-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px 12px;
-  border-bottom:1px solid var(--border2);
+  padding:10px 14px 9px;
+  border-bottom:1px solid var(--border,#252d3d);
   flex-shrink:0;
   background:var(--bg2);
 }
-#hm-hd-left { display:flex;flex-direction:column;gap:3px; }
+#hm-hd-left { display:flex;flex-direction:column;gap:2px; }
 
-/* Badge */
-#hm-badge {
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:9px;font-family:var(--font-mono,monospace);font-weight:600;
-  letter-spacing:.12em;text-transform:uppercase;
-  color:var(--blue);margin-bottom:2px;
-}
-#hm-badge::before {
-  content:'';width:6px;height:6px;border-radius:50%;
-  background:var(--blue);flex-shrink:0;
-}
 
 #hm-title-row { display:flex;align-items:center;gap:7px; }
-#hm-title { font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em; }
+#hm-title { font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em;line-height:1.2;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
 #hm-title .fi { border-radius:2px;font-size:16px; }
-#hm-sub   { font-size:10px;font-family:var(--font-mono,monospace);color:var(--text2);letter-spacing:.02em; }
+#hm-sub { font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);letter-spacing:.02em;margin-top:1px; }
 #hm-close {
-  background:none;border:none;color:var(--text2);font-size:18px;
-  cursor:pointer;padding:5px 7px;border-radius:5px;line-height:1;
-  transition:color .1s,background .1s;
+  background:none;border:none;color:var(--text3,#4e5c70);font-size:16px;
+  cursor:pointer;padding:3px 6px;border-radius:3px;line-height:1;
+  transition:color .1s,background .1s;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
 #hm-close:hover { color:var(--text);background:var(--bg3); }
 
@@ -108,8 +95,8 @@
 
 /* ── Tabs ── */
 #hm-tabs {
-  display:flex;padding:0 18px;
-  border-bottom:1px solid var(--border2);
+  display:flex;padding:0 14px;
+  border-bottom:1px solid var(--border,#252d3d);
   flex-shrink:0;background:var(--bg2);
   overflow-x:auto;scrollbar-width:none;
 }
@@ -123,43 +110,45 @@
   font-family:var(--font-ui,sans-serif);
 }
 .hm-tab:hover { color:var(--text2); }
-.hm-tab.on { color:var(--text);border-bottom-color:var(--blue); }
+.hm-tab.on { color:var(--text);border-bottom-color:var(--text); }
 
 /* ── Body ── */
 #hm-body {
   flex:1;min-height:0;
   overflow-y:auto;
-  padding:14px 16px;
+  padding:0;
   background:var(--bg);
   scrollbar-width:thin;
-  scrollbar-color:#444c56 transparent;
+  scrollbar-color:var(--border2,#2e3a50) transparent;
 }
-#hm-body::-webkit-scrollbar { width:4px; }
+#hm-body::-webkit-scrollbar { width:3px!important; }
 #hm-body::-webkit-scrollbar-track { background:transparent; }
-#hm-body::-webkit-scrollbar-thumb { background:#444c56;border-radius:2px; }
+#hm-body::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
 #hm-body::-webkit-scrollbar-thumb:hover { background:var(--text2); }
 .hm-panel { display:none;padding:0; }
 .hm-panel.on { display:flex;flex:1;flex-direction:column;min-height:0; }
 
 /* ── Card wrapper ── */
 .hm-cw {
-  background:var(--bg2);
-  border:1px solid var(--border2);
-  border-radius:6px;padding:12px 14px;
-  margin-bottom:10px;
+  background:var(--bg);
+  border:none;
+  border-radius:0;
+  padding:14px;
+  margin-bottom:0;
+  border-bottom:1px solid var(--border,#252d3d);
   overflow-x:auto;
   scrollbar-width:thin;
-  scrollbar-color:#444c56 transparent;
+  scrollbar-color:var(--border2,#2e3a50) transparent;
 }
-.hm-cw:last-child { margin-bottom:0; }
-.hm-cw::-webkit-scrollbar { height:4px; }
-.hm-cw::-webkit-scrollbar-thumb { background:#444c56;border-radius:2px; }
+.hm-cw:last-child { border-bottom:none; }
+.hm-cw::-webkit-scrollbar { height:3px; }
+.hm-cw::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
 
 /* Section label */
 .hm-ct {
-  font-size:9.5px;font-family:var(--font-mono,monospace);color:var(--text2);
-  letter-spacing:.04em;margin-bottom:10px;
-  padding-bottom:8px;border-bottom:1px solid var(--border2);
+  font-size:8.5px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text3,#4e5c70);
+  letter-spacing:.07em;margin-bottom:10px;
+  font-weight:600;
   text-transform:uppercase;
 }
 
@@ -438,7 +427,7 @@
   // CSI state
   let _csiData       = null;  // { dates: [...], series: { EUR: [...], GBP: [...], ... } }
   let _csiChart      = null;  // LWC chart instance
-  let _csiPeriodDays = 63;    // default 3M (Bloomberg WCRS default)
+  let _csiPeriodDays = 63;    // default 3M
   let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for highlight toggling
   let _csiHighlightCcy = null; // currently highlighted ccy (null = use modal focal ccy)
   let _csiInited     = false;
@@ -460,7 +449,7 @@
 
   // Fetch session-context.json once per page load (lazy, on first modal open).
   // Falls back silently — session notes are additive, never blocking.
-  // On weekends, the file contains Bloomberg-style recap notes generated by
+  // On weekends, the file contains AI-generated recap notes
   // generate_session_context_closed() — same schema, market_closed:true flag added.
   function fetchSessionContext() {
     if (_sessionCtxFetched) return;
@@ -497,7 +486,7 @@
   }
 
   // Returns true when the FX market is closed for the weekend.
-  // FX convention (Bloomberg/Eikon standard):
+  // FX convention (industry standard):
   //   Closes:  Friday    21:00 UTC  (New York close)
   //   Opens:   Sunday    21:00 UTC  (Sydney open)
   // UTC day: 0=Sun, 1=Mon, …, 5=Fri, 6=Sat
@@ -550,7 +539,6 @@
 <div id="hm-modal">
   <div id="hm-hd">
     <div id="hm-hd-left">
-      <div id="hm-badge">Currency Strength</div>
       <div id="hm-title-row">
         <div id="hm-title"></div>
       </div>
