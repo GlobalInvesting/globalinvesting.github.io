@@ -44,9 +44,9 @@
 @keyframes rcm-su{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 @keyframes rcm-pulse{0%,100%{opacity:1}50%{opacity:.35}}
 /* ── Backdrop ── */
-#rcm-bd{position:fixed!important;inset:0!important;z-index:9200!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;background:var(--bg)!important;padding:0!important;margin:0!important;width:100vw!important;height:100vh!important;top:0!important;left:0!important;}
+#rcm-bd{position:fixed!important;inset:0!important;z-index:9200;display:flex!important;flex-direction:column;overflow:hidden;background:var(--bg);}
 /* ── Modal shell ── */
-#rcm-modal{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);color:var(--text);display:flex!important;flex-direction:column!important;overflow:hidden!important;box-sizing:border-box!important;font-size:11px;flex:1;}
+#rcm-modal{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);color:var(--text);display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;font-size:11px;flex:1;}
 #rcm-modal::before{display:none;}
 
 /* ── Header ── */
@@ -925,19 +925,6 @@ function _rcmBuildDOM() {
   </div>`;
 
   document.body.appendChild(bd);
-
-  // Force position:fixed — dashboard2.js normalizes all dialogs to position:static via inline style,
-  // which breaks the fullscreen overlay. We use a MutationObserver to re-enforce it.
-  function _rcmEnforceFixed() {
-    bd.style.setProperty('position', 'fixed', 'important');
-    bd.style.setProperty('inset', '0', 'important');
-    bd.style.setProperty('width', '100vw', 'important');
-    bd.style.setProperty('height', '100vh', 'important');
-    bd.style.setProperty('z-index', '9200', 'important');
-  }
-  _rcmEnforceFixed();
-  const _rcmStyleObserver = new MutationObserver(_rcmEnforceFixed);
-  _rcmStyleObserver.observe(bd, { attributes: true, attributeFilter: ['style'] });
 
   // Close handlers
   document.getElementById('rcm-close').addEventListener('click', _rcmClose);
