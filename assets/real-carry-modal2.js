@@ -44,9 +44,9 @@
 @keyframes rcm-su{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 @keyframes rcm-pulse{0%,100%{opacity:1}50%{opacity:.35}}
 /* ── Backdrop ── */
-#rcm-bd{position:fixed!important;inset:0!important;z-index:9200;display:flex!important;flex-direction:column;overflow:hidden;background:var(--bg);}
+#rcm-bd{position:fixed!important;inset:0!important;z-index:9200!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;background:var(--bg)!important;padding:0!important;margin:0!important;width:100vw!important;height:100vh!important;top:0!important;left:0!important;}
 /* ── Modal shell ── */
-#rcm-modal{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);color:var(--text);display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;font-size:11px;flex:1;}
+#rcm-modal{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);color:var(--text);display:flex!important;flex-direction:column!important;overflow:hidden!important;box-sizing:border-box!important;font-size:11px;flex:1;}
 #rcm-modal::before{display:none;}
 
 /* ── Header ── */
@@ -89,7 +89,11 @@
 .rcm-panel.on::-webkit-scrollbar-thumb:hover{background:var(--text2);}
 
 /* ── Card wrapper (legacy compat) ── */
-.rcm-cw{background:var(--bg);border:none;border-radius:0;padding:0;margin-bottom:0;flex:1;display:flex;flex-direction:column;overflow:auto;min-width:0;}
+.rcm-cw{background:var(--bg);border:none;border-radius:0;padding:0;margin-bottom:0;flex:1;display:flex;flex-direction:column;overflow:auto;min-width:0;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+.rcm-cw::-webkit-scrollbar{width:3px!important;}
+.rcm-cw::-webkit-scrollbar-track{background:transparent;}
+.rcm-cw::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.rcm-cw::-webkit-scrollbar-thumb:hover{background:var(--text2);}
 .rcm-ct{display:none;}
 
 /* ── Breakdown table — Bloomberg-style: UI font for labels, mono for numbers ── */
@@ -584,8 +588,8 @@ function _rcmRenderMatrix() {
     </tr>`;
   }).join('');
 
-  return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-    <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;padding:14px;">
+  return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;">
+    <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;">
       <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
         <thead>${header}</thead>
         <tbody>${rows}</tbody>
@@ -921,6 +925,19 @@ function _rcmBuildDOM() {
   </div>`;
 
   document.body.appendChild(bd);
+
+  // Force position:fixed — dashboard2.js normalizes all dialogs to position:static via inline style,
+  // which breaks the fullscreen overlay. We use a MutationObserver to re-enforce it.
+  function _rcmEnforceFixed() {
+    bd.style.setProperty('position', 'fixed', 'important');
+    bd.style.setProperty('inset', '0', 'important');
+    bd.style.setProperty('width', '100vw', 'important');
+    bd.style.setProperty('height', '100vh', 'important');
+    bd.style.setProperty('z-index', '9200', 'important');
+  }
+  _rcmEnforceFixed();
+  const _rcmStyleObserver = new MutationObserver(_rcmEnforceFixed);
+  _rcmStyleObserver.observe(bd, { attributes: true, attributeFilter: ['style'] });
 
   // Close handlers
   document.getElementById('rcm-close').addEventListener('click', _rcmClose);
