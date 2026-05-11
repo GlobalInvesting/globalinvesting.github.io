@@ -85,14 +85,10 @@
 #p-overview.on { display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
 #p-overview.on::-webkit-scrollbar { width:3px!important; }
 #p-overview.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
-/* Top row: Gauge (left col) | LS-Split + Signal stacked (right col) */
-#p-overview .cot-ov-top { display:grid;grid-template-columns:1fr 1fr;min-width:0;flex-shrink:0;border-bottom:1px solid var(--border,#252d3d); }
-/* Gauge card: first grid child */
+/* Top row: 3 cols — Gauge | L/S Split | Signal Summary */
+#p-overview .cot-ov-top { display:grid;grid-template-columns:1fr 1fr 1fr;min-width:0;flex-shrink:0;border-bottom:1px solid var(--border,#252d3d); }
 #p-overview .cot-ov-top > .cot-cw { min-width:0;border-right:1px solid var(--border,#252d3d);border-bottom:none; }
-/* Right flex-column: second grid child (contains LS-Split + Signal) */
-#p-overview .cot-ov-right { display:flex;flex-direction:column;min-width:0;overflow:hidden; }
-#p-overview .cot-ov-right > .cot-cw { min-width:0;border-bottom:1px solid var(--border,#252d3d);border-right:none; }
-#p-overview .cot-ov-right > .cot-cw:last-child { border-bottom:none; }
+#p-overview .cot-ov-top > .cot-cw:last-child { border-right:none; }
 /* Bottom row: Trend | 52w Range | Participants */
 #p-overview .cot-ov-bottom { display:grid;grid-template-columns:1fr 1fr 1fr;min-width:0;flex-shrink:0; }
 #p-overview .cot-ov-bottom > .cot-cw { min-width:0;border-right:1px solid var(--border,#252d3d);border-bottom:none; }
@@ -168,8 +164,6 @@
   #cot-m-tabs{padding:0 8px;}.cot-tab{font-size:10px;padding:8px 8px;}
   #cot-m-body{padding:0;}.cot-cw{padding:10px 12px;}
   #p-overview .cot-ov-top{grid-template-columns:1fr;}
-  #p-overview .cot-ov-right{flex-direction:row;flex-wrap:wrap;}
-  #p-overview .cot-ov-right>.cot-cw{flex:1;min-width:0;}
   #p-overview .cot-ov-bottom{grid-template-columns:1fr;}
   #p-overview .cot-ov-top .cot-ct{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   #p-overview .cot-tbl th:last-child,#p-overview .cot-tbl td:last-child{display:none;}
@@ -485,8 +479,7 @@ function openCOTModal(ccy,data){
           <div class="cot-gauge-track"><div class="cot-gauge-fill"></div><div id="cot-pin" class="cot-gauge-pin" style="left:50%"></div></div>
           <div class="cot-gauge-lbls"><span>Extreme Short</span><span>Neutral</span><span>Extreme Long</span></div>
         </div>
-        <div class="cot-ov-right">
-          <div class="cot-cw">
+        <div class="cot-cw">
             <div class="cot-ct">LONG / SHORT SPLIT</div>
             <div class="cot-ls-row">
               <div><div class="cot-ls-num cu">${long_.toLocaleString()}</div><div class="cot-ov-sub">Longs</div></div>
@@ -500,7 +493,6 @@ function openCOTModal(ccy,data){
             <div class="cot-ct">SIGNAL SUMMARY</div>
             <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net,amNet,ddNet,aligned,isCrowded)}</div>
           </div>
-        </div>
       </div>
       <div class="cot-ov-bottom">
         <div class="cot-cw">
