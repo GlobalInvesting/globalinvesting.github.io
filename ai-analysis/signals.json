@@ -1,52 +1,56 @@
 {
-  "generated_at": "2026-05-12T17:52:10Z",
+  "generated_at": "2026-05-12T19:54:27Z",
   "signals": [
     {
-      "time": "17:51",
+      "time": "19:54",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry + Inflation",
-      "text": "USD/JPY at 157.70 — 300bp Fed-BoJ carry advantage sustains the bid as US CPI beats expectations, reinforcing a hawkish Fed outlook. Despite Middle East tensions and Trump's oil supply headlines, JPY safe-haven demand remains absent with VIX at 18.3 (normal volatility). JPY COT LF net short -61,340 (crowded carry) faces limited relief as the USD/JPY vs US 10Y correlation (corr=+0.597 vs norm=+0.150, z=-2.19σ) breaks, suggesting JPY is failing to track yield pullbacks. Carry dominates until VIX > 25.",
+      "title": "USD — CPI Surprise + Fed Governor Confirmation",
+      "text": "USD DXY at 98.26 following a 'hot' US CPI report and the Senate confirmation of Kevin Warsh to the Fed Board. Fed's Goolsbee notes inflation is moving the 'wrong way,' reinforcing the Fed 3.75% [ON HOLD] stance against immediate easing. US 10Y yields testing 4.463% as the curve enters a BEAR STEEPENER regime (2s10s +56.3bp). Higher-than-expected inflation and a hawkish-leaning Governor confirmation provide structural support for USD carry advantages, specifically the +175bp spread vs EUR and +300bp vs JPY.",
       "evidence": [
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "JPY COT LF net: -61,340",
-        "US CPI: Beat"
+        "DXY: 98.26 (+0.31%)",
+        "US 10Y: 4.463%",
+        "Fed: 3.75% [ON HOLD]"
       ],
+      "watch_level": "Fed Chair vote on Wednesday for confirmation of policy trajectory.",
       "_source": "gemini"
     },
     {
-      "time": "17:48",
+      "time": "19:51",
       "priority": "warning",
       "title": "AUD/JPY — G8 Bilateral Theme + Carry",
-      "text": "AUD/JPY at 113.89 — G8 bilateral spread of 0.866% confirms AUD outperformance against a weak JPY. The +360bp carry premium (RBA 4.35% vs BoJ 0.75%) remains the primary structural driver as RBA maintains its hiking stance while BoJ holds. Retail sentiment is 84% short, diverging from the COT LF net long +58,994 (78.3% long), signaling a potential retail capitulation risk if the carry-driven uptrend extends. Watch for BoJ verbal intervention if JPY weakness accelerates.",
+      "text": "AUD/JPY at 114.052 as the G8 leader-to-laggard spread reaches 1.055%. AUD outperformance (+0.530% avg) is driven by its status as the highest-yielding G8 currency (RBA 4.35% [HIKING]), while JPY remains the laggard (-0.524% avg) amid a +360bp carry deficit. Despite WTI Oil rallying +4.39% to $102.4 and Hormuz tensions introducing geopolitical risk, the carry trade remains dominant while VIX holds at 18.0 (normal volatility). Retail sentiment is 84% short, diverging from the institutional AUD COT LF net long +58,994, signaling a squeeze if 115.00 is tested.",
       "evidence": [
-        "AUD 1W avg: +0.380% (n=4)",
-        "JPY 1W avg: -0.485% (n=7)",
-        "G8 spread: 0.866%"
+        "AUD 1W avg: +0.530% (n=4)",
+        "JPY 1W avg: -0.524% (n=7)",
+        "G8 spread: 1.055%"
       ],
+      "watch_level": "VIX break above 25 to invalidate carry-first regime.",
       "_source": "gemini"
     },
     {
-      "time": "17:46",
-      "priority": "warning",
-      "title": "EUR/USD — Technical + Inflation + Correlation",
-      "text": "EUR/USD at 1.1734 — price breaks below the 200-hour MA (1.1736) following a hot US CPI report that strengthens the USD DXY (+0.42%). EUR/USD vs EuroStoxx correlation (corr=+0.706 vs norm=-0.112, z=+1.65σ) indicates EUR is currently trading as a proxy for European equity sentiment rather than its own macro fundamentals. With a 175bp carry deficit vs the Fed, the technical break shifts the short-term bias toward further downside. Watch for a sustained close below 1.1730 to confirm the trend shift.",
-      "evidence": [
-        "Fed 3.75% vs ECB 2.0% — 175bp",
-        "EUR/USD vs EuroStoxx: z=+1.65σ",
-        "EUR/USD: 1.1734"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "17:42",
+      "time": "19:49",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD at 0.5945 — COT LF net short -19,294 (long% 18.5%) shows specs are heavily fading the RBNZ despite a hawkish market bias and a 2.25% policy rate. With the RBNZ meeting on 27 May signaling a potential hike, the crowded spec short position creates significant short-squeeze risk if the central bank delivers a hawkish surprise. The 150bp Fed-RBNZ carry spread currently favors USD, but positioning extremes suggest the downside is becoming exhausted. Watch for RBNZ policy guidance to trigger a long-unwind or short-squeeze.",
+      "text": "NZD/USD COT LF net short -19,294 (long% 18.5%) shows speculators are heavily positioned against the kiwi despite a hawkish RBNZ market bias (↑ Hike). With the RBNZ meeting on 27 May, a delivery of a hike or hawkish guidance creates significant short-squeeze risk for the crowded spec short. USD strength from the +150bp carry advantage and hot CPI is currently capping gains at 0.5956, but the positioning extreme (long% < 20%) suggests limited room for further downside without a shift in RBNZ expectations.",
       "evidence": [
         "NZD COT LF net: -19,294",
         "NZD long%: 18.5%",
-        "Fed 3.75% vs RBNZ 2.25% — 150bp"
+        "RBNZ: 2.25% [Market bias: ↑ Hike]"
       ],
+      "watch_level": "RBNZ meeting on 27 May for policy confirmation.",
+      "_source": "gemini"
+    },
+    {
+      "time": "19:45",
+      "priority": "info",
+      "title": "GBP/USD — Technical Breakdown + Political Risk",
+      "text": "GBP/USD at 1.3542, down -0.49% intraday as sellers take control following political instability surrounding PM Keir Starmer. Despite a neutral carry profile (Fed 3.75% vs BoE 3.75%), the pair is the G8's biggest mover today. COT positioning remains net long +31,244, suggesting the current move is a liquidation of stale longs rather than a fresh short cycle. Support at 1.3500 is the immediate focus as the dollar bid intensifies.",
+      "evidence": [
+        "GBP/USD: 1.3542 (-0.49%)",
+        "GBP COT LF net: +31,244",
+        "Fed-BoE Spread: 0bp"
+      ],
+      "watch_level": "Sustained break below 1.3500 targets 1.3420.",
       "_source": "gemini"
     }
   ]
