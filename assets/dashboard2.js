@@ -9767,8 +9767,9 @@ async function renderG8YieldPane(cty) {
     const d = ext.data ?? ext;
     // Subtitle row
     let html = `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${cfg.subtitle}</div>`;
-    // Tile grid — matches US tile format: label / value / change row
-    html += '<div class="rates-grid" style="margin-bottom:6px;">';
+    // Tile grid — columns match tenor count so single-tenor countries (JP, AU, NZ) don't leave a grey gap
+    const cols = cfg.tenors.length === 1 ? '1fr' : '1fr 1fr';
+    html += `<div class="rates-grid" style="margin-bottom:6px;grid-template-columns:${cols};">`;
     cfg.tenors.forEach(t => {
       const val = d[t.k];
       // Values in extended-data are stored as percentages (e.g. 3.04 = 3.04%)

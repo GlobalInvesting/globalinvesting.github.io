@@ -57,17 +57,13 @@
 .cbr-tbl tr:hover td{background:rgba(255,255,255,.02);}
 .cbr-tbl .now-row td{background:rgba(79,127,255,.05);}
 .cu{color:var(--up);}.cd{color:var(--down);}.cf{color:var(--text2);}
-.cbr-hm-wrap{flex-shrink:0;border-top:1px solid var(--border,#252d3d);padding:0 0 8px;background:var(--bg);}
-.cbr-hm-row{display:flex;align-items:center;padding:0 12px;gap:4px;margin-bottom:2px;}
-.cbr-hm-hdr{margin-bottom:1px;padding-top:0;}
-.cbr-hm-year{font-size:8px;color:var(--text2);font-family:var(--font-mono);width:28px;flex-shrink:0;text-align:right;padding-right:4px;}
-.cbr-hm-cells{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;flex:1;}
-.cbr-hm-cell{height:14px;border-radius:2px;cursor:default;transition:opacity .1s;}
-.cbr-hm-cell:hover{opacity:.8;}
-.cbr-hm-mlbl{font-size:7px;color:var(--text2);font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;background:none!important;height:12px;}
-.cbr-hm-leg{display:flex;gap:10px;padding:4px 12px 0 44px;}
-.cbr-hm-leg-item{display:flex;align-items:center;gap:4px;font-size:8px;color:var(--text2);font-family:var(--font-mono);}
-.cbr-hm-leg-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.cbr-ctx-wrap{flex-shrink:0;border-top:1px solid var(--border,#252d3d);padding:0 0 6px;background:var(--bg);}
+.cbr-ctx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
+.cbr-ctx-cell{padding:7px 12px;border-right:1px solid var(--border,#252d3d);border-bottom:1px solid var(--border,#252d3d);}
+.cbr-ctx-cell:nth-child(4n){border-right:none;}
+.cbr-ctx-cell:nth-last-child(-n+4){border-bottom:none;}
+.cbr-ctx-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono);}
+.cbr-ctx-val{font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text);}
 `;
   document.head.appendChild(s);
 })();
@@ -76,45 +72,80 @@ const _cbrMonoF="var(--font-mono,'JetBrains Mono','Courier New',monospace)";
 let _cbrLwChart=null;
 function _destroyCBRChart(){if(_cbrLwChart){try{_cbrLwChart.remove();}catch(_){}  _cbrLwChart=null;}}
 
-function _cbrBuildHeatmap(decisions){
-  // Build a year × month decision heatmap (Bloomberg-style).
-  // Each cell = one calendar month. Color: green=hike, red=cut, dim=hold/no data.
-  if(!decisions||!decisions.length)return'';
-  const MONTHS=['J','F','M','A','M','J','J','A','S','O','N','D'];
-  // Map "YYYY-MM" → decision
-  const decMap={};
-  decisions.forEach(d=>{decMap[d.time.slice(0,7)]=d;});
-  // Year range: from earliest decision year to current year
-  const years=decisions.map(d=>parseInt(d.time.slice(0,4)));
-  const minY=Math.min(...years),maxY=new Date().getFullYear();
-  let rows='';
-  for(let y=maxY;y>=minY;y--){
-    let cells='';
-    for(let m=0;m<12;m++){
-      const key=`${y}-${String(m+1).padStart(2,'0')}`;
-      const dec=decMap[key];
-      const isFuture=new Date(y,m,1)>new Date();
-      let bg,title,border='';
-      if(isFuture){bg='transparent';title='';}
-      else if(!dec){bg='rgba(255,255,255,0.04)';title=`${MONTHS[m]} ${y} - No change`;}
-      else if(dec.delta>0){
-        const intensity=Math.min(1,Math.abs(dec.delta)/0.005);
-        bg=`rgba(38,166,154,${0.25+intensity*0.55})`;
-        title=`${MONTHS[m]} ${y} - +${Math.round(dec.delta*100)}bp hike`;
-        border='1px solid rgba(38,166,154,0.6)';
-      }else{
-        const intensity=Math.min(1,Math.abs(dec.delta)/0.005);
-        bg=`rgba(239,83,80,${0.25+intensity*0.55})`;
-        title=`${MONTHS[m]} ${y} - ${Math.round(dec.delta*100)}bp cut`;
-        border='1px solid rgba(239,83,80,0.6)';
-      }
-      cells+=`<div class="cbr-hm-cell" style="background:${bg};${border?'border:'+border+';':''}" title="${title}"></div>`;
-    }
-    rows+=`<div class="cbr-hm-row"><div class="cbr-hm-year">${y}</div><div class="cbr-hm-cells">${cells}</div></div>`;
+function _cbrBuildContextStrip(decisions, chronData, currentRate, meetingData, nMonths){
+  // Rate Context Strip — Bloomberg-style summary of the full policy cycle.
+  // Shows: days to next meeting, meetings remaining this year, cycle duration,
+  // cycle high/low, avg change per decision, hold streak (consecutive holds).
+  if(!decisions||!chronData||!chronData.length)return'';
+
+  const now=new Date();
+
+  // Days to next meeting
+  let daysToNext='—';
+  if(meetingData?.nextMeetingISO){
+    const diff=Math.round((new Date(meetingData.nextMeetingISO)-now)/(864e5));
+    daysToNext=diff>=0?diff+'d':'—';
   }
-  const legend=`<div class="cbr-hm-leg"><div class="cbr-hm-leg-item"><div class="cbr-hm-leg-swatch" style="background:rgba(38,166,154,.7)"></div>Hike</div><div class="cbr-hm-leg-item"><div class="cbr-hm-leg-swatch" style="background:rgba(239,83,80,.7)"></div>Cut</div><div class="cbr-hm-leg-item"><div class="cbr-hm-leg-swatch" style="background:rgba(255,255,255,.04)"></div>Hold</div></div>`;
-  const header=`<div class="cbr-hm-row cbr-hm-hdr"><div class="cbr-hm-year"></div><div class="cbr-hm-cells">${MONTHS.map(m=>`<div class="cbr-hm-cell cbr-hm-mlbl">${m}</div>`).join('')}</div></div>`;
-  return`<div class="cbr-hm-wrap"><div class="cbr-ct" style="padding:6px 12px 4px;">DECISION CALENDAR</div>${header}${rows}${legend}</div>`;
+
+  // Meetings remaining this year (from allMeetings)
+  let mtgsLeft='—';
+  if(Array.isArray(meetingData?.allMeetings)){
+    const future=meetingData.allMeetings.filter(d=>new Date(d)>now);
+    mtgsLeft=future.length;
+  }
+
+  // Cycle duration in months (from first decision in current direction streak)
+  const lastDec=decisions[decisions.length-1];
+  const lastDir=lastDec?Math.sign(lastDec.delta):0;
+  let cycleStart=null;
+  if(lastDir!==0){
+    for(let i=decisions.length-1;i>=0;i--){
+      if(Math.sign(decisions[i].delta)===lastDir)cycleStart=decisions[i].time;
+      else break;
+    }
+  }
+  let cycleDurTxt='—';
+  if(cycleStart){
+    const ms=now-new Date(cycleStart);
+    const mo=Math.round(ms/(1000*60*60*24*30.44));
+    cycleDurTxt=mo+'m';
+  }
+
+  // Cycle high / low (all-time in dataset)
+  const rates=chronData.map(d=>d.value);
+  const hi=Math.max(...rates),lo=Math.min(...rates);
+
+  // Avg change per decision (bp)
+  let avgChg='—';
+  if(decisions.length){
+    const totalBp=decisions.reduce((s,d)=>s+Math.abs(d.delta),0);
+    avgChg=(Math.round(totalBp/decisions.length*100))+'bp';
+  }
+
+  // Hold streak — how many consecutive months since last decision
+  let holdStreak='—';
+  if(lastDec){
+    const msSinceLast=now-new Date(lastDec.time);
+    const moSinceLast=Math.floor(msSinceLast/(1000*60*60*24*30.44));
+    holdStreak=moSinceLast>0?moSinceLast+'m':' <1m';
+  }
+
+  function _cell(lbl,val,valCol){
+    return`<div class="cbr-ctx-cell"><div class="cbr-ctx-lbl">${lbl}</div><div class="cbr-ctx-val"${valCol?` style="color:${valCol}"`:''}>${val}</div></div>`;
+  }
+
+  return`<div class="cbr-ctx-wrap">` +
+    `<div class="cbr-ct" style="padding:6px 12px 4px;">RATE CONTEXT</div>` +
+    `<div class="cbr-ctx-grid">` +
+      _cell('Days to Mtg', daysToNext) +
+      _cell('Mtgs Left '+now.getFullYear(), mtgsLeft) +
+      _cell('Cycle Duration', cycleDurTxt) +
+      _cell('Period High', hi.toFixed(2)+'%','var(--up)') +
+      _cell('Period Low', lo.toFixed(2)+'%','var(--down)') +
+      _cell('Avg Move', avgChg) +
+      _cell('Hold Streak', holdStreak) +
+      _cell('Decisions', decisions.length) +
+    `</div></div>`;
 }
 
 function _processCBRateData(obs){
@@ -335,7 +366,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
         <div style="padding:10px 14px;border-right:1px solid var(--border,#252d3d);"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Next Meeting</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nextMtg}</div><div style="font-size:9px;font-family:var(--font-mono);color:${biasCol};margin-top:2px;">${biasLabel}</div></div>
         <div style="padding:10px 14px;" title="${fwdIsEst?'Bias-only estimate — no OIS probability data.':'OIS-implied forward rate (CIP convention)'}"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Fwd Rate</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:${bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text)'}">${fwdDisplay}</div><div style="font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:2px;">${fwdIsEst?'~ est \u00b7 bias only':'OIS implied \u00b7 CIP'}</div></div>
       </div>
-      ${_cbrBuildHeatmap(decisions)}
+      ${_cbrBuildContextStrip(decisions,chronData,currentRate,meetingData,nMonths)}
     </div>
     <div id="cbr-p-decisions" class="cbr-panel">
       <div class="cbr-cw" style="flex:1;min-height:0;overflow:auto;">
