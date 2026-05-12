@@ -3044,6 +3044,17 @@ function _lwBuildTodayBar(ohlcId) {
     h = q.high != null && q.high > 0 ? parseFloat(q.high.toFixed(dec)) : Math.max(o, c);
     l = q.low  != null && q.low  > 0 ? parseFloat(q.low.toFixed(dec))  : Math.min(o, c);
   }
+  // ── OHLC structural integrity clamp ──────────────────────────────────────
+  // Guarantee H >= max(O,C) and L <= min(O,C) for every bar, regardless of source.
+  // Root cause: the live today-bar uses prev_close as Open (correct for coloring the
+  // pct-direction body), but session_high/session_low from quotes.json reflect only
+  // real intraday ticks. On gap-down sessions (e.g. USD/JPY May 7 2026), prev_close
+  // can exceed session_high by >1 pip, producing H < O — a structurally impossible
+  // candle that LightweightCharts renders as a malformed/inverted chart. Same for
+  // L > min(O,C) on gap-up sessions. Clamping extends the wick to include the open/
+  // close body without discarding the real intraday range.
+  h = Math.max(h, o, c);
+  l = Math.min(l, o, c);
 
   // ── FX stale-quote guard ─────────────────────────────────────────────────
   // At the very start of the FX week (Sunday 21:00 UTC – Monday ~02:00 UTC),
