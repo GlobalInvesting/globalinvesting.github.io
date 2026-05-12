@@ -358,12 +358,24 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                 continue
             if not _guard(id_, b["close"]):
                 continue
+            o_r = round(b["open"],  dec)
+            c_r = round(b["close"], dec)
+            # ── OHLC structural integrity clamp ──────────────────────────────
+            # The bucket open = first 1H bar's Open (which yfinance FX 1H reports
+            # as prev_session_close on most bars). On gap-down sessions the
+            # prev_session_close can exceed all 1H highs accumulated during the day,
+            # producing high < open — a structurally impossible candle. Clamping
+            # guarantees H >= max(O,C) and L <= min(O,C) without discarding the
+            # real intraday range. The same clamp is applied in _lwBuildTodayBar
+            # in dashboard.js for the live today-bar.
+            h_r = round(max(b["high"],  o_r, c_r), dec)
+            l_r = round(min(b["low"],   o_r, c_r), dec)
             bars_1h.append({
                 "time":   date_str,
-                "open":   round(b["open"],  dec),
-                "high":   round(b["high"],  dec),
-                "low":    round(b["low"],   dec),
-                "close":  round(b["close"], dec),
+                "open":   o_r,
+                "high":   h_r,
+                "low":    l_r,
+                "close":  c_r,
                 "volume": 0,  # 1H FX tick-volume from Yahoo is not meaningful; omit
             })
 
@@ -540,12 +552,16 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                 continue
             if not _guard(id_, b["close"]):
                 continue
+            o_r = round(b["open"],  dec)
+            c_r = round(b["close"], dec)
+            h_r = round(max(b["high"],  o_r, c_r), dec)  # clamp: H >= max(O,C)
+            l_r = round(min(b["low"],   o_r, c_r), dec)  # clamp: L <= min(O,C)
             bars_1h.append({
                 "time":   date_str,
-                "open":   round(b["open"],  dec),
-                "high":   round(b["high"],  dec),
-                "low":    round(b["low"],   dec),
-                "close":  round(b["close"], dec),
+                "open":   o_r,
+                "high":   h_r,
+                "low":    l_r,
+                "close":  c_r,
                 "volume": 0,
             })
 
@@ -710,12 +726,16 @@ def fetch_wti_dxy_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                 continue
             if not _guard(id_, b["close"]):
                 continue
+            o_r = round(b["open"],  dec)
+            c_r = round(b["close"], dec)
+            h_r = round(max(b["high"],  o_r, c_r), dec)  # clamp: H >= max(O,C)
+            l_r = round(min(b["low"],   o_r, c_r), dec)  # clamp: L <= min(O,C)
             bars_1h.append({
                 "time":   date_str,
-                "open":   round(b["open"],  dec),
-                "high":   round(b["high"],  dec),
-                "low":    round(b["low"],   dec),
-                "close":  round(b["close"], dec),
+                "open":   o_r,
+                "high":   h_r,
+                "low":    l_r,
+                "close":  c_r,
                 "volume": 0,
             })
 
@@ -886,12 +906,16 @@ def fetch_equity_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
             b = day_buckets[date_str]
             if not _guard(id_, b["close"]):
                 continue
+            o_r = round(b["open"],  dec)
+            c_r = round(b["close"], dec)
+            h_r = round(max(b["high"],  o_r, c_r), dec)  # clamp: H >= max(O,C)
+            l_r = round(min(b["low"],   o_r, c_r), dec)  # clamp: L <= min(O,C)
             bars_1h.append({
                 "time":   date_str,
-                "open":   round(b["open"],  dec),
-                "high":   round(b["high"],  dec),
-                "low":    round(b["low"],   dec),
-                "close":  round(b["close"], dec),
+                "open":   o_r,
+                "high":   h_r,
+                "low":    l_r,
+                "close":  c_r,
                 "volume": 0,
             })
 
