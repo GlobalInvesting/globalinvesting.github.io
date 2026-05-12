@@ -59,9 +59,12 @@
 #ycm-table { width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono); }
 #ycm-table th { padding:4px 8px;text-align:right;color:var(--text2);font-weight:500;font-size:8px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border2);background:var(--bg2); }
 #ycm-table th:first-child { text-align:left; }
-#ycm-table td { padding:4px 8px;text-align:right;border-top:1px solid rgba(54,60,78,.4);color:var(--text); }
-#ycm-table td:first-child { text-align:left;color:var(--text2); }
+#ycm-table td { padding:4px 8px;text-align:right;border-bottom:1px solid rgba(54,60,78,.4);color:var(--text); }
+#ycm-table td:first-child { text-align:left;color:var(--text2);font-weight:500; }
+#ycm-table tr:last-child td { border-bottom:none; }
 #ycm-table tr:hover td { background:rgba(255,255,255,.02); }
+#ycm-table td.up { color:var(--up); }
+#ycm-table td.down { color:var(--down); }
 `;
   document.head.appendChild(s);
 })();
