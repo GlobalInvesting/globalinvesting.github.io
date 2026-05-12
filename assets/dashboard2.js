@@ -9134,6 +9134,61 @@ function toggleAlertsPopover() {
     }
   });
 
+  // ── Monitor-transition layout flush ──────────────────────────────────────
+  // When the browser moves between screens with different DPR or resolution,
+  // the resize event fires but canvas-based charts and flex containers sized
+  // via calc(100vh - Npx) don't always reflow correctly. We detect the DPR
+  // change and force a synchronous layout flush by toggling a CSS property.
+  (function _watchDPR(){
+    var lastDPR = window.devicePixelRatio;
+    function _onDPRChange(){
+      var newDPR = window.devicePixelRatio;
+      if(Math.abs(newDPR - lastDPR) > 0.01){
+        lastDPR = newDPR;
+        // Force layout flush: toggle display on #main to invalidate cached geometry
+        if(main){
+          main.style.display = 'none';
+          // Reading offsetHeight forces a synchronous reflow before we restore display
+          void main.offsetHeight;
+          main.style.display = '';
+        }
+        // Reapply split state to recalculate widths on new viewport
+        if(main.classList.contains('split-layout')){
+          var pct = upper ? parseFloat((upper.offsetWidth / main.offsetWidth * 100).toFixed(1)) || 55 : 55;
+          applyState(true, pct);
+        }
+        // Redraw canvas charts at correct DPR
+        if(typeof drawLiquidityChart === 'function') drawLiquidityChart();
+        if(typeof drawYieldCurve === 'function') drawYieldCurve(
+          typeof _lastDrawnYields !== 'undefined' ? _lastDrawnYields : null,
+          typeof _lastDrawnPrior  !== 'undefined' ? _lastDrawnPrior  : null
+        );
+        if(typeof _lwChart !== 'undefined' && _lwChart){
+          try{
+            var cw = document.getElementById('lw-chart-div') || (typeof chartDiv !== 'undefined' ? chartDiv : null);
+            if(cw) _lwChart.resize(cw.offsetWidth, cw.offsetHeight);
+          }catch(_){}
+        }
+      }
+      // Re-register for next DPR change (matchMedia fires once per threshold crossing)
+      try{
+        window.matchMedia('screen and (resolution: ' + newDPR + 'dppx)')
+          .addEventListener('change', _onDPRChange, {once:true});
+      }catch(e){
+        // Fallback: poll every 2s (very low cost — just a number comparison)
+        setTimeout(_watchDPR, 2000);
+      }
+    }
+    try{
+      window.matchMedia('screen and (resolution: ' + lastDPR + 'dppx)')
+        .addEventListener('change', _onDPRChange, {once:true});
+    }catch(e){
+      setInterval(function(){
+        if(Math.abs(window.devicePixelRatio - lastDPR) > 0.01) _onDPRChange();
+      }, 2000);
+    }
+  })();
+
   if(handle){
     var dragging = false, startX = 0, startW = 0;
     handle.addEventListener('mousedown', function(e){
