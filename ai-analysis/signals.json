@@ -1,56 +1,56 @@
 {
-  "generated_at": "2026-05-12T19:54:27Z",
+  "generated_at": "2026-05-12T21:11:00Z",
   "signals": [
     {
-      "time": "19:54",
+      "time": "21:10",
       "priority": "critical",
-      "title": "USD — CPI Surprise + Fed Governor Confirmation",
-      "text": "USD DXY at 98.26 following a 'hot' US CPI report and the Senate confirmation of Kevin Warsh to the Fed Board. Fed's Goolsbee notes inflation is moving the 'wrong way,' reinforcing the Fed 3.75% [ON HOLD] stance against immediate easing. US 10Y yields testing 4.463% as the curve enters a BEAR STEEPENER regime (2s10s +56.3bp). Higher-than-expected inflation and a hawkish-leaning Governor confirmation provide structural support for USD carry advantages, specifically the +175bp spread vs EUR and +300bp vs JPY.",
+      "title": "USD/EUR — Hot CPI + CB Differential",
+      "text": "US CPI surprise reignites inflation fears, driving DXY toward 98.30 as US 10Y yields climb to 4.463%. Fed 3.75% vs ECB 2.0% — +175bp carry advantage favors USD. ECB's Nagel warns of persistent inflation, but the bear steepener regime (+56.3bp 2s10s) and hawkish Fed repricing dominate. EUR/USD at 1.1741 remains under pressure as the policy divergence widens.",
       "evidence": [
-        "DXY: 98.26 (+0.31%)",
-        "US 10Y: 4.463%",
-        "Fed: 3.75% [ON HOLD]"
+        "US 10Y: 4.463% (+1.20%)",
+        "USD/EUR carry: +175bp",
+        "DXY: 98.29"
       ],
-      "watch_level": "Fed Chair vote on Wednesday for confirmation of policy trajectory.",
+      "watch level": "Watch for a break of 1.1700 following the next ECB meeting on 11 Jun.",
       "_source": "gemini"
     },
     {
-      "time": "19:51",
+      "time": "21:07",
       "priority": "warning",
       "title": "AUD/JPY — G8 Bilateral Theme + Carry",
-      "text": "AUD/JPY at 114.052 as the G8 leader-to-laggard spread reaches 1.055%. AUD outperformance (+0.530% avg) is driven by its status as the highest-yielding G8 currency (RBA 4.35% [HIKING]), while JPY remains the laggard (-0.524% avg) amid a +360bp carry deficit. Despite WTI Oil rallying +4.39% to $102.4 and Hormuz tensions introducing geopolitical risk, the carry trade remains dominant while VIX holds at 18.0 (normal volatility). Retail sentiment is 84% short, diverging from the institutional AUD COT LF net long +58,994, signaling a squeeze if 115.00 is tested.",
+      "text": "AUD/JPY at 114.024. AUD 4.35% vs BoJ 0.75% — +360bp carry premium drives the bilateral G8 divergence. AUD is the week's leader (+0.553%) while JPY remains the laggard (-0.506%) despite BoJ hike bias. Retail 84% short AUD/JPY diverges from COT LF net long +58,994 (78.3% long), signaling a squeeze of retail shorts if carry demand persists.",
       "evidence": [
-        "AUD 1W avg: +0.530% (n=4)",
-        "JPY 1W avg: -0.524% (n=7)",
-        "G8 spread: 1.055%"
+        "AUD 1W avg: +0.553% (n=4)",
+        "JPY 1W avg: -0.506% (n=7)",
+        "G8 spread: 1.059%"
       ],
-      "watch_level": "VIX break above 25 to invalidate carry-first regime.",
+      "watch level": "Next RBA meeting on 16 Jun determines if the carry advantage expands.",
       "_source": "gemini"
     },
     {
-      "time": "19:49",
+      "time": "21:05",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -19,294 (long% 18.5%) shows speculators are heavily positioned against the kiwi despite a hawkish RBNZ market bias (↑ Hike). With the RBNZ meeting on 27 May, a delivery of a hike or hawkish guidance creates significant short-squeeze risk for the crowded spec short. USD strength from the +150bp carry advantage and hot CPI is currently capping gains at 0.5956, but the positioning extreme (long% < 20%) suggests limited room for further downside without a shift in RBNZ expectations.",
+      "title": "NZD/USD — COT vs OIS Divergence + Inflation Survey",
+      "text": "NZD/USD COT LF net short -19,294 (specs short) vs RBNZ hike bias priced for the next meeting. NZD long% at 18.5% represents a positioning extreme. With the RBNZ Survey of Inflation Expectations due Wednesday, any hawkish surprise risks a crowded short-unwind. NZD/USD at 0.5955 is testing the upper bound of spec conviction.",
       "evidence": [
+        "NZD COT long%: 18.5%",
         "NZD COT LF net: -19,294",
-        "NZD long%: 18.5%",
-        "RBNZ: 2.25% [Market bias: ↑ Hike]"
+        "NZD/USD: 0.5955"
       ],
-      "watch_level": "RBNZ meeting on 27 May for policy confirmation.",
+      "watch level": "RBNZ Survey of Inflation Expectations on 13 May.",
       "_source": "gemini"
     },
     {
-      "time": "19:45",
+      "time": "21:02",
       "priority": "info",
-      "title": "GBP/USD — Technical Breakdown + Political Risk",
-      "text": "GBP/USD at 1.3542, down -0.49% intraday as sellers take control following political instability surrounding PM Keir Starmer. Despite a neutral carry profile (Fed 3.75% vs BoE 3.75%), the pair is the G8's biggest mover today. COT positioning remains net long +31,244, suggesting the current move is a liquidation of stale longs rather than a fresh short cycle. Support at 1.3500 is the immediate focus as the dollar bid intensifies.",
+      "title": "USD/JPY — Correlation Break + Carry",
+      "text": "USD/JPY vs US 10Y correlation at +0.594 vs 252d norm of +0.150 (z=-2.20σ). The pair is hyper-sensitized to US Treasury moves following the hot CPI print. Fed 3.75% vs BoJ 0.75% (+300bp) sustains the bid at 157.58. Carry remains the dominant driver while VIX stays at 18.0 (normal volatility), though intervention risk remains a factor as price holds near recent highs.",
       "evidence": [
-        "GBP/USD: 1.3542 (-0.49%)",
-        "GBP COT LF net: +31,244",
-        "Fed-BoE Spread: 0bp"
+        "USD/JPY vs US 10Y z-score: -2.20σ",
+        "USD/JPY carry: +300bp",
+        "VIX: 18.0"
       ],
-      "watch_level": "Sustained break below 1.3500 targets 1.3420.",
+      "watch level": "Next BoJ meeting on 16 Jun.",
       "_source": "gemini"
     }
   ]
