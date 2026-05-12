@@ -87,7 +87,7 @@ function _cbrBuildHeatmap(decisions){
   // Year range: from earliest decision year to current year
   const years=decisions.map(d=>parseInt(d.time.slice(0,4)));
   const minY=Math.min(...years),maxY=new Date().getFullYear();
-  const rows=[];
+  let rows='';
   for(let y=maxY;y>=minY;y--){
     let cells='';
     for(let m=0;m<12;m++){
@@ -96,16 +96,16 @@ function _cbrBuildHeatmap(decisions){
       const isFuture=new Date(y,m,1)>new Date();
       let bg,title,border='';
       if(isFuture){bg='transparent';title='';}
-      else if(!dec){bg='rgba(255,255,255,0.04)';title=`${MONTHS[m]} ${y} — No change`;}
+      else if(!dec){bg='rgba(255,255,255,0.04)';title=`${MONTHS[m]} ${y} - No change`;}
       else if(dec.delta>0){
         const intensity=Math.min(1,Math.abs(dec.delta)/0.005);
         bg=`rgba(38,166,154,${0.25+intensity*0.55})`;
-        title=`${MONTHS[m]} ${y} — +${Math.round(dec.delta*100)}bp hike`;
+        title=`${MONTHS[m]} ${y} - +${Math.round(dec.delta*100)}bp hike`;
         border='1px solid rgba(38,166,154,0.6)';
       }else{
         const intensity=Math.min(1,Math.abs(dec.delta)/0.005);
         bg=`rgba(239,83,80,${0.25+intensity*0.55})`;
-        title=`${MONTHS[m]} ${y} — ${Math.round(dec.delta*100)}bp cut`;
+        title=`${MONTHS[m]} ${y} - ${Math.round(dec.delta*100)}bp cut`;
         border='1px solid rgba(239,83,80,0.6)';
       }
       cells+=`<div class="cbr-hm-cell" style="background:${bg};${border?'border:'+border+';':''}" title="${title}"></div>`;

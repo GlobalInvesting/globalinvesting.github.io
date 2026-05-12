@@ -55,11 +55,11 @@
 #ycm-canvas-wrap { flex:1;position:relative;min-height:160px; }
 #ycm-canvas { width:100%!important;height:100%!important; }
 #ycm-shape { position:absolute;top:4px;right:4px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;font-size:8.5px;color:var(--text2);font-family:var(--font-mono);pointer-events:none; }
-#ycm-table-wrap { flex-shrink:0;border-top:1px solid var(--border2);overflow-x:auto;background:var(--bg2); }
-#ycm-table { width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono); }
+#ycm-table-wrap { flex-shrink:0;border-top:1px solid var(--border2);overflow-x:auto;background:var(--bg); }
+#ycm-table { width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);background:var(--bg); }
 #ycm-table th { padding:4px 8px;text-align:right;color:var(--text2);font-weight:500;font-size:8px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border2);background:var(--bg2); }
 #ycm-table th:first-child { text-align:left; }
-#ycm-table td { padding:4px 8px;text-align:right;border-bottom:1px solid rgba(54,60,78,.4);color:var(--text); }
+#ycm-table td { padding:4px 8px;text-align:right;border-bottom:1px solid rgba(54,60,78,.4);color:var(--text);background:var(--bg); }
 #ycm-table td:first-child { text-align:left;color:var(--text2);font-weight:500; }
 #ycm-table tr:last-child td { border-bottom:none; }
 #ycm-table tr:hover td { background:rgba(255,255,255,.02); }
