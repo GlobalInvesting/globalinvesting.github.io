@@ -33,21 +33,21 @@
 #ycm-modal::before { display:none; }
 #ycm-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px 8px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);
+  padding:7px 14px 6px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);
 }
 #ycm-title { font-size:12px;font-weight:600;letter-spacing:-.01em;color:var(--text); }
 #ycm-sub   { font-size:9px;color:var(--text2);margin-top:1px;font-family:var(--font-mono);letter-spacing:.02em; }
 #ycm-close { background:none;border:none;color:var(--text2);font-size:16px;cursor:pointer;padding:3px 6px;border-radius:4px;line-height:1;transition:color .1s,background .1s; }
 #ycm-close:hover { color:var(--text);background:var(--bg3); }
 #ycm-strip { display:flex;border-bottom:1px solid var(--border2);flex-shrink:0;overflow-x:auto;background:var(--bg); }
-.ycm-metric { flex:1;min-width:60px;padding:7px 10px;border-right:1px solid var(--border2);background:var(--bg);text-align:center; }
+.ycm-metric { flex:1;min-width:60px;padding:5px 10px;border-right:1px solid var(--border2);background:var(--bg);text-align:center; }
 .ycm-metric:last-child { border-right:none; }
 .ycm-m-lbl { font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;font-family:var(--font-mono); }
 .ycm-m-val { font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text); }
 .ycm-m-val.up { color:var(--up); } .ycm-m-val.down { color:var(--down); }
 .ycm-m-chg { font-size:8px;margin-top:1px;font-family:var(--font-mono);color:var(--text2); }
 .ycm-m-chg.up { color:var(--up); } .ycm-m-chg.down { color:var(--down); }
-#ycm-chart-wrap { flex:1;position:relative;padding:12px 14px 10px;display:flex;flex-direction:column;min-height:200px;background:var(--bg); }
+#ycm-chart-wrap { flex:1;position:relative;padding:8px 14px 4px;display:flex;flex-direction:column;min-height:200px;background:var(--bg); }
 #ycm-legend { display:flex;gap:14px;margin-bottom:8px;flex-shrink:0;flex-wrap:wrap; }
 .ycm-leg-item { display:flex;align-items:center;gap:4px;font-size:8.5px;color:var(--text2);font-family:var(--font-mono); }
 .ycm-leg-dot  { width:16px;height:2px;border-radius:1px;flex-shrink:0; }
@@ -138,7 +138,7 @@ function openYCModal(tenorData) {
   bd.innerHTML = `
 <div id="ycm-modal">
   <div id="ycm-hd">
-    <div><div id="ycm-title">US Treasury Yield Curve</div><div id="ycm-sub">FRED \u00b7 today vs prior close \u00b7 basis points change</div></div>
+    <div><div id="ycm-title"><span class="fi fi-us" style="margin-right:6px;border-radius:2px;font-size:14px;vertical-align:middle;"></span>US Treasury Yield Curve</div><div id="ycm-sub">FRED \u00b7 today vs prior close \u00b7 basis points change</div></div>
     <button id="ycm-close" onclick="closeYCModal()" aria-label="Close">\u00d7</button>
   </div>
   <div id="ycm-strip">${spreadMetrics}${metricsHtml}</div>
