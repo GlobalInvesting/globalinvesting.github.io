@@ -15,13 +15,13 @@
   display:flex;flex-direction:column;
 }
 #cbr-modal::before{display:none;}
-#cbr-m-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);}
+#cbr-m-hd{display:flex;align-items:center;justify-content:space-between;padding:7px 14px 6px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);}
 #cbr-m-title{font-size:12px;font-weight:600;color:var(--text);letter-spacing:-.01em;}
 #cbr-m-sub{font-size:9px;color:var(--text2);margin-top:2px;font-family:var(--font-mono);letter-spacing:.02em;}
 #cbr-m-close{background:none;border:none;color:var(--text2);font-size:16px;cursor:pointer;padding:3px 6px;border-radius:4px;line-height:1;transition:color .1s,background .1s;}
 #cbr-m-close:hover{color:var(--text);background:var(--bg3);}
 #cbr-m-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--bg);border-bottom:1px solid var(--border2);flex-shrink:0;}
-.cbr-mm{background:var(--bg);padding:7px 10px;display:flex;flex-direction:column;gap:1px;border-right:1px solid var(--border2);}
+.cbr-mm{background:var(--bg);padding:5px 10px;display:flex;flex-direction:column;gap:1px;border-right:1px solid var(--border2);}
 .cbr-mm:last-child{border-right:none;}
 .cbr-mm-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-mono);}
 .cbr-mm-val{font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text);}
@@ -46,7 +46,7 @@
 .cbr-cw.fill{flex:1;min-height:0;}
 .cbr-ct{display:none;}
 .cbr-chart-area{flex:1;min-height:0;height:100%;position:relative;}
-.cbr-lw-wrap{width:100%;height:100%;min-height:180px;position:relative;}
+.cbr-lw-wrap{width:100%;height:100%;min-height:220px;position:relative;}
 .cbr-lw-tooltip{position:absolute;display:none;pointer-events:none;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:6px 10px;font-size:10px;line-height:1.5;font-family:var(--font-mono);color:var(--text);z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.4);white-space:nowrap;}
 .cbr-tbl{width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);}
 .cbr-tbl th{text-align:right;color:var(--text2);font-weight:500;font-size:8px;text-transform:uppercase;letter-spacing:.08em;padding:4px 6px 3px;border-bottom:1px solid var(--border2);}
@@ -168,7 +168,7 @@ function _cbrDims(){
   const metH=metrics?metrics.offsetHeight:0;
   const tabH=tabs?tabs.offsetHeight:0;
   const infoH=infoBar?infoBar.offsetHeight:0;
-  const padH=20; // 12px top + 8px bottom padding inside cbr-chart-area
+  const padH=12; // 8px top + 4px bottom padding inside cbr-chart-area
   const h=Math.max(totalH-hdH-metH-tabH-infoH-padH,180);
   // Width: modal width minus price scale area padding (14px each side)
   const w=Math.max(modal.offsetWidth-28,200);
@@ -277,7 +277,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
     <div id="cbr-p-chart" class="cbr-panel on">
       <div class="cbr-cw fill">
         <div class="cbr-ct">POLICY RATE \u00b7 MONTHLY \u00b7 STEP CHART \u00b7 DECISION MARKERS</div>
-        <div class="cbr-chart-area" style="padding:12px 12px 8px;"><div class="cbr-lw-wrap"></div></div>
+        <div class="cbr-chart-area" style="padding:8px 12px 4px;"><div class="cbr-lw-wrap"></div></div>
       </div>
       <div style="flex-shrink:0;border-top:1px solid var(--border,#252d3d);display:grid;grid-template-columns:1fr 1fr;">
         <div style="padding:10px 14px;border-right:1px solid var(--border,#252d3d);"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Next Meeting</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nextMtg}</div><div style="font-size:9px;font-family:var(--font-mono);color:${biasCol};margin-top:2px;">${biasLabel}</div></div>
