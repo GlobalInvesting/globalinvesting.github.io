@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-05-12T10:57:06Z",
+  "generated_at": "2026-05-12T12:24:11Z",
   "signals": [
     {
-      "time": "10:56",
+      "time": "12:23",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry + Intervention Risk",
-      "text": "USD/JPY at 157.55 — Strait of Hormuz closure pushes WTI crude +2.78% to $101.6, driving USD bid via energy-import inflation risk for Japan. Fed 3.75% vs BoJ 0.75% (+300bp) carry sustains the floor despite Iran tensions. JPY COT LF net short -61,340 (36.0% long) remains crowded; intervention risk rises on a sustained break toward 160.00. Carry dominates until VIX > 25.",
+      "title": "USD/CAD — Geopolitical Shock + US CPI",
+      "text": "USD/CAD at 1.3704 as WTI crude surges +3.58% to $101.6 following the Strait of Hormuz closure. Despite CAD's typical correlation with oil, the pair remains bid as the market pivots to US CPI risk and a 150bp Fed-BoC carry advantage. CAD COT LF net short -46,889 (26.4% long) reflects deep institutional bearishness. Geopolitical supply shocks usually support CAD, but the impending US inflation print and risk-off sentiment are currently overriding the energy tailwind. Watch for a break of 1.3750 if US CPI exceeds expectations.",
       "evidence": [
-        "WTI Oil: $101.6 (+3.60%)",
-        "USD/JPY carry: +300bp",
-        "JPY COT LF net: -61,340"
+        "WTI Oil: $101.6 (+3.58%)",
+        "Fed 3.75% vs BoC 2.25% — +150bp",
+        "CAD COT LF net: -46,889"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:53",
+      "time": "12:20",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -19,294 (specs at 18.5% long extreme) vs RBNZ hike bias priced for 27 May. Speculators are aggressively fading a hawkish central bank while NZD/USD holds at 0.5952. If RBNZ delivers a hike or hawkish guidance, short-squeeze risk is elevated as crowded spec shorts unwind. Watch for 0.6000 resistance test.",
+      "title": "USD/JPY — Carry vs Intervention Risk",
+      "text": "USD/JPY at 157.584 testing the upper bound of its recent range as the 300bp Fed-BoJ carry spread sustains the bid. JPY COT LF net short -61,340 (36.0% long) confirms crowded carry positioning. While VIX at 18.8 indicates normal volatility, the z-score of -1.91σ in the USD/JPY vs US 10Y correlation suggests the pair is becoming less sensitive to Treasury yields and more sensitive to intervention headlines. Verbal warnings likely intensify if price holds above 158.00 ahead of the June BoJ meeting.",
+      "evidence": [
+        "Fed 3.75% vs BoJ 0.75% — +300bp",
+        "JPY COT LF net: -61,340",
+        "USD/JPY vs US 10Y z-score: -1.91σ"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "12:18",
+      "priority": "warning",
+      "title": "NZD/USD — COT vs OIS Divergence",
+      "text": "NZD/USD at 0.5950 faces a significant positioning mismatch. COT LF net short is -19,294 with long positioning at an extreme low of 18.5%, while the RBNZ maintains a hawkish bias for the May 27 meeting. This creates a high-conviction short-squeeze profile if the RBNZ signals a hike. The 150bp Fed-NZD carry advantage currently supports USD, but the extreme spec short positioning leaves the pair vulnerable to a rapid reversal on any hawkish RBNZ surprise. Watch 0.6000 for squeeze confirmation.",
       "evidence": [
         "NZD COT long%: 18.5%",
-        "RBNZ bias: Hike",
-        "NZD/USD: 0.5952"
+        "NZD COT LF net: -19,294",
+        "Fed 3.75% vs RBNZ 2.25% — +150bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:51",
-      "priority": "warning",
-      "title": "AUD/JPY — G8 Bilateral Theme + Carry",
-      "text": "AUD/JPY at 113.827 — G8 spread of 0.807% confirms a bilateral theme as AUD outperforms (+0.346%) and JPY lags (-0.461%). RBA 4.35% vs BoJ 0.75% (+360bp) carry advantage drives the divergence. Retail 84% short AUD/JPY diverges from COT LF net long +58,994, suggesting retail is unsuccessfully fading institutional carry flows. Watch for retail capitulation if 114.00 breaks.",
-      "evidence": [
-        "G8 spread: 0.807%",
-        "AUD/JPY carry: +360bp",
-        "Retail: 84% short"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "10:48",
-      "priority": "warning",
-      "title": "GBP/USD — Political Risk + Yield Surge",
-      "text": "GBP/USD at 1.3541 — UK 10Y yields surge to 4.97% as markets price 'Zombie Government' risk following ministerial resignations. Despite BoE 3.75% vs Fed 3.75% (0bp) neutral carry, GBP is underperforming peers as political instability offsets the yield spike. COT LF net long +31,244 (65.3% long) faces liquidation risk if 1.3500 support fails. Watch for US CPI at 12:30 UTC for USD-side volatility.",
-      "evidence": [
-        "UK 10Y: 4.97%",
-        "GBP COT long%: 65.3%",
-        "GBP/USD: 1.3541"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "10:42",
+      "time": "12:15",
       "priority": "info",
-      "title": "USD/CHF — Retail Sentiment Extreme",
-      "text": "USD/CHF at 0.781 — Retail 86% long vs 14% short represents an extreme contrarian reversal risk. This retail positioning diverges from COT LF net short -7,392 (30.5% long), where institutions remain bearish. Fed 3.75% vs SNB 0.0% (+375bp) carry supports USD, but retail crowding suggests upside exhaustion. Watch for a break below 0.7780 to confirm retail washout.",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD/USD at 0.7226 shows a sharp divergence between institutional and retail flows. COT LF net long is +58,994 (78.3% long) while retail sentiment is 84% short. Retail is aggressively fading the institutional trend and the 60bp AUD carry premium provided by the RBA's hiking stance. This divergence typically precedes a continuation of the institutional trend as retail is forced to cover. Support holds at 0.7200; invalidation on a shift in RBA hiking rhetoric at the June 16 meeting.",
       "evidence": [
-        "Retail: 86% long",
-        "CHF COT LF net: -7,392",
-        "USD/CHF carry: +375bp"
+        "AUD COT LF net: +58,994",
+        "Retail Sentiment: 84% short",
+        "RBA 4.35% vs Fed 3.75% — +60bp"
       ],
       "_source": "gemini"
     }
