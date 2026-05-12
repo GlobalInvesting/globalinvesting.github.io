@@ -181,6 +181,10 @@ function _buildCBRChart(data){
   _destroyCBRChart();
   const parent=container.parentElement;
   const{w:initW,h:initH}=_cbrDims();
+  // Set explicit px height on the wrapper so LWC measures it correctly
+  // regardless of whether the flex chain has resolved yet.
+  container.style.width=initW+'px';
+  container.style.height=initH+'px';
   const opts=_cbrLwOptions();
   opts.width=initW;opts.height=initH;
   opts.kineticScroll={touch:false,mouse:false};
@@ -203,12 +207,14 @@ function _buildCBRChart(data){
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
   const apply=()=>{
     const{w,h}=_cbrDims();
-    if(_cbrLwChart&&w>0&&h>10){_cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();}
+    if(_cbrLwChart&&w>0&&h>10){
+      container.style.width=w+'px';container.style.height=h+'px';
+      _cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();
+    }
   };
   // No ResizeObserver — modal is fixed height; canvas observation causes infinite loops.
-  // Single setTimeout covers first-open flex timing; window.resize handles viewport changes.
+  // window.resize handles viewport changes; no setTimeout needed since dimensions set explicitly above.
   window.addEventListener('resize',apply);container._cbrResize=apply;
-  setTimeout(apply,50);
 }
 
 async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
