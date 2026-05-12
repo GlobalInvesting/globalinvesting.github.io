@@ -157,9 +157,15 @@ function _attachCBRTooltip(container,lwChart,mainSeries,fwdSeries,decisions){
 }
 
 function _cbrDims(){
+  // cbr-bd sits inside the rightpanel which has a fixed height (calc(100vh - 92px)).
+  // #cbr-modal is height:auto so its offsetHeight = natural content height, NOT available space.
+  // We must measure the PARENT of cbr-bd (the rightpanel) and subtract the fixed elements above the chart.
+  const bd=document.getElementById('cbr-bd');
+  const panel=bd?bd.parentElement:null;
   const modal=document.getElementById('cbr-modal');
-  if(!modal)return{w:600,h:300};
-  const totalH=modal.offsetHeight;
+  if(!panel||!modal)return{w:600,h:300};
+
+  const totalH=panel.clientHeight; // rightpanel's full height — always resolved
   const hd=document.getElementById('cbr-m-hd');
   const metrics=document.getElementById('cbr-m-metrics');
   const tabs=document.getElementById('cbr-m-tabs');
@@ -168,10 +174,9 @@ function _cbrDims(){
   const metH=metrics?metrics.offsetHeight:0;
   const tabH=tabs?tabs.offsetHeight:0;
   const infoH=infoBar?infoBar.offsetHeight:0;
-  const padH=20; // 12px top + 8px bottom padding inside cbr-chart-area
+  const padH=8; // small safety margin
   const h=Math.max(totalH-hdH-metH-tabH-infoH-padH,180);
-  // Width: modal width minus price scale area padding (14px each side)
-  const w=Math.max(modal.offsetWidth-28,200);
+  const w=Math.max(modal.offsetWidth||panel.clientWidth,200);
   return{w,h};
 }
 
