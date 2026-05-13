@@ -34,7 +34,7 @@ from datetime import datetime, timedelta, timezone
 
 
 BASE_URL = "https://api.frankfurter.app"
-OUTPUT_PATH = os.path.join("site", "fx-data", "frankfurter.json")
+OUTPUT_PATH = os.path.join("fx-data", "frankfurter.json")
 
 # Currencies to fetch (USD base — mirrors what dashboard.js needs)
 ALL_CURRENCIES = "EUR,GBP,JPY,AUD,CAD,CHF,NZD,HKD,SEK,NOK,DKK,SGD,MXN,ZAR,PLN,HUF,CZK,TRY"
