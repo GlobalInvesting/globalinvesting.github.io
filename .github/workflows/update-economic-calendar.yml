@@ -1,0 +1,121 @@
+name: Update Economic Calendar
+
+on:
+  schedule:
+    # 4× daily (UTC) — aligned with major data-release windows:
+    #   05:30 — before London open; captures EU/Asia AM releases
+    #   09:30 — after Asia AM window; captures early EU data
+    #   13:30 — after US morning releases (CPI, NFP typically at 12:30 UTC)
+    #   20:30 — before Sydney/Tokyo open; captures any US afternoon releases
+    - cron: '30 5 * * *'
+    - cron: '30 9 * * *'
+    - cron: '30 13 * * *'
+    - cron: '30 20 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: update-economic-calendar
+  cancel-in-progress: false
+
+jobs:
+  update-economic-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout PUBLIC site repo
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting.github.io
+          token: ${{ secrets.PAT_TOKEN }}
+          path: site
+
+      - name: Checkout THIS private repo (scripts)
+        uses: actions/checkout@v4
+        with:
+          path: engine
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create calendar-data directory
+        run: mkdir -p site/calendar-data
+
+      - name: Fetch TradingEconomics economic calendar
+        working-directory: site
+        run: python ../engine/scripts/fetch_economic_calendar.py
+
+      - name: Display summary
+        if: always()
+        working-directory: site
+        run: |
+          echo ""
+          echo "========================================"
+          echo "    ECONOMIC CALENDAR FETCH SUMMARY"
+          echo "========================================"
+          if [ -f "calendar-data/calendar.json" ]; then
+            python3 -c "
+          import json
+          from datetime import datetime, timezone, timedelta
+          with open('calendar-data/calendar.json') as f:
+              cal = json.load(f)
+          events = cal.get('events', [])
+          today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+          cutoff_90 = (datetime.now(timezone.utc) - timedelta(days=90)).strftime('%Y-%m-%d')
+          released_90  = [e for e in events if e.get('actual') and e.get('dateISO','') >= cutoff_90]
+          beat_miss_90 = [e for e in released_90 if e.get('forecast')]
+          high_today   = [e for e in events if e.get('impact') == 'high' and e.get('dateISO') == today]
+          print(f'  Source: {cal.get(\"source\",\"unknown\")}')
+          print(f'  Total events: {len(events)}')
+          print(f'  Released (90d): {len(released_90)} | with beat/miss data: {len(beat_miss_90)}')
+          print(f'  High-impact today ({today}): {len(high_today)}')
+          for e in high_today:
+              print(f'    {e[\"timeUTC\"]} [{e[\"currency\"]}] {e[\"event\"][:45]} | actual={e.get(\"actual\") or \"pending\"} forecast={e.get(\"forecast\") or \"—\"}')
+          "
+          else
+            echo "  calendar.json not found — fetch may have failed"
+          fi
+
+      - name: Commit and push
+        working-directory: site
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp calendar-data/calendar.json /tmp/calendar_fresh.json
+          BEAT_MISS=$(python3 -c "
+          import json
+          from datetime import datetime, timezone, timedelta
+          c = json.load(open('/tmp/calendar_fresh.json'))
+          cutoff = (datetime.now(timezone.utc) - timedelta(days=90)).strftime('%Y-%m-%d')
+          n = sum(1 for e in c['events'] if e.get('actual') and e.get('forecast') and e.get('dateISO','') >= cutoff)
+          print(f'{n} beat/miss events (90d)')
+          " 2>/dev/null || echo "updated")
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Push attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p calendar-data
+            cp /tmp/calendar_fresh.json calendar-data/calendar.json
+            git add calendar-data/calendar.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "Economic calendar ${TIMESTAMP} — ${BEAT_MISS}"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data refreshes on next scheduled run."
+          exit 0
