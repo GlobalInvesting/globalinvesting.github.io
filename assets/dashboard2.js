@@ -9127,96 +9127,49 @@ function toggleAlertsPopover() {
     });
   }
 
-  var _resizeTimer = null;
   window.addEventListener('resize', function(){
     btn.style.display = isMobile() ? 'none' : '';
     if(isMobile() && main.classList.contains('split-layout')){
       applyState(false);
-      return;
     }
-    // Debounced reflow: re-apply split state after resize settles (covers monitor
-    // transitions where 100vh changes and flex widths need recalculation).
-    clearTimeout(_resizeTimer);
-    _resizeTimer = setTimeout(function(){
-      if(main.classList.contains('split-layout')){
-        var pct = upper && main.offsetWidth > 0
-          ? parseFloat((upper.offsetWidth / main.offsetWidth * 100).toFixed(1))
-          : 55;
-        if(isNaN(pct) || pct <= 0 || pct >= 100) pct = 55;
-        applyState(true, pct);
-        // Force LW chart to resize to its container after layout settles
-        if(typeof _lwChart !== 'undefined' && _lwChart){
-          try{
-            var tw = document.getElementById('tv-chart-wrap');
-            if(tw && tw.offsetWidth > 0 && tw.offsetHeight > 0){
-              _lwChart.resize(tw.offsetWidth, tw.offsetHeight);
-            }
-          }catch(_){}
-        }
-        if(typeof drawLiquidityChart === 'function') drawLiquidityChart();
-        if(typeof drawYieldCurve === 'function'){
-          drawYieldCurve(
-            typeof _lastDrawnYields !== 'undefined' ? _lastDrawnYields : null,
-            typeof _lastDrawnPrior  !== 'undefined' ? _lastDrawnPrior  : null
-          );
-        }
-      }
-    }, 120);
   });
 
-  // ── Monitor-transition layout flush ──────────────────────────────────────
-  // When the browser moves between screens with different DPR or resolution,
-  // the resize event fires but canvas-based charts and flex containers sized
-  // via calc(100vh - Npx) don't always reflow correctly. We detect the DPR
-  // change and force a synchronous layout flush by toggling a CSS property.
-  (function _watchDPR(){
-    var lastDPR = window.devicePixelRatio;
-    function _onDPRChange(){
-      var newDPR = window.devicePixelRatio;
-      if(Math.abs(newDPR - lastDPR) > 0.01){
-        lastDPR = newDPR;
-        // Force layout flush: toggle display on #main to invalidate cached geometry
-        if(main){
-          main.style.display = 'none';
-          // Reading offsetHeight forces a synchronous reflow before we restore display
-          void main.offsetHeight;
-          main.style.display = '';
-        }
-        // Reapply split state to recalculate widths on new viewport
-        if(main.classList.contains('split-layout')){
-          var pct = upper ? parseFloat((upper.offsetWidth / main.offsetWidth * 100).toFixed(1)) || 55 : 55;
-          applyState(true, pct);
-        }
-        // Redraw canvas charts at correct DPR
-        if(typeof drawLiquidityChart === 'function') drawLiquidityChart();
-        if(typeof drawYieldCurve === 'function') drawYieldCurve(
-          typeof _lastDrawnYields !== 'undefined' ? _lastDrawnYields : null,
-          typeof _lastDrawnPrior  !== 'undefined' ? _lastDrawnPrior  : null
-        );
-        if(typeof _lwChart !== 'undefined' && _lwChart){
-          try{
-            var cw = document.getElementById('lw-chart-div') || (typeof chartDiv !== 'undefined' ? chartDiv : null);
-            if(cw) _lwChart.resize(cw.offsetWidth, cw.offsetHeight);
-          }catch(_){}
-        }
-      }
-      // Re-register for next DPR change (matchMedia fires once per threshold crossing)
-      try{
-        window.matchMedia('screen and (resolution: ' + newDPR + 'dppx)')
-          .addEventListener('change', _onDPRChange, {once:true});
-      }catch(e){
-        // Fallback: poll every 2s (very low cost — just a number comparison)
-        setTimeout(_watchDPR, 2000);
+  // ── Monitor-transition: reload on screen change ───────────────────────────
+  // When the browser window moves to a monitor with a different resolution or
+  // DPR, the CSS grid layout (#layout: 180px minmax(0,1fr) 220px) can enter an
+  // irrecoverable broken state where #main collapses to ~220px. No JS reflow
+  // can reliably fix a broken grid mid-paint. The correct solution is to reload
+  // the page when a screen change is detected. The reload is fast (all assets
+  // are cached) and the user returns to the same state via localStorage.
+  (function _watchScreenChange(){
+    var _lastW = window.screen.width;
+    var _lastH = window.screen.height;
+    var _lastDPR = window.devicePixelRatio;
+    var _reloadPending = false;
+
+    function _onScreenChange(){
+      if(_reloadPending) return;
+      var w = window.screen.width;
+      var h = window.screen.height;
+      var dpr = window.devicePixelRatio;
+      // Only reload if screen dimensions changed (rules out normal browser resize)
+      if(w !== _lastW || h !== _lastH || Math.abs(dpr - _lastDPR) > 0.05){
+        _reloadPending = true;
+        // Small delay so the browser finishes moving the window before reload
+        setTimeout(function(){ window.location.reload(); }, 300);
       }
     }
+
+    // Primary: matchMedia on DPR — fires reliably on monitor change
     try{
-      window.matchMedia('screen and (resolution: ' + lastDPR + 'dppx)')
-        .addEventListener('change', _onDPRChange, {once:true});
-    }catch(e){
-      setInterval(function(){
-        if(Math.abs(window.devicePixelRatio - lastDPR) > 0.01) _onDPRChange();
-      }, 2000);
-    }
+      var _mq = window.matchMedia('(resolution: ' + _lastDPR + 'dppx)');
+      _mq.addEventListener('change', _onScreenChange);
+    }catch(e){}
+
+    // Secondary: poll screen dimensions every 2s as fallback
+    setInterval(function(){
+      if(!_reloadPending) _onScreenChange();
+    }, 2000);
   })();
 
   if(handle){
