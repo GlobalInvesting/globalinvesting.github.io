@@ -255,12 +255,18 @@ function _cbrDims(){
   const hd=document.getElementById('cbr-m-hd');
   const metrics=document.getElementById('cbr-m-metrics');
   const tabs=document.getElementById('cbr-m-tabs');
-  const infoBar=document.querySelector('#cbr-p-chart [style*="grid-template-columns:1fr 1fr"]');
+  const infoBar=document.querySelector('#cbr-p-chart .cbr-next-fwd');
   const hdH=hd?hd.offsetHeight:0;
   const metH=metrics?metrics.offsetHeight:0;
   const tabH=tabs?tabs.offsetHeight:0;
   const infoH=infoBar?infoBar.offsetHeight:0;
   const padH=12; // 8px top + 4px bottom padding inside cbr-chart-area
+  // On mobile the modal has height:auto — totalH includes the chart itself which creates
+  // an infinite-expand loop. Use a fixed chart height on narrow viewports instead.
+  if(window.innerWidth<=600){
+    const w=Math.max(modal.offsetWidth-28,200);
+    return{w,h:220};
+  }
   const h=Math.max(totalH-hdH-metH-tabH-infoH-padH,180);
   // Width: modal width minus price scale area padding (14px each side)
   const w=Math.max(modal.offsetWidth-28,200);

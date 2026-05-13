@@ -118,7 +118,7 @@
 #p-overview .cot-ov-spark-top { display:flex;justify-content:space-between;margin-bottom:8px;padding:0 14px; }
 #p-overview .cot-ov-spark-trend { font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
 #p-overview .cot-ov-spark-row .cot-spark { max-width:100%;width:100%;height:72px;display:block;box-sizing:border-box; }
-#cot-ov-spark-lw { width:100%;box-sizing:border-box;overflow:hidden; }
+#cot-ov-spark-lw { width:100%;max-width:100%!important;box-sizing:border-box;overflow:hidden; }
 
 #p-net.on .cot-cw,
 #p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
@@ -263,60 +263,79 @@ function _buildSparklineChart(container, history, nWeeks) {
   const topFill  = isPos ? 'rgba(38,198,176,0.18)' : 'rgba(239,83,80,0.18)';
   const botFill  = isPos ? 'rgba(38,198,176,0.0)'  : 'rgba(239,83,80,0.0)';
 
-  const W = container.offsetWidth || 300;
-  const chart = LWC.createChart(container, {
-    width: W, height: 72,
-    layout: {
-      background: { type: 'solid', color: '#131722' },
-      textColor: '#6e7681',
-      attributionLogo: false,
-    },
-    grid: { vertLines: { visible: false }, horzLines: { visible: false } },
-    crosshair: {
-      mode: LWC.CrosshairMode?.Normal ?? 1,
-      vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
-      horzLine: { visible: false, labelVisible: false },
-    },
-    rightPriceScale: { visible: false },
-    leftPriceScale:  { visible: false },
-    timeScale: { visible: false, borderVisible: false },
-    handleScroll: false,
-    handleScale:  false,
-  });
-  _cotLwCharts.push(chart);
+  // Defer chart creation until browser has laid out the container at its real width.
+  // Using rAF twice ensures CSS has resolved (avoids 200px max-width from base rule).
+  const _create = () => {
+    // Force container to full width before measuring
+    container.style.width = '100%';
+    container.style.maxWidth = '100%';
+    const W = container.getBoundingClientRect().width || container.offsetWidth || 300;
+    const CHART_H = 72;
+    const chart = LWC.createChart(container, {
+      width: W, height: CHART_H,
+      layout: {
+        background: { type: 'solid', color: '#131722' },
+        textColor: '#6e7681',
+        attributionLogo: false,
+      },
+      grid: { vertLines: { visible: false }, horzLines: { visible: false } },
+      crosshair: {
+        mode: LWC.CrosshairMode?.Normal ?? 1,
+        vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
+        horzLine: { visible: false, labelVisible: false },
+      },
+      rightPriceScale: { visible: false },
+      leftPriceScale:  { visible: false },
+      timeScale: { visible: false, borderVisible: false },
+      handleScroll: false,
+      handleScale:  false,
+    });
+    _cotLwCharts.push(chart);
 
-  // Synthesise weekly dates — work backwards from today
-  const today = new Date();
-  const times = vals.map((_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (vals.length - 1 - i) * 7);
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  });
+    // Synthesise weekly dates — work backwards from today
+    const today = new Date();
+    const times = vals.map((_, i) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() - (vals.length - 1 - i) * 7);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    });
 
-  const area = chart.addSeries(LWC.AreaSeries, {
-    lineColor: lineCol,
-    topColor:    topFill,
-    bottomColor: botFill,
-    lineWidth: 2,
-    priceLineVisible: false,
-    lastValueVisible: false,
-    crosshairMarkerRadius: 4,
-    crosshairMarkerBorderWidth: 1,
-    crosshairMarkerBorderColor: '#131722',
-    crosshairMarkerBackgroundColor: lineCol,
-  });
-  area.setData(times.map((t, i) => ({ time: t, value: vals[i] })));
-  chart.timeScale().fitContent();
+    const area = chart.addSeries(LWC.AreaSeries, {
+      lineColor: lineCol,
+      topColor:    topFill,
+      bottomColor: botFill,
+      lineWidth: 2,
+      priceLineVisible: false,
+      lastValueVisible: false,
+      crosshairMarkerRadius: 4,
+      crosshairMarkerBorderWidth: 1,
+      crosshairMarkerBorderColor: '#131722',
+      crosshairMarkerBackgroundColor: lineCol,
+    });
+    area.setData(times.map((t, i) => ({ time: t, value: vals[i] })));
+    chart.timeScale().fitContent();
 
-  // Tooltip
-  _mkTooltip(container, chart, () => area, param => {
-    const v = param.seriesData.get(area);
-    if (!v) return null;
-    return `<div>${_cotFmt(v.value)}</div>`;
-  });
+    // Tooltip
+    _mkTooltip(container, chart, () => area, param => {
+      const v = param.seriesData.get(area);
+      if (!v) return null;
+      return `<div>${_cotFmt(v.value)}</div>`;
+    });
 
-  // Resize observer
-  _lwResize(container, chart);
+    // Resize — width only; height stays locked at CHART_H to prevent vertical expand
+    const apply = () => {
+      requestAnimationFrame(() => {
+        const rect = container.getBoundingClientRect();
+        const w = Math.round(rect.width) || container.offsetWidth || 300;
+        if (chart && w > 0) chart.applyOptions({ width: w, height: CHART_H });
+      });
+    };
+    if (window.ResizeObserver) { const ro = new ResizeObserver(() => apply()); ro.observe(container); container._lwRo = ro; }
+    window.addEventListener('resize', apply); container._lwResize = apply;
+    setTimeout(apply, 60); setTimeout(apply, 300);
+  };
+
+  requestAnimationFrame(() => requestAnimationFrame(_create));
 }
 
 function _cotTrendLabel(history) {
