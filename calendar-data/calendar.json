@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-13T12:56:03Z",
-  "generatedAt": "2026-05-13T12:56:03Z",
+  "lastUpdate": "2026-05-13T16:01:43Z",
+  "generatedAt": "2026-05-13T16:01:43Z",
   "fetchMode": "ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-05-14",
-  "totalEvents": 512,
+  "totalEvents": 513,
   "currencyCounts": {
     "GBP": 69,
     "CHF": 16,
     "EUR": 90,
     "CAD": 29,
-    "USD": 218,
+    "USD": 219,
     "AUD": 30,
     "JPY": 51,
     "NZD": 9
   },
   "impactCounts": {
     "medium": 392,
-    "high": 120
+    "high": 121
   },
   "events": [
     {
@@ -6607,6 +6607,19 @@
       "date": "13 May",
       "dateISO": "2026-05-13",
       "timeUTC": "16:29",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Chair Nomination Vote",
+      "impact": "high",
+      "actual": null,
+      "forecast": "Pass",
+      "previous": null
+    },
+    {
+      "date": "13 May",
+      "dateISO": "2026-05-13",
+      "timeUTC": "18:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
