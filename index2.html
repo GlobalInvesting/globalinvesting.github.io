@@ -1084,29 +1084,30 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </tbody>
     </table>
 
-    <!-- ECONOMIC SURPRISES — derived from calendar vs yfinance reaction -->
-    <!-- Replaces Positioning Bias CBOE/CME panel (redundant with Derivatives section) -->
+    <!-- ECONOMIC SURPRISES — TradingEconomics authenticated API, beat/miss vs consensus, G8 -->
     <div id="section-econ-surprise" style="border-top:1px solid var(--border);padding:6px 0 0;">
       <div class="sb-head" style="margin-bottom:2px;">Economic Surprises</div>
-      <div style="padding:0 8px 2px;font-size:9px;color:var(--text3);">Calendar outcome vs prior · price reaction proxy · weekly</div>
-      <table id="econ-surprise-table" aria-label="Economic surprise index by currency" style="width:100%;">
+      <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · G8 · 90d rolling</div>
+      <table id="econ-surprise-table" aria-label="Economic surprise index by G8 currency" style="width:100%;border-collapse:collapse;">
         <thead>
           <tr>
-            <th style="text-align:left;font-size:9px;" scope="col">CCY</th>
-            <th style="font-size:9px;text-align:right;" scope="col" title="Net surprise score: events beating consensus vs missing">Score</th>
-            <th style="font-size:9px;text-align:right;" scope="col" title="Directional bias implied by recent surprises">Bias</th>
+            <th style="text-align:left;font-size:9px;padding:1px 8px;" scope="col">CCY</th>
+            <th style="font-size:9px;text-align:center;padding:1px 4px;width:80px;" scope="col" title="Normalised surprise index: positive = data beating consensus, negative = missing">Index</th>
+            <th style="font-size:9px;text-align:right;padding:1px 8px;width:36px;" scope="col" title="Number of events with actuals in 90d window">N</th>
           </tr>
         </thead>
         <tbody id="econ-surprise-tbody">
-          <tr><td>USD</td><td style="text-align:right;color:var(--text3);">—</td><td style="text-align:right;color:var(--text3);">—</td></tr>
-          <tr><td>EUR</td><td style="text-align:right;color:var(--text3);">—</td><td style="text-align:right;color:var(--text3);">—</td></tr>
-          <tr><td>GBP</td><td style="text-align:right;color:var(--text3);">—</td><td style="text-align:right;color:var(--text3);">—</td></tr>
-          <tr><td>JPY</td><td style="text-align:right;color:var(--text3);">—</td><td style="text-align:right;color:var(--text3);">—</td></tr>
-          <tr><td>AUD</td><td style="text-align:right;color:var(--text3);">—</td><td style="text-align:right;color:var(--text3);">—</td></tr>
-          <tr><td>CAD</td><td style="text-align:right;color:var(--text3);">—</td><td style="text-align:right;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">USD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">EUR</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">GBP</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">JPY</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">AUD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">CAD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">CHF</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">NZD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
         </tbody>
       </table>
-      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">ForexFactory · calendar beat/miss vs consensus · 21d rolling</div>
+      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">TradingEconomics · beat/miss vs consensus · 90d rolling</div>
     </div>
 
     <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
@@ -1235,7 +1236,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/dashboard2.js?v=7.75.0" defer></script>
+<script src="assets/dashboard2.js?v=7.76.0" defer></script>
 <script src="assets/cot-modal2.js?v=7.74.43" defer></script>
 <script src="assets/cb-rates-modal2.js?v=7.74.43" defer></script>
 <script src="assets/real-carry-modal2.js?v=2.7.5" defer></script>
