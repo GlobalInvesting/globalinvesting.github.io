@@ -9905,151 +9905,152 @@ async function renderSovereignSpreads() {
   tbody.dataset.loaded = '2';
 }
 
-// ── Economic Surprises — derived from calendar.json (TradingEconomics) ──
+// ── Economic Surprises — CESI-style centred bar index (v7.76.0) ──────────────
+// Methodology: for each G8 currency, computes a normalised surprise index over
+// a 90-day rolling window from TradingEconomics calendar (actual vs consensus).
+// Index = (beats − misses) / total scored, scaled to [−100, +100].
+// Bar chart centred at 0: green bar extends right for positive, red bar extends
+// left for negative — matching Citi CESI / Bloomberg BEEI visual convention.
+// N column shows count of events with actuals (sample size transparency).
 async function renderEconSurprises() {
   const tbody = document.getElementById('econ-surprise-tbody');
   if (!tbody) return;
 
-  // Primary: calendar.json — updated 4x/day by fetch_economic_calendar.py (TradingEconomics)
-  // Returns actuals for released events. 90-day rolling window.
-  // Fallback: ff_calendar.json — forward-looking only, actuals not available in FF JSON API.
-  // calendar.json schema: { events: [{ event, currency, dateISO, timeUTC, impact, actual, forecast, previous }] }
-  let calData = null;
-  let calSource = '';
-  let calMaxDate = '';
-  const LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000; // 90-day rolling window
   const nowMs = Date.now();
+  const LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 
-  // ── Primary: calendar.json (TradingEconomics) ─────────────────────────────
+  // ── Load calendar.json (TradingEconomics, authenticated) ──────────────────
+  let calEvents = [];
+  let calSource = '';
   try {
     const res = await fetch('./calendar-data/calendar.json').catch(() => null);
     if (res?.ok) {
       const calj = await res.json();
-      const normalised = (calj?.events || []).map(ev => ({
+      const evts = (calj?.events || []).map(ev => ({
         title:    ev.event || ev.title || '',
-        currency: ev.currency,
+        currency: ev.currency || '',
         dateISO:  ev.dateISO || '',
-        timeUTC:  ev.timeUTC || '00:00',
         impact:   ev.impact || 'low',
         forecast: ev.forecast || null,
         previous: ev.previous || null,
         actual:   ev.actual || null,
         released: !!(ev.actual && ev.actual !== '' && ev.actual !== '-'),
       }));
-      const hasReleased = normalised.some(ev => {
-        const t = new Date(ev.dateISO || '').getTime();
+      const hasReleased = evts.some(ev => {
+        const t = new Date(ev.dateISO).getTime();
         return !isNaN(t) && nowMs - t <= LOOKBACK_MS && ev.released;
       });
-      if (hasReleased) {
-        calData = { events: normalised };
-        calSource = calj.source || 'TradingEconomics';
-        calMaxDate = normalised
-          .filter(ev => ev.released)
-          .reduce((acc, ev) => ev.dateISO > acc ? ev.dateISO : acc, '');
-      }
+      if (hasReleased) { calEvents = evts; calSource = calj.source || 'TradingEconomics'; }
     }
-  } catch { /* ignore */ }
+  } catch { /* graceful */ }
 
-  // ── Fallback: ff_calendar.json (ForexFactory — forward calendar only) ──────
-  if (!calData) {
+  // ── Fallback: ff_calendar.json ────────────────────────────────────────────
+  if (!calEvents.length) {
     try {
       const res2 = await fetch('./calendar-data/ff_calendar.json').catch(() => null);
       if (res2?.ok) {
         const ffj = await res2.json();
         const win21 = 21 * 24 * 60 * 60 * 1000;
-        const hasReleased = (ffj?.events || []).some(ev => {
-          const t = new Date(ev.dateISO || '').getTime();
+        const evts = (ffj?.events || []).map(ev => ({
+          title: ev.event || ev.title || '', currency: ev.currency || '',
+          dateISO: ev.dateISO || '', impact: ev.impact || 'low',
+          forecast: ev.forecast || null, previous: ev.previous || null,
+          actual: ev.actual || null,
+          released: !!(ev.actual && ev.actual !== '' && ev.actual !== '-'),
+        }));
+        const hasReleased = evts.some(ev => {
+          const t = new Date(ev.dateISO).getTime();
           return !isNaN(t) && nowMs - t <= win21 && ev.released && ev.actual != null;
         });
-        if (hasReleased) { calData = ffj; calSource = 'ForexFactory'; }
+        if (hasReleased) { calEvents = evts; calSource = 'ForexFactory'; }
       }
     } catch { /* no fallback */ }
   }
 
-  // Update source footer
+  // ── Source label ──────────────────────────────────────────────────────────
   const srcEl = document.getElementById('econ-surprise-source');
   if (srcEl) {
-    if (calSource && calSource !== 'ForexFactory' && calMaxDate) {
-      srcEl.textContent = `TradingEconomics · beat/miss vs consensus · 90d rolling`;
+    if (calSource === 'TradingEconomics') {
+      srcEl.textContent = 'TradingEconomics · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
-      srcEl.textContent = 'ForexFactory · calendar beat/miss vs consensus · 21d rolling';
+      srcEl.textContent = 'ForexFactory · actual vs consensus · 21d rolling';
     } else {
       srcEl.textContent = 'Calendar data unavailable';
     }
   }
 
-  // Build surprise score per currency:
-  // For each past released event with actual & forecast: beat = actual > forecast
-  // Fallback: if no released events, use upcoming high-impact events to show schedule
-  const inverseIndicators = ['unemployment', 'jobless', 'claims', 'deficit'];
+  // ── Score per currency ────────────────────────────────────────────────────
+  // Inverse indicators: a lower actual is a positive surprise (e.g. unemployment fell)
+  const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit', 'trade balance'];
   const ccyScores = {};
-  const ccyUpcoming = {}; // count of high-impact events in next 7 days
-  const now = Date.now();
-  const windowMs = 90 * 24 * 60 * 60 * 1000; // 90-day lookback (matches TradingEconomics rolling window)
-  const fwdWindowMs = 7 * 24 * 60 * 60 * 1000; // 7-day forward
 
-  (calData?.events || []).forEach(ev => {
-    // Correct field names: dateISO (not date), title (not event), currency (correct)
-    const evTime = new Date(ev.dateISO || ev.date || ev.datetime).getTime();
-    if (isNaN(evTime)) return;
-    const ccy = ev.currency;
-    if (!ccy) return;
-
-    // Forward-looking: count high-impact upcoming events per currency
-    if (evTime > now && evTime - now <= fwdWindowMs) {
-      if (ev.impact === 'high' || ev.impact === 'medium') {
-        ccyUpcoming[ccy] = (ccyUpcoming[ccy] || 0) + 1;
-      }
-    }
-
-    // Past events: score actual vs forecast
-    if (evTime > now || now - evTime > windowMs) return;
+  calEvents.forEach(ev => {
+    const evTime = new Date(ev.dateISO).getTime();
+    if (isNaN(evTime) || evTime > nowMs || nowMs - evTime > LOOKBACK_MS) return;
     if (!ev.released || ev.actual == null) return;
-    const actual = parseFloat(String(ev.actual).replace('%',''));
-    const forecast = parseFloat(String(ev.forecast || ev.previous || '').replace('%',''));
+    const ccy = ev.currency;
+    if (!['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].includes(ccy)) return;
+
+    const actualStr   = String(ev.actual   || '').replace(/[%,]/g,'');
+    const forecastStr = String(ev.forecast || ev.previous || '').replace(/[%,]/g,'');
+    const actual   = parseFloat(actualStr);
+    const forecast = parseFloat(forecastStr);
     if (isNaN(actual) || isNaN(forecast)) return;
-    const isInverse = inverseIndicators.some(kw => (ev.title || '').toLowerCase().includes(kw));
+
+    const isInverse = INVERSE_KW.some(kw => ev.title.toLowerCase().includes(kw));
     const beat = isInverse ? actual < forecast : actual > forecast;
     const miss = isInverse ? actual > forecast : actual < forecast;
+
     if (!ccyScores[ccy]) ccyScores[ccy] = { beats: 0, misses: 0, total: 0 };
     ccyScores[ccy].total++;
     if (beat) ccyScores[ccy].beats++;
     if (miss) ccyScores[ccy].misses++;
   });
 
-  const order = ['USD','EUR','GBP','JPY','AUD','CAD'];
+  // ── Normalise to [−100, +100] index (Citi CESI convention) ───────────────
+  // index = (beats − misses) / total × 100
+  // Bar fill: 50% of bar width per side (each side = 50% of container)
+  const G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
   const rows = tbody.querySelectorAll('tr');
-  order.forEach((ccy, idx) => {
+
+  G8.forEach((ccy, idx) => {
     const row = rows[idx];
     if (!row) return;
     const tds = row.querySelectorAll('td');
+    const barFill = row.querySelector('.es-bar-fill');
     const s = ccyScores[ccy];
-    const upcoming = ccyUpcoming[ccy] || 0;
+
     if (!s || s.total === 0) {
-      // No released data yet — show upcoming event count as context
-      if (tds[1]) {
-        tds[1].textContent = upcoming > 0 ? `${upcoming} due` : '—';
-        tds[1].style.color = 'var(--text3)';
-        tds[1].style.textAlign = 'right';
-        tds[1].title = upcoming > 0 ? `${upcoming} medium/high impact events due in next 7 days` : 'No released data in last 21 days';
-      }
-      if (tds[2]) { tds[2].textContent = upcoming > 0 ? 'Watch' : '—'; tds[2].style.color = 'var(--text3)'; tds[2].style.textAlign = 'right'; }
+      // No data — neutral empty bar
+      if (barFill) { barFill.style.width = '0%'; barFill.style.left = '50%'; barFill.style.background = 'var(--border2)'; }
+      if (tds[2]) { tds[2].textContent = '—'; tds[2].style.color = 'var(--text3)'; }
+      row.title = `${ccy}: no released events with actuals in 90d window`;
       return;
     }
-    const score = s.beats - s.misses;
-    const pct = (s.beats / s.total * 100).toFixed(0);
-    if (tds[1]) {
-      tds[1].textContent = (score >= 0 ? '+' : '') + score + ' (' + pct + '%)';
-      tds[1].style.color = score > 0 ? 'var(--up)' : score < 0 ? 'var(--down)' : 'var(--text2)';
-      tds[1].style.textAlign = 'right';
-      tds[1].title = `${s.beats} beat, ${s.misses} miss, ${s.total - s.beats - s.misses} in-line · last 21 days`;
+
+    // Normalised index −100 to +100
+    const idx100 = ((s.beats - s.misses) / s.total) * 100;
+    // Bar: max half-width = 50% of container (the zero line is at 50%)
+    const halfPct = Math.min(Math.abs(idx100), 100) / 2; // 0–50%
+    const positive = idx100 >= 0;
+    const color = positive ? 'var(--up)' : 'var(--down)';
+
+    if (barFill) {
+      barFill.style.width  = halfPct.toFixed(1) + '%';
+      barFill.style.left   = positive ? '50%' : (50 - halfPct).toFixed(1) + '%';
+      barFill.style.background = color;
     }
+
+    // N column
     if (tds[2]) {
-      const bias = score > 1 ? 'Positive' : score < -1 ? 'Negative' : 'Neutral';
-      tds[2].textContent = bias;
-      tds[2].style.color = score > 1 ? 'var(--up)' : score < -1 ? 'var(--down)' : 'var(--text3)';
-      tds[2].style.textAlign = 'right';
+      tds[2].textContent = s.total;
+      tds[2].style.color = 'var(--text3)';
     }
+
+    // Row tooltip
+    const pct = (s.beats / s.total * 100).toFixed(0);
+    const inLine = s.total - s.beats - s.misses;
+    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)}`;
   });
 }
 

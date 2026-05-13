@@ -1674,3 +1674,30 @@ a:focus-visible,
     transform: translateX(-50%) translateY(0);
   }
 }
+
+/* ── Economic Surprises panel — CESI-style bar chart (v7.76.0) ── */
+.es-bar-wrap {
+  position: relative;
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: visible;
+  /* Centre-line marker */
+}
+.es-bar-wrap::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  width: 1px;
+  height: 8px;
+  background: var(--border2);
+  border-radius: 0;
+}
+.es-bar-fill {
+  position: absolute;
+  top: 0;
+  height: 6px;
+  border-radius: 2px;
+  transition: width 0.35s ease, background 0.35s ease, left 0.35s ease;
+}
