@@ -9905,57 +9905,63 @@ async function renderSovereignSpreads() {
   tbody.dataset.loaded = '2';
 }
 
-// ── Economic Surprises — derived from ff_calendar.json + yfinance price reaction ──
+// ── Economic Surprises — derived from calendar.json (TradingEconomics) ──
 async function renderEconSurprises() {
   const tbody = document.getElementById('econ-surprise-tbody');
   if (!tbody) return;
 
-  // Load ForexFactory calendar — primary: ff_calendar.json, fallback: calendar.json
-  // ff_calendar.json: { events: [{ title, currency, dateISO, timeUTC, impact, forecast, previous, actual, released }] }
-  // calendar.json:    { events: [{ event, currency, dateISO, impact, actual, forecast, previous }] }
+  // Primary: calendar.json — updated 4x/day by fetch_economic_calendar.py (TradingEconomics)
+  // Returns actuals for released events. 90-day rolling window.
+  // Fallback: ff_calendar.json — forward-looking only, actuals not available in FF JSON API.
+  // calendar.json schema: { events: [{ event, currency, dateISO, timeUTC, impact, actual, forecast, previous }] }
   let calData = null;
-  let calSource = 'ForexFactory';
+  let calSource = '';
   let calMaxDate = '';
+  const LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000; // 90-day rolling window
+  const nowMs = Date.now();
+
+  // ── Primary: calendar.json (TradingEconomics) ─────────────────────────────
   try {
-    const res = await fetch('./calendar-data/ff_calendar.json').catch(() => null);
+    const res = await fetch('./calendar-data/calendar.json').catch(() => null);
     if (res?.ok) {
-      const ffj = await res.json();
-      // Only use ff_calendar if it has released events with actuals in last 21 days
-      const nowMs = Date.now();
-      const win21 = 21 * 24 * 60 * 60 * 1000;
-      const hasReleased = (ffj?.events || []).some(ev => {
+      const calj = await res.json();
+      const normalised = (calj?.events || []).map(ev => ({
+        title:    ev.event || ev.title || '',
+        currency: ev.currency,
+        dateISO:  ev.dateISO || '',
+        timeUTC:  ev.timeUTC || '00:00',
+        impact:   ev.impact || 'low',
+        forecast: ev.forecast || null,
+        previous: ev.previous || null,
+        actual:   ev.actual || null,
+        released: !!(ev.actual && ev.actual !== '' && ev.actual !== '-'),
+      }));
+      const hasReleased = normalised.some(ev => {
         const t = new Date(ev.dateISO || '').getTime();
-        return !isNaN(t) && nowMs - t <= win21 && ev.released && ev.actual != null;
+        return !isNaN(t) && nowMs - t <= LOOKBACK_MS && ev.released;
       });
-      if (hasReleased) { calData = ffj; calSource = 'ForexFactory'; }
+      if (hasReleased) {
+        calData = { events: normalised };
+        calSource = calj.source || 'TradingEconomics';
+        calMaxDate = normalised
+          .filter(ev => ev.released)
+          .reduce((acc, ev) => ev.dateISO > acc ? ev.dateISO : acc, '');
+      }
     }
   } catch { /* ignore */ }
 
-  // Fallback to calendar.json (broader history, different schema)
+  // ── Fallback: ff_calendar.json (ForexFactory — forward calendar only) ──────
   if (!calData) {
     try {
-      const res2 = await fetch('./calendar-data/calendar.json').catch(() => null);
+      const res2 = await fetch('./calendar-data/ff_calendar.json').catch(() => null);
       if (res2?.ok) {
-        const calj = await res2.json();
-        // Normalize to ff_calendar schema
-        const normalised = (calj?.events || []).map(ev => ({
-          title:    ev.event || ev.title || '',
-          currency: ev.currency,
-          dateISO:  ev.dateISO || '',
-          timeUTC:  ev.timeUTC || '00:00',
-          impact:   ev.impact || 'low',
-          forecast: ev.forecast || null,
-          previous: ev.previous || null,
-          actual:   ev.actual || null,
-          released: !!(ev.actual && ev.actual !== '' && ev.actual !== '-'),
-        }));
-        if (normalised.some(ev => ev.released && ev.actual)) {
-          calData = { events: normalised };
-          calSource = 'calendar';
-          calMaxDate = normalised
-            .filter(ev => ev.released)
-            .reduce((acc, ev) => ev.dateISO > acc ? ev.dateISO : acc, '');
-        }
+        const ffj = await res2.json();
+        const win21 = 21 * 24 * 60 * 60 * 1000;
+        const hasReleased = (ffj?.events || []).some(ev => {
+          const t = new Date(ev.dateISO || '').getTime();
+          return !isNaN(t) && nowMs - t <= win21 && ev.released && ev.actual != null;
+        });
+        if (hasReleased) { calData = ffj; calSource = 'ForexFactory'; }
       }
     } catch { /* no fallback */ }
   }
@@ -9963,8 +9969,8 @@ async function renderEconSurprises() {
   // Update source footer
   const srcEl = document.getElementById('econ-surprise-source');
   if (srcEl) {
-    if (calSource === 'calendar' && calMaxDate) {
-      srcEl.textContent = `Economic calendar · beat/miss vs consensus · through ${calMaxDate}`;
+    if (calSource && calSource !== 'ForexFactory' && calMaxDate) {
+      srcEl.textContent = `TradingEconomics · beat/miss vs consensus · 90d rolling`;
     } else if (calSource === 'ForexFactory') {
       srcEl.textContent = 'ForexFactory · calendar beat/miss vs consensus · 21d rolling';
     } else {
@@ -9979,7 +9985,7 @@ async function renderEconSurprises() {
   const ccyScores = {};
   const ccyUpcoming = {}; // count of high-impact events in next 7 days
   const now = Date.now();
-  const windowMs = 21 * 24 * 60 * 60 * 1000; // 21-day lookback
+  const windowMs = 90 * 24 * 60 * 60 * 1000; // 90-day lookback (matches TradingEconomics rolling window)
   const fwdWindowMs = 7 * 24 * 60 * 60 * 1000; // 7-day forward
 
   (calData?.events || []).forEach(ev => {
