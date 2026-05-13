@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-05-12T22:56:05Z",
+  "generated_at": "2026-05-13T02:55:15Z",
   "signals": [
     {
-      "time": "22:55",
+      "time": "02:54",
       "priority": "critical",
-      "title": "USD — Hot CPI + Fed Stance",
-      "text": "US CPI surprise reignites inflation fears, driving DXY to 98.29 as US 10Y yields climb to 4.463%. Fed's Goolsbee maintains policy independence stance while the market shifts toward a 'higher-for-longer' regime. Bear steepener in the US yield curve (2s10s +56.3bp) confirms tightening cycle dominance. USD/EUR 175bp carry advantage and USD/JPY 300bp spread sustain the dollar bid against low-yielders. Watch for 17 Jun Fed meeting to confirm hold duration.",
+      "title": "USD — Inflation Shock + Bear Steepener",
+      "text": "US CPI at 3.8% (April) exceeds forecasts, driven by a 40% contribution from energy costs. The 2s10s yield curve shifts into a Bear Steepener regime (+51.3bp) as US 10Y yields climb to 4.463%. This inflation surprise reignites Fed hike fears, supporting the USD despite neutral spec positioning (long% 35.8%). DXY at 98.30 remains bid as the market rotates into industrials and out of high-growth assets. Implication: USD strength persists until energy-led inflation expectations cool.",
       "evidence": [
-        "DXY: 98.29 (+0.34%)",
+        "US CPI: 3.8%",
         "US 10Y: 4.463%",
-        "US CPI: Hot (12 May)"
+        "2s10s Spread: +51.3bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "22:52",
+      "time": "02:51",
       "priority": "warning",
-      "title": "AUD/JPY — G8 Bilateral Theme + Carry",
-      "text": "AUD/JPY at 114.114 reflects a dominant G8 bilateral theme as AUD outperforms (+0.563%) and JPY lags (-0.551%). The 360bp RBA-BoJ carry premium (RBA 4.35% vs BoJ 0.75%) remains the primary driver. Retail sentiment shows 85% short AUD/JPY, diverging from COT LF net long +58,994 (78.3% long), suggesting institutional carry-seeking is overwhelming retail contrarians. Risk of retail capitulation if price holds above 114.00. Watch for BoJ verbal intervention risk as JPY weakness persists.",
+      "title": "AUD/JPY — G8 Bilateral Theme + Carry + Retail Divergence",
+      "text": "AUD/JPY at 114.152 reflects a dominant G8 bilateral theme with a 1.184% spread between the week's leader and laggard. The pair is supported by a +360bp carry advantage (RBA 4.35% vs BoJ 0.75%) and a hawkish RBA bias. Retail sentiment is 87% short, diverging from COT LF net long +58,994 (78.3% long). This institutional vs retail divergence at extreme levels suggests a potential retail capitulation squeeze if price holds above 114.00. Implication: Carry-seeking flows dominate JPY weakness.",
       "evidence": [
-        "AUD 1W avg: +0.563% (n=4)",
-        "JPY 1W avg: -0.551% (n=7)",
-        "G8 spread: 1.114%"
+        "AUD 1W avg: +0.571% (n=4)",
+        "JPY 1W avg: -0.613% (n=7)",
+        "G8 spread: 1.184%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "22:50",
+      "time": "02:49",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + Inflation Survey",
-      "text": "NZD/USD at 0.5955 faces a sharp divergence between speculative positioning and central bank bias. COT LF net short -19,294 (18.5% long) shows specs are heavily fading the RBNZ, despite a hawkish market bias toward a hike. The upcoming RBNZ Survey of Inflation Expectations (13 May) is the critical catalyst; a hot print risks a massive short-squeeze as specs are forced to cover into a hawkish RBNZ stance. USD/NZD 150bp carry favors USD but is vulnerable to NZD-specific hawkishness.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -19,294 (long% 18.5%) shows speculators heavily fading the currency despite a hawkish RBNZ market bias (↑ Hike). With the RBNZ quarterly Survey of Inflation Expectations due next, any upside surprise creates an acute short-squeeze risk for crowded spec shorts. NZD/USD at 0.5963 faces a +150bp carry deficit vs USD, but the RBNZ meeting on 27 May remains the primary catalyst for a positioning unwind. Implication: Extreme spec shorting leaves NZD vulnerable to hawkish data.",
       "evidence": [
-        "NZD COT LF long%: 18.5%",
+        "NZD COT long%: 18.5%",
         "RBNZ Bias: Hike",
-        "NZD/USD: 0.5955"
+        "NZD/USD: 0.5963"
       ],
       "_source": "gemini"
     },
     {
-      "time": "22:45",
+      "time": "02:45",
       "priority": "info",
       "title": "USD/JPY — Correlation Break + Carry",
-      "text": "USD/JPY at 157.586 shows a significant correlation break vs US 10Y yields (corr=+0.595 vs norm=+0.150, z=-2.20σ). The pair is tracking US yields more tightly than historical norms, ignoring traditional safe-haven JPY flows despite VIX at 18.0. Fed 3.75% vs BoJ 0.75% (300bp spread) keeps the pair bid. Intervention risk remains the primary upside cap; watch 160.00 for BoJ action if the 10Y-driven rally accelerates.",
+      "text": "USD/JPY at 157.649 shows a significant correlation break vs US 10Y yields (corr=+0.525 vs norm=+0.089, z=-1.96σ). While the +300bp Fed-BoJ carry spread keeps the pair bid, the decoupling from Treasury moves suggests JPY is currently more sensitive to domestic BoJ hike expectations (bias ↑ Hike) than US rate volatility. VIX at 18.0 (normal volatility) keeps carry trades viable, but intervention risk remains a factor as price tests recent highs. Implication: Carry remains the primary driver until VIX exceeds 25.",
       "evidence": [
-        "USD/JPY vs US 10Y z-score: -2.20σ",
-        "Fed-BoJ Spread: 300bp",
-        "USD/JPY: 157.586"
+        "USD/JPY vs US 10Y z-score: -1.96σ",
+        "Fed-BoJ Spread: +300bp",
+        "VIX: 18.0"
       ],
       "_source": "gemini"
     }
