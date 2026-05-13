@@ -9941,6 +9941,8 @@ async function renderEconSurprises() {
         return !isNaN(t) && nowMs - t <= LOOKBACK_MS && ev.released;
       });
       if (hasReleased) { calEvents = evts; calSource = calj.source || 'investing.com'; }
+      // Store surprise stats for z-score scoring (populated by engine v3.1+)
+      window._ECON_SURPRISE_STATS = calj.surpriseStats || {};
     }
   } catch { /* graceful */ }
 
@@ -10023,11 +10025,25 @@ async function renderEconSurprises() {
     const isInverse = INVERSE_KW.some(kw => ev.title.toLowerCase().includes(kw));
     const beat = isInverse ? actual < forecast : actual > forecast;
     const miss = isInverse ? actual > forecast : actual < forecast;
+    const surprise = actual - forecast;
 
-    if (!ccyScores[ccy]) ccyScores[ccy] = { beats: 0, misses: 0, total: 0 };
+    // ── Z-score scoring (hybrid: z-score when stats available, beat/miss otherwise) ──
+    // As history accumulates in surpriseStats (engine v3.1+), more events
+    // graduate to z-score. MIN 5 observations required for a valid std estimate.
+    const CANONICAL_MIN_N = 5;
+    const statsKey = (() => {
+      const canon = (evTitle.replace(/\s*\([^)]*\)/g, '').trim());
+      return `${ccy}/${canon}`;
+    })();
+    const stats = (window._ECON_SURPRISE_STATS || {})[statsKey];
+    const useZScore = stats && stats.n >= CANONICAL_MIN_N && stats.std > 0;
+    const zScore = useZScore ? (surprise - stats.mean) / stats.std : null;
+
+    if (!ccyScores[ccy]) ccyScores[ccy] = { beats: 0, misses: 0, total: 0, zSum: 0, zN: 0 };
     ccyScores[ccy].total++;
     if (beat) ccyScores[ccy].beats++;
     if (miss) ccyScores[ccy].misses++;
+    if (zScore !== null) { ccyScores[ccy].zSum += zScore; ccyScores[ccy].zN++; }
   });
 
   // ── Normalise to [−100, +100] index (Citi CESI convention) ───────────────
@@ -10051,8 +10067,24 @@ async function renderEconSurprises() {
       return;
     }
 
-    // Normalised index −100 to +100
-    const idx100 = ((s.beats - s.misses) / s.total) * 100;
+    // ── Index: z-score blend when available, beat/miss otherwise ────────────
+    // Events with ≥5 historical observations use z-score (normalised surprise).
+    // Remaining events use beat/miss. Both contribute to the same [-100,+100] scale.
+    // As history accumulates over months, more events will graduate to z-score.
+    let idx100;
+    const zFraction = s.zN / s.total;
+    if (s.zN >= 10 || (s.zN > 0 && zFraction >= 0.30)) {
+      // Blend: z-score events contribute avg_z * 50 (maps ±2σ to ±100),
+      // beat/miss events contribute beat/miss ratio * 100.
+      const nonZN    = s.total - s.zN;
+      const nonZBeat = s.beats - s.zN; // approximation
+      const zPart    = s.zN > 0 ? (s.zSum / s.zN) * 50 : 0;
+      const bmPart   = nonZN > 0 ? ((Math.max(0, nonZBeat) - (nonZN - Math.max(0, nonZBeat))) / nonZN) * 100 : 0;
+      idx100 = (zPart * s.zN + bmPart * nonZN) / s.total;
+    } else {
+      // Pure beat/miss (Citi CESI convention) — used until enough z-score history
+      idx100 = ((s.beats - s.misses) / s.total) * 100;
+    }
     // Bar: max half-width = 50% of container (the zero line is at 50%)
     const halfPct = Math.min(Math.abs(idx100), 100) / 2; // 0–50%
     const positive = idx100 >= 0;
