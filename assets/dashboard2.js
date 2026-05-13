@@ -9940,7 +9940,7 @@ async function renderEconSurprises() {
         const t = new Date(ev.dateISO).getTime();
         return !isNaN(t) && nowMs - t <= LOOKBACK_MS && ev.released;
       });
-      if (hasReleased) { calEvents = evts; calSource = calj.source || 'TradingEconomics'; }
+      if (hasReleased) { calEvents = evts; calSource = calj.source || 'investing.com'; }
     }
   } catch { /* graceful */ }
 
@@ -9970,7 +9970,9 @@ async function renderEconSurprises() {
   // ── Source label ──────────────────────────────────────────────────────────
   const srcEl = document.getElementById('econ-surprise-source');
   if (srcEl) {
-    if (calSource === 'TradingEconomics') {
+    if (calSource === 'investing.com') {
+      srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
+    } else if (calSource === 'TradingEconomics') {
       srcEl.textContent = 'TradingEconomics · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
       srcEl.textContent = 'ForexFactory · actual vs consensus · 21d rolling';
