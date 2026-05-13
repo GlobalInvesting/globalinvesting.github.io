@@ -9127,11 +9127,41 @@ function toggleAlertsPopover() {
     });
   }
 
+  var _resizeTimer = null;
   window.addEventListener('resize', function(){
     btn.style.display = isMobile() ? 'none' : '';
     if(isMobile() && main.classList.contains('split-layout')){
       applyState(false);
+      return;
     }
+    // Debounced reflow: re-apply split state after resize settles (covers monitor
+    // transitions where 100vh changes and flex widths need recalculation).
+    clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(function(){
+      if(main.classList.contains('split-layout')){
+        var pct = upper && main.offsetWidth > 0
+          ? parseFloat((upper.offsetWidth / main.offsetWidth * 100).toFixed(1))
+          : 55;
+        if(isNaN(pct) || pct <= 0 || pct >= 100) pct = 55;
+        applyState(true, pct);
+        // Force LW chart to resize to its container after layout settles
+        if(typeof _lwChart !== 'undefined' && _lwChart){
+          try{
+            var tw = document.getElementById('tv-chart-wrap');
+            if(tw && tw.offsetWidth > 0 && tw.offsetHeight > 0){
+              _lwChart.resize(tw.offsetWidth, tw.offsetHeight);
+            }
+          }catch(_){}
+        }
+        if(typeof drawLiquidityChart === 'function') drawLiquidityChart();
+        if(typeof drawYieldCurve === 'function'){
+          drawYieldCurve(
+            typeof _lastDrawnYields !== 'undefined' ? _lastDrawnYields : null,
+            typeof _lastDrawnPrior  !== 'undefined' ? _lastDrawnPrior  : null
+          );
+        }
+      }
+    }, 120);
   });
 
   // ── Monitor-transition layout flush ──────────────────────────────────────
