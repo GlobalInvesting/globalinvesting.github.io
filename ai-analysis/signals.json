@@ -1,60 +1,65 @@
 {
-  "generated_at": "2026-05-13T12:27:56Z",
+  "generated_at": "2026-05-13T15:22:54Z",
   "signals": [
     {
-      "time": "12:30",
+      "time": "15:20",
       "priority": "critical",
       "title": "AUD/JPY — G8 Bilateral Theme + Carry",
-      "text": "AUD/JPY at 114.31 — AUD 1W avg: +0.757% (n=4) outperforms JPY 1W avg: -0.505% (n=7) with a G8 spread of 1.262%. RBA 4.35% vs BoJ 0.75% — +360bp carry favors AUD. Strong theme and carry advantage drive AUD/JPY higher. Watch for the next BoJ meeting (mkt: 40% hike priced) to determine the yield gap direction.",
+      "text": "AUD/JPY at 114.578 — AUD outperformance hits critical threshold with a +0.976% weekly average across G8 peers, while JPY remains the primary laggard at -0.592%. The 1.568% spread is reinforced by a +360bp RBA-BoJ carry advantage (RBA 4.35% vs BoJ 0.75%). Despite BoJ hike bias, the bear steepener regime in US yields (2s10s +53.9bp) and normal volatility (VIX 18.0) sustain carry-seeking flows into AUD. Watch for RBA meeting on 16 Jun to confirm hiking trajectory.",
       "evidence": [
-        "AUD 1W avg: +0.757% (n=4)",
-        "JPY 1W avg: -0.505% (n=7)",
-        "G8 spread: 1.262%"
-      ]
+        "AUD 1W avg: +0.976% (n=4)",
+        "JPY 1W avg: -0.592% (n=7)",
+        "G8 spread: 1.568%"
+      ],
+      "_source": "gemini"
     },
     {
-      "time": "12:27",
+      "time": "15:17",
+      "priority": "critical",
+      "title": "USD/JPY — Inflation Surprise + Yield Correlation Break",
+      "text": "USD/JPY at 157.845 — US PPI surprise (6.0% YoY vs 4.9% est) reinforces higher-for-longer Fed outlook, lifting US 10Y yields to 4.489%. USD/JPY vs US 10Y correlation has broken to +0.541 (z=-2.23σ), indicating the pair is now hyper-sensitive to US terminal rate repricing rather than domestic JPY factors. Fed 3.75% vs BoJ 0.75% (+300bp) remains the structural floor. Intervention risk rises if price tests 160.00; next BoJ meeting (mkt: 40% hike priced) determines if domestic policy can offset US yield pressure.",
+      "evidence": [
+        "US PPI YoY: 6.0% (est 4.9%)",
+        "USD/JPY vs US 10Y z-score: -2.23σ",
+        "Fed-BoJ Spread: +300bp"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "15:15",
       "priority": "warning",
-      "title": "USD/JPY — Geopolitical + Carry",
-      "text": "USD/JPY at 157.81 — 300bp Fed-BoJ carry sustains bid; Middle East tensions introduce intervention risk on a break above 160.00. JPY COT LF short −61,340 (crowded carry). Carry dominates until VIX > 25. Watch for the next Fed meeting (mkt: 100% hold priced) to assess the impact of geopolitical tensions on USD/JPY.",
-      "evidence": [
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "JPY COT LF short: -61,340",
-        "VIX: 17.9 — normal volatility"
-      ]
-    },
-    {
-      "time": "12:24",
-      "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short −19,294 (specs fading a hawkish CB) vs RBNZ hike 40% priced for 27 May. If RBNZ delivers or signals hike, short-squeeze risk is elevated — crowded spec short unwind targets 0.6000+. NZD/USD at 0.5927. Watch for the next RBNZ meeting (mkt: 40% hike priced) to determine the direction of NZD/USD.",
-      "evidence": [
-        "NZD COT LF net: -19,294",
-        "RBNZ hike prob: 40%",
-        "NZD/USD: 0.5927"
-      ]
-    },
-    {
-      "time": "12:21",
-      "priority": "info",
-      "title": "EUR/USD — Positioning + Vol",
-      "text": "HV30 at 8.2%, ATM IV at 9.4% — 1.2 vol-pt premium over realized. 25d RR at −0.14: put skew despite bullish trend — market hedging, not chasing. LF net −21,011, WoW delta +1,101 second consecutive week. Price bid, positioning stalling — late-trend caution. Watch for the next ECB meeting (mkt: 100% hold priced) to assess the impact on EUR/USD.",
-      "evidence": [
-        "HV30: 8.2%",
-        "ATM IV: 9.4%",
-        "LF net: -21,011"
-      ]
-    },
-    {
-      "time": "12:18",
-      "priority": "warning",
-      "title": "AUD/USD — Retail Sentiment + COT",
-      "text": "AUD/USD: COT LF net long +58,994 (bullish spec positioning) vs retail 13% long (extreme retail short). Divergence active: retail is fading the institutional long. Late-trend caution; retail capitulation risk if price extends higher. Watch for the next RBA meeting (mkt: 100% hold priced) to determine the yield gap direction.",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD/USD at 0.7261 — COT LF net long +58,994 (78.3% long) indicates heavy institutional backing, while retail sentiment is at an 88% short extreme. This institutional vs retail divergence at the top of a 1W +0.73% move suggests retail is unsuccessfully fading the trend. Risk of retail capitulation squeeze remains high as long as RBA 4.35% vs Fed 3.75% maintains the -60bp AUD carry premium. Watch for LF long% exceeding 80% for signs of institutional exhaustion.",
       "evidence": [
         "AUD COT LF net: +58,994",
-        "Retail sentiment: 13% long",
-        "AUD/USD: 0.7246"
-      ]
+        "Retail Sentiment: 88% Short",
+        "AUD/USD 1W: +0.73%"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "15:12",
+      "priority": "warning",
+      "title": "GBP/USD — Geopolitical Risk + Leadership Crisis",
+      "text": "GBP/USD at 1.3515 — Sterling is under pressure following BoE Mann's warnings on UK geopolitical exposure and reports of a domestic leadership crisis. GBP COT LF net long +31,244 (65.3% long) represents a crowded long position vulnerable to liquidation if political instability persists. Fed 3.75% vs BoE 3.75% (0bp spread) offers no carry protection for GBP against USD strength. Price holding below 20-day EMA confirms bearish momentum; watch for BoE meeting on 18 Jun for policy shift.",
+      "evidence": [
+        "GBP COT LF long%: 65.3%",
+        "Fed-BoE Spread: 0bp",
+        "GBP/USD 1D: -0.18%"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "15:05",
+      "priority": "info",
+      "title": "NZD/USD — COT vs OIS Divergence",
+      "text": "NZD/USD at 0.5934 — COT LF net short -19,294 (18.5% long) shows specs are heavily short despite a hawkish RBNZ bias (Next meeting 27 May). This positioning-policy divergence creates short-squeeze risk if the RBNZ signals a hike. However, the +150bp carry advantage for USD (Fed 3.75% vs RBNZ 2.25%) currently supports the spec short thesis. Watch RBNZ decision on 27 May to trigger either a short unwind or a move toward 0.5850.",
+      "evidence": [
+        "NZD COT LF long%: 18.5%",
+        "Fed-RBNZ Spread: +150bp",
+        "NZD/USD 1D: -0.31%"
+      ],
+      "_source": "gemini"
     }
   ]
 }
