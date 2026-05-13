@@ -183,7 +183,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #topbar{background:var(--head-bg);border-bottom:1px solid var(--border);height:36px;display:flex;align-items:center;padding:0 10px;position:sticky;top:0;z-index:200}
 #tv-ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:34px;flex-shrink:0}
 #news-ticker{background:var(--head-bg);border-bottom:1px solid var(--border);height:22px;display:flex;align-items:center;overflow:hidden;flex-shrink:0}
-#layout{display:grid;grid-template-columns:180px 1fr 220px;height:calc(100vh - 92px);overflow:hidden}#layout.layout--no-right{grid-template-columns:180px 1fr 0}#layout.layout--no-right #rightpanel{display:none}
+#layout{display:grid;grid-template-columns:180px minmax(0,1fr) 220px;height:calc(100vh - 92px);height:calc(100dvh - 92px);overflow:hidden;min-width:0;width:100%}#layout.layout--no-right{grid-template-columns:180px 1fr 0}#layout.layout--no-right #rightpanel{display:none}
 #sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;font-size:11px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 #sidebar::-webkit-scrollbar{width:3px}
 #sidebar::-webkit-scrollbar-track{background:transparent}
@@ -223,7 +223,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 /* ── OPTION B: SPLIT LAYOUT (upper chart / lower 2×2 grid) ── */
 /* SPLIT LAYOUT — vertical left/right split */
-#main.split-layout{display:flex;flex-direction:row;height:calc(100vh - 92px);overflow:hidden}
+#main.split-layout{display:flex;flex-direction:row;height:calc(100vh - 92px);height:calc(100dvh - 92px);overflow:hidden;width:100%}
 #main.split-layout #split-upper{display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;width:55%;min-width:300px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 #main.split-layout #split-upper::-webkit-scrollbar{width:3px}
 #main.split-layout #split-upper::-webkit-scrollbar-track{background:transparent}
