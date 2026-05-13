@@ -1166,6 +1166,50 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
         print(f"  ERROR [{id_}]: {exc}")
         return None
 
+def clamp_bars(bars: list[dict], id_: str) -> list[dict]:
+    """
+    Apply OHLC structural integrity clamp to every bar in the final output list.
+
+    Guarantees H >= max(O, C) and L <= min(O, C) for every bar.
+
+    Root cause of violations in FX 1H-aggregated data:
+      - The bucket open = first 1H bar's Open, which yfinance FX reports as the
+        prev_session_close on most bars (the last tick before session open, not the
+        first real tick of the new session). On gap-down sessions prev_session_close
+        can exceed all 1H highs accumulated during the day → H < O.
+      - The Part B 1D legacy bars apply prev_close open correction AFTER individual
+        bar validation, which can also introduce H < O when bars are merged.
+      - The per-bucket clamp in each fetch_*_ohlc_from_1h already handles the 1H
+        portion, but the merge step and deduplication can still expose violations.
+
+    This function is the definitive last-line-of-defense: it processes every bar
+    regardless of how it was produced, ensuring the JSON written to disk is always
+    structurally valid. LightweightCharts renders H < O or L > C as visually
+    deformed candles — this clamp prevents that entirely.
+
+    The clamp is idempotent and only extends wicks outward — it never compresses
+    the real intraday range. A session where the open genuinely gaps above/below
+    the intraday range will correctly show an upper/lower wick extending to the
+    gap-open level.
+    """
+    dec = DECIMALS.get(id_, 5)
+    clamped = 0
+    result = []
+    for bar in bars:
+        o, h, l, c = bar["open"], bar["high"], bar["low"], bar["close"]
+        new_h = round(max(h, o, c), dec)
+        new_l = round(min(l, o, c), dec)
+        if new_h != h or new_l != l:
+            clamped += 1
+            bar = dict(bar)
+            bar["high"] = new_h
+            bar["low"]  = new_l
+        result.append(bar)
+    if clamped:
+        print(f"    clamp: fixed {clamped} structurally invalid bars")
+    return result
+
+
 def write_json(path: Path, obj) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
@@ -1191,6 +1235,7 @@ def main() -> None:
             errors.append(id_)
             print("FAILED")
         else:
+            bars = clamp_bars(bars, id_)
             write_json(OUT_DIR / f"{id_}.json", bars)
             print(f"OK  ({len(bars)} bars, {OUT_DIR / f'{id_}.json'} {(OUT_DIR / f'{id_}.json').stat().st_size // 1024}KB)")
             written += 1
