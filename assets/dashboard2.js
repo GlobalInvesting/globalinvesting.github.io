@@ -9918,6 +9918,7 @@ async function renderEconSurprises() {
 
   const nowMs = Date.now();
   const LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
+  window._ES_SEEN = new Set(); // reset dedup guard on each render
 
   // ── Load calendar.json (ForexFactory via ff_calendar.json) ─────────────────
   let calEvents = [];
@@ -9996,8 +9997,8 @@ async function renderEconSurprises() {
 
     // ── Noise filter: exclude non-macro events ─────────────────────────────
     // CESI-style indices (Citi, DB, MS) only score fundamental macro releases.
-    // Bond auctions, CFTC positioning, commodity inventory/rig data, and
-    // sentiment surveys based on price levels are excluded.
+    // Bond auctions, CFTC positioning, commodity inventory/rig data, derived
+    // averages, financial flow data, and SEP dot projections are excluded.
     const evTitle = (ev.event || ev.title || '').toLowerCase();
     const NOISE_KW = [
       'cftc','baker hughes','rig count','auction','api weekly',
@@ -10012,8 +10013,22 @@ async function renderEconSurprises() {
       'm2 money','m3 money','m4 money','reserve assets total',
       'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
       'ibd','3-month bill','4-week bill','52-week bill',
+      // Additional noise: derived averages, financial flows, SEP projections, EIA energy
+      '4-week average','4-week avg',
+      'tic net','net long-term tic','total net tic',
+      'interest rate projection',
+      'eia crude oil','eia crude',
     ];
     if (NOISE_KW.some(kw => evTitle.includes(kw))) return;
+    // ── Dedup guard: same canonical event + same actual → score only once ──
+    // ForexFactory publishes Flash then Final PMIs with identical data on
+    // different dates. Without dedup, each revision counts as a separate event,
+    // inflating N and double-counting the same macro signal.
+    const canonEvent = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
+    const dedupKey   = `${ccy}/${canonEvent}/${String(ev.actual).replace(/[%,\s]/g,'')}/${String(ev.forecast||'').replace(/[%,\s]/g,'')}`;
+    if (!window._ES_SEEN) window._ES_SEEN = new Set();
+    if (window._ES_SEEN.has(dedupKey)) return;
+    window._ES_SEEN.add(dedupKey);
     // ───────────────────────────────────────────────────────────────────────
 
     const actualStr   = String(ev.actual   || '').replace(/[%,]/g,'');
