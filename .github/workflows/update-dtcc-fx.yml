@@ -1,0 +1,103 @@
+name: Update DTCC FX OTC Volume
+
+# Fetches daily FX OTC notional volume from DTCC GTR (Global Trade Repository)
+# public dissemination API and writes dtcc-data/dtcc_fx.json.
+#
+# Source: DTCC GTR CFTC Recast — https://pddata.dtcc.com/gtr/api/fx/current
+# Delay: T+1 (data published next business day after trade date)
+# No API key required — public under Dodd-Frank Section 2(a)(13).
+# Public repo = unlimited GitHub Actions minutes.
+
+on:
+  schedule:
+    - cron: '0 14 * * 1-5'   # 14:00 UTC Mon-Fri — DTCC publishes by ~13:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: update-dtcc-fx
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-dtcc-fx:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git fetch origin main && git rebase origin/main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p dtcc-data
+
+      - name: Fetch DTCC GTR FX data
+        run: python scripts/fetch_dtcc_fx.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "        DTCC FX VOLUME SUMMARY"
+          echo "========================================"
+          if [ -f "dtcc-data/dtcc_fx.json" ]; then
+            python3 -c "
+          import json
+          with open('dtcc-data/dtcc_fx.json') as f:
+              d = json.load(f)
+          print(f'Status:     {d.get(\"status\",\"?\")}')
+          print(f'Trade date: {d.get(\"trade_date\",\"?\")}')
+          print(f'Fetched:    {d.get(\"fetched\",\"?\")}')
+          t = d.get('totals', {})
+          print(f'Total:      \${t.get(\"notional_usd_bn\",0):.1f}bn / {t.get(\"trade_count\",0):,} trades')
+          print()
+          print('Top pairs:')
+          for pair, data in list(d.get('pairs', {}).items())[:8]:
+              print(f'  {pair:<12} \${data[\"notional_usd_bn\"]:>7.2f}bn  ({data[\"trade_count\"]:>5} trades)')
+          "
+          else
+            echo "dtcc_fx.json not found"
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p /tmp/dtcc_fresh
+          cp -r dtcc-data/. /tmp/dtcc_fresh/
+          TIMESTAMP=$(date -u '+%Y-%m-%d')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp -r /tmp/dtcc_fresh/. dtcc-data/
+            git add dtcc-data/
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "DTCC FX volume ${TIMESTAMP}"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0
