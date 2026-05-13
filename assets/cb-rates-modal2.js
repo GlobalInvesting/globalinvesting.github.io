@@ -64,6 +64,15 @@
 .cbr-ctx-cell:nth-last-child(-n+4){border-bottom:none;}
 .cbr-ctx-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono);}
 .cbr-ctx-val{font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text);}
+.cbr-next-fwd{display:grid;grid-template-columns:1fr 1fr;flex-shrink:0;border-top:1px solid var(--border,#252d3d);}
+@media(max-width:480px){
+  #cbr-m-metrics{grid-template-columns:repeat(3,1fr);}
+  .cbr-ctx-grid{grid-template-columns:repeat(2,1fr);}
+  .cbr-ctx-cell:nth-child(4n){border-right:1px solid var(--border,#252d3d);}
+  .cbr-ctx-cell:nth-child(2n){border-right:none;}
+  .cbr-ctx-cell:nth-last-child(-n+4){border-bottom:1px solid var(--border,#252d3d);}
+  .cbr-ctx-cell:nth-last-child(-n+2){border-bottom:none;}
+}
 `;
   document.head.appendChild(s);
 })();
@@ -362,7 +371,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
         <div class="cbr-ct">POLICY RATE \u00b7 MONTHLY \u00b7 STEP CHART \u00b7 DECISION MARKERS</div>
         <div class="cbr-chart-area" style="padding:8px 12px 4px;"><div class="cbr-lw-wrap"></div></div>
       </div>
-      <div style="flex-shrink:0;border-top:1px solid var(--border,#252d3d);display:grid;grid-template-columns:1fr 1fr;">
+      <div class="cbr-next-fwd">
         <div style="padding:10px 14px;border-right:1px solid var(--border,#252d3d);"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Next Meeting</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nextMtg}</div><div style="font-size:9px;font-family:var(--font-mono);color:${biasCol};margin-top:2px;">${biasLabel}</div></div>
         <div style="padding:10px 14px;" title="${fwdIsEst?'Bias-only estimate — no OIS probability data.':'OIS-implied forward rate (CIP convention)'}"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Fwd Rate</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:${bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text)'}">${fwdDisplay}</div><div style="font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:2px;">${fwdIsEst?'~ est \u00b7 bias only':'OIS implied \u00b7 CIP'}</div></div>
       </div>
