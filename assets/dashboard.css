@@ -222,9 +222,12 @@
   /* ── LAYOUT ── */
   #layout {
     display: grid;
-    grid-template-columns: 180px 1fr 220px;
+    grid-template-columns: 180px minmax(0,1fr) 220px;
     height: calc(100vh - 92px);
+    height: calc(100dvh - 92px);
     overflow: hidden;
+    min-width: 0;
+    width: 100%;
   }
   /* When rightpanel is hidden, collapse its grid column */
   #layout.layout--no-right {
@@ -320,6 +323,7 @@
     flex-direction: column;
     padding-bottom: 24px;
     min-width: 0;
+    width: 100%;
   }
   #main::-webkit-scrollbar { width: 4px; }
   #main::-webkit-scrollbar-thumb { background: var(--border2); }
