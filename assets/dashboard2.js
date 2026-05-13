@@ -10090,24 +10090,16 @@ async function renderEconSurprises() {
     const positive = idx100 >= 0;
     const color = positive ? 'var(--up)' : 'var(--down)';
 
-    // Confidence weight: opacity scales with N (industry standard for low-N currencies).
-    // Full opacity at N≥60 (USD-tier), fades to 0.25 at N=5.
-    // NZD/CHF with N<15 will render visibly dimmer — signaling low confidence.
-    const MIN_N = 5, FULL_N = 60;
-    const confidence = Math.min(1, Math.max(0.25, (s.total - MIN_N) / (FULL_N - MIN_N)));
     const lowConf = s.total < 15;
 
     if (barFill) {
-      barFill.style.width   = halfPct.toFixed(1) + '%';
-      barFill.style.left    = positive ? '50%' : (50 - halfPct).toFixed(1) + '%';
+      barFill.style.width      = halfPct.toFixed(1) + '%';
+      barFill.style.left       = positive ? '50%' : (50 - halfPct).toFixed(1) + '%';
       barFill.style.background = color;
-      barFill.style.opacity = confidence.toFixed(2);
-      // Low-N: dashed border on the bar container to signal uncertainty
-      const barTrack = barFill.parentElement;
-      if (barTrack) barTrack.style.outline = lowConf ? '1px dashed rgba(255,255,255,0.12)' : '';
+      barFill.style.opacity    = '1';
     }
 
-    // N column — dim the number for low-confidence currencies
+    // N column — dim number for low-N currencies; the visible N is the signal
     if (tds[2]) {
       tds[2].textContent = s.total;
       tds[2].style.color = lowConf ? 'var(--text4, rgba(255,255,255,0.3))' : 'var(--text3)';
