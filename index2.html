@@ -1013,6 +1013,59 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="font-size:9px;color:var(--text3);margin-top:3px;">Realized volatility · annualized · yfinance OHLC · Trend: HV 10d vs HV 30d</div>
       </div>
 
+      <!-- ECB Reference Exchange Rates -->
+      <div style="padding:8px 10px 2px;border-top:1px solid var(--border);">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">ECB Reference Exchange Rates · Frankfurt · T+1 · daily official fixing</div>
+        <div style="overflow-x:auto;">
+          <table id="ecb-fixings-table" aria-label="ECB reference exchange rates" style="width:100%;min-width:480px;">
+            <thead>
+              <tr>
+                <th style="text-align:left" scope="col">Pair</th>
+                <th scope="col" title="ECB reference rate — daily official fixing, published ~16:00 CET">ECB Fix</th>
+                <th scope="col" title="Previous business day ECB fix">Prev Fix</th>
+                <th scope="col" title="Change vs prior fixing">Chg</th>
+                <th scope="col" title="Change as percentage">Chg %</th>
+                <th scope="col" title="Current spot vs ECB fix (offset from official rate)">vs Spot</th>
+              </tr>
+            </thead>
+            <tbody id="ecb-fixings-tbody">
+              <tr><td>EUR/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/GBP</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/AUD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/NZD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="ecb-fixings-footer" style="font-size:9px;color:var(--text3);margin-top:3px;">ECB · daily official fixing · published ~16:00 CET · source: frankfurter.json</div>
+      </div>
+
+      <!-- DTCC GTR FX OTC Volume -->
+      <div style="padding:8px 10px 10px;border-top:1px solid var(--border);">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">FX OTC Notional Volume · DTCC GTR · CFTC Recast · T+1</div>
+        <div style="overflow-x:auto;">
+          <table id="dtcc-table" aria-label="DTCC GTR FX OTC notional volume" style="width:100%;min-width:480px;">
+            <thead>
+              <tr>
+                <th style="text-align:left" scope="col">Pair</th>
+                <th scope="col" title="Total notional USD-equivalent in billions (new trades only, NEWT action, capped at $250M per trade)">Notional ($bn)</th>
+                <th scope="col" title="Number of new trade records">Trades</th>
+                <th scope="col" title="FX Swap notional in billions">Swap $bn</th>
+                <th scope="col" title="FX Forward notional in billions">Fwd $bn</th>
+                <th scope="col" title="FX Spot notional in billions">Spot $bn</th>
+                <th scope="col" title="Share of total DTCC-reported G8 notional">% Total</th>
+              </tr>
+            </thead>
+            <tbody id="dtcc-tbody">
+              <tr><td colspan="7" style="color:var(--text3);text-align:center;padding:12px 0;">Loading DTCC data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="dtcc-footer" style="font-size:9px;color:var(--text3);margin-top:3px;">DTCC GTR · CFTC Recast public dissemination · Dodd-Frank 2(a)(13) · Notional capped at $250M/trade · subset of total OTC FX volume</div>
+      </div>
+
     </div><!-- /#section-derivatives -->
 
       </div><!-- /#split-lower-right -->

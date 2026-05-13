@@ -31,6 +31,7 @@ A professional-grade foreign exchange monitoring platform for serious market par
 - **News feed** — FXStreet, ForexLive, Investing.com and others, filtered by FX relevance, updated hourly
 - **Market signals** — 4–5 AI-generated signals updated 12× daily
 - **Carry Trade Ranking** — G8 carry-to-vol ranking for all 28 pairs, sorted by nominal rate differential divided by 30-day realised volatility. Clicking any row opens the Real Rate Carry Analysis modal with three tabs: (1) Rates Breakdown — 8 currencies sorted by real rate (nominal CB rate minus inflation expectation), with OIS bias chip and data-age transparency; (2) Real Rate Matrix — 8×8 differential grid color-coded by carry sustainability; (3) Pair Detail — nominal carry, real carry, carry-to-vol on both bases, OIS probability for each leg, and carry sustainability assessment (sustainable / moderate / carry trap). Inflation expectations sourced live from FRED (T5YIE for USD, T5YIFR for EUR) and from `extended-data/*.json` batch for remaining currencies. Matches Bloomberg FXFR / FXFC layout convention.
+- **Derivatives section** — Implied forwards (CIP, 1M/3M/6M/1Y), 25-delta Risk Reversal term structure (Saxo Bank), realized vol vs RR skew, ECB official reference exchange rates (daily fixing, 7 EUR pairs), and FX OTC notional volume by pair and product type (DTCC GTR CFTC Recast public dissemination, T+1).
 
 ---
 
@@ -69,6 +70,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | `rates/` | FX rates cache | Engine — daily |
 | `rr-data/` | `rr.json` — 25-delta Risk Reversal quotes (4 G8 pairs, 1M tenor) from Saxo Bank | Engine — Mon–Fri daily |
 | `sentiment-data/` | `myfxbook.json` — retail positioning | Engine — hourly |
+| `dtcc-data/` | `dtcc_fx.json` — FX OTC notional volume by pair and product type (DTCC GTR CFTC Recast) | Site — Mon–Fri 14:00 UTC |
 
 ### Site repo workflows
 
