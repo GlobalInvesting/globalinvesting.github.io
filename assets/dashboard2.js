@@ -10192,6 +10192,10 @@ function initDerivativesNavFixed() {
     // Load CB rates from files (reliable source, no DOM dependency)
     await loadCBRatesCache();
 
+    // renderEconSurprises only needs calendar.json — no RR cache dependency.
+    // Fire it immediately in parallel so the panel doesn't wait for RR polling.
+    const econPromise = renderEconSurprises();
+
     // Populate RR cache by piggybacking on existing rr.json fetch
     // (fetchOptionSkew already calls this — we wait for it to be available)
     // Small poll: wait up to 8s for RR_DATA_CACHE to be populated by main dashboard.js
@@ -10201,10 +10205,8 @@ function initDerivativesNavFixed() {
       rrWait += 500;
     }
 
-    // Initial render
-    await renderCIPForwards();
-    await renderRRInFXTable();
-    await renderEconSurprises();
+    // CIP + RR need the RR cache; econ runs independently above
+    await Promise.all([renderCIPForwards(), renderRRInFXTable(), econPromise]);
 
     // Refresh every 5 min
     setInterval(async () => {
