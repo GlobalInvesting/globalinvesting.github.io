@@ -4,12 +4,18 @@ fetch_dtcc_fx.py
 Fetches FX OTC transaction data from the DTCC GTR CFTC Cumulative Slice Reports
 (S3 public bucket) and writes dtcc-data/dtcc_fx.json.
 
-Source:  DTCC GTR — CFTC Cumulative Slice Reports (Phase 2, December 2023+)
+Source:  DTCC GTR — CFTC Cumulative Slice Reports (Phase 2, Jan 2024+)
+         PPD User Guide v2.8, May 2025 — Appendix A confirmed field list
 S3 URL:  https://kgc0418-tdw-data-0.s3.amazonaws.com/cftc/eod/CFTC_CUMULATIVE_FOREX_{YYYY}_{MM}_{DD}.zip
 Delay:   T+1 (cumulative for prior business day)
-No API key required — public under Dodd-Frank Section 2(a)(13).
+Access:  Public — no API key required (Dodd-Frank §2(a)(13))
 
-The script tries yesterday first, then falls back up to 5 prior business days.
+Phase 2 field mapping (confirmed from PPD User Guide v2.8 Appendix A):
+  Currency pair:  "Notional currency-Leg 1" + "Notional currency-Leg 2" (swaps/fwds/spots/NDFs)
+                  "Strike price currency/currency pair"                   (FX options)
+  Notional:       "Notional amount-Leg 1"
+  Product:        "Product name"
+  Action:         "Action type"  (NEWT/NEW/"" = new trade; skip MODI/TERM/CORR/NOVA/REVI/VALU)
 """
 
 import csv
@@ -32,14 +38,17 @@ G8_PAIRS = {
     "USD/CHF", "USD/CAD", "NZD/USD",
     "EUR/GBP", "EUR/JPY", "GBP/JPY", "EUR/CHF",
     "EUR/AUD", "AUD/JPY", "USD/MXN", "USD/CNY",
+    "GBP/CHF", "GBP/AUD", "EUR/CAD", "USD/SGD",
 }
 
-INVERSE_MAP = {
-    "JPY/USD": "USD/JPY", "CHF/USD": "USD/CHF", "CAD/USD": "USD/CAD",
-    "MXN/USD": "USD/MXN", "CNY/USD": "USD/CNY",
-    "JPY/EUR": "EUR/JPY", "GBP/EUR": "EUR/GBP", "CHF/EUR": "EUR/CHF",
-    "AUD/EUR": "EUR/AUD", "JPY/GBP": "GBP/JPY", "JPY/AUD": "AUD/JPY",
-}
+# Build bidirectional lookup: EURUSD / EUR/USD / EUR-USD all → "EUR/USD"
+# Inverse also maps to the canonical form (USDEUR → "EUR/USD")
+PAIR_LOOKUP: dict = {}
+for _p in G8_PAIRS:
+    _left, _right = _p.split("/")
+    for _sep in ("", "/", "-"):
+        PAIR_LOOKUP[_left + _sep + _right] = _p
+        PAIR_LOOKUP[_right + _sep + _left] = _p  # inverse → same canonical
 
 PRODUCT_NORM = {
     "foreignexchange:fxswap":    "FxSwap",
@@ -52,10 +61,15 @@ PRODUCT_NORM = {
     "fx:fxspot":    "FxSpot",
     "fx:fxoption":  "FxOption",
     "fx:fxndf":     "FxNDF",
-    "fxswap":       "FxSwap",
-    "fxforward":    "FxForward",
-    "fxspot":       "FxSpot",
+    "fxswap":    "FxSwap",
+    "fxforward": "FxForward",
+    "fxspot":    "FxSpot",
+    "fxoption":  "FxOption",
+    "fxndf":     "FxNDF",
 }
+
+# Action types that represent lifecycle events — NOT new notional exposure
+SKIP_ACTIONS = {"MODI", "TERM", "CORR", "NOVA", "REVI", "VALU", "PRTO", "EROR"}
 
 
 def s3_url(d: date) -> str:
@@ -79,52 +93,68 @@ def candidate_dates(today: date) -> list:
     return candidates
 
 
-def fetch_zip(url: str) -> bytes:
+def fetch_zip(url: str):
     try:
-        resp = requests.get(url, timeout=60, headers={
-            "User-Agent": "globalinvesting-fx-terminal/1.0",
-        })
+        resp = requests.get(
+            url, timeout=90,
+            headers={"User-Agent": "globalinvesting-fx-terminal/1.0"}
+        )
         if resp.status_code == 200 and len(resp.content) > 500:
             return resp.content
         if resp.status_code == 404:
             return None
         print(f"  HTTP {resp.status_code} for {url}", file=sys.stderr)
         return None
-    except Exception as e:
-        print(f"  Error fetching {url}: {e}", file=sys.stderr)
+    except Exception as exc:
+        print(f"  Error fetching {url}: {exc}", file=sys.stderr)
         return None
 
 
-def parse_csv_from_zip(zip_bytes: bytes) -> tuple:
+def parse_csv_from_zip(zip_bytes: bytes):
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         names = zf.namelist()
-        csv_name = next((n for n in names if n.lower().endswith('.csv')), None)
+        csv_name = next((n for n in names if n.lower().endswith(".csv")), None)
         if not csv_name:
             print(f"  No CSV in ZIP. Contents: {names}", file=sys.stderr)
-            return [], ""
+            return [], []
         with zf.open(csv_name) as f:
             text = f.read().decode("utf-8-sig", errors="replace")
     reader = csv.DictReader(io.StringIO(text))
-    return list(reader), csv_name
+    rows = list(reader)
+    headers = list(reader.fieldnames or [])
+    return rows, headers
 
 
-def find_field(record: dict, *candidates: str) -> str:
-    lower_map = {k.lower().strip(): v for k, v in record.items()}
+def normalise_pair(raw: str):
+    p = raw.strip().upper().replace(" ", "")
+    return PAIR_LOOKUP.get(p)
+
+
+def build_pair_from_legs(ccy1: str, ccy2: str):
+    if not ccy1 or not ccy2:
+        return None
+    c1 = ccy1.strip().upper()[:3]
+    c2 = ccy2.strip().upper()[:3]
+    return PAIR_LOOKUP.get(c1 + c2) or PAIR_LOOKUP.get(c2 + c1)
+
+
+def get(row_lower: dict, *candidates: str) -> str:
     for c in candidates:
-        v = lower_map.get(c.lower().strip())
+        v = row_lower.get(c.lower().strip())
         if v is not None:
-            return str(v)
+            return v.strip()
     return ""
 
 
-def notional_value(record: dict) -> float:
+def parse_notional(row_lower: dict) -> float:
     for field in (
-        "notional amount-leg 1", "notional amount leg 1",
+        "notional amount-leg 1",
+        "notional amount-leg1",
+        "notional amount leg 1",
         "notional_amount_1",
-        "rounded notional amount-leg 1", "rounded_notional_amount_1",
     ):
-        v = find_field(record, field)
-        if v and v not in ("", "null", "None", "N/A"):
+        v = row_lower.get(field, "")
+        if v and v not in ("", "null", "none", "n/a", "-"):
             try:
                 return float(str(v).replace(",", "")) / 1e9
             except (ValueError, TypeError):
@@ -132,18 +162,18 @@ def notional_value(record: dict) -> float:
     return 0.0
 
 
-def normalise_pair(raw: str) -> str:
-    p = raw.strip().upper().replace(" ", "").replace("-", "/")
-    if "/" not in p and len(p) == 6:
-        p = p[:3] + "/" + p[3:]
-    if p in G8_PAIRS:
-        return p
-    if p in INVERSE_MAP:
-        return INVERSE_MAP[p]
-    return None
+def aggregate(records: list, headers: list):
+    # Diagnostic header/row dump — helps confirm field names in workflow log
+    print(f"  === CSV HEADERS ({len(headers)}) ===")
+    for h in headers:
+        print(f"    '{h}'")
+    if records:
+        first_lower = {k.lower().strip(): (v.strip() if v else "") for k, v in records[0].items()}
+        print("  === FIRST ROW (non-empty fields only) ===")
+        for k, v in first_lower.items():
+            if v:
+                print(f"    '{k}': '{v[:80]}'")
 
-
-def aggregate(records: list) -> tuple:
     pairs = defaultdict(lambda: {
         "notional_usd_bn": 0.0, "trade_count": 0,
         "by_product": defaultdict(lambda: {"notional_usd_bn": 0.0, "count": 0}),
@@ -153,33 +183,63 @@ def aggregate(records: list) -> tuple:
         "by_product": defaultdict(lambda: {"notional_usd_bn": 0.0, "count": 0}),
     }
     trade_dates = set()
+    cnt = {"skipped_action": 0, "skipped_pair": 0, "skipped_notional": 0, "accepted": 0}
 
     for rec in records:
-        action = find_field(rec, "action type", "action").strip().upper()
-        if action and action not in ("NEWT", "NEW", ""):
+        rl = {k.lower().strip(): (v.strip() if v else "") for k, v in rec.items()}
+
+        # Skip lifecycle events — keep only new trades (NEWT, NEW, or blank)
+        action = get(rl, "action type", "action").upper()
+        if action in SKIP_ACTIONS:
+            cnt["skipped_action"] += 1
             continue
 
-        raw_pair = find_field(rec, "underlying asset name", "underlying_asset_1",
-                               "underlier id-leg 1", "underlier id leg 1",
-                               "strike price currency/currency pair").strip()
-        pair = normalise_pair(raw_pair)
+        # --- Determine currency pair ---
+        pair = None
+
+        # 1. FX options: "Strike price currency/currency pair"
+        raw_opt = get(rl,
+            "strike price currency/currency pair",
+            "strike price currency currency pair",
+        )
+        if raw_opt:
+            pair = normalise_pair(raw_opt)
+
+        # 2. All other FX products: build from Notional currency legs (Phase 2 primary)
         if not pair:
+            ccy1 = get(rl,
+                "notional currency-leg 1", "notional currency-leg1",
+                "notional currency leg 1", "notional_currency_1",
+            )
+            ccy2 = get(rl,
+                "notional currency-leg 2", "notional currency-leg2",
+                "notional currency leg 2", "notional_currency_2",
+            )
+            pair = build_pair_from_legs(ccy1, ccy2)
+
+        if not pair:
+            cnt["skipped_pair"] += 1
             continue
 
-        notional = notional_value(rec)
+        notional = parse_notional(rl)
         if notional <= 0:
+            cnt["skipped_notional"] += 1
             continue
 
-        raw_product = find_field(rec, "product name",
-                                  "sub_asset_class_for_other_commodity").strip()
-        key = raw_product.lower().replace(" ", "").replace("_", "")
+        # Normalise product name
+        raw_product = get(rl, "product name", "sub_asset_class_for_other_commodity")
+        key = raw_product.lower().replace(" ", "").replace("_", "").replace("-", "")
         product = PRODUCT_NORM.get(key)
         if not product:
-            tail = raw_product.split(":")[-1].strip().lower() if ":" in raw_product else key
+            tail = key.split(":")[-1] if ":" in key else key
             product = PRODUCT_NORM.get(tail, tail.capitalize() or "FxSwap")
 
-        td = find_field(rec, "execution timestamp", "event timestamp", "effective date")[:10]
-        if td and len(td) == 10:
+        # Trade date
+        td = get(rl,
+            "execution timestamp", "event timestamp",
+            "dissemination timestamp", "effective date",
+        )[:10]
+        if td and len(td) == 10 and td[:4].isdigit():
             trade_dates.add(td)
 
         pairs[pair]["notional_usd_bn"] += notional
@@ -190,6 +250,12 @@ def aggregate(records: list) -> tuple:
         totals["trade_count"] += 1
         totals["by_product"][product]["notional_usd_bn"] += notional
         totals["by_product"][product]["count"] += 1
+        cnt["accepted"] += 1
+
+    print(f"  Counts: accepted={cnt['accepted']} | "
+          f"skipped_action={cnt['skipped_action']} | "
+          f"skipped_pair={cnt['skipped_pair']} | "
+          f"skipped_notional={cnt['skipped_notional']}")
 
     def clean(entry):
         return {
@@ -197,15 +263,19 @@ def aggregate(records: list) -> tuple:
             "trade_count": entry["trade_count"],
             "by_product": {
                 k: {"notional_usd_bn": round(v["notional_usd_bn"], 2), "count": v["count"]}
-                for k, v in sorted(entry["by_product"].items(),
-                                   key=lambda x: x[1]["notional_usd_bn"], reverse=True)
+                for k, v in sorted(
+                    entry["by_product"].items(),
+                    key=lambda x: x[1]["notional_usd_bn"], reverse=True,
+                )
             },
         }
 
     pairs_clean = {
         pair: clean(data)
-        for pair, data in sorted(pairs.items(),
-                                  key=lambda x: x[1]["notional_usd_bn"], reverse=True)
+        for pair, data in sorted(
+            pairs.items(),
+            key=lambda x: x[1]["notional_usd_bn"], reverse=True,
+        )
     }
     trade_date_str = sorted(trade_dates)[-1] if trade_dates else ""
     return pairs_clean, clean(totals), trade_date_str
@@ -239,23 +309,25 @@ def main():
             "status": "unavailable",
         }
     else:
-        records, csv_name = parse_csv_from_zip(zip_bytes)
-        print(f"  Parsed {len(records):,} rows from {csv_name}")
+        records, headers = parse_csv_from_zip(zip_bytes)
+        print(f"  Parsed {len(records):,} rows from CSV")
+
         if not records:
-            print("  Empty CSV", file=sys.stderr)
             output = {
-                "fetched": today.isoformat(), "trade_date": fetched_date.isoformat(),
+                "fetched": today.isoformat(),
+                "trade_date": fetched_date.isoformat(),
                 "source": "DTCC GTR · CFTC Cumulative Slice · public dissemination · T+1",
                 "note": "Notional capped at $250M per trade per CFTC rules.",
                 "pairs": {}, "totals": {"notional_usd_bn": 0.0, "trade_count": 0, "by_product": {}},
                 "status": "unavailable",
             }
         else:
-            pairs, totals, trade_date = aggregate(records)
-            print(f"  {len(pairs)} G8 pairs | trade_date={trade_date} | "
+            pairs, totals, trade_date = aggregate(records, headers)
+            print(f"  Result: {len(pairs)} G8 pairs | trade_date={trade_date} | "
                   f"${totals['notional_usd_bn']:.1f}bn / {totals['trade_count']:,} trades")
-            for pair, d in list(pairs.items())[:5]:
+            for pair, d in list(pairs.items())[:8]:
                 print(f"    {pair}: ${d['notional_usd_bn']:.2f}bn ({d['trade_count']} trades)")
+
             output = {
                 "fetched":    today.isoformat(),
                 "trade_date": trade_date or fetched_date.isoformat(),
@@ -263,18 +335,18 @@ def main():
                 "note":       "Notional capped at $250M per trade per CFTC rules. Represents a subset of total OTC FX volume.",
                 "pairs":      pairs,
                 "totals":     totals,
-                "status":     "ok",
+                "status":     "ok" if pairs else "no_g8_pairs",
             }
 
-    with open(OUTPUT_PATH, "w") as f:
-        json.dump(output, f, separators=(",", ":"))
+    with open(OUTPUT_PATH, "w") as fh:
+        json.dump(output, fh, separators=(",", ":"))
     print(f"  Written: {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
+    except Exception:
         import traceback
         traceback.print_exc()
         sys.exit(1)
