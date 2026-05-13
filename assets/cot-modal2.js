@@ -246,96 +246,50 @@ function _posLabel(z) {
 
 // ── Overview helpers ──────────────────────────────────────────────────────────
 function _cotSparkline(history, nWeeks) {
-  // Returns a placeholder div; the LWC chart is built post-render by _buildSparklineChart()
   const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0)));
   if (vals.length < 2) return '<div style="height:72px;display:flex;align-items:center;font-size:9px;color:#6e7681">Insufficient data</div>';
-  return '<div id="cot-ov-spark-lw" class="cot-spark" style="height:72px;position:relative;"></div>';
+
+  const last = vals[vals.length - 1];
+  const isPos = last >= 0;
+  const lineCol = isPos ? '#26c6b0' : '#ef5350';
+  const fillCol = isPos ? 'rgba(38,198,176,0.18)' : 'rgba(239,83,80,0.18)';
+
+  const W = 1000, H = 72; // viewBox coords — scales to any container width
+  const PAD = { t: 6, b: 6, l: 0, r: 0 };
+  const minV = Math.min(...vals), maxV = Math.max(...vals);
+  const range = maxV - minV || 1;
+
+  const n = vals.length;
+  const xOf = i => PAD.l + (i / (n - 1)) * (W - PAD.l - PAD.r);
+  const yOf = v => PAD.t + (1 - (v - minV) / range) * (H - PAD.t - PAD.b);
+
+  const pts = vals.map((v, i) => `${xOf(i).toFixed(1)},${yOf(v).toFixed(1)}`).join(' ');
+  const firstX = xOf(0).toFixed(1), lastX = xOf(n-1).toFixed(1), baseY = (H - PAD.b).toFixed(1);
+
+  // Polyline points for the area fill (close at bottom)
+  const areaPts = `${firstX},${baseY} ${pts} ${lastX},${baseY}`;
+
+  // Crosshair dot — render at last point
+  const dotX = xOf(n-1).toFixed(1), dotY = yOf(last).toFixed(1);
+
+  return `<svg id="cot-ov-spark-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"
+    style="width:100%;height:72px;display:block;overflow:visible;"
+    xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="cot-spark-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${lineCol}" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="${lineCol}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="${areaPts}" fill="url(#cot-spark-grad)" stroke="none"/>
+    <polyline points="${pts}" fill="none" stroke="${lineCol}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${dotX}" cy="${dotY}" r="4" fill="${lineCol}" stroke="#131722" stroke-width="1.5"/>
+  </svg>`;
 }
 
 function _buildSparklineChart(container, history, nWeeks) {
-  const LWC = window.LightweightCharts;
-  if (!LWC || !container) return;
-  const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0)));
-  if (vals.length < 2) return;
-  const last = vals[vals.length - 1];
-  const isPos = last >= 0;
-  const lineCol  = isPos ? '#26c6b0' : '#ef5350';
-  const topFill  = isPos ? 'rgba(38,198,176,0.18)' : 'rgba(239,83,80,0.18)';
-  const botFill  = isPos ? 'rgba(38,198,176,0.0)'  : 'rgba(239,83,80,0.0)';
-
-  // Defer chart creation until browser has laid out the container at its real width.
-  // Using rAF twice ensures CSS has resolved (avoids 200px max-width from base rule).
-  const _create = () => {
-    // Force container to full width before measuring
-    container.style.width = '100%';
-    container.style.maxWidth = '100%';
-    const W = container.getBoundingClientRect().width || container.offsetWidth || 300;
-    const CHART_H = 72;
-    const chart = LWC.createChart(container, {
-      width: W, height: CHART_H,
-      layout: {
-        background: { type: 'solid', color: '#131722' },
-        textColor: '#6e7681',
-        attributionLogo: false,
-      },
-      grid: { vertLines: { visible: false }, horzLines: { visible: false } },
-      crosshair: {
-        mode: LWC.CrosshairMode?.Normal ?? 1,
-        vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
-        horzLine: { visible: false, labelVisible: false },
-      },
-      rightPriceScale: { visible: false },
-      leftPriceScale:  { visible: false },
-      timeScale: { visible: false, borderVisible: false },
-      handleScroll: false,
-      handleScale:  false,
-    });
-    _cotLwCharts.push(chart);
-
-    // Synthesise weekly dates — work backwards from today
-    const today = new Date();
-    const times = vals.map((_, i) => {
-      const d = new Date(today);
-      d.setDate(d.getDate() - (vals.length - 1 - i) * 7);
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    });
-
-    const area = chart.addSeries(LWC.AreaSeries, {
-      lineColor: lineCol,
-      topColor:    topFill,
-      bottomColor: botFill,
-      lineWidth: 2,
-      priceLineVisible: false,
-      lastValueVisible: false,
-      crosshairMarkerRadius: 4,
-      crosshairMarkerBorderWidth: 1,
-      crosshairMarkerBorderColor: '#131722',
-      crosshairMarkerBackgroundColor: lineCol,
-    });
-    area.setData(times.map((t, i) => ({ time: t, value: vals[i] })));
-    chart.timeScale().fitContent();
-
-    // Tooltip
-    _mkTooltip(container, chart, () => area, param => {
-      const v = param.seriesData.get(area);
-      if (!v) return null;
-      return `<div>${_cotFmt(v.value)}</div>`;
-    });
-
-    // Resize — width only; height stays locked at CHART_H to prevent vertical expand
-    const apply = () => {
-      requestAnimationFrame(() => {
-        const rect = container.getBoundingClientRect();
-        const w = Math.round(rect.width) || container.offsetWidth || 300;
-        if (chart && w > 0) chart.applyOptions({ width: w, height: CHART_H });
-      });
-    };
-    if (window.ResizeObserver) { const ro = new ResizeObserver(() => apply()); ro.observe(container); container._lwRo = ro; }
-    window.addEventListener('resize', apply); container._lwResize = apply;
-    setTimeout(apply, 60); setTimeout(apply, 300);
-  };
-
-  requestAnimationFrame(() => requestAnimationFrame(_create));
+  // SVG sparkline is now built inline by _cotSparkline() — no LWC chart needed.
+  // This function is kept as a no-op so existing callers don't error.
 }
 
 function _cotTrendLabel(history) {
@@ -721,12 +675,7 @@ function openCOTModal(ccy,data){
   document.body.appendChild(bd);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const pin=document.getElementById('cot-pin');if(pin)pin.style.left=gaugeLeft;
-    // Build LWC sparkline in Overview tab (visible on open)
-    const sparkEl=document.getElementById('cot-ov-spark-lw');
-    if(sparkEl&&!sparkEl._built){
-      sparkEl._built=true;
-      _cotEnsureLWLib().then(()=>_buildSparklineChart(sparkEl,history,12)).catch(()=>{});
-    }
+    // Sparkline is now inline SVG — no async build needed
   }));
 
   const tbody=document.getElementById('cot-hist-body');
@@ -772,9 +721,8 @@ function cotTab(el,tabId){
     if(tabId==='net'){const w=document.getElementById('cot-lw-net');if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
     if(tabId==='split'){const w=document.getElementById('cot-lw-split');if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
     if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
-    if(tabId==='overview'){const w=document.getElementById('cot-ov-spark-lw');if(w&&!w._built){w._built=true;_cotEnsureLWLib().then(()=>_buildSparklineChart(w,d.history,12)).catch(()=>{});}else if(w&&w._lwResize)w._lwResize();}
-    // Force resize after layout settles
-    setTimeout(()=>{['cot-lw-net','cot-lw-split','cot-lw-part','cot-ov-spark-lw'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
+    if(tabId==='overview'){ /* sparkline is inline SVG — no build needed */ }
+    setTimeout(()=>{['cot-lw-net','cot-lw-split','cot-lw-part'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
   }));
 }
 
@@ -782,7 +730,7 @@ function closeCOTModal(){
   const bd=document.getElementById('cot-bd');
   if(bd){
     if(bd._esc)document.removeEventListener('keydown',bd._esc);
-    document.querySelectorAll('.cot-lw-wrap, #cot-ov-spark-lw').forEach(w=>{if(w._lwResize)window.removeEventListener('resize',w._lwResize);if(w._lwRo)w._lwRo.disconnect();});
+    document.querySelectorAll('.cot-lw-wrap').forEach(w=>{if(w._lwResize)window.removeEventListener('resize',w._lwResize);if(w._lwRo)w._lwRo.disconnect();});
     bd.remove();
   }
   _destroyCOTCharts();
