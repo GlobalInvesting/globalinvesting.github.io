@@ -1,12 +1,21 @@
 name: Update Economic Calendar
 
+# Builds calendar-data/calendar.json (Economic Surprises panel source) from ff_calendar.json.
+#
+# Moved from private engine repo (v7.80.0) — no private API keys required.
+# fetch_economic_calendar.py reads calendar-data/ff_calendar.json (written by update-ff-calendar.yml)
+# and converts/merges it into the format expected by the Economic Surprises panel.
+# Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
+# Public repos have unlimited GitHub Actions minutes → no budget impact.
+#
+# Schedule (4× daily UTC — 30min after update-ff-calendar to ensure ff_calendar.json is fresh):
+#   05:30 — before London open; captures EU/Asia AM releases
+#   09:30 — after Asia AM window; captures early EU data
+#   13:30 — after US morning releases (CPI, NFP typically at 12:30 UTC)
+#   20:30 — before Sydney/Tokyo open; captures any US afternoon releases
+
 on:
   schedule:
-    # 4× daily (UTC) — aligned with major data-release windows:
-    #   05:30 — before London open; captures EU/Asia AM releases
-    #   09:30 — after Asia AM window; captures early EU data
-    #   13:30 — after US morning releases (CPI, NFP typically at 12:30 UTC)
-    #   20:30 — before Sydney/Tokyo open; captures any US afternoon releases
     - cron: '30 5 * * *'
     - cron: '30 9 * * *'
     - cron: '30 13 * * *'
@@ -17,23 +26,19 @@ concurrency:
   group: update-economic-calendar
   cancel-in-progress: false
 
+permissions:
+  contents: write
+
 jobs:
   update-economic-calendar:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
-      - name: Checkout PUBLIC site repo
+      - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          repository: GlobalInvesting/globalinvesting.github.io
-          token: ${{ secrets.PAT_TOKEN }}
-          path: site
 
-      - name: Checkout THIS private repo (scripts)
-        uses: actions/checkout@v4
-        with:
-          path: engine
+      - name: Pull latest changes
+        run: git fetch origin main && git rebase origin/main
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -44,15 +49,13 @@ jobs:
         run: pip install requests --break-system-packages
 
       - name: Create calendar-data directory
-        run: mkdir -p site/calendar-data
+        run: mkdir -p calendar-data
 
-      - name: Fetch TradingEconomics economic calendar
-        working-directory: site
-        run: python ../engine/scripts/fetch_economic_calendar.py
+      - name: Build calendar.json from ff_calendar.json
+        run: python scripts/fetch_economic_calendar.py
 
       - name: Display summary
         if: always()
-        working-directory: site
         run: |
           echo ""
           echo "========================================"
@@ -82,7 +85,6 @@ jobs:
           fi
 
       - name: Commit and push
-        working-directory: site
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

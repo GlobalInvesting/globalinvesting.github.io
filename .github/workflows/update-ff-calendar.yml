@@ -1,0 +1,116 @@
+name: Update ForexFactory Calendar
+
+# Runs 4×/day covering major session opens.
+# Fetches ForexFactory economic calendar (this week + next week) and writes
+# calendar-data/ff_calendar.json to THIS (public) repo.
+#
+# Moved from private engine repo (v7.80.0) — no private API keys required.
+# ForexFactory public JSON API (nfs.faireconomy.media) — no auth.
+# Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
+# Public repos have unlimited GitHub Actions minutes → no budget impact.
+#
+# Schedule (4× daily UTC — major session windows):
+#   00:30 — before Tokyo open
+#   06:30 — before London open
+#   12:30 — before New York open
+#   20:30 — before Sydney open
+
+on:
+  schedule:
+    - cron: '30 0 * * *'
+    - cron: '30 6 * * *'
+    - cron: '30 12 * * *'
+    - cron: '30 20 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: update-ff-calendar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-ff-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git fetch origin main && git rebase origin/main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests python-dateutil --break-system-packages
+
+      - name: Create calendar-data directory
+        run: mkdir -p calendar-data
+
+      - name: Fetch ForexFactory calendar
+        run: python scripts/fetch_ff_calendar.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "       FF CALENDAR FETCH SUMMARY"
+          echo "========================================"
+          if [ -f "calendar-data/ff_calendar.json" ]; then
+            python3 -c "
+          import json
+          from datetime import datetime, timezone
+          with open('calendar-data/ff_calendar.json') as f:
+              cal = json.load(f)
+          events = cal.get('events', [])\
+          
+          today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+          high = [e for e in events if e['impact'] == 'high']
+          today_high = [e for e in high if e['dateISO'] == today]
+          released = [e for e in today_high if e['released']]
+          pending = [e for e in today_high if not e['released']]
+          print(f'  Total events: {len(events)}')
+          print(f'  High-impact today ({today}): {len(today_high)} ({len(released)} released, {len(pending)} pending)')
+          for e in today_high:
+              status = e.get('actual') or 'pending'
+              print(f'    {e[\"timeUTC\"]} [{e[\"currency\"]}] {e[\"title\"]} | {status}')
+          "
+          else
+            echo "  ff_calendar.json not found — fetch may have failed"
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp calendar-data/ff_calendar.json /tmp/ff_calendar_fresh.json
+          HIGH_IMPACT=$(python3 -c "import json; c=json.load(open('/tmp/ff_calendar_fresh.json')); h=[e for e in c['events'] if e['impact']=='high']; print(f'{len(h)} high-impact events')" 2>/dev/null || echo 'updated')
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/ff_calendar_fresh.json calendar-data/ff_calendar.json
+            git add calendar-data/ff_calendar.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "FF calendar ${TIMESTAMP} — ${HIGH_IMPACT}"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data refreshes on next scheduled run."
+          exit 0

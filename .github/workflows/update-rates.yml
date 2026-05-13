@@ -1,0 +1,125 @@
+name: Update Interest Rates (Scraping + Frankfurter validation)
+
+# Fetches G8 central bank policy rates from official CB sources and writes
+# rates/{CCY}.json + rates/health.json to THIS (public) repo.
+#
+# Moved from private engine repo (v7.80.0) — no private API keys required.
+# All sources are public: RBA CSV, BoC Valet API, ECB Data Portal, BoE Database,
+# NY Fed EFFR API, BoJ/SNB/RBNZ scraping. FRED_API_KEY optional (uses public CSV fallback).
+# Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
+# Public repos have unlimited GitHub Actions minutes → no budget impact.
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # Daily at 08:00 UTC — after Asia close, before EU open
+  workflow_dispatch:
+
+concurrency:
+  group: update-rates
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-rates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git fetch origin main && git rebase origin/main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml --break-system-packages
+
+      - name: Create rates directory
+        run: mkdir -p rates
+
+      - name: Fetch and validate rates
+        # fetch_rates.py exits with code 1 if it detects:
+        #   - Rate outside the plausible range [-2%, 15%]
+        #   - Change > 1pp vs the last saved observation (unusual between daily runs)
+        # health.json is always saved with status of each currency for frontend alerts.
+        run: python scripts/fetch_rates.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "         INTEREST RATES SUMMARY"
+          echo "========================================"
+          echo ""
+          for currency in USD EUR GBP JPY CAD AUD CHF NZD; do
+            if [ -f "rates/$currency.json" ]; then
+              echo "[$currency]"
+              python3 -c "
+          import json
+          with open('rates/$currency.json') as f:
+              data = json.load(f)
+          obs = data['observations']
+          print(f'  Rate:     {obs[0][\"value\"]}%')
+          print(f'  Date:     {obs[0][\"date\"]}')
+          print(f'  History:  {len(obs)} observations')
+          "
+              echo ""
+            fi
+          done
+          echo "[Health Status]"
+          if [ -f "rates/health.json" ]; then
+            python3 -c "
+          import json
+          with open('rates/health.json') as f:
+              h = json.load(f)
+          print(f'  Overall: {h[\"overallStatus\"]}')
+          print(f'  Run:     {h[\"runTimestamp\"]}')
+          print(f'  Frankfurter validation: {\"OK\" if h[\"frankfurterOk\"] else \"UNAVAILABLE\"}')
+          for ccy, info in h['currencies'].items():
+              status = info['status']
+              rate = info['rate']
+              src = info['source'] or 'N/A'
+              print(f'  {ccy}: {rate}%  [{status}]  source={src}')
+          if h[\"issues\"]:
+              print(f'  Issues:')
+              for i in h[\"issues\"]:
+                  print(f'    - {i}')
+          "
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p /tmp/rates_fresh
+          cp -r rates/. /tmp/rates_fresh/
+          TIMESTAMP=$(date -u '+%Y-%m-%d')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp -r /tmp/rates_fresh/. rates/
+            git add rates/
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "Rates ${TIMESTAMP} — scraping + validation"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0

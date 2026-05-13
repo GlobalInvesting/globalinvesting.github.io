@@ -1,0 +1,104 @@
+name: Update Frankfurter FX Cache
+
+# Fetches ECB/Frankfurter FX rates and writes fx-data/frankfurter.json to THIS (public) repo.
+#
+# Moved from private engine repo (v7.80.0) — no private API keys required.
+# Frankfurter.app / ECB public API — no auth required.
+# Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
+# Public repos have unlimited GitHub Actions minutes → no budget impact.
+#
+# Schedule:
+#   Every 4h on weekdays — ECB rates update once daily, but frequent refresh
+#   ensures the cache is always fresh when dashboard.js reads it.
+#   Weekends: once at 08:00 UTC (markets closed, rates stable).
+
+on:
+  schedule:
+    - cron: '0 */4 * * 1-5'  # Every 4h on weekdays
+    - cron: '0 8 * * 6,0'    # Weekends: once at 08:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: update-frankfurter-cache
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-frankfurter-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git fetch origin main && git rebase origin/main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create fx-data directory
+        run: mkdir -p fx-data
+
+      - name: Fetch Frankfurter data
+        run: python scripts/fetch_frankfurter_cache.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "       FRANKFURTER CACHE SUMMARY"
+          echo "========================================"
+          if [ -f "fx-data/frankfurter.json" ]; then
+            python3 -c "
+          import json
+          with open('fx-data/frankfurter.json') as f:
+              d = json.load(f)
+          print(f'  Updated:     {d[\"updated\"]}')
+          print(f'  Today date:  {d[\"today\"][\"date\"]}')
+          print(f'  Today rates: {list(d[\"today\"][\"rates\"].keys())}')
+          print(f'  Prev date:   {d[\"prev\"][\"date\"]}')
+          series_len = len(d.get(\"series\", {}).get(\"rates\", {}))
+          print(f'  Series days: {series_len}')
+          "
+          else
+            echo "  ❌ fx-data/frankfurter.json NOT created"
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p /tmp/frankfurter_fresh
+          cp -r fx-data/. /tmp/frankfurter_fresh/
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp -r /tmp/frankfurter_fresh/. fx-data/
+            git add fx-data/
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "Frankfurter cache ${TIMESTAMP}"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0
