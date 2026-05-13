@@ -9992,6 +9992,28 @@ async function renderEconSurprises() {
     const ccy = ev.currency;
     if (!['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].includes(ccy)) return;
 
+    // ── Noise filter: exclude non-macro events ─────────────────────────────
+    // CESI-style indices (Citi, DB, MS) only score fundamental macro releases.
+    // Bond auctions, CFTC positioning, commodity inventory/rig data, and
+    // sentiment surveys based on price levels are excluded.
+    const evTitle = (ev.event || ev.title || '').toLowerCase();
+    const NOISE_KW = [
+      'cftc','baker hughes','rig count','auction','api weekly',
+      'milk auction','fed\'s balance sheet','reserve balances',
+      'redbook','ibd/tipp','tips auction','note auction','bond auction',
+      'gilt auction','jgb auction','obligaciones','speculative net',
+      'nc net position','crude oil inventories','crude oil imports',
+      'distillate','gasoline inventorie','gasoline production',
+      'refinery','heating oil','natural gas storage',
+      'foreign bonds buying','foreign investments in japanese',
+      'foreign bond investment','foreign investment in japan',
+      'm2 money','m3 money','m4 money','reserve assets total',
+      'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
+      'ibd','3-month bill','4-week bill','52-week bill',
+    ];
+    if (NOISE_KW.some(kw => evTitle.includes(kw))) return;
+    // ───────────────────────────────────────────────────────────────────────
+
     const actualStr   = String(ev.actual   || '').replace(/[%,]/g,'');
     const forecastStr = String(ev.forecast || ev.previous || '').replace(/[%,]/g,'');
     const actual   = parseFloat(actualStr);
