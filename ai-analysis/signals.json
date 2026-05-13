@@ -1,56 +1,53 @@
 {
-  "generated_at": "2026-05-13T05:55:19Z",
+  "generated_at": "2026-05-13T09:23:21Z",
   "signals": [
     {
-      "time": "05:54",
+      "time": "09:22",
       "priority": "critical",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -19,294 (long% at 18.5% extreme) vs RBNZ hawkish shift. New Zealand inflation expectations jumped sharply as the market prices a hike bias for the 27 May meeting. Fed 3.75% vs RBNZ 2.25% — 150bp spread currently favors USD, but crowded spec shorts face significant unwind risk if RBNZ confirms the hawkish outlook. NZD/USD at 0.5944.",
-      "evidence": [
-        "NZD COT LF net: -19,294",
-        "RBNZ bias: Hike",
-        "NZD/USD: 0.5944"
-      ],
-      "watch level": "RBNZ meeting on 27 May",
-      "_source": "gemini"
-    },
-    {
-      "time": "05:51",
-      "priority": "warning",
       "title": "AUD/JPY — G8 Bilateral Theme + Carry",
-      "text": "AUD/JPY at 114.150 — AUD 1W avg +0.560% vs JPY 1W avg -0.587% creates a 1.147% G8 spread. RBA 4.35% vs BoJ 0.75% — +360bp carry premium remains the primary driver as JPY remains subdued despite OECD calls for BoJ rate normalization to 2% by 2027. Retail 87% short AUD/JPY diverges from COT LF net long +58,994, suggesting retail capitulation risk if the carry trade extends.",
+      "text": "AUD/JPY at 114.231 — AUD outperformance (avg +0.695%) vs JPY weakness (avg -0.515%) creates a 1.210% G8 spread, the widest in the complex. RBA at 4.35% (HIKING) vs BoJ 0.75% (ON HOLD) provides a +360bp carry premium, fueling the divergence. JPY COT LF net short -61,340 (crowded carry) vs AUD COT LF net long +58,994 (78.3% long) confirms institutional alignment. Retail 88% short AUD/JPY diverges from COT, suggesting a squeeze if 115.00 is tested. Carry dominates while VIX remains at 17.9 (normal volatility).",
       "evidence": [
-        "AUD 1W avg: +0.560% (n=4)",
-        "JPY 1W avg: -0.587% (n=7)",
-        "G8 spread: 1.147%"
+        "AUD 1W avg: +0.695% (n=4)",
+        "JPY 1W avg: -0.515% (n=7)",
+        "G8 spread: 1.210%",
+        "RBA 4.35% vs BoJ 0.75% — +360bp"
       ],
-      "watch level": "RBA meeting on 16 June",
       "_source": "gemini"
     },
     {
-      "time": "05:49",
+      "time": "09:19",
       "priority": "warning",
-      "title": "USD/JPY — Correlation Break + Monetary Policy",
-      "text": "USD/JPY at 157.698 vs US 10Y: corr=+0.526 vs 252d norm=+0.089 (z=-1.96σ). The pair is trading with an abnormally high sensitivity to US yields as hot US CPI (3.8% y/y) lifts Fed hike bets. Fed 3.75% vs BoJ 0.75% — 300bp spread keeps the pair bid despite hawkish BoJ rhetoric. JPY COT LF net short -61,340 confirms institutional carry persistence.",
+      "title": "USD/JPY — Headline + Carry + Correlation Break",
+      "text": "USD/JPY at 157.875 — Hawkish Fed repricing following hotter US CPI supports DXY (98.53) while JPY extends declines. Fed 3.75% vs BoJ 0.75% (+300bp) maintains the structural bid. USD/JPY vs US 10Y correlation has broken to +0.529 (z=-1.93σ vs norm +0.089), indicating JPY is now hyper-sensitive to US rates compared to historical norms. Intervention risk remains the primary ceiling as price tests the 158.00 handle. Watch for US PPI data for further USD momentum.",
       "evidence": [
-        "USD/JPY vs US 10Y z-score: -1.96σ",
-        "Fed-BoJ spread: 300bp",
-        "JPY COT LF net: -61,340"
+        "USD/JPY: 157.875",
+        "Fed 3.75% vs BoJ 0.75% — +300bp",
+        "USD/JPY vs US 10Y z-score: -1.93σ"
       ],
-      "watch level": "BoJ meeting on 16 June",
       "_source": "gemini"
     },
     {
-      "time": "05:45",
-      "priority": "info",
-      "title": "EUR/USD — Positioning + Cross-Asset Correlation",
-      "text": "EUR/USD at 1.1737 vs EuroStoxx: corr=+0.689 vs 252d norm=-0.121 (z=+1.79σ). EUR is currently tracking equity sentiment rather than its traditional inverse relationship. Fed 3.75% vs ECB 2.0% — 175bp spread favors USD, while EUR COT LF net short -21,011 indicates specs are positioned for further downside as US inflation picks up.",
+      "time": "09:17",
+      "priority": "warning",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD at 0.5928 — COT LF net short -19,294 (long% at extreme 18.5%) shows specs heavily fading the NZD despite the RBNZ market bias for a Hike. Fed 3.75% vs RBNZ 2.25% (+150bp USD carry) supports the current level, but the crowded spec short creates significant squeeze risk if the RBNZ delivers a hawkish surprise at the 27 May meeting. Invalidation of the bearish spec thesis occurs on a sustained break above 0.6000.",
       "evidence": [
-        "EUR/USD vs EuroStoxx z-score: +1.79σ",
-        "USD/EUR spread: +175bp",
-        "EUR COT LF net: -21,011"
+        "NZD COT LF long%: 18.5%",
+        "NZD COT LF net: -19,294",
+        "RBNZ bias: Hike"
       ],
-      "watch level": "ECB meeting on 11 June",
+      "_source": "gemini"
+    },
+    {
+      "time": "09:12",
+      "priority": "info",
+      "title": "EUR/USD — Headline + Positioning",
+      "text": "EUR/USD at 1.1701 — Euro softens following French headline inflation surge (HICP +2.5%) and ahead of Eurozone GDP. Fed 3.75% vs ECB 2.0% (+175bp) favors USD carry. EUR COT LF net short -21,011 (long% 44.7%) reflects neutral-to-bearish institutional sentiment. EUR/USD vs EuroStoxx correlation at +0.697 (z=+1.54σ) suggests EUR is currently trading as a high-beta proxy for European equities rather than on rate differentials alone. Support holds at 1.1680.",
+      "evidence": [
+        "EUR/USD: 1.1701",
+        "Fed 3.75% vs ECB 2.0% — +175bp",
+        "EUR/USD vs EuroStoxx z-score: +1.54σ"
+      ],
       "_source": "gemini"
     }
   ]
