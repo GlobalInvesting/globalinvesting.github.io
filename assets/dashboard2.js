@@ -9907,7 +9907,7 @@ async function renderSovereignSpreads() {
 
 // ── Economic Surprises — CESI-style centred bar index (v7.76.0) ──────────────
 // Methodology: for each G8 currency, computes a normalised surprise index over
-// a 90-day rolling window from TradingEconomics calendar (actual vs consensus).
+// a 90-day rolling window from ForexFactory calendar (actual vs consensus).
 // Index = (beats − misses) / total scored, scaled to [−100, +100].
 // Bar chart centred at 0: green bar extends right for positive, red bar extends
 // left for negative — matching Citi CESI / Bloomberg BEEI visual convention.
@@ -9919,7 +9919,7 @@ async function renderEconSurprises() {
   const nowMs = Date.now();
   const LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 
-  // ── Load calendar.json (TradingEconomics, authenticated) ──────────────────
+  // ── Load calendar.json (ForexFactory via ff_calendar.json) ─────────────────
   let calEvents = [];
   let calSource = '';
   try {
@@ -9973,7 +9973,7 @@ async function renderEconSurprises() {
     if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
       srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
-      srcEl.textContent = 'ForexFactory · actual vs consensus · 21d rolling';
+      srcEl.textContent = 'ForexFactory · actual vs consensus · 90d rolling';
     } else {
       srcEl.textContent = 'Calendar data unavailable';
     }
