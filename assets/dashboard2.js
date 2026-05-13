@@ -9988,6 +9988,7 @@ async function renderEconSurprises() {
     const evTime = new Date(ev.dateISO).getTime();
     if (isNaN(evTime) || evTime > nowMs || nowMs - evTime > LOOKBACK_MS) return;
     if (!ev.released || ev.actual == null) return;
+    if (!['medium','high'].includes(ev.impact)) return;
     const ccy = ev.currency;
     if (!['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].includes(ccy)) return;
 
