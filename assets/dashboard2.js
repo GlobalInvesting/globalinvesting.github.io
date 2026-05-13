@@ -9747,6 +9747,142 @@ async function renderDerivativesSection() {
       }
     });
   }
+
+  // ── ECB Reference Exchange Rates ──
+  // Source: fx-data/frankfurter.json (server-side cached from api.frankfurter.app)
+  // Shows today's ECB fixing vs previous day, plus offset from current spot
+  const ecbTbody = document.getElementById('ecb-fixings-tbody');
+  if (ecbTbody) {
+    try {
+      const fxRes = await fetch('./fx-data/frankfurter.json').catch(() => null);
+      if (fxRes?.ok) {
+        const fxJson = await fxRes.json();
+        const todayRates = fxJson?.today?.rates ?? {};    // EUR-base: {USD: 1.08, GBP: 0.86, ...}
+        const prevRates  = fxJson?.prev?.rates  ?? {};
+        const fxDate     = fxJson?.today?.date  ?? '';
+
+        // Pairs to display — all EUR-quoted
+        const ecbPairs = [
+          { label: 'EUR/USD', ccy: 'USD' },
+          { label: 'EUR/GBP', ccy: 'GBP' },
+          { label: 'EUR/JPY', ccy: 'JPY' },
+          { label: 'EUR/CHF', ccy: 'CHF' },
+          { label: 'EUR/AUD', ccy: 'AUD' },
+          { label: 'EUR/CAD', ccy: 'CAD' },
+          { label: 'EUR/NZD', ccy: 'NZD' },
+        ];
+
+        const rows = ecbTbody.querySelectorAll('tr');
+        const MN = { USD: 4, GBP: 4, JPY: 2, CHF: 4, AUD: 4, CAD: 4, NZD: 4 };
+
+        ecbPairs.forEach(({ label, ccy }, i) => {
+          const row = rows[i];
+          if (!row) return;
+          const tds = row.querySelectorAll('td');
+          const dec = MN[ccy] ?? 4;
+          const today = todayRates[ccy];
+          const prev  = prevRates[ccy];
+          const chg   = (today != null && prev != null) ? today - prev : null;
+          const chgPct = (chg != null && prev != null && prev !== 0) ? (chg / prev) * 100 : null;
+
+          // Spot for vs-fix comparison: try to get EUR/XXX spot from intraday/stooq cache
+          const pairId = ('eur' + ccy).toLowerCase();
+          const spot = STOOQ_RT_CACHE?.[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
+          const vsSpot = (spot != null && today != null) ? spot - today : null;
+
+          const monoStyle = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
+
+          if (tds[0]) tds[0].textContent = label;
+          if (tds[1]) { tds[1].textContent = today != null ? today.toFixed(dec) : '—'; tds[1].setAttribute('style', monoStyle); }
+          if (tds[2]) { tds[2].textContent = prev  != null ? prev.toFixed(dec)  : '—'; tds[2].setAttribute('style', monoStyle + 'color:var(--text2);'); }
+          if (tds[3]) {
+            tds[3].textContent = chg != null ? (chg >= 0 ? '+' : '') + chg.toFixed(dec) : '—';
+            tds[3].setAttribute('style', monoStyle + `color:${chg == null ? 'var(--text3)' : chg > 0 ? 'var(--up)' : chg < 0 ? 'var(--down)' : 'var(--text3)'};`);
+          }
+          if (tds[4]) {
+            tds[4].textContent = chgPct != null ? (chgPct >= 0 ? '+' : '') + chgPct.toFixed(3) + '%' : '—';
+            tds[4].setAttribute('style', monoStyle + `color:${chgPct == null ? 'var(--text3)' : chgPct > 0 ? 'var(--up)' : chgPct < 0 ? 'var(--down)' : 'var(--text3)'};`);
+          }
+          if (tds[5]) {
+            tds[5].textContent = vsSpot != null ? (vsSpot >= 0 ? '+' : '') + vsSpot.toFixed(dec) : '—';
+            tds[5].title       = vsSpot != null ? `Spot (${spot.toFixed(dec)}) minus ECB fix (${today.toFixed(dec)})` : 'Spot not available';
+            tds[5].setAttribute('style', monoStyle + `color:${vsSpot == null ? 'var(--text3)' : Math.abs(vsSpot) < 0.001 ? 'var(--text3)' : 'var(--text2)'};`);
+          }
+        });
+
+        const footer = document.getElementById('ecb-fixings-footer');
+        if (footer && fxDate) footer.textContent = `ECB · official reference fixing · ${fxDate} · published ~16:00 CET · source: frankfurter.json`;
+      }
+    } catch { /* graceful — table shows dashes */ }
+  }
+
+  // ── DTCC GTR FX OTC Notional Volume ──
+  // Source: dtcc-data/dtcc_fx.json (fetched daily by update-dtcc-fx.yml — public repo)
+  // CFTC Recast public dissemination under Dodd-Frank 2(a)(13); no API key required
+  const dtccTbody = document.getElementById('dtcc-tbody');
+  if (dtccTbody) {
+    try {
+      const dtccRes = await fetch('./dtcc-data/dtcc_fx.json').catch(() => null);
+      if (dtccRes?.ok) {
+        const dtcc = await dtccRes.json();
+        const pairs = dtcc?.pairs ?? {};
+        const totals = dtcc?.totals ?? {};
+        const totalNotional = totals?.notional_usd_bn ?? 0;
+
+        const pairKeys = Object.keys(pairs);
+        if (dtcc.status === 'pending' || pairKeys.length === 0) {
+          // First run — data not yet fetched
+          dtccTbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:12px 0;font-size:10px;">Data pending — workflow runs Mon-Fri 14:00 UTC · DTCC GTR T+1</td></tr>';
+        } else {
+          // Build rows — sorted by notional (already sorted in JSON)
+          const rows = pairKeys.map(pair => {
+            const d = pairs[pair];
+            const byProduct = d.by_product ?? {};
+            const swapBn  = byProduct['FxSwap']?.notional_usd_bn    ?? 0;
+            const fwdBn   = byProduct['FxForward']?.notional_usd_bn ?? 0;
+            const spotBn  = byProduct['FxSpot']?.notional_usd_bn    ?? 0;
+            const sharePct = totalNotional > 0 ? (d.notional_usd_bn / totalNotional) * 100 : 0;
+
+            const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
+            return `<tr>
+              <td style="font-size:10px;">${pair}</td>
+              <td style="${mono}color:var(--text);">${d.notional_usd_bn.toFixed(1)}</td>
+              <td style="${mono}color:var(--text2);">${d.trade_count.toLocaleString()}</td>
+              <td style="${mono}color:var(--text2);">${swapBn > 0 ? swapBn.toFixed(1) : '—'}</td>
+              <td style="${mono}color:var(--text2);">${fwdBn  > 0 ? fwdBn.toFixed(1)  : '—'}</td>
+              <td style="${mono}color:var(--text2);">${spotBn > 0 ? spotBn.toFixed(1) : '—'}</td>
+              <td style="${mono}color:var(--text3);">${sharePct.toFixed(1)}%</td>
+            </tr>`;
+          }).join('');
+
+          // Totals row
+          const byProd = totals.by_product ?? {};
+          const totalSwap = byProd['FxSwap']?.notional_usd_bn ?? 0;
+          const totalFwd  = byProd['FxForward']?.notional_usd_bn ?? 0;
+          const totalSpot = byProd['FxSpot']?.notional_usd_bn ?? 0;
+          const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
+          const totRow = `<tr style="border-top:1px solid var(--border2);font-weight:600;">
+            <td style="font-size:10px;color:var(--text2);">TOTAL (G8)</td>
+            <td style="${mono}color:var(--text);">${totalNotional.toFixed(1)}</td>
+            <td style="${mono}color:var(--text2);">${totals.trade_count.toLocaleString()}</td>
+            <td style="${mono}color:var(--text2);">${totalSwap > 0 ? totalSwap.toFixed(1) : '—'}</td>
+            <td style="${mono}color:var(--text2);">${totalFwd  > 0 ? totalFwd.toFixed(1)  : '—'}</td>
+            <td style="${mono}color:var(--text2);">${totalSpot > 0 ? totalSpot.toFixed(1) : '—'}</td>
+            <td style="${mono}color:var(--text3);">100%</td>
+          </tr>`;
+
+          dtccTbody.innerHTML = rows + totRow;
+        }
+
+        const footer = document.getElementById('dtcc-footer');
+        if (footer && dtcc.trade_date) {
+          footer.textContent = `DTCC GTR · CFTC Recast · trade date ${dtcc.trade_date} · fetched ${dtcc.fetched} · Notional capped at $250M/trade · subset of total OTC FX volume`;
+        }
+      } else {
+        dtccTbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:12px 0;font-size:10px;">DTCC data unavailable</td></tr>';
+      }
+    } catch { dtccTbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:12px 0;font-size:10px;">DTCC data error</td></tr>'; }
+  }
 }
 
 
