@@ -9970,10 +9970,8 @@ async function renderEconSurprises() {
   // ── Source label ──────────────────────────────────────────────────────────
   const srcEl = document.getElementById('econ-surprise-source');
   if (srcEl) {
-    if (calSource === 'investing.com') {
+    if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
       srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
-    } else if (calSource === 'TradingEconomics') {
-      srcEl.textContent = 'TradingEconomics · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
       srcEl.textContent = 'ForexFactory · actual vs consensus · 21d rolling';
     } else {

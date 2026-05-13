@@ -1675,7 +1675,18 @@ a:focus-visible,
   }
 }
 
-/* ── Economic Surprises panel — CESI-style bar chart (v7.76.0) ── */
+/* ── Economic Surprises panel — CESI-style bar chart (v7.77.0) ── */
+#econ-surprise-table {
+  table-layout: fixed;
+}
+#econ-surprise-table th:first-child,
+#econ-surprise-table td:first-child {
+  width: 34px;
+}
+#econ-surprise-table th:last-child,
+#econ-surprise-table td:last-child {
+  width: 28px;
+}
 .es-bar-wrap {
   position: relative;
   height: 6px;
