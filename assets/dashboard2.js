@@ -9757,8 +9757,10 @@ async function renderDerivativesSection() {
       const fxRes = await fetch('./fx-data/frankfurter.json').catch(() => null);
       if (fxRes?.ok) {
         const fxJson = await fxRes.json();
-        const todayRates = fxJson?.today?.rates ?? {};    // EUR-base: {USD: 1.08, GBP: 0.86, ...}
-        const prevRates  = fxJson?.prev?.rates  ?? {};
+        // Use EUR-base section for ECB panel (today_eur/prev_eur keys: USD, GBP, JPY, AUD, CAD, CHF, NZD)
+        // Fall back to today/prev (USD-base) for older cached files — USD won't appear in that case
+        const todayRates = fxJson?.today_eur?.rates ?? fxJson?.today?.rates ?? {};
+        const prevRates  = fxJson?.prev_eur?.rates  ?? fxJson?.prev?.rates  ?? {};
         const fxDate     = fxJson?.today?.date  ?? '';
 
         // Pairs to display — all EUR-quoted
@@ -9839,7 +9841,8 @@ async function renderDerivativesSection() {
             const d = pairs[pair];
             const byProduct = d.by_product ?? {};
             const swapBn  = byProduct['FxSwap']?.notional_usd_bn    ?? 0;
-            const fwdBn   = byProduct['FxForward']?.notional_usd_bn ?? 0;
+            const fwdBn   = (byProduct['FxForward']?.notional_usd_bn ?? 0)
+                          + (byProduct['FxNDF']?.notional_usd_bn     ?? 0);  // NDFs are forward-type
             const spotBn  = byProduct['FxSpot']?.notional_usd_bn    ?? 0;
             const sharePct = totalNotional > 0 ? (d.notional_usd_bn / totalNotional) * 100 : 0;
 
@@ -9858,7 +9861,8 @@ async function renderDerivativesSection() {
           // Totals row
           const byProd = totals.by_product ?? {};
           const totalSwap = byProd['FxSwap']?.notional_usd_bn ?? 0;
-          const totalFwd  = byProd['FxForward']?.notional_usd_bn ?? 0;
+          const totalFwd  = (byProd['FxForward']?.notional_usd_bn ?? 0)
+                          + (byProd['FxNDF']?.notional_usd_bn     ?? 0);
           const totalSpot = byProd['FxSpot']?.notional_usd_bn ?? 0;
           const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
           const totRow = `<tr style="border-top:1px solid var(--border2);font-weight:600;">
