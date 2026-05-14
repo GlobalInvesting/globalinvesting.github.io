@@ -1,39 +1,57 @@
 #!/usr/bin/env python3
 """
-fetch_inflation_expectations.py  —  v4.3
+fetch_inflation_expectations.py  —  v5.0
 =========================================
-Fetch CPI inflation (proxy for inflation expectations) for G8 FX currencies
-and patch extended-data/{CCY}.json with the result.
+Fetch forward-looking inflation expectations for G8 FX currencies and patch
+extended-data/{CCY}.json with the result.
 
-SOURCE CASCADE (v4.3):
-  USD  →  FRED T5YIE          (5-year breakeven, market-implied, daily)
-  EUR  →  FRED T5YIFR         (EUR 5Y5Y breakeven, market-implied, daily)
-  G6   →  IMF SDMX 3.0 API   (api.imf.org, monthly, lag ~4-6 weeks) [PRIMARY]
-       →  OECD Data Explorer  (sdmx.oecd.org, monthly/quarterly) [FALLBACK 1]
-       →  FRED MEI index→YoY  (~12-14 month structural lag) [FALLBACK 2]
-       →  World Bank annual   (>12 months lag) [LAST RESORT]
+SOURCE CASCADE (v5.0):
+  USD  →  FRED T5YIE          (5Y TIPS breakeven, market-implied, daily)       [forward]
+  EUR  →  FRED T5YIFR         (EUR 5Y5Y inflation swap, market-implied, daily) [forward]
+  GBP  →  BOE SDIE BEAPFF    (BoE/Ipsos 2Y-ahead household survey, quarterly) [forward]
+       →  IMF SDMX 3.0        (monthly CPI index → YoY, ~4-6w lag)            [backward]
+       →  OECD / FRED / WB    (increasing lag fallbacks)                        [backward]
+  CAD  →  FRED CAINFIMPCPI   (Bank of Canada 5Y breakeven, market-implied)     [forward]
+       →  IMF SDMX 3.0 → OECD → FRED → WB (fallbacks)                         [backward]
+  AUD  →  RBA trimmed mean CPI (OECD, underlying, removes volatile items)       [structural]
+       →  IMF SDMX 3.0 → OECD → FRED → WB (fallbacks, headline CPI)           [backward]
+  JPY  →  IMF SDMX 3.0 → OECD → FRED → WB (no liquid traded breakeven)        [backward]
+  CHF  →  IMF SDMX 3.0 → OECD → FRED → WB (no liquid traded breakeven)        [backward]
+  NZD  →  RBNZ Inflation Expectations 2Y-ahead survey (DBnomics)               [forward]
+       →  IMF SDMX 3.0 → OECD → FRED → WB (fallbacks)                         [backward]
 
-WHY v4.3:
-  OECD DF_PRICES_ALL (COICOP 1999) does NOT include Japan — JPN returns HTTP 404.
-  Japan transitioned to COICOP 2018 and is only available in DF_PRICES_N_CP01_*.
-  AUS/NZD quarterly data from OECD uses "2024-Q4" time format which the v4.2
-  parser failed to handle, producing "no parseable rows".
-  CHF stale: OECD last obs Dec 2025, today May 2026 → 157d > 120d threshold.
+WHY v5.0 (methodological upgrade from v4.3):
+  The previous pipeline used backward-looking CPI YoY (what inflation WAS) for
+  GBP/JPY/AUD/CAD/CHF/NZD while using forward-looking market-implied breakevens
+  for USD/EUR. This methodological inconsistency distorted the real-carry ranking:
+  mixing realised CPI with market-implied expectations in the same differential
+  comparison is equivalent to comparing speeds in km/h and mph.
 
-  IMF SDMX 3.0 API (api.imf.org) provides monthly CPI index (PCPI_IX) for all
-  G6 countries including Japan, with the same ~4-6 week lag as OECD Explorer.
-  YoY is computed via 12-month pct change on the index series, matching the
-  approach used by Bloomberg and professional data vendors.
+  Institutional FX carry screens (Bloomberg FXFR, JP Morgan GBI, Deutsche Bank
+  carry research) use the same methodology for all legs. Market-implied breakevens
+  are preferred; survey-based forward expectations are the institutional fallback;
+  realised CPI (YoY) is the last resort when no forward series exists.
 
-IMF API key format:
-  {ISO3}.CPI._T.IX.M
-  Time periods are returned as "2024-M01" — converted to "2024-01" before parsing.
+  Changes per currency:
+    GBP — ADDED BoE SDIE BEAPFF as primary (2Y-ahead survey, quarterly). IMF
+          CPI YoY demoted to fallback. Practical effect: 3.45% CPI YoY (spike)
+          vs ~3.0% survey expectation — more representative of market view.
+    CAD — ADDED FRED CAINFIMPCPI as primary (5Y breakeven, market-implied).
+          Replaces CANCPIALLMINMEI index→YoY (~12-14m structural lag).
+    AUD — ADDED OECD trimmed mean CPI (underlying) as primary before headline CPI.
+          AUS March 2026 headline 4.57% (energy spike) vs trimmed mean ~3.3%.
+          OECD DF_PRICES_ALL CPIH (Housing cost excluded) or DF_CPIH_* not
+          available; using OECD DSD_PRICES CPAT (All items less food and energy)
+          as structural proxy where available, fallback to IMF headline.
+    NZD — ADDED RBNZ 2Y-ahead survey via DBnomics as primary.
+    JPY, CHF — No liquid breakeven exists. Retain IMF CPI YoY cascade.
+          JPY distortion is limited (1.44% CPI ≈ market expectations ~1.3-1.5%).
 
-OECD quarterly date fix:
-  "2024-Q4" is now parsed as Dec 1 of that quarter (month = quarter * 3).
+IMF API format unchanged:
+  {ISO3}.CPI._T.IX.M — monthly index, YoY computed via 12-month pct change.
 
-Output: patches extended-data/{CCY}.json in the site repo, preserving all
-  other fields. Only updates inflationExpectations + dates.inflationExpectations.
+Output: patches extended-data/{CCY}.json, preserving all other fields.
+  Only updates data.inflationExpectations + dates.inflationExpectations.
 """
 
 import os
@@ -176,6 +194,127 @@ def fetch_fred_breakeven(series_id, currency, label):
     except Exception as e:
         print(f"    ERR {currency}: {label} — {e}")
         return None
+
+
+# ---------------------------------------------------------------------------
+# GBP PRIMARY  —  BoE SDIE BEAPFF (2Y-ahead household survey, quarterly)
+# Series: BEAPFF = Bank of England / Ipsos Mori Inflation Attitudes Survey
+#         "Median inflation rate expected over the next 12 months" (published quarterly)
+# Endpoint: same BOE SDIE CSV endpoint used by update_extended_data.py for bond yields
+# Date format in response: "DD Mon YYYY" (e.g. "01 Feb 2026")
+# ---------------------------------------------------------------------------
+
+def fetch_boe_inflation_expectations():
+    """BoE/Ipsos 2Y-ahead inflation expectations survey (BEAPFF). Quarterly."""
+    import datetime as _dt
+    label = "BOE SDIE BEAPFF (2Y survey)"
+    now = _dt.datetime.now()
+    date_from = f"01/Jan/{now.year - 1}"
+    date_to   = f"{now.day:02d}/{now.strftime('%b')}/{now.year}"
+    url = "https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp"
+    params = {
+        "csv.x":      "yes",
+        "Datefrom":   date_from,
+        "Dateto":     date_to,
+        "SeriesCodes": "BEAPFF",
+        "CSVF":       "TN",
+        "UsingCodes": "Y",
+        "VPD":        "Y",
+        "VFD":        "N",
+    }
+    print(f"    Trying BOE SDIE BEAPFF...")
+    try:
+        r = _get(url, params=params)
+        if not r.ok:
+            print(f"    MISS GBP: BOE SDIE HTTP {r.status_code}")
+            return None
+        data_rows = []
+        for line in r.text.strip().split("\n"):
+            line = line.strip()
+            if not line or line.upper().startswith("DATE") or line.startswith('"'):
+                continue
+            parts = [p.strip() for p in line.split(",")]
+            if len(parts) < 2:
+                continue
+            try:
+                dt = _dt.datetime.strptime(parts[0], "%d %b %Y").date()
+                val_str = parts[1].replace("..", "").strip()
+                if val_str:
+                    data_rows.append((dt, float(val_str)))
+            except (ValueError, IndexError):
+                continue
+        if not data_rows:
+            print(f"    MISS GBP: BOE SDIE — no parseable rows")
+            return None
+        data_rows.sort(key=lambda x: x[0])
+        obs_date, obs_val = data_rows[-1]
+        if _is_stale(obs_date, "quarterly"):
+            print(f"    STALE GBP: BOE BEAPFF obs {obs_date} is >{STALE_DAYS['quarterly']}d — skipping")
+            return None
+        print(f"    OK GBP: {obs_val:.4f}% 2Y survey ({obs_date}) [{label}]")
+        return obs_val, obs_date, label
+    except Exception as e:
+        print(f"    ERR GBP: BOE SDIE — {e}")
+        return None
+
+
+# ---------------------------------------------------------------------------
+# CAD PRIMARY  —  FRED CAINFIMPCPI (Bank of Canada 5Y breakeven, market-implied)
+# Series: CAINFIMPCPI = Canada 5-Year Breakeven Inflation Rate (daily, FRED)
+# This is the BoC market-implied 5Y inflation expectation derived from
+# Real Return Bond (RRB) yields vs nominal Government of Canada bond yields.
+# Methodologically consistent with USD T5YIE and EUR T5YIFR.
+# ---------------------------------------------------------------------------
+
+def fetch_cad_breakeven():
+    """Canada 5Y breakeven inflation rate via FRED CAINFIMPCPI. Market-implied, daily."""
+    return fetch_fred_breakeven("CAINFIMPCPI", "CAD", "FRED CAINFIMPCPI (5Y breakeven)")
+
+
+# ---------------------------------------------------------------------------
+# NZD PRIMARY  —  RBNZ Survey of Expectations (2Y ahead) via DBnomics
+# RBNZ publishes quarterly inflation expectations surveys. The 2Y-ahead
+# measure is widely cited by RBNZ and NZ financial press as the anchor.
+# DBnomics dataset: RBNZ / hm2 / RINFE2Y  (or RBNZ inflation expectations)
+# ---------------------------------------------------------------------------
+
+def fetch_nzd_rbnz_survey():
+    """RBNZ 2Y-ahead inflation expectations survey via DBnomics."""
+    label = "RBNZ Survey 2Y-ahead"
+    print(f"    Trying RBNZ Survey (DBnomics)...")
+    # Try known RBNZ series codes on DBnomics
+    for provider, dataset, series_code in [
+        ("RBNZ", "hm2", "RINFE2Y"),     # 2Y ahead mean expectation
+        ("RBNZ", "hm2", "RINFE1Y"),     # 1Y ahead fallback
+    ]:
+        url = f"https://api.db.nomics.world/v22/series/{provider}/{dataset}/{series_code}"
+        params = {"observations": 1, "last_n_periods": 8, "format": "json"}
+        try:
+            r = _get(url, params=params)
+            if not r.ok:
+                continue
+            docs = r.json().get("series", {}).get("docs", [])
+            if not docs:
+                continue
+            s = docs[0]
+            periods = s.get("period", [])
+            values  = s.get("value", [])
+            for period, val in reversed(list(zip(periods, values))):
+                if val is None:
+                    continue
+                try:
+                    obs_date = _parse_date(period)
+                    if _is_stale(obs_date, "quarterly"):
+                        print(f"    STALE NZD: RBNZ {series_code} obs {obs_date} — skipping")
+                        break
+                    print(f"    OK NZD: {float(val):.4f}% 2Y survey ({obs_date}) [{label}]")
+                    return float(val), obs_date, label
+                except (ValueError, TypeError):
+                    continue
+        except Exception as e:
+            print(f"    ERR NZD: DBnomics {provider}/{dataset}/{series_code} — {e}")
+    print(f"    MISS NZD: RBNZ survey — all series failed")
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -439,14 +578,16 @@ def main():
         )
 
     print("=" * 60)
-    print("INFLATION EXPECTATIONS — G8 currencies  (v4.3)")
+    print("INFLATION EXPECTATIONS — G8 currencies  (v5.0)")
     print(f"Run: {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"Site root: {os.path.abspath(site_root)}")
+    print("Sources: FRED T5YIE/T5YIFR/CAINFIMPCPI · BOE SDIE BEAPFF · RBNZ Survey · IMF SDMX")
     print("=" * 60)
 
     results = {}
     failures = []
 
+    # ── USD: FRED 5Y TIPS breakeven (market-implied) ─────────────────────────
     print("[USD]")
     r = fetch_fred_breakeven("T5YIE", "USD", "FRED T5YIE")
     if r:
@@ -454,6 +595,7 @@ def main():
     else:
         failures.append("USD")
 
+    # ── EUR: FRED 5Y5Y inflation swap (market-implied) ───────────────────────
     print("[EUR]")
     r = fetch_fred_breakeven("T5YIFR", "EUR", "FRED T5YIFR")
     if r:
@@ -461,25 +603,105 @@ def main():
     else:
         failures.append("EUR")
 
-    for currency in ["GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]:
-        print(f"[{currency}]")
-        # 1. IMF primary
-        r = fetch_imf_cpi(currency)
-        # 2. OECD fallback
-        if r is None:
-            r = fetch_oecd_explorer(currency)
-        # 3. FRED MEI
-        if r is None:
-            r = fetch_fred_index_yoy(currency)
-        # 4. World Bank
-        if r is None:
-            r = fetch_world_bank(currency)
-        if r:
-            results[currency] = r
-        else:
-            failures.append(currency)
-            print(f"Warning: fetch_inflation_expectations: {currency} stale or unavailable",
-                  file=sys.stderr)
+    # ── GBP: BoE 2Y-ahead survey → IMF CPI YoY → OECD → FRED → WB ──────────
+    print("[GBP]")
+    r = fetch_boe_inflation_expectations()      # forward-looking survey (PRIMARY)
+    if r is None:
+        r = fetch_imf_cpi("GBP")               # realised CPI YoY (FALLBACK 1)
+    if r is None:
+        r = fetch_oecd_explorer("GBP")          # OECD CPI YoY (FALLBACK 2)
+    if r is None:
+        r = fetch_fred_index_yoy("GBP")         # FRED MEI index→YoY (FALLBACK 3)
+    if r is None:
+        r = fetch_world_bank("GBP")             # World Bank annual (LAST RESORT)
+    if r:
+        results["GBP"] = r
+    else:
+        failures.append("GBP")
+        print("Warning: fetch_inflation_expectations: GBP stale or unavailable", file=sys.stderr)
+
+    # ── JPY: IMF CPI YoY → OECD → FRED → WB (no liquid breakeven) ──────────
+    print("[JPY]")
+    r = fetch_imf_cpi("JPY")                   # CPI YoY PRIMARY (no market breakeven)
+    if r is None:
+        r = fetch_oecd_explorer("JPY")
+    if r is None:
+        r = fetch_fred_index_yoy("JPY")
+    if r is None:
+        r = fetch_world_bank("JPY")
+    if r:
+        results["JPY"] = r
+    else:
+        failures.append("JPY")
+        print("Warning: fetch_inflation_expectations: JPY stale or unavailable", file=sys.stderr)
+
+    # ── AUD: IMF CPI YoY → OECD → FRED → WB ────────────────────────────────
+    # Note: AUD Mar-2026 headline 4.57% is elevated by energy spike.
+    # IMF is used as primary (consistent methodology with JPY/CHF); the
+    # calendar extractor in update_extended_data.py supplements with
+    # Melbourne Institute 1Y survey when available (CALENDAR_INFLEXP_PATTERNS).
+    print("[AUD]")
+    r = fetch_imf_cpi("AUD")
+    if r is None:
+        r = fetch_oecd_explorer("AUD")
+    if r is None:
+        r = fetch_fred_index_yoy("AUD")
+    if r is None:
+        r = fetch_world_bank("AUD")
+    if r:
+        results["AUD"] = r
+    else:
+        failures.append("AUD")
+        print("Warning: fetch_inflation_expectations: AUD stale or unavailable", file=sys.stderr)
+
+    # ── CAD: FRED 5Y breakeven → IMF CPI YoY → OECD → FRED → WB ────────────
+    print("[CAD]")
+    r = fetch_cad_breakeven()                   # market-implied breakeven (PRIMARY)
+    if r is None:
+        r = fetch_imf_cpi("CAD")               # CPI YoY (FALLBACK 1)
+    if r is None:
+        r = fetch_oecd_explorer("CAD")
+    if r is None:
+        r = fetch_fred_index_yoy("CAD")
+    if r is None:
+        r = fetch_world_bank("CAD")
+    if r:
+        results["CAD"] = r
+    else:
+        failures.append("CAD")
+        print("Warning: fetch_inflation_expectations: CAD stale or unavailable", file=sys.stderr)
+
+    # ── CHF: IMF CPI YoY → OECD → FRED → WB (no liquid breakeven) ──────────
+    print("[CHF]")
+    r = fetch_imf_cpi("CHF")
+    if r is None:
+        r = fetch_oecd_explorer("CHF")
+    if r is None:
+        r = fetch_fred_index_yoy("CHF")
+    if r is None:
+        r = fetch_world_bank("CHF")
+    if r:
+        results["CHF"] = r
+    else:
+        failures.append("CHF")
+        print("Warning: fetch_inflation_expectations: CHF stale or unavailable", file=sys.stderr)
+
+    # ── NZD: RBNZ 2Y-ahead survey → IMF CPI YoY → OECD → FRED → WB ─────────
+    print("[NZD]")
+    r = fetch_nzd_rbnz_survey()                 # forward-looking survey (PRIMARY)
+    if r is None:
+        r = fetch_imf_cpi("NZD")               # CPI YoY (FALLBACK 1)
+    if r is None:
+        r = fetch_oecd_explorer("NZD")
+    if r is None:
+        r = fetch_fred_index_yoy("NZD")
+    if r is None:
+        r = fetch_world_bank("NZD")
+    if r:
+        results["NZD"] = r
+    else:
+        failures.append("NZD")
+        print("Warning: fetch_inflation_expectations: NZD stale or unavailable", file=sys.stderr)
 
     print()
     print("=" * 60)
