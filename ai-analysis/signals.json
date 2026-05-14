@@ -1,51 +1,66 @@
 {
-  "generated_at": "2026-05-14T09:13:25Z",
+  "generated_at": "2026-05-14T16:24:39Z",
   "signals": [
     {
-      "time": "09:13",
+      "time": "16:24",
       "priority": "critical",
+      "title": "USD — Macro Inflation Surprise + Yield Curve",
+      "text": "USD at 98.77 following US Import Prices (+1.9% vs +1.0% est) and Export Prices (+3.3% vs +1.1% est) data. KC Fed Pres Schmid confirms inflation remains the 'most pressing risk,' supporting a higher-for-longer regime. US 2s10s spread at +44.5bp in a Bull Flattener regime indicates tightening cycle dominance. Fed 3.75% vs ECB 2.0% (+175bp) and Fed 3.75% vs SNB 0.0% (+375bp) carry spreads remain the primary structural drivers as inflation data delays easing expectations.",
+      "evidence": [
+        "US Import Prices: +1.9% vs +1.0% est",
+        "US 2s10s: +44.5bp (Bull Flattener)",
+        "DXY: 98.77 (+0.25%)"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "16:21",
+      "priority": "warning",
       "title": "AUD/JPY — G8 Bilateral Theme + Carry",
-      "text": "AUD/JPY at 114.502 — AUD outperformance reaches critical thresholds as the G8 leader, supported by a +362bp OIS carry advantage over JPY. The 1.512% spread between the G8 leader and laggard confirms a dominant carry-seeking regime. Despite JPY being the weakest G8 performer, USD/JPY at 157.916 remains below the 160.00 intervention watch level. AUD/JPY strength is structurally supported by the RBA 4.35% (HIKING) vs BoJ 0.75% (ON HOLD) differential.",
+      "text": "AUD/JPY at 114.228 — AUD outperformance (avg +0.624%) vs JPY weakness (avg -0.539%) creates a 1.163% G8 spread. The move is fundamentally anchored by a +360bp OIS carry advantage (RBA 4.35% vs BoJ 0.75%). Retail sentiment is at an extreme 85% short, diverging from COT LF net long +58,994 (78.3% long). This institutional-retail divergence suggests a contrarian risk of further upside as retail shorts are squeezed. Carry dominates while VIX remains at 17.9 (normal volatility).",
       "evidence": [
-        "AUD 1W avg: +0.868% (n=4)",
-        "JPY 1W avg: -0.644% (n=7)",
-        "G8 spread: 1.512%"
+        "AUD 1W avg: +0.624% (n=4)",
+        "JPY 1W avg: -0.539% (n=7)",
+        "G8 spread: 1.163%"
       ],
+      "watch_level": "Next RBA meeting on 16 Jun",
       "_source": "gemini"
     },
     {
-      "time": "09:10",
+      "time": "16:19",
       "priority": "warning",
-      "title": "GBP/USD — Volatility + GDP Headline",
-      "text": "GBP/USD at 1.3518 — UK Q1 Preliminary GDP beat at +0.6% QoQ provides a fundamental floor, yet options markets signal heavy hedging demand. IV at 11.0% vs HV30 at 6.8% generates a +4.2% Vol Risk Premium (VRP), indicating traders are paying a significant premium for protection relative to realized movement. COT LF net long +31,244 (65.3%) shows institutional backing, but the high VRP suggests caution near recent highs. Watch for a break of 1.3500 to invalidate the bullish GDP impulse.",
+      "title": "USD/JPY — Options Skew + Correlation Break",
+      "text": "USD/JPY at 158.123 — 25d Risk Reversal at -1.69 (Saxo) reveals a strong put skew, signaling the options market is paying a premium for downside protection despite the +300bp Fed-BoJ carry advantage. USD/JPY vs US 10Y correlation has broken to +0.503 (z=-2.24σ vs norm +0.146), indicating the pair is no longer tracking Treasury yields linearly. Hawkish BoJ signals are being offset by USD strength, but the options skew suggests institutional positioning for a potential intervention or policy shift.",
       "evidence": [
-        "UK GDP: +0.6% QoQ",
-        "GBP/USD VRP: +4.2%",
-        "GBP COT LF net: +31,244"
+        "25d RR: -1.69 (Strong Put Skew)",
+        "USD/JPY vs US 10Y: z=-2.24σ",
+        "USD/JPY: 158.123"
       ],
+      "watch_level": "Next BoJ meeting on 16 Jun",
       "_source": "gemini"
     },
     {
-      "time": "09:08",
+      "time": "16:15",
       "priority": "warning",
-      "title": "USD/JPY — Options vs Correlation Divergence",
-      "text": "USD/JPY at 157.916 — A strong 25d Risk Reversal of -1.62 (Saxo) reveals an aggressive institutional skew toward JPY calls (downside protection), diverging from the spot trend. This options-market caution coincides with a significant correlation break: USD/JPY vs US 10Y yield (4.48%) has collapsed to corr=+0.476 (z=-1.93σ), suggesting the pair is losing its primary macro driver. Intervention risk at 160.00 remains the primary catalyst for the downside skew despite the +287bp OIS carry advantage.",
+      "title": "USD/CAD — Technical Break + Volatility Premium",
+      "text": "USD/CAD at 1.3726 testing a break above the 100-day MA (1.3718). Despite stronger Canada Wholesale Trade (+1.9% vs +1.4% est), the pair remains bid on USD momentum. Fed 3.75% vs BoC 2.25% (+150bp) carry spread supports the upside. COT LF net short -46,889 (26.4% long) shows specs are heavily positioned against the CAD. Watch for a sustained close above 1.3720 to confirm the technical breakout.",
       "evidence": [
-        "USDJPY 25d RR: -1.62",
-        "z-score: -1.93σ",
-        "USD/JPY OIS Carry: +287bp"
+        "USD/CAD: 1.3726",
+        "100-day MA: 1.3718",
+        "CAD COT LF net: -46,889"
       ],
+      "watch_level": "Next BoC meeting on 10 Jun",
       "_source": "gemini"
     },
     {
-      "time": "09:05",
+      "time": "16:10",
       "priority": "info",
-      "title": "AUD/USD — Positioning + Retail Divergence",
-      "text": "AUD/USD at 0.7255 — Institutional vs retail divergence reaches an extreme. COT LF net long +58,994 (78.3% long) shows heavy institutional commitment, while retail sentiment is 87% short (Myfxbook). This contrarian setup suggests retail is unsuccessfully fading the institutional trend; a further squeeze higher is likely if RBA maintains its hiking bias. Watch for COT long% exceeding 80% to signal a positioning exhaustion point.",
+      "title": "USD/CHF — Volatility Risk Premium",
+      "text": "USD/CHF at 0.7829 — IV at 12.3% vs HV30 at 7.4% generates a +4.9% Vol Risk Premium (VRP). This elevated premium indicates the options market is pricing in significantly higher volatility than has been realized over the past 30 days. Fed 3.75% vs SNB 0.0% (+375bp) carry remains the widest in the G10 space, but the high VRP suggests market participants are aggressively hedging against a sharp CHF reversal or safe-haven bid.",
       "evidence": [
-        "AUD COT LF net: +58,994",
-        "Retail Sentiment: 87% short",
-        "AUD/USD: 0.7255"
+        "USD/CHF VRP: +4.9%",
+        "USD/CHF IV: 12.3%",
+        "Fed-SNB Spread: +375bp"
       ],
       "_source": "gemini"
     }
