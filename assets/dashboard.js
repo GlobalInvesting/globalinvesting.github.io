@@ -1157,6 +1157,8 @@ async function loadIntradayQuotes() {
 
       _intradayCache     = data;
       _intradayCacheTime = now;
+      window._intradayQuotes = data;  // expose for watchlist module
+      document.dispatchEvent(new CustomEvent('gi:quotesLoaded'));
       console.log(`[Intraday] Loaded ${Object.keys(data.quotes).length} quotes — source: ${data.source}`);
       return data;
     } catch (e) {
@@ -10531,3 +10533,114 @@ function initDerivativesNavFixed() {
   }
 })();
 
+
+// ═══════════════════════════════════════════════════════════════════
+// Personal Watchlist — localStorage-backed sidebar widget
+// Pairs are stored as a JSON array under 'gi_watchlist' key.
+// Prices are sourced from the intraday quotes cache (loadIntradayQuotes).
+// ═══════════════════════════════════════════════════════════════════
+(function initWatchlist() {
+  'use strict';
+
+  var WL_KEY = 'gi_watchlist';
+
+  // Map user-entered symbol to intraday quotes key
+  var SYMBOL_MAP = {
+    'EURUSD': 'EURUSD', 'GBPUSD': 'GBPUSD', 'USDJPY': 'USDJPY',
+    'AUDUSD': 'AUDUSD', 'USDCAD': 'USDCAD', 'USDCHF': 'USDCHF',
+    'NZDUSD': 'NZDUSD', 'GBPJPY': 'GBPJPY', 'EURJPY': 'EURJPY',
+    'EURGBP': 'EURGBP', 'AUDJPY': 'AUDJPY', 'EURAUD': 'EURAUD',
+    'EURCHF': 'EURCHF', 'EURCAD': 'EURCAD', 'GBPCHF': 'GBPCHF',
+    'GBPCAD': 'GBPCAD', 'GBPAUD': 'GBPAUD', 'CADJPY': 'CADJPY',
+    'CHFJPY': 'CHFJPY', 'NZDJPY': 'NZDJPY', 'AUDNZD': 'AUDNZD',
+    'XAUUSD': 'XAUUSD', 'XAGUSD': 'XAGUSD',
+  };
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(WL_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function save(list) {
+    try { localStorage.setItem(WL_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+
+  function render() {
+    var tbody = document.getElementById('watchlist-rows');
+    if (!tbody) return;
+    var list = load();
+    if (list.length === 0) {
+      tbody.innerHTML = '<div style="padding:4px 8px;font-size:10px;color:var(--text3);">No pairs added</div>';
+      return;
+    }
+    var quotes = (window._intradayQuotes && window._intradayQuotes.quotes) || {};
+    tbody.innerHTML = list.map(function (sym) {
+      var q = quotes[sym] || {};
+      var price = (q.price != null) ? String(q.price) : '—';
+      var chg = (q.chgPct != null) ? q.chgPct : null;
+      var chgStr = (chg != null) ? ((chg >= 0 ? '+' : '') + chg.toFixed(2) + '%') : '—';
+      var chgColor = (chg == null) ? 'var(--text3)' : (chg >= 0 ? 'var(--up)' : 'var(--down)');
+      return '<div class="sb-row" style="display:flex;align-items:center;gap:0;">' +
+        '<span class="sb-sym" style="flex:1;">' + sym + '</span>' +
+        '<span class="sb-price" style="min-width:52px;text-align:right;font-family:var(--font-mono);font-size:10px;">' + price + '</span>' +
+        '<span style="min-width:42px;text-align:right;font-family:var(--font-mono);font-size:10px;color:' + chgColor + ';">' + chgStr + '</span>' +
+        '<button data-wl-remove="' + sym + '" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:0 4px;line-height:1;" aria-label="Remove ' + sym + '" title="Remove">&times;</button>' +
+        '</div>';
+    }).join('');
+    // Remove buttons
+    tbody.querySelectorAll('[data-wl-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var sym = btn.getAttribute('data-wl-remove');
+        var list = load().filter(function (s) { return s !== sym; });
+        save(list);
+        render();
+      });
+    });
+  }
+
+  function addSymbol(rawInput) {
+    var sym = rawInput.trim().toUpperCase().replace(/[^A-Z]/g, '');
+    if (!sym) return;
+    if (!(sym in SYMBOL_MAP)) return; // only supported symbols
+    var list = load();
+    if (list.indexOf(sym) !== -1) return; // no duplicates
+    if (list.length >= 8) { list.shift(); } // max 8 pairs
+    list.push(sym);
+    save(list);
+    render();
+  }
+
+  function init() {
+    var addBtn = document.getElementById('wl-add-btn');
+    var inputRow = document.getElementById('wl-input-row');
+    var input = document.getElementById('wl-input');
+    if (!addBtn || !inputRow || !input) return;
+
+    render();
+
+    addBtn.addEventListener('click', function () {
+      var visible = inputRow.style.display !== 'none';
+      inputRow.style.display = visible ? 'none' : 'block';
+      if (!visible) { input.value = ''; input.focus(); }
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        addSymbol(input.value);
+        input.value = '';
+        inputRow.style.display = 'none';
+      } else if (e.key === 'Escape') {
+        inputRow.style.display = 'none';
+      }
+    });
+
+    // Refresh prices after quotes load
+    document.addEventListener('gi:quotesLoaded', render);
+    // Also refresh on a slow polling interval
+    setInterval(render, 30000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
