@@ -255,7 +255,7 @@ function _cotSparkline(history, nWeeks) {
   const fillCol = isPos ? 'rgba(38,198,176,0.18)' : 'rgba(239,83,80,0.18)';
 
   const W = 1000, H = 72; // viewBox coords — scales to any container width
-  const PAD = { t: 6, b: 6, l: 0, r: 0 };
+  const PAD = { t: 6, b: 6, l: 14, r: 14 }; // horizontal padding keeps line away from edges
   const minV = Math.min(...vals), maxV = Math.max(...vals);
   const range = maxV - minV || 1;
 
