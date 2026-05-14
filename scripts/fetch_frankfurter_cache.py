@@ -82,8 +82,18 @@ def main():
     today_eur_data = fetch_json(f"{BASE_URL}/{today_date}?from=EUR&to={ECB_CURRENCIES}")
     print(f"  ✓ today (EUR base): {today_eur_data['date']} — {len(today_eur_data['rates'])} currencies")
 
-    # 4) Previous EUR base — for ECB panel prev column
-    prev_eur_data = fetch_json(f"{BASE_URL}/{prev_date}?from=EUR&to={ECB_CURRENCIES}")
+    # 4) Previous EUR base — use the business day before the date the API ACTUALLY returned
+    #    (not prev_date from the calendar). This handles the case where the ECB hasn't published
+    #    today's fixing yet: the API returns yesterday's date for "today", so using calendar
+    #    prev_date would produce the same date → Chg = 0.
+    actual_today_eur = today_eur_data["date"]
+    actual_today_dt = datetime.strptime(actual_today_eur, "%Y-%m-%d")
+    # Step back one business day from the API-returned date
+    prev_eur_dt = actual_today_dt - timedelta(days=1)
+    while prev_eur_dt.weekday() >= 5:
+        prev_eur_dt -= timedelta(days=1)
+    prev_eur_date = prev_eur_dt.strftime("%Y-%m-%d")
+    prev_eur_data = fetch_json(f"{BASE_URL}/{prev_eur_date}?from=EUR&to={ECB_CURRENCIES}")
     print(f"  ✓ prev  (EUR base): {prev_eur_data['date']} — {len(prev_eur_data['rates'])} currencies")
 
     # 5) Timeseries: EUR base → USD, GBP, JPY (for liquidity canvas vol scalar)

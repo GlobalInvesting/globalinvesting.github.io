@@ -146,17 +146,32 @@ def get(row_lower: dict, *candidates: str) -> str:
     return ""
 
 
+CAP_BN = 0.25  # CFTC Dodd-Frank §2(a)(13): large notional trades are capped at $250M
+
+
 def parse_notional(row_lower: dict) -> float:
-    for field in (
-        "notional amount-leg 1",
-        "notional amount-leg1",
-        "notional amount leg 1",
-        "notional_amount_1",
-    ):
+    """Return USD-equivalent notional in $bn, capped at $250M per CFTC rules.
+
+    Prefer the leg whose notional currency is USD. If neither leg is USD
+    (e.g. EUR/GBP), use Leg 1 as a proxy (still subject to the $250M cap).
+    """
+    ccy1 = row_lower.get("notional currency-leg 1", "").strip().upper()[:3]
+    ccy2 = row_lower.get("notional currency-leg 2", "").strip().upper()[:3]
+
+    # Pick the USD leg; fall back to leg 1 if neither is USD
+    if ccy1 == "USD":
+        leg_fields = ("notional amount-leg 1", "notional amount-leg1", "notional amount leg 1")
+    elif ccy2 == "USD":
+        leg_fields = ("notional amount-leg 2", "notional amount-leg2", "notional amount leg 2")
+    else:
+        leg_fields = ("notional amount-leg 1", "notional amount-leg1", "notional amount leg 1")
+
+    for field in leg_fields:
         v = row_lower.get(field, "")
         if v and v not in ("", "null", "none", "n/a", "-"):
             try:
-                return float(str(v).replace(",", "")) / 1e9
+                raw_bn = float(str(v).replace(",", "")) / 1e9
+                return min(raw_bn, CAP_BN)  # apply CFTC $250M cap
             except (ValueError, TypeError):
                 pass
     return 0.0
@@ -236,13 +251,27 @@ def aggregate(records: list, headers: list):
             cnt["skipped_notional"] += 1
             continue
 
-        # Normalise product name
+        # Normalise product name — Product name field is often blank in CFTC Phase 2 data.
+        # Fallback: parse product type from UPI FISN (e.g. "NA/Fwd NDF TWD USD" → FxNDF).
         raw_product = get(rl, "product name", "sub_asset_class_for_other_commodity")
         key = raw_product.lower().replace(" ", "").replace("_", "").replace("-", "")
         product = PRODUCT_NORM.get(key)
         if not product:
             tail = key.split(":")[-1] if ":" in key else key
-            product = PRODUCT_NORM.get(tail, tail.capitalize() or "FxSwap")
+            product = PRODUCT_NORM.get(tail)
+        if not product:
+            # Product name blank or unrecognised — try UPI FISN
+            fisn = get(rl, "upi fisn").upper()
+            if "NDF" in fisn:
+                product = "FxNDF"
+            elif "SPOT" in fisn:
+                product = "FxSpot"
+            elif "FWD" in fisn or "FORWARD" in fisn:
+                product = "FxForward"
+            elif "SWAP" in fisn:
+                product = "FxSwap"
+            else:
+                product = "FxSwap"  # default fallback
 
         # Trade date
         td = get(rl,
