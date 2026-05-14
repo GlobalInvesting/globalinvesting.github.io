@@ -6,7 +6,7 @@
 //   • Everything else      → Network only
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v7.55.2';
+const CACHE_VERSION = 'gi-v7.91.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -14,8 +14,8 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 const STATIC_PRECACHE = [
   '/',
   '/index.html',
-  '/assets/dashboard.css?v=7.52.0',
-  '/assets/dashboard.js?v=7.50.5',
+  '/assets/dashboard.css?v=7.74.42',
+  '/assets/dashboard.js?v=7.89.1',
   '/assets/gdpr.js',
   '/assets/sw-register.js',
   '/favicon.ico',
@@ -99,6 +99,29 @@ self.addEventListener('fetch', event => {
       })
     );
   }
+});
+
+// ── Push — COT Friday notifications ──────────────────────────────
+self.addEventListener('push', event => {
+  var data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (e) { /* ignore */ }
+
+  var title   = data.title   || 'COT Report Updated';
+  var body    = data.body    || 'CFTC data for GBP, EUR, JPY & AUD is now live.';
+  var url     = data.url     || '/';
+  var icon    = data.icon    || '/favicon-192x192.png';
+  var badge   = data.badge   || '/favicon-32x32.png';
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body:  body,
+      icon:  icon,
+      badge: badge,
+      tag:   'cot-update',          // replaces previous COT notification
+      renotify: false,
+      data:  { url: url }
+    })
+  );
 });
 
 // ── Notification click — open/focus the terminal ──────────────────

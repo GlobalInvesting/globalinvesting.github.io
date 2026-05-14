@@ -455,6 +455,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="padding:4px 8px;font-size:10px;color:var(--text3);">Loading…</div>
       </div>
     </div>
+    <div class="sb-section" id="watchlist-section">
+      <div class="sb-head" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Watchlist</span>
+        <button id="wl-add-btn" style="background:none;border:none;cursor:pointer;color:var(--blue);font-size:13px;line-height:1;padding:0 2px;" aria-label="Add pair to watchlist" title="Add pair">+</button>
+      </div>
+      <div id="watchlist-rows" style="padding:0;min-height:24px;"></div>
+      <div id="wl-input-row" style="display:none;padding:4px 8px 6px;">
+        <input id="wl-input" type="text" placeholder="e.g. EURUSD" maxlength="10"
+          style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--font-mono);font-size:10px;padding:3px 6px;outline:none;box-sizing:border-box;"
+          aria-label="Enter pair symbol" />
+      </div>
+    </div>
   </aside>
 
   <!-- MAIN PANEL -->
