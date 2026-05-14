@@ -283,7 +283,7 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
         # ── PART A: 1H bars → aggregate to daily (FX session boundary 21:00 UTC) ──
         _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
-        _start_1h = _end_1h - timedelta(days=730)
+        _start_1h = datetime.now(timezone.utc) - timedelta(days=729)
         hist_1h = ticker.history(
             start=_start_1h.strftime("%Y-%m-%d"),
             end=_end_1h.strftime("%Y-%m-%d"),
@@ -469,7 +469,7 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
         # ── PART A: 1H bars → aggregate to daily (CME session boundary 22:00 UTC) ─
         _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
-        _start_1h = _end_1h - timedelta(days=730)
+        _start_1h = datetime.now(timezone.utc) - timedelta(days=729)
         hist_1h = ticker.history(
             start=_start_1h.strftime("%Y-%m-%d"),
             end=_end_1h.strftime("%Y-%m-%d"),
@@ -647,7 +647,7 @@ def fetch_wti_dxy_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
         # ── PART A: 1H bars → aggregate to daily (CME/ICE 17:00 ET boundary) ──
         _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
-        _start_1h = _end_1h - timedelta(days=730)
+        _start_1h = datetime.now(timezone.utc) - timedelta(days=729)
         hist_1h = ticker.history(
             start=_start_1h.strftime("%Y-%m-%d"),
             end=_end_1h.strftime("%Y-%m-%d"),
@@ -834,7 +834,7 @@ def fetch_equity_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
         # PART A: 1H bars -> aggregate to daily (NYSE boundary 21:00 UTC)
         _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
-        _start_1h = _end_1h - timedelta(days=730)
+        _start_1h = datetime.now(timezone.utc) - timedelta(days=729)
         hist_1h = ticker.history(
             start=_start_1h.strftime("%Y-%m-%d"),
             end=_end_1h.strftime("%Y-%m-%d"),
