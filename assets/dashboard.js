@@ -2141,9 +2141,11 @@ async function renderRiskData(byId) {
   // VIX
   if (byId.vix) {
     const vix = byId.vix.close;
-    const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val warning' : 'risk-val up';
+    const cls = vix > 30 ? 'risk-val down' : vix > 25 ? 'risk-val down' : vix > 20 ? 'risk-val warning' : 'risk-val up';
     setEl('risk-vix', vix.toFixed(1), cls);
-    const signal = vix > 30 ? 'High' : vix > 20 ? 'Elevated' : 'Low';
+    // Bloomberg 4-level VIX classification: <18=Low, 18-25=Moderate, 25-30=Elevated, >30=High
+    // Aligns with stress scoring thresholds: >18=+1pt, >25=+2pts, >30=+3pts
+    const signal = vix > 30 ? 'High' : vix > 25 ? 'Elevated' : vix > 18 ? 'Moderate' : 'Low';
     const chg = byId.vix.chg || 0;
     const arrow = chg > 0 ? '▲' : chg < 0 ? '▼' : '→';
     const chgStr = (chg >= 0 ? ' +' : ' ') + chg.toFixed(1);
@@ -2173,9 +2175,10 @@ async function renderRiskData(byId) {
   // MOVE Index — ^MOVE via yfinance (ICE BofA bond volatility index)
   {
     if (move && move.close > 10) {
-      const cls = move.close > 150 ? 'risk-val down' : move.close > 100 ? 'risk-val warning' : 'risk-val up';
+      // MOVE thresholds: >100=elevated (BofA/ICE standard), >120=late-stage crisis (per GUIDELINES)
+      const cls = move.close > 120 ? 'risk-val down' : move.close > 100 ? 'risk-val warning' : 'risk-val up';
       setEl('risk-move', move.close.toFixed(1), cls);
-      const signal = move.close > 150 ? 'High' : move.close > 100 ? 'Elevated' : 'Low';
+      const signal = move.close > 120 ? 'High' : move.close > 100 ? 'Elevated' : 'Low';
       const arrow = move.chg > 0 ? '▲' : move.chg < 0 ? '▼' : '→';
       const chgStr = (move.chg >= 0 ? ' +' : ' ') + move.chg.toFixed(1);
       setEl('risk-move-sub', arrow + chgStr + ' · ' + signal + ' · ICE BofA');
@@ -5311,9 +5314,14 @@ async function buildInlineDetail(tvSym, container) {
     if (!cotWeek && cotRaw2.weekEnding) cotWeek = cotRaw2.weekEnding;
   }
 
-  // Carry
-  const cbBase  = base  ? (STATE.cbRates?.[base.toLowerCase()]?.rate  ?? null) : null;
-  const cbQuote = quote ? (STATE.cbRates?.[quote.toLowerCase()]?.rate ?? null) : null;
+  // Carry — OIS rate preferred over CB policy rate (Bloomberg standard)
+  // OIS reflects the market's current funding cost; policy rate lags by one meeting.
+  // _resolveRate() returns [rate, source] — OIS if available, policy fallback.
+  const [oisBase,  oisSrcBase]  = (typeof _resolveRate === 'function' && base)  ? _resolveRate(base)  : [null, null];
+  const [oisQuote, oisSrcQuote] = (typeof _resolveRate === 'function' && quote) ? _resolveRate(quote) : [null, null];
+  const cbBase  = oisBase  ?? (base  ? (STATE.cbRates?.[base.toLowerCase()]?.rate  ?? null) : null);
+  const cbQuote = oisQuote ?? (quote ? (STATE.cbRates?.[quote.toLowerCase()]?.rate ?? null) : null);
+  const carrySource = (oisBase != null || oisQuote != null) ? 'OIS' : 'policy rate';
   let carryDiff = null;
   if (cbBase != null && cbQuote != null) {
     carryDiff = meta?.cross ? cbBase - cbQuote : (invert ? cbBase - cbQuote : cbQuote - cbBase);
@@ -5403,7 +5411,7 @@ async function buildInlineDetail(tvSym, container) {
           <div class="pd-inline-metric fx-tip" data-tip-title="1-Week Change" data-tip-body="Weekly % change vs prior Friday close.">
             <div class="pd-inline-lbl">1W Chg</div><div class="pd-inline-val ${cls(pct1w)}">${fmtP(pct1w)}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="Carry Differential" data-tip-body="CB rate differential: base minus quote. Positive = carry favours long." data-tip-ex="USD/JPY carry = Fed 4.5% − BoJ 0.5% = +4.0%.">
+          <div class="pd-inline-metric fx-tip" data-tip-title="Carry Differential" data-tip-body="OIS/overnight rate differential (OIS preferred; falls back to CB policy rate). Positive = carry favours long base currency." data-tip-ex="USD/JPY carry = SOFR (5.30%) − TONA (0.08%) = +5.22%. OIS reflects actual funding cost; policy rate is the ceiling.">
             <div class="pd-inline-lbl">Carry</div><div class="pd-inline-val ${clsI(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2) + '%' : '—'}</div>
           </div>
           <div class="pd-inline-metric fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated avg daily range in pips from HV 30d. Useful for stop/target sizing.">
@@ -5845,8 +5853,12 @@ async function updatePairDetail(tvSym) {
   //   The pair label is always BASE/QUOTE (e.g. AUD/CHF), so numerator = base
   //   carry = cbBase − cbQuote  (AUD rate − CHF rate = 4.10% − 0% = +4.10%)
   //   Using meta.cross to detect cross pairs and always apply cbBase − cbQuote.
-  const cbBase  = base  ? (STATE.cbRates?.[base.toLowerCase()]?.rate  ?? null) : null;
-  const cbQuote = quote ? (STATE.cbRates?.[quote.toLowerCase()]?.rate ?? null) : null;
+  // OIS rate preferred over CB policy rate (Bloomberg standard for carry display).
+  // _resolveRate() returns [rate, source] — OIS if loaded, policy rate as fallback.
+  const [_oisBase,  ]  = (typeof _resolveRate === 'function' && base)  ? _resolveRate(base)  : [null];
+  const [_oisQuote, ]  = (typeof _resolveRate === 'function' && quote) ? _resolveRate(quote) : [null];
+  const cbBase  = _oisBase  ?? (base  ? (STATE.cbRates?.[base.toLowerCase()]?.rate  ?? null) : null);
+  const cbQuote = _oisQuote ?? (quote ? (STATE.cbRates?.[quote.toLowerCase()]?.rate ?? null) : null);
   let carryDiff = null;
   if (cbBase != null && cbQuote != null) {
     if (meta?.cross) {
