@@ -9837,6 +9837,8 @@ async function renderDerivativesSection() {
           dtccTbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:12px 0;font-size:10px;">Data pending — workflow runs Mon-Fri 14:00 UTC · DTCC GTR T+1</td></tr>';
         } else {
           // Build rows — sorted by notional (already sorted in JSON)
+          const maxNotional = pairs[pairKeys[0]]?.notional_usd_bn ?? 1; // largest pair for heat bar scale
+
           const rows = pairKeys.map(pair => {
             const d = pairs[pair];
             const byProduct = d.by_product ?? {};
@@ -9845,8 +9847,15 @@ async function renderDerivativesSection() {
                           + (byProduct['FxNDF']?.notional_usd_bn     ?? 0);  // NDFs are forward-type
             const spotBn  = byProduct['FxSpot']?.notional_usd_bn    ?? 0;
             const sharePct = totalNotional > 0 ? (d.notional_usd_bn / totalNotional) * 100 : 0;
+            // Heat bar: width proportional to this pair vs the largest pair (not total)
+            const barPct = maxNotional > 0 ? Math.min((d.notional_usd_bn / maxNotional) * 100, 100) : 0;
 
             const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
+            // Share cell: number + heat bar background
+            const shareCell = `<td style="${mono}color:var(--text3);position:relative;padding-right:6px;">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:${barPct.toFixed(1)}%;background:var(--blue);opacity:0.18;border-radius:0 2px 2px 0;"></div>
+              <span style="position:relative;">${sharePct.toFixed(1)}%</span>
+            </td>`;
             return `<tr>
               <td style="font-size:10px;">${pair}</td>
               <td style="${mono}color:var(--text);">${d.notional_usd_bn.toFixed(1)}</td>
@@ -9854,7 +9863,7 @@ async function renderDerivativesSection() {
               <td style="${mono}color:var(--text2);">${swapBn > 0 ? swapBn.toFixed(1) : '—'}</td>
               <td style="${mono}color:var(--text2);">${fwdBn  > 0 ? fwdBn.toFixed(1)  : '—'}</td>
               <td style="${mono}color:var(--text2);">${spotBn > 0 ? spotBn.toFixed(1) : '—'}</td>
-              <td style="${mono}color:var(--text3);">${sharePct.toFixed(1)}%</td>
+              ${shareCell}
             </tr>`;
           }).join('');
 
