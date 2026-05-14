@@ -229,16 +229,18 @@ def fetch_boe_inflation_expectations():
             print(f"    MISS GBP: BOE SDIE HTTP {r.status_code}")
             return None
         data_rows = []
-        for line in r.text.strip().split("\n"):
-            line = line.strip()
-            if not line or line.upper().startswith("DATE") or line.startswith('"'):
+        import csv as _csv
+        reader = _csv.reader(r.text.strip().splitlines())
+        for row in reader:
+            if not row or not row[0].strip():
                 continue
-            parts = [p.strip() for p in line.split(",")]
-            if len(parts) < 2:
+            date_str = row[0].strip().strip('"')
+            # Skip header rows (DATE, BEAPFF, etc.)
+            if date_str.upper() in ("DATE", "BEAPFF") or not date_str[0].isdigit():
                 continue
             try:
-                dt = _dt.datetime.strptime(parts[0], "%d %b %Y").date()
-                val_str = parts[1].replace("..", "").strip()
+                dt = _dt.datetime.strptime(date_str, "%d %b %Y").date()
+                val_str = row[1].strip().strip('"').replace("..", "").strip() if len(row) > 1 else ""
                 if val_str:
                     data_rows.append((dt, float(val_str)))
             except (ValueError, IndexError):
@@ -259,62 +261,187 @@ def fetch_boe_inflation_expectations():
 
 
 # ---------------------------------------------------------------------------
-# CAD PRIMARY  —  FRED CAINFIMPCPI (Bank of Canada 5Y breakeven, market-implied)
-# Series: CAINFIMPCPI = Canada 5-Year Breakeven Inflation Rate (daily, FRED)
-# This is the BoC market-implied 5Y inflation expectation derived from
-# Real Return Bond (RRB) yields vs nominal Government of Canada bond yields.
-# Methodologically consistent with USD T5YIE and EUR T5YIFR.
+# CAD PRIMARY  —  BOC Valet breakeven inflation (nominal 10Y − RRB long-term yield)
+# Canada does not publish a pre-computed breakeven series on FRED or BOC Valet.
+# The standard market measure is: BD.CDN.LONG.DQ.YLD (30Y nominal) − BD.CDN.RRB.DQ.YLD (RRB)
+# Note: BOC cancelled new RRB issuances in 2022. The RRB series remains published
+# (secondary market) but with declining liquidity. When the spread is outside [1%, 3%]
+# or the RRB data is stale, we fall through to IMF CPI YoY.
 # ---------------------------------------------------------------------------
 
 def fetch_cad_breakeven():
-    """Canada 5Y breakeven inflation rate via FRED CAINFIMPCPI. Market-implied, daily."""
-    return fetch_fred_breakeven("CAINFIMPCPI", "CAD", "FRED CAINFIMPCPI (5Y breakeven)")
+    """Canada breakeven inflation: BOC Valet LONG nominal yield − RRB yield. Daily."""
+    import datetime as _dt
+    label = "BOC Valet breakeven (nominal LONG − RRB)"
+    end   = _dt.datetime.now().strftime("%Y-%m-%d")
+    start = (_dt.datetime.now() - _dt.timedelta(weeks=6)).strftime("%Y-%m-%d")
+    url   = "https://www.bankofcanada.ca/valet/observations/group/bond_yields_benchmark/json"
+    params = {"start_date": start, "end_date": end}
+    print(f"    Trying BOC Valet breakeven (LONG − RRB)...")
+    try:
+        r = _get(url, params=params)
+        if not r.ok:
+            print(f"    MISS CAD: BOC Valet HTTP {r.status_code}")
+            return None
+        data = r.json()
+        obs_list = data.get("observations", [])
+        if not obs_list:
+            print(f"    MISS CAD: BOC Valet — no observations")
+            return None
+        # Walk backwards to find the latest date with both LONG and RRB values
+        for obs in reversed(obs_list):
+            long_val = obs.get("BD.CDN.LONG.DQ.YLD", {}).get("v")
+            rrb_val  = obs.get("BD.CDN.RRB.DQ.YLD",  {}).get("v")
+            obs_date_str = obs.get("d", "")
+            if not long_val or not rrb_val or not obs_date_str:
+                continue
+            try:
+                long_y = float(long_val)
+                rrb_y  = float(rrb_val)
+                obs_date = _parse_date(obs_date_str)
+            except (ValueError, TypeError):
+                continue
+            breakeven = round(long_y - rrb_y, 4)
+            # Sanity: Canadian breakeven historically 1.5%–2.5%; post-2022 cancellation
+            # the RRB market is thin, so accept wider range [0.5%, 3.5%] before skipping.
+            if not (0.5 <= breakeven <= 3.5):
+                print(f"    MISS CAD: BOC breakeven {breakeven:.2f}% out of plausible range — skipping")
+                return None
+            if _is_stale(obs_date, "monthly"):
+                print(f"    STALE CAD: BOC Valet RRB obs {obs_date} is >{STALE_DAYS['monthly']}d — skipping")
+                return None
+            print(f"    OK CAD: {breakeven:.4f}% breakeven ({obs_date}) [{label}]")
+            print(f"           (LONG {long_y:.2f}% − RRB {rrb_y:.2f}%)")
+            return breakeven, obs_date, label
+        print(f"    MISS CAD: BOC Valet — no valid LONG+RRB pair found")
+        return None
+    except Exception as e:
+        print(f"    ERR CAD: BOC Valet — {e}")
+        return None
 
 
 # ---------------------------------------------------------------------------
-# NZD PRIMARY  —  RBNZ Survey of Expectations (2Y ahead) via DBnomics
-# RBNZ publishes quarterly inflation expectations surveys. The 2Y-ahead
-# measure is widely cited by RBNZ and NZ financial press as the anchor.
-# DBnomics dataset: RBNZ / hm2 / RINFE2Y  (or RBNZ inflation expectations)
+# NZD PRIMARY  —  RBNZ Survey of Expectations M14 (2Y-ahead, quarterly)
+# RBNZ publishes quarterly inflation expectations for 1Y, 2Y, 5Y, 10Y ahead.
+# The 2Y-ahead mean is the anchor watched by RBNZ and NZ markets (Fed equivalent:
+# NY Fed Survey of Professional Forecasters 3Y-ahead median).
+# Data URL: https://www.rbnz.govt.nz/statistics/series/m/m14 (Excel/CSV download)
+# Published: first or second week of the second month of each quarter (Feb, May, Aug, Nov)
+# DBnomics does not index RBNZ M14 inflation expectations — fetch directly from RBNZ.
 # ---------------------------------------------------------------------------
 
 def fetch_nzd_rbnz_survey():
-    """RBNZ 2Y-ahead inflation expectations survey via DBnomics."""
-    label = "RBNZ Survey 2Y-ahead"
-    print(f"    Trying RBNZ Survey (DBnomics)...")
-    # Try known RBNZ series codes on DBnomics
-    for provider, dataset, series_code in [
-        ("RBNZ", "hm2", "RINFE2Y"),     # 2Y ahead mean expectation
-        ("RBNZ", "hm2", "RINFE1Y"),     # 1Y ahead fallback
-    ]:
-        url = f"https://api.db.nomics.world/v22/series/{provider}/{dataset}/{series_code}"
-        params = {"observations": 1, "last_n_periods": 8, "format": "json"}
+    """RBNZ Survey of Expectations M14 — 2Y-ahead CPI inflation mean. Quarterly."""
+    import io as _io
+    label = "RBNZ Survey of Expectations M14 (2Y-ahead)"
+    print(f"    Trying RBNZ M14 Survey (direct fetch)...")
+
+    # RBNZ M14 historical data as XLSX
+    xlsx_url = (
+        "https://www.rbnz.govt.nz/-/media/project/sites/rbnz/files/statistics/"
+        "series/m/m14/hm14.xlsx"
+    )
+    try:
+        r = _get(xlsx_url, custom_headers={"Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})
+        if not r.ok:
+            print(f"    MISS NZD: RBNZ M14 XLSX HTTP {r.status_code}")
+            raise ValueError("HTTP error")
+
+        # Parse with openpyxl
         try:
-            r = _get(url, params=params)
-            if not r.ok:
+            import openpyxl as _openpyxl
+        except ImportError:
+            print(f"    MISS NZD: openpyxl not available — pip install openpyxl")
+            raise ValueError("no openpyxl")
+
+        wb = _openpyxl.load_workbook(_io.BytesIO(r.content), read_only=True, data_only=True)
+        ws = wb.active
+
+        # RBNZ M14 structure: row 1=header, subsequent rows=data
+        # Columns include date + multiple expectation horizons.
+        # We look for the column header matching "Two years ahead" / "2 year" / "2-year CPI"
+        header_row  = None
+        col_2y      = None
+        date_col    = 0  # first column is always the date
+
+        for i, row in enumerate(ws.iter_rows(min_row=1, max_row=8, values_only=True), 1):
+            if row is None:
                 continue
-            docs = r.json().get("series", {}).get("docs", [])
-            if not docs:
-                continue
-            s = docs[0]
-            periods = s.get("period", [])
-            values  = s.get("value", [])
-            for period, val in reversed(list(zip(periods, values))):
-                if val is None:
-                    continue
-                try:
-                    obs_date = _parse_date(period)
-                    if _is_stale(obs_date, "quarterly"):
-                        print(f"    STALE NZD: RBNZ {series_code} obs {obs_date} — skipping")
+            # Find the header row (contains "Two" or "2 year" etc.)
+            row_str = [str(c).lower() if c else "" for c in row]
+            if any("two" in s or "2 year" in s or "2yr" in s for s in row_str):
+                header_row = i
+                # Find the column index for 2Y-ahead CPI expectations
+                for j, cell_str in enumerate(row_str):
+                    if ("two" in cell_str or "2 year" in cell_str or "2yr" in cell_str) and (
+                        "cpi" in cell_str or "inflation" in cell_str or "price" in cell_str
+                        or j == next((k for k, s in enumerate(row_str)
+                                     if "two" in s or "2 year" in s or "2yr" in s), -1)
+                    ):
+                        col_2y = j
                         break
-                    print(f"    OK NZD: {float(val):.4f}% 2Y survey ({obs_date}) [{label}]")
-                    return float(val), obs_date, label
-                except (ValueError, TypeError):
+                if col_2y is None:
+                    # fallback: first column containing "two" or "2 year"
+                    for j, cell_str in enumerate(row_str):
+                        if "two" in cell_str or "2 year" in cell_str or "2yr" in cell_str:
+                            col_2y = j
+                            break
+                break
+
+        if header_row is None or col_2y is None:
+            print(f"    MISS NZD: RBNZ M14 — could not find 2Y-ahead column in header")
+            raise ValueError("no 2Y column")
+
+        # Read data rows: find the most recent non-null 2Y expectation
+        data_rows = []
+        for row in ws.iter_rows(min_row=header_row + 1, values_only=True):
+            if not row or not row[date_col]:
+                continue
+            try:
+                date_raw = row[date_col]
+                val_raw  = row[col_2y] if col_2y < len(row) else None
+                if val_raw is None:
                     continue
-        except Exception as e:
-            print(f"    ERR NZD: DBnomics {provider}/{dataset}/{series_code} — {e}")
-    print(f"    MISS NZD: RBNZ survey — all series failed")
-    return None
+                val = float(str(val_raw).replace(",", "."))
+                # Parse date: RBNZ uses datetime objects or string "YYYY-MM-DD" / "Mar-2026"
+                if hasattr(date_raw, "strftime"):
+                    obs_date = date_raw.date() if hasattr(date_raw, "date") else date_raw
+                else:
+                    date_str = str(date_raw).strip()
+                    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%b-%Y", "%B %Y", "%Y"):
+                        try:
+                            import datetime as _dt2
+                            obs_date = _dt2.datetime.strptime(date_str, fmt).date()
+                            break
+                        except ValueError:
+                            continue
+                    else:
+                        continue
+                # Sanity: NZD 2Y-ahead expectations should be in [0%, 8%]
+                if 0 <= val <= 8:
+                    data_rows.append((obs_date, val))
+            except (ValueError, TypeError):
+                continue
+
+        if not data_rows:
+            print(f"    MISS NZD: RBNZ M14 — no parseable 2Y-ahead rows")
+            raise ValueError("no data rows")
+
+        data_rows.sort(key=lambda x: x[0])
+        obs_date, obs_val = data_rows[-1]
+
+        if _is_stale(obs_date, "quarterly"):
+            print(f"    STALE NZD: RBNZ M14 obs {obs_date} is >{STALE_DAYS['quarterly']}d — skipping")
+            raise ValueError("stale")
+
+        print(f"    OK NZD: {obs_val:.4f}% 2Y survey ({obs_date}) [{label}]")
+        return obs_val, obs_date, label
+
+    except Exception as e:
+        if str(e) not in ("HTTP error", "no openpyxl", "no 2Y column", "no data rows", "stale"):
+            print(f"    ERR NZD: RBNZ M14 — {e}")
+        print(f"    MISS NZD: RBNZ survey — falling back to IMF CPI YoY")
+        return None
 
 
 # ---------------------------------------------------------------------------
