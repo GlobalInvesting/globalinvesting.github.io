@@ -36,8 +36,10 @@ from datetime import datetime, timedelta, timezone
 BASE_URL = "https://api.frankfurter.app"
 OUTPUT_PATH = os.path.join("fx-data", "frankfurter.json")
 
-# Currencies to fetch (USD base — mirrors what dashboard.js needs)
+# Currencies to fetch (USD base — mirrors what dashboard.js needs for FX table / STATE.rates)
 ALL_CURRENCIES = "EUR,GBP,JPY,AUD,CAD,CHF,NZD,HKD,SEK,NOK,DKK,SGD,MXN,ZAR,PLN,HUF,CZK,TRY"
+# EUR-base currencies for the ECB Reference Rates panel (USD must appear as a key)
+ECB_CURRENCIES = "USD,GBP,JPY,AUD,CAD,CHF,NZD"
 # Liquidity series currencies (EUR base — mirrors fetchLiquidityData)
 SERIES_CURRENCIES = "USD,GBP,JPY"
 
@@ -68,15 +70,23 @@ def main():
 
     print(f"  Fetching today={today_date}, prev={prev_date}, series={series_start}..{today_date}")
 
-    # 1) Today rates (USD base → all major currencies)
+    # 1) Today rates (USD base → all major currencies) — used by STATE.rates / FX table
     today_data = fetch_json(f"{BASE_URL}/{today_date}?from=USD&to={ALL_CURRENCIES}")
-    print(f"  ✓ today: {today_data['date']} — {len(today_data['rates'])} currencies")
+    print(f"  ✓ today (USD base): {today_data['date']} — {len(today_data['rates'])} currencies")
 
     # 2) Previous business day (USD base)
     prev_data = fetch_json(f"{BASE_URL}/{prev_date}?from=USD&to={ALL_CURRENCIES}")
-    print(f"  ✓ prev:  {prev_data['date']} — {len(prev_data['rates'])} currencies")
+    print(f"  ✓ prev  (USD base): {prev_data['date']} — {len(prev_data['rates'])} currencies")
 
-    # 3) Timeseries: EUR base → USD, GBP, JPY (for liquidity canvas vol scalar)
+    # 3) Today EUR base — for ECB Reference Rates panel (USD must appear as a key)
+    today_eur_data = fetch_json(f"{BASE_URL}/{today_date}?from=EUR&to={ECB_CURRENCIES}")
+    print(f"  ✓ today (EUR base): {today_eur_data['date']} — {len(today_eur_data['rates'])} currencies")
+
+    # 4) Previous EUR base — for ECB panel prev column
+    prev_eur_data = fetch_json(f"{BASE_URL}/{prev_date}?from=EUR&to={ECB_CURRENCIES}")
+    print(f"  ✓ prev  (EUR base): {prev_eur_data['date']} — {len(prev_eur_data['rates'])} currencies")
+
+    # 5) Timeseries: EUR base → USD, GBP, JPY (for liquidity canvas vol scalar)
     series_data = fetch_json(
         f"{BASE_URL}/{series_start}..{today_date}?from=EUR&to={SERIES_CURRENCIES}"
     )
@@ -84,6 +94,7 @@ def main():
 
     output = {
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        # USD-base: used by STATE.rates / FX table / computeRate()
         "today": {
             "date": today_data["date"],
             "rates": today_data["rates"],
@@ -91,6 +102,17 @@ def main():
         "prev": {
             "date": prev_data["date"],
             "rates": prev_data["rates"],
+        },
+        # EUR-base: used exclusively by the ECB Reference Rates panel
+        # rates keys are USD, GBP, JPY, AUD, CAD, CHF, NZD
+        # e.g. {"USD": 1.1715, "GBP": 0.8671, "JPY": 184.83, ...}
+        "today_eur": {
+            "date": today_eur_data["date"],
+            "rates": today_eur_data["rates"],
+        },
+        "prev_eur": {
+            "date": prev_eur_data["date"],
+            "rates": prev_eur_data["rates"],
         },
         "series": {
             "date_from": series_start,

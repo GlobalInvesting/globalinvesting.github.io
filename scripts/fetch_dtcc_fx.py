@@ -37,8 +37,8 @@ G8_PAIRS = {
     "EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD",
     "USD/CHF", "USD/CAD", "NZD/USD",
     "EUR/GBP", "EUR/JPY", "GBP/JPY", "EUR/CHF",
-    "EUR/AUD", "AUD/JPY", "USD/MXN", "USD/CNY",
-    "GBP/CHF", "GBP/AUD", "EUR/CAD", "USD/SGD",
+    "EUR/AUD", "AUD/JPY",
+    "GBP/CHF", "GBP/AUD", "EUR/CAD",
 }
 
 # Build bidirectional lookup: EURUSD / EUR/USD / EUR-USD all → "EUR/USD"
@@ -173,6 +173,16 @@ def aggregate(records: list, headers: list):
         for k, v in first_lower.items():
             if v:
                 print(f"    '{k}': '{v[:80]}'")
+        # Explicitly log product name distribution across first 200 rows (diagnose product breakdown)
+        from collections import Counter
+        prod_sample = Counter()
+        for rec in records[:200]:
+            rl2 = {k.lower().strip(): (v.strip() if v else "") for k, v in rec.items()}
+            raw = (rl2.get("product name") or rl2.get("sub_asset_class_for_other_commodity") or "")
+            prod_sample[raw or "(blank)"] += 1
+        print(f"  === PRODUCT NAME sample (first 200 rows) ===")
+        for pname, cnt in prod_sample.most_common(10):
+            print(f"    '{pname}': {cnt}")
 
     pairs = defaultdict(lambda: {
         "notional_usd_bn": 0.0, "trade_count": 0,
