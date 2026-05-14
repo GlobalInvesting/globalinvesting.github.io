@@ -6873,7 +6873,6 @@ async function fetchFedExpectations() {
           const step = dir === 'down' ? -cbStep : dir === 'up' ? cbStep : 0;
           fwdDisplay = '~' + Math.max(0, current + step).toFixed(2) + '%';
         }
-        }
       }
 
       const meta = bankMeta[ccy];
