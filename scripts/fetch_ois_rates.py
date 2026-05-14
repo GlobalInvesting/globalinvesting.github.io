@@ -1,148 +1,146 @@
 """
-fetch_ois_rates.py  —  OIS / Overnight Rates  G8  (v2.0)
+fetch_ois_rates.py  —  OIS / Overnight Rates  G8  (v3.0)
 =========================================================
 Fetches overnight/OIS benchmark rates for all G8 currencies and writes
 ois-rates/rates.json to the public site repo.
 
 RATE → BENCHMARK MAPPING
-  USD  SOFR   → NY Fed API (markets.newyorkfed.org)   daily
-  EUR  €STR   → ECB Data Portal SDMX-JSON             daily
-  GBP  SONIA  → BOE SDIE API (IUDSOIA)                daily
-  JPY  TONA   → SNB zimoma cube (zimoma)               monthly
-  AUD  AONIA  → RBA Table F1 CSV                       monthly
-  CAD  CORRA  → BoC Valet API (V122514)                daily
-  CHF  SARON  → SNB data portal (snbgwdzid)            daily
-  NZD  OCR    → RBNZ B2 CSV → policy fallback          monthly
+  USD  SOFR   → FRED API (SOFR)                          daily
+  EUR  €STR   → ECB Data Portal SDMX-JSON                daily
+  GBP  SONIA  → FRED API (IUDSOIA)                       daily
+  JPY  TONA   → SNB zimoma cube                          monthly
+  AUD  AONIA  → FRED API (IRSTCI01AUM156N, staleness-gd) monthly
+  CAD  CORRA  → BoC Valet API (V122514)                  daily
+  CHF  SARON  → SNB data portal (snbgwdzid)              daily
+  NZD  OCR    → FRED API (IRSTCI01NZM156N, staleness-gd) monthly
 
-SOURCE DECISIONS vs workflow_meetings.yml
-  workflow_meetings.yml: reads OIS rates to produce BIAS signals (hold/cut/hike)
-                         Uses FRED API (authenticated) — runs Mondays only
-  fetch_ois_rates.py:    reads OIS rates to produce RATE VALUES for CIP forwards
-                         Uses direct CB APIs (no auth) — runs daily
+SOURCE DESIGN vs workflow_meetings.yml
+  workflow_meetings.yml uses FRED API for: SOFR, DFF, IUDSOIA, ECBDFR,
+    IRSTCI01AUM156N, IR3TIB01NZM156N, IRSTCI01NZM156N.
+  This script uses FRED API for: SOFR (USD), IUDSOIA (GBP), IRSTCI01AUM156N (AUD),
+    IRSTCI01NZM156N (NZD). EUR/JPY/CAD/CHF use direct CB APIs that work without keys.
 
-  NO PURPOSE OVERLAP — separate outputs, separate consumers:
-    meetings-data/meetings.json  → CB Meetings panel (bias + probabilities)
-    ois-rates/rates.json         → CIP forward pricing via _resolveRate()
+  WHY FRED API (not direct CB APIs) for USD/GBP/AUD/NZD:
+    - NY Fed /api/rates/* returned 403 on GH Actions (confirmed v2.0 run)
+    - BOE boeapps CSV returned 403 on GH Actions (confirmed v2.0 run)
+    - RBA CSV/API returned 403 on GH Actions (confirmed v2.0 run)
+    - RBNZ CSV/page returned 403 on GH Actions (confirmed v2.0 run)
+    - FRED API (api.stlouisfed.org, key-auth) confirmed working on GH Actions
+      (workflow_meetings.yml uses it every Monday without failures)
 
-  SHARED UNDERLYING SOURCES (same data, different use):
-    GBP: both use BOE SONIA — meetings: bias signal; ois-rates: rate value
-    JPY: both use SNB zimoma TONA — meetings: bias + supplement; ois-rates: rate value
-    CAD: both use BoC Valet CORRA (V122514) — same series, aligned in v2.0
-    CHF: both use SNB snbgwdzid SARON — same series
+  FRED_API_KEY: already present in engine repo (used by workflow_meetings.yml).
+  The update-ois-rates.yml workflow must pass it as env: FRED_API_KEY.
 
-WHY NOT FRED CSV (v1.0 issue)
-  FRED CSV endpoint (fred.stlouisfed.org) hit read timeouts on GitHub Actions runners
-  in the v1.0 run (2026-05-14). FRED blocks or throttles GH Actions IP ranges on the
-  unauthenticated CSV endpoint. Fix: use direct CB/NY Fed APIs that don't rate-limit
-  by IP. The FRED API (api.stlouisfed.org, key-authenticated) works fine — that's
-  what workflow_meetings.yml uses — but requires FRED_API_KEY secret. This script
-  intentionally avoids secrets to keep the workflow simple (public repo, no vault).
+  NO PURPOSE OVERLAP with workflow_meetings.yml:
+    meetings-data/meetings.json  CB Meetings panel (bias hold/cut/hike + probs)
+    ois-rates/rates.json         CIP forward pricing via _resolveRate()
+
+  STALENESS GUARDS (AUD/NZD):
+    FRED OECD monthly series lag 4-6 weeks. Guard: if abs(ois - policy) > 50bp,
+    the series predates the last CB move -> fall back to policy rate.
+    Same logic as workflow_meetings.yml v7.45.0+.
 
 CONSUMED BY
-  dashboard2.js → loadOISRatesCache() → _resolveRate() → computeCIPForward()
-  Policy rates (rates/*.json) are NOT changed — they drive CB Rates panel,
-  carry ranking, and regime scoring. OIS rates are ONLY used for forward pricing.
+  dashboard2.js -> loadOISRatesCache() -> _resolveRate() -> computeCIPForward()
+  Policy rates (rates/*.json) unchanged — CB Rates panel, carry, regime scoring.
 """
 
 import json
 import os
 import sys
+import datetime as _dt
 from datetime import date, timedelta
 
 import requests
 
-SITE_DIR = os.environ.get('SITE_DIR', '.')
-OUTPUT_PATH = os.path.join(SITE_DIR, 'ois-rates', 'rates.json')
-RATES_DIR   = os.path.join(SITE_DIR, 'rates')
-
-HEADERS = {'User-Agent': 'Mozilla/5.0 (compatible; GlobalInvestingBot/2.0)'}
+SITE_DIR     = os.environ.get('SITE_DIR', '.')
+OUTPUT_PATH  = os.path.join(SITE_DIR, 'ois-rates', 'rates.json')
+RATES_DIR    = os.path.join(SITE_DIR, 'rates')
+HEADERS      = {'User-Agent': 'Mozilla/5.0 (compatible; GlobalInvestingBot/2.0)'}
+FRED_API_KEY = os.environ.get('FRED_API_KEY', '')
+FRED_BASE    = 'https://api.stlouisfed.org/fred/series/observations'
 
 print('=' * 50)
-print('OIS / OVERNIGHT RATES  —  G8')
+print('OIS / OVERNIGHT RATES  --  G8')
 print('=' * 50)
 
-# ── Policy rate fallback ──────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def policy_rate(ccy):
-    """Read current CB policy rate from rates/{CCY}.json as last-resort fallback."""
+    """Read current CB policy rate from rates/{CCY}.json — last-resort fallback."""
     path = os.path.join(RATES_DIR, f'{ccy}.json')
     try:
         with open(path) as f:
             d = json.load(f)
         obs = d.get('observations', [])
         raw = obs[0]['value'] if obs else d.get('rate') or d.get('value')
+        dt  = obs[0].get('date', str(date.today())[:7]) if obs else str(date.today())[:7]
         if raw is not None and str(raw) not in ('.', ''):
-            return float(raw), d.get('observations', [{}])[0].get('date', str(date.today())[:7])
+            return float(raw), dt
     except Exception:
         pass
+    return None, None
+
+
+def fred_latest(series_id, label=None):
+    """
+    Fetch most recent observation from FRED API (api.stlouisfed.org, key-auth).
+    Confirmed working on GH Actions (workflow_meetings.yml uses same key every Monday).
+    Returns (value: float, date: str) or (None, None).
+    """
+    lbl = label or series_id
+    if not FRED_API_KEY:
+        print(f'    [FRED] No API key -- skipping {lbl}')
+        return None, None
+    try:
+        r = requests.get(FRED_BASE, params={
+            'series_id':  series_id,
+            'api_key':    FRED_API_KEY,
+            'file_type':  'json',
+            'sort_order': 'desc',
+            'limit':      '5',
+        }, headers=HEADERS, timeout=15)
+        r.raise_for_status()
+        for o in r.json().get('observations', []):
+            if o.get('value') not in ('.', '', None):
+                return float(o['value']), o.get('date', str(date.today()))
+    except Exception as e:
+        print(f'    FRED {lbl}: {e}')
     return None, None
 
 # ── Fetchers ──────────────────────────────────────────────────────────────────
 
 def fetch_usd():
     """
-    SOFR via NY Fed public API.
-    Endpoint: https://markets.newyorkfed.org/api/rates/sofr/last/1.json
-    No auth, no rate limit on GH Actions — confirmed working.
-    Fallback: EFFR (Fed Funds Effective) from NY Fed.
-    Rationale: NY Fed is the authoritative SOFR publisher (it calculates SOFR).
-    Using the NY Fed API directly avoids FRED's IP-based throttling.
+    SOFR via FRED API (series SOFR).
+    Same key and series as workflow_meetings.yml fetch_bias_usd().
+    Fallback: EFFR (DFF).
     """
     print('[USD]')
-    # Primary: SOFR
-    try:
-        r = requests.get(
-            'https://markets.newyorkfed.org/api/rates/sofr/last/1.json',
-            headers=HEADERS, timeout=15
-        )
-        r.raise_for_status()
-        d = r.json()
-        refRates = d.get('refRates', [])
-        if refRates:
-            val = float(refRates[0]['percentRate'])
-            dt  = refRates[0].get('effectiveDate', str(date.today()))
-            print(f'  USD: SOFR (NY Fed API)')
-            print(f'    ✓ SOFR {val}% ({dt})')
-            return val, 'SOFR', dt
-    except Exception as e:
-        print(f'  USD: SOFR (NY Fed API)')
-        print(f'    SOFR failed: {e}')
+    val, dt = fred_latest('SOFR', 'SOFR')
+    if val is not None:
+        print(f'  USD: SOFR (FRED API)')
+        print(f'    OK SOFR {val}% ({dt})')
+        return val, 'SOFR', dt
 
-    # Fallback: EFFR
-    try:
-        r = requests.get(
-            'https://markets.newyorkfed.org/api/rates/effr/last/1.json',
-            headers=HEADERS, timeout=15
-        )
-        r.raise_for_status()
-        d = r.json()
-        refRates = d.get('refRates', [])
-        if refRates:
-            val = float(refRates[0]['percentRate'])
-            dt  = refRates[0].get('effectiveDate', str(date.today()))
-            print(f'  USD: fallback → EFFR (NY Fed API)')
-            print(f'    ✓ EFFR {val}% ({dt})')
-            return val, 'EFFR', dt
-    except Exception as e:
-        print(f'  USD: fallback → EFFR: {e}')
+    val, dt = fred_latest('DFF', 'EFFR/DFF')
+    if val is not None:
+        print(f'  USD: fallback EFFR (FRED API DFF)')
+        print(f'    OK EFFR {val}% ({dt})')
+        return val, 'EFFR', dt
 
-    # Last resort: policy rate
     val, dt = policy_rate('USD')
     if val is not None:
-        print(f'    ⚠ policy fallback {val:.4f}%')
+        print(f'    policy fallback {val:.4f}%')
         return val, 'policy-fallback', dt
     return None, None, None
 
 
 def fetch_eur():
     """
-    €STR via ECB Data Portal SDMX-JSON (same source as workflow_meetings.yml).
-    Dataflow: EST  Series key: B.EU000A2X2A25.WT
-    URL: https://data-api.ecb.europa.eu/service/data/EST/B.EU000A2X2A25.WT
-    No auth, no bot protection — confirmed reachable from GitHub Actions.
-    Note: we fetch the raw €STR rate (not normalised vs DFR) because
-    _resolveRate() uses this as the discount rate for CIP forwards — the
-    absolute level is what matters, not the spread to DFR.
+    EUR/STR via ECB Data Portal SDMX-JSON (no auth).
+    Confirmed working on GH Actions (v2.0 run: 1.929% 2026-05-12).
+    Fallback: ECB SDW REST alternative endpoint.
     """
     print('[EUR]')
     try:
@@ -152,110 +150,74 @@ def fetch_eur():
         )
         r = requests.get(url, headers=HEADERS, timeout=15)
         r.raise_for_status()
-        ds = r.json()['dataSets'][0]['series']
+        body = r.json()
+        ds = body['dataSets'][0]['series']
         series_key = list(ds.keys())[0]
         obs = ds[series_key]['observations']
-        # Also get dates from structure
         try:
-            time_periods = (
-                r.json()['structure']['dimensions']['observation'][0]['values']
-            )
+            time_periods = body['structure']['dimensions']['observation'][0]['values']
         except Exception:
             time_periods = []
-        sorted_idx = sorted(obs.keys(), key=int, reverse=True)
-        for idx in sorted_idx:
-            val = obs[idx][0]
-            if val is not None:
-                dt = time_periods[int(idx)]['id'] if int(idx) < len(time_periods) else str(date.today())
-                val = float(val)
-                print(f'  EUR: €STR (ECB Data Portal · EST.B.EU000A2X2A25.WT)')
-                print(f'    ✓ €STR {val}% ({dt})')
-                return val, '€STR', dt
+        for idx in sorted(obs.keys(), key=int, reverse=True):
+            v = obs[idx][0]
+            if v is not None:
+                dt  = time_periods[int(idx)]['id'] if int(idx) < len(time_periods) else str(date.today())
+                val = float(v)
+                print(f'  EUR: ESTR (ECB Data Portal EST.B.EU000A2X2A25.WT)')
+                print(f'    OK ESTR {val}% ({dt})')
+                return val, 'ESTR', dt
     except Exception as e:
-        print(f'  EUR: €STR (ECB Data Portal): {e}')
+        print(f'  EUR: ECB Data Portal failed: {e}')
 
-    # Fallback: ECB SDMX REST (alternative endpoint)
     try:
         url2 = 'https://sdw-wsrest.ecb.europa.eu/service/data/EST/B.EU000A2X2A25.WT?lastNObservations=1'
         r2 = requests.get(url2, headers={**HEADERS, 'Accept': 'application/json'}, timeout=15)
         r2.raise_for_status()
         ds2 = r2.json()['dataSets'][0]['series']
-        series_key2 = list(ds2.keys())[0]
-        obs2 = ds2[series_key2]['observations']
-        for idx2 in sorted(obs2.keys(), key=int, reverse=True):
-            val2 = obs2[idx2][0]
-            if val2 is not None:
-                val2 = float(val2)
-                print(f'  EUR: fallback → ECB SDW REST')
-                print(f'    ✓ €STR {val2}% (ECB SDW)')
-                return val2, '€STR', str(date.today())
+        sk2 = list(ds2.keys())[0]
+        for idx2 in sorted(ds2[sk2]['observations'].keys(), key=int, reverse=True):
+            v2 = ds2[sk2]['observations'][idx2][0]
+            if v2 is not None:
+                val2 = float(v2)
+                print(f'  EUR: fallback ECB SDW REST OK {val2}%')
+                return val2, 'ESTR', str(date.today())
     except Exception as e:
-        print(f'  EUR: fallback → ECB SDW: {e}')
+        print(f'  EUR: ECB SDW fallback failed: {e}')
 
     val, dt = policy_rate('EUR')
     if val is not None:
-        print(f'    ⚠ policy fallback {val:.4f}%')
+        print(f'    policy fallback {val:.4f}%')
         return val, 'policy-fallback', dt
     return None, None, None
 
 
 def fetch_gbp():
     """
-    SONIA via BOE SDIE API (series IUDSOIA).
-    URL: https://www.bankofengland.co.uk/boeapps/database/_iadb-FromShowColumns.asp?...
-    CSV export, no auth. Confirmed working in v1.0 run (3.729% 2026-05-11).
-    Note: workflow_meetings.yml uses 1M OIS forward (IUQIBLOK) for bias direction,
-    which is more forward-looking. For CIP forward PRICING, the overnight rate
-    (SONIA spot) is the correct input — matching Bloomberg FXFA methodology.
+    SONIA via FRED API (series IUDSOIA).
+    workflow_meetings.yml falls back to FRED IUDSOIA for SONIA spot — same key/series.
+    For CIP pricing, SONIA spot is the correct rate (not 1M OIS forward which meetings uses).
     """
     print('[GBP]')
-    try:
-        today = date.today()
-        from_date = (today - timedelta(days=14)).strftime('%d/%b/%Y')
-        to_date   = today.strftime('%d/%b/%Y')
-        url = (
-            'https://www.bankofengland.co.uk/boeapps/database/_iadb-FromShowColumns.asp'
-            f'?Travel=NIxIRx&FromSeries=1&ToSeries=50&DAT=RNG'
-            f'&FD=1&FM=Jan&FY=2025'
-            f'&TD={today.day}&TM={today.strftime("%b")}&TY={today.year}'
-            '&C=IUDSOIA&UsingCodes=True&CSVF=TT&BoEpdf=pdf.pdf'
-        )
-        r = requests.get(url, headers=HEADERS, timeout=15)
-        r.raise_for_status()
-        lines = r.text.splitlines()
-        for line in reversed(lines):
-            line = line.strip()
-            if not line or 'Date' in line:
-                continue
-            parts = [p.strip().strip('"') for p in line.split(',')]
-            if len(parts) >= 2 and parts[1] not in ('', 'n/a', 'NA'):
-                try:
-                    val = float(parts[1])
-                    dt  = parts[0]
-                    print(f'  GBP: SONIA (BOE SDIE IUDSOIA)')
-                    print(f'    ✓ SONIA {val}% ({dt})')
-                    return val, 'SONIA', dt
-                except ValueError:
-                    continue
-    except Exception as e:
-        print(f'  GBP: BOE SDIE failed: {e}')
+    val, dt = fred_latest('IUDSOIA', 'SONIA')
+    if val is not None:
+        print(f'  GBP: SONIA (FRED API IUDSOIA)')
+        print(f'    OK SONIA {val}% ({dt})')
+        return val, 'SONIA', dt
 
     val, dt = policy_rate('GBP')
     if val is not None:
-        print(f'    ⚠ policy fallback {val:.4f}%')
+        print(f'    policy fallback {val:.4f}%')
         return val, 'policy-fallback', dt
     return None, None, None
 
 
 def fetch_jpy():
     """
-    TONA via SNB zimoma cube (same source as workflow_meetings.yml).
-    URL: https://data.snb.ch/api/cube/zimoma/data/csv/en?dimSel=D0(TONA)
-    CSV, no auth. SNB publishes monthly international money market rates
-    including TONA (Tokyo Overnight Average Rate).
-    Monthly lag: acceptable for JPY — BoJ moves very slowly and telegraphs well.
-    NOTE: we use the raw TONA value (not the bias-supplement logic that meetings
-    uses for hikeProb). For CIP pricing, the raw overnight rate is correct.
+    TONA via SNB zimoma (data.snb.ch/api/cube/zimoma).
+    Confirmed working on GH Actions (v2.0 run: 0.727% 2026-04).
+    Same source as workflow_meetings.yml. Monthly lag acceptable for JPY.
+    Raw TONA value only -- bias-supplement logic belongs in meetings workflow only.
+    Fallback: FRED OECD overnight Japan (IRSTCI01JPM156N) with staleness guard.
     """
     print('[JPY]')
     today = date.today()
@@ -266,10 +228,7 @@ def fetch_jpy():
         y -= 1
     from_date = f'{y}-{m:02d}'
     try:
-        url = (
-            f'https://data.snb.ch/api/cube/zimoma/data/csv/en'
-            f'?dimSel=D0(TONA)&fromDate={from_date}'
-        )
+        url = f'https://data.snb.ch/api/cube/zimoma/data/csv/en?dimSel=D0(TONA)&fromDate={from_date}'
         r = requests.get(url, headers=HEADERS, timeout=15)
         r.raise_for_status()
         lines = r.text.splitlines()
@@ -281,155 +240,106 @@ def fetch_jpy():
                     val = float(parts[2])
                     dt  = parts[0]
                     print(f'  JPY: TONA (SNB zimoma)')
-                    print(f'    ✓ TONA {val}% ({dt})')
+                    print(f'    OK TONA {val}% ({dt})')
                     return val, 'TONA', dt
                 except ValueError:
                     continue
-        print(f'  JPY: SNB zimoma — no data rows found')
+        print(f'  JPY: SNB zimoma -- no data rows found')
     except Exception as e:
         print(f'  JPY: SNB zimoma failed: {e}')
 
+    val, dt = fred_latest('IRSTCI01JPM156N', 'OECD-JPY')
+    if val is not None:
+        pol, _ = policy_rate('JPY')
+        if pol is not None and abs(val - pol) > 0.50:
+            print(f'  JPY: FRED OECD={val}% vs policy={pol}% -- stale (>50bp), skipping')
+        else:
+            print(f'  JPY: fallback FRED OECD overnight {val}% ({dt})')
+            return val, 'OECD-overnight', dt
+
     val, dt = policy_rate('JPY')
     if val is not None:
-        print(f'    ⚠ policy fallback {val:.4f}%')
+        print(f'    policy fallback {val:.4f}%')
         return val, 'policy-fallback', dt
     return None, None, None
 
 
 def fetch_aud():
     """
-    AONIA via RBA Table F1 CSV.
-    URL: https://www.rba.gov.au/statistics/tables/csv/f1.csv
-    AONIA (Australian Overnight Index Average) = RBA cash rate target tracking rate.
-    Monthly frequency in the RBA F1 table.
-    Confirmed working in v1.0 run (4.35% 2026-05-13).
+    AONIA via FRED API (series IRSTCI01AUM156N -- OECD AUD overnight rate).
+    Staleness guard: abs(ois - policy) > 50bp OR ois < policy - 10bp -> policy fallback.
+    Same series and guard as workflow_meetings.yml v7.45.0+.
+    ASX IB futures and RBA API both return 403 on GH Actions (confirmed v2.0 run).
     """
     print('[AUD]')
-    try:
-        url = 'https://www.rba.gov.au/statistics/tables/csv/f1.csv'
-        r = requests.get(url, headers=HEADERS, timeout=20)
-        r.raise_for_status()
-        lines = r.text.splitlines()
-        # Find the AONIA row — RBA CSV has variable header depth
-        # Look for 'Cash Rate' or 'AONIA' in the description column
-        aonia_row_idx = None
-        for i, line in enumerate(lines):
-            low = line.lower()
-            if 'aonia' in low or ('cash rate' in low and 'target' not in low):
-                aonia_row_idx = i
-                break
-        if aonia_row_idx is None:
-            # Try to find the date row and the row right after 'FIRMMCRT'
-            for i, line in enumerate(lines):
-                if 'FIRMMCRT' in line or 'overnight index' in line.lower():
-                    aonia_row_idx = i
-                    break
-        if aonia_row_idx is not None:
-            row_parts = lines[aonia_row_idx].split(',')
-            # Find last non-empty numeric value
-            for cell in reversed(row_parts):
-                cell = cell.strip().strip('"')
-                if cell and cell not in ('', 'n/a', 'na', 'N/A'):
-                    try:
-                        val = float(cell)
-                        # Find the date from the header row
-                        date_row = None
-                        for line in lines[:aonia_row_idx]:
-                            if '20' in line and ('Jan' in line or 'Feb' in line or
-                               'Mar' in line or 'Apr' in line or 'May' in line or
-                               '-' in line):
-                                date_row = line
-                        dt = str(date.today())[:7]
-                        print(f'  AUD: AONIA via RBA Table F1 CSV')
-                        print(f'    ✓ AONIA/RBA {val}% ({dt})')
-                        return val, 'AONIA', dt
-                    except ValueError:
-                        continue
-    except Exception as e:
-        print(f'  AUD: RBA Table F1 CSV failed: {e}')
+    rba_target, rba_dt = policy_rate('AUD')
 
-    val, dt = policy_rate('AUD')
+    val, dt = fred_latest('IRSTCI01AUM156N', 'AONIA/OECD')
     if val is not None:
-        print(f'    ⚠ policy fallback {val:.4f}%')
-        return val, 'policy-fallback', dt
+        if rba_target is not None:
+            diff = val - rba_target
+            stale = abs(diff) > 0.50 or diff < -0.10
+            if stale:
+                print(f'  AUD: FRED OECD={val}% vs RBA={rba_target}% -- stale (diff={diff:.2f}%)')
+                print(f'    policy fallback {rba_target:.4f}%')
+                return rba_target, 'policy-fallback', rba_dt
+        print(f'  AUD: AONIA (FRED API IRSTCI01AUM156N)')
+        print(f'    OK AONIA {val}% ({dt})')
+        return val, 'AONIA', dt
+
+    if rba_target is not None:
+        print(f'    policy fallback {rba_target:.4f}%')
+        return rba_target, 'policy-fallback', rba_dt
     return None, None, None
 
 
 def fetch_cad():
     """
     CORRA via Bank of Canada Valet API (series V122514).
-    URL: https://www.bankofcanada.ca/valet/observations/V122514/json?recent=3
-    V122514 = CORRA (Canadian Overnight Repo Rate Average).
-    Daily frequency. No auth required.
-    ALIGNMENT NOTE v2.0: workflow_meetings.yml uses V122514 — aligned here.
-    v1.0 used V122530 (overnight money market, equivalent but different series).
-    V122514 is the canonical CORRA series used by BoC for policy rate communication.
+    Confirmed working on GH Actions (v2.0 run: 2.2492% 2026-02-01).
+    V122514 = canonical CORRA series (aligned with workflow_meetings.yml).
+    V122530 retained as fallback.
     """
     print('[CAD]')
-    try:
-        series = 'V122514'
-        r = requests.get(
-            f'https://www.bankofcanada.ca/valet/observations/{series}/json',
-            params={'recent': '3'},
-            headers=HEADERS, timeout=15
-        )
-        r.raise_for_status()
-        obs = r.json().get('observations', [])
-        if obs:
-            last = obs[-1]
-            val_raw = last.get(series, {}).get('v')
-            if val_raw is not None:
-                val = float(val_raw)
-                dt  = last.get('d', str(date.today()))
-                print(f'  CAD: CORRA (BoC Valet {series})')
-                print(f'    ✓ CORRA {val}% ({dt})')
-                return val, 'CORRA', dt
-    except Exception as e:
-        print(f'  CAD: BoC Valet {series} failed: {e}')
-
-    # Fallback: V122530 (overnight money market — equivalent, v1.0 series)
-    try:
-        series2 = 'V122530'
-        r2 = requests.get(
-            f'https://www.bankofcanada.ca/valet/observations/{series2}/json',
-            params={'recent': '3'},
-            headers=HEADERS, timeout=15
-        )
-        r2.raise_for_status()
-        obs2 = r2.json().get('observations', [])
-        if obs2:
-            last2 = obs2[-1]
-            val_raw2 = last2.get(series2, {}).get('v')
-            if val_raw2 is not None:
-                val2 = float(val_raw2)
-                dt2  = last2.get('d', str(date.today()))
-                print(f'  CAD: fallback → BoC Valet {series2}')
-                print(f'    ✓ CORRA {val2}% ({dt2})')
-                return val2, 'CORRA', dt2
-    except Exception as e:
-        print(f'  CAD: BoC Valet {series2} failed: {e}')
+    for series in ('V122514', 'V122530'):
+        try:
+            r = requests.get(
+                f'https://www.bankofcanada.ca/valet/observations/{series}/json',
+                params={'recent': '3'}, headers=HEADERS, timeout=15
+            )
+            r.raise_for_status()
+            obs = r.json().get('observations', [])
+            if obs:
+                last = obs[-1]
+                raw  = last.get(series, {}).get('v')
+                if raw is not None:
+                    val = float(raw)
+                    dt  = last.get('d', str(date.today()))
+                    print(f'  CAD: CORRA (BoC Valet {series})')
+                    print(f'    OK CORRA {val}% ({dt})')
+                    return val, 'CORRA', dt
+        except Exception as e:
+            print(f'  CAD: BoC Valet {series} failed: {e}')
 
     val, dt = policy_rate('CAD')
     if val is not None:
-        print(f'    ⚠ policy fallback {val:.4f}%')
+        print(f'    policy fallback {val:.4f}%')
         return val, 'policy-fallback', dt
     return None, None, None
 
 
 def fetch_chf():
     """
-    SARON via SNB data portal (cube: snbgwdzid).
-    URL: https://data.snb.ch/api/cube/snbgwdzid/data/csv/en?dimSel=D0(SARON)
-    Same source as workflow_meetings.yml. Daily frequency.
+    SARON via SNB data portal (cube snbgwdzid).
+    Confirmed working on GH Actions (v2.0 run: -0.04% 2026-05-08).
+    Same source as workflow_meetings.yml.
+    Fallback: FRED OECD CHF overnight (IRSTCI01CHM156N) with staleness guard.
     """
     print('[CHF]')
     today = date.today()
     from_date = (today - timedelta(days=14)).strftime('%Y-%m-%d')
     try:
-        url = (
-            f'https://data.snb.ch/api/cube/snbgwdzid/data/csv/en'
-            f'?dimSel=D0(SARON)&fromDate={from_date}'
-        )
+        url = f'https://data.snb.ch/api/cube/snbgwdzid/data/csv/en?dimSel=D0(SARON)&fromDate={from_date}'
         r = requests.get(url, headers=HEADERS, timeout=15)
         r.raise_for_status()
         lines = r.text.splitlines()
@@ -441,59 +351,55 @@ def fetch_chf():
                     val = float(parts[2])
                     dt  = parts[0]
                     print(f'  CHF: SARON (SNB snbgwdzid)')
-                    print(f'    ✓ SARON {val}% ({dt})')
+                    print(f'    OK SARON {val}% ({dt})')
                     return val, 'SARON', dt
                 except ValueError:
                     continue
-        print(f'  CHF: SNB snbgwdzid — no data rows found')
+        print(f'  CHF: SNB snbgwdzid -- no data rows found')
     except Exception as e:
         print(f'  CHF: SNB snbgwdzid failed: {e}')
 
+    val, dt = fred_latest('IRSTCI01CHM156N', 'OECD-CHF')
+    if val is not None:
+        pol, _ = policy_rate('CHF')
+        if pol is not None and abs(val - pol) > 0.50:
+            print(f'  CHF: FRED OECD={val}% vs policy={pol}% -- stale (>50bp), skipping')
+        else:
+            print(f'  CHF: fallback FRED OECD overnight {val}% ({dt})')
+            return val, 'OECD-overnight', dt
+
     val, dt = policy_rate('CHF')
     if val is not None:
-        print(f'    ⚠ policy fallback {val:.4f}%')
+        print(f'    policy fallback {val:.4f}%')
         return val, 'policy-fallback', dt
     return None, None, None
 
 
 def fetch_nzd():
     """
-    NZD OCR overnight via RBNZ B2 CSV (wholesale interest rates).
-    URL: https://www.rbnz.govt.nz/statistics/b2
-    B2 'Wholesale interest rates' — published daily.
-    Fallback: policy rate from rates/NZD.json.
-    Note: workflow_meetings.yml uses NZFBF OIS → IR3TIB → IRSTCI01NZM156N for
-    bias direction with a 40bp track supplement. For CIP pricing we use the
-    clean overnight rate, not the forward-adjusted bias.
+    NZD overnight via FRED API (series IRSTCI01NZM156N -- OECD NZD overnight rate).
+    Staleness guard: abs(ois - policy) > 50bp -> fall back to policy rate.
+    RBNZ CSV and NZFBF both return 403 on GH Actions (confirmed v2.0 run).
+    workflow_meetings.yml uses IRSTCI01NZM156N as tertiary source -- same series here.
+    Note: meetings applies credit-adj + track supplement for bias direction; this
+    script uses the raw overnight rate as the CIP discount rate (no adjustment needed).
     """
     print('[NZD]')
-    try:
-        url = 'https://www.rbnz.govt.nz/statistics/b2'
-        r = requests.get(url, headers=HEADERS, timeout=15)
-        r.raise_for_status()
-        lines = r.text.splitlines()
-        # RBNZ B2: CSV with date column and rate columns
-        # Look for 'OCR' or 'Official Cash Rate' row
-        for i, line in enumerate(lines):
-            if 'OCR' in line or 'overnight' in line.lower() or 'official cash' in line.lower():
-                parts = [p.strip().strip('"') for p in line.split(',')]
-                for cell in reversed(parts):
-                    try:
-                        val = float(cell)
-                        if 0.0 <= val <= 15.0:
-                            dt = str(date.today())[:7]
-                            print(f'  NZD: OCR (RBNZ B2 CSV)')
-                            print(f'    ✓ OCR {val}% ({dt})')
-                            return val, 'OCR', dt
-                    except ValueError:
-                        continue
-    except Exception as e:
-        print(f'  NZD: RBNZ B2 failed: {e}')
+    rbnz_ocr, rbnz_dt = policy_rate('NZD')
 
-    val, dt = policy_rate('NZD')
+    val, dt = fred_latest('IRSTCI01NZM156N', 'NZD-OECD')
     if val is not None:
-        print(f'    ⚠ policy fallback {val:.4f}%')
-        return val, 'policy-fallback', dt
+        if rbnz_ocr is not None and abs(val - rbnz_ocr) > 0.50:
+            print(f'  NZD: FRED OECD={val}% vs RBNZ={rbnz_ocr}% -- stale (>{abs(val-rbnz_ocr):.2f}%)')
+            print(f'    policy fallback {rbnz_ocr:.4f}%')
+            return rbnz_ocr, 'policy-fallback', rbnz_dt
+        print(f'  NZD: OCR overnight (FRED API IRSTCI01NZM156N)')
+        print(f'    OK NZD overnight {val}% ({dt})')
+        return val, 'OCR-overnight', dt
+
+    if rbnz_ocr is not None:
+        print(f'    policy fallback {rbnz_ocr:.4f}%')
+        return rbnz_ocr, 'policy-fallback', rbnz_dt
     return None, None, None
 
 
@@ -510,29 +416,29 @@ FETCHERS = {
     'NZD': fetch_nzd,
 }
 
-rates   = {}
-sources = {}
-dates   = {}
+rates    = {}
+sources  = {}
+dates    = {}
 failures = 0
 
 for ccy, fetcher in FETCHERS.items():
     try:
         val, src, dt = fetcher()
     except Exception as e:
-        print(f'  {ccy}: unexpected fetcher exception: {e}')
+        print(f'  {ccy}: unexpected exception: {e}')
         val, src, dt = None, None, None
 
     if val is not None:
         rates[ccy]   = round(val, 6)
         sources[ccy] = src
         dates[ccy]   = dt
-        print(f'  → {ccy} = {val}%  [{src}]  ({dt})')
+        print(f'  -> {ccy} = {val}%  [{src}]  ({dt})')
     else:
         failures += 1
-        print(f'  → {ccy} = FAILED (no data, no policy fallback)')
+        print(f'  -> {ccy} = FAILED (no data, no policy fallback)')
 
 print()
-print(f'── Summary: {len(rates)}/8 currencies loaded, {failures} failures ──')
+print(f'-- Summary: {len(rates)}/8 currencies loaded, {failures} failures --')
 
 # ── Write output ──────────────────────────────────────────────────────────────
 
@@ -542,15 +448,15 @@ output = {
     'rates':   rates,
     'sources': sources,
     'dates':   dates,
-    'updated': date.today().strftime('%Y-%m-%dT') + __import__('datetime').datetime.utcnow().strftime('%H:%M:%SZ'),
+    'updated': _dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
 }
 
 with open(OUTPUT_PATH, 'w') as f:
     json.dump(output, f, indent=2)
 
-print(f'✅ Written: {OUTPUT_PATH}')
+print(f'OK Written: {OUTPUT_PATH}')
 print(json.dumps(output, indent=2))
 
 if failures == 8:
-    print('⚠️  All currencies failed — no data written to repo', file=sys.stderr)
+    print('WARNING: All currencies failed -- check FRED_API_KEY secret', file=sys.stderr)
     sys.exit(1)
