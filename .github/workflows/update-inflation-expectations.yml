@@ -32,17 +32,22 @@ jobs:
         run: mkdir -p extended-data
 
       - name: Fetch inflation expectations
-        # Sources (v4.2):
-        #   USD: FRED T5YIE (5Y breakeven, market-implied, daily)
-        #   EUR: FRED T5YIFR (EUR 5Y5Y breakeven, market-implied, daily)
-        #   G6:  OECD Data Explorer SDMX API (sdmx.oecd.org)
-        #          Dataflow: OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0
-        #          Key: {country}.{M|Q}.N.CPI.PA._T.N.GY (TRANSFORMATION=GY = annual pct change)
-        #          Format: csvfilewithlabels -- lag ~4-6 weeks from national CPI release
-        #        Fallback: FRED OECD MEI index series (~12-14m structural lag)
-        #        Last resort: World Bank annual (>12m lag)
+        # Sources (v5.0) — methodologically consistent forward-looking cascade:
+        #   USD: FRED T5YIE (5Y TIPS breakeven, market-implied, daily)
+        #   EUR: FRED T5YIFR (EUR 5Y5Y inflation swap, market-implied, daily)
+        #   GBP: BOE SDIE BEAPFF (2Y-ahead household survey, quarterly) → IMF → OECD → FRED → WB
+        #   CAD: FRED CAINFIMPCPI (5Y breakeven, market-implied, daily) → IMF → OECD → FRED → WB
+        #   NZD: RBNZ 2Y-ahead survey (DBnomics, quarterly) → IMF → OECD → FRED → WB
+        #   JPY: IMF SDMX 3.0 → OECD → FRED → WB  (no liquid traded breakeven)
+        #   AUD: IMF SDMX 3.0 → OECD → FRED → WB  (calendar supplements with MI survey)
+        #   CHF: IMF SDMX 3.0 → OECD → FRED → WB  (no liquid traded breakeven)
         #
-        # Script lives at scripts/fetch_inflation_expectations.py in this repo.
+        # v5.0 upgrade: GBP/CAD/NZD now use forward-looking market-implied or survey
+        # sources as primary, consistent with USD/EUR methodology. Previous v4.3
+        # used backward-looking CPI YoY for all G6, creating a methodological
+        # inconsistency that distorted the real-carry ranking.
+        #
+        # Script: scripts/fetch_inflation_expectations.py in this repo.
         # Patches extended-data/{CCY}.json updating only:
         #   data.inflationExpectations  and  dates.inflationExpectations
         # All other fields in each file are preserved unchanged.
@@ -77,7 +82,7 @@ jobs:
             echo "No changes to commit"
             exit 0
           fi
-          git commit -m "Inflation expectations $(date +'%Y-%m-%d') -- OECD Data Explorer / FRED breakevens"
+          git commit -m "Inflation expectations $(date +'%Y-%m-%d') -- FRED breakevens / BOE survey / RBNZ survey / IMF SDMX"
           for i in 1 2 3; do
             git push && echo "Push succeeded" && exit 0
             echo "Push rejected (attempt $i) -- rebasing..."
