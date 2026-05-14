@@ -79,7 +79,7 @@
       side:    'right',
       title:   'Cross-Asset Risk Monitor',
       badge:   'Cross-Asset',
-      body:    'VIX, MOVE, DXY, Gold, and S&amp;P 500 — the five inputs that determine the regime. When two or more enter stress territory the terminal shifts to CAUTION or RISK-OFF. This panel shows you exactly which factors are driving the read, refreshed every 15 minutes.',
+      body:    'VIX, MOVE, DXY, Gold, and S&amp;P 500 — the five inputs that determine the regime. When two or more enter stress territory the terminal shifts to CAUTION or RISK-OFF. This panel shows you exactly which factors are driving the read, refreshed every 5 minutes.',
       action:  null,
     },
 
