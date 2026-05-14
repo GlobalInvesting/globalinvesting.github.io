@@ -1,53 +1,18 @@
-name: Update OIS / Overnight Rates
-
-# Fetches OIS/overnight benchmark rates for all G8 currencies and writes
-# ois-rates/rates.json to THIS (public) repo.
-#
-# Rate → benchmark:
-#   USD  SOFR (NY Fed via FRED)           daily
-#   EUR  €STR (ECB via FRED)              daily
-#   GBP  SONIA (BOE SDIE IUDSOIA)         daily
-#   JPY  TONA (BOJ Statistics)            daily
-#   AUD  AONIA (RBA Table F1)             monthly
-#   CAD  CORRA (BoC Valet V122530)        daily
-#   CHF  SARON (SNB data API)             weekly
-#   NZD  OCR overnight (RBNZ B2)          monthly
-#
-# All sources are public — no API keys required.
-# Public repo → unlimited GitHub Actions minutes.
-#
-# Consumed by:
-#   dashboard2.js → loadOISRatesCache() → computeCIPForward()
-#   Replaces CB policy rates in the CIP forward calculator.
-#   Policy rates (rates/*.json) remain unchanged — used for CB Rates panel,
-#   carry ranking, and regime scoring. OIS rates are ONLY used for forward pricing.
-#
-# Schedule: 23:15 UTC daily — 15 min after update-bond-yields (23:00 UTC)
-# Fallback: if primary source fails, script falls back to rates/*.json (policy rate)
-#           so forwards remain valid (if slightly less precise) on data outages.
+name: Update OIS Rates
 
 on:
   schedule:
-    - cron: '15 23 * * *'   # 23:15 UTC daily
+    # Daily at 23:15 UTC (15 min after bond yields workflow)
+    - cron: '15 23 * * *'
   workflow_dispatch:
 
-concurrency:
-  group: update-ois-rates
-  cancel-in-progress: false
-
-permissions:
-  contents: write
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
-  update-ois-rates:
+  fetch-ois-rates:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Checkout repo
+      - name: Checkout engine repo
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -56,66 +21,62 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests --break-system-packages
+        run: pip install requests
 
-      - name: Create output directory
-        run: mkdir -p ois-rates
+      - name: Checkout site repo
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting.github.io
+          token: ${{ secrets.PAT_TOKEN }}
+          path: site
 
       - name: Fetch OIS rates
         env:
-          SITE_DIR: .
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          SITE_DIR: ./site
         run: python3 scripts/fetch_ois_rates.py
 
-      - name: Display summary
-        if: always()
+      - name: Print summary
         run: |
           echo ""
           echo "========================================"
           echo "         OIS / OVERNIGHT RATES"
           echo "========================================"
-          if [ -f "ois-rates/rates.json" ]; then
-            python3 -c "
+          python3 -c "
           import json
-          with open('ois-rates/rates.json') as f:
+          with open('./site/ois-rates/rates.json') as f:
               d = json.load(f)
           print(f'  Updated: {d[\"updated\"]}')
-          print()
-          for ccy in ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']:
-              rate = d['rates'].get(ccy, 'N/A')
-              src  = d['sources'].get(ccy, '?')
-              dt   = d['dates'].get(ccy, '?')
-              print(f'  {ccy}: {str(rate):>8}%  [{src}]  ({dt})')
+          for ccy in d['rates']:
+              print(f'  {ccy}:  {d[\"rates\"][ccy]}%  [{d[\"sources\"][ccy]}]  ({d[\"dates\"][ccy]})')
           "
-          else
-            echo "  ois-rates/rates.json not found"
-          fi
 
-      - name: Commit and push
+      - name: Commit and push to site repo
         run: |
+          cd site
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          cp ois-rates/rates.json /tmp/ois_rates_fresh.json
-          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
-
-          for i in 1 2 3 4 5; do
-            echo "--- Attempt $i ---"
+          MAX_ATTEMPTS=3
+          for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            echo "--- Attempt $attempt ---"
             git fetch origin main
             git reset --hard origin/main
-            mkdir -p ois-rates
-            cp /tmp/ois_rates_fresh.json ois-rates/rates.json
+
+            # Re-run fetch so the file is fresh after reset
+            if [ $attempt -gt 1 ]; then
+              cd ..
+              SITE_DIR=./site FRED_API_KEY=${{ secrets.FRED_API_KEY }} python3 scripts/fetch_ois_rates.py
+              cd site
+            fi
+
+            TIMESTAMP=$(python3 -c "import json; d=json.load(open('ois-rates/rates.json')); print(d['updated'][:16].replace('T',' '))" 2>/dev/null || date -u '+%Y-%m-%d %H:%M')
             git add ois-rates/rates.json
-            if git diff --quiet && git diff --staged --quiet; then
-              echo "No changes vs remote HEAD — skipping commit."
-              exit 0
-            fi
-            git commit -m "OIS rates ${TIMESTAMP} (SOFR/ESTR/SONIA/TONA/AONIA/CORRA/SARON/OCR)"
-            if git push origin main; then
-              echo "✅ Push succeeded on attempt $i."
-              exit 0
-            fi
-            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
-            sleep $((i * 2))
+            git diff --cached --quiet && echo "No changes to commit." && break
+
+            git commit -m "OIS rates ${TIMESTAMP} UTC (SOFR/ESTR/SONIA/TONA/AONIA/CORRA/SARON/OCR)"
+            git push origin main && echo "✅ Push succeeded on attempt $attempt." && break
+
+            echo "Push failed — retrying in 10s..."
+            sleep 10
           done
-          echo "⚠️  All push attempts exhausted — data will refresh on next run."
-          exit 0
