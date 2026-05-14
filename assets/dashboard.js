@@ -6924,8 +6924,8 @@ async function fetchOptionSkew() {
       { pair:'GBP/USD', cot:'GBP', etfId:'gbpusd', rrKey:'GBPUSD' },
       { pair:'USD/JPY', cot:'JPY', etfId:'usdjpy', rrKey:'USDJPY' },
       { pair:'AUD/USD', cot:'AUD', etfId:'audusd', rrKey:'AUDUSD' },
-      { pair:'USD/CAD', cot:'CAD', etfId:null,     rrKey:'USDCAD' },
-      { pair:'USD/CHF', cot:'CHF', etfId:null,     rrKey:'USDCHF' },
+      { pair:'USD/CAD', cot:'CAD', etfId:'usdcad',  rrKey:'USDCAD' },
+      { pair:'USD/CHF', cot:'CHF', etfId:'usdchf',  rrKey:'USDCHF' },
       { pair:'NZD/USD', cot:'NZD', etfId:null,     rrKey:null     },
     ];
 
@@ -7054,7 +7054,7 @@ async function fetchOptionSkew() {
         const td0Ex    = pairTip?.ex   || '';
         const td1Title = 'ATM Implied Volatility · ' + p.pair;
         const td1Body  = `ATM IV ${ivStr} from CBOE/CME FX Volatility Index (${etfIv.source || 'CBOE/CME'}) — variance-swap methodology, same as VIX. Institutional benchmark for OTC interbank implied vol. Green ≤7% (cheap vol); red >12% (expensive).`;
-        const td1Ex    = 'CBOE/CME FX Volatility Indexes use the same variance-swap replication as VIX. EUR/GBP/JPY/AUD have dedicated indexes; CHF and CAD fall to COT-derived proxy when no CBOE/CME index is available. All values have ~15min delay.';
+        const td1Ex    = 'CBOE/CME FX Volatility Indexes use the same variance-swap replication as VIX. EUR/GBP/JPY/AUD have dedicated CBOE indexes (^EUVIX/^BPVIX/^JYVIX/^AUDVIX). CHF and CAD use CME futures options (6S/6C) with ETF fallback (FXF/FXC). All values have ~15min delay.';
         const td3Title = p.pair + ' — Directional Bias';
         const td3Body  = pairTip?.body || '';
         const td3Ex    = pairTip?.ex   || '';
