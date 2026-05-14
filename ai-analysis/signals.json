@@ -1,66 +1,63 @@
 {
-  "generated_at": "2026-05-14T16:24:39Z",
+  "generated_at": "2026-05-14T21:03:35Z",
   "signals": [
     {
-      "time": "16:24",
+      "time": "21:03",
       "priority": "critical",
-      "title": "USD — Macro Inflation Surprise + Yield Curve",
-      "text": "USD at 98.77 following US Import Prices (+1.9% vs +1.0% est) and Export Prices (+3.3% vs +1.1% est) data. KC Fed Pres Schmid confirms inflation remains the 'most pressing risk,' supporting a higher-for-longer regime. US 2s10s spread at +44.5bp in a Bull Flattener regime indicates tightening cycle dominance. Fed 3.75% vs ECB 2.0% (+175bp) and Fed 3.75% vs SNB 0.0% (+375bp) carry spreads remain the primary structural drivers as inflation data delays easing expectations.",
+      "title": "AUD/GBP — G8 Bilateral Theme + Political Uncertainty",
+      "text": "AUD/GBP exhibits a 1.284% G8 performance spread as GBP tumbles -0.92% intraday following reports of political uncertainty. AUD remains the G8 leader (+0.652% avg) despite a -60bp carry disadvantage vs USD, while GBP (-0.632% avg) breaks below its 100 and 200-day MAs. The divergence is driven by idiosyncratic GBP weakness rather than broad risk-on sentiment, as VIX remains at 17.3 (normal volatility).",
       "evidence": [
-        "US Import Prices: +1.9% vs +1.0% est",
-        "US 2s10s: +44.5bp (Bull Flattener)",
-        "DXY: 98.77 (+0.25%)"
+        "AUD 1W avg: +0.652% (n=4)",
+        "GBP 1W avg: -0.632% (n=4)",
+        "G8 spread: 1.284%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "16:21",
+      "time": "20:59",
+      "priority": "critical",
+      "title": "USD/JPY — Positioning + Options + Yields",
+      "text": "USD/JPY at 158.253 supported by +287bp OIS carry (SOFR 3.60% vs TONA 0.73%) as US Retail Sales outperformance drives DXY to two-week highs. However, 25d RR at -1.69 (Saxo) reveals a strong institutional put skew, signaling heavy demand for downside protection despite COT LF net short -61,340 (crowded carry). The correlation break (z=-1.87σ) vs US 10Y suggests the pair is becoming less sensitive to yield upside as intervention fears or BoJ hike bets (16 Jun) cap the advance.",
+      "evidence": [
+        "USD/JPY OIS carry: +287bp",
+        "25d RR: -1.69 (Saxo)",
+        "JPY COT LF net: -61,340"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "20:57",
       "priority": "warning",
-      "title": "AUD/JPY — G8 Bilateral Theme + Carry",
-      "text": "AUD/JPY at 114.228 — AUD outperformance (avg +0.624%) vs JPY weakness (avg -0.539%) creates a 1.163% G8 spread. The move is fundamentally anchored by a +360bp OIS carry advantage (RBA 4.35% vs BoJ 0.75%). Retail sentiment is at an extreme 85% short, diverging from COT LF net long +58,994 (78.3% long). This institutional-retail divergence suggests a contrarian risk of further upside as retail shorts are squeezed. Carry dominates while VIX remains at 17.9 (normal volatility).",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -19,294 (specs fading the CB) vs RBNZ hike bias priced for 27 May. With NZD long% at an extreme low of 18.5% and retail 70% long, a hawkish RBNZ delivery creates significant short-squeeze risk. NZD/USD at 0.5914 remains pressured by a +150bp USD carry advantage, but crowded spec shorts are vulnerable if the RBNZ signals a terminal rate hike.",
       "evidence": [
-        "AUD 1W avg: +0.624% (n=4)",
-        "JPY 1W avg: -0.539% (n=7)",
-        "G8 spread: 1.163%"
+        "NZD COT LF net: -19,294",
+        "NZD COT long%: 18.5%",
+        "NZD/USD: 0.5914"
       ],
-      "watch_level": "Next RBA meeting on 16 Jun",
       "_source": "gemini"
     },
     {
-      "time": "16:19",
+      "time": "20:54",
       "priority": "warning",
-      "title": "USD/JPY — Options Skew + Correlation Break",
-      "text": "USD/JPY at 158.123 — 25d Risk Reversal at -1.69 (Saxo) reveals a strong put skew, signaling the options market is paying a premium for downside protection despite the +300bp Fed-BoJ carry advantage. USD/JPY vs US 10Y correlation has broken to +0.503 (z=-2.24σ vs norm +0.146), indicating the pair is no longer tracking Treasury yields linearly. Hawkish BoJ signals are being offset by USD strength, but the options skew suggests institutional positioning for a potential intervention or policy shift.",
+      "title": "AUD/USD — Volatility + Retail Divergence",
+      "text": "AUD/USD IV at 14.5% vs HV30 at 10.2% generates a +4.3% Vol Risk Premium, signaling elevated hedging demand. This aligns with a sharp divergence where retail is 82% short while COT LF net positioning is +58,994 long (78.3% long). Institutional conviction remains bullish despite the intraday -0.48% dip to 0.7223; retail capitulation risk remains high if price holds the 0.7200 support level.",
       "evidence": [
-        "25d RR: -1.69 (Strong Put Skew)",
-        "USD/JPY vs US 10Y: z=-2.24σ",
-        "USD/JPY: 158.123"
+        "AUD/USD VRP: +4.3%",
+        "AUD COT LF net: +58,994",
+        "Retail Sentiment: 82% short"
       ],
-      "watch_level": "Next BoJ meeting on 16 Jun",
       "_source": "gemini"
     },
     {
-      "time": "16:15",
-      "priority": "warning",
-      "title": "USD/CAD — Technical Break + Volatility Premium",
-      "text": "USD/CAD at 1.3726 testing a break above the 100-day MA (1.3718). Despite stronger Canada Wholesale Trade (+1.9% vs +1.4% est), the pair remains bid on USD momentum. Fed 3.75% vs BoC 2.25% (+150bp) carry spread supports the upside. COT LF net short -46,889 (26.4% long) shows specs are heavily positioned against the CAD. Watch for a sustained close above 1.3720 to confirm the technical breakout.",
-      "evidence": [
-        "USD/CAD: 1.3726",
-        "100-day MA: 1.3718",
-        "CAD COT LF net: -46,889"
-      ],
-      "watch_level": "Next BoC meeting on 10 Jun",
-      "_source": "gemini"
-    },
-    {
-      "time": "16:10",
+      "time": "20:48",
       "priority": "info",
-      "title": "USD/CHF — Volatility Risk Premium",
-      "text": "USD/CHF at 0.7829 — IV at 12.3% vs HV30 at 7.4% generates a +4.9% Vol Risk Premium (VRP). This elevated premium indicates the options market is pricing in significantly higher volatility than has been realized over the past 30 days. Fed 3.75% vs SNB 0.0% (+375bp) carry remains the widest in the G10 space, but the high VRP suggests market participants are aggressively hedging against a sharp CHF reversal or safe-haven bid.",
+      "title": "USD/CHF — Volatility Premium + Carry",
+      "text": "USD/CHF at 0.7833 supported by a massive +375bp carry advantage (Fed 3.75% vs SNB 0.0%). Options market is pricing extreme tail risk with IV at 12.8% vs HV30 7.1% (VRP +5.7%), the highest in the G10 space. While retail is 76% long, the elevated vol premium suggests professional desks are paying up for protection against a rapid CHF safe-haven reversal despite the carry-positive environment.",
       "evidence": [
-        "USD/CHF VRP: +4.9%",
-        "USD/CHF IV: 12.3%",
-        "Fed-SNB Spread: +375bp"
+        "USD/CHF VRP: +5.7%",
+        "USD/CHF carry: +375bp",
+        "USD/CHF: 0.7833"
       ],
       "_source": "gemini"
     }
