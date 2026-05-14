@@ -804,13 +804,13 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
           <div style="padding:12px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
             <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">VIX</div>
-            <div style="font-size:22px;font-weight:700;color:var(--down);font-family:var(--font-mono);">22.4</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:3px;">↑ Elevated fear</div>
+            <div style="font-size:22px;font-weight:700;color:var(--orange);font-family:var(--font-mono);">22.4</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:3px;">↑ Moderate · CBOE</div>
           </div>
           <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
             <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">MOVE INDEX</div>
             <div style="font-size:22px;font-weight:700;color:var(--orange);font-family:var(--font-mono);">108</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:3px;">Bond vol</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:3px;">↑ +3.2 · Elevated · ICE BofA</div>
           </div>
           <div style="padding:12px 14px;border-right:1px solid var(--border);">
             <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">EUR/USD HV 30D</div>
@@ -819,8 +819,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           </div>
           <div style="padding:12px 14px;">
             <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">REGIME</div>
-            <div style="font-size:16px;font-weight:700;color:var(--down);font-family:var(--font-mono);">RISK OFF</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:3px;">VIX &gt; 20</div>
+            <div style="font-size:16px;font-weight:700;color:var(--orange);font-family:var(--font-mono);">MIXED</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:3px;">Mixed signals · VIX 22.4</div>
           </div>
         </div>
         <div style="padding:4px 12px 0;border-top:1px solid var(--border);overflow-x:auto;">
@@ -849,10 +849,10 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <table class="threshold-table">
         <thead><tr><th>VIX Level</th><th>Regime</th><th>FX Implication</th></tr></thead>
         <tbody>
-          <tr><td class="t-low">&lt; 15</td><td>Complacency / Low vol</td><td>Risk-on dominant. Carry trades perform. JPY/CHF weak. AUD/NZD/EM supported.</td></tr>
-          <tr><td class="t-mid">15 – 20</td><td>Normal / Transitional</td><td>No strong directional bias from vol alone. Look at rate differentials for direction.</td></tr>
-          <tr><td class="t-mid">20 – 30</td><td>Elevated stress</td><td>Carry unwind risk. Begin monitoring JPY/CHF crosses for sudden strength. Watch DXY.</td></tr>
-          <tr><td class="t-hi">30 – 40</td><td>Significant stress</td><td>JPY/CHF sharply bid. AUD/NZD/EM selling off. USD typically strong (liquidity premium).</td></tr>
+          <tr><td class="t-low">&lt; 18</td><td>Low / Complacency</td><td>Risk-on dominant. Carry trades perform. JPY/CHF weak. AUD/NZD/EM supported.</td></tr>
+          <tr><td class="t-mid">18 – 25</td><td>Moderate / Transitional</td><td>No strong directional bias from vol alone. Look at rate differentials for direction.</td></tr>
+          <tr><td class="t-mid">25 – 30</td><td>Elevated stress</td><td>Carry unwind risk. Begin monitoring JPY/CHF crosses for sudden strength. Watch DXY.</td></tr>
+          <tr><td class="t-hi">30 – 40</td><td>High / Significant stress</td><td>JPY/CHF sharply bid. AUD/NZD/EM selling off. USD typically strong (liquidity premium).</td></tr>
           <tr><td class="t-hi">&gt; 40</td><td>Crisis / Panic</td><td>All correlations compress. Every safe haven bid simultaneously. Historical reference: COVID spike 85, GFC peak 89.</td></tr>
         </tbody>
       </table>
