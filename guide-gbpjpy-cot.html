@@ -389,7 +389,7 @@ a { color: inherit; text-decoration: none; }
     <div class="page-hero">
       <div class="page-hero-label">Market Research</div>
       <h1>GBP/JPY Bias Factors: What Drives and Changes the Directional Bias</h1>
-      <p>GBP/JPY is one of the most volatile G8 pairs — driven by a four-way interaction between BoE and BoJ policy, institutional COT positioning in two separate futures markets, and global risk appetite. This guide explains each factor and how to combine them into a coherent directional bias using the terminal's data panels.</p>
+      <p>GBP/JPY directional bias is determined by four factors: GBP COT positioning (CFTC Leveraged Funds net contracts), JPY COT positioning (inverted — net short JPY is bullish GBP/JPY), the BoE vs BoJ rate differential trend, and the cross-asset risk regime. This guide explains each factor, what a bullish or bearish reading looks like, and the five specific catalysts most likely to change the current bias — with links to the live data panels in the terminal where each factor is tracked.</p>
     </div>
 
     <div class="guide-section" id="why-gbpjpy">
@@ -438,6 +438,7 @@ a { color: inherit; text-decoration: none; }
       <div class="callout callout-orange">
         <strong>Data lag:</strong> COT data reflects positions as of the prior Tuesday and is published by the CFTC on Fridays. By the time you read it on Friday evening, events from Wednesday through Friday are not reflected. Use COT as a medium-term backdrop (days to weeks), not as a same-day timing tool.
       </div>
+      <p style="margin-top:14px;font-size:13.5px;"><a href="/" style="color:var(--blue);font-weight:500;">→ See current GBP COT net position in the CFTC Positioning panel</a></p>
     </div>
 
     <div class="guide-section" id="cot-jpy">
@@ -474,6 +475,7 @@ a { color: inherit; text-decoration: none; }
       <div class="callout callout-red">
         <strong>Crowded short JPY warning:</strong> When JPY Net%OI is below -20% and VIX is rising through the 20–25 range, the risk of a violent GBP/JPY selloff is elevated regardless of GBP fundamentals. The cross-asset risk panel in the terminal will show this via the CAUTION or RISK-OFF regime badge.
       </div>
+      <p style="margin-top:14px;font-size:13.5px;"><a href="/" style="color:var(--blue);font-weight:500;">→ See current JPY COT net position and Net%OI in the CFTC Positioning panel</a></p>
     </div>
 
     <div class="guide-section" id="rate-differential">
@@ -515,6 +517,7 @@ a { color: inherit; text-decoration: none; }
       <div class="callout">
         <strong>April 2026 example:</strong> The BoJ trend arrow is neutral (no move in 8+ months) but the OIS-derived bias is Hike — the market expects the next BoJ move to be up. This is the most important scenario for GBP/JPY: a BoJ hike that narrows the differential is the single largest structural risk to a bullish GBP/JPY thesis, and it is priced before the actual decision via the Rate Expectations panel.
       </div>
+      <p style="margin-top:14px;font-size:13.5px;"><a href="/" style="color:var(--blue);font-weight:500;">→ See current BoE and BoJ rates and OIS-implied bias in the CB Rates panel</a></p>
     </div>
 
     <div class="guide-section" id="risk-regime">
@@ -530,6 +533,7 @@ a { color: inherit; text-decoration: none; }
       <div class="callout callout-orange">
         <strong>VIX 25 threshold:</strong> Historical analysis of GBP/JPY behavior shows that moves above VIX 25 are associated with a statistically significant shift in the pair's short-term behavior — mean reversion accelerates, trend persistence drops, and intraday volatility expands. The terminal scores VIX 25–30 as +2 points toward a CAUTION regime.
       </div>
+      <p style="margin-top:14px;font-size:13.5px;"><a href="/" style="color:var(--blue);font-weight:500;">→ See current regime score and VIX in the Cross-Asset Risk Monitor</a></p>
     </div>
 
     <div class="guide-section" id="retail-sentiment">
@@ -563,6 +567,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <p>Average entry price is a secondary signal: if retail is net long with an average entry significantly above the current price, those positions are in loss — increasing the probability of a stop-loss cascade on the downside. If retail is net long with an average entry below current price, those positions are in profit and more likely to be closed into strength rather than force a panic flush.</p>
+      <p style="margin-top:14px;font-size:13.5px;"><a href="/" style="color:var(--blue);font-weight:500;">→ See current GBP/JPY retail long/short ratio in the Retail FX Positioning panel</a></p>
     </div>
 
     <div class="guide-section" id="combining">
@@ -659,7 +664,7 @@ a { color: inherit; text-decoration: none; }
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">MARKET RESEARCH · GBP/JPY</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.41.9</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.92.0</span></div>
 </footer>
 
 <script>
