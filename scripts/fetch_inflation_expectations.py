@@ -228,6 +228,11 @@ def fetch_boe_inflation_expectations():
         if not r.ok:
             print(f"    MISS GBP: BOE SDIE HTTP {r.status_code}")
             return None
+        # Detect HTML bot-challenge response (same check as fetch_bond_yields.py)
+        content_type = r.headers.get("Content-Type", "")
+        if "html" in content_type.lower() or r.text.strip().startswith("<"):
+            print(f"    MISS GBP: BOE SDIE — HTML/bot-challenge response (not CSV), falling back")
+            return None
         data_rows = []
         import csv as _csv
         reader = _csv.reader(r.text.strip().splitlines())
@@ -336,15 +341,30 @@ def fetch_nzd_rbnz_survey():
     label = "RBNZ Survey of Expectations M14 (2Y-ahead)"
     print(f"    Trying RBNZ M14 Survey (direct fetch)...")
 
-    # RBNZ M14 historical data as XLSX
-    xlsx_url = (
-        "https://www.rbnz.govt.nz/-/media/project/sites/rbnz/files/statistics/"
-        "series/m/m14/hm14.xlsx"
-    )
+    # RBNZ M14 historical data as XLSX.
+    # RBNZ blocks requests without a browser-like Referer from automated runners.
+    # Adding Referer + Accept headers mimics a browser download from the stats page.
+    _RBNZ_XLSX_URLS = [
+        "https://www.rbnz.govt.nz/-/media/project/sites/rbnz/files/statistics/series/m/m14/hm14.xlsx",
+        "https://www.rbnz.govt.nz/-/media/project/sites/rbnz/files/statistics/series/m/m14/hm14.xlsx?sc_lang=en",
+    ]
+    _RBNZ_HEADERS = {
+        "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream,*/*",
+        "Referer": "https://www.rbnz.govt.nz/statistics/series/economic-indicators/survey-of-expectations",
+        "Accept-Language": "en-NZ,en;q=0.9",
+    }
+    r = None
+    for xlsx_url in _RBNZ_XLSX_URLS:
+        try:
+            r = _get(xlsx_url, custom_headers=_RBNZ_HEADERS)
+            if r.ok:
+                break
+            print(f"    MISS NZD: RBNZ M14 XLSX HTTP {r.status_code} ({xlsx_url.split('?')[0].split('/')[-1]})")
+        except Exception as _e:
+            print(f"    ERR NZD: RBNZ M14 fetch — {_e}")
+            r = None
     try:
-        r = _get(xlsx_url, custom_headers={"Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})
-        if not r.ok:
-            print(f"    MISS NZD: RBNZ M14 XLSX HTTP {r.status_code}")
+        if r is None or not r.ok:
             raise ValueError("HTTP error")
 
         # Parse with openpyxl
