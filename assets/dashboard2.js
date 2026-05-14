@@ -9333,18 +9333,37 @@ if (document.readyState === 'loading') {
 // ── Global cache: CB rates by currency (populated by fetchRiskData/renderCBRates) ──
 window._CB_RATES_CACHE = window._CB_RATES_CACHE || {};
 
+// ── OIS / Overnight rate cache (used exclusively for CIP forward pricing) ──
+// Populated by loadOISRatesCache() from ois-rates/rates.json (daily workflow).
+// Falls back to _CB_RATES_CACHE (policy rate) if file unavailable.
+// Rate → benchmark: USD=SOFR, EUR=€STR, GBP=SONIA, JPY=TONA,
+//                   AUD=AONIA, CAD=CORRA, CHF=SARON, NZD=OCR overnight.
+window._OIS_RATES_CACHE  = window._OIS_RATES_CACHE  || {};
+window._OIS_RATE_SOURCES = window._OIS_RATE_SOURCES || {};  // e.g. { USD: 'SOFR', EUR: '€STR' }
+
 // ── CIP Forward Calculator ──
-// F = S × ((1 + r_base × T) / (1 + r_quote × T))
-// r_base = rate of base currency, r_quote = rate of quote currency
+// F = S × (1 + r_RIGHT × T) / (1 + r_LEFT × T)
+// r_left  = OIS rate of left-hand (base) currency
+// r_right = OIS rate of right-hand (quote) currency
 // T in years (1M=1/12, 3M=1/4, 6M=1/2, 1Y=1)
+// Industry standard: use overnight/OIS benchmarks, not CB policy rates.
+// Benchmarks: USD=SOFR, EUR=€STR, GBP=SONIA, JPY=TONA, AUD=AONIA, CAD=CORRA, CHF=SARON, NZD=OCR.
+// Source: BIS FX conventions; Bloomberg FX Forward methodology (FXFA).
 function computeCIPForward(spot, rLeft, rRight, T) {
-  // CIP: F = S × (1 + r_right × T) / (1 + r_left × T)
-  // Left-hand currency at forward discount when r_left > r_right (IRP).
-  // Source: BIS FX conventions; Bloomberg forward point methodology.
   if (spot == null || rLeft == null || rRight == null) return null;
   const rL = rLeft  / 100;
   const rR = rRight / 100;
   return spot * ((1 + rR * T) / (1 + rL * T));
+}
+
+// ── Helper: resolve rate for a currency (OIS preferred, policy fallback) ──
+// Returns [rate, sourceName] — sourceName used in tooltips.
+function _resolveRate(ccy) {
+  const ois = window._OIS_RATES_CACHE[ccy];
+  if (ois != null) return [ois, window._OIS_RATE_SOURCES[ccy] || 'OIS'];
+  const policy = window._CB_RATES_CACHE[ccy];
+  if (policy != null) return [policy, 'policy'];
+  return [null, null];
 }
 
 // ── Rate map: which CB rate applies to which currency ──
@@ -9358,7 +9377,6 @@ const CIP_CCY_RATES = new Set([
 
 // ── Render CIP Forwards in main FX Pairs table (tds[7]=Fwd1M, tds[8]=Fwd3M) ──
 async function renderCIPForwards() {
-  const ratesCache = window._CB_RATES_CACHE;
   const fxTbody = document.getElementById('fx-pairs-tbody');
   if (!fxTbody) return;
 
@@ -9373,25 +9391,26 @@ async function renderCIPForwards() {
 
     const [leftCcy, rightCcy] = pair.split('/');
     const pairId = pair.replace('/', '').toLowerCase();
-    const spot  = STOOQ_RT_CACHE[pairId]?.close ?? null;
-    const rLeft  = ratesCache[leftCcy]  ?? null;
-    const rRight = ratesCache[rightCcy] ?? null;
+    const spot = STOOQ_RT_CACHE[pairId]?.close ?? null;
 
-    const tenors = [1/12, 3/12];
+    const [rLeft,  srcLeft]  = _resolveRate(leftCcy);
+    const [rRight, srcRight] = _resolveRate(rightCcy);
+
+    const tenors  = [1/12, 3/12];
     const indices = [7, 8];
     const pairCfg = PAIRS.find(p => p.id === pairId);
     const dec = pairCfg?.dec ?? 4;
 
     tenors.forEach((T, i) => {
       const fwd = computeCIPForward(spot, rLeft, rRight, T);
-      const el = tds[indices[i]];
+      const el  = tds[indices[i]];
       if (!el) return;
       if (fwd != null && spot != null) {
         el.textContent = fwd.toFixed(dec);
-        // fwd < spot: left-hand ccy at forward discount (higher rate → IRP discount)
         const atDiscount = fwd < spot;
         el.style.color = atDiscount ? 'var(--down)' : 'var(--up)';
-        el.title = `CIP ${T === 1/12 ? '1M' : '3M'} fwd · r${leftCcy}=${rLeft?.toFixed(2)}% vs r${rightCcy}=${rRight?.toFixed(2)}% · ${leftCcy} at forward ${atDiscount ? 'discount' : 'premium'}`;
+        const tLabel = T === 1/12 ? '1M' : '3M';
+        el.title = `CIP ${tLabel} fwd · ${leftCcy}=${rLeft?.toFixed(2)}% (${srcLeft}) vs ${rightCcy}=${rRight?.toFixed(2)}% (${srcRight}) · ${leftCcy} at forward ${atDiscount ? 'discount' : 'premium'}`;
       } else {
         el.textContent = '—';
         el.style.color = 'var(--text3)';
@@ -9496,8 +9515,11 @@ async function renderDerivativesSection() {
       const pairCfg = PAIRS.find(p => p.id === pairId);
       const dec = pairCfg?.dec ?? 4;
       const spot  = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
-      const rLeft  = ratesCache[leftCcy]  ?? null;
-      const rRight = ratesCache[rightCcy] ?? null;
+
+      // ── OIS rates (preferred) with policy fallback ──
+      const [rLeft,  srcLeft]  = _resolveRate(leftCcy);
+      const [rRight, srcRight] = _resolveRate(rightCcy);
+
       const tds = row.querySelectorAll('td');
 
       // Spot
@@ -9519,13 +9541,13 @@ async function renderDerivativesSection() {
         }
       });
 
-      // Rate Diff — r_left minus r_right (positive = left has more carry → forward discount)
+      // Rate Diff — OIS diff (positive = left has more carry → forward discount)
       if (tds[6]) {
         const diff = (rLeft != null && rRight != null) ? (rLeft - rRight) : null;
         if (diff != null) {
           tds[6].textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + '%';
           tds[6].style.color = diff > 0.1 ? 'var(--down)' : diff < -0.1 ? 'var(--up)' : 'var(--text2)';
-          tds[6].title = `r${leftCcy}=${rLeft?.toFixed(2)}% minus r${rightCcy}=${rRight?.toFixed(2)}% · positive = ${leftCcy} at forward discount`;
+          tds[6].title = `OIS rate diff: ${leftCcy}=${rLeft?.toFixed(2)}% (${srcLeft}) − ${rightCcy}=${rRight?.toFixed(2)}% (${srcRight}) · positive = ${leftCcy} at forward discount · Used for CIP forward pricing`;
         } else {
           tds[6].textContent = '—';
         }
@@ -9542,8 +9564,11 @@ async function renderDerivativesSection() {
       const pairCfg = PAIRS.find(p => p.id === pairId);
       const dec = pairCfg?.dec ?? 5;
       const spot  = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
-      const rLeft  = ratesCache[leftCcy]  ?? null;
-      const rRight = ratesCache[rightCcy] ?? null;
+
+      // ── OIS rates (preferred) with policy fallback ──
+      const [rLeft,  srcLeft]  = _resolveRate(leftCcy);
+      const [rRight, srcRight] = _resolveRate(rightCcy);
+
       const tds = row.querySelectorAll('td');
 
       if (tds[1]) tds[1].textContent = spot != null ? spot.toFixed(dec) : '—';
@@ -9568,7 +9593,7 @@ async function renderDerivativesSection() {
         if (diff != null) {
           tds[6].textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + '%';
           tds[6].style.color = diff > 0.1 ? 'var(--down)' : diff < -0.1 ? 'var(--up)' : 'var(--text2)';
-          tds[6].title = `r${leftCcy}=${rLeft?.toFixed(2)}% minus r${rightCcy}=${rRight?.toFixed(2)}% · positive = ${leftCcy} at forward discount`;
+          tds[6].title = `OIS rate diff: ${leftCcy}=${rLeft?.toFixed(2)}% (${srcLeft}) − ${rightCcy}=${rRight?.toFixed(2)}% (${srcRight}) · positive = ${leftCcy} at forward discount`;
         } else {
           tds[6].textContent = '—';
         }
@@ -10299,6 +10324,8 @@ function initDerivativesNav() {
 // ── Bootstrap all new features ──
 // ── Load CB rates from rates/*.json directly (reliable, not DOM-dependent) ──
 async function loadCBRatesCache() {
+  // Loads CB policy rates from rates/*.json — used for CB Rates panel,
+  // carry ranking, regime scoring. NOT used for CIP forward pricing.
   // rates/*.json files: observations array, most recent first.
   // Schema: { observations: [{ date: "YYYY-MM-DD", value: "3.75" }, ...], ... }
   const ccyFiles = {
@@ -10319,6 +10346,28 @@ async function loadCBRatesCache() {
       if (raw != null && !isNaN(+raw)) window._CB_RATES_CACHE[ccy] = +raw;
     } catch { /* graceful — leave missing */ }
   }));
+}
+
+async function loadOISRatesCache() {
+  // Loads OIS/overnight benchmark rates from ois-rates/rates.json.
+  // Used exclusively by computeCIPForward() via _resolveRate().
+  // Falls back silently — _resolveRate() uses policy rate when OIS unavailable.
+  // Benchmarks: USD=SOFR, EUR=€STR, GBP=SONIA, JPY=TONA, AUD=AONIA, CAD=CORRA, CHF=SARON, NZD=OCR.
+  try {
+    const r = await fetch('./ois-rates/rates.json');
+    if (!r.ok) return;
+    const d = await r.json();
+    const rates   = d.rates   || {};
+    const sources = d.sources || {};
+    for (const [ccy, val] of Object.entries(rates)) {
+      if (val != null && !isNaN(+val)) {
+        window._OIS_RATES_CACHE[ccy]  = +val;
+        window._OIS_RATE_SOURCES[ccy] = sources[ccy] || 'OIS';
+      }
+    }
+  } catch {
+    // File not yet deployed or network failure — _resolveRate() falls back to policy.
+  }
 }
 
 // ── Section visibility: Derivatives panel toggle ──
@@ -10411,12 +10460,12 @@ function initDerivativesNavFixed() {
     initG8RatesTabs();
     initDerivativesNavFixed();
 
-    // Load CB rates from files (reliable source, no DOM dependency)
-    await loadCBRatesCache();
+    // Load CB policy rates and OIS benchmark rates in parallel
+    await Promise.all([loadCBRatesCache(), loadOISRatesCache()]);
 
     // All three panels fetch their own data independently.
     // renderRRInFXTable has its own direct rr.json fallback — no need to poll.
-    // Run everything in parallel immediately after CB rates are ready.
+    // Run everything in parallel immediately after rates are ready.
     await Promise.all([
       renderCIPForwards(),
       renderRRInFXTable(),
@@ -10425,7 +10474,7 @@ function initDerivativesNavFixed() {
 
     // Refresh every 5 min
     setInterval(async () => {
-      await loadCBRatesCache();
+      await Promise.all([loadCBRatesCache(), loadOISRatesCache()]);
       await renderCIPForwards();
       await renderRRInFXTable();
     }, 5 * 60 * 1000);
