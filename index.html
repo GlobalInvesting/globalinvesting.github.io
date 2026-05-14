@@ -322,6 +322,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <a href="#section-positioning" data-target="section-positioning">Positioning</a>
     <a href="#section-sessions" data-target="section-sessions">Sessions</a>
     <a href="#section-tvcalendar" data-target="section-tvcalendar">Calendar</a>
+    <a href="#section-derivatives" data-target="section-derivatives" title="Implied forwards, RR surface, realized volatility · Shortcut: D">Derivatives</a>
   </nav>
   <div class="topbar-right">
     <!-- Site menu dropdown -->
@@ -449,7 +450,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
     </div>
     <div class="sb-section">
-      <div class="sb-head" style="display:flex;flex-direction:column;gap:1px;padding-bottom:5px;">Carry Trade Ranking <span style="font-size:8px;color:var(--text3);font-weight:normal;letter-spacing:.04em;">G8 &middot; carry-to-vol &middot; click for real rate</span></div>
+      <div class="sb-head" style="display:flex;flex-direction:column;gap:1px;padding-bottom:5px;">Carry Trade Ranking <span style="font-size:8px;color:var(--text3);font-weight:normal;letter-spacing:.04em;">G8 &middot; CIP-adjusted &middot; click for real rate</span></div>
       <div id="carry-rank-rows" style="padding:0;">
         <div style="padding:4px 8px;font-size:10px;color:var(--text3);">Loading…</div>
       </div>
@@ -570,7 +571,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="panel" id="section-fxtable">
       <div class="panel-head">
         <span class="panel-title">FX Pairs — Majors</span>
-        <span class="panel-sub" id="fx-table-updated">Bid / Ask · Spread · 1D · 1W · HV 30d · Session Range</span>
+        <span class="panel-sub" id="fx-table-updated">Bid / Ask · Spread · 1D · 1W · HV 30d · Fwd 1M/3M (CIP) · RR 1M (Saxo) · Session Range</span>
         <div class="export-btns" aria-label="Export FX pairs data">
           <button class="export-btn" id="export-fx-csv" title="Export FX pairs as CSV">CSV</button>
           <button class="export-btn" id="export-fx-json" title="Export FX pairs as JSON">JSON</button>
@@ -583,18 +584,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <th style="text-align:left" scope="col">Pair</th>
             <th scope="col">Bid</th><th scope="col">Ask</th><th scope="col">Spread</th>
             <th scope="col">1D Chg</th><th scope="col">1W Chg</th>
-            <th scope="col" title="Historical Volatility 30d — annualized standard deviation of daily returns, computed from real yfinance data. Not options-implied volatility.">HV 30d</th><th scope="col">Sess H</th><th scope="col">Sess L</th>
+            <th scope="col" title="Historical Volatility 30d — annualized standard deviation of daily returns, computed from real yfinance data. Not options-implied volatility.">HV 30d</th>
+            <th scope="col" title="Implied 1-month forward calculated via Covered Interest Parity (CIP) from G8 central bank rates. Not a live quoted price.">Fwd 1M</th>
+            <th scope="col" title="Implied 3-month forward via CIP.">Fwd 3M</th>
+            <th scope="col" title="25-delta Risk Reversal 1M tenor from Saxo Bank. Negative = put skew (downside hedging). Source: Saxo FX Options Analytics.">RR 1M</th>
+            <th scope="col">Sess H</th><th scope="col">Sess L</th>
           </tr>
         </thead>
         <tbody id="fx-pairs-tbody">
           <!-- 7 skeleton rows — reserve exact height of real data, prevents CLS when JS loads -->
-          <tr><td class="sym">EUR/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr><td class="sym">GBP/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr><td class="sym">USD/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr><td class="sym">AUD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr><td class="sym">USD/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr><td class="sym">USD/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-          <tr><td class="sym">NZD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">EUR/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">GBP/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">AUD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">NZD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
         </tbody>
       </table>
       </div>
@@ -646,16 +651,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </div>
         </div>
         <div class="panel" id="section-risk" style="border-bottom:none;" role="region" aria-label="Risk Monitor">
-          <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub" id="risk-panel-sub">Volatility &amp; regime</span></div>
+          <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub" id="risk-panel-sub">Volatility &amp; regime · HV 10/30/60d</span></div>
           <div class="risk-grid" aria-live="polite" aria-atomic="false">
             <div class="risk-cell" style="cursor:pointer;" title="Click: chart"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
             <div class="risk-cell" style="cursor:pointer;" title="Click: chart"><div class="risk-lbl">MOVE Index</div><div class="risk-val" id="risk-move">—</div><div class="risk-sub" id="risk-move-sub">Bond vol</div></div>
             <div class="risk-cell"><div class="risk-lbl">EUR/USD HV 30d</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Hist. volatility</div></div>
             <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px" aria-live="assertive" aria-label="Regime">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
           </div>
-          <div style="padding:4px 8px 0;border-top:1px solid var(--border);overflow-x:auto;">
-            <table aria-label="Risk indicators">
-              <thead><tr><th style="text-align:left" scope="col">Indicator</th><th scope="col">Value</th><th class="signal-col" scope="col">Signal</th></tr></thead>
+          <!-- Risk Indicators — full width below VIX/MOVE/Regime grid -->
+          <div style="padding:4px 8px 4px;border-top:1px solid var(--border);overflow-x:auto;">
+            <table aria-label="Risk indicators" style="width:100%;">
+              <thead><tr><th style="text-align:left;font-size:9px;" scope="col">Indicator</th><th style="font-size:9px;" scope="col">Value</th><th style="font-size:9px;" class="signal-col" scope="col">Signal</th></tr></thead>
               <tbody id="risk-indicators-tbody">
                 <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
                 <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
@@ -667,7 +673,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </div>
         </div>
       </div>
-      <!-- VaR / CVaR Panel — full width below both columns -->
+      <!-- VaR / CVaR Panel — full width -->
       <div style="padding:4px 8px 6px;">
         <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
           <span>Historical VaR 95% · 1-day · 252d window</span>
@@ -690,30 +696,91 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
-    <!-- RATES & YIELD CURVE -->
+    <!-- RATES & YIELD CURVE — G8 multi-country -->
     <div class="panel" id="section-rates">
-      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve — US Treasuries</span><span class="panel-sub" id="yield-panel-sub">Nominal yields · yfinance</span></div>
-      <div id="rates-grid-wrap" class="rates-grid">
-        <div class="rate-cell"><div class="rate-cty">3M T-Bill</div><div class="rate-val" id="rate-3m">—</div><div class="rate-chg flat" id="rate-3m-chg">—</div></div>
-        <div class="rate-cell"><div class="rate-cty">2Y Note</div><div class="rate-val" id="rate-2y">—</div><div class="rate-chg flat" id="rate-2y-chg">—</div></div>
-        <div class="rate-cell"><div class="rate-cty">5Y Note</div><div class="rate-val" id="rate-5y">—</div><div class="rate-chg flat" id="rate-5y-chg">—</div></div>
-        <div class="rate-cell"><div class="rate-cty">10Y Bond</div><div class="rate-val" id="rate-10y">—</div><div class="rate-chg flat" id="rate-10y-chg">—</div></div>
+      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve</span><span class="panel-sub" id="yield-panel-sub">Nominal yields · yfinance · daily pipeline</span></div>
+
+      <!-- Country tab bar -->
+      <div id="rates-country-tabs" role="tablist" aria-label="Select country yield curve" style="display:flex;gap:2px;padding:0 8px 4px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);">
+        <button class="rates-ctab active" data-cty="us"  role="tab" aria-selected="true"  style="padding:2px 7px;font-size:10px;font-weight:600;border:none;border-radius:3px;background:var(--blue);color:#fff;cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">US</button>
+        <button class="rates-ctab"        data-cty="de"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">DE</button>
+        <button class="rates-ctab"        data-cty="gb"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">GB</button>
+        <button class="rates-ctab"        data-cty="jp"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">JP</button>
+        <button class="rates-ctab"        data-cty="au"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">AU</button>
+        <button class="rates-ctab"        data-cty="ca"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">CA</button>
+        <button class="rates-ctab"        data-cty="nz"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">NZ</button>
+        <button class="rates-ctab"        data-cty="spreads" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--blue);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Spreads</button>
       </div>
-      <div class="yield-canvas-wrap"
-           style="cursor:pointer;"
-           title="Click to view full yield curve detail"
-           onclick="(function(){ var d=window._STATE_ycTenors; if(d&&d.length&&typeof openYCModal==='function') openYCModal(d); })()">
-        <canvas id="yield-canvas" height="100" style="pointer-events:none;"></canvas>
+
+      <!-- US panel (default) -->
+      <div id="rates-pane-us" class="rates-country-pane">
+        <div id="rates-grid-wrap" class="rates-grid">
+          <div class="rate-cell"><div class="rate-cty">3M T-Bill</div><div class="rate-val" id="rate-3m">—</div><div class="rate-chg flat" id="rate-3m-chg">—</div></div>
+          <div class="rate-cell"><div class="rate-cty">2Y Note</div><div class="rate-val" id="rate-2y">—</div><div class="rate-chg flat" id="rate-2y-chg">—</div></div>
+          <div class="rate-cell"><div class="rate-cty">5Y Note</div><div class="rate-val" id="rate-5y">—</div><div class="rate-chg flat" id="rate-5y-chg">—</div></div>
+          <div class="rate-cell"><div class="rate-cty">10Y Bond</div><div class="rate-val" id="rate-10y">—</div><div class="rate-chg flat" id="rate-10y-chg">—</div></div>
+        </div>
+        <div class="yield-canvas-wrap"
+             style="cursor:pointer;"
+             title="Click to view full yield curve detail"
+             onclick="(function(){ var d=window._STATE_ycTenors; if(d&&d.length&&typeof openYCModal==='function') openYCModal(d); })()">
+          <canvas id="yield-canvas" height="100" style="pointer-events:none;"></canvas>
+        </div>
+        <div style="padding:0 10px 6px;overflow-x:auto;">
+          <table aria-label="US yield spreads">
+            <thead><tr><th style="text-align:left" scope="col">Spread</th><th scope="col">Value</th><th class="signal-col" scope="col">Signal</th></tr></thead>
+            <tbody id="yield-spreads-tbody">
+              <tr><td>2Y–10Y</td><td class="down" id="ys-2-10">—</td><td id="ys-2-10-sig">—</td></tr>
+              <tr><td>US–DE 10Y</td><td id="ys-usde">—</td><td id="ys-usde-sig">—</td></tr>
+              <tr><td>US–JP 10Y</td><td id="ys-usjp">—</td><td id="ys-usjp-sig">—</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div style="padding:0 10px 6px;overflow-x:auto;">
-        <table aria-label="Yield spreads">
-          <thead><tr><th style="text-align:left" scope="col">Spread</th><th scope="col">Value</th><th class="signal-col" scope="col">Signal</th></tr></thead>
-          <tbody id="yield-spreads-tbody">
-            <tr><td>2Y–10Y</td><td class="down" id="ys-2-10">—</td><td id="ys-2-10-sig">—</td></tr>
-            <tr><td>US–DE 10Y</td><td id="ys-usde">—</td><td id="ys-usde-sig">—</td></tr>
-            <tr><td>US–JP 10Y</td><td id="ys-usjp">—</td><td id="ys-usjp-sig">—</td></tr>
+
+      <!-- G8 foreign country panes — populated by JS from extended-data/*.json -->
+      <div id="rates-pane-de" class="rates-country-pane" style="display:none;padding:6px 10px;">
+        <div id="rates-g8-content-de" style="color:var(--text3);font-size:11px;">Loading DE yields…</div>
+      </div>
+      <div id="rates-pane-gb" class="rates-country-pane" style="display:none;padding:6px 10px;">
+        <div id="rates-g8-content-gb" style="color:var(--text3);font-size:11px;">Loading GB yields…</div>
+      </div>
+      <div id="rates-pane-jp" class="rates-country-pane" style="display:none;padding:6px 10px;">
+        <div id="rates-g8-content-jp" style="color:var(--text3);font-size:11px;">Loading JP yields…</div>
+      </div>
+      <div id="rates-pane-au" class="rates-country-pane" style="display:none;padding:6px 10px;">
+        <div id="rates-g8-content-au" style="color:var(--text3);font-size:11px;">Loading AU yields…</div>
+      </div>
+      <div id="rates-pane-ca" class="rates-country-pane" style="display:none;padding:6px 10px;">
+        <div id="rates-g8-content-ca" style="color:var(--text3);font-size:11px;">Loading CA yields…</div>
+      </div>
+      <div id="rates-pane-nz" class="rates-country-pane" style="display:none;padding:6px 10px;">
+        <div id="rates-g8-content-nz" style="color:var(--text3);font-size:11px;">Loading NZ yields…</div>
+      </div>
+
+      <!-- Sovereign Spreads pane -->
+      <div id="rates-pane-spreads" class="rates-country-pane" style="display:none;padding:6px 10px 2px;">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Sovereign 10Y Spreads vs US — extended-data</div>
+        <table id="sovereign-spreads-table" aria-label="Sovereign 10Y spreads vs US" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="text-align:left" scope="col">Country</th>
+              <th scope="col" title="10Y yield">10Y</th>
+              <th scope="col" title="Spread vs US 10Y in basis points">vs US (bp)</th>
+              <th scope="col" title="2Y yield where available">2Y</th>
+              <th scope="col" title="2Y–10Y curve slope">Curve</th>
+            </tr>
+          </thead>
+          <tbody id="sovereign-spreads-tbody">
+            <tr><td>Germany</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>UK</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Japan</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Australia</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Canada</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>New Zealand</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
           </tbody>
         </table>
+        <div style="font-size:9px;color:var(--text3);margin-top:4px;">Daily sovereign yield pipeline · yfinance · FRED · ECB · BOE</div>
       </div>
     </div>
 
@@ -844,6 +911,163 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div><!-- /#section-macro (alerts) -->
 
+    <!-- DERIVATIVES — Implied Forwards (CIP), RR Surface, HV Term Structure -->
+    <!-- Hidden by default; shown when Derivatives nav tab is clicked -->
+    <div class="panel" id="section-derivatives" style="display:none;">
+      <div class="panel-head">
+        <span class="panel-title">Derivatives</span>
+        <span class="panel-sub" id="deriv-panel-sub">Implied forwards (CIP) · RR term structure · Saxo Bank · CB rates</span>
+      </div>
+
+      <!-- Forwards table -->
+      <div style="padding:6px 10px 2px;">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Implied Forwards — Covered Interest Parity (CIP) · not a live quoted price</div>
+        <div style="overflow-x:auto;">
+          <table id="fwd-table" aria-label="Implied forwards via CIP" style="width:100%;min-width:480px;">
+            <thead>
+              <tr>
+                <th style="text-align:left" scope="col">Pair</th>
+                <th scope="col" title="Spot rate">Spot</th>
+                <th scope="col" title="1-month forward via CIP">1M Fwd</th>
+                <th scope="col" title="3-month forward via CIP">3M Fwd</th>
+                <th scope="col" title="6-month forward via CIP">6M Fwd</th>
+                <th scope="col" title="1-year forward via CIP">1Y Fwd</th>
+                <th scope="col" title="r(left) minus r(right) · annualized · positive = left-hand currency at forward discount per CIP">Rate Diff</th>
+              </tr>
+            </thead>
+            <tbody id="fwd-tbody">
+              <tr data-pair="EUR/USD"><td>EUR/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="GBP/USD"><td>GBP/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="USD/JPY"><td>USD/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="AUD/USD"><td>AUD/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="USD/CHF"><td>USD/CHF</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="USD/CAD"><td>USD/CAD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="NZD/USD"><td>NZD/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr style="border-top:1px solid var(--border2);"><td style="color:var(--text3);font-size:9px;padding-top:4px;" colspan="7">Cross pairs</td></tr>
+              <tr data-pair="EUR/GBP"><td>EUR/GBP</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="EUR/JPY"><td>EUR/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="GBP/JPY"><td>GBP/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="AUD/JPY"><td>AUD/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="EUR/AUD"><td>EUR/AUD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="EUR/CHF"><td>EUR/CHF</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Covered Interest Parity · CB policy rates · G8 central banks · Not a live quoted price</div>
+      </div>
+
+      <!-- RR Term Structure table -->
+      <div style="padding:8px 10px 2px;border-top:1px solid var(--border);">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">25-Delta Risk Reversal Term Structure · Saxo Bank · indicative mid</div>
+        <div style="overflow-x:auto;">
+          <table id="rr-surface-table" aria-label="Risk reversal term structure" style="width:100%;min-width:480px;">
+            <thead>
+              <tr>
+                <th style="text-align:left" scope="col">Pair</th>
+                <th scope="col" title="1-week RR">1W</th>
+                <th scope="col" title="1-month RR (from rr.json)">1M</th>
+                <th scope="col" title="3-month RR">3M</th>
+                <th scope="col" title="6-month RR">6M</th>
+                <th scope="col" title="1-year RR">1Y</th>
+                <th scope="col" title="Skew direction: Put skew (downside hedging) or Call skew (upside)">Skew</th>
+              </tr>
+            </thead>
+            <tbody id="rr-surface-tbody">
+              <tr><td>EUR/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
+              <tr><td>GBP/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
+              <tr><td>USD/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
+              <tr><td>AUD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
+              <tr><td>USD/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
+              <tr><td>USD/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Saxo Bank · indicative mid · daily · negative = put skew (downside hedging premium)</div>
+      </div>
+
+      <!-- HV Term Structure -->
+      <div style="padding:8px 10px 2px;border-top:1px solid var(--border);">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Realized Vol · yfinance OHLC · HV 30d vs RR Skew</div>
+        <div style="overflow-x:auto;">
+          <table id="hv-term-table" aria-label="Historical volatility term structure" style="width:100%;">
+            <thead>
+              <tr>
+                <th style="text-align:left;font-size:9px;" scope="col">Pair</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="30-day HV annualized · only window computed by pipeline · std(log returns)×√252">HV 30d</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="25d Risk Reversal 1M from Saxo Bank — negative = put skew (downside hedging demand)">RR 1M</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="RR 1M expressed as % of HV 30d — measures implied skew premium vs realized vol">RR / HV</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="Vol trend: HV 10d vs HV 30d. ↑ expanding (short-term vol above 30d avg), ↓ contracting, → neutral (within 1pp)">Trend</th>
+              </tr>
+            </thead>
+            <tbody id="hv-term-tbody">
+              <tr><td>EUR/USD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>GBP/USD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>USD/JPY</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>AUD/USD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>USD/CHF</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>USD/CAD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>NZD/USD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Realized volatility · annualized · yfinance OHLC · Trend: HV 10d vs HV 30d</div>
+      </div>
+
+      <!-- ECB Reference Exchange Rates -->
+      <div style="padding:8px 10px 2px;border-top:1px solid var(--border);">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">ECB Reference Exchange Rates · Frankfurt · T+1 · daily official fixing</div>
+        <div style="overflow-x:auto;">
+          <table id="ecb-fixings-table" aria-label="ECB reference exchange rates" style="width:100%;min-width:480px;">
+            <thead>
+              <tr>
+                <th style="text-align:left" scope="col">Pair</th>
+                <th scope="col" title="ECB reference rate — daily official fixing, published ~16:00 CET">ECB Fix</th>
+                <th scope="col" title="Previous business day ECB fix">Prev Fix</th>
+                <th scope="col" title="Change vs prior fixing">Chg</th>
+                <th scope="col" title="Change as percentage">Chg %</th>
+                <th scope="col" title="Current spot vs ECB fix (offset from official rate)">vs Spot</th>
+              </tr>
+            </thead>
+            <tbody id="ecb-fixings-tbody">
+              <tr><td>EUR/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/GBP</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/AUD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/NZD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="ecb-fixings-footer" style="font-size:9px;color:var(--text3);margin-top:3px;">ECB · daily official fixing · published ~16:00 CET · source: frankfurter.json</div>
+      </div>
+
+      <!-- DTCC GTR FX OTC Volume -->
+      <div style="padding:8px 10px 10px;border-top:1px solid var(--border);">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">FX OTC Notional Volume · DTCC GTR · CFTC Recast · T+1</div>
+        <div style="overflow-x:auto;">
+          <table id="dtcc-table" aria-label="DTCC GTR FX OTC notional volume" style="width:100%;min-width:480px;">
+            <thead>
+              <tr>
+                <th style="text-align:left" scope="col">Pair</th>
+                <th scope="col" title="Total notional USD-equivalent in billions (new trades only, NEWT action, capped at $250M per trade)">Notional ($bn)</th>
+                <th scope="col" title="Number of new trade records">Trades</th>
+                <th scope="col" title="FX Swap notional in billions">Swap $bn</th>
+                <th scope="col" title="FX Forward notional in billions">Fwd $bn</th>
+                <th scope="col" title="FX Spot notional in billions">Spot $bn</th>
+                <th scope="col" title="Share of total DTCC-reported G8 notional">% Total</th>
+              </tr>
+            </thead>
+            <tbody id="dtcc-tbody">
+              <tr><td colspan="7" style="color:var(--text3);text-align:center;padding:12px 0;">Loading DTCC data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="dtcc-footer" style="font-size:9px;color:var(--text3);margin-top:3px;">DTCC GTR · CFTC Recast public dissemination · Dodd-Frank 2(a)(13) · Notional capped at $250M/trade · subset of total OTC FX volume</div>
+      </div>
+
+    </div><!-- /#section-derivatives -->
+
       </div><!-- /#split-lower-right -->
     </div><!-- /#split-lower -->
 
@@ -913,17 +1137,31 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </tbody>
     </table>
 
-    <div class="sb-head" style="margin-top:2px;">Positioning Bias <span style="font-size:9px;color:var(--text3);font-weight:normal;" id="skew-source-label">ETF IV · COT · 25d RR</span></div>
-    <table aria-label="Directional positioning bias per pair — ETF IV, COT, 25d Risk Reversal">
-      <thead><tr><th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th></tr></thead>
-      <tbody id="skew-tbody">
-        <!-- 4 skeleton rows — one per pair, prevents CLS when JS loads -->
-        <tr><td>EUR/USD</td><td>—</td><td>—</td><td>—</td></tr>
-        <tr><td>GBP/USD</td><td>—</td><td>—</td><td>—</td></tr>
-        <tr><td>USD/JPY</td><td>—</td><td>—</td><td>—</td></tr>
-        <tr><td>AUD/USD</td><td>—</td><td>—</td><td>—</td></tr>
-      </tbody>
-    </table>
+    <!-- ECONOMIC SURPRISES — ForexFactory calendar, beat/miss vs consensus, G8 -->
+    <div id="section-econ-surprise" style="border-top:1px solid var(--border);padding:6px 0 0;">
+      <div class="sb-head" style="margin-bottom:2px;">Economic Surprises</div>
+      <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · G8 · 90d rolling</div>
+      <table id="econ-surprise-table" aria-label="Economic surprise index by G8 currency" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left;font-size:9px;padding:1px 8px;" scope="col">CCY</th>
+            <th style="font-size:9px;text-align:center;padding:1px 4px;" scope="col" title="Normalised surprise index: positive = data beating consensus, negative = missing">Index</th>
+            <th style="font-size:9px;text-align:right;padding:1px 8px;width:24px;" scope="col" title="Number of events with actuals in 90d window">N</th>
+          </tr>
+        </thead>
+        <tbody id="econ-surprise-tbody">
+          <tr><td style="padding:2px 8px;font-size:10px;">USD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">EUR</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">GBP</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">JPY</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">AUD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">CAD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">CHF</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr><td style="padding:2px 8px;font-size:10px;">NZD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+        </tbody>
+      </table>
+      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">ForexFactory · actual vs consensus · 90d rolling</div>
+    </div>
 
     <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
       ECB · CFTC · yfinance · Myfxbook · TradingView · AI
@@ -1051,18 +1289,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/dashboard.js?v=7.69.1" defer></script>
-<script src="assets/cot-modal-chart.js?v=2.0.0" defer></script>
-<script src="assets/cb-rates-modal.js?v=2.0.0" defer></script>
-<script src="assets/real-carry-modal.js?v=1.4.1" defer></script>
-<script src="assets/corr-modal.js?v=1.0.0" defer></script>
+<script src="assets/dashboard.js?v=7.78.1" defer></script>
+<script src="assets/cot-modal-chart.js?v=7.74.43" defer></script>
+<script src="assets/cb-rates-modal.js?v=7.74.43" defer></script>
+<script src="assets/real-carry-modal.js?v=2.7.5" defer></script>
+<script src="assets/corr-modal.js?v=2.1.1" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-<script src="assets/yc-modal.js?v=1.2.0" defer></script>
-<script src="assets/heatmap-modal.js?v=1.0.0" defer></script>
+<script src="assets/yc-modal.js?v=7.74.41" defer></script>
+<script src="assets/heatmap-modal.js?v=2.1.0" defer></script>
 <script src="assets/onboarding.js?v=1.0.0" defer></script>
 <script src="assets/layout-resizer.js?v=1.0.0" defer></script>
 <script src="assets/feed.js?v=1.0.0" defer></script>
 <script src="assets/share.js?v=1.0.0" defer></script>
+<script src="assets/inline-panel.js?v=7.74.41" defer></script>
 
 <div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
