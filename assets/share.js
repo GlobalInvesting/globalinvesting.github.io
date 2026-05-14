@@ -26,10 +26,12 @@
   }
 
   /**
-   * Build the share string.
-   * Format: "[REGIME] <first sentence or 200 chars of narrative> — globalinvesting.github.io"
+   * Build the share snippet (regime + first sentence, no URL appended).
+   * The URL is passed separately in Web Share API calls so the OS/app handles
+   * link placement — avoids double-URL on WhatsApp and similar apps that
+   * automatically concatenate the `text` and `url` parameters.
    */
-  function _buildShareText() {
+  function _buildShareSnippet() {
     const regimeEl = document.getElementById('narrative-regime');
     const textEl   = document.getElementById('narrative-text');
 
@@ -45,7 +47,16 @@
       : _truncate(narr, 200);
 
     const regimePart = regime && regime !== '—' ? `[${regime}] ` : '';
-    return `${regimePart}${snippet}\n\n${SITE_URL}`;
+    return `${regimePart}${snippet}`;
+  }
+
+  /**
+   * Build the full share string for clipboard/legacy copy.
+   * Appends the URL so plain-text recipients get the link.
+   */
+  function _buildShareText() {
+    const snippet = _buildShareSnippet();
+    return snippet ? `${snippet}\n\n${SITE_URL}` : null;
   }
 
   /**
@@ -72,11 +83,17 @@
 
     const btn = document.getElementById('narr-share-btn');
 
-    // Web Share API — available on mobile browsers and some desktop Chromium
+    // Web Share API — available on mobile browsers and some desktop Chromium.
+    // Pass the narrative snippet as `text` and the site URL as `url` separately.
+    // Do NOT include SITE_URL inside `text` — the OS concatenates text + url
+    // automatically (e.g. WhatsApp, iMessage), so embedding it in text would
+    // produce a duplicate link. Email clients display both fields correctly this way.
     if (navigator.share) {
+      var snippet = _buildShareSnippet();
+      if (!snippet) return;
       navigator.share({
         title: 'Global Investing FX — Market Narrative',
-        text:  text,
+        text:  snippet,
         url:   SITE_URL,
       }).catch(function () {
         // User cancelled — no action needed

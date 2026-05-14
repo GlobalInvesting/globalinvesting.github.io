@@ -10480,14 +10480,30 @@ function initDerivativesNavFixed() {
     initDerivativesNavFixed();
 
     // Load CB policy rates, OIS benchmark rates, and intraday quotes in parallel.
-    // Awaiting _quotesReadyPromise (set by boot()) guarantees STOOQ_RT_CACHE is
-    // populated before renderCIPForwards() runs. Promise.resolve() is safe even if
-    // boot() hasn't set it yet — renderCIPForwards has its own loadIntradayQuotes
-    // fallback as a second line of defence.
+    // _waitForQuotesPromise() polls until boot() has set window._quotesReadyPromise
+    // (typically within 0–50 ms) then awaits it, guaranteeing STOOQ_RT_CACHE is
+    // fully populated before renderCIPForwards() runs.
+    // Without polling, bootNewFeatures() can reach this await before boot() has
+    // assigned the promise (both run concurrently), causing Promise.resolve(undefined)
+    // to resolve immediately and forwards to render as —.
+    function _waitForQuotesPromise(timeoutMs) {
+      return new Promise(function (resolve) {
+        var deadline = Date.now() + (timeoutMs || 8000);
+        (function poll() {
+          if (window._quotesReadyPromise) {
+            Promise.resolve(window._quotesReadyPromise).then(resolve, resolve);
+          } else if (Date.now() < deadline) {
+            setTimeout(poll, 20);
+          } else {
+            resolve(); // timed out — renderCIPForwards fallback handles it
+          }
+        })();
+      });
+    }
     await Promise.all([
       loadCBRatesCache(),
       loadOISRatesCache(),
-      Promise.resolve(window._quotesReadyPromise),
+      _waitForQuotesPromise(8000),
     ]);
 
     // All three panels fetch their own data independently.
