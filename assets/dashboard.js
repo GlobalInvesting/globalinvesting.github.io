@@ -7483,9 +7483,11 @@ async function boot() {
   // request it — prevents each function from issuing its own parallel fetch and racing.
   await loadIntradayQuotes();
 
-  // fetchQuoteBarRT popula STOOQ_RT_CACHE (precios RT + hv30).
-  // Awaited so populateFxPairsTable finds the RT cache ready when it renders.
-  await fetchQuoteBarRT();
+  // fetchQuoteBarRT populates STOOQ_RT_CACHE (RT prices + hv30).
+  // Expose promise so bootNewFeatures() can await it before renderCIPForwards().
+  // Awaited here so populateFxPairsTable finds the RT cache ready when it renders.
+  window._quotesReadyPromise = fetchQuoteBarRT();
+  await window._quotesReadyPromise;
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
   populateCorrelations(); // 60-day rolling correlations from quotes.json
 
@@ -9380,18 +9382,35 @@ async function renderCIPForwards() {
   const fxTbody = document.getElementById('fx-pairs-tbody');
   if (!fxTbody) return;
 
+  // Use for...of instead of forEach so we can await inside the loop
+  // (needed for the STOOQ_RT_CACHE fallback to loadIntradayQuotes)
   const rows = fxTbody.querySelectorAll('tr');
-  rows.forEach(row => {
+  for (const row of rows) {
     const symCell = row.querySelector('td.sym');
-    if (!symCell) return;
+    if (!symCell) continue;
     const pair = symCell.textContent.trim();
-    if (!CIP_CCY_RATES.has(pair)) return;
+    if (!CIP_CCY_RATES.has(pair)) continue;
     const tds = row.querySelectorAll('td');
-    if (tds.length < 12) return;
+    if (tds.length < 12) continue;
 
     const [leftCcy, rightCcy] = pair.split('/');
     const pairId = pair.replace('/', '').toLowerCase();
-    const spot = STOOQ_RT_CACHE[pairId]?.close ?? null;
+
+    // Primary: read from STOOQ_RT_CACHE (populated by fetchQuoteBarRT).
+    // Fallback: call loadIntradayQuotes() which has a 90-second in-memory cache —
+    // near-zero cost if already loaded, and avoids the race condition on first render.
+    let spot = STOOQ_RT_CACHE[pairId]?.close ?? null;
+    if (spot == null) {
+      try {
+        const freshIntra = await loadIntradayQuotes().catch(() => null);
+        if (freshIntra) {
+          const matched = Object.entries(freshIntra).find(
+            ([k]) => k.toLowerCase().replace('=x', '').replace('-', '').replace('/', '') === pairId
+          );
+          if (matched) spot = matched[1]?.close ?? matched[1]?.price ?? null;
+        }
+      } catch { /* stay null — cells render as — */ }
+    }
 
     const [rLeft,  srcLeft]  = _resolveRate(leftCcy);
     const [rRight, srcRight] = _resolveRate(rightCcy);
@@ -9416,7 +9435,7 @@ async function renderCIPForwards() {
         el.style.color = 'var(--text3)';
       }
     });
-  });
+  }
 }
 
 // ── Render RR 1M in main FX Pairs table (tds[9]) ──
@@ -10460,8 +10479,16 @@ function initDerivativesNavFixed() {
     initG8RatesTabs();
     initDerivativesNavFixed();
 
-    // Load CB policy rates and OIS benchmark rates in parallel
-    await Promise.all([loadCBRatesCache(), loadOISRatesCache()]);
+    // Load CB policy rates, OIS benchmark rates, and intraday quotes in parallel.
+    // Awaiting _quotesReadyPromise (set by boot()) guarantees STOOQ_RT_CACHE is
+    // populated before renderCIPForwards() runs. Promise.resolve() is safe even if
+    // boot() hasn't set it yet — renderCIPForwards has its own loadIntradayQuotes
+    // fallback as a second line of defence.
+    await Promise.all([
+      loadCBRatesCache(),
+      loadOISRatesCache(),
+      Promise.resolve(window._quotesReadyPromise),
+    ]);
 
     // All three panels fetch their own data independently.
     // renderRRInFXTable has its own direct rr.json fallback — no need to poll.
