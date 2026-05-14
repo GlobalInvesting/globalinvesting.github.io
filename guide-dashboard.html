@@ -726,6 +726,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <a class="toc-item" href="#right-panel">Right Panel</a>
     <a class="toc-item" href="#news-feed">News Feed</a>
     <a class="toc-item" href="#alerts">Alerts &amp; Signals</a>
+    <a class="toc-item" href="#derivatives">Derivatives</a>
     <div class="toc-divider"></div>
     <a class="toc-item" href="guide-cross-asset-risk.html">→ Cross-Asset Risk</a>
     <a class="toc-item" href="guide-rates-yield-curve.html">→ Rates &amp; Yield Curve</a>
@@ -863,7 +864,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <p>The main content area is split into two scrollable columns by default — the chart, FX table, and heatmap on the left; cross-asset, risk, rates, COT, sessions, news, and signals on the right. This is the recommended view on desktop as it keeps the chart visible while scrolling through data panels on the right. The split ratio is adjustable: drag the vertical divider bar between the two columns left or right to resize. Your preferred split width is saved automatically.</p>
       <p>To toggle split mode on or off, click the <strong>split icon button</strong> <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:16px;border:1px solid var(--border2);border-radius:3px;vertical-align:middle;font-size:9px;color:var(--text2);">⊟</span> in the top-right corner of the Price Chart panel header — next to the panel subtitle. When split layout is active, the button is highlighted in blue. Clicking it again collapses back to a single full-width scroll. Split layout is disabled automatically on mobile viewports.</p>
       <p>On mobile, the layout collapses into a single scrollable column regardless of the split setting. The sidebar and right panel fold into the main flow.</p>
-      <p>The sticky topbar navigation links jump you directly to major sections: <strong>FX Pairs</strong>, <strong>Macro</strong>, <strong>Rates</strong>, <strong>Cross-Asset</strong>, <strong>Risk</strong>, <strong>Positioning</strong>, and <strong>Calendar</strong>.</p>
+      <p>The sticky topbar navigation links jump you directly to major sections: <strong>FX Pairs</strong>, <strong>Macro</strong>, <strong>Rates</strong>, <strong>Cross-Asset</strong>, <strong>Risk</strong>, <strong>Positioning</strong>, <strong>Calendar</strong>, and <strong>Derivatives</strong>.</p>
     </div>
 
     <div class="guide-section" id="topbar-guide">
@@ -938,7 +939,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </div>
       </div>
       <div class="callout callout-orange">
-        <strong>Frequency:</strong> The narrative and regime update 12× daily (00:00, 02:00, 04:00, 06:30, 08:30, 10:30, 12:30, 14:30, 16:00, 18:00, 20:00, 22:00 UTC). The timestamp is shown next to the label. Do not rely on the narrative for intraday tick-by-tick changes — use the live price feeds and VIX/MOVE data in the Risk Monitor for real-time regime shifts.
+        <strong>Frequency:</strong> The narrative and regime update 4× daily (00:00, 06:30, 14:30, 20:00 UTC). The timestamp is shown next to the label. Do not rely on the narrative for intraday tick-by-tick changes — use the live price feeds and VIX/MOVE data in the Risk Monitor for real-time regime shifts.
       </div>
     </div>
 
@@ -1272,7 +1273,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
       <p><strong style="color:var(--text);">Pair Breakdown</strong> — shows the 7 direct pairs for the selected currency with close price, previous close, percentage change, day % and 1W %, and a proportional impact bar. A composite ranking row shows the full 8-currency strength order with animated horizontal bars. The metrics strip above the table shows six tiles: Composite (intraday), 1W Strength, Rank, Pairs won, Strongest vs, and Weakest vs.</p>
 
-      <p><strong style="color:var(--text);">Session</strong> — shows the selected currency's strength contribution weighted by trading session volume (New York 38%, London 35%, Tokyo 18%, Sydney 9%). The active session is highlighted in blue. Below the session bars, an <strong>AI Session Context</strong> block provides per-session notes for the currency: a concise recap of the catalyst that drove price action in each session (CLOSED), current session dynamics (ACTIVE), and the upcoming scheduled event to watch (UPCOMING). Session context notes are generated 12&times; daily alongside the main narrative and are grounded in actual economic calendar events. All displayed times are converted to your local timezone.</p>
+      <p><strong style="color:var(--text);">Session</strong> — shows the selected currency's strength contribution weighted by trading session volume (New York 38%, London 35%, Tokyo 18%, Sydney 9%). The active session is highlighted in blue. Below the session bars, an <strong>AI Session Context</strong> block provides per-session notes for the currency: a concise recap of the catalyst that drove price action in each session (CLOSED), current session dynamics (ACTIVE), and the upcoming scheduled event to watch (UPCOMING). Session context notes are generated 4&times; daily alongside the main narrative and are grounded in actual economic calendar events. All displayed times are converted to your local timezone.</p>
 
       <p><strong style="color:var(--text);">Correlations</strong> — shows an 8&times;8 strength differential matrix with a Composite column: each cell is the composite % difference between the row currency and the column currency, with color intensity proportional to the divergence. Below the matrix, a <strong>Strength Drivers</strong> block lists the top 3 pairs by absolute contribution, each with an AI-generated one-line note (max 85 characters) explaining the structural driver — CB stance differential, COT positioning extreme, or carry differential. Attribution footer: <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">AI Analytics &middot; ~5min delay</span>. Clicking any row in the Key Correlations panel (right panel) opens a dedicated correlation modal with a 252-day history sparkline showing real calendar dates, z-score, and a regime signal.</p>
 
@@ -1687,7 +1688,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
     <div class="guide-section" id="alerts">
       <h2>Alerts &amp; Market Signals</h2>
-      <p>The final section of the main panel shows AI-generated market signals, updated 12× daily alongside the narrative (00:00, 02:00, 04:00, 06:30, 08:30, 10:30, 12:30, 14:30, 16:00, 18:00, 20:00, 22:00 UTC). Each signal includes:</p>
+      <p>The final section of the main panel shows AI-generated market signals, updated 4× daily alongside the narrative (00:00, 06:30, 14:30, 20:00 UTC). Each signal includes:</p>
       <ul style="list-style:none;padding:0;margin-bottom:14px;">
         <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Priority dot</strong> — a colored indicator: <span style="color:var(--down);">red = critical</span>, <span style="color:var(--orange);">amber = warning</span>, <span style="color:var(--blue);">blue = informational</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Timestamp</strong> — time of the last update cycle, converted to your local timezone</li>
@@ -1767,7 +1768,63 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   </div>
 </div>
 
-<div style="max-width:860px;margin:0 auto;padding:32px 24px 48px;">
+<!-- DERIVATIVES SECTION -->
+<div style="max-width:860px;margin:0 auto;padding:0 24px;">
+  <div class="guide-section" id="derivatives">
+    <h2>Derivatives</h2>
+    <p>The <strong>Derivatives</strong> section is accessible via the topbar navigation tab (keyboard shortcut: <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">D</kbd>). It is hidden by default and replaces the main content area when selected. It consolidates five derivative and reference data panels not found elsewhere in the terminal.</p>
+
+    <h3>Implied Forwards — Covered Interest Parity (CIP)</h3>
+    <p>Shows the theoretically fair forward rate for G8 major and cross pairs at four tenors (1M, 3M, 6M, 1Y), computed using the <strong>Covered Interest Parity formula</strong>: <code style="font-family:var(--font-mono);font-size:12px;">F = S × (1 + r_left × T) / (1 + r_right × T)</code>. The overnight benchmark rates (SOFR for USD, €STR for EUR, SONIA for GBP, TONA for JPY, AONIA for AUD, CORRA for CAD, SARON for CHF, OCR overnight for NZD) are used as discount rates — not the CB policy rates. This is the same methodology used by institutional FX desks for CIP pricing.</p>
+    <p>The <strong>Rate Diff</strong> column shows the annualized differential between the left-hand and right-hand currency's overnight benchmark. A positive value means the base currency is at a forward discount — the left-hand currency's interest rate is higher, so the forward rate is below spot per CIP. These are <em>not live quoted prices</em> — they are theoretical fair-value estimates based on OIS benchmarks and the current spot rate. Actual market forward prices incorporate credit, liquidity, and balance sheet premia.</p>
+    <!-- MOCK: Implied Forwards table -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:16px 0 20px;overflow-x:auto;">
+      <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;">
+        <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Implied Forwards — CIP · not a live quoted price</span>
+      </div>
+      <table style="width:100%;min-width:500px;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
+        <thead><tr style="color:var(--text3);font-size:9px;border-bottom:1px solid var(--border);">
+          <th style="text-align:left;padding:4px 10px;">Pair</th>
+          <th style="padding:4px 8px;">Spot</th>
+          <th style="padding:4px 8px;">1M Fwd</th>
+          <th style="padding:4px 8px;">3M Fwd</th>
+          <th style="padding:4px 8px;">6M Fwd</th>
+          <th style="padding:4px 8px;">1Y Fwd</th>
+          <th style="padding:4px 8px;">Rate Diff</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px;color:var(--text);">EUR/USD</td><td style="padding:4px 8px;color:var(--text2);">1.1245</td><td style="padding:4px 8px;color:var(--text2);">1.1261</td><td style="padding:4px 8px;color:var(--text2);">1.1304</td><td style="padding:4px 8px;color:var(--text2);">1.1364</td><td style="padding:4px 8px;color:var(--text2);">1.1487</td><td style="padding:4px 8px;color:var(--down);">−2.31%</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px;color:var(--text);">USD/JPY</td><td style="padding:4px 8px;color:var(--text2);">143.85</td><td style="padding:4px 8px;color:var(--text2);">143.22</td><td style="padding:4px 8px;color:var(--text2);">141.97</td><td style="padding:4px 8px;color:var(--text2);">140.15</td><td style="padding:4px 8px;color:var(--text2);">136.63</td><td style="padding:4px 8px;color:var(--up);">+3.22%</td></tr>
+        </tbody>
+      </table>
+      <div style="padding:3px 10px 5px;font-size:9px;color:var(--text3);">Covered Interest Parity · OIS benchmarks · not a live quoted price</div>
+    </div>
+
+    <h3>25-Delta Risk Reversal Term Structure</h3>
+    <p>The Risk Reversal table shows the 25-delta options skew for six major pairs (EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CHF, USD/CAD) across five tenors (1W, 1M, 3M, 6M, 1Y). Data is sourced from <strong>Saxo Bank's public options page</strong> — indicative mid-market prices, updated daily.</p>
+    <p>A negative RR value means <strong>put skew</strong> — the market is paying a premium for downside protection on the base currency. A positive value means <strong>call skew</strong> — upside hedging demand dominates. The <strong>Skew</strong> column summarizes the directional lean across the curve. These figures are a raw indication of options market sentiment at each tenor; they do not represent bid/ask quotes and should not be used directly to price options.</p>
+
+    <h3>Realized Volatility — HV 30d vs RR Skew</h3>
+    <p>Shows the 30-day historical (realized) volatility for six pairs, computed from yfinance OHLC data using the standard deviation of log returns annualized (×√252). Columns include:</p>
+    <ul>
+      <li><strong>HV 30d</strong> — annualized realized volatility over the past 30 trading days.</li>
+      <li><strong>RR 1M</strong> — the 25d Risk Reversal at the 1-month tenor from Saxo Bank.</li>
+      <li><strong>RR / HV</strong> — the Risk Reversal expressed as a percentage of HV 30d. A large ratio means the options market is implying significant directional skew relative to actual observed volatility — a potential signal of crowded positioning or anticipated event risk.</li>
+      <li><strong>Trend</strong> — compares HV 10d vs HV 30d: ↑ = short-term vol expanding (HV 10d > HV 30d by more than 1pp), ↓ = contracting, → = neutral.</li>
+    </ul>
+
+    <h3>ECB Reference Exchange Rates</h3>
+    <p>The ECB publishes official daily reference exchange rates for all major currency pairs against EUR, typically around 16:00 CET. This panel shows the official fixing for seven EUR-base pairs (EUR/USD, EUR/GBP, EUR/JPY, EUR/CHF, EUR/AUD, EUR/CAD, EUR/NZD) alongside the previous day's fix, the day-over-day change, and the offset between the current spot rate and the official fixing.</p>
+    <p>The ECB fixing is the industry standard reference rate used in FX contracts, derivative valuations, and regulatory reporting. It differs from interbank mid prices — use the <strong>vs Spot</strong> column to see how far the live market has moved from the official reference. Data is sourced from the ECB Frankfurter API cache, updated daily after ~16:00 CET (T+1 settlement basis).</p>
+
+    <h3>FX OTC Notional Volume — DTCC GTR</h3>
+    <p>Shows aggregated FX OTC notional volume from the <strong>DTCC Global Trade Repository</strong>, the largest trade repository for OTC derivatives in the US under Dodd-Frank reporting obligations. Data is the public CFTC Recast dissemination — T+1 (published by ~13:00 UTC the following business day), covering new trades only (ACTION = NEWT). Amendments, terminations, and lifecycle events are excluded to avoid double-counting.</p>
+    <p>Columns shown: <strong>Notional ($bn)</strong> — USD-equivalent notional, capped at $250M per trade per CFTC Dodd-Frank rules; <strong>Trades</strong> — count of new trade records; <strong>Swap $bn / Fwd $bn / Spot $bn</strong> — product-type breakdown where available (product type is derived from the UPI FISN field); <strong>% Total</strong> — each pair's share of the G8 aggregate, with a proportional intensity bar (Bloomberg/Reuters convention for volume data — directionally neutral, so blue intensity rather than green/red).</p>
+    <div class="callout callout-orange">
+      <strong>Coverage note:</strong> The DTCC GTR captures a significant subset of OTC FX trades reported under US Dodd-Frank rules — not total global FX volume. Spot FX rarely appears in the DTCC file because spot settles T+2 and is infrequently SDR-reportable. The $250M/trade notional cap suppresses large institutional block trades. Use this panel to identify relative activity across pairs, not as a measure of absolute global FX turnover.
+    </div>
+  </div>
+</div>
   <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.05);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
     <div>
       <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">Open the FX Terminal</div>
@@ -1781,7 +1838,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.52.0</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.87.0</span></div>
 </footer>
 
 

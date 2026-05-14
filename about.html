@@ -17,7 +17,7 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="About — Global Investing FX Terminal">
-<meta name="twitter:description" content="Professional-grade FX terminal covering G8 pairs, COT positioning, central bank rates, yield curve, cross-asset risk, and AI market narrative — free to use.">
+<meta name="twitter:description" content="Professional-grade FX terminal covering G8 pairs, COT positioning, central bank rates, yield curve, cross-asset risk, derivatives, and AI market narrative.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -572,7 +572,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <div class="section">
     <h2>What it is</h2>
     <p>The FX Terminal is a single-page dashboard designed for serious FX market monitoring. It was built to address a specific gap: professional-quality FX context is fragmented across institutional terminals, broker platforms, and government data portals. This terminal aggregates the most signal-rich publicly available data into a coherent, fast, and always-accessible interface.</p>
-    <p>Coverage spans continuously updated FX price feeds (~5-minute delay) across all G8 major pairs, CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, rolling cross-asset correlations with full 252-day history, live central bank policy rates, OIS-derived forward rate expectations for each G8 central bank, an AI-generated market regime narrative updated twelve times daily, and news headlines refreshed every hour. The main price chart is a native LightweightCharts implementation with candlestick, line, and area modes, multi-timeframe moving averages, central bank decision markers, and volume overlay — supplemented by a real-time TradingView widget.</p>
+    <p>Coverage spans continuously updated FX price feeds (~5-minute delay) across all G8 major pairs, CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, rolling cross-asset correlations with full 252-day history, live central bank policy rates, OIS-derived forward rate expectations for each G8 central bank, an AI-generated market regime narrative updated four times daily, and news headlines refreshed every hour. The main price chart is a native LightweightCharts implementation with candlestick, line, area, and bar modes, multi-timeframe moving averages, central bank decision markers, and volume overlay — supplemented by a real-time TradingView widget. A dedicated Derivatives section consolidates implied forwards via Covered Interest Parity (CIP), the 25-delta Risk Reversal term structure, realized volatility versus RR skew, ECB official reference fixings, and DTCC GTR FX OTC notional volume.</p>
   </div>
 
   <div class="section">
@@ -593,6 +593,11 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <tr><td>Carry Trade Ranking (carry-to-vol)</td><td>Official central bank sources · yfinance HV30</td><td><span class="badge-daily">~30 MIN</span></td></tr>
         <tr><td>CFTC COT Positioning</td><td>CFTC.gov</td><td><span class="badge-weekly">WEEKLY</span></td></tr>
         <tr><td>Positioning Bias (CBOE/CME Vol · COT · 25d RR)</td><td>CBOE/CME FX Volatility Indexes (^EUVIX, ^BPVIX, ^JYVIX, ^AUDVIX — primary; same variance-swap methodology as VIX, Bloomberg BVOL benchmark) · CME FX futures options (6E, 6B, 6J, 6A — fallback for CHF/CAD) · CBOE ETF options (FXE/FXF/FXC — last resort) · CFTC.gov · Saxo Bank (25-delta Risk Reversals, 1M tenor)</td><td><span class="badge-weekly">WEEKLY / DAILY</span></td></tr>
+        <tr><td>Derivatives — Implied Forwards (CIP)</td><td>OIS/overnight rate markets (SOFR, €STR, SONIA, TONA, AONIA, CORRA, SARON, OCR overnight) · Covered Interest Parity formula · not a live quoted price</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>Derivatives — 25d RR Term Structure</td><td>Saxo Bank · indicative mid-market · 1W / 1M / 3M / 6M / 1Y tenors</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>Derivatives — Realized Vol (HV 30d vs RR Skew)</td><td>yfinance OHLC · std(log returns)×√252 · HV 10d vs HV 30d trend · Saxo Bank RR 1M</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>Derivatives — ECB Reference Exchange Rates</td><td>ECB · official daily fixing · published ~16:00 CET · Frankfurter API cache</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>Derivatives — FX OTC Notional Volume</td><td>DTCC GTR · CFTC Recast public dissemination · Dodd-Frank 2(a)(13) · notional capped at $250M/trade</td><td><span class="badge-daily">DAILY</span></td></tr>
         <tr><td>Reference Spreads</td><td>Typical ECN · session average</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
         <tr><td>FX Liquidity Canvas</td><td>yfinance · H-L range proxy · 30d avg (fallback: Frankfurter API · historical baseline)</td><td><span class="badge-daily">EVERY 1H</span></td></tr>
         <tr><td>FX Retail Market Sentiment</td><td>Myfxbook</td><td><span class="badge-daily">EVERY 1H</span></td></tr>
@@ -618,23 +623,22 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
   <div class="section">
     <h2>AI in the terminal</h2>
-    <p>AI is used for four specific outputs in the terminal, all clearly labeled. Three are generated alongside the main narrative run (12&times; daily); one is generated per heatmap modal interaction. On weekends, when markets are closed, the narrative switches to a forward-looking recap format — conditional framing anchored to the week's developments and the upcoming session open, consistent with professional closed-market desk practice.</p>
+    <p>AI is used for four specific outputs in the terminal, all clearly labeled. All four are generated alongside the main narrative run (4&times; daily: 00:00, 06:30, 14:30, 20:00 UTC). On weekends, when markets are closed, the narrative switches to a forward-looking recap format — conditional framing anchored to the week's developments and the upcoming session open, consistent with professional closed-market desk practice.</p>
     <div class="grid-2">
       <div class="card">
         <div class="card-title">Market Narrative</div>
-        <div class="card-body">A concise market summary updated twelve times daily (00:00, 02:00, 04:00, 06:30, 08:30, 10:30, 12:30, 14:30, 16:00, 18:00, 20:00, 22:00 UTC), synthesizing rate differentials, cross-asset conditions, COT positioning, and macro events into a readable context. Includes a regime label: RISK-ON, RISK-OFF, CAUTION, or MIXED.</div>
+        <div class="card-body">A concise market summary updated four times daily (00:00, 06:30, 14:30, 20:00 UTC), synthesizing rate differentials, cross-asset conditions, COT positioning, and macro events into a readable context. Includes a regime label: RISK-ON, RISK-OFF, CAUTION, or MIXED.</div>
       </div>
       <div class="card">
         <div class="card-title">Market Signals</div>
-        <div class="card-body">Five to seven prioritized market signals published alongside the narrative — critical alerts, warnings, and informational notes covering CB decisions, key technical levels, positioning extremes, and regime shifts.</div>
-      </div>
+        <div class="card-body">Five to seven prioritized market signals published alongside the narrative — critical alerts, warnings, and informational notes covering CB decisions, key technical levels, positioning extremes, and regime shifts.</div>      </div>
       <div class="card">
         <div class="card-title">Currency Drivers</div>
-        <div class="card-body">One declarative note per direct pair (max 85 characters) explaining the structural driver behind the move: CB stance differential, COT positioning extreme, or carry differential. Generated per currency (8 calls/run) and displayed in the Strength Drivers tab of the Currency Strength Heatmap modal. Updated 12&times; daily alongside the narrative.</div>
+        <div class="card-body">One declarative note per direct pair (max 85 characters) explaining the structural driver behind the move: CB stance differential, COT positioning extreme, or carry differential. Generated per currency (8 calls/run) and displayed in the Strength Drivers tab of the Currency Strength Heatmap modal. Updated 4&times; daily alongside the narrative.</div>
       </div>
       <div class="card">
         <div class="card-title">Session Context</div>
-        <div class="card-body">Per-session, per-currency notes covering all four trading sessions (Sydney, Tokyo, London, New York) for all 8 G8 currencies. Each note is anchored to actual ForexFactory calendar events — citing the specific catalyst (data release, CB speaker) rather than generic CB-stance commentary. Displayed in the Session tab of the Currency Strength Heatmap modal. Updated 12&times; daily.</div>
+        <div class="card-body">Per-session, per-currency notes covering all four trading sessions (Sydney, Tokyo, London, New York) for all 8 G8 currencies. Each note is anchored to actual ForexFactory calendar events — citing the specific catalyst (data release, CB speaker) rather than generic CB-stance commentary. Displayed in the Session tab of the Currency Strength Heatmap modal. Updated 4&times; daily alongside the narrative.</div>
       </div>
     </div>
     <p style="margin-top:16px;">All other sections — prices, COT data, yield curve, heatmap, news — consume market data directly. AI does not generate, filter, or modify price data.</p>
@@ -672,7 +676,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">ABOUT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.41.7</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.87.0</span></div>
 </footer>
 
 
