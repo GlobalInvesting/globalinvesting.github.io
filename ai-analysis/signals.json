@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-05-14T02:57:25Z",
+  "generated_at": "2026-05-14T09:13:25Z",
   "signals": [
     {
-      "time": "02:57",
+      "time": "09:13",
       "priority": "critical",
       "title": "AUD/JPY — G8 Bilateral Theme + Carry",
-      "text": "AUD/JPY at 114.494 — AUD outperformance hits critical thresholds as the G8 leader, supported by a +360bp carry premium (RBA 4.35% vs BoJ 0.75%). JPY remains the G8 laggard despite normal volatility (VIX 17.9), as carry-seeking flows dominate safe-haven demand. Retail sentiment is 87% short, diverging from the institutional trend and increasing the risk of a short-squeeze if the 115.00 level is tested.",
+      "text": "AUD/JPY at 114.502 — AUD outperformance reaches critical thresholds as the G8 leader, supported by a +362bp OIS carry advantage over JPY. The 1.512% spread between the G8 leader and laggard confirms a dominant carry-seeking regime. Despite JPY being the weakest G8 performer, USD/JPY at 157.916 remains below the 160.00 intervention watch level. AUD/JPY strength is structurally supported by the RBA 4.35% (HIKING) vs BoJ 0.75% (ON HOLD) differential.",
       "evidence": [
-        "AUD 1W avg: +0.849% (n=4)",
-        "JPY 1W avg: -0.633% (n=7)",
-        "G8 spread: 1.482%"
+        "AUD 1W avg: +0.868% (n=4)",
+        "JPY 1W avg: -0.644% (n=7)",
+        "G8 spread: 1.512%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "02:54",
-      "priority": "critical",
-      "title": "USD/JPY — Positioning + Options + Fed Bias",
-      "text": "USD/JPY at 157.917 — Boston Fed's Collins raises the prospect of rate hikes, supporting the +287bp SOFR-TONA carry advantage. However, the options market shows a strong directional bias for JPY strength with 25d RR at -1.62, signaling institutional hedging against intervention or a hawkish BoJ shift. COT data shows a crowded JPY net short of -61,340, leaving the pair vulnerable to rapid deleveraging if 160.00 is approached.",
-      "evidence": [
-        "USD/JPY 25d RR: -1.62",
-        "JPY COT LF net: -61,340",
-        "Fed 3.75% vs BoJ 0.75% — +300bp"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "02:52",
+      "time": "09:10",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD at 0.5932 — COT LF net short -19,294 (long% 18.5%) shows speculators are heavily positioned against the NZD despite a hawkish market bias for the next RBNZ meeting (mkt: 40% hike priced) on 27 May. This positioning extreme (long% < 20%) creates a high-conviction short-squeeze setup if the RBNZ signals a hike. Retail is 71% long, aligning with the squeeze but contradicting the institutional short position.",
+      "title": "GBP/USD — Volatility + GDP Headline",
+      "text": "GBP/USD at 1.3518 — UK Q1 Preliminary GDP beat at +0.6% QoQ provides a fundamental floor, yet options markets signal heavy hedging demand. IV at 11.0% vs HV30 at 6.8% generates a +4.2% Vol Risk Premium (VRP), indicating traders are paying a significant premium for protection relative to realized movement. COT LF net long +31,244 (65.3%) shows institutional backing, but the high VRP suggests caution near recent highs. Watch for a break of 1.3500 to invalidate the bullish GDP impulse.",
       "evidence": [
-        "NZD COT LF net: -19,294",
-        "NZD long%: 18.5%",
-        "RBNZ bias: Hike"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "02:49",
-      "priority": "warning",
-      "title": "GBP/USD — Volatility + Sentiment + UK Data",
-      "text": "GBP/USD at 1.3525 — Options market pricing reflects elevated fear with a +4.2% Vol Risk Premium (IV 11.0% vs HV30 6.8%). UK house prices falling at the fastest pace since 2023 and Iran-related geopolitical tensions are driving hedging demand. While carry is neutral (Fed 3.75% vs BoE 3.75%), the moderate put skew (RR -0.96) suggests the market is paying for downside protection ahead of UK GDP data.",
-      "evidence": [
+        "UK GDP: +0.6% QoQ",
         "GBP/USD VRP: +4.2%",
-        "GBP/USD 25d RR: -0.96",
         "GBP COT LF net: +31,244"
       ],
       "_source": "gemini"
     },
     {
-      "time": "02:45",
-      "priority": "info",
-      "title": "USD/CHF — Volatility Extreme + Carry",
-      "text": "USD/CHF at 0.7817 — Volatility risk premium is at an extreme +11.3% (IV 18.6% vs HV30 7.3%), signaling massive demand for options protection despite a neutral 25d RR (-0.06). The +375bp carry advantage (Fed 3.75% vs SNB 0.0%) structurally supports the USD, but the vol spike suggests the market is bracing for a regime shift or safe-haven CHF bid. Watch for VIX > 25 to trigger carry unwind.",
+      "time": "09:08",
+      "priority": "warning",
+      "title": "USD/JPY — Options vs Correlation Divergence",
+      "text": "USD/JPY at 157.916 — A strong 25d Risk Reversal of -1.62 (Saxo) reveals an aggressive institutional skew toward JPY calls (downside protection), diverging from the spot trend. This options-market caution coincides with a significant correlation break: USD/JPY vs US 10Y yield (4.48%) has collapsed to corr=+0.476 (z=-1.93σ), suggesting the pair is losing its primary macro driver. Intervention risk at 160.00 remains the primary catalyst for the downside skew despite the +287bp OIS carry advantage.",
       "evidence": [
-        "USD/CHF VRP: +11.3%",
-        "Fed 3.75% vs SNB 0.0% — +375bp",
-        "VIX: 17.9"
+        "USDJPY 25d RR: -1.62",
+        "z-score: -1.93σ",
+        "USD/JPY OIS Carry: +287bp"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "09:05",
+      "priority": "info",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD/USD at 0.7255 — Institutional vs retail divergence reaches an extreme. COT LF net long +58,994 (78.3% long) shows heavy institutional commitment, while retail sentiment is 87% short (Myfxbook). This contrarian setup suggests retail is unsuccessfully fading the institutional trend; a further squeeze higher is likely if RBA maintains its hiking bias. Watch for COT long% exceeding 80% to signal a positioning exhaustion point.",
+      "evidence": [
+        "AUD COT LF net: +58,994",
+        "Retail Sentiment: 87% short",
+        "AUD/USD: 0.7255"
       ],
       "_source": "gemini"
     }
