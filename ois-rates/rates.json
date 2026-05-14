@@ -1,0 +1,33 @@
+{
+  "rates": {
+    "USD": 3.75,
+    "EUR": 2.0,
+    "GBP": 3.729,
+    "JPY": 0.75,
+    "AUD": 4.35,
+    "CAD": 2.5,
+    "CHF": 0.0,
+    "NZD": 2.25
+  },
+  "sources": {
+    "USD": "policy-fallback",
+    "EUR": "policy-fallback",
+    "GBP": "SONIA",
+    "JPY": "policy-fallback",
+    "AUD": "AONIA",
+    "CAD": "CORRA",
+    "CHF": "policy-fallback",
+    "NZD": "policy-fallback"
+  },
+  "dates": {
+    "USD": "2026-05-01",
+    "EUR": "2026-05-01",
+    "GBP": "2026-05-11",
+    "JPY": "2026-05-01",
+    "AUD": "2026-05-13",
+    "CAD": "2026-04-01",
+    "CHF": "2026-05-01",
+    "NZD": "2026-05-01"
+  },
+  "updated": "2026-05-14T01:05:54Z"
+}
