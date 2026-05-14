@@ -394,7 +394,7 @@ async function populateCorrelations() {
       return `<tr
         style="cursor:pointer;"
         title="Click to view correlation detail · ${c.a} vs ${c.b}"
-        onclick="(function(el){ var idx=+el.dataset.corrIdx; var d=window._corrDataCache&&window._corrDataCache[idx]; if(d&&typeof openCorrModal==='function') openCorrModal(d); })(this)"
+        onclick="(function(el){ var idx=+el.dataset.corrIdx; var d=window._corrDataCache&&window._corrDataCache[idx]; if(d&&typeof window.openCorrModal==='function') window.openCorrModal(d); })(this)"
         data-corr-idx="${corrIdx}"
       ><td>${c.a}</td><td>${c.b}</td>${corrCell}${normCell}</tr>`;
     }).join('');
@@ -482,6 +482,9 @@ function populateFxPairsTable() {
       <td class="${cls1d}">${chg1d}</td>
       <td class="${cls1w}">${chg1w}</td>
       <td style="color:var(--text2);font-size:10px">${ivStr}</td>
+      <td style="color:var(--text3);font-size:10px">—</td>
+      <td style="color:var(--text3);font-size:10px">—</td>
+      <td style="color:var(--text3);font-size:10px">—</td>
       <td style="${sessStyle}">${sessH}</td>
       <td style="${sessStyle}">${sessL}</td>
     </tr>`;
@@ -716,10 +719,10 @@ async function fetchCBRates() {
           var id  = el.dataset.cbrId;
           var st  = window._STATE_cbRates;
           var r   = st && st[id];
-          if (!r || typeof openCBRatesModal !== 'function') return;
+          if (!r || typeof window.openCBRatesModal !== 'function') return;
           var bi  = (window._STATE_bankInfo && window._STATE_bankInfo[id]) || {};
           var mtg = window._STATE_meetings && window._STATE_meetings.meetings && window._STATE_meetings.meetings[id.toUpperCase()];
-          openCBRatesModal(id.toUpperCase(), r.obs, bi, mtg);
+          window.openCBRatesModal(id.toUpperCase(), r.obs, bi, mtg);
         })(this)"
       >
         <td style="white-space:nowrap;">${flag}<span style="font-size:10px;">${info.short}</span></td>
@@ -928,8 +931,8 @@ async function fetchCOTData() {
     row.addEventListener('click', () => {
       const ccy  = row.dataset.ccy;
       const data = window.COT_DATA_STORE && window.COT_DATA_STORE[ccy];
-      if (ccy && data && typeof openCOTModal === 'function') {
-        openCOTModal(ccy, data);
+      if (ccy && data && typeof window.openCOTModal === 'function') {
+        window.openCOTModal(ccy, data);
       } else {
         const sym = row.dataset.sym;
         if (sym) loadCOTChart(sym);
@@ -1303,10 +1306,12 @@ function updateFxPairsTableRT() {
       if (tds[6] && data.hv30 != null) {
         tds[6].textContent = data.hv30.toFixed(1) + '%';
       }
-      // SESS H / SESS L — populate from high/low; dim on weekends (last close values)
+      // Fwd 1M (tds[7]) and Fwd 3M (tds[8]) — populated by renderCIPForwards()
+      // RR 1M (tds[9]) — populated by renderRRSurface() from rr-data/rr.json
+      // SESS H / SESS L — now at tds[10]/tds[11] due to 3 new columns
       const sessColor = _isWeekendRT ? 'var(--text3)' : 'var(--text1)';
-      if (tds[7]) { tds[7].textContent = (data.high != null) ? fmt(data.high, pairCfg.dec) : '—'; tds[7].style.color = sessColor; }
-      if (tds[8]) { tds[8].textContent = (data.low  != null) ? fmt(data.low,  pairCfg.dec) : '—'; tds[8].style.color = sessColor; }
+      if (tds[10]) { tds[10].textContent = (data.high != null) ? fmt(data.high, pairCfg.dec) : '—'; tds[10].style.color = sessColor; }
+      if (tds[11]) { tds[11].textContent = (data.low  != null) ? fmt(data.low,  pairCfg.dec) : '—'; tds[11].style.color = sessColor; }
     });
   }
 
@@ -2039,6 +2044,7 @@ function attachRiskMonitorTooltips() {
     'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) — nearest expiry ≥4 days. ETF IV is the closest free proxy for OTC interbank implied vol (not publicly available). COT bias from CFTC Disaggregated TFF · Leveraged Funds · Options+Futures Combined. 25-delta Risk Reversal from Saxo Bank public options page (1M tenor, indicative mid) — positive = calls bid over puts (upside skew on base currency); negative = puts bid (downside protection dominant).',
     'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels. RR from Saxo is indicative mid-market, updated during European hours; treat as directional context, not a tradeable quote. Direction signal always comes from Leveraged Funds net positioning (most reactive speculative category in CFTC data).'
   );
+  // skew-tbody may be absent (Positioning Bias panel removed) — safe to skip
   const skewRows = document.querySelectorAll('#skew-tbody tr');
   skewRows.forEach(row => {
     // Attach tooltip to each <td> individually — tooltip changes per cell hovered
@@ -2582,6 +2588,10 @@ function drawYieldCurve(points, priorPoints) {
   if (!canvas) return;
   const wrap = canvas.parentElement;
   const W = wrap.clientWidth - 20, H = 100;
+  // Guard: if the panel is hidden (display:none), clientWidth is 0.
+  // Setting canvas.width=0 clears it permanently. Abort and let the next
+  // rAF pass (triggered by hideDerivatives double-rAF) redraw correctly.
+  if (W <= 0) return;
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
@@ -5176,8 +5186,13 @@ function toggleInlineDetail(row) {
   // Always remove any existing expand row first
   if (existingExpand) {
     const inner = existingExpand.querySelector('td > div');
-    if (inner) inner.style.maxHeight = '0';
-    setTimeout(() => existingExpand.remove(), 180);
+    if (inner) {
+      // Snap to scrollHeight first so CSS transition can animate from a numeric value → 0
+      inner.style.maxHeight = inner.scrollHeight + 'px';
+      inner.style.overflow = 'hidden';
+      requestAnimationFrame(() => { inner.style.maxHeight = '0'; });
+    }
+    setTimeout(() => existingExpand.remove(), 200);
     tbody.querySelector('tr.pd-selected')?.classList.remove('pd-selected');
   }
 
@@ -5191,7 +5206,7 @@ function toggleInlineDetail(row) {
   expandRow.className = 'pd-expand-row';
   expandRow.dataset.forSym = tvSym;
   const td = document.createElement('td');
-  td.colSpan = 9;
+  td.colSpan = 12; // FX table has 12 columns
   const inner = document.createElement('div');
   inner.innerHTML = '<div style="padding:6px 10px;font-size:10px;color:var(--text3);">Loading…</div>';
   td.appendChild(inner);
@@ -5926,7 +5941,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-section-lbl">Volatility</div>
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market."><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair CBOE/CME vol index values via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD CBOE/CME vol index (^AUDVIX) × 1.08 (long-run NZD/AUD realised vol ratio). No dedicated CBOE/CME NZD vol index exists — treat as directional context only.' : 'ATM implied vol from CBOE/CME FX Volatility Index (^EUVIX/^BPVIX/^JYVIX/^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark used by Bloomberg BVOL. CHF/CAD: CME futures options or CBOE ETF fallback.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair CBOE/CME vol index values via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD CBOE/CME vol index (^AUDVIX) × 1.08 (long-run NZD/AUD realised vol ratio). No dedicated CBOE/CME NZD vol index exists — treat as directional context only.' : 'ATM implied vol from CBOE/CME FX Volatility Index (^EUVIX/^BPVIX/^JYVIX/^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark for FX options pricing. CHF/CAD: CME futures options or CBOE ETF fallback.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically indicates options are pricing in a premium above recent realised moves — hedging costs are elevated relative to actual market movement."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="25-delta Risk Reversal (1M) · Saxo Bank" data-tip-body="25d RR = 25d call IV minus 25d put IV. Positive = calls bid over puts — market skewed for upside on ${rrBase}. Negative = puts bid — downside protection dominant. Source: Saxo Bank public options page, 1M tenor, indicative mid-market. Updated during European hours." data-tip-ex="RR is a directional skew signal, not a vol-level signal. A strongly negative RR alongside high ATM IV = market pricing in both expensive hedging AND downside risk — historically a high-conviction bearish setup."><div class="pd-lbl">25d RR</div><div class="pd-val ${rrVal != null ? cls(rrVal) : ''}">${rrVal != null ? (rrVal >= 0 ? '+' : '') + rrVal.toFixed(2) : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Derived from live HV30 + VIX + MOVE model; falls back to ECN floor (IC Markets / Pepperstone Razor averages) when intraday data is unavailable. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in Asian session and around news events."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
@@ -6147,6 +6162,22 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 // source used by the main FX table and the pair detail popover).
 // Falls back to gross differential ranking when HV30 unavailable.
 // ═══════════════════════════════════════════════════════════════════
+// CARRY TRADE RANKING — G8 · CIP-adjusted · annualised
+// ═══════════════════════════════════════════════════════════════════
+// Institutional-grade carry ranking per Bloomberg FXFR / Refinitiv conventions:
+//
+//   Primary sort:  CIP-adjusted real carry = nominal rate diff − ΔInflation expectations
+//                  (real carry after inflation — the standard institutional metric)
+//   Tiebreak:      carry-to-vol ratio = real carry / HV30
+//                  (vol-adjusted carry; Bloomberg carry screens use this for pair selection)
+//   Last fallback: gross nominal differential (when extended-data unavailable)
+//
+//   Display:       rank · pair · nominal spread label · proportional bar · CIP-adj value
+//                  Bar width = proportional to top pair's CIP-adj carry (or nominal fallback)
+//                  Value coloring: ≥+0.5% green (carry positive after infl.) / ≤−0.5% red
+//
+//   Tooltip:       long rate / short rate / CIP adj. / HV30 / click for real rate analysis
+// ═══════════════════════════════════════════════════════════════════
 async function fetchCarryRanking() {
   const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
 
@@ -6157,10 +6188,8 @@ async function fetchCarryRanking() {
     return 'FX_IDC:' + long + short;
   }
 
-  // Canonical pair ID used in quotes.json / hv30 map — matches HV30_FX_PAIRS in
-  // fetch_intraday_quotes.py (FX market convention, not alphabetical for crosses).
-  // e.g. EUR/AUD = 'euraud' (not 'audeur'), GBP/CHF = 'gbpchf' (not 'chfgbp'),
-  //      NZD/JPY = 'nzdjpy' (not 'jpynzd').
+  // Canonical pair ID used in quotes.json / hv30 map — FX market convention,
+  // not alphabetical for crosses (e.g. EUR/AUD = 'euraud', GBP/CHF = 'gbpchf').
   function pairId(a, b) {
     const HV30_PAIRS = new Set([
       'eurusd','gbpusd','usdjpy','audusd','usdchf','usdcad','nzdusd',
@@ -6177,22 +6206,11 @@ async function fetchCarryRanking() {
     return a < b ? c1 : c2;
   }
 
-  // Rate-cycle regime arrow for a currency, derived from STATE.cbRates trend
-  // (same source as the CB Rates panel trend arrow — no double-computation)
-  function regimeArrow(ccy) {
-    const entry = STATE.cbRates?.[ccy.toLowerCase()];
-    if (!entry) return '';
-    const trend = entry.trend; // 'up' | 'down' | 'flat' | undefined
-    if (trend === 'up')   return '<span class="cr-regime cr-hike">↑</span>';
-    if (trend === 'down') return '<span class="cr-regime cr-cut">↓</span>';
-    return '<span class="cr-regime cr-hold">→</span>';
-  }
-
   const container = document.getElementById('carry-rank-rows');
   if (!container) return;
 
   try {
-    // ── 1. CB rates ──────────────────────────────────────────────
+    // ── 1. CB rates (use STATE cache from fetchCBRates if available) ─────────
     const rates = {};
     await Promise.all(G8.map(async ccy => {
       const cached = STATE.cbRates?.[ccy.toLowerCase()];
@@ -6210,19 +6228,34 @@ async function fetchCarryRanking() {
       return;
     }
 
-    // ── 2. HV30 per pair from intraday cache ─────────────────────
-    // quotes.json hv30 field is authoritative — same source used in FX table
+    // ── 2. HV30 per pair from intraday cache ─────────────────────────────────
     const intra = await loadIntradayQuotes().catch(() => null);
     const hv30Map = {};
-    if (intra?.hv30) {
-      Object.assign(hv30Map, intra.hv30);
-    }
-    // Also pull from STOOQ_RT_CACHE (populated by fetchQuoteBarRT) as supplement
+    if (intra?.hv30) Object.assign(hv30Map, intra.hv30);
     for (const [id, entry] of Object.entries(STOOQ_RT_CACHE)) {
       if (entry?.hv30 != null && hv30Map[id] == null) hv30Map[id] = entry.hv30;
     }
 
-    // ── 3. Build all 28 G8 pairs ─────────────────────────────────
+    // ── 3. Inflation expectations (same source as real-carry-modal2.js) ──────
+    // extended-data/{CCY}.json written weekly by update-inflation-expectations.yml
+    // Real rate = nominal CB rate − inflationExpectations
+    // If modal was opened earlier, reuse _rcmData to avoid duplicate fetches.
+    const inflExp = {};
+    await Promise.all(G8.map(async ccy => {
+      if (typeof _rcmData !== 'undefined' && _rcmData?.inflExp?.[ccy]?.val != null) {
+        inflExp[ccy] = _rcmData.inflExp[ccy].val;
+        return;
+      }
+      try {
+        const r = await fetch('./extended-data/' + ccy + '.json');
+        if (!r.ok) return;
+        const d = await r.json();
+        const ie = d?.data?.inflationExpectations;
+        if (ie != null && ie > 0 && ie < 20) inflExp[ccy] = ie;
+      } catch {}
+    }));
+
+    // ── 4. Build all 28 G8 pairs ─────────────────────────────────────────────
     const allPairs = [];
     for (let i = 0; i < G8.length; i++) {
       for (let j = i + 1; j < G8.length; j++) {
@@ -6230,9 +6263,9 @@ async function fetchCarryRanking() {
         const rA = rates[a] ?? null, rB = rates[b] ?? null;
         if (rA == null || rB == null) continue;
 
-        const diff = rA - rB;
-        const long  = diff >= 0 ? a : b;
-        const short = diff >= 0 ? b : a;
+        const diff   = rA - rB;
+        const long   = diff >= 0 ? a : b;
+        const short  = diff >= 0 ? b : a;
         const rLong  = diff >= 0 ? rA : rB;
         const rShort = diff >= 0 ? rB : rA;
         const absDiff = Math.abs(diff);
@@ -6240,18 +6273,32 @@ async function fetchCarryRanking() {
         const pid  = pairId(long, short);
         const hv30 = hv30Map[pid] ?? null;
 
-        // Carry-to-vol: annualised rate diff / annualised HV30
-        // Interpretation: units of carry earned per unit of realised vol risk
-        // Primary ranking metric for carry panels
-        const carryVol = (hv30 != null && hv30 > 0) ? absDiff / hv30 : null;
+        // CIP-adjusted carry: nominal diff minus inflation expectations differential
+        // = real carry that long leg earns after accounting for purchasing power erosion
+        const ieLong  = inflExp[long]  ?? null;
+        const ieShort = inflExp[short] ?? null;
+        const cipVal  = (ieLong != null && ieShort != null)
+          ? parseFloat((absDiff - (ieLong - ieShort)).toFixed(3))
+          : null;
 
-        allPairs.push({ long, short, diff: absDiff, rLong, rShort, hv30, carryVol, pid });
+        // Carry-to-vol: CIP-adj carry / HV30 — used as tiebreak
+        const carryVol = (hv30 != null && hv30 > 0)
+          ? (cipVal != null ? Math.abs(cipVal) : absDiff) / hv30
+          : null;
+
+        allPairs.push({ long, short, diff: absDiff, rLong, rShort, hv30, carryVol, cipVal, pid });
       }
     }
 
-    // ── 4. Sort by carry-to-vol (primary); fall back to gross diff ─
+    // ── 5. Sort: CIP-adjusted (primary) → carry-to-vol (tiebreak) → gross diff ─
+    const hasCipData = allPairs.some(p => p.cipVal != null);
     const hasVolData = allPairs.some(p => p.carryVol != null);
     allPairs.sort((a, b) => {
+      if (hasCipData) {
+        const cipA = a.cipVal ?? -Infinity;
+        const cipB = b.cipVal ?? -Infinity;
+        if (Math.abs(cipB - cipA) > 0.001) return cipB - cipA;
+      }
       if (hasVolData) {
         const cvA = a.carryVol ?? -Infinity;
         const cvB = b.carryVol ?? -Infinity;
@@ -6260,31 +6307,33 @@ async function fetchCarryRanking() {
       return b.diff - a.diff;
     });
 
-    const top     = allPairs.slice(0, 10);
-    const maxDiff = Math.max(...top.map(p => p.diff)) || 1;
-    const maxCV   = hasVolData ? (Math.max(...top.map(p => p.carryVol ?? 0)) || 1) : 1;
+    const top = allPairs.slice(0, 10);
 
-    // Update panel subtitle to reflect sort method
-    const headSpan = container.closest('.sb-section')
-      ?.querySelector('.sb-head span');
+    // Bar scale: proportional to the top pair's display value
+    // Use CIP-adj when available; fall back to nominal diff
+    const topDisplay = top.map(p => Math.max(p.cipVal ?? p.diff, 0));
+    const maxDisplay = Math.max(...topDisplay, 0.01);
+
+    // ── 6. Update panel subtitle ──────────────────────────────────────────────
+    const headSpan = container.closest('.sb-section')?.querySelector('.sb-head span');
     if (headSpan) {
-      headSpan.textContent = hasVolData
-        ? 'G8 · carry-to-vol ratio'
+      headSpan.textContent = hasCipData
+        ? 'G8 · CIP-adjusted · annualised'
         : 'G8 · CB rate differential';
     }
 
-    // Attach explanatory tooltip to the panel header (once — guard against re-attach on refresh)
+    // ── 7. Attach header tooltip (once) ──────────────────────────────────────
     const sbHead = container.closest('.sb-section')?.querySelector('.sb-head');
     if (sbHead && !sbHead._carryTipAttached) {
       sbHead._carryTipAttached = true;
       sbHead.style.cursor = 'help';
-      const tipTitle = 'Carry-to-Vol Ratio';
-      const tipBody  = hasVolData
-        ? 'Rate differential / HV30 (30-day realised vol). Ranks pairs by carry earned per unit of vol risk. Click any row to open the Real Rate Carry Analysis — real carry = nominal spread minus inflation expectations.'
-        : 'CB rate differential (%) between the long and short leg. Carry-to-vol ranking requires HV30 data (unavailable). Click any row for real rate analysis.';
-      const tipEx = hasVolData
-        ? 'Example: AUD/CHF +4.75% diff / 8.0% HV30 = 0.59. Click to compare real rates (nominal minus inflation expectations) — the institutional carry metric.'
-        : 'Example: AUD 4.35% − CHF 0.00% = +4.35% raw differential. Click for real rate breakdown.';
+      const tipTitle = hasCipData ? 'CIP-Adjusted Carry' : 'CB Rate Differential';
+      const tipBody  = hasCipData
+        ? 'Ranked by CIP-adjusted real carry: nominal rate differential minus the inflation expectations differential between the two legs. Tiebreak: carry-to-vol (carry per unit of HV30 risk). Industry standard per Bloomberg FXFR. Click any row for full real rate breakdown.'
+        : 'CB policy rate differential (%) between the long and short leg. CIP-adjusted ranking requires inflation expectations data (unavailable). Click any row for real rate analysis.';
+      const tipEx = hasCipData
+        ? 'Example: GBP/CHF nominal +3.75% − (BoE infl.exp − SNB infl.exp) = CIP-adj carry. Positive = long leg earns real carry after purchasing power adjustment.'
+        : 'Example: AUD 4.35% − CHF 0.00% = +4.35% gross nominal differential.';
 
       sbHead.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('fx-tt');
@@ -6302,34 +6351,39 @@ async function fetchCarryRanking() {
       });
     }
 
+    // ── 8. Render rows ────────────────────────────────────────────────────────
+    // Design: rank · pair · nominal spread label · proportional bar · CIP-adj value
+    // This matches Bloomberg/Refinitiv carry screen conventions:
+    //   - Nominal spread shown as reference (what the market quotes)
+    //   - Bar width proportional to CIP-adjusted real carry (true ranking metric)
+    //   - CIP value shown on right with color coding (green ≥+0.5%, red ≤−0.5%)
     container.innerHTML = top.map((p, idx) => {
-      const sym  = carryTV(p.long, p.short);
-      // Bar width represents the vol-adjusted carry (or gross diff as fallback)
-      const barVal = hasVolData && p.carryVol != null ? p.carryVol / maxCV : p.diff / maxDiff;
-      // Bar width: percentage of the bar-wrap container (proportional to top pair)
-      const barPct = Math.round(barVal * 100);
+      const sym = carryTV(p.long, p.short);
 
-      // Color: strong carry-to-vol (>0.3) = green; moderate = neutral; weak = dim
-      const cls = hasVolData && p.carryVol != null
-        ? (p.carryVol > 0.30 ? 'pd-up' : p.carryVol > 0.12 ? '' : 'pd-dim')
+      // Nominal spread — the raw CB rate differential, shown as context
+      const spreadLabel = '+' + p.diff.toFixed(2) + '%';
+
+      // CIP-adjusted carry — primary ranking value shown on the right
+      const cipVal = p.cipVal;
+      const displayVal = cipVal != null
+        ? (cipVal >= 0 ? '+' : '') + cipVal.toFixed(2)
+        : '+' + p.diff.toFixed(2);
+
+      // Bar width: proportional to CIP-adj carry of the top pair
+      // Clamped to [4%, 100%] — never invisible, never overflows
+      const barRaw = cipVal != null ? Math.max(cipVal, 0) : p.diff;
+      const barPct = Math.max(Math.round((barRaw / maxDisplay) * 100), 4);
+
+      // Color: green when CIP carry ≥+0.5% (real carry positive after inflation)
+      //        neutral when 0%–0.5% (marginal carry)
+      //        dim when carry is CIP-negative (inflation erodes the nominal spread)
+      const cls = cipVal != null
+        ? (cipVal >= 0.5 ? 'pd-up' : cipVal <= -0.1 ? 'pd-dim' : '')
         : (p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim');
 
-      const rArrowL = regimeArrow(p.long);
-      const rArrowS = regimeArrow(p.short);
-
-      // Tooltip: full institutional detail (rates, vol, carry-to-vol, regime)
-      const cvStr  = p.carryVol != null ? p.carryVol.toFixed(2) : 'n/a';
-      const hvStr  = p.hv30     != null ? p.hv30.toFixed(1) + '%' : 'n/a';
-      const tip = `${p.long}/${p.short} · Long ${p.rLong.toFixed(2)}% / Short ${p.rShort.toFixed(2)}% · Diff ${p.diff.toFixed(2)}% · HV30 ${hvStr} · Carry/Vol ${cvStr} — Click for real rate analysis`;
-
-      // Display: show carry-to-vol when available, gross diff otherwise
-      const displayVal = hasVolData && p.carryVol != null
-        ? p.carryVol.toFixed(2)
-        : '+' + p.diff.toFixed(2) + '%';
-
-      // Spread label: show gross rate differential (e.g. +4.00%) — industry standard
-      // for carry screens (Bloomberg/Refinitiv show rate spread, not CB trend arrows)
-      const spreadLabel = (p.diff >= 0 ? '+' : '') + p.diff.toFixed(2) + '%';
+      const cipStr  = cipVal != null ? (cipVal >= 0 ? '+' : '') + cipVal.toFixed(2) + '%' : '—';
+      const hvStr   = p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a';
+      const tip = `${p.long}/${p.short} · Nominal ${spreadLabel} · CIP-adj ${cipStr} · HV30 ${hvStr} — Click for real rate analysis`;
 
       return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
@@ -6340,19 +6394,19 @@ async function fetchCarryRanking() {
       </div>`;
     }).join('');
 
-    // Click: open real rate carry modal for the selected pair
-    // Falls back to TradingView chart if modal function unavailable
+    // ── 9. Row click → open Real Rate Carry Modal ────────────────────────────
     container.querySelectorAll('.carry-rank-row[data-long]').forEach(row => {
       row.addEventListener('click', () => {
         const longCcy  = row.dataset.long;
         const shortCcy = row.dataset.short;
-        if (typeof openRealCarryModal === 'function') {
-          openRealCarryModal(longCcy, shortCcy);
+        if (typeof window.openRealCarryModal === 'function') {
+          window.openRealCarryModal(longCcy, shortCcy);
         } else {
           loadTVChart(row.dataset.sym);
         }
       });
     });
+
   } catch(e) {
     console.warn('[CarryRanking]', e);
     if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
@@ -6840,8 +6894,9 @@ async function fetchFedExpectations() {
 // ═══════════════════════════════════════════════════════════════════
 async function fetchOptionSkew() {
   try {
+    // skew-tbody may be absent if Positioning Bias panel was removed;
+    // RR fetch must still run so RR_DATA_CACHE is populated for other panels.
     const tbody = document.getElementById('skew-tbody');
-    if (!tbody) return;
 
     const pairs = [
       { pair:'EUR/USD', cot:'EUR', etfId:'eurusd', rrKey:'EURUSD' },
@@ -6895,7 +6950,7 @@ async function fetchOptionSkew() {
     // Update thead to reflect what's actually showing
     const hasAnyEtfIv = pairs.some(p => etfIvMap[p.etfId]?.iv != null);
     const hasIvRank   = pairs.some(p => etfIvMap[p.etfId]?.iv_rank != null);
-    const thead = tbody.closest('table')?.querySelector('thead tr');
+    const thead = tbody ? tbody.closest('table')?.querySelector('thead tr') : null;
     if (thead) {
       if (hasAnyEtfIv) {
         // IV Rank column shown when history is available (≥4 weeks)
@@ -6918,7 +6973,7 @@ async function fetchOptionSkew() {
       'NZD/USD': { body: 'NZD/USD bias from CFTC Leveraged Funds net NZD positioning. NZD is a high-beta risk/commodity proxy — positive bias aligns with global risk appetite and dairy/agricultural strength.', ex: 'NZD often moves in tandem with AUD. Divergence between the two — e.g. NZD negative while AUD positive — can signal idiosyncratic NZ macro risk (RBNZ, trade data).' },
     };
 
-    tbody.innerHTML = pairs.map(p => {
+    if (tbody) tbody.innerHTML = pairs.map(p => {
       const cotData = cotMap[p.cot];
       const etfIv   = etfIvMap[p.etfId];
       const invert  = p.pair.startsWith('USD/');
@@ -8232,9 +8287,23 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     m: 'section-econmap',
     y: 'section-cbrates',
     k: 'section-tvcalendar',
+    d: 'section-derivatives',
   };
 
   function navTo(target) {
+    if (target === 'section-derivatives') {
+      // Derivatives uses a custom show/hide toggle, not scroll-into-view
+      const derivSection = window._derivNavSection;
+      if (!derivSection) return;
+      if (derivSection.style.display === 'none' || derivSection.style.display === '') {
+        // If currently hidden, show it
+        if (typeof window._derivNavShow === 'function') window._derivNavShow();
+      } else {
+        // Already visible — treat D as a toggle back to Overview
+        if (typeof window._derivNavHide === 'function') window._derivNavHide();
+      }
+      return;
+    }
     const link = document.querySelector(`.top-nav a[data-target="${target}"]`);
     if (link) link.click();
   }
@@ -8278,6 +8347,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
           <span class="kbl-key">M</span><span class="kbl-desc">Macro map</span>
           <span class="kbl-key">Y</span><span class="kbl-desc">Rates &amp; Yield Curve</span>
           <span class="kbl-key">K</span><span class="kbl-desc">Economic Calendar</span>
+          <span class="kbl-key">D</span><span class="kbl-desc">Derivatives (toggle)</span>
           <span class="kbl-key">&uarr;&darr;</span><span class="kbl-desc">Navigate FX rows</span>
           <span class="kbl-key">?</span><span class="kbl-desc">Close this panel</span>
         </div>
@@ -9064,6 +9134,44 @@ function toggleAlertsPopover() {
     }
   });
 
+  // ── Monitor-transition: reload on screen change ───────────────────────────
+  // When the browser window moves to a monitor with a different resolution or
+  // DPR, the CSS grid layout (#layout: 180px minmax(0,1fr) 220px) can enter an
+  // irrecoverable broken state where #main collapses to ~220px. No JS reflow
+  // can reliably fix a broken grid mid-paint. The correct solution is to reload
+  // the page when a screen change is detected. The reload is fast (all assets
+  // are cached) and the user returns to the same state via localStorage.
+  (function _watchScreenChange(){
+    var _lastW = window.screen.width;
+    var _lastH = window.screen.height;
+    var _lastDPR = window.devicePixelRatio;
+    var _reloadPending = false;
+
+    function _onScreenChange(){
+      if(_reloadPending) return;
+      var w = window.screen.width;
+      var h = window.screen.height;
+      var dpr = window.devicePixelRatio;
+      // Only reload if screen dimensions changed (rules out normal browser resize)
+      if(w !== _lastW || h !== _lastH || Math.abs(dpr - _lastDPR) > 0.05){
+        _reloadPending = true;
+        // Small delay so the browser finishes moving the window before reload
+        setTimeout(function(){ window.location.reload(); }, 300);
+      }
+    }
+
+    // Primary: matchMedia on DPR — fires reliably on monitor change
+    try{
+      var _mq = window.matchMedia('(resolution: ' + _lastDPR + 'dppx)');
+      _mq.addEventListener('change', _onScreenChange);
+    }catch(e){}
+
+    // Secondary: poll screen dimensions every 2s as fallback
+    setInterval(function(){
+      if(!_reloadPending) _onScreenChange();
+    }, 2000);
+  })();
+
   if(handle){
     var dragging = false, startX = 0, startW = 0;
     handle.addEventListener('mousedown', function(e){
@@ -9216,3 +9324,1167 @@ if (document.readyState === 'loading') {
 } else {
   giOnboardInit();
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// NEW FEATURES v7.71.0 — CIP Forwards, RR Surface, HV Term Structure,
+//                         G8 Rates tabs, Sovereign Spreads, Econ Surprises
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Global cache: CB rates by currency (populated by fetchRiskData/renderCBRates) ──
+window._CB_RATES_CACHE = window._CB_RATES_CACHE || {};
+
+// ── OIS / Overnight rate cache (used exclusively for CIP forward pricing) ──
+// Populated by loadOISRatesCache() from ois-rates/rates.json (daily workflow).
+// Falls back to _CB_RATES_CACHE (policy rate) if file unavailable.
+// Rate → benchmark: USD=SOFR, EUR=€STR, GBP=SONIA, JPY=TONA,
+//                   AUD=AONIA, CAD=CORRA, CHF=SARON, NZD=OCR overnight.
+window._OIS_RATES_CACHE  = window._OIS_RATES_CACHE  || {};
+window._OIS_RATE_SOURCES = window._OIS_RATE_SOURCES || {};  // e.g. { USD: 'SOFR', EUR: '€STR' }
+
+// ── CIP Forward Calculator ──
+// F = S × (1 + r_RIGHT × T) / (1 + r_LEFT × T)
+// r_left  = OIS rate of left-hand (base) currency
+// r_right = OIS rate of right-hand (quote) currency
+// T in years (1M=1/12, 3M=1/4, 6M=1/2, 1Y=1)
+// Industry standard: use overnight/OIS benchmarks, not CB policy rates.
+// Benchmarks: USD=SOFR, EUR=€STR, GBP=SONIA, JPY=TONA, AUD=AONIA, CAD=CORRA, CHF=SARON, NZD=OCR.
+// Source: BIS FX conventions; Bloomberg FX Forward methodology (FXFA).
+function computeCIPForward(spot, rLeft, rRight, T) {
+  if (spot == null || rLeft == null || rRight == null) return null;
+  const rL = rLeft  / 100;
+  const rR = rRight / 100;
+  return spot * ((1 + rR * T) / (1 + rL * T));
+}
+
+// ── Helper: resolve rate for a currency (OIS preferred, policy fallback) ──
+// Returns [rate, sourceName] — sourceName used in tooltips.
+function _resolveRate(ccy) {
+  const ois = window._OIS_RATES_CACHE[ccy];
+  if (ois != null) return [ois, window._OIS_RATE_SOURCES[ccy] || 'OIS'];
+  const policy = window._CB_RATES_CACHE[ccy];
+  if (policy != null) return [policy, 'policy'];
+  return [null, null];
+}
+
+// ── Rate map: which CB rate applies to which currency ──
+// CIP-eligible pairs — both legs have CB policy rates in rates/*.json
+// Formula: F = S × (1 + r_RIGHT × T) / (1 + r_LEFT × T)
+// Left-hand currency at forward discount when its rate exceeds the right-hand rate.
+const CIP_CCY_RATES = new Set([
+  'EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD',
+  'EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CHF',
+]);
+
+// ── Render CIP Forwards in main FX Pairs table (tds[7]=Fwd1M, tds[8]=Fwd3M) ──
+async function renderCIPForwards() {
+  const fxTbody = document.getElementById('fx-pairs-tbody');
+  if (!fxTbody) return;
+
+  const rows = fxTbody.querySelectorAll('tr');
+  rows.forEach(row => {
+    const symCell = row.querySelector('td.sym');
+    if (!symCell) return;
+    const pair = symCell.textContent.trim();
+    if (!CIP_CCY_RATES.has(pair)) return;
+    const tds = row.querySelectorAll('td');
+    if (tds.length < 12) return;
+
+    const [leftCcy, rightCcy] = pair.split('/');
+    const pairId = pair.replace('/', '').toLowerCase();
+    const spot = STOOQ_RT_CACHE[pairId]?.close ?? null;
+
+    const [rLeft,  srcLeft]  = _resolveRate(leftCcy);
+    const [rRight, srcRight] = _resolveRate(rightCcy);
+
+    const tenors  = [1/12, 3/12];
+    const indices = [7, 8];
+    const pairCfg = PAIRS.find(p => p.id === pairId);
+    const dec = pairCfg?.dec ?? 4;
+
+    tenors.forEach((T, i) => {
+      const fwd = computeCIPForward(spot, rLeft, rRight, T);
+      const el  = tds[indices[i]];
+      if (!el) return;
+      if (fwd != null && spot != null) {
+        el.textContent = fwd.toFixed(dec);
+        const atDiscount = fwd < spot;
+        el.style.color = atDiscount ? 'var(--down)' : 'var(--up)';
+        const tLabel = T === 1/12 ? '1M' : '3M';
+        el.title = `CIP ${tLabel} fwd · ${leftCcy}=${rLeft?.toFixed(2)}% (${srcLeft}) vs ${rightCcy}=${rRight?.toFixed(2)}% (${srcRight}) · ${leftCcy} at forward ${atDiscount ? 'discount' : 'premium'}`;
+      } else {
+        el.textContent = '—';
+        el.style.color = 'var(--text3)';
+      }
+    });
+  });
+}
+
+// ── Render RR 1M in main FX Pairs table (tds[9]) ──
+async function renderRRInFXTable() {
+  // RR_DATA_CACHE is populated by fetchOptionSkew — but also fetch directly as fallback
+  let rrMap = window.RR_DATA_CACHE || {};
+  if (Object.keys(rrMap).length === 0) {
+    try {
+      const res = await fetch('./rr-data/rr.json').catch(() => null);
+      if (res?.ok) {
+        const j = await res.json();
+        if (j?.pairs) { rrMap = j.pairs; Object.assign(window.RR_DATA_CACHE, rrMap); }
+      }
+    } catch { /* leave empty */ }
+  }
+  const fxTbody = document.getElementById('fx-pairs-tbody');
+  if (!fxTbody) return;
+
+  const rrKeys = {
+    'EUR/USD': 'EURUSD', 'GBP/USD': 'GBPUSD', 'USD/JPY': 'USDJPY',
+    'AUD/USD': 'AUDUSD', 'USD/CHF': 'USDCHF', 'USD/CAD': 'USDCAD', 'NZD/USD': 'NZDUSD'
+  };
+
+  const rows = fxTbody.querySelectorAll('tr');
+  rows.forEach(row => {
+    const symCell = row.querySelector('td.sym');
+    if (!symCell) return;
+    const pair = symCell.textContent.trim();
+    const rrKey = rrKeys[pair];
+    if (!rrKey) return;
+    const tds = row.querySelectorAll('td');
+    const el = tds[9];
+    if (!el) return;
+
+    const rrVal = rrMap[rrKey]?.rr25d ?? null;
+    if (rrVal != null) {
+      el.textContent = (rrVal >= 0 ? '+' : '') + rrVal.toFixed(2);
+      el.style.color = rrVal > 0.1 ? 'var(--up)' : rrVal < -0.1 ? 'var(--down)' : 'var(--text2)';
+      el.title = `25d RR 1M · ${rrKey} · Saxo Bank indicative mid`;
+    } else {
+      el.textContent = '—';
+      el.style.color = 'var(--text3)';
+    }
+  });
+}
+
+// ── Render Derivatives section ──
+async function renderDerivativesSection() {
+  const ratesCache = window._CB_RATES_CACHE;
+  const intraday = await loadIntradayQuotes().catch(() => null);
+
+  // Guarantee RR data is available — fetch directly if cache is still empty
+  let rrMap = window.RR_DATA_CACHE || {};
+  if (Object.keys(rrMap).length === 0) {
+    try {
+      const res = await fetch('./rr-data/rr.json').catch(() => null);
+      if (res?.ok) {
+        const j = await res.json();
+        if (j?.pairs) {
+          rrMap = j.pairs;
+          if (!window.RR_DATA_CACHE) window.RR_DATA_CACHE = {};
+          Object.assign(window.RR_DATA_CACHE, rrMap);
+        }
+      }
+    } catch { /* leave empty, cells show — */ }
+  } else {
+    rrMap = window.RR_DATA_CACHE;
+  }
+
+  // Load rr2.json if available (multi-tenor from fetch_saxo_rr2.py)
+  let rr2Map = {};
+  try {
+    const rr2Res = await fetch('./rr-data/rr2.json').catch(() => null);
+    if (rr2Res?.ok) {
+      const rr2Json = await rr2Res.json();
+      if (rr2Json?.pairs) rr2Map = rr2Json.pairs;
+    }
+  } catch { /* rr2.json not yet deployed — graceful fallback */ }
+
+  const pairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD'];
+  const rrKeys = {
+    'EUR/USD':'EURUSD','GBP/USD':'GBPUSD','USD/JPY':'USDJPY',
+    'AUD/USD':'AUDUSD','USD/CHF':'USDCHF','USD/CAD':'USDCAD','NZD/USD':'NZDUSD'
+  };
+
+  // ── Forwards table ──
+  const fwdTbody = document.getElementById('fwd-tbody');
+  if (fwdTbody) {
+    const rows = fwdTbody.querySelectorAll('tr');
+    pairs.forEach((pair, idx) => {
+      const row = rows[idx];
+      if (!row) return;
+      if (!CIP_CCY_RATES.has(pair)) return;
+      const [leftCcy, rightCcy] = pair.split('/');
+      const pairId = pair.replace('/','').toLowerCase();
+      const pairCfg = PAIRS.find(p => p.id === pairId);
+      const dec = pairCfg?.dec ?? 4;
+      const spot  = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
+
+      // ── OIS rates (preferred) with policy fallback ──
+      const [rLeft,  srcLeft]  = _resolveRate(leftCcy);
+      const [rRight, srcRight] = _resolveRate(rightCcy);
+
+      const tds = row.querySelectorAll('td');
+
+      // Spot
+      if (tds[1]) tds[1].textContent = spot != null ? spot.toFixed(dec) : '—';
+
+      // Forwards: 1M, 3M, 6M, 1Y
+      const tenors = [1/12, 3/12, 6/12, 1];
+      tenors.forEach((T, ti) => {
+        const fwd = computeCIPForward(spot, rLeft, rRight, T);
+        const el = tds[2 + ti];
+        if (!el) return;
+        if (fwd != null && spot != null) {
+          el.textContent = fwd.toFixed(dec);
+          const atDiscount = fwd < spot; // left-hand ccy at discount
+          el.style.color = atDiscount ? 'var(--down)' : 'var(--up)';
+        } else {
+          el.textContent = '—';
+          el.style.color = 'var(--text3)';
+        }
+      });
+
+      // Rate Diff — OIS diff (positive = left has more carry → forward discount)
+      if (tds[6]) {
+        const diff = (rLeft != null && rRight != null) ? (rLeft - rRight) : null;
+        if (diff != null) {
+          tds[6].textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + '%';
+          tds[6].style.color = diff > 0.1 ? 'var(--down)' : diff < -0.1 ? 'var(--up)' : 'var(--text2)';
+          tds[6].title = `OIS rate diff: ${leftCcy}=${rLeft?.toFixed(2)}% (${srcLeft}) − ${rightCcy}=${rRight?.toFixed(2)}% (${srcRight}) · positive = ${leftCcy} at forward discount · Used for CIP forward pricing`;
+        } else {
+          tds[6].textContent = '—';
+        }
+      }
+    });
+
+    // ── Cross pairs CIP forwards ──
+    const crossFwdPairs = ['EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CHF'];
+    crossFwdPairs.forEach(pair => {
+      const row = fwdTbody.querySelector(`tr[data-pair="${pair}"]`);
+      if (!row) return;
+      const [leftCcy, rightCcy] = pair.split('/');
+      const pairId = pair.replace('/','').toLowerCase();
+      const pairCfg = PAIRS.find(p => p.id === pairId);
+      const dec = pairCfg?.dec ?? 5;
+      const spot  = STOOQ_RT_CACHE[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
+
+      // ── OIS rates (preferred) with policy fallback ──
+      const [rLeft,  srcLeft]  = _resolveRate(leftCcy);
+      const [rRight, srcRight] = _resolveRate(rightCcy);
+
+      const tds = row.querySelectorAll('td');
+
+      if (tds[1]) tds[1].textContent = spot != null ? spot.toFixed(dec) : '—';
+
+      const tenors = [1/12, 3/12, 6/12, 1];
+      tenors.forEach((T, ti) => {
+        const fwd = computeCIPForward(spot, rLeft, rRight, T);
+        const el = tds[2 + ti];
+        if (!el) return;
+        if (fwd != null && spot != null) {
+          el.textContent = fwd.toFixed(dec);
+          const atDiscount = fwd < spot;
+          el.style.color = atDiscount ? 'var(--down)' : 'var(--up)';
+        } else {
+          el.textContent = '—';
+          el.style.color = 'var(--text3)';
+        }
+      });
+
+      if (tds[6]) {
+        const diff = (rLeft != null && rRight != null) ? (rLeft - rRight) : null;
+        if (diff != null) {
+          tds[6].textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + '%';
+          tds[6].style.color = diff > 0.1 ? 'var(--down)' : diff < -0.1 ? 'var(--up)' : 'var(--text2)';
+          tds[6].title = `OIS rate diff: ${leftCcy}=${rLeft?.toFixed(2)}% (${srcLeft}) − ${rightCcy}=${rRight?.toFixed(2)}% (${srcRight}) · positive = ${leftCcy} at forward discount`;
+        } else {
+          tds[6].textContent = '—';
+        }
+      }
+    });
+  }
+
+  // ── RR Surface table ──
+  const rrSurfaceTbody = document.getElementById('rr-surface-tbody');
+  if (rrSurfaceTbody) {
+    const rrPairs = pairs.filter(p => p !== 'NZD/USD'); // NZD rarely available in full surface
+    const rows = rrSurfaceTbody.querySelectorAll('tr');
+    rrPairs.forEach((pair, idx) => {
+      const row = rows[idx];
+      if (!row) return;
+      const rrKey = rrKeys[pair];
+      const tds = row.querySelectorAll('td');
+      const rr2 = rr2Map[rrKey] || {};
+      const rr1m = rr2['1M'] ?? rrMap[rrKey]?.rr25d ?? null;
+      const tenorData = [
+        rr2['1W'] ?? null,
+        rr1m,
+        rr2['3M'] ?? null,
+        rr2['6M'] ?? null,
+        rr2['1Y'] ?? null,
+      ];
+      tenorData.forEach((v, ti) => {
+        const el = tds[1 + ti];
+        if (!el) return;
+        if (v != null) {
+          el.textContent = (v >= 0 ? '+' : '') + v.toFixed(2);
+          el.style.color = v > 0.1 ? 'var(--up)' : v < -0.1 ? 'var(--down)' : 'var(--text2)';
+        } else {
+          el.textContent = '—';
+          el.style.color = 'var(--text3)';
+        }
+      });
+      // Skew direction
+      if (tds[6] && rr1m != null) {
+        const skewLbl = rr1m < -0.3 ? 'Put skew' : rr1m > 0.3 ? 'Call skew' : 'Balanced';
+        tds[6].textContent = skewLbl;
+        tds[6].style.color = rr1m < -0.3 ? 'var(--down)' : rr1m > 0.3 ? 'var(--up)' : 'var(--text3)';
+      }
+    });
+  }
+
+  // ── HV Term Structure table — 4 columns: Pair | HV 30d | RR 1M | RR/HV ──
+  const hvTermTbody = document.getElementById('hv-term-tbody');
+  if (hvTermTbody) {
+    const rows = hvTermTbody.querySelectorAll('tr');
+    const termPairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD'];
+    termPairs.forEach((pair, idx) => {
+      const row = rows[idx];
+      if (!row) return;
+      const pairId = pair.replace('/','').toLowerCase();
+      const q = intraday?.quotes?.[pairId];
+      const tds = row.querySelectorAll('td');
+
+      const hv30 = q?.hv30 ?? STOOQ_RT_CACHE[pairId]?.hv30 ?? null;
+      const hv10 = q?.hv10 ?? null;
+      const rrKey = rrKeys[pair] ?? pair.replace('/','');
+      const rr1m = rrMap[rrKey]?.rr25d ?? null;
+
+      // td[1] = HV 30d
+      if (tds[1]) {
+        tds[1].textContent = hv30 != null ? hv30.toFixed(1) + '%' : '—';
+        tds[1].style.textAlign = 'right';
+        tds[1].style.color = hv30 != null ? (hv30 > 12 ? 'var(--down)' : hv30 < 5 ? 'var(--up)' : 'var(--text)') : 'var(--text3)';
+        tds[1].style.fontFamily = 'var(--font-mono)';
+        tds[1].style.fontSize = '10px';
+      }
+      // td[2] = RR 1M
+      if (tds[2]) {
+        tds[2].textContent = rr1m != null ? (rr1m >= 0 ? '+' : '') + rr1m.toFixed(2) : '—';
+        tds[2].style.textAlign = 'right';
+        tds[2].style.color = rr1m != null ? (rr1m > 0.1 ? 'var(--up)' : rr1m < -0.1 ? 'var(--down)' : 'var(--text2)') : 'var(--text3)';
+        tds[2].style.fontFamily = 'var(--font-mono)';
+        tds[2].style.fontSize = '10px';
+      }
+      // td[3] = RR/HV ratio — skew premium relative to realized vol
+      if (tds[3]) {
+        if (rr1m != null && hv30 != null && hv30 > 0) {
+          const ratio = (rr1m / hv30) * 100;
+          tds[3].textContent = (ratio >= 0 ? '+' : '') + ratio.toFixed(0) + '%';
+          tds[3].style.color = ratio > 5 ? 'var(--up)' : ratio < -5 ? 'var(--down)' : 'var(--text3)';
+          tds[3].title = `RR 1M (${rr1m.toFixed(2)}) ÷ HV30 (${hv30.toFixed(1)}%) — options skew premium vs realized vol`;
+        } else {
+          tds[3].textContent = '—';
+          tds[3].style.color = 'var(--text3)';
+        }
+        tds[3].style.textAlign = 'right';
+        tds[3].style.fontFamily = 'var(--font-mono)';
+        tds[3].style.fontSize = '10px';
+      }
+      // td[4] = Vol Trend — Bloomberg convention: HV 10d vs HV 30d
+      // ↑ expanding (HV10 > HV30 + 1pp), ↓ contracting (HV10 < HV30 − 1pp), → neutral
+      if (tds[4]) {
+        if (hv10 != null && hv30 != null) {
+          const diff = hv10 - hv30;
+          let arrow, color, tip;
+          if (diff > 1) {
+            arrow = '↑'; color = 'var(--down)';  // expanding vol = risk-off color (red)
+            tip = `HV10 (${hv10.toFixed(1)}%) > HV30 (${hv30.toFixed(1)}%) — short-term vol expanding`;
+          } else if (diff < -1) {
+            arrow = '↓'; color = 'var(--up)';    // contracting vol = green
+            tip = `HV10 (${hv10.toFixed(1)}%) < HV30 (${hv30.toFixed(1)}%) — short-term vol contracting`;
+          } else {
+            arrow = '→'; color = 'var(--text3)';
+            tip = `HV10 (${hv10.toFixed(1)}%) ≈ HV30 (${hv30.toFixed(1)}%) — vol stable (within 1pp)`;
+          }
+          tds[4].textContent = arrow;
+          tds[4].style.color = color;
+          tds[4].title = tip;
+        } else {
+          tds[4].textContent = '—';
+          tds[4].style.color = 'var(--text3)';
+          tds[4].title = 'HV 10d not yet available — pipeline computes on next run';
+        }
+        tds[4].style.textAlign = 'right';
+        tds[4].style.fontSize = '11px';
+      }
+    });
+  }
+
+  // ── Cross-Pair Vol Monitor ──
+  const crossVolTbody = document.getElementById('cross-vol-tbody');
+  if (crossVolTbody && intraday) {
+    const crossPairs = [
+      { label: 'EUR/GBP', id: 'eurgbp' },
+      { label: 'EUR/JPY', id: 'eurjpy' },
+      { label: 'GBP/JPY', id: 'gbpjpy' },
+      { label: 'AUD/JPY', id: 'audjpy' },
+      { label: 'EUR/AUD', id: 'euraud' },
+      { label: 'EUR/NZD', id: 'eurnzd' },
+    ];
+    const rows = crossVolTbody.querySelectorAll('tr');
+    crossPairs.forEach((cp, idx) => {
+      const row = rows[idx];
+      if (!row) return;
+      const q = intraday?.quotes?.[cp.id];
+      const tds = row.querySelectorAll('td');
+      const hv30 = q?.hv30 ?? null;
+      const hv10 = q?.hv10 ?? null;
+      const pct  = q?.pct  ?? null;
+
+      // HV 30d
+      if (tds[1]) {
+        tds[1].textContent = hv30 != null ? hv30.toFixed(1) + '%' : '—';
+        tds[1].style.color = hv30 != null ? (hv30 > 10 ? 'var(--down)' : hv30 < 4 ? 'var(--up)' : 'var(--text)') : 'var(--text3)';
+        tds[1].style.fontFamily = 'var(--font-mono)'; tds[1].style.fontSize = '10px';
+      }
+      // HV 10d
+      if (tds[2]) {
+        tds[2].textContent = hv10 != null ? hv10.toFixed(1) + '%' : '—';
+        tds[2].style.color = 'var(--text2)';
+        tds[2].style.fontFamily = 'var(--font-mono)'; tds[2].style.fontSize = '10px';
+      }
+      // Vol Trend
+      if (tds[3]) {
+        if (hv10 != null && hv30 != null) {
+          const diff = hv10 - hv30;
+          const arrow = diff > 1 ? '↑' : diff < -1 ? '↓' : '→';
+          const color = diff > 1 ? 'var(--down)' : diff < -1 ? 'var(--up)' : 'var(--text3)';
+          tds[3].textContent = arrow; tds[3].style.color = color;
+          tds[3].title = `HV10 ${hv10.toFixed(1)}% vs HV30 ${hv30.toFixed(1)}%`;
+        } else {
+          tds[3].textContent = '—'; tds[3].style.color = 'var(--text3)';
+        }
+        tds[3].style.fontSize = '11px';
+      }
+      // 1D Δ%
+      if (tds[4]) {
+        tds[4].textContent = pct != null ? (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%' : '—';
+        tds[4].style.color = pct != null ? (pct > 0 ? 'var(--up)' : pct < 0 ? 'var(--down)' : 'var(--text3)') : 'var(--text3)';
+        tds[4].style.fontFamily = 'var(--font-mono)'; tds[4].style.fontSize = '10px';
+      }
+    });
+  }
+
+  // ── ECB Reference Exchange Rates ──
+  // Source: fx-data/frankfurter.json (server-side cached from api.frankfurter.app)
+  // Shows today's ECB fixing vs previous day, plus offset from current spot
+  const ecbTbody = document.getElementById('ecb-fixings-tbody');
+  if (ecbTbody) {
+    try {
+      const fxRes = await fetch('./fx-data/frankfurter.json').catch(() => null);
+      if (fxRes?.ok) {
+        const fxJson = await fxRes.json();
+        // Use EUR-base section for ECB panel (today_eur/prev_eur keys: USD, GBP, JPY, AUD, CAD, CHF, NZD)
+        // Fall back to today/prev (USD-base) for older cached files — USD won't appear in that case
+        const todayRates = fxJson?.today_eur?.rates ?? fxJson?.today?.rates ?? {};
+        const prevRates  = fxJson?.prev_eur?.rates  ?? fxJson?.prev?.rates  ?? {};
+        const fxDate     = fxJson?.today?.date  ?? '';
+
+        // Pairs to display — all EUR-quoted
+        const ecbPairs = [
+          { label: 'EUR/USD', ccy: 'USD' },
+          { label: 'EUR/GBP', ccy: 'GBP' },
+          { label: 'EUR/JPY', ccy: 'JPY' },
+          { label: 'EUR/CHF', ccy: 'CHF' },
+          { label: 'EUR/AUD', ccy: 'AUD' },
+          { label: 'EUR/CAD', ccy: 'CAD' },
+          { label: 'EUR/NZD', ccy: 'NZD' },
+        ];
+
+        const rows = ecbTbody.querySelectorAll('tr');
+        const MN = { USD: 4, GBP: 4, JPY: 2, CHF: 4, AUD: 4, CAD: 4, NZD: 4 };
+
+        ecbPairs.forEach(({ label, ccy }, i) => {
+          const row = rows[i];
+          if (!row) return;
+          const tds = row.querySelectorAll('td');
+          const dec = MN[ccy] ?? 4;
+          const today = todayRates[ccy];
+          const prev  = prevRates[ccy];
+          const chg   = (today != null && prev != null) ? today - prev : null;
+          const chgPct = (chg != null && prev != null && prev !== 0) ? (chg / prev) * 100 : null;
+
+          // Spot for vs-fix comparison: try to get EUR/XXX spot from intraday/stooq cache
+          const pairId = ('eur' + ccy).toLowerCase();
+          const spot = STOOQ_RT_CACHE?.[pairId]?.close ?? intraday?.quotes?.[pairId]?.close ?? null;
+          const vsSpot = (spot != null && today != null) ? spot - today : null;
+
+          const monoStyle = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
+
+          if (tds[0]) tds[0].textContent = label;
+          if (tds[1]) { tds[1].textContent = today != null ? today.toFixed(dec) : '—'; tds[1].setAttribute('style', monoStyle); }
+          if (tds[2]) { tds[2].textContent = prev  != null ? prev.toFixed(dec)  : '—'; tds[2].setAttribute('style', monoStyle + 'color:var(--text2);'); }
+          if (tds[3]) {
+            tds[3].textContent = chg != null ? (chg >= 0 ? '+' : '') + chg.toFixed(dec) : '—';
+            tds[3].setAttribute('style', monoStyle + `color:${chg == null ? 'var(--text3)' : chg > 0 ? 'var(--up)' : chg < 0 ? 'var(--down)' : 'var(--text3)'};`);
+          }
+          if (tds[4]) {
+            tds[4].textContent = chgPct != null ? (chgPct >= 0 ? '+' : '') + chgPct.toFixed(3) + '%' : '—';
+            tds[4].setAttribute('style', monoStyle + `color:${chgPct == null ? 'var(--text3)' : chgPct > 0 ? 'var(--up)' : chgPct < 0 ? 'var(--down)' : 'var(--text3)'};`);
+          }
+          if (tds[5]) {
+            tds[5].textContent = vsSpot != null ? (vsSpot >= 0 ? '+' : '') + vsSpot.toFixed(dec) : '—';
+            tds[5].title       = vsSpot != null ? `Spot (${spot.toFixed(dec)}) minus ECB fix (${today.toFixed(dec)})` : 'Spot not available';
+            tds[5].setAttribute('style', monoStyle + `color:${vsSpot == null ? 'var(--text3)' : Math.abs(vsSpot) < 0.001 ? 'var(--text3)' : 'var(--text2)'};`);
+          }
+        });
+
+        const footer = document.getElementById('ecb-fixings-footer');
+        if (footer && fxDate) footer.textContent = `ECB · official reference fixing · ${fxDate} · published ~16:00 CET · source: frankfurter.json`;
+      }
+    } catch { /* graceful — table shows dashes */ }
+  }
+
+  // ── DTCC GTR FX OTC Notional Volume ──
+  // Source: dtcc-data/dtcc_fx.json (fetched daily by update-dtcc-fx.yml — public repo)
+  // CFTC Recast public dissemination under Dodd-Frank 2(a)(13); no API key required
+  const dtccTbody = document.getElementById('dtcc-tbody');
+  if (dtccTbody) {
+    try {
+      const dtccRes = await fetch('./dtcc-data/dtcc_fx.json').catch(() => null);
+      if (dtccRes?.ok) {
+        const dtcc = await dtccRes.json();
+        const pairs = dtcc?.pairs ?? {};
+        const totals = dtcc?.totals ?? {};
+        const totalNotional = totals?.notional_usd_bn ?? 0;
+
+        const pairKeys = Object.keys(pairs);
+        if (dtcc.status === 'pending' || pairKeys.length === 0) {
+          // First run — data not yet fetched
+          dtccTbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:12px 0;font-size:10px;">Data pending — workflow runs Mon-Fri 14:00 UTC · DTCC GTR T+1</td></tr>';
+        } else {
+          // Build rows — sorted by notional (already sorted in JSON)
+          const maxNotional = pairs[pairKeys[0]]?.notional_usd_bn ?? 1; // largest pair for heat bar scale
+
+          const rows = pairKeys.map(pair => {
+            const d = pairs[pair];
+            const byProduct = d.by_product ?? {};
+            const swapBn  = byProduct['FxSwap']?.notional_usd_bn    ?? 0;
+            const fwdBn   = (byProduct['FxForward']?.notional_usd_bn ?? 0)
+                          + (byProduct['FxNDF']?.notional_usd_bn     ?? 0);  // NDFs are forward-type
+            const spotBn  = byProduct['FxSpot']?.notional_usd_bn    ?? 0;
+            const sharePct = totalNotional > 0 ? (d.notional_usd_bn / totalNotional) * 100 : 0;
+            // Heat bar: width proportional to this pair vs the largest pair (not total)
+            const barPct = maxNotional > 0 ? Math.min((d.notional_usd_bn / maxNotional) * 100, 100) : 0;
+
+            const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
+            // Share cell: number + heat bar background
+            const shareCell = `<td style="${mono}color:var(--text3);position:relative;padding-right:6px;">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:${barPct.toFixed(1)}%;background:var(--blue);opacity:0.18;border-radius:0 2px 2px 0;"></div>
+              <span style="position:relative;">${sharePct.toFixed(1)}%</span>
+            </td>`;
+            return `<tr>
+              <td style="font-size:10px;">${pair}</td>
+              <td style="${mono}color:var(--text);">${d.notional_usd_bn.toFixed(1)}</td>
+              <td style="${mono}color:var(--text2);">${d.trade_count.toLocaleString()}</td>
+              <td style="${mono}color:var(--text2);">${swapBn > 0 ? swapBn.toFixed(1) : '—'}</td>
+              <td style="${mono}color:var(--text2);">${fwdBn  > 0 ? fwdBn.toFixed(1)  : '—'}</td>
+              <td style="${mono}color:var(--text2);">${spotBn > 0 ? spotBn.toFixed(1) : '—'}</td>
+              ${shareCell}
+            </tr>`;
+          }).join('');
+
+          // Totals row
+          const byProd = totals.by_product ?? {};
+          const totalSwap = byProd['FxSwap']?.notional_usd_bn ?? 0;
+          const totalFwd  = (byProd['FxForward']?.notional_usd_bn ?? 0)
+                          + (byProd['FxNDF']?.notional_usd_bn     ?? 0);
+          const totalSpot = byProd['FxSpot']?.notional_usd_bn ?? 0;
+          const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
+          const totRow = `<tr style="border-top:1px solid var(--border2);font-weight:600;">
+            <td style="font-size:10px;color:var(--text2);">TOTAL (G8)</td>
+            <td style="${mono}color:var(--text);">${totalNotional.toFixed(1)}</td>
+            <td style="${mono}color:var(--text2);">${totals.trade_count.toLocaleString()}</td>
+            <td style="${mono}color:var(--text2);">${totalSwap > 0 ? totalSwap.toFixed(1) : '—'}</td>
+            <td style="${mono}color:var(--text2);">${totalFwd  > 0 ? totalFwd.toFixed(1)  : '—'}</td>
+            <td style="${mono}color:var(--text2);">${totalSpot > 0 ? totalSpot.toFixed(1) : '—'}</td>
+            <td style="${mono}color:var(--text3);">100%</td>
+          </tr>`;
+
+          dtccTbody.innerHTML = rows + totRow;
+        }
+
+        const footer = document.getElementById('dtcc-footer');
+        if (footer && dtcc.trade_date) {
+          footer.textContent = `DTCC GTR · CFTC Recast · trade date ${dtcc.trade_date} · fetched ${dtcc.fetched} · Notional capped at $250M/trade · subset of total OTC FX volume`;
+        }
+      } else {
+        dtccTbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:12px 0;font-size:10px;">DTCC data unavailable</td></tr>';
+      }
+    } catch { dtccTbody.innerHTML = '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:12px 0;font-size:10px;">DTCC data error</td></tr>'; }
+  }
+}
+
+
+// ── G8 Rates Tabs ──
+function initG8RatesTabs() {
+  const tabBar = document.getElementById('rates-country-tabs');
+  if (!tabBar) return;
+  tabBar.addEventListener('click', e => {
+    const btn = e.target.closest('.rates-ctab');
+    if (!btn) return;
+    const cty = btn.dataset.cty;
+
+    // Update tab styles
+    tabBar.querySelectorAll('.rates-ctab').forEach(b => {
+      const isActive = b === btn;
+      b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      b.style.background = isActive ? 'var(--blue)' : 'none';
+      b.style.color = isActive ? '#fff' : (b.dataset.cty === 'spreads' ? 'var(--blue)' : 'var(--text2)');
+      b.style.border = isActive ? 'none' : '1px solid var(--border2)';
+    });
+
+    // Show/hide panes
+    document.querySelectorAll('.rates-country-pane').forEach(p => { p.style.display = 'none'; });
+    const pane = document.getElementById('rates-pane-' + cty);
+    if (pane) pane.style.display = '';
+
+    // Lazy-load G8 data on first open
+    if (cty !== 'us' && cty !== 'spreads') renderG8YieldPane(cty);
+    if (cty === 'spreads') renderSovereignSpreads();
+  });
+}
+
+// Map country code to extended-data file key and yield tickers
+const G8_YIELD_MAP = {
+  de: { file: 'EUR', label: 'Germany', subtitle: 'GERMANY · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond2y', label: '2Y Bund' }, { k: 'bond10y', label: '10Y Bund' }] },
+  gb: { file: 'GBP', label: 'UK',      subtitle: 'UK · SOVEREIGN BOND YIELDS',      tenors: [{ k: 'bond2y', label: '2Y Gilt' }, { k: 'bond10y', label: '10Y Gilt' }] },
+  jp: { file: 'JPY', label: 'Japan',   subtitle: 'JAPAN · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond10y', label: '10Y JGB' }] },
+  au: { file: 'AUD', label: 'Australia', subtitle: 'AUSTRALIA · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond10y', label: '10Y ACGB' }] },
+  ca: { file: 'CAD', label: 'Canada',  subtitle: 'CANADA · SOVEREIGN BOND YIELDS',  tenors: [{ k: 'bond2y', label: '2Y CGB' }, { k: 'bond10y', label: '10Y CGB' }] },
+  nz: { file: 'NZD', label: 'New Zealand', subtitle: 'NEW ZEALAND · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond10y', label: '10Y NZGB' }] },
+};
+
+async function renderG8YieldPane(cty) {
+  const pane = document.getElementById('rates-pane-' + cty);
+  const contentEl = document.getElementById('rates-g8-content-' + cty);
+  if (!pane || !contentEl) return;
+  if (contentEl.dataset.loaded) return; // already populated
+
+  const cfg = G8_YIELD_MAP[cty];
+  if (!cfg) return;
+
+  try {
+    const ext = await fetch('./extended-data/' + cfg.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
+    if (!ext) { contentEl.textContent = 'Data unavailable — extended-data/' + cfg.file + '.json'; return; }
+
+    const d = ext.data ?? ext;
+    // Subtitle row
+    let html = `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${cfg.subtitle}</div>`;
+    // Tile grid — columns match tenor count so single-tenor countries (JP, AU, NZ) don't leave a grey gap
+    const cols = cfg.tenors.length === 1 ? '1fr' : '1fr 1fr';
+    html += `<div class="rates-grid" style="margin-bottom:6px;grid-template-columns:${cols};">`;
+    cfg.tenors.forEach(t => {
+      const val = d[t.k];
+      // Values in extended-data are stored as percentages (e.g. 3.04 = 3.04%)
+      // US tiles use same scale. No conversion needed.
+      const valStr = val != null ? val.toFixed(2) + '%' : '—';
+      // Change indicator: extended-data has no intraday delta — show "—" in flat style
+      // consistent with how US tiles show "—" when fromRepo=true
+      html += `<div class="rate-cell">` +
+        `<div class="rate-cty">${t.label}</div>` +
+        `<div class="rate-val">${valStr}</div>` +
+        `<div class="rate-chg flat">—</div>` +
+        `</div>`;
+    });
+    html += '</div>';
+    // Source attribution
+    const dateLbl = ext?.dates?.bond10y ? ext.dates.bond10y : '';
+    html += `<div style="font-size:9px;color:var(--text3);">Daily sovereign yield pipeline${dateLbl ? ' · ' + dateLbl : ''}</div>`;
+    contentEl.innerHTML = html;
+    contentEl.dataset.loaded = '1';
+  } catch {
+    contentEl.textContent = 'Failed to load yield data.';
+  }
+}
+
+// ── Sovereign Spreads vs US ──
+async function renderSovereignSpreads() {
+  const tbody = document.getElementById('sovereign-spreads-tbody');
+  if (!tbody) return;
+  if (tbody.dataset.loaded === '2') return; // already rendered with flag spans
+
+  const countries = [
+    { code: 'de', file: 'EUR', label: 'DE' },
+    { code: 'gb', file: 'GBP', label: 'GB' },
+    { code: 'jp', file: 'JPY', label: 'JP' },
+    { code: 'au', file: 'AUD', label: 'AU' },
+    { code: 'ca', file: 'CAD', label: 'CA' },
+    { code: 'nz', file: 'NZD', label: 'NZ' },
+  ];
+
+  // Load US first
+  const usExt = await fetch('./extended-data/USD.json').then(r => r.ok ? r.json() : null).catch(() => null);
+  const _usData = usExt?.data ?? usExt;
+  const us10y = _usData?.bond10y ?? null;
+  const us2y  = _usData?.bond2y  ?? null;
+
+  const rows = tbody.querySelectorAll('tr');
+  await Promise.all(countries.map(async (c, idx) => {
+    const row = rows[idx];
+    if (!row) return;
+    const tds = row.querySelectorAll('td');
+
+    try {
+      const ext = await fetch('./extended-data/' + c.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
+      const _extData = ext?.data ?? ext;
+      const cty10y = _extData?.bond10y ?? null;
+      const cty2y  = _extData?.bond2y  ?? null;
+
+      // Normalise: extended-data stores some yields as 0.04 (4%) and some as 4.0
+      const norm = v => v != null ? (v < 1 ? v * 100 : v) : null;
+      const n10 = norm(cty10y);
+      const n2  = norm(cty2y);
+      const us10 = norm(us10y);
+      const us2  = norm(us2y);
+
+      // Country flag + label
+      if (tds[0]) { tds[0].innerHTML = `<span class="fi fi-${c.code}" style="margin-right:4px;border-radius:1px;vertical-align:middle;"></span><span>${c.label}</span>`; }
+      // 10Y value
+      if (tds[1]) { tds[1].textContent = n10 != null ? n10.toFixed(2) + '%' : '—'; }
+
+      // Spread vs US
+      if (tds[2]) {
+        const spread = (n10 != null && us10 != null) ? (n10 - us10) * 100 : null; // in bp
+        if (spread != null) {
+          tds[2].textContent = (spread >= 0 ? '+' : '') + Math.round(spread) + ' bp';
+          tds[2].style.color = spread > 20 ? 'var(--up)' : spread < -20 ? 'var(--down)' : 'var(--text2)';
+        } else { tds[2].textContent = '—'; }
+      }
+
+      // 2Y
+      if (tds[3]) { tds[3].textContent = n2 != null ? n2.toFixed(2) + '%' : '—'; }
+
+      // 2Y-10Y curve slope
+      if (tds[4]) {
+        const slope = (n2 != null && n10 != null) ? n10 - n2 : null;
+        if (slope != null) {
+          tds[4].textContent = (slope >= 0 ? '+' : '') + slope.toFixed(0) + ' bp';
+          tds[4].style.color = slope < 0 ? 'var(--down)' : slope > 50 ? 'var(--up)' : 'var(--text2)';
+          tds[4].title = slope < 0 ? 'Inverted curve' : slope < 25 ? 'Flat curve' : 'Normal curve';
+        } else { tds[4].textContent = '—'; }
+      }
+    } catch {
+      tds.forEach((td, i) => { if (i > 0) td.textContent = '—'; });
+    }
+  }));
+  tbody.dataset.loaded = '2';
+}
+
+// ── Economic Surprises — CESI-style centred bar index (v7.76.0) ──────────────
+// Methodology: for each G8 currency, computes a normalised surprise index over
+// a 90-day rolling window from ForexFactory calendar (actual vs consensus).
+// Index = (beats − misses) / total scored, scaled to [−100, +100].
+// Bar chart centred at 0: green bar extends right for positive, red bar extends
+// left for negative — matching Citi CESI / Bloomberg BEEI visual convention.
+// N column shows count of events with actuals (sample size transparency).
+async function renderEconSurprises() {
+  const tbody = document.getElementById('econ-surprise-tbody');
+  if (!tbody) return;
+
+  const nowMs = Date.now();
+  const LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
+  window._ES_SEEN = new Set(); // reset dedup guard on each render
+
+  // ── Load calendar.json (ForexFactory via ff_calendar.json) ─────────────────
+  let calEvents = [];
+  let calSource = '';
+  try {
+    const res = await fetch('./calendar-data/calendar.json').catch(() => null);
+    if (res?.ok) {
+      const calj = await res.json();
+      const evts = (calj?.events || []).map(ev => ({
+        title:    ev.event || ev.title || '',
+        currency: ev.currency || '',
+        dateISO:  ev.dateISO || '',
+        impact:   ev.impact || 'low',
+        forecast: ev.forecast || null,
+        previous: ev.previous || null,
+        actual:   ev.actual || null,
+        released: !!(ev.actual && ev.actual !== '' && ev.actual !== '-'),
+      }));
+      const hasReleased = evts.some(ev => {
+        const t = new Date(ev.dateISO).getTime();
+        return !isNaN(t) && nowMs - t <= LOOKBACK_MS && ev.released;
+      });
+      if (hasReleased) { calEvents = evts; calSource = calj.source || 'investing.com'; }
+      // Store surprise stats for z-score scoring (populated by engine v3.1+)
+      window._ECON_SURPRISE_STATS = calj.surpriseStats || {};
+    }
+  } catch { /* graceful */ }
+
+  // ── Fallback: ff_calendar.json ────────────────────────────────────────────
+  if (!calEvents.length) {
+    try {
+      const res2 = await fetch('./calendar-data/ff_calendar.json').catch(() => null);
+      if (res2?.ok) {
+        const ffj = await res2.json();
+        const win21 = 21 * 24 * 60 * 60 * 1000;
+        const evts = (ffj?.events || []).map(ev => ({
+          title: ev.event || ev.title || '', currency: ev.currency || '',
+          dateISO: ev.dateISO || '', impact: ev.impact || 'low',
+          forecast: ev.forecast || null, previous: ev.previous || null,
+          actual: ev.actual || null,
+          released: !!(ev.actual && ev.actual !== '' && ev.actual !== '-'),
+        }));
+        const hasReleased = evts.some(ev => {
+          const t = new Date(ev.dateISO).getTime();
+          return !isNaN(t) && nowMs - t <= win21 && ev.released && ev.actual != null;
+        });
+        if (hasReleased) { calEvents = evts; calSource = 'ForexFactory'; }
+      }
+    } catch { /* no fallback */ }
+  }
+
+  // ── Source label ──────────────────────────────────────────────────────────
+  const srcEl = document.getElementById('econ-surprise-source');
+  if (srcEl) {
+    if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
+      srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
+    } else if (calSource === 'ForexFactory') {
+      srcEl.textContent = 'ForexFactory · actual vs consensus · 90d rolling';
+    } else {
+      srcEl.textContent = 'Calendar data unavailable';
+    }
+  }
+
+  // ── Score per currency ────────────────────────────────────────────────────
+  // Inverse indicators: a lower actual is a positive surprise (e.g. unemployment fell)
+  const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit', 'trade balance'];
+  const ccyScores = {};
+
+  calEvents.forEach(ev => {
+    const evTime = new Date(ev.dateISO).getTime();
+    if (isNaN(evTime) || evTime > nowMs || nowMs - evTime > LOOKBACK_MS) return;
+    if (!ev.released || ev.actual == null) return;
+    if (!['medium','high'].includes(ev.impact)) return;
+    const ccy = ev.currency;
+    if (!['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].includes(ccy)) return;
+
+    // ── Noise filter: exclude non-macro events ─────────────────────────────
+    // CESI-style indices (Citi, DB, MS) only score fundamental macro releases.
+    // Bond auctions, CFTC positioning, commodity inventory/rig data, derived
+    // averages, financial flow data, and SEP dot projections are excluded.
+    const evTitle = (ev.event || ev.title || '').toLowerCase();
+    const NOISE_KW = [
+      'cftc','baker hughes','rig count','auction','api weekly',
+      'milk auction','fed\'s balance sheet','reserve balances',
+      'redbook','ibd/tipp','tips auction','note auction','bond auction',
+      'gilt auction','jgb auction','obligaciones','speculative net',
+      'nc net position','crude oil inventories','crude oil imports',
+      'distillate','gasoline inventorie','gasoline production',
+      'refinery','heating oil','natural gas storage',
+      'foreign bonds buying','foreign investments in japanese',
+      'foreign bond investment','foreign investment in japan',
+      'm2 money','m3 money','m4 money','reserve assets total',
+      'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
+      'ibd','3-month bill','4-week bill','52-week bill',
+      // Additional noise: derived averages, financial flows, SEP projections, EIA energy
+      '4-week average','4-week avg',
+      'tic net','net long-term tic','total net tic',
+      'interest rate projection',
+      'eia crude oil','eia crude',
+    ];
+    if (NOISE_KW.some(kw => evTitle.includes(kw))) return;
+    // ── Dedup guard: same canonical event + same actual → score only once ──
+    // ForexFactory publishes Flash then Final PMIs with identical data on
+    // different dates. Without dedup, each revision counts as a separate event,
+    // inflating N and double-counting the same macro signal.
+    const canonEvent = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
+    const dedupKey   = `${ccy}/${canonEvent}/${String(ev.actual).replace(/[%,\s]/g,'')}/${String(ev.forecast||'').replace(/[%,\s]/g,'')}`;
+    if (!window._ES_SEEN) window._ES_SEEN = new Set();
+    if (window._ES_SEEN.has(dedupKey)) return;
+    window._ES_SEEN.add(dedupKey);
+    // ───────────────────────────────────────────────────────────────────────
+
+    const actualStr   = String(ev.actual   || '').replace(/[%,]/g,'');
+    const forecastStr = String(ev.forecast || ev.previous || '').replace(/[%,]/g,'');
+    const actual   = parseFloat(actualStr);
+    const forecast = parseFloat(forecastStr);
+    if (isNaN(actual) || isNaN(forecast)) return;
+
+    const isInverse = INVERSE_KW.some(kw => ev.title.toLowerCase().includes(kw));
+    const beat = isInverse ? actual < forecast : actual > forecast;
+    const miss = isInverse ? actual > forecast : actual < forecast;
+    const surprise = actual - forecast;
+
+    // ── Z-score scoring (hybrid: z-score when stats available, beat/miss otherwise) ──
+    // As history accumulates in surpriseStats (engine v3.1+), more events
+    // graduate to z-score. MIN 5 observations required for a valid std estimate.
+    const CANONICAL_MIN_N = 5;
+    const statsKey = (() => {
+      const canon = (evTitle.replace(/\s*\([^)]*\)/g, '').trim());
+      return `${ccy}/${canon}`;
+    })();
+    const stats = (window._ECON_SURPRISE_STATS || {})[statsKey];
+    const useZScore = stats && stats.n >= CANONICAL_MIN_N && stats.std > 0;
+    const zScore = useZScore ? (surprise - stats.mean) / stats.std : null;
+
+    if (!ccyScores[ccy]) ccyScores[ccy] = { beats: 0, misses: 0, total: 0, zSum: 0, zN: 0 };
+    ccyScores[ccy].total++;
+    if (beat) ccyScores[ccy].beats++;
+    if (miss) ccyScores[ccy].misses++;
+    if (zScore !== null) { ccyScores[ccy].zSum += zScore; ccyScores[ccy].zN++; }
+  });
+
+  // ── Normalise to [−100, +100] index (Citi CESI convention) ───────────────
+  // index = (beats − misses) / total × 100
+  // Bar fill: 50% of bar width per side (each side = 50% of container)
+  const G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+  const rows = tbody.querySelectorAll('tr');
+
+  G8.forEach((ccy, idx) => {
+    const row = rows[idx];
+    if (!row) return;
+    const tds = row.querySelectorAll('td');
+    const barFill = row.querySelector('.es-bar-fill');
+    const s = ccyScores[ccy];
+
+    if (!s || s.total === 0) {
+      // No data — neutral empty bar
+      if (barFill) { barFill.style.width = '0%'; barFill.style.left = '50%'; barFill.style.background = 'var(--border2)'; }
+      if (tds[2]) { tds[2].textContent = '—'; tds[2].style.color = 'var(--text3)'; }
+      row.title = `${ccy}: no released events with actuals in 90d window`;
+      return;
+    }
+
+    // ── Index: z-score blend when available, beat/miss otherwise ────────────
+    // Events with ≥5 historical observations use z-score (normalised surprise).
+    // Remaining events use beat/miss. Both contribute to the same [-100,+100] scale.
+    // As history accumulates over months, more events will graduate to z-score.
+    let idx100;
+    const zFraction = s.zN / s.total;
+    if (s.zN >= 10 || (s.zN > 0 && zFraction >= 0.30)) {
+      // Blend: z-score events contribute avg_z * 50 (maps ±2σ to ±100),
+      // beat/miss events contribute beat/miss ratio * 100.
+      const nonZN    = s.total - s.zN;
+      const nonZBeat = s.beats - s.zN; // approximation
+      const zPart    = s.zN > 0 ? (s.zSum / s.zN) * 50 : 0;
+      const bmPart   = nonZN > 0 ? ((Math.max(0, nonZBeat) - (nonZN - Math.max(0, nonZBeat))) / nonZN) * 100 : 0;
+      idx100 = (zPart * s.zN + bmPart * nonZN) / s.total;
+    } else {
+      // Pure beat/miss (Citi CESI convention) — used until enough z-score history
+      idx100 = ((s.beats - s.misses) / s.total) * 100;
+    }
+    // Bar: max half-width = 50% of container (the zero line is at 50%)
+    const halfPct = Math.min(Math.abs(idx100), 100) / 2; // 0–50%
+    const positive = idx100 >= 0;
+    const color = positive ? 'var(--up)' : 'var(--down)';
+
+    const lowConf = s.total < 15;
+
+    if (barFill) {
+      barFill.style.width      = halfPct.toFixed(1) + '%';
+      barFill.style.left       = positive ? '50%' : (50 - halfPct).toFixed(1) + '%';
+      barFill.style.background = color;
+      barFill.style.opacity    = '1';
+    }
+
+    // N column — dim number for low-N currencies; the visible N is the signal
+    if (tds[2]) {
+      tds[2].textContent = s.total;
+      tds[2].style.color = lowConf ? 'var(--text4, rgba(255,255,255,0.3))' : 'var(--text3)';
+      tds[2].title = lowConf ? 'Low sample size — interpret with caution' : '';
+    }
+
+    // Row tooltip
+    const pct = (s.beats / s.total * 100).toFixed(0);
+    const inLine = s.total - s.beats - s.misses;
+    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)}`;
+  });
+}
+
+// ── Derivatives section visibility toggle ──
+function initDerivativesNav() {
+  const allNavLinks = document.querySelectorAll('.top-nav a[data-target]');
+  allNavLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      const target = link.dataset.target;
+      const derivSection = document.getElementById('section-derivatives');
+      if (!derivSection) return;
+      // Show Derivatives section only when that tab is active; hide otherwise
+      if (target === 'section-derivatives') {
+        derivSection.style.display = '';
+        renderDerivativesSection();
+      } else {
+        derivSection.style.display = 'none';
+      }
+    });
+  });
+}
+
+// ── Bootstrap all new features ──
+// ── Load CB rates from rates/*.json directly (reliable, not DOM-dependent) ──
+async function loadCBRatesCache() {
+  // Loads CB policy rates from rates/*.json — used for CB Rates panel,
+  // carry ranking, regime scoring. NOT used for CIP forward pricing.
+  // rates/*.json files: observations array, most recent first.
+  // Schema: { observations: [{ date: "YYYY-MM-DD", value: "3.75" }, ...], ... }
+  const ccyFiles = {
+    USD: 'rates/USD.json', EUR: 'rates/EUR.json', GBP: 'rates/GBP.json',
+    JPY: 'rates/JPY.json', AUD: 'rates/AUD.json', CAD: 'rates/CAD.json',
+    CHF: 'rates/CHF.json', NZD: 'rates/NZD.json',
+  };
+  await Promise.all(Object.entries(ccyFiles).map(async ([ccy, path]) => {
+    try {
+      const r = await fetch('./' + path);
+      if (!r.ok) return;
+      const d = await r.json();
+      // Use most recent observation (observations[0].value is a string like "3.75")
+      const obs = d.observations;
+      const raw = Array.isArray(obs) && obs.length > 0
+        ? obs[0].value           // observations array format
+        : (d.rate ?? d.value ?? null); // fallback for other shapes
+      if (raw != null && !isNaN(+raw)) window._CB_RATES_CACHE[ccy] = +raw;
+    } catch { /* graceful — leave missing */ }
+  }));
+}
+
+async function loadOISRatesCache() {
+  // Loads OIS/overnight benchmark rates from ois-rates/rates.json.
+  // Used exclusively by computeCIPForward() via _resolveRate().
+  // Falls back silently — _resolveRate() uses policy rate when OIS unavailable.
+  // Benchmarks: USD=SOFR, EUR=€STR, GBP=SONIA, JPY=TONA, AUD=AONIA, CAD=CORRA, CHF=SARON, NZD=OCR.
+  try {
+    const r = await fetch('./ois-rates/rates.json');
+    if (!r.ok) return;
+    const d = await r.json();
+    const rates   = d.rates   || {};
+    const sources = d.sources || {};
+    for (const [ccy, val] of Object.entries(rates)) {
+      if (val != null && !isNaN(+val)) {
+        window._OIS_RATES_CACHE[ccy]  = +val;
+        window._OIS_RATE_SOURCES[ccy] = sources[ccy] || 'OIS';
+      }
+    }
+  } catch {
+    // File not yet deployed or network failure — _resolveRate() falls back to policy.
+  }
+}
+
+// ── Section visibility: Derivatives panel toggle ──
+function initDerivativesNavFixed() {
+  const derivSection = document.getElementById('section-derivatives');
+  if (!derivSection) return;
+
+  const splitLowerRight = document.getElementById('split-lower-right');
+  if (!splitLowerRight) return;
+
+  function showDerivatives() {
+    Array.from(splitLowerRight.children).forEach(el => {
+      if (el.id !== 'section-derivatives') {
+        // Store original computed display so we can restore it exactly
+        const originalDisplay = el.style.display || window.getComputedStyle(el).display;
+        el.dataset.derivHidden = originalDisplay === 'none' ? 'none' : (el.style.display || '');
+        el.style.display = 'none';
+      }
+    });
+    derivSection.style.display = '';
+    // Scroll split-lower to top so derivatives is visible
+    const splitLower = document.getElementById('split-lower');
+    if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
+    renderDerivativesSection();
+  }
+
+  function hideDerivatives() {
+    derivSection.style.display = 'none';
+    splitLowerRight.querySelectorAll('[data-deriv-hidden]').forEach(el => {
+      // Restore the exact inline display value that was set before hiding
+      const saved = el.dataset.derivHidden;
+      el.style.display = saved === '' ? '' : saved;
+      delete el.dataset.derivHidden;
+    });
+    // Canvas and lazy-loaded G8 panes need a repaint after display is restored.
+    // Double rAF: split-lower-right uses display:contents which requires two frames
+    // for the browser to commit the layout change and expose correct clientWidth values.
+    // (Same pattern as the ticker strip — 'Double rAF ensures layout before we measure'.)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // Yield curve canvas: redraws using cached data (_lastDrawnYields / _lastDrawnPrior)
+        if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
+          drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
+        }
+        // Re-trigger whichever Rates tab is currently active so G8/Spreads panes re-render
+        const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
+        if (activeRatesTab) {
+          const cty = activeRatesTab.dataset.cty;
+          if (cty && cty !== 'us') {
+            if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
+              renderSovereignSpreads();
+            } else if (typeof renderG8YieldPane === 'function') {
+              // Reset loaded flag so the pane re-renders with correct dimensions
+              const contentEl = document.getElementById('rates-g8-content-' + cty);
+              if (contentEl) delete contentEl.dataset.loaded;
+              renderG8YieldPane(cty);
+            }
+          }
+        }
+      });
+    });
+  }
+
+  // Use capture phase on Derivatives link to run before the main nav scroll handler
+  const derivLink = document.querySelector('.top-nav a[data-target="section-derivatives"]');
+  if (derivLink) {
+    derivLink.addEventListener('click', (e) => {
+      e.stopImmediatePropagation();
+      showDerivatives();
+    }, true);
+  }
+
+  // Restore on any other nav click
+  document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
+    if (link.dataset.target !== 'section-derivatives') {
+      link.addEventListener('click', () => {
+        if (derivSection.style.display !== 'none') hideDerivatives();
+      });
+    }
+  });
+
+  // Expose for keyboard shortcut
+  window._derivNavShow = showDerivatives;
+  window._derivNavHide = hideDerivatives;
+  window._derivNavSection = derivSection;
+}
+
+(function bootNewFeatures() {
+  const run = async () => {
+    initG8RatesTabs();
+    initDerivativesNavFixed();
+
+    // Load CB policy rates and OIS benchmark rates in parallel
+    await Promise.all([loadCBRatesCache(), loadOISRatesCache()]);
+
+    // All three panels fetch their own data independently.
+    // renderRRInFXTable has its own direct rr.json fallback — no need to poll.
+    // Run everything in parallel immediately after rates are ready.
+    await Promise.all([
+      renderCIPForwards(),
+      renderRRInFXTable(),
+      renderEconSurprises(),
+    ]);
+
+    // Refresh every 5 min
+    setInterval(async () => {
+      await Promise.all([loadCBRatesCache(), loadOISRatesCache()]);
+      await renderCIPForwards();
+      await renderRRInFXTable();
+    }, 5 * 60 * 1000);
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    // DOMContentLoaded already fired (dashboard.js is deferred — this runs after)
+    run();
+  }
+})();
+

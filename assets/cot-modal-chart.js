@@ -1,176 +1,208 @@
-// ═══════════════════════════════════════════════════════════════════════════
+// COT MODAL CHART  v2.1 — inline-panel edition, terminal CSS variables
 // COT MODAL CHART  v2.0 — LightweightCharts v5 (replaces Chart.js)
 // File: assets/cot-modal-chart.js
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ── CSS ─────────────────────────────────────────────────────────────────────
 (function () {
-  if (document.getElementById('cot-modal-css')) return;
+  if (document.getElementById('cot-modal2-css')) return;
   const s = document.createElement('style');
-  s.id = 'cot-modal-css';
+  s.id = 'cot-modal2-css';
   s.textContent = `
 #cot-bd {
-  position:fixed;inset:0;z-index:9100;
-  background:rgba(0,0,0,.85);
-  display:flex;align-items:center;justify-content:center;
-  padding:12px;
-  animation:cot-fi .15s ease;
+  display:block!important;
 }
-@keyframes cot-fi { from{opacity:0} to{opacity:1} }
-@keyframes cot-su { from{transform:translateY(12px);opacity:0} to{transform:none;opacity:1} }
+
+
 #cot-modal {
-  background:#161b22;
-  border:1px solid #30363d;
-  border-radius:8px;
-  width:min(920px,100%);
-  height:min(680px,90vh);
+  width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
+  border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;
+  background:var(--bg)!important;position:static!important;
+  font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text);
   display:flex;flex-direction:column;
-  overflow:hidden;
-  box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
-  animation:cot-su .18s cubic-bezier(.16,1,.3,1);
-  font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);
-  color:#e6edf3;
-  position:relative;
 }
 #cot-modal::before {
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,#1f6feb 0%,#58a6ff 50%,#26a69a 100%);
-  border-radius:8px 8px 0 0;z-index:1;
+  display:none;
 }
 #cot-m-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px 12px;
-  border-bottom:1px solid #30363d;
-  flex-shrink:0;background:#161b22;
+  padding:10px 14px 9px;
+  border-bottom:1px solid var(--border,#252d3d);
+  flex-shrink:0;background:var(--bg2);
 }
-#cot-m-title { font-size:14px;font-weight:600;color:#e6edf3;letter-spacing:-.01em; }
-#cot-m-sub   { font-size:10px;color:#6e7681;margin-top:2px;font-family:'IBM Plex Mono',var(--font-mono,monospace);letter-spacing:.02em; }
+#cot-m-title { font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em;line-height:1.2;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+#cot-m-sub   { font-size:10px;color:var(--text2);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.02em; }
 #cot-m-close {
-  background:none;border:none;color:#6e7681;font-size:18px;
-  cursor:pointer;padding:5px 7px;border-radius:5px;line-height:1;
-  transition:color .1s,background .1s;
+  background:none;border:none;color:var(--text3,#4e5c70);font-size:16px;
+  cursor:pointer;padding:3px 6px;border-radius:3px;line-height:1;
+  transition:color .1s,background .1s;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
-#cot-m-close:hover { color:#e6edf3;background:#21262d; }
+#cot-m-close:hover { color:var(--text);background:var(--bg3); }
 #cot-m-metrics {
   display:grid;grid-template-columns:repeat(6,1fr);
-  gap:0;background:#0d1117;
-  border-bottom:1px solid #30363d;
+  border-bottom:1px solid var(--border,#252d3d);
   flex-shrink:0;
+  background:var(--bg);
 }
-.cot-mm { background:#0d1117;padding:9px 14px;display:flex;flex-direction:column;gap:2px;border-right:1px solid #30363d; }
+.cot-mm { padding:9px 14px;border-right:1px solid var(--border,#252d3d);display:flex;flex-direction:column;gap:1px; }
 .cot-mm:last-child { border-right:none; }
-.cot-mm-lbl { font-size:9px;color:#6e7681;text-transform:uppercase;letter-spacing:.06em;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
-.cot-mm-val { font-size:13px;font-weight:600;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
-.cot-mm-sub { font-size:9px;color:#6e7681;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.cot-mm-lbl { font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.09em; }
+.cot-mm-val { font-size:13px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1;margin-top:2px; }
+.cot-mm-sub { font-size:9px;color:var(--text2);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:1px; }
 #cot-m-tabs {
-  display:flex;padding:0 18px;
-  border-bottom:1px solid #30363d;
+  display:flex;padding:0 14px;
+  border-bottom:1px solid var(--border,#252d3d);
   flex-shrink:0;overflow-x:auto;scrollbar-width:none;
-  background:#161b22;
+  background:var(--bg2);
 }
 #cot-m-tabs::-webkit-scrollbar { display:none; }
 .cot-tab {
-  font-size:11px;padding:9px 13px;cursor:pointer;
-  color:#6e7681;border-bottom:2px solid transparent;
-  transition:color .1s;white-space:nowrap;user-select:none;
+  font-size:11px;font-weight:500;padding:9px 13px;cursor:pointer;
+  color:var(--text2);border-bottom:2px solid transparent;
+  transition:color .12s;white-space:nowrap;user-select:none;
+  font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
-.cot-tab:hover { color:#8b949e; }
-.cot-tab.on { color:#e6edf3;border-bottom-color:#388bfd; }
+.cot-tab:hover { color:var(--text2); }
+.cot-tab.on { color:var(--text);border-bottom-color:var(--blue); }
 #cot-m-body {
   flex:1;min-height:0;overflow-y:auto;
-  padding:14px 16px;
+  padding:0;
   display:flex;flex-direction:column;
-  background:#0d1117;
-  scrollbar-width:thin;scrollbar-color:#444c56 transparent;
+  background:var(--bg);
+  scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;
 }
-#cot-m-body::-webkit-scrollbar { width:4px; }
+#cot-m-body::-webkit-scrollbar { width:3px!important; }
 #cot-m-body::-webkit-scrollbar-track { background:transparent; }
-#cot-m-body::-webkit-scrollbar-thumb { background:#444c56;border-radius:2px; }
+#cot-m-body::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
+#cot-m-body::-webkit-scrollbar-thumb:hover { background:var(--text2); }
 #cot-m-body.cot-body--chart,
 #cot-m-body.cot-body--overview { overflow-y:hidden; }
 .cot-panel { display:none; }
 .cot-panel.on { display:flex;flex:1;flex-direction:column;min-height:0; }
-#p-history.on { display:block; }
-#p-overview.on { display:flex;flex:1;flex-direction:column;gap:10px;min-height:0;overflow-y:auto; }
-#p-overview .cot-ov-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex-shrink:0; }
-#p-overview .cot-ov-grid > .cot-cw { margin-bottom:0; }
-#p-overview .cot-ov-bottom { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;flex-shrink:0; }
-#p-overview .cot-ov-bottom > .cot-cw { margin-bottom:0; }
+#p-history.on { display:block;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
+#p-history.on::-webkit-scrollbar { width:3px!important; }
+#p-history.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
+#p-overview.on { display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
+#p-overview.on::-webkit-scrollbar { width:3px!important; }
+#p-overview.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
+/* Overview — KFV single-column layout */
+#p-overview .cot-ov-sec {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 14px 5px;
+  border-top:1px solid var(--border2,#1e2636);
+  border-bottom:1px solid var(--border2,#1e2636);
+  background:var(--bg,#0d1117);
+  flex-shrink:0;
+}
+#p-overview .cot-ov-sec:first-child { border-top:none; }
+#p-overview .cot-ov-sec-lbl { font-size:8.5px;font-weight:600;color:var(--text3,#4e5c70);text-transform:uppercase;letter-spacing:.1em;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+#p-overview .cot-ov-sec-note { font-size:8.5px;color:var(--text3,#4e5c70);opacity:.6;letter-spacing:.02em;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+/* Top row: Positioning + L/S side by side */
+#p-overview .cot-ov-top-row { display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0; }
+#p-overview .cot-ov-top-row > .cot-ov-half { padding:12px 14px; }
+#p-overview .cot-ov-top-row > .cot-ov-half:first-child { border-right:1px solid var(--border,#252d3d); }
+/* KFV rows */
+#p-overview .cot-kfv { display:flex;align-items:center;padding:5px 14px;border-bottom:1px solid rgba(255,255,255,.04);min-height:28px;flex-shrink:0; }
+#p-overview .cot-kfv:last-child { border-bottom:none; }
+#p-overview .cot-kfv-key { font-size:10px;color:var(--text2,#8b949e);flex:1;min-width:0;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+#p-overview .cot-kfv-bar { flex:0 0 80px;margin:0 10px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;position:relative;flex-shrink:0; }
+#p-overview .cot-kfv-bar-fill { position:absolute;left:0;top:0;height:100%;border-radius:2px; }
+#p-overview .cot-kfv-val { font-size:11px;font-weight:600;text-align:right;flex-shrink:0;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+#p-overview .cot-kfv-badge { font-size:8px;font-weight:700;letter-spacing:.06em;padding:2px 6px;border-radius:2px;margin-left:8px;flex-shrink:0;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+.cot-badge-l { background:rgba(38,166,154,.15);color:#26a69a; }
+.cot-badge-s { background:rgba(239,83,80,.15);color:#ef5350; }
+.cot-badge-n { background:rgba(88,166,255,.1);color:#58a6ff; }
+.cot-badge-w { background:rgba(243,156,18,.12);color:#f39c12; }
+/* Spark row */
+#p-overview .cot-ov-spark-row { padding:10px 0 12px;flex-shrink:0; }
+#p-overview .cot-ov-spark-top { display:flex;justify-content:space-between;margin-bottom:8px;padding:0 14px; }
+#p-overview .cot-ov-spark-trend { font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+#p-overview .cot-ov-spark-row .cot-spark { max-width:100%;width:100%;height:72px;display:block;box-sizing:border-box; }
+#cot-ov-spark-lw { width:100%;max-width:100%!important;box-sizing:border-box;overflow:hidden; }
+
 #p-net.on .cot-cw,
-#p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0; }
+#p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
 #p-net.on .cot-cw > .cot-chart-area,
-#p-split.on .cot-cw > .cot-chart-area { flex:1;min-height:0; }
+#p-split.on .cot-cw > .cot-chart-area { flex:1;min-height:0;display:flex;flex-direction:column; }
+#p-net.on .cot-cw > .cot-chart-area > .cot-lw-wrap,
+#p-split.on .cot-cw > .cot-chart-area > .cot-lw-wrap { flex:1;min-height:0;height:100%; }
 #p-participants .cot-chart-area { height:300px;position:relative; }
-#p-participants.on { overflow-y:auto; }
-.cot-chart-area { position:relative; }
-.cot-lw-wrap { width:100%;height:100%;min-height:180px;position:relative; }
+#p-participants.on { overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
+#p-participants.on::-webkit-scrollbar { width:3px!important; }
+#p-participants.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
+.cot-chart-area { position:relative;flex:1;min-height:0;display:flex;flex-direction:column; }
+.cot-lw-wrap { width:100%;flex:1;min-height:180px;position:relative;min-width:0; }
 .cot-lw-tooltip {
   position:absolute;display:none;pointer-events:none;
-  background:#161b22;border:1px solid #30363d;border-radius:4px;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:4px;
   padding:7px 11px;font-size:11px;line-height:1.55;
-  font-family:'IBM Plex Mono',var(--font-mono,monospace);
-  color:#e6edf3;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.7);white-space:nowrap;
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  color:var(--text);z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.7);white-space:nowrap;
 }
 .cot-cw {
-  background:#161b22;border:1px solid #30363d;
-  border-radius:6px;padding:12px 14px;margin-bottom:10px;
+  background:var(--bg);
+  border:none;
+  border-radius:0;
+  padding:14px;
+  margin-bottom:0;
+  border-bottom:1px solid var(--border,#252d3d);
   display:flex;flex-direction:column;
 }
+.cot-cw:last-child { border-bottom:none; }
 .cot-ct {
-  font-size:9.5px;color:#6e7681;margin-bottom:8px;
-  font-family:'IBM Plex Mono',var(--font-mono,monospace);
-  letter-spacing:.04em;flex-shrink:0;padding-bottom:8px;border-bottom:1px solid #30363d;text-transform:uppercase;
+  font-size:8.5px;color:var(--text3,#4e5c70);margin-bottom:10px;
+  font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
+  letter-spacing:.07em;flex-shrink:0;text-transform:uppercase;font-weight:600;
 }
 .cot-gauge-track { height:6px;background:rgba(255,255,255,.06);border-radius:3px;position:relative;margin:10px 0 6px; }
-.cot-gauge-fill { position:absolute;left:0;top:0;height:100%;border-radius:3px;background:linear-gradient(90deg,#ef5350 0%,#ff9800 35%,#388bfd 50%,#ff9800 65%,#26a69a 100%);width:100%; }
+.cot-gauge-fill { position:absolute;left:0;top:0;height:100%;border-radius:3px;background:linear-gradient(90deg,#ef5350 0%,var(--orange) 35%,var(--blue) 50%,var(--orange) 65%,#26a69a 100%);width:100%; }
 .cot-gauge-pin {
   position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;
-  background:#e6edf3;border:2px solid #161b22;
+  background:var(--text);border:2px solid var(--bg2);
   box-shadow:0 0 0 1px rgba(255,255,255,.2);
   transition:left .4s cubic-bezier(.25,.46,.45,.94);transform:translateX(-50%);
 }
-.cot-gauge-lbls { display:flex;justify-content:space-between;font-size:8px;color:#6e7681;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
-.cot-ov-bignum { font-size:24px;font-weight:700;font-family:'IBM Plex Mono',var(--font-mono,monospace);margin:4px 0 2px; }
-.cot-ov-sub { font-size:9px;color:#6e7681;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
+.cot-gauge-lbls { display:flex;justify-content:space-between;font-size:8px;color:var(--text2);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+.cot-ov-bignum { font-size:24px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin:4px 0 2px; }
+.cot-ov-sub { font-size:9px;color:var(--text2);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
 .cot-ls-row { display:flex;justify-content:space-between;align-items:center;gap:12px;margin:4px 0; }
-.cot-ls-num { font-size:18px;font-weight:600;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
-.cot-ls-vs { font-size:11px;color:#6e7681;flex-shrink:0; }
+.cot-ls-num { font-size:18px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+.cot-ls-vs { font-size:11px;color:var(--text2);flex-shrink:0; }
 .cot-ls-bar { height:4px;background:rgba(255,255,255,.06);border-radius:2px;position:relative;overflow:hidden;margin-top:8px; }
 .cot-ls-bar-fill { height:100%;border-radius:2px; }
 .cot-sig-dot { display:inline-block;border-radius:50%;width:8px;height:8px;flex-shrink:0; }
 .cot-spark { display:block;width:100%;max-width:200px;overflow:visible; }
-.cot-tbl { width:100%;border-collapse:collapse;font-size:11px;font-family:'IBM Plex Mono',var(--font-mono,monospace); }
-.cot-tbl th { text-align:right;color:#6e7681;font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:5px 8px 4px;border-bottom:1px solid #30363d; }
-.cot-tbl th:first-child { text-align:left; }
-.cot-tbl td { text-align:right;padding:5px 8px;border-bottom:1px solid rgba(48,54,61,.6); }
-.cot-tbl td:first-child { text-align:left;color:#8b949e; }
+.cot-tbl { width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+.cot-tbl thead th { text-align:right;color:var(--text2);font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:7px 10px;border-bottom:1px solid var(--border2);white-space:nowrap; }
+.cot-tbl thead th:first-child { text-align:left; }
+.cot-tbl tbody tr { transition:background .08s; }
+.cot-tbl tbody tr:nth-child(even) td { background:rgba(255,255,255,.015); }
+.cot-tbl tbody tr:hover td { background:rgba(88,166,255,.05); }
+.cot-tbl td { text-align:right;padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);vertical-align:middle;white-space:nowrap; }
+.cot-tbl td:first-child { text-align:left;color:var(--text2); }
 .cot-tbl tr:last-child td { border-bottom:none; }
-.cot-tbl tr:hover td { background:rgba(255,255,255,.03); }
 .cu { color:#26a69a; }
 .cd { color:#ef5350; }
-.cn { color:#8b949e; }
-@media(max-width:600px){
-  #cot-bd{padding:0;align-items:flex-end;}
+.cn { color:var(--text2); }
+
+@media (max-width:480px){
   #cot-modal{width:100%;height:93vh;border-radius:12px 12px 0 0;border-bottom:none;}
   #cot-m-metrics{grid-template-columns:repeat(3,1fr);}
   .cot-mm{padding:6px 10px;}.cot-mm-val{font-size:11px;}
   #cot-m-tabs{padding:0 8px;}.cot-tab{font-size:10px;padding:8px 8px;}
-  #cot-m-body{padding:8px;}.cot-cw{padding:9px 10px;margin-bottom:8px;}
-  #p-overview .cot-ov-grid{grid-template-columns:1fr 1fr;gap:6px;}
-  #p-overview .cot-ov-bottom{grid-template-columns:1fr;gap:6px;}
-  #p-overview .cot-ov-grid .cot-ct{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  #p-overview .cot-tbl th:last-child,#p-overview .cot-tbl td:last-child{display:none;}
-  #p-overview .cot-ls-row{display:grid !important;grid-template-columns:1fr auto 1fr !important;align-items:center !important;gap:4px !important;}
-  #p-overview .cot-ls-row > div:last-child{text-align:right;}
+  #cot-m-body{padding:0;}.cot-cw{padding:10px 12px;}
+  #p-overview .cot-ov-top-row{grid-template-columns:1fr;}
+  #p-overview .cot-ov-top-row > .cot-ov-half:first-child{border-right:none;border-bottom:1px solid var(--border,#252d3d);}
+  #p-overview .cot-kfv-bar{flex:0 0 50px;}
   .cot-ls-vs{display:block !important;text-align:center;}
   #p-history .cot-cw > div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   #p-history .cot-tbl{min-width:540px;font-size:9px;}
-  #p-history .cot-tbl th,#p-history .cot-tbl td{padding:3px 5px;}
+  #p-history .cot-tbl th,#p-history .cot-tbl td{padding:4px 5px;}
   #p-participants .cot-chart-area{height:260px;}
-  #p-overview{flex:none;}#p-overview .cot-ov-bottom{flex:none;}
+  #p-overview{flex:none;}
   #p-overview .cot-ov-bignum{font-size:20px !important;}
   .cot-gauge-lbls{font-size:7.5px;}.cot-ls-num{font-size:16px !important;}
-  .cot-tbl{min-width:0;}.cot-tbl td,.cot-tbl th{font-size:9px;padding:3px 4px;white-space:nowrap;}
+  .cot-tbl{min-width:0;}.cot-tbl td,.cot-tbl th{font-size:9px;padding:4px 5px;white-space:nowrap;}
 }
 `;
   document.head.appendChild(s);
@@ -215,24 +247,49 @@ function _posLabel(z) {
 // ── Overview helpers ──────────────────────────────────────────────────────────
 function _cotSparkline(history, nWeeks) {
   const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0)));
-  if (vals.length < 2) return '<div style="height:44px;display:flex;align-items:center;font-size:9px;color:#6e7681">Insufficient data</div>';
-  const mn = Math.min(...vals), mx = Math.max(...vals), range = mx-mn||1;
-  const W=200,H=44,pad=4;
-  const x = i => (pad+(i/(vals.length-1))*(W-pad*2)).toFixed(1);
-  const y = v => (H-pad-((v-mn)/range)*(H-pad*2)).toFixed(1);
-  const pts = vals.map((v,i)=>x(i)+','+y(v)).join(' ');
-  const last = vals[vals.length-1];
-  const col = last>=0?'#26a69a':'#ef5350';
-  const fillCol = last>=0?'rgba(38,166,154,0.12)':'rgba(239,83,80,0.12)';
-  const fillPts = pts+` ${x(vals.length-1)},${H-pad} ${x(0)},${H-pad}`;
-  const zeroY = H-pad-((0-mn)/range)*(H-pad*2);
-  const zeroLine = (zeroY>=pad&&zeroY<=H-pad)
-    ?`<line x1="${pad}" y1="${zeroY.toFixed(1)}" x2="${W-pad}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" stroke-dasharray="3,3"/>`:'' ;
-  return `<svg viewBox="0 0 ${W} ${H}" class="cot-spark" aria-hidden="true">
-    ${zeroLine}<polygon points="${fillPts}" fill="${fillCol}"/>
-    <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${x(vals.length-1)}" cy="${y(last)}" r="2.5" fill="${col}"/>
+  if (vals.length < 2) return '<div style="height:72px;display:flex;align-items:center;font-size:9px;color:#6e7681">Insufficient data</div>';
+
+  const last = vals[vals.length - 1];
+  const isPos = last >= 0;
+  const lineCol = isPos ? '#26c6b0' : '#ef5350';
+  const fillCol = isPos ? 'rgba(38,198,176,0.18)' : 'rgba(239,83,80,0.18)';
+
+  const W = 1000, H = 72; // viewBox coords — scales to any container width
+  const PAD = { t: 6, b: 6, l: 0, r: 0 };
+  const minV = Math.min(...vals), maxV = Math.max(...vals);
+  const range = maxV - minV || 1;
+
+  const n = vals.length;
+  const xOf = i => PAD.l + (i / (n - 1)) * (W - PAD.l - PAD.r);
+  const yOf = v => PAD.t + (1 - (v - minV) / range) * (H - PAD.t - PAD.b);
+
+  const pts = vals.map((v, i) => `${xOf(i).toFixed(1)},${yOf(v).toFixed(1)}`).join(' ');
+  const firstX = xOf(0).toFixed(1), lastX = xOf(n-1).toFixed(1), baseY = (H - PAD.b).toFixed(1);
+
+  // Polyline points for the area fill (close at bottom)
+  const areaPts = `${firstX},${baseY} ${pts} ${lastX},${baseY}`;
+
+  // Crosshair dot — render at last point
+  const dotX = xOf(n-1).toFixed(1), dotY = yOf(last).toFixed(1);
+
+  return `<svg id="cot-ov-spark-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"
+    style="width:100%;height:72px;display:block;overflow:visible;"
+    xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="cot-spark-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${lineCol}" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="${lineCol}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="${areaPts}" fill="url(#cot-spark-grad)" stroke="none"/>
+    <polyline points="${pts}" fill="none" stroke="${lineCol}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${dotX}" cy="${dotY}" r="4" fill="${lineCol}" stroke="#131722" stroke-width="1.5"/>
   </svg>`;
+}
+
+function _buildSparklineChart(container, history, nWeeks) {
+  // SVG sparkline is now built inline by _cotSparkline() — no LWC chart needed.
+  // This function is kept as a no-op so existing callers don't error.
 }
 
 function _cotTrendLabel(history) {
@@ -293,7 +350,7 @@ function _destroyCOTCharts(){
 function _lwOpts(W,H){
   return {
     width:W,height:H,
-    layout:{background:{type:'solid',color:'#161b22'},textColor:'#6e7681',fontFamily:_monoF,fontSize:10,attributionLogo:false},
+    layout:{background:{type:'solid',color:'#131722'},textColor:'#6e7681',fontFamily:_monoF,fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{
       mode:window.LightweightCharts?.CrosshairMode?.Normal??1,
@@ -327,14 +384,24 @@ function _mkTooltip(container,lwChart,getSeries,fmtFn){
 }
 
 function _lwResize(container,lwChart){
-  const fn=()=>{if(lwChart&&container.offsetWidth>0)lwChart.applyOptions({width:container.offsetWidth,height:container.offsetHeight});};
-  window.addEventListener('resize',fn);container._lwResize=fn;return fn;
+  const apply=()=>{
+    requestAnimationFrame(()=>{
+      const rect=container.getBoundingClientRect();
+      const h=Math.round(rect.height)||container.offsetHeight||container.parentElement?.getBoundingClientRect().height||240;
+      const w=Math.round(rect.width)||container.offsetWidth||600;
+      if(lwChart&&w>0&&h>10)lwChart.applyOptions({width:w,height:h});
+    });
+  };
+  if(window.ResizeObserver){const ro=new ResizeObserver(()=>apply());ro.observe(container);container._lwRo=ro;}
+  window.addEventListener('resize',apply);container._lwResize=apply;
+  setTimeout(apply,60);setTimeout(apply,200);setTimeout(apply,500);
+  return apply;
 }
 
 // ── Chart builders ────────────────────────────────────────────────────────────
 function _buildNetChart(container,dates,netData,ccy){
   const LWC=window.LightweightCharts;if(!LWC||!container)return null;
-  const W=container.offsetWidth||600,H=container.offsetHeight||240;
+  const W=container.offsetWidth||600,H=container.offsetHeight||container.parentElement?.offsetHeight||280;
   const chart=LWC.createChart(container,_lwOpts(W,H));
   _cotLwCharts.push(chart);
   const hist=chart.addSeries(LWC.HistogramSeries,{color:'#4f7fff',priceLineVisible:false,lastValueVisible:true,base:0});
@@ -351,7 +418,7 @@ function _buildNetChart(container,dates,netData,ccy){
 
 function _buildSplitChart(container,dates,lngData,shrtData,ccy){
   const LWC=window.LightweightCharts;if(!LWC||!container)return null;
-  const W=container.offsetWidth||600,H=container.offsetHeight||240;
+  const W=container.offsetWidth||600,H=container.offsetHeight||container.parentElement?.offsetHeight||280;
   const chart=LWC.createChart(container,_lwOpts(W,H));_cotLwCharts.push(chart);
   const lS=chart.addSeries(LWC.AreaSeries,{lineColor:'#26a69a',topColor:'rgba(38,166,154,0.15)',bottomColor:'rgba(38,166,154,0.01)',lineWidth:2,priceLineVisible:false,lastValueVisible:true,crosshairMarkerRadius:4});
   const sS=chart.addSeries(LWC.AreaSeries,{lineColor:'#ef5350',topColor:'rgba(239,83,80,0.15)',bottomColor:'rgba(239,83,80,0.01)',lineWidth:2,priceLineVisible:false,lastValueVisible:true,crosshairMarkerRadius:4});
@@ -403,6 +470,21 @@ function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy){
 }
 
 // ── Main open function ────────────────────────────────────────────────────────
+// Ensure LightweightCharts is loaded (mirrors dashboard.js loader — idempotent)
+let _cotLwLibPromise = null;
+function _cotEnsureLWLib() {
+  if (window.LightweightCharts) return Promise.resolve();
+  if (_cotLwLibPromise) return _cotLwLibPromise;
+  _cotLwLibPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
+    s.onload  = resolve;
+    s.onerror = () => { _cotLwLibPromise = null; reject(new Error('LW lib load failed')); };
+    document.head.appendChild(s);
+  });
+  return _cotLwLibPromise;
+}
+
 function openCOTModal(ccy,data){
   closeCOTModal();
   const history=Array.isArray(data.history)?[...data.history]:[];
@@ -454,15 +536,17 @@ function openCOTModal(ccy,data){
   </div>
   <div id="cot-m-body" class="cot-body--overview">
     <div id="p-overview" class="cot-panel on">
-      <div class="cot-ov-grid">
-        <div class="cot-cw">
-          <div class="cot-ct">POSITIONING GAUGE · Z-SCORE</div>
-          <div class="cot-ov-bignum" style="color:${zCol}">${zStr}σ</div>
-          <div class="cot-ov-sub">${zInfo.txt} · ${pStr} pctile · ${nWks}w</div>
+
+      <!-- TOP ROW: Positioning Gauge + L/S Split side by side -->
+      <div class="cot-ov-top-row">
+        <div class="cot-ov-half">
+          <div class="cot-ct">POSITIONING · Z-SCORE</div>
+          <div class="cot-ov-bignum" style="color:${zCol}">${zStr}σ <span style="font-size:12px;color:var(--text2);font-weight:400">· ${pStr} pctile</span></div>
+          <div class="cot-ov-sub" style="margin-bottom:8px">${zInfo.txt} · ${nWks}w window</div>
           <div class="cot-gauge-track"><div class="cot-gauge-fill"></div><div id="cot-pin" class="cot-gauge-pin" style="left:50%"></div></div>
           <div class="cot-gauge-lbls"><span>Extreme Short</span><span>Neutral</span><span>Extreme Long</span></div>
         </div>
-        <div class="cot-cw">
+        <div class="cot-ov-half">
           <div class="cot-ct">LONG / SHORT SPLIT</div>
           <div class="cot-ls-row">
             <div><div class="cot-ls-num cu">${long_.toLocaleString()}</div><div class="cot-ov-sub">Longs</div></div>
@@ -472,28 +556,90 @@ function openCOTModal(ccy,data){
           <div class="cot-ls-bar"><div class="cot-ls-bar-fill" style="width:100%;background:linear-gradient(90deg,#26a69a ${lPct}%,#ef5350 ${lPct}%)"></div></div>
           <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:#6e7681"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
         </div>
-        <div class="cot-cw">
-          <div class="cot-ct">12-WEEK NET TREND</div>
-          ${_cotSparkline(history,12)}
-          <div class="cot-ov-sub" style="margin-top:6px">${_cotTrendLabel(history)}</div>
-        </div>
       </div>
-      <div class="cot-ov-bottom">
-        <div class="cot-cw"><div class="cot-ct">52-WEEK RANGE</div>${_cotRangeCard(history,net)}</div>
-        <div class="cot-cw">
-          <div class="cot-ct">PARTICIPANTS · CURRENT WEEK</div>
-          <table class="cot-tbl"><thead><tr><th style="text-align:left">Category</th><th>Net Contracts</th><th>Direction</th></tr></thead>
-          <tbody>
-            <tr><td>Leveraged Funds</td><td class="${_cotCls(net)}">${_cotFmt(net)}</td><td class="${_cotCls(net)}">${net>0?'Long':net<0?'Short':'Flat'}</td></tr>
-            ${amNet!=null?`<tr><td>Asset Managers</td><td class="${_cotCls(amNet)}">${_cotFmt(amNet)}</td><td class="${_cotCls(amNet)}">${amNet>0?'Long':amNet<0?'Short':'Flat'}</td></tr>`:''}
-            ${ddNet!=null?`<tr><td>Dealers</td><td class="${_cotCls(-ddNet)}">${_cotFmt(ddNet)}</td><td class="${_cotCls(-ddNet)}">${ddNet>0?'Long':ddNet<0?'Short':'Flat'}</td></tr>`:''}
-          </tbody></table>
-        </div>
-        <div class="cot-cw" style="justify-content:space-between">
-          <div class="cot-ct">SIGNAL SUMMARY</div>
-          <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net,amNet,ddNet,aligned,isCrowded)}</div>
-        </div>
+
+      <!-- SECTION: KEY METRICS -->
+      <div class="cot-ov-sec">
+        <span class="cot-ov-sec-lbl">Key Metrics</span>
       </div>
+      <div class="cot-kfv">
+        <span class="cot-kfv-key">Net as % of Open Interest</span>
+        <span class="cot-kfv-val ${_cotCls(netPctOI)}">${netPctStr}</span>
+        ${Math.abs(netPctOI||0)>15?'<span class="cot-kfv-badge cot-badge-w">ELEVATED</span>':''}
+      </div>
+      <div class="cot-kfv">
+        <span class="cot-kfv-key">Week-on-Week Change</span>
+        <span class="cot-kfv-val ${_cotCls(wow)}">${_cotFmt(wow)}</span>
+        ${wow!=null&&wow>0?'<span class="cot-kfv-badge cot-badge-l">BUYING</span>':wow!=null&&wow<0?'<span class="cot-kfv-badge cot-badge-s">SELLING</span>':''}
+      </div>
+      <div class="cot-kfv">
+        <span class="cot-kfv-key">Crowd Alignment (LF + AM)</span>
+        <span class="cot-kfv-val ${aligned?_cotCls(net):'cn'}">${aligned?(net>0?'Both Long':'Both Short'):'Diverging'}</span>
+        ${isCrowded?'<span class="cot-kfv-badge cot-badge-w">CROWDED</span>':aligned?'<span class="cot-kfv-badge cot-badge-l">ALIGNED</span>':'<span class="cot-kfv-badge cot-badge-n">MIXED</span>'}
+      </div>
+      <div class="cot-kfv">
+        <span class="cot-kfv-key">Trend Pattern (last 4w)</span>
+        <span class="cot-kfv-val" style="color:var(--text)">${_cotTrendLabel(history).split(' · ')[0]}</span>
+      </div>
+
+      <!-- SECTION: PARTICIPANTS -->
+      <div class="cot-ov-sec">
+        <span class="cot-ov-sec-lbl">Participants · Current Week</span>
+        <span class="cot-ov-sec-note">Net contracts by category</span>
+      </div>
+      ${(()=>{
+        const maxAbs = Math.max(Math.abs(net), Math.abs(amNet||0), Math.abs(ddNet||0), 1);
+        const pRow = (label, val) => {
+          if (val == null) return '';
+          const pct = Math.round(Math.abs(val) / maxAbs * 100);
+          const col = val >= 0 ? '#26a69a' : '#ef5350';
+          const dir = val > 0 ? 'LONG' : val < 0 ? 'SHORT' : 'FLAT';
+          const badgeCls = val > 0 ? 'cot-badge-l' : val < 0 ? 'cot-badge-s' : 'cot-badge-n';
+          return `<div class="cot-kfv">
+            <span class="cot-kfv-key">${label}</span>
+            <div class="cot-kfv-bar"><div class="cot-kfv-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+            <span class="cot-kfv-val ${_cotCls(val)}">${_cotFmt(val)}</span>
+            <span class="cot-kfv-badge ${badgeCls}">${dir}</span>
+          </div>`;
+        };
+        return pRow('Leveraged Funds', net) +
+               pRow('Asset Managers', amNet) +
+               pRow('Dealers / Intermediaries', ddNet!=null ? -ddNet : null);
+      })()}
+
+      <!-- SECTION: 52-WEEK RANGE -->
+      <div class="cot-ov-sec">
+        <span class="cot-ov-sec-lbl">52-Week Range</span>
+      </div>
+      ${(()=>{
+        const vals = history.map(h=>h.levNet??((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
+        if (vals.length < 2) return '<div class="cot-kfv"><span class="cot-kfv-key" style="color:var(--text3)">Insufficient data</span></div>';
+        const hi = Math.max(...vals), lo = Math.min(...vals);
+        const pct = hi !== lo ? Math.round((net - lo) / (hi - lo) * 100) : 50;
+        const rangeBar = `<div style="margin:6px 14px 2px;height:5px;background:rgba(255,255,255,.06);border-radius:3px;position:relative;">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:var(--up,#26a69a);border-radius:3px;"></div>
+          <div style="position:absolute;top:-3px;left:calc(${pct}% - 4px);width:8px;height:8px;border-radius:50%;background:var(--text,#e6edf3);border:2px solid var(--bg2,#161b22);box-shadow:0 0 0 1px rgba(255,255,255,.2)"></div>
+        </div>`;
+        return rangeBar +
+          `<div class="cot-kfv"><span class="cot-kfv-key">${vals.length}w High</span><span class="cot-kfv-val cu">${_cotFmt(hi)}</span></div>` +
+          `<div class="cot-kfv"><span class="cot-kfv-key">Current</span><span class="cot-kfv-val ${_cotCls(net)}">${_cotFmt(net)}</span><span class="cot-kfv-badge cot-badge-n">${pct}th PCTILE</span></div>` +
+          `<div class="cot-kfv"><span class="cot-kfv-key">${vals.length}w Low</span><span class="cot-kfv-val cd">${_cotFmt(lo)}</span></div>`;
+      })()}
+
+      <!-- SECTION: 12-WEEK TREND -->
+      <div class="cot-ov-sec">
+        <span class="cot-ov-sec-lbl">12-Week Net Trend</span>
+        <span class="cot-ov-sec-note">Leveraged Funds · weekly snapshot</span>
+      </div>
+      <div class="cot-ov-spark-row">
+        <div class="cot-ov-spark-top">
+          <span class="cot-ct" style="margin-bottom:0">Net contracts — last 12 weeks</span>
+          <span class="cot-ov-spark-trend ${_cotCls(net)}">${_cotTrendLabel(history)}</span>
+        </div>
+        ${_cotSparkline(history,12)}
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:8.5px;color:var(--text3,#4e5c70);font-family:${_monoF};padding:0 14px"><span>12w ago</span><span>Now · ${_cotFmt(net)}</span></div>
+      </div>
+
     </div>
     <div id="p-net" class="cot-panel">
       <div class="cot-cw"><div class="cot-ct">NET POSITION · LEVERAGED FUNDS · WEEKLY CONTRACTS</div><div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-net"></div></div></div>
@@ -527,7 +673,10 @@ function openCOTModal(ccy,data){
 </div>`;
 
   document.body.appendChild(bd);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{const pin=document.getElementById('cot-pin');if(pin)pin.style.left=gaugeLeft;}));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const pin=document.getElementById('cot-pin');if(pin)pin.style.left=gaugeLeft;
+    // Sparkline is now inline SVG — no async build needed
+  }));
 
   const tbody=document.getElementById('cot-hist-body');
   if(tbody){
@@ -556,7 +705,7 @@ function openCOTModal(ccy,data){
   bd.addEventListener('click',e=>{if(e.target===bd)closeCOTModal();});
   const esc=e=>{if(e.key==='Escape')closeCOTModal();};
   document.addEventListener('keydown',esc);bd._esc=esc;
-  bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy};
+  bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy,history};
 }
 
 function cotTab(el,tabId){
@@ -569,9 +718,11 @@ function cotTab(el,tabId){
   const bd=document.getElementById('cot-bd');if(!bd?._cotData)return;
   const d=bd._cotData;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    if(tabId==='net'){const w=document.getElementById('cot-lw-net');if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}}
-    if(tabId==='split'){const w=document.getElementById('cot-lw-split');if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}}
-    if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}}
+    if(tabId==='net'){const w=document.getElementById('cot-lw-net');if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
+    if(tabId==='split'){const w=document.getElementById('cot-lw-split');if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
+    if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
+    if(tabId==='overview'){ /* sparkline is inline SVG — no build needed */ }
+    setTimeout(()=>{['cot-lw-net','cot-lw-split','cot-lw-part'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
   }));
 }
 
@@ -579,7 +730,7 @@ function closeCOTModal(){
   const bd=document.getElementById('cot-bd');
   if(bd){
     if(bd._esc)document.removeEventListener('keydown',bd._esc);
-    document.querySelectorAll('.cot-lw-wrap').forEach(w=>{if(w._lwResize)window.removeEventListener('resize',w._lwResize);});
+    document.querySelectorAll('.cot-lw-wrap').forEach(w=>{if(w._lwResize)window.removeEventListener('resize',w._lwResize);if(w._lwRo)w._lwRo.disconnect();});
     bd.remove();
   }
   _destroyCOTCharts();

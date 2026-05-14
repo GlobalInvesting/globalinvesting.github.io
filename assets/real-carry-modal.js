@@ -1,4 +1,4 @@
-// ═══════════════════════════════════════════════════════════════════════════
+// REAL RATE CARRY MODAL  v2.1 — inline-panel edition, terminal CSS variables
 // REAL RATE CARRY MODAL  v1.4
 // File: assets/real-carry-modal.js
 //
@@ -13,8 +13,7 @@
 //   OIS Bias       : ./meetings-data/meetings.json
 //
 // Real rate = Nominal CB rate − Inflation Expectation (breakeven / CPI proxy)
-// This is the standard used by Bloomberg FXFR, Refinitiv FX carry screens,
-// and institutional macro PM morning packets.
+// This is the standard used by institutional FX carry screens and macro PM morning packets.
 //
 // Inflation expectation sources (in priority order):
 //   USD: FRED T5YIE   — 5Y breakeven inflation, market-derived, daily
@@ -33,123 +32,219 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 (function () {
-  if (document.getElementById('rcm-modal-css')) return;
+  if (document.getElementById('rcm-modal2-css')) return;
 
   // ── CSS ─────────────────────────────────────────────────────────────────
   const s = document.createElement('style');
-  s.id = 'rcm-modal-css';
+  s.id = 'rcm-modal2-css';
   s.textContent = `
 /* ── Animations ── */
 @keyframes rcm-fi{from{opacity:0}to{opacity:1}}
 @keyframes rcm-su{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
-@keyframes rcm-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes rcm-pulse{0%,100%{opacity:1}50%{opacity:.35}}
 /* ── Backdrop ── */
-#rcm-bd{position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:16px;animation:rcm-fi .15s ease;}
+#rcm-bd{position:fixed!important;inset:0!important;z-index:9200;display:flex!important;flex-direction:column;overflow:hidden;background:var(--bg);}
 /* ── Modal shell ── */
-#rcm-modal{background:#161b22;border:1px solid #30363d;border-radius:8px;width:min(940px,100%);height:min(640px,92vh);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);animation:rcm-su .18s cubic-bezier(.16,1,.3,1);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:#e6edf3;position:relative;}
-#rcm-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#1f6feb 0%,#58a6ff 50%,#26a69a 100%);border-radius:8px 8px 0 0;}
+#rcm-modal{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);color:var(--text);display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;font-size:11px;flex:1;}
+#rcm-modal::before{display:none;}
+
 /* ── Header ── */
-#rcm-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid #30363d;flex-shrink:0;background:#161b22;}
-#rcm-hd-left{display:flex;flex-direction:column;gap:3px;}
-.rcm-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#388bfd;margin-bottom:2px;}
-.rcm-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#388bfd;flex-shrink:0;}
-#rcm-title{font-size:14px;font-weight:600;color:#e6edf3;letter-spacing:-.01em;}
-#rcm-sub{font-size:10px;color:#6e7681;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.02em;}
-#rcm-close{background:none;border:none;color:#6e7681;font-size:18px;cursor:pointer;padding:5px 7px;border-radius:5px;line-height:1;transition:color .1s,background .1s;font-family:inherit;}
-#rcm-close:hover{color:#e6edf3;background:#21262d;}
+#rcm-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 9px;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;background:var(--bg2);}
+#rcm-hd-left{display:flex;align-items:center;gap:10px;}
+#rcm-hd-text{display:flex;flex-direction:column;gap:1px;}
+.rcm-badge{font-size:8px;font-weight:700;letter-spacing:.10em;color:var(--blue,#4d7cfe);text-transform:uppercase;display:flex;align-items:center;gap:4px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--blue,#4d7cfe);flex-shrink:0;}
+#rcm-title{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em;line-height:1.2;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+#rcm-sub{font-size:10px;color:var(--text2);letter-spacing:.02em;margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+#rcm-close{background:none;border:none;color:var(--text3,#4e5c70);font-size:16px;cursor:pointer;padding:3px 6px;border-radius:3px;line-height:1;transition:color .1s,background .1s;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+#rcm-close:hover{color:var(--text);background:var(--bg3);}
+
 /* ── Metrics strip ── */
-#rcm-metrics{display:flex;border-bottom:1px solid #30363d;flex-shrink:0;background:#0d1117;}
-.rcm-mm{flex:1;padding:9px 16px;border-right:1px solid #30363d;display:flex;flex-direction:column;gap:1px;}
+#rcm-metrics{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;}
+.rcm-mm{padding:8px 12px;border-right:1px solid var(--border,#252d3d);display:flex;flex-direction:column;}
 .rcm-mm:last-child{border-right:none;}
-.rcm-mm-lbl{font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:600;color:#6e7681;text-transform:uppercase;letter-spacing:.09em;}
-.rcm-mm-val{font-size:16px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#e6edf3;line-height:1;margin-top:2px;}
-.rcm-mm-sub{font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#6e7681;margin-top:1px;}
+.rcm-mm-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:3px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-mm-val{font-size:13px;font-weight:600;line-height:1;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-mm-sub{font-size:9px;color:var(--text2);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+
 /* ── Tabs ── */
-#rcm-tabs{display:flex;padding:0 18px;border-bottom:1px solid #30363d;flex-shrink:0;background:#161b22;overflow-x:auto;scrollbar-width:none;}
+#rcm-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;padding:0 14px;overflow-x:auto;scrollbar-width:none;}
 #rcm-tabs::-webkit-scrollbar{display:none;}
-.rcm-tab{font-size:11px;font-weight:500;padding:9px 14px;cursor:pointer;color:#6e7681;border-bottom:2px solid transparent;transition:color .12s;white-space:nowrap;user-select:none;}
-.rcm-tab:hover{color:#8b949e;}
-.rcm-tab.on{color:#e6edf3;border-bottom-color:#388bfd;}
+.rcm-tab{font-size:11px;font-weight:400;padding:9px 13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:color .1s;white-space:nowrap;user-select:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-tab:hover{color:var(--text2);}
+.rcm-tab.on{color:var(--text);border-bottom-color:var(--blue,#4d7cfe);}
+
 /* ── Body ── */
-#rcm-body{flex:1;min-height:0;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;background:#0d1117;scrollbar-width:thin;scrollbar-color:#444c56 transparent;}
-#rcm-body::-webkit-scrollbar{width:4px;}
+#rcm-body{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg);scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+#rcm-body::-webkit-scrollbar{width:3px!important;}
 #rcm-body::-webkit-scrollbar-track{background:transparent;}
-#rcm-body::-webkit-scrollbar-thumb{background:#444c56;border-radius:2px;}
-#rcm-body::-webkit-scrollbar-thumb:hover{background:#6e7681;}
+#rcm-body::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+#rcm-body::-webkit-scrollbar-thumb:hover{background:var(--text2);}
 .rcm-panel{display:none;}
-.rcm-panel.on{display:flex;flex:1;flex-direction:column;min-height:0;}
-/* ── Card wrapper ── */
-.rcm-cw{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px 14px;margin-bottom:10px;}
-.rcm-cw:last-child{margin-bottom:0;}
-.rcm-ct{font-size:9.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#6e7681;letter-spacing:.04em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #30363d;text-transform:uppercase;}
-/* ── Table ── */
-.rcm-tbl{width:100%;border-collapse:collapse;font-size:11.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.rcm-tbl thead th{text-align:right;color:#6e7681;font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:0 10px 7px;border-bottom:1px solid #30363d;}
+.rcm-panel.on{display:flex;flex:1;flex-direction:column;min-height:0;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+.rcm-panel.on::-webkit-scrollbar{width:3px!important;}
+.rcm-panel.on::-webkit-scrollbar-track{background:transparent;}
+.rcm-panel.on::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.rcm-panel.on::-webkit-scrollbar-thumb:hover{background:var(--text2);}
+
+/* ── Card wrapper (legacy compat) ── */
+.rcm-cw{background:var(--bg);border:none;border-radius:0;padding:0;margin-bottom:0;flex:1;display:flex;flex-direction:column;overflow:auto;min-width:0;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+.rcm-cw::-webkit-scrollbar{width:3px!important;}
+.rcm-cw::-webkit-scrollbar-track{background:transparent;}
+.rcm-cw::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.rcm-cw::-webkit-scrollbar-thumb:hover{background:var(--text2);}
+.rcm-ct{display:none;}
+
+/* ── Breakdown table — UI font for labels, mono for numbers ── */
+.rcm-tbl{width:100%;border-collapse:collapse;}
+.rcm-tbl thead th{font-size:8.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3,#4e5c70);font-weight:600;padding:7px 14px;text-align:right;border-bottom:1px solid var(--border,#252d3d);background:var(--bg2);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
 .rcm-tbl thead th:first-child{text-align:left;}
-.rcm-tbl tbody tr{transition:background .08s;}
-.rcm-tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.015);}
-.rcm-tbl tbody tr:hover td{background:rgba(88,166,255,.05);}
-.rcm-tbl td{text-align:right;padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
-.rcm-tbl td:first-child{text-align:left;}
-.rcm-tbl tr:last-child td{border-bottom:none;}
-/* #1 badge on best row */
-.rcm-tbl .rcm-best td:first-child::before{content:'#1';display:inline-block;margin-right:7px;font-size:8px;font-weight:700;background:#26a69a;color:#0d1117;padding:1px 4px;border-radius:3px;vertical-align:middle;}
-/* ── Real rate coloring ── */
-.rr-pos2{color:#26a69a;font-weight:700;}
-.rr-pos1{color:#26a641;}
-.rr-neg1{color:#e07070;}
-.rr-neg2{color:#ef5350;font-weight:700;}
-.rr-flat{color:#6e7681;}
+.rcm-tbl tbody td{padding:8px 14px;font-size:11px;text-align:right;border-bottom:1px solid var(--border,#252d3d);color:var(--text);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-tbl tbody td:first-child{text-align:left;color:var(--text);font-weight:700;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-tbl tbody td.rcm-td-cb{color:var(--text2);font-size:9px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-weight:400;}
+.rcm-tbl tbody tr:hover td{background:rgba(77,124,254,.04);}
+.rcm-tbl tbody tr:last-child td{border-bottom:none;}
+
+/* ── Real rate coloring — terminal vars (--up / --down = #26a69a / #ef5350) ── */
+/* More specific selectors override .rcm-tbl tbody td { color:var(--text) } */
+.rcm-tbl tbody td.rr-pos2,.rr-pos2{color:var(--up,#26a69a)!important;font-weight:700;}
+.rcm-tbl tbody td.rr-pos1,.rr-pos1{color:var(--up,#26a69a)!important;}
+.rcm-tbl tbody td.rr-neg1,.rr-neg1{color:var(--down,#ef5350)!important;}
+.rcm-tbl tbody td.rr-neg2,.rr-neg2{color:var(--down,#ef5350)!important;font-weight:700;}
+.rr-flat{color:var(--text2);}
+
 /* ── OIS bias chip ── */
-.rcm-bias{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.04em;white-space:nowrap;}
-.rcm-bias-hike{background:rgba(38,166,154,.15);color:#26a69a;border:1px solid rgba(38,166,154,.25);}
-.rcm-bias-cut{background:rgba(239,83,80,.15);color:#ef5350;border:1px solid rgba(239,83,80,.25);}
-.rcm-bias-hold{background:rgba(139,148,158,.10);color:#8b949e;border:1px solid rgba(139,148,158,.18);}
+.rcm-bias{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:2px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-bias-hike{background:rgba(38,166,154,.15);color:var(--up,#26a69a);border:1px solid rgba(38,166,154,.30);}
+.rcm-bias-cut{background:rgba(239,83,80,.12);color:var(--down,#ef5350);border:1px solid rgba(239,83,80,.25);}
+.rcm-bias-hold{background:rgba(122,135,153,.10);color:var(--text2);border:1px solid rgba(122,135,153,.20);}
+
 /* ── Live dot ── */
-.rcm-live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#26a69a;margin-left:3px;vertical-align:middle;animation:rcm-pulse 2s ease-in-out infinite;}
-/* ── Real Rate Matrix ── */
-#rcm-matrix-wrap{overflow:auto;flex:1;min-height:0;scrollbar-width:thin;scrollbar-color:#444c56 transparent;}
+.rcm-live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--up,#26a69a);margin-left:3px;vertical-align:middle;animation:rcm-pulse 2s ease-in-out infinite;}
+
+/* ── Pair detail ── */
+.rcm-pd-header{padding:10px 14px 9px;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3,#4e5c70);display:flex;align-items:center;gap:6px;flex-shrink:0;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-pd-pair{color:var(--text);font-size:10px;font-weight:700;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-pd-dir{color:var(--text3,#4e5c70);}
+
+.rcm-pd-row-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border,#252d3d);}
+.rcm-pd-cell{padding:10px 14px;border-right:1px solid var(--border,#252d3d);}
+.rcm-pd-cell:last-child{border-right:none;}
+.rcm-pd-cell-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);margin-bottom:4px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-pd-cell-val{font-size:20px;font-weight:700;line-height:1;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-pd-cell-sub{font-size:9px;color:var(--text2);margin-top:3px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+
+/* ── Rate bars ── */
+.rcm-rate-bars{padding:10px 14px;border-bottom:1px solid var(--border,#252d3d);}
+.rcm-rb-title{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3,#4e5c70);margin-bottom:8px;}
+.rcm-rb-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.rcm-rb-label{font-size:10px;color:var(--text2);width:36px;flex-shrink:0;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-rb-track{flex:1;height:4px;background:var(--bg3,#1e2433);border-radius:0;position:relative;}
+.rcm-rb-zero{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--border2,#2e3a50);}
+.rcm-rb-fill{height:100%;border-radius:0;position:absolute;top:0;}
+.rcm-rb-val{font-size:10px;font-weight:700;width:36px;text-align:right;flex-shrink:0;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+
+/* ── Vol / OIS row ── */
+.rcm-vol-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border,#252d3d);}
+.rcm-vol-cell{padding:8px 14px;border-right:1px solid var(--border,#252d3d);}
+.rcm-vol-cell:last-child{border-right:none;}
+.rcm-vol-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3,#4e5c70);margin-bottom:3px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-vol-val{font-size:14px;font-weight:700;color:var(--text);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
+.rcm-vol-sub{font-size:8px;color:var(--text2);margin-top:2px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+
+.rcm-ois-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border,#252d3d);}
+.rcm-ois-cell{padding:8px 14px;border-right:1px solid var(--border,#252d3d);}
+.rcm-ois-cell:last-child{border-right:none;}
+.rcm-ois-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3,#4e5c70);margin-bottom:4px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-ois-sub{font-size:8px;color:var(--text3,#4e5c70);margin-top:3px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+
+/* ── Sustainability ── */
+.rcm-sustain{padding:8px 14px;border-bottom:1px solid var(--border,#252d3d);display:flex;align-items:flex-start;gap:8px;}
+.rcm-sustain-icon{width:3px;flex-shrink:0;align-self:stretch;border-radius:2px;}
+.rcm-sustain-ok   .rcm-sustain-icon{background:var(--up,#26a69a);}
+.rcm-sustain-warn .rcm-sustain-icon{background:var(--orange,#f59e0b);}
+.rcm-sustain-bad  .rcm-sustain-icon{background:var(--down,#ef5350);}
+.rcm-sustain-body{font-size:9.5px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-sustain-body strong{color:var(--text);font-weight:700;}
+
+/* ── Source note ── */
+.rcm-src-note{padding:8px 14px;font-size:10px;color:var(--text3,#4e5c70);line-height:1.6;border-top:1px solid var(--border,#252d3d);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+
+/* ── Real Rate Matrix — full 8×8, colored cells, mono values ── */
+#rcm-matrix-wrap{overflow:auto;padding:14px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;width:100%;min-width:0;box-sizing:border-box;}
 #rcm-matrix-wrap::-webkit-scrollbar{width:4px;height:4px;}
 #rcm-matrix-wrap::-webkit-scrollbar-track{background:transparent;}
-#rcm-matrix-wrap::-webkit-scrollbar-thumb{background:#444c56;border-radius:2px;}
-#rcm-matrix-wrap::-webkit-scrollbar-thumb:hover{background:#6e7681;}
-.rcm-matrix{border-collapse:collapse;font-size:10.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);width:100%;}
-.rcm-matrix th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:6px 8px;color:#6e7681;text-align:center;white-space:nowrap;background:#161b22;position:sticky;top:0;z-index:2;border-bottom:1px solid #30363d;}
-.rcm-matrix th.row-head{text-align:left;min-width:46px;}
-.rcm-matrix td{padding:5px 8px;text-align:center;border:1px solid rgba(255,255,255,.04);font-size:10.5px;min-width:58px;transition:filter .1s;}
-.rcm-matrix td:hover{filter:brightness(1.4);}
-.rcm-matrix td.diag{background:#2d333b;color:#8b949e;font-size:10px;font-weight:600;}
-.rcm-matrix td.row-head{text-align:left;color:#8b949e;font-weight:700;font-size:10.5px;background:#161b22;border:none;position:sticky;left:0;z-index:1;}
-.rcm-matrix td.empty{background:transparent;border:none;}
-/* matrix cell shading */
-.rcm-cell-pos-hi{background:rgba(38,166,154,.25);color:#26a69a;font-weight:700;}
-.rcm-cell-pos{background:rgba(38,166,154,.10);color:#26a69a;}
-.rcm-cell-neg-hi{background:rgba(239,83,80,.25);color:#ef5350;font-weight:700;}
-.rcm-cell-neg{background:rgba(239,83,80,.10);color:#ef5350;}
-.rcm-cell-flat{color:#6e7681;}
+#rcm-matrix-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.rcm-matrix{border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);table-layout:fixed;width:100%;}
+.rcm-matrix th{font-weight:600;letter-spacing:.04em;padding:5px 0;color:var(--text2);text-align:center;white-space:nowrap;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;}
+.rcm-matrix td{height:36px;text-align:center;vertical-align:middle;font-weight:700;font-size:10.5px;border:1px solid var(--border,#252d3d);overflow:hidden;white-space:nowrap;}
+.rcm-matrix td:hover{filter:brightness(1.28);cursor:default;}
+.rcm-matrix td.row-head{text-align:left;color:var(--text3,#4e5c70);font-weight:700;padding:0 8px 0 8px;white-space:nowrap;width:52px;background:var(--bg2);border:none;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);font-size:9px;letter-spacing:.04em;}
+.rcm-matrix td.diag{background:var(--bg2);color:var(--text2);font-size:10.5px;font-weight:600;}
+/* matrix cell shading — terminal standard colors (--up=#26a69a / --down=#ef5350) */
+.rcm-cell-pos-hi{background:rgba(38,166,154,.26);color:var(--up,#26a69a);}
+.rcm-cell-pos{background:rgba(38,166,154,.12);color:var(--up,#26a69a);}
+.rcm-cell-neg-hi{background:rgba(239,83,80,.26);color:var(--down,#ef5350);}
+.rcm-cell-neg{background:rgba(239,83,80,.12);color:var(--down,#ef5350);}
+.rcm-cell-flat{background:rgba(122,135,153,.07);color:var(--text3,#4e5c70);}
 /* matrix legend */
-.rcm-matrix-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#6e7681;margin-top:10px;padding-top:10px;border-top:1px solid #30363d;align-items:center;}
-.rcm-legend-sw{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;margin-right:5px;}
-/* ── Pair detail ── */
+.rcm-matrix-legend{margin-top:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.rcm-matrix-legend span{font-size:10px;display:flex;align-items:center;gap:4px;color:var(--text2);font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.rcm-legend-sw{width:10px;height:10px;display:inline-block;flex-shrink:0;}
+
+/* ── Loading ── */
+.rcm-loading{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text2);font-size:11px;letter-spacing:.06em;padding:40px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+
+/* ── Pair detail wrapper ── */
+.rcm-pd-wrap{width:100%;box-sizing:border-box;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+.rcm-pd-wrap::-webkit-scrollbar{width:3px!important;}
+.rcm-pd-wrap::-webkit-scrollbar-track{background:transparent;}
+.rcm-pd-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.rcm-pd-wrap::-webkit-scrollbar-thumb:hover{background:var(--text2);}
+
+/* ── Keep old grid for backward compat ── */
 .rcm-pd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
 .rcm-pd-kv{display:flex;flex-direction:column;gap:3px;}
-.rcm-pd-lbl{font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#6e7681;}
-.rcm-pd-val{font-size:15px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1;}
-.rcm-pd-sub{font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#6e7681;margin-top:1px;}
-.rcm-sustain{border-radius:5px;padding:9px 12px;font-size:10.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.5;margin-top:4px;}
-.rcm-sustain-ok{background:rgba(38,166,154,.08);border:1px solid rgba(38,166,154,.22);color:#26a69a;}
-.rcm-sustain-warn{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.22);color:#d29922;}
-.rcm-sustain-bad{background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.22);color:#ef5350;}
-.rcm-src-note{font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#6e7681;margin-top:10px;padding-top:9px;border-top:1px solid #30363d;line-height:1.6;}
-.rcm-loading{display:flex;align-items:center;justify-content:center;flex:1;color:#6e7681;font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.06em;}
+
+/* ── Responsive breakpoints ── */
+@media(max-width:900px){
+  .rcm-pd-row-grid{grid-template-columns:1fr 1fr;}
+  .rcm-vol-row{grid-template-columns:1fr 1fr;}
+  /* Matrix: slightly smaller on mid-size screens */
+  .rcm-matrix{font-size:9.5px;}
+  .rcm-matrix td{height:32px;font-size:9.5px;}
+  .rcm-matrix td.diag{font-size:9.5px;}
+  #rcm-matrix-wrap{padding:10px;}
+}
 @media(max-width:640px){
-  #rcm-bd{padding:0;align-items:flex-end;}
-  #rcm-modal{width:100%;height:94vh;border-radius:12px 12px 0 0;}
-  #rcm-metrics{flex-wrap:wrap;}
-  .rcm-mm{flex:1 1 50%;border-right:none;border-bottom:1px solid #30363d;}
-  .rcm-mm-val{font-size:12px;}
-  .rcm-pd-grid{grid-template-columns:1fr 1fr;}
-  #rcm-body{padding:10px;}
+  #rcm-metrics{grid-template-columns:repeat(3,1fr);}
+  .rcm-mm-val{font-size:14px;}
+  .rcm-pd-row-grid{grid-template-columns:1fr 1fr;}
+  .rcm-pd-cell-val{font-size:16px;}
+  .rcm-vol-row{grid-template-columns:1fr 1fr;}
+  .rcm-ois-row{grid-template-columns:1fr 1fr;}
+  .rcm-rate-bars{padding:8px 10px;}
+  .rcm-pd-header{padding:8px 10px;}
+  .rcm-pd-cell{padding:8px 10px;}
+  .rcm-vol-cell{padding:6px 10px;}
+  .rcm-ois-cell{padding:6px 10px;}
+  /* Matrix: compact cells, scrolls horizontally */
+  .rcm-matrix{font-size:9px;}
+  .rcm-matrix td{height:28px;font-size:9px;}
+  .rcm-matrix td.diag{font-size:9px;}
+  .rcm-matrix th{font-size:8px;}
+  .rcm-matrix td.row-head{font-size:8px;}
+  /* Hide body scrollbar on small screens to reclaim space */
+  #rcm-body{scrollbar-width:none;}
+  #rcm-body::-webkit-scrollbar{display:none!important;}
+}
+@media(max-width:420px){
+  .rcm-pd-row-grid{grid-template-columns:1fr;}
+  .rcm-vol-row{grid-template-columns:1fr;}
+  .rcm-ois-row{grid-template-columns:1fr;}
+  #rcm-metrics{grid-template-columns:repeat(2,1fr);}
+  .rcm-pd-cell:last-child{border-right:none;border-bottom:none;}
+  .rcm-vol-cell{border-bottom:1px solid var(--border,#252d3d);}
 }
 `;
   document.head.appendChild(s);
@@ -158,6 +253,7 @@
 // ── Constants ───────────────────────────────────────────────────────────────
 const _RCM_G8 = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD'];
 const _RCM_CB = { USD: 'Fed', EUR: 'ECB', GBP: 'BoE', JPY: 'BoJ', AUD: 'RBA', CAD: 'BoC', CHF: 'SNB', NZD: 'RBNZ' };
+const _RCM_FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CAD: 'ca', CHF: 'ch', NZD: 'nz' };
 
 // Inflation expectation source labels — shown in the source column for transparency
 const _RCM_IE_SRC = {
@@ -376,11 +472,13 @@ function _rcmDateAge(dateStr) {
 }
 
 // ── Tab 1: Rates Breakdown ───────────────────────────────────────────────────
+// rank · CENTRAL BANK · NOMINAL · INFL.EXP. · REAL RATE · OIS BIAS
+// Sorted by real rate descending (highest real carry at top)
 function _rcmRenderBreakdown() {
   const d = _rcmData;
   if (!d) return '<div class="rcm-loading">Loading...</div>';
 
-  // Sort currencies by real rate descending (carry attractiveness)
+  // Sort by real rate descending
   const sorted = [..._RCM_G8].sort((a, b) => {
     const ra = d.realRates[a] ?? -99;
     const rb = d.realRates[b] ?? -99;
@@ -396,35 +494,41 @@ function _rcmRenderBreakdown() {
     const nomFmt = nom != null ? nom.toFixed(2) + '%' : '—';
     const ieFmt  = ie  ? ie.val.toFixed(2) + '%' : '—';
     const rrFmt  = _rcmRrFmt(rr);
-    const isLive  = ie?.live ? '<span title="Market-implied (FRED breakeven)" style="color:var(--up,#26a69a);font-size:8px;">&#x25CF;</span>' : '';
-    const dateAge = _rcmDateAge(ie?.date);
-    const srcLabel = _RCM_IE_SRC[ccy] || '';
-    const srcTitle = `${srcLabel}${ie?.date ? ' · ' + ie.date : ''}`;
-    const isTR = idx === 0 ? ' class="rcm-best"' : '';
+    const isLive = ie?.live
+      ? `<span class="rcm-live-dot" title="Market-implied (FRED breakeven)"></span>`
+      : '';
+    const srcTitle = `${_RCM_IE_SRC[ccy] || ''}${ie?.date ? ' · ' + ie.date : ''}`;
 
-    return `<tr${isTR} title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
-      <td style="font-weight:700;color:var(--text,#d1d4dc);">${_RCM_CB[ccy]} (${ccy})</td>
+    // Left border accent on top row (highest real rate)
+
+    const firstTdBorder = idx === 0
+      ? 'border-left:3px solid var(--up,#26a69a);'
+      : (idx === sorted.length - 1 ? 'border-left:3px solid var(--down,#ef5350);' : 'border-left:3px solid transparent;');
+    return `<tr title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
+      <td style="color:var(--text3);font-size:9px;text-align:center;width:20px;padding:8px 4px 8px 11px;${firstTdBorder}">${idx + 1}</td>
+      <td style="text-align:left;">
+        <span class="fi fi-${_RCM_FLAG[ccy]}" style="margin-right:6px;border-radius:2px;font-size:14px;vertical-align:middle;flex-shrink:0;"></span><span style="font-weight:700;color:var(--text);">${_RCM_CB[ccy]}</span>
+        <span style="color:var(--text3);font-size:9px;margin-left:4px;">${ccy}</span>
+      </td>
       <td>${nomFmt}</td>
-      <td title="${srcTitle}">${ieFmt} ${isLive}</td>
-      <td title="${srcTitle}">${dateAge}</td>
-      <td class="${rrCls}" style="font-weight:600;">${rrFmt}</td>
-      <td>${_rcmBiasChip(bias)}</td>
+      <td title="${srcTitle}">${ieFmt}${isLive}</td>
+      <td class="${rrCls}" style="font-weight:700;">${rrFmt}</td>
+      <td style="text-align:right;">${_rcmBiasChip(bias)}</td>
     </tr>`;
   }).join('');
 
-  const liveNote = 'USD/EUR: FRED market-implied breakeven (live, daily). GBP/JPY/AUD/CAD/CHF: CPI YoY (IMF SDMX 3.0, weekly batch — updated Wednesdays). NZD: OECD Data Explorer (weekly batch). ' +
-    'CPI YoY and 5Y breakeven are different methodologies — cross-currency real rate comparisons carry wider uncertainty for non-USD/EUR legs. ' +
-    'Data age column shows observation date — treat figures older than 6 months as indicative only.';
+  const liveNote = 'USD/EUR: FRED 5Y breakeven inflation (market-implied, daily). ' +
+    'GBP/JPY/AUD/CAD/CHF: CPI YoY (IMF SDMX 3.0, weekly). NZD: OECD Data Explorer (weekly). ' +
+    'Real rate = Nominal CB rate − Inflation Expectation. OIS Bias reflects forward market consensus at next CB meeting.';
 
   return `<div class="rcm-cw" style="flex:1;min-height:0;overflow:auto;">
-    <div class="rcm-ct">Real Rate Carry Ranking — G8 Central Banks · sorted by real rate descending</div>
     <table class="rcm-tbl" aria-label="Real rate carry ranking by currency">
       <thead>
         <tr>
+          <th scope="col" style="text-align:center;width:20px;padding:7px 4px 7px 11px;border-left:3px solid transparent;">#</th>
           <th scope="col" style="text-align:left;">Central Bank</th>
           <th scope="col">Nominal</th>
           <th scope="col">Infl. Exp.</th>
-          <th scope="col">Data Age</th>
           <th scope="col">Real Rate</th>
           <th scope="col">OIS Bias</th>
         </tr>
@@ -436,9 +540,10 @@ function _rcmRenderBreakdown() {
 }
 
 // ── Tab 2: Real Rate Matrix ──────────────────────────────────────────────────
-// Upper triangle: real rate of ROW minus real rate of COLUMN (long row, short col)
-// Positive = row currency has higher real rate (carry advantage long row / short col)
-// Diagonal: absolute real rate of the currency
+// Full 8×8 symmetric matrix: cell (row, col) = real rate of ROW minus real rate of COLUMN
+// Long row / Short column → positive = row currency has higher real rate
+// Diagonal: absolute real rate of the currency (greyed out)
+// Matches image: all cells filled, strong green/red shading, signed percentages
 function _rcmRenderMatrix() {
   const d = _rcmData;
   if (!d) return '<div class="rcm-loading">Loading...</div>';
@@ -447,60 +552,63 @@ function _rcmRenderMatrix() {
 
   function cellClass(diff) {
     if (diff == null) return 'rcm-cell-flat';
-    if (diff >= 1.5)  return 'rcm-cell-pos-hi';
-    if (diff >= 0.15) return 'rcm-cell-pos';
-    if (diff <= -1.5) return 'rcm-cell-neg-hi';
-    if (diff <= -0.15)return 'rcm-cell-neg';
+    if (diff >= 1.5)   return 'rcm-cell-pos-hi';
+    if (diff >= 0.10)  return 'rcm-cell-pos';
+    if (diff <= -1.5)  return 'rcm-cell-neg-hi';
+    if (diff <= -0.10) return 'rcm-cell-neg';
     return 'rcm-cell-flat';
   }
 
   function cellFmt(diff) {
     if (diff == null) return '—';
-    if (Math.abs(diff) < 0.01) return '0';
+    if (Math.abs(diff) < 0.005) return '0';
     return (diff > 0 ? '+' : '') + diff.toFixed(2) + '%';
   }
 
-  const header = `<tr><th class="row-head" scope="col">Long ↓ / Short →</th>${G8.map(c => `<th scope="col">${c}</th>`).join('')}</tr>`;
+  // Column headers
+  const header = `<tr>
+    <td class="row-head" style="font-size:8.5px;font-family:var(--font-ui,'Inter',sans-serif);padding:0 8px 0 8px;">L↓/S→</td>
+    ${G8.map(c => `<th scope="col">${c}</th>`).join('')}
+  </tr>`;
 
   const rows = G8.map(rowCcy => {
+    const rrRow = d.realRates[rowCcy];
     const cells = G8.map(colCcy => {
       if (rowCcy === colCcy) {
-        // Diagonal: absolute real rate
+        // Diagonal: absolute real rate — neutral grey, no color coding (see legend)
         const rr = d.realRates[rowCcy];
         const fmt = rr != null ? (rr >= 0 ? '+' : '') + rr.toFixed(2) + '%' : '—';
         return `<td class="diag" title="${rowCcy} real rate: ${fmt}">${fmt}</td>`;
       }
-      const rrRow = d.realRates[rowCcy];
       const rrCol = d.realRates[colCcy];
       const diff  = (rrRow != null && rrCol != null) ? parseFloat((rrRow - rrCol).toFixed(3)) : null;
       const cls   = cellClass(diff);
       const fmt   = cellFmt(diff);
       const tip   = diff != null
-        ? `Long ${rowCcy} (${_rcmRrFmt(rrRow)}) / Short ${colCcy} (${_rcmRrFmt(rrCol)}) — real spread: ${cellFmt(diff)}`
+        ? `Long ${rowCcy} (${_rcmRrFmt(rrRow)}) / Short ${colCcy} (${_rcmRrFmt(rrCol)}) = ${cellFmt(diff)}`
         : `${rowCcy}/${colCcy} — insufficient data`;
       return `<td class="${cls}" title="${tip}">${fmt}</td>`;
     }).join('');
-    return `<tr><td class="row-head">${rowCcy}</td>${cells}</tr>`;
+    return `<tr>
+      <td class="row-head">${rowCcy}</td>
+      ${cells}
+    </tr>`;
   }).join('');
 
-  const legend = `
-    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text3,#6b7280);margin-top:8px;">
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.28);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong real carry (&ge;1.5%)</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.14);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Positive real spread</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.14);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Negative real spread</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.28);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong real drag (&le;-1.5%)</span>
-      <span>Diagonal = absolute real rate</span>
-    </div>`;
-
-  return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-    <div class="rcm-ct">Real Rate Differential Matrix · Long row / Short column · Cell = Row real rate − Column real rate</div>
-    <div id="rcm-matrix-wrap" style="overflow:auto;flex:1;">
+  return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;overflow-x:auto;">
+    <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;">
       <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
         <thead>${header}</thead>
         <tbody>${rows}</tbody>
       </table>
+      <div style="margin-top:10px;display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--text3);font-family:var(--font-ui,'Inter',sans-serif);">
+        <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.26);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Strong real carry (≥+1.5%)</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.12);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Positive real spread</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.12);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Negative real spread</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.26);border-radius:1px;vertical-align:middle;margin-right:4px;"></span>Strong real drag (≤−1.5%)</span>
+        <span style="color:var(--text3);">Diagonal = absolute real rate · Cell = Row real rate − Column real rate</span>
+      </div>
     </div>
-    ${legend}
     <div class="rcm-src-note">Real rate = Nominal CB rate − Inflation Expectation. Positive cell = long row currency earns higher real carry vs short column currency.</div>
   </div>`;
 }
@@ -525,9 +633,6 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   const realSpread = (rrL  != null && rrS  != null) ? rrL  - rrS  : null;
 
   // HV30 for the pair
-  // Uses FX market convention lookup table matching HV30_FX_PAIRS in fetch_intraday_quotes.py.
-  // Pure alphabetical is WRONG for crosses: EUR/AUD key is 'euraud' not 'audeur',
-  // GBP/CHF is 'gbpchf' not 'chfgbp', NZD/JPY is 'nzdjpy' not 'jpynzd'.
   function pairId(a, b) {
     const HV30_PAIRS = new Set([
       'eurusd','gbpusd','usdjpy','audusd','usdchf','usdcad','nzdusd',
@@ -552,17 +657,17 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   let sustainCls = 'rcm-sustain-ok', sustainText = '';
   if (rrL != null && rrS != null) {
     if (rrL > 0 && rrS < 0) {
-      sustainText = `Sustainable — long leg has positive real rate (+${rrL.toFixed(2)}%), short leg negative (${rrS.toFixed(2)}%). Carry unlikely to erode via inflation differential.`;
+      sustainText = `<strong>Sustainable</strong> — long leg has positive real rate (${_rcmRrFmt(rrL)}), short leg negative (${_rcmRrFmt(rrS)}). Carry unlikely to erode via inflation differential.`;
       sustainCls  = 'rcm-sustain-ok';
     } else if (rrL < 0) {
-      sustainText = `Carry trap risk — long leg real rate is negative (${rrL.toFixed(2)}%). Nominal carry may be eroded by inflation; real return to holder is negative.`;
+      sustainText = `<strong>Carry trap risk</strong> — long leg real rate is negative (${_rcmRrFmt(rrL)}). Nominal carry may be eroded by inflation; real return to holder is negative.`;
       sustainCls  = 'rcm-sustain-bad';
     } else if (rrL > 0 && rrS > 0) {
       if (rrL > rrS) {
-        sustainText = `Moderate — both legs have positive real rates. Spread ${_rcmRrFmt(realSpread)} real vs ${nomSpread != null ? (nomSpread >= 0 ? '+' : '') + nomSpread.toFixed(2) + '%' : '—'} nominal. Watch for inflation convergence.`;
+        sustainText = `<strong>Moderate</strong> — both legs positive real. Spread ${_rcmRrFmt(realSpread)} real vs ${nomSpread != null ? (nomSpread >= 0 ? '+' : '') + nomSpread.toFixed(2) + '%' : '—'} nominal. Watch for inflation convergence.`;
         sustainCls  = 'rcm-sustain-warn';
       } else {
-        sustainText = `Negative real spread — short leg has higher real rate. Nominal carry favors long ${longCcy}, but real carry favors long ${shortCcy}.`;
+        sustainText = `<strong>Negative real spread</strong> — short leg has higher real rate. Nominal carry favors long ${longCcy}, but real carry favors long ${shortCcy}.`;
         sustainCls  = 'rcm-sustain-bad';
       }
     } else {
@@ -573,52 +678,97 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
 
   function fmt(v, suffix) { return v != null ? (v >= 0 ? '+' : '') + v.toFixed(2) + (suffix || '') : '—'; }
 
+  // ── Real rate bars (all G8, sorted by real rate desc) ──────────────────────
+  const G8sorted = [..._RCM_G8].filter(c => d.realRates[c] != null).sort((a, b) => d.realRates[b] - d.realRates[a]);
+  const maxAbs = Math.max(...G8sorted.map(c => Math.abs(d.realRates[c] ?? 0)), 0.01);
+  const barRows = G8sorted.map(ccy => {
+    const rr = d.realRates[ccy];
+    const isLong  = ccy === longCcy;
+    const isShort = ccy === shortCcy;
+    const pct = Math.abs(rr) / maxAbs * 42; // max 42% of track from center
+    const rrCls = _rcmRrClass(rr);
+    let barColor = rr >= 0 ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
+    let labelStyle = isLong ? 'color:var(--up,#26a69a);font-weight:700;' : isShort ? 'color:var(--down,#ef5350);font-weight:700;' : '';
+    let valStyle = `class="${rrCls}"`;
+    // For positive: fill right of zero; for negative: fill left
+    const fillStyle = rr >= 0
+      ? `left:50%;width:${pct}%;background:${barColor};`
+      : `right:50%;width:${pct}%;background:${barColor};`;
+    return `<div class="rcm-rb-row">
+      <div class="rcm-rb-label" style="${labelStyle}">${ccy}</div>
+      <div class="rcm-rb-track">
+        <div class="rcm-rb-zero" style="left:50%"></div>
+        <div class="rcm-rb-fill" style="${fillStyle}"></div>
+      </div>
+      <div class="rcm-rb-val ${rrCls}">${_rcmRrFmt(rr)}</div>
+    </div>`;
+  }).join('');
+
   return `
-  <div class="rcm-cw">
-    <div class="rcm-ct">${longCcy}/${shortCcy} — Real Rate Carry Analysis · Long ${longCcy} / Short ${shortCcy}</div>
-    <div class="rcm-pd-grid">
-      <div class="rcm-pd-kv"><div class="rcm-pd-lbl">Nominal carry</div>
-        <div class="rcm-pd-val ${_rcmRrClass(nomSpread)}">${fmt(nomSpread, '%')}</div>
-        <div class="rcm-pd-sub">${_RCM_CB[longCcy]} ${nomL != null ? nomL.toFixed(2) + '%' : '—'} − ${_RCM_CB[shortCcy]} ${nomS != null ? nomS.toFixed(2) + '%' : '—'}</div>
-      </div>
-      <div class="rcm-pd-kv"><div class="rcm-pd-lbl">Real carry</div>
-        <div class="rcm-pd-val ${_rcmRrClass(realSpread)}">${fmt(realSpread, '%')}</div>
-        <div class="rcm-pd-sub">After inflation expectations</div>
-      </div>
-      <div class="rcm-pd-kv"><div class="rcm-pd-lbl">Long real rate (${longCcy})</div>
-        <div class="rcm-pd-val ${_rcmRrClass(rrL)}">${_rcmRrFmt(rrL)}</div>
-        <div class="rcm-pd-sub">${nomL != null ? nomL.toFixed(2) + '%' : '—'} nom − ${ieL != null ? ieL.toFixed(2) + '%' : '—'} infl.exp</div>
-      </div>
-      <div class="rcm-pd-kv"><div class="rcm-pd-lbl">Short real rate (${shortCcy})</div>
-        <div class="rcm-pd-val ${_rcmRrClass(rrS)}">${_rcmRrFmt(rrS)}</div>
-        <div class="rcm-pd-sub">${nomS != null ? nomS.toFixed(2) + '%' : '—'} nom − ${ieS != null ? ieS.toFixed(2) + '%' : '—'} infl.exp</div>
-      </div>
-      <div class="rcm-pd-kv"><div class="rcm-pd-lbl">Nominal carry/vol</div>
-        <div class="rcm-pd-val">${nomCarryVol ?? '—'}</div>
-        <div class="rcm-pd-sub">HV30 ${hv30 ? hv30.toFixed(1) + '%' : 'n/a'}</div>
-      </div>
-      <div class="rcm-pd-kv"><div class="rcm-pd-lbl">Real carry/vol</div>
-        <div class="rcm-pd-val">${realCarryVol ?? '—'}</div>
-        <div class="rcm-pd-sub">Real spread / HV30</div>
-      </div>
-      <div class="rcm-pd-kv"><div class="rcm-pd-lbl">OIS bias (${longCcy})</div>
-        <div class="rcm-pd-val" style="font-size:12px;">${_rcmBiasChip(biasL)}</div>
-        <div class="rcm-pd-sub">${biasL?.method || '—'}</div>
-      </div>
-      <div class="rcm-pd-kv"><div class="rcm-pd-lbl">OIS bias (${shortCcy})</div>
-        <div class="rcm-pd-val" style="font-size:12px;">${_rcmBiasChip(biasS)}</div>
-        <div class="rcm-pd-sub">${biasS?.method || '—'}</div>
-      </div>
+  <div class="rcm-pd-wrap">
+  <div class="rcm-pd-header">
+    <div class="rcm-pd-pair">${longCcy} / ${shortCcy}</div>
+    <div class="rcm-pd-dir">—</div>
+    <div class="rcm-pd-dir">Long ${longCcy} / Short ${shortCcy}</div>
+  </div>
+  <div class="rcm-pd-row-grid">
+    <div class="rcm-pd-cell">
+      <div class="rcm-pd-cell-lbl">Nominal carry</div>
+      <div class="rcm-pd-cell-val ${_rcmRrClass(nomSpread)}">${fmt(nomSpread, '%')}</div>
+      <div class="rcm-pd-cell-sub">${_RCM_CB[longCcy]} ${nomL != null ? nomL.toFixed(2) + '%' : '—'} − ${_RCM_CB[shortCcy]} ${nomS != null ? nomS.toFixed(2) + '%' : '—'}</div>
     </div>
-    ${sustainText ? `<div class="rcm-sustain ${sustainCls}">${sustainText}</div>` : ''}
-    <div class="rcm-src-note">
-      Infl. Exp. source — ${longCcy}: ${_RCM_IE_SRC[longCcy] || '—'} · ${shortCcy}: ${_RCM_IE_SRC[shortCcy] || '—'}<br>
-      Real carry/vol = |real spread| / HV30 (30-day realised vol, annualised)
+    <div class="rcm-pd-cell">
+      <div class="rcm-pd-cell-lbl">Real carry</div>
+      <div class="rcm-pd-cell-val ${_rcmRrClass(realSpread)}">${fmt(realSpread, '%')}</div>
+      <div class="rcm-pd-cell-sub">After inflation expectations</div>
     </div>
+    <div class="rcm-pd-cell">
+      <div class="rcm-pd-cell-lbl">Long real rate (${longCcy})</div>
+      <div class="rcm-pd-cell-val ${_rcmRrClass(rrL)}">${_rcmRrFmt(rrL)}</div>
+      <div class="rcm-pd-cell-sub">${nomL != null ? nomL.toFixed(2) + '%' : '—'} nom − ${ieL != null ? ieL.toFixed(2) + '%' : '—'} infl.exp</div>
+    </div>
+  </div>
+  <div class="rcm-rate-bars">
+    <div class="rcm-rb-title">Real rate positioning — G8 (long ${longCcy} highlighted)</div>
+    ${barRows}
+  </div>
+  <div class="rcm-vol-row">
+    <div class="rcm-vol-cell">
+      <div class="rcm-vol-lbl">Short real rate (${shortCcy})</div>
+      <div class="rcm-vol-val ${_rcmRrClass(rrS)}">${_rcmRrFmt(rrS)}</div>
+      <div class="rcm-vol-sub">${nomS != null ? nomS.toFixed(2) + '%' : '—'} nom − ${ieS != null ? ieS.toFixed(2) + '%' : '—'} infl.exp</div>
+    </div>
+    <div class="rcm-vol-cell">
+      <div class="rcm-vol-lbl">Nominal carry / vol</div>
+      <div class="rcm-vol-val">${nomCarryVol ?? '—'}</div>
+      <div class="rcm-vol-sub">HV30 ${hv30 ? hv30.toFixed(1) + '%' : 'n/a'}</div>
+    </div>
+    <div class="rcm-vol-cell">
+      <div class="rcm-vol-lbl">Real carry / vol</div>
+      <div class="rcm-vol-val">${realCarryVol ?? '—'}</div>
+      <div class="rcm-vol-sub">Real spread / HV30</div>
+    </div>
+  </div>
+  <div class="rcm-ois-row">
+    <div class="rcm-ois-cell">
+      <div class="rcm-ois-lbl">OIS bias (${longCcy})</div>
+      ${_rcmBiasChip(biasL)}
+      <div class="rcm-ois-sub">${biasL?.method || '—'}</div>
+    </div>
+    <div class="rcm-ois-cell">
+      <div class="rcm-ois-lbl">OIS bias (${shortCcy})</div>
+      ${_rcmBiasChip(biasS)}
+      <div class="rcm-ois-sub">${biasS?.method || '—'}</div>
+    </div>
+  </div>
+  ${sustainText ? `<div class="rcm-sustain ${sustainCls}">${sustainText}</div>` : ''}
+  <div class="rcm-src-note" style="padding:8px 14px;font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);line-height:1.6;border-top:1px solid var(--border2);">
+    Infl. Exp. source — ${longCcy}: ${_RCM_IE_SRC[longCcy] || '—'} · ${shortCcy}: ${_RCM_IE_SRC[shortCcy] || '—'}<br>
+    Real carry/vol = |real spread| / HV30 (30-day realised vol, annualised)
+  </div>
   </div>`;
 }
 
-// ── Modal render ─────────────────────────────────────────────────────────────
 function _rcmRender() {
   const modal = document.getElementById('rcm-body');
   if (!modal) return;
@@ -633,7 +783,17 @@ function _rcmRender() {
     content = _rcmRenderPairDetail(l, s);
   }
 
-  modal.innerHTML = `<div class="rcm-panel on" style="overflow:auto;">${content}</div>`;
+  modal.innerHTML = `<div class="rcm-panel on" style="overflow-y:visible;overflow-x:hidden;width:100%;box-sizing:border-box;">${content}</div>`;
+
+  // Update header pair name
+  const titleEl = document.getElementById('rcm-title');
+  if (titleEl) {
+    if (_rcmActiveTab === 'detail' && _rcmActivePair) {
+      titleEl.textContent = _rcmActivePair.replace('/', ' / ');
+    } else {
+      titleEl.textContent = 'Real Rate Carry Analysis';
+    }
+  }
 
   // Update summary metrics bar
   _rcmUpdateMetrics();
@@ -675,8 +835,15 @@ function _rcmUpdateMetrics() {
   }
   if (elSrc) {
     const usdFresh = d.inflExp['USD']?.live;
-    elSrc.querySelector('.rcm-mm-val').textContent = usdFresh ? 'Live' : 'Batch';
-    elSrc.querySelector('.rcm-mm-sub').textContent = usdFresh ? 'USD/EUR: FRED live' : 'extended-data batch';
+    elSrc.querySelector('.rcm-mm-lbl').textContent = 'Infl. Exp.';
+    elSrc.querySelector('.rcm-mm-val').textContent = usdFresh ? 'FRED · IMF' : 'IMF · OECD';
+    elSrc.querySelector('.rcm-mm-sub').textContent = usdFresh ? 'USD/EUR: live breakeven' : 'CPI proxy · weekly';
+  }
+
+  const elPos = document.getElementById('rcm-mm-positive');
+  if (elPos) {
+    const posCount = _RCM_G8.filter(c => (d.realRates[c] ?? -99) > 0).length;
+    elPos.querySelector('.rcm-mm-val').textContent = `${posCount} / ${_RCM_G8.length}`;
   }
 }
 
@@ -724,7 +891,6 @@ function _rcmBuildDOM() {
   <div id="rcm-modal" role="document">
     <div id="rcm-hd">
       <div id="rcm-hd-left">
-        <span class="rcm-badge">Real Rate Carry</span>
         <div id="rcm-title">Real Rate Carry Analysis</div>
         <div id="rcm-sub">Nominal CB rate &minus; Inflation Expectation (breakeven / CPI proxy) &middot; G8</div>
       </div>
@@ -742,13 +908,18 @@ function _rcmBuildDOM() {
         <div class="rcm-mm-sub">—</div>
       </div>
       <div class="rcm-mm" id="rcm-mm-spread">
-        <div class="rcm-mm-lbl">Max Real Spread</div>
+        <div class="rcm-mm-lbl">Max real spread</div>
         <div class="rcm-mm-val">—</div>
         <div class="rcm-mm-sub">—</div>
       </div>
+      <div class="rcm-mm" id="rcm-mm-positive">
+        <div class="rcm-mm-lbl">Pairs w/ + real</div>
+        <div class="rcm-mm-val" style="color:var(--text2);">—</div>
+        <div class="rcm-mm-sub">G8 currencies</div>
+      </div>
       <div class="rcm-mm" id="rcm-mm-src">
-        <div class="rcm-mm-lbl">Data Source</div>
-        <div class="rcm-mm-val" style="font-size:12px;">—</div>
+        <div class="rcm-mm-lbl">Infl. Exp.</div>
+        <div class="rcm-mm-val">—</div>
         <div class="rcm-mm-sub">—</div>
       </div>
     </div>
