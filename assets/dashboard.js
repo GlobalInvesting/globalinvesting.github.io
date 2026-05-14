@@ -6852,6 +6852,12 @@ async function fetchFedExpectations() {
         const pCut  = (meetings?.cutProb  != null && !isNaN(meetings.cutProb))  ? Math.min(100, Math.max(0, meetings.cutProb))  : null;
         const pHike = (meetings?.hikeProb != null && !isNaN(meetings.hikeProb)) ? Math.min(100, Math.max(0, meetings.hikeProb)) : null;
 
+        // Per-bank standard move size (Bloomberg WIRP convention):
+        // BoJ historically moves in 10bp increments; SNB uses 25bp standard (may use 50bp).
+        // All others: 25bp standard.
+        const CB_STEP = { JPY: 0.10, CHF: 0.25 };
+        const cbStep  = CB_STEP[ccy] ?? 0.25;
+
         if (pCut !== null || pHike !== null) {
           // Priority 2: probability-weighted — Bloomberg WIRP standard
           const cut  = pCut  ?? 0;
@@ -6859,13 +6865,14 @@ async function fetchFedExpectations() {
           // Clamp residual so probabilities never exceed 100%
           const cutC  = Math.min(cut,  100);
           const hikeC = Math.min(hike, 100 - cutC);
-          const implied = current + (hikeC / 100) * 0.25 - (cutC / 100) * 0.25;
+          const implied = current + (hikeC / 100) * cbStep - (cutC / 100) * cbStep;
           fwdDisplay = Math.max(0, implied).toFixed(2) + '%';
         } else {
-          // Priority 3: no probabilities available — naive ±25bp step, ~ signals estimate
+          // Priority 3: no probabilities available — naive ±step, ~ signals estimate
           const dir  = meetingBias ?? trendDir;
-          const step = dir === 'down' ? -0.25 : dir === 'up' ? 0.25 : 0;
+          const step = dir === 'down' ? -cbStep : dir === 'up' ? cbStep : 0;
           fwdDisplay = '~' + Math.max(0, current + step).toFixed(2) + '%';
+        }
         }
       }
 
@@ -7047,7 +7054,7 @@ async function fetchOptionSkew() {
         const td0Ex    = pairTip?.ex   || '';
         const td1Title = 'ATM Implied Volatility · ' + p.pair;
         const td1Body  = `ATM IV ${ivStr} from CBOE/CME FX Volatility Index (${etfIv.source || 'CBOE/CME'}) — variance-swap methodology, same as VIX. Institutional benchmark for OTC interbank implied vol. Green ≤7% (cheap vol); red >12% (expensive).`;
-        const td1Ex    = 'CBOE/CME FX Volatility Indexes use the same variance-swap replication as VIX. CHF and CAD fall through to CME futures options or CBOE ETF when no dedicated index exists. All values have ~15min delay.';
+        const td1Ex    = 'CBOE/CME FX Volatility Indexes use the same variance-swap replication as VIX. EUR/GBP/JPY/AUD have dedicated indexes; CHF and CAD fall to COT-derived proxy when no CBOE/CME index is available. All values have ~15min delay.';
         const td3Title = p.pair + ' — Directional Bias';
         const td3Body  = pairTip?.body || '';
         const td3Ex    = pairTip?.ex   || '';
@@ -7084,7 +7091,7 @@ async function fetchOptionSkew() {
         const td0BodyCot  = pairTipCot?.body || '';
         const td0ExCot    = pairTipCot?.ex   || '';
         const td12Title   = 'COT Directional Skew · ' + p.pair;
-        const td12Body    = 'COT-derived skew proxy — ETF IV unavailable for this pair. Derived from CFTC Leveraged Funds net positioning. 1W = current week net skew; 1M = smoothed (×0.85 decay).';
+        const td12Body    = 'est. via COT — no CBOE/CME volatility index available for this pair. Derived from CFTC Leveraged Funds net positioning (Disaggregated TFF · Options+Futures Combined). 1W = current week net skew; 1M = smoothed (×0.85 decay).';
         const td3TitleCot = p.pair + ' — Directional Bias';
         const td3BodyCot  = pairTipCot?.body || '';
         const td3ExCot    = pairTipCot?.ex   || '';
