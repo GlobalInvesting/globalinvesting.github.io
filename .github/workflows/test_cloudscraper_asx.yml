@@ -1,4 +1,3 @@
-```yaml
 name: test-cloudscraper-asx-ib
 
 on:
@@ -11,57 +10,54 @@ jobs:
       - name: Install dependencies
         run: pip install cloudscraper --break-system-packages
 
-      - name: Search markitcdn JS bundles for API paths
+      - name: Write test script
         run: |
-          python3 << 'EOFPYTHON'
+          cat > test_asx.py << 'PYEOF'
           import cloudscraper, re
 
           scraper = cloudscraper.create_scraper(
-              browser={'browser': 'chrome', 'platform': 'linux', 'mobile': False}
+              browser={"browser": "chrome", "platform": "linux", "mobile": False}
           )
 
-          v = '45d2cb0245ec3d637b28c065d06d8bed94c6b642'
+          v = "45d2cb0245ec3d637b28c065d06d8bed94c6b642"
           bundles = [
-              f'https://content.markitcdn.com/asx.markitdigital.com/js/manifest.js?v={v}',
-              f'https://content.markitcdn.com/asx.markitdigital.com/js/vendor.js?v={v}',
-              f'https://content.markitcdn.com/asx.markitdigital.com/js/common.js?v={v}',
+              "https://content.markitcdn.com/asx.markitdigital.com/js/manifest.js?v=" + v,
+              "https://content.markitcdn.com/asx.markitdigital.com/js/vendor.js?v=" + v,
+              "https://content.markitcdn.com/asx.markitdigital.com/js/common.js?v=" + v,
           ]
 
           for url in bundles:
-              name = url.split('/')[-1].split('?')[0]
+              name = url.split("/")[-1].split("?")[0]
               r = scraper.get(url, timeout=20)
-              print(f"\n--- {name}: {r.status_code} {len(r.text)} bytes ---")
+              print("\n--- " + name + ": " + str(r.status_code) + " " + str(len(r.text)) + " bytes ---")
               if r.status_code != 200:
                   continue
-
               js = r.text
 
-              # Broad search: any path with /1.0/ or /2.0/ (REST API convention)
-              paths = re.findall(r'["`](/(?:asx-research|api)[^"`\s]{5,100})["`]', js)
+              paths = re.findall(r'"/(?:asx-research|api)[^"\s]{5,100}"', js)
               if paths:
-                  print(f"REST paths ({len(paths)}):")
+                  print("REST paths (" + str(len(paths)) + "):")
                   for p in sorted(set(paths))[:20]:
-                      print(f"  {p}")
+                      print("  " + p)
 
-              # Search for 'IB' near quotes (futures product code)
-              ib_ctx = re.findall(r'.{0,40}["`]IB["`].{0,40}', js)
+              ib_ctx = re.findall(r'.{0,40}"IB".{0,40}', js)
               if ib_ctx:
-                  print(f"\n'IB' string contexts ({len(ib_ctx)}):")
+                  print("IB contexts (" + str(len(ib_ctx)) + "):")
                   for c in ib_ctx[:10]:
-                      print(f"  {c.strip()}")
+                      print("  " + c.strip())
 
-              # Search for 'interbank' or 'cash.rate' or 'rba' in JS strings
-              keywords = re.findall(r'["`][^"`]{0,30}(?:interbank|cashrate|cash_rate|rba|RBA|TargetRate)[^"`]{0,30}["`]', js, re.I)
+              keywords = re.findall(r'"[^"]{0,30}(?:interbank|cashrate|cash_rate|rba|RBA|TargetRate)[^"]{0,30}"', js)
               if keywords:
-                  print(f"\nKeyword contexts ({len(keywords)}):")
+                  print("Keywords (" + str(len(keywords)) + "):")
                   for k in keywords[:10]:
-                      print(f"  {k.strip()}")
+                      print("  " + k.strip())
 
-              # Search for any markitdigital.com URLs
-              mkit = re.findall(r'markitdigital\.com[^"`\s]{0,80}', js)
+              mkit = re.findall(r'markitdigital\.com[^"\s]{0,80}', js)
               if mkit:
-                  print(f"\nmarkitdigital refs ({len(mkit)}):")
+                  print("markitdigital refs (" + str(len(mkit)) + "):")
                   for m in sorted(set(mkit))[:15]:
-                      print(f"  {m}")
-          EOFPYTHON
-```
+                      print("  " + m)
+          PYEOF
+
+      - name: Run test script
+        run: python3 test_asx.py
