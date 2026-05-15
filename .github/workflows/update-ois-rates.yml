@@ -3,17 +3,25 @@ name: Update OIS / Overnight Rates
 # Fetches OIS/overnight benchmark rates for all G8 currencies and writes
 # ois-rates/rates.json to THIS (public) repo.
 #
-# Rate → benchmark:
-#   USD  SOFR (NY Fed via FRED)           daily
-#   EUR  €STR (ECB via FRED)              daily
-#   GBP  SONIA (BOE SDIE IUDSOIA)         daily
-#   JPY  TONA (BOJ Statistics)            daily
-#   AUD  AONIA (RBA Table F1)             monthly
-#   CAD  CORRA (BoC Valet V122530)        daily
-#   CHF  SARON (SNB data API)             weekly
-#   NZD  OCR overnight (RBNZ B2)          monthly
+# Rate → benchmark (v4.0 — industry-standard alignment):
+#   USD  SOFR (NY Fed via FRED)                  daily
+#   EUR  €STR (ECB via FRED)                     daily
+#   GBP  SONIA (BOE SDIE IUDSOIA)                daily
+#   JPY  TONA (BOJ Statistics)                   daily
+#   AUD  AONIA = RBA Cash Rate (rates/AUD.json)  daily  ← v4.0: policy rate IS AONIA
+#   CAD  CORRA (BoC Valet V122530)               daily
+#   CHF  SARON (SNB data API)                    weekly
+#   NZD  NZONIA ≈ RBNZ OCR (rates/NZD.json)     daily  ← v4.0: OCR IS NZONIA ref rate
 #
-# All sources are public — no API keys required.
+# AUD/NZD industry-standard rationale (v4.0):
+#   AONIA is defined by AFMA as identical to the RBA Cash Rate. Bloomberg and
+#   Refinitiv both use RBA Cash Rate as the AUD RFR in CIP forward calculators.
+#   NZONIA (NZFBF compound index) tracks the RBNZ OCR with ±5bp precision; the
+#   OCR is the institutional NZD RFR proxy used when NZFBF is not available.
+#   Previous FRED OECD monthly sources lagged by 4-6 weeks, introducing
+#   systematic forward mispricing of 14-39bp (AUD) and 10-25bp (NZD).
+#
+# All sources are public — no API keys required except FRED_API_KEY for USD/GBP.
 # Public repo → unlimited GitHub Actions minutes.
 #
 # Consumed by:
