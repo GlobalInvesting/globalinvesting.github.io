@@ -8,79 +8,61 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
-        run: pip install cloudscraper pypdf2 pdfplumber --break-system-packages
+        run: pip install cloudscraper pdfplumber --break-system-packages
 
-      - name: Test 1 - Parse ASX IB curve PDF
+      - name: Test PDF date and parse implied yields
         run: |
           python3 << 'EOFPYTHON'
           import cloudscraper, io, re
+          from datetime import date
 
           scraper = cloudscraper.create_scraper(
               browser={'browser': 'chrome', 'platform': 'linux', 'mobile': False}
           )
 
-          print("--- Fetching ASX IB expectation curve PDF ---")
           r = scraper.get(
               'https://www.asx.com.au/data/trt/ib_expectation_curve_graph.pdf',
               timeout=20
           )
           print(f"Status: {r.status_code}  Size: {len(r.content)} bytes")
 
-          # Try pdfplumber first (better text extraction)
-          try:
-              import pdfplumber
-              with pdfplumber.open(io.BytesIO(r.content)) as pdf:
-                  for i, page in enumerate(pdf.pages):
-                      text = page.extract_text()
-                      print(f"\n--- Page {i+1} text ---")
-                      print(text[:2000] if text else "(no text)")
-          except Exception as e:
-              print(f"pdfplumber error: {e}")
-              # Fallback to PyPDF2
-              try:
-                  import PyPDF2
-                  reader = PyPDF2.PdfReader(io.BytesIO(r.content))
-                  for i, page in enumerate(reader.pages):
-                      text = page.extract_text()
-                      print(f"\n--- Page {i+1} text ---")
-                      print(text[:2000] if text else "(no text)")
-              except Exception as e2:
-                  print(f"PyPDF2 error: {e2}")
-          EOFPYTHON
+          # Check HTTP headers for Last-Modified date
+          print(f"Last-Modified: {r.headers.get('Last-Modified', 'not set')}")
+          print(f"ETag: {r.headers.get('ETag', 'not set')}")
+          print(f"Cache-Control: {r.headers.get('Cache-Control', 'not set')}")
+          print(f"Date: {r.headers.get('Date', 'not set')}")
+          print()
 
-      - name: Test 2 - Probe markitdigital API paths
-        run: |
-          python3 << 'EOFPYTHON'
-          import cloudscraper, json
+          import pdfplumber
+          with pdfplumber.open(io.BytesIO(r.content)) as pdf:
+              text = pdf.pages[0].extract_text()
 
-          scraper = cloudscraper.create_scraper(
-              browser={'browser': 'chrome', 'platform': 'linux', 'mobile': False}
-          )
+          # Extract the "As at market close on DD Month YYYY" date
+          date_match = re.search(r'As at market close on (.+?)(?:\n|$)', text)
+          if date_match:
+              print(f"PDF internal date: {date_match.group(1).strip()}")
+          else:
+              print("PDF date: NOT FOUND")
 
-          # Probe markitdigital systematically - we know it responds JSON (not Cloudflare block)
-          # Try to find the correct path for IB futures data
-          base = 'https://asx.api.markitdigital.com'
-          paths = [
-              '/asx-research/1.0/derivatives/interest-rates',
-              '/asx-research/1.0/derivatives',
-              '/asx-research/1.0/derivatives/futures/IB',
-              '/asx-research/1.0/derivatives/futures?productCode=IB',
-              '/asx-research/1.0/derivatives/futures?type=IB',
-              '/asx-research/1.0/market/interest-rates/IB',
-              '/asx-research/1.0/market/derivatives/IB',
-              '/asx-research/1.0/products/IB',
-              '/asx-research/1.0/products/futures/IB',
-          ]
+          print(f"Today: {date.today()}")
+          print()
 
-          for path in paths:
-              try:
-                  r = scraper.get(base + path, timeout=10)
-                  body = r.text[:150].replace('\n',' ')
-                  print(f"[{r.status_code}] {path}")
-                  if r.status_code == 200:
-                      print(f"  ✅ BODY: {body}")
-                  else:
-                      print(f"  {body}")
-              except Exception as e:
-                  print(f"[ERR] {path}: {e}")
+          # Extract month labels and implied yields
+          # Format: "Jun-23 Jul-23 Aug-23 ..."  then "Implied Yield 4.015 4.170 ..."
+          months_match = re.search(r'((?:[A-Z][a-z]{2}-\d{2}\s+){3,})', text)
+          yields_match = re.search(r'Implied Yield\s+([\d\.\s]+)', text)
+
+          if months_match and yields_match:
+              months = months_match.group(1).strip().split()
+              yields = [float(x) for x in yields_match.group(1).strip().split()]
+              print(f"Months found: {months}")
+              print(f"Yields found: {yields}")
+              print()
+              print("--- Implied curve ---")
+              for m, y in zip(months, yields):
+                  print(f"  {m}: {y:.3f}%")
+          else:
+              print("Could not parse months/yields")
+              print("Raw text:")
+              print(text)
           EOFPYTHON
