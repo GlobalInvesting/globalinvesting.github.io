@@ -1,6 +1,5 @@
 name: Update OHLC Chart Data
 
-# Runs once daily after NY close.
 # Downloads 3 years of daily OHLC bars for all 38 chart symbols via yfinance
 # and writes ohlc-data/{id}.json to THIS (public) repo.
 #
@@ -10,14 +9,24 @@ name: Update OHLC Chart Data
 # Files are REPLACED on every run — repo size stays fixed (~1.7 MB raw).
 #
 # Schedule:
-#   Mon–Fri 22:30 UTC — after NY equity close, before Sydney open. Covers all
-#     non-crypto symbols (FX, Gold, WTI, indices, yields). dashboard.js injects
-#     the live today-bar from quotes.json (refreshed every 5 min) so the
-#     21:00–22:30 UTC window is covered without a second weekday run.
-#   Sat–Sun 23:30 UTC — crypto-only run. BTC and ETH trade 24/7; without a
-#     weekend run, the Friday script would write a partial Saturday bar (~22.5h)
-#     that persists all weekend with truncated H/L wicks. The 23:30 UTC timing
-#     ensures the UTC calendar day (00:00–24:00 UTC) is nearly complete before
+#   Tue–Sat 01:30 UTC — Main weekday run (after FX session finalization).
+#     The FX trading day closes at 21:00 UTC. The last 1H bar of each session
+#     (20:00–21:00 UTC) closes at 21:00 UTC, but yfinance has a finalization lag
+#     of 15–90 minutes: H/L/C values for the most recent 1H bars remain provisional
+#     in Yahoo Finance's feed for up to ~1 hour after bar close. Running at 22:30 UTC
+#     (only 90 min after session close) wrote provisional data that appeared as
+#     candles with wrong wicks or body vs TradingView and Bloomberg — the persistent
+#     nightly FX candle bug. Moving to 01:30 UTC (4.5h after session close) ensures
+#     all yfinance 1H FX data is 100% finalized before the JSON is written.
+#     Runs Tue–Sat UTC: covers the Mon–Fri FX sessions (Mon session correction runs
+#     Tue 01:30 UTC, …, Fri session correction runs Sat 01:30 UTC).
+#     dashboard.js injects the live today-bar from quotes.json (refreshed every 5 min)
+#     covering the 21:00–01:30 UTC window without any static data gap.
+#
+#   Sat–Sun 23:30 UTC — Crypto weekend run. BTC and ETH trade 24/7; without a
+#     weekend run the Friday script would write a partial Saturday bar (~22.5h) that
+#     persists all weekend with truncated H/L wicks. The 23:30 UTC timing ensures
+#     the UTC calendar day (00:00–24:00 UTC) is nearly complete before
 #     fetch_ohlc.py strips the in-progress today-bar and writes the final JSON.
 #     All non-crypto symbols are also refreshed (no-op cost — same script).
 #
@@ -27,7 +36,7 @@ name: Update OHLC Chart Data
 
 on:
   schedule:
-    - cron: '30 22 * * 1-5'   # 22:30 UTC Mon–Fri — authoritative daily close (after NY close, before Sydney open)
+    - cron: '30  1 * * 2-6'   # 01:30 UTC Tue–Sat — after FX session data finalization (was 22:30 UTC, caused nightly candle bug)
     - cron: '30 23 * * 0,6'   # 23:30 UTC Sat–Sun  — crypto weekend bars (BTC, ETH trade 24/7)
   workflow_dispatch:             # manual trigger for backfill / testing
 
