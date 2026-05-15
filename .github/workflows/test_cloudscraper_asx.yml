@@ -10,54 +10,50 @@ jobs:
       - name: Install dependencies
         run: pip install cloudscraper --break-system-packages
 
-      - name: Intercept ASX Rate Tracker API calls
+      - name: Probe rate_tracker_calc.htm and markitcdn JS
         run: |
           python3 << 'EOFPYTHON'
-          import cloudscraper, re, json
+          import cloudscraper, re
 
           scraper = cloudscraper.create_scraper(
               browser={'browser': 'chrome', 'platform': 'linux', 'mobile': False}
           )
 
-          # Step 1: Fetch the Rate Tracker page and extract all JS bundle URLs
-          print("--- Step 1: Fetch Rate Tracker page ---")
+          # Test 1: rate_tracker_calc.htm - may contain raw data
+          print("--- Test 1: rate_tracker_calc.htm ---")
           r = scraper.get(
-              'https://www.asx.com.au/markets/trade-our-derivatives-market/futures-market/rba-rate-tracker',
-              timeout=20
+              'https://www.asx.com.au/data/trt/rate_tracker_calc.htm',
+              timeout=15
           )
-          print(f"Status: {r.status_code}  Size: {len(r.text)}")
-
-          # Extract all script src URLs
-          scripts = re.findall(r'src=["\']([^"\']+\.js[^"\']*)["\']', r.text)
-          print(f"JS bundles found: {len(scripts)}")
-          for s in scripts:
-              print(f"  {s}")
-
-          # Also look for any API URLs directly in the HTML
-          api_hints = re.findall(r'(https?://[^\s"\'<>]+(?:api|data|json|curve|futures|interbank)[^\s"\'<>]*)', r.text, re.I)
-          print(f"\nAPI hints in HTML: {len(api_hints)}")
-          for h in api_hints[:20]:
-              print(f"  {h}")
+          print(f"Status: {r.status_code}  CT: {r.headers.get('Content-Type','')}")
+          print(f"Last-Modified: {r.headers.get('Last-Modified','not set')}")
+          print(r.text[:3000])
 
           print()
 
-          # Step 2: Fetch the main JS bundle and search for API endpoints
-          print("--- Step 2: Search JS bundles for API endpoints ---")
-          for script_url in scripts[:5]:  # check first 5 bundles
-              if not script_url.startswith('http'):
-                  script_url = 'https://www.asx.com.au' + script_url
-              try:
-                  jr = scraper.get(script_url, timeout=15)
-                  if jr.status_code == 200:
-                      # Search for markitdigital or other API URLs
-                      endpoints = re.findall(
-                          r'["\`]((?:https?://)?[^\s"\'`]+(?:markitdigital|api\.asx|data/trt|interbank|IB)[^\s"\'`]*)["\`]',
-                          jr.text, re.I
-                      )
-                      if endpoints:
-                          print(f"\n  {script_url.split('/')[-1]}:")
-                          for ep in set(endpoints)[:15]:
-                              print(f"    {ep}")
-              except Exception as e:
-                  print(f"  ERR {script_url}: {e}")
+          # Test 2: common.js from markitcdn - has the API endpoints hardcoded
+          print("--- Test 2: markitcdn common.js API endpoints ---")
+          r2 = scraper.get(
+              'https://content.markitcdn.com/asx.markitdigital.com/js/common.js?v=45d2cb0245ec3d637b28c065d06d8bed94c6b642',
+              timeout=20
+          )
+          print(f"Status: {r2.status_code}  Size: {len(r2.text)}")
+          if r2.status_code == 200:
+              # Find all API endpoint patterns
+              endpoints = re.findall(
+                  r'["\`](/[^\s"\'`]{5,80}(?:interbank|IB|futures|curve|cash.rate|rba|rate.tracker)[^\s"\'`]*)["\`]',
+                  r2.text, re.I
+              )
+              print(f"API paths found: {len(endpoints)}")
+              for ep in sorted(set(endpoints))[:30]:
+                  print(f"  {ep}")
+
+              # Also search for full URLs
+              full_urls = re.findall(
+                  r'["\`](https?://[^\s"\'`]{10,120}(?:interbank|IB|futures|curve|cash|rba)[^\s"\'`]*)["\`]',
+                  r2.text, re.I
+              )
+              print(f"\nFull URLs found: {len(full_urls)}")
+              for u in sorted(set(full_urls))[:20]:
+                  print(f"  {u}")
           EOFPYTHON
