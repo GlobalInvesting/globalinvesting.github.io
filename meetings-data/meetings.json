@@ -149,12 +149,12 @@
         "8 Dec"
       ],
       "source": "rba.gov.au",
-      "bias": "hike",
+      "bias": "cut",
       "biasSource": "ASX 30-day IB Cash Rate Futures (ib_expectation_curve_0.json) → RBA Statistics API (A3 cash rate) → FRED IRSTCI01AUM156N (OECD overnight · monthly, two-sided stale guard) vs RBA target → rates/AUD.json trajectory fallback",
-      "biasMethod": "heuristic",
+      "biasMethod": "ois",
       "biasUpdated": "2026-05-15",
-      "cutProb": null,
-      "hikeProb": null
+      "cutProb": 100,
+      "hikeProb": 0
     },
     "CAD": {
       "nextMeeting": "10 Jun",
