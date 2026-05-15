@@ -10,86 +10,39 @@ jobs:
       - name: Install dependencies
         run: pip install cloudscraper --break-system-packages
 
-      - name: Test ASX IB futures via cloudscraper
+      - name: Test ASX endpoints via cloudscraper
         run: |
           python3 << 'EOFPYTHON'
-          import cloudscraper
-          import json
+          import cloudscraper, json
 
           scraper = cloudscraper.create_scraper(
-              browser={
-                  'browser': 'chrome',
-                  'platform': 'linux',
-                  'mobile': False
-              }
+              browser={'browser': 'chrome', 'platform': 'linux', 'mobile': False}
           )
 
-          # Test 1: ASX ib_expectation_curve_0.json (el JSON que ya teníamos)
-          print("--- Test 1: ASX ib_expectation_curve_0.json ---")
-          try:
-              r = scraper.get(
-                  'https://www.asx.com.au/data/trt/ib_expectation_curve_0.json',
-                  timeout=15
-              )
-              print(f"Status: {r.status_code}")
-              print(f"Content-Type: {r.headers.get('Content-Type','')}")
-              print(f"Body[:300]: {r.text[:300]}")
-          except Exception as e:
-              print(f"ERROR: {e}")
+          # Probe multiple candidate ASX URLs for the IB curve data
+          urls = [
+              # Original (devolvió 404)
+              'https://www.asx.com.au/data/trt/ib_expectation_curve_0.json',
+              # Variantes comunes tras migraciones ASX
+              'https://www.asx.com.au/data/trt/ib_expectation_curve.json',
+              'https://www.asx.com.au/data/trt/ib_expectation_curve_1.json',
+              'https://www.asx.com.au/data/trt/TargetRateTracker.json',
+              # API markitdigital que usa el Rate Tracker de ASX internamente
+              'https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rates/interbank-cash-rate/curve',
+              'https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rates/IB/curve',
+              'https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rates/IB/futures',
+              # PDF (a veces accesible cuando el JSON no lo es)
+              'https://www.asx.com.au/data/trt/ib_expectation_curve_graph.pdf',
+          ]
 
-          print()
-
-          # Test 2: Yahoo Finance v8 API para IBV6.AX
-          print("--- Test 2: Yahoo Finance v8 IBV6.AX ---")
-          try:
-              r = scraper.get(
-                  'https://query1.finance.yahoo.com/v8/finance/chart/IBV6.AX?interval=1d&range=5d',
-                  timeout=15
-              )
-              print(f"Status: {r.status_code}")
-              if r.status_code == 200:
-                  data = r.json()
-                  result = data.get('chart', {}).get('result', [])
-                  if result:
-                      closes = result[0].get('indicators', {}).get('quote', [{}])[0].get('close', [])
-                      closes = [c for c in closes if c is not None]
-                      if closes:
-                          price = closes[-1]
-                          print(f"IBV6.AX price={price:.3f}  implied={100-price:.4f}%  OK")
-                      else:
-                          print("No close prices in response")
-                  else:
-                      print(f"No result: {r.text[:300]}")
-              else:
-                  print(f"Body[:200]: {r.text[:200]}")
-          except Exception as e:
-              print(f"ERROR: {e}")
-
-          print()
-
-          # Test 3: Yahoo Finance v8 para IBM6.AX (junio 2026 - la más relevante)
-          print("--- Test 3: Yahoo Finance v8 IBM6.AX ---")
-          try:
-              r = scraper.get(
-                  'https://query1.finance.yahoo.com/v8/finance/chart/IBM6.AX?interval=1d&range=5d',
-                  timeout=15
-              )
-              print(f"Status: {r.status_code}")
-              if r.status_code == 200:
-                  data = r.json()
-                  result = data.get('chart', {}).get('result', [])
-                  if result:
-                      closes = result[0].get('indicators', {}).get('quote', [{}])[0].get('close', [])
-                      closes = [c for c in closes if c is not None]
-                      if closes:
-                          price = closes[-1]
-                          print(f"IBM6.AX price={price:.3f}  implied={100-price:.4f}%  OK")
-                      else:
-                          print("No close prices in response")
-                  else:
-                      print(f"No result: {r.text[:300]}")
-              else:
-                  print(f"Body[:200]: {r.text[:200]}")
-          except Exception as e:
-              print(f"ERROR: {e}")
+          for url in urls:
+              try:
+                  r = scraper.get(url, timeout=15)
+                  ct = r.headers.get('Content-Type', '')
+                  body = r.text[:200].replace('\n', ' ')
+                  print(f"[{r.status_code}] {url.split('asx.com.au/')[-1]}")
+                  print(f"        CT={ct}  body={body[:120]}")
+              except Exception as e:
+                  print(f"[ERR] {url.split('/')[-1]}: {e}")
+              print()
           EOFPYTHON
