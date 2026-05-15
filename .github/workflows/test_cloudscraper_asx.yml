@@ -8,9 +8,47 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
-        run: pip install cloudscraper --break-system-packages
+        run: pip install cloudscraper pypdf2 pdfplumber --break-system-packages
 
-      - name: Test ASX endpoints via cloudscraper
+      - name: Test 1 - Parse ASX IB curve PDF
+        run: |
+          python3 << 'EOFPYTHON'
+          import cloudscraper, io, re
+
+          scraper = cloudscraper.create_scraper(
+              browser={'browser': 'chrome', 'platform': 'linux', 'mobile': False}
+          )
+
+          print("--- Fetching ASX IB expectation curve PDF ---")
+          r = scraper.get(
+              'https://www.asx.com.au/data/trt/ib_expectation_curve_graph.pdf',
+              timeout=20
+          )
+          print(f"Status: {r.status_code}  Size: {len(r.content)} bytes")
+
+          # Try pdfplumber first (better text extraction)
+          try:
+              import pdfplumber
+              with pdfplumber.open(io.BytesIO(r.content)) as pdf:
+                  for i, page in enumerate(pdf.pages):
+                      text = page.extract_text()
+                      print(f"\n--- Page {i+1} text ---")
+                      print(text[:2000] if text else "(no text)")
+          except Exception as e:
+              print(f"pdfplumber error: {e}")
+              # Fallback to PyPDF2
+              try:
+                  import PyPDF2
+                  reader = PyPDF2.PdfReader(io.BytesIO(r.content))
+                  for i, page in enumerate(reader.pages):
+                      text = page.extract_text()
+                      print(f"\n--- Page {i+1} text ---")
+                      print(text[:2000] if text else "(no text)")
+              except Exception as e2:
+                  print(f"PyPDF2 error: {e2}")
+          EOFPYTHON
+
+      - name: Test 2 - Probe markitdigital API paths
         run: |
           python3 << 'EOFPYTHON'
           import cloudscraper, json
@@ -19,30 +57,30 @@ jobs:
               browser={'browser': 'chrome', 'platform': 'linux', 'mobile': False}
           )
 
-          # Probe multiple candidate ASX URLs for the IB curve data
-          urls = [
-              # Original (devolvió 404)
-              'https://www.asx.com.au/data/trt/ib_expectation_curve_0.json',
-              # Variantes comunes tras migraciones ASX
-              'https://www.asx.com.au/data/trt/ib_expectation_curve.json',
-              'https://www.asx.com.au/data/trt/ib_expectation_curve_1.json',
-              'https://www.asx.com.au/data/trt/TargetRateTracker.json',
-              # API markitdigital que usa el Rate Tracker de ASX internamente
-              'https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rates/interbank-cash-rate/curve',
-              'https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rates/IB/curve',
-              'https://asx.api.markitdigital.com/asx-research/1.0/derivatives/interest-rates/IB/futures',
-              # PDF (a veces accesible cuando el JSON no lo es)
-              'https://www.asx.com.au/data/trt/ib_expectation_curve_graph.pdf',
+          # Probe markitdigital systematically - we know it responds JSON (not Cloudflare block)
+          # Try to find the correct path for IB futures data
+          base = 'https://asx.api.markitdigital.com'
+          paths = [
+              '/asx-research/1.0/derivatives/interest-rates',
+              '/asx-research/1.0/derivatives',
+              '/asx-research/1.0/derivatives/futures/IB',
+              '/asx-research/1.0/derivatives/futures?productCode=IB',
+              '/asx-research/1.0/derivatives/futures?type=IB',
+              '/asx-research/1.0/market/interest-rates/IB',
+              '/asx-research/1.0/market/derivatives/IB',
+              '/asx-research/1.0/products/IB',
+              '/asx-research/1.0/products/futures/IB',
           ]
 
-          for url in urls:
+          for path in paths:
               try:
-                  r = scraper.get(url, timeout=15)
-                  ct = r.headers.get('Content-Type', '')
-                  body = r.text[:200].replace('\n', ' ')
-                  print(f"[{r.status_code}] {url.split('asx.com.au/')[-1]}")
-                  print(f"        CT={ct}  body={body[:120]}")
+                  r = scraper.get(base + path, timeout=10)
+                  body = r.text[:150].replace('\n',' ')
+                  print(f"[{r.status_code}] {path}")
+                  if r.status_code == 200:
+                      print(f"  ✅ BODY: {body}")
+                  else:
+                      print(f"  {body}")
               except Exception as e:
-                  print(f"[ERR] {url.split('/')[-1]}: {e}")
-              print()
+                  print(f"[ERR] {path}: {e}")
           EOFPYTHON
