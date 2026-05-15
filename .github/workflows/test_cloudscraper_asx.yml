@@ -1,4 +1,4 @@
-name: test-cloudscraper-asx-ib
+name: test-investing-com-aud-ib
 
 on:
   workflow_dispatch:
@@ -8,56 +8,81 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
-        run: pip install cloudscraper --break-system-packages
+        run: pip install cloudscraper requests --break-system-packages
 
       - name: Write test script
         run: |
-          cat > test_asx.py << 'PYEOF'
-          import cloudscraper, re
+          cat > test_investing.py << 'PYEOF'
+          import cloudscraper, requests, json, datetime
+
+          RBA_RATE = 4.10  # current as of 2026-05
+          NEXT_MEETING = datetime.date(2026, 6, 16)
 
           scraper = cloudscraper.create_scraper(
               browser={"browser": "chrome", "platform": "linux", "mobile": False}
           )
 
-          v = "45d2cb0245ec3d637b28c065d06d8bed94c6b642"
-          bundles = [
-              "https://content.markitcdn.com/asx.markitdigital.com/js/manifest.js?v=" + v,
-              "https://content.markitcdn.com/asx.markitdigital.com/js/vendor.js?v=" + v,
-              "https://content.markitcdn.com/asx.markitdigital.com/js/common.js?v=" + v,
+          # -- Approach 1: Investing.com quote page (cloudscraper) --
+          print("=== Approach 1: cloudscraper quote page ===")
+          headers_a = {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+              "Accept-Language": "en-US,en;q=0.9",
+              "Referer": "https://www.investing.com/",
+          }
+          try:
+              r = scraper.get("https://www.investing.com/rates-bonds/aud-30-day-interbank", headers=headers_a, timeout=20)
+              print(f"  Status: {r.status_code}  CT: {r.headers.get('Content-Type','?')[:40]}")
+              print(f"  CF blocked: {'cf-ray' in r.headers}")
+              # Look for price in HTML
+              import re
+              prices = re.findall(r'"last_close"\s*:\s*"?([\d.]+)"?', r.text)
+              prices2 = re.findall(r'data-last-price="([\d.]+)"', r.text)
+              print(f"  prices found: {prices[:5]}")
+              print(f"  prices2 found: {prices2[:5]}")
+              print(f"  Body[:200]: {r.text[:200]}")
+          except Exception as e:
+              print(f"  ERROR: {e}")
+
+          # -- Approach 2: Investing.com internal API (instrument ID 8836) --
+          print()
+          print("=== Approach 2: Investing.com API (instrument 8836) ===")
+          api_headers = {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+              "X-Requested-With": "XMLHttpRequest",
+              "domain-id": "www",
+              "Referer": "https://www.investing.com/rates-bonds/aud-30-day-interbank",
+          }
+          endpoints = [
+              "https://api.investing.com/api/financialdata/8836/historical/chart/?period=P1W&pointscount=10",
+              "https://www.investing.com/rates-bonds/aud-30-day-interbank/historical-data",
           ]
+          for url in endpoints:
+              try:
+                  r = scraper.get(url, headers=api_headers, timeout=20)
+                  print(f"  [{r.status_code}] {url.split('/')[-2][:40]}")
+                  print(f"    CT: {r.headers.get('Content-Type','?')[:60]}")
+                  print(f"    Body[:300]: {r.text[:300]}")
+              except Exception as e:
+                  print(f"  ERROR {url[:50]}: {e}")
 
-          for url in bundles:
-              name = url.split("/")[-1].split("?")[0]
-              r = scraper.get(url, timeout=20)
-              print("\n--- " + name + ": " + str(r.status_code) + " " + str(len(r.text)) + " bytes ---")
-              if r.status_code != 200:
-                  continue
-              js = r.text
-
-              paths = re.findall(r'"/(?:asx-research|api)[^"\s]{5,100}"', js)
-              if paths:
-                  print("REST paths (" + str(len(paths)) + "):")
-                  for p in sorted(set(paths))[:20]:
-                      print("  " + p)
-
-              ib_ctx = re.findall(r'.{0,40}"IB".{0,40}', js)
-              if ib_ctx:
-                  print("IB contexts (" + str(len(ib_ctx)) + "):")
-                  for c in ib_ctx[:10]:
-                      print("  " + c.strip())
-
-              keywords = re.findall(r'"[^"]{0,30}(?:interbank|cashrate|cash_rate|rba|RBA|TargetRate)[^"]{0,30}"', js)
-              if keywords:
-                  print("Keywords (" + str(len(keywords)) + "):")
-                  for k in keywords[:10]:
-                      print("  " + k.strip())
-
-              mkit = re.findall(r'markitdigital\.com[^"\s]{0,80}', js)
-              if mkit:
-                  print("markitdigital refs (" + str(len(mkit)) + "):")
-                  for m in sorted(set(mkit))[:15]:
-                      print("  " + m)
+          # -- Approach 3: Stooq (Polish financial data, no bot protection) --
+          print()
+          print("=== Approach 3: Stooq AUD IB futures ===")
+          # Stooq sometimes has ASX data
+          stooq_urls = [
+              "https://stooq.com/q/d/l/?s=ibm6.ax&i=d",
+              "https://stooq.com/q/d/l/?s=ib.ax&i=d",
+              "https://stooq.pl/q/d/l/?s=ibm6.ax&i=d",
+          ]
+          for url in stooq_urls:
+              try:
+                  r = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+                  print(f"  [{r.status_code}] {url}")
+                  print(f"    Body[:200]: {r.text[:200]}")
+              except Exception as e:
+                  print(f"  ERROR {url}: {e}")
           PYEOF
 
-      - name: Run test script
-        run: python3 test_asx.py
+      - name: Run test
+        run: python3 test_investing.py
