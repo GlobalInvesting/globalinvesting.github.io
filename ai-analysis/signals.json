@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-05-15T09:27:02Z",
+  "generated_at": "2026-05-15T16:18:41Z",
   "signals": [
     {
-      "time": "09:26",
+      "time": "16:18",
       "priority": "critical",
-      "title": "USD/GBP — G8 Bilateral Theme + UK Political Crisis",
-      "text": "USD/GBP spread at 2.019% marks a dominant G8 theme as the British Pound dives to five-week lows below 1.3350 amid a deepening UK political crisis. USD outperformance (+1.076% avg) is fueled by soaring US yields and Fed hike bets, while GBP (-0.943% avg) faces aggressive liquidation. Despite a neutral 0bp carry spread (Fed 3.75% vs BoE 3.75%), the political risk premium is driving a structural break in GBP/USD. Watch for a sustained break of 1.3300 to accelerate the move.",
+      "title": "USD/GBP — G8 Bilateral Theme + Hawkish Fed Repricing",
+      "text": "USD outperforms the G8 complex by +1.097% as hawkish Fed repricing drives a broad breakout, while GBP lags at -0.986%. Despite a neutral 0bp OIS carry differential (Fed 3.75% vs BoE 3.73%), the USD/GBP spread of 2.083% reflects aggressive positioning into US inflation concerns and rising Treasury yields. The bear steepener regime (+59.9bp 2s10s) supports USD momentum over GBP's deteriorating relative strength. Watch for a sustained break of 1.3300 to confirm further GBP/USD downside.",
       "evidence": [
-        "USD 1W avg: +1.076% (n=7)",
-        "GBP 1W avg: -0.943% (n=4)",
-        "G8 spread: 2.019%"
+        "USD 1W avg: +1.097% (n=7)",
+        "GBP 1W avg: -0.986% (n=4)",
+        "G8 spread: 2.083%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "09:23",
+      "time": "16:15",
+      "priority": "critical",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
+      "text": "NZD/USD COT LF net short -19,294 (long% at 18.5%) contradicts the RBNZ hike bias priced for the 27 May meeting. This institutional short-bias is further challenged by an 86% retail long extreme, creating a high-conviction contrarian setup. While the +150bp USD carry advantage currently supports the pair's decline to 0.5842, a hawkish RBNZ delivery risks a violent short-squeeze against crowded speculative shorts. Watch the 0.5800 level for support or capitulation.",
+      "evidence": [
+        "NZD COT long%: 18.5%",
+        "Retail Sentiment: 86% Long",
+        "USD/NZD carry: +150bp"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "16:13",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + Fed Hike Bets",
-      "text": "NZD/USD COT LF net short -19,294 (long% at 18.5% extreme) vs RBNZ hike bias with a next meeting on 27 May. While specs are heavily short, the pair has tumbled to 0.5844 on renewed Fed rate hike bets and DXY strength above 99.00. This creates a high-conviction short-squeeze risk if the RBNZ delivers a hawkish surprise, as speculative positioning is at a historical extreme against the central bank's hiking stance. NZD/USD testing 0.5840 support.",
+      "title": "USD/JPY — Options Skew + Intervention Risk",
+      "text": "USD/JPY at 158.70 faces increasing intervention risk as price tests the 160.00 psychological barrier. The 25d RR at -1.73 signals a strong institutional put skew, confirming the options market is paying a premium for JPY strength/USD downside protection despite the +286bp SOFR-TONA carry advantage. JPY COT LF net short -61,340 remains crowded; intervention at 160.00 triggers a rapid unwind of carry trades. Carry dominates only while VIX remains below 25.",
       "evidence": [
-        "NZD COT LF net: -19,294",
-        "NZD long%: 18.5%",
-        "NZD/USD: 0.5844"
+        "USD/JPY 25d RR: -1.73",
+        "JPY COT LF net: -61,340",
+        "USD/JPY carry: +286bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "09:21",
+      "time": "16:10",
       "priority": "warning",
-      "title": "USD/JPY — Options Skew + Correlation Break",
-      "text": "USD/JPY at 158.52 shows a strong 25d RR put skew of -1.69, signaling the options market is paying a significant premium for downside protection despite the +286bp OIS carry advantage (SOFR 3.59% vs TONA 0.73%). This bearish options bias aligns with a correlation break (z=-1.84σ) where JPY is failing to track US 10Y yields. The divergence suggests institutional hedging against BoJ intervention risk as price holds near the 160.00 critical threshold. Watch for BoJ verbal warnings to trigger a volatility spike.",
+      "title": "AUD/USD — Volatility Premium + Positioning",
+      "text": "AUD/USD IV at 14.3% vs HV30 at 11.1% generates a +3.2% Vol Risk Premium, the highest in the G8 space, signaling aggressive hedging against further downside. COT LF net long +58,994 (78.3% long) shows institutional positioning remains heavily overextended just as price breaks lower to 0.7154. This combination of high vol-premium and crowded longs suggests a late-cycle trend exhaustion; a break below 0.7100 accelerates long liquidation.",
       "evidence": [
-        "USD/JPY 25d RR: -1.69",
-        "USD/JPY vs US 10Y z-score: -1.84σ",
-        "USD/JPY OIS carry: +286bp"
+        "AUD/USD VRP: +3.2%",
+        "AUD COT long%: 78.3%",
+        "AUD/USD: 0.7154"
       ],
       "_source": "gemini"
     },
     {
-      "time": "09:15",
-      "priority": "info",
-      "title": "GBP/USD — Elevated Volatility Risk Premium",
-      "text": "GBP/USD IV at 11.0% vs HV30 at 7.8% generates a +3.2% Vol Risk Premium (VRP), indicating the options market is pricing in significantly higher future volatility than has been realized over the last 30 days. This elevated premium reflects intense hedging demand surrounding the UK political crisis and upcoming BoE meeting on 18 Jun. Negative 25d RR at -0.88 confirms the bias is for downside protection. Expect wide intraday ranges while VRP remains above 2.0%.",
-      "evidence": [
-        "GBP/USD IV: 11.0%",
-        "GBP/USD HV30: 7.8%",
-        "VRP: +3.2%"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "09:11",
+      "time": "16:05",
       "priority": "info",
       "title": "GBP/CHF — Retail Sentiment Extreme",
-      "text": "GBP/CHF retail sentiment at 90% long vs 10% short (Myfxbook) represents an extreme contrarian signal. Retail traders are aggressively fading the GBP weakness driven by the UK political crisis, while institutional COT data for GBP remains net long (+31,244). This 90% retail long extreme typically precedes further downside as retail positions are forced into liquidation. GBP/CHF at 1.0486; watch for a break of 1.0450 to trigger retail capitulation.",
+      "text": "GBP/CHF retail positioning reaches a 90% long extreme, diverging from the broader GBP weakness seen in the G8 scorecard (-0.986%). While the +375bp carry premium (BoE 3.75% vs SNB 0.0%) structurally favors the pair, retail's heavy long bias at 1.0484 suggests a contrarian risk of further downside if GBP sentiment continues to deteriorate. Watch for retail capitulation if price breaks the 1.0450 support level.",
       "evidence": [
-        "GBP/CHF Retail: 90% Long",
-        "GBP COT LF net: +31,244",
-        "GBP/CHF: 1.0486"
+        "Retail Sentiment: 90% Long",
+        "GBP/CHF carry: +375bp",
+        "GBP 1W avg: -0.986%"
       ],
       "_source": "gemini"
     }
