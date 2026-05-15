@@ -332,8 +332,8 @@ async function _rcmFetchData() {
     try {
       // ── PHASE 1: all same-origin fetches in parallel ───────────────────────
       const extKeys = _RCM_G8; // 8 extended-data files
-      const [rateResults, extResults, meetingsRes, quotesRes] = await Promise.all([
-        // 8 × rates/*.json
+      const [rateResults, extResults, meetingsRes, quotesRes, oisRes] = await Promise.all([
+        // 8 × rates/*.json  (CB policy rates — fallback when OIS unavailable)
         Promise.all(_RCM_G8.map(ccy =>
           fetch(`./rates/${ccy}.json`).then(r => r.ok ? r.json() : null).catch(() => null)
         )),
@@ -345,14 +345,38 @@ async function _rcmFetchData() {
         fetch('./meetings-data/meetings.json').then(r => r.ok ? r.json() : null).catch(() => null),
         // quotes.json (HV30)
         fetch('./intraday-data/quotes.json').then(r => r.ok ? r.json() : null).catch(() => null),
+        // ois-rates/rates.json — SOFR/€STR/SONIA/TONA/CORRA/SARON/AONIA/OCR
+        // Bloomberg/Refinitiv standard: overnight benchmarks reflect actual funding cost
+        fetch('./ois-rates/rates.json').then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
 
-      // Parse nominal rates
+      // Parse nominal rates — OIS preferred over CB policy rate (Bloomberg standard).
+      // SOFR/€STR/SONIA/TONA/CORRA/SARON reflect actual overnight funding cost;
+      // CB policy rate is used as fallback when OIS data is unavailable or stale.
+      const oisRates   = oisRes?.rates   || {};   // { USD: 5.30, EUR: 3.90, … }
+      const oisSources = oisRes?.sources  || {};   // { USD: 'SOFR', EUR: '€STR', … }
       const nominalRates = {};
       _RCM_G8.forEach((ccy, i) => {
-        const d = rateResults[i];
-        if (d?.observations?.[0]?.value != null) {
-          nominalRates[ccy] = { rate: parseFloat(d.observations[0].value), date: d.observations[0].date };
+        const ois = oisRates[ccy];
+        if (ois != null) {
+          // OIS available — use it; record benchmark name for tooltip/footnote
+          nominalRates[ccy] = {
+            rate:   ois,
+            date:   oisRes?.asOf || null,
+            source: oisSources[ccy] || 'OIS',
+            isOIS:  true,
+          };
+        } else {
+          // Fallback: CB policy rate (AUD/NZD staleness guard, or missing data)
+          const d = rateResults[i];
+          if (d?.observations?.[0]?.value != null) {
+            nominalRates[ccy] = {
+              rate:   parseFloat(d.observations[0].value),
+              date:   d.observations[0].date,
+              source: 'policy',
+              isOIS:  false,
+            };
+          }
         }
       });
 
@@ -486,7 +510,8 @@ function _rcmRenderBreakdown() {
   });
 
   const rows = sorted.map((ccy, idx) => {
-    const nom  = d.nominalRates[ccy]?.rate;
+    const nomEntry = d.nominalRates[ccy];
+    const nom  = nomEntry?.rate;
     const ie   = d.inflExp[ccy];
     const rr   = d.realRates[ccy];
     const bias = d.biasMap[ccy];
@@ -499,27 +524,42 @@ function _rcmRenderBreakdown() {
       : '';
     const srcTitle = `${_RCM_IE_SRC[ccy] || ''}${ie?.date ? ' · ' + ie.date : ''}`;
 
-    // Left border accent on top row (highest real rate)
+    // OIS source indicator — shows benchmark name (SOFR/€STR/…) or 'policy' as fallback
+    const nomSrc    = nomEntry?.source || 'policy';
+    const nomIsOIS  = nomEntry?.isOIS === true;
+    const nomSrcTag = nom != null
+      ? `<span style="font-size:8px;color:${nomIsOIS ? 'var(--accent,#26a69a)' : 'var(--text3)'};margin-left:3px;vertical-align:super;">${nomSrc}</span>`
+      : '';
+    const nomTitle  = nom != null
+      ? `${nomIsOIS ? nomSrc + ' overnight benchmark' : 'CB policy rate (OIS unavailable)'} · ${nomEntry?.date || ''}`
+      : '';
 
+    // Left border accent on top row (highest real rate)
     const firstTdBorder = idx === 0
       ? 'border-left:3px solid var(--up,#26a69a);'
       : (idx === sorted.length - 1 ? 'border-left:3px solid var(--down,#ef5350);' : 'border-left:3px solid transparent;');
-    return `<tr title="${ccy} — Real rate = ${nomFmt} nominal − ${ieFmt} infl.exp = ${rrFmt}">
+    return `<tr title="${ccy} — Real rate = ${nomFmt} nominal (${nomSrc}) − ${ieFmt} infl.exp = ${rrFmt}">
       <td style="color:var(--text3);font-size:9px;text-align:center;width:20px;padding:8px 4px 8px 11px;${firstTdBorder}">${idx + 1}</td>
       <td style="text-align:left;">
         <span class="fi fi-${_RCM_FLAG[ccy]}" style="margin-right:6px;border-radius:2px;font-size:14px;vertical-align:middle;flex-shrink:0;"></span><span style="font-weight:700;color:var(--text);">${_RCM_CB[ccy]}</span>
         <span style="color:var(--text3);font-size:9px;margin-left:4px;">${ccy}</span>
       </td>
-      <td>${nomFmt}</td>
+      <td title="${nomTitle}">${nomFmt}${nomSrcTag}</td>
       <td title="${srcTitle}">${ieFmt}${isLive}</td>
       <td class="${rrCls}" style="font-weight:700;">${rrFmt}</td>
       <td style="text-align:right;">${_rcmBiasChip(bias)}</td>
     </tr>`;
   }).join('');
 
-  const liveNote = 'USD/EUR: FRED 5Y breakeven inflation (market-implied, daily). ' +
+  // Build footnote: list which currencies are using policy fallback (not OIS)
+  const policyFallbacks = _RCM_G8.filter(c => d.nominalRates[c]?.isOIS === false);
+  const fallbackNote = policyFallbacks.length
+    ? ` ${policyFallbacks.join('/')} nominal: CB policy rate (OIS data unavailable).`
+    : '';
+  const liveNote = 'Nominal rate: OIS overnight benchmark (SOFR/€STR/SONIA/TONA/CORRA/SARON) — Bloomberg/Refinitiv standard.' + fallbackNote + ' · ' +
+    'USD/EUR infl.exp: FRED 5Y breakeven (market-implied, daily). ' +
     'GBP/JPY/AUD/CAD/CHF: CPI YoY (IMF SDMX 3.0, weekly). NZD: OECD Data Explorer (weekly). ' +
-    'Real rate = Nominal CB rate − Inflation Expectation. OIS Bias reflects forward market consensus at next CB meeting.';
+    'Real rate = Nominal OIS − Inflation Expectation. OIS Bias reflects forward market consensus at next CB meeting.';
 
   return `<div class="rcm-cw" style="flex:1;min-height:0;overflow:auto;">
     <table class="rcm-tbl" aria-label="Real rate carry ranking by currency">
@@ -527,7 +567,7 @@ function _rcmRenderBreakdown() {
         <tr>
           <th scope="col" style="text-align:center;width:20px;padding:7px 4px 7px 11px;border-left:3px solid transparent;">#</th>
           <th scope="col" style="text-align:left;">Central Bank</th>
-          <th scope="col">Nominal</th>
+          <th scope="col" title="OIS overnight benchmark (SOFR/€STR/SONIA/TONA/CORRA/SARON) — Bloomberg/Refinitiv standard. Falls back to CB policy rate when OIS unavailable." style="cursor:help;">Nominal <span style="font-size:8px;color:var(--accent,#26a69a);vertical-align:super;">OIS</span></th>
           <th scope="col">Infl. Exp.</th>
           <th scope="col">Real Rate</th>
           <th scope="col">OIS Bias</th>
@@ -620,8 +660,12 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
     return `<div class="rcm-loading">Select a pair from the Carry Ranking to view detail.</div>`;
   }
 
-  const nomL = d.nominalRates[longCcy]?.rate;
-  const nomS = d.nominalRates[shortCcy]?.rate;
+  const nomEntryL = d.nominalRates[longCcy];
+  const nomEntryS = d.nominalRates[shortCcy];
+  const nomL = nomEntryL?.rate;
+  const nomS = nomEntryS?.rate;
+  const nomSrcL = nomEntryL?.source || 'policy';
+  const nomSrcS = nomEntryS?.source || 'policy';
   const ieL  = d.inflExp[longCcy]?.val;
   const ieS  = d.inflExp[shortCcy]?.val;
   const rrL  = d.realRates[longCcy];
@@ -713,9 +757,9 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   </div>
   <div class="rcm-pd-row-grid">
     <div class="rcm-pd-cell">
-      <div class="rcm-pd-cell-lbl">Nominal carry</div>
+      <div class="rcm-pd-cell-lbl">Nominal carry <span style="font-size:8px;color:var(--accent,#26a69a);">(OIS)</span></div>
       <div class="rcm-pd-cell-val ${_rcmRrClass(nomSpread)}">${fmt(nomSpread, '%')}</div>
-      <div class="rcm-pd-cell-sub">${_RCM_CB[longCcy]} ${nomL != null ? nomL.toFixed(2) + '%' : '—'} − ${_RCM_CB[shortCcy]} ${nomS != null ? nomS.toFixed(2) + '%' : '—'}</div>
+      <div class="rcm-pd-cell-sub">${nomSrcL} ${nomL != null ? nomL.toFixed(2) + '%' : '—'} − ${nomSrcS} ${nomS != null ? nomS.toFixed(2) + '%' : '—'}</div>
     </div>
     <div class="rcm-pd-cell">
       <div class="rcm-pd-cell-lbl">Real carry</div>
@@ -725,7 +769,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
     <div class="rcm-pd-cell">
       <div class="rcm-pd-cell-lbl">Long real rate (${longCcy})</div>
       <div class="rcm-pd-cell-val ${_rcmRrClass(rrL)}">${_rcmRrFmt(rrL)}</div>
-      <div class="rcm-pd-cell-sub">${nomL != null ? nomL.toFixed(2) + '%' : '—'} nom − ${ieL != null ? ieL.toFixed(2) + '%' : '—'} infl.exp</div>
+      <div class="rcm-pd-cell-sub">${nomL != null ? nomL.toFixed(2) + '%' : '—'} ${nomSrcL} − ${ieL != null ? ieL.toFixed(2) + '%' : '—'} infl.exp</div>
     </div>
   </div>
   <div class="rcm-rate-bars">
@@ -736,7 +780,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
     <div class="rcm-vol-cell">
       <div class="rcm-vol-lbl">Short real rate (${shortCcy})</div>
       <div class="rcm-vol-val ${_rcmRrClass(rrS)}">${_rcmRrFmt(rrS)}</div>
-      <div class="rcm-vol-sub">${nomS != null ? nomS.toFixed(2) + '%' : '—'} nom − ${ieS != null ? ieS.toFixed(2) + '%' : '—'} infl.exp</div>
+      <div class="rcm-vol-sub">${nomS != null ? nomS.toFixed(2) + '%' : '—'} ${nomSrcS} − ${ieS != null ? ieS.toFixed(2) + '%' : '—'} infl.exp</div>
     </div>
     <div class="rcm-vol-cell">
       <div class="rcm-vol-lbl">Nominal carry / vol</div>

@@ -6224,22 +6224,51 @@ async function fetchCarryRanking() {
   if (!container) return;
 
   try {
-    // ── 1. CB rates (use STATE cache from fetchCBRates if available) ─────────
-    const rates = {};
+    // ── 1. CB policy rates (use STATE cache from fetchCBRates if available) ──
+    const cbRates = {};
     await Promise.all(G8.map(async ccy => {
       const cached = STATE.cbRates?.[ccy.toLowerCase()];
-      if (cached?.rate != null) { rates[ccy] = cached.rate; return; }
+      if (cached?.rate != null) { cbRates[ccy] = cached.rate; return; }
       try {
         const r = await fetch('./rates/' + ccy + '.json');
         if (!r.ok) return;
         const d = await r.json();
-        if (d.observations?.[0]?.value) rates[ccy] = parseFloat(d.observations[0].value);
+        if (d.observations?.[0]?.value) cbRates[ccy] = parseFloat(d.observations[0].value);
       } catch {}
     }));
 
-    if (Object.keys(rates).length < 4) {
+    if (Object.keys(cbRates).length < 4) {
       container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Rate data unavailable</div>';
       return;
+    }
+
+    // ── 1.5. OIS rates — preferred over CB policy rate (Bloomberg standard) ──
+    // ois-rates/rates.json: SOFR(USD) €STR(EUR) SONIA(GBP) TONA(JPY)
+    //                       CORRA(CAD) SARON(CHF) AONIA(AUD) OCR(NZD)
+    // Falls back to CB policy rate when OIS unavailable (AUD/NZD staleness guard).
+    // rateSource[ccy] tracks which benchmark is active for tooltip display.
+    const oisCache = window._OIS_RATES_CACHE || {};
+    const oisSrcs  = window._OIS_RATE_SOURCES || {};
+    // If _OIS_RATES_CACHE is unpopulated (loadOISRatesCache not yet called), fetch inline
+    let oisData = null;
+    if (Object.keys(oisCache).length === 0) {
+      try {
+        const or = await fetch('./ois-rates/rates.json');
+        if (or.ok) oisData = await or.json();
+      } catch {}
+    }
+    const rates       = {};
+    const rateSource  = {}; // e.g. { USD: 'SOFR', EUR: '€STR', AUD: 'policy' }
+    for (const ccy of G8) {
+      const ois = oisCache[ccy] ?? oisData?.rates?.[ccy] ?? null;
+      const src = oisSrcs[ccy]  ?? oisData?.sources?.[ccy] ?? null;
+      if (ois != null) {
+        rates[ccy]      = ois;
+        rateSource[ccy] = src || 'OIS';
+      } else if (cbRates[ccy] != null) {
+        rates[ccy]      = cbRates[ccy];
+        rateSource[ccy] = 'policy';
+      }
     }
 
     // ── 2. HV30 per pair from intraday cache ─────────────────────────────────
@@ -6270,6 +6299,8 @@ async function fetchCarryRanking() {
     }));
 
     // ── 4. Build all 28 G8 pairs ─────────────────────────────────────────────
+    // Rates now use OIS benchmarks (SOFR/€STR/SONIA/TONA/CORRA/SARON/AONIA/OCR)
+    // with per-currency policy-rate fallback — matching Bloomberg FXFR convention.
     const allPairs = [];
     for (let i = 0; i < G8.length; i++) {
       for (let j = i + 1; j < G8.length; j++) {
@@ -6282,6 +6313,8 @@ async function fetchCarryRanking() {
         const short  = diff >= 0 ? b : a;
         const rLong  = diff >= 0 ? rA : rB;
         const rShort = diff >= 0 ? rB : rA;
+        const srcLong  = rateSource[long]  || 'OIS';
+        const srcShort = rateSource[short] || 'OIS';
         const absDiff = Math.abs(diff);
 
         const pid  = pairId(long, short);
