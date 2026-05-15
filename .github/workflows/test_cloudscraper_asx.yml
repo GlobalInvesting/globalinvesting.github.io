@@ -1,3 +1,4 @@
+```yaml
 name: test-cloudscraper-asx-ib
 
 on:
@@ -10,7 +11,7 @@ jobs:
       - name: Install dependencies
         run: pip install cloudscraper --break-system-packages
 
-      - name: Probe rate_tracker_calc.htm and markitcdn JS
+      - name: Search markitcdn JS bundles for API paths
         run: |
           python3 << 'EOFPYTHON'
           import cloudscraper, re
@@ -19,41 +20,48 @@ jobs:
               browser={'browser': 'chrome', 'platform': 'linux', 'mobile': False}
           )
 
-          # Test 1: rate_tracker_calc.htm - may contain raw data
-          print("--- Test 1: rate_tracker_calc.htm ---")
-          r = scraper.get(
-              'https://www.asx.com.au/data/trt/rate_tracker_calc.htm',
-              timeout=15
-          )
-          print(f"Status: {r.status_code}  CT: {r.headers.get('Content-Type','')}")
-          print(f"Last-Modified: {r.headers.get('Last-Modified','not set')}")
-          print(r.text[:3000])
+          v = '45d2cb0245ec3d637b28c065d06d8bed94c6b642'
+          bundles = [
+              f'https://content.markitcdn.com/asx.markitdigital.com/js/manifest.js?v={v}',
+              f'https://content.markitcdn.com/asx.markitdigital.com/js/vendor.js?v={v}',
+              f'https://content.markitcdn.com/asx.markitdigital.com/js/common.js?v={v}',
+          ]
 
-          print()
+          for url in bundles:
+              name = url.split('/')[-1].split('?')[0]
+              r = scraper.get(url, timeout=20)
+              print(f"\n--- {name}: {r.status_code} {len(r.text)} bytes ---")
+              if r.status_code != 200:
+                  continue
 
-          # Test 2: common.js from markitcdn - has the API endpoints hardcoded
-          print("--- Test 2: markitcdn common.js API endpoints ---")
-          r2 = scraper.get(
-              'https://content.markitcdn.com/asx.markitdigital.com/js/common.js?v=45d2cb0245ec3d637b28c065d06d8bed94c6b642',
-              timeout=20
-          )
-          print(f"Status: {r2.status_code}  Size: {len(r2.text)}")
-          if r2.status_code == 200:
-              # Find all API endpoint patterns
-              endpoints = re.findall(
-                  r'["\`](/[^\s"\'`]{5,80}(?:interbank|IB|futures|curve|cash.rate|rba|rate.tracker)[^\s"\'`]*)["\`]',
-                  r2.text, re.I
-              )
-              print(f"API paths found: {len(endpoints)}")
-              for ep in sorted(set(endpoints))[:30]:
-                  print(f"  {ep}")
+              js = r.text
 
-              # Also search for full URLs
-              full_urls = re.findall(
-                  r'["\`](https?://[^\s"\'`]{10,120}(?:interbank|IB|futures|curve|cash|rba)[^\s"\'`]*)["\`]',
-                  r2.text, re.I
-              )
-              print(f"\nFull URLs found: {len(full_urls)}")
-              for u in sorted(set(full_urls))[:20]:
-                  print(f"  {u}")
+              # Broad search: any path with /1.0/ or /2.0/ (REST API convention)
+              paths = re.findall(r'["`](/(?:asx-research|api)[^"`\s]{5,100})["`]', js)
+              if paths:
+                  print(f"REST paths ({len(paths)}):")
+                  for p in sorted(set(paths))[:20]:
+                      print(f"  {p}")
+
+              # Search for 'IB' near quotes (futures product code)
+              ib_ctx = re.findall(r'.{0,40}["`]IB["`].{0,40}', js)
+              if ib_ctx:
+                  print(f"\n'IB' string contexts ({len(ib_ctx)}):")
+                  for c in ib_ctx[:10]:
+                      print(f"  {c.strip()}")
+
+              # Search for 'interbank' or 'cash.rate' or 'rba' in JS strings
+              keywords = re.findall(r'["`][^"`]{0,30}(?:interbank|cashrate|cash_rate|rba|RBA|TargetRate)[^"`]{0,30}["`]', js, re.I)
+              if keywords:
+                  print(f"\nKeyword contexts ({len(keywords)}):")
+                  for k in keywords[:10]:
+                      print(f"  {k.strip()}")
+
+              # Search for any markitdigital.com URLs
+              mkit = re.findall(r'markitdigital\.com[^"`\s]{0,80}', js)
+              if mkit:
+                  print(f"\nmarkitdigital refs ({len(mkit)}):")
+                  for m in sorted(set(mkit))[:15]:
+                      print(f"  {m}")
           EOFPYTHON
+```
