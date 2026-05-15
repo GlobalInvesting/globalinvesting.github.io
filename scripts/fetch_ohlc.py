@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_ohlc.py  v1.8 — Daily OHLC history for Lightweight Charts
+fetch_ohlc.py  v1.9 — Daily OHLC history for Lightweight Charts
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Downloads 3 years of daily OHLC bars via yfinance for all symbols
 used by the Lightweight Charts panel (replaces TradingView widget).
@@ -59,6 +59,21 @@ Data integrity — FX daily bar construction (v1.3):
   DXY only:       HL_MAX_SPREAD guard drops bars with impossible intraday ranges
   Nasdaq:         Uses ^NDX (Nasdaq 100) to match the CFI:US100 chart tab; ^IXIC
                   (Composite) has different constituents and price levels (~19k vs ~5.8k).
+
+yfinance 1H window — 720-day limit (v1.9):
+  yfinance enforces a hard 730-day limit for 1H bars, evaluated in Yahoo's server
+  timezone (America/New_York, UTC-4 in summer). When the script runs before midnight
+  NY time (i.e. before 04:00 UTC), the NY date is still "yesterday". A start window
+  of `now_utc - 729 days` expressed as a date string can land exactly on the 730-day
+  boundary as seen from NY, triggering:
+    "1h data not available ... The requested range must be within the last 730 days."
+  When this happens yfinance silently falls through to the native 1D path for the
+  entire 1H request, producing 350-425 structurally invalid bars per FX pair (vs the
+  normal ~120-155 from the known open-tick artifact) — the root cause of the nightly
+  FX candle bug that persisted through v7.74.35.
+  Fix (v1.9): use `now_utc - 720 days` (9-day safety margin). The 10-day gap in
+  1H coverage (days 720-730) is seamlessly covered by the Part B native 1D bars,
+  which always cover the full 3-year period. No visible impact on chart quality.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
@@ -282,8 +297,13 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         dec    = DECIMALS.get(id_, 5)
 
         # ── PART A: 1H bars → aggregate to daily (FX session boundary 21:00 UTC) ──
+        # 720-day window (not 729/730): yfinance enforces a 730-day hard limit evaluated
+        # in NY time (UTC-4). Before 04:00 UTC the NY date is still yesterday — a 729-day
+        # UTC window lands exactly on the 730-day NY boundary and triggers a silent fallback
+        # to native 1D, producing ~400 clamped bars per pair vs the normal ~130. 9-day
+        # safety margin; gap covered by Part B native 1D. (v1.9)
         _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
-        _start_1h = datetime.now(timezone.utc) - timedelta(days=729)
+        _start_1h = datetime.now(timezone.utc) - timedelta(days=720)
         hist_1h = ticker.history(
             start=_start_1h.strftime("%Y-%m-%d"),
             end=_end_1h.strftime("%Y-%m-%d"),
@@ -292,9 +312,9 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         )
 
         # Session-complete guard: only include a session bar if the session has closed.
-        # FX session closes at 21:00 UTC. The scheduled run at 22:30 UTC always runs
-        # AFTER the close — session_date == run_date_utc is the fully-completed bar.
-        # session_date > run_date_utc is tomorrow's partial session (~1.5h) — discard.
+        # FX session closes at 21:00 UTC. The scheduled run at 01:30 UTC runs well after
+        # the close — session_date == run_date_utc is the fully-completed bar.
+        # session_date > run_date_utc is the next partial session — discard.
         # If triggered via workflow_dispatch before 21:00 UTC (mid-session), today's
         # bucket is still open — discard it by treating yesterday as the effective cutoff.
         _now_utc = datetime.now(timezone.utc)
@@ -469,7 +489,7 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
         # ── PART A: 1H bars → aggregate to daily (CME session boundary 22:00 UTC) ─
         _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
-        _start_1h = datetime.now(timezone.utc) - timedelta(days=729)
+        _start_1h = datetime.now(timezone.utc) - timedelta(days=720)
         hist_1h = ticker.history(
             start=_start_1h.strftime("%Y-%m-%d"),
             end=_end_1h.strftime("%Y-%m-%d"),
@@ -647,7 +667,7 @@ def fetch_wti_dxy_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
         # ── PART A: 1H bars → aggregate to daily (CME/ICE 17:00 ET boundary) ──
         _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
-        _start_1h = datetime.now(timezone.utc) - timedelta(days=729)
+        _start_1h = datetime.now(timezone.utc) - timedelta(days=720)
         hist_1h = ticker.history(
             start=_start_1h.strftime("%Y-%m-%d"),
             end=_end_1h.strftime("%Y-%m-%d"),
@@ -834,7 +854,7 @@ def fetch_equity_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
         # PART A: 1H bars -> aggregate to daily (NYSE boundary 21:00 UTC)
         _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
-        _start_1h = datetime.now(timezone.utc) - timedelta(days=729)
+        _start_1h = datetime.now(timezone.utc) - timedelta(days=720)
         hist_1h = ticker.history(
             start=_start_1h.strftime("%Y-%m-%d"),
             end=_end_1h.strftime("%Y-%m-%d"),
