@@ -690,7 +690,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <div class="guide-section" id="what-it-shows">
       <h2>What It Shows</h2>
       <p>The Rates &amp; Yield Curve section of the terminal displays four US Treasury nominal yields (3-month T-Bill, 2-year Note, 5-year Note, 10-year Bond), a canvas-drawn yield curve connecting them, and a table of three key spreads: the 2Y–10Y domestic spread, the US–Germany 10Y differential, and the US–Japan 10Y differential.</p>
-      <p>Data comes from yfinance and updates every 5 minutes during market hours. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
+      <p>Data updates every 5 minutes during market hours via a server-side pipeline. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
 
       <!-- MOCK: Full-width Rates & Yield Curve panel (mirrors index) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:20px;">
@@ -882,7 +882,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <li>Bear steepening (10Y rising, 2Y stable) → watch for gold and AUD pressure as real rates rise</li>
       </ul>
       <div class="callout">
-        <strong>Data source:</strong> US Treasury yields in the terminal come from yfinance and update every 5 minutes during market hours. For real-time tick data on Treasury yields, use the TradingView chart (US10Y, US02Y, etc.) in the price chart panel.
+        <strong>Data source:</strong> US Treasury yields update every 5 minutes during market hours via a server-side pipeline. For real-time tick data on Treasury yields, use the TradingView chart (US10Y, US02Y, etc.) in the price chart panel.
       </div>
     </div>
 
