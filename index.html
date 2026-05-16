@@ -1171,7 +1171,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </span>
     </div>
     <table aria-label="Key FX correlations">
-      <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col" id="corr-th-window">60d</th><th scope="col" title="Z-score vs 252-day historical norm · always computed on 60d window as stable baseline · |z|>1.5 = correlation break">vs norm</th></tr></thead>
+      <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col" id="corr-th-window">60d</th><th scope="col" title="Z-score vs 252d norm · 30d Pearson vs rolling 30d-window baseline (apples-to-apples) · |z|>1.5 = stretched · |z|>2.5 = break">vs norm</th></tr></thead>
       <tbody id="correlations-tbody">
         <!-- 12 skeleton rows — exact real pairs from quotes.json to prevent CLS -->
         <tr><td>EUR/USD</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
