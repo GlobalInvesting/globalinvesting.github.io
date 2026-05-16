@@ -668,7 +668,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <nav class="guide-toc">
     <div class="toc-head">Contents</div>
     <a class="toc-item" href="#what-it-shows">What It Shows</a>
-    <a class="toc-item" href="#tenors">The Four Tenors</a>
+    <a class="toc-item" href="#tenors">The Five Tenors</a>
     <a class="toc-item" href="#curve-shape">Curve Shape</a>
     <a class="toc-item" href="#2y-10y">2Y–10Y Spread</a>
     <a class="toc-item" href="#intl-spreads">International Spreads</a>
@@ -689,8 +689,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
     <div class="guide-section" id="what-it-shows">
       <h2>What It Shows</h2>
-      <p>The Rates &amp; Yield Curve section of the terminal displays four US Treasury nominal yields (3-month T-Bill, 2-year Note, 5-year Note, 10-year Bond), a canvas-drawn yield curve connecting them, and a table of three key spreads: the 2Y–10Y domestic spread, the US–Germany 10Y differential, and the US–Japan 10Y differential.</p>
-      <p>Data updates every 5 minutes during market hours via a server-side pipeline. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
+      <p>The Rates &amp; Yield Curve section of the terminal displays five US Treasury nominal yields (3-month T-Bill, 2-year Note, 5-year Note, 10-year Bond, 30-year Bond), a canvas-drawn yield curve connecting them, and a table of three key spreads: the 2Y–10Y domestic spread, the US–Germany 10Y differential, and the US–Japan 10Y differential.</p>
+      <p>Data updates approximately every 5 minutes during US market hours via yfinance. Outside market hours or when the intraday feed is unavailable, the terminal falls back to FRED DGS2 daily batch values; the panel subtitle reflects the active source. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
 
       <!-- MOCK: Full-width Rates & Yield Curve panel (mirrors index) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:20px;">
@@ -698,61 +698,62 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">Rates &amp; Yield Curve — US Treasuries</span>
           <span style="font-size:9.5px;color:var(--text3);">Nominal yields · yfinance</span>
         </div>
-        <!-- 4 tenor cells -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);">
-          <div style="padding:10px 14px;border-right:1px solid var(--border);">
+        <!-- 5 tenor cells -->
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border);">
+          <div style="padding:10px 10px;border-right:1px solid var(--border);">
             <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">3M T-Bill</div>
-            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.29%</div>
+            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.29%</div>
             <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.01</div>
           </div>
-          <div style="padding:10px 14px;border-right:1px solid var(--border);">
+          <div style="padding:10px 10px;border-right:1px solid var(--border);">
             <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">2Y Note</div>
-            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">3.79%</div>
+            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">3.79%</div>
             <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.03</div>
           </div>
-          <div style="padding:10px 14px;border-right:1px solid var(--border);">
+          <div style="padding:10px 10px;border-right:1px solid var(--border);">
             <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">5Y Note</div>
-            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.02%</div>
+            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.02%</div>
             <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.02</div>
           </div>
-          <div style="padding:10px 14px;">
+          <div style="padding:10px 10px;border-right:1px solid var(--border);">
             <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">10Y Bond</div>
-            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.31%</div>
+            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.31%</div>
             <div style="font-size:10px;color:var(--up);margin-top:2px;">+0.02</div>
           </div>
+          <div style="padding:10px 10px;">
+            <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">30Y Bond</div>
+            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.58%</div>
+            <div style="font-size:10px;color:var(--up);margin-top:2px;">+0.03</div>
+          </div>
         </div>
-        <!-- Yield curve canvas area -->
+        <!-- Yield curve canvas area — 5 tenors: 3M, 2Y, 5Y, 10Y, 30Y -->
         <div style="padding:8px 12px;border-bottom:1px solid var(--border);">
           <svg viewBox="0 0 700 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
-            <!-- area fill under curve -->
             <defs>
               <linearGradient id="yc-grad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#4f7fff" stop-opacity="0.18"/>
                 <stop offset="100%" stop-color="#4f7fff" stop-opacity="0.02"/>
               </linearGradient>
             </defs>
-            <!-- normal (steep) curve: 3M elevated, 2Y dips below, 5Y recovers, 10Y highest -->
-            <!-- y-axis: 3.6%=70, 3.8%=50, 4.0%=30, 4.3%=10  (scale: each 0.1%=~7px) -->
-            <!-- 3M 4.29→y=15, 2Y 3.79→y=51, 5Y 4.02→y=35, 10Y 4.31→y=13 -->
-            <path d="M 80,15 C 200,55 350,38 620,13 L 620,88 L 80,88 Z" fill="url(#yc-grad)"/>
-            <path d="M 80,15 C 200,55 350,38 620,13" fill="none" stroke="#4f7fff" stroke-width="2"/>
-            <!-- data points -->
-            <circle cx="80" cy="15" r="3.5" fill="#4f7fff"/>
-            <circle cx="240" cy="51" r="3.5" fill="#4f7fff"/>
-            <circle cx="430" cy="35" r="3.5" fill="#4f7fff"/>
-            <circle cx="620" cy="13" r="3.5" fill="#4f7fff"/>
-            <!-- labels x-axis -->
-            <text x="76" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">3M</text>
-            <text x="240" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">2Y</text>
-            <text x="430" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">5Y</text>
-            <text x="620" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">10Y</text>
-            <!-- labels y-axis -->
+            <!-- 3M=4.29→y=15, 2Y=3.79→y=51, 5Y=4.02→y=35, 10Y=4.31→y=13, 30Y=4.58→y=0 -->
+            <path d="M 60,15 C 120,55 260,38 435,13 L 630,0 L 630,88 L 60,88 Z" fill="url(#yc-grad)"/>
+            <path d="M 60,15 C 120,55 260,38 435,13 L 630,0" fill="none" stroke="#4f7fff" stroke-width="2"/>
+            <circle cx="60"  cy="15" r="3.5" fill="#4f7fff"/>
+            <circle cx="192" cy="51" r="3.5" fill="#4f7fff"/>
+            <circle cx="324" cy="35" r="3.5" fill="#4f7fff"/>
+            <circle cx="456" cy="13" r="3.5" fill="#4f7fff"/>
+            <circle cx="630" cy="0"  r="3.5" fill="#4f7fff"/>
+            <text x="60"  y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">3M</text>
+            <text x="192" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">2Y</text>
+            <text x="324" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">5Y</text>
+            <text x="456" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">10Y</text>
+            <text x="630" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">30Y</text>
             <text x="4" y="18" fill="#787b86" font-size="8.5" font-family="monospace">4.30%</text>
             <text x="4" y="38" fill="#787b86" font-size="8.5" font-family="monospace">4.00%</text>
             <text x="4" y="58" fill="#787b86" font-size="8.5" font-family="monospace">3.80%</text>
           </svg>
         </div>
-        <!-- Spreads table -->
+        <!-- Spreads table — signal labels match production output -->
         <div style="padding:4px 12px 10px;">
           <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
             <thead>
@@ -765,18 +766,18 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <tbody>
               <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:6px 0;color:var(--text2);">2Y–10Y</td>
-                <td style="text-align:center;color:var(--up);font-family:var(--font-mono);padding:6px 0;">+52 bp</td>
+                <td style="text-align:center;color:var(--up);font-family:var(--font-mono);padding:6px 0;">+52bp</td>
                 <td style="text-align:right;color:var(--up);font-size:10px;padding:6px 0;">Normal</td>
               </tr>
               <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:6px 0;color:var(--text2);">US–DE 10Y</td>
-                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+131 bp</td>
-                <td style="text-align:right;color:var(--down);font-size:10px;padding:6px 0;">USD bid</td>
+                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+131bp</td>
+                <td style="text-align:right;font-size:10px;padding:6px 0;">US Premium</td>
               </tr>
               <tr>
                 <td style="padding:6px 0;color:var(--text2);">US–JP 10Y</td>
-                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+199 bp</td>
-                <td style="text-align:right;color:var(--down);font-size:10px;padding:6px 0;">USD/JPY supported</td>
+                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+199bp</td>
+                <td style="text-align:right;font-size:10px;padding:6px 0;">US Premium</td>
               </tr>
             </tbody>
           </table>
@@ -785,23 +786,31 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     </div>
 
     <div class="guide-section" id="tenors">
-      <h2>The Four Tenors — What Each Measures</h2>
-      <div class="curve-grid" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px;gap:0;">
+      <h2>The Five Tenors — What Each Measures</h2>
+      <div class="curve-grid" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px;gap:0;display:grid;grid-template-columns:repeat(3,1fr);">
         <div style="padding:12px;border-right:1px solid var(--border);">
           <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">3M T-Bill</div>
           <div style="font-size:12px;color:var(--text2);line-height:1.5;">Tracks the Fed's overnight policy rate most closely. The "risk-free" short-term rate. When 3M is high relative to 10Y, the curve is inverted.</div>
         </div>
-        <div style="padding:12px;">
+        <div style="padding:12px;border-right:1px solid var(--border);">
           <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">2Y Note</div>
           <div style="font-size:12px;color:var(--text2);line-height:1.5;">Most sensitive to Fed rate expectations over the next 1–2 years. Moves sharply on FOMC decisions and CPI/PCE data. The primary measure of near-term policy pricing.</div>
         </div>
-        <div style="padding:12px;border-right:1px solid var(--border);border-top:1px solid var(--border);">
+        <div style="padding:12px;">
           <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">5Y Note</div>
           <div style="font-size:12px;color:var(--text2);line-height:1.5;">Reflects the medium-term equilibrium policy rate expectation. Often used by fixed income traders to gauge the "neutral rate" implied by markets.</div>
         </div>
-        <div style="padding:12px;border-top:1px solid var(--border);">
+        <div style="padding:12px;border-right:1px solid var(--border);border-top:1px solid var(--border);">
           <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">10Y Bond</div>
-          <div style="font-size:12px;color:var(--text2);line-height:1.5;">The global benchmark rate. Drives mortgage rates, corporate borrowing costs, and global capital allocation. The single most-watched yield in international markets. USD/JPY has a structural 0.85 correlation to the US 10Y.</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">The global benchmark rate. Drives mortgage rates, corporate borrowing costs, and global capital allocation. The single most-watched yield in international markets. USD/JPY has a structural positive correlation to the US 10Y.</div>
+        </div>
+        <div style="padding:12px;border-right:1px solid var(--border);border-top:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">30Y Bond</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">The long-end anchor. Driven by inflation expectations, fiscal deficits, and term premium. A rising 30Y while 2Y is flat signals a fiscal/inflation concern, not a Fed policy shift. The modal shows the 30Y–2Y spread alongside the 10Y–2Y.</div>
+        </div>
+        <div style="padding:12px;border-top:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Which to watch</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">2Y for policy signals. 10Y for cross-asset flows. 30Y for fiscal and long-run inflation expectations. The 10Y–2Y spread is the canonical inversion metric; 3M–10Y is the NY Fed recession model input.</div>
         </div>
       </div>
     </div>
@@ -868,7 +877,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <p>Japan's yield curve control (YCC) policy (now largely unwound as of 2024) historically capped JGB yields near 0%, meaning the US–JP spread widened and narrowed almost entirely based on US yield movements. This made USD/JPY one of the purest expressions of US rate expectations in FX markets.</p>
       <div class="callout callout-red">
         <strong>Post-YCC Japan:</strong> As the BoJ has normalized policy and allowed JGB yields to rise, the US–JP spread relationship has become more symmetric. Japanese rate hikes now compress the spread from the JP side as well. This means carry trade unwinds in USD/JPY can be triggered by either US yield declines or JP yield increases — monitor both.</div>
-      <p>The terminal displays the signal as Steepening (spread widening, bullish USD/JPY), Narrowing (spread compressing, bearish USD/JPY), or Stable (within recent range).</p>
+      <p>The terminal displays the signal as <strong>US Premium</strong> when the US 10Y yield exceeds Japan's (spread positive — carry incentive to be long USD/JPY), or <strong>JP Premium</strong> when the Japanese 10Y yield exceeds the US (spread negative — carry incentive compressed or reversed). The spread value is shown in basis points alongside the signal.</p>
     </div>
 
     <div class="guide-section" id="fx-implication">
@@ -882,7 +891,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <li>Bear steepening (10Y rising, 2Y stable) → watch for gold and AUD pressure as real rates rise</li>
       </ul>
       <div class="callout">
-        <strong>Data source:</strong> US Treasury yields update every 5 minutes during market hours via a server-side pipeline. For real-time tick data on Treasury yields, use the TradingView chart (US10Y, US02Y, etc.) in the price chart panel.
+        <strong>Data source:</strong> US Treasury yields update approximately every 5 minutes during US market hours via yfinance (^TNX, ^TYX, ^FVX, ^IRX, DGS2). Outside market hours or when the intraday feed is unavailable, the terminal falls back to FRED DGS2/DGS10 daily batch values — the panel subtitle reflects the active source. For real-time tick data on Treasury yields, use the TradingView chart (US10Y, US02Y, etc.) in the price chart panel.
       </div>
     </div>
 
@@ -903,7 +912,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · RATES</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.41.9</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.86.0</span></div>
 </footer>
 
 
