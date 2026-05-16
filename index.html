@@ -1249,6 +1249,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div class="footer-copy">&#169; 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
 
+    <!-- PWA INSTALL BUTTON — hidden until beforeinstallprompt fires -->
+    <button id="gi-pwa-install-btn" class="kb-hint-btn" style="display:none;"
+      title="Install terminal as app"
+      aria-label="Install as app"
+      onclick="(function(){var p=window._giDeferredInstallPrompt;if(!p)return;p.prompt();p.userChoice.then(function(){window._giDeferredInstallPrompt=null;document.getElementById('gi-pwa-install-btn').style.display='none';});})()">
+      install
+    </button>
+
     <!-- RSS FEED BUTTON -->
     <div id="rss-anchor" style="position:relative;">
       <button class="kb-hint-btn" id="rss-btn" onclick="toggleRssPopover()" title="Subscribe to AI narrative feed" aria-label="Subscribe to market narrative feed" aria-haspopup="true" aria-expanded="false">
