@@ -6862,9 +6862,12 @@ async function fetchFedExpectations() {
       //             − (cutProb/100  × +0.25)
       //   holdProb = 100 − cutProb − hikeProb  (residual, not stored separately)
       //
-      // Priority 1: explicit fwdRate from meetings.json (OIS-derived — future use)
-      // Priority 2: probability-weighted if cutProb or hikeProb available (≥1 field)
-      // Priority 3: ±25bp naive step with ~ prefix (only when no probabilities at all)
+      // Priority 1: explicit fwdRate from meetings.json (prob-weighted · computed by workflow)
+      //             Workflow writes this field using the same formula as Priority 2.
+      //             No ~ prefix — label shows 'prob. weighted · OIS' in the modal.
+      // Priority 2: compute on-the-fly if cutProb or hikeProb available (≥1 field)
+      //             No ~ prefix — probability data from OIS/futures is authoritative.
+      // Priority 3: ±step naive estimate (no prob data at all) → ~ prefix signals estimation
       let fwdDisplay = '—';
       const meetingBias = (() => {
         if (!meetings) return null;
@@ -6874,7 +6877,7 @@ async function fetchFedExpectations() {
         if (/hike|hawkish/i.test(b)) return 'up';
         return 'flat';
       })();
-      // Priority 1: explicit fwdRate from meetings.json (OIS-derived)
+      // Priority 1: meetings.json fwdRate (prob-weighted · workflow-computed)
       if (meetings?.fwdRate != null && !isNaN(meetings.fwdRate) && meetings.fwdRate > 0) {
         fwdDisplay = meetings.fwdRate.toFixed(2) + '%';
       } else {

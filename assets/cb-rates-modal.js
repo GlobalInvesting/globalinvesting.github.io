@@ -346,7 +346,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   else{
     const pCut=meetingData?.cutProb!=null?Math.min(100,Math.max(0,meetingData.cutProb)):null;
     const pHike=meetingData?.hikeProb!=null?Math.min(100,Math.max(0,meetingData.hikeProb)):null;
-    if(pCut!==null||pHike!==null){const cut=pCut??0,hike=Math.min(pHike??0,100-cut);fwdRate=Math.max(0,currentRate+(hike/100)*0.25-(cut/100)*0.25);fwdDisplay='~'+fwdRate.toFixed(2)+'%';fwdIsProbEst=true;}
+    if(pCut!==null||pHike!==null){const cut=pCut??0,hike=Math.min(pHike??0,100-cut);const cbStepModal=ccy==='JPY'?0.10:0.25;fwdRate=Math.max(0,currentRate+(hike/100)*cbStepModal-(cut/100)*cbStepModal);fwdDisplay=fwdRate.toFixed(2)+'%';fwdIsProbEst=true;}
     else{const step=bias==='cut'?-0.25:bias==='hike'?0.25:0;fwdRate=Math.max(0,currentRate+step);fwdDisplay='~'+fwdRate.toFixed(2)+'%';fwdIsEst=true;}
   }
   const bankName=bankInfo?.name||ccy,bankShort=bankInfo?.short||ccy;
@@ -379,7 +379,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
       </div>
       <div class="cbr-next-fwd">
         <div style="padding:10px 14px;border-right:1px solid var(--border,#252d3d);"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Next Meeting</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nextMtg}</div><div style="font-size:9px;font-family:var(--font-mono);color:${biasCol};margin-top:2px;">${biasLabel}</div></div>
-        <div style="padding:10px 14px;" title="${fwdIsEst?'Bias-only estimate — no OIS probability data.':fwdIsProbEst?'Probability-weighted estimate: E[rate] = P(hike)×+25bp + P(cut)×−25bp. Not a live OIS forward rate.':'OIS-implied forward rate (CIP convention)'}"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Fwd Rate</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:${bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text)'}">${fwdDisplay}</div><div style="font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:2px;">${fwdIsEst?'~ est \u00b7 bias only':fwdIsProbEst?'~ est \u00b7 prob. weighted':'OIS implied \u00b7 CIP'}</div></div>
+        <div style="padding:10px 14px;" title="${fwdIsEst?'Bias-only estimate — no OIS probability data.':'Probability-weighted expected rate at next meeting: E[rate] = current + P(hike)×step − P(cut)×step, where step = 25bp (10bp for BoJ). Derived from OIS/futures market probabilities (Bloomberg WIRP methodology).'}" ><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Fwd Rate</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:${bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text)'}">${fwdDisplay}</div><div style="font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:2px;">${fwdIsEst?'~ est \u00b7 bias only':'prob. weighted \u00b7 OIS'}</div></div>
       </div>
       ${_cbrBuildContextStrip(decisions,chronData,currentRate,meetingData,nMonths)}
     </div>
