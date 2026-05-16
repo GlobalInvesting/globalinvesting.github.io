@@ -2140,7 +2140,7 @@ async function renderRiskData(byId) {
   // VIX
   if (byId.vix) {
     const vix = byId.vix.close;
-    const cls = vix > 30 ? 'risk-val down' : vix > 25 ? 'risk-val down' : vix > 20 ? 'risk-val warning' : 'risk-val up';
+    const cls = vix > 30 ? 'risk-val down' : vix > 25 ? 'risk-val down' : vix > 18 ? 'risk-val warning' : 'risk-val up';  // v7.88.0: aligned with stress score >18 threshold
     setEl('risk-vix', vix.toFixed(1), cls);
     // Bloomberg 4-level VIX classification: <18=Low, 18-25=Moderate, 25-30=Elevated, >30=High
     // Aligns with stress scoring thresholds: >18=+1pt, >25=+2pts, >30=+3pts
@@ -2197,7 +2197,7 @@ async function renderRiskData(byId) {
     } else if (byId.us10y) {
       // Proxy: MOVE ≈ VIX-like measure from 10Y move
       const vixLevel = byId.vix ? byId.vix.close : 20;
-      const approx = Math.round(vixLevel * 3.8);
+      const approx = Math.round(vixLevel * 4.5);  // v7.88.0: raised from 3.8, empirical 2020-2025 avg MOVE/VIX ratio
       const cls = approx > 150 ? 'risk-val down' : approx > 100 ? 'risk-val warning' : 'risk-val up';
       setEl('risk-move', approx.toString(), cls);
       setEl('risk-move-sub', 'Bond vol · estimated');
@@ -2476,8 +2476,8 @@ async function renderRiskData(byId) {
         const sign = v >= 0 ? '+' : '';
         const corrLabel = sign + v.toFixed(2) + 'r';
         // Normal relationship is negative (gold priced in USD, inverse)
-        const corrSig = v > 0.2 ? 'Inflation bid' : v < -0.3 ? 'Normal' : 'Neutral';
-        const corrCls = v > 0.2 ? 'down' : v < -0.3 ? 'up' : 'flat';
+        const corrSig = v > 0.3 ? 'Inflation bid' : v < -0.3 ? 'Normal' : 'Neutral';  // v7.88.0: raised from 0.2 for Bloomberg +-0.3 symmetry
+        const corrCls = v > 0.3 ? 'down' : v < -0.3 ? 'up' : 'flat';
         setEl('ri-gold-dxy', corrLabel);
         setEl('ri-gold-dxy-sig', corrSig, corrCls);
       } else {
@@ -7010,7 +7010,7 @@ async function fetchOptionSkew() {
           ? '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col" title="IV Rank: position of current IV within 52-week range (0=historically low, 100=historically high)">IV Rnk</th><th scope="col">Direction</th>'
           : '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col">COT bias</th><th scope="col">Direction</th>';
       } else {
-        thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th>';
+        thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col" title="Current CFTC COT net (LF longs minus shorts)">Net</th><th scope="col" title="Net ~4 weeks ago — direction of change">4W</th><th scope="col">Bias</th>';
       }
     }
 
@@ -7101,7 +7101,10 @@ async function fetchOptionSkew() {
       } else {
         // ── COT fallback: original behavior ──
         const skew1w = cotData ? netToSkew(cotData.net, invert) : 0;
-        const skew1m = cotData ? netToSkew(cotData.net * 0.85, invert) : 0;
+        // v7.88.0: 4W-ago net from real CFTC history, replaces fabricated 0.85 multiplier
+        const _hist4w = window.COT_DATA_STORE?.[cotData?.ccy]?.history;
+        const _net4w = (_hist4w && _hist4w.length >= 5) ? (_hist4w[_hist4w.length - 5]?.levNet ?? null) : null;
+        const skew1m = cotData ? netToSkew(_net4w ?? cotData.net * 0.85, invert) : 0;
         // 25d RR chip — shown below bias label when Saxo data available
         // Note: no native browser title= here — tooltip handled per-cell via #fx-tt
         const rrEntryCot = rrMap[p.rrKey];
@@ -7122,7 +7125,7 @@ async function fetchOptionSkew() {
         const td0BodyCot  = pairTipCot?.body || '';
         const td0ExCot    = pairTipCot?.ex   || '';
         const td12Title   = 'COT Directional Skew · ' + p.pair;
-        const td12Body    = 'est. via COT — no CBOE/CME volatility index available for this pair. Derived from CFTC Leveraged Funds net positioning (Disaggregated TFF · Options+Futures Combined). 1W = current week net skew; 1M = smoothed (×0.85 decay).';
+        const td12Body    = 'est. via COT — no CBOE/CME volatility index available for this pair. Derived from CFTC Leveraged Funds net positioning (Disaggregated TFF · Options+Futures Combined). Net = current week; 4W = net ~4 weeks ago (real CFTC history, v7.88.0).';
         const td3TitleCot = p.pair + ' — Directional Bias';
         const td3BodyCot  = pairTipCot?.body || '';
         const td3ExCot    = pairTipCot?.ex   || '';
@@ -7484,7 +7487,7 @@ async function computeSessionVol() {
 
     // Session/daily range ratios — Myfxbook 5yr empirical averages
     const SESSION_RATIO_EUR = { syd: 0.28, tok: 0.50, lon: 0.87, ny: 0.83 };
-    const SESSION_RATIO_JPY = { syd: 0.25, tok: 0.60, lon: 0.75, ny: 0.80 };
+    const SESSION_RATIO_JPY = { syd: 0.25, tok: 0.65, lon: 0.72, ny: 0.80 };  // v7.88.0: Tokyo raised 0.60→0.65, London lowered 0.75→0.72 (BIS 2022: USD/JPY Asia ~44% vol share > London ~34%)
 
     // Daily range estimate from HV30 (annualised % → daily pips)
     const dailyEur = eur.close * (eur.hv30 / 100) / Math.sqrt(252) * 10000;
@@ -7512,7 +7515,7 @@ async function computeSessionVol() {
     });
 
     const sub = document.getElementById('svol-sub');
-    if (sub) sub.textContent = `HV30 ${eur.hv30.toFixed(1)}% · session ratios BIS/Myfxbook`;
+    if (sub) sub.textContent = `HV30 ${eur.hv30.toFixed(1)}% · 5yr historical session ratios`;  // v7.88.0: BIS/Myfxbook removed — BIS publishes volume share, not range ratios
 
   } catch(e) { console.warn('[SessionVol] Failed:', e); }
 }
