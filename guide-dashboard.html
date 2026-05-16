@@ -722,6 +722,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <a class="toc-item" href="#fx-pairs">FX Pairs Table</a>
     <a class="toc-item" href="#heatmap">Currency Strength Heatmap</a>
     <a class="toc-item" href="#sidebar">Left Sidebar</a>
+    <a class="toc-item" href="#econ-surprises">Economic Surprises</a>
     <a class="toc-item" href="#pair-detail">Pair Detail</a>
     <a class="toc-item" href="#right-panel">Right Panel</a>
     <a class="toc-item" href="#news-feed">News Feed</a>
@@ -1404,6 +1405,72 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <p style="font-size:12px;color:var(--text2);margin:4px 0 16px;">Color coding: <span style="color:var(--up);">green</span> = carry-to-vol &gt; 0.30 (strong), neutral = 0.12–0.30, <span style="color:var(--text3);">dim</span> = &lt; 0.12 (weak). The spread column shows the gross rate differential (long-leg rate minus short-leg rate) — the raw carry available before adjusting for volatility.</p>
       <h3>Upcoming Events</h3>
       <p>A Myfxbook economic calendar widget embedded at the bottom of the left sidebar, showing the next scheduled high-impact macro events (FOMC, ECB, NFP, CPI, etc.) with their expected release times. Use this to anticipate volatility windows before they arrive.</p>
+
+      <h3 id="econ-surprises">Economic Surprises</h3>
+      <p>A CESI-style (Citi Economic Surprise Index) centred bar chart showing whether each G8 currency&#8217;s macro data is beating or missing consensus forecasts over a rolling 90-day window. The panel scores medium- and high-impact ForexFactory releases only &#8212; low-impact events and non-macro noise (auctions, inventory data, financial flows) are excluded to match the methodology of institutional surprise indices.</p>
+      <p>The bar is centred at zero: a green bar extending right means data is beating consensus on net; a red bar extending left means data is missing. The N column shows how many events with actuals are in the current window &#8212; entries with fewer than 15 events are dimmed to flag low statistical confidence.</p>
+
+      <!-- MOCK: Economic Surprises panel -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px 0 4px;max-width:220px;margin:16px 0 20px;">
+        <div style="padding:0 8px 2px;font-size:10px;font-weight:700;color:var(--text);letter-spacing:.04em;">Economic Surprises</div>
+        <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast &middot; G8 &middot; 90d rolling</div>
+        <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+          <thead>
+            <tr>
+              <th style="text-align:left;font-size:9px;padding:1px 8px;width:34px;color:var(--text3);">CCY</th>
+              <th style="font-size:9px;text-align:center;padding:1px 4px;color:var(--text3);">Index</th>
+              <th style="font-size:9px;text-align:right;padding:1px 8px;width:28px;color:var(--text3);">N</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr title="USD: 18 beat &middot; 9 miss &middot; 4 in-line &middot; 58% beat rate &middot; index +29">
+              <td style="padding:2px 8px;font-size:10px;color:var(--text);">USD</td>
+              <td style="padding:2px 4px;"><div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;"><div style="position:absolute;height:6px;border-radius:2px;background:var(--up);left:50%;width:14.5%;"></div><div style="position:absolute;left:50%;top:-1px;width:1px;height:8px;background:var(--border2);"></div></div></td>
+              <td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">31</td>
+            </tr>
+            <tr title="EUR: 11 beat &middot; 16 miss &middot; 2 in-line &middot; 41% beat rate &middot; index -17">
+              <td style="padding:2px 8px;font-size:10px;color:var(--text);">EUR</td>
+              <td style="padding:2px 4px;"><div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;"><div style="position:absolute;height:6px;border-radius:2px;background:var(--down);left:41.5%;width:8.5%;"></div><div style="position:absolute;left:50%;top:-1px;width:1px;height:8px;background:var(--border2);"></div></div></td>
+              <td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">29</td>
+            </tr>
+            <tr title="GBP: 14 beat &middot; 11 miss &middot; 3 in-line &middot; 50% beat rate &middot; index +11">
+              <td style="padding:2px 8px;font-size:10px;color:var(--text);">GBP</td>
+              <td style="padding:2px 4px;"><div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;"><div style="position:absolute;height:6px;border-radius:2px;background:var(--up);left:50%;width:5.5%;"></div><div style="position:absolute;left:50%;top:-1px;width:1px;height:8px;background:var(--border2);"></div></div></td>
+              <td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">28</td>
+            </tr>
+            <tr title="JPY: 8 beat &middot; 14 miss &middot; 2 in-line &middot; 36% beat rate &middot; index -25">
+              <td style="padding:2px 8px;font-size:10px;color:var(--text);">JPY</td>
+              <td style="padding:2px 4px;"><div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;"><div style="position:absolute;height:6px;border-radius:2px;background:var(--down);left:37.5%;width:12.5%;"></div><div style="position:absolute;left:50%;top:-1px;width:1px;height:8px;background:var(--border2);"></div></div></td>
+              <td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">24</td>
+            </tr>
+            <tr title="AUD: 9 beat &middot; 7 miss &middot; 2 in-line &middot; 50% beat rate &middot; index +11">
+              <td style="padding:2px 8px;font-size:10px;color:var(--text);">AUD</td>
+              <td style="padding:2px 4px;"><div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;"><div style="position:absolute;height:6px;border-radius:2px;background:var(--up);left:50%;width:5.5%;"></div><div style="position:absolute;left:50%;top:-1px;width:1px;height:8px;background:var(--border2);"></div></div></td>
+              <td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">18</td>
+            </tr>
+            <tr title="CAD: 7 beat &middot; 9 miss &middot; 1 in-line &middot; 41% beat rate &middot; index -12">
+              <td style="padding:2px 8px;font-size:10px;color:var(--text);">CAD</td>
+              <td style="padding:2px 4px;"><div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;"><div style="position:absolute;height:6px;border-radius:2px;background:var(--down);left:44%;width:6%;"></div><div style="position:absolute;left:50%;top:-1px;width:1px;height:8px;background:var(--border2);"></div></div></td>
+              <td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">17</td>
+            </tr>
+            <tr title="CHF: 5 beat &middot; 4 miss &middot; 0 in-line &middot; 56% beat rate &middot; index +11">
+              <td style="padding:2px 8px;font-size:10px;color:var(--text);">CHF</td>
+              <td style="padding:2px 4px;"><div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;"><div style="position:absolute;height:6px;border-radius:2px;background:var(--up);left:50%;width:5.5%;"></div><div style="position:absolute;left:50%;top:-1px;width:1px;height:8px;background:var(--border2);"></div></div></td>
+              <td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);color:rgba(255,255,255,0.3);" title="Low sample size — interpret with caution">9</td>
+            </tr>
+            <tr title="NZD: 6 beat &middot; 5 miss &middot; 1 in-line &middot; 50% beat rate &middot; index +8">
+              <td style="padding:2px 8px;font-size:10px;color:var(--text);">NZD</td>
+              <td style="padding:2px 4px;"><div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;"><div style="position:absolute;height:6px;border-radius:2px;background:var(--up);left:50%;width:4%;"></div><div style="position:absolute;left:50%;top:-1px;width:1px;height:8px;background:var(--border2);"></div></div></td>
+              <td style="text-align:right;padding:2px 8px;font-size:9px;color:rgba(255,255,255,0.3);" title="Low sample size — interpret with caution">12</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">ForexFactory &middot; actual vs consensus &middot; 90d rolling</div>
+      </div>
+
+      <p>How to read the index: an event where actual exceeds consensus counts as a beat (+1), below consensus as a miss (&#8722;1), equal as in-line (0). Index = (beats &#8722; misses) / total scored &times; 100, ranging from &#8722;100 (all misses) to +100 (all beats). This is the same formula used by Citi CESI and Bloomberg BEEI before they apply their proprietary weighting. As 12&#8211;24 months of history accumulate, the panel upgrades each event to a z-score (actual &#8722; forecast relative to historical standard deviation), providing a magnitude-weighted signal that matches the full institutional index methodology.</p>
+      <p>Hover any row for a detailed breakdown: beat count, miss count, in-line count, beat rate, and current index value.</p>
+      <p><strong>Attribution:</strong> <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">ForexFactory &middot; actual vs consensus &middot; 90d rolling</span></p>
     </div>
 
     <div class="guide-section" id="pair-detail">
