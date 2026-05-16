@@ -596,7 +596,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <th style="text-align:left" scope="col">Pair</th>
             <th scope="col">Bid</th><th scope="col">Ask</th><th scope="col">Spread</th>
             <th scope="col">1D Chg</th><th scope="col">1W Chg</th>
-            <th scope="col" title="Historical Volatility 30d — annualized standard deviation of daily returns, computed from real yfinance data. Not options-implied volatility.">HV 30d</th>
+            <th scope="col" title="Historical Volatility 30d — annualized standard deviation of daily log returns over the last 30 trading days. Not options-implied volatility.">HV 30d</th>
             <th scope="col" title="Implied 1-month forward calculated via Covered Interest Parity (CIP) from G8 central bank rates. Not a live quoted price.">Fwd 1M</th>
             <th scope="col" title="Implied 3-month forward via CIP.">Fwd 3M</th>
             <th scope="col" title="25-delta Risk Reversal 1M tenor from Saxo Bank. Negative = put skew (downside hedging). Source: Saxo FX Options Analytics.">RR 1M</th>
@@ -859,7 +859,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
       <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;height:100%;">
-        <div class="panel-head"><span class="panel-title" title="Model-derived indicative spreads — not live quoted prices. Computed as ECN floor + HV30 × vol coefficient × VIX stress multiplier. Calibrated against published ECN averages (IC Markets, Pepperstone, OANDA). Values widen during high-volatility sessions. Not a tradeable quote — use your broker's live feed for execution.">Reference Spreads</span><span class="panel-sub" id="spreads-sub">ECN est. · Loading…</span></div>
+        <div class="panel-head"><span class="panel-title" title="Indicative ECN bid-ask spreads — model-estimated, not live quoted prices. Values widen during high-volatility sessions. Use your broker's live feed for execution.">Reference Spreads</span><span class="panel-sub" id="spreads-sub">ECN est. · Loading…</span></div>
         <div id="spreads-rows" style="padding:4px 10px;flex-shrink:0;">
           <!-- populated by fetchSpreadsData() -->
           <div class="spread-row"><span class="spr-sym">EUR/USD</span><div class="spr-bar"><div class="spr-fill" style="width:20%;background:var(--up)"></div></div><span class="spr-val up" id="spr-eurusd">0.9 pip</span></div>
@@ -1005,7 +1005,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <thead>
               <tr>
                 <th style="text-align:left;font-size:9px;" scope="col">Pair</th>
-                <th style="font-size:9px;text-align:right;" scope="col" title="30-day HV annualized · only window computed by pipeline · std(log returns)×√252">HV 30d</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="30-day Historical Volatility — annualized standard deviation of daily log returns">HV 30d</th>
                 <th style="font-size:9px;text-align:right;" scope="col" title="25d Risk Reversal 1M from Saxo Bank — negative = put skew (downside hedging demand)">RR 1M</th>
                 <th style="font-size:9px;text-align:right;" scope="col" title="RR 1M expressed as % of HV 30d — measures implied skew premium vs realized vol">RR / HV</th>
                 <th style="font-size:9px;text-align:right;" scope="col" title="Vol trend: HV 10d vs HV 30d. ↑ expanding (short-term vol above 30d avg), ↓ contracting, → neutral (within 1pp)">Trend</th>
