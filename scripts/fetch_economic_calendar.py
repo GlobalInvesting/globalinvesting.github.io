@@ -34,7 +34,7 @@ MERGE STRATEGY
   even though FF only provides 2 weeks of live data per run.
 
 CONSUMED BY
-  dashboard2.js -> renderEconSurprises() -- Economic Surprises panel
+  dashboard.js -> renderEconSurprises() -- Economic Surprises panel
 
 SCHEDULE
   update-economic-calendar.yml -- 4x daily (05:30, 09:30, 13:30, 20:30 UTC)
@@ -231,17 +231,22 @@ def main():
     # The frontend uses z-score when n>=5 for that event, beat/miss otherwise.
     # After 12-24 months of history, most major events will have valid z-scores.
 
+    # Must mirror the JS NOISE_KW list in dashboard.js renderEconSurprises() exactly.
+    # Any divergence causes events to enter surpriseStats but be filtered in JS scoring,
+    # corrupting the z-score mean/std with noise that never reaches the index.
     NOISE_KW_PY = [
         'cftc','baker hughes','rig count','auction','api weekly',
         'milk auction',"fed's balance sheet",'reserve balances',
-        'redbook','ibd/tipp','speculative net','nc net position',
-        'crude oil inventories','crude oil imports','distillate',
-        'gasoline','refinery','heating oil','natural gas storage',
+        'redbook','ibd/tipp','tips auction','note auction','bond auction',
+        'gilt auction','jgb auction','obligaciones','speculative net',
+        'nc net position','crude oil inventories','crude oil imports',
+        'distillate','gasoline inventorie','gasoline production',
+        'refinery','heating oil','natural gas storage',
         'foreign bonds buying','foreign investments in japanese',
         'foreign bond investment','foreign investment in japan',
         'm2 money','m3 money','m4 money','reserve assets total',
         'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
-        '3-month bill','4-week bill','52-week bill',
+        'ibd','3-month bill','4-week bill','52-week bill',
         # Additional noise: derived averages, financial flows, SEP projections, EIA energy
         '4-week average','4-week avg',
         'tic net','net long-term tic','total net tic',
@@ -249,38 +254,54 @@ def main():
         'eia crude oil','eia crude',
     ]
 
+    # Inverse indicators: a lower actual is a positive surprise (e.g. unemployment fell).
+    # Must mirror INVERSE_KW in dashboard.js renderEconSurprises().
+    INVERSE_KW_PY = ['unemployment', 'jobless', 'claims', 'deficit', 'trade balance']
+
     def _canonical(name):
         """Strip date/period suffixes to get a stable event key."""
         name = re.sub(r'\s*\([^)]*\)', '', name or '').strip()
         return name.lower()
 
-    def _parse_surprise(ev):
-        """Return (actual - forecast) as float, or None if unparseable."""
+    def _parse_surprise(ev, evname_lower=''):
+        """Return sign-corrected (actual - forecast) as float, or None if unparseable.
+
+        For inverse indicators (unemployment, claims, etc.) a lower actual is a
+        positive surprise. The raw difference is negated so the z-score direction
+        matches the beat/miss direction used by the JS frontend scoring loop.
+        This must mirror the INVERSE_KW logic in dashboard.js renderEconSurprises().
+        """
         def _f(s):
             if not s:
                 return None
             s = re.sub(r'[%,]', '', str(s).strip())
             m = re.match(r'^(-?[\d.]+)[KMBT]?$', s)
             return float(m.group(1)) if m else None
-        a = _f(ev.get('actual'))
+        a  = _f(ev.get('actual'))
         fc = _f(ev.get('forecast') or ev.get('previous'))
         if a is None or fc is None:
             return None
-        return a - fc
+        raw = a - fc
+        # Apply sign flip for inverse indicators so z-score direction is consistent
+        # with beat (positive surprise) / miss (negative surprise) semantics.
+        is_inverse = any(kw in evname_lower for kw in INVERSE_KW_PY)
+        return -raw if is_inverse else raw
 
-    surprise_by_event = {}  # key: "CCY/canonical_name" -> list of surprises
+    surprise_by_event = {}  # key: "CCY/canonical_name" -> list of sign-corrected surprises
     seen_surprises = set()  # dedup: same event+actual+forecast counted once
     for ev in fresh:
         if ev.get('impact', 'low') not in ('high', 'medium'):
             continue
         evname = ev.get('event') or ev.get('title') or ''
-        if any(kw in evname.lower() for kw in NOISE_KW_PY):
+        evname_lower = evname.lower()
+        if any(kw in evname_lower for kw in NOISE_KW_PY):
             continue
-        surprise = _parse_surprise(ev)
+        surprise = _parse_surprise(ev, evname_lower)
         if surprise is None:
             continue
-        # Dedup: Flash PMI then Final PMI publish same actual on different dates
-        actual_str = str(ev.get('actual', '')).replace('%','').replace(',','').strip()
+        # Dedup: Flash PMI then Final PMI publish same actual on different dates.
+        # Use forecast||previous in dedup key — matches JS dedupKey construction.
+        actual_str = str(ev.get('actual') or '').replace('%','').replace(',','').strip()
         fcast_str  = str(ev.get('forecast') or ev.get('previous') or '').replace('%','').replace(',','').strip()
         dedup_key  = f"{ev.get('currency','')}/{_canonical(evname)}/{actual_str}/{fcast_str}"
         if dedup_key in seen_surprises:
