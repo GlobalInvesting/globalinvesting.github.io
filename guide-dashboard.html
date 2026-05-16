@@ -1357,52 +1357,52 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </div>
       </div>
       <h3>Carry Trade — Top Pairs</h3>
-      <p>A ranked list of the top carry trade pair candidates across all 28 G8 combinations, sorted by the <strong>carry-to-vol ratio</strong> — the industry-standard metric for vol-adjusted carry: rate differential divided by realised 30-day historical volatility (HV30). This reflects how much yield per unit of realised volatility risk each pair offers, not just the raw rate differential. When HV30 data is unavailable, the panel falls back to gross rate differential ranking and the subtitle updates accordingly.</p>
-      <p>Each row shows the gross rate differential between the two legs (e.g. <code style="font-family:var(--font-mono);font-size:11px;">+4.00%</code> = long-leg rate minus short-leg rate), giving an instant read on the raw carry available. Clicking any row opens the pair in the price chart. Hovering shows the full breakdown: long rate / short rate / gross diff / HV30 / carry-to-vol.</p>
-      <!-- MOCK: Carry Trade Ranking -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:180px;font-size:11px;">
+      <p>A ranked list of the top 10 carry trade pair candidates across all 28 G8 combinations, sorted by <strong>real carry</strong> — the nominal OIS rate differential minus the inflation expectations differential between the two legs. This equals the real rate of the long leg minus the real rate of the short leg, and is the primary metric used by institutional FX carry screens (Bloomberg FXFR, Refinitiv). The tiebreak is carry-to-vol: real carry divided by 30-day realised volatility (HV30), filtering for efficiency of return per unit of risk. When inflation expectations data is unavailable, the panel falls back to gross nominal differential ranking and the subtitle updates to reflect this.</p>
+      <p>Each row shows: the rank, the pair, the <em>nominal</em> OIS spread as context (e.g. <code style="font-family:var(--font-mono);font-size:11px;">+2.83%</code>), a proportional bar, and the <em>real carry</em> value on the right (what actually ranks the pair). A positive real carry means the long leg earns positive carry after inflation erodes the nominal spread. Clicking any row opens the Real Rate Carry Modal for a full breakdown. Hovering shows: long rate / short rate / real carry / HV30.</p>
+      <!-- MOCK: Carry Trade Ranking — values match current OIS rates (May 2026) -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:200px;font-size:11px;">
         <div style="padding:5px 8px 4px;border-bottom:1px solid var(--border);background:var(--head-bg);display:flex;flex-direction:column;gap:1px;">
           <span style="font-size:9px;font-weight:700;color:var(--text2);font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em;">Carry Trade Ranking</span>
-          <span style="font-size:8px;color:var(--text3);letter-spacing:.04em;">G8 · carry-to-vol ratio</span>
+          <span style="font-size:8px;color:var(--text3);letter-spacing:.04em;">G8 &middot; real carry &middot; annualised</span>
         </div>
-        <!-- rows: rank / pair / rate spread / bar / carry-to-vol value -->
-        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 34px;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);cursor:pointer;">
+        <!-- rows: rank / pair / nominal OIS spread / bar / real carry value -->
+        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 38px;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);cursor:pointer;">
           <span style="font-size:9px;color:var(--text3);font-family:monospace;">1</span>
-          <span style="font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;">GBP/JPY</span>
-          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+3.00%</span>
+          <span style="font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;">USD/NZD</span>
+          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+1.31%</span>
           <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:8px;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:100%;max-width:100%;"></div></div>
-          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">0.53</span>
+          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">+1.69%</span>
         </div>
-        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 34px;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);cursor:pointer;">
+        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 38px;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);cursor:pointer;">
           <span style="font-size:9px;color:var(--text3);font-family:monospace;">2</span>
-          <span style="font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;">USD/CHF</span>
-          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+3.75%</span>
-          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:8px;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:84%;max-width:100%;"></div></div>
-          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">0.48</span>
-        </div>
-        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 34px;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);cursor:pointer;">
-          <span style="font-size:9px;color:var(--text3);font-family:monospace;">3</span>
-          <span style="font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;">GBP/EUR</span>
-          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+1.75%</span>
-          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:8px;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:70%;max-width:100%;"></div></div>
-          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">0.45</span>
-        </div>
-        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 34px;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);cursor:pointer;">
-          <span style="font-size:9px;color:var(--text3);font-family:monospace;">4</span>
           <span style="font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;">USD/JPY</span>
-          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+3.00%</span>
-          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:8px;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:57%;max-width:100%;"></div></div>
-          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">0.41</span>
+          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+2.83%</span>
+          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:8px;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:93%;max-width:100%;"></div></div>
+          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">+1.57%</span>
         </div>
-        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 34px;align-items:center;gap:4px;padding:4px 8px;font-family:var(--font-ui);cursor:pointer;">
+        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 38px;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);cursor:pointer;">
+          <span style="font-size:9px;color:var(--text3);font-family:monospace;">3</span>
+          <span style="font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;">USD/CHF</span>
+          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+3.60%</span>
+          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:8px;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:72%;max-width:100%;"></div></div>
+          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">+1.22%</span>
+        </div>
+        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 38px;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);cursor:pointer;">
+          <span style="font-size:9px;color:var(--text3);font-family:monospace;">4</span>
+          <span style="font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;">USD/EUR</span>
+          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+1.63%</span>
+          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:8px;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:69%;max-width:100%;"></div></div>
+          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">+1.17%</span>
+        </div>
+        <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 38px;align-items:center;gap:4px;padding:4px 8px;font-family:var(--font-ui);cursor:pointer;">
           <span style="font-size:9px;color:var(--text3);font-family:monospace;">5</span>
-          <span style="font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;">AUD/CHF</span>
-          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+4.18%</span>
-          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:8px;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:44%;max-width:100%;"></div></div>
-          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">0.39</span>
+          <span style="font-size:10.5px;font-weight:700;color:var(--text);white-space:nowrap;">GBP/NZD</span>
+          <span style="font-family:monospace;font-size:8px;color:var(--text2);white-space:nowrap;">+1.48%</span>
+          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:8px;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:65%;max-width:100%;"></div></div>
+          <span style="font-family:monospace;font-size:9.5px;text-align:right;color:var(--up);">+1.10%</span>
         </div>
       </div>
-      <p style="font-size:12px;color:var(--text2);margin:4px 0 16px;">Color coding: <span style="color:var(--up);">green</span> = carry-to-vol &gt; 0.30 (strong), neutral = 0.12–0.30, <span style="color:var(--text3);">dim</span> = &lt; 0.12 (weak). The spread column shows the gross rate differential (long-leg rate minus short-leg rate) — the raw carry available before adjusting for volatility.</p>
+      <p style="font-size:12px;color:var(--text2);margin:4px 0 16px;">The right column shows <strong>real carry</strong> (nominal OIS spread minus inflation differential) — the primary ranking value. The middle column shows the <strong>nominal OIS spread</strong> as reference context. Color coding: <span style="color:var(--up);">green</span> = real carry &ge;+0.5% (positive after inflation), neutral = 0%&ndash;0.5%, <span style="color:var(--text3);">dim</span> = negative real carry (inflation erodes nominal spread). Note: this is inflation-adjusted carry, not Covered Interest Parity (CIP) — no FX forward adjustment is applied.</p>
       <h3>Upcoming Events</h3>
       <p>A Myfxbook economic calendar widget embedded at the bottom of the left sidebar, showing the next scheduled high-impact macro events (FOMC, ECB, NFP, CPI, etc.) with their expected release times. Use this to anticipate volatility windows before they arrive.</p>
 
