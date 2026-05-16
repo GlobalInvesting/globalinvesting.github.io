@@ -155,7 +155,7 @@
   letter-spacing:.07em;flex-shrink:0;text-transform:uppercase;font-weight:600;
 }
 .cot-gauge-track { height:6px;background:rgba(255,255,255,.06);border-radius:3px;position:relative;margin:10px 0 6px; }
-.cot-gauge-fill { position:absolute;left:0;top:0;height:100%;border-radius:3px;background:linear-gradient(90deg,#ef5350 0%,var(--orange) 35%,var(--blue) 50%,var(--orange) 65%,#26a69a 100%);width:100%; }
+.cot-gauge-fill { position:absolute;left:0;top:0;height:100%;border-radius:3px;background:linear-gradient(90deg,#ef5350 0%,#ef5350 20%,var(--orange) 20%,var(--orange) 27%,var(--blue) 27%,var(--blue) 73%,var(--orange) 73%,var(--orange) 80%,#26a69a 80%,#26a69a 100%);width:100%; }
 .cot-gauge-pin {
   position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;
   background:var(--text);border:2px solid var(--bg2);
@@ -223,7 +223,7 @@ function _calcZ(history) {
   const vals = history.map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
   if (vals.length < 4) return null;
   const mean = vals.reduce((a,b)=>a+b,0)/vals.length;
-  const std  = Math.sqrt(vals.reduce((a,b)=>a+(b-mean)**2,0)/vals.length);
+  const std  = Math.sqrt(vals.reduce((a,b)=>a+(b-mean)**2,0)/(vals.length-1));
   if (std < 1) return null;
   return (vals[vals.length-1]-mean)/std;
 }
@@ -298,8 +298,9 @@ function _cotTrendLabel(history) {
   const recent = history.slice(-n).map(h=>h.levNet??((h.levLong||0)-(h.levShort||0)));
   let up=0,dn=0;
   for(let i=1;i<recent.length;i++){if(recent[i]>recent[i-1])up++;else if(recent[i]<recent[i-1])dn++;}
-  const streak = up===n-1?'Accumulating':dn===n-1?'Distributing':'Mixed';
-  return streak+' · '+(n-1)+' consecutive weeks';
+  if (up===n-1) return 'Accumulating · '+(n-1)+' consecutive '+(n-1===1?'week':'weeks');
+  if (dn===n-1) return 'Distributing · '+(n-1)+' consecutive '+(n-1===1?'week':'weeks');
+  return 'Mixed';
 }
 
 function _cotRangeCard(history, current) {
@@ -604,7 +605,7 @@ function openCOTModal(ccy,data){
         };
         return pRow('Leveraged Funds', net) +
                pRow('Asset Managers', amNet) +
-               pRow('Dealers / Intermediaries', ddNet!=null ? -ddNet : null);
+               pRow('Dealers / Intermediaries', ddNet);
       })()}
 
       <!-- SECTION: 52-WEEK RANGE -->
@@ -697,7 +698,7 @@ function openCOTModal(ccy,data){
         <td class="${_cotCls(hLP!=null?hLP-50:null)}">${hLP!=null?hLP+'%':'—'}</td>
         <td class="${_cotCls(hPctOI)}">${hPctOI!=null?(hPctOI>0?'+':'')+hPctOI.toFixed(1)+'%':'—'}</td>
         <td class="${_cotCls(h.assetManagerNet)}">${h.assetManagerNet!=null?_cotFmt(h.assetManagerNet):'—'}</td>
-        <td class="${_cotCls(h.dealerNet?-h.dealerNet:null)}">${h.dealerNet!=null?_cotFmt(h.dealerNet):'—'}</td>
+        <td class="${_cotCls(h.dealerNet)}">${h.dealerNet!=null?_cotFmt(h.dealerNet):'—'}</td>
       </tr>`;
     }).join('');
   }
