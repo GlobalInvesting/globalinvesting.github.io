@@ -1,4 +1,4 @@
-name: test-investing-com-aud-ib-v2
+name: test-investing-com-aud-ib-v3
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ jobs:
 
       - name: Write test script
         run: |
-          cat > test_investing2.py << 'PYEOF'
+          cat > test_investing3.py << 'PYEOF'
           import cloudscraper, requests, json, re, datetime
 
           scraper = cloudscraper.create_scraper(
@@ -21,77 +21,109 @@ jobs:
 
           BASE_HEADERS = {
               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-              "Accept": "application/json, text/plain, */*",
+              "Accept": "text/html,application/xhtml+xml,*/*",
               "Accept-Language": "en-US,en;q=0.9",
-              "domain-id": "www",
-              "Referer": "https://www.investing.com/rates-bonds/aud-30-day-interbank",
+              "Referer": "https://www.investing.com/",
           }
 
-          # -- Test 1: Fix the chart API with valid pointscount values --
-          print("=== Test 1: api.investing.com chart (instrument 8836) ===")
-          for pc in [60, 120]:
-              url = f"https://api.investing.com/api/financialdata/8836/historical/chart/?period=P1W&pointscount={pc}"
-              try:
-                  r = scraper.get(url, headers=BASE_HEADERS, timeout=20)
-                  print(f"  pointscount={pc}: status={r.status_code} CT={r.headers.get('Content-Type','?')[:50]}")
-                  print(f"  Body[:400]: {r.text[:400]}")
-              except Exception as e:
-                  print(f"  ERROR pc={pc}: {e}")
-
-          # -- Test 2: Search investing.com for AUD IB futures instrument IDs --
-          # Their search API is publicly known
-          print()
-          print("=== Test 2: Investing.com search for AUD IB futures contracts ===")
-          search_url = "https://api.investing.com/api/search/v2/search/?q=AUD+30+day+interbank&t=Bonds&limit=10"
-          try:
-              r = scraper.get(search_url, headers=BASE_HEADERS, timeout=20)
-              print(f"  Status: {r.status_code}  CT: {r.headers.get('Content-Type','?')[:50]}")
-              print(f"  Body[:800]: {r.text[:800]}")
-          except Exception as e:
-              print(f"  ERROR: {e}")
-
-          # -- Test 3: Try known investing.com quote API directly --
-          print()
-          print("=== Test 3: Investing.com quotes API ===")
-          quote_urls = [
-              "https://api.investing.com/api/financialdata/quotes?pairIds=8836&fields=last_close,last_numeric&c=1",
-              "https://api.investing.com/api/financialdata/8836?fields=last_close,last_numeric",
-          ]
-          for url in quote_urls:
-              try:
-                  r = scraper.get(url, headers=BASE_HEADERS, timeout=20)
-                  print(f"  [{r.status_code}] {url[45:80]}")
-                  print(f"    Body[:400]: {r.text[:400]}")
-              except Exception as e:
-                  print(f"  ERROR: {e}")
-
-          # -- Test 4: Try the Next.js __NEXT_DATA__ from the page --
-          # (same approach that works for NZFBF)
-          print()
-          print("=== Test 4: Next.js __NEXT_DATA__ from quote page ===")
+          # -- Test 1: Extract price from __NEXT_DATA__ on the correct page --
+          # We know Test 4 found 95.63 on /rates-bonds/aud-30-day-interbank
+          # Now extract it more precisely from the JSON tree
+          print("=== Test 1: Full __NEXT_DATA__ price extraction ===")
           try:
               r = scraper.get(
                   "https://www.investing.com/rates-bonds/aud-30-day-interbank",
-                  headers={**BASE_HEADERS, "Accept": "text/html"},
-                  timeout=20
+                  headers=BASE_HEADERS, timeout=20
               )
               print(f"  Status: {r.status_code}")
               nd = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', r.text, re.S)
               if nd:
                   data = json.loads(nd.group(1))
-                  print(f"  __NEXT_DATA__ found! Keys: {list(data.keys())}")
-                  # Try to find price
-                  s = json.dumps(data)
-                  prices = re.findall(r'"(?:last|price|close|bid|ask)"\s*:\s*([\d.]+)', s)
-                  print(f"  Price-like values: {prices[:10]}")
+                  # Search recursively for price-like keys
+                  def find_keys(obj, target_keys, depth=0, path=""):
+                      results = []
+                      if depth > 10:
+                          return results
+                      if isinstance(obj, dict):
+                          for k, v in obj.items():
+                              if any(t in str(k).lower() for t in target_keys):
+                                  results.append((path + "." + k, v))
+                              results.extend(find_keys(v, target_keys, depth+1, path+"."+k))
+                      elif isinstance(obj, list):
+                          for i, v in enumerate(obj):
+                              results.extend(find_keys(v, target_keys, depth+1, path+f"[{i}]"))
+                      return results
+                  
+                  hits = find_keys(data, ["last", "price", "close", "bid", "ask", "settle", "prev"])
+                  print(f"  Price-key hits ({len(hits)}):")
+                  seen = set()
+                  for path, val in hits[:30]:
+                      key = str(val)
+                      if key not in seen and val is not None:
+                          seen.add(key)
+                          print(f"    {path}: {val}")
               else:
                   print("  No __NEXT_DATA__ found")
-                  # Try to find any JSON with price data
-                  json_blobs = re.findall(r'window\.__.*?=\s*({.*?});', r.text[:5000], re.S)
-                  print(f"  window.__ blobs: {len(json_blobs)}")
           except Exception as e:
               print(f"  ERROR: {e}")
+
+          # -- Test 2: Search for the correct instrument ID for AUD IB front month --
+          # investing.com instrument 8836 turned out to be something else (price ~87-88)
+          # We need to find the AUD 30-day IB Jun-26 or Aug-26 contract
+          print()
+          print("=== Test 2: Find correct instrument IDs via search ===")
+          search_urls = [
+              "https://api.investing.com/api/search/v2/search/?q=30+day+interbank+cash+rate&limit=15",
+              "https://api.investing.com/api/search/v2/search/?q=ASX+IB+futures&limit=15",
+              "https://api.investing.com/api/search/v2/search/?q=AUD+interbank+futures&limit=15",
+          ]
+          api_headers = {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+              "domain-id": "www",
+              "Referer": "https://www.investing.com/",
+          }
+          for url in search_urls:
+              try:
+                  r = scraper.get(url, headers=api_headers, timeout=15)
+                  print(f"  [{r.status_code}] {url[50:90]}")
+                  if r.status_code == 200:
+                      d = r.json()
+                      # Print quotes section
+                      for section in ["quotes", "results", "hits"]:
+                          items = d.get(section, [])
+                          if items:
+                              print(f"    {section} ({len(items)}):")
+                              for item in items[:8]:
+                                  print(f"      {item}")
+                      if not d.get("quotes") and not d.get("results"):
+                          print(f"    Raw: {str(d)[:400]}")
+              except Exception as e:
+                  print(f"  ERROR: {e}")
+
+          # -- Test 3: Try specific IDs that could be AUD IB front month --
+          # ASX IB futures: Jun-26=IBM6, Aug-26=IBQ6 — investing.com may use different IDs
+          # Let's probe a range around 8836 to find the right one
+          print()
+          print("=== Test 3: Probe instrument IDs near 8836 for AUD IB ===")
+          api_headers2 = {**api_headers, "X-Requested-With": "XMLHttpRequest"}
+          for inst_id in [8830, 8833, 8836, 8839, 8842, 8850, 44336, 44337, 44338]:
+              try:
+                  url = f"https://api.investing.com/api/financialdata/{inst_id}/historical/chart/?period=P1W&pointscount=60"
+                  r = scraper.get(url, headers=api_headers2, timeout=10)
+                  if r.status_code == 200:
+                      d = r.json()
+                      pts = d.get("data", [])
+                      if pts:
+                          last_close = pts[-1][4]
+                          implied = round(100 - last_close, 3)
+                          print(f"  ID {inst_id}: last_close={last_close}  implied={implied}%  {'<-- AUD 4.x% range!' if 3.5 < implied < 5.0 else ''}")
+                      else:
+                          print(f"  ID {inst_id}: 200 but no data points")
+                  else:
+                      print(f"  ID {inst_id}: {r.status_code}")
+              except Exception as e:
+                  print(f"  ID {inst_id}: ERROR {e}")
           PYEOF
 
       - name: Run test
-        run: python3 test_investing2.py
+        run: python3 test_investing3.py
