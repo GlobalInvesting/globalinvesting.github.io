@@ -1,4 +1,4 @@
-name: test-investing-com-aud-ib
+name: test-investing-com-aud-ib-v2
 
 on:
   workflow_dispatch:
@@ -12,77 +12,86 @@ jobs:
 
       - name: Write test script
         run: |
-          cat > test_investing.py << 'PYEOF'
-          import cloudscraper, requests, json, datetime
-
-          RBA_RATE = 4.10  # current as of 2026-05
-          NEXT_MEETING = datetime.date(2026, 6, 16)
+          cat > test_investing2.py << 'PYEOF'
+          import cloudscraper, requests, json, re, datetime
 
           scraper = cloudscraper.create_scraper(
               browser={"browser": "chrome", "platform": "linux", "mobile": False}
           )
 
-          # -- Approach 1: Investing.com quote page (cloudscraper) --
-          print("=== Approach 1: cloudscraper quote page ===")
-          headers_a = {
+          BASE_HEADERS = {
               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+              "Accept": "application/json, text/plain, */*",
               "Accept-Language": "en-US,en;q=0.9",
-              "Referer": "https://www.investing.com/",
-          }
-          try:
-              r = scraper.get("https://www.investing.com/rates-bonds/aud-30-day-interbank", headers=headers_a, timeout=20)
-              print(f"  Status: {r.status_code}  CT: {r.headers.get('Content-Type','?')[:40]}")
-              print(f"  CF blocked: {'cf-ray' in r.headers}")
-              # Look for price in HTML
-              import re
-              prices = re.findall(r'"last_close"\s*:\s*"?([\d.]+)"?', r.text)
-              prices2 = re.findall(r'data-last-price="([\d.]+)"', r.text)
-              print(f"  prices found: {prices[:5]}")
-              print(f"  prices2 found: {prices2[:5]}")
-              print(f"  Body[:200]: {r.text[:200]}")
-          except Exception as e:
-              print(f"  ERROR: {e}")
-
-          # -- Approach 2: Investing.com internal API (instrument ID 8836) --
-          print()
-          print("=== Approach 2: Investing.com API (instrument 8836) ===")
-          api_headers = {
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-              "X-Requested-With": "XMLHttpRequest",
               "domain-id": "www",
               "Referer": "https://www.investing.com/rates-bonds/aud-30-day-interbank",
           }
-          endpoints = [
-              "https://api.investing.com/api/financialdata/8836/historical/chart/?period=P1W&pointscount=10",
-              "https://www.investing.com/rates-bonds/aud-30-day-interbank/historical-data",
-          ]
-          for url in endpoints:
-              try:
-                  r = scraper.get(url, headers=api_headers, timeout=20)
-                  print(f"  [{r.status_code}] {url.split('/')[-2][:40]}")
-                  print(f"    CT: {r.headers.get('Content-Type','?')[:60]}")
-                  print(f"    Body[:300]: {r.text[:300]}")
-              except Exception as e:
-                  print(f"  ERROR {url[:50]}: {e}")
 
-          # -- Approach 3: Stooq (Polish financial data, no bot protection) --
-          print()
-          print("=== Approach 3: Stooq AUD IB futures ===")
-          # Stooq sometimes has ASX data
-          stooq_urls = [
-              "https://stooq.com/q/d/l/?s=ibm6.ax&i=d",
-              "https://stooq.com/q/d/l/?s=ib.ax&i=d",
-              "https://stooq.pl/q/d/l/?s=ibm6.ax&i=d",
-          ]
-          for url in stooq_urls:
+          # -- Test 1: Fix the chart API with valid pointscount values --
+          print("=== Test 1: api.investing.com chart (instrument 8836) ===")
+          for pc in [60, 120]:
+              url = f"https://api.investing.com/api/financialdata/8836/historical/chart/?period=P1W&pointscount={pc}"
               try:
-                  r = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-                  print(f"  [{r.status_code}] {url}")
-                  print(f"    Body[:200]: {r.text[:200]}")
+                  r = scraper.get(url, headers=BASE_HEADERS, timeout=20)
+                  print(f"  pointscount={pc}: status={r.status_code} CT={r.headers.get('Content-Type','?')[:50]}")
+                  print(f"  Body[:400]: {r.text[:400]}")
               except Exception as e:
-                  print(f"  ERROR {url}: {e}")
+                  print(f"  ERROR pc={pc}: {e}")
+
+          # -- Test 2: Search investing.com for AUD IB futures instrument IDs --
+          # Their search API is publicly known
+          print()
+          print("=== Test 2: Investing.com search for AUD IB futures contracts ===")
+          search_url = "https://api.investing.com/api/search/v2/search/?q=AUD+30+day+interbank&t=Bonds&limit=10"
+          try:
+              r = scraper.get(search_url, headers=BASE_HEADERS, timeout=20)
+              print(f"  Status: {r.status_code}  CT: {r.headers.get('Content-Type','?')[:50]}")
+              print(f"  Body[:800]: {r.text[:800]}")
+          except Exception as e:
+              print(f"  ERROR: {e}")
+
+          # -- Test 3: Try known investing.com quote API directly --
+          print()
+          print("=== Test 3: Investing.com quotes API ===")
+          quote_urls = [
+              "https://api.investing.com/api/financialdata/quotes?pairIds=8836&fields=last_close,last_numeric&c=1",
+              "https://api.investing.com/api/financialdata/8836?fields=last_close,last_numeric",
+          ]
+          for url in quote_urls:
+              try:
+                  r = scraper.get(url, headers=BASE_HEADERS, timeout=20)
+                  print(f"  [{r.status_code}] {url[45:80]}")
+                  print(f"    Body[:400]: {r.text[:400]}")
+              except Exception as e:
+                  print(f"  ERROR: {e}")
+
+          # -- Test 4: Try the Next.js __NEXT_DATA__ from the page --
+          # (same approach that works for NZFBF)
+          print()
+          print("=== Test 4: Next.js __NEXT_DATA__ from quote page ===")
+          try:
+              r = scraper.get(
+                  "https://www.investing.com/rates-bonds/aud-30-day-interbank",
+                  headers={**BASE_HEADERS, "Accept": "text/html"},
+                  timeout=20
+              )
+              print(f"  Status: {r.status_code}")
+              nd = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', r.text, re.S)
+              if nd:
+                  data = json.loads(nd.group(1))
+                  print(f"  __NEXT_DATA__ found! Keys: {list(data.keys())}")
+                  # Try to find price
+                  s = json.dumps(data)
+                  prices = re.findall(r'"(?:last|price|close|bid|ask)"\s*:\s*([\d.]+)', s)
+                  print(f"  Price-like values: {prices[:10]}")
+              else:
+                  print("  No __NEXT_DATA__ found")
+                  # Try to find any JSON with price data
+                  json_blobs = re.findall(r'window\.__.*?=\s*({.*?});', r.text[:5000], re.S)
+                  print(f"  window.__ blobs: {len(json_blobs)}")
+          except Exception as e:
+              print(f"  ERROR: {e}")
           PYEOF
 
       - name: Run test
-        run: python3 test_investing.py
+        run: python3 test_investing2.py
