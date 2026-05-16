@@ -1546,6 +1546,36 @@ def main():
                 "break_pos": "AUD and Gold unusually correlated — commodity FX regime dominant.",
                 "break_neg": "Gold rising but AUD falling — China/domestic risk overriding commodity link.",
             },
+            ("USD/JPY", "US 10Y"): {
+                "normal": "positive",
+                "break_pos": "USD/JPY rising without yield support — positioning or safe-haven unwind driving JPY weakness.",
+                "break_neg": "US yields rising but USD/JPY falling — JPY bid on intervention risk or BoJ policy shift.",
+            },
+            ("USD/CAD", "WTI Oil"): {
+                "normal": "negative",
+                "break_pos": "USD/CAD rising with oil — USD dominance overriding the CAD commodity link; potential demand shock.",
+                "break_neg": "USD/CAD falling while oil also falls — broad USD weakness stronger than the oil headwind on CAD.",
+            },
+            ("GBP/USD", "FTSE 100"): {
+                "normal": "positive",
+                "break_pos": "GBP and UK equities in unusually strong lockstep — GBP purely tracking risk appetite.",
+                "break_neg": "GBP falling while FTSE holds — GBP-specific pressure (BoE, fiscal, or political) decoupled from equities.",
+            },
+            ("AUD/USD", "ASX 200"): {
+                "normal": "positive",
+                "break_pos": "AUD and ASX unusually correlated — pure domestic risk-on regime.",
+                "break_neg": "ASX holding but AUD falling — external FX headwinds (China, USD) overriding domestic equity strength.",
+            },
+            ("NZD/USD", "NZX 50"): {
+                "normal": "positive",
+                "break_pos": "NZD and NZX unusually correlated — domestic risk appetite dominant.",
+                "break_neg": "NZX stable but NZD falling — external drivers (USD, global risk) overriding domestic equity signal.",
+            },
+            ("GBP/USD", "Gold"): {
+                "normal": "positive",
+                "break_pos": "GBP and Gold rising together — USD weakness the common driver; safe-haven and risk-on coexisting.",
+                "break_neg": "Gold bid but GBP falling — sterling-specific pressure; safe-haven flow bypassing UK assets.",
+            },
         }
 
         _new_corr_signals = []
@@ -1557,6 +1587,7 @@ def main():
             ctx = _corr_context.get(pair_key, {})
             direction = "above" if z > 0 else "below"
             norm_str = f"{c['norm']:+.2f}" if c.get("norm") is not None else "hist. avg"
+            corr30_str = f"{c['corr30']:+.2f}" if c.get("corr30") is not None else "—"
             corr_str = f"{c['corr']:+.2f}" if c.get("corr") is not None else "—"
 
             # Select description based on direction of break
@@ -1574,6 +1605,7 @@ def main():
                 "title":    f"{c['a']} / {c['b']} correlation break",
                 "text":     desc,
                 "evidence": [
+                    f"30d corr: {corr30_str}",
                     f"60d corr: {corr_str}",
                     f"Hist. norm: {norm_str}",
                     f"Z-score: {z:+.2f}σ",
