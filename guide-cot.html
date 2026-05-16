@@ -845,11 +845,12 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <h3>Overview tab</h3>
       <p>The default tab. Organized in two rows:</p>
       <ul>
-        <li><strong>Positioning Gauge</strong> (top-left): A visual spectrum from Extreme Short (&lt;−2σ) to Extreme Long (&gt;+2σ), with a pin showing where current LF net positioning falls within the trailing 52-week history. Below the gauge: the z-score label (e.g. <em>Moderately Short</em>), the historical percentile (e.g. <em>18th percentile</em>), and a badge — <strong style="color:#f6941c;">CROWDED TRADE</strong> when |z| ≥ 1.5, or <strong style="color:#26a69a;">Within normal range</strong> otherwise.</li>
-        <li><strong>Long / Short Split + Participants</strong> (top-right): The proportional bar between LF long and short contracts, combined with the three-row participants table (Leveraged Funds, Asset Managers, Dealers) and LF/AM alignment signal — consolidated into a single card.</li>
-        <li><strong>Net Position Trend sparkline</strong> (bottom-left): An 8-week sparkline showing the trajectory of LF net contracts, with a trend label (e.g. <em>Accumulating · 3 consecutive weeks</em>).</li>
-        <li><strong>Positioning Range (52w)</strong> (bottom-center): A range bar and table showing where the current net position sits between the 52-week high and low.</li>
-        <li><strong>Signal Summary</strong> (bottom-right): Up to 4 color-coded bullets — LF direction, LF/AM alignment, crowding status, and dealer contra-positioning — without requiring tab navigation.</li>
+        <li><strong>Top row — Positioning Gauge</strong> (left): A visual spectrum from Extreme Short (&lt;−2σ) to Extreme Long (&gt;+2σ), with a pin showing where current LF net positioning falls within the trailing 52-week history. Below the gauge: z-score, historical percentile, and label (e.g. <em>Crowded Short</em> · 22nd percentile).</li>
+        <li><strong>Top row — Long / Short Split</strong> (right): The absolute long and short contract counts and a proportional bar between them, showing LF long% and short%.</li>
+        <li><strong>Key Metrics section</strong> (full-width): Net%OI, Week-on-Week change with BUYING/SELLING badge, LF/AM crowd alignment, and 4-week trend pattern (Accumulating / Distributing / Mixed).</li>
+        <li><strong>Participants section</strong> (full-width): A mini bar-chart row for each category (Leveraged Funds, Asset Managers, Dealers / Intermediaries) with net contracts and LONG/SHORT/FLAT badge. Bars are proportionally scaled to the largest absolute net.</li>
+        <li><strong>52-Week Range section</strong> (full-width): A range bar and table showing 52w High, Current, and 52w Low net contracts with the current position's percentile rank.</li>
+        <li><strong>12-Week Net Trend section</strong> (full-width): A 12-week SVG sparkline of LF net contracts with a trend label (e.g. <em>Accumulating · 3 consecutive weeks</em>).</li>
       </ul>
 
       <!-- MOCK: COT Modal — Overview tab v1.2 (2-col top + 3-col bottom) -->
@@ -952,7 +953,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
 
       <h3>Net Position tab</h3>
-      <p>A weekly bar chart of LF net contracts over the available history (up to 52 weeks). Bars use a single identity color — <span style="color:#4f7fff;font-weight:700;">blue (#4f7fff)</span>, the same Leveraged Funds color used throughout the terminal — at 85% opacity for positive weeks and 35% for negative weeks. The color identifies the series, not the sign; the y-axis makes direction unambiguous.</p>
+      <p>A weekly bar chart of LF net contracts over the available history (up to 52 weeks). Bars are <span style="color:#26a69a;font-weight:700;">green (teal)</span> for net-long weeks and <span style="color:#ef5350;font-weight:700;">red</span> for net-short weeks — direction is encoded in both the bar color and the y-axis. This matches the terminal's standard up/down color convention.</p>
 
       <h3>Long / Short tab</h3>
       <p>A weekly line chart overlaying LF longs (teal) and LF shorts (red) on the same scale. Where the two lines converge, the position is close to neutral. Where they diverge, the gap represents the absolute size of the net position. Useful for seeing whether a net move is driven by new positions being added or existing positions being unwound.</p>
@@ -1084,7 +1085,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · COT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.41.9</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.84.0</span></div>
 </footer>
 
 
