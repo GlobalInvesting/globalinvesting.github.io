@@ -233,7 +233,7 @@ function openCorrModal(corrObj) {
         '</div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">Regime</span><span class="cm-regime-val ' + regimeCls + '">' + regimeLabel + ' &thinsp;· ' + _cmFmt(corr30) + '</span></div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">Trend</span><span class="cm-regime-val">' + trendHtml + '</span></div>' +
-        '<div class="cm-regime-row"><span class="cm-regime-key">30d vs norm</span><span class="cm-regime-val ' + (normDelta != null ? _cmCls(normDelta) : '') + '">' + (normDelta != null ? _cmFmt(normDelta) : '\u2014') + '</span></div>' +
+        '<div class="cm-regime-row"><span class="cm-regime-key">30d vs norm</span><span class="cm-regime-val ' + (normDelta != null ? _cmZcls(z_score) : '') + '">' + (normDelta != null ? _cmFmt(normDelta) : '\u2014') + '</span></div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">Z-score</span><span class="cm-regime-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</span></div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">252d range</span><span class="cm-regime-val">' + rangeHtml + '</span></div>' +
         (sigTxt ? '<div class="cm-signal ' + sigCls + '"><span class="cm-signal-tag">' + sigTag + '</span><span class="cm-signal-body">' + sigTxt + '</span></div>' : '') +
