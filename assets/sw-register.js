@@ -24,6 +24,21 @@
   var SUB_KEY       = 'gi_push_sub';        // localStorage — serialised subscription
   var VAPID_PUBLIC  = '';                   // Provide your VAPID public key here
 
+  // ── 0. Capture PWA install prompt ──────────────────────────────────
+  // Stores the deferred prompt so the tour or a button can trigger it.
+  window._giDeferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    window._giDeferredInstallPrompt = e;
+    var btn = document.getElementById('gi-pwa-install-btn');
+    if (btn) btn.style.display = 'inline-block';
+  });
+  window.addEventListener('appinstalled', function () {
+    window._giDeferredInstallPrompt = null;
+    var btn = document.getElementById('gi-pwa-install-btn');
+    if (btn) btn.style.display = 'none';
+  });
+
   // ── 1. Register Service Worker ─────────────────────────────────────
   if (!('serviceWorker' in navigator)) return;
 

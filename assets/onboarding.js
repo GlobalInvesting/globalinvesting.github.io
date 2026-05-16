@@ -1,14 +1,14 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.82.0 — onboarding2 (staging/preview build)
+ * v7.83.0 — onboarding2 (staging/preview build)
  *
  * Differences vs onboarding.js (v7.81.5 production):
  *   - Storage key changed to 'gi_welcome2_done' so staging tour is independent
  *     of production localStorage state (visiting index.html won't suppress this)
  *   - giReplayTour() exposed as giReplayTour2() to avoid collisions
- *   - 9-step tour covering all panels: AI Narrative, Macro Regime, Cross-Asset,
- *     COT Positioning (opens modal), Rates, Heatmap, Derivatives (nav + render),
- *     Signal Alerts
+ *   - 10-step tour: AI Narrative, Macro Regime, Cross-Asset, COT Positioning,
+ *     Rates, Heatmap, Derivatives, Install & Subscribe (NEW), Signal Alerts
+ *   - Step 8 (Install & Subscribe): surfaces PWA install + RSS feed — retention
  *   - Derivatives step clicks nav link and waits 400ms before positioning
  *   - COT modal opened non-blocking (600ms delay) so popover renders first
  *   - All BUG-1..5 fixes from v7.73.0 preserved
@@ -157,21 +157,41 @@
       },
     },
 
-    /* 8 — Signal alerts (last) */
+    /* 8 — Install & Subscribe */
+    {
+      target:  'rss-btn',
+      side:    'top',
+      title:   'Keep the terminal in reach',
+      badge:   'Install',
+      body:    'Two ways to stay connected without bookmarks:<br><br>' +
+               '<b>Install as app</b> — Add the terminal to your desktop or home screen for instant access. ' +
+               'No app store required: click <b>Install</b> in your browser address bar, or use the button below if available.<br><br>' +
+               '<b>RSS / JSON feed</b> — Subscribe to the AI narrative feed (button above) to receive macro regime updates in any feed reader, every session open.',
+      action:  function () {
+        /* navigate back to overview so the RSS button in the footer is visible */
+        try {
+          var overviewLink = document.querySelector('.top-nav a[data-target="top"]') ||
+                             document.querySelector('.top-nav a[href="#top"]');
+          if (overviewLink) overviewLink.click();
+        } catch (e) {}
+        /* show PWA install button if prompt is available */
+        try {
+          var installBtn = document.getElementById('gi-pwa-install-btn');
+          if (installBtn && window._giDeferredInstallPrompt) {
+            installBtn.style.display = 'inline-block';
+          }
+        } catch (e) {}
+      },
+    },
+
+    /* 9 — Signal alerts (last) */
     {
       target:  'sig-notif-btn',
       side:    'top',
       title:   'Stay ahead — enable signal alerts',
       badge:   'Alerts',
       body:    'The terminal publishes AI-generated signals when the regime shifts or a high-conviction setup appears. Enable browser notifications to catch the signal at session open, even when this tab is in the background — no account or email required.',
-      action:  function () {
-        /* navigate back to overview so the UI is in a clean state after dismiss */
-        try {
-          var overviewLink = document.querySelector('.top-nav a[data-target="top"]') ||
-                             document.querySelector('.top-nav a[href="#top"]');
-          if (overviewLink) overviewLink.click();
-        } catch (e) {}
-      },
+      action:  function () {},
       lastCta: true,
     },
   ];
