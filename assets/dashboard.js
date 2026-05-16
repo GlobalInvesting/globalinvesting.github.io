@@ -2420,14 +2420,7 @@ async function renderRiskData(byId) {
   }
 
   // Gold/SPX ratio — computed in fetchCrossAssetData() after gold & SPX are fetched
-  // US–EU Spread 10Y (uses byId from this scope)
-  if (byId.us10y && byId.de10y) {
-    const spr = byId.us10y.close - byId.de10y.close;
-    const bp = Math.round(spr * 100);
-    const sign = bp >= 0 ? '+' : '';
-    setEl('ri-us-eu', sign + bp + 'bp');
-    setEl('ri-us-eu-sig', bp > 0 ? 'USD+' : 'EUR+', bp > 50 ? 'up' : bp < -50 ? 'down' : 'flat');
-  }
+  // Note: ri-us-eu and ri-us-eu-sig are written by the yield spreads block above (canonical path).
   // USD/JPY vs VIX — real 60-day rolling Pearson from quotes.json (computed by engine).
   // Replaces the previous hardcoded proxy coefficients (-0.72, -0.41, etc.) which were
   // invented values. Now shows the actual computed correlation or '—' if unavailable.

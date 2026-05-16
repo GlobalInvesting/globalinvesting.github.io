@@ -341,12 +341,12 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   const bias=meetingData?.bias??null,nextMtg=meetingData?.nextMeeting??'—';
   const biasLabel=bias==='cut'?'\u2193 Cut':bias==='hike'?'\u2191 Hike':'\u2192 Hold';
   const biasCol=bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text2)';
-  let fwdRate=null,fwdDisplay='—',fwdIsEst=false;
+  let fwdRate=null,fwdDisplay='—',fwdIsEst=false,fwdIsProbEst=false;
   if(meetingData?.fwdRate!=null&&!isNaN(meetingData.fwdRate)&&meetingData.fwdRate>0){fwdRate=parseFloat(meetingData.fwdRate);fwdDisplay=fwdRate.toFixed(2)+'%';}
   else{
     const pCut=meetingData?.cutProb!=null?Math.min(100,Math.max(0,meetingData.cutProb)):null;
     const pHike=meetingData?.hikeProb!=null?Math.min(100,Math.max(0,meetingData.hikeProb)):null;
-    if(pCut!==null||pHike!==null){const cut=pCut??0,hike=Math.min(pHike??0,100-cut);fwdRate=Math.max(0,currentRate+(hike/100)*0.25-(cut/100)*0.25);fwdDisplay=fwdRate.toFixed(2)+'%';}
+    if(pCut!==null||pHike!==null){const cut=pCut??0,hike=Math.min(pHike??0,100-cut);fwdRate=Math.max(0,currentRate+(hike/100)*0.25-(cut/100)*0.25);fwdDisplay='~'+fwdRate.toFixed(2)+'%';fwdIsProbEst=true;}
     else{const step=bias==='cut'?-0.25:bias==='hike'?0.25:0;fwdRate=Math.max(0,currentRate+step);fwdDisplay='~'+fwdRate.toFixed(2)+'%';fwdIsEst=true;}
   }
   const bankName=bankInfo?.name||ccy,bankShort=bankInfo?.short||ccy;
@@ -379,7 +379,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
       </div>
       <div class="cbr-next-fwd">
         <div style="padding:10px 14px;border-right:1px solid var(--border,#252d3d);"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Next Meeting</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nextMtg}</div><div style="font-size:9px;font-family:var(--font-mono);color:${biasCol};margin-top:2px;">${biasLabel}</div></div>
-        <div style="padding:10px 14px;" title="${fwdIsEst?'Bias-only estimate — no OIS probability data.':'OIS-implied forward rate (CIP convention)'}"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Fwd Rate</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:${bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text)'}">${fwdDisplay}</div><div style="font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:2px;">${fwdIsEst?'~ est \u00b7 bias only':'OIS implied \u00b7 CIP'}</div></div>
+        <div style="padding:10px 14px;" title="${fwdIsEst?'Bias-only estimate — no OIS probability data.':fwdIsProbEst?'Probability-weighted estimate: E[rate] = P(hike)×+25bp + P(cut)×−25bp. Not a live OIS forward rate.':'OIS-implied forward rate (CIP convention)'}"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Fwd Rate</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:${bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text)'}">${fwdDisplay}</div><div style="font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:2px;">${fwdIsEst?'~ est \u00b7 bias only':fwdIsProbEst?'~ est \u00b7 prob. weighted':'OIS implied \u00b7 CIP'}</div></div>
       </div>
       ${_cbrBuildContextStrip(decisions,chronData,currentRate,meetingData,nMonths)}
     </div>
