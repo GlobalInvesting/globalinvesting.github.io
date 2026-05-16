@@ -502,7 +502,7 @@ function populateHeatmap() {
 
   // Prefer STOOQ_RT_CACHE (intraday ~5min delay) over ECB daily rates
   // because ECB daily rates have zero intraday movement (same open/close on weekends)
-  const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 14; // need majority of 28 pairs
+  const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 21; // need ≥75% of 28 pairs for reliable composite
 
   let strengths;
   if (rtAvailable) {

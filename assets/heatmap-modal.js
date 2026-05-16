@@ -1,4 +1,4 @@
-// CURRENCY STRENGTH HEATMAP MODAL  v2.1 — inline-panel edition, terminal CSS variables
+// CURRENCY STRENGTH HEATMAP MODAL  v2.2 — audit fixes: tooltipEl bug, keyframes, tab a11y, labels
 // CURRENCY STRENGTH HEATMAP MODAL  v1.1.0
 // File: assets/heatmap-modal.js
 // Loaded AFTER dashboard.js (see index.html)
@@ -24,8 +24,8 @@
 #hm-bd {
   display:block!important;
 }
- to{opacity:1} }
- to{transform:none;opacity:1} }
+@keyframes hm-fadein  { from{opacity:0}                              to{opacity:1} }
+@keyframes hm-slidein { from{transform:translateY(-8px);opacity:0}  to{transform:none;opacity:1} }
 
 #hm-modal {
   width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
@@ -108,7 +108,10 @@
   border-bottom:2px solid transparent;
   transition:color .12s;white-space:nowrap;user-select:none;
   font-family:var(--font-ui,sans-serif);
+  /* button reset — keeps visual identical to former div */
+  background:none;border-top:none;border-left:none;border-right:none;outline:none;
 }
+.hm-tab:focus-visible { outline:2px solid var(--blue);outline-offset:-2px;border-radius:2px; }
 .hm-tab:hover { color:var(--text2); }
 .hm-tab.on { color:var(--text);border-bottom-color:var(--blue); }
 
@@ -230,8 +233,8 @@
 .sess-note-name { font-size:10px;font-family:var(--font-mono,monospace);font-weight:600;letter-spacing:.04em;color:var(--text); }
 .sess-note-body { font-size:10.5px;font-family:var(--font-mono,monospace);color:var(--text2);line-height:1.6;padding-left:2px; }
 
-/* ── Correlations — Proposal A ── */
-/* ── Correlations matrix — rcm-matrix aesthetic ── */
+/* ── Rel. Strength tab (Strength Differential matrix) ── */
+/* ── Strength matrix — rcm-matrix aesthetic ── */
 .corr-wrap { overflow:auto;flex:1;min-height:0;scrollbar-width:thin;scrollbar-color:#444c56 transparent; }
 .corr-wrap::-webkit-scrollbar { width:4px;height:4px; }
 .corr-wrap::-webkit-scrollbar-track { background:transparent; }
@@ -550,12 +553,12 @@
     <div class="hm-mm">
       <div class="hm-mm-lbl">Composite</div>
       <div class="hm-mm-val" id="hm-m-composite">—</div>
-      <div class="hm-mm-sub">avg vs 7 pairs</div>
+      <div class="hm-mm-sub" id="hm-m-comp-sub">avg vs 7 pairs</div>
     </div>
     <div class="hm-mm">
       <div class="hm-mm-lbl">1W Strength</div>
       <div class="hm-mm-val" id="hm-m-1w">—</div>
-      <div class="hm-mm-sub" id="hm-m-1w-sub">avg vs 7 pairs</div>
+      <div class="hm-mm-sub" id="hm-m-1w-sub">vs prior Fri</div>
     </div>
     <div class="hm-mm">
       <div class="hm-mm-lbl">Rank</div>
@@ -579,10 +582,10 @@
     </div>
   </div>
   <div id="hm-tabs" role="tablist" aria-label="Heatmap breakdown tabs">
-    <div class="hm-tab on" role="tab" aria-selected="true"  data-tab="breakdown"    onclick="hmTab(this,'breakdown')">Pair Breakdown</div>
-    <div class="hm-tab"    role="tab" aria-selected="false" data-tab="session"      onclick="hmTab(this,'session')">Session</div>
-    <div class="hm-tab"    role="tab" aria-selected="false" data-tab="correlations" onclick="hmTab(this,'correlations')">Correlations</div>
-    <div class="hm-tab"    role="tab" aria-selected="false" data-tab="csi"          onclick="hmTab(this,'csi')">CSI</div>
+    <button class="hm-tab on" role="tab" aria-selected="true"  data-tab="breakdown"    onclick="hmTab(this,'breakdown')">Pair Breakdown</button>
+    <button class="hm-tab"    role="tab" aria-selected="false" data-tab="session"      onclick="hmTab(this,'session')">Session</button>
+    <button class="hm-tab"    role="tab" aria-selected="false" data-tab="correlations" onclick="hmTab(this,'correlations')">Rel. Strength</button>
+    <button class="hm-tab"    role="tab" aria-selected="false" data-tab="csi"          onclick="hmTab(this,'csi')">CSI</button>
   </div>
   <div id="hm-body">
     <div class="hm-panel on" id="hm-p-breakdown">
@@ -596,7 +599,7 @@
               <th scope="col" class="col-prev-close">Prev close</th>
               <th scope="col">Day %</th>
               <th scope="col">1W %</th>
-              <th scope="col">Impact</th>
+              <th scope="col" title="Relative contribution vs peers — bar width = magnitude">Contribution</th>
               <th scope="col">Session range</th>
             </tr>
           </thead>
@@ -611,7 +614,7 @@
             <div id="hm-ranking-rows"></div>
           </div>
           <div style="flex:1;">
-            <div class="hm-rank-sublbl">1W % · Mon–Fri</div>
+            <div class="hm-rank-sublbl">1W % · vs prior Fri</div>
             <div id="hm-ranking-1w-rows"></div>
           </div>
         </div>
@@ -629,7 +632,7 @@
     </div>
     <div class="hm-panel" id="hm-p-correlations">
       <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-        <div class="hm-ct">INTRADAY STRENGTH DIFFERENTIAL · ALL G8 PAIRS · % CHG vs PREV CLOSE</div>
+        <div class="hm-ct">RELATIVE STRENGTH DIFFERENTIAL · ALL G8 · % COMPOSITE vs PREV CLOSE</div>
         <div id="hm-corr-matrix" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;"></div>
       </div>
       <div class="hm-cw">
@@ -697,10 +700,20 @@
       if (impact < worstPct) { worstPct = impact; worstPair = { pair: p.id.toUpperCase(), opp, pct: impact }; }
     });
 
-    const compositeEl = document.getElementById('hm-m-composite');
+    const compositeEl    = document.getElementById('hm-m-composite');
+    const compositeSubEl = document.getElementById('hm-m-comp-sub');
     const v = self.pct;
     compositeEl.textContent = fmt2(v);
-    compositeEl.className = 'hm-mm-val ' + pctClass(v);
+    compositeEl.className   = 'hm-mm-val ' + pctClass(v);
+
+    // Count how many pairs actually contributed to this currency's composite
+    const compPairCnt = myPairs.filter(p => {
+      const d = rtCache[p.id];
+      return d && d.pct != null;
+    }).length;
+    if (compositeSubEl) {
+      compositeSubEl.textContent = compPairCnt + ' pair' + (compPairCnt !== 1 ? 's' : '') + ' · intraday';
+    }
 
     // 1W composite — same equal-weighted model but using pct1w per pair
     let w1sum = 0, w1n = 0;
@@ -717,7 +730,7 @@
       const w1avg = w1sum / w1n;
       w1El.textContent    = fmt2(w1avg);
       w1El.className      = 'hm-mm-val ' + pctClass(w1avg);
-      w1SubEl.textContent = w1n + ' pairs · Mon–Fri';
+      w1SubEl.textContent = w1n + ' pairs · vs prior Fri';
     } else {
       w1El.textContent    = '—';
       w1El.className      = 'hm-mm-val flat';
@@ -787,8 +800,7 @@
         <td class="col-prev-close">${fmtPrice(r.open)}</td>
         <td class="${iCls}">${fmt2(r.impact)}</td>
         <td class="${pctClass(r.imp1w)}">${r.imp1w != null ? fmt2(r.imp1w) : '—'}</td>
-        <td><div class="imp-wrap">
-          <span class="${iCls}">${fmt2(r.impact)}</span>
+        <td><div class="imp-wrap" title="${fmt2(r.impact)} vs peers">
           <div class="imp-bar-bg"><div class="imp-bar-fill" style="width:${barW}%;background:${barClr}"></div></div>
         </div></td>
         <td style="font-size:9px;color:var(--text3)">${rng}</td>
@@ -1196,7 +1208,7 @@
     wrap.className = 'corr-wrap';
 
     // Header row
-    const headerCells = `<th class="row-head" scope="col">Strength ↓ / vs →</th>` +
+    const headerCells = `<th class="row-head" scope="col" title="Row − Column = strength differential. Positive = row currency outperforms column currency today.">Δ Strength (row − col)</th>` +
       ccys.map(c => `<th scope="col"${c === ccy ? ' class="focal"' : ''}>${c}</th>`).join('') +
       `<th scope="col" class="focal" title="Equal-weighted composite — avg % vs all 7 G8 peers">Comp.</th>`;
 
@@ -1234,11 +1246,11 @@
     const footRow = `<tr class="comp-row"><td class="row-head focal" style="font-size:9px">Comp.</td>${footCells}<td class="diag" style="font-size:9px">—</td></tr>`;
 
     const legend = `<div class="corr-legend">
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.25);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong outperformance</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.10);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Mild outperformance</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.25);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong outperformance (Δ ≥ +0.40%)</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(38,166,154,.10);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Mild outperformance (Δ ≥ +0.06%)</span>
       <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.10);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Mild underperformance</span>
       <span><span style="display:inline-block;width:10px;height:10px;background:rgba(239,83,80,.25);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Strong underperformance</span>
-      <span>Diagonal = composite strength</span>
+      <span style="color:var(--text3,#4e5c70)">Diagonal = intraday composite · Values = equal-weighted Δ%, not Pearson correlations</span>
     </div>`;
 
     wrap.innerHTML = `<table class="corr-matrix" aria-label="Intraday strength differential matrix G8 currencies">
@@ -1393,8 +1405,9 @@
     const LWC = window.LightweightCharts;
     if (!LWC || !_csiData) return;
 
-    const wrap = document.getElementById('hm-csi-wrap');
-    const chartEl = document.getElementById('hm-csi-chart');
+    const wrap      = document.getElementById('hm-csi-wrap');
+    const chartEl   = document.getElementById('hm-csi-chart');
+    const tooltipEl = document.getElementById('hm-csi-tooltip');
     if (!wrap || !chartEl) return;
 
     // Determine date slice
