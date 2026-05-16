@@ -6443,10 +6443,6 @@ async function fetchCarryRanking() {
         <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
         <span class="cr-diff ${cls}">${displayVal}</span>
       </div>`;
-    container.innerHTML = top.map((p, idx) => {
-      const sym = carryTV(p.long, p.short);
-
-      // (row HTML built above — spreadLabel, displayVal, barPct, cls, tip already set)
     }).join('');
 
     // ── 9. Row click → open Real Rate Carry Modal ────────────────────────────
