@@ -256,15 +256,16 @@ const _RCM_CB = { USD: 'Fed', EUR: 'ECB', GBP: 'BoE', JPY: 'BoJ', AUD: 'RBA', CA
 const _RCM_FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CAD: 'ca', CHF: 'ch', NZD: 'nz' };
 
 // Inflation expectation source labels — shown in the source column for transparency
+// Sources reflect update-inflation-expectations.yml v5.0 (forward-looking cascade)
 const _RCM_IE_SRC = {
-  USD: 'FRED T5YIE · 5Y breakeven',
+  USD: 'FRED T5YIE · 5Y TIPS breakeven',
   EUR: 'FRED T5YIFR · EUR 5Y5Y swap',
-  GBP: 'CPI YoY · IMF SDMX',
+  GBP: 'BOE SDIE BEAPFF · 2Y-ahead survey',
   JPY: 'CPI YoY · IMF SDMX',
   AUD: 'CPI YoY · IMF SDMX',
-  CAD: 'CPI YoY · IMF SDMX',
+  CAD: 'FRED CAINFIMPCPI · 5Y breakeven',
   CHF: 'CPI YoY · IMF SDMX',
-  NZD: 'CPI YoY · OECD Explorer',
+  NZD: 'RBNZ survey · 2Y-ahead',
 };
 
 // ── State ───────────────────────────────────────────────────────────────────
@@ -558,8 +559,10 @@ function _rcmRenderBreakdown() {
     : '';
   const liveNote = 'Nominal rate: OIS overnight benchmark (SOFR/€STR/SONIA/TONA/CORRA/SARON) — Bloomberg/Refinitiv standard.' + fallbackNote + ' · ' +
     'USD/EUR infl.exp: FRED 5Y breakeven (market-implied, daily). ' +
-    'GBP/JPY/AUD/CAD/CHF: CPI YoY (IMF SDMX 3.0, weekly). NZD: OECD Data Explorer (weekly). ' +
-    'Real rate = Nominal OIS − Inflation Expectation. OIS Bias reflects forward market consensus at next CB meeting.';
+    'GBP: BOE SDIE household survey 2Y-ahead. CAD: FRED 5Y breakeven. NZD: RBNZ survey 2Y-ahead. ' +
+    'JPY/AUD/CHF: CPI YoY (IMF SDMX 3.0, weekly). ' +
+    'Real rate = Nominal OIS − Inflation Expectation. OIS Bias reflects forward market consensus at next CB meeting. ' +
+    'Note: real carry ≠ CIP — no FX forward adjustment applied.';
 
   return `<div class="rcm-cw" style="flex:1;min-height:0;overflow:auto;">
     <table class="rcm-tbl" aria-label="Real rate carry ranking by currency">
@@ -649,7 +652,7 @@ function _rcmRenderMatrix() {
         <span style="color:var(--text3);">Diagonal = absolute real rate · Cell = Row real rate − Column real rate</span>
       </div>
     </div>
-    <div class="rcm-src-note">Real rate = Nominal CB rate − Inflation Expectation. Positive cell = long row currency earns higher real carry vs short column currency.</div>
+    <div class="rcm-src-note">Real rate = Nominal OIS rate − Inflation Expectation. Positive cell = long row currency earns higher real carry vs short column currency. No FX forward adjustment applied — this is inflation-adjusted carry, not Covered Interest Parity (CIP).</div>
   </div>`;
 }
 
@@ -936,7 +939,7 @@ function _rcmBuildDOM() {
     <div id="rcm-hd">
       <div id="rcm-hd-left">
         <div id="rcm-title">Real Rate Carry Analysis</div>
-        <div id="rcm-sub">Nominal CB rate &minus; Inflation Expectation (breakeven / CPI proxy) &middot; G8</div>
+        <div id="rcm-sub">Nominal OIS rate &minus; Inflation Expectation &middot; Real carry &middot; G8</div>
       </div>
       <button id="rcm-close" aria-label="Close real rate carry modal">&times;</button>
     </div>

@@ -5945,7 +5945,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-section-lbl">Price</div>
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="1-Week Change" data-tip-body="Weekly % change vs prior Friday close. Source: FX performance cache."><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="Carry Differential" data-tip-body="Central bank policy rate differential: numerator currency rate minus denominator currency rate. Positive = pair&apos;s leading currency yields more, carry favours holding long." data-tip-ex="Positive carry = the long leg earns more than it costs to fund the short. Carry is most reliable as a persistent trend signal; it can reverse quickly on policy surprises."><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="Carry Differential" data-tip-body="OIS overnight rate differential (SOFR/€STR/SONIA/TONA/CORRA/SARON — Bloomberg standard). Falls back to CB policy rate when OIS data unavailable. Positive = base currency yields more, carry favours long." data-tip-ex="Positive carry = the long leg earns more than it costs to fund the short. OIS reflects actual overnight funding cost — more accurate than CB policy rate for carry calculations. Carry is most reliable as a persistent trend signal; it can reverse quickly on policy surprises."><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated average daily range in pips, derived from HV 30d: close × (HV / √252). Indicates typical intraday movement — useful for stop and target sizing." data-tip-ex="ADR of 85 pip on EUR/USD means the pair moves ~85 pip on an average day."><div class="pd-lbl">ADR</div><div class="pd-val">${adr != null ? adr + ' pip' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="${base || 'Base'} Policy Rate" data-tip-body="${base || 'Base'} central bank policy rate (annualised). Source: CB rates cache."><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
       </div>
@@ -6176,21 +6176,24 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 // source used by the main FX table and the pair detail popover).
 // Falls back to gross differential ranking when HV30 unavailable.
 // ═══════════════════════════════════════════════════════════════════
-// CARRY TRADE RANKING — G8 · CIP-adjusted · annualised
+// CARRY TRADE RANKING — G8 · real carry · annualised
 // ═══════════════════════════════════════════════════════════════════
 // Institutional-grade carry ranking per Bloomberg FXFR / Refinitiv conventions:
 //
-//   Primary sort:  CIP-adjusted real carry = nominal rate diff − ΔInflation expectations
-//                  (real carry after inflation — the standard institutional metric)
+//   Primary sort:  real carry = nominal OIS differential − ΔInflation expectations
+//                  = realRate(long) − realRate(short)
+//                  (carry adjusted for inflation — the standard institutional metric)
+//                  NOTE: this is real carry, NOT Covered Interest Parity (CIP).
+//                  True CIP uses FX forward points; this uses inflation differentials.
 //   Tiebreak:      carry-to-vol ratio = real carry / HV30
 //                  (vol-adjusted carry; Bloomberg carry screens use this for pair selection)
 //   Last fallback: gross nominal differential (when extended-data unavailable)
 //
-//   Display:       rank · pair · nominal spread label · proportional bar · CIP-adj value
-//                  Bar width = proportional to top pair's CIP-adj carry (or nominal fallback)
+//   Display:       rank · pair · nominal spread label · proportional bar · real carry value
+//                  Bar width = proportional to top pair's real carry (or nominal fallback)
 //                  Value coloring: ≥+0.5% green (carry positive after infl.) / ≤−0.5% red
 //
-//   Tooltip:       long rate / short rate / CIP adj. / HV30 / click for real rate analysis
+//   Tooltip:       long rate / short rate / real carry / HV30 / click for real rate analysis
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCarryRanking() {
   const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
@@ -6294,7 +6297,7 @@ async function fetchCarryRanking() {
         if (!r.ok) return;
         const d = await r.json();
         const ie = d?.data?.inflationExpectations;
-        if (ie != null && ie > 0 && ie < 20) inflExp[ccy] = ie;
+        if (ie != null && ie > -5 && ie < 20) inflExp[ccy] = ie; // -5 floor accepts deflation (CHF/JPY history)
       } catch {}
     }));
 
@@ -6320,30 +6323,31 @@ async function fetchCarryRanking() {
         const pid  = pairId(long, short);
         const hv30 = hv30Map[pid] ?? null;
 
-        // CIP-adjusted carry: nominal diff minus inflation expectations differential
-        // = real carry that long leg earns after accounting for purchasing power erosion
+        // Real carry: nominal OIS differential minus inflation expectations differential
+        // = realRate(long) − realRate(short). Inflation-adjusted carry, NOT CIP.
+        // True CIP (Covered Interest Parity) uses FX forward points, not inflation data.
         const ieLong  = inflExp[long]  ?? null;
         const ieShort = inflExp[short] ?? null;
-        const cipVal  = (ieLong != null && ieShort != null)
+        const realCarry = (ieLong != null && ieShort != null)
           ? parseFloat((absDiff - (ieLong - ieShort)).toFixed(3))
           : null;
 
-        // Carry-to-vol: CIP-adj carry / HV30 — used as tiebreak
+        // Carry-to-vol: real carry / HV30 — used as tiebreak
         const carryVol = (hv30 != null && hv30 > 0)
-          ? (cipVal != null ? Math.abs(cipVal) : absDiff) / hv30
+          ? (realCarry != null ? Math.abs(realCarry) : absDiff) / hv30
           : null;
 
-        allPairs.push({ long, short, diff: absDiff, rLong, rShort, hv30, carryVol, cipVal, pid });
+        allPairs.push({ long, short, diff: absDiff, rLong, rShort, hv30, carryVol, realCarry, pid });
       }
     }
 
-    // ── 5. Sort: CIP-adjusted (primary) → carry-to-vol (tiebreak) → gross diff ─
-    const hasCipData = allPairs.some(p => p.cipVal != null);
+    // ── 5. Sort: real carry (primary) → carry-to-vol (tiebreak) → gross diff ─
+    const hasRealCarryData = allPairs.some(p => p.realCarry != null);
     const hasVolData = allPairs.some(p => p.carryVol != null);
     allPairs.sort((a, b) => {
-      if (hasCipData) {
-        const cipA = a.cipVal ?? -Infinity;
-        const cipB = b.cipVal ?? -Infinity;
+      if (hasRealCarryData) {
+        const cipA = a.realCarry ?? -Infinity;
+        const cipB = b.realCarry ?? -Infinity;
         if (Math.abs(cipB - cipA) > 0.001) return cipB - cipA;
       }
       if (hasVolData) {
@@ -6357,15 +6361,15 @@ async function fetchCarryRanking() {
     const top = allPairs.slice(0, 10);
 
     // Bar scale: proportional to the top pair's display value
-    // Use CIP-adj when available; fall back to nominal diff
-    const topDisplay = top.map(p => Math.max(p.cipVal ?? p.diff, 0));
+    // Use real carry when available; fall back to nominal diff
+    const topDisplay = top.map(p => Math.max(p.realCarry ?? p.diff, 0));
     const maxDisplay = Math.max(...topDisplay, 0.01);
 
     // ── 6. Update panel subtitle ──────────────────────────────────────────────
     const headSpan = container.closest('.sb-section')?.querySelector('.sb-head span');
     if (headSpan) {
-      headSpan.textContent = hasCipData
-        ? 'G8 · CIP-adjusted · annualised'
+      headSpan.textContent = hasRealCarryData
+        ? 'G8 · real carry · annualised'
         : 'G8 · CB rate differential';
     }
 
@@ -6374,12 +6378,12 @@ async function fetchCarryRanking() {
     if (sbHead && !sbHead._carryTipAttached) {
       sbHead._carryTipAttached = true;
       sbHead.style.cursor = 'help';
-      const tipTitle = hasCipData ? 'CIP-Adjusted Carry' : 'CB Rate Differential';
-      const tipBody  = hasCipData
-        ? 'Ranked by CIP-adjusted real carry: nominal rate differential minus the inflation expectations differential between the two legs. Tiebreak: carry-to-vol (carry per unit of HV30 risk). Industry standard per Bloomberg FXFR. Click any row for full real rate breakdown.'
-        : 'CB policy rate differential (%) between the long and short leg. CIP-adjusted ranking requires inflation expectations data (unavailable). Click any row for real rate analysis.';
-      const tipEx = hasCipData
-        ? 'Example: GBP/CHF nominal +3.75% − (BoE infl.exp − SNB infl.exp) = CIP-adj carry. Positive = long leg earns real carry after purchasing power adjustment.'
+      const tipTitle = hasRealCarryData ? 'Real Carry Ranking' : 'CB Rate Differential';
+      const tipBody  = hasRealCarryData
+        ? 'Ranked by real carry: nominal OIS rate differential minus the inflation expectations differential between the two legs (= real rate long − real rate short). Tiebreak: carry-to-vol (carry per unit of HV30 risk). Industry standard per Bloomberg FXFR. Click any row for full real rate breakdown.'
+        : 'CB policy rate differential (%) between the long and short leg. Real carry ranking requires inflation expectations data (unavailable). Click any row for real rate analysis.';
+      const tipEx = hasRealCarryData
+        ? 'Example: GBP/CHF nominal +3.77% − (BoE infl.exp 3.45% − SNB infl.exp 0.31%) = real carry +0.63%. Positive = long leg earns positive real carry after purchasing power adjustment.'
         : 'Example: AUD 4.35% − CHF 0.00% = +4.35% gross nominal differential.';
 
       sbHead.addEventListener('mouseenter', ev => {
@@ -6399,38 +6403,38 @@ async function fetchCarryRanking() {
     }
 
     // ── 8. Render rows ────────────────────────────────────────────────────────
-    // Design: rank · pair · nominal spread label · proportional bar · CIP-adj value
+    // Design: rank · pair · nominal spread label · proportional bar · real carry value
     // This matches Bloomberg/Refinitiv carry screen conventions:
     //   - Nominal spread shown as reference (what the market quotes)
-    //   - Bar width proportional to CIP-adjusted real carry (true ranking metric)
-    //   - CIP value shown on right with color coding (green ≥+0.5%, red ≤−0.5%)
+    //   - Bar width proportional to real carry (true ranking metric)
+    //   - Real carry value shown on right with color coding (green ≥+0.5%, red ≤−0.5%)
     container.innerHTML = top.map((p, idx) => {
       const sym = carryTV(p.long, p.short);
 
-      // Nominal spread — the raw CB rate differential, shown as context
+      // Nominal spread — the raw OIS rate differential, shown as context
       const spreadLabel = '+' + p.diff.toFixed(2) + '%';
 
-      // CIP-adjusted carry — primary ranking value shown on the right
-      const cipVal = p.cipVal;
-      const displayVal = cipVal != null
-        ? (cipVal >= 0 ? '+' : '') + cipVal.toFixed(2)
+      // Real carry — primary ranking value shown on the right
+      const realCarryVal = p.realCarry;
+      const displayVal = realCarryVal != null
+        ? (realCarryVal >= 0 ? '+' : '') + realCarryVal.toFixed(2)
         : '+' + p.diff.toFixed(2);
 
-      // Bar width: proportional to CIP-adj carry of the top pair
+      // Bar width: proportional to real carry of the top pair
       // Clamped to [4%, 100%] — never invisible, never overflows
-      const barRaw = cipVal != null ? Math.max(cipVal, 0) : p.diff;
+      const barRaw = realCarryVal != null ? Math.max(realCarryVal, 0) : p.diff;
       const barPct = Math.max(Math.round((barRaw / maxDisplay) * 100), 4);
 
-      // Color: green when CIP carry ≥+0.5% (real carry positive after inflation)
+      // Color: green when real carry ≥+0.5% (positive after inflation)
       //        neutral when 0%–0.5% (marginal carry)
-      //        dim when carry is CIP-negative (inflation erodes the nominal spread)
-      const cls = cipVal != null
-        ? (cipVal >= 0.5 ? 'pd-up' : cipVal <= -0.1 ? 'pd-dim' : '')
+      //        dim when real carry is negative (inflation erodes the nominal spread)
+      const cls = realCarryVal != null
+        ? (realCarryVal >= 0.5 ? 'pd-up' : realCarryVal <= -0.1 ? 'pd-dim' : '')
         : (p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim');
 
-      const cipStr  = cipVal != null ? (cipVal >= 0 ? '+' : '') + cipVal.toFixed(2) + '%' : '—';
+      const realStr = realCarryVal != null ? (realCarryVal >= 0 ? '+' : '') + realCarryVal.toFixed(2) + '%' : '—';
       const hvStr   = p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a';
-      const tip = `${p.long}/${p.short} · Nominal ${spreadLabel} · CIP-adj ${cipStr} · HV30 ${hvStr} — Click for real rate analysis`;
+      const tip = `${p.long}/${p.short} · Nominal ${spreadLabel} · Real carry ${realStr} · HV30 ${hvStr} — Click for real rate analysis`;
 
       return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
@@ -6439,6 +6443,10 @@ async function fetchCarryRanking() {
         <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
         <span class="cr-diff ${cls}">${displayVal}</span>
       </div>`;
+    container.innerHTML = top.map((p, idx) => {
+      const sym = carryTV(p.long, p.short);
+
+      // (row HTML built above — spreadLabel, displayVal, barPct, cls, tip already set)
     }).join('');
 
     // ── 9. Row click → open Real Rate Carry Modal ────────────────────────────
