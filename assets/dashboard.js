@@ -10271,7 +10271,10 @@ async function renderEconSurprises() {
     // different dates. Without dedup, each revision counts as a separate event,
     // inflating N and double-counting the same macro signal.
     const canonEvent = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
-    const dedupKey   = `${ccy}/${canonEvent}/${String(ev.actual).replace(/[%,\s]/g,'')}/${String(ev.forecast||'').replace(/[%,\s]/g,'')}`;
+    // Use forecast||previous in the dedup key — mirrors fetch_economic_calendar.py
+    // so events without an explicit forecast but with a previous baseline deduplicate
+    // consistently between JS scoring and Python surpriseStats computation.
+    const dedupKey   = `${ccy}/${canonEvent}/${String(ev.actual).replace(/[%,\s]/g,'')}/${String(ev.forecast||ev.previous||'').replace(/[%,\s]/g,'')}`;
     if (!window._ES_SEEN) window._ES_SEEN = new Set();
     if (window._ES_SEEN.has(dedupKey)) return;
     window._ES_SEEN.add(dedupKey);
@@ -10286,7 +10289,12 @@ async function renderEconSurprises() {
     const isInverse = INVERSE_KW.some(kw => ev.title.toLowerCase().includes(kw));
     const beat = isInverse ? actual < forecast : actual > forecast;
     const miss = isInverse ? actual > forecast : actual < forecast;
-    const surprise = actual - forecast;
+    // rawSurprise is unsigned (actual − forecast). For the z-score we apply the
+    // same sign correction that fetch_economic_calendar.py applies when building
+    // surpriseStats: negate for inverse indicators so positive z-score always means
+    // a positive surprise. beat/miss already encodes direction correctly above.
+    const rawSurprise = actual - forecast;
+    const surprise    = isInverse ? -rawSurprise : rawSurprise;
 
     // ── Z-score scoring (hybrid: z-score when stats available, beat/miss otherwise) ──
     // As history accumulates in surpriseStats (engine v3.1+), more events
@@ -10300,11 +10308,18 @@ async function renderEconSurprises() {
     const useZScore = stats && stats.n >= CANONICAL_MIN_N && stats.std > 0;
     const zScore = useZScore ? (surprise - stats.mean) / stats.std : null;
 
-    if (!ccyScores[ccy]) ccyScores[ccy] = { beats: 0, misses: 0, total: 0, zSum: 0, zN: 0 };
+    if (!ccyScores[ccy]) ccyScores[ccy] = { beats: 0, misses: 0, total: 0, zSum: 0, zN: 0, zBeats: 0, zMisses: 0 };
     ccyScores[ccy].total++;
     if (beat) ccyScores[ccy].beats++;
     if (miss) ccyScores[ccy].misses++;
-    if (zScore !== null) { ccyScores[ccy].zSum += zScore; ccyScores[ccy].zN++; }
+    // Track z-score beats/misses separately so the blend formula can compute
+    // non-z-score beat/miss without the incorrect "assumes all zN are beats" approximation.
+    if (zScore !== null) {
+      ccyScores[ccy].zSum += zScore;
+      ccyScores[ccy].zN++;
+      if (beat) ccyScores[ccy].zBeats++;
+      if (miss) ccyScores[ccy].zMisses++;
+    }
   });
 
   // ── Normalise to [−100, +100] index (Citi CESI convention) ───────────────
@@ -10336,11 +10351,14 @@ async function renderEconSurprises() {
     const zFraction = s.zN / s.total;
     if (s.zN >= 10 || (s.zN > 0 && zFraction >= 0.30)) {
       // Blend: z-score events contribute avg_z * 50 (maps ±2σ to ±100),
-      // beat/miss events contribute beat/miss ratio * 100.
-      const nonZN    = s.total - s.zN;
-      const nonZBeat = s.beats - s.zN; // approximation
-      const zPart    = s.zN > 0 ? (s.zSum / s.zN) * 50 : 0;
-      const bmPart   = nonZN > 0 ? ((Math.max(0, nonZBeat) - (nonZN - Math.max(0, nonZBeat))) / nonZN) * 100 : 0;
+      // non-z-score events contribute their beat/miss ratio * 100.
+      // nonZBeat/nonZMiss use the separately tracked zBeats/zMisses accumulators
+      // so the beat/miss half is accurate regardless of how many z-score events are beats.
+      const nonZN     = s.total - s.zN;
+      const nonZBeat  = s.beats  - s.zBeats;
+      const nonZMiss  = s.misses - s.zMisses;
+      const zPart     = s.zN  > 0 ? (s.zSum / s.zN) * 50 : 0;
+      const bmPart    = nonZN > 0 ? ((nonZBeat - nonZMiss) / nonZN) * 100 : 0;
       idx100 = (zPart * s.zN + bmPart * nonZN) / s.total;
     } else {
       // Pure beat/miss (Citi CESI convention) — used until enough z-score history
