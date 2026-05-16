@@ -30,7 +30,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-05-16",
       "cutProb": 0,
-      "hikeProb": 0
+      "hikeProb": 0,
+      "fwdRate": 3.75
     },
     "EUR": {
       "nextMeeting": "11 Jun",
@@ -61,7 +62,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-05-16",
       "cutProb": 0,
-      "hikeProb": 0
+      "hikeProb": 0,
+      "fwdRate": 2.0
     },
     "GBP": {
       "nextMeeting": "18 Jun",
@@ -92,7 +94,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-05-16",
       "cutProb": 0,
-      "hikeProb": 0
+      "hikeProb": 0,
+      "fwdRate": 3.75
     },
     "JPY": {
       "nextMeeting": "16 Jun",
@@ -119,11 +122,12 @@
       ],
       "source": "boj.or.jp",
       "bias": "hike",
-      "biasSource": "TONA overnight rate + BoJ forward guidance",
+      "biasSource": "TONA overnight rate + BoJ MPM vote (6-3 Apr, 3 hawks)",
       "biasMethod": "ois",
       "biasUpdated": "2026-05-16",
       "cutProb": 0,
-      "hikeProb": 40
+      "hikeProb": 65,
+      "fwdRate": 0.815
     },
     "AUD": {
       "nextMeeting": "16 Jun",
@@ -154,7 +158,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-05-16",
       "cutProb": 0,
-      "hikeProb": 16
+      "hikeProb": 16,
+      "fwdRate": 4.39
     },
     "CAD": {
       "nextMeeting": "10 Jun",
@@ -187,7 +192,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-05-16",
       "cutProb": 0,
-      "hikeProb": 0
+      "hikeProb": 0,
+      "fwdRate": 2.25
     },
     "CHF": {
       "nextMeeting": "18 Jun",
@@ -210,7 +216,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-05-16",
       "cutProb": 0,
-      "hikeProb": 0
+      "hikeProb": 0,
+      "fwdRate": 0.0
     },
     "NZD": {
       "nextMeeting": "27 May",
@@ -239,7 +246,8 @@
       "biasMethod": "spread",
       "biasUpdated": "2026-05-16",
       "cutProb": 0,
-      "hikeProb": 40
+      "hikeProb": 20,
+      "fwdRate": 2.3
     }
   }
 }
