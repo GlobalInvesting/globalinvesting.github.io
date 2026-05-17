@@ -8791,7 +8791,8 @@ function _liveRegime() {
 }
 
 // Expose to window for inline onchange handlers in the popover HTML
-window._ADV_OPTS = ADV_ALERT_TYPES;
+window._ADV_OPTS      = ADV_ALERT_TYPES;
+window.ALERTS_LABELS  = ALERTS_LABELS;
 
 // ── Signal Notifications — browser push for new AI signals ────────────────────
 // Storage: localStorage key 'gi_sig_notif' → 'on' | 'off'  (default: 'off')

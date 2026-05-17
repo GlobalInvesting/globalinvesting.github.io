@@ -1,22 +1,22 @@
 /**
  * Global Investing FX Terminal — Layout Resize Handles
- * v7.71.0 — enfoque 2: handles arrastrables entre columnas del grid
+ * v7.71.0 — approach 2: draggable handles between grid columns
  *
- * Qué hace:
- *   - Inserta dos handles de 4px entre las 3 columnas del #layout grid
- *   - El usuario arrastra para dar más/menos espacio a sidebar, main, rightpanel
- *   - Los anchos se guardan en localStorage y se restauran en la próxima visita
- *   - Double-click en cualquier handle restaura el layout por defecto
- *   - Solo activo en desktop (> 900px). En mobile/tablet: sin efecto.
+ * What it does:
+ *   - Inserts two 4px handles between the 3 columns of the #layout grid
+ *   - User drags to give more/less space to sidebar, main, rightpanel
+ *   - Column widths are saved in localStorage and restored on the next visit
+ *   - Double-click on any handle restores the default layout
+ *   - Active on desktop only (> 900px). No effect on mobile/tablet.
  *
- * Columnas del grid (desktop):
+ * Grid columns (desktop):
  *   Col 1: #sidebar        — default 180px, min 120px, max 320px
- *   Col 2: #main           — flex 1fr (el resto)
+ *   Col 2: #main           — flex 1fr (remainder)
  *   Col 3: #rightpanel     — default 220px, min 150px, max 400px
  *
  * Storage keys:
- *   gi_layout_sidebar_w    — ancho sidebar en px
- *   gi_layout_right_w      — ancho rightpanel en px
+ *   gi_layout_sidebar_w    — sidebar width in px
+ *   gi_layout_right_w      — rightpanel width in px
  */
 
 (function () {

@@ -1,13 +1,10 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.83.0 — onboarding2 (staging/preview build)
+ * v7.89.3 — production build
  *
- * Differences vs onboarding.js (v7.81.5 production):
- *   - Storage key changed to 'gi_welcome2_done' so staging tour is independent
- *     of production localStorage state (visiting index.html won't suppress this)
- *   - giReplayTour() exposed as giReplayTour2() to avoid collisions
+ * Changes vs v7.81.5 (prior production):
  *   - 10-step tour: AI Narrative, Macro Regime, Cross-Asset, COT Positioning,
- *     Rates, Heatmap, Derivatives, Install & Subscribe (NEW), Signal Alerts
+ *     Rates, Heatmap, Derivatives, Install & Subscribe, Signal Alerts
  *   - Step 8 (Install & Subscribe): surfaces PWA install + RSS feed — retention
  *   - Derivatives step clicks nav link and waits 400ms before positioning
  *   - COT modal opened non-blocking (600ms delay) so popover renders first
@@ -21,7 +18,7 @@
   'use strict';
 
   /* ─── config ─────────────────────────────────────────────────────────── */
-  var STORAGE_KEY  = 'gi_welcome2_done';   // ← staging key, separate from prod
+  var STORAGE_KEY  = 'gi_welcome_done';
   var DELAY_MS     = 2400;
   var AUTO_CLOSE_S = 100;
   var POPOVER_W    = 340;
@@ -643,7 +640,7 @@
   }
 
   /* ─── public replay API ──────────────────────────────────────────────── */
-  window.giReplayTour2 = function () {
+  window.giReplayTour = function () {
     _memDone = false;
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
     if (overlayEl) dismiss();
