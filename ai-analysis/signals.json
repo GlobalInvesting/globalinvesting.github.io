@@ -1,64 +1,55 @@
 {
-  "generated_at": "2026-05-18T03:33:15Z",
+  "generated_at": "2026-05-18T10:45:56Z",
   "signals": [
     {
-      "time": "03:32",
+      "time": "10:45",
       "priority": "critical",
-      "title": "USD/AUD — G8 Bilateral Theme + Geopolitical Stress",
-      "text": "USD/AUD at 1.4021 (inverse 0.7132) — G8 scorecard confirms a dominant USD lead (+0.579%) against AUD laggard (-0.904%) as global bond yields explode following the underwhelming Trump-Xi summit. Geopolitical escalation via a drone strike on a UAE nuclear plant drives safe-haven demand for USD while weighing on risk-sensitive AUD. Despite a -60bp carry deficit (Fed 3.75% vs RBA 4.35%), the 1.484% G8 spread indicates macro-driven USD outperformance. Implication: Risk-off flows and yield volatility override carry advantages; AUD/USD downside pressure persists toward 0.7100.",
-      "evidence": [
-        "USD 1W avg: +0.579% (n=7)",
-        "AUD 1W avg: -0.904% (n=4)",
-        "G8 spread: 1.484%"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "03:29",
-      "priority": "critical",
-      "title": "USD/JPY — Positioning + Options + Intervention Risk",
-      "text": "USD/JPY at 158.92 — 283bp OIS carry (SOFR 3.56% vs TONA 0.73%) keeps the pair bid despite extreme speculative positioning. JPY COT LF net short -70,605 (33.1% long) indicates a crowded carry trade, while the options market signals acute caution with a strong 25d RR put skew of -1.73. This divergence between spot bid and downside hedging reflects fear of BoJ intervention as price holds near the 160.00 threshold. Implication: Institutional hedging for a sharp reversal despite the carry-driven uptrend. Watch for verbal intervention or a break of 160.00.",
-      "evidence": [
-        "USD/JPY OIS Carry: +283bp",
-        "JPY COT LF net: -70,605",
-        "USD/JPY 25d RR: -1.73"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "03:27",
-      "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
-      "text": "NZD/USD at 0.5838 — COT LF net short -19,437 (22.3% long) shows specs fading the RBNZ hike bias ahead of the 27 May meeting. This institutional short is met by an extreme retail long of 87%, creating a dual-layered contrarian risk. While the services sector contraction (PSI) weighs on the bird, the OIS market prices a hike bias that is likely to trigger a massive short-squeeze if delivered. Implication: Retail capitulation risk if 0.5800 breaks, but high squeeze potential on hawkish RBNZ delivery. Watch RBNZ meeting 27 May.",
+      "text": "NZD/USD COT LF net short -19,437 (specs fading hawkish bias) vs RBNZ hike probability priced for 27 May. Retail sentiment at 87% long (extreme) diverges from institutional short positioning. If RBNZ delivers a hike or hawkish guidance, the crowded spec short and retail long positioning creates a high-velocity volatility window. NZD/USD at 0.5857.",
       "evidence": [
         "NZD COT LF net: -19,437",
         "Retail Sentiment: 87% Long",
-        "RBNZ Bias: Hike"
+        "NZD/USD: 0.5857"
       ],
       "_source": "gemini"
     },
     {
-      "time": "03:24",
+      "time": "10:42",
       "priority": "warning",
-      "title": "GBP/USD — Volatility Premium + Positioning",
-      "text": "GBP/USD at 1.3314 — IV at 11.0% vs HV30 at 7.4% generates an elevated +3.6% Vol Risk Premium (VRP), signaling the options market is paying a significant premium for protection relative to realized movement. GBP COT LF net long remains high at +40,980 (70% long), suggesting a crowded institutional long. With UK employer confidence at record lows and a -17bp OIS carry deficit vs USD, the high VRP suggests the market is bracing for a volatility spike or trend reversal. Implication: Expensive protection and crowded longs signal late-cycle exhaustion. Watch for 1.3300 support break.",
+      "title": "USD/AUD — G8 Bilateral Theme + Geopolitical Risk",
+      "text": "USD/AUD spread at 1.039% confirms a dominant G8 bilateral theme as USD outperforms (+0.386%) and AUD lags (-0.653%). Escalating Iran tensions and oil price rallies support USD safe-haven demand while weighing on risk-sensitive AUD. Despite a -60bp carry disadvantage (Fed 3.75% vs RBA 4.35%), USD strength persists on geopolitical escalation. AUD/USD at 0.7154.",
       "evidence": [
-        "GBP/USD VRP: +3.6%",
-        "GBP COT LF net: +40,980",
-        "GBP/USD OIS Carry: -17bp"
+        "USD 1W avg: +0.386% (n=7)",
+        "AUD 1W avg: -0.653% (n=4)",
+        "G8 spread: 1.039%"
       ],
+      "watch_level": "Watch for RBA meeting on 16 Jun to shift the carry narrative.",
       "_source": "gemini"
     },
     {
-      "time": "03:18",
-      "priority": "info",
-      "title": "USD/CHF — Volatility Complacency + Carry",
-      "text": "USD/CHF at 0.7869 — Pair supported by a massive +375bp carry advantage (Fed 3.75% vs SNB 0.0%). IV at 10.6% vs HV30 at 7.2% results in a +3.4% VRP, indicating that despite the steady carry-driven climb, the options market is pricing in tail-risk protection for a CHF safe-haven bid. Implication: Carry dominates the spot trend, but the elevated VRP suggests institutional fear of a rapid risk-off deleveraging event. Watch VIX; if VIX > 25, carry support will likely fail.",
+      "time": "10:40",
+      "priority": "warning",
+      "title": "USD/JPY — Options Skew + Intervention Risk",
+      "text": "USD/JPY at 158.91 testing the 160.00 psychological barrier where BoJ intervention risk rises. 25d RR at -1.73 (strong put skew) signals the options market is paying a significant premium for JPY strength/USD downside protection despite the +283bp SOFR-TONA carry advantage. JPY COT LF net short -70,605 remains crowded, increasing reversal magnitude if the 160.00 level triggers a policy response.",
       "evidence": [
-        "USD/CHF Carry: +375bp",
-        "USD/CHF VRP: +3.4%",
-        "VIX: 18.4 (Normal)"
+        "USD/JPY 25d RR: -1.73",
+        "USD/JPY Carry: +283bp",
+        "JPY COT LF net: -70,605"
       ],
+      "watch_level": "160.00 remains the critical level for BoJ verbal or physical intervention.",
+      "_source": "gemini"
+    },
+    {
+      "time": "10:35",
+      "priority": "info",
+      "title": "GBP/USD — Elevated Vol Premium + Supply Shocks",
+      "text": "GBP/USD IV at 11.0% vs HV30 at 7.2% generates a +3.8% Vol Risk Premium (VRP), signaling elevated hedging demand. BoE's Greene highlights that the bank should not look through negative supply shocks (US-Iran war), maintaining a hawkish floor. GBP/USD at 1.3357 remains supported by a - (SONIA 3.73% vs SOFR 3.56%) despite technical pressure below the 200-DMA.",
+      "evidence": [
+        "GBP/USD VRP: +3.8%",
+        "SONIA 3.73% vs SOFR 3.56%: -17bp",
+        "GBP COT LF net: +40,980"
+      ],
+      "watch_level": "Next BoE meeting on 18 Jun determines if the hawkish floor holds.",
       "_source": "gemini"
     }
   ]
