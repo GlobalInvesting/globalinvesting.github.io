@@ -241,6 +241,7 @@ function openCorrModal(corrObj) {
     '</div>';
 
   document.body.appendChild(bd);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ bd.scrollIntoView({behavior:'smooth',block:'start'}); }));
   bd.addEventListener('click', e => { if (e.target === bd) closeCorrModal(); });
   document.addEventListener('keydown', _cmKeydown);
   const container = document.getElementById('cm-lwc-container');

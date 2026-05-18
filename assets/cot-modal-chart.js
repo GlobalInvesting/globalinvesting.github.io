@@ -676,6 +676,7 @@ function openCOTModal(ccy,data){
   document.body.appendChild(bd);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const pin=document.getElementById('cot-pin');if(pin)pin.style.left=gaugeLeft;
+    bd.scrollIntoView({behavior:'smooth',block:'start'});
     // Sparkline is now inline SVG — no async build needed
   }));
 

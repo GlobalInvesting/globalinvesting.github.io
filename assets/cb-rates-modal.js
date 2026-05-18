@@ -403,6 +403,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
 </div>`;
 
   document.body.appendChild(bd);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ bd.scrollIntoView({behavior:'smooth',block:'start'}); }));
   const dBody=document.getElementById('cbr-decisions-body');
   if(dBody&&decisions.length){
     let running=0;

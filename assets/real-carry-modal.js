@@ -979,6 +979,7 @@ function _rcmBuildDOM() {
   </div>`;
 
   document.body.appendChild(bd);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ bd.scrollIntoView({behavior:'smooth',block:'start'}); }));
 
   // Close handlers
   document.getElementById('rcm-close').addEventListener('click', _rcmClose);

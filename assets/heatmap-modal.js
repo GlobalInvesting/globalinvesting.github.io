@@ -668,6 +668,7 @@
   </div>
 </div>`;
     document.body.appendChild(el);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.scrollIntoView({behavior:'smooth',block:'start'}); }));
     document.getElementById('hm-close').addEventListener('click', closeHeatmapModal);
     el.addEventListener('click', function(e) { if (e.target === el) closeHeatmapModal(); });
     document.addEventListener('keydown', _onKey);
