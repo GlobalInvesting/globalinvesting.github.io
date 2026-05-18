@@ -1,68 +1,63 @@
 {
-  "generated_at": "2026-05-16T02:46:14Z",
+  "generated_at": "2026-05-18T03:33:15Z",
   "signals": [
     {
-      "time": "21:44",
+      "time": "03:32",
       "priority": "critical",
-      "title": "GBP/USD — G8 Bilateral Theme + Inflation Divergence",
-      "text": "GBP/USD downside pressure intensifies as hotter-than-expected US CPI and PPI data drive hawkish Fed bets against a weakening GBP. The pair faces a -17bp OIS carry disadvantage (SOFR 3.56% vs SONIA 3.73%) which is failing to support the Pound as US 10Y yields surge to 4.595%. GBP COT net long +40,980 (70% long) creates significant liquidation risk if the 1.3300 support level fails at the open.",
+      "title": "USD/AUD — G8 Bilateral Theme + Geopolitical Stress",
+      "text": "USD/AUD at 1.4021 (inverse 0.7132) — G8 scorecard confirms a dominant USD lead (+0.579%) against AUD laggard (-0.904%) as global bond yields explode following the underwhelming Trump-Xi summit. Geopolitical escalation via a drone strike on a UAE nuclear plant drives safe-haven demand for USD while weighing on risk-sensitive AUD. Despite a -60bp carry deficit (Fed 3.75% vs RBA 4.35%), the 1.484% G8 spread indicates macro-driven USD outperformance. Implication: Risk-off flows and yield volatility override carry advantages; AUD/USD downside pressure persists toward 0.7100.",
       "evidence": [
-        "USD 1W avg: +1.084% (n=7)",
-        "GBP 1W avg: -0.988% (n=4)",
-        "G8 spread: 2.072%",
-        "GBP COT net long +40,980"
+        "USD 1W avg: +0.579% (n=7)",
+        "AUD 1W avg: -0.904% (n=4)",
+        "G8 spread: 1.484%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "23:37",
+      "time": "03:29",
       "priority": "critical",
-      "title": "NZD/USD — Commodity Correction + Retail Long Squeeze",
-      "text": "NZD/USD downside bias is reinforced by a sharp retreat in soybean prices and broader commodity weakness following Friday's US inflation roar. Extreme retail sentiment (87% long) diverges from the NZD COT net short -19,437, signaling a high probability of a stop-run toward 0.5800. The next RBNZ meeting (mkt: 40% hike priced) on 27 May is the primary catalyst for determining if the current hike bias can offset the 150bp USD carry advantage.",
+      "title": "USD/JPY — Positioning + Options + Intervention Risk",
+      "text": "USD/JPY at 158.92 — 283bp OIS carry (SOFR 3.56% vs TONA 0.73%) keeps the pair bid despite extreme speculative positioning. JPY COT LF net short -70,605 (33.1% long) indicates a crowded carry trade, while the options market signals acute caution with a strong 25d RR put skew of -1.73. This divergence between spot bid and downside hedging reflects fear of BoJ intervention as price holds near the 160.00 threshold. Implication: Institutional hedging for a sharp reversal despite the carry-driven uptrend. Watch for verbal intervention or a break of 160.00.",
       "evidence": [
-        "NZD/USD retail 87% long",
-        "NZD COT net short -19,437",
-        "USD/NZD carry +150bp",
-        "Soybeans down 14-15 cents"
+        "USD/JPY OIS Carry: +283bp",
+        "JPY COT LF net: -70,605",
+        "USD/JPY 25d RR: -1.73"
       ],
       "_source": "gemini"
     },
     {
-      "time": "21:32",
+      "time": "03:27",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Unwind + Yield Gap",
-      "text": "AUD COT net long +55,794 (74.8% long) creates a crowded-long unwind risk as the pair closed Friday at 0.7153 amid a global equity sell-off. While the RBA maintains a 4.35% rate with a hike bias, the 79bp OIS carry advantage for AUD is being neutralized by the 4.595% US 10Y yield surge. The next RBA meeting (mkt: 16% hike priced) on 16 June determines if the policy divergence can sustain the bid against a bear-steepening US curve.",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
+      "text": "NZD/USD at 0.5838 — COT LF net short -19,437 (22.3% long) shows specs fading the RBNZ hike bias ahead of the 27 May meeting. This institutional short is met by an extreme retail long of 87%, creating a dual-layered contrarian risk. While the services sector contraction (PSI) weighs on the bird, the OIS market prices a hike bias that is likely to trigger a massive short-squeeze if delivered. Implication: Retail capitulation risk if 0.5800 breaks, but high squeeze potential on hawkish RBNZ delivery. Watch RBNZ meeting 27 May.",
       "evidence": [
-        "AUD COT net long +55,794",
-        "AUD/USD OIS carry -79bp",
-        "US 10Y yield 4.595% (+3.00%)",
-        "S&P 500 1D: -1.24%"
+        "NZD COT LF net: -19,437",
+        "Retail Sentiment: 87% Long",
+        "RBNZ Bias: Hike"
       ],
       "_source": "gemini"
     },
     {
-      "time": "19:33",
+      "time": "03:24",
       "priority": "warning",
-      "title": "USD/JPY — Carry Advantage + Options Downside Skew",
-      "text": "USD/JPY upside momentum is supported by a 283bp OIS carry advantage and a JPY COT net short of -70,605, though a strong options put skew (RR -1.73) signals hedging against a sudden reversal. The 158.73 Friday close sits near multi-week highs as US inflation risks push bond yields higher, increasing the cost of JPY shorts. The next BoJ meeting (mkt: 40% hike priced) on 16 June is the catalyst for any potential policy shift to address the widening yield gap.",
+      "title": "GBP/USD — Volatility Premium + Positioning",
+      "text": "GBP/USD at 1.3314 — IV at 11.0% vs HV30 at 7.4% generates an elevated +3.6% Vol Risk Premium (VRP), signaling the options market is paying a significant premium for protection relative to realized movement. GBP COT LF net long remains high at +40,980 (70% long), suggesting a crowded institutional long. With UK employer confidence at record lows and a -17bp OIS carry deficit vs USD, the high VRP suggests the market is bracing for a volatility spike or trend reversal. Implication: Expensive protection and crowded longs signal late-cycle exhaustion. Watch for 1.3300 support break.",
       "evidence": [
-        "USD/JPY OIS carry +283bp",
-        "JPY COT net short -70,605",
-        "USDJPY 25d RR: -1.73",
-        "US 10Y yield 4.595%"
+        "GBP/USD VRP: +3.6%",
+        "GBP COT LF net: +40,980",
+        "GBP/USD OIS Carry: -17bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "16:10",
+      "time": "03:18",
       "priority": "info",
-      "title": "EUR/USD — Technical Breakdown + Carry Disadvantage",
-      "text": "EUR/USD downside targets 1.1600 after breaking below a major technical support cluster as sellers lean against corrective resistance. The 163bp OIS carry advantage for USD (SOFR 3.56% vs ESTR 1.93%) remains a structural headwind for the Euro. The next ECB meeting (mkt: 100% hold priced) on 11 June will resolve whether the current hold bias can withstand the widening US-German 10Y yield spread of 149.5bp.",
+      "title": "USD/CHF — Volatility Complacency + Carry",
+      "text": "USD/CHF at 0.7869 — Pair supported by a massive +375bp carry advantage (Fed 3.75% vs SNB 0.0%). IV at 10.6% vs HV30 at 7.2% results in a +3.4% VRP, indicating that despite the steady carry-driven climb, the options market is pricing in tail-risk protection for a CHF safe-haven bid. Implication: Carry dominates the spot trend, but the elevated VRP suggests institutional fear of a rapid risk-off deleveraging event. Watch VIX; if VIX > 25, carry support will likely fail.",
       "evidence": [
-        "EUR/USD OIS carry +163bp",
-        "EUR COT net short -8,151",
-        "US-DE 10Y spread 149.5bp",
-        "EUR/USD 1W: -0.86%"
+        "USD/CHF Carry: +375bp",
+        "USD/CHF VRP: +3.4%",
+        "VIX: 18.4 (Normal)"
       ],
       "_source": "gemini"
     }
