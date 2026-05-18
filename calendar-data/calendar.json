@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-18T12:51:10Z",
-  "generatedAt": "2026-05-18T12:51:10Z",
+  "lastUpdate": "2026-05-18T16:38:26Z",
+  "generatedAt": "2026-05-18T16:38:26Z",
   "fetchMode": "ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,19 +9,19 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-05-22",
-  "totalEvents": 539,
+  "totalEvents": 540,
   "currencyCounts": {
     "GBP": 75,
     "CHF": 16,
     "EUR": 94,
     "CAD": 35,
     "USD": 227,
-    "AUD": 32,
+    "AUD": 33,
     "JPY": 51,
     "NZD": 9
   },
   "impactCounts": {
-    "medium": 409,
+    "medium": 410,
     "high": 130
   },
   "events": [
@@ -6706,6 +6706,19 @@
       "actual": null,
       "forecast": "205K",
       "previous": "200K"
+    },
+    {
+      "date": "19 May",
+      "dateISO": "2026-05-19",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Monetary Policy Meeting Minutes",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "19 May",
