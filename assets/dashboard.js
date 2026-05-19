@@ -3229,6 +3229,50 @@ async function _renderLWChart(ohlcId, label) {
     }
     bars = bars.filter(b => b.time < _stripFrom);
     if (bars.length < 10) throw new Error('insufficient data after strip');
+
+    // ── Gap-window prev-bar injection ───────────────────────────────────────
+    // When _jsonStale is true (21:00–01:30 UTC gap window) the OHLC JSON ends
+    // at the session BEFORE the one that just closed.  The just-closed session
+    // bar is absent from the static JSON but is available in quotes.json as
+    // prev_bar (computed by fetch_fx_prev_session in fetch_intraday_quotes.py).
+    // Inject it here so the chart shows the completed bar as a normal historical
+    // candle, matching TradingView's display during this window.
+    //
+    // Guard conditions (all must be true to inject):
+    //   1. The pair is an FX pair (only FX uses the 21:00 UTC boundary)
+    //   2. The current UTC hour >= 21 (new session has opened — gap window active)
+    //   3. The OHLC JSON is stale (_jsonStale detected in the strip block above)
+    //   4. The STOOQ_RT_CACHE entry has a valid prev_bar from quotes.json
+    //   5. The prev_bar.time is strictly later than the last bar in the stripped
+    //      array and strictly earlier than _stripFrom (no collision, no duplicate)
+    if (_isFxStrip && _hourUTC >= 21) {
+      const _todayStr2 = _nowUTC.toISOString().slice(0, 10);
+      const _isGapWindow = _lwLastJsonBarDate != null && _lwLastJsonBarDate < _todayStr2;
+      if (_isGapWindow) {
+        const _cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
+        const _q = STOOQ_RT_CACHE[_cacheKey];
+        const _pb = _q?.prev_bar;
+        if (_pb && _pb.time && _pb.open > 0 && _pb.high > 0 && _pb.low > 0 && _pb.close > 0) {
+          const _lastBarTime = bars.length > 0 ? bars[bars.length - 1].time : null;
+          const _pbInRange   = (!_lastBarTime || _pb.time > _lastBarTime) && _pb.time < _stripFrom;
+          if (_pbInRange) {
+            const _dec2 = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
+                            eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
+                            gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
+                            audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3 }[ohlcId] ?? 5;
+            const _pbBar = {
+              time:  _pb.time,
+              open:  parseFloat(_pb.open.toFixed(_dec2)),
+              high:  parseFloat(_pb.high.toFixed(_dec2)),
+              low:   parseFloat(_pb.low.toFixed(_dec2)),
+              close: parseFloat(_pb.close.toFixed(_dec2)),
+            };
+            bars.push(_pbBar);
+          }
+        }
+      }
+    }
+    // ── End gap-window prev-bar injection ───────────────────────────────────
   }
   // ── End today-bar strip ─────────────────────────────────────────────────────
 
