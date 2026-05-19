@@ -1094,25 +1094,38 @@ def fetch_fx_prev_session(fx_pairs_map: dict) -> dict:
 
     now_utc = datetime.now(timezone.utc)
 
-    # Determine the session date (= open date) of the previous completed session.
-    # hour >= 21: new session just started — prev session opened YESTERDAY at 21:00 UTC.
-    # hour <  21: current session started YESTERDAY — prev session opened DAY-BEFORE-YESTERDAY.
+    # Determine the previous COMPLETED FX session boundaries.
+    #
+    # FX session convention: session runs from 21:00 UTC day N → 21:00 UTC day N+1.
+    # The session is identified by the date of its CLOSE (day N+1), which is the
+    # calendar trading day it belongs to (e.g. Monday session closes at 21:00 UTC
+    # Monday even though it opened at 21:00 UTC Sunday).
+    #
+    # Gap window cases:
+    #   Case A (hour >= 21 UTC): new session just opened.  The completed session
+    #     closed TODAY at 21:00 UTC.  session_date = today UTC.
+    #   Case B (hour < 21 UTC, JSON stale): cross-midnight gap window.  The session
+    #     that needs to be filled closed YESTERDAY at 21:00 UTC.
+    #     session_date = yesterday UTC.
+    #
+    # In both cases prev_session_open = prev_session_close - 1 day.
     if now_utc.hour >= 21:
-        prev_session_open = now_utc.replace(hour=21, minute=0, second=0, microsecond=0) \
-                            - timedelta(days=1)   # yesterday 21:00 UTC
+        # Case A: session closed today at 21:00 UTC
+        prev_session_close = now_utc.replace(hour=21, minute=0, second=0, microsecond=0)
     else:
-        prev_session_open = now_utc.replace(hour=21, minute=0, second=0, microsecond=0) \
-                            - timedelta(days=2)   # day-before-yesterday 21:00 UTC
+        # Case B: session closed yesterday at 21:00 UTC
+        prev_session_close = now_utc.replace(hour=21, minute=0, second=0, microsecond=0) \
+                            - timedelta(days=1)
 
-    prev_session_close = prev_session_open + timedelta(days=1)  # 21:00 UTC next day
+    prev_session_open = prev_session_close - timedelta(days=1)  # 21:00 UTC one day earlier
 
-    # The session date assigned to a bar is the date of its OPEN (prev_session_open).
-    # BUT: the Monday session opens at 21:00 UTC SUNDAY.  prev_session_open.weekday()
-    # would be Sunday (6) — triggering the weekend guard incorrectly.
-    # Fix: guard on the session CLOSE date (prev_session_close), which is the calendar
-    # day the session actually belongs to (Monday in the Sunday-open example).
-    # A session is invalid only if its close date is a Saturday or Sunday (FX closed).
-    session_date_str = prev_session_open.strftime("%Y-%m-%d")
+    # session_date_str is the close date — this matches the date label that
+    # LightweightCharts and dashboard.js use for the bar (e.g. "2026-05-18" for
+    # the session that opened Sun 17 21:00 UTC and closed Mon 18 21:00 UTC).
+    session_date_str = prev_session_close.strftime("%Y-%m-%d")
+
+    # Weekend guard: a session is invalid if its close date falls on Saturday or Sunday.
+    # (The Monday session opens Sunday night — guard on CLOSE, not open.)
     if prev_session_close.weekday() in (5, 6):
         print(f"[PrevSession] Previous session close date {prev_session_close.strftime('%Y-%m-%d')} "
               f"is weekend — skipping.")
