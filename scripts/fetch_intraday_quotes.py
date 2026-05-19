@@ -1105,12 +1105,17 @@ def fetch_fx_prev_session(fx_pairs_map: dict) -> dict:
                             - timedelta(days=2)   # day-before-yesterday 21:00 UTC
 
     prev_session_close = prev_session_open + timedelta(days=1)  # 21:00 UTC next day
-    session_date_str   = prev_session_open.strftime("%Y-%m-%d")
 
-    # Weekend guard: FX is closed Sat/Sun.  If the previous session date lands
-    # on a Saturday (weekday=5) or Sunday (weekday=6), there is no bar to inject.
-    if prev_session_open.weekday() in (5, 6):
-        print(f"[PrevSession] Previous session date {session_date_str} is weekend — skipping.")
+    # The session date assigned to a bar is the date of its OPEN (prev_session_open).
+    # BUT: the Monday session opens at 21:00 UTC SUNDAY.  prev_session_open.weekday()
+    # would be Sunday (6) — triggering the weekend guard incorrectly.
+    # Fix: guard on the session CLOSE date (prev_session_close), which is the calendar
+    # day the session actually belongs to (Monday in the Sunday-open example).
+    # A session is invalid only if its close date is a Saturday or Sunday (FX closed).
+    session_date_str = prev_session_open.strftime("%Y-%m-%d")
+    if prev_session_close.weekday() in (5, 6):
+        print(f"[PrevSession] Previous session close date {prev_session_close.strftime('%Y-%m-%d')} "
+              f"is weekend — skipping.")
         return {}
 
     # Fetch 1H bars covering the previous session window with a 1h safety buffer
