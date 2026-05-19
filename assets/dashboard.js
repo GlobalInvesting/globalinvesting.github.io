@@ -3231,23 +3231,41 @@ async function _renderLWChart(ohlcId, label) {
     if (bars.length < 10) throw new Error('insufficient data after strip');
 
     // ── Gap-window prev-bar injection ───────────────────────────────────────
-    // When _jsonStale is true (21:00–01:30 UTC gap window) the OHLC JSON ends
-    // at the session BEFORE the one that just closed.  The just-closed session
-    // bar is absent from the static JSON but is available in quotes.json as
-    // prev_bar (computed by fetch_fx_prev_session in fetch_intraday_quotes.py).
-    // Inject it here so the chart shows the completed bar as a normal historical
-    // candle, matching TradingView's display during this window.
+    // The OHLC gap window spans 21:00 UTC (session close) → 01:30 UTC next day
+    // (when the OHLC workflow writes the completed bar).  This crosses midnight UTC,
+    // so two separate hour ranges must be handled:
+    //
+    //   A) 21:00–23:59 UTC (same calendar day as session close):
+    //      _hourUTC >= 21.  The strip block already used _stripFrom = today because
+    //      _jsonStale was true.  The gap is active.
+    //
+    //   B) 00:00–01:29 UTC (calendar day has flipped to the next day):
+    //      _hourUTC < 21.  The strip block used _stripFrom = today (UTC date has
+    //      advanced by 1 relative to the gap start).  The JSON is still stale
+    //      (_lwLastJsonBarDate = two calendar days ago) but the hour check in the
+    //      original guard (_hourUTC >= 21) excluded this window.  Fix: also check
+    //      _lwLastJsonBarDate < (today − 1 day) to detect the cross-midnight stale.
     //
     // Guard conditions (all must be true to inject):
     //   1. The pair is an FX pair (only FX uses the 21:00 UTC boundary)
-    //   2. The current UTC hour >= 21 (new session has opened — gap window active)
-    //   3. The OHLC JSON is stale (_jsonStale detected in the strip block above)
-    //   4. The STOOQ_RT_CACHE entry has a valid prev_bar from quotes.json
-    //   5. The prev_bar.time is strictly later than the last bar in the stripped
+    //   2. The OHLC JSON is stale — two sub-cases:
+    //      A) hourUTC >= 21 AND lastJsonBar < today  (same-night window)
+    //      B) hourUTC <  21 AND lastJsonBar < yesterday  (cross-midnight window, 00:00–01:30)
+    //   3. The STOOQ_RT_CACHE entry has a valid prev_bar from quotes.json
+    //   4. The prev_bar.time is strictly later than the last bar in the stripped
     //      array and strictly earlier than _stripFrom (no collision, no duplicate)
-    if (_isFxStrip && _hourUTC >= 21) {
-      const _todayStr2 = _nowUTC.toISOString().slice(0, 10);
-      const _isGapWindow = _lwLastJsonBarDate != null && _lwLastJsonBarDate < _todayStr2;
+    if (_isFxStrip) {
+      const _todayStr2     = _nowUTC.toISOString().slice(0, 10);
+      const _yesterdayDate = new Date(_nowUTC);
+      _yesterdayDate.setUTCDate(_yesterdayDate.getUTCDate() - 1);
+      const _yesterdayStr2 = _yesterdayDate.toISOString().slice(0, 10);
+
+      // Case A: 21:00–23:59 UTC — same night as session close
+      const _gapA = _hourUTC >= 21 && _lwLastJsonBarDate != null && _lwLastJsonBarDate < _todayStr2;
+      // Case B: 00:00–01:29 UTC — cross-midnight (JSON still stale from yesterday's gap)
+      const _gapB = _hourUTC < 21 && _lwLastJsonBarDate != null && _lwLastJsonBarDate < _yesterdayStr2;
+      const _isGapWindow = _gapA || _gapB;
+
       if (_isGapWindow) {
         const _cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
         const _q = STOOQ_RT_CACHE[_cacheKey];
