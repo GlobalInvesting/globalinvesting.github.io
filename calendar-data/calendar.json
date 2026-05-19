@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-18T21:44:25Z",
-  "generatedAt": "2026-05-18T21:44:25Z",
+  "lastUpdate": "2026-05-19T08:41:46Z",
+  "generatedAt": "2026-05-19T08:41:46Z",
   "fetchMode": "ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,9 +9,9 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-05-22",
-  "totalEvents": 540,
+  "totalEvents": 542,
   "currencyCounts": {
-    "GBP": 75,
+    "GBP": 77,
     "CHF": 16,
     "EUR": 94,
     "CAD": 35,
@@ -21,8 +21,8 @@
     "NZD": 9
   },
   "impactCounts": {
-    "medium": 410,
-    "high": 130
+    "medium": 411,
+    "high": 131
   },
   "events": [
     {
@@ -6730,7 +6730,7 @@
       "event": "Claimant Count Change",
       "impact": "high",
       "actual": null,
-      "forecast": "25.9K",
+      "forecast": "23.1K",
       "previous": "26.8K"
     },
     {
@@ -6756,7 +6756,7 @@
       "event": "CPI m/m",
       "impact": "high",
       "actual": null,
-      "forecast": "0.6%",
+      "forecast": "0.7%",
       "previous": "0.9%"
     },
     {
@@ -6782,7 +6782,7 @@
       "event": "Median CPI y/y",
       "impact": "medium",
       "actual": null,
-      "forecast": "2.2%",
+      "forecast": "2.3%",
       "previous": "2.3%"
     },
     {
@@ -6808,7 +6808,7 @@
       "event": "Pending Home Sales m/m",
       "impact": "medium",
       "actual": null,
-      "forecast": "1.2%",
+      "forecast": "1.0%",
       "previous": "1.5%"
     },
     {
@@ -6823,6 +6823,19 @@
       "actual": null,
       "forecast": "3.0%",
       "previous": "3.3%"
+    },
+    {
+      "date": "20 May",
+      "dateISO": "2026-05-20",
+      "timeUTC": "13:15",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Monetary Policy Report Hearings",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "20 May",
@@ -6847,7 +6860,7 @@
       "event": "Employment Change",
       "impact": "high",
       "actual": null,
-      "forecast": "15.7K",
+      "forecast": "16.2K",
       "previous": "17.9K"
     },
     {
@@ -6873,7 +6886,7 @@
       "event": "French Flash Manufacturing PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": "52.3",
+      "forecast": "52.1",
       "previous": "52.8"
     },
     {
@@ -6925,7 +6938,7 @@
       "event": "Flash Manufacturing PMI",
       "impact": "high",
       "actual": null,
-      "forecast": "53.0",
+      "forecast": "52.8",
       "previous": "53.6"
     },
     {
@@ -6951,7 +6964,7 @@
       "event": "Philly Fed Manufacturing Index",
       "impact": "medium",
       "actual": null,
-      "forecast": "17.9",
+      "forecast": "17.8",
       "previous": "26.7"
     },
     {
@@ -6977,7 +6990,7 @@
       "event": "Flash Manufacturing PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": "53.6",
+      "forecast": "53.7",
       "previous": "54.0"
     },
     {
@@ -6992,6 +7005,19 @@
       "actual": null,
       "forecast": "51.1",
       "previous": "51.3"
+    },
+    {
+      "date": "21 May",
+      "dateISO": "2026-05-21",
+      "timeUTC": "15:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BOE Gov Bailey Speaks",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "22 May",
@@ -7029,7 +7055,7 @@
       "event": "Retail Sales m/m",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.7%",
+      "forecast": "0.6%",
       "previous": "0.7%"
     },
     {
@@ -7042,7 +7068,7 @@
       "event": "Revised UoM Consumer Sentiment",
       "impact": "medium",
       "actual": null,
-      "forecast": "48.2",
+      "forecast": "48.3",
       "previous": "48.2"
     }
   ],
