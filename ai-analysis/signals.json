@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-05-19T10:12:28Z",
+  "generated_at": "2026-05-19T17:23:11Z",
   "signals": [
     {
-      "time": "10:12",
+      "time": "17:22",
       "priority": "critical",
-      "title": "USD/AUD — G8 Bilateral Theme + RBA Pause",
-      "text": "USD/AUD exhibits a 1.566% G8 spread as USD outperforms (+0.507%) while AUD lags (-1.060%) following RBA minutes signaling a potential pause after three hikes. Despite a -60bp AUD carry advantage (Fed 3.75% vs RBA 4.35%), the divergence is driven by the shift in RBA bias. USD/AUD at 0.7119 remains under pressure as the G8 spread exceeds the 1.20% critical threshold.",
+      "title": "USD/AUD — G8 Bilateral Theme + Yield Surge",
+      "text": "USD outperformance accelerates as US 10Y yields jump to 4.659% (+0.78%), driving a 1.555% G8 spread against laggard AUD. Despite a -60bp carry disadvantage (Fed 3.75% vs RBA 4.35%), USD dominance is fueled by the 'Warsh Trade' and hawkish US fiscal/monetary expectations. AUD/USD at 0.7118 faces sustained pressure as the bear steepener regime favors the greenback over high-beta commodity FX. Watch for a break of 0.7100 to confirm further downside extension.",
       "evidence": [
-        "USD 1W avg: +0.507% (n=7)",
-        "AUD 1W avg: -1.060% (n=4)",
-        "G8 spread: 1.566%"
+        "USD 1W avg: +0.523% (n=7)",
+        "AUD 1W avg: -1.031% (n=4)",
+        "G8 spread: 1.555%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:09",
+      "time": "17:19",
+      "priority": "critical",
+      "title": "USD/JPY — Intervention Risk + Options Skew",
+      "text": "USD/JPY at 158.814 remains below the 160.00 threshold as Japan's Finance Minister Katayama issues a direct warning of 'decisive action.' Options markets are aggressively pricing downside protection with a strong 25d RR put skew of -1.52, signaling institutional fear of a BoJ-led reversal despite the +300bp Fed-BoJ carry advantage. JPY COT LF net short -70,605 (33.1% long) reflects a crowded carry trade vulnerable to verbal or physical intervention. Watch 160.00 for immediate BoJ response.",
+      "evidence": [
+        "USD/JPY: 158.814",
+        "25d RR: -1.52 (Saxo)",
+        "JPY COT LF net: -70,605"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "17:17",
       "priority": "warning",
       "title": "NZD/USD — COT vs Retail Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -19,437 (specs short) vs retail 86% long (extreme retail long) at 0.5843. This institutional vs retail divergence occurs ahead of the 27 May RBNZ meeting where a hike bias remains. Retail is aggressively fading the institutional short; capitulation risk is elevated if price breaks lower, while a hawkish RBNZ delivery triggers a crowded spec short unwind.",
+      "text": "NZD/USD at 0.5843 exhibits a sharp positioning conflict: retail traders are 85% long (extreme contrarian short signal) while COT LF specs remain net short -19,437 (22.3% long). This retail-led long bias diverges from the institutional short, increasing the risk of a capitulation flush lower if the RBNZ (2.25%) fails to deliver a sufficiently hawkish hike signal on 27 May. The +150bp USD carry advantage continues to weigh on the pair. Watch for retail long liquidation below 0.5800.",
       "evidence": [
+        "NZD/USD Retail: 85% Long",
         "NZD COT LF net: -19,437",
-        "Retail Sentiment: 86% Long",
-        "NZD/USD: 0.5843"
+        "USD/NZD carry: +150bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:07",
+      "time": "17:14",
       "priority": "warning",
-      "title": "GBP/USD — Volatility Premium + Positioning",
-      "text": "GBP/USD IV at 11.0% vs HV30 at 7.6% generates an elevated +3.4% Vol Risk Premium, signaling intense hedging demand. COT LF net long +40,980 (70% long) shows crowded institutional positioning while 25d RR at -1.20 indicates the options market is paying for downside protection. Market is heavily long but increasingly fearful of a reversal following weak UK jobs data.",
+      "title": "GBP/USD — Volatility Premium + Jobs Data",
+      "text": "GBP/USD IV at 11.0% vs HV30 at 7.6% generates a +3.4% Vol Risk Premium, signaling elevated hedging demand as the UK jobs market shows signs of cracking. Despite a neutral 0bp carry spread (Fed 3.75% vs BoE 3.75%) and a net long COT position (+40,980), the 25d RR at -1.10 indicates the options market is paying for downside protection. Price at 1.34110 is vulnerable to a long-unwind if US yields continue to climb. Watch for a break of 1.3400 to trigger further spec liquidation.",
       "evidence": [
         "GBP/USD VRP: +3.4%",
-        "GBP COT LF net: +40,980",
-        "25d RR: -1.20"
+        "GBP 25d RR: -1.10",
+        "GBP COT LF net: +40,980"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:04",
-      "priority": "warning",
-      "title": "USD/JPY — Options Skew + Intervention Risk",
-      "text": "USD/JPY at 159.08 — 160.00 remains the key level that has previously triggered BoJ verbal warnings. 25d RR at -1.66 (strong put skew) confirms the options market is aggressively hedging for JPY strength/USD weakness despite the +300bp Fed-BoJ carry advantage. Speculative positioning remains heavily short (LF net -70,605), leaving the pair vulnerable to a rapid unwind if 160.00 is tested.",
-      "evidence": [
-        "USD/JPY 25d RR: -1.66",
-        "JPY COT LF net: -70,605",
-        "Fed 3.75% vs BoJ 0.75% — +300bp"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "09:58",
+      "time": "17:08",
       "priority": "info",
-      "title": "USD/CAD — Carry + Inflation Catalyst",
-      "text": "USD/CAD at 1.3760 is supported by a +150bp carry advantage (Fed 3.75% vs BoC 2.25%). COT LF net short -39,960 (28.4% long) shows specs are positioned for CAD weakness. Today's Canada CPI release is the primary catalyst; a higher-than-expected print is required to challenge the current carry-driven upside and shift the BoC hold bias.",
+      "title": "EUR/USD — Technical Breakdown + Carry",
+      "text": "EUR/USD at 1.16140 is testing its lowest levels since April 8th as sellers retain control following a failure to sustain early session gains. The +175bp USD carry advantage (Fed 3.75% vs ECB 2.0%) remains the structural anchor for the move, while COT positioning shows specs are already net short -8,151. With VIX at 17.8 (normal volatility), the carry-driven divergence is the primary driver. Watch for a sustained break below 1.1593 to confirm a move toward 1.1500.",
       "evidence": [
-        "USD/CAD Carry: +150bp",
-        "CAD COT LF net: -39,960",
-        "USD/CAD: 1.3760"
+        "EUR/USD: 1.16140",
+        "USD/EUR carry: +175bp",
+        "EUR COT LF net: -8,151"
       ],
       "_source": "gemini"
     }
