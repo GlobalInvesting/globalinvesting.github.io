@@ -1060,6 +1060,158 @@ def fetch_fx_session_hl(fx_pairs_map: dict) -> dict:
     return results
 
 
+def fetch_fx_prev_session(fx_pairs_map: dict) -> dict:
+    """
+    Compute the OHLC of the COMPLETED FX session that immediately preceded the
+    current one.  This data fills the 21:00–01:30 UTC gap window during which
+    the OHLC workflow (update-ohlc.yml, 01:30 UTC Tue–Sat) has not yet written
+    the just-closed session bar into ohlc-data/{id}.json.
+
+    Session boundary convention (same as fetch_ohlc.py and fetch_fx_session_hl):
+      Each FX session runs from 21:00 UTC (day N) to 21:00 UTC (day N+1).
+      The session is assigned to the calendar date of its OPEN (day N).
+
+    Which session is "previous"?
+      • hour < 21 UTC:  the session that ran 21:00 UTC (day-2) → 21:00 UTC (day-1).
+                        Session date = (today UTC − 1 day).
+                        This is the session already finalized by the 01:30 UTC workflow.
+                        fetch_fx_prev_session is a no-op in this window — the OHLC
+                        JSON is up-to-date and dashboard.js does not need prev_bar.
+      • hour >= 21 UTC: a new session just opened at 21:00 UTC today.
+                        The previous session ran 21:00 UTC (yesterday) → 21:00 UTC (today).
+                        Session date = today UTC.  This IS the gap window: the OHLC
+                        workflow won't write this bar until 01:30 UTC tomorrow.
+
+    The function always computes the prev session so the data is available in
+    quotes.json regardless of the hour.  dashboard.js only injects it as a bar
+    when _lwLastJsonBarDate < todayUtcStr (i.e. jsonIsStale — the gap window).
+
+    Returns a dict: { pair_id: { "time": "YYYY-MM-DD", "open": float,
+                                  "high": float, "low": float, "close": float } }
+    for pairs that succeed.  Pairs that fail are omitted.
+    """
+    from datetime import datetime, timezone, timedelta
+
+    now_utc = datetime.now(timezone.utc)
+
+    # Determine the session date (= open date) of the previous completed session.
+    # hour >= 21: new session just started — prev session opened YESTERDAY at 21:00 UTC.
+    # hour <  21: current session started YESTERDAY — prev session opened DAY-BEFORE-YESTERDAY.
+    if now_utc.hour >= 21:
+        prev_session_open = now_utc.replace(hour=21, minute=0, second=0, microsecond=0) \
+                            - timedelta(days=1)   # yesterday 21:00 UTC
+    else:
+        prev_session_open = now_utc.replace(hour=21, minute=0, second=0, microsecond=0) \
+                            - timedelta(days=2)   # day-before-yesterday 21:00 UTC
+
+    prev_session_close = prev_session_open + timedelta(days=1)  # 21:00 UTC next day
+    session_date_str   = prev_session_open.strftime("%Y-%m-%d")
+
+    # Weekend guard: FX is closed Sat/Sun.  If the previous session date lands
+    # on a Saturday (weekday=5) or Sunday (weekday=6), there is no bar to inject.
+    if prev_session_open.weekday() in (5, 6):
+        print(f"[PrevSession] Previous session date {session_date_str} is weekend — skipping.")
+        return {}
+
+    # Fetch 1H bars covering the previous session window with a 1h safety buffer
+    # on each side.  The window is prev_session_open (21:00 UTC day N-1) →
+    # prev_session_close (21:00 UTC day N).  yfinance needs date strings only.
+    fetch_start_str = (prev_session_open - timedelta(hours=1)).strftime("%Y-%m-%d")
+    fetch_end_str   = (prev_session_close + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    results = {}
+    try:
+        import yfinance as yf
+
+        tickers = list(fx_pairs_map.values())
+        raw = yf.download(
+            tickers,
+            start=fetch_start_str,
+            end=fetch_end_str,
+            interval="1h",
+            auto_adjust=True,
+            group_by="ticker",
+            progress=False,
+            threads=True,
+        )
+
+        for pair_id, yf_sym in fx_pairs_map.items():
+            try:
+                if len(tickers) == 1:
+                    df = raw
+                else:
+                    df = raw[yf_sym] if yf_sym in raw.columns.get_level_values(0) else None
+
+                if df is None or df.empty:
+                    continue
+
+                opens, highs, lows, closes = [], [], [], []
+                for ts_idx, row in df.iterrows():
+                    if hasattr(ts_idx, "tzinfo") and ts_idx.tzinfo is not None:
+                        ts_utc = ts_idx.astimezone(timezone.utc)
+                    else:
+                        ts_utc = ts_idx.replace(tzinfo=timezone.utc)
+
+                    # Only include 1H bars that belong to the previous session window:
+                    # [prev_session_open, prev_session_close).
+                    # A bar at 21:00 UTC belongs to the session that OPENS then
+                    # (the new session), so the upper bound is exclusive (<).
+                    if ts_utc < prev_session_open or ts_utc >= prev_session_close:
+                        continue
+
+                    o = row.get("Open")  if hasattr(row, "get") else getattr(row, "Open",  None)
+                    h = row.get("High")  if hasattr(row, "get") else getattr(row, "High",  None)
+                    l = row.get("Low")   if hasattr(row, "get") else getattr(row, "Low",   None)
+                    c = row.get("Close") if hasattr(row, "get") else getattr(row, "Close", None)
+
+                    def _ok(v):
+                        return v is not None and v == v and float(v) > 0
+
+                    if _ok(o): opens.append(float(o))
+                    if _ok(h): highs.append(float(h))
+                    if _ok(l): lows.append(float(l))
+                    if _ok(c): closes.append(float(c))
+
+                if not (opens and highs and lows and closes):
+                    continue
+
+                dec = 3 if "jpy" in pair_id else 5
+
+                bar_o = round(opens[0],    dec)   # first 1H bar open = session open
+                bar_h = round(max(highs),  dec)
+                bar_l = round(min(lows),   dec)
+                bar_c = round(closes[-1],  dec)   # last 1H bar close = session close
+
+                # Structural integrity clamp (mirrors fetch_ohlc.py)
+                bar_h = round(max(bar_h, bar_o, bar_c), dec)
+                bar_l = round(min(bar_l, bar_o, bar_c), dec)
+
+                # Reject flat/phantom bars (open == high == low == close)
+                if bar_o == bar_h == bar_l == bar_c:
+                    continue
+
+                results[pair_id] = {
+                    "time":  session_date_str,
+                    "open":  bar_o,
+                    "high":  bar_h,
+                    "low":   bar_l,
+                    "close": bar_c,
+                }
+
+            except Exception as e:
+                print(f"[PrevSession] {pair_id}: {e}")
+                continue
+
+        print(f"[PrevSession] {len(results)}/{len(fx_pairs_map)} prev-session bars computed "
+              f"(session: {session_date_str}, "
+              f"window: {prev_session_open.strftime('%H:%M')}–{prev_session_close.strftime('%H:%M')} UTC)")
+
+    except Exception as e:
+        print(f"[PrevSession] Batch download failed: {e}")
+
+    return results
+
+
 def fetch_yfinance_all(symbols_map):
     yf_tickers = list(symbols_map.values())
     print(f"[yfinance] Descargando: {' '.join(yf_tickers)}")
@@ -1470,6 +1622,20 @@ def main():
         if pair_id in quotes and quotes[pair_id] is not None:
             quotes[pair_id]["session_high"] = hl["session_high"]
             quotes[pair_id]["session_low"]  = hl["session_low"]
+
+    # PASO 4c: FX prev-session bar — fills the 21:00–01:30 UTC gap window
+    # During this window the OHLC workflow (01:30 UTC) has not yet written the
+    # just-closed session bar into ohlc-data/{id}.json.  dashboard.js detects
+    # the stale JSON (_lwLastJsonBarDate < todayUtcStr) and injects prev_bar as
+    # the missing historical bar so the chart shows two complete candles instead
+    # of one live candle with a gap.  The bar is always computed and stored;
+    # dashboard.js decides whether to use it based on the staleness flag.
+    # Falls back silently per pair — pairs that fail simply omit prev_bar and
+    # dashboard.js behaves as before (gap-fill only, no prev bar).
+    fx_prev_session = fetch_fx_prev_session(FX_SESSION_HL_MAP)
+    for pair_id, bar in fx_prev_session.items():
+        if pair_id in quotes and quotes[pair_id] is not None:
+            quotes[pair_id]["prev_bar"] = bar
 
     # PASO 5: Calcular HV30 + HV10 + pct1m para pares FX e inyectar en cada quote
     hv30_data = fetch_hv30_fx(HV30_FX_PAIRS)
