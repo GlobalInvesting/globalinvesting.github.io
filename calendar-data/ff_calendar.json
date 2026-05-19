@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T10:12:28Z",
+  "generated_at": "2026-05-19T15:54:34Z",
   "source": "ForexFactory",
   "events": [
     {
@@ -1356,6 +1356,17 @@
       "released": false
     },
     {
+      "title": "NHPI m/m",
+      "currency": "CAD",
+      "dateISO": "2026-05-19",
+      "timeUTC": "12:30",
+      "impact": "low",
+      "forecast": "0.0%",
+      "previous": "-0.2%",
+      "actual": null,
+      "released": false
+    },
+    {
       "title": "Core CPI m/m",
       "currency": "CAD",
       "dateISO": "2026-05-19",
@@ -1367,13 +1378,13 @@
       "released": false
     },
     {
-      "title": "NHPI m/m",
+      "title": "Core CPI m/m",
       "currency": "CAD",
       "dateISO": "2026-05-19",
-      "timeUTC": "12:30",
+      "timeUTC": "12:32",
       "impact": "low",
-      "forecast": "0.0%",
-      "previous": "-0.2%",
+      "forecast": null,
+      "previous": "0.2%",
       "actual": null,
       "released": false
     },
@@ -1393,6 +1404,17 @@
       "currency": "NZD",
       "dateISO": "2026-05-19",
       "timeUTC": "14:50",
+      "impact": "low",
+      "forecast": null,
+      "previous": "1.5%",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "GDT Price Index",
+      "currency": "NZD",
+      "dateISO": "2026-05-19",
+      "timeUTC": "14:53",
       "impact": "low",
       "forecast": null,
       "previous": "1.5%",
@@ -1570,7 +1592,7 @@
       "dateISO": "2026-05-20",
       "timeUTC": "14:30",
       "impact": "low",
-      "forecast": null,
+      "forecast": "-2.5M",
       "previous": "-4.3M",
       "actual": null,
       "released": false
