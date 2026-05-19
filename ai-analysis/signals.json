@@ -1,55 +1,52 @@
 {
-  "generated_at": "2026-05-18T21:03:08Z",
+  "generated_at": "2026-05-19T03:25:56Z",
   "signals": [
     {
-      "time": "21:02",
+      "time": "03:25",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Options + Intervention Risk",
-      "text": "USD/JPY at 158.81 — President Trump's cancellation of a planned attack on Iran has eased immediate safe-haven demand, yet 300bp Fed-BoJ carry sustains the structural bid. Options market remains heavily skewed toward downside protection with 25d RR at -1.66 (strong put skew) as Japan's Finance Minister Katayama warns of speculative moves. JPY COT LF net short -70,605 confirms a crowded carry trade vulnerable to verbal or physical intervention as price tests the 160.00 threshold.",
+      "title": "GBP/AUD — G8 Bilateral Theme + Hawkish RBA Crowding",
+      "text": "GBP/AUD G8 spread at 1.169% as AUD underperforms peers by -0.804% on average. Despite RBA Assistant Governor Hunter's hawkish stance and a 4.35% vs 3.75% carry advantage for AUD, the 'hawkish trade' is reported as crowded. AUD/USD testing 0.7146 as spec long positioning (74.8%) faces liquidation risk if Middle East inflation risks are already priced. GBP remains the G8 leader (+0.365%) supported by a 5.05% UK 10Y yield.",
       "evidence": [
-        "USD/JPY: 158.81",
-        "25d RR: -1.66 (Saxo)",
-        "Fed-BoJ Carry: +300bp"
+        "GBP 1W avg: +0.365% (n=4)",
+        "AUD 1W avg: -0.804% (n=4)",
+        "G8 spread: 1.169%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "20:58",
+      "time": "03:22",
       "priority": "warning",
-      "title": "GBP/AUD — G8 Bilateral Theme + Carry Divergence",
-      "text": "GBP/AUD G8 spread at 0.928% identifies a dominant bilateral theme as AUD underperforms peers by -0.577%. Despite a -60bp carry disadvantage for GBP (BoE 3.75% vs RBA 4.35%), GBP/USD strength and easing Middle East tensions are weighing on the high-beta AUD. COT data shows AUD LF net long +55,794 (74.8% long), suggesting a crowded long position at risk if RBA minutes fail to reinforce hiking bias.",
-      "evidence": [
-        "GBP 1W avg: +0.351% (n=4)",
-        "AUD 1W avg: -0.577% (n=4)",
-        "G8 spread: 0.928%"
-      ],
-      "watch level": "RBA Minutes (16 Jun)",
-      "_source": "gemini"
-    },
-    {
-      "time": "20:55",
-      "priority": "warning",
-      "title": "AUD/USD — Volatility + Positioning + Retail Divergence",
-      "text": "AUD/USD at 0.7172 — Options market pricing reflects extreme hedging demand with IV at 21.3% vs HV30 of 10.4%, creating a massive +10.8% Vol Risk Premium. While COT LF specs remain net long +55,794, retail sentiment is 72% short, creating a sharp institutional-retail divergence. The elevated VRP suggests the market is paying a high premium for protection against a sharp break, likely tied to the 25d RR put skew of -1.03.",
-      "evidence": [
-        "VRP: +10.8%",
-        "Retail: 72% Short",
-        "COT LF Net: +55,794"
-      ],
-      "watch level": "RBA Meeting (16 Jun)",
-      "_source": "gemini"
-    },
-    {
-      "time": "20:48",
-      "priority": "info",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -19,437 (long% 22.3%) shows speculators fading the RBNZ despite a market bias for a hike at the next meeting. With NZD/USD at 0.5877 and retail 77% long, a hawkish RBNZ delivery on 27 May poses a significant short-squeeze risk for institutional accounts. Fed 3.75% vs RBNZ 2.25% provides a +150bp carry cushion for USD, but the crowded spec short remains the primary tactical risk.",
+      "title": "NZD/USD — COT vs OIS Divergence + PPI Surprise",
+      "text": "NZD/USD COT LF net short -19,437 (long% 22.3%) contradicts the RBNZ hike bias and Q1 PPI input surge of 1.4%. With retail 76% long, a sentiment-positioning clash is emerging. If the RBNZ signals a hike on 27 May to combat building inflation pressures, the crowded spec short is vulnerable to a squeeze. NZD/USD at 0.586.",
       "evidence": [
         "NZD COT LF net: -19,437",
-        "NZD/USD: 0.5877",
-        "USD/NZD Carry: +150bp"
+        "NZD PPI Input: +1.4%",
+        "NZD/USD: 0.586"
       ],
-      "watch level": "RBNZ Meeting (27 May)",
+      "_source": "gemini"
+    },
+    {
+      "time": "03:20",
+      "priority": "warning",
+      "title": "USD/JPY — Options Skew + Carry + Intervention Risk",
+      "text": "USD/JPY at 158.94 remains supported by a +282bp SOFR-TONA carry differential, yet the options market signals acute caution. 25d RR at -1.66 (strong put skew) indicates institutional demand for JPY strength protection despite the carry bid. 160.00 remains the critical level for BoJ verbal or physical intervention. Carry dominates while VIX remains at 17.8 (normal volatility).",
+      "evidence": [
+        "USD/JPY 25d RR: -1.66",
+        "Fed 3.75% vs BoJ 0.75% — +300bp",
+        "USD/JPY: 158.94"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "03:15",
+      "priority": "info",
+      "title": "AUD/USD — Volatility Premium + Retail Divergence",
+      "text": "AUD/USD IV at 21.6% vs HV30 at 10.9% creates a massive +10.7% VRP, pricing extreme protection relative to realized movement. Retail sentiment is 71% short, diverging from the COT LF net long of +55,794. This institutional-retail gap suggests retail is fading the RBA's hiking cycle, increasing the risk of retail capitulation if AUD/USD holds above 0.7120.",
+      "evidence": [
+        "AUD/USD VRP: +10.7%",
+        "Retail Sentiment: 71% Short",
+        "COT LF Net: +55,794"
+      ],
       "_source": "gemini"
     }
   ]
