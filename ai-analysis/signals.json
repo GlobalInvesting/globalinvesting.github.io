@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-05-19T21:11:58Z",
+  "generated_at": "2026-05-20T03:26:33Z",
   "signals": [
     {
-      "time": "21:11",
+      "time": "03:26",
       "priority": "critical",
-      "title": "USD/AUD — G8 Bilateral Theme + Geopolitical Stress",
-      "text": "USD outperformance (1W avg +0.563%) vs AUD underperformance (1W avg -1.106%) creates a 1.669% G8 spread, signaling a dominant risk-off regime. The USD is supported by safe-haven demand following stalled US/Iran talks and hawkish Fed bets, while AUD faces a correction from 0.7280 resistance. Despite a -60bp carry deficit for USD (Fed 3.75% vs RBA 4.35%), geopolitical tension and equity weakness favor the Greenback. AUD/USD at 0.7111.",
+      "title": "USD/AUD — G8 Bilateral Theme + Fed Hawkishness",
+      "text": "USD outperforms as the G8 leader (+0.648%) while AUD lags (-1.188%), creating a 1.837% spread. The divergence is driven by Philadelphia Fed President Paulson's endorsement of current restrictive policy and market hike pricing, alongside a bear steepener in the US yield curve (2s10s +59.7bp). Despite a -60bp carry deficit vs AUD (Fed 3.75% vs RBA 4.35%), USD strength dominates on safe-haven demand and surging US 10Y yields at 4.667%. AUD/USD at 0.7102 remains under pressure as the G8 laggard.",
       "evidence": [
-        "USD 1W avg: +0.563% (n=7)",
-        "AUD 1W avg: -1.106% (n=4)",
-        "G8 spread: 1.669%"
+        "USD 1W avg: +0.648% (n=7)",
+        "AUD 1W avg: -1.188% (n=4)",
+        "G8 spread: 1.837%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "21:08",
-      "priority": "warning",
-      "title": "NZD/USD — COT vs Retail Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -19,437 (long% 22.3%) vs retail 86% long — a sharp institutional vs retail divergence at extremes. While retail is fading the move, specs are positioned for further downside ahead of the 27 May RBNZ meeting. If the RBNZ fails to deliver on the priced hike bias, a long-unwind risk for retail and extension for specs targets 0.5800. NZD/USD at 0.5839.",
+      "time": "03:23",
+      "priority": "critical",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
+      "text": "NZD/USD COT LF net short -19,437 (specs fading the RBNZ) vs a market hike bias for the 27 May meeting. This institutional short positioning diverges from extreme retail sentiment (86% long), creating a high-conviction contrarian setup. If RBNZ delivers a hike or hawkish guidance, the crowded spec short is vulnerable to a squeeze, while retail longs face capitulation risk if price breaks below 0.5800. NZD/USD at 0.5828.",
       "evidence": [
         "NZD COT LF net: -19,437",
         "Retail Sentiment: 86% Long",
-        "NZD/USD: 0.5839"
+        "NZD/USD: 0.5828"
       ],
       "_source": "gemini"
     },
     {
-      "time": "21:06",
+      "time": "03:21",
       "priority": "warning",
-      "title": "USD/JPY — Options Skew + Intervention Risk",
-      "text": "USD/JPY at 159.004 — 282bp OIS carry (SOFR 3.55% vs TONA 0.73%) keeps the pair bid, but 25d RR at -1.52 (strong put skew) signals the options market is paying a premium for JPY strength/USD downside protection. BoJ Governor Ueda's comments on rising long-term rates and the proximity to 160.00 increase intervention risk. Carry dominates until VIX > 25, but the options skew suggests institutional caution.",
+      "title": "EUR/USD — Positioning + Vol + ECB Hawkishness",
+      "text": "EUR/USD at 1.1605 testing recent lows as ECB's Nagel and Kocher signal a June hike is 'unavoidable' due to Hormuz Strait energy shocks. Despite hawkish CB rhetoric, EUR COT LF net remains short -8,151. Options market shows elevated hedging demand with IV at 7.1% vs HV30 at 5.0% (VRP +2.1%), while 25d RR at -0.53 confirms a persistent put skew. The +175bp USD carry advantage (Fed 3.75% vs ECB 2.0%) continues to overpower ECB hike bets.",
+      "evidence": [
+        "EUR/USD VRP: +2.1%",
+        "USD/EUR Carry: +175bp",
+        "EUR COT LF net: -8,151"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "03:18",
+      "priority": "warning",
+      "title": "USD/JPY — Options Skew + BoJ Taper Risk",
+      "text": "USD/JPY at 158.91 remains below the 160.00 intervention threshold, but options markets are pricing heavy downside protection with a strong 25d RR of -1.52 (Saxo). This extreme put skew contradicts the +280bp OIS carry advantage (SOFR 3.53% vs TONA 0.73%), signaling institutional fear of a BoJ policy shift. Analysts suggest BoJ may slow bond tapering in June, which would catalyze a JPY bid. Watch for a break of 160.00 to trigger verbal or physical intervention.",
       "evidence": [
         "USD/JPY 25d RR: -1.52",
-        "USD/JPY OIS Carry: +282bp",
-        "USD/JPY: 159.004"
+        "USD/JPY Carry: +280bp",
+        "JPY COT LF net: -70,605"
       ],
       "_source": "gemini"
     },
     {
-      "time": "21:03",
-      "priority": "warning",
-      "title": "GBP/USD — Volatility Premium + UK Jobs Shock",
-      "text": "GBP/USD IV at 11.0% vs HV30 at 7.6% — 3.4pt VRP indicates elevated hedging demand following the drop of 100,000 UK payrolled employees in April. COT LF net long +40,980 (70% long) remains crowded; the energy shock from Iran tensions threatens this positioning. GBP/USD at 1.3396 faces downside risk if the 18 Jun BoE meeting shifts dovish in response to labor market cooling.",
-      "evidence": [
-        "GBP VRP: +3.4%",
-        "GBP COT LF net: +40,980",
-        "GBP/USD: 1.3396"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "20:58",
+      "time": "03:12",
       "priority": "info",
-      "title": "USD/CHF — Volatility Premium + Carry",
-      "text": "USD/CHF IV at 12.2% vs HV30 at 7.1% — 5.1pt VRP signals significant protection buying despite a neutral 25d RR (+0.09). The 375bp carry advantage (Fed 3.75% vs SNB 0.0%) supports USD/CHF at 0.7881, but the high vol premium suggests the market is bracing for a sharp safe-haven CHF bid if Middle East tensions escalate further.",
+      "title": "AUD/USD — Volatility Premium Extreme",
+      "text": "AUD/USD IV at 20.4% vs HV30 at 9.3% generates a massive +11.1% Vol Risk Premium (VRP), the highest in the G10 space. This extreme premium indicates the options market is pricing in significant tail risk or a regime shift that has not yet materialized in realized price action. With AUD as the G8 laggard (-1.188% 1W avg), the high cost of protection suggests a lack of conviction in the current 0.7102 floor. Watch for IV mean-reversion or a volatility-led break lower.",
       "evidence": [
-        "USD/CHF VRP: +5.1%",
-        "USD/CHF Carry: +375bp",
-        "USD/CHF: 0.7881"
+        "AUD/USD IV: 20.4%",
+        "AUD/USD HV30: 9.3%",
+        "VRP: +11.1%"
       ],
       "_source": "gemini"
     }
