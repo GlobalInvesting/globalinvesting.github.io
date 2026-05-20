@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-05-20T03:26:33Z",
+  "generated_at": "2026-05-20T09:58:33Z",
   "signals": [
     {
-      "time": "03:26",
+      "time": "09:58",
       "priority": "critical",
-      "title": "USD/AUD — G8 Bilateral Theme + Fed Hawkishness",
-      "text": "USD outperforms as the G8 leader (+0.648%) while AUD lags (-1.188%), creating a 1.837% spread. The divergence is driven by Philadelphia Fed President Paulson's endorsement of current restrictive policy and market hike pricing, alongside a bear steepener in the US yield curve (2s10s +59.7bp). Despite a -60bp carry deficit vs AUD (Fed 3.75% vs RBA 4.35%), USD strength dominates on safe-haven demand and surging US 10Y yields at 4.667%. AUD/USD at 0.7102 remains under pressure as the G8 laggard.",
+      "title": "USD/AUD — G8 Bilateral Theme + Fed Ideology Shift",
+      "text": "USD outperforms as the G8 leader (+0.670%) while AUD lags (-0.934%), creating a massive 1.605% spread. The divergence is accelerated by headlines regarding new Fed Chair Kevin Warsh portending a significant shift in ideology, coinciding with a bear steepener in the US yield curve (2s10s +59.7bp). Despite a -60bp OIS carry disadvantage for USD, the policy shift narrative and rising US 10Y yields (4.667%) dominate price action. AUD/USD at 0.7115 remains under pressure as the weakest G8 performer.",
       "evidence": [
-        "USD 1W avg: +0.648% (n=7)",
-        "AUD 1W avg: -1.188% (n=4)",
-        "G8 spread: 1.837%"
+        "USD 1W avg: +0.670% (n=7)",
+        "AUD 1W avg: -0.934% (n=4)",
+        "G8 spread: 1.605%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "03:23",
+      "time": "09:55",
       "priority": "critical",
-      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
-      "text": "NZD/USD COT LF net short -19,437 (specs fading the RBNZ) vs a market hike bias for the 27 May meeting. This institutional short positioning diverges from extreme retail sentiment (86% long), creating a high-conviction contrarian setup. If RBNZ delivers a hike or hawkish guidance, the crowded spec short is vulnerable to a squeeze, while retail longs face capitulation risk if price breaks below 0.5800. NZD/USD at 0.5828.",
-      "evidence": [
-        "NZD COT LF net: -19,437",
-        "Retail Sentiment: 86% Long",
-        "NZD/USD: 0.5828"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "03:21",
-      "priority": "warning",
-      "title": "EUR/USD — Positioning + Vol + ECB Hawkishness",
-      "text": "EUR/USD at 1.1605 testing recent lows as ECB's Nagel and Kocher signal a June hike is 'unavoidable' due to Hormuz Strait energy shocks. Despite hawkish CB rhetoric, EUR COT LF net remains short -8,151. Options market shows elevated hedging demand with IV at 7.1% vs HV30 at 5.0% (VRP +2.1%), while 25d RR at -0.53 confirms a persistent put skew. The +175bp USD carry advantage (Fed 3.75% vs ECB 2.0%) continues to overpower ECB hike bets.",
-      "evidence": [
-        "EUR/USD VRP: +2.1%",
-        "USD/EUR Carry: +175bp",
-        "EUR COT LF net: -8,151"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "03:18",
-      "priority": "warning",
-      "title": "USD/JPY — Options Skew + BoJ Taper Risk",
-      "text": "USD/JPY at 158.91 remains below the 160.00 intervention threshold, but options markets are pricing heavy downside protection with a strong 25d RR of -1.52 (Saxo). This extreme put skew contradicts the +280bp OIS carry advantage (SOFR 3.53% vs TONA 0.73%), signaling institutional fear of a BoJ policy shift. Analysts suggest BoJ may slow bond tapering in June, which would catalyze a JPY bid. Watch for a break of 160.00 to trigger verbal or physical intervention.",
+      "title": "USD/JPY — Carry + Options Skew + Intervention Risk",
+      "text": "USD/JPY at 159.04 remains supported by a +280bp SOFR-TONA carry advantage, yet the options market signals acute caution. 25d Risk Reversals show a strong -1.52 put skew, indicating institutional demand for JPY protection despite the carry bid. This divergence between spot carry and options pricing reflects mounting intervention risk as price tests the 160.00 threshold. JPY COT LF net short -70,605 confirms a crowded carry trade vulnerable to a sharp unwind if the BoJ signals a June hike.",
       "evidence": [
         "USD/JPY 25d RR: -1.52",
-        "USD/JPY Carry: +280bp",
+        "USD/JPY OIS Carry: +280bp",
         "JPY COT LF net: -70,605"
       ],
       "_source": "gemini"
     },
     {
-      "time": "03:12",
-      "priority": "info",
-      "title": "AUD/USD — Volatility Premium Extreme",
-      "text": "AUD/USD IV at 20.4% vs HV30 at 9.3% generates a massive +11.1% Vol Risk Premium (VRP), the highest in the G10 space. This extreme premium indicates the options market is pricing in significant tail risk or a regime shift that has not yet materialized in realized price action. With AUD as the G8 laggard (-1.188% 1W avg), the high cost of protection suggests a lack of conviction in the current 0.7102 floor. Watch for IV mean-reversion or a volatility-led break lower.",
+      "time": "09:53",
+      "priority": "warning",
+      "title": "NZD/USD — COT vs Retail Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -19,437 (specs fading the currency) vs retail sentiment at 84% long (extreme retail long). This institutional vs retail divergence at 0.5839 creates a high-risk environment for retail longs if the RBNZ fails to deliver on hike expectations at the May 27 meeting. Speculative positioning is already near the lower end of the range (22.3% long), suggesting limited further selling capacity unless the RBNZ shifts dovish.",
       "evidence": [
-        "AUD/USD IV: 20.4%",
-        "AUD/USD HV30: 9.3%",
-        "VRP: +11.1%"
+        "NZD COT LF net: -19,437",
+        "Retail Sentiment: 84% Long",
+        "NZD/USD: 0.5839"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "09:50",
+      "priority": "warning",
+      "title": "AUD/USD — Volatility Risk Premium + Positioning",
+      "text": "AUD/USD IV at 20.4% vs HV30 at 9.2% generates a massive +11.2% Vol Risk Premium, signaling the options market is pricing in extreme tail risk compared to recent realized moves. This elevated hedging demand coincides with a crowded COT LF net long of +55,794 (74.8% long). With AUD as the G8 laggard (-0.934%), the combination of high vol-premium and long positioning suggests a high probability of a forced liquidation event if 0.7100 fails to hold.",
+      "evidence": [
+        "AUD/USD VRP: +11.2%",
+        "AUD COT LF net: +55,794",
+        "AUD 1W avg: -0.934%"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "09:45",
+      "priority": "info",
+      "title": "EUR/USD — Volatility Premium + ECB Neutrality",
+      "text": "EUR/USD IV at 7.1% vs HV30 at 5.1% shows a +2.0% VRP, indicating a moderate premium for protection as ECB nominee Moulin signals it is 'too soon' to commit to June action. EUR/USD at 1.1593 is structurally weighed down by a +160bp SOFR-€STR carry disadvantage. Speculative positioning remains neutral (48% long), suggesting the current move is driven by USD strength rather than EUR-specific liquidation. Watch for the ECB meeting on 11 June to redefine the vol regime.",
+      "evidence": [
+        "EUR/USD VRP: +2.0%",
+        "EUR/USD OIS Carry: +160bp",
+        "EUR COT long%: 48.0%"
       ],
       "_source": "gemini"
     }
