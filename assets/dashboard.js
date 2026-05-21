@@ -10453,8 +10453,24 @@ async function renderEconSurprises() {
     // Row tooltip
     const pct = (s.beats / s.total * 100).toFixed(0);
     const inLine = s.total - s.beats - s.misses;
-    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)}`;
+    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)} · click for detail`;
   });
+
+  // ── Keyboard activation for clickable rows (Enter / Space) ──────────────
+  // onclick is already in the static HTML; this adds keyboard parity.
+  if (tbody && !tbody._esmKeyBound) {
+    tbody._esmKeyBound = true;
+    tbody.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        const row = ev.target.closest('tr');
+        const ccy = row?.querySelector('td')?.textContent?.trim();
+        if (ccy && window.openEconSurprisesModal) {
+          ev.preventDefault();
+          window.openEconSurprisesModal(ccy);
+        }
+      }
+    });
+  }
 }
 
 // ── Derivatives section visibility toggle ──

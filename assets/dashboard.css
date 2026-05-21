@@ -1719,3 +1719,11 @@ a:focus-visible,
   border-radius: 2px;
   transition: width 0.35s ease, background 0.35s ease, left 0.35s ease;
 }
+/* Clickable Economic Surprises rows */
+#econ-surprise-tbody tr:hover td {
+  background: rgba(79,127,255,0.06);
+}
+#econ-surprise-tbody tr:focus {
+  outline: 2px solid var(--blue,#4f7fff);
+  outline-offset: -1px;
+}
