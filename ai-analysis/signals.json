@@ -1,63 +1,52 @@
 {
-  "generated_at": "2026-05-21T10:08:22Z",
+  "generated_at": "2026-05-21T17:09:01Z",
   "signals": [
     {
-      "time": "10:08",
+      "time": "17:08",
       "priority": "critical",
-      "title": "GBP/AUD — G8 Bilateral Theme + Jobs Shock",
-      "text": "GBP/AUD divergence reaches critical levels as GBP 1W outperformance (+0.623%) meets AUD weakness (-0.821%) following an April jobs shock. The 1.444% G8 spread is driven by a collapse in RBA hike expectations while GBP remains supported by a 60bp carry advantage over USD (neutral) and 435bp over CHF. AUD/USD at 0.7141 faces further downside as the jobs data dims the RBA's hiking bias.",
+      "title": "USD/JPY — Geopolitical + Carry + Intervention Risk",
+      "text": "USD/JPY at 159.15 — 300bp Fed-BoJ carry sustains the bid as Middle East tensions regarding Strait of Hormuz tolls drive crude oil +1.99%. JPY COT LF net short -70,605 (33.1% long) indicates crowded carry positioning. While carry dominates in the current normal volatility regime (VIX 17.2), intervention risk rises on a sustained break above 160.00. Options market remains cautious with a -1.32 25d RR put skew, signaling institutional hedging against a sudden JPY spike.",
       "evidence": [
-        "GBP 1W avg: +0.623% (n=4)",
-        "AUD 1W avg: -0.821% (n=4)",
-        "G8 spread: 1.444%"
+        "Fed 3.75% vs BoJ 0.75% — 300bp",
+        "JPY COT LF net: -70,605",
+        "USD/JPY: 159.15"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:05",
-      "priority": "critical",
-      "title": "EUR/USD — PMI Contraction + Vol Premium",
-      "text": "EUR/USD at 1.1632 under pressure as Eurozone Composite PMI falls to a 31-month low, signaling a Q2 GDP contraction. Options markets are pricing significant tail risk with IV at 7.1% vs HV30 at 5.0%, creating a +2.1% vol risk premium. Fed 3.75% vs ECB 2.0% provides a +175bp carry advantage to USD, structurally limiting EUR upside as growth data deteriorates.",
-      "evidence": [
-        "Eurozone Services PMI: 46.4",
-        "VRP: +2.1%",
-        "USD/EUR carry: +175bp"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "10:03",
+      "time": "17:05",
       "priority": "warning",
-      "title": "GBP/USD — Positioning + Vol Risk Premium",
-      "text": "GBP/USD at 1.3445 shows signs of late-trend exhaustion despite being the G8 leader. COT LF net long is crowded at +40,980 (70% long) while the options market demands a massive +4.0% vol risk premium (IV 11.0% vs HV30 7.0%). 25d RR at -1.10 confirms a moderate put skew as traders hedge against a reversal following the UK Services PMI slide to 47.9.",
+      "title": "GBP/AUD — G8 Bilateral Theme + Carry Divergence",
+      "text": "GBP/AUD G8 spread at 1.196% as GBP outperforms (+0.540%) and AUD lags (-0.657%) across the G8 complex. Despite a -60bp carry disadvantage (BoE 3.75% vs RBA 4.35%), GBP remains bid while AUD faces pressure from equity weakness (S&P 500 -0.32%) and soft risk sentiment. AUD COT LF net long +55,794 (74.8% long) suggests a crowded long trade vulnerable to further liquidation if risk-off flows accelerate. GBP/USD at 1.3407, AUD/USD at 0.7138.",
       "evidence": [
-        "GBP COT LF net: +40,980",
-        "GBP/USD VRP: +4.0%",
-        "25d RR: -1.10"
+        "GBP 1W avg: +0.540% (n=4)",
+        "AUD 1W avg: -0.657% (n=4)",
+        "G8 spread: 1.196%"
       ],
+      "watch_level": "Next RBA meeting on 16 Jun",
       "_source": "gemini"
     },
     {
-      "time": "10:00",
+      "time": "17:03",
       "priority": "warning",
-      "title": "USD/JPY — Carry vs Intervention Risk",
-      "text": "USD/JPY at 158.98 remains supported by a +278bp OIS carry advantage (SOFR 3.51% vs TONA 0.73%). However, 25d RR at -1.44 signals a moderate put skew as the pair tests the 160.00 psychological level where BoJ intervention risk rises. Retail sentiment is 79% short, diverging from the institutional carry bid; a break above 160.00 risks a sharp short-squeeze or official yen support.",
-      "evidence": [
-        "USD/JPY OIS carry: +278bp",
-        "25d RR: -1.44",
-        "Retail sentiment: 79% short"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "09:55",
-      "priority": "info",
-      "title": "NZD/USD — COT vs OIS Divergence",
-      "text": "NZD/USD at 0.5872 presents a tactical short-squeeze risk ahead of the RBNZ meeting on 27 May. COT LF net positioning is heavily short at -19,437 (22.3% long) while the OIS market maintains a hike bias. If the RBNZ delivers a hawkish hold or signals a hike, the crowded spec short is vulnerable to an unwind. Watch for a break above 0.5900 to confirm the squeeze.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -19,437 (specs 22.3% long) vs RBNZ hike bias priced for the meeting on 27 May. Speculative positioning is fading the hawkish central bank stance; if RBNZ delivers a hike or hawkish guidance, a short-squeeze risk is elevated as crowded spec shorts unwind. NZD/USD at 0.5861 remains pressured by USD strength (DXY 99.37) but technical support holds near 0.5850.",
       "evidence": [
         "NZD COT LF net: -19,437",
-        "NZD long%: 22.3%",
-        "RBNZ bias: Hike"
+        "RBNZ bias: Hike",
+        "NZD/USD: 0.5861"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "16:58",
+      "priority": "info",
+      "title": "USD/CHF — Volatility Premium + Carry",
+      "text": "USD/CHF at 0.7889 supported by a +375bp Fed-SNB carry advantage. Options market shows significant hedging demand with IV at 14.4% vs HV30 at 6.8%, resulting in a +7.6% Vol Risk Premium (VRP). This elevated premium suggests the market is pricing in high protection costs for CHF safe-haven reversals despite the dominant carry-driven upside in USD/CHF. Carry remains the primary driver while VIX stays below 25.",
+      "evidence": [
+        "Fed 3.75% vs SNB 0% — 375bp",
+        "USD/CHF VRP: +7.6%",
+        "USD/CHF: 0.7889"
       ],
       "_source": "gemini"
     }
