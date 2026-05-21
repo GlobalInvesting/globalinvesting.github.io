@@ -1,14 +1,127 @@
 {
-  "generated_at": "2026-05-05T08:00:03Z",
+  "generated_at": "2026-05-21T09:27:29Z",
   "drivers": {
-    "EUR": {},
-    "GBP": {},
-    "JPY": {},
-    "AUD": {},
-    "CAD": {},
-    "CHF": {},
-    "NZD": {},
-    "USD": {}
+    "EUR": {
+      "EUR/USD": "USD bid. Fed delay fuels yield surge. Fed-ECB 175bp carry anchors pair",
+      "EUR/GBP": "GBP COT LF long +41.0k. BoE on hold. GBP 1W avg +0.61% leads G8",
+      "EUR/JPY": "JPY COT LF short -70.6k. BoJ hike expected. EUR/JPY carry +125bp",
+      "EUR/AUD": "AUD COT LF long +55.8k. RBA hike priced in. AUD 1W avg -0.80% laggard",
+      "EUR/CAD": "CAD COT LF short -40.0k. BoC on hold. Oil stable at $98.1 limits move",
+      "EUR/CHF": "CHF steady. SNB on hold. EUR/CHF 200bp carry advantage supports floor",
+      "EUR/NZD": "NZD bid. RBNZ hike priced in for May. NZD/USD 150bp carry vs EUR"
+    },
+    "GBP": {
+      "GBP/USD": "GBP COT LF long +41.0k. Fed delay fuels USD yield surge. Carry neutral",
+      "GBP/JPY": "JPY COT LF short -70.6k. BoJ hike expected. GBP/JPY carry +300bp",
+      "EUR/GBP": "GBP COT LF long +41.0k. BoE on hold. GBP 1W avg +0.61% outperforming",
+      "GBP/AUD": "GBP/AUD — G8 Bilateral Theme. GBP 1W avg: +0.613%, AUD 1W avg: -0.798%",
+      "GBP/CAD": "CAD COT LF short -40.0k. BoC on hold. GBP/CAD carry +150bp favors GBP",
+      "GBP/CHF": "CHF steady. SNB on hold. GBP/CHF 375bp carry advantage anchors pair",
+      "GBP/NZD": "NZD firm. RBNZ hike priced in. GBP 1W avg +0.61% vs NZD hike bias"
+    },
+    "JPY": {
+      "USD/JPY": "JPY COT LF short -70.6k. Fed delay fuels yield surge. Carry +300bp to USD",
+      "EUR/JPY": "JPY COT LF short -70.6k. BoJ hike expected. EUR/JPY carry +125bp",
+      "GBP/JPY": "JPY COT LF short -70.6k. BoJ hike expected. GBP/JPY carry +300bp",
+      "AUD/JPY": "JPY COT LF short -70.6k. RBA hike priced in. AUD/JPY carry +360bp",
+      "CAD/JPY": "JPY COT LF short -70.6k. BoC on hold. CAD/JPY carry +150bp",
+      "CHF/JPY": "JPY COT LF short -70.6k. BoJ hike expected. Carry favors JPY -75bp",
+      "NZD/JPY": "JPY COT LF short -70.6k. RBNZ hike priced in. Carry favors NZD"
+    },
+    "AUD": {
+      "AUD/USD": "AUD COT LF long +55.8k. Fed delay fuels yield surge. Carry +60bp to AUD",
+      "EUR/AUD": "AUD COT LF long +55.8k. RBA hike priced in. AUD 1W avg -0.80% laggard",
+      "GBP/AUD": "GBP/AUD — G8 Bilateral Theme. GBP 1W avg: +0.613%, AUD 1W avg: -0.798%",
+      "AUD/JPY": "JPY COT LF short -70.6k. BoJ hike expected. AUD/JPY carry +360bp",
+      "AUD/CAD": "AUD COT LF long +55.8k. BoC on hold. AUD/CAD carry +210bp favors AUD",
+      "AUD/CHF": "AUD COT LF long +55.8k. SNB on hold. AUD/CHF 435bp carry bid",
+      "AUD/NZD": "AUD COT LF long +55.8k. RBNZ hike priced in. RBA-RBNZ divergence eyed"
+    },
+    "CAD": {
+      "USD/CAD": "CAD COT LF short -40.0k. Fed delay fuels yield surge. Carry +150bp to USD",
+      "EUR/CAD": "CAD COT LF short -40.0k. BoC on hold. Oil stable at $98.1 anchors pair",
+      "GBP/CAD": "CAD COT LF short -40.0k. BoE on hold. GBP/CAD carry +150bp favors GBP",
+      "AUD/CAD": "AUD COT LF long +55.8k. RBA hike priced in. AUD/CAD carry +210bp",
+      "CAD/JPY": "CAD COT LF short -40.0k. BoJ hike expected. CAD/JPY carry +150bp",
+      "CAD/CHF": "CAD COT LF short -40.0k. SNB on hold. CAD/CHF 225bp carry advantage",
+      "NZD/CAD": "NZD firm. RBNZ hike priced in. BoC on hold. Carry neutral"
+    },
+    "CHF": {
+      "USD/CHF": "USD bid. Fed delay fuels yield surge. USD/CHF 375bp carry advantage",
+      "EUR/CHF": "EUR steady. ECB on hold. EUR/CHF 200bp carry differential anchors pair",
+      "GBP/CHF": "GBP COT LF long +41.0k. BoE on hold. GBP/CHF 375bp carry bid",
+      "AUD/CHF": "AUD COT LF long +55.8k. RBA hike priced in. AUD/CHF 435bp carry bid",
+      "CAD/CHF": "CAD COT LF short -40.0k. BoC on hold. CAD/CHF 225bp carry advantage",
+      "CHF/JPY": "JPY COT LF short -70.6k. BoJ hike expected. Carry favors JPY -75bp",
+      "NZD/CHF": "NZD firm. RBNZ hike priced in. NZD/CHF 225bp carry advantage"
+    },
+    "NZD": {
+      "NZD/USD": "USD bid. Fed delay fuels yield surge. USD/NZD 150bp carry advantage",
+      "EUR/NZD": "NZD firm. RBNZ hike priced in for May. NZD/USD carry vs EUR",
+      "GBP/NZD": "GBP COT LF long +41.0k. BoE on hold. GBP 1W avg +0.61% leads G8",
+      "AUD/NZD": "AUD COT LF long +55.8k. RBA hike priced in. RBNZ hike bias limits move",
+      "NZD/JPY": "JPY COT LF short -70.6k. BoJ hike expected. Carry favors NZD",
+      "NZD/CAD": "CAD COT LF short -40.0k. BoC on hold. RBNZ hike priced in for May",
+      "NZD/CHF": "CHF steady. SNB on hold. NZD/CHF 225bp carry advantage"
+    },
+    "USD": {
+      "EUR/USD": "USD bid. Fed delay fuels yield surge. Fed-ECB 175bp carry anchors pair",
+      "GBP/USD": "GBP COT LF long +41.0k. Fed delay fuels USD yield surge. Carry neutral",
+      "USD/JPY": "JPY COT LF short -70.6k. Fed delay fuels yield surge. Carry +300bp to USD",
+      "AUD/USD": "AUD COT LF long +55.8k. Fed delay fuels yield surge. Carry +60bp to AUD",
+      "USD/CAD": "CAD COT LF short -40.0k. Fed delay fuels yield surge. Carry +150bp to USD",
+      "USD/CHF": "USD bid. Fed delay fuels yield surge. USD/CHF 375bp carry advantage",
+      "NZD/USD": "NZD firm. Fed delay fuels USD yield surge. USD/NZD 150bp carry"
+    }
   },
-  "_inputs_snap": {}
+  "_inputs_snap": {
+    "USD": {
+      "cot_we": "2026-05-12",
+      "rate_updated": "2026-05-20",
+      "bias": "hold",
+      "bias_updated": "2026-05-18"
+    },
+    "EUR": {
+      "cot_we": "2026-05-12",
+      "rate_updated": "2026-05-20",
+      "bias": "hold",
+      "bias_updated": "2026-05-18"
+    },
+    "GBP": {
+      "cot_we": "2026-05-12",
+      "rate_updated": "2026-05-20",
+      "bias": "hold",
+      "bias_updated": "2026-05-18"
+    },
+    "JPY": {
+      "cot_we": "2026-05-12",
+      "rate_updated": "2026-05-20",
+      "bias": "hike",
+      "bias_updated": "2026-05-18"
+    },
+    "AUD": {
+      "cot_we": "2026-05-12",
+      "rate_updated": "2026-05-20",
+      "bias": "hike",
+      "bias_updated": "2026-05-18"
+    },
+    "CAD": {
+      "cot_we": "2026-05-12",
+      "rate_updated": "2026-05-20",
+      "bias": "hold",
+      "bias_updated": "2026-05-18"
+    },
+    "CHF": {
+      "cot_we": "2026-05-12",
+      "rate_updated": "2026-05-20",
+      "bias": "hold",
+      "bias_updated": "2026-05-18"
+    },
+    "NZD": {
+      "cot_we": "2026-05-12",
+      "rate_updated": "2026-05-20",
+      "bias": "hike",
+      "bias_updated": "2026-05-18"
+    }
+  }
 }
