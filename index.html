@@ -1210,7 +1210,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <!-- ECONOMIC SURPRISES — ForexFactory calendar, beat/miss vs consensus, G8 -->
     <div id="section-econ-surprise" style="border-top:1px solid var(--border);padding:6px 0 0;">
       <div class="sb-head" style="margin-bottom:2px;">Economic Surprises</div>
-      <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · G8 · 90d rolling</div>
+      <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · G8 · 90d rolling · <span style="color:var(--blue,#4f7fff);">click row for detail</span></div>
       <table id="econ-surprise-table" aria-label="Economic surprise index by G8 currency" style="width:100%;border-collapse:collapse;">
         <thead>
           <tr>
@@ -1220,14 +1220,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </tr>
         </thead>
         <tbody id="econ-surprise-tbody">
-          <tr><td style="padding:2px 8px;font-size:10px;">USD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
-          <tr><td style="padding:2px 8px;font-size:10px;">EUR</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
-          <tr><td style="padding:2px 8px;font-size:10px;">GBP</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
-          <tr><td style="padding:2px 8px;font-size:10px;">JPY</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
-          <tr><td style="padding:2px 8px;font-size:10px;">AUD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
-          <tr><td style="padding:2px 8px;font-size:10px;">CAD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
-          <tr><td style="padding:2px 8px;font-size:10px;">CHF</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
-          <tr><td style="padding:2px 8px;font-size:10px;">NZD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('USD')" title="Click to view USD surprise index detail" tabindex="0" role="button" aria-label="USD economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">USD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('EUR')" title="Click to view EUR surprise index detail" tabindex="0" role="button" aria-label="EUR economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">EUR</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('GBP')" title="Click to view GBP surprise index detail" tabindex="0" role="button" aria-label="GBP economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">GBP</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('JPY')" title="Click to view JPY surprise index detail" tabindex="0" role="button" aria-label="JPY economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">JPY</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('AUD')" title="Click to view AUD surprise index detail" tabindex="0" role="button" aria-label="AUD economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">AUD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('CAD')" title="Click to view CAD surprise index detail" tabindex="0" role="button" aria-label="CAD economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">CAD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('CHF')" title="Click to view CHF surprise index detail" tabindex="0" role="button" aria-label="CHF economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">CHF</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('NZD')" title="Click to view NZD surprise index detail" tabindex="0" role="button" aria-label="NZD economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">NZD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
         </tbody>
       </table>
       <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">ForexFactory · actual vs consensus · 90d rolling</div>
@@ -1375,6 +1375,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/yc-modal.js?v=7.74.41" defer></script>
 <script src="assets/heatmap-modal.js?v=2.1.0" defer></script>
+<script src="assets/econ-surprises-modal.js?v=1.0.0" defer></script>
 <script src="assets/onboarding.js?v=7.89.3" defer></script>
 <script src="assets/layout-resizer.js?v=1.0.0" defer></script>
 <script src="assets/feed.js?v=1.0.0" defer></script>
