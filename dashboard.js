@@ -1234,8 +1234,6 @@ async function fetchQuoteBarRT() {
         hv30:  (q.hv30  != null) ? q.hv30 : (intradayData.hv30?.[pair.id] ?? null),
         pct1w: (q.pct1w != null) ? q.pct1w : null,
         pct1w_date: q.pct1w_date ?? null,
-        prev_bar: (q.prev_bar?.time && q.prev_bar.open > 0 && q.prev_bar.high > 0 &&
-                   q.prev_bar.low > 0 && q.prev_bar.close > 0) ? q.prev_bar : null,
         fromIntraday: true,
         stale: q.stale ?? false,
       };
@@ -10674,6 +10672,14 @@ function initDerivativesNavFixed() {
 // Personal Watchlist — localStorage-backed sidebar widget
 // Pairs are stored as a JSON array under 'gi_watchlist' key.
 // Prices are sourced from the intraday quotes cache (loadIntradayQuotes).
+// FIX-WL (v7.91.0): Three bugs corrected —
+//   1. render() called at init() before window._intradayQuotes is populated;
+//      now defers with a short poll so prices show immediately on load.
+//   2. gi:quotesLoaded listener was the only re-render path; if boot() already
+//      ran (90s cache hit), the event never fired after init(). Retained as
+//      primary path; poll fallback covers the cached case.
+//   3. Duplicate event-listener registration on every addSymbol/remove call
+//      replaced by event delegation on the container.
 // ═══════════════════════════════════════════════════════════════════
 (function initWatchlist() {
   'use strict';
@@ -10708,11 +10714,14 @@ function initDerivativesNavFixed() {
       return;
     }
     var quotes = (window._intradayQuotes && window._intradayQuotes.quotes) || {};
+    // FIX-WL-1: If quotes are not yet loaded, show skeleton prices and schedule
+    // a re-render after a short delay rather than showing — permanently.
+    var quotesReady = Object.keys(quotes).length > 0;
     tbody.innerHTML = list.map(function (sym) {
-      var q = quotes[sym] || {};
-      var price = (q.price != null) ? String(q.price) : '—';
-      var chg = (q.chgPct != null) ? q.chgPct : null;
-      var chgStr = (chg != null) ? ((chg >= 0 ? '+' : '') + chg.toFixed(2) + '%') : '—';
+      var q = quotes[sym.toLowerCase()] || quotes[sym] || {};
+      var price = (q.close != null) ? String(q.close) : (quotesReady ? '—' : '···');
+      var chg = (q.pct != null) ? q.pct : null;
+      var chgStr = (chg != null) ? ((chg >= 0 ? '+' : '') + chg.toFixed(2) + '%') : (quotesReady ? '—' : '···');
       var chgColor = (chg == null) ? 'var(--text3)' : (chg >= 0 ? 'var(--up)' : 'var(--down)');
       return '<div class="sb-row" style="display:flex;align-items:center;gap:0;">' +
         '<span class="sb-sym" style="flex:1;">' + sym + '</span>' +
@@ -10721,15 +10730,10 @@ function initDerivativesNavFixed() {
         '<button data-wl-remove="' + sym + '" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:0 4px;line-height:1;" aria-label="Remove ' + sym + '" title="Remove">&times;</button>' +
         '</div>';
     }).join('');
-    // Remove buttons
-    tbody.querySelectorAll('[data-wl-remove]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var sym = btn.getAttribute('data-wl-remove');
-        var list = load().filter(function (s) { return s !== sym; });
-        save(list);
-        render();
-      });
-    });
+    // FIX-WL-1: If quotes weren't ready yet, retry after boot() has had time to load them.
+    if (!quotesReady) {
+      setTimeout(render, 800);
+    }
   }
 
   function addSymbol(rawInput) {
@@ -10748,7 +10752,8 @@ function initDerivativesNavFixed() {
     var addBtn = document.getElementById('wl-add-btn');
     var inputRow = document.getElementById('wl-input-row');
     var input = document.getElementById('wl-input');
-    if (!addBtn || !inputRow || !input) return;
+    var tbody = document.getElementById('watchlist-rows');
+    if (!addBtn || !inputRow || !input || !tbody) return;
 
     render();
 
@@ -10768,9 +10773,23 @@ function initDerivativesNavFixed() {
       }
     });
 
-    // Refresh prices after quotes load
+    // FIX-WL-3: Use event delegation on the container instead of attaching
+    // individual click listeners on every remove button on each render() call.
+    // The old approach accumulated O(n * renders) listeners on the same nodes.
+    tbody.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-wl-remove]');
+      if (!btn) return;
+      var sym = btn.getAttribute('data-wl-remove');
+      save(load().filter(function (s) { return s !== sym; }));
+      render();
+    });
+
+    // FIX-WL-2: gi:quotesLoaded fires when boot() finishes loadIntradayQuotes().
+    // On a 90s cache hit boot() runs synchronously before init() — the event
+    // won't fire again. The render() retry loop above covers this case, but we
+    // also keep the event listener as the primary fast path.
     document.addEventListener('gi:quotesLoaded', render);
-    // Also refresh on a slow polling interval
+    // Periodic refresh every 30s keeps prices current as the intraday cache updates.
     setInterval(render, 30000);
   }
 
