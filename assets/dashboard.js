@@ -10707,9 +10707,9 @@ function initDerivativesNavFixed() {
     }
     var quotes = (window._intradayQuotes && window._intradayQuotes.quotes) || {};
     tbody.innerHTML = list.map(function (sym) {
-      var q = quotes[sym] || {};
-      var price = (q.price != null) ? String(q.price) : '—';
-      var chg = (q.chgPct != null) ? q.chgPct : null;
+      var q = quotes[sym.toLowerCase()] || quotes[sym] || {};
+      var price = (q.close != null) ? String(q.close) : '—';
+      var chg = (q.pct != null) ? q.pct : null;
       var chgStr = (chg != null) ? ((chg >= 0 ? '+' : '') + chg.toFixed(2) + '%') : '—';
       var chgColor = (chg == null) ? 'var(--text3)' : (chg >= 0 ? 'var(--up)' : 'var(--down)');
       return '<div class="sb-row" style="display:flex;align-items:center;gap:0;">' +
