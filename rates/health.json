@@ -1,27 +1,27 @@
 {
-  "runTimestamp": "2026-05-20T10:44:58.986646Z",
-  "runDate": "2026-05-20",
+  "runTimestamp": "2026-05-21T11:16:05.108917Z",
+  "runDate": "2026-05-21",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
       "status": "ok",
       "rate": "3.75",
       "source": "NYFed-EFFR",
-      "date": "2026-05-18",
+      "date": "2026-05-19",
       "issues": []
     },
     "EUR": {
-      "status": "ok",
-      "rate": "2",
-      "source": "ECB-SDMX",
-      "date": "2025-06-11",
+      "status": "fallback",
+      "rate": "2.00",
+      "source": "ECB-HTML",
+      "date": "2026-05-21",
       "issues": []
     },
     "GBP": {
       "status": "ok",
       "rate": "3.75",
       "source": "BoE-CSV",
-      "date": "2026-05-19",
+      "date": "2026-05-20",
       "issues": []
     },
     "JPY": {
@@ -35,7 +35,7 @@
       "status": "ok",
       "rate": "2.25",
       "source": "BoC-Valet",
-      "date": "2026-05-12",
+      "date": "2026-05-13",
       "issues": []
     },
     "AUD": {
