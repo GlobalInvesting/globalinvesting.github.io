@@ -5097,7 +5097,7 @@ function _loadTVWidgetFallback(sym) {
   const hdrEl = document.getElementById('lw-chart-header');
   if (hdrEl) hdrEl.style.display = 'none';
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
-  if (panelSub) panelSub.textContent = 'TradingView \u00b7 live data';
+  if (panelSub) panelSub.textContent = 'Interactive chart \u00b7 live data';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
   container.style.cssText = 'height:100%;width:100%;';
@@ -6434,7 +6434,7 @@ async function fetchCarryRanking() {
       sbHead.style.cursor = 'help';
       const tipTitle = hasRealCarryData ? 'Real Carry Ranking' : 'CB Rate Differential';
       const tipBody  = hasRealCarryData
-        ? 'Ranked by real carry: nominal OIS rate differential minus the inflation expectations differential between the two legs (= real rate long − real rate short). Tiebreak: carry-to-vol (carry per unit of HV30 risk). Industry standard per Bloomberg FXFR. Click any row for full real rate breakdown.'
+        ? 'Ranked by real carry: nominal OIS rate differential minus the inflation expectations differential between the two legs (= real rate long − real rate short). Tiebreak: carry-to-vol (carry per unit of HV30 risk). Click any row for full real rate breakdown.'
         : 'CB policy rate differential (%) between the long and short leg. Real carry ranking requires inflation expectations data (unavailable). Click any row for real rate analysis.';
       const tipEx = hasRealCarryData
         ? 'Example: GBP/CHF nominal +3.77% − (BoE infl.exp 3.45% − SNB infl.exp 0.31%) = real carry +0.63%. Positive = long leg earns positive real carry after purchasing power adjustment.'
@@ -10698,6 +10698,11 @@ function initDerivativesNavFixed() {
     'XAUUSD': 'XAUUSD', 'XAGUSD': 'XAGUSD',
   };
 
+  // Map watchlist symbol to TradingView FX_IDC symbol used by loadTVChart / sidebar handler.
+  // XAUUSD and XAGUSD use the same FX_IDC prefix — loadTVChart will fall back to TV widget
+  // if no OHLC file exists, which is the correct behaviour for commodities.
+  var TV_SYM_PREFIX = 'FX_IDC:';
+
   function load() {
     try { return JSON.parse(localStorage.getItem(WL_KEY) || '[]'); } catch (e) { return []; }
   }
@@ -10723,7 +10728,11 @@ function initDerivativesNavFixed() {
       var chg = (q.pct != null) ? q.pct : null;
       var chgStr = (chg != null) ? ((chg >= 0 ? '+' : '') + chg.toFixed(2) + '%') : (quotesReady ? '—' : '···');
       var chgColor = (chg == null) ? 'var(--text3)' : (chg >= 0 ? 'var(--up)' : 'var(--down)');
-      return '<div class="sb-row" style="display:flex;align-items:center;gap:0;">' +
+      var tvSym = TV_SYM_PREFIX + sym;
+      // data-sym makes this row compatible with the sidebar's delegated click handler
+      // (line ~5650) which calls loadTVChart() + toggleSidebarDetail() automatically.
+      // cursor:pointer and title match Crosses row conventions.
+      return '<div class="sb-row" data-sym="' + tvSym + '" style="display:flex;align-items:center;gap:0;cursor:pointer;" title="Click to open chart">' +
         '<span class="sb-sym" style="flex:1;">' + sym + '</span>' +
         '<span class="sb-price" style="min-width:52px;text-align:right;font-family:var(--font-mono);font-size:10px;">' + price + '</span>' +
         '<span style="min-width:42px;text-align:right;font-family:var(--font-mono);font-size:10px;color:' + chgColor + ';">' + chgStr + '</span>' +
@@ -10760,7 +10769,13 @@ function initDerivativesNavFixed() {
     addBtn.addEventListener('click', function () {
       var visible = inputRow.style.display !== 'none';
       inputRow.style.display = visible ? 'none' : 'block';
-      if (!visible) { input.value = ''; input.focus(); }
+      if (!visible) {
+        input.value = '';
+        input.focus();
+        // Scroll the input into view in case the watchlist section is near the
+        // bottom of the sidebar and partially outside the visible scroll area.
+        setTimeout(function () { inputRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 50);
+      }
     });
 
     input.addEventListener('keydown', function (e) {
@@ -10776,9 +10791,12 @@ function initDerivativesNavFixed() {
     // FIX-WL-3: Use event delegation on the container instead of attaching
     // individual click listeners on every remove button on each render() call.
     // The old approach accumulated O(n * renders) listeners on the same nodes.
+    // stopPropagation prevents the remove click from also triggering the sidebar's
+    // delegated click handler (which would open the chart for a removed pair).
     tbody.addEventListener('click', function (e) {
       var btn = e.target.closest('[data-wl-remove]');
       if (!btn) return;
+      e.stopPropagation();
       var sym = btn.getAttribute('data-wl-remove');
       save(load().filter(function (s) { return s !== sym; }));
       render();
