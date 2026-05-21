@@ -1241,13 +1241,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </div>
 
 <!-- STATUS BAR / FOOTER -->
-<footer id="statusbar" role="contentinfo" aria-label="Status bar">
-  <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB · CFTC · YF · TV</span></div>
-  <div style="display:flex;gap:4px;"><span class="sb-k">DELAY</span><span class="sb-v" style="color:var(--orange);">~5 MIN</span></div>
-  <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
-  <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
-  <div class="footer-copy">&#169; 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
+<footer id="statusbar" role="contentinfo" aria-label="Status bar" style="flex-direction:column;height:auto;">
+  <div style="display:flex;align-items:center;width:100%;gap:6px;padding:0 10px;height:22px;">
+    <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB · CFTC · YF · TV</span></div>
+    <div style="display:flex;gap:4px;"><span class="sb-k">DELAY</span><span class="sb-v" style="color:var(--orange);">~5 MIN</span></div>
+    <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
+    <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
+    <div class="footer-copy">&#169; 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
 
     <!-- PWA INSTALL BUTTON — hidden until beforeinstallprompt fires -->
     <button id="gi-pwa-install-btn" class="kb-hint-btn" style="display:none;"
@@ -1363,7 +1364,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
     <span class="sb-v">FX Terminal v7.52.0</span>
+  </div><!-- end first row -->
+
+  <!-- DISCLAIMER ROW -->
+  <div style="width:100%;border-top:1px solid var(--border);padding:3px 10px;display:flex;flex-wrap:wrap;gap:0 16px;align-items:baseline;background:var(--bg2);">
+    <span style="font-size:9px;color:var(--text3);letter-spacing:.05em;font-weight:600;white-space:nowrap;font-family:var(--font-ui);">DISCLAIMER</span>
+    <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">For informational purposes only — not investment advice. Data provided without warranty of accuracy or completeness.</span>
+    <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Financial markets involve risk. Past performance is not indicative of future results.</span>
+    <span id="gi-affil-note" style="display:none;font-size:9px;color:var(--text3);font-family:var(--font-ui);">This site may receive compensation for broker referrals. Editorial independence is maintained.</span>
   </div>
+
 </footer>
 
 <!-- ═══════════════════════════════════════
