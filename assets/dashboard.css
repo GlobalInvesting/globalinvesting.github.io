@@ -243,6 +243,13 @@
     border-right: 1px solid var(--border);
     overflow-y: auto;
     font-size: 11px;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Watchlist is the last section — grows to fill leftover sidebar height, no blank gap */
+  #watchlist-section {
+    flex: 1 0 auto;
+    border-bottom: none;
   }
   #sidebar::-webkit-scrollbar { width: 3px; }
   #sidebar::-webkit-scrollbar-thumb { background: var(--border2); }
