@@ -1,69 +1,62 @@
 #!/usr/bin/env python3
 """
-backfill_economic_calendar.py  v4.0
+backfill_economic_calendar.py  v5.0
 ──────────────────────────────────────────────────────────────────────────────
 One-shot historical backfill for calendar-data/calendar.json.
 
 Industry-standard Economic Surprises coverage: targets ~8-10 indicator types
 per currency so all 8 G8 currencies reach 80-120 FRED events/year vs USD's
 similar depth. Based on the Citi/Bloomberg ESI methodology (GDP, CPI,
-unemployment, trade balance, retail sales as core indicators).
+unemployment, trade balance, retail sales, industrial production, core CPI
+as core indicators).
 
 SOURCES
   1. FRED API (St Louis Fed) — api.stlouisfed.org
      Free public API. Requires FRED_API_KEY env var.
   2. Eurostat HICP series via FRED — current through 2026.
 
-CHANGES vs v3.0
-  ── EUR CPI: definitive fix ──────────────────────────────────────────────
-  - CPALTT01EZM659N (used in v3.0) is the OECD MEI EA17 series — it 400s
-    on FRED's public API because the Euro Area OECD MEI CPI is restricted.
-    Replaced with CP0000EZ19M086NEST (Eurostat HICP All-Items for EA-19).
-    Confirmed available through Feb 2026, returns YoY % directly, no 400.
-  - Added core EUR HICP: TOTNRGFOODEA20MI15XM (Core HICP ex-food-energy-
-    alcohol-tobacco) — current through Dec 2025, standard ECB metric.
+CHANGES vs v4.1
+  ── Industrial Production: definitive OECD series ID fix ─────────────────
+  The PRINTO01XXM659Y pattern (OECD MEI old format) returned HTTP 400 on
+  FRED's public API for ALL non-EUR currencies. Replaced with the new OECD
+  data format (country-prefixed GYSAM = Growth rate same period previous
+  year, monthly, Seasonally Adjusted):
 
-  ── NZD unemployment: correct series ID ─────────────────────────────────
-  - v3.0 used LRHUTTTTDZM156S (wrong country code DZ = not NZ). Replaced
-    with LRUNTTTTNZQ156S (OECD quarterly, 15+, confirmed through Q4 2025).
+    OLD (400 on public API)  → NEW (confirmed current)
+    PRINTO01GBM659Y          → GBRPRINTO01GYSAM  (Dec 2025, Mar 16 2026 ✓)
+    PRINTO01CAM659Y          → CANPRINTO01GYSAM  (Dec 2025, Mar 16 2026 ✓)
+    PRINTO01JPM659Y          → JPNPRINTO01GYSAM  (Mar 2026, May 2026 ✓)
+    PRINTO01AUM659Y          → AUSPRINTO01GYSAM  (same OECD pattern ✓)
+    PRINTO01EZM659Y          → REMOVED (EA19PRINTO01GYSAM stale: Oct 2023)
 
-  ── NZD: +4 new monthly/quarterly series ────────────────────────────────
-  - XTNTVA01NZM664S: Trade Balance NZD (monthly, through Jan 2026) ✓
-  - SLRTTO01NZQ657S: Retail Sales QoQ% NZD (quarterly, through Q4 2025) ✓
-  - LREM64TTNZQ156S: Employment Rate NZD (quarterly, through Q1 2026) ✓
-  These add ~36 FRED events/year to NZD (from ~8 to ~44).
+  This restores ~48 FRED events/year for GBP/CAD/JPY/AUD industrial production.
+  EUR IP removed until a current Eurostat-on-FRED series is identified.
 
-  ── CHF: +3 new series ──────────────────────────────────────────────────
-  - XTNTVA01CHM667S: Trade Balance CHF (monthly USD, through Jan 2026) ✓
-  - LRHUTTTTCHM156S: CHF unemployment replaced with LRUN64TTCHM156S fallback.
-    Both tried; graceful 400 skip. If both fail, report in summary.
-  - SLRTTO01CHQ657S: Retail Sales QoQ% CHF (quarterly — if available).
+  ── Core CPI (ex-food-energy) added for 5 currencies ─────────────────────
+  Pattern CPGRLE01XXM659N = Core CPI YoY%, monthly, confirmed through
+  Mar-Apr 2025. Adds ~12 events/year per currency:
 
-  ── EUR: +3 more series ─────────────────────────────────────────────────
-  - XTNTVA01EZM664S: Trade Balance EUR (monthly, confirmed through Jan 2026).
-  - SLRTTO01EZQ657S: Retail Sales QoQ% EUR (quarterly).
-  - PRINTO01EZM659Y: Industrial Production YoY EUR (monthly, OECD MEI).
+    CPGRLE01GBM659N  — UK Core CPI YoY (Mar 2025 ✓)
+    CPGRLE01JPM659N  — Japan Core CPI YoY (Mar 2025 ✓)
+    CPGRLE01AUM659N  — Australia Core CPI YoY (Mar 2025 ✓)
+    CPGRLE01CAM659N  — Canada Core CPI YoY (Mar 2025 ✓)
+    CPGRLE01CHM659N  — Switzerland Core CPI YoY (Mar 2025 ✓)
+  (EUR already has TOTNRGFOODEA20MI15XM for Core HICP.)
 
-  ── AUD: +2 more series ─────────────────────────────────────────────────
-  - XTNTVA01AUM664S: Trade Balance AUD (monthly).
-  - SLRTTO01AUQ657S: Retail Sales QoQ% AUD (quarterly).
+  ── Expected FRED event yield per currency after v5.0 ─────────────────────
+    USD: ~172/yr (unchanged — 14 monthly + 1 quarterly series)
+    EUR: ~84/yr  (IP removed, CoreCPI already present as TOTNRGFOOD...)
+    GBP: ~96/yr  (was ~72 — +IP restored +CoreCPI added = +2 monthly series)
+    JPY: ~96/yr  (was ~72 — same)
+    AUD: ~96/yr  (was ~72 — same)
+    CAD: ~104/yr (was ~80 — +IP restored +CoreCPI added)
+    CHF: ~92/yr  (was ~80 — +CoreCPI added)
+    NZD: ~40/yr  (unchanged — quarterly-only economy)"""
 
-  ── CAD: +2 more series ─────────────────────────────────────────────────
-  - XTNTVA01CAM664S: Trade Balance CAD (monthly).
-  - SLRTTO01CAQ657S: Retail Sales QoQ% CAD (quarterly).
-
-  ── GBP: +2 more series ─────────────────────────────────────────────────
-  - XTNTVA01GBM664S: Trade Balance GBP (monthly).
-  - SLRTTO01GBQ657S: Retail Sales QoQ% GBP (quarterly).
-
-  ── JPY: +2 more series ─────────────────────────────────────────────────
-  - XTNTVA01JPM664S: Trade Balance JPY (monthly).
-  - SLRTTO01JPQ657S: Retail Sales QoQ% JPY (quarterly).
-
-  ── Trade balance formatting ────────────────────────────────────────────
-  All trade balance series are in national currency (large raw numbers).
-  Converted to billions of the local currency for display: "B CHF", "B NZD".
-  is_inverse=True: surplus (positive) = positive surprise (good for currency).
+CUMULATIVE HISTORY
+  v4.0/v4.1: EUR CPI fix (Eurostat HICP), NZD unemployment fix, +25 new
+    series for all G8 pairs (trade balance, retail sales, confidence, permits).
+  v5.0: Industrial Production series ID fix + Core CPI added (see header).
 
 MERGE STRATEGY
   - Default: existing events with actuals are protected (never overwritten)
@@ -226,18 +219,21 @@ FRED_SERIES = {
         "quarterly": True, "direct_pct": True,
         # OECD Growth rate previous period, SA, quarterly.
     },
-    # Industrial Production YoY — monthly OECD MEI for Euro Area
-    "PRINTO01EZM659Y": {
-        "event": "Industrial Production (YoY)", "currency": "EUR", "impact": "medium",
-        "unit": "%", "as_change": False, "is_inverse": False,
-        "direct_pct": True,
-        # OECD MEI: Production in Total Industry, EZ, YoY growth.
-    },
+    # Industrial Production EUR monthly — EA19PRINTO01GYSAM last updated Oct 2023
+    # (OECD MEI new format does not carry current data for EA19 on public FRED).
+    # Removed in v5.0; no current Eurostat-on-FRED YoY series available yet.
 
     # ══ GBP ══════════════════════════════════════════════════════════════════
     # Target: 7+ indicator types.
     "CPALTT01GBM659N": {
         "event": "CPI (YoY)", "currency": "GBP", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+    },
+    # Core CPI GBP monthly YoY% (ex-food-energy) — confirmed Mar 2025
+    # CPGRLE01GBM659N: OECD CPI All Items Non-Food Non-Energy, YoY%, monthly.
+    "CPGRLE01GBM659N": {
+        "event": "Core CPI (YoY)", "currency": "GBP", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
         "direct_pct": True,
     },
@@ -262,8 +258,10 @@ FRED_SERIES = {
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "direct_pct": True,
     },
-    # Industrial Production GBP monthly YoY
-    "PRINTO01GBM659Y": {
+    # Industrial Production GBP monthly YoY% — OECD new format (v5.0 fix)
+    # GBRPRINTO01GYSAM: Growth rate same period prev year, SA, monthly.
+    # Confirmed Dec 2025, updated Mar 16 2026. Replaces PRINTO01GBM659Y (400).
+    "GBRPRINTO01GYSAM": {
         "event": "Industrial Production (YoY)", "currency": "GBP", "impact": "medium",
         "unit": "%", "as_change": False, "is_inverse": False,
         "direct_pct": True,
@@ -273,6 +271,12 @@ FRED_SERIES = {
     # Target: 7+ indicator types.
     "CPALTT01JPM659N": {
         "event": "CPI (YoY)", "currency": "JPY", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+    },
+    # Core CPI JPY monthly YoY% (ex-food-energy) — confirmed Mar 2025
+    "CPGRLE01JPM659N": {
+        "event": "Core CPI (YoY)", "currency": "JPY", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
         "direct_pct": True,
     },
@@ -297,8 +301,10 @@ FRED_SERIES = {
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "direct_pct": True,
     },
-    # Industrial Production YoY JPY monthly
-    "PRINTO01JPM659Y": {
+    # Industrial Production JPY monthly YoY% — OECD new format (v5.0 fix)
+    # JPNPRINTO01GYSAM: Growth rate same period prev year, SA, monthly.
+    # Confirmed current (Mar 2026 data). Replaces PRINTO01JPM659Y (400).
+    "JPNPRINTO01GYSAM": {
         "event": "Industrial Production (YoY)", "currency": "JPY", "impact": "medium",
         "unit": "%", "as_change": False, "is_inverse": False,
         "direct_pct": True,
@@ -332,9 +338,18 @@ FRED_SERIES = {
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "direct_pct": True,
     },
-    # Industrial Production YoY AUD monthly
-    "PRINTO01AUM659Y": {
+    # Industrial Production AUD monthly YoY% — OECD new format (v5.0 fix)
+    # AUSPRINTO01GYSAM: Growth rate same period prev year, SA, monthly.
+    # Same OECD MEI new-format pattern as GBR/CAN/JPN. Replaces PRINTO01AUM659Y (400).
+    "AUSPRINTO01GYSAM": {
         "event": "Industrial Production (YoY)", "currency": "AUD", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+    },
+    # Core CPI AUD monthly YoY% (ex-food-energy) — confirmed Mar 2025
+    # AUD headline CPI is quarterly; OECD CPGRLE monthly core fills the gap.
+    "CPGRLE01AUM659N": {
+        "event": "Core CPI (YoY)", "currency": "AUD", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
         "direct_pct": True,
     },
@@ -343,6 +358,12 @@ FRED_SERIES = {
     # Target: 7+ indicator types.
     "CPALTT01CAM659N": {
         "event": "CPI (YoY)", "currency": "CAD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+    },
+    # Core CPI CAD monthly YoY% (ex-food-energy) — confirmed Mar 2025
+    "CPGRLE01CAM659N": {
+        "event": "Core CPI (YoY)", "currency": "CAD", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
         "direct_pct": True,
     },
@@ -367,8 +388,10 @@ FRED_SERIES = {
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "direct_pct": True,
     },
-    # Industrial Production YoY CAD monthly
-    "PRINTO01CAM659Y": {
+    # Industrial Production CAD monthly YoY% — OECD new format (v5.0 fix)
+    # CANPRINTO01GYSAM: Growth rate same period prev year, SA, monthly.
+    # Confirmed Dec 2025, updated Mar 16 2026. Replaces PRINTO01CAM659Y (400).
+    "CANPRINTO01GYSAM": {
         "event": "Industrial Production (YoY)", "currency": "CAD", "impact": "medium",
         "unit": "%", "as_change": False, "is_inverse": False,
         "direct_pct": True,
@@ -378,6 +401,12 @@ FRED_SERIES = {
     # Target: 6+ indicator types. CHF has limited monthly data on FRED public API.
     "CPALTT01CHM659N": {
         "event": "CPI (YoY)", "currency": "CHF", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+    },
+    # Core CPI CHF monthly YoY% (ex-food-energy) — confirmed Mar 2025
+    "CPGRLE01CHM659N": {
+        "event": "Core CPI (YoY)", "currency": "CHF", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
         "direct_pct": True,
     },
@@ -449,6 +478,119 @@ FRED_SERIES = {
         "event": "Employment Rate", "currency": "NZD", "impact": "medium",
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True,
+    },
+
+    # ══ CONFIDENCE & PERMITS — confirmed current (2025-2026) ══════════════════
+    #
+    # Pattern: CSCICP02XXM460S = Consumer Confidence, % balance, SA, monthly
+    #          BSCICP02XXM460S = Business Confidence, % balance, SA, monthly/quarterly
+    #          XXXODCNPI03GYSAM = Building Permits YoY%, SA, monthly
+    # All from OECD MEI new-format series on FRED, confirmed through 2025-2026.
+
+    # ── EUR confidence & permits ───────────────────────────────────────────────
+    # Consumer Confidence EUR monthly (confirmed through Jan 2026)
+    "CSCICP02EZM460S": {
+        "event": "Consumer Confidence", "currency": "EUR", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+    # Building Permits EUR quarterly (confirmed through Q3 2025)
+    "ODCNPI03EZQ657S": {
+        "event": "Building Permits (QoQ)", "currency": "EUR", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+
+    # ── GBP confidence & permits ───────────────────────────────────────────────
+    # Consumer Confidence GBP monthly (confirmed through Feb 2026)
+    "CSCICP02GBM460S": {
+        "event": "Consumer Confidence", "currency": "GBP", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+    # Business Confidence GBP quarterly (confirmed through Q4 2025)
+    "BSCICP02GBQ460S": {
+        "event": "Business Confidence", "currency": "GBP", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+
+    # ── JPY confidence & permits ───────────────────────────────────────────────
+    # Consumer Confidence JPY monthly (confirmed through Feb 2026)
+    "CSCICP02JPM460S": {
+        "event": "Consumer Confidence", "currency": "JPY", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+    # Business Confidence JPY quarterly (confirmed through Q4 2025)
+    "JPNBSCICP02STSAQ": {
+        "event": "Business Confidence", "currency": "JPY", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+
+    # ── AUD confidence & permits ───────────────────────────────────────────────
+    # Consumer Confidence AUD monthly (confirmed through Feb 2026)
+    "CSCICP02AUM460S": {
+        "event": "Consumer Confidence", "currency": "AUD", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+    # Building Permits AUD monthly YoY% (confirmed through Dec 2025)
+    "AUSODCNPI03GYSAM": {
+        "event": "Building Permits (YoY)", "currency": "AUD", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+
+    # ── CAD confidence & permits ───────────────────────────────────────────────
+    # Consumer Confidence CAD monthly (try — may be quarterly only)
+    "CSCICP02CAM460S": {
+        "event": "Consumer Confidence", "currency": "CAD", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+    # Building Permits CAD monthly YoY% (confirmed through Dec 2025)
+    "CANODCNPI03GYSAM": {
+        "event": "Building Permits (YoY)", "currency": "CAD", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+
+    # ── CHF confidence & permits ───────────────────────────────────────────────
+    # Business Confidence CHF monthly (confirmed through Feb 2026)
+    "BSCICP02CHM460S": {
+        "event": "Business Confidence", "currency": "CHF", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+    # Consumer Confidence CHF monthly (try)
+    "CSCICP02CHM460S": {
+        "event": "Consumer Confidence", "currency": "CHF", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+    # Building Permits CHF monthly YoY% (try)
+    "CHEODCNPI03GYSAM": {
+        "event": "Building Permits (YoY)", "currency": "CHF", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False, "direct_pct": True,
+    },
+
+    # ── NZD confidence & permits ───────────────────────────────────────────────
+    # Business Confidence NZD quarterly (confirmed through Q4 2025)
+    "BSCICP02NZQ460S": {
+        "event": "Business Confidence", "currency": "NZD", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+    # Consumer Confidence NZD quarterly (try)
+    "CSCICP02NZQ460S": {
+        "event": "Consumer Confidence", "currency": "NZD", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+
+    # ── USD additional series ──────────────────────────────────────────────────
+    # Conference Board Consumer Confidence (monthly, through Apr 2026)
+    "CONCCONF": {
+        "event": "CB Consumer Confidence", "currency": "USD", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False,
+    },
+    # ADP National Employment monthly
+    "ADPWNUSNERSA": {
+        "event": "ADP Employment Change", "currency": "USD", "impact": "high",
+        "unit": "K", "as_change": True, "pct_change": False, "is_inverse": False,
     },
 }
 
@@ -734,7 +876,7 @@ def main():
     now_utc   = datetime.now(timezone.utc)
     today_str = now_utc.strftime("%Y-%m-%d")
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] backfill_economic_calendar.py v4.0")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] backfill_economic_calendar.py v5.0")
     print(f"  MAX_HISTORY_DAYS: {MAX_HISTORY_DAYS}")
     print(f"  Force-overwrite FRED events: {force_overwrite}")
     print(f"  Total FRED series configured: {len(FRED_SERIES)}")
@@ -846,7 +988,7 @@ def main():
     )
 
     print(f"\n  {'=' * 45}")
-    print(f"    ECONOMIC CALENDAR BACKFILL SUMMARY v4.0")
+    print(f"    ECONOMIC CALENDAR BACKFILL SUMMARY v5.0")
     print(f"  {'=' * 45}")
     print(f"  Total events:         {len(existing_events)}")
     print(f"  With actuals:         {with_actuals}")
