@@ -19,7 +19,7 @@
 
   // Browser timezone offset label e.g. "GMT-3"
   function tzLabel() {
-    const off = -new Date().getTimezoneOffset(); // minutes
+    const off = -new Date().getTimezoneOffset();
     const sign = off >= 0 ? '+' : '-';
     const h = Math.floor(Math.abs(off) / 60);
     const m = Math.abs(off) % 60;
@@ -36,13 +36,13 @@
     return d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false });
   }
 
-  // "2026-05-22" → "Friday, May 22" in local date
+  // "2026-05-22" → "Friday, May 22"
   function formatDate(dateISO) {
     const d = new Date(dateISO + 'T12:00:00Z');
     return d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', timeZone:'UTC' });
   }
 
-  // Is this event in the past (released and its datetime has passed)?
+  // Has this event's datetime already passed?
   function isPastEvent(dateISO, timeUTC) {
     const [h, m] = (timeUTC || '23:59').split(':').map(Number);
     const evMs = Date.UTC(
@@ -51,14 +51,16 @@
     return evMs < Date.now();
   }
 
+  // Today's ISO date in UTC
+  function todayISO() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
   function buildPanel(events) {
     const container = document.getElementById('cal-events-body');
     const sourceEl  = document.getElementById('cal-panel-sub');
-    const section   = document.getElementById('section-tvcalendar');
     if (!container) return;
 
-    // Filter: G8, medium+high only — show ALL (past week released + upcoming)
-    // Industry standard (Bloomberg/Reuters): show full week, past events dimmed
     const filtered = events.filter(ev =>
       G8.has(ev.currency) && IMPACTS.has(ev.impact)
     );
@@ -75,12 +77,13 @@
       byDate[ev.dateISO].push(ev);
     });
 
+    const today = todayISO();
     let html = '';
-    let totalRows = 0;
+
     Object.keys(byDate).sort().forEach(dateISO => {
       const dayEvs = byDate[dateISO];
-      html += `<div class="cal-date-row">${formatDate(dateISO)}</div>`;
-      totalRows++;
+      const isToday = dateISO === today;
+      html += `<div class="cal-date-row" data-date="${dateISO}"${isToday ? ' data-today="1"' : ''}>${formatDate(dateISO)}</div>`;
 
       dayEvs.forEach(ev => {
         const dot        = IMPACT_DOT[ev.impact];
@@ -90,7 +93,7 @@
         const isPast     = isPastEvent(ev.dateISO, ev.timeUTC);
         const dimmed     = isPast && isReleased;
 
-        // Actual coloring: green=beat, red=miss
+        // Actual coloring
         let actualHtml = '<span style="color:var(--text3)">—</span>';
         if (isReleased && ev.actual != null) {
           const actualN   = parseFloat(String(ev.actual).replace(/[%,KMB\s]/gi,''));
@@ -110,8 +113,9 @@
           : '<span style="color:var(--text3)">—</span>';
 
         const localTime = toLocalTime(ev.dateISO, ev.timeUTC);
+        const upcomingAttr = (!isPast) ? ' data-upcoming="1"' : '';
 
-        html += `<div class="cal-event-row${dimmed ? ' cal-released' : ''}">
+        html += `<div class="cal-event-row${dimmed ? ' cal-released' : ''}"${upcomingAttr}>
   <div class="cal-col cal-time">${localTime}</div>
   <div class="cal-col cal-ccy">${flagHtml}${ev.currency}</div>
   <div class="cal-col cal-impact"><span class="cal-dot" style="background:${dot.color}" title="${dot.label} impact"></span></div>
@@ -120,37 +124,50 @@
   <div class="cal-col cal-num">${forecastHtml}</div>
   <div class="cal-col cal-num">${previousHtml}</div>
 </div>`;
-        totalRows++;
       });
     });
 
     container.innerHTML = html;
 
-    // Scroll to first upcoming event or today's date header
+    // Scroll logic — priority order:
+    // 1. First upcoming event (future datetime)
+    // 2. Today's date separator (all today's events are past, but show today)
+    // 3. First future date separator (next trading day)
+    // 4. Top (fallback)
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      // Priority 1: first non-released event
-      const firstUpcoming = container.querySelector('.cal-event-row:not(.cal-released)');
+      // Priority 1: first event that hasn't happened yet
+      const firstUpcoming = container.querySelector('[data-upcoming="1"]');
       if (firstUpcoming) {
-        firstUpcoming.scrollIntoView({ block: 'start' });
+        // Scroll the preceding date-row if possible
+        const prev = firstUpcoming.previousElementSibling;
+        const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcoming;
+        target.scrollIntoView({ block: 'start' });
         return;
       }
-      // Priority 2: today's date separator
-      const todayISO = new Date().toISOString().slice(0, 10);
-      const todayFormatted = formatDate(todayISO);
-      const allDateRows = container.querySelectorAll('.cal-date-row');
+
+      // Priority 2: today's date separator (even if all past)
+      const todayRow = container.querySelector('[data-today="1"]');
+      if (todayRow) {
+        todayRow.scrollIntoView({ block: 'start' });
+        return;
+      }
+
+      // Priority 3: first future date (next trading day after today)
+      const allDateRows = container.querySelectorAll('.cal-date-row[data-date]');
       for (const row of allDateRows) {
-        if (row.textContent.trim() === todayFormatted) {
+        if (row.dataset.date > today) {
           row.scrollIntoView({ block: 'start' });
           return;
         }
       }
+
+      // Fallback: top
+      container.scrollTop = 0;
     }));
 
     if (sourceEl) {
       sourceEl.textContent = `ForexFactory · G8 · medium & high impact · ${tzLabel()}`;
     }
-
-    // Update column time header with local timezone
     const thTime = document.getElementById('cal-th-time');
     if (thTime) thTime.textContent = tzLabel();
   }
