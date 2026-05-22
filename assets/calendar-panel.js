@@ -132,16 +132,6 @@
       if (firstUpcoming) firstUpcoming.scrollIntoView({ block: 'start' });
     });
 
-    // Dynamic height: 30px panel-head + 24px col-header + rows
-    // Each date-row ~22px, each event-row ~26px. Cap at 360px, min 120px.
-    if (section) {
-      const dateRows  = Object.keys(byDate).length;
-      const eventRows = filtered.length;
-      const computed  = 30 + 24 + (dateRows * 22) + (eventRows * 26);
-      const clamped   = Math.min(Math.max(computed, 120), 360);
-      section.style.height = clamped + 'px';
-    }
-
     if (sourceEl) {
       sourceEl.textContent = `ForexFactory · G8 · medium & high impact · ${tzLabel()}`;
     }
