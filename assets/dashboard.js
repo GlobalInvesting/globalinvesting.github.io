@@ -1529,7 +1529,16 @@ function renderSentiment(pairs, sourceLabel, general) {
       : Math.max(b.buy, b.sell) - Math.max(a.buy, a.sell)
   );
 
-  container.innerHTML = '';
+  // ── Compact table header ──
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px 3px;background:var(--head-bg);border-bottom:1px solid var(--border2);position:sticky;top:0;z-index:1;">
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);">Pair</span>
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);">Long / Short</span>
+      <span style="font-size:9px;color:var(--up);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);text-align:right;">L%</span>
+      <span style="font-size:9px;color:var(--down);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);text-align:right;">S%</span>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);text-align:center;"> </span>
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);text-align:right;">Pos</span>
+    </div>`;
 
   sorted.forEach(p => {
     const hasRich = p.totalPos > 0 && p.avgL > 0 && p.avgS > 0;
@@ -1553,7 +1562,6 @@ function renderSentiment(pairs, sourceLabel, general) {
         trapped   = domLong ? currentPrice < domAvg : currentPrice > domAvg;
         distPct   = (currentPrice - domAvg) / domAvg * 100;
         distPips  = Math.abs(Math.round((currentPrice - domAvg) * (domAvg > 20 ? 100 : 10000)));
-        // tick: map currentPrice into [min-1.5r … max+1.5r]
         const lo    = Math.min(p.avgL, p.avgS);
         const hi    = Math.max(p.avgL, p.avgS);
         const range = (hi - lo) || domAvg * 0.01;
@@ -1563,121 +1571,77 @@ function renderSentiment(pairs, sourceLabel, general) {
       }
     }
 
-    const distCol  = trapped ? 'var(--down)' : 'var(--up)';
     const distSign = distPct !== null && distPct >= 0 ? '+' : '';
-
-    // ── TV symbol: "EUR/USD" → "FX_IDC:EURUSD" ──
     const tvSym = 'FX_IDC:' + p.sym.replace('/', '');
 
-    // ── Outer wrapper: two-row layout ──
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'border-bottom:1px solid var(--border);padding:5px 0 4px;cursor:pointer;';
-    wrap.title = 'Click to open ' + p.sym + ' chart';
-    wrap.addEventListener('click', () => loadTVChart(tvSym));
+    // ── Compact single-row layout ──
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;';
+    row.title = 'Click to open ' + p.sym + ' chart';
+    row.addEventListener('mouseenter', () => row.style.background = 'var(--bg3)');
+    row.addEventListener('mouseleave', () => row.style.background = '');
+    row.addEventListener('click', () => loadTVChart(tvSym));
 
-    // Row 1: sym | bar | %L %S bias
-    const row1 = document.createElement('div');
-    row1.style.cssText = 'display:grid;grid-template-columns:58px 1fr auto;align-items:center;gap:6px;';
-
-    // Sym + positions
+    // Col 1: Symbol
     const symDiv = document.createElement('div');
-    symDiv.style.cssText = 'display:flex;flex-direction:column;gap:1px;min-width:0;';
+    symDiv.style.cssText = 'display:flex;flex-direction:column;gap:0;';
     const symSpan = document.createElement('span');
-    symSpan.style.cssText = 'font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);white-space:nowrap;';
+    symSpan.style.cssText = 'font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);white-space:nowrap;line-height:1.2;';
     symSpan.textContent = p.sym;
     symDiv.appendChild(symSpan);
-
-    let posSpan = null;
-    if (hasRich) {
-      posSpan = document.createElement('span');
-      posSpan.style.cssText = 'font-size:9px;color:var(--text3);font-family:var(--font-ui);cursor:help;display:inline-block;';
-      posSpan.textContent = fmtK(p.totalPos) + ' pos';
-      symDiv.appendChild(posSpan);
+    // Sub-line: trapped/profit status
+    if (distPct !== null) {
+      const statusSpan = document.createElement('span');
+      const distCol2 = trapped ? 'var(--down)' : 'var(--up)';
+      statusSpan.style.cssText = `font-size:8px;font-family:var(--font-mono);color:${distCol2};white-space:nowrap;line-height:1.2;`;
+      statusSpan.textContent = (trapped ? '▼' : '▲') + ' ' + distPips + 'p';
+      symDiv.appendChild(statusSpan);
+    } else if (hasRich) {
+      const statusSpan = document.createElement('span');
+      statusSpan.style.cssText = 'font-size:8px;font-family:var(--font-mono);color:var(--text3);white-space:nowrap;line-height:1.2;';
+      statusSpan.textContent = fmtK(p.totalPos) + ' pos';
+      symDiv.appendChild(statusSpan);
     }
 
-    // Bar
+    // Col 2: Bar (compact 6px height)
     const barDiv = document.createElement('div');
-    barDiv.style.cssText = 'position:relative;height:8px;background:var(--bg3);border-radius:1px;overflow:visible;cursor:help;';
+    barDiv.style.cssText = 'position:relative;height:6px;background:var(--bg3);border-radius:1px;overflow:visible;margin:0 4px;cursor:help;';
     barDiv.innerHTML = `
       <div style="position:absolute;left:0;top:0;height:100%;width:${p.buy}%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
-      <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
-    `;
+      <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>`;
 
-    // Tick element (separate so we can attach its own tooltip)
     let tickEl = null;
     if (tickPct !== null) {
       tickEl = document.createElement('div');
-      tickEl.style.cssText = `position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:${tickPct}%;transform:translateX(-1px);z-index:2;cursor:help;`;
+      tickEl.style.cssText = `position:absolute;top:-3px;width:2px;height:12px;background:#fff;opacity:.9;border-radius:1px;left:${tickPct}%;transform:translateX(-1px);z-index:2;cursor:help;`;
       barDiv.appendChild(tickEl);
     }
 
-    // Right block: %L %S bias
-    const rightDiv = document.createElement('div');
-    rightDiv.style.cssText = 'display:flex;align-items:center;gap:4px;flex-shrink:0;';
-
-    const buySpan  = document.createElement('span');
-    buySpan.style.cssText = 'font-size:10px;color:var(--up);font-family:var(--font-mono);cursor:help;';
+    // Col 3: % Long
+    const buySpan = document.createElement('span');
+    buySpan.style.cssText = 'font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right;cursor:help;';
     buySpan.textContent = p.buy + '%';
 
+    // Col 4: % Short
     const sellSpan = document.createElement('span');
-    sellSpan.style.cssText = 'font-size:10px;color:var(--down);font-family:var(--font-mono);cursor:help;';
+    sellSpan.style.cssText = 'font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right;cursor:help;';
     sellSpan.textContent = p.sell + '%';
 
+    // Col 5: Bias dot
     const biasSpan = document.createElement('span');
-    biasSpan.style.cssText = `font-size:9px;font-weight:700;color:${biasCol};font-family:var(--font-ui);min-width:10px;text-align:right;`;
+    biasSpan.style.cssText = `font-size:9px;font-weight:700;color:${biasCol};font-family:var(--font-ui);text-align:center;`;
     biasSpan.textContent = biasLbl;
 
-    rightDiv.append(buySpan, sellSpan, biasSpan);
-    row1.append(symDiv, barDiv, rightDiv);
-    wrap.appendChild(row1);
+    // Col 6: Positions
+    const posSpan = document.createElement('span');
+    posSpan.style.cssText = 'font-size:9px;color:var(--text3);font-family:var(--font-ui);text-align:right;white-space:nowrap;';
+    posSpan.textContent = hasRich ? fmtK(p.totalPos) : '—';
 
-    // Row 2: avg entry / dist info — show whenever we have rich data
-    if (hasRich) {
-      const row2 = document.createElement('div');
-      row2.style.cssText = 'display:grid;grid-template-columns:58px 1fr auto;gap:6px;margin-top:2px;';
+    row.append(symDiv, barDiv, buySpan, sellSpan, biasSpan, posSpan);
+    container.appendChild(row);
 
-      const distSpan = document.createElement('span');
-      distSpan.style.cssText = `font-size:9px;font-family:var(--font-mono);cursor:help;grid-column:2/4;`;
-
-      let distTitle, distBody, distEx;
-
-      if (distPct !== null) {
-        // Full dist: live price available
-        const distCol = trapped ? 'var(--down)' : 'var(--up)';
-        distSpan.style.color = distCol;
-        distSpan.innerHTML = `${trapped ? '▼' : '▲'} ${distSign}${distPct.toFixed(2)}% · ${distPips}pip · <span style="opacity:.7">${trapped ? 'trapped' : 'in profit'}</span>`;
-        const domSideTxt = domLong ? 'longs' : 'shorts';
-        distTitle = trapped ? 'Retail trapped' : 'Retail in profit';
-        distBody  = `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}. Current price: ${currentPrice.toFixed(decimals)}. They are ${trapped ? 'underwater (losing)' : 'in profit'}.`;
-        distEx    = trapped
-          ? 'If price continues against them, mass stop-outs can trigger a sharp move.'
-          : 'They may take profits soon, creating pressure in the opposite direction.';
-      } else {
-        // Partial: show avg entry without live price
-        const longDec = p.avgL > 20 ? 2 : 4;
-        const shortDec = p.avgS > 20 ? 2 : 4;
-        distSpan.style.color = 'var(--text3)';
-        distSpan.innerHTML = `avg L ${p.avgL.toFixed(longDec)} · S ${p.avgS.toFixed(shortDec)}`;
-        distTitle = 'Average entry price';
-        distBody  = `Retail longs entered at avg ${p.avgL.toFixed(longDec)}, shorts at avg ${p.avgS.toFixed(shortDec)}. Live price not available for this pair — trapped/profit status cannot be calculated.`;
-        distEx    = 'Compare these levels to the current chart price to assess whether the dominant side is underwater or in profit.';
-      }
-
-      attachTip(distSpan, distTitle, distBody, distEx);
-      row2.append(document.createElement('span'), distSpan);
-      wrap.appendChild(row2);
-    }
-
-    container.appendChild(wrap);
-
-    // ── Attach tooltips ──
-    if (posSpan) {
-      attachTip(posSpan,
-        'Open positions',
-        `Number of Myfxbook traders with ${p.sym} open right now. Higher count = more statistically representative.`,
-        `EUR/USD with 54K positions is the most-followed pair — mass stop-outs here move the market.`
-      );
-    }
+    // ── Tooltips ──
+    const domSideTxt = domLong ? 'longs' : 'shorts';
     attachTip(barDiv,
       'Long / Short bar',
       `Shows the split between retail buyers (green, left) and sellers (red, right). Extreme readings are often contrarian signals.`,
@@ -1690,16 +1654,30 @@ function renderSentiment(pairs, sourceLabel, general) {
         `Line to the left of center = price fell below where retail longs entered — they are underwater.`
       );
     }
-    attachTip(buySpan,
-      '% Long',
+    attachTip(buySpan, '% Long',
       `Percentage of retail traders currently holding long (buy) positions in ${p.sym}.`,
       `Readings above 70% long are unusual and often precede a drop as crowded longs get squeezed.`
     );
-    attachTip(sellSpan,
-      '% Short',
+    attachTip(sellSpan, '% Short',
       `Percentage of retail traders currently holding short (sell) positions in ${p.sym}.`,
       `Readings above 70% short are unusual and often precede a rally as crowded shorts get squeezed.`
     );
+    if (hasRich) {
+      attachTip(posSpan,
+        'Open positions',
+        `Number of Myfxbook traders with ${p.sym} open right now. Higher count = more statistically representative.`,
+        `EUR/USD with 54K positions is the most-followed pair — mass stop-outs here move the market.`
+      );
+    }
+    if (distPct !== null) {
+      const distEl = symDiv.lastChild;
+      const distTitle2 = trapped ? 'Retail trapped' : 'Retail in profit';
+      const distBody2  = `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}. Current price: ${currentPrice.toFixed(decimals)}. They are ${trapped ? 'underwater (losing)' : 'in profit'}.`;
+      const distEx2    = trapped
+        ? 'If price continues against them, mass stop-outs can trigger a sharp move.'
+        : 'They may take profits soon, creating pressure in the opposite direction.';
+      attachTip(distEl, distTitle2, distBody2, distEx2);
+    }
   });
 
   // ── General stats footer ──
