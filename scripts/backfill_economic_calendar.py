@@ -1025,6 +1025,7 @@ def build_fh_events(start_date: str, end_date: str) -> list[dict]:
                     "actual":     str(actual_raw),
                     "forecast":   str(ev.get("estimate", "") or "") or None,
                     "previous":   str(ev.get("prev", "") or "") or None,
+                    "impact":     impact,        # "high"/"medium"/"low" — required by JS scoring filter
                     "importance": importance,
                     "source":     "FH",
                 })
