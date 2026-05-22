@@ -710,14 +710,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div id="split-lower-right">
 
     <!-- ECONOMIC CALENDAR — full width, above Cross-Asset & Risk Monitor -->
-    <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:340px;flex-shrink:0;">
+    <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:250px;flex-shrink:0;">
       <div class="panel-head">
         <span class="panel-title">Economic Calendar</span>
         <span class="panel-sub">Dukascopy · G8 · medium &amp; high impact</span>
       </div>
       <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;">
         <!-- Dukascopy core.js uses document.write() — must be served from its own HTML file
-             so the script runs synchronously during that document's parse, not the parent's. -->
+             so the script runs synchronously during that document's parse, not the parent's.
+             filter: brightness reduces the white tab bar / headers to match the dark terminal. -->
         <iframe
           id="dukascopy-cal-frame"
           src="calendar-widget.html"
