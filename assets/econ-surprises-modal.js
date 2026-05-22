@@ -92,7 +92,7 @@
   display:flex;flex-direction:column;background:var(--bg,#131722);
 }
 #esm-chart-wrap {
-  flex:0 0 45%;min-height:180px;max-height:320px;position:relative;
+  flex:0 0 220px;min-height:180px;max-height:240px;position:relative;
   border-bottom:1px solid var(--border,#252d3d);
 }
 #esm-chart-inner { position:absolute;inset:0; }
@@ -168,7 +168,7 @@
   #esm-metrics { grid-template-columns:repeat(3,1fr); }
   .esm-mm:nth-child(3) { border-right:none; }
   .esm-mm:nth-child(4) { border-top:1px solid var(--border,#252d3d); }
-  #esm-chart-wrap { flex:0 0 40%;max-height:240px; }
+  #esm-chart-wrap { flex:0 0 180px;max-height:200px; }
 }
 `;
   document.head.appendChild(s);
