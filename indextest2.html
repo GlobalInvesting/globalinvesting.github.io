@@ -371,6 +371,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     border-radius: 50%;
     flex-shrink: 0;
   }
+  #sent-rows::-webkit-scrollbar { width: 3px; }
+  #sent-rows::-webkit-scrollbar-track { background: transparent; }
+  #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
@@ -769,9 +772,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <!-- CROSS ASSET + RISK -->
     <div style="border-bottom:1px solid var(--border);">
       <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
-        <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
+        <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;">
           <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Multi-source · daily updated</span></div>
-          <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,auto);gap:0;padding:0;">
+          <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);gap:0;padding:0;min-height:0;flex:1;">
             <!-- Populated by fetchCrossAssetData() -->
             <div class="ca-cell" data-sym="CMCMARKETS:SPX500" style="cursor:pointer;" title="Click: chart"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
             <div class="ca-cell" data-sym="CMCMARKETS:GOLDM2026" style="cursor:pointer;" title="Gold front-month futures · GC=F · Click: chart"><div class="ca-name">Gold Futures</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
@@ -941,7 +944,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <span class="panel-sub" id="sent-source-sub">Myfxbook · retail positioning</span>
       </div>
       <div id="myfxbook-wrap" style="padding:4px 8px 6px;width:100%;background:var(--bg);">
-        <div id="sent-rows" style="overflow-y:auto;max-height:348px;" class="thin-scroll">
+        <div id="sent-rows" style="overflow-y:auto;max-height:232px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;" class="thin-scroll">
           <div style="color:var(--text3);font-size:11px;padding:8px 0;">Loading sentiment…</div>
         </div>
         <div id="sent-general" style="flex-shrink:0;"></div>
