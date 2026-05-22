@@ -934,8 +934,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
-    <!-- SESSIONS + SPREADS + RETAIL POSITIONING — 3 equal columns -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);">
+    <!-- RETAIL FX POSITIONING — full width -->
+    <div class="panel" id="section-positioning" style="border-bottom:1px solid var(--border);">
+      <div class="panel-head">
+        <span class="panel-title">Retail FX Positioning</span>
+        <span class="panel-sub" id="sent-source-sub">Myfxbook · retail positioning</span>
+      </div>
+      <div id="myfxbook-wrap" style="padding:4px 8px 6px;width:100%;background:var(--bg);">
+        <div id="sent-rows" style="overflow-y:auto;" class="thin-scroll">
+          <div style="color:var(--text3);font-size:11px;padding:8px 0;">Loading sentiment…</div>
+        </div>
+        <div id="sent-general" style="flex-shrink:0;"></div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--font-ui);padding:2px 0 1px;" id="sent-updated"></div>
+      </div>
+    </div>
+
+    <!-- SESSIONS + SPREADS — 2 equal columns -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
 
       <!-- Col 1: Market Sessions -->
       <div class="panel" id="section-sessions" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
@@ -970,7 +985,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
 
       <!-- Col 2: Reference Spreads -->
-      <div class="panel" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
+      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;">
         <div class="panel-head"><span class="panel-title" title="Indicative ECN bid-ask spreads — model-estimated, not live quoted prices. Values widen during high-volatility sessions. Use your broker's live feed for execution.">Reference Spreads</span><span class="panel-sub" id="spreads-sub">ECN est. · Loading…</span></div>
         <div id="spreads-rows" style="padding:4px 10px;flex-shrink:0;">
           <div class="spread-row"><span class="spr-sym">EUR/USD</span><div class="spr-bar"><div class="spr-fill" style="width:20%;background:var(--up)"></div></div><span class="spr-val up" id="spr-eurusd">0.9 pip</span></div>
@@ -980,21 +995,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div class="spread-row"><span class="spr-sym">USD/CHF</span><div class="spr-bar"><div class="spr-fill" style="width:44%;background:var(--orange)"></div></div><span class="spr-val" id="spr-usdchf" style="color:var(--orange)">2.0 pip</span></div>
           <div class="spread-row"><span class="spr-sym">USD/CAD</span><div class="spr-bar"><div class="spr-fill" style="width:52%;background:var(--down)"></div></div><span class="spr-val down" id="spr-usdcad">2.5 pip</span></div>
           <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down" id="spr-nzdusd">3.0 pip</span></div>
-        </div>
-      </div>
-
-      <!-- Col 3: Retail FX Positioning -->
-      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;min-height:0;">
-        <div class="panel-head">
-          <span class="panel-title">Retail FX Positioning</span>
-          <span class="panel-sub" id="sent-source-sub">Myfxbook · retail positioning</span>
-        </div>
-        <div id="myfxbook-wrap" style="overflow:hidden;padding:4px 8px 2px;width:100%;flex:1;background:var(--bg);position:relative;min-height:0;display:flex;flex-direction:column;">
-          <div id="sent-rows" style="flex:1;overflow-y:auto;" class="thin-scroll">
-            <div style="color:var(--text3);font-size:11px;padding:8px 0;">Loading sentiment…</div>
-          </div>
-          <div id="sent-general" style="flex-shrink:0;"></div>
-          <div style="font-size:9px;color:var(--text3);font-family:var(--font-ui);padding:2px 0 1px;flex-shrink:0;" id="sent-updated"></div>
         </div>
       </div>
 
