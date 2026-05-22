@@ -126,11 +126,25 @@
 
     container.innerHTML = html;
 
-    // Scroll to first upcoming (non-released) event
-    requestAnimationFrame(() => {
+    // Scroll to first upcoming event or today's date header
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      // Priority 1: first non-released event
       const firstUpcoming = container.querySelector('.cal-event-row:not(.cal-released)');
-      if (firstUpcoming) firstUpcoming.scrollIntoView({ block: 'start' });
-    });
+      if (firstUpcoming) {
+        firstUpcoming.scrollIntoView({ block: 'start' });
+        return;
+      }
+      // Priority 2: today's date separator
+      const todayISO = new Date().toISOString().slice(0, 10);
+      const todayFormatted = formatDate(todayISO);
+      const allDateRows = container.querySelectorAll('.cal-date-row');
+      for (const row of allDateRows) {
+        if (row.textContent.trim() === todayFormatted) {
+          row.scrollIntoView({ block: 'start' });
+          return;
+        }
+      }
+    }));
 
     if (sourceEl) {
       sourceEl.textContent = `ForexFactory · G8 · medium & high impact · ${tzLabel()}`;
