@@ -166,7 +166,7 @@
     }));
 
     if (sourceEl) {
-      sourceEl.textContent = `ForexFactory · G8 · medium & high impact · ${tzLabel()}`;
+      sourceEl.textContent = `FF · G8 · medium & high impact · ${tzLabel()}`;
     }
     const thTime = document.getElementById('cal-th-time');
     if (thTime) thTime.textContent = tzLabel();
