@@ -51,7 +51,7 @@ CHANGES vs v4.1
     AUD: ~96/yr  (was ~72 — same)
     CAD: ~104/yr (was ~80 — +IP restored +CoreCPI added)
     CHF: ~92/yr  (was ~80 — +CoreCPI added)
-    NZD: ~40/yr  (unchanged — quarterly-only economy)"""
+    NZD: ~40/yr  (unchanged — quarterly-only economy)
 
 CUMULATIVE HISTORY
   v4.0/v4.1: EUR CPI fix (Eurostat HICP), NZD unemployment fix, +25 new
