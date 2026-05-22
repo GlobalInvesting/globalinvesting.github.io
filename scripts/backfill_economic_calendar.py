@@ -857,7 +857,6 @@ def main():
     print(f"  {'=' * 45}")
 
     # Per-currency series count for diagnostics
-    series_by_ccy_final = Counter(v["currency"] for v in FRED_SERIES.items().__class__(FRED_SERIES.values()))
     print(f"\n  FRED series configured per currency:")
     for ccy in sorted(set(v["currency"] for v in FRED_SERIES.values())):
         count = sum(1 for v in FRED_SERIES.values() if v["currency"] == ccy)
