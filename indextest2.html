@@ -716,14 +716,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <span class="panel-sub">Dukascopy · G8 · medium &amp; high impact</span>
       </div>
       <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;">
-        <!-- Dukascopy core.js uses document.write() — must run inside an iframe's own document
-             to avoid the "async script / document.write" restriction and isolate tracking storage. -->
+        <!-- Dukascopy core.js uses document.write() — must be served from its own HTML file
+             so the script runs synchronously during that document's parse, not the parent's. -->
         <iframe
           id="dukascopy-cal-frame"
+          src="calendar-widget.html"
           style="border:0;width:100%;height:100%;display:block;"
           title="Economic Calendar — Dukascopy"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-          srcdoc="<!DOCTYPE html><html><head><meta charset=utf-8><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#1e222d;overflow:hidden}</style></head><body><script type=&quot;text/javascript&quot;>DukascopyApplet={&quot;type&quot;:&quot;economic_calendar_new&quot;,&quot;params&quot;:{&quot;showHeader&quot;:false,&quot;tableBorderColor&quot;:&quot;#2a2e39&quot;,&quot;bgColor&quot;:&quot;#1e222d&quot;,&quot;headerBgColor&quot;:&quot;#1a1d29&quot;,&quot;rowOddColor&quot;:&quot;#1e222d&quot;,&quot;rowEvenColor&quot;:&quot;#131722&quot;,&quot;textColor&quot;:&quot;#d1d4dc&quot;,&quot;linkColor&quot;:&quot;#4f7fff&quot;,&quot;positiveColor&quot;:&quot;#26a69a&quot;,&quot;negativeColor&quot;:&quot;#ef5350&quot;,&quot;neutralColor&quot;:&quot;#787b86&quot;,&quot;defaultTimezone&quot;:0,&quot;defaultCountries&quot;:&quot;c:AU,CA,CH,EU,GB,JP,NZ,US&quot;,&quot;impacts&quot;:[2,3],&quot;dateTab&quot;:2,&quot;showColCountry&quot;:true,&quot;showColCurrency&quot;:true,&quot;showColImpact&quot;:true,&quot;showColPrevious&quot;:true,&quot;showColForecast&quot;:true,&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;306&quot;,&quot;adv&quot;:&quot;popup&quot;}};<\/script><script type=&quot;text/javascript&quot; src=&quot;https://freeserv-static.dukascopy.com/2.0/core.js&quot;><\/script></body></html>"
         ></iframe>
       </div>
     </div>
