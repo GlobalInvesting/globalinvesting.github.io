@@ -37,6 +37,7 @@ jobs:
       - name: Run backfill
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: |
           FLAGS=""
           if [ "${{ inputs.force }}" = "true" ]; then
@@ -98,7 +99,7 @@ jobs:
             if [ "${{ inputs.force }}" = "true" ]; then
               FLAGS="--force"
             fi
-            FRED_API_KEY="${{ secrets.FRED_API_KEY }}" python scripts/backfill_economic_calendar.py $FLAGS || true
+            FRED_API_KEY="${{ secrets.FRED_API_KEY }}" FINNHUB_API_KEY="${{ secrets.FINNHUB_API_KEY }}" python scripts/backfill_economic_calendar.py $FLAGS || true
 
             git add calendar-data/calendar.json
             if git diff --cached --quiet; then
