@@ -1,55 +1,64 @@
 {
-  "generated_at": "2026-05-21T21:22:05Z",
+  "generated_at": "2026-05-22T03:31:47Z",
   "signals": [
     {
-      "time": "21:21",
+      "time": "03:31",
       "priority": "critical",
-      "title": "USD/CHF — Volatility + Intervention Risk",
-      "text": "USD/CHF at 0.7865 — SNB Vice Chairman Schlegel confirms 'elevated willingness' to intervene in FX markets. Options market pricing extreme protection: IV at 12.8% vs HV30 at 6.9% generates a +5.9% Vol Risk Premium (VRP), the highest in the G10 space. Despite a +375bp carry advantage for USD (Fed 3.75% vs SNB 0.0%), the SNB's verbal pivot introduces immediate downside risk to the carry trade. Watch for a break of 0.7800 to confirm intervention-led reversal.",
+      "title": "GBP/AUD — G8 Bilateral Theme + RBA Pivot",
+      "text": "GBP/AUD G8 spread at 1.309% confirms a dominant bilateral theme as GBP outperforms (+0.552%) while AUD lags (-0.757%). AUD is under pressure following weak domestic labor data and headlines suggesting the RBA hike cycle is nearing its end. Despite the RBA 4.35% vs BoE 3.75% carry advantage for AUD, the 60bp premium is being offset by growth concerns. GBP/AUD at 1.8805.",
       "evidence": [
-        "SNB SARON: -0.05%",
-        "USD/CHF VRP: +5.9%",
-        "SNB Bias: Intervention Ready"
+        "GBP 1W avg: +0.552% (n=4)",
+        "AUD 1W avg: -0.757% (n=4)",
+        "G8 spread: 1.309%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "21:18",
-      "priority": "warning",
-      "title": "GBP/AUD — G8 Bilateral Theme + Carry",
-      "text": "GBP/AUD at 1.8769 — G8 scorecard identifies a 1.165% performance spread between leader GBP and laggard AUD. GBP 1W avg +0.546% vs AUD 1W avg -0.618% confirms a strong bilateral theme. While AUD holds a +60bp carry advantage over GBP (RBA 4.35% vs BoE 3.75%), the technical and momentum divergence suggests institutional rotation out of AUD. Watch for RBNZ on 27 May to potentially spill over into broader Antipodean sentiment.",
+      "time": "03:27",
+      "priority": "critical",
+      "title": "USD/JPY — Geopolitical + Carry + Options",
+      "text": "USD/JPY at 159.04 remains supported by a +277bp SOFR-TONA carry advantage. While claims of a US-Iran draft agreement provide a temporary risk-on tailwind for the Nikkei (+2.29%), Middle East uncertainty continues to support USD on dips. Options market shows a moderate put skew (25d RR -1.32), signaling institutional hedging against BoJ intervention as price holds near the 160.00 threshold. Carry dominates while VIX remains at 16.8 (normal volatility).",
       "evidence": [
-        "GBP 1W avg: +0.546% (n=4)",
-        "AUD 1W avg: -0.618% (n=4)",
-        "G8 spread: 1.165%"
+        "USD/JPY OIS Carry: +277bp",
+        "USD/JPY 25d RR: -1.32",
+        "VIX: 16.8"
       ],
-      "watch_level": "RBNZ meeting 27 May",
       "_source": "gemini"
     },
     {
-      "time": "21:15",
+      "time": "03:24",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD at 0.5880 — COT LF net short -19,437 (specs fading the kiwi) vs RBNZ hike bias priced for the 27 May meeting. Speculative positioning is crowded at 22.3% long (extreme short), creating a high-conviction short-squeeze setup if the RBNZ delivers a hawkish hold or a surprise hike. Fed's Barkin noting policy is 'in a good place' limits USD upside, further exposing the spec short. Watch for a break above 0.5920 to trigger a stop-run.",
+      "text": "NZD/USD COT LF net short -19,437 (long% 22.3%) shows speculators heavily fading the currency despite a hawkish market bias for the RBNZ. With the RBNZ meeting on 27 May and a market bias for a hike, the crowded spec short position faces significant unwind risk if the central bank delivers. NZD/USD at 0.5873; a hawkish hold or hike targets a squeeze toward 0.6000.",
       "evidence": [
         "NZD COT LF net: -19,437",
         "NZD long%: 22.3%",
         "RBNZ Bias: Hike"
       ],
-      "watch_level": "RBNZ meeting 27 May",
       "_source": "gemini"
     },
     {
-      "time": "21:10",
-      "priority": "info",
-      "title": "USD/JPY — Carry + Options Skew",
-      "text": "USD/JPY at 158.91 — 278bp OIS carry (SOFR 3.51% vs TONA 0.73%) remains the primary driver as VIX at 16.8 signals normal volatility. However, 25d Risk Reversals show a -1.32 put skew, indicating the options market is paying a premium for JPY strength (USD/JPY downside) despite the carry advantage. This reflects persistent hedging against BoJ intervention as price holds near 160.00. Carry dominates the regime until VIX exceeds 25.",
+      "time": "03:20",
+      "priority": "warning",
+      "title": "USD/CHF — Volatility Premium + Carry",
+      "text": "USD/CHF at 0.7868 exhibits an extreme Vol Risk Premium (VRP) of +6.1%, with IV at 13.0% vs HV30 of 6.9%. This suggests the options market is pricing in significantly higher volatility than recently realized, likely due to safe-haven CHF demand competing with the massive +375bp USD carry advantage. The bear flattener regime in US yields (2s10s +54.6bp) supports the USD leg, but the vol premium indicates high protection costs for further CHF weakness.",
       "evidence": [
-        "USD/JPY OIS spread: +278bp",
-        "25d RR: -1.32",
-        "VIX: 16.8"
+        "USD/CHF VRP: +6.1%",
+        "USD/CHF Carry: +375bp",
+        "US 2s10s: +54.6bp"
       ],
-      "watch_level": "160.00 intervention level",
+      "_source": "gemini"
+    },
+    {
+      "time": "03:15",
+      "priority": "info",
+      "title": "EUR/USD — Positioning + Volatility",
+      "text": "EUR/USD at 1.1614 remains in a structural downtrend supported by a +157bp SOFR-€STR carry advantage for the USD. COT data shows specs are net short -8,151, aligning with the 1M trend (-1.08%). Elevated hedging demand is evident with a +2.2% VRP (IV 7.1% vs HV30 4.9%), while the 25d RR at -0.47 shows a mild put skew. Market is paying a premium for downside protection rather than chasing the move.",
+      "evidence": [
+        "EUR/USD VRP: +2.2%",
+        "EUR COT LF net: -8,151",
+        "EUR/USD OIS Carry: +157bp"
+      ],
       "_source": "gemini"
     }
   ]
