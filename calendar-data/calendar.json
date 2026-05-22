@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-22T03:33:11Z",
-  "generatedAt": "2026-05-22T03:33:11Z",
+  "lastUpdate": "2026-05-22T03:48:16Z",
+  "generatedAt": "2026-05-22T03:48:16Z",
   "fetchMode": "FRED backfill + Finnhub + ForexFactory rolling",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -21,9 +21,9 @@
     "AUD": 146
   },
   "impactCounts": {
-    "": 405,
-    "medium": 689,
-    "high": 308
+    "medium": 892,
+    "low": 152,
+    "high": 358
   },
   "events": [
     {
@@ -34,6 +34,7 @@
       "actual": "-20",
       "forecast": "-22",
       "previous": "-23",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -45,6 +46,7 @@
       "actual": "61.2",
       "forecast": null,
       "previous": "50.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -56,6 +58,7 @@
       "actual": "58.3",
       "forecast": "50.1",
       "previous": "50.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -67,6 +70,7 @@
       "actual": "61.2",
       "forecast": "50.8",
       "previous": "50.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -78,6 +82,7 @@
       "actual": "-15.2",
       "forecast": "-15.2",
       "previous": "-16.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -89,6 +94,7 @@
       "actual": "94.8",
       "forecast": "94",
       "previous": "93.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -100,6 +106,7 @@
       "actual": "98",
       "forecast": "87",
       "previous": "85.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -111,6 +118,7 @@
       "actual": "-22",
       "forecast": null,
       "previous": "-51.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -122,6 +130,7 @@
       "actual": "-2.1",
       "forecast": "-3.25",
       "previous": "-3.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -133,6 +142,7 @@
       "actual": "32.8",
       "forecast": "31.8",
       "previous": "31.2",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -144,6 +154,7 @@
       "actual": "2.1",
       "forecast": null,
       "previous": "2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -155,6 +166,7 @@
       "actual": "3.4",
       "forecast": null,
       "previous": "3.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -166,6 +178,7 @@
       "actual": "36.6",
       "forecast": null,
       "previous": "49.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -177,6 +190,7 @@
       "actual": "92.9",
       "forecast": null,
       "previous": "98.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -188,6 +202,7 @@
       "actual": "98.5",
       "forecast": "98.4",
       "previous": "97.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -199,6 +214,7 @@
       "actual": "-26.6",
       "forecast": "-18.3",
       "previous": "39.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -210,6 +226,7 @@
       "actual": "40.5",
       "forecast": "45",
       "previous": "44.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -221,6 +238,7 @@
       "actual": "52.2",
       "forecast": "51",
       "previous": "52.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -386,6 +404,7 @@
       "actual": "51",
       "forecast": "51.7",
       "previous": "51.7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -397,6 +416,7 @@
       "actual": "46.1",
       "forecast": null,
       "previous": "45.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -408,6 +428,7 @@
       "actual": "42.1",
       "forecast": "46.5",
       "previous": "45.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -419,6 +440,7 @@
       "actual": "52",
       "forecast": "52.3",
       "previous": "50.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -430,6 +452,7 @@
       "actual": "48.5",
       "forecast": "49.5",
       "previous": "48.7",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -441,6 +464,7 @@
       "actual": "-14.7",
       "forecast": "-12",
       "previous": "-16.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -452,6 +476,7 @@
       "actual": "50.5",
       "forecast": null,
       "previous": "51",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -463,6 +488,7 @@
       "actual": "50.6",
       "forecast": "50.5",
       "previous": "51",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -474,6 +500,7 @@
       "actual": "45.5",
       "forecast": null,
       "previous": "41.7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -485,6 +512,7 @@
       "actual": "45.6",
       "forecast": null,
       "previous": "41.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -496,6 +524,7 @@
       "actual": "37",
       "forecast": "115",
       "previous": "60",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -507,6 +536,7 @@
       "actual": "53",
       "forecast": "52.1",
       "previous": "50.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -518,6 +548,7 @@
       "actual": "53.7",
       "forecast": "52.3",
       "previous": "50.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -529,6 +560,7 @@
       "actual": "50",
       "forecast": null,
       "previous": "53.7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -540,6 +572,7 @@
       "actual": "49.9",
       "forecast": "52",
       "previous": "51.6",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -551,6 +584,7 @@
       "actual": "48.9",
       "forecast": "48.3",
       "previous": "47.9",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -562,6 +596,7 @@
       "actual": "2258",
       "forecast": "2560",
       "previous": "3678.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -573,6 +608,7 @@
       "actual": "0.5",
       "forecast": null,
       "previous": "2.2",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -584,6 +620,7 @@
       "actual": "92.6",
       "forecast": null,
       "previous": "92.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -595,6 +632,7 @@
       "actual": "2",
       "forecast": null,
       "previous": "-1",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -606,6 +644,7 @@
       "actual": "-37",
       "forecast": "-38",
       "previous": "-42",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -617,6 +656,7 @@
       "actual": "5.2",
       "forecast": "5.4",
       "previous": "5.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -628,6 +668,7 @@
       "actual": "5.3",
       "forecast": "5.5",
       "previous": "5.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -639,6 +680,7 @@
       "actual": "18.8",
       "forecast": null,
       "previous": "-8.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -650,6 +692,7 @@
       "actual": "47.5",
       "forecast": null,
       "previous": "53.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -661,6 +704,7 @@
       "actual": "60.5",
       "forecast": "53.5",
       "previous": "52.2",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -1190,6 +1234,7 @@
       "actual": "279.5",
       "forecast": "248",
       "previous": "280.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1201,6 +1246,7 @@
       "actual": "35.3",
       "forecast": "23.5",
       "previous": "11.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1212,6 +1258,7 @@
       "actual": "6",
       "forecast": null,
       "previous": "8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1223,6 +1270,7 @@
       "actual": "91.2",
       "forecast": null,
       "previous": "89.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1234,6 +1282,7 @@
       "actual": "-2.32",
       "forecast": "-2.2",
       "previous": "-7.04",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1245,6 +1294,7 @@
       "actual": "-0.1",
       "forecast": null,
       "previous": null,
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1256,6 +1306,7 @@
       "actual": "19.3",
       "forecast": null,
       "previous": "60.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1267,6 +1318,7 @@
       "actual": "19.8",
       "forecast": "40.4",
       "previous": "50.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1278,6 +1330,7 @@
       "actual": "1.256",
       "forecast": "1.36",
       "previous": "1.392",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -1289,6 +1342,7 @@
       "actual": "-9.8",
       "forecast": null,
       "previous": "2.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1300,6 +1354,7 @@
       "actual": "-18",
       "forecast": "-20",
       "previous": "-20",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1311,6 +1366,7 @@
       "actual": "19.4",
       "forecast": null,
       "previous": "9.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1322,6 +1378,7 @@
       "actual": "-15.3",
       "forecast": "-14.5",
       "previous": "-15.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1333,6 +1390,7 @@
       "actual": "51.2",
       "forecast": null,
       "previous": "50.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1344,6 +1402,7 @@
       "actual": "51",
       "forecast": null,
       "previous": "51",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1355,6 +1414,7 @@
       "actual": "51.3",
       "forecast": null,
       "previous": "50.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1366,6 +1426,7 @@
       "actual": "52.8",
       "forecast": null,
       "previous": "53",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1377,6 +1438,7 @@
       "actual": "52",
       "forecast": "51",
       "previous": "52",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1388,6 +1450,7 @@
       "actual": "53.1",
       "forecast": "52.9",
       "previous": "53.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1889,6 +1952,7 @@
       "actual": "0",
       "forecast": null,
       "previous": "0.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1900,6 +1964,7 @@
       "actual": "53.6",
       "forecast": null,
       "previous": "51.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1911,6 +1976,7 @@
       "actual": "51.6",
       "forecast": null,
       "previous": "50.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1922,6 +1988,7 @@
       "actual": "53.8",
       "forecast": null,
       "previous": "51.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1933,6 +2000,7 @@
       "actual": "-14.7",
       "forecast": "-15",
       "previous": "-15.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1944,6 +2012,7 @@
       "actual": "-19",
       "forecast": "-20",
       "previous": "-18",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1955,6 +2024,7 @@
       "actual": "2.9",
       "forecast": null,
       "previous": "3.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1966,6 +2036,7 @@
       "actual": "2.9",
       "forecast": null,
       "previous": "3.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -1977,6 +2048,7 @@
       "actual": "54.6",
       "forecast": null,
       "previous": "52.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1988,6 +2060,7 @@
       "actual": "49.5",
       "forecast": "52.6",
       "previous": "52",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -1999,6 +2072,7 @@
       "actual": "55.2",
       "forecast": "53",
       "previous": "52.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2010,6 +2084,7 @@
       "actual": "97.2",
       "forecast": "95.8",
       "previous": "95.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2021,6 +2096,7 @@
       "actual": "101.1",
       "forecast": "97.5",
       "previous": "96.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2032,6 +2108,7 @@
       "actual": "2.4",
       "forecast": null,
       "previous": "-2.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2043,6 +2120,7 @@
       "actual": "-14.7",
       "forecast": "-14.7",
       "previous": "-15.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2054,6 +2132,7 @@
       "actual": "95.8",
       "forecast": "94.5",
       "previous": "94.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2065,6 +2144,7 @@
       "actual": "47.8",
       "forecast": null,
       "previous": "46.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2076,6 +2156,7 @@
       "actual": "104",
       "forecast": "75",
       "previous": "-23",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2087,6 +2168,7 @@
       "actual": "51.3",
       "forecast": null,
       "previous": "50.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2098,6 +2180,7 @@
       "actual": "33.7",
       "forecast": "35.1",
       "previous": "34.5",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -2109,6 +2192,7 @@
       "actual": "-15.6",
       "forecast": "-15.8",
       "previous": "-34.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2120,6 +2204,7 @@
       "actual": "94.7",
       "forecast": null,
       "previous": "98.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2131,6 +2216,7 @@
       "actual": "47.1",
       "forecast": "42",
       "previous": "40.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2142,6 +2228,7 @@
       "actual": "46.1",
       "forecast": null,
       "previous": "45.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2153,6 +2240,7 @@
       "actual": "49.8",
       "forecast": "49.5",
       "previous": "52.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2164,6 +2252,7 @@
       "actual": "48",
       "forecast": "49.5",
       "previous": "49",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -2175,6 +2264,7 @@
       "actual": "61.7",
       "forecast": "62",
       "previous": "60.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2186,6 +2276,7 @@
       "actual": "53.8",
       "forecast": null,
       "previous": "51.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2197,6 +2288,7 @@
       "actual": "54.1",
       "forecast": "53.8",
       "previous": "51.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2208,6 +2300,7 @@
       "actual": "48.8",
       "forecast": "49.9",
       "previous": "49.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2219,6 +2312,7 @@
       "actual": "55.1",
       "forecast": "54.6",
       "previous": "52.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2230,6 +2324,7 @@
       "actual": "55.7",
       "forecast": "55.2",
       "previous": "52.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2241,6 +2336,7 @@
       "actual": "52.6",
       "forecast": null,
       "previous": "54.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2252,6 +2348,7 @@
       "actual": "50.1",
       "forecast": "51.5",
       "previous": "50.8",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -2263,6 +2360,7 @@
       "actual": "48.7",
       "forecast": null,
       "previous": "44",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2274,6 +2372,7 @@
       "actual": "49.3",
       "forecast": null,
       "previous": "44.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2285,6 +2384,7 @@
       "actual": "55.8",
       "forecast": "55.2",
       "previous": "53.3",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -2296,6 +2396,7 @@
       "actual": "1348",
       "forecast": "1480",
       "previous": "3436",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2307,6 +2408,7 @@
       "actual": "-33",
       "forecast": "-30",
       "previous": "-32",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2318,6 +2420,7 @@
       "actual": "7",
       "forecast": null,
       "previous": "5",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -2329,6 +2432,7 @@
       "actual": "25.1",
       "forecast": "28.1",
       "previous": "36.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2340,6 +2444,7 @@
       "actual": "5",
       "forecast": "5",
       "previous": "5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2351,6 +2456,7 @@
       "actual": "4.6",
       "forecast": "4.7",
       "previous": "5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2362,6 +2468,7 @@
       "actual": "9",
       "forecast": null,
       "previous": "7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2373,6 +2480,7 @@
       "actual": "0.8",
       "forecast": "0.8",
       "previous": "0.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2384,6 +2492,7 @@
       "actual": "3.4",
       "forecast": "3.3",
       "previous": "3.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2395,6 +2504,7 @@
       "actual": "52.8",
       "forecast": null,
       "previous": "48.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2406,6 +2516,7 @@
       "actual": "0.8",
       "forecast": null,
       "previous": "6.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2907,6 +3018,7 @@
       "actual": "58.6",
       "forecast": "62",
       "previous": "61.7",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -2918,6 +3030,7 @@
       "actual": "294.1",
       "forecast": "265",
       "previous": "283.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2929,6 +3042,7 @@
       "actual": "5.7",
       "forecast": null,
       "previous": "0.6",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -2940,6 +3054,7 @@
       "actual": "98.5",
       "forecast": null,
       "previous": "93.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2951,6 +3066,7 @@
       "actual": "38.9",
       "forecast": null,
       "previous": "0.04",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2962,6 +3078,7 @@
       "actual": "35.8",
       "forecast": "30.3",
       "previous": "31.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -2973,6 +3090,7 @@
       "actual": "1.428",
       "forecast": "1.29",
       "previous": "1.358",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -2984,6 +3102,7 @@
       "actual": "5.2",
       "forecast": null,
       "previous": "5.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -2995,6 +3114,7 @@
       "actual": "54.9",
       "forecast": null,
       "previous": "53.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3006,6 +3126,7 @@
       "actual": "52.9",
       "forecast": null,
       "previous": "51.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3017,6 +3138,7 @@
       "actual": "55.1",
       "forecast": null,
       "previous": "54.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3028,6 +3150,7 @@
       "actual": "-15.5",
       "forecast": "-14.9",
       "previous": "-14.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3039,6 +3162,7 @@
       "actual": "-17",
       "forecast": "-20",
       "previous": "-19",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3050,6 +3174,7 @@
       "actual": "55.4",
       "forecast": null,
       "previous": "55.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3061,6 +3186,7 @@
       "actual": "53.3",
       "forecast": "49.5",
       "previous": "49.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3072,6 +3198,7 @@
       "actual": "55.4",
       "forecast": "54.2",
       "previous": "55.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3083,6 +3210,7 @@
       "actual": "97.4",
       "forecast": "96.2",
       "previous": "98.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3094,6 +3222,7 @@
       "actual": "0.1",
       "forecast": null,
       "previous": "-0.03",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3105,6 +3234,7 @@
       "actual": "-53.8",
       "forecast": null,
       "previous": "2.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3116,6 +3246,7 @@
       "actual": "49.7",
       "forecast": null,
       "previous": "47.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3785,6 +3916,7 @@
       "actual": "52.1",
       "forecast": null,
       "previous": "55.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3796,6 +3928,7 @@
       "actual": "51.6",
       "forecast": null,
       "previous": "53",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3807,6 +3940,7 @@
       "actual": "52",
       "forecast": null,
       "previous": "55.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3818,6 +3952,7 @@
       "actual": "-14.9",
       "forecast": "-15.3",
       "previous": "-15.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3829,6 +3964,7 @@
       "actual": "10.2",
       "forecast": null,
       "previous": "23.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3840,6 +3976,7 @@
       "actual": "-251.3",
       "forecast": "-256.3",
       "previous": "-439.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3851,6 +3988,7 @@
       "actual": "53.6",
       "forecast": "54.6",
       "previous": "54.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3862,6 +4000,7 @@
       "actual": "52",
       "forecast": "52",
       "previous": "53",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3873,6 +4012,7 @@
       "actual": "53.9",
       "forecast": "54",
       "previous": "54.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3884,6 +4024,7 @@
       "actual": "-46.4",
       "forecast": null,
       "previous": "-53.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3895,6 +4036,7 @@
       "actual": "2.5",
       "forecast": null,
       "previous": "3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3906,6 +4048,7 @@
       "actual": "2.5",
       "forecast": null,
       "previous": "2.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3917,6 +4060,7 @@
       "actual": "94.6",
       "forecast": null,
       "previous": "92",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3928,6 +4072,7 @@
       "actual": "55.1",
       "forecast": "55.4",
       "previous": "58.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3939,6 +4084,7 @@
       "actual": "-14.9",
       "forecast": "-14.9",
       "previous": "-15.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3950,6 +4096,7 @@
       "actual": "95.5",
       "forecast": "95.2",
       "previous": "95.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3961,6 +4108,7 @@
       "actual": "51.4",
       "forecast": "51.6",
       "previous": "53",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -3972,6 +4120,7 @@
       "actual": "98",
       "forecast": "97.3",
       "previous": "96.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3983,6 +4132,7 @@
       "actual": "-28.9",
       "forecast": "-24.9",
       "previous": "-21.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -3994,6 +4144,7 @@
       "actual": "-9.8",
       "forecast": "-4.8",
       "previous": "-9.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4005,6 +4156,7 @@
       "actual": "12.5",
       "forecast": null,
       "previous": "11.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4016,6 +4168,7 @@
       "actual": "14",
       "forecast": "15",
       "previous": "13",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -4027,6 +4180,7 @@
       "actual": "12",
       "forecast": "13",
       "previous": "12",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4038,6 +4192,7 @@
       "actual": "34",
       "forecast": "34",
       "previous": "34",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4049,6 +4204,7 @@
       "actual": "28",
       "forecast": "29",
       "previous": "27",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4060,6 +4216,7 @@
       "actual": "1",
       "forecast": "2",
       "previous": "1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4071,6 +4228,7 @@
       "actual": "49.6",
       "forecast": null,
       "previous": "49.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4082,6 +4240,7 @@
       "actual": "40.6",
       "forecast": "43",
       "previous": "41.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4093,6 +4252,7 @@
       "actual": "94.2",
       "forecast": "96",
       "previous": "97.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4104,6 +4264,7 @@
       "actual": "47.7",
       "forecast": null,
       "previous": "48.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4115,6 +4276,7 @@
       "actual": "46.3",
       "forecast": "48",
       "previous": "49",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4126,6 +4288,7 @@
       "actual": "-32",
       "forecast": "50",
       "previous": "-3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4137,6 +4300,7 @@
       "actual": "52",
       "forecast": "52",
       "previous": "53",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4148,6 +4312,7 @@
       "actual": "49.1",
       "forecast": "49",
       "previous": "48.7",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -4159,6 +4324,7 @@
       "actual": "52.4",
       "forecast": null,
       "previous": "55.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4170,6 +4336,7 @@
       "actual": "52.4",
       "forecast": "52",
       "previous": "55.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4181,6 +4348,7 @@
       "actual": "35.3",
       "forecast": "35.2",
       "previous": "34.9",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -4192,6 +4360,7 @@
       "actual": "46.3",
       "forecast": null,
       "previous": "48.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4203,6 +4372,7 @@
       "actual": "46.3",
       "forecast": null,
       "previous": "48.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4214,6 +4384,7 @@
       "actual": "53.9",
       "forecast": "53.6",
       "previous": "54.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4225,6 +4396,7 @@
       "actual": "54.2",
       "forecast": "53.9",
       "previous": "54.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4236,6 +4408,7 @@
       "actual": "49.9",
       "forecast": "51.8",
       "previous": "55",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4247,6 +4420,7 @@
       "actual": "50",
       "forecast": "51.7",
       "previous": "52",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -4258,6 +4432,7 @@
       "actual": "-3.5",
       "forecast": null,
       "previous": "-3.1",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -4269,6 +4444,7 @@
       "actual": "92.1",
       "forecast": null,
       "previous": "95.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4280,6 +4456,7 @@
       "actual": "18",
       "forecast": null,
       "previous": "22",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4291,6 +4468,7 @@
       "actual": "59.8",
       "forecast": "51.2",
       "previous": "50.1",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -4302,6 +4480,7 @@
       "actual": "3776",
       "forecast": "3540",
       "previous": "2684",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4313,6 +4492,7 @@
       "actual": "8",
       "forecast": null,
       "previous": "13",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4324,6 +4504,7 @@
       "actual": "49.9",
       "forecast": null,
       "previous": "49.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4335,6 +4516,7 @@
       "actual": "-37",
       "forecast": "-38",
       "previous": "-40",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4346,6 +4528,7 @@
       "actual": "55",
       "forecast": "54.2",
       "previous": "55.1",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -4357,6 +4540,7 @@
       "actual": "7.5",
       "forecast": null,
       "previous": "6.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4368,6 +4552,7 @@
       "actual": "7",
       "forecast": null,
       "previous": "4",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -4379,6 +4564,7 @@
       "actual": "22.7",
       "forecast": "30.2",
       "previous": "26.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4390,6 +4576,7 @@
       "actual": "4.7",
       "forecast": "4.7",
       "previous": "4.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4401,6 +4588,7 @@
       "actual": "5",
       "forecast": "4.7",
       "previous": "4.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4412,6 +4600,7 @@
       "actual": "25.8",
       "forecast": "10.3",
       "previous": "-2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4423,6 +4612,7 @@
       "actual": "0",
       "forecast": null,
       "previous": "-0.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4924,6 +5114,7 @@
       "actual": "279.2",
       "forecast": "255",
       "previous": "244.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4935,6 +5126,7 @@
       "actual": "13",
       "forecast": null,
       "previous": "36.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4946,6 +5138,7 @@
       "actual": "11.9",
       "forecast": "22.5",
       "previous": "29.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4957,6 +5150,7 @@
       "actual": "52.6",
       "forecast": null,
       "previous": "52.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -4968,6 +5162,7 @@
       "actual": "49.7",
       "forecast": null,
       "previous": "51.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4979,6 +5174,7 @@
       "actual": "53.1",
       "forecast": null,
       "previous": "52.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -4990,6 +5186,7 @@
       "actual": "-14.2",
       "forecast": "-15",
       "previous": "-14.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5001,6 +5198,7 @@
       "actual": "-17",
       "forecast": "-20",
       "previous": "-19",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5012,6 +5210,7 @@
       "actual": "54.8",
       "forecast": null,
       "previous": "53.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5023,6 +5222,7 @@
       "actual": "52.2",
       "forecast": "52",
       "previous": "52",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5034,6 +5234,7 @@
       "actual": "55.2",
       "forecast": "53.5",
       "previous": "54.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5045,6 +5246,7 @@
       "actual": "53.6",
       "forecast": "55",
       "previous": "55.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5546,6 +5748,7 @@
       "actual": "-19",
       "forecast": "-18",
       "previous": "-17",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5557,6 +5760,7 @@
       "actual": "54.8",
       "forecast": "54.5",
       "previous": "54.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5568,6 +5772,7 @@
       "actual": "51.9",
       "forecast": "52",
       "previous": "52.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5579,6 +5784,7 @@
       "actual": "55",
       "forecast": "54.6",
       "previous": "54.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5590,6 +5796,7 @@
       "actual": "51",
       "forecast": "50.5",
       "previous": "53.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5601,6 +5808,7 @@
       "actual": "-13.5",
       "forecast": null,
       "previous": "-2.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5612,6 +5820,7 @@
       "actual": "88.7",
       "forecast": "93.4",
       "previous": "95.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5623,6 +5832,7 @@
       "actual": "12.2",
       "forecast": null,
       "previous": "-7.7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5634,6 +5844,7 @@
       "actual": "36.3",
       "forecast": "44.3",
       "previous": "43.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5645,6 +5856,7 @@
       "actual": "-9.7",
       "forecast": "-16.5",
       "previous": "-21.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5656,6 +5868,7 @@
       "actual": "-14.2",
       "forecast": "-14.2",
       "previous": "-14.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5667,6 +5880,7 @@
       "actual": "97",
       "forecast": "97",
       "previous": "96.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5678,6 +5892,7 @@
       "actual": "2.8",
       "forecast": null,
       "previous": "2.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5689,6 +5904,7 @@
       "actual": "2.7",
       "forecast": "2.7",
       "previous": "2.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5700,6 +5916,7 @@
       "actual": "67.1",
       "forecast": null,
       "previous": "58.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5711,6 +5928,7 @@
       "actual": "98.4",
       "forecast": null,
       "previous": "92.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5722,6 +5940,7 @@
       "actual": "101.7",
       "forecast": "101.5",
       "previous": "101.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5733,6 +5952,7 @@
       "actual": "3.2",
       "forecast": "-5.2",
       "previous": "-7.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5898,6 +6118,7 @@
       "actual": "51.6",
       "forecast": "51.6",
       "previous": "49.7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5909,6 +6130,7 @@
       "actual": "48.4",
       "forecast": null,
       "previous": "49.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -5920,6 +6142,7 @@
       "actual": "52.2",
       "forecast": "51.9",
       "previous": "52.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5931,6 +6154,7 @@
       "actual": "48.2",
       "forecast": "48.6",
       "previous": "48.7",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -5942,6 +6166,7 @@
       "actual": "-16.6",
       "forecast": "-13.3",
       "previous": "-16.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5953,6 +6178,7 @@
       "actual": "52.6",
       "forecast": "52.6",
       "previous": "52.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5964,6 +6190,7 @@
       "actual": "52.8",
       "forecast": "52.7",
       "previous": "52.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5975,6 +6202,7 @@
       "actual": "37.5",
       "forecast": "35.9",
       "previous": "35.8",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -5986,6 +6214,7 @@
       "actual": "44.9",
       "forecast": null,
       "previous": "50.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -5997,6 +6226,7 @@
       "actual": "44.3",
       "forecast": null,
       "previous": "50.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6008,6 +6238,7 @@
       "actual": "-32",
       "forecast": "10",
       "previous": "47",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6019,6 +6250,7 @@
       "actual": "54.2",
       "forecast": "54.8",
       "previous": "54.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6030,6 +6262,7 @@
       "actual": "54.1",
       "forecast": "55",
       "previous": "54.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6041,6 +6274,7 @@
       "actual": "54.5",
       "forecast": null,
       "previous": "54.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6052,6 +6286,7 @@
       "actual": "52.6",
       "forecast": "52.1",
       "previous": "52.4",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -6063,6 +6298,7 @@
       "actual": "48.4",
       "forecast": "53.6",
       "previous": "52.4",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -6074,6 +6310,7 @@
       "actual": "49.7",
       "forecast": "48.5",
       "previous": "48.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6085,6 +6322,7 @@
       "actual": "53.3",
       "forecast": "52",
       "previous": "51",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -6096,6 +6334,7 @@
       "actual": "2834",
       "forecast": "3109.5",
       "previous": "4483",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6107,6 +6346,7 @@
       "actual": "-34",
       "forecast": "-34",
       "previous": "-37",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6118,6 +6358,7 @@
       "actual": "1",
       "forecast": null,
       "previous": "6",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -6129,6 +6370,7 @@
       "actual": "10",
       "forecast": null,
       "previous": "17",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6140,6 +6382,7 @@
       "actual": "9.4",
       "forecast": null,
       "previous": "9.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6151,6 +6394,7 @@
       "actual": "4.75",
       "forecast": null,
       "previous": "-13.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6162,6 +6406,7 @@
       "actual": "51.4",
       "forecast": null,
       "previous": "51.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6173,6 +6418,7 @@
       "actual": "12.6",
       "forecast": "12",
       "previous": "12.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6184,6 +6430,7 @@
       "actual": "15",
       "forecast": "15",
       "previous": "14",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -6195,6 +6442,7 @@
       "actual": "15",
       "forecast": "13",
       "previous": "12",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6206,6 +6454,7 @@
       "actual": "34",
       "forecast": "35",
       "previous": "34",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6217,6 +6466,7 @@
       "actual": "28",
       "forecast": "28",
       "previous": "28",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6228,6 +6478,7 @@
       "actual": "6",
       "forecast": "2",
       "previous": "1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6239,6 +6490,7 @@
       "actual": "51.1",
       "forecast": null,
       "previous": "52.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6250,6 +6502,7 @@
       "actual": "52.2",
       "forecast": null,
       "previous": "51.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6261,6 +6514,7 @@
       "actual": "51",
       "forecast": null,
       "previous": "52.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6272,6 +6526,7 @@
       "actual": "-9",
       "forecast": null,
       "previous": "12.8",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -6283,6 +6538,7 @@
       "actual": "94.5",
       "forecast": null,
       "previous": "103.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6294,6 +6550,7 @@
       "actual": "254.1",
       "forecast": "250",
       "previous": "232.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6753,6 +7010,7 @@
       "actual": "33.7",
       "forecast": "26.3",
       "previous": "25",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6764,6 +7022,7 @@
       "actual": "4.6",
       "forecast": "4.5",
       "previous": "4.7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6775,6 +7034,7 @@
       "actual": "4.7",
       "forecast": "4.4",
       "previous": "4.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6786,6 +7046,7 @@
       "actual": "20.1",
       "forecast": "22.3",
       "previous": "-3.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6797,6 +7058,7 @@
       "actual": "96.5",
       "forecast": null,
       "previous": "90.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6808,6 +7070,7 @@
       "actual": "-8.37",
       "forecast": "-8.1",
       "previous": "-1.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6819,6 +7082,7 @@
       "actual": "16.25",
       "forecast": null,
       "previous": "2.75",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6830,6 +7094,7 @@
       "actual": "53",
       "forecast": null,
       "previous": "54.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6841,6 +7106,7 @@
       "actual": "51.8",
       "forecast": "52",
       "previous": "52.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6852,6 +7118,7 @@
       "actual": "52.9",
       "forecast": "54",
       "previous": "54.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6863,6 +7130,7 @@
       "actual": "0",
       "forecast": null,
       "previous": "0.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6874,6 +7142,7 @@
       "actual": "101.5",
       "forecast": null,
       "previous": "98.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6885,6 +7154,7 @@
       "actual": "15.4",
       "forecast": null,
       "previous": "12.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6896,6 +7166,7 @@
       "actual": "32",
       "forecast": null,
       "previous": "38.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6907,6 +7178,7 @@
       "actual": "25.7",
       "forecast": "19.6",
       "previous": "23.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6918,6 +7190,7 @@
       "actual": "-14.6",
       "forecast": "-14",
       "previous": "-14.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6929,6 +7202,7 @@
       "actual": "-17",
       "forecast": "-18",
       "previous": "-19",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6940,6 +7214,7 @@
       "actual": "73.6",
       "forecast": null,
       "previous": "67.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6951,6 +7226,7 @@
       "actual": "52.9",
       "forecast": "53.4",
       "previous": "51",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6962,6 +7238,7 @@
       "actual": "-12.1",
       "forecast": "-21.3",
       "previous": "-21.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -6973,6 +7250,7 @@
       "actual": "6.2",
       "forecast": null,
       "previous": "12.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -6984,6 +7262,7 @@
       "actual": "11.5",
       "forecast": null,
       "previous": "17.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7485,6 +7764,7 @@
       "actual": "0.1",
       "forecast": null,
       "previous": null,
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -7496,6 +7776,7 @@
       "actual": "8.2",
       "forecast": null,
       "previous": "9.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -7507,6 +7788,7 @@
       "actual": "-12.4",
       "forecast": null,
       "previous": "-13.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7518,6 +7800,7 @@
       "actual": "-16",
       "forecast": "-16",
       "previous": "-17",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7529,6 +7812,7 @@
       "actual": "56.4",
       "forecast": "54",
       "previous": "52.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7540,6 +7824,7 @@
       "actual": "3",
       "forecast": null,
       "previous": "2",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -7551,6 +7836,7 @@
       "actual": "7.75",
       "forecast": null,
       "previous": "8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7562,6 +7848,7 @@
       "actual": "84.5",
       "forecast": "90.9",
       "previous": "94.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7573,6 +7860,7 @@
       "actual": "-4.7",
       "forecast": null,
       "previous": "6.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -7584,6 +7872,7 @@
       "actual": "-12.4",
       "forecast": "-12.4",
       "previous": "-13.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -7595,6 +7884,7 @@
       "actual": "99.4",
       "forecast": "97",
       "previous": "97.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7606,6 +7896,7 @@
       "actual": "37.9",
       "forecast": "38",
       "previous": "37.2",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -7617,6 +7908,7 @@
       "actual": "2",
       "forecast": null,
       "previous": "2.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -7628,6 +7920,7 @@
       "actual": "1.5",
       "forecast": null,
       "previous": "2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -7639,6 +7932,7 @@
       "actual": "64.1",
       "forecast": null,
       "previous": "73.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7650,6 +7944,7 @@
       "actual": "102.5",
       "forecast": "103",
       "previous": "103.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7661,6 +7956,7 @@
       "actual": "-1.3",
       "forecast": "-4.1",
       "previous": "-8.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7672,6 +7968,7 @@
       "actual": "107.2",
       "forecast": null,
       "previous": "101.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -7683,6 +7980,7 @@
       "actual": "54",
       "forecast": "44",
       "previous": "42.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7694,6 +7992,7 @@
       "actual": "48.8",
       "forecast": "47.9",
       "previous": "46.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7705,6 +8004,7 @@
       "actual": "52.6",
       "forecast": "48.5",
       "previous": "47.9",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -7716,6 +8016,7 @@
       "actual": "22",
       "forecast": "48",
       "previous": "37",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7727,6 +8028,7 @@
       "actual": "57.4",
       "forecast": null,
       "previous": "55.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -7738,6 +8040,7 @@
       "actual": "53.8",
       "forecast": "53.5",
       "previous": "53.8",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -7749,6 +8052,7 @@
       "actual": "50.9",
       "forecast": "49.7",
       "previous": "51.9",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -7760,6 +8064,7 @@
       "actual": "57.3",
       "forecast": "55",
       "previous": "56.4",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -7771,6 +8076,7 @@
       "actual": "7288",
       "forecast": "1060",
       "previous": "3674",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7782,6 +8088,7 @@
       "actual": "-2.6",
       "forecast": null,
       "previous": "-1.7",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -7793,6 +8100,7 @@
       "actual": "90.5",
       "forecast": null,
       "previous": "92.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7804,6 +8112,7 @@
       "actual": "-30",
       "forecast": "-30",
       "previous": "-31",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7815,6 +8124,7 @@
       "actual": "3",
       "forecast": null,
       "previous": "2",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -7826,6 +8136,7 @@
       "actual": "6.5",
       "forecast": null,
       "previous": "5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7837,6 +8148,7 @@
       "actual": "55.2",
       "forecast": null,
       "previous": "56.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -7848,6 +8160,7 @@
       "actual": "7",
       "forecast": null,
       "previous": "8.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8349,6 +8662,7 @@
       "actual": "238",
       "forecast": "263.3",
       "previous": "280.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8360,6 +8674,7 @@
       "actual": "39.4",
       "forecast": "45.2",
       "previous": "40.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8371,6 +8686,7 @@
       "actual": "4.2",
       "forecast": "4.2",
       "previous": "4.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8382,6 +8698,7 @@
       "actual": "4.2",
       "forecast": "4.6",
       "previous": "4.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8393,6 +8710,7 @@
       "actual": "28.6",
       "forecast": "22.8",
       "previous": "2.7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8404,6 +8722,7 @@
       "actual": "10.25",
       "forecast": null,
       "previous": "7.75",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8415,6 +8734,7 @@
       "actual": "-0.1",
       "forecast": null,
       "previous": "0.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8426,6 +8746,7 @@
       "actual": "0.8",
       "forecast": "0.8",
       "previous": "0.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8437,6 +8758,7 @@
       "actual": "3.4",
       "forecast": null,
       "previous": "3.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8448,6 +8770,7 @@
       "actual": "13",
       "forecast": null,
       "previous": "7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8459,6 +8782,7 @@
       "actual": "1.404",
       "forecast": "1.33",
       "previous": "1.322",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -8470,6 +8794,7 @@
       "actual": "6.2",
       "forecast": null,
       "previous": "3.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8481,6 +8806,7 @@
       "actual": "34.6",
       "forecast": null,
       "previous": "12.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8492,6 +8818,7 @@
       "actual": "14.6",
       "forecast": "9.2",
       "previous": "8.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8503,6 +8830,7 @@
       "actual": "-12.2",
       "forecast": "-11.8",
       "previous": "-12.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8514,6 +8842,7 @@
       "actual": "56.6",
       "forecast": "57.3",
       "previous": "56.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8525,6 +8854,7 @@
       "actual": "12.75",
       "forecast": null,
       "previous": "11.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8536,6 +8866,7 @@
       "actual": "91.2",
       "forecast": "87",
       "previous": "89",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8547,6 +8878,7 @@
       "actual": "9.8",
       "forecast": null,
       "previous": "-4.7",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8558,6 +8890,7 @@
       "actual": "-0.7",
       "forecast": "-7.7",
       "previous": "-9.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8569,6 +8902,7 @@
       "actual": "-12.2",
       "forecast": "-12.2",
       "previous": "-12.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8580,6 +8914,7 @@
       "actual": "98.3",
       "forecast": "99.8",
       "previous": "99.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8591,6 +8926,7 @@
       "actual": "1.8",
       "forecast": null,
       "previous": "2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8602,6 +8938,7 @@
       "actual": "1.6",
       "forecast": null,
       "previous": "1.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8613,6 +8950,7 @@
       "actual": "59.2",
       "forecast": null,
       "previous": "64.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8624,6 +8962,7 @@
       "actual": "100.1",
       "forecast": null,
       "previous": "107.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -8635,6 +8974,7 @@
       "actual": "-19",
       "forecast": "-15",
       "previous": "-16",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -8646,6 +8986,7 @@
       "actual": "-0.4",
       "forecast": "-1.6",
       "previous": "-1.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -13511,6 +13852,7 @@
       "actual": "-16.3",
       "forecast": "-14.4",
       "previous": "-12.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -13639,6 +13981,7 @@
       "actual": "7",
       "forecast": null,
       "previous": "15.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -13650,6 +13993,7 @@
       "actual": "50.5",
       "forecast": "51",
       "previous": "51.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -13661,6 +14005,7 @@
       "actual": "51.4",
       "forecast": "49.4",
       "previous": "50.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -13672,6 +14017,7 @@
       "actual": "50.1",
       "forecast": "51.1",
       "previous": "51.9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -13683,6 +14029,7 @@
       "actual": "10",
       "forecast": null,
       "previous": "9",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -14006,6 +14353,7 @@
       "actual": "-35",
       "forecast": null,
       "previous": "9.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -14394,6 +14742,7 @@
       "actual": "91.3",
       "forecast": null,
       "previous": "100.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -14613,6 +14962,7 @@
       "actual": "-21",
       "forecast": "-24",
       "previous": "-19",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -14624,6 +14974,7 @@
       "actual": "53.3",
       "forecast": "54",
       "previous": "56.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15090,6 +15441,7 @@
       "actual": "96.1",
       "forecast": "102",
       "previous": "103.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15101,6 +15453,7 @@
       "actual": "-16.3",
       "forecast": "-16.3",
       "previous": "-12.2",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -15112,6 +15465,7 @@
       "actual": "96.6",
       "forecast": "96.8",
       "previous": "98.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15123,6 +15477,7 @@
       "actual": "2.3",
       "forecast": null,
       "previous": "2.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -15134,6 +15489,7 @@
       "actual": "1.4",
       "forecast": null,
       "previous": "1.5",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -15314,6 +15670,7 @@
       "actual": "-18.4",
       "forecast": "-23.4",
       "previous": "-10.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15325,6 +15682,7 @@
       "actual": "-4.9",
       "forecast": "-4.7",
       "previous": "-0.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15336,6 +15694,7 @@
       "actual": "3.3",
       "forecast": null,
       "previous": "12.6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -15347,6 +15706,7 @@
       "actual": "17",
       "forecast": "16",
       "previous": "16",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -15358,6 +15718,7 @@
       "actual": "14",
       "forecast": "13",
       "previous": "15",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -15369,6 +15730,7 @@
       "actual": "36",
       "forecast": "33",
       "previous": "34",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -15380,6 +15742,7 @@
       "actual": "29",
       "forecast": "28",
       "previous": "28",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -15391,6 +15754,7 @@
       "actual": "7",
       "forecast": "7",
       "previous": "6",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -15402,6 +15766,7 @@
       "actual": "32.5",
       "forecast": null,
       "previous": "59.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15413,6 +15778,7 @@
       "actual": "52.8",
       "forecast": "55",
       "previous": "57.7",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15424,6 +15790,7 @@
       "actual": "91.8",
       "forecast": "88",
       "previous": "91",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15695,6 +16062,7 @@
       "actual": "53.3",
       "forecast": "47",
       "previous": "47.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15706,6 +16074,7 @@
       "actual": "62",
       "forecast": "40",
       "previous": "66",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -15717,6 +16086,7 @@
       "actual": "52.7",
       "forecast": "52.5",
       "previous": "52.4",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -16092,6 +16462,7 @@
       "actual": "53.9",
       "forecast": null,
       "previous": "59.9",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16103,6 +16474,7 @@
       "actual": "54",
       "forecast": "55",
       "previous": "56.1",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -16114,6 +16486,7 @@
       "actual": "49.7",
       "forecast": "55.9",
       "previous": "56.6",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -16125,6 +16498,7 @@
       "actual": "3933",
       "forecast": "3549",
       "previous": "942",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16136,6 +16510,7 @@
       "actual": "26",
       "forecast": null,
       "previous": "15.25",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16147,6 +16522,7 @@
       "actual": "33.3",
       "forecast": "38",
       "previous": "39.7",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -16158,6 +16534,7 @@
       "actual": "53.2",
       "forecast": null,
       "previous": "54.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16169,6 +16546,7 @@
       "actual": "-43",
       "forecast": "-32",
       "previous": "-30",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16180,6 +16558,7 @@
       "actual": "47.6",
       "forecast": "52",
       "previous": "53.3",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -16191,6 +16570,7 @@
       "actual": "15.2",
       "forecast": null,
       "previous": "4.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16202,6 +16582,7 @@
       "actual": "-12.5",
       "forecast": null,
       "previous": "1.2",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -16213,6 +16594,7 @@
       "actual": "80.1",
       "forecast": null,
       "previous": "91.6",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16224,6 +16606,7 @@
       "actual": "-29",
       "forecast": null,
       "previous": null,
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -16235,6 +16618,7 @@
       "actual": "39",
       "forecast": null,
       "previous": "26",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16708,6 +17092,7 @@
       "actual": "7",
       "forecast": null,
       "previous": "18",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16719,6 +17104,7 @@
       "actual": "235.9",
       "forecast": "255",
       "previous": "251",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16730,6 +17116,7 @@
       "actual": "21.09",
       "forecast": null,
       "previous": "15.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16741,6 +17128,7 @@
       "actual": "25",
       "forecast": "29.8",
       "previous": "40.4",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16752,6 +17140,7 @@
       "actual": "-4",
       "forecast": null,
       "previous": "48",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16763,6 +17152,7 @@
       "actual": "-20.4",
       "forecast": "-3.6",
       "previous": "-8.5",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16774,6 +17164,7 @@
       "actual": "3.6",
       "forecast": "3.5",
       "previous": "3.8",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16785,6 +17176,7 @@
       "actual": "3.8",
       "forecast": "3.6",
       "previous": "4.1",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16796,6 +17188,7 @@
       "actual": "26.8",
       "forecast": "21.4",
       "previous": "17.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16807,6 +17200,7 @@
       "actual": "54.75",
       "forecast": null,
       "previous": "40.25",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16818,6 +17212,7 @@
       "actual": "-0.1",
       "forecast": null,
       "previous": "-0.1",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16829,6 +17224,7 @@
       "actual": "-20.6",
       "forecast": null,
       "previous": "-16.4",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16840,6 +17236,7 @@
       "actual": "-25",
       "forecast": "-24",
       "previous": "-21",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16851,6 +17248,7 @@
       "actual": "49.8",
       "forecast": "47.6",
       "previous": "53.3",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16862,6 +17260,7 @@
       "actual": "39.25",
       "forecast": null,
       "previous": "40.25",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16873,6 +17272,7 @@
       "actual": "92.8",
       "forecast": "89",
       "previous": "92.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16884,6 +17284,7 @@
       "actual": "-30.3",
       "forecast": null,
       "previous": "-35",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16895,6 +17296,7 @@
       "actual": "-20.6",
       "forecast": "-20.6",
       "previous": "-16.3",
+      "impact": "low",
       "importance": 1,
       "source": "FH"
     },
@@ -16906,6 +17308,7 @@
       "actual": "93",
       "forecast": "95.2",
       "previous": "96.2",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
@@ -16917,6 +17320,7 @@
       "actual": "1.502",
       "forecast": "1.4",
       "previous": "1.356",
+      "impact": "high",
       "importance": 3,
       "source": "FH"
     },
@@ -16928,6 +17332,7 @@
       "actual": "-3",
       "forecast": null,
       "previous": "1.8",
+      "impact": "medium",
       "importance": 2,
       "source": "FH"
     },
