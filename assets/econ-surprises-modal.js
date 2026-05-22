@@ -1,36 +1,37 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.0.0
+// ECONOMIC SURPRISES MODAL  v1.1.0
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
-// Displays a fullscreen panel (same pattern as COT / CB Rates modals) with:
-//   Tab per G8 currency (USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD)
-//   LightweightCharts v5 area line — rolling 30d surprise index (weekly step)
-//   Zero reference line at 0 (centre, CESI convention)
-//   Events table — individual releases with beat / miss / in-line markers
+// Mounts into #split-lower (right inline panel) via inline-panel.js intercept —
+// same behaviour as COT / CB Rates / Yield Curve modals.
 //
-// Data: calendar-data/calendar.json (same source as renderEconSurprises()).
-// Index methodology: mirrors renderEconSurprises() — beat/miss beat rate scaled
-//   to [−100, +100], 30d rolling window stepped weekly.
+// DOM shape mirrors the other modals:
+//   #esm-bd    (outer wrapper — position:static when transplanted)
+//     #esm-modal (inner flex column — full width/height)
+//
+// Tabs: G8 currencies with flag-icons (.fi.fi-xx) matching CB Rates convention.
+// Chart: LightweightCharts v5 AreaSeries — rolling 30d surprise index, weekly.
+// Table: Individual releases 90d window — beat/miss/in-line badge, H/M impact.
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ── CSS (injected once) ──────────────────────────────────────────────────────
 (function () {
   if (document.getElementById('esm-css')) return;
   const s = document.createElement('style');
   s.id = 'esm-css';
   s.textContent = `
-#esm-bd {
-  position:fixed!important;inset:0!important;z-index:9400;
-  display:flex!important;flex-direction:column;overflow:hidden;
-  background:var(--bg,#131722);
+#esm-bd { display:block!important; }
+#esm-modal {
+  width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
+  border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;
+  background:var(--bg,#131722)!important;position:static!important;
   font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);
   color:var(--text,#d1d4dc);
+  display:flex;flex-direction:column;
 }
 #esm-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px 9px;
-  border-bottom:1px solid var(--border,#252d3d);
+  padding:10px 14px 9px;border-bottom:1px solid var(--border,#252d3d);
   flex-shrink:0;background:var(--bg2,#1e222d);
 }
 #esm-hd-left { display:flex;align-items:center;gap:10px; }
@@ -47,10 +48,11 @@
 #esm-title {
   font-size:14px;font-weight:600;color:var(--text,#d1d4dc);
   letter-spacing:-.01em;line-height:1.2;
+  display:flex;align-items:center;gap:7px;
 }
+#esm-title .fi { font-size:15px;line-height:1;vertical-align:middle;border-radius:2px; }
 #esm-sub {
-  font-size:10px;color:var(--text2,#787b86);
-  letter-spacing:.02em;margin-top:2px;
+  font-size:10px;color:var(--text2,#787b86);letter-spacing:.02em;margin-top:2px;
   font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
 }
 #esm-close {
@@ -61,8 +63,7 @@
 #esm-close:hover { color:var(--text,#d1d4dc);background:var(--bg3,#2a2e39); }
 #esm-metrics {
   display:grid;grid-template-columns:repeat(5,1fr);
-  border-bottom:1px solid var(--border,#252d3d);
-  flex-shrink:0;background:var(--bg,#131722);
+  border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;
 }
 .esm-mm {
   padding:8px 12px;border-right:1px solid var(--border,#252d3d);
@@ -70,48 +71,42 @@
 }
 .esm-mm:last-child { border-right:none; }
 .esm-mm-lbl {
-  font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
-  font-weight:600;color:var(--text2,#787b86);text-transform:uppercase;letter-spacing:.09em;
+  font-size:9px;font-weight:600;color:var(--text2,#787b86);
+  text-transform:uppercase;letter-spacing:.09em;
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
 }
 .esm-mm-val {
-  font-size:13px;font-weight:600;
+  font-size:13px;font-weight:600;line-height:1;margin-top:3px;
   font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
-  line-height:1;margin-top:3px;
 }
 .esm-mm-sub {
-  font-size:9px;color:var(--text2,#787b86);
+  font-size:9px;color:var(--text2,#787b86);margin-top:1px;
   font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
-  margin-top:1px;
 }
 #esm-tabs {
-  display:flex;padding:0 14px;
-  border-bottom:1px solid var(--border,#252d3d);
-  flex-shrink:0;overflow-x:auto;scrollbar-width:none;
-  background:var(--bg2,#1e222d);
-  role:tablist;
+  display:flex;padding:0 14px;border-bottom:1px solid var(--border,#252d3d);
+  flex-shrink:0;overflow-x:auto;scrollbar-width:none;background:var(--bg2,#1e222d);
 }
 #esm-tabs::-webkit-scrollbar { display:none; }
 .esm-tab {
-  font-size:11px;font-weight:500;padding:9px 13px;cursor:pointer;
+  font-size:11px;font-weight:500;padding:8px 12px;cursor:pointer;
   color:var(--text2,#787b86);border-bottom:2px solid transparent;
   transition:color .12s;white-space:nowrap;user-select:none;
+  display:flex;align-items:center;gap:5px;
   font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
 .esm-tab:hover { color:var(--text,#d1d4dc); }
 .esm-tab.on { color:var(--text,#d1d4dc);border-bottom-color:var(--blue,#4f7fff); }
+.esm-tab .fi { font-size:11px;border-radius:2px;flex-shrink:0; }
 #esm-body {
   flex:1;min-height:0;overflow:hidden;
-  display:flex;flex-direction:column;
-  background:var(--bg,#131722);
+  display:flex;flex-direction:column;background:var(--bg,#131722);
 }
 #esm-chart-wrap {
-  flex:0 0 45%;min-height:200px;max-height:340px;
-  position:relative;
+  flex:0 0 45%;min-height:180px;max-height:320px;position:relative;
   border-bottom:1px solid var(--border,#252d3d);
 }
-#esm-chart-inner {
-  position:absolute;inset:0;
-}
+#esm-chart-inner { position:absolute;inset:0; }
 .esm-lw-tooltip {
   position:absolute;display:none;pointer-events:none;
   background:var(--bg2,#1e222d);border:1px solid var(--border2,#363c4e);
@@ -128,33 +123,28 @@
 #esm-events-wrap::-webkit-scrollbar-thumb { background:var(--border2,#363c4e);border-radius:2px; }
 #esm-events-hd {
   display:flex;align-items:center;justify-content:space-between;
-  padding:7px 14px 5px;
-  border-bottom:1px solid rgba(54,60,78,.5);
+  padding:6px 14px 5px;border-bottom:1px solid rgba(54,60,78,.5);
   position:sticky;top:0;background:var(--bg,#131722);z-index:2;
 }
 #esm-events-hd-title {
-  font-size:9px;font-weight:600;
-  text-transform:uppercase;letter-spacing:.08em;
+  font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;
   color:var(--text2,#787b86);
   font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
 }
 .esm-evt-tbl {
-  width:100%;border-collapse:collapse;
-  font-size:10px;
+  width:100%;border-collapse:collapse;font-size:10px;
   font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
 }
 .esm-evt-tbl th {
   text-align:left;color:var(--text2,#787b86);font-weight:500;
   font-size:8px;text-transform:uppercase;letter-spacing:.08em;
-  padding:5px 8px 4px;border-bottom:1px solid var(--border2,#363c4e);
-  white-space:nowrap;
+  padding:5px 8px 4px;border-bottom:1px solid var(--border2,#363c4e);white-space:nowrap;
 }
 .esm-evt-tbl th:nth-child(3),
 .esm-evt-tbl th:nth-child(4),
 .esm-evt-tbl th:nth-child(5) { text-align:right; }
 .esm-evt-tbl td {
-  padding:5px 8px;
-  border-bottom:1px solid rgba(54,60,78,.3);
+  padding:5px 8px;border-bottom:1px solid rgba(54,60,78,.3);
   color:var(--text,#d1d4dc);vertical-align:middle;
 }
 .esm-evt-tbl td:nth-child(3),
@@ -164,7 +154,6 @@
 .esm-evt-tbl tr:hover td { background:rgba(255,255,255,.025); }
 .esm-beat { color:var(--up,#26a69a);font-weight:600; }
 .esm-miss { color:var(--down,#ef5350);font-weight:600; }
-.esm-inline { color:var(--text3,#6b7280); }
 .esm-badge-beat {
   display:inline-block;font-size:7px;font-weight:700;letter-spacing:.06em;
   padding:1px 4px;border-radius:2px;text-transform:uppercase;
@@ -183,15 +172,14 @@
 .esm-impact-h { color:var(--down,#ef5350); }
 .esm-impact-m { color:var(--orange,#f6941c); }
 .esm-no-data {
-  padding:24px 16px;text-align:center;
-  font-size:11px;color:var(--text3,#6b7280);
+  padding:24px 16px;text-align:center;font-size:11px;color:var(--text3,#6b7280);
   font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
 @media(max-width:600px){
   #esm-metrics { grid-template-columns:repeat(3,1fr); }
   .esm-mm:nth-child(3) { border-right:none; }
   .esm-mm:nth-child(4) { border-top:1px solid var(--border,#252d3d); }
-  #esm-chart-wrap { flex:0 0 40%;max-height:260px; }
+  #esm-chart-wrap { flex:0 0 40%;max-height:240px; }
 }
 `;
   document.head.appendChild(s);
@@ -199,6 +187,17 @@
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const _esmMonoF = "var(--font-mono,'JetBrains Mono','Courier New',monospace)";
+
+const _ESM_CCY_META = {
+  USD: { flag: 'us', label: 'US Dollar' },
+  EUR: { flag: 'eu', label: 'Euro'      },
+  GBP: { flag: 'gb', label: 'Pound'     },
+  JPY: { flag: 'jp', label: 'Yen'       },
+  AUD: { flag: 'au', label: 'Aussie'    },
+  CAD: { flag: 'ca', label: 'Loonie'    },
+  CHF: { flag: 'ch', label: 'Swissie'   },
+  NZD: { flag: 'nz', label: 'Kiwi'     },
+};
 
 const _ESM_G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
 
@@ -223,12 +222,7 @@ const _ESM_NOISE_KW = [
   'eia crude oil','eia crude',
 ];
 
-const _ESM_FLAG = {
-  USD:'US', EUR:'EU', GBP:'GB', JPY:'JP',
-  AUD:'AU', CAD:'CA', CHF:'CH', NZD:'NZ',
-};
-
-// ── LWC library loader (idempotent) ──────────────────────────────────────────
+// ── LWC loader ───────────────────────────────────────────────────────────────
 let _esmLwcPromise = null;
 function _esmEnsureLWC() {
   if (window.LightweightCharts) return Promise.resolve();
@@ -244,17 +238,15 @@ function _esmEnsureLWC() {
 }
 
 // ── State ────────────────────────────────────────────────────────────────────
-let _esmChart      = null;
-let _esmCalData    = null;  // cached calendar.json payload
-let _esmActiveCcy  = 'USD';
+let _esmChart     = null;
+let _esmCalData   = null;
+let _esmActiveCcy = 'USD';
 
-// ── Score computation helpers ────────────────────────────────────────────────
-// Mirrors renderEconSurprises() exactly.
-
+// ── Score helpers ─────────────────────────────────────────────────────────────
 function _esmScoreWindow(events, ccy, startMs, endMs) {
-  const seen   = new Set();
+  const seen = new Set();
   let beats = 0, misses = 0, total = 0, zSum = 0, zN = 0, zBeats = 0, zMisses = 0;
-  const stats = (window._ECON_SURPRISE_STATS || {});
+  const stats = window._ECON_SURPRISE_STATS || {};
 
   events.forEach(ev => {
     if (ev.currency !== ccy) return;
@@ -266,12 +258,12 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
     const evTitle = (ev.event || ev.title || '').toLowerCase();
     if (_ESM_NOISE_KW.some(kw => evTitle.includes(kw))) return;
 
-    const canon    = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
-    const actualS  = String(ev.actual   || '').replace(/[%,\s]/g, '');
-    const forecastS= String(ev.forecast || ev.previous || '').replace(/[%,\s]/g, '');
-    const dedupKey = `${ccy}/${canon}/${actualS}/${forecastS}`;
-    if (seen.has(dedupKey)) return;
-    seen.add(dedupKey);
+    const canon     = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
+    const actualS   = String(ev.actual   || '').replace(/[%,\s]/g, '');
+    const forecastS = String(ev.forecast || ev.previous || '').replace(/[%,\s]/g, '');
+    const key = `${ccy}/${canon}/${actualS}/${forecastS}`;
+    if (seen.has(key)) return;
+    seen.add(key);
 
     const actual   = parseFloat(String(ev.actual   || '').replace(/[%,]/g, ''));
     const forecast = parseFloat(String(ev.forecast || ev.previous || '').replace(/[%,]/g, ''));
@@ -280,25 +272,19 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
     const isInverse = _ESM_INVERSE_KW.some(kw => evTitle.includes(kw));
     const beat = isInverse ? actual < forecast : actual > forecast;
     const miss = isInverse ? actual > forecast : actual < forecast;
-    const rawSurprise = actual - forecast;
-    const surprise    = isInverse ? -rawSurprise : rawSurprise;
+    const surprise = isInverse ? -(actual - forecast) : (actual - forecast);
 
-    const statsKey = `${ccy}/${canon}`;
-    const st = stats[statsKey];
+    const st = stats[`${ccy}/${canon}`];
     const useZ = st && st.n >= 5 && st.std > 0;
     const zScore = useZ ? (surprise - st.mean) / st.std : null;
 
     total++;
     if (beat) beats++;
     if (miss) misses++;
-    if (zScore !== null) {
-      zSum += zScore; zN++;
-      if (beat) zBeats++;
-      if (miss) zMisses++;
-    }
+    if (zScore !== null) { zSum += zScore; zN++; if (beat) zBeats++; if (miss) zMisses++; }
   });
 
-  if (total === 0) return null;
+  if (!total) return null;
 
   let idx100;
   const zFrac = zN / total;
@@ -306,7 +292,7 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
     const nonZN    = total - zN;
     const nonZBeat = beats  - zBeats;
     const nonZMiss = misses - zMisses;
-    const zPart    = zN  > 0 ? (zSum / zN) * 50 : 0;
+    const zPart    = zN    > 0 ? (zSum / zN) * 50 : 0;
     const bmPart   = nonZN > 0 ? ((nonZBeat - nonZMiss) / nonZN) * 100 : 0;
     idx100 = (zPart * zN + bmPart * nonZN) / total;
   } else {
@@ -316,31 +302,26 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
   return { idx: idx100, beats, misses, total };
 }
 
-// ── Rolling time-series: weekly steps, 30d window ────────────────────────────
-// Returns [{date: "YYYY-MM-DD", value: number}] for use in LWC area series.
 function _esmBuildSeries(events, ccy) {
-  const nowMs      = Date.now();
-  const WINDOW_MS  = 30 * 24 * 60 * 60 * 1000;
-  const STEP_MS    = 7  * 24 * 60 * 60 * 1000;
+  const nowMs     = Date.now();
+  const WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+  const STEP_MS   =  7 * 24 * 60 * 60 * 1000;
 
-  // Find earliest released event for this currency
   const ccyEvts = events.filter(ev =>
-    ev.currency === ccy &&
-    (ev.actual && ev.actual !== '' && ev.actual !== '-')
+    ev.currency === ccy && ev.actual && ev.actual !== '' && ev.actual !== '-'
   );
   if (!ccyEvts.length) return [];
 
   const minDate = Math.min(...ccyEvts.map(ev => new Date(ev.dateISO).getTime()).filter(t => !isNaN(t)));
+  const series  = [];
+  let cursor    = minDate + WINDOW_MS;
 
-  const series = [];
-  // Step from (minDate + WINDOW) to now, weekly
-  let cursor = minDate + WINDOW_MS;
   while (cursor <= nowMs + STEP_MS) {
     const endMs   = Math.min(cursor, nowMs);
     const startMs = endMs - WINDOW_MS;
-    const r = _esmScoreWindow(events, ccy, startMs, endMs);
+    const r       = _esmScoreWindow(events, ccy, startMs, endMs);
     if (r !== null) {
-      const dt = new Date(endMs);
+      const dt  = new Date(endMs);
       const iso = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
       series.push({ time: iso, value: parseFloat(r.idx.toFixed(2)) });
     }
@@ -349,19 +330,16 @@ function _esmBuildSeries(events, ccy) {
   return series;
 }
 
-// ── Current 90d score (for header metrics) ───────────────────────────────────
 function _esmCurrentScore(events, ccy) {
   const nowMs = Date.now();
-  const W90   = 90 * 24 * 60 * 60 * 1000;
-  return _esmScoreWindow(events, ccy, nowMs - W90, nowMs);
+  return _esmScoreWindow(events, ccy, nowMs - 90 * 24 * 60 * 60 * 1000, nowMs);
 }
 
-// ── Collect individual events for the table ──────────────────────────────────
 function _esmGetEvents(events, ccy) {
-  const nowMs   = Date.now();
-  const W90_MS  = 90 * 24 * 60 * 60 * 1000;
-  const seen    = new Set();
-  const result  = [];
+  const nowMs  = Date.now();
+  const W90_MS = 90 * 24 * 60 * 60 * 1000;
+  const seen   = new Set();
+  const result = [];
 
   events.forEach(ev => {
     if (ev.currency !== ccy) return;
@@ -370,15 +348,15 @@ function _esmGetEvents(events, ccy) {
     if (!ev.actual || ev.actual === '' || ev.actual === '-') return;
     if (!['medium','high'].includes(ev.impact)) return;
 
-    const evTitle  = (ev.event || ev.title || '').toLowerCase();
+    const evTitle   = (ev.event || ev.title || '').toLowerCase();
     if (_ESM_NOISE_KW.some(kw => evTitle.includes(kw))) return;
 
-    const actualS  = String(ev.actual   || '').replace(/[%,\s]/g, '');
-    const forecastS= String(ev.forecast || ev.previous || '').replace(/[%,\s]/g, '');
-    const canon    = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
-    const dedupKey = `${ccy}/${canon}/${actualS}/${forecastS}`;
-    if (seen.has(dedupKey)) return;
-    seen.add(dedupKey);
+    const canon     = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
+    const actualS   = String(ev.actual   || '').replace(/[%,\s]/g, '');
+    const forecastS = String(ev.forecast || ev.previous || '').replace(/[%,\s]/g, '');
+    const key = `${ccy}/${canon}/${actualS}/${forecastS}`;
+    if (seen.has(key)) return;
+    seen.add(key);
 
     const actual   = parseFloat(String(ev.actual   || '').replace(/[%,]/g, ''));
     const forecast = parseFloat(String(ev.forecast || ev.previous || '').replace(/[%,]/g, ''));
@@ -393,11 +371,11 @@ function _esmGetEvents(events, ccy) {
     }
 
     result.push({
-      dateISO:  ev.dateISO,
-      event:    ev.event || ev.title || '',
-      impact:   ev.impact,
-      actual:   ev.actual   || '—',
-      forecast: ev.forecast || ev.previous || '—',
+      dateISO: ev.dateISO,
+      event:   ev.event || ev.title || '',
+      impact:  ev.impact,
+      actual:  ev.actual   || '—',
+      forecast:ev.forecast || ev.previous || '—',
       outcome,
     });
   });
@@ -406,99 +384,47 @@ function _esmGetEvents(events, ccy) {
   return result;
 }
 
-// ── Chart destroy helper ──────────────────────────────────────────────────────
+// ── Chart ─────────────────────────────────────────────────────────────────────
 function _esmDestroyChart() {
-  if (_esmChart) {
-    try { _esmChart.remove(); } catch (_) {}
-    _esmChart = null;
-  }
+  if (_esmChart) { try { _esmChart.remove(); } catch (_) {} _esmChart = null; }
 }
 
-// ── Resize observer ──────────────────────────────────────────────────────────
-function _esmBindResize(container, lwChart) {
-  const apply = () => {
-    requestAnimationFrame(() => {
-      const rect = container.getBoundingClientRect();
-      const w = Math.round(rect.width)  || container.offsetWidth  || 600;
-      const h = Math.round(rect.height) || container.offsetHeight || 260;
-      if (lwChart && w > 0 && h > 10) lwChart.applyOptions({ width: w, height: h });
-    });
-  };
-  if (window.ResizeObserver) {
-    const ro = new ResizeObserver(() => apply());
-    ro.observe(container);
-    container._esmRo = ro;
-  }
-  window.addEventListener('resize', apply);
-  container._esmResize = apply;
-  setTimeout(apply, 60);
-  setTimeout(apply, 250);
-  setTimeout(apply, 600);
-}
-
-// ── Build (or rebuild) chart for the given currency ───────────────────────────
 function _esmRenderChart(ccy) {
   const LWC = window.LightweightCharts;
-  if (!LWC) return;
-  if (!_esmCalData) return;
-
+  if (!LWC || !_esmCalData) return;
   _esmDestroyChart();
 
   const container = document.getElementById('esm-chart-inner');
   if (!container) return;
 
-  const events = _esmCalData.events || [];
-  const series = _esmBuildSeries(events, ccy);
-
-  const W = container.offsetWidth  || 600;
-  const H = container.offsetHeight || 260;
+  const series = _esmBuildSeries(_esmCalData.events || [], ccy);
+  const W = container.offsetWidth || 600, H = container.offsetHeight || 240;
 
   const chart = LWC.createChart(container, {
-    width:  W,
-    height: H,
+    width: W, height: H,
     layout: {
       background: { type: 'solid', color: '#131722' },
-      textColor: '#6e7681',
-      fontFamily: _esmMonoF,
-      fontSize: 10,
-      attributionLogo: false,
+      textColor: '#6e7681', fontFamily: _esmMonoF, fontSize: 10, attributionLogo: false,
     },
-    grid: {
-      vertLines: { color: 'rgba(255,255,255,0.04)' },
-      horzLines: { color: 'rgba(255,255,255,0.04)' },
-    },
+    grid: { vertLines: { color: 'rgba(255,255,255,0.04)' }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
     crosshair: {
       mode: LWC.CrosshairMode?.Normal ?? 1,
       vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
       horzLine: { color: 'rgba(255,255,255,0.15)', style: 2, labelVisible: true },
     },
-    rightPriceScale: {
-      borderVisible: false,
-      scaleMargins: { top: 0.12, bottom: 0.12 },
-    },
-    timeScale: {
-      borderVisible: false,
-      fixRightEdge: true,
-    },
+    rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.12 } },
+    timeScale: { borderVisible: false, fixRightEdge: true },
     handleScroll: { mouseWheel: true, pressedMouseMove: true },
     handleScale:  { mouseWheel: true, pinch: true },
-    localization: {
-      priceFormatter: v => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) : '—',
-    },
+    localization: { priceFormatter: v => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) : '—' },
   });
-
   _esmChart = chart;
 
-  // Zero reference line (Priceline at 0)
+  // Zero line
   const zeroLine = chart.addSeries(LWC.LineSeries, {
-    color: 'rgba(110,118,129,0.4)',
-    lineWidth: 1,
-    lineStyle: 2,
-    priceLineVisible: false,
-    lastValueVisible: false,
-    crosshairMarkerVisible: false,
+    color: 'rgba(110,118,129,0.4)', lineWidth: 1, lineStyle: 2,
+    priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
   });
-  // Extend zero line across the full date range
   if (series.length >= 2) {
     zeroLine.setData([
       { time: series[0].time, value: 0 },
@@ -506,30 +432,21 @@ function _esmRenderChart(ccy) {
     ]);
   }
 
-  // Determine positive/negative for gradient color — use last value
-  const lastVal = series.length > 0 ? series[series.length - 1].value : 0;
-  const isPositive = lastVal >= 0;
-  const lineColor   = isPositive ? '#26a69a' : '#ef5350';
-  const topColor    = isPositive ? 'rgba(38,166,154,0.28)' : 'rgba(239,83,80,0.28)';
-  const bottomColor = isPositive ? 'rgba(38,166,154,0.02)' : 'rgba(239,83,80,0.02)';
+  const lastVal   = series.length > 0 ? series[series.length - 1].value : 0;
+  const pos       = lastVal >= 0;
+  const lineColor = pos ? '#26a69a' : '#ef5350';
+  const topColor  = pos ? 'rgba(38,166,154,0.28)' : 'rgba(239,83,80,0.28)';
+  const botColor  = pos ? 'rgba(38,166,154,0.02)' : 'rgba(239,83,80,0.02)';
 
   const areaSeries = chart.addSeries(LWC.AreaSeries, {
-    lineColor,
-    topColor,
-    bottomColor,
-    lineWidth: 2,
-    priceLineVisible: false,
-    lastValueVisible: true,
-    crosshairMarkerVisible: true,
-    crosshairMarkerRadius: 4,
+    lineColor, topColor, bottomColor: botColor, lineWidth: 2,
+    priceLineVisible: false, lastValueVisible: true,
+    crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
   });
 
-  if (series.length > 0) {
-    areaSeries.setData(series);
-    chart.timeScale().fitContent();
-  }
+  if (series.length > 0) { areaSeries.setData(series); chart.timeScale().fitContent(); }
 
-  // ── Tooltip ──────────────────────────────────────────────────────────────
+  // Tooltip
   const tip = document.createElement('div');
   tip.className = 'esm-lw-tooltip';
   container.style.position = 'relative';
@@ -541,19 +458,15 @@ function _esmRenderChart(ccy) {
     const d = param.seriesData.get(areaSeries);
     if (!d) { tip.style.display = 'none'; return; }
 
-    const val   = d.value;
-    const col   = val >= 0 ? '#26a69a' : '#ef5350';
-    const sign  = val >= 0 ? '+' : '';
+    const val = d.value, col = val >= 0 ? '#26a69a' : '#ef5350';
     const dateStr = typeof param.time === 'string' ? param.time : '';
-    // Find events scored in this 30d window
     const endMs   = new Date(dateStr).getTime();
-    const startMs = endMs - 30 * 24 * 60 * 60 * 1000;
-    const winScore = _esmScoreWindow(_esmCalData.events || [], ccy, startMs, endMs);
-    const nTxt = winScore ? `${winScore.total} events` : '';
+    const winSc   = _esmScoreWindow(_esmCalData.events || [], ccy, endMs - 30*24*60*60*1000, endMs);
+    const nTxt    = winSc ? `${winSc.total} events · ${winSc.beats}B / ${winSc.misses}M` : '';
 
     tip.innerHTML = `
-      <div style="font-size:9px;color:var(--text2,#787b86);margin-bottom:4px;">${dateStr} · 30d window</div>
-      <div style="font-size:12px;font-weight:700;color:${col}">${sign}${val.toFixed(1)}</div>
+      <div style="font-size:9px;color:var(--text2,#787b86);margin-bottom:4px;">${dateStr} · 30d</div>
+      <div style="font-size:13px;font-weight:700;color:${col}">${val >= 0 ? '+' : ''}${val.toFixed(1)}</div>
       ${nTxt ? `<div style="font-size:9px;color:var(--text3,#6b7280);margin-top:3px;">${nTxt}</div>` : ''}
     `;
     tip.style.display = 'block';
@@ -567,94 +480,102 @@ function _esmRenderChart(ccy) {
     tip.style.top  = Math.max(0, ty) + 'px';
   });
 
-  _esmBindResize(container, chart);
+  // Resize
+  const apply = () => {
+    requestAnimationFrame(() => {
+      const w = container.offsetWidth || 600, h = container.offsetHeight || 240;
+      if (w > 0 && h > 10) chart.applyOptions({ width: w, height: h });
+    });
+  };
+  if (window.ResizeObserver) { const ro = new ResizeObserver(apply); ro.observe(container); }
+  window.addEventListener('resize', apply);
+  setTimeout(apply, 60); setTimeout(apply, 250); setTimeout(apply, 600);
 }
 
-// ── Populate metrics bar ──────────────────────────────────────────────────────
+// ── Metrics ───────────────────────────────────────────────────────────────────
 function _esmRenderMetrics(ccy) {
   if (!_esmCalData) return;
-  const events = _esmCalData.events || [];
-  const s = _esmCurrentScore(events, ccy);
-
+  const s = _esmCurrentScore(_esmCalData.events || [], ccy);
   const el = id => document.getElementById(id);
 
   if (!s) {
-    el('esm-m-index').textContent   = '—';
-    el('esm-m-beats').textContent   = '—';
-    el('esm-m-misses').textContent  = '—';
-    el('esm-m-n').textContent       = '—';
-    el('esm-m-beat-rt').textContent = '—';
-    el('esm-m-index').style.color = 'var(--text2)';
+    ['esm-m-index','esm-m-beats','esm-m-misses','esm-m-n','esm-m-beat-rt'].forEach(id => {
+      const e = el(id); if (e) { e.textContent = '—'; e.style.color = 'var(--text2)'; }
+    });
     return;
   }
 
   const idx    = s.idx;
   const idxCol = idx > 5 ? 'var(--up,#26a69a)' : idx < -5 ? 'var(--down,#ef5350)' : 'var(--text,#d1d4dc)';
-  const inLine = s.total - s.beats - s.misses;
   const beatRt = s.total > 0 ? (s.beats / s.total * 100).toFixed(0) + '%' : '—';
 
-  el('esm-m-index').textContent   = (idx >= 0 ? '+' : '') + idx.toFixed(1);
-  el('esm-m-index').style.color   = idxCol;
-  el('esm-m-beats').textContent   = s.beats;
-  el('esm-m-beats').style.color   = 'var(--up,#26a69a)';
-  el('esm-m-misses').textContent  = s.misses;
-  el('esm-m-misses').style.color  = 'var(--down,#ef5350)';
-  el('esm-m-n').textContent       = s.total;
-  el('esm-m-beat-rt').textContent = beatRt;
-  el('esm-m-beat-rt').style.color = parseFloat(beatRt) >= 50 ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
+  const mi = el('esm-m-index');
+  if (mi) { mi.textContent = (idx >= 0 ? '+' : '') + idx.toFixed(1); mi.style.color = idxCol; }
+  const mb = el('esm-m-beats');  if (mb) { mb.textContent = s.beats;  mb.style.color = 'var(--up,#26a69a)'; }
+  const mm = el('esm-m-misses'); if (mm) { mm.textContent = s.misses; mm.style.color = 'var(--down,#ef5350)'; }
+  const mn = el('esm-m-n');      if (mn) { mn.textContent = s.total;  mn.style.color = 'var(--text)'; }
+  const mr = el('esm-m-beat-rt');
+  if (mr) {
+    mr.textContent = beatRt;
+    mr.style.color = parseFloat(beatRt) >= 50 ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
+  }
 }
 
-// ── Populate events table ─────────────────────────────────────────────────────
+// ── Events table ──────────────────────────────────────────────────────────────
 function _esmRenderTable(ccy) {
   const tbody = document.getElementById('esm-evt-tbody');
   if (!tbody) return;
   if (!_esmCalData) { tbody.innerHTML = '<tr><td colspan="5" class="esm-no-data">Loading…</td></tr>'; return; }
 
   const rows = _esmGetEvents(_esmCalData.events || [], ccy);
-
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="5" class="esm-no-data" style="padding:20px 16px;">No released events with actuals in the 90d window for ${ccy}.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="esm-no-data">No released events with actuals in the 90d window for ${ccy}.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = rows.map(r => {
-    const badgeCls  = r.outcome === 'beat' ? 'esm-badge-beat' : r.outcome === 'miss' ? 'esm-badge-miss' : 'esm-badge-inline';
-    const badgeTxt  = r.outcome === 'beat' ? 'BEAT' : r.outcome === 'miss' ? 'MISS' : r.outcome === 'inline' ? 'IN LINE' : '—';
-    const impactCls = r.impact === 'high' ? 'esm-impact-h' : 'esm-impact-m';
-    const actualCls = r.outcome === 'beat' ? 'esm-beat' : r.outcome === 'miss' ? 'esm-miss' : '';
-    const dateDisp  = r.dateISO.slice(5).replace('-', '/');
+    const badgeCls = r.outcome === 'beat' ? 'esm-badge-beat' : r.outcome === 'miss' ? 'esm-badge-miss' : 'esm-badge-inline';
+    const badgeTxt = r.outcome === 'beat' ? 'BEAT' : r.outcome === 'miss' ? 'MISS' : r.outcome === 'inline' ? 'IN LINE' : '—';
+    const impCls   = r.impact === 'high' ? 'esm-impact-h' : 'esm-impact-m';
+    const actCls   = r.outcome === 'beat' ? 'esm-beat' : r.outcome === 'miss' ? 'esm-miss' : '';
     return `<tr>
-      <td style="color:var(--text2,#787b86)">${dateDisp}</td>
+      <td style="color:var(--text2,#787b86)">${r.dateISO.slice(5).replace('-','/')}</td>
       <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.event}">
-        <span class="${impactCls}" style="font-size:8px;margin-right:4px;">${r.impact === 'high' ? 'H' : 'M'}</span>${r.event}
+        <span class="${impCls}" style="font-size:8px;margin-right:4px;">${r.impact === 'high' ? 'H' : 'M'}</span>${r.event}
       </td>
-      <td class="${actualCls}">${r.actual}</td>
+      <td class="${actCls}">${r.actual}</td>
       <td style="color:var(--text2,#787b86)">${r.forecast}</td>
       <td><span class="${badgeCls}">${badgeTxt}</span></td>
     </tr>`;
   }).join('');
 }
 
-// ── Switch currency tab ───────────────────────────────────────────────────────
+// ── Tab switch ────────────────────────────────────────────────────────────────
 function esmTab(el, ccy) {
   document.querySelectorAll('.esm-tab').forEach(t => {
     t.classList.remove('on');
-    t.setAttribute('aria-selected', 'false');
+    t.setAttribute('aria-selected','false');
+    t.setAttribute('tabindex','-1');
   });
   el.classList.add('on');
-  el.setAttribute('aria-selected', 'true');
+  el.setAttribute('aria-selected','true');
+  el.setAttribute('tabindex','0');
   _esmActiveCcy = ccy;
 
-  // Update title
+  // Update title flag
   const titleEl = document.getElementById('esm-title');
-  if (titleEl) titleEl.textContent = `Economic Surprises · ${ccy}`;
+  if (titleEl) {
+    const meta = _ESM_CCY_META[ccy] || {};
+    const flagHtml = meta.flag ? `<span class="fi fi-${meta.flag}"></span>` : '';
+    titleEl.innerHTML = `${flagHtml}Economic Surprises &middot; ${ccy}`;
+  }
 
   _esmRenderMetrics(ccy);
   _esmRenderChart(ccy);
   _esmRenderTable(ccy);
 }
 
-// ── Close modal ───────────────────────────────────────────────────────────────
+// ── Close ─────────────────────────────────────────────────────────────────────
 function closeESModal() {
   _esmDestroyChart();
   const bd = document.getElementById('esm-bd');
@@ -662,132 +583,120 @@ function closeESModal() {
   document.removeEventListener('keydown', _esmKeydown);
 }
 
-function _esmKeydown(e) {
-  if (e.key === 'Escape') closeESModal();
-}
+function _esmKeydown(e) { if (e.key === 'Escape') closeESModal(); }
 
-// ── Open modal ────────────────────────────────────────────────────────────────
+// ── Open ──────────────────────────────────────────────────────────────────────
 async function openEconSurprisesModal(initialCcy) {
-  closeESModal(); // reset any stale instance
-
-  const ccy = _ESM_G8.includes(initialCcy) ? initialCcy : 'USD';
+  closeESModal();
+  const ccy  = _ESM_G8.includes(initialCcy) ? initialCcy : 'USD';
   _esmActiveCcy = ccy;
 
-  // ── Build DOM ──────────────────────────────────────────────────────────────
+  const initMeta = _ESM_CCY_META[ccy] || {};
+  const initFlag = initMeta.flag ? `<span class="fi fi-${initMeta.flag}"></span>` : '';
+
+  // outer #esm-bd → inner #esm-modal  (matches _transplant pattern)
   const bd = document.createElement('div');
   bd.id = 'esm-bd';
-  bd.setAttribute('role', 'dialog');
-  bd.setAttribute('aria-modal', 'true');
-  bd.setAttribute('aria-label', `Economic Surprises — ${ccy}`);
 
   bd.innerHTML = `
-<div id="esm-hd">
-  <div id="esm-hd-left">
-    <div>
-      <div id="esm-badge">CESI-STYLE INDEX</div>
-      <div id="esm-title">Economic Surprises &middot; ${ccy}</div>
-      <div id="esm-sub">ForexFactory &middot; actual vs consensus &middot; 30d rolling window &middot; [&minus;100, +100]</div>
-    </div>
-  </div>
-  <button id="esm-close" onclick="closeESModal()" aria-label="Close Economic Surprises modal">&times;</button>
-</div>
-
-<div id="esm-metrics">
-  <div class="esm-mm">
-    <div class="esm-mm-lbl">Index (90d)</div>
-    <div class="esm-mm-val" id="esm-m-index" style="color:var(--text2)">—</div>
-    <div class="esm-mm-sub">[-100, +100]</div>
-  </div>
-  <div class="esm-mm">
-    <div class="esm-mm-lbl">Beats</div>
-    <div class="esm-mm-val" id="esm-m-beats">—</div>
-    <div class="esm-mm-sub">events</div>
-  </div>
-  <div class="esm-mm">
-    <div class="esm-mm-lbl">Misses</div>
-    <div class="esm-mm-val" id="esm-m-misses">—</div>
-    <div class="esm-mm-sub">events</div>
-  </div>
-  <div class="esm-mm">
-    <div class="esm-mm-lbl">N (90d)</div>
-    <div class="esm-mm-val" id="esm-m-n">—</div>
-    <div class="esm-mm-sub">scored</div>
-  </div>
-  <div class="esm-mm">
-    <div class="esm-mm-lbl">Beat Rate</div>
-    <div class="esm-mm-val" id="esm-m-beat-rt">—</div>
-    <div class="esm-mm-sub">of total</div>
-  </div>
-</div>
-
-<div id="esm-tabs" role="tablist" aria-label="G8 currency tabs">
-  ${_ESM_G8.map(c => `
-  <div class="esm-tab${c === ccy ? ' on' : ''}"
-       data-ccy="${c}"
-       role="tab"
-       aria-selected="${c === ccy ? 'true' : 'false'}"
-       onclick="esmTab(this,'${c}')"
-       tabindex="${c === ccy ? '0' : '-1'}">
-    ${c}
-  </div>`).join('')}
-</div>
-
-<div id="esm-body">
-  <div id="esm-chart-wrap">
-    <div id="esm-chart-inner"></div>
-  </div>
-  <div id="esm-events-wrap">
-    <div id="esm-events-hd">
-      <div id="esm-events-hd-title">Events (90d rolling window)</div>
-      <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);">
-        H&nbsp;=&nbsp;high&nbsp;impact &nbsp;·&nbsp; M&nbsp;=&nbsp;medium
+<div id="esm-modal" role="dialog" aria-modal="true" aria-label="Economic Surprises — ${ccy}">
+  <div id="esm-hd">
+    <div id="esm-hd-left">
+      <div>
+        <div id="esm-badge">CESI-STYLE INDEX</div>
+        <div id="esm-title">${initFlag}Economic Surprises &middot; ${ccy}</div>
+        <div id="esm-sub">ForexFactory &middot; actual vs consensus &middot; 30d rolling &middot; [&minus;100, +100]</div>
       </div>
     </div>
-    <table class="esm-evt-tbl" aria-label="Economic event releases">
-      <thead>
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col">Event</th>
-          <th scope="col">Actual</th>
-          <th scope="col">Forecast</th>
-          <th scope="col">Outcome</th>
-        </tr>
-      </thead>
-      <tbody id="esm-evt-tbody">
-        <tr><td colspan="5" class="esm-no-data">Loading data…</td></tr>
-      </tbody>
-    </table>
+    <button id="esm-close" onclick="closeESModal()" aria-label="Close">&times;</button>
   </div>
-</div>
-`;
+
+  <div id="esm-metrics">
+    <div class="esm-mm">
+      <div class="esm-mm-lbl">Index (90d)</div>
+      <div class="esm-mm-val" id="esm-m-index" style="color:var(--text2)">—</div>
+      <div class="esm-mm-sub">[−100, +100]</div>
+    </div>
+    <div class="esm-mm">
+      <div class="esm-mm-lbl">Beats</div>
+      <div class="esm-mm-val" id="esm-m-beats">—</div>
+      <div class="esm-mm-sub">events</div>
+    </div>
+    <div class="esm-mm">
+      <div class="esm-mm-lbl">Misses</div>
+      <div class="esm-mm-val" id="esm-m-misses">—</div>
+      <div class="esm-mm-sub">events</div>
+    </div>
+    <div class="esm-mm">
+      <div class="esm-mm-lbl">N (90d)</div>
+      <div class="esm-mm-val" id="esm-m-n">—</div>
+      <div class="esm-mm-sub">scored</div>
+    </div>
+    <div class="esm-mm">
+      <div class="esm-mm-lbl">Beat Rate</div>
+      <div class="esm-mm-val" id="esm-m-beat-rt">—</div>
+      <div class="esm-mm-sub">of total</div>
+    </div>
+  </div>
+
+  <div id="esm-tabs" role="tablist" aria-label="G8 currency tabs">
+    ${_ESM_G8.map(c => {
+      const m = _ESM_CCY_META[c] || {};
+      const f = m.flag ? `<span class="fi fi-${m.flag}"></span>` : '';
+      return `<div class="esm-tab${c === ccy ? ' on' : ''}" data-ccy="${c}" role="tab"
+        aria-selected="${c === ccy ? 'true' : 'false'}"
+        onclick="esmTab(this,'${c}')"
+        tabindex="${c === ccy ? '0' : '-1'}">${f}${c}</div>`;
+    }).join('')}
+  </div>
+
+  <div id="esm-body">
+    <div id="esm-chart-wrap">
+      <div id="esm-chart-inner"></div>
+    </div>
+    <div id="esm-events-wrap">
+      <div id="esm-events-hd">
+        <div id="esm-events-hd-title">Events · 90d rolling window</div>
+        <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);">H&nbsp;=&nbsp;high&nbsp;·&nbsp;M&nbsp;=&nbsp;medium</div>
+      </div>
+      <table class="esm-evt-tbl" aria-label="Economic event releases">
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Event</th>
+            <th scope="col">Actual</th>
+            <th scope="col">Forecast</th>
+            <th scope="col">Outcome</th>
+          </tr>
+        </thead>
+        <tbody id="esm-evt-tbody">
+          <tr><td colspan="5" class="esm-no-data">Loading data…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>`;
 
   document.body.appendChild(bd);
   document.addEventListener('keydown', _esmKeydown);
 
-  // ── Load calendar data (re-use window cache from renderEconSurprises if fresh) ──
+  // Fetch calendar
   try {
-    const res  = await fetch('./calendar-data/calendar.json').catch(() => null);
+    const res = await fetch('./calendar-data/calendar.json').catch(() => null);
     if (res?.ok) {
       const calj = await res.json();
       _esmCalData = calj;
-      // Sync surpriseStats for z-score scoring (same key used by renderEconSurprises)
-      if (calj.surpriseStats) {
-        window._ECON_SURPRISE_STATS = calj.surpriseStats;
-      }
+      if (calj.surpriseStats) window._ECON_SURPRISE_STATS = calj.surpriseStats;
     }
-  } catch (_) { /* graceful — table will show no-data */ }
+  } catch (_) {}
 
-  // ── Ensure LWC then render ────────────────────────────────────────────────
-  try {
-    await _esmEnsureLWC();
-  } catch (_) { /* chart will not render but table still works */ }
+  try { await _esmEnsureLWC(); } catch (_) {}
 
   _esmRenderMetrics(ccy);
   _esmRenderChart(ccy);
   _esmRenderTable(ccy);
 }
 
-// ── Expose globals ────────────────────────────────────────────────────────────
 window.openEconSurprisesModal = openEconSurprisesModal;
 window.closeESModal           = closeESModal;
 window.esmTab                 = esmTab;

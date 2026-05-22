@@ -325,6 +325,31 @@
     document.body.style.overflow = '';
   };
 
+  // ═══════════════════════════════════════════════════════════════════
+  // INTERCEPT: Economic Surprises Modal → #split-lower (RIGHT)
+  // ═══════════════════════════════════════════════════════════════════
+  var _origOpenESM = window.openEconSurprisesModal;
+
+  window.openEconSurprisesModal = function(ccy) {
+    var panels = _ensureSplit();
+    if (!panels) { _origOpenESM && _origOpenESM(ccy); return; }
+
+    var body = _makeShell(panels.lower, 'Economic Surprises \u00b7 ' + (ccy || 'G8'), function() {
+      if (typeof window.closeESModal === 'function') window.closeESModal();
+    });
+
+    var bdPre = document.getElementById('esm-bd');
+    if (bdPre) bdPre.style.display = 'none';
+
+    _origOpenESM && _origOpenESM(ccy);
+
+    if (!_transplant(body, 'esm-bd', 'esm-modal', 'esm-close',
+        'display:flex!important;flex-direction:column!important;overflow:hidden!important;')) {
+      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Economic Surprises data unavailable.</div>';
+    }
+    document.body.style.overflow = '';
+  };
+
   window._showInlinePanel   = _makeShell;
   window._ensureInlineSplit = _ensureSplit;
 
