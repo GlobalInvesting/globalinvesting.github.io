@@ -745,14 +745,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div id="split-lower-right">
 
     <!-- ECONOMIC CALENDAR — native panel, ForexFactory data, terminal colors -->
-    <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:250px;flex-shrink:0;">
+    <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;">
       <div class="panel-head">
         <span class="panel-title">Economic Calendar</span>
-        <span class="panel-sub" id="cal-panel-sub">ForexFactory · G8 · medium &amp; high impact · UTC</span>
+        <span class="panel-sub" id="cal-panel-sub">ForexFactory · G8 · medium &amp; high impact</span>
       </div>
       <!-- Column headers -->
       <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
-        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Time UTC</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
         <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
         <span style="font-size:9px;color:var(--text3);">·</span>
         <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
@@ -761,7 +761,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
       </div>
       <!-- Scrollable events body -->
-      <div id="cal-events-body" style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;">
+      <div id="cal-events-body" style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;max-height:330px;">
         <div style="padding:12px 10px;color:var(--text3);font-size:11px;">Loading calendar…</div>
       </div>
     </div>
