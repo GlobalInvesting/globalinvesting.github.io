@@ -10301,6 +10301,13 @@ async function renderEconSurprises() {
   // ── Score per currency ────────────────────────────────────────────────────
   // Inverse indicators: a lower actual is a positive surprise (e.g. unemployment fell)
   const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit', 'trade balance'];
+
+  // ── Exponential time-decay (CESI convention) ────────────────────────────────────────
+  // CESI applies decay so recent surprises dominate and old data fades.
+  // Half-life = 45 days: w(0d)=1.00, w(45d)=0.50, w(90d)=0.25.
+  // λ = ln(2) / 45 ≈ 0.01540. N column still shows raw event count for transparency.
+  const DECAY_LAMBDA = Math.LN2 / 45;
+
   const ccyScores = {};
 
   calEvents.forEach(ev => {
@@ -10366,6 +10373,11 @@ async function renderEconSurprises() {
     const rawSurprise = actual - forecast;
     const surprise    = isInverse ? -rawSurprise : rawSurprise;
 
+    // ── Exponential decay weight ─────────────────────────────────────────────────────────────
+    // w = e^(-λ · ageDays). Recent events weight 1.0; older events fade smoothly.
+    const ageDays = (nowMs - evTime) / 86400000;
+    const w = Math.exp(-DECAY_LAMBDA * ageDays);
+
     // ── Z-score scoring (hybrid: z-score when stats available, beat/miss otherwise) ──
     // As history accumulates in surpriseStats (engine v3.1+), more events
     // graduate to z-score. MIN 5 observations required for a valid std estimate.
@@ -10378,17 +10390,23 @@ async function renderEconSurprises() {
     const useZScore = stats && stats.n >= CANONICAL_MIN_N && stats.std > 0;
     const zScore = useZScore ? (surprise - stats.mean) / stats.std : null;
 
-    if (!ccyScores[ccy]) ccyScores[ccy] = { beats: 0, misses: 0, total: 0, zSum: 0, zN: 0, zBeats: 0, zMisses: 0 };
+    if (!ccyScores[ccy]) ccyScores[ccy] = {
+      // Raw counts — for N display and low-confidence threshold
+      total: 0, beats: 0, misses: 0,
+      // Decay-weighted accumulators — used for index calculation
+      wTotal: 0, wBeats: 0, wMisses: 0,
+      zWSum: 0, zWTotal: 0, zWBeats: 0, zWMisses: 0,
+    };
     ccyScores[ccy].total++;
-    if (beat) ccyScores[ccy].beats++;
-    if (miss) ccyScores[ccy].misses++;
-    // Track z-score beats/misses separately so the blend formula can compute
-    // non-z-score beat/miss without the incorrect "assumes all zN are beats" approximation.
+    ccyScores[ccy].wTotal += w;
+    if (beat) { ccyScores[ccy].beats++;  ccyScores[ccy].wBeats  += w; }
+    if (miss) { ccyScores[ccy].misses++; ccyScores[ccy].wMisses += w; }
+    // Decay-weighted z-score accumulators for the blend formula.
     if (zScore !== null) {
-      ccyScores[ccy].zSum += zScore;
-      ccyScores[ccy].zN++;
-      if (beat) ccyScores[ccy].zBeats++;
-      if (miss) ccyScores[ccy].zMisses++;
+      ccyScores[ccy].zWSum   += zScore * w;
+      ccyScores[ccy].zWTotal += w;
+      if (beat) ccyScores[ccy].zWBeats += w;
+      if (miss) ccyScores[ccy].zWMisses += w;
     }
   });
 
@@ -10413,26 +10431,24 @@ async function renderEconSurprises() {
       return;
     }
 
-    // ── Index: z-score blend when available, beat/miss otherwise ────────────
-    // Events with ≥5 historical observations use z-score (normalised surprise).
-    // Remaining events use beat/miss. Both contribute to the same [-100,+100] scale.
-    // As history accumulates over months, more events will graduate to z-score.
+    // ── Index: decay-weighted z-score blend when available, beat/miss otherwise ───────
+    // All contributions scaled by w = e^(-λ·ageDays) — recent surprises dominate.
+    // Events with ≥5 historical observations use z-score (normalised surprise magnitude).
+    // Remaining events use beat/miss. Both halves are decay-weighted consistently.
     let idx100;
-    const zFraction = s.zN / s.total;
-    if (s.zN >= 10 || (s.zN > 0 && zFraction >= 0.30)) {
-      // Blend: z-score events contribute avg_z * 50 (maps ±2σ to ±100),
-      // non-z-score events contribute their beat/miss ratio * 100.
-      // nonZBeat/nonZMiss use the separately tracked zBeats/zMisses accumulators
-      // so the beat/miss half is accurate regardless of how many z-score events are beats.
-      const nonZN     = s.total - s.zN;
-      const nonZBeat  = s.beats  - s.zBeats;
-      const nonZMiss  = s.misses - s.zMisses;
-      const zPart     = s.zN  > 0 ? (s.zSum / s.zN) * 50 : 0;
-      const bmPart    = nonZN > 0 ? ((nonZBeat - nonZMiss) / nonZN) * 100 : 0;
-      idx100 = (zPart * s.zN + bmPart * nonZN) / s.total;
+    const zFraction = s.zWTotal / s.wTotal;
+    if (s.zWTotal >= 10 || (s.zWTotal > 0 && zFraction >= 0.30)) {
+      // Blend: weighted z-score contrib = (zWSum/zWTotal)*50 (maps ±2σ to ±100),
+      // weighted non-z contrib = weighted beat/miss ratio * 100.
+      const nonZWTotal = s.wTotal  - s.zWTotal;
+      const nonZWBeat  = s.wBeats  - s.zWBeats;
+      const nonZWMiss  = s.wMisses - s.zWMisses;
+      const zPart  = s.zWTotal   > 0 ? (s.zWSum / s.zWTotal) * 50 : 0;
+      const bmPart = nonZWTotal  > 0 ? ((nonZWBeat - nonZWMiss) / nonZWTotal) * 100 : 0;
+      idx100 = (zPart * s.zWTotal + bmPart * nonZWTotal) / s.wTotal;
     } else {
-      // Pure beat/miss (Citi CESI convention) — used until enough z-score history
-      idx100 = ((s.beats - s.misses) / s.total) * 100;
+      // Pure decay-weighted beat/miss (CESI convention)
+      idx100 = s.wTotal > 0 ? ((s.wBeats - s.wMisses) / s.wTotal) * 100 : 0;
     }
     // Bar: max half-width = 50% of container (the zero line is at 50%)
     const halfPct = Math.min(Math.abs(idx100), 100) / 2; // 0–50%
@@ -10458,7 +10474,7 @@ async function renderEconSurprises() {
     // Row tooltip
     const pct = (s.beats / s.total * 100).toFixed(0);
     const inLine = s.total - s.beats - s.misses;
-    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)} · click for detail`;
+    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)} · decay-weighted (45d half-life) · click for detail`;
   });
 
   // ── Keyboard activation for clickable rows (Enter / Space) ──────────────
