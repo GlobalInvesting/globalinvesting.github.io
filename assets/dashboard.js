@@ -10288,6 +10288,11 @@ async function renderEconSurprises() {
       srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
       srcEl.textContent = 'ForexFactory · actual vs consensus · 90d rolling';
+    } else if (calSource && calSource.includes('ForexFactory')) {
+      // Backfill sources: "FRED / Finnhub / ForexFactory" multi-source string
+      srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · G8 · 90d rolling';
+    } else if (calSource) {
+      srcEl.textContent = calSource + ' · actual vs consensus · 90d rolling';
     } else {
       srcEl.textContent = 'Calendar data unavailable';
     }
