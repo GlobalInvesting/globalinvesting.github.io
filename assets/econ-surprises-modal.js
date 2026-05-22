@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.1.0
+// ECONOMIC SURPRISES MODAL  v1.1.1
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -454,7 +454,7 @@ function _esmRenderChart(ccy) {
     const nTxt    = winSc ? `${winSc.total} events · ${winSc.beats}B / ${winSc.misses}M` : '';
 
     tip.innerHTML = `
-      <div style="font-size:9px;color:var(--text2,#787b86);margin-bottom:4px;">${dateStr} · 30d</div>
+      <div style="font-size:9px;color:var(--text2,#787b86);margin-bottom:4px;">${dateStr} · 30d window</div>
       <div style="font-size:13px;font-weight:700;color:${col}">${val >= 0 ? '+' : ''}${val.toFixed(1)}</div>
       ${nTxt ? `<div style="font-size:9px;color:var(--text3,#6b7280);margin-top:3px;">${nTxt}</div>` : ''}
     `;
@@ -593,7 +593,7 @@ async function openEconSurprisesModal(initialCcy) {
     <div id="esm-hd-left">
       <div>
         <div id="esm-title">${initFlag}Economic Surprises &middot; ${ccy}</div>
-        <div id="esm-sub">ForexFactory &middot; actual vs consensus &middot; 30d rolling &middot; [&minus;100, +100]</div>
+        <div id="esm-sub">Actual vs consensus &middot; G8 &middot; 90d rolling window &middot; [&minus;100, +100]</div>
       </div>
     </div>
     <button id="esm-close" onclick="closeESModal()" aria-label="Close">&times;</button>
