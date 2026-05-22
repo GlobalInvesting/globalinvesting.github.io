@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v1.1
-Fetches the ForexFactory economic calendar (this week + next week) and writes
+fetch_ff_calendar.py — v1.2
+Fetches the ForexFactory economic calendar (last week + this week + next week) and writes
 a normalised snapshot to calendar-data/ff_calendar.json.
 
 SOURCE
   ForexFactory public JSON API (no auth required):
+    https://nfs.faireconomy.media/ff_calendar_lastweek.json  (actuals for last 7 days)
     https://nfs.faireconomy.media/ff_calendar_thisweek.json
     https://nfs.faireconomy.media/ff_calendar_nextweek.json
 
@@ -60,6 +61,7 @@ from dateutil import parser as dateparser
 import requests
 
 FF_URLS = [
+    "https://nfs.faireconomy.media/ff_calendar_lastweek.json",   # includes actuals for last week
     "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
     "https://nfs.faireconomy.media/ff_calendar_nextweek.json",
 ]
