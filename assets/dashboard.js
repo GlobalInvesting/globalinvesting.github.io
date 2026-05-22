@@ -1589,17 +1589,14 @@ function renderSentiment(pairs, sourceLabel, general) {
     symSpan.style.cssText = 'font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);white-space:nowrap;line-height:1.2;';
     symSpan.textContent = p.sym;
     symDiv.appendChild(symSpan);
-    // Sub-line: trapped/profit status
-    if (distPct !== null) {
+    // Sub-line: avg entry price + trapped/profit arrow
+    if (hasRich) {
       const statusSpan = document.createElement('span');
-      const distCol2 = trapped ? 'var(--down)' : 'var(--up)';
+      const distCol2 = distPct !== null ? (trapped ? 'var(--down)' : 'var(--up)') : 'var(--text3)';
       statusSpan.style.cssText = `font-size:8px;font-family:var(--font-mono);color:${distCol2};white-space:nowrap;line-height:1.2;`;
-      statusSpan.textContent = (trapped ? '▼' : '▲') + ' ' + distPips + 'p';
-      symDiv.appendChild(statusSpan);
-    } else if (hasRich) {
-      const statusSpan = document.createElement('span');
-      statusSpan.style.cssText = 'font-size:8px;font-family:var(--font-mono);color:var(--text3);white-space:nowrap;line-height:1.2;';
-      statusSpan.textContent = fmtK(p.totalPos) + ' pos';
+      const avgStr = domAvg.toFixed(decimals);
+      const arrow = distPct !== null ? (trapped ? ' ▼' : ' ▲') : '';
+      statusSpan.textContent = avgStr + arrow;
       symDiv.appendChild(statusSpan);
     }
 
