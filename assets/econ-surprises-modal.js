@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.1.1
+// ECONOMIC SURPRISES MODAL  v1.2.0
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -231,10 +231,16 @@ let _esmChart     = null;
 let _esmCalData   = null;
 let _esmActiveCcy = 'USD';
 
-// ── Score helpers ─────────────────────────────────────────────────────────────
+// ── Score helpers ─────────────────────────────────────────────────────
+// Decay-weighted scorer — mirrors dashboard.js renderEconSurprises() exactly.
+// w = e^(-_ESM_DECAY_LAMBDA · ageDays), anchored to endMs (window right edge).
+// For the 90d summary: endMs = now, w(0d)=1.0, w(45d)=0.5, w(90d)=0.25.
+// For chart history: endMs = point date, keeping each slice consistent.
 function _esmScoreWindow(events, ccy, startMs, endMs) {
   const seen = new Set();
-  let beats = 0, misses = 0, total = 0, zSum = 0, zN = 0, zBeats = 0, zMisses = 0;
+  let total = 0, beats = 0, misses = 0;
+  let wTotal = 0, wBeats = 0, wMisses = 0;
+  let zWSum = 0, zWTotal = 0, zWBeats = 0, zWMisses = 0;
   const stats = window._ECON_SURPRISE_STATS || {};
 
   events.forEach(ev => {
@@ -263,38 +269,53 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
     const miss = isInverse ? actual > forecast : actual < forecast;
     const surprise = isInverse ? -(actual - forecast) : (actual - forecast);
 
+    // Decay weight anchored to window right edge
+    const ageDays = (endMs - t) / 86400000;
+    const w = Math.exp(-_ESM_DECAY_LAMBDA * ageDays);
+
     const st = stats[`${ccy}/${canon}`];
     const useZ = st && st.n >= 5 && st.std > 0;
     const zScore = useZ ? (surprise - st.mean) / st.std : null;
 
     total++;
-    if (beat) beats++;
-    if (miss) misses++;
-    if (zScore !== null) { zSum += zScore; zN++; if (beat) zBeats++; if (miss) zMisses++; }
+    wTotal += w;
+    if (beat) { beats++;  wBeats  += w; }
+    if (miss) { misses++; wMisses += w; }
+    if (zScore !== null) {
+      zWSum   += zScore * w;
+      zWTotal += w;
+      if (beat) zWBeats += w;
+      if (miss) zWMisses += w;
+    }
   });
 
   if (!total) return null;
 
+  // Identical formula to dashboard.js
   let idx100;
-  const zFrac = zN / total;
-  if (zN >= 10 || (zN > 0 && zFrac >= 0.30)) {
-    const nonZN    = total - zN;
-    const nonZBeat = beats  - zBeats;
-    const nonZMiss = misses - zMisses;
-    const zPart    = zN    > 0 ? (zSum / zN) * 50 : 0;
-    const bmPart   = nonZN > 0 ? ((nonZBeat - nonZMiss) / nonZN) * 100 : 0;
-    idx100 = (zPart * zN + bmPart * nonZN) / total;
+  const zFrac = zWTotal / wTotal;
+  if (zWTotal >= 10 || (zWTotal > 0 && zFrac >= 0.30)) {
+    const nonZW     = wTotal  - zWTotal;
+    const nonZWBeat = wBeats  - zWBeats;
+    const nonZWMiss = wMisses - zWMisses;
+    const zPart  = zWTotal > 0 ? (zWSum / zWTotal) * 50 : 0;
+    const bmPart = nonZW   > 0 ? ((nonZWBeat - nonZWMiss) / nonZW) * 100 : 0;
+    idx100 = (zPart * zWTotal + bmPart * nonZW) / wTotal;
   } else {
-    idx100 = ((beats - misses) / total) * 100;
+    idx100 = wTotal > 0 ? ((wBeats - wMisses) / wTotal) * 100 : 0;
   }
 
   return { idx: idx100, beats, misses, total };
 }
-
+// Builds the rolling time-series for the chart.
+// CESI convention: 90d rolling window, weekly step.
+// Each point is the decay-weighted index over [pointDate-90d, pointDate].
+// Decay anchor = pointDate (endMs), so the curve is consistent with the
+// current-period score which anchors to now.
 function _esmBuildSeries(events, ccy) {
   const nowMs     = Date.now();
-  const WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
-  const STEP_MS   =  7 * 24 * 60 * 60 * 1000;
+  const WINDOW_MS = 90 * 24 * 60 * 60 * 1000; // 90d — CESI standard
+  const STEP_MS   =  7 * 24 * 60 * 60 * 1000; // weekly step
 
   const ccyEvts = events.filter(ev =>
     ev.currency === ccy && ev.actual && ev.actual !== '' && ev.actual !== '-'
@@ -318,7 +339,6 @@ function _esmBuildSeries(events, ccy) {
   }
   return series;
 }
-
 function _esmCurrentScore(events, ccy) {
   const nowMs = Date.now();
   return _esmScoreWindow(events, ccy, nowMs - 90 * 24 * 60 * 60 * 1000, nowMs);
@@ -450,11 +470,11 @@ function _esmRenderChart(ccy) {
     const val = d.value, col = val >= 0 ? '#26a69a' : '#ef5350';
     const dateStr = typeof param.time === 'string' ? param.time : '';
     const endMs   = new Date(dateStr).getTime();
-    const winSc   = _esmScoreWindow(_esmCalData.events || [], ccy, endMs - 30*24*60*60*1000, endMs);
+    const winSc   = _esmScoreWindow(_esmCalData.events || [], ccy, endMs - 90*24*60*60*1000, endMs);
     const nTxt    = winSc ? `${winSc.total} events · ${winSc.beats}B / ${winSc.misses}M` : '';
 
     tip.innerHTML = `
-      <div style="font-size:9px;color:var(--text2,#787b86);margin-bottom:4px;">${dateStr} · 30d window</div>
+      <div style="font-size:9px;color:var(--text2,#787b86);margin-bottom:4px;">${dateStr} · 90d window · decay-weighted</div>
       <div style="font-size:13px;font-weight:700;color:${col}">${val >= 0 ? '+' : ''}${val.toFixed(1)}</div>
       ${nTxt ? `<div style="font-size:9px;color:var(--text3,#6b7280);margin-top:3px;">${nTxt}</div>` : ''}
     `;
@@ -593,7 +613,7 @@ async function openEconSurprisesModal(initialCcy) {
     <div id="esm-hd-left">
       <div>
         <div id="esm-title">${initFlag}Economic Surprises &middot; ${ccy}</div>
-        <div id="esm-sub">Actual vs consensus &middot; G8 &middot; 90d rolling window &middot; [&minus;100, +100]</div>
+        <div id="esm-sub">Actual vs consensus &middot; G8 &middot; 90d rolling &middot; decay-weighted (45d ½life) &middot; [&minus;100, +100]</div>
       </div>
     </div>
     <button id="esm-close" onclick="closeESModal()" aria-label="Close">&times;</button>
