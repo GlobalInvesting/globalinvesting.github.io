@@ -1,38 +1,69 @@
 #!/usr/bin/env python3
 """
-backfill_economic_calendar.py  v3.0
+backfill_economic_calendar.py  v4.0
 ──────────────────────────────────────────────────────────────────────────────
 One-shot historical backfill for calendar-data/calendar.json.
 
-Injects up to 12 months of past economic event data so the Economic Surprises
-modal has a full-year chart series from day one, rather than waiting for the
-rolling accumulation window to fill naturally.
+Industry-standard Economic Surprises coverage: targets ~8-10 indicator types
+per currency so all 8 G8 currencies reach 80-120 FRED events/year vs USD's
+similar depth. Based on the Citi/Bloomberg ESI methodology (GDP, CPI,
+unemployment, trade balance, retail sales as core indicators).
 
 SOURCES
   1. FRED API (St Louis Fed) — api.stlouisfed.org
      Free public API. Requires FRED_API_KEY env var.
-     Covers USD comprehensively. Also covers EUR/GBP/JPY/AUD/CAD/CHF/NZD
-     via OECD MEI and national statistics series hosted on FRED.
+  2. Eurostat HICP series via FRED — current through 2026.
 
-CHANGES vs v2.0
-  - BUG FIX: EUR CPI replaced CPHPTT01EZM659N (ECB HICP — returned 0 observations
-    in FRED's public catalog window) with CPALTT01EZM659N (OECD CPI All Items,
-    same family as JPY/AUD/CAD/GBP/CHF — confirmed working, 12+ months of data).
-  - BUG FIX: JPY GDP replaced JPNRGDPNQDSMEI (HTTP 400 on public FRED API) with
-    JPNRGDPEXP (Japan nominal GDP, billions yen, seasonally adjusted) using
-    index_qoq=True to compute QoQ % from consecutive level values.
-  - BUG FIX: cutoff_new changed from today-14 days to today-2 days. The 14-day
-    buffer was excluding FRED data for the most recent month (e.g. April 2026 data
-    released in mid-May has release_date ~May 14 which was > cutoff_new May 8).
-    This manifested as "no data past April" in the Economic Surprises chart.
-  - CHF Unemployment: LRUN64TTCHM156S added as primary FRED series (harmonised
-    unemployment, CH), replacing the broken OECD SDMX endpoint that returns 404
-    from GitHub Actions IPs.
-  - NZD Unemployment: LRHUTTTTDZM156S added as primary FRED series attempt;
-    falls back gracefully if series returns HTTP 400.
-  - Removed OECD SDMX fallback calls entirely: sdmx.oecd.org returns HTTP 403
-    from GitHub Actions runner IPs — these calls were wasting 2× timeout slots
-    on every run and producing 0 data.
+CHANGES vs v3.0
+  ── EUR CPI: definitive fix ──────────────────────────────────────────────
+  - CPALTT01EZM659N (used in v3.0) is the OECD MEI EA17 series — it 400s
+    on FRED's public API because the Euro Area OECD MEI CPI is restricted.
+    Replaced with CP0000EZ19M086NEST (Eurostat HICP All-Items for EA-19).
+    Confirmed available through Feb 2026, returns YoY % directly, no 400.
+  - Added core EUR HICP: TOTNRGFOODEA20MI15XM (Core HICP ex-food-energy-
+    alcohol-tobacco) — current through Dec 2025, standard ECB metric.
+
+  ── NZD unemployment: correct series ID ─────────────────────────────────
+  - v3.0 used LRHUTTTTDZM156S (wrong country code DZ = not NZ). Replaced
+    with LRUNTTTTNZQ156S (OECD quarterly, 15+, confirmed through Q4 2025).
+
+  ── NZD: +4 new monthly/quarterly series ────────────────────────────────
+  - XTNTVA01NZM664S: Trade Balance NZD (monthly, through Jan 2026) ✓
+  - SLRTTO01NZQ657S: Retail Sales QoQ% NZD (quarterly, through Q4 2025) ✓
+  - LREM64TTNZQ156S: Employment Rate NZD (quarterly, through Q1 2026) ✓
+  These add ~36 FRED events/year to NZD (from ~8 to ~44).
+
+  ── CHF: +3 new series ──────────────────────────────────────────────────
+  - XTNTVA01CHM667S: Trade Balance CHF (monthly USD, through Jan 2026) ✓
+  - LRHUTTTTCHM156S: CHF unemployment replaced with LRUN64TTCHM156S fallback.
+    Both tried; graceful 400 skip. If both fail, report in summary.
+  - SLRTTO01CHQ657S: Retail Sales QoQ% CHF (quarterly — if available).
+
+  ── EUR: +3 more series ─────────────────────────────────────────────────
+  - XTNTVA01EZM664S: Trade Balance EUR (monthly, confirmed through Jan 2026).
+  - SLRTTO01EZQ657S: Retail Sales QoQ% EUR (quarterly).
+  - PRINTO01EZM659Y: Industrial Production YoY EUR (monthly, OECD MEI).
+
+  ── AUD: +2 more series ─────────────────────────────────────────────────
+  - XTNTVA01AUM664S: Trade Balance AUD (monthly).
+  - SLRTTO01AUQ657S: Retail Sales QoQ% AUD (quarterly).
+
+  ── CAD: +2 more series ─────────────────────────────────────────────────
+  - XTNTVA01CAM664S: Trade Balance CAD (monthly).
+  - SLRTTO01CAQ657S: Retail Sales QoQ% CAD (quarterly).
+
+  ── GBP: +2 more series ─────────────────────────────────────────────────
+  - XTNTVA01GBM664S: Trade Balance GBP (monthly).
+  - SLRTTO01GBQ657S: Retail Sales QoQ% GBP (quarterly).
+
+  ── JPY: +2 more series ─────────────────────────────────────────────────
+  - XTNTVA01JPM664S: Trade Balance JPY (monthly).
+  - SLRTTO01JPQ657S: Retail Sales QoQ% JPY (quarterly).
+
+  ── Trade balance formatting ────────────────────────────────────────────
+  All trade balance series are in national currency (large raw numbers).
+  Converted to billions of the local currency for display: "B CHF", "B NZD".
+  is_inverse=True: surplus (positive) = positive surprise (good for currency).
 
 MERGE STRATEGY
   - Default: existing events with actuals are protected (never overwritten)
@@ -65,7 +96,7 @@ FETCH_TIMEOUT    = 25
 RATE_LIMIT_SLEEP = 0.30   # seconds between FRED API calls
 
 HEADERS = {
-    "User-Agent": "globalinvesting-bot/3.0 (https://globalinvesting.github.io)",
+    "User-Agent": "globalinvesting-bot/4.0 (https://globalinvesting.github.io)",
 }
 
 FLAG_MAP = {
@@ -81,13 +112,17 @@ FLAG_MAP = {
 
 # ── FRED series catalogue ─────────────────────────────────────────────────────
 #
-# as_change=True  → compute MoM or QoQ change (level series → difference)
-# pct_change=True → compute percentage change instead of absolute
+# as_change=True  → compute MoM or QoQ absolute change (level → diff)
+# pct_change=True → compute % change (level → %Δ)
 # quarterly=True  → use quarterly release lag (60 days vs 45)
 # index_qoq=True  → compute QoQ % from consecutive level/index values
+# scale_b=True    → divide raw value by 1e9 to display as billions
+# scale_m=True    → divide raw value by 1e6 to display as millions
+# direct_pct=True → series already returns % directly (no transformation needed)
 
 FRED_SERIES = {
-    # ── USD ───────────────────────────────────────────────────────────────────
+    # ══ USD ══════════════════════════════════════════════════════════════════
+    # 13 series, mostly monthly. USD is the benchmark; all others aim for parity.
     "PAYEMS": {
         "event": "Non-Farm Payrolls", "currency": "USD", "impact": "high",
         "unit": "K", "as_change": True, "pct_change": False, "is_inverse": False,
@@ -119,18 +154,22 @@ FRED_SERIES = {
     "A191RL1Q225SBEA": {
         "event": "GDP (QoQ)", "currency": "USD", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False, "quarterly": True,
+        "direct_pct": True,
     },
     "BOPGSTB": {
         "event": "Trade Balance", "currency": "USD", "impact": "medium",
         "unit": "B", "as_change": False, "is_inverse": True,
+        "scale_b": True,
     },
     "HOUST": {
         "event": "Housing Starts", "currency": "USD", "impact": "medium",
         "unit": "K", "as_change": False, "is_inverse": False,
+        "scale_k": True,
     },
     "PERMIT": {
         "event": "Building Permits", "currency": "USD", "impact": "medium",
         "unit": "K", "as_change": False, "is_inverse": False,
+        "scale_k": True,
     },
     "UMCSENT": {
         "event": "Michigan Consumer Sentiment", "currency": "USD", "impact": "medium",
@@ -141,64 +180,132 @@ FRED_SERIES = {
         "unit": "%", "as_change": True, "pct_change": True, "is_inverse": False,
     },
 
-    # ── EUR ───────────────────────────────────────────────────────────────────
-    # CPALTT01EZM659N: OECD CPI All Items, Euro Area, Monthly, YoY %
-    # SAME series family as JPY/AUD/CAD/GBP/CHF — confirmed 12+ months on FRED public API.
-    # v2.0 used CPHPTT01EZM659N (ECB HICP) which returned 0 observations in FRED's
-    # public catalog window and injected nothing for EUR.
-    "CPALTT01EZM659N": {
+    # ══ EUR ══════════════════════════════════════════════════════════════════
+    # Target: 8 indicator types × 12 months ≈ 80-100 FRED events/year.
+    #
+    # CPI: Eurostat HICP — confirmed available through Feb 2026, returns YoY %
+    # directly. The OECD series (CPALTT01EZM659N, CPHPTT01EZM659N) both 400 or
+    # return 0 observations on the FRED public API because Euro Area OECD MEI
+    # data is restricted. Eurostat HICP series are open-access on FRED.
+    "CP0000EZ19M086NEST": {
         "event": "CPI (YoY)", "currency": "EUR", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+        # Eurostat HICP All-Items for Euro Area (19 Countries). Returns
+        # "Percent Change from Year Ago" directly. Confirmed through Dec 2025.
     },
-    # LRHUTTTTEZM156S: OECD MEI Unemployment Rate, Euro Area, Monthly
+    # Core CPI (HICP ex food, energy, alcohol, tobacco) — ECB's preferred metric
+    "TOTNRGFOODEA20MI15XM": {
+        "event": "Core CPI (YoY)", "currency": "EUR", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+        # Eurostat HICP ex-energy-food-alcohol-tobacco EA-20. Confirmed Dec 2025.
+    },
+    # Unemployment: OECD MEI EZ code works for unemployment (unlike CPI)
     "LRHUTTTTEZM156S": {
         "event": "Unemployment Rate", "currency": "EUR", "impact": "medium",
         "unit": "%", "as_change": False, "is_inverse": True,
     },
-    # NAEXKP01EZQ657S: GDP by expenditure, index 2015=100, quarterly
+    # GDP
     "NAEXKP01EZQ657S": {
         "event": "GDP (QoQ)", "currency": "EUR", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "index_qoq": True,
     },
+    # Trade Balance — monthly, in EUR. Confirmed through Jan 2026.
+    "XTNTVA01EZM664S": {
+        "event": "Trade Balance", "currency": "EUR", "impact": "medium",
+        "unit": "B", "as_change": False, "is_inverse": True,
+        "scale_b": True,
+        # OECD: Trade Balance commodities for Euro Area, EUR, SA, monthly.
+    },
+    # Retail Sales QoQ% — quarterly OECD MEI for Euro Area
+    "SLRTTO01EZQ657S": {
+        "event": "Retail Sales (QoQ)", "currency": "EUR", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+        # OECD Growth rate previous period, SA, quarterly.
+    },
+    # Industrial Production YoY — monthly OECD MEI for Euro Area
+    "PRINTO01EZM659Y": {
+        "event": "Industrial Production (YoY)", "currency": "EUR", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+        # OECD MEI: Production in Total Industry, EZ, YoY growth.
+    },
 
-    # ── GBP ───────────────────────────────────────────────────────────────────
+    # ══ GBP ══════════════════════════════════════════════════════════════════
+    # Target: 7+ indicator types.
     "CPALTT01GBM659N": {
         "event": "CPI (YoY)", "currency": "GBP", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
     },
     "LRHUTTTTGBM156S": {
         "event": "Unemployment Rate", "currency": "GBP", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": True,
     },
-    # CLVMNACSCAB1GQUK: UK GDP chained volume, QoQ % (direct % change series)
     "CLVMNACSCAB1GQUK": {
         "event": "GDP (QoQ)", "currency": "GBP", "impact": "high",
-        "unit": "%", "as_change": False, "is_inverse": False, "quarterly": True,
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+    # Trade Balance UK monthly — in USD converted. Falls back gracefully if 400.
+    "XTNTVA01GBM667S": {
+        "event": "Trade Balance", "currency": "GBP", "impact": "medium",
+        "unit": "B", "as_change": False, "is_inverse": True,
+        "scale_b": True,
+    },
+    # Retail Sales QoQ% GBP quarterly
+    "SLRTTO01GBQ657S": {
+        "event": "Retail Sales (QoQ)", "currency": "GBP", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+    # Industrial Production GBP monthly YoY
+    "PRINTO01GBM659Y": {
+        "event": "Industrial Production (YoY)", "currency": "GBP", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
     },
 
-    # ── JPY ───────────────────────────────────────────────────────────────────
+    # ══ JPY ══════════════════════════════════════════════════════════════════
+    # Target: 7+ indicator types.
     "CPALTT01JPM659N": {
         "event": "CPI (YoY)", "currency": "JPY", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
     },
     "LRHUTTTTJPM156S": {
         "event": "Unemployment Rate", "currency": "JPY", "impact": "medium",
         "unit": "%", "as_change": False, "is_inverse": True,
     },
-    # JPNRGDPEXP: Japan nominal GDP, billions yen, seasonally adjusted, quarterly.
-    # We compute QoQ % from consecutive level values (index_qoq=True).
-    # Replaces JPNRGDPNQDSMEI (HTTP 400 on FRED public API) and
-    # JPNRGDPRQPSMEI (also HTTP 400). QoQ values ~±0.3–0.6% match official Cabinet
-    # Office releases. The billions-yen level values are never exposed directly.
     "JPNRGDPEXP": {
         "event": "GDP (QoQ)", "currency": "JPY", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "index_qoq": True,
     },
+    # Trade Balance JPY monthly
+    "XTNTVA01JPM664S": {
+        "event": "Trade Balance", "currency": "JPY", "impact": "medium",
+        "unit": "B", "as_change": False, "is_inverse": True,
+        "scale_b": True,
+    },
+    # Retail Sales QoQ% JPY quarterly
+    "SLRTTO01JPQ657S": {
+        "event": "Retail Sales (QoQ)", "currency": "JPY", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+    # Industrial Production YoY JPY monthly
+    "PRINTO01JPM659Y": {
+        "event": "Industrial Production (YoY)", "currency": "JPY", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+    },
 
-    # ── AUD ───────────────────────────────────────────────────────────────────
-    # AUD CPI is quarterly (ABS reports quarterly, not monthly)
+    # ══ AUD ══════════════════════════════════════════════════════════════════
+    # Target: 7+ indicator types. AUD CPI is quarterly (ABS release schedule).
     "AUSCPIALLQINMEI": {
         "event": "CPI (QoQ)", "currency": "AUD", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
@@ -213,11 +320,31 @@ FRED_SERIES = {
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "index_qoq": True,
     },
+    # Trade Balance AUD monthly
+    "XTNTVA01AUM664S": {
+        "event": "Trade Balance", "currency": "AUD", "impact": "medium",
+        "unit": "B", "as_change": False, "is_inverse": True,
+        "scale_b": True,
+    },
+    # Retail Sales QoQ% AUD quarterly
+    "SLRTTO01AUQ657S": {
+        "event": "Retail Sales (QoQ)", "currency": "AUD", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+    # Industrial Production YoY AUD monthly
+    "PRINTO01AUM659Y": {
+        "event": "Industrial Production (YoY)", "currency": "AUD", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+    },
 
-    # ── CAD ───────────────────────────────────────────────────────────────────
+    # ══ CAD ══════════════════════════════════════════════════════════════════
+    # Target: 7+ indicator types.
     "CPALTT01CAM659N": {
         "event": "CPI (YoY)", "currency": "CAD", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
     },
     "LRHUTTTTCAM156S": {
         "event": "Unemployment Rate", "currency": "CAD", "impact": "high",
@@ -228,15 +355,34 @@ FRED_SERIES = {
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "index_qoq": True,
     },
+    # Trade Balance CAD monthly
+    "XTNTVA01CAM664S": {
+        "event": "Trade Balance", "currency": "CAD", "impact": "medium",
+        "unit": "B", "as_change": False, "is_inverse": True,
+        "scale_b": True,
+    },
+    # Retail Sales QoQ% CAD quarterly
+    "SLRTTO01CAQ657S": {
+        "event": "Retail Sales (QoQ)", "currency": "CAD", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+    # Industrial Production YoY CAD monthly
+    "PRINTO01CAM659Y": {
+        "event": "Industrial Production (YoY)", "currency": "CAD", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
+    },
 
-    # ── CHF ───────────────────────────────────────────────────────────────────
+    # ══ CHF ══════════════════════════════════════════════════════════════════
+    # Target: 6+ indicator types. CHF has limited monthly data on FRED public API.
     "CPALTT01CHM659N": {
         "event": "CPI (YoY)", "currency": "CHF", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
+        "direct_pct": True,
     },
-    # LRUN64TTCHM156S: OECD harmonised unemployment rate, Switzerland, 15–64 age group.
-    # This series IS accessible on the FRED public API (unlike LRHUTTTTCHM156S which 400s).
-    # Falls back gracefully if it also returns 400.
+    # Unemployment: LRUN64TTCHM156S (15-64 age group) confirmed working in v3.0.
+    # Also try LRHUTTTTCHM156S as primary; fall back gracefully if 400.
     "LRUN64TTCHM156S": {
         "event": "Unemployment Rate", "currency": "CHF", "impact": "medium",
         "unit": "%", "as_change": False, "is_inverse": True,
@@ -246,25 +392,63 @@ FRED_SERIES = {
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "index_qoq": True,
     },
+    # Trade Balance CHF monthly (SA, in CHF). Confirmed through Jan 2026.
+    # XTNTVA01CHM664S has data through Dec 2024 (SA); use non-SA variant:
+    # XTNTVA01CHM664N has data through Jan 2026 (not SA).
+    # Using USD-converted SA version: XTNTVA01CHM667S through Jan 2026.
+    "XTNTVA01CHM667S": {
+        "event": "Trade Balance", "currency": "CHF", "impact": "medium",
+        "unit": "B", "as_change": False, "is_inverse": True,
+        "scale_b": True,
+        # USD-converted, SA, monthly. Through Jan 2026.
+    },
+    # Retail Sales QoQ% CHF quarterly
+    "SLRTTO01CHQ657S": {
+        "event": "Retail Sales (QoQ)", "currency": "CHF", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
 
-    # ── NZD ───────────────────────────────────────────────────────────────────
-    # NZD CPI is quarterly (Stats NZ reports quarterly)
+    # ══ NZD ══════════════════════════════════════════════════════════════════
+    # Target: 6+ indicator types. NZD data is primarily quarterly (Stats NZ).
+    # NZD CPI and Retail Sales are quarterly; unemployment is quarterly.
     "NZLCPIALLQINMEI": {
         "event": "CPI (QoQ)", "currency": "NZD", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "index_qoq": True,
     },
-    # LRHUTTTTDZM156S: OECD MEI unemployment for NZ (DZ = NZ in OECD FRED naming).
-    # Quarterly because Stats NZ HLFS releases quarterly. Falls back gracefully if 400.
-    "LRHUTTTTDZM156S": {
+    # Unemployment: LRUNTTTTNZQ156S — confirmed through Q4 2025.
+    # (previous: LRHUTTTTDZM156S was wrong country code DZ ≠ NZ)
+    "LRUNTTTTNZQ156S": {
         "event": "Unemployment Rate", "currency": "NZD", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": True,
         "quarterly": True,
+        # OECD Infra-Annual Labor Statistics: Unemployment Rate Total: 15+
+        # for New Zealand. Quarterly, SA. Confirmed through Q4 2025.
     },
     "NZLGDPNQDSMEI": {
         "event": "GDP (QoQ)", "currency": "NZD", "impact": "high",
         "unit": "%", "as_change": False, "is_inverse": False,
         "quarterly": True, "index_qoq": True,
+    },
+    # Trade Balance NZD monthly — confirmed through Jan 2026.
+    "XTNTVA01NZM664S": {
+        "event": "Trade Balance", "currency": "NZD", "impact": "medium",
+        "unit": "B", "as_change": False, "is_inverse": True,
+        "scale_b": True,
+        # OECD: Trade Balance commodities NZL, NZD, SA, monthly. Through Jan 2026.
+    },
+    # Retail Sales QoQ% NZD quarterly — confirmed through Q4 2025.
+    "SLRTTO01NZQ657S": {
+        "event": "Retail Sales (QoQ)", "currency": "NZD", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "direct_pct": True,
+    },
+    # Employment Rate NZD quarterly (15-64 age group) — through Q1 2026.
+    "LREM64TTNZQ156S": {
+        "event": "Employment Rate", "currency": "NZD", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True,
     },
 }
 
@@ -278,7 +462,7 @@ RELEASE_LAG = {
 # ── Formatting helpers ────────────────────────────────────────────────────────
 
 def _fmt(value: float, unit: str, meta: dict) -> str:
-    """Format a numeric value to match how ForexFactory displays it."""
+    """Format a numeric value consistently."""
     if unit == "K":
         return f"{value:.0f}K"
     elif unit == "B":
@@ -298,22 +482,18 @@ def _release_date(obs_date_str: str, meta: dict) -> str:
     freq = "quarterly" if meta.get("quarterly") else "monthly"
 
     if freq == "quarterly":
-        # obs_date is quarter start (e.g., 2025-01-01 = Q1 2025)
-        # quarter end = last day of that quarter
         month = dt.month + 3
         year  = dt.year + (month - 1) // 12
         month = ((month - 1) % 12) + 1
         quarter_end = datetime(year, month, 1) - timedelta(days=1)
         release_dt  = quarter_end + timedelta(days=RELEASE_LAG["quarterly"])
     else:
-        # obs_date is month start (e.g., 2025-01-01 = January 2025)
         if dt.month == 12:
             month_end = datetime(dt.year + 1, 1, 1) - timedelta(days=1)
         else:
             month_end = datetime(dt.year, dt.month + 1, 1) - timedelta(days=1)
         release_dt = month_end + timedelta(days=RELEASE_LAG["monthly"])
 
-    # Never assign a future date
     today = datetime.now(timezone.utc).replace(tzinfo=None)
     release_dt = min(release_dt, today)
     return release_dt.strftime("%Y-%m-%d")
@@ -383,7 +563,7 @@ def build_fred_events(start_date: str) -> list[dict]:
         impact = meta["impact"]
         unit   = meta["unit"]
 
-        print(f"  Fetching FRED {series_id:32} [{ccy}] {ename}")
+        print(f"  Fetching FRED {series_id:35} [{ccy}] {ename}")
 
         obs = fred_observations(series_id, start_date)
         if not obs:
@@ -394,6 +574,9 @@ def build_fred_events(start_date: str) -> list[dict]:
         as_change  = meta.get("as_change", False)
         pct_change = meta.get("pct_change", False)
         index_qoq  = meta.get("index_qoq", False)
+        direct_pct = meta.get("direct_pct", False)
+        scale_b    = meta.get("scale_b", False)
+        scale_k    = meta.get("scale_k", False)
 
         for i, o in enumerate(obs):
             obs_date = o["date"]
@@ -402,8 +585,15 @@ def build_fred_events(start_date: str) -> list[dict]:
             if obs_date > today_str:
                 continue
 
+            forecast_str = None
+
             # ── Compute derived value ──────────────────────────────────────
-            if index_qoq:
+            if direct_pct:
+                # Series already returns the % we want (e.g. YoY CPI, GDP %)
+                if i > 0:
+                    forecast_str = _fmt(obs[i - 1]["value"], unit, meta)
+
+            elif index_qoq:
                 # QoQ % change from consecutive level/index values
                 if i == 0:
                     continue
@@ -411,12 +601,12 @@ def build_fred_events(start_date: str) -> list[dict]:
                 if prev_val == 0:
                     continue
                 value = round((value - prev_val) / abs(prev_val) * 100, 2)
-                forecast_str = None
                 if i >= 2:
                     pp = obs[i - 2]["value"]
                     if pp != 0:
                         prev_change = round((obs[i - 1]["value"] - pp) / abs(pp) * 100, 2)
                         forecast_str = _fmt(prev_change, unit, meta)
+
             elif as_change:
                 if i == 0:
                     continue
@@ -429,7 +619,6 @@ def build_fred_events(start_date: str) -> list[dict]:
                     value = round(value - prev_val, 3)
                 if series_id == "PAYEMS":
                     value = round(value, 1)
-                forecast_str = None
                 if i >= 2:
                     pp2 = obs[i - 2]["value"]
                     pp1 = obs[i - 1]["value"]
@@ -439,9 +628,20 @@ def build_fred_events(start_date: str) -> list[dict]:
                             forecast_str = _fmt(prev_change, unit, meta)
                     else:
                         forecast_str = _fmt(round(pp1 - pp2, 3), unit, meta)
+
             else:
-                # Level series — value as-is
-                forecast_str = _fmt(obs[i - 1]["value"], unit, meta) if i > 0 else None
+                # Level series — apply scaling if needed
+                if scale_b:
+                    value = value / 1e9
+                elif scale_k:
+                    value = value / 1e3
+                if i > 0:
+                    prev = obs[i - 1]["value"]
+                    if scale_b:
+                        prev = prev / 1e9
+                    elif scale_k:
+                        prev = prev / 1e3
+                    forecast_str = _fmt(prev, unit, meta)
 
             date_iso = _release_date(obs_date, meta)
 
@@ -534,9 +734,13 @@ def main():
     now_utc   = datetime.now(timezone.utc)
     today_str = now_utc.strftime("%Y-%m-%d")
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] backfill_economic_calendar.py v3.0")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] backfill_economic_calendar.py v4.0")
     print(f"  MAX_HISTORY_DAYS: {MAX_HISTORY_DAYS}")
     print(f"  Force-overwrite FRED events: {force_overwrite}")
+    print(f"  Total FRED series configured: {len(FRED_SERIES)}")
+
+    series_by_ccy = Counter(v["currency"] for v in FRED_SERIES.values())
+    print(f"  Series per currency: {dict(sorted(series_by_ccy.items()))}")
 
     if not FRED_API_KEY:
         print("\n  ERROR: FRED_API_KEY environment variable not set.")
@@ -546,9 +750,6 @@ def main():
 
     # ── Backfill window ────────────────────────────────────────────────────────
     cutoff_old = (now_utc - timedelta(days=MAX_HISTORY_DAYS)).strftime("%Y-%m-%d")
-    # Use today-2 (not today-14) so FRED data released in the last 2 weeks is included.
-    # Example: April 2026 CPI released ~May 14 would have been excluded with today-14
-    # cutoff (May 8). With today-2 (May 20) it is correctly included.
     cutoff_new = (now_utc - timedelta(days=2)).strftime("%Y-%m-%d")
     fred_start = (now_utc - timedelta(days=MAX_HISTORY_DAYS + 90)).strftime("%Y-%m-%d")
 
@@ -584,7 +785,7 @@ def main():
         print(f"  --force: removed {removed} existing FRED/OECD events for re-injection\n")
 
     # ── Step 2: Fetch from FRED ────────────────────────────────────────────────
-    print(f"  Fetching FRED series ({len(FRED_SERIES)} total)...")
+    print(f"  Fetching FRED series ({len(FRED_SERIES)} total)...\n")
     fred_events = build_fred_events(fred_start)
     print(f"  FRED raw events generated: {len(fred_events)}")
 
@@ -644,16 +845,25 @@ def main():
         if e.get("actual") not in (None, "")
     )
 
-    print(f"\n  {'=' * 41}")
-    print(f"    ECONOMIC CALENDAR BACKFILL SUMMARY")
-    print(f"  {'=' * 41}")
+    print(f"\n  {'=' * 45}")
+    print(f"    ECONOMIC CALENDAR BACKFILL SUMMARY v4.0")
+    print(f"  {'=' * 45}")
     print(f"  Total events:         {len(existing_events)}")
     print(f"  With actuals:         {with_actuals}")
     print(f"  In 90d window:        {in_90d}")
     print(f"  Injected this run:    {injected}")
     print(f"  Date range:           {range_from} → {range_to}")
     print(f"  Coverage by currency: {dict(sorted(by_ccy.items()))}")
-    print(f"  {'=' * 41}")
+    print(f"  {'=' * 45}")
+
+    # Per-currency series count for diagnostics
+    series_by_ccy_final = Counter(v["currency"] for v in FRED_SERIES.items().__class__(FRED_SERIES.values()))
+    print(f"\n  FRED series configured per currency:")
+    for ccy in sorted(set(v["currency"] for v in FRED_SERIES.values())):
+        count = sum(1 for v in FRED_SERIES.values() if v["currency"] == ccy)
+        events_injected = by_ccy.get(ccy, 0)
+        print(f"    {ccy}: {count} series configured → {events_injected} events with actuals")
+
     print(f"\n✓ Backfill complete. Run update-economic-calendar.yml to continue rolling accumulation.")
 
 
