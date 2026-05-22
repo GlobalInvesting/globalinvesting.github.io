@@ -1,0 +1,122 @@
+name: Backfill Economic Calendar (12 months)
+
+# One-shot historical backfill for calendar-data/calendar.json.
+#
+# Injects up to 12 months of past G8 macro releases via FRED API so the
+# Economic Surprises modal has a full-year chart series from day one.
+#
+# HOW TO USE
+#   Actions → "Backfill Economic Calendar (12 months)" → Run workflow → Run workflow
+#   Requires FRED_API_KEY secret (Settings → Secrets → Actions).
+#   Register for a free key at: https://fred.stlouisfed.org/docs/api/api_key.html
+#
+# SCHEDULE
+#   workflow_dispatch only. Not scheduled — run once to seed history.
+#   The rolling update-economic-calendar.yml continues accumulating data after.
+#
+# WHAT IT DOES
+#   Reads calendar-data/calendar.json, injects FRED historical releases
+#   for dates not already present, writes back. Existing events with actuals
+#   are never overwritten (merge strategy matches fetch_economic_calendar.py).
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: backfill-economic-calendar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git fetch origin main && git rebase origin/main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Run backfill
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/backfill_economic_calendar.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================="
+          echo "    ECONOMIC CALENDAR BACKFILL SUMMARY"
+          echo "========================================="
+          if [ -f "calendar-data/calendar.json" ]; then
+            python3 -c "
+          import json
+          from datetime import datetime, timezone, timedelta
+          with open('calendar-data/calendar.json') as f:
+              cal = json.load(f)
+          events = cal.get('events', [])
+          cutoff_90 = (datetime.now(timezone.utc) - timedelta(days=90)).strftime('%Y-%m-%d')
+          all_actuals  = [e for e in events if e.get('actual')]
+          in_90d       = [e for e in all_actuals if e.get('dateISO','') >= cutoff_90]
+          fred_events  = [e for e in events if e.get('source') == 'FRED']
+          all_dates    = [e['dateISO'] for e in events if e.get('dateISO')]
+          print(f'  Total events:         {len(events)}')
+          print(f'  With actuals:         {len(all_actuals)}')
+          print(f'  In 90d window:        {len(in_90d)}')
+          print(f'  FRED injected:        {len(fred_events)}')
+          if all_dates:
+              print(f'  Date range:           {min(all_dates)} → {max(all_dates)}')
+          "
+          else
+            echo "  calendar.json not found — backfill may have failed"
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp calendar-data/calendar.json /tmp/calendar_backfilled.json
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+          STATS=$(python3 -c "
+          import json
+          c = json.load(open('/tmp/calendar_backfilled.json'))
+          fred = sum(1 for e in c['events'] if e.get('source') == 'FRED')
+          total = len(c['events'])
+          print(f'{fred} FRED events injected, {total} total')
+          " 2>/dev/null || echo "backfill complete")
+
+          for i in 1 2 3 4 5; do
+            echo "--- Push attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p calendar-data
+            cp /tmp/calendar_backfilled.json calendar-data/calendar.json
+            git add calendar-data/calendar.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — nothing to commit."
+              exit 0
+            fi
+            git commit -m "Economic calendar backfill ${TIMESTAMP} — ${STATS}"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted."
+          exit 0
