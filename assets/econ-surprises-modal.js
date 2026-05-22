@@ -231,6 +231,10 @@ let _esmChart     = null;
 let _esmCalData   = null;
 let _esmActiveCcy = 'USD';
 
+// ── Time-decay constant (CESI convention, half-life 45d) ───────────────────────
+// w = e^(-λ·ageDays), λ = ln(2)/45. Mirrors DECAY_LAMBDA in dashboard.js exactly.
+const _ESM_DECAY_LAMBDA = Math.LN2 / 45;
+
 // ── Score helpers ─────────────────────────────────────────────────────
 // Decay-weighted scorer — mirrors dashboard.js renderEconSurprises() exactly.
 // w = e^(-_ESM_DECAY_LAMBDA · ageDays), anchored to endMs (window right edge).
