@@ -1,44 +1,30 @@
 {
-  "lastUpdate": "2026-05-22T00:57:53Z",
-  "generatedAt": "2026-05-22T00:57:53Z",
-  "fetchMode": "FRED backfill + ForexFactory rolling",
+  "lastUpdate": "2026-05-22T01:23:20Z",
+  "generatedAt": "2026-05-22T01:23:20Z",
+  "fetchMode": "FRED + OECD backfill + ForexFactory rolling",
   "timezoneNote": "All times UTC",
   "status": "ok",
-  "source": "FRED / ForexFactory",
+  "source": "FRED / OECD / ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-05-30",
   "rangeTo": "2026-05-22",
-  "totalEvents": 722,
+  "totalEvents": 718,
   "currencyCounts": {
-    "JPY": 66,
     "USD": 360,
     "AUD": 44,
     "CAD": 46,
     "CHF": 17,
     "GBP": 86,
+    "JPY": 62,
     "EUR": 94,
     "NZD": 9
   },
   "impactCounts": {
-    "high": 243,
-    "medium": 479
+    "high": 250,
+    "medium": 468
   },
   "events": [
-    {
-      "date": "30 May",
-      "dateISO": "2025-05-30",
-      "timeUTC": "12:30",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "GDP (QoQ)",
-      "impact": "high",
-      "actual": "591103.8%",
-      "forecast": null,
-      "previous": null,
-      "source": "FRED"
-    },
     {
       "date": "30 May",
       "dateISO": "2025-05-30",
@@ -147,8 +133,8 @@
       "event": "CPI (MoM)",
       "impact": "high",
       "actual": "0.2%",
-      "forecast": "319.8%",
-      "previous": "319.8%",
+      "forecast": "0.0%",
+      "previous": "0.0%",
       "source": "FRED"
     },
     {
@@ -161,8 +147,8 @@
       "event": "Core CPI (MoM)",
       "impact": "high",
       "actual": "0.2%",
-      "forecast": "325.7%",
-      "previous": "325.7%",
+      "forecast": "0.1%",
+      "previous": "0.1%",
       "source": "FRED"
     },
     {
@@ -175,8 +161,8 @@
       "event": "Core PCE Price Index (MoM)",
       "impact": "high",
       "actual": "0.2%",
-      "forecast": "125.3%",
-      "previous": "125.3%",
+      "forecast": "0.1%",
+      "previous": "0.1%",
       "source": "FRED"
     },
     {
@@ -217,8 +203,8 @@
       "event": "Non-Farm Payrolls",
       "impact": "high",
       "actual": "108K",
-      "forecast": "158377K",
-      "previous": "158377K",
+      "forecast": "67K",
+      "previous": "67K",
       "source": "FRED"
     },
     {
@@ -231,8 +217,8 @@
       "event": "PCE Price Index (MoM)",
       "impact": "high",
       "actual": "0.2%",
-      "forecast": "125.9%",
-      "previous": "125.9%",
+      "forecast": "0.0%",
+      "previous": "0.0%",
       "source": "FRED"
     },
     {
@@ -243,10 +229,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "-0.1%",
-      "forecast": "258.5%",
-      "previous": "258.5%",
+      "forecast": "-0.4%",
+      "previous": "-0.4%",
       "source": "FRED"
     },
     {
@@ -259,8 +245,8 @@
       "event": "Retail Sales (MoM)",
       "impact": "high",
       "actual": "-0.3%",
-      "forecast": "625420.0%",
-      "previous": "625420.0%",
+      "forecast": "1.4%",
+      "previous": "1.4%",
       "source": "FRED"
     },
     {
@@ -467,7 +453,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "0.1%",
       "forecast": "-0.1%",
       "previous": "-0.1%",
@@ -691,7 +677,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "0.7%",
       "forecast": "0.1%",
       "previous": "0.1%",
@@ -737,20 +723,6 @@
       "actual": "4.1%",
       "forecast": "4.3%",
       "previous": "4.3%",
-      "source": "FRED"
-    },
-    {
-      "date": "29 Aug",
-      "dateISO": "2025-08-29",
-      "timeUTC": "12:30",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "GDP (QoQ)",
-      "impact": "high",
-      "actual": "593119.6%",
-      "forecast": "591103.8%",
-      "previous": "591103.8%",
       "source": "FRED"
     },
     {
@@ -943,7 +915,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "0.7%",
       "forecast": "0.7%",
       "previous": "0.7%",
@@ -1167,7 +1139,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "-0.1%",
       "forecast": "0.7%",
       "previous": "0.7%",
@@ -1391,7 +1363,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "-0.0%",
       "forecast": "-0.1%",
       "previous": "-0.1%",
@@ -1437,20 +1409,6 @@
       "actual": "4.4%",
       "forecast": "4.3%",
       "previous": "4.3%",
-      "source": "FRED"
-    },
-    {
-      "date": "29 Nov",
-      "dateISO": "2025-11-29",
-      "timeUTC": "12:30",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "GDP (QoQ)",
-      "impact": "high",
-      "actual": "589441.3%",
-      "forecast": "593119.6%",
-      "previous": "593119.6%",
       "source": "FRED"
     },
     {
@@ -1615,7 +1573,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "-0.6%",
       "forecast": "-0.0%",
       "previous": "-0.0%",
@@ -1825,7 +1783,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "0.5%",
       "forecast": "-0.6%",
       "previous": "-0.6%",
@@ -2049,7 +2007,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "-0.2%",
       "forecast": "0.5%",
       "previous": "0.5%",
@@ -2876,20 +2834,6 @@
       "actual": "2.122%",
       "forecast": "",
       "previous": "2.249%"
-    },
-    {
-      "date": "1 Mar",
-      "dateISO": "2026-03-01",
-      "timeUTC": "12:30",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "GDP (QoQ)",
-      "impact": "high",
-      "actual": "590673.3%",
-      "forecast": "589441.3%",
-      "previous": "589441.3%",
-      "source": "FRED"
     },
     {
       "date": "1 Mar",
@@ -5121,7 +5065,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "0.8%",
       "forecast": "-0.2%",
       "previous": "-0.2%",
@@ -8997,7 +8941,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "2.4%",
       "forecast": "0.8%",
       "previous": "0.8%",
