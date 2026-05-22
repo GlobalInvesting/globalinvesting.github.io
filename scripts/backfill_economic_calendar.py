@@ -14,20 +14,22 @@ SOURCES
   1. FRED API (St Louis Fed) — api.stlouisfed.org
      Free public API. Requires FRED_API_KEY env var.
   2. Eurostat HICP series via FRED — current through 2026.
-  3. TradingEconomics public calendar API — api.tradingeconomics.com
-     Register free at finnhub.io — no credit card required.
-     Provides actual + consensus forecast in the same payload — enabling
-     true surprise calculation (actual - consensus) vs FRED's lagged proxy.
-     Covers PMI, Tankan, business/consumer confidence, and 30+ other
-     indicators per currency not available via FRED public API.
-     Rate-limited to 1 req/s; requests chunked by country/month.
+  3. Finnhub economic calendar API — finnhub.io
+     Free tier requires a free API key (register at finnhub.io, no CC needed).
+     Set FINNHUB_API_KEY env var. Rate limit: 60 req/min on free tier.
+     Returns actual + estimate (consensus) in the same payload — enabling
+     true surprise calculation (actual - consensus). Covers PMI, Tankan,
+     business/consumer confidence, Ivey PMI, ZEW, IFO, KOF, Claimant Count,
+     Tokyo CPI, Machine Orders and 30+ indicators not in FRED public API.
+     Country filter via ISO-2 code; chunked by 60-day windows.
 
-CHANGES vs v5.0
-  ── TradingEconomics second source (new in v6.0) ──────────────────────────
-  Replaced TradingEconomics (HTTP 410 Gone) with Finnhub economic calendar.
-  Added build_fh_events() which queries finnhub.io/api/v1/calendar/economic
-  with FINNHUB_API_KEY for all G8 countries. Events include actual + estimate
-  (consensus), enabling true surprise scores. Source tag "FH".
+CHANGES vs v6.0
+  ── TradingEconomics → Finnhub migration (v7.0) ──────────────────────────
+  TE guest:guest returned HTTP 410 (Gone) for all date-range calendar
+  requests — the endpoint was permanently removed for unauthenticated
+  access. Replaced with Finnhub economic calendar API (finnhub.io).
+  Free tier: 60 req/min, no CC required. Source tag "FH". Field mapping
+  is equivalent: actual + estimate (consensus) + prev per event.
 
   TE events added per currency (~events/year added vs v5.0):
     EUR: +IFO Business Climate (m), ZEW Economic Sentiment (m),
@@ -112,7 +114,7 @@ MERGE STRATEGY
 HOW TO RUN
   FRED_API_KEY=<key> python scripts/backfill_economic_calendar.py
   FRED_API_KEY=<key> python scripts/backfill_economic_calendar.py --force
-  # FINNHUB_API_KEY must be set as a repository secret.
+  # FINNHUB_API_KEY must be set as a repository secret (free at finnhub.io).
 """
 
 import json
@@ -128,6 +130,7 @@ import requests
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 FRED_API_KEY     = os.environ.get("FRED_API_KEY", "")
+FRED_API_KEY     = os.environ.get("FRED_API_KEY", "")
 FINNHUB_API_KEY  = os.environ.get("FINNHUB_API_KEY", "")
 FRED_BASE        = "https://api.stlouisfed.org/fred/series/observations"
 FH_BASE          = "https://finnhub.io/api/v1/calendar/economic"
@@ -135,27 +138,16 @@ OUTPUT_PATH      = "calendar-data/calendar.json"
 MAX_HISTORY_DAYS = 365
 FETCH_TIMEOUT    = 25
 RATE_LIMIT_SLEEP = 0.30   # seconds between FRED API calls
-FH_RATE_SLEEP    = 0.50   # seconds between Finnhub calls (well within 60 req/min)
+FH_RATE_SLEEP    = 0.50   # seconds between Finnhub calls (60 req/min free tier)
 
 HEADERS = {
     "User-Agent": "globalinvesting-bot/4.0 (https://globalinvesting.github.io)",
 }
 
-FLAG_MAP = {
-    "USD": "\U0001f1fa\U0001f1f8",
-    "EUR": "\U0001f1ea\U0001f1fa",
-    "GBP": "\U0001f1ec\U0001f1e7",
-    "JPY": "\U0001f1ef\U0001f1f5",
-    "AUD": "\U0001f1e6\U0001f1fa",
-    "CAD": "\U0001f1e8\U0001f1e6",
-    "CHF": "\U0001f1e8\U0001f1ed",
-    "NZD": "\U0001f1f3\U0001f1ff",
-}
-
 # ── Finnhub configuration ─────────────────────────────────────────────────────
 
-# ISO-2 country codes for Finnhub economic calendar.
-# Finnhub returns actual, previous, and estimate (consensus) per event.
+# ISO-2 country codes for Finnhub economic calendar endpoint.
+# Finnhub returns actual, prev, and estimate (consensus) per event.
 
 FH_COUNTRY_CCY = {
     "US": "USD",
@@ -169,57 +161,60 @@ FH_COUNTRY_CCY = {
 }
 
 # Indicators to INCLUDE from Finnhub (case-insensitive substring match on event name).
-# These are the indicators FRED does NOT cover well — PMI, surveys, flash estimates, etc.
-# FRED handles CPI, GDP, unemployment, trade, retail sales, industrial production.
+# These complement FRED — they are the survey/PMI/flash/confidence indicators
+# that FRED public API does not provide with actual+forecast in one payload.
 FH_INCLUDE_KEYWORDS = [
-    "pmi", "purchasing manager", "business confidence", "business climate",
-    "business activity", "ifo", "zew", "kof", "sentix",
+    "pmi", "purchasing manager",
+    "business confidence", "business climate", "business activity",
+    "ifo", "zew", "kof", "sentix",
     "consumer confidence", "consumer sentiment", "westpac", "nab business",
-    "tankan", "machine orders", "housing starts", "building approval",
-    "claimant count", "average earnings", "wage price", "labor price",
-    "ivey", "employment change",  # ADP covers USD, Ivey for CAD
-    "visitor arrivals", "current account",  # NZD/AUD
-    "tokyo cpi", "tokyo inflation",          # JPY flash indicator
+    "tankan",
+    "machine orders",
+    "housing starts", "building approval",
+    "claimant count",
+    "average earnings", "wage price", "labor price",
+    "ivey",
+    "adp employment",          # ADP for USD (FRED series is often stale)
+    "visitor arrivals",        # NZD high-frequency
+    "current account",         # NZD / AUD quarterly
+    "tokyo cpi", "tokyo inflation",   # JPY flash CPI
     "services pmi", "composite pmi", "manufacturing pmi",
     "flash gdp", "flash cpi", "flash inflation",
     "leading indicator", "economic sentiment",
 ]
 
-# Skip Finnhub events for indicators FRED already covers well
+# Skip Finnhub events whose name matches these — FRED covers them well
+# (list is checked AFTER include keywords, so "tokyo cpi" still passes)
 FH_SKIP_IF_COVERED = [
-    "cpi",  # BUT tokyo cpi is an exception — handled in include keywords first
     "inflation rate",
     "unemployment rate",
-    "gdp growth",
+    "gdp growth rate",
     "trade balance",
     "retail sales",
     "industrial production",
     "interest rate decision",
     "non farm payroll",
     "nonfarm payroll",
-    "payroll",
 ]
 
 
 def _fh_event_qualifies(event_name: str) -> bool:
     """Return True if this Finnhub event should be imported."""
     name_lc = event_name.lower()
-    # Check include list first (more specific)
     for kw in FH_INCLUDE_KEYWORDS:
         if kw in name_lc:
             return True
     return False
 
-
 def fh_fetch_country_window(iso2: str, start_date: str, end_date: str) -> list[dict]:
     """
     Fetch Finnhub economic calendar events for one country over a date window.
-    Returns list of raw Finnhub event dicts. Empty list on any error.
+    Returns list of raw Finnhub event dicts (filtered by country). Empty on error.
     """
     params = {
-        "from":   start_date,
-        "to":     end_date,
-        "token":  FINNHUB_API_KEY,
+        "from":  start_date,
+        "to":    end_date,
+        "token": FINNHUB_API_KEY,
     }
     try:
         r = requests.get(FH_BASE, params=params, headers=HEADERS, timeout=FETCH_TIMEOUT)
@@ -235,7 +230,6 @@ def fh_fetch_country_window(iso2: str, start_date: str, end_date: str) -> list[d
             return []
         data = r.json()
         events = data.get("economicCalendar", []) if isinstance(data, dict) else []
-        # Filter by country
         return [ev for ev in events if ev.get("country", "").upper() == iso2.upper()]
     except Exception as e:
         print(f"  WARNING: Finnhub {iso2}: {e}")
@@ -247,27 +241,28 @@ def fh_fetch_country_window(iso2: str, start_date: str, end_date: str) -> list[d
 def build_fh_events(start_date: str, end_date: str) -> list[dict]:
     """
     Fetch Finnhub economic calendar for all G8 currencies over the full
-    backfill window. Chunks requests into 60-day windows per country.
+    backfill window. Chunks requests into 60-day windows per country to
+    stay within Finnhub rate limits.
     Returns list of calendar.json-compatible event dicts with source='FH'.
     """
     from datetime import datetime as _dt, timedelta as _td
 
     if not FINNHUB_API_KEY:
         print("  WARNING: FINNHUB_API_KEY not set — skipping Finnhub fetch.")
-        print("           Register free at https://finnhub.io and add FINNHUB_API_KEY secret.")
+        print("           Register free at https://finnhub.io then add FINNHUB_API_KEY secret.")
         return []
 
-    print(f"\n  Fetching Finnhub events ({start_date} → {end_date})...")
+    print(f"\n  Fetching Finnhub events ({start_date} \u2192 {end_date})...")
 
     chunk_days = 60
     d_start = _dt.strptime(start_date, "%Y-%m-%d")
     d_end   = _dt.strptime(end_date,   "%Y-%m-%d")
 
     result: list[dict] = []
-    total_raw  = 0
-    total_kept = 0
+    total_raw       = 0
+    total_kept      = 0
     skipped_covered = 0
-    no_actual  = 0
+    no_actual       = 0
 
     for iso2, ccy in FH_COUNTRY_CCY.items():
         country_raw  = 0
@@ -280,14 +275,14 @@ def build_fh_events(start_date: str, end_date: str) -> list[dict]:
             for ev in raw:
                 event_name = ev.get("event", "") or ""
                 actual_raw = ev.get("actual")
-                # Finnhub uses None for unreleased events — skip
-                if actual_raw is None or actual_raw == "":
+                # Finnhub uses None for unreleased events
+                if actual_raw is None or str(actual_raw).strip() == "":
                     no_actual += 1
                     continue
                 if not _fh_event_qualifies(event_name):
                     skipped_covered += 1
                     continue
-                # Parse date
+                # Parse datetime
                 date_str = ev.get("time", "") or ""
                 try:
                     dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
@@ -298,23 +293,18 @@ def build_fh_events(start_date: str, end_date: str) -> list[dict]:
                     hour_utc = "00:00"
                 if not date_iso:
                     continue
-                # Impact → importance
-                impact = ev.get("impact", "low") or "low"
-                importance_map = {"high": 3, "medium": 2, "low": 1}
-                importance = importance_map.get(impact.lower(), 1)
-
-                actual_val   = str(actual_raw) if actual_raw is not None else None
-                forecast_val = str(ev.get("estimate", "")) or None
-                prev_val     = str(ev.get("prev", "")) or None
+                # impact → importance int
+                impact = (ev.get("impact") or "low").lower()
+                importance = {"high": 3, "medium": 2, "low": 1}.get(impact, 1)
 
                 result.append({
                     "currency":   ccy,
                     "event":      event_name,
                     "dateISO":    date_iso,
                     "hourUTC":    hour_utc,
-                    "actual":     actual_val,
-                    "forecast":   forecast_val,
-                    "previous":   prev_val,
+                    "actual":     str(actual_raw),
+                    "forecast":   str(ev.get("estimate", "") or "") or None,
+                    "previous":   str(ev.get("prev", "") or "") or None,
                     "importance": importance,
                     "source":     "FH",
                 })
@@ -324,12 +314,14 @@ def build_fh_events(start_date: str, end_date: str) -> list[dict]:
         total_raw  += country_raw
         total_kept += country_kept
         flag = FLAG_MAP.get(ccy, "")
-        print(f"    {flag} {iso2:<8} [{ccy}]  {country_raw:4d} raw → {country_kept:4d} kept")
+        print(f"    {flag} {iso2:<4} [{ccy}]  {country_raw:4d} raw \u2192 {country_kept:4d} kept")
 
-    print(f"  Finnhub fetch complete: {total_raw} raw events → {total_kept} kept "
+    print(f"  Finnhub fetch complete: {total_raw} raw events \u2192 {total_kept} kept "
           f"({skipped_covered} skipped by category, {no_actual} no actual)")
     return result
 
+
+# ── Load / save calendar.json ─────────────────────────────────────────────────
 
 def load_calendar() -> list[dict]:
     if not os.path.exists(OUTPUT_PATH):
@@ -395,7 +387,7 @@ def main():
 
     series_by_ccy = Counter(v["currency"] for v in FRED_SERIES.values())
     print(f"  Series per currency (FRED): {dict(sorted(series_by_ccy.items()))}")
-    print(f"  Finnhub: {len(FH_COUNTRY_CCY)} countries, API key: {'set' if FINNHUB_API_KEY else 'NOT SET — register free at finnhub.io'}")
+    print(f"  Finnhub: {len(FH_COUNTRY_CCY)} countries, key: {'set' if FINNHUB_API_KEY else 'NOT SET — register free at finnhub.io'}")
 
     if not FRED_API_KEY:
         print("\n  ERROR: FRED_API_KEY environment variable not set.")
