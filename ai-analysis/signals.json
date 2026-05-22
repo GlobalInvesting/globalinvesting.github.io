@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-05-22T03:31:47Z",
+  "generated_at": "2026-05-22T09:54:23Z",
   "signals": [
     {
-      "time": "03:31",
+      "time": "09:54",
       "priority": "critical",
-      "title": "GBP/AUD — G8 Bilateral Theme + RBA Pivot",
-      "text": "GBP/AUD G8 spread at 1.309% confirms a dominant bilateral theme as GBP outperforms (+0.552%) while AUD lags (-0.757%). AUD is under pressure following weak domestic labor data and headlines suggesting the RBA hike cycle is nearing its end. Despite the RBA 4.35% vs BoE 3.75% carry advantage for AUD, the 60bp premium is being offset by growth concerns. GBP/AUD at 1.8805.",
+      "title": "GBP/AUD — G8 Bilateral Theme + Carry Divergence",
+      "text": "GBP/AUD at 1.8826 — G8 scorecard identifies a critical bilateral theme with a 1.416% spread. GBP outperformance (+0.571%) vs AUD weakness (-0.846%) occurs despite a -60bp carry disadvantage (BoE 3.75% vs RBA 4.35%). AUD COT LF net long +55,794 (74.8%) suggests a crowded long liquidation is driving the underperformance. The bear flattener regime (2s10s +54.6bp) supports the higher-yielding USD/GBP complex over high-beta AUD.",
       "evidence": [
-        "GBP 1W avg: +0.552% (n=4)",
-        "AUD 1W avg: -0.757% (n=4)",
-        "G8 spread: 1.309%"
+        "GBP 1W avg: +0.571% (n=4)",
+        "AUD 1W avg: -0.846% (n=4)",
+        "G8 spread: 1.416%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "03:27",
-      "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry + Options",
-      "text": "USD/JPY at 159.04 remains supported by a +277bp SOFR-TONA carry advantage. While claims of a US-Iran draft agreement provide a temporary risk-on tailwind for the Nikkei (+2.29%), Middle East uncertainty continues to support USD on dips. Options market shows a moderate put skew (25d RR -1.32), signaling institutional hedging against BoJ intervention as price holds near the 160.00 threshold. Carry dominates while VIX remains at 16.8 (normal volatility).",
-      "evidence": [
-        "USD/JPY OIS Carry: +277bp",
-        "USD/JPY 25d RR: -1.32",
-        "VIX: 16.8"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "03:24",
+      "time": "09:51",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -19,437 (long% 22.3%) shows speculators heavily fading the currency despite a hawkish market bias for the RBNZ. With the RBNZ meeting on 27 May and a market bias for a hike, the crowded spec short position faces significant unwind risk if the central bank delivers. NZD/USD at 0.5873; a hawkish hold or hike targets a squeeze toward 0.6000.",
+      "text": "NZD/USD at 0.5858 — COT LF net short -19,437 (22.3% long) shows speculators heavily fading the RBNZ's hawkish bias. With the RBNZ meeting on 27 May and a market bias for a hike, the pair faces significant short-squeeze risk if the central bank delivers. USD/NZD carry at +150bp currently favors USD, but crowded spec shorts are vulnerable to a hawkish surprise.",
       "evidence": [
         "NZD COT LF net: -19,437",
-        "NZD long%: 22.3%",
-        "RBNZ Bias: Hike"
+        "RBNZ bias: Hike",
+        "NZD/USD: 0.5858"
       ],
       "_source": "gemini"
     },
     {
-      "time": "03:20",
+      "time": "09:49",
       "priority": "warning",
-      "title": "USD/CHF — Volatility Premium + Carry",
-      "text": "USD/CHF at 0.7868 exhibits an extreme Vol Risk Premium (VRP) of +6.1%, with IV at 13.0% vs HV30 of 6.9%. This suggests the options market is pricing in significantly higher volatility than recently realized, likely due to safe-haven CHF demand competing with the massive +375bp USD carry advantage. The bear flattener regime in US yields (2s10s +54.6bp) supports the USD leg, but the vol premium indicates high protection costs for further CHF weakness.",
+      "title": "EUR/USD — Positioning + Volatility Premium",
+      "text": "EUR/USD at 1.1608 — IV at 7.1% vs HV30 at 4.9% generates a +2.2% Vol Risk Premium, signaling elevated institutional hedging demand. 25d RR at -0.47 confirms a mild put skew as markets price downside protection. COT LF net short -8,151 aligns with the 175bp Fed-ECB carry advantage (Fed 3.75% vs ECB 2.00%), suggesting the path of least resistance remains lower toward 1.1550.",
       "evidence": [
-        "USD/CHF VRP: +6.1%",
-        "USD/CHF Carry: +375bp",
-        "US 2s10s: +54.6bp"
+        "VRP: +2.2%",
+        "Fed 3.75% vs ECB 2.00% — +175bp",
+        "EUR/USD: 1.1608"
       ],
       "_source": "gemini"
     },
     {
-      "time": "03:15",
-      "priority": "info",
-      "title": "EUR/USD — Positioning + Volatility",
-      "text": "EUR/USD at 1.1614 remains in a structural downtrend supported by a +157bp SOFR-€STR carry advantage for the USD. COT data shows specs are net short -8,151, aligning with the 1M trend (-1.08%). Elevated hedging demand is evident with a +2.2% VRP (IV 7.1% vs HV30 4.9%), while the 25d RR at -0.47 shows a mild put skew. Market is paying a premium for downside protection rather than chasing the move.",
+      "time": "09:45",
+      "priority": "warning",
+      "title": "USD/JPY — Carry + Intervention Risk",
+      "text": "USD/JPY at 159.12 — 300bp Fed-BoJ carry (Fed 3.75% vs BoJ 0.75%) sustains the bid despite JPY COT LF net short -70,605. 160.00 remains the critical watch level for BoJ verbal warnings or direct intervention. Options market is paying for downside protection with a -1.32 moderate put skew (25d RR), indicating institutional fear of a sharp reversal despite the carry advantage.",
       "evidence": [
-        "EUR/USD VRP: +2.2%",
-        "EUR COT LF net: -8,151",
-        "EUR/USD OIS Carry: +157bp"
+        "USD/JPY carry: +300bp",
+        "USDJPY 25d RR: -1.32",
+        "USD/JPY: 159.12"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "09:40",
+      "priority": "info",
+      "title": "GBP/USD — Volatility Premium + Options Skew",
+      "text": "GBP/USD at 1.3427 — IV 11.0% vs HV30 6.9% creates a significant +4.1% VRP, the highest in the G10 space. Despite GBP being the G8 weekly leader, the -0.95 moderate put skew in 25d RR suggests the options market is aggressively hedging against a reversal. Carry is neutral (Fed 3.75% vs BoE 3.75%), leaving the pair sensitive to US yield shifts.",
+      "evidence": [
+        "VRP: +4.1%",
+        "GBPUSD 25d RR: -0.95",
+        "GBP/USD: 1.3427"
       ],
       "_source": "gemini"
     }
