@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-backfill_economic_calendar.py  v1.0
+backfill_economic_calendar.py  v1.1
 ──────────────────────────────────────────────────────────────────────────────
 One-shot historical backfill for calendar-data/calendar.json.
 
@@ -181,22 +181,7 @@ FRED_SERIES = {
         "as_change": False,
         "is_inverse": True,
     },
-    "NAPM": {
-        "event":    "ISM Manufacturing PMI",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "",
-        "as_change": False,
-        "is_inverse": False,
-    },
-    "NMFCI": {
-        "event":    "ISM Services PMI",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "",
-        "as_change": False,
-        "is_inverse": False,
-    },
+
     "HOUST": {
         "event":    "Housing Starts",
         "currency": "USD",
@@ -299,24 +284,19 @@ FRED_SERIES = {
         "as_change": False,
         "is_inverse": True,
     },
-    "JPNRGDPEXP": {
+    "JPNRGDPRQPSMEI": {
         "event":    "GDP (QoQ)",
         "currency": "JPY",
         "impact":   "high",
         "unit":     "%",
-        "as_change": False,
+        "as_change": False,  # FRED already gives QoQ % growth rate
         "is_inverse": False,
         "quarterly": True,
     },
     # ── AUD ───────────────────────────────────────────────────────────────────
-    "CPALTT01AUM659N": {
-        "event":    "CPI (YoY)",
-        "currency": "AUD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
-    },
+    # AUD CPI monthly not available on FRED public API (CPALTT01AUM659N returns 400)
+    # Covered by rolling ForexFactory accumulation instead
+
     "LRHUTTTTAUM156S": {
         "event":    "Unemployment Rate",
         "currency": "AUD",
@@ -369,14 +349,9 @@ FRED_SERIES = {
         "as_change": False,
         "is_inverse": False,
     },
-    "LRHUTTTTCHM156S": {
-        "event":    "Unemployment Rate",
-        "currency": "CHF",
-        "impact":   "medium",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": True,
-    },
+    # CHF Unemployment Rate: LRHUTTTTCHM156S returns 400 on FRED public API
+    # Switzerland uses SECO unemployment which has limited FRED coverage
+
     "CHEGDPNQDSMEI": {
         "event":    "GDP (QoQ)",
         "currency": "CHF",
@@ -387,22 +362,10 @@ FRED_SERIES = {
         "quarterly": True,
     },
     # ── NZD ───────────────────────────────────────────────────────────────────
-    "CPALTT01NZM659N": {
-        "event":    "CPI (YoY)",
-        "currency": "NZD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
-    },
-    "LRHUTTTTDZM156S": {
-        "event":    "Unemployment Rate",
-        "currency": "NZD",
-        "impact":   "medium",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": True,
-    },
+    # NZD CPI monthly not available on FRED public API (CPALTT01NZM659N returns 400)
+
+    # NZD Unemployment Rate: LRHUTTTTDZM156S returns HTTP 400 on FRED public API
+
     "NZLGDPNQDSMEI": {
         "event":    "GDP (QoQ)",
         "currency": "NZD",
@@ -614,19 +577,19 @@ def build_fred_events(start_date: str) -> list[dict]:
             actual_str = _fmt(value, unit, meta)
 
             # Previous period value as forecast proxy
+            # For as_change series: forecast = previous period's computed change (needs i>=2)
+            # For level series: forecast = previous period's level (needs i>0)
             forecast_str = None
-            if i > 0:
-                prev_value = obs[i - 1]["value"]
-                if as_change and pct_change and i >= 2:
-                    pp = obs[i - 2]["value"]
-                    if pp != 0:
-                        prev_value = round((obs[i - 1]["value"] - pp) / abs(pp) * 100, 2)
-                    else:
-                        prev_value = None
-                elif as_change and not pct_change and i >= 2:
-                    prev_value = round(obs[i - 1]["value"] - obs[i - 2]["value"], 3)
-                if prev_value is not None:
-                    forecast_str = _fmt(prev_value, unit, meta)
+            if as_change and pct_change and i >= 2:
+                pp = obs[i - 2]["value"]
+                if pp != 0:
+                    prev_change = round((obs[i - 1]["value"] - pp) / abs(pp) * 100, 2)
+                    forecast_str = _fmt(prev_change, unit, meta)
+            elif as_change and not pct_change and i >= 2:
+                prev_change = round(obs[i - 1]["value"] - obs[i - 2]["value"], 3)
+                forecast_str = _fmt(prev_change, unit, meta)
+            elif not as_change and i > 0:
+                forecast_str = _fmt(obs[i - 1]["value"], unit, meta)
 
             try:
                 display_date = datetime.strptime(date_iso, "%Y-%m-%d").strftime("%-d %b")
