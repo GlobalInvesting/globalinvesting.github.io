@@ -35,16 +35,6 @@
   flex-shrink:0;background:var(--bg2,#1e222d);
 }
 #esm-hd-left { display:flex;align-items:center;gap:10px; }
-#esm-badge {
-  font-size:8px;font-weight:700;letter-spacing:.10em;
-  color:var(--blue,#4f7fff);text-transform:uppercase;
-  display:flex;align-items:center;gap:4px;
-  font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
-}
-#esm-badge::before {
-  content:'';width:5px;height:5px;border-radius:50%;
-  background:var(--blue,#4f7fff);flex-shrink:0;
-}
 #esm-title {
   font-size:14px;font-weight:600;color:var(--text,#d1d4dc);
   letter-spacing:-.01em;line-height:1.2;
@@ -97,7 +87,6 @@
 }
 .esm-tab:hover { color:var(--text,#d1d4dc); }
 .esm-tab.on { color:var(--text,#d1d4dc);border-bottom-color:var(--blue,#4f7fff); }
-.esm-tab .fi { font-size:11px;border-radius:2px;flex-shrink:0; }
 #esm-body {
   flex:1;min-height:0;overflow:hidden;
   display:flex;flex-direction:column;background:var(--bg,#131722);
@@ -603,7 +592,6 @@ async function openEconSurprisesModal(initialCcy) {
   <div id="esm-hd">
     <div id="esm-hd-left">
       <div>
-        <div id="esm-badge">CESI-STYLE INDEX</div>
         <div id="esm-title">${initFlag}Economic Surprises &middot; ${ccy}</div>
         <div id="esm-sub">ForexFactory &middot; actual vs consensus &middot; 30d rolling &middot; [&minus;100, +100]</div>
       </div>
@@ -641,12 +629,10 @@ async function openEconSurprisesModal(initialCcy) {
 
   <div id="esm-tabs" role="tablist" aria-label="G8 currency tabs">
     ${_ESM_G8.map(c => {
-      const m = _ESM_CCY_META[c] || {};
-      const f = m.flag ? `<span class="fi fi-${m.flag}"></span>` : '';
       return `<div class="esm-tab${c === ccy ? ' on' : ''}" data-ccy="${c}" role="tab"
         aria-selected="${c === ccy ? 'true' : 'false'}"
         onclick="esmTab(this,'${c}')"
-        tabindex="${c === ccy ? '0' : '-1'}">${f}${c}</div>`;
+        tabindex="${c === ccy ? '0' : '-1'}">${c}</div>`;
     }).join('')}
   </div>
 
