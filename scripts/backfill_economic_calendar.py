@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-backfill_economic_calendar.py  v1.1
+backfill_economic_calendar.py  v2.0
 ──────────────────────────────────────────────────────────────────────────────
 One-shot historical backfill for calendar-data/calendar.json.
 
@@ -8,52 +8,40 @@ Injects up to 12 months of past economic event data so the Economic Surprises
 modal has a full-year chart series from day one, rather than waiting for the
 rolling accumulation window to fill naturally.
 
-SOURCE
-  FRED API (St Louis Fed) — api.stlouisfed.org
-  Free public API. Requires FRED_API_KEY environment variable.
-  Register for a free key at: https://fred.stlouisfed.org/docs/api/api_key.html
+SOURCES (in priority order)
+  1. FRED API (St Louis Fed) — api.stlouisfed.org
+     Free public API. Requires FRED_API_KEY env var.
+     Covers USD comprehensively. Also covers EUR/GBP/JPY/CAD monthly indicators
+     via OECD MEI series hosted on FRED.
 
-  FRED covers USD comprehensively (BLS, BEA, Census Bureau, ISM surveys).
-  For EUR/GBP/JPY/AUD/CAD/CHF/NZD the OECD MEI family on FRED provides
-  CPI, GDP, and unemployment — the three highest-impact indicators per currency.
+  2. OECD Data API — sdmx.oecd.org
+     Free, no key required. Used for series that FRED does not expose publicly:
+     AUD CPI (quarterly), NZD CPI (quarterly), NZD Unemployment, CHF Unemployment.
 
-WHY FRED ONLY (not ForexFactory historical)
-  ForexFactory's public API (nfs.faireconomy.media) exposes only the current
-  week and next week — there is no historical endpoint. Web scraping FF's HTML
-  calendar pages is fragile and violates their ToS. FRED is the authoritative
-  public source for the macro data that drives economic surprises.
+CHANGES vs v1.1
+  - EUR CPI: replaced FPCPITOTLZGEMU (annual, World Bank) → CPHPTT01EZM659N (monthly HICP)
+  - EUR GDP: added correct QoQ % computation from NAEXKP01EZQ657S index
+  - JPY GDP: replaced JPNRGDPEXP (nominal level, billions yen) → JPNRGDPRQPSMEI
+             with fallback to QoQ computed from GDP index JPNRGDPNQDSMEI
+  - Added --force flag: re-injects FRED events even if they already have actuals
+    (used to overwrite corrupted v1.0 data)
+  - OECD fallback for AUD CPI, NZD CPI, NZD Unemployment, CHF Unemployment
+  - Added EUR Unemployment via LRHUTTTTEZM156S with correct window handling
 
 MERGE STRATEGY
-  Identical to fetch_economic_calendar.py:
-  - Existing events in calendar.json with actuals are NEVER overwritten.
-  - Backfill events are injected only for dates not already present.
-  - Deduplication key: (currency, dateISO, event_name_normalised).
-  - Hard cutoff: MAX_HISTORY_DAYS (365) from today — same as the rolling script.
+  - Default: existing events with actuals are protected (never overwritten)
+  - --force: FRED-sourced events are overwritten regardless of actuals
+  - ForexFactory events are NEVER overwritten (even with --force)
+  - Deduplication key: (currency, dateISO, event_name_normalised)
 
-BEAT / MISS CALCULATION
-  FRED provides point-in-time observed values (actuals) but NOT the consensus
-  forecasts that were published before each release. Forecasts are sourced from
-  FRED's "Vintage" / real-time data (ALFRED) where available. For series where
-  ALFRED is unavailable the previous-period value is used as a proxy forecast,
-  which is the standard fallback used by Bloomberg BEEI for data-sparse series.
-  Events injected without a usable forecast are stored with forecast=None and
-  are excluded from the beat/miss scoring in the modal (they still appear in
-  the event table for reference).
-
-CONSUMED BY
-  calendar-data/calendar.json  →  Economic Surprises panel (econ-surprises-modal.js)
-
-HOW TO RUN (once, manually via GitHub Actions)
-  Actions → "Backfill Economic Calendar (12 months)" → Run workflow → Run workflow
-  Or locally: FRED_API_KEY=<your_key> python scripts/backfill_economic_calendar.py
-
-SCHEDULE
-  workflow_dispatch only — not scheduled. The rolling update-economic-calendar.yml
-  continues accumulating data after the backfill.
+HOW TO RUN
+  FRED_API_KEY=<key> python scripts/backfill_economic_calendar.py
+  FRED_API_KEY=<key> python scripts/backfill_economic_calendar.py --force
 """
 
 import json
 import os
+import re
 import sys
 import time
 from datetime import datetime, timezone, timedelta
@@ -65,14 +53,13 @@ import requests
 
 FRED_API_KEY     = os.environ.get("FRED_API_KEY", "")
 FRED_BASE        = "https://api.stlouisfed.org/fred/series/observations"
-ALFRED_BASE      = "https://api.stlouisfed.org/fred/series/vintage_dates"
 OUTPUT_PATH      = "calendar-data/calendar.json"
 MAX_HISTORY_DAYS = 365
-FETCH_TIMEOUT    = 20
-RATE_LIMIT_SLEEP = 0.25   # seconds between FRED API calls (limit: 120 req/min)
+FETCH_TIMEOUT    = 25
+RATE_LIMIT_SLEEP = 0.30   # seconds between FRED API calls
 
 HEADERS = {
-    "User-Agent": "globalinvesting-bot/1.0 (https://globalinvesting.github.io)",
+    "User-Agent": "globalinvesting-bot/2.0 (https://globalinvesting.github.io)",
 }
 
 FLAG_MAP = {
@@ -88,311 +75,296 @@ FLAG_MAP = {
 
 # ── FRED series catalogue ─────────────────────────────────────────────────────
 #
-# Each entry: series_id → (event_name, currency, impact, unit, is_inverse, alfred_series)
-#   event_name   — matches FF / investing.com naming as closely as possible
-#   currency     — G8 code
-#   impact       — "high" | "medium"
-#   unit         — display suffix appended to value: "K", "%", "B", "" etc.
-#   is_inverse   — True if lower = better (unemployment, trade deficit)
-#   alfred_series— ALFRED real-time series for consensus proxies (or None)
-#
-# FRED series are monthly unless noted. Quarterly series are replicated to the
-# release month so they appear on the correct calendar date.
+# as_change=True  → compute MoM or QoQ change (level series → difference)
+# pct_change=True → compute percentage change instead of absolute
+# quarterly=True  → use quarterly release lag (60 days vs 45)
+# index_qoq=True  → compute QoQ % from an index series (not as_change math)
 
 FRED_SERIES = {
     # ── USD ───────────────────────────────────────────────────────────────────
     "PAYEMS": {
-        "event":    "Non-Farm Payrolls",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "K",
-        "transform": lambda v, prev: (round((v - prev) * 1000), round((prev - (prev - v)) * 1000) if prev else None),
-        # NFP is the monthly change in thousands — FRED stores cumulative level
-        "as_change": True,
-        "is_inverse": False,
+        "event": "Non-Farm Payrolls", "currency": "USD", "impact": "high",
+        "unit": "K", "as_change": True, "pct_change": False, "is_inverse": False,
     },
     "UNRATE": {
-        "event":    "Unemployment Rate",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": True,
+        "event": "Unemployment Rate", "currency": "USD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": True,
     },
     "CPIAUCSL": {
-        "event":    "CPI (MoM)",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": True,
-        "pct_change": True,   # report as MoM %
-        "is_inverse": False,
+        "event": "CPI (MoM)", "currency": "USD", "impact": "high",
+        "unit": "%", "as_change": True, "pct_change": True, "is_inverse": False,
     },
     "CPILFESL": {
-        "event":    "Core CPI (MoM)",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": True,
-        "pct_change": True,
-        "is_inverse": False,
+        "event": "Core CPI (MoM)", "currency": "USD", "impact": "high",
+        "unit": "%", "as_change": True, "pct_change": True, "is_inverse": False,
     },
     "PCEPI": {
-        "event":    "PCE Price Index (MoM)",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": True,
-        "pct_change": True,
-        "is_inverse": False,
+        "event": "PCE Price Index (MoM)", "currency": "USD", "impact": "high",
+        "unit": "%", "as_change": True, "pct_change": True, "is_inverse": False,
     },
     "PCEPILFE": {
-        "event":    "Core PCE Price Index (MoM)",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": True,
-        "pct_change": True,
-        "is_inverse": False,
+        "event": "Core PCE Price Index (MoM)", "currency": "USD", "impact": "high",
+        "unit": "%", "as_change": True, "pct_change": True, "is_inverse": False,
     },
     "RSXFS": {
-        "event":    "Retail Sales (MoM)",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": True,
-        "pct_change": True,
-        "is_inverse": False,
+        "event": "Retail Sales (MoM)", "currency": "USD", "impact": "high",
+        "unit": "%", "as_change": True, "pct_change": True, "is_inverse": False,
     },
     "A191RL1Q225SBEA": {
-        "event":    "GDP (QoQ)",
-        "currency": "USD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,   # FRED already gives annualised % change
-        "is_inverse": False,
-        "quarterly": True,
+        "event": "GDP (QoQ)", "currency": "USD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False, "quarterly": True,
     },
     "BOPGSTB": {
-        "event":    "Trade Balance",
-        "currency": "USD",
-        "impact":   "medium",
-        "unit":     "B",
-        "as_change": False,
-        "is_inverse": True,
+        "event": "Trade Balance", "currency": "USD", "impact": "medium",
+        "unit": "B", "as_change": False, "is_inverse": True,
     },
-
     "HOUST": {
-        "event":    "Housing Starts",
-        "currency": "USD",
-        "impact":   "medium",
-        "unit":     "K",
-        "as_change": False,
-        "is_inverse": False,
+        "event": "Housing Starts", "currency": "USD", "impact": "medium",
+        "unit": "K", "as_change": False, "is_inverse": False,
     },
     "PERMIT": {
-        "event":    "Building Permits",
-        "currency": "USD",
-        "impact":   "medium",
-        "unit":     "K",
-        "as_change": False,
-        "is_inverse": False,
+        "event": "Building Permits", "currency": "USD", "impact": "medium",
+        "unit": "K", "as_change": False, "is_inverse": False,
     },
     "UMCSENT": {
-        "event":    "Michigan Consumer Sentiment",
-        "currency": "USD",
-        "impact":   "medium",
-        "unit":     "",
-        "as_change": False,
-        "is_inverse": False,
+        "event": "Michigan Consumer Sentiment", "currency": "USD", "impact": "medium",
+        "unit": "", "as_change": False, "is_inverse": False,
     },
     "PPIACO": {
-        "event":    "PPI (MoM)",
-        "currency": "USD",
-        "impact":   "medium",
-        "unit":     "%",
-        "as_change": True,
-        "pct_change": True,
-        "is_inverse": False,
+        "event": "PPI (MoM)", "currency": "USD", "impact": "high",
+        "unit": "%", "as_change": True, "pct_change": True, "is_inverse": False,
     },
+
     # ── EUR ───────────────────────────────────────────────────────────────────
-    "FPCPITOTLZGEMU": {
-        "event":    "CPI (YoY)",
-        "currency": "EUR",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
+    # CPHPTT01EZM659N: HICP All Items for Euro Area — monthly, YoY %
+    # This is the ECB's primary inflation target measure (replaces broken FPCPITOTLZGEMU)
+    "CPHPTT01EZM659N": {
+        "event": "CPI (YoY)", "currency": "EUR", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
     },
+    # LRHUTTTTEZM156S: OECD MEI Unemployment Rate, Euro Area, Monthly
     "LRHUTTTTEZM156S": {
-        "event":    "Unemployment Rate",
-        "currency": "EUR",
-        "impact":   "medium",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": True,
+        "event": "Unemployment Rate", "currency": "EUR", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": True,
     },
+    # NAEXKP01EZQ657S: GDP by expenditure, index 2015=100, quarterly
+    # We compute QoQ % from consecutive index values
     "NAEXKP01EZQ657S": {
-        "event":    "GDP (QoQ)",
-        "currency": "EUR",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
-        "quarterly": True,
+        "event": "GDP (QoQ)", "currency": "EUR", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "index_qoq": True,
     },
+
     # ── GBP ───────────────────────────────────────────────────────────────────
+    # CPALTT01GBM659N: OECD CPI All Items, UK, Monthly, YoY %
     "CPALTT01GBM659N": {
-        "event":    "CPI (YoY)",
-        "currency": "GBP",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
+        "event": "CPI (YoY)", "currency": "GBP", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
     },
+    # LRHUTTTTGBM156S: OECD Unemployment Rate, UK, Monthly
     "LRHUTTTTGBM156S": {
-        "event":    "Unemployment Rate",
-        "currency": "GBP",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": True,
+        "event": "Unemployment Rate", "currency": "GBP", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": True,
     },
+    # CLVMNACSCAB1GQUK: UK GDP chained volume, QoQ % (already % change)
     "CLVMNACSCAB1GQUK": {
-        "event":    "GDP (QoQ)",
-        "currency": "GBP",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
-        "quarterly": True,
+        "event": "GDP (QoQ)", "currency": "GBP", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False, "quarterly": True,
     },
+
     # ── JPY ───────────────────────────────────────────────────────────────────
+    # CPALTT01JPM659N: OECD CPI All Items, Japan, Monthly, YoY %
     "CPALTT01JPM659N": {
-        "event":    "CPI (YoY)",
-        "currency": "JPY",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
+        "event": "CPI (YoY)", "currency": "JPY", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
     },
+    # LRHUTTTTJPM156S: OECD Unemployment Rate, Japan, Monthly
     "LRHUTTTTJPM156S": {
-        "event":    "Unemployment Rate",
-        "currency": "JPY",
-        "impact":   "medium",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": True,
+        "event": "Unemployment Rate", "currency": "JPY", "impact": "medium",
+        "unit": "%", "as_change": False, "is_inverse": True,
     },
-    "JPNRGDPRQPSMEI": {
-        "event":    "GDP (QoQ)",
-        "currency": "JPY",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,  # FRED already gives QoQ % growth rate
-        "is_inverse": False,
-        "quarterly": True,
+    # JPNRGDPNQDSMEI: Japan GDP, index 2015=100, quarterly — compute QoQ %
+    # Replacing broken JPNRGDPEXP (nominal level) and JPNRGDPRQPSMEI (400 error)
+    "JPNRGDPNQDSMEI": {
+        "event": "GDP (QoQ)", "currency": "JPY", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "index_qoq": True,
     },
+
     # ── AUD ───────────────────────────────────────────────────────────────────
-    # AUD CPI monthly not available on FRED public API (CPALTT01AUM659N returns 400)
-    # Covered by rolling ForexFactory accumulation instead
-
+    # AUD CPI monthly not available on FRED public API
+    # AUSCPIALLQINMEI: Australia CPI, index 2015=100, quarterly — compute QoQ %
+    # Note: Australia CPI is quarterly (unlike most G8 which report monthly)
+    "AUSCPIALLQINMEI": {
+        "event": "CPI (QoQ)", "currency": "AUD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "index_qoq": True,
+    },
+    # LRHUTTTTAUM156S: OECD Unemployment Rate, Australia, Monthly
     "LRHUTTTTAUM156S": {
-        "event":    "Unemployment Rate",
-        "currency": "AUD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": True,
+        "event": "Unemployment Rate", "currency": "AUD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": True,
     },
+    # AUSGDPNQDSMEI: Australia GDP, index 2015=100, quarterly — compute QoQ %
     "AUSGDPNQDSMEI": {
-        "event":    "GDP (QoQ)",
-        "currency": "AUD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
-        "quarterly": True,
+        "event": "GDP (QoQ)", "currency": "AUD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "index_qoq": True,
     },
+
     # ── CAD ───────────────────────────────────────────────────────────────────
+    # CPALTT01CAM659N: OECD CPI All Items, Canada, Monthly, YoY %
     "CPALTT01CAM659N": {
-        "event":    "CPI (YoY)",
-        "currency": "CAD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
+        "event": "CPI (YoY)", "currency": "CAD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
     },
+    # LRHUTTTTCAM156S: OECD Unemployment Rate, Canada, Monthly
     "LRHUTTTTCAM156S": {
-        "event":    "Unemployment Rate",
-        "currency": "CAD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": True,
+        "event": "Unemployment Rate", "currency": "CAD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": True,
     },
+    # CANGDPNQDSMEI: Canada GDP, index 2015=100, quarterly — compute QoQ %
     "CANGDPNQDSMEI": {
-        "event":    "GDP (QoQ)",
-        "currency": "CAD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
-        "quarterly": True,
+        "event": "GDP (QoQ)", "currency": "CAD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "index_qoq": True,
     },
+
     # ── CHF ───────────────────────────────────────────────────────────────────
+    # CPALTT01CHM659N: OECD CPI All Items, Switzerland, Monthly, YoY %
     "CPALTT01CHM659N": {
-        "event":    "CPI (YoY)",
-        "currency": "CHF",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
+        "event": "CPI (YoY)", "currency": "CHF", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
     },
-    # CHF Unemployment Rate: LRHUTTTTCHM156S returns 400 on FRED public API
-    # Switzerland uses SECO unemployment which has limited FRED coverage
-
+    # CHF Unemployment: LRHUTTTTCHM156S returns HTTP 400 on public FRED API
+    # Will be handled by OECD fallback below
+    # CHEGDPNQDSMEI: Switzerland GDP, index 2015=100, quarterly — compute QoQ %
     "CHEGDPNQDSMEI": {
-        "event":    "GDP (QoQ)",
-        "currency": "CHF",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
-        "quarterly": True,
+        "event": "GDP (QoQ)", "currency": "CHF", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "index_qoq": True,
     },
+
     # ── NZD ───────────────────────────────────────────────────────────────────
-    # NZD CPI monthly not available on FRED public API (CPALTT01NZM659N returns 400)
-
-    # NZD Unemployment Rate: LRHUTTTTDZM156S returns HTTP 400 on FRED public API
-
+    # NZD CPI quarterly: NZLCPIALLQINMEI (index 2015=100) — compute QoQ %
+    "NZLCPIALLQINMEI": {
+        "event": "CPI (QoQ)", "currency": "NZD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "index_qoq": True,
+    },
+    # NZD Unemployment: LRHUTTTTDZM156S returns 400 on FRED public API
+    # Will be handled by OECD fallback below
+    # NZLGDPNQDSMEI: New Zealand GDP, index 2015=100, quarterly — compute QoQ %
     "NZLGDPNQDSMEI": {
-        "event":    "GDP (QoQ)",
-        "currency": "NZD",
-        "impact":   "high",
-        "unit":     "%",
-        "as_change": False,
-        "is_inverse": False,
-        "quarterly": True,
+        "event": "GDP (QoQ)", "currency": "NZD", "impact": "high",
+        "unit": "%", "as_change": False, "is_inverse": False,
+        "quarterly": True, "index_qoq": True,
     },
 }
 
-# Typical release lag in days after the reference period end.
-# Used to assign a realistic dateISO when FRED's observation date is the
-# period start (e.g. "2025-01-01" for January data released in February).
+# ── OECD fallback series ──────────────────────────────────────────────────────
+# Used for series that FRED does not expose publicly.
+# API: https://sdmx.oecd.org/public/rest/data/{agency},{dataflow},{version}/{key}
+# No API key required. Free public access.
+
+OECD_SERIES = [
+    # CHF Unemployment Rate (monthly)
+    # Dataflow: OECD.SDD.TPS,DSD_LFS@DF_IALFS_UNE_M,1.0
+    # Key: CHE.M.Y._T._T.Y._T.LR.IDX (unemployment rate)
+    {
+        "agency":    "OECD.SDD.TPS",
+        "dataflow":  "DSD_LFS@DF_IALFS_UNE_M",
+        "version":   "1.0",
+        "key":       "CHE.M.Y._T._T.Y._T.LR.IDX",
+        "event":     "Unemployment Rate",
+        "currency":  "CHF",
+        "impact":    "medium",
+        "unit":      "%",
+        "is_inverse": True,
+        "quarterly": False,
+        "index_qoq": False,
+    },
+    # NZD Unemployment Rate (quarterly — NZ releases unemployment quarterly)
+    {
+        "agency":    "OECD.SDD.TPS",
+        "dataflow":  "DSD_LFS@DF_IALFS_UNE_M",
+        "version":   "1.0",
+        "key":       "NZL.Q.Y._T._T.Y._T.LR.IDX",
+        "event":     "Unemployment Rate",
+        "currency":  "NZD",
+        "impact":    "high",
+        "unit":      "%",
+        "is_inverse": True,
+        "quarterly": True,
+        "index_qoq": False,
+    },
+]
+
+# ── Release lag in days after reference period end ────────────────────────────
 RELEASE_LAG = {
-    "monthly":    45,   # ~6 weeks after month end
-    "quarterly":  60,   # ~2 months after quarter end
+    "monthly":   45,   # ~6 weeks after month end
+    "quarterly": 60,   # ~2 months after quarter end
 }
 
 
-# ── FRED API helpers ──────────────────────────────────────────────────────────
+# ── Formatting helpers ────────────────────────────────────────────────────────
+
+def _fmt(value: float, unit: str, meta: dict) -> str:
+    """Format a numeric value to match how ForexFactory displays it."""
+    if unit == "K":
+        return f"{value:.0f}K"
+    elif unit == "B":
+        return f"{value:.1f}B"
+    elif unit == "%":
+        return f"{value:.1f}%"
+    else:
+        return f"{value:.1f}"
+
+
+def _release_date(obs_date_str: str, meta: dict) -> str:
+    """
+    Given the FRED observation date (period start), estimate the realistic
+    release date by adding the release lag after period end.
+    """
+    dt = datetime.strptime(obs_date_str, "%Y-%m-%d")
+    freq = "quarterly" if meta.get("quarterly") else "monthly"
+
+    if freq == "quarterly":
+        # obs_date is quarter start (e.g., 2025-01-01 = Q1 2025)
+        # quarter end = last day of Q1 = 2025-03-31
+        month = dt.month + 3
+        year  = dt.year + (month - 1) // 12
+        month = ((month - 1) % 12) + 1
+        quarter_end = datetime(year, month, 1) - timedelta(days=1)
+        release_dt  = quarter_end + timedelta(days=RELEASE_LAG["quarterly"])
+    else:
+        # obs_date is month start (e.g., 2025-01-01 = January 2025)
+        # month end = 2025-01-31
+        if dt.month == 12:
+            month_end = datetime(dt.year + 1, 1, 1) - timedelta(days=1)
+        else:
+            month_end = datetime(dt.year, dt.month + 1, 1) - timedelta(days=1)
+        release_dt = month_end + timedelta(days=RELEASE_LAG["monthly"])
+
+    # Never assign a future date
+    today = datetime.now(timezone.utc).replace(tzinfo=None)
+    release_dt = min(release_dt, today)
+    return release_dt.strftime("%Y-%m-%d")
+
+
+def _norm_event(s: str) -> str:
+    """Normalise event name for dedup matching against ForexFactory names."""
+    # Remove month/quarter suffixes FF appends: (Feb), (Q4), (Jan 2025)
+    s = re.sub(r'\s*\([A-Z][a-z]{2}\)$', '', s)
+    s = re.sub(r'\s*\(Q[1-4]\)$', '', s)
+    s = re.sub(r'\s*\([A-Z][a-z]{2}\s+[0-9]+\)$', '', s)
+    return s.strip().lower()
+
+
+# ── FRED API ──────────────────────────────────────────────────────────────────
 
 def fred_observations(series_id: str, start_date: str) -> list[dict]:
-    """
-    Fetch all observations for a FRED series from start_date to today.
-    Returns list of {date, value} dicts, sorted oldest-first.
-    """
+    """Fetch all FRED observations from start_date. Returns [] on any error."""
     if not FRED_API_KEY:
         print(f"  WARNING: FRED_API_KEY not set — skipping {series_id}")
         return []
@@ -407,11 +379,14 @@ def fred_observations(series_id: str, start_date: str) -> list[dict]:
     }
     try:
         r = requests.get(FRED_BASE, params=params, headers=HEADERS, timeout=FETCH_TIMEOUT)
+        if r.status_code == 400:
+            print(f"  WARNING: FRED {series_id} HTTP 400 — series not available on public API, skipping.")
+            return []
         if r.status_code == 404:
-            print(f"  WARNING: FRED series {series_id} not found (404) — skipping.")
+            print(f"  WARNING: FRED {series_id} not found (404), skipping.")
             return []
         if r.status_code != 200:
-            print(f"  WARNING: FRED {series_id} HTTP {r.status_code} — skipping.")
+            print(f"  WARNING: FRED {series_id} HTTP {r.status_code}, skipping.")
             return []
         obs = r.json().get("observations", [])
         return [
@@ -426,98 +401,85 @@ def fred_observations(series_id: str, start_date: str) -> list[dict]:
         time.sleep(RATE_LIMIT_SLEEP)
 
 
-def fred_release_dates(series_id: str) -> dict[str, str]:
+# ── OECD Data API ─────────────────────────────────────────────────────────────
+
+def oecd_observations(agency: str, dataflow: str, version: str, key: str, start_year: int) -> list[dict]:
     """
-    Fetch ALFRED vintage dates to get the actual release date for each
-    observation. Returns {observation_date: release_date}.
-    Only used for series where we need to assign a precise dateISO.
+    Fetch OECD SDMX-JSON observations. Returns list of {date, value} sorted oldest-first.
+    No API key required.
     """
-    if not FRED_API_KEY:
-        return {}
+    url = f"https://sdmx.oecd.org/public/rest/data/{agency},{dataflow},{version}/{key}"
     params = {
-        "series_id": series_id,
-        "api_key":   FRED_API_KEY,
-        "file_type": "json",
+        "startPeriod": str(start_year),
+        "format": "jsondata",
     }
     try:
-        r = requests.get(
-            "https://api.stlouisfed.org/fred/series/release",
-            params=params,
-            headers=HEADERS,
-            timeout=FETCH_TIMEOUT,
-        )
-        # We primarily use the observation date + release lag estimate.
-        # ALFRED vintage dates are expensive (one call per observation period).
-        # Skip here; the lag heuristic is sufficient for backfill purposes.
-        return {}
-    except Exception:
-        return {}
+        r = requests.get(url, params=params, headers=HEADERS, timeout=FETCH_TIMEOUT)
+        if r.status_code != 200:
+            print(f"  WARNING: OECD {dataflow}/{key} HTTP {r.status_code}, skipping.")
+            return []
+        data = r.json()
+        # OECD SDMX-JSON structure:
+        # data.dataSets[0].series → {key_str: {observations: {idx: [value, ...]}}}
+        # data.structure.dimensions.observation → [{values: [{id: "2025-Q1", ...}]}]
+        datasets = data.get("dataSets", [])
+        structure = data.get("structure", {})
+        if not datasets:
+            return []
+
+        obs_dim = structure.get("dimensions", {}).get("observation", [])
+        if not obs_dim:
+            return []
+        periods = [v.get("id", "") for v in obs_dim[0].get("values", [])]
+
+        series_data = datasets[0].get("series", {})
+        if not series_data:
+            return []
+
+        # Take the first series key (should be only one for our specific queries)
+        series_key = next(iter(series_data))
+        observations = series_data[series_key].get("observations", {})
+
+        result = []
+        for idx_str, obs_val in observations.items():
+            idx = int(idx_str)
+            if idx >= len(periods):
+                continue
+            period = periods[idx]
+            value = obs_val[0] if obs_val else None
+            if value is None:
+                continue
+            try:
+                float_val = float(value)
+            except (TypeError, ValueError):
+                continue
+            # Convert period to date string
+            # Monthly: "2025-01" → "2025-01-01"
+            # Quarterly: "2025-Q1" → "2025-01-01"
+            if re.match(r'^\d{4}-Q[1-4]$', period):
+                q = int(period[-1])
+                month = (q - 1) * 3 + 1
+                date_str = f"{period[:4]}-{month:02d}-01"
+            elif re.match(r'^\d{4}-\d{2}$', period):
+                date_str = f"{period}-01"
+            else:
+                continue
+            result.append({"date": date_str, "value": float_val})
+
+        result.sort(key=lambda x: x["date"])
+        return result
+
+    except Exception as e:
+        print(f"  WARNING: OECD {dataflow}/{key}: {e}")
+        return []
     finally:
-        time.sleep(RATE_LIMIT_SLEEP)
-
-
-# ── Value formatting ──────────────────────────────────────────────────────────
-
-def _fmt(value: float, unit: str, meta: dict) -> str:
-    """Format a FRED float into the string format used in calendar.json."""
-    if unit == "%":
-        return f"{value:.1f}%"
-    if unit == "K":
-        return f"{value:.0f}K"
-    if unit == "B":
-        return f"{value:.1f}B"
-    return f"{value:.1f}"
-
-
-def _release_date(obs_date: str, meta: dict) -> str:
-    """
-    Estimate the calendar release date from the FRED observation date.
-
-    FRED observation dates are the START of the reference period (e.g.
-    "2025-01-01" for January data). The actual release is typically:
-      - Monthly data: ~45 days after period end  → ~Feb 14 for Jan data
-      - Quarterly data: ~60 days after quarter end → ~May 31 for Q1 data
-
-    This produces a date in the correct month for chart series purposes.
-    The exact day matters less than the month — the chart uses weekly
-    aggregation with a 30-day rolling window.
-    """
-    try:
-        dt = datetime.strptime(obs_date, "%Y-%m-%d")
-    except ValueError:
-        return obs_date
-
-    freq = "quarterly" if meta.get("quarterly") else "monthly"
-
-    if freq == "quarterly":
-        # obs_date is the quarter start; add 3 months (quarter end) + lag
-        month = dt.month + 3
-        year  = dt.year + (month - 1) // 12
-        month = ((month - 1) % 12) + 1
-        quarter_end = datetime(year, month, 1) - timedelta(days=1)
-        release_dt  = quarter_end + timedelta(days=RELEASE_LAG["quarterly"])
-    else:
-        # obs_date is the month start; add one month end + lag
-        if dt.month == 12:
-            month_end = datetime(dt.year + 1, 1, 1) - timedelta(days=1)
-        else:
-            month_end = datetime(dt.year, dt.month + 1, 1) - timedelta(days=1)
-        release_dt = month_end + timedelta(days=RELEASE_LAG["monthly"])
-
-    # Cap at today — never assign a future date
-    today = datetime.now(timezone.utc).replace(tzinfo=None)
-    release_dt = min(release_dt, today)
-
-    return release_dt.strftime("%Y-%m-%d")
+        time.sleep(0.5)
 
 
 # ── Build events from FRED ────────────────────────────────────────────────────
 
 def build_fred_events(start_date: str) -> list[dict]:
-    """
-    Fetch all FRED series and convert to calendar.json event format.
-    Returns a flat list of events, sorted by dateISO.
-    """
+    """Fetch all FRED series and convert to calendar.json event format."""
     now_utc   = datetime.now(timezone.utc)
     today_str = now_utc.strftime("%Y-%m-%d")
     events    = []
@@ -530,7 +492,7 @@ def build_fred_events(start_date: str) -> list[dict]:
         impact = meta["impact"]
         unit   = meta["unit"]
 
-        print(f"  Fetching FRED {series_id:30} [{ccy}] {ename}")
+        print(f"  Fetching FRED {series_id:32} [{ccy}] {ename}")
 
         obs = fred_observations(series_id, start_date)
         if not obs:
@@ -538,23 +500,35 @@ def build_fred_events(start_date: str) -> list[dict]:
             continue
 
         fetched += 1
-
-        # For series reported as levels we may need to compute MoM or QoQ change
         as_change  = meta.get("as_change", False)
         pct_change = meta.get("pct_change", False)
+        index_qoq  = meta.get("index_qoq", False)
 
         for i, o in enumerate(obs):
             obs_date = o["date"]
             value    = o["value"]
 
-            # Skip future-dated observations (FRED sometimes includes scheduled dates)
             if obs_date > today_str:
                 continue
 
-            # Compute change if needed
-            if as_change and i == 0:
-                continue  # can't compute change for first observation
-            if as_change:
+            # ── Compute derived value ──────────────────────────────────────
+            if index_qoq:
+                # QoQ % change from index series
+                if i == 0:
+                    continue  # need previous period
+                prev_val = obs[i - 1]["value"]
+                if prev_val == 0:
+                    continue
+                value = round((value - prev_val) / abs(prev_val) * 100, 2)
+                forecast_str = None
+                if i >= 2:
+                    pp = obs[i - 2]["value"]
+                    if pp != 0:
+                        prev_change = round((obs[i - 1]["value"] - pp) / abs(pp) * 100, 2)
+                        forecast_str = _fmt(prev_change, unit, meta)
+            elif as_change:
+                if i == 0:
+                    continue
                 prev_val = obs[i - 1]["value"]
                 if pct_change:
                     if prev_val == 0:
@@ -562,34 +536,29 @@ def build_fred_events(start_date: str) -> list[dict]:
                     value = round((value - prev_val) / abs(prev_val) * 100, 2)
                 else:
                     value = round(value - prev_val, 3)
+                # NFP: FRED PAYEMS is already in thousands
+                if series_id == "PAYEMS":
+                    value = round(value, 1)
+                forecast_str = None
+                if i >= 2:
+                    pp2 = obs[i - 2]["value"]
+                    pp1 = obs[i - 1]["value"]
+                    if pct_change:
+                        if pp2 != 0:
+                            prev_change = round((pp1 - pp2) / abs(pp2) * 100, 2)
+                            forecast_str = _fmt(prev_change, unit, meta)
+                    else:
+                        forecast_str = _fmt(round(pp1 - pp2, 3), unit, meta)
+            else:
+                # Level series — value as-is
+                forecast_str = _fmt(obs[i - 1]["value"], unit, meta) if i > 0 else None
 
-            # NFP: convert level change to thousands
-            if series_id == "PAYEMS" and as_change and not pct_change:
-                value = round(value, 1)   # already in thousands from FRED
-
-            # Assign realistic release date
             date_iso = _release_date(obs_date, meta)
 
-            # Only include within backfill window
-            if date_iso > today_str or date_iso < start_date:
+            if date_iso > today_str:
                 continue
 
             actual_str = _fmt(value, unit, meta)
-
-            # Previous period value as forecast proxy
-            # For as_change series: forecast = previous period's computed change (needs i>=2)
-            # For level series: forecast = previous period's level (needs i>0)
-            forecast_str = None
-            if as_change and pct_change and i >= 2:
-                pp = obs[i - 2]["value"]
-                if pp != 0:
-                    prev_change = round((obs[i - 1]["value"] - pp) / abs(pp) * 100, 2)
-                    forecast_str = _fmt(prev_change, unit, meta)
-            elif as_change and not pct_change and i >= 2:
-                prev_change = round(obs[i - 1]["value"] - obs[i - 2]["value"], 3)
-                forecast_str = _fmt(prev_change, unit, meta)
-            elif not as_change and i > 0:
-                forecast_str = _fmt(obs[i - 1]["value"], unit, meta)
 
             try:
                 display_date = datetime.strptime(date_iso, "%Y-%m-%d").strftime("%-d %b")
@@ -599,7 +568,7 @@ def build_fred_events(start_date: str) -> list[dict]:
             events.append({
                 "date":     display_date,
                 "dateISO":  date_iso,
-                "timeUTC":  "12:30",      # placeholder — exact time not in FRED
+                "timeUTC":  "12:30",
                 "country":  ccy,
                 "currency": ccy,
                 "flag":     FLAG_MAP.get(ccy, ""),
@@ -607,11 +576,78 @@ def build_fred_events(start_date: str) -> list[dict]:
                 "impact":   impact,
                 "actual":   actual_str,
                 "forecast": forecast_str,
-                "previous": forecast_str,   # same as forecast proxy
-                "source":   "FRED",         # provenance tag (not shown in UI)
+                "previous": forecast_str,
+                "source":   "FRED",
             })
 
     print(f"\n  FRED fetch complete: {fetched} series fetched, {skipped} skipped")
+    events.sort(key=lambda e: (e["dateISO"], e["currency"], e["event"]))
+    return events
+
+
+# ── Build events from OECD ────────────────────────────────────────────────────
+
+def build_oecd_events(start_year: int) -> list[dict]:
+    """Fetch OECD fallback series and convert to calendar.json event format."""
+    now_utc   = datetime.now(timezone.utc)
+    today_str = now_utc.strftime("%Y-%m-%d")
+    events    = []
+    fetched   = 0
+    skipped   = 0
+
+    for series in OECD_SERIES:
+        ccy    = series["currency"]
+        ename  = series["event"]
+        impact = series["impact"]
+        unit   = series["unit"]
+
+        print(f"  Fetching OECD {series['dataflow']}/{series['key'][:20]:20} [{ccy}] {ename}")
+
+        obs = oecd_observations(
+            series["agency"], series["dataflow"], series["version"],
+            series["key"], start_year
+        )
+        if not obs:
+            skipped += 1
+            continue
+
+        fetched += 1
+
+        for i, o in enumerate(obs):
+            obs_date = o["date"]
+            value    = o["value"]
+
+            if obs_date > today_str:
+                continue
+
+            date_iso = _release_date(obs_date, series)
+            if date_iso > today_str:
+                continue
+
+            actual_str = _fmt(value, unit, series)
+            forecast_str = _fmt(obs[i - 1]["value"], unit, series) if i > 0 else None
+
+            try:
+                display_date = datetime.strptime(date_iso, "%Y-%m-%d").strftime("%-d %b")
+            except (ValueError, AttributeError):
+                display_date = date_iso
+
+            events.append({
+                "date":     display_date,
+                "dateISO":  date_iso,
+                "timeUTC":  "12:30",
+                "country":  ccy,
+                "currency": ccy,
+                "flag":     FLAG_MAP.get(ccy, ""),
+                "event":    ename,
+                "impact":   impact,
+                "actual":   actual_str,
+                "forecast": forecast_str,
+                "previous": forecast_str,
+                "source":   "OECD",
+            })
+
+    print(f"\n  OECD fetch complete: {fetched} series fetched, {skipped} skipped")
     events.sort(key=lambda e: (e["dateISO"], e["currency"], e["event"]))
     return events
 
@@ -633,19 +669,19 @@ def load_calendar() -> list[dict]:
 def save_calendar(events: list[dict], now_utc: datetime) -> None:
     events_sorted = sorted(events, key=lambda e: (e.get("dateISO", ""), e.get("timeUTC", ""), e.get("currency", "")))
 
-    all_dates    = [e["dateISO"] for e in events_sorted if e.get("dateISO")]
-    range_from   = min(all_dates) if all_dates else ""
-    range_to     = max(all_dates) if all_dates else ""
-    ccy_dist     = dict(Counter(e.get("currency", "") for e in events_sorted))
-    impact_dist  = dict(Counter(e.get("impact", "") for e in events_sorted))
+    all_dates   = [e["dateISO"] for e in events_sorted if e.get("dateISO")]
+    range_from  = min(all_dates) if all_dates else ""
+    range_to    = max(all_dates) if all_dates else ""
+    ccy_dist    = dict(Counter(e.get("currency", "") for e in events_sorted))
+    impact_dist = dict(Counter(e.get("impact", "") for e in events_sorted))
 
     output = {
         "lastUpdate":     now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "generatedAt":    now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "fetchMode":      "FRED backfill + ForexFactory rolling",
+        "fetchMode":      "FRED + OECD backfill + ForexFactory rolling",
         "timezoneNote":   "All times UTC",
         "status":         "ok",
-        "source":         "FRED / ForexFactory",
+        "source":         "FRED / OECD / ForexFactory",
         "errorMessage":   None,
         "fetchErrors":    [],
         "rangeFrom":      range_from,
@@ -658,7 +694,7 @@ def save_calendar(events: list[dict], now_utc: datetime) -> None:
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     output_json = json.dumps(output, ensure_ascii=False, indent=2)
-    json.loads(output_json)   # validate before writing
+    json.loads(output_json)  # validate before writing
 
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         f.write(output_json)
@@ -667,11 +703,14 @@ def save_calendar(events: list[dict], now_utc: datetime) -> None:
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
+    force_overwrite = "--force" in sys.argv
+
     now_utc   = datetime.now(timezone.utc)
     today_str = now_utc.strftime("%Y-%m-%d")
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] backfill_economic_calendar.py v1.0")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] backfill_economic_calendar.py v2.0")
     print(f"  MAX_HISTORY_DAYS: {MAX_HISTORY_DAYS}")
+    print(f"  Force-overwrite FRED events: {force_overwrite}")
 
     if not FRED_API_KEY:
         print("\n  ERROR: FRED_API_KEY environment variable not set.")
@@ -679,49 +718,68 @@ def main():
         print("  Then run: FRED_API_KEY=<your_key> python scripts/backfill_economic_calendar.py")
         sys.exit(1)
 
-    # Backfill window: MAX_HISTORY_DAYS back, but leave a 14-day buffer at the
-    # recent end — the rolling update-economic-calendar.yml covers recent weeks
-    # with higher-fidelity ForexFactory data including exact release times.
-    cutoff_old  = (now_utc - timedelta(days=MAX_HISTORY_DAYS)).strftime("%Y-%m-%d")
-    cutoff_new  = (now_utc - timedelta(days=14)).strftime("%Y-%m-%d")
-    # FRED start: pull from 2 months before the cutoff so change calculations
-    # have a previous-period value available for the oldest events in window.
-    fred_start  = (now_utc - timedelta(days=MAX_HISTORY_DAYS + 60)).strftime("%Y-%m-%d")
+    # Backfill window
+    cutoff_old = (now_utc - timedelta(days=MAX_HISTORY_DAYS)).strftime("%Y-%m-%d")
+    cutoff_new = (now_utc - timedelta(days=14)).strftime("%Y-%m-%d")
+    fred_start = (now_utc - timedelta(days=MAX_HISTORY_DAYS + 90)).strftime("%Y-%m-%d")
+    oecd_start_year = (now_utc - timedelta(days=MAX_HISTORY_DAYS + 90)).year
 
     print(f"  Backfill window: {cutoff_old} → {cutoff_new}")
-    print(f"  FRED fetch start: {fred_start}\n")
+    print(f"  FRED fetch start: {fred_start}")
+    print(f"  OECD fetch start year: {oecd_start_year}\n")
 
-    # ── Step 1: Load existing calendar events ─────────────────────────────────
+    # ── Step 1: Load existing calendar ────────────────────────────────────────
     existing_events = load_calendar()
     print(f"  Existing calendar.json: {len(existing_events)} events")
 
-    # Build dedup key set from existing events with actuals (never overwrite)
-    existing_keys: set[tuple] = set()
+    # Build dedup key set.
+    # With --force: protect only ForexFactory events (never overwrite real data).
+    # Without --force: protect all events with actuals (safe default).
+    protected_keys: set[tuple] = set()
     for ev in existing_events:
         if ev.get("actual"):
+            source = ev.get("source", "")
+            # With --force: only protect non-FRED/non-OECD events
+            if force_overwrite and source in ("FRED", "OECD"):
+                continue  # allow overwrite of bad backfill data
             key = (
                 ev.get("currency", ""),
                 ev.get("dateISO", ""),
-                ev.get("event", "").lower().strip(),
+                _norm_event(ev.get("event", "")),
             )
-            existing_keys.add(key)
+            protected_keys.add(key)
 
-    print(f"  Existing events with actuals (protected): {len(existing_keys)}")
+    print(f"  Protected events (will not be overwritten): {len(protected_keys)}")
 
-    # ── Step 2: Fetch FRED backfill ───────────────────────────────────────────
-    print(f"\n  Fetching FRED series ({len(FRED_SERIES)} total)...")
+    # With --force: remove existing FRED/OECD events so they can be re-injected
+    if force_overwrite:
+        before = len(existing_events)
+        existing_events = [
+            e for e in existing_events
+            if e.get("source", "") not in ("FRED", "OECD")
+        ]
+        removed = before - len(existing_events)
+        print(f"  --force: removed {removed} existing FRED/OECD events for re-injection\n")
+
+    # ── Step 2: Fetch from FRED ────────────────────────────────────────────────
+    print(f"  Fetching FRED series ({len(FRED_SERIES)} total)...")
     fred_events = build_fred_events(fred_start)
     print(f"  FRED raw events generated: {len(fred_events)}")
 
-    # ── Step 3: Filter to backfill window and deduplicate ─────────────────────
+    # ── Step 3: Fetch from OECD fallback ──────────────────────────────────────
+    print(f"\n  Fetching OECD fallback series ({len(OECD_SERIES)} total)...")
+    oecd_events = build_oecd_events(oecd_start_year)
+    print(f"  OECD raw events generated: {len(oecd_events)}")
+
+    # ── Step 4: Filter to backfill window and deduplicate ─────────────────────
+    all_new_events = fred_events + oecd_events
     injected   = 0
     duplicates = 0
     out_window = 0
 
-    for ev in fred_events:
+    for ev in all_new_events:
         date_iso = ev.get("dateISO", "")
 
-        # Only inject dates within backfill window
         if date_iso < cutoff_old or date_iso > cutoff_new:
             out_window += 1
             continue
@@ -729,45 +787,51 @@ def main():
         key = (
             ev.get("currency", ""),
             date_iso,
-            ev.get("event", "").lower().strip(),
+            _norm_event(ev.get("event", "")),
         )
 
-        if key in existing_keys:
+        if key in protected_keys:
             duplicates += 1
             continue
 
         existing_events.append(ev)
-        existing_keys.add(key)
+        protected_keys.add(key)
         injected += 1
 
     print(f"\n  Backfill results:")
-    print(f"    Injected:   {injected} new events")
-    print(f"    Duplicates: {duplicates} (already in calendar.json — preserved)")
+    print(f"    Injected:      {injected} new events")
+    print(f"    Duplicates:    {duplicates} (already in calendar.json — preserved)")
     print(f"    Out of window: {out_window} (outside {cutoff_old}–{cutoff_new})")
 
-    if injected == 0:
+    if injected == 0 and not force_overwrite:
         print("\n  INFO: Nothing to inject — calendar.json already has full coverage.")
+        print("  Run with --force to re-inject FRED/OECD events (e.g. to fix corrupted data).")
         print("  No changes written.")
         sys.exit(0)
 
-    # ── Step 4: Save ──────────────────────────────────────────────────────────
+    # ── Step 5: Save ──────────────────────────────────────────────────────────
     save_calendar(existing_events, now_utc)
 
-    # ── Step 5: Summary ───────────────────────────────────────────────────────
-    all_dates = [e["dateISO"] for e in existing_events if e.get("dateISO")]
-    range_from = min(all_dates) if all_dates else "—"
-    range_to   = max(all_dates) if all_dates else "—"
+    # ── Step 6: Summary ───────────────────────────────────────────────────────
+    all_dates    = [e["dateISO"] for e in existing_events if e.get("dateISO")]
+    range_from   = min(all_dates) if all_dates else "—"
+    range_to     = max(all_dates) if all_dates else "—"
+    with_actuals = sum(1 for e in existing_events if e.get("actual") not in (None, ""))
+    in_90d       = sum(1 for e in existing_events
+                       if e.get("actual") and e.get("dateISO", "") >= (now_utc - timedelta(days=90)).strftime("%Y-%m-%d"))
 
-    ccy_new = Counter(
-        ev.get("currency", "")
-        for ev in existing_events
-        if ev.get("source") == "FRED"
-    )
+    by_ccy = Counter(e.get("currency", "") for e in existing_events if e.get("actual") not in (None, ""))
 
-    print(f"\n  calendar.json updated:")
-    print(f"    Total events: {len(existing_events)}")
-    print(f"    Date range:   {range_from} → {range_to}")
-    print(f"    FRED events by currency: {dict(sorted(ccy_new.items()))}")
+    print(f"\n  {'=' * 41}")
+    print(f"    ECONOMIC CALENDAR BACKFILL SUMMARY")
+    print(f"  {'=' * 41}")
+    print(f"  Total events:         {len(existing_events)}")
+    print(f"  With actuals:         {with_actuals}")
+    print(f"  In 90d window:        {in_90d}")
+    print(f"  Injected this run:    {injected}")
+    print(f"  Date range:           {range_from} → {range_to}")
+    print(f"  Coverage by currency: {dict(sorted(by_ccy.items()))}")
+    print(f"  {'=' * 41}")
     print(f"\n✓ Backfill complete. Run update-economic-calendar.yml to continue rolling accumulation.")
 
 
