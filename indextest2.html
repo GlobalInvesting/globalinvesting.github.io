@@ -6,7 +6,13 @@
 <script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FX Terminal — Live G8 Rates, COT Positioning &amp; Market Snapshot</title>
+<title>[TEST] FX Terminal — Dukascopy Calendar Widget</title>
+  <!-- ⚠ TEST FILE — indextest2.html — DO NOT DEPLOY AS index.html
+       Tests: Dukascopy economic_calendar_new widget replacing Myfxbook iframe.
+       If approved for production, _headers must add to script-src:
+         freeserv-static.dukascopy.com
+       and connect-src already has freeserv.dukascopy.com (verify subdomain matches).
+  -->
 
 <!-- ═══════════════════════════════════════
      SEO — Core
@@ -704,17 +710,40 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div id="split-lower-right">
 
     <!-- ECONOMIC CALENDAR — full width, above Cross-Asset & Risk Monitor -->
-    <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:200px;flex-shrink:0;">
+    <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:340px;flex-shrink:0;">
       <div class="panel-head">
         <span class="panel-title">Economic Calendar</span>
-        <span class="panel-sub">Myfxbook · hourly</span>
+        <span class="panel-sub">Dukascopy · G8 · medium &amp; high impact</span>
       </div>
       <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;">
-        <div style="width:100%;height:100%;filter:invert(0.90) hue-rotate(180deg) brightness(0.93);">
-          <iframe src="https://widget.myfxbook.com/widget/calendar.html?lang=en&impacts=0,1,2,3&symbols=AUD,CAD,CHF,EUR,GBP,JPY,NZD,USD"
-                  style="border:0;width:100%;height:100%;display:block;"
-                  title="Economic Calendar — Myfxbook"></iframe>
-        </div>
+        <script type="text/javascript">
+          DukascopyApplet = {"type":"economic_calendar_new","params":{
+            "showHeader":       false,
+            "tableBorderColor": "#2a2e39",
+            "bgColor":          "#1e222d",
+            "headerBgColor":    "#1a1d29",
+            "rowOddColor":      "#1e222d",
+            "rowEvenColor":     "#131722",
+            "textColor":        "#d1d4dc",
+            "linkColor":        "#4f7fff",
+            "positiveColor":    "#26a69a",
+            "negativeColor":    "#ef5350",
+            "neutralColor":     "#787b86",
+            "defaultTimezone":  0,
+            "defaultCountries": "c:AU,CA,CH,EU,GB,JP,NZ,US",
+            "impacts":          [2,3],
+            "dateTab":          2,
+            "showColCountry":   true,
+            "showColCurrency":  true,
+            "showColImpact":    true,
+            "showColPrevious":  true,
+            "showColForecast":  true,
+            "width":            "100%",
+            "height":           "306",
+            "adv":              "popup"
+          }};
+        </script>
+        <script type="text/javascript" src="https://freeserv-static.dukascopy.com/2.0/core.js" defer></script>
       </div>
     </div>
 
