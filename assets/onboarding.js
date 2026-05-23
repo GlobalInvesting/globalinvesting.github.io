@@ -142,8 +142,8 @@
 
     /* 7 — COT Positioning (opens modal) */
     {
-      target:  'section-positioning',
-      side:    'top',
+      target:  null,
+      side:    'bottom',
       title:   'CFTC COT Positioning',
       badge:   'Positioning',
       body:    'The Commitment of Traders report reveals what institutional speculators — hedge funds and large money managers — are actually holding. Click any currency row to open a detailed modal: net positioning history, z-score, crowding indicator, and the COT-based directional bias. The modal is opening now so you can see it in action.',
@@ -168,7 +168,23 @@
       badge:   'Rates',
       body:    'Policy rates for all G8 central banks with full decision history, next meeting date, and market-implied next move. Click any central bank flag to open the rate history modal: 24 months of decisions plotted against the yield curve, plus OIS-implied forward guidance and carry differential ranking.',
       action:  function () {
-        try { if (typeof window.closeCOTModal === 'function') window.closeCOTModal(); } catch (e) {}
+        // Close the COT inline panel correctly via the shell close button.
+        // closeCOTModal() alone only handles the modal DOM — it leaves the
+        // inline-panel wrap alive with no content, producing the black screen bug.
+        // Clicking the shell close button runs wrap.remove() + restoreChildren()
+        // + the onClose callback (_restore) in the correct order.
+        try {
+          var lwr = document.getElementById('split-lower');
+          if (lwr) {
+            var wrap = lwr.querySelector('[data-inline-panel]');
+            if (wrap) {
+              var closeBtn = wrap.querySelector('button[aria-label="Close panel"]');
+              if (closeBtn) { closeBtn.click(); return; }
+              wrap.remove();
+            }
+          }
+          if (typeof window.closeCOTModal === 'function') window.closeCOTModal();
+        } catch (e) {}
       },
     },
 
