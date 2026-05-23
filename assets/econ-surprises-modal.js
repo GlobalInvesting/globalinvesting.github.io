@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.2.0
+// ECONOMIC SURPRISES MODAL  v1.3.0
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -20,6 +20,7 @@
   const s = document.createElement('style');
   s.id = 'esm-css';
   s.textContent = `
+/* ── Desktop: inline panel layout (no fixed height on #esm-bd) ── */
 #esm-bd { display:block!important; }
 #esm-modal {
   width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
@@ -87,9 +88,12 @@
 }
 .esm-tab:hover { color:var(--text,#d1d4dc); }
 .esm-tab.on { color:var(--text,#d1d4dc);border-bottom-color:var(--blue,#4f7fff); }
+
+/* ── Desktop #esm-body: flex column, chart fixed height, events scroll internally ── */
 #esm-body {
-  flex:1;min-height:0;overflow:hidden;
   display:flex;flex-direction:column;background:var(--bg,#131722);
+  /* Desktop: contained scroll within the panel */
+  flex:1;min-height:0;overflow:hidden;
 }
 #esm-chart-wrap {
   flex:0 0 220px;min-height:180px;max-height:240px;position:relative;
@@ -164,11 +168,53 @@
   padding:24px 16px;text-align:center;font-size:11px;color:var(--text3,#6b7280);
   font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
-@media(max-width:600px){
+
+/* ── Mobile (≤900px): fixed bottom-sheet overlay ──────────────────────────────
+   Fixes Bug 1 (no scroll needed) and Bug 2 (layout has a defined height so
+   flex:1;min-height:0 works and #esm-events-wrap scrolls internally).
+   Uses 900px to match the terminal's own mobile breakpoint.
+─────────────────────────────────────────────────────────────────────────────── */
+@media(max-width:900px){
+  #esm-bd {
+    position:fixed!important;inset:0!important;
+    background:rgba(0,0,0,.55)!important;
+    z-index:9800!important;
+    display:flex!important;align-items:flex-end!important;
+    /* Tap backdrop to close */
+    cursor:pointer;
+  }
+  #esm-modal {
+    position:relative!important;
+    width:100%!important;
+    /* 80dvh gives enough room; fallback to 80vh */
+    height:80vh!important;height:80dvh!important;
+    max-height:80dvh!important;
+    border-radius:12px 12px 0 0!important;
+    box-shadow:0 -8px 40px rgba(0,0,0,.6)!important;
+    animation:_esmSlideUp .22s cubic-bezier(.16,1,.3,1) both!important;
+    /* Prevent backdrop tap from closing when tapping modal content */
+    cursor:default;
+    overflow:hidden!important;
+  }
+  @keyframes _esmSlideUp {
+    from { transform:translateY(100%); opacity:.6; }
+    to   { transform:translateY(0);    opacity:1;  }
+  }
+  /* With a fixed height on #esm-modal, flex:1 + min-height:0 work correctly */
+  #esm-body {
+    flex:1!important;min-height:0!important;overflow:hidden!important;
+  }
+  #esm-events-wrap {
+    /* overflow-y:auto now works because the parent chain has a defined height */
+    flex:1!important;min-height:0!important;overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  /* The sticky header is inside a scrollable container — no longer floats over chart */
+  #esm-events-hd { position:sticky!important;top:0!important; }
   #esm-metrics { grid-template-columns:repeat(3,1fr); }
   .esm-mm:nth-child(3) { border-right:none; }
   .esm-mm:nth-child(4) { border-top:1px solid var(--border,#252d3d); }
-  #esm-chart-wrap { flex:0 0 180px;max-height:200px; }
+  #esm-chart-wrap { flex:0 0 180px!important;min-height:160px!important;max-height:200px!important; }
 }
 `;
   document.head.appendChild(s);
@@ -689,6 +735,19 @@ async function openEconSurprisesModal(initialCcy) {
 
   document.body.appendChild(bd);
   document.addEventListener('keydown', _esmKeydown);
+
+  // Bug 1 fix: on mobile the modal is a fixed overlay (no scroll needed).
+  // On desktop (>900px) it appends to the document flow — scroll it into view.
+  if (window.innerWidth > 900) {
+    requestAnimationFrame(() => {
+      bd.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  // Mobile: tap the dark backdrop (not the modal itself) to close
+  bd.addEventListener('click', function(e) {
+    if (e.target === bd) closeESModal();
+  });
 
   // Fetch calendar
   try {
