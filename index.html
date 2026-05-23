@@ -110,7 +110,7 @@
     "FX Session Liquidity Map — Tokyo, London, New York overlap tracking",
     "Retail FX Positioning — Myfxbook community sentiment, long/short % and avg entry",
     "Implied Forwards via Covered Interest Parity (CIP) — 1M, 3M, 6M, 1Y",
-    "Macro Economic Calendar — ForexFactory upcoming events with impact filter",
+    "Macro Economic Calendar — Finnhub G8 events with actual vs consensus scoring",
     "Reference ECN Bid-Ask Spreads — volatility-adjusted model for all G8 pairs",
     "Rolling Cross-Asset Correlations — 30d/60d/90d Pearson with z-score vs 252d norm"
   ],
@@ -330,6 +330,44 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #main.split-layout #split-lower{border-left:none!important;overflow-y:visible!important}
 .split-drag-handle{display:none!important}
 }
+  /* ── Economic Calendar native panel ──────────────────────────────────── */
+  .cal-date-row {
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text2);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: .03em;
+    font-family: var(--font-ui);
+  }
+  .cal-event-row {
+    display: grid;
+    grid-template-columns: 52px 52px 18px 1fr 58px 58px 58px;
+    align-items: center;
+    padding: 3px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-family: var(--font-ui);
+    color: var(--text);
+    transition: background .1s;
+  }
+  .cal-event-row:hover { background: var(--bg3); }
+  .cal-event-row.cal-released { opacity: .55; }
+  .cal-col { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-col.cal-time { color: var(--text2); font-size: 10px; font-family: var(--font-mono); }
+  .cal-col.cal-ccy  { font-size: 10px; font-weight: 600; color: var(--text); display: flex; align-items: center; }
+  .cal-col.cal-title { padding-right: 4px; font-size: 11px; }
+  .cal-col.cal-num  { text-align: right; font-family: var(--font-mono); font-size: 10px; }
+  .cal-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  #sent-rows::-webkit-scrollbar { width: 3px; }
+  #sent-rows::-webkit-scrollbar-track { background: transparent; }
+  #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
@@ -711,10 +749,32 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- CROSS ASSET + RISK -->
     <div style="border-bottom:1px solid var(--border);">
+      <!-- ECONOMIC CALENDAR — native panel, Finnhub data, terminal colors -->
+      <div id="section-tvcalendar-top" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
+        <div class="panel-head">
+          <span class="panel-title">Economic Calendar</span>
+          <span class="panel-sub" id="cal-panel-sub">Finnhub · G8 · medium &amp; high impact</span>
+        </div>
+        <!-- Column headers -->
+        <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
+          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
+          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
+          <span style="font-size:9px;color:var(--text3);">·</span>
+          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
+          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
+          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
+          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
+        </div>
+        <!-- Scrollable events body -->
+        <div id="cal-events-body" style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;max-height:330px;">
+          <div style="padding:12px 10px;color:var(--text3);font-size:11px;">Loading calendar...</div>
+        </div>
+      </div>
+
       <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
-        <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
+        <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;">
           <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Multi-source · daily updated</span></div>
-          <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);gap:0;padding:0;height:calc(100% - 30px);align-content:stretch;">
+          <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);gap:0;padding:0;min-height:0;flex:1;">
             <!-- Populated by fetchCrossAssetData() -->
             <div class="ca-cell" data-sym="CMCMARKETS:SPX500" style="cursor:pointer;" title="Click: chart"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
             <div class="ca-cell" data-sym="CMCMARKETS:GOLDM2026" style="cursor:pointer;" title="Gold front-month futures · GC=F · Click: chart"><div class="ca-name">Gold Futures</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
@@ -1213,7 +1273,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </tbody>
     </table>
 
-    <!-- ECONOMIC SURPRISES — ForexFactory calendar, beat/miss vs consensus, G8 -->
+    <!-- ECONOMIC SURPRISES — Finnhub calendar, beat/miss vs consensus, G8 -->
     <div id="section-econ-surprise" style="border-top:1px solid var(--border);padding:6px 0 0;">
       <div class="sb-head" style="margin-bottom:1px;" title="Click any row to open the full surprise index chart">Economic Surprises</div>
       <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · G8 · 90d rolling</div>
@@ -1236,7 +1296,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <tr style="cursor:pointer;" onclick="openEconSurprisesModal('NZD')" title="Click to view NZD surprise index detail" tabindex="0" role="button" aria-label="NZD economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">NZD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
         </tbody>
       </table>
-      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">ForexFactory · actual vs consensus · 90d rolling</div>
+      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">Finnhub · actual vs consensus · G8 · 90d rolling</div>
     </div>
 
     <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
@@ -1382,6 +1442,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <script src="assets/yc-modal.js?v=7.74.41" defer></script>
 <script src="assets/heatmap-modal.js?v=2.1.0" defer></script>
 <script src="assets/econ-surprises-modal.js?v=1.2.0" defer></script>
+<script src="assets/calendar-panel.js?v=1.0.0" defer></script>
 <script src="assets/onboarding.js?v=7.89.3" defer></script>
 <script src="assets/layout-resizer.js?v=1.0.0" defer></script>
 <script src="assets/feed.js?v=1.0.0" defer></script>
