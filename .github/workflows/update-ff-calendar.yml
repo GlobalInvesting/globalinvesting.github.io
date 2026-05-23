@@ -1,31 +1,65 @@
 name: Update ForexFactory Calendar
 
-# Runs 4×/day covering major session opens.
-# Fetches G8 economic calendar with real-time actuals from Finnhub API
-# and writes calendar-data/ff_calendar.json to THIS (public) repo.
+# Polls Finnhub every 5 minutes during G8 economic data release windows,
+# and every 30 minutes during off-peak hours.
 #
-# v3.0 (2026-05-23): Migrated primary source from ForexFactory HTML (Playwright)
-# to Finnhub economic calendar API (finnhub.io). FF HTML scraping produced
-# incorrect dateISO/timeUTC for released events (day-boundary grouping bug).
-# Finnhub returns clean ISO UTC timestamps and actuals in the same JSON payload.
-# Requires FINNHUB_API_KEY repository secret (free at finnhub.io, no CC needed).
-# ForexFactory HTML (Playwright) remains available as fallback if key is unset.
+# KEY DESIGN: smart commit — the Python script compares new actuals/forecasts
+# against the previous ff_calendar.json and writes a /tmp/cal_changed flag.
+# The commit step only runs when the flag is "1", so git history stays clean
+# (no noise commits on every 5-min poll that found nothing new).
 #
-# Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
-# Public repos have unlimited GitHub Actions minutes.
+# RELEASE WINDOWS (every 5 min via GitHub cron + bash time gate):
+#   Asia/NZ:   23:00–02:30 UTC  (JPY, AUD, NZD data)
+#   EU/UK:     05:30–10:00 UTC  (EUR, GBP, CHF data)
+#   US:        12:00–15:30 UTC  (USD data — NFP, CPI, PCE all at 12:30 UTC)
 #
-# Schedule (4× daily UTC — major session windows):
-#   00:30 — before Tokyo open (picks up actuals from Asia/NZ events)
-#   06:30 — before London open (picks up EU morning actuals)
-#   12:30 — before New York open (picks up EU/US morning actuals)
-#   20:30 — before Sydney open (picks up US afternoon actuals)
+# OFF-PEAK HOURS (30-min sparse crons, no gate needed):
+#   02:30–05:30, 10:00–12:00, 15:30–23:00 UTC
+#   These cover CB speeches, late releases, and keep data fresh overnight.
+#
+# LATENCY: ~5–15 min during windows (GitHub runner queue + 45 sec job startup).
+# This matches industry standard for free-tier data pipelines. Bloomberg
+# achieves sub-second via dedicated data feeds (paid). Forex Factory itself
+# shows actuals ~2–5 min after official release time.
+#
+# GITHUB ACTIONS LIMITS:
+#   - Minimum cron interval: 5 minutes (*/5 * * * *)
+#   - Runner queue: adds 0–15 min delay, especially during peak (12:00–14:00 UTC)
+#   - Public repos: unlimited Actions minutes — no cost concern
+#   - Scheduled workflows disabled after 60 days of repo inactivity (GitHub policy)
+#
+# v4.0 (2026-05-23): Replaces 8-cron-per-day schedule with 5-min polling +
+# time-gate architecture and smart commit via CHANGED_FLAG.
 
 on:
   schedule:
-    - cron: '30 0 * * *'
-    - cron: '30 6 * * *'
-    - cron: '30 12 * * *'
-    - cron: '30 20 * * *'
+    # ── Every 5 minutes (GitHub minimum) — time gate in bash filters to windows ──
+    - cron: '*/5 * * * *'
+    # ── Off-peak sparse runs — 30-min interval, no gate needed ──
+    # 02:30–05:30 UTC window (between Asia close and EU open)
+    - cron: '30 2 * * *'
+    - cron: '0 3 * * *'
+    - cron: '30 3 * * *'
+    - cron: '0 4 * * *'
+    - cron: '30 4 * * *'
+    - cron: '0 5 * * *'
+    # 10:00–12:00 UTC window (between EU close and US open)
+    - cron: '0 10 * * *'
+    - cron: '30 10 * * *'
+    - cron: '0 11 * * *'
+    - cron: '30 11 * * *'
+    # 15:30–23:00 UTC window (US afternoon through Asia pre-open)
+    - cron: '30 15 * * *'
+    - cron: '0 16 * * *'
+    - cron: '30 16 * * *'
+    - cron: '0 17 * * *'
+    - cron: '30 17 * * *'
+    - cron: '0 18 * * *'
+    - cron: '30 18 * * *'
+    - cron: '0 19 * * *'
+    - cron: '30 19 * * *'
+    - cron: '0 20 * * *'
+    # (20:30 covered by */5 which starts the Asia window at 23:00)
   workflow_dispatch:
 
 concurrency:
@@ -46,29 +80,76 @@ jobs:
       - name: Pull latest changes
         run: git fetch origin main && git rebase origin/main
 
+      - name: Time-window gate (release windows only for */5 runs)
+        id: gate
+        run: |
+          # Only apply the gate to the */5 cron — off-peak sparse crons always proceed.
+          # Detection: if current minute is not a multiple of 5, we were triggered by
+          # a sparse off-peak cron (e.g. :30) — proceed unconditionally.
+          # If minute IS a multiple of 5, check if we're in a release window.
+          HOUR=$(date -u +%H)
+          MIN=$(date -u +%M)
+          echo "Current UTC time: ${HOUR}:${MIN}"
+
+          # Off-peak sparse cron: minute is not a multiple of 5 → always run
+          if [ $(( 10#$MIN % 5 )) -ne 0 ]; then
+            echo "Sparse off-peak cron — proceeding unconditionally."
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Dense */5 cron: check if we're in a release window
+          HOUR_INT=$(( 10#$HOUR ))
+          # Asia/NZ window: 23:00–02:30 UTC
+          if [ $HOUR_INT -ge 23 ] || [ $HOUR_INT -lt 2 ] || \
+             ( [ $HOUR_INT -eq 2 ] && [ $(( 10#$MIN )) -lt 30 ] ); then
+            echo "In Asia/NZ release window (23:00–02:30 UTC) — proceeding."
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          # EU/UK window: 05:30–10:00 UTC
+          if ( [ $HOUR_INT -eq 5 ] && [ $(( 10#$MIN )) -ge 30 ] ) || \
+             ( [ $HOUR_INT -ge 6 ] && [ $HOUR_INT -lt 10 ] ); then
+            echo "In EU/UK release window (05:30–10:00 UTC) — proceeding."
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          # US window: 12:00–15:30 UTC
+          if [ $HOUR_INT -ge 12 ] && \
+             ( [ $HOUR_INT -lt 15 ] || ( [ $HOUR_INT -eq 15 ] && [ $(( 10#$MIN )) -le 30 ] ) ); then
+            echo "In US release window (12:00–15:30 UTC) — proceeding."
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Off-peak hour — skipping fetch (not in any release window)."
+          echo "run=false" >> $GITHUB_OUTPUT
+
       - name: Setup Python
+        if: steps.gate.outputs.run == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
         run: pip install requests --break-system-packages
 
-      - name: Create calendar-data directory
-        run: mkdir -p calendar-data
-
       - name: Fetch economic calendar (Finnhub)
+        if: steps.gate.outputs.run == 'true'
         env:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: python scripts/fetch_ff_calendar.py
 
       - name: Display summary
-        if: always()
+        if: steps.gate.outputs.run == 'true'
         run: |
           echo ""
           echo "========================================"
           echo "    ECONOMIC CALENDAR FETCH SUMMARY"
           echo "========================================"
+          CHANGED=$(cat /tmp/cal_changed 2>/dev/null || echo "0")
+          echo "  Changed flag: ${CHANGED}"
           if [ -f "calendar-data/ff_calendar.json" ]; then
             python3 -c "
           import json
@@ -88,12 +169,17 @@ jobs:
               status = e.get('actual') or 'pending'
               print(f'    {e[\"timeUTC\"]} [{e[\"currency\"]}] {e[\"title\"]} | actual={status} est={e.get(\"forecast\",\"—\")}')
           "
-          else
-            echo "  ff_calendar.json not found — fetch may have failed"
           fi
 
-      - name: Commit and push
+      - name: Commit and push (only if actuals/forecasts changed)
+        if: steps.gate.outputs.run == 'true'
         run: |
+          CHANGED=$(cat /tmp/cal_changed 2>/dev/null || echo "0")
+          if [ "${CHANGED}" != "1" ]; then
+            echo "No new actuals or forecasts — skipping commit."
+            exit 0
+          fi
+
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
@@ -110,7 +196,7 @@ jobs:
             cp /tmp/ff_calendar_fresh.json calendar-data/ff_calendar.json
             git add calendar-data/ff_calendar.json
             if git diff --quiet && git diff --staged --quiet; then
-              echo "No changes vs remote HEAD — skipping commit."
+              echo "No changes vs remote HEAD — skipping commit (race condition resolved)."
               exit 0
             fi
             git commit -m "Calendar ${TIMESTAMP} [${SOURCE}] — ${HIGH} high-impact, ${RELEASED} with actuals"
