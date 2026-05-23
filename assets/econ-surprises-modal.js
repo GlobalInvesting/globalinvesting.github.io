@@ -276,6 +276,8 @@ function _esmEnsureLWC() {
 let _esmChart     = null;
 let _esmCalData   = null;
 let _esmActiveCcy = 'USD';
+let _esmRo        = null;   // active ResizeObserver — disconnected on destroy
+let _esmTimers    = [];     // pending setTimeout IDs — cleared on destroy
 
 // ── Time-decay constant (CESI convention, half-life 45d) ───────────────────────
 // w = e^(-λ·ageDays), λ = ln(2)/45. Mirrors DECAY_LAMBDA in dashboard.js exactly.
@@ -445,6 +447,12 @@ function _esmGetEvents(events, ccy) {
 
 // ── Chart ─────────────────────────────────────────────────────────────────────
 function _esmDestroyChart() {
+  // Cancel pending resize timers before removing the chart — prevents
+  // "Object is disposed" errors from ResizeObserver / setTimeout callbacks
+  // that fire applyOptions() on an already-removed LWC instance.
+  _esmTimers.forEach(id => clearTimeout(id));
+  _esmTimers = [];
+  if (_esmRo) { try { _esmRo.disconnect(); } catch (_) {} _esmRo = null; }
   if (_esmChart) { try { _esmChart.remove(); } catch (_) {} _esmChart = null; }
 }
 
@@ -539,16 +547,24 @@ function _esmRenderChart(ccy) {
     tip.style.top  = Math.max(0, ty) + 'px';
   });
 
-  // Resize
+  // Resize — store observer and timer IDs so _esmDestroyChart() can cancel them
   const apply = () => {
     requestAnimationFrame(() => {
+      if (!_esmChart) return;   // guard: chart may have been destroyed before rAF fires
       const w = container.offsetWidth || 600, h = container.offsetHeight || 240;
-      if (w > 0 && h > 10) chart.applyOptions({ width: w, height: h });
+      if (w > 0 && h > 10) { try { chart.applyOptions({ width: w, height: h }); } catch (_) {} }
     });
   };
-  if (window.ResizeObserver) { const ro = new ResizeObserver(apply); ro.observe(container); }
+  if (window.ResizeObserver) {
+    _esmRo = new ResizeObserver(apply);
+    _esmRo.observe(container);
+  }
   window.addEventListener('resize', apply);
-  setTimeout(apply, 60); setTimeout(apply, 250); setTimeout(apply, 600);
+  _esmTimers = [
+    setTimeout(apply, 60),
+    setTimeout(apply, 250),
+    setTimeout(apply, 600),
+  ];
 }
 
 // ── Metrics ───────────────────────────────────────────────────────────────────
