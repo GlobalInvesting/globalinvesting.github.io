@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// INLINE PANEL SYSTEM  v1.4.0
+// INLINE PANEL SYSTEM  v1.5.0
 // File: assets/inline-panel.js
 //
 //   LEFT center  (#split-upper):  Carry Trade · Heatmap
@@ -342,8 +342,11 @@
   var _origOpenESM = window.openEconSurprisesModal;
 
   window.openEconSurprisesModal = function(ccy) {
-    // Mobile path: fixed overlay, no transplant needed
-    if (window.innerWidth <= 900) {
+    // Mobile path: fixed overlay, no transplant needed.
+    // Use matchMedia for reliable detection (innerWidth can be unreliable in
+    // DevTools device emulation and at exactly-900px viewport widths).
+    var isMobile = window.matchMedia('(max-width:900px)').matches;
+    if (isMobile) {
       _origOpenESM && _origOpenESM(ccy);
       return;
     }
@@ -366,14 +369,30 @@
 
     _origOpenESM && _origOpenESM(ccy);
 
-    if (!_transplant(body, 'esm-bd', 'esm-modal', 'esm-close',
-        'display:flex!important;flex-direction:column!important;overflow:hidden!important;height:100%!important;')) {
+    // After _transplant, force esm-bd itself into the flex chain:
+    // _transplant sets esm-bd to display:block — but body is display:flex;flex-direction:column,
+    // so esm-bd needs to be flex:1;min-height:0 for height:100% on esm-modal to resolve
+    // to a real pixel value. Without this, the flex chain collapses and sticky headers
+    // float over the chart (Bug 2).
+    var ok = _transplant(body, 'esm-bd', 'esm-modal', 'esm-close',
+        'display:flex!important;flex-direction:column!important;overflow:hidden!important;height:100%!important;');
+    var esmBd = document.getElementById('esm-bd');
+    if (esmBd) {
+      esmBd.style.flex    = '1';
+      esmBd.style.minHeight = '0';
+      esmBd.style.display = 'flex';
+      esmBd.style.flexDirection = 'column';
+    }
+    if (!ok) {
       body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Economic Surprises data unavailable.</div>';
     }
     document.body.style.overflow = '';
-  };
-
-  window._showInlinePanel   = _makeShell;
+    // Scroll the panel into view in case the user is scrolled above it
+    requestAnimationFrame(function() {
+      var wrap = panels.lower.querySelector('[data-inline-panel]');
+      if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };   = _makeShell;
   window._ensureInlineSplit = _ensureSplit;
 
 })();
