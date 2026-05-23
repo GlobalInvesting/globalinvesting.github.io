@@ -87,8 +87,8 @@
 
     /* 4 — Economic Surprise Index (opens modal) */
     {
-      target:  'section-econ-surprise',
-      side:    'top',
+      target:  null,
+      side:    'bottom',
       title:   'Economic Surprise Index',
       badge:   'ESI',
       body:    'The ESI is a decay-weighted score that measures whether G8 economic data is consistently beating or missing consensus — decay-weighted so recent releases count more than older ones. A rising ESI signals that the economy is outperforming expectations, which is typically bullish for the currency. The chart is opening now so you can explore the 90-day rolling window.',
@@ -103,8 +103,8 @@
 
     /* 5 — Macro Risk Regime */
     {
-      target:  'risk-regime',
-      side:    'left',
+      target:  null,
+      side:    'bottom',
       title:   'Macro Risk Regime',
       badge:   'Risk',
       body:    null,
@@ -245,7 +245,12 @@
       title:   'Stay ahead — enable signal alerts',
       badge:   'Alerts',
       body:    'The terminal publishes AI-generated signals when the regime shifts or a high-conviction setup appears. Enable browser notifications to catch the signal at session open, even when this tab is in the background — no account or email required.',
-      action:  function () {},
+      action:  function () {
+        // Hide Derivatives section before showing the alerts CTA.
+        // Step 11 called _derivNavShow() which hides sibling panels in split-lower-right.
+        // Without this, those siblings stay hidden and the section looks broken.
+        try { if (typeof window._derivNavHide === 'function') window._derivNavHide(); } catch (e) {}
+      },
       lastCta: true,
     },
   ];
@@ -467,6 +472,7 @@
     try { if (typeof window.closeCOTModal     === 'function') window.closeCOTModal();     } catch (e) {}
     try { if (typeof window.closeCBRatesModal === 'function') window.closeCBRatesModal(); } catch (e) {}
     try { if (typeof window.closeHeatmapModal === 'function') window.closeHeatmapModal(); } catch (e) {}
+    try { if (typeof window._derivNavHide     === 'function') window._derivNavHide();     } catch (e) {}
     try {
       var _lwr = document.getElementById('split-lower');
       if (_lwr) {
