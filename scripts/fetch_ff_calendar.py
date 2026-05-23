@@ -1,8 +1,25 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.1
+fetch_ff_calendar.py — v3.3
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.3 changes:
+- derive_previous_from_history(): new step that fills missing `previous` fields
+  by finding the most recent prior actual of the same event series in the combined
+  ff_calendar + calendar.json history. Fixes Flash PMIs (EUR/GBP/AUD/JPY), energy
+  inventories (EIA/API), jobless claims, and other events where Finnhub returns
+  previous=null. The prior occurrence's `actual` becomes the current `previous`.
+- Fixed _TITLE_IGNORE: removed 'pmi' so it acts as a keyword discriminator,
+  preventing false matches between "Manufacturing PMI" and "Manufacturing Production".
+- _STRONG_WORDS updated accordingly.
+
+v3.2 change: Added calendar.json enrichment step. Finnhub does not have
+licensed actuals for Flash PMIs (EUR/GBP/AUD/JPY) — these are S&P Global
+proprietary data. After fetching from Finnhub, the script cross-references
+calendar-data/calendar.json (the FRED+FH backfill) to fill in `actual` and
+`previous` for events that Finnhub left empty, using fuzzy title matching
+on (currency, date, keyword overlap).
 
 WHY FINNHUB (v3.0 change from v2.0)
   v2.0 used Playwright to scrape ForexFactory HTML. FF HTML parsing proved
@@ -67,7 +84,7 @@ from datetime import datetime, timezone, timedelta
 import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
-OUTPUT_PATH      = "calendar-data/ff_calendar.json"
+CALENDAR_PATH = "calendar-data/calendar.json"   # backfill — FRED + Finnhub historical
 FINNHUB_API_KEY  = os.environ.get("FINNHUB_API_KEY", "")
 FH_BASE          = "https://finnhub.io/api/v1/calendar/economic"
 FETCH_TIMEOUT    = 25
@@ -313,7 +330,224 @@ def fetch_forexfactory_fallback() -> list[dict]:
     return events
 
 
-# ── Historical merge ──────────────────────────────────────────────────────────
+# ── calendar.json enrichment ──────────────────────────────────────────────────
+# Finnhub does not carry licensed actuals for Flash PMIs (EUR/GBP/AUD/JPY) or
+# certain other events. This step reads calendar-data/calendar.json (the FRED+FH
+# backfill) and fills in `actual` and `previous` for events that Finnhub left null.
+#
+# Matching strategy: same currency + same date + fuzzy title keyword overlap (>=2 words).
+# The backfill uses different provider names (e.g. "HCOB Manufacturing PMI Flash" vs
+# "S&P Global Manufacturing PMI Flash") so exact matching fails — keyword overlap works.
+
+_TITLE_IGNORE = frozenset({
+    'flash','prelim','prel','final','s&p','global','rate','index','change',
+    'm/m','y/y','q/q','mom','yoy','qoq','of','the','a','and','or','for',
+    'hcob','ism','cb','fed','ecb','boe','boj','rba','rbnz','snb','boc',
+    'pct',
+    # NOTE: 'pmi' intentionally NOT in ignore — it discriminates PMI events from
+    # similar events like "Manufacturing Production", "Services Sentiment", etc.
+    'jibun','unicredit','markit','nab','westpac','bank',
+})
+
+# Words that are distinctive enough to match alone (score=1 threshold OK)
+_STRONG_WORDS = frozenset({
+    'unemployment','payrolls','cpi','ppi','pce','gdp','pmi',
+    'retail','housing','inflation','employment',
+    'sentiment','confidence','permits','balance',
+    'trade','sales','michigan','chicago','adp','nfp','inventory','jobless','claims',
+    'construction','consumer',
+    # NOTE: 'manufacturing', 'services', 'composite', 'production', 'industrial'
+    # are NOT listed here — they appear across many different event types.
+    # They do match correctly when 'pmi' is also present (score >= 2).
+})
+
+def _title_keywords(title: str) -> frozenset:
+    words = title.lower().replace('/', ' ').replace('-', ' ').split()
+    return frozenset(w for w in words if w not in _TITLE_IGNORE and len(w) > 2)
+
+
+def enrich_from_calendar_json(events: list[dict]) -> int:
+    """
+    Fill in missing `actual` and `previous` fields by cross-referencing
+    calendar-data/calendar.json (FRED + Finnhub backfill).
+    Returns count of events enriched.
+    """
+    if not os.path.exists(CALENDAR_PATH):
+        print("  Enrichment: calendar.json not found — skipping.")
+        return 0
+
+    try:
+        with open(CALENDAR_PATH, encoding="utf-8") as f:
+            cal = json.load(f)
+        cal_events = cal.get("events", [])
+    except Exception as e:
+        print(f"  Enrichment: could not read calendar.json — {e}")
+        return 0
+
+    # Build lookup: (currency, dateISO) → list of calendar events with actuals
+    from collections import defaultdict
+    cal_by_cd = defaultdict(list)
+    for ce in cal_events:
+        if ce.get("actual") is not None:
+            cal_by_cd[(ce.get("currency", ""), ce.get("dateISO", ""))].append(ce)
+
+    enriched = 0
+    for ev in events:
+        needs_actual   = ev.get("actual")   is None
+        needs_previous = ev.get("previous") is None
+        if not needs_actual and not needs_previous:
+            continue
+
+        candidates = cal_by_cd.get((ev["currency"], ev["dateISO"]), [])
+        if not candidates:
+            continue
+
+        ff_kw = _title_keywords(ev["title"])
+        if not ff_kw:
+            continue
+
+        best, best_score = None, 0
+        for ce in candidates:
+            cal_kw = _title_keywords(ce.get("event") or ce.get("title") or "")
+            overlap = ff_kw & cal_kw
+            score   = len(overlap)
+            # Strong single-word match is sufficient; otherwise need 2+
+            if score == 1 and not (overlap & _STRONG_WORDS):
+                score = 0
+            if score > best_score:
+                best_score, best = score, ce
+
+        if best and best_score >= 1:
+            changed = False
+            if needs_actual and best.get("actual") is not None:
+                ev["actual"]   = str(best["actual"])
+                ev["released"] = True
+                changed = True
+            if needs_previous and best.get("previous") is not None:
+                ev["previous"] = str(best["previous"])
+                changed = True
+            if changed:
+                enriched += 1
+
+    print(f"  Enrichment from calendar.json: {enriched} events updated")
+    return enriched
+
+
+# ── Previous derivation from historical series ────────────────────────────────
+# For events where Finnhub has no `previous` (e.g. Flash PMIs for EUR/GBP/AUD/JPY,
+# energy inventories, jobless claims), we derive it by finding the most recent prior
+# occurrence of the same event series in the combined ff_calendar + calendar.json
+# history. The prior occurrence's `actual` becomes the current event's `previous`.
+#
+# Matching: same currency + keyword overlap >= 1 strong word OR >= 2 words total.
+# Using `actual` of the prior event (not `previous`) because that is the value
+# that was the "latest reading" when the current event was due.
+
+def derive_previous_from_history(events: list[dict]) -> int:
+    """
+    Derive missing `previous` values from historical actuals of the same event
+    series. Reads both calendar-data/calendar.json and the current ff_calendar
+    events list. Returns count of events updated.
+    """
+    from collections import defaultdict
+
+    # Load calendar.json for additional history
+    cal_history: list[tuple] = []   # (dateISO, currency, event_name, value, kw_frozenset)
+    if os.path.exists(CALENDAR_PATH):
+        try:
+            with open(CALENDAR_PATH, encoding="utf-8") as f:
+                cal = json.load(f)
+            for ce in cal.get("events", []):
+                # Prefer actual; fall back to previous when actual is empty/null
+                # (calendar.json sometimes stores actual="" for events that have been
+                # released but where the backfill script didn't capture the value)
+                raw = ce.get("actual")
+                val = str(raw).strip() if raw is not None else None
+                if not val:
+                    raw_prev = ce.get("previous")
+                    val = str(raw_prev).strip() if raw_prev is not None else None
+                if not val:
+                    continue
+                kw = _title_keywords(ce.get("event") or "")
+                if kw:
+                    cal_history.append((
+                        ce.get("dateISO", ""),
+                        ce.get("currency", ""),
+                        ce.get("event", ""),
+                        val,
+                        kw,
+                    ))
+        except Exception:
+            pass
+
+    # Also include actuals already in the current ff_calendar batch
+    ff_history: list[tuple] = []
+    for ev in events:
+        if ev.get("actual") is not None:
+            kw = _title_keywords(ev.get("title") or "")
+            if kw:
+                ff_history.append((
+                    ev.get("dateISO", ""),
+                    ev.get("currency", ""),
+                    ev.get("title", ""),
+                    str(ev["actual"]),
+                    kw,
+                ))
+
+    combined = cal_history + ff_history
+
+    # Group by currency for fast lookup
+    by_ccy: dict[str, list] = defaultdict(list)
+    for row in combined:
+        by_ccy[row[1]].append(row)
+
+    # Sort each currency list by date descending (most recent first)
+    for ccy in by_ccy:
+        by_ccy[ccy].sort(key=lambda x: x[0], reverse=True)
+
+    # Commodity words that must match exactly if present in target title
+    _COMMODITY_WORDS = frozenset({'gasoline','crude','natural','gas','distillate','heating'})
+
+    derived = 0
+    for ev in events:
+        if ev.get("previous") is not None:
+            continue  # already has previous — skip
+
+        ff_kw = _title_keywords(ev.get("title") or "")
+        if not ff_kw:
+            continue
+
+        ev_date = ev.get("dateISO", "")
+        ev_ccy  = ev.get("currency", "")
+        # If this event involves a specific commodity, require that commodity to match
+        ev_commodities = ff_kw & _COMMODITY_WORDS
+
+        best_actual: str | None = None
+        best_score  = 0
+
+        for h_date, h_ccy, h_event, h_actual, h_kw in by_ccy.get(ev_ccy, []):
+            if h_date >= ev_date:
+                continue  # must be strictly before this event
+            # Commodity guard: if the target has a commodity word (e.g. "gasoline"),
+            # the candidate must also contain that word — prevents crude→gasoline matches
+            if ev_commodities and not (ev_commodities & h_kw):
+                continue
+            overlap = ff_kw & h_kw
+            score   = len(overlap)
+            if score == 1 and not (overlap & _STRONG_WORDS):
+                score = 0
+            if score > best_score:
+                best_score  = score
+                best_actual = h_actual
+            if best_score >= 2:
+                break  # good enough match found, take it
+
+        if best_actual is not None and best_score >= 1:
+            ev["previous"] = best_actual
+            derived += 1
+
+    print(f"  Previous derived from history: {derived} events updated")
+    return derived
 
 def load_previous() -> list[dict]:
     if not os.path.exists(OUTPUT_PATH):
@@ -334,7 +568,7 @@ def load_previous() -> list[dict]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.1")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.3")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -370,6 +604,14 @@ def main():
             fresh_keys.add(k)
             merged += 1
     print(f"  Merged: {merged} historical events outside fetch window")
+
+    # Step 2b: Enrich from calendar.json backfill (fills actuals/previous Finnhub can't provide)
+    enrich_from_calendar_json(fresh)
+
+    # Step 2c: Derive missing `previous` from historical series
+    # Covers Flash PMIs (EUR/GBP/AUD/JPY), energy inventories, jobless claims, etc.
+    # where Finnhub returns previous=null but prior actuals exist in the combined history.
+    derive_previous_from_history(fresh)
 
     # Step 3: Sort
     fresh.sort(key=lambda e: (e["dateISO"], e["timeUTC"], e["currency"]))
