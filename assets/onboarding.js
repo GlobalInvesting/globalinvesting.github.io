@@ -149,13 +149,12 @@
       body:    'The Commitment of Traders report reveals what institutional speculators — hedge funds and large money managers — are actually holding. Click any currency row to open a detailed modal: net positioning history, z-score, crowding indicator, and the COT-based directional bias. The modal is opening now so you can see it in action.',
       action:  function () {
         try {
+          var store = window.COT_DATA_STORE;
+          if (!store) return;
           var cotRows = document.querySelectorAll('#cot-rows .cot-row, #cot-rows [data-ccy]');
-          if (cotRows.length > 0) {
-            var ccy   = cotRows[0].dataset.ccy || 'EUR';
-            var cache = window._cotDataCache;
-            if (cache && cache[ccy] && typeof window.openCOTModal === 'function') {
-              setTimeout(function () { window.openCOTModal(ccy, cache[ccy]); }, 700);
-            }
+          var ccy = cotRows.length > 0 ? (cotRows[0].dataset.ccy || 'EUR') : 'EUR';
+          if (store[ccy] && typeof window.openCOTModal === 'function') {
+            setTimeout(function () { window.openCOTModal(ccy, store[ccy]); }, 700);
           }
         } catch (e) {}
       },
