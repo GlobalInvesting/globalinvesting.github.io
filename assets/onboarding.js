@@ -1,9 +1,15 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.4 — production build
+ * v7.89.5 — production build
  *
  * Changes vs v7.81.5 (prior production):
- *   - 10-step tour: AI Narrative, Macro Regime, Cross-Asset, COT Positioning,
+ *   - 13-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
+ *     Cross-Asset, COT Positioning (opens modal), Rates, Sessions, Heatmap, Derivatives,
+ *     Signal Alerts
+ *   - ESI step opens openEconSurprisesModal('USD') — same pattern as COT step
+ *   - dismiss() now also closes ESI modal via closeESModal()
+ *   - Removed Install/RSS step (replaced by higher-value panels)
+ *   - [prior] 10-step tour: AI Narrative, Macro Regime, Cross-Asset, COT Positioning,
  *     Rates, Heatmap, Derivatives, Install & Subscribe, Signal Alerts
  *   - Step 8 (Install & Subscribe): surfaces PWA install + RSS feed — retention
  *   - Derivatives step clicks nav link and waits 400ms before positioning
@@ -45,7 +51,7 @@
       side:    'bottom',
       title:   'Institutional-grade FX data, in one place.',
       badge:   'Welcome',
-      body:    'Most retail traders operate blind to what institutions are doing. This terminal changes that: live G8 rates, CFTC positioning, central bank policy, yield curves, derivatives market structure, cross-asset risk — and an AI that synthesises it all into a single macro narrative, updated at every major session open.',
+      body:    'Most retail traders operate blind to what institutions are doing. This terminal changes that: live G8 rates, CFTC positioning, central bank policy, yield curves, economic surprise scoring, derivatives market structure, cross-asset risk — and an AI that synthesises it all into a single macro narrative, updated at every major session open.',
       action:  null,
     },
 
@@ -59,7 +65,43 @@
       action:  null,
     },
 
-    /* 2 — Macro Regime */
+    /* 2 — FX Pairs & Price Chart */
+    {
+      target:  'section-fxpairs',
+      side:    'right',
+      title:   'Live Price Chart & FX Pairs Table',
+      badge:   'Price Chart',
+      body:    'Live charts for all 28 G8 pairs — EUR/USD, USD/JPY, GBP/USD and more — plus a full pairs table with intraday change, spread, and carry differential. Switch pair with one click; the chart, heatmap, and carry rank all update together.',
+      action:  null,
+    },
+
+    /* 3 — Economic Calendar */
+    {
+      target:  'section-tvcalendar-top',
+      side:    'bottom',
+      title:   'Economic Calendar',
+      badge:   'Calendar',
+      body:    'Upcoming G8 macro releases filtered to medium and high impact only — the events that actually move FX. Each event shows local time across all G8 timezones, the consensus forecast, and the previous print. Once the actual is released the terminal scores it as a beat or miss and feeds the result directly into the Economic Surprise Index.',
+      action:  null,
+    },
+
+    /* 4 — Economic Surprise Index (opens modal) */
+    {
+      target:  'section-econ-surprise',
+      side:    'top',
+      title:   'Economic Surprise Index',
+      badge:   'ESI',
+      body:    'The ESI is a decay-weighted score that measures whether G8 economic data is consistently beating or missing consensus — decay-weighted so recent releases count more than older ones. A rising ESI signals that the economy is outperforming expectations, which is typically bullish for the currency. The chart is opening now so you can explore the 90-day rolling window.',
+      action:  function () {
+        try {
+          if (typeof window.openEconSurprisesModal === 'function') {
+            setTimeout(function () { window.openEconSurprisesModal('USD'); }, 700);
+          }
+        } catch (e) {}
+      },
+    },
+
+    /* 5 — Macro Risk Regime */
     {
       target:  'risk-regime',
       side:    'left',
@@ -67,10 +109,12 @@
       badge:   'Risk',
       body:    null,
       dynamic: 'regime',
-      action:  null,
+      action:  function () {
+        try { if (typeof window.closeESModal === 'function') window.closeESModal(); } catch (e) {}
+      },
     },
 
-    /* 3 — Cross-Asset */
+    /* 6 — Cross-Asset */
     {
       target:  'section-crossasset',
       side:    'right',
@@ -80,7 +124,7 @@
       action:  null,
     },
 
-    /* 4 — COT Positioning (opens modal) */
+    /* 7 — COT Positioning (opens modal) */
     {
       target:  'section-positioning',
       side:    'top',
@@ -101,7 +145,7 @@
       },
     },
 
-    /* 5 — Rates */
+    /* 8 — Rates */
     {
       target:  'section-rates',
       side:    'top',
@@ -113,19 +157,29 @@
       },
     },
 
-    /* 6 — Heatmap */
+    /* 9 — Market Sessions */
+    {
+      target:  'section-sessions',
+      side:    'top',
+      title:   'Market Sessions',
+      badge:   'Sessions',
+      body:    'Live session clocks for Tokyo, London, and New York with overlap windows highlighted — the hours where liquidity and volatility peak. Each session shows which G8 pairs are most active in that window, so you know exactly when your pair is trading at its tightest spread and deepest order book.',
+      action:  function () {
+        try { if (typeof window.closeCBRatesModal === 'function') window.closeCBRatesModal(); } catch (e) {}
+      },
+    },
+
+    /* 10 — Heatmap */
     {
       target:  'heatmap-grid',
       side:    'top',
       title:   'Currency Strength Heatmap',
       badge:   'Heatmap',
       body:    'Eight currencies ranked by intraday strength across all direct G8 pairs. Click any cell to open the currency detail modal: all 7 direct pairs, live carry, COT bias, realized vol, and pair correlations — the complete single-currency picture without switching views.',
-      action:  function () {
-        try { if (typeof window.closeCBRatesModal === 'function') window.closeCBRatesModal(); } catch (e) {}
-      },
+      action:  null,
     },
 
-    /* 7 — Derivatives */
+    /* 11 — Derivatives */
     {
       target:  'section-derivatives',
       side:    'top',
@@ -133,12 +187,11 @@
       badge:   'Derivatives',
       body:    'Four data streams in one section:<br>' +
                '&nbsp;&nbsp;<b>CIP Forwards</b> — implied 1M–1Y forward prices from covered interest parity.<br>' +
-               '&nbsp;&nbsp;<b>RR Term Structure</b> — 25-delta risk reversal skew across tenors (Saxo Bank live feed).<br>' +
+               '&nbsp;&nbsp;<b>RR Term Structure</b> — 25-delta risk reversal skew across tenors, updated daily.<br>' +
                '&nbsp;&nbsp;<b>ECB Fixings</b> — official daily reference rates vs live spot.<br>' +
                '&nbsp;&nbsp;<b>DTCC GTR</b> — actual OTC FX notional reported under Dodd-Frank: Swap, Forward &amp; NDF breakdown per pair.',
       action:  function () {
         try { if (typeof window.closeHeatmapModal === 'function') window.closeHeatmapModal(); } catch (e) {}
-        /* navigate to derivatives section via nav link (preferred) */
         try {
           var derivLink = document.querySelector('.top-nav a[data-target="section-derivatives"]');
           if (derivLink) {
@@ -154,34 +207,7 @@
       },
     },
 
-    /* 8 — Install & Subscribe */
-    {
-      target:  'rss-btn',
-      side:    'top',
-      title:   'Keep the terminal in reach',
-      badge:   'Install',
-      body:    'Two ways to stay connected without bookmarks:<br><br>' +
-               '<b>Install as app</b> — Add the terminal to your desktop or home screen for instant access. ' +
-               'No app store required: click <b>Install</b> in your browser address bar, or use the button below if available.<br><br>' +
-               '<b>RSS / JSON feed</b> — Subscribe to the AI narrative feed (button above) to receive macro regime updates in any feed reader, every session open.',
-      action:  function () {
-        /* navigate back to overview so the RSS button in the footer is visible */
-        try {
-          var overviewLink = document.querySelector('.top-nav a[data-target="top"]') ||
-                             document.querySelector('.top-nav a[href="#top"]');
-          if (overviewLink) overviewLink.click();
-        } catch (e) {}
-        /* show PWA install button if prompt is available */
-        try {
-          var installBtn = document.getElementById('gi-pwa-install-btn');
-          if (installBtn && window._giDeferredInstallPrompt) {
-            installBtn.style.display = 'inline-block';
-          }
-        } catch (e) {}
-      },
-    },
-
-    /* 9 — Signal alerts (last) */
+    /* 12 — Signal alerts (last CTA) */
     {
       target:  'sig-notif-btn',
       side:    'top',
@@ -192,7 +218,6 @@
       lastCta: true,
     },
   ];
-
   /* ─── state ──────────────────────────────────────────────────────────── */
   var currentStep  = 0;
   var overlayEl    = null;
@@ -384,6 +409,7 @@
     try { if (typeof window.closeCOTModal     === 'function') window.closeCOTModal();     } catch (e) {}
     try { if (typeof window.closeCBRatesModal === 'function') window.closeCBRatesModal(); } catch (e) {}
     try { if (typeof window.closeHeatmapModal === 'function') window.closeHeatmapModal(); } catch (e) {}
+    try { if (typeof window.closeESModal      === 'function') window.closeESModal();      } catch (e) {}
     [overlayEl, arrowEl].forEach(function (el) {
       if (!el) return;
       el.style.opacity    = '0';
@@ -463,7 +489,7 @@
 
     /* position popover — extra delay for derivatives nav */
     var targetEl = highlight(step.target);
-    var posDelay = step.target === 'section-derivatives' ? 450 : 0;
+    var posDelay = (step.target === 'section-derivatives' || step.target === 'section-econ-surprise') ? 450 : 0;
     setTimeout(function () { positionPopover(targetEl, step.side); }, posDelay);
   }
 
