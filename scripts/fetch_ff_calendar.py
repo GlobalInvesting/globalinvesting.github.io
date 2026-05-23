@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.5
+fetch_ff_calendar.py — v3.6
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.6 changes (2026-05-23):
+- Fix critical bug: FETCH_TIMEOUT was referenced in fetch_finnhub() but never
+  defined in the config block. This caused a NameError caught by the broad
+  except clause, silently returning [] and preserving the previous ff_calendar.json
+  unchanged on every run. Added FETCH_TIMEOUT = 30 to the config block.
 
 v3.5 changes:
 - Smart-change detection: compares new actuals/forecasts against the previous
@@ -106,6 +112,7 @@ FINNHUB_API_KEY  = os.environ.get("FINNHUB_API_KEY", "")
 FH_BASE          = "https://finnhub.io/api/v1/calendar/economic"
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FH_RATE_SLEEP    = 0.6   # seconds between calls (60 req/min free tier)
+FETCH_TIMEOUT    = 30    # seconds — requests.get timeout for Finnhub API calls
 LOOKBACK_DAYS    = 21
 FETCH_PAST_DAYS  = 21    # fetch actuals from last 21 days (covers 3 weeks of history)
 FETCH_FUTURE_DAYS = 14   # fetch upcoming events 2 weeks out
@@ -598,7 +605,7 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.5")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.6")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")

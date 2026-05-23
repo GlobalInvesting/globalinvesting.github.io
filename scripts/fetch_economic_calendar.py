@@ -1,57 +1,64 @@
 #!/usr/bin/env python3
 """
-fetch_economic_calendar.py  v3.1
+fetch_economic_calendar.py  v3.2
 ──────────────────────────────────────────────────────────────────────────────
 Builds calendar-data/calendar.json (Economic Surprises panel source) by
 converting and merging data from calendar-data/ff_calendar.json, which is
-maintained by fetch_ff_calendar.py / update-ff-calendar.yml and updates 4×/day.
+maintained by fetch_ff_calendar.py / update-ff-calendar.yml.
 
-WHY THIS APPROACH (v3.0/v3.1)
+WHY THIS APPROACH
   v2.0 scraped investing.com via a hidden POST endpoint, which worked until
   May 2026 when investing.com began returning HTTP 503 to GitHub Actions
   runner IP ranges (datacenter traffic detection).
 
-  ForexFactory (nfs.faireconomy.media) is a REST JSON API that remains
-  accessible from GitHub Actions runners. fetch_ff_calendar.py already
-  fetches and maintains ff_calendar.json with a 21-day rolling window.
-
-  This script reads ff_calendar.json, converts the schema to the format
-  expected by the Economic Surprises panel, and merges with the existing
-  calendar.json to maintain up to MAX_HISTORY_DAYS of beat/miss history.
+  ForexFactory/Finnhub (via ff_calendar.json) is the replacement. This script
+  reads ff_calendar.json, converts the schema to the format expected by the
+  Economic Surprises panel, and merges with the existing calendar.json to
+  maintain up to MAX_HISTORY_DAYS of beat/miss history.
 
 DEPENDENCY
   Requires calendar-data/ff_calendar.json to exist and be recent.
-  This file is written by fetch_ff_calendar.py, which runs on the same
-  4x/daily schedule via update-ff-calendar.yml.
-  The update-economic-calendar.yml workflow must run AFTER update-ff-calendar.yml.
-  Use `needs: [update-ff-calendar]` or schedule it 30min later.
+  Written by fetch_ff_calendar.py via update-ff-calendar.yml.
+  This script runs automatically via workflow_run trigger after
+  update-ff-calendar.yml completes (inherits CF Worker latency ~2-3 min).
 
 MERGE STRATEGY
-  Fresh data from ff_calendar.json takes priority over stale cached events.
-  Historical events (up to MAX_HISTORY_DAYS old) from the previous
-  calendar.json are preserved if they have actuals and are not in the
-  fresh FF window. This maintains the 90-day rolling beat/miss dataset
-  even though FF only provides 2 weeks of live data per run.
+  Fresh data from ff_calendar.json always takes priority.
+  Merge key: (currency, dateISO, event) — excludes timeUTC intentionally.
+  Finnhub occasionally adjusts scheduled times between runs; including timeUTC
+  caused the same event to appear twice (fresh with forecast + stale without).
+  A purge pass also removes any lingering stale duplicates from the historical
+  section that were created before the v3.1 merge key fix.
+  Historical events (up to MAX_HISTORY_DAYS) without a fresh counterpart are
+  preserved only if they have actuals — this maintains the 90-day beat/miss dataset.
+
+SURPRISE STATS
+  Computes per-event-series statistics (n, mean, std of actual-vs-forecast surprise)
+  over the LOOKBACK_DAYS window. Written to calendar.json as `surpriseStats` field.
+  Consumed by dashboard.js for z-score normalisation (graduated from beat/miss
+  to z-score when n >= 5 for a given series).
 
 CONSUMED BY
-  dashboard2.js -> renderEconSurprises() -- Economic Surprises panel
+  dashboard.js        -> renderEconSurprises() -- Economic Surprises panel (inline)
+  econ-surprises-modal.js -> full modal with chart + table
 
 SCHEDULE
-  update-economic-calendar.yml -- triggered by workflow_run after update-ff-calendar.yml
+  update-economic-calendar.yml -- workflow_run after update-ff-calendar.yml
   (inherits CF Worker latency: ~2-3 min end-to-end). Falls back to 4x daily cron.
 
 CHANGELOG
-  v3.1 (2026-05-23): Fix merge key -- exclude timeUTC. Finnhub adjusts scheduled
-    times between runs, causing duplicate entries when the same event had different
-    timeUTC values in ff_calendar vs cached calendar.json. Fresh data now always wins.
-  v3.0 (2026-05-23): Initial version. Reads ff_calendar.json, converts schema,
-    merges with historical calendar.json to maintain 90-day beat/miss window.
+  v3.2 (2026-05-23): Propagate source from ff_calendar.json (was hardcoded
+    'ForexFactory'); add purge pass for stale pre-v3.1 duplicate entries;
+    generate surpriseStats for z-score scoring.
+  v3.1 (2026-05-23): Fix merge key — exclude timeUTC.
+  v3.0 (2026-05-23): Initial version replacing investing.com scraper.
 """
 
 import json
+import math
 import os
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime, timezone, timedelta
 
 FF_CALENDAR_PATH = "calendar-data/ff_calendar.json"
@@ -73,22 +80,28 @@ FLAG_MAP = {
     "NZD": "\U0001f1f3\U0001f1ff",
 }
 
+# Indicators where lower-than-forecast = positive surprise
+INVERSE_EVENTS = frozenset({
+    "unemployment", "jobless", "claims", "deficit", "trade balance",
+})
+
 
 def load_ff_calendar():
-    """Load and return events from ff_calendar.json."""
+    """Load events and source from ff_calendar.json."""
     if not os.path.exists(FF_CALENDAR_PATH):
         print(f"  ERROR: {FF_CALENDAR_PATH} not found -- run update-ff-calendar workflow first.")
-        return []
+        return [], "unknown"
     try:
         with open(FF_CALENDAR_PATH, encoding="utf-8") as f:
             data = json.load(f)
         events = data.get("events", [])
         generated_at = data.get("generated_at", "unknown")
-        print(f"  Loaded ff_calendar.json: {len(events)} events (generated {generated_at})")
-        return events
+        source = data.get("source", "Finnhub")
+        print(f"  Loaded ff_calendar.json: {len(events)} events (generated {generated_at}, source: {source})")
+        return events, source
     except Exception as e:
         print(f"  ERROR: Could not read ff_calendar.json -- {e}")
-        return []
+        return [], "unknown"
 
 
 def ff_to_cal_event(ff):
@@ -151,12 +164,72 @@ def load_previous_calendar():
         return []
 
 
+def compute_surprise_stats(events, lookback_cutoff):
+    """
+    Compute per-event-series surprise statistics for z-score normalisation.
+
+    For each (currency, canonical_event_name) series, computes:
+      n    — number of observations in the lookback window
+      mean — mean surprise (actual - forecast, sign-corrected for inverse events)
+      std  — sample standard deviation of surprises
+
+    Only includes events with both actual and forecast (numeric) in the window.
+    Returns dict keyed by "CCY/EventName" matching the format expected by dashboard.js.
+
+    Industry standard: Bloomberg uses 1-year rolling z-score per series.
+    We use LOOKBACK_DAYS (90d) as our window — sufficient for most monthly series
+    (gives ~6 data points for monthly, ~12 for weekly like Claims).
+    """
+    series = defaultdict(list)
+
+    for ev in events:
+        if not ev.get("actual") or not ev.get("forecast"):
+            continue
+        if ev.get("dateISO", "") < lookback_cutoff:
+            continue
+
+        ccy = ev.get("currency", "")
+        title = ev.get("event", "")
+        if not ccy or not title:
+            continue
+
+        # Canonical name: strip trailing parentheticals like "(MoM)" for grouping
+        # Keep the full name for display; canon is for stats key only
+        canon = title.strip()
+
+        try:
+            actual_f   = float(str(ev["actual"]).replace("%", "").replace(",", "").strip())
+            forecast_f = float(str(ev["forecast"]).replace("%", "").replace(",", "").strip())
+        except (ValueError, TypeError):
+            continue
+
+        raw_surprise = actual_f - forecast_f
+        # Sign-correct: for inverse indicators, lower actual = positive surprise
+        title_lower = title.lower()
+        is_inverse  = any(kw in title_lower for kw in INVERSE_EVENTS)
+        surprise    = -raw_surprise if is_inverse else raw_surprise
+
+        series[f"{ccy}/{canon}"].append(surprise)
+
+    stats = {}
+    for key, surprises in series.items():
+        n = len(surprises)
+        if n < 2:
+            continue  # need at least 2 for a meaningful std
+        mean = sum(surprises) / n
+        variance = sum((x - mean) ** 2 for x in surprises) / (n - 1)  # sample variance
+        std = math.sqrt(variance)
+        stats[key] = {"n": n, "mean": round(mean, 6), "std": round(std, 6)}
+
+    return stats
+
+
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_economic_calendar.py v3.1")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_economic_calendar.py v3.2")
 
-    # Step 1: Load FF calendar
-    ff_events = load_ff_calendar()
+    # Step 1: Load FF calendar (source propagated, not hardcoded)
+    ff_events, ff_source = load_ff_calendar()
     if not ff_events:
         print("  WARNING: No FF events available -- preserving previous calendar.json.")
         sys.exit(0)
@@ -179,31 +252,36 @@ def main():
           f"(skipped {skipped_low} low-impact, {skipped_bad} non-G8/invalid)")
 
     # Step 3: Merge historical events from previous calendar.json
-    # FF provides only ~2 weeks of live data. Preserve older events with actuals
-    # so the 90-day beat/miss window stays populated.
     # Merge key: (currency, dateISO, event) — intentionally excludes timeUTC.
-    # Finnhub occasionally adjusts scheduled times between runs, so including
-    # timeUTC in the key causes the same event to appear twice: the fresh version
-    # (with forecast) and the stale cached version (without forecast). Excluding
-    # timeUTC ensures the fresh ff_calendar version always wins.
+    # Fresh ff_calendar data always wins; stale historical versions are skipped.
     fresh_keys  = {(e["currency"], e["dateISO"], e["event"]) for e in fresh}
     hard_cutoff = (now_utc - timedelta(days=MAX_HISTORY_DAYS)).strftime("%Y-%m-%d")
     prev_events = load_previous_calendar()
     merged = 0
+    purged = 0
     for ev in prev_events:
         d = ev.get("dateISO", "")
         if d < hard_cutoff:
             continue
-        if not (ev.get("actual") or ev.get("forecast")):
+        if not ev.get("actual"):
+            # Events without actuals add no value to the beat/miss history
             continue
         # Normalise legacy field name (older calendar.json used "title" instead of "event")
         if "title" in ev and "event" not in ev:
             ev["event"] = ev.pop("title")
         k = (ev.get("currency", ""), d, ev.get("event", ""))
-        if k not in fresh_keys:
-            fresh.append(ev)
-            fresh_keys.add(k)
-            merged += 1
+        if k in fresh_keys:
+            # Fresh version already covers this event — skip the stale historical copy.
+            # This also purges pre-v3.1 duplicates that slipped in before the merge
+            # key fix (where the same event had two entries with different timeUTC).
+            purged += 1
+            continue
+        fresh.append(ev)
+        fresh_keys.add(k)
+        merged += 1
+
+    if purged:
+        print(f"  Purged {purged} stale historical duplicates (superseded by fresh data)")
     print(f"  Merged {merged} historical events from previous calendar.json")
 
     if not fresh:
@@ -235,14 +313,21 @@ def main():
     for e in high_today:
         print(f"    {e['timeUTC']} [{e['currency']}] {e['event'][:45]} | actual={e.get('actual') or 'pending'} forecast={e.get('forecast', '--')}")
 
-    # Step 5: Write output
+    # Step 5: Compute surpriseStats for z-score scoring in dashboard.js
+    surprise_stats = compute_surprise_stats(fresh, lookback_cutoff)
+    series_with_stats = sum(1 for v in surprise_stats.values() if v["n"] >= 5)
+    print(f"\n  surpriseStats: {len(surprise_stats)} series computed ({series_with_stats} with n>=5 for z-score)")
+
+    # Step 6: Write output
+    # Source propagated from ff_calendar.json ("Finnhub" or "ForexFactory")
+    fetch_mode = f"{ff_source} via ff_calendar.json"
     output = {
         "lastUpdate":     now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "generatedAt":    now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "fetchMode":      "ForexFactory via ff_calendar.json",
+        "fetchMode":      fetch_mode,
         "timezoneNote":   "All times UTC",
         "status":         "ok",
-        "source":         "ForexFactory",
+        "source":         ff_source,
         "errorMessage":   None,
         "fetchErrors":    [],
         "rangeFrom":      range_from,
@@ -250,6 +335,7 @@ def main():
         "totalEvents":    len(fresh),
         "currencyCounts": dict(ccy_dist),
         "impactCounts":   dict(impact_dist),
+        "surpriseStats":  surprise_stats,
         "events":         fresh,
     }
 
@@ -261,7 +347,7 @@ def main():
         f.write(output_json)
 
     print(f"\n  {len(fresh)} events written to {OUTPUT_PATH} "
-          f"({beat_miss_ok} with beat/miss in {LOOKBACK_DAYS}d window)")
+          f"({beat_miss_ok} with beat/miss in {LOOKBACK_DAYS}d window) — source: {ff_source}")
 
 
 if __name__ == "__main__":
