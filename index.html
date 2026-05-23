@@ -6,13 +6,7 @@
 <script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[TEST] FX Terminal — Dukascopy Calendar Widget</title>
-  <!-- ⚠ TEST FILE — indextest2.html — DO NOT DEPLOY AS index.html
-       Tests: Dukascopy economic_calendar_new widget replacing Myfxbook iframe.
-       If approved for production, _headers must add to script-src:
-         freeserv-static.dukascopy.com
-       and connect-src already has freeserv.dukascopy.com (verify subdomain matches).
-  -->
+<title>FX Terminal — Live G8 Rates, COT Positioning &amp; Market Snapshot</title>
 
 <!-- ═══════════════════════════════════════
      SEO — Core
@@ -116,7 +110,7 @@
     "FX Session Liquidity Map — Tokyo, London, New York overlap tracking",
     "Retail FX Positioning — Myfxbook community sentiment, long/short % and avg entry",
     "Implied Forwards via Covered Interest Parity (CIP) — 1M, 3M, 6M, 1Y",
-    "Macro Economic Calendar — ForexFactory upcoming events with impact filter",
+    "Macro Economic Calendar — Finnhub G8 events with actual vs consensus scoring",
     "Reference ECN Bid-Ask Spreads — volatility-adjusted model for all G8 pairs",
     "Rolling Cross-Asset Correlations — 30d/60d/90d Pearson with z-score vs 252d norm"
   ],
@@ -380,12 +374,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=7.91.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.92.0">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
 
 <script src="assets/sw-register.js" defer></script>
+<!-- Disable browser scroll-position restoration BEFORE any defer scripts run.
+     history.scrollRestoration = 'manual' in dashboard.js fires too late because
+     defer scripts execute after HTML parsing — the browser restores scroll first.
+     This inline script (no defer/async) runs during HTML parsing, guaranteeing
+     manual restoration is set before the browser can restore any scroll position. -->
+<script>if ('scrollRestoration' in history) history.scrollRestoration = 'manual';</script>
 </head>
 <body>
 
@@ -747,11 +747,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="split-lower">
       <div id="split-lower-right">
 
-    <!-- ECONOMIC CALENDAR — native panel, ForexFactory data, terminal colors -->
-    <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
+    <!-- ECONOMIC CALENDAR — native panel, Finnhub data, terminal colors -->
+    <div id="section-tvcalendar-top" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
       <div class="panel-head">
         <span class="panel-title">Economic Calendar</span>
-        <span class="panel-sub" id="cal-panel-sub">ForexFactory · G8 · medium &amp; high impact</span>
+        <span class="panel-sub" id="cal-panel-sub">Finnhub · G8 · medium &amp; high impact</span>
       </div>
       <!-- Column headers -->
       <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
@@ -1266,7 +1266,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </tbody>
     </table>
 
-    <!-- ECONOMIC SURPRISES — ForexFactory calendar, beat/miss vs consensus, G8 -->
+    <!-- ECONOMIC SURPRISES — Finnhub calendar, beat/miss vs consensus, G8 -->
     <div id="section-econ-surprise" style="border-top:1px solid var(--border);padding:6px 0 0;">
       <div class="sb-head" style="margin-bottom:1px;" title="Click any row to open the full surprise index chart">Economic Surprises</div>
       <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · G8 · 90d rolling</div>
@@ -1289,7 +1289,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <tr style="cursor:pointer;" onclick="openEconSurprisesModal('NZD')" title="Click to view NZD surprise index detail" tabindex="0" role="button" aria-label="NZD economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">NZD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
         </tbody>
       </table>
-      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">ForexFactory · actual vs consensus · 90d rolling</div>
+      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">Finnhub · actual vs consensus · G8 · 90d rolling</div>
     </div>
 
     <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
@@ -1426,7 +1426,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/dashboard.js?v=7.91.0" defer></script>
+<script src="assets/dashboard.js?v=7.92.0" defer></script>
 <script src="assets/cot-modal-chart.js?v=7.89.2" defer></script>
 <script src="assets/cb-rates-modal.js?v=7.74.43" defer></script>
 <script src="assets/real-carry-modal.js?v=2.7.5" defer></script>
@@ -1434,12 +1434,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/yc-modal.js?v=7.74.41" defer></script>
 <script src="assets/heatmap-modal.js?v=2.1.0" defer></script>
-<script src="assets/econ-surprises-modal.js?v=1.2.0" defer></script>
+<script src="assets/econ-surprises-modal.js?v=1.3.0" defer></script>
 <script src="assets/onboarding.js?v=7.89.3" defer></script>
 <script src="assets/layout-resizer.js?v=1.0.0" defer></script>
 <script src="assets/feed.js?v=1.0.0" defer></script>
 <script src="assets/share.js?v=1.0.0" defer></script>
-<script src="assets/inline-panel.js?v=1.3.1" defer></script>
+<script src="assets/inline-panel.js?v=1.4.0" defer></script>
 
 <div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
@@ -1463,7 +1463,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
 
-  <!-- TEST: native calendar panel — replaces third-party iframe -->
-  <script src="assets/calendar-panel.js" defer></script>
+<script src="assets/calendar-panel.js?v=1.0.0" defer></script>
 </body>
 </html>
