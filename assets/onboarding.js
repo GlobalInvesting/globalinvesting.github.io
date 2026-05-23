@@ -3,7 +3,7 @@
  * v7.89.6 — production build
  *
  * Changes vs v7.81.5 (prior production):
- *   - 13-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
+ *   - 14-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
  *     Cross-Asset, COT Positioning (opens modal), Rates, Sessions, Heatmap, Derivatives,
  *     Signal Alerts
  *   - ESI step opens openEconSurprisesModal('USD') — same pattern as COT step
@@ -169,19 +169,15 @@
       },
     },
 
-    /* 8 — Rates */
+    /* 8 — Rates & Yield Curve */
     {
       target:  'section-rates',
       side:    'top',
-      title:   'Rates, Yield Curve & OIS Forwards',
+      title:   'Rates & Yield Curve',
       badge:   'Rates',
-      body:    'Policy rates for all G8 central banks with full decision history, next meeting date, and market-implied next move. Click any central bank flag to open the rate history modal: 24 months of decisions plotted against the yield curve, plus OIS-implied forward guidance and carry differential ranking.',
+      body:    'G8 sovereign yields across the full term structure — 3M through 30Y — plotted against the prior close. Switch tabs for DE, GB, JP, AU, CA, NZ or Sovereign Spreads. Key spread signals (2Y–10Y slope, US–DE, US–JP) flag curve regime shifts in real time. Click the curve to open the detailed yield modal.',
       action:  function () {
         // Close the COT inline panel correctly via the shell close button.
-        // closeCOTModal() alone only handles the modal DOM — it leaves the
-        // inline-panel wrap alive with no content, producing the black screen bug.
-        // Clicking the shell close button runs wrap.remove() + restoreChildren()
-        // + the onClose callback (_restore) in the correct order.
         try {
           var lwr = document.getElementById('split-lower');
           if (lwr) {
@@ -197,7 +193,24 @@
       },
     },
 
-    /* 9 — Market Sessions */
+    /* 9 — CB Rate Expectations & OIS */
+    {
+      target:    'section-rates',
+      highlight: 'section-cb-expectations',
+      side:      'top',
+      title:     'CB Rate Expectations & OIS Forwards',
+      badge:     'OIS',
+      body:      'The market\'s best estimate of where each G8 central bank will be at its next meeting — derived from OIS and futures markets (SOFR, €STR, SONIA, TONA, CORRA, SARON). Each row shows the current policy rate, meeting date, directional bias, and the probability-weighted implied rate. Click any central bank flag to open the full decision history: 24 months of decisions plotted on the yield curve, plus the OIS-implied forward rate.',
+      action:    function () {
+        try {
+          var rp = document.getElementById('rightpanel');
+          var el = document.getElementById('section-cb-expectations');
+          if (rp && el) rp.scrollTo({ top: el.offsetTop - rp.offsetTop - 4, behavior: 'smooth' });
+        } catch (e) {}
+      },
+    },
+
+    /* 10 — Market Sessions */
     {
       target:  'section-sessions',
       side:    'top',
@@ -209,7 +222,7 @@
       },
     },
 
-    /* 10 — Heatmap */
+    /* 11 — Heatmap */
     {
       target:  'heatmap-grid',
       side:    'top',
@@ -219,7 +232,7 @@
       action:  null,
     },
 
-    /* 11 — Derivatives */
+    /* 12 — Derivatives */
     {
       target:  'section-derivatives',
       side:    'top',
@@ -247,7 +260,7 @@
       },
     },
 
-    /* 12 — Signal alerts (last CTA) */
+    /* 13 — Signal alerts (last CTA) */
     {
       target:  'sig-notif-btn',
       side:    'top',
