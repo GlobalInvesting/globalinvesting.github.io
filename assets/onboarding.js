@@ -87,7 +87,8 @@
 
     /* 4 — Economic Surprise Index (opens modal) */
     {
-      target:  'split-lower',
+      target:    'split-lower',
+      highlight: 'section-econ-surprise',
       side:    'left',
       title:   'Economic Surprise Index · G8 · 90d rolling',
       badge:   'ESI',
@@ -109,7 +110,8 @@
 
     /* 5 — Macro Risk Regime */
     {
-      target:  'split-lower',
+      target:    'split-lower',
+      highlight: 'section-risk',
       side:    'left',
       title:   'Macro Risk Regime',
       badge:   'Risk',
@@ -148,7 +150,8 @@
 
     /* 7 — COT Positioning (opens modal) */
     {
-      target:  'split-lower',
+      target:    'split-lower',
+      highlight: 'section-positioning',
       side:    'left',
       title:   'CFTC COT Positioning',
       badge:   'Positioning',
@@ -569,7 +572,9 @@
     }
 
     /* position popover — extra delay for derivatives nav and modal steps */
-    var targetEl = highlight(step.target);
+    /* step.highlight (optional) separates the highlighted element from the positioning target */
+    highlight(step.highlight !== undefined ? step.highlight : step.target);
+    var targetEl = step.target ? (document.getElementById(step.target) || null) : null;
     var posDelay = (step.target === 'section-derivatives' || step.target === 'section-econ-surprise' || step.target === 'split-lower') ? 800 : 0;
     setTimeout(function () { positionPopover(targetEl, step.side); }, posDelay);
   }
