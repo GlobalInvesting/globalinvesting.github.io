@@ -1952,8 +1952,8 @@ function attachRiskMonitorTooltips() {
   const regCell = document.querySelector('#section-risk .risk-cell:nth-child(4)');
   if (regCell) attachRiskTip(regCell,
     'Market Regime',
-    'Composite live assessment: VIX level (primary driver), yield curve shape, gold intraday demand (>2% = stress signal), S&P 500 daily move (< -1.5% = stress), and MOVE index (>100 = elevated per BofA/ICE). Updates in real time.',
-    'RISK-ON: VIX <18, no stress signals active. MIXED: 1 stress factor (e.g. VIX 18–25). CAUTION: 2–3 factors. RISK-OFF: 4+ factors — high stress, USD/JPY/CHF bid, equities sold.'
+    'Composite live assessment: VIX level (primary driver), yield curve shape, gold intraday demand (>2% = stress signal), S&P 500 daily move (< -1.5% = stress), MOVE index (>100 = elevated per BofA/ICE), AUD/JPY intraday move (the canonical cross-asset risk barometer — sharp selloff >-1.5% = risk-off signal), and USD/JPY (yen safe-haven bid). Updates in real time.',
+    'RISK-ON: VIX <18, no stress signals active. MIXED: 1 stress factor (e.g. VIX 18–25). CAUTION: 2–3 factors. RISK-OFF: 4+ factors — high stress, USD/JPY/CHF bid, equities sold. Note: AUD/USD and NZD/USD falling modestly in isolation is normal when CBs diverge (RBA/RBNZ cuts) — AUD/JPY captures risk sentiment more cleanly.'
   );
 
   // ── Risk Indicators table rows ───────────────────────────────────
@@ -2091,14 +2091,17 @@ async function fetchRiskData() {
   // quotes.json (same-origin, GitHub Action) covers all needed symbols.
   if (_intradayData) {
     const _enrich2 = (id, guard) => { const q = intradayQuote(_intradayData, id); if (q && guard(q.close)) byId[id] = q; };
-    _enrich2('vix',   v => v > 5 && v < 100);
-    _enrich2('us10y', v => v > 0 && v < 20);
-    _enrich2('us2y',  v => v > 0 && v < 20);
-    _enrich2('us3m',  v => v > 0 && v < 20);
-    _enrich2('us5y',  v => v > 0 && v < 20);
-    _enrich2('us30y', v => v > 0 && v < 20);
-    _enrich2('dxy',   v => v > 50 && v < 130);
-    _enrich2('move',  v => v > 10 && v < 400);
+    _enrich2('vix',    v => v > 5 && v < 100);
+    _enrich2('us10y',  v => v > 0 && v < 20);
+    _enrich2('us2y',   v => v > 0 && v < 20);
+    _enrich2('us3m',   v => v > 0 && v < 20);
+    _enrich2('us5y',   v => v > 0 && v < 20);
+    _enrich2('us30y',  v => v > 0 && v < 20);
+    _enrich2('dxy',    v => v > 50 && v < 130);
+    _enrich2('move',   v => v > 10 && v < 400);
+    // FX risk proxies — used by regime scoring (AUD/JPY is the canonical cross-asset risk barometer)
+    _enrich2('audjpy', v => v > 50 && v < 150);
+    _enrich2('usdjpy', v => v > 80 && v < 200);
   }
 
   // ── STEP 3: Final render ──
@@ -2343,6 +2346,14 @@ async function renderRiskData(byId) {
     if (byId.spx && byId.spx.pct < -1.5) stressScore += 1;
     // MOVE index elevated = bond market stress (>100 = elevated per BofA/ICE; >120 is late-stage crisis)
     if (byId.move && byId.move.close > 100) stressScore += 1;
+    // AUD/JPY is the canonical cross-asset risk barometer (used by JPM, Deutsche Bank, Bloomberg).
+    // A move >-1.5% intraday signals genuine risk-off rotation (yen demand + AUD selling).
+    // Threshold calibrated to avoid false signals from CB divergence (RBA cuts, etc.)
+    // which typically produce moves of -0.3% to -0.8% in isolation.
+    if (byId.audjpy && byId.audjpy.pct < -1.5) stressScore += 1;
+    // USD/JPY falling sharply (>-1%) = yen safe-haven bid = confirms risk-off.
+    // Only add if AUD/JPY also weak to avoid double-counting pure USD moves.
+    if (byId.usdjpy && byId.usdjpy.pct < -1.0 && byId.audjpy && byId.audjpy.pct < -0.5) stressScore += 1;
 
     let regime, regimeSub;
     if (stressScore >= 4)      { regime = 'RISK-OFF'; regimeSub = `High stress · VIX ${vix.toFixed(1)}`; }
@@ -7607,7 +7618,15 @@ async function boot() {
   fetchRiskData();
   fetchCrossAssetData();
   fetchCommodityQuotes();
-  buildRichNarrative();              // AI narrative full build (non-blocking, fills narrative text)
+  // AI narrative full build (non-blocking, fills narrative text).
+  // Chain a post-resolve scroll reset: injecting the full narrative text expands
+  // #narrative's height, which can cause the browser to scroll #main down to
+  // maintain the visual position of content below it. Resetting scrollTop after
+  // the text is injected ensures the narrative is always visible on load.
+  buildRichNarrative().then(() => {
+    const _m = document.getElementById('main');
+    if (_m) _m.scrollTop = 0;
+  });
   setTimeout(fetchSentiment, 800);   // Dukascopy sentiment (last, non-critical)
 
   // Reset scroll on every load — prevents browser from restoring mid-panel positions
