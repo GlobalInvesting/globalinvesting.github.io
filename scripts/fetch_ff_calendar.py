@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.3
+fetch_ff_calendar.py — v3.4
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.4 changes:
+- Dedup step (Step 2d): Finnhub occasionally emits the same event twice with
+  slightly different times (e.g. API Crude Oil Stock Change at 20:30 and 21:30
+  with identical actual values). When all copies of a (title, currency, date)
+  group share the same actual, the earliest-time entry is kept and duplicates
+  are dropped. Groups with distinct actuals (prelim vs revised) are preserved.
 
 v3.3 changes:
 - derive_previous_from_history(): new step that fills missing `previous` fields
@@ -569,7 +576,7 @@ def load_previous() -> list[dict]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.3")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.4")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -613,6 +620,35 @@ def main():
     # Covers Flash PMIs (EUR/GBP/AUD/JPY), energy inventories, jobless claims, etc.
     # where Finnhub returns previous=null but prior actuals exist in the combined history.
     derive_previous_from_history(fresh)
+
+    # Step 2d: Dedup — Finnhub occasionally emits the same release twice with slightly
+    # different times (e.g. API Crude Oil at 20:30 and 21:30 with identical actuals).
+    # Strategy: for each (title, currency, date) group where all entries share the same
+    # actual value (or all are unreleased), keep the entry with the earliest timeUTC.
+    # Entries with distinct actuals are kept as separate rows (prelim vs revised, etc).
+    dedup_map: dict = {}
+    for ev in fresh:
+        key = (ev["title"], ev["currency"], ev["dateISO"])
+        if key not in dedup_map:
+            dedup_map[key] = []
+        dedup_map[key].append(ev)
+    deduped: list = []
+    dedup_removed = 0
+    for key, group in dedup_map.items():
+        if len(group) == 1:
+            deduped.append(group[0])
+            continue
+        actuals = [ev.get("actual") for ev in group]
+        all_same_actual = len(set(str(a) for a in actuals)) == 1
+        if all_same_actual:
+            group.sort(key=lambda e: e.get("timeUTC", ""))
+            deduped.append(group[0])
+            dedup_removed += len(group) - 1
+        else:
+            deduped.extend(group)
+    if dedup_removed:
+        print(f"  Deduped: removed {dedup_removed} duplicate entries (same title+currency+date+actual)")
+    fresh = deduped
 
     # Step 3: Sort
     fresh.sort(key=lambda e: (e["dateISO"], e["timeUTC"], e["currency"]))
