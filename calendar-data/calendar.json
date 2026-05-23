@@ -1,79 +1,31 @@
 {
-  "lastUpdate": "2026-05-22T21:40:46Z",
-  "generatedAt": "2026-05-22T21:40:46Z",
-  "fetchMode": "ForexFactory via ff_calendar.json",
+  "lastUpdate": "2026-05-23T00:48:41Z",
+  "generatedAt": "2026-05-23T00:48:41Z",
+  "fetchMode": "FRED backfill + Finnhub + ForexFactory rolling",
   "timezoneNote": "All times UTC",
   "status": "ok",
-  "source": "ForexFactory",
+  "source": "FRED / Finnhub / ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-05-22",
+  "rangeFrom": "2025-05-27",
   "rangeTo": "2026-05-22",
-  "totalEvents": 1402,
+  "totalEvents": 1400,
   "currencyCounts": {
-    "GBP": 159,
-    "USD": 497,
-    "EUR": 175,
-    "CHF": 78,
+    "EUR": 176,
+    "USD": 493,
+    "CHF": 80,
     "CAD": 108,
-    "JPY": 166,
+    "JPY": 168,
     "NZD": 73,
-    "AUD": 146
+    "AUD": 145,
+    "GBP": 157
   },
   "impactCounts": {
-    "medium": 892,
     "low": 152,
-    "high": 358
+    "medium": 889,
+    "high": 359
   },
   "events": [
-    {
-      "currency": "GBP",
-      "event": "Gfk Consumer Confidence",
-      "dateISO": "2025-05-22",
-      "hourUTC": "23:01",
-      "actual": "-20",
-      "forecast": "-22",
-      "previous": "-23",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Composite PMI Flash",
-      "dateISO": "2025-05-22",
-      "hourUTC": "07:45",
-      "actual": "61.2",
-      "forecast": null,
-      "previous": "50.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Manufacturing PMI Flash",
-      "dateISO": "2025-05-22",
-      "hourUTC": "07:45",
-      "actual": "58.3",
-      "forecast": "50.1",
-      "previous": "50.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Services PMI Flash",
-      "dateISO": "2025-05-22",
-      "hourUTC": "07:45",
-      "actual": "61.2",
-      "forecast": "50.8",
-      "previous": "50.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
     {
       "currency": "EUR",
       "event": "Consumer Confidence Final",
@@ -1452,6 +1404,42 @@
       "previous": "53.7",
       "impact": "medium",
       "importance": 2,
+      "source": "FH"
+    },
+    {
+      "currency": "USD",
+      "event": "Current Account",
+      "dateISO": "2025-06-24",
+      "hourUTC": "12:30",
+      "actual": "-450.2",
+      "forecast": "-443.3",
+      "previous": "-312",
+      "impact": "medium",
+      "importance": 2,
+      "source": "FH"
+    },
+    {
+      "currency": "USD",
+      "event": "CB Consumer Confidence",
+      "dateISO": "2025-06-24",
+      "hourUTC": "14:00",
+      "actual": "93",
+      "forecast": "100",
+      "previous": "98.4",
+      "impact": "medium",
+      "importance": 2,
+      "source": "FH"
+    },
+    {
+      "currency": "CHF",
+      "event": "Economic Sentiment Index",
+      "dateISO": "2025-06-25",
+      "hourUTC": "08:00",
+      "actual": "-2.1",
+      "forecast": null,
+      "previous": "-22",
+      "impact": "low",
+      "importance": 1,
       "source": "FH"
     },
     {
@@ -3236,6 +3224,42 @@
       "previous": "2.4",
       "impact": "low",
       "importance": 1,
+      "source": "FH"
+    },
+    {
+      "currency": "CHF",
+      "event": "KOF Leading Indicators",
+      "dateISO": "2025-08-28",
+      "hourUTC": "07:15",
+      "actual": "97.4",
+      "forecast": "98",
+      "previous": "101.3",
+      "impact": "medium",
+      "importance": 2,
+      "source": "FH"
+    },
+    {
+      "currency": "EUR",
+      "event": "Consumer Confidence Final",
+      "dateISO": "2025-08-28",
+      "hourUTC": "09:00",
+      "actual": "-15.5",
+      "forecast": "-15.5",
+      "previous": "-14.7",
+      "impact": "low",
+      "importance": 1,
+      "source": "FH"
+    },
+    {
+      "currency": "EUR",
+      "event": "Economic Sentiment",
+      "dateISO": "2025-08-28",
+      "hourUTC": "09:00",
+      "actual": "95.2",
+      "forecast": "96",
+      "previous": "95.7",
+      "impact": "medium",
+      "importance": 2,
       "source": "FH"
     },
     {
@@ -5741,66 +5765,6 @@
       "source": "FRED"
     },
     {
-      "currency": "GBP",
-      "event": "GfK Consumer Confidence",
-      "dateISO": "2025-11-21",
-      "hourUTC": "00:01",
-      "actual": "-19",
-      "forecast": "-18",
-      "previous": "-17",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Composite PMI Flash",
-      "dateISO": "2025-11-21",
-      "hourUTC": "14:45",
-      "actual": "54.8",
-      "forecast": "54.5",
-      "previous": "54.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Manufacturing PMI Flash",
-      "dateISO": "2025-11-21",
-      "hourUTC": "14:45",
-      "actual": "51.9",
-      "forecast": "52",
-      "previous": "52.5",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Services PMI Flash",
-      "dateISO": "2025-11-21",
-      "hourUTC": "14:45",
-      "actual": "55",
-      "forecast": "54.6",
-      "previous": "54.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "Michigan Consumer Sentiment Final",
-      "dateISO": "2025-11-21",
-      "hourUTC": "15:00",
-      "actual": "51",
-      "forecast": "50.5",
-      "previous": "53.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
       "currency": "USD",
       "event": "ADP Employment Change Weekly",
       "dateISO": "2025-11-25",
@@ -7267,6 +7231,18 @@
       "source": "FH"
     },
     {
+      "currency": "USD",
+      "event": "CB Consumer Confidence",
+      "dateISO": "2025-12-23",
+      "hourUTC": "15:00",
+      "actual": "89.1",
+      "forecast": "91",
+      "previous": "92.9",
+      "impact": "medium",
+      "importance": 2,
+      "source": "FH"
+    },
+    {
       "date": "14 Jan",
       "dateISO": "2026-01-14",
       "timeUTC": "12:30",
@@ -7755,30 +7731,6 @@
       "forecast": "4.4%",
       "previous": "4.4%",
       "source": "FRED"
-    },
-    {
-      "currency": "AUD",
-      "event": "Westpac Leading Index MoM",
-      "dateISO": "2026-01-21",
-      "hourUTC": "00:00",
-      "actual": "0.1",
-      "forecast": null,
-      "previous": null,
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "NZD",
-      "event": "Visitor Arrivals YoY",
-      "dateISO": "2026-01-21",
-      "hourUTC": "21:45",
-      "actual": "8.2",
-      "forecast": null,
-      "previous": "9.4",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
     },
     {
       "currency": "EUR",
@@ -13845,18 +13797,6 @@
       "previous": "228.0"
     },
     {
-      "currency": "EUR",
-      "event": "Consumer Confidence Flash",
-      "dateISO": "2026-03-23",
-      "hourUTC": "15:00",
-      "actual": "-16.3",
-      "forecast": "-14.4",
-      "previous": "-12.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
       "date": "23 Mar",
       "dateISO": "2026-03-23",
       "timeUTC": "05:30",
@@ -17332,6 +17272,42 @@
       "actual": "-3",
       "forecast": null,
       "previous": "1.8",
+      "impact": "medium",
+      "importance": 2,
+      "source": "FH"
+    },
+    {
+      "currency": "JPY",
+      "event": "Consumer Confidence",
+      "dateISO": "2026-04-30",
+      "hourUTC": "05:00",
+      "actual": "32.2",
+      "forecast": "33.1",
+      "previous": "33.3",
+      "impact": "high",
+      "importance": 3,
+      "source": "FH"
+    },
+    {
+      "currency": "JPY",
+      "event": "Housing Starts YoY",
+      "dateISO": "2026-04-30",
+      "hourUTC": "05:00",
+      "actual": "-29.3",
+      "forecast": "-28.5",
+      "previous": "-4.9",
+      "impact": "medium",
+      "importance": 2,
+      "source": "FH"
+    },
+    {
+      "currency": "NZD",
+      "event": "ANZ Business Confidence",
+      "dateISO": "2026-04-30",
+      "hourUTC": "01:00",
+      "actual": "-10.6",
+      "forecast": null,
+      "previous": "32.5",
       "impact": "medium",
       "importance": 2,
       "source": "FH"
