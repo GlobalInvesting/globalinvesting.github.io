@@ -747,30 +747,30 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="split-lower">
       <div id="split-lower-right">
 
+    <!-- ECONOMIC CALENDAR — native panel, Finnhub data, terminal colors -->
+    <div id="section-tvcalendar-top" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
+      <div class="panel-head">
+        <span class="panel-title">Economic Calendar</span>
+        <span class="panel-sub" id="cal-panel-sub">Finnhub · G8 · medium &amp; high impact</span>
+      </div>
+      <!-- Column headers -->
+      <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
+        <span style="font-size:9px;color:var(--text3);">·</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
+      </div>
+      <!-- Scrollable events body -->
+      <div id="cal-events-body" style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;max-height:330px;">
+        <div style="padding:12px 10px;color:var(--text3);font-size:11px;">Loading calendar…</div>
+      </div>
+    </div>
+
     <!-- CROSS ASSET + RISK -->
     <div style="border-bottom:1px solid var(--border);">
-      <!-- ECONOMIC CALENDAR — native panel, Finnhub data, terminal colors -->
-      <div id="section-tvcalendar-top" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
-        <div class="panel-head">
-          <span class="panel-title">Economic Calendar</span>
-          <span class="panel-sub" id="cal-panel-sub">Finnhub · G8 · medium &amp; high impact</span>
-        </div>
-        <!-- Column headers -->
-        <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
-          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
-          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
-          <span style="font-size:9px;color:var(--text3);">·</span>
-          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
-          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
-          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
-          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
-        </div>
-        <!-- Scrollable events body -->
-        <div id="cal-events-body" style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;max-height:330px;">
-          <div style="padding:12px 10px;color:var(--text3);font-size:11px;">Loading calendar...</div>
-        </div>
-      </div>
-
       <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
         <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;">
           <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Multi-source · daily updated</span></div>
@@ -937,9 +937,26 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
-    <!-- SESSIONS + SPREADS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:580px;">
-      <div class="panel" id="section-sessions" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:100%;">
+    <!-- RETAIL FX POSITIONING — full width -->
+    <div class="panel" id="section-positioning" style="border-bottom:1px solid var(--border);">
+      <div class="panel-head">
+        <span class="panel-title">Retail FX Positioning</span>
+        <span class="panel-sub" id="sent-source-sub">Myfxbook · retail positioning</span>
+      </div>
+      <div id="myfxbook-wrap" style="padding:4px 8px 6px;width:100%;background:var(--bg);">
+        <div id="sent-rows" style="overflow-y:auto;max-height:204px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;" class="thin-scroll">
+          <div style="color:var(--text3);font-size:11px;padding:8px 0;">Loading sentiment…</div>
+        </div>
+        <div id="sent-general" style="flex-shrink:0;"></div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--font-ui);padding:2px 0 1px;" id="sent-updated"></div>
+      </div>
+    </div>
+
+    <!-- SESSIONS + SPREADS — 2 equal columns -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
+
+      <!-- Col 1: Market Sessions -->
+      <div class="panel" id="section-sessions" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
         <div class="panel-head"><span class="panel-title">Market Sessions</span></div>
         <div class="session-row">
           <span class="sess" id="sess-sydney">Sydney</span>
@@ -968,24 +985,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </table>
           <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" id="svol-sub">5yr historical avg · fixed reference</div>
         </div>
-        <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
-          <div class="panel-head">
-            <span class="panel-title">Upcoming Events</span>
-            <span class="panel-sub">Myfxbook · hourly</span>
-          </div>
-          <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;">
-            <div style="width:100%;height:100%;filter:invert(0.90) hue-rotate(180deg) brightness(0.93);">
-              <iframe src="https://widget.myfxbook.com/widget/calendar.html?lang=en&impacts=0,1,2,3&symbols=AUD,CAD,CHF,EUR,GBP,JPY,NZD,USD"
-                      style="border:0;width:100%;height:100%;display:block;"
-                      title="Economic Calendar — Myfxbook"></iframe>
-            </div>
-          </div>
-        </div>
       </div>
-      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;height:100%;">
+
+      <!-- Col 2: Reference Spreads -->
+      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;">
         <div class="panel-head"><span class="panel-title" title="Indicative ECN bid-ask spreads — model-estimated, not live quoted prices. Values widen during high-volatility sessions. Use your broker's live feed for execution.">Reference Spreads</span><span class="panel-sub" id="spreads-sub">ECN est. · Loading…</span></div>
         <div id="spreads-rows" style="padding:4px 10px;flex-shrink:0;">
-          <!-- populated by fetchSpreadsData() -->
           <div class="spread-row"><span class="spr-sym">EUR/USD</span><div class="spr-bar"><div class="spr-fill" style="width:20%;background:var(--up)"></div></div><span class="spr-val up" id="spr-eurusd">0.9 pip</span></div>
           <div class="spread-row"><span class="spr-sym">GBP/USD</span><div class="spr-bar"><div class="spr-fill" style="width:24%;background:var(--up)"></div></div><span class="spr-val up" id="spr-gbpusd">1.1 pip</span></div>
           <div class="spread-row"><span class="spr-sym">USD/JPY</span><div class="spr-bar"><div class="spr-fill" style="width:36%;background:var(--orange)"></div></div><span class="spr-val" id="spr-usdjpy" style="color:var(--orange)">2.0 pip</span></div>
@@ -994,20 +999,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div class="spread-row"><span class="spr-sym">USD/CAD</span><div class="spr-bar"><div class="spr-fill" style="width:52%;background:var(--down)"></div></div><span class="spr-val down" id="spr-usdcad">2.5 pip</span></div>
           <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down" id="spr-nzdusd">3.0 pip</span></div>
         </div>
-        <div style="border-top:1px solid var(--border);overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:0;">
-          <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-            <span class="panel-title">Retail FX Positioning</span>
-            <span class="panel-sub" id="sent-source-sub">Myfxbook · retail positioning</span>
-          </div>
-          <div id="myfxbook-wrap" style="overflow:hidden;padding:4px 8px 2px;width:100%;flex:1;background:var(--bg);position:relative;min-height:0;display:flex;flex-direction:column;">
-            <div id="sent-rows" style="flex:1;overflow-y:auto;" class="thin-scroll">
-              <div style="color:var(--text3);font-size:11px;padding:8px 0;">Loading sentiment…</div>
-            </div>
-            <div id="sent-general" style="flex-shrink:0;"></div>
-            <div style="font-size:9px;color:var(--text3);font-family:var(--font-ui);padding:2px 0 1px;flex-shrink:0;" id="sent-updated"></div>
-          </div>
-        </div>
       </div>
+
     </div>
 
     <!-- NEWS FEED + ECONOMIC MAP -->
@@ -1442,7 +1435,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <script src="assets/yc-modal.js?v=7.74.41" defer></script>
 <script src="assets/heatmap-modal.js?v=2.1.0" defer></script>
 <script src="assets/econ-surprises-modal.js?v=1.2.0" defer></script>
-<script src="assets/calendar-panel.js?v=1.0.0" defer></script>
 <script src="assets/onboarding.js?v=7.89.3" defer></script>
 <script src="assets/layout-resizer.js?v=1.0.0" defer></script>
 <script src="assets/feed.js?v=1.0.0" defer></script>
@@ -1471,5 +1463,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
 
+<script src="assets/calendar-panel.js?v=1.0.0" defer></script>
 </body>
 </html>
