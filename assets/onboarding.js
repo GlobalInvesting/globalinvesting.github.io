@@ -1,6 +1,6 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.5 — production build
+ * v7.89.6 — production build
  *
  * Changes vs v7.81.5 (prior production):
  *   - 13-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
@@ -110,7 +110,23 @@
       body:    null,
       dynamic: 'regime',
       action:  function () {
-        try { if (typeof window.closeESModal === 'function') window.closeESModal(); } catch (e) {}
+        // Close the ESI inline panel completely.
+        // closeESModal() removes #esm-bd but the inline-panel wrap stays alive
+        // with overflowY:hidden and no content → black screen.
+        // Clicking the wrap's own close button triggers onClose (closeESModal)
+        // AND runs restoreChildren() + removes the wrap correctly.
+        try {
+          var lwr = document.getElementById('split-lower');
+          if (lwr) {
+            var wrap = lwr.querySelector('[data-inline-panel]');
+            if (wrap) {
+              var closeBtn = wrap.querySelector('button[aria-label="Close panel"]');
+              if (closeBtn) { closeBtn.click(); return; }
+              wrap.remove();
+            }
+          }
+          if (typeof window.closeESModal === 'function') window.closeESModal();
+        } catch (e) {}
       },
     },
 
@@ -230,14 +246,41 @@
   var _memDone     = false;
 
   /* ─── storage ────────────────────────────────────────────────────────── */
+  // Multi-layer persistence: localStorage → sessionStorage → cookie.
+  // Edge Tracking Prevention can silently block localStorage.setItem without
+  // throwing, so we verify the write succeeded and fall back to sessionStorage,
+  // then to a session cookie. _memDone guards against showing the tour twice
+  // within the same page load even if all storage layers fail.
+  function _storageGet() {
+    try { if (localStorage.getItem(STORAGE_KEY)) return true; } catch (e) {}
+    try { if (sessionStorage.getItem(STORAGE_KEY)) return true; } catch (e) {}
+    try { if (document.cookie.indexOf(STORAGE_KEY + '=1') !== -1) return true; } catch (e) {}
+    return false;
+  }
+
+  function _storageSet() {
+    var ok = false;
+    try {
+      localStorage.setItem(STORAGE_KEY, '1');
+      // Verify the write actually persisted (silent-fail defence)
+      if (localStorage.getItem(STORAGE_KEY) === '1') ok = true;
+    } catch (e) {}
+    if (!ok) {
+      try { sessionStorage.setItem(STORAGE_KEY, '1'); ok = true; } catch (e) {}
+    }
+    if (!ok) {
+      try { document.cookie = STORAGE_KEY + '=1;path=/;max-age=31536000'; } catch (e) {}
+    }
+  }
+
   function shouldShow() {
     if (_memDone) return false;
-    try { return !localStorage.getItem(STORAGE_KEY); } catch (e) { return true; }
+    return !_storageGet();
   }
 
   function markDone() {
     _memDone = true;
-    try { localStorage.setItem(STORAGE_KEY, '1'); } catch (e) {}
+    _storageSet();
   }
 
   /* ─── utils ──────────────────────────────────────────────────────────── */
@@ -409,7 +452,18 @@
     try { if (typeof window.closeCOTModal     === 'function') window.closeCOTModal();     } catch (e) {}
     try { if (typeof window.closeCBRatesModal === 'function') window.closeCBRatesModal(); } catch (e) {}
     try { if (typeof window.closeHeatmapModal === 'function') window.closeHeatmapModal(); } catch (e) {}
-    try { if (typeof window.closeESModal      === 'function') window.closeESModal();      } catch (e) {}
+    try {
+      var _lwr = document.getElementById('split-lower');
+      if (_lwr) {
+        var _wrap = _lwr.querySelector('[data-inline-panel]');
+        if (_wrap) {
+          var _cb = _wrap.querySelector('button[aria-label="Close panel"]');
+          if (_cb) { _cb.click(); }
+          else { _wrap.remove(); }
+        }
+      }
+      if (typeof window.closeESModal === 'function') window.closeESModal();
+    } catch (e) {}
     [overlayEl, arrowEl].forEach(function (el) {
       if (!el) return;
       el.style.opacity    = '0';
@@ -669,6 +723,8 @@
   window.giReplayTour = function () {
     _memDone = false;
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    try { document.cookie = STORAGE_KEY + '=;path=/;max-age=0'; } catch (e) {}
     if (overlayEl) dismiss();
     currentStep = 0;
     injectStyles();
