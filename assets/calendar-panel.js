@@ -1,6 +1,6 @@
 /**
  * calendar-panel.js — Native economic calendar renderer
- * Reads calendar-data/ff_calendar.json (ForexFactory, G8, medium+high impact)
+ * Reads calendar-data/ff_calendar.json (Finnhub, G8, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  * TEST FILE — not yet merged into dashboard.js.
  */
@@ -54,6 +54,98 @@
   // Today's ISO date in UTC
   function todayISO() {
     return new Date().toISOString().slice(0, 10);
+  }
+
+  // Scroll cal-events-body to a child element (correct inner scroll, not outer panel)
+  function scrollCalTo(container, target) {
+    if (!target) { container.scrollTop = 0; return; }
+    const offset = target.offsetTop - container.offsetTop;
+    container.scrollTop = Math.max(0, offset - 2);
+  }
+
+  // ── Next-event jump button ────────────────────────────────────────────────
+  // Industry standard: floating pill at bottom of calendar that shows
+  // the next upcoming high/medium event and jumps to it on click.
+  // Hides automatically when the next event is already in view.
+  function setupNextEventButton(container, firstUpcomingEl) {
+    // Remove any previous instance
+    const prev = document.getElementById('cal-next-btn');
+    if (prev) prev.remove();
+
+    if (!firstUpcomingEl) return;
+
+    // Read the event label for the button
+    const timeEl  = firstUpcomingEl.querySelector('.cal-time');
+    const ccyEl   = firstUpcomingEl.querySelector('.cal-ccy');
+    const titleEl = firstUpcomingEl.querySelector('.cal-title');
+    const dotEl   = firstUpcomingEl.querySelector('.cal-dot');
+
+    const timeStr  = timeEl  ? timeEl.textContent.trim()  : '';
+    const ccyStr   = ccyEl  ? ccyEl.textContent.trim()   : '';
+    const titleStr = titleEl ? titleEl.textContent.trim() : 'Next event';
+    // Truncate title to keep pill compact
+    const shortTitle = titleStr.length > 28 ? titleStr.slice(0, 26) + '…' : titleStr;
+    const dotColor = dotEl ? dotEl.style.background : 'var(--text3)';
+
+    const btn = document.createElement('button');
+    btn.id = 'cal-next-btn';
+    btn.title = `Jump to next event: ${titleStr}`;
+    btn.setAttribute('aria-label', `Jump to next event: ${titleStr}`);
+    btn.innerHTML = `
+      <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${dotColor};margin-right:5px;flex-shrink:0;"></span>
+      <span style="color:var(--text2);margin-right:4px;font-family:var(--font-mono);font-size:10px;">${timeStr}</span>
+      <span style="color:var(--text3);margin-right:4px;font-size:9px;">${ccyStr}</span>
+      <span style="color:var(--text1);font-size:10px;">${shortTitle}</span>
+      <span style="color:var(--text3);margin-left:5px;font-size:10px;">↑</span>`;
+    btn.style.cssText = [
+      'position:absolute',
+      'bottom:6px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'display:flex',
+      'align-items:center',
+      'padding:4px 10px',
+      'background:var(--bg3)',
+      'border:1px solid var(--border2)',
+      'border-radius:12px',
+      'cursor:pointer',
+      'white-space:nowrap',
+      'z-index:10',
+      'transition:opacity .15s',
+      'opacity:0',
+      'pointer-events:none',
+    ].join(';');
+
+    // Parent needs position:relative for absolute positioning to work
+    const wrapper = container.parentElement;
+    if (wrapper) {
+      wrapper.style.position = 'relative';
+      wrapper.appendChild(btn);
+    } else {
+      return;
+    }
+
+    btn.addEventListener('click', () => {
+      // Scroll to the date row just before the first upcoming event
+      const prev = firstUpcomingEl.previousElementSibling;
+      const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcomingEl;
+      scrollCalTo(container, target);
+    });
+
+    // Show/hide based on whether the first upcoming event is visible in the scroll box
+    function updateBtnVisibility() {
+      const cTop    = container.scrollTop;
+      const cBottom = cTop + container.clientHeight;
+      const eTop    = firstUpcomingEl.offsetTop - container.offsetTop;
+      const eBottom = eTop + firstUpcomingEl.offsetHeight;
+      const visible = eTop >= cTop && eBottom <= cBottom + 4;
+      btn.style.opacity        = visible ? '0' : '0.92';
+      btn.style.pointerEvents  = visible ? 'none' : 'auto';
+    }
+
+    container.addEventListener('scroll', updateBtnVisibility, { passive: true });
+    // Initial check after layout settles
+    requestAnimationFrame(() => requestAnimationFrame(updateBtnVisibility));
   }
 
   function buildPanel(events, source) {
@@ -130,39 +222,41 @@
 
     container.innerHTML = html;
 
-    // Scroll logic — priority order:
-    // 1. Today's date separator if today has any events (show today even if all past)
-    // 2. First upcoming event within today (scroll to next pending event)
-    // 3. First future date separator (next trading day, when no events today)
-    // 4. Top (fallback)
+    // ── Scroll logic ──────────────────────────────────────────────────────
+    // Uses direct scrollTop on cal-events-body (the overflow:auto container),
+    // NOT scrollIntoView which would scroll the outer #rightpanel instead.
+    //
+    // Priority order:
+    // 1. Today's date row — always anchor on today if the day has events
+    // 2. No today section — jump to first upcoming event's date row
+    // 3. First future date (next trading day after today)
+    // 4. Top (fallback — all events past, no future dates yet loaded)
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      // Priority 1: today's date row — always anchor on today if events exist today
-      const todayRow = container.querySelector('[data-today="1"]');
-      if (todayRow) {
-        todayRow.scrollIntoView({ block: 'start' });
-        return;
-      }
-
-      // Priority 2: no today section — find first upcoming event date row
+      const todayRow      = container.querySelector('[data-today="1"]');
       const firstUpcoming = container.querySelector('[data-upcoming="1"]');
-      if (firstUpcoming) {
+
+      if (todayRow) {
+        scrollCalTo(container, todayRow);
+      } else if (firstUpcoming) {
         const prev = firstUpcoming.previousElementSibling;
         const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcoming;
-        target.scrollIntoView({ block: 'start' });
-        return;
-      }
-
-      // Priority 3: first future date (next trading day after today)
-      const allDateRows = container.querySelectorAll('.cal-date-row[data-date]');
-      for (const row of allDateRows) {
-        if (row.dataset.date > today) {
-          row.scrollIntoView({ block: 'start' });
-          return;
+        scrollCalTo(container, target);
+      } else {
+        // Find first future date row
+        const allDateRows = container.querySelectorAll('.cal-date-row[data-date]');
+        let scrolled = false;
+        for (const row of allDateRows) {
+          if (row.dataset.date > today) {
+            scrollCalTo(container, row);
+            scrolled = true;
+            break;
+          }
         }
+        if (!scrolled) container.scrollTop = 0;
       }
 
-      // Fallback: top
-      container.scrollTop = 0;
+      // Setup "Next event" jump button
+      setupNextEventButton(container, firstUpcoming);
     }));
 
     if (sourceEl) {

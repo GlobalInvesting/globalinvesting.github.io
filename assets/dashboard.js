@@ -7609,6 +7609,11 @@ async function boot() {
   fetchCommodityQuotes();
   buildRichNarrative();              // AI narrative full build (non-blocking, fills narrative text)
   setTimeout(fetchSentiment, 800);   // Dukascopy sentiment (last, non-critical)
+
+  // Reset right panel scroll to top on every load — prevents browser from
+  // restoring mid-panel scroll position (which hides narrative + calendar header).
+  const _rp = document.getElementById('rightpanel');
+  if (_rp) _rp.scrollTop = 0;
 }
 
 boot();
@@ -8153,6 +8158,9 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     }
+    // Always reset right panel to top on bfcache restore
+    const _rp = document.getElementById('rightpanel');
+    if (_rp) _rp.scrollTop = 0;
     setTimeout(function() {
       redrawLiquidityIfVisible();
       // Same logic: only recreate TV widget if TV is currently active.
