@@ -84,7 +84,8 @@ from datetime import datetime, timezone, timedelta
 import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
-CALENDAR_PATH = "calendar-data/calendar.json"   # backfill — FRED + Finnhub historical
+OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
+CALENDAR_PATH = "calendar-data/calendar.json"    # backfill — FRED + Finnhub historical (read-only)
 FINNHUB_API_KEY  = os.environ.get("FINNHUB_API_KEY", "")
 FH_BASE          = "https://finnhub.io/api/v1/calendar/economic"
 FETCH_TIMEOUT    = 25
