@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.3.2
+// ECONOMIC SURPRISES MODAL  v1.3.3
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -276,8 +276,9 @@ function _esmEnsureLWC() {
 let _esmChart     = null;
 let _esmCalData   = null;
 let _esmActiveCcy = 'USD';
-let _esmRo        = null;   // active ResizeObserver — disconnected on destroy
-let _esmTimers    = [];     // pending setTimeout IDs — cleared on destroy
+let _esmRo           = null;   // active ResizeObserver — disconnected on destroy
+let _esmTimers       = [];     // pending setTimeout IDs — cleared on destroy
+let _esmResizeApply  = null;   // active window 'resize' handler — removed on destroy
 
 // ── Time-decay constant (CESI convention, half-life 45d) ───────────────────────
 // w = e^(-λ·ageDays), λ = ln(2)/45. Mirrors DECAY_LAMBDA in dashboard.js exactly.
@@ -453,6 +454,7 @@ function _esmDestroyChart() {
   _esmTimers.forEach(id => clearTimeout(id));
   _esmTimers = [];
   if (_esmRo) { try { _esmRo.disconnect(); } catch (_) {} _esmRo = null; }
+  if (_esmResizeApply) { window.removeEventListener('resize', _esmResizeApply); _esmResizeApply = null; }
   if (_esmChart) { try { _esmChart.remove(); } catch (_) {} _esmChart = null; }
 }
 
@@ -547,7 +549,12 @@ function _esmRenderChart(ccy) {
     tip.style.top  = Math.max(0, ty) + 'px';
   });
 
-  // Resize — store observer and timer IDs so _esmDestroyChart() can cancel them
+  // Resize — store observer and timer IDs so _esmDestroyChart() can cancel them.
+  // IMPORTANT: store `apply` in _esmResizeApply so the window 'resize' listener
+  // can be removed on destroy. Without this, each tab switch leaks a listener
+  // that holds a stale closure over the old `container` ref — `container.offsetHeight`
+  // returns 0 after LWC clears the DOM, causing chart.applyOptions({ height: 0 })
+  // which collapses the time-axis row and hides the date labels permanently.
   const apply = () => {
     requestAnimationFrame(() => {
       if (!_esmChart) return;   // guard: chart may have been destroyed before rAF fires
@@ -555,6 +562,7 @@ function _esmRenderChart(ccy) {
       if (w > 0 && h > 10) { try { chart.applyOptions({ width: w, height: h }); } catch (_) {} }
     });
   };
+  _esmResizeApply = apply;
   if (window.ResizeObserver) {
     _esmRo = new ResizeObserver(apply);
     _esmRo.observe(container);
