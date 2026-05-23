@@ -1728,3 +1728,47 @@ a:focus-visible,
   outline: 2px solid var(--blue,#4f7fff);
   outline-offset: -1px;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLOBAL THIN SCROLLBARS — v7.99.7
+   Applies to every scrollable container in the terminal.
+   Firefox: scrollbar-width:thin + scrollbar-color
+   Webkit/Blink (Chrome, Safari, Edge): 4px width, transparent track,
+   var(--border2) thumb with rounded corners.
+   The universal * selector ensures no container inherits the OS default
+   thick scrollbar — each element picks up the thin style automatically.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Firefox — global */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+
+/* Webkit — global: any element that scrolls gets a thin bar */
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 2px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--text3);
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Elements that should show NO scrollbar at all — preserve existing hide rules */
+#tv-ticker::-webkit-scrollbar,
+#tv-pair-tabs::-webkit-scrollbar,
+#lw-range-bar::-webkit-scrollbar,
+#rates-country-tabs::-webkit-scrollbar,
+.top-nav::-webkit-scrollbar {
+  display: none;
+}
