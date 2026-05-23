@@ -6,13 +6,13 @@
 <script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FX Terminal — Live G8 Rates, COT Positioning &amp; Market Snapshot</title>
+<title>Global Investing FX Terminal — COT Positioning, Economic Surprises &amp; AI Narrative</title>
 
 <!-- ═══════════════════════════════════════
      SEO — Core
      ═══════════════════════════════════════ -->
-<meta name="description" content="Professional FX terminal for G8 currency pairs. OIS-implied central bank rate expectations, CFTC COT institutional positioning, 25-delta Risk Reversals, carry trade rankings, US yield curve, VaR monitor, cross-asset risk regime, AI market narrative and price alerts — free, no login.">
-<meta name="keywords" content="fx terminal, forex dashboard 2026, real-time forex rates, currency strength meter, yield curve monitor, cross asset risk, COT positioning CFTC, central bank rates live, FX liquidity sessions, DXY dollar index, forex spread monitor, VIX MOVE index, forex market signals, professional forex tools, global investing fx">
+<meta name="description" content="Professional FX terminal for G8 currency pairs. Economic Surprise Index with z-score scoring, CFTC COT institutional positioning, OIS-implied central bank rate expectations, AI market narrative updated 4x daily, cross-asset risk regime, carry rankings and yield curve — free, no login.">
+<meta name="keywords" content="fx terminal, economic surprise index, COT positioning CFTC, forex economic calendar, AI market narrative, real-time forex rates, OIS central bank rates, cross asset risk, currency strength meter, yield curve monitor, FX liquidity sessions, carry trade ranking, 25 delta risk reversal, DXY dollar index, professional forex tools, global investing fx">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <meta name="author" content="Santiago Plá Casuriaga — Global Investing">
 <meta name="theme-color" content="#0d1117">
@@ -38,8 +38,8 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://globalinvesting.github.io/">
 <meta property="og:site_name" content="Global Investing FX Terminal">
-<meta property="og:title" content="FX Terminal — Live G8 Rates, COT Positioning &amp; Market Snapshot">
-<meta property="og:description" content="Professional FX terminal for G8 currency pairs. OIS-implied central bank rate expectations, CFTC COT institutional positioning, 25-delta Risk Reversals, carry trade rankings, US yield curve, VaR monitor, cross-asset risk regime, AI market narrative and price alerts — free, no login.">
+<meta property="og:title" content="Global Investing FX Terminal — COT Positioning, Economic Surprises &amp; AI Narrative">
+<meta property="og:description" content="Professional FX terminal for G8 currency pairs. Economic Surprise Index with z-score scoring, CFTC COT institutional positioning, OIS-implied central bank rate expectations, AI market narrative updated 4x daily, cross-asset risk regime, carry rankings and yield curve — free, no login.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -51,8 +51,8 @@
      ═══════════════════════════════════════ -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://globalinvesting.github.io/">
-<meta name="twitter:title" content="FX Terminal — Live G8 Rates, COT Positioning &amp; Market Snapshot">
-<meta name="twitter:description" content="Professional FX terminal: OIS-implied CB rate expectations, CFTC COT positioning, 25d Risk Reversals, carry rankings, yield curve, VaR, cross-asset risk and AI market signals. Free, no login.">
+<meta name="twitter:title" content="Global Investing FX Terminal — COT Positioning, Economic Surprises &amp; AI Narrative">
+<meta name="twitter:description" content="Professional FX terminal: Economic Surprise Index (z-score), CFTC COT positioning, OIS-implied CB rate expectations, AI narrative 4x daily, cross-asset risk regime, carry rankings and yield curve. Free, no login.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <meta name="twitter:image:alt" content="Global Investing FX Terminal">
 
@@ -96,21 +96,23 @@
   "browserRequirements": "Requires JavaScript",
   "featureList": [
     "Live FX rates for all G8 pairs — EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP and 20+ crosses (~5 min data delay)",
+    "Economic Surprise Index (ESI) — decay-weighted G8 currency scores from actual vs forecast data, with z-score normalisation per event series and 90-day rolling chart",
+    "G8 Economic Calendar — Finnhub medium/high-impact events with actual vs consensus beat/miss scoring, updated within 2-3 minutes of release",
     "OIS-implied central bank rate expectations for Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ — with market-implied cut/hike probability",
     "CFTC Commitment of Traders (COT) — Leveraged Funds and Asset Manager net positioning, WoW change, % of OI",
+    "AI-powered market narrative — synthesises COT, OIS bias, cross-asset risk and carry differentials, updated 4x daily with directional bias and key signals",
     "Implied Volatility from CBOE/CME FX Volatility Indexes (EUR, GBP, JPY, AUD) — same variance-swap methodology as VIX",
-    "25-delta Risk Reversal term structure — Saxo Bank, 1M tenor, all G8 pairs",
+    "25-delta Risk Reversal term structure — 1M tenor, all G8 pairs",
     "Carry Trade Ranking — CIP-adjusted G8 carry with OIS benchmark rates",
     "US Treasury Yield Curve — 3M to 30Y with 2Y-10Y spread and inversion flag",
     "Historical VaR 95% and CVaR (Expected Shortfall) — 252-day window for all G8 pairs",
     "Cross-Asset Risk Monitor — SPX, Gold, WTI, BTC, Nikkei, Stoxx 50, DXY, US10Y",
     "Currency Strength Heatmap — 28-pair equal-weighted model, all G8 currencies",
-    "AI-powered market narrative — updated 4× daily with directional bias and key signals",
     "Customisable price alerts with browser notifications",
     "FX Session Liquidity Map — Tokyo, London, New York overlap tracking",
     "Retail FX Positioning — Myfxbook community sentiment, long/short % and avg entry",
     "Implied Forwards via Covered Interest Parity (CIP) — 1M, 3M, 6M, 1Y",
-    "Macro Economic Calendar — Finnhub G8 events with actual vs consensus scoring",
+    "DTCC GTR FX OTC notional volume — G8 pair flow data, public dissemination T+1",
     "Reference ECN Bid-Ask Spreads — volatility-adjusted model for all G8 pairs",
     "Rolling Cross-Asset Correlations — 30d/60d/90d Pearson with z-score vs 252d norm"
   ],
@@ -222,6 +224,22 @@
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "The Carry Trade Ranking shows the net interest rate differential for all G8 currency pairs, adjusted for Covered Interest Parity (CIP) — the same methodology used by institutional FX desks. It ranks all 28 G8 pairs from highest to lowest carry, displaying benchmark OIS rates for both currencies and the net spread in basis points."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the Economic Surprise Index and how is it calculated?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Economic Surprise Index (ESI) measures how economic data is coming in relative to market expectations for each G8 currency. When the actual release beats the consensus forecast, it registers a positive surprise; a miss registers negative. The terminal uses decay-weighted scoring so recent releases count more than older ones, and normalises each event series using a 90-day rolling z-score — the same methodology used by institutional economic research desks. The ESI panel shows a running score per currency and a 90-day chart you can inspect by pair, updated within minutes of each data release."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the Economic Calendar work in the terminal?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Economic Calendar shows medium and high-impact G8 events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data is sourced from Finnhub and updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically."
       }
     }
   ]
