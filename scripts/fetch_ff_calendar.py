@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.0
+fetch_ff_calendar.py — v3.1
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
 
@@ -43,7 +43,7 @@ OUTPUT SCHEMA (ff_calendar.json) — unchanged from v1.x/v2.0
     released    — bool
 
 FETCH WINDOW
-  today - 7 days → today + 14 days (captures last week's actuals + 2 weeks ahead)
+  today - 21 days → today + 14 days (covers 3 weeks of history to backfill actuals + 2 weeks ahead)
 
 HISTORICAL MERGE
   Past events (21-day rolling window) from the previous ff_calendar.json are
@@ -73,7 +73,7 @@ FH_BASE          = "https://finnhub.io/api/v1/calendar/economic"
 FETCH_TIMEOUT    = 25
 FH_RATE_SLEEP    = 0.6   # seconds between calls (60 req/min free tier)
 LOOKBACK_DAYS    = 21
-FETCH_PAST_DAYS  = 7     # fetch actuals from last 7 days
+FETCH_PAST_DAYS  = 21    # fetch actuals from last 21 days (covers 3 weeks of history)
 FETCH_FUTURE_DAYS = 14   # fetch upcoming events 2 weeks out
 
 G8 = {
@@ -334,7 +334,7 @@ def load_previous() -> list[dict]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.0")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.1")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
