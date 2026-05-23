@@ -1,6 +1,6 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.3 — production build
+ * v7.89.4 — production build
  *
  * Changes vs v7.81.5 (prior production):
  *   - 10-step tour: AI Narrative, Macro Regime, Cross-Asset, COT Positioning,
@@ -506,20 +506,20 @@
     ].join(';');
 
     div.innerHTML =
-      /* close button */
-      '<button id="gi-tour2-close" aria-label="Skip tour" style="position:absolute;top:10px;right:11px;' +
-      'background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;line-height:1;' +
-      'padding:3px 5px;border-radius:3px;transition:color .15s;" ' +
-      'onmouseover="this.style.color=\'var(--text)\'" onmouseout="this.style.color=\'var(--text3)\'">&#x2715;</button>' +
-
-      /* header row */
+      /* header row — label left, step-counter + close button right (no absolute overlap) */
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
         '<div style="font-size:9.5px;font-weight:700;letter-spacing:.09em;color:var(--text3);text-transform:uppercase;' +
         'display:flex;align-items:center;gap:5px;">' +
           '<span style="width:5px;height:5px;border-radius:50%;background:var(--blue);display:inline-block;' +
           'box-shadow:0 0 5px var(--blue);"></span>Quick Tour' +
         '</div>' +
-        '<div id="gi-tour2-step-counter" style="font-size:9.5px;color:var(--text3);font-variant-numeric:tabular-nums;"></div>' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<div id="gi-tour2-step-counter" style="font-size:9.5px;color:var(--text3);font-variant-numeric:tabular-nums;"></div>' +
+          '<button id="gi-tour2-close" aria-label="Skip tour" style="' +
+          'background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;line-height:1;' +
+          'padding:3px 5px;border-radius:3px;transition:color .15s;flex-shrink:0;" ' +
+          'onmouseover="this.style.color=\'var(--text)\'" onmouseout="this.style.color=\'var(--text3)\'">&#x2715;</button>' +
+        '</div>' +
       '</div>' +
 
       /* step progress bar */
@@ -530,7 +530,7 @@
 
       /* badge + title */
       '<div id="gi-tour2-badge-title" style="font-size:13px;font-weight:700;color:var(--text);' +
-      'margin-bottom:8px;padding-right:20px;line-height:1.4;"></div>' +
+      'margin-bottom:8px;line-height:1.4;"></div>' +
 
       /* body */
       '<div id="gi-tour2-body" style="font-size:11.5px;color:var(--text2);line-height:1.7;' +

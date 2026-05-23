@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.3.3
+// ECONOMIC SURPRISES MODAL  v1.3.4
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -461,13 +461,20 @@ function _esmDestroyChart() {
 function _esmRenderChart(ccy) {
   const LWC = window.LightweightCharts;
   if (!LWC || !_esmCalData) return;
-  _esmDestroyChart();
 
+  // Read dimensions BEFORE destroy — _esmChart.remove() causes LWC to clear the
+  // container innerHTML which zeros offsetHeight in the same frame.
+  // getBoundingClientRect() is more reliable (mirrors the COT modal fix).
   const container = document.getElementById('esm-chart-inner');
   if (!container) return;
+  const _rect = container.getBoundingClientRect();
+  const W = Math.round(_rect.width)  || container.offsetWidth  || 600;
+  const H = Math.round(_rect.height) || container.offsetHeight
+          || container.parentElement?.getBoundingClientRect().height || 220;
+
+  _esmDestroyChart();
 
   const series = _esmBuildSeries(_esmCalData.events || [], ccy);
-  const W = container.offsetWidth || 600, H = container.offsetHeight || 240;
 
   const chart = LWC.createChart(container, {
     width: W, height: H,
@@ -558,7 +565,10 @@ function _esmRenderChart(ccy) {
   const apply = () => {
     requestAnimationFrame(() => {
       if (!_esmChart) return;   // guard: chart may have been destroyed before rAF fires
-      const w = container.offsetWidth || 600, h = container.offsetHeight || 240;
+      const r = container.getBoundingClientRect();
+      const w = Math.round(r.width)  || container.offsetWidth  || 600;
+      const h = Math.round(r.height) || container.offsetHeight
+              || container.parentElement?.getBoundingClientRect().height || 220;
       if (w > 0 && h > 10) { try { chart.applyOptions({ width: w, height: h }); } catch (_) {} }
     });
   };
