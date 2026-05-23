@@ -1,0 +1,36 @@
+name = "globalinvesting-calendar-watcher"
+main = "calendar-watcher.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ── Cron triggers ─────────────────────────────────────────────────────────────
+# Every 1 minute — Cloudflare Workers free tier minimum.
+# This is 5× more frequent than GitHub Actions minimum cron (*/5).
+[triggers]
+crons = ["* * * * *"]
+
+# ── KV Namespace ──────────────────────────────────────────────────────────────
+# Create this namespace first:
+#   npx wrangler kv namespace create CALENDAR_KV
+# Then paste the returned id below.
+[[kv_namespaces]]
+binding = "CALENDAR_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# ── Environment variables (non-secret) ───────────────────────────────────────
+# Secrets are set separately via: npx wrangler secret put SECRET_NAME
+# Do NOT put secrets here — this file is committed to the repo.
+
+# ── Deployment notes ──────────────────────────────────────────────────────────
+# 1. Install Wrangler:  npm install -g wrangler
+# 2. Login:             npx wrangler login
+# 3. Create KV:         npx wrangler kv namespace create CALENDAR_KV
+#    → Copy the id into [[kv_namespaces]] above
+# 4. Set secrets:
+#    npx wrangler secret put FINNHUB_API_KEY
+#    npx wrangler secret put GITHUB_PAT
+#    npx wrangler secret put GITHUB_OWNER   (value: globalinvesting)
+#    npx wrangler secret put GITHUB_REPO    (value: globalinvesting.github.io)
+# 5. Deploy:            npx wrangler deploy
+# 6. Test manually:     curl https://globalinvesting-calendar-watcher.YOUR_SUBDOMAIN.workers.dev/trigger
+# 7. Check logs:        npx wrangler tail
