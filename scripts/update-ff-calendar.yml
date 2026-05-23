@@ -1,0 +1,135 @@
+name: Update ForexFactory Calendar
+
+# Runs 8×/day targeting major economic data release windows.
+# Fetches G8 economic calendar with real-time actuals from Finnhub API
+# and writes calendar-data/ff_calendar.json to THIS (public) repo.
+#
+# v3.0 (2026-05-23): Migrated primary source from ForexFactory HTML (Playwright)
+# to Finnhub economic calendar API (finnhub.io). FF HTML scraping produced
+# incorrect dateISO/timeUTC for released events (day-boundary grouping bug).
+# Finnhub returns clean ISO UTC timestamps and actuals in the same JSON payload.
+# Requires FINNHUB_API_KEY repository secret (free at finnhub.io, no CC needed).
+# ForexFactory HTML (Playwright) remains available as fallback if key is unset.
+#
+# v3.5 (2026-05-23): Increased from 4×/day to 8×/day to reduce actual pickup
+# latency. Runs are now anchored to major release windows so actuals appear
+# within ~60 min of publication:
+#   00:30 — before Tokyo open (JPY/AUD early releases)
+#   01:30 — after JPY/AUD early releases (23:00–01:00 UTC window)
+#   06:30 — before London open (EU/UK morning data)
+#   07:30 — after EU morning data burst (06:00–07:30 UTC)
+#   12:30 — at New York open / before USD releases (critical: NFP, CPI at 12:30 UTC)
+#   13:30 — after initial US data releases (covers 12:30 UTC data like PCE, retail)
+#   14:30 — US afternoon window (PMI, housing, sentiment)
+#   20:30 — before Sydney open (picks up remaining US afternoon + NZD data)
+#
+# Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
+# Public repos have unlimited GitHub Actions minutes.
+
+on:
+  schedule:
+    - cron: '30 0 * * *'
+    - cron: '30 1 * * *'
+    - cron: '30 6 * * *'
+    - cron: '30 7 * * *'
+    - cron: '30 12 * * *'
+    - cron: '30 13 * * *'
+    - cron: '30 14 * * *'
+    - cron: '30 20 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: update-ff-calendar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-ff-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git fetch origin main && git rebase origin/main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create calendar-data directory
+        run: mkdir -p calendar-data
+
+      - name: Fetch economic calendar (Finnhub)
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: python scripts/fetch_ff_calendar.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "    ECONOMIC CALENDAR FETCH SUMMARY"
+          echo "========================================"
+          if [ -f "calendar-data/ff_calendar.json" ]; then
+            python3 -c "
+          import json
+          from datetime import datetime, timezone
+          with open('calendar-data/ff_calendar.json') as f:
+              cal = json.load(f)
+          events = cal.get('events', [])
+          today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+          released_all = [e for e in events if e.get('released')]
+          today_evs = [e for e in events if e['dateISO'] == today]
+          released_today = [e for e in today_evs if e.get('released')]
+          high_today = [e for e in today_evs if e['impact'] == 'high']
+          print(f'  Source: {cal.get(\"source\",\"?\")}')
+          print(f'  Total events: {len(events)} | with actuals: {len(released_all)}')
+          print(f'  Today ({today}): {len(today_evs)} events | {len(released_today)} released')
+          for e in high_today:
+              status = e.get('actual') or 'pending'
+              print(f'    {e[\"timeUTC\"]} [{e[\"currency\"]}] {e[\"title\"]} | actual={status} est={e.get(\"forecast\",\"—\")}')
+          "
+          else
+            echo "  ff_calendar.json not found — fetch may have failed"
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp calendar-data/ff_calendar.json /tmp/ff_calendar_fresh.json
+          SOURCE=$(python3 -c "import json; print(json.load(open('/tmp/ff_calendar_fresh.json')).get('source','?'))" 2>/dev/null || echo "?")
+          RELEASED=$(python3 -c "import json; c=json.load(open('/tmp/ff_calendar_fresh.json')); print(sum(1 for e in c['events'] if e.get('released')))" 2>/dev/null || echo "?")
+          HIGH=$(python3 -c "import json; c=json.load(open('/tmp/ff_calendar_fresh.json')); print(sum(1 for e in c['events'] if e['impact']=='high'))" 2>/dev/null || echo "?")
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/ff_calendar_fresh.json calendar-data/ff_calendar.json
+            git add calendar-data/ff_calendar.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "Calendar ${TIMESTAMP} [${SOURCE}] — ${HIGH} high-impact, ${RELEASED} with actuals"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data refreshes on next scheduled run."
+          exit 0
