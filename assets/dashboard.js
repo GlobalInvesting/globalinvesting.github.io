@@ -1,3 +1,8 @@
+// Disable browser scroll-position restoration so our explicit scrollTop = 0 calls
+// in boot() are never overridden by the browser restoring a previous scroll position.
+// Must be set before any scroll resets run. Standard pattern for dashboard/SPA pages.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
 // ═══════════════════════════════════════════════════════════════════
 // GLOBAL STATE
 // ═══════════════════════════════════════════════════════════════════
@@ -1577,7 +1582,9 @@ function renderSentiment(pairs, sourceLabel, general) {
     // ── Compact single-row layout ──
     const row = document.createElement('div');
     row.style.cssText = 'display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;';
-    row.title = 'Click to open ' + p.sym + ' chart';
+    // No row.title — the native browser tooltip overlaps the custom #fx-tt tooltips on child cells.
+    // Screen-reader label via aria-label instead.
+    row.setAttribute('aria-label', 'Click to open ' + p.sym + ' chart');
     row.addEventListener('mouseenter', () => row.style.background = 'var(--bg3)');
     row.addEventListener('mouseleave', () => row.style.background = '');
     row.addEventListener('click', () => loadTVChart(tvSym));
@@ -1639,6 +1646,11 @@ function renderSentiment(pairs, sourceLabel, general) {
 
     // ── Tooltips ──
     const domSideTxt = domLong ? 'longs' : 'shorts';
+    attachTip(symDiv,
+      'Click to open ' + p.sym + ' chart',
+      `Opens the ${p.sym} price chart. Retail positioning is most useful when cross-referenced with price action.`,
+      null
+    );
     attachTip(barDiv,
       'Long / Short bar',
       `Shows the split between retail buyers (green, left) and sellers (red, right). Extreme readings are often contrarian signals.`,
@@ -7626,6 +7638,10 @@ async function boot() {
   buildRichNarrative().then(() => {
     const _m = document.getElementById('main');
     if (_m) _m.scrollTop = 0;
+    // Belt-and-suspenders: signals and regime badge also render async after the
+    // narrative resolves (fetchRiskData → renderRiskData). Give them 300ms to
+    // settle, then do a final reset so any secondary reflow is also corrected.
+    setTimeout(() => { if (_m) _m.scrollTop = 0; }, 300);
   });
   setTimeout(fetchSentiment, 800);   // Dukascopy sentiment (last, non-critical)
 
