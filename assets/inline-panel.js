@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// INLINE PANEL SYSTEM  v1.5.0
+// INLINE PANEL SYSTEM  v1.6.0
 // File: assets/inline-panel.js
 //
 //   LEFT center  (#split-upper):  Carry Trade · Heatmap
@@ -328,40 +328,36 @@
   // ═══════════════════════════════════════════════════════════════════
   // INTERCEPT: Economic Surprises Modal → #split-lower (RIGHT)
   //
-  // On mobile (≤900px) the split-lower has no fixed height — transplanting
-  // into it produces a zero-height container where flex:1 collapses,
-  // overflow-y:auto never activates, and sticky headers float over the
-  // chart (Bug 2). The user also has to scroll manually to reach the
-  // transplanted panel (Bug 1).
+  // Desktop: identical pattern to COT/CB Rates — transplant into #split-lower.
+  // The shell body uses overflow:hidden (not auto) so that #esm-body's
+  // flex:1;min-height:0 chain works and #esm-events-wrap scrolls internally
+  // (fixes the sticky header floating over the chart — Bug 2).
   //
-  // Fix: on mobile, bypass the transplant entirely and let
-  // _origOpenESM run directly — the econ-surprises-modal.js CSS
-  // renders it as a fixed bottom-sheet overlay (position:fixed;inset:0)
-  // which solves both bugs. On desktop the transplant runs as before.
+  // Mobile (≤900px): #split-lower has overflow:visible and no fixed height,
+  // so transplanting produces a zero-height container where flex:1 collapses.
+  // On mobile we bypass the transplant and let openEconSurprisesModal append
+  // directly to body — the @media(max-width:900px) CSS in econ-surprises-modal.js
+  // renders it as a position:fixed bottom-sheet overlay (Bug 1 fix).
   // ═══════════════════════════════════════════════════════════════════
   var _origOpenESM = window.openEconSurprisesModal;
 
   window.openEconSurprisesModal = function(ccy) {
-    // Mobile path: fixed overlay, no transplant needed.
-    // Use matchMedia for reliable detection (innerWidth can be unreliable in
-    // DevTools device emulation and at exactly-900px viewport widths).
-    var isMobile = window.matchMedia('(max-width:900px)').matches;
-    if (isMobile) {
+    // Mobile: fixed overlay, no transplant
+    if (window.matchMedia('(max-width:900px)').matches) {
       _origOpenESM && _origOpenESM(ccy);
       return;
     }
 
-    // Desktop path: transplant into #split-lower as before.
-    // The shell body uses overflow-y:auto by default — for ESM we override it
-    // to overflow:hidden so that #esm-body's flex:1;min-height:0 chain works
-    // correctly and #esm-events-wrap scrolls internally (fixes Bug 2 on desktop).
+    // Desktop: transplant into #split-lower — same pattern as COT
     var panels = _ensureSplit();
     if (!panels) { _origOpenESM && _origOpenESM(ccy); return; }
 
     var body = _makeShell(panels.lower, 'Economic Surprises \u00b7 ' + (ccy || 'G8'), function() {
       if (typeof window.closeESModal === 'function') window.closeESModal();
     });
-    // Override shell body to overflow:hidden so ESM manages its own internal scroll
+    // Override shell body to overflow:hidden — ESM manages its own internal scroll
+    // via #esm-events-wrap (flex:1;min-height:0;overflow-y:auto). Without this,
+    // the shell body's overflow:auto interferes with the sticky header.
     body.style.overflowY = 'hidden';
 
     var bdPre = document.getElementById('esm-bd');
@@ -369,29 +365,22 @@
 
     _origOpenESM && _origOpenESM(ccy);
 
-    // After _transplant, force esm-bd itself into the flex chain:
-    // _transplant sets esm-bd to display:block — but body is display:flex;flex-direction:column,
-    // so esm-bd needs to be flex:1;min-height:0 for height:100% on esm-modal to resolve
-    // to a real pixel value. Without this, the flex chain collapses and sticky headers
-    // float over the chart (Bug 2).
-    var ok = _transplant(body, 'esm-bd', 'esm-modal', 'esm-close',
-        'display:flex!important;flex-direction:column!important;overflow:hidden!important;height:100%!important;');
-    var esmBd = document.getElementById('esm-bd');
-    if (esmBd) {
-      esmBd.style.flex    = '1';
-      esmBd.style.minHeight = '0';
-      esmBd.style.display = 'flex';
-      esmBd.style.flexDirection = 'column';
-    }
-    if (!ok) {
+    if (!_transplant(body, 'esm-bd', 'esm-modal', 'esm-close',
+        'display:flex!important;flex-direction:column!important;overflow:hidden!important;')) {
       body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Economic Surprises data unavailable.</div>';
     }
+    // _transplant sets esm-bd to display:block — but body is a flex column,
+    // so esm-bd must be flex:1;min-height:0 for height:100% on esm-modal to
+    // resolve to real pixels. Without this the flex chain collapses and the
+    // sticky events header floats over the chart (Bug 2).
+    var esmBdEl = document.getElementById('esm-bd');
+    if (esmBdEl) {
+      esmBdEl.style.flex        = '1';
+      esmBdEl.style.minHeight   = '0';
+      esmBdEl.style.display     = 'flex';
+      esmBdEl.style.flexDirection = 'column';
+    }
     document.body.style.overflow = '';
-    // Scroll the panel into view in case the user is scrolled above it
-    requestAnimationFrame(function() {
-      var wrap = panels.lower.querySelector('[data-inline-panel]');
-      if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
   };   = _makeShell;
   window._ensureInlineSplit = _ensureSplit;
 

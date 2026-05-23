@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.3.1
+// ECONOMIC SURPRISES MODAL  v1.3.2
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -751,14 +751,6 @@ async function openEconSurprisesModal(initialCcy) {
 
   document.body.appendChild(bd);
   document.addEventListener('keydown', _esmKeydown);
-
-  // Bug 1 fix: on mobile the modal is a fixed overlay (no scroll needed).
-  // On desktop (>900px) it appends to the document flow — scroll it into view.
-  if (window.innerWidth > 900) {
-    requestAnimationFrame(() => {
-      bd.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  }
 
   // Mobile: tap the dark backdrop (not the modal itself) to close
   bd.addEventListener('click', function(e) {
