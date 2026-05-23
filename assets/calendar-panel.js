@@ -56,7 +56,8 @@
     return new Date().toISOString().slice(0, 10);
   }
 
-  function buildPanel(events) {
+  function buildPanel(events, source) {
+    source = source || 'Finnhub';
     const container = document.getElementById('cal-events-body');
     const sourceEl  = document.getElementById('cal-panel-sub');
     if (!container) return;
@@ -130,25 +131,24 @@
     container.innerHTML = html;
 
     // Scroll logic — priority order:
-    // 1. First upcoming event (future datetime)
-    // 2. Today's date separator (all today's events are past, but show today)
-    // 3. First future date separator (next trading day)
+    // 1. Today's date separator if today has any events (show today even if all past)
+    // 2. First upcoming event within today (scroll to next pending event)
+    // 3. First future date separator (next trading day, when no events today)
     // 4. Top (fallback)
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      // Priority 1: first event that hasn't happened yet
-      const firstUpcoming = container.querySelector('[data-upcoming="1"]');
-      if (firstUpcoming) {
-        // Scroll the preceding date-row if possible
-        const prev = firstUpcoming.previousElementSibling;
-        const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcoming;
-        target.scrollIntoView({ block: 'start' });
-        return;
-      }
-
-      // Priority 2: today's date separator (even if all past)
+      // Priority 1: today's date row — always anchor on today if events exist today
       const todayRow = container.querySelector('[data-today="1"]');
       if (todayRow) {
         todayRow.scrollIntoView({ block: 'start' });
+        return;
+      }
+
+      // Priority 2: no today section — find first upcoming event date row
+      const firstUpcoming = container.querySelector('[data-upcoming="1"]');
+      if (firstUpcoming) {
+        const prev = firstUpcoming.previousElementSibling;
+        const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcoming;
+        target.scrollIntoView({ block: 'start' });
         return;
       }
 
@@ -166,7 +166,7 @@
     }));
 
     if (sourceEl) {
-      sourceEl.textContent = `FF · G8 · medium & high impact · ${tzLabel()}`;
+      sourceEl.textContent = `${source} · G8 · medium & high impact · ${tzLabel()}`;
     }
     const thTime = document.getElementById('cal-th-time');
     if (thTime) thTime.textContent = tzLabel();
@@ -175,13 +175,14 @@
   async function fetchEconomicCalendar() {
     try {
       let events = [];
+      let source = 'Finnhub';
       for (const path of ['./calendar-data/ff_calendar.json', './calendar-data/calendar.json']) {
         const res = await fetch(path).catch(() => null);
         if (!res?.ok) continue;
         const j = await res.json();
-        if (j?.events?.length) { events = j.events; break; }
+        if (j?.events?.length) { events = j.events; source = j.source || source; break; }
       }
-      buildPanel(events);
+      buildPanel(events, source);
     } catch {
       const c = document.getElementById('cal-events-body');
       if (c) c.innerHTML = '<div style="padding:12px 10px;color:var(--text3);font-size:11px;">Calendar unavailable.</div>';
