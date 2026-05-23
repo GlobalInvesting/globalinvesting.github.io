@@ -13,6 +13,9 @@ on:
     - cron: '0 14 * * 1-5'   # 14:00 UTC Mon-Fri — DTCC publishes by ~13:00 UTC
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
 concurrency:
   group: update-dtcc-fx
   cancel-in-progress: false

@@ -72,6 +72,9 @@ on:
     # (20:30 covered by */5 which starts the Asia window at 23:00)
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
 concurrency:
   group: update-ff-calendar
   cancel-in-progress: false

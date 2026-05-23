@@ -12,6 +12,9 @@ on:
 # Runs in the PUBLIC repo → minutos ilimitados (sin consumo de cuota privada).
 # Scripts movidos desde el engine privado en auditoría 2026-03-31.
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
 concurrency:
   group: forex-news
   cancel-in-progress: false

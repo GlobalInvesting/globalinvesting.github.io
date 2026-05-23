@@ -40,6 +40,9 @@ on:
     - cron: '30 23 * * 0,6'   # 23:30 UTC Sat–Sun  — crypto weekend bars (BTC, ETH trade 24/7)
   workflow_dispatch:             # manual trigger for backfill / testing
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
 concurrency:
   group: update-ohlc
   cancel-in-progress: false

@@ -14,6 +14,9 @@ on:
     - cron: '0 8 * * *'   # Daily at 08:00 UTC — after Asia close, before EU open
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
 concurrency:
   group: update-rates
   cancel-in-progress: false

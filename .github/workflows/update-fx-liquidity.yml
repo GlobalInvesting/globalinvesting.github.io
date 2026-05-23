@@ -22,6 +22,9 @@ on:
 
   workflow_dispatch:   # trigger manual desde GitHub UI para test
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
 concurrency:
   group: update-fx-liquidity
   cancel-in-progress: false   # no cancelar un fetch en curso — esperar

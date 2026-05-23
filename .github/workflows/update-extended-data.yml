@@ -26,6 +26,9 @@ on:
   workflow_dispatch:  # manual only — not on schedule
 
 # v13.0: Bond yields diarios (ECB/BOE/BOC/DBnomics), BIS rateMomentum, Calendar extractor.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
 concurrency:
   group: update-extended-data
   cancel-in-progress: false
