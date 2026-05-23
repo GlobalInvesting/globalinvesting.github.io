@@ -94,9 +94,9 @@
     btn.innerHTML = `
       <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${dotColor};margin-right:5px;flex-shrink:0;"></span>
       <span style="color:var(--text2);margin-right:4px;font-family:var(--font-mono);font-size:10px;">${timeStr}</span>
-      <span style="color:var(--text3);margin-right:4px;font-size:9px;">${ccyStr}</span>
-      <span style="color:var(--text1);font-size:10px;">${shortTitle}</span>
-      <span style="color:var(--text3);margin-left:5px;font-size:10px;">↑</span>`;
+      <span style="color:var(--text2);margin-right:4px;font-size:9px;">${ccyStr}</span>
+      <span style="color:var(--text2);font-size:10px;">${shortTitle}</span>
+      <span id="cal-next-btn-arrow" style="color:var(--text2);margin-left:5px;font-size:10px;">↓</span>`;
     btn.style.cssText = [
       'position:absolute',
       'bottom:6px',
@@ -141,6 +141,11 @@
       const visible = eTop >= cTop && eBottom <= cBottom + 4;
       btn.style.opacity        = visible ? '0' : '0.92';
       btn.style.pointerEvents  = visible ? 'none' : 'auto';
+      // Arrow points toward the next event:
+      // If we've scrolled past it (next event is above) → arrow up ↑
+      // If we're above it (next event is below, i.e. past events) → arrow down ↓
+      const arrowEl = document.getElementById('cal-next-btn-arrow');
+      if (arrowEl) arrowEl.textContent = eTop < cTop ? '↑' : '↓';
     }
 
     container.addEventListener('scroll', updateBtnVisibility, { passive: true });
