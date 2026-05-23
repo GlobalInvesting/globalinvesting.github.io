@@ -1,7 +1,25 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.11
+fetch_news.py — v5.12
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.12 (sobre v5.11):
+  FINNHUB MARKET NEWS — NUEVA FUENTE ESTRUCTURADA:
+    · Añadido fetch_finnhub_news(): consulta Finnhub /news?category=forex
+      cuando FINNHUB_API_KEY está disponible (misma key que el calendario).
+    · La API devuelve JSON estructurado: headline, summary, source, datetime,
+      url — sin HTML parsing, sin RSS parsing, sin riesgo de rotación de feeds.
+    · Free tier: 60 req/min, sin credit limit. Una sola llamada trae todas las
+      noticias FX de las últimas 24h — más eficiente que 8 queries de NewsData.
+    · Cap de 8 artículos por ejecución (FINNHUB_NEWS_MAX) para complementar
+      sin desplazar la cobertura RSS existente. Clasificados por detect_impact().
+    · Capped at "med" si el source RSS duplicado ya tiene la noticia
+      (deduplication por título normalizado compartido con seen_ids).
+    · Fallback limpio: si FINNHUB_API_KEY no está set, se omite silenciosamente
+      — sin efecto sobre el pipeline RSS existente.
+    · No afecta smart_select() ni la distribución de divisas — las noticias FX
+      de Finnhub se insertan en raw_articles antes de smart_select() como
+      cualquier otra fuente.
 
 CAMBIOS v5.11 (sobre v5.10):
   CALIDAD DE FUENTES — AUDITORÍA Y ADICIÓN:
@@ -462,6 +480,15 @@ NEWSDATA_QUERIES = {
 }
 
 # ─────────────────────────────────────────────
+# FINNHUB MARKET NEWS — configuración (v5.12)
+# Single call to /news?category=forex — returns all FX news for 24h.
+# Same FINNHUB_API_KEY as fetch_ff_calendar.py. Free tier: 60 req/min.
+# ─────────────────────────────────────────────
+FINNHUB_API_KEY_ENV  = "FINNHUB_API_KEY"
+FINNHUB_NEWS_MAX     = 8                     # cap per run — complement, not replace RSS
+FINNHUB_NEWS_BASE    = "https://finnhub.io/api/v1/news"
+
+# ─────────────────────────────────────────────
 HIGH_IMPACT_KW = [
     "rate decision", "interest rate", "hike", "cut rates", "fomc", "ecb meeting",
     "boe meeting", "boj meeting", "nonfarm", "non-farm", "cpi", "inflation report",
@@ -858,6 +885,106 @@ def fetch_newsdata(api_key: str, now_utc: datetime) -> list:
             print(f"  [NewsData] {cur}: excepción — {e}")
 
     return articles
+def fetch_finnhub_news(api_key: str, now_utc: datetime) -> list:
+    """
+    v5.12: Fetches FX market news from Finnhub /news?category=forex.
+    Single API call returns all FX news — efficient vs per-currency NewsData queries.
+    Complements RSS feeds with structured institutional news; capped at FINNHUB_NEWS_MAX.
+    """
+    if not api_key:
+        print("  [FinnhubNews] FINNHUB_API_KEY not set — skipping")
+        return []
+
+    cutoff = now_utc - timedelta(days=MAX_AGE_DAYS)
+    articles = []
+    seen_fh_titles = set()
+
+    try:
+        resp = requests.get(
+            FINNHUB_NEWS_BASE,
+            params={"category": "forex", "token": api_key},
+            timeout=FETCH_TIMEOUT,
+        )
+        if resp.status_code == 401:
+            print("  [FinnhubNews] API key invalid (401) — skipping")
+            return []
+        if resp.status_code == 429:
+            print("  [FinnhubNews] Rate limit hit (429) — skipping")
+            return []
+        if resp.status_code != 200:
+            print(f"  [FinnhubNews] Error {resp.status_code} — skipping")
+            return []
+
+        items = resp.json()
+        if not isinstance(items, list):
+            print(f"  [FinnhubNews] Unexpected response shape — skipping")
+            return []
+
+        for item in items:
+            title   = clean_html(item.get("headline", "") or "")
+            summary = clean_html(item.get("summary", "") or "")
+            link    = item.get("url", "")
+            source  = item.get("source", "Finnhub News")
+
+            if not title or len(title) < 15:
+                continue
+
+            # Finnhub datetime is a Unix timestamp (seconds)
+            raw_ts = item.get("datetime", 0)
+            try:
+                pub_date = datetime.fromtimestamp(int(raw_ts), tz=timezone.utc)
+            except Exception:
+                pub_date = now_utc
+
+            if pub_date < cutoff:
+                continue
+
+            if is_calendar_entry(title, summary):
+                continue
+            if not has_real_content(title, summary):
+                continue
+            if not is_forex_relevant(title, summary):
+                continue
+
+            norm_title = normalize_title(title)
+            title_key  = norm_title[:60]
+            if title_key in seen_fh_titles:
+                continue
+            seen_fh_titles.add(title_key)
+
+            cur = detect_currency(title, summary, source) or "USD"
+            nid = entry_id(title, f"Finnhub News")
+            impact = detect_impact(title, summary)
+            expand = summary[:350] + ("..." if len(summary) > 350 else "")
+            age_hours = (now_utc - pub_date).total_seconds() / 3600
+
+            articles.append({
+                "id":       nid,
+                "cur":      cur,
+                "impact":   impact,
+                "title":    title,
+                "expand":   expand,
+                "source":   f"Finnhub",
+                "link":     link,
+                "time":     pub_date.strftime("%H:%M"),
+                "ts":       int(pub_date.timestamp() * 1000),
+                "featured": impact == "high" and age_hours <= 6,
+                "lang":     "en",
+                "date":     pub_date.strftime("%d %b"),
+                "datetime": pub_date.isoformat(),
+                "recent":   age_hours <= 24,
+            })
+
+            if len(articles) >= FINNHUB_NEWS_MAX:
+                break
+
+    except Exception as e:
+        print(f"  [FinnhubNews] Exception: {e}")
+
+    print(f"  [FinnhubNews] {len(articles)} articles fetched")
+    return articles
+
+
 def load_previous_headlines() -> dict:
     if not os.path.exists(OUTPUT_FILE):
         return {}
@@ -946,6 +1073,15 @@ def main():
         print(f"  NewsData: {len(newsdata_articles)} artículos obtenidos")
     else:
         print(f"  [NewsData] NEWSDATA_API_KEY no configurada — omitiendo")
+
+    # v5.12: Finnhub market news — single structured call, complements RSS
+    finnhub_api_key = os.environ.get(FINNHUB_API_KEY_ENV, "").strip()
+    finnhub_news_articles = []
+    if finnhub_api_key:
+        print(f"  Consultando Finnhub market news (forex category)...")
+        finnhub_news_articles = fetch_finnhub_news(finnhub_api_key, now_utc)
+    else:
+        print(f"  [FinnhubNews] FINNHUB_API_KEY no configurada — omitiendo")
 
     for feed_cfg in FEEDS:
         source           = feed_cfg["source"]
@@ -1058,6 +1194,22 @@ def main():
         newsdata_added += 1
     if newsdata_added:
         print(f"    [NewsData] {newsdata_added} artículos añadidos (tras deduplicación)")
+
+    # v5.12: añadir artículos de Finnhub market news con deduplicación
+    finnhub_news_added = 0
+    for a in finnhub_news_articles:
+        if a["id"] in seen_ids:
+            continue
+        title_key = normalize_title(a["title"])[:60]
+        if title_key in seen_titles:
+            continue
+        seen_ids.add(a["id"])
+        seen_titles.add(title_key)
+        raw_articles.append(a)
+        en_raw += 1
+        finnhub_news_added += 1
+    if finnhub_news_added:
+        print(f"    [FinnhubNews] {finnhub_news_added} artículos añadidos (tras deduplicación)")
 
     print(f"\n📦 Total artículos recopilados: {len(raw_articles)}")
     print(f"   ES: {es_raw} | EN: {en_raw}")
