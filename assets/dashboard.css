@@ -569,9 +569,10 @@
   .risk-sub  { font-size: 10px; color: var(--text2); margin-top: 1px; font-family: var(--font-mono); }
 
   /* SESSIONS */
-  .session-row { display: flex; gap: 4px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
-  .sess { padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; border: 1px solid var(--border2); color: var(--text3); font-family: var(--font-ui); }
+  .session-row { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .sess { padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; border: 1px solid var(--border2); color: var(--text3); font-family: var(--font-ui); white-space: nowrap; }
   .sess.active { border-color: var(--up); color: var(--up); }
+  .sessions-table-wrap { overflow-x: auto; }
 
   /* SPREADS */
   .spread-row {
