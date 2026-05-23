@@ -41,6 +41,7 @@ jobs:
       - name: Fetch news from RSS feeds
         env:
           NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: python scripts/fetch_news.py
 
       - name: Commit updated news data
