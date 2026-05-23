@@ -90,9 +90,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Pull latest changes
-        run: git fetch origin main && git rebase origin/main
-
       - name: Time-window gate (release windows only for */5 runs)
         id: gate
         run: |

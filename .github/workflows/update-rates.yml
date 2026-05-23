@@ -32,9 +32,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Pull latest changes
-        run: git fetch origin main && git rebase origin/main
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
