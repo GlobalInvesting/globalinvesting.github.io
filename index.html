@@ -374,7 +374,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=7.92.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.92.1">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -964,6 +964,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span class="sess" id="sess-london">London</span>
           <span class="sess" id="sess-newyork">New York</span>
         </div>
+        <div class="sessions-table-wrap">
         <table aria-label="Trading sessions">
           <thead><tr><th style="text-align:left" scope="col">Session</th><th id="sess-col-open" scope="col">Open</th><th id="sess-col-close" scope="col">Close</th><th scope="col">Status</th></tr></thead>
           <tbody>
@@ -973,7 +974,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <tr><td>New York</td><td id="sess-open-newyork">13:00</td><td id="sess-close-newyork">22:00</td><td class="flat" id="status-newyork">—</td></tr>
           </tbody>
         </table>
+        </div>
         <div style="border-top:1px solid var(--border);padding:4px 8px 0;flex-shrink:0;">
+          <div class="sessions-table-wrap">
           <table aria-label="Session volatility">
             <thead><tr><th style="text-align:left" scope="col">Session Vol</th><th scope="col">EUR/USD</th><th scope="col">USD/JPY</th></tr></thead>
             <tbody>
@@ -983,6 +986,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <tr><td>New York</td><td id="svol-ny-eur" class="up">±71p</td><td id="svol-ny-jpy" class="up">±66p</td></tr>
             </tbody>
           </table>
+          </div>
           <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" id="svol-sub">5yr historical avg · fixed reference</div>
         </div>
       </div>
