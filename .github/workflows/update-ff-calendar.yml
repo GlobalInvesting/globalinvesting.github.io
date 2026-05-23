@@ -1,37 +1,47 @@
 name: Update ForexFactory Calendar
 
-# Polls Finnhub every 5 minutes during G8 economic data release windows,
-# and every 30 minutes during off-peak hours.
+# TWO-TIER TRIGGER ARCHITECTURE (v5.0)
+#
+# TIER 1 — Cloudflare Worker (primary, ~2–3 min latency):
+#   cf-worker/calendar-watcher.js polls Finnhub every 1 minute.
+#   When actuals/forecasts change it fires a repository_dispatch event
+#   (event_type: "calendar-data-changed") which triggers this workflow
+#   immediately — bypassing the 5-min GitHub cron minimum entirely.
+#   Setup: see cf-worker/README.md
+#
+# TIER 2 — GitHub Actions cron (fallback, ~5–15 min latency):
+#   If the CF Worker is down or misconfigured, the 5-min cron and
+#   off-peak sparse crons below ensure data still updates within 15 min.
+#   The bash time-gate stops the dense cron from running Python outside
+#   release windows, keeping runner minutes efficient.
+#
+# END-TO-END LATENCY:
+#   Normal (CF Worker active):   ~2–3 min
+#   Fallback (cron only):        ~5–15 min during windows; ~30 min off-peak
+#   Bloomberg Terminal:          <1 sec (paid proprietary feed — not achievable
+#                                with free REST APIs regardless of architecture)
 #
 # KEY DESIGN: smart commit — the Python script compares new actuals/forecasts
 # against the previous ff_calendar.json and writes a /tmp/cal_changed flag.
-# The commit step only runs when the flag is "1", so git history stays clean
-# (no noise commits on every 5-min poll that found nothing new).
+# The commit step only runs when the flag is "1", so git history stays clean.
 #
-# RELEASE WINDOWS (every 5 min via GitHub cron + bash time gate):
+# RELEASE WINDOWS for cron time-gate:
 #   Asia/NZ:   23:00–02:30 UTC  (JPY, AUD, NZD data)
 #   EU/UK:     05:30–10:00 UTC  (EUR, GBP, CHF data)
 #   US:        12:00–15:30 UTC  (USD data — NFP, CPI, PCE all at 12:30 UTC)
 #
-# OFF-PEAK HOURS (30-min sparse crons, no gate needed):
-#   02:30–05:30, 10:00–12:00, 15:30–23:00 UTC
-#   These cover CB speeches, late releases, and keep data fresh overnight.
-#
-# LATENCY: ~5–15 min during windows (GitHub runner queue + 45 sec job startup).
-# This matches industry standard for free-tier data pipelines. Bloomberg
-# achieves sub-second via dedicated data feeds (paid). Forex Factory itself
-# shows actuals ~2–5 min after official release time.
-#
 # GITHUB ACTIONS LIMITS:
 #   - Minimum cron interval: 5 minutes (*/5 * * * *)
-#   - Runner queue: adds 0–15 min delay, especially during peak (12:00–14:00 UTC)
-#   - Public repos: unlimited Actions minutes — no cost concern
-#   - Scheduled workflows disabled after 60 days of repo inactivity (GitHub policy)
+#   - Runner queue: adds 0–15 min delay, especially 12:00–14:00 UTC
+#   - Public repos: unlimited Actions minutes
+#   - Scheduled workflows disabled after 60 days of repo inactivity
 #
-# v4.0 (2026-05-23): Replaces 8-cron-per-day schedule with 5-min polling +
-# time-gate architecture and smart commit via CHANGED_FLAG.
+# v5.0 (2026-05-23): Added repository_dispatch trigger (CF Worker integration).
+# v4.0 (2026-05-23): 5-min polling + time-gate + smart commit.
 
 on:
+  repository_dispatch:
+    types: [calendar-data-changed]
   schedule:
     # ── Every 5 minutes (GitHub minimum) — time gate in bash filters to windows ──
     - cron: '*/5 * * * *'
@@ -83,13 +93,21 @@ jobs:
       - name: Time-window gate (release windows only for */5 runs)
         id: gate
         run: |
+          # repository_dispatch (from CF Worker) always proceeds — no gate needed.
+          # The CF Worker already verified data changed before firing the dispatch.
+          EVENT="${{ github.event_name }}"
+          if [ "$EVENT" = "repository_dispatch" ]; then
+            DESC="${{ github.event.client_payload.description }}"
+            SRC="${{ github.event.client_payload.source }}"
+            echo "Triggered by repository_dispatch (${SRC}): ${DESC}"
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           # Only apply the gate to the */5 cron — off-peak sparse crons always proceed.
-          # Detection: if current minute is not a multiple of 5, we were triggered by
-          # a sparse off-peak cron (e.g. :30) — proceed unconditionally.
-          # If minute IS a multiple of 5, check if we're in a release window.
           HOUR=$(date -u +%H)
           MIN=$(date -u +%M)
-          echo "Current UTC time: ${HOUR}:${MIN}"
+          echo "Current UTC time: ${HOUR}:${MIN} (cron trigger)"
 
           # Off-peak sparse cron: minute is not a multiple of 5 → always run
           if [ $(( 10#$MIN % 5 )) -ne 0 ]; then
