@@ -8,13 +8,22 @@ name: Update Economic Calendar
 # Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
 # Public repos have unlimited GitHub Actions minutes → no budget impact.
 #
-# Schedule (4× daily UTC — 30min after update-ff-calendar to ensure ff_calendar.json is fresh):
-#   05:30 — before London open; captures EU/Asia AM releases
-#   09:30 — after Asia AM window; captures early EU data
-#   13:30 — after US morning releases (CPI, NFP typically at 12:30 UTC)
-#   20:30 — before Sydney/Tokyo open; captures any US afternoon releases
+# TRIGGER ARCHITECTURE (v2.0):
+#   PRIMARY: workflow_run — fires automatically every time update-ff-calendar.yml
+#   completes successfully with a real data change. This means calendar.json updates
+#   within ~30 sec of ff_calendar.json, inheriting the full CF Worker latency improvement
+#   (~2-3 min end-to-end vs the previous 4x/day schedule).
+#
+#   FALLBACK: 4x daily cron — covers edge cases where update-ff-calendar ran but
+#   this workflow was queued/delayed, and ensures calendar.json stays fresh even
+#   if the workflow_run trigger misses a run.
+#
+#   workflow_dispatch: manual trigger for debugging.
 
 on:
+  workflow_run:
+    workflows: ["Update ForexFactory Calendar"]
+    types: [completed]
   schedule:
     - cron: '30 5 * * *'
     - cron: '30 9 * * *'
@@ -31,6 +40,11 @@ permissions:
 
 jobs:
   update-economic-calendar:
+    # When triggered by workflow_run, only proceed if the upstream workflow succeeded.
+    # (Cron and workflow_dispatch triggers always proceed — github.event.workflow_run is null.)
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
