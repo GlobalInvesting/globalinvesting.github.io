@@ -10274,7 +10274,7 @@ async function renderSovereignSpreads() {
 
 // ── Economic Surprises — CESI-style centred bar index (v7.76.0) ──────────────
 // Methodology: for each G8 currency, computes a normalised surprise index over
-// a 90-day rolling window from ForexFactory calendar (actual vs consensus).
+// a 90-day rolling window from Finnhub economic calendar (actual vs consensus).
 // Index = (beats − misses) / total scored, scaled to [−100, +100].
 // Bar chart centred at 0: green bar extends right for positive, red bar extends
 // left for negative — matching Citi CESI / Bloomberg BEEI visual convention.
@@ -10287,7 +10287,7 @@ async function renderEconSurprises() {
   const LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
   window._ES_SEEN = new Set(); // reset dedup guard on each render
 
-  // ── Load calendar.json (ForexFactory via ff_calendar.json) ─────────────────
+  // ── Load calendar.json (Finnhub via ff_calendar.json) ─────────────────
   let calEvents = [];
   let calSource = '';
   try {
@@ -10340,12 +10340,15 @@ async function renderEconSurprises() {
   // ── Source label ──────────────────────────────────────────────────────────
   const srcEl = document.getElementById('econ-surprise-source');
   if (srcEl) {
-    if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
+    if (calSource === 'Finnhub' || calSource.startsWith('Finnhub')) {
+      srcEl.textContent = 'Finnhub · actual vs consensus · G8 · 90d rolling';
+    } else if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
       srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
+      // Fallback path: Finnhub key not set, FF scraper used instead
       srcEl.textContent = 'ForexFactory · actual vs consensus · 90d rolling';
     } else if (calSource && calSource.includes('ForexFactory')) {
-      // Backfill sources: "FRED / Finnhub / ForexFactory" multi-source string
+      // Legacy backfill sources: multi-source historical string
       srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · G8 · 90d rolling';
     } else if (calSource) {
       srcEl.textContent = calSource + ' · actual vs consensus · 90d rolling';
