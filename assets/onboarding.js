@@ -87,8 +87,8 @@
 
     /* 4 — Economic Surprise Index (opens modal) */
     {
-      target:  'section-crossasset',
-      side:    'bottom',
+      target:  'split-lower',
+      side:    'left',
       title:   'Economic Surprise Index · G8 · 90d rolling',
       badge:   'ESI',
       body:    'The ESI is a decay-weighted score that measures whether G8 economic data is consistently beating or missing consensus — decay-weighted so recent releases count more than older ones. A rising ESI signals that the economy is outperforming expectations, which is typically bullish for the currency. The chart is opening now so you can explore the 90-day rolling window.',
@@ -109,8 +109,8 @@
 
     /* 5 — Macro Risk Regime */
     {
-      target:  'section-crossasset',
-      side:    'bottom',
+      target:  'split-lower',
+      side:    'left',
       title:   'Macro Risk Regime',
       badge:   'Risk',
       body:    null,
@@ -148,8 +148,8 @@
 
     /* 7 — COT Positioning (opens modal) */
     {
-      target:  'section-crossasset',
-      side:    'bottom',
+      target:  'split-lower',
+      side:    'left',
       title:   'CFTC COT Positioning',
       badge:   'Positioning',
       body:    'The Commitment of Traders report reveals what institutional speculators — hedge funds and large money managers — are actually holding. Click any currency row to open a detailed modal: net positioning history, z-score, crowding indicator, and the COT-based directional bias. The modal is opening now so you can see it in action.',
@@ -568,9 +568,9 @@
       try { step.action(); } catch (e) { console.warn('[gi-tour2] step action error:', e); }
     }
 
-    /* position popover — extra delay for derivatives nav */
+    /* position popover — extra delay for derivatives nav and modal steps */
     var targetEl = highlight(step.target);
-    var posDelay = (step.target === 'section-derivatives' || step.target === 'section-econ-surprise') ? 450 : 0;
+    var posDelay = (step.target === 'section-derivatives' || step.target === 'section-econ-surprise' || step.target === 'split-lower') ? 800 : 0;
     setTimeout(function () { positionPopover(targetEl, step.side); }, posDelay);
   }
 
