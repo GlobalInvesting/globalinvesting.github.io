@@ -1,19 +1,22 @@
 name: Update ForexFactory Calendar
 
 # Runs 4×/day covering major session opens.
-# Fetches ForexFactory economic calendar (this week + next week) and writes
-# calendar-data/ff_calendar.json to THIS (public) repo.
+# Scrapes ForexFactory HTML calendar (with real-time actuals) using Playwright
+# and writes calendar-data/ff_calendar.json to THIS (public) repo.
 #
-# Moved from private engine repo (v7.80.0) — no private API keys required.
-# ForexFactory public JSON API (nfs.faireconomy.media) — no auth.
+# v2.0 (2026-05-22): Migrated from FF JSON API (nfs.faireconomy.media) to HTML
+# scraping via Playwright. The FF JSON API never populated actual values — it is
+# a planning feed only. The HTML page shows actuals in real-time as events release.
+#
 # Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
 # Public repos have unlimited GitHub Actions minutes → no budget impact.
+# Playwright/Chromium install adds ~2 min to each run (acceptable).
 #
 # Schedule (4× daily UTC — major session windows):
 #   00:30 — before Tokyo open
-#   06:30 — before London open
-#   12:30 — before New York open
-#   20:30 — before Sydney open
+#   06:30 — before London open (catches early EU data actuals)
+#   12:30 — before New York open (catches EU/morning US actuals)
+#   20:30 — before Sydney open (catches US afternoon actuals)
 
 on:
   schedule:
@@ -33,7 +36,7 @@ permissions:
 jobs:
   update-ff-calendar:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20   # increased from 10 — Playwright install + headless render
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -47,7 +50,9 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests python-dateutil --break-system-packages
+        run: |
+          pip install playwright beautifulsoup4 --break-system-packages
+          playwright install chromium --with-deps
 
       - name: Create calendar-data directory
         run: mkdir -p calendar-data
@@ -68,15 +73,15 @@ jobs:
           from datetime import datetime, timezone
           with open('calendar-data/ff_calendar.json') as f:
               cal = json.load(f)
-          events = cal.get('events', [])\
-          
+          events = cal.get('events', [])
           today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+          released_all = [e for e in events if e.get('released')]
           high = [e for e in events if e['impact'] == 'high']
           today_high = [e for e in high if e['dateISO'] == today]
-          released = [e for e in today_high if e['released']]
-          pending = [e for e in today_high if not e['released']]
-          print(f'  Total events: {len(events)}')
-          print(f'  High-impact today ({today}): {len(today_high)} ({len(released)} released, {len(pending)} pending)')
+          released_today = [e for e in today_high if e['released']]
+          pending_today  = [e for e in today_high if not e['released']]
+          print(f'  Total events: {len(events)} | with actuals: {len(released_all)}')
+          print(f'  High-impact today ({today}): {len(today_high)} ({len(released_today)} released, {len(pending_today)} pending)')
           for e in today_high:
               status = e.get('actual') or 'pending'
               print(f'    {e[\"timeUTC\"]} [{e[\"currency\"]}] {e[\"title\"]} | {status}')
@@ -91,7 +96,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           cp calendar-data/ff_calendar.json /tmp/ff_calendar_fresh.json
-          HIGH_IMPACT=$(python3 -c "import json; c=json.load(open('/tmp/ff_calendar_fresh.json')); h=[e for e in c['events'] if e['impact']=='high']; print(f'{len(h)} high-impact events')" 2>/dev/null || echo 'updated')
+          RELEASED=$(python3 -c "import json; c=json.load(open('/tmp/ff_calendar_fresh.json')); print(sum(1 for e in c['events'] if e.get('released')))" 2>/dev/null || echo '?')
+          HIGH=$(python3 -c "import json; c=json.load(open('/tmp/ff_calendar_fresh.json')); print(sum(1 for e in c['events'] if e['impact']=='high'))" 2>/dev/null || echo '?')
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
 
           for i in 1 2 3 4 5; do
@@ -104,7 +110,7 @@ jobs:
               echo "No changes vs remote HEAD — skipping commit."
               exit 0
             fi
-            git commit -m "FF calendar ${TIMESTAMP} — ${HIGH_IMPACT}"
+            git commit -m "FF calendar ${TIMESTAMP} — ${HIGH} high-impact, ${RELEASED} with actuals"
             if git push origin main; then
               echo "✅ Push succeeded on attempt $i."
               exit 0
