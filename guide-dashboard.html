@@ -1408,7 +1408,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <p>A native Economic Calendar panel embedded in the left sidebar, showing G8 medium- and high-impact events from Finnhub. Columns: local time (your browser timezone), currency flag, impact dot (red = high, orange = medium), event name, actual result with beat/miss coloring, consensus forecast, and previous reading. The panel auto-scrolls to today or the next upcoming event on load. A floating pill button appears when upcoming events are off-screen, with an adaptive arrow pointing toward them. Source label includes your browser timezone (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">Finnhub · G8 · medium &amp; high impact · GMT-3</span>). Use this to anticipate volatility windows before they arrive.</p>
 
       <h3 id="econ-surprises">Economic Surprises</h3>
-      <p>A CESI-style (Citi Economic Surprise Index) centred bar chart showing whether each G8 currency&#8217;s macro data is beating or missing consensus forecasts over a rolling 90-day window. The panel scores medium- and high-impact Finnhub releases only &#8212; low-impact events and non-macro noise (auctions, inventory data, financial flows) are excluded to match the methodology of institutional surprise indices.</p>
+      <p>A CESI-style (Citi Economic Surprise Index) centred bar chart showing whether each G8 currency&#8217;s macro data is beating or missing consensus forecasts over a rolling 90-day window. The panel scores medium- and high-impact ForexFactory/Finnhub releases only &#8212; low-impact events and non-macro noise (auctions, inventory data, financial flows) are excluded to match the methodology of institutional surprise indices.</p>
       <p>The bar is centred at zero: a green bar extending right means data is beating consensus on net; a red bar extending left means data is missing. The N column shows how many events with actuals are in the current window &#8212; entries with fewer than 15 events are dimmed to flag low statistical confidence.</p>
 
       <!-- MOCK: Economic Surprises panel -->
@@ -1466,12 +1466,12 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             </tr>
           </tbody>
         </table>
-        <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Finnhub &middot; actual vs consensus &middot; 90d rolling</div>
+        <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">ForexFactory &middot; Finnhub &middot; actual vs consensus &middot; 90d rolling</div>
       </div>
 
       <p>How to read the index: an event where actual exceeds consensus counts as a beat (+1), below consensus as a miss (&#8722;1), equal as in-line (0). Index = (beats &#8722; misses) / total scored &times; 100, ranging from &#8722;100 (all misses) to +100 (all beats). This is the same beat/miss approach used as the basis of institutional economic surprise indices (Citi CESI and equivalents) before they apply their proprietary weighting. As 12&#8211;24 months of history accumulate, the panel upgrades each event to a z-score (actual &#8722; forecast relative to historical standard deviation), providing a magnitude-weighted signal that matches the full institutional index methodology.</p>
       <p>Hover any row for a detailed breakdown: beat count, miss count, in-line count, beat rate, and current index value.</p>
-      <p><strong>Attribution:</strong> <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">Finnhub &middot; actual vs consensus &middot; 90d rolling</span></p>
+      <p><strong>Attribution:</strong> <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">ForexFactory &middot; Finnhub &middot; actual vs consensus &middot; 90d rolling</span></p>
     </div>
 
     <div class="guide-section" id="pair-detail">
@@ -1918,7 +1918,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.98.1</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.99.5</span></div>
 </footer>
 
 
