@@ -6,7 +6,13 @@
 <script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FX Terminal — Live G8 Rates, COT Positioning &amp; Market Snapshot</title>
+<title>[TEST] FX Terminal — Dukascopy Calendar Widget</title>
+  <!-- ⚠ TEST FILE — indextest2.html — DO NOT DEPLOY AS index.html
+       Tests: Dukascopy economic_calendar_new widget replacing Myfxbook iframe.
+       If approved for production, _headers must add to script-src:
+         freeserv-static.dukascopy.com
+       and connect-src already has freeserv.dukascopy.com (verify subdomain matches).
+  -->
 
 <!-- ═══════════════════════════════════════
      SEO — Core
@@ -330,24 +336,56 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #main.split-layout #split-lower{border-left:none!important;overflow-y:visible!important}
 .split-drag-handle{display:none!important}
 }
+  /* ── Economic Calendar native panel ──────────────────────────────────── */
+  .cal-date-row {
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text2);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: .03em;
+    font-family: var(--font-ui);
+  }
+  .cal-event-row {
+    display: grid;
+    grid-template-columns: 52px 52px 18px 1fr 58px 58px 58px;
+    align-items: center;
+    padding: 3px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-family: var(--font-ui);
+    color: var(--text);
+    transition: background .1s;
+  }
+  .cal-event-row:hover { background: var(--bg3); }
+  .cal-event-row.cal-released { opacity: .55; }
+  .cal-col { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-col.cal-time { color: var(--text2); font-size: 10px; font-family: var(--font-mono); }
+  .cal-col.cal-ccy  { font-size: 10px; font-weight: 600; color: var(--text); display: flex; align-items: center; }
+  .cal-col.cal-title { padding-right: 4px; font-size: 11px; }
+  .cal-col.cal-num  { text-align: right; font-family: var(--font-mono); font-size: 10px; }
+  .cal-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  #sent-rows::-webkit-scrollbar { width: 3px; }
+  #sent-rows::-webkit-scrollbar-track { background: transparent; }
+  #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=7.92.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.91.0">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
 
 <script src="assets/sw-register.js" defer></script>
-<!-- Disable browser scroll-position restoration BEFORE any defer scripts run.
-     history.scrollRestoration = 'manual' in dashboard.js fires too late because
-     defer scripts execute after HTML parsing — the browser restores scroll first.
-     This inline script (no defer/async) runs during HTML parsing, guaranteeing
-     manual restoration is set before the browser can restore any scroll position. -->
-<script>if ('scrollRestoration' in history) history.scrollRestoration = 'manual';</script>
 </head>
 <body>
 
@@ -709,12 +747,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="split-lower">
       <div id="split-lower-right">
 
+    <!-- ECONOMIC CALENDAR — native panel, ForexFactory data, terminal colors -->
+    <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
+      <div class="panel-head">
+        <span class="panel-title">Economic Calendar</span>
+        <span class="panel-sub" id="cal-panel-sub">ForexFactory · G8 · medium &amp; high impact</span>
+      </div>
+      <!-- Column headers -->
+      <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
+        <span style="font-size:9px;color:var(--text3);">·</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
+      </div>
+      <!-- Scrollable events body -->
+      <div id="cal-events-body" style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;max-height:330px;">
+        <div style="padding:12px 10px;color:var(--text3);font-size:11px;">Loading calendar…</div>
+      </div>
+    </div>
+
     <!-- CROSS ASSET + RISK -->
     <div style="border-bottom:1px solid var(--border);">
       <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
-        <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
+        <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;">
           <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Multi-source · daily updated</span></div>
-          <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);gap:0;padding:0;height:calc(100% - 30px);align-content:stretch;">
+          <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);gap:0;padding:0;min-height:0;flex:1;">
             <!-- Populated by fetchCrossAssetData() -->
             <div class="ca-cell" data-sym="CMCMARKETS:SPX500" style="cursor:pointer;" title="Click: chart"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
             <div class="ca-cell" data-sym="CMCMARKETS:GOLDM2026" style="cursor:pointer;" title="Gold front-month futures · GC=F · Click: chart"><div class="ca-name">Gold Futures</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
@@ -877,9 +937,26 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
-    <!-- SESSIONS + SPREADS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:580px;">
-      <div class="panel" id="section-sessions" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:100%;">
+    <!-- RETAIL FX POSITIONING — full width -->
+    <div class="panel" id="section-positioning" style="border-bottom:1px solid var(--border);">
+      <div class="panel-head">
+        <span class="panel-title">Retail FX Positioning</span>
+        <span class="panel-sub" id="sent-source-sub">Myfxbook · retail positioning</span>
+      </div>
+      <div id="myfxbook-wrap" style="padding:4px 8px 6px;width:100%;background:var(--bg);">
+        <div id="sent-rows" style="overflow-y:auto;max-height:204px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;" class="thin-scroll">
+          <div style="color:var(--text3);font-size:11px;padding:8px 0;">Loading sentiment…</div>
+        </div>
+        <div id="sent-general" style="flex-shrink:0;"></div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--font-ui);padding:2px 0 1px;" id="sent-updated"></div>
+      </div>
+    </div>
+
+    <!-- SESSIONS + SPREADS — 2 equal columns -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
+
+      <!-- Col 1: Market Sessions -->
+      <div class="panel" id="section-sessions" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
         <div class="panel-head"><span class="panel-title">Market Sessions</span></div>
         <div class="session-row">
           <span class="sess" id="sess-sydney">Sydney</span>
@@ -908,24 +985,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </table>
           <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" id="svol-sub">5yr historical avg · fixed reference</div>
         </div>
-        <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
-          <div class="panel-head">
-            <span class="panel-title">Upcoming Events</span>
-            <span class="panel-sub">Myfxbook · hourly</span>
-          </div>
-          <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;">
-            <div style="width:100%;height:100%;filter:invert(0.90) hue-rotate(180deg) brightness(0.93);">
-              <iframe src="https://widget.myfxbook.com/widget/calendar.html?lang=en&impacts=0,1,2,3&symbols=AUD,CAD,CHF,EUR,GBP,JPY,NZD,USD"
-                      style="border:0;width:100%;height:100%;display:block;"
-                      title="Economic Calendar — Myfxbook"></iframe>
-            </div>
-          </div>
-        </div>
       </div>
-      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;height:100%;">
+
+      <!-- Col 2: Reference Spreads -->
+      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;">
         <div class="panel-head"><span class="panel-title" title="Indicative ECN bid-ask spreads — model-estimated, not live quoted prices. Values widen during high-volatility sessions. Use your broker's live feed for execution.">Reference Spreads</span><span class="panel-sub" id="spreads-sub">ECN est. · Loading…</span></div>
         <div id="spreads-rows" style="padding:4px 10px;flex-shrink:0;">
-          <!-- populated by fetchSpreadsData() -->
           <div class="spread-row"><span class="spr-sym">EUR/USD</span><div class="spr-bar"><div class="spr-fill" style="width:20%;background:var(--up)"></div></div><span class="spr-val up" id="spr-eurusd">0.9 pip</span></div>
           <div class="spread-row"><span class="spr-sym">GBP/USD</span><div class="spr-bar"><div class="spr-fill" style="width:24%;background:var(--up)"></div></div><span class="spr-val up" id="spr-gbpusd">1.1 pip</span></div>
           <div class="spread-row"><span class="spr-sym">USD/JPY</span><div class="spr-bar"><div class="spr-fill" style="width:36%;background:var(--orange)"></div></div><span class="spr-val" id="spr-usdjpy" style="color:var(--orange)">2.0 pip</span></div>
@@ -934,20 +999,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div class="spread-row"><span class="spr-sym">USD/CAD</span><div class="spr-bar"><div class="spr-fill" style="width:52%;background:var(--down)"></div></div><span class="spr-val down" id="spr-usdcad">2.5 pip</span></div>
           <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down" id="spr-nzdusd">3.0 pip</span></div>
         </div>
-        <div style="border-top:1px solid var(--border);overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:0;">
-          <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-            <span class="panel-title">Retail FX Positioning</span>
-            <span class="panel-sub" id="sent-source-sub">Myfxbook · retail positioning</span>
-          </div>
-          <div id="myfxbook-wrap" style="overflow:hidden;padding:4px 8px 2px;width:100%;flex:1;background:var(--bg);position:relative;min-height:0;display:flex;flex-direction:column;">
-            <div id="sent-rows" style="flex:1;overflow-y:auto;" class="thin-scroll">
-              <div style="color:var(--text3);font-size:11px;padding:8px 0;">Loading sentiment…</div>
-            </div>
-            <div id="sent-general" style="flex-shrink:0;"></div>
-            <div style="font-size:9px;color:var(--text3);font-family:var(--font-ui);padding:2px 0 1px;flex-shrink:0;" id="sent-updated"></div>
-          </div>
-        </div>
       </div>
+
     </div>
 
     <!-- NEWS FEED + ECONOMIC MAP -->
@@ -1373,7 +1426,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/dashboard.js?v=7.92.0" defer></script>
+<script src="assets/dashboard.js?v=7.91.0" defer></script>
 <script src="assets/cot-modal-chart.js?v=7.89.2" defer></script>
 <script src="assets/cb-rates-modal.js?v=7.74.43" defer></script>
 <script src="assets/real-carry-modal.js?v=2.7.5" defer></script>
@@ -1410,5 +1463,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
 
+  <!-- TEST: native calendar panel — replaces third-party iframe -->
+  <script src="assets/calendar-panel.js" defer></script>
 </body>
 </html>
