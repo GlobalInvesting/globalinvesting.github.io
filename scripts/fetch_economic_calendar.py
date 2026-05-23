@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-fetch_economic_calendar.py  v3.0
+fetch_economic_calendar.py  v3.1
 ──────────────────────────────────────────────────────────────────────────────
 Builds calendar-data/calendar.json (Economic Surprises panel source) by
 converting and merging data from calendar-data/ff_calendar.json, which is
 maintained by fetch_ff_calendar.py / update-ff-calendar.yml and updates 4×/day.
 
-WHY THIS APPROACH (v3.0)
+WHY THIS APPROACH (v3.0/v3.1)
   v2.0 scraped investing.com via a hidden POST endpoint, which worked until
   May 2026 when investing.com began returning HTTP 503 to GitHub Actions
   runner IP ranges (datacenter traffic detection).
@@ -37,7 +37,15 @@ CONSUMED BY
   dashboard2.js -> renderEconSurprises() -- Economic Surprises panel
 
 SCHEDULE
-  update-economic-calendar.yml -- 4x daily (05:30, 09:30, 13:30, 20:30 UTC)
+  update-economic-calendar.yml -- triggered by workflow_run after update-ff-calendar.yml
+  (inherits CF Worker latency: ~2-3 min end-to-end). Falls back to 4x daily cron.
+
+CHANGELOG
+  v3.1 (2026-05-23): Fix merge key -- exclude timeUTC. Finnhub adjusts scheduled
+    times between runs, causing duplicate entries when the same event had different
+    timeUTC values in ff_calendar vs cached calendar.json. Fresh data now always wins.
+  v3.0 (2026-05-23): Initial version. Reads ff_calendar.json, converts schema,
+    merges with historical calendar.json to maintain 90-day beat/miss window.
 """
 
 import json
@@ -145,7 +153,7 @@ def load_previous_calendar():
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_economic_calendar.py v3.0")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_economic_calendar.py v3.1")
 
     # Step 1: Load FF calendar
     ff_events = load_ff_calendar()
@@ -173,7 +181,12 @@ def main():
     # Step 3: Merge historical events from previous calendar.json
     # FF provides only ~2 weeks of live data. Preserve older events with actuals
     # so the 90-day beat/miss window stays populated.
-    fresh_keys  = {(e["currency"], e["dateISO"], e["timeUTC"], e["event"]) for e in fresh}
+    # Merge key: (currency, dateISO, event) — intentionally excludes timeUTC.
+    # Finnhub occasionally adjusts scheduled times between runs, so including
+    # timeUTC in the key causes the same event to appear twice: the fresh version
+    # (with forecast) and the stale cached version (without forecast). Excluding
+    # timeUTC ensures the fresh ff_calendar version always wins.
+    fresh_keys  = {(e["currency"], e["dateISO"], e["event"]) for e in fresh}
     hard_cutoff = (now_utc - timedelta(days=MAX_HISTORY_DAYS)).strftime("%Y-%m-%d")
     prev_events = load_previous_calendar()
     merged = 0
@@ -186,7 +199,7 @@ def main():
         # Normalise legacy field name (older calendar.json used "title" instead of "event")
         if "title" in ev and "event" not in ev:
             ev["event"] = ev.pop("title")
-        k = (ev.get("currency", ""), d, ev.get("timeUTC", ""), ev.get("event", ""))
+        k = (ev.get("currency", ""), d, ev.get("event", ""))
         if k not in fresh_keys:
             fresh.append(ev)
             fresh_keys.add(k)
