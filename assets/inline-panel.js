@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════
-// INLINE PANEL SYSTEM  v1.3.0
+// INLINE PANEL SYSTEM  v1.4.0
 // File: assets/inline-panel.js
 //
 //   LEFT center  (#split-upper):  Carry Trade · Heatmap
@@ -327,16 +327,39 @@
 
   // ═══════════════════════════════════════════════════════════════════
   // INTERCEPT: Economic Surprises Modal → #split-lower (RIGHT)
+  //
+  // On mobile (≤900px) the split-lower has no fixed height — transplanting
+  // into it produces a zero-height container where flex:1 collapses,
+  // overflow-y:auto never activates, and sticky headers float over the
+  // chart (Bug 2). The user also has to scroll manually to reach the
+  // transplanted panel (Bug 1).
+  //
+  // Fix: on mobile, bypass the transplant entirely and let
+  // _origOpenESM run directly — the econ-surprises-modal.js CSS
+  // renders it as a fixed bottom-sheet overlay (position:fixed;inset:0)
+  // which solves both bugs. On desktop the transplant runs as before.
   // ═══════════════════════════════════════════════════════════════════
   var _origOpenESM = window.openEconSurprisesModal;
 
   window.openEconSurprisesModal = function(ccy) {
+    // Mobile path: fixed overlay, no transplant needed
+    if (window.innerWidth <= 900) {
+      _origOpenESM && _origOpenESM(ccy);
+      return;
+    }
+
+    // Desktop path: transplant into #split-lower as before.
+    // The shell body uses overflow-y:auto by default — for ESM we override it
+    // to overflow:hidden so that #esm-body's flex:1;min-height:0 chain works
+    // correctly and #esm-events-wrap scrolls internally (fixes Bug 2 on desktop).
     var panels = _ensureSplit();
     if (!panels) { _origOpenESM && _origOpenESM(ccy); return; }
 
     var body = _makeShell(panels.lower, 'Economic Surprises \u00b7 ' + (ccy || 'G8'), function() {
       if (typeof window.closeESModal === 'function') window.closeESModal();
     });
+    // Override shell body to overflow:hidden so ESM manages its own internal scroll
+    body.style.overflowY = 'hidden';
 
     var bdPre = document.getElementById('esm-bd');
     if (bdPre) bdPre.style.display = 'none';
@@ -344,7 +367,7 @@
     _origOpenESM && _origOpenESM(ccy);
 
     if (!_transplant(body, 'esm-bd', 'esm-modal', 'esm-close',
-        'display:flex!important;flex-direction:column!important;overflow:hidden!important;')) {
+        'display:flex!important;flex-direction:column!important;overflow:hidden!important;height:100%!important;')) {
       body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">Economic Surprises data unavailable.</div>';
     }
     document.body.style.overflow = '';
