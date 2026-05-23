@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.4
+fetch_ff_calendar.py — v3.5
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.5 changes:
+- Smart-change detection: compares new actuals/forecasts against the previous
+  ff_calendar.json before writing. If nothing changed, the file is NOT rewritten
+  and a CHANGED_FLAG file is NOT created. The workflow reads this flag to decide
+  whether to commit and push, keeping git history clean (no "no changes" noise
+  commits on every 5-min poll).
+- CHANGED_FLAG (/tmp/cal_changed): written with content "1" when at least one
+  actual or forecast value differs from the previous file. Absent or "0" = skip commit.
 
 v3.4 changes:
 - Dedup step (Step 2d): Finnhub occasionally emits the same event twice with
@@ -95,7 +104,7 @@ OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script write
 CALENDAR_PATH = "calendar-data/calendar.json"    # backfill — FRED + Finnhub historical (read-only)
 FINNHUB_API_KEY  = os.environ.get("FINNHUB_API_KEY", "")
 FH_BASE          = "https://finnhub.io/api/v1/calendar/economic"
-FETCH_TIMEOUT    = 25
+CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FH_RATE_SLEEP    = 0.6   # seconds between calls (60 req/min free tier)
 LOOKBACK_DAYS    = 21
 FETCH_PAST_DAYS  = 21    # fetch actuals from last 21 days (covers 3 weeks of history)
@@ -557,26 +566,39 @@ def derive_previous_from_history(events: list[dict]) -> int:
     print(f"  Previous derived from history: {derived} events updated")
     return derived
 
-def load_previous() -> list[dict]:
+
+def load_previous() -> tuple[list, set]:
+    """
+    Returns (events_list, actuals_fingerprint).
+    actuals_fingerprint: set of (title, currency, dateISO, actual, forecast)
+    tuples for all released events — used for smart change detection so the
+    workflow only commits when real data values changed.
+    """
     if not os.path.exists(OUTPUT_PATH):
-        return []
+        return [], set()
     try:
         with open(OUTPUT_PATH, encoding="utf-8") as f:
             data = json.load(f)
         events = data.get("events", [])
         released = sum(1 for e in events if e.get("released"))
         print(f"  Previous file: {len(events)} events ({released} released)")
-        return events
+        fingerprint = {
+            (e["title"], e["currency"], e["dateISO"],
+             str(e.get("actual") or ""), str(e.get("forecast") or ""))
+            for e in events
+            if e.get("actual") is not None
+        }
+        return events, fingerprint
     except Exception as e:
         print(f"  WARNING: Could not read previous file — {e}")
-        return []
+        return [], set()
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.4")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.5")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -600,9 +622,10 @@ def main():
 
     # Step 2: Historical merge — keep past events outside the fetch window
     cutoff = (now_utc - timedelta(days=LOOKBACK_DAYS)).strftime("%Y-%m-%d")
+    prev_events, prev_fingerprint = load_previous()
     fresh_keys = {(e["currency"], e["dateISO"], e["timeUTC"], e["title"]) for e in fresh}
     merged = 0
-    for ev in load_previous():
+    for ev in prev_events:
         d = ev.get("dateISO", "")
         if d < cutoff or d >= date_from:   # skip if outside lookback OR inside fetch window (already refreshed)
             continue
@@ -670,7 +693,52 @@ def main():
     for e in high_today:
         print(f"    {e['timeUTC']} [{e['currency']}] {e['title'][:45]} | actual={e.get('actual') or 'pending'} est={e.get('forecast','—')}")
 
-    # Step 5: Write
+    # Step 5: Smart change detection — only write and signal commit if data changed.
+    # Compares (title, currency, dateISO, actual, forecast) tuples for all released events.
+    # New actuals, changed actuals, and new forecasts all trigger a write.
+    # If nothing changed (e.g. a no-op poll between releases), skip the write entirely
+    # so the workflow doesn't create a meaningless git commit.
+    new_fingerprint = {
+        (e["title"], e["currency"], e["dateISO"],
+         str(e.get("actual") or ""), str(e.get("forecast") or ""))
+        for e in fresh
+        if e.get("actual") is not None
+    }
+    # Also detect new forecasts on future events (not yet released)
+    new_forecasts = {
+        (e["title"], e["currency"], e["dateISO"], str(e.get("forecast") or ""))
+        for e in fresh
+        if not e.get("released") and e.get("forecast") is not None
+    }
+    prev_forecasts = {
+        (e["title"], e["currency"], e["dateISO"], str(e.get("forecast") or ""))
+        for e in prev_events
+        if not e.get("released") and e.get("forecast") is not None
+    }
+
+    new_actuals_added   = new_fingerprint - prev_fingerprint
+    new_forecasts_added = new_forecasts - prev_forecasts
+    data_changed = bool(new_actuals_added or new_forecasts_added)
+
+    if data_changed:
+        if new_actuals_added:
+            print(f"\n  NEW actuals: {len(new_actuals_added)} event(s) updated")
+            for t, ccy, d, act, fc in sorted(new_actuals_added, key=lambda x: x[2]):
+                print(f"    {d} [{ccy}] {t[:50]} → actual={act}" + (f" (fc was {fc})" if fc else ""))
+        if new_forecasts_added:
+            print(f"  NEW forecasts: {len(new_forecasts_added)} event(s) updated")
+    else:
+        print("\n  No new actuals or forecasts — skipping write and commit.")
+        # Clear the flag file so the workflow knows to skip the commit step
+        try:
+            with open(CHANGED_FLAG, "w") as f:
+                f.write("0")
+        except Exception:
+            pass
+        print(f"✓ No changes — {OUTPUT_PATH} unchanged.")
+        return
+
+    # Step 5b: Write
     output = {
         "generated_at": now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": source,
@@ -678,10 +746,17 @@ def main():
     }
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     output_json = json.dumps(output, ensure_ascii=False, indent=2)
-    json.loads(output_json)
+    json.loads(output_json)  # validate before writing
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         f.write(output_json)
-    print(f"\n✓ {len(fresh)} events written to {OUTPUT_PATH} ({released_total} with actuals) — source: {source}")
+    print(f"✓ {len(fresh)} events written to {OUTPUT_PATH} ({released_total} with actuals) — source: {source}")
+
+    # Step 5c: Signal the workflow that a commit is needed
+    try:
+        with open(CHANGED_FLAG, "w") as f:
+            f.write("1")
+    except Exception as e:
+        print(f"  WARNING: Could not write changed flag — {e}")
 
 
 if __name__ == "__main__":
