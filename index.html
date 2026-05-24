@@ -1452,6 +1452,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/dashboard.js?v=7.92.0" defer></script>
+<!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
+     Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
+     in assets/fx-websocket.js, 3) uncommenting the line below.
+     Falls back to yfinance quotes.json polling if the Worker is unavailable. -->
+<!-- <script src="assets/fx-websocket.js?v=1.0.0" defer></script> -->
 <script src="assets/cot-modal-chart.js?v=7.89.2" defer></script>
 <script src="assets/cb-rates-modal.js?v=7.74.43" defer></script>
 <script src="assets/real-carry-modal.js?v=2.7.5" defer></script>
