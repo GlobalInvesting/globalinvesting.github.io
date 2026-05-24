@@ -1376,9 +1376,20 @@ function updateFxPairsTableRT() {
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
     const _rtDay = now.getUTCDay(), _rtH = now.getUTCHours();
     const _rtWeekend = _rtDay === 6 || (_rtDay === 0 && _rtH < 21) || (_rtDay === 5 && _rtH >= 21);
+    // Show Finnhub · live when WebSocket is delivering ticks (any entry has fromFinnhub flag)
+    const _hasFinnhub = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
     upd.textContent = _rtWeekend
       ? `yfinance · Last close: Fri · ~5min delay`
-      : `yfinance · ${hh}:${mm} ${tzAbbr} · ~5min delay`;
+      : _hasFinnhub
+        ? `Finnhub · live`
+        : `yfinance · ${hh}:${mm} ${tzAbbr} · ~5min delay`;
+  }
+
+  // Update Price Chart panel-sub label to match active source
+  const _chartSub = document.querySelector('#section-fxpairs .panel-sub');
+  if (_chartSub && _chartSub.textContent !== 'TradingView \u00b7 live data') {
+    const _hasFh = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
+    _chartSub.textContent = _hasFh ? 'Finnhub \u00b7 live' : `yfinance \u00b7 ~5min delay`;
   }
 }
 
@@ -2892,9 +2903,13 @@ function _lwBuildTodayBar(ohlcId) {
   const nowUTC = new Date();
   const dowUTC = nowUTC.getUTCDay(); // 0=Sun, 6=Sat
 
-  // FX markets are closed Saturday and Sunday — skip today-bar to avoid
+  // FX markets are closed Saturday and most of Sunday — skip today-bar to avoid
   // injecting a flat open=close phantom doji after the last real bar.
-  if (_LW_FX_IDS.has(ohlcId) && (dowUTC === 0 || dowUTC === 6)) return null;
+  // Exception: Sunday >= 21:00 UTC — the FX week opens (Sydney/Tokyo session).
+  // The today-bar for that new session is dated MONDAY (tomorrow) per FX convention.
+  const hourUTC = nowUTC.getUTCHours();
+  if (_LW_FX_IDS.has(ohlcId) && dowUTC === 6) return null;  // all Saturday
+  if (_LW_FX_IDS.has(ohlcId) && dowUTC === 0 && hourUTC < 21) return null;  // Sunday before open
 
   // FX Friday-after-close guard: after 21:00 UTC on Friday the session boundary
   // logic (hourUTC >= 21 → use tomorrow's date) produces dateStr = Saturday.
@@ -2939,7 +2954,6 @@ function _lwBuildTodayBar(ohlcId) {
   // DXY (ICE): 22:00 UTC (17:00 EDT) / 23:00 UTC (17:00 EST) — same as FX but 1h later
   let dateStr;
   if (isFxBar) {
-    const hourUTC = nowUTC.getUTCHours();
     if (hourUTC >= 21) {
       // The FX session boundary is 21:00 UTC. A bar at or after 21:00 UTC belongs to
       // the session that will be dated TOMORROW in fetch_ohlc.py.
@@ -4991,9 +5005,12 @@ async function _renderLWChart(ohlcId, label) {
   const lastBar = todayBar || (bars.length > 0 ? bars[bars.length - 1] : null);
   _updateLWHeader(lastBar, null, _getRtOverride());
 
-  // Update panel-sub to reflect yfinance source
+  // Update panel-sub to reflect active data source
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
-  if (panelSub) panelSub.textContent = 'yfinance \u00b7 ~5min delay';
+  if (panelSub) {
+    const _hasFinnhubLive = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
+    panelSub.textContent = _hasFinnhubLive ? 'Finnhub · live' : 'yfinance \u00b7 ~5min delay';
+  }
 
   // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
   // ── CB Meeting floating tooltip — TradingView floating-tooltip pattern ────
