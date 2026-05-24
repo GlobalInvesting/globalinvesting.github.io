@@ -3146,7 +3146,7 @@ function _lwSetRange(days, totalBars) {
     default:   barsPerDay = 5 / 7;   break; // D1: 5 trading days per week
   }
   const tradingBars = Math.round(days * barsPerDay);
-  const rightPad    = (_lwActiveTf === 'W1' || _lwActiveTf === 'MN') ? 2 : 8;
+  const rightPad    = 8;
   const from = n - tradingBars - 1;
   const to   = n + rightPad - 1;
 
@@ -11178,16 +11178,23 @@ function _lwOpenFullscreen() {
   if (!overlay || !inner || !chartWrap || _chartMode !== 'lw') return;
   if (overlay.classList.contains('lw-fs-active')) return;
 
-  _lwFsOriginalParent = chartWrap.parentNode;
-  _lwFsOriginalNext   = chartWrap.nextSibling;
+  // Store anchor: the element immediately BEFORE rangeBar so we can
+  // restore the full block (rangeBar→chartHdr→chartWrap) in one shot.
+  _lwFsOriginalParent = rangeBar ? rangeBar.parentNode : chartWrap.parentNode;
+  _lwFsOriginalNext   = chartWrap.nextSibling;     // element AFTER chartWrap
   _lwFsOriginalHeight = chartWrap.style.height;
 
+  // Lift all three elements into the fullscreen inner container
   if (rangeBar)  inner.appendChild(rangeBar);
+  if (chartHdr)  inner.appendChild(chartHdr);
   inner.appendChild(chartWrap);
 
   chartWrap.style.height    = '100%';
   chartWrap.style.minHeight = '0';
   chartWrap.style.flex      = '1';
+
+  // Populate the FS tab strip to mirror the real pair tabs
+  _lwFsPopulateTabs();
 
   overlay.classList.add('lw-fs-active');
   document.body.style.overflow = 'hidden';
@@ -11211,8 +11218,11 @@ function _lwCloseFullscreen() {
   overlay.classList.remove('lw-fs-active');
   document.body.style.overflow = '';
 
+  // Restore all three elements before the stored next-sibling reference.
+  // insertBefore with a null ref appends to end, which is also correct.
   if (_lwFsOriginalParent) {
     if (rangeBar)  _lwFsOriginalParent.insertBefore(rangeBar,  _lwFsOriginalNext);
+    if (chartHdr)  _lwFsOriginalParent.insertBefore(chartHdr,  _lwFsOriginalNext);
     if (chartWrap) _lwFsOriginalParent.insertBefore(chartWrap, _lwFsOriginalNext);
   }
 
@@ -11232,6 +11242,45 @@ function _lwCloseFullscreen() {
   _lwFsOriginalParent = null;
   _lwFsOriginalNext   = null;
 }
+
+// Populate FS toolbar tab strip to mirror the main pair tabs
+function _lwFsPopulateTabs() {
+  const fsTabs = document.getElementById('lw-fs-tabs');
+  if (!fsTabs) return;
+  const realTabs = document.querySelectorAll('#tv-pair-tabs .tv-tab');
+  if (!realTabs.length) return;
+  fsTabs.innerHTML = '';
+  realTabs.forEach(realTab => {
+    const btn = document.createElement('button');
+    btn.className = realTab.className;  // copies 'tv-tab active' etc.
+    btn.textContent = realTab.textContent;
+    btn.dataset.sym = realTab.dataset.sym;
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', realTab.getAttribute('aria-selected'));
+    btn.addEventListener('click', () => {
+      // Click the real tab — it handles data fetch + active state
+      realTab.click();
+      // Update FS tab active states to match
+      fsTabs.querySelectorAll('.tv-tab').forEach(b => {
+        b.classList.toggle('active', b.dataset.sym === realTab.dataset.sym);
+        b.setAttribute('aria-selected', b.dataset.sym === realTab.dataset.sym ? 'true' : 'false');
+      });
+    });
+    fsTabs.appendChild(btn);
+  });
+}
+
+// Keep FS tabs in sync when a real tab is clicked while NOT in fullscreen
+document.getElementById('tv-pair-tabs')?.addEventListener('click', e => {
+  const clicked = e.target.closest('.tv-tab');
+  if (!clicked) return;
+  const fsTabs = document.getElementById('lw-fs-tabs');
+  if (!fsTabs) return;
+  fsTabs.querySelectorAll('.tv-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.sym === clicked.dataset.sym);
+    b.setAttribute('aria-selected', b.dataset.sym === clicked.dataset.sym ? 'true' : 'false');
+  });
+});
 
 document.getElementById('lw-fs-btn')?.addEventListener('click', _lwOpenFullscreen);
 document.getElementById('lw-fs-close')?.addEventListener('click', _lwCloseFullscreen);
