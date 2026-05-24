@@ -1376,7 +1376,6 @@ function updateFxPairsTableRT() {
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
     const _rtDay = now.getUTCDay(), _rtH = now.getUTCHours();
     const _rtWeekend = _rtDay === 6 || (_rtDay === 0 && _rtH < 21) || (_rtDay === 5 && _rtH >= 21);
-    // Show Finnhub · live when WebSocket is delivering ticks (any entry has fromFinnhub flag)
     const _hasFinnhub = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
     upd.textContent = _rtWeekend
       ? `yfinance · Last close: Fri · ~5min delay`
@@ -2906,7 +2905,6 @@ function _lwBuildTodayBar(ohlcId) {
   // FX markets are closed Saturday and most of Sunday — skip today-bar to avoid
   // injecting a flat open=close phantom doji after the last real bar.
   // Exception: Sunday >= 21:00 UTC — the FX week opens (Sydney/Tokyo session).
-  // The today-bar for that new session is dated MONDAY (tomorrow) per FX convention.
   const hourUTC = nowUTC.getUTCHours();
   if (_LW_FX_IDS.has(ohlcId) && dowUTC === 6) return null;  // all Saturday
   if (_LW_FX_IDS.has(ohlcId) && dowUTC === 0 && hourUTC < 21) return null;  // Sunday before open
@@ -2916,7 +2914,7 @@ function _lwBuildTodayBar(ohlcId) {
   // No FX session opens on Saturday — returning that bar creates a phantom May 9-type
   // candle that should not exist. The weekend guard above only catches Sat/Sun UTC days;
   // this closes the Friday-night gap window (21:00 UTC Fri → 00:00 UTC Sat).
-  if (_LW_FX_IDS.has(ohlcId) && dowUTC === 5 && nowUTC.getUTCHours() >= 21) return null;
+  if (_LW_FX_IDS.has(ohlcId) && dowUTC === 5 && hourUTC >= 21) return null;
 
   // STOOQ_RT_CACHE key for this ohlcId
   const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
@@ -5009,7 +5007,7 @@ async function _renderLWChart(ohlcId, label) {
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
   if (panelSub) {
     const _hasFinnhubLive = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
-    panelSub.textContent = _hasFinnhubLive ? 'Finnhub · live' : 'yfinance \u00b7 ~5min delay';
+    panelSub.textContent = _hasFinnhubLive ? 'Finnhub \u00b7 live' : 'yfinance \u00b7 ~5min delay';
   }
 
   // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
@@ -7712,9 +7710,8 @@ async function boot() {
   // Awaited here so populateFxPairsTable finds the RT cache ready when it renders.
   window._quotesReadyPromise = fetchQuoteBarRT();
   await window._quotesReadyPromise;
-  // Init WebSocket AFTER STOOQ_RT_CACHE is populated — fx-websocket.js needs it ready
-  // to apply incoming ticks immediately (prev_close for chg/pct calculation).
   if (typeof initFxWebSocket === 'function') initFxWebSocket();
+  await window._quotesReadyPromise;
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
   populateCorrelations(); // 60-day rolling correlations from quotes.json
 
@@ -11343,12 +11340,12 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
       ? _lwChart.addSeries(LWC.LineSeries, {
           color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
           priceScaleId: 'cmp', priceFormat,
-          lastValueVisible: true, priceLineVisible: false,
+          lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' })
       : _lwChart.addLineSeries({
           color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
           priceScaleId: 'cmp', priceFormat,
-          lastValueVisible: true, priceLineVisible: false,
+          lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' });
 
       // For rate: expand monthly observations to daily step-line so it aligns with the chart
@@ -11450,8 +11447,12 @@ function _lwOpenFullscreen() {
   document.body.style.overflow = 'hidden';
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    if (_lwChart) {
-      const w = inner.offsetWidth, h = inner.offsetHeight;
+    if (_lwChart && chartWrap) {
+      // Use chartWrap (not inner) — inner also contains rangeBar and chartHdr above the chart.
+      // Sizing to inner.offsetHeight makes the chart taller than its actual container,
+      // pushing the time axis off the bottom edge.
+      const w = chartWrap.offsetWidth  || inner.offsetWidth;
+      const h = chartWrap.offsetHeight || inner.offsetHeight;
       if (w > 0 && h > 0) _lwChart.resize(w, h);
     }
   }));
