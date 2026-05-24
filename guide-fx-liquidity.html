@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FX Sessions & Liquidity Guide: When Each Market Opens and Peaks — Global Investing</title>
-<meta name="description" content="Sydney, Tokyo, London, New York: session hours, volume profiles, and how each FX pair behaves differently across sessions. Includes the DXY-liquidity relationship and London-New York overlap dynamics.">
+<meta name="description" content="FX market is most liquid during the London-New York overlap (12:00–17:00 GMT). See which hours each pair is most active, how JPY pairs peak in Tokyo, and how the 30-day H-L range proxy signals intraday liquidity shifts — live in the terminal.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-fx-liquidity.html">
 <meta name="google-adsense-account" content="ca-pub-7977942731354565">
@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://globalinvesting.github.io/guide-fx-liquidity.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
 <meta property="og:title" content="FX Sessions & Liquidity Guide: When Each Market Opens and Peaks — Global Investing">
-<meta property="og:description" content="Sydney, Tokyo, London, New York: session hours, volume profiles, and how each FX pair behaves differently across sessions. Includes the DXY-liquidity relationship and London-New York overlap dynamics.">
+<meta property="og:description" content="FX market is most liquid during the London-New York overlap (12:00–17:00 GMT). See which hours each pair is most active, how JPY pairs peak in Tokyo, and how the 30-day H-L range proxy signals intraday liquidity shifts — live in the terminal.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
@@ -607,6 +607,46 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "When is the FX market most liquid?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "FX liquidity peaks during the London session (07:00–17:00 GMT) and reaches its daily maximum during the London-New York overlap (12:00–17:00 GMT). EUR/USD, GBP/USD, and USD/JPY see the tightest spreads and deepest order books during this window. The Sydney-Tokyo overlap (00:00–02:00 GMT) is the second most active period for JPY and AUD pairs. The quietest period is the New York-Tokyo gap (22:00–00:00 GMT)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the FX Liquidity panel and how is it calculated?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The FX Liquidity panel shows an hourly activity proxy based on the average High-Low range across major FX pairs, compared against a 30-day historical baseline. Each bar represents one hour of the trading day. Hours where the current range exceeds the 30-day average are shown as elevated activity. This is a price-based proxy — the standard approach for non-institutional tools — since true order book depth data requires institutional-grade feeds."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the London-New York overlap and why does it matter?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The London-New York overlap (approximately 12:00–17:00 GMT) is the most liquid window in the FX trading day. Both the world's two largest FX hubs are simultaneously active, which concentrates order flow, tightens spreads, and produces the largest intraday price moves. Major US economic data releases (NFP, CPI, FOMC) fall within this window, making it the highest-volatility period for USD pairs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does each FX pair behave differently across trading sessions?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "JPY pairs (USD/JPY, GBP/JPY, EUR/JPY) are most active during the Tokyo session (00:00–09:00 GMT) due to Bank of Japan activity and Japanese economic data. AUD and NZD pairs peak during Sydney-Tokyo hours. EUR and GBP pairs are most active during London hours. During the Asian session, GBP/JPY specifically tends to be choppy and illiquid with wider spreads, becoming directional only at the London open."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -902,7 +942,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · FX LIQUIDITY</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.2</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.3</span></div>
 </footer>
 
 

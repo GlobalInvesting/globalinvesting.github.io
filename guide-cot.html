@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CFTC COT Report Explained: How to Read Institutional FX Positioning — Global Investing</title>
-<meta name="description" content="How to read CFTC COT data: net contracts, Long%, week-over-week changes, and extreme positioning signals for GBP, JPY, EUR, AUD and all G8 currencies. Includes what current positioning means for the directional bias of each pair. Updated weekly.">
+<meta name="description" content="The CFTC COT report shows what institutional traders (hedge funds, CTAs) are positioned in each G8 currency. Learn to read net contracts, Long%, WoW changes, and extreme positioning signals — with live weekly data for GBP, JPY, EUR, AUD and all major pairs.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-cot.html">
 <meta name="google-adsense-account" content="ca-pub-7977942731354565">
@@ -604,6 +604,54 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the CFTC COT report and how is it used in FX trading?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Commitments of Traders (COT) report is a weekly publication from the US Commodity Futures Trading Commission (CFTC). It shows the aggregate open positions of different trader categories in futures markets, including currency futures on the CME. FX traders use it to read the positioning of leveraged funds (hedge funds, CTAs) as a proxy for institutional directional bias in each G8 currency."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you read net COT positioning for currency pairs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Net positioning is the difference between long and short contracts held by leveraged funds. A positive net means more longs than shorts (bullish institutional bias); a negative net means more shorts (bearish bias). For cross pairs like GBP/JPY, you compare net GBP positioning against net JPY positioning — noting that JPY futures are quoted as JPY/USD, so the sign must be inverted relative to USD/JPY."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Long% in the COT terminal and what does it signal?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Long% (also called the Bullish Percent Index) is the share of total open interest held on the long side by leveraged funds: Long% = longs / (longs + shorts) × 100. Values above 60% signal a crowded long; below 40% signal a crowded short. These extremes are contrarian warning signals — not directional calls — indicating elevated reversal risk when a catalyst appears."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How often is COT data updated and what is the reporting lag?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The CFTC publishes COT data every Friday at 3:30 PM Eastern Time, reflecting positions as of the previous Tuesday close. This creates a 3-day reporting lag. The Global Investing FX Terminal updates the COT panel automatically each Saturday via a scheduled workflow that fetches the latest CFTC Disaggregated TFF report."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Open Interest (OI) in the COT report and why does it matter?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Open Interest is the total number of outstanding futures contracts that have not been settled. In the COT context, rising OI alongside increasing net longs confirms institutional conviction behind a directional move. Falling OI while positioning stays extreme often signals that the crowded trade is being unwound — a leading indicator of potential trend exhaustion."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -1000,7 +1048,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · COT POSITIONING</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.2</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.3</span></div>
 </footer>
 
 
