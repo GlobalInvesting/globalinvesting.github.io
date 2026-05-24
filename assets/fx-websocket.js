@@ -252,18 +252,31 @@ function _updateQuoteBarPriceElement(pairId, price) {
  * Update the source label in the quote bar from "yfinance · HH:MM" to
  * "Finnhub · live" on first tick, and back to null (reverts to yfinance label)
  * when the WebSocket is no longer active.
+ *
+ * Also controls the statusbar DELAY chip (#footer-delay-label):
+ *   - WebSocket live → "LIVE"  green  (var(--up))
+ *   - WebSocket down → "~5 MIN" orange (var(--orange))
  */
 function _updateSourceLabel(pairId) {
-  const qbLabel = document.getElementById("qb-source-label");
-  if (!qbLabel) return;
+  const qbLabel   = document.getElementById("qb-source-label");
+  const delayChip = document.getElementById("footer-delay-label");
 
   if (pairId === null) {
-    // WebSocket gave up — let the next fetchQuoteBarRT() cycle rewrite the label
+    // WebSocket gave up — revert footer chip to ~5 MIN
+    if (delayChip) {
+      delayChip.textContent = "~5 MIN";
+      delayChip.style.color = "var(--orange)";
+    }
+    // Let the next fetchQuoteBarRT() cycle rewrite qbLabel
     return;
   }
 
-  // Show "Finnhub · live" while WebSocket is delivering ticks
-  qbLabel.textContent = "Finnhub · live";
+  // WebSocket is delivering ticks — set both labels to live state
+  if (qbLabel)   qbLabel.textContent = "Finnhub · live";
+  if (delayChip) {
+    delayChip.textContent = "LIVE";
+    delayChip.style.color = "var(--up)";
+  }
 }
 
 // ── PUBLIC API ────────────────────────────────────────────────────────────────
