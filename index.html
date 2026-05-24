@@ -282,7 +282,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .lw-tb-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
 .lw-tb-btn.on{color:var(--text);border-color:var(--blue)}
 .lw-tb-btn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
-.lw-tb-sep{width:1px;height:14px;background:var(--border2);margin:0 6px;flex-shrink:0}#lw-range-bar::-webkit-scrollbar{display:none}
+.lw-tb-sep{width:1px;height:14px;background:var(--border2);margin:0 6px;flex-shrink:0}
+#lw-range-bar::-webkit-scrollbar,#lw-range-bar div::-webkit-scrollbar{display:none}
+.lw-tf-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em;white-space:nowrap}
+.lw-tf-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
+.lw-tf-btn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.lw-cmp-item{padding:4px 12px;cursor:pointer;color:var(--text2);white-space:nowrap;font-family:var(--font-ui,sans-serif)}
+.lw-cmp-item:hover{background:var(--bg3,#2a2e39);color:var(--text)}
+.lw-cmp-item.active{color:var(--blue);font-weight:600}
+.lw-cmp-pill{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 7px;font-size:9px;color:var(--text2);cursor:pointer;white-space:nowrap;font-family:var(--font-ui,sans-serif)}
+.lw-cmp-pill:hover{border-color:#ef5350;color:#ef5350}
+#lw-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:#131722;flex-direction:column}
+#lw-fullscreen-overlay.lw-fs-active{display:flex}
+#lw-fullscreen-inner{flex:1;min-height:0;position:relative}
+#lw-fs-toolbar{display:flex;align-items:center;gap:2px;padding:3px 8px;background:#1a1d2a;border-bottom:1px solid #2a2e39;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+#lw-fs-toolbar::-webkit-scrollbar{display:none}
+#lw-fs-close{margin-left:auto;flex-shrink:0;background:transparent;border:1px solid #444;border-radius:3px;color:#999;font-size:11px;padding:2px 8px;cursor:pointer}
+#lw-fs-close:hover{border-color:#ef5350;color:#ef5350}
 #lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:#131722;border-bottom:1px solid #2a2e39;min-height:26px;flex-wrap:wrap;overflow:hidden}
 #lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
 #lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--font-mono,monospace)}
@@ -654,29 +670,67 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <!-- Single scrollable row — overflow-x:auto so all buttons are reachable on narrow mobile
            without any horizontal overflow of the page itself. -webkit-overflow-scrolling for iOS
            momentum scrolling. Scrollbar hidden via CSS (see dashboard.css lw-range-bar rule). -->
-      <div id="lw-range-bar" style="display:none;align-items:center;gap:2px;padding:2px 6px;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-        <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">RANGE</span>
-        <button class="lw-range-btn active" data-days="91"  aria-label="3 months"  style="flex-shrink:0;">3M</button>
-        <button class="lw-range-btn"        data-days="182" aria-label="6 months"  style="flex-shrink:0;">6M</button>
-        <button class="lw-range-btn"        data-days="365" aria-label="1 year"    style="flex-shrink:0;">1Y</button>
-        <button class="lw-range-btn"        data-days="1095" aria-label="3 years"  style="flex-shrink:0;">3Y</button>
-        <button class="lw-range-btn"        data-days="0"   aria-label="All data"  style="flex-shrink:0;">ALL</button>
-        <span style="flex:1;min-width:6px;flex-shrink:0;"></span>
-        <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">TYPE</span>
-        <button class="lw-tb-btn sel" id="lw-type-candle" data-chart-type="candle" aria-label="Candlestick chart" title="Candlestick" style="flex-shrink:0;">Candle</button>
-        <button class="lw-tb-btn"    id="lw-type-bar"    data-chart-type="bar"    aria-label="Bar (OHLC) chart"   title="Bar (OHLC)"  style="margin-left:2px;flex-shrink:0;">Bar</button>
-        <button class="lw-tb-btn"    id="lw-type-line"   data-chart-type="line"   aria-label="Line chart"         title="Line"        style="margin-left:2px;flex-shrink:0;">Line</button>
-        <button class="lw-tb-btn"    id="lw-type-area"   data-chart-type="area"   aria-label="Area chart"         title="Area"        style="margin-left:2px;flex-shrink:0;">Area</button>
-        <span class="lw-tb-sep" style="flex-shrink:0;"></span>
-        <button class="lw-tb-btn"    id="lw-wm-btn"  aria-label="Toggle watermark"          aria-pressed="false" title="Symbol watermark"    style="flex-shrink:0;">WM</button>
-        <button class="lw-tb-btn on" id="lw-pc-btn"  aria-label="Toggle prev close line"    aria-pressed="true"  title="Prev close line"    style="margin-left:2px;flex-shrink:0;">PC</button>
-        <button class="lw-tb-btn"    id="lw-vol-btn" aria-label="Toggle volume histogram"   aria-pressed="false" title="Volume histogram"    style="margin-left:2px;flex-shrink:0;">VOL</button>
-        <button class="lw-tb-btn on" id="lw-cb-btn"  aria-label="Toggle CB meeting markers" aria-pressed="true"  title="CB meeting markers"  style="margin-left:2px;flex-shrink:0;">CB</button>
-        <span class="lw-tb-sep" style="flex-shrink:0;"></span>
-        <button class="lw-tb-btn"    id="lw-log-btn" aria-label="Toggle logarithmic scale"  aria-pressed="false" title="Log scale"           style="flex-shrink:0;">LOG</button>
-        <span class="lw-tb-sep" style="flex-shrink:0;"></span>
-        <button class="lw-tb-btn" id="lw-ind-btn" aria-label="Open indicators menu" aria-haspopup="true" aria-expanded="false" title="Add indicator" style="flex-shrink:0;padding:1px 8px;">Indicators &#9662;</button>
-        <div id="lw-ind-pills" style="display:inline-flex;align-items:center;gap:3px;flex-shrink:0;flex-wrap:nowrap;"></div>
+      <!-- Chart toolbar — two rows: (1) TF + Range + Compare + Fullscreen, (2) Type + Overlays -->
+      <div id="lw-range-bar" style="display:none;flex-direction:column;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+        <!-- Row 1: Timeframe · Range · Compare · Fullscreen -->
+        <div style="display:flex;align-items:center;gap:2px;padding:2px 6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+          <span style="font-size:9px;color:var(--text3);margin-right:2px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">TF</span>
+          <button class="lw-tf-btn"     data-tf="H1" aria-label="1 hour"  title="1 Hour"  style="flex-shrink:0;">H1</button>
+          <button class="lw-tf-btn"     data-tf="H4" aria-label="4 hours" title="4 Hours" style="flex-shrink:0;margin-left:2px;">H4</button>
+          <button class="lw-tf-btn sel" data-tf="D1" aria-label="1 day"   title="Daily"   style="flex-shrink:0;margin-left:2px;">D1</button>
+          <button class="lw-tf-btn"     data-tf="W1" aria-label="1 week"  title="Weekly"  style="flex-shrink:0;margin-left:2px;">W1</button>
+          <button class="lw-tf-btn"     data-tf="MN" aria-label="1 month" title="Monthly" style="flex-shrink:0;margin-left:2px;">MN</button>
+          <span class="lw-tb-sep" style="flex-shrink:0;"></span>
+          <span style="font-size:9px;color:var(--text3);margin-right:2px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">RANGE</span>
+          <span id="lw-range-btns" style="display:contents;">
+            <button class="lw-range-btn active" data-days="91"   aria-label="3 months" style="flex-shrink:0;">3M</button>
+            <button class="lw-range-btn"        data-days="182"  aria-label="6 months" style="flex-shrink:0;">6M</button>
+            <button class="lw-range-btn"        data-days="365"  aria-label="1 year"   style="flex-shrink:0;">1Y</button>
+            <button class="lw-range-btn"        data-days="1095" aria-label="3 years"  style="flex-shrink:0;">3Y</button>
+            <button class="lw-range-btn"        data-days="0"    aria-label="All data" style="flex-shrink:0;">ALL</button>
+          </span>
+          <span style="flex:1;min-width:4px;"></span>
+          <!-- Compare overlay selector -->
+          <div id="lw-compare-wrap" style="position:relative;flex-shrink:0;">
+            <button class="lw-tb-btn" id="lw-cmp-btn" aria-label="Compare symbol overlay" aria-haspopup="true" aria-expanded="false" title="Overlay a second symbol (% change)" style="padding:1px 7px;">+ Compare</button>
+            <div id="lw-cmp-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--bg2,#1e222d);border:1px solid var(--border);border-radius:4px;z-index:300;min-width:175px;max-height:260px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.55);padding:4px 0;font-size:11px;font-family:var(--font-ui,sans-serif);">
+              <div style="padding:3px 10px 3px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border2);margin-bottom:2px;">FX Majors</div>
+              <div class="lw-cmp-item" data-cmpid="eurusd">EUR/USD</div><div class="lw-cmp-item" data-cmpid="gbpusd">GBP/USD</div>
+              <div class="lw-cmp-item" data-cmpid="usdjpy">USD/JPY</div><div class="lw-cmp-item" data-cmpid="audusd">AUD/USD</div>
+              <div class="lw-cmp-item" data-cmpid="usdcad">USD/CAD</div><div class="lw-cmp-item" data-cmpid="usdchf">USD/CHF</div>
+              <div class="lw-cmp-item" data-cmpid="nzdusd">NZD/USD</div>
+              <div style="padding:3px 10px 3px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);margin:2px 0;">FX Crosses</div>
+              <div class="lw-cmp-item" data-cmpid="eurgbp">EUR/GBP</div><div class="lw-cmp-item" data-cmpid="eurjpy">EUR/JPY</div>
+              <div class="lw-cmp-item" data-cmpid="gbpjpy">GBP/JPY</div><div class="lw-cmp-item" data-cmpid="audjpy">AUD/JPY</div>
+              <div class="lw-cmp-item" data-cmpid="cadjpy">CAD/JPY</div><div class="lw-cmp-item" data-cmpid="chfjpy">CHF/JPY</div>
+              <div class="lw-cmp-item" data-cmpid="nzdjpy">NZD/JPY</div>
+              <div style="padding:3px 10px 3px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);margin:2px 0;">Cross-Asset</div>
+              <div class="lw-cmp-item" data-cmpid="gold">Gold</div><div class="lw-cmp-item" data-cmpid="wti">WTI Oil</div>
+              <div class="lw-cmp-item" data-cmpid="btc">BTC/USD</div><div class="lw-cmp-item" data-cmpid="spx">S&amp;P 500</div>
+              <div class="lw-cmp-item" data-cmpid="dxy">DXY</div><div class="lw-cmp-item" data-cmpid="us10y">US 10Y</div>
+            </div>
+          </div>
+          <!-- Fullscreen -->
+          <button class="lw-tb-btn" id="lw-fs-btn" aria-label="Toggle fullscreen chart" title="Fullscreen (Esc to exit)" style="margin-left:4px;flex-shrink:0;">&#x26F6;</button>
+        </div>
+        <!-- Row 2: Chart type + Overlays -->
+        <div style="display:flex;align-items:center;gap:2px;padding:1px 6px 2px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-top:1px solid var(--border2,#2a2e39);">
+          <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">TYPE</span>
+          <button class="lw-tb-btn sel" id="lw-type-candle" data-chart-type="candle" aria-label="Candlestick chart" title="Candlestick" style="flex-shrink:0;">Candle</button>
+          <button class="lw-tb-btn"    id="lw-type-bar"    data-chart-type="bar"    aria-label="Bar (OHLC) chart"   title="Bar (OHLC)"  style="margin-left:2px;flex-shrink:0;">Bar</button>
+          <button class="lw-tb-btn"    id="lw-type-line"   data-chart-type="line"   aria-label="Line chart"         title="Line"        style="margin-left:2px;flex-shrink:0;">Line</button>
+          <button class="lw-tb-btn"    id="lw-type-area"   data-chart-type="area"   aria-label="Area chart"         title="Area"        style="margin-left:2px;flex-shrink:0;">Area</button>
+          <span class="lw-tb-sep" style="flex-shrink:0;"></span>
+          <button class="lw-tb-btn"    id="lw-wm-btn"  aria-label="Toggle watermark"          aria-pressed="false" title="Symbol watermark"   style="flex-shrink:0;">WM</button>
+          <button class="lw-tb-btn on" id="lw-pc-btn"  aria-label="Toggle prev close line"    aria-pressed="true"  title="Prev close line"   style="margin-left:2px;flex-shrink:0;">PC</button>
+          <button class="lw-tb-btn"    id="lw-vol-btn" aria-label="Toggle volume histogram"   aria-pressed="false" title="Volume histogram"   style="margin-left:2px;flex-shrink:0;">VOL</button>
+          <button class="lw-tb-btn on" id="lw-cb-btn"  aria-label="Toggle CB meeting markers" aria-pressed="true"  title="CB meeting markers" style="margin-left:2px;flex-shrink:0;">CB</button>
+          <span class="lw-tb-sep" style="flex-shrink:0;"></span>
+          <button class="lw-tb-btn"    id="lw-log-btn" aria-label="Toggle logarithmic scale"  aria-pressed="false" title="Log scale"          style="flex-shrink:0;">LOG</button>
+          <span class="lw-tb-sep" style="flex-shrink:0;"></span>
+          <button class="lw-tb-btn" id="lw-ind-btn" aria-label="Open indicators menu" aria-haspopup="true" aria-expanded="false" title="Add indicator" style="flex-shrink:0;padding:1px 8px;">Indicators &#9662;</button>
+          <div id="lw-ind-pills" style="display:inline-flex;align-items:center;gap:3px;flex-shrink:0;flex-wrap:nowrap;"></div>
+        </div>
       </div>
       <!-- Symbol legend bar — shown only when LW chart is active (mirrors TV widget legend) -->
       <div id="lw-chart-header" aria-live="polite">
@@ -1494,5 +1548,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
 
 <script src="assets/calendar-panel.js?v=1.0.0" defer></script>
+  <!-- Fullscreen chart overlay (⛶ button → position:fixed over entire viewport) -->
+  <div id="lw-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen chart">
+    <div id="lw-fs-toolbar">
+      <span id="lw-fs-sym" style="font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:8px;white-space:nowrap;flex-shrink:0;"></span>
+      <span id="lw-fs-tf-label" style="font-size:9px;color:#787b86;margin-right:8px;font-family:var(--font-ui,sans-serif);flex-shrink:0;"></span>
+      <button class="lw-fs-type-btn" data-fs-type="candle" style="font-size:9px;padding:1px 6px;background:var(--blue,#4f7fff);border:1px solid var(--blue,#4f7fff);border-radius:3px;color:#fff;cursor:pointer;flex-shrink:0;">Candle</button>
+      <button class="lw-fs-type-btn" data-fs-type="bar"    style="font-size:9px;padding:1px 6px;background:transparent;border:1px solid #444;border-radius:3px;color:#aaa;cursor:pointer;margin-left:2px;flex-shrink:0;">Bar</button>
+      <button class="lw-fs-type-btn" data-fs-type="line"   style="font-size:9px;padding:1px 6px;background:transparent;border:1px solid #444;border-radius:3px;color:#aaa;cursor:pointer;margin-left:2px;flex-shrink:0;">Line</button>
+      <span style="width:1px;height:14px;background:#333;margin:0 6px;flex-shrink:0;"></span>
+      <button class="lw-fs-range-btn" data-days="91"   style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:var(--blue,#4f7fff);border:1px solid var(--blue,#4f7fff);color:#fff;">3M</button>
+      <button class="lw-fs-range-btn" data-days="182"  style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid #444;color:#aaa;margin-left:2px;">6M</button>
+      <button class="lw-fs-range-btn" data-days="365"  style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid #444;color:#aaa;margin-left:2px;">1Y</button>
+      <button class="lw-fs-range-btn" data-days="1095" style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid #444;color:#aaa;margin-left:2px;">3Y</button>
+      <button class="lw-fs-range-btn" data-days="0"    style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid #444;color:#aaa;margin-left:2px;">ALL</button>
+      <button id="lw-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit</button>
+    </div>
+    <div id="lw-fullscreen-inner"></div>
+  </div>
+
 </body>
 </html>
