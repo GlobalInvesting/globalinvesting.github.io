@@ -1206,6 +1206,7 @@ function intradayQuote(cache, id) {
 
 // Cache for intraday RT rates — fed by yfinance JSON, used to update FX table + heatmap
 const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
+window.STOOQ_RT_CACHE = STOOQ_RT_CACHE;  // expose for fx-websocket.js (const doesn't auto-bind to window)
 
 // proxyUrls / proxyUrlsYahoo removed — all data now comes from
 // intraday-data/quotes.json (yfinance via GitHub Action, same-origin).
@@ -7693,8 +7694,10 @@ async function boot() {
   // Expose promise so bootNewFeatures() can await it before renderCIPForwards().
   // Awaited here so populateFxPairsTable finds the RT cache ready when it renders.
   window._quotesReadyPromise = fetchQuoteBarRT();
-if (typeof initFxWebSocket === 'function') initFxWebSocket();
   await window._quotesReadyPromise;
+  // Init WebSocket AFTER STOOQ_RT_CACHE is populated — fx-websocket.js needs it ready
+  // to apply incoming ticks immediately (prev_close for chg/pct calculation).
+  if (typeof initFxWebSocket === 'function') initFxWebSocket();
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
   populateCorrelations(); // 60-day rolling correlations from quotes.json
 
