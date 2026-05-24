@@ -300,7 +300,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #lw-fs-toolbar::-webkit-scrollbar{display:none}
 #lw-fs-close{flex-shrink:0;background:transparent;border:1px solid #444;border-radius:3px;color:#999;font-size:11px;padding:2px 10px;cursor:pointer}
 #lw-fs-close:hover{border-color:#ef5350;color:#ef5350}
-#lw-chart-header{display:none;position:absolute;top:4px;left:8px;z-index:10;align-items:center;gap:0;padding:0;background:transparent;min-height:0;flex-wrap:wrap;overflow:visible;pointer-events:none}
+#lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:#131722;border-bottom:1px solid #2a2e39;min-height:26px;flex-wrap:wrap;overflow:hidden}
 #lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
 #lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--font-mono,monospace)}
 #lw-chart-header .lw-hdr-o,.lw-hdr-h,.lw-hdr-l,.lw-hdr-c,.lw-hdr-chg,.lw-hdr-ma{white-space:nowrap}
@@ -733,18 +733,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div id="lw-ind-pills" style="display:inline-flex;align-items:center;gap:3px;flex-shrink:0;flex-wrap:nowrap;"></div>
         </div>
       </div>
-      <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-32px;pointer-events:none;">
-        <!-- Symbol legend overlay — position:absolute top-left of chart canvas -->
-        <div id="lw-chart-header" aria-live="polite">
-          <span class="lw-hdr-sym" id="lw-hdr-sym"></span>
-          <div class="lw-hdr-ohlc" id="lw-hdr-ohlc">
-            <span id="lw-hdr-ohlc-wrap" style="display:contents"><span class="lw-hdr-o"><span class="lw-hdr-lbl">O</span><span class="lw-hdr-val" id="lw-hdr-o-val"></span></span>
-            <span class="lw-hdr-h"><span class="lw-hdr-lbl">H</span><span class="lw-hdr-val" id="lw-hdr-h-val"></span></span>
-            <span class="lw-hdr-l"><span class="lw-hdr-lbl">L</span><span class="lw-hdr-val" id="lw-hdr-l-val"></span></span></span>
-            <span class="lw-hdr-c"><span class="lw-hdr-lbl">C</span><span class="lw-hdr-val" id="lw-hdr-c-val"></span></span>
-            <span class="lw-hdr-chg" id="lw-hdr-chg-val"></span>
-          </div>
+      <!-- Symbol legend bar — shown only when LW chart is active -->
+      <div id="lw-chart-header" aria-live="polite">
+        <span class="lw-hdr-sym" id="lw-hdr-sym"></span>
+        <div class="lw-hdr-ohlc" id="lw-hdr-ohlc">
+          <span id="lw-hdr-ohlc-wrap" style="display:contents"><span class="lw-hdr-o"><span class="lw-hdr-lbl">O</span><span class="lw-hdr-val" id="lw-hdr-o-val"></span></span>
+          <span class="lw-hdr-h"><span class="lw-hdr-lbl">H</span><span class="lw-hdr-val" id="lw-hdr-h-val"></span></span>
+          <span class="lw-hdr-l"><span class="lw-hdr-lbl">L</span><span class="lw-hdr-val" id="lw-hdr-l-val"></span></span></span>
+          <span class="lw-hdr-c"><span class="lw-hdr-lbl">C</span><span class="lw-hdr-val" id="lw-hdr-c-val"></span></span>
+          <span class="lw-hdr-chg" id="lw-hdr-chg-val"></span>
         </div>
+      </div>
+      <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-32px;pointer-events:none;">
         <div class="tradingview-widget-container" style="height:100%;width:100%;">
           <div id="tv-chart-widget" class="tradingview-widget-container__widget" style="height:100%;width:100%;">
             <div class="tv-skeleton"></div>
