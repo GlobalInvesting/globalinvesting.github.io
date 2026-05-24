@@ -294,10 +294,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .lw-cmp-pill:hover{border-color:#ef5350;color:#ef5350}
 #lw-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:#131722;flex-direction:column}
 #lw-fullscreen-overlay.lw-fs-active{display:flex}
-#lw-fullscreen-inner{flex:1;min-height:0;position:relative}
-#lw-fs-toolbar{display:flex;align-items:center;gap:2px;padding:3px 8px;background:#1a1d2a;border-bottom:1px solid #2a2e39;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+#lw-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+#lw-fullscreen-overlay.lw-fs-active #tv-chart-wrap{flex:1!important;height:100%!important;min-height:0!important}
+#lw-fs-toolbar{display:flex;align-items:center;justify-content:flex-end;padding:3px 8px;background:#1a1d2a;border-bottom:1px solid #2a2e39;flex-shrink:0}
 #lw-fs-toolbar::-webkit-scrollbar{display:none}
-#lw-fs-close{margin-left:auto;flex-shrink:0;background:transparent;border:1px solid #444;border-radius:3px;color:#999;font-size:11px;padding:2px 8px;cursor:pointer}
+#lw-fs-close{flex-shrink:0;background:transparent;border:1px solid #444;border-radius:3px;color:#999;font-size:11px;padding:2px 10px;cursor:pointer}
 #lw-fs-close:hover{border-color:#ef5350;color:#ef5350}
 #lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:#131722;border-bottom:1px solid #2a2e39;min-height:26px;flex-wrap:wrap;overflow:hidden}
 #lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
@@ -693,7 +694,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <!-- Compare overlay selector -->
           <div id="lw-compare-wrap" style="position:relative;flex-shrink:0;">
             <button class="lw-tb-btn" id="lw-cmp-btn" aria-label="Compare symbol overlay" aria-haspopup="true" aria-expanded="false" title="Overlay a second symbol (% change)" style="padding:1px 7px;">+ Compare</button>
-            <div id="lw-cmp-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--bg2,#1e222d);border:1px solid var(--border);border-radius:4px;z-index:300;min-width:175px;max-height:260px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.55);padding:4px 0;font-size:11px;font-family:var(--font-ui,sans-serif);">
+            <div id="lw-cmp-dropdown" style="display:none;position:fixed;background:var(--bg2,#1e222d);border:1px solid var(--border);border-radius:4px;z-index:9100;min-width:175px;max-height:260px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.55);padding:4px 0;font-size:11px;font-family:var(--font-ui,sans-serif);">
               <div style="padding:3px 10px 3px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border2);margin-bottom:2px;">FX Majors</div>
               <div class="lw-cmp-item" data-cmpid="eurusd">EUR/USD</div><div class="lw-cmp-item" data-cmpid="gbpusd">GBP/USD</div>
               <div class="lw-cmp-item" data-cmpid="usdjpy">USD/JPY</div><div class="lw-cmp-item" data-cmpid="audusd">AUD/USD</div>
@@ -1548,23 +1549,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
 
 <script src="assets/calendar-panel.js?v=1.0.0" defer></script>
-  <!-- Fullscreen chart overlay (⛶ button → position:fixed over entire viewport) -->
+  <!-- Fullscreen chart overlay — chart panel DOM is moved here on open, restored on close -->
   <div id="lw-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen chart">
     <div id="lw-fs-toolbar">
-      <span id="lw-fs-sym" style="font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:8px;white-space:nowrap;flex-shrink:0;"></span>
-      <span id="lw-fs-tf-label" style="font-size:9px;color:#787b86;margin-right:8px;font-family:var(--font-ui,sans-serif);flex-shrink:0;"></span>
-      <button class="lw-fs-type-btn" data-fs-type="candle" style="font-size:9px;padding:1px 6px;background:var(--blue,#4f7fff);border:1px solid var(--blue,#4f7fff);border-radius:3px;color:#fff;cursor:pointer;flex-shrink:0;">Candle</button>
-      <button class="lw-fs-type-btn" data-fs-type="bar"    style="font-size:9px;padding:1px 6px;background:transparent;border:1px solid #444;border-radius:3px;color:#aaa;cursor:pointer;margin-left:2px;flex-shrink:0;">Bar</button>
-      <button class="lw-fs-type-btn" data-fs-type="line"   style="font-size:9px;padding:1px 6px;background:transparent;border:1px solid #444;border-radius:3px;color:#aaa;cursor:pointer;margin-left:2px;flex-shrink:0;">Line</button>
-      <span style="width:1px;height:14px;background:#333;margin:0 6px;flex-shrink:0;"></span>
-      <button class="lw-fs-range-btn" data-days="91"   style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:var(--blue,#4f7fff);border:1px solid var(--blue,#4f7fff);color:#fff;">3M</button>
-      <button class="lw-fs-range-btn" data-days="182"  style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid #444;color:#aaa;margin-left:2px;">6M</button>
-      <button class="lw-fs-range-btn" data-days="365"  style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid #444;color:#aaa;margin-left:2px;">1Y</button>
-      <button class="lw-fs-range-btn" data-days="1095" style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid #444;color:#aaa;margin-left:2px;">3Y</button>
-      <button class="lw-fs-range-btn" data-days="0"    style="flex-shrink:0;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid #444;color:#aaa;margin-left:2px;">ALL</button>
-      <button id="lw-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit</button>
+      <button id="lw-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
     </div>
-    <div id="lw-fullscreen-inner"></div>
+    <div id="lw-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
   </div>
 
 </body>
