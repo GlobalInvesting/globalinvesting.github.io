@@ -466,11 +466,12 @@ function populateFxPairsTable() {
     const ivStr = hv30val != null ? hv30val.toFixed(1) + '%' : '—';
 
     // Session High/Low — from intraday RT cache (STOOQ_RT_CACHE populated by yfinance JSON).
-    // On weekdays: intraday high/low for current session.
-    // On weekends: last Friday close values — shown dimmed per Bloomberg/Eikon convention.
+    // Prefer session_high/session_low (21:00 UTC FX session boundary, same as fetch_ohlc.py
+    // historical bars) over high/low (Yahoo UTC-midnight cutoff, which excludes Tokyo/Sydney
+    // open hours 21:00–23:59 UTC). Falls back to high/low if session values are null.
     const rtD = STOOQ_RT_CACHE[pair.id];
-    const sessH = (rtD?.high  != null) ? fmt(rtD.high,  pair.dec) : '—';
-    const sessL = (rtD?.low   != null) ? fmt(rtD.low,   pair.dec) : '—';
+    const sessH = (rtD?.session_high != null) ? fmt(rtD.session_high, pair.dec) : (rtD?.high != null) ? fmt(rtD.high, pair.dec) : '—';
+    const sessL = (rtD?.session_low  != null) ? fmt(rtD.session_low,  pair.dec) : (rtD?.low  != null) ? fmt(rtD.low,  pair.dec) : '—';
     const sessStyle = isWeekend ? 'color:var(--text3);font-size:10px' : 'color:var(--text1);font-size:10px';
 
     const rateFmt = rate != null ? fmt(rate, pair.dec) : '—';
@@ -1309,6 +1310,20 @@ function updateFxPairsTableRT() {
         tds[4].textContent = '—';
         tds[4].className   = 'flat';
       }
+      // 1W Chg (tds[5]) — from pct1w in cache (prior-Friday-close convention).
+      // This column was previously only set in populateFxPairsTable() (initial render).
+      // Without updating it here, Finnhub ticks that call updateFxPairsTableRT()
+      // never refresh tds[5], so the 1W column stays stale until the next full
+      // page render. Fix: mirror the same pct1w logic as populateFxPairsTable().
+      if (tds[5]) {
+        if (data.pct1w != null) {
+          tds[5].textContent = pctStr(data.pct1w);
+          tds[5].className   = clsDir(data.pct1w);
+        } else {
+          tds[5].textContent = '—';
+          tds[5].className   = 'flat';
+        }
+      }
       // HV30: update if data is available in cache (column index 6)
       if (tds[6] && data.hv30 != null) {
         tds[6].textContent = data.hv30.toFixed(1) + '%';
@@ -1316,9 +1331,15 @@ function updateFxPairsTableRT() {
       // Fwd 1M (tds[7]) and Fwd 3M (tds[8]) — populated by renderCIPForwards()
       // RR 1M (tds[9]) — populated by renderRRSurface() from rr-data/rr.json
       // SESS H / SESS L — now at tds[10]/tds[11] due to 3 new columns
+      // Use session_high/session_low (21:00 UTC FX session boundary, same as fetch_ohlc.py)
+      // instead of high/low (UTC midnight cutoff, which misses the Tokyo/Sydney open hours
+      // 21:00–23:59 UTC of the prior calendar day). Falls back to high/low if session
+      // values are null (e.g. on weekend or if fetch_fx_session_hl() failed).
       const sessColor = _isWeekendRT ? 'var(--text3)' : 'var(--text1)';
-      if (tds[10]) { tds[10].textContent = (data.high != null) ? fmt(data.high, pairCfg.dec) : '—'; tds[10].style.color = sessColor; }
-      if (tds[11]) { tds[11].textContent = (data.low  != null) ? fmt(data.low,  pairCfg.dec) : '—'; tds[11].style.color = sessColor; }
+      const _sessH = data.session_high ?? data.high;
+      const _sessL = data.session_low  ?? data.low;
+      if (tds[10]) { tds[10].textContent = (_sessH != null) ? fmt(_sessH, pairCfg.dec) : '—'; tds[10].style.color = sessColor; }
+      if (tds[11]) { tds[11].textContent = (_sessL != null) ? fmt(_sessL, pairCfg.dec) : '—'; tds[11].style.color = sessColor; }
     });
   }
 
@@ -3115,33 +3136,86 @@ function _lwBuildTodayBar(ohlcId) {
 // Safe to call when no chart is open — exits silently.
 function _lwUpdateTodayBar() {
   if (!_lwCandleSeries || !_lwActiveOhlcId) return;
-  if (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') return; // intraday TF: no live today-bar
+
+  // H1/H4 live partial-bar update
+  // H1/H4 bars come from static JSON files written once per day (01:30 UTC workflow).
+  // The JSON has no bar for the current session / current partial H1 block.
+  // We build a live partial bar from STOOQ_RT_CACHE:
+  //   time  = unix timestamp of the start of the current H1 or H4 UTC block
+  //   open  = prev_close from cache (best available session-open proxy)
+  //   high  = session_high (21:00 UTC FX boundary) with fallback to dayHigh
+  //   low   = session_low  (21:00 UTC FX boundary) with fallback to dayLow
+  //   close = live close from cache (Finnhub tick or yfinance 5-min poll)
+  // LightweightCharts.update() appends or replaces only the current block's bar --
+  // it never touches earlier completed bars. Completely safe.
+  if (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') {
+    const _isFxId = _LW_FX_IDS?.has(_lwActiveOhlcId) ?? false;
+    const _ck = _lwActiveOhlcId === 'gold' ? 'xauusd' : _lwActiveOhlcId;
+    const _rt = STOOQ_RT_CACHE[_ck];
+    if (!_rt?.close || !(_rt.close > 0)) return;
+
+    const _now = new Date();
+
+    // Compute the start of the current H1 or H4 block (aligned to UTC clock)
+    let _blockTs;
+    if (_lwActiveTf === 'H1') {
+      const _d = new Date(_now);
+      _d.setUTCMinutes(0, 0, 0);
+      _blockTs = Math.floor(_d.getTime() / 1000);
+    } else {
+      const _blockH = Math.floor(_now.getUTCHours() / 4) * 4;
+      const _d = new Date(_now);
+      _d.setUTCHours(_blockH, 0, 0, 0);
+      _blockTs = Math.floor(_d.getTime() / 1000);
+    }
+
+    // Skip weekend for FX (Sat all-day, Sun before 21:00 UTC, Fri after 21:00 UTC)
+    const _utcDay = _now.getUTCDay();
+    const _utcH   = _now.getUTCHours();
+    const _isFxWeekend = _isFxId && (
+      _utcDay === 6 ||
+      (_utcDay === 0 && _utcH < 21) ||
+      (_utcDay === 5 && _utcH >= 21)
+    );
+    if (_isFxWeekend) return;
+
+    const _c = _rt.close;
+    const _o = (_rt.prev_close && _rt.prev_close > 0) ? _rt.prev_close : _c;
+    const _h2 = Math.max(_rt.session_high ?? _rt.high ?? _c, _o, _c);
+    const _l2 = Math.min(_rt.session_low  ?? _rt.low  ?? _c, _o, _c);
+    if (!(_h2 > 0 && _l2 > 0 && _h2 >= _l2)) return;
+
+    const _liveBar = { time: _blockTs, open: _o, high: _h2, low: _l2, close: _c };
+    try {
+      const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
+      _lwCandleSeries.update(_isLA ? { time: _blockTs, value: _c } : _liveBar);
+    } catch(_) {}
+
+    // Sync chart header % with RT data
+    if (_lwActiveUpdateHeader && _rt.pct != null && _lwActivePrevCloseMap) {
+      _lwActiveUpdateHeader(_liveBar, null, { pct: _rt.pct, chg: _rt.chg });
+    }
+    return;
+  }
+
+  // D1 / W1 / MN live today-bar (unchanged path)
   const bar = _lwBuildTodayBar(_lwActiveOhlcId);
   if (!bar) return;
   try {
-    // Line/Area series use {time, value} — not OHLC format
+    // Line/Area series use {time, value} -- not OHLC format
     const isLineArea = (window._lwChartType === 'line' || window._lwChartType === 'area');
     _lwCandleSeries.update(isLineArea ? { time: bar.time, value: bar.close } : bar);
   } catch(_) {}
 
-  // Sync the chart header % with yfinance RT data — DIRECT from rt.pct/rt.chg,
+  // Sync the chart header % with yfinance RT data -- DIRECT from rt.pct/rt.chg,
   // never recalculated from bar OHLC differences.
-  // Recalculating from bar close deltas causes divergence because:
-  //   • The JSON historical bars use a slightly different prev_close than yfinance's
-  //     regularMarketPreviousClose (timezone boundaries, fetch timing, rounding).
-  //   • On weekends FX has no today-bar — the last bar IS Friday's, and its prevClose
-  //     in the JSON (Thursday bar close) may differ from yfinance's official Thursday close.
-  // Using rt.pct directly guarantees the header matches the ticker/table exactly.
   if (_lwActiveUpdateHeader) {
     const cacheKey = _lwActiveOhlcId === 'gold' ? 'xauusd' : _lwActiveOhlcId;
     const rt = STOOQ_RT_CACHE[cacheKey];
     if (rt?.pct != null && rt.pct !== undefined && _lwActivePrevCloseMap) {
-      // Inject the yfinance-authoritative prevClose so _updateLWHeader calculates
-      // the correct % when called for crosshair hover on today's bar too.
       if (rt.open != null && rt.open > 0) {
         _lwActivePrevCloseMap.set(bar.time, rt.open);
       }
-      // Override the header % display directly with yfinance values
       _lwActiveUpdateHeader(bar, null, { pct: rt.pct, chg: rt.chg });
     } else {
       _lwActiveUpdateHeader(bar, null, null);
@@ -3672,13 +3746,20 @@ async function _renderLWChart(ohlcId, label) {
   _lwCandleSeries = candleSeries;
   _lwActiveOhlcId = ohlcId;
 
-  // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated)
-  const todayBar = _lwBuildTodayBar(ohlcId);
-  if (todayBar) {
-    try {
-      const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
-      candleSeries.update(_isLA ? { time: todayBar.time, value: todayBar.close } : todayBar);
-    } catch(_) {}
+  // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated).
+  // For D1/W1/MN: _lwBuildTodayBar() constructs the bar.
+  // For H1/H4: _lwUpdateTodayBar() handles the live partial-bar injection directly
+  //            (block-aligned unix timestamp + session_high/low from STOOQ_RT_CACHE).
+  if (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') {
+    _lwUpdateTodayBar();
+  } else {
+    const todayBar = _lwBuildTodayBar(ohlcId);
+    if (todayBar) {
+      try {
+        const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
+        candleSeries.update(_isLA ? { time: todayBar.time, value: todayBar.close } : todayBar);
+      } catch(_) {}
+    }
   }
 
   // ── Multi-MA legacy state cleanup — MA overlays now handled by Full Indicator Library ──
