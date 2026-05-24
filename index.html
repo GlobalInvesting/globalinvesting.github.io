@@ -300,6 +300,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #lw-fs-toolbar::-webkit-scrollbar{display:none}
 #lw-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid #2a2e39;color:#999;font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #lw-fs-close:hover{border-color:#ef5350;color:#ef5350}
+#lw-fullscreen-overlay.lw-fs-active #lw-fs-btn{display:none!important}
 #lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:#131722;border-bottom:1px solid #2a2e39;min-height:26px;flex-wrap:wrap;overflow:hidden}
 #lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
 #lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--font-mono,monospace)}
@@ -685,6 +686,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="CBOE:VIX">VIX</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="TVC:MOVE">MOVE</button>
           </div>
           <button id="tv-tabs-next" aria-label="Scroll chart tabs right" style="flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
         </div>
@@ -1574,8 +1576,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <!-- Fullscreen chart overlay — chart panel DOM is moved here on open, restored on close -->
   <div id="lw-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen chart">
     <div id="lw-fs-toolbar">
-      <div id="lw-fs-tabs" role="tablist" aria-label="Chart symbol selector" style="flex:1;display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;gap:0;"></div>
-      <button id="lw-fs-close" title="Exit fullscreen (Esc)" style="flex-shrink:0;margin-left:4px;">&#x2715; Exit fullscreen</button>
+      <div id="lw-fs-tab-outer" style="flex:1;display:flex;align-items:stretch;overflow:hidden;min-width:0;">
+        <button id="lw-fs-tabs-prev" aria-label="Scroll left" style="display:none;flex-shrink:0;width:22px;background:#1a1d2a;border:none;border-right:1px solid #2a2e39;color:#666;cursor:pointer;font-size:13px;align-items:center;justify-content:center;">&#8249;</button>
+        <div id="lw-fs-tabs" role="tablist" aria-label="Chart symbol selector" style="flex:1;display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;gap:0;min-width:0;"></div>
+        <button id="lw-fs-tabs-next" aria-label="Scroll right" style="flex-shrink:0;width:22px;background:#1a1d2a;border:none;border-left:1px solid #2a2e39;color:#666;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;">&#8250;</button>
+      </div>
+      <button id="lw-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
     </div>
     <div id="lw-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
   </div>
