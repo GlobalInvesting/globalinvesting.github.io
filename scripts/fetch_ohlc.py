@@ -1238,6 +1238,117 @@ def write_json(path: Path, obj) -> None:
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 
+
+
+# ── Intraday (H1 / H4) OHLC builder ───────────────────────────────────────────
+# Generates ohlc-data/h1/{id}.json and ohlc-data/h4/{id}.json for all FX pairs
+# plus key non-FX instruments (BTC, ETH, Gold, WTI, SPX, DXY).
+#
+# Bar format: {"time": <unix_seconds_int>, "open": …, "high": …, "low": …, "close": …}
+# LightweightCharts requires unix timestamps (not YYYY-MM-DD) for intraday series.
+# H4 boundaries align to UTC 4-hour blocks (00, 04, 08, 12, 16, 20).
+# yfinance 1H limit: 730 days.
+
+INTRADAY_SYMBOLS: dict[str, str] = {
+    **{id_: sym for id_, sym in SYMBOLS.items() if id_ not in NON_FX_SYMBOLS},
+    "btc": "BTC-USD", "eth": "ETH-USD", "gold": "GC=F",
+    "wti": "CL=F", "spx": "^GSPC", "dxy": "DX-Y.NYB",
+}
+
+
+def build_intraday_ohlc() -> None:
+    """Fetch 1H bars from yfinance and write H1 + H4 JSONs for all intraday symbols."""
+    now_utc  = datetime.now(timezone.utc)
+    h1_dir   = OUT_DIR / "h1"
+    h4_dir   = OUT_DIR / "h4"
+    h1_dir.mkdir(parents=True, exist_ok=True)
+    h4_dir.mkdir(parents=True, exist_ok=True)
+
+    end_dt   = now_utc + timedelta(days=1)
+    start_dt = now_utc - timedelta(days=720)
+    written_h1 = written_h4 = 0
+    errors_intra: list[str] = []
+
+    for id_, ticker_sym in INTRADAY_SYMBOLS.items():
+        print(f"  [{id_:10s}] {ticker_sym} H1/H4 ...", end=" ", flush=True)
+        try:
+            ticker = yf.Ticker(ticker_sym)
+            dec    = DECIMALS.get(id_, 5)
+            hist   = ticker.history(
+                start=start_dt.strftime("%Y-%m-%d"),
+                end=end_dt.strftime("%Y-%m-%d"),
+                interval="1h", auto_adjust=True,
+            )
+            if hist.empty:
+                print("SKIP (empty)")
+                continue
+
+            h1_bars: list[dict] = []
+            h4_buckets: dict[int, dict] = {}
+
+            for ts, row in hist.iterrows():
+                ts_utc  = ts.replace(tzinfo=timezone.utc) if ts.tzinfo is None else ts.astimezone(timezone.utc)
+                unix_ts = int(ts_utc.timestamp())
+                o = round(float(row["Open"]),  dec)
+                h = round(float(row["High"]),  dec)
+                l = round(float(row["Low"]),   dec)
+                c = round(float(row["Close"]), dec)
+                if not (_guard(id_, c) and _guard(id_, o) and h >= l):
+                    continue
+                if o == h == l == c:
+                    continue
+                h = round(max(h, o, c), dec)
+                l = round(min(l, o, c), dec)
+                h1_bars.append({"time": unix_ts, "open": o, "high": h, "low": l, "close": c})
+
+                # H4: align to UTC 4-hour block
+                block_hour  = (ts_utc.hour // 4) * 4
+                block_start = ts_utc.replace(hour=block_hour, minute=0, second=0, microsecond=0)
+                block_unix  = int(block_start.timestamp())
+                if block_unix not in h4_buckets:
+                    h4_buckets[block_unix] = {"open": o, "high": h, "low": l, "close": c}
+                else:
+                    b = h4_buckets[block_unix]
+                    b["high"]  = round(max(b["high"], h), dec)
+                    b["low"]   = round(min(b["low"],  l), dec)
+                    b["close"] = c
+
+            # Drop the current (incomplete) H4 block
+            if h4_buckets:
+                del h4_buckets[max(h4_buckets)]
+
+            # Deduplicate H1 and sort
+            seen_h1: dict[int, dict] = {b["time"]: b for b in h1_bars}
+            h1_final = sorted(seen_h1.values(), key=lambda b: b["time"])
+
+            # Build sorted H4 list with integrity clamp
+            h4_final = [
+                {"time": ts, "open": b["open"],
+                 "high": round(max(b["high"], b["open"], b["close"]), dec),
+                 "low":  round(min(b["low"],  b["open"], b["close"]), dec),
+                 "close": b["close"]}
+                for ts, b in sorted(h4_buckets.items())
+            ]
+
+            if len(h1_final) < 50:
+                print(f"SKIP (only {len(h1_final)} H1 bars)")
+                errors_intra.append(id_)
+                continue
+
+            write_json(h1_dir / f"{id_}.json", h1_final)
+            write_json(h4_dir / f"{id_}.json", h4_final)
+            written_h1 += 1; written_h4 += 1
+            print(f"OK  H1:{len(h1_final)} H4:{len(h4_final)}")
+
+        except Exception as exc:
+            print(f"ERROR: {exc}")
+            errors_intra.append(id_)
+        time.sleep(0.4)
+
+    print(f"  Intraday: {written_h1} H1 files, {written_h4} H4 files written.")
+    if errors_intra:
+        print(f"  Intraday errors: {', '.join(errors_intra)}")
+
 def main() -> None:
     now_utc = datetime.now(timezone.utc)
     print(f"fetch_ohlc.py — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
@@ -1276,7 +1387,12 @@ def main() -> None:
     print(f"Done — {written}/{len(SYMBOLS)} symbols written.")
     if errors:
         print(f"Errors ({len(errors)}): {', '.join(errors)}")
-    # Exit non-zero only if majority of symbols failed
+    # Build H1/H4 intraday OHLC files
+    print()
+    print("Building H1/H4 intraday OHLC …")
+    build_intraday_ohlc()
+
+    # Exit non-zero only if majority of D1 symbols failed
     if written < len(SYMBOLS) // 2:
         sys.exit(1)
 
