@@ -7602,6 +7602,7 @@ async function boot() {
   // Expose promise so bootNewFeatures() can await it before renderCIPForwards().
   // Awaited here so populateFxPairsTable finds the RT cache ready when it renders.
   window._quotesReadyPromise = fetchQuoteBarRT();
+if (typeof initFxWebSocket === 'function') initFxWebSocket();
   await window._quotesReadyPromise;
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
   populateCorrelations(); // 60-day rolling correlations from quotes.json
