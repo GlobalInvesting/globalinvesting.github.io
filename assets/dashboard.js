@@ -3775,10 +3775,13 @@ async function _renderLWChart(ohlcId, label) {
   // For D1/W1/MN: _lwBuildTodayBar() constructs the bar.
   // For H1/H4: _lwUpdateTodayBar() handles the live partial-bar injection directly
   //            (block-aligned unix timestamp + session_high/low from STOOQ_RT_CACHE).
+  // todayBar hoisted to function scope — referenced further below for lastBar calculation
+  // regardless of TF. For H1/H4 it stays null (live bar pushed via _lwUpdateTodayBar).
+  let todayBar = null;
   if (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') {
     _lwUpdateTodayBar();
   } else {
-    const todayBar = _lwBuildTodayBar(ohlcId);
+    todayBar = _lwBuildTodayBar(ohlcId);
     if (todayBar) {
       try {
         const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
