@@ -11323,12 +11323,12 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
       ? _lwChart.addSeries(LWC.LineSeries, {
           color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
           priceScaleId: 'cmp', priceFormat,
-          lastValueVisible: false, priceLineVisible: false,
+          lastValueVisible: true, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' })
       : _lwChart.addLineSeries({
           color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
           priceScaleId: 'cmp', priceFormat,
-          lastValueVisible: false, priceLineVisible: false,
+          lastValueVisible: true, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' });
 
       // For rate: expand monthly observations to daily step-line so it aligns with the chart
