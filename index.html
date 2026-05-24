@@ -95,7 +95,7 @@
   "operatingSystem": "Any",
   "browserRequirements": "Requires JavaScript",
   "featureList": [
-    "Live FX rates for all G8 pairs — EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP and 20+ crosses (~5 min data delay)",
+    "Live FX rates for all 28 G8 pairs — EUR/USD, GBP/USD, USD/JPY and all crosses — streaming in real time via Finnhub WebSocket during market hours",
     "Economic Surprise Index (ESI) — decay-weighted G8 currency scores from actual vs forecast data, with z-score normalisation per event series and 90-day rolling chart",
     "G8 Economic Calendar — Finnhub medium/high-impact events with actual vs consensus beat/miss scoring, updated within 2-3 minutes of release",
     "OIS-implied central bank rate expectations for Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ — with market-implied cut/hike probability",
@@ -167,7 +167,7 @@
       "name": "How real-time is the forex data?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "FX rates carry approximately a 5-minute data delay. Prices are sourced from a server-side pipeline that runs every 5 minutes during market hours and commits the latest data to the site. The browser then reloads that data automatically. TradingView charts in the terminal stream live tick data independently."
+        "text": "FX pair prices stream in real time during market hours via Finnhub WebSocket — a Cloudflare Worker proxy maintains one connection to Finnhub and fans ticks out to all browsers simultaneously. The quote bar label changes from 'yfinance · HH:MM' to 'Finnhub · live' on first tick. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 minutes via yfinance. During weekends and off-hours when the FX market is closed, the last available closing price is displayed."
       }
     },
     {
@@ -499,7 +499,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="q-item" data-sym="FRED:DGS10" style="cursor:pointer;" title="Click: chart"><span class="q-sym">US 10Y</span><span class="q-price" id="q-us10y">—</span><span class="q-chg" id="qc-us10y">—</span></div>
       <div class="q-item" data-sym="PEPPERSTONE:USDX" style="cursor:pointer;" title="Click: chart"><span class="q-sym">DXY</span><span class="q-price" id="q-dxy">—</span><span class="q-chg" id="qc-dxy">—</span></div>
     </div>
-    <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">yfinance</span>
+    <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">Finnhub · live</span>
   </div>
   <button id="qb-next" class="qb-arrow" aria-label="Scroll quotes right">&#8250;</button>
 </div>
@@ -1446,7 +1446,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
-    <span class="sb-v">FX Terminal v7.52.0</span>
+    <span class="sb-v">FX Terminal v8.1.1</span>
   </div>
 </footer>
 

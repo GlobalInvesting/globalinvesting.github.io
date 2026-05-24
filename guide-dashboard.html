@@ -909,9 +909,9 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <h3>Session indicator</h3>
       <p>The top-right of the topbar shows the current active trading session (Sydney, Tokyo, London, New York, or an overlap) based on your browser's local time converted to UTC. A blinking green dot indicates the clock is live.</p>
       <h3>Quote bar</h3>
-      <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, GOLD FUT, WTI FUT, BTC/USD, US 10Y Yield, and DXY. Prices update with ~5 min data delay during market hours. ECB/Frankfurter rates serve as a silent fallback only when primary data is unavailable.</p>
+      <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, GOLD FUT, WTI FUT, BTC/USD, US 10Y Yield, and DXY. FX pair prices update in real time during market hours via Finnhub WebSocket (tick-by-tick). Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) continue updating every ~5 min via yfinance. ECB/Frankfurter rates serve as a silent fallback when all primary sources are unavailable.</p>
       <div class="callout">
-        <strong>Update cadence:</strong> FX rates in the quote bar update every 5 minutes during market hours via a server-side pipeline. The browser reloads the latest data automatically (~5 min delay from market). Click any pair to jump directly to the price chart with that symbol pre-selected.
+        <strong>Update cadence:</strong> FX pair prices stream in real time via Finnhub WebSocket — a Cloudflare Worker proxy maintains one upstream connection to Finnhub and fans ticks out to all browser tabs. When the market is open you will see the source label change from <code style="font-family:var(--font-mono);font-size:11px;">yfinance · HH:MM</code> to <code style="font-family:var(--font-mono);font-size:11px;">Finnhub · live</code>. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min via yfinance. Click any pair to jump directly to the price chart with that symbol pre-selected.
       </div>
       <p>Click any pair in the quote bar to jump to the Price Chart with that symbol pre-selected.</p>
       <h3>News ticker</h3>
@@ -991,7 +991,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <!-- OHLC header bar -->
         <div id="gct-ohlc-bar" style="display:flex;align-items:center;gap:10px;padding:4px 10px;background:#131722;font-size:10px;font-family:'JetBrains Mono',monospace;border-bottom:1px solid #2a2e39;min-height:24px;">
           <span style="font-size:11px;font-weight:700;color:#d1d4dc;font-family:Inter,sans-serif;">EUR / U.S. Dollar &middot; 1D</span>
-          <span style="font-size:9px;color:#6b7280;margin-left:2px;">yfinance &middot; ~5min delay</span>
+          <span style="font-size:9px;color:#6b7280;margin-left:2px;">Finnhub · live · yfinance fallback (~5 min)</span>
           <span id="gct-ohlc-vals" style="display:flex;gap:8px;margin-left:4px;">
             <span><span style="color:#6b7280;font-size:9px;">O </span><span id="gct-o" style="color:#d1d4dc;">1.17060</span></span>
             <span><span style="color:#6b7280;font-size:9px;">H </span><span id="gct-h" style="color:#26a69a;">1.17275</span></span>
@@ -1168,11 +1168,11 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             </tr>
           </tbody>
         </table>
-        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Spread color: <span style="color:var(--up);">green &lt;1.5 pip</span> · <span style="color:var(--orange);">orange 1.5–3</span> · <span style="color:var(--down);">red &gt;3</span> · Source: yfinance / ECB · ~5min delay</div>
+        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Spread color: <span style="color:var(--up);">green &lt;1.5 pip</span> · <span style="color:var(--orange);">orange 1.5–3</span> · <span style="color:var(--down);">red &gt;3</span> · Source: Finnhub live · yfinance fallback / ECB</div>
       </div>
       <ul style="list-style:none;padding:0;">
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Pair</strong> <span style="color:var(--text2);">Currency pair identifier (e.g., EUR/USD)</span></li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Bid / Ask</strong> <span style="color:var(--text2);">Current bid and ask prices sourced from yfinance (~5 min delay)</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Bid / Ask</strong> <span style="color:var(--text2);">Current bid and ask prices — FX pairs sourced from Finnhub WebSocket (live); non-FX from yfinance (~5 min delay)</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Spread</strong> <span style="color:var(--text2);">Estimated current spread in pips, color-coded (green &lt;1.5 pip, orange 1.5–3, red &gt;3)</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">1D</strong> <span style="color:var(--text2);">Percentage change vs. yesterday's closing price</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">1W</strong> <span style="color:var(--text2);">Percentage change vs. last week's close</span></li>
@@ -1225,9 +1225,9 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <div style="font-size:10px;color:var(--down);margin-top:3px;">−1.05</div>
           </div>
         </div>
-        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Sorted strongest → weakest · yfinance RT ~5min delay · fallback: ECB daily</div>
+        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Sorted strongest → weakest · Finnhub live ticks · yfinance fallback (~5 min) · fallback: ECB daily</div>
       </div>
-      <p>Strength is computed using the <strong>industry-standard 28-pair method</strong>: all combinations of the 8 G8 currencies (8×7÷2 = 28 pairs). Each currency appears in exactly 7 pairs, so every score carries equal statistical weight — no currency is over- or under-represented. When intraday data is available (~5 min delayed), each currency's score is the average of its signed % contribution across the 7 pairs it appears in. For example, JPY's score averages its move in USD/JPY, EUR/JPY, GBP/JPY, AUD/JPY, NZD/JPY, CAD/JPY and CHF/JPY — giving a true basket reading rather than a single-pair proxy. ECB daily rates serve as a silent fallback only when RT data is unavailable. Cells are color-coded by intensity: dark green (strong), light green (mild), flat (near zero), light red (mild weakness), dark red (weak).</p>
+      <p>Strength is computed using the <strong>industry-standard 28-pair method</strong>: all combinations of the 8 G8 currencies (8×7÷2 = 28 pairs). Each currency appears in exactly 7 pairs, so every score carries equal statistical weight — no currency is over- or under-represented. When market is open, each currency's score updates in real time from Finnhub WebSocket ticks; during off-hours yfinance (~5 min delay) provides the baseline. For example, JPY's score averages its move in USD/JPY, EUR/JPY, GBP/JPY, AUD/JPY, NZD/JPY, CAD/JPY and CHF/JPY — giving a true basket reading rather than a single-pair proxy. ECB daily rates serve as a silent fallback only when RT data is unavailable. Cells are color-coded by intensity: dark green (strong), light green (mild), flat (near zero), light red (mild weakness), dark red (weak).</p>
       <div class="callout callout-green">
         <strong>Why 28 pairs?</strong> A meter based on fewer pairs creates asymmetric scoring — currencies with fewer pair observations get noisier, less reliable scores. The 28-pair standard ensures each currency is measured against all 7 of its peers simultaneously, making the ranking meaningful even when individual pairs are moving for idiosyncratic reasons.
       </div>
@@ -1918,7 +1918,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.99.5</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.1</span></div>
 </footer>
 
 
