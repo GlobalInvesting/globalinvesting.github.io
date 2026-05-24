@@ -11267,7 +11267,9 @@ function _lwCloseFullscreen() {
 
 // Populate FS toolbar tab strip to mirror the main pair tabs
 function _lwFsPopulateTabs() {
-  const fsTabs = document.getElementById('lw-fs-tabs');
+  // lw-fs-tabs is the scrollable inner strip; its parent lw-fs-tab-outer has ‹ › scroll buttons
+  const fsOuter = document.getElementById('lw-fs-tab-outer');
+  const fsTabs  = document.getElementById('lw-fs-tabs');
   if (!fsTabs) return;
   const realTabs = document.querySelectorAll('#tv-pair-tabs .tv-tab');
   if (!realTabs.length) return;
@@ -11280,16 +11282,31 @@ function _lwFsPopulateTabs() {
     btn.setAttribute('role', 'tab');
     btn.setAttribute('aria-selected', realTab.getAttribute('aria-selected'));
     btn.addEventListener('click', () => {
-      // Click the real tab — it handles data fetch + active state
       realTab.click();
-      // Update FS tab active states to match
       fsTabs.querySelectorAll('.tv-tab').forEach(b => {
         b.classList.toggle('active', b.dataset.sym === realTab.dataset.sym);
         b.setAttribute('aria-selected', b.dataset.sym === realTab.dataset.sym ? 'true' : 'false');
       });
+      // Scroll active tab into view
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     });
     fsTabs.appendChild(btn);
   });
+
+  // Wire ‹ › scroll buttons (same logic as tv-tabs-prev/next in main toolbar)
+  if (fsOuter) {
+    const prevBtn = fsOuter.querySelector('#lw-fs-tabs-prev');
+    const nextBtn = fsOuter.querySelector('#lw-fs-tabs-next');
+    const updateArrows = () => {
+      if (!prevBtn || !nextBtn) return;
+      prevBtn.style.display = fsTabs.scrollLeft > 1 ? 'flex' : 'none';
+      nextBtn.style.display = fsTabs.scrollLeft < fsTabs.scrollWidth - fsTabs.clientWidth - 1 ? 'flex' : 'none';
+    };
+    if (prevBtn) prevBtn.onclick = () => { fsTabs.scrollBy({ left: -160, behavior: 'smooth' }); setTimeout(updateArrows, 320); };
+    if (nextBtn) nextBtn.onclick = () => { fsTabs.scrollBy({ left:  160, behavior: 'smooth' }); setTimeout(updateArrows, 320); };
+    fsTabs.addEventListener('scroll', updateArrows, { passive: true });
+    setTimeout(updateArrows, 50);
+  }
 }
 
 // Keep FS tabs in sync when a real tab is clicked while NOT in fullscreen
