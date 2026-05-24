@@ -1,25 +1,26 @@
 name: Update OHLC Chart Data
 
-# Downloads 3 years of daily OHLC bars for all 38 chart symbols via yfinance
-# and writes ohlc-data/{id}.json to THIS (public) repo.
+# Downloads OHLC bars for all chart symbols via yfinance and writes JSON files
+# to THIS (public) repo under ohlc-data/:
+#
+#   ohlc-data/{id}.json       — Daily (D1) bars, ~3 years, ~38 symbols
+#   ohlc-data/h1/{id}.json    — Hourly (H1) bars, ~720 days, unix timestamps
+#   ohlc-data/h4/{id}.json    — 4-Hour (H4) bars, ~720 days, unix timestamps
 #
 # Symbols: 28 FX pairs + Gold, WTI, BTC, US10Y + S&P 500, Nasdaq, Nikkei,
 #           EuroStoxx 50, ETH/USD, DXY — all rendered via Lightweight Charts.
 #
-# Files are REPLACED on every run — repo size stays fixed (~1.7 MB raw).
+# D1 files are REPLACED on every run — repo size stays fixed.
+# H1/H4 files cover 720-day yfinance limit; also replaced on every run.
 #
 # Schedule:
 #   Tue–Sat 01:30 UTC — Main weekday run (after FX session finalization).
 #     The FX trading day closes at 21:00 UTC. The last 1H bar of each session
 #     (20:00–21:00 UTC) closes at 21:00 UTC, but yfinance has a finalization lag
 #     of 15–90 minutes: H/L/C values for the most recent 1H bars remain provisional
-#     in Yahoo Finance's feed for up to ~1 hour after bar close. Running at 22:30 UTC
-#     (only 90 min after session close) wrote provisional data that appeared as
-#     candles with wrong wicks or body vs TradingView and Bloomberg — the persistent
-#     nightly FX candle bug. Moving to 01:30 UTC (4.5h after session close) ensures
-#     all yfinance 1H FX data is 100% finalized before the JSON is written.
-#     Runs Tue–Sat UTC: covers the Mon–Fri FX sessions (Mon session correction runs
-#     Tue 01:30 UTC, …, Fri session correction runs Sat 01:30 UTC).
+#     in Yahoo Finance's feed for up to ~1 hour after bar close. Running at 01:30 UTC
+#     (4.5h after session close) ensures all yfinance 1H FX data is 100% finalized
+#     before the JSON is written.
 #     dashboard.js injects the live today-bar from quotes.json (refreshed every 5 min)
 #     covering the 21:00–01:30 UTC window without any static data gap.
 #
@@ -67,8 +68,8 @@ jobs:
       - name: Install dependencies
         run: pip install yfinance --break-system-packages
 
-      - name: Create output directory
-        run: mkdir -p ohlc-data
+      - name: Create output directories
+        run: mkdir -p ohlc-data ohlc-data/h1 ohlc-data/h4
 
       - name: Fetch OHLC data
         env:
@@ -87,17 +88,21 @@ jobs:
           with open('ohlc-data/meta.json') as f:
               m = json.load(f)
           print(f'  Updated   : {m[\"updated_at\"]}')
-          print(f'  Symbols   : {m[\"symbol_count\"]} written')
+          print(f'  D1 symbols: {m[\"symbol_count\"]} written')
           print(f'  Period    : {m[\"period\"]} / {m[\"interval\"]}')
           if m['errors']:
               print(f'  Errors    : {len(m[\"errors\"])} failed: {m[\"errors\"]}')
           else:
               print('  Errors    : none')
           total = 0
-          for f in sorted(os.listdir('ohlc-data')):
-              if f.endswith('.json') and f != 'meta.json':
-                  sz = os.path.getsize(f'ohlc-data/{f}')
-                  total += sz
+          for root, dirs, files in os.walk('ohlc-data'):
+              for f in files:
+                  if f.endswith('.json') and f != 'meta.json':
+                      total += os.path.getsize(os.path.join(root, f))
+          h1_count = len([f for f in os.listdir('ohlc-data/h1') if f.endswith('.json')]) if os.path.isdir('ohlc-data/h1') else 0
+          h4_count = len([f for f in os.listdir('ohlc-data/h4') if f.endswith('.json')]) if os.path.isdir('ohlc-data/h4') else 0
+          print(f'  H1 files  : {h1_count}')
+          print(f'  H4 files  : {h4_count}')
           print(f'  Total size: {total // 1024} KB raw')
           "
           fi
