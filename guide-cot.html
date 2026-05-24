@@ -971,3 +971,65 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <p>A scrollable table of the last 52 weeks of raw CFTC data for the selected currency, with columns: Week, Net LF, WoW Δ (week-over-week change in net), Longs, Shorts, Long%, Net%OI, AM Net, and Dealer Net. This is the same source data that feeds all other tabs, presented in full for manual analysis or reference.</p>
     </div>
 
+
+</div>
+
+<div style="max-width:860px;margin:0 auto;padding:32px 24px 48px;">
+  <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.05);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">View live COT positioning in the terminal</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">CFTC Disaggregated TFF — Leveraged Funds, Asset Managers, and Dealers across all G8 currencies, updated weekly after each Friday release.</div>
+    </div>
+    <a href="/" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:var(--blue);color:#fff;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
+  </div>
+</div>
+<div style="max-width:860px;margin:0 auto;padding:0 24px 24px;">
+  <div style="border:1px solid var(--border);border-radius:6px;background:var(--bg2);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">AI Market Narrative — Updated 4x Daily</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">The terminal publishes an AI-generated market narrative at each major session transition. Subscribe via RSS or JSON Feed to receive updates in your reader.</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;">
+      <a href="/feed.xml" style="display:inline-block;padding:8px 16px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap;">RSS Feed</a>
+      <a href="/feed.json" style="display:inline-block;padding:8px 16px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap;">JSON Feed</a>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer id="statusbar" role="contentinfo" aria-label="Status bar">
+  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · COT POSITIONING</span></div>
+  <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.2</span></div>
+</footer>
+
+
+<script>
+// aria-expanded on site menu button
+const btn = document.querySelector('.site-menu-btn');
+const menu = document.querySelector('.site-menu');
+if (btn && menu) {
+  const update = () => btn.setAttribute('aria-expanded', String(menu.matches(':hover') || menu.matches(':focus-within')));
+  menu.addEventListener('mouseenter', update);
+  menu.addEventListener('mouseleave', update);
+  menu.addEventListener('focusin', update);
+  menu.addEventListener('focusout', update);
+}
+</script>
+
+<script>
+const sections = document.querySelectorAll('.guide-section');
+const tocItems = document.querySelectorAll('.toc-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocItems.forEach(t => t.classList.remove('active'));
+      const link = document.querySelector(`.toc-item[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-40px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
