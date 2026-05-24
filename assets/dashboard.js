@@ -3135,13 +3135,26 @@ function _lwSetRange(days, totalBars) {
 
   // LW Charts v4.2: index 0 = FIRST bar, index (n-1) = LAST bar.
   if (n < 1) { ts.fitContent(); return; }
-  const tradingBars = Math.round(days * 5 / 7);
-  const rightPad    = 8;
+
+  // Convert calendar days → logical bar count based on active timeframe.
+  let barsPerDay;
+  switch (_lwActiveTf) {
+    case 'H1': barsPerDay = 17;      break; // FX ~17 1H bars/calendar-day
+    case 'H4': barsPerDay = 4.25;    break; // FX ~4.25 H4 bars/calendar-day
+    case 'W1': barsPerDay = 1 / 7;   break; // 1 weekly bar per 7 days
+    case 'MN': barsPerDay = 1 / 30;  break; // 1 monthly bar per 30 days
+    default:   barsPerDay = 5 / 7;   break; // D1: 5 trading days per week
+  }
+  const tradingBars = Math.round(days * barsPerDay);
+  const rightPad    = (_lwActiveTf === 'W1' || _lwActiveTf === 'MN') ? 2 : 8;
   const from = n - tradingBars - 1;
   const to   = n + rightPad - 1;
 
+  // If computed range would exceed total bars, just fitContent
+  if (tradingBars >= n) { ts.fitContent(); _lwActiveDays = days; return; }
+
   setTimeout(() => {
-    try { ts.setVisibleLogicalRange({ from, to }); } catch (_) { ts.fitContent(); }
+    try { ts.setVisibleLogicalRange({ from: Math.max(0, from), to }); } catch (_) { ts.fitContent(); }
   }, 30);
 
   document.querySelectorAll('.lw-range-btn').forEach(b => {
@@ -3154,9 +3167,7 @@ let _lwActiveDays = 91; // default: 3M (calendar days)
 let _lwActiveTf   = 'D1'; // active timeframe: H1 | H4 | D1 | W1 | MN
 let _lwCompareSeries = null;  // LineSeries for compare overlay
 let _lwCompareId     = null;  // ohlcId of the compared symbol
-let _lwFsChart       = null;  // LightweightCharts instance in fullscreen overlay
-let _lwFsCandle      = null;  // candle/bar/line series in fullscreen chart
-let _lwFsResizeObs   = null;  // ResizeObserver for fullscreen chart
+// Fullscreen: DOM-lift vars are declared in the FS block below
 
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
@@ -4892,7 +4903,7 @@ async function _renderLWChart(ohlcId, label) {
     const lEl    = document.getElementById('lw-hdr-l-val');
     const cEl    = document.getElementById('lw-hdr-c-val');
     const chgEl  = document.getElementById('lw-hdr-chg-val');
-    if (symEl) symEl.textContent = (_OHLC_FULL_NAMES[ohlcId] || label) + ' \u00b7 1D';
+    if (symEl) symEl.textContent = (_OHLC_FULL_NAMES[ohlcId] || label) + ' \u00b7 ' + _lwActiveTf;
     if (bar) {
       // Determine direction first so O/H/L/C all share the same color (industry standard)
       let isUp;
@@ -11019,7 +11030,18 @@ document.getElementById('lw-cmp-btn')?.addEventListener('click', function(e) {
   const dd = document.getElementById('lw-cmp-dropdown');
   if (!dd) return;
   const open = dd.style.display === 'none' || !dd.style.display;
-  dd.style.display = open ? 'block' : 'none';
+  if (open) {
+    // Position with fixed coords to escape any overflow:hidden ancestor
+    const rect = this.getBoundingClientRect();
+    dd.style.position  = 'fixed';
+    dd.style.top       = (rect.bottom + 4) + 'px';
+    dd.style.right     = (window.innerWidth - rect.right) + 'px';
+    dd.style.left      = 'auto';
+    dd.style.zIndex    = '9100';
+    dd.style.display   = 'block';
+  } else {
+    dd.style.display = 'none';
+  }
   this.setAttribute('aria-expanded', String(open));
 });
 // Close on outside click
@@ -11137,168 +11159,83 @@ async function _lwLoadCompare(cmpId, cmpLabel) {
 }
 
 // =============================================================================
-// FULLSCREEN CHART — position:fixed overlay with independent LW chart instance
+// FULLSCREEN CHART — DOM-lift: move the real chart panel into the overlay
+// This preserves ALL indicators, compare series, CB markers, event handlers.
 // =============================================================================
 
-function _lwOpenFullscreen() {
-  if (!_lwActiveOhlcId || !_lwCandleSeries) return;
-  const overlay = document.getElementById('lw-fullscreen-overlay');
-  const inner   = document.getElementById('lw-fullscreen-inner');
-  if (!overlay || !inner) return;
+let _lwFsOriginalParent = null;
+let _lwFsOriginalNext   = null;
+let _lwFsOriginalHeight = null;
 
-  _lwDestroyFullscreen(); // tear down any previous instance
+function _lwOpenFullscreen() {
+  const overlay   = document.getElementById('lw-fullscreen-overlay');
+  const inner     = document.getElementById('lw-fullscreen-inner');
+  const rangeBar  = document.getElementById('lw-range-bar');
+  const chartHdr  = document.getElementById('lw-chart-header');
+  const chartWrap = document.getElementById('tv-chart-wrap');
+  if (!overlay || !inner || !chartWrap || _chartMode !== 'lw') return;
+  if (overlay.classList.contains('lw-fs-active')) return;
+
+  _lwFsOriginalParent = chartWrap.parentNode;
+  _lwFsOriginalNext   = chartWrap.nextSibling;
+  _lwFsOriginalHeight = chartWrap.style.height;
+
+  if (chartHdr)  inner.appendChild(chartHdr);
+  if (rangeBar)  inner.appendChild(rangeBar);
+  inner.appendChild(chartWrap);
+
+  chartWrap.style.height    = '100%';
+  chartWrap.style.minHeight = '0';
+  chartWrap.style.flex      = '1';
+
   overlay.classList.add('lw-fs-active');
   document.body.style.overflow = 'hidden';
 
-  // Sync FS toolbar labels
-  const symEl = document.getElementById('lw-fs-sym');
-  if (symEl) symEl.textContent = (document.getElementById('lw-hdr-sym')?.textContent || _lwActiveOhlcId.toUpperCase()) + ' · ' + _lwActiveTf;
-
-  // Sync FS range buttons to current _lwActiveDays
-  document.querySelectorAll('.lw-fs-range-btn').forEach(b => {
-    const a = parseInt(b.dataset.days) === _lwActiveDays;
-    Object.assign(b.style, {
-      background: a ? 'var(--blue,#4f7fff)' : 'transparent',
-      borderColor: a ? 'var(--blue,#4f7fff)' : '#444',
-      color: a ? '#fff' : '#aaa',
-    });
-  });
-
-  const chartType = window._lwChartType || 'candle';
-  document.querySelectorAll('.lw-fs-type-btn').forEach(b => {
-    const a = b.dataset.fsType === chartType;
-    Object.assign(b.style, {
-      background: a ? 'var(--blue,#4f7fff)' : 'transparent',
-      borderColor: a ? 'var(--blue,#4f7fff)' : '#444',
-      color: a ? '#fff' : '#aaa',
-    });
-  });
-
-  const LWC = window.LightweightCharts;
-  if (!LWC) return;
-
-  const chartDiv = document.createElement('div');
-  chartDiv.style.cssText = 'width:100%;height:100%;';
-  inner.appendChild(chartDiv);
-
-  const isIntraday = (_lwActiveTf === 'H1' || _lwActiveTf === 'H4');
-  _lwFsChart = LWC.createChart(chartDiv, {
-    width:  inner.offsetWidth  || window.innerWidth,
-    height: inner.offsetHeight || (window.innerHeight - 44),
-    layout:     { background: { color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
-    grid:       { vertLines: { color: 'rgba(42,46,57,.5)' }, horzLines: { color: 'rgba(42,46,57,.5)' } },
-    crosshair:  { mode: LWC.CrosshairMode?.Normal ?? 1 },
-    rightPriceScale: { borderColor: '#2a2e39', minimumWidth: 70 },
-    timeScale:  { borderColor: '#2a2e39', timeVisible: isIntraday },
-    handleScroll: true, handleScale: true,
-  });
-
-  // Copy the current bars from the main series into the FS chart
-  const dec = _lwCandleSeries.options?.().priceFormat?.minMove
-    ? Math.round(-Math.log10(_lwCandleSeries.options().priceFormat.minMove))
-    : 5;
-  const pf = { type: 'price', precision: dec, minMove: parseFloat((10**-dec).toFixed(dec)) };
-
-  if (chartType === 'line' || chartType === 'area') {
-    _lwFsCandle = LWC.LineSeries
-      ? _lwFsChart.addSeries(LWC.LineSeries, { color: '#4f7fff', lineWidth: 2, priceFormat: pf })
-      : _lwFsChart.addLineSeries({ color: '#4f7fff', lineWidth: 2, priceFormat: pf });
-  } else if (chartType === 'bar') {
-    _lwFsCandle = LWC.BarSeries
-      ? _lwFsChart.addSeries(LWC.BarSeries, { priceFormat: pf })
-      : _lwFsChart.addBarSeries({ priceFormat: pf });
-  } else {
-    _lwFsCandle = LWC.CandlestickSeries
-      ? _lwFsChart.addSeries(LWC.CandlestickSeries, {
-          upColor:'#26a69a',downColor:'#ef5350',borderVisible:false,
-          wickUpColor:'#26a69a',wickDownColor:'#ef5350',priceFormat:pf })
-      : _lwFsChart.addCandlestickSeries({
-          upColor:'#26a69a',downColor:'#ef5350',borderVisible:false,
-          wickUpColor:'#26a69a',wickDownColor:'#ef5350',priceFormat:pf });
-  }
-
-  try {
-    const mainData = _lwCandleSeries.data ? _lwCandleSeries.data() : [];
-    if (mainData.length > 0) {
-      _lwFsCandle.setData(mainData);
-      // Set the same range as the main chart
-      if (_lwActiveDays === 0) {
-        _lwFsChart.timeScale().fitContent();
-      } else {
-        _lwFsChart.timeScale().setVisibleLogicalRange({
-          from: Math.max(0, mainData.length - _lwActiveDays),
-          to:   mainData.length + 2,
-        });
-      }
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (_lwChart) {
+      const w = inner.offsetWidth, h = inner.offsetHeight;
+      if (w > 0 && h > 0) _lwChart.resize(w, h);
     }
-  } catch(e) { console.warn('[lw-fs] data copy failed:', e); }
-
-  // ResizeObserver keeps FS chart filling the inner div
-  if (typeof ResizeObserver !== 'undefined') {
-    _lwFsResizeObs = new ResizeObserver(entries => {
-      for (const e of entries) {
-        const { width, height } = e.contentRect;
-        if (_lwFsChart && width > 0 && height > 0) _lwFsChart.resize(width, height);
-      }
-    });
-    _lwFsResizeObs.observe(chartDiv);
-  }
-}
-
-function _lwDestroyFullscreen() {
-  if (_lwFsResizeObs) { try { _lwFsResizeObs.disconnect(); } catch(_e) {} _lwFsResizeObs = null; }
-  if (_lwFsChart)     { try { _lwFsChart.remove();          } catch(_e) {} _lwFsChart = null; }
-  _lwFsCandle = null;
-  const inner = document.getElementById('lw-fullscreen-inner');
-  if (inner) inner.innerHTML = '';
+  }));
 }
 
 function _lwCloseFullscreen() {
-  document.getElementById('lw-fullscreen-overlay')?.classList.remove('lw-fs-active');
+  const overlay   = document.getElementById('lw-fullscreen-overlay');
+  const inner     = document.getElementById('lw-fullscreen-inner');
+  const rangeBar  = document.getElementById('lw-range-bar');
+  const chartHdr  = document.getElementById('lw-chart-header');
+  const chartWrap = document.getElementById('tv-chart-wrap');
+  if (!overlay || !overlay.classList.contains('lw-fs-active')) return;
+
+  overlay.classList.remove('lw-fs-active');
   document.body.style.overflow = '';
-  _lwDestroyFullscreen();
+
+  if (_lwFsOriginalParent) {
+    if (chartHdr)  _lwFsOriginalParent.insertBefore(chartHdr,  _lwFsOriginalNext);
+    if (rangeBar)  _lwFsOriginalParent.insertBefore(rangeBar,  _lwFsOriginalNext);
+    if (chartWrap) _lwFsOriginalParent.insertBefore(chartWrap, _lwFsOriginalNext);
+  }
+
+  if (chartWrap) {
+    chartWrap.style.height    = _lwFsOriginalHeight || '';
+    chartWrap.style.minHeight = '';
+    chartWrap.style.flex      = '';
+  }
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (_lwChart && chartWrap) {
+      const w = chartWrap.offsetWidth, h = chartWrap.offsetHeight;
+      if (w > 0 && h > 0) _lwChart.resize(w, h);
+    }
+  }));
+
+  _lwFsOriginalParent = null;
+  _lwFsOriginalNext   = null;
 }
 
-// Fullscreen open button
 document.getElementById('lw-fs-btn')?.addEventListener('click', _lwOpenFullscreen);
-// Close button and Escape key
 document.getElementById('lw-fs-close')?.addEventListener('click', _lwCloseFullscreen);
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('lw-fullscreen-overlay')?.classList.contains('lw-fs-active'))
     _lwCloseFullscreen();
-});
-
-// FS toolbar delegated: range + chart type buttons
-document.getElementById('lw-fs-toolbar')?.addEventListener('click', e => {
-  // Range change
-  const rangeBtn = e.target.closest('.lw-fs-range-btn');
-  if (rangeBtn && _lwFsChart && _lwFsCandle) {
-    const days = parseInt(rangeBtn.dataset.days);
-    _lwActiveDays = days;
-    const data = _lwFsCandle.data ? _lwFsCandle.data() : [];
-    if (days === 0) _lwFsChart.timeScale().fitContent();
-    else _lwFsChart.timeScale().setVisibleLogicalRange({ from: Math.max(0, data.length - days), to: data.length + 2 });
-    // Sync FS buttons
-    document.querySelectorAll('.lw-fs-range-btn').forEach(b => {
-      const a = parseInt(b.dataset.days) === days;
-      Object.assign(b.style, { background: a ? 'var(--blue,#4f7fff)':'transparent', borderColor: a ? 'var(--blue,#4f7fff)':'#444', color: a ? '#fff':'#aaa' });
-    });
-    // Also sync main chart
-    if (_lwChart) _lwSetRange(days, (_lwCandleSeries?.data?.() ?? []).length);
-    return;
-  }
-  // Chart type change
-  const typeBtn = e.target.closest('.lw-fs-type-btn');
-  if (typeBtn) {
-    window._lwChartType = typeBtn.dataset.fsType;
-    document.querySelectorAll('.lw-fs-type-btn').forEach(b => {
-      const a = b === typeBtn;
-      Object.assign(b.style, { background: a ? 'var(--blue,#4f7fff)':'transparent', borderColor: a ? 'var(--blue,#4f7fff)':'#444', color: a ? '#fff':'#aaa' });
-    });
-    // Also update main chart type button state and re-open FS
-    document.querySelectorAll('[data-chart-type]').forEach(b => {
-      b.classList.toggle('sel', b.dataset.chartType === window._lwChartType);
-    });
-    if (_lwActiveOhlcId) _lwOpenFullscreen(); // re-renders FS with new type
-  }
 });
