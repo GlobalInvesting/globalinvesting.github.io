@@ -10995,7 +10995,7 @@ const _TF_RANGE_SETS = {
   W1: [{days:182,label:'6M'},{days:365,label:'1Y'},{days:730,label:'2Y'},{days:1095,label:'3Y'},{days:0,label:'ALL'}],
   MN: [{days:365,label:'1Y'},{days:1095,label:'3Y'},{days:1825,label:'5Y'},{days:0,label:'ALL'}],
 };
-const _TF_DEFAULT_DAYS = {H1:5,H4:91,D1:91,W1:365,MN:1095};
+const _TF_DEFAULT_DAYS = {H1:5,H4:14,D1:91,W1:365,MN:1095};
 
 function _lwUpdateRangeBtns() {
   const wrap = document.getElementById('lw-range-btns');
