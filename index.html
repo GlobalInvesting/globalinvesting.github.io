@@ -642,24 +642,46 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <button id="tv-tabs-prev" aria-label="Scroll chart tabs left" style="display:none;flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
           <div id="tv-pair-tabs" role="tablist" aria-label="Currency pair chart selector" style="display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;flex:1;">
             <button class="tv-tab active" role="tab" aria-selected="true" data-sym="FX_IDC:EURUSD">EUR/USD</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:USDJPY">USD/JPY</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:GBPUSD">GBP/USD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:AUDUSD">AUD/USD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:NZDUSD">NZD/USD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:USDCAD">USD/CAD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:USDCHF">USD/CHF</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:NZDUSD">NZD/USD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:USDJPY">USD/JPY</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURGBP">EUR/GBP</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURJPY">EUR/JPY</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:GBPJPY">GBP/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURAUD">EUR/AUD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURNZD">EUR/NZD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURCAD">EUR/CAD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURCHF">EUR/CHF</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURJPY">EUR/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:GBPAUD">GBP/AUD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:GBPNZD">GBP/NZD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:GBPCAD">GBP/CAD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:GBPCHF">GBP/CHF</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:GBPJPY">GBP/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:AUDNZD">AUD/NZD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:AUDCAD">AUD/CAD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:AUDCHF">AUD/CHF</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:AUDJPY">AUD/JPY</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="CMCMARKETS:GOLDM2026">Gold FUT</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FPMARKETS:WTI">WTI FUT</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:NZDCAD">NZD/CAD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:NZDCHF">NZD/CHF</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:NZDJPY">NZD/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:CADCHF">CAD/CHF</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:CADJPY">CAD/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:CHFJPY">CHF/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="OANDA:XAUUSD">Gold</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="OANDA:XAGUSD">Silver</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="OANDA:WTICOUSD">WTI</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="OANDA:BCOUSD">Brent</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="PEPPERSTONE:USDX">DXY</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="CMCMARKETS:SPX500">S&P 500</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="CFI:US100">Nasdaq</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="OSE:NK2251!">Nikkei</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="GOMARKETS:STOXX50">EuroStoxx</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FOREXCOM:SPXUSD">S&P 500</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FOREXCOM:NSXUSD">Nasdaq</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FOREXCOM:DJI">Dow Jones</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FOREXCOM:DEU40">DAX</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FOREXCOM:UK100">FTSE 100</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FOREXCOM:HKG33">Hang Seng</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="INDEX:NI225">Nikkei</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FOREXCOM:EU50">EuroStoxx</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="CBOE:VIX">VIX</button>
