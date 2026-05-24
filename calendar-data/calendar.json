@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-24T12:02:06Z",
-  "generatedAt": "2026-05-24T12:02:06Z",
+  "lastUpdate": "2026-05-24T12:10:37Z",
+  "generatedAt": "2026-05-24T12:10:37Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,12 +9,12 @@
   "fetchErrors": [],
   "rangeFrom": "2025-05-27",
   "rangeTo": "2026-06-05",
-  "totalEvents": 1649,
+  "totalEvents": 1650,
   "currencyCounts": {
     "EUR": 209,
     "USD": 605,
     "CHF": 91,
-    "CAD": 130,
+    "CAD": 131,
     "JPY": 183,
     "NZD": 84,
     "AUD": 169,
@@ -23,7 +23,7 @@
   "impactCounts": {
     "low": 152,
     "medium": 1129,
-    "high": 368
+    "high": 369
   },
   "surpriseStats": {
     "USD/CB Consumer Confidence": {
@@ -20887,7 +20887,7 @@
       "event": "Personal Income MoM",
       "impact": "high",
       "actual": null,
-      "forecast": null,
+      "forecast": "0.4",
       "previous": "0.6"
     },
     {
@@ -20900,7 +20900,7 @@
       "event": "Personal Spending MoM",
       "impact": "high",
       "actual": null,
-      "forecast": null,
+      "forecast": "0.5",
       "previous": "0.9"
     },
     {
@@ -21199,7 +21199,7 @@
       "event": "Wholesale Inventories MoM Adv",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "0.5",
       "previous": "1.3"
     },
     {
@@ -21916,6 +21916,19 @@
       "actual": null,
       "forecast": null,
       "previous": "4.3"
+    },
+    {
+      "date": "5 Jun",
+      "dateISO": "2026-06-05",
+      "timeUTC": "14:00",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Ivey PMI s.a",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "57.7"
     }
   ]
 }
