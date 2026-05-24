@@ -3081,6 +3081,7 @@ function _lwBuildTodayBar(ohlcId) {
 // Safe to call when no chart is open — exits silently.
 function _lwUpdateTodayBar() {
   if (!_lwCandleSeries || !_lwActiveOhlcId) return;
+  if (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') return; // intraday TF: no live today-bar
   const bar = _lwBuildTodayBar(_lwActiveOhlcId);
   if (!bar) return;
   try {
@@ -3150,6 +3151,12 @@ function _lwSetRange(days, totalBars) {
 }
 
 let _lwActiveDays = 91; // default: 3M (calendar days)
+let _lwActiveTf   = 'D1'; // active timeframe: H1 | H4 | D1 | W1 | MN
+let _lwCompareSeries = null;  // LineSeries for compare overlay
+let _lwCompareId     = null;  // ohlcId of the compared symbol
+let _lwFsChart       = null;  // LightweightCharts instance in fullscreen overlay
+let _lwFsCandle      = null;  // candle/bar/line series in fullscreen chart
+let _lwFsResizeObs   = null;  // ResizeObserver for fullscreen chart
 
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
@@ -3167,12 +3174,55 @@ async function _renderLWChart(ohlcId, label) {
   wrap.appendChild(loader);
 
   await _ensureLWLib();
-  const r = await fetch('./ohlc-data/' + ohlcId + '.json', { signal: AbortSignal.timeout(6000) });
+
+  // ── Resolve JSON path based on active timeframe ──────────────────────────────
+  // H1/H4: ohlc-data/h1/{id}.json or ohlc-data/h4/{id}.json (unix timestamp bars)
+  // D1/W1/MN: ohlc-data/{id}.json (YYYY-MM-DD date bars); W1/MN aggregated below
+  const _activeTf = _lwActiveTf;
+  const _isIntradayTf = (_activeTf === 'H1' || _activeTf === 'H4');
+  let _jsonPath;
+  if (_activeTf === 'H1')      _jsonPath = './ohlc-data/h1/' + ohlcId + '.json';
+  else if (_activeTf === 'H4') _jsonPath = './ohlc-data/h4/' + ohlcId + '.json';
+  else                         _jsonPath = './ohlc-data/' + ohlcId + '.json';
+
+  const r = await fetch(_jsonPath, { signal: AbortSignal.timeout(6000) });
   if (!r.ok) throw new Error('HTTP ' + r.status);
   let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
 
-  // Record the last bar date from the raw JSON (before any strip) so _lwBuildTodayBar
+  // ── W1/MN aggregation from D1 bars ───────────────────────────────────────────
+  // For W1: group D1 bars by ISO week Monday. For MN: group by YYYY-MM-01.
+  // H1/H4 bars already have unix timestamps and need no aggregation.
+  if (_activeTf === 'W1' || _activeTf === 'MN') {
+    const agg = {};
+    for (const b of bars) {
+      let key;
+      if (_activeTf === 'W1') {
+        // ISO week Monday date
+        const d   = new Date(b.time + 'T00:00:00Z');
+        const dow = d.getUTCDay() || 7; // Mon=1 … Sun=7
+        const mon = new Date(d);
+        mon.setUTCDate(d.getUTCDate() - (dow - 1));
+        key = mon.toISOString().slice(0, 10);
+      } else {
+        key = b.time.slice(0, 7) + '-01'; // YYYY-MM-01
+      }
+      if (!agg[key]) {
+        agg[key] = { time: key, open: b.open, high: b.high, low: b.low, close: b.close };
+      } else {
+        const a   = agg[key];
+        a.high    = Math.max(a.high, b.high);
+        a.low     = Math.min(a.low,  b.low);
+        a.close   = b.close;
+      }
+    }
+    bars = Object.values(agg).sort((a, b) => a.time < b.time ? -1 : 1);
+    if (bars.length < 4) throw new Error('insufficient aggregated data');
+  }
+
+  // ── Today-bar strip and gap-window injection (D1/W1/MN only) ─────────────────
+  // For H1/H4 intraday TFs: bars have unix timestamps, no live today-bar to inject.
+  if (!_isIntradayTf) {
   // can detect the 21:00–22:30 UTC gap window where the just-closed session bar is
   // not yet present in the JSON (the OHLC workflow only runs at 22:30 UTC).
   _lwLastJsonBarDate = bars[bars.length - 1]?.time ?? null;
@@ -3291,6 +3341,7 @@ async function _renderLWChart(ohlcId, label) {
     // ── End gap-window prev-bar injection ───────────────────────────────────
   }
   // ── End today-bar strip ─────────────────────────────────────────────────────
+  } // end if (!_isIntradayTf)
 
   wrap.innerHTML = '';
 
@@ -5018,6 +5069,13 @@ async function _renderLWChart(ohlcId, label) {
   const rangeBar = document.getElementById('lw-range-bar');
   if (rangeBar) {
     rangeBar.style.display = 'flex';
+    // Sync TF selector
+    rangeBar.querySelectorAll('.lw-tf-btn').forEach(b => {
+      b.classList.toggle('sel', b.dataset.tf === _lwActiveTf);
+    });
+    // Rebuild range buttons for the current TF
+    _lwUpdateRangeBtns();
+    // Sync active range button
     rangeBar.querySelectorAll('.lw-range-btn').forEach(b => {
       b.classList.toggle('active', parseInt(b.dataset.days) === _lwActiveDays);
     });
@@ -10914,3 +10972,333 @@ function initDerivativesNavFixed() {
     init();
   }
 })();
+
+// =============================================================================
+// TIMEFRAME SELECTOR — H1 · H4 · D1 · W1 · MN
+// =============================================================================
+
+const _TF_RANGE_SETS = {
+  H1: [{days:1,label:'1D'},{days:5,label:'1W'},{days:14,label:'2W'},{days:30,label:'1M'}],
+  H4: [{days:14,label:'2W'},{days:30,label:'1M'},{days:91,label:'3M'},{days:182,label:'6M'}],
+  D1: [{days:91,label:'3M'},{days:182,label:'6M'},{days:365,label:'1Y'},{days:1095,label:'3Y'},{days:0,label:'ALL'}],
+  W1: [{days:182,label:'6M'},{days:365,label:'1Y'},{days:730,label:'2Y'},{days:1095,label:'3Y'},{days:0,label:'ALL'}],
+  MN: [{days:365,label:'1Y'},{days:1095,label:'3Y'},{days:1825,label:'5Y'},{days:0,label:'ALL'}],
+};
+const _TF_DEFAULT_DAYS = {H1:5,H4:91,D1:91,W1:365,MN:1095};
+
+function _lwUpdateRangeBtns() {
+  const wrap = document.getElementById('lw-range-btns');
+  if (!wrap) return;
+  const set = _TF_RANGE_SETS[_lwActiveTf] || _TF_RANGE_SETS.D1;
+  wrap.innerHTML = set.map(r =>
+    `<button class="lw-range-btn${r.days === _lwActiveDays ? ' active' : ''}" data-days="${r.days}" aria-label="${r.label}" style="flex-shrink:0;">${r.label}</button>`
+  ).join('');
+}
+
+// TF button click handler (delegated on the range-bar)
+document.getElementById('lw-range-bar')?.addEventListener('click', e => {
+  const tfBtn = e.target.closest('.lw-tf-btn');
+  if (!tfBtn) return;
+  const newTf = tfBtn.dataset.tf;
+  if (!newTf || newTf === _lwActiveTf) return;
+  _lwActiveTf   = newTf;
+  _lwActiveDays = _TF_DEFAULT_DAYS[newTf] ?? 91;
+  _lwClearCompare(); // compare series has different timestamps on different TFs
+  document.querySelectorAll('.lw-tf-btn').forEach(b => b.classList.toggle('sel', b.dataset.tf === newTf));
+  _lwUpdateRangeBtns();
+  if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
+});
+
+// =============================================================================
+// COMPARE OVERLAY — normalised % change LineSeries on secondary price scale
+// =============================================================================
+
+// Toggle compare dropdown open/close
+document.getElementById('lw-cmp-btn')?.addEventListener('click', function(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('lw-cmp-dropdown');
+  if (!dd) return;
+  const open = dd.style.display === 'none' || !dd.style.display;
+  dd.style.display = open ? 'block' : 'none';
+  this.setAttribute('aria-expanded', String(open));
+});
+// Close on outside click
+document.addEventListener('click', () => {
+  const dd = document.getElementById('lw-cmp-dropdown');
+  if (dd) dd.style.display = 'none';
+  document.getElementById('lw-cmp-btn')?.setAttribute('aria-expanded','false');
+});
+
+// Item selection in compare dropdown
+document.getElementById('lw-cmp-dropdown')?.addEventListener('click', e => {
+  e.stopPropagation();
+  const item = e.target.closest('.lw-cmp-item');
+  if (!item || !_lwActiveOhlcId) return;
+  const cmpId = item.dataset.cmpid;
+  if (!cmpId || cmpId === _lwActiveOhlcId) return;
+  if (cmpId === _lwCompareId) { _lwClearCompare(); return; }
+  _lwLoadCompare(cmpId, item.textContent.trim());
+  document.getElementById('lw-cmp-dropdown').style.display = 'none';
+});
+
+function _lwClearCompare() {
+  if (_lwCompareSeries && _lwChart) {
+    try { _lwChart.removeSeries(_lwCompareSeries); } catch(_e) {}
+  }
+  _lwCompareSeries = null;
+  _lwCompareId     = null;
+  document.querySelectorAll('.lw-cmp-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('lw-cmp-pill')?.remove();
+}
+
+async function _lwLoadCompare(cmpId, cmpLabel) {
+  if (!_lwChart || !_lwCandleSeries) return;
+  _lwClearCompare();
+  try {
+    let cmpPath;
+    if (_lwActiveTf === 'H1')      cmpPath = `./ohlc-data/h1/${cmpId}.json`;
+    else if (_lwActiveTf === 'H4') cmpPath = `./ohlc-data/h4/${cmpId}.json`;
+    else                           cmpPath = `./ohlc-data/${cmpId}.json`;
+
+    const r = await fetch(cmpPath, { signal: AbortSignal.timeout(6000) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    let cmpBars = await r.json();
+    if (!Array.isArray(cmpBars) || cmpBars.length < 4) throw new Error('no data');
+
+    // Aggregate W1/MN the same way as the main series
+    if (_lwActiveTf === 'W1' || _lwActiveTf === 'MN') {
+      const agg = {};
+      for (const b of cmpBars) {
+        let key;
+        if (_lwActiveTf === 'W1') {
+          const d = new Date(b.time + 'T00:00:00Z');
+          const dow = d.getUTCDay() || 7;
+          const mon = new Date(d); mon.setUTCDate(d.getUTCDate() - (dow-1));
+          key = mon.toISOString().slice(0, 10);
+        } else { key = b.time.slice(0,7) + '-01'; }
+        if (!agg[key]) agg[key] = {time:key, open:b.open, high:b.high, low:b.low, close:b.close};
+        else { const a=agg[key]; a.high=Math.max(a.high,b.high); a.low=Math.min(a.low,b.low); a.close=b.close; }
+      }
+      cmpBars = Object.values(agg).sort((a,b) => a.time < b.time ? -1 : 1);
+    }
+
+    // Find base price: first bar at or after the main chart's first visible bar
+    let baseIdx = 0;
+    try {
+      const range = _lwChart.timeScale().getVisibleLogicalRange();
+      if (range && range.from > 0) baseIdx = Math.max(0, Math.floor(range.from));
+    } catch(_e) {}
+    const basePrice = cmpBars[Math.min(baseIdx, cmpBars.length-1)]?.close;
+    if (!basePrice || basePrice <= 0) throw new Error('no base price');
+
+    const normalizedBars = cmpBars.map(b => ({
+      time:  b.time,
+      value: ((b.close - basePrice) / basePrice) * 100,
+    }));
+
+    const CMP_COLOR = '#f0a500';
+    const LWC = window.LightweightCharts;
+    _lwCompareSeries = LWC.LineSeries
+      ? _lwChart.addSeries(LWC.LineSeries, {
+          color: CMP_COLOR, lineWidth: 1.5, priceScaleId: 'cmp',
+          priceFormat: { type: 'custom', formatter: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%' },
+          lastValueVisible: true, priceLineVisible: false })
+      : _lwChart.addLineSeries({
+          color: CMP_COLOR, lineWidth: 1.5, priceScaleId: 'cmp',
+          priceFormat: { type: 'custom', formatter: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%' },
+          lastValueVisible: true, priceLineVisible: false });
+
+    try {
+      _lwChart.priceScale('cmp').applyOptions({
+        scaleMargins: { top: 0.1, bottom: 0.1 },
+        borderVisible: false, textColor: CMP_COLOR,
+      });
+    } catch(_e) {}
+    _lwCompareSeries.setData(normalizedBars);
+    _lwCompareId = cmpId;
+
+    document.querySelectorAll('.lw-cmp-item').forEach(i =>
+      i.classList.toggle('active', i.dataset.cmpid === cmpId));
+
+    // Add pill showing compare symbol; clicking it removes the overlay
+    const indPills = document.getElementById('lw-ind-pills');
+    if (indPills) {
+      const pill = document.createElement('span');
+      pill.id = 'lw-cmp-pill';
+      pill.className = 'lw-cmp-pill';
+      pill.title = 'Remove compare overlay';
+      pill.innerHTML = `<span style="width:8px;height:2px;background:${CMP_COLOR};display:inline-block;border-radius:1px;"></span> ${cmpLabel} ×`;
+      pill.addEventListener('click', _lwClearCompare);
+      indPills.parentNode.insertBefore(pill, indPills);
+    }
+  } catch(err) {
+    console.warn('[lw-compare] Failed to load compare data:', err.message);
+  }
+}
+
+// =============================================================================
+// FULLSCREEN CHART — position:fixed overlay with independent LW chart instance
+// =============================================================================
+
+function _lwOpenFullscreen() {
+  if (!_lwActiveOhlcId || !_lwCandleSeries) return;
+  const overlay = document.getElementById('lw-fullscreen-overlay');
+  const inner   = document.getElementById('lw-fullscreen-inner');
+  if (!overlay || !inner) return;
+
+  _lwDestroyFullscreen(); // tear down any previous instance
+  overlay.classList.add('lw-fs-active');
+  document.body.style.overflow = 'hidden';
+
+  // Sync FS toolbar labels
+  const symEl = document.getElementById('lw-fs-sym');
+  if (symEl) symEl.textContent = (document.getElementById('lw-hdr-sym')?.textContent || _lwActiveOhlcId.toUpperCase()) + ' · ' + _lwActiveTf;
+
+  // Sync FS range buttons to current _lwActiveDays
+  document.querySelectorAll('.lw-fs-range-btn').forEach(b => {
+    const a = parseInt(b.dataset.days) === _lwActiveDays;
+    Object.assign(b.style, {
+      background: a ? 'var(--blue,#4f7fff)' : 'transparent',
+      borderColor: a ? 'var(--blue,#4f7fff)' : '#444',
+      color: a ? '#fff' : '#aaa',
+    });
+  });
+
+  const chartType = window._lwChartType || 'candle';
+  document.querySelectorAll('.lw-fs-type-btn').forEach(b => {
+    const a = b.dataset.fsType === chartType;
+    Object.assign(b.style, {
+      background: a ? 'var(--blue,#4f7fff)' : 'transparent',
+      borderColor: a ? 'var(--blue,#4f7fff)' : '#444',
+      color: a ? '#fff' : '#aaa',
+    });
+  });
+
+  const LWC = window.LightweightCharts;
+  if (!LWC) return;
+
+  const chartDiv = document.createElement('div');
+  chartDiv.style.cssText = 'width:100%;height:100%;';
+  inner.appendChild(chartDiv);
+
+  const isIntraday = (_lwActiveTf === 'H1' || _lwActiveTf === 'H4');
+  _lwFsChart = LWC.createChart(chartDiv, {
+    width:  inner.offsetWidth  || window.innerWidth,
+    height: inner.offsetHeight || (window.innerHeight - 44),
+    layout:     { background: { color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
+    grid:       { vertLines: { color: 'rgba(42,46,57,.5)' }, horzLines: { color: 'rgba(42,46,57,.5)' } },
+    crosshair:  { mode: LWC.CrosshairMode?.Normal ?? 1 },
+    rightPriceScale: { borderColor: '#2a2e39', minimumWidth: 70 },
+    timeScale:  { borderColor: '#2a2e39', timeVisible: isIntraday },
+    handleScroll: true, handleScale: true,
+  });
+
+  // Copy the current bars from the main series into the FS chart
+  const dec = _lwCandleSeries.options?.().priceFormat?.minMove
+    ? Math.round(-Math.log10(_lwCandleSeries.options().priceFormat.minMove))
+    : 5;
+  const pf = { type: 'price', precision: dec, minMove: parseFloat((10**-dec).toFixed(dec)) };
+
+  if (chartType === 'line' || chartType === 'area') {
+    _lwFsCandle = LWC.LineSeries
+      ? _lwFsChart.addSeries(LWC.LineSeries, { color: '#4f7fff', lineWidth: 2, priceFormat: pf })
+      : _lwFsChart.addLineSeries({ color: '#4f7fff', lineWidth: 2, priceFormat: pf });
+  } else if (chartType === 'bar') {
+    _lwFsCandle = LWC.BarSeries
+      ? _lwFsChart.addSeries(LWC.BarSeries, { priceFormat: pf })
+      : _lwFsChart.addBarSeries({ priceFormat: pf });
+  } else {
+    _lwFsCandle = LWC.CandlestickSeries
+      ? _lwFsChart.addSeries(LWC.CandlestickSeries, {
+          upColor:'#26a69a',downColor:'#ef5350',borderVisible:false,
+          wickUpColor:'#26a69a',wickDownColor:'#ef5350',priceFormat:pf })
+      : _lwFsChart.addCandlestickSeries({
+          upColor:'#26a69a',downColor:'#ef5350',borderVisible:false,
+          wickUpColor:'#26a69a',wickDownColor:'#ef5350',priceFormat:pf });
+  }
+
+  try {
+    const mainData = _lwCandleSeries.data ? _lwCandleSeries.data() : [];
+    if (mainData.length > 0) {
+      _lwFsCandle.setData(mainData);
+      // Set the same range as the main chart
+      if (_lwActiveDays === 0) {
+        _lwFsChart.timeScale().fitContent();
+      } else {
+        _lwFsChart.timeScale().setVisibleLogicalRange({
+          from: Math.max(0, mainData.length - _lwActiveDays),
+          to:   mainData.length + 2,
+        });
+      }
+    }
+  } catch(e) { console.warn('[lw-fs] data copy failed:', e); }
+
+  // ResizeObserver keeps FS chart filling the inner div
+  if (typeof ResizeObserver !== 'undefined') {
+    _lwFsResizeObs = new ResizeObserver(entries => {
+      for (const e of entries) {
+        const { width, height } = e.contentRect;
+        if (_lwFsChart && width > 0 && height > 0) _lwFsChart.resize(width, height);
+      }
+    });
+    _lwFsResizeObs.observe(chartDiv);
+  }
+}
+
+function _lwDestroyFullscreen() {
+  if (_lwFsResizeObs) { try { _lwFsResizeObs.disconnect(); } catch(_e) {} _lwFsResizeObs = null; }
+  if (_lwFsChart)     { try { _lwFsChart.remove();          } catch(_e) {} _lwFsChart = null; }
+  _lwFsCandle = null;
+  const inner = document.getElementById('lw-fullscreen-inner');
+  if (inner) inner.innerHTML = '';
+}
+
+function _lwCloseFullscreen() {
+  document.getElementById('lw-fullscreen-overlay')?.classList.remove('lw-fs-active');
+  document.body.style.overflow = '';
+  _lwDestroyFullscreen();
+}
+
+// Fullscreen open button
+document.getElementById('lw-fs-btn')?.addEventListener('click', _lwOpenFullscreen);
+// Close button and Escape key
+document.getElementById('lw-fs-close')?.addEventListener('click', _lwCloseFullscreen);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('lw-fullscreen-overlay')?.classList.contains('lw-fs-active'))
+    _lwCloseFullscreen();
+});
+
+// FS toolbar delegated: range + chart type buttons
+document.getElementById('lw-fs-toolbar')?.addEventListener('click', e => {
+  // Range change
+  const rangeBtn = e.target.closest('.lw-fs-range-btn');
+  if (rangeBtn && _lwFsChart && _lwFsCandle) {
+    const days = parseInt(rangeBtn.dataset.days);
+    _lwActiveDays = days;
+    const data = _lwFsCandle.data ? _lwFsCandle.data() : [];
+    if (days === 0) _lwFsChart.timeScale().fitContent();
+    else _lwFsChart.timeScale().setVisibleLogicalRange({ from: Math.max(0, data.length - days), to: data.length + 2 });
+    // Sync FS buttons
+    document.querySelectorAll('.lw-fs-range-btn').forEach(b => {
+      const a = parseInt(b.dataset.days) === days;
+      Object.assign(b.style, { background: a ? 'var(--blue,#4f7fff)':'transparent', borderColor: a ? 'var(--blue,#4f7fff)':'#444', color: a ? '#fff':'#aaa' });
+    });
+    // Also sync main chart
+    if (_lwChart) _lwSetRange(days, (_lwCandleSeries?.data?.() ?? []).length);
+    return;
+  }
+  // Chart type change
+  const typeBtn = e.target.closest('.lw-fs-type-btn');
+  if (typeBtn) {
+    window._lwChartType = typeBtn.dataset.fsType;
+    document.querySelectorAll('.lw-fs-type-btn').forEach(b => {
+      const a = b === typeBtn;
+      Object.assign(b.style, { background: a ? 'var(--blue,#4f7fff)':'transparent', borderColor: a ? 'var(--blue,#4f7fff)':'#444', color: a ? '#fff':'#aaa' });
+    });
+    // Also update main chart type button state and re-open FS
+    document.querySelectorAll('[data-chart-type]').forEach(b => {
+      b.classList.toggle('sel', b.dataset.chartType === window._lwChartType);
+    });
+    if (_lwActiveOhlcId) _lwOpenFullscreen(); // re-renders FS with new type
+  }
+});
