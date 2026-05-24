@@ -45,7 +45,7 @@
 // Paste your Worker /ws URL here after deploying.
 // Leave empty to disable the module entirely (falls back to yfinance polling).
 //
-const FX_PROXY_WS_URL = "";   // e.g. "wss://globalinvesting-fx-ws-proxy.example.workers.dev/ws"
+const FX_PROXY_WS_URL = "wss://globalinvesting-fx-ws-proxy.globalinvestingmarkets.workers.dev/ws";   // e.g. "wss://globalinvesting-fx-ws-proxy.example.workers.dev/ws"
 
 // Reconnection settings
 const RECONNECT_DELAY_MS_BASE = 2_000;
