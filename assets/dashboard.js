@@ -11318,29 +11318,18 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
     if (!seriesData.length) throw new Error('empty data');
 
     // ── Render series ──────────────────────────────────────────────────────
-    if (cmpType === 'cot') {
-      _lwCompareSeries = LWC.HistogramSeries
-        ? _lwChart.addSeries(LWC.HistogramSeries, {
-            color: CMP_COLOR, priceScaleId: 'cmp',
-            priceFormat, lastValueVisible: false, priceLineVisible: false,
-            base: 0 })
-        : _lwChart.addHistogramSeries({
-            color: CMP_COLOR, priceScaleId: 'cmp',
-            priceFormat, lastValueVisible: false, priceLineVisible: false,
-            base: 0 });
-    } else {
-      // ohlc → line; rate → step-line; esi → line with markers
-      _lwCompareSeries = LWC.LineSeries
-        ? _lwChart.addSeries(LWC.LineSeries, {
-            color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
-            priceScaleId: 'cmp', priceFormat,
-            lastValueVisible: false, priceLineVisible: false,
-            crosshairMarkerVisible: cmpType === 'rate' || cmpType === 'esi' })
-        : _lwChart.addLineSeries({
-            color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
-            priceScaleId: 'cmp', priceFormat,
-            lastValueVisible: false, priceLineVisible: false,
-            crosshairMarkerVisible: cmpType === 'rate' || cmpType === 'esi' });
+    // All types use LineSeries: ohlc → % change, cot → net contracts, rate → step-line, esi → index
+    _lwCompareSeries = LWC.LineSeries
+      ? _lwChart.addSeries(LWC.LineSeries, {
+          color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
+          priceScaleId: 'cmp', priceFormat,
+          lastValueVisible: false, priceLineVisible: false,
+          crosshairMarkerVisible: cmpType !== 'ohlc' })
+      : _lwChart.addLineSeries({
+          color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
+          priceScaleId: 'cmp', priceFormat,
+          lastValueVisible: false, priceLineVisible: false,
+          crosshairMarkerVisible: cmpType !== 'ohlc' });
 
       // For rate: expand monthly observations to daily step-line so it aligns with the chart
       if (cmpType === 'rate') {
@@ -11370,7 +11359,6 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
         }
         seriesData = expanded;
       }
-    }
 
     try {
       _lwChart.priceScale('cmp').applyOptions({
