@@ -11078,10 +11078,14 @@ document.getElementById('lw-cmp-dropdown')?.addEventListener('click', e => {
   e.stopPropagation();
   const item = e.target.closest('.lw-cmp-item');
   if (!item || !_lwActiveOhlcId) return;
-  const cmpId = item.dataset.cmpid;
-  if (!cmpId || cmpId === _lwActiveOhlcId) return;
-  if (cmpId === _lwCompareId) { _lwClearCompare(); return; }
-  _lwLoadCompare(cmpId, item.textContent.trim());
+  const cmpId   = item.dataset.cmpid;
+  const cmpType = item.dataset.cmptype || 'ohlc';
+  if (!cmpId) return;
+  // For ohlc: prevent comparing a symbol with itself; for cot/rate: always allow
+  if (cmpType === 'ohlc' && cmpId === _lwActiveOhlcId) return;
+  const uid = cmpType + ':' + cmpId;
+  if (uid === _lwCompareId) { _lwClearCompare(); return; }
+  _lwLoadCompare(cmpId, item.textContent.trim(), cmpType);
   document.getElementById('lw-cmp-dropdown').style.display = 'none';
 });
 
@@ -11095,64 +11099,278 @@ function _lwClearCompare() {
   document.getElementById('lw-cmp-pill')?.remove();
 }
 
-async function _lwLoadCompare(cmpId, cmpLabel) {
+async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
   if (!_lwChart || !_lwCandleSeries) return;
   _lwClearCompare();
+  const LWC = window.LightweightCharts;
+  const uid = cmpType + ':' + cmpId;
+
+  // ── Colour per type ────────────────────────────────────────────────────────
+  const CMP_COLOR = cmpType === 'cot'  ? '#9c27b0'   // purple for COT
+                  : cmpType === 'rate' ? '#26a69a'   // teal for CB rate
+                  : cmpType === 'esi'  ? '#2196f3'   // blue for ESI
+                  :                      '#f0a500';  // amber for price overlay
+
   try {
-    let cmpPath;
-    if (_lwActiveTf === 'H1')      cmpPath = `./ohlc-data/h1/${cmpId}.json`;
-    else if (_lwActiveTf === 'H4') cmpPath = `./ohlc-data/h4/${cmpId}.json`;
-    else                           cmpPath = `./ohlc-data/${cmpId}.json`;
+    let seriesData = [];
+    let priceFormat;
 
-    const r = await fetch(cmpPath, { signal: AbortSignal.timeout(6000) });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    let cmpBars = await r.json();
-    if (!Array.isArray(cmpBars) || cmpBars.length < 4) throw new Error('no data');
+    // ── OHLC price overlay (existing behaviour) ───────────────────────────
+    if (cmpType === 'ohlc') {
+      let cmpPath;
+      if (_lwActiveTf === 'H1')      cmpPath = `./ohlc-data/h1/${cmpId}.json`;
+      else if (_lwActiveTf === 'H4') cmpPath = `./ohlc-data/h4/${cmpId}.json`;
+      else                           cmpPath = `./ohlc-data/${cmpId}.json`;
 
-    // Aggregate W1/MN the same way as the main series
-    if (_lwActiveTf === 'W1' || _lwActiveTf === 'MN') {
-      const agg = {};
-      for (const b of cmpBars) {
-        let key;
-        if (_lwActiveTf === 'W1') {
-          const d = new Date(b.time + 'T00:00:00Z');
-          const dow = d.getUTCDay() || 7;
-          const mon = new Date(d); mon.setUTCDate(d.getUTCDate() - (dow-1));
-          key = mon.toISOString().slice(0, 10);
-        } else { key = b.time.slice(0,7) + '-01'; }
-        if (!agg[key]) agg[key] = {time:key, open:b.open, high:b.high, low:b.low, close:b.close};
-        else { const a=agg[key]; a.high=Math.max(a.high,b.high); a.low=Math.min(a.low,b.low); a.close=b.close; }
+      const r = await fetch(cmpPath, { signal: AbortSignal.timeout(6000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      let cmpBars = await r.json();
+      if (!Array.isArray(cmpBars) || cmpBars.length < 4) throw new Error('no data');
+
+      // Aggregate W1/MN
+      if (_lwActiveTf === 'W1' || _lwActiveTf === 'MN') {
+        const agg = {};
+        for (const b of cmpBars) {
+          let key;
+          if (_lwActiveTf === 'W1') {
+            const d = new Date(b.time + 'T00:00:00Z');
+            const dow = d.getUTCDay() || 7;
+            const mon = new Date(d); mon.setUTCDate(d.getUTCDate() - (dow-1));
+            key = mon.toISOString().slice(0, 10);
+          } else { key = b.time.slice(0,7) + '-01'; }
+          if (!agg[key]) agg[key] = {time:key, open:b.open, high:b.high, low:b.low, close:b.close};
+          else { const a=agg[key]; a.high=Math.max(a.high,b.high); a.low=Math.min(a.low,b.low); a.close=b.close; }
+        }
+        cmpBars = Object.values(agg).sort((a,b) => a.time < b.time ? -1 : 1);
       }
-      cmpBars = Object.values(agg).sort((a,b) => a.time < b.time ? -1 : 1);
+
+      // Normalise to % change from first visible bar
+      let baseIdx = 0;
+      try {
+        const range = _lwChart.timeScale().getVisibleLogicalRange();
+        if (range && range.from > 0) baseIdx = Math.max(0, Math.floor(range.from));
+      } catch(_e) {}
+      const basePrice = cmpBars[Math.min(baseIdx, cmpBars.length-1)]?.close;
+      if (!basePrice || basePrice <= 0) throw new Error('no base price');
+
+      seriesData  = cmpBars.map(b => ({ time: b.time, value: ((b.close - basePrice) / basePrice) * 100 }));
+      priceFormat = { type: 'custom', formatter: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%' };
+
+    // ── COT Net Position (Leveraged Funds) ────────────────────────────────
+    } else if (cmpType === 'cot') {
+      const r = await fetch(`./cot-data/${cmpId}.json`, { signal: AbortSignal.timeout(6000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const history = Array.isArray(d.history) ? d.history : [];
+      if (history.length < 2) throw new Error('no COT history');
+
+      // Add current week as the last point
+      const allPoints = [
+        ...history,
+        { weekEnding: d.weekEnding, levNet: d.netPosition }
+      ];
+
+      seriesData = allPoints
+        .filter(h => h.weekEnding && h.weekEnding.length === 10)
+        .map(h => ({
+          time:  h.weekEnding,
+          value: h.levNet ?? ((h.levLong || 0) - (h.levShort || 0)),
+        }))
+        .sort((a, b) => a.time < b.time ? -1 : 1);
+
+      // Remove duplicates (same weekEnding)
+      seriesData = seriesData.filter((p, i) => i === 0 || p.time !== seriesData[i-1].time);
+      if (seriesData.length < 2) throw new Error('insufficient COT points');
+
+      priceFormat = {
+        type: 'custom',
+        formatter: v => {
+          const abs = Math.abs(v);
+          const str = abs >= 1000 ? (v / 1000).toFixed(1) + 'K' : v.toFixed(0);
+          return (v >= 0 ? '+' : '') + str;
+        }
+      };
+
+    // ── CB Policy Rate (step-line) ─────────────────────────────────────────
+    } else if (cmpType === 'rate') {
+      const r = await fetch(`./rates/${cmpId}.json`, { signal: AbortSignal.timeout(6000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const obs = Array.isArray(d.observations) ? d.observations : [];
+      if (obs.length < 2) throw new Error('no rate observations');
+
+      // observations are newest-first — reverse to oldest-first for LWC
+      seriesData = obs
+        .filter(o => o.date && o.value != null)
+        .map(o => ({ time: o.date, value: parseFloat(o.value) }))
+        .sort((a, b) => a.time < b.time ? -1 : 1);
+
+      priceFormat = {
+        type: 'custom',
+        formatter: v => v.toFixed(2) + '%'
+      };
+
+    // ── ESI (Economic Surprise Index, CESI-style) ─────────────────────────
+    } else if (cmpType === 'esi') {
+      // Fetch calendar.json — same source used by the ESI panel and modal
+      const r = await fetch('./calendar-data/calendar.json', { signal: AbortSignal.timeout(8000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const calj = await r.json();
+      const allEvents = calj.events || [];
+      if (calj.surpriseStats) window._ECON_SURPRISE_STATS = calj.surpriseStats;
+
+      // Use existing modal functions if already loaded, otherwise compute inline
+      if (typeof _esmBuildSeries === 'function') {
+        seriesData = _esmBuildSeries(allEvents, cmpId);
+      } else {
+        // Inline ESI computation — mirrors _esmBuildSeries / _esmScoreWindow
+        const DECAY_LAMBDA = Math.LN2 / 45;
+        const WINDOW_MS    = 90 * 24 * 60 * 60 * 1000;
+        const STEP_MS      =  7 * 24 * 60 * 60 * 1000;
+        const NOISE_KW     = ['crude','gasoline','natural gas','rig count','baker hughes','auction','api weekly','fomc minutes','fed speak','ecb speak','boe speak','speeches','testimony'];
+        const INVERSE_KW   = ['unemployment','jobless','claims','deficit','trade balance'];
+        const stats        = window._ECON_SURPRISE_STATS || {};
+
+        function _scoreWin(startMs, endMs) {
+          const seen = new Set();
+          let total=0, wTotal=0, wBeats=0, wMisses=0;
+          let zWSum=0, zWTotal=0, zWBeats=0, zWMisses=0;
+          allEvents.forEach(ev => {
+            if (ev.currency !== cmpId) return;
+            const t = new Date(ev.dateISO).getTime();
+            if (isNaN(t) || t > endMs || t < startMs) return;
+            if (!ev.actual || ev.actual === '' || ev.actual === '-') return;
+            if (!['medium','high'].includes(ev.impact)) return;
+            const name = (ev.event || '').toLowerCase();
+            if (NOISE_KW.some(k => name.includes(k))) return;
+            const canon = name.replace(/\s*\([^)]*\)/g,'').trim();
+            const aS = String(ev.actual||'').replace(/[%,\s]/g,'');
+            const fS = String(ev.forecast||ev.previous||'').replace(/[%,\s]/g,'');
+            const key = `${cmpId}/${canon}/${aS}/${fS}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+            const actual   = parseFloat(String(ev.actual||'').replace(/[%,]/g,''));
+            const forecast = parseFloat(String(ev.forecast||ev.previous||'').replace(/[%,]/g,''));
+            if (isNaN(actual) || isNaN(forecast)) return;
+            const inv     = INVERSE_KW.some(k => name.includes(k));
+            const beat    = inv ? actual < forecast : actual > forecast;
+            const miss    = inv ? actual > forecast : actual < forecast;
+            const surp    = inv ? -(actual-forecast) : (actual-forecast);
+            const ageDays = (endMs - t) / 86400000;
+            const w       = Math.exp(-DECAY_LAMBDA * ageDays);
+            const st      = stats[`${cmpId}/${canon}`];
+            const useZ    = st && st.n >= 5 && st.std > 0;
+            const z       = useZ ? (surp - st.mean) / st.std : null;
+            total++; wTotal += w;
+            if (beat) { wBeats  += w; }
+            if (miss) { wMisses += w; }
+            if (z !== null) {
+              zWSum += z*w; zWTotal += w;
+              if (beat) zWBeats += w;
+              if (miss) zWMisses += w;
+            }
+          });
+          if (!total) return null;
+          const zFrac = zWTotal / wTotal;
+          let idx100;
+          if (zWTotal >= 10 || (zWTotal > 0 && zFrac >= 0.30)) {
+            const nZW=wTotal-zWTotal, nZWB=wBeats-zWBeats, nZWM=wMisses-zWMisses;
+            const zP  = zWTotal>0 ? (zWSum/zWTotal)*50 : 0;
+            const bmP = nZW>0 ? ((nZWB-nZWM)/nZW)*100 : 0;
+            idx100 = (zP*zWTotal + bmP*nZW) / wTotal;
+          } else {
+            idx100 = wTotal>0 ? ((wBeats-wMisses)/wTotal)*100 : 0;
+          }
+          return idx100;
+        }
+
+        const ccyEvts = allEvents.filter(ev =>
+          ev.currency === cmpId && ev.actual && ev.actual !== '' && ev.actual !== '-'
+        );
+        if (!ccyEvts.length) throw new Error('no ESI events for ' + cmpId);
+
+        const minDate = Math.min(...ccyEvts.map(ev => new Date(ev.dateISO).getTime()).filter(t => !isNaN(t)));
+        const nowMs = Date.now();
+        let cursor = minDate + WINDOW_MS;
+        while (cursor <= nowMs + STEP_MS) {
+          const endMs   = Math.min(cursor, nowMs);
+          const startMs = endMs - WINDOW_MS;
+          const idx     = _scoreWin(startMs, endMs);
+          if (idx !== null) {
+            const dt = new Date(endMs);
+            seriesData.push({
+              time:  `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`,
+              value: parseFloat(idx.toFixed(2)),
+            });
+          }
+          cursor += STEP_MS;
+        }
+      }
+
+      if (seriesData.length < 2) throw new Error('insufficient ESI data');
+
+      priceFormat = {
+        type: 'custom',
+        formatter: v => (v >= 0 ? '+' : '') + v.toFixed(1)
+      };
     }
 
-    // Find base price: first bar at or after the main chart's first visible bar
-    let baseIdx = 0;
-    try {
-      const range = _lwChart.timeScale().getVisibleLogicalRange();
-      if (range && range.from > 0) baseIdx = Math.max(0, Math.floor(range.from));
-    } catch(_e) {}
-    const basePrice = cmpBars[Math.min(baseIdx, cmpBars.length-1)]?.close;
-    if (!basePrice || basePrice <= 0) throw new Error('no base price');
+    if (!seriesData.length) throw new Error('empty data');
 
-    const normalizedBars = cmpBars.map(b => ({
-      time:  b.time,
-      value: ((b.close - basePrice) / basePrice) * 100,
-    }));
+    // ── Render series ──────────────────────────────────────────────────────
+    if (cmpType === 'cot') {
+      _lwCompareSeries = LWC.HistogramSeries
+        ? _lwChart.addSeries(LWC.HistogramSeries, {
+            color: CMP_COLOR, priceScaleId: 'cmp',
+            priceFormat, lastValueVisible: false, priceLineVisible: false,
+            base: 0 })
+        : _lwChart.addHistogramSeries({
+            color: CMP_COLOR, priceScaleId: 'cmp',
+            priceFormat, lastValueVisible: false, priceLineVisible: false,
+            base: 0 });
+    } else {
+      // ohlc → line; rate → step-line; esi → line with markers
+      _lwCompareSeries = LWC.LineSeries
+        ? _lwChart.addSeries(LWC.LineSeries, {
+            color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
+            priceScaleId: 'cmp', priceFormat,
+            lastValueVisible: false, priceLineVisible: false,
+            crosshairMarkerVisible: cmpType === 'rate' || cmpType === 'esi' })
+        : _lwChart.addLineSeries({
+            color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
+            priceScaleId: 'cmp', priceFormat,
+            lastValueVisible: false, priceLineVisible: false,
+            crosshairMarkerVisible: cmpType === 'rate' || cmpType === 'esi' });
 
-    const CMP_COLOR = '#f0a500';
-    const LWC = window.LightweightCharts;
-    _lwCompareSeries = LWC.LineSeries
-      ? _lwChart.addSeries(LWC.LineSeries, {
-          color: CMP_COLOR, lineWidth: 1.5, priceScaleId: 'cmp',
-          priceFormat: { type: 'custom', formatter: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%' },
-          lastValueVisible: false, priceLineVisible: false,
-          crosshairMarkerVisible: false })
-      : _lwChart.addLineSeries({
-          color: CMP_COLOR, lineWidth: 1.5, priceScaleId: 'cmp',
-          priceFormat: { type: 'custom', formatter: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%' },
-          lastValueVisible: false, priceLineVisible: false,
-          crosshairMarkerVisible: false });
+      // For rate: expand monthly observations to daily step-line so it aligns with the chart
+      if (cmpType === 'rate') {
+        const expanded = [];
+        for (let i = 0; i < seriesData.length; i++) {
+          const cur  = seriesData[i];
+          const next = seriesData[i + 1];
+          expanded.push(cur);
+          if (next) {
+            // Fill every month between cur and next with cur's value
+            let d = new Date(cur.time + 'T00:00:00Z');
+            d.setUTCMonth(d.getUTCMonth() + 1);
+            while (d.toISOString().slice(0,10) < next.time) {
+              expanded.push({ time: d.toISOString().slice(0,10), value: cur.value });
+              d.setUTCMonth(d.getUTCMonth() + 1);
+            }
+          }
+        }
+        // Extend to today
+        const today = new Date().toISOString().slice(0,10);
+        const last  = seriesData[seriesData.length - 1];
+        let d = new Date(last.time + 'T00:00:00Z');
+        d.setUTCMonth(d.getUTCMonth() + 1);
+        while (d.toISOString().slice(0,10) <= today) {
+          expanded.push({ time: d.toISOString().slice(0,10), value: last.value });
+          d.setUTCMonth(d.getUTCMonth() + 1);
+        }
+        seriesData = expanded;
+      }
+    }
 
     try {
       _lwChart.priceScale('cmp').applyOptions({
@@ -11160,13 +11378,15 @@ async function _lwLoadCompare(cmpId, cmpLabel) {
         borderVisible: false, textColor: CMP_COLOR,
       });
     } catch(_e) {}
-    _lwCompareSeries.setData(normalizedBars);
-    _lwCompareId = cmpId;
+
+    _lwCompareSeries.setData(seriesData);
+    _lwCompareId = uid;
 
     document.querySelectorAll('.lw-cmp-item').forEach(i =>
-      i.classList.toggle('active', i.dataset.cmpid === cmpId));
+      i.classList.toggle('active',
+        (i.dataset.cmptype || 'ohlc') === cmpType && i.dataset.cmpid === cmpId));
 
-    // Add pill showing compare symbol; clicking it removes the overlay
+    // Add pill
     const indPills = document.getElementById('lw-ind-pills');
     if (indPills) {
       const pill = document.createElement('span');
