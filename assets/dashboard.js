@@ -11124,11 +11124,13 @@ async function _lwLoadCompare(cmpId, cmpLabel) {
       ? _lwChart.addSeries(LWC.LineSeries, {
           color: CMP_COLOR, lineWidth: 1.5, priceScaleId: 'cmp',
           priceFormat: { type: 'custom', formatter: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%' },
-          lastValueVisible: true, priceLineVisible: false })
+          lastValueVisible: false, priceLineVisible: false,
+          crosshairMarkerVisible: false })
       : _lwChart.addLineSeries({
           color: CMP_COLOR, lineWidth: 1.5, priceScaleId: 'cmp',
           priceFormat: { type: 'custom', formatter: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%' },
-          lastValueVisible: true, priceLineVisible: false });
+          lastValueVisible: false, priceLineVisible: false,
+          crosshairMarkerVisible: false });
 
     try {
       _lwChart.priceScale('cmp').applyOptions({
@@ -11180,7 +11182,6 @@ function _lwOpenFullscreen() {
   _lwFsOriginalNext   = chartWrap.nextSibling;
   _lwFsOriginalHeight = chartWrap.style.height;
 
-  if (chartHdr)  inner.appendChild(chartHdr);
   if (rangeBar)  inner.appendChild(rangeBar);
   inner.appendChild(chartWrap);
 
@@ -11211,7 +11212,6 @@ function _lwCloseFullscreen() {
   document.body.style.overflow = '';
 
   if (_lwFsOriginalParent) {
-    if (chartHdr)  _lwFsOriginalParent.insertBefore(chartHdr,  _lwFsOriginalNext);
     if (rangeBar)  _lwFsOriginalParent.insertBefore(rangeBar,  _lwFsOriginalNext);
     if (chartWrap) _lwFsOriginalParent.insertBefore(chartWrap, _lwFsOriginalNext);
   }
