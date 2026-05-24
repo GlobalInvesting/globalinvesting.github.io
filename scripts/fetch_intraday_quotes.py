@@ -144,6 +144,13 @@ YFINANCE_SYMBOLS = {
     "cadchf": "CADCHF=X",
     "nzdcad": "NZDCAD=X",
     "nzdchf": "NZDCHF=X",
+    # Additional cross-asset instruments
+    "silver": "SI=F",      # Silver front-month futures (CME)
+    "brent":  "BZ=F",      # Brent Crude front-month futures (ICE)
+    "dax":    "^GDAXI",    # DAX Performance Index
+    # "ftse" already in YFINANCE_SYMBOLS above (used for GBP/USD correlation)
+    "hsi":    "^HSI",      # Hang Seng Index
+    "dji":    "^DJI",      # Dow Jones Industrial Average
 }
 
 # Yields que Yahoo devuelve ×10 (^TNX=43.42 significa 4.342%) — dividir por 10
@@ -197,6 +204,12 @@ VALIDATORS = {
     "cadchf": lambda v: 0.50 < v < 0.85,
     "nzdcad": lambda v: 0.67 < v < 1.11,
     "nzdchf": lambda v: 0.40 < v < 0.71,
+    # Additional instruments
+    "silver": lambda v: 5 < v < 500,
+    "brent":  lambda v: 10 < v < 300,
+    "dax":    lambda v: v > 3000,
+    "hsi":    lambda v: v > 5000,
+    "dji":    lambda v: v > 5000,
 }
 
 
@@ -223,6 +236,13 @@ FX_SESSION_HL_MAP = {
     "eurnzd": "EURNZD=X", "gbpaud": "GBPAUD=X", "gbpnzd": "GBPNZD=X",
     "audcad": "AUDCAD=X", "cadchf": "CADCHF=X", "nzdcad": "NZDCAD=X",
     "nzdchf": "NZDCHF=X",
+    # Additional cross-asset instruments
+    "silver": "SI=F",      # Silver front-month futures (CME)
+    "brent":  "BZ=F",      # Brent Crude front-month futures (ICE)
+    "dax":    "^GDAXI",    # DAX Performance Index
+    # "ftse" already in YFINANCE_SYMBOLS above (used for GBP/USD correlation)
+    "hsi":    "^HSI",      # Hang Seng Index
+    "dji":    "^DJI",      # Dow Jones Industrial Average
 }
 
 

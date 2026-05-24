@@ -147,6 +147,13 @@ SYMBOLS: dict[str, str] = {
     "eth":   "ETH-USD",    # Ethereum vs USD
     # FX Index
     "dxy":   "DX-Y.NYB",   # US Dollar Index (ICE futures)
+    # Additional instruments
+    "silver": "SI=F",       # Silver front-month futures (CME)
+    "brent":  "BZ=F",       # Brent Crude front-month futures (ICE)
+    "dax":    "^GDAXI",     # DAX Performance Index (Frankfurt)
+    "ftse":   "^FTSE",      # FTSE 100 Index (London)
+    "hsi":    "^HSI",       # Hang Seng Index (Hong Kong)
+    "dji":    "^DJI",       # Dow Jones Industrial Average
 }
 
 # Decimal precision per symbol (for display only — not stored in OHLC)
@@ -162,6 +169,7 @@ DECIMALS: dict[str, int] = {
     "spx": 2, "nasdaq": 2, "nikkei": 2, "stoxx": 2, "vix": 2,
     "move": 2,
     "eth": 2, "dxy": 3,
+    "silver": 2, "brent": 2, "dax": 2, "ftse": 2, "hsi": 2, "dji": 2,
 }
 
 # Plausibility guards — reject bars outside these ranges
@@ -178,6 +186,12 @@ GUARDS: dict[str, tuple[float, float]] = {
     "move":  (20.0,    400.0),     # MOVE Index historically ranges ~30–200; headroom for spikes
     "eth":   (10.0,    20000.0),
     "dxy":   (60.0,    150.0),
+    "silver": (5.0,    500.0),
+    "brent":  (10.0,   300.0),
+    "dax":    (3000.0, 30000.0),
+    "ftse":   (2000.0, 12000.0),
+    "hsi":    (5000.0, 60000.0),
+    "dji":    (5000.0, 70000.0),
     # JPY pairs — quoted in yen, must not use FX_GUARD (0.1–50)
     "usdjpy":(70.0,    300.0),
     "eurjpy":(100.0,   400.0),
@@ -225,7 +239,7 @@ HL_MAX_SPREAD: dict[str, float] = {
 # Fix: download 1H bars and aggregate them over the 21:00 UTC → 21:00 UTC window.
 # Result: open/high/low/close exactly match what Yahoo Finance shows on its own
 # 4H chart, and match TradingView and Bloomberg FX daily candles.
-NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'move', 'eth', 'dxy', 'gold'}
+NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'move', 'eth', 'dxy', 'gold', 'silver', 'brent', 'dax', 'ftse', 'hsi', 'dji'}
 # Equity indices routed to fetch_equity_ohlc_from_1h (1H aggregation over 21:00 UTC boundary).
 # These instruments close well before the 22:30 UTC workflow run, so their 1H bars are fully
 # available. Nikkei: TSE closes ~06:00 UTC. EuroStoxx: Euronext closes ~15:30 UTC.
