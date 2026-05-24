@@ -1,6 +1,6 @@
 # Global Investing — FX Terminal
 
-A professional-grade foreign exchange monitoring platform for serious market participants. Consolidates real-time price data, central bank policy rates, institutional positioning, cross-asset flows, and AI-assisted market narrative into a single unified dashboard.
+A professional-grade foreign exchange monitoring platform for serious market participants. Consolidates live FX prices (Finnhub WebSocket, tick-by-tick), central bank policy rates, institutional positioning, cross-asset flows, and AI-assisted market narrative into a single unified dashboard.
 
 **[globalinvesting.github.io](https://globalinvesting.github.io/)**
 
@@ -65,7 +65,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | `economic-data/` | Macro indicators | Engine — daily |
 | `extended-data/` | IV, carry, cross-asset fallback, inflation expectations | Engine — daily / Site — weekly (inflation expectations) |
 | `fx-data/` | `frankfurter.json` (ECB rates cache) + `fx-liquidity.json` | Engine — daily |
-| `intraday-data/` | `quotes.json` — primary intraday source for cross-asset panels; `iv_history.json` — rolling 52-week IV snapshots per FX pair for IV Rank calculation | Engine — every 5 min (quotes); weekly append (iv_history) |
+| `intraday-data/` | `quotes.json` — intraday source for non-FX instruments (VIX, SPX, Gold, WTI, etc.) and HV30/H-L/pct1w fields for FX pairs; `iv_history.json` — rolling 52-week IV snapshots | Engine — every 5 min (quotes); weekly append (iv_history) |
 | `meetings-data/` | CB meeting schedules | Engine — weekly |
 | `news-data/` | News feed headlines | Engine — hourly |
 | `rates/` | FX rates cache | Engine — daily |
