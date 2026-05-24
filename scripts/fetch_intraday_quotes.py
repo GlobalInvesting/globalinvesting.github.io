@@ -1477,16 +1477,31 @@ def fetch_yfinance_all(symbols_map):
 
                     # Step 1: anchor to today's UTC date
                     today_utc = datetime.now(timezone.utc).date()
-                    # Step 2: find the prior-week Friday (Bloomberg convention).
-                    # "Prior Friday" = the Friday that closed the PREVIOUS ISO week.
-                    # Formula: go back to this week's Monday (today - weekday days),
-                    # then subtract 3 more days to land on the preceding Friday.
-                    # This is stable for every day of the week:
-                    #   Mon 21-Apr → this_monday=21-Apr → prior_friday=17-Apr ✓
-                    #   Fri 24-Apr → this_monday=21-Apr → prior_friday=17-Apr ✓
-                    #   Sat 25-Apr → this_monday=21-Apr → prior_friday=17-Apr ✓
-                    this_monday = today_utc - timedelta(days=today_utc.weekday())  # weekday(): Mon=0
-                    reference_friday = this_monday - timedelta(days=3)
+                    # Step 2: find the most recent completed Friday (Bloomberg convention).
+                    # On weekdays (Mon–Fri) this is the Friday of the prior ISO week.
+                    # On weekends (Sat/Sun) this is the Friday that just closed
+                    # (i.e. last Friday = today − ((weekday − 4) % 7) days).
+                    #
+                    # Bug fixed (v3.3): the old formula used this_monday − 3 days,
+                    # which on Sunday gives: this_monday = May 18 → reference = May 15
+                    # (TWO Fridays ago), instead of the correct May 22.
+                    # Root cause: today_utc.weekday() is 6 on Sunday, so
+                    # this_monday = today − 6 = prior Monday, not the current week's Monday.
+                    # Fix: compute the most recent Friday directly as
+                    # today − ((weekday − 4) % 7), which gives:
+                    #   Mon (0) → 0−4 mod 7 = 3 → last Friday (prior week)  ✓
+                    #   Tue (1) → 1−4 mod 7 = 4 → last Friday (prior week)  ✓
+                    #   Fri (4) → 4−4 mod 7 = 0 → today (this Friday)       ✓ (current week)
+                    #   Sat (5) → 5−4 mod 7 = 1 → yesterday (this Friday)   ✓
+                    #   Sun (6) → 6−4 mod 7 = 2 → two days ago (this Friday) ✓
+                    # On weekdays Mon–Thu we still want the PRIOR Friday (not same-week),
+                    # so we subtract 7 more days if days_back == 0 or today is Mon–Thu.
+                    _wb = today_utc.weekday()  # Mon=0, Tue=1, …, Sat=5, Sun=6
+                    _days_back = (_wb - 4) % 7
+                    if _days_back == 0 and _wb < 4:
+                        # Today is Friday itself — use prior week's Friday
+                        _days_back = 7
+                    reference_friday = today_utc - timedelta(days=_days_back)
 
                     # Step 3: look up reference_friday in history
                     # Build a date→index map for O(1) lookup
