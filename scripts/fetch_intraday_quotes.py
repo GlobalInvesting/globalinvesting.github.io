@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v3.2  —  Intraday quotes via yfinance (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
+fetch_intraday_quotes.py  v3.4  —  Intraday quotes via yfinance (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -1494,12 +1494,14 @@ def fetch_yfinance_all(symbols_map):
                     #   Fri (4) → 4−4 mod 7 = 0 → today (this Friday)       ✓ (current week)
                     #   Sat (5) → 5−4 mod 7 = 1 → yesterday (this Friday)   ✓
                     #   Sun (6) → 6−4 mod 7 = 2 → two days ago (this Friday) ✓
-                    # On weekdays Mon–Thu we still want the PRIOR Friday (not same-week),
-                    # so we subtract 7 more days if days_back == 0 or today is Mon–Thu.
+                    # days_back == 0 only when wb == 4 (Friday).  On any Friday we want
+                    # the PRIOR week's Friday (7 days back), not today's close (which
+                    # would give pct1w ≈ 0 all day Friday).  Remove the erroneous wb < 4
+                    # guard — it incorrectly excluded Friday from the +7 adjustment.
                     _wb = today_utc.weekday()  # Mon=0, Tue=1, …, Sat=5, Sun=6
                     _days_back = (_wb - 4) % 7
-                    if _days_back == 0 and _wb < 4:
-                        # Today is Friday itself — use prior week's Friday
+                    if _days_back == 0:
+                        # Today IS Friday — 1W compares vs prior week's Friday (7d ago)
                         _days_back = 7
                     reference_friday = today_utc - timedelta(days=_days_back)
 
