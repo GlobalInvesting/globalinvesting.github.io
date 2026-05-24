@@ -1,0 +1,42 @@
+name = "globalinvesting-fx-ws-proxy"
+main = "fx-ws-proxy.js"
+compatibility_date = "2026-04-07"
+
+# ── Durable Objects ───────────────────────────────────────────────────────────
+# FxProxy holds the singleton Finnhub WebSocket connection and fans out ticks
+# to all connected browsers. One instance per deployment ("fx-proxy-singleton").
+[durable_objects]
+bindings = [
+  { name = "FX_PROXY", class_name = "FxProxy" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["FxProxy"]
+
+# ── Environment variables (non-secret) ───────────────────────────────────────
+# Secrets are set via:  npx wrangler secret put FINNHUB_API_KEY
+# Do NOT put secrets here — this file is committed to the repo.
+
+# ── Cloudflare free tier usage estimate ──────────────────────────────────────
+# (see fx-ws-proxy.js header for full calculation)
+# DO requests/day:  ~35,000   (100,000 limit — 35% used)
+# DO duration/day:  ~6,200 GB-s  (13,000 limit — 48% used)
+# Workers req/day:  ~1,000    (100,000 limit — 1% used)
+# Monthly cost: $0
+
+# ── Deployment notes ──────────────────────────────────────────────────────────
+# 1. Install Wrangler:  npm install -g wrangler
+# 2. Login:             npx wrangler login
+# 3. Set secret:        npx wrangler secret put FINNHUB_API_KEY --name globalinvesting-fx-ws-proxy
+#    (Use the same Finnhub key that calendar-watcher uses — it covers both)
+# 4. Deploy:            npx wrangler deploy --config cf-worker/wrangler-fx-proxy.toml
+# 5. Get URL:           shown in deploy output — e.g.:
+#                       https://globalinvesting-fx-ws-proxy.YOUR_SUBDOMAIN.workers.dev
+#    Copy the /ws endpoint URL to ASSETS/fx-websocket.js → FX_PROXY_WS_URL
+# 6. Test:              curl https://globalinvesting-fx-ws-proxy.YOUR_SUBDOMAIN.workers.dev/
+# 7. Watch logs:        npx wrangler tail --name globalinvesting-fx-ws-proxy
+#
+# IMPORTANT: deploy this worker BEFORE enabling fx-websocket.js in index.html.
+# If the Worker URL is wrong, the frontend falls back to yfinance quotes.json
+# automatically — no user-visible breakage.
