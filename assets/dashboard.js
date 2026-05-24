@@ -3180,7 +3180,15 @@ function _lwUpdateTodayBar() {
     if (_isFxWeekend) return;
 
     const _c = _rt.close;
-    const _o = (_rt.prev_close && _rt.prev_close > 0) ? _rt.prev_close : _c;
+    // Bloomberg institutional standard: H1/H4 open = close of the last completed bar
+    // in the JSON (the most recent finished H1/H4 candle), NOT the daily prev_close.
+    // Using prev_close (D-1 daily close) made the live bar's body span the entire
+    // trading session instead of just the current H1/H4 period — structurally wrong.
+    // _lwLastIntradayBarClose is set by _renderLWChart after setData() for H1/H4.
+    // Falls back to close (open=close, doji candle) if the bar hasn't been set yet.
+    const _o = (_lwLastIntradayBarClose != null && _lwLastIntradayBarClose > 0)
+      ? _lwLastIntradayBarClose
+      : _c;
     const _h2 = Math.max(_rt.session_high ?? _rt.high ?? _c, _o, _c);
     const _l2 = Math.min(_rt.session_low  ?? _rt.low  ?? _c, _o, _c);
     if (!(_h2 > 0 && _l2 > 0 && _h2 >= _l2)) return;
@@ -3276,6 +3284,12 @@ let _lwActiveTf   = 'D1'; // active timeframe: H1 | H4 | D1 | W1 | MN
 let _lwCompareSeries = null;  // LineSeries for compare overlay
 let _lwCompareId     = null;  // ohlcId of the compared symbol
 // Fullscreen: DOM-lift vars are declared in the FS block below
+
+// Institutional standard: the open of a live H1/H4 partial bar = close of the last
+// completed bar in the JSON, not the daily prev_close.  Bloomberg H1: open = first
+// real tick of that hour = last bar's close.  Stored here after each setData() call
+// so _lwUpdateTodayBar() can use it without the bars array being in scope.
+let _lwLastIntradayBarClose = null; // set by _renderLWChart for H1/H4, null for D1+
 
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
@@ -3650,7 +3664,18 @@ async function _renderLWChart(ohlcId, label) {
     candleSeries.setData(bars);
   }
 
-  // ── Volume histogram — lower panel (industry standard on Bloomberg, TradingView, FXCM) ──
+  // ── Store last completed bar close for H1/H4 live-bar open (Bloomberg standard) ──
+  // Bloomberg H1 open = first real tick of that hour = close of the last completed H1 bar.
+  // This is NOT the same as prev_close (daily close from D-1) which the previous version
+  // used incorrectly, causing the live bar's body to span the entire session instead of
+  // just the current hour. Reset to null for D1/W1/MN (those TFs use _lwBuildTodayBar).
+  if (_isIntradayTf && bars.length > 0) {
+    _lwLastIntradayBarClose = bars[bars.length - 1].close;
+  } else {
+    _lwLastIntradayBarClose = null;
+  }
+
+
   // Uses separate priceScaleId 'volume' pinned to bottom 20% — clean Bloomberg-style presentation
   if (typeof window._lwShowVol === 'undefined') window._lwShowVol = false;
   let volumeSeries = null;
@@ -5329,7 +5354,11 @@ function loadTVChart(sym) {
     const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
     _renderLWChart(ohlcId, label)
       .then(() => { if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
-      .catch(() => {
+      .catch(err => {
+        // Log the real exception — primary diagnostic for the TV-fallback regression.
+        // Without this log the error was silently swallowed and the TV widget loaded
+        // with no console trace of the root cause.
+        console.error('[LWChart] _renderLWChart failed for', ohlcId, '—', err);
         _loadTVWidgetFallback(sym);
         if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
