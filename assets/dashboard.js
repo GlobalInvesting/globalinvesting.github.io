@@ -3460,7 +3460,7 @@ async function _renderLWChart(ohlcId, label) {
         // (b) fill any gap between the last JSON bar and the current live block.
         // Finnhub OANDA data for the current session is consistently cleaner than
         // the yfinance stub bars produced at session open.
-        const _daysSinceSun = (_utcDow + 1) % 7;       // 0 if today is Sunday
+        const _daysSinceSun = _utcDow;                  // Sun=0, Mon=1 … Sat=6 — days since last Sunday
         const _lastSun      = new Date(_nowUTC2);
         _lastSun.setUTCDate(_nowUTC2.getUTCDate() - _daysSinceSun);
         _lastSun.setUTCHours(21, 0, 0, 0);
