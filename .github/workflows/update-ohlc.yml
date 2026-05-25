@@ -14,15 +14,19 @@ name: Update OHLC Chart Data
 # H1/H4 files cover 720-day yfinance limit; also replaced on every run.
 #
 # Schedule:
-#   Tue–Sat 01:30 UTC — Main weekday run (after FX session finalization).
-#     The FX trading day closes at 21:00 UTC. The last 1H bar of each session
-#     (20:00–21:00 UTC) closes at 21:00 UTC, but yfinance has a finalization lag
-#     of 15–90 minutes: H/L/C values for the most recent 1H bars remain provisional
-#     in Yahoo Finance's feed for up to ~1 hour after bar close. Running at 01:30 UTC
-#     (4.5h after session close) ensures all yfinance 1H FX data is 100% finalized
-#     before the JSON is written.
-#     dashboard.js injects the live today-bar from quotes.json (refreshed every 5 min)
-#     covering the 21:00–01:30 UTC window without any static data gap.
+#   Mon–Fri :30 (every hour) — Hourly intraday run during the FX week.
+#     Keeps H1/H4 JSON files at most ~1 hour stale, matching H1 bar granularity.
+#     dashboard.js fetches these JSON files directly — the gap between the last
+#     completed bar in the JSON and the live partial bar (injected via quotes.json)
+#     is at most 1 H1 period instead of up to ~22.
+#     fetch_ohlc.py is safe at any hour: writes all fully-closed H1 bars and drops
+#     only the current incomplete H4 block. No partial-bar artifacts.
+#     Public repo = unlimited GitHub Actions minutes — zero cost impact.
+#
+#   Tue–Sat 01:30 UTC — Retained for FX session finalization. The last H1 bar of
+#     each session (20:00–21:00 UTC) has a yfinance finalization lag of up to ~1h.
+#     The 01:30 UTC run ensures D1 FX bars (built from 1H aggregation) use fully
+#     finalized H/L/C values. Also serves as the authoritative daily D1 write.
 #
 #   Sat–Sun 23:30 UTC — Crypto weekend run. BTC and ETH trade 24/7; without a
 #     weekend run the Friday script would write a partial Saturday bar (~22.5h) that
@@ -37,7 +41,8 @@ name: Update OHLC Chart Data
 
 on:
   schedule:
-    - cron: '30  1 * * 2-6'   # 01:30 UTC Tue–Sat — after FX session data finalization (was 22:30 UTC, caused nightly candle bug)
+    - cron: '30 * * * 1-5'    # every hour :30 Mon–Fri UTC — H1/H4 gap ≤ 1 hour during FX week
+    - cron: '30 1 * * 2-6'    # 01:30 UTC Tue–Sat — retained for FX session finalization (full D1 bars)
     - cron: '30 23 * * 0,6'   # 23:30 UTC Sat–Sun  — crypto weekend bars (BTC, ETH trade 24/7)
   workflow_dispatch:             # manual trigger for backfill / testing
 
