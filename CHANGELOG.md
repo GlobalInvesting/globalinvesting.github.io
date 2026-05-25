@@ -1,3 +1,140 @@
+## v8.2.30 (2026-05-25) — Holiday injection from ForexFactory public JSON
+
+### Engine — scripts/fetch_ff_calendar.py
+- **`fetch_ff_holidays()` (Step 1b):** New function fetches bank/market holidays from `https://nfs.faireconomy.media/ff_calendar_thisweek.json` (public endpoint, no API key). FF marks exchange-closed days with `impact == "Holiday"`. The function filters to G8 currencies, deduplicates by `(currency, dateISO)`, and returns a sorted list of `{title, currency, dateISO}` objects.
+- **Output schema extended:** `holidays` top-level field added to `calendar-data/ff_calendar.json`. Field is always present (empty list when no G8 holidays this week). Frontend can read `ff_calendar.holidays` to surface "Market closed — public holiday" context instead of showing stale quotes without explanation.
+- **Change-detection extended:** Holiday fingerprint `(currency, dateISO, title)` is now included in the smart-change check. A new or removed holiday triggers a commit even when no economic event actuals changed — ensuring the holiday indicator is never more than one workflow cycle stale.
+- **Always fetched:** Holiday fetch runs unconditionally regardless of Finnhub source/fallback, as the FF public JSON is independent of the economic data source.
+- **Version bump:** `v3.6 → v3.7`.
+
+### Frontend — assets/calendar-panel.js
+- **`fetchEconomicCalendar`:** Now reads `j.holidays` from `ff_calendar.json` and passes the array to `buildPanel`.
+- **`buildPanel(events, source, holidays)`:** New third parameter. Builds a `holidayByDate` lookup and extends `allDates` to include holiday-only days (days with no economic events). For each day with holidays, a `.cal-holiday-row` banner is inserted above the events showing: all affected G8 flags, the holiday title in muted italic, and dashes for actual/forecast/previous — making it immediately clear why quotes are frozen on those days.
+
+### Frontend — index.html
+- **`.cal-holiday-row` CSS:** New rule distinguishes holiday banners from normal event rows — slightly dimmer (`opacity: .75`), dashed bottom border instead of solid, same hover treatment as regular rows. Inline `<style>` block (correct location per architecture rules — no `unsafe-inline` needed as these are non-interactive styles).
+
+---
+
+## v8.2.29 (2026-05-25) — Staleness detection + Twelve Data batch fallback for frozen non-FX quotes
+
+### Engine — scripts/fetch_intraday_quotes.py
+- **Staleness detection (PASO 2b):** Added `_is_quote_stale()` which inspects `regularMarketTime` (Unix timestamp already stored per quote) and flags a quote as frozen when: (a) `market_time` is from a previous calendar day during weekday market hours (after 13:00 UTC), or (b) `market_time` is > 30 min behind the current time while `market_state == "REGULAR"`. Does NOT gate on `pct==0.0` alone — that would false-positive on legitimate flat opens.
+- **Twelve Data batch fallback (`fetch_td_batch`):** New function replaces all stale non-FX symbols in a single HTTP request. `TD_BATCH_MAP` maps 14 internal symbols to their Twelve Data equivalents: commodities (`XAU/USD`, `XAG/USD`, `WTI/USD`, `BRENT/USD`) and equity indices (`SPX`, `IXIC`, `DJI`, `VIX`, `N225`, `DAX`, `HSI`, `SX5E`, `FTSE100`, `AS51`). 1 batch call per run ≈ 288 calls/day — well within the 800/day free tier limit.
+- **`fetch_td_gold` preserved as thin wrapper** — delegates to `fetch_td_batch(["gold"])` so the PASO 2 missing-gold path is unchanged.
+- **`load_repo_fallback` extended:** Now also covers `us5y` from `bond5y` in `extended-data/USD.json`. All repo fallback entries include `sourceDate` for transparency. Bond yields (`us10y`, `us5y`) remain repo-only — Twelve Data free tier doesn't expose yield curve data.
+- **Trigger for this change:** Yahoo Finance freeze observed 2026-05-25 where `GC=F`, `CL=F`, and several indices showed `regularMarketTime` from 08:41 ET while the market had been open since 09:30 ET, producing `pct=0.00%` throughout the session. The fix fires automatically without any manual intervention on future occurrences.
+- **Version bump:** `v3.4 → v3.5`.
+
+---
+
+## v8.2.28 (2026-05-25) — Fix W1/MN Prev C line: use previous completed period close
+
+### Frontend — assets/dashboard.js
+- **Bug fix — Prev C line incorrect for W1/MN:** `_lastHistClose` was computed as
+  `bars[-1].close` after the strip. For D1 this is correct (bars[-1] = last completed
+  day). For W1/MN, the strip never removes the current period bar (e.g. the May MN bar
+  is keyed `'2026-05-01'` which is always < today), so `bars[-1]` is the current
+  incomplete period whose close = the last D1 close in the JSON (e.g. May 22 = 1.16050),
+  not the true month close. The Prev C line therefore reflected the wrong value and
+  rendered at the wrong price. Fix: for W1/MN, `_lastHistClose = bars[-2].close`
+  (the penultimate bar = previous completed period). For EURUSD MN this corrects
+  Prev C from 1.16050 to 1.17343 (April close), matching TradingView/Saxo.
+
+---
+
+## v8.2.27 (2026-05-25) — Fix W1/MN live bar: reset ordering bug
+
+### Frontend — assets/dashboard.js
+- **Bug fix — `_lwPeriodOpen/High/Low` reset after snapshot:** The three period state
+  variables snapshotted after W1/MN aggregation were also being reset to `null` later
+  in the same `_renderLWChart` call (in the per-block reset block after `setData`).
+  This nullified the snapshot before `_lwBuildTodayBar` ever read them, making the
+  fix from v8.2.26 a no-op. Removed `_lwPeriodOpen/High/Low` from the mid-function
+  reset block. Added them to `_destroyLWChart` instead, so they are cleared on every
+  new chart load (before the snapshot) and when switching from W1/MN to another TF.
+
+---
+
+## v8.2.26 (2026-05-25) — Fix W1/MN live bar: correct period open and cumulative H/L
+
+### Frontend — assets/dashboard.js
+- **Bug fix — W1/MN live bar open/high/low incorrect:** `_lwBuildTodayBar` was using
+  `prev_close` as the candle open and `session_high/session_low` (last 24h only) as the
+  wick extents for W1 and MN timeframes. This produced a doji-like current-period candle
+  with wrong open (e.g. May MN showed O≈1.160 instead of 1.174) and compressed wicks
+  covering only today's session instead of the full week/month range.
+- **Root cause:** The function computed O/H/L the same way for all TFs, but for W1/MN
+  the "correct" open is the first D1 bar's open for the period, and the correct H/L is
+  the cumulative max/min across all D1 bars in the period — not just the current session.
+- **Fix (O/H/L):** Three new global state variables (`_lwPeriodOpen`, `_lwPeriodHigh`,
+  `_lwPeriodLow`) are snapshotted in `_renderLWChart` immediately after the W1/MN
+  aggregation loop, from the last (current-period) aggregated bar. In `_lwBuildTodayBar`,
+  when `_lwActiveTf` is `W1` or `MN`, these values override the default `o/h/l` before
+  the structural integrity clamp — so the live bar has the real period open and cumulative
+  H/L, with today's live tick extending the wick only if it sets a new period extreme.
+  Variables are reset to `null` on every chart destroy alongside the existing block vars.
+- **Fix (_lwLastJsonBarDate):** `_lwLastJsonBarDate` was being assigned from `bars[]`
+  after the W1/MN aggregation loop, at which point `bars[]` holds aggregated period keys
+  (e.g. `'2026-05-01'`) rather than raw D1 dates (e.g. `'2026-05-22'`). This caused
+  the FX gap-window stale check in `_lwBuildTodayBar` to fire spuriously after 21:00 UTC.
+  Fix: assign `_lwLastJsonBarDate` from raw D1 bars before the aggregation block. The
+  late assignment inside `!_isIntradayTf` is now guarded to `D1` only.
+
+---
+
+## v8.2.25 (2026-05-25) — Two-fix deploy: session-start formula bug + OHLC cron twice-per-hour
+
+### Frontend — assets/dashboard.js + index.html
+- **Bug fix — `_daysSinceSun` off-by-one:** The session-replace code introduced in v8.2.24
+  used `(_utcDow + 1) % 7` to compute days-since-last-Sunday. This was wrong: on Monday
+  (`utcDow=1`) it returned `2`, going back to **Saturday**, not Sunday. The correct formula
+  is simply `_utcDow` (Sunday=0 → 0 days back; Monday=1 → 1 day back; etc.). Effect: the
+  `from=` param in the `/candles` Worker request was `Sat 21:00 UTC` instead of `Sun 21:00 UTC`
+  — a 24h wider range that caused the Worker request to take >2s, hitting the `AbortSignal.timeout(2000)`
+  and surfacing as a CORS error in the browser console (the browser reports the preflight failure,
+  not the real timeout). Fixed to `const _daysSinceSun = _utcDow`.
+- **Cache-bust:** version string bumped to `v=8.2.25` in `index.html` (both dashboard.js and
+  dashboard.css query strings) so browsers discard the cached v8.2.19 file that was preventing
+  the v8.2.23/v8.2.24 changes from reaching users.
+
+### Workflow — .github/workflows/update-ohlc.yml
+- **Cron changed from `:30` to `:02` and `:32` (twice per hour):**
+  - Old: `30 * * * 1-5` → runs once/hour at :30 UTC → max JSON staleness = **~60 min**
+  - New: `2,32 * * * 1-5` → runs at :02 and :32 UTC → max JSON staleness = **~30 min**
+  - Rationale: H1 bars close at :00 and :30. Running at :02/:32 (2-minute finalization
+    window for yfinance) ensures completed bars are always available within 2-3 minutes
+    of closing. This matches what Yahoo Finance shows for the current session — the missing
+    bars the user saw were bars that had closed but whose yfinance data wasn't yet in the JSON.
+  - GitHub Actions public repo = unlimited minutes; 2× run frequency has zero cost impact.
+  - The dedicated D1/session-finalization cron (`30 1 * * 2-6`) and crypto weekend cron
+    (`30 23 * * 0,6`) are unchanged.
+
+---
+
+## v8.2.24 (2026-05-25) — H1/H4 FX session-replace: swap yfinance artifact bars with Finnhub OANDA data
+
+### Frontend — assets/dashboard.js
+- **Problem:** yfinance 1H bars at the start of the FX week (Sunday 21:00 UTC open) frequently
+  have O≈L or C≈L artifacts — bars where the open equals the low, or close equals the low.
+  Affects 3–6 FX pairs each session open (e.g. EURUSD all 3 bars, AUDUSD 2/3, GBPUSD 2/3).
+  These produce candles with shaved bottoms that look noticeably different from TradingView/Saxo.
+- **Root cause:** yfinance resamples tick data for the newly opened FX session and the
+  first/last tick of each hour sometimes becomes both the open and the low (or close and low),
+  creating an artifact that doesn't match what institutional data providers show.
+- **Fix:** Extended the H1/H4 FX gap-fill (v8.2.23) to also **replace** current-session bars
+  in the JSON with cleaner Finnhub OANDA data. On chart open:
+  1. Compute `_sessionStartTs` = most recent Sunday 21:00 UTC (FX week open).
+  2. Fetch Finnhub bars from `_sessionStartTs` → `_currentBlockTs` (in-progress bar excluded).
+  3. Validate OHLC sanity (`high ≥ open/close`, `low ≤ open/close`, all > 0).
+  4. Keep all pre-session JSON bars (historical, clean). Discard session bars Finnhub covers.
+     Append Finnhub bars. Result: Finnhub OANDA candles for the current week's session —
+     bodies and wicks match TradingView/Saxo appearance.
+- **Scope:** FX pairs only (`_LW_FX_IDS`), H1/H4 TFs only, market hours only.
+- **Fallback:** silent — if Worker times out (2s) or returns empty, original JSON bars used.
+
+---
+
 ## v7.77.6 (2026-05-13) — Economic Surprises: load in parallel, eliminate startup delay
 
 ### Frontend — assets/dashboard2.js
