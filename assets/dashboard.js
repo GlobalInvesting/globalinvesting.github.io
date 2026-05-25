@@ -503,6 +503,14 @@ function populateFxPairsTable() {
   }
 }
 
+// Throttle guard for populateHeatmap — Finnhub sends 2-5 ticks/second across 28 pairs.
+// Rebuilding the full heatmap grid on every tick causes visible jank.
+// Bloomberg convention: strength panels refresh at ~1s cadence, not per-tick.
+// The throttle limits DOM rebuilds to at most once per 800ms — fast enough to feel live,
+// cheap enough to never block the main thread.
+let _hmThrottleTimer = null;
+const _HM_THROTTLE_MS = 800;
+
 function populateHeatmap() {
   const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD'];
 
@@ -608,6 +616,33 @@ function populateHeatmap() {
       <span class="hm-val ${cls}">${sign}${s.pct.toFixed(2)}</span>
     </div>`;
   }).join('');
+
+  // ── Heatmap source label — reflects active data source (Finnhub live vs yfinance) ──
+  // Located in the panel subtitle below the heatmap title.
+  const _hasFhHm = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
+  const _hmSubEl = document.getElementById('hm-panel-sub');
+  if (_hmSubEl) {
+    _hmSubEl.textContent = _hasFhHm
+      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies'
+      : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies';
+  }
+
+  // ── Live-refresh open modal — if the heatmap modal is currently open, push ──
+  // the latest strengths and RT cache so all tabs reflect Finnhub live prices.
+  // Only refreshes the active tab to avoid jank on tabs the user isn't viewing.
+  if (typeof window._hmRefreshIfOpen === 'function') {
+    window._hmRefreshIfOpen(strengths, STOOQ_RT_CACHE);
+  }
+}
+
+// Throttled entry point — called by updateFxPairsTableRT() on every Finnhub tick.
+// Direct calls (boot, full refresh) bypass the throttle by calling populateHeatmap() directly.
+function populateHeatmapThrottled() {
+  if (_hmThrottleTimer) return; // already scheduled — skip
+  _hmThrottleTimer = setTimeout(() => {
+    _hmThrottleTimer = null;
+    populateHeatmap();
+  }, _HM_THROTTLE_MS);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1385,8 +1420,8 @@ function updateFxPairsTableRT() {
   setCA_rt('gold', STOOQ_RT_CACHE['xauusd']);
   setCA_rt('wti',  STOOQ_RT_CACHE['wti']);
 
-  // ── Refresh heatmap with latest RT data ──
-  populateHeatmap();
+  // ── Refresh heatmap with latest RT data (throttled — Finnhub ~2-5 ticks/s) ──
+  populateHeatmapThrottled();
 
   // ── Timestamp ──
   const upd = document.getElementById('fx-table-updated');
@@ -3326,6 +3361,7 @@ let _lwCompareId     = null;  // ohlcId of the compared symbol
 // real tick of that hour = last bar's close.  Stored here after each setData() call
 // so _lwUpdateTodayBar() can use it without the bars array being in scope.
 let _lwLastIntradayBarClose = null; // set by _renderLWChart for H1/H4, null for D1+
+
 
 // Per-block H/L tracking for H1/H4 live partial bar (Bloomberg standard).
 // H1/H4 live bar H/L must reflect only the CURRENT incomplete block's tick range,

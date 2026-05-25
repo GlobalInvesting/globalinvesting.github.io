@@ -1695,6 +1695,9 @@
     fetchDrivers();        // lazy-load AI driver notes in the background
     fetchSessionContext(); // lazy-load AI session context notes in the background
 
+    // Update source labels to reflect active data source (Finnhub live vs yfinance)
+    _updateModalSourceLabels();
+
     const bd = document.getElementById('hm-bd');
     bd.style.display = 'flex';
     document.getElementById('hm-close').focus();
@@ -1754,6 +1757,54 @@
     } else if (tabId === 'csi' && _ccy) {
       populateCSI(_ccy);
     }
+  };
+
+  // ── Live source label — updates hm-sub and hm-footer-meta to reflect active source ──
+  function _updateModalSourceLabels() {
+    const hasFh = window.STOOQ_RT_CACHE
+      ? Object.values(window.STOOQ_RT_CACHE).some(e => e?.fromFinnhub)
+      : false;
+    const srcLabel = hasFh
+      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies'
+      : '28-pair equal-weighted model \u00b7 8 G8 currencies \u00b7 yfinance \u00b7 ~5min delay';
+    const footerLabel = hasFh
+      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted model'
+      : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted model';
+    const subEl    = document.getElementById('hm-sub');
+    const footerEl = document.getElementById('hm-footer-meta');
+    if (subEl)    subEl.textContent    = srcLabel;
+    if (footerEl) footerEl.textContent = footerLabel;
+  }
+
+  // ── _hmRefreshIfOpen — called by dashboard.js populateHeatmap() on every RT update ──
+  // Refreshes whichever tab is currently active without closing/reopening the modal.
+  // Only runs when the modal is actually visible — no-op otherwise.
+  // This is the mechanism that makes the modal update in real time from Finnhub ticks.
+  window._hmRefreshIfOpen = function(newStrengths, newRtCache) {
+    const bd = document.getElementById('hm-bd');
+    if (!bd || bd.style.display === 'none' || !_ccy) return;
+
+    // Update stored references so tab switches also get fresh data
+    _strengths = newStrengths;
+    _rtCache   = newRtCache;
+
+    // Update source labels in header and footer
+    _updateModalSourceLabels();
+
+    // Refresh the active tab — find which panel is currently visible
+    const activeTab = document.querySelector('.hm-tab.on');
+    if (!activeTab) return;
+    const tabId = activeTab.dataset.tab;
+
+    if (tabId === 'breakdown') {
+      populateMetrics(_ccy, _strengths, _rtCache);
+      populateBreakdown(_ccy, _strengths, _rtCache);
+    } else if (tabId === 'session') {
+      populateSession(_ccy, _rtCache);
+    } else if (tabId === 'correlations') {
+      populateCorrelations(_ccy, _strengths, _rtCache);
+    }
+    // CSI tab uses historical OHLC data only — no RT refresh needed
   };
 
 })();
