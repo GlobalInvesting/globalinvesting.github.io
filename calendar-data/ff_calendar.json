@@ -1,6 +1,13 @@
 {
-  "generated_at": "2026-05-25T12:06:13Z",
+  "generated_at": "2026-05-25T19:24:59Z",
   "source": "Finnhub",
+  "holidays": [
+    {
+      "title": "Bank Holiday",
+      "currency": "USD",
+      "dateISO": "2026-05-25"
+    }
+  ],
   "events": [
     {
       "title": "BoC Macklem Speech",
@@ -2489,17 +2496,6 @@
       "released": true
     },
     {
-      "title": "CBI Industrial Trends Orders",
-      "currency": "GBP",
-      "dateISO": "2026-05-22",
-      "timeUTC": "10:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": "-38",
-      "actual": null,
-      "released": false
-    },
-    {
       "title": "Retail Sales Ex Autos MoM",
       "currency": "CAD",
       "dateISO": "2026-05-22",
@@ -3871,6 +3867,17 @@
       "impact": "high",
       "forecast": null,
       "previous": "4.3",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Ivey PMI s.a",
+      "currency": "CAD",
+      "dateISO": "2026-06-05",
+      "timeUTC": "14:00",
+      "impact": "high",
+      "forecast": null,
+      "previous": "57.7",
       "actual": null,
       "released": false
     }
