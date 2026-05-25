@@ -14,13 +14,12 @@ name: Update OHLC Chart Data
 # H1/H4 files cover 720-day yfinance limit; also replaced on every run.
 #
 # Schedule:
-#   Mon–Fri :30 (every hour) — Hourly intraday run during the FX week.
-#     Keeps H1/H4 JSON files at most ~1 hour stale, matching H1 bar granularity.
-#     dashboard.js fetches these JSON files directly — the gap between the last
-#     completed bar in the JSON and the live partial bar (injected via quotes.json)
-#     is at most 1 H1 period instead of up to ~22.
-#     fetch_ohlc.py is safe at any hour: writes all fully-closed H1 bars and drops
-#     only the current incomplete H4 block. No partial-bar artifacts.
+#   Mon–Fri :02 and :32 (twice per hour) — Intraday run during the FX week.
+#     Runs 2 minutes after each 30-min mark, once H1 bars have finalized in yfinance.
+#     Halves the max JSON staleness to ~30 minutes (vs ~60 min with the old :30 cron).
+#     bar closes at :00 → finalized in yfinance by :02. Bar closes at :30 → finalized by :32.
+#     dashboard.js fetches these JSON files directly — gap between last completed bar
+#     and the live partial bar (WebSocket) is at most ~30 min instead of ~60 min.
 #     Public repo = unlimited GitHub Actions minutes — zero cost impact.
 #
 #   Tue–Sat 01:30 UTC — Retained for FX session finalization. The last H1 bar of
@@ -41,7 +40,7 @@ name: Update OHLC Chart Data
 
 on:
   schedule:
-    - cron: '30 * * * 1-5'    # every hour :30 Mon–Fri UTC — H1/H4 gap ≤ 1 hour during FX week
+    - cron: '2,32 * * * 1-5'  # every :02 and :32 Mon–Fri UTC — H1/H4 gap ≤ 30 min during FX week
     - cron: '30 1 * * 2-6'    # 01:30 UTC Tue–Sat — retained for FX session finalization (full D1 bars)
     - cron: '30 23 * * 0,6'   # 23:30 UTC Sat–Sun  — crypto weekend bars (BTC, ETH trade 24/7)
   workflow_dispatch:             # manual trigger for backfill / testing
