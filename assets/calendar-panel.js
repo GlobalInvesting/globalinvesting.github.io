@@ -141,28 +141,30 @@
     return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  // ─── Holiday banner ───────────────────────────────────────────────────────
-  // Bloomberg convention: muted orange bar at top of the day, before event rows.
-  // Shows: ⊘ icon · holiday name · currency chip per affected market · "Prior close"
+  // ─── Holiday row ─────────────────────────────────────────────────────────
+  // Sits in the same 7-col grid as .cal-event-row — perfectly aligned.
+  // Cols: [time=empty] [ccy=flag icons] [dot=⊘] [title=holiday name italic]
+  //       [cols 5-7 span = "Prior close" right-aligned]
   function buildHolidayRowHtml(dateISO, holiday) {
     var ccys = holiday.currencies.filter(function (c) { return G8_SET[c]; });
     if (!ccys.length) return '';
 
-    var chips = ccys.map(function (c) {
+    // Flag icons only — no text labels, no chips. Fits in the 52px ccy column.
+    var flags = ccys.slice(0, 4).map(function (c) {
       var f  = FLAG[c] || '';
       var ex = EXCHANGE[c] || c;
-      var flagHtml = f ? '<span class="fi fi-' + f + '" style="font-size:9px;line-height:1;"></span>' : '';
-      return '<span title="' + esc(ex) + ' closed today" style="display:inline-flex;align-items:center;gap:2px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;font-size:9px;color:var(--text2);white-space:nowrap;">' + flagHtml + esc(c) + '</span>';
-    }).join('');
+      return f ? '<span class="fi fi-' + f + '" title="' + esc(ex) + ' closed" style="font-size:10px;line-height:1;"></span>' : '';
+    }).filter(Boolean).join('');
 
     var label   = holiday.labels.join(' \u00b7 ');
     var exList  = ccys.map(function (c) { return c + ' (' + (EXCHANGE[c] || c) + ')'; }).join(', ');
-    var tooltip = esc(label) + ' \u2014 closed: ' + esc(exList) + ' \u2014 prices reflect prior close';
+    var tooltip = esc(label) + ' \u2014 ' + esc(exList) + ' closed \u2014 prices reflect prior close';
 
     return '<div class="cal-holiday-row" data-date="' + dateISO + '" title="' + tooltip + '">' +
+      '<span></span>' +
+      '<span class="cal-holiday-flags">' + flags + '</span>' +
       '<span class="cal-holiday-icon" aria-hidden="true">\u2298</span>' +
-      '<span class="cal-holiday-label">' + esc(label) + '</span>' +
-      '<span class="cal-holiday-chips">' + chips + '</span>' +
+      '<span class="cal-holiday-name">' + esc(label) + '</span>' +
       '<span class="cal-holiday-note">Prior close</span>' +
       '</div>';
   }
@@ -387,8 +389,25 @@
         var res = await fetch(paths[i]).catch(function () { return null; });
         if (!res || !res.ok) continue;
         var j = await res.json();
-        if (j && j.events && j.events.length) { events = j.events; source = j.source || source; break; }
+        if (j && j.events && j.events.length) {
+          events = j.events;
+          source = j.source || source;
+          // Merge live holidays from JSON into the lookup table (overrides hardcoded table
+          // for dates in the JSON window; hardcoded table still covers dates outside it)
+          if (j.holidays && Array.isArray(j.holidays)) {
+            j.holidays.forEach(function (h) {
+              if (!h.dateISO || !h.currencies) return;
+              HOLIDAYS_BY_DATE[h.dateISO] = {
+                labels: [h.label || 'Market Holiday'],
+                currencies: h.currencies,
+              };
+            });
+          }
+          break;
+        }
       }
+      // Re-expose updated table for dashboard.js cross-asset annotation
+      window._MARKET_HOLIDAYS = HOLIDAYS_BY_DATE;
       buildPanel(events, source);
     } catch (e) {
       var c = document.getElementById('cal-events-body');
