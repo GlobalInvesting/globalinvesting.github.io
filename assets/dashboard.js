@@ -3584,9 +3584,13 @@ async function _renderLWChart(ohlcId, label) {
   // ── Today-bar strip and gap-window injection (D1/W1/MN only) ─────────────────
   // For H1/H4 intraday TFs: bars have unix timestamps, no live today-bar to inject.
   if (!_isIntradayTf) {
-  // can detect the 21:00–22:30 UTC gap window where the just-closed session bar is
-  // not yet present in the JSON (the OHLC workflow only runs at 22:30 UTC).
-  _lwLastJsonBarDate = bars[bars.length - 1]?.time ?? null;
+  // _lwLastJsonBarDate was already set from raw D1 bars before W1/MN aggregation.
+  // For plain D1 TF (no aggregation), bars[] was never mutated — update it here too
+  // so D1 stays consistent. Skip for W1/MN: bars[] now holds aggregated period keys
+  // (e.g. '2026-05-01') which would make the gap-window stale check always fire.
+  if (_activeTf === 'D1') {
+    _lwLastJsonBarDate = bars[bars.length - 1]?.time ?? null;
+  }
 
   // ── Strip today-bar from JSON before setData ────────────────────────────────
   // fetch_ohlc.py keeps today's in-progress bar in the JSON. dashboard.js replaces
