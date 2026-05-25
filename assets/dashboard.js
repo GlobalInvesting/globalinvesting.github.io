@@ -3251,8 +3251,15 @@ function _lwUpdateTodayBar() {
     // which is structurally incorrect (a 14:00–15:00 bar showing the 05:00 session high).
     // Instead, maintain running block H/L that resets at every block boundary.
     if (_lwBlockTs !== _blockTs) {
-      // Block has rolled over — reset tracking to the current price at the rollover point.
-      // Use session_high/low only as a seed when we have no prior ticks for this block.
+      // Block has rolled over — the previous block is now complete.
+      // Update _lwLastIntradayBarClose to the close of the completed block so the
+      // new block's open = last completed H1/H4 bar close (Bloomberg standard).
+      // Without this, _lwLastIntradayBarClose stays at the stale value from page-load
+      // for the entire session, making every subsequent hour's open wrong.
+      if (_lwBlockTs !== null && _c > 0) {
+        _lwLastIntradayBarClose = _c;
+      }
+      // Reset block H/L tracking to the current price at the rollover point.
       _lwBlockHigh = _c;
       _lwBlockLow  = _c;
       _lwBlockTs   = _blockTs;

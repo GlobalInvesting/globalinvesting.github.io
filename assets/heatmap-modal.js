@@ -788,23 +788,23 @@
     const maxImp = Math.max(...impacts.map(i => Math.abs(i.impact ?? 0)), 0.001);
 
     const tbody = document.getElementById('hm-pair-tbody');
-    tbody.innerHTML = impacts.map(r => {
+    tbody.innerHTML = impacts.map((r, _i) => {
       const iCls  = pctClass(r.impact);
       const rng   = (r.hi != null && r.lo != null)
         ? fmtPrice(r.lo) + ' – ' + fmtPrice(r.hi)
         : '—';
       const barW  = r.impact != null ? Math.round(Math.abs(r.impact)/maxImp*100) : 0;
       const barClr = r.impact != null && r.impact >= 0 ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
-      return `<tr>
+      return `<tr data-pair="${r.label}">
         <td><span class="sym">${r.label}</span></td>
-        <td>${fmtPrice(r.close)}</td>
-        <td class="col-prev-close">${fmtPrice(r.open)}</td>
-        <td class="${iCls}">${fmt2(r.impact)}</td>
-        <td class="${pctClass(r.imp1w)}">${r.imp1w != null ? fmt2(r.imp1w) : '—'}</td>
+        <td data-cell="close">${fmtPrice(r.close)}</td>
+        <td class="col-prev-close" data-cell="open">${fmtPrice(r.open)}</td>
+        <td class="${iCls}" data-cell="impact">${fmt2(r.impact)}</td>
+        <td class="${pctClass(r.imp1w)}" data-cell="imp1w">${r.imp1w != null ? fmt2(r.imp1w) : '—'}</td>
         <td><div class="imp-wrap" title="${fmt2(r.impact)} vs peers">
-          <div class="imp-bar-bg"><div class="imp-bar-fill" style="width:${barW}%;background:${barClr}"></div></div>
+          <div class="imp-bar-bg"><div class="imp-bar-fill" data-cell="bar" style="width:${barW}%;background:${barClr}"></div></div>
         </div></td>
-        <td style="font-size:9px;color:var(--text3)">${rng}</td>
+        <td style="font-size:9px;color:var(--text3)" data-cell="rng">${rng}</td>
       </tr>`;
     }).join('');
 
@@ -819,12 +819,13 @@
       const fillW = Math.round(Math.abs(s.pct) / maxAbsPct * 100);
       const row   = document.createElement('div');
       row.className = 'hm-rank-row';
+      row.dataset.rankCcy = s.ccy;
       row.innerHTML = `
         <div class="hm-rank-ccy${isHL?' hl':''}">${s.ccy}</div>
         <div class="hm-rank-bg">
           <div class="hm-rank-fill ${cls}" style="width:0" data-w="${fillW}"></div>
         </div>
-        <div class="hm-rank-val ${pctClass(s.pct)}">${fmt2(s.pct)}</div>`;
+        <div class="hm-rank-val ${pctClass(s.pct)}" data-rank-val>${fmt2(s.pct)}</div>`;
       container.appendChild(row);
     });
     // Animate bars after paint
@@ -860,12 +861,13 @@
         const fillW = Math.round(Math.abs(s.pct) / maxAbs1w * 100);
         const row   = document.createElement('div');
         row.className = 'hm-rank-row';
+        row.dataset.rankCcy = s.ccy;
         row.innerHTML = `
           <div class="hm-rank-ccy${isHL?' hl':''}">${s.ccy}</div>
           <div class="hm-rank-bg">
             <div class="hm-rank-fill ${cls}" style="width:0" data-w="${fillW}"></div>
           </div>
-          <div class="hm-rank-val ${pctClass(s.pct)}">${fmt2(s.pct)}</div>`;
+          <div class="hm-rank-val ${pctClass(s.pct)}" data-rank-val>${fmt2(s.pct)}</div>`;
         cont1w.appendChild(row);
       });
       requestAnimationFrame(() => {
@@ -1220,19 +1222,19 @@
         if (rowCcy === colCcy) {
           // Diagonal: absolute composite strength
           const abs = pctMap[rowCcy] ?? 0;
-          return `<td class="diag" title="${rowCcy} composite: ${corrFmt(abs)}">${corrFmt(abs)}</td>`;
+          return `<td class="diag" data-diag="${rowCcy}" title="${rowCcy} composite: ${corrFmt(abs)}">${corrFmt(abs)}</td>`;
         }
         const diff = (pctMap[rowCcy] ?? 0) - (pctMap[colCcy] ?? 0);
         const cls  = corrCellClass(diff);
         const focalCls = (isFocalRow || colCcy === ccy) ? ' corr-cell-focal' : '';
-        return `<td class="${cls}${focalCls}" title="${rowCcy} vs ${colCcy}: ${corrFmt(diff)}">${corrFmt(diff)}</td>`;
+        return `<td class="${cls}${focalCls}" data-r="${rowCcy}" data-c="${colCcy}" title="${rowCcy} vs ${colCcy}: ${corrFmt(diff)}">${corrFmt(diff)}</td>`;
       }).join('');
 
       // Comp. column (row composite)
       const rowComp = pctMap[rowCcy] ?? 0;
       const compCls = corrCellClass(rowComp);
       const compFocalCls = isFocalRow ? ' corr-cell-focal' : '';
-      const compCell = `<td class="${compCls} comp-col${compFocalCls}" style="font-weight:700" title="${rowCcy} composite vs G8 peers: ${corrFmt(rowComp)}">${corrFmt(rowComp)}</td>`;
+      const compCell = `<td class="${compCls} comp-col${compFocalCls}" data-comp-row="${rowCcy}" style="font-weight:700" title="${rowCcy} composite vs G8 peers: ${corrFmt(rowComp)}">${corrFmt(rowComp)}</td>`;
 
       return `<tr><td class="row-head${isFocalRow ? ' focal' : ''}">${rowCcy}</td>${cells}${compCell}</tr>`;
     }).join('');
@@ -1242,7 +1244,7 @@
       const cv  = pctMap[colCcy] ?? 0;
       const cls = corrCellClass(cv);
       const focalCls = colCcy === ccy ? ' corr-cell-focal' : '';
-      return `<td class="${cls}${focalCls}" style="font-weight:700" title="${colCcy} composite vs G8 peers: ${corrFmt(cv)}">${corrFmt(cv)}</td>`;
+      return `<td class="${cls}${focalCls}" data-comp-col="${colCcy}" style="font-weight:700" title="${colCcy} composite vs G8 peers: ${corrFmt(cv)}">${corrFmt(cv)}</td>`;
     }).join('');
     const footRow = `<tr class="comp-row"><td class="row-head focal" style="font-size:9px">Comp.</td>${footCells}<td class="diag" style="font-size:9px">—</td></tr>`;
 
@@ -1300,7 +1302,7 @@
         <div style="font-size:11px;font-weight:600;color:var(--text);width:70px;padding-top:1px">${d.label}</div>
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:11px;font-weight:600" class="${cls}">${fmt2(d.impact)}</span>
+            <span style="font-size:11px;font-weight:600" class="${cls}" data-driver-idx="${i}">${fmt2(d.impact)}</span>
             <span style="font-size:11px;color:var(--text2,#787b86)">vs ${d.opp}</span>
           </div>
           ${noteEl}
@@ -1776,7 +1778,214 @@
     if (footerEl) footerEl.textContent = footerLabel;
   }
 
-  // ── _hmRefreshIfOpen — called by dashboard.js populateHeatmap() on every RT update ──
+  // ── _updateBreakdownRT — flash-free in-place update for the Breakdown tab ──────────
+  // Called by _hmRefreshIfOpen on every Finnhub tick instead of full populateBreakdown().
+  // Updates only textContent/className/style on already-rendered DOM nodes.
+  // Falls back to full populateBreakdown() if the DOM structure is stale (e.g. ccy changed).
+  function _updateBreakdownRT(ccy, strengths, rtCache) {
+    const tbody = document.getElementById('hm-pair-tbody');
+    if (!tbody || tbody.children.length === 0) {
+      populateMetrics(ccy, strengths, rtCache);
+      populateBreakdown(ccy, strengths, rtCache);
+      return;
+    }
+
+    // Re-compute impacts (same logic as populateBreakdown but no DOM rebuild)
+    const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
+    const impacts = [];
+    myPairs.forEach(p => {
+      const d = rtCache[p.id];
+      const isCcyBase = p.base === ccy;
+      const opp = isCcyBase ? p.quote : p.base;
+      const rawPct = d?.pct ?? null;
+      const impact = rawPct != null ? rawPct * p.sign * (isCcyBase ? 1 : -1) : null;
+      const raw1w  = d?.pct1w ?? null;
+      const imp1w  = raw1w != null ? raw1w * p.sign * (isCcyBase ? 1 : -1) : null;
+      const close  = isCcyBase ? (d?.close ?? null) : (d?.close != null ? 1/d.close : null);
+      const open   = isCcyBase ? (d?.open  ?? null) : (d?.open  != null ? 1/d.open  : null);
+      const hi     = isCcyBase ? (d?.high  ?? null) : (d?.high  != null ? 1/d.high  : null);
+      const lo     = isCcyBase ? (d?.low   ?? null) : (d?.low   != null ? 1/d.low   : null);
+      const label  = isCcyBase ? (p.base+'/'+p.quote) : (p.quote+'/'+p.base);
+      impacts.push({ label, opp, close, open, hi, lo, impact, rawPct, imp1w });
+    });
+    impacts.sort((a,b) => (b.impact??-99) - (a.impact??-99));
+    const maxImp = Math.max(...impacts.map(i => Math.abs(i.impact ?? 0)), 0.001);
+
+    // Check if sort order changed — if so, fall back to full render
+    const rows = Array.from(tbody.querySelectorAll('tr[data-pair]'));
+    const currentOrder = rows.map(r => r.dataset.pair);
+    const newOrder = impacts.map(r => r.label);
+    if (currentOrder.join(',') !== newOrder.join(',')) {
+      populateMetrics(ccy, strengths, rtCache);
+      populateBreakdown(ccy, strengths, rtCache);
+      return;
+    }
+
+    // In-place update only — no innerHTML touches
+    impacts.forEach(r => {
+      const row = tbody.querySelector(`tr[data-pair="${r.label}"]`);
+      if (!row) return;
+      const iCls   = pctClass(r.impact);
+      const barW   = r.impact != null ? Math.round(Math.abs(r.impact)/maxImp*100) : 0;
+      const barClr = r.impact != null && r.impact >= 0 ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
+      const rng    = (r.hi != null && r.lo != null) ? fmtPrice(r.lo) + ' – ' + fmtPrice(r.hi) : '—';
+
+      const closeCell  = row.querySelector('[data-cell="close"]');
+      const openCell   = row.querySelector('[data-cell="open"]');
+      const impactCell = row.querySelector('[data-cell="impact"]');
+      const imp1wCell  = row.querySelector('[data-cell="imp1w"]');
+      const barFill    = row.querySelector('[data-cell="bar"]');
+      const rngCell    = row.querySelector('[data-cell="rng"]');
+
+      if (closeCell)  closeCell.textContent  = fmtPrice(r.close);
+      if (openCell)   openCell.textContent   = fmtPrice(r.open);
+      if (impactCell) { impactCell.textContent = fmt2(r.impact); impactCell.className = iCls; }
+      if (imp1wCell)  { imp1wCell.textContent  = r.imp1w != null ? fmt2(r.imp1w) : '—'; imp1wCell.className = pctClass(r.imp1w); }
+      if (barFill)    { barFill.style.width = barW + '%'; barFill.style.background = barClr; }
+      if (rngCell)    rngCell.textContent   = rng;
+    });
+
+    // Update metrics header (already in-place — populateMetrics uses textContent throughout)
+    populateMetrics(ccy, strengths, rtCache);
+
+    // Update day% ranking in-place
+    const container = document.getElementById('hm-ranking-rows');
+    if (container) {
+      const sorted    = [...strengths].sort((a,b) => b.pct - a.pct);
+      const maxAbsPct = Math.max(...sorted.map(s => Math.abs(s.pct)), 0.001);
+      sorted.forEach(s => {
+        const rankRow = container.querySelector(`[data-rank-ccy="${s.ccy}"]`);
+        if (!rankRow) return;
+        const fillEl = rankRow.querySelector('.hm-rank-fill');
+        const valEl  = rankRow.querySelector('[data-rank-val]');
+        const fillW  = Math.round(Math.abs(s.pct) / maxAbsPct * 100);
+        const cls    = (s.ccy === ccy) ? 'hl' : pctClass(s.pct);
+        if (fillEl) { fillEl.style.width = fillW + '%'; fillEl.className = 'hm-rank-fill ' + cls; }
+        if (valEl)  { valEl.textContent = fmt2(s.pct); valEl.className = 'hm-rank-val ' + pctClass(s.pct); }
+      });
+    }
+
+    // Update 1W ranking in-place
+    const cont1w = document.getElementById('hm-ranking-1w-rows');
+    if (cont1w && cont1w.querySelector('[data-rank-ccy]')) {
+      const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+      const w1map = {};
+      ccys.forEach(c => { w1map[c] = { sum: 0, n: 0 }; });
+      PAIR_DEFS.forEach(p => {
+        const d = rtCache[p.id];
+        if (!d || d.pct1w == null) return;
+        const v = d.pct1w * p.sign;
+        w1map[p.base].sum += v; w1map[p.base].n++;
+        w1map[p.quote].sum -= v; w1map[p.quote].n++;
+      });
+      const w1strengths = ccys.map(c => ({ ccy: c, pct: w1map[c].n > 0 ? w1map[c].sum / w1map[c].n : null })).filter(s => s.pct != null);
+      const maxAbs1w = Math.max(...w1strengths.map(s => Math.abs(s.pct)), 0.001);
+      w1strengths.forEach(s => {
+        const rankRow = cont1w.querySelector(`[data-rank-ccy="${s.ccy}"]`);
+        if (!rankRow) return;
+        const fillEl = rankRow.querySelector('.hm-rank-fill');
+        const valEl  = rankRow.querySelector('[data-rank-val]');
+        const fillW  = Math.round(Math.abs(s.pct) / maxAbs1w * 100);
+        const cls    = (s.ccy === ccy) ? 'hl' : pctClass(s.pct);
+        if (fillEl) { fillEl.style.width = fillW + '%'; fillEl.className = 'hm-rank-fill ' + cls; }
+        if (valEl)  { valEl.textContent = fmt2(s.pct); valEl.className = 'hm-rank-val ' + pctClass(s.pct); }
+      });
+    }
+  }
+
+  // ── _updateCorrelationsRT — flash-free in-place update for the Correlations tab ──
+  // Updates only cell values/classes in the already-rendered corr matrix.
+  // Falls back to full populateCorrelations() if the table is missing (shouldn't happen).
+  function _updateCorrelationsRT(ccy, strengths, rtCache) {
+    const matrix = document.getElementById('hm-corr-matrix');
+    if (!matrix || !matrix.querySelector('[data-r]')) {
+      populateCorrelations(ccy, strengths, rtCache);
+      return;
+    }
+
+    // Re-compute pctMap
+    const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+    const pctMap = {};
+    ccys.forEach(c => { pctMap[c] = null; });
+    strengths.forEach(s => { pctMap[s.ccy] = s.pct; });
+
+    function corrFmt(v) {
+      if (v == null) return '—';
+      if (Math.abs(v) < 0.005) return '0';
+      return (v > 0 ? '+' : '') + v.toFixed(2);
+    }
+    function corrCellClass(diff) {
+      if (diff == null) return 'corr-cell-flat';
+      if (diff >=  0.40) return 'corr-cell-pos-hi';
+      if (diff >=  0.06) return 'corr-cell-pos';
+      if (diff <= -0.40) return 'corr-cell-neg-hi';
+      if (diff <= -0.06) return 'corr-cell-neg';
+      return 'corr-cell-flat';
+    }
+
+    // Update body cells
+    matrix.querySelectorAll('td[data-r][data-c]').forEach(td => {
+      const r = td.dataset.r, c = td.dataset.c;
+      const diff = (pctMap[r] ?? 0) - (pctMap[c] ?? 0);
+      const focalCls = (r === ccy || c === ccy) ? ' corr-cell-focal' : '';
+      td.className = corrCellClass(diff) + focalCls;
+      td.textContent = corrFmt(diff);
+      td.title = `${r} vs ${c}: ${corrFmt(diff)}`;
+    });
+
+    // Update diagonal cells
+    matrix.querySelectorAll('td[data-diag]').forEach(td => {
+      const r = td.dataset.diag;
+      const abs = pctMap[r] ?? 0;
+      td.textContent = corrFmt(abs);
+      td.title = `${r} composite: ${corrFmt(abs)}`;
+    });
+
+    // Update Comp. column cells (row composites)
+    matrix.querySelectorAll('td[data-comp-row]').forEach(td => {
+      const r = td.dataset.compRow;
+      const v = pctMap[r] ?? 0;
+      const focalCls = r === ccy ? ' corr-cell-focal' : '';
+      td.className = corrCellClass(v) + ' comp-col' + focalCls;
+      td.textContent = corrFmt(v);
+      td.title = `${r} composite vs G8 peers: ${corrFmt(v)}`;
+    });
+
+    // Update footer cells (column composites)
+    matrix.querySelectorAll('td[data-comp-col]').forEach(td => {
+      const c = td.dataset.compCol;
+      const v = pctMap[c] ?? 0;
+      const focalCls = c === ccy ? ' corr-cell-focal' : '';
+      td.className = corrCellClass(v) + focalCls;
+      td.textContent = corrFmt(v);
+      td.title = `${c} composite vs G8 peers: ${corrFmt(v)}`;
+    });
+
+    // Update top-3 drivers in-place (just the pct values, no layout change)
+    const driversEl = document.getElementById('hm-drivers');
+    if (driversEl) {
+      const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
+      const driven  = [];
+      myPairs.forEach(p => {
+        const d = rtCache[p.id];
+        if (!d || d.pct == null) return;
+        const impact = d.pct * p.sign * (p.base === ccy ? 1 : -1);
+        const opp    = p.base === ccy ? p.quote : p.base;
+        const label  = p.base === ccy ? (p.base+'/'+p.quote) : (p.quote+'/'+p.base);
+        driven.push({ label, opp, impact });
+      });
+      driven.sort((a,b) => Math.abs(b.impact) - Math.abs(a.impact));
+      driven.slice(0,3).forEach((d,i) => {
+        const pctEl = driversEl.querySelector(`[data-driver-idx="${i}"]`);
+        if (pctEl) {
+          pctEl.textContent = fmt2(d.impact);
+          pctEl.className   = pctClass(d.impact);
+        }
+      });
+    }
+  }
+
+    // ── _hmRefreshIfOpen — called by dashboard.js populateHeatmap() on every RT update ──
   // Refreshes whichever tab is currently active without closing/reopening the modal.
   // Only runs when the modal is actually visible — no-op otherwise.
   // This is the mechanism that makes the modal update in real time from Finnhub ticks.
@@ -1791,18 +2000,20 @@
     // Update source labels in header and footer
     _updateModalSourceLabels();
 
-    // Refresh the active tab — find which panel is currently visible
+    // Refresh the active tab with flash-free in-place updates
     const activeTab = document.querySelector('.hm-tab.on');
     if (!activeTab) return;
     const tabId = activeTab.dataset.tab;
 
     if (tabId === 'breakdown') {
-      populateMetrics(_ccy, _strengths, _rtCache);
-      populateBreakdown(_ccy, _strengths, _rtCache);
+      // In-place update — no innerHTML rebuild, no flash
+      _updateBreakdownRT(_ccy, _strengths, _rtCache);
     } else if (tabId === 'session') {
+      // Session data is from session_high/low (changes slowly) — full render acceptable
       populateSession(_ccy, _rtCache);
     } else if (tabId === 'correlations') {
-      populateCorrelations(_ccy, _strengths, _rtCache);
+      // In-place update — only cell values/classes, no table rebuild
+      _updateCorrelationsRT(_ccy, _strengths, _rtCache);
     }
     // CSI tab uses historical OHLC data only — no RT refresh needed
   };
