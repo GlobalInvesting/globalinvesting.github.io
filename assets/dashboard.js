@@ -3158,13 +3158,13 @@ function _lwUpdateTodayBar() {
   if (!_lwCandleSeries || !_lwActiveOhlcId) return;
 
   // H1/H4 live partial-bar update
-  // H1/H4 bars come from static JSON files written once per day (01:30 UTC workflow).
-  // The JSON has no bar for the current session / current partial H1 block.
+  // H1/H4 bars come from static JSON files updated every hour Mon–Fri (:30 UTC).
+  // The JSON gap is at most 1 H1 period. The partial bar is the current incomplete block.
   // We build a live partial bar from STOOQ_RT_CACHE:
   //   time  = unix timestamp of the start of the current H1 or H4 UTC block
-  //   open  = prev_close from cache (best available session-open proxy)
-  //   high  = session_high (21:00 UTC FX boundary) with fallback to dayHigh
-  //   low   = session_low  (21:00 UTC FX boundary) with fallback to dayLow
+  //   open  = close of the last completed H1/H4 bar in the JSON (Bloomberg standard)
+  //   high  = running block high since block start (resets at block boundary)
+  //   low   = running block low since block start (resets at block boundary)
   //   close = live close from cache (Finnhub tick or yfinance 5-min poll)
   // LightweightCharts.update() appends or replaces only the current block's bar --
   // it never touches earlier completed bars. Completely safe.
@@ -3209,8 +3209,24 @@ function _lwUpdateTodayBar() {
     const _o = (_lwLastIntradayBarClose != null && _lwLastIntradayBarClose > 0)
       ? _lwLastIntradayBarClose
       : _c;
-    const _h2 = Math.max(_rt.session_high ?? _rt.high ?? _c, _o, _c);
-    const _l2 = Math.min(_rt.session_low  ?? _rt.low  ?? _c, _o, _c);
+
+    // ── Per-block H/L tracking (Bloomberg standard for live partial bars) ──────
+    // session_high/session_low span the full 21:00 UTC trading session — using them
+    // for the current H1/H4 block would show the day's full range on the partial bar,
+    // which is structurally incorrect (a 14:00–15:00 bar showing the 05:00 session high).
+    // Instead, maintain running block H/L that resets at every block boundary.
+    if (_lwBlockTs !== _blockTs) {
+      // Block has rolled over — reset tracking to the current price at the rollover point.
+      // Use session_high/low only as a seed when we have no prior ticks for this block.
+      _lwBlockHigh = _c;
+      _lwBlockLow  = _c;
+      _lwBlockTs   = _blockTs;
+    }
+    // Always update running H/L with the latest tick
+    _lwBlockHigh = Math.max(_lwBlockHigh ?? _c, _o, _c);
+    _lwBlockLow  = Math.min(_lwBlockLow  ?? _c, _o, _c);
+    const _h2 = _lwBlockHigh;
+    const _l2 = _lwBlockLow;
     if (!(_h2 > 0 && _l2 > 0 && _h2 >= _l2)) return;
 
     const _liveBar = { time: _blockTs, open: _o, high: _h2, low: _l2, close: _c };
@@ -3311,15 +3327,14 @@ let _lwCompareId     = null;  // ohlcId of the compared symbol
 // so _lwUpdateTodayBar() can use it without the bars array being in scope.
 let _lwLastIntradayBarClose = null; // set by _renderLWChart for H1/H4, null for D1+
 
-// CF Worker REST endpoint for H1/H4 gap bar fetching (Finnhub forex/candle proxy).
-// Evaluated lazily at call time — fx-websocket.js loads with `defer` so
-// FX_PROXY_WS_URL is not yet defined when dashboard.js first executes.
-function _getLWCandlesBase() {
-  if (typeof FX_PROXY_WS_URL === 'string' && FX_PROXY_WS_URL) {
-    return FX_PROXY_WS_URL.replace(/^wss?:\/\//, 'https://').replace(/\/ws$/, '');
-  }
-  return '';
-}
+// Per-block H/L tracking for H1/H4 live partial bar (Bloomberg standard).
+// H1/H4 live bar H/L must reflect only the CURRENT incomplete block's tick range,
+// not the full session high/low (which spans the entire 21:00 UTC trading session).
+// These globals are reset whenever the block boundary changes and updated on every
+// Finnhub tick or yfinance poll — producing the correct intrabar range at all times.
+let _lwBlockHigh      = null; // running high within the current H1/H4 block
+let _lwBlockLow       = null; // running low within the current H1/H4 block
+let _lwBlockTs        = null; // unix ts of the current block start (detects rollovers)
 
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
@@ -3353,71 +3368,6 @@ async function _renderLWChart(ohlcId, label) {
   let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
 
-  // ── H1/H4 gap-bar fill via Finnhub candle proxy ───────────────────────────
-  // The OHLC workflow runs once per day at ~22:30 UTC. Between runs, completed
-  // H1/H4 bars accumulate that are not in the JSON. _lwUpdateTodayBar() only
-  // injects the current in-progress block — up to ~22 completed H1 bars can be
-  // missing at peak gap (22:29 UTC). This block fetches those missing bars from
-  // the Cloudflare Worker's /candles endpoint (Finnhub forex/candle REST proxy).
-  //
-  // Only fetches for FX pairs — non-FX instruments (SPX, Gold, DXY, etc.) use
-  // native D1 bars and don't have intraday JSON files.
-  //
-  // Gap detection: if the last JSON bar timestamp is older than the start of the
-  // current H1 block, there is at least one missing completed bar.
-  //
-  // Fallback: if the Worker is unavailable or returns an error, bars from the
-  // JSON are used as-is. The chart still loads correctly — the gap is just empty.
-  const _LW_CANDLES_BASE = _getLWCandlesBase();
-  if (_isIntradayTf && _LW_CANDLES_BASE && _LW_FX_IDS.has(ohlcId)) {
-    try {
-      const _nowTs   = Math.floor(Date.now() / 1000);
-      const _lastTs  = bars[bars.length - 1]?.time ?? 0;
-      const _res     = _activeTf === 'H1' ? 60 : 240;   // minutes
-      const _resSec  = _res * 60;
-
-      // Start of the current in-progress block (floor to _resSec boundary)
-      const _curBlock  = Math.floor(_nowTs / _resSec) * _resSec;
-      // from = last JSON bar timestamp (Finnhub range is inclusive on from,
-      //        but we'll deduplicate below by filtering ts > _lastTs)
-      // to   = start of in-progress block (exclusive — don't include live bar)
-      const _gapFrom = _lastTs;
-      const _gapTo   = _curBlock;
-
-      // Only call if there's actually a gap (at least one full bar period elapsed)
-      if (_gapTo > _gapFrom + _resSec) {
-        const _candleUrl = `${_LW_CANDLES_BASE}/candles?id=${encodeURIComponent(ohlcId)}&resolution=${_res}&from=${_gapFrom}&to=${_gapTo}`;
-        const _cr = await fetch(_candleUrl, { signal: AbortSignal.timeout(5000) });
-        if (_cr.ok) {
-          const _cd = await _cr.json();
-          if (Array.isArray(_cd.bars) && _cd.bars.length > 0) {
-            // Merge: deduplicate by ts (keep JSON bars, append only truly new ones)
-            const _existingTs = new Set(bars.map(b => b.time));
-            const _decGap = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
-                              eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
-                              gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
-                              audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3 }[ohlcId] ?? 5;
-            for (const gb of _cd.bars) {
-              if (!_existingTs.has(gb.time) && gb.time > _lastTs && gb.time < _curBlock) {
-                bars.push({
-                  time:  gb.time,
-                  open:  parseFloat(gb.open.toFixed(_decGap)),
-                  high:  parseFloat(gb.high.toFixed(_decGap)),
-                  low:   parseFloat(gb.low.toFixed(_decGap)),
-                  close: parseFloat(gb.close.toFixed(_decGap)),
-                });
-              }
-            }
-            // Re-sort (Finnhub bars should already be sorted, but enforce it)
-            bars.sort((a, b) => a.time - b.time);
-          }
-        }
-      }
-    } catch (_gapErr) {
-      // Non-fatal: chart continues with JSON bars only
-      console.warn('[LWChart] Gap-bar fetch failed (non-fatal):', _gapErr.message);
-    }
-  }
 
   // ── W1/MN aggregation from D1 bars ───────────────────────────────────────────
   // For W1: group D1 bars by ISO week Monday. For MN: group by YYYY-MM-01.
@@ -3770,6 +3720,11 @@ async function _renderLWChart(ohlcId, label) {
   } else {
     _lwLastIntradayBarClose = null;
   }
+  // Reset per-block H/L on every chart load — the block tracking starts fresh
+  // from the first tick received, ensuring clean state after TF or symbol changes.
+  _lwBlockHigh = null;
+  _lwBlockLow  = null;
+  _lwBlockTs   = null;
 
 
   // Uses separate priceScaleId 'volume' pinned to bottom 20% — clean Bloomberg-style presentation
@@ -3870,7 +3825,7 @@ async function _renderLWChart(ohlcId, label) {
   // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated).
   // For D1/W1/MN: _lwBuildTodayBar() constructs the bar.
   // For H1/H4: _lwUpdateTodayBar() handles the live partial-bar injection directly
-  //            (block-aligned unix timestamp + session_high/low from STOOQ_RT_CACHE).
+  //            (block-aligned unix timestamp + per-block running H/L from ticks).
   // todayBar hoisted to function scope — referenced further below for lastBar calculation
   // regardless of TF. For H1/H4 it stays null (live bar pushed via _lwUpdateTodayBar).
   let todayBar = null;
