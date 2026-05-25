@@ -3129,7 +3129,27 @@ function _lwBuildTodayBar(ohlcId) {
   // chart clean and avoid confusing "no change" labels.)
   if (isFxBar && o === h && h === l && l === c) return null;
 
-  return { time: dateStr, open: o, high: h, low: l, close: c };
+  // ── W1/MN period-key alignment ────────────────────────────────────────────
+  // W1 and MN bars are aggregated from D1 bars and keyed by ISO Monday
+  // (YYYY-MM-DD of Monday) and month start (YYYY-MM-01) respectively.
+  // dateStr above is a daily date (YYYY-MM-DD). If we pass it as-is to
+  // LWC update(), it won't match any existing aggregated bar and LWC will
+  // append a new orphan candle instead of updating the current period.
+  // Fix: remap dateStr to the period key that the aggregation uses.
+  let barTime = dateStr;
+  if (_lwActiveTf === 'W1') {
+    // ISO Monday of dateStr's week
+    const _d = new Date(dateStr + 'T00:00:00Z');
+    const _dow = _d.getUTCDay() || 7; // Mon=1 … Sun=7
+    const _mon = new Date(_d);
+    _mon.setUTCDate(_d.getUTCDate() - (_dow - 1));
+    barTime = _mon.toISOString().slice(0, 10);
+  } else if (_lwActiveTf === 'MN') {
+    // Month start key: YYYY-MM-01
+    barTime = dateStr.slice(0, 7) + '-01';
+  }
+
+  return { time: barTime, open: o, high: h, low: l, close: c };
 }
 
 // Push/update the live today-bar on the active LW chart (called every 5 min).
@@ -3291,6 +3311,14 @@ let _lwCompareId     = null;  // ohlcId of the compared symbol
 // so _lwUpdateTodayBar() can use it without the bars array being in scope.
 let _lwLastIntradayBarClose = null; // set by _renderLWChart for H1/H4, null for D1+
 
+// CF Worker REST endpoint for H1/H4 gap bar fetching (Finnhub forex/candle proxy).
+// Same Worker as the WebSocket proxy — just a different path.
+// Set to '' to disable gap-bar fetching (fallback: only JSON bars displayed).
+// Derived from FX_PROXY_WS_URL when that constant is defined (fx-websocket.js loads first).
+const _LW_CANDLES_BASE = (typeof FX_PROXY_WS_URL === 'string' && FX_PROXY_WS_URL)
+  ? FX_PROXY_WS_URL.replace(/^wss?:\/\//, 'https://').replace(/\/ws$/, '')
+  : '';
+
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
   const wrap = document.getElementById('tv-chart-wrap');
@@ -3322,6 +3350,71 @@ async function _renderLWChart(ohlcId, label) {
   if (!r.ok) throw new Error('HTTP ' + r.status);
   let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
+
+  // ── H1/H4 gap-bar fill via Finnhub candle proxy ───────────────────────────
+  // The OHLC workflow runs once per day at ~22:30 UTC. Between runs, completed
+  // H1/H4 bars accumulate that are not in the JSON. _lwUpdateTodayBar() only
+  // injects the current in-progress block — up to ~22 completed H1 bars can be
+  // missing at peak gap (22:29 UTC). This block fetches those missing bars from
+  // the Cloudflare Worker's /candles endpoint (Finnhub forex/candle REST proxy).
+  //
+  // Only fetches for FX pairs — non-FX instruments (SPX, Gold, DXY, etc.) use
+  // native D1 bars and don't have intraday JSON files.
+  //
+  // Gap detection: if the last JSON bar timestamp is older than the start of the
+  // current H1 block, there is at least one missing completed bar.
+  //
+  // Fallback: if the Worker is unavailable or returns an error, bars from the
+  // JSON are used as-is. The chart still loads correctly — the gap is just empty.
+  if (_isIntradayTf && _LW_CANDLES_BASE && _LW_FX_IDS.has(ohlcId)) {
+    try {
+      const _nowTs   = Math.floor(Date.now() / 1000);
+      const _lastTs  = bars[bars.length - 1]?.time ?? 0;
+      const _res     = _activeTf === 'H1' ? 60 : 240;   // minutes
+      const _resSec  = _res * 60;
+
+      // Start of the current in-progress block (floor to _resSec boundary)
+      const _curBlock  = Math.floor(_nowTs / _resSec) * _resSec;
+      // from = last JSON bar timestamp (Finnhub range is inclusive on from,
+      //        but we'll deduplicate below by filtering ts > _lastTs)
+      // to   = start of in-progress block (exclusive — don't include live bar)
+      const _gapFrom = _lastTs;
+      const _gapTo   = _curBlock;
+
+      // Only call if there's actually a gap (at least one full bar period elapsed)
+      if (_gapTo > _gapFrom + _resSec) {
+        const _candleUrl = `${_LW_CANDLES_BASE}/candles?id=${encodeURIComponent(ohlcId)}&resolution=${_res}&from=${_gapFrom}&to=${_gapTo}`;
+        const _cr = await fetch(_candleUrl, { signal: AbortSignal.timeout(5000) });
+        if (_cr.ok) {
+          const _cd = await _cr.json();
+          if (Array.isArray(_cd.bars) && _cd.bars.length > 0) {
+            // Merge: deduplicate by ts (keep JSON bars, append only truly new ones)
+            const _existingTs = new Set(bars.map(b => b.time));
+            const _decGap = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
+                              eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
+                              gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
+                              audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3 }[ohlcId] ?? 5;
+            for (const gb of _cd.bars) {
+              if (!_existingTs.has(gb.time) && gb.time > _lastTs && gb.time < _curBlock) {
+                bars.push({
+                  time:  gb.time,
+                  open:  parseFloat(gb.open.toFixed(_decGap)),
+                  high:  parseFloat(gb.high.toFixed(_decGap)),
+                  low:   parseFloat(gb.low.toFixed(_decGap)),
+                  close: parseFloat(gb.close.toFixed(_decGap)),
+                });
+              }
+            }
+            // Re-sort (Finnhub bars should already be sorted, but enforce it)
+            bars.sort((a, b) => a.time - b.time);
+          }
+        }
+      }
+    } catch (_gapErr) {
+      // Non-fatal: chart continues with JSON bars only
+      console.warn('[LWChart] Gap-bar fetch failed (non-fatal):', _gapErr.message);
+    }
+  }
 
   // ── W1/MN aggregation from D1 bars ───────────────────────────────────────────
   // For W1: group D1 bars by ISO week Monday. For MN: group by YYYY-MM-01.
