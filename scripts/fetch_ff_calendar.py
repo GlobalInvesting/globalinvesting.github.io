@@ -1,18 +1,8 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.7
+fetch_ff_calendar.py — v3.6
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
-
-v3.7 changes (2026-05-25):
-- fetch_market_holidays(): new function that calls Finnhub /stock/market-holiday
-  for each of 6 G8 exchanges (US/NYSE, TO/TSX, L/LSE, T/TSE, AX/ASX, NZ/NZX)
-  and writes a `holidays` array to ff_calendar.json alongside `events`.
-  Each entry: {dateISO, label, currencies}. Only full-day closures (tradingHours
-  == "closed") are included; early-close/partial sessions are excluded.
-  calendar-panel.js merges these live holidays into its lookup table on load,
-  overriding the hardcoded 2026 fallback for dates within the JSON window.
-- Output schema: added top-level `holidays` key to ff_calendar.json.
 
 v3.6 changes (2026-05-23):
 - Fix critical bug: FETCH_TIMEOUT was referenced in fetch_finnhub() but never
@@ -120,7 +110,6 @@ OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script write
 CALENDAR_PATH = "calendar-data/calendar.json"    # backfill — FRED + Finnhub historical (read-only)
 FINNHUB_API_KEY  = os.environ.get("FINNHUB_API_KEY", "")
 FH_BASE          = "https://finnhub.io/api/v1/calendar/economic"
-FH_HOLIDAY_BASE  = "https://finnhub.io/api/v1/stock/market-holiday"
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FH_RATE_SLEEP    = 0.6   # seconds between calls (60 req/min free tier)
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout for Finnhub API calls
@@ -612,95 +601,11 @@ def load_previous() -> tuple[list, set]:
         return [], set()
 
 
-
-# ── Market holiday fetch ───────────────────────────────────────────────────────
-# Finnhub /stock/market-holiday?exchange=<EXCHANGE> returns the official holiday
-# calendar for each primary exchange. We fetch all 8 G8 exchanges and deduplicate
-# by date, collecting the currencies affected per holiday date.
-#
-# Exchange codes: US (NYSE) · TO (TSX) · L (LSE) · T (TSE) · AX (ASX) · NZ (NZX)
-# Eurex and SIX don't have a dedicated Finnhub exchange code; EUR and CHF holidays
-# are instead derived from the US/LSE/TSX shared days (Good Friday, Christmas, etc.)
-# plus the Swiss and Eurozone-specific dates that Finnhub includes under "EU" holidays
-# via the economic calendar country field. We accept this limitation — the hardcoded
-# table in calendar-panel.js covers CHF/EUR edge cases as a front-end fallback.
-#
-# Data shape returned by Finnhub:
-#   { "exchange": "US", "timezone": "America/New_York",
-#     "data": [{"eventName": "Memorial Day", "atDate": "2026-05-25", "tradingHours": "closed"}, ...] }
-#
-# We only keep entries with tradingHours == "closed" (full-day closure).
-# Partial sessions (e.g. Christmas Eve early close) are excluded.
-
-EXCHANGE_CCY_MAP = {
-    "US": ["USD"],
-    "TO": ["CAD"],
-    "L":  ["GBP"],
-    "T":  ["JPY"],
-    "AX": ["AUD"],
-    "NZ": ["NZD"],
-}
-
-def fetch_market_holidays(date_from: str, date_to: str) -> list[dict]:
-    """
-    Fetch market holidays for G8 exchanges from Finnhub.
-    Returns list of dicts:
-        { dateISO, label, currencies, exchange }
-    where currencies is a list of G8 codes closed on that date.
-    """
-    if not FINNHUB_API_KEY:
-        return []
-
-    holidays_by_date: dict = {}  # date → {label, currencies: set, exchanges: set}
-
-    for exchange, ccys in EXCHANGE_CCY_MAP.items():
-        url = FH_HOLIDAY_BASE
-        params = {"exchange": exchange, "token": FINNHUB_API_KEY}
-        try:
-            r = requests.get(url, params=params, headers=HEADERS, timeout=FETCH_TIMEOUT)
-            if r.status_code != 200:
-                print(f"  [holidays] {exchange}: HTTP {r.status_code} — skipping")
-                continue
-            payload = r.json()
-            data = payload.get("data", []) if isinstance(payload, dict) else []
-            added = 0
-            for item in data:
-                dt = (item.get("atDate") or "").strip()[:10]  # "YYYY-MM-DD"
-                if not dt or dt < date_from or dt > date_to:
-                    continue
-                trading = (item.get("tradingHours") or "").lower()
-                if trading != "closed":
-                    continue  # skip partial sessions (early close etc.)
-                label = (item.get("eventName") or "Market Holiday").strip()
-                if dt not in holidays_by_date:
-                    holidays_by_date[dt] = {"label": label, "currencies": set(), "exchanges": set()}
-                # Prefer the more descriptive label (longer wins)
-                if len(label) > len(holidays_by_date[dt]["label"]):
-                    holidays_by_date[dt]["label"] = label
-                holidays_by_date[dt]["currencies"].update(ccys)
-                holidays_by_date[dt]["exchanges"].add(exchange)
-                added += 1
-            time.sleep(FH_RATE_SLEEP)
-            print(f"  [holidays] {exchange} ({', '.join(ccys)}): {added} closures in window")
-        except Exception as e:
-            print(f"  [holidays] {exchange}: error — {e}")
-
-    result = []
-    for dt, info in sorted(holidays_by_date.items()):
-        result.append({
-            "dateISO":    dt,
-            "label":      info["label"],
-            "currencies": sorted(info["currencies"]),
-        })
-    print(f"  [holidays] Total: {len(result)} holiday dates in [{date_from} … {date_to}]")
-    return result
-
-
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.7")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.6")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -718,9 +623,6 @@ def main():
     if not fresh:
         print("  ERROR: No events fetched — preserving previous file.")
         sys.exit(0)
-
-    # Step 1b: Fetch market holidays for G8 exchanges
-    holidays = fetch_market_holidays(date_from, date_to)
 
     released_fresh = sum(1 for e in fresh if e.get("released"))
     print(f"  Fetched: {len(fresh)} events ({released_fresh} with actuals)")
@@ -848,7 +750,6 @@ def main():
         "generated_at": now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": source,
         "events": fresh,
-        "holidays": holidays,  # [{dateISO, label, currencies}] — G8 market closures
     }
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     output_json = json.dumps(output, ensure_ascii=False, indent=2)
