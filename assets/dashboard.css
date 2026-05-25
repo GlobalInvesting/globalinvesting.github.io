@@ -1772,3 +1772,113 @@ a:focus-visible,
 .top-nav::-webkit-scrollbar {
   display: none;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ECONOMIC CALENDAR PANEL (calendar-panel.js  v1.2.0)
+   Date headers, event rows, holiday banners, jump button
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Date separator — sticky so it stays visible while scrolling */
+.cal-date-row {
+  padding: 5px 8px 3px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text3);
+  background: var(--head-bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+/* Today gets a blue left-border accent */
+.cal-date-row[data-today="1"] {
+  color: var(--blue);
+  border-left: 2px solid var(--blue);
+  padding-left: 6px;
+}
+
+/* Holiday banner — Bloomberg-style muted orange bar */
+.cal-holiday-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: color-mix(in srgb, var(--orange) 7%, var(--bg2));
+  border-left: 2px solid var(--orange);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  cursor: default;
+}
+.cal-holiday-icon {
+  font-size: 10px;
+  color: var(--orange);
+  flex-shrink: 0;
+}
+.cal-holiday-label {
+  font-size: 10px;
+  color: var(--text2);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cal-holiday-chips {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.cal-holiday-note {
+  font-size: 9px;
+  color: var(--text3);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Event row — 7-column grid matching the column headers in index.html */
+.cal-event-row {
+  display: grid;
+  grid-template-columns: 52px 52px 18px 1fr 58px 58px 58px;
+  padding: 4px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+  align-items: center;
+  min-height: 26px;
+  transition: background .1s;
+}
+.cal-event-row:hover { background: var(--bg3); }
+.cal-event-row.cal-released { opacity: .6; }
+
+/* Individual column cells */
+.cal-col {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cal-time   { color: var(--text2); }
+.cal-ccy    { color: var(--text); display: flex; align-items: center; }
+.cal-impact { display: flex; align-items: center; justify-content: center; }
+.cal-title  { color: var(--text); font-family: var(--font-ui); font-size: 10px; padding-right: 4px; }
+.cal-num    { text-align: right; }
+
+/* Impact severity dot */
+.cal-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Holiday indicator on Cross-Asset cells (injected by dashboard.js) */
+.ca-holiday-badge {
+  display: inline-block;
+  font-size: 8px;
+  color: var(--orange);
+  font-family: var(--font-ui);
+  margin-top: 1px;
+  opacity: .9;
+  white-space: nowrap;
+  font-weight: 500;
+}

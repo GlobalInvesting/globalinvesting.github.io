@@ -7203,6 +7203,72 @@ async function fetchCrossAssetData() {
     if (dcEl) { dcEl.textContent = pctStr(dxyData.pct); dcEl.className = 'q-chg ' + clsDir(dxyData.chg); }
   }
 
+  // ── Market-holiday annotation on Cross-Asset cells ──────────────────────
+  // When a market is closed due to a public holiday, quotes.json reflects the
+  // prior session's close (pct = 0.0, market_state = "CLOSED"). Bloomberg
+  // annotates these cells with a muted "Market holiday" badge so traders are
+  // not misled into thinking the instrument is flat on the day.
+  //
+  // Logic: if window._MARKET_HOLIDAYS (set by calendar-panel.js) has an entry
+  // for today AND one of the affected currencies maps to this CA cell, AND the
+  // quote's market_state is CLOSED and pct is 0.0, show the badge.
+  (function annotateHolidayCells() {
+    const todayISO = new Date().toISOString().slice(0, 10);
+    const holidays = window._MARKET_HOLIDAYS || {};
+    const todayHol = holidays[todayISO];
+    if (!todayHol) return;
+
+    // Map: ca cell id → currencies whose primary exchange closure affects this instrument
+    const CA_HOLIDAY_MAP = {
+      spx:    ['USD'], // NYSE
+      gold:   ['USD'], // CME (gold futures)
+      wti:    ['USD'], // CME (WTI futures)
+      dxy:    ['USD'], // CME
+      nikkei: ['JPY'], // TSE
+      stoxx:  ['EUR'], // Eurex
+      us10y:  ['USD'], // CME/Treasury
+    };
+
+    const quotes = (_caIntraday && _caIntraday.quotes) ? _caIntraday.quotes : {};
+
+    Object.entries(CA_HOLIDAY_MAP).forEach(([caId, ccys]) => {
+      const isHolidayForCell = ccys.some(c => todayHol.currencies.indexOf(c) !== -1);
+      if (!isHolidayForCell) return;
+
+      // Get the quote to check market_state
+      const qKey = { spx:'spx', gold:'gold', wti:'wti', dxy:'dxy',
+                     nikkei:'nikkei', stoxx:'stoxx', us10y:'us10y' }[caId];
+      const q = quotes[qKey] || {};
+      const isClosed = q.market_state === 'CLOSED' || q.market_state === 'POSTPOST' || q.market_state === 'PREPRE';
+      if (!isClosed) return;
+
+      // Add holiday badge below the change cell
+      const cEl = document.getElementById('cac-' + caId);
+      if (!cEl) return;
+      // Avoid duplicates
+      if (cEl.parentElement && cEl.parentElement.querySelector('.ca-holiday-badge')) return;
+
+      const badge = document.createElement('span');
+      badge.className = 'ca-holiday-badge';
+      badge.textContent = '\u2298 Market holiday \u00b7 prior close';
+      // Insert after the change element
+      if (cEl.nextSibling) {
+        cEl.parentElement.insertBefore(badge, cEl.nextSibling);
+      } else {
+        cEl.parentElement.appendChild(badge);
+      }
+      // Also update the ca-cell title attribute
+      const cellEl = cEl.closest('.ca-cell');
+      if (cellEl) {
+        const existing = cellEl.getAttribute('title') || '';
+        if (!existing.includes('holiday')) {
+          const label = (todayHol.labels || []).join(', ');
+          cellEl.setAttribute('title', existing + (existing ? ' \u00b7 ' : '') + label + ' \u2014 market closed \u00b7 price reflects prior close');
+        }
+      }
+    });
+  })();
+
   // BTC — intraday JSON (yfinance BTC-USD) primary, CoinGecko topbar cache fallback
   const btcEl = document.getElementById('ca-btc');
   const btcCEl = document.getElementById('cac-btc');
