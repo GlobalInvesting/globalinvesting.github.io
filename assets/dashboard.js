@@ -3312,12 +3312,14 @@ let _lwCompareId     = null;  // ohlcId of the compared symbol
 let _lwLastIntradayBarClose = null; // set by _renderLWChart for H1/H4, null for D1+
 
 // CF Worker REST endpoint for H1/H4 gap bar fetching (Finnhub forex/candle proxy).
-// Same Worker as the WebSocket proxy — just a different path.
-// Set to '' to disable gap-bar fetching (fallback: only JSON bars displayed).
-// Derived from FX_PROXY_WS_URL when that constant is defined (fx-websocket.js loads first).
-const _LW_CANDLES_BASE = (typeof FX_PROXY_WS_URL === 'string' && FX_PROXY_WS_URL)
-  ? FX_PROXY_WS_URL.replace(/^wss?:\/\//, 'https://').replace(/\/ws$/, '')
-  : '';
+// Evaluated lazily at call time — fx-websocket.js loads with `defer` so
+// FX_PROXY_WS_URL is not yet defined when dashboard.js first executes.
+function _getLWCandlesBase() {
+  if (typeof FX_PROXY_WS_URL === 'string' && FX_PROXY_WS_URL) {
+    return FX_PROXY_WS_URL.replace(/^wss?:\/\//, 'https://').replace(/\/ws$/, '');
+  }
+  return '';
+}
 
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
@@ -3366,6 +3368,7 @@ async function _renderLWChart(ohlcId, label) {
   //
   // Fallback: if the Worker is unavailable or returns an error, bars from the
   // JSON are used as-is. The chart still loads correctly — the gap is just empty.
+  const _LW_CANDLES_BASE = _getLWCandlesBase();
   if (_isIntradayTf && _LW_CANDLES_BASE && _LW_FX_IDS.has(ohlcId)) {
     try {
       const _nowTs   = Math.floor(Date.now() / 1000);
