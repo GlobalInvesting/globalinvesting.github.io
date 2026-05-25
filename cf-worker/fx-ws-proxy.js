@@ -1,5 +1,5 @@
 /**
- * fx-ws-proxy.js — Cloudflare Worker + Durable Object v1.0
+ * fx-ws-proxy.js — Cloudflare Worker + Durable Object v2.0
  *
  * WHY THIS EXISTS
  *   Finnhub's free tier allows 1 concurrent WebSocket connection per API key.
@@ -72,7 +72,7 @@ export default {
     if (url.pathname === "/" && request.method === "GET") {
       return new Response(JSON.stringify({
         worker:   "fx-ws-proxy",
-        version:  "1.0",
+        version:  "2.0",
         ts:       new Date().toISOString(),
         endpoint: "/ws  (WebSocket upgrade)",
       }), { headers: { "Content-Type": "application/json" } });
@@ -99,6 +99,134 @@ export default {
       const id    = env.FX_PROXY.idFromName("fx-proxy-singleton");
       const proxy = env.FX_PROXY.get(id);
       return proxy.fetch(request);
+    }
+
+
+    // ── /candles — Finnhub forex candle proxy for H1/H4 gap bar filling ──────
+    // GET /candles?id=eurusd&resolution=60&from=1716000000&to=1716086400
+    //
+    // Parameters:
+    //   id         — our instrument ID (e.g. "eurusd", "gbpusd")
+    //   resolution — candle resolution in minutes: 60 (H1) or 240 (H4)
+    //   from       — Unix timestamp (seconds), start of range
+    //   to         — Unix timestamp (seconds), end of range (in-progress bar excluded by client)
+    //
+    // Returns:
+    //   { bars: [{time, open, high, low, close}] }  — empty array if no data
+    //   { error: "..." }                            — on Finnhub API error
+    //
+    // Rate limit: Finnhub free tier = 60 REST req/min. This endpoint is called
+    // only on H1/H4 chart load, so load ≤ 2 calls per chart open — well within limits.
+    // Cloudflare edge cache (60s) absorbs rapid tab reloads.
+    //
+    // CORS: same origin whitelist as /ws — only globalinvesting.github.io.
+    if (url.pathname === "/candles" && request.method === "GET") {
+      const CORS_HEADERS = {
+        "Access-Control-Allow-Origin":  "https://globalinvesting.github.io",
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Max-Age":       "86400",
+      };
+
+      // Validate origin
+      const origin2 = request.headers.get("Origin") || "";
+      const allowed2 = [
+        "https://globalinvesting.github.io",
+        "http://localhost",
+        "http://127.0.0.1",
+      ];
+      if (!allowed2.some(o => origin2.startsWith(o))) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+        });
+      }
+
+      const candleId   = url.searchParams.get("id")         || "";
+      const resolution = url.searchParams.get("resolution") || "60";
+      const fromTs     = parseInt(url.searchParams.get("from") || "0", 10);
+      const toTs       = parseInt(url.searchParams.get("to")   || "0", 10);
+
+      // Only H1 (60) and H4 (240) supported
+      if (resolution !== "60" && resolution !== "240") {
+        return new Response(JSON.stringify({ error: "resolution must be 60 or 240" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+        });
+      }
+
+      // Map our ID to Finnhub OANDA symbol
+      const candlePair = FX_PAIRS.find(p => p.id === candleId);
+      if (!candlePair) {
+        return new Response(JSON.stringify({ bars: [] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+        });
+      }
+
+      if (!fromTs || !toTs || fromTs >= toTs) {
+        return new Response(JSON.stringify({ bars: [] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+        });
+      }
+
+      // Clamp range to 7 days max
+      const MAX_RANGE_S = 7 * 24 * 3600;
+      const clampedFrom = Math.max(fromTs, toTs - MAX_RANGE_S);
+
+      const apiKey = env.FINNHUB_API_KEY;
+      if (!apiKey) {
+        return new Response(JSON.stringify({ error: "no API key configured", bars: [] }), {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+        });
+      }
+
+      const finnhubUrl = `https://finnhub.io/api/v1/forex/candle?symbol=${encodeURIComponent(candlePair.finnhub)}&resolution=${resolution}&from=${clampedFrom}&to=${toTs}&token=${apiKey}`;
+
+      let fhData;
+      try {
+        const fhResp = await fetch(finnhubUrl, {
+          headers: { "User-Agent": "globalinvesting-fx-proxy/2.0" },
+        });
+        if (!fhResp.ok) {
+          return new Response(JSON.stringify({ error: `Finnhub ${fhResp.status}`, bars: [] }), {
+            status: 200,
+            headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+          });
+        }
+        fhData = await fhResp.json();
+      } catch (_fetchErr) {
+        return new Response(JSON.stringify({ error: "Finnhub fetch failed", bars: [] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+        });
+      }
+
+      // Finnhub response: { s: "ok"|"no_data", t: [...], o: [...], h: [...], l: [...], c: [...] }
+      const candleBars = [];
+      if (fhData.s === "ok" && Array.isArray(fhData.t) && fhData.t.length > 0) {
+        for (let i = 0; i < fhData.t.length; i++) {
+          const bTs = fhData.t[i];
+          const bO  = fhData.o[i];
+          const bH  = fhData.h[i];
+          const bL  = fhData.l[i];
+          const bC  = fhData.c[i];
+          if (bTs && bO > 0 && bH > 0 && bL > 0 && bC > 0) {
+            candleBars.push({ time: bTs, open: bO, high: bH, low: bL, close: bC });
+          }
+        }
+      }
+
+      return new Response(JSON.stringify({ bars: candleBars }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          // 60s edge cache absorbs rapid reloads without hitting Finnhub rate limits
+          "Cache-Control": "public, max-age=60, s-maxage=60",
+          ...CORS_HEADERS,
+        },
+      });
     }
 
     return new Response("Not found", { status: 404 });
