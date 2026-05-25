@@ -3972,7 +3972,17 @@ async function _renderLWChart(ohlcId, label) {
   // Always visible by default, toggle via PC button
   if (typeof window._lwShowPc === 'undefined') window._lwShowPc = true;
   let _prevCloseLine = null;
-  const _lastHistClose = bars.length > 1 ? bars[bars.length - 1].close : null;
+  // For D1: bars[-1] is the last completed day before strip — use its close.
+  // For W1/MN: bars[-1] is the current INCOMPLETE period (e.g. the May MN bar whose
+  // close = last D1 close in the JSON, not the true month close). The "Prev C" line
+  // should reflect the PREVIOUS completed period (e.g. April for MN), which is bars[-2].
+  // For H1/H4: _prevCloseLine is not shown (PC button is hidden for intraday TFs).
+  const _lastHistClose = (() => {
+    if (_activeTf === 'W1' || _activeTf === 'MN') {
+      return bars.length > 2 ? bars[bars.length - 2].close : null;
+    }
+    return bars.length > 1 ? bars[bars.length - 1].close : null;
+  })();
   function _applyPrevClose() {
     if (_prevCloseLine) { try { candleSeries.removePriceLine(_prevCloseLine); } catch(_) {} _prevCloseLine = null; }
     if (!window._lwShowPc || _lastHistClose == null) return;
