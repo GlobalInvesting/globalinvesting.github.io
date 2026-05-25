@@ -1,67 +1,63 @@
 {
-  "generated_at": "2026-05-22T21:03:47Z",
+  "generated_at": "2026-05-25T03:39:39Z",
   "signals": [
     {
-      "time": "17:38",
+      "time": "03:39",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical De-escalation + Hawkish Fed Pivot",
-      "text": "Reports of a nuclear understanding between the US and Iran in Tehran reduce safe-haven demand for JPY while the swearing-in of hawkish Fed Chair Kevin Warsh reinforces the USD yield advantage. The 277bp SOFR-TONA carry spread favors USD upside, and the JPY COT net short of -70,605 contracts suggests speculators are already positioned for this divergence. The next BoJ meeting (mkt: 45% hike priced) on 16 June is the primary catalyst for any JPY recovery against this hawkish Fed backdrop.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkish bias) vs RBNZ hike bias priced for May 27. Despite NZIER shadow board backing a hold at 2.25%, the market prices future hikes and a restrictive real rate deficit of -0.83%. If RBNZ delivers a hawkish hold or signals imminent tightening, short-squeeze risk is elevated as specs are crowded short (28% long). NZD/USD at 0.5874.",
       "evidence": [
-        "Sky News Arabia: Iran nuclear agreement reached",
-        "USD/JPY Friday close: 159.16",
-        "USD/JPY OIS carry: +277bp",
-        "JPY COT net short: -70,605"
+        "NZD COT LF net: -15,435",
+        "RBNZ real rate: -0.83%",
+        "NZD/USD: 0.5874"
       ],
       "_source": "gemini"
     },
     {
-      "time": "21:00",
-      "priority": "critical",
-      "title": "GBP/AUD — G8 Bilateral Theme + Monetary Divergence",
-      "text": "GBP outperformance (+0.587% avg) against AUD weakness (-0.989% avg) creates a 1.576% G8 spread, driven by extreme crowded long positioning in AUD. AUD COT LF long +55,794 (74.8% long) creates significant liquidation risk as the pair closed Friday at 0.7130 amid a broader commodity-linked currency sell-off. The next RBA meeting (mkt: 16% hike priced) on 16 June determines if the current hiking bias can offset this positioning overhang.",
-      "evidence": [
-        "GBP 1W avg: +0.587% (n=4)",
-        "AUD 1W avg: -0.989% (n=4)",
-        "G8 spread: 1.576%",
-        "AUD COT net long: +55,794"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "17:48",
+      "time": "03:35",
       "priority": "warning",
-      "title": "EUR/USD — ECB Growth Dilemma + Negative Carry",
-      "text": "EUR/USD closed Friday at 1.1606 as the ECB faces a conflict between persistent inflation and weakening eurozone growth, limiting the currency's recovery potential. The 157bp SOFR-ESTR carry advantage for USD and a EUR COT net short of -8,151 contracts maintain downward pressure on the pair. The next ECB meeting (mkt: 100% hold priced) on 11 June is the catalyst for resolving whether growth concerns will force a more dovish stance.",
+      "title": "USD/JPY — Geopolitical + Carry + Options",
+      "text": "USD/JPY at 158.85 supported by +278bp SOFR-TONA carry advantage. Trump headlines regarding a 'largely negotiated' Iran deal and Strait of Hormuz reopening have triggered a 5% tumble in WTI, easing safe-haven JPY demand. Options market remains cautious with 25d RR at -1.22 (moderate put skew) despite neutral VIX at 16.7. Carry dominates while 160.00 remains the intervention watch level.",
       "evidence": [
-        "EUR/USD Friday close: 1.1606",
-        "EUR/USD OIS carry: +157bp (USD lead)",
-        "EUR COT net short: -8,151"
+        "USD/JPY OIS carry: +278bp",
+        "USD/JPY 25d RR: -1.22",
+        "WTI Oil: -5% gap"
       ],
       "_source": "gemini"
     },
     {
-      "time": "21:00",
+      "time": "03:32",
       "priority": "warning",
-      "title": "NZD/USD — RBNZ Decision + Crowded Retail Longs",
-      "text": "NZD/USD faces immediate volatility as the RBNZ meeting on 27 May approaches with a 150bp carry disadvantage against the USD. Retail sentiment is extremely stretched at 71% long, creating a contrarian setup for further downside if the RBNZ fails to deliver a hawkish surprise. The NZD COT net short of -19,437 contracts aligns with the broader institutional trend toward NZD weakness.",
+      "title": "EUR/USD — Lagarde Headline + Volatility Premium",
+      "text": "EUR/USD at 1.1641 as Lagarde flags inflation forecast revisions ahead of the June 11 meeting. IV at 7.1% vs HV30 at 4.9% creates a +2.2% Vol Risk Premium, signaling the options market is pricing elevated protection relative to realized movement. Fed 3.75% vs ECB 2.00% (+175bp) carry advantage favors USD, structurally limiting upside from hawkish ECB rhetoric.",
       "evidence": [
-        "NZD/USD Friday close: 0.5851",
-        "RBNZ meeting: 27 May",
-        "Retail sentiment: 71% Long",
-        "NZD COT net short: -19,437"
+        "EUR/USD VRP: +2.2%",
+        "Fed-ECB spread: 175bp",
+        "EUR/USD: 1.1641"
       ],
       "_source": "gemini"
     },
     {
-      "time": "15:07",
+      "time": "03:28",
+      "priority": "warning",
+      "title": "AUD/USD — Positioning + Vol + Data Shock",
+      "text": "AUD/USD at 0.7166 faces late-trend exhaustion as COT LF net long reaches +57,180 (74.5% long extreme). AUD Unemployment surprise (z=+2.60σ) contradicts the RBA's hiking stance (4.35%). Options market is heavily hedging downside with a +4.9% VRP (IV 13.8% vs HV30 8.9%) and -0.79 RR skew. High-conviction long positioning is vulnerable to a washout if data continues to miss.",
+      "evidence": [
+        "AUD COT long%: 74.5%",
+        "AUD Unemployment z-score: +2.60σ",
+        "AUD/USD VRP: +4.9%"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "03:24",
       "priority": "info",
-      "title": "USD/CAD — Oil Volatility + Speculative Short Squeeze",
-      "text": "USD/CAD closed at 1.3820 as uncertainty regarding Iran negotiations and a hawkish Fed outlook support the Greenback over the Loonie. CAD COT net short of -39,960 contracts (only 28.4% long) leaves the pair vulnerable to a squeeze if WTI oil prices sustain their Friday gains. The next BoC meeting (mkt: 100% hold priced) on 10 June will clarify if the 125bp OIS carry disadvantage for CAD will persist.",
+      "title": "CHF/JPY — Retail vs Options Divergence",
+      "text": "CHF/JPY at 203.113 shows extreme retail sentiment with 88% short (contrarian long signal). However, the SNB 0.0% vs BoJ 0.75% (-75bp) carry deficit favors JPY. With VIX at 16.7 (normal volatility), the JPY carry bid competes with CHF safe-haven flows. Watch for retail capitulation if the pair holds above 203.00.",
       "evidence": [
-        "USD/CAD Friday close: 1.3820",
-        "CAD COT net short: -39,960",
-        "WTI Oil: $96.9 (+0.53%)",
-        "USD/CAD OIS carry: +125bp"
+        "CHF/JPY retail: 88% short",
+        "SNB-BoJ spread: -75bp",
+        "VIX: 16.7"
       ],
       "_source": "gemini"
     }
