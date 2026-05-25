@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-25T19:11:57Z",
-  "generatedAt": "2026-05-25T19:11:57Z",
+  "lastUpdate": "2026-05-25T19:25:16Z",
+  "generatedAt": "2026-05-25T19:25:16Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -14,16 +14,16 @@
     "EUR": 206,
     "USD": 605,
     "CHF": 91,
-    "CAD": 130,
+    "CAD": 131,
     "JPY": 183,
     "NZD": 84,
     "AUD": 169,
-    "GBP": 178
+    "GBP": 177
   },
   "impactCounts": {
     "low": 152,
-    "medium": 1126,
-    "high": 368
+    "medium": 1125,
+    "high": 369
   },
   "surpriseStats": {
     "USD/CB Consumer Confidence": {
@@ -20243,19 +20243,6 @@
     {
       "date": "22 May",
       "dateISO": "2026-05-22",
-      "timeUTC": "10:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "CBI Industrial Trends Orders",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": "-38"
-    },
-    {
-      "date": "22 May",
-      "dateISO": "2026-05-22",
       "timeUTC": "12:30",
       "country": "CAD",
       "currency": "CAD",
@@ -21877,6 +21864,19 @@
       "actual": null,
       "forecast": null,
       "previous": "4.3"
+    },
+    {
+      "date": "5 Jun",
+      "dateISO": "2026-06-05",
+      "timeUTC": "14:00",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Ivey PMI s.a",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "57.7"
     }
   ]
 }
