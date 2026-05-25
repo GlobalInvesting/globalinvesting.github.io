@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-05-25T10:55:06Z",
+  "generated_at": "2026-05-25T16:36:51Z",
   "signals": [
     {
-      "time": "10:54",
+      "time": "16:36",
       "priority": "critical",
+      "title": "USD/JPY — Geopolitical Shock + Carry + Options",
+      "text": "USD/JPY at 158.91 — Markets pricing a 'peace pivot' as Iran deal hopes crash Oil to $95, driving a bearish gap and USD weakness. Despite the headline-driven retreat, the 278bp Fed-BoJ OIS carry advantage (SOFR 3.51% vs TONA 0.73%) remains the structural anchor. JPY COT LF net short -81,624 (31.2% long) confirms a crowded carry trade, while the 25d RR at -1.41 signals the options market is paying a moderate premium for JPY protection (downside USD/JPY) amid intervention fears. Carry dominates the long-term regime, but geopolitical de-escalation triggers immediate JPY short-covering.",
+      "evidence": [
+        "OIS Carry: +278bp favors USD",
+        "COT JPY LF Net: -81,624",
+        "USD/JPY 25d RR: -1.41 (put skew)"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "16:32",
+      "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkish bias) vs RBNZ hike bias priced for the 27 May meeting. While BBH expects a hold, ING forecasts a hawkish stance; if RBNZ delivers a hike or signals tightening, the crowded spec short (28.0% long) faces significant unwind risk. NZD/USD at 0.5872 remains vulnerable to a short squeeze toward 0.6000 as real rates sit at -0.83%.",
+      "text": "NZD/USD at 0.5872 — COT LF net short -15,435 (28.0% long) shows speculators fading the RBNZ despite a hawkish OIS bias (Hike bias priced for 27 May). With NZD real rates at -0.83% (most accommodative in G8), the currency faces structural pressure, yet a hawkish hold or surprise hike on 27 May introduces significant short-squeeze risk against the crowded spec short. NZD/USD vs NZX 50 correlation at +0.386 (z=+2.03σ) indicates a break from the -0.232 norm, suggesting NZD is currently trading as a high-beta risk proxy rather than on domestic equity fundamentals.",
       "evidence": [
-        "NZD COT LF net: -15,435",
-        "RBNZ Market Bias: Hike",
-        "NZD/USD: 0.5872"
+        "NZD COT LF Net: -15,435",
+        "RBNZ Bias: Hike (27 May)",
+        "NZD Real Rate: -0.83%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:51",
+      "time": "16:28",
       "priority": "warning",
-      "title": "CHF/NZD — G8 Bilateral Theme + Carry Divergence",
-      "text": "CHF outperformance (avg +0.530%) vs NZD weakness (avg -0.360%) creates a 0.889% G8 spread, triggering a bilateral theme alert. CHF strength persists despite a -225bp carry disadvantage vs NZD (SNB 0% vs RBNZ 2.25%), signaling non-carry flows or safe-haven demand dominating the cross. NZD/CHF at 0.4586 reflects this divergence ahead of the RBNZ decision.",
+      "title": "AUD/USD — Volatility + Positioning + Retail Divergence",
+      "text": "AUD/USD at 0.7173 — IV at 13.8% vs HV30 at 8.9% generates a +4.9% Vol Risk Premium, signaling aggressive institutional hedging of the upside. This aligns with COT LF net long +57,180 (74.5% long), showing heavy institutional backing. Conversely, retail sentiment is 75% short, creating a classic institutional vs. retail divergence. The 84bp AUD carry premium (AONIA 4.35% vs SOFR 3.51%) supports the long bias, but the extreme VRP suggests the market is paying up for protection against a trend exhaustion. Watch for retail capitulation if price tests 0.7250.",
       "evidence": [
-        "CHF 1W avg: +0.530% (n=6)",
-        "NZD 1W avg: -0.360% (n=4)",
-        "G8 spread: 0.889%"
+        "AUD VRP: +4.9%",
+        "COT AUD LF Net: +57,180",
+        "Retail Sentiment: 75% Short"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:49",
-      "priority": "warning",
-      "title": "USD/JPY — Intervention Risk + Options Skew",
-      "text": "USD/JPY at 158.94 holds just below the 160.00 critical intervention threshold. While the +278bp OIS carry (SOFR vs TONA) supports the pair, the options market is pricing downside protection with a -1.22 moderate put skew (25d RR). HSBC notes intervention requires BoJ support to be sustainable; watch for verbal intervention or BoJ TONA repricing to catalyze a move toward 155.00.",
-      "evidence": [
-        "USD/JPY: 158.94",
-        "25d RR (Saxo): -1.22",
-        "OIS Carry: +278bp"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "10:46",
-      "priority": "warning",
-      "title": "AUD/USD — Volatility Premium + Retail Divergence",
-      "text": "AUD/USD IV at 13.8% vs HV30 at 8.9% generates a +4.9% Vol Risk Premium, signaling heavy institutional hedging. This aligns with a retail/institutional divergence: retail is 72% short (fading the move) while COT LF remains net long +57,180 (74.5% long). Despite a 2.60σ unemployment rate shock, the 84bp AUD OIS carry advantage keeps the pair bid at 0.7171.",
-      "evidence": [
-        "AUD VRP: +4.9% (IV 13.8% / HV30 8.9%)",
-        "Retail Sentiment: 72% Short",
-        "COT LF Net: +57,180"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "10:42",
+      "time": "16:21",
       "priority": "info",
-      "title": "EUR/USD — Volatility Premium + CESI Support",
-      "text": "EUR/USD at 1.1647 shows an elevated VRP of +2.2% (IV 7.1% vs HV30 4.9%), indicating the market is paying up for protection despite a neutral 25d RR (-0.39). While BBH warns of downside to 1.1400, the EUR CESI (net +5) and USD CESI (net +24) both show data outperforming expectations. The 158bp OIS carry advantage for USD remains the structural ceiling for EUR upside.",
+      "title": "EUR/USD — Volatility Premium + CESI Alignment",
+      "text": "EUR/USD at 1.1641 — IV at 7.1% vs HV30 at 4.9% (VRP +2.2%) indicates elevated hedging demand despite a relatively stable spot price. The positive USD CESI (net +24) supports the 175bp Fed-ECB carry advantage (Fed 3.75% vs ECB 2.00%), keeping EUR upside structurally limited. While the 25d RR at -0.35 shows only a mild put skew, the combination of a restrictive US real rate (+1.09%) vs an accommodative EUR real rate (-0.32%) favors USD on any data-driven rallies. Watch the ECB meeting on 11 June for a shift in the 'Hold' bias.",
       "evidence": [
         "EUR/USD VRP: +2.2%",
-        "USD CESI Net: +24",
-        "EUR/USD OIS Carry: +158bp"
+        "USD CESI: +24 net beats",
+        "Real Rate Spread: 141bp favors USD"
       ],
       "_source": "gemini"
     }
