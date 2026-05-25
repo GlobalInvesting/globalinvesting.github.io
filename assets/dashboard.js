@@ -3139,6 +3139,23 @@ function _lwBuildTodayBar(ohlcId) {
     h = q.high != null && q.high > 0 ? parseFloat(q.high.toFixed(dec)) : Math.max(o, c);
     l = q.low  != null && q.low  > 0 ? parseFloat(q.low.toFixed(dec))  : Math.min(o, c);
   }
+  // ── W1/MN: override O/H/L with period-wide accumulated values ─────────────
+  // For W1/MN, o/h/l computed above from prev_close/session_high/session_low are
+  // wrong for these longer TFs:
+  //   open   → prev_close (yesterday close) instead of first D1 open of the period
+  //   high   → session_high (last 24h only)  instead of cumulative period high
+  //   low    → session_low  (last 24h only)  instead of cumulative period low
+  // _lwPeriodOpen/High/Low are snapshotted in _renderLWChart after W1/MN aggregation
+  // and hold exactly the values from the aggregated current-period bar (which covers
+  // all completed D1 bars in the period). Override here, then let the integrity clamp
+  // below extend the wick to include today's live close if it sets a new period extreme.
+  if ((_lwActiveTf === 'W1' || _lwActiveTf === 'MN') &&
+      _lwPeriodOpen != null && _lwPeriodHigh != null && _lwPeriodLow != null) {
+    o = parseFloat(_lwPeriodOpen.toFixed(dec));
+    h = parseFloat(_lwPeriodHigh.toFixed(dec));
+    l = parseFloat(_lwPeriodLow.toFixed(dec));
+  }
+
   // ── OHLC structural integrity clamp ──────────────────────────────────────
   // Guarantee H >= max(O,C) and L <= min(O,C) for every bar, regardless of source.
   // Root cause: the live today-bar uses prev_close as Open (correct for coloring the
@@ -3378,6 +3395,9 @@ let _lwLastIntradayBarClose = null; // set by _renderLWChart for H1/H4, null for
 let _lwBlockHigh      = null; // running high within the current H1/H4 block
 let _lwBlockLow       = null; // running low within the current H1/H4 block
 let _lwBlockTs        = null; // unix ts of the current block start (detects rollovers)
+let _lwPeriodOpen     = null; // W1/MN: open of the current period (first D1 open) — set after W1/MN aggregation
+let _lwPeriodHigh     = null; // W1/MN: cumulative high of all D1 bars in the current period — set after W1/MN aggregation
+let _lwPeriodLow      = null; // W1/MN: cumulative low  of all D1 bars in the current period — set after W1/MN aggregation
 
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
@@ -3550,6 +3570,15 @@ async function _renderLWChart(ohlcId, label) {
     }
     bars = Object.values(agg).sort((a, b) => a.time < b.time ? -1 : 1);
     if (bars.length < 4) throw new Error('insufficient aggregated data');
+    // ── Snapshot current-period O/H/L for _lwBuildTodayBar ─────────────────
+    // The last aggregated bar IS the current incomplete period (it will be stripped
+    // below and replaced by the live today-bar). Capture its accumulated O/H/L now
+    // so _lwBuildTodayBar can produce a bar with the REAL period open and cumulative
+    // period H/L rather than prev_close + session H/L (today only).
+    const _curPeriodBar = bars[bars.length - 1];
+    _lwPeriodOpen = _curPeriodBar ? _curPeriodBar.open : null;
+    _lwPeriodHigh = _curPeriodBar ? _curPeriodBar.high : null;
+    _lwPeriodLow  = _curPeriodBar ? _curPeriodBar.low  : null;
   }
 
   // ── Today-bar strip and gap-window injection (D1/W1/MN only) ─────────────────
@@ -3875,9 +3904,12 @@ async function _renderLWChart(ohlcId, label) {
   }
   // Reset per-block H/L on every chart load — the block tracking starts fresh
   // from the first tick received, ensuring clean state after TF or symbol changes.
-  _lwBlockHigh = null;
-  _lwBlockLow  = null;
-  _lwBlockTs   = null;
+  _lwBlockHigh  = null;
+  _lwBlockLow   = null;
+  _lwBlockTs    = null;
+  _lwPeriodOpen = null;
+  _lwPeriodHigh = null;
+  _lwPeriodLow  = null;
 
 
   // Uses separate priceScaleId 'volume' pinned to bottom 20% — clean Bloomberg-style presentation
