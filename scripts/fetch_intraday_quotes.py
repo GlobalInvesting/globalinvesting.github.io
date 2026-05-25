@@ -1,9 +1,23 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v3.4  —  Intraday quotes via yfinance (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
+fetch_intraday_quotes.py  v3.5  —  Intraday quotes via yfinance + Twelve Data staleness fallback (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
+
+MEJORAS v3.5 vs v3.4:
+  - Staleness detection (PASO 2b): detects frozen Yahoo quotes by checking
+    regularMarketTime against expected session open. Fires when market_time is
+    from a previous calendar day (weekday, after 13:00 UTC) or is > 30 min
+    stale during REGULAR market state. Does NOT gate on pct==0.0 alone.
+  - Twelve Data batch fallback (fetch_td_batch): replaces stale yfinance quotes
+    for commodities (XAU/USD, XAG/USD, WTI/USD, BRENT/USD) and equity indices
+    (SPX, IXIC, DJI, VIX, N225, DAX, HSI, SX5E, FTSE100, AS51) in a single
+    HTTP request (1 batch call regardless of symbol count → within 800 req/day).
+  - load_repo_fallback extended: now also covers us5y (bond5y from USD.json)
+    and includes sourceDate for transparency.
+  - TD_BATCH_MAP: central map from internal symbol → Twelve Data symbol for all
+    non-FX stale-able instruments. Bond yields excluded (handled by USD.json/FRED).
 
 MEJORAS v3.0 vs v2.9:
   - pct1m (cambio % vs cierre de hace ~30 días) añadido a los 7 pares FX majors.
@@ -1556,50 +1570,187 @@ def fetch_yfinance_all(symbols_map):
     return results
 
 
-def fetch_td_gold():
-    if not TWELVE_DATA_API_KEY or requests is None:
-        return None
+# Twelve Data symbol map for non-FX instruments that can freeze on Yahoo.
+# Used by fetch_td_batch() as a staleness fallback.
+# Bond yields (us10y, us5y, us2y) are handled separately via extended-data/USD.json
+# (FRED:DGS series) — they are not included here.
+# Crypto (btc, eth) and FX (dxy) trade near-continuously — excluded.
+TD_BATCH_MAP = {
+    # Commodities — TD spot price (XAU/USD etc.) vs Yahoo futures (GC=F):
+    # basis ~0.3–0.5% but intraday %change tracks identically.
+    "gold":   "XAU/USD",
+    "silver": "XAG/USD",
+    "wti":    "WTI/USD",
+    "brent":  "BRENT/USD",
+    # Equity indices — US
+    "spx":    "SPX",
+    "nasdaq": "IXIC",
+    "dji":    "DJI",
+    "vix":    "VIX",
+    # Equity indices — international
+    "nikkei": "N225",
+    "dax":    "DAX",
+    "hsi":    "HSI",
+    "stoxx":  "SX5E",
+    "ftse":   "FTSE100",
+    "asx":    "AS51",
+}
 
-    print("[TwelveData] Fallback para gold (XAU/USD)...")
+
+def _is_quote_stale(quote: dict, now_utc) -> bool:
+    """Return True if a yfinance quote looks frozen (market_time predates today's session open).
+
+    Staleness definition:
+      - market_time (Unix ts) is available AND
+      - the local session should have already opened (market_state == "REGULAR" or
+        it is a weekday between 13:00 and 22:00 UTC — covers US, EU, and Asian opens) AND
+      - market_time is older than the expected session open by > 30 minutes.
+
+    This catches the Yahoo freeze observed on 2026-05-25: GC=F and CL=F showed
+    regularMarketTime = 08:41 ET while the market had been open since 09:30 ET,
+    with pct=0.00% because close == prev_close.
+
+    We do NOT gate on pct==0.0 alone because pct can legitimately be 0% early in a session.
+    We gate on the timestamp being stale, which is a harder signal.
+    """
+    market_time  = quote.get("market_time")
+    market_state = quote.get("market_state", "")
+
+    if not market_time:
+        return False  # no timestamp → cannot determine staleness
+
+    last_trade_utc = datetime.fromtimestamp(market_time, tz=timezone.utc)
+    today_utc      = now_utc.date()
+
+    # If the last trade was on a previous calendar day → definitely stale during market hours
+    if last_trade_utc.date() < today_utc:
+        # Only flag as stale if market should be open now (Mon–Fri, after 13:00 UTC)
+        is_weekday   = now_utc.weekday() < 5  # 0=Mon…4=Fri
+        after_open   = now_utc.hour >= 13      # conservative: US pre-market opens ~13:00 UTC
+        if is_weekday and after_open:
+            return True
+
+    # Same-day but market_time is > 30 min behind now AND market_state is REGULAR
+    if last_trade_utc.date() == today_utc:
+        lag_minutes = (now_utc - last_trade_utc).total_seconds() / 60
+        if lag_minutes > 30 and market_state == "REGULAR":
+            return True
+
+    return False
+
+
+def fetch_td_batch(symbols: list[str]) -> dict:
+    """Fetch a batch of non-FX quotes from Twelve Data /quote endpoint.
+
+    Args:
+        symbols: list of internal symbol keys present in TD_BATCH_MAP.
+
+    Returns:
+        dict keyed by internal symbol → quote dict (same shape as yfinance output),
+        or empty dict on failure / missing key.
+
+    Rate limit: 1 HTTP request regardless of how many symbols are requested
+    (Twelve Data /quote accepts comma-separated symbols in a single call).
+    Free tier: 800 req/day — 1 batch call per run × 288 runs/day = 288 calls/day ✅
+    """
+    if not TWELVE_DATA_API_KEY or requests is None:
+        return {}
+
+    td_syms = {s: TD_BATCH_MAP[s] for s in symbols if s in TD_BATCH_MAP}
+    if not td_syms:
+        return {}
+
+    # Build reverse map: TD symbol → internal key
+    rev = {td_sym: internal for internal, td_sym in td_syms.items()}
+    batch_str = ",".join(td_syms.values())
+
+    print(f"[TwelveData] Batch fallback para: {list(td_syms.keys())} …")
     try:
         r = requests.get(
             "https://api.twelvedata.com/quote",
-            params={"symbol": "XAU/USD", "apikey": TWELVE_DATA_API_KEY, "dp": 4},
-            timeout=10,
+            params={"symbol": batch_str, "apikey": TWELVE_DATA_API_KEY, "dp": 4},
+            timeout=15,
         )
         r.raise_for_status()
         raw = r.json()
-        if raw.get("status") == "error" or not raw.get("close"):
-            print(f"[TwelveData] Error: {raw.get('message', 'sin datos')}")
-            return None
-
-        close      = float(raw["close"])
-        prev_close = float(raw.get("previous_close") or raw.get("open") or close)
-        chg        = close - prev_close
-        pct        = (chg / prev_close * 100) if prev_close != 0 else 0.0
-
-        if not VALIDATORS["gold"](close):
-            return None
-
-        print(f"[TwelveData] ✓ gold: {close:.4f}")
-        return {"close": round(close,4), "prev_close": round(prev_close,4),
-                "chg": round(chg,4), "pct": round(pct,4), "source": "twelve_data"}
     except Exception as e:
-        print(f"[TwelveData] Error: {e}")
-        return None
+        print(f"[TwelveData] Error en batch request: {e}")
+        return {}
+
+    # Twelve Data returns a plain object for a single symbol, a dict-of-objects for multiple.
+    if len(td_syms) == 1:
+        td_sym    = next(iter(td_syms.values()))
+        raw_items = {td_sym: raw}
+    else:
+        raw_items = raw  # {"XAU/USD": {...}, "SPX": {...}, ...}
+
+    results = {}
+    for td_sym, data in raw_items.items():
+        internal = rev.get(td_sym)
+        if not internal:
+            continue
+        if not isinstance(data, dict) or data.get("status") == "error":
+            print(f"[TwelveData] ✗ {internal} ({td_sym}): {data.get('message','error') if isinstance(data,dict) else 'bad response'}")
+            continue
+
+        try:
+            close      = float(data["close"])
+            prev_close = float(data.get("previous_close") or data.get("open") or close)
+            chg        = close - prev_close
+            pct        = (chg / prev_close * 100) if prev_close != 0 else 0.0
+
+            validator = VALIDATORS.get(internal)
+            if validator and not validator(close):
+                print(f"[TwelveData] ✗ {internal} fuera de rango: {close}")
+                continue
+
+            print(f"[TwelveData] ✓ {internal:8s} ({td_sym}): {close:.4f}  {pct:+.2f}%")
+            results[internal] = {
+                "close":      round(close, 4),
+                "prev_close": round(prev_close, 4),
+                "chg":        round(chg, 4),
+                "pct":        round(pct, 4),
+                "source":     "twelve_data",
+            }
+        except (KeyError, ValueError, TypeError) as e:
+            print(f"[TwelveData] ✗ {internal} parse error: {e}")
+
+    return results
+
+
+# Keep fetch_td_gold as a thin wrapper so existing callers (PASO 2 missing-gold path) still work.
+def fetch_td_gold():
+    res = fetch_td_batch(["gold"])
+    return res.get("gold")
 
 
 def load_repo_fallback(site_path):
+    """Last-resort fallback: read cached values from extended-data/USD.json.
+
+    Covers symbols NOT handled by Twelve Data (bond yields) and symbols that failed
+    both yfinance and Twelve Data.  Values are marked stale=True so the dashboard
+    can display them with a visual indicator.
+    """
     path = os.path.join(site_path, "extended-data", "USD.json")
     try:
         with open(path) as f:
-            d = json.load(f).get("data", {})
+            usd_ext = json.load(f)
+        d     = usd_ext.get("data",  {})
+        dates = usd_ext.get("dates", {})
         fb = {}
+
+        def _entry(close, source_date=""):
+            return {"close": close, "prev_close": close, "chg": 0, "pct": 0,
+                    "source": "repo", "stale": True, "sourceDate": source_date}
+
         if d.get("vix") and VALIDATORS["vix"](d["vix"]):
-            fb["vix"]   = {"close": d["vix"],     "prev_close": d["vix"],     "chg": 0, "pct": 0, "source": "repo", "stale": True}
+            fb["vix"]   = _entry(d["vix"],    dates.get("vix", ""))
         if d.get("bond10y") and VALIDATORS["us10y"](d["bond10y"]):
-            fb["us10y"] = {"close": d["bond10y"], "prev_close": d["bond10y"], "chg": 0, "pct": 0, "source": "repo", "stale": True}
-        print(f"[Repo] {len(fb)} fallbacks desde USD.json")
+            fb["us10y"] = _entry(d["bond10y"], dates.get("bond10y", ""))
+        if d.get("bond5y") and VALIDATORS["us5y"](d["bond5y"]):
+            fb["us5y"]  = _entry(d["bond5y"],  dates.get("bond5y", ""))
+
+        print(f"[Repo] {len(fb)} fallbacks desde USD.json: {list(fb.keys())}")
         return fb
     except Exception as e:
         print(f"[Repo] No se pudo leer USD.json: {e}")
@@ -1623,11 +1774,36 @@ def main():
         if v is not None:
             quotes[k] = v
 
-    # PASO 2: Fallback TD para gold si yfinance falló
+    # PASO 2: Fallback TD para gold si yfinance falló (complete failure)
     if "gold" not in quotes:
         td = fetch_td_gold()
         if td:
             quotes["gold"] = td
+
+    # PASO 2b: Staleness detection + Twelve Data batch fallback
+    # Fires when yfinance returned a quote but with a frozen regularMarketTime
+    # (e.g. Yahoo freeze observed 2026-05-25: GC=F pct=0.00% while market was open).
+    # Only applies to symbols in TD_BATCH_MAP — FX, crypto, and bonds are excluded.
+    now_utc = datetime.now(timezone.utc)
+    stale_symbols = [
+        sym for sym in TD_BATCH_MAP
+        if sym in quotes and _is_quote_stale(quotes[sym], now_utc)
+    ]
+    if stale_symbols:
+        print(f"\n[Staleness] Detectados {len(stale_symbols)} símbolo(s) congelados: {stale_symbols}")
+        td_fresh = fetch_td_batch(stale_symbols)
+        for sym, q in td_fresh.items():
+            # Preserve high/low/open from the yfinance quote (TD /quote doesn't return intraday H/L)
+            old = quotes.get(sym, {})
+            q.setdefault("high", old.get("high"))
+            q.setdefault("low",  old.get("low"))
+            q.setdefault("open", old.get("open"))
+            q["market_state"] = old.get("market_state")
+            q["market_time"]  = old.get("market_time")
+            quotes[sym] = q
+            print(f"[Staleness] ✓ {sym} reemplazado con datos frescos de Twelve Data")
+    else:
+        print("[Staleness] No se detectaron símbolos congelados.")
 
     # PASO 3: Repo fallback para lo restante
     missing = [k for k in YFINANCE_SYMBOLS if k not in quotes]
