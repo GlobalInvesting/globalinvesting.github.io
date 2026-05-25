@@ -199,29 +199,28 @@
       const isToday = dateISO === today;
       html += `<div class="cal-date-row" data-date="${dateISO}"${isToday ? ' data-today="1"' : ''}>${formatDate(dateISO)}</div>`;
 
-      // ── Holiday banner ─────────────────────────────────────────────────────
-      // Shown at the top of the day, above economic events. Groups all affected
-      // G8 currencies into a single row — explains stale quotes on holiday days.
-      if (dayHols.length) {
-        const affectedCcys = [...new Set(dayHols.map(h => h.currency).filter(c => G8.has(c)))];
-        const holTitle = dayHols.reduce((best, h) =>
-          (h.title && h.title.length > best.length) ? h.title : best, 'Bank Holiday');
-        const flagsHtml = affectedCcys.map(ccy => {
-          const f = FLAG[ccy] || '';
-          return f
-            ? `<span class="fi fi-${f}" title="${ccy}" style="font-size:10px;margin-right:2px;"></span>`
-            : `<span style="font-size:10px;margin-right:2px;color:var(--text2);">${ccy}</span>`;
-        }).join('');
-        html += `<div class="cal-event-row cal-holiday-row" title="${holTitle} — market closed">` +
+      // ── Holiday rows ────────────────────────────────────────────────────────
+      // One row per holiday entry, shown at the top of the day above economic
+      // events. Each row identifies its specific currency and holiday name so
+      // users can see exactly which markets are closed.
+      dayHols.forEach(hol => {
+        const ccy = hol.currency || '';
+        const f   = FLAG[ccy] || '';
+        const flagHtml = f
+          ? `<span class="fi fi-${f}" style="font-size:10px;margin-right:3px;flex-shrink:0;" title="${ccy}"></span>`
+          : '';
+        const holTitle  = hol.title || 'Bank Holiday';
+        const tooltipTx = `${holTitle} — ${ccy} market closed`;
+        html += `<div class="cal-event-row cal-holiday-row" title="${tooltipTx}">` +
           `<div class="cal-col cal-time" style="color:var(--text3);">All Day</div>` +
-          `<div class="cal-col cal-ccy" style="gap:2px;">${flagsHtml}</div>` +
+          `<div class="cal-col cal-ccy">${flagHtml}<span style="font-size:10px;">${ccy}</span></div>` +
           `<div class="cal-col cal-impact"><span class="cal-dot" style="background:var(--text3);" title="Market holiday"></span></div>` +
-          `<div class="cal-col cal-title" style="color:var(--text3);font-style:italic;">${holTitle}</div>` +
+          `<div class="cal-col cal-title">${holTitle}</div>` +
           `<div class="cal-col cal-num"><span style="color:var(--text3)">—</span></div>` +
           `<div class="cal-col cal-num"><span style="color:var(--text3)">—</span></div>` +
           `<div class="cal-col cal-num"><span style="color:var(--text3)">—</span></div>` +
           `</div>`;
-      }
+      });
 
       dayEvs.forEach(ev => {
         const dot        = IMPACT_DOT[ev.impact];
