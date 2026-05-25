@@ -164,8 +164,11 @@ def fetch_ff_holidays() -> list[dict]:
     JSON feed (nfs.faireconomy.media/ff_calendar_thisweek.json). No API key needed.
 
     FF marks holidays with impact == "Holiday" (case-insensitive). The `country`
-    field is a 2-letter ISO code matching our G8 map. Returns a deduplicated list
-    of {title, currency, dateISO} for G8 currencies only.
+    field in the FF public JSON is the 3-letter G8 currency code (e.g. "USD", "EUR",
+    "GBP", "CHF") — NOT the ISO2 country code. This differs from Finnhub's economic
+    calendar API which uses ISO2. Dedup key is (currency, dateISO, title) so that
+    distinct holidays for the same currency on the same day are preserved
+    (e.g. "French Bank Holiday" and "German Bank Holiday" both under EUR).
 
     Returns [] on any network or parse error — holiday data is supplementary and
     must never block the main calendar write.
@@ -189,11 +192,14 @@ def fetch_ff_holidays() -> list[dict]:
         print("  Holidays: unexpected response format — skipping.")
         return []
 
+    # G8 currency codes — FF `country` field is the 3-letter currency code directly
+    G8_CURRENCIES = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"}
+
     holidays: list[dict] = []
     seen: set[tuple] = set()
 
     for ev in raw:
-        # FF signals holidays via the "type" or "impact" field
+        # FF signals holidays via the "impact" field (value: "Holiday")
         impact = (ev.get("impact") or "").strip().lower()
         event_type = (ev.get("type") or "").strip().lower()
         title = (ev.get("title") or ev.get("name") or "").strip()
@@ -202,25 +208,28 @@ def fetch_ff_holidays() -> list[dict]:
             impact == "holiday"
             or event_type == "holiday"
             or "holiday" in title.lower()
-            or "bank holiday" in title.lower()
         )
         if not is_holiday:
             continue
 
-        # Map country → G8 currency
-        iso2 = (ev.get("country") or "").upper().strip()
-        currency = G8.get(iso2)
-        if not currency:
-            # Some FF entries use a full country name — attempt name lookup
-            country_name = (ev.get("country") or "").lower().strip()
-            for cn, ccy in FF_COUNTRY_NAME_TO_CCY.items():
-                if cn in country_name:
-                    currency = ccy
-                    break
+        # FF `country` field is the 3-letter currency code (USD, EUR, GBP, etc.)
+        country_raw = (ev.get("country") or "").strip().upper()
+        if country_raw in G8_CURRENCIES:
+            currency = country_raw
+        else:
+            # Fallback: try ISO2 → currency map (in case FF changes format)
+            currency = G8.get(country_raw)
+            if not currency:
+                # Last resort: name-based lookup
+                country_name = country_raw.lower()
+                for cn, ccy in FF_COUNTRY_NAME_TO_CCY.items():
+                    if cn in country_name:
+                        currency = ccy
+                        break
         if not currency:
             continue  # not a G8 currency
 
-        # Parse date — FF uses "YYYY-MM-DDTHH:MM:SS+00:00" or "YYYY-MM-DD"
+        # Parse date — FF public JSON uses "YYYY-MM-DDTHH:MM:SS±HH:MM"
         date_raw = (ev.get("date") or ev.get("dateISO") or "").strip()
         if not date_raw:
             continue
@@ -230,12 +239,14 @@ def fetch_ff_holidays() -> list[dict]:
                 date_iso = dt.astimezone(timezone.utc).strftime("%Y-%m-%d")
             else:
                 date_iso = date_raw[:10]
-            # Basic validation
-            datetime.strptime(date_iso, "%Y-%m-%d")
+            datetime.strptime(date_iso, "%Y-%m-%d")  # validate
         except Exception:
             continue
 
-        key = (currency, date_iso)
+        # Dedup by (currency, dateISO, normalised title) — preserves distinct holidays
+        # for the same currency on the same day (e.g. French vs German Bank Holiday, both EUR)
+        norm_title = title.lower().strip()
+        key = (currency, date_iso, norm_title)
         if key in seen:
             continue
         seen.add(key)
@@ -246,7 +257,7 @@ def fetch_ff_holidays() -> list[dict]:
             "dateISO":  date_iso,
         })
 
-    holidays.sort(key=lambda h: (h["dateISO"], h["currency"]))
+    holidays.sort(key=lambda h: (h["dateISO"], h["currency"], h["title"]))
     print(f"  Holidays: {len(holidays)} G8 bank/market holidays found "
           f"({', '.join(h['currency'] + ' ' + h['dateISO'] for h in holidays) or 'none'})")
     return holidays
