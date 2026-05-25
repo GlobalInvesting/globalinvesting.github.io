@@ -153,8 +153,9 @@
     requestAnimationFrame(() => requestAnimationFrame(updateBtnVisibility));
   }
 
-  function buildPanel(events, source) {
-    source = source || 'Finnhub';
+  function buildPanel(events, source, holidays) {
+    source   = source   || 'Finnhub';
+    holidays = holidays || [];
     const container = document.getElementById('cal-events-body');
     const sourceEl  = document.getElementById('cal-panel-sub');
     if (!container) return;
@@ -163,12 +164,26 @@
       G8.has(ev.currency) && IMPACTS.has(ev.impact)
     );
 
-    if (!filtered.length) {
+    // Build holiday lookup: dateISO → [{title, currency}]
+    const holidayByDate = {};
+    holidays.forEach(h => {
+      if (!h.dateISO) return;
+      if (!holidayByDate[h.dateISO]) holidayByDate[h.dateISO] = [];
+      holidayByDate[h.dateISO].push(h);
+    });
+
+    // Collect all dates that need rendering (events + holiday-only days)
+    const allDates = new Set([
+      ...filtered.map(ev => ev.dateISO),
+      ...Object.keys(holidayByDate),
+    ]);
+
+    if (!allDates.size) {
       container.innerHTML = '<div style="padding:12px 10px;color:var(--text3);font-size:11px;">No events available.</div>';
       return;
     }
 
-    // Group by date
+    // Group events by date
     const byDate = {};
     filtered.forEach(ev => {
       if (!byDate[ev.dateISO]) byDate[ev.dateISO] = [];
@@ -178,10 +193,35 @@
     const today = todayISO();
     let html = '';
 
-    Object.keys(byDate).sort().forEach(dateISO => {
-      const dayEvs = byDate[dateISO];
+    Array.from(allDates).sort().forEach(dateISO => {
+      const dayEvs  = byDate[dateISO] || [];
+      const dayHols = holidayByDate[dateISO] || [];
       const isToday = dateISO === today;
       html += `<div class="cal-date-row" data-date="${dateISO}"${isToday ? ' data-today="1"' : ''}>${formatDate(dateISO)}</div>`;
+
+      // ── Holiday banner ─────────────────────────────────────────────────────
+      // Shown at the top of the day, above economic events. Groups all affected
+      // G8 currencies into a single row — explains stale quotes on holiday days.
+      if (dayHols.length) {
+        const affectedCcys = [...new Set(dayHols.map(h => h.currency).filter(c => G8.has(c)))];
+        const holTitle = dayHols.reduce((best, h) =>
+          (h.title && h.title.length > best.length) ? h.title : best, 'Bank Holiday');
+        const flagsHtml = affectedCcys.map(ccy => {
+          const f = FLAG[ccy] || '';
+          return f
+            ? `<span class="fi fi-${f}" title="${ccy}" style="font-size:10px;margin-right:2px;"></span>`
+            : `<span style="font-size:10px;margin-right:2px;color:var(--text2);">${ccy}</span>`;
+        }).join('');
+        html += `<div class="cal-event-row cal-holiday-row" title="${holTitle} — market closed">` +
+          `<div class="cal-col cal-time" style="color:var(--text3);">All Day</div>` +
+          `<div class="cal-col cal-ccy" style="gap:2px;">${flagsHtml}</div>` +
+          `<div class="cal-col cal-impact"><span class="cal-dot" style="background:var(--text3);" title="Market holiday"></span></div>` +
+          `<div class="cal-col cal-title" style="color:var(--text3);font-style:italic;">${holTitle}</div>` +
+          `<div class="cal-col cal-num"><span style="color:var(--text3)">—</span></div>` +
+          `<div class="cal-col cal-num"><span style="color:var(--text3)">—</span></div>` +
+          `<div class="cal-col cal-num"><span style="color:var(--text3)">—</span></div>` +
+          `</div>`;
+      }
 
       dayEvs.forEach(ev => {
         const dot        = IMPACT_DOT[ev.impact];
@@ -274,14 +314,21 @@
   async function fetchEconomicCalendar() {
     try {
       let events = [];
+      let holidays = [];
       let source = 'Finnhub';
       for (const path of ['./calendar-data/ff_calendar.json', './calendar-data/calendar.json']) {
         const res = await fetch(path).catch(() => null);
         if (!res?.ok) continue;
         const j = await res.json();
-        if (j?.events?.length) { events = j.events; source = j.source || source; break; }
+        if (j?.events?.length) {
+          events = j.events;
+          source = j.source || source;
+          // holidays only exist in ff_calendar.json (top-level field)
+          if (Array.isArray(j.holidays)) holidays = j.holidays;
+          break;
+        }
       }
-      buildPanel(events, source);
+      buildPanel(events, source, holidays);
     } catch {
       const c = document.getElementById('cal-events-body');
       if (c) c.innerHTML = '<div style="padding:12px 10px;color:var(--text3);font-size:11px;">Calendar unavailable.</div>';
