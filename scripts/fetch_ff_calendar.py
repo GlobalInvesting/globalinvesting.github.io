@@ -1,8 +1,23 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.6
+fetch_ff_calendar.py — v3.7
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.7 changes (2026-05-25):
+- fetch_ff_holidays(): new step that fetches bank/market holidays from the
+  ForexFactory public JSON feed (nfs.faireconomy.media/ff_calendar_thisweek.json).
+  FF uses impact="Holiday" to mark days when a G8 market is closed. These events
+  explain why certain symbols show stale quotes on days that are not weekends —
+  the underlying exchange is closed. The holidays are written as a separate top-level
+  field `holidays` in ff_calendar.json (list of {title, currency, dateISO}) so the
+  frontend can surface a visual indicator ("Market closed — public holiday") instead
+  of showing a stale/frozen price with no context.
+  The holiday fetch is always attempted regardless of whether Finnhub event data
+  changed — holidays can appear or disappear mid-week as FF updates their feed.
+  Change-detection fingerprint extended to include holidays so a new/removed holiday
+  triggers a commit even when economic event actuals are unchanged.
+- Output schema extended: `holidays` top-level field (see schema below).
 
 v3.6 changes (2026-05-23):
 - Fix critical bug: FETCH_TIMEOUT was referenced in fetch_finnhub() but never
@@ -67,9 +82,13 @@ SOURCE
   Primary:  https://finnhub.io/api/v1/calendar/economic (requires FINNHUB_API_KEY secret)
   Fallback: https://www.forexfactory.com/calendar (Playwright, no key needed)
 
-OUTPUT SCHEMA (ff_calendar.json) — unchanged from v1.x/v2.0
+OUTPUT SCHEMA (ff_calendar.json) — v3.7
   generated_at  — ISO UTC timestamp
   source        — "Finnhub" or "ForexFactory"
+  holidays[]    — bank/market holidays this week from ForexFactory public JSON
+    title       — holiday name (e.g. "Memorial Day", "Bank Holiday")
+    currency    — G8 currency code of the affected market
+    dateISO     — YYYY-MM-DD
   events[]
     title       — event name
     currency    — G8 currency code
@@ -110,6 +129,7 @@ OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script write
 CALENDAR_PATH = "calendar-data/calendar.json"    # backfill — FRED + Finnhub historical (read-only)
 FINNHUB_API_KEY  = os.environ.get("FINNHUB_API_KEY", "")
 FH_BASE          = "https://finnhub.io/api/v1/calendar/economic"
+FF_HOLIDAYS_URL  = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"  # public, no key needed
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FH_RATE_SLEEP    = 0.6   # seconds between calls (60 req/min free tier)
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout for Finnhub API calls
@@ -121,7 +141,116 @@ G8 = {
     "US": "USD", "EU": "EUR", "GB": "GBP", "JP": "JPY",
     "AU": "AUD", "CA": "CAD", "CH": "CHF", "NZ": "NZD",
 }
+# Reverse map: currency → ISO2 country code (for holiday matching)
+G8_CCY_TO_COUNTRY = {v: k for k, v in G8.items()}
+# FF uses country names in the holiday title — map known country strings to G8 currencies
+FF_COUNTRY_NAME_TO_CCY = {
+    "united states": "USD", "us": "USD",
+    "eurozone": "EUR", "euro zone": "EUR", "european": "EUR",
+    "united kingdom": "GBP", "uk": "GBP", "britain": "GBP",
+    "japan": "JPY", "japanese": "JPY",
+    "australia": "AUD", "australian": "AUD",
+    "canada": "CAD", "canadian": "CAD",
+    "switzerland": "CHF", "swiss": "CHF",
+    "new zealand": "NZD",
+}
 HEADERS = {"User-Agent": "globalinvesting-bot/3.0 (https://globalinvesting.github.io)"}
+
+# ── ForexFactory holiday fetch ────────────────────────────────────────────────
+
+def fetch_ff_holidays() -> list[dict]:
+    """
+    Fetch bank/market holidays for the current week from the ForexFactory public
+    JSON feed (nfs.faireconomy.media/ff_calendar_thisweek.json). No API key needed.
+
+    FF marks holidays with impact == "Holiday" (case-insensitive). The `country`
+    field is a 2-letter ISO code matching our G8 map. Returns a deduplicated list
+    of {title, currency, dateISO} for G8 currencies only.
+
+    Returns [] on any network or parse error — holiday data is supplementary and
+    must never block the main calendar write.
+    """
+    print("  Holidays: fetching from ForexFactory public JSON ...")
+    try:
+        r = requests.get(
+            FF_HOLIDAYS_URL,
+            headers={**HEADERS, "Accept": "application/json"},
+            timeout=15,
+        )
+        if r.status_code != 200:
+            print(f"  Holidays: HTTP {r.status_code} — skipping.")
+            return []
+        raw = r.json()
+    except Exception as e:
+        print(f"  Holidays: request failed — {e}")
+        return []
+
+    if not isinstance(raw, list):
+        print("  Holidays: unexpected response format — skipping.")
+        return []
+
+    holidays: list[dict] = []
+    seen: set[tuple] = set()
+
+    for ev in raw:
+        # FF signals holidays via the "type" or "impact" field
+        impact = (ev.get("impact") or "").strip().lower()
+        event_type = (ev.get("type") or "").strip().lower()
+        title = (ev.get("title") or ev.get("name") or "").strip()
+
+        is_holiday = (
+            impact == "holiday"
+            or event_type == "holiday"
+            or "holiday" in title.lower()
+            or "bank holiday" in title.lower()
+        )
+        if not is_holiday:
+            continue
+
+        # Map country → G8 currency
+        iso2 = (ev.get("country") or "").upper().strip()
+        currency = G8.get(iso2)
+        if not currency:
+            # Some FF entries use a full country name — attempt name lookup
+            country_name = (ev.get("country") or "").lower().strip()
+            for cn, ccy in FF_COUNTRY_NAME_TO_CCY.items():
+                if cn in country_name:
+                    currency = ccy
+                    break
+        if not currency:
+            continue  # not a G8 currency
+
+        # Parse date — FF uses "YYYY-MM-DDTHH:MM:SS+00:00" or "YYYY-MM-DD"
+        date_raw = (ev.get("date") or ev.get("dateISO") or "").strip()
+        if not date_raw:
+            continue
+        try:
+            if "T" in date_raw:
+                dt = datetime.fromisoformat(date_raw.replace("Z", "+00:00"))
+                date_iso = dt.astimezone(timezone.utc).strftime("%Y-%m-%d")
+            else:
+                date_iso = date_raw[:10]
+            # Basic validation
+            datetime.strptime(date_iso, "%Y-%m-%d")
+        except Exception:
+            continue
+
+        key = (currency, date_iso)
+        if key in seen:
+            continue
+        seen.add(key)
+
+        holidays.append({
+            "title":    title if title else "Bank Holiday",
+            "currency": currency,
+            "dateISO":  date_iso,
+        })
+
+    holidays.sort(key=lambda h: (h["dateISO"], h["currency"]))
+    print(f"  Holidays: {len(holidays)} G8 bank/market holidays found "
+          f"({', '.join(h['currency'] + ' ' + h['dateISO'] for h in holidays) or 'none'})")
+    return holidays
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -605,7 +734,7 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.6")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.7")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -626,6 +755,10 @@ def main():
 
     released_fresh = sum(1 for e in fresh if e.get("released"))
     print(f"  Fetched: {len(fresh)} events ({released_fresh} with actuals)")
+
+    # Step 1b: Fetch bank/market holidays from ForexFactory public JSON
+    # Always attempted — holidays can appear/disappear mid-week independently of actuals.
+    holidays = fetch_ff_holidays()
 
     # Step 2: Historical merge — keep past events outside the fetch window
     cutoff = (now_utc - timedelta(days=LOOKBACK_DAYS)).strftime("%Y-%m-%d")
@@ -725,7 +858,29 @@ def main():
 
     new_actuals_added   = new_fingerprint - prev_fingerprint
     new_forecasts_added = new_forecasts - prev_forecasts
-    data_changed = bool(new_actuals_added or new_forecasts_added)
+
+    # Also detect holiday changes (new or removed holidays vs previous file)
+    prev_holidays_fp: set[tuple] = set()
+    try:
+        if os.path.exists(OUTPUT_PATH):
+            with open(OUTPUT_PATH, encoding="utf-8") as f:
+                prev_output = json.load(f)
+            for h in prev_output.get("holidays", []):
+                prev_holidays_fp.add((h.get("currency",""), h.get("dateISO",""), h.get("title","")))
+    except Exception:
+        pass
+    new_holidays_fp = {(h["currency"], h["dateISO"], h["title"]) for h in holidays}
+    holidays_changed = new_holidays_fp != prev_holidays_fp
+
+    if holidays_changed:
+        added_h   = new_holidays_fp - prev_holidays_fp
+        removed_h = prev_holidays_fp - new_holidays_fp
+        if added_h:
+            print(f"  NEW holidays: {', '.join(f'{c} {d}' for c,d,_ in sorted(added_h))}")
+        if removed_h:
+            print(f"  REMOVED holidays: {', '.join(f'{c} {d}' for c,d,_ in sorted(removed_h))}")
+
+    data_changed = bool(new_actuals_added or new_forecasts_added or holidays_changed)
 
     if data_changed:
         if new_actuals_added:
@@ -735,7 +890,7 @@ def main():
         if new_forecasts_added:
             print(f"  NEW forecasts: {len(new_forecasts_added)} event(s) updated")
     else:
-        print("\n  No new actuals or forecasts — skipping write and commit.")
+        print("\n  No new actuals, forecasts, or holiday changes — skipping write and commit.")
         # Clear the flag file so the workflow knows to skip the commit step
         try:
             with open(CHANGED_FLAG, "w") as f:
@@ -749,6 +904,7 @@ def main():
     output = {
         "generated_at": now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": source,
+        "holidays": holidays,
         "events": fresh,
     }
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
