@@ -3229,10 +3229,27 @@ function _lwUpdateTodayBar() {
     const _l2 = _lwBlockLow;
     if (!(_h2 > 0 && _l2 > 0 && _h2 >= _l2)) return;
 
-    const _liveBar = { time: _blockTs, open: _o, high: _h2, low: _l2, close: _c };
+    // ── Ordinal time mapping for live bar ──
+    // When H1/H4 ordinal remapping is active (_lwTsToIdx is set), the series time
+    // values are sequential bar indices, not unix timestamps.
+    // If _blockTs is already in the map (a completed bar rolled over), use its index.
+    // If it's a new block (next bar), assign index = existing bar count (append).
+    let _liveBarTime = _blockTs; // default: raw unix ts (if ordinal not active)
+    if (_lwTsToIdx != null && _lwIdxToTs != null) {
+      if (_lwTsToIdx.has(_blockTs)) {
+        _liveBarTime = _lwTsToIdx.get(_blockTs);
+      } else {
+        // New block not yet in the map — append at the next index
+        _liveBarTime = _lwIdxToTs.length;
+        _lwIdxToTs.push(_blockTs);
+        _lwTsToIdx.set(_blockTs, _liveBarTime);
+      }
+    }
+
+    const _liveBar = { time: _liveBarTime, open: _o, high: _h2, low: _l2, close: _c };
     try {
       const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
-      _lwCandleSeries.update(_isLA ? { time: _blockTs, value: _c } : _liveBar);
+      _lwCandleSeries.update(_isLA ? { time: _liveBarTime, value: _c } : _liveBar);
     } catch(_) {}
 
     // Sync chart header % with RT data
@@ -3326,6 +3343,19 @@ let _lwCompareId     = null;  // ohlcId of the compared symbol
 // real tick of that hour = last bar's close.  Stored here after each setData() call
 // so _lwUpdateTodayBar() can use it without the bars array being in scope.
 let _lwLastIntradayBarClose = null; // set by _renderLWChart for H1/H4, null for D1+
+
+// ── H1/H4 ordinal time mapping — eliminates weekend/off-hours gap in chart x-axis ──
+// Bloomberg and TradingView hide the weekend gap on FX intraday charts by mapping
+// bars to sequential bar-index positions and using a custom tick label formatter.
+// LightweightCharts with unix timestamps shows time linearly, making the Fri→Sun
+// gap occupy ~29% of the x-axis on a 1W view — visually jarring and non-standard.
+// Fix: before setData() for H1/H4, remap each bar's time to a sequential integer
+// (treated as a unix-timestamp by LWC, but rendered via tickMarkFormatter).
+// _lwTsToIdx: Map<originalUnixTs → seqIndex>  — used by _lwUpdateTodayBar()
+// _lwIdxToTs: Array<seqIndex → originalUnixTs> — used by tickMarkFormatter
+// Both are reset on every _renderLWChart call and null outside H1/H4 mode.
+let _lwTsToIdx = null; // Map<number,number> | null
+let _lwIdxToTs = null; // number[] | null
 
 // Per-block H/L tracking for H1/H4 live partial bar (Bloomberg standard).
 // H1/H4 live bar H/L must reflect only the CURRENT incomplete block's tick range,
@@ -3522,6 +3552,27 @@ async function _renderLWChart(ohlcId, label) {
   // ── End today-bar strip ─────────────────────────────────────────────────────
   } // end if (!_isIntradayTf)
 
+  // ── H1/H4 ordinal time remapping — eliminates weekend gap on x-axis ──────────
+  // For H1/H4: replace unix timestamps with sequential integer indices so LWC
+  // renders bars at equal spacing with no empty time slots for weekends / off-hours.
+  // tickMarkFormatter (applied in createChart options below) converts indices back
+  // to human-readable dates for the x-axis labels and the crosshair tooltip.
+  if (_isIntradayTf) {
+    _lwTsToIdx = new Map();
+    _lwIdxToTs = [];
+    for (let _bi = 0; _bi < bars.length; _bi++) {
+      const _origTs = bars[_bi].time;
+      _lwTsToIdx.set(_origTs, _bi);
+      _lwIdxToTs.push(_origTs);
+      bars[_bi] = Object.assign({}, bars[_bi], { time: _bi });
+    }
+  } else {
+    // Reset for D1/W1/MN — not used in those modes
+    _lwTsToIdx = null;
+    _lwIdxToTs = null;
+  }
+  // ── End ordinal remapping ────────────────────────────────────────────────────
+
   wrap.innerHTML = '';
 
   // Remove the negative margin used to hide TradingView widget footer — not needed for LW
@@ -3567,7 +3618,28 @@ async function _renderLWChart(ohlcId, label) {
                        scaleMargins: mainScaleMargins },
     timeScale:   { borderColor: '#2a2e39', timeVisible: false, secondsVisible: false,
                    rightOffset: 8, minBarSpacing: 1,
-                   fixLeftEdge: false, fixRightEdge: false },
+                   fixLeftEdge: false, fixRightEdge: false,
+                   // ── Ordinal tick formatter for H1/H4 (eliminates weekend gap) ──
+                   // For H1/H4, time values are sequential bar indices (not unix ts).
+                   // tickMarkFormatter converts the index back to a human-readable label.
+                   // For D1/W1/MN, _lwIdxToTs is null — the formatter returns undefined
+                   // and LWC uses its built-in date formatter (YYYY-MM-DD strings).
+                   tickMarkFormatter: _isIntradayTf && _lwIdxToTs
+                     ? (idx, tickMarkType) => {
+                         const _ts = _lwIdxToTs[idx];
+                         if (_ts == null) return '';
+                         const _d = new Date(_ts * 1000);
+                         // TickMarkType enum (LWC v5): 0=Year,1=Month,2=DayOfMonth,3=Time,4=TimeWithSeconds
+                         // For intraday: show Month+Day at day boundaries, HH:MM at hour boundaries
+                         const _mn = String(_d.getUTCMonth() + 1).padStart(2, '0');
+                         const _dy = String(_d.getUTCDate()).padStart(2, '0');
+                         const _hh = String(_d.getUTCHours()).padStart(2, '0');
+                         const _mm = String(_d.getUTCMinutes()).padStart(2, '0');
+                         // Show date label at day-boundary ticks; time label for intraday ticks
+                         if (tickMarkType <= 2) return _mn + '/' + _dy;
+                         return _hh + ':' + _mm;
+                       }
+                     : undefined },
     handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
     handleScale:   { mouseWheel: true, pinch: true, axisPressedMouseMove: { time: true, price: true } },
     localization: { priceFormatter: v => v.toFixed(dec) },
@@ -5229,8 +5301,13 @@ async function _renderLWChart(ohlcId, label) {
     if (candleData) _updateLWHeader(candleData, null, isCurrentBar ? _getRtOverride() : null);
 
     // ── CB floating tooltip ──
+    // For H1/H4 with ordinal time, param.time is a bar index — look up the real ts.
+    let _paramTs = param.time;
+    if (_lwIdxToTs != null && typeof _paramTs === 'number' && !isNaN(_paramTs)) {
+      _paramTs = _lwIdxToTs[_paramTs] ?? _paramTs;
+    }
     const dateStr = typeof param.time === 'string' ? param.time
-      : new Date(param.time * 1000).toISOString().slice(0, 10);
+      : new Date(_paramTs * 1000).toISOString().slice(0, 10);
     const cbEvents = window._lwShowCb && window._lwCbMarkerMap && window._lwCbMarkerMap[dateStr];
     if (!cbEvents || cbEvents.length === 0) {
       _cbTooltip.style.display = 'none';
