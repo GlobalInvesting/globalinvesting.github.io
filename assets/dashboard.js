@@ -2926,6 +2926,9 @@ function _destroyLWChart() {
   _lwActiveUpdateHeader = null;
   _lwActivePrevCloseMap = null;
   _lwLastJsonBarDate   = null;
+  _lwPeriodOpen = null;
+  _lwPeriodHigh = null;
+  _lwPeriodLow  = null;
 }
 
 // Compute MA(n) over close prices
@@ -3911,9 +3914,9 @@ async function _renderLWChart(ohlcId, label) {
   _lwBlockHigh  = null;
   _lwBlockLow   = null;
   _lwBlockTs    = null;
-  _lwPeriodOpen = null;
-  _lwPeriodHigh = null;
-  _lwPeriodLow  = null;
+  // _lwPeriodOpen/High/Low are NOT reset here — they were snapshotted earlier in this
+  // same _renderLWChart call (after W1/MN aggregation) and must survive for
+  // _lwBuildTodayBar to use. For non-W1/MN TFs they remain null from _destroyLWChart.
 
 
   // Uses separate priceScaleId 'volume' pinned to bottom 20% — clean Bloomberg-style presentation
