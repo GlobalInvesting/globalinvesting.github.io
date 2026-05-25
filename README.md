@@ -79,6 +79,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 |---|---|---|
 | `update-bond-yields.yml` | 23:00 daily | `extended-data/{USD,EUR,GBP,JPY}.json` — bond10y, bond2y, bond5y, vix (FRED + ECB + BOE) |
 | `update-inflation-expectations.yml` | Monday 06:00 | `extended-data/{USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD}.json` — inflationExpectations (FRED + World Bank) |
+| `update-ohlc.yml` | Every :30 Mon–Fri (H1/H4); 01:30 Tue–Sat (D1 finalization); 23:30 Sat–Sun (crypto) | `ohlc-data/`, `ohlc-data/h1/`, `ohlc-data/h4/` — OHLC bars for all 38 chart symbols |
 
 ---
 
