@@ -3427,20 +3427,19 @@ async function _renderLWChart(ohlcId, label) {
   if (_isIntradayTf && _LW_FX_IDS.has(ohlcId)) {
     try {
       const _resolutionSec  = (_activeTf === 'H1') ? 3600 : 14400;
-      const _lastJsonTs     = bars[bars.length - 1].time;          // last completed bar in JSON
-      const _nowSec         = Math.floor(Date.now() / 1000);
+      const _lastJsonTs     = bars[bars.length - 1].time;
       const _nowUTC2        = new Date();
       const _utcDow         = _nowUTC2.getUTCDay();
       const _utcHr          = _nowUTC2.getUTCHours();
 
-      // Skip gap-fill entirely outside FX market hours (same guard as _lwUpdateTodayBar)
+      // Skip outside FX market hours
       const _fxClosed = (
-        _utcDow === 6 ||                          // all Saturday
-        (_utcDow === 0 && _utcHr < 21) ||         // Sunday before 21:00 UTC
-        (_utcDow === 5 && _utcHr >= 21)            // Friday after 21:00 UTC
+        _utcDow === 6 ||
+        (_utcDow === 0 && _utcHr < 21) ||
+        (_utcDow === 5 && _utcHr >= 21)
       );
 
-      // Compute start of current live block (bars in progress — must be excluded)
+      // Current live block start (in-progress bar — must be excluded)
       let _currentBlockTs;
       if (_activeTf === 'H1') {
         const _d = new Date(_nowUTC2);
@@ -3453,41 +3452,73 @@ async function _renderLWChart(ohlcId, label) {
         _currentBlockTs = Math.floor(_d.getTime() / 1000);
       }
 
-      // Gap exists when the expected next JSON bar is earlier than the current live block
-      const _expectedNextTs = _lastJsonTs + _resolutionSec;
+      if (!_fxClosed) {
+        // ── Session start: most recent Sunday 21:00 UTC ───────────────────────
+        // We fetch Finnhub bars from session open to current block. This lets us:
+        // (a) replace yfinance artifact bars in the JSON (O≈L / C≈L artifacts that
+        //     occur in the first hours of the FX week), AND
+        // (b) fill any gap between the last JSON bar and the current live block.
+        // Finnhub OANDA data for the current session is consistently cleaner than
+        // the yfinance stub bars produced at session open.
+        const _daysSinceSun = (_utcDow + 1) % 7;       // 0 if today is Sunday
+        const _lastSun      = new Date(_nowUTC2);
+        _lastSun.setUTCDate(_nowUTC2.getUTCDate() - _daysSinceSun);
+        _lastSun.setUTCHours(21, 0, 0, 0);
+        // If the computed Sunday 21:00 is in the future (e.g. it's Sunday but before 21:00),
+        // step back 7 days — but _fxClosed already guards that case above.
+        const _sessionStartTs = Math.floor(_lastSun.getTime() / 1000);
 
-      if (!_fxClosed && _expectedNextTs < _currentBlockTs) {
-        // Derive HTTPS candle URL from the WSS WebSocket URL (same Worker, different path)
-        // FX_PROXY_WS_URL = "wss://...workers.dev/ws" → "https://...workers.dev"
-        const _wsUrl      = (typeof FX_PROXY_WS_URL !== 'undefined') ? FX_PROXY_WS_URL : '';
-        const _candleBase = _wsUrl.replace(/^wss:\/\//, 'https://').replace(/\/ws$/, '');
+        // Only fire the fetch if there are bars in the current session window
+        // (avoids a request when session just opened and JSON already has today's bars)
+        const _sessionBarsInJson = bars.filter(b => b.time >= _sessionStartTs && b.time < _currentBlockTs);
+        const _expectedNextTs    = _lastJsonTs + _resolutionSec;
+        const _hasGap            = _expectedNextTs < _currentBlockTs;
+        const _sessionHasData    = _sessionBarsInJson.length > 0;
 
-        if (_candleBase) {
-          const _resParam = (_activeTf === 'H1') ? '60' : '240';
-          const _candleUrl = `${_candleBase}/candles?id=${encodeURIComponent(ohlcId)}&resolution=${_resParam}&from=${_expectedNextTs}&to=${_currentBlockTs}`;
+        if (_sessionHasData || _hasGap) {
+          const _wsUrl      = (typeof FX_PROXY_WS_URL !== 'undefined') ? FX_PROXY_WS_URL : '';
+          const _candleBase = _wsUrl.replace(/^wss:\/\//, 'https://').replace(/\/ws$/, '');
 
-          const _gapResp = await fetch(_candleUrl, { signal: AbortSignal.timeout(1500) });
-          if (_gapResp.ok) {
-            const _gapData = await _gapResp.json();
-            if (Array.isArray(_gapData.bars) && _gapData.bars.length > 0) {
-              // Only accept bars that are completed (time < current live block start)
-              // and newer than the last JSON bar (time > _lastJsonTs)
-              const _gapBars = _gapData.bars.filter(b =>
-                b.time > _lastJsonTs && b.time < _currentBlockTs &&
-                b.open > 0 && b.high > 0 && b.low > 0 && b.close > 0
-              );
-              if (_gapBars.length > 0) {
-                // Sort by time (should already be sorted, but defensive)
-                _gapBars.sort((a, b) => a.time - b.time);
-                bars = bars.concat(_gapBars);
+          if (_candleBase) {
+            const _resParam   = (_activeTf === 'H1') ? '60' : '240';
+            // Request from session start (to capture artifact bars) up to the current block
+            const _candleUrl  = `${_candleBase}/candles?id=${encodeURIComponent(ohlcId)}&resolution=${_resParam}&from=${_sessionStartTs}&to=${_currentBlockTs}`;
+
+            const _gapResp = await fetch(_candleUrl, { signal: AbortSignal.timeout(2000) });
+            if (_gapResp.ok) {
+              const _gapData = await _gapResp.json();
+              if (Array.isArray(_gapData.bars) && _gapData.bars.length > 0) {
+                // Validate bars: completed, within session window, sensible OHLC values
+                const _finnhubBars = _gapData.bars.filter(b =>
+                  b.time >= _sessionStartTs && b.time < _currentBlockTs &&
+                  b.open > 0 && b.high > 0 && b.low > 0 && b.close > 0 &&
+                  b.high >= b.open && b.high >= b.close &&
+                  b.low  <= b.open && b.low  <= b.close
+                );
+                if (_finnhubBars.length > 0) {
+                  _finnhubBars.sort((a, b) => a.time - b.time);
+                  // Build a timestamp Set for O(1) lookup
+                  const _finnhubTs = new Set(_finnhubBars.map(b => b.time));
+                  // Keep JSON bars that predate the session (historical) or are not
+                  // covered by Finnhub (non-FX session bars). Replace everything
+                  // within the session window that Finnhub returned.
+                  // Keep pre-session bars (historical, unaffected by artifacts).
+                  // Discard session bars covered by Finnhub (cleaner OANDA data).
+                  // Keep any in-session bars Finnhub didn't return (defensive).
+                  const _keptJsonBars = bars.filter(b =>
+                    b.time < _sessionStartTs ||
+                    (b.time >= _sessionStartTs && !_finnhubTs.has(b.time) && b.time < _currentBlockTs)
+                  );
+                  bars = [..._keptJsonBars, ..._finnhubBars].sort((a, b) => a.time - b.time);
+                }
               }
             }
           }
         }
       }
     } catch (_gapErr) {
-      // Silent fallback — gap bars are a best-effort enhancement, not required for
-      // correct chart operation. _lwUpdateTodayBar() always covers the live block.
+      // Silent fallback — if Worker unreachable/timeout, chart renders with JSON bars.
+      // _lwUpdateTodayBar() always covers the live block regardless.
     }
   }
 
