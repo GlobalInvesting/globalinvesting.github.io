@@ -1,9 +1,22 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v3.5  —  Intraday quotes via yfinance + Twelve Data staleness fallback (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
+fetch_intraday_quotes.py  v3.6  —  Intraday quotes via yfinance + Twelve Data staleness fallback (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
+
+MEJORAS v3.6 vs v3.5:
+  - _is_quote_stale() rewritten: now gates EXCLUSIVELY on marketState=="REGULAR"
+    before declaring a quote frozen. Previously used a weekday+hour heuristic that
+    fired on US/EU market holidays (e.g. Memorial Day 2026-05-26), triggering 5
+    useless TD batch calls for indices that were correctly closed.
+    New rule: CLOSED/PRE/POST/POSTPOST → not stale (last price IS the valid close).
+    REGULAR → check timestamp lag. This is the only correct signal.
+  - TD_BATCH_MAP trimmed to commodities only: removed all equity index entries
+    (SPX, IXIC, DJI, VIX, N225, DAX, HSI, SX5E, FTSE100, AS51) that were either
+    plan-restricted or used wrong TD symbol names on the free tier.
+    Retained: XAU/USD, XAG/USD, WTI/USD, BRENT/USD (commodity spot prices —
+    confirmed accessible on TD free tier).
 
 MEJORAS v3.5 vs v3.4:
   - Staleness detection (PASO 2b): detects frozen Yahoo quotes by checking
@@ -11,9 +24,8 @@ MEJORAS v3.5 vs v3.4:
     from a previous calendar day (weekday, after 13:00 UTC) or is > 30 min
     stale during REGULAR market state. Does NOT gate on pct==0.0 alone.
   - Twelve Data batch fallback (fetch_td_batch): replaces stale yfinance quotes
-    for commodities (XAU/USD, XAG/USD, WTI/USD, BRENT/USD) and equity indices
-    (SPX, IXIC, DJI, VIX, N225, DAX, HSI, SX5E, FTSE100, AS51) in a single
-    HTTP request (1 batch call regardless of symbol count → within 800 req/day).
+    for commodities (XAU/USD, XAG/USD, WTI/USD, BRENT/USD) in a single HTTP
+    request (1 batch call regardless of symbol count → within 800 req/day).
   - load_repo_fallback extended: now also covers us5y (bond5y from USD.json)
     and includes sourceDate for transparency.
   - TD_BATCH_MAP: central map from internal symbol → Twelve Data symbol for all
@@ -1576,42 +1588,46 @@ def fetch_yfinance_all(symbols_map):
 # (FRED:DGS series) — they are not included here.
 # Crypto (btc, eth) and FX (dxy) trade near-continuously — excluded.
 TD_BATCH_MAP = {
-    # Commodities — TD spot price (XAU/USD etc.) vs Yahoo futures (GC=F):
+    # Commodities only — confirmed accessible on TD free tier.
+    # TD spot price (XAU/USD etc.) vs Yahoo futures (GC=F):
     # basis ~0.3–0.5% but intraday %change tracks identically.
+    #
+    # Equity indices REMOVED (v3.6): SPX/IXIC/DJI/VIX require paid plan;
+    # N225/HSI/DAX/SX5E/FTSE100/AS51 return "symbol not found" or "unavailable"
+    # on the free tier. When Yahoo freezes these, the correct behavior is to
+    # keep the yfinance value as-is (last valid close) — not to fire failing
+    # TD calls. The marketState=="REGULAR" gate in _is_quote_stale() now
+    # prevents false-positive staleness detection on closed/holiday markets,
+    # so these symbols will only trigger if Yahoo truly freezes during an
+    # active REGULAR session — which is the correct and rare case.
     "gold":   "XAU/USD",
     "silver": "XAG/USD",
     "wti":    "WTI/USD",
     "brent":  "BRENT/USD",
-    # Equity indices — US
-    "spx":    "SPX",
-    "nasdaq": "IXIC",
-    "dji":    "DJI",
-    "vix":    "VIX",
-    # Equity indices — international
-    "nikkei": "N225",
-    "dax":    "DAX",
-    "hsi":    "HSI",
-    "stoxx":  "SX5E",
-    "ftse":   "FTSE100",
-    "asx":    "AS51",
 }
 
 
 def _is_quote_stale(quote: dict, now_utc) -> bool:
-    """Return True if a yfinance quote looks frozen (market_time predates today's session open).
+    """Return True if a yfinance quote is frozen while the market is actively trading.
 
-    Staleness definition:
-      - market_time (Unix ts) is available AND
-      - the local session should have already opened (market_state == "REGULAR" or
-        it is a weekday between 13:00 and 22:00 UTC — covers US, EU, and Asian opens) AND
-      - market_time is older than the expected session open by > 30 minutes.
+    A quote is stale if AND ONLY IF:
+      1. market_time (Unix timestamp) is available, AND
+      2. marketState == "REGULAR" (Yahoo confirms the exchange is actively trading), AND
+      3. Either:
+         (a) market_time is from a previous calendar day, OR
+         (b) market_time is > 30 min behind now (intraday freeze).
 
-    This catches the Yahoo freeze observed on 2026-05-25: GC=F and CL=F showed
-    regularMarketTime = 08:41 ET while the market had been open since 09:30 ET,
-    with pct=0.00% because close == prev_close.
+    The marketState gate is the critical guard against false positives:
+      "CLOSED"   -> holiday or weekend; last price IS the correct last close -> not stale.
+      "PRE"      -> pre-market; thin/delayed quotes are expected -> not stale.
+      "POST"     -> after-hours; last price is the official close -> not stale.
+      "POSTPOST" -> extended after-hours -> not stale.
+      "REGULAR"  -> exchange is open; a stale timestamp here = Yahoo froze the feed.
 
-    We do NOT gate on pct==0.0 alone because pct can legitimately be 0% early in a session.
-    We gate on the timestamp being stale, which is a harder signal.
+    Root cause of v3.5 false positives (Memorial Day 2026-05-26):
+      US markets were CLOSED; Yahoo correctly returned marketState="CLOSED" and
+      market_time from prior Friday. Old code checked weekday + hour only, flagging
+      spx/nasdaq/dji/hsi/ftse as stale and firing 5 useless TD calls that all failed.
     """
     market_time  = quote.get("market_time")
     market_state = quote.get("market_state", "")
@@ -1619,22 +1635,21 @@ def _is_quote_stale(quote: dict, now_utc) -> bool:
     if not market_time:
         return False  # no timestamp → cannot determine staleness
 
+    # Only declare staleness when Yahoo confirms the exchange is actively trading.
+    if market_state != "REGULAR":
+        return False
+
     last_trade_utc = datetime.fromtimestamp(market_time, tz=timezone.utc)
     today_utc      = now_utc.date()
 
-    # If the last trade was on a previous calendar day → definitely stale during market hours
+    # Branch (a): last trade was on a previous calendar day while market is REGULAR.
     if last_trade_utc.date() < today_utc:
-        # Only flag as stale if market should be open now (Mon–Fri, after 13:00 UTC)
-        is_weekday   = now_utc.weekday() < 5  # 0=Mon…4=Fri
-        after_open   = now_utc.hour >= 13      # conservative: US pre-market opens ~13:00 UTC
-        if is_weekday and after_open:
-            return True
+        return True
 
-    # Same-day but market_time is > 30 min behind now AND market_state is REGULAR
-    if last_trade_utc.date() == today_utc:
-        lag_minutes = (now_utc - last_trade_utc).total_seconds() / 60
-        if lag_minutes > 30 and market_state == "REGULAR":
-            return True
+    # Branch (b): same-day but timestamp is > 30 min stale during REGULAR session.
+    lag_minutes = (now_utc - last_trade_utc).total_seconds() / 60
+    if lag_minutes > 30:
+        return True
 
     return False
 
@@ -1764,7 +1779,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v3.0  —  {ts}\n{'='*60}\n")
+    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v3.6  —  {ts}\n{'='*60}\n")
 
     quotes = {}
 
