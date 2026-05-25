@@ -3411,6 +3411,85 @@ async function _renderLWChart(ohlcId, label) {
   let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
 
+  // ── H1/H4 FX gap-fill via Cloudflare Worker /candles ─────────────────────────
+  // The JSON is updated every :30 UTC Mon–Fri. At worst, 1 completed H1 bar or
+  // 3 completed H4 bars are missing (bars that closed after the last workflow run
+  // but before the user opened the chart). This block fetches those missing completed
+  // bars from Finnhub via the CF Worker and splices them in before setData().
+  //
+  // Scope: FX pairs only (Finnhub OANDA covers exactly the 28 pairs in _LW_FX_IDS).
+  //        H1/H4 only (unix timestamp bars). Non-FX (gold, BTC, etc.) has no
+  //        Finnhub FX equivalent — their gap is handled by _lwUpdateTodayBar alone.
+  //
+  // Failure mode: silent — if the Worker is unreachable, returns empty, or times out
+  //               (1.5s budget), the chart renders normally with the JSON bars and
+  //               the live partial bar from _lwUpdateTodayBar. No user-visible error.
+  if (_isIntradayTf && _LW_FX_IDS.has(ohlcId)) {
+    try {
+      const _resolutionSec  = (_activeTf === 'H1') ? 3600 : 14400;
+      const _lastJsonTs     = bars[bars.length - 1].time;          // last completed bar in JSON
+      const _nowSec         = Math.floor(Date.now() / 1000);
+      const _nowUTC2        = new Date();
+      const _utcDow         = _nowUTC2.getUTCDay();
+      const _utcHr          = _nowUTC2.getUTCHours();
+
+      // Skip gap-fill entirely outside FX market hours (same guard as _lwUpdateTodayBar)
+      const _fxClosed = (
+        _utcDow === 6 ||                          // all Saturday
+        (_utcDow === 0 && _utcHr < 21) ||         // Sunday before 21:00 UTC
+        (_utcDow === 5 && _utcHr >= 21)            // Friday after 21:00 UTC
+      );
+
+      // Compute start of current live block (bars in progress — must be excluded)
+      let _currentBlockTs;
+      if (_activeTf === 'H1') {
+        const _d = new Date(_nowUTC2);
+        _d.setUTCMinutes(0, 0, 0);
+        _currentBlockTs = Math.floor(_d.getTime() / 1000);
+      } else {
+        const _blockH = Math.floor(_nowUTC2.getUTCHours() / 4) * 4;
+        const _d = new Date(_nowUTC2);
+        _d.setUTCHours(_blockH, 0, 0, 0);
+        _currentBlockTs = Math.floor(_d.getTime() / 1000);
+      }
+
+      // Gap exists when the expected next JSON bar is earlier than the current live block
+      const _expectedNextTs = _lastJsonTs + _resolutionSec;
+
+      if (!_fxClosed && _expectedNextTs < _currentBlockTs) {
+        // Derive HTTPS candle URL from the WSS WebSocket URL (same Worker, different path)
+        // FX_PROXY_WS_URL = "wss://...workers.dev/ws" → "https://...workers.dev"
+        const _wsUrl      = (typeof FX_PROXY_WS_URL !== 'undefined') ? FX_PROXY_WS_URL : '';
+        const _candleBase = _wsUrl.replace(/^wss:\/\//, 'https://').replace(/\/ws$/, '');
+
+        if (_candleBase) {
+          const _resParam = (_activeTf === 'H1') ? '60' : '240';
+          const _candleUrl = `${_candleBase}/candles?id=${encodeURIComponent(ohlcId)}&resolution=${_resParam}&from=${_expectedNextTs}&to=${_currentBlockTs}`;
+
+          const _gapResp = await fetch(_candleUrl, { signal: AbortSignal.timeout(1500) });
+          if (_gapResp.ok) {
+            const _gapData = await _gapResp.json();
+            if (Array.isArray(_gapData.bars) && _gapData.bars.length > 0) {
+              // Only accept bars that are completed (time < current live block start)
+              // and newer than the last JSON bar (time > _lastJsonTs)
+              const _gapBars = _gapData.bars.filter(b =>
+                b.time > _lastJsonTs && b.time < _currentBlockTs &&
+                b.open > 0 && b.high > 0 && b.low > 0 && b.close > 0
+              );
+              if (_gapBars.length > 0) {
+                // Sort by time (should already be sorted, but defensive)
+                _gapBars.sort((a, b) => a.time - b.time);
+                bars = bars.concat(_gapBars);
+              }
+            }
+          }
+        }
+      }
+    } catch (_gapErr) {
+      // Silent fallback — gap bars are a best-effort enhancement, not required for
+      // correct chart operation. _lwUpdateTodayBar() always covers the live block.
+    }
+  }
 
   // ── W1/MN aggregation from D1 bars ───────────────────────────────────────────
   // For W1: group D1 bars by ISO week Monday. For MN: group by YYYY-MM-01.
