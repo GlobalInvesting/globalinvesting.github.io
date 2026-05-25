@@ -1,6 +1,7 @@
 name: Update OHLC Chart Data
 
-# Downloads OHLC bars for all chart symbols via yfinance and writes JSON files
+# Downloads OHLC bars for all chart symbols and writes JSON files
+# FX pairs (28): Finnhub REST API (OANDA). All others: yfinance.
 # to THIS (public) repo under ohlc-data/:
 #
 #   ohlc-data/{id}.json       — Daily (D1) bars, ~3 years, ~38 symbols
@@ -70,7 +71,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install yfinance --break-system-packages
+        run: pip install yfinance requests --break-system-packages
 
       - name: Create output directories
         run: mkdir -p ohlc-data ohlc-data/h1 ohlc-data/h4
@@ -78,6 +79,7 @@ jobs:
       - name: Fetch OHLC data
         env:
           SITE_DIR: .
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: python scripts/fetch_ohlc.py
 
       - name: Display summary
