@@ -212,7 +212,7 @@
         const holTitle  = hol.title || 'Bank Holiday';
         const tooltipTx = `${holTitle} — ${ccy} market closed`;
         html += `<div class="cal-event-row cal-holiday-row" title="${tooltipTx}">` +
-          `<div class="cal-col cal-time" style="color:var(--text3);">All Day</div>` +
+          `<div class="cal-col cal-time">All Day</div>` +
           `<div class="cal-col cal-ccy">${flagHtml}<span style="font-size:10px;">${ccy}</span></div>` +
           `<div class="cal-col cal-impact"><span class="cal-dot" style="background:var(--text3);" title="Market holiday"></span></div>` +
           `<div class="cal-col cal-title">${holTitle}</div>` +
