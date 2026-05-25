@@ -1,21 +1,9 @@
 #!/usr/bin/env python3
 """
-fetch_ohlc.py  v2.0 — Daily OHLC history for Lightweight Charts
+fetch_ohlc.py  v1.9 — Daily OHLC history for Lightweight Charts
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Downloads 3 years of daily OHLC bars for all symbols used by the
-Lightweight Charts panel.
-
-FX pairs (28):   Finnhub REST API — OANDA feed (v2.0).
-                 Uses the same data source as the CF Worker WebSocket
-                 proxy. Finnhub D1 bars use the correct 21:00 UTC FX
-                 session boundary — no UTC-midnight artifact, no O≈L/
-                 C≈L bugs that yfinance 1H-aggregation produced.
-                 FINNHUB_API_KEY env var required (GitHub repo secret).
-                 H1/H4 intraday FX bars also sourced from Finnhub
-                 (resolution=60 / resolution=240).
-
-All other instruments (indices, commodities, crypto, bonds):
-                 yfinance — unchanged from v1.9.
+Downloads 3 years of daily OHLC bars via yfinance for all symbols
+used by the Lightweight Charts panel (replaces TradingView widget).
 
 Symbols covered:
   FX Majors   (7): EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD
@@ -93,7 +81,6 @@ import json
 import os
 import sys
 import time
-import requests
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -102,59 +89,6 @@ try:
 except ImportError:
     print("ERROR: yfinance not installed. Run: pip install yfinance")
     sys.exit(1)
-
-# ── Finnhub config ─────────────────────────────────────────────────────────────
-# Used for all 28 FX pairs (D1, H1, H4). Same source as the CF Worker WS proxy.
-FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY", "")
-FINNHUB_BASE    = "https://finnhub.io/api/v1/forex/candle"
-
-# Finnhub OANDA symbol map — mirrors FX_PAIRS in cf-worker/fx-ws-proxy.js
-FINNHUB_FX_SYMBOLS: dict[str, str] = {
-    "eurusd": "OANDA:EUR_USD", "gbpusd": "OANDA:GBP_USD", "usdjpy": "OANDA:USD_JPY",
-    "audusd": "OANDA:AUD_USD", "usdcad": "OANDA:USD_CAD", "usdchf": "OANDA:USD_CHF",
-    "nzdusd": "OANDA:NZD_USD", "eurgbp": "OANDA:EUR_GBP", "eurjpy": "OANDA:EUR_JPY",
-    "eurchf": "OANDA:EUR_CHF", "eurcad": "OANDA:EUR_CAD", "euraud": "OANDA:EUR_AUD",
-    "eurnzd": "OANDA:EUR_NZD", "gbpjpy": "OANDA:GBP_JPY", "gbpchf": "OANDA:GBP_CHF",
-    "gbpcad": "OANDA:GBP_CAD", "gbpaud": "OANDA:GBP_AUD", "gbpnzd": "OANDA:GBP_NZD",
-    "audjpy": "OANDA:AUD_JPY", "audnzd": "OANDA:AUD_NZD", "audchf": "OANDA:AUD_CHF",
-    "audcad": "OANDA:AUD_CAD", "cadjpy": "OANDA:CAD_JPY", "cadchf": "OANDA:CAD_CHF",
-    "nzdjpy": "OANDA:NZD_JPY", "nzdcad": "OANDA:NZD_CAD", "nzdchf": "OANDA:NZD_CHF",
-    "chfjpy": "OANDA:CHF_JPY",
-}
-
-# Finnhub free tier: 60 req/min. 28 pairs × up to 2 blocks = ≤56 calls per pair set.
-# Sleep 1.1s between calls → max ~54 req/min — safely within the limit.
-FINNHUB_RATE_SLEEP = 1.1   # seconds between Finnhub REST calls
-
-
-def _finnhub_candles(symbol: str, resolution: str, from_ts: int, to_ts: int) -> list[dict] | None:
-    """
-    Fetch one block of candles from Finnhub REST.
-    Returns list of raw dicts {t, o, h, l, c} or None on error / rate limit.
-    Sleeps FINNHUB_RATE_SLEEP before each call to respect rate limit.
-    """
-    time.sleep(FINNHUB_RATE_SLEEP)
-    try:
-        resp = requests.get(
-            FINNHUB_BASE,
-            params={"symbol": symbol, "resolution": resolution,
-                    "from": from_ts, "to": to_ts, "token": FINNHUB_API_KEY},
-            timeout=20,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        if data.get("s") == "no_data":
-            return []
-        if data.get("s") != "ok" or not isinstance(data.get("t"), list) or len(data["t"]) == 0:
-            err = data.get("error", "unknown error")
-            print(f"    Finnhub: s={data.get('s')} error={err}")
-            return None
-        return [{"t": data["t"][i], "o": data["o"][i], "h": data["h"][i],
-                 "l": data["l"][i], "c": data["c"][i]}
-                for i in range(len(data["t"]))]
-    except Exception as exc:
-        print(f"    Finnhub request failed: {exc}")
-        return None
 
 # ── Configuration ──────────────────────────────────────────────────────────────
 
@@ -356,85 +290,180 @@ def _guard(id_: str, val: float) -> bool:
     return lo <= val <= hi
 
 
-# ── FX D1 bars from Finnhub OANDA ───────────────────────────────────────────
+# ── FX 1H → daily aggregation ───────────────────────────────────────────────
 
-def fetch_fx_ohlc_from_finnhub(id_: str) -> list[dict] | None:
+def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
     """
-    Build FX daily (D1) bars from Finnhub OANDA data.
+    Build FX daily bars by aggregating 1H bars over the industry-standard FX
+    session boundary: 21:00 UTC → 21:00 UTC (≈ 17:00 New York → 17:00 New York).
 
-    Finnhub D1 resolution uses the correct FX session boundary (21:00 UTC /
-    17:00 New York), matching Bloomberg, TradingView, and Reuters. This avoids
-    the UTC-midnight artifact in yfinance that produced O≈L and C≈L bars.
+    This produces H/L values that match Yahoo Finance's own 4H chart, TradingView
+    daily FX candles, and Bloomberg FX daily bars — all of which use the NY session
+    boundary, NOT a UTC midnight cutoff.
 
-    Strategy:
-    - Finnhub free tier supports D resolution for ~2 years without pagination.
-    - We request in two blocks: 3y–1y ago and 1y–now.
-    - Each block is a single API call. With 28 pairs × 2 calls = 56 calls total,
-      safely within the 60 req/min free tier limit at FINNHUB_RATE_SLEEP pace.
-    - OHLC sanity clamp applied: H >= max(O,C), L <= min(O,C).
-    - Weekend bars (Sat/Sun) dropped — FX market closed.
+    yfinance returns 1H data for up to 730 days. Bars older than 730 days fall back
+    to the native 1D endpoint with prev_close open correction. The crossover is
+    seamless — only H/L differ, and the 1H portion (most recent ~2 years) is always
+    the correct, faithful representation of real FX session ranges.
     """
-    if not FINNHUB_API_KEY:
-        print(f"  WARN [{id_}]: FINNHUB_API_KEY not set — skipping Finnhub path")
+    try:
+        ticker = yf.Ticker(ticker_sym)
+        dec    = DECIMALS.get(id_, 5)
+
+        # ── PART A: 1H bars → aggregate to daily (FX session boundary 21:00 UTC) ──
+        # 720-day window (not 729/730): yfinance enforces a 730-day hard limit evaluated
+        # in NY time (UTC-4). Before 04:00 UTC the NY date is still yesterday — a 729-day
+        # UTC window lands exactly on the 730-day NY boundary and triggers a silent fallback
+        # to native 1D, producing ~400 clamped bars per pair vs the normal ~130. 9-day
+        # safety margin; gap covered by Part B native 1D. (v1.9)
+        _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
+        _start_1h = datetime.now(timezone.utc) - timedelta(days=720)
+        hist_1h = ticker.history(
+            start=_start_1h.strftime("%Y-%m-%d"),
+            end=_end_1h.strftime("%Y-%m-%d"),
+            interval="1h",
+            auto_adjust=True,
+        )
+
+        # Session-complete guard: only include a session bar if the session has closed.
+        # FX session closes at 21:00 UTC. The scheduled run at 01:30 UTC runs well after
+        # the close — session_date == run_date_utc is the fully-completed bar.
+        # session_date > run_date_utc is the next partial session — discard.
+        # If triggered via workflow_dispatch before 21:00 UTC (mid-session), today's
+        # bucket is still open — discard it by treating yesterday as the effective cutoff.
+        _now_utc = datetime.now(timezone.utc)
+        _fx_session_closed = _now_utc.hour >= 21   # FX closes 21:00 UTC
+        if _fx_session_closed:
+            run_date_utc = (_end_1h - timedelta(days=1)).date()  # today UTC = last complete session
+        else:
+            run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday UTC (today's session still open)
+
+        day_buckets: dict[str, dict] = {}
+        if not hist_1h.empty:
+            for ts, row in hist_1h.iterrows():
+                if ts.tzinfo is None:
+                    ts_utc = ts.replace(tzinfo=timezone.utc)
+                else:
+                    ts_utc = ts.astimezone(timezone.utc)
+
+                # Assign 1H bar to FX session date (session closes at 21:00 UTC)
+                # Hours 00–20 belong to the session closing today (UTC date)
+                # Hours 21–23 open a new session that closes tomorrow (UTC date)
+                if ts_utc.hour < 21:
+                    session_date = ts_utc.date()
+                else:
+                    session_date = (ts_utc + timedelta(days=1)).date()
+
+                # Drop any 1H bar that belongs to a session not yet completed.
+                # session_date == run_date_utc = today's session (complete — closed at 21:00 UTC).
+                # session_date > run_date_utc = tomorrow's partial session — discard.
+                if session_date > run_date_utc:
+                    continue
+
+                date_str = session_date.strftime("%Y-%m-%d")
+                o = float(row["Open"])
+                h = float(row["High"])
+                l = float(row["Low"])
+                c = float(row["Close"])
+
+                if not (_guard(id_, c) and _guard(id_, o) and h >= l):
+                    continue
+                if o == h == l == c:
+                    continue
+
+                if date_str not in day_buckets:
+                    # Include open in H/L so the session open price is always within range.
+                    # yfinance 1H high/low reflect ticks WITHIN that hour, not the open tick
+                    # itself. If the open is above the hour's high (gap-up open) or below
+                    # the hour's low (gap-down open), ignoring it produces H < O or L > O —
+                    # structurally impossible bars that render as deformed candles.
+                    day_buckets[date_str] = {"open": o, "high": max(o, h), "low": min(o, l), "close": c}
+                else:
+                    b = day_buckets[date_str]
+                    b["high"]  = max(b["high"], h)
+                    b["low"]   = min(b["low"],  l)
+                    b["close"] = c  # overwrite with the chronologically latest 1H close
+
+        bars_1h: list[dict] = []
+        for date_str in sorted(day_buckets.keys()):
+            b = day_buckets[date_str]
+            d = datetime.strptime(date_str, "%Y-%m-%d")
+            if d.weekday() in (5, 6):  # Saturday, Sunday — FX closed
+                continue
+            if not _guard(id_, b["close"]):
+                continue
+            o_r = round(b["open"],  dec)
+            c_r = round(b["close"], dec)
+            # ── OHLC structural integrity clamp ──────────────────────────────
+            # The bucket open = first 1H bar's Open (which yfinance FX 1H reports
+            # as prev_session_close on most bars). On gap-down sessions the
+            # prev_session_close can exceed all 1H highs accumulated during the day,
+            # producing high < open — a structurally impossible candle. Clamping
+            # guarantees H >= max(O,C) and L <= min(O,C) without discarding the
+            # real intraday range. The same clamp is applied in _lwBuildTodayBar
+            # in dashboard.js for the live today-bar.
+            h_r = round(max(b["high"],  o_r, c_r), dec)
+            l_r = round(min(b["low"],   o_r, c_r), dec)
+            bars_1h.append({
+                "time":   date_str,
+                "open":   o_r,
+                "high":   h_r,
+                "low":    l_r,
+                "close":  c_r,
+                "volume": 0,  # 1H FX tick-volume from Yahoo is not meaningful; omit
+            })
+
+        # ── PART B: native 1D bars for period older than 730-day 1H limit ────────
+        hist_1d = ticker.history(period=PERIOD, interval=INTERVAL, auto_adjust=True)
+        bars_1d_old: list[dict] = []
+        earliest_1h = bars_1h[0]["time"] if bars_1h else None
+
+        if not hist_1d.empty:
+            for ts, row in hist_1d.iterrows():
+                date_str = ts.strftime("%Y-%m-%d")
+                if earliest_1h and date_str >= earliest_1h:
+                    continue  # covered by more-accurate 1H aggregation
+                o, h, l, c = float(row["Open"]), float(row["High"]), float(row["Low"]), float(row["Close"])
+                if not (_guard(id_, c) and _guard(id_, o) and h >= l and h >= c and l <= c):
+                    continue
+                if o == h == l == c:
+                    continue
+                vol = int(row["Volume"]) if "Volume" in row and not (row["Volume"] != row["Volume"]) else 0
+                bars_1d_old.append({
+                    "time":   date_str,
+                    "open":   round(o, dec),
+                    "high":   round(h, dec),
+                    "low":    round(l, dec),
+                    "close":  round(c, dec),
+                    "volume": vol,
+                })
+            # Apply prev_close open correction to legacy 1D bars
+            for i in range(1, len(bars_1d_old)):
+                bars_1d_old[i]["open"] = bars_1d_old[i - 1]["close"]
+
+        # ── Merge: legacy 1D + 1H-aggregated (chronological) ─────────────────────
+        combined = bars_1d_old + bars_1h
+
+        seen: set[str] = set()
+        deduped: list[dict] = []
+        for bar in reversed(combined):
+            if bar["time"] not in seen:
+                seen.add(bar["time"])
+                deduped.append(bar)
+        deduped.reverse()  # oldest to newest
+
+        if len(deduped) < 30:
+            print(f"  WARN [{id_}]: only {len(deduped)} valid bars after 1H aggregation - skipping")
+            return None
+
+        return deduped
+
+    except Exception as exc:
+        print(f"  ERROR [{id_}] (1H agg): {exc}")
         return None
 
-    symbol = FINNHUB_FX_SYMBOLS.get(id_)
-    if not symbol:
-        return None
 
-    dec = DECIMALS.get(id_, 5)
-    now_ts  = int(datetime.now(timezone.utc).timestamp())
-    # Three years back (3 * 365 days)
-    start_ts = now_ts - 3 * 365 * 86400
-
-    # Fetch in two ~18-month blocks to stay within Finnhub free tier response limits
-    mid_ts = now_ts - 365 * 86400   # 1 year ago
-
-    all_raw: list[dict] = []
-    for (frm, to) in [(start_ts, mid_ts), (mid_ts, now_ts)]:
-        raw = _finnhub_candles(symbol, "D", frm, to)
-        if raw is None:
-            print(f"  WARN [{id_}]: Finnhub D block {frm}–{to} failed")
-            # Continue — the other block may still have data
-        elif raw:
-            all_raw.extend(raw)
-
-    if not all_raw:
-        print(f"  WARN [{id_}]: no D1 data from Finnhub for {id_}")
-        return None
-
-    bars: list[dict] = []
-    for r in all_raw:
-        ts = r["t"]
-        date_str = datetime.utcfromtimestamp(ts).strftime("%Y-%m-%d")
-        d = datetime.strptime(date_str, "%Y-%m-%d")
-        if d.weekday() in (5, 6):   # Saturday, Sunday — FX closed
-            continue
-        o, h, l, c = float(r["o"]), float(r["h"]), float(r["l"]), float(r["c"])
-        if not (_guard(id_, c) and _guard(id_, o) and h > 0 and l > 0):
-            continue
-        if o == h == l == c:
-            continue
-        o_r = round(o, dec)
-        c_r = round(c, dec)
-        h_r = round(max(h, o_r, c_r), dec)   # clamp: H >= max(O,C)
-        l_r = round(min(l, o_r, c_r), dec)   # clamp: L <= min(O,C)
-        bars.append({"time": date_str, "open": o_r, "high": h_r,
-                     "low": l_r, "close": c_r, "volume": 0})
-
-    # Deduplicate (keep last occurrence per date — Finnhub returns latest close)
-    seen: dict[str, dict] = {}
-    for b in bars:
-        seen[b["time"]] = b
-    deduped = sorted(seen.values(), key=lambda b: b["time"])
-
-    if len(deduped) < 30:
-        print(f"  WARN [{id_}]: only {len(deduped)} valid D1 bars from Finnhub — skipping")
-        return None
-
-    return deduped
-
-
+# ── Gold CME 1H → daily aggregation ─────────────────────────────────────────
 
 def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
     """
@@ -976,10 +1005,10 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     or None on failure.
 
     Three paths:
-      FX pairs (28):      Finnhub REST API (OANDA feed) via fetch_fx_ohlc_from_finnhub().
-                          D resolution uses the correct 21:00 UTC FX session boundary —
-                          no O=L/C=L artifact, matches Bloomberg, TradingView, Reuters.
-                          Requires FINNHUB_API_KEY env var (GitHub repo secret).
+      FX pairs (28):      delegates to fetch_fx_ohlc_from_1h() — 1H aggregation over the
+                          21:00 UTC NY session boundary. H/L match Bloomberg, TradingView,
+                          Reuters FX daily candles. Required because native 1D FX bars use
+                          UTC midnight cutoff, producing wrong H/L and unreliable opens.
 
       Equity 1H (2):      Nikkei 225 (TSE) and EuroStoxx 50 (Euronext) via
                           fetch_equity_ohlc_from_1h(). Both close well before the 22:30 UTC
@@ -989,13 +1018,13 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                           completed bar to be excluded. 1H bars have no such lag.
 
       Non-FX (9):         native yfinance 1D bars — BTC, ETH, SPX, Nasdaq, US10Y, VIX,
-                          WTI, DXY, Gold. SPX/Nasdaq/US10Y/VIX close at 20:00-21:00 UTC;
+                          WTI, DXY, Gold. SPX/Nasdaq/US10Y/VIX close at 20:00–21:00 UTC;
                           native 1D includes their in-progress today bar at 22:30 UTC.
                           dashboard.js strips the today bar and re-injects it live from
                           quotes.json.
     """
     if id_ in FX_SYMBOLS:
-        return fetch_fx_ohlc_from_finnhub(id_)
+        return fetch_fx_ohlc_from_1h(id_, ticker_sym)
     if id_ in CME_SYMBOLS:
         if id_ == 'gold':
             return fetch_gold_ohlc_from_1h(id_, ticker_sym)
@@ -1162,7 +1191,7 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
         # we KEEP the today-bar in the JSON so the JS can strip it and replace
         # with the live feed. This is the correct pipeline architecture.
         #
-        # No FX open correction here — FX pairs handled by fetch_fx_ohlc_from_finnhub().
+        # No FX open correction here — handled by fetch_fx_ohlc_from_1h.
         # No back-adjustment for futures — removed v7.47.19.
 
         return deduped
@@ -1241,123 +1270,20 @@ INTRADAY_SYMBOLS: dict[str, str] = {
 }
 
 
-def _build_h1_h4_from_raw(raw_bars: list[dict], id_: str, dec: int) -> tuple[list[dict], list[dict]]:
-    """
-    Convert a list of raw {t, o, h, l, c} bars (unix timestamps) into
-    deduplicated H1 bars and H4 bars aggregated to UTC 4-hour blocks.
-    Returns (h1_final, h4_final). Does NOT drop the last H4 block.
-    """
-    h1_bars: list[dict] = []
-    h4_buckets: dict[int, dict] = {}
-
-    for r in raw_bars:
-        unix_ts = int(r["t"])
-        o = round(float(r["o"]), dec)
-        h = round(float(r["h"]), dec)
-        l = round(float(r["l"]), dec)
-        c = round(float(r["c"]), dec)
-        if not (_guard(id_, c) and _guard(id_, o) and h >= l):
-            continue
-        if o == h == l == c:
-            continue
-        h = round(max(h, o, c), dec)
-        l = round(min(l, o, c), dec)
-        h1_bars.append({"time": unix_ts, "open": o, "high": h, "low": l, "close": c})
-
-        # H4: align to UTC 4-hour block
-        ts_utc = datetime.utcfromtimestamp(unix_ts).replace(tzinfo=timezone.utc)
-        block_hour  = (ts_utc.hour // 4) * 4
-        block_start = ts_utc.replace(hour=block_hour, minute=0, second=0, microsecond=0)
-        block_unix  = int(block_start.timestamp())
-        if block_unix not in h4_buckets:
-            h4_buckets[block_unix] = {"open": o, "high": h, "low": l, "close": c}
-        else:
-            b = h4_buckets[block_unix]
-            b["high"]  = round(max(b["high"], h), dec)
-            b["low"]   = round(min(b["low"],  l), dec)
-            b["close"] = c
-
-    seen_h1: dict[int, dict] = {b["time"]: b for b in h1_bars}
-    h1_final = sorted(seen_h1.values(), key=lambda b: b["time"])
-    h4_final = [
-        {"time": ts, "open": b["open"],
-         "high": round(max(b["high"], b["open"], b["close"]), dec),
-         "low":  round(min(b["low"],  b["open"], b["close"]), dec),
-         "close": b["close"]}
-        for ts, b in sorted(h4_buckets.items())
-    ]
-    return h1_final, h4_final
-
-
 def build_intraday_ohlc() -> None:
-    """
-    Fetch H1 + H4 bars for all intraday symbols and write JSONs.
-
-    FX pairs (28): sourced from Finnhub OANDA (resolution=60).
-      Same feed as the CF Worker WS proxy — correct session boundaries,
-      no O=L/C=L artifacts. Requires FINNHUB_API_KEY env var.
-      Each pair fetched as a single 365-day block (Finnhub H1 free tier).
-
-    Non-FX (6): yfinance 1H — BTC, ETH, Gold, WTI, SPX, DXY. Unchanged.
-    """
+    """Fetch 1H bars from yfinance and write H1 + H4 JSONs for all intraday symbols."""
     now_utc  = datetime.now(timezone.utc)
     h1_dir   = OUT_DIR / "h1"
     h4_dir   = OUT_DIR / "h4"
     h1_dir.mkdir(parents=True, exist_ok=True)
     h4_dir.mkdir(parents=True, exist_ok=True)
 
+    end_dt   = now_utc + timedelta(days=1)
+    start_dt = now_utc - timedelta(days=720)
     written_h1 = written_h4 = 0
     errors_intra: list[str] = []
 
-    # ── FX pairs: Finnhub H1 ──────────────────────────────────────────────────
-    if FINNHUB_API_KEY:
-        now_ts   = int(now_utc.timestamp())
-        # Finnhub free tier H1: ~1 year window reliable. Fetch last 365 days.
-        start_ts = now_ts - 365 * 86400
-
-        for id_ in sorted(FINNHUB_FX_SYMBOLS.keys()):
-            symbol = FINNHUB_FX_SYMBOLS[id_]
-            dec    = DECIMALS.get(id_, 5)
-            print(f"  [{id_:10s}] Finnhub {symbol} H1/H4 ...", end=" ", flush=True)
-            try:
-                raw = _finnhub_candles(symbol, "60", start_ts, now_ts)
-                if not raw:
-                    print("SKIP (no data)")
-                    errors_intra.append(id_)
-                    continue
-
-                h1_final, h4_final = _build_h1_h4_from_raw(raw, id_, dec)
-
-                # Drop the last (possibly incomplete) H4 block
-                if h4_final:
-                    h4_final = h4_final[:-1]
-
-                if len(h1_final) < 50:
-                    print(f"SKIP (only {len(h1_final)} H1 bars)")
-                    errors_intra.append(id_)
-                    continue
-
-                write_json(h1_dir / f"{id_}.json", h1_final)
-                write_json(h4_dir / f"{id_}.json", h4_final)
-                written_h1 += 1; written_h4 += 1
-                print(f"OK  H1:{len(h1_final)} H4:{len(h4_final)}")
-
-            except Exception as exc:
-                print(f"ERROR: {exc}")
-                errors_intra.append(id_)
-    else:
-        print("  WARN: FINNHUB_API_KEY not set — FX H1/H4 skipped")
-        errors_intra.extend(FINNHUB_FX_SYMBOLS.keys())
-
-    # ── Non-FX symbols: yfinance 1H (unchanged) ──────────────────────────────
-    non_fx_intraday = {
-        id_: sym for id_, sym in INTRADAY_SYMBOLS.items()
-        if id_ not in FINNHUB_FX_SYMBOLS
-    }
-    end_dt   = now_utc + timedelta(days=1)
-    start_dt = now_utc - timedelta(days=720)
-
-    for id_, ticker_sym in non_fx_intraday.items():
+    for id_, ticker_sym in INTRADAY_SYMBOLS.items():
         print(f"  [{id_:10s}] {ticker_sym} H1/H4 ...", end=" ", flush=True)
         try:
             ticker = yf.Ticker(ticker_sym)
@@ -1389,6 +1315,7 @@ def build_intraday_ohlc() -> None:
                 l = round(min(l, o, c), dec)
                 h1_bars.append({"time": unix_ts, "open": o, "high": h, "low": l, "close": c})
 
+                # H4: align to UTC 4-hour block
                 block_hour  = (ts_utc.hour // 4) * 4
                 block_start = ts_utc.replace(hour=block_hour, minute=0, second=0, microsecond=0)
                 block_unix  = int(block_start.timestamp())
@@ -1400,11 +1327,15 @@ def build_intraday_ohlc() -> None:
                     b["low"]   = round(min(b["low"],  l), dec)
                     b["close"] = c
 
+            # Drop the current (incomplete) H4 block
             if h4_buckets:
                 del h4_buckets[max(h4_buckets)]
 
+            # Deduplicate H1 and sort
             seen_h1: dict[int, dict] = {b["time"]: b for b in h1_bars}
             h1_final = sorted(seen_h1.values(), key=lambda b: b["time"])
+
+            # Build sorted H4 list with integrity clamp
             h4_final = [
                 {"time": ts, "open": b["open"],
                  "high": round(max(b["high"], b["open"], b["close"]), dec),
