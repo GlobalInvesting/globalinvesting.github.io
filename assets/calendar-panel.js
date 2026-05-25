@@ -1,258 +1,358 @@
 /**
- * calendar-panel.js — Native economic calendar renderer
- * Reads calendar-data/ff_calendar.json (Finnhub, G8, medium+high impact)
+ * calendar-panel.js — Native economic calendar renderer  v1.2.0
+ * Reads calendar-data/ff_calendar.json (ForexFactory / Finnhub, G8, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
- * TEST FILE — not yet merged into dashboard.js.
+ *
+ * v1.2.0 (2026-05-25) — Market holiday awareness
+ * - Hardcoded G8 holiday table (2026). On any holiday date, a Bloomberg-style
+ *   banner row appears under the date header: holiday name + affected currency
+ *   chips + "Prior close" note. Covers all dates in the visible window.
+ * - cal-panel-sub gets a holiday count suffix when today is a holiday.
+ * - Exposes window._MARKET_HOLIDAYS for dashboard.js cross-asset tooltip logic.
  */
 (function () {
   'use strict';
 
-  const G8      = new Set(['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']);
-  const IMPACTS = new Set(['medium','high']);
+  // ─── G8 Market Holidays 2026 ─────────────────────────────────────────────
+  // Sources: NYSE/CME (USD), Eurex/ECB (EUR), LSE (GBP), TSE (JPY),
+  //          ASX (AUD), TSX (CAD), SIX (CHF), NZX (NZD)
+  // Full-day closures only. Partial/early-close days are excluded.
+  var G8_HOLIDAYS_RAW = [
+    // USD
+    { date:'2026-01-01', label:"New Year's Day",             currencies:['USD','EUR','GBP','AUD','CAD','CHF','NZD'] },
+    { date:'2026-01-19', label:'Martin Luther King Jr. Day', currencies:['USD'] },
+    { date:'2026-02-16', label:"Presidents' Day",            currencies:['USD'] },
+    { date:'2026-04-03', label:'Good Friday',                currencies:['USD','EUR','GBP','AUD','CAD','CHF','NZD'] },
+    { date:'2026-04-06', label:'Easter Monday',              currencies:['EUR','GBP','AUD','CAD','CHF','NZD'] },
+    { date:'2026-05-25', label:'Memorial Day',               currencies:['USD'] },
+    { date:'2026-07-03', label:'Independence Day (observed)',currencies:['USD'] },
+    { date:'2026-09-07', label:'Labor Day',                  currencies:['USD','CAD'] },
+    { date:'2026-10-12', label:'Columbus Day',               currencies:['USD'] },
+    { date:'2026-11-11', label:'Veterans Day / Remembrance Day', currencies:['USD','CAD'] },
+    { date:'2026-11-26', label:'Thanksgiving Day',           currencies:['USD'] },
+    { date:'2026-12-25', label:'Christmas Day',              currencies:['USD','EUR','GBP','AUD','CAD','CHF','NZD'] },
+    { date:'2026-12-26', label:'Boxing Day',                 currencies:['GBP','AUD','CAD','CHF','NZD'] },
+    // GBP
+    { date:'2026-05-04', label:'Early May Bank Holiday',     currencies:['GBP'] },
+    { date:'2026-05-26', label:'Spring Bank Holiday',        currencies:['GBP'] },
+    { date:'2026-08-03', label:'Summer Bank Holiday',        currencies:['GBP'] },
+    // EUR / CHF
+    { date:'2026-05-19', label:'Whit Monday',                currencies:['CHF'] },
+    { date:'2026-05-26', label:'Whit Monday',                currencies:['EUR'] },
+    // AUD
+    { date:'2026-01-26', label:'Australia Day',              currencies:['AUD'] },
+    { date:'2026-04-25', label:'ANZAC Day',                  currencies:['AUD','NZD'] },
+    { date:'2026-06-08', label:"King's Birthday (AU)",       currencies:['AUD'] },
+    // CAD
+    { date:'2026-05-18', label:'Victoria Day',               currencies:['CAD'] },
+    { date:'2026-10-12', label:'Thanksgiving Day (CA)',      currencies:['CAD'] },
+    // NZD
+    { date:'2026-01-02', label:"New Year's Day (observed)",  currencies:['NZD'] },
+    { date:'2026-06-01', label:"King's Birthday (NZ)",       currencies:['NZD'] },
+    { date:'2026-10-26', label:'Labour Day (NZ)',            currencies:['NZD'] },
+    { date:'2026-12-28', label:'Boxing Day (observed)',      currencies:['NZD'] },
+    // JPY — TSE
+    { date:'2026-01-01', label:"New Year's Day",             currencies:['JPY'] },
+    { date:'2026-01-12', label:'Coming of Age Day',          currencies:['JPY'] },
+    { date:'2026-02-11', label:'National Foundation Day',    currencies:['JPY'] },
+    { date:'2026-02-23', label:"Emperor's Birthday",         currencies:['JPY'] },
+    { date:'2026-03-20', label:'Vernal Equinox Day',         currencies:['JPY'] },
+    { date:'2026-04-29', label:'Showa Day',                  currencies:['JPY'] },
+    { date:'2026-05-03', label:'Constitution Memorial Day',  currencies:['JPY'] },
+    { date:'2026-05-04', label:'Greenery Day',               currencies:['JPY'] },
+    { date:'2026-05-05', label:"Children's Day",             currencies:['JPY'] },
+    { date:'2026-07-20', label:'Marine Day',                 currencies:['JPY'] },
+    { date:'2026-08-11', label:'Mountain Day',               currencies:['JPY'] },
+    { date:'2026-09-21', label:'Respect for the Aged Day',   currencies:['JPY'] },
+    { date:'2026-09-23', label:'Autumnal Equinox',           currencies:['JPY'] },
+    { date:'2026-10-12', label:'Sports Day',                 currencies:['JPY'] },
+    { date:'2026-11-03', label:'Culture Day',                currencies:['JPY'] },
+    { date:'2026-11-23', label:'Labour Thanksgiving Day',    currencies:['JPY'] },
+  ];
 
-  const IMPACT_DOT = {
+  // Merge into one entry per date
+  var HOLIDAYS_BY_DATE = (function () {
+    var map = {};
+    G8_HOLIDAYS_RAW.forEach(function (h) {
+      if (!map[h.date]) map[h.date] = { labels: [], currencies: [] };
+      if (map[h.date].labels.indexOf(h.label) === -1) map[h.date].labels.push(h.label);
+      h.currencies.forEach(function (c) {
+        if (map[h.date].currencies.indexOf(c) === -1) map[h.date].currencies.push(c);
+      });
+    });
+    return map;
+  })();
+
+  // Expose for dashboard.js cross-asset holiday tooltip logic
+  window._MARKET_HOLIDAYS = HOLIDAYS_BY_DATE;
+
+  // ─── Constants ────────────────────────────────────────────────────────────
+  var G8_SET    = { USD:1, EUR:1, GBP:1, JPY:1, AUD:1, CAD:1, CHF:1, NZD:1 };
+  var IMPACTS   = { medium:1, high:1 };
+
+  var IMPACT_DOT = {
     high:   { color: 'var(--down)',   label: 'High'   },
     medium: { color: 'var(--orange)', label: 'Medium' },
   };
 
-  const FLAG = { USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz' };
+  var FLAG = { USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz' };
 
-  // Browser timezone offset label e.g. "GMT-3"
+  var EXCHANGE = {
+    USD:'NYSE/CME', EUR:'Eurex', GBP:'LSE', JPY:'TSE',
+    AUD:'ASX', CAD:'TSX', CHF:'SIX', NZD:'NZX',
+  };
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
   function tzLabel() {
-    const off = -new Date().getTimezoneOffset();
-    const sign = off >= 0 ? '+' : '-';
-    const h = Math.floor(Math.abs(off) / 60);
-    const m = Math.abs(off) % 60;
+    var off = -new Date().getTimezoneOffset();
+    var sign = off >= 0 ? '+' : '-';
+    var h = Math.floor(Math.abs(off) / 60);
+    var m = Math.abs(off) % 60;
     return 'GMT' + sign + h + (m ? ':' + String(m).padStart(2,'0') : '');
   }
 
-  // Convert "HH:MM" UTC on dateISO to browser local time "HH:MM"
   function toLocalTime(dateISO, timeUTC) {
     if (!timeUTC) return 'All Day';
-    const [h, m] = timeUTC.split(':').map(Number);
-    const d = new Date(Date.UTC(
-      +dateISO.slice(0,4), +dateISO.slice(5,7)-1, +dateISO.slice(8,10), h, m
+    var parts = timeUTC.split(':').map(Number);
+    var d = new Date(Date.UTC(
+      +dateISO.slice(0,4), +dateISO.slice(5,7)-1, +dateISO.slice(8,10), parts[0], parts[1]
     ));
     return d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false });
   }
 
-  // "2026-05-22" → "Friday, May 22"
   function formatDate(dateISO) {
-    const d = new Date(dateISO + 'T12:00:00Z');
+    var d = new Date(dateISO + 'T12:00:00Z');
     return d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', timeZone:'UTC' });
   }
 
-  // Has this event's datetime already passed?
   function isPastEvent(dateISO, timeUTC) {
-    const [h, m] = (timeUTC || '23:59').split(':').map(Number);
-    const evMs = Date.UTC(
-      +dateISO.slice(0,4), +dateISO.slice(5,7)-1, +dateISO.slice(8,10), h, m
+    var t = (timeUTC || '23:59').split(':').map(Number);
+    var evMs = Date.UTC(
+      +dateISO.slice(0,4), +dateISO.slice(5,7)-1, +dateISO.slice(8,10), t[0], t[1]
     );
     return evMs < Date.now();
   }
 
-  // Today's ISO date in UTC
   function todayISO() {
     return new Date().toISOString().slice(0, 10);
   }
 
-  // Scroll cal-events-body to a child element (correct inner scroll, not outer panel)
-  function scrollCalTo(container, target) {
-    if (!target) { container.scrollTop = 0; return; }
-    const offset = target.offsetTop - container.offsetTop;
-    container.scrollTop = Math.max(0, offset - 2);
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  // ── Next-event jump button ────────────────────────────────────────────────
-  // Industry standard: floating pill at bottom of calendar that shows
-  // the next upcoming high/medium event and jumps to it on click.
-  // Hides automatically when the next event is already in view.
-  function setupNextEventButton(container, firstUpcomingEl) {
-    // Remove any previous instance
-    const prev = document.getElementById('cal-next-btn');
-    if (prev) prev.remove();
+  // ─── Holiday banner ───────────────────────────────────────────────────────
+  // Bloomberg convention: muted orange bar at top of the day, before event rows.
+  // Shows: ⊘ icon · holiday name · currency chip per affected market · "Prior close"
+  function buildHolidayRowHtml(dateISO, holiday) {
+    var ccys = holiday.currencies.filter(function (c) { return G8_SET[c]; });
+    if (!ccys.length) return '';
 
+    var chips = ccys.map(function (c) {
+      var f  = FLAG[c] || '';
+      var ex = EXCHANGE[c] || c;
+      var flagHtml = f ? '<span class="fi fi-' + f + '" style="font-size:9px;line-height:1;"></span>' : '';
+      return '<span title="' + esc(ex) + ' closed today" style="display:inline-flex;align-items:center;gap:2px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;font-size:9px;color:var(--text2);white-space:nowrap;">' + flagHtml + esc(c) + '</span>';
+    }).join('');
+
+    var label   = holiday.labels.join(' \u00b7 ');
+    var exList  = ccys.map(function (c) { return c + ' (' + (EXCHANGE[c] || c) + ')'; }).join(', ');
+    var tooltip = esc(label) + ' \u2014 closed: ' + esc(exList) + ' \u2014 prices reflect prior close';
+
+    return '<div class="cal-holiday-row" data-date="' + dateISO + '" title="' + tooltip + '">' +
+      '<span class="cal-holiday-icon" aria-hidden="true">\u2298</span>' +
+      '<span class="cal-holiday-label">' + esc(label) + '</span>' +
+      '<span class="cal-holiday-chips">' + chips + '</span>' +
+      '<span class="cal-holiday-note">Prior close</span>' +
+      '</div>';
+  }
+
+  // ─── Scroll helpers ────────────────────────────────────────────────────────
+  function scrollCalTo(container, target) {
+    if (!target) { container.scrollTop = 0; return; }
+    container.scrollTop = Math.max(0, target.offsetTop - container.offsetTop - 2);
+  }
+
+  // ─── Next-event jump button ───────────────────────────────────────────────
+  function setupNextEventButton(container, firstUpcomingEl) {
+    var prev = document.getElementById('cal-next-btn');
+    if (prev) prev.remove();
     if (!firstUpcomingEl) return;
 
-    // Read the event label for the button
-    const timeEl  = firstUpcomingEl.querySelector('.cal-time');
-    const ccyEl   = firstUpcomingEl.querySelector('.cal-ccy');
-    const titleEl = firstUpcomingEl.querySelector('.cal-title');
-    const dotEl   = firstUpcomingEl.querySelector('.cal-dot');
+    var timeEl  = firstUpcomingEl.querySelector('.cal-time');
+    var ccyEl   = firstUpcomingEl.querySelector('.cal-ccy');
+    var titleEl = firstUpcomingEl.querySelector('.cal-title');
+    var dotEl   = firstUpcomingEl.querySelector('.cal-dot');
 
-    const timeStr  = timeEl  ? timeEl.textContent.trim()  : '';
-    const ccyStr   = ccyEl  ? ccyEl.textContent.trim()   : '';
-    const titleStr = titleEl ? titleEl.textContent.trim() : 'Next event';
-    // Truncate title to keep pill compact
-    const shortTitle = titleStr.length > 28 ? titleStr.slice(0, 26) + '…' : titleStr;
-    const dotColor = dotEl ? dotEl.style.background : 'var(--text3)';
+    var timeStr    = timeEl  ? timeEl.textContent.trim()  : '';
+    var ccyStr     = ccyEl   ? ccyEl.textContent.trim()   : '';
+    var titleStr   = titleEl ? titleEl.textContent.trim() : 'Next event';
+    var shortTitle = titleStr.length > 28 ? titleStr.slice(0, 26) + '\u2026' : titleStr;
+    var dotColor   = dotEl ? dotEl.style.background : 'var(--text3)';
 
-    const btn = document.createElement('button');
+    var btn = document.createElement('button');
     btn.id = 'cal-next-btn';
-    btn.title = `Jump to next event: ${titleStr}`;
-    btn.setAttribute('aria-label', `Jump to next event: ${titleStr}`);
-    btn.innerHTML = `
-      <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${dotColor};margin-right:5px;flex-shrink:0;"></span>
-      <span style="color:var(--text2);margin-right:4px;font-family:var(--font-mono);font-size:10px;">${timeStr}</span>
-      <span style="color:var(--text2);margin-right:4px;font-size:9px;">${ccyStr}</span>
-      <span style="color:var(--text2);font-size:10px;">${shortTitle}</span>
-      <span id="cal-next-btn-arrow" style="color:var(--text2);margin-left:5px;font-size:10px;">↓</span>`;
+    btn.title = 'Jump to next event: ' + titleStr;
+    btn.setAttribute('aria-label', 'Jump to next event: ' + titleStr);
+    btn.innerHTML =
+      '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + dotColor + ';margin-right:5px;flex-shrink:0;"></span>' +
+      '<span style="color:var(--text2);margin-right:4px;font-family:var(--font-mono);font-size:10px;">' + timeStr + '</span>' +
+      '<span style="color:var(--text2);margin-right:4px;font-size:9px;">' + ccyStr + '</span>' +
+      '<span style="color:var(--text2);font-size:10px;">' + shortTitle + '</span>' +
+      '<span id="cal-next-btn-arrow" style="color:var(--text2);margin-left:5px;font-size:10px;">\u2193</span>';
     btn.style.cssText = [
-      'position:absolute',
-      'bottom:6px',
-      'left:50%',
-      'transform:translateX(-50%)',
-      'display:flex',
-      'align-items:center',
-      'padding:4px 10px',
-      'background:var(--bg3)',
-      'border:1px solid var(--border2)',
-      'border-radius:12px',
-      'cursor:pointer',
-      'white-space:nowrap',
-      'z-index:10',
-      'transition:opacity .15s',
-      'opacity:0',
-      'pointer-events:none',
+      'position:absolute','bottom:6px','left:50%','transform:translateX(-50%)',
+      'display:flex','align-items:center','padding:4px 10px',
+      'background:var(--bg3)','border:1px solid var(--border2)','border-radius:12px',
+      'cursor:pointer','white-space:nowrap','z-index:10',
+      'transition:opacity .15s','opacity:0','pointer-events:none',
     ].join(';');
 
-    // Parent needs position:relative for absolute positioning to work
-    const wrapper = container.parentElement;
-    if (wrapper) {
-      wrapper.style.position = 'relative';
-      wrapper.appendChild(btn);
-    } else {
-      return;
-    }
+    var wrapper = container.parentElement;
+    if (!wrapper) return;
+    wrapper.style.position = 'relative';
+    wrapper.appendChild(btn);
 
-    btn.addEventListener('click', () => {
-      // Scroll to the date row just before the first upcoming event
-      const prev = firstUpcomingEl.previousElementSibling;
-      const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcomingEl;
+    btn.addEventListener('click', function () {
+      var prevEl = firstUpcomingEl.previousElementSibling;
+      var target = (prevEl && prevEl.classList.contains('cal-date-row')) ? prevEl : firstUpcomingEl;
       scrollCalTo(container, target);
     });
 
-    // Show/hide based on whether the first upcoming event is visible in the scroll box
-    function updateBtnVisibility() {
-      const cTop    = container.scrollTop;
-      const cBottom = cTop + container.clientHeight;
-      const eTop    = firstUpcomingEl.offsetTop - container.offsetTop;
-      const eBottom = eTop + firstUpcomingEl.offsetHeight;
-      const visible = eTop >= cTop && eBottom <= cBottom + 4;
-      btn.style.opacity        = visible ? '0' : '0.92';
-      btn.style.pointerEvents  = visible ? 'none' : 'auto';
-      // Arrow points toward the next event:
-      // If we've scrolled past it (next event is above) → arrow up ↑
-      // If we're above it (next event is below, i.e. past events) → arrow down ↓
-      const arrowEl = document.getElementById('cal-next-btn-arrow');
-      if (arrowEl) arrowEl.textContent = eTop < cTop ? '↑' : '↓';
+    function updateVisibility() {
+      var cTop    = container.scrollTop;
+      var cBottom = cTop + container.clientHeight;
+      var eTop    = firstUpcomingEl.offsetTop - container.offsetTop;
+      var eBottom = eTop + firstUpcomingEl.offsetHeight;
+      var visible = eTop >= cTop && eBottom <= cBottom + 4;
+      btn.style.opacity       = visible ? '0' : '0.92';
+      btn.style.pointerEvents = visible ? 'none' : 'auto';
+      var arrowEl = document.getElementById('cal-next-btn-arrow');
+      if (arrowEl) arrowEl.textContent = eTop < cTop ? '\u2191' : '\u2193';
     }
-
-    container.addEventListener('scroll', updateBtnVisibility, { passive: true });
-    // Initial check after layout settles
-    requestAnimationFrame(() => requestAnimationFrame(updateBtnVisibility));
+    container.addEventListener('scroll', updateVisibility, { passive: true });
+    requestAnimationFrame(function () { requestAnimationFrame(updateVisibility); });
   }
 
+  // ─── Build panel ──────────────────────────────────────────────────────────
   function buildPanel(events, source) {
     source = source || 'Finnhub';
-    const container = document.getElementById('cal-events-body');
-    const sourceEl  = document.getElementById('cal-panel-sub');
+    var container = document.getElementById('cal-events-body');
+    var sourceEl  = document.getElementById('cal-panel-sub');
     if (!container) return;
 
-    const filtered = events.filter(ev =>
-      G8.has(ev.currency) && IMPACTS.has(ev.impact)
-    );
+    var today = todayISO();
 
-    if (!filtered.length) {
+    // Filter to G8 medium+high impact
+    var filtered = events.filter(function (ev) {
+      return G8_SET[ev.currency] && IMPACTS[ev.impact];
+    });
+
+    // Collect all dates: event dates + holiday dates in the visible window
+    // Window: 5 days back to 30 days ahead (covers this week's releases + upcoming)
+    var windowStartMs = new Date(today).getTime() - 5 * 86400000;
+    var windowEndMs   = new Date(today).getTime() + 30 * 86400000;
+
+    var allDates = {};
+    filtered.forEach(function (ev) { allDates[ev.dateISO] = 1; });
+    Object.keys(HOLIDAYS_BY_DATE).forEach(function (d) {
+      var dMs = new Date(d).getTime();
+      if (dMs >= windowStartMs && dMs <= windowEndMs) allDates[d] = 1;
+    });
+
+    var sortedDates = Object.keys(allDates).sort();
+
+    if (!sortedDates.length) {
       container.innerHTML = '<div style="padding:12px 10px;color:var(--text3);font-size:11px;">No events available.</div>';
       return;
     }
 
-    // Group by date
-    const byDate = {};
-    filtered.forEach(ev => {
+    // Group events by date
+    var byDate = {};
+    filtered.forEach(function (ev) {
       if (!byDate[ev.dateISO]) byDate[ev.dateISO] = [];
       byDate[ev.dateISO].push(ev);
     });
 
-    const today = todayISO();
-    let html = '';
+    var html = '';
 
-    Object.keys(byDate).sort().forEach(dateISO => {
-      const dayEvs = byDate[dateISO];
-      const isToday = dateISO === today;
-      html += `<div class="cal-date-row" data-date="${dateISO}"${isToday ? ' data-today="1"' : ''}>${formatDate(dateISO)}</div>`;
+    sortedDates.forEach(function (dateISO) {
+      var dayEvs  = byDate[dateISO] || [];
+      var holiday = HOLIDAYS_BY_DATE[dateISO];
+      var isToday = dateISO === today;
 
-      dayEvs.forEach(ev => {
-        const dot        = IMPACT_DOT[ev.impact];
-        const flag       = FLAG[ev.currency] || '';
-        const flagHtml   = flag ? `<span class="fi fi-${flag}" style="margin-right:4px;font-size:10px;flex-shrink:0;"></span>` : '';
-        const isReleased = !!(ev.actual && ev.actual !== '' && ev.actual !== '-');
-        const isPast     = isPastEvent(ev.dateISO, ev.timeUTC);
-        const dimmed     = isPast && isReleased;
+      // Skip dates with no events AND no holiday
+      if (!dayEvs.length && !holiday) return;
+      // Skip past dates >5d ago that have no holiday marker
+      var dMs = new Date(dateISO).getTime();
+      if (!holiday && dMs < windowStartMs) return;
 
-        // Actual coloring
-        let actualHtml = '<span style="color:var(--text3)">—</span>';
+      html += '<div class="cal-date-row" data-date="' + dateISO + '"' +
+        (isToday ? ' data-today="1"' : '') + '>' + formatDate(dateISO) + '</div>';
+
+      // Bloomberg convention: holiday banner BEFORE event rows
+      if (holiday) html += buildHolidayRowHtml(dateISO, holiday);
+
+      dayEvs.forEach(function (ev) {
+        var dot        = IMPACT_DOT[ev.impact];
+        var flag       = FLAG[ev.currency] || '';
+        var flagHtml   = flag ? '<span class="fi fi-' + flag + '" style="margin-right:4px;font-size:10px;flex-shrink:0;"></span>' : '';
+        var isReleased = !!(ev.actual && ev.actual !== '' && ev.actual !== '-');
+        var isPast     = isPastEvent(ev.dateISO, ev.timeUTC);
+        var dimmed     = isPast && isReleased;
+
+        var actualHtml = '<span style="color:var(--text3)">—</span>';
         if (isReleased && ev.actual != null) {
-          const actualN   = parseFloat(String(ev.actual).replace(/[%,KMB\s]/gi,''));
-          const forecastN = parseFloat(String(ev.forecast || ev.previous || '').replace(/[%,KMB\s]/gi,''));
-          let cls = '';
+          var actualN   = parseFloat(String(ev.actual).replace(/[%,KMB\s]/gi,''));
+          var forecastN = parseFloat(String(ev.forecast || ev.previous || '').replace(/[%,KMB\s]/gi,''));
+          var cls = '';
           if (!isNaN(actualN) && !isNaN(forecastN) && actualN !== forecastN) {
             cls = actualN > forecastN ? ' class="up"' : ' class="down"';
           }
-          actualHtml = `<span${cls}>${ev.actual}</span>`;
+          actualHtml = '<span' + cls + '>' + esc(String(ev.actual)) + '</span>';
         }
 
-        const forecastHtml = ev.forecast
-          ? `<span style="color:var(--text2)">${ev.forecast}</span>`
+        var forecastHtml = ev.forecast
+          ? '<span style="color:var(--text2)">' + esc(String(ev.forecast)) + '</span>'
           : '<span style="color:var(--text3)">—</span>';
-        const previousHtml = ev.previous
-          ? `<span style="color:var(--text3)">${ev.previous}</span>`
+        var previousHtml = ev.previous
+          ? '<span style="color:var(--text3)">' + esc(String(ev.previous)) + '</span>'
           : '<span style="color:var(--text3)">—</span>';
 
-        const localTime = toLocalTime(ev.dateISO, ev.timeUTC);
-        const upcomingAttr = (!isPast) ? ' data-upcoming="1"' : '';
+        var localTime    = toLocalTime(ev.dateISO, ev.timeUTC);
+        var upcomingAttr = (!isPast) ? ' data-upcoming="1"' : '';
 
-        html += `<div class="cal-event-row${dimmed ? ' cal-released' : ''}"${upcomingAttr}>
-  <div class="cal-col cal-time">${localTime}</div>
-  <div class="cal-col cal-ccy">${flagHtml}${ev.currency}</div>
-  <div class="cal-col cal-impact"><span class="cal-dot" style="background:${dot.color}" title="${dot.label} impact"></span></div>
-  <div class="cal-col cal-title" title="${ev.title}">${ev.title}</div>
-  <div class="cal-col cal-num">${actualHtml}</div>
-  <div class="cal-col cal-num">${forecastHtml}</div>
-  <div class="cal-col cal-num">${previousHtml}</div>
-</div>`;
+        html += '<div class="cal-event-row' + (dimmed ? ' cal-released' : '') + '"' + upcomingAttr + '>' +
+          '<div class="cal-col cal-time">' + localTime + '</div>' +
+          '<div class="cal-col cal-ccy">' + flagHtml + esc(ev.currency) + '</div>' +
+          '<div class="cal-col cal-impact"><span class="cal-dot" style="background:' + dot.color + '" title="' + dot.label + ' impact"></span></div>' +
+          '<div class="cal-col cal-title" title="' + esc(ev.title) + '">' + esc(ev.title) + '</div>' +
+          '<div class="cal-col cal-num">' + actualHtml + '</div>' +
+          '<div class="cal-col cal-num">' + forecastHtml + '</div>' +
+          '<div class="cal-col cal-num">' + previousHtml + '</div>' +
+          '</div>';
       });
     });
 
-    container.innerHTML = html;
+    container.innerHTML = html || '<div style="padding:12px 10px;color:var(--text3);font-size:11px;">No events available.</div>';
 
-    // ── Scroll logic ──────────────────────────────────────────────────────
-    // Uses direct scrollTop on cal-events-body (the overflow:auto container),
-    // NOT scrollIntoView which would scroll the outer #rightpanel instead.
-    //
-    // Priority order:
-    // 1. Today's date row — always anchor on today if the day has events
-    // 2. No today section — jump to first upcoming event's date row
-    // 3. First future date (next trading day after today)
-    // 4. Top (fallback — all events past, no future dates yet loaded)
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const todayRow      = container.querySelector('[data-today="1"]');
-      const firstUpcoming = container.querySelector('[data-upcoming="1"]');
+    // ── Scroll: today > first upcoming > next future date > top ──────────────
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      var todayRow      = container.querySelector('[data-today="1"]');
+      var firstUpcoming = container.querySelector('[data-upcoming="1"]');
 
       if (todayRow) {
         scrollCalTo(container, todayRow);
       } else if (firstUpcoming) {
-        const prev = firstUpcoming.previousElementSibling;
-        const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcoming;
+        var prevEl = firstUpcoming.previousElementSibling;
+        var target = (prevEl && prevEl.classList.contains('cal-date-row')) ? prevEl : firstUpcoming;
         scrollCalTo(container, target);
       } else {
-        // Find first future date row
-        const allDateRows = container.querySelectorAll('.cal-date-row[data-date]');
-        let scrolled = false;
-        for (const row of allDateRows) {
-          if (row.dataset.date > today) {
-            scrollCalTo(container, row);
+        var dateRows = container.querySelectorAll('.cal-date-row[data-date]');
+        var scrolled = false;
+        for (var i = 0; i < dateRows.length; i++) {
+          if (dateRows[i].dataset.date > today) {
+            scrollCalTo(container, dateRows[i]);
             scrolled = true;
             break;
           }
@@ -260,30 +360,38 @@
         if (!scrolled) container.scrollTop = 0;
       }
 
-      // Setup "Next event" jump button
       setupNextEventButton(container, firstUpcoming);
-    }));
+    }); });
 
+    // ── Panel subtitle: source + timezone + holiday notice ────────────────────
     if (sourceEl) {
-      sourceEl.textContent = `${source} · G8 · medium & high impact · ${tzLabel()}`;
+      var todayH = HOLIDAYS_BY_DATE[today];
+      var sub = source + ' \u00b7 G8 \u00b7 medium & high impact \u00b7 ' + tzLabel();
+      if (todayH) {
+        var n = todayH.currencies.filter(function (c) { return G8_SET[c]; }).length;
+        sub += ' \u00b7 ' + n + ' market holiday' + (n > 1 ? 's' : '') + ' today \u00b7 prices reflect prior close';
+      }
+      sourceEl.textContent = sub;
     }
-    const thTime = document.getElementById('cal-th-time');
+
+    var thTime = document.getElementById('cal-th-time');
     if (thTime) thTime.textContent = tzLabel();
   }
 
+  // ─── Fetch ────────────────────────────────────────────────────────────────
   async function fetchEconomicCalendar() {
     try {
-      let events = [];
-      let source = 'Finnhub';
-      for (const path of ['./calendar-data/ff_calendar.json', './calendar-data/calendar.json']) {
-        const res = await fetch(path).catch(() => null);
-        if (!res?.ok) continue;
-        const j = await res.json();
-        if (j?.events?.length) { events = j.events; source = j.source || source; break; }
+      var events = [], source = 'Finnhub';
+      var paths = ['./calendar-data/ff_calendar.json', './calendar-data/calendar.json'];
+      for (var i = 0; i < paths.length; i++) {
+        var res = await fetch(paths[i]).catch(function () { return null; });
+        if (!res || !res.ok) continue;
+        var j = await res.json();
+        if (j && j.events && j.events.length) { events = j.events; source = j.source || source; break; }
       }
       buildPanel(events, source);
-    } catch {
-      const c = document.getElementById('cal-events-body');
+    } catch (e) {
+      var c = document.getElementById('cal-events-body');
       if (c) c.innerHTML = '<div style="padding:12px 10px;color:var(--text3);font-size:11px;">Calendar unavailable.</div>';
     }
   }
