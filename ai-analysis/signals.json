@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-05-25T03:39:39Z",
+  "generated_at": "2026-05-25T10:55:06Z",
   "signals": [
     {
-      "time": "03:39",
+      "time": "10:54",
       "priority": "critical",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkish bias) vs RBNZ hike bias priced for May 27. Despite NZIER shadow board backing a hold at 2.25%, the market prices future hikes and a restrictive real rate deficit of -0.83%. If RBNZ delivers a hawkish hold or signals imminent tightening, short-squeeze risk is elevated as specs are crowded short (28% long). NZD/USD at 0.5874.",
+      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkish bias) vs RBNZ hike bias priced for the 27 May meeting. While BBH expects a hold, ING forecasts a hawkish stance; if RBNZ delivers a hike or signals tightening, the crowded spec short (28.0% long) faces significant unwind risk. NZD/USD at 0.5872 remains vulnerable to a short squeeze toward 0.6000 as real rates sit at -0.83%.",
       "evidence": [
         "NZD COT LF net: -15,435",
-        "RBNZ real rate: -0.83%",
-        "NZD/USD: 0.5874"
+        "RBNZ Market Bias: Hike",
+        "NZD/USD: 0.5872"
       ],
       "_source": "gemini"
     },
     {
-      "time": "03:35",
+      "time": "10:51",
       "priority": "warning",
-      "title": "USD/JPY — Geopolitical + Carry + Options",
-      "text": "USD/JPY at 158.85 supported by +278bp SOFR-TONA carry advantage. Trump headlines regarding a 'largely negotiated' Iran deal and Strait of Hormuz reopening have triggered a 5% tumble in WTI, easing safe-haven JPY demand. Options market remains cautious with 25d RR at -1.22 (moderate put skew) despite neutral VIX at 16.7. Carry dominates while 160.00 remains the intervention watch level.",
+      "title": "CHF/NZD — G8 Bilateral Theme + Carry Divergence",
+      "text": "CHF outperformance (avg +0.530%) vs NZD weakness (avg -0.360%) creates a 0.889% G8 spread, triggering a bilateral theme alert. CHF strength persists despite a -225bp carry disadvantage vs NZD (SNB 0% vs RBNZ 2.25%), signaling non-carry flows or safe-haven demand dominating the cross. NZD/CHF at 0.4586 reflects this divergence ahead of the RBNZ decision.",
       "evidence": [
-        "USD/JPY OIS carry: +278bp",
-        "USD/JPY 25d RR: -1.22",
-        "WTI Oil: -5% gap"
+        "CHF 1W avg: +0.530% (n=6)",
+        "NZD 1W avg: -0.360% (n=4)",
+        "G8 spread: 0.889%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "03:32",
+      "time": "10:49",
       "priority": "warning",
-      "title": "EUR/USD — Lagarde Headline + Volatility Premium",
-      "text": "EUR/USD at 1.1641 as Lagarde flags inflation forecast revisions ahead of the June 11 meeting. IV at 7.1% vs HV30 at 4.9% creates a +2.2% Vol Risk Premium, signaling the options market is pricing elevated protection relative to realized movement. Fed 3.75% vs ECB 2.00% (+175bp) carry advantage favors USD, structurally limiting upside from hawkish ECB rhetoric.",
+      "title": "USD/JPY — Intervention Risk + Options Skew",
+      "text": "USD/JPY at 158.94 holds just below the 160.00 critical intervention threshold. While the +278bp OIS carry (SOFR vs TONA) supports the pair, the options market is pricing downside protection with a -1.22 moderate put skew (25d RR). HSBC notes intervention requires BoJ support to be sustainable; watch for verbal intervention or BoJ TONA repricing to catalyze a move toward 155.00.",
+      "evidence": [
+        "USD/JPY: 158.94",
+        "25d RR (Saxo): -1.22",
+        "OIS Carry: +278bp"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "10:46",
+      "priority": "warning",
+      "title": "AUD/USD — Volatility Premium + Retail Divergence",
+      "text": "AUD/USD IV at 13.8% vs HV30 at 8.9% generates a +4.9% Vol Risk Premium, signaling heavy institutional hedging. This aligns with a retail/institutional divergence: retail is 72% short (fading the move) while COT LF remains net long +57,180 (74.5% long). Despite a 2.60σ unemployment rate shock, the 84bp AUD OIS carry advantage keeps the pair bid at 0.7171.",
+      "evidence": [
+        "AUD VRP: +4.9% (IV 13.8% / HV30 8.9%)",
+        "Retail Sentiment: 72% Short",
+        "COT LF Net: +57,180"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "10:42",
+      "priority": "info",
+      "title": "EUR/USD — Volatility Premium + CESI Support",
+      "text": "EUR/USD at 1.1647 shows an elevated VRP of +2.2% (IV 7.1% vs HV30 4.9%), indicating the market is paying up for protection despite a neutral 25d RR (-0.39). While BBH warns of downside to 1.1400, the EUR CESI (net +5) and USD CESI (net +24) both show data outperforming expectations. The 158bp OIS carry advantage for USD remains the structural ceiling for EUR upside.",
       "evidence": [
         "EUR/USD VRP: +2.2%",
-        "Fed-ECB spread: 175bp",
-        "EUR/USD: 1.1641"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "03:28",
-      "priority": "warning",
-      "title": "AUD/USD — Positioning + Vol + Data Shock",
-      "text": "AUD/USD at 0.7166 faces late-trend exhaustion as COT LF net long reaches +57,180 (74.5% long extreme). AUD Unemployment surprise (z=+2.60σ) contradicts the RBA's hiking stance (4.35%). Options market is heavily hedging downside with a +4.9% VRP (IV 13.8% vs HV30 8.9%) and -0.79 RR skew. High-conviction long positioning is vulnerable to a washout if data continues to miss.",
-      "evidence": [
-        "AUD COT long%: 74.5%",
-        "AUD Unemployment z-score: +2.60σ",
-        "AUD/USD VRP: +4.9%"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "03:24",
-      "priority": "info",
-      "title": "CHF/JPY — Retail vs Options Divergence",
-      "text": "CHF/JPY at 203.113 shows extreme retail sentiment with 88% short (contrarian long signal). However, the SNB 0.0% vs BoJ 0.75% (-75bp) carry deficit favors JPY. With VIX at 16.7 (normal volatility), the JPY carry bid competes with CHF safe-haven flows. Watch for retail capitulation if the pair holds above 203.00.",
-      "evidence": [
-        "CHF/JPY retail: 88% short",
-        "SNB-BoJ spread: -75bp",
-        "VIX: 16.7"
+        "USD CESI Net: +24",
+        "EUR/USD OIS Carry: +158bp"
       ],
       "_source": "gemini"
     }
