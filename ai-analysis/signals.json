@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-05-25T16:36:51Z",
+  "generated_at": "2026-05-25T20:57:56Z",
   "signals": [
     {
-      "time": "16:36",
+      "time": "20:57",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical Shock + Carry + Options",
-      "text": "USD/JPY at 158.91 — Markets pricing a 'peace pivot' as Iran deal hopes crash Oil to $95, driving a bearish gap and USD weakness. Despite the headline-driven retreat, the 278bp Fed-BoJ OIS carry advantage (SOFR 3.51% vs TONA 0.73%) remains the structural anchor. JPY COT LF net short -81,624 (31.2% long) confirms a crowded carry trade, while the 25d RR at -1.41 signals the options market is paying a moderate premium for JPY protection (downside USD/JPY) amid intervention fears. Carry dominates the long-term regime, but geopolitical de-escalation triggers immediate JPY short-covering.",
+      "text": "USD/JPY at 158.91 — US-Iran diplomacy headlines regarding the reopening of the Strait of Hormuz in 30 days have triggered a 7% collapse in WTI oil to $96.6, pressuring the USD. Despite the risk-on relief, the +278bp OIS carry advantage (SOFR 3.51% vs TONA 0.73%) remains the structural floor. Options markets are aggressively hedging the downside with a -1.41 moderate put skew (25d RR), while COT shows a crowded JPY net short of -81,624. The combination of geopolitical de-escalation and crowded shorts suggests a floor near 158.00 unless VIX (16.6) spikes above 25.",
       "evidence": [
-        "OIS Carry: +278bp favors USD",
-        "COT JPY LF Net: -81,624",
-        "USD/JPY 25d RR: -1.41 (put skew)"
+        "WTI Oil: $96.6 (-7%)",
+        "USD/JPY OIS Carry: +278bp",
+        "JPY COT LF Net: -81,624"
       ],
       "_source": "gemini"
     },
     {
-      "time": "16:32",
+      "time": "20:54",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD at 0.5872 — COT LF net short -15,435 (28.0% long) shows speculators fading the RBNZ despite a hawkish OIS bias (Hike bias priced for 27 May). With NZD real rates at -0.83% (most accommodative in G8), the currency faces structural pressure, yet a hawkish hold or surprise hike on 27 May introduces significant short-squeeze risk against the crowded spec short. NZD/USD vs NZX 50 correlation at +0.386 (z=+2.03σ) indicates a break from the -0.232 norm, suggesting NZD is currently trading as a high-beta risk proxy rather than on domestic equity fundamentals.",
+      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ hike bias priced for the 27 May meeting. With NZD real rates at -0.83% (most accommodative in G8) and the pair testing 0.5875, a hawkish RBNZ delivery poses a significant short-squeeze risk. Speculative positioning is misaligned with the OIS forward bias; any signal of a terminal rate hike targets a move toward 0.6000. Watch for the RBNZ rate decision on 27 May to trigger the squeeze.",
       "evidence": [
         "NZD COT LF Net: -15,435",
-        "RBNZ Bias: Hike (27 May)",
-        "NZD Real Rate: -0.83%"
+        "NZD Real Rate: -0.83%",
+        "NZD/USD: 0.5875"
       ],
       "_source": "gemini"
     },
     {
-      "time": "16:28",
+      "time": "20:52",
       "priority": "warning",
-      "title": "AUD/USD — Volatility + Positioning + Retail Divergence",
-      "text": "AUD/USD at 0.7173 — IV at 13.8% vs HV30 at 8.9% generates a +4.9% Vol Risk Premium, signaling aggressive institutional hedging of the upside. This aligns with COT LF net long +57,180 (74.5% long), showing heavy institutional backing. Conversely, retail sentiment is 75% short, creating a classic institutional vs. retail divergence. The 84bp AUD carry premium (AONIA 4.35% vs SOFR 3.51%) supports the long bias, but the extreme VRP suggests the market is paying up for protection against a trend exhaustion. Watch for retail capitulation if price tests 0.7250.",
+      "title": "AUD/USD — Volatility Premium + Positioning + Retail",
+      "text": "AUD/USD at 0.7178 — IV at 13.8% vs HV30 at 8.9% generates a +4.9% Vol Risk Premium, the second highest in the G8, signaling extreme demand for downside protection. This aligns with a -0.85 moderate put skew in 25d RR. However, a massive institutional vs retail divergence is active: COT LF net long +57,180 (74.5% long) vs retail 76% short. Institutional conviction remains bullish despite the high cost of hedging; retail capitulation on a break of 0.7200 determines the next leg higher.",
       "evidence": [
         "AUD VRP: +4.9%",
-        "COT AUD LF Net: +57,180",
-        "Retail Sentiment: 75% Short"
+        "AUD COT LF Net: +57,180",
+        "Retail Sentiment: 76% Short"
       ],
       "_source": "gemini"
     },
     {
-      "time": "16:21",
+      "time": "20:45",
       "priority": "info",
-      "title": "EUR/USD — Volatility Premium + CESI Alignment",
-      "text": "EUR/USD at 1.1641 — IV at 7.1% vs HV30 at 4.9% (VRP +2.2%) indicates elevated hedging demand despite a relatively stable spot price. The positive USD CESI (net +24) supports the 175bp Fed-ECB carry advantage (Fed 3.75% vs ECB 2.00%), keeping EUR upside structurally limited. While the 25d RR at -0.35 shows only a mild put skew, the combination of a restrictive US real rate (+1.09%) vs an accommodative EUR real rate (-0.32%) favors USD on any data-driven rallies. Watch the ECB meeting on 11 June for a shift in the 'Hold' bias.",
+      "title": "EUR/USD — Volatility Premium + Carry",
+      "text": "EUR/USD at 1.1647 — IV at 7.1% vs HV30 at 4.9% creates a +2.2% VRP, indicating the options market is pricing in more realized volatility than the recent range suggests. The +175bp nominal carry advantage (Fed 3.75% vs ECB 2.0%) continues to favor USD, supported by a superior US Economic Surprise Index (CESI) net of +24. Upside remains structurally limited by the carry deficit and restrictive US real rates (+1.09%) vs accommodative EUR real rates (-0.32%).",
       "evidence": [
         "EUR/USD VRP: +2.2%",
-        "USD CESI: +24 net beats",
-        "Real Rate Spread: 141bp favors USD"
+        "USD/EUR Carry: +175bp",
+        "USD CESI Net: +24"
       ],
       "_source": "gemini"
     }
