@@ -1,11 +1,21 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v3.6  —  Intraday quotes via yfinance + Twelve Data staleness fallback (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
+fetch_intraday_quotes.py  v3.7  —  Intraday quotes via yfinance + Twelve Data staleness fallback (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization + context_snapshot enrichment)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
 
-MEJORAS v3.6 vs v3.5:
+MEJORAS v3.7 vs v3.6:
+  - PASO 6c: enriquece ai-analysis/context_snapshot.json in-place con dos campos nuevos:
+      cross_pct:       dict con el % change del día por símbolo (gold, spx, dxy, vix, wti, move)
+                       para que el LLM pueda usar "gold +0.12%" en vez de inferirlo del precio.
+      closed_symbols:  lista de símbolos cuyo pct == 0.0 Y cuyo marketState no es "REGULAR"
+                       (i.e. cerrados por feriado o fin de semana). El script de narrativa
+                       (generate_narrative_signals.py) debe omitir estos símbolos del prompt
+                       o marcarlos explícitamente como "market closed — no intraday move".
+    Raíz del bug: gold mostraba "+0.00%" en la narrativa del feriado Memorial Day 2026-05-25
+    porque context_snapshot.json solo tenía el precio sin el pct ni el flag de cierre.
+    El LLM inventaba "+0.00%" en vez de omitir el dato.
   - _is_quote_stale() rewritten: now gates EXCLUSIVELY on marketState=="REGULAR"
     before declaring a quote frozen. Previously used a weekday+hour heuristic that
     fired on US/EU market holidays (e.g. Memorial Day 2026-05-26), triggering 5
@@ -2038,6 +2048,88 @@ def main():
                     json.dump(_existing_signals, _sf, indent=2)
     except Exception as _e:
         print(f"[CorrSignal] Error generating correlation signals: {_e}")
+
+    # PASO 6c: Enriquecer context_snapshot.json con cross_pct y closed_symbols.
+    # ──────────────────────────────────────────────────────────────────────────
+    # Problema raíz: context_snapshot.json solo tiene precios (cross.gold=4523.2)
+    # sin los % changes del día ni un flag de cierre por feriado. Cuando el LLM
+    # genera la narrativa a partir de ese snapshot, inventa el pct ("gold +0.00%")
+    # en vez de omitir el dato. Este PASO añade:
+    #   cross_pct:      {gold: 0.12, spx: 0.37, dxy: -0.24, vix: ..., wti: -3.1, move: ...}
+    #   closed_symbols: ["gold", "spx", "vix", "wti"] — cerrados por feriado/fin de semana
+    # El engine (generate_narrative_signals.py) debe:
+    #   - Usar cross_pct para formatear los cambios en el prompt en vez de inferirlos.
+    #   - Omitir closed_symbols del prompt o reemplazarlos por "market closed — no intraday data".
+    try:
+        import os as _os
+        _snapshot_path = _os.path.join(site_path, "ai-analysis", "context_snapshot.json")
+
+        # Symbols that belong in the "cross" section of context_snapshot
+        _CROSS_SYMBOLS = ["gold", "spx", "dxy", "vix", "wti", "move", "us2y", "us10y", "btc", "nasdaq"]
+
+        # Build cross_pct and closed_symbols from the freshly-fetched quotes dict
+        _cross_pct: dict = {}
+        _closed_symbols: list = []
+
+        for _sym in _CROSS_SYMBOLS:
+            _q = quotes.get(_sym)
+            if not _q:
+                continue
+            _pct = _q.get("pct")
+            if _pct is not None:
+                _cross_pct[_sym] = round(float(_pct), 2)
+
+            # A symbol is "closed" if pct == 0.0 AND market state is not REGULAR.
+            # We detect this by checking market_state (stored as q["market_state"]) or
+            # by the absence of the stale flag combined with pct == 0.0 and a non-REGULAR state.
+            # Since _is_quote_stale() returns False for CLOSED/holiday markets (correct behavior),
+            # we need a dedicated closed check: marketState in {CLOSED, PRE, POST, POSTPOST}
+            # OR the symbol appears in a G8 holiday today (read from ff_calendar.json).
+            _market_state = (_q.get("market_state") or "").upper()
+            _is_closed_state = _market_state in {"CLOSED", "PRE", "POST", "POSTPOST", ""}
+            _pct_is_zero = _pct is not None and abs(float(_pct)) < 0.001
+
+            if _pct_is_zero and _is_closed_state:
+                _closed_symbols.append(_sym)
+
+        # Additionally flag any symbol that maps to a G8 currency with a holiday today
+        # (e.g. US equity indices on Memorial Day → USD holiday → also closed)
+        _today_iso = ts[:10]
+        _ff_path = _os.path.join(site_path, "calendar-data", "ff_calendar.json")
+        _holiday_ccys: set = set()
+        if _os.path.exists(_ff_path):
+            try:
+                with open(_ff_path) as _ff:
+                    _ff_data = json.load(_ff)
+                for _h in (_ff_data.get("holidays") or []):
+                    if _h.get("dateISO") == _today_iso:
+                        _holiday_ccys.add(_h.get("currency", "").upper())
+            except Exception:
+                pass
+
+        # US symbols (spx, nasdaq, vix, gold, wti, dxy, move, us2y, us10y) are closed on USD holidays
+        _USD_SYMS = {"spx", "nasdaq", "vix", "gold", "wti", "dxy", "move", "us2y", "us10y", "btc"}
+        if "USD" in _holiday_ccys:
+            for _sym in _USD_SYMS:
+                if _sym not in _closed_symbols:
+                    _closed_symbols.append(_sym)
+
+        # Patch context_snapshot.json in-place if it exists
+        if _os.path.exists(_snapshot_path):
+            with open(_snapshot_path) as _csf:
+                _snapshot = json.load(_csf)
+            _snapshot["cross_pct"]      = _cross_pct
+            _snapshot["closed_symbols"] = sorted(set(_closed_symbols))
+            with open(_snapshot_path, "w") as _csf:
+                json.dump(_snapshot, _csf, indent=2)
+            print(f"[Snapshot] context_snapshot.json enriched — "
+                  f"cross_pct: {len(_cross_pct)} symbols, "
+                  f"closed: {_snapshot['closed_symbols'] or 'none'}")
+        else:
+            print("[Snapshot] context_snapshot.json not found — skipping enrichment.")
+
+    except Exception as _e:
+        print(f"[Snapshot] Error enriching context_snapshot.json: {_e}")
 
     # PASO 7: ATM implied volatility — CME FX futures options (primary) + CBOE ETF (fallback)
     fx_etf_iv = fetch_fx_etf_iv()
