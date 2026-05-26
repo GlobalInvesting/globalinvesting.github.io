@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-25T23:44:02Z",
-  "generatedAt": "2026-05-25T23:44:02Z",
+  "lastUpdate": "2026-05-26T00:00:36Z",
+  "generatedAt": "2026-05-26T00:00:36Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,29 +8,24 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-05-27",
-  "rangeTo": "2026-06-05",
-  "totalEvents": 1646,
+  "rangeTo": "2026-06-09",
+  "totalEvents": 1643,
   "currencyCounts": {
-    "EUR": 206,
-    "USD": 605,
-    "CHF": 91,
-    "CAD": 131,
-    "JPY": 183,
+    "EUR": 198,
+    "USD": 604,
+    "CHF": 92,
+    "CAD": 129,
+    "JPY": 186,
     "NZD": 84,
-    "AUD": 169,
-    "GBP": 177
+    "AUD": 172,
+    "GBP": 178
   },
   "impactCounts": {
     "low": 152,
-    "medium": 1125,
-    "high": 369
+    "medium": 1120,
+    "high": 371
   },
   "surpriseStats": {
-    "USD/CB Consumer Confidence": {
-      "n": 3,
-      "mean": 3.933333,
-      "std": 0.23094
-    },
     "EUR/Consumer Confidence Final": {
       "n": 3,
       "mean": 0.0,
@@ -355,6 +350,11 @@
       "n": 3,
       "mean": -0.633333,
       "std": 2.800595
+    },
+    "USD/CB Consumer Confidence": {
+      "n": 2,
+      "mean": 3.8,
+      "std": 0.0
     },
     "CHF/procure.ch Manufacturing PMI": {
       "n": 2,
@@ -16885,71 +16885,6 @@
     {
       "date": "4 May",
       "dateISO": "2026-05-04",
-      "timeUTC": "00:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "BoC Macklem Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
-      "timeUTC": "00:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "BoC Rogers Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
-      "timeUTC": "00:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Buch Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
-      "timeUTC": "00:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
-      "timeUTC": "00:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Eurogroup Meeting",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
       "timeUTC": "01:30",
       "country": "AUD",
       "currency": "AUD",
@@ -16976,71 +16911,6 @@
     {
       "date": "4 May",
       "dateISO": "2026-05-04",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Survey of Monetary Analysts",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Survey of Professional Forecasters",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
-      "timeUTC": "11:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Cipollone Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
-      "timeUTC": "12:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Annual Report",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
-      "timeUTC": "12:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB de Guindos Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
       "timeUTC": "14:00",
       "country": "USD",
       "currency": "USD",
@@ -17050,19 +16920,6 @@
       "actual": "1.5",
       "forecast": "0.5",
       "previous": "0.3"
-    },
-    {
-      "date": "4 May",
-      "dateISO": "2026-05-04",
-      "timeUTC": "16:50",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Williams Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "5 May",
@@ -21877,6 +21734,110 @@
       "actual": null,
       "forecast": null,
       "previous": "57.7"
+    },
+    {
+      "date": "7 Jun",
+      "dateISO": "2026-06-07",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "4682"
+    },
+    {
+      "date": "7 Jun",
+      "dateISO": "2026-06-07",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "GDP Growth Annualized Final",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.1",
+      "previous": "0.8"
+    },
+    {
+      "date": "7 Jun",
+      "dateISO": "2026-06-07",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "GDP Growth Rate QoQ Final",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.5",
+      "previous": "0.2"
+    },
+    {
+      "date": "8 Jun",
+      "dateISO": "2026-06-08",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "-40"
+    },
+    {
+      "date": "8 Jun",
+      "dateISO": "2026-06-08",
+      "timeUTC": "23:01",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BRC Retail Sales Monitor YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "-3.4"
+    },
+    {
+      "date": "9 Jun",
+      "dateISO": "2026-06-09",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Westpac Consumer Confidence Change",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "3.5"
+    },
+    {
+      "date": "9 Jun",
+      "dateISO": "2026-06-09",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Westpac Consumer Confidence Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "83"
+    },
+    {
+      "date": "9 Jun",
+      "dateISO": "2026-06-09",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "NAB Business Confidence",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "-24"
     }
   ]
 }
