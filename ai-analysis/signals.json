@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-05-26T17:40:31Z",
+  "generated_at": "2026-05-26T21:29:38Z",
   "signals": [
     {
-      "time": "17:39",
+      "time": "21:28",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Shock + Carry + Options",
-      "text": "USD/JPY at 159.32 — Strait of Hormuz closure and US Navy escort resumption revive USD safe-haven demand, overriding the bull flattener regime (2s10s +42.6bp). 278bp SOFR-TONA carry advantage sustains the bid despite BoJ hike bias. Options market remains defensive with a -1.41 moderate put skew (25d RR), signaling institutional hedging against intervention as price holds near the 160.00 threshold. Carry dominates while VIX remains at 17.2 (normal volatility).",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkish bias) vs RBNZ hike probability priced for the May 27 meeting. RBNZ nominal rate at 2.25% vs Fed 3.75% maintains a -150bp carry deficit, but a hawkish delivery or signal tomorrow triggers elevated short-squeeze risk for crowded speculative shorts. NZD/USD at 0.5839 testing recent lows while CESI remains neutral at -2.",
       "evidence": [
-        "USD/JPY: 159.32",
-        "SOFR-TONA spread: +278bp",
-        "USDJPY 25d RR: -1.41"
+        "NZD COT LF net: -15,435",
+        "RBNZ hike bias: 27 May",
+        "NZD/USD: 0.5839"
       ],
       "_source": "gemini"
     },
     {
-      "time": "17:36",
+      "time": "21:25",
       "priority": "warning",
-      "title": "AUD/NZD — G8 Bilateral Theme + RBNZ Event Risk",
-      "text": "AUD/NZD G8 spread at 0.952% as NZD laggard status (-0.718% 1W avg) meets AUD outperformance. NZD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ hike risk priced for the 27 May meeting. If RBNZ signals a July hike as flagged by MUFG, a crowded spec short unwind targets 1.0800+. AUD/NZD retail at 93% short represents an extreme contrarian reversal risk if the RBNZ disappoints.",
+      "title": "AUD/NZD — G8 Bilateral Theme + CPI Focus",
+      "text": "AUD/NZD G8 spread at 0.945% as AUD outperforms (+0.256%) and NZD lags (-0.689%) across G8 peers. AUD/USD at 0.7173 remains supported by over CHF and -84bp OIS premium over USD. Upcoming Australia CPI data determines if the RBA's 4.35% hiking stance maintains this outperformance. Retail sentiment at 92% short AUD/NZD signals extreme contrarian reversal risk if CPI surprises to the upside.",
       "evidence": [
-        "AUD 1W avg: +0.234% (n=4)",
-        "NZD 1W avg: -0.718% (n=4)",
-        "G8 spread: 0.952%"
+        "AUD 1W avg: +0.256% (n=4)",
+        "NZD 1W avg: -0.689% (n=4)",
+        "G8 spread: 0.945%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "17:34",
+      "time": "21:23",
       "priority": "warning",
-      "title": "EUR/USD — Volatility Premium + Macro Divergence",
-      "text": "EUR/USD at 1.1629 — IV at 7.1% vs HV30 at 4.3% generates a +2.8pt VRP, signaling elevated hedging demand as Hormuz tensions revive USD demand. Fed 3.75% vs ECB 2.00% creates a +175bp carry advantage for USD, supported by a restrictive +1.09% US real rate vs -0.32% for EUR. CESI divergence (USD +24 vs EUR +5) confirms superior US data momentum, keeping EUR upside structurally limited.",
+      "title": "USD/JPY — Carry + Vol + Intervention Risk",
+      "text": "USD/JPY at 159.29 — 300bp Fed-BoJ carry sustains the bid despite Hormuz firefight headlines reviving USD demand. JPY COT LF net short -81,624 (long% 31.2%) remains crowded. 160.00 remains the key level for BoJ verbal warnings or intervention. 25d RR at -1.41 (moderate put skew) confirms the options market is paying for downside protection against intervention despite the carry-driven spot bid.",
       "evidence": [
-        "EUR/USD VRP: +2.8%",
-        "USD-EUR Real Rate Spread: 141bp",
-        "USD CESI: +24"
+        "USD/JPY Carry: +300bp",
+        "JPY COT LF net: -81,624",
+        "USD/JPY 25d RR: -1.41"
       ],
       "_source": "gemini"
     },
     {
-      "time": "17:31",
-      "priority": "warning",
-      "title": "AUD/USD — Positioning + Volatility + Retail Divergence",
-      "text": "AUD/USD at 0.7167 — COT LF net long +57,180 (74.5% long) vs retail 74% short creates a sharp institutional vs retail divergence. Extreme +19.5% VRP (IV 27.8% vs HV30 8.3%) indicates the options market is pricing significant tail risk despite the 84bp AONIA-SOFR carry advantage for AUD. High-conviction spec longs face liquidation risk if AUD/Unemployment (z=+2.60σ shock) triggers a shift in RBA hold bias.",
-      "evidence": [
-        "AUD COT LF net: +57,180",
-        "AUD/USD VRP: +19.5%",
-        "AUD/Unemployment: z=+2.60σ"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "17:25",
+      "time": "21:15",
       "priority": "info",
-      "title": "DXY/SPX — Correlation Break + Funding Stress",
-      "text": "DXY vs SPX correlation at -0.662 vs 252d norm of -0.339 (z=+1.78σ). The intensified negative correlation during a session where both DXY and SPX are marginally higher/flat suggests USD is functioning as a primary risk-off funding hedge amid Middle East maritime disruptions. Watch for DXY to break 100.00 if Strait of Hormuz tensions escalate further, potentially decoupling from equity performance.",
+      "title": "AUD/USD — Volatility + Retail Divergence",
+      "text": "AUD/USD IV at 27.5% vs HV30 at 8.3% generates a +19.2% Vol Risk Premium, signaling extreme institutional hedging demand ahead of CPI. Retail sentiment is 74% short, diverging from COT LF net long +57,180 (74.5% long). Institutional positioning and options pricing suggest a breakout bias, while retail fades the trend. Watch 0.7200 resistance for a squeeze higher.",
       "evidence": [
-        "DXY vs SPX z-score: +1.78σ",
-        "VIX: 17.2",
-        "DXY: 99.19"
+        "AUD/USD VRP: +19.2%",
+        "AUD COT LF long%: 74.5%",
+        "Retail Sentiment: 74% short"
       ],
       "_source": "gemini"
     }
