@@ -909,9 +909,9 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <h3>Session indicator</h3>
       <p>The top-right of the topbar shows the current active trading session (Sydney, Tokyo, London, New York, or an overlap) based on your browser's local time converted to UTC. A blinking green dot indicates the clock is live.</p>
       <h3>Quote bar</h3>
-      <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, GOLD FUT, WTI FUT, BTC/USD, US 10Y Yield, and DXY. FX pair prices update in real time during market hours via Finnhub WebSocket (tick-by-tick). Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) continue updating every ~5 min via yfinance. ECB/Frankfurter rates serve as a silent fallback when all primary sources are unavailable.</p>
+      <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, GOLD FUT, WTI FUT, BTC/USD, US 10Y Yield, and DXY. FX pair prices update in real time during market hours via Finnhub WebSocket (tick-by-tick). Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min via yfinance; on days when yfinance data appears frozen (e.g. a bank holiday), the engine automatically falls back to Twelve Data for commodities and equity indices. ECB/Frankfurter rates serve as a silent fallback when all primary sources are unavailable.</p>
       <div class="callout">
-        <strong>Update cadence:</strong> FX pair prices stream in real time via Finnhub WebSocket — a Cloudflare Worker proxy maintains one upstream connection to Finnhub and fans ticks out to all browser tabs. When the market is open you will see the source label change from <code style="font-family:var(--font-mono);font-size:11px;">yfinance · HH:MM</code> to <code style="font-family:var(--font-mono);font-size:11px;">Finnhub · live</code>. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min via yfinance. Click any pair to jump directly to the price chart with that symbol pre-selected.
+        <strong>Update cadence:</strong> FX pair prices stream in real time via Finnhub WebSocket — a Cloudflare Worker proxy maintains one upstream connection to Finnhub and fans ticks out to all browser tabs. When the market is open you will see the source label change from <code style="font-family:var(--font-mono);font-size:11px;">yfinance · HH:MM</code> to <code style="font-family:var(--font-mono);font-size:11px;">Finnhub · live</code>. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min via yfinance; when yfinance data is detected as frozen, the engine falls back automatically to Twelve Data for commodities and equity indices. Click any pair to jump directly to the price chart with that symbol pre-selected.
       </div>
       <p>Click any pair in the quote bar to jump to the Price Chart with that symbol pre-selected.</p>
       <h3>News ticker</h3>
@@ -943,12 +943,15 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <div class="callout callout-orange">
         <strong>Frequency:</strong> The narrative and regime update 4× daily (00:00, 06:30, 14:30, 20:00 UTC). The timestamp is shown next to the label. Do not rely on the narrative for intraday tick-by-tick changes — use the live price feeds and VIX/MOVE data in the Risk Monitor for real-time regime shifts.
       </div>
+      <div class="callout">
+        <strong>Bank holidays:</strong> When a G8 market is closed (e.g. Memorial Day for USD markets), the AI engine automatically omits percentage-change figures for affected instruments — Gold, SPX, WTI, US yields, and DXY — rather than reporting a misleading +0.00%. The narrative will note the closure context instead.
+      </div>
     </div>
 
     <div class="guide-section" id="price-chart">
       <h2>Price Chart</h2>
       <p>A native LightweightCharts price chart — the primary chart for all symbols with OHLC data (all G8 FX majors and crosses, Gold FUT, WTI FUT, DXY, BTC/USD, and others). 22 instruments are accessible via the tab row above the chart. For symbols without OHLC data, the chart falls back to an embedded TradingView widget.</p>
-      <p>The LW chart loads in candlestick mode with a 3-month default range. The toolbar above the chart gives you full control: chart type (Candle / Bar / Line / Area), range (3M / 6M / 1Y / 3Y / ALL), overlay toggles (WM — symbol watermark; PC — previous close line; VOL — volume histogram; CB — central bank meeting markers), logarithmic scale, and a multi-MA selector (periods: 5, 10, 20, 50, 100, 200 — up to three simultaneous MAs). The OHLC header updates on hover showing O/H/L/C values and the daily change.</p>
+      <p>The LW chart loads in candlestick mode with a D1 (daily) timeframe and a 3-month default range. The toolbar above the chart gives you full control: <strong>timeframe</strong> (H1 / H4 / D1 / W1 / MN), chart type (Candle / Bar / Line / Area), <strong>range</strong> (3M / 6M / 1Y / 3Y / ALL), overlay toggles (WM — symbol watermark; PC — previous close line; VOL — volume histogram; CB — central bank meeting markers), logarithmic scale, and a multi-MA selector (periods: 5, 10, 20, 50, 100, 200 — up to three simultaneous MAs). The OHLC header updates on hover showing O/H/L/C values and the daily change. For H1/H4, bars are sourced from Finnhub OANDA candles; D1 bars come from yfinance. W1 and MN bars are aggregated from the daily dataset — the current incomplete bar's open, high, and low reflect the full period to date (not just the current session).</p>
       <!-- MOCK: interactive LightweightCharts v5 — EUR/USD hardcoded OHLC, mirrors terminal -->
       <div id="guide-chart-wrap" style="background:#131722;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;">
         <!-- Tab row — scroll-able, matches terminal exactly -->
@@ -968,11 +971,17 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </div>
         <!-- Range + toolbar bar — matches terminal layout -->
         <div style="display:flex;align-items:center;gap:2px;padding:3px 8px;background:#1a1d29;border-bottom:1px solid #2a2e39;flex-wrap:wrap;">
-          <button class="gct-rb active-rb" data-days="91"  style="flex-shrink:0;">3M</button>
-          <button class="gct-rb"           data-days="182" style="flex-shrink:0;">6M</button>
-          <button class="gct-rb"           data-days="365" style="flex-shrink:0;">1Y</button>
-          <button class="gct-rb"           data-days="1095"style="flex-shrink:0;">3Y</button>
-          <button class="gct-rb"           data-days="0"   style="flex-shrink:0;">ALL</button>
+          <button class="gct-rb" style="flex-shrink:0;background:#253048;color:#4f7fff;border:1px solid #4f7fff;border-radius:3px;font-size:9px;padding:1px 6px;cursor:pointer;">H1</button>
+          <button class="gct-rb" style="flex-shrink:0;background:transparent;color:#787b86;border:1px solid #2a2e39;border-radius:3px;font-size:9px;padding:1px 6px;cursor:pointer;margin-left:2px;">H4</button>
+          <button class="gct-rb active-rb" style="flex-shrink:0;margin-left:2px;" data-days="91">D1</button>
+          <button class="gct-rb" style="flex-shrink:0;background:transparent;color:#787b86;border:1px solid #2a2e39;border-radius:3px;font-size:9px;padding:1px 6px;cursor:pointer;margin-left:2px;">W1</button>
+          <button class="gct-rb" style="flex-shrink:0;background:transparent;color:#787b86;border:1px solid #2a2e39;border-radius:3px;font-size:9px;padding:1px 6px;cursor:pointer;margin-left:2px;">MN</button>
+          <span style="width:1px;height:14px;background:#2a2e39;margin:0 6px;flex-shrink:0;display:inline-block;"></span>
+          <button class="gct-rb" data-days="91"  style="flex-shrink:0;">3M</button>
+          <button class="gct-rb" data-days="182" style="flex-shrink:0;">6M</button>
+          <button class="gct-rb" data-days="365" style="flex-shrink:0;">1Y</button>
+          <button class="gct-rb" data-days="1095"style="flex-shrink:0;">3Y</button>
+          <button class="gct-rb" data-days="0"   style="flex-shrink:0;">ALL</button>
           <span style="width:1px;height:14px;background:#2a2e39;margin:0 4px;flex-shrink:0;display:inline-block;"></span>
           <button class="gct-tb active-tb" id="gct-candle" style="flex-shrink:0;">Candle</button>
           <button class="gct-tb"           id="gct-bar"    style="flex-shrink:0;margin-left:2px;">Bar</button>
@@ -1405,7 +1414,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
       <p style="font-size:12px;color:var(--text2);margin:4px 0 16px;">The right column shows <strong>real carry</strong> (nominal OIS spread minus inflation differential) — the primary ranking value. The middle column shows the <strong>nominal OIS spread</strong> as reference context. Color coding: <span style="color:var(--up);">green</span> = real carry &ge;+0.5% (positive after inflation), neutral = 0%&ndash;0.5%, <span style="color:var(--text3);">dim</span> = negative real carry (inflation erodes nominal spread). Note: this is inflation-adjusted carry, not Covered Interest Parity (CIP) — no FX forward adjustment is applied.</p>
       <h3>Upcoming Events</h3>
-      <p>A native Economic Calendar panel embedded in the left sidebar, showing G8 medium- and high-impact events from Finnhub. Columns: local time (your browser timezone), currency flag, impact dot (red = high, orange = medium), event name, actual result with beat/miss coloring, consensus forecast, and previous reading. The panel auto-scrolls to today or the next upcoming event on load. A floating pill button appears when upcoming events are off-screen, with an adaptive arrow pointing toward them. Source label includes your browser timezone (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">Finnhub · G8 · medium &amp; high impact · GMT-3</span>). Use this to anticipate volatility windows before they arrive.</p>
+      <p>A native Economic Calendar panel embedded in the left sidebar, showing G8 medium- and high-impact events. The primary source is <strong>ForexFactory</strong> (fetched server-side every ~6 hours); the fallback is Finnhub. Columns: local time (your browser timezone), currency flag, impact dot (red = high, orange = medium), event name, actual result with beat/miss coloring, consensus forecast, and previous reading. The source label reflects the active feed (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">ForexFactory · G8 · medium &amp; high impact · GMT-3</span>). The panel auto-scrolls to today or the next upcoming event on load. A floating pill button appears when upcoming events are off-screen, with an adaptive arrow pointing toward them.</p>
+      <p>On <strong>bank holidays</strong>, one or more dedicated holiday rows appear at the top of the affected day — one row per market closure. Each row shows the currency flag, 3-letter code (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">🇺🇸 USD</span>), the holiday title (e.g. "Memorial Day"), and "All Day" in the time column. A tooltip on hover shows the full label: "<em>Memorial Day — USD market closed</em>". This makes it immediately visible why quotes for Gold, SPX, WTI, and USD pairs may be frozen on those days.</p>
 
       <h3 id="econ-surprises">Economic Surprises</h3>
       <p>A CESI-style (Citi Economic Surprise Index) centred bar chart showing whether each G8 currency&#8217;s macro data is beating or missing consensus forecasts over a rolling 90-day window. The panel scores medium- and high-impact ForexFactory/Finnhub releases only &#8212; low-impact events and non-macro noise (auctions, inventory data, financial flows) are excluded to match the methodology of institutional surprise indices.</p>
