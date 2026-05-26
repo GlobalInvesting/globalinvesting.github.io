@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-05-26T02:59:19Z",
+  "generated_at": "2026-05-26T10:34:48Z",
   "signals": [
     {
-      "time": "02:58",
+      "time": "10:32",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry + Options",
-      "text": "USD/JPY at 158.95 — 300bp Fed-BoJ carry sustains the bid despite a 7% tumble in WTI oil following US-Iran diplomacy headlines. JPY COT LF net short -81,624 (crowded carry) remains vulnerable to safe-haven shocks, but 25d RR at -1.41 confirms the options market is already paying for downside protection. Carry dominates while VIX remains at 16.6 (normal volatility), but intervention risk rises on any retest of 160.00.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkish bias) vs RBNZ hike bias priced for 27 May. With NZD real rates at -0.83% (most accommodative in G8), any RBNZ hawkish delivery or signal triggers a crowded short-unwind. Geopolitical tensions in the Middle East and IRGC drone activity introduce risk-off headwinds, but the immediate catalyst remains the RBNZ policy decision. NZD/USD at 0.5847.",
       "evidence": [
-        "USD/JPY carry: +300bp",
-        "WTI Oil: -5.16%",
+        "NZD COT LF net: -15,435",
+        "RBNZ real rate: -0.83%",
+        "NZD/USD: 0.5847"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "10:29",
+      "priority": "warning",
+      "title": "CHF/NZD — G8 Bilateral Theme + Geopolitical Risk",
+      "text": "CHF outperforming as the G8 leader (+0.278%) while NZD lags (-0.675%), creating a 0.953% spread. Despite a -225bp carry deficit for CHF/NZD (SNB 0.0% vs RBNZ 2.25%), safe-haven demand for CHF is dominant following reports of Iran downing a US-made MQ-9 drone. Carry advantage for NZD is currently secondary to geopolitical risk-off flows. Watch for VIX > 25 to accelerate the carry unwind.",
+      "evidence": [
+        "CHF 1W avg: +0.278% (n=6)",
+        "NZD 1W avg: -0.675% (n=4)",
+        "G8 spread: 0.953%"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "10:27",
+      "priority": "warning",
+      "title": "USD/JPY — Carry + Options Skew + Intervention Risk",
+      "text": "USD/JPY at 159.12 supported by +300bp Fed-BoJ carry (Fed 3.75% vs BoJ 0.75%). Options market signals caution with a -1.41 25d RR (moderate put skew) despite the carry bid, suggesting institutional hedging against BoJ intervention as price holds near the 160.00 threshold. JPY COT LF net short -81,624 remains crowded; intervention risk rises on a sustained test of 160.00.",
+      "evidence": [
+        "Fed 3.75% vs BoJ 0.75% — 300bp",
+        "USDJPY 25d RR: -1.41",
         "JPY COT LF net: -81,624"
       ],
       "_source": "gemini"
     },
     {
-      "time": "02:55",
-      "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ hike bias priced for the 27 May meeting. With NZD 1W avg performance at -0.600% (G8 laggard), a hawkish delivery or signal from the RBNZ introduces significant short-squeeze risk. NZD/USD at 0.5852 faces a crowded spec short unwind if the 2.25% OCR is hiked or forward guidance shifts higher.",
-      "evidence": [
-        "NZD COT LF net: -15,435",
-        "NZD 1W avg: -0.600%",
-        "RBNZ bias: Hike"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "02:53",
-      "priority": "warning",
-      "title": "CHF/NZD — G8 Bilateral Theme + Carry Divergence",
-      "text": "CHF/NZD G8 spread at 0.929% as CHF outperforms (+0.329%) while NZD lags (-0.600%). CHF strength persists despite a -225bp carry disadvantage vs NZD, signaling a shift toward defensive positioning as US-Iran headlines impact energy markets. NZD real rate of -0.83% (most accommodative in G8) further weighs on the laggard. Watch for CHF/NZD extension if the Strait of Hormuz diplomacy stalls.",
-      "evidence": [
-        "G8 spread: 0.929%",
-        "NZD real rate: -0.83%",
-        "NZD/CHF carry: +225bp"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "02:50",
-      "priority": "warning",
-      "title": "AUD/USD — Volatility + Positioning + Retail Divergence",
-      "text": "AUD/USD at 0.7166 — IV at 14.1% vs HV30 at 8.3% generates a +5.8pt VRP, the second highest in the complex, signaling heavy institutional hedging. This aligns with a massive divergence: COT LF net long +57,180 (74.5% long) vs retail 76% short. Institutional conviction is high, but the extreme retail fade and high vol premium suggest a volatile breakout attempt toward 0.7200. Confirmation required via RBA meeting on 16 Jun.",
-      "evidence": [
-        "AUD VRP: +5.8%",
-        "AUD COT long%: 74.5%",
-        "Retail: 76% short"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "02:45",
+      "time": "10:22",
       "priority": "info",
-      "title": "USD/CHF — Volatility Premium + CESI",
-      "text": "USD/CHF at 0.7835 — IV 13.9% vs HV30 6.1% creates an extreme +7.8pt VRP, pricing significant tail-risk protection. While USD CESI at +24 (strong positive) supports the greenback, the 375bp carry advantage is being challenged by CHF safe-haven demand. Negative 252d correlation between DXY and SPX (z=+1.78σ) suggests USD is currently trading as a funding currency rather than a haven. Watch for VRP compression to signal a return to carry-trade dominance.",
+      "title": "EUR/USD — Volatility Premium + CESI Divergence",
+      "text": "EUR/USD IV at 7.1% vs HV30 at 4.3% creates a +2.8pt VRP, signaling elevated hedging demand despite a neutral 25d RR (-0.35). USD CESI at +24 (strong positive) vs EUR at +5 suggests US data outperformance continues to anchor the pair. Fed 3.75% vs ECB 2.0% (+175bp) carry favors USD, keeping EUR/USD upside structurally limited at 1.1646.",
       "evidence": [
-        "USD/CHF VRP: +7.8%",
+        "EUR/USD VRP: +2.8%",
         "USD CESI: +24",
-        "DXY vs SPX z-score: +1.78σ"
+        "Fed 3.75% vs ECB 2.0% — 175bp"
       ],
       "_source": "gemini"
     }
