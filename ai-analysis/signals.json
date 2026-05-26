@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-05-25T20:57:56Z",
+  "generated_at": "2026-05-26T02:59:19Z",
   "signals": [
     {
-      "time": "20:57",
+      "time": "02:58",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Shock + Carry + Options",
-      "text": "USD/JPY at 158.91 — US-Iran diplomacy headlines regarding the reopening of the Strait of Hormuz in 30 days have triggered a 7% collapse in WTI oil to $96.6, pressuring the USD. Despite the risk-on relief, the +278bp OIS carry advantage (SOFR 3.51% vs TONA 0.73%) remains the structural floor. Options markets are aggressively hedging the downside with a -1.41 moderate put skew (25d RR), while COT shows a crowded JPY net short of -81,624. The combination of geopolitical de-escalation and crowded shorts suggests a floor near 158.00 unless VIX (16.6) spikes above 25.",
+      "title": "USD/JPY — Geopolitical + Carry + Options",
+      "text": "USD/JPY at 158.95 — 300bp Fed-BoJ carry sustains the bid despite a 7% tumble in WTI oil following US-Iran diplomacy headlines. JPY COT LF net short -81,624 (crowded carry) remains vulnerable to safe-haven shocks, but 25d RR at -1.41 confirms the options market is already paying for downside protection. Carry dominates while VIX remains at 16.6 (normal volatility), but intervention risk rises on any retest of 160.00.",
       "evidence": [
-        "WTI Oil: $96.6 (-7%)",
-        "USD/JPY OIS Carry: +278bp",
-        "JPY COT LF Net: -81,624"
+        "USD/JPY carry: +300bp",
+        "WTI Oil: -5.16%",
+        "JPY COT LF net: -81,624"
       ],
       "_source": "gemini"
     },
     {
-      "time": "20:54",
+      "time": "02:55",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ hike bias priced for the 27 May meeting. With NZD real rates at -0.83% (most accommodative in G8) and the pair testing 0.5875, a hawkish RBNZ delivery poses a significant short-squeeze risk. Speculative positioning is misaligned with the OIS forward bias; any signal of a terminal rate hike targets a move toward 0.6000. Watch for the RBNZ rate decision on 27 May to trigger the squeeze.",
+      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ hike bias priced for the 27 May meeting. With NZD 1W avg performance at -0.600% (G8 laggard), a hawkish delivery or signal from the RBNZ introduces significant short-squeeze risk. NZD/USD at 0.5852 faces a crowded spec short unwind if the 2.25% OCR is hiked or forward guidance shifts higher.",
       "evidence": [
-        "NZD COT LF Net: -15,435",
-        "NZD Real Rate: -0.83%",
-        "NZD/USD: 0.5875"
+        "NZD COT LF net: -15,435",
+        "NZD 1W avg: -0.600%",
+        "RBNZ bias: Hike"
       ],
       "_source": "gemini"
     },
     {
-      "time": "20:52",
+      "time": "02:53",
       "priority": "warning",
-      "title": "AUD/USD — Volatility Premium + Positioning + Retail",
-      "text": "AUD/USD at 0.7178 — IV at 13.8% vs HV30 at 8.9% generates a +4.9% Vol Risk Premium, the second highest in the G8, signaling extreme demand for downside protection. This aligns with a -0.85 moderate put skew in 25d RR. However, a massive institutional vs retail divergence is active: COT LF net long +57,180 (74.5% long) vs retail 76% short. Institutional conviction remains bullish despite the high cost of hedging; retail capitulation on a break of 0.7200 determines the next leg higher.",
+      "title": "CHF/NZD — G8 Bilateral Theme + Carry Divergence",
+      "text": "CHF/NZD G8 spread at 0.929% as CHF outperforms (+0.329%) while NZD lags (-0.600%). CHF strength persists despite a -225bp carry disadvantage vs NZD, signaling a shift toward defensive positioning as US-Iran headlines impact energy markets. NZD real rate of -0.83% (most accommodative in G8) further weighs on the laggard. Watch for CHF/NZD extension if the Strait of Hormuz diplomacy stalls.",
       "evidence": [
-        "AUD VRP: +4.9%",
-        "AUD COT LF Net: +57,180",
-        "Retail Sentiment: 76% Short"
+        "G8 spread: 0.929%",
+        "NZD real rate: -0.83%",
+        "NZD/CHF carry: +225bp"
       ],
       "_source": "gemini"
     },
     {
-      "time": "20:45",
-      "priority": "info",
-      "title": "EUR/USD — Volatility Premium + Carry",
-      "text": "EUR/USD at 1.1647 — IV at 7.1% vs HV30 at 4.9% creates a +2.2% VRP, indicating the options market is pricing in more realized volatility than the recent range suggests. The +175bp nominal carry advantage (Fed 3.75% vs ECB 2.0%) continues to favor USD, supported by a superior US Economic Surprise Index (CESI) net of +24. Upside remains structurally limited by the carry deficit and restrictive US real rates (+1.09%) vs accommodative EUR real rates (-0.32%).",
+      "time": "02:50",
+      "priority": "warning",
+      "title": "AUD/USD — Volatility + Positioning + Retail Divergence",
+      "text": "AUD/USD at 0.7166 — IV at 14.1% vs HV30 at 8.3% generates a +5.8pt VRP, the second highest in the complex, signaling heavy institutional hedging. This aligns with a massive divergence: COT LF net long +57,180 (74.5% long) vs retail 76% short. Institutional conviction is high, but the extreme retail fade and high vol premium suggest a volatile breakout attempt toward 0.7200. Confirmation required via RBA meeting on 16 Jun.",
       "evidence": [
-        "EUR/USD VRP: +2.2%",
-        "USD/EUR Carry: +175bp",
-        "USD CESI Net: +24"
+        "AUD VRP: +5.8%",
+        "AUD COT long%: 74.5%",
+        "Retail: 76% short"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "02:45",
+      "priority": "info",
+      "title": "USD/CHF — Volatility Premium + CESI",
+      "text": "USD/CHF at 0.7835 — IV 13.9% vs HV30 6.1% creates an extreme +7.8pt VRP, pricing significant tail-risk protection. While USD CESI at +24 (strong positive) supports the greenback, the 375bp carry advantage is being challenged by CHF safe-haven demand. Negative 252d correlation between DXY and SPX (z=+1.78σ) suggests USD is currently trading as a funding currency rather than a haven. Watch for VRP compression to signal a return to carry-trade dominance.",
+      "evidence": [
+        "USD/CHF VRP: +7.8%",
+        "USD CESI: +24",
+        "DXY vs SPX z-score: +1.78σ"
       ],
       "_source": "gemini"
     }
