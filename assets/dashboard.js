@@ -11274,11 +11274,42 @@ function initDerivativesNavFixed() {
   // if no OHLC file exists, which is the correct behaviour for commodities.
   var TV_SYM_PREFIX = 'FX_IDC:';
 
+  // FIX-WL-4: In-memory fallback for environments where localStorage is blocked
+  // (Privacy Badger, Tracking Prevention, Safari ITP, etc.).
+  // When setItem() throws OR a subsequent getItem() round-trip returns null (silent
+  // failure under Tracking Prevention), we fall back to a module-scoped array so
+  // the watchlist remains functional for the session even without persistence.
+  var _memList = null; // null = not yet initialised; [] after first load attempt
+
+  function _lsAvailable() {
+    // Test once per session — result is cached on _lsOk.
+    if (typeof _lsAvailable._ok !== 'undefined') return _lsAvailable._ok;
+    try {
+      var t = '__gi_wl_test__';
+      localStorage.setItem(t, '1');
+      var ok = localStorage.getItem(t) === '1';
+      localStorage.removeItem(t);
+      _lsAvailable._ok = ok;
+    } catch (e) {
+      _lsAvailable._ok = false;
+    }
+    return _lsAvailable._ok;
+  }
+
   function load() {
-    try { return JSON.parse(localStorage.getItem(WL_KEY) || '[]'); } catch (e) { return []; }
+    if (_lsAvailable()) {
+      try { return JSON.parse(localStorage.getItem(WL_KEY) || '[]'); } catch (e) {}
+    }
+    // localStorage unavailable — use in-memory list
+    if (_memList === null) _memList = [];
+    return _memList.slice();
   }
   function save(list) {
-    try { localStorage.setItem(WL_KEY, JSON.stringify(list)); } catch (e) {}
+    if (_lsAvailable()) {
+      try { localStorage.setItem(WL_KEY, JSON.stringify(list)); return; } catch (e) {}
+    }
+    // localStorage unavailable — persist in memory for this session
+    _memList = list.slice();
   }
 
   function render() {
@@ -11351,9 +11382,21 @@ function initDerivativesNavFixed() {
 
     input.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
+        var sym = input.value.trim().toUpperCase().replace(/[^A-Z]/g, '');
+        if (sym && !(sym in SYMBOL_MAP)) {
+          // Unknown symbol — shake the input briefly as visual feedback, don't close
+          input.style.outline = '1px solid var(--down)';
+          setTimeout(function () { input.style.outline = ''; }, 800);
+          return;
+        }
         addSymbol(input.value);
         input.value = '';
         inputRow.style.display = 'none';
+        // Scroll the new row into view so the user sees it was added
+        setTimeout(function () {
+          var rows = tbody.querySelectorAll('.sb-row');
+          if (rows.length) rows[rows.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
       } else if (e.key === 'Escape') {
         inputRow.style.display = 'none';
       }

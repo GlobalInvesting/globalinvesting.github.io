@@ -250,6 +250,10 @@
   #watchlist-section {
     flex: 1 0 auto;
     border-bottom: none;
+    /* FIX-WL-5: Extra bottom padding so the search input (#wl-input-row) is always
+       fully visible when the sidebar scrolls to it. Without this, the input sits flush
+       against the sidebar bottom edge and the last few px are clipped by the container. */
+    padding-bottom: 48px;
   }
   #sidebar::-webkit-scrollbar { width: 3px; }
   #sidebar::-webkit-scrollbar-thumb { background: var(--border2); }
