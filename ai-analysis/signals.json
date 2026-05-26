@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-05-26T10:34:48Z",
+  "generated_at": "2026-05-26T17:40:31Z",
   "signals": [
     {
-      "time": "10:32",
+      "time": "17:39",
       "priority": "critical",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkish bias) vs RBNZ hike bias priced for 27 May. With NZD real rates at -0.83% (most accommodative in G8), any RBNZ hawkish delivery or signal triggers a crowded short-unwind. Geopolitical tensions in the Middle East and IRGC drone activity introduce risk-off headwinds, but the immediate catalyst remains the RBNZ policy decision. NZD/USD at 0.5847.",
+      "title": "USD/JPY — Geopolitical Shock + Carry + Options",
+      "text": "USD/JPY at 159.32 — Strait of Hormuz closure and US Navy escort resumption revive USD safe-haven demand, overriding the bull flattener regime (2s10s +42.6bp). 278bp SOFR-TONA carry advantage sustains the bid despite BoJ hike bias. Options market remains defensive with a -1.41 moderate put skew (25d RR), signaling institutional hedging against intervention as price holds near the 160.00 threshold. Carry dominates while VIX remains at 17.2 (normal volatility).",
       "evidence": [
-        "NZD COT LF net: -15,435",
-        "RBNZ real rate: -0.83%",
-        "NZD/USD: 0.5847"
+        "USD/JPY: 159.32",
+        "SOFR-TONA spread: +278bp",
+        "USDJPY 25d RR: -1.41"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:29",
+      "time": "17:36",
       "priority": "warning",
-      "title": "CHF/NZD — G8 Bilateral Theme + Geopolitical Risk",
-      "text": "CHF outperforming as the G8 leader (+0.278%) while NZD lags (-0.675%), creating a 0.953% spread. Despite a -225bp carry deficit for CHF/NZD (SNB 0.0% vs RBNZ 2.25%), safe-haven demand for CHF is dominant following reports of Iran downing a US-made MQ-9 drone. Carry advantage for NZD is currently secondary to geopolitical risk-off flows. Watch for VIX > 25 to accelerate the carry unwind.",
+      "title": "AUD/NZD — G8 Bilateral Theme + RBNZ Event Risk",
+      "text": "AUD/NZD G8 spread at 0.952% as NZD laggard status (-0.718% 1W avg) meets AUD outperformance. NZD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ hike risk priced for the 27 May meeting. If RBNZ signals a July hike as flagged by MUFG, a crowded spec short unwind targets 1.0800+. AUD/NZD retail at 93% short represents an extreme contrarian reversal risk if the RBNZ disappoints.",
       "evidence": [
-        "CHF 1W avg: +0.278% (n=6)",
-        "NZD 1W avg: -0.675% (n=4)",
-        "G8 spread: 0.953%"
+        "AUD 1W avg: +0.234% (n=4)",
+        "NZD 1W avg: -0.718% (n=4)",
+        "G8 spread: 0.952%"
       ],
       "_source": "gemini"
     },
     {
-      "time": "10:27",
+      "time": "17:34",
       "priority": "warning",
-      "title": "USD/JPY — Carry + Options Skew + Intervention Risk",
-      "text": "USD/JPY at 159.12 supported by +300bp Fed-BoJ carry (Fed 3.75% vs BoJ 0.75%). Options market signals caution with a -1.41 25d RR (moderate put skew) despite the carry bid, suggesting institutional hedging against BoJ intervention as price holds near the 160.00 threshold. JPY COT LF net short -81,624 remains crowded; intervention risk rises on a sustained test of 160.00.",
-      "evidence": [
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "USDJPY 25d RR: -1.41",
-        "JPY COT LF net: -81,624"
-      ],
-      "_source": "gemini"
-    },
-    {
-      "time": "10:22",
-      "priority": "info",
-      "title": "EUR/USD — Volatility Premium + CESI Divergence",
-      "text": "EUR/USD IV at 7.1% vs HV30 at 4.3% creates a +2.8pt VRP, signaling elevated hedging demand despite a neutral 25d RR (-0.35). USD CESI at +24 (strong positive) vs EUR at +5 suggests US data outperformance continues to anchor the pair. Fed 3.75% vs ECB 2.0% (+175bp) carry favors USD, keeping EUR/USD upside structurally limited at 1.1646.",
+      "title": "EUR/USD — Volatility Premium + Macro Divergence",
+      "text": "EUR/USD at 1.1629 — IV at 7.1% vs HV30 at 4.3% generates a +2.8pt VRP, signaling elevated hedging demand as Hormuz tensions revive USD demand. Fed 3.75% vs ECB 2.00% creates a +175bp carry advantage for USD, supported by a restrictive +1.09% US real rate vs -0.32% for EUR. CESI divergence (USD +24 vs EUR +5) confirms superior US data momentum, keeping EUR upside structurally limited.",
       "evidence": [
         "EUR/USD VRP: +2.8%",
-        "USD CESI: +24",
-        "Fed 3.75% vs ECB 2.0% — 175bp"
+        "USD-EUR Real Rate Spread: 141bp",
+        "USD CESI: +24"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "17:31",
+      "priority": "warning",
+      "title": "AUD/USD — Positioning + Volatility + Retail Divergence",
+      "text": "AUD/USD at 0.7167 — COT LF net long +57,180 (74.5% long) vs retail 74% short creates a sharp institutional vs retail divergence. Extreme +19.5% VRP (IV 27.8% vs HV30 8.3%) indicates the options market is pricing significant tail risk despite the 84bp AONIA-SOFR carry advantage for AUD. High-conviction spec longs face liquidation risk if AUD/Unemployment (z=+2.60σ shock) triggers a shift in RBA hold bias.",
+      "evidence": [
+        "AUD COT LF net: +57,180",
+        "AUD/USD VRP: +19.5%",
+        "AUD/Unemployment: z=+2.60σ"
+      ],
+      "_source": "gemini"
+    },
+    {
+      "time": "17:25",
+      "priority": "info",
+      "title": "DXY/SPX — Correlation Break + Funding Stress",
+      "text": "DXY vs SPX correlation at -0.662 vs 252d norm of -0.339 (z=+1.78σ). The intensified negative correlation during a session where both DXY and SPX are marginally higher/flat suggests USD is functioning as a primary risk-off funding hedge amid Middle East maritime disruptions. Watch for DXY to break 100.00 if Strait of Hormuz tensions escalate further, potentially decoupling from equity performance.",
+      "evidence": [
+        "DXY vs SPX z-score: +1.78σ",
+        "VIX: 17.2",
+        "DXY: 99.19"
       ],
       "_source": "gemini"
     }
