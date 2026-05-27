@@ -1,3 +1,20 @@
+## v8.2.38 (2026-05-27) — FIX: Calendar panel updates immediately after workflow push
+
+### Frontend — assets/calendar-panel.js
+- **`cache: 'no-store'` en fetch:** El `fetch()` de `ff_calendar.json` / `calendar.json` ahora incluye `{ cache: 'no-store' }` para saltear el caché del browser y obtener siempre el archivo fresco del servidor.
+- **`setInterval` de 5 minutos:** `fetchEconomicCalendar()` se llama cada 5 min mientras la pestaña está abierta. Con el workflow corriendo cada ~2–3 min vía CF Worker + cron, los actuals aparecen en la próxima vuelta del intervalo.
+- **`visibilitychange` refresh:** Al volver a la pestaña del terminal tras haberla ocultado, se dispara `fetchEconomicCalendar()` de inmediato, sin esperar el intervalo.
+
+### sw.js — Service Worker
+- **`/calendar-data/` agregado a `DATA_PATH_PREFIXES`:** El SW ahora aplica estrategia `network-first` a todos los archivos bajo `/calendar-data/`. Antes, al no estar listado, el SW lo trataba como shell asset (`cache-first`), sirviendo datos potencialmente horas viejos aunque el servidor ya tuviera el JSON actualizado.
+- **`CACHE_VERSION` bumpeado a `gi-v7.92.0`:** Fuerza que los clientes existentes descarten el caché viejo e instalen el nuevo SW con la estrategia corregida.
+
+### _headers — Cloudflare Pages cache
+- **`/calendar-data/*` reducido de `max-age=7200` a `max-age=60, stale-while-revalidate=30`:** La CDN y el browser ahora expiran el caché en 60 segundos. Con el workflow empujando cada ~2–3 min, el JSON fresco estará disponible en la próxima solicitud sin demora de CDN.
+
+---
+
+
 ## v8.2.37 (2026-05-27) — FIX: Asia/NZ release window extended to 22:00 UTC (covers AUD/NZD 22:30 releases)
 
 ### Engine — .github/workflows/update-ff-calendar.yml (site repo)
