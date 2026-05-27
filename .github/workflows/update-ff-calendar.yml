@@ -26,7 +26,7 @@ name: Update ForexFactory Calendar
 # The commit step only runs when the flag is "1", so git history stays clean.
 #
 # RELEASE WINDOWS for cron time-gate:
-#   Asia/NZ:   23:00–02:30 UTC  (JPY, AUD, NZD data)
+#   Asia/NZ:   22:00–02:30 UTC  (JPY, AUD, NZD data — AUD/NZD releases from 22:30 UTC)
 #   EU/UK:     05:30–10:00 UTC  (EUR, GBP, CHF data)
 #   US:        12:00–15:30 UTC  (USD data — NFP, CPI, PCE all at 12:30 UTC)
 #
@@ -36,6 +36,8 @@ name: Update ForexFactory Calendar
 #   - Public repos: unlimited Actions minutes
 #   - Scheduled workflows disabled after 60 days of repo inactivity
 #
+# v5.1 (2026-05-27): Extended Asia/NZ window from 23:00 → 22:00 UTC to cover AUD/NZD releases
+#   at 22:30 UTC (08:30 AEST / 10:30 NZST). Added sparse crons at 20:30–22:30 UTC.
 # v5.0 (2026-05-23): Added repository_dispatch trigger (CF Worker integration).
 # v4.0 (2026-05-23): 5-min polling + time-gate + smart commit.
 
@@ -69,7 +71,12 @@ on:
     - cron: '0 19 * * *'
     - cron: '30 19 * * *'
     - cron: '0 20 * * *'
-    # (20:30 covered by */5 which starts the Asia window at 23:00)
+    - cron: '30 20 * * *'
+    - cron: '0 21 * * *'
+    - cron: '30 21 * * *'
+    - cron: '0 22 * * *'
+    - cron: '30 22 * * *'
+    # (22:30 covered by */5 which now falls inside the Asia/NZ window starting at 22:00)
   workflow_dispatch:
 
 env:
@@ -118,10 +125,10 @@ jobs:
 
           # Dense */5 cron: check if we're in a release window
           HOUR_INT=$(( 10#$HOUR ))
-          # Asia/NZ window: 23:00–02:30 UTC
-          if [ $HOUR_INT -ge 23 ] || [ $HOUR_INT -lt 2 ] || \
+          # Asia/NZ window: 22:00–02:30 UTC (AUD/NZD releases from 22:30 UTC; was 23:00 — v5.1 fix)
+          if [ $HOUR_INT -ge 22 ] || [ $HOUR_INT -lt 2 ] || \
              ( [ $HOUR_INT -eq 2 ] && [ $(( 10#$MIN )) -lt 30 ] ); then
-            echo "In Asia/NZ release window (23:00–02:30 UTC) — proceeding."
+            echo "In Asia/NZ release window (22:00–02:30 UTC) — proceeding."
             echo "run=true" >> $GITHUB_OUTPUT
             exit 0
           fi
