@@ -10897,7 +10897,7 @@ async function renderEconSurprises() {
     const forecast = parseFloat(forecastStr);
     if (isNaN(actual) || isNaN(forecast)) return;
 
-    const isInverse = INVERSE_KW.some(kw => ev.title.toLowerCase().includes(kw));
+    const isInverse = INVERSE_KW.some(kw => evTitle.includes(kw));
     const beat = isInverse ? actual < forecast : actual > forecast;
     const miss = isInverse ? actual > forecast : actual < forecast;
     // rawSurprise is unsigned (actual − forecast). For the z-score we apply the
@@ -11653,7 +11653,24 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
         const DECAY_LAMBDA = Math.LN2 / 45;
         const WINDOW_MS    = 90 * 24 * 60 * 60 * 1000;
         const STEP_MS      =  7 * 24 * 60 * 60 * 1000;
-        const NOISE_KW     = ['crude','gasoline','natural gas','rig count','baker hughes','auction','api weekly','fomc minutes','fed speak','ecb speak','boe speak','speeches','testimony'];
+        const NOISE_KW     = [
+          'cftc','baker hughes','rig count','auction','api weekly',
+          'milk auction','fed\'s balance sheet','reserve balances',
+          'redbook','ibd/tipp','tips auction','note auction','bond auction',
+          'gilt auction','jgb auction','obligaciones','speculative net',
+          'nc net position','crude oil inventories','crude oil imports',
+          'distillate','gasoline inventorie','gasoline production',
+          'refinery','heating oil','natural gas storage',
+          'foreign bonds buying','foreign investments in japanese',
+          'foreign bond investment','foreign investment in japan',
+          'm2 money','m3 money','m4 money','reserve assets total',
+          'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
+          'ibd','3-month bill','4-week bill','52-week bill',
+          '4-week average','4-week avg',
+          'tic net','net long-term tic','total net tic',
+          'interest rate projection',
+          'eia crude oil','eia crude',
+        ];
         const INVERSE_KW   = ['unemployment','jobless','claims','deficit','trade balance'];
         const stats        = window._ECON_SURPRISE_STATS || {};
 
