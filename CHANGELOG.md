@@ -1,3 +1,92 @@
+## v8.2.37 (2026-05-27) — FIX: Asia/NZ release window extended to 22:00 UTC (covers AUD/NZD 22:30 releases)
+
+### Engine — .github/workflows/update-ff-calendar.yml (site repo)
+- **Root cause:** Asia/NZ time-gate started at 23:00 UTC, but AUD/NZD releases (CPI, Inflation Rate, Construction Work Done, etc.) land at **22:30 UTC** (08:30 AEST / 10:30 NZST). The 30-minute gap meant the `*/5` cron was blocked by the gate and the next coverage was a sparse cron at 23:00 — 30 min late.
+- **Fix — gate extended:** Asia/NZ window moved from `23:00–02:30` → `22:00–02:30 UTC`. The `HOUR_INT -ge 22` guard in the bash time-gate now lets `*/5` runs through from 22:00 onward.
+- **Fix — sparse crons added:** Added `20:30`, `21:00`, `21:30`, `22:00`, `22:30` UTC sparse crons as fallback coverage for the 20:00–22:59 UTC band. These bypass the gate unconditionally (non-multiple-of-5 minutes), providing ~30 min fallback latency if the CF Worker misses a dispatch.
+- **Note on CF Worker:** The Cloudflare Worker polls every minute and bypasses the gate via `repository_dispatch`. It covers this scenario correctly when active. The gate bug was the fallback (cron-only) failure path.
+- Version bumped to v5.1 in workflow header comments.
+
+---
+
+## v8.2.36 (2026-05-25) — FIX-30/31/WL-4/5/6: narrative closed-market fixes + watchlist localStorage fallback + scroll
+
+### Engine — scripts/generate_narrative_signals.py
+- **FIX-30 — save_snapshot preserves cross_pct and closed_symbols:** `save_snapshot()` now reads the existing `context_snapshot.json` before writing and carries forward `cross_pct` and `closed_symbols` if the new snapshot doesn't contain them. Previously every narrative run (`generate-ai-narrative.yml` — 4×/day) would overwrite those two fields with nothing, silently discarding the enrichment written by `fetch_intraday_quotes.py`. The narrative prompt then received no closed-symbol data and could produce `+0.00%` outputs on US bank holidays (e.g. Memorial Day).
+- **FIX-31 — extract_tokens_from_intraday suppresses pct tokens for closed symbols:** `fmt_pct()` now returns `None` for any symbol in `get_closed_symbols()`. On US holidays, gold/spx/dxy carry `pct=0.0` in `quotes.json` (stale Friday close). Without this guard, `resolve_tokens()` would inject `+0.00%` verbatim into the narrative, producing output like `"gold higher +0.00%; DXY +0.00%"`. With the fix, `None` causes `resolve_tokens()` to strip the placeholder cleanly, eliminating the false precision.
+
+### Frontend — assets/dashboard.js + assets/dashboard.css
+- **FIX-WL-4 — localStorage in-memory fallback:** `load()`/`save()` now probe localStorage availability once per session via a round-trip test. When blocked (Tracking Prevention, Safari ITP, Privacy Badger), the watchlist falls back to a module-scoped array for the session. Previously, `save()` silently failed and `load()` returned `[]` on every call, making the watchlist appear empty immediately after adding a pair.
+- **FIX-WL-5 — watchlist section scroll padding:** `#watchlist-section` gains `padding-bottom: 48px` so the `#wl-input-row` search field is always fully visible when the sidebar scrolls to it. Previously the input was clipped at the bottom edge of the sidebar container.
+- **FIX-WL-6 — Enter key UX:** Unknown symbol input now shows a red outline shake instead of silently doing nothing. After a successful add, the new row is scrolled into view. Previously the user had no feedback for rejected symbols and no confirmation the row was added.
+
+---
+
+## v8.2.35 (2026-05-25) — guide-dashboard: TF buttons, ForexFactory calendar, bank holiday rows, Twelve Data fallback
+
+### Guides — guide-dashboard.html
+- **Price Chart — prose:** Added timeframe buttons (H1 / H4 / D1 / W1 / MN) to the toolbar description. Added note that H1/H4 bars use Finnhub OANDA candles, D1 bars use yfinance, and that W1/MN current-period bars reflect the full period open/high/low — not just the current session (v8.2.25–28 fixes). The text previously described only range and chart-type controls.
+- **Price Chart — mock toolbar:** Added H1 / H4 / D1 (active) / W1 / MN timeframe buttons before the range buttons, matching the actual terminal layout. The mock was missing these buttons entirely.
+- **Upcoming Events / Economic Calendar:** Updated primary source from "Finnhub" → "ForexFactory" (primary, server-side every ~6h) with Finnhub as fallback, matching the production source-detection logic in `calendar-panel.js`. Added a paragraph explaining bank holiday rows: one row per affected G8 market, showing flag + CCY code + holiday title + "All Day" in the time column, with a specific tooltip (e.g. "Memorial Day — USD market closed") — v8.2.30/31.
+- **Quote bar — prose:** Added mention of Twelve Data staleness fallback for non-FX instruments (Gold, WTI, equity indices) when yfinance data is detected as frozen — v8.2.29.
+- **Quote bar — callout:** Same Twelve Data fallback note added to the callout box.
+- **AI Narrative — bank holiday callout:** New callout box explaining that when a G8 market is closed, the engine omits % change figures for affected instruments rather than reporting +0.00% — v8.2.32/33.
+
+---
+
+## v8.2.34 (2026-05-25) — Monitor & ZAP fixes: holiday-aware news check, DTCC path, ZAP checkout
+
+### Engine — scripts/monitor_data_health.py
+- **FIX-26 `is_usd_bank_holiday()`:** New helper reads `calendar-data/ff_calendar.json` to detect USD bank holidays (Memorial Day, Labor Day, etc.). Used by `check_news` to relax the threshold from 2h → 4h and demote severity from 🔴 → 🟡 on holidays when RSS feeds publish late.
+- **FIX-27 `check_dtcc_fx()` path:** Path corrected from `derivatives-data/dtcc_fx.json` → `dtcc-data/dtcc_fx.json` (matching `OUTPUT_DIR` in `fetch_dtcc_fx.py`). The wrong path caused a permanent false-positive "archivo no existe" warning.
+- **FIX-28 DTCC WORKFLOWS_TO_CHECK threshold:** Raised from 30h → 72h. DTCC does not publish on weekends or USD holidays — the Friday→Monday-holiday gap is ~72h, which exceeded the 30h threshold every Memorial/Labor Day Monday.
+
+### Engine — .github/workflows/security-scan.yml
+- **FIX-29 ZAP `owasp-zap-scan` job:** Added `actions/checkout@v4` step with `sparse-checkout: .zap` from the site repo (`globalinvesting.github.io`) so that `.zap/rules.tsv` is present before ZAP runs. Without this, ZAP printed "Error when reading the rules file" and fell back to defaults. Removed `issue_title` parameter — it requires `issues:write` on the private engine repo, which the action cannot grant, causing `Error: Resource not accessible by integration`.
+
+---
+
+## v8.2.33 (2026-05-25) — Narrative guard: generate_narrative_signals reads closed_symbols and suppresses stale pct
+
+### Engine — scripts/generate_narrative_signals.py
+- **`get_closed_symbols()`:** New helper reads `closed_symbols` from `ai-analysis/context_snapshot.json` (written by `fetch_intraday_quotes.py` PASO 6c). Falls back to deriving closed symbols from `ff_calendar.json` holidays if the snapshot field is absent — ensures the guard fires even on the first run after deploy.
+- **`get_today_holidays()`:** New helper returns today's G8 bank holidays from `ff_calendar.json` for the fallback path.
+- **`is_market_closed()` docstring updated** to clarify that USD bank holidays represent a partial closure (FX open, USD equities/commodities closed).
+- **Cross-asset block (Section 5):** Now calls `get_closed_symbols()` once and annotates the prompt in two ways:
+  1. An explicit `NOTE:` line listing all closed symbols so the LLM has a clear upfront instruction to omit their % changes.
+  2. Per-symbol: closed symbols show `[market closed — last known price, no intraday move]` instead of `1D:+0.00%`.
+- **Yields block (Section 5):** Same closed-symbol guard applied to `us10y`, `us2y`, `us5y`, `us30y`, `us3m`.
+- **Root cause addressed:** `"gold higher +0.00%"` in the Memorial Day 2026-05-25 narrative was caused by the prompt including `Gold (XAU): $4,523  1D:+0.00%` with no context that the COMEX was closed. The LLM faithfully reported the stale 0.00% as a real move.
+
+---
+
+## v8.2.32 (2026-05-25) — Narrative guard: context_snapshot enriched with pct changes and closed symbols
+
+### Engine — scripts/fetch_intraday_quotes.py
+- **PASO 6c — context_snapshot.json enrichment:** After each quotes fetch, `fetch_intraday_quotes.py` now patches `ai-analysis/context_snapshot.json` in-place, adding two new top-level fields:
+  - `cross_pct`: `{gold: 0.12, spx: 0.37, dxy: -0.24, vix: -0.66, wti: -3.1, move: -1.6, ...}` — the actual intraday % change for each cross-asset symbol so the LLM never has to infer it from a price.
+  - `closed_symbols`: sorted list of symbols where `pct == 0.0` AND `market_state` is not `REGULAR` (e.g. `["dxy", "gold", "us10y", "wti"]` on a US holiday). The engine's `generate_narrative_signals.py` must omit these symbols or replace them with `"market closed — no intraday data"` in the narrative prompt.
+- **Holiday cross-check:** If `ff_calendar.json` has a USD holiday today, all US-linked symbols (`spx`, `nasdaq`, `vix`, `gold`, `wti`, `dxy`, `move`, `us2y`, `us10y`, `btc`) are unconditionally added to `closed_symbols` — catching symbols like `us2y` that may lack a `market_state` field.
+- **Root cause fixed:** The narrative bug `"gold higher +0.00%"` on Memorial Day 2026-05-25 traced to `context_snapshot.json` containing only the spot price without the pct change or closure flag. The LLM generated a nonsensical "+0.00%" rather than skipping the symbol.
+- **Version bump:** `v3.6 → v3.7`.
+
+---
+
+## v8.2.31 (2026-05-25) — Holiday calendar: one row per holiday, specific tooltip, CCY code visible
+
+### Engine — scripts/fetch_ff_calendar.py
+- **Root cause fix — `country` field mapping:** FF public JSON sends the 3-letter currency code (e.g. `"USD"`, `"EUR"`, `"CHF"`) in the `country` field, not an ISO2 code. The old `G8.get(iso2)` lookup always returned `None` and silently dropped all holidays except those that accidentally matched. Replaced with a direct `G8_CURRENCIES` set lookup (`if country_raw in G8_CURRENCIES`) with ISO2 and name-based fallbacks. This was preventing CHF, EUR, GBP rows from appearing.
+- **Dedup key changed:** Now `(currency, dateISO, title)` instead of `(currency, dateISO)` — preserves "French Bank Holiday" and "German Bank Holiday" as distinct EUR rows on the same day.
+
+### Frontend — assets/calendar-panel.js
+- **One row per holiday (not one banner):** Rendering changed from a single grouped banner to one row per holiday entry, matching ForexFactory layout. CHF, EUR (French), EUR (German), GBP, USD holidays now each appear as their own row.
+- **Specific tooltip:** Each row shows `"<Holiday title> — <CCY> market closed"` (e.g. `"French Bank Holiday — EUR market closed"`) instead of the generic `"Bank Holiday — market closed"`.
+- **CCY code displayed:** Currency column shows flag + 3-letter code (e.g. 🇺🇸 USD) — consistent with economic event rows.
+- **"All Day" font fixed:** Removed inline `color:var(--text3)` override; "All Day" now inherits `.cal-col.cal-time` CSS (`color: var(--text2); font-family: var(--font-mono); font-size: 10px`) — same appearance as event times.
+- **Removed italic/grey on title:** Holiday title uses normal text color. The grey dot already distinguishes holidays.
+
+---
+
 ## v8.2.30 (2026-05-25) — Holiday injection from ForexFactory public JSON
 
 ### Engine — scripts/fetch_ff_calendar.py
