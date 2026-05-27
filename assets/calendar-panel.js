@@ -316,7 +316,7 @@
       let holidays = [];
       let source = 'Finnhub';
       for (const path of ['./calendar-data/ff_calendar.json', './calendar-data/calendar.json']) {
-        const res = await fetch(path).catch(() => null);
+        const res = await fetch(path, { cache: 'no-store' }).catch(() => null);
         if (!res?.ok) continue;
         const j = await res.json();
         if (j?.events?.length) {
@@ -333,6 +333,14 @@
       if (c) c.innerHTML = '<div style="padding:12px 10px;color:var(--text3);font-size:11px;">Calendar unavailable.</div>';
     }
   }
+
+  // Refresh every 5 minutes so actuals appear shortly after each release
+  setInterval(fetchEconomicCalendar, 5 * 60 * 1000);
+
+  // Also refresh immediately when the tab regains focus (user returns to terminal)
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') fetchEconomicCalendar();
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fetchEconomicCalendar);
