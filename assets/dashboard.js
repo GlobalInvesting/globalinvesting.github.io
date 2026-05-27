@@ -10272,12 +10272,15 @@ async function renderDerivativesSection() {
   // ── RR Surface table ──
   const rrSurfaceTbody = document.getElementById('rr-surface-tbody');
   if (rrSurfaceTbody) {
-    const rrPairs = pairs.filter(p => p !== 'NZD/USD'); // NZD rarely available in full surface
+    // EUR/JPY is the only cross pair Saxo consistently publishes — include it.
+    // NZD/USD excluded: Saxo does not publish NZD/USD 25d RR on their public page.
+    const rrPairs = [...pairs.filter(p => p !== 'NZD/USD'), 'EUR/JPY'];
+    const rrPairKeys = { ...rrKeys, 'EUR/JPY': 'EURJPY' };
     const rows = rrSurfaceTbody.querySelectorAll('tr');
     rrPairs.forEach((pair, idx) => {
       const row = rows[idx];
       if (!row) return;
-      const rrKey = rrKeys[pair];
+      const rrKey = rrPairKeys[pair];
       const tds = row.querySelectorAll('td');
       const rr2 = rr2Map[rrKey] || {};
       const rr1m = rr2['1M'] ?? rrMap[rrKey]?.rr25d ?? null;
