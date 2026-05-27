@@ -644,7 +644,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       "name": "How is the cross-asset risk score calculated in the terminal?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The cross-asset risk score aggregates signals from VIX level and trend, the MOVE Index (bond market volatility), gold price direction, SPX momentum, DXY positioning, and yield curve slope. Each input is scored on its risk-on vs risk-off contribution and combined into a composite score. The score is displayed as a normalized reading with a RISK-ON or RISK-OFF label and a numeric value indicating the strength and direction of the current regime."
+        "text": "The cross-asset risk score is a point-based composite: VIX above 30 adds 3 points; VIX 25–30 adds 2 points; VIX 18–25 adds 1 point; VIX below 18 adds 0. Each of the following adds 1 additional point when triggered: yield curve inverted (10Y below 3M), gold up more than 2% intraday, SPX down more than 1.5% intraday, MOVE index above 100. Total score maps to a regime label: 0 = RISK-ON, 1 = MIXED, 2–3 = CAUTION, 4 or above = RISK-OFF. The maximum possible score is 8."
       }
     }
   ]
@@ -715,6 +715,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <a class="toc-item" href="#overview">What It Shows</a>
     <a class="toc-item" href="#cross-asset">Cross-Asset Panel</a>
     <a class="toc-item" href="#risk-monitor">Risk Monitor</a>
+    <a class="toc-item" href="#scoring-model">Scoring Model</a>
     <a class="toc-item" href="#vix">VIX — Equity Volatility</a>
     <a class="toc-item" href="#move">MOVE Index — Bond Vol</a>
     <a class="toc-item" href="#iv">EUR/USD HV 30d</a>
@@ -882,6 +883,32 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
       <p>The Risk Monitor panel shows three volatility gauges plus five derived indicators that, together, characterize the type and severity of market stress (if any). Understanding all simultaneously is more valuable than reading any one in isolation.</p>
       <p>The two correlation rows at the bottom of the table are regime-diagnostic: <strong>DXY vs SPX 60d</strong> normally runs negative (USD weakens in risk-on environments). When it turns positive, it signals USD funding stress — both USD and equities moving together, which historically precedes sharp risk-off moves. <strong>Gold vs DXY 60d</strong> normally runs negative. When it turns positive, it means both safe havens are rallying simultaneously — typically inflation-driven or geopolitical, rather than the usual USD-strength-suppresses-gold relationship. Hover over any row for a tooltip explaining the signal context.</p>
+
+      <h3 id="scoring-model" style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:28px 0 14px;scroll-margin-top:52px;">Stress Scoring Model</h3>
+      <p>The REGIME badge is computed from a composite stress score. Each factor contributes a fixed number of points; the total determines the regime label. This is the same model used in the terminal's <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">fetchRiskData()</code> function — no smoothing, no lag.</p>
+      <table class="threshold-table" aria-label="Stress scoring factors and point values">
+        <thead><tr><th>Factor</th><th>Threshold</th><th style="text-align:center;">Points</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td>VIX</td><td>&gt; 30</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+3</td><td>Crisis / acute stress — GFC, COVID, 2022 spike</td></tr>
+          <tr><td>VIX</td><td>25 – 30</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+2</td><td>Elevated stress — tail risk visible</td></tr>
+          <tr><td>VIX</td><td>18 – 25</td><td style="text-align:center;font-family:var(--font-mono);color:var(--orange);">+1</td><td>Uncertainty zone — below crisis, above complacency</td></tr>
+          <tr><td>VIX</td><td>&lt; 18</td><td style="text-align:center;font-family:var(--font-mono);color:var(--text2);">0</td><td>Neutral to risk-on</td></tr>
+          <tr><td>Yield curve</td><td>10Y &lt; 3M (inverted)</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+1</td><td>Recession signal — NY Fed / Campbell-Shiller</td></tr>
+          <tr><td>Gold intraday</td><td>&gt; +2.0%</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+1</td><td>Safe-haven demand — threshold filters routine noise</td></tr>
+          <tr><td>SPX intraday</td><td>&lt; −1.5%</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+1</td><td>Meaningful risk-off pressure — avoids routine dips</td></tr>
+          <tr><td>MOVE index</td><td>&gt; 100</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+1</td><td>Bond market stress — BofA/ICE "elevated" boundary</td></tr>
+        </tbody>
+      </table>
+      <table class="threshold-table" style="margin-top:10px;" aria-label="Regime score to label mapping">
+        <thead><tr><th>Total Score</th><th>Regime Label</th><th>Color</th></tr></thead>
+        <tbody>
+          <tr><td style="font-family:var(--font-mono);">0</td><td><strong style="color:var(--up);">RISK-ON</strong></td><td>Green — low stress, favorable for carry and momentum</td></tr>
+          <tr><td style="font-family:var(--font-mono);">1</td><td><strong style="color:var(--text);">MIXED</strong></td><td>Neutral — conflicting signals, no strong bias</td></tr>
+          <tr><td style="font-family:var(--font-mono);">2 – 3</td><td><strong style="color:var(--orange);">CAUTION</strong></td><td>Orange — elevated stress, monitor JPY and CHF</td></tr>
+          <tr><td style="font-family:var(--font-mono);">≥ 4</td><td><strong style="color:var(--down);">RISK-OFF</strong></td><td>Red — acute stress, safe-haven bid dominant</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:14px;font-size:14.3px;color:var(--text2);">Maximum possible score is 8 (VIX &gt; 30 contributes 3 of these points, all other factors 1 each). The VIX component dominates intentionally — equity volatility remains the single fastest and most liquid signal of a risk regime shift. The other four factors act as confirming signals; a RISK-OFF reading on VIX alone can be upgraded by corroborating bond, gold, equity, or curve signals.</p>
     </div>
 
     <div class="guide-section" id="vix">
