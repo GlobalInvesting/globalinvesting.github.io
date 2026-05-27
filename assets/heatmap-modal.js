@@ -202,6 +202,7 @@
 .hm-rank-ccy.hl { color:var(--text); }
 .hm-rank-bg { flex:1;height:14px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden; }
 .hm-rank-fill { height:100%;border-radius:2px;transition:width .35s ease; }
+.hm-rank-fill.no-transition { transition:none; }
 .hm-rank-fill.hl   { background:var(--blue); }
 .hm-rank-fill.up   { background:rgba(38,166,154,.35); }
 .hm-rank-fill.down { background:rgba(239,83,80,.30); }
@@ -756,7 +757,9 @@
     }
   }
 
-  function populateBreakdown(ccy, strengths, rtCache) {
+  // _skipAnim: true when called from _updateBreakdownRT on sort-order changes
+  //            (modal already open — bars should appear at target width, not animate from 0)
+  function populateBreakdown(ccy, strengths, rtCache, _skipAnim) {
     document.getElementById('hm-pairs-title').textContent =
       ccy + ' DIRECT PAIRS · INTRADAY % CHANGE · vs PREV CLOSE';
 
@@ -820,20 +823,24 @@
       const row   = document.createElement('div');
       row.className = 'hm-rank-row';
       row.dataset.rankCcy = s.ccy;
+      // On RT rebuilds (_skipAnim) set final width directly — no 0→target animation that causes flash
+      const initW = _skipAnim ? fillW + '%' : '0';
       row.innerHTML = `
         <div class="hm-rank-ccy${isHL?' hl':''}">${s.ccy}</div>
         <div class="hm-rank-bg">
-          <div class="hm-rank-fill ${cls}" style="width:0" data-w="${fillW}"></div>
+          <div class="hm-rank-fill ${cls}" style="width:${initW}" data-w="${fillW}"></div>
         </div>
         <div class="hm-rank-val ${pctClass(s.pct)}" data-rank-val>${fmt2(s.pct)}</div>`;
       container.appendChild(row);
     });
-    // Animate bars after paint
-    requestAnimationFrame(() => {
-      container.querySelectorAll('.hm-rank-fill').forEach(el => {
-        el.style.width = el.dataset.w + '%';
+    // Only run the entry animation on first open (not on RT sort-order rebuilds)
+    if (!_skipAnim) {
+      requestAnimationFrame(() => {
+        container.querySelectorAll('.hm-rank-fill').forEach(el => {
+          el.style.width = el.dataset.w + '%';
+        });
       });
-    });
+    }
 
     // 1W Ranking — compute G8 composite weekly strength from pct1w across all 28 pairs
     const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
@@ -862,19 +869,22 @@
         const row   = document.createElement('div');
         row.className = 'hm-rank-row';
         row.dataset.rankCcy = s.ccy;
+        const initW = _skipAnim ? fillW + '%' : '0';
         row.innerHTML = `
           <div class="hm-rank-ccy${isHL?' hl':''}">${s.ccy}</div>
           <div class="hm-rank-bg">
-            <div class="hm-rank-fill ${cls}" style="width:0" data-w="${fillW}"></div>
+            <div class="hm-rank-fill ${cls}" style="width:${initW}" data-w="${fillW}"></div>
           </div>
           <div class="hm-rank-val ${pctClass(s.pct)}" data-rank-val>${fmt2(s.pct)}</div>`;
         cont1w.appendChild(row);
       });
-      requestAnimationFrame(() => {
-        cont1w.querySelectorAll('.hm-rank-fill').forEach(el => {
-          el.style.width = el.dataset.w + '%';
+      if (!_skipAnim) {
+        requestAnimationFrame(() => {
+          cont1w.querySelectorAll('.hm-rank-fill').forEach(el => {
+            el.style.width = el.dataset.w + '%';
+          });
         });
-      });
+      }
     } else {
       cont1w.innerHTML = '<div style="font-size:10px;color:var(--text3);padding:6px 0">No 1W data available</div>';
     }
@@ -1786,7 +1796,7 @@
     const tbody = document.getElementById('hm-pair-tbody');
     if (!tbody || tbody.children.length === 0) {
       populateMetrics(ccy, strengths, rtCache);
-      populateBreakdown(ccy, strengths, rtCache);
+      populateBreakdown(ccy, strengths, rtCache, true); // _skipAnim: modal already open
       return;
     }
 
@@ -1811,13 +1821,13 @@
     impacts.sort((a,b) => (b.impact??-99) - (a.impact??-99));
     const maxImp = Math.max(...impacts.map(i => Math.abs(i.impact ?? 0)), 0.001);
 
-    // Check if sort order changed — if so, fall back to full render
+    // Check if sort order changed — if so, fall back to full render (with _skipAnim to avoid flash)
     const rows = Array.from(tbody.querySelectorAll('tr[data-pair]'));
     const currentOrder = rows.map(r => r.dataset.pair);
     const newOrder = impacts.map(r => r.label);
     if (currentOrder.join(',') !== newOrder.join(',')) {
       populateMetrics(ccy, strengths, rtCache);
-      populateBreakdown(ccy, strengths, rtCache);
+      populateBreakdown(ccy, strengths, rtCache, true); // _skipAnim: modal already open
       return;
     }
 
@@ -1859,9 +1869,18 @@
         const fillEl = rankRow.querySelector('.hm-rank-fill');
         const valEl  = rankRow.querySelector('[data-rank-val]');
         const fillW  = Math.round(Math.abs(s.pct) / maxAbsPct * 100);
-        const cls    = (s.ccy === ccy) ? 'hl' : pctClass(s.pct);
-        if (fillEl) { fillEl.style.width = fillW + '%'; fillEl.className = 'hm-rank-fill ' + cls; }
-        if (valEl)  { valEl.textContent = fmt2(s.pct); valEl.className = 'hm-rank-val ' + pctClass(s.pct); }
+        const cls    = 'hm-rank-fill ' + ((s.ccy === ccy) ? 'hl' : pctClass(s.pct));
+        const newW   = fillW + '%';
+        if (fillEl) {
+          if (fillEl.style.width !== newW)    fillEl.style.width = newW;
+          if (fillEl.className  !== cls)      fillEl.className   = cls;
+        }
+        if (valEl) {
+          const newTxt = fmt2(s.pct);
+          const newCls = 'hm-rank-val ' + pctClass(s.pct);
+          if (valEl.textContent !== newTxt) valEl.textContent = newTxt;
+          if (valEl.className   !== newCls) valEl.className   = newCls;
+        }
       });
     }
 
@@ -1886,9 +1905,18 @@
         const fillEl = rankRow.querySelector('.hm-rank-fill');
         const valEl  = rankRow.querySelector('[data-rank-val]');
         const fillW  = Math.round(Math.abs(s.pct) / maxAbs1w * 100);
-        const cls    = (s.ccy === ccy) ? 'hl' : pctClass(s.pct);
-        if (fillEl) { fillEl.style.width = fillW + '%'; fillEl.className = 'hm-rank-fill ' + cls; }
-        if (valEl)  { valEl.textContent = fmt2(s.pct); valEl.className = 'hm-rank-val ' + pctClass(s.pct); }
+        const cls    = 'hm-rank-fill ' + ((s.ccy === ccy) ? 'hl' : pctClass(s.pct));
+        const newW   = fillW + '%';
+        if (fillEl) {
+          if (fillEl.style.width !== newW)    fillEl.style.width = newW;
+          if (fillEl.className  !== cls)      fillEl.className   = cls;
+        }
+        if (valEl) {
+          const newTxt = fmt2(s.pct);
+          const newCls = 'hm-rank-val ' + pctClass(s.pct);
+          if (valEl.textContent !== newTxt) valEl.textContent = newTxt;
+          if (valEl.className   !== newCls) valEl.className   = newCls;
+        }
       });
     }
   }
