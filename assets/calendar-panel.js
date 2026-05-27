@@ -230,11 +230,12 @@
         const isPast     = isPastEvent(ev.dateISO, ev.timeUTC);
         const dimmed     = isPast && isReleased;
 
-        // Actual coloring
+        // Actual coloring — strip "*" suffix before numeric comparison (derived forecast)
         let actualHtml = '<span style="color:var(--text3)">—</span>';
         if (isReleased && ev.actual != null) {
+          const forecastRaw = ev.forecast ? String(ev.forecast).replace(/\*$/, '') : null;
           const actualN   = parseFloat(String(ev.actual).replace(/[%,KMB\s]/gi,''));
-          const forecastN = parseFloat(String(ev.forecast || ev.previous || '').replace(/[%,KMB\s]/gi,''));
+          const forecastN = parseFloat(String(forecastRaw || ev.previous || '').replace(/[%,KMB\s]/gi,''));
           let cls = '';
           if (!isNaN(actualN) && !isNaN(forecastN) && actualN !== forecastN) {
             cls = actualN > forecastN ? ' class="up"' : ' class="down"';
@@ -242,9 +243,16 @@
           actualHtml = `<span${cls}>${ev.actual}</span>`;
         }
 
-        const forecastHtml = ev.forecast
-          ? `<span style="color:var(--text2)">${ev.forecast}</span>`
-          : '<span style="color:var(--text3)">—</span>';
+        // Derived forecast (suffixed "*"): render in muted color with tooltip
+        let forecastHtml;
+        if (!ev.forecast) {
+          forecastHtml = '<span style="color:var(--text3)">—</span>';
+        } else if (String(ev.forecast).endsWith('*')) {
+          const displayVal = String(ev.forecast).slice(0, -1); // strip "*" for display
+          forecastHtml = `<span style="color:var(--text3)" title="Last known consensus (provider estimate unavailable)">${displayVal}*</span>`;
+        } else {
+          forecastHtml = `<span style="color:var(--text2)">${ev.forecast}</span>`;
+        }
         const previousHtml = ev.previous
           ? `<span style="color:var(--text3)">${ev.previous}</span>`
           : '<span style="color:var(--text3)">—</span>';
