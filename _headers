@@ -48,7 +48,7 @@
 
 
 /calendar-data/*
-  Cache-Control: public, max-age=7200, stale-while-revalidate=600
+  Cache-Control: public, max-age=60, stale-while-revalidate=30
 
 # Assets estáticos — cache largo
 /*.png

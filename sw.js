@@ -6,7 +6,7 @@
 //   • Everything else      → Network only
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v7.91.0';
+const CACHE_VERSION = 'gi-v7.92.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -28,6 +28,7 @@ const STATIC_PRECACHE = [
 // Paths treated as data (network-first)
 const DATA_PATH_PREFIXES = [
   '/ai-analysis/',
+  '/calendar-data/',
   '/cot-data/',
   '/economic-data/',
   '/extended-data/',
