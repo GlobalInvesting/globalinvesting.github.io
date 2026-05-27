@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-27T18:57:09Z",
-  "generatedAt": "2026-05-27T18:57:09Z",
+  "lastUpdate": "2026-05-27T19:09:28Z",
+  "generatedAt": "2026-05-27T19:09:28Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -26,402 +26,477 @@
     "high": 373
   },
   "surpriseStats": {
-    "EUR/Consumer Confidence Final": {
+    "EUR/consumer confidence final": {
       "n": 3,
       "mean": 0.0,
       "std": 0.0
     },
-    "EUR/Economic Sentiment": {
+    "EUR/economic sentiment": {
       "n": 3,
       "mean": -1.3,
       "std": 1.014889
     },
-    "GBP/Gfk Consumer Confidence": {
+    "GBP/gfk consumer confidence": {
       "n": 4,
       "mean": 0.75,
       "std": 4.031129
     },
-    "JPY/Housing Starts YoY": {
+    "JPY/housing starts yoy": {
       "n": 3,
       "mean": 0.066667,
       "std": 1.02632
     },
-    "GBP/Nationwide HPI (MoM) (Feb)": {
+    "GBP/nationwide hpi": {
+      "n": 4,
+      "mean": 0.2,
+      "std": 0.11547
+    },
+    "CHF/cpi": {
       "n": 2,
       "mean": 0.1,
       "std": 0.0
     },
-    "GBP/Nationwide HPI (YoY) (Feb)": {
+    "CHF/kof leading indicators": {
       "n": 2,
-      "mean": 0.3,
-      "std": 0.0
+      "mean": -2.35,
+      "std": 5.020458
     },
-    "CHF/CPI (MoM) (Feb)": {
-      "n": 2,
-      "mean": 0.1,
-      "std": 0.0
+    "CHF/procure.ch manufacturing pmi": {
+      "n": 4,
+      "mean": 1.0,
+      "std": 4.221374
     },
-    "CHF/procure.ch Manufacturing PMI (Feb)": {
-      "n": 2,
-      "mean": -2.4,
-      "std": 0.0
+    "EUR/hcob eurozone manufacturing pmi": {
+      "n": 3,
+      "mean": 0.666667,
+      "std": 1.154701
     },
-    "EUR/HCOB Eurozone Manufacturing PMI (Feb)": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
+    "EUR/hcob eurozone composite pmi": {
+      "n": 3,
+      "mean": -0.166667,
+      "std": 0.288675
     },
-    "EUR/HCOB Eurozone Composite PMI (Feb)": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
+    "EUR/hcob eurozone services pmi": {
+      "n": 3,
+      "mean": -0.266667,
+      "std": 0.635085
     },
-    "EUR/HCOB Eurozone Services PMI (Feb)": {
-      "n": 2,
-      "mean": 0.1,
-      "std": 0.0
+    "GBP/s&p global manufacturing pmi": {
+      "n": 3,
+      "mean": 0.266667,
+      "std": 0.981495
     },
-    "GBP/S&P Global Manufacturing PMI (Feb)": {
-      "n": 2,
-      "mean": -0.3,
-      "std": 0.0
+    "GBP/s&p global composite pmi": {
+      "n": 3,
+      "mean": -0.733333,
+      "std": 0.92376
     },
-    "GBP/S&P Global Composite PMI (Feb)": {
-      "n": 2,
-      "mean": -0.2,
-      "std": 0.0
+    "GBP/s&p global services pmi": {
+      "n": 3,
+      "mean": -0.533333,
+      "std": 0.92376
     },
-    "GBP/S&P Global Services PMI (Feb)": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "GBP/S&P Global Construction PMI (Feb)": {
+    "GBP/s&p global construction pmi": {
       "n": 2,
       "mean": -2.5,
       "std": 0.0
     },
-    "EUR/Core CPI (YoY) (Feb)": {
+    "EUR/core cpi": {
+      "n": 6,
+      "mean": 0.15,
+      "std": 0.700714
+    },
+    "EUR/cpi": {
+      "n": 7,
+      "mean": 0.242857,
+      "std": 0.607885
+    },
+    "EUR/unemployment rate": {
       "n": 3,
-      "mean": 0.133333,
-      "std": 0.11547
+      "mean": 0.2,
+      "std": 0.173205
     },
-    "EUR/CPI (YoY) (Feb)": {
-      "n": 3,
-      "mean": 0.133333,
-      "std": 0.11547
-    },
-    "EUR/Unemployment Rate (Jan)": {
-      "n": 2,
-      "mean": 0.1,
-      "std": 0.0
-    },
-    "CAD/Labor Productivity (QoQ) (Q4)": {
+    "CAD/labor productivity": {
       "n": 2,
       "mean": 0.0,
       "std": 0.0
     },
-    "USD/Export Price Index (MoM) (Jan)": {
+    "USD/core ppi": {
       "n": 2,
-      "mean": 0.3,
-      "std": 0.0
+      "mean": 0.35,
+      "std": 0.212132
     },
-    "USD/Import Price Index (MoM) (Jan)": {
-      "n": 2,
-      "mean": -0.1,
-      "std": 0.0
+    "USD/ppi": {
+      "n": 5,
+      "mean": 0.64,
+      "std": 0.654217
     },
-    "USD/Nonfarm Productivity (QoQ) (Q4)": {
+    "USD/export price index": {
+      "n": 3,
+      "mean": 0.533333,
+      "std": 0.404145
+    },
+    "USD/import price index": {
+      "n": 3,
+      "mean": 0.166667,
+      "std": 0.46188
+    },
+    "USD/nonfarm productivity": {
       "n": 3,
       "mean": 0.266667,
       "std": 1.096966
     },
-    "USD/Unit Labor Costs (QoQ) (Q4)": {
+    "USD/unit labor costs": {
       "n": 3,
       "mean": 1.066667,
       "std": 0.46188
     },
-    "USD/S&P Global Manufacturing PMI (Feb)": {
+    "USD/chicago pmi": {
       "n": 2,
-      "mean": 0.4,
-      "std": 0.0
+      "mean": 1.75,
+      "std": 5.586144
     },
-    "USD/S&P Global Composite PMI (Feb)": {
+    "USD/s&p global manufacturing pmi": {
+      "n": 3,
+      "mean": 0.566667,
+      "std": 0.288675
+    },
+    "USD/s&p global composite pmi": {
       "n": 2,
       "mean": -0.4,
       "std": 0.0
     },
-    "USD/S&P Global Services PMI (Feb)": {
-      "n": 2,
-      "mean": -0.6,
-      "std": 0.0
+    "USD/s&p global services pmi": {
+      "n": 3,
+      "mean": -0.7,
+      "std": 0.173205
     },
-    "USD/ISM Manufacturing Employment (Feb)": {
+    "USD/construction spending": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.353553
+    },
+    "USD/ism manufacturing employment": {
       "n": 2,
       "mean": 0.5,
       "std": 0.0
     },
-    "USD/ISM Manufacturing Prices (Feb)": {
+    "USD/ism manufacturing prices": {
       "n": 2,
       "mean": 9.9,
       "std": 0.0
     },
-    "USD/ISM Non-Manufacturing Prices (Feb)": {
+    "USD/ism non-manufacturing prices": {
       "n": 2,
       "mean": -5.3,
       "std": 0.0
     },
-    "USD/Atlanta Fed GDPNow (Q1)": {
+    "USD/atlanta fed gdpnow": {
       "n": 7,
       "mean": -0.157143,
       "std": 0.457738
     },
-    "JPY/Capital Spending (YoY) (Q4)": {
+    "JPY/capital spending": {
       "n": 2,
       "mean": 3.5,
       "std": 0.0
     },
-    "AUD/Building Approvals (MoM) (Jan)": {
+    "AUD/building approvals": {
       "n": 3,
       "mean": -8.4,
       "std": 7.274613
     },
-    "AUD/GDP (QoQ) (Q4)": {
+    "AUD/gdp": {
+      "n": 4,
+      "mean": 0.25,
+      "std": 0.173205
+    },
+    "JPY/s&p global services pmi": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "GBP/retail sales": {
+      "n": 3,
+      "mean": -0.533333,
+      "std": 1.446836
+    },
+    "NZD/unemployment rate": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.141421
+    },
+    "USD/gdp": {
+      "n": 2,
+      "mean": -2.3,
+      "std": 2.262742
+    },
+    "USD/ism manufacturing pmi": {
+      "n": 2,
+      "mean": 0.45,
+      "std": 0.353553
+    },
+    "GBP/halifax house price index": {
+      "n": 2,
+      "mean": 0.2,
+      "std": 0.282843
+    },
+    "EUR/gdp": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.0
+    },
+    "USD/average hourly earnings": {
       "n": 2,
       "mean": 0.1,
       "std": 0.0
     },
-    "AUD/GDP (YoY) (Q4)": {
-      "n": 2,
-      "mean": 0.4,
-      "std": 0.0
+    "USD/retail sales": {
+      "n": 4,
+      "mean": 0.475,
+      "std": 0.556028
     },
-    "JPY/S&P Global Services PMI (Feb)": {
-      "n": 2,
+    "USD/unemployment rate": {
+      "n": 5,
       "mean": 0.0,
-      "std": 0.0
+      "std": 0.1
     },
-    "NZD/Unemployment Rate": {
+    "JPY/household spending": {
       "n": 2,
-      "mean": 0.0,
-      "std": 0.141421
+      "mean": -3.35,
+      "std": 0.070711
     },
-    "USD/Michigan 1-Year Inflation Expectations (Mar)": {
+    "USD/core cpi": {
+      "n": 5,
+      "mean": 0.0,
+      "std": 0.070711
+    },
+    "USD/cpi": {
+      "n": 5,
+      "mean": 0.12,
+      "std": 0.277489
+    },
+    "CAD/building permits": {
+      "n": 3,
+      "mean": 5.733333,
+      "std": 1.436431
+    },
+    "GBP/industrial production": {
+      "n": 3,
+      "mean": -0.5,
+      "std": 0.360555
+    },
+    "CAD/unemployment rate": {
+      "n": 5,
+      "mean": -0.04,
+      "std": 0.207364
+    },
+    "USD/core pce price index": {
+      "n": 5,
+      "mean": 0.0,
+      "std": 0.070711
+    },
+    "USD/pce price index": {
+      "n": 5,
+      "mean": 0.06,
+      "std": 0.151658
+    },
+    "USD/michigan 1-year inflation expectations": {
       "n": 2,
       "mean": -0.1,
       "std": 0.141421
     },
-    "USD/Michigan Consumer Expectations (Mar)": {
+    "USD/michigan consumer expectations": {
       "n": 2,
       "mean": -1.4,
       "std": 1.414214
     },
-    "USD/Michigan Consumer Sentiment (Mar)": {
-      "n": 2,
-      "mean": -0.85,
-      "std": 1.909188
+    "USD/michigan consumer sentiment": {
+      "n": 5,
+      "mean": -0.26,
+      "std": 2.642537
     },
-    "AUD/Building Permits (YoY)": {
+    "USD/ny empire state manufacturing index": {
+      "n": 2,
+      "mean": 3.95,
+      "std": 11.525841
+    },
+    "AUD/rba interest rate decision": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "AUD/building permits": {
       "n": 3,
       "mean": 2.066667,
       "std": 26.725518
     },
-    "AUD/Consumer Confidence": {
+    "AUD/consumer confidence": {
       "n": 3,
       "mean": -1.0,
       "std": 2.645751
     },
-    "AUD/Unemployment Rate": {
-      "n": 4,
-      "mean": -0.1,
-      "std": 0.11547
+    "AUD/unemployment rate": {
+      "n": 5,
+      "mean": -0.12,
+      "std": 0.109545
     },
-    "CAD/Building Permits (YoY)": {
-      "n": 2,
-      "mean": 5.2,
-      "std": 1.555635
-    },
-    "CAD/Industrial Production (YoY)": {
+    "CAD/industrial production": {
       "n": 2,
       "mean": -0.35,
       "std": 1.909188
     },
-    "CAD/Unemployment Rate": {
-      "n": 4,
-      "mean": -0.025,
-      "std": 0.236291
-    },
-    "CHF/Business Confidence": {
+    "CHF/business confidence": {
       "n": 3,
       "mean": 1.566667,
       "std": 2.500667
     },
-    "EUR/CPI (YoY)": {
-      "n": 3,
-      "mean": 0.466667,
-      "std": 0.971253
-    },
-    "EUR/Consumer Confidence": {
+    "EUR/consumer confidence": {
       "n": 2,
       "mean": 2.2,
       "std": 1.979899
     },
-    "EUR/Core CPI (YoY)": {
-      "n": 3,
-      "mean": 0.166667,
-      "std": 1.101514
-    },
-    "GBP/Consumer Confidence": {
+    "GBP/consumer confidence": {
       "n": 3,
       "mean": -1.4,
       "std": 2.515949
     },
-    "GBP/Industrial Production (YoY)": {
-      "n": 2,
-      "mean": -0.55,
-      "std": 0.494975
-    },
-    "JPY/Consumer Confidence": {
+    "JPY/consumer confidence": {
       "n": 5,
       "mean": -1.84,
       "std": 3.599722
     },
-    "JPY/Industrial Production (YoY)": {
-      "n": 3,
-      "mean": 0.433333,
-      "std": 2.850146
+    "JPY/industrial production": {
+      "n": 4,
+      "mean": 0.85,
+      "std": 2.471841
     },
-    "JPY/Unemployment Rate": {
+    "JPY/unemployment rate": {
       "n": 3,
       "mean": -0.033333,
       "std": 0.11547
     },
-    "USD/CPI (MoM)": {
-      "n": 3,
-      "mean": 0.2,
-      "std": 0.360555
+    "JPY/machinery orders": {
+      "n": 2,
+      "mean": 3.65,
+      "std": 0.636396
     },
-    "USD/Core CPI (MoM)": {
-      "n": 3,
+    "GBP/unemployment rate": {
+      "n": 2,
       "mean": 0.0,
-      "std": 0.1
+      "std": 0.141421
     },
-    "USD/Core PCE Price Index (MoM)": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.1
+    "USD/philadelphia fed manufacturing index": {
+      "n": 2,
+      "mean": -4.3,
+      "std": 19.940411
     },
-    "USD/Michigan Consumer Sentiment": {
-      "n": 3,
-      "mean": 0.133333,
-      "std": 3.40049
+    "USD/new home sales": {
+      "n": 2,
+      "mean": -9.144,
+      "std": 12.976824
     },
-    "USD/PCE Price Index (MoM)": {
-      "n": 3,
-      "mean": 0.133333,
-      "std": 0.152753
-    },
-    "USD/PPI (MoM)": {
-      "n": 3,
-      "mean": 0.866667,
-      "std": 0.80829
-    },
-    "USD/Retail Sales (MoM)": {
-      "n": 3,
-      "mean": 0.6,
-      "std": 0.608276
-    },
-    "USD/Unemployment Rate": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.095743
-    },
-    "USD/EIA Natural Gas Storage Change": {
+    "USD/eia natural gas storage change": {
       "n": 2,
       "mean": -4.5,
       "std": 0.707107
     },
-    "USD/EIA Crude Oil Stocks Change": {
+    "EUR/producer price index": {
+      "n": 2,
+      "mean": -0.7,
+      "std": 0.141421
+    },
+    "GBP/cpi": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "GBP/retail price index": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.0
+    },
+    "USD/eia crude oil stocks change": {
       "n": 4,
       "mean": 0.0605,
       "std": 4.890766
     },
-    "USD/Michigan Consumer Sentiment Final": {
+    "USD/michigan consumer sentiment final": {
       "n": 3,
       "mean": -0.633333,
       "std": 2.800595
     },
-    "USD/CB Consumer Confidence": {
+    "GBP/core retail sales": {
+      "n": 2,
+      "mean": 0.45,
+      "std": 0.070711
+    },
+    "USD/cb consumer confidence": {
       "n": 3,
       "mean": 2.9,
       "std": 1.558846
     },
-    "CHF/procure.ch Manufacturing PMI": {
-      "n": 2,
-      "mean": 4.4,
-      "std": 2.687006
-    },
-    "USD/ADP Employment Change": {
+    "USD/adp employment change": {
       "n": 2,
       "mean": 16.0,
       "std": 8.485281
     },
-    "USD/ISM Services PMI": {
+    "USD/ism services pmi": {
       "n": 2,
       "mean": -0.55,
       "std": 0.636396
     },
-    "CAD/Ivey PMI s.a": {
+    "CAD/ivey pmi s.a": {
       "n": 2,
       "mean": 0.8,
       "std": 9.899495
     },
-    "JPY/Current Account": {
+    "JPY/current account": {
       "n": 2,
       "mean": 593.5,
       "std": 296.277741
     },
-    "CHF/Consumer Confidence": {
+    "CHF/consumer confidence": {
       "n": 2,
       "mean": -2.5,
       "std": 12.020815
     },
-    "USD/Michigan Consumer Sentiment Prel": {
+    "USD/michigan consumer sentiment prel": {
       "n": 2,
       "mean": -2.85,
       "std": 2.192031
     },
-    "CAD/Housing Starts": {
+    "CAD/housing starts": {
       "n": 2,
       "mean": 10.1,
       "std": 41.295036
     },
-    "EUR/ZEW Economic Sentiment Index": {
+    "EUR/zew economic sentiment index": {
       "n": 2,
       "mean": -2.95,
       "std": 19.586858
     },
-    "GBP/Average Earnings incl. Bonus (3Mo/Yr)": {
+    "GBP/average earnings incl. bonus": {
       "n": 2,
       "mean": 0.25,
       "std": 0.070711
     },
-    "USD/Housing Starts": {
+    "USD/housing starts": {
       "n": 2,
       "mean": 0.0785,
       "std": 0.033234
     },
-    "USD/API Crude Oil Stock Change": {
+    "USD/api crude oil stock change": {
       "n": 3,
       "mean": -3.846,
       "std": 2.871785
     },
-    "USD/EIA Gasoline Stocks Change": {
+    "USD/eia gasoline stocks change": {
       "n": 3,
       "mean": -0.362,
       "std": 0.89374
     },
-    "USD/Initial Jobless Claims": {
+    "USD/initial jobless claims": {
       "n": 3,
       "mean": 0.0,
       "std": 5.567764
