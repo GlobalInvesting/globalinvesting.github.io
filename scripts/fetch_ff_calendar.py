@@ -1,8 +1,26 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.7
+fetch_ff_calendar.py — v3.8
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.8 changes (2026-05-27):
+- derive_forecast_from_history(): new Step 2e that fills missing `forecast` fields
+  using last-known-consensus fallback — the industry standard approach used by
+  Bloomberg Terminal and Reuters Eikon. For event series that structurally carry
+  analyst consensus (ADP, MBA Mortgage Rate, CBI Distributive Trades, etc.), when
+  Finnhub returns estimate=null (timing gap, API tier, or provider lag), the most
+  recent prior forecast for that series is used as a fallback.
+  Two safeguards mirror industry practice:
+    1. Consensus eligibility gate (MIN_FORECAST_HISTORY=2): only fills series that
+       had a forecast in at least 2 prior occurrences — prevents filling speech,
+       testimony, and other no-consensus event types.
+    2. Derived values are suffixed with "*" (e.g. "0.3%*") so the frontend can
+       render them in a muted style, distinct from live estimates. Users can see
+       the value is the last known consensus, not a fresh provider estimate.
+  History is sourced from calendar.json (FRED+Finnhub backfill) and the current
+  ff_calendar batch. Matching uses the same keyword overlap logic as
+  derive_previous_from_history().
 
 v3.7 changes (2026-05-25):
 - fetch_ff_holidays(): new step that fetches bank/market holidays from the
@@ -597,6 +615,174 @@ def enrich_from_calendar_json(events: list[dict]) -> int:
     return enriched
 
 
+# ── Forecast derivation from historical series ───────────────────────────────
+# Industry standard (Bloomberg/Reuters Eikon): for events that structurally carry
+# analyst consensus (e.g. ADP, MBA Mortgage Rate, CBI Distributive Trades), when
+# the current run has no estimate from the provider, fill with the *most recent
+# prior forecast* for that event series — this is called "last known consensus"
+# or "stale forecast fallback".
+#
+# Two critical safeguards (matching industry practice):
+#   1. Only applies when the series has had a forecast in >= MIN_FORECAST_HISTORY
+#      prior occurrences — prevents filling events that structurally never have one
+#      (e.g. Fed speeches). This is the "consensus eligibility" gate.
+#   2. The derived value is suffixed with "*" so downstream consumers can render it
+#      differently (e.g. "0.3%*" vs "0.3%" from the live feed). The calendar panel
+#      uses this to show a muted style distinguishing derived from live forecasts.
+#
+# Matching logic mirrors derive_previous_from_history: same currency + keyword
+# overlap. History is read from calendar.json (which stores forecasts from Finnhub
+# backfill) and from the current ff_calendar batch itself.
+#
+# NOT applied to:
+#   - Events already having a forecast (live value takes priority)
+#   - Events not yet confirmed to have a consensus history (MIN_FORECAST_HISTORY gate)
+#   - Events matching known no-consensus patterns (speeches, testimonies)
+
+MIN_FORECAST_HISTORY = 2   # need at least 2 prior forecasts to consider the series "eligible"
+_NO_CONSENSUS_WORDS  = frozenset({
+    "speech", "speaks", "testimony", "testifies", "statement", "press",
+    "conference", "minutes", "vote", "meeting", "forum", "symposium",
+    "appearance", "hearing", "panel",
+})
+
+def derive_forecast_from_history(events: list[dict]) -> int:
+    """
+    Fill missing `forecast` fields using the most recent prior forecast for the
+    same event series (last-known-consensus fallback). Derived values are suffixed
+    with "*" to indicate they are estimated, not live from the provider.
+
+    Only applies when at least MIN_FORECAST_HISTORY prior forecasts exist for the
+    series, ensuring speech/testimony-type events (which never have a consensus)
+    are never filled.
+
+    Returns count of events updated.
+    """
+    from collections import defaultdict
+
+    # ── Build forecast history from calendar.json ─────────────────────────────
+    # calendar.json stores forecast values from the Finnhub backfill pipeline.
+    cal_fc_history: list[tuple] = []  # (dateISO, currency, event_name, forecast, kw_frozenset)
+    if os.path.exists(CALENDAR_PATH):
+        try:
+            with open(CALENDAR_PATH, encoding="utf-8") as f:
+                cal = json.load(f)
+            for ce in cal.get("events", []):
+                raw_fc = ce.get("forecast")
+                if raw_fc is None:
+                    continue
+                fc_str = str(raw_fc).strip()
+                if not fc_str or fc_str in ("—", "-", "N/A", "--"):
+                    continue
+                kw = _title_keywords(ce.get("event") or "")
+                if kw:
+                    cal_fc_history.append((
+                        ce.get("dateISO", ""),
+                        ce.get("currency", ""),
+                        ce.get("event", ""),
+                        fc_str,
+                        kw,
+                    ))
+        except Exception:
+            pass
+
+    # ── Also include forecasts already present in the current ff_calendar batch ─
+    ff_fc_history: list[tuple] = []
+    for ev in events:
+        raw_fc = ev.get("forecast")
+        if raw_fc is None:
+            continue
+        fc_str = str(raw_fc).strip()
+        if not fc_str or fc_str in ("—", "-", "N/A", "--"):
+            continue
+        # Strip existing "*" suffix to avoid double-marking re-used derived values
+        fc_str = fc_str.rstrip("*")
+        kw = _title_keywords(ev.get("title") or "")
+        if kw:
+            ff_fc_history.append((
+                ev.get("dateISO", ""),
+                ev.get("currency", ""),
+                ev.get("title", ""),
+                fc_str,
+                kw,
+            ))
+
+    combined = cal_fc_history + ff_fc_history
+
+    # Group by currency for fast lookup
+    by_ccy: dict[str, list] = defaultdict(list)
+    for row in combined:
+        by_ccy[row[1]].append(row)
+
+    # Sort each currency group by date descending (most recent first)
+    for ccy in by_ccy:
+        by_ccy[ccy].sort(key=lambda x: x[0], reverse=True)
+
+    derived = 0
+    for ev in events:
+        # Skip if already has a forecast (live value takes priority)
+        if ev.get("forecast") is not None:
+            continue
+
+        title = ev.get("title") or ""
+        ff_kw = _title_keywords(title)
+        if not ff_kw:
+            continue
+
+        # No-consensus guard: skip known non-forecastable event types
+        title_lower = title.lower()
+        if any(w in title_lower for w in _NO_CONSENSUS_WORDS):
+            continue
+
+        ev_date = ev.get("dateISO", "")
+        ev_ccy  = ev.get("currency", "")
+
+        # ── Consensus eligibility gate ────────────────────────────────────────
+        # Count how many prior occurrences of this series had a forecast.
+        # Only proceed if >= MIN_FORECAST_HISTORY — this is the key safeguard
+        # that prevents filling events that structurally never have consensus.
+        eligible_count = 0
+        for h_date, h_ccy, _, _, h_kw in by_ccy.get(ev_ccy, []):
+            if h_date >= ev_date:
+                continue
+            overlap = ff_kw & h_kw
+            score = len(overlap)
+            if score == 1 and not (overlap & _STRONG_WORDS):
+                score = 0
+            if score >= 1:
+                eligible_count += 1
+            if eligible_count >= MIN_FORECAST_HISTORY:
+                break
+
+        if eligible_count < MIN_FORECAST_HISTORY:
+            continue  # series not eligible — structurally has no consensus
+
+        # ── Find most recent prior forecast ───────────────────────────────────
+        best_forecast: str | None = None
+        best_score = 0
+
+        for h_date, h_ccy, _, h_fc, h_kw in by_ccy.get(ev_ccy, []):
+            if h_date >= ev_date:
+                continue
+            overlap = ff_kw & h_kw
+            score = len(overlap)
+            if score == 1 and not (overlap & _STRONG_WORDS):
+                score = 0
+            if score > best_score:
+                best_score = score
+                best_forecast = h_fc
+            if best_score >= 2:
+                break  # good enough
+
+        if best_forecast is not None and best_score >= 1:
+            # Suffix with "*" — industry convention for "last known consensus / estimated"
+            ev["forecast"] = best_forecast.rstrip("*") + "*"
+            derived += 1
+
+    print(f"  Forecast derived from history: {derived} events updated (suffixed '*' = last known consensus)")
+    return derived
+
+
 # ── Previous derivation from historical series ────────────────────────────────
 # For events where Finnhub has no `previous` (e.g. Flash PMIs for EUR/GBP/AUD/JPY,
 # energy inventories, jobless claims), we derive it by finding the most recent prior
@@ -745,7 +931,7 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.7")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.8")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -794,6 +980,14 @@ def main():
     # Covers Flash PMIs (EUR/GBP/AUD/JPY), energy inventories, jobless claims, etc.
     # where Finnhub returns previous=null but prior actuals exist in the combined history.
     derive_previous_from_history(fresh)
+
+    # Step 2e: Derive missing `forecast` from historical series (last-known-consensus fallback)
+    # Industry standard (Bloomberg/Reuters Eikon): for events that structurally carry analyst
+    # consensus but whose current-run estimate is null (timing gap, API tier, provider lag),
+    # fill with the most recent prior forecast for that series. Derived values are suffixed
+    # with "*" so the frontend renders them in a muted style distinct from live estimates.
+    # The MIN_FORECAST_HISTORY gate ensures speech/testimony events (no consensus) are skipped.
+    derive_forecast_from_history(fresh)
 
     # Step 2d: Dedup — Finnhub occasionally emits the same release twice with slightly
     # different times (e.g. API Crude Oil at 20:30 and 21:30 with identical actuals).

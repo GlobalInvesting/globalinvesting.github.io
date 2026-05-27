@@ -199,7 +199,8 @@ def compute_surprise_stats(events, lookback_cutoff):
 
         try:
             actual_f   = float(str(ev["actual"]).replace("%", "").replace(",", "").strip())
-            forecast_f = float(str(ev["forecast"]).replace("%", "").replace(",", "").strip())
+            # Strip "*" suffix — derived/last-known-consensus forecasts are still valid for surprise calc
+            forecast_f = float(str(ev["forecast"]).replace("*", "").replace("%", "").replace(",", "").strip())
         except (ValueError, TypeError):
             continue
 
