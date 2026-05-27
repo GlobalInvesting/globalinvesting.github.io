@@ -1,3 +1,15 @@
+## v8.2.39 (2026-05-27) — FIX: Heatmap modal ranking bars parpadeo eliminado
+
+### Frontend — assets/heatmap-modal.js
+- **Causa raíz 1 — `populateBreakdown` reconstruía con `width:0`:** Cuando el sort order de los pares cambia entre ticks de Finnhub, `_updateBreakdownRT` hace fallback a `populateBreakdown()`. La función reconstruía el DOM con `style="width:0"` y luego animaba al valor final via `requestAnimationFrame`, causando el parpadeo visible (barras colapsan a cero y se expanden de nuevo en cada tick que altera el order).
+- **Fix — parámetro `_skipAnim`:** `populateBreakdown` recibe un nuevo 4to parámetro `_skipAnim`. Cuando `true` (llamadas desde `_updateBreakdownRT`), las barras se renderizan directamente al `fillW%` final sin pasar por `width:0`. El `requestAnimationFrame` de entrada solo corre cuando `_skipAnim` es falsy (primer render al abrir el modal).
+- **Causa raíz 2 — in-place update sobreescribía props sin verificar cambios:** `fillEl.style.width` y `fillEl.className` se reescribían en cada tick aunque el valor fuera idéntico, disparando recalculos de estilo y micro-transiciones innecesarios.
+- **Fix — guards de igualdad:** Todas las asignaciones de `style.width`, `className`, y `textContent` en los bloques de ranking in-place ahora están protegidas por `!== newValue` antes de escribir.
+- **Utilidad CSS `.no-transition`:** Agregada como cobertura defensiva para suprimir `transition:width` en barras recién creadas si fueran afectadas por algún edge case no cubierto.
+
+---
+
+
 ## v8.2.38 (2026-05-27) — FIX: Calendar panel updates immediately after workflow push
 
 ### Frontend — assets/calendar-panel.js
