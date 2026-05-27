@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_economic_calendar.py  v3.2
+fetch_economic_calendar.py  v3.3
 ──────────────────────────────────────────────────────────────────────────────
 Builds calendar-data/calendar.json (Economic Surprises panel source) by
 converting and merging data from calendar-data/ff_calendar.json, which is
@@ -47,6 +47,13 @@ SCHEDULE
   (inherits CF Worker latency: ~2-3 min end-to-end). Falls back to 4x daily cron.
 
 CHANGELOG
+  v3.3 (2026-05-27): Fix statsKey canon normalisation — strip parentheticals and
+    lowercase to match JS evTitle normalisation in renderEconSurprises() and
+    _esmScoreWindow(). Previous code used title.strip() (title-cased, parens kept),
+    so the Python key was e.g. "USD/Average Hourly Earnings (MoM) (Feb)" while JS
+    looked up "usd/average hourly earnings". 165/303 (54%) of events with actuals
+    had parenthetical suffixes — none of them ever received z-score stats from
+    surpriseStats. All events now resolve correctly.
   v3.2 (2026-05-23): Propagate source from ff_calendar.json (was hardcoded
     'ForexFactory'); add purge pass for stale pre-v3.1 duplicate entries;
     generate surpriseStats for z-score scoring.
@@ -57,6 +64,7 @@ CHANGELOG
 import json
 import math
 import os
+import re
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timezone, timedelta
@@ -193,9 +201,12 @@ def compute_surprise_stats(events, lookback_cutoff):
         if not ccy or not title:
             continue
 
-        # Canonical name: strip trailing parentheticals like "(MoM)" for grouping
-        # Keep the full name for display; canon is for stats key only
-        canon = title.strip()
+        # Canonical name: strip parentheticals (e.g. "(MoM)", "(Feb)") and lowercase.
+        # Must match JS normalization in renderEconSurprises and _esmScoreWindow:
+        #   evTitle.replace(/\s*\([^)]*\)/g, '').trim()  (on already-lowercased string)
+        # Without this, statsKey in Python would be "USD/Average Hourly Earnings (MoM) (Feb)"
+        # while JS looks up "usd/average hourly earnings" — z-score stats would never be found.
+        canon = re.sub(r'\s*\([^)]*\)', '', title).strip().lower()
 
         try:
             actual_f   = float(str(ev["actual"]).replace("%", "").replace(",", "").strip())
@@ -227,7 +238,7 @@ def compute_surprise_stats(events, lookback_cutoff):
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_economic_calendar.py v3.2")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_economic_calendar.py v3.3")
 
     # Step 1: Load FF calendar (source propagated, not hardcoded)
     ff_events, ff_source = load_ff_calendar()
