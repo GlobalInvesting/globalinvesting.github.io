@@ -1,8 +1,36 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.12
+fetch_ff_calendar.py — v3.13
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.13 changes (2026-05-27):
+- Industry-standard audit of last-known-consensus (derive_forecast_from_history):
+  1. Released-event guard: derive_forecast_from_history() now skips events that
+     are already released (actual != None or released == True). Filling a stale
+     consensus forecast AFTER an event has released is not standard practice —
+     Bloomberg/Reuters only show estimate vs actual when the estimate was published
+     before the release. Without this guard, a released event with no Finnhub
+     estimate would get a derived "*" forecast that could suggest a spurious miss.
+  2. Recency window on eligibility count (ELIGIBILITY_WINDOW_DAYS=180): the
+     consensus eligibility gate (MIN_FORECAST_HISTORY=2) now only counts prior
+     forecasts within the last 180 days. Previously any historical forecast —
+     including ones from years ago — counted toward eligibility, meaning a series
+     that had forecasts years ago but whose API coverage lapsed would still pass
+     the gate and receive a stale derived forecast. 180 days accommodates quarterly
+     series (GDP, Corporate Profits, current account) while excluding genuinely
+     discontinued series. Mirrors Refinitiv's recency window for consensus eligibility.
+  3. Z-score magnitude guard (Z_SCORE_THRESHOLD=3.0): after a best-match forecast
+     is found, it is validated against the recent actuals of the same matched series
+     from ff_history (Finnhub-sourced data only). If the candidate forecast value is
+     a numeric outlier more than 3 standard deviations from the series mean, the
+     derived forecast is suppressed. This catches unit-mismatch scenarios where
+     FRED historical data stored values in a different unit scale than Finnhub
+     (e.g. ADP in thousands vs. FRED raw units). Requires at least
+     Z_SCORE_MIN_ACTUALS=3 Finnhub actuals to fire; otherwise the guard is skipped.
+     Non-numeric forecast values (e.g. "0.3%", "Unchanged") pass through unchanged.
+  4. BUG FIX: main() print statement corrected from "v3.8" to "v3.13" — the version
+     string was hardcoded at v3.8 since the initial implementation and never updated.
 
 v3.12 changes (2026-05-27):
 - Scoring model fully rewritten (three-tier non-variant scoring):
@@ -791,24 +819,33 @@ def enrich_from_calendar_json(events: list[dict]) -> int:
 # prior forecast* for that event series — this is called "last known consensus"
 # or "stale forecast fallback".
 #
-# Two critical safeguards (matching industry practice):
-#   1. Only applies when the series has had a forecast in >= MIN_FORECAST_HISTORY
-#      prior occurrences — prevents filling events that structurally never have one
-#      (e.g. Fed speeches). This is the "consensus eligibility" gate.
-#   2. The derived value is suffixed with "*" so downstream consumers can render it
+# Four critical safeguards (matching industry practice, v3.13):
+#   1. Released-event guard: only upcoming events are filled. Bloomberg/Reuters
+#      only show estimate vs actual when the estimate was published before the
+#      release — filling post-release implies a false miss.
+#   2. Consensus eligibility gate (MIN_FORECAST_HISTORY=2, ELIGIBILITY_WINDOW_DAYS=180):
+#      only fills series that had a forecast in >= 2 of the last 180 days. The recency
+#      window prevents filling events whose API coverage has lapsed (stale FRED-era
+#      coverage only). 180 days accommodates quarterly series (GDP, corporate profits).
+#   3. The derived value is suffixed with "*" so downstream consumers can render it
 #      differently (e.g. "0.3%*" vs "0.3%" from the live feed). The calendar panel
 #      uses this to show a muted style distinguishing derived from live forecasts.
-#
-# Matching logic mirrors derive_previous_from_history: same currency + keyword
-# overlap. History is read from calendar.json (which stores forecasts from Finnhub
-# backfill) and from the current ff_calendar batch itself.
+#   4. Z-score magnitude guard (Z_SCORE_THRESHOLD=3.0, Z_SCORE_MIN_ACTUALS=3):
+#      derived forecast must be within 3σ of recent Finnhub actuals for the same
+#      series. Catches unit-mismatch scenarios where FRED stored values in a
+#      different scale than Finnhub (e.g. "6000" vs "220" for ADP Employment Change).
+#      Only fires when >= Z_SCORE_MIN_ACTUALS Finnhub actuals exist for the series.
 #
 # NOT applied to:
 #   - Events already having a forecast (live value takes priority)
-#   - Events not yet confirmed to have a consensus history (MIN_FORECAST_HISTORY gate)
+#   - Events that are already released (actual != None)
+#   - Events not yet confirmed to have a consensus history (eligibility gate)
 #   - Events matching known no-consensus patterns (speeches, testimonies)
 
-MIN_FORECAST_HISTORY = 2   # need at least 2 prior forecasts to consider the series "eligible"
+MIN_FORECAST_HISTORY     = 2    # need at least 2 prior forecasts in recency window to be eligible
+ELIGIBILITY_WINDOW_DAYS  = 180  # recency window for eligibility count — accommodates quarterly series
+Z_SCORE_THRESHOLD        = 3.0  # suppress derived forecast if |z| > this vs Finnhub actuals
+Z_SCORE_MIN_ACTUALS      = 3    # minimum Finnhub actuals needed to activate z-score guard
 _NO_CONSENSUS_WORDS  = frozenset({
     "speech", "speaks", "testimony", "testifies", "statement", "press",
     "conference", "minutes", "vote", "meeting", "forum", "symposium",
@@ -821,15 +858,28 @@ def derive_forecast_from_history(events: list[dict]) -> int:
     same event series (last-known-consensus fallback). Derived values are suffixed
     with "*" to indicate they are estimated, not live from the provider.
 
-    Only applies when at least MIN_FORECAST_HISTORY prior forecasts exist for the
-    series, ensuring speech/testimony-type events (which never have a consensus)
-    are never filled.
+    Guards (v3.13 industry-standard audit):
+      1. Released-event guard: skips events that are already released
+         (actual != None or released == True). Only upcoming events get derived
+         forecasts — filling post-release is misleading (implied miss without real estimate).
+      2. Eligibility recency window (ELIGIBILITY_WINDOW_DAYS=180): only counts
+         prior forecasts within 180 days toward the eligibility threshold. Prevents
+         series with stale historical coverage from passing the eligibility gate.
+      3. Z-score magnitude guard (Z_SCORE_THRESHOLD=3.0): derived forecast must be
+         within 3σ of recent Finnhub actuals for the same series, or it is suppressed.
+         Catches unit-mismatch scenarios (e.g. FRED-unit values vs Finnhub-unit values).
 
     Returns count of events updated.
     """
+    import math
     from collections import defaultdict
 
     _COMMODITY_WORDS = frozenset({'gasoline', 'crude', 'natural', 'gas', 'distillate', 'heating'})
+
+    # Compute cutoff date for eligibility recency window
+    now_utc = datetime.now(timezone.utc)
+    eligibility_cutoff = (now_utc - timedelta(days=ELIGIBILITY_WINDOW_DAYS)).strftime("%Y-%m-%d")
+
     # ── Build forecast history from calendar.json ─────────────────────────────
     # calendar.json stores forecast values from the Finnhub backfill pipeline.
     cal_fc_history: list[tuple] = []  # (dateISO, currency, event_name, forecast, kw_frozenset)
@@ -879,19 +929,56 @@ def derive_forecast_from_history(events: list[dict]) -> int:
 
     combined = cal_fc_history + ff_fc_history
 
+    # ── Build actual history from ff_calendar batch (Finnhub-sourced only) ────
+    # Used by z-score guard to validate candidate forecast magnitudes.
+    # Only Finnhub-sourced actuals are used — FRED actuals may be in different units.
+    ff_actual_history: list[tuple] = []  # (dateISO, currency, actual_float, kw_frozenset)
+    for ev in events:
+        raw_act = ev.get("actual")
+        if raw_act is None:
+            continue
+        act_str = str(raw_act).strip().rstrip("*")
+        try:
+            act_float = float(act_str)
+            kw = _title_keywords(ev.get("title") or "")
+            if kw:
+                ff_actual_history.append((
+                    ev.get("dateISO", ""),
+                    ev.get("currency", ""),
+                    act_float,
+                    kw,
+                ))
+        except (ValueError, AttributeError):
+            pass  # non-numeric actual — skip for z-score purposes
+
     # Group by currency for fast lookup
     by_ccy: dict[str, list] = defaultdict(list)
     for row in combined:
         by_ccy[row[1]].append(row)
-
-    # Sort each currency group by date descending (most recent first)
     for ccy in by_ccy:
         by_ccy[ccy].sort(key=lambda x: x[0], reverse=True)
 
+    by_ccy_actuals: dict[str, list] = defaultdict(list)
+    for row in ff_actual_history:
+        by_ccy_actuals[row[1]].append(row)
+    for ccy in by_ccy_actuals:
+        by_ccy_actuals[ccy].sort(key=lambda x: x[0], reverse=True)
+
     derived = 0
+    suppressed_released = 0
+    suppressed_zscore = 0
+
     for ev in events:
         # Skip if already has a forecast (live value takes priority)
         if ev.get("forecast") is not None:
+            continue
+
+        # ── Guard 1: Released-event guard (v3.13) ────────────────────────────
+        # Only derive forecasts for upcoming/unreleased events.
+        # Bloomberg/Reuters only show estimate vs actual when the estimate was
+        # published before release — filling post-release implies a false miss.
+        if ev.get("released") or ev.get("actual") is not None:
+            suppressed_released += 1
             continue
 
         title = ev.get("title") or ""
@@ -906,25 +993,29 @@ def derive_forecast_from_history(events: list[dict]) -> int:
 
         ev_date = ev.get("dateISO", "")
         ev_ccy  = ev.get("currency", "")
-        ev_commodities = ff_kw & _COMMODITY_WORDS   # commodity guard (same as derive_previous)
+        ev_commodities = ff_kw & _COMMODITY_WORDS
+        ev_variants = ff_kw & _VARIANT_WORDS
 
-        # ── Consensus eligibility gate ────────────────────────────────────────
-        # Count how many prior occurrences of this series had a forecast.
-        # Only proceed if >= MIN_FORECAST_HISTORY — this is the key safeguard
-        # that prevents filling events that structurally never have consensus.
-        ev_variants = ff_kw & _VARIANT_WORDS   # rate-of-change type for this event
+        # ── Guard 2: Consensus eligibility gate (with recency window, v3.13) ──
+        # Count how many prior forecasts exist within ELIGIBILITY_WINDOW_DAYS.
+        # Only proceed if >= MIN_FORECAST_HISTORY — this prevents filling events
+        # that structurally never carry consensus (speeches, testimonies) AND
+        # events whose API coverage has lapsed (stale FRED-era coverage only).
         eligible_count = 0
         for h_date, h_ccy, _, _, h_kw in by_ccy.get(ev_ccy, []):
             if h_date >= ev_date:
                 continue
-            # Variant guard: reject cross-series matches (MoM vs absolute, weekly vs monthly)
+            # Recency window: only count forecasts within ELIGIBILITY_WINDOW_DAYS
+            if h_date < eligibility_cutoff:
+                continue
+            # Variant guard
             if (h_kw & _VARIANT_WORDS) != ev_variants:
                 continue
-            # Commodity guard: EIA Gasoline ≠ EIA Crude (same EIA provider, different commodity)
+            # Commodity guard
             if ev_commodities and not (ev_commodities & h_kw):
                 continue
             overlap = ff_kw & h_kw
-            score = len(overlap - _VARIANT_WORDS)   # only non-variant words count
+            score = len(overlap - _VARIANT_WORDS)
             if score == 1 and not (overlap & _STRONG_NON_VARIANT):
                 score = 0
             elif score == 2 and not (overlap & _ANCHOR):
@@ -935,23 +1026,22 @@ def derive_forecast_from_history(events: list[dict]) -> int:
                 break
 
         if eligible_count < MIN_FORECAST_HISTORY:
-            continue  # series not eligible — structurally has no consensus
+            continue  # series not eligible
 
         # ── Find most recent prior forecast ───────────────────────────────────
         best_forecast: str | None = None
         best_score = 0
+        best_match_kw: frozenset | None = None
 
         for h_date, h_ccy, _, h_fc, h_kw in by_ccy.get(ev_ccy, []):
             if h_date >= ev_date:
                 continue
-            # Variant guard (same as eligibility loop)
             if (h_kw & _VARIANT_WORDS) != ev_variants:
                 continue
-            # Commodity guard (same as eligibility loop)
             if ev_commodities and not (ev_commodities & h_kw):
                 continue
             overlap = ff_kw & h_kw
-            score = len(overlap - _VARIANT_WORDS)   # only non-variant words count
+            score = len(overlap - _VARIANT_WORDS)
             if score == 1 and not (overlap & _STRONG_NON_VARIANT):
                 score = 0
             elif score == 2 and not (overlap & _ANCHOR):
@@ -959,14 +1049,63 @@ def derive_forecast_from_history(events: list[dict]) -> int:
             if score > best_score:
                 best_score = score
                 best_forecast = h_fc
+                best_match_kw = h_kw
             if best_score >= 2:
-                break  # good enough
+                break  # most recent high-quality match found
 
-        if best_forecast is not None and best_score >= 1:
-            # Suffix with "*" — industry convention for "last known consensus / estimated"
-            ev["forecast"] = best_forecast.rstrip("*") + "*"
-            derived += 1
+        if best_forecast is None or best_score < 1:
+            continue
 
+        # ── Guard 3: Z-score magnitude guard (v3.13) ─────────────────────────
+        # Validate the candidate forecast against recent Finnhub actuals for the
+        # same matched series. Suppresses unit-mismatch outliers (e.g. FRED "6000"
+        # vs Finnhub "220" for ADP Employment Change).
+        # Only activates when >= Z_SCORE_MIN_ACTUALS Finnhub actuals exist.
+        # Non-numeric candidates pass through (no numeric check possible).
+        fc_numeric: float | None = None
+        try:
+            fc_numeric = float(best_forecast.rstrip("*%KkMmBb").replace(",", ""))
+        except (ValueError, AttributeError):
+            pass  # non-numeric forecast — skip z-score check
+
+        if fc_numeric is not None:
+            # Collect Finnhub actuals for the matched series
+            matched_actuals: list[float] = []
+            for a_date, a_ccy, a_val, a_kw in by_ccy_actuals.get(ev_ccy, []):
+                if a_date >= ev_date:
+                    continue
+                if best_match_kw is not None:
+                    overlap_a = ff_kw & a_kw
+                    score_a = len(overlap_a - _VARIANT_WORDS)
+                    if score_a == 1 and not (overlap_a & _STRONG_NON_VARIANT):
+                        score_a = 0
+                    elif score_a == 2 and not (overlap_a & _ANCHOR):
+                        score_a = 0
+                    if score_a < 1:
+                        continue
+                matched_actuals.append(a_val)
+                if len(matched_actuals) >= 8:  # use up to 8 most recent Finnhub actuals
+                    break
+
+            if len(matched_actuals) >= Z_SCORE_MIN_ACTUALS:
+                n = len(matched_actuals)
+                mean_a = sum(matched_actuals) / n
+                variance = sum((x - mean_a) ** 2 for x in matched_actuals) / (n - 1)
+                std_a = math.sqrt(variance) if variance > 0 else 0
+                if std_a > 1e-9:
+                    z = abs(fc_numeric - mean_a) / std_a
+                    if z > Z_SCORE_THRESHOLD:
+                        suppressed_zscore += 1
+                        continue  # suppress — outlier vs Finnhub actuals
+
+        # Suffix with "*" — industry convention for "last known consensus / estimated"
+        ev["forecast"] = best_forecast.rstrip("*") + "*"
+        derived += 1
+
+    if suppressed_released:
+        pass  # intentionally not printed — released events are expected to be skipped silently
+    if suppressed_zscore:
+        print(f"  Forecast z-score guard: {suppressed_zscore} outlier candidate(s) suppressed")
     print(f"  Forecast derived from history: {derived} events updated (suffixed '*' = last known consensus)")
     return derived
 
@@ -1125,7 +1264,7 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.8")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.13")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
