@@ -1,8 +1,98 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.8
+fetch_ff_calendar.py — v3.12
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.12 changes (2026-05-27):
+- Scoring model fully rewritten (three-tier non-variant scoring):
+  1. Variant guard: (target & _VARIANT_WORDS) == (history & _VARIANT_WORDS) — unchanged from v3.10.
+  2. Non-variant score: score = len(overlap - _VARIANT_WORDS). Variant words excluded from count,
+     preventing {spending, yoy} from scoring 2 and matching "Capital Spending YoY" ←→ "Household Spending YoY".
+  3. Minimum-score thresholds (new in v3.12):
+       nv_score == 1  → word must be in _STRONG_SINGLE_OK (high-specificity event words only)
+       nv_score == 2  → at least 1 word must be in _ANCHOR (_STRONG_SINGLE_OK | _SECTOR_ANCHOR)
+       nv_score >= 3  → always OK
+     This blocks {home, sales}, {crude, oil}, {autos, retail}, {change, eia}, {pmi} alone, etc.
+     while keeping all legitimate same-series matches.
+- _STRONG_SINGLE_OK: refined set of words sufficient alone for a match. Removed:
+    pmi        (Manufacturing PMI ≠ Services PMI ≠ Chicago PMI — needs companion)
+    sales      (Existing Home Sales ≠ Retail Sales — needs companion)
+    retail     (Retail Sales ≠ Retail Inventories — needs companion)
+    consumer   (Consumer Confidence ≠ Consumer Credit — needs companion)
+    confidence (Consumer Confidence ≠ Business Confidence — needs companion)
+    change     (generic suffix, appears in hundreds of unrelated events)
+    prel       (release-stage qualifier, not an event concept)
+    chicago    (moved to _SECTOR_ANCHOR — Chicago PMI passes via chicago+pmi=2, not chicago alone)
+- _SECTOR_ANCHOR: new set of domain-specific words that anchor a nv_score=2 match:
+    manufacturing, services, composite, industrial, production,
+    consumer, confidence, household, factory, orders, spending,
+    business, current, account, chicago
+- Commodity guard added to derive_forecast_from_history (was already in derive_previous):
+    EIA Gasoline Stocks Change ← EIA Crude Oil Stocks Change now blocked (gasoline ≠ crude).
+    API Crude Oil Stock Change ← EIA Crude Oil Stocks Change still passes (same commodity).
+- False matches eliminated vs v3.8 baseline: Building Permits MoM ← Building Permits (absolute),
+  ADP Weekly ← ADP Monthly, Housing Starts MoM ← Housing Starts, CPI YoY ← CPI MoM,
+  Existing Home Sales MoM ← Retail Sales MoM, Corporate Profits QoQ ← Nonfarm Productivity QoQ,
+  ISM Services ← Chicago PMI, EIA Gasoline ← EIA Natural Gas, Chicago Fed ← Chicago PMI, and more.
+
+v3.11 changes (2026-05-27):
+- Fix secondary cross-series contamination in score=1 guard: variant words (mom/yoy/qoq/weekly)
+  should NOT be sufficient by themselves to authorize a single-word match. Previously, the guard
+  was: score=1 only if overlap contains a STRONG_WORD. Since mom/yoy/qoq/weekly are in STRONG_WORDS,
+  "Housing Starts MoM" still matched "Factory Orders MoM" (overlap={mom}, score=1 → allowed).
+  Fix: add _STRONG_NON_VARIANT = _STRONG_WORDS - _VARIANT_WORDS. All four score=1 guards in
+  enrich_from_calendar_json(), derive_forecast_from_history() (both loops), and
+  derive_previous_from_history() now check overlap against _STRONG_NON_VARIANT instead of
+  _STRONG_WORDS. A variant-only overlap (e.g. {mom}, {weekly}) now scores 0 and is rejected
+  unless another non-variant strong word is also in the overlap.
+  Examples now correctly BLOCKED:
+    • "Housing Starts MoM" vs "Factory Orders MoM" (overlap={mom} → score=0)
+    • "Building Permits MoM Prel" vs "Retail Sales MoM" (overlap={mom} → score=0)
+    • "API Weekly Crude Oil Stock" vs "ADP Employment Change Weekly" (overlap={weekly} → score=0)
+  Examples still correctly PASSING:
+    • "Housing Starts MoM" vs "Housing Starts MoM" (overlap={starts,housing,mom} → score=3)
+    • "CPI MoM" vs "Core CPI MoM" (overlap={cpi,mom} → score=2, cpi is non-variant strong)
+    • "Retail Sales MoM" vs "Retail Sales MoM Prel" (overlap={retail,sales,mom} → score=3)
+
+v3.10 changes (2026-05-27):
+- Fix variant guard in derive_forecast_from_history() and derive_previous_from_history():
+  _VARIANT_WORDS was defined in v3.9 but never wired into the actual matching loops.
+  The variant guard is now applied in BOTH the eligibility-count loop and the
+  best-match loop of derive_forecast_from_history(), and in the best-match loop of
+  derive_previous_from_history(). Guard logic: (h_kw & _VARIANT_WORDS) must equal
+  (ff_kw & _VARIANT_WORDS) — if the rate-of-change type differs, the candidate is
+  skipped. This prevents cross-series contamination where:
+    • "Building Permits MoM Prel" (target, variants={mom}) matches "Building Permits"
+      (history, variants={}) scoring 2 on {building, permits} → now BLOCKED.
+    • "ADP Employment Change Weekly" (variants={weekly}) matches "ADP Employment Change"
+      (variants={}) → now BLOCKED.
+    • "Housing Starts MoM" vs "Housing Starts" → now BLOCKED.
+    • "CPI YoY" vs "CPI MoM" → now BLOCKED (yoy ≠ mom).
+  Correct intra-series matches are preserved:
+    • "Building Permits MoM Prel" vs "Building Permits MoM" → PASS (both have mom).
+    • "Retail Sales MoM" vs "Retail Sales MoM Prel" → PASS (prel excluded from guard).
+    • "Manufacturing PMI Flash" vs "Manufacturing PMI" → PASS (flash excluded from guard).
+- _VARIANT_WORDS refined: removed 'prel' and 'flash' from the set (prel/flash vs
+  final of the same series are the same release — forecasts are interchangeable and
+  should be cross-used). Guard set is now {'mom','yoy','qoq','weekly'} only.
+
+v3.9 changes (2026-05-27):
+- Fix cross-series contamination in derive_forecast_from_history() (and derive_previous_from_history()):
+  'mom', 'yoy', 'qoq', 'prel', 'change', and 'weekly' were in _TITLE_IGNORE, causing them to be
+  stripped before keyword matching. This made "Building Permits MoM Prel" and "Building Permits"
+  (absolute level, thousands) produce identical keyword sets, so the last known forecast for the
+  absolute-level series (e.g. "2K") was being injected as the derived forecast for the MoM % series.
+  Same contamination affected "ADP Employment Change" (monthly, thousands-unit, "6000K") vs
+  "ADP Employment Change Weekly" (weekly, raw number).
+  Fix: removed 'mom', 'yoy', 'qoq', 'prel', 'change', 'weekly' from _TITLE_IGNORE so they are
+  preserved as discriminating keywords. Also added them to _STRONG_WORDS so a single-word match
+  on these suffixes is sufficient for the score threshold. Result: series variants that differ only
+  by rate-of-change suffix now resolve to distinct keyword sets and will not cross-contaminate.
+  Affected events in the May 27 run: Building Permits MoM Prel (was "2K*" → now no derived forecast
+  until a proper MoM history entry exists), ADP Employment Change Weekly (was "6000K*" → now none),
+  Housing Starts MoM (was "1K*" → now none), Retail Sales MoM Prel (was "1.2%*" — this one was
+  actually correct since it matched prior MoM forecasts, so it will continue working).
 
 v3.8 changes (2026-05-27):
 - derive_forecast_from_history(): new Step 2e that fills missing `forecast` fields
@@ -522,26 +612,104 @@ def fetch_forexfactory_fallback() -> list[dict]:
 # "S&P Global Manufacturing PMI Flash") so exact matching fails — keyword overlap works.
 
 _TITLE_IGNORE = frozenset({
-    'flash','prelim','prel','final','s&p','global','rate','index','change',
-    'm/m','y/y','q/q','mom','yoy','qoq','of','the','a','and','or','for',
+    'flash','prelim','final','s&p','global','rate','index',
+    'm/m','y/y','q/q',
+    'of','the','a','and','or','for',
     'hcob','ism','cb','fed','ecb','boe','boj','rba','rbnz','snb','boc',
     'pct',
     # NOTE: 'pmi' intentionally NOT in ignore — it discriminates PMI events from
     # similar events like "Manufacturing Production", "Services Sentiment", etc.
+    # NOTE: 'mom','yoy','qoq','prel','change','weekly' intentionally NOT in ignore —
+    # they discriminate series variants (e.g. "Building Permits" vs "Building Permits MoM Prel",
+    # "ADP Employment Change" vs "ADP Employment Change Weekly"). Removing them prevents
+    # cross-series contamination in derive_forecast_from_history and derive_previous_from_history.
     'jibun','unicredit','markit','nab','westpac','bank',
 })
 
-# Words that are distinctive enough to match alone (score=1 threshold OK)
-_STRONG_WORDS = frozenset({
-    'unemployment','payrolls','cpi','ppi','pce','gdp','pmi',
-    'retail','housing','inflation','employment',
-    'sentiment','confidence','permits','balance',
-    'trade','sales','michigan','chicago','adp','nfp','inventory','jobless','claims',
-    'construction','consumer',
-    # NOTE: 'manufacturing', 'services', 'composite', 'production', 'industrial'
-    # are NOT listed here — they appear across many different event types.
-    # They do match correctly when 'pmi' is also present (score >= 2).
+# ── Keyword scoring constants (v3.12) ─────────────────────────────────────────
+#
+# SCORING MODEL:
+#   1. Variant guard: (target_kw & _VARIANT_WORDS) must equal (history_kw & _VARIANT_WORDS).
+#      Prevents cross-series contamination between rate-of-change types and frequencies:
+#      "CPI MoM" vs "CPI YoY", "Building Permits MoM" vs "Building Permits" (absolute, 1000s),
+#      "ADP Employment Change Weekly" vs "ADP Employment Change" (monthly).
+#      NOTE: 'prel'/'flash' intentionally excluded — Prel vs Final of the same series are
+#      interchangeable for forecast purposes.
+#
+#   2. Non-variant score: score = len(overlap - _VARIANT_WORDS).
+#      Variant words do NOT count toward the match score. This prevents "Capital Spending YoY"
+#      matching "Household Spending YoY" via {spending, yoy} — the non-variant overlap {spending}
+#      is not in _STRONG_SINGLE_OK so the match is rejected.
+#
+#   3. Single non-variant word: only sufficient if that word is in _STRONG_SINGLE_OK.
+#      Generic words (pmi, sales, retail, consumer, confidence, change, prel) appear in too many
+#      unrelated events to justify a single-word match; they require score >= 2.
+#        pmi        — Manufacturing PMI ≠ Services PMI ≠ Chicago PMI
+#        sales      — Existing Home Sales ≠ Retail Sales ≠ New Home Sales
+#        retail     — Retail Sales ≠ Retail Inventories
+#        consumer   — Consumer Confidence ≠ Consumer Credit ≠ Consumer Spending
+#        confidence — Consumer Confidence ≠ Business Confidence
+#        change     — appears in hundreds of unrelated events (suffix, not a concept)
+#        prel       — qualifier (preliminary), not an event-type word
+#
+# ── Three-tier scoring model (v3.12) ─────────────────────────────────────────
+#
+# TIER 1 — Variant guard (applied first, before scoring):
+#   (target_kw & _VARIANT_WORDS) must equal (history_kw & _VARIANT_WORDS).
+#   Prevents cross-series contamination between rate-of-change types/frequencies.
+#   'prel'/'flash' intentionally excluded: Prel vs Final are the same underlying
+#   release — their forecasts are interchangeable.
+#
+# TIER 2 — Non-variant score:
+#   score = len(overlap - _VARIANT_WORDS)  (variant words excluded from count)
+#   Prevents {spending, yoy} from scoring 2 — the yoy is a variant marker, not
+#   a meaningful disambiguator between "Capital Spending" and "Household Spending".
+#
+# TIER 3 — Minimum-score thresholds:
+#   nv_score == 0  → no match
+#   nv_score == 1  → ONLY if that word is in _STRONG_SINGLE_OK
+#                    (unemployment, payrolls, cpi, adp, permits, etc.)
+#   nv_score == 2  → at least 1 word must be in _ANCHOR
+#                    (_STRONG_SINGLE_OK | _SECTOR_ANCHOR)
+#                    Blocks: {home, sales}, {crude, oil}, {autos, retail}, {change, eia}
+#                    Passes: {manufacturing, pmi}, {household, spending}, {factory, orders}
+#   nv_score >= 3  → always OK
+
+# Words sufficient alone (nv_score=1) to justify a same-series match.
+_STRONG_SINGLE_OK = frozenset({
+    'unemployment', 'payrolls', 'cpi', 'ppi', 'pce', 'gdp',
+    'housing', 'inflation', 'employment',
+    'sentiment', 'permits', 'balance',
+    'trade', 'michigan', 'adp', 'nfp', 'inventory', 'jobless', 'claims',
+    'construction',
+    # NOTE: 'chicago' moved to _SECTOR_ANCHOR — "Chicago PMI" passes via nv=2 {chicago,pmi},
+    # but "Chicago Fed National Activity Index" ← "Chicago PMI" is now blocked (nv=1 via chicago only).
 })
+
+# Domain-specific words that anchor a score=2 match to a particular economic concept.
+# Not strong enough alone (nv_score=1 would be too loose), but sufficient when paired
+# with at least one other word from the same economic domain.
+_SECTOR_ANCHOR = frozenset({
+    'manufacturing', 'services', 'composite', 'industrial', 'production',
+    'consumer', 'confidence', 'household', 'factory', 'orders', 'spending',
+    'business', 'current', 'account',
+    'chicago',   # "Chicago PMI" needs chicago+pmi (score=2 via anchor), not chicago alone
+})
+
+# For nv_score==2, at least 1 non-variant word must be in _ANCHOR.
+_ANCHOR = _STRONG_SINGLE_OK | _SECTOR_ANCHOR
+
+# _STRONG_WORDS: superset for backward compatibility (e.g. _TITLE_IGNORE removal decisions).
+_STRONG_WORDS = _STRONG_SINGLE_OK | _SECTOR_ANCHOR | frozenset({
+    'mom', 'yoy', 'qoq', 'prel', 'weekly', 'change',
+    'pmi', 'sales', 'retail', 'consumer', 'confidence',
+})
+
+# Series-variant words: rate-of-change type and frequency discriminators.
+_VARIANT_WORDS = frozenset({'mom', 'yoy', 'qoq', 'weekly'})
+
+# Alias for the score=1 guard (= _STRONG_SINGLE_OK).
+_STRONG_NON_VARIANT = _STRONG_SINGLE_OK
 
 def _title_keywords(title: str) -> frozenset:
     words = title.lower().replace('/', ' ').replace('-', ' ').split()
@@ -592,9 +760,10 @@ def enrich_from_calendar_json(events: list[dict]) -> int:
         for ce in candidates:
             cal_kw = _title_keywords(ce.get("event") or ce.get("title") or "")
             overlap = ff_kw & cal_kw
-            score   = len(overlap)
-            # Strong single-word match is sufficient; otherwise need 2+
-            if score == 1 and not (overlap & _STRONG_WORDS):
+            score   = len(overlap - _VARIANT_WORDS)   # only non-variant words count
+            if score == 1 and not (overlap & _STRONG_NON_VARIANT):
+                score = 0
+            elif score == 2 and not (overlap & _ANCHOR):
                 score = 0
             if score > best_score:
                 best_score, best = score, ce
@@ -660,6 +829,7 @@ def derive_forecast_from_history(events: list[dict]) -> int:
     """
     from collections import defaultdict
 
+    _COMMODITY_WORDS = frozenset({'gasoline', 'crude', 'natural', 'gas', 'distillate', 'heating'})
     # ── Build forecast history from calendar.json ─────────────────────────────
     # calendar.json stores forecast values from the Finnhub backfill pipeline.
     cal_fc_history: list[tuple] = []  # (dateISO, currency, event_name, forecast, kw_frozenset)
@@ -736,18 +906,28 @@ def derive_forecast_from_history(events: list[dict]) -> int:
 
         ev_date = ev.get("dateISO", "")
         ev_ccy  = ev.get("currency", "")
+        ev_commodities = ff_kw & _COMMODITY_WORDS   # commodity guard (same as derive_previous)
 
         # ── Consensus eligibility gate ────────────────────────────────────────
         # Count how many prior occurrences of this series had a forecast.
         # Only proceed if >= MIN_FORECAST_HISTORY — this is the key safeguard
         # that prevents filling events that structurally never have consensus.
+        ev_variants = ff_kw & _VARIANT_WORDS   # rate-of-change type for this event
         eligible_count = 0
         for h_date, h_ccy, _, _, h_kw in by_ccy.get(ev_ccy, []):
             if h_date >= ev_date:
                 continue
+            # Variant guard: reject cross-series matches (MoM vs absolute, weekly vs monthly)
+            if (h_kw & _VARIANT_WORDS) != ev_variants:
+                continue
+            # Commodity guard: EIA Gasoline ≠ EIA Crude (same EIA provider, different commodity)
+            if ev_commodities and not (ev_commodities & h_kw):
+                continue
             overlap = ff_kw & h_kw
-            score = len(overlap)
-            if score == 1 and not (overlap & _STRONG_WORDS):
+            score = len(overlap - _VARIANT_WORDS)   # only non-variant words count
+            if score == 1 and not (overlap & _STRONG_NON_VARIANT):
+                score = 0
+            elif score == 2 and not (overlap & _ANCHOR):
                 score = 0
             if score >= 1:
                 eligible_count += 1
@@ -764,9 +944,17 @@ def derive_forecast_from_history(events: list[dict]) -> int:
         for h_date, h_ccy, _, h_fc, h_kw in by_ccy.get(ev_ccy, []):
             if h_date >= ev_date:
                 continue
+            # Variant guard (same as eligibility loop)
+            if (h_kw & _VARIANT_WORDS) != ev_variants:
+                continue
+            # Commodity guard (same as eligibility loop)
+            if ev_commodities and not (ev_commodities & h_kw):
+                continue
             overlap = ff_kw & h_kw
-            score = len(overlap)
-            if score == 1 and not (overlap & _STRONG_WORDS):
+            score = len(overlap - _VARIANT_WORDS)   # only non-variant words count
+            if score == 1 and not (overlap & _STRONG_NON_VARIANT):
+                score = 0
+            elif score == 2 and not (overlap & _ANCHOR):
                 score = 0
             if score > best_score:
                 best_score = score
@@ -871,6 +1059,7 @@ def derive_previous_from_history(events: list[dict]) -> int:
         ev_ccy  = ev.get("currency", "")
         # If this event involves a specific commodity, require that commodity to match
         ev_commodities = ff_kw & _COMMODITY_WORDS
+        ev_variants = ff_kw & _VARIANT_WORDS   # rate-of-change type for this event
 
         best_actual: str | None = None
         best_score  = 0
@@ -882,9 +1071,14 @@ def derive_previous_from_history(events: list[dict]) -> int:
             # the candidate must also contain that word — prevents crude→gasoline matches
             if ev_commodities and not (ev_commodities & h_kw):
                 continue
+            # Variant guard: reject cross-series matches (MoM vs absolute, weekly vs monthly)
+            if (h_kw & _VARIANT_WORDS) != ev_variants:
+                continue
             overlap = ff_kw & h_kw
-            score   = len(overlap)
-            if score == 1 and not (overlap & _STRONG_WORDS):
+            score   = len(overlap - _VARIANT_WORDS)   # only non-variant words count
+            if score == 1 and not (overlap & _STRONG_NON_VARIANT):
+                score = 0
+            elif score == 2 and not (overlap & _ANCHOR):
                 score = 0
             if score > best_score:
                 best_score  = score
