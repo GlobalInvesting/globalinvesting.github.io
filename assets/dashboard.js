@@ -7490,7 +7490,7 @@ async function fetchOptionSkew() {
       { pair:'AUD/USD', cot:'AUD', etfId:'audusd', rrKey:'AUDUSD' },
       { pair:'USD/CAD', cot:'CAD', etfId:'usdcad',  rrKey:'USDCAD' },
       { pair:'USD/CHF', cot:'CHF', etfId:'usdchf',  rrKey:'USDCHF' },
-      { pair:'NZD/USD', cot:'NZD', etfId:null,     rrKey:null     },
+      { pair:'NZD/USD', cot:'NZD', etfId:null,     rrKey:'NZDUSD' },
     ];
 
     // ── SOURCE 1: ETF IV from intraday quotes.json (primary) ──
