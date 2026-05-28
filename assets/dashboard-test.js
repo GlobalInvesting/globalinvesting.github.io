@@ -11156,11 +11156,37 @@ function renderNewsSection(items, meta) {
 
   filtered.forEach(function(item) {
     let time = item.time || '--:--';
+    let ageMs = 0;
+    let pubDate = null;
     if (item.ts) {
-      time = new Date(item.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      pubDate = new Date(item.ts);
+      time = pubDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      ageMs = Date.now() - item.ts;
     } else if (item.datetime) {
       const d = new Date(item.datetime);
-      if (!isNaN(d)) time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      if (!isNaN(d)) {
+        pubDate = d;
+        time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        ageMs = Date.now() - d.getTime();
+      }
+    }
+
+    // Age label — Bloomberg compact: "<1h shows minutes, <24h shows hours, ≥24h shows date
+    let ageLabel = '';
+    let showDate = false;
+    if (ageMs > 0) {
+      const ageMin  = Math.floor(ageMs / 60000);
+      const ageHr   = Math.floor(ageMs / 3600000);
+      const ageDays = Math.floor(ageMs / 86400000);
+      if (ageDays >= 1) {
+        showDate = true;  // show date badge instead of relative age for old articles
+      } else if (ageHr >= 1) {
+        ageLabel = ageHr + 'h';
+      } else if (ageMin >= 1) {
+        ageLabel = ageMin + 'm';
+      } else {
+        ageLabel = 'now';
+      }
     }
 
     const headline = item.title  || '';
@@ -11182,7 +11208,25 @@ function renderNewsSection(items, meta) {
 
     const timeEl = document.createElement('span');
     timeEl.className = 'ns-time';
-    timeEl.textContent = time;
+    if (showDate && pubDate) {
+      // Article is ≥1 day old — show date instead of time (Bloomberg pattern: shows date for old items)
+      const dateStr = pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      timeEl.textContent = dateStr;
+      timeEl.title = time + ' · ' + pubDate.toLocaleDateString();
+    } else if (ageLabel) {
+      // Recent article — show HH:MM with age hint on hover; append subtle age badge inline
+      timeEl.textContent = time;
+      timeEl.title = ageLabel + ' ago';
+    } else {
+      timeEl.textContent = time;
+    }
+
+    // Age badge — shown inline after time for recent articles (<24h)
+    const ageBadge = document.createElement('span');
+    ageBadge.className = 'ns-age';
+    if (!showDate && ageLabel && ageLabel !== 'now') {
+      ageBadge.textContent = ageLabel;
+    }
 
     const dot = document.createElement('span');
     dot.className = 'ns-dot ns-dot-' + impact;
@@ -11190,6 +11234,7 @@ function renderNewsSection(items, meta) {
     const headEl = document.createElement('span');
     headEl.className = 'ns-headline';
     headEl.textContent = headline;
+    headEl.title = headline;  // native tooltip — full headline on hover (Bloomberg compact pattern)
 
     const chevron = document.createElement('span');
     chevron.className = 'ns-chevron';
@@ -11197,6 +11242,7 @@ function renderNewsSection(items, meta) {
     chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
 
     row.appendChild(timeEl);
+    if (ageBadge.textContent) row.appendChild(ageBadge);
     row.appendChild(dot);
     row.appendChild(headEl);
 
