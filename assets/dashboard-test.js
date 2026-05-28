@@ -11133,7 +11133,7 @@ function renderNewsSection(items, meta) {
   const feed = document.getElementById('news-section-feed');
   if (!feed) return;
 
-  const filtered = _newsAllItems.filter(item => {
+  const filtered = _newsAllItems.filter(function(item) {
     const curOk    = _newsFilter.cur    === 'ALL' || item.cur    === _newsFilter.cur;
     const impactOk = _newsFilter.impact === 'ALL' || item.impact === _newsFilter.impact;
     return curOk && impactOk;
@@ -11154,7 +11154,7 @@ function renderNewsSection(items, meta) {
     return;
   }
 
-  filtered.forEach(item => {
+  filtered.forEach(function(item) {
     let time = item.time || '--:--';
     if (item.ts) {
       time = new Date(item.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -11172,74 +11172,61 @@ function renderNewsSection(items, meta) {
     const safeLink = rawLink.startsWith('https://') ? rawLink : '';
     const hasSnip  = snippet.length > 0;
 
-    // ── Wrapper — click toggles accordion ──────────────────────────────────
+    // ── Outer wrapper ────────────────────────────────────────────────────────
     const wrap = document.createElement('div');
     wrap.className = 'ns-item' + (item.featured ? ' ns-featured' : '');
-    wrap.setAttribute('role', 'button');
-    wrap.setAttribute('aria-expanded', 'false');
 
-    // ── Left: time + impact dot ─────────────────────────────────────────────
-    const leftCol = document.createElement('div');
-    leftCol.className = 'ns-left';
-    const timeEl = document.createElement('div');
+    // ── Single flex row: [time][dot][headline...][cur-tag][source][chevron] ──
+    const row = document.createElement('div');
+    row.className = 'ns-row';
+
+    const timeEl = document.createElement('span');
     timeEl.className = 'ns-time';
     timeEl.textContent = time;
-    const dot = document.createElement('div');
+
+    const dot = document.createElement('span');
     dot.className = 'ns-dot ns-dot-' + impact;
-    leftCol.appendChild(timeEl);
-    leftCol.appendChild(dot);
 
-    // ── Right: headline row (headline + chevron) + meta + snippet drawer ────
-    const rightCol = document.createElement('div');
-    rightCol.className = 'ns-right';
-
-    // Headline row
-    const headRow = document.createElement('div');
-    headRow.className = 'ns-head-row';
-
-    const headEl = document.createElement('div');
+    const headEl = document.createElement('span');
     headEl.className = 'ns-headline';
     headEl.textContent = headline;
-    headRow.appendChild(headEl);
 
-    // Chevron (only when there is a snippet)
-    if (hasSnip) {
-      const chev = document.createElement('span');
-      chev.className = 'ns-chevron';
-      chev.setAttribute('aria-hidden', 'true');
-      chev.innerHTML = '<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,3 4.5,6.5 7.5,3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      headRow.appendChild(chev);
-    }
-    rightCol.appendChild(headRow);
+    const chevron = document.createElement('span');
+    chevron.className = 'ns-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
 
-    // Meta row (always visible)
-    const metaEl = document.createElement('div');
-    metaEl.className = 'ns-meta';
+    row.appendChild(timeEl);
+    row.appendChild(dot);
+    row.appendChild(headEl);
+
     if (cur) {
       const curTag = document.createElement('span');
       curTag.className = 'ns-cur-tag';
       curTag.textContent = cur;
-      metaEl.appendChild(curTag);
+      row.appendChild(curTag);
     }
     if (source) {
       const srcEl = document.createElement('span');
       srcEl.className = 'ns-source';
       srcEl.textContent = source;
-      metaEl.appendChild(srcEl);
+      row.appendChild(srcEl);
     }
-    rightCol.appendChild(metaEl);
+    row.appendChild(chevron);
+    wrap.appendChild(row);
 
-    // Snippet drawer (collapsed by default)
-    if (hasSnip) {
+    // ── Accordion drawer (hidden, expands below the row on click) ───────────
+    if (hasSnip || safeLink) {
       const drawer = document.createElement('div');
       drawer.className = 'ns-drawer';
 
-      const snipEl = document.createElement('div');
-      snipEl.className = 'ns-snippet';
-      snipEl.textContent = snippet;   // full text — no truncation in accordion
-      drawer.appendChild(snipEl);
+      if (hasSnip) {
+        const snipEl = document.createElement('p');
+        snipEl.className = 'ns-snippet';
+        snipEl.textContent = snippet;   // full text — no truncation
+        drawer.appendChild(snipEl);
+      }
 
-      // "Read full article" link (shown only when snippet is open)
       if (safeLink) {
         const readLink = document.createElement('a');
         readLink.className = 'ns-read-link';
@@ -11247,30 +11234,25 @@ function renderNewsSection(items, meta) {
         readLink.href = safeLink;
         readLink.target = '_blank';
         readLink.rel = 'noopener noreferrer';
-        readLink.addEventListener('click', e => e.stopPropagation());
+        readLink.addEventListener('click', function(e) { e.stopPropagation(); });
         drawer.appendChild(readLink);
       }
-      rightCol.appendChild(drawer);
-    }
+      wrap.appendChild(drawer);
 
-    wrap.appendChild(leftCol);
-    wrap.appendChild(rightCol);
-
-    // ── Accordion toggle ────────────────────────────────────────────────────
-    if (hasSnip) {
-      wrap.addEventListener('click', () => {
-        const isOpen = wrap.classList.toggle('ns-open');
-        wrap.setAttribute('aria-expanded', isOpen);
+      // Click the row → open/close accordion (only one open at a time)
+      row.addEventListener('click', function() {
+        const isOpen = wrap.classList.contains('ns-open');
+        feed.querySelectorAll('.ns-open').forEach(function(el) { el.classList.remove('ns-open'); });
+        if (!isOpen) wrap.classList.add('ns-open');
       });
     } else if (safeLink) {
-      wrap.style.cursor = 'pointer';
-      wrap.addEventListener('click', () => window.open(safeLink, '_blank', 'noopener,noreferrer'));
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', function() { window.open(safeLink, '_blank', 'noopener,noreferrer'); });
     }
 
     feed.appendChild(wrap);
   });
 }
-
 function _newsSetFilter(type, value) {
   _newsFilter[type] = value;
   // Update active pill styling
