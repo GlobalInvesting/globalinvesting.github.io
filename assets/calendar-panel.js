@@ -36,14 +36,14 @@
     return d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false });
   }
 
-  // "2026-05-22" → "Friday, May 22"  (in the browser's local timezone)
-  // The dateISO is the UTC calendar date. An event at 01:00 UTC on May 28
-  // is actually May 27 at 22:00 for a GMT-3 user — the header must say "Wednesday, May 27".
-  // Using UTC midnight + no timeZone in toLocaleDateString lets the browser
-  // translate to the correct local date automatically.
+  // "2026-05-28" → "Thursday, May 28"  (in the browser's local timezone)
+  // dateISO here is already the LOCAL date (output of toLocalDateISO).
+  // We parse it with the local Date constructor (no time/zone suffix) so the
+  // browser never applies a UTC offset — it reads year/month/day as-is.
   function formatDate(dateISO) {
-    const d = new Date(dateISO + 'T00:00:00Z');
-    return d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+    const [y, mo, d] = dateISO.split('-').map(Number);
+    const dt = new Date(y, mo - 1, d);   // local constructor — no UTC shift
+    return dt.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
   }
 
   // Return the local-timezone YYYY-MM-DD for an event's UTC datetime.
