@@ -11206,19 +11206,22 @@ function renderNewsSection(items, meta) {
       curTag.textContent = cur;
       row.appendChild(curTag);
     }
-    if (source) {
-      const srcEl = document.createElement('span');
-      srcEl.className = 'ns-source';
-      srcEl.textContent = source;
-      row.appendChild(srcEl);
-    }
+    // Source moved to drawer — keeps headline full width (Bloomberg compact pattern)
     row.appendChild(chevron);
     wrap.appendChild(row);
 
     // ── Accordion drawer (hidden, expands below the row on click) ───────────
-    if (hasSnip || safeLink) {
+    if (hasSnip || safeLink || source) {
       const drawer = document.createElement('div');
       drawer.className = 'ns-drawer';
+
+      // Source label at top of drawer — subtle, secondary color
+      if (source) {
+        const srcDrawer = document.createElement('p');
+        srcDrawer.className = 'ns-drawer-source';
+        srcDrawer.textContent = source;
+        drawer.appendChild(srcDrawer);
+      }
 
       if (hasSnip) {
         const snipEl = document.createElement('p');
@@ -11245,9 +11248,6 @@ function renderNewsSection(items, meta) {
         feed.querySelectorAll('.ns-open').forEach(function(el) { el.classList.remove('ns-open'); });
         if (!isOpen) wrap.classList.add('ns-open');
       });
-    } else if (safeLink) {
-      row.style.cursor = 'pointer';
-      row.addEventListener('click', function() { window.open(safeLink, '_blank', 'noopener,noreferrer'); });
     }
 
     feed.appendChild(wrap);
