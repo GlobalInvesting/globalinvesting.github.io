@@ -12,7 +12,7 @@ A professional-grade foreign exchange monitoring platform for serious market par
 
 - **Real-time price feeds** — Major FX pairs, commodities (XAU, WTI), crypto (BTC), DXY, and US 10Y yield
 - **Currency strength heatmap** — 8×8 grid showing G8 currency performance across all pairs
-- **AI market narrative** — 2–3 sentence regime summary updated 12× daily alongside market signals
+- **AI market narrative** — 2–3 sentence regime summary updated 4× daily alongside market signals
 - **CFTC COT positioning** — Leveraged Funds net positioning (Disaggregated TFF, Options+Futures Combined) from CFTC.gov, updated weekly
 - **US Treasury yield curve** — 3M, 2Y, 5Y, 10Y, 30Y, updated daily
 - **Cross-asset risk monitor** — SPX, Gold, WTI, BTC, DXY, Nikkei, Stoxx correlations with stress scoring
@@ -30,7 +30,7 @@ A professional-grade foreign exchange monitoring platform for serious market par
 - **Economic calendar** — TradingView embed with real-time event actuals
 - **Economic Surprises** — CESI-style normalised surprise index for all G8 currencies, computed from ForexFactory calendar actual-vs-consensus over a 90-day rolling window. Clicking any currency row opens a full-screen detail modal with: (1) LightweightCharts v5 area series showing the 30-day rolling index history stepped weekly; (2) metrics bar (index, beats, misses, N, beat rate); (3) individual events table with beat / miss / in-line badges for the full 90-day window. Methodology mirrors Citi CESI convention — beat rate scaled to [−100, +100].
 - **News Feed** — Dedicated tab (shortcut: N) with 52 FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Finnhub, NewsData.io, Marc to Market and others. Single-row accordion layout with impact dot, currency tag, relative age indicator, and full-headline tooltip. Filterable by currency (G8) and impact level (High / Med / All). Engine updates hourly; terminal re-checks every 2 minutes via HTTP ETag.
-- **Market signals** — 4–5 AI-generated signals updated 12× daily
+- **Market signals** — 4–5 AI-generated signals updated 4× daily
 - **Carry Trade Ranking** — G8 carry-to-vol ranking for all 28 pairs, sorted by nominal rate differential divided by 30-day realised volatility. Clicking any row opens the Real Rate Carry Analysis modal with three tabs: (1) Rates Breakdown — 8 currencies sorted by real rate (nominal CB rate minus inflation expectation), with OIS bias chip and data-age transparency; (2) Real Rate Matrix — 8×8 differential grid color-coded by carry sustainability; (3) Pair Detail — nominal carry, real carry, carry-to-vol on both bases, OIS probability for each leg, and carry sustainability assessment (sustainable / moderate / carry trap). Inflation expectations sourced live from FRED (T5YIE for USD, T5YIFR for EUR) and from `extended-data/*.json` batch for remaining currencies. Matches Bloomberg FXFR / FXFC layout convention.
 - **Derivatives section** — Implied forwards (CIP, 1M/3M/6M/1Y), 25-delta Risk Reversal term structure (Saxo Bank), realized vol vs RR skew, ECB official reference exchange rates (daily fixing, 7 EUR pairs), and FX OTC notional volume by pair and product type (DTCC GTR CFTC Recast public dissemination, T+1).
 
@@ -59,7 +59,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 
 | Directory | Contents | Updated by |
 |-----------|----------|------------|
-| `ai-analysis/` | `index.json` — AI regime label + narrative; `signals.json` — market signals | Engine — 12× daily |
+| `ai-analysis/` | `index.json` — AI regime label + narrative; `signals.json` — market signals | Engine — 4× daily |
 | `calendar-data/` | Economic calendar events — `calendar.json` consumed by `update_extended_data.py` for PMI/CPI enrichment; `ff_calendar.json` (ForexFactory, G8 high-impact, this week + next) consumed by `generate_narrative_signals.py` → `build_calendar_block()` to ground session context notes in real catalysts | Engine — daily |
 | `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer) + 26-week `history[]` rolling window | Engine — weekly (Saturday) |
 | `economic-data/` | Macro indicators | Engine — daily |
