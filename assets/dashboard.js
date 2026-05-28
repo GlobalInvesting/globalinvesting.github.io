@@ -8979,6 +8979,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
           <span class="kbl-key">Y</span><span class="kbl-desc">Rates &amp; Yield Curve</span>
           <span class="kbl-key">K</span><span class="kbl-desc">Economic Calendar</span>
           <span class="kbl-key">D</span><span class="kbl-desc">Derivatives (toggle)</span>
+          <span class="kbl-key">N</span><span class="kbl-desc">News Feed (toggle)</span>
           <span class="kbl-key">&uarr;&darr;</span><span class="kbl-desc">Navigate FX rows</span>
           <span class="kbl-key">?</span><span class="kbl-desc">Close this panel</span>
         </div>
