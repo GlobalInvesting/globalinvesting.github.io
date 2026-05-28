@@ -36,10 +36,28 @@
     return d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false });
   }
 
-  // "2026-05-22" → "Friday, May 22"
+  // "2026-05-22" → "Friday, May 22"  (in the browser's local timezone)
+  // The dateISO is the UTC calendar date. An event at 01:00 UTC on May 28
+  // is actually May 27 at 22:00 for a GMT-3 user — the header must say "Wednesday, May 27".
+  // Using UTC midnight + no timeZone in toLocaleDateString lets the browser
+  // translate to the correct local date automatically.
   function formatDate(dateISO) {
-    const d = new Date(dateISO + 'T12:00:00Z');
-    return d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', timeZone:'UTC' });
+    const d = new Date(dateISO + 'T00:00:00Z');
+    return d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+  }
+
+  // Return the local-timezone YYYY-MM-DD for an event's UTC datetime.
+  // Used to group events under the correct local date header.
+  function toLocalDateISO(dateISO, timeUTC) {
+    if (!timeUTC) return dateISO;
+    const [h, m] = timeUTC.split(':').map(Number);
+    const d = new Date(Date.UTC(
+      +dateISO.slice(0,4), +dateISO.slice(5,7)-1, +dateISO.slice(8,10), h, m
+    ));
+    const ly = d.getFullYear();
+    const lm = String(d.getMonth() + 1).padStart(2, '0');
+    const ld = String(d.getDate()).padStart(2, '0');
+    return `${ly}-${lm}-${ld}`;
   }
 
   // Has this event's datetime already passed?
@@ -51,9 +69,13 @@
     return evMs < Date.now();
   }
 
-  // Today's ISO date in UTC
+  // Today's date in the browser's local timezone (YYYY-MM-DD)
   function todayISO() {
-    return new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 
   // Scroll cal-events-body to a child element (correct inner scroll, not outer panel)
@@ -172,9 +194,10 @@
       holidayByDate[h.dateISO].push(h);
     });
 
-    // Collect all dates that need rendering (events + holiday-only days)
+    // Collect all dates that need rendering — use LOCAL date (not UTC dateISO)
+    // so that e.g. an event at 01:00 UTC on May 28 shows under May 27 for GMT-3 users.
     const allDates = new Set([
-      ...filtered.map(ev => ev.dateISO),
+      ...filtered.map(ev => toLocalDateISO(ev.dateISO, ev.timeUTC)),
       ...Object.keys(holidayByDate),
     ]);
 
@@ -183,11 +206,12 @@
       return;
     }
 
-    // Group events by date
+    // Group events by LOCAL date
     const byDate = {};
     filtered.forEach(ev => {
-      if (!byDate[ev.dateISO]) byDate[ev.dateISO] = [];
-      byDate[ev.dateISO].push(ev);
+      const localDate = toLocalDateISO(ev.dateISO, ev.timeUTC);
+      if (!byDate[localDate]) byDate[localDate] = [];
+      byDate[localDate].push(ev);
     });
 
     const today = todayISO();
