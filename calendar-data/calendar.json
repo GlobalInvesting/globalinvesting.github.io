@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-28T12:04:33Z",
-  "generatedAt": "2026-05-28T12:04:33Z",
+  "lastUpdate": "2026-05-28T12:06:33Z",
+  "generatedAt": "2026-05-28T12:06:33Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-05-28",
   "rangeTo": "2026-06-11",
-  "totalEvents": 1652,
+  "totalEvents": 1653,
   "currencyCounts": {
     "CHF": 92,
     "CAD": 132,
-    "JPY": 185,
+    "JPY": 186,
     "NZD": 82,
     "USD": 618,
     "AUD": 173,
@@ -22,7 +22,7 @@
   },
   "impactCounts": {
     "low": 151,
-    "medium": 1119,
+    "medium": 1120,
     "high": 382
   },
   "surpriseStats": {
@@ -20685,6 +20685,19 @@
     {
       "date": "29 May",
       "dateISO": "2026-05-29",
+      "timeUTC": "05:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Housing Starts YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "15.5",
+      "previous": "-29.3"
+    },
+    {
+      "date": "29 May",
+      "dateISO": "2026-05-29",
       "timeUTC": "06:00",
       "country": "GBP",
       "currency": "GBP",
@@ -20822,7 +20835,7 @@
       "event": "Wholesale Inventories MoM Adv",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.5",
+      "forecast": "0.6",
       "previous": "1.3"
     },
     {
@@ -21161,7 +21174,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "-5*",
-      "previous": "-7.864"
+      "previous": "-2.8"
     },
     {
       "date": "2 Jun",
