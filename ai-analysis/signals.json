@@ -1,53 +1,65 @@
 {
-  "generated_at": "2026-05-27T17:40:21Z",
+  "generated_at": "2026-05-28T01:21:50Z",
   "signals": [
     {
-      "time": "17:42",
+      "time": "01:19",
       "priority": "critical",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD at 0.5891. COT LF net short -15,435 (specs fading hawkish bias) vs RBNZ hike probability priced for today's meeting. With NZD real rates at -0.83% (most accommodative in G8), a hawkish delivery or signal from RBNZ triggers significant short-squeeze risk as crowded spec shorts unwind. NZD/USD vs NZX 50 correlation at +0.362 (z=+1.83σ) confirms NZD is decoupling from local equities to follow rate pricing.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ Hawkish Shift",
+      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ Governor Breman signaling the cash rate must rise further due to building inflationary pressures. With the RBNZ bias shifting toward a hike while specs remain net short, a significant short-squeeze risk is active. NZD/USD at 0.5910 faces immediate upside pressure if the committee formalizes this hawkish pivot.",
       "evidence": [
         "NZD COT LF net: -15,435",
-        "RBNZ Bias: Hike (Next meeting: 27 May)",
-        "NZD/USD: 0.5891"
+        "RBNZ Bias: Hike",
+        "NZD/USD: 0.5910"
       ],
-      "_source": "gemini"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:39",
+      "time": "01:16",
       "priority": "warning",
-      "title": "USD/JPY — Carry + Options Skew + Intervention Risk",
-      "text": "USD/JPY at 159.54. 282bp Fed-BoJ OIS carry advantage sustains the bid, but 25d RR at -1.22 (moderate put skew) signals institutional hedging against JPY strength. JPY COT LF net short -81,624 remains crowded. 160.00 remains the critical watch level for BoJ verbal warnings or physical intervention; carry dominates the regime while VIX remains at 16.8 (normal volatility).",
+      "title": "NZD/CAD — G8 Bilateral Theme + RBNZ Hawkishness",
+      "text": "NZD outperformance (avg +0.604%) vs CAD weakness (avg -0.398%) creates a 1.002% G8 spread, the widest bilateral theme in the complex. The divergence is fundamentally driven by RBNZ Governor Breman's hike signals contrasting with a neutral BoC (2.25%). Despite the 1.002% spread, NZD faces a -75bp real rate deficit vs CAD (+0.18% vs -0.83%), suggesting the move is driven by policy delta rather than current carry.",
       "evidence": [
-        "USD/JPY OIS Carry: +282bp",
-        "USD/JPY 25d RR: -1.22",
-        "JPY COT LF net: -81,624"
+        "NZD 1W avg: +0.604% (n=4)",
+        "CAD 1W avg: -0.398% (n=3)",
+        "G8 spread: 1.002%"
       ],
-      "_source": "gemini"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:35",
+      "time": "01:14",
       "priority": "warning",
-      "title": "AUD/USD — Volatility Premium + Retail Divergence",
-      "text": "AUD/USD at 0.7136. IV at 16.6% vs HV30 at 8.3% generates a +8.3% VRP, the highest in the G8, signaling extreme hedging demand. Retail sentiment is 68% short, diverging from COT LF net long +57,180 (74.5% long). This institutional vs retail divergence at an extreme suggests retail is fading the trend; capitulation risk rises if price holds above 0.7150. AUD real rate at -0.22% remains accommodative despite RBA hiking stance.",
+      "title": "AUD/USD — Positioning + Vol + Carry",
+      "text": "AUD/USD COT LF net long +57,180 (74.5% long) represents a crowded institutional long, while retail sentiment (68% short) provides a contrarian divergence. Options markets are pricing extreme caution with a +8.6% Vol Risk Premium (IV 16.7% vs HV30 8.1%) and a -0.70 25d RR put skew. The 60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%) supports the pair at 0.7133, but the high VRP suggests the market is paying heavily for downside protection against a positioning unwind.",
       "evidence": [
-        "AUD/USD VRP: +8.3%",
-        "AUD COT LF long%: 74.5%",
-        "Retail Sentiment: 68% Short"
+        "AUD COT LF net: +57,180",
+        "AUD/USD VRP: +8.6%",
+        "RBA 4.35% vs Fed 3.75% — 60bp"
       ],
-      "_source": "gemini"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:28",
+      "time": "01:10",
+      "priority": "warning",
+      "title": "USD/JPY — Fed Rhetoric + Carry + Options Skew",
+      "text": "USD/JPY at 159.55 remains supported by a +300bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 0.75%). Fed Governor Cook's warning of possible rate hikes if inflation worsens reinforces the USD bid, while the 25d RR at -1.34 (put skew) confirms the options market is actively hedging for BoJ intervention as price tests the 160.00 threshold. JPY COT LF net short -81,624 indicates a crowded carry trade vulnerable to verbal intervention.",
+      "evidence": [
+        "USD/JPY: 159.55",
+        "Fed 3.75% vs BoJ 0.75% — 300bp",
+        "USD/JPY 25d RR: -1.34"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "01:05",
       "priority": "info",
-      "title": "EUR/USD — Volatility Premium + Macro Headwinds",
-      "text": "EUR/USD at 1.1625. IV at 7.1% vs HV30 at 4.2% (VRP +2.9%) indicates the options market is pricing in higher forward risk than realized. Fed 3.75% vs ECB 2.00% (175bp spread) structurally favors USD carry. ECB's de Guindos citing supply shocks and lower growth expectations reinforces the bearish macro backdrop. Watch 1.1600 for a clean break to confirm downside extension.",
+      "title": "DXY vs SPX — Correlation Break + USD Funding",
+      "text": "The correlation between DXY and S&P 500 has shifted to -0.643 vs a 252d norm of -0.333 (z=+1.81σ). This significant deviation indicates an intensified inverse relationship where USD is acting as a primary funding stress indicator. With VIX at 16.3 (normal volatility), the USD bid is currently driven by Fed hawkishness (Jefferson/Cook) rather than broad risk-off, but the tightening correlation increases DXY sensitivity to any equity drawdown.",
       "evidence": [
-        "EUR/USD VRP: +2.9%",
-        "Fed-ECB Spread: 175bp",
-        "EUR/USD: 1.1625"
+        "DXY vs SPX corr: -0.643",
+        "z-score: +1.81σ",
+        "VIX: 16.3"
       ],
-      "_source": "gemini"
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
