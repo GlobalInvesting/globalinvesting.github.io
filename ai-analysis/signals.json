@@ -1,69 +1,52 @@
 {
-  "generated_at": "2026-05-28T02:58:38Z",
+  "generated_at": "2026-05-28T10:39:13Z",
   "signals": [
     {
-      "time": "02:57",
+      "time": "10:36",
       "priority": "critical",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ Hawkish Shift",
-      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ Governor Breman signaling the cash rate must rise further as inflationary pressures build. With the market bias shifting toward a hike, the crowded spec short faces significant unwind risk. NZD/USD at 0.5894 remains supported by this hawkish pivot despite the 150bp nominal carry deficit vs USD.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkish bias) vs RBNZ hike bias priced for next meeting. TD Securities shifts call to preemptive 25bps hike as inflation worries persist. If RBNZ delivers, crowded spec short unwind targets 0.6000+. NZD/USD at 0.5893.",
       "evidence": [
         "NZD COT LF net: -15,435",
-        "RBNZ Bias: Hike (Breman signal)",
-        "NZD/USD: 0.5894"
+        "RBNZ Bias: Hike",
+        "NZD/USD: 0.5893"
       ],
-      "watch_level": "Watch for a break above 0.5950 to confirm short-squeeze acceleration following the RBNZ meeting.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:54",
+      "time": "10:32",
       "priority": "warning",
-      "title": "NZD/CAD — G8 Bilateral Theme + CB Divergence",
-      "text": "NZD/CAD spread at 0.810% identifies a dominant bilateral theme as NZD outperforms (+0.392% avg) while CAD lags (-0.418% avg). The divergence is fundamentally anchored by the RBNZ's hike signal vs the BoC's hold stance. Despite CAD's positive CESI (+8), the hawkish RBNZ shift overrides domestic data beats, driving NZD/CAD higher.",
+      "title": "NZD/CAD — G8 Bilateral Theme + Carry",
+      "text": "NZD 1W avg +0.399% vs CAD 1W avg -0.535% (spread 0.935%) — bilateral G8 divergence active. NZD/CAD supported by +75bp OIS carry advantage (RBNZ 2.25% vs BoC 2.25% nominal, but NZD OIS premium persists). CAD underperforms despite positive CESI (+8) as oil volatility weighs.",
       "evidence": [
-        "NZD 1W avg: +0.392% (n=4)",
-        "CAD 1W avg: -0.418% (n=3)",
-        "G8 spread: 0.810%"
+        "NZD 1W avg: +0.399% (n=4)",
+        "CAD 1W avg: -0.535% (n=3)",
+        "G8 spread: 0.935%"
       ],
-      "watch_level": "Watch for BoC meeting on 10 Jun to determine if CAD can recover on a hawkish hold.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:52",
+      "time": "10:28",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Vol + Carry",
-      "text": "AUD/USD at 0.7126 supported by a 60bp AONIA-SOFR carry premium and extreme COT LF net long +57,180 (74.5% long). However, IV at 16.7% vs HV30 at 8.2% creates a massive +8.5% VRP, signaling the options market is paying a heavy premium for downside protection. This suggests institutional hedging against a potential long-unwind despite the carry advantage.",
+      "title": "GBP/USD — Positioning + Vol + Carry",
+      "text": "GBP/USD at 1.3397 — 10bp SONIA-SOFR carry premium favors GBP, but 25d RR at -0.81 (put skew) signals institutional hedging against downside. GBP COT LF net long +30,708 (64.8%) is becoming crowded. VRP at +4.5% (IV 11.0% vs HV30 6.5%) indicates high protection costs ahead of US PCE data.",
       "evidence": [
-        "AUD COT LF net: +57,180",
-        "AUD/USD VRP: +8.5%",
-        "RBA 4.35% vs Fed 3.75%: -60bp"
+        "GBP COT LF net: +30,708",
+        "GBP/USD VRP: +4.5%",
+        "SONIA 3.73% vs SOFR 3.63%: -10bp"
       ],
-      "watch_level": "Watch for VRP compression or a break of 0.7100 to signal the start of a spec long liquidation.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:49",
-      "priority": "warning",
-      "title": "USD/JPY — Carry + Options Skew + Intervention Risk",
-      "text": "USD/JPY at 159.57 remains bid on the 300bp Fed-BoJ carry advantage (SOFR 3.63% vs TONA 0.73%). However, 25d RR at -1.34 (Saxo) shows a moderate put skew, indicating the options market is pricing protection against a JPY rally as price tests the 160.00 psychological level. JPY COT LF net short -81,624 confirms a crowded carry trade vulnerable to verbal intervention.",
-      "evidence": [
-        "USD/JPY Carry: +300bp",
-        "25d RR: -1.34 (put skew)",
-        "JPY COT LF net: -81,624"
-      ],
-      "watch_level": "160.00 remains the critical level for BoJ verbal warnings or direct intervention.",
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "02:45",
+      "time": "10:21",
       "priority": "info",
-      "title": "DXY vs SPX — Correlation Break + Funding Stress",
-      "text": "DXY vs SPX correlation at -0.641 vs 252d norm of -0.333 (z=+1.81σ) indicates a significant strengthening of the inverse relationship. This suggests the USD is increasingly functioning as a pure risk-off funding proxy; USD bid intensifies on any equity weakness. DXY at 99.35 is supported by this regime shift and a strong positive CESI (+23).",
+      "title": "USD/JPY — Carry vs Intervention Risk",
+      "text": "USD/JPY at 159.40 — 300bp Fed-BoJ carry sustains the bid; conflicting US-Iran peace plans and rebounding oil prices introduce geopolitical friction. 160.00 remains the critical level for BoJ verbal warnings. JPY COT LF net short -81,624 (crowded carry) remains vulnerable to VIX spikes above 25.",
       "evidence": [
-        "DXY vs SPX z-score: +1.81σ",
-        "USD CESI: +23 beats",
-        "DXY: 99.35"
+        "Fed 3.75% vs BoJ 0.75%: 300bp",
+        "JPY COT LF net: -81,624",
+        "VIX: 16.7 (normal)"
       ],
-      "watch_level": "Watch for VIX exceeding 20.0 to confirm a transition into a high-volatility USD-bid regime.",
       "_source": "gemini:gemini-3-flash-preview"
     }
   ]
