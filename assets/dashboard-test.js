@@ -11134,20 +11134,17 @@ function renderNewsSection(items, meta) {
   if (!feed) return;
 
   const filtered = _newsAllItems.filter(item => {
-    const curOk    = _newsFilter.cur === 'ALL'    || item.cur === _newsFilter.cur;
+    const curOk    = _newsFilter.cur    === 'ALL' || item.cur    === _newsFilter.cur;
     const impactOk = _newsFilter.impact === 'ALL' || item.impact === _newsFilter.impact;
     return curOk && impactOk;
   });
 
-  // Update last-refreshed timestamp
   const tsEl = document.getElementById('news-section-ts');
   if (tsEl && _newsMeta.updated_label) tsEl.textContent = _newsMeta.updated_label;
 
-  // Update count badge
   const countEl = document.getElementById('news-section-count');
   if (countEl) countEl.textContent = filtered.length + ' stories';
 
-  // Render articles
   feed.innerHTML = '';
   if (!filtered.length) {
     const empty = document.createElement('div');
@@ -11158,32 +11155,30 @@ function renderNewsSection(items, meta) {
   }
 
   filtered.forEach(item => {
-    // Time
     let time = item.time || '--:--';
     if (item.ts) {
-      const d = new Date(item.ts);
-      time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      time = new Date(item.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     } else if (item.datetime) {
       const d = new Date(item.datetime);
       if (!isNaN(d)) time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     }
 
-    const headline = item.title   || '';
-    const snippet  = item.expand  || '';
-    const cur      = item.cur     || '';
-    const source   = item.source  || '';
-    const impact   = item.impact  || 'low';
-    const rawLink  = item.link    || '';
+    const headline = item.title  || '';
+    const snippet  = item.expand || '';
+    const cur      = item.cur    || '';
+    const source   = item.source || '';
+    const impact   = item.impact || 'low';
+    const rawLink  = item.link   || '';
     const safeLink = rawLink.startsWith('https://') ? rawLink : '';
+    const hasSnip  = snippet.length > 0;
 
+    // ── Wrapper — click toggles accordion ──────────────────────────────────
     const wrap = document.createElement('div');
     wrap.className = 'ns-item' + (item.featured ? ' ns-featured' : '');
-    if (safeLink) {
-      wrap.style.cursor = 'pointer';
-      wrap.addEventListener('click', () => window.open(safeLink, '_blank', 'noopener,noreferrer'));
-    }
+    wrap.setAttribute('role', 'button');
+    wrap.setAttribute('aria-expanded', 'false');
 
-    // Left column: time + impact dot
+    // ── Left: time + impact dot ─────────────────────────────────────────────
     const leftCol = document.createElement('div');
     leftCol.className = 'ns-left';
     const timeEl = document.createElement('div');
@@ -11194,29 +11189,30 @@ function renderNewsSection(items, meta) {
     leftCol.appendChild(timeEl);
     leftCol.appendChild(dot);
 
-    // Right column: headline + snippet + meta
+    // ── Right: headline row (headline + chevron) + meta + snippet drawer ────
     const rightCol = document.createElement('div');
     rightCol.className = 'ns-right';
+
+    // Headline row
+    const headRow = document.createElement('div');
+    headRow.className = 'ns-head-row';
 
     const headEl = document.createElement('div');
     headEl.className = 'ns-headline';
     headEl.textContent = headline;
+    headRow.appendChild(headEl);
 
-    rightCol.appendChild(headEl);
-
-    if (snippet) {
-      const snipEl = document.createElement('div');
-      snipEl.className = 'ns-snippet';
-      // Truncate at word boundary (last space before 220 chars) — no mid-word cuts
-      let snipText = snippet;
-      if (snipText.length > 220) {
-        const cut = snipText.lastIndexOf(' ', 220);
-        snipText = snipText.slice(0, cut > 80 ? cut : 220) + '…';
-      }
-      snipEl.textContent = snipText;
-      rightCol.appendChild(snipEl);
+    // Chevron (only when there is a snippet)
+    if (hasSnip) {
+      const chev = document.createElement('span');
+      chev.className = 'ns-chevron';
+      chev.setAttribute('aria-hidden', 'true');
+      chev.innerHTML = '<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,3 4.5,6.5 7.5,3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      headRow.appendChild(chev);
     }
+    rightCol.appendChild(headRow);
 
+    // Meta row (always visible)
     const metaEl = document.createElement('div');
     metaEl.className = 'ns-meta';
     if (cur) {
@@ -11233,8 +11229,44 @@ function renderNewsSection(items, meta) {
     }
     rightCol.appendChild(metaEl);
 
+    // Snippet drawer (collapsed by default)
+    if (hasSnip) {
+      const drawer = document.createElement('div');
+      drawer.className = 'ns-drawer';
+
+      const snipEl = document.createElement('div');
+      snipEl.className = 'ns-snippet';
+      snipEl.textContent = snippet;   // full text — no truncation in accordion
+      drawer.appendChild(snipEl);
+
+      // "Read full article" link (shown only when snippet is open)
+      if (safeLink) {
+        const readLink = document.createElement('a');
+        readLink.className = 'ns-read-link';
+        readLink.textContent = 'Read full article';
+        readLink.href = safeLink;
+        readLink.target = '_blank';
+        readLink.rel = 'noopener noreferrer';
+        readLink.addEventListener('click', e => e.stopPropagation());
+        drawer.appendChild(readLink);
+      }
+      rightCol.appendChild(drawer);
+    }
+
     wrap.appendChild(leftCol);
     wrap.appendChild(rightCol);
+
+    // ── Accordion toggle ────────────────────────────────────────────────────
+    if (hasSnip) {
+      wrap.addEventListener('click', () => {
+        const isOpen = wrap.classList.toggle('ns-open');
+        wrap.setAttribute('aria-expanded', isOpen);
+      });
+    } else if (safeLink) {
+      wrap.style.cursor = 'pointer';
+      wrap.addEventListener('click', () => window.open(safeLink, '_blank', 'noopener,noreferrer'));
+    }
+
     feed.appendChild(wrap);
   });
 }
