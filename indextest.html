@@ -1344,7 +1344,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
     <!-- NEWS — Dedicated full-width panel (hidden by default; shown on "News" nav click) -->
-    <div class="panel" id="section-news" style="display:none;">
+    <div id="section-news" style="display:none;flex-direction:column;height:100%;">
       <div class="panel-head" style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;">
         <div style="display:flex;align-items:center;gap:10px;">
           <span class="panel-title">News Feed</span>
@@ -1374,7 +1374,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="ns-imp-pill" data-val="med"  onclick="window._newsSetFilter('impact','med')">Med</button>
       </div>
       <!-- News list -->
-      <div id="news-section-feed" style="overflow-y:auto;max-height:calc(100vh - 220px);" class="thin-scroll">
+      <div id="news-section-feed" style="overflow-y:auto;flex:1;min-height:0;" class="thin-scroll">
         <div style="padding:14px;color:var(--text3);font-size:11px;">Loading news…</div>
       </div>
     </div><!-- /#section-news -->
