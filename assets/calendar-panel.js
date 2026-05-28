@@ -296,13 +296,22 @@
       });
     });
 
+    // ── Scroll position preservation ──────────────────────────────────────
+    // Capture scroll state BEFORE innerHTML wipe so re-renders can restore it.
+    // isFirstRender: container has never been populated (data attribute absent).
+    // On first render  → smart-scroll to today / first upcoming (see below).
+    // On re-renders    → restore the user's exact scrollTop so manual navigation
+    //   is never interrupted by the 5-min interval or visibilitychange refresh.
+    const isFirstRender  = container.dataset.calInitialized !== '1';
+    const savedScrollTop = isFirstRender ? 0 : container.scrollTop;
+
     container.innerHTML = html;
 
     // ── Scroll logic ──────────────────────────────────────────────────────
     // Uses direct scrollTop on cal-events-body (the overflow:auto container),
     // NOT scrollIntoView which would scroll the outer #rightpanel instead.
     //
-    // Priority order:
+    // First-render priority order:
     // 1. Today's date row — always anchor on today if the day has events
     // 2. No today section — jump to first upcoming event's date row
     // 3. First future date (next trading day after today)
@@ -311,24 +320,34 @@
       const todayRow      = container.querySelector('[data-today="1"]');
       const firstUpcoming = container.querySelector('[data-upcoming="1"]');
 
-      if (todayRow) {
-        scrollCalTo(container, todayRow);
-      } else if (firstUpcoming) {
-        const prev = firstUpcoming.previousElementSibling;
-        const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcoming;
-        scrollCalTo(container, target);
+      if (!isFirstRender) {
+        // Re-render (5-min refresh or tab focus regain) — restore user's position.
+        // Row layout is stable between refreshes (actuals fill in but no rows are
+        // inserted above existing ones), so pixel-level scrollTop is reliable.
+        container.scrollTop = savedScrollTop;
       } else {
-        // Find first future date row
-        const allDateRows = container.querySelectorAll('.cal-date-row[data-date]');
-        let scrolled = false;
-        for (const row of allDateRows) {
-          if (row.dataset.date > today) {
-            scrollCalTo(container, row);
-            scrolled = true;
-            break;
+        // First render — smart-scroll to the most relevant date.
+        if (todayRow) {
+          scrollCalTo(container, todayRow);
+        } else if (firstUpcoming) {
+          const prev = firstUpcoming.previousElementSibling;
+          const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcoming;
+          scrollCalTo(container, target);
+        } else {
+          // Find first future date row
+          const allDateRows = container.querySelectorAll('.cal-date-row[data-date]');
+          let scrolled = false;
+          for (const row of allDateRows) {
+            if (row.dataset.date > today) {
+              scrollCalTo(container, row);
+              scrolled = true;
+              break;
+            }
           }
+          if (!scrolled) container.scrollTop = 0;
         }
-        if (!scrolled) container.scrollTop = 0;
+        // Mark initialized so future re-renders take the restore path.
+        container.dataset.calInitialized = '1';
       }
 
       // Setup "Next event" jump button
