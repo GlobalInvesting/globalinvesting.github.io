@@ -410,6 +410,40 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   #sent-rows::-webkit-scrollbar { width: 3px; }
   #sent-rows::-webkit-scrollbar-track { background: transparent; }
   #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* NEWS SECTION (section-news) — single-row calendar-style accordion */
+  /* Each item: [time][dot][headline...truncated][cur-tag][source][chevron] — ONE line */
+  .ns-item { display:block;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s; }
+  .ns-item:hover { background:var(--bg3); }
+  .ns-item:last-child { border-bottom:none; }
+  .ns-featured .ns-row { border-left:2px solid var(--blue);padding-left:12px; }
+  /* Single flex row — matches economic calendar row height */
+  .ns-row { display:flex;align-items:center;gap:8px;padding:0 14px;height:30px;min-width:0; }
+  /* Time cell: fixed 38px — same width as econmap hour column.
+     Stacks HH:MM over Xh in a single column; no extra flex item in the row. */
+  .ns-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
+  .ns-time-hm  { font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap; }
+  .ns-time-age { font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;white-space:nowrap;margin-top:1px; }
+  .ns-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+  .ns-dot-high { background:var(--down); }
+  .ns-dot-med  { background:var(--orange); }
+  .ns-dot-low  { background:var(--text3); }
+  .ns-headline { font-size:11px;color:var(--text);font-family:var(--font-ui);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0; }
+  .ns-cur-tag { font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;font-family:var(--font-ui);flex-shrink:0; }
+  .ns-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);flex-shrink:0;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .ns-chevron { color:var(--text3);flex-shrink:0;display:flex;align-items:center;transition:transform .18s; }
+  .ns-open .ns-chevron { transform:rotate(180deg); }
+  /* Accordion drawer — slides in below the single row when open */
+  .ns-drawer { display:none;padding:6px 14px 10px 56px; }
+  .ns-open .ns-drawer { display:block; }
+  .ns-drawer-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);margin:0 0 4px 0;text-transform:uppercase;letter-spacing:.04em; }
+  .ns-snippet { font-size:11px;color:var(--text2);line-height:1.5;font-family:var(--font-ui);margin:0; }
+  .ns-read-link { display:inline-block;margin-top:6px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none; }
+  .ns-read-link:hover { text-decoration:underline; }
+  /* Filter pills */
+  .ns-cur-pill,.ns-imp-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
+  .ns-cur-pill:hover,.ns-imp-pill:hover { background:var(--bg3);color:var(--text); }
+  .ns-pill-active { background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important; }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
@@ -466,6 +500,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <a href="#section-sessions" data-target="section-sessions">Sessions</a>
     <a href="#section-tvcalendar" data-target="section-tvcalendar">Calendar</a>
     <a href="#section-derivatives" data-target="section-derivatives" title="Implied forwards, RR surface, realized volatility · Shortcut: D">Derivatives</a>
+    <a href="#section-news" data-target="section-news" title="FX headlines and macro news · Shortcut: N">News</a>
   </nav>
   <div class="topbar-right">
     <!-- Site menu dropdown -->
@@ -1127,26 +1162,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     </div>
 
-    <!-- NEWS FEED + ECONOMIC MAP -->
-    <div id="section-econmap" style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:440px;">
-      <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:440px;">
-        <div class="panel-head">
-          <span class="panel-title">News Feed</span>
-          <span class="panel-sub" id="news-sub">FX-relevant · sorted by impact</span>
-        </div>
-        <div id="news-feed-items" style="flex:1;overflow-y:auto;min-height:0;" class="thin-scroll">
-          <div class="news-item" style="color:var(--text3);">Loading news…</div>
-        </div>
+    <!-- ECONOMIC MAP — full width (News Feed moved to dedicated News tab) -->
+    <div id="section-econmap" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);height:440px;">
+      <div class="panel-head">
+        <span class="panel-title">Economic Map</span>
+        <span class="panel-sub">TradingView · World Economics</span>
       </div>
-      <div style="display:flex;flex-direction:column;background:var(--bg);height:440px;overflow:hidden;">
-        <div class="panel-head">
-          <span class="panel-title">Economic Map</span>
-          <span class="panel-sub">TradingView · World Economics</span>
-        </div>
-        <div style="flex:1;overflow:hidden;background:#131722;display:flex;align-items:stretch;">
-          <!-- Economic map loaded lazily — see initLazyWidgets() in dashboard.js -->
-          <div id="tv-econmap-placeholder" style="width:100%;height:100%;min-height:380px;background:#131722;"></div>
-        </div>
+      <div style="flex:1;overflow:hidden;background:#131722;display:flex;align-items:stretch;">
+        <!-- Economic map loaded lazily — see initLazyWidgets() in dashboard.js -->
+        <div id="tv-econmap-placeholder" style="width:100%;height:100%;min-height:380px;background:#131722;"></div>
       </div>
     </div>
 
@@ -1322,6 +1346,42 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     </div><!-- /#section-derivatives -->
 
+
+    <!-- NEWS — Dedicated full-width panel (hidden by default; shown on "News" nav click) -->
+    <div id="section-news" style="display:none;flex-direction:column;height:100%;">
+      <div class="panel-head" style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="panel-title">News Feed</span>
+          <span class="panel-sub">Finnhub · RSS · sorted by impact</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="news-section-count" style="font-size:9px;color:var(--text3);"></span>
+          <span style="font-size:9px;color:var(--text3);">Updated: <span id="news-section-ts" style="color:var(--text2);">—</span></span>
+        </div>
+      </div>
+      <!-- Currency + impact filter pills -->
+      <div id="ns-filter-bar" style="display:flex;gap:4px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+        <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Currency</span>
+        <button class="ns-cur-pill ns-pill-active" data-val="ALL"  onclick="window._newsSetFilter('cur','ALL')">All</button>
+        <button class="ns-cur-pill" data-val="USD"  onclick="window._newsSetFilter('cur','USD')">USD</button>
+        <button class="ns-cur-pill" data-val="EUR"  onclick="window._newsSetFilter('cur','EUR')">EUR</button>
+        <button class="ns-cur-pill" data-val="GBP"  onclick="window._newsSetFilter('cur','GBP')">GBP</button>
+        <button class="ns-cur-pill" data-val="JPY"  onclick="window._newsSetFilter('cur','JPY')">JPY</button>
+        <button class="ns-cur-pill" data-val="AUD"  onclick="window._newsSetFilter('cur','AUD')">AUD</button>
+        <button class="ns-cur-pill" data-val="CAD"  onclick="window._newsSetFilter('cur','CAD')">CAD</button>
+        <button class="ns-cur-pill" data-val="CHF"  onclick="window._newsSetFilter('cur','CHF')">CHF</button>
+        <button class="ns-cur-pill" data-val="NZD"  onclick="window._newsSetFilter('cur','NZD')">NZD</button>
+        <span style="width:1px;height:14px;background:var(--border2);margin:0 4px;flex-shrink:0;"></span>
+        <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Impact</span>
+        <button class="ns-imp-pill ns-pill-active" data-val="ALL"  onclick="window._newsSetFilter('impact','ALL')">All</button>
+        <button class="ns-imp-pill" data-val="high" onclick="window._newsSetFilter('impact','high')">High</button>
+        <button class="ns-imp-pill" data-val="med"  onclick="window._newsSetFilter('impact','med')">Med</button>
+      </div>
+      <!-- News list -->
+      <div id="news-section-feed" style="overflow-y:auto;flex:1;min-height:0;" class="thin-scroll">
+        <div style="padding:14px;color:var(--text3);font-size:11px;">Loading news…</div>
+      </div>
+    </div><!-- /#section-news -->
       </div><!-- /#split-lower-right -->
     </div><!-- /#split-lower -->
 
@@ -1553,7 +1613,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/dashboard.js?v=8.2.36" defer></script>
+<script src="assets/dashboard.js?v=8.3.0" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.

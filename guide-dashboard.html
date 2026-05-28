@@ -842,7 +842,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <rect x="370" y="176" width="188" height="18" rx="2" fill="#2a2e39"/>
   <text x="376" y="189" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">Sessions · Spreads · Sentiment</text>
   <rect x="370" y="198" width="188" height="18" rx="2" fill="#2a2e39"/>
-  <text x="376" y="211" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">News · Economic Map</text>
+  <text x="376" y="211" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">Economic Map</text>
 
   <!-- RIGHT PANEL — x=564, w=116 -->
   <rect x="564" y="72" width="116" height="298" fill="#1e222d" stroke="#2a2e39" stroke-width="0.5"/>
@@ -863,10 +863,10 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 </svg>
 </div>
       <h3>Split Layout</h3>
-      <p>The main content area is split into two scrollable columns by default — the chart, FX table, and heatmap on the left; cross-asset, risk, rates, COT, sessions, news, and signals on the right. This is the recommended view on desktop as it keeps the chart visible while scrolling through data panels on the right. The split ratio is adjustable: drag the vertical divider bar between the two columns left or right to resize. Your preferred split width is saved automatically.</p>
+      <p>The main content area is split into two scrollable columns by default — the chart, FX table, and heatmap on the left; cross-asset, risk, rates, COT, sessions, and signals on the right. This is the recommended view on desktop as it keeps the chart visible while scrolling through data panels on the right. The split ratio is adjustable: drag the vertical divider bar between the two columns left or right to resize. Your preferred split width is saved automatically.</p>
       <p>To toggle split mode on or off, click the <strong>split icon button</strong> <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:16px;border:1px solid var(--border2);border-radius:3px;vertical-align:middle;font-size:9px;color:var(--text2);">⊟</span> in the top-right corner of the Price Chart panel header — next to the panel subtitle. When split layout is active, the button is highlighted in blue. Clicking it again collapses back to a single full-width scroll. Split layout is disabled automatically on mobile viewports.</p>
       <p>On mobile, the layout collapses into a single scrollable column regardless of the split setting. The sidebar and right panel fold into the main flow.</p>
-      <p>The sticky topbar navigation links jump you directly to major sections: <strong>FX Pairs</strong>, <strong>Macro</strong>, <strong>Rates</strong>, <strong>Cross-Asset</strong>, <strong>Risk</strong>, <strong>Positioning</strong>, <strong>Calendar</strong>, and <strong>Derivatives</strong>.</p>
+      <p>The sticky topbar navigation links jump you directly to major sections: <strong>FX Pairs</strong>, <strong>Macro</strong>, <strong>Rates</strong>, <strong>Cross-Asset</strong>, <strong>Risk</strong>, <strong>Positioning</strong>, <strong>Calendar</strong>, <strong>Derivatives</strong>, and <strong>News</strong>.</p>
     </div>
 
     <div class="guide-section" id="topbar-guide">
@@ -915,7 +915,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
       <p>Click any pair in the quote bar to jump to the Price Chart with that symbol pre-selected.</p>
       <h3>News ticker</h3>
-      <p>The scrolling headline strip below the quote bar shows the most recent FX-relevant headlines from RSS feeds (FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Investing.com, ForexCrunch, MarketPulse, DailyForex, ActionForex, BabyPips, FX Empire and others), updated every hour by the engine. The terminal re-checks for new data every 10 minutes. Headlines are color-tagged by currency when a specific pair is mentioned.</p>
+      <p>The scrolling headline strip below the quote bar shows the most recent FX-relevant headlines from RSS feeds (FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Investing.com, ForexCrunch, MarketPulse, DailyForex, ActionForex, BabyPips, FX Empire and others), updated every hour by the engine. The terminal re-checks for new data every 2 minutes. Headlines are color-tagged by currency when a specific pair is mentioned.</p>
     </div>
 
     <div class="guide-section" id="narrative">
@@ -1720,48 +1720,80 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
     <div class="guide-section" id="news-feed">
       <h2>News Feed</h2>
-      <p>FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Investing.com, ForexCrunch, MarketPulse, DailyForex, ActionForex, BabyPips, FX Empire and others, filtered and sorted by estimated market impact. Each item shows the timestamp, headline, currency tag for the pairs most likely affected, and the source. The engine updates the feed every hour; the terminal re-checks for new data every 10 minutes.</p>
-      <!-- MOCK: News feed -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;">
-        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;">
-          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">News Feed</span>
-          <span style="font-size:9px;color:var(--text3);">FX-relevant · 48 stories · sorted by impact</span>
+      <p>The <strong>News</strong> tab in the topbar (keyboard shortcut: <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">N</kbd>) opens the dedicated News Feed panel, replacing the main content area — the same pattern as the Derivatives section. It shows FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Finnhub, NewsData.io, Marc to Market and others, sorted by estimated market impact. The engine updates the feed every hour; the terminal re-checks for new data every 2 minutes using HTTP ETags — no bandwidth cost when there are no changes.</p>
+      <!-- MOCK: News Feed panel — matches production single-row accordion layout -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:700px;">
+        <!-- Panel header -->
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">News Feed</span>
+            <span style="font-size:9px;color:var(--text3);">Finnhub · RSS · sorted by impact</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:9px;color:var(--text3);">52 stories</span>
+            <span style="font-size:9px;color:var(--text3);">Updated: 14:05 UTC</span>
+          </div>
         </div>
-        <div style="padding:0;">
-          <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);min-width:36px;padding-top:1px;">08:31</span>
-            <div>
-              <div style="font-size:12px;color:var(--text);line-height:1.5;margin-bottom:3px;">ECB holds rates, signals further cuts dependent on inflation trajectory</div>
-              <div style="display:flex;align-items:center;gap:5px;">
-                <span style="font-size:9px;background:rgba(79,127,255,0.12);color:#4f7fff;padding:1px 5px;border-radius:2px;">EUR</span>
-                <span style="font-size:9px;background:rgba(79,127,255,0.12);color:#4f7fff;padding:1px 5px;border-radius:2px;">USD</span>
-                <span style="font-size:9px;color:var(--text3);">FXStreet · 04 Apr</span>
-              </div>
-            </div>
+        <!-- Filter pills -->
+        <div style="display:flex;gap:4px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+          <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Currency</span>
+          <span style="font-size:9px;font-weight:600;background:#4f7fff;color:#fff;border:1px solid #4f7fff;border-radius:2px;padding:1px 6px;">All</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">USD</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">EUR</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">GBP</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">JPY</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">AUD</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">CAD</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">CHF</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">NZD</span>
+          <span style="width:1px;height:14px;background:var(--border2);margin:0 4px;"></span>
+          <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Impact</span>
+          <span style="font-size:9px;font-weight:600;background:#4f7fff;color:#fff;border:1px solid #4f7fff;border-radius:2px;padding:1px 6px;">All</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">High</span>
+          <span style="font-size:9px;font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;">Med</span>
+        </div>
+        <!-- News rows — single-row accordion pattern -->
+        <div style="border-left:2px solid var(--blue);padding-left:12px;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 14px 0 0;height:30px;min-width:0;">
+            <span style="display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1;">
+              <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);">08:31</span>
+              <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;margin-top:1px;">3h</span>
+            </span>
+            <span style="width:6px;height:6px;border-radius:50%;background:var(--down);flex-shrink:0;"></span>
+            <span style="font-size:11px;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">ECB holds rates, signals further cuts dependent on inflation trajectory</span>
+            <span style="font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;flex-shrink:0;">EUR</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--text3);flex-shrink:0;transform:rotate(180deg);"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>
           </div>
-          <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);min-width:36px;padding-top:1px;">07:54</span>
-            <div>
-              <div style="font-size:12px;color:var(--text);line-height:1.5;margin-bottom:3px;">BoJ's Ueda: no rush to raise rates further, watching wage data closely</div>
-              <div style="display:flex;align-items:center;gap:5px;">
-                <span style="font-size:9px;background:rgba(79,127,255,0.12);color:#4f7fff;padding:1px 5px;border-radius:2px;">JPY</span>
-                <span style="font-size:9px;color:var(--text3);">ForexLive · 04 Apr</span>
-              </div>
-            </div>
+          <!-- Expanded drawer -->
+          <div style="padding:6px 14px 10px 56px;">
+            <p style="font-size:9px;color:var(--text3);font-family:var(--font-ui);margin:0 0 4px 0;text-transform:uppercase;letter-spacing:.04em;">FXStreet</p>
+            <p style="font-size:11px;color:var(--text2);line-height:1.5;font-family:var(--font-ui);margin:0;">The ECB kept its key interest rates unchanged at its April meeting, maintaining the deposit facility rate at 2.25%. President Lagarde signalled the disinflation process is well on track but said the path forward remains data-dependent...</p>
+            <a style="display:inline-block;margin-top:6px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none;">Read full article ↗</a>
           </div>
-          <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;">
-            <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);min-width:36px;padding-top:1px;">07:12</span>
-            <div>
-              <div style="font-size:12px;color:var(--text);line-height:1.5;margin-bottom:3px;">UK retail sales beat expectations at +0.4% MoM vs +0.2% consensus</div>
-              <div style="display:flex;align-items:center;gap:5px;">
-                <span style="font-size:9px;background:rgba(79,127,255,0.12);color:#4f7fff;padding:1px 5px;border-radius:2px;">GBP</span>
-                <span style="font-size:9px;color:var(--text3);">Investing.com · 04 Apr</span>
-              </div>
-            </div>
-          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:0 14px;height:30px;min-width:0;border-bottom:1px solid var(--border);">
+          <span style="display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1;">
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);">07:54</span>
+            <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;margin-top:1px;">4h</span>
+          </span>
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--down);flex-shrink:0;"></span>
+          <span style="font-size:11px;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">BoJ's Ueda: no rush to raise rates further, watching wage data closely</span>
+          <span style="font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;flex-shrink:0;">JPY</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--text3);flex-shrink:0;"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:0 14px;height:30px;min-width:0;">
+          <span style="display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1;">
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);">07:12</span>
+            <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;margin-top:1px;">4h</span>
+          </span>
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;"></span>
+          <span style="font-size:11px;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">UK retail sales beat expectations at +0.4% MoM vs +0.2% consensus</span>
+          <span style="font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;flex-shrink:0;">GBP</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--text3);flex-shrink:0;"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>
         </div>
       </div>
-      <p>The <strong>Economic Map</strong> to the right of the news feed is a TradingView world economics widget showing GDP, inflation, and other macro metrics by country in an interactive geographic view.</p>
+      <p>Each row shows: the publication time with a relative age indicator below it, an impact dot (red = high, amber = medium, grey = low), the headline truncated to one line, and the currency tag for the pair most likely affected. Hovering over any row shows the complete headline in a native tooltip. Click a row to expand an accordion drawer with the full snippet, source name, and a link to the original article — only one item can be expanded at a time.</p>
+      <p>The filter bar at the top lets you narrow the feed by currency (All / USD / EUR / GBP / JPY / AUD / CAD / CHF / NZD) or by impact (All / High / Med). Filters apply instantly in memory without re-fetching.</p>
     </div>
 
     <div class="guide-section" id="alerts">
