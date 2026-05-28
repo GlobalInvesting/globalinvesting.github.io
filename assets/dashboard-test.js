@@ -11207,7 +11207,13 @@ function renderNewsSection(items, meta) {
     if (snippet) {
       const snipEl = document.createElement('div');
       snipEl.className = 'ns-snippet';
-      snipEl.textContent = snippet.length > 160 ? snippet.slice(0, 157) + '…' : snippet;
+      // Truncate at word boundary (last space before 220 chars) — no mid-word cuts
+      let snipText = snippet;
+      if (snipText.length > 220) {
+        const cut = snipText.lastIndexOf(' ', 220);
+        snipText = snipText.slice(0, cut > 80 ? cut : 220) + '…';
+      }
+      snipEl.textContent = snipText;
       rightCol.appendChild(snipEl);
     }
 
