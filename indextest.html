@@ -419,8 +419,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   .ns-featured .ns-row { border-left:2px solid var(--blue);padding-left:12px; }
   /* Single flex row — matches economic calendar row height */
   .ns-row { display:flex;align-items:center;gap:8px;padding:0 14px;height:30px;min-width:0; }
-  .ns-time { font-size:10px;color:var(--text3);white-space:nowrap;font-family:var(--font-mono);min-width:34px;flex-shrink:0; }
-  .ns-age  { font-size:9px;color:var(--text3);font-family:var(--font-mono);flex-shrink:0;opacity:.7; }
+  /* Time cell: fixed 38px — same width as econmap hour column.
+     Stacks HH:MM over Xh in a single column; no extra flex item in the row. */
+  .ns-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
+  .ns-time-hm  { font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap; }
+  .ns-time-age { font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;white-space:nowrap;margin-top:1px; }
   .ns-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
   .ns-dot-high { background:var(--down); }
   .ns-dot-med  { background:var(--orange); }
