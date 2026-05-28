@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-27T20:57:51Z",
+  "generated_at": "2026-05-28T00:00:47Z",
   "source": "Finnhub",
   "holidays": [
     {
@@ -29,149 +29,6 @@
     }
   ],
   "events": [
-    {
-      "title": "RBNZ Press Conference",
-      "currency": "NZD",
-      "dateISO": "2026-05-06",
-      "timeUTC": "01:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "ECB Buch Speech",
-      "currency": "EUR",
-      "dateISO": "2026-05-06",
-      "timeUTC": "07:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "ECB Lane Speech",
-      "currency": "EUR",
-      "dateISO": "2026-05-06",
-      "timeUTC": "08:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "ECB Cipollone Speech",
-      "currency": "EUR",
-      "dateISO": "2026-05-06",
-      "timeUTC": "08:20",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "MBA 30-Year Mortgage Rate",
-      "currency": "USD",
-      "dateISO": "2026-05-06",
-      "timeUTC": "11:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": "6.37",
-      "actual": "6.45",
-      "released": true
-    },
-    {
-      "title": "ADP Employment Change",
-      "currency": "USD",
-      "dateISO": "2026-05-06",
-      "timeUTC": "12:15",
-      "impact": "medium",
-      "forecast": "99",
-      "previous": "61",
-      "actual": "109",
-      "released": true
-    },
-    {
-      "title": "Fed Musalem Speech",
-      "currency": "USD",
-      "dateISO": "2026-05-06",
-      "timeUTC": "13:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "Ivey PMI s.a",
-      "currency": "CAD",
-      "dateISO": "2026-05-06",
-      "timeUTC": "14:00",
-      "impact": "high",
-      "forecast": "49.9",
-      "previous": "49.7",
-      "actual": "57.7",
-      "released": true
-    },
-    {
-      "title": "EIA Crude Oil Stocks Change",
-      "currency": "USD",
-      "dateISO": "2026-05-06",
-      "timeUTC": "14:30",
-      "impact": "medium",
-      "forecast": "-3.3",
-      "previous": "-6.233",
-      "actual": "-2.314",
-      "released": true
-    },
-    {
-      "title": "EIA Gasoline Stocks Change",
-      "currency": "USD",
-      "dateISO": "2026-05-06",
-      "timeUTC": "14:30",
-      "impact": "medium",
-      "forecast": "-2.1",
-      "previous": "-6.075",
-      "actual": "-2.504",
-      "released": true
-    },
-    {
-      "title": "Fed Goolsbee Speech",
-      "currency": "USD",
-      "dateISO": "2026-05-06",
-      "timeUTC": "17:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "Fed Hammack Speech",
-      "currency": "USD",
-      "dateISO": "2026-05-06",
-      "timeUTC": "17:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "BoJ Monetary Policy Meeting Minutes",
-      "currency": "JPY",
-      "dateISO": "2026-05-06",
-      "timeUTC": "23:50",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
     {
       "title": "Local Elections",
       "currency": "GBP",
@@ -2510,7 +2367,7 @@
       "dateISO": "2026-05-28",
       "timeUTC": "12:30",
       "impact": "medium",
-      "forecast": null,
+      "forecast": "-4.7",
       "previous": "-0.7",
       "actual": null,
       "released": false
@@ -2532,7 +2389,7 @@
       "dateISO": "2026-05-28",
       "timeUTC": "12:30",
       "impact": "medium",
-      "forecast": null,
+      "forecast": "5.7",
       "previous": "5.7",
       "actual": null,
       "released": false
@@ -2686,7 +2543,7 @@
       "dateISO": "2026-05-28",
       "timeUTC": "16:00",
       "impact": "medium",
-      "forecast": "-2.9*",
+      "forecast": "-5",
       "previous": "-7.864",
       "actual": null,
       "released": false
@@ -2697,7 +2554,7 @@
       "dateISO": "2026-05-28",
       "timeUTC": "16:00",
       "impact": "medium",
-      "forecast": "-2.1*",
+      "forecast": "-3",
       "previous": "-1.548",
       "actual": null,
       "released": false
@@ -3689,6 +3546,215 @@
       "impact": "medium",
       "forecast": "-10.0*",
       "previous": "83",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "MBA 30-Year Mortgage Rate",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "11:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "6.65",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Core Inflation Rate MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "0.3*",
+      "previous": "0.4",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Core Inflation Rate YoY",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "2.7*",
+      "previous": "2.8",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "CPI",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "0.3%*",
+      "previous": "333.02",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "CPI s.a",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "0.3%*",
+      "previous": "332.407",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Inflation Rate MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "0.3*",
+      "previous": "0.6",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Inflation Rate YoY",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "2.7*",
+      "previous": "3.8",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "BoC Interest Rate Decision",
+      "currency": "CAD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "13:45",
+      "impact": "high",
+      "forecast": null,
+      "previous": "2.25",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "BoC Press Conference",
+      "currency": "CAD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "EIA Crude Oil Stocks Change",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "impact": "medium",
+      "forecast": "-2.9*",
+      "previous": "-7.864",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "EIA Gasoline Stocks Change",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "impact": "medium",
+      "forecast": "-2.1*",
+      "previous": "-1.548",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Monthly Budget Statement",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "18:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "215",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "RICS House Price Balance",
+      "currency": "GBP",
+      "dateISO": "2026-06-10",
+      "timeUTC": "23:01",
+      "impact": "medium",
+      "forecast": "-25*",
+      "previous": "-34",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Deposit Facility Rate",
+      "currency": "EUR",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:15",
+      "impact": "high",
+      "forecast": null,
+      "previous": "2",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "ECB Interest Rate Decision",
+      "currency": "EUR",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:15",
+      "impact": "high",
+      "forecast": null,
+      "previous": "2.15",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Core PPI MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "0.3*",
+      "previous": "1",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Initial Jobless Claims",
+      "currency": "USD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "211*",
+      "previous": "209",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "PPI MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "0.3*",
+      "previous": "1.4",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "ECB Press Conference",
+      "currency": "EUR",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:45",
+      "impact": "high",
+      "forecast": null,
+      "previous": null,
       "actual": null,
       "released": false
     }
