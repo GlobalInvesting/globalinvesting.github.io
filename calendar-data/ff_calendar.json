@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T12:06:13Z",
+  "generated_at": "2026-05-28T12:31:14Z",
   "source": "Finnhub",
   "holidays": [
     {
@@ -2032,17 +2032,6 @@
       "released": false
     },
     {
-      "title": "Chicago Fed National Activity Index",
-      "currency": "USD",
-      "dateISO": "2026-05-25",
-      "timeUTC": "12:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": "-0.2",
-      "actual": null,
-      "released": false
-    },
-    {
       "title": "CBI Distributive Trades",
       "currency": "GBP",
       "dateISO": "2026-05-26",
@@ -2219,17 +2208,6 @@
       "released": false
     },
     {
-      "title": "CBI Distributive Trades",
-      "currency": "GBP",
-      "dateISO": "2026-05-27",
-      "timeUTC": "10:00",
-      "impact": "medium",
-      "forecast": "-60*",
-      "previous": "-68",
-      "actual": null,
-      "released": false
-    },
-    {
       "title": "MBA 30-Year Mortgage Rate",
       "currency": "USD",
       "dateISO": "2026-05-27",
@@ -2368,9 +2346,9 @@
       "timeUTC": "12:30",
       "impact": "medium",
       "forecast": "-4.7",
-      "previous": "-0.7",
-      "actual": null,
-      "released": false
+      "previous": "-1",
+      "actual": "-7.2",
+      "released": true
     },
     {
       "title": "Core PCE Price Index MoM",
@@ -2380,8 +2358,8 @@
       "impact": "high",
       "forecast": "0.3",
       "previous": "0.3",
-      "actual": null,
-      "released": false
+      "actual": "0.2",
+      "released": true
     },
     {
       "title": "Corporate Profits QoQ Prel",
@@ -2390,9 +2368,9 @@
       "timeUTC": "12:30",
       "impact": "medium",
       "forecast": "5.7",
-      "previous": "5.7",
-      "actual": null,
-      "released": false
+      "previous": "4.7",
+      "actual": "-0.4",
+      "released": true
     },
     {
       "title": "Durable Goods Orders Ex Transp MoM",
@@ -2401,9 +2379,9 @@
       "timeUTC": "12:30",
       "impact": "medium",
       "forecast": "0.5",
-      "previous": "0.9",
-      "actual": null,
-      "released": false
+      "previous": "1.1",
+      "actual": "1.1",
+      "released": true
     },
     {
       "title": "Durable Goods Orders MoM",
@@ -2412,9 +2390,9 @@
       "timeUTC": "12:30",
       "impact": "high",
       "forecast": "3.5",
-      "previous": "0.8",
-      "actual": null,
-      "released": false
+      "previous": "1.3",
+      "actual": "7.9",
+      "released": true
     },
     {
       "title": "GDP Growth Rate QoQ 2nd Est",
@@ -2424,8 +2402,8 @@
       "impact": "high",
       "forecast": "2",
       "previous": "0.5",
-      "actual": null,
-      "released": false
+      "actual": "1.6",
+      "released": true
     },
     {
       "title": "GDP Price Index QoQ 2nd Est",
@@ -2435,8 +2413,8 @@
       "impact": "medium",
       "forecast": "4.5",
       "previous": "3.7",
-      "actual": null,
-      "released": false
+      "actual": "3.5",
+      "released": true
     },
     {
       "title": "Initial Jobless Claims",
@@ -2445,9 +2423,9 @@
       "timeUTC": "12:30",
       "impact": "medium",
       "forecast": "211",
-      "previous": "209",
-      "actual": null,
-      "released": false
+      "previous": "210",
+      "actual": "215",
+      "released": true
     },
     {
       "title": "PCE Price Index MoM",
@@ -2457,8 +2435,8 @@
       "impact": "medium",
       "forecast": "0.5",
       "previous": "0.7",
-      "actual": null,
-      "released": false
+      "actual": "0.4",
+      "released": true
     },
     {
       "title": "PCE Price Index YoY",
@@ -2468,8 +2446,8 @@
       "impact": "medium",
       "forecast": "3.8",
       "previous": "3.5",
-      "actual": null,
-      "released": false
+      "actual": "3.8",
+      "released": true
     },
     {
       "title": "Personal Income MoM",
@@ -2479,8 +2457,8 @@
       "impact": "high",
       "forecast": "0.4",
       "previous": "0.6",
-      "actual": null,
-      "released": false
+      "actual": "0",
+      "released": true
     },
     {
       "title": "Personal Spending MoM",
@@ -2489,9 +2467,9 @@
       "timeUTC": "12:30",
       "impact": "high",
       "forecast": "0.5",
-      "previous": "0.9",
-      "actual": null,
-      "released": false
+      "previous": "1",
+      "actual": "0.5",
+      "released": true
     },
     {
       "title": "Fed Williams Speech",
@@ -3116,7 +3094,7 @@
       "timeUTC": "14:30",
       "impact": "medium",
       "forecast": "-5*",
-      "previous": "-7.864",
+      "previous": "-2.8",
       "actual": null,
       "released": false
     },
@@ -3766,6 +3744,17 @@
       "impact": "high",
       "forecast": null,
       "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Business NZ PMI",
+      "currency": "NZD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "22:30",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "50.5",
       "actual": null,
       "released": false
     }
