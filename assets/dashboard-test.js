@@ -11206,27 +11206,31 @@ function renderNewsSection(items, meta) {
     const row = document.createElement('div');
     row.className = 'ns-row';
 
+    // ── Time cell: stacked HH:MM / Xh — Bloomberg Anywhere compact pattern ──
+    // Single fixed-width container; no separate badge element in the flex row.
     const timeEl = document.createElement('span');
     timeEl.className = 'ns-time';
+
+    const timeTop = document.createElement('span');
+    timeTop.className = 'ns-time-hm';
+    const timeBot = document.createElement('span');
+    timeBot.className = 'ns-time-age';
+
     if (showDate && pubDate) {
-      // Article is ≥1 day old — show date instead of time (Bloomberg pattern: shows date for old items)
+      // ≥1 day old — show abbreviated date on top line, no age line
       const dateStr = pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      timeEl.textContent = dateStr;
+      timeTop.textContent = dateStr;
       timeEl.title = time + ' · ' + pubDate.toLocaleDateString();
-    } else if (ageLabel) {
-      // Recent article — show HH:MM with age hint on hover; append subtle age badge inline
-      timeEl.textContent = time;
-      timeEl.title = ageLabel + ' ago';
     } else {
-      timeEl.textContent = time;
+      timeTop.textContent = time;
+      if (ageLabel && ageLabel !== 'now') {
+        timeBot.textContent = ageLabel;
+      }
+      if (ageLabel) timeEl.title = ageLabel + ' ago';
     }
 
-    // Age badge — shown inline after time for recent articles (<24h)
-    const ageBadge = document.createElement('span');
-    ageBadge.className = 'ns-age';
-    if (!showDate && ageLabel && ageLabel !== 'now') {
-      ageBadge.textContent = ageLabel;
-    }
+    timeEl.appendChild(timeTop);
+    if (timeBot.textContent) timeEl.appendChild(timeBot);
 
     const dot = document.createElement('span');
     dot.className = 'ns-dot ns-dot-' + impact;
@@ -11242,7 +11246,6 @@ function renderNewsSection(items, meta) {
     chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
 
     row.appendChild(timeEl);
-    if (ageBadge.textContent) row.appendChild(ageBadge);
     row.appendChild(dot);
     row.appendChild(headEl);
 
