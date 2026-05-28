@@ -411,37 +411,26 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   #sent-rows::-webkit-scrollbar-track { background: transparent; }
   #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-  /* NEWS SECTION — dedicated full-width panel (section-news) */
-  .ns-item {
-    display: flex; gap: 10px; align-items: flex-start;
-    padding: 8px 14px; border-bottom: 1px solid var(--border);
-    cursor: pointer; transition: background .1s;
-  }
-  .ns-item:hover { background: var(--bg3); }
-  .ns-item:last-child { border-bottom: none; }
-  .ns-featured { border-left: 2px solid var(--blue); padding-left: 12px; }
-  .ns-left { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 40px; padding-top: 1px; }
-  .ns-time { font-size: 10px; color: var(--text3); white-space: nowrap; font-family: var(--font-mono); }
-  .ns-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .ns-dot-high { background: var(--down); }
-  .ns-dot-med  { background: var(--orange); }
-  .ns-dot-low  { background: var(--text3); }
-  .ns-right { flex: 1; min-width: 0; }
-  .ns-headline { font-size: 12px; color: var(--text); line-height: 1.4; font-family: var(--font-ui); }
-  .ns-snippet  { font-size: 11px; color: var(--text2); line-height: 1.45; margin-top: 3px; font-family: var(--font-ui); }
-  .ns-meta { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
-  .ns-cur-tag { font-size: 9px; font-weight: 700; color: var(--text2); border: 1px solid var(--border2); padding: 0 4px; border-radius: 2px; font-family: var(--font-ui); }
-  .ns-source  { font-size: 9px; color: var(--text3); font-family: var(--font-ui); }
-  /* Filter pills */
-  .ns-cur-pill, .ns-imp-pill {
-    font-size: 9px; font-family: var(--font-ui); font-weight: 600;
-    color: var(--text2); background: transparent;
-    border: 1px solid var(--border2); border-radius: 2px;
-    padding: 1px 6px; cursor: pointer; transition: background .1s, color .1s, border-color .1s;
-    text-transform: uppercase; letter-spacing: .04em;
-  }
-  .ns-cur-pill:hover, .ns-imp-pill:hover { background: var(--bg3); color: var(--text); }
-  .ns-pill-active { background: var(--blue) !important; color: #fff !important; border-color: var(--blue) !important; }
+  /* NEWS SECTION (section-news) */
+  .ns-item { display:flex;gap:10px;align-items:flex-start;padding:8px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s; }
+  .ns-item:hover { background:var(--bg3); }
+  .ns-item:last-child { border-bottom:none; }
+  .ns-featured { border-left:2px solid var(--blue);padding-left:12px; }
+  .ns-left { display:flex;flex-direction:column;align-items:center;gap:5px;min-width:40px;padding-top:1px; }
+  .ns-time { font-size:10px;color:var(--text3);white-space:nowrap;font-family:var(--font-mono); }
+  .ns-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+  .ns-dot-high { background:var(--down); }
+  .ns-dot-med  { background:var(--orange); }
+  .ns-dot-low  { background:var(--text3); }
+  .ns-right { flex:1;min-width:0; }
+  .ns-headline { font-size:12px;color:var(--text);line-height:1.4;font-family:var(--font-ui); }
+  .ns-snippet  { font-size:11px;color:var(--text2);line-height:1.45;margin-top:3px;font-family:var(--font-ui); }
+  .ns-meta { display:flex;gap:8px;align-items:center;margin-top:4px; }
+  .ns-cur-tag { font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;font-family:var(--font-ui); }
+  .ns-source  { font-size:9px;color:var(--text3);font-family:var(--font-ui); }
+  .ns-cur-pill,.ns-imp-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
+  .ns-cur-pill:hover,.ns-imp-pill:hover { background:var(--bg3);color:var(--text); }
+  .ns-pill-active { background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important; }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
@@ -498,6 +487,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <a href="#section-sessions" data-target="section-sessions">Sessions</a>
     <a href="#section-tvcalendar" data-target="section-tvcalendar">Calendar</a>
     <a href="#section-derivatives" data-target="section-derivatives" title="Implied forwards, RR surface, realized volatility · Shortcut: D">Derivatives</a>
+    <a href="#section-news" data-target="section-news" title="FX headlines and macro news · Shortcut: N">News</a>
   </nav>
   <div class="topbar-right">
     <!-- Site menu dropdown -->
@@ -1354,6 +1344,42 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     </div><!-- /#section-derivatives -->
 
+
+    <!-- NEWS — Dedicated full-width panel (hidden by default; shown on "News" nav click) -->
+    <div class="panel" id="section-news" style="display:none;">
+      <div class="panel-head" style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="panel-title">News Feed</span>
+          <span class="panel-sub">Finnhub · RSS · sorted by impact</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="news-section-count" style="font-size:9px;color:var(--text3);"></span>
+          <span style="font-size:9px;color:var(--text3);">Updated: <span id="news-section-ts" style="color:var(--text2);">—</span></span>
+        </div>
+      </div>
+      <!-- Currency + impact filter pills -->
+      <div id="ns-filter-bar" style="display:flex;gap:4px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+        <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Currency</span>
+        <button class="ns-cur-pill ns-pill-active" data-val="ALL"  onclick="window._newsSetFilter('cur','ALL')">All</button>
+        <button class="ns-cur-pill" data-val="USD"  onclick="window._newsSetFilter('cur','USD')">USD</button>
+        <button class="ns-cur-pill" data-val="EUR"  onclick="window._newsSetFilter('cur','EUR')">EUR</button>
+        <button class="ns-cur-pill" data-val="GBP"  onclick="window._newsSetFilter('cur','GBP')">GBP</button>
+        <button class="ns-cur-pill" data-val="JPY"  onclick="window._newsSetFilter('cur','JPY')">JPY</button>
+        <button class="ns-cur-pill" data-val="AUD"  onclick="window._newsSetFilter('cur','AUD')">AUD</button>
+        <button class="ns-cur-pill" data-val="CAD"  onclick="window._newsSetFilter('cur','CAD')">CAD</button>
+        <button class="ns-cur-pill" data-val="CHF"  onclick="window._newsSetFilter('cur','CHF')">CHF</button>
+        <button class="ns-cur-pill" data-val="NZD"  onclick="window._newsSetFilter('cur','NZD')">NZD</button>
+        <span style="width:1px;height:14px;background:var(--border2);margin:0 4px;flex-shrink:0;"></span>
+        <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Impact</span>
+        <button class="ns-imp-pill ns-pill-active" data-val="ALL"  onclick="window._newsSetFilter('impact','ALL')">All</button>
+        <button class="ns-imp-pill" data-val="high" onclick="window._newsSetFilter('impact','high')">High</button>
+        <button class="ns-imp-pill" data-val="med"  onclick="window._newsSetFilter('impact','med')">Med</button>
+      </div>
+      <!-- News list -->
+      <div id="news-section-feed" style="overflow-y:auto;max-height:calc(100vh - 220px);" class="thin-scroll">
+        <div style="padding:14px;color:var(--text3);font-size:11px;">Loading news…</div>
+      </div>
+    </div><!-- /#section-news -->
       </div><!-- /#split-lower-right -->
     </div><!-- /#split-lower -->
 
