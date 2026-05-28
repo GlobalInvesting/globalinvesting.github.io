@@ -1,41 +1,31 @@
 {
-  "lastUpdate": "2026-05-27T23:45:37Z",
-  "generatedAt": "2026-05-27T23:45:37Z",
+  "lastUpdate": "2026-05-28T00:01:10Z",
+  "generatedAt": "2026-05-28T00:01:10Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Finnhub",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-05-27",
-  "rangeTo": "2026-06-10",
-  "totalEvents": 1644,
+  "rangeFrom": "2025-05-28",
+  "rangeTo": "2026-06-11",
+  "totalEvents": 1652,
   "currencyCounts": {
-    "EUR": 194,
-    "USD": 609,
     "CHF": 92,
-    "CAD": 130,
-    "JPY": 186,
-    "NZD": 83,
+    "CAD": 132,
+    "JPY": 185,
+    "NZD": 82,
+    "USD": 618,
     "AUD": 173,
-    "GBP": 177
+    "GBP": 178,
+    "EUR": 192
   },
   "impactCounts": {
-    "low": 152,
+    "low": 151,
     "medium": 1119,
-    "high": 373
+    "high": 382
   },
   "surpriseStats": {
-    "EUR/consumer confidence final": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "EUR/economic sentiment": {
-      "n": 3,
-      "mean": -1.3,
-      "std": 1.014889
-    },
     "GBP/gfk consumer confidence": {
       "n": 4,
       "mean": 0.75,
@@ -431,6 +421,16 @@
       "mean": 0.45,
       "std": 0.070711
     },
+    "EUR/consumer confidence final": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "EUR/economic sentiment": {
+      "n": 2,
+      "mean": -1.2,
+      "std": 1.414214
+    },
     "USD/cb consumer confidence": {
       "n": 3,
       "mean": 2.9,
@@ -503,42 +503,6 @@
     }
   },
   "events": [
-    {
-      "currency": "EUR",
-      "event": "Consumer Confidence Final",
-      "dateISO": "2025-05-27",
-      "hourUTC": "09:00",
-      "actual": "-15.2",
-      "forecast": "-15.2",
-      "previous": "-16.6",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "EUR",
-      "event": "Economic Sentiment",
-      "dateISO": "2025-05-27",
-      "hourUTC": "09:00",
-      "actual": "94.8",
-      "forecast": "94",
-      "previous": "93.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "CB Consumer Confidence",
-      "dateISO": "2025-05-27",
-      "hourUTC": "14:00",
-      "actual": "98",
-      "forecast": "87",
-      "previous": "85.7",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
     {
       "currency": "CHF",
       "event": "Economic Sentiment Index",
@@ -17181,58 +17145,6 @@
     {
       "date": "6 May",
       "dateISO": "2026-05-06",
-      "timeUTC": "01:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "RBNZ Press Conference",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 May",
-      "dateISO": "2026-05-06",
-      "timeUTC": "07:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Buch Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 May",
-      "dateISO": "2026-05-06",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Lane Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 May",
-      "dateISO": "2026-05-06",
-      "timeUTC": "08:20",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Cipollone Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 May",
-      "dateISO": "2026-05-06",
       "timeUTC": "11:00",
       "country": "USD",
       "currency": "USD",
@@ -17255,19 +17167,6 @@
       "actual": "109",
       "forecast": "99",
       "previous": "61"
-    },
-    {
-      "date": "6 May",
-      "dateISO": "2026-05-06",
-      "timeUTC": "13:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Musalem Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "6 May",
@@ -17307,45 +17206,6 @@
       "actual": "-2.504",
       "forecast": "-2.1",
       "previous": "-6.075"
-    },
-    {
-      "date": "6 May",
-      "dateISO": "2026-05-06",
-      "timeUTC": "17:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Goolsbee Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 May",
-      "dateISO": "2026-05-06",
-      "timeUTC": "17:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Hammack Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 May",
-      "dateISO": "2026-05-06",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "BoJ Monetary Policy Meeting Minutes",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "7 May",
@@ -20533,7 +20393,7 @@
       "event": "Current Account",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "-4.7",
       "previous": "-0.7"
     },
     {
@@ -20559,7 +20419,7 @@
       "event": "Corporate Profits QoQ Prel",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "5.7",
       "previous": "5.7"
     },
     {
@@ -20741,7 +20601,7 @@
       "event": "EIA Crude Oil Stocks Change",
       "impact": "medium",
       "actual": null,
-      "forecast": "-2.9*",
+      "forecast": "-5",
       "previous": "-7.864"
     },
     {
@@ -20754,7 +20614,7 @@
       "event": "EIA Gasoline Stocks Change",
       "impact": "medium",
       "actual": null,
-      "forecast": "-2.1*",
+      "forecast": "-3",
       "previous": "-1.548"
     },
     {
@@ -21926,6 +21786,253 @@
       "actual": null,
       "forecast": "-10.0*",
       "previous": "83"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "11:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "MBA 30-Year Mortgage Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "6.65"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Core Inflation Rate MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.3*",
+      "previous": "0.4"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Core Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.7*",
+      "previous": "2.8"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CPI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3%*",
+      "previous": "333.02"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CPI s.a",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3%*",
+      "previous": "332.407"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Inflation Rate MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.3*",
+      "previous": "0.6"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.7*",
+      "previous": "3.8"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "13:45",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "BoC Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "2.25"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "BoC Press Conference",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-2.9*",
+      "previous": "-7.864"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-2.1*",
+      "previous": "-1.548"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "18:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Monthly Budget Statement",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "215"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "23:01",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "RICS House Price Balance",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-25*",
+      "previous": "-34"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Deposit Facility Rate",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "2"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "2.15"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Core PPI MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3*",
+      "previous": "1"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Initial Jobless Claims",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "211*",
+      "previous": "209"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "PPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.3*",
+      "previous": "1.4"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB Press Conference",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     }
   ]
 }
