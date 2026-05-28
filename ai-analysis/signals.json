@@ -1,64 +1,69 @@
 {
-  "generated_at": "2026-05-28T01:21:50Z",
+  "generated_at": "2026-05-28T02:58:38Z",
   "signals": [
     {
-      "time": "01:19",
+      "time": "02:57",
       "priority": "critical",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ Hawkish Shift",
-      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ Governor Breman signaling the cash rate must rise further due to building inflationary pressures. With the RBNZ bias shifting toward a hike while specs remain net short, a significant short-squeeze risk is active. NZD/USD at 0.5910 faces immediate upside pressure if the committee formalizes this hawkish pivot.",
+      "text": "NZD/USD COT LF net short -15,435 (specs fading hawkishness) vs RBNZ Governor Breman signaling the cash rate must rise further as inflationary pressures build. With the market bias shifting toward a hike, the crowded spec short faces significant unwind risk. NZD/USD at 0.5894 remains supported by this hawkish pivot despite the 150bp nominal carry deficit vs USD.",
       "evidence": [
         "NZD COT LF net: -15,435",
-        "RBNZ Bias: Hike",
-        "NZD/USD: 0.5910"
+        "RBNZ Bias: Hike (Breman signal)",
+        "NZD/USD: 0.5894"
       ],
+      "watch_level": "Watch for a break above 0.5950 to confirm short-squeeze acceleration following the RBNZ meeting.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:16",
+      "time": "02:54",
       "priority": "warning",
-      "title": "NZD/CAD — G8 Bilateral Theme + RBNZ Hawkishness",
-      "text": "NZD outperformance (avg +0.604%) vs CAD weakness (avg -0.398%) creates a 1.002% G8 spread, the widest bilateral theme in the complex. The divergence is fundamentally driven by RBNZ Governor Breman's hike signals contrasting with a neutral BoC (2.25%). Despite the 1.002% spread, NZD faces a -75bp real rate deficit vs CAD (+0.18% vs -0.83%), suggesting the move is driven by policy delta rather than current carry.",
+      "title": "NZD/CAD — G8 Bilateral Theme + CB Divergence",
+      "text": "NZD/CAD spread at 0.810% identifies a dominant bilateral theme as NZD outperforms (+0.392% avg) while CAD lags (-0.418% avg). The divergence is fundamentally anchored by the RBNZ's hike signal vs the BoC's hold stance. Despite CAD's positive CESI (+8), the hawkish RBNZ shift overrides domestic data beats, driving NZD/CAD higher.",
       "evidence": [
-        "NZD 1W avg: +0.604% (n=4)",
-        "CAD 1W avg: -0.398% (n=3)",
-        "G8 spread: 1.002%"
+        "NZD 1W avg: +0.392% (n=4)",
+        "CAD 1W avg: -0.418% (n=3)",
+        "G8 spread: 0.810%"
       ],
+      "watch_level": "Watch for BoC meeting on 10 Jun to determine if CAD can recover on a hawkish hold.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:14",
+      "time": "02:52",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol + Carry",
-      "text": "AUD/USD COT LF net long +57,180 (74.5% long) represents a crowded institutional long, while retail sentiment (68% short) provides a contrarian divergence. Options markets are pricing extreme caution with a +8.6% Vol Risk Premium (IV 16.7% vs HV30 8.1%) and a -0.70 25d RR put skew. The 60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%) supports the pair at 0.7133, but the high VRP suggests the market is paying heavily for downside protection against a positioning unwind.",
+      "text": "AUD/USD at 0.7126 supported by a 60bp AONIA-SOFR carry premium and extreme COT LF net long +57,180 (74.5% long). However, IV at 16.7% vs HV30 at 8.2% creates a massive +8.5% VRP, signaling the options market is paying a heavy premium for downside protection. This suggests institutional hedging against a potential long-unwind despite the carry advantage.",
       "evidence": [
         "AUD COT LF net: +57,180",
-        "AUD/USD VRP: +8.6%",
-        "RBA 4.35% vs Fed 3.75% — 60bp"
+        "AUD/USD VRP: +8.5%",
+        "RBA 4.35% vs Fed 3.75%: -60bp"
       ],
+      "watch_level": "Watch for VRP compression or a break of 0.7100 to signal the start of a spec long liquidation.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:10",
+      "time": "02:49",
       "priority": "warning",
-      "title": "USD/JPY — Fed Rhetoric + Carry + Options Skew",
-      "text": "USD/JPY at 159.55 remains supported by a +300bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 0.75%). Fed Governor Cook's warning of possible rate hikes if inflation worsens reinforces the USD bid, while the 25d RR at -1.34 (put skew) confirms the options market is actively hedging for BoJ intervention as price tests the 160.00 threshold. JPY COT LF net short -81,624 indicates a crowded carry trade vulnerable to verbal intervention.",
+      "title": "USD/JPY — Carry + Options Skew + Intervention Risk",
+      "text": "USD/JPY at 159.57 remains bid on the 300bp Fed-BoJ carry advantage (SOFR 3.63% vs TONA 0.73%). However, 25d RR at -1.34 (Saxo) shows a moderate put skew, indicating the options market is pricing protection against a JPY rally as price tests the 160.00 psychological level. JPY COT LF net short -81,624 confirms a crowded carry trade vulnerable to verbal intervention.",
       "evidence": [
-        "USD/JPY: 159.55",
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "USD/JPY 25d RR: -1.34"
+        "USD/JPY Carry: +300bp",
+        "25d RR: -1.34 (put skew)",
+        "JPY COT LF net: -81,624"
       ],
+      "watch_level": "160.00 remains the critical level for BoJ verbal warnings or direct intervention.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:05",
+      "time": "02:45",
       "priority": "info",
-      "title": "DXY vs SPX — Correlation Break + USD Funding",
-      "text": "The correlation between DXY and S&P 500 has shifted to -0.643 vs a 252d norm of -0.333 (z=+1.81σ). This significant deviation indicates an intensified inverse relationship where USD is acting as a primary funding stress indicator. With VIX at 16.3 (normal volatility), the USD bid is currently driven by Fed hawkishness (Jefferson/Cook) rather than broad risk-off, but the tightening correlation increases DXY sensitivity to any equity drawdown.",
+      "title": "DXY vs SPX — Correlation Break + Funding Stress",
+      "text": "DXY vs SPX correlation at -0.641 vs 252d norm of -0.333 (z=+1.81σ) indicates a significant strengthening of the inverse relationship. This suggests the USD is increasingly functioning as a pure risk-off funding proxy; USD bid intensifies on any equity weakness. DXY at 99.35 is supported by this regime shift and a strong positive CESI (+23).",
       "evidence": [
-        "DXY vs SPX corr: -0.643",
-        "z-score: +1.81σ",
-        "VIX: 16.3"
+        "DXY vs SPX z-score: +1.81σ",
+        "USD CESI: +23 beats",
+        "DXY: 99.35"
       ],
+      "watch_level": "Watch for VIX exceeding 20.0 to confirm a transition into a high-volatility USD-bid regime.",
       "_source": "gemini:gemini-3-flash-preview"
     }
   ]
