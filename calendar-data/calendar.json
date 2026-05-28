@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-28T12:07:37Z",
-  "generatedAt": "2026-05-28T12:07:37Z",
+  "lastUpdate": "2026-05-28T12:31:34Z",
+  "generatedAt": "2026-05-28T12:31:34Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2025-05-28",
   "rangeTo": "2026-06-11",
-  "totalEvents": 1653,
+  "totalEvents": 1652,
   "currencyCounts": {
     "CHF": 92,
     "CAD": 132,
     "JPY": 186,
-    "NZD": 82,
-    "USD": 618,
+    "NZD": 83,
+    "USD": 617,
     "AUD": 173,
-    "GBP": 178,
+    "GBP": 177,
     "EUR": 192
   },
   "impactCounts": {
     "low": 151,
-    "medium": 1120,
+    "medium": 1119,
     "high": 382
   },
   "surpriseStats": {
@@ -497,9 +497,9 @@
       "std": 0.89374
     },
     "USD/initial jobless claims": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 5.567764
+      "n": 4,
+      "mean": -1.0,
+      "std": 4.966555
     }
   },
   "events": [
@@ -19994,19 +19994,6 @@
       "previous": null
     },
     {
-      "date": "25 May",
-      "dateISO": "2026-05-25",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Chicago Fed National Activity Index",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": "-0.2"
-    },
-    {
       "date": "26 May",
       "dateISO": "2026-05-26",
       "timeUTC": "10:00",
@@ -20217,19 +20204,6 @@
     {
       "date": "27 May",
       "dateISO": "2026-05-27",
-      "timeUTC": "10:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "CBI Distributive Trades",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "-60*",
-      "previous": "-68"
-    },
-    {
-      "date": "27 May",
-      "dateISO": "2026-05-27",
       "timeUTC": "11:00",
       "country": "USD",
       "currency": "USD",
@@ -20392,9 +20366,9 @@
       "flag": "🇨🇦",
       "event": "Current Account",
       "impact": "medium",
-      "actual": null,
+      "actual": "-7.2",
       "forecast": "-4.7",
-      "previous": "-0.7"
+      "previous": "-1"
     },
     {
       "date": "28 May",
@@ -20405,7 +20379,7 @@
       "flag": "🇺🇸",
       "event": "Core PCE Price Index MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.2",
       "forecast": "0.3",
       "previous": "0.3"
     },
@@ -20418,9 +20392,9 @@
       "flag": "🇺🇸",
       "event": "Corporate Profits QoQ Prel",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.4",
       "forecast": "5.7",
-      "previous": "5.7"
+      "previous": "4.7"
     },
     {
       "date": "28 May",
@@ -20431,9 +20405,9 @@
       "flag": "🇺🇸",
       "event": "Durable Goods Orders Ex Transp MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "1.1",
       "forecast": "0.5",
-      "previous": "0.9"
+      "previous": "1.1"
     },
     {
       "date": "28 May",
@@ -20444,9 +20418,9 @@
       "flag": "🇺🇸",
       "event": "Durable Goods Orders MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "7.9",
       "forecast": "3.5",
-      "previous": "0.8"
+      "previous": "1.3"
     },
     {
       "date": "28 May",
@@ -20457,7 +20431,7 @@
       "flag": "🇺🇸",
       "event": "GDP Growth Rate QoQ 2nd Est",
       "impact": "high",
-      "actual": null,
+      "actual": "1.6",
       "forecast": "2",
       "previous": "0.5"
     },
@@ -20470,7 +20444,7 @@
       "flag": "🇺🇸",
       "event": "GDP Price Index QoQ 2nd Est",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.5",
       "forecast": "4.5",
       "previous": "3.7"
     },
@@ -20483,9 +20457,9 @@
       "flag": "🇺🇸",
       "event": "Initial Jobless Claims",
       "impact": "medium",
-      "actual": null,
+      "actual": "215",
       "forecast": "211",
-      "previous": "209"
+      "previous": "210"
     },
     {
       "date": "28 May",
@@ -20496,7 +20470,7 @@
       "flag": "🇺🇸",
       "event": "PCE Price Index MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.4",
       "forecast": "0.5",
       "previous": "0.7"
     },
@@ -20509,7 +20483,7 @@
       "flag": "🇺🇸",
       "event": "PCE Price Index YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.8",
       "forecast": "3.8",
       "previous": "3.5"
     },
@@ -20522,7 +20496,7 @@
       "flag": "🇺🇸",
       "event": "Personal Income MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0",
       "forecast": "0.4",
       "previous": "0.6"
     },
@@ -20535,9 +20509,9 @@
       "flag": "🇺🇸",
       "event": "Personal Spending MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.5",
       "forecast": "0.5",
-      "previous": "0.9"
+      "previous": "1"
     },
     {
       "date": "28 May",
@@ -21278,7 +21252,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "-5*",
-      "previous": "-7.864"
+      "previous": "-2.8"
     },
     {
       "date": "3 Jun",
@@ -22046,6 +22020,19 @@
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "22:30",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "Business NZ PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "50.5"
     }
   ]
 }
