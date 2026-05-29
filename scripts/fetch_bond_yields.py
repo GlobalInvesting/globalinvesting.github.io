@@ -35,6 +35,7 @@ Source cascade per currency:
     EUR bond2y   → ECB SDMX YC daily SR_2Y (no key)                [REQUIRED]
     GBP bond10y  → BOE SDIE _iadb CSV    (daily, no key)           [REQUIRED]
                    FRED IRLTLT01GBM156N  (monthly, no key) [fallback]
+                   OECD SDMX GBR.IRLTLT01 (monthly, no key) [final fallback]
     GBP bond2y   → BOE SDIE _iadb CSV IUDMNPY (daily, no key)      [REQUIRED]
                    FRED IRLTST01GBM156N  (monthly, no key) [fallback]
     JPY bond10y  → ECB FM SDMX monthly   (no key)                  [REQUIRED]
@@ -411,19 +412,23 @@ def fetch_gbp(req_failures: list) -> None:
     print("\nGBP")
     data, dates = _load_existing("GBP")
 
-    print("  bond10y  (BOE SDIE _iadb:IUDMNZC daily → FRED:IRLTLT01GBM156N monthly)")
+    print("  bond10y  (BOE SDIE _iadb:IUDMNZC daily → FRED:IRLTLT01GBM156N monthly → OECD SDMX monthly)")
     dt, val = _boe_latest("IUDMNZC")
     source = "BOE-SDIE-daily"
     if val is None or not (0 < val < 20):
         print(f"    BOE SDIE miss (val={val}) — trying FRED IRLTLT01GBM156N")
         dt, val = _fred_csv_latest("IRLTLT01GBM156N")
         source = "FRED-monthly"
+    if val is None or not (0 < val < 20):
+        print(f"    FRED miss (val={val}) — trying OECD SDMX (UK 10Y long-term rate)")
+        dt, val = _oecd_sdmx_latest("OECD.SDD.STES,DSD_KEI@DF_KEI,4.0/M.GBR.IRLTLT01.ST")
+        source = "OECD-SDMX-monthly"
     if val is not None and 0 < val < 20:
         data["bond10y"]  = round(val, 4)
         dates["bond10y"] = dt
         print(f"    {val:.4f}%  ({dt})  [{source}]")
     else:
-        _gha_warning("GBP bond10y: all sources unavailable — keeping existing value")
+        _gha_warning("GBP bond10y: all sources unavailable (BOE SDIE, FRED, OECD) — keeping existing value")
         req_failures.append("GBP.bond10y")
 
     print("  bond2y  (BOE SDIE IUDMNPY → FRED:IRLTST01GBM156N)")
