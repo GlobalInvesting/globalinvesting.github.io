@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-29T06:48:22Z",
-  "generatedAt": "2026-05-29T06:48:22Z",
+  "lastUpdate": "2026-05-29T07:01:31Z",
+  "generatedAt": "2026-05-29T07:01:31Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -360,6 +360,11 @@
       "n": 2,
       "mean": 0.45,
       "std": 0.070711
+    },
+    "CHF/kof leading indicators": {
+      "n": 2,
+      "mean": -2.95,
+      "std": 4.17193
     },
     "EUR/consumer confidence final": {
       "n": 2,
@@ -20533,9 +20538,9 @@
       "flag": "🇨🇭",
       "event": "KOF Leading Indicators",
       "impact": "medium",
-      "actual": null,
+      "actual": "98",
       "forecast": "98",
-      "previous": "97.9"
+      "previous": "97.8"
     },
     {
       "date": "29 May",
