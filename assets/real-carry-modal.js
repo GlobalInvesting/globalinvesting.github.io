@@ -276,30 +276,15 @@ const _RCM_TTL = 15 * 60 * 1000; // 15-minute TTL (matches intraday-data cadence
 let _rcmActiveTab = 'breakdown';
 let _rcmActivePair = null;
 
-// ── FRED CSV fetch — non-blocking live enhancement ───────────────────────────
-// FRED provides public CSVs at: https://fred.stlouisfed.org/graph/fredgraph.csv?id=SERIES
-// Used to UPGRADE extended-data values with live market-implied breakevens for USD/EUR.
-// Called with a short timeout — never blocks the primary render path.
-// NOTE: cache:'default' intentionally allows the browser HTTP cache (typically 5-30min
-// for FRED responses) so repeated opens within a session avoid a redundant full download.
-async function _rcmFredLatest(seriesId) {
-  try {
-    const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${seriesId}`;
-    const r = await fetch(url); // cache:'default' — reuses browser HTTP cache when fresh
-    if (!r.ok) return { val: null, date: null };
-    const text = await r.text();
-    const lines = text.trim().split('\n').filter(l => !l.startsWith('DATE'));
-    for (let i = lines.length - 1; i >= 0; i--) {
-      const [date, val] = lines[i].split(',');
-      if (val && val.trim() !== '.' && val.trim() !== '') {
-        return { val: parseFloat(val), date: date.trim() };
-      }
-    }
-    return { val: null, date: null };
-  } catch {
-    return { val: null, date: null };
-  }
-}
+// ── FRED CSV fetch — REMOVED (v8.3.6) ────────────────────────────────────────
+// FRED's fredgraph.csv endpoint does not send Access-Control-Allow-Origin headers,
+// so browser fetch() calls are blocked by CORS policy. The live upgrade was a
+// no-op in production and generated console errors on every modal open.
+// Inflation expectations for USD/EUR are now sourced exclusively from the
+// server-side fetch_inflation_expectations.py run (extended-data/{USD,EUR}.json),
+// which runs via the update-inflation-expectations.yml workflow (weekly).
+// The extended-data values are already market-implied FRED breakevens (T5YIE/T5YIFR)
+// — fetched without CORS restriction on the server — so the live upgrade was redundant.
 
 // ── Data assembly ─────────────────────────────────────────────────────────────
 // Performance design (v1.5):
@@ -309,12 +294,9 @@ async function _rcmFredLatest(seriesId) {
 //             Same-origin requests share HTTP/2 multiplexing → typically 40-80ms total.
 //             Modal renders with full data as soon as Phase 1 completes.
 //
-//   PHASE 2 — FRED live upgrade (non-blocking, fire-and-forget).
-//             Runs concurrently with Phase 1 and races to finish.
-//             If FRED responds before Phase 1 completes → live values used in first render.
-//             If FRED is slow → extended-data values used in first render (no spinner gap),
-//             then a silent background patch replaces USD/EUR infl.exp with live values
-//             and re-renders the metrics bar + table without the user noticing a delay.
+//   PHASE 2 — removed in v8.3.6. FRED CORS policy blocks browser-side fetches.
+//             Inflation expectations for USD/EUR are served from extended-data/ directly
+//             (server-side fetch_inflation_expectations.py uses FRED API without CORS limits).
 //
 //   CACHE — timestamp-based TTL replaces the always-invalidate 15-min interval.
 //           _rcmData persists across modal opens for up to 15 min. The interval only
@@ -422,34 +404,9 @@ async function _rcmFetchData() {
       _rcmData = { nominalRates, inflExp, biasMap, hv30Map, realRates };
       _rcmFetchedAt = Date.now();
 
-      // ── PHASE 2: FRED live upgrade (non-blocking) ─────────────────────────
-      // Fire-and-forget. If FRED responds, silently upgrade USD/EUR infl.exp
-      // and re-render the metrics bar + breakdown table. No spinner shown.
-      Promise.all([
-        _rcmFredLatest('T5YIE'),
-        _rcmFredLatest('T5YIFR'),
-      ]).then(([fredUSD, fredEUR]) => {
-        if (!_rcmData) return; // cache was invalidated while FRED was in-flight
-        let upgraded = false;
-        if (fredUSD.val != null) {
-          _rcmData.inflExp['USD'] = { val: fredUSD.val, date: fredUSD.date, live: true };
-          upgraded = true;
-        }
-        if (fredEUR.val != null) {
-          _rcmData.inflExp['EUR'] = { val: fredEUR.val, date: fredEUR.date, live: true };
-          upgraded = true;
-        }
-        if (!upgraded) return;
-        // Recompute real rates for USD and EUR with live infl.exp
-        for (const ccy of ['USD', 'EUR']) {
-          const nom = _rcmData.nominalRates[ccy]?.rate;
-          const ie  = _rcmData.inflExp[ccy]?.val;
-          _rcmData.realRates[ccy] = (nom != null && ie != null) ? parseFloat((nom - ie).toFixed(3)) : null;
-        }
-        // Re-render only if the modal is currently open (avoid invisible background work)
-        const bd = document.getElementById('rcm-bd');
-        if (bd && bd.style.display !== 'none') _rcmRender();
-      }).catch(() => {}); // FRED failure is silent — extended-data values remain
+      // PHASE 2 (FRED live upgrade) removed in v8.3.6 — CORS policy blocks browser
+      // fetch to fred.stlouisfed.org. Inflation expectations now come exclusively from
+      // extended-data/{USD,EUR}.json (server-side FRED fetch, no CORS restriction).
 
     } finally {
       _rcmFetchPromise = null; // clear in-flight lock regardless of outcome
