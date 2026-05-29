@@ -4451,9 +4451,12 @@ async function _renderLWChart(ohlcId, label) {
         for(let i=0;i<bars.length;i++){
           const tk=tenkan(i,TK),kj=tenkan(i,KJ);
           if(i>=TK-1) tLine.push({time:bars[i].time,value:tk});
-          if(i>=KJ-1){kLine.push({time:bars[i].time,value:kj});sa.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:(tk+kj)/2});}
-          if(i>=SB2-1) sb.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:tenkan(i,SB2)});
-          if(i>=KJ-1)  cl.push({time:bars[Math.max(0,i-DISP)].time,value:bars[i].close});
+          if(i>=KJ-1){
+            kLine.push({time:bars[i].time,value:kj});
+            if(i+DISP<bars.length) sa.push({time:bars[i+DISP].time,value:(tk+kj)/2});
+          }
+          if(i>=SB2-1&&i+DISP<bars.length) sb.push({time:bars[i+DISP].time,value:tenkan(i,SB2)});
+          if(i>=KJ-1&&i>DISP) cl.push({time:bars[i-DISP].time,value:bars[i].close});
         }
         return [
           { data:tLine, color:_iC(id,0), lineWidth:1, label:'Tenkan' },
