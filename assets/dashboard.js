@@ -4295,13 +4295,13 @@ async function _renderLWChart(ohlcId, label) {
     // ── Oscillators ───────────────────────────────────────────────────────────
     { id:'rsi',      group:'Oscillators',     label:'RSI',               desc:'Relative Strength Index',                                type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#9c27b0'] },
     { id:'stoch',    group:'Oscillators',     label:'Stochastic',        desc:'Stochastic Oscillator',                                  type:'oscillator', defaultParams:{ k:14, d:3, smooth:3 },         paramDefs:[{key:'k',label:'%K',type:'int',min:1,max:100,step:1},{key:'smooth',label:'Smooth',type:'int',min:1,max:20,step:1},{key:'d',label:'%D',type:'int',min:1,max:20,step:1}], colors:['#2196f3','#ff9800'] },
-    { id:'macd',     group:'Oscillators',     label:'MACD',              desc:'MACD',                                                   type:'oscillator', defaultParams:{ fast:12, slow:26, signal:9 },  paramDefs:[{key:'fast',label:'Fast',type:'int',min:2,max:100,step:1},{key:'slow',label:'Slow',type:'int',min:2,max:200,step:1},{key:'signal',label:'Signal',type:'int',min:1,max:50,step:1}], colors:['#26a69a','#2196f3','#ff9800'] },
+    { id:'macd',     group:'Oscillators',     label:'MACD',              desc:'MACD',                                                   type:'oscillator', defaultParams:{ fast:12, slow:26, signal:9 },  paramDefs:[{key:'fast',label:'Fast',type:'int',min:2,max:100,step:1},{key:'slow',label:'Slow',type:'int',min:2,max:200,step:1},{key:'signal',label:'Signal',type:'int',min:1,max:50,step:1}], colors:['#26a69a','#2196f3','#ff9800'], histoIdx:[0] },
     { id:'cci',      group:'Oscillators',     label:'CCI',               desc:'Commodity Channel Index',                                type:'oscillator', defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#00bcd4'] },
     { id:'willr',    group:'Oscillators',     label:'Williams %R',       desc:'Williams %R',                                            type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#ff5722'] },
     { id:'roc',      group:'Oscillators',     label:'ROC',               desc:'Rate of Change',                                         type:'oscillator', defaultParams:{ period:12 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#4caf50'] },
     { id:'mom',      group:'Oscillators',     label:'Momentum',          desc:'Momentum',                                               type:'oscillator', defaultParams:{ period:10 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#9c27b0'] },
     { id:'mfi',      group:'Oscillators',     label:'MFI',               desc:'Money Flow Index (uses volume)',                         type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#03a9f4'] },
-    { id:'ao',       group:'Oscillators',     label:'Awesome Oscillator',desc:'Awesome Oscillator · 5/34',                              type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#26a69a'] },
+    { id:'ao',       group:'Oscillators',     label:'Awesome Oscillator',desc:'Awesome Oscillator · 5/34',                              type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#26a69a'], histoIdx:[0] },
     { id:'trix',     group:'Oscillators',     label:'TRIX',              desc:'Triple Smoothed EMA',                                    type:'oscillator', defaultParams:{ period:18 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#673ab7'] },
     { id:'dpo',      group:'Oscillators',     label:'DPO',               desc:'Detrended Price Oscillator',                             type:'oscillator', defaultParams:{ period:21 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#ff9800'] },
     { id:'uo',       group:'Oscillators',     label:'Ultimate Osc.',     desc:'Ultimate Oscillator · 7/14/28',                          type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#8bc34a'] },
@@ -4399,7 +4399,7 @@ async function _renderLWChart(ohlcId, label) {
         const { period:n, mult } = p;
         const ema   = _iEMA(closes, n);
         const tr    = _iTR(bars);
-        const atr   = _iRMA(tr, 10);
+        const atr   = _iRMA(tr, n);
         const upper = ema.map((v,i) => v + mult * atr[i]);
         const lower = ema.map((v,i) => v - mult * atr[i]);
         return [
@@ -4567,7 +4567,7 @@ async function _renderLWChart(ohlcId, label) {
         const off=34-1;
         const data=s34.map((v,i)=>{
           const ao=s5[i+(34-5)]-v;
-          const prev=i>0?s34[i-1]+s5[i+(34-5)-1]-s34[i-1]:ao;
+          const prev=i>0?s5[i+(34-5)-1]-s34[i-1]:ao;
           return{time:bars[off+i].time,value:parseFloat(ao.toFixed(6)),color:ao>=prev?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'};
         });
         return [{data,color:_iC(id,0),lineWidth:0,label:'AO',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]}];
@@ -5233,6 +5233,7 @@ async function _renderLWChart(ohlcId, label) {
           };
           const labels = seriesLabels[cfg.id] || cfg.colors.map((_,i) => `S${i+1}`);
           cfg.colors.forEach((_, ci) => {
+            if ((cfg.histoIdx || []).includes(ci)) return; // histogram bars use fixed green/red per-bar colors
             const sw = _makeColorSwatch(cfg.id, ci, labels[ci] || `Series ${ci+1}`);
             const lbl = document.createElement('span');
             lbl.style.cssText = 'color:#6b7280;font-size:9px;';
