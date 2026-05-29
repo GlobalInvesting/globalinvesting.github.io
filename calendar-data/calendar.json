@@ -1,191 +1,31 @@
 {
-  "lastUpdate": "2026-05-28T23:52:30Z",
-  "generatedAt": "2026-05-28T23:52:30Z",
+  "lastUpdate": "2026-05-29T00:00:33Z",
+  "generatedAt": "2026-05-29T00:00:33Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Finnhub",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-05-28",
-  "rangeTo": "2026-06-11",
-  "totalEvents": 1652,
+  "rangeFrom": "2025-05-29",
+  "rangeTo": "2026-06-12",
+  "totalEvents": 1650,
   "currencyCounts": {
-    "CHF": 92,
     "CAD": 132,
     "JPY": 186,
     "NZD": 83,
-    "USD": 617,
+    "CHF": 91,
+    "USD": 616,
     "AUD": 173,
-    "GBP": 177,
-    "EUR": 192
+    "GBP": 181,
+    "EUR": 188
   },
   "impactCounts": {
-    "low": 151,
-    "medium": 1119,
-    "high": 382
+    "medium": 1117,
+    "high": 383,
+    "low": 150
   },
   "surpriseStats": {
-    "GBP/gfk consumer confidence": {
-      "n": 4,
-      "mean": 0.75,
-      "std": 4.031129
-    },
-    "JPY/housing starts yoy": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 1.02632
-    },
-    "GBP/nationwide hpi": {
-      "n": 4,
-      "mean": 0.2,
-      "std": 0.11547
-    },
-    "CHF/cpi": {
-      "n": 2,
-      "mean": 0.1,
-      "std": 0.0
-    },
-    "CHF/kof leading indicators": {
-      "n": 2,
-      "mean": -2.35,
-      "std": 5.020458
-    },
-    "CHF/procure.ch manufacturing pmi": {
-      "n": 4,
-      "mean": 1.0,
-      "std": 4.221374
-    },
-    "EUR/hcob eurozone manufacturing pmi": {
-      "n": 3,
-      "mean": 0.666667,
-      "std": 1.154701
-    },
-    "EUR/hcob eurozone composite pmi": {
-      "n": 3,
-      "mean": -0.166667,
-      "std": 0.288675
-    },
-    "EUR/hcob eurozone services pmi": {
-      "n": 3,
-      "mean": -0.266667,
-      "std": 0.635085
-    },
-    "GBP/s&p global manufacturing pmi": {
-      "n": 3,
-      "mean": 0.266667,
-      "std": 0.981495
-    },
-    "GBP/s&p global composite pmi": {
-      "n": 3,
-      "mean": -0.733333,
-      "std": 0.92376
-    },
-    "GBP/s&p global services pmi": {
-      "n": 3,
-      "mean": -0.533333,
-      "std": 0.92376
-    },
-    "GBP/s&p global construction pmi": {
-      "n": 2,
-      "mean": -2.5,
-      "std": 0.0
-    },
-    "EUR/core cpi": {
-      "n": 6,
-      "mean": 0.15,
-      "std": 0.700714
-    },
-    "EUR/cpi": {
-      "n": 7,
-      "mean": 0.242857,
-      "std": 0.607885
-    },
-    "EUR/unemployment rate": {
-      "n": 3,
-      "mean": 0.2,
-      "std": 0.173205
-    },
-    "CAD/labor productivity": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "USD/core ppi": {
-      "n": 2,
-      "mean": 0.35,
-      "std": 0.212132
-    },
-    "USD/ppi": {
-      "n": 5,
-      "mean": 0.64,
-      "std": 0.654217
-    },
-    "USD/export price index": {
-      "n": 3,
-      "mean": 0.533333,
-      "std": 0.404145
-    },
-    "USD/import price index": {
-      "n": 3,
-      "mean": 0.166667,
-      "std": 0.46188
-    },
-    "USD/nonfarm productivity": {
-      "n": 3,
-      "mean": 0.266667,
-      "std": 1.096966
-    },
-    "USD/unit labor costs": {
-      "n": 3,
-      "mean": 1.066667,
-      "std": 0.46188
-    },
-    "USD/chicago pmi": {
-      "n": 2,
-      "mean": 1.75,
-      "std": 5.586144
-    },
-    "USD/s&p global manufacturing pmi": {
-      "n": 3,
-      "mean": 0.566667,
-      "std": 0.288675
-    },
-    "USD/s&p global composite pmi": {
-      "n": 2,
-      "mean": -0.4,
-      "std": 0.0
-    },
-    "USD/s&p global services pmi": {
-      "n": 3,
-      "mean": -0.7,
-      "std": 0.173205
-    },
-    "USD/construction spending": {
-      "n": 2,
-      "mean": -0.15,
-      "std": 0.353553
-    },
-    "USD/ism manufacturing employment": {
-      "n": 2,
-      "mean": 0.5,
-      "std": 0.0
-    },
-    "USD/ism manufacturing prices": {
-      "n": 2,
-      "mean": 9.9,
-      "std": 0.0
-    },
-    "USD/ism non-manufacturing prices": {
-      "n": 2,
-      "mean": -5.3,
-      "std": 0.0
-    },
-    "USD/atlanta fed gdpnow": {
-      "n": 7,
-      "mean": -0.157143,
-      "std": 0.457738
-    },
     "JPY/capital spending": {
       "n": 2,
       "mean": 3.5,
@@ -221,10 +61,100 @@
       "mean": -2.3,
       "std": 2.262742
     },
+    "GBP/nationwide hpi": {
+      "n": 2,
+      "mean": 0.2,
+      "std": 0.141421
+    },
+    "CHF/procure.ch manufacturing pmi": {
+      "n": 3,
+      "mean": 2.133333,
+      "std": 4.361575
+    },
+    "EUR/hcob eurozone manufacturing pmi": {
+      "n": 2,
+      "mean": 1.0,
+      "std": 1.414214
+    },
+    "GBP/s&p global manufacturing pmi": {
+      "n": 2,
+      "mean": 0.55,
+      "std": 1.202082
+    },
+    "USD/s&p global manufacturing pmi": {
+      "n": 2,
+      "mean": 0.65,
+      "std": 0.353553
+    },
     "USD/ism manufacturing pmi": {
       "n": 2,
       "mean": 0.45,
       "std": 0.353553
+    },
+    "USD/atlanta fed gdpnow": {
+      "n": 6,
+      "mean": -0.166667,
+      "std": 0.500666
+    },
+    "EUR/core cpi": {
+      "n": 5,
+      "mean": 0.14,
+      "std": 0.782943
+    },
+    "EUR/cpi": {
+      "n": 6,
+      "mean": 0.25,
+      "std": 0.665582
+    },
+    "EUR/hcob eurozone composite pmi": {
+      "n": 2,
+      "mean": -0.25,
+      "std": 0.353553
+    },
+    "EUR/hcob eurozone services pmi": {
+      "n": 2,
+      "mean": -0.45,
+      "std": 0.777817
+    },
+    "GBP/s&p global composite pmi": {
+      "n": 2,
+      "mean": -1.0,
+      "std": 1.131371
+    },
+    "GBP/s&p global services pmi": {
+      "n": 2,
+      "mean": -0.8,
+      "std": 1.131371
+    },
+    "EUR/unemployment rate": {
+      "n": 2,
+      "mean": 0.25,
+      "std": 0.212132
+    },
+    "USD/s&p global services pmi": {
+      "n": 2,
+      "mean": -0.75,
+      "std": 0.212132
+    },
+    "USD/export price index": {
+      "n": 2,
+      "mean": 0.65,
+      "std": 0.494975
+    },
+    "USD/import price index": {
+      "n": 2,
+      "mean": 0.3,
+      "std": 0.565685
+    },
+    "USD/nonfarm productivity": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 1.343503
+    },
+    "USD/unit labor costs": {
+      "n": 2,
+      "mean": 1.2,
+      "std": 0.565685
     },
     "GBP/halifax house price index": {
       "n": 2,
@@ -366,6 +296,11 @@
       "mean": 0.025,
       "std": 0.15
     },
+    "USD/ppi": {
+      "n": 4,
+      "mean": 0.75,
+      "std": 0.7
+    },
     "JPY/machinery orders": {
       "n": 2,
       "mean": 3.65,
@@ -411,6 +346,11 @@
       "mean": 0.203,
       "std": 4.247496
     },
+    "GBP/gfk consumer confidence": {
+      "n": 3,
+      "mean": 2.333333,
+      "std": 3.05505
+    },
     "USD/michigan consumer sentiment final": {
       "n": 3,
       "mean": -0.633333,
@@ -430,6 +370,11 @@
       "n": 3,
       "mean": -0.566667,
       "std": 1.484363
+    },
+    "JPY/housing starts yoy": {
+      "n": 2,
+      "mean": -0.5,
+      "std": 0.424264
     },
     "USD/cb consumer confidence": {
       "n": 3,
@@ -503,18 +448,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CHF",
-      "event": "Economic Sentiment Index",
-      "dateISO": "2025-05-28",
-      "hourUTC": "08:00",
-      "actual": "-22",
-      "forecast": null,
-      "previous": "-51.6",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
     {
       "currency": "CAD",
       "event": "Current Account",
@@ -17210,19 +17143,6 @@
     {
       "date": "7 May",
       "dateISO": "2026-05-07",
-      "timeUTC": "00:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "Local Elections",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "7 May",
-      "dateISO": "2026-05-07",
       "timeUTC": "01:30",
       "country": "AUD",
       "currency": "AUD",
@@ -17249,32 +17169,6 @@
     {
       "date": "7 May",
       "dateISO": "2026-05-07",
-      "timeUTC": "07:15",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB de Guindos Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "7 May",
-      "dateISO": "2026-05-07",
-      "timeUTC": "08:30",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "S&P Global Construction PMI",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "45.7",
-      "previous": "44.5"
-    },
-    {
-      "date": "7 May",
-      "dateISO": "2026-05-07",
       "timeUTC": "09:00",
       "country": "EUR",
       "currency": "EUR",
@@ -17284,19 +17178,6 @@
       "actual": "-0.1",
       "forecast": "-0.3",
       "previous": "-0.3"
-    },
-    {
-      "date": "7 May",
-      "dateISO": "2026-05-07",
-      "timeUTC": "12:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Elderson Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "7 May",
@@ -17336,58 +17217,6 @@
       "actual": "2.3",
       "forecast": "2.6",
       "previous": "4.6"
-    },
-    {
-      "date": "7 May",
-      "dateISO": "2026-05-07",
-      "timeUTC": "12:40",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Lane Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "7 May",
-      "dateISO": "2026-05-07",
-      "timeUTC": "17:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Schnabel Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "7 May",
-      "dateISO": "2026-05-07",
-      "timeUTC": "18:05",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Hammack Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "7 May",
-      "dateISO": "2026-05-07",
-      "timeUTC": "19:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Williams Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "8 May",
@@ -20276,7 +20105,7 @@
       "event": "ANZ Business Confidence",
       "impact": "medium",
       "actual": null,
-      "forecast": "5.0*",
+      "forecast": null,
       "previous": "-10.6"
     },
     {
@@ -20757,7 +20586,7 @@
       "event": "GDP MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.1",
+      "forecast": "0",
       "previous": "0.2"
     },
     {
@@ -20783,7 +20612,7 @@
       "event": "Goods Trade Balance Adv",
       "impact": "medium",
       "actual": null,
-      "forecast": "-87",
+      "forecast": "-86.5",
       "previous": "-87.45"
     },
     {
@@ -20848,7 +20677,7 @@
       "event": "Chicago PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": "49.7",
+      "forecast": "50.5",
       "previous": "49.2"
     },
     {
@@ -22033,6 +21862,97 @@
       "actual": null,
       "forecast": null,
       "previous": "50.5"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "GDP 3-Month Avg",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.6*",
+      "previous": "0.6"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "GDP MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-0.2*",
+      "previous": "0.3"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Goods Trade Balance",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-31.2B*",
+      "previous": "-27.22"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Goods Trade Balance Non-EU",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-31.2B*",
+      "previous": "-15.195"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Industrial Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.3*",
+      "previous": "-0.2"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Manufacturing Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.2*",
+      "previous": "1.2"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Michigan Consumer Sentiment Prel",
+      "impact": "high",
+      "actual": null,
+      "forecast": "48.2*",
+      "previous": "44.8"
     }
   ]
 }
