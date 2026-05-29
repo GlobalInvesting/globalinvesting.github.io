@@ -1,3 +1,8 @@
+// Disable browser scroll-position restoration so our explicit scrollTop = 0 calls
+// in boot() are never overridden by the browser restoring a previous scroll position.
+// Must be set before any scroll resets run. Standard pattern for dashboard/SPA pages.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
 // ═══════════════════════════════════════════════════════════════════
 // GLOBAL STATE
 // ═══════════════════════════════════════════════════════════════════
@@ -461,11 +466,12 @@ function populateFxPairsTable() {
     const ivStr = hv30val != null ? hv30val.toFixed(1) + '%' : '—';
 
     // Session High/Low — from intraday RT cache (STOOQ_RT_CACHE populated by yfinance JSON).
-    // On weekdays: intraday high/low for current session.
-    // On weekends: last Friday close values — shown dimmed per Bloomberg/Eikon convention.
+    // Prefer session_high/session_low (21:00 UTC FX session boundary, same as fetch_ohlc.py
+    // historical bars) over high/low (Yahoo UTC-midnight cutoff, which excludes Tokyo/Sydney
+    // open hours 21:00–23:59 UTC). Falls back to high/low if session values are null.
     const rtD = STOOQ_RT_CACHE[pair.id];
-    const sessH = (rtD?.high  != null) ? fmt(rtD.high,  pair.dec) : '—';
-    const sessL = (rtD?.low   != null) ? fmt(rtD.low,   pair.dec) : '—';
+    const sessH = (rtD?.session_high != null) ? fmt(rtD.session_high, pair.dec) : (rtD?.high != null) ? fmt(rtD.high, pair.dec) : '—';
+    const sessL = (rtD?.session_low  != null) ? fmt(rtD.session_low,  pair.dec) : (rtD?.low  != null) ? fmt(rtD.low,  pair.dec) : '—';
     const sessStyle = isWeekend ? 'color:var(--text3);font-size:10px' : 'color:var(--text1);font-size:10px';
 
     const rateFmt = rate != null ? fmt(rate, pair.dec) : '—';
@@ -496,6 +502,14 @@ function populateFxPairsTable() {
     upd.textContent = 'ECB · ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}) + ' ' + tzAbbr + (isWeekend ? ' · Last close: Fri' : '');
   }
 }
+
+// Throttle guard for populateHeatmap — Finnhub sends 2-5 ticks/second across 28 pairs.
+// Rebuilding the full heatmap grid on every tick causes visible jank.
+// Bloomberg convention: strength panels refresh at ~1s cadence, not per-tick.
+// The throttle limits DOM rebuilds to at most once per 800ms — fast enough to feel live,
+// cheap enough to never block the main thread.
+let _hmThrottleTimer = null;
+const _HM_THROTTLE_MS = 800;
 
 function populateHeatmap() {
   const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD'];
@@ -602,6 +616,33 @@ function populateHeatmap() {
       <span class="hm-val ${cls}">${sign}${s.pct.toFixed(2)}</span>
     </div>`;
   }).join('');
+
+  // ── Heatmap source label — reflects active data source (Finnhub live vs yfinance) ──
+  // Located in the panel subtitle below the heatmap title.
+  const _hasFhHm = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
+  const _hmSubEl = document.getElementById('hm-panel-sub');
+  if (_hmSubEl) {
+    _hmSubEl.textContent = _hasFhHm
+      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies'
+      : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies';
+  }
+
+  // ── Live-refresh open modal — if the heatmap modal is currently open, push ──
+  // the latest strengths and RT cache so all tabs reflect Finnhub live prices.
+  // Only refreshes the active tab to avoid jank on tabs the user isn't viewing.
+  if (typeof window._hmRefreshIfOpen === 'function') {
+    window._hmRefreshIfOpen(strengths, STOOQ_RT_CACHE);
+  }
+}
+
+// Throttled entry point — called by updateFxPairsTableRT() on every Finnhub tick.
+// Direct calls (boot, full refresh) bypass the throttle by calling populateHeatmap() directly.
+function populateHeatmapThrottled() {
+  if (_hmThrottleTimer) return; // already scheduled — skip
+  _hmThrottleTimer = setTimeout(() => {
+    _hmThrottleTimer = null;
+    populateHeatmap();
+  }, _HM_THROTTLE_MS);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -966,6 +1007,9 @@ async function fetchNewsData() {
     // ── NEWS TICKER
     buildNewsTicker(enItems);
 
+    // ── NEWS SECTION (dedicated panel below narrative — always hydrates so it is ready when opened)
+    renderNewsSection(enItems, data);
+
     // ── NEWS FEED (fill the full panel, up to 24 items)
     const feedEl = document.getElementById('news-feed-items');
     if (feedEl) {
@@ -1201,6 +1245,7 @@ function intradayQuote(cache, id) {
 
 // Cache for intraday RT rates — fed by yfinance JSON, used to update FX table + heatmap
 const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
+window.STOOQ_RT_CACHE = STOOQ_RT_CACHE;  // expose for fx-websocket.js (const doesn't auto-bind to window)
 
 // proxyUrls / proxyUrlsYahoo removed — all data now comes from
 // intraday-data/quotes.json (yfinance via GitHub Action, same-origin).
@@ -1303,6 +1348,20 @@ function updateFxPairsTableRT() {
         tds[4].textContent = '—';
         tds[4].className   = 'flat';
       }
+      // 1W Chg (tds[5]) — from pct1w in cache (prior-Friday-close convention).
+      // This column was previously only set in populateFxPairsTable() (initial render).
+      // Without updating it here, Finnhub ticks that call updateFxPairsTableRT()
+      // never refresh tds[5], so the 1W column stays stale until the next full
+      // page render. Fix: mirror the same pct1w logic as populateFxPairsTable().
+      if (tds[5]) {
+        if (data.pct1w != null) {
+          tds[5].textContent = pctStr(data.pct1w);
+          tds[5].className   = clsDir(data.pct1w);
+        } else {
+          tds[5].textContent = '—';
+          tds[5].className   = 'flat';
+        }
+      }
       // HV30: update if data is available in cache (column index 6)
       if (tds[6] && data.hv30 != null) {
         tds[6].textContent = data.hv30.toFixed(1) + '%';
@@ -1310,9 +1369,15 @@ function updateFxPairsTableRT() {
       // Fwd 1M (tds[7]) and Fwd 3M (tds[8]) — populated by renderCIPForwards()
       // RR 1M (tds[9]) — populated by renderRRSurface() from rr-data/rr.json
       // SESS H / SESS L — now at tds[10]/tds[11] due to 3 new columns
+      // Use session_high/session_low (21:00 UTC FX session boundary, same as fetch_ohlc.py)
+      // instead of high/low (UTC midnight cutoff, which misses the Tokyo/Sydney open hours
+      // 21:00–23:59 UTC of the prior calendar day). Falls back to high/low if session
+      // values are null (e.g. on weekend or if fetch_fx_session_hl() failed).
       const sessColor = _isWeekendRT ? 'var(--text3)' : 'var(--text1)';
-      if (tds[10]) { tds[10].textContent = (data.high != null) ? fmt(data.high, pairCfg.dec) : '—'; tds[10].style.color = sessColor; }
-      if (tds[11]) { tds[11].textContent = (data.low  != null) ? fmt(data.low,  pairCfg.dec) : '—'; tds[11].style.color = sessColor; }
+      const _sessH = data.session_high ?? data.high;
+      const _sessL = data.session_low  ?? data.low;
+      if (tds[10]) { tds[10].textContent = (_sessH != null) ? fmt(_sessH, pairCfg.dec) : '—'; tds[10].style.color = sessColor; }
+      if (tds[11]) { tds[11].textContent = (_sessL != null) ? fmt(_sessL, pairCfg.dec) : '—'; tds[11].style.color = sessColor; }
     });
   }
 
@@ -1358,8 +1423,8 @@ function updateFxPairsTableRT() {
   setCA_rt('gold', STOOQ_RT_CACHE['xauusd']);
   setCA_rt('wti',  STOOQ_RT_CACHE['wti']);
 
-  // ── Refresh heatmap with latest RT data ──
-  populateHeatmap();
+  // ── Refresh heatmap with latest RT data (throttled — Finnhub ~2-5 ticks/s) ──
+  populateHeatmapThrottled();
 
   // ── Timestamp ──
   const upd = document.getElementById('fx-table-updated');
@@ -1370,9 +1435,19 @@ function updateFxPairsTableRT() {
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
     const _rtDay = now.getUTCDay(), _rtH = now.getUTCHours();
     const _rtWeekend = _rtDay === 6 || (_rtDay === 0 && _rtH < 21) || (_rtDay === 5 && _rtH >= 21);
+    const _hasFinnhub = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
     upd.textContent = _rtWeekend
       ? `yfinance · Last close: Fri · ~5min delay`
-      : `yfinance · ${hh}:${mm} ${tzAbbr} · ~5min delay`;
+      : _hasFinnhub
+        ? `Finnhub · live`
+        : `yfinance · ${hh}:${mm} ${tzAbbr} · ~5min delay`;
+  }
+
+  // Update Price Chart panel-sub label to match active source
+  const _chartSub = document.querySelector('#section-fxpairs .panel-sub');
+  if (_chartSub && _chartSub.textContent !== 'TradingView \u00b7 live data') {
+    const _hasFh = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
+    _chartSub.textContent = _hasFh ? 'Finnhub \u00b7 live' : `yfinance \u00b7 ~5min delay`;
   }
 }
 
@@ -1529,7 +1604,16 @@ function renderSentiment(pairs, sourceLabel, general) {
       : Math.max(b.buy, b.sell) - Math.max(a.buy, a.sell)
   );
 
-  container.innerHTML = '';
+  // ── Compact table header ──
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px 3px;background:var(--head-bg);border-bottom:1px solid var(--border2);position:sticky;top:0;z-index:1;">
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);">Pair</span>
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);">Long / Short</span>
+      <span style="font-size:9px;color:var(--up);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);text-align:right;">L%</span>
+      <span style="font-size:9px;color:var(--down);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);text-align:right;">S%</span>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);text-align:center;"> </span>
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);text-align:right;">Pos</span>
+    </div>`;
 
   sorted.forEach(p => {
     const hasRich = p.totalPos > 0 && p.avgL > 0 && p.avgS > 0;
@@ -1553,7 +1637,6 @@ function renderSentiment(pairs, sourceLabel, general) {
         trapped   = domLong ? currentPrice < domAvg : currentPrice > domAvg;
         distPct   = (currentPrice - domAvg) / domAvg * 100;
         distPips  = Math.abs(Math.round((currentPrice - domAvg) * (domAvg > 20 ? 100 : 10000)));
-        // tick: map currentPrice into [min-1.5r … max+1.5r]
         const lo    = Math.min(p.avgL, p.avgS);
         const hi    = Math.max(p.avgL, p.avgS);
         const range = (hi - lo) || domAvg * 0.01;
@@ -1563,121 +1646,81 @@ function renderSentiment(pairs, sourceLabel, general) {
       }
     }
 
-    const distCol  = trapped ? 'var(--down)' : 'var(--up)';
     const distSign = distPct !== null && distPct >= 0 ? '+' : '';
-
-    // ── TV symbol: "EUR/USD" → "FX_IDC:EURUSD" ──
     const tvSym = 'FX_IDC:' + p.sym.replace('/', '');
 
-    // ── Outer wrapper: two-row layout ──
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'border-bottom:1px solid var(--border);padding:5px 0 4px;cursor:pointer;';
-    wrap.title = 'Click to open ' + p.sym + ' chart';
-    wrap.addEventListener('click', () => loadTVChart(tvSym));
+    // ── Compact single-row layout ──
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;';
+    // No row.title — the native browser tooltip overlaps the custom #fx-tt tooltips on child cells.
+    // Screen-reader label via aria-label instead.
+    row.setAttribute('aria-label', 'Click to open ' + p.sym + ' chart');
+    row.addEventListener('mouseenter', () => row.style.background = 'var(--bg3)');
+    row.addEventListener('mouseleave', () => row.style.background = '');
+    row.addEventListener('click', () => loadTVChart(tvSym));
 
-    // Row 1: sym | bar | %L %S bias
-    const row1 = document.createElement('div');
-    row1.style.cssText = 'display:grid;grid-template-columns:58px 1fr auto;align-items:center;gap:6px;';
-
-    // Sym + positions
+    // Col 1: Symbol
     const symDiv = document.createElement('div');
-    symDiv.style.cssText = 'display:flex;flex-direction:column;gap:1px;min-width:0;';
+    symDiv.style.cssText = 'display:flex;flex-direction:column;gap:0;';
     const symSpan = document.createElement('span');
-    symSpan.style.cssText = 'font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);white-space:nowrap;';
+    symSpan.style.cssText = 'font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);white-space:nowrap;line-height:1.2;';
     symSpan.textContent = p.sym;
     symDiv.appendChild(symSpan);
-
-    let posSpan = null;
+    // Sub-line: avg entry price + trapped/profit arrow
     if (hasRich) {
-      posSpan = document.createElement('span');
-      posSpan.style.cssText = 'font-size:9px;color:var(--text3);font-family:var(--font-ui);cursor:help;display:inline-block;';
-      posSpan.textContent = fmtK(p.totalPos) + ' pos';
-      symDiv.appendChild(posSpan);
+      const statusSpan = document.createElement('span');
+      const distCol2 = distPct !== null ? (trapped ? 'var(--down)' : 'var(--up)') : 'var(--text3)';
+      statusSpan.style.cssText = `font-size:8px;font-family:var(--font-mono);color:${distCol2};white-space:nowrap;line-height:1.2;`;
+      const avgStr = domAvg.toFixed(decimals);
+      const arrow = distPct !== null ? (trapped ? ' ▼' : ' ▲') : '';
+      statusSpan.textContent = avgStr + arrow;
+      symDiv.appendChild(statusSpan);
     }
 
-    // Bar
+    // Col 2: Bar (compact 6px height)
     const barDiv = document.createElement('div');
-    barDiv.style.cssText = 'position:relative;height:8px;background:var(--bg3);border-radius:1px;overflow:visible;cursor:help;';
+    barDiv.style.cssText = 'position:relative;height:6px;background:var(--bg3);border-radius:1px;overflow:visible;margin:0 4px;cursor:help;';
     barDiv.innerHTML = `
       <div style="position:absolute;left:0;top:0;height:100%;width:${p.buy}%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
-      <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
-    `;
+      <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>`;
 
-    // Tick element (separate so we can attach its own tooltip)
     let tickEl = null;
     if (tickPct !== null) {
       tickEl = document.createElement('div');
-      tickEl.style.cssText = `position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:${tickPct}%;transform:translateX(-1px);z-index:2;cursor:help;`;
+      tickEl.style.cssText = `position:absolute;top:-3px;width:2px;height:12px;background:#fff;opacity:.9;border-radius:1px;left:${tickPct}%;transform:translateX(-1px);z-index:2;cursor:help;`;
       barDiv.appendChild(tickEl);
     }
 
-    // Right block: %L %S bias
-    const rightDiv = document.createElement('div');
-    rightDiv.style.cssText = 'display:flex;align-items:center;gap:4px;flex-shrink:0;';
-
-    const buySpan  = document.createElement('span');
-    buySpan.style.cssText = 'font-size:10px;color:var(--up);font-family:var(--font-mono);cursor:help;';
+    // Col 3: % Long
+    const buySpan = document.createElement('span');
+    buySpan.style.cssText = 'font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right;cursor:help;';
     buySpan.textContent = p.buy + '%';
 
+    // Col 4: % Short
     const sellSpan = document.createElement('span');
-    sellSpan.style.cssText = 'font-size:10px;color:var(--down);font-family:var(--font-mono);cursor:help;';
+    sellSpan.style.cssText = 'font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right;cursor:help;';
     sellSpan.textContent = p.sell + '%';
 
+    // Col 5: Bias dot
     const biasSpan = document.createElement('span');
-    biasSpan.style.cssText = `font-size:9px;font-weight:700;color:${biasCol};font-family:var(--font-ui);min-width:10px;text-align:right;`;
+    biasSpan.style.cssText = `font-size:9px;font-weight:700;color:${biasCol};font-family:var(--font-ui);text-align:center;`;
     biasSpan.textContent = biasLbl;
 
-    rightDiv.append(buySpan, sellSpan, biasSpan);
-    row1.append(symDiv, barDiv, rightDiv);
-    wrap.appendChild(row1);
+    // Col 6: Positions
+    const posSpan = document.createElement('span');
+    posSpan.style.cssText = 'font-size:9px;color:var(--text3);font-family:var(--font-ui);text-align:right;white-space:nowrap;';
+    posSpan.textContent = hasRich ? fmtK(p.totalPos) : '—';
 
-    // Row 2: avg entry / dist info — show whenever we have rich data
-    if (hasRich) {
-      const row2 = document.createElement('div');
-      row2.style.cssText = 'display:grid;grid-template-columns:58px 1fr auto;gap:6px;margin-top:2px;';
+    row.append(symDiv, barDiv, buySpan, sellSpan, biasSpan, posSpan);
+    container.appendChild(row);
 
-      const distSpan = document.createElement('span');
-      distSpan.style.cssText = `font-size:9px;font-family:var(--font-mono);cursor:help;grid-column:2/4;`;
-
-      let distTitle, distBody, distEx;
-
-      if (distPct !== null) {
-        // Full dist: live price available
-        const distCol = trapped ? 'var(--down)' : 'var(--up)';
-        distSpan.style.color = distCol;
-        distSpan.innerHTML = `${trapped ? '▼' : '▲'} ${distSign}${distPct.toFixed(2)}% · ${distPips}pip · <span style="opacity:.7">${trapped ? 'trapped' : 'in profit'}</span>`;
-        const domSideTxt = domLong ? 'longs' : 'shorts';
-        distTitle = trapped ? 'Retail trapped' : 'Retail in profit';
-        distBody  = `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}. Current price: ${currentPrice.toFixed(decimals)}. They are ${trapped ? 'underwater (losing)' : 'in profit'}.`;
-        distEx    = trapped
-          ? 'If price continues against them, mass stop-outs can trigger a sharp move.'
-          : 'They may take profits soon, creating pressure in the opposite direction.';
-      } else {
-        // Partial: show avg entry without live price
-        const longDec = p.avgL > 20 ? 2 : 4;
-        const shortDec = p.avgS > 20 ? 2 : 4;
-        distSpan.style.color = 'var(--text3)';
-        distSpan.innerHTML = `avg L ${p.avgL.toFixed(longDec)} · S ${p.avgS.toFixed(shortDec)}`;
-        distTitle = 'Average entry price';
-        distBody  = `Retail longs entered at avg ${p.avgL.toFixed(longDec)}, shorts at avg ${p.avgS.toFixed(shortDec)}. Live price not available for this pair — trapped/profit status cannot be calculated.`;
-        distEx    = 'Compare these levels to the current chart price to assess whether the dominant side is underwater or in profit.';
-      }
-
-      attachTip(distSpan, distTitle, distBody, distEx);
-      row2.append(document.createElement('span'), distSpan);
-      wrap.appendChild(row2);
-    }
-
-    container.appendChild(wrap);
-
-    // ── Attach tooltips ──
-    if (posSpan) {
-      attachTip(posSpan,
-        'Open positions',
-        `Number of Myfxbook traders with ${p.sym} open right now. Higher count = more statistically representative.`,
-        `EUR/USD with 54K positions is the most-followed pair — mass stop-outs here move the market.`
-      );
-    }
+    // ── Tooltips ──
+    const domSideTxt = domLong ? 'longs' : 'shorts';
+    attachTip(symDiv,
+      'Click to open ' + p.sym + ' chart',
+      `Opens the ${p.sym} price chart. Retail positioning is most useful when cross-referenced with price action.`,
+      null
+    );
     attachTip(barDiv,
       'Long / Short bar',
       `Shows the split between retail buyers (green, left) and sellers (red, right). Extreme readings are often contrarian signals.`,
@@ -1690,16 +1733,30 @@ function renderSentiment(pairs, sourceLabel, general) {
         `Line to the left of center = price fell below where retail longs entered — they are underwater.`
       );
     }
-    attachTip(buySpan,
-      '% Long',
+    attachTip(buySpan, '% Long',
       `Percentage of retail traders currently holding long (buy) positions in ${p.sym}.`,
       `Readings above 70% long are unusual and often precede a drop as crowded longs get squeezed.`
     );
-    attachTip(sellSpan,
-      '% Short',
+    attachTip(sellSpan, '% Short',
       `Percentage of retail traders currently holding short (sell) positions in ${p.sym}.`,
       `Readings above 70% short are unusual and often precede a rally as crowded shorts get squeezed.`
     );
+    if (hasRich) {
+      attachTip(posSpan,
+        'Open positions',
+        `Number of Myfxbook traders with ${p.sym} open right now. Higher count = more statistically representative.`,
+        `EUR/USD with 54K positions is the most-followed pair — mass stop-outs here move the market.`
+      );
+    }
+    if (distPct !== null) {
+      const distEl = symDiv.lastChild;
+      const distTitle2 = trapped ? 'Retail trapped' : 'Retail in profit';
+      const distBody2  = `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}. Current price: ${currentPrice.toFixed(decimals)}. They are ${trapped ? 'underwater (losing)' : 'in profit'}.`;
+      const distEx2    = trapped
+        ? 'If price continues against them, mass stop-outs can trigger a sharp move.'
+        : 'They may take profits soon, creating pressure in the opposite direction.';
+      attachTip(distEl, distTitle2, distBody2, distEx2);
+    }
   });
 
   // ── General stats footer ──
@@ -1977,8 +2034,8 @@ function attachRiskMonitorTooltips() {
   const regCell = document.querySelector('#section-risk .risk-cell:nth-child(4)');
   if (regCell) attachRiskTip(regCell,
     'Market Regime',
-    'Composite live assessment: VIX level (primary driver), yield curve shape, gold intraday demand (>2% = stress signal), S&P 500 daily move (< -1.5% = stress), and MOVE index (>100 = elevated per BofA/ICE). Updates in real time.',
-    'RISK-ON: VIX <18, no stress signals active. MIXED: 1 stress factor (e.g. VIX 18–25). CAUTION: 2–3 factors. RISK-OFF: 4+ factors — high stress, USD/JPY/CHF bid, equities sold.'
+    'Composite live assessment: VIX level (primary driver), yield curve shape, gold intraday demand (>2% = stress signal), S&P 500 daily move (< -1.5% = stress), MOVE index (>100 = elevated per BofA/ICE), AUD/JPY intraday move (the canonical cross-asset risk barometer — sharp selloff >-1.5% = risk-off signal), and USD/JPY (yen safe-haven bid). Updates in real time.',
+    'RISK-ON: VIX <18, no stress signals active. MIXED: 1 stress factor (e.g. VIX 18–25). CAUTION: 2–3 factors. RISK-OFF: 4+ factors — high stress, USD/JPY/CHF bid, equities sold. Note: AUD/USD and NZD/USD falling modestly in isolation is normal when CBs diverge (RBA/RBNZ cuts) — AUD/JPY captures risk sentiment more cleanly.'
   );
 
   // ── Risk Indicators table rows ───────────────────────────────────
@@ -2116,14 +2173,17 @@ async function fetchRiskData() {
   // quotes.json (same-origin, GitHub Action) covers all needed symbols.
   if (_intradayData) {
     const _enrich2 = (id, guard) => { const q = intradayQuote(_intradayData, id); if (q && guard(q.close)) byId[id] = q; };
-    _enrich2('vix',   v => v > 5 && v < 100);
-    _enrich2('us10y', v => v > 0 && v < 20);
-    _enrich2('us2y',  v => v > 0 && v < 20);
-    _enrich2('us3m',  v => v > 0 && v < 20);
-    _enrich2('us5y',  v => v > 0 && v < 20);
-    _enrich2('us30y', v => v > 0 && v < 20);
-    _enrich2('dxy',   v => v > 50 && v < 130);
-    _enrich2('move',  v => v > 10 && v < 400);
+    _enrich2('vix',    v => v > 5 && v < 100);
+    _enrich2('us10y',  v => v > 0 && v < 20);
+    _enrich2('us2y',   v => v > 0 && v < 20);
+    _enrich2('us3m',   v => v > 0 && v < 20);
+    _enrich2('us5y',   v => v > 0 && v < 20);
+    _enrich2('us30y',  v => v > 0 && v < 20);
+    _enrich2('dxy',    v => v > 50 && v < 130);
+    _enrich2('move',   v => v > 10 && v < 400);
+    // FX risk proxies — used by regime scoring (AUD/JPY is the canonical cross-asset risk barometer)
+    _enrich2('audjpy', v => v > 50 && v < 150);
+    _enrich2('usdjpy', v => v > 80 && v < 200);
   }
 
   // ── STEP 3: Final render ──
@@ -2368,6 +2428,14 @@ async function renderRiskData(byId) {
     if (byId.spx && byId.spx.pct < -1.5) stressScore += 1;
     // MOVE index elevated = bond market stress (>100 = elevated per BofA/ICE; >120 is late-stage crisis)
     if (byId.move && byId.move.close > 100) stressScore += 1;
+    // AUD/JPY is the canonical cross-asset risk barometer (used by JPM, Deutsche Bank, Bloomberg).
+    // A move >-1.5% intraday signals genuine risk-off rotation (yen demand + AUD selling).
+    // Threshold calibrated to avoid false signals from CB divergence (RBA cuts, etc.)
+    // which typically produce moves of -0.3% to -0.8% in isolation.
+    if (byId.audjpy && byId.audjpy.pct < -1.5) stressScore += 1;
+    // USD/JPY falling sharply (>-1%) = yen safe-haven bid = confirms risk-off.
+    // Only add if AUD/JPY also weak to avoid double-counting pure USD moves.
+    if (byId.usdjpy && byId.usdjpy.pct < -1.0 && byId.audjpy && byId.audjpy.pct < -0.5) stressScore += 1;
 
     let regime, regimeSub;
     if (stressScore >= 4)      { regime = 'RISK-OFF'; regimeSub = `High stress · VIX ${vix.toFixed(1)}`; }
@@ -2756,6 +2824,9 @@ const _OHLC_FULL_NAMES = {
   nikkei:'Nikkei 225', stoxx:'Euro Stoxx 50', eth:'Ethereum / U.S. Dollar',
   dxy:'U.S. Dollar Index',
   vix:'CBOE Volatility Index',
+  silver:'Silver Futures', brent:'Crude Oil Brent Futures',
+  dax:'DAX Performance Index', ftse:'FTSE 100 Index',
+  hsi:'Hang Seng Index', dji:'Dow Jones Industrial Average',
 };
 
 const _TV_TO_OHLC = {
@@ -2773,16 +2844,32 @@ const _TV_TO_OHLC = {
   'FX_IDC:CADJPY': 'cadjpy',  'FX_IDC:CADCHF': 'cadchf',
   'FX_IDC:NZDJPY': 'nzdjpy',  'FX_IDC:NZDCAD': 'nzdcad',
   'FX_IDC:NZDCHF': 'nzdchf',  'FX_IDC:CHFJPY': 'chfjpy',
-  'CMCMARKETS:GOLDM2026': 'gold',
-  'FPMARKETS:WTI':        'wti',
+  // Metals
+  'OANDA:XAUUSD':         'gold',
+  'CMCMARKETS:GOLDM2026': 'gold',   // legacy alias
+  'OANDA:XAGUSD':         'silver',
+  // Energy
+  'OANDA:WTICOUSD':       'wti',
+  'FPMARKETS:WTI':        'wti',    // legacy alias
+  'OANDA:BCOUSD':         'brent',
+  // Crypto
   'BITSTAMP:BTCUSD':      'btc',
   'COINBASE:BTCUSD':      'btc',
+  // Yields
   'FRED:DGS10':           'us10y',
   // Equity indices
-  'CMCMARKETS:SPX500':    'spx',
-  'CFI:US100':            'nasdaq',
-  'OSE:NK2251!':          'nikkei',
-  'GOMARKETS:STOXX50':    'stoxx',
+  'FOREXCOM:SPXUSD':      'spx',
+  'CMCMARKETS:SPX500':    'spx',    // legacy alias
+  'FOREXCOM:NSXUSD':      'nasdaq',
+  'CFI:US100':            'nasdaq', // legacy alias
+  'INDEX:NI225':          'nikkei',
+  'OSE:NK2251!':          'nikkei', // legacy alias
+  'FOREXCOM:EU50':        'stoxx',
+  'GOMARKETS:STOXX50':    'stoxx',  // legacy alias
+  'FOREXCOM:DJI':         'dji',
+  'FOREXCOM:DEU40':       'dax',
+  'FOREXCOM:UK100':       'ftse',
+  'FOREXCOM:HKG33':       'hsi',
   // Crypto
   'BITSTAMP:ETHUSD':      'eth',
   'COINBASE:ETHUSD':      'eth',
@@ -2797,8 +2884,9 @@ const _TV_TO_OHLC = {
 // Human-readable labels for the chart source footer
 const _OHLC_LABELS = {
   gold: 'GC=F', wti: 'CL=F', btc: 'BTC-USD', us10y: '^TNX',
-  spx: '^GSPC', nasdaq: '^IXIC', nikkei: '^N225', stoxx: '^STOXX50E',
+  spx: '^GSPC', nasdaq: '^NDX', nikkei: '^N225', stoxx: '^STOXX50E',
   eth: 'ETH-USD', dxy: 'DX-Y.NYB', vix: '^VIX', move: '^MOVE',
+  silver: 'SI=F', brent: 'BZ=F', dax: '^GDAXI', ftse: '^FTSE', hsi: '^HSI', dji: '^DJI',
 };
 
 // Active LW chart instance — destroyed before each new render
@@ -2841,6 +2929,9 @@ function _destroyLWChart() {
   _lwActiveUpdateHeader = null;
   _lwActivePrevCloseMap = null;
   _lwLastJsonBarDate   = null;
+  _lwPeriodOpen = null;
+  _lwPeriodHigh = null;
+  _lwPeriodLow  = null;
 }
 
 // Compute MA(n) over close prices
@@ -2873,16 +2964,19 @@ function _lwBuildTodayBar(ohlcId) {
   const nowUTC = new Date();
   const dowUTC = nowUTC.getUTCDay(); // 0=Sun, 6=Sat
 
-  // FX markets are closed Saturday and Sunday — skip today-bar to avoid
+  // FX markets are closed Saturday and most of Sunday — skip today-bar to avoid
   // injecting a flat open=close phantom doji after the last real bar.
-  if (_LW_FX_IDS.has(ohlcId) && (dowUTC === 0 || dowUTC === 6)) return null;
+  // Exception: Sunday >= 21:00 UTC — the FX week opens (Sydney/Tokyo session).
+  const hourUTC = nowUTC.getUTCHours();
+  if (_LW_FX_IDS.has(ohlcId) && dowUTC === 6) return null;  // all Saturday
+  if (_LW_FX_IDS.has(ohlcId) && dowUTC === 0 && hourUTC < 21) return null;  // Sunday before open
 
   // FX Friday-after-close guard: after 21:00 UTC on Friday the session boundary
   // logic (hourUTC >= 21 → use tomorrow's date) produces dateStr = Saturday.
   // No FX session opens on Saturday — returning that bar creates a phantom May 9-type
   // candle that should not exist. The weekend guard above only catches Sat/Sun UTC days;
   // this closes the Friday-night gap window (21:00 UTC Fri → 00:00 UTC Sat).
-  if (_LW_FX_IDS.has(ohlcId) && dowUTC === 5 && nowUTC.getUTCHours() >= 21) return null;
+  if (_LW_FX_IDS.has(ohlcId) && dowUTC === 5 && hourUTC >= 21) return null;
 
   // STOOQ_RT_CACHE key for this ohlcId
   const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
@@ -2920,7 +3014,6 @@ function _lwBuildTodayBar(ohlcId) {
   // DXY (ICE): 22:00 UTC (17:00 EDT) / 23:00 UTC (17:00 EST) — same as FX but 1h later
   let dateStr;
   if (isFxBar) {
-    const hourUTC = nowUTC.getUTCHours();
     if (hourUTC >= 21) {
       // The FX session boundary is 21:00 UTC. A bar at or after 21:00 UTC belongs to
       // the session that will be dated TOMORROW in fetch_ohlc.py.
@@ -3012,7 +3105,8 @@ function _lwBuildTodayBar(ohlcId) {
                 eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
                 gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
                 audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
-                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
+                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3,
+                silver:2,brent:2,dax:2,ftse:2,hsi:2,dji:2 }[ohlcId] ?? 5;
   const c = parseFloat(q.close.toFixed(dec));
   // Candle open convention:
   //   FX pairs  → prev_close (open = last bar's close, consistent with Yahoo daily FX data
@@ -3051,6 +3145,23 @@ function _lwBuildTodayBar(ohlcId) {
     h = q.high != null && q.high > 0 ? parseFloat(q.high.toFixed(dec)) : Math.max(o, c);
     l = q.low  != null && q.low  > 0 ? parseFloat(q.low.toFixed(dec))  : Math.min(o, c);
   }
+  // ── W1/MN: override O/H/L with period-wide accumulated values ─────────────
+  // For W1/MN, o/h/l computed above from prev_close/session_high/session_low are
+  // wrong for these longer TFs:
+  //   open   → prev_close (yesterday close) instead of first D1 open of the period
+  //   high   → session_high (last 24h only)  instead of cumulative period high
+  //   low    → session_low  (last 24h only)  instead of cumulative period low
+  // _lwPeriodOpen/High/Low are snapshotted in _renderLWChart after W1/MN aggregation
+  // and hold exactly the values from the aggregated current-period bar (which covers
+  // all completed D1 bars in the period). Override here, then let the integrity clamp
+  // below extend the wick to include today's live close if it sets a new period extreme.
+  if ((_lwActiveTf === 'W1' || _lwActiveTf === 'MN') &&
+      _lwPeriodOpen != null && _lwPeriodHigh != null && _lwPeriodLow != null) {
+    o = parseFloat(_lwPeriodOpen.toFixed(dec));
+    h = parseFloat(_lwPeriodHigh.toFixed(dec));
+    l = parseFloat(_lwPeriodLow.toFixed(dec));
+  }
+
   // ── OHLC structural integrity clamp ──────────────────────────────────────
   // Guarantee H >= max(O,C) and L <= min(O,C) for every bar, regardless of source.
   // Root cause: the live today-bar uses prev_close as Open (correct for coloring the
@@ -3076,39 +3187,144 @@ function _lwBuildTodayBar(ohlcId) {
   // chart clean and avoid confusing "no change" labels.)
   if (isFxBar && o === h && h === l && l === c) return null;
 
-  return { time: dateStr, open: o, high: h, low: l, close: c };
+  // ── W1/MN period-key alignment ────────────────────────────────────────────
+  // W1 and MN bars are aggregated from D1 bars and keyed by ISO Monday
+  // (YYYY-MM-DD of Monday) and month start (YYYY-MM-01) respectively.
+  // dateStr above is a daily date (YYYY-MM-DD). If we pass it as-is to
+  // LWC update(), it won't match any existing aggregated bar and LWC will
+  // append a new orphan candle instead of updating the current period.
+  // Fix: remap dateStr to the period key that the aggregation uses.
+  let barTime = dateStr;
+  if (_lwActiveTf === 'W1') {
+    // ISO Monday of dateStr's week
+    const _d = new Date(dateStr + 'T00:00:00Z');
+    const _dow = _d.getUTCDay() || 7; // Mon=1 … Sun=7
+    const _mon = new Date(_d);
+    _mon.setUTCDate(_d.getUTCDate() - (_dow - 1));
+    barTime = _mon.toISOString().slice(0, 10);
+  } else if (_lwActiveTf === 'MN') {
+    // Month start key: YYYY-MM-01
+    barTime = dateStr.slice(0, 7) + '-01';
+  }
+
+  return { time: barTime, open: o, high: h, low: l, close: c };
 }
 
 // Push/update the live today-bar on the active LW chart (called every 5 min).
 // Safe to call when no chart is open — exits silently.
 function _lwUpdateTodayBar() {
   if (!_lwCandleSeries || !_lwActiveOhlcId) return;
+
+  // H1/H4 live partial-bar update
+  // H1/H4 bars come from static JSON files updated every hour Mon–Fri (:30 UTC).
+  // The JSON gap is at most 1 H1 period. The partial bar is the current incomplete block.
+  // We build a live partial bar from STOOQ_RT_CACHE:
+  //   time  = unix timestamp of the start of the current H1 or H4 UTC block
+  //   open  = close of the last completed H1/H4 bar in the JSON (Bloomberg standard)
+  //   high  = running block high since block start (resets at block boundary)
+  //   low   = running block low since block start (resets at block boundary)
+  //   close = live close from cache (Finnhub tick or yfinance 5-min poll)
+  // LightweightCharts.update() appends or replaces only the current block's bar --
+  // it never touches earlier completed bars. Completely safe.
+  if (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') {
+    const _isFxId = _LW_FX_IDS?.has(_lwActiveOhlcId) ?? false;
+    const _ck = _lwActiveOhlcId === 'gold' ? 'xauusd' : _lwActiveOhlcId;
+    const _rt = STOOQ_RT_CACHE[_ck];
+    if (!_rt?.close || !(_rt.close > 0)) return;
+
+    const _now = new Date();
+
+    // Compute the start of the current H1 or H4 block (aligned to UTC clock)
+    let _blockTs;
+    if (_lwActiveTf === 'H1') {
+      const _d = new Date(_now);
+      _d.setUTCMinutes(0, 0, 0);
+      _blockTs = Math.floor(_d.getTime() / 1000);
+    } else {
+      const _blockH = Math.floor(_now.getUTCHours() / 4) * 4;
+      const _d = new Date(_now);
+      _d.setUTCHours(_blockH, 0, 0, 0);
+      _blockTs = Math.floor(_d.getTime() / 1000);
+    }
+
+    // Skip weekend for FX (Sat all-day, Sun before 21:00 UTC, Fri after 21:00 UTC)
+    const _utcDay = _now.getUTCDay();
+    const _utcH   = _now.getUTCHours();
+    const _isFxWeekend = _isFxId && (
+      _utcDay === 6 ||
+      (_utcDay === 0 && _utcH < 21) ||
+      (_utcDay === 5 && _utcH >= 21)
+    );
+    if (_isFxWeekend) return;
+
+    const _c = _rt.close;
+    // Bloomberg institutional standard: H1/H4 open = close of the last completed bar
+    // in the JSON (the most recent finished H1/H4 candle), NOT the daily prev_close.
+    // Using prev_close (D-1 daily close) made the live bar's body span the entire
+    // trading session instead of just the current H1/H4 period — structurally wrong.
+    // _lwLastIntradayBarClose is set by _renderLWChart after setData() for H1/H4.
+    // Falls back to close (open=close, doji candle) if the bar hasn't been set yet.
+    const _o = (_lwLastIntradayBarClose != null && _lwLastIntradayBarClose > 0)
+      ? _lwLastIntradayBarClose
+      : _c;
+
+    // ── Per-block H/L tracking (Bloomberg standard for live partial bars) ──────
+    // session_high/session_low span the full 21:00 UTC trading session — using them
+    // for the current H1/H4 block would show the day's full range on the partial bar,
+    // which is structurally incorrect (a 14:00–15:00 bar showing the 05:00 session high).
+    // Instead, maintain running block H/L that resets at every block boundary.
+    if (_lwBlockTs !== _blockTs) {
+      // Block has rolled over — the previous block is now complete.
+      // Update _lwLastIntradayBarClose to the close of the completed block so the
+      // new block's open = last completed H1/H4 bar close (Bloomberg standard).
+      // Without this, _lwLastIntradayBarClose stays at the stale value from page-load
+      // for the entire session, making every subsequent hour's open wrong.
+      if (_lwBlockTs !== null && _c > 0) {
+        _lwLastIntradayBarClose = _c;
+      }
+      // Reset block H/L tracking to the current price at the rollover point.
+      _lwBlockHigh = _c;
+      _lwBlockLow  = _c;
+      _lwBlockTs   = _blockTs;
+    }
+    // Always update running H/L with the latest tick
+    _lwBlockHigh = Math.max(_lwBlockHigh ?? _c, _o, _c);
+    _lwBlockLow  = Math.min(_lwBlockLow  ?? _c, _o, _c);
+    const _h2 = _lwBlockHigh;
+    const _l2 = _lwBlockLow;
+    if (!(_h2 > 0 && _l2 > 0 && _h2 >= _l2)) return;
+
+    const _liveBar = { time: _blockTs, open: _o, high: _h2, low: _l2, close: _c };
+    try {
+      const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
+      _lwCandleSeries.update(_isLA ? { time: _blockTs, value: _c } : _liveBar);
+    } catch(_) {}
+
+    // Sync chart header % with RT data
+    if (_lwActiveUpdateHeader && _rt.pct != null && _lwActivePrevCloseMap) {
+      _lwActiveUpdateHeader(_liveBar, null, { pct: _rt.pct, chg: _rt.chg });
+    }
+    return;
+  }
+
+  // D1 / W1 / MN live today-bar (unchanged path)
   const bar = _lwBuildTodayBar(_lwActiveOhlcId);
   if (!bar) return;
   try {
-    // Line/Area series use {time, value} — not OHLC format
+    // Line/Area series use {time, value} -- not OHLC format
     const isLineArea = (window._lwChartType === 'line' || window._lwChartType === 'area');
     _lwCandleSeries.update(isLineArea ? { time: bar.time, value: bar.close } : bar);
   } catch(_) {}
 
-  // Sync the chart header % with yfinance RT data — DIRECT from rt.pct/rt.chg,
+  // Sync the chart header % with yfinance RT data -- DIRECT from rt.pct/rt.chg,
   // never recalculated from bar OHLC differences.
-  // Recalculating from bar close deltas causes divergence because:
-  //   • The JSON historical bars use a slightly different prev_close than yfinance's
-  //     regularMarketPreviousClose (timezone boundaries, fetch timing, rounding).
-  //   • On weekends FX has no today-bar — the last bar IS Friday's, and its prevClose
-  //     in the JSON (Thursday bar close) may differ from yfinance's official Thursday close.
-  // Using rt.pct directly guarantees the header matches the ticker/table exactly.
   if (_lwActiveUpdateHeader) {
     const cacheKey = _lwActiveOhlcId === 'gold' ? 'xauusd' : _lwActiveOhlcId;
     const rt = STOOQ_RT_CACHE[cacheKey];
     if (rt?.pct != null && rt.pct !== undefined && _lwActivePrevCloseMap) {
-      // Inject the yfinance-authoritative prevClose so _updateLWHeader calculates
-      // the correct % when called for crosshair hover on today's bar too.
       if (rt.open != null && rt.open > 0) {
         _lwActivePrevCloseMap.set(bar.time, rt.open);
       }
-      // Override the header % display directly with yfinance values
       _lwActiveUpdateHeader(bar, null, { pct: rt.pct, chg: rt.chg });
     } else {
       _lwActiveUpdateHeader(bar, null, null);
@@ -3136,13 +3352,26 @@ function _lwSetRange(days, totalBars) {
 
   // LW Charts v4.2: index 0 = FIRST bar, index (n-1) = LAST bar.
   if (n < 1) { ts.fitContent(); return; }
-  const tradingBars = Math.round(days * 5 / 7);
+
+  // Convert calendar days → logical bar count based on active timeframe.
+  let barsPerDay;
+  switch (_lwActiveTf) {
+    case 'H1': barsPerDay = 17;      break; // FX ~17 1H bars/calendar-day
+    case 'H4': barsPerDay = 4.25;    break; // FX ~4.25 H4 bars/calendar-day
+    case 'W1': barsPerDay = 1 / 7;   break; // 1 weekly bar per 7 days
+    case 'MN': barsPerDay = 1 / 30;  break; // 1 monthly bar per 30 days
+    default:   barsPerDay = 5 / 7;   break; // D1: 5 trading days per week
+  }
+  const tradingBars = Math.round(days * barsPerDay);
   const rightPad    = 8;
   const from = n - tradingBars - 1;
   const to   = n + rightPad - 1;
 
+  // If computed range would exceed total bars, just fitContent
+  if (tradingBars >= n) { ts.fitContent(); _lwActiveDays = days; return; }
+
   setTimeout(() => {
-    try { ts.setVisibleLogicalRange({ from, to }); } catch (_) { ts.fitContent(); }
+    try { ts.setVisibleLogicalRange({ from: Math.max(0, from), to }); } catch (_) { ts.fitContent(); }
   }, 30);
 
   document.querySelectorAll('.lw-range-btn').forEach(b => {
@@ -3152,6 +3381,29 @@ function _lwSetRange(days, totalBars) {
 }
 
 let _lwActiveDays = 91; // default: 3M (calendar days)
+let _lwActiveTf   = 'D1'; // active timeframe: H1 | H4 | D1 | W1 | MN
+let _lwCompareSeries = null;  // LineSeries for compare overlay
+let _lwCompareId     = null;  // ohlcId of the compared symbol
+// Fullscreen: DOM-lift vars are declared in the FS block below
+
+// Institutional standard: the open of a live H1/H4 partial bar = close of the last
+// completed bar in the JSON, not the daily prev_close.  Bloomberg H1: open = first
+// real tick of that hour = last bar's close.  Stored here after each setData() call
+// so _lwUpdateTodayBar() can use it without the bars array being in scope.
+let _lwLastIntradayBarClose = null; // set by _renderLWChart for H1/H4, null for D1+
+
+
+// Per-block H/L tracking for H1/H4 live partial bar (Bloomberg standard).
+// H1/H4 live bar H/L must reflect only the CURRENT incomplete block's tick range,
+// not the full session high/low (which spans the entire 21:00 UTC trading session).
+// These globals are reset whenever the block boundary changes and updated on every
+// Finnhub tick or yfinance poll — producing the correct intrabar range at all times.
+let _lwBlockHigh      = null; // running high within the current H1/H4 block
+let _lwBlockLow       = null; // running low within the current H1/H4 block
+let _lwBlockTs        = null; // unix ts of the current block start (detects rollovers)
+let _lwPeriodOpen     = null; // W1/MN: open of the current period (first D1 open) — set after W1/MN aggregation
+let _lwPeriodHigh     = null; // W1/MN: cumulative high of all D1 bars in the current period — set after W1/MN aggregation
+let _lwPeriodLow      = null; // W1/MN: cumulative low  of all D1 bars in the current period — set after W1/MN aggregation
 
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
@@ -3169,15 +3421,182 @@ async function _renderLWChart(ohlcId, label) {
   wrap.appendChild(loader);
 
   await _ensureLWLib();
-  const r = await fetch('./ohlc-data/' + ohlcId + '.json', { signal: AbortSignal.timeout(6000) });
+
+  // ── Resolve JSON path based on active timeframe ──────────────────────────────
+  // H1/H4: ohlc-data/h1/{id}.json or ohlc-data/h4/{id}.json (unix timestamp bars)
+  // D1/W1/MN: ohlc-data/{id}.json (YYYY-MM-DD date bars); W1/MN aggregated below
+  const _activeTf = _lwActiveTf;
+  const _isIntradayTf = (_activeTf === 'H1' || _activeTf === 'H4');
+  let _jsonPath;
+  if (_activeTf === 'H1')      _jsonPath = './ohlc-data/h1/' + ohlcId + '.json';
+  else if (_activeTf === 'H4') _jsonPath = './ohlc-data/h4/' + ohlcId + '.json';
+  else                         _jsonPath = './ohlc-data/' + ohlcId + '.json';
+
+  const r = await fetch(_jsonPath, { signal: AbortSignal.timeout(6000) });
   if (!r.ok) throw new Error('HTTP ' + r.status);
   let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
 
-  // Record the last bar date from the raw JSON (before any strip) so _lwBuildTodayBar
-  // can detect the 21:00–22:30 UTC gap window where the just-closed session bar is
-  // not yet present in the JSON (the OHLC workflow only runs at 22:30 UTC).
-  _lwLastJsonBarDate = bars[bars.length - 1]?.time ?? null;
+  // ── H1/H4 FX gap-fill via Cloudflare Worker /candles ─────────────────────────
+  // The JSON is updated every :30 UTC Mon–Fri. At worst, 1 completed H1 bar or
+  // 3 completed H4 bars are missing (bars that closed after the last workflow run
+  // but before the user opened the chart). This block fetches those missing completed
+  // bars from Finnhub via the CF Worker and splices them in before setData().
+  //
+  // Scope: FX pairs only (Finnhub OANDA covers exactly the 28 pairs in _LW_FX_IDS).
+  //        H1/H4 only (unix timestamp bars). Non-FX (gold, BTC, etc.) has no
+  //        Finnhub FX equivalent — their gap is handled by _lwUpdateTodayBar alone.
+  //
+  // Failure mode: silent — if the Worker is unreachable, returns empty, or times out
+  //               (1.5s budget), the chart renders normally with the JSON bars and
+  //               the live partial bar from _lwUpdateTodayBar. No user-visible error.
+  if (_isIntradayTf && _LW_FX_IDS.has(ohlcId)) {
+    try {
+      const _resolutionSec  = (_activeTf === 'H1') ? 3600 : 14400;
+      const _lastJsonTs     = bars[bars.length - 1].time;
+      const _nowUTC2        = new Date();
+      const _utcDow         = _nowUTC2.getUTCDay();
+      const _utcHr          = _nowUTC2.getUTCHours();
+
+      // Skip outside FX market hours
+      const _fxClosed = (
+        _utcDow === 6 ||
+        (_utcDow === 0 && _utcHr < 21) ||
+        (_utcDow === 5 && _utcHr >= 21)
+      );
+
+      // Current live block start (in-progress bar — must be excluded)
+      let _currentBlockTs;
+      if (_activeTf === 'H1') {
+        const _d = new Date(_nowUTC2);
+        _d.setUTCMinutes(0, 0, 0);
+        _currentBlockTs = Math.floor(_d.getTime() / 1000);
+      } else {
+        const _blockH = Math.floor(_nowUTC2.getUTCHours() / 4) * 4;
+        const _d = new Date(_nowUTC2);
+        _d.setUTCHours(_blockH, 0, 0, 0);
+        _currentBlockTs = Math.floor(_d.getTime() / 1000);
+      }
+
+      if (!_fxClosed) {
+        // ── Session start: most recent Sunday 21:00 UTC ───────────────────────
+        // We fetch Finnhub bars from session open to current block. This lets us:
+        // (a) replace yfinance artifact bars in the JSON (O≈L / C≈L artifacts that
+        //     occur in the first hours of the FX week), AND
+        // (b) fill any gap between the last JSON bar and the current live block.
+        // Finnhub OANDA data for the current session is consistently cleaner than
+        // the yfinance stub bars produced at session open.
+        const _daysSinceSun = _utcDow;                  // Sun=0, Mon=1 … Sat=6 — days since last Sunday
+        const _lastSun      = new Date(_nowUTC2);
+        _lastSun.setUTCDate(_nowUTC2.getUTCDate() - _daysSinceSun);
+        _lastSun.setUTCHours(21, 0, 0, 0);
+        // If the computed Sunday 21:00 is in the future (e.g. it's Sunday but before 21:00),
+        // step back 7 days — but _fxClosed already guards that case above.
+        const _sessionStartTs = Math.floor(_lastSun.getTime() / 1000);
+
+        // Only fire the fetch if there are bars in the current session window
+        // (avoids a request when session just opened and JSON already has today's bars)
+        const _sessionBarsInJson = bars.filter(b => b.time >= _sessionStartTs && b.time < _currentBlockTs);
+        const _expectedNextTs    = _lastJsonTs + _resolutionSec;
+        const _hasGap            = _expectedNextTs < _currentBlockTs;
+        const _sessionHasData    = _sessionBarsInJson.length > 0;
+
+        if (_sessionHasData || _hasGap) {
+          const _wsUrl      = (typeof FX_PROXY_WS_URL !== 'undefined') ? FX_PROXY_WS_URL : '';
+          const _candleBase = _wsUrl.replace(/^wss:\/\//, 'https://').replace(/\/ws$/, '');
+
+          if (_candleBase) {
+            const _resParam   = (_activeTf === 'H1') ? '60' : '240';
+            // Request from session start (to capture artifact bars) up to the current block
+            const _candleUrl  = `${_candleBase}/candles?id=${encodeURIComponent(ohlcId)}&resolution=${_resParam}&from=${_sessionStartTs}&to=${_currentBlockTs}`;
+
+            const _gapResp = await fetch(_candleUrl, { signal: AbortSignal.timeout(2000) });
+            if (_gapResp.ok) {
+              const _gapData = await _gapResp.json();
+              if (Array.isArray(_gapData.bars) && _gapData.bars.length > 0) {
+                // Validate bars: completed, within session window, sensible OHLC values
+                const _finnhubBars = _gapData.bars.filter(b =>
+                  b.time >= _sessionStartTs && b.time < _currentBlockTs &&
+                  b.open > 0 && b.high > 0 && b.low > 0 && b.close > 0 &&
+                  b.high >= b.open && b.high >= b.close &&
+                  b.low  <= b.open && b.low  <= b.close
+                );
+                if (_finnhubBars.length > 0) {
+                  _finnhubBars.sort((a, b) => a.time - b.time);
+                  // Build a timestamp Set for O(1) lookup
+                  const _finnhubTs = new Set(_finnhubBars.map(b => b.time));
+                  // Keep JSON bars that predate the session (historical) or are not
+                  // covered by Finnhub (non-FX session bars). Replace everything
+                  // within the session window that Finnhub returned.
+                  // Keep pre-session bars (historical, unaffected by artifacts).
+                  // Discard session bars covered by Finnhub (cleaner OANDA data).
+                  // Keep any in-session bars Finnhub didn't return (defensive).
+                  const _keptJsonBars = bars.filter(b =>
+                    b.time < _sessionStartTs ||
+                    (b.time >= _sessionStartTs && !_finnhubTs.has(b.time) && b.time < _currentBlockTs)
+                  );
+                  bars = [..._keptJsonBars, ..._finnhubBars].sort((a, b) => a.time - b.time);
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (_gapErr) {
+      // Silent fallback — if Worker unreachable/timeout, chart renders with JSON bars.
+      // _lwUpdateTodayBar() always covers the live block regardless.
+    }
+  }
+
+  // ── W1/MN aggregation from D1 bars ───────────────────────────────────────────
+  // For W1: group D1 bars by ISO week Monday. For MN: group by YYYY-MM-01.
+  // H1/H4 bars already have unix timestamps and need no aggregation.
+  if (_activeTf === 'W1' || _activeTf === 'MN') {
+    const agg = {};
+    for (const b of bars) {
+      let key;
+      if (_activeTf === 'W1') {
+        // ISO week Monday date
+        const d   = new Date(b.time + 'T00:00:00Z');
+        const dow = d.getUTCDay() || 7; // Mon=1 … Sun=7
+        const mon = new Date(d);
+        mon.setUTCDate(d.getUTCDate() - (dow - 1));
+        key = mon.toISOString().slice(0, 10);
+      } else {
+        key = b.time.slice(0, 7) + '-01'; // YYYY-MM-01
+      }
+      if (!agg[key]) {
+        agg[key] = { time: key, open: b.open, high: b.high, low: b.low, close: b.close };
+      } else {
+        const a   = agg[key];
+        a.high    = Math.max(a.high, b.high);
+        a.low     = Math.min(a.low,  b.low);
+        a.close   = b.close;
+      }
+    }
+    bars = Object.values(agg).sort((a, b) => a.time < b.time ? -1 : 1);
+    if (bars.length < 4) throw new Error('insufficient aggregated data');
+    // ── Snapshot current-period O/H/L for _lwBuildTodayBar ─────────────────
+    // The last aggregated bar IS the current incomplete period (it will be stripped
+    // below and replaced by the live today-bar). Capture its accumulated O/H/L now
+    // so _lwBuildTodayBar can produce a bar with the REAL period open and cumulative
+    // period H/L rather than prev_close + session H/L (today only).
+    const _curPeriodBar = bars[bars.length - 1];
+    _lwPeriodOpen = _curPeriodBar ? _curPeriodBar.open : null;
+    _lwPeriodHigh = _curPeriodBar ? _curPeriodBar.high : null;
+    _lwPeriodLow  = _curPeriodBar ? _curPeriodBar.low  : null;
+  }
+
+  // ── Today-bar strip and gap-window injection (D1/W1/MN only) ─────────────────
+  // For H1/H4 intraday TFs: bars have unix timestamps, no live today-bar to inject.
+  if (!_isIntradayTf) {
+  // _lwLastJsonBarDate was already set from raw D1 bars before W1/MN aggregation.
+  // For plain D1 TF (no aggregation), bars[] was never mutated — update it here too
+  // so D1 stays consistent. Skip for W1/MN: bars[] now holds aggregated period keys
+  // (e.g. '2026-05-01') which would make the gap-window stale check always fire.
+  if (_activeTf === 'D1') {
+    _lwLastJsonBarDate = bars[bars.length - 1]?.time ?? null;
+  }
 
   // ── Strip today-bar from JSON before setData ────────────────────────────────
   // fetch_ohlc.py keeps today's in-progress bar in the JSON. dashboard.js replaces
@@ -3293,6 +3712,7 @@ async function _renderLWChart(ohlcId, label) {
     // ── End gap-window prev-bar injection ───────────────────────────────────
   }
   // ── End today-bar strip ─────────────────────────────────────────────────────
+  } // end if (!_isIntradayTf)
 
   wrap.innerHTML = '';
 
@@ -3311,7 +3731,8 @@ async function _renderLWChart(ohlcId, label) {
                 eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
                 gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
                 audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
-                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
+                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3,
+                silver:2,brent:2,dax:2,ftse:2,hsi:2,dji:2 }[ohlcId] ?? 5;
   // minMove must match the precision: 5dp → 0.00001, 4dp → 0.0001, 3dp → 0.001, 2dp → 0.01
   const minMove = parseFloat((1 / Math.pow(10, dec)).toFixed(dec));
 
@@ -3481,7 +3902,26 @@ async function _renderLWChart(ohlcId, label) {
     candleSeries.setData(bars);
   }
 
-  // ── Volume histogram — lower panel (industry standard on Bloomberg, TradingView, FXCM) ──
+  // ── Store last completed bar close for H1/H4 live-bar open (Bloomberg standard) ──
+  // Bloomberg H1 open = first real tick of that hour = close of the last completed H1 bar.
+  // This is NOT the same as prev_close (daily close from D-1) which the previous version
+  // used incorrectly, causing the live bar's body to span the entire session instead of
+  // just the current hour. Reset to null for D1/W1/MN (those TFs use _lwBuildTodayBar).
+  if (_isIntradayTf && bars.length > 0) {
+    _lwLastIntradayBarClose = bars[bars.length - 1].close;
+  } else {
+    _lwLastIntradayBarClose = null;
+  }
+  // Reset per-block H/L on every chart load — the block tracking starts fresh
+  // from the first tick received, ensuring clean state after TF or symbol changes.
+  _lwBlockHigh  = null;
+  _lwBlockLow   = null;
+  _lwBlockTs    = null;
+  // _lwPeriodOpen/High/Low are NOT reset here — they were snapshotted earlier in this
+  // same _renderLWChart call (after W1/MN aggregation) and must survive for
+  // _lwBuildTodayBar to use. For non-W1/MN TFs they remain null from _destroyLWChart.
+
+
   // Uses separate priceScaleId 'volume' pinned to bottom 20% — clean Bloomberg-style presentation
   if (typeof window._lwShowVol === 'undefined') window._lwShowVol = false;
   let volumeSeries = null;
@@ -3535,7 +3975,17 @@ async function _renderLWChart(ohlcId, label) {
   // Always visible by default, toggle via PC button
   if (typeof window._lwShowPc === 'undefined') window._lwShowPc = true;
   let _prevCloseLine = null;
-  const _lastHistClose = bars.length > 1 ? bars[bars.length - 1].close : null;
+  // For D1: bars[-1] is the last completed day before strip — use its close.
+  // For W1/MN: bars[-1] is the current INCOMPLETE period (e.g. the May MN bar whose
+  // close = last D1 close in the JSON, not the true month close). The "Prev C" line
+  // should reflect the PREVIOUS completed period (e.g. April for MN), which is bars[-2].
+  // For H1/H4: _prevCloseLine is not shown (PC button is hidden for intraday TFs).
+  const _lastHistClose = (() => {
+    if (_activeTf === 'W1' || _activeTf === 'MN') {
+      return bars.length > 2 ? bars[bars.length - 2].close : null;
+    }
+    return bars.length > 1 ? bars[bars.length - 1].close : null;
+  })();
   function _applyPrevClose() {
     if (_prevCloseLine) { try { candleSeries.removePriceLine(_prevCloseLine); } catch(_) {} _prevCloseLine = null; }
     if (!window._lwShowPc || _lastHistClose == null) return;
@@ -3577,13 +4027,23 @@ async function _renderLWChart(ohlcId, label) {
   _lwCandleSeries = candleSeries;
   _lwActiveOhlcId = ohlcId;
 
-  // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated)
-  const todayBar = _lwBuildTodayBar(ohlcId);
-  if (todayBar) {
-    try {
-      const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
-      candleSeries.update(_isLA ? { time: todayBar.time, value: todayBar.close } : todayBar);
-    } catch(_) {}
+  // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated).
+  // For D1/W1/MN: _lwBuildTodayBar() constructs the bar.
+  // For H1/H4: _lwUpdateTodayBar() handles the live partial-bar injection directly
+  //            (block-aligned unix timestamp + per-block running H/L from ticks).
+  // todayBar hoisted to function scope — referenced further below for lastBar calculation
+  // regardless of TF. For H1/H4 it stays null (live bar pushed via _lwUpdateTodayBar).
+  let todayBar = null;
+  if (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') {
+    _lwUpdateTodayBar();
+  } else {
+    todayBar = _lwBuildTodayBar(ohlcId);
+    if (todayBar) {
+      try {
+        const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
+        candleSeries.update(_isLA ? { time: todayBar.time, value: todayBar.close } : todayBar);
+      } catch(_) {}
+    }
   }
 
   // ── Multi-MA legacy state cleanup — MA overlays now handled by Full Indicator Library ──
@@ -3835,13 +4295,13 @@ async function _renderLWChart(ohlcId, label) {
     // ── Oscillators ───────────────────────────────────────────────────────────
     { id:'rsi',      group:'Oscillators',     label:'RSI',               desc:'Relative Strength Index',                                type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#9c27b0'] },
     { id:'stoch',    group:'Oscillators',     label:'Stochastic',        desc:'Stochastic Oscillator',                                  type:'oscillator', defaultParams:{ k:14, d:3, smooth:3 },         paramDefs:[{key:'k',label:'%K',type:'int',min:1,max:100,step:1},{key:'smooth',label:'Smooth',type:'int',min:1,max:20,step:1},{key:'d',label:'%D',type:'int',min:1,max:20,step:1}], colors:['#2196f3','#ff9800'] },
-    { id:'macd',     group:'Oscillators',     label:'MACD',              desc:'MACD',                                                   type:'oscillator', defaultParams:{ fast:12, slow:26, signal:9 },  paramDefs:[{key:'fast',label:'Fast',type:'int',min:2,max:100,step:1},{key:'slow',label:'Slow',type:'int',min:2,max:200,step:1},{key:'signal',label:'Signal',type:'int',min:1,max:50,step:1}], colors:['#26a69a','#2196f3','#ff9800'] },
+    { id:'macd',     group:'Oscillators',     label:'MACD',              desc:'MACD',                                                   type:'oscillator', defaultParams:{ fast:12, slow:26, signal:9 },  paramDefs:[{key:'fast',label:'Fast',type:'int',min:2,max:100,step:1},{key:'slow',label:'Slow',type:'int',min:2,max:200,step:1},{key:'signal',label:'Signal',type:'int',min:1,max:50,step:1}], colors:['#26a69a','#2196f3','#ff9800'], histoIdx:[0] },
     { id:'cci',      group:'Oscillators',     label:'CCI',               desc:'Commodity Channel Index',                                type:'oscillator', defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#00bcd4'] },
     { id:'willr',    group:'Oscillators',     label:'Williams %R',       desc:'Williams %R',                                            type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#ff5722'] },
     { id:'roc',      group:'Oscillators',     label:'ROC',               desc:'Rate of Change',                                         type:'oscillator', defaultParams:{ period:12 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#4caf50'] },
     { id:'mom',      group:'Oscillators',     label:'Momentum',          desc:'Momentum',                                               type:'oscillator', defaultParams:{ period:10 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#9c27b0'] },
     { id:'mfi',      group:'Oscillators',     label:'MFI',               desc:'Money Flow Index (uses volume)',                         type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#03a9f4'] },
-    { id:'ao',       group:'Oscillators',     label:'Awesome Oscillator',desc:'Awesome Oscillator · 5/34',                              type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#26a69a'] },
+    { id:'ao',       group:'Oscillators',     label:'Awesome Oscillator',desc:'Awesome Oscillator · 5/34',                              type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#26a69a'], histoIdx:[0] },
     { id:'trix',     group:'Oscillators',     label:'TRIX',              desc:'Triple Smoothed EMA',                                    type:'oscillator', defaultParams:{ period:18 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#673ab7'] },
     { id:'dpo',      group:'Oscillators',     label:'DPO',               desc:'Detrended Price Oscillator',                             type:'oscillator', defaultParams:{ period:21 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#ff9800'] },
     { id:'uo',       group:'Oscillators',     label:'Ultimate Osc.',     desc:'Ultimate Oscillator · 7/14/28',                          type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#8bc34a'] },
@@ -3939,7 +4399,7 @@ async function _renderLWChart(ohlcId, label) {
         const { period:n, mult } = p;
         const ema   = _iEMA(closes, n);
         const tr    = _iTR(bars);
-        const atr   = _iRMA(tr, 10);
+        const atr   = _iRMA(tr, n);
         const upper = ema.map((v,i) => v + mult * atr[i]);
         const lower = ema.map((v,i) => v - mult * atr[i]);
         return [
@@ -3991,9 +4451,12 @@ async function _renderLWChart(ohlcId, label) {
         for(let i=0;i<bars.length;i++){
           const tk=tenkan(i,TK),kj=tenkan(i,KJ);
           if(i>=TK-1) tLine.push({time:bars[i].time,value:tk});
-          if(i>=KJ-1){kLine.push({time:bars[i].time,value:kj});sa.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:(tk+kj)/2});}
-          if(i>=SB2-1) sb.push({time:bars[Math.min(i+DISP,bars.length-1)].time,value:tenkan(i,SB2)});
-          if(i>=KJ-1)  cl.push({time:bars[Math.max(0,i-DISP)].time,value:bars[i].close});
+          if(i>=KJ-1){
+            kLine.push({time:bars[i].time,value:kj});
+            if(i+DISP<bars.length) sa.push({time:bars[i+DISP].time,value:(tk+kj)/2});
+          }
+          if(i>=SB2-1&&i+DISP<bars.length) sb.push({time:bars[i+DISP].time,value:tenkan(i,SB2)});
+          if(i>=KJ-1&&i>DISP) cl.push({time:bars[i-DISP].time,value:bars[i].close});
         }
         return [
           { data:tLine, color:_iC(id,0), lineWidth:1, label:'Tenkan' },
@@ -4034,15 +4497,17 @@ async function _renderLWChart(ohlcId, label) {
         const { fast, slow, signal:sig } = p;
         const ef=_iEMA(closes,fast), es=_iEMA(closes,slow);
         const ml=ef.map((v,i)=>v-es[i]);
+        // sl2 = EMA of MACD line starting from bar (slow-1).
+        // sl2[j] corresponds to bars index (slow-1+j), so for bar i use sl2[si] where si=i-(slow-1).
         const sl2=_iEMA(ml.slice(slow-1),sig);
         const offset=slow-1+sig-1;
         const macdD=[],sigD=[],histD=[];
         for(let i=offset;i<bars.length;i++){
-          const si=i-(slow-1),sgi=si-(sig-1);
-          const m=ml[i],s=sl2[sgi],h=m-s;
+          const si=i-(slow-1); // sl2 index aligned to bar i
+          const m=ml[i],s=sl2[si],h=m-s;
           macdD.push({time:bars[i].time,value:parseFloat(m.toFixed(6))});
           sigD.push( {time:bars[i].time,value:parseFloat(s.toFixed(6))});
-          histD.push({time:bars[i].time,value:parseFloat(h.toFixed(6)),color:h>=0?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'});
+          const hBase=_iC(id,0);histD.push({time:bars[i].time,value:parseFloat(h.toFixed(6)),color:h>=0?hBase:'rgba(239,83,80,0.7)'});
         }
         return [
           {data:histD,color:_iC(id,0),lineWidth:0,label:'Hist',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]},
@@ -4105,8 +4570,8 @@ async function _renderLWChart(ohlcId, label) {
         const off=34-1;
         const data=s34.map((v,i)=>{
           const ao=s5[i+(34-5)]-v;
-          const prev=i>0?s34[i-1]+s5[i+(34-5)-1]-s34[i-1]:ao;
-          return{time:bars[off+i].time,value:parseFloat(ao.toFixed(6)),color:ao>=prev?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'};
+          const prev=i>0?s5[i+(34-5)-1]-s34[i-1]:ao;
+          const aoBase=_iC(id,0);return{time:bars[off+i].time,value:parseFloat(ao.toFixed(6)),color:ao>=prev?aoBase:'rgba(239,83,80,0.7)'};
         });
         return [{data,color:_iC(id,0),lineWidth:0,label:'AO',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]}];
       }
@@ -4656,7 +5121,13 @@ async function _renderLWChart(ohlcId, label) {
         _saveIndParams();
         // Live-update series color if active
         if (window._lwIndState[id] && window._indSeries && window._indSeries[id] && window._indSeries[id][i]) {
-          try { window._indSeries[id][i].applyOptions({ color: e.target.value }); } catch(_) {}
+          const cfg2 = _IND_CATALOGUE.find(c => c.id === id);
+          if ((cfg2?.histoIdx || []).includes(i)) {
+            // Histogram uses per-bar colors — rebuild the whole pane to pick up new color
+            try { _buildIndicatorPane(id); } catch(_) {}
+          } else {
+            try { window._indSeries[id][i].applyOptions({ color: e.target.value }); } catch(_) {}
+          }
         }
       });
       wrap.appendChild(swatch);
@@ -4843,7 +5314,7 @@ async function _renderLWChart(ohlcId, label) {
     const lEl    = document.getElementById('lw-hdr-l-val');
     const cEl    = document.getElementById('lw-hdr-c-val');
     const chgEl  = document.getElementById('lw-hdr-chg-val');
-    if (symEl) symEl.textContent = (_OHLC_FULL_NAMES[ohlcId] || label) + ' \u00b7 1D';
+    if (symEl) symEl.textContent = (_OHLC_FULL_NAMES[ohlcId] || label) + ' \u00b7 ' + _lwActiveTf;
     if (bar) {
       // Determine direction first so O/H/L/C all share the same color (industry standard)
       let isUp;
@@ -4908,9 +5379,12 @@ async function _renderLWChart(ohlcId, label) {
   const lastBar = todayBar || (bars.length > 0 ? bars[bars.length - 1] : null);
   _updateLWHeader(lastBar, null, _getRtOverride());
 
-  // Update panel-sub to reflect yfinance source
+  // Update panel-sub to reflect active data source
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
-  if (panelSub) panelSub.textContent = 'yfinance \u00b7 ~5min delay';
+  if (panelSub) {
+    const _hasFinnhubLive = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
+    panelSub.textContent = _hasFinnhubLive ? 'Finnhub \u00b7 live' : 'yfinance \u00b7 ~5min delay';
+  }
 
   // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
   // ── CB Meeting floating tooltip — TradingView floating-tooltip pattern ────
@@ -5020,6 +5494,13 @@ async function _renderLWChart(ohlcId, label) {
   const rangeBar = document.getElementById('lw-range-bar');
   if (rangeBar) {
     rangeBar.style.display = 'flex';
+    // Sync TF selector
+    rangeBar.querySelectorAll('.lw-tf-btn').forEach(b => {
+      b.classList.toggle('sel', b.dataset.tf === _lwActiveTf);
+    });
+    // Rebuild range buttons for the current TF
+    _lwUpdateRangeBtns();
+    // Sync active range button
     rangeBar.querySelectorAll('.lw-range-btn').forEach(b => {
       b.classList.toggle('active', parseInt(b.dataset.days) === _lwActiveDays);
     });
@@ -5097,7 +5578,7 @@ function _loadTVWidgetFallback(sym) {
   const hdrEl = document.getElementById('lw-chart-header');
   if (hdrEl) hdrEl.style.display = 'none';
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
-  if (panelSub) panelSub.textContent = 'Interactive chart \u00b7 live data';
+  if (panelSub) panelSub.textContent = 'TradingView \u00b7 live data';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
   container.style.cssText = 'height:100%;width:100%;';
@@ -5143,7 +5624,11 @@ function loadTVChart(sym) {
     const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
     _renderLWChart(ohlcId, label)
       .then(() => { if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
-      .catch(() => {
+      .catch(err => {
+        // Log the real exception — primary diagnostic for the TV-fallback regression.
+        // Without this log the error was silently swallowed and the TV widget loaded
+        // with no console trace of the root cause.
+        console.error('[LWChart] _renderLWChart failed for', ohlcId, '—', err);
         _loadTVWidgetFallback(sym);
         if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
@@ -6434,7 +6919,7 @@ async function fetchCarryRanking() {
       sbHead.style.cursor = 'help';
       const tipTitle = hasRealCarryData ? 'Real Carry Ranking' : 'CB Rate Differential';
       const tipBody  = hasRealCarryData
-        ? 'Ranked by real carry: nominal OIS rate differential minus the inflation expectations differential between the two legs (= real rate long − real rate short). Tiebreak: carry-to-vol (carry per unit of HV30 risk). Click any row for full real rate breakdown.'
+        ? 'Ranked by real carry: nominal OIS rate differential minus the inflation expectations differential between the two legs (= real rate long − real rate short). Tiebreak: carry-to-vol (carry per unit of HV30 risk). Industry standard per Bloomberg FXFR. Click any row for full real rate breakdown.'
         : 'CB policy rate differential (%) between the long and short leg. Real carry ranking requires inflation expectations data (unavailable). Click any row for real rate analysis.';
       const tipEx = hasRealCarryData
         ? 'Example: GBP/CHF nominal +3.77% − (BoE infl.exp 3.45% − SNB infl.exp 0.31%) = real carry +0.63%. Positive = long leg earns positive real carry after purchasing power adjustment.'
@@ -7019,7 +7504,7 @@ async function fetchOptionSkew() {
       { pair:'AUD/USD', cot:'AUD', etfId:'audusd', rrKey:'AUDUSD' },
       { pair:'USD/CAD', cot:'CAD', etfId:'usdcad',  rrKey:'USDCAD' },
       { pair:'USD/CHF', cot:'CHF', etfId:'usdchf',  rrKey:'USDCHF' },
-      { pair:'NZD/USD', cot:'NZD', etfId:null,     rrKey:null     },
+      { pair:'NZD/USD', cot:'NZD', etfId:null,     rrKey:'NZDUSD' },
     ];
 
     // ── SOURCE 1: ETF IV from intraday quotes.json (primary) ──
@@ -7605,6 +8090,8 @@ async function boot() {
   // Awaited here so populateFxPairsTable finds the RT cache ready when it renders.
   window._quotesReadyPromise = fetchQuoteBarRT();
   await window._quotesReadyPromise;
+  if (typeof initFxWebSocket === 'function') initFxWebSocket();
+  await window._quotesReadyPromise;
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
   populateCorrelations(); // 60-day rolling correlations from quotes.json
 
@@ -7632,8 +8119,27 @@ async function boot() {
   fetchRiskData();
   fetchCrossAssetData();
   fetchCommodityQuotes();
-  buildRichNarrative();              // AI narrative full build (non-blocking, fills narrative text)
+  // AI narrative full build (non-blocking, fills narrative text).
+  // Chain a post-resolve scroll reset: injecting the full narrative text expands
+  // #narrative's height, which can cause the browser to scroll #main down to
+  // maintain the visual position of content below it. Resetting scrollTop after
+  // the text is injected ensures the narrative is always visible on load.
+  buildRichNarrative().then(() => {
+    const _m = document.getElementById('main');
+    if (_m) _m.scrollTop = 0;
+    // Belt-and-suspenders: signals and regime badge also render async after the
+    // narrative resolves (fetchRiskData → renderRiskData). Give them 300ms to
+    // settle, then do a final reset so any secondary reflow is also corrected.
+    setTimeout(() => { if (_m) _m.scrollTop = 0; }, 300);
+  });
   setTimeout(fetchSentiment, 800);   // Dukascopy sentiment (last, non-critical)
+
+  // Reset scroll on every load — prevents browser from restoring mid-panel positions
+  // that would hide the narrative section or the calendar header on first view.
+  const _rp = document.getElementById('rightpanel');
+  if (_rp) _rp.scrollTop = 0;
+  const _main = document.getElementById('main');
+  if (_main) _main.scrollTop = 0;
 }
 
 boot();
@@ -7643,7 +8149,7 @@ setInterval(fetchQuoteBarRT, 60 * 1000);
 // Refresh ECB rates every 30 minutes (FX table + heatmap + cross rows)
 setInterval(fetchFrankfurter, 30 * 60 * 1000);
 // Refresh news every 10 minutes
-setInterval(fetchNewsData, 10 * 60 * 1000);  // every 10 min; ETag avoids re-download if unchanged
+setInterval(fetchNewsData, 2 * 60 * 1000);   // every 2 min — ETag returns 304 when unchanged (zero cost); server updates hourly
 // Refresh narrative every 5 minutes
 setInterval(buildRichNarrative, 15 * 60 * 1000);
 // Refresh risk/yield data every 5 minutes
@@ -8178,6 +8684,11 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     }
+    // Always reset right panel and main panel to top on bfcache restore
+    const _rp = document.getElementById('rightpanel');
+    if (_rp) _rp.scrollTop = 0;
+    const _main = document.getElementById('main');
+    if (_main) _main.scrollTop = 0;
     setTimeout(function() {
       redrawLiquidityIfVisible();
       // Same logic: only recreate TV widget if TV is currently active.
@@ -8407,6 +8918,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     y: 'section-cbrates',
     k: 'section-tvcalendar',
     d: 'section-derivatives',
+    n: 'section-news',
   };
 
   function navTo(target) {
@@ -8420,6 +8932,17 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
       } else {
         // Already visible — treat D as a toggle back to Overview
         if (typeof window._derivNavHide === 'function') window._derivNavHide();
+      }
+      return;
+    }
+    if (target === 'section-news') {
+      // News uses same show/hide toggle pattern as Derivatives
+      const newsSection = window._newsNavSection;
+      if (!newsSection) return;
+      if (newsSection.style.display === 'none' || newsSection.style.display === '') {
+        if (typeof window._newsNavShow === 'function') window._newsNavShow();
+      } else {
+        if (typeof window._newsNavHide === 'function') window._newsNavHide();
       }
       return;
     }
@@ -8467,6 +8990,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
           <span class="kbl-key">Y</span><span class="kbl-desc">Rates &amp; Yield Curve</span>
           <span class="kbl-key">K</span><span class="kbl-desc">Economic Calendar</span>
           <span class="kbl-key">D</span><span class="kbl-desc">Derivatives (toggle)</span>
+          <span class="kbl-key">N</span><span class="kbl-desc">News Feed (toggle)</span>
           <span class="kbl-key">&uarr;&darr;</span><span class="kbl-desc">Navigate FX rows</span>
           <span class="kbl-key">?</span><span class="kbl-desc">Close this panel</span>
         </div>
@@ -9254,7 +9778,41 @@ function toggleAlertsPopover() {
     }
   });
 
-  // ── Monitor-transition: reload on screen change ───────────────────────────
+  // ── ResizeObserver on #layout: fixes snap/restore layout collapse ─────────
+  // When the user uses OS window snap (Win+Left/Right, macOS Stage Manager,
+  // browser split-view) and then restores to full screen, the CSS grid can
+  // enter a broken state that window.resize alone doesn't recover from.
+  // A ResizeObserver on #layout detects the actual element width change and
+  // forces a style reflow via a class toggle — the standard industry fix.
+  (function _watchLayoutResize(){
+    var layout = document.getElementById('layout');
+    if(!layout || typeof ResizeObserver === 'undefined') return;
+    var _lastW = layout.offsetWidth;
+    var _rafPending = false;
+    var ro = new ResizeObserver(function(entries){
+      if(_rafPending) return;
+      var newW = entries[0].contentRect.width;
+      // Only act on meaningful width changes (>20px) to avoid micro-reflows
+      if(Math.abs(newW - _lastW) < 20) return;
+      _lastW = newW;
+      _rafPending = true;
+      requestAnimationFrame(function(){
+        _rafPending = false;
+        // Force grid reflow: toggle a class that adds/removes display:contents
+        layout.classList.add('_reflow');
+        requestAnimationFrame(function(){ layout.classList.remove('_reflow'); });
+        // Re-apply split state so widths recalculate correctly
+        var isActive = main.classList.contains('split-layout');
+        if(isActive){
+          var pct = upper.offsetWidth > 0
+            ? parseFloat((upper.offsetWidth / main.offsetWidth * 100).toFixed(1))
+            : 55;
+          upper.style.width = pct + '%';
+        }
+      });
+    });
+    ro.observe(layout);
+  })();
   // When the browser window moves to a monitor with a different resolution or
   // DPR, the CSS grid layout (#layout: 180px minmax(0,1fr) 220px) can enter an
   // irrecoverable broken state where #main collapses to ~220px. No JS reflow
@@ -9741,12 +10299,15 @@ async function renderDerivativesSection() {
   // ── RR Surface table ──
   const rrSurfaceTbody = document.getElementById('rr-surface-tbody');
   if (rrSurfaceTbody) {
-    const rrPairs = pairs.filter(p => p !== 'NZD/USD'); // NZD rarely available in full surface
+    // EUR/JPY is the only cross pair Saxo consistently publishes — include it.
+    // NZD/USD excluded: Saxo does not publish NZD/USD 25d RR on their public page.
+    const rrPairs = [...pairs.filter(p => p !== 'NZD/USD'), 'EUR/JPY'];
+    const rrPairKeys = { ...rrKeys, 'EUR/JPY': 'EURJPY' };
     const rows = rrSurfaceTbody.querySelectorAll('tr');
     rrPairs.forEach((pair, idx) => {
       const row = rows[idx];
       if (!row) return;
-      const rrKey = rrKeys[pair];
+      const rrKey = rrPairKeys[pair];
       const tds = row.querySelectorAll('td');
       const rr2 = rr2Map[rrKey] || {};
       const rr1m = rr2['1M'] ?? rrMap[rrKey]?.rr25d ?? null;
@@ -10218,7 +10779,7 @@ async function renderSovereignSpreads() {
 
 // ── Economic Surprises — CESI-style centred bar index (v7.76.0) ──────────────
 // Methodology: for each G8 currency, computes a normalised surprise index over
-// a 90-day rolling window from ForexFactory calendar (actual vs consensus).
+// a 90-day rolling window from Finnhub economic calendar (actual vs consensus).
 // Index = (beats − misses) / total scored, scaled to [−100, +100].
 // Bar chart centred at 0: green bar extends right for positive, red bar extends
 // left for negative — matching Citi CESI / Bloomberg BEEI visual convention.
@@ -10231,7 +10792,7 @@ async function renderEconSurprises() {
   const LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
   window._ES_SEEN = new Set(); // reset dedup guard on each render
 
-  // ── Load calendar.json (ForexFactory via ff_calendar.json) ─────────────────
+  // ── Load calendar.json (Finnhub via ff_calendar.json) ─────────────────
   let calEvents = [];
   let calSource = '';
   try {
@@ -10284,10 +10845,18 @@ async function renderEconSurprises() {
   // ── Source label ──────────────────────────────────────────────────────────
   const srcEl = document.getElementById('econ-surprise-source');
   if (srcEl) {
-    if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
+    if (calSource === 'Finnhub' || calSource.startsWith('Finnhub')) {
+      srcEl.textContent = 'Finnhub · actual vs consensus · G8 · 90d rolling';
+    } else if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
       srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
+      // Fallback path: Finnhub key not set, FF scraper used instead
       srcEl.textContent = 'ForexFactory · actual vs consensus · 90d rolling';
+    } else if (calSource && calSource.includes('ForexFactory')) {
+      // Legacy backfill sources: multi-source historical string
+      srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · G8 · 90d rolling';
+    } else if (calSource) {
+      srcEl.textContent = calSource + ' · actual vs consensus · 90d rolling';
     } else {
       srcEl.textContent = 'Calendar data unavailable';
     }
@@ -10296,6 +10865,13 @@ async function renderEconSurprises() {
   // ── Score per currency ────────────────────────────────────────────────────
   // Inverse indicators: a lower actual is a positive surprise (e.g. unemployment fell)
   const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit', 'trade balance'];
+
+  // ── Exponential time-decay (CESI convention) ────────────────────────────────────────
+  // CESI applies decay so recent surprises dominate and old data fades.
+  // Half-life = 45 days: w(0d)=1.00, w(45d)=0.50, w(90d)=0.25.
+  // λ = ln(2) / 45 ≈ 0.01540. N column still shows raw event count for transparency.
+  const DECAY_LAMBDA = Math.LN2 / 45;
+
   const ccyScores = {};
 
   calEvents.forEach(ev => {
@@ -10351,7 +10927,7 @@ async function renderEconSurprises() {
     const forecast = parseFloat(forecastStr);
     if (isNaN(actual) || isNaN(forecast)) return;
 
-    const isInverse = INVERSE_KW.some(kw => ev.title.toLowerCase().includes(kw));
+    const isInverse = INVERSE_KW.some(kw => evTitle.includes(kw));
     const beat = isInverse ? actual < forecast : actual > forecast;
     const miss = isInverse ? actual > forecast : actual < forecast;
     // rawSurprise is unsigned (actual − forecast). For the z-score we apply the
@@ -10360,6 +10936,11 @@ async function renderEconSurprises() {
     // a positive surprise. beat/miss already encodes direction correctly above.
     const rawSurprise = actual - forecast;
     const surprise    = isInverse ? -rawSurprise : rawSurprise;
+
+    // ── Exponential decay weight ─────────────────────────────────────────────────────────────
+    // w = e^(-λ · ageDays). Recent events weight 1.0; older events fade smoothly.
+    const ageDays = (nowMs - evTime) / 86400000;
+    const w = Math.exp(-DECAY_LAMBDA * ageDays);
 
     // ── Z-score scoring (hybrid: z-score when stats available, beat/miss otherwise) ──
     // As history accumulates in surpriseStats (engine v3.1+), more events
@@ -10373,17 +10954,23 @@ async function renderEconSurprises() {
     const useZScore = stats && stats.n >= CANONICAL_MIN_N && stats.std > 0;
     const zScore = useZScore ? (surprise - stats.mean) / stats.std : null;
 
-    if (!ccyScores[ccy]) ccyScores[ccy] = { beats: 0, misses: 0, total: 0, zSum: 0, zN: 0, zBeats: 0, zMisses: 0 };
+    if (!ccyScores[ccy]) ccyScores[ccy] = {
+      // Raw counts — for N display and low-confidence threshold
+      total: 0, beats: 0, misses: 0,
+      // Decay-weighted accumulators — used for index calculation
+      wTotal: 0, wBeats: 0, wMisses: 0,
+      zWSum: 0, zWTotal: 0, zWBeats: 0, zWMisses: 0,
+    };
     ccyScores[ccy].total++;
-    if (beat) ccyScores[ccy].beats++;
-    if (miss) ccyScores[ccy].misses++;
-    // Track z-score beats/misses separately so the blend formula can compute
-    // non-z-score beat/miss without the incorrect "assumes all zN are beats" approximation.
+    ccyScores[ccy].wTotal += w;
+    if (beat) { ccyScores[ccy].beats++;  ccyScores[ccy].wBeats  += w; }
+    if (miss) { ccyScores[ccy].misses++; ccyScores[ccy].wMisses += w; }
+    // Decay-weighted z-score accumulators for the blend formula.
     if (zScore !== null) {
-      ccyScores[ccy].zSum += zScore;
-      ccyScores[ccy].zN++;
-      if (beat) ccyScores[ccy].zBeats++;
-      if (miss) ccyScores[ccy].zMisses++;
+      ccyScores[ccy].zWSum   += zScore * w;
+      ccyScores[ccy].zWTotal += w;
+      if (beat) ccyScores[ccy].zWBeats += w;
+      if (miss) ccyScores[ccy].zWMisses += w;
     }
   });
 
@@ -10408,26 +10995,24 @@ async function renderEconSurprises() {
       return;
     }
 
-    // ── Index: z-score blend when available, beat/miss otherwise ────────────
-    // Events with ≥5 historical observations use z-score (normalised surprise).
-    // Remaining events use beat/miss. Both contribute to the same [-100,+100] scale.
-    // As history accumulates over months, more events will graduate to z-score.
+    // ── Index: decay-weighted z-score blend when available, beat/miss otherwise ───────
+    // All contributions scaled by w = e^(-λ·ageDays) — recent surprises dominate.
+    // Events with ≥5 historical observations use z-score (normalised surprise magnitude).
+    // Remaining events use beat/miss. Both halves are decay-weighted consistently.
     let idx100;
-    const zFraction = s.zN / s.total;
-    if (s.zN >= 10 || (s.zN > 0 && zFraction >= 0.30)) {
-      // Blend: z-score events contribute avg_z * 50 (maps ±2σ to ±100),
-      // non-z-score events contribute their beat/miss ratio * 100.
-      // nonZBeat/nonZMiss use the separately tracked zBeats/zMisses accumulators
-      // so the beat/miss half is accurate regardless of how many z-score events are beats.
-      const nonZN     = s.total - s.zN;
-      const nonZBeat  = s.beats  - s.zBeats;
-      const nonZMiss  = s.misses - s.zMisses;
-      const zPart     = s.zN  > 0 ? (s.zSum / s.zN) * 50 : 0;
-      const bmPart    = nonZN > 0 ? ((nonZBeat - nonZMiss) / nonZN) * 100 : 0;
-      idx100 = (zPart * s.zN + bmPart * nonZN) / s.total;
+    const zFraction = s.zWTotal / s.wTotal;
+    if (s.zWTotal >= 10 || (s.zWTotal > 0 && zFraction >= 0.30)) {
+      // Blend: weighted z-score contrib = (zWSum/zWTotal)*50 (maps ±2σ to ±100),
+      // weighted non-z contrib = weighted beat/miss ratio * 100.
+      const nonZWTotal = s.wTotal  - s.zWTotal;
+      const nonZWBeat  = s.wBeats  - s.zWBeats;
+      const nonZWMiss  = s.wMisses - s.zWMisses;
+      const zPart  = s.zWTotal   > 0 ? (s.zWSum / s.zWTotal) * 50 : 0;
+      const bmPart = nonZWTotal  > 0 ? ((nonZWBeat - nonZWMiss) / nonZWTotal) * 100 : 0;
+      idx100 = (zPart * s.zWTotal + bmPart * nonZWTotal) / s.wTotal;
     } else {
-      // Pure beat/miss (Citi CESI convention) — used until enough z-score history
-      idx100 = ((s.beats - s.misses) / s.total) * 100;
+      // Pure decay-weighted beat/miss (CESI convention)
+      idx100 = s.wTotal > 0 ? ((s.wBeats - s.wMisses) / s.wTotal) * 100 : 0;
     }
     // Bar: max half-width = 50% of container (the zero line is at 50%)
     const halfPct = Math.min(Math.abs(idx100), 100) / 2; // 0–50%
@@ -10453,8 +11038,24 @@ async function renderEconSurprises() {
     // Row tooltip
     const pct = (s.beats / s.total * 100).toFixed(0);
     const inLine = s.total - s.beats - s.misses;
-    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)}`;
+    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)} · decay-weighted (45d half-life) · click for detail`;
   });
+
+  // ── Keyboard activation for clickable rows (Enter / Space) ──────────────
+  // onclick is already in the static HTML; this adds keyboard parity.
+  if (tbody && !tbody._esmKeyBound) {
+    tbody._esmKeyBound = true;
+    tbody.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        const row = ev.target.closest('tr');
+        const ccy = row?.querySelector('td')?.textContent?.trim();
+        if (ccy && window.openEconSurprisesModal) {
+          ev.preventDefault();
+          window.openEconSurprisesModal(ccy);
+        }
+      }
+    });
+  }
 }
 
 // ── Derivatives section visibility toggle ──
@@ -10526,6 +11127,281 @@ async function loadOISRatesCache() {
 }
 
 // ── Section visibility: Derivatives panel toggle ──
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NEWS SECTION — dedicated full-width panel (shown when "News" nav tab clicked)
+// Mirrors Derivatives show/hide pattern. Shortcut: N.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Module state
+let _newsAllItems = [];
+let _newsMeta     = {};
+let _newsFilter   = { cur: 'ALL', impact: 'ALL' };
+
+function renderNewsSection(items, meta) {
+  if (Array.isArray(items)) _newsAllItems = items;
+  if (meta) _newsMeta = meta;
+
+  const feed = document.getElementById('news-section-feed');
+  if (!feed) return;
+
+  const filtered = _newsAllItems.filter(function(item) {
+    const curOk    = _newsFilter.cur    === 'ALL' || item.cur    === _newsFilter.cur;
+    const impactOk = _newsFilter.impact === 'ALL' || item.impact === _newsFilter.impact;
+    return curOk && impactOk;
+  });
+
+  const tsEl = document.getElementById('news-section-ts');
+  if (tsEl && _newsMeta.updated_label) tsEl.textContent = _newsMeta.updated_label;
+
+  const countEl = document.getElementById('news-section-count');
+  if (countEl) countEl.textContent = filtered.length + ' stories';
+
+  feed.innerHTML = '';
+  if (!filtered.length) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:20px 14px;color:var(--text3);font-size:11px;';
+    empty.textContent = 'No stories match current filter.';
+    feed.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(function(item) {
+    let time = item.time || '--:--';
+    let ageMs = 0;
+    let pubDate = null;
+    if (item.ts) {
+      pubDate = new Date(item.ts);
+      time = pubDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      ageMs = Date.now() - item.ts;
+    } else if (item.datetime) {
+      const d = new Date(item.datetime);
+      if (!isNaN(d)) {
+        pubDate = d;
+        time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        ageMs = Date.now() - d.getTime();
+      }
+    }
+
+    // Age label — Bloomberg compact: "<1h shows minutes, <24h shows hours, ≥24h shows date
+    let ageLabel = '';
+    let showDate = false;
+    if (ageMs > 0) {
+      const ageMin  = Math.floor(ageMs / 60000);
+      const ageHr   = Math.floor(ageMs / 3600000);
+      const ageDays = Math.floor(ageMs / 86400000);
+      if (ageDays >= 1) {
+        showDate = true;  // show date badge instead of relative age for old articles
+      } else if (ageHr >= 1) {
+        ageLabel = ageHr + 'h';
+      } else if (ageMin >= 1) {
+        ageLabel = ageMin + 'm';
+      } else {
+        ageLabel = 'now';
+      }
+    }
+
+    const headline = item.title  || '';
+    const snippet  = item.expand || '';
+    const cur      = item.cur    || '';
+    const source   = item.source || '';
+    const impact   = item.impact || 'low';
+    const rawLink  = item.link   || '';
+    const safeLink = rawLink.startsWith('https://') ? rawLink : '';
+    const hasSnip  = snippet.length > 0;
+
+    // ── Outer wrapper ────────────────────────────────────────────────────────
+    const wrap = document.createElement('div');
+    wrap.className = 'ns-item' + (item.featured ? ' ns-featured' : '');
+
+    // ── Single flex row: [time][dot][headline...][cur-tag][source][chevron] ──
+    const row = document.createElement('div');
+    row.className = 'ns-row';
+
+    // ── Time cell: stacked HH:MM / Xh — Bloomberg Anywhere compact pattern ──
+    // Single fixed-width container; no separate badge element in the flex row.
+    const timeEl = document.createElement('span');
+    timeEl.className = 'ns-time';
+
+    const timeTop = document.createElement('span');
+    timeTop.className = 'ns-time-hm';
+    const timeBot = document.createElement('span');
+    timeBot.className = 'ns-time-age';
+
+    if (showDate && pubDate) {
+      const dateStr = pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      timeTop.textContent = dateStr;
+      timeEl.title = time + ' · ' + pubDate.toLocaleDateString();
+    } else {
+      timeTop.textContent = time;
+      if (ageLabel && ageLabel !== 'now') {
+        timeBot.textContent = ageLabel;
+      }
+      if (ageLabel) timeEl.title = ageLabel + ' ago';
+    }
+
+    timeEl.appendChild(timeTop);
+    if (timeBot.textContent) timeEl.appendChild(timeBot);
+
+    const dot = document.createElement('span');
+    dot.className = 'ns-dot ns-dot-' + impact;
+
+    const headEl = document.createElement('span');
+    headEl.className = 'ns-headline';
+    headEl.textContent = headline;
+    headEl.title = headline;  // native tooltip — full headline on hover (Bloomberg compact pattern)
+
+    const chevron = document.createElement('span');
+    chevron.className = 'ns-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
+
+    row.appendChild(timeEl);
+    row.appendChild(dot);
+    row.appendChild(headEl);
+
+    if (cur) {
+      const curTag = document.createElement('span');
+      curTag.className = 'ns-cur-tag';
+      curTag.textContent = cur;
+      row.appendChild(curTag);
+    }
+    // Source moved to drawer — keeps headline full width (Bloomberg compact pattern)
+    row.appendChild(chevron);
+    wrap.appendChild(row);
+
+    // ── Accordion drawer (hidden, expands below the row on click) ───────────
+    if (hasSnip || safeLink || source) {
+      const drawer = document.createElement('div');
+      drawer.className = 'ns-drawer';
+
+      // Source label at top of drawer — subtle, secondary color
+      if (source) {
+        const srcDrawer = document.createElement('p');
+        srcDrawer.className = 'ns-drawer-source';
+        srcDrawer.textContent = source;
+        drawer.appendChild(srcDrawer);
+      }
+
+      if (hasSnip) {
+        const snipEl = document.createElement('p');
+        snipEl.className = 'ns-snippet';
+        snipEl.textContent = snippet;   // full text — no truncation
+        drawer.appendChild(snipEl);
+      }
+
+      if (safeLink) {
+        const readLink = document.createElement('a');
+        readLink.className = 'ns-read-link';
+        readLink.textContent = 'Read full article';
+        readLink.href = safeLink;
+        readLink.target = '_blank';
+        readLink.rel = 'noopener noreferrer';
+        readLink.addEventListener('click', function(e) { e.stopPropagation(); });
+        drawer.appendChild(readLink);
+      }
+      wrap.appendChild(drawer);
+
+      // Click the row → open/close accordion (only one open at a time)
+      row.addEventListener('click', function() {
+        const isOpen = wrap.classList.contains('ns-open');
+        feed.querySelectorAll('.ns-open').forEach(function(el) { el.classList.remove('ns-open'); });
+        if (!isOpen) wrap.classList.add('ns-open');
+      });
+    }
+
+    feed.appendChild(wrap);
+  });
+}
+function _newsSetFilter(type, value) {
+  _newsFilter[type] = value;
+  // Update active pill styling
+  const selector = type === 'cur' ? '.ns-cur-pill' : '.ns-imp-pill';
+  document.querySelectorAll(selector).forEach(btn => {
+    btn.classList.toggle('ns-pill-active', btn.dataset.val === value);
+  });
+  renderNewsSection();
+}
+
+function initNewsNav() {
+  const newsSection = document.getElementById('section-news');
+  if (!newsSection) return;
+
+  const splitLowerRight = document.getElementById('split-lower-right');
+  if (!splitLowerRight) return;
+
+  function showNews() {
+    Array.from(splitLowerRight.children).forEach(el => {
+      if (el.id !== 'section-news') {
+        const originalDisplay = el.style.display || window.getComputedStyle(el).display;
+        el.dataset.newsHidden = originalDisplay === 'none' ? 'none' : (el.style.display || '');
+        el.style.display = 'none';
+      }
+    });
+    newsSection.style.display = '';
+    const splitLower = document.getElementById('split-lower');
+    if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
+    // Re-render with current data so pills and count are up to date
+    renderNewsSection();
+  }
+
+  function hideNews() {
+    newsSection.style.display = 'none';
+    splitLowerRight.querySelectorAll('[data-news-hidden]').forEach(el => {
+      const saved = el.dataset.newsHidden;
+      el.style.display = saved === '' ? '' : saved;
+      delete el.dataset.newsHidden;
+    });
+    // Repaint canvases after display restore (same double-rAF pattern as Derivatives)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
+          drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
+        }
+        const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
+        if (activeRatesTab) {
+          const cty = activeRatesTab.dataset.cty;
+          if (cty && cty !== 'us') {
+            if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
+              renderSovereignSpreads();
+            } else if (typeof renderG8YieldPane === 'function') {
+              const contentEl = document.getElementById('rates-g8-content-' + cty);
+              if (contentEl) delete contentEl.dataset.loaded;
+              renderG8YieldPane(cty);
+            }
+          }
+        }
+      });
+    });
+  }
+
+  // Capture phase so it runs before the main nav scroll handler
+  const newsLink = document.querySelector('.top-nav a[data-target="section-news"]');
+  if (newsLink) {
+    newsLink.addEventListener('click', (e) => {
+      e.stopImmediatePropagation();
+      showNews();
+    }, true);
+  }
+
+  // Hide when any other nav tab is clicked
+  document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
+    if (link.dataset.target !== 'section-news') {
+      link.addEventListener('click', () => {
+        if (newsSection.style.display !== 'none') hideNews();
+      });
+    }
+  });
+
+  // Expose for keyboard shortcut
+  window._newsNavShow    = showNews;
+  window._newsNavHide    = hideNews;
+  window._newsNavSection = newsSection;
+
+  // Expose filter setter for inline onclick
+  window._newsSetFilter  = _newsSetFilter;
+}
+
 function initDerivativesNavFixed() {
   const derivSection = document.getElementById('section-derivatives');
   if (!derivSection) return;
@@ -10614,6 +11490,7 @@ function initDerivativesNavFixed() {
   const run = async () => {
     initG8RatesTabs();
     initDerivativesNavFixed();
+    initNewsNav();
 
     // Load CB policy rates, OIS benchmark rates, and intraday quotes in parallel.
     // _waitForQuotesPromise() polls until boot() has set window._quotesReadyPromise
@@ -10703,11 +11580,42 @@ function initDerivativesNavFixed() {
   // if no OHLC file exists, which is the correct behaviour for commodities.
   var TV_SYM_PREFIX = 'FX_IDC:';
 
+  // FIX-WL-4: In-memory fallback for environments where localStorage is blocked
+  // (Privacy Badger, Tracking Prevention, Safari ITP, etc.).
+  // When setItem() throws OR a subsequent getItem() round-trip returns null (silent
+  // failure under Tracking Prevention), we fall back to a module-scoped array so
+  // the watchlist remains functional for the session even without persistence.
+  var _memList = null; // null = not yet initialised; [] after first load attempt
+
+  function _lsAvailable() {
+    // Test once per session — result is cached on _lsOk.
+    if (typeof _lsAvailable._ok !== 'undefined') return _lsAvailable._ok;
+    try {
+      var t = '__gi_wl_test__';
+      localStorage.setItem(t, '1');
+      var ok = localStorage.getItem(t) === '1';
+      localStorage.removeItem(t);
+      _lsAvailable._ok = ok;
+    } catch (e) {
+      _lsAvailable._ok = false;
+    }
+    return _lsAvailable._ok;
+  }
+
   function load() {
-    try { return JSON.parse(localStorage.getItem(WL_KEY) || '[]'); } catch (e) { return []; }
+    if (_lsAvailable()) {
+      try { return JSON.parse(localStorage.getItem(WL_KEY) || '[]'); } catch (e) {}
+    }
+    // localStorage unavailable — use in-memory list
+    if (_memList === null) _memList = [];
+    return _memList.slice();
   }
   function save(list) {
-    try { localStorage.setItem(WL_KEY, JSON.stringify(list)); } catch (e) {}
+    if (_lsAvailable()) {
+      try { localStorage.setItem(WL_KEY, JSON.stringify(list)); return; } catch (e) {}
+    }
+    // localStorage unavailable — persist in memory for this session
+    _memList = list.slice();
   }
 
   function render() {
@@ -10780,9 +11688,21 @@ function initDerivativesNavFixed() {
 
     input.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
+        var sym = input.value.trim().toUpperCase().replace(/[^A-Z]/g, '');
+        if (sym && !(sym in SYMBOL_MAP)) {
+          // Unknown symbol — shake the input briefly as visual feedback, don't close
+          input.style.outline = '1px solid var(--down)';
+          setTimeout(function () { input.style.outline = ''; }, 800);
+          return;
+        }
         addSymbol(input.value);
         input.value = '';
         inputRow.style.display = 'none';
+        // Scroll the new row into view so the user sees it was added
+        setTimeout(function () {
+          var rows = tbody.querySelectorAll('.sb-row');
+          if (rows.length) rows[rows.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
       } else if (e.key === 'Escape') {
         inputRow.style.display = 'none';
       }
@@ -10817,3 +11737,554 @@ function initDerivativesNavFixed() {
     init();
   }
 })();
+
+// =============================================================================
+// TIMEFRAME SELECTOR — H1 · H4 · D1 · W1 · MN
+// =============================================================================
+
+const _TF_RANGE_SETS = {
+  H1: [{days:1,label:'1D'},{days:5,label:'1W'},{days:14,label:'2W'},{days:30,label:'1M'}],
+  H4: [{days:14,label:'2W'},{days:30,label:'1M'},{days:91,label:'3M'},{days:182,label:'6M'}],
+  D1: [{days:91,label:'3M'},{days:182,label:'6M'},{days:365,label:'1Y'},{days:1095,label:'3Y'},{days:0,label:'ALL'}],
+  W1: [{days:182,label:'6M'},{days:365,label:'1Y'},{days:730,label:'2Y'},{days:1095,label:'3Y'},{days:0,label:'ALL'}],
+  MN: [{days:365,label:'1Y'},{days:1095,label:'3Y'},{days:1825,label:'5Y'},{days:0,label:'ALL'}],
+};
+const _TF_DEFAULT_DAYS = {H1:5,H4:14,D1:91,W1:365,MN:1095};
+
+function _lwUpdateRangeBtns() {
+  const wrap = document.getElementById('lw-range-btns');
+  if (!wrap) return;
+  const set = _TF_RANGE_SETS[_lwActiveTf] || _TF_RANGE_SETS.D1;
+  wrap.innerHTML = set.map(r =>
+    `<button class="lw-range-btn${r.days === _lwActiveDays ? ' active' : ''}" data-days="${r.days}" aria-label="${r.label}" style="flex-shrink:0;">${r.label}</button>`
+  ).join('');
+}
+
+// TF button click handler (delegated on the range-bar)
+document.getElementById('lw-range-bar')?.addEventListener('click', e => {
+  const tfBtn = e.target.closest('.lw-tf-btn');
+  if (!tfBtn) return;
+  const newTf = tfBtn.dataset.tf;
+  if (!newTf || newTf === _lwActiveTf) return;
+  _lwActiveTf   = newTf;
+  _lwActiveDays = _TF_DEFAULT_DAYS[newTf] ?? 91;
+  _lwClearCompare(); // compare series has different timestamps on different TFs
+  document.querySelectorAll('.lw-tf-btn').forEach(b => b.classList.toggle('sel', b.dataset.tf === newTf));
+  _lwUpdateRangeBtns();
+  if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
+});
+
+// =============================================================================
+// COMPARE OVERLAY — normalised % change LineSeries on secondary price scale
+// =============================================================================
+
+// Toggle compare dropdown open/close
+document.getElementById('lw-cmp-btn')?.addEventListener('click', function(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('lw-cmp-dropdown');
+  if (!dd) return;
+  const open = dd.style.display === 'none' || !dd.style.display;
+  if (open) {
+    // Position with fixed coords to escape any overflow:hidden ancestor
+    const rect = this.getBoundingClientRect();
+    dd.style.position  = 'fixed';
+    dd.style.top       = (rect.bottom + 4) + 'px';
+    dd.style.right     = (window.innerWidth - rect.right) + 'px';
+    dd.style.left      = 'auto';
+    dd.style.zIndex    = '9100';
+    dd.style.display   = 'block';
+  } else {
+    dd.style.display = 'none';
+  }
+  this.setAttribute('aria-expanded', String(open));
+});
+// Close on outside click
+document.addEventListener('click', () => {
+  const dd = document.getElementById('lw-cmp-dropdown');
+  if (dd) dd.style.display = 'none';
+  document.getElementById('lw-cmp-btn')?.setAttribute('aria-expanded','false');
+});
+
+// Item selection in compare dropdown
+document.getElementById('lw-cmp-dropdown')?.addEventListener('click', e => {
+  e.stopPropagation();
+  const item = e.target.closest('.lw-cmp-item');
+  if (!item || !_lwActiveOhlcId) return;
+  const cmpId   = item.dataset.cmpid;
+  const cmpType = item.dataset.cmptype || 'ohlc';
+  if (!cmpId) return;
+  // For ohlc: prevent comparing a symbol with itself; for cot/rate: always allow
+  if (cmpType === 'ohlc' && cmpId === _lwActiveOhlcId) return;
+  const uid = cmpType + ':' + cmpId;
+  if (uid === _lwCompareId) { _lwClearCompare(); return; }
+  _lwLoadCompare(cmpId, item.textContent.trim(), cmpType);
+  document.getElementById('lw-cmp-dropdown').style.display = 'none';
+});
+
+function _lwClearCompare() {
+  if (_lwCompareSeries && _lwChart) {
+    try { _lwChart.removeSeries(_lwCompareSeries); } catch(_e) {}
+  }
+  _lwCompareSeries = null;
+  _lwCompareId     = null;
+  document.querySelectorAll('.lw-cmp-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('lw-cmp-pill')?.remove();
+}
+
+async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
+  if (!_lwChart || !_lwCandleSeries) return;
+  _lwClearCompare();
+  const LWC = window.LightweightCharts;
+  const uid = cmpType + ':' + cmpId;
+
+  // ── Colour per type ────────────────────────────────────────────────────────
+  const CMP_COLOR = cmpType === 'cot'  ? '#9c27b0'   // purple for COT
+                  : cmpType === 'rate' ? '#26a69a'   // teal for CB rate
+                  : cmpType === 'esi'  ? '#2196f3'   // blue for ESI
+                  :                      '#f0a500';  // amber for price overlay
+
+  try {
+    let seriesData = [];
+    let priceFormat;
+
+    // ── OHLC price overlay (existing behaviour) ───────────────────────────
+    if (cmpType === 'ohlc') {
+      let cmpPath;
+      if (_lwActiveTf === 'H1')      cmpPath = `./ohlc-data/h1/${cmpId}.json`;
+      else if (_lwActiveTf === 'H4') cmpPath = `./ohlc-data/h4/${cmpId}.json`;
+      else                           cmpPath = `./ohlc-data/${cmpId}.json`;
+
+      const r = await fetch(cmpPath, { signal: AbortSignal.timeout(6000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      let cmpBars = await r.json();
+      if (!Array.isArray(cmpBars) || cmpBars.length < 4) throw new Error('no data');
+
+      // Aggregate W1/MN
+      if (_lwActiveTf === 'W1' || _lwActiveTf === 'MN') {
+        const agg = {};
+        for (const b of cmpBars) {
+          let key;
+          if (_lwActiveTf === 'W1') {
+            const d = new Date(b.time + 'T00:00:00Z');
+            const dow = d.getUTCDay() || 7;
+            const mon = new Date(d); mon.setUTCDate(d.getUTCDate() - (dow-1));
+            key = mon.toISOString().slice(0, 10);
+          } else { key = b.time.slice(0,7) + '-01'; }
+          if (!agg[key]) agg[key] = {time:key, open:b.open, high:b.high, low:b.low, close:b.close};
+          else { const a=agg[key]; a.high=Math.max(a.high,b.high); a.low=Math.min(a.low,b.low); a.close=b.close; }
+        }
+        cmpBars = Object.values(agg).sort((a,b) => a.time < b.time ? -1 : 1);
+      }
+
+      // Normalise to % change from first visible bar
+      let baseIdx = 0;
+      try {
+        const range = _lwChart.timeScale().getVisibleLogicalRange();
+        if (range && range.from > 0) baseIdx = Math.max(0, Math.floor(range.from));
+      } catch(_e) {}
+      const basePrice = cmpBars[Math.min(baseIdx, cmpBars.length-1)]?.close;
+      if (!basePrice || basePrice <= 0) throw new Error('no base price');
+
+      seriesData  = cmpBars.map(b => ({ time: b.time, value: ((b.close - basePrice) / basePrice) * 100 }));
+      priceFormat = { type: 'custom', formatter: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%' };
+
+    // ── COT Net Position (Leveraged Funds) ────────────────────────────────
+    } else if (cmpType === 'cot') {
+      const r = await fetch(`./cot-data/${cmpId}.json`, { signal: AbortSignal.timeout(6000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const history = Array.isArray(d.history) ? d.history : [];
+      if (history.length < 2) throw new Error('no COT history');
+
+      // Add current week as the last point
+      const allPoints = [
+        ...history,
+        { weekEnding: d.weekEnding, levNet: d.netPosition }
+      ];
+
+      seriesData = allPoints
+        .filter(h => h.weekEnding && h.weekEnding.length === 10)
+        .map(h => ({
+          time:  h.weekEnding,
+          value: h.levNet ?? ((h.levLong || 0) - (h.levShort || 0)),
+        }))
+        .sort((a, b) => a.time < b.time ? -1 : 1);
+
+      // Remove duplicates (same weekEnding)
+      seriesData = seriesData.filter((p, i) => i === 0 || p.time !== seriesData[i-1].time);
+      if (seriesData.length < 2) throw new Error('insufficient COT points');
+
+      priceFormat = {
+        type: 'custom',
+        formatter: v => {
+          const abs = Math.abs(v);
+          const str = abs >= 1000 ? (v / 1000).toFixed(1) + 'K' : v.toFixed(0);
+          return (v >= 0 ? '+' : '') + str;
+        }
+      };
+
+    // ── CB Policy Rate (step-line) ─────────────────────────────────────────
+    } else if (cmpType === 'rate') {
+      const r = await fetch(`./rates/${cmpId}.json`, { signal: AbortSignal.timeout(6000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const obs = Array.isArray(d.observations) ? d.observations : [];
+      if (obs.length < 2) throw new Error('no rate observations');
+
+      // observations are newest-first — reverse to oldest-first for LWC
+      seriesData = obs
+        .filter(o => o.date && o.value != null)
+        .map(o => ({ time: o.date, value: parseFloat(o.value) }))
+        .sort((a, b) => a.time < b.time ? -1 : 1);
+
+      priceFormat = {
+        type: 'custom',
+        formatter: v => v.toFixed(2) + '%'
+      };
+
+    // ── ESI (Economic Surprise Index, CESI-style) ─────────────────────────
+    } else if (cmpType === 'esi') {
+      // Fetch calendar.json — same source used by the ESI panel and modal
+      const r = await fetch('./calendar-data/calendar.json', { signal: AbortSignal.timeout(8000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const calj = await r.json();
+      const allEvents = calj.events || [];
+      if (calj.surpriseStats) window._ECON_SURPRISE_STATS = calj.surpriseStats;
+
+      // Use existing modal functions if already loaded, otherwise compute inline
+      if (typeof _esmBuildSeries === 'function') {
+        seriesData = _esmBuildSeries(allEvents, cmpId);
+      } else {
+        // Inline ESI computation — mirrors _esmBuildSeries / _esmScoreWindow
+        const DECAY_LAMBDA = Math.LN2 / 45;
+        const WINDOW_MS    = 90 * 24 * 60 * 60 * 1000;
+        const STEP_MS      =  7 * 24 * 60 * 60 * 1000;
+        const NOISE_KW     = [
+          'cftc','baker hughes','rig count','auction','api weekly',
+          'milk auction','fed\'s balance sheet','reserve balances',
+          'redbook','ibd/tipp','tips auction','note auction','bond auction',
+          'gilt auction','jgb auction','obligaciones','speculative net',
+          'nc net position','crude oil inventories','crude oil imports',
+          'distillate','gasoline inventorie','gasoline production',
+          'refinery','heating oil','natural gas storage',
+          'foreign bonds buying','foreign investments in japanese',
+          'foreign bond investment','foreign investment in japan',
+          'm2 money','m3 money','m4 money','reserve assets total',
+          'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
+          'ibd','3-month bill','4-week bill','52-week bill',
+          '4-week average','4-week avg',
+          'tic net','net long-term tic','total net tic',
+          'interest rate projection',
+          'eia crude oil','eia crude',
+        ];
+        const INVERSE_KW   = ['unemployment','jobless','claims','deficit','trade balance'];
+        const stats        = window._ECON_SURPRISE_STATS || {};
+
+        function _scoreWin(startMs, endMs) {
+          const seen = new Set();
+          let total=0, wTotal=0, wBeats=0, wMisses=0;
+          let zWSum=0, zWTotal=0, zWBeats=0, zWMisses=0;
+          allEvents.forEach(ev => {
+            if (ev.currency !== cmpId) return;
+            const t = new Date(ev.dateISO).getTime();
+            if (isNaN(t) || t > endMs || t < startMs) return;
+            if (!ev.actual || ev.actual === '' || ev.actual === '-') return;
+            if (!['medium','high'].includes(ev.impact)) return;
+            const name = (ev.event || '').toLowerCase();
+            if (NOISE_KW.some(k => name.includes(k))) return;
+            const canon = name.replace(/\s*\([^)]*\)/g,'').trim();
+            const aS = String(ev.actual||'').replace(/[%,\s]/g,'');
+            const fS = String(ev.forecast||ev.previous||'').replace(/[%,\s]/g,'');
+            const key = `${cmpId}/${canon}/${aS}/${fS}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+            const actual   = parseFloat(String(ev.actual||'').replace(/[%,]/g,''));
+            const forecast = parseFloat(String(ev.forecast||ev.previous||'').replace(/[%,]/g,''));
+            if (isNaN(actual) || isNaN(forecast)) return;
+            const inv     = INVERSE_KW.some(k => name.includes(k));
+            const beat    = inv ? actual < forecast : actual > forecast;
+            const miss    = inv ? actual > forecast : actual < forecast;
+            const surp    = inv ? -(actual-forecast) : (actual-forecast);
+            const ageDays = (endMs - t) / 86400000;
+            const w       = Math.exp(-DECAY_LAMBDA * ageDays);
+            const st      = stats[`${cmpId}/${canon}`];
+            const useZ    = st && st.n >= 5 && st.std > 0;
+            const z       = useZ ? (surp - st.mean) / st.std : null;
+            total++; wTotal += w;
+            if (beat) { wBeats  += w; }
+            if (miss) { wMisses += w; }
+            if (z !== null) {
+              zWSum += z*w; zWTotal += w;
+              if (beat) zWBeats += w;
+              if (miss) zWMisses += w;
+            }
+          });
+          if (!total) return null;
+          const zFrac = zWTotal / wTotal;
+          let idx100;
+          if (zWTotal >= 10 || (zWTotal > 0 && zFrac >= 0.30)) {
+            const nZW=wTotal-zWTotal, nZWB=wBeats-zWBeats, nZWM=wMisses-zWMisses;
+            const zP  = zWTotal>0 ? (zWSum/zWTotal)*50 : 0;
+            const bmP = nZW>0 ? ((nZWB-nZWM)/nZW)*100 : 0;
+            idx100 = (zP*zWTotal + bmP*nZW) / wTotal;
+          } else {
+            idx100 = wTotal>0 ? ((wBeats-wMisses)/wTotal)*100 : 0;
+          }
+          return idx100;
+        }
+
+        const ccyEvts = allEvents.filter(ev =>
+          ev.currency === cmpId && ev.actual && ev.actual !== '' && ev.actual !== '-'
+        );
+        if (!ccyEvts.length) throw new Error('no ESI events for ' + cmpId);
+
+        const minDate = Math.min(...ccyEvts.map(ev => new Date(ev.dateISO).getTime()).filter(t => !isNaN(t)));
+        const nowMs = Date.now();
+        let cursor = minDate + WINDOW_MS;
+        while (cursor <= nowMs + STEP_MS) {
+          const endMs   = Math.min(cursor, nowMs);
+          const startMs = endMs - WINDOW_MS;
+          const idx     = _scoreWin(startMs, endMs);
+          if (idx !== null) {
+            const dt = new Date(endMs);
+            seriesData.push({
+              time:  `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`,
+              value: parseFloat(idx.toFixed(2)),
+            });
+          }
+          cursor += STEP_MS;
+        }
+      }
+
+      if (seriesData.length < 2) throw new Error('insufficient ESI data');
+
+      priceFormat = {
+        type: 'custom',
+        formatter: v => (v >= 0 ? '+' : '') + v.toFixed(1)
+      };
+    }
+
+    if (!seriesData.length) throw new Error('empty data');
+
+    // ── Render series ──────────────────────────────────────────────────────
+    // All types use LineSeries: ohlc → % change, cot → net contracts, rate → step-line, esi → index
+    _lwCompareSeries = LWC.LineSeries
+      ? _lwChart.addSeries(LWC.LineSeries, {
+          color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
+          priceScaleId: 'cmp', priceFormat,
+          lastValueVisible: false, priceLineVisible: false,
+          crosshairMarkerVisible: cmpType !== 'ohlc' })
+      : _lwChart.addLineSeries({
+          color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
+          priceScaleId: 'cmp', priceFormat,
+          lastValueVisible: false, priceLineVisible: false,
+          crosshairMarkerVisible: cmpType !== 'ohlc' });
+
+      // For rate: expand monthly observations to daily step-line so it aligns with the chart
+      if (cmpType === 'rate') {
+        const expanded = [];
+        for (let i = 0; i < seriesData.length; i++) {
+          const cur  = seriesData[i];
+          const next = seriesData[i + 1];
+          expanded.push(cur);
+          if (next) {
+            // Fill every month between cur and next with cur's value
+            let d = new Date(cur.time + 'T00:00:00Z');
+            d.setUTCMonth(d.getUTCMonth() + 1);
+            while (d.toISOString().slice(0,10) < next.time) {
+              expanded.push({ time: d.toISOString().slice(0,10), value: cur.value });
+              d.setUTCMonth(d.getUTCMonth() + 1);
+            }
+          }
+        }
+        // Extend to today
+        const today = new Date().toISOString().slice(0,10);
+        const last  = seriesData[seriesData.length - 1];
+        let d = new Date(last.time + 'T00:00:00Z');
+        d.setUTCMonth(d.getUTCMonth() + 1);
+        while (d.toISOString().slice(0,10) <= today) {
+          expanded.push({ time: d.toISOString().slice(0,10), value: last.value });
+          d.setUTCMonth(d.getUTCMonth() + 1);
+        }
+        seriesData = expanded;
+      }
+
+    try {
+      _lwChart.priceScale('cmp').applyOptions({
+        scaleMargins: { top: 0.1, bottom: 0.1 },
+        borderVisible: false, textColor: CMP_COLOR,
+      });
+    } catch(_e) {}
+
+    _lwCompareSeries.setData(seriesData);
+    _lwCompareId = uid;
+
+    document.querySelectorAll('.lw-cmp-item').forEach(i =>
+      i.classList.toggle('active',
+        (i.dataset.cmptype || 'ohlc') === cmpType && i.dataset.cmpid === cmpId));
+
+    // Add pill
+    const indPills = document.getElementById('lw-ind-pills');
+    if (indPills) {
+      const pill = document.createElement('span');
+      pill.id = 'lw-cmp-pill';
+      pill.className = 'lw-cmp-pill';
+      pill.title = 'Remove compare overlay';
+      pill.innerHTML = `<span style="width:8px;height:2px;background:${CMP_COLOR};display:inline-block;border-radius:1px;"></span> ${cmpLabel} ×`;
+      pill.addEventListener('click', _lwClearCompare);
+      indPills.parentNode.insertBefore(pill, indPills);
+    }
+  } catch(err) {
+    console.warn('[lw-compare] Failed to load compare data:', err.message);
+  }
+}
+
+// =============================================================================
+// FULLSCREEN CHART — DOM-lift: move the real chart panel into the overlay
+// This preserves ALL indicators, compare series, CB markers, event handlers.
+// =============================================================================
+
+let _lwFsOriginalParent = null;
+let _lwFsOriginalNext   = null;
+let _lwFsOriginalHeight = null;
+
+function _lwOpenFullscreen() {
+  const overlay   = document.getElementById('lw-fullscreen-overlay');
+  const inner     = document.getElementById('lw-fullscreen-inner');
+  const rangeBar  = document.getElementById('lw-range-bar');
+  const chartHdr  = document.getElementById('lw-chart-header');
+  const chartWrap = document.getElementById('tv-chart-wrap');
+  if (!overlay || !inner || !chartWrap || _chartMode !== 'lw') return;
+  if (overlay.classList.contains('lw-fs-active')) return;
+
+  // Store anchor: the element immediately BEFORE rangeBar so we can
+  // restore the full block (rangeBar→chartHdr→chartWrap) in one shot.
+  _lwFsOriginalParent = rangeBar ? rangeBar.parentNode : chartWrap.parentNode;
+  _lwFsOriginalNext   = chartWrap.nextSibling;     // element AFTER chartWrap
+  _lwFsOriginalHeight = chartWrap.style.height;
+
+  // Lift all three elements into the fullscreen inner container
+  if (rangeBar)  inner.appendChild(rangeBar);
+  if (chartHdr)  inner.appendChild(chartHdr);
+  inner.appendChild(chartWrap);
+
+  chartWrap.style.height    = '100%';
+  chartWrap.style.minHeight = '0';
+  chartWrap.style.flex      = '1';
+
+  // Populate the FS tab strip to mirror the real pair tabs
+  _lwFsPopulateTabs();
+
+  overlay.classList.add('lw-fs-active');
+  document.body.style.overflow = 'hidden';
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (_lwChart && chartWrap) {
+      // Use chartWrap (not inner) — inner also contains rangeBar and chartHdr above the chart.
+      // Sizing to inner.offsetHeight makes the chart taller than its actual container,
+      // pushing the time axis off the bottom edge.
+      const w = chartWrap.offsetWidth  || inner.offsetWidth;
+      const h = chartWrap.offsetHeight || inner.offsetHeight;
+      if (w > 0 && h > 0) _lwChart.resize(w, h);
+    }
+  }));
+}
+
+function _lwCloseFullscreen() {
+  const overlay   = document.getElementById('lw-fullscreen-overlay');
+  const inner     = document.getElementById('lw-fullscreen-inner');
+  const rangeBar  = document.getElementById('lw-range-bar');
+  const chartHdr  = document.getElementById('lw-chart-header');
+  const chartWrap = document.getElementById('tv-chart-wrap');
+  if (!overlay || !overlay.classList.contains('lw-fs-active')) return;
+
+  overlay.classList.remove('lw-fs-active');
+  document.body.style.overflow = '';
+
+  // Restore all three elements before the stored next-sibling reference.
+  // insertBefore with a null ref appends to end, which is also correct.
+  if (_lwFsOriginalParent) {
+    if (rangeBar)  _lwFsOriginalParent.insertBefore(rangeBar,  _lwFsOriginalNext);
+    if (chartHdr)  _lwFsOriginalParent.insertBefore(chartHdr,  _lwFsOriginalNext);
+    if (chartWrap) _lwFsOriginalParent.insertBefore(chartWrap, _lwFsOriginalNext);
+  }
+
+  if (chartWrap) {
+    chartWrap.style.height    = _lwFsOriginalHeight || '';
+    chartWrap.style.minHeight = '';
+    chartWrap.style.flex      = '';
+  }
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (_lwChart && chartWrap) {
+      const w = chartWrap.offsetWidth, h = chartWrap.offsetHeight;
+      if (w > 0 && h > 0) _lwChart.resize(w, h);
+    }
+  }));
+
+  _lwFsOriginalParent = null;
+  _lwFsOriginalNext   = null;
+}
+
+// Populate FS toolbar tab strip to mirror the main pair tabs
+function _lwFsPopulateTabs() {
+  // lw-fs-tabs is the scrollable inner strip; its parent lw-fs-tab-outer has ‹ › scroll buttons
+  const fsOuter = document.getElementById('lw-fs-tab-outer');
+  const fsTabs  = document.getElementById('lw-fs-tabs');
+  if (!fsTabs) return;
+  const realTabs = document.querySelectorAll('#tv-pair-tabs .tv-tab');
+  if (!realTabs.length) return;
+  fsTabs.innerHTML = '';
+  realTabs.forEach(realTab => {
+    const btn = document.createElement('button');
+    btn.className = realTab.className;  // copies 'tv-tab active' etc.
+    btn.textContent = realTab.textContent;
+    btn.dataset.sym = realTab.dataset.sym;
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', realTab.getAttribute('aria-selected'));
+    btn.addEventListener('click', () => {
+      realTab.click();
+      fsTabs.querySelectorAll('.tv-tab').forEach(b => {
+        b.classList.toggle('active', b.dataset.sym === realTab.dataset.sym);
+        b.setAttribute('aria-selected', b.dataset.sym === realTab.dataset.sym ? 'true' : 'false');
+      });
+      // Scroll active tab into view
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    });
+    fsTabs.appendChild(btn);
+  });
+
+  // Wire ‹ › scroll buttons (same logic as tv-tabs-prev/next in main toolbar)
+  if (fsOuter) {
+    const prevBtn = fsOuter.querySelector('#lw-fs-tabs-prev');
+    const nextBtn = fsOuter.querySelector('#lw-fs-tabs-next');
+    const updateArrows = () => {
+      if (!prevBtn || !nextBtn) return;
+      prevBtn.style.display = fsTabs.scrollLeft > 1 ? 'flex' : 'none';
+      nextBtn.style.display = fsTabs.scrollLeft < fsTabs.scrollWidth - fsTabs.clientWidth - 1 ? 'flex' : 'none';
+    };
+    if (prevBtn) prevBtn.onclick = () => { fsTabs.scrollBy({ left: -160, behavior: 'smooth' }); setTimeout(updateArrows, 320); };
+    if (nextBtn) nextBtn.onclick = () => { fsTabs.scrollBy({ left:  160, behavior: 'smooth' }); setTimeout(updateArrows, 320); };
+    fsTabs.addEventListener('scroll', updateArrows, { passive: true });
+    setTimeout(updateArrows, 50);
+  }
+}
+
+// Keep FS tabs in sync when a real tab is clicked while NOT in fullscreen
+document.getElementById('tv-pair-tabs')?.addEventListener('click', e => {
+  const clicked = e.target.closest('.tv-tab');
+  if (!clicked) return;
+  const fsTabs = document.getElementById('lw-fs-tabs');
+  if (!fsTabs) return;
+  fsTabs.querySelectorAll('.tv-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.sym === clicked.dataset.sym);
+    b.setAttribute('aria-selected', b.dataset.sym === clicked.dataset.sym ? 'true' : 'false');
+  });
+});
+
+document.getElementById('lw-fs-btn')?.addEventListener('click', _lwOpenFullscreen);
+document.getElementById('lw-fs-close')?.addEventListener('click', _lwCloseFullscreen);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('lw-fullscreen-overlay')?.classList.contains('lw-fs-active'))
+    _lwCloseFullscreen();
+});
