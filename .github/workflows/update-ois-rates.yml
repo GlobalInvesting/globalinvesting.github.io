@@ -3,15 +3,25 @@ name: Update OIS / Overnight Rates
 # Fetches OIS/overnight benchmark rates for all G8 currencies and writes
 # ois-rates/rates.json to THIS (public) repo.
 #
-# Rate → benchmark (v4.0 — industry-standard alignment):
-#   USD  SOFR (NY Fed via FRED)                  daily
-#   EUR  €STR (ECB via FRED)                     daily
-#   GBP  SONIA (BOE SDIE IUDSOIA)                daily
-#   JPY  TONA (BOJ Statistics)                   daily
-#   AUD  AONIA = RBA Cash Rate (rates/AUD.json)  daily  ← v4.0: policy rate IS AONIA
-#   CAD  CORRA (BoC Valet V122530)               daily
-#   CHF  SARON (SNB data API)                    weekly
-#   NZD  NZONIA ≈ RBNZ OCR (rates/NZD.json)     daily  ← v4.0: OCR IS NZONIA ref rate
+# Rate → benchmark (v5.0 — no-key primary sources for USD/GBP):
+#   USD  SOFR (NY Fed API, no key → FRED fallback)      daily  ← v5.0
+#   EUR  €STR (ECB via SDMX-JSON, no key)               daily
+#   GBP  SONIA (BoE SDIE IUDSOIA, no key → FRED)        daily  ← v5.0
+#   JPY  TONA (SNB zimoma, no key)                       monthly
+#   AUD  AONIA = RBA Cash Rate (rates/AUD.json)          daily  ← v4.0: policy rate IS AONIA
+#   CAD  CORRA (BoC Valet V122514, date-range params)    daily  ← v5.0: fixes stale dates
+#   CHF  SARON (SNB data API, no key)                    weekly
+#   NZD  NZONIA ≈ RBNZ OCR (rates/NZD.json)             daily  ← v4.0: OCR IS NZONIA ref rate
+#
+# v5.0 changes:
+#   USD: NY Fed SOFR API (markets.newyorkfed.org, no key) added as primary.
+#        FRED SOFR/DFF retained as secondary. Eliminates FRED 504 failures for USD.
+#   GBP: BoE SDIE IUDSOIA (no key, same endpoint as fetch_bond_yields.py) added as
+#        primary. FRED IUDSOIA retained as secondary. Eliminates FRED 504 failures for GBP.
+#   CAD: BoC Valet call switched from params={'recent': 3} to start_date/end_date
+#        date-range (6-week window). 'recent=3' was returning stale monthly observations
+#        (e.g. 2026-03-01 on 2026-05-29). Date-range params match fetch_bond_yields.py.
+#   FRED timeout: 15s → 8s for faster fallthrough on 504 gateway timeouts.
 #
 # AUD/NZD industry-standard rationale (v4.0):
 #   AONIA is defined by AFMA as identical to the RBA Cash Rate. Bloomberg and
@@ -21,7 +31,8 @@ name: Update OIS / Overnight Rates
 #   Previous FRED OECD monthly sources lagged by 4-6 weeks, introducing
 #   systematic forward mispricing of 14-39bp (AUD) and 10-25bp (NZD).
 #
-# All sources are public — no API keys required except FRED_API_KEY for USD/GBP.
+# All primary sources are public — no API keys required.
+# FRED_API_KEY is used as secondary fallback for USD/GBP only.
 # Public repo → unlimited GitHub Actions minutes.
 #
 # Consumed by:
