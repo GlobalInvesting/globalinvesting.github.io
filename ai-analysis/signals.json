@@ -1,55 +1,51 @@
 {
-  "generated_at": "2026-05-28T21:50:27Z",
+  "generated_at": "2026-05-29T03:29:20Z",
   "signals": [
     {
-      "time": "21:49",
+      "time": "03:26",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry + Options",
-      "text": "USD/JPY at 159.21 — 300bp Fed-BoJ carry sustains the bid despite reports of Iran targeting ships in the Straits of Hormuz. While VIX at 15.7 (normal volatility) keeps carry dominant, the 25d RR at -1.11 (Saxo) signals the options market is paying for downside protection against BoJ intervention risk. JPY COT LF net short -81,624 (week ending May 19) remains a crowded carry trade vulnerable to geopolitical escalation. Carry dominates until VIX > 25.",
+      "title": "NZD/JPY — G8 Bilateral Theme + RBNZ Hike Bias",
+      "text": "NZD/JPY at 114.01 — NZD dominates G8 performance as the 1W leader while JPY remains the laggard. Despite NZD COT LF net short -15,435 (specs fading the move), the RBNZ hike bias and 225bp NZD/CHF carry advantage support the bid. NZD/USD price action confirms the breakout targeting 0.5950. JPY remains under pressure ahead of Tokyo CPI, which acts as the next policy catalyst.",
       "evidence": [
-        "USD/JPY: 159.21",
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "JPY COT LF net: -81,624",
-        "USD/JPY 25d RR: -1.11"
+        "NZD 1W avg: +1.124% (n=4)",
+        "JPY 1W avg: -0.453% (n=7)",
+        "G8 spread: 1.577%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:45",
+      "time": "03:23",
       "priority": "warning",
-      "title": "NZD/JPY — G8 Bilateral Theme + COT vs OIS Divergence",
-      "text": "NZD/JPY at 94.46 — NZD outperformance (1W avg +0.707%) vs JPY weakness (1W avg -0.363%) creates a 1.070% G8 spread. NZD COT LF net short -15,435 (specs fading hawkishness) contradicts the RBNZ hike bias (2.25% rate, market bias: Hike). If RBNZ signals further tightening, a short-squeeze in NZD is likely. NZD/JPY carry at +150bp (OIS basis) supports the bilateral divergence.",
+      "title": "USD/CHF — Volatility Premium + Retail Divergence",
+      "text": "USD/CHF at 0.7844 — IV at 19.9% vs HV30 at 6.2% creates a massive +13.7pt VRP, signaling extreme institutional hedging demand for CHF protection. This institutional fear diverges from retail sentiment, where 76% of traders are long USD/CHF. The 375bp Fed-SNB carry advantage favors USD, but the vol premium suggests the market is pricing a sharp safe-haven reversal. Watch for VIX > 25 to trigger carry unwind.",
       "evidence": [
-        "NZD 1W avg: +0.707% (n=4)",
-        "JPY 1W avg: -0.363% (n=7)",
-        "G8 spread: 1.070%",
-        "NZD COT LF net: -15,435"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "21:42",
-      "priority": "warning",
-      "title": "USD/CHF — Volatility + Retail Divergence",
-      "text": "USD/CHF at 0.7832 — IV at 19.5% vs HV30 at 6.1% creates an extreme +13.4% Vol Risk Premium, signaling the options market is pricing in significant tail risk. Retail sentiment is 76% long (Myfxbook), diverging from the COT LF net short -6,015. This institutional vs retail divergence at a 375bp Fed-SNB carry advantage suggests retail is catching a falling knife; further downside targets 0.7750 if US PCE softness persists.",
-      "evidence": [
-        "USD/CHF VRP: +13.4%",
+        "USD/CHF VRP: +13.7%",
         "Retail Sentiment: 76% Long",
-        "Fed 3.75% vs SNB 0% — 375bp",
-        "CHF COT LF net: -6,015"
+        "Fed 3.75% vs SNB 0.0% — +375bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:38",
-      "priority": "info",
-      "title": "EUR/USD — Positioning + Volatility",
-      "text": "EUR/USD at 1.1656 — IV at 7.1% vs HV30 at 4.2% (VRP +2.9%) indicates elevated hedging demand despite a 175bp USD carry advantage. EUR COT LF net short -20,890 (week ending May 19) shows specs are positioned for weakness, but the DXY vs SPX correlation break (z=+1.75σ) suggests USD funding stress is the primary driver. Watch 1.1700 for a break of the bearish trend if US yields continue to soften.",
+      "time": "03:21",
+      "priority": "warning",
+      "title": "AUD/USD — Positioning + Vol + Carry",
+      "text": "AUD/USD at 0.7159 — COT LF net long +57,180 (74.5% long) shows crowded institutional positioning while retail is 72% short, creating a sharp institutional-retail divergence. IV at 14.2% vs HV30 at 8.2% (VRP +6.0%) indicates high cost for protection. The -60bp carry deficit vs USD makes the long AUD trade expensive to hold if US data continues to beat expectations (USD CESI +19). Watch the 16 Jun RBA meeting for policy support.",
       "evidence": [
-        "EUR/USD VRP: +2.9%",
-        "EUR COT LF net: -20,890",
-        "Fed 3.75% vs ECB 2.0% — 175bp",
-        "DXY vs SPX z-score: +1.75σ"
+        "AUD COT LF net: +57,180",
+        "AUD/USD VRP: +6.0%",
+        "USD/AUD OIS: -60bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "03:18",
+      "priority": "info",
+      "title": "USD/JPY — Carry vs Intervention Risk",
+      "text": "USD/JPY at 159.35 — The 300bp Fed-BoJ carry spread sustains the pair's bid despite softer US PCE data and US-Iran peace hopes. 25d RR at -1.11 shows a moderate put skew as the options market pays for protection against BoJ intervention near 160.00. JPY CESI at +12 suggests domestic data is improving, but carry remains the dominant driver until Tokyo CPI or a break of 160.00.",
+      "evidence": [
+        "USD/JPY OIS: +302bp",
+        "25d RR: -1.11 (Saxo)",
+        "JPY CESI: +12"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
