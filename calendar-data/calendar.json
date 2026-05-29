@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-29T11:57:21Z",
-  "generatedAt": "2026-05-29T11:57:21Z",
+  "lastUpdate": "2026-05-29T12:06:27Z",
+  "generatedAt": "2026-05-29T12:06:27Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,19 +9,19 @@
   "fetchErrors": [],
   "rangeFrom": "2025-05-29",
   "rangeTo": "2026-06-12",
-  "totalEvents": 1650,
+  "totalEvents": 1661,
   "currencyCounts": {
     "CAD": 132,
     "JPY": 186,
     "NZD": 83,
     "CHF": 91,
-    "USD": 616,
+    "USD": 625,
     "AUD": 173,
-    "GBP": 181,
+    "GBP": 183,
     "EUR": 188
   },
   "impactCounts": {
-    "medium": 1117,
+    "medium": 1128,
     "high": 383,
     "low": 150
   },
@@ -20532,6 +20532,19 @@
     {
       "date": "29 May",
       "dateISO": "2026-05-29",
+      "timeUTC": "06:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Kashkari Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "29 May",
+      "dateISO": "2026-05-29",
       "timeUTC": "07:00",
       "country": "CHF",
       "currency": "CHF",
@@ -20550,6 +20563,19 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "BoE Gov Bailey Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "29 May",
+      "dateISO": "2026-05-29",
+      "timeUTC": "10:25",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Schmid Speech",
       "impact": "medium",
       "actual": null,
       "forecast": null,
@@ -20688,6 +20714,19 @@
     {
       "date": "29 May",
       "dateISO": "2026-05-29",
+      "timeUTC": "16:40",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Daly Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "29 May",
+      "dateISO": "2026-05-29",
       "timeUTC": "23:50",
       "country": "JPY",
       "currency": "JPY",
@@ -20697,6 +20736,19 @@
       "actual": null,
       "forecast": null,
       "previous": "1.7"
+    },
+    {
+      "date": "31 May",
+      "dateISO": "2026-05-31",
+      "timeUTC": "00:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Powell Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "31 May",
@@ -20727,6 +20779,32 @@
     {
       "date": "1 Jun",
       "dateISO": "2026-06-01",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Nationwide Housing Prices MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.2",
+      "previous": "0.4"
+    },
+    {
+      "date": "1 Jun",
+      "dateISO": "2026-06-01",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Nationwide Housing Prices YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "3"
+    },
+    {
+      "date": "1 Jun",
+      "dateISO": "2026-06-01",
       "timeUTC": "06:30",
       "country": "CHF",
       "currency": "CHF",
@@ -20734,7 +20812,7 @@
       "event": "Retail Sales YoY",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "0.5",
       "previous": "0.5"
     },
     {
@@ -20760,7 +20838,7 @@
       "event": "procure.ch Manufacturing PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": "52*",
+      "forecast": "54",
       "previous": "54.5"
     },
     {
@@ -20773,7 +20851,7 @@
       "event": "Unemployment Rate",
       "impact": "medium",
       "actual": null,
-      "forecast": "5.8*",
+      "forecast": "6.2",
       "previous": "6.2"
     },
     {
@@ -20812,7 +20890,7 @@
       "event": "ISM Manufacturing PMI",
       "impact": "high",
       "actual": null,
-      "forecast": "53.8*",
+      "forecast": "52.6",
       "previous": "52.7"
     },
     {
@@ -20840,6 +20918,19 @@
       "actual": null,
       "forecast": null,
       "previous": "5.8"
+    },
+    {
+      "date": "2 Jun",
+      "dateISO": "2026-06-02",
+      "timeUTC": "05:50",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Kashkari Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "2 Jun",
@@ -20916,7 +21007,7 @@
       "event": "Core Inflation Rate YoY Flash",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "2.4",
       "previous": "2.2"
     },
     {
@@ -20942,7 +21033,7 @@
       "event": "Inflation Rate YoY Flash",
       "impact": "high",
       "actual": null,
-      "forecast": null,
+      "forecast": "3.3",
       "previous": "3"
     },
     {
@@ -20968,7 +21059,7 @@
       "event": "JOLTs Job Openings",
       "impact": "high",
       "actual": null,
-      "forecast": "6.84*",
+      "forecast": "6.8",
       "previous": "6.866"
     },
     {
@@ -21007,7 +21098,7 @@
       "event": "GDP Growth Rate QoQ",
       "impact": "high",
       "actual": null,
-      "forecast": null,
+      "forecast": "0.5",
       "previous": "0.8"
     },
     {
@@ -21046,8 +21137,21 @@
       "event": "ADP Employment Change",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "110",
       "previous": "109"
+    },
+    {
+      "date": "3 Jun",
+      "dateISO": "2026-06-03",
+      "timeUTC": "13:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Barr Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "3 Jun",
@@ -21072,7 +21176,7 @@
       "event": "ISM Services PMI",
       "impact": "high",
       "actual": null,
-      "forecast": "51.1*",
+      "forecast": "53.6",
       "previous": "53.6"
     },
     {
@@ -21086,7 +21190,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "-4.1*",
-      "previous": "-2.8"
+      "previous": "-3.327"
     },
     {
       "date": "3 Jun",
@@ -21100,6 +21204,19 @@
       "actual": null,
       "forecast": "-2.4*",
       "previous": "-2.572"
+    },
+    {
+      "date": "3 Jun",
+      "dateISO": "2026-06-03",
+      "timeUTC": "20:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Logan Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "4 Jun",
@@ -21182,6 +21299,19 @@
     {
       "date": "4 Jun",
       "dateISO": "2026-06-04",
+      "timeUTC": "17:10",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Daly Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "4 Jun",
+      "dateISO": "2026-06-04",
       "timeUTC": "23:30",
       "country": "JPY",
       "currency": "JPY",
@@ -21202,7 +21332,7 @@
       "event": "Household Spending YoY",
       "impact": "medium",
       "actual": null,
-      "forecast": "-1.3*",
+      "forecast": "-1.4",
       "previous": "-2.9"
     },
     {
@@ -21241,7 +21371,7 @@
       "event": "Employment Change",
       "impact": "medium",
       "actual": null,
-      "forecast": "15*",
+      "forecast": "10.2",
       "previous": "-17.7"
     },
     {
@@ -21293,7 +21423,7 @@
       "event": "Unemployment Rate",
       "impact": "high",
       "actual": null,
-      "forecast": "6.7%*",
+      "forecast": "6.9",
       "previous": "6.9"
     },
     {
@@ -21306,7 +21436,7 @@
       "event": "Average Hourly Earnings MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.3*",
+      "forecast": "0.3",
       "previous": "0.2"
     },
     {
@@ -21332,7 +21462,7 @@
       "event": "Non Farm Payrolls",
       "impact": "high",
       "actual": null,
-      "forecast": "-156K*",
+      "forecast": "96",
       "previous": "115"
     },
     {
@@ -21358,7 +21488,7 @@
       "event": "Unemployment Rate",
       "impact": "high",
       "actual": null,
-      "forecast": "4.4%*",
+      "forecast": "4.3",
       "previous": "4.3"
     },
     {
@@ -21373,6 +21503,19 @@
       "actual": null,
       "forecast": "49.9*",
       "previous": "57.7"
+    },
+    {
+      "date": "6 Jun",
+      "dateISO": "2026-06-06",
+      "timeUTC": "16:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Barr Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "7 Jun",
