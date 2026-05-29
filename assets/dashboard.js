@@ -4494,12 +4494,14 @@ async function _renderLWChart(ohlcId, label) {
         const { fast, slow, signal:sig } = p;
         const ef=_iEMA(closes,fast), es=_iEMA(closes,slow);
         const ml=ef.map((v,i)=>v-es[i]);
+        // sl2 = EMA of MACD line starting from bar (slow-1).
+        // sl2[j] corresponds to bars index (slow-1+j), so for bar i use sl2[si] where si=i-(slow-1).
         const sl2=_iEMA(ml.slice(slow-1),sig);
         const offset=slow-1+sig-1;
         const macdD=[],sigD=[],histD=[];
         for(let i=offset;i<bars.length;i++){
-          const si=i-(slow-1),sgi=si-(sig-1);
-          const m=ml[i],s=sl2[sgi],h=m-s;
+          const si=i-(slow-1); // sl2 index aligned to bar i
+          const m=ml[i],s=sl2[si],h=m-s;
           macdD.push({time:bars[i].time,value:parseFloat(m.toFixed(6))});
           sigD.push( {time:bars[i].time,value:parseFloat(s.toFixed(6))});
           histD.push({time:bars[i].time,value:parseFloat(h.toFixed(6)),color:h>=0?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'});
