@@ -1,20 +1,38 @@
 """
-fetch_ois_rates.py  —  OIS / Overnight Rates  G8  (v4.0)
+fetch_ois_rates.py  —  OIS / Overnight Rates  G8  (v5.0)
 =========================================================
 Fetches overnight/OIS benchmark rates for all G8 currencies and writes
 ois-rates/rates.json to the public site repo.
 
 RATE → BENCHMARK MAPPING
-  USD  SOFR   → FRED API (SOFR)                          daily
-  EUR  €STR   → ECB Data Portal SDMX-JSON                daily
-  GBP  SONIA  → FRED API (IUDSOIA)                       daily
-  JPY  TONA   → SNB zimoma cube                          monthly
-  AUD  AONIA  → RBA Cash Rate (rates/AUD.json)           daily  ← v4.0
-  CAD  CORRA  → BoC Valet API (V122514)                  daily
-  CHF  SARON  → SNB data portal (snbgwdzid)              daily
-  NZD  OCR    → RBNZ OCR (rates/NZD.json)               daily  ← v4.0
+  USD  SOFR   → NY Fed API (no key) → FRED API (SOFR/DFF)       daily  ← v5.0
+  EUR  €STR   → ECB Data Portal SDMX-JSON                        daily
+  GBP  SONIA  → BoE SDIE IUDSOIA (no key) → FRED API (IUDSOIA)  daily  ← v5.0
+  JPY  TONA   → SNB zimoma cube                                   monthly
+  AUD  AONIA  → RBA Cash Rate (rates/AUD.json)                   daily  ← v4.0
+  CAD  CORRA  → BoC Valet API V122514 (date-range params)        daily  ← v5.0
+  CHF  SARON  → SNB data portal (snbgwdzid)                      daily
+  NZD  OCR    → RBNZ OCR (rates/NZD.json)                        daily  ← v4.0
 
-INDUSTRY STANDARD ALIGNMENT (v4.0)
+INDUSTRY STANDARD ALIGNMENT (v5.0)
+  USD: NY Fed SOFR API (markets.newyorkfed.org/api/rates/sofr/last/1.json)
+    added as primary no-key source. FRED SOFR/DFF retained as secondary.
+    Eliminates dependency on FRED API key for the most liquid OIS benchmark.
+    Confirmed working from GitHub Actions (no bot protection on NY Fed API).
+
+  GBP: BoE SDIE IUDSOIA added as primary no-key source using the same
+    _iadb-fromshowcolumns endpoint confirmed working in fetch_bond_yields.py.
+    FRED IUDSOIA retained as secondary. SONIA spot (= Bank Rate ± ~5bp
+    structurally) is the correct CIP pricing input; OIS forward belongs in
+    workflow_meetings.yml (forward-looking bias, not spot discount rate).
+
+  CAD: BoC Valet call switched from params={'recent': 3} to start_date/
+    end_date date-range parameters (6-week window). 'recent=3' was returning
+    the 3 most recent rows in the SERIES file rather than calendar-recent
+    daily observations, causing 89-day stale dates (2026-03-01) in production.
+    Date-range params match the pattern used by fetch_bond_yields.py
+    (_boc_valet_latest) which reliably returns the current trading day value.
+
   AUD: AONIA is defined by AFMA as identical to the RBA Cash Rate (AFMA
     benchmark notice; RBA Cash Rate Methodology). Bloomberg and Refinitiv
     use the RBA Cash Rate as the AUD RFR in CIP forward calculators.
@@ -28,11 +46,16 @@ INDUSTRY STANDARD ALIGNMENT (v4.0)
     RBNZ OCR is now primary; FRED OECD retained as sanity-check (75bp guard,
     aligned with workflow_meetings.yml v7.79.0).
 
+FRED TIMEOUT
+  Reduced from 15s to 8s. FRED API 504s (gateway timeouts under high load)
+  were causing the full script to stall for 30+ seconds before reaching the
+  policy fallback. No-key primary sources (NY Fed, BoE SDIE) now absorb the
+  load so FRED failures are fast-fallthrough, not blocking.
+
 SOURCE DESIGN vs workflow_meetings.yml
-  workflow_meetings.yml uses FRED API for: SOFR, DFF, IUDSOIA, ECBDFR,
-    IRSTCI01AUM156N, IR3TIB01NZM156N, IRSTCI01NZM156N.
-  This script uses FRED API for: SOFR (USD), IUDSOIA (GBP).
-  AUD/NZD now use rates/*.json (policy rate = RFR by definition).
+  workflow_meetings.yml uses FRED API for: SOFR, DFF, IUDSOIA, ECBDFR.
+  This script now uses FRED as secondary only for USD/GBP (no-key primaries first).
+  AUD/NZD use rates/*.json (policy rate = RFR by definition).
   EUR/JPY/CAD/CHF use direct CB APIs that work without keys.
 
   NO PURPOSE OVERLAP with workflow_meetings.yml:
@@ -49,6 +72,10 @@ CHANGE LOG
         NZD: RBNZ OCR promoted to primary (NZONIA ≈ OCR by construction).
         Eliminates post-hike forward pricing lag of 14-39bp (AUD) and 10-25bp (NZD).
         FRED OECD retained as background sanity-check for both currencies.
+  v5.0: USD: NY Fed SOFR API added as primary no-key source before FRED.
+        GBP: BoE SDIE IUDSOIA added as primary no-key source before FRED.
+        CAD: BoC Valet switched from 'recent=3' to date-range params (fixes stale dates).
+        FRED timeout reduced 15s → 8s for faster fallthrough on gateway timeouts.
 """
 
 import json
@@ -105,7 +132,7 @@ def fred_latest(series_id, label=None):
             'file_type':  'json',
             'sort_order': 'desc',
             'limit':      '5',
-        }, headers=HEADERS, timeout=15)
+        }, headers=HEADERS, timeout=8)
         r.raise_for_status()
         for o in r.json().get('observations', []):
             if o.get('value') not in ('.', '', None):
@@ -118,14 +145,44 @@ def fred_latest(series_id, label=None):
 
 def fetch_usd():
     """
-    SOFR via FRED API (series SOFR).
-    Same key and series as workflow_meetings.yml fetch_bias_usd().
-    Fallback: EFFR (DFF).
+    SOFR via NY Fed API (no key required), then FRED API fallback.
+
+    PRIMARY: NY Fed Markets API (markets.newyorkfed.org/api/rates/sofr/last/1.json)
+      No API key. No bot protection. Confirmed reachable from GitHub Actions.
+      Returns: {"refRates": [{"type": "SOFR", "percentRate": 5.30, "effectiveDate": "2025-01-17"}]}
+      Published each business day after ~08:00 ET (NY Fed daily release schedule).
+      This is the authoritative SOFR source — NY Fed administers the benchmark.
+
+    SECONDARY: FRED API (series SOFR) — same key + series as workflow_meetings.yml.
+      Fallback to EFFR (DFF) if SOFR series unavailable.
+      504 gateway timeouts on FRED are handled by the 8s timeout limit.
+
+    TERTIARY: CB policy rate (rates/USD.json) — never stale, always available.
     """
     print('[USD]')
+
+    # Primary: NY Fed SOFR API (no key, authoritative source)
+    try:
+        r = requests.get(
+            'https://markets.newyorkfed.org/api/rates/sofr/last/1.json',
+            headers=HEADERS, timeout=10,
+        )
+        r.raise_for_status()
+        ref_rates = r.json().get('refRates', [])
+        for entry in ref_rates:
+            if entry.get('type') == 'SOFR' and entry.get('percentRate') is not None:
+                val = float(entry['percentRate'])
+                dt  = entry.get('effectiveDate', str(date.today()))
+                print(f'  USD: SOFR (NY Fed API — no key)')
+                print(f'    OK SOFR {val}% ({dt})')
+                return val, 'SOFR', dt
+    except Exception as e:
+        print(f'    NY Fed SOFR: {e}')
+
+    # Secondary: FRED API (requires FRED_API_KEY)
     val, dt = fred_latest('SOFR', 'SOFR')
     if val is not None:
-        print(f'  USD: SOFR (FRED API)')
+        print(f'  USD: SOFR (FRED API fallback)')
         print(f'    OK SOFR {val}% ({dt})')
         return val, 'SOFR', dt
 
@@ -135,6 +192,7 @@ def fetch_usd():
         print(f'    OK EFFR {val}% ({dt})')
         return val, 'EFFR', dt
 
+    # Tertiary: CB policy rate
     val, dt = policy_rate('USD')
     if val is not None:
         print(f'    policy fallback {val:.4f}%')
@@ -199,17 +257,85 @@ def fetch_eur():
 
 def fetch_gbp():
     """
-    SONIA via FRED API (series IUDSOIA).
-    workflow_meetings.yml falls back to FRED IUDSOIA for SONIA spot — same key/series.
-    For CIP pricing, SONIA spot is the correct rate (not 1M OIS forward which meetings uses).
+    SONIA via BoE SDIE (no key required), then FRED API fallback.
+
+    PRIMARY: BoE SDIE _iadb-fromshowcolumns endpoint — series IUDSOIA.
+      No API key. Same endpoint confirmed working in fetch_bond_yields.py
+      (_boe_latest helper, used daily for GBP bond yields without failures).
+      Returns CSV; date range: 01/Jan/{year-1} to today.
+      IUDSOIA = SONIA overnight spot rate, published daily by the BoE.
+
+    SECONDARY: FRED API series IUDSOIA — mirrors the same BoE-administered
+      SONIA series. Used when BoE endpoint is temporarily unavailable.
+      504 gateway timeouts on FRED are handled by the 8s timeout limit.
+
+    DESIGN NOTE: SONIA spot (= Bank Rate ± ~5bp structurally) is the correct
+      CIP forward pricing input — it reflects the actual overnight funding cost.
+      The 1M OIS forward (IUQIBLOK) belongs in workflow_meetings.yml for
+      forward-looking CB bias signals; it is not appropriate for spot CIP pricing.
+
+    TERTIARY: CB policy rate (rates/GBP.json).
     """
     print('[GBP]')
+
+    # Primary: BoE SDIE IUDSOIA (no key, same endpoint as fetch_bond_yields.py)
+    try:
+        now       = date.today()
+        date_from = f'01/Jan/{now.year - 1}'
+        date_to   = f'{now.day:02d}/{now.strftime("%b")}/{now.year}'
+        boe_url   = 'https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp'
+        boe_params = {
+            'csv.x':       'yes',
+            'Datefrom':    date_from,
+            'Dateto':      date_to,
+            'SeriesCodes': 'IUDSOIA',
+            'CSVF':        'TN',
+            'UsingCodes':  'Y',
+            'VPD':         'Y',
+            'VFD':         'N',
+        }
+        r = requests.get(boe_url, params=boe_params, headers=HEADERS, timeout=20)
+        r.raise_for_status()
+        content_type = r.headers.get('Content-Type', '')
+        if 'html' in content_type.lower() or r.text.strip().startswith('<'):
+            print(f'    BoE SDIE IUDSOIA: received HTML (bot challenge?) — skipping')
+        else:
+            rows = []
+            for line in r.text.strip().split('\n'):
+                line = line.strip()
+                if not line or line.upper().startswith('DATE') or line.startswith('"'):
+                    continue
+                parts = [p.strip() for p in line.split(',')]
+                if len(parts) < 2:
+                    continue
+                val_str = parts[1].strip().replace('..', '').strip()
+                if not val_str or val_str in ('.', '', 'N/A', 'n/a'):
+                    continue
+                try:
+                    from datetime import datetime as _dtime
+                    dt_obj = _dtime.strptime(parts[0].strip(), '%d %b %Y')
+                    rows.append((dt_obj.strftime('%Y-%m-%d'), float(val_str)))
+                except (ValueError, TypeError):
+                    continue
+            if rows:
+                rows.sort(key=lambda x: x[0])
+                dt_str, val = rows[-1]
+                print(f'  GBP: SONIA (BoE SDIE IUDSOIA — no key)')
+                print(f'    OK SONIA {val}% ({dt_str})')
+                return val, 'SONIA', dt_str
+            else:
+                print(f'    BoE SDIE IUDSOIA: no data rows found')
+    except Exception as e:
+        print(f'    BoE SDIE IUDSOIA: {e}')
+
+    # Secondary: FRED API IUDSOIA (mirrors BoE series, requires key)
     val, dt = fred_latest('IUDSOIA', 'SONIA')
     if val is not None:
-        print(f'  GBP: SONIA (FRED API IUDSOIA)')
+        print(f'  GBP: SONIA (FRED API IUDSOIA fallback)')
         print(f'    OK SONIA {val}% ({dt})')
         return val, 'SONIA', dt
 
+    # Tertiary: CB policy rate
     val, dt = policy_rate('GBP')
     if val is not None:
         print(f'    policy fallback {val:.4f}%')
@@ -333,28 +459,45 @@ def fetch_aud():
 def fetch_cad():
     """
     CORRA via Bank of Canada Valet API (series V122514).
-    Confirmed working on GH Actions (v2.0 run: 2.2492% 2026-02-01).
-    V122514 = canonical CORRA series (aligned with workflow_meetings.yml).
-    V122530 retained as fallback.
+
+    FIX v5.0: Switched from params={'recent': 3} to start_date/end_date date-range
+      parameters (6-week window). 'recent=3' was returning the 3 most recent entries
+      in the series file as stored by the BoC Valet backend, which for V122514
+      resolved to monthly average observations (last seen: 2026-03-01, 89 days stale)
+      rather than the current daily fixing. Date-range params reliably return all
+      observations between the specified dates, matching the pattern used by
+      fetch_bond_yields.py (_boc_valet_latest) which returns the current trading day.
+
+    V122514 = canonical daily CORRA series (aligned with workflow_meetings.yml).
+    V122530 retained as fallback (daily CORRA, alternative BoC Valet ID).
+    Confirmed working from GitHub Actions (CORRA ~2.25% current target range).
     """
     print('[CAD]')
+    end_date   = date.today().strftime('%Y-%m-%d')
+    start_date = (date.today() - timedelta(days=42)).strftime('%Y-%m-%d')  # 6-week window
+
     for series in ('V122514', 'V122530'):
         try:
             r = requests.get(
                 f'https://www.bankofcanada.ca/valet/observations/{series}/json',
-                params={'recent': '3'}, headers=HEADERS, timeout=15
+                params={'start_date': start_date, 'end_date': end_date},
+                headers=HEADERS, timeout=15,
             )
             r.raise_for_status()
             obs = r.json().get('observations', [])
-            if obs:
-                last = obs[-1]
-                raw  = last.get(series, {}).get('v')
-                if raw is not None:
-                    val = float(raw)
-                    dt  = last.get('d', str(date.today()))
-                    print(f'  CAD: CORRA (BoC Valet {series})')
-                    print(f'    OK CORRA {val}% ({dt})')
-                    return val, 'CORRA', dt
+            # Walk backwards from most recent to find latest non-empty value
+            for entry in reversed(obs):
+                raw = entry.get(series, {}).get('v')
+                if raw and raw not in ('', 'Bank holiday', 'nd'):
+                    try:
+                        val = float(raw)
+                        dt  = entry.get('d', str(date.today()))
+                        print(f'  CAD: CORRA (BoC Valet {series})')
+                        print(f'    OK CORRA {val}% ({dt})')
+                        return val, 'CORRA', dt
+                    except (ValueError, TypeError):
+                        continue
+            print(f'  CAD: BoC Valet {series} — no observations in window ({start_date} → {end_date})')
         except Exception as e:
             print(f'  CAD: BoC Valet {series} failed: {e}')
 
