@@ -410,47 +410,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   #sent-rows::-webkit-scrollbar { width: 3px; }
   #sent-rows::-webkit-scrollbar-track { background: transparent; }
   #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-  /* NEWS SECTION (section-news) — single-row calendar-style accordion */
-  /* Each item: [time][dot][headline...truncated][cur-tag][source][chevron] — ONE line */
-  .ns-item { display:block;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s; }
-  .ns-item:hover { background:var(--bg3); }
-  .ns-item:last-child { border-bottom:none; }
-  .ns-featured .ns-row { border-left:2px solid var(--blue);padding-left:12px; }
-  /* Single flex row — matches economic calendar row height */
-  .ns-row { display:flex;align-items:center;gap:8px;padding:0 14px;height:30px;min-width:0; }
-  /* Time cell: fixed 38px — same width as econmap hour column.
-     Stacks HH:MM over Xh in a single column; no extra flex item in the row. */
-  .ns-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
-  .ns-time-hm  { font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap; }
-  .ns-time-age { font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;white-space:nowrap;margin-top:1px; }
-  .ns-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
-  .ns-dot-high { background:var(--down); }
-  .ns-dot-med  { background:var(--orange); }
-  .ns-dot-low  { background:var(--text3); }
-  .ns-headline { font-size:11px;color:var(--text);font-family:var(--font-ui);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0; }
-  .ns-cur-tag { font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;font-family:var(--font-ui);flex-shrink:0; }
-  .ns-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);flex-shrink:0;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .ns-chevron { color:var(--text3);flex-shrink:0;display:flex;align-items:center;transition:transform .18s; }
-  .ns-open .ns-chevron { transform:rotate(180deg); }
-  /* Accordion drawer — slides in below the single row when open */
-  .ns-drawer { display:none;padding:6px 14px 10px 56px; }
-  .ns-open .ns-drawer { display:block; }
-  .ns-drawer-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);margin:0 0 4px 0;text-transform:uppercase;letter-spacing:.04em; }
-  .ns-snippet { font-size:11px;color:var(--text2);line-height:1.5;font-family:var(--font-ui);margin:0; }
-  .ns-read-link { display:inline-block;margin-top:6px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none; }
-  .ns-read-link:hover { text-decoration:underline; }
-  /* Filter pills */
-  .ns-cur-pill,.ns-imp-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
-  .ns-cur-pill:hover,.ns-imp-pill:hover { background:var(--bg3);color:var(--text); }
-  .ns-pill-active { background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important; }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.2.36">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.3.2">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -1613,7 +1579,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/dashboard.js?v=8.3.0" defer></script>
+<script src="assets/dashboard.js?v=8.3.2" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
