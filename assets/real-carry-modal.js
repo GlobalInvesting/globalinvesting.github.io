@@ -514,7 +514,7 @@ function _rcmRenderBreakdown() {
   const fallbackNote = policyFallbacks.length
     ? ` ${policyFallbacks.join('/')} nominal: CB policy rate (OIS data unavailable).`
     : '';
-  const liveNote = 'Nominal rate: OIS overnight benchmark (SOFR/€STR/SONIA/TONA/CORRA/SARON) — institutional overnight rate standard.' + fallbackNote + ' · ' +
+  const liveNote = 'Nominal rate: OIS overnight benchmark (SOFR/€STR/SONIA/TONA/AONIA/CORRA/SARON/OCR) — institutional overnight rate standard.' + fallbackNote + ' · ' +
     'USD/EUR infl.exp: FRED 5Y breakeven (market-implied, daily). ' +
     'GBP: BOE SDIE household survey 2Y-ahead. CAD: FRED 5Y breakeven. NZD: RBNZ survey 2Y-ahead. ' +
     'JPY/AUD/CHF: CPI YoY (IMF SDMX 3.0, weekly). ' +
@@ -527,7 +527,7 @@ function _rcmRenderBreakdown() {
         <tr>
           <th scope="col" style="text-align:center;width:20px;padding:7px 4px 7px 11px;border-left:3px solid transparent;">#</th>
           <th scope="col" style="text-align:left;">Central Bank</th>
-          <th scope="col" title="OIS overnight benchmark (SOFR/€STR/SONIA/TONA/CORRA/SARON) — institutional overnight benchmarks. Falls back to CB policy rate when OIS unavailable." style="cursor:help;">Nominal <span style="font-size:8px;color:var(--accent,#26a69a);vertical-align:super;">OIS</span></th>
+          <th scope="col" title="OIS overnight benchmark (SOFR/€STR/SONIA/TONA/AONIA/CORRA/SARON/OCR) — institutional overnight benchmarks. Falls back to CB policy rate when OIS unavailable." style="cursor:help;">Nominal <span style="font-size:8px;color:var(--accent,#26a69a);vertical-align:super;">OIS</span></th>
           <th scope="col">Infl. Exp.</th>
           <th scope="col">Real Rate</th>
           <th scope="col">OIS Bias</th>
