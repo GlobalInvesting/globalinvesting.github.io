@@ -1,7 +1,7 @@
 /**
  * calendar-watcher.js — Cloudflare Worker v1.0
  *
- * Polls Finnhub every 1 minute for G8 economic calendar actuals/forecasts.
+ * Polls Finnhub every 1 minute for major-economy economic calendar actuals/forecasts.
  * When new data is detected, fires a repository_dispatch event to GitHub Actions,
  * which triggers the full fetch_ff_calendar.py pipeline.
  *
@@ -130,7 +130,7 @@ async function runCalendarWatch(env) {
   }
 
   if (!events || events.length === 0) {
-    console.log(`${label} No G8 events returned from Finnhub — skipping.`);
+    console.log(`${label} No 8 major currencies events returned from Finnhub — skipping.`);
     return;
   }
 
@@ -190,7 +190,7 @@ async function fetchFinnhub(dateFrom, dateTo, apiKey) {
   const data = await resp.json();
   const raw = Array.isArray(data?.economicCalendar) ? data.economicCalendar : [];
 
-  // Filter to G8 medium+high impact only, with actual or forecast
+  // Filter to major-economy medium+high impact only, with actual or forecast
   const events = [];
   for (const ev of raw) {
     const iso2 = (ev.country || "").toUpperCase();
