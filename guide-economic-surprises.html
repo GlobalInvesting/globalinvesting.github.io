@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Economic Surprise Index (ESI) Explained: Methodology, Signals, and FX Impact — Global Investing</title>
-<meta name="description" content="How the Economic Surprise Index works: decay-weighted z-score methodology, G8 currency scoring, beat/miss classification, and what a rising or falling ESI means for currency direction. Updated continuously from the economic calendar.">
+<meta name="description" content="How the Economic Surprise Index works: decay-weighted z-score methodology, major currency scoring, beat/miss classification, and what a rising or falling ESI means for currency direction. Updated continuously from the economic calendar.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-economic-surprises.html">
 <meta name="google-adsense-account" content="ca-pub-7977942731354565">
@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://globalinvesting.github.io/guide-economic-surprises.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
 <meta property="og:title" content="Economic Surprise Index (ESI) Explained: Methodology, Signals, and FX Impact — Global Investing">
-<meta property="og:description" content="How the Economic Surprise Index works: decay-weighted z-score methodology, G8 currency scoring, beat/miss classification, and what a rising or falling ESI means for currency direction.">
+<meta property="og:description" content="How the Economic Surprise Index works: decay-weighted z-score methodology, major currency scoring, beat/miss classification, and what a rising or falling ESI means for currency direction.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -22,14 +22,14 @@
 <meta property="article:section" content="Guides">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Economic Surprise Index (ESI) Explained: Methodology, Signals, and FX Impact">
-<meta name="twitter:description" content="Decay-weighted z-score methodology for G8 currency ESI scoring, beat/miss classification, inverse indicators, and what a rising or falling index means for FX direction.">
+<meta name="twitter:description" content="Decay-weighted z-score methodology for major currency ESI scoring, beat/miss classification, inverse indicators, and what a rising or falling index means for FX direction.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": "Economic Surprise Index (ESI) Explained: Methodology, Signals, and FX Impact",
-  "description": "How the Economic Surprise Index works in the FX Terminal: decay-weighted z-score methodology, G8 currency scoring, beat/miss classification, inverse indicators, and what a rising or falling ESI means for currency direction.",
+  "description": "How the Economic Surprise Index works in the FX Terminal: decay-weighted z-score methodology, major currency scoring, beat/miss classification, inverse indicators, and what a rising or falling ESI means for currency direction.",
   "image": "https://globalinvesting.github.io/og-image.png",
   "datePublished": "2026-05-23T00:00:00Z",
   "dateModified": "2026-05-23T00:00:00Z",
@@ -51,7 +51,7 @@
     "@type": "WebPage",
     "@id": "https://globalinvesting.github.io/guide-economic-surprises.html"
   },
-  "keywords": "economic surprise index, CESI forex, economic surprise index FX, what is ESI forex, economic data beat miss, z-score economic surprise, decay weighted surprise index, G8 economic surprise"
+  "keywords": "economic surprise index, CESI forex, economic surprise index FX, what is ESI forex, economic data beat miss, z-score economic surprise, decay weighted surprise index, major currency economic surprise"
 }
 </script>
 <script type="application/ld+json">
@@ -106,7 +106,7 @@
       "name": "What is the difference between the ESI and standard economic data?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Standard economic data (e.g. 'US CPI was 3.2%') tells you the absolute level of an indicator. The ESI tells you whether that level was higher or lower than the market expected. A 3.2% CPI print is irrelevant without context: if the consensus forecast was 3.5%, the actual result is a downside surprise — which can weaken the currency even though CPI is still high. The ESI aggregates these relative surprises across all G8 medium and high-impact releases over a 90-day rolling window, giving a comprehensive picture of whether a currency's macro backdrop is improving or deteriorating relative to expectations."
+        "text": "Standard economic data (e.g. 'US CPI was 3.2%') tells you the absolute level of an indicator. The ESI tells you whether that level was higher or lower than the market expected. A 3.2% CPI print is irrelevant without context: if the consensus forecast was 3.5%, the actual result is a downside surprise — which can weaken the currency even though CPI is still high. The ESI aggregates these relative surprises across all major-economy medium and high-impact releases over a 90-day rolling window, giving a comprehensive picture of whether a currency's macro backdrop is improving or deteriorating relative to expectations."
       }
     },
     {
@@ -346,13 +346,13 @@ a { color: inherit; text-decoration: none; }
     <div class="page-hero">
       <div class="page-hero-label">Guides</div>
       <h1>Economic Surprise Index (ESI)</h1>
-      <p>The ESI measures whether G8 economic data releases are beating or missing consensus forecasts, aggregated over a 90-day rolling window. It uses a decay-weighted z-score methodology modeled on the Citigroup CESI and Bloomberg BEEI — the same approach used by institutional macro desks to gauge whether a currency's economic backdrop is improving or deteriorating relative to market expectations.</p>
+      <p>The ESI measures whether major-economy economic data releases are beating or missing consensus forecasts, aggregated over a 90-day rolling window. It uses a decay-weighted z-score methodology modeled on the Citigroup CESI and Bloomberg BEEI — the same approach used by institutional macro desks to gauge whether a currency's economic backdrop is improving or deteriorating relative to market expectations.</p>
     </div>
 
     <div class="guide-section" id="what-is-esi">
       <h2>What Is the Economic Surprise Index</h2>
       <p>The Economic Surprise Index (ESI) answers a specific question: are economic data releases for a given currency consistently beating market forecasts, missing them, or landing in line? It does not measure whether the economy is strong or weak in absolute terms — it measures whether it is stronger or weaker <em>than expected</em>.</p>
-      <p>This distinction matters because FX markets price in expectations. A currency that trades at a given level already reflects the market's best estimate of future economic conditions. What moves it further is <em>new information</em> — data that surprises relative to those expectations. The ESI tracks whether those surprises have been running systematically positive (beats) or negative (misses) across all G8 medium and high-impact releases.</p>
+      <p>This distinction matters because FX markets price in expectations. A currency that trades at a given level already reflects the market's best estimate of future economic conditions. What moves it further is <em>new information</em> — data that surprises relative to those expectations. The ESI tracks whether those surprises have been running systematically positive (beats) or negative (misses) across all major-economy medium and high-impact releases.</p>
       <table class="data-table" aria-label="ESI index values and interpretation">
         <thead>
           <tr>
@@ -405,7 +405,7 @@ a { color: inherit; text-decoration: none; }
       <h2>Methodology Overview</h2>
       <p>The terminal ESI scoring pipeline follows the Citigroup CESI and Bloomberg BEEI conventions as closely as the available data permits. The key steps:</p>
       <ol>
-        <li><strong style="color:var(--text);">Event filter:</strong> Only G8 medium and high-impact releases with both a consensus forecast and an actual result are scored. Low-impact events and data without a forecast baseline are excluded. Noise events (bond auctions, rig counts, inventory data — see the Excluded Events section) are filtered out regardless of their impact rating.</li>
+        <li><strong style="color:var(--text);">Event filter:</strong> Only major-economy medium and high-impact releases with both a consensus forecast and an actual result are scored. Low-impact events and data without a forecast baseline are excluded. Noise events (bond auctions, rig counts, inventory data — see the Excluded Events section) are filtered out regardless of their impact rating.</li>
         <li><strong style="color:var(--text);">Deduplication:</strong> Flash and Final PMI prints are deduplicated so each macro signal is counted only once, even when published on different dates with the same data. The dedup key is based on the canonical event name plus the actual value, matching the same logic used in the engine's data pipeline.</li>
         <li><strong style="color:var(--text);">Beat/miss classification:</strong> For each event, actual is compared to consensus forecast. If actual &gt; forecast, it is a beat. If actual &lt; forecast, it is a miss. For inverse indicators (e.g. unemployment rate, jobless claims), the sign is flipped so that a lower actual than forecast correctly scores as a beat.</li>
         <li><strong style="color:var(--text);">Decay weighting:</strong> Each event's contribution is multiplied by an exponential decay weight based on its age. Recent events carry more weight; older events fade. Half-life is 45 days — matching the Citi CESI convention.</li>
@@ -526,7 +526,7 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="reading-panel">
       <h2>Reading the ESI Panel</h2>
-      <p>The Economic Surprises panel in the terminal displays one row per G8 currency. Each row contains:</p>
+      <p>The Economic Surprises panel in the terminal displays one row per major currency. Each row contains:</p>
       <table class="data-table" aria-label="ESI panel columns and their meaning">
         <thead>
           <tr>
@@ -538,7 +538,7 @@ a { color: inherit; text-decoration: none; }
         <tbody>
           <tr>
             <td>Currency</td>
-            <td>G8 currency code (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD)</td>
+            <td>major currency code (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD)</td>
             <td>Click any row to open the detail modal with the full event breakdown for that currency</td>
           </tr>
           <tr>
@@ -606,7 +606,7 @@ a { color: inherit; text-decoration: none; }
       <ul>
         <li><strong style="color:var(--text);">It is a lagging indicator of sentiment, not a leading indicator of price.</strong> The ESI reflects what has happened in data releases over the past 90 days. It does not predict where data will go next. A high ESI can remain high for several more weeks before deteriorating, or it can reverse immediately — the index does not signal which.</li>
         <li><strong style="color:var(--text);">Mean-reversion tendency.</strong> As documented in academic studies of the Citigroup CESI, economic surprise indices tend to mean-revert because analyst forecasts adjust to systematic beats or misses over time. An ESI that has been persistently positive for 10+ weeks is statistically more likely to weaken than to continue rising — not because the economy is deteriorating, but because forecasters have raised their expectations.</li>
-        <li><strong style="color:var(--text);">Consensus quality varies by currency.</strong> The Bloomberg consensus for USD economic releases is deep and liquid — dozens of contributing analysts producing well-calibrated forecasts. For some smaller G8 currencies (NZD, CHF), the consensus is thinner and individual outlier estimates can produce false beats or misses. A lower N value in the panel is the signal to apply more caution to the index reading.</li>
+        <li><strong style="color:var(--text);">Consensus quality varies by currency.</strong> The Bloomberg consensus for USD economic releases is deep and liquid — dozens of contributing analysts producing well-calibrated forecasts. For some smaller 8 major currencies (NZD, CHF), the consensus is thinner and individual outlier estimates can produce false beats or misses. A lower N value in the panel is the signal to apply more caution to the index reading.</li>
         <li><strong style="color:var(--text);">The ESI does not capture market impact directly.</strong> Not all beats or misses have equal FX impact. A surprise in a release the market currently considers a key policy variable (e.g. US CPI during an inflation-sensitive Fed cycle) has far greater FX impact than an equivalent surprise in a secondary release. The z-score methodology partially addresses this by weighting larger surprises more, but it does not specifically amplify releases that are contextually more important to the current rate-setting narrative.</li>
       </ul>
       <p>For this reason, the ESI is most effective when read alongside the CB Rate Expectations panel (which shows what OIS markets are pricing for the next CB meeting), the COT Positioning panel (which shows institutional medium-term directional bias), and the Cross-Asset Risk regime (which determines whether carry trades are being rewarded or unwound).</p>
@@ -619,7 +619,7 @@ a { color: inherit; text-decoration: none; }
   <div style="border:1px solid var(--border);border-radius:6px;background:var(--bg2);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
     <div>
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">AI Market Narrative — Updated 4x Daily</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;">The terminal publishes an AI-generated market narrative at each major session transition. Each update includes current ESI readings across G8 currencies and their implication for the dominant FX themes. Subscribe via RSS or JSON Feed.</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">The terminal publishes an AI-generated market narrative at each major session transition. Each update includes current ESI readings across 8 major currencies and their implication for the dominant FX themes. Subscribe via RSS or JSON Feed.</div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;">
       <a href="/feed.xml" style="display:inline-block;padding:8px 16px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap;">RSS Feed</a>
@@ -632,7 +632,7 @@ a { color: inherit; text-decoration: none; }
   <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.05);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
     <div>
       <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">View live ESI scores in the terminal</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Current Economic Surprise Index for all G8 currencies — beat/miss breakdown, event detail modal, and comparison against COT positioning and rate expectations.</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">Current Economic Surprise Index for all 8 major currencies — beat/miss breakdown, event detail modal, and comparison against COT positioning and rate expectations.</div>
     </div>
     <a href="/" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:var(--blue);color:#fff;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
   </div>

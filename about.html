@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About — Global Investing FX Terminal</title>
-<meta name="description" content="Global Investing FX Terminal is a professional-grade foreign exchange monitoring platform covering G8 FX pairs, institutional positioning data, central bank rates, yield curve metrics, and AI-powered market narrative.">
+<meta name="description" content="Global Investing FX Terminal is a professional-grade foreign exchange monitoring platform covering major FX pairs, institutional positioning data, central bank rates, yield curve metrics, and AI-powered market narrative.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://globalinvesting.github.io/about.html">
 <meta name="google-adsense-account" content="ca-pub-7977942731354565">
@@ -12,12 +12,12 @@
 <meta property="og:url" content="https://globalinvesting.github.io/about.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
 <meta property="og:title" content="About — Global Investing FX Terminal">
-<meta property="og:description" content="Global Investing FX Terminal is a professional-grade foreign exchange monitoring platform covering G8 FX pairs, institutional positioning data, central bank rates, yield curve metrics, and AI-powered market narrative.">
+<meta property="og:description" content="Global Investing FX Terminal is a professional-grade foreign exchange monitoring platform covering major FX pairs, institutional positioning data, central bank rates, yield curve metrics, and AI-powered market narrative.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="About — Global Investing FX Terminal">
-<meta name="twitter:description" content="Professional-grade FX terminal covering G8 pairs, COT positioning, central bank rates, yield curve, cross-asset risk, derivatives, and AI market narrative.">
+<meta name="twitter:description" content="Professional-grade FX terminal covering major pairs, COT positioning, central bank rates, yield curve, cross-asset risk, derivatives, and AI market narrative.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -472,7 +472,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     "width": 180,
     "height": 180
   },
-  "description": "Professional-grade foreign exchange monitoring platform covering G8 FX pairs, institutional COT positioning, central bank rates, yield curve metrics, cross-asset risk signals, and AI-powered market narrative.",
+  "description": "Professional-grade foreign exchange monitoring platform covering major FX pairs, institutional COT positioning, central bank rates, yield curve metrics, cross-asset risk signals, and AI-powered market narrative.",
   "foundingDate": "2026",
   "knowsAbout": [
     "Foreign exchange markets",
@@ -565,7 +565,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <div class="stat-label">FX quote bar</div>
     </div>
     <div class="stat-item">
-      <div class="stat-val">8<span>G8</span></div>
+      <div class="stat-val">8<span>Major</span></div>
       <div class="stat-label">Major currencies</div>
     </div>
   </div>
@@ -573,7 +573,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <div class="section">
     <h2>What it is</h2>
     <p>The FX Terminal is a single-page dashboard designed for serious FX market monitoring. It was built to address a specific gap: professional-quality FX context is fragmented across institutional terminals, broker platforms, and government data portals. This terminal aggregates the most signal-rich publicly available data into a coherent, fast, and always-accessible interface.</p>
-    <p>Coverage spans live FX price feeds across all 28 G8 pairs via Finnhub WebSocket (tick-by-tick during market hours), CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, rolling cross-asset correlations with full 252-day history, live central bank policy rates, OIS-derived forward rate expectations for each G8 central bank, an AI-generated market regime narrative updated four times daily, and news headlines refreshed every hour. A native Economic Calendar panel renders G8 medium- and high-impact events from Finnhub in terminal colors with local timezone conversion, auto-scrolling to the next upcoming event and displaying actual versus consensus coloring as data releases. An Economic Surprises panel provides a CESI-style (Citi Economic Surprise Index) beat/miss chart over a rolling 90-day window, upgrading to z-score normalization per series as history accumulates. The main price chart is a native LightweightCharts implementation with candlestick, line, area, and bar modes, multi-timeframe moving averages, central bank decision markers, and volume overlay — supplemented by a real-time TradingView widget. A dedicated Derivatives section consolidates implied forwards via Covered Interest Parity (CIP), the 25-delta Risk Reversal term structure, realized volatility versus RR skew, ECB official reference fixings, and DTCC GTR FX OTC notional volume.</p>
+    <p>Coverage spans live FX price feeds across all 28 major pairs via Finnhub WebSocket (tick-by-tick during market hours), CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, rolling cross-asset correlations with full 252-day history, live central bank policy rates, OIS-derived forward rate expectations for each major central bank, an AI-generated market regime narrative updated four times daily, and news headlines refreshed every hour. A native Economic Calendar panel renders major-economy medium- and high-impact events from Finnhub in terminal colors with local timezone conversion, auto-scrolling to the next upcoming event and displaying actual versus consensus coloring as data releases. An Economic Surprises panel provides a CESI-style (Citi Economic Surprise Index) beat/miss chart over a rolling 90-day window, upgrading to z-score normalization per series as history accumulates. The main price chart is a native LightweightCharts implementation with candlestick, line, area, and bar modes, multi-timeframe moving averages, central bank decision markers, and volume overlay — supplemented by a real-time TradingView widget. A dedicated Derivatives section consolidates implied forwards via Covered Interest Parity (CIP), the 25-delta Risk Reversal term structure, realized volatility versus RR skew, ECB official reference fixings, and DTCC GTR FX OTC notional volume.</p>
   </div>
 
   <div class="section">
@@ -588,8 +588,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <tr><td>Quote bar — FX pairs (28 pairs)</td><td>Finnhub WebSocket via Cloudflare Worker proxy · yfinance fallback (~5 min)</td><td><span class="badge-rt">LIVE</span></td></tr>
         <tr><td>Quote bar — XAU, WTI, BTC, DXY, US10Y</td><td>yfinance</td><td><span class="badge-daily">~5 MIN</span></td></tr>
         <tr><td>Currency Strength Heatmap</td><td>Finnhub WebSocket ticks · yfinance fallback (~5 min)</td><td><span class="badge-rt">LIVE</span></td></tr>
-        <tr><td>Economic Calendar</td><td>Finnhub · G8 · medium &amp; high impact</td><td><span class="badge-daily">~1–3 MIN</span></td></tr>
-        <tr><td>Economic Surprises</td><td>Finnhub · actual vs consensus · G8 · 90d rolling window · z-score normalised per series (n ≥ 5)</td><td><span class="badge-daily">~1–3 MIN</span></td></tr>
+        <tr><td>Economic Calendar</td><td>Finnhub · 8 major currencies · medium &amp; high impact</td><td><span class="badge-daily">~1–3 MIN</span></td></tr>
+        <tr><td>Economic Surprises</td><td>Finnhub · actual vs consensus · 8 major currencies · 90d rolling window · z-score normalised per series (n ≥ 5)</td><td><span class="badge-daily">~1–3 MIN</span></td></tr>
         <tr><td>Central Bank Rates</td><td>Official central bank sources (ECB, Fed, BoE, BoJ, RBA, BoC, SNB, RBNZ)</td><td><span class="badge-daily">DAILY</span></td></tr>
         <tr><td>CB Rate Expectations</td><td>OIS/overnight rate markets — CME FedWatch (USD · SOFR futures), ECB SDW ESTER (EUR), BoE SONIA (GBP), BoJ TONA (JPY), ASX Rate Indicator (AUD), BoC CORRA (CAD), SNB SARON (CHF), RBNZ OCR overnight (NZD)</td><td><span class="badge-weekly">WEEKLY</span></td></tr>
         <tr><td>Carry Trade Ranking (carry-to-vol)</td><td>Official central bank sources · yfinance HV30</td><td><span class="badge-daily">~30 MIN</span></td></tr>
@@ -611,7 +611,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <tr><td>Economic Map</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
       </tbody>
     </table>
-    <p style="margin-top:14px;font-size:12px;color:var(--text2);line-height:1.7;"><strong style="color:var(--text);">Central Bank Rates vs. CB Rate Expectations — two distinct signals.</strong> The CB Rates panel shows the <em>current</em> policy rate for each G8 central bank — a retrospective indicator of where the rate stands today. The CB Rate Expectations panel is <em>forward-looking</em>: it shows the market-consensus direction at the <em>next</em> scheduled meeting, derived from overnight index swap (OIS) markets — the same instruments institutional desks use to price monetary policy risk. These two signals will sometimes diverge; that is correct and intentional. The Bank of Japan in early 2026 is a canonical example: the current rate was unchanged for eight months (trend arrow = neutral), while OIS markets priced a hike at the next meeting (bias = ↑ Hike). FX reacts to the expectation, not the current rate.</p>
+    <p style="margin-top:14px;font-size:12px;color:var(--text2);line-height:1.7;"><strong style="color:var(--text);">Central Bank Rates vs. CB Rate Expectations — two distinct signals.</strong> The CB Rates panel shows the <em>current</em> policy rate for each major central bank — a retrospective indicator of where the rate stands today. The CB Rate Expectations panel is <em>forward-looking</em>: it shows the market-consensus direction at the <em>next</em> scheduled meeting, derived from overnight index swap (OIS) markets — the same instruments institutional desks use to price monetary policy risk. These two signals will sometimes diverge; that is correct and intentional. The Bank of Japan in early 2026 is a canonical example: the current rate was unchanged for eight months (trend arrow = neutral), while OIS markets priced a hike at the next meeting (bias = ↑ Hike). FX reacts to the expectation, not the current rate.</p>
   </div>
 
   <div class="section">
@@ -640,11 +640,11 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
       <div class="card">
         <div class="card-title">Session Context</div>
-        <div class="card-body">Per-session, per-currency notes covering all four trading sessions (Sydney, Tokyo, London, New York) for all 8 G8 currencies. Each note is anchored to actual Finnhub calendar events — citing the specific catalyst (data release, CB speaker) rather than generic CB-stance commentary. Displayed in the Session tab of the Currency Strength Heatmap modal. Updated 4&times; daily alongside the narrative.</div>
+        <div class="card-body">Per-session, per-currency notes covering all four trading sessions (Sydney, Tokyo, London, New York) for all 8 major currencies. Each note is anchored to actual Finnhub calendar events — citing the specific catalyst (data release, CB speaker) rather than generic CB-stance commentary. Displayed in the Session tab of the Currency Strength Heatmap modal. Updated 4&times; daily alongside the narrative.</div>
       </div>
     </div>
     <p style="margin-top:16px;">All other sections — prices, COT data, yield curve, heatmap, news — consume market data directly. AI does not generate, filter, or modify price data.</p>
-    <p style="margin-top:10px;font-size:14.3px;color:var(--text2);line-height:1.8;">The <strong style="color:var(--text);">Currency Strength Heatmap modal</strong> also includes a <strong style="color:var(--text);">Currency Strength Index (CSI)</strong> tab: a multi-series chart showing the cumulative log-return of each G8 currency over 1M / 3M / 6M / 1Y horizons, computed from the full OHLC dataset across all 28 pairs. The focal currency is highlighted; all eight series update on period selection without re-fetching data. An intraday and weekly composite, pair-by-pair breakdown, and currency ranking are shown alongside.</p>
+    <p style="margin-top:10px;font-size:14.3px;color:var(--text2);line-height:1.8;">The <strong style="color:var(--text);">Currency Strength Heatmap modal</strong> also includes a <strong style="color:var(--text);">Currency Strength Index (CSI)</strong> tab: a multi-series chart showing the cumulative log-return of each major currency over 1M / 3M / 6M / 1Y horizons, computed from the full OHLC dataset across all 28 pairs. The focal currency is highlighted; all eight series update on period selection without re-fetching data. An intraday and weekly composite, pair-by-pair breakdown, and currency ranking are shown alongside.</p>
   </div>
 
   <div class="section">
@@ -656,7 +656,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
   <div class="section">
     <h2>Currencies covered</h2>
-    <p>USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major currencies, accounting for the substantial majority of global daily FX turnover.</p>
+    <p>USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight major currencies, accounting for the substantial majority of global daily FX turnover.</p>
   </div>
 
   <div class="section">
