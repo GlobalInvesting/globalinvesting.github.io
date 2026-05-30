@@ -11,13 +11,13 @@ A professional-grade foreign exchange monitoring platform for serious market par
 ## What it covers
 
 - **Real-time price feeds** — Major FX pairs, commodities (XAU, WTI), crypto (BTC), DXY, and US 10Y yield
-- **Currency strength heatmap** — 8×8 grid showing G8 currency performance across all pairs
+- **Currency strength heatmap** — 8×8 grid showing major currency performance across all pairs
 - **AI market narrative** — 2–3 sentence regime summary updated 4× daily alongside market signals
 - **CFTC COT positioning** — Leveraged Funds net positioning (Disaggregated TFF, Options+Futures Combined) from CFTC.gov, updated weekly
 - **US Treasury yield curve** — 3M, 2Y, 5Y, 10Y, 30Y, updated daily
 - **Cross-asset risk monitor** — SPX, Gold, WTI, BTC, DXY, Nikkei, Stoxx correlations with stress scoring
-- **Central bank policy rates** — All G8 CBs with rate cycle direction
-- **CB Rate Expectations** — OIS-derived forward consensus direction (Cut/Hold/Hike) and 30-day CIP forward rate for each G8 central bank at their next meeting; sourced from CME FedWatch, ECB SDW ESTER, BoE SONIA, BoJ TONA, ASX Rate Indicator, BoC CORRA, SNB SARON, and RBNZ OCR overnight
+- **Central bank policy rates** — All 8 major currencies CBs with rate cycle direction
+- **CB Rate Expectations** — OIS-derived forward consensus direction (Cut/Hold/Hike) and 30-day CIP forward rate for each major central bank at their next meeting; sourced from CME FedWatch, ECB SDW ESTER, BoE SONIA, BoJ TONA, ASX Rate Indicator, BoC CORRA, SNB SARON, and RBNZ OCR overnight
 - **FX liquidity & sessions** — 24-hour liquidity profile with live session indicator
 - **Positioning Bias** — ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) combined with COT Leveraged Funds directional bias and 25-delta Risk Reversals from Saxo Bank (1M tenor, indicative mid-market). When ≥4 weeks of IV history are available, an IV Rank column (0–100 scale, where 100 = historically expensive vol) replaces the COT bias column.
 - **Pair detail panel** — Linked right-panel showing price, 1W change, HV30, ATM IV, IV−HV, LF net, AM net, carry differential, and LF/AM alignment badge for the currently selected chart pair (Eikon-style linked panel). Hover tooltips on every metric cell explain the data source and interpretation.
@@ -28,10 +28,10 @@ A professional-grade foreign exchange monitoring platform for serious market par
 - **Per-panel timestamps** — Every data panel displays its source and last update time in the user's local timezone. Panels with AI-generated signals also show when the data was loaded from the engine.
 - **AI signal evidence traceability** — Each AI-generated market signal carries an `evidence[]` field listing the exact data values that motivated it (e.g. "VIX: 23.9", "Fed rate: 4.50%"). Evidence chips are hidden by default and revealed by clicking the signal row.
 - **Economic calendar** — TradingView embed with real-time event actuals
-- **Economic Surprises** — CESI-style normalised surprise index for all G8 currencies, computed from ForexFactory calendar actual-vs-consensus over a 90-day rolling window. Clicking any currency row opens a full-screen detail modal with: (1) LightweightCharts v5 area series showing the 30-day rolling index history stepped weekly; (2) metrics bar (index, beats, misses, N, beat rate); (3) individual events table with beat / miss / in-line badges for the full 90-day window. Methodology mirrors Citi CESI convention — beat rate scaled to [−100, +100].
-- **News Feed** — Dedicated tab (shortcut: N) with 52 FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Finnhub, NewsData.io, Marc to Market and others. Single-row accordion layout with impact dot, currency tag, relative age indicator, and full-headline tooltip. Filterable by currency (G8) and impact level (High / Med / All). Engine updates hourly; terminal re-checks every 2 minutes via HTTP ETag.
+- **Economic Surprises** — CESI-style normalised surprise index for all 8 major currencies, computed from ForexFactory calendar actual-vs-consensus over a 90-day rolling window. Clicking any currency row opens a full-screen detail modal with: (1) LightweightCharts v5 area series showing the 30-day rolling index history stepped weekly; (2) metrics bar (index, beats, misses, N, beat rate); (3) individual events table with beat / miss / in-line badges for the full 90-day window. Methodology mirrors Citi CESI convention — beat rate scaled to [−100, +100].
+- **News Feed** — Dedicated tab (shortcut: N) with 52 FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Finnhub, NewsData.io, Marc to Market and others. Single-row accordion layout with impact dot, currency tag, relative age indicator, and full-headline tooltip. Filterable by currency (8 major currencies) and impact level (High / Med / All). Engine updates hourly; terminal re-checks every 2 minutes via HTTP ETag.
 - **Market signals** — 4–5 AI-generated signals updated 4× daily
-- **Carry Trade Ranking** — G8 carry-to-vol ranking for all 28 pairs, sorted by nominal rate differential divided by 30-day realised volatility. Clicking any row opens the Real Rate Carry Analysis modal with three tabs: (1) Rates Breakdown — 8 currencies sorted by real rate (nominal CB rate minus inflation expectation), with OIS bias chip and data-age transparency; (2) Real Rate Matrix — 8×8 differential grid color-coded by carry sustainability; (3) Pair Detail — nominal carry, real carry, carry-to-vol on both bases, OIS probability for each leg, and carry sustainability assessment (sustainable / moderate / carry trap). Inflation expectations sourced live from FRED (T5YIE for USD, T5YIFR for EUR) and from `extended-data/*.json` batch for remaining currencies. Matches Bloomberg FXFR / FXFC layout convention.
+- **Carry Trade Ranking** — 8 major currencies carry-to-vol ranking for all 28 pairs, sorted by nominal rate differential divided by 30-day realised volatility. Clicking any row opens the Real Rate Carry Analysis modal with three tabs: (1) Rates Breakdown — 8 currencies sorted by real rate (nominal CB rate minus inflation expectation), with OIS bias chip and data-age transparency; (2) Real Rate Matrix — 8×8 differential grid color-coded by carry sustainability; (3) Pair Detail — nominal carry, real carry, carry-to-vol on both bases, OIS probability for each leg, and carry sustainability assessment (sustainable / moderate / carry trap). Inflation expectations sourced live from FRED (T5YIE for USD, T5YIFR for EUR) and from `extended-data/*.json` batch for remaining currencies. Matches Bloomberg FXFR / FXFC layout convention.
 - **Derivatives section** — Implied forwards (CIP, 1M/3M/6M/1Y), 25-delta Risk Reversal term structure (Saxo Bank), realized vol vs RR skew, ECB official reference exchange rates (daily fixing, 7 EUR pairs), and FX OTC notional volume by pair and product type (DTCC GTR CFTC Recast public dissemination, T+1).
 
 ---
@@ -51,7 +51,7 @@ The frontend reads all data via `fetch()` from JSON files committed to this repo
 
 ## Currencies covered
 
-USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major currencies, covering the substantial majority of global daily FX turnover.
+USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight major currencies, covering the substantial majority of global daily FX turnover.
 
 ---
 
@@ -60,7 +60,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | Directory | Contents | Updated by |
 |-----------|----------|------------|
 | `ai-analysis/` | `index.json` — AI regime label + narrative; `signals.json` — market signals | Engine — 4× daily |
-| `calendar-data/` | Economic calendar events — `calendar.json` consumed by `update_extended_data.py` for PMI/CPI enrichment; `ff_calendar.json` (ForexFactory, G8 high-impact, this week + next) consumed by `generate_narrative_signals.py` → `build_calendar_block()` to ground session context notes in real catalysts | Engine — daily |
+| `calendar-data/` | Economic calendar events — `calendar.json` consumed by `update_extended_data.py` for PMI/CPI enrichment; `ff_calendar.json` (ForexFactory, 8 major currencies high-impact, this week + next) consumed by `generate_narrative_signals.py` → `build_calendar_block()` to ground session context notes in real catalysts | Engine — daily |
 | `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer) + 26-week `history[]` rolling window | Engine — weekly (Saturday) |
 | `economic-data/` | Macro indicators | Engine — daily |
 | `extended-data/` | IV, carry, cross-asset fallback, inflation expectations | Engine — daily / Site — weekly (inflation expectations) |
@@ -69,7 +69,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | `meetings-data/` | CB meeting schedules | Engine — weekly |
 | `news-data/` | News feed headlines | Engine — hourly |
 | `rates/` | FX rates cache | Engine — daily |
-| `rr-data/` | `rr.json` — 25-delta Risk Reversal quotes (4 G8 pairs, 1M tenor) from Saxo Bank | Engine — Mon–Fri daily |
+| `rr-data/` | `rr.json` — 25-delta Risk Reversal quotes (4 major pairs, 1M tenor) from Saxo Bank | Engine — Mon–Fri daily |
 | `sentiment-data/` | `myfxbook.json` — retail positioning | Engine — hourly |
 | `dtcc-data/` | `dtcc_fx.json` — FX OTC notional volume by pair and product type (DTCC GTR CFTC Recast) | Site — Mon–Fri 14:00 UTC |
 
