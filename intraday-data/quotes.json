@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T03:50:26Z",
+  "updated": "2026-05-30T03:55:26Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,10 +35,10 @@
       "pct1w_date": "2026-05-29"
     },
     "gold": {
-      "close": 4542.4395,
+      "close": 4542.554,
       "prev_close": 4540.1578,
-      "chg": 2.2817,
-      "pct": 0.0503,
+      "chg": 2.3962,
+      "pct": 0.0528,
       "source": "twelve_data",
       "high": 4627.1,
       "low": 4519.5,
@@ -52,7 +52,7 @@
       "chg": -1.14,
       "pct": -1.2823,
       "high": 89.02,
-      "low": 86.36,
+      "low": 86.35,
       "open": 88.55,
       "bid": 87.5,
       "ask": 88.05,
@@ -199,35 +199,35 @@
       "pct1w_date": "2026-05-29"
     },
     "btc": {
-      "close": 73476.01,
+      "close": 73443.65,
       "prev_close": 73369.125,
-      "chg": 106.885,
-      "pct": 0.1457,
+      "chg": 74.525,
+      "pct": 0.1016,
       "high": 73694.625,
       "low": 73331.016,
       "open": 73369.125,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780113023,
+      "market_time": 1780113323,
       "source": "yfinance",
-      "pct1w": -0.0823,
+      "pct1w": -0.1263,
       "pct1w_date": "2026-05-28"
     },
     "eth": {
-      "close": 2014.06,
+      "close": 2013.97,
       "prev_close": 2011.8403,
-      "chg": 2.2197,
-      "pct": 0.1103,
+      "chg": 2.1297,
+      "pct": 0.1059,
       "high": 2019.683,
       "low": 2008.7595,
       "open": 2011.8403,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780113024,
+      "market_time": 1780113325,
       "source": "yfinance",
-      "pct1w": 0.3241,
+      "pct1w": 0.3197,
       "pct1w_date": "2026-05-28"
     },
     "nasdaq": {
@@ -396,8 +396,6 @@
       "source": "yfinance",
       "pct1w": 0.0,
       "pct1w_date": "2026-05-29",
-      "session_high": 0.7186,
-      "session_low": 0.7186,
       "prev_bar": {
         "time": "2026-05-29",
         "open": 0.71674,
@@ -1109,7 +1107,7 @@
       "prev_close": 75.912,
       "chg": -0.327,
       "pct": -0.4308,
-      "high": 76.94,
+      "high": 76.96,
       "low": 74.815,
       "open": 76.025,
       "bid": 75.545,
@@ -6827,15 +6825,7 @@
       "iv_pct_rank": null,
       "iv_hist_n": 1
     },
-    "usdchf": {
-      "iv": 12.3,
-      "expiry": "2026-06-18",
-      "atm": 113.0,
-      "source": "FXF options",
-      "iv_rank": null,
-      "iv_pct_rank": null,
-      "iv_hist_n": 1
-    },
+    "usdchf": null,
     "usdcad": null,
     "nzdusd": {
       "iv": 15.3,
