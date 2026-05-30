@@ -1,9 +1,9 @@
 {
-  "updated_utc": "2026-05-29T23:38:33.033946+00:00",
-  "updated_label": "23:38 UTC",
+  "updated_utc": "2026-05-30T04:13:18.248480+00:00",
+  "updated_label": "04:13 UTC",
   "total": 52,
-  "total_high": 49,
-  "total_med": 3,
+  "total_high": 51,
+  "total_med": 1,
   "sources_active": [
     "ActionForex",
     "BabyPips",
@@ -14,11 +14,10 @@
     "InvestMacro",
     "InvestingLive",
     "MarketPulse",
-    "NewsData AUD",
     "NewsData CAD",
     "NewsData CHF",
-    "NewsData EUR",
-    "NewsData NZD",
+    "NewsData GBP",
+    "NewsData JPY",
     "RBA"
   ],
   "lang_counts": {
@@ -36,7 +35,7 @@
       "link": "https://investinglive.com/news/us-bessent-on-iran-blockade-says-anything-that-is-taken-off-will-be-taken-off-slowly-20260529/",
       "time": "19:58",
       "ts": 1780084725000,
-      "featured": true,
+      "featured": false,
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T19:58:45+00:00",
@@ -52,7 +51,7 @@
       "link": "https://investinglive.com/news/investinglive-americas-fx-news-wrap-trump-touts-naval-blockade-lift-progress-toward-deal-20260529/",
       "time": "19:31",
       "ts": 1780083118000,
-      "featured": true,
+      "featured": false,
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T19:31:58+00:00",
@@ -68,26 +67,10 @@
       "link": "https://www.fxstreet.com/news/gold-climbs-on-us-iran-ceasefire-progress-as-fed-rate-hike-bets-fade-202605291849",
       "time": "18:49",
       "ts": 1780080570000,
-      "featured": true,
-      "lang": "en",
-      "date": "29 May",
-      "datetime": "2026-05-29T18:49:30+00:00",
-      "recent": true
-    },
-    {
-      "id": "3008cf728935",
-      "cur": "GBP",
-      "impact": "med",
-      "title": "Pound Sterling Price News & Forecast: GBP/USD holds minor gains after rebounding from intraday lows",
-      "expand": "GBP/USD holds minor gains on Friday after rebounding from intraday lows, supported by improving risk sentiment surrounding a potential US-Iran peace deal. At the time of writing, the pair trades around 1.3460 and is on course to end the week little changed.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/pound-sterling-price-news-forecast-gbp-usd-holds-minor-gains-after-rebounding-from-intraday-lows-202605291829",
-      "time": "18:29",
-      "ts": 1780079389000,
       "featured": false,
       "lang": "en",
       "date": "29 May",
-      "datetime": "2026-05-29T18:29:49+00:00",
+      "datetime": "2026-05-29T18:49:30+00:00",
       "recent": true
     },
     {
@@ -100,7 +83,7 @@
       "link": "https://investinglive.com/news/how-have-interest-rate-expectations-changed-after-this-weeks-event-20260529/",
       "time": "18:22",
       "ts": 1780078930000,
-      "featured": true,
+      "featured": false,
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T18:22:10+00:00",
@@ -123,6 +106,22 @@
       "recent": true
     },
     {
+      "id": "3de5eee48169",
+      "cur": "CAD",
+      "impact": "high",
+      "title": "Passport Rule Shock: Canadian seniors warned their benefits and return flights could be at risk",
+      "expand": "Imagine spending decades working, paying taxes, and contributing to Canada, only to find yourself stranded at a foreign airport because of the wrong passport in your pocket. For thousands of Canadian seniors living part-time abroad, that frightening possibility is becoming a growing concern in 2026 as confusion surrounding dual citizenship travel r...",
+      "source": "NewsData CAD",
+      "link": "https://www.myjoyonline.com/passport-rule-shock-canadian-seniors-warned-their-benefits-and-return-flights-could-be-at-risk/",
+      "time": "16:10",
+      "ts": 1780071000000,
+      "featured": false,
+      "lang": "en",
+      "date": "29 May",
+      "datetime": "2026-05-29T16:10:00+00:00",
+      "recent": true
+    },
+    {
       "id": "dffb4815399f",
       "cur": "EUR",
       "impact": "high",
@@ -139,6 +138,22 @@
       "recent": true
     },
     {
+      "id": "03260a3b8183",
+      "cur": "JPY",
+      "impact": "high",
+      "title": "Japan backs Philippine’s strategic oil reserve plan",
+      "expand": "Japan is throwing its support behind the Philippines’ push to build a strategic petroleum reserve program designed to strengthen resilience against global supply shocks driven by geopolitical tensions.",
+      "source": "NewsData JPY",
+      "link": "https://www.philstar.com/business/2026/05/30/2531427/japan-backs-philippines-strategic-oil-reserve-plan",
+      "time": "16:00",
+      "ts": 1780070400000,
+      "featured": false,
+      "lang": "en",
+      "date": "29 May",
+      "datetime": "2026-05-29T16:00:00+00:00",
+      "recent": true
+    },
+    {
       "id": "e6ea2bd66923",
       "cur": "CAD",
       "impact": "high",
@@ -152,6 +167,38 @@
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T15:14:12+00:00",
+      "recent": true
+    },
+    {
+      "id": "c1ea51e95f98",
+      "cur": "GBP",
+      "impact": "high",
+      "title": "Global bonds take wild ride in May",
+      "expand": "Iran war sends global yields to multi-year highs; investors fret over inflation shock, public debt",
+      "source": "NewsData GBP",
+      "link": "https://tribune.com.pk/story/2610478/global-bonds-take-wild-ride-in-may",
+      "time": "15:13",
+      "ts": 1780067593000,
+      "featured": false,
+      "lang": "en",
+      "date": "29 May",
+      "datetime": "2026-05-29T15:13:13+00:00",
+      "recent": true
+    },
+    {
+      "id": "1ca35fe6e075",
+      "cur": "CHF",
+      "impact": "high",
+      "title": "Europe Intelligence Brief - Friday, May 29, 2026: German Inflation Cools, French Recession Fears, Italy At 3.2% - Rio Times",
+      "expand": "(MENAFN - The Rio Times) Now Published in Two Editions Europe Intelligence Brief – Europe Intelligence Dossier You're reading the Brief - today's hemisphere at a glance, free, every weekday. The ...",
+      "source": "NewsData CHF",
+      "link": "https://menafn.com/1111184920/Europe-Intelligence-Brief-Friday-May-29-2026-German-Inflation-Cools-French-Recession-Fears-Italy-At-32-Rio-Times",
+      "time": "14:30",
+      "ts": 1780065055000,
+      "featured": false,
+      "lang": "en",
+      "date": "29 May",
+      "datetime": "2026-05-29T14:30:55+00:00",
       "recent": true
     },
     {
@@ -299,6 +346,22 @@
       "recent": true
     },
     {
+      "id": "d114009b801c",
+      "cur": "CHF",
+      "impact": "med",
+      "title": "Bank Of Montreal (NYSE:BMO) Issues Quarterly Earnings Results",
+      "expand": "Bank Of Montreal (NYSE:BMO – Get Free Report) (TSE:BMO) released its quarterly earnings results on Wednesday. The bank reported $2.68 earnings per share for the quarter, topping the consensus estimate of $2.54 by $0.14, Zacks reports. Bank Of Montreal had a net margin of 12.60% and a return on equity of 13.06%. The business had [...]",
+      "source": "NewsData CHF",
+      "link": "https://www.thelincolnianonline.com/2026/05/29/bank-of-montreal-nysebmo-issues-quarterly-earnings-results.html",
+      "time": "12:50",
+      "ts": 1780059045000,
+      "featured": false,
+      "lang": "en",
+      "date": "29 May",
+      "datetime": "2026-05-29T12:50:45+00:00",
+      "recent": true
+    },
+    {
       "id": "1e591d77188e",
       "cur": "CAD",
       "impact": "high",
@@ -315,6 +378,22 @@
       "recent": true
     },
     {
+      "id": "4fa13b875218",
+      "cur": "CHF",
+      "impact": "high",
+      "title": "Futures Hit Another Record High After Pricing In Same \"Iran Deal\" Every Day For The Past Month",
+      "expand": "Futures Hit Another Record High After Pricing In Same \"Iran Deal\" Every Day For The Past Month US equity futures are higher, continuing their slow motion-gamma squeeze into record territory, as traders waited to see whether America and Iran could finally get the peace deal they have already priced in every single day for the past month. As of 8:00a...",
+      "source": "NewsData CHF",
+      "link": "https://www.zerohedge.com/markets/futures-hit-another-record-high-after-pricing-same-iran-deal-every-day-past-month",
+      "time": "12:29",
+      "ts": 1780057774000,
+      "featured": false,
+      "lang": "en",
+      "date": "29 May",
+      "datetime": "2026-05-29T12:29:34+00:00",
+      "recent": true
+    },
+    {
       "id": "33cf101ae756",
       "cur": "NZD",
       "impact": "high",
@@ -328,54 +407,6 @@
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T11:37:36+00:00",
-      "recent": true
-    },
-    {
-      "id": "529ab2c8916e",
-      "cur": "EUR",
-      "impact": "high",
-      "title": "Ex-Trump economist drops bombshell Fed rate-hike reset",
-      "expand": "Former Trump economist Joseph LaVorgna warns inflation and energy shocks could force the Fed to raise rates by 100 basis points or more.",
-      "source": "NewsData EUR",
-      "link": "https://www.thestreet.com/fed/ex-trump-economist-drops-bombshell-fed-rate-hikes",
-      "time": "11:37",
-      "ts": 1780054620000,
-      "featured": false,
-      "lang": "en",
-      "date": "29 May",
-      "datetime": "2026-05-29T11:37:00+00:00",
-      "recent": true
-    },
-    {
-      "id": "3690edc34335",
-      "cur": "CAD",
-      "impact": "high",
-      "title": "Bolivia’s Austerity Shock Triggers Nationwide Revolt",
-      "expand": "Politics, Geopolitics & Conflict Austerity measures in Bolivia have gone too far, too fast, putting the president’s political longevity in question. Bolivian President Rodrigo Paz, who came into office six months ago, backed by Washington and promising market-oriented reforms during a severe economic crisis, is now facing nationwide unrest after sc...",
-      "source": "NewsData CAD",
-      "link": "https://oilprice.com/Energy/Energy-General/Bolivias-Austerity-Shock-Triggers-Nationwide-Revolt.html",
-      "time": "11:30",
-      "ts": 1780054200000,
-      "featured": false,
-      "lang": "en",
-      "date": "29 May",
-      "datetime": "2026-05-29T11:30:00+00:00",
-      "recent": true
-    },
-    {
-      "id": "2a8f59c2ea09",
-      "cur": "NZD",
-      "impact": "high",
-      "title": "NZ Dollar Rises As RBNZ Signals Rate Hike",
-      "expand": "CANBERA (dpa-AFX) - The New Zealand dollar strengthened against other major currencies in the European session on Friday, as investors signaled rate hike by the Reserve Bank of New Zealand's (RBNZ...",
-      "source": "NewsData NZD",
-      "link": "https://www.finanznachrichten.de/nachrichten-2026-05/68629769-nz-dollar-rises-as-rbnz-signals-rate-hike-020.htm",
-      "time": "11:24",
-      "ts": 1780053840000,
-      "featured": false,
-      "lang": "en",
-      "date": "29 May",
-      "datetime": "2026-05-29T11:24:00+00:00",
       "recent": true
     },
     {
@@ -459,22 +490,6 @@
       "recent": true
     },
     {
-      "id": "b8b6fb969bf2",
-      "cur": "AUD",
-      "impact": "high",
-      "title": "AUD/USD Price Forecast: Remains depressed near 0.7150 on firm USD, reduced RBA hike bets",
-      "expand": "The AUD/USD pair attracts fresh sellers on Friday, stalling the previous day's goodish recovery move from sub-0.7100 levels or a one-week low.",
-      "source": "NewsData AUD",
-      "link": "https://www.fxstreet.com/news/aud-usd-price-forecast-remains-depressed-near-07150-on-firm-usd-reduced-rba-hike-bets-202605290858",
-      "time": "08:58",
-      "ts": 1780045090000,
-      "featured": false,
-      "lang": "en",
-      "date": "29 May",
-      "datetime": "2026-05-29T08:58:10+00:00",
-      "recent": true
-    },
-    {
       "id": "b1ff6c821829",
       "cur": "EUR",
       "impact": "high",
@@ -488,22 +503,6 @@
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T08:00:07+00:00",
-      "recent": true
-    },
-    {
-      "id": "cfd4176ed7a1",
-      "cur": "CHF",
-      "impact": "med",
-      "title": "Swiss KOF Barometer Edges Higher to 98.0, But Outlook Remains Subdued",
-      "expand": "Switzerland&#8217;s KOF Economic Barometer rose marginally from 97.8 to 98.0 in May, extending the modest improvement seen in the previous month. However, the leading indicator remains below its medium-term average, suggesting that the outlook for the Swiss economy continues to be subdued despite signs of stabilization. The latest reading points to...",
-      "source": "ActionForex",
-      "link": "https://www.actionforex.com/live-comments/642102-swiss-kof-barometer-edges-higher-to-98-0-but-outlook-remains-subdued/",
-      "time": "07:15",
-      "ts": 1780038936000,
-      "featured": false,
-      "lang": "en",
-      "date": "29 May",
-      "datetime": "2026-05-29T07:15:36+00:00",
       "recent": true
     },
     {
@@ -571,22 +570,6 @@
       "recent": true
     },
     {
-      "id": "b2d7507c1040",
-      "cur": "CHF",
-      "impact": "high",
-      "title": "Swiss Franc declines as market caution lifts USD",
-      "expand": "USD/CHF edges higher after registering modest losses in the previous day, trading around 0.7840 during the Asian hours on Friday. The pair caught in a tug-of-war between lingering geopolitical risks in the Middle East and stronger-than-expected economic data from Switzerland.",
-      "source": "NewsData CHF",
-      "link": "https://www.fxstreet.com/news/swiss-franc-declines-as-market-caution-lifts-usd-202605290341",
-      "time": "03:41",
-      "ts": 1780026106000,
-      "featured": false,
-      "lang": "en",
-      "date": "29 May",
-      "datetime": "2026-05-29T03:41:46+00:00",
-      "recent": true
-    },
-    {
       "id": "22f9a0452b9f",
       "cur": "NZD",
       "impact": "high",
@@ -600,7 +583,7 @@
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T02:50:50+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "5ea57644763c",
@@ -616,7 +599,7 @@
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T02:22:49+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "ac090aa5e394",
@@ -632,7 +615,7 @@
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T02:09:29+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "c3ff86619605",
@@ -648,7 +631,7 @@
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T01:18:50+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "3e5e17e2f54b",
@@ -664,7 +647,7 @@
       "lang": "en",
       "date": "29 May",
       "datetime": "2026-05-29T00:08:42+00:00",
-      "recent": true
+      "recent": false
     },
     {
       "id": "4f9f4af393f7",
@@ -680,22 +663,6 @@
       "lang": "en",
       "date": "28 May",
       "datetime": "2026-05-28T23:43:14+00:00",
-      "recent": true
-    },
-    {
-      "id": "40fb17b05ca1",
-      "cur": "CHF",
-      "impact": "med",
-      "title": "World’s Richest Families Reduce Dollar Exposure Amid U.S. Debt Concerns (Worthy News Focus)",
-      "expand": "The world’s wealthiest families are reducing their exposure to the U.S. dollar amid growing concerns about the long-term outlook for the world’s dominant reserve currency due to rising American debt levels and geopolitical tensions, according to reports released Thursday by UBS and JPMorgan Asset Management. The post World’s Richest Families Reduce...",
-      "source": "NewsData CHF",
-      "link": "https://www.worthynews.com/114678-worlds-richest-families-reduce-dollar-exposure-amid-u-s-debt-concerns-worthy-news-focus",
-      "time": "20:51",
-      "ts": 1780001517000,
-      "featured": false,
-      "lang": "en",
-      "date": "28 May",
-      "datetime": "2026-05-28T20:51:57+00:00",
       "recent": false
     },
     {
@@ -747,6 +714,22 @@
       "recent": false
     },
     {
+      "id": "6c92eca1fd63",
+      "cur": "EUR",
+      "impact": "high",
+      "title": "ECB policymaker Lane says second-round effects would persist even after shock reversal",
+      "expand": "ECB Chief Economist Philip Lane warned that inflationary pressures from the energy shock will persist even if we see a reversal. Lane highlighted that while the initial shock is fading, the resulting adjustments in wages and price-setting behavior continue to weigh on the economy. He noted that the impact of high energy costs is not a one-time even...",
+      "source": "ForexLive",
+      "link": "https://investinglive.com/centralbank/ecb-policymaker-lane-says-second-round-effects-would-persist-even-after-shock-reversal-20260528/",
+      "time": "10:21",
+      "ts": 1779963716000,
+      "featured": false,
+      "lang": "en",
+      "date": "28 May",
+      "datetime": "2026-05-28T10:21:56+00:00",
+      "recent": false
+    },
+    {
       "id": "4c62cd164ced",
       "cur": "NZD",
       "impact": "high",
@@ -760,6 +743,22 @@
       "lang": "en",
       "date": "28 May",
       "datetime": "2026-05-28T04:17:00+00:00",
+      "recent": false
+    },
+    {
+      "id": "2644b520343e",
+      "cur": "NZD",
+      "impact": "high",
+      "title": "Three hikes, three holds and the governor's call: The New Zealand Dollar got its most hawkish hold in years",
+      "expand": "The Reserve Bank of New Zealand (RBNZ) left the Official Cash Rate (OCR) at 2.25% on Wednesday, but only because Governor Anna Breman's casting vote broke a 3-3 split inside the Monetary Policy Committee.",
+      "source": "FXStreet",
+      "link": "https://www.fxstreet.com/analysis/rbnz-holds-at-225-by-one-vote-will-the-kiwi-finally-break-range-202605272329",
+      "time": "23:29",
+      "ts": 1779924590000,
+      "featured": false,
+      "lang": "en",
+      "date": "27 May",
+      "datetime": "2026-05-27T23:29:50+00:00",
       "recent": false
     },
     {
