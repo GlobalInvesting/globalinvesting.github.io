@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T03:55:26Z",
+  "updated": "2026-05-30T04:00:27Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -28,23 +28,27 @@
       "open": 7579.33,
       "bid": 7429.78,
       "ask": 7500.56,
-      "market_state": "POSTPOST",
+      "market_state": "CLOSED",
       "market_time": 1780088617,
       "source": "yfinance",
       "pct1w": -0.0,
       "pct1w_date": "2026-05-29"
     },
     "gold": {
-      "close": 4542.554,
-      "prev_close": 4540.1578,
-      "chg": 2.3962,
-      "pct": 0.0528,
-      "source": "twelve_data",
+      "close": 4569.9,
+      "prev_close": 4532.4,
+      "chg": 37.5,
+      "pct": 0.8274,
       "high": 4627.1,
       "low": 4519.5,
       "open": 4527.6,
-      "market_state": "REGULAR",
-      "market_time": 1780088398
+      "bid": 4565.0,
+      "ask": 4570.4,
+      "market_state": "CLOSED",
+      "market_time": 1780088398,
+      "source": "yfinance",
+      "pct1w": 0.2061,
+      "pct1w_date": "2026-05-29"
     },
     "wti": {
       "close": 87.76,
@@ -56,10 +60,10 @@
       "open": 88.55,
       "bid": 87.5,
       "ask": 88.05,
-      "market_state": "REGULAR",
+      "market_state": "CLOSED",
       "market_time": 1780088397,
       "source": "yfinance",
-      "pct1w": -0.0,
+      "pct1w": 0.4579,
       "pct1w_date": "2026-05-29"
     },
     "us10y": {
@@ -120,10 +124,10 @@
       "open": 98.998,
       "bid": null,
       "ask": null,
-      "market_state": "REGULAR",
+      "market_state": "CLOSED",
       "market_time": 1780088399,
       "source": "yfinance",
-      "pct1w": -0.0,
+      "pct1w": 0.0323,
       "pct1w_date": "2026-05-29"
     },
     "us3m": {
@@ -192,42 +196,42 @@
       "open": 69.7379,
       "bid": null,
       "ask": null,
-      "market_state": "POSTPOST",
+      "market_state": "CLOSED",
       "market_time": 1780086615,
       "source": "yfinance",
-      "pct1w": -0.0,
+      "pct1w": 0.004,
       "pct1w_date": "2026-05-29"
     },
     "btc": {
-      "close": 73443.65,
+      "close": 73438.5,
       "prev_close": 73369.125,
-      "chg": 74.525,
-      "pct": 0.1016,
+      "chg": 69.375,
+      "pct": 0.0946,
       "high": 73694.625,
       "low": 73331.016,
       "open": 73369.125,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780113323,
+      "market_time": 1780113627,
       "source": "yfinance",
-      "pct1w": -0.1263,
+      "pct1w": -0.1333,
       "pct1w_date": "2026-05-28"
     },
     "eth": {
-      "close": 2013.97,
+      "close": 2014.35,
       "prev_close": 2011.8403,
-      "chg": 2.1297,
-      "pct": 0.1059,
+      "chg": 2.5097,
+      "pct": 0.1247,
       "high": 2019.683,
       "low": 2008.7595,
       "open": 2011.8403,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780113325,
+      "market_time": 1780113626,
       "source": "yfinance",
-      "pct1w": 0.3197,
+      "pct1w": 0.3386,
       "pct1w_date": "2026-05-28"
     },
     "nasdaq": {
@@ -240,7 +244,7 @@
       "open": 30333.863,
       "bid": null,
       "ask": null,
-      "market_state": "POSTPOST",
+      "market_state": "CLOSED",
       "market_time": 1780089359,
       "source": "yfinance",
       "pct1w": 0.0,
@@ -396,6 +400,8 @@
       "source": "yfinance",
       "pct1w": 0.0,
       "pct1w_date": "2026-05-29",
+      "session_high": 0.7186,
+      "session_low": 0.7186,
       "prev_bar": {
         "time": "2026-05-29",
         "open": 0.71674,
@@ -1017,18 +1023,18 @@
     },
     "cadchf": {
       "close": 0.5654,
-      "prev_close": 0.5679,
-      "chg": -0.0025,
-      "pct": -0.4437,
+      "prev_close": 0.569,
+      "chg": -0.0036,
+      "pct": -0.6414,
       "high": 0.5689,
       "low": 0.5646,
       "open": 0.5677,
-      "bid": 0.5666,
-      "ask": 0.5685,
-      "market_state": "CLOSED",
-      "market_time": 1780090069,
+      "bid": null,
+      "ask": null,
+      "market_state": null,
+      "market_time": null,
       "source": "yfinance",
-      "pct1w": -0.0,
+      "pct1w": 0.0,
       "pct1w_date": "2026-05-29",
       "session_high": 0.56537,
       "session_low": 0.5651,
@@ -1112,10 +1118,10 @@
       "open": 76.025,
       "bid": 75.545,
       "ask": 75.895,
-      "market_state": "REGULAR",
+      "market_state": "CLOSED",
       "market_time": 1780088375,
       "source": "yfinance",
-      "pct1w": 0.0,
+      "pct1w": -0.041,
       "pct1w_date": "2026-05-29",
       "prev_bar": {
         "time": "2026-05-29",
@@ -1135,10 +1141,10 @@
       "open": 92.67,
       "bid": 91.5,
       "ask": 92.0,
-      "market_state": "REGULAR",
+      "market_state": "CLOSED",
       "market_time": 1780088396,
       "source": "yfinance",
-      "pct1w": 0.0,
+      "pct1w": -0.3802,
       "pct1w_date": "2026-05-29",
       "prev_bar": {
         "time": "2026-05-29",
@@ -1204,7 +1210,7 @@
       "open": 50773.91,
       "bid": 50444.44,
       "ask": 50689.6,
-      "market_state": "POSTPOST",
+      "market_state": "CLOSED",
       "market_time": 1780088624,
       "source": "yfinance",
       "pct1w": -0.0,
@@ -1258,11 +1264,10 @@
       "n": 60,
       "corr90": -0.868,
       "n90": 90,
-      "norm": -0.482,
+      "norm": -0.481,
       "z_score": -1.21,
-      "std": 0.3914,
+      "std": 0.3922,
       "history": [
-        -0.608,
         -0.57,
         -0.486,
         -0.437,
@@ -1487,7 +1492,6 @@
         -0.955
       ],
       "hist_dates": [
-        "2025-07-21",
         "2025-07-22",
         "2025-07-23",
         "2025-07-24",
@@ -1715,14 +1719,14 @@
     {
       "a": "AUD/USD",
       "b": "Gold",
-      "corr30": 0.313,
+      "corr30": 0.311,
       "n30": 30,
-      "corr": 0.041,
+      "corr": 0.04,
       "n": 60,
       "corr90": -0.122,
       "n90": 90,
       "norm": 0.296,
-      "z_score": 0.04,
+      "z_score": 0.03,
       "std": 0.4838,
       "history": [
         -0.224,
@@ -1947,7 +1951,7 @@
         0.144,
         0.229,
         0.281,
-        0.313
+        0.311
       ],
       "hist_dates": [
         "2025-07-21",
@@ -3104,14 +3108,14 @@
     {
       "a": "USD/CAD",
       "b": "WTI Oil",
-      "corr30": -0.293,
+      "corr30": -0.295,
       "n30": 30,
-      "corr": 0.25,
+      "corr": 0.249,
       "n": 60,
-      "corr90": 0.503,
+      "corr90": 0.502,
       "n90": 90,
       "norm": 0.025,
-      "z_score": -0.74,
+      "z_score": -0.75,
       "std": 0.427,
       "history": [
         0.391,
@@ -3336,7 +3340,7 @@
         -0.119,
         -0.165,
         -0.238,
-        -0.293
+        -0.295
       ],
       "hist_dates": [
         "2025-07-21",
@@ -5409,7 +5413,7 @@
     {
       "a": "GBP/USD",
       "b": "Gold",
-      "corr30": 0.416,
+      "corr30": 0.417,
       "n30": 30,
       "corr": -0.089,
       "n": 60,
@@ -5641,7 +5645,7 @@
         0.417,
         0.407,
         0.411,
-        0.416
+        0.417
       ],
       "hist_dates": [
         "2025-07-21",
@@ -5872,15 +5876,15 @@
     {
       "a": "DXY",
       "b": "SPX",
-      "corr30": 0.453,
+      "corr30": 0.449,
       "n30": 30,
-      "corr": -0.623,
+      "corr": -0.625,
       "n": 60,
-      "corr90": -0.25,
+      "corr90": -0.251,
       "n90": 90,
       "norm": -0.321,
-      "z_score": 1.72,
-      "std": 0.45,
+      "z_score": 1.71,
+      "std": 0.4499,
       "history": [
         -0.819,
         -0.747,
@@ -6103,7 +6107,7 @@
         0.456,
         0.47,
         0.46,
-        0.453
+        0.449
       ],
       "hist_dates": [
         "2025-07-14",
@@ -6335,15 +6339,14 @@
       "b": "DXY",
       "corr30": -0.754,
       "n30": 30,
-      "corr": -0.02,
+      "corr": -0.019,
       "n": 60,
-      "corr90": -0.474,
+      "corr90": -0.473,
       "n90": 90,
-      "norm": -0.296,
+      "norm": -0.298,
       "z_score": -1.05,
-      "std": 0.4354,
+      "std": 0.4348,
       "history": [
-        0.257,
         0.361,
         0.322,
         0.323,
@@ -6568,7 +6571,6 @@
         -0.754
       ],
       "hist_dates": [
-        "2025-07-11",
         "2025-07-14",
         "2025-07-15",
         "2025-07-16",
@@ -6825,7 +6827,15 @@
       "iv_pct_rank": null,
       "iv_hist_n": 1
     },
-    "usdchf": null,
+    "usdchf": {
+      "iv": 12.3,
+      "expiry": "2026-06-18",
+      "atm": 113.0,
+      "source": "FXF options",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    },
     "usdcad": null,
     "nzdusd": {
       "iv": 15.3,
