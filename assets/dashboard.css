@@ -1790,10 +1790,6 @@ a:focus-visible,
 .ns-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
 .ns-time-hm  { font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap; }
 .ns-time-age { font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;white-space:nowrap;margin-top:1px; }
-.ns-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
-.ns-dot-high { background:var(--down); }
-.ns-dot-med  { background:var(--orange); }
-.ns-dot-low  { background:var(--text3); }
 .ns-headline { font-size:11px;color:var(--text);font-family:var(--font-ui);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0; }
 .ns-cur-tag { font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;font-family:var(--font-ui);flex-shrink:0; }
 .ns-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);flex-shrink:0;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
@@ -1805,6 +1801,6 @@ a:focus-visible,
 .ns-snippet { font-size:11px;color:var(--text2);line-height:1.5;font-family:var(--font-ui);margin:0; }
 .ns-read-link { display:inline-block;margin-top:6px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none; }
 .ns-read-link:hover { text-decoration:underline; }
-.ns-cur-pill,.ns-imp-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
-.ns-cur-pill:hover,.ns-imp-pill:hover { background:var(--bg3);color:var(--text); }
+.ns-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
+.ns-cur-pill:hover { background:var(--bg3);color:var(--text); }
 .ns-pill-active { background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important; }

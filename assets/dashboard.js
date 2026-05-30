@@ -11131,7 +11131,7 @@ async function loadOISRatesCache() {
 // Module state
 let _newsAllItems = [];
 let _newsMeta     = {};
-let _newsFilter   = { cur: 'ALL', impact: 'ALL' };
+let _newsFilter   = { cur: 'ALL' };
 
 function renderNewsSection(items, meta) {
   if (Array.isArray(items)) _newsAllItems = items;
@@ -11142,8 +11142,7 @@ function renderNewsSection(items, meta) {
 
   const filtered = _newsAllItems.filter(function(item) {
     const curOk    = _newsFilter.cur    === 'ALL' || item.cur    === _newsFilter.cur;
-    const impactOk = _newsFilter.impact === 'ALL' || item.impact === _newsFilter.impact;
-    return curOk && impactOk;
+    return curOk;
   });
 
   const tsEl = document.getElementById('news-section-ts');
@@ -11238,9 +11237,6 @@ function renderNewsSection(items, meta) {
     timeEl.appendChild(timeTop);
     if (timeBot.textContent) timeEl.appendChild(timeBot);
 
-    const dot = document.createElement('span');
-    dot.className = 'ns-dot ns-dot-' + impact;
-
     const headEl = document.createElement('span');
     headEl.className = 'ns-headline';
     headEl.textContent = headline;
@@ -11252,7 +11248,6 @@ function renderNewsSection(items, meta) {
     chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
 
     row.appendChild(timeEl);
-    row.appendChild(dot);
     row.appendChild(headEl);
 
     if (cur) {
@@ -11311,8 +11306,7 @@ function renderNewsSection(items, meta) {
 function _newsSetFilter(type, value) {
   _newsFilter[type] = value;
   // Update active pill styling
-  const selector = type === 'cur' ? '.ns-cur-pill' : '.ns-imp-pill';
-  document.querySelectorAll(selector).forEach(btn => {
+  document.querySelectorAll('.ns-cur-pill').forEach(btn => {
     btn.classList.toggle('ns-pill-active', btn.dataset.val === value);
   });
   renderNewsSection();
