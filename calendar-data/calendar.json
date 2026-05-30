@@ -1,51 +1,31 @@
 {
-  "lastUpdate": "2026-05-29T23:57:18Z",
-  "generatedAt": "2026-05-29T23:57:18Z",
+  "lastUpdate": "2026-05-30T00:01:10Z",
+  "generatedAt": "2026-05-30T00:01:10Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Finnhub",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-05-29",
+  "rangeFrom": "2025-05-30",
   "rangeTo": "2026-06-12",
-  "totalEvents": 1661,
+  "totalEvents": 1655,
   "currencyCounts": {
-    "CAD": 132,
-    "JPY": 186,
-    "NZD": 83,
     "CHF": 91,
+    "JPY": 183,
     "USD": 625,
     "AUD": 173,
     "GBP": 183,
+    "NZD": 81,
+    "CAD": 131,
     "EUR": 188
   },
   "impactCounts": {
-    "medium": 1128,
-    "high": 383,
-    "low": 150
+    "medium": 1126,
+    "high": 382,
+    "low": 147
   },
   "surpriseStats": {
-    "JPY/capital spending": {
-      "n": 2,
-      "mean": 3.5,
-      "std": 0.0
-    },
-    "AUD/building approvals": {
-      "n": 3,
-      "mean": -8.4,
-      "std": 7.274613
-    },
-    "AUD/gdp": {
-      "n": 4,
-      "mean": 0.25,
-      "std": 0.173205
-    },
-    "JPY/s&p global services pmi": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
     "GBP/retail sales": {
       "n": 3,
       "mean": -0.533333,
@@ -96,6 +76,11 @@
       "mean": -0.166667,
       "std": 0.500666
     },
+    "AUD/building approvals": {
+      "n": 2,
+      "mean": -6.3,
+      "std": 8.909545
+    },
     "EUR/core cpi": {
       "n": 5,
       "mean": 0.14,
@@ -105,6 +90,11 @@
       "n": 6,
       "mean": 0.25,
       "std": 0.665582
+    },
+    "AUD/gdp": {
+      "n": 2,
+      "mean": 0.25,
+      "std": 0.212132
     },
     "EUR/hcob eurozone composite pmi": {
       "n": 2,
@@ -458,78 +448,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CAD",
-      "event": "Current Account",
-      "dateISO": "2025-05-29",
-      "hourUTC": "12:30",
-      "actual": "-2.1",
-      "forecast": "-3.25",
-      "previous": "-3.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "JPY",
-      "event": "Consumer Confidence",
-      "dateISO": "2025-05-29",
-      "hourUTC": "05:00",
-      "actual": "32.8",
-      "forecast": "31.8",
-      "previous": "31.2",
-      "impact": "high",
-      "importance": 3,
-      "source": "FH"
-    },
-    {
-      "currency": "JPY",
-      "event": "Tokyo CPI Ex Food and Energy YoY",
-      "dateISO": "2025-05-29",
-      "hourUTC": "23:30",
-      "actual": "2.1",
-      "forecast": null,
-      "previous": "2",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "JPY",
-      "event": "Tokyo CPI YoY",
-      "dateISO": "2025-05-29",
-      "hourUTC": "23:30",
-      "actual": "3.4",
-      "forecast": null,
-      "previous": "3.4",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "NZD",
-      "event": "ANZ Business Confidence",
-      "dateISO": "2025-05-29",
-      "hourUTC": "01:00",
-      "actual": "36.6",
-      "forecast": null,
-      "previous": "49.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "NZD",
-      "event": "ANZ Roy Morgan Consumer Confidence",
-      "dateISO": "2025-05-29",
-      "hourUTC": "22:00",
-      "actual": "92.9",
-      "forecast": null,
-      "previous": "98.3",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
     {
       "currency": "CHF",
       "event": "KOF Leading Indicators",
