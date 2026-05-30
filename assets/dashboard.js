@@ -520,12 +520,12 @@ function populateHeatmap() {
 
   let strengths;
   if (rtAvailable) {
-    // Map each currency to its avg % change across all 28 G8 pairs.
+    // Map each currency to its avg % change across all 28 major pairs.
     // Each currency appears in exactly 7 pairs — equal statistical weight.
     const pctMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
     const countMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
 
-    // All 28 G8 pairs (8×7÷2) — industry-standard currency strength calculation.
+    // All 28 major pairs (8×7÷2) — industry-standard currency strength calculation.
     // Each of the 8 currencies appears in exactly 7 pairs, giving equal statistical weight.
     // sign: +1 means base strengthens when price rises; -1 means quote strengthens.
     const pairDefs = [
@@ -623,8 +623,8 @@ function populateHeatmap() {
   const _hmSubEl = document.getElementById('hm-panel-sub');
   if (_hmSubEl) {
     _hmSubEl.textContent = _hasFhHm
-      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies'
-      : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies';
+      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 major currencies'
+      : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted \u00b7 8 major currencies';
   }
 
   // ── Live-refresh open modal — if the heatmap modal is currently open, push ──
@@ -6694,7 +6694,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// CARRY TRADE RANKING — full G8 28-pair differential, left sidebar
+// CARRY TRADE RANKING — full 8 major currencies 28-pair differential, left sidebar
 // ═══════════════════════════════════════════════════════════════════
 // Institutional-grade carry ranking
 // and JP Morgan GBI conventions:
@@ -6710,7 +6710,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 // source used by the main FX table and the pair detail popover).
 // Falls back to gross differential ranking when HV30 unavailable.
 // ═══════════════════════════════════════════════════════════════════
-// CARRY TRADE RANKING — G8 · real carry · annualised
+// CARRY TRADE RANKING — 8 major currencies · real carry · annualised
 // ═══════════════════════════════════════════════════════════════════
 // Institutional-grade carry ranking per Bloomberg FXFR / Refinitiv conventions:
 //
@@ -6730,7 +6730,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 //   Tooltip:       long rate / short rate / real carry / HV30 / click for real rate analysis
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCarryRanking() {
-  const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+  const 8 major currencies = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
 
   // TradingView symbol for a given long/short ccy pair
   function carryTV(long, short) {
@@ -6763,7 +6763,7 @@ async function fetchCarryRanking() {
   try {
     // ── 1. CB policy rates (use STATE cache from fetchCBRates if available) ──
     const cbRates = {};
-    await Promise.all(G8.map(async ccy => {
+    await Promise.all(8 major currencies.map(async ccy => {
       const cached = STATE.cbRates?.[ccy.toLowerCase()];
       if (cached?.rate != null) { cbRates[ccy] = cached.rate; return; }
       try {
@@ -6796,7 +6796,7 @@ async function fetchCarryRanking() {
     }
     const rates       = {};
     const rateSource  = {}; // e.g. { USD: 'SOFR', EUR: '€STR', AUD: 'policy' }
-    for (const ccy of G8) {
+    for (const ccy of 8 major currencies) {
       const ois = oisCache[ccy] ?? oisData?.rates?.[ccy] ?? null;
       const src = oisSrcs[ccy]  ?? oisData?.sources?.[ccy] ?? null;
       if (ois != null) {
@@ -6821,7 +6821,7 @@ async function fetchCarryRanking() {
     // Real rate = nominal CB rate − inflationExpectations
     // If modal was opened earlier, reuse _rcmData to avoid duplicate fetches.
     const inflExp = {};
-    await Promise.all(G8.map(async ccy => {
+    await Promise.all(8 major currencies.map(async ccy => {
       if (typeof _rcmData !== 'undefined' && _rcmData?.inflExp?.[ccy]?.val != null) {
         inflExp[ccy] = _rcmData.inflExp[ccy].val;
         return;
@@ -6835,13 +6835,13 @@ async function fetchCarryRanking() {
       } catch {}
     }));
 
-    // ── 4. Build all 28 G8 pairs ─────────────────────────────────────────────
+    // ── 4. Build all 28 major pairs ─────────────────────────────────────────────
     // Rates now use OIS benchmarks (SOFR/€STR/SONIA/TONA/CORRA/SARON/AONIA/OCR)
     // with per-currency policy-rate fallback — matching Bloomberg FXFR convention.
     const allPairs = [];
-    for (let i = 0; i < G8.length; i++) {
-      for (let j = i + 1; j < G8.length; j++) {
-        const a = G8[i], b = G8[j];
+    for (let i = 0; i < 8 major currencies.length; i++) {
+      for (let j = i + 1; j < 8 major currencies.length; j++) {
+        const a = 8 major currencies[i], b = 8 major currencies[j];
         const rA = rates[a] ?? null, rB = rates[b] ?? null;
         if (rA == null || rB == null) continue;
 
@@ -6903,8 +6903,8 @@ async function fetchCarryRanking() {
     const headSpan = container.closest('.sb-section')?.querySelector('.sb-head span');
     if (headSpan) {
       headSpan.textContent = hasRealCarryData
-        ? 'G8 · real carry · annualised'
-        : 'G8 · CB rate differential';
+        ? '8 major currencies · real carry · annualised'
+        : '8 major currencies · CB rate differential';
     }
 
     // ── 7. Attach header tooltip (once) ──────────────────────────────────────
@@ -9117,16 +9117,16 @@ function exportPanel(type, format = 'csv') {
 
   else if (type === 'carry') {
     headers = ['Long', 'Short', 'Carry_Diff_Pct', 'Long_Rate_Pct', 'Short_Rate_Pct'];
-    const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+    const 8 major currencies = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
     const rates = {};
-    G8.forEach(ccy => {
+    8 major currencies.forEach(ccy => {
       const r = STATE.cbRates?.[ccy.toLowerCase()]?.rate;
       if (r != null) rates[ccy] = r;
     });
     const pairs = [];
-    for (let i = 0; i < G8.length; i++) {
-      for (let j = i + 1; j < G8.length; j++) {
-        const a = G8[i], b = G8[j];
+    for (let i = 0; i < 8 major currencies.length; i++) {
+      for (let j = i + 1; j < 8 major currencies.length; j++) {
+        const a = 8 major currencies[i], b = 8 major currencies[j];
         if (rates[a] == null || rates[b] == null) continue;
         const diff = rates[a] - rates[b];
         pairs.push(diff >= 0
@@ -10000,7 +10000,7 @@ if (document.readyState === 'loading') {
 
 // ═══════════════════════════════════════════════════════════════════
 // NEW FEATURES v7.71.0 — CIP Forwards, RR Surface, HV Term Structure,
-//                         G8 Rates tabs, Sovereign Spreads, Econ Surprises
+//                         8 major currencies Rates tabs, Sovereign Spreads, Econ Surprises
 // ═══════════════════════════════════════════════════════════════════
 
 // ── Global cache: CB rates by currency (populated by fetchRiskData/renderCBRates) ──
@@ -10593,7 +10593,7 @@ async function renderDerivativesSection() {
           const totalSpot = byProd['FxSpot']?.notional_usd_bn ?? 0;
           const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
           const totRow = `<tr style="border-top:1px solid var(--border2);font-weight:600;">
-            <td style="font-size:10px;color:var(--text2);">TOTAL (G8)</td>
+            <td style="font-size:10px;color:var(--text2);">TOTAL (8 major currencies)</td>
             <td style="${mono}color:var(--text);">${totalNotional.toFixed(1)}</td>
             <td style="${mono}color:var(--text2);">${totals.trade_count.toLocaleString()}</td>
             <td style="${mono}color:var(--text2);">${totalSwap > 0 ? totalSwap.toFixed(1) : '—'}</td>
@@ -10617,7 +10617,7 @@ async function renderDerivativesSection() {
 }
 
 
-// ── G8 Rates Tabs ──
+// ── 8 major currencies Rates Tabs ──
 function initG8RatesTabs() {
   const tabBar = document.getElementById('rates-country-tabs');
   if (!tabBar) return;
@@ -10640,7 +10640,7 @@ function initG8RatesTabs() {
     const pane = document.getElementById('rates-pane-' + cty);
     if (pane) pane.style.display = '';
 
-    // Lazy-load G8 data on first open
+    // Lazy-load 8 major currencies data on first open
     if (cty !== 'us' && cty !== 'spreads') renderG8YieldPane(cty);
     if (cty === 'spreads') renderSovereignSpreads();
   });
@@ -10773,7 +10773,7 @@ async function renderSovereignSpreads() {
 }
 
 // ── Economic Surprises — CESI-style centred bar index (v7.76.0) ──────────────
-// Methodology: for each G8 currency, computes a normalised surprise index over
+// Methodology: for each major currency, computes a normalised surprise index over
 // a 90-day rolling window from Finnhub economic calendar (actual vs consensus).
 // Index = (beats − misses) / total scored, scaled to [−100, +100].
 // Bar chart centred at 0: green bar extends right for positive, red bar extends
@@ -10841,7 +10841,7 @@ async function renderEconSurprises() {
   const srcEl = document.getElementById('econ-surprise-source');
   if (srcEl) {
     if (calSource === 'Finnhub' || calSource.startsWith('Finnhub')) {
-      srcEl.textContent = 'Finnhub · actual vs consensus · G8 · 90d rolling';
+      srcEl.textContent = 'Finnhub · actual vs consensus · 8 major currencies · 90d rolling';
     } else if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
       srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
@@ -10849,7 +10849,7 @@ async function renderEconSurprises() {
       srcEl.textContent = 'ForexFactory · actual vs consensus · 90d rolling';
     } else if (calSource && calSource.includes('ForexFactory')) {
       // Legacy backfill sources: multi-source historical string
-      srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · G8 · 90d rolling';
+      srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · 8 major currencies · 90d rolling';
     } else if (calSource) {
       srcEl.textContent = calSource + ' · actual vs consensus · 90d rolling';
     } else {
@@ -10972,10 +10972,10 @@ async function renderEconSurprises() {
   // ── Normalise to [−100, +100] index (Citi CESI convention) ───────────────
   // index = (beats − misses) / total × 100
   // Bar fill: 50% of bar width per side (each side = 50% of container)
-  const G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+  const 8 major currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
   const rows = tbody.querySelectorAll('tr');
 
-  G8.forEach((ccy, idx) => {
+  8 major currencies.forEach((ccy, idx) => {
     const row = rows[idx];
     if (!row) return;
     const tds = row.querySelectorAll('td');
@@ -11422,7 +11422,7 @@ function initDerivativesNavFixed() {
       el.style.display = saved === '' ? '' : saved;
       delete el.dataset.derivHidden;
     });
-    // Canvas and lazy-loaded G8 panes need a repaint after display is restored.
+    // Canvas and lazy-loaded 8 major currencies panes need a repaint after display is restored.
     // Double rAF: split-lower-right uses display:contents which requires two frames
     // for the browser to commit the layout change and expose correct clientWidth values.
     // (Same pattern as the ticker strip — 'Double rAF ensures layout before we measure'.)
@@ -11432,7 +11432,7 @@ function initDerivativesNavFixed() {
         if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
           drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
         }
-        // Re-trigger whichever Rates tab is currently active so G8/Spreads panes re-render
+        // Re-trigger whichever Rates tab is currently active so 8 major currencies/Spreads panes re-render
         const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
         if (activeRatesTab) {
           const cty = activeRatesTab.dataset.cty;

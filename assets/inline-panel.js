@@ -156,7 +156,7 @@
     var panels = _ensureSplit();
     if (!panels) { _origOpenRCM && _origOpenRCM(longCcy, shortCcy); return; }
 
-    var label = (longCcy && shortCcy) ? longCcy + '/' + shortCcy : 'G8';
+    var label = (longCcy && shortCcy) ? longCcy + '/' + shortCcy : '8 major currencies';
     var body  = _makeShell(panels.upper, 'Real Rate Carry · ' + label, function() {
       _restore('rcm-bd', 'rcm-close',
         'position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:16px;',
@@ -334,7 +334,7 @@
     var panels = _ensureSplit();
     if (!panels) { _origOpenESM && _origOpenESM(ccy); return; }
 
-    var body = _makeShell(panels.lower, 'Economic Surprises \u00b7 ' + (ccy || 'G8'), function() {
+    var body = _makeShell(panels.lower, 'Economic Surprises \u00b7 ' + (ccy || '8 major currencies'), function() {
       if (typeof window.closeESModal === 'function') window.closeESModal();
     });
 

@@ -51,7 +51,7 @@
       side:    'bottom',
       title:   'Institutional-grade FX data, in one place.',
       badge:   'Welcome',
-      body:    'Most retail traders operate blind to what institutions are doing. This terminal changes that: live G8 rates, CFTC positioning, central bank policy, yield curves, economic surprise scoring, derivatives market structure, cross-asset risk — and an AI that synthesises it all into a single macro narrative, updated at every major session open.',
+      body:    'Most retail traders operate blind to what institutions are doing. This terminal changes that: live major currency rates, CFTC positioning, central bank policy, yield curves, economic surprise scoring, derivatives market structure, cross-asset risk — and an AI that synthesises it all into a single macro narrative, updated at every major session open.',
       action:  null,
     },
 
@@ -71,7 +71,7 @@
       side:    'right',
       title:   'Live Price Chart & FX Pairs Table',
       badge:   'Price Chart',
-      body:    'Live charts for all 28 G8 pairs — EUR/USD, USD/JPY, GBP/USD and more — plus a full pairs table with intraday change, spread, and carry differential. Switch pair with one click; the chart, heatmap, and carry rank all update together.',
+      body:    'Live charts for all 28 major pairs — EUR/USD, USD/JPY, GBP/USD and more — plus a full pairs table with intraday change, spread, and carry differential. Switch pair with one click; the chart, heatmap, and carry rank all update together.',
       action:  null,
     },
 
@@ -81,7 +81,7 @@
       side:    'bottom',
       title:   'Economic Calendar',
       badge:   'Calendar',
-      body:    'Upcoming G8 macro releases filtered to medium and high impact only — the events that actually move FX. Each event shows local time across all G8 timezones, the consensus forecast, and the previous print. Once the actual is released the terminal scores it as a beat or miss and feeds the result directly into the Economic Surprise Index.',
+      body:    'Upcoming major-economy macro releases filtered to medium and high impact only — the events that actually move FX. Each event shows local time across all major currency timezones, the consensus forecast, and the previous print. Once the actual is released the terminal scores it as a beat or miss and feeds the result directly into the Economic Surprise Index.',
       action:  null,
     },
 
@@ -90,9 +90,9 @@
       target:    'split-lower',
       highlight: 'section-econ-surprise',
       side:    'left',
-      title:   'Economic Surprise Index · G8 · 90d rolling',
+      title:   'Economic Surprise Index · 8 major currencies · 90d rolling',
       badge:   'ESI',
-      body:    'The ESI is a decay-weighted score that measures whether G8 economic data is consistently beating or missing consensus — decay-weighted so recent releases count more than older ones. A rising ESI signals that the economy is outperforming expectations, which is typically bullish for the currency. The chart is opening now so you can explore the 90-day rolling window.',
+      body:    'The ESI is a decay-weighted score that measures whether major-economy economic data is consistently beating or missing consensus — decay-weighted so recent releases count more than older ones. A rising ESI signals that the economy is outperforming expectations, which is typically bullish for the currency. The chart is opening now so you can explore the 90-day rolling window.',
       action:  function () {
         try {
           // Scroll rightpanel so "Economic Surprises" section is visible
@@ -175,7 +175,7 @@
       side:    'top',
       title:   'Rates & Yield Curve',
       badge:   'Rates',
-      body:    'G8 sovereign yields across the full term structure — 3M through 30Y — plotted against the prior close. Switch tabs for DE, GB, JP, AU, CA, NZ or Sovereign Spreads. Key spread signals (2Y–10Y slope, US–DE, US–JP) flag curve regime shifts in real time. Click the curve to open the detailed yield modal.',
+      body:    'major sovereign yields across the full term structure — 3M through 30Y — plotted against the prior close. Switch tabs for DE, GB, JP, AU, CA, NZ or Sovereign Spreads. Key spread signals (2Y–10Y slope, US–DE, US–JP) flag curve regime shifts in real time. Click the curve to open the detailed yield modal.',
       action:  function () {
         // Close the COT inline panel correctly via the shell close button.
         try {
@@ -200,7 +200,7 @@
       side:      'top',
       title:     'CB Rate Expectations & OIS Forwards',
       badge:     'OIS',
-      body:      'The market\'s best estimate of where each G8 central bank will be at its next meeting — derived from OIS and futures markets (SOFR, €STR, SONIA, TONA, CORRA, SARON). Each row shows the current policy rate, meeting date, directional bias, and the probability-weighted implied rate. Click any central bank flag to open the full decision history: 24 months of decisions plotted on the yield curve, plus the OIS-implied forward rate.',
+      body:      'The market\'s best estimate of where each major central bank will be at its next meeting — derived from OIS and futures markets (SOFR, €STR, SONIA, TONA, CORRA, SARON). Each row shows the current policy rate, meeting date, directional bias, and the probability-weighted implied rate. Click any central bank flag to open the full decision history: 24 months of decisions plotted on the yield curve, plus the OIS-implied forward rate.',
       action:    function () {
         try {
           var rp = document.getElementById('rightpanel');
@@ -216,7 +216,7 @@
       side:    'top',
       title:   'Market Sessions',
       badge:   'Sessions',
-      body:    'Live session clocks for Tokyo, London, and New York with overlap windows highlighted — the hours where liquidity and volatility peak. Each session shows which G8 pairs are most active in that window, so you know exactly when your pair is trading at its tightest spread and deepest order book.',
+      body:    'Live session clocks for Tokyo, London, and New York with overlap windows highlighted — the hours where liquidity and volatility peak. Each session shows which major pairs are most active in that window, so you know exactly when your pair is trading at its tightest spread and deepest order book.',
       action:  function () {
         try { if (typeof window.closeCBRatesModal === 'function') window.closeCBRatesModal(); } catch (e) {}
       },
@@ -228,7 +228,7 @@
       side:    'top',
       title:   'Currency Strength Heatmap',
       badge:   'Heatmap',
-      body:    'Eight currencies ranked by intraday strength across all direct G8 pairs. Click any cell to open the currency detail modal: all 7 direct pairs, live carry, COT bias, realized vol, and pair correlations — the complete single-currency picture without switching views.',
+      body:    'Eight currencies ranked by intraday strength across all direct major pairs. Click any cell to open the currency detail modal: all 7 direct pairs, live carry, COT bias, realized vol, and pair correlations — the complete single-currency picture without switching views.',
       action:  null,
     },
 

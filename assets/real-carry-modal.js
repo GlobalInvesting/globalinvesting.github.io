@@ -548,7 +548,7 @@ function _rcmRenderMatrix() {
   const d = _rcmData;
   if (!d) return '<div class="rcm-loading">Loading...</div>';
 
-  const G8 = _RCM_G8;
+  const 8 major currencies = _RCM_G8;
 
   function cellClass(diff) {
     if (diff == null) return 'rcm-cell-flat';
@@ -568,12 +568,12 @@ function _rcmRenderMatrix() {
   // Column headers
   const header = `<tr>
     <td class="row-head" style="font-size:8.5px;font-family:var(--font-ui,'Inter',sans-serif);padding:0 8px 0 8px;">L↓/S→</td>
-    ${G8.map(c => `<th scope="col">${c}</th>`).join('')}
+    ${8 major currencies.map(c => `<th scope="col">${c}</th>`).join('')}
   </tr>`;
 
-  const rows = G8.map(rowCcy => {
+  const rows = 8 major currencies.map(rowCcy => {
     const rrRow = d.realRates[rowCcy];
-    const cells = G8.map(colCcy => {
+    const cells = 8 major currencies.map(colCcy => {
       if (rowCcy === colCcy) {
         // Diagonal: absolute real rate — neutral grey, no color coding (see legend)
         const rr = d.realRates[rowCcy];
@@ -597,7 +597,7 @@ function _rcmRenderMatrix() {
 
   return `<div class="rcm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;overflow-x:auto;">
     <div id="rcm-matrix-wrap" style="flex:1;overflow-x:auto;overflow-y:auto;">
-      <table class="rcm-matrix" aria-label="Real rate differential matrix G8 currencies">
+      <table class="rcm-matrix" aria-label="Real rate differential matrix 8 major currencies">
         <thead>${header}</thead>
         <tbody>${rows}</tbody>
       </table>
@@ -682,7 +682,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
 
   function fmt(v, suffix) { return v != null ? (v >= 0 ? '+' : '') + v.toFixed(2) + (suffix || '') : '—'; }
 
-  // ── Real rate bars (all G8, sorted by real rate desc) ──────────────────────
+  // ── Real rate bars (all 8 major, sorted by real rate desc) ──────────────────────
   const G8sorted = [..._RCM_G8].filter(c => d.realRates[c] != null).sort((a, b) => d.realRates[b] - d.realRates[a]);
   const maxAbs = Math.max(...G8sorted.map(c => Math.abs(d.realRates[c] ?? 0)), 0.01);
   const barRows = G8sorted.map(ccy => {
@@ -733,7 +733,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
     </div>
   </div>
   <div class="rcm-rate-bars">
-    <div class="rcm-rb-title">Real rate positioning — G8 (long ${longCcy} highlighted)</div>
+    <div class="rcm-rb-title">Real rate positioning — 8 major currencies (long ${longCcy} highlighted)</div>
     ${barRows}
   </div>
   <div class="rcm-vol-row">
@@ -896,7 +896,7 @@ function _rcmBuildDOM() {
     <div id="rcm-hd">
       <div id="rcm-hd-left">
         <div id="rcm-title">Real Rate Carry Analysis</div>
-        <div id="rcm-sub">Nominal OIS rate &minus; Inflation Expectation &middot; Real carry &middot; G8</div>
+        <div id="rcm-sub">Nominal OIS rate &minus; Inflation Expectation &middot; Real carry &middot; 8 major currencies</div>
       </div>
       <button id="rcm-close" aria-label="Close real rate carry modal">&times;</button>
     </div>
@@ -919,7 +919,7 @@ function _rcmBuildDOM() {
       <div class="rcm-mm" id="rcm-mm-positive">
         <div class="rcm-mm-lbl">Pairs w/ + real</div>
         <div class="rcm-mm-val" style="color:var(--text2);">—</div>
-        <div class="rcm-mm-sub">G8 currencies</div>
+        <div class="rcm-mm-sub">8 major currencies</div>
       </div>
       <div class="rcm-mm" id="rcm-mm-src">
         <div class="rcm-mm-lbl">Infl. Exp.</div>

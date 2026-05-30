@@ -1,13 +1,13 @@
 /**
  * calendar-panel.js — Native economic calendar renderer
- * Reads calendar-data/ff_calendar.json (Finnhub, G8, medium+high impact)
+ * Reads calendar-data/ff_calendar.json (Finnhub, 8 major currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  * TEST FILE — not yet merged into dashboard.js.
  */
 (function () {
   'use strict';
 
-  const G8      = new Set(['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']);
+  const 8 major currencies      = new Set(['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']);
   const IMPACTS = new Set(['medium','high']);
 
   const IMPACT_DOT = {
@@ -183,7 +183,7 @@
     if (!container) return;
 
     const filtered = events.filter(ev =>
-      G8.has(ev.currency) && IMPACTS.has(ev.impact)
+      8 major currencies.has(ev.currency) && IMPACTS.has(ev.impact)
     );
 
     // Build holiday lookup: dateISO → [{title, currency}]
@@ -355,7 +355,7 @@
     }));
 
     if (sourceEl) {
-      sourceEl.textContent = `${source} · G8 · medium & high impact · ${tzLabel()}`;
+      sourceEl.textContent = `${source} · 8 major currencies · medium & high impact · ${tzLabel()}`;
     }
     const thTime = document.getElementById('cal-th-time');
     if (thTime) thTime.textContent = tzLabel();

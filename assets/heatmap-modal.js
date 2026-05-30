@@ -378,7 +378,7 @@
     USD: { flag: 'us', full: 'US Dollar' },
   };
 
-  // All 28 G8 pair definitions (same as populateHeatmap in dashboard.js)
+  // All 28 8 major currencies pair definitions (same as populateHeatmap in dashboard.js)
   const PAIR_DEFS = [
     { id:'eurusd', base:'EUR', quote:'USD', sign:1 },
     { id:'gbpusd', base:'GBP', quote:'USD', sign:1 },
@@ -546,7 +546,7 @@
       <div id="hm-title-row">
         <div id="hm-title"></div>
       </div>
-      <div id="hm-sub">28-pair equal-weighted model · 8 G8 currencies · yfinance · ~5min delay</div>
+      <div id="hm-sub">28-pair equal-weighted model · 8 major currencies · yfinance · ~5min delay</div>
     </div>
     <button id="hm-close" aria-label="Close" title="Close">&#10005;</button>
   </div>
@@ -564,7 +564,7 @@
     <div class="hm-mm">
       <div class="hm-mm-lbl">Rank</div>
       <div class="hm-mm-val flat" id="hm-m-rank">—</div>
-      <div class="hm-mm-sub">of G8</div>
+      <div class="hm-mm-sub">of 8 major currencies</div>
     </div>
     <div class="hm-mm">
       <div class="hm-mm-lbl">Pairs won</div>
@@ -608,7 +608,7 @@
         </table>
       </div>
       <div class="hm-cw">
-        <div class="hm-ct">FULL RANKING · ALL 8 G8 CURRENCIES · COMPOSITE STRENGTH</div>
+        <div class="hm-ct">FULL RANKING · ALL 8 MAJOR CURRENCIES · COMPOSITE STRENGTH</div>
         <div style="display:flex;gap:16px;">
           <div style="flex:1;">
             <div class="hm-rank-sublbl">Day %</div>
@@ -633,7 +633,7 @@
     </div>
     <div class="hm-panel" id="hm-p-correlations">
       <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-        <div class="hm-ct">RELATIVE STRENGTH DIFFERENTIAL · ALL G8 · % COMPOSITE vs PREV CLOSE</div>
+        <div class="hm-ct">RELATIVE STRENGTH DIFFERENTIAL · ALL 8 MAJOR · % COMPOSITE vs PREV CLOSE</div>
         <div id="hm-corr-matrix" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;"></div>
       </div>
       <div class="hm-cw">
@@ -842,7 +842,7 @@
       });
     }
 
-    // 1W Ranking — compute G8 composite weekly strength from pct1w across all 28 pairs
+    // 1W Ranking — compute 8 major currencies composite weekly strength from pct1w across all 28 pairs
     const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
     const w1map = {};
     ccys.forEach(c => { w1map[c] = { sum: 0, n: 0 }; });
@@ -1223,7 +1223,7 @@
     // Header row
     const headerCells = `<th class="row-head" scope="col" title="Row − Column = strength differential. Positive = row currency outperforms column currency today.">Δ Strength (row − col)</th>` +
       ccys.map(c => `<th scope="col"${c === ccy ? ' class="focal"' : ''}>${c}</th>`).join('') +
-      `<th scope="col" class="focal" title="Equal-weighted composite — avg % vs all 7 G8 peers">Comp.</th>`;
+      `<th scope="col" class="focal" title="Equal-weighted composite — avg % vs all 7 major currency peers">Comp.</th>`;
 
     // Data rows
     const bodyRows = ccys.map(rowCcy => {
@@ -1244,7 +1244,7 @@
       const rowComp = pctMap[rowCcy] ?? 0;
       const compCls = corrCellClass(rowComp);
       const compFocalCls = isFocalRow ? ' corr-cell-focal' : '';
-      const compCell = `<td class="${compCls} comp-col${compFocalCls}" data-comp-row="${rowCcy}" style="font-weight:700" title="${rowCcy} composite vs G8 peers: ${corrFmt(rowComp)}">${corrFmt(rowComp)}</td>`;
+      const compCell = `<td class="${compCls} comp-col${compFocalCls}" data-comp-row="${rowCcy}" style="font-weight:700" title="${rowCcy} composite vs major currency peers: ${corrFmt(rowComp)}">${corrFmt(rowComp)}</td>`;
 
       return `<tr><td class="row-head${isFocalRow ? ' focal' : ''}">${rowCcy}</td>${cells}${compCell}</tr>`;
     }).join('');
@@ -1254,7 +1254,7 @@
       const cv  = pctMap[colCcy] ?? 0;
       const cls = corrCellClass(cv);
       const focalCls = colCcy === ccy ? ' corr-cell-focal' : '';
-      return `<td class="${cls}${focalCls}" data-comp-col="${colCcy}" style="font-weight:700" title="${colCcy} composite vs G8 peers: ${corrFmt(cv)}">${corrFmt(cv)}</td>`;
+      return `<td class="${cls}${focalCls}" data-comp-col="${colCcy}" style="font-weight:700" title="${colCcy} composite vs major currency peers: ${corrFmt(cv)}">${corrFmt(cv)}</td>`;
     }).join('');
     const footRow = `<tr class="comp-row"><td class="row-head focal" style="font-size:9px">Comp.</td>${footCells}<td class="diag" style="font-size:9px">—</td></tr>`;
 
@@ -1266,7 +1266,7 @@
       <span style="color:var(--text3,#4e5c70)">Diagonal = intraday composite · Values = equal-weighted Δ%, not Pearson correlations</span>
     </div>`;
 
-    wrap.innerHTML = `<table class="corr-matrix" aria-label="Intraday strength differential matrix G8 currencies">
+    wrap.innerHTML = `<table class="corr-matrix" aria-label="Intraday strength differential matrix 8 major currencies">
       <thead><tr>${headerCells}</tr></thead>
       <tbody>${bodyRows}${footRow}</tbody>
     </table>`;
@@ -1396,7 +1396,7 @@
       });
     });
 
-    // Normalize by number of pairs each ccy participates in (always 7 for G8)
+    // Normalize by number of pairs each ccy participates in (always 7 for 8 major currencies)
     // then accumulate to get the CSI series
     const series = {};
     CCY_ORDER.forEach(ccy => {
@@ -1777,8 +1777,8 @@
       ? Object.values(window.STOOQ_RT_CACHE).some(e => e?.fromFinnhub)
       : false;
     const srcLabel = hasFh
-      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies'
-      : '28-pair equal-weighted model \u00b7 8 G8 currencies \u00b7 yfinance \u00b7 ~5min delay';
+      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 major currencies'
+      : '28-pair equal-weighted model \u00b7 8 major currencies \u00b7 yfinance \u00b7 ~5min delay';
     const footerLabel = hasFh
       ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted model'
       : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted model';
@@ -1976,7 +1976,7 @@
       const focalCls = r === ccy ? ' corr-cell-focal' : '';
       td.className = corrCellClass(v) + ' comp-col' + focalCls;
       td.textContent = corrFmt(v);
-      td.title = `${r} composite vs G8 peers: ${corrFmt(v)}`;
+      td.title = `${r} composite vs major currency peers: ${corrFmt(v)}`;
     });
 
     // Update footer cells (column composites)
@@ -1986,7 +1986,7 @@
       const focalCls = c === ccy ? ' corr-cell-focal' : '';
       td.className = corrCellClass(v) + focalCls;
       td.textContent = corrFmt(v);
-      td.title = `${c} composite vs G8 peers: ${corrFmt(v)}`;
+      td.title = `${c} composite vs major currency peers: ${corrFmt(v)}`;
     });
 
     // Update top-3 drivers in-place (just the pct values, no layout change)
