@@ -1,0 +1,94 @@
+name: Update Sitemap
+
+# Regenerates sitemap.xml with accurate lastmod dates derived from git history.
+# Runs automatically on every push to main that touches an HTML page, key data
+# files, or this workflow/script itself.
+#
+# Why: previously all lastmod values were hardcoded to the same date.
+# Google uses lastmod to prioritise re-crawl scheduling — stale or uniform
+# dates reduce crawl efficiency and delay ranking updates after content changes.
+#
+# Approach: scripts/update_sitemap.py calls `git log -1 --format=%cI <file>`
+# for each page and its data dependencies, picks the most recent commit date,
+# and writes a fresh sitemap.xml. For the terminal (index.html), AI narrative
+# JSON is included as a dependency so daily AI updates also bump the lastmod.
+#
+# No secrets required — reads only public git history.
+# Schedule: also runs weekly (Sunday 01:00 UTC) as a safety net.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'ai-analysis/**'
+      - 'cot-data/**'
+      - 'rates/**'
+      - 'ois-rates/**'
+      - 'economic-data/**'
+      - 'sentiment-data/**'
+      - 'scripts/update_sitemap.py'
+      - '.github/workflows/update-sitemap.yml'
+  schedule:
+    - cron: '0 1 * * 0'   # Sunday 01:00 UTC — weekly safety run
+  workflow_dispatch:
+
+concurrency:
+  group: update-sitemap
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  update-sitemap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repo (full history for git log dates)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history required — git log -1 needs commit ancestry
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Regenerate sitemap.xml
+        run: python3 scripts/update_sitemap.py
+
+      - name: Commit and push (if changed)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Re-run against fresh checkout to avoid stale working tree
+            python3 scripts/update_sitemap.py
+
+            git add sitemap.xml
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "sitemap.xml unchanged — skipping commit."
+              exit 0
+            fi
+            git commit -m "sitemap: update lastmod dates ${TIMESTAMP}"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — sitemap will update on next run."
+          exit 0
