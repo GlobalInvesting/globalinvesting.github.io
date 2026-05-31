@@ -582,14 +582,20 @@ NEWSDATA_QUERIES = {
 # tagged GBP, ASEAN-6 tagged JPY, RBI rate decisions tagged EUR/NZD)
 # without making the queries so narrow that AUD/CAD/CHF return 0 results.
 NEWSDATA_REQUIRED_TERMS: dict[str, list[str]] = {
-    "USD": ["federal reserve", "fomc", "us dollar", "dollar index", "dxy", "fed ", "powell",
-            "usd/", "/usd", "nonfarm", "us treasury", "wall street", "us economy"],
+    # v5.15-fix: "fed " removed (breaks on sentence-end/punctuation); added
+    # "dollar" movement phrases so standard FX reporting passes the gate.
+    # summary window expanded to 600 chars in fetch_newsdata() to match expand field.
+    "USD": ["federal reserve", "fomc", "us dollar", "dollar index", "dxy", "fed rate",
+            "powell", "usd/", "/usd", "nonfarm", "us treasury", "wall street",
+            "greenback", "dollar fell", "dollar rose", "dollar gained", "dollar weakened",
+            "dollar strength", "dollar weakness"],
     "EUR": ["ecb", "european central bank", "eurozone", "euro area", "lagarde", "eur/",
             "/eur", "euro ", " eur ", "bce", "eurostoxx"],
     "GBP": ["bank of england", "sterling", "british pound", "gbp/", "/gbp", "bailey",
-            "boe ", "mpc ", "gilts", "uk economy", "united kingdom gdp"],
+            "boe rate", "mpc vote", "mpc member", "gilts", "uk economy", "uk gdp"],
     "JPY": ["bank of japan", "boj", "japanese yen", "usd/jpy", "jpy/", "/jpy", "ueda",
-            "tokyo cpi", "japan cpi", "boj rate", "yen intervention"],
+            "tokyo cpi", "japan cpi", "boj rate", "yen intervention", "yen weakens",
+            "yen strengthens", "yen rally"],
     "AUD": ["reserve bank of australia", "rba", "australian dollar", "aud/", "/aud",
             "bullock", "aussie dollar", "australia cpi", "australia gdp"],
     "CAD": ["bank of canada", "canadian dollar", "cad/", "/cad", "macklem", "loonie",
@@ -984,7 +990,7 @@ def fetch_newsdata(api_key: str, now_utc: datetime) -> list:
                 # return 0 results. NON_G8_CB_RE is the first filter; this is the
                 # second — a positive requirement that the G8 currency is actually named.
                 required = NEWSDATA_REQUIRED_TERMS.get(cur, [])
-                text_lc = (title + " " + summary[:300]).lower()
+                text_lc = (title + " " + summary[:600]).lower()
                 if required and not any(term in text_lc for term in required):
                     continue
 
