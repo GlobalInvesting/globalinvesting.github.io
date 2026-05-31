@@ -1,7 +1,36 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.12
+fetch_news.py — v5.13
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.13 (sobre v5.12):
+  FUENTES INSTITUCIONALES AÑADIDAS — BANCOS CENTRALES + FX MARKETS:
+    · FX Markets (Risk.net): fx-markets.com/feeds/rss — publicación FX institucional de
+      Risk.net. Cobertura profesional: derivados FX, política monetaria, regulación,
+      prime brokerage. Nivel Bloomberg/Risk — no es broker retail, es prensa financiera
+      institucional. Forzado a revisión por detect_impact() — no en TECHNICAL_ANALYSIS_SOURCES.
+    · Bank of Canada speeches: bankofcanada.ca/content_type/speeches/feed/ — discursos
+      del Gobernador y miembros del Consejo. Forzado a CAD. Complementa el feed de press
+      releases existente — los speeches son el canal más market-moving del BoC.
+    · Bank of England speeches: bankofengland.co.uk/rss/speeches — discursos del MPC.
+      Forzado a GBP. Los speeches de Bailey, Ramsden, Dhingra son equivalentes a las
+      minutes en impacto de mercado — esenciales para GBP bias.
+    · Bank of England Bank Insights: bankofengland.co.uk/rss/bank-insights — blog analítico
+      del BoE. Artículos macro de investigadores del banco; más profundidad que press releases.
+      Forzado a GBP.
+    · SNB: tres feeds añadidos para reemplazar la URL antigua (formato pre-2024 que redirige):
+      - pressrel (comunicados de prensa) — url nueva correcta
+      - speeches (discursos de Schlegel y miembros) — muy market-moving para CHF
+      - mopo (monetary policy) — el más importante: decisiones de tasas y FX interventions
+      URL anterior (snb.ch/en/snb/medmit/medienmitteilungen/id/rss) mantenida como fallback.
+    · ECB Blog: ecb.europa.eu/rss/blog.html — blog oficial del BCE. Artículos de Lagarde,
+      Lane, Schnabel con análisis de política monetaria. Forzado a EUR. Más frecuente que
+      los press releases y captura el tono hawks/dovish entre reuniones.
+
+  SNIPPET EXPANDIDO:
+    · expand: summary[:350] → summary[:600] — muestra más contexto del artículo en el panel.
+      El campo es mostrado en el accordion del news panel; más texto = menos clicks necesarios
+      para evaluar relevancia. Los artículos de CBs (breves por naturaleza) no se ven afectados.
 
 CAMBIOS v5.12 (sobre v5.11):
   FINNHUB MARKET NEWS — NUEVA FUENTE ESTRUCTURADA:
@@ -449,6 +478,34 @@ FEEDS = [
     # NO en TECHNICAL_ANALYSIS_SOURCES — es macro fundamental, no análisis de precio.
     { "source": "Marc to Market",   "url": "https://www.marctomarket.com/feeds/posts/default",                 "lang": "en" },
 
+    # ── INGLÉS — fuentes institucionales FX añadidas (v5.13) ─────────────────
+    # FX Markets (Risk.net): publicación FX institucional — cobertura de derivados FX,
+    # política monetaria, regulación y prime brokerage. Nivel Bloomberg/Risk.
+    # NO en TECHNICAL_ANALYSIS_SOURCES — es prensa financiera institucional, no TA.
+    { "source": "FX Markets",       "url": "https://www.fx-markets.com/feeds/rss",                            "lang": "en" },
+
+    # ── INGLÉS — bancos centrales añadidos/actualizados (v5.13) ─────────────
+    # Bank of Canada speeches: discursos del Gobernador y miembros del Consejo.
+    # Canal más market-moving del BoC — complementa el feed de press releases.
+    { "source": "Bank of Canada",   "url": "https://www.bankofcanada.ca/content_type/speeches/feed/",         "lang": "en" },
+    # Bank of England speeches: discursos del MPC (Bailey, Ramsden, Dhingra).
+    # Equivalente en impacto de mercado a las minutes de política monetaria.
+    { "source": "Bank of England",  "url": "https://www.bankofengland.co.uk/rss/speeches",                    "lang": "en" },
+    # Bank of England Bank Insights: blog analítico del BoE — análisis macro de
+    # investigadores del banco, más profundidad que los press releases estándar.
+    { "source": "Bank of England",  "url": "https://www.bankofengland.co.uk/rss/bank-insights",               "lang": "en" },
+    # SNB — tres feeds con URLs correctos (formato post-2024):
+    # pressrel: comunicados de prensa oficiales
+    # speeches: discursos de Schlegel y miembros del directorio — muy market-moving para CHF
+    # mopo: monetary policy — el más importante: decisiones de tasas y FX interventions
+    # URL anterior (snb.ch/en/snb/medmit/medienmitteilungen/id/rss) mantenida como fallback.
+    { "source": "SNB",              "url": "https://www.snb.ch/public/en/rss/pressrel",                       "lang": "en" },
+    { "source": "SNB",              "url": "https://www.snb.ch/public/en/rss/speeches",                       "lang": "en" },
+    { "source": "SNB",              "url": "https://www.snb.ch/public/en/rss/mopo",                           "lang": "en" },
+    # ECB Blog: blog oficial del BCE con artículos de Lagarde, Lane y Schnabel.
+    # Captura el tono hawkish/dovish entre reuniones — más frecuente que press releases.
+    { "source": "ECB",              "url": "https://www.ecb.europa.eu/rss/blog.html",                         "lang": "en" },
+
     # v5.10: DailyFX (3 feeds) removidos — dailyfx.com/feeds/* redirige a ig.com/uk,
     # los URLs no devuelven XML válido. Pendiente verificar feeds RSS en ig.com para v5.11.
 
@@ -574,7 +631,7 @@ FOREX_SOURCES = {
     "ActionForex", "InvestingLive", "MyFXBook",
     "Investing.com", "BabyPips", "InvestMacro", "ForexCrunch",
     "MarketPulse", "Reuters FX", "Reuters Markets", "Nasdaq FX", "FX Empire",
-    "Barchart", "Marc to Market",
+    "Barchart", "Marc to Market", "FX Markets",
     # v5.7: NewsData API
     "NewsData USD", "NewsData EUR", "NewsData GBP", "NewsData JPY",
     "NewsData AUD", "NewsData CAD", "NewsData CHF", "NewsData NZD",
@@ -853,7 +910,7 @@ def fetch_newsdata(api_key: str, now_utc: datetime) -> list:
 
                 nid       = entry_id(title, f"NewsData {cur}")
                 impact    = detect_impact(title, summary)
-                expand    = summary[:350] + ("..." if len(summary) > 350 else "")
+                expand    = summary[:600] + ("..." if len(summary) > 600 else "")
                 age_hours = (now_utc - pub_date).total_seconds() / 3600
 
                 articles.append({
@@ -955,7 +1012,7 @@ def fetch_finnhub_news(api_key: str, now_utc: datetime) -> list:
             cur = detect_currency(title, summary, source) or "USD"
             nid = entry_id(title, f"Finnhub News")
             impact = detect_impact(title, summary)
-            expand = summary[:350] + ("..." if len(summary) > 350 else "")
+            expand = summary[:600] + ("..." if len(summary) > 600 else "")
             age_hours = (now_utc - pub_date).total_seconds() / 3600
 
             articles.append({
@@ -1058,7 +1115,7 @@ def main():
     filtered_no_currency = 0
     # v5.11: instaforex_count removed — InstaForex feeds eliminated
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.7 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.13 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
@@ -1150,7 +1207,7 @@ def main():
                 if not any(kw in combined for kw in TA_MACRO_OVERRIDE_KW):
                     impact = "med"
 
-            expand    = summary[:350] + ("..." if len(summary) > 350 else "")
+            expand    = summary[:600] + ("..." if len(summary) > 600 else "")
             age_hours = (now_utc - pub_date).total_seconds() / 3600
 
             raw_articles.append({
