@@ -1,7 +1,20 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.14
+fetch_news.py — v5.15
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.15 (sobre v5.14):
+  NEWSDATA REQUIRED-TERMS GATE:
+    · NEWSDATA_REQUIRED_TERMS: nuevo dict — lista de términos que deben aparecer en
+      title+summary para que un artículo de NewsData sea aceptado. Cada divisa tiene
+      su lista propia (e.g. USD: "federal reserve", "us dollar", "powell"...).
+      Soluciona: ASEAN-6 (Qatar/QNB) etiquetado JPY, India Finance Ministry etiquetado
+      GBP, RBI rate hike etiquetado EUR — todos pasan is_forex_relevant() pero ninguno
+      menciona la divisa objetivo. El gate positivo los elimina sin afectar feeds RSS.
+    · NEWSDATA_QUERIES relaxed: las queries multi-frase exactas ("RBA rate", "Bullock rate",
+      "MPC sterling") causaban 0 resultados en AUD/CAD/CHF porque NewsData las trata como
+      frases exactas raramente usadas verbatim. Volvemos a queries simples (single-term OR)
+      y dejamos NEWSDATA_REQUIRED_TERMS como filtro de calidad post-query.
 
 CAMBIOS v5.13 (sobre v5.12):
   FUENTES INSTITUCIONALES AÑADIDAS — BANCOS CENTRALES + FX MARKETS:
@@ -547,18 +560,44 @@ NEWSDATA_MAX_RESULTS  = 5                    # por query (plan free: max 10)
 NEWSDATA_BASE_URL     = "https://newsdata.io/api/1/news"
 
 NEWSDATA_QUERIES = {
-    # v5.14: queries tightened — previous broad terms ("euro OR ECB OR european central bank")
-    # were matching any article mentioning "central bank" generically (India's RBI, Qatar QCB,
-    # PagerDuty earnings tagged CHF). New queries require the G8 CB name or ISO ticker
-    # to appear together with a clear macro/FX context term.
-    "USD": "federal reserve OR FOMC OR \"US dollar\" OR \"dollar index\" OR DXY",
-    "EUR": "ECB OR \"European Central Bank\" OR \"eurozone inflation\" OR \"euro area\" OR Lagarde",
-    "GBP": "\"Bank of England\" OR MPC sterling OR \"british pound\" OR Bailey monetary",
-    "JPY": "\"Bank of Japan\" OR BOJ OR \"japanese yen\" OR Ueda monetary policy",
-    "AUD": "\"Reserve Bank of Australia\" OR \"RBA rate\" OR \"australian dollar\" OR Bullock rate",
-    "CAD": "\"Bank of Canada\" OR Macklem OR \"canadian dollar\" OR loonie rate",
-    "CHF": "\"Swiss National Bank\" OR SNB OR \"swiss franc\" OR Schlegel monetary",
-    "NZD": "RBNZ OR \"Reserve Bank of New Zealand\" OR \"new zealand dollar\" OR \"kiwi dollar\"",
+    # v5.15: queries relaxed back to single-term OR (multi-word quoted phrases like
+    # "RBA rate" / "Bullock rate" / "MPC sterling" caused 0 results for AUD/CAD/CHF
+    # because NewsData treats them as exact phrases that rarely appear verbatim).
+    # Quality filtering is now handled by NEWSDATA_REQUIRED_TERMS below — that gate
+    # is more reliable than query tightness for blocking non-G8 articles.
+    "USD": "\"federal reserve\" OR FOMC OR \"US dollar\" OR dollar OR powell",
+    "EUR": "ECB OR eurozone OR Lagarde OR \"euro area\"",
+    "GBP": "sterling OR \"Bank of England\" OR \"british pound\" OR Bailey",
+    "JPY": "\"Bank of Japan\" OR BOJ OR \"japanese yen\" OR Ueda",
+    "AUD": "RBA OR \"australian dollar\" OR Bullock OR \"Reserve Bank Australia\"",
+    "CAD": "\"Bank of Canada\" OR Macklem OR \"canadian dollar\" OR loonie",
+    "CHF": "SNB OR \"swiss franc\" OR Schlegel OR \"Swiss National Bank\"",
+    "NZD": "RBNZ OR \"new zealand dollar\" OR \"kiwi dollar\"",
+}
+
+# v5.15: Required-terms gate for NewsData results.
+# After the API returns candidates, at least ONE of these terms must appear
+# in title+summary (case-insensitive) for the article to be accepted.
+# This blocks articles that match the query loosely (India Finance Ministry
+# tagged GBP, ASEAN-6 tagged JPY, RBI rate decisions tagged EUR/NZD)
+# without making the queries so narrow that AUD/CAD/CHF return 0 results.
+NEWSDATA_REQUIRED_TERMS: dict[str, list[str]] = {
+    "USD": ["federal reserve", "fomc", "us dollar", "dollar index", "dxy", "fed ", "powell",
+            "usd/", "/usd", "nonfarm", "us treasury", "wall street", "us economy"],
+    "EUR": ["ecb", "european central bank", "eurozone", "euro area", "lagarde", "eur/",
+            "/eur", "euro ", " eur ", "bce", "eurostoxx"],
+    "GBP": ["bank of england", "sterling", "british pound", "gbp/", "/gbp", "bailey",
+            "boe ", "mpc ", "gilts", "uk economy", "united kingdom gdp"],
+    "JPY": ["bank of japan", "boj", "japanese yen", "usd/jpy", "jpy/", "/jpy", "ueda",
+            "tokyo cpi", "japan cpi", "boj rate", "yen intervention"],
+    "AUD": ["reserve bank of australia", "rba", "australian dollar", "aud/", "/aud",
+            "bullock", "aussie dollar", "australia cpi", "australia gdp"],
+    "CAD": ["bank of canada", "canadian dollar", "cad/", "/cad", "macklem", "loonie",
+            "canada gdp", "canada cpi", "canada jobs"],
+    "CHF": ["swiss national bank", "snb", "swiss franc", "chf/", "/chf", "schlegel",
+            "swiss kof", "switzerland gdp", "swiss cpi"],
+    "NZD": ["rbnz", "reserve bank of new zealand", "new zealand dollar", "nzd/", "/nzd",
+            "kiwi dollar", "new zealand cpi", "nz economy", "new zealand gdp"],
 }
 
 # ─────────────────────────────────────────────
@@ -938,6 +977,17 @@ def fetch_newsdata(api_key: str, now_utc: datetime) -> list:
                 if not is_forex_relevant(title, summary):
                     continue
 
+                # v5.15: required-terms gate — at least one currency-specific term
+                # must appear in title+summary. Blocks articles that match the query
+                # loosely (e.g. India RBI tagged EUR, ASEAN-6 tagged JPY, Hormuz
+                # tagged GBP) without making queries so narrow that AUD/CAD/CHF
+                # return 0 results. NON_G8_CB_RE is the first filter; this is the
+                # second — a positive requirement that the G8 currency is actually named.
+                required = NEWSDATA_REQUIRED_TERMS.get(cur, [])
+                text_lc = (title + " " + summary[:300]).lower()
+                if required and not any(term in text_lc for term in required):
+                    continue
+
                 norm_title = normalize_title(title)
                 title_key  = norm_title[:60]
                 if title_key in seen_newsdata_titles:
@@ -1151,7 +1201,7 @@ def main():
     filtered_no_currency = 0
     # v5.11: instaforex_count removed — InstaForex feeds eliminated
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.14 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.15 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
