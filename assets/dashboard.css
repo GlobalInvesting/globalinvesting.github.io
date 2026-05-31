@@ -1799,8 +1799,6 @@ a:focus-visible,
 .ns-open .ns-drawer { display:block; }
 .ns-drawer-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);margin:0 0 4px 0;text-transform:uppercase;letter-spacing:.04em; }
 .ns-snippet { font-size:11px;color:var(--text2);line-height:1.5;font-family:var(--font-ui);margin:0; }
-.ns-preview { font-size:10px;color:var(--text3);line-height:1.4;font-family:var(--font-ui);padding:0 14px 6px 56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-.ns-open .ns-preview { display:none; }
 .ns-read-link { display:inline-block;margin-top:6px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none; }
 .ns-read-link:hover { text-decoration:underline; }
 .ns-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
