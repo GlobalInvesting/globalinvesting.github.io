@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-31T23:45:24Z",
-  "generatedAt": "2026-05-31T23:45:24Z",
+  "lastUpdate": "2026-05-31T23:57:28Z",
+  "generatedAt": "2026-05-31T23:57:28Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-01",
   "rangeTo": "2026-06-12",
-  "totalEvents": 1635,
+  "totalEvents": 1630,
   "currencyCounts": {
     "AUD": 175,
     "CAD": 131,
     "CHF": 89,
     "USD": 617,
-    "JPY": 181,
-    "GBP": 181,
-    "NZD": 77,
+    "JPY": 179,
+    "GBP": 179,
+    "NZD": 76,
     "EUR": 184
   },
   "impactCounts": {
     "low": 147,
-    "medium": 1109,
+    "medium": 1104,
     "high": 379
   },
   "surpriseStats": {
@@ -19684,19 +19684,6 @@
     {
       "date": "28 May",
       "dateISO": "2026-05-28",
-      "timeUTC": "01:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "ANZ Business Confidence",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": "-10.6"
-    },
-    {
-      "date": "28 May",
-      "dateISO": "2026-05-28",
       "timeUTC": "01:30",
       "country": "AUD",
       "currency": "AUD",
@@ -19719,19 +19706,6 @@
       "actual": null,
       "forecast": null,
       "previous": null
-    },
-    {
-      "date": "28 May",
-      "dateISO": "2026-05-28",
-      "timeUTC": "05:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Housing Starts YoY",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "15.5",
-      "previous": "-29.3"
     },
     {
       "date": "28 May",
@@ -20088,32 +20062,6 @@
       "date": "29 May",
       "dateISO": "2026-05-29",
       "timeUTC": "06:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "Nationwide Housing Prices MoM",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": "0.4"
-    },
-    {
-      "date": "29 May",
-      "dateISO": "2026-05-29",
-      "timeUTC": "06:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "Nationwide Housing Prices YoY",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": "3"
-    },
-    {
-      "date": "29 May",
-      "dateISO": "2026-05-29",
-      "timeUTC": "06:00",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
@@ -20306,19 +20254,6 @@
       "previous": null
     },
     {
-      "date": "29 May",
-      "dateISO": "2026-05-29",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Retail Sales YoY",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": "1.7"
-    },
-    {
       "date": "31 May",
       "dateISO": "2026-05-31",
       "timeUTC": "00:30",
@@ -20353,7 +20288,7 @@
       "flag": "🇯🇵",
       "event": "Capital Spending YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "0",
       "forecast": "4.1",
       "previous": "6.5"
     },
