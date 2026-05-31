@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-31T12:40:26Z",
+  "updated": "2026-05-31T12:45:28Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,10 +35,10 @@
       "pct1w_date": "2026-05-29"
     },
     "gold": {
-      "close": 4542.4363,
+      "close": 4542.5096,
       "prev_close": 4542.5265,
-      "chg": -0.0902,
-      "pct": -0.002,
+      "chg": -0.0169,
+      "pct": -0.0004,
       "source": "twelve_data",
       "high": 4627.1,
       "low": 4519.5,
@@ -51,8 +51,8 @@
       "prev_close": 88.9,
       "chg": -1.54,
       "pct": -1.7323,
-      "high": null,
-      "low": null,
+      "high": 89.02,
+      "low": 86.36,
       "open": 88.55,
       "bid": 87.5,
       "ask": 88.05,
@@ -199,35 +199,35 @@
       "pct1w_date": "2026-05-29"
     },
     "btc": {
-      "close": 73820.31,
+      "close": 73869.99,
       "prev_close": 73754.984,
-      "chg": 65.326,
-      "pct": 0.0886,
+      "chg": 115.006,
+      "pct": 0.1559,
       "high": 74150.984,
       "low": 73654.38,
       "open": 73754.984,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780231230,
+      "market_time": 1780231526,
       "source": "yfinance",
-      "pct1w": 0.6103,
+      "pct1w": 0.678,
       "pct1w_date": "2026-05-29"
     },
     "eth": {
-      "close": 2020.69,
+      "close": 2021.65,
       "prev_close": 2019.2559,
-      "chg": 1.4341,
-      "pct": 0.071,
+      "chg": 2.3941,
+      "pct": 0.1186,
       "high": 2033.1941,
       "low": 2013.6868,
       "open": 2019.2559,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780231228,
+      "market_time": 1780231529,
       "source": "yfinance",
-      "pct1w": 0.433,
+      "pct1w": 0.4807,
       "pct1w_date": "2026-05-29"
     },
     "nasdaq": {
@@ -859,15 +859,15 @@
       "prev_close": 75.912,
       "chg": -0.037,
       "pct": -0.0487,
-      "high": null,
-      "low": null,
+      "high": 76.94,
+      "low": 74.815,
       "open": 76.025,
       "bid": 75.545,
       "ask": 75.895,
       "market_state": "REGULAR",
       "market_time": 1780088375,
       "source": "yfinance",
-      "pct1w": 0.3425,
+      "pct1w": 0.0,
       "pct1w_date": "2026-05-29"
     },
     "brent": {
@@ -875,15 +875,15 @@
       "prev_close": 92.7,
       "chg": -1.58,
       "pct": -1.7044,
-      "high": null,
-      "low": null,
+      "high": 92.89,
+      "low": 89.94,
       "open": 92.67,
       "bid": 91.5,
       "ask": 92.0,
       "market_state": "REGULAR",
       "market_time": 1780088396,
       "source": "yfinance",
-      "pct1w": -1.0103,
+      "pct1w": -0.0,
       "pct1w_date": "2026-05-29"
     },
     "dax": {
@@ -1428,14 +1428,14 @@
     {
       "a": "AUD/USD",
       "b": "Gold",
-      "corr30": 0.232,
+      "corr30": 0.235,
       "n30": 30,
-      "corr": 0.064,
+      "corr": 0.066,
       "n": 60,
-      "corr90": -0.108,
+      "corr90": -0.106,
       "n90": 90,
       "norm": 0.301,
-      "z_score": -0.15,
+      "z_score": -0.14,
       "std": 0.4756,
       "history": [
         0.061,
@@ -1659,7 +1659,7 @@
         0.052,
         0.127,
         0.168,
-        0.232
+        0.235
       ],
       "hist_dates": [
         "2025-07-23",
@@ -5118,14 +5118,14 @@
     {
       "a": "GBP/USD",
       "b": "Gold",
-      "corr30": 0.262,
+      "corr30": 0.256,
       "n30": 30,
       "corr": -0.091,
       "n": 60,
       "corr90": 0.193,
       "n90": 90,
       "norm": 0.193,
-      "z_score": 0.16,
+      "z_score": 0.15,
       "std": 0.4299,
       "history": [
         0.476,
@@ -5349,7 +5349,7 @@
         0.197,
         0.216,
         0.231,
-        0.262
+        0.256
       ],
       "hist_dates": [
         "2025-07-23",
@@ -6038,14 +6038,14 @@
     {
       "a": "Gold",
       "b": "DXY",
-      "corr30": -0.754,
+      "corr30": -0.751,
       "n30": 30,
       "corr": -0.019,
       "n": 60,
       "corr90": -0.473,
       "n90": 90,
       "norm": -0.301,
-      "z_score": -1.05,
+      "z_score": -1.04,
       "std": 0.4335,
       "history": [
         0.322,
@@ -6268,7 +6268,7 @@
         -0.748,
         -0.761,
         -0.756,
-        -0.754
+        -0.751
       ],
       "hist_dates": [
         "2025-07-15",
