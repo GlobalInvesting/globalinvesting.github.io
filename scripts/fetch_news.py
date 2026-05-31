@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.13
+fetch_news.py — v5.14
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
 
 CAMBIOS v5.13 (sobre v5.12):
@@ -215,6 +215,10 @@ CALENDAR_PATTERNS = [
     r"^the bank of (canada|england|japan|reserve)",
     r"monetary policy report$", r"rate announcement$",
     r"^(what is|how to|learn|guide to|introduction to|basics of|beginner)",
+    # v5.14: weekly roundup/preview articles are calendar noise, not market-moving news
+    r"^key market events for the week",
+    r"^(week ahead|week in review|weekly wrap|weekly outlook|weekly preview|week in focus)",
+    r"^(highlights? for the week|events for the week)",
 ]
 CALENDAR_RE = re.compile("|".join(CALENDAR_PATTERNS), re.IGNORECASE)
 
@@ -249,6 +253,23 @@ EMERGING_MARKET_TITLE_RE = re.compile(
 EQUITY_INDEX_TITLE_RE = re.compile(
     r"\b(dax|cac 40|eurostoxx|euro stoxx|ibex 35|ftse mib|stoxx 600|aex|"
     r"bel 20|omx|wig20)\b.{0,40}\b(rises?|falls?|gains?|drops?|points?|higher|lower|climbs?|slides?)\b",
+    re.IGNORECASE,
+)
+
+# v5.14: filter articles whose primary subject is a non-G8 central bank.
+# These articles pass is_forex_relevant() because they contain "central bank",
+# "interest rate", "inflation" etc., but they are about the Indian RBI, Qatar QCB,
+# Indonesia BI, etc. — not the 8 currencies this terminal covers.
+NON_G8_CB_RE = re.compile(
+    r"\b(reserve bank of india|rbi (rate|policy|meeting|governor|hike|cut|likely|expected|decision)|"
+    r"rbi monetary|bank of israel|qatar central bank|qcb|people'?s bank of china|pboc|"
+    r"bank of korea|bank indonesia|bi rate|bank negara|"
+    r"central bank of brazil|banco central do brasil|"
+    r"south african reserve bank|sarb|banco de mexico|banxico|"
+    r"central bank of turkey|cbrt|tcmb|"
+    r"central bank of russia|bank of russia|"
+    r"norwegian krone|riksbank|norges bank|"
+    r"czech national bank|national bank of poland)\b",
     re.IGNORECASE,
 )
 
@@ -526,14 +547,18 @@ NEWSDATA_MAX_RESULTS  = 5                    # por query (plan free: max 10)
 NEWSDATA_BASE_URL     = "https://newsdata.io/api/1/news"
 
 NEWSDATA_QUERIES = {
-    "USD": "US dollar OR federal reserve OR FOMC",
-    "EUR": "euro OR ECB OR european central bank",
-    "GBP": "british pound OR sterling OR bank of england",
-    "JPY": "japanese yen OR bank of japan OR BOJ",
-    "AUD": "australian dollar OR RBA OR reserve bank australia",
-    "CAD": "canadian dollar OR bank of canada",
-    "CHF": "swiss franc OR SNB OR swiss national bank",
-    "NZD": "new zealand dollar OR RBNZ",
+    # v5.14: queries tightened — previous broad terms ("euro OR ECB OR european central bank")
+    # were matching any article mentioning "central bank" generically (India's RBI, Qatar QCB,
+    # PagerDuty earnings tagged CHF). New queries require the G8 CB name or ISO ticker
+    # to appear together with a clear macro/FX context term.
+    "USD": "federal reserve OR FOMC OR \"US dollar\" OR \"dollar index\" OR DXY",
+    "EUR": "ECB OR \"European Central Bank\" OR \"eurozone inflation\" OR \"euro area\" OR Lagarde",
+    "GBP": "\"Bank of England\" OR MPC sterling OR \"british pound\" OR Bailey monetary",
+    "JPY": "\"Bank of Japan\" OR BOJ OR \"japanese yen\" OR Ueda monetary policy",
+    "AUD": "\"Reserve Bank of Australia\" OR \"RBA rate\" OR \"australian dollar\" OR Bullock rate",
+    "CAD": "\"Bank of Canada\" OR Macklem OR \"canadian dollar\" OR loonie rate",
+    "CHF": "\"Swiss National Bank\" OR SNB OR \"swiss franc\" OR Schlegel monetary",
+    "NZD": "RBNZ OR \"Reserve Bank of New Zealand\" OR \"new zealand dollar\" OR \"kiwi dollar\"",
 }
 
 # ─────────────────────────────────────────────
@@ -669,6 +694,12 @@ def is_forex_relevant(title: str, summary: str) -> bool:
         return False
 
     if EMERGING_MARKET_TITLE_RE.search(title):
+        return False
+
+    # v5.14: filter articles whose primary subject is a non-G8 central bank.
+    # These pass the keyword check below because they contain "central bank"/"interest rate"
+    # but cover the Indian RBI, Qatar QCB, Indonesia BI, etc. — not G8 FX drivers.
+    if NON_G8_CB_RE.search(title + " " + summary[:150]):
         return False
 
     if CRYPTO_NOISE_RE.search(title):
@@ -901,6 +932,11 @@ def fetch_newsdata(api_key: str, now_utc: datetime) -> list:
                     continue
                 if not has_real_content(title, summary):
                     continue
+                # v5.14: stricter gate for NewsData — articles returned by the API
+                # can match the query broadly (e.g. "central bank" in any context)
+                # and slip through without a G8-currency anchor.
+                if not is_forex_relevant(title, summary):
+                    continue
 
                 norm_title = normalize_title(title)
                 title_key  = norm_title[:60]
@@ -1115,7 +1151,7 @@ def main():
     filtered_no_currency = 0
     # v5.11: instaforex_count removed — InstaForex feeds eliminated
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.13 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.14 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
