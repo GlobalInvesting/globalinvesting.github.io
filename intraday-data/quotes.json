@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-31T11:57:06Z",
+  "updated": "2026-05-31T12:00:26Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,10 +35,10 @@
       "pct1w_date": "2026-05-29"
     },
     "gold": {
-      "close": 4542.4583,
+      "close": 4542.4398,
       "prev_close": 4542.5265,
-      "chg": -0.0682,
-      "pct": -0.0015,
+      "chg": -0.0867,
+      "pct": -0.0019,
       "source": "twelve_data",
       "high": 4627.1,
       "low": 4519.5,
@@ -52,7 +52,7 @@
       "chg": -1.54,
       "pct": -1.7323,
       "high": 89.02,
-      "low": 86.36,
+      "low": 86.35,
       "open": 88.55,
       "bid": 87.5,
       "ask": 88.05,
@@ -199,35 +199,35 @@
       "pct1w_date": "2026-05-29"
     },
     "btc": {
-      "close": 73847.23,
+      "close": 73842.04,
       "prev_close": 73754.984,
-      "chg": 92.246,
-      "pct": 0.1251,
+      "chg": 87.056,
+      "pct": 0.118,
       "high": 74150.984,
       "low": 73654.38,
       "open": 73754.984,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780228625,
+      "market_time": 1780228825,
       "source": "yfinance",
-      "pct1w": 0.647,
+      "pct1w": 0.6399,
       "pct1w_date": "2026-05-29"
     },
     "eth": {
-      "close": 2020.8,
+      "close": 2020.54,
       "prev_close": 2019.2559,
-      "chg": 1.5441,
-      "pct": 0.0765,
+      "chg": 1.2841,
+      "pct": 0.0636,
       "high": 2033.1941,
       "low": 2013.6868,
       "open": 2019.2559,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780228619,
+      "market_time": 1780228829,
       "source": "yfinance",
-      "pct1w": 0.4384,
+      "pct1w": 0.4255,
       "pct1w_date": "2026-05-29"
     },
     "nasdaq": {
@@ -859,7 +859,7 @@
       "prev_close": 75.912,
       "chg": -0.037,
       "pct": -0.0487,
-      "high": 76.94,
+      "high": 76.96,
       "low": 74.815,
       "open": 76.025,
       "bid": 75.545,
@@ -6496,13 +6496,53 @@
     }
   ],
   "fx_etf_iv": {
-    "eurusd": null,
-    "gbpusd": null,
-    "usdjpy": null,
-    "audusd": null,
-    "usdchf": null,
+    "eurusd": {
+      "iv": 7.1,
+      "source": "CBOE ^EUVIX",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    },
+    "gbpusd": {
+      "iv": 11.0,
+      "source": "CBOE ^BPVIX",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    },
+    "usdjpy": {
+      "iv": 7.2,
+      "source": "CBOE ^JYVIX",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    },
+    "audusd": {
+      "iv": 14.6,
+      "expiry": "2026-06-18",
+      "atm": 71.0,
+      "source": "FXA options",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    },
+    "usdchf": {
+      "iv": 12.6,
+      "expiry": "2026-06-18",
+      "atm": 113.0,
+      "source": "FXF options",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    },
     "usdcad": null,
-    "nzdusd": null
+    "nzdusd": {
+      "iv": 15.8,
+      "source": "est. CBOE ^AUDVIX \u00d7 1.08",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    }
   },
   "var_cvar": {
     "eurusd": {
