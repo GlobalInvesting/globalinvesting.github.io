@@ -1,7 +1,27 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.15
+fetch_news.py — v5.16
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.16 (sobre v5.15):
+  KEYWORD SUBSTRING BUGS — FALSOS POSITIVOS EN DETECCIÓN DE DIVISA:
+    · NZD "orr" → eliminado como keyword bare. "worries", "corridor", "tomorrow" contienen
+      "orr" como substring → artículos sin relación con RBNZ recibían NZD score=10.
+      Reemplazado por: "governor orr"(10), " orr "(8), "orr said"(8), "orr noted"(8).
+    · AUD "rba" → reemplazado por " rba"(10) + "rba rate/meeting/decision"(8).
+      "urban" (u+rba+n) contiene "rba" como substring → hit falso de 10 puntos para AUD.
+    · AUD "aud " → reemplazado por " aud"(3). "fraud " (fr+aud+space) contiene "aud " → hit
+      falso de 3 puntos para AUD en artículos de fraude financiero.
+    · EUR country keywords reforzados: "france"→2, "french"→3, "italy"→2, "spain"→2.
+      Añadidos: "french gdp/cpi/pmi/inflation"(5/5/3/5), "spain gdp/cpi/pmi"(5/5/3),
+      "italy gdp/cpi"(5/5), "german gdp"(5), "eu inflation"(5), "european inflation"(3).
+      Motivo: "France Q1 final GDP" tenía EUR score=1.5 (< CURRENCY_MIN_SCORE=5) y quedaba
+      sin divisa; fallback no aplica a ForexLive → artículo descartado. Con los pesos nuevos:
+      title "france"(+3) + summary "french"(+3) → EUR=6 ≥ 5. Artículo correctamente etiquetado.
+    · Nuevo FALSE_POSITIVE_GUARD eurozona: patrón regex para "france q[1-4]", "french gdp/cpi",
+      "german gdp/cpi", "spain/italy gdp/cpi/pmi", "eurostat", "ifo business", "zew sentiment".
+      Penaliza NZD(-10), AUD(-8), JPY(-6), CAD(-4). Segunda capa de seguridad — independiente
+      del fix de "orr" — protege contra regresiones futuras en los pesos.
 
 CAMBIOS v5.15 (sobre v5.14):
   NEWSDATA REQUIRED-TERMS GATE:
@@ -332,7 +352,13 @@ CURRENCY_KEYWORDS_WEIGHTED = {
         ("eur/", 5), ("/eur", 5), ("euro ", 2),
         ("eu economy", 1), ("european economy", 1),
         ("economía europea", 1), ("alemania", 1),
-        ("france", 1), ("italy", 1), ("spain", 1),
+        # v5.16: boosted country weights + added "french" to catch summary mentions.
+        # "France Q1 final GDP" → title "france"(+3), summary "french"(+3) → EUR=6 ≥ CURRENCY_MIN_SCORE.
+        ("france", 2), ("french", 3), ("italy", 2), ("spain", 2),
+        ("french gdp", 5), ("french cpi", 5), ("french pmi", 3), ("french inflation", 5),
+        ("spain gdp", 5), ("spain cpi", 5), ("spain pmi", 3),
+        ("italy gdp", 5), ("italy cpi", 5),
+        ("german gdp", 5), ("eu inflation", 5), ("european inflation", 3),
     ],
     "GBP": [
         ("boe", 10), ("bank of england", 10), ("bailey", 10),
@@ -358,7 +384,10 @@ CURRENCY_KEYWORDS_WEIGHTED = {
         ("japón ", 1),
     ],
     "AUD": [
-        ("rba", 10), ("reserve bank of australia", 10), ("bullock", 10),
+        # v5.16: ("rba", 10) matched "urban" (u+rba+n) as substring → AUD false hits.
+        # Leading space prevents match inside longer words; explicit phrases cover RBA-specific contexts.
+        (" rba", 10), ("rba rate", 8), ("rba meeting", 8), ("rba decision", 8),
+        ("reserve bank of australia", 10), ("bullock", 10),
         ("banco de la reserva de australia", 10),
         ("australian dollar", 8), ("dólar australiano", 8), ("aussie dollar", 8),
         ("australia gdp", 5), ("australian gdp", 5),
@@ -366,7 +395,7 @@ CURRENCY_KEYWORDS_WEIGHTED = {
         ("australia trade", 5), ("australia retail", 5),
         ("australia jobs", 5), ("australian jobs", 5),
         ("australian economy", 5), ("australia economy", 5),
-        ("aud/", 5), ("/aud", 5), ("aud ", 3), ("aussie ", 3),
+        ("aud/", 5), ("/aud", 5), (" aud", 3), ("aussie ", 3),  # v5.16: "aud " → " aud" (prevents "fraud " match)
         ("australia", 1),
     ],
     "CAD": [
@@ -394,7 +423,10 @@ CURRENCY_KEYWORDS_WEIGHTED = {
         ("swiss ", 1),
     ],
     "NZD": [
-        ("rbnz", 10), ("reserve bank of new zealand", 10), ("orr", 10),
+        ("rbnz", 10), ("reserve bank of new zealand", 10),
+        # v5.16: "orr" (bare substring) matched "worries", "corridor", "tomorrow" → NZD false hits.
+        # Replaced with word-boundary-safe patterns — full name or verb-anchored phrases.
+        ("governor orr", 10), (" orr ", 8), ("orr said", 8), ("orr noted", 8),
         ("banco de la reserva de nueva zelanda", 10),
         ("new zealand dollar", 8), ("dólar neozelandés", 8), ("kiwi dollar", 8),
         ("new zealand gdp", 5), ("nz gdp", 5), ("nz cpi", 5),
@@ -442,6 +474,20 @@ FALSE_POSITIVE_GUARDS = [
     {
         "pattern": re.compile(r"\b(halifax|house prices?|housing market uk|uk property|uk housing|dwelling consents)\b", re.IGNORECASE),
         "penalize": {"NZD": 5, "AUD": 3, "CHF": 3, "CAD": 2},
+    },
+    # v5.16: eurozone country data releases — France/Germany/Spain/Italy economic data
+    # (GDP, CPI, PMI, inflation) are EUR-primary. Secondary safety net after the "orr"
+    # substring fix; ensures these articles can never be claimed by NZD/AUD/JPY/CAD
+    # even if future keyword changes introduce scoring regressions.
+    {
+        "pattern": re.compile(
+            r"\b(france\s+q[1-4]|french\s+(gdp|cpi|pmi|inflation|output|growth)|"
+            r"germany\s+q[1-4]|german\s+(gdp|cpi|pmi|inflation|output|growth)|"
+            r"spain\s+(gdp|cpi|pmi|inflation)|italy\s+(gdp|cpi|pmi|inflation)|"
+            r"eurostat|ifo\s+business|zew\s+(sentiment|survey))\b",
+            re.IGNORECASE
+        ),
+        "penalize": {"NZD": 10, "AUD": 8, "JPY": 6, "CAD": 4},
     },
 ]
 
@@ -1207,7 +1253,7 @@ def main():
     filtered_no_currency = 0
     # v5.11: instaforex_count removed — InstaForex feeds eliminated
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.15 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.16 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
