@@ -57,3 +57,18 @@
 /*.ico
   Cache-Control: public, max-age=2592000
 
+# ── Páginas obsoletas — bloqueadas en robots.txt pero visibles en Search Console ──
+# X-Robots-Tag previene la indexación incluso si Google llega por links externos.
+# robots.txt Disallow bloquea el rastreo; X-Robots-Tag noindex bloquea la indexación.
+/guia-cot.html
+  X-Robots-Tag: noindex, nofollow
+
+/en.html
+  X-Robots-Tag: noindex, nofollow
+
+/tecnico-vs-fundamental.html
+  X-Robots-Tag: noindex, nofollow
+
+/news.html
+  X-Robots-Tag: noindex, nofollow
+
