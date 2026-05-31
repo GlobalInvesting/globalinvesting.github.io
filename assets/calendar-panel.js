@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  const 8 major currencies      = new Set(['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']);
+  const G8_CURRENCIES      = new Set(['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']);
   const IMPACTS = new Set(['medium','high']);
 
   const IMPACT_DOT = {
@@ -183,7 +183,7 @@
     if (!container) return;
 
     const filtered = events.filter(ev =>
-      8 major currencies.has(ev.currency) && IMPACTS.has(ev.impact)
+      G8_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact)
     );
 
     // Build holiday lookup: dateISO → [{title, currency}]

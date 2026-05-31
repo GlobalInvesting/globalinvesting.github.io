@@ -6730,7 +6730,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 //   Tooltip:       long rate / short rate / real carry / HV30 / click for real rate analysis
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCarryRanking() {
-  const 8 major currencies = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+  const G8_CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
 
   // TradingView symbol for a given long/short ccy pair
   function carryTV(long, short) {
@@ -6763,7 +6763,7 @@ async function fetchCarryRanking() {
   try {
     // ── 1. CB policy rates (use STATE cache from fetchCBRates if available) ──
     const cbRates = {};
-    await Promise.all(8 major currencies.map(async ccy => {
+    await Promise.all(G8_CURRENCIES.map(async ccy => {
       const cached = STATE.cbRates?.[ccy.toLowerCase()];
       if (cached?.rate != null) { cbRates[ccy] = cached.rate; return; }
       try {
@@ -6796,7 +6796,7 @@ async function fetchCarryRanking() {
     }
     const rates       = {};
     const rateSource  = {}; // e.g. { USD: 'SOFR', EUR: '€STR', AUD: 'policy' }
-    for (const ccy of 8 major currencies) {
+    for (const ccy of G8_CURRENCIES) {
       const ois = oisCache[ccy] ?? oisData?.rates?.[ccy] ?? null;
       const src = oisSrcs[ccy]  ?? oisData?.sources?.[ccy] ?? null;
       if (ois != null) {
@@ -6821,7 +6821,7 @@ async function fetchCarryRanking() {
     // Real rate = nominal CB rate − inflationExpectations
     // If modal was opened earlier, reuse _rcmData to avoid duplicate fetches.
     const inflExp = {};
-    await Promise.all(8 major currencies.map(async ccy => {
+    await Promise.all(G8_CURRENCIES.map(async ccy => {
       if (typeof _rcmData !== 'undefined' && _rcmData?.inflExp?.[ccy]?.val != null) {
         inflExp[ccy] = _rcmData.inflExp[ccy].val;
         return;
@@ -6839,9 +6839,9 @@ async function fetchCarryRanking() {
     // Rates now use OIS benchmarks (SOFR/€STR/SONIA/TONA/CORRA/SARON/AONIA/OCR)
     // with per-currency policy-rate fallback — matching Bloomberg FXFR convention.
     const allPairs = [];
-    for (let i = 0; i < 8 major currencies.length; i++) {
-      for (let j = i + 1; j < 8 major currencies.length; j++) {
-        const a = 8 major currencies[i], b = 8 major currencies[j];
+    for (let i = 0; i < G8_CURRENCIES.length; i++) {
+      for (let j = i + 1; j < G8_CURRENCIES.length; j++) {
+        const a = G8_CURRENCIES[i], b = G8_CURRENCIES[j];
         const rA = rates[a] ?? null, rB = rates[b] ?? null;
         if (rA == null || rB == null) continue;
 
@@ -9117,16 +9117,16 @@ function exportPanel(type, format = 'csv') {
 
   else if (type === 'carry') {
     headers = ['Long', 'Short', 'Carry_Diff_Pct', 'Long_Rate_Pct', 'Short_Rate_Pct'];
-    const 8 major currencies = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+    const G8_CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
     const rates = {};
-    8 major currencies.forEach(ccy => {
+    G8_CURRENCIES.forEach(ccy => {
       const r = STATE.cbRates?.[ccy.toLowerCase()]?.rate;
       if (r != null) rates[ccy] = r;
     });
     const pairs = [];
-    for (let i = 0; i < 8 major currencies.length; i++) {
-      for (let j = i + 1; j < 8 major currencies.length; j++) {
-        const a = 8 major currencies[i], b = 8 major currencies[j];
+    for (let i = 0; i < G8_CURRENCIES.length; i++) {
+      for (let j = i + 1; j < G8_CURRENCIES.length; j++) {
+        const a = G8_CURRENCIES[i], b = G8_CURRENCIES[j];
         if (rates[a] == null || rates[b] == null) continue;
         const diff = rates[a] - rates[b];
         pairs.push(diff >= 0
@@ -10593,7 +10593,7 @@ async function renderDerivativesSection() {
           const totalSpot = byProd['FxSpot']?.notional_usd_bn ?? 0;
           const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
           const totRow = `<tr style="border-top:1px solid var(--border2);font-weight:600;">
-            <td style="font-size:10px;color:var(--text2);">TOTAL (8 major currencies)</td>
+            <td style="font-size:10px;color:var(--text2);">TOTAL (G8_CURRENCIES)</td>
             <td style="${mono}color:var(--text);">${totalNotional.toFixed(1)}</td>
             <td style="${mono}color:var(--text2);">${totals.trade_count.toLocaleString()}</td>
             <td style="${mono}color:var(--text2);">${totalSwap > 0 ? totalSwap.toFixed(1) : '—'}</td>
@@ -10972,10 +10972,10 @@ async function renderEconSurprises() {
   // ── Normalise to [−100, +100] index (Citi CESI convention) ───────────────
   // index = (beats − misses) / total × 100
   // Bar fill: 50% of bar width per side (each side = 50% of container)
-  const 8 major currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+  const G8_CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
   const rows = tbody.querySelectorAll('tr');
 
-  8 major currencies.forEach((ccy, idx) => {
+  G8_CURRENCIES.forEach((ccy, idx) => {
     const row = rows[idx];
     if (!row) return;
     const tds = row.querySelectorAll('td');

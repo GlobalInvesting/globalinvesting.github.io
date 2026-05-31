@@ -548,7 +548,7 @@ function _rcmRenderMatrix() {
   const d = _rcmData;
   if (!d) return '<div class="rcm-loading">Loading...</div>';
 
-  const 8 major currencies = _RCM_G8;
+  const G8_CURRENCIES = _RCM_G8;
 
   function cellClass(diff) {
     if (diff == null) return 'rcm-cell-flat';
@@ -568,12 +568,12 @@ function _rcmRenderMatrix() {
   // Column headers
   const header = `<tr>
     <td class="row-head" style="font-size:8.5px;font-family:var(--font-ui,'Inter',sans-serif);padding:0 8px 0 8px;">L↓/S→</td>
-    ${8 major currencies.map(c => `<th scope="col">${c}</th>`).join('')}
+    ${G8_CURRENCIES.map(c => `<th scope="col">${c}</th>`).join('')}
   </tr>`;
 
-  const rows = 8 major currencies.map(rowCcy => {
+  const rows = G8_CURRENCIES.map(rowCcy => {
     const rrRow = d.realRates[rowCcy];
-    const cells = 8 major currencies.map(colCcy => {
+    const cells = G8_CURRENCIES.map(colCcy => {
       if (rowCcy === colCcy) {
         // Diagonal: absolute real rate — neutral grey, no color coding (see legend)
         const rr = d.realRates[rowCcy];
@@ -733,7 +733,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
     </div>
   </div>
   <div class="rcm-rate-bars">
-    <div class="rcm-rb-title">Real rate positioning — 8 major currencies (long ${longCcy} highlighted)</div>
+    <div class="rcm-rb-title">Real rate positioning — G8_CURRENCIES (long ${longCcy} highlighted)</div>
     ${barRows}
   </div>
   <div class="rcm-vol-row">
@@ -896,7 +896,7 @@ function _rcmBuildDOM() {
     <div id="rcm-hd">
       <div id="rcm-hd-left">
         <div id="rcm-title">Real Rate Carry Analysis</div>
-        <div id="rcm-sub">Nominal OIS rate &minus; Inflation Expectation &middot; Real carry &middot; 8 major currencies</div>
+        <div id="rcm-sub">Nominal OIS rate &minus; Inflation Expectation &middot; Real carry &middot; G8_CURRENCIES</div>
       </div>
       <button id="rcm-close" aria-label="Close real rate carry modal">&times;</button>
     </div>
@@ -919,7 +919,7 @@ function _rcmBuildDOM() {
       <div class="rcm-mm" id="rcm-mm-positive">
         <div class="rcm-mm-lbl">Pairs w/ + real</div>
         <div class="rcm-mm-val" style="color:var(--text2);">—</div>
-        <div class="rcm-mm-sub">8 major currencies</div>
+        <div class="rcm-mm-sub">G8_CURRENCIES</div>
       </div>
       <div class="rcm-mm" id="rcm-mm-src">
         <div class="rcm-mm-lbl">Infl. Exp.</div>
