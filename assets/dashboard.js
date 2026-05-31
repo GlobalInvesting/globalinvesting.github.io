@@ -11260,6 +11260,15 @@ function renderNewsSection(items, meta) {
     row.appendChild(chevron);
     wrap.appendChild(row);
 
+    // ── Snippet preview — always visible, single truncated line (Bloomberg teaser pattern) ──
+    // Shown below the headline row without requiring a click. Hidden when drawer opens.
+    if (hasSnip) {
+      const previewEl = document.createElement('div');
+      previewEl.className = 'ns-preview';
+      previewEl.textContent = snippet.length > 160 ? snippet.slice(0, 160) + '…' : snippet;
+      wrap.appendChild(previewEl);
+    }
+
     // ── Accordion drawer (hidden, expands below the row on click) ───────────
     if (hasSnip || safeLink || source) {
       const drawer = document.createElement('div');
