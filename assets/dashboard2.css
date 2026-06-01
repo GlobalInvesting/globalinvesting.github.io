@@ -1816,8 +1816,11 @@ a:focus-visible,
   border-top: 2px solid var(--accent);
   border-bottom: 1px solid var(--border);
   flex-direction: column;
-  /* In split mode this is constrained by #split-upper height;
-     in non-split mode allow auto height so content isn't clipped */
+  /* flex-shrink:0 prevents #split-upper's flex algorithm from collapsing the panel
+     to ~0px when its intrinsic height is not yet established (e.g. on first open).
+     min-height gives the flex container a concrete floor to work with. */
+  flex-shrink: 0;
+  min-height: 220px;
   max-height: 420px;
   overflow: hidden;
   animation: pdp-slide-in 0.18s ease;
@@ -1931,6 +1934,7 @@ a:focus-visible,
 /* ── Body / panes ────────────────────────────────────────────── */
 .pdp-body {
   flex: 1 1 auto;
+  min-height: 0; /* required in flex context for overflow-y:auto to work */
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
