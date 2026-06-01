@@ -1,431 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
+<!-- Google tag -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CJLGQET9KJ"></script>
 <script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Investing FX Terminal v2 — Bloomberg Style [TEST]</title>
+<title>Global Investing — FX Terminal [TEST]</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<!-- Fonts -->
+<!-- Fonts: blocking load = zero font CLS (per GUIDELINES §Core Web Vitals) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
 
-<!-- Critical inline CSS for zero CLS -->
+<!-- Critical inline CSS: stable above-fold dimensions = zero layout shift -->
 <style>
-html,body{height:100%;overflow:hidden;margin:0;padding:0;background:#000;color:#e2e8f0;font-family:'JetBrains Mono',Consolas,monospace;font-size:10px;}
-#topbar{display:flex;align-items:center;height:28px;background:#02040a;border-bottom:1px solid #1a1e26;flex-shrink:0;padding:0 6px;}
-#quotebar{display:flex;align-items:center;height:22px;background:#02040a;border-bottom:1px solid #1a1e26;flex-shrink:0;overflow:hidden;}
-#layout{display:grid;grid-template-columns:210px 1fr 255px;height:calc(100vh - 50px);overflow:hidden;gap:1px;background:#1a1e26;}
-#sidebar{background:#050507;overflow:hidden;display:flex;flex-direction:column;}
-#main{background:#000;overflow:hidden;display:flex;flex-direction:column;}
-#rightpanel{background:#050507;overflow:hidden;display:flex;flex-direction:column;}
-#tv-chart-wrap{flex:1;min-height:200px;}
+html,body{height:100%;overflow:hidden;margin:0;padding:0;background:#000;color:#d1d4dc;font-family:'JetBrains Mono',Consolas,monospace;font-size:10px;}
+#cmd-bar{height:26px;background:#050709;}
+#ticker-strip{height:19px;background:#030406;}
+#terminal{display:grid;grid-template-columns:21fr 26fr 26fr 27fr;grid-template-rows:58fr 42fr;gap:1px;background:#141820;}
+#page-wrap{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.pnl{background:#000;}
+.ph{height:17px;background:#04060a;}
 </style>
 
 <link rel="stylesheet" href="assets/dashboard2.css">
 </head>
-<body>
 
-<!-- Skip link -->
+<body>
 <a href="#main" class="skip-link">Skip to main content</a>
 
-<!-- ══════════════════════════════════════════
-     TOPBAR
-     ══════════════════════════════════════════ -->
-<header id="topbar" role="banner">
-  <div class="tb-brand">GI&gt;</div>
-  <div class="tb-cmd-wrap" title="Bloomberg-style command line">
-    <span class="tb-prompt">&gt;</span>
-    <input id="tb-cmd" type="text" value="FXIP EURUSD" aria-label="Command input" autocomplete="off">
+<div id="page-wrap">
+
+  <!-- ── COMMAND BAR ──────────────────────────────────────────── -->
+  <div id="cmd-bar" role="banner" aria-label="Terminal command bar">
+    <span id="bbg-prompt" aria-hidden="true">GI&gt;</span>
+    <input id="bbg-input" type="text" value="FXIP <GO>" aria-label="Bloomberg command input" autocomplete="off" spellcheck="false">
+    <nav id="cmd-tabs" class="cmd-tabs" aria-label="Terminal function tabs">
+      <button class="ctab active" onclick="ctabClick(this,'FXIP')" aria-pressed="true">FXIP</button>
+      <button class="ctab" onclick="ctabClick(this,'CBRT')" aria-pressed="false">CBRT</button>
+      <button class="ctab" onclick="ctabClick(this,'YCUR')" aria-pressed="false">YCUR</button>
+      <button class="ctab" onclick="ctabClick(this,'COTS')" aria-pressed="false">COTS</button>
+      <button class="ctab" onclick="ctabClick(this,'VOLS')" aria-pressed="false">VOLS</button>
+      <button class="ctab" onclick="ctabClick(this,'RISK')" aria-pressed="false">RISK</button>
+    </nav>
+    <div id="cmd-right" aria-label="Status and time">
+      <span id="cmd-status">LIVE</span>
+      <span id="cmd-upd">Data: —</span>
+      <span id="cmd-clock" aria-live="polite">--:--:-- UTC</span>
+    </div>
   </div>
-  <nav class="tb-tabs" aria-label="Terminal sections">
-    <div class="tb-tab active" onclick="this.parentNode.querySelectorAll('.tb-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">FXIP</div>
-    <div class="tb-tab" onclick="this.parentNode.querySelectorAll('.tb-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">FXRV</div>
-    <div class="tb-tab" onclick="this.parentNode.querySelectorAll('.tb-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">CBRT</div>
-    <div class="tb-tab" onclick="this.parentNode.querySelectorAll('.tb-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">YCUR</div>
-    <div class="tb-tab" onclick="this.parentNode.querySelectorAll('.tb-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">COT</div>
-  </nav>
-  <div class="tb-right">
-    <span class="tb-status">LIVE</span>
-    <span id="tb-clock" aria-live="polite" aria-label="UTC clock">00:00:00 UTC</span>
-    <span class="dim">yfinance · ~15min delay</span>
+
+  <!-- ── TICKER STRIP ─────────────────────────────────────────── -->
+  <div id="ticker-strip" role="marquee" aria-label="Live price ticker">
+    <div class="tk-item" id="tk-eurusd"><span class="tk-sym">EUR/USD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+    <div class="tk-item" id="tk-gbpusd"><span class="tk-sym">GBP/USD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+    <div class="tk-item" id="tk-usdjpy"><span class="tk-sym">USD/JPY</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+    <div class="tk-item" id="tk-audusd"><span class="tk-sym">AUD/USD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+    <div class="tk-item" id="tk-usdcad"><span class="tk-sym">USD/CAD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+    <div class="tk-item" id="tk-dxy"><span class="tk-sym">DXY</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+    <div class="tk-item" id="tk-gold"><span class="tk-sym">XAU/USD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+    <div class="tk-item" id="tk-spx"><span class="tk-sym">SPX</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+    <div class="tk-item" id="tk-vix"><span class="tk-sym">VIX</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+    <div class="tk-item" id="tk-us10y"><span class="tk-sym">US10Y</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
   </div>
-</header>
 
-<!-- ══════════════════════════════════════════
-     QUOTE BAR
-     ══════════════════════════════════════════ -->
-<div id="quotebar" role="region" aria-label="Market quote strip">
-  <!-- populated by dashboard2.js -->
-  <div class="qb-item"><span class="qb-sym">EUR/USD</span><span class="qb-price dim">—</span></div>
-  <div class="qb-item"><span class="qb-sym">GBP/USD</span><span class="qb-price dim">—</span></div>
-  <div class="qb-item"><span class="qb-sym">USD/JPY</span><span class="qb-price dim">—</span></div>
-  <div class="qb-item"><span class="qb-sym">AUD/USD</span><span class="qb-price dim">—</span></div>
-  <div class="qb-item"><span class="qb-sym">DXY</span><span class="qb-price dim">—</span></div>
-  <div class="qb-item"><span class="qb-sym">GOLD</span><span class="qb-price dim">—</span></div>
-  <div class="qb-item"><span class="qb-sym">VIX</span><span class="qb-price dim">—</span></div>
-  <div class="qb-item"><span class="qb-sym">S&amp;P 500</span><span class="qb-price dim">—</span></div>
-  <div class="qb-item"><span class="qb-sym">US10Y</span><span class="qb-price dim">—</span></div>
-</div>
+  <!-- ── MAIN 4×2 TERMINAL GRID ───────────────────────────────── -->
+  <main id="main" role="main" aria-label="FX Terminal">
+  <div id="terminal">
 
-<!-- ══════════════════════════════════════════
-     MAIN LAYOUT
-     ══════════════════════════════════════════ -->
-<div id="layout">
-
-  <!-- ── LEFT: FX Watchlist ── -->
-  <aside id="sidebar" aria-label="FX pairs watchlist">
-    <!-- Panel header -->
-    <div class="panel-head">
-      <span class="panel-title">FX Monitor</span>
-      <span class="panel-code">ALL FX</span>
-    </div>
-    <!-- G10 / Cross tabs -->
-    <div class="fx-tabs" role="tablist" aria-label="FX pair groups">
-      <div class="fx-tab active" id="fxtab-g10" role="tab" aria-selected="true" onclick="setFXTab('g10')">G10</div>
-      <div class="fx-tab" id="fxtab-cross" role="tab" aria-selected="false" onclick="setFXTab('cross')">Cross</div>
-    </div>
-    <!-- Watchlist table -->
-    <div class="panel-body" style="flex:1;overflow:auto;">
-      <table class="dt" aria-label="FX pair watchlist">
-        <thead>
-          <tr>
-            <th scope="col">Pair</th>
-            <th scope="col" class="r">Price</th>
-            <th scope="col" class="r hide-sm">Bid</th>
-            <th scope="col" class="r hide-sm">Ask</th>
-            <th scope="col" class="r">1D%</th>
-            <th scope="col" class="r hide-sm">HV30</th>
-          </tr>
-        </thead>
-        <tbody id="fx-tbody">
-          <!-- skeleton rows -->
-          <tr><td colspan="6" class="dim" style="text-align:center;padding:8px;">Loading...</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <!-- Source footer -->
-    <div style="padding:3px 6px;border-top:1px solid var(--border);background:var(--bg3);flex-shrink:0;">
-      <span class="dim">yfinance · Finnhub (live via WebSocket)</span>
-    </div>
-  </aside>
-
-  <!-- ── CENTER: Chart + Lower Panel ── -->
-  <main id="main" role="main" aria-label="FX Chart and Market Data">
-    <!-- Chart toolbar -->
-    <div id="chart-area">
-      <div id="chart-toolbar">
-        <span id="chart-pair-label" class="amb bold">EUR/USD</span>
-        <span id="chart-price-label" class="bold">—</span>
-        <span id="chart-chg-label" class="neu">—</span>
-        <div style="margin-left:auto;display:flex;gap:2px;" role="group" aria-label="Timeframe">
-          <button class="chart-tf-btn" onclick="setTF('5')">5M</button>
-          <button class="chart-tf-btn" onclick="setTF('15')">15M</button>
-          <button class="chart-tf-btn active" onclick="setTF('60')">1H</button>
-          <button class="chart-tf-btn" onclick="setTF('240')">4H</button>
-          <button class="chart-tf-btn" onclick="setTF('D')">1D</button>
-          <button class="chart-tf-btn" onclick="setTF('W')">1W</button>
-        </div>
+    <!-- ╔═══════════════╗ -->
+    <!-- ║  P1: SPOT FX  ║  Row 1, Col 1 -->
+    <!-- ╚═══════════════╝ -->
+    <section class="pnl" aria-label="FX Spot Rates">
+      <div class="ph">
+        <span class="ph-title">FX Monitor</span>
+        <span class="ph-code">FXIP</span>
       </div>
-      <div id="tv-chart-wrap" aria-label="TradingView price chart">
-        <!-- TradingView widget loaded by dashboard2.js -->
-        <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:11px;">
-          Loading chart...
-        </div>
+      <div class="sub-hd">
+        <b>PAIR</b><span style="margin-left:auto">BID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ASK&nbsp;&nbsp;&nbsp;SPR&nbsp;&nbsp;CHG&nbsp;&nbsp;HV30</span>
       </div>
-    </div>
-
-    <!-- Lower tabs: Cross-Asset / CB Rates / COT / Yield Curve -->
-    <div id="lower-panel">
-      <div id="lower-tabs" role="tablist" aria-label="Market data sections">
-        <div class="lower-tab active" id="ltab-crossasset" role="tab" aria-selected="true" onclick="setLowerTab('crossasset')">Cross-Asset</div>
-        <div class="lower-tab" id="ltab-cbrates" role="tab" aria-selected="false" onclick="setLowerTab('cbrates')">CB Rates</div>
-        <div class="lower-tab" id="ltab-cot" role="tab" aria-selected="false" onclick="setLowerTab('cot')">COT / Positioning</div>
-        <div class="lower-tab" id="ltab-yieldcurve" role="tab" aria-selected="false" onclick="setLowerTab('yieldcurve')">Yield Curve</div>
-        <div class="lower-tab" id="ltab-rr" role="tab" aria-selected="false" onclick="setLowerTab('rr')">Options 25d RR</div>
-        <div style="margin-left:auto;display:flex;align-items:center;padding:0 6px;">
-          <span class="dim" id="lower-src">yfinance · COT/CFTC · Saxo Bank</span>
-        </div>
+      <div class="pb">
+        <table class="t" aria-label="FX spot rates">
+          <thead>
+            <tr>
+              <th scope="col">Pair</th>
+              <th scope="col" class="r">Bid</th>
+              <th scope="col" class="r">Ask</th>
+              <th scope="col" class="r">Spr</th>
+              <th scope="col" class="r">Chg%</th>
+              <th scope="col" class="r">HV30</th>
+            </tr>
+          </thead>
+          <tbody id="spot-tbody"></tbody>
+        </table>
       </div>
+    </section>
 
-      <!-- Cross-Asset Grid -->
-      <div class="lower-content active" id="lcontent-crossasset" role="tabpanel">
-        <div class="ca-grid" id="ca-grid" aria-label="Cross-asset prices">
-          <!-- populated by JS -->
-        </div>
+    <!-- ╔════════════════╗ -->
+    <!-- ║  P2: VOL SURF  ║  Row 1, Col 2 -->
+    <!-- ╚════════════════╝ -->
+    <section class="pnl" aria-label="FX Volatility Surface">
+      <div class="ph">
+        <span class="ph-title" id="vol-ttl">Vol Structure — EUR/USD</span>
+        <span class="ph-code">OVDV</span>
       </div>
+      <div id="vol-pair-sel" role="group" aria-label="Select currency pair">
+        <button class="vps-btn active" data-p="EURUSD" onclick="pairClick('EURUSD')">EUR/USD</button>
+        <button class="vps-btn" data-p="USDJPY" onclick="pairClick('USDJPY')">USD/JPY</button>
+        <button class="vps-btn" data-p="GBPUSD" onclick="pairClick('GBPUSD')">GBP/USD</button>
+        <button class="vps-btn" data-p="AUDUSD" onclick="pairClick('AUDUSD')">AUD/USD</button>
+        <button class="vps-btn" data-p="USDCAD" onclick="pairClick('USDCAD')">USD/CAD</button>
+        <button class="vps-btn" data-p="USDCHF" onclick="pairClick('USDCHF')">USD/CHF</button>
+        <button class="vps-btn" data-p="EURJPY" onclick="pairClick('EURJPY')">EUR/JPY</button>
+      </div>
+      <div id="vol-src" style="font-size:7.5px;color:#2e3845;padding:2px 5px;background:#020405;border-bottom:1px solid #0a0f14;flex-shrink:0;">ATM: HV30 est. · 25d RR: Saxo Bank indicative</div>
+      <div class="pb">
+        <table class="t" aria-label="Volatility surface by tenor">
+          <thead>
+            <tr>
+              <th scope="col">Tenor</th>
+              <th scope="col" class="r">ATM IV</th>
+              <th scope="col" class="r">25d RR</th>
+              <th scope="col" class="r">10d RR</th>
+            </tr>
+          </thead>
+          <tbody id="vol-tbody">
+            <tr><td class="dim" colspan="4" style="text-align:center;padding:12px 0;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-      <!-- CB Rates table -->
-      <div class="lower-content" id="lcontent-cbrates" role="tabpanel">
-        <table class="dt" aria-label="Central bank rates and expectations">
+    <!-- ╔══════════════╗ -->
+    <!-- ║  P3: CB RATES ║  Row 1, Col 3 -->
+    <!-- ╚══════════════╝ -->
+    <section class="pnl" aria-label="Central Bank Rates and Policy">
+      <div class="ph">
+        <span class="ph-title">CB Rates &amp; Policy</span>
+        <span class="ph-code">CBRT</span>
+      </div>
+      <div class="sub-hd">
+        <b>OIS bias: market-implied forward direction (meetings-data/meetings.json)</b>
+      </div>
+      <div class="pb">
+        <table class="t" aria-label="Central bank rates and policy bias">
           <thead>
             <tr>
               <th scope="col">CB</th>
               <th scope="col" class="r">Rate</th>
+              <th scope="col" class="r">Trnd</th>
+              <th scope="col" class="r">Next Mtg</th>
               <th scope="col" class="r">OIS Bias</th>
-              <th scope="col" class="r hide-sm">Next Mtg</th>
-              <th scope="col" class="r hide-sm">Fwd Rate</th>
+              <th scope="col" class="r">Cut%</th>
+              <th scope="col" class="r">Hike%</th>
             </tr>
           </thead>
-          <tbody id="cbrates-lower-tbody">
-            <tr><td colspan="5" class="dim" style="text-align:center;padding:8px;">Loading...</td></tr>
+          <tbody id="cb-tbody">
+            <tr><td class="dim" colspan="7" style="text-align:center;padding:12px 0;">Loading…</td></tr>
           </tbody>
         </table>
-        <div style="padding:3px 6px;border-top:1px solid var(--border);background:var(--bg3);">
-          <span class="dim">OIS/Overnight rate implied bias · meetings-data/meetings.json · rates/</span>
-        </div>
       </div>
+    </section>
 
-      <!-- COT -->
-      <div class="lower-content" id="lcontent-cot" role="tabpanel">
-        <table class="dt" aria-label="CFTC COT institutional positioning">
+    <!-- ╔═══════════════════╗ -->
+    <!-- ║  P4: CROSS-ASSET  ║  Row 1, Col 4 -->
+    <!-- ╚═══════════════════╝ -->
+    <section class="pnl" aria-label="Cross-Asset Risk Monitor">
+      <div class="ph">
+        <span class="ph-title">Cross-Asset Risk</span>
+        <span id="risk-badge" class="ph-badge rb-on" role="status" aria-live="assertive">—</span>
+        <span class="ph-code">RISK</span>
+      </div>
+      <div id="stress-row">
+        <span style="color:#3a4255">Score:</span>
+        <span id="stress-sc" class="amb bld">—</span>
+        <span id="stress-factors">Calculating…</span>
+      </div>
+      <div class="pb">
+        <table class="t" aria-label="Cross-asset prices and changes">
           <thead>
             <tr>
-              <th scope="col">CCY</th>
-              <th scope="col" class="r">Net Position</th>
-              <th scope="col">Bias</th>
-              <th scope="col" class="r hide-sm">WoW</th>
-              <th scope="col" class="r hide-sm">25d RR</th>
-              <th scope="col" class="r hide-sm">Week</th>
+              <th scope="col">Asset</th>
+              <th scope="col" class="r">Last</th>
+              <th scope="col" class="r">1D%</th>
+              <th scope="col" class="r">1W%</th>
+            </tr>
+          </thead>
+          <tbody id="risk-tbody">
+            <tr><td class="dim" colspan="4" style="text-align:center;padding:12px 0;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ╔═══════════════╗ -->
+    <!-- ║  P5: COT/POS  ║  Row 2, Col 1 -->
+    <!-- ╚═══════════════╝ -->
+    <section class="pnl" aria-label="COT Positioning">
+      <div class="ph">
+        <span class="ph-title">COT Positioning</span>
+        <span class="ph-code">COTS</span>
+      </div>
+      <div class="sub-hd">
+        <b>CFTC Disaggregated TFF · Leveraged Funds · Options+Futures</b>
+      </div>
+      <div class="pb">
+        <table class="t" aria-label="CFTC COT leveraged funds net positions">
+          <thead>
+            <tr>
+              <th scope="col">Ccy</th>
+              <th scope="col" class="r">Net</th>
+              <th scope="col">Bar</th>
+              <th scope="col" class="r">WoW</th>
+              <th scope="col" class="r">%OI</th>
+              <th scope="col" class="r">Week</th>
             </tr>
           </thead>
           <tbody id="cot-tbody">
-            <tr><td colspan="6" class="dim" style="text-align:center;padding:8px;">Loading...</td></tr>
+            <tr><td class="dim" colspan="6" style="text-align:center;padding:12px 0;">Loading…</td></tr>
           </tbody>
         </table>
-        <div style="padding:3px 6px;border-top:1px solid var(--border);background:var(--bg3);">
-          <span class="dim">CFTC Disaggregated TFF · Non-Commercial Net · cot-data/ · 25d RR: Saxo Bank indicative mid</span>
+      </div>
+    </section>
+
+    <!-- ╔═══════════════╗ -->
+    <!-- ║  P6: YIELD CV ║  Row 2, Col 2 -->
+    <!-- ╚═══════════════╝ -->
+    <section class="pnl" aria-label="US Yield Curve">
+      <div class="ph">
+        <span class="ph-title">US Yield Curve</span>
+        <span class="ph-code">YCUR</span>
+      </div>
+      <div class="sub-hd"><b>Treasury yields · yfinance · extended-data/USD.json</b></div>
+      <div id="yc-wrap">
+        <canvas id="yc-canvas" role="img" aria-label="US Treasury yield curve chart" style="min-height:80px;"></canvas>
+        <div id="yc-table-wrap">
+          <table class="t" id="yc-tbl" aria-label="Yield curve values by tenor">
+            <thead><tr><th scope="col">Tenor</th><th scope="col" class="r">Yield</th><th scope="col" class="r">Chg</th></tr></thead>
+            <tbody id="yc-tb"></tbody>
+          </table>
         </div>
       </div>
+    </section>
 
-      <!-- Yield Curve -->
-      <div class="lower-content" id="lcontent-yieldcurve" role="tabpanel" style="padding:4px;display:none;">
-        <div id="yc-canvas-wrap" style="height:180px;">
-          <canvas id="yc-canvas" width="600" height="160" aria-label="US yield curve"></canvas>
-        </div>
-        <div style="padding:2px 6px;border-top:1px solid var(--border);background:var(--bg3);">
-          <span class="dim">US Treasury yield curve · yfinance · 3M / 2Y / 5Y / 10Y / 30Y</span>
-        </div>
+    <!-- ╔════════════════╗ -->
+    <!-- ║  P7: SIGNALS   ║  Row 2, Col 3 -->
+    <!-- ╚════════════════╝ -->
+    <section class="pnl" aria-label="Market Signals">
+      <div class="ph">
+        <span class="ph-title">Market Signals</span>
+        <span class="ph-code">MSIG</span>
       </div>
+      <div class="sub-hd"><b>ai-analysis/signals.json · Groq LLM · updated every 6h</b></div>
+      <div class="pb" id="sigs-wire" role="log" aria-live="polite" aria-label="Market signal alerts">
+        <div style="padding:12px 6px;color:#2a3040;font-size:9px;">Loading signals…</div>
+      </div>
+    </section>
 
-      <!-- 25d Risk Reversals -->
-      <div class="lower-content" id="lcontent-rr" role="tabpanel">
-        <table class="dt" aria-label="25-delta risk reversals">
+    <!-- ╔════════════════╗ -->
+    <!-- ║  P8: MACRO     ║  Row 2, Col 4 -->
+    <!-- ╚════════════════╝ -->
+    <section class="pnl" aria-label="Macro Snapshot">
+      <div class="ph">
+        <span class="ph-title">Macro Snapshot</span>
+        <span class="ph-code">ECOS</span>
+      </div>
+      <div class="sub-hd"><b>economic-data/*.json · extended-data/*.json · rates/*.json</b></div>
+      <div class="pb">
+        <table class="t" aria-label="Macroeconomic indicators by central bank">
           <thead>
             <tr>
-              <th scope="col">Pair</th>
-              <th scope="col" class="r">25d RR</th>
-              <th scope="col" class="r">Tenor</th>
+              <th scope="col">CB</th>
+              <th scope="col" class="r">Rate</th>
+              <th scope="col" class="r">CPI</th>
+              <th scope="col" class="r">GDP</th>
+              <th scope="col" class="r">10Y</th>
             </tr>
           </thead>
-          <tbody id="rr-main-tbody">
-            <tr><td colspan="3" class="dim" style="text-align:center;padding:8px;">Loading...</td></tr>
+          <tbody id="macro-tbody">
+            <tr><td class="dim" colspan="5" style="text-align:center;padding:12px 0;">Loading…</td></tr>
           </tbody>
         </table>
-        <div style="padding:3px 6px;border-top:1px solid var(--border);background:var(--bg3);">
-          <span class="dim">Saxo Bank · FX Options Analytics · 25d RR · 1M tenor · indicative mid · rr-data/rr.json</span>
-        </div>
       </div>
+    </section>
 
-    </div><!-- #lower-panel -->
+  </div><!-- #terminal -->
   </main>
 
-  <!-- ── RIGHT: Risk Monitor + CB Rates + RR ── -->
-  <aside id="rightpanel" aria-label="Risk monitor and market data panels">
+</div><!-- #page-wrap -->
 
-    <!-- Risk Monitor -->
-    <div class="rp-section">
-      <div class="rp-head">
-        <span class="rp-title">Risk Monitor</span>
-        <span id="risk-regime" class="regime-badge regime-MIXED" aria-live="assertive">MIXED</span>
-      </div>
-      <div id="risk-rows" style="padding:2px 0;">
-        <!-- populated by JS -->
-      </div>
-    </div>
-
-    <!-- CB Rate Expectations -->
-    <div class="rp-section">
-      <div class="rp-head">
-        <span class="rp-title">CB Rate Expectations</span>
-        <span class="rp-src">OIS implied</span>
-      </div>
-      <table class="dt" aria-label="Central bank rate expectations">
-        <thead>
-          <tr>
-            <th scope="col">CB</th>
-            <th scope="col" class="r">Rate</th>
-            <th scope="col" class="r">Bias</th>
-            <th scope="col" class="r hide-sm">Next</th>
-            <th scope="col" class="r hide-sm">Fwd</th>
-          </tr>
-        </thead>
-        <tbody id="cbrates-tbody">
-          <!-- 8 skeleton rows -->
-          <tr><td>Fed</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
-          <tr><td>ECB</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
-          <tr><td>BoE</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
-          <tr><td>BoJ</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
-          <tr><td>RBA</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
-          <tr><td>BoC</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
-          <tr><td>SNB</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
-          <tr><td>RBNZ</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 25d Risk Reversals -->
-    <div class="rp-section">
-      <div class="rp-head">
-        <span class="rp-title">25D Risk Reversals</span>
-        <span class="rp-src">Saxo · 1M</span>
-      </div>
-      <table class="dt" aria-label="25-delta risk reversals compact">
-        <thead>
-          <tr>
-            <th scope="col">Pair</th>
-            <th scope="col" class="r">RR</th>
-            <th scope="col" class="r">T</th>
-          </tr>
-        </thead>
-        <tbody id="rr-tbody">
-          <tr><td colspan="3" class="dim" style="text-align:center;padding:4px;">—</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Correlations summary -->
-    <div class="rp-section" style="flex:1;min-height:0;display:flex;flex-direction:column;">
-      <div class="rp-head">
-        <span class="rp-title">Session Snapshot</span>
-        <span class="rp-src" id="session-date">—</span>
-      </div>
-      <div style="flex:1;overflow:auto;padding:3px 6px;">
-        <table class="dt" aria-label="Session snapshot">
-          <thead>
-            <tr><th scope="col">Instrument</th><th scope="col" class="r">Price</th><th scope="col" class="r">1D%</th></tr>
-          </thead>
-          <tbody id="session-tbody">
-            <!-- filled by JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </aside>
-</div><!-- #layout -->
-
-<!-- ══════════════════════════════════════════
-     TEST BANNER
-     ══════════════════════════════════════════ -->
-<div id="test-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#f59e0b;color:#000;text-align:center;font-size:9px;padding:2px;font-family:monospace;z-index:9999;">
-  TEST BUILD — index2.html / dashboard2.js / dashboard2.css — Not for production
+<!-- TEST BANNER — marks this as a non-production build -->
+<div id="test-banner" role="note" aria-label="Test build notice">
+  TEST BUILD — index2.html · Bloomberg-style layout · noindex,nofollow · Production terminal: <a href="/" style="color:#000;text-decoration:underline;">globalinvesting.github.io</a>
 </div>
-
-<script>
-// Show test banner
-document.getElementById('test-banner').style.display = 'block';
-
-// Timeframe switcher
-function setTF(tf) {
-  window._tvInterval = tf;
-  document.querySelectorAll('.chart-tf-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  if (window.loadTVChart) loadTVChart(window._selectedPair || 'eurusd');
-}
-
-// setLowerTab fix for yield curve panel visibility
-const _origSetLowerTab = window.setLowerTab;
-document.addEventListener('DOMContentLoaded', () => {
-  // Patch lower-content visibility for yield curve
-  const orig = window.setLowerTab;
-  window.setLowerTab = function(tab) {
-    orig(tab);
-    // fix: yield curve panel uses display:none so tabpanel style must be overridden
-    const yc = document.getElementById('lcontent-yieldcurve');
-    if (yc) {
-      if (tab === 'yieldcurve') {
-        yc.style.display = 'block';
-      } else {
-        yc.style.display = '';
-      }
-    }
-  };
-});
-
-// Session snapshot: show index & commodity data
-function renderSessionSnapshot() {
-  const tbody = document.getElementById('session-tbody');
-  if (!tbody || !window._quotes) return;
-  const q = window._quotes;
-  const items = [
-    {key:'nasdaq', label:'NASDAQ'},
-    {key:'ftse',   label:'FTSE 100'},
-    {key:'dax',    label:'DAX'},
-    {key:'nikkei', label:'Nikkei'},
-    {key:'stoxx',  label:'Euro Stoxx'},
-    {key:'hsi',    label:'Hang Seng'},
-    {key:'gold',   label:'Gold XAU'},
-    {key:'silver', label:'Silver XAG'},
-    {key:'wti',    label:'WTI Oil'},
-    {key:'brent',  label:'Brent Oil'},
-    {key:'btc',    label:'Bitcoin'},
-    {key:'eth',    label:'Ethereum'},
-  ];
-  tbody.innerHTML = items.map(({key, label}) => {
-    const d = q[key];
-    if (!d) return `<tr><td class="dim">${label}</td><td class="r dim">—</td><td class="r dim">—</td></tr>`;
-    const pct = d.pct || 0;
-    const cls = pct > 0 ? 'up' : pct < 0 ? 'dn' : 'neu';
-    const priceStr = d.close > 1000 ? d.close.toLocaleString('en-US',{maximumFractionDigits:0})
-      : d.close > 10 ? d.close.toFixed(2)
-      : d.close.toFixed(4);
-    return `<tr>
-      <td class="dim">${label}</td>
-      <td class="r">${priceStr}</td>
-      <td class="r ${cls}">${(pct>=0?'+':'') + pct.toFixed(2)}%</td>
-    </tr>`;
-  }).join('');
-  const dateEl = document.getElementById('session-date');
-  if (dateEl) {
-    const d = new Date();
-    dateEl.textContent = d.toUTCString().slice(5, 16);
-  }
-}
-
-// Hook into dashboard2.js boot cycle
-const _origBoot = window.boot;
-document.addEventListener('DOMContentLoaded', () => {
-  // After data loads, also render session snapshot
-  const origRenderAll = window.renderAll;
-  if (origRenderAll) {
-    window.renderAll = function() {
-      origRenderAll();
-      renderSessionSnapshot();
-      // Also populate the RR main tbody in the lower tab
-      const rrMain = document.getElementById('rr-main-tbody');
-      if (rrMain && window._rr && window.renderRRTable) {
-        // reuse logic
-        const pairs = ['EURUSD','USDJPY','GBPUSD','AUDUSD','USDCAD','USDCHF','EURJPY'];
-        rrMain.innerHTML = pairs.map(p => {
-          const d = window._rr[p];
-          if (!d) return `<tr><td class="sym">${p.slice(0,3)}/${p.slice(3)}</td><td class="r dim" colspan="2">—</td></tr>`;
-          const rr = d.rr25d;
-          const cls = rr > 0 ? 'up' : rr < 0 ? 'dn' : 'neu';
-          return `<tr><td class="sym">${p.slice(0,3)}/${p.slice(3)}</td><td class="r ${cls} bold">${(rr>=0?'+':'')+rr.toFixed(2)}</td><td class="r dim">${d.tenor||'1M'}</td></tr>`;
-        }).join('');
-      }
-    };
-  }
-});
-</script>
 
 <script src="assets/dashboard2.js" defer></script>
 </body>
