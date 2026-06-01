@@ -2900,6 +2900,9 @@ let _lwCandleSeries = null;   // reference for live today-bar updates
 // Using a dedicated flag avoids the race where _lwChart===null during the async fetch/render
 // window even though the user's intent is clearly to show the LW chart.
 let _chartMode = 'lw'; // default: LW chart (FX pairs load first)
+// When the pair detail panel is opening we own the scroll position — suppress chart scrollIntoView
+// for 500ms so loadTVChart's async .then() calls don't scroll the panel out of view.
+let _pdpScrollLock = false;
 let _lwActiveOhlcId = null;   // ohlcId currently displayed
 let _lwActiveUpdateHeader = null; // ref to _updateLWHeader of the active chart (for RT header refresh)
 let _lwActivePrevCloseMap = null; // ref to _prevCloseMap of the active chart (for today-bar % calc)
@@ -5553,7 +5556,7 @@ function loadCOTChart(longSym) {
   container.appendChild(script);
   wrap.appendChild(container);
   const chartSection = document.getElementById('section-fxpairs') || wrap.closest('.panel') || wrap;
-  chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (!_pdpScrollLock) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ── Internal: TV widget fallback for symbols without OHLC data ──
@@ -5618,18 +5621,18 @@ function loadTVChart(sym) {
   if (ohlcId) {
     const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
     _renderLWChart(ohlcId, label)
-      .then(() => { if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
+      .then(() => { if (chartSection && !_pdpScrollLock) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
       .catch(err => {
         // Log the real exception — primary diagnostic for the TV-fallback regression.
         // Without this log the error was silently swallowed and the TV widget loaded
         // with no console trace of the root cause.
         console.error('[LWChart] _renderLWChart failed for', ohlcId, '—', err);
         _loadTVWidgetFallback(sym);
-        if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (chartSection && !_pdpScrollLock) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
   } else {
     _loadTVWidgetFallback(sym);
-    if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (chartSection && !_pdpScrollLock) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
@@ -6079,21 +6082,39 @@ function openPairDetailPanel(tvSym) {
     return;
   }
 
+  // Lock out loadTVChart's scrollIntoView for 600ms so it can't scroll the panel out of view.
+  _pdpScrollLock = true;
+  clearTimeout(openPairDetailPanel._unlockTimer);
+  openPairDetailPanel._unlockTimer = setTimeout(() => { _pdpScrollLock = false; }, 600);
+
   panel.dataset.sym = tvSym;
   panel.style.display = 'flex';
   // Reset animation
   panel.style.animation = 'none';
   requestAnimationFrame(() => {
     panel.style.animation = '';
-    // In non-split mode the page scrolls vertically.
-    // Use explicit window.scrollTo (more reliable than scrollIntoView cross-browser).
     const isSplit = document.getElementById('main')?.classList.contains('split-layout');
     if (!isSplit) {
+      // Non-split: window scrolls vertically. Use explicit scrollTo (reliable cross-browser).
       setTimeout(() => {
         const rect = panel.getBoundingClientRect();
         const scrollTarget = window.scrollY + rect.top - 70;
         window.scrollTo({ top: Math.max(0, scrollTarget), behavior: 'smooth' });
       }, 60);
+    } else {
+      // Split mode: #split-upper is the overflow container (not window).
+      // Scroll it so the pair-detail-panel is visible just below the chart.
+      // Use panel.offsetTop (stable, relative to offsetParent) rather than getBoundingClientRect
+      // (which changes if the container is already mid-scroll).
+      const splitUpper = document.getElementById('split-upper');
+      if (splitUpper) {
+        // panel.offsetTop is relative to its offsetParent; walk up to #split-upper if needed
+        let offset = panel.offsetTop;
+        let el = panel.offsetParent;
+        while (el && el !== splitUpper) { offset += el.offsetTop; el = el.offsetParent; }
+        // Scroll with 8px breathing room above the panel
+        splitUpper.scrollTo({ top: Math.max(0, offset - 8), behavior: 'smooth' });
+      }
     }
   });
 
