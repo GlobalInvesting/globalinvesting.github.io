@@ -6108,12 +6108,10 @@ function openPairDetailPanel(tvSym) {
       // (which changes if the container is already mid-scroll).
       const splitUpper = document.getElementById('split-upper');
       if (splitUpper) {
-        // panel.offsetTop is relative to its offsetParent; walk up to #split-upper if needed
-        let offset = panel.offsetTop;
-        let el = panel.offsetParent;
-        while (el && el !== splitUpper) { offset += el.offsetTop; el = el.offsetParent; }
-        // Scroll with 8px breathing room above the panel
-        splitUpper.scrollTo({ top: Math.max(0, offset - 8), behavior: 'smooth' });
+        // The panel lives immediately after the chart in #split-upper.
+        // Scrolling to 0 keeps the chart visible at the top with the
+        // panel appearing right below — no chart hidden off-screen.
+        splitUpper.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   });
