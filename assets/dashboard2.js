@@ -6143,7 +6143,7 @@ document.getElementById('sidebar')?.addEventListener('click', e => {
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
-  toggleSidebarDetail(row);
+  openPairDetailPanel(row.dataset.sym);
 });
 
 function toggleSidebarDetail(row) {
@@ -6182,12 +6182,12 @@ function toggleSidebarDetail(row) {
   buildInlineDetail(tvSym, inner);
 }
 
-// ── FX Pairs table: click = chart + expand detail inline ──────────────────
+// ── FX Pairs table: click = chart + pair detail panel ──────────────────
 document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
   const row = e.target.closest('tr[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
-  toggleInlineDetail(row);
+  openPairDetailPanel(row.dataset.sym);
 });
 
 // ── Cross-Asset cells: click to open chart (US 10Y excluded — no TV symbol) ──
