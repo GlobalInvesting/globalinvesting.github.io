@@ -6108,19 +6108,22 @@ function openPairDetailPanel(tvSym) {
       // (which changes if the container is already mid-scroll).
       const splitUpper = document.getElementById('split-upper');
       if (splitUpper) {
-        // If split-upper has overflow-y:visible (mobile/narrow breakpoint),
-        // scrollHeight === clientHeight and scrollTo does nothing.
-        // In that case fall back to scrolling the window.
         const isScrollable = splitUpper.scrollHeight > splitUpper.clientHeight;
         if (isScrollable) {
-          // Desktop split: #split-upper is the overflow container.
-          // Scroll to 0 so chart stays at top and panel appears right below.
-          splitUpper.scrollTo({ top: 0, behavior: 'smooth' });
+          // Scroll so the panel sits ~80px below split-upper's top edge.
+          // Use live getBoundingClientRect so we scroll the exact right delta.
+          const panelTop = panel.getBoundingClientRect().top;
+          const suTop    = splitUpper.getBoundingClientRect().top;
+          const desiredPanelTop = suTop + 80;
+          const delta = panelTop - desiredPanelTop;
+          splitUpper.scrollTo({
+            top: Math.max(0, splitUpper.scrollTop + delta),
+            behavior: 'smooth'
+          });
         } else {
-          // No overflow on split-upper — scroll window to panel position.
+          // overflow:visible — scroll window instead.
           const rect = panel.getBoundingClientRect();
-          const scrollTarget = window.scrollY + rect.top - 70;
-          window.scrollTo({ top: Math.max(0, scrollTarget), behavior: 'smooth' });
+          window.scrollTo({ top: Math.max(0, window.scrollY + rect.top - 70), behavior: 'smooth' });
         }
       }
     }
