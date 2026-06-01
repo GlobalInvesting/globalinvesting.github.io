@@ -1,68 +1,51 @@
 {
-  "generated_at": "2026-05-29T21:45:45Z",
+  "generated_at": "2026-06-01T03:54:48Z",
   "signals": [
     {
-      "time": "19:31",
+      "time": "03:54",
       "priority": "critical",
-      "title": "NZD/JPY — G8 Bilateral Theme + Geopolitical De-escalation",
-      "text": "NZD outperformance (1W avg +1.64%) combined with JPY weakness (-0.66%) creates a 2.30% G8 spread that is likely to widen as US-Iran ceasefire progress fuels risk-on sentiment. The 150bp NZD/JPY nominal carry advantage and JPY COT net short -81.6k reinforce the upside bias as safe-haven demand for JPY evaporates. The next BoJ meeting (mkt: 45% hike priced) on 16 June is the primary catalyst for any structural reversal of this trend.",
+      "title": "USD/JPY — Geopolitical Shock + Carry + Options",
+      "text": "USD/JPY at 159.47 remains bid as the 289bp Fed-BoJ OIS carry advantage offsets geopolitical volatility from the Iranian President's resignation and IRGC takeover. While JPY COT LF net short -86,249 reflects a crowded carry trade, the 25d RR at -1.04 confirms the options market is paying a moderate premium for downside protection against BoJ intervention risk. Carry remains the dominant regime driver until VIX exceeds 25, though the 160.00 level is the critical threshold for potential BoJ verbal or physical intervention.",
       "evidence": [
-        "NZD 1W avg: +1.643% (n=4)",
-        "JPY 1W avg: -0.657% (n=7)",
-        "G8 spread: 2.300%",
-        "JPY COT net short -81.6k"
+        "OIS Carry: +289bp",
+        "USD/JPY: 159.47",
+        "25d RR: -1.04"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:49",
+      "time": "03:51",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Unwind Risk vs Carry Support",
-      "text": "AUD COT net long +57.1k (74.5% long) creates a crowded-long unwind risk despite the 73bp OIS carry advantage favoring the AUD. While US-Iran deal optimism supports risk-sensitive currencies, the extreme retail short positioning (80% short) suggests a contrarian squeeze is likely to target the 0.7200 level. The next RBA meeting (mkt: 100% hold priced) on 16 June determines if the current hiking bias can sustain these levels against the heavy positioning.",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
+      "text": "NZD/USD at 0.5970 faces a significant positioning mismatch. COT LF net short -13,767 (specs short) contradicts the RBNZ hawkish bias (hike priced for next meeting). This institutional short-squeeze risk is amplified by an extreme retail 86% short position. If the RBNZ delivers a hawkish hold or hike, the combined capitulation of retail and speculative shorts targets a move toward 0.6100. NZD/USD vs NZX 50 correlation at +0.412 (z=+1.78σ) suggests the pair is decoupling from local equities to follow rate differentials.",
       "evidence": [
-        "AUD COT net long +57.1k",
-        "AUD/USD OIS carry: -73bp (favors AUD)",
-        "Retail sentiment: 80% short",
-        "AUD/USD IV 13.8% vs HV30 8.4%"
+        "NZD COT LF net: -13,767",
+        "Retail: 86% Short",
+        "RBNZ Bias: Hike"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:22",
+      "time": "03:49",
       "priority": "warning",
-      "title": "USD/JPY — Yield Gap vs Squeeze Risk",
-      "text": "USD/JPY closed Friday at 159.25, supported by a 289bp OIS carry advantage and a bull steepener regime in the US curve (+46.3bp 2s10s). However, the JPY COT net short of -81.6k and a positive JPY CESI (+12) suggest the pair is vulnerable to a sharp downside squeeze if BoJ hike bets (79% probability) continue to firm. The next BoJ meeting (mkt: 45% hike priced) on 16 June is the catalyst for resolving the tension between the yield gap and spec positioning.",
+      "title": "AUD/USD — Volatility Premium + Manufacturing Miss",
+      "text": "AUD/USD at 0.7183 shows signs of late-trend exhaustion following the Australia Manufacturing PMI slip to 50.7. Despite a 60bp carry advantage over the USD, the options market is pricing extreme caution with an IV of 14.9% vs HV30 of 8.2% (VRP +6.7%). This elevated vol premium suggests traders are aggressively hedging downside risk rather than chasing the 1M +0.73% gain. Watch for a break below 0.7150 to confirm a shift in the bullish trend.",
       "evidence": [
-        "USD/JPY OIS carry: +289bp",
-        "JPY COT net short -81.6k",
-        "JPY CESI: +12",
-        "US 2s10s spread: +46.3bp"
+        "AUD/USD VRP: +6.7%",
+        "AU Mfg PMI: 50.7",
+        "AUD/USD: 0.7183"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:14",
+      "time": "03:46",
       "priority": "info",
-      "title": "USD/CAD — COT Short Overhang + Growth Divergence",
-      "text": "CAD COT net short -41.7k reinforces downside pressure on the Loonie following weak Canadian GDP data and a softening USD. The 138bp OIS carry advantage for USD keeps the floor under the pair, but the restrictive US real rate (+1.22%) vs CAD (+0.18%) suggests a widening policy divergence. The next BoC meeting (mkt: 100% hold priced) on 10 June is the catalyst for confirming if the growth slowdown warrants a more accommodative stance.",
+      "title": "USD/CHF — Retail Extreme + Real Rate Divergence",
+      "text": "USD/CHF at 0.7832 is testing retail sentiment limits with 85% of community traders long. This extreme retail long position diverges from the institutional COT net short -5,651, creating a contrarian bearish signal. While the nominal Fed-SNB spread is +375bp, the real rate differential is narrower (+1.22% USD vs -0.31% CHF), suggesting the carry trade is less restrictive than nominals imply. Retail capitulation risk rises if price breaks the 1M low near 0.7800.",
       "evidence": [
-        "CAD COT net short -41.7k",
-        "USD/CAD OIS carry: +138bp",
-        "US real rate: +1.22% vs CAD: +0.18%",
-        "USD CESI: +20"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "19:43",
-      "priority": "info",
-      "title": "USD/CHF — Retail Extreme vs Real Rate Parity",
-      "text": "USD/CHF faces contrarian reversal risk as retail positioning reaches an 85% long extreme while the pair closed Friday at 0.7808. Despite a massive 375bp nominal carry advantage for the USD, the real rate gap is significantly narrower (USD +1.22% vs CHF -0.31%), limiting the fundamental drive for further upside. The next SNB meeting (mkt: 100% hold priced) on 18 June determines if the neutral market bias shifts toward supporting the franc.",
-      "evidence": [
-        "Retail sentiment: 85% long",
-        "USD/CHF OIS carry: +375bp",
-        "USD real rate: +1.22% vs CHF: -0.31%",
-        "USD/CHF IV 12.0% vs HV30 6.7%"
+        "Retail: 85% Long",
+        "USD/CHF: 0.7832",
+        "Real Rate Spread: 153bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
