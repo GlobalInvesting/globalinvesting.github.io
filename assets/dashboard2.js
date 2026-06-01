@@ -6108,10 +6108,20 @@ function openPairDetailPanel(tvSym) {
       // (which changes if the container is already mid-scroll).
       const splitUpper = document.getElementById('split-upper');
       if (splitUpper) {
-        // The panel lives immediately after the chart in #split-upper.
-        // Scrolling to 0 keeps the chart visible at the top with the
-        // panel appearing right below — no chart hidden off-screen.
-        splitUpper.scrollTo({ top: 0, behavior: 'smooth' });
+        // If split-upper has overflow-y:visible (mobile/narrow breakpoint),
+        // scrollHeight === clientHeight and scrollTo does nothing.
+        // In that case fall back to scrolling the window.
+        const isScrollable = splitUpper.scrollHeight > splitUpper.clientHeight;
+        if (isScrollable) {
+          // Desktop split: #split-upper is the overflow container.
+          // Scroll to 0 so chart stays at top and panel appears right below.
+          splitUpper.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          // No overflow on split-upper — scroll window to panel position.
+          const rect = panel.getBoundingClientRect();
+          const scrollTarget = window.scrollY + rect.top - 70;
+          window.scrollTo({ top: Math.max(0, scrollTarget), behavior: 'smooth' });
+        }
       }
     }
   });
