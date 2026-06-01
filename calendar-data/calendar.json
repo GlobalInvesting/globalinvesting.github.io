@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-05-31T23:57:28Z",
-  "generatedAt": "2026-05-31T23:57:28Z",
+  "lastUpdate": "2026-06-01T00:01:30Z",
+  "generatedAt": "2026-06-01T00:01:30Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,59 +8,24 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-06-01",
-  "rangeTo": "2026-06-12",
-  "totalEvents": 1630,
+  "rangeTo": "2026-06-15",
+  "totalEvents": 1635,
   "currencyCounts": {
     "AUD": 175,
-    "CAD": 131,
+    "CAD": 132,
     "CHF": 89,
-    "USD": 617,
+    "USD": 620,
     "JPY": 179,
     "GBP": 179,
     "NZD": 76,
-    "EUR": 184
+    "EUR": 185
   },
   "impactCounts": {
     "low": 147,
-    "medium": 1104,
+    "medium": 1109,
     "high": 379
   },
   "surpriseStats": {
-    "GBP/nationwide hpi": {
-      "n": 2,
-      "mean": 0.2,
-      "std": 0.141421
-    },
-    "CHF/procure.ch manufacturing pmi": {
-      "n": 3,
-      "mean": 2.133333,
-      "std": 4.361575
-    },
-    "EUR/hcob eurozone manufacturing pmi": {
-      "n": 2,
-      "mean": 1.0,
-      "std": 1.414214
-    },
-    "GBP/s&p global manufacturing pmi": {
-      "n": 2,
-      "mean": 0.55,
-      "std": 1.202082
-    },
-    "USD/s&p global manufacturing pmi": {
-      "n": 2,
-      "mean": 0.65,
-      "std": 0.353553
-    },
-    "USD/ism manufacturing pmi": {
-      "n": 2,
-      "mean": 0.45,
-      "std": 0.353553
-    },
-    "USD/atlanta fed gdpnow": {
-      "n": 6,
-      "mean": -0.166667,
-      "std": 0.500666
-    },
     "AUD/building approvals": {
       "n": 2,
       "mean": -6.3,
@@ -155,6 +120,11 @@
       "n": 5,
       "mean": 0.0,
       "std": 0.1
+    },
+    "USD/atlanta fed gdpnow": {
+      "n": 5,
+      "mean": -0.2,
+      "std": 0.552268
     },
     "JPY/household spending": {
       "n": 2,
@@ -370,6 +340,11 @@
       "n": 3,
       "mean": 2.9,
       "std": 1.558846
+    },
+    "CHF/procure.ch manufacturing pmi": {
+      "n": 2,
+      "mean": 4.4,
+      "std": 2.687006
     },
     "USD/adp employment change": {
       "n": 2,
@@ -17117,19 +17092,6 @@
       "previous": "49.8"
     },
     {
-      "date": "10 May",
-      "dateISO": "2026-05-10",
-      "timeUTC": "09:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB Cipollone Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
       "date": "11 May",
       "dateISO": "2026-05-11",
       "timeUTC": "14:00",
@@ -21682,6 +21644,84 @@
       "actual": null,
       "forecast": "48.2*",
       "previous": "44.8"
+    },
+    {
+      "date": "15 Jun",
+      "dateISO": "2026-06-15",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "5.4*",
+      "previous": "7.8"
+    },
+    {
+      "date": "15 Jun",
+      "dateISO": "2026-06-15",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Industrial Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3*",
+      "previous": "0.2"
+    },
+    {
+      "date": "15 Jun",
+      "dateISO": "2026-06-15",
+      "timeUTC": "12:15",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Housing Starts",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "240*",
+      "previous": "279.3"
+    },
+    {
+      "date": "15 Jun",
+      "dateISO": "2026-06-15",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "NY Empire State Manufacturing Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "7.5*",
+      "previous": "19.6"
+    },
+    {
+      "date": "15 Jun",
+      "dateISO": "2026-06-15",
+      "timeUTC": "13:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Industrial Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3*",
+      "previous": "0.7"
+    },
+    {
+      "date": "15 Jun",
+      "dateISO": "2026-06-15",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "NAHB Housing Market Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "35*",
+      "previous": "37"
     }
   ]
 }
