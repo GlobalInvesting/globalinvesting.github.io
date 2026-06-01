@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-01T13:32:00Z",
-  "generatedAt": "2026-06-01T13:32:00Z",
+  "lastUpdate": "2026-06-01T14:01:48Z",
+  "generatedAt": "2026-06-01T14:01:48Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -350,6 +350,11 @@
       "n": 2,
       "mean": 16.0,
       "std": 8.485281
+    },
+    "USD/ism manufacturing pmi": {
+      "n": 2,
+      "mean": 0.6,
+      "std": 0.565685
     },
     "USD/ism services pmi": {
       "n": 2,
@@ -20354,8 +20359,8 @@
       "flag": "🇺🇸",
       "event": "ISM Manufacturing Employment",
       "impact": "medium",
-      "actual": null,
-      "forecast": "48.3*",
+      "actual": "48.6",
+      "forecast": null,
       "previous": "46.4"
     },
     {
@@ -20367,7 +20372,7 @@
       "flag": "🇺🇸",
       "event": "ISM Manufacturing PMI",
       "impact": "high",
-      "actual": null,
+      "actual": "54",
       "forecast": "53",
       "previous": "52.7"
     },
