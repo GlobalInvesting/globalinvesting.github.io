@@ -6083,7 +6083,14 @@ function openPairDetailPanel(tvSym) {
   panel.style.display = 'flex';
   // Reset animation
   panel.style.animation = 'none';
-  requestAnimationFrame(() => { panel.style.animation = ''; });
+  requestAnimationFrame(() => {
+    panel.style.animation = '';
+    // In non-split mode the page scrolls vertically — bring panel into view
+    const isSplit = document.getElementById('main')?.classList.contains('split-layout');
+    if (!isSplit) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
 
   // Initialise tab switching (idempotent)
   _pdpInitTabs();

@@ -1814,10 +1814,17 @@ a:focus-visible,
   width: 100%;
   background: var(--bg2);
   border-top: 2px solid var(--accent);
+  border-bottom: 1px solid var(--border);
   flex-direction: column;
-  max-height: 380px;
+  /* In split mode this is constrained by #split-upper height;
+     in non-split mode allow auto height so content isn't clipped */
+  max-height: 420px;
   overflow: hidden;
   animation: pdp-slide-in 0.18s ease;
+}
+/* In non-split mode, give the panel a bit more height since there's no fixed column */
+:not(.split-layout) #pair-detail-panel {
+  max-height: 480px;
 }
 #pair-detail-panel[style*="flex"] {
   display: flex;
