@@ -6085,10 +6085,15 @@ function openPairDetailPanel(tvSym) {
   panel.style.animation = 'none';
   requestAnimationFrame(() => {
     panel.style.animation = '';
-    // In non-split mode the page scrolls vertically — bring panel into view
+    // In non-split mode the page scrolls vertically.
+    // Use explicit window.scrollTo (more reliable than scrollIntoView cross-browser).
     const isSplit = document.getElementById('main')?.classList.contains('split-layout');
     if (!isSplit) {
-      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => {
+        const rect = panel.getBoundingClientRect();
+        const scrollTarget = window.scrollY + rect.top - 70;
+        window.scrollTo({ top: Math.max(0, scrollTarget), behavior: 'smooth' });
+      }, 60);
     }
   });
 
