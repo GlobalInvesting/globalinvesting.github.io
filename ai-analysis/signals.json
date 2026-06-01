@@ -1,53 +1,58 @@
 {
-  "generated_at": "2026-06-01T03:54:48Z",
+  "generated_at": "2026-06-01T12:16:02Z",
   "signals": [
     {
-      "time": "03:54",
+      "time": "12:14",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Shock + Carry + Options",
-      "text": "USD/JPY at 159.47 remains bid as the 289bp Fed-BoJ OIS carry advantage offsets geopolitical volatility from the Iranian President's resignation and IRGC takeover. While JPY COT LF net short -86,249 reflects a crowded carry trade, the 25d RR at -1.04 confirms the options market is paying a moderate premium for downside protection against BoJ intervention risk. Carry remains the dominant regime driver until VIX exceeds 25, though the 160.00 level is the critical threshold for potential BoJ verbal or physical intervention.",
+      "title": "USD/JPY — Geopolitical + Carry + COT vs OIS Divergence",
+      "text": "USD/JPY at 159.48 — 289bp Fed-BoJ OIS carry premium sustains the bid, while Japan Q1 capex growth stalled at near zero, raising GDP revision risk and BoJ rate hike uncertainty. JPY COT LF net short −86,249 (extreme spec short) vs BoJ hike bias for the next meeting. This creates a significant short-squeeze risk if BoJ signals a hawkish shift. Middle East tensions introduce intervention risk on a sustained break above 160.00. Options market 25d RR at −1.04 (moderate put skew) suggests options traders are hedging for JPY strength, diverging from spot and futures positioning. Watch for BoJ's next meeting on 16 Jun for clarity on policy and potential intervention triggers.",
       "evidence": [
-        "OIS Carry: +289bp",
-        "USD/JPY: 159.47",
-        "25d RR: -1.04"
+        "USD/JPY: 159.48",
+        "USD/JPY OIS carry: +289bp (favors USD)",
+        "JPY COT LF net: −86,249 (week ending 2026-05-26)",
+        "BoJ Market bias: ↑ Hike",
+        "USDJPY 25d RR: -1.04 (Saxo, 1M tenor, indicative mid)"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "03:51",
+      "time": "12:17",
+      "priority": "warning",
+      "title": "EUR/USD — ECB Hawkish Shift + Volatility Premium",
+      "text": "ECB’s Schnabel strengthened the case for a June hike, citing inflation expectations risk. This hawkish commentary supports EUR despite the 169bp OIS carry disadvantage (SOFR 3.62% vs €STR 1.93%) favoring USD. EUR/USD IV at 7.1% vs HV30 at 4.2% (VRP +2.9%) indicates elevated options market hedging demand above realized volatility, suggesting caution. EUR COT LF net short −26,311 (week ending 2026-05-26) is a moderate short position. Watch for the ECB meeting on 11 Jun for confirmation of a hawkish shift.",
+      "evidence": [
+        "ECB’s Schnabel: Hawkish comments",
+        "EUR/USD OIS carry: +169bp (favors USD)",
+        "EUR/USD IV: 7.1% vs HV30: 4.2% (VRP +2.9%)",
+        "EUR COT LF net: −26,311 (week ending 2026-05-26)"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "12:20",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
-      "text": "NZD/USD at 0.5970 faces a significant positioning mismatch. COT LF net short -13,767 (specs short) contradicts the RBNZ hawkish bias (hike priced for next meeting). This institutional short-squeeze risk is amplified by an extreme retail 86% short position. If the RBNZ delivers a hawkish hold or hike, the combined capitulation of retail and speculative shorts targets a move toward 0.6100. NZD/USD vs NZX 50 correlation at +0.412 (z=+1.78σ) suggests the pair is decoupling from local equities to follow rate differentials.",
+      "text": "NZD/USD COT LF net short −13,767 (specs fading a hawkish CB) vs RBNZ hike bias for the next meeting. If RBNZ delivers or signals a hike, short-squeeze risk is elevated. Retail sentiment shows an extreme 81% short position, reinforcing the contrarian signal against the institutional short. NZD/USD is at 0.5957. The next RBNZ meeting (mkt: 20% hike priced) is the catalyst for a potential short-squeeze targeting 0.6000+.",
       "evidence": [
-        "NZD COT LF net: -13,767",
-        "Retail: 86% Short",
-        "RBNZ Bias: Hike"
+        "NZD COT LF net: −13,767 (week ending 2026-05-26)",
+        "RBNZ Market bias: ↑ Hike",
+        "NZD/USD Retail: 81% short",
+        "NZD/USD: 0.5957"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "03:49",
-      "priority": "warning",
-      "title": "AUD/USD — Volatility Premium + Manufacturing Miss",
-      "text": "AUD/USD at 0.7183 shows signs of late-trend exhaustion following the Australia Manufacturing PMI slip to 50.7. Despite a 60bp carry advantage over the USD, the options market is pricing extreme caution with an IV of 14.9% vs HV30 of 8.2% (VRP +6.7%). This elevated vol premium suggests traders are aggressively hedging downside risk rather than chasing the 1M +0.73% gain. Watch for a break below 0.7150 to confirm a shift in the bullish trend.",
-      "evidence": [
-        "AUD/USD VRP: +6.7%",
-        "AU Mfg PMI: 50.7",
-        "AUD/USD: 0.7183"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "03:46",
+      "time": "12:23",
       "priority": "info",
-      "title": "USD/CHF — Retail Extreme + Real Rate Divergence",
-      "text": "USD/CHF at 0.7832 is testing retail sentiment limits with 85% of community traders long. This extreme retail long position diverges from the institutional COT net short -5,651, creating a contrarian bearish signal. While the nominal Fed-SNB spread is +375bp, the real rate differential is narrower (+1.22% USD vs -0.31% CHF), suggesting the carry trade is less restrictive than nominals imply. Retail capitulation risk rises if price breaks the 1M low near 0.7800.",
+      "title": "DXY — Correlation Break + CESI Strength",
+      "text": "DXY vs SPX correlation at +0.565 vs 252d norm=−0.261 (z=+1.67σ) indicates a break in the normal negative relationship, suggesting USD funding stress or a risk-off USD bid despite normal volatility (VIX 15.8). USD CESI net=+20 (strong positive) confirms sustained data outperformance, supporting underlying USD strength. DXY at 99.05. Watch for further equity weakness to confirm the risk-off USD bid.",
       "evidence": [
-        "Retail: 85% Long",
-        "USD/CHF: 0.7832",
-        "Real Rate Spread: 153bp"
+        "DXY vs SPX corr: +0.565 (z=+1.67σ)",
+        "USD CESI net: +20",
+        "DXY: 99.05",
+        "VIX: 15.8 (normal volatility)"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
