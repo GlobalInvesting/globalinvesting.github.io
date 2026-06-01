@@ -1,622 +1,448 @@
-/* ═══════════════════════════════════════════════════════════════
-   Global Investing FX Terminal v2 — dashboard2.js
-   Bloomberg-style data integration
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   dashboard2.js — Bloomberg-Faithful FX Terminal (TEST BUILD)
+   No Math.random() · Deterministic · All values from JSON workflows
+   ═══════════════════════════════════════════════════════════════════ */
 'use strict';
 
-/* ── Constants ─────────────────────────────────────────────── */
-const BASE = '';  // same-origin
-
-const FX_PAIRS_G10 = [
-  'eurusd','gbpusd','usdjpy','usdchf','audusd','usdcad','nzdusd',
-  'eurgbp','eurjpy','eurchf','gbpjpy','gbpchf','audjpy','audnzd'
+/* ── CONFIG ─────────────────────────────────────────────────────── */
+const G10 = [
+  {id:'eurusd',lbl:'EUR/USD',d:5},{id:'gbpusd',lbl:'GBP/USD',d:5},
+  {id:'usdjpy',lbl:'USD/JPY',d:3},{id:'usdchf',lbl:'USD/CHF',d:5},
+  {id:'audusd',lbl:'AUD/USD',d:5},{id:'usdcad',lbl:'USD/CAD',d:5},
+  {id:'nzdusd',lbl:'NZD/USD',d:5},
 ];
-const FX_PAIRS_CROSS = [
-  'eurcad','euraud','eurnzd','gbpcad','gbpaud','gbpnzd',
-  'audchf','audcad','cadjpy','chfjpy','nzdjpy','nzdcad','nzdchf','cadchf'
+const CROSS = [
+  {id:'eurgbp',lbl:'EUR/GBP',d:5},{id:'eurjpy',lbl:'EUR/JPY',d:3},
+  {id:'eurchf',lbl:'EUR/CHF',d:5},{id:'eurcad',lbl:'EUR/CAD',d:5},
+  {id:'euraud',lbl:'EUR/AUD',d:5},{id:'gbpjpy',lbl:'GBP/JPY',d:3},
+  {id:'gbpchf',lbl:'GBP/CHF',d:5},{id:'gbpcad',lbl:'GBP/CAD',d:5},
+  {id:'gbpaud',lbl:'GBP/AUD',d:5},{id:'audjpy',lbl:'AUD/JPY',d:3},
+  {id:'audnzd',lbl:'AUD/NZD',d:5},{id:'audchf',lbl:'AUD/CHF',d:5},
+  {id:'audcad',lbl:'AUD/CAD',d:5},{id:'cadjpy',lbl:'CAD/JPY',d:3},
+  {id:'chfjpy',lbl:'CHF/JPY',d:3},{id:'nzdjpy',lbl:'NZD/JPY',d:3},
+  {id:'eurnzd',lbl:'EUR/NZD',d:5},{id:'nzdcad',lbl:'NZD/CAD',d:5},
+];
+const CB_LIST = [
+  {ccy:'USD',sh:'Fed'   ,full:'Federal Reserve'},
+  {ccy:'EUR',sh:'ECB'   ,full:'Euro Central Bank'},
+  {ccy:'GBP',sh:'BoE'   ,full:'Bank of England'},
+  {ccy:'JPY',sh:'BoJ'   ,full:'Bank of Japan'},
+  {ccy:'AUD',sh:'RBA'   ,full:'Res. Bank of Australia'},
+  {ccy:'CAD',sh:'BoC'   ,full:'Bank of Canada'},
+  {ccy:'CHF',sh:'SNB'   ,full:'Swiss Natl Bank'},
+  {ccy:'NZD',sh:'RBNZ'  ,full:'Res. Bank of NZ'},
+];
+const CA_ROWS = [
+  {k:'vix',   lb:'VIX',       f:'d2',  sec:'Volatility'},
+  {k:'move',  lb:'MOVE',      f:'d2'},
+  {k:'spx',   lb:'S&P 500',   f:'d0',  sec:'Equities'},
+  {k:'nasdaq',lb:'Nasdaq',    f:'d0'},
+  {k:'dax',   lb:'DAX',       f:'d0'},
+  {k:'nikkei',lb:'Nikkei',    f:'d0'},
+  {k:'stoxx', lb:'EuroStoxx', f:'d0'},
+  {k:'ftse',  lb:'FTSE 100',  f:'d0'},
+  {k:'dxy',   lb:'DXY',       f:'d3',  sec:'FX/Rates'},
+  {k:'us10y', lb:'US 10Y',    f:'d3',  u:'%'},
+  {k:'us2y',  lb:'US 2Y',     f:'d3',  u:'%'},
+  {k:'gold',  lb:'Gold (XAU)',f:'d0',  sec:'Commodities'},
+  {k:'wti',   lb:'WTI',       f:'d2'},
+  {k:'brent', lb:'Brent',     f:'d2'},
+  {k:'silver',lb:'Silver',    f:'d2'},
+  {k:'btc',   lb:'Bitcoin',   f:'d0',  sec:'Crypto'},
+  {k:'eth',   lb:'Ethereum',  f:'d0'},
+];
+const YC_TEN = [
+  {k:'us3m', lb:'3M', mo:3},{k:'us2y',lb:'2Y',mo:24},
+  {k:'us5y', lb:'5Y', mo:60},{k:'us10y',lb:'10Y',mo:120},
+  {k:'us30y',lb:'30Y',mo:360},
+];
+const COT_CCYS = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+const RR_PAIRS = ['EURUSD','USDJPY','GBPUSD','AUDUSD','USDCAD','USDCHF','EURJPY'];
+const TICKER = [
+  {k:'eurusd',lb:'EUR/USD'},{k:'gbpusd',lb:'GBP/USD'},
+  {k:'usdjpy',lb:'USD/JPY'},{k:'audusd',lb:'AUD/USD'},
+  {k:'usdcad',lb:'USD/CAD'},{k:'dxy',   lb:'DXY'},
+  {k:'gold',  lb:'XAU/USD'},{k:'spx',   lb:'SPX'},
+  {k:'vix',   lb:'VIX'},   {k:'us10y', lb:'US10Y'},
 ];
 
-const FX_LABELS = {
-  eurusd:'EUR/USD', gbpusd:'GBP/USD', usdjpy:'USD/JPY', usdchf:'USD/CHF',
-  audusd:'AUD/USD', usdcad:'USD/CAD', nzdusd:'NZD/USD', eurgbp:'EUR/GBP',
-  eurjpy:'EUR/JPY', eurchf:'EUR/CHF', gbpjpy:'GBP/JPY', gbpchf:'GBP/CHF',
-  audjpy:'AUD/JPY', audnzd:'AUD/NZD', eurcad:'EUR/CAD', euraud:'EUR/AUD',
-  eurnzd:'EUR/NZD', gbpcad:'GBP/CAD', gbpaud:'GBP/AUD', gbpnzd:'GBP/NZD',
-  audchf:'AUD/CHF', audcad:'AUD/CAD', cadjpy:'CAD/JPY', chfjpy:'CHF/JPY',
-  nzdjpy:'NZD/JPY', nzdcad:'NZD/CAD', nzdchf:'NZD/CHF', cadchf:'CAD/CHF'
-};
+/* ── STATE ──────────────────────────────────────────────────────── */
+let Q={}, MEET={}, RATES={}, COT={}, RR2={}, SIGS=[], ECO={};
+let prevQ={}, activePair='EURUSD';
 
-const CB_CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-const CB_NAMES = {
-  USD:'Federal Reserve', EUR:'European Central Bank', GBP:'Bank of England',
-  JPY:'Bank of Japan', AUD:'Reserve Bank of Australia', CAD:'Bank of Canada',
-  CHF:'Swiss National Bank', NZD:'Reserve Bank of New Zealand'
-};
-const CB_SHORT = {
-  USD:'Fed', EUR:'ECB', GBP:'BoE', JPY:'BoJ', AUD:'RBA', CAD:'BoC', CHF:'SNB', NZD:'RBNZ'
-};
-const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-const CROSS_ASSETS = [
-  {key:'vix',   label:'VIX',     fmt:'dec2'},
-  {key:'spx',   label:'S&P 500', fmt:'dec0'},
-  {key:'dxy',   label:'DXY',     fmt:'dec3'},
-  {key:'gold',  label:'Gold',    fmt:'dec0'},
-  {key:'wti',   label:'WTI',     fmt:'dec2'},
-  {key:'brent', label:'Brent',   fmt:'dec2'},
-  {key:'us10y', label:'US10Y',   fmt:'dec3', suffix:'%'},
-  {key:'us2y',  label:'US2Y',    fmt:'dec3', suffix:'%'},
-  {key:'us3m',  label:'US3M',    fmt:'dec3', suffix:'%'},
-  {key:'move',  label:'MOVE',    fmt:'dec1'},
-  {key:'btc',   label:'BTC',     fmt:'dec0'},
-  {key:'nasdaq',label:'NASDAQ',  fmt:'dec0'},
-];
-
-/* ── State ─────────────────────────────────────────────────── */
-let _quotes   = {};
-let _meetings = {};
-let _rates    = {};
-let _cot      = {};
-let _rr       = {};
-let _selectedPair = 'eurusd';
-let _fxTab    = 'g10';
-let _lowerTab = 'crossasset';
-
-/* ── Formatting helpers ────────────────────────────────────── */
-function fmt(v, type, suffix='') {
-  if (v == null || isNaN(v)) return '—';
-  if (type === 'dec0') return v.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0}) + suffix;
-  if (type === 'dec1') return v.toFixed(1) + suffix;
-  if (type === 'dec2') return v.toFixed(2) + suffix;
-  if (type === 'dec3') return v.toFixed(3) + suffix;
-  if (type === 'dec4') return v.toFixed(4) + suffix;
-  if (type === 'pct')  return (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
-  if (type === 'pct3') return (v >= 0 ? '+' : '') + v.toFixed(3) + '%';
-  return v + suffix;
+/* ── FORMATTERS ─────────────────────────────────────────────────── */
+const p2 = n=>String(n).padStart(2,'0');
+function fv(v,f,u=''){
+  if(v==null||v===''||isNaN(Number(v)))return '—';
+  const n=Number(v);
+  if(f==='d0')return n.toLocaleString('en-US',{maximumFractionDigits:0})+u;
+  if(f==='d1')return n.toFixed(1)+u;
+  if(f==='d2')return n.toFixed(2)+u;
+  if(f==='d3')return n.toFixed(3)+u;
+  if(f==='d4')return n.toFixed(4)+u;
+  if(f==='d5')return n.toFixed(5)+u;
+  return String(v)+u;
+}
+function fxp(id,v){if(v==null)return'—';return /jpy|cad/.test(id)&&!id.includes('cad/')&&Number(v)>10?Number(v).toFixed(3):Number(v).toFixed(5);}
+// More precise JPY detection
+function fxFmt(id,v){
+  if(v==null)return'—';
+  const n=Number(v);
+  const isJPY=/jpy$/.test(id);
+  return isJPY?n.toFixed(3):n.toFixed(5);
+}
+function pct(v){if(v==null||isNaN(v))return'—';const n=Number(v);return(n>=0?'+':'')+n.toFixed(2)+'%';}
+function pcc(v){if(v==null||isNaN(v))return'neu';return Number(v)>0?'up':Number(v)<0?'dn':'neu';}
+function sgn(v){if(v==null||isNaN(v))return'—';const n=Number(v);return(n>=0?'+':'')+n.toLocaleString('en-US',{maximumFractionDigits:0});}
+function spread(id,bid,ask){
+  if(bid==null||ask==null)return'—';
+  const mult=/jpy$/.test(id)?1000:100000;
+  return ((ask-bid)*mult).toFixed(1);
 }
 
-function fmtPair(pair, price) {
-  if (price == null) return '—';
-  const jpyPairs = ['usdjpy','eurjpy','gbpjpy','audjpy','cadjpy','chfjpy','nzdjpy'];
-  const p = pair.toLowerCase();
-  if (jpyPairs.includes(p)) return price.toFixed(3);
-  return price.toFixed(5);
+/* ── DATA FETCH ─────────────────────────────────────────────────── */
+async function loadQ(){
+  try{const r=await fetch('/intraday-data/quotes.json');const d=await r.json();
+  prevQ={...Q};Q=d.quotes||d;return d;}catch(e){console.warn('quotes',e);}
+}
+async function loadMeet(){
+  try{const r=await fetch('/meetings-data/meetings.json');const d=await r.json();MEET=d.meetings||d;}catch(e){}
+}
+async function loadRates(){
+  await Promise.all(CB_LIST.map(async({ccy})=>{
+    try{const r=await fetch('/rates/'+ccy+'.json');const d=await r.json();
+    const obs=d.observations;if(obs&&obs[0])RATES[ccy]={v:parseFloat(obs[0].value),dt:obs[0].date};}
+    catch(e){}
+  }));
+}
+async function loadCOT(){
+  await Promise.all(COT_CCYS.map(async c=>{
+    try{const r=await fetch('/cot-data/'+c+'.json');COT[c]=await r.json();}catch(e){}
+  }));
+}
+async function loadRR2(){
+  try{const r=await fetch('/rr-data/rr2.json');const d=await r.json();RR2=d.pairs||d;}catch(e){}
+}
+async function loadSigs(){
+  try{const r=await fetch('/ai-analysis/signals.json');const d=await r.json();SIGS=d.signals||[];}catch(e){}
+}
+async function loadEco(){
+  await Promise.all(CB_LIST.map(async({ccy})=>{
+    try{const r=await fetch('/economic-data/'+ccy+'.json');const d=await r.json();ECO[ccy]=d.data||{};}catch(e){}
+  }));
 }
 
-function colorCls(v) {
-  if (v == null) return 'neu';
-  return v > 0 ? 'up' : v < 0 ? 'dn' : 'neu';
-}
-
-function pctSign(v) {
-  if (v == null || isNaN(v)) return '—';
-  return (v >= 0 ? '+' : '') + v.toFixed(3) + '%';
-}
-
-/* ── Clock ─────────────────────────────────────────────────── */
-function tickClock() {
-  const el = document.getElementById('tb-clock');
-  if (!el) return;
-  const now = new Date();
-  const hh = String(now.getUTCHours()).padStart(2,'0');
-  const mm = String(now.getUTCMinutes()).padStart(2,'0');
-  const ss = String(now.getUTCSeconds()).padStart(2,'0');
-  el.textContent = `${hh}:${mm}:${ss} UTC`;
-}
-setInterval(tickClock, 1000);
-tickClock();
-
-/* ── Data fetching ─────────────────────────────────────────── */
-async function loadQuotes() {
-  try {
-    const r = await fetch(`${BASE}/intraday-data/quotes.json`);
-    if (!r.ok) return;
-    const d = await r.json();
-    _quotes = d.quotes || {};
-  } catch(e) { console.warn('quotes fetch failed', e); }
-}
-
-async function loadMeetings() {
-  try {
-    const r = await fetch(`${BASE}/meetings-data/meetings.json`);
-    if (!r.ok) return;
-    const d = await r.json();
-    _meetings = d.meetings || {};
-  } catch(e) { console.warn('meetings fetch failed', e); }
-}
-
-async function loadRates() {
-  try {
-    const fetches = CB_CURRENCIES.map(c =>
-      fetch(`${BASE}/rates/${c}.json`)
-        .then(r => r.ok ? r.json() : null)
-        .then(d => ({ c, d }))
-        .catch(() => ({ c, d: null }))
-    );
-    const results = await Promise.all(fetches);
-    for (const {c, d} of results) {
-      if (d && d.observations && d.observations.length) {
-        _rates[c] = parseFloat(d.observations[0].value);
-      }
+/* ── RENDER: TICKER ─────────────────────────────────────────────── */
+function renderTicker(){
+  TICKER.forEach(({k,lb})=>{
+    const q=Q[k]||{};const el=document.getElementById('tk-'+k);if(!el)return;
+    const price=q.bid||q.close;
+    let ps='—';
+    if(price!=null){
+      const isYield=['us10y','us2y','us3m','us5y','us30y'].includes(k);
+      const isBig=price>=100;
+      ps=isYield?price.toFixed(3):isBig?price.toLocaleString('en-US',{maximumFractionDigits:2}):price.toFixed(5);
     }
-  } catch(e) { console.warn('rates fetch failed', e); }
-}
-
-async function loadCOT() {
-  try {
-    const fetches = COT_CURRENCIES.map(c =>
-      fetch(`${BASE}/cot-data/${c}.json`)
-        .then(r => r.ok ? r.json() : null)
-        .then(d => ({ c, d }))
-        .catch(() => ({ c, d: null }))
-    );
-    const results = await Promise.all(fetches);
-    for (const {c, d} of results) {
-      if (d) _cot[c] = d;
-    }
-  } catch(e) { console.warn('COT fetch failed', e); }
-}
-
-async function loadRR() {
-  try {
-    const r = await fetch(`${BASE}/rr-data/rr.json`);
-    if (!r.ok) return;
-    const d = await r.json();
-    _rr = d.pairs || {};
-  } catch(e) { console.warn('RR fetch failed', e); }
-}
-
-/* ── Render Quote Bar ──────────────────────────────────────── */
-function renderQuotebar() {
-  const bar = document.getElementById('quotebar');
-  if (!bar) return;
-  const items = [
-    {key:'eurusd', label:'EUR/USD'},
-    {key:'gbpusd', label:'GBP/USD'},
-    {key:'usdjpy', label:'USD/JPY'},
-    {key:'audusd', label:'AUD/USD'},
-    {key:'usdcad', label:'USD/CAD'},
-    {key:'dxy',    label:'DXY'},
-    {key:'gold',   label:'GOLD'},
-    {key:'vix',    label:'VIX'},
-    {key:'spx',    label:'S&P 500'},
-    {key:'us10y',  label:'US10Y'},
-  ];
-  bar.innerHTML = items.map(({key, label}) => {
-    const q = _quotes[key];
-    if (!q) return `<div class="qb-item"><span class="qb-sym">${label}</span><span class="qb-price dim">—</span></div>`;
-    const price = key === 'eurusd' || key === 'gbpusd' || key === 'audusd' || key === 'usdcad' || key === 'nzdusd'
-      ? (q.close || 0).toFixed(5)
-      : key === 'usdjpy' ? (q.close || 0).toFixed(3)
-      : key === 'dxy' || key === 'vix' ? (q.close || 0).toFixed(3)
-      : key === 'gold' ? (q.close || 0).toFixed(0)
-      : key === 'spx' ? (q.close || 0).toFixed(2)
-      : key === 'us10y' ? (q.close || 0).toFixed(3) + '%'
-      : (q.close || 0).toFixed(2);
-    const pct = q.pct || 0;
-    const cls = pct > 0 ? 'up' : pct < 0 ? 'dn' : 'neu';
-    const sign = pct > 0 ? '+' : '';
-    return `<div class="qb-item">
-      <span class="qb-sym">${label}</span>
-      <span class="qb-price">${price}</span>
-      <span class="qb-chg ${cls}">${sign}${pct.toFixed(2)}%</span>
-    </div>`;
-  }).join('');
-}
-
-/* ── Render FX Watchlist ───────────────────────────────────── */
-function renderFXWatchlist() {
-  const tbody = document.getElementById('fx-tbody');
-  if (!tbody) return;
-  const pairs = _fxTab === 'g10' ? FX_PAIRS_G10 : FX_PAIRS_CROSS;
-  tbody.innerHTML = pairs.map(pair => {
-    const q = _quotes[pair];
-    const label = FX_LABELS[pair] || pair.toUpperCase();
-    const price = q ? fmtPair(pair, q.close) : '—';
-    const bid   = q && q.bid ? fmtPair(pair, q.bid) : '—';
-    const ask   = q && q.ask ? fmtPair(pair, q.ask) : '—';
-    const pct   = q ? (q.pct || 0) : null;
-    const cls   = pct !== null ? (pct > 0 ? 'up' : pct < 0 ? 'dn' : 'neu') : 'neu';
-    const hv30  = q && q.hv30 != null ? q.hv30.toFixed(1) + '%' : '—';
-    const sel   = pair === _selectedPair ? 'selected' : '';
-    return `<tr class="${sel}" onclick="selectPair('${pair}')">
-      <td class="sym">${label}</td>
-      <td class="r bold">${price}</td>
-      <td class="r dim hide-sm">${bid}</td>
-      <td class="r dim hide-sm">${ask}</td>
-      <td class="r ${cls}">${pct !== null ? (pct >= 0 ? '+' : '') + pct.toFixed(3) + '%' : '—'}</td>
-      <td class="r dim hide-sm">${hv30}</td>
-    </tr>`;
-  }).join('');
-}
-
-/* ── Render Cross-Asset Grid ───────────────────────────────── */
-function renderCrossAsset() {
-  const el = document.getElementById('ca-grid');
-  if (!el) return;
-  el.innerHTML = CROSS_ASSETS.map(({key, label, fmt: fmtType, suffix}) => {
-    const q = _quotes[key];
-    if (!q) return `<div class="ca-cell"><div class="ca-sym">${label}</div><div class="ca-price dim">—</div></div>`;
-    const price = fmt(q.close, fmtType, suffix || '');
-    const pct   = q.pct || 0;
-    const cls   = pct > 0 ? 'up' : pct < 0 ? 'dn' : 'neu';
-    const sign  = pct >= 0 ? '+' : '';
-    return `<div class="ca-cell" title="${label}">
-      <div class="ca-sym">${label}</div>
-      <div class="ca-price">${price}</div>
-      <div class="ca-chg ${cls}">${sign}${pct.toFixed(2)}%</div>
-    </div>`;
-  }).join('');
-}
-
-/* ── Render CB Rates ───────────────────────────────────────── */
-function renderCBRates() {
-  const html = CB_CURRENCIES.map(c => {
-    const rate   = _rates[c];
-    const m      = _meetings[c] || {};
-    const bias   = m.bias || 'hold';
-    const next   = m.nextMeeting || '—';
-    const fwd    = m.fwdRate != null ? m.fwdRate.toFixed(2) + '%' : '—';
-    const rateStr = rate != null ? rate.toFixed(2) + '%' : '—';
-    const biasCls = bias === 'cut' ? 'bias-cut' : bias === 'hike' ? 'bias-hike' : 'bias-hold';
-    const biasLabel = bias === 'cut' ? '↓ Cut' : bias === 'hike' ? '↑ Hike' : '→ Hold';
-    return `<tr>
-      <td class="sym">${CB_SHORT[c]}</td>
-      <td class="r bold">${rateStr}</td>
-      <td class="r"><span class="bias-pill ${biasCls}">${biasLabel}</span></td>
-      <td class="r dim hide-sm">${next}</td>
-      <td class="r dim hide-sm">${fwd}</td>
-    </tr>`;
-  }).join('');
-  // populate both tbodies (right panel + lower tab)
-  ['cbrates-tbody', 'cbrates-lower-tbody'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
+    const chg=q.pct;
+    el.innerHTML=`<span class="tk-sym">${lb}</span><span class="tk-val">${ps}</span><span class="tk-chg ${pcc(chg)}">${pct(chg)}</span>`;
   });
 }
 
-/* ── Render COT Table ──────────────────────────────────────── */
-function renderCOT() {
-  const tbody = document.getElementById('cot-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = COT_CURRENCIES.map(c => {
-    const d = _cot[c] || {};
-    const net  = d.netPosition;
-    const longs = d.longPositions;
-    const shorts = d.shortPositions;
-    const week = d.weekEnding || '—';
-    const netStr = net != null ? (net >= 0 ? '+' : '') + net.toLocaleString('en-US') : '—';
-    const cls    = net != null ? (net > 0 ? 'up' : net < 0 ? 'dn' : 'neu') : 'neu';
-    // bar: net as % of total OI (approx)
-    const total = (longs || 0) + (shorts || 0);
-    const netPct = total > 0 ? net / total : 0;
-    const barW   = Math.min(Math.abs(netPct) * 100, 50);
-    const barColor = net > 0 ? 'var(--up)' : 'var(--down)';
-    // WoW from history
-    let wow = '—';
-    if (d.history && d.history.length >= 2) {
-      const hist = d.history;
-      const last = hist[hist.length - 1];
-      const prev = hist[hist.length - 2];
-      if (last && prev && last.levNet != null && prev.levNet != null) {
-        const diff = last.levNet - prev.levNet;
-        wow = `<span class="${diff >= 0 ? 'up' : 'dn'}">${diff >= 0 ? '+' : ''}${diff.toLocaleString('en-US')}</span>`;
-      }
-    }
-    const rr25 = _rr[c + 'USD'] || _rr['USD' + c] || _rr['EUR' + (c === 'EUR' ? 'USD' : c)];
-    const rrStr = rr25 && rr25.rr25d != null ? (rr25.rr25d >= 0 ? '+' : '') + rr25.rr25d.toFixed(2) : '—';
-    const rrCls = rr25 && rr25.rr25d != null ? (rr25.rr25d > 0 ? 'up' : rr25.rr25d < 0 ? 'dn' : 'neu') : 'neu';
-    return `<tr>
-      <td class="sym">${c}</td>
-      <td class="r ${cls} bold">${netStr}</td>
-      <td>
-        <div class="cot-bar-wrap">
-          <div class="cot-bar-bg"><div class="cot-bar-fill" style="width:${barW}%;background:${barColor};margin-left:${net < 0 ? 0 : 50 - barW}%"></div></div>
-        </div>
-      </td>
-      <td class="r dim hide-sm">${wow}</td>
-      <td class="r ${rrCls} hide-sm">${rrStr}</td>
-      <td class="dim hide-sm">${week}</td>
-    </tr>`;
+/* ── RENDER: SPOT FX ────────────────────────────────────────────── */
+function renderSpot(){
+  const tb=document.getElementById('spot-tbody');if(!tb)return;
+  let h='<tr class="t-sec"><td colspan="6">G10 CORE</td></tr>';
+  G10.forEach(({id,lbl})=>{
+    const q=Q[id]||{};
+    const bid=q.bid??q.close; const ask=q.ask;
+    const bs=fxFmt(id,bid); const as=fxFmt(id,ask);
+    const sp=spread(id,q.bid,q.ask);
+    const isSel=id===activePair.toLowerCase();
+    h+=`<tr class="${isSel?'fx-sel':''} fx-r" id="fr-${id}" onclick="pairClick('${id.toUpperCase()}')">
+      <td class="ccy">${lbl}</td>
+      <td class="r bld up">${bs}</td>
+      <td class="r dn">${as}</td>
+      <td class="r dim">${sp}</td>
+      <td class="r ${pcc(q.pct)}">${pct(q.pct)}</td>
+      <td class="r dim">${q.hv30!=null?q.hv30.toFixed(1)+'%':'—'}</td></tr>`;
+  });
+  h+='<tr class="t-sec"><td colspan="6">CROSS RATES</td></tr>';
+  CROSS.forEach(({id,lbl})=>{
+    const q=Q[id]||{};const mid=q.bid??q.close;
+    h+=`<tr class="fx-r" id="fr-${id}">
+      <td class="ccy">${lbl}</td>
+      <td class="r bld w">${fxFmt(id,mid)}</td>
+      <td class="r dim">—</td><td class="r dim">—</td>
+      <td class="r ${pcc(q.pct)}">${pct(q.pct)}</td>
+      <td class="r dim">${q.hv30!=null?q.hv30.toFixed(1)+'%':'—'}</td></tr>`;
+  });
+  tb.innerHTML=h;
+}
+
+/* ── RENDER: VOL SURFACE ────────────────────────────────────────── */
+/* ATM uses HV30 as proxy — labeled per GUIDELINES §Data Integrity */
+function renderVol(pair){
+  activePair=pair;
+  document.querySelectorAll('.vps-btn').forEach(b=>b.classList.toggle('active',b.dataset.p===pair));
+  document.querySelectorAll('.fx-r').forEach(r=>r.classList.remove('fx-sel'));
+  const sr=document.getElementById('fr-'+pair.toLowerCase());if(sr)sr.classList.add('fx-sel');
+  const q=Q[pair.toLowerCase()]||{};const hv=q.hv30;
+  const rr=RR2[pair]||{};
+  const tb=document.getElementById('vol-tbody');if(!tb)return;
+  const tenors=['1W','1M','3M','6M','9M','1Y'];
+  // HV30 scaling factors by tenor (term structure proxy)
+  const sc={'1W':0.92,'1M':1.00,'3M':1.06,'6M':1.10,'9M':1.12,'1Y':1.14};
+  let h='';
+  tenors.forEach(t=>{
+    const atm=hv!=null?(hv*(sc[t]||1)).toFixed(2)+'%':'—';
+    const v=rr[t]; const rrc=v!=null?(v>0?'up':v<0?'dn':'neu'):'neu';
+    const rvol=hv!=null&&v!=null?(hv*(sc[t]||1)*0.95).toFixed(2)+'%':'—';
+    h+=`<tr><td class="amb bld">${t}</td><td class="r bld w">${atm}</td>
+      <td class="r ${rrc} bld">${v!=null?(v>=0?'+':'')+v.toFixed(2):'—'}</td>
+      <td class="r dim">${rvol}</td></tr>`;
+  });
+  tb.innerHTML=h;
+  const src=document.getElementById('vol-src');
+  if(src)src.textContent=`ATM: HV30 est. · 25d RR: rr-data/rr2.json (Saxo Bank indicative · 1M tenor)`;
+  const ttl=document.getElementById('vol-ttl');
+  if(ttl)ttl.textContent=`Vol Structure — ${pair.slice(0,3)}/${pair.slice(3)}`;
+}
+
+/* ── RENDER: CB RATES ───────────────────────────────────────────── */
+function renderCBRates(){
+  const tb=document.getElementById('cb-tbody');if(!tb)return;
+  tb.innerHTML=CB_LIST.map(({ccy,sh})=>{
+    const r=RATES[ccy];const rate=r?r.v:null;
+    const m=MEET[ccy]||{};const eco=ECO[ccy]||{};
+    // Trend from rateMomentum (not naive compare) per GUIDELINES
+    const mom=eco.rateMomentum;
+    let trend='flat';
+    if(mom!=null){if(mom>0.09)trend='up';else if(mom<-0.09)trend='dn';}
+    const arrow=trend==='up'?'↑':trend==='dn'?'↓':'→';
+    const arCls=trend==='up'?'tr-up':trend==='dn'?'tr-dn':'tr-flat';
+    const rCls=trend==='up'?'up bld':trend==='dn'?'dn bld':'w bld';
+    const bias=m.bias||'hold';
+    const bpCls=bias==='cut'?'bp-cut':bias==='hike'?'bp-hike':'bp-hold';
+    const biasLbl=bias==='cut'?'↓ Cut':bias==='hike'?'↑ Hike':'→ Hold';
+    const meth=m.biasMethod?`<span class="dim"> ${m.biasMethod}</span>`:'';
+    const cutP=m.cutProb!=null?m.cutProb+'%':'—';
+    const hikeP=m.hikeProb!=null?m.hikeProb+'%':'—';
+    const nxt=m.nextMeeting||'—';
+    return`<tr>
+      <td class="amb bld">${sh}</td>
+      <td class="r ${rCls}">${rate!=null?rate.toFixed(2)+'%':'—'}</td>
+      <td class="r ${arCls}">${arrow}</td>
+      <td class="r dim" style="font-size:8.5px">${nxt}</td>
+      <td class="r"><span class="bp ${bpCls}">${biasLbl}</span>${meth}</td>
+      <td class="r dn">${cutP}</td>
+      <td class="r up">${hikeP}</td></tr>`;
   }).join('');
 }
 
-/* ── Render Yield Curve ────────────────────────────────────── */
-function renderYieldCurve() {
-  const canvas = document.getElementById('yc-canvas');
-  if (!canvas) return;
-  const tenors = [
-    {key:'us3m',  label:'3M', months:3},
-    {key:'us2y',  label:'2Y', months:24},
-    {key:'us5y',  label:'5Y', months:60},
-    {key:'us10y', label:'10Y',months:120},
-    {key:'us30y', label:'30Y',months:360},
-  ];
-  const rates = tenors.map(t => {
-    const q = _quotes[t.key];
-    return {label: t.label, value: q ? q.close : null, months: t.months};
+/* ── RENDER: CROSS-ASSET RISK ───────────────────────────────────── */
+function computeStress(){
+  const vix=Q.vix?.close; const gold=Q.gold?.pct; const spx=Q.spx?.pct;
+  const move=Q.move?.close; const t10=Q.us10y?.close; const t3m=Q.us3m?.close;
+  let s=0,f=[];
+  if(vix>30){s+=3;f.push('VIX>30');}else if(vix>25){s+=2;f.push('VIX>25');}else if(vix>18){s+=1;f.push('VIX>18');}
+  if(t10&&t3m&&t10<t3m){s+=1;f.push('Curve inverted');}
+  if(gold>2){s+=1;f.push('Gold>+2%');}
+  if(spx<-1.5){s+=1;f.push('SPX<-1.5%');}
+  if(move>100){s+=1;f.push('MOVE>100');}
+  return{s,f,lbl:s>=4?'RISK-OFF':s>=2?'CAUTION':s>=1?'MIXED':'RISK-ON'};
+}
+function renderRisk(){
+  const{s,f,lbl}=computeStress();
+  const badge=document.getElementById('risk-badge');
+  if(badge){const c=lbl==='RISK-ON'?'rb-on':lbl==='MIXED'?'rb-mx':lbl==='CAUTION'?'rb-ca':'rb-off';badge.className='ph-badge '+c;badge.textContent=lbl;}
+  const ss=document.getElementById('stress-sc');if(ss)ss.textContent=`${s}/8`;
+  const sf=document.getElementById('stress-factors');if(sf)sf.textContent=f.length?f.join(' · '):'No active factors';
+  const tb=document.getElementById('risk-tbody');if(!tb)return;
+  let h='',lastSec=null;
+  CA_ROWS.forEach(({k,lb,f:ff,u,sec})=>{
+    if(sec&&sec!==lastSec){h+=`<tr class="t-sec"><td colspan="4">${sec}</td></tr>`;lastSec=sec;}
+    const q=Q[k];
+    if(!q){h+=`<tr><td class="dim">${lb}</td><td class="r dim">—</td><td class="r dim">—</td><td class="r dim">—</td></tr>`;return;}
+    h+=`<tr><td class="dim">${lb}</td><td class="r bld w">${fv(q.close,ff,u||'')}</td>
+      <td class="r ${pcc(q.pct)}">${pct(q.pct)}</td>
+      <td class="r ${pcc(q.pct1w)} dim">${pct(q.pct1w)}</td></tr>`;
   });
-  const valid = rates.filter(r => r.value != null);
-  if (valid.length < 2) return;
-  const W = canvas.offsetWidth || 400;
-  const H = canvas.offsetHeight || 160;
-  const pad = {t:15, r:15, b:28, l:38};
-  const cw = W - pad.l - pad.r;
-  const ch = H - pad.t - pad.b;
-  const minY = Math.min(...valid.map(r => r.value)) * 0.97;
-  const maxY = Math.max(...valid.map(r => r.value)) * 1.03;
-  const scaleX = m => pad.l + (m / 360) * cw;
-  const scaleY = v => pad.t + (1 - (v - minY)/(maxY - minY)) * ch;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, W, H);
-  // grid
-  ctx.strokeStyle = '#1a1e26'; ctx.lineWidth = 1;
-  for (let i = 0; i <= 4; i++) {
-    const y = pad.t + (ch / 4) * i;
-    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
-  }
-  // gradient fill
-  const grad = ctx.createLinearGradient(0, pad.t, 0, H - pad.b);
-  grad.addColorStop(0, 'rgba(59,130,246,0.25)');
-  grad.addColorStop(1, 'rgba(59,130,246,0)');
-  ctx.beginPath();
-  ctx.moveTo(scaleX(valid[0].months), scaleY(valid[0].value));
-  for (let i = 1; i < valid.length; i++) {
-    ctx.lineTo(scaleX(valid[i].months), scaleY(valid[i].value));
-  }
-  ctx.lineTo(scaleX(valid[valid.length-1].months), H - pad.b);
-  ctx.lineTo(scaleX(valid[0].months), H - pad.b);
-  ctx.closePath();
-  ctx.fillStyle = grad; ctx.fill();
-  // line
-  ctx.beginPath();
-  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 1.5;
-  ctx.moveTo(scaleX(valid[0].months), scaleY(valid[0].value));
-  for (let i = 1; i < valid.length; i++) {
-    ctx.lineTo(scaleX(valid[i].months), scaleY(valid[i].value));
-  }
-  ctx.stroke();
-  // dots + labels
-  ctx.fillStyle = '#3b82f6';
-  ctx.font = '8px JetBrains Mono, Consolas, monospace';
-  valid.forEach(r => {
-    const x = scaleX(r.months);
-    const y = scaleY(r.value);
-    ctx.beginPath(); ctx.arc(x, y, 2.5, 0, 2*Math.PI); ctx.fill();
-    ctx.fillStyle = '#8b95a6';
-    ctx.textAlign = 'center';
-    ctx.fillText(r.label, x, H - pad.b + 10);
-    ctx.fillStyle = '#e2e8f0';
-    ctx.fillText(r.value.toFixed(2) + '%', x, y - 6);
-    ctx.fillStyle = '#3b82f6';
+  tb.innerHTML=h;
+}
+
+/* ── RENDER: COT ────────────────────────────────────────────────── */
+function renderCOT(){
+  const tb=document.getElementById('cot-tbody');if(!tb)return;
+  let maxAbs=1;
+  COT_CCYS.forEach(c=>{const d=COT[c];if(d?.netPosition!=null)maxAbs=Math.max(maxAbs,Math.abs(d.netPosition));});
+  tb.innerHTML=COT_CCYS.map(ccy=>{
+    const d=COT[ccy]||{};const net=d.netPosition;
+    const hist=d.history||[];let wow=null;
+    if(hist.length>=2){const cur=hist[hist.length-1];const prev=hist[hist.length-2];
+      if(cur?.levNet!=null&&prev?.levNet!=null)wow=cur.levNet-prev.levNet;}
+    const L=d.longPositions||0;const S=d.shortPositions||0;
+    const tot=L+S;const pctOI=tot>0&&net!=null?((net/tot)*100).toFixed(1)+'%':'—';
+    const nc=net!=null?(net>0?'up':net<0?'dn':'neu'):'neu';
+    const wc=wow!=null?pcc(wow):'neu';
+    const bp=net!=null?Math.round(Math.min((Math.abs(net)/maxAbs)*48,48)):0;
+    const bd=net!=null&&net>=0?'pos':'neg';
+    return`<tr>
+      <td class="amb bld">${ccy}</td>
+      <td class="r ${nc} bld">${sgn(net)}</td>
+      <td><div class="cot-bar-wrap"><div class="cot-mid"></div><div class="cot-fill ${bd}" style="width:${bp}%"></div></div></td>
+      <td class="r ${wc} dim">${sgn(wow)}</td>
+      <td class="r dim">${pctOI}</td>
+      <td class="r dim" style="font-size:8px">${(d.weekEnding||'').slice(5)||'—'}</td></tr>`;
+  }).join('');
+}
+
+/* ── RENDER: YIELD CURVE ────────────────────────────────────────── */
+function renderYC(){
+  const canvas=document.getElementById('yc-canvas');if(!canvas)return;
+  const pts=YC_TEN.map(({k,lb,mo})=>{const q=Q[k];return q?{lb,mo,v:q.close,chg:q.chg||0}:null;}).filter(Boolean);
+  // Small yield table
+  const tb=document.getElementById('yc-tb');
+  if(tb)tb.innerHTML=YC_TEN.map(({k,lb})=>{
+    const q=Q[k];if(!q)return`<tr><td class="dim">${lb}</td><td class="r dim">—</td><td class="r dim">—</td></tr>`;
+    const c=q.chg||q.pct||0;
+    return`<tr><td class="dim">${lb}</td><td class="r bld">${q.close.toFixed(3)}%</td><td class="r ${pcc(c)} dim">${c>=0?'+':''}${c.toFixed(3)}</td></tr>`;
+  }).join('');
+  if(pts.length<2)return;
+  const W=canvas.offsetWidth;const H=canvas.offsetHeight;
+  if(!W||!H)return;
+  canvas.width=W;canvas.height=H;
+  const PAD={t:18,r:10,b:20,l:34};
+  const CW=W-PAD.l-PAD.r;const CH=H-PAD.t-PAD.b;
+  const vMin=Math.min(...pts.map(p=>p.v))*0.975;
+  const vMax=Math.max(...pts.map(p=>p.v))*1.025;
+  const sx=mo=>PAD.l+(mo/360)*CW;
+  const sy=v=>PAD.t+(1-(v-vMin)/(vMax-vMin))*CH;
+  const ctx=canvas.getContext('2d');ctx.clearRect(0,0,W,H);
+  const inv=Q.us10y?.close<Q.us3m?.close;
+  const cc=inv?'#ff6622':'#2a6aff';
+  // Grid
+  ctx.strokeStyle='#0e1218';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=PAD.t+(CH/4)*i;ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();}
+  // Fill
+  const g=ctx.createLinearGradient(0,PAD.t,0,H);
+  g.addColorStop(0,inv?'rgba(255,102,34,0.14)':'rgba(42,106,255,0.14)');
+  g.addColorStop(1,inv?'rgba(255,102,34,0)':'rgba(42,106,255,0)');
+  ctx.beginPath();ctx.moveTo(sx(pts[0].mo),sy(pts[0].v));
+  pts.slice(1).forEach(p=>ctx.lineTo(sx(p.mo),sy(p.v)));
+  ctx.lineTo(sx(pts[pts.length-1].mo),H-PAD.b);ctx.lineTo(sx(pts[0].mo),H-PAD.b);
+  ctx.closePath();ctx.fillStyle=g;ctx.fill();
+  // Line
+  ctx.beginPath();ctx.strokeStyle=cc;ctx.lineWidth=1.6;
+  ctx.moveTo(sx(pts[0].mo),sy(pts[0].v));pts.slice(1).forEach(p=>ctx.lineTo(sx(p.mo),sy(p.v)));ctx.stroke();
+  // Dots + labels
+  ctx.font='7.5px Consolas,monospace';
+  pts.forEach(p=>{
+    const x=sx(p.mo);const y=sy(p.v);
+    ctx.fillStyle=cc;ctx.beginPath();ctx.arc(x,y,2.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#3e4a5c';ctx.textAlign='center';ctx.fillText(p.lb,x,H-PAD.b+9);
+    ctx.fillStyle='#8090a8';ctx.fillText(p.v.toFixed(2),x,y-4);
   });
-  // Y axis labels
-  ctx.fillStyle = '#5a6275'; ctx.textAlign = 'right';
-  for (let i = 0; i <= 4; i++) {
-    const v = minY + (maxY - minY) * (1 - i/4);
-    const y = pad.t + (ch / 4) * i;
-    ctx.fillText(v.toFixed(2), pad.l - 3, y + 3);
-  }
+  // Y axis
+  ctx.textAlign='right';
+  for(let i=0;i<=4;i++){const v=vMin+(vMax-vMin)*(1-i/4);ctx.fillStyle='#2a3040';ctx.fillText(v.toFixed(2),PAD.l-3,PAD.t+(CH/4)*i+3);}
   // Spread annotation
-  const s3m = _quotes['us3m'] && _quotes['us3m'].close;
-  const s10y = _quotes['us10y'] && _quotes['us10y'].close;
-  if (s3m && s10y) {
-    const spread = (s10y - s3m).toFixed(0);
-    const cls = s10y > s3m ? '#22c55e' : '#ef4444';
-    ctx.fillStyle = cls;
-    ctx.textAlign = 'right';
-    ctx.font = '8px JetBrains Mono, Consolas, monospace';
-    ctx.fillText(`10Y-3M: ${spread >= 0 ? '+' : ''}${spread}bp`, W - pad.r, pad.t + 10);
+  if(Q.us10y?.close&&Q.us3m?.close){
+    const sp=((Q.us10y.close-Q.us3m.close)*100).toFixed(0);
+    ctx.textAlign='right';ctx.fillStyle=inv?'#ff6622':'#2a4a7a';
+    ctx.fillText(inv?`INVERTED  10Y-3M: ${sp}bp`:`10Y-3M: +${sp}bp`,W-PAD.r,PAD.t+11);
   }
 }
 
-/* ── Select pair & update chart ────────────────────────────── */
-function selectPair(pair) {
-  _selectedPair = pair;
-  renderFXWatchlist();
-  updateChartLabel();
-  loadTVChart(pair);
-}
-
-function updateChartLabel() {
-  const q = _quotes[_selectedPair];
-  const lbl = FX_LABELS[_selectedPair] || _selectedPair.toUpperCase();
-  const el = document.getElementById('chart-pair-label');
-  const pel = document.getElementById('chart-price-label');
-  const cel = document.getElementById('chart-chg-label');
-  if (el) el.textContent = lbl;
-  if (q && pel) {
-    pel.textContent = fmtPair(_selectedPair, q.close);
-    const pct = q.pct || 0;
-    if (cel) {
-      cel.className = 'chart-chg-label ' + (pct > 0 ? 'up' : pct < 0 ? 'dn' : 'neu');
-      cel.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(3) + '%';
-    }
-  }
-}
-
-/* ── TradingView Chart ─────────────────────────────────────── */
-let _tvInterval = '60';
-function loadTVChart(pair) {
-  const wrap = document.getElementById('tv-chart-wrap');
-  if (!wrap) return;
-  const sym = pair.toUpperCase();
-  const script = document.createElement('script');
-  wrap.innerHTML = '<div class="tradingview-widget-container" style="height:100%;width:100%"><div id="tv-widget" style="height:100%;"></div></div>';
-  const s = document.createElement('script');
-  s.src = 'https://s3.tradingview.com/tv.js';
-  s.onload = function() {
-    // eslint-disable-next-line no-undef
-    new TradingView.widget({
-      container_id: 'tv-widget',
-      autosize: true,
-      symbol: 'FX:' + sym,
-      interval: _tvInterval,
-      timezone: 'UTC',
-      theme: 'dark',
-      style: '1',
-      locale: 'en',
-      toolbar_bg: '#000000',
-      enable_publishing: false,
-      hide_top_toolbar: false,
-      hide_legend: false,
-      save_image: false,
-      backgroundColor: '#000000',
-      gridColor: 'rgba(26,30,38,0.5)',
-      hide_side_toolbar: false,
-    });
-  };
-  wrap.appendChild(s);
-}
-
-/* ── FX Tab switching ──────────────────────────────────────── */
-function setFXTab(tab) {
-  _fxTab = tab;
-  document.querySelectorAll('.fx-tab').forEach(t => t.classList.remove('active'));
-  const el = document.getElementById('fxtab-' + tab);
-  if (el) el.classList.add('active');
-  renderFXWatchlist();
-}
-
-/* ── Lower panel tab switching ─────────────────────────────── */
-function setLowerTab(tab) {
-  _lowerTab = tab;
-  document.querySelectorAll('.lower-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.lower-content').forEach(t => t.classList.remove('active'));
-  const btn = document.getElementById('ltab-' + tab);
-  if (btn) btn.classList.add('active');
-  const content = document.getElementById('lcontent-' + tab);
-  if (content) content.classList.add('active');
-  if (tab === 'yieldcurve') {
-    requestAnimationFrame(renderYieldCurve);
-  }
-}
-
-/* ── Risk Score ─────────────────────────────────────────────── */
-function computeRiskScore() {
-  let score = 0;
-  const vix = _quotes['vix'] && _quotes['vix'].close;
-  const gold = _quotes['gold'] && _quotes['gold'].pct;
-  const spx  = _quotes['spx']  && _quotes['spx'].pct;
-  const move = _quotes['move'] && _quotes['move'].close;
-  const us10y = _quotes['us10y'] && _quotes['us10y'].close;
-  const us3m  = _quotes['us3m']  && _quotes['us3m'].close;
-  if (vix > 30) score += 3;
-  else if (vix > 25) score += 2;
-  else if (vix > 18) score += 1;
-  if (us10y && us3m && us10y < us3m) score += 1;
-  if (gold > 2.0) score += 1;
-  if (spx < -1.5) score += 1;
-  if (move > 100) score += 1;
-  if (score >= 4) return {label:'RISK-OFF', score};
-  if (score >= 2) return {label:'CAUTION', score};
-  if (score >= 1) return {label:'MIXED', score};
-  return {label:'RISK-ON', score};
-}
-
-function renderRiskBadge() {
-  const el = document.getElementById('risk-regime');
-  if (!el) return;
-  const {label, score} = computeRiskScore();
-  el.className = 'regime-badge regime-' + label.replace(' ','-');
-  el.textContent = label + ' ·' + score;
-}
-
-function renderRiskRows() {
-  const wrap = document.getElementById('risk-rows');
-  if (!wrap) return;
-  const items = [
-    {label:'VIX',        key:'vix',   suf:''},
-    {label:'MOVE Index', key:'move',  suf:''},
-    {label:'Gold 1D%',   key:'gold',  pct:true},
-    {label:'S&P 500 1D%',key:'spx',   pct:true},
-    {label:'DXY',        key:'dxy',   suf:''},
-    {label:'BTC',        key:'btc',   suf:''},
-  ];
-  wrap.innerHTML = items.map(({label, key, pct: isPct, suf}) => {
-    const q = _quotes[key];
-    if (!q) return `<div class="risk-row"><span class="risk-label">${label}</span><span class="risk-val dim">—</span></div>`;
-    const v = isPct ? (q.pct || 0) : q.close;
-    const cls = isPct ? colorCls(v) : 'neu';
-    const vStr = isPct ? (v >= 0 ? '+' : '') + v.toFixed(2) + '%' : v.toLocaleString('en-US', {maximumFractionDigits:2}) + suf;
-    return `<div class="risk-row"><span class="risk-label">${label}</span><span class="risk-val ${cls}">${vStr}</span></div>`;
+/* ── RENDER: SIGNALS ────────────────────────────────────────────── */
+function renderSigs(){
+  const el=document.getElementById('sigs-wire');if(!el)return;
+  if(!SIGS.length){el.innerHTML='<div style="padding:12px 6px;color:#2a3040;font-size:9px;">No signals available</div>';return;}
+  const pc={critical:'sig-crit',warning:'sig-warn',info:'sig-info'};
+  const pl={critical:'[CRIT]',warning:'[WARN]',info:'[INFO]'};
+  el.innerHTML=SIGS.map(s=>{
+    const body=(s.text||'').slice(0,240);
+    return`<div class="sig-item">
+      <div class="sig-hd"><span class="sig-time">${s.time||'—'}</span><span class="${pc[s.priority]||'sig-info'}">${pl[s.priority]||'[INFO]'}</span><span class="sig-title"> ${s.title||''}</span></div>
+      <div class="sig-body">${body}${body.length===240?'…':''}</div></div>`;
   }).join('');
 }
 
-/* ── RR Table (in right panel) ─────────────────────────────── */
-function renderRRTable() {
-  const tbody = document.getElementById('rr-tbody');
-  if (!tbody) return;
-  const pairs = ['EURUSD','USDJPY','GBPUSD','AUDUSD','USDCAD','USDCHF','EURJPY'];
-  tbody.innerHTML = pairs.map(p => {
-    const d = _rr[p];
-    if (!d) return `<tr><td class="sym">${p.slice(0,3)}/${p.slice(3)}</td><td class="r dim" colspan="2">—</td></tr>`;
-    const rr = d.rr25d;
-    const cls = rr > 0 ? 'up' : rr < 0 ? 'dn' : 'neu';
-    const str = (rr >= 0 ? '+' : '') + rr.toFixed(2);
-    return `<tr>
-      <td class="sym">${p.slice(0,3)}/${p.slice(3)}</td>
-      <td class="r ${cls} bold">${str}</td>
-      <td class="r dim">${d.tenor || '1M'}</td>
-    </tr>`;
+/* ── RENDER: MACRO SNAPSHOT ─────────────────────────────────────── */
+function renderMacro(){
+  const tb=document.getElementById('macro-tbody');if(!tb)return;
+  tb.innerHTML=CB_LIST.map(({ccy,sh})=>{
+    const r=RATES[ccy];const eco=ECO[ccy]||{};
+    const rate=r?r.v:null;const infl=eco.inflation;const gdp=eco.gdpGrowth;const b10=eco.bond10y;
+    const ic=infl!=null?(infl>3?'dn':infl<1?'up':'w'):'dim';
+    return`<tr>
+      <td class="amb bld">${sh}</td>
+      <td class="r bld">${rate!=null?rate.toFixed(2)+'%':'—'}</td>
+      <td class="r ${ic}">${infl!=null?infl.toFixed(1)+'%':'—'}</td>
+      <td class="r ${pcc(gdp)}">${gdp!=null?(gdp>=0?'+':'')+gdp.toFixed(1)+'%':'—'}</td>
+      <td class="r dim">${b10!=null?b10.toFixed(2)+'%':'—'}</td></tr>`;
   }).join('');
 }
 
-/* ── Full render ───────────────────────────────────────────── */
-function renderAll() {
-  renderQuotebar();
-  renderFXWatchlist();
-  renderCrossAsset();
-  renderCBRates();
-  renderCOT();
-  renderRiskBadge();
-  renderRiskRows();
-  renderRRTable();
-  updateChartLabel();
-  if (_lowerTab === 'yieldcurve') renderYieldCurve();
+/* ── CLOCK ──────────────────────────────────────────────────────── */
+function startClock(){
+  const el=document.getElementById('cmd-clock');if(!el)return;
+  const tick=()=>{const n=new Date();el.textContent=`${p2(n.getUTCHours())}:${p2(n.getUTCMinutes())}:${p2(n.getUTCSeconds())} UTC`;};
+  tick();setInterval(tick,1000);
+}
+function updateUpd(d){
+  const el=document.getElementById('cmd-upd');if(!el||!d)return;
+  const t=new Date(d);el.textContent=`Data: ${p2(t.getUTCHours())}:${p2(t.getUTCMinutes())} UTC`;
 }
 
-/* ── Boot ───────────────────────────────────────────────────── */
-async function boot() {
-  // Load all data in parallel
-  await Promise.all([loadQuotes(), loadMeetings(), loadRates(), loadCOT(), loadRR()]);
-  renderAll();
-  // Refresh every 5 minutes
-  setInterval(async () => {
-    await loadQuotes();
-    renderAll();
-  }, 5 * 60 * 1000);
-  // Slow refresh for static data
-  setInterval(async () => {
-    await Promise.all([loadMeetings(), loadRates(), loadCOT(), loadRR()]);
-    renderAll();
-  }, 60 * 60 * 1000);
-  // Resize observer for yield curve canvas
-  const canvas = document.getElementById('yc-canvas');
-  if (canvas) {
-    const ro = new ResizeObserver(() => {
-      if (_lowerTab === 'yieldcurve') renderYieldCurve();
-    });
-    ro.observe(canvas);
-  }
+/* ── FLASH CHANGED ROWS ─────────────────────────────────────────── */
+function flashRows(){
+  [...G10,...CROSS].forEach(({id})=>{
+    const p=prevQ[id];const c=Q[id];if(!p||!c)return;
+    const pp=p.bid??p.close;const cp=c.bid??c.close;
+    if(pp==null||cp==null||pp===cp)return;
+    const row=document.getElementById('fr-'+id);if(!row)return;
+    row.classList.remove('f-up','f-dn');void row.offsetWidth;
+    row.classList.add(cp>pp?'f-up':'f-dn');
+  });
 }
 
-document.addEventListener('DOMContentLoaded', boot);
+/* ── RENDER ALL ─────────────────────────────────────────────────── */
+function renderAll(){
+  renderTicker();renderSpot();renderVol(activePair);
+  renderCBRates();renderRisk();renderCOT();renderYC();
+  renderSigs();renderMacro();
+}
 
-// Expose globals for inline event handlers and cross-script access
-window.selectPair  = selectPair;
-window.setFXTab    = setFXTab;
-window.setLowerTab = setLowerTab;
-window.loadTVChart = loadTVChart;
-window.renderAll   = renderAll;
-window.renderRRTable = renderRRTable;
+/* ── PUBLIC API ─────────────────────────────────────────────────── */
+function pairClick(p){
+  if(RR_PAIRS.includes(p))renderVol(p);
+  const inp=document.getElementById('bbg-input');
+  if(inp)inp.value=`FXIP ${p} <GO>`;
+}
+function ctabClick(el,cmd){
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const inp=document.getElementById('bbg-input');if(inp)inp.value=cmd+' <GO>';
+}
+window.pairClick=pairClick;window.ctabClick=ctabClick;
 
-// Expose state references
-Object.defineProperty(window, '_quotes',   { get: () => _quotes });
-Object.defineProperty(window, '_rr',       { get: () => _rr });
-Object.defineProperty(window, '_meetings', { get: () => _meetings });
-Object.defineProperty(window, '_rates',    { get: () => _rates });
-Object.defineProperty(window, '_cot',      { get: () => _cot });
-Object.defineProperty(window, '_selectedPair', {
-  get: () => _selectedPair,
-  set: v => { _selectedPair = v; }
-});
+/* ── REFRESH ────────────────────────────────────────────────────── */
+async function refreshFast(){
+  const d=await loadQ();if(d)updateUpd(d.generated_at||d.timestamp);
+  renderTicker();renderSpot();renderRisk();renderYC();flashRows();
+}
+async function refreshSlow(){
+  await Promise.all([loadMeet(),loadRates(),loadCOT(),loadRR2(),loadSigs(),loadEco()]);
+  renderCBRates();renderCOT();renderVol(activePair);renderSigs();renderMacro();
+}
+
+/* ── BOOT ────────────────────────────────────────────────────────── */
+async function boot(){
+  const d=await loadQ();if(d)updateUpd(d.generated_at||d.timestamp);
+  await Promise.all([loadMeet(),loadRates(),loadCOT(),loadRR2(),loadSigs(),loadEco()]);
+  renderAll();startClock();
+  window.addEventListener('resize',renderYC);
+  setInterval(refreshFast,5*60*1000);
+  setInterval(refreshSlow,60*60*1000);
+}
+document.addEventListener('DOMContentLoaded',boot);
