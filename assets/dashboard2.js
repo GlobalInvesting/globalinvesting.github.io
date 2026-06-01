@@ -6082,10 +6082,12 @@ function openPairDetailPanel(tvSym) {
     return;
   }
 
-  // Lock out loadTVChart's scrollIntoView for 600ms so it can't scroll the panel out of view.
+  // Lock out loadTVChart's scrollIntoView for as long as the panel is visible.
+  // Lock is released only in closePairDetailPanel — not on a timer.
+  // This prevents the chart from scrolling back into view after async chart renders
+  // (e.g. _renderLWChart .then() firing 600ms+ after click on slow connections).
   _pdpScrollLock = true;
   clearTimeout(openPairDetailPanel._unlockTimer);
-  openPairDetailPanel._unlockTimer = setTimeout(() => { _pdpScrollLock = false; }, 600);
 
   panel.dataset.sym = tvSym;
   panel.style.display = 'flex';
@@ -6144,6 +6146,7 @@ function closePairPopover() { closePairDetailPanel(); }
 function closePairDetailPanel() {
   const panel = document.getElementById('pair-detail-panel');
   if (panel) { panel.style.display = 'none'; panel.dataset.sym = ''; }
+  _pdpScrollLock = false;  // release scroll lock so chart nav resumes normally
 }
 
 // Tab init — attaches click handlers once
@@ -6182,12 +6185,13 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePairDetailPanel();
 });
 
-// ── Sidebar crosses: single click → chart + inline detail (same pattern as majors table) ──
+// ── Sidebar crosses: single click → chart + pair detail panel ──
 document.getElementById('sidebar')?.addEventListener('click', e => {
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
-  loadTVChart(row.dataset.sym);
+  // Open panel FIRST to set _pdpScrollLock=true before loadTVChart fires scrollIntoView.
   openPairDetailPanel(row.dataset.sym);
+  loadTVChart(row.dataset.sym);
 });
 
 function toggleSidebarDetail(row) {
@@ -6230,8 +6234,9 @@ function toggleSidebarDetail(row) {
 document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
   const row = e.target.closest('tr[data-sym]');
   if (!row) return;
-  loadTVChart(row.dataset.sym);
+  // Open panel FIRST to set _pdpScrollLock=true before loadTVChart fires scrollIntoView.
   openPairDetailPanel(row.dataset.sym);
+  loadTVChart(row.dataset.sym);
 });
 
 // ── Cross-Asset cells: click to open chart (US 10Y excluded — no TV symbol) ──
