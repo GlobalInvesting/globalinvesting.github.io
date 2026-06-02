@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-02T20:32:15Z",
-  "generatedAt": "2026-06-02T20:32:15Z",
+  "lastUpdate": "2026-06-02T20:53:01Z",
+  "generatedAt": "2026-06-02T20:53:01Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,19 +9,19 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-02",
   "rangeTo": "2026-06-16",
-  "totalEvents": 1649,
+  "totalEvents": 1650,
   "currencyCounts": {
     "CAD": 131,
     "CHF": 89,
     "USD": 628,
     "AUD": 176,
     "JPY": 183,
-    "GBP": 179,
+    "GBP": 180,
     "NZD": 77,
     "EUR": 186
   },
   "impactCounts": {
-    "medium": 1119,
+    "medium": 1120,
     "low": 146,
     "high": 384
   },
@@ -407,9 +407,9 @@
       "std": 0.50346
     },
     "USD/api crude oil stock change": {
-      "n": 3,
-      "mean": -3.846,
-      "std": 2.871785
+      "n": 4,
+      "mean": -3.672,
+      "std": 2.370486
     },
     "USD/eia gasoline stocks change": {
       "n": 4,
@@ -20503,6 +20503,19 @@
       "date": "2 Jun",
       "dateISO": "2026-06-02",
       "timeUTC": "14:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE Gov Bailey Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "2 Jun",
+      "dateISO": "2026-06-02",
+      "timeUTC": "14:00",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
@@ -20521,7 +20534,7 @@
       "flag": "🇺🇸",
       "event": "API Crude Oil Stock Change",
       "impact": "medium",
-      "actual": null,
+      "actual": "-6.75",
       "forecast": "-3.6",
       "previous": "-2.8"
     },
