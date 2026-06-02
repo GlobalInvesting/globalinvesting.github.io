@@ -11322,8 +11322,10 @@ function initNewsNav() {
   function showNews() {
     Array.from(splitLowerRight.children).forEach(el => {
       if (el.id !== 'section-news') {
-        const originalDisplay = el.style.display || window.getComputedStyle(el).display;
-        el.dataset.newsHidden = originalDisplay === 'none' ? 'none' : (el.style.display || '');
+        // Store only the inline style value ('' means no inline override — CSS controls it).
+        // Never read getComputedStyle here: that can return 'none' for CSS-hidden elements
+        // and cause them to be permanently hidden with display:none after restoring.
+        el.dataset.newsHidden = el.style.display;
         el.style.display = 'none';
       }
     });
@@ -11337,8 +11339,9 @@ function initNewsNav() {
   function hideNews() {
     newsSection.style.display = 'none';
     splitLowerRight.querySelectorAll('[data-news-hidden]').forEach(el => {
-      const saved = el.dataset.newsHidden;
-      el.style.display = saved === '' ? '' : saved;
+      // Restore the exact inline style that was saved ('' clears any inline override,
+      // letting the stylesheet take over again — prevents the black/blank right panel).
+      el.style.display = el.dataset.newsHidden;
       delete el.dataset.newsHidden;
     });
     // Repaint canvases after display restore (same double-rAF pattern as Derivatives)
@@ -11360,6 +11363,10 @@ function initNewsNav() {
             }
           }
         }
+        // Repaint any canvas elements in the right panel that may have gone blank
+        splitLowerRight.querySelectorAll('canvas').forEach(c => {
+          c.dispatchEvent(new Event('resize'));
+        });
       });
     });
   }
