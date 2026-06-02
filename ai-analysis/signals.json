@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-06-02T11:01:12Z",
+  "generated_at": "2026-06-02T18:15:03Z",
   "signals": [
     {
-      "time": "11:00",
+      "time": "18:13",
       "priority": "critical",
-      "title": "EUR/USD — Macro Divergence + Volatility",
-      "text": "Eurozone CPI accelerated to 3.2% in May with Core topping forecasts at 2.5%, prompting ECB's Rehn to frame a June move as an 'insurance' hike. This hawkish shift contradicts the current EUR COT LF net short of -26,311, creating significant short-squeeze risk. Despite the 175bp Fed-ECB carry advantage favoring USD, EUR/USD IV at 7.1% vs HV30 at 4.0% (VRP +3.1%) signals the options market is aggressively pricing protection against a trend break. EUR/USD at 1.1650.",
+      "title": "USD/JPY — Intervention Risk + Carry + Retail Divergence",
+      "text": "USD/JPY at 159.97 testing the 160.00 psychological and intervention threshold. Despite hawkish Fed rhetoric from Cleveland's Hammack and a +290bp OIS carry advantage (SOFR 3.63% vs TONA 0.73%), the pair faces acute reversal risk as markets demand more than a 'token' BoJ hike. Retail sentiment is 78% short, diverging from COT LF net short -86,249; institutional carry-chasing is meeting extreme retail fading at the BoJ's 'red line'. Sustained trade above 160.00 triggers intervention warnings.",
       "evidence": [
-        "Eurozone CPI: 3.2% (May)",
-        "EUR COT LF Net: -26,311",
-        "EUR/USD VRP: +3.1%"
+        "USD/JPY: 159.97",
+        "OIS Carry: +290bp",
+        "Retail: 78% Short"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "10:57",
+      "time": "18:10",
       "priority": "warning",
-      "title": "USD/JPY — Intervention Risk + Carry",
-      "text": "USD/JPY at 159.716 remains within the critical 160.00 intervention zone previously flagged by the BoJ. While the +300bp Fed-BoJ carry sustains the bid, the 25d RR at -1.06 (moderate put skew) confirms institutional hedging against a sharp JPY reversal. JPY COT LF net short at -86,249 represents a crowded carry trade vulnerable to verbal or physical intervention. Carry remains the dominant driver until VIX exceeds 25.",
+      "title": "EUR/USD — ECB Hike Bias + Vol Premium",
+      "text": "EUR/USD at 1.1623 remains under pressure from a +175bp USD carry advantage (Fed 3.75% vs ECB 2.0%), but TIER-1 headlines from Commerzbank and SocGen signal an 'inevitable' ECB hike due to 3.2% services inflation. Options markets are pricing a significant 3.0 vol-pt premium (IV 7.1% vs HV30 4.0%), indicating heavy hedging demand against a hawkish ECB shift. COT LF net short -26,311 suggests specs are poorly positioned for a hawkish surprise at the June 11 meeting.",
       "evidence": [
-        "USD/JPY: 159.716",
-        "USD/JPY 25d RR: -1.06",
-        "Fed-BoJ Carry: +300bp"
+        "VRP: +3.0%",
+        "Euro Area Inflation: 3.2%",
+        "COT LF Net: -26,311"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "10:55",
+      "time": "18:08",
       "priority": "warning",
-      "title": "AUD/CAD — G8 Bilateral Theme + Carry",
-      "text": "AUD/CAD exhibits a 0.823% G8 strength spread as AUD outperforms (+0.452% avg) while CAD lags (-0.371% avg). The divergence is fundamentally supported by a +210bp OIS carry advantage for AUD (AONIA 4.35% vs CORRA 2.24%). However, AUD COT LF net long at +58,041 (76.1%) is approaching extreme levels, while retail is 73% short AUD/CAD, suggesting a potential late-cycle extension before a reversal. AUD/CAD at 0.9955 (implied).",
+      "title": "AUD/CHF — G8 Bilateral Theme + Carry",
+      "text": "AUD/CHF G8 spread at 0.847% confirms a bilateral divergence theme as AUD outperforms (+0.464% avg) while CHF lags (-0.383% avg). The move is fundamentally anchored by a massive +435bp carry premium (RBA 4.35% vs SNB 0.0%). Retail is 84% short AUD/CHF, attempting to fade the carry-driven strength. The divergence persists as long as VIX remains at 16.0 (normal volatility), favoring carry over safe-haven CHF demand.",
       "evidence": [
-        "G8 spread: 0.823%",
-        "AUD-CAD OIS Carry: +210bp",
-        "AUD COT Long%: 76.1%"
+        "G8 spread: 0.847%",
+        "AUD/CHF Carry: +435bp",
+        "Retail: 84% Short"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "10:50",
-      "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + Correlation Break",
-      "text": "NZD/USD COT LF net short -13,767 (specs fading the NZD) contradicts the RBNZ's hawkish bias with a hike priced for the next cycle. A correlation break (z=+1.80σ) between NZD/USD and the NZX 50 suggests the pair is decoupling from local equities, likely driven by the 150bp USD carry advantage. If RBNZ reaffirms the hike bias, a crowded spec short unwind targets 0.6000. NZD/USD at 0.5932.",
-      "evidence": [
-        "NZD COT LF Net: -13,767",
-        "NZD/USD vs NZX 50: z=+1.80σ",
-        "USD/NZD Carry: +150bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "10:45",
+      "time": "18:05",
       "priority": "info",
-      "title": "GBP/USD — Volatility Premium + Positioning",
-      "text": "GBP/USD IV at 11.0% vs HV30 at 6.2% generates a +4.8% Vol Risk Premium, the highest in the G8 complex. This elevated hedging demand occurs as GBP COT LF net long remains at +26,377 (63.9% long), suggesting the market is paying up for protection against a long-unwind despite neutral carry (0bp spread). UK mortgage data holding above the six-month average provides a fundamental floor. GBP/USD at 1.3472.",
+      "title": "GBP/USD — BoE Pushback + CESI Support",
+      "text": "GBP/USD at 1.3459 as BoE's Bailey attributes inflation overshoot to Persian Gulf energy shocks, pushing back against 50bp hike pricing. Despite the dovish-leaning rhetoric, GBP is supported by a positive CESI (net +5 beats) and a neutral OIS carry profile vs USD (-10bp). COT LF net long +26,377 shows institutional support, though a 4.8pt VRP (IV 11.0% vs HV30 6.2%) suggests the market is paying up for protection ahead of the June 18 meeting.",
       "evidence": [
-        "GBP/USD VRP: +4.8%",
-        "GBP COT LF Net: +26,377",
-        "Fed-BoE Carry: 0bp"
+        "GBP CESI: +5",
+        "VRP: +4.8%",
+        "COT LF Net: +26,377"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
