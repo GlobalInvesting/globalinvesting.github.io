@@ -1,46 +1,31 @@
 {
-  "lastUpdate": "2026-06-01T23:51:40Z",
-  "generatedAt": "2026-06-01T23:51:40Z",
+  "lastUpdate": "2026-06-02T00:01:34Z",
+  "generatedAt": "2026-06-02T00:01:34Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Finnhub",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-01",
-  "rangeTo": "2026-06-15",
-  "totalEvents": 1635,
+  "rangeFrom": "2025-06-02",
+  "rangeTo": "2026-06-16",
+  "totalEvents": 1649,
   "currencyCounts": {
-    "AUD": 175,
-    "CAD": 132,
+    "CAD": 131,
     "CHF": 89,
-    "USD": 620,
-    "JPY": 179,
+    "USD": 628,
+    "AUD": 176,
+    "JPY": 183,
     "GBP": 179,
-    "NZD": 76,
-    "EUR": 185
+    "NZD": 77,
+    "EUR": 186
   },
   "impactCounts": {
-    "low": 147,
-    "medium": 1109,
-    "high": 379
+    "medium": 1119,
+    "low": 146,
+    "high": 384
   },
   "surpriseStats": {
-    "AUD/building approvals": {
-      "n": 2,
-      "mean": -6.3,
-      "std": 8.909545
-    },
-    "EUR/core cpi": {
-      "n": 5,
-      "mean": 0.14,
-      "std": 0.782943
-    },
-    "EUR/cpi": {
-      "n": 6,
-      "mean": 0.25,
-      "std": 0.665582
-    },
     "AUD/gdp": {
       "n": 2,
       "mean": 0.25,
@@ -216,10 +201,20 @@
       "mean": 1.566667,
       "std": 2.500667
     },
+    "EUR/cpi": {
+      "n": 5,
+      "mean": 0.26,
+      "std": 0.74364
+    },
     "EUR/consumer confidence": {
       "n": 2,
       "mean": 2.2,
       "std": 1.979899
+    },
+    "EUR/core cpi": {
+      "n": 4,
+      "mean": 0.125,
+      "std": 0.903235
     },
     "GBP/consumer confidence": {
       "n": 3,
@@ -418,18 +413,6 @@
     }
   },
   "events": [
-    {
-      "currency": "AUD",
-      "event": "S&P Global Manufacturing PMI Final",
-      "dateISO": "2025-06-01",
-      "hourUTC": "23:00",
-      "actual": "51",
-      "forecast": "51.7",
-      "previous": "51.7",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
     {
       "currency": "CAD",
       "event": "S&P Global Manufacturing PMI",
@@ -17125,19 +17108,6 @@
     {
       "date": "11 May",
       "dateISO": "2026-05-11",
-      "timeUTC": "14:30",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "BoC Market Participants Survey",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "11 May",
-      "dateISO": "2026-05-11",
       "timeUTC": "23:01",
       "country": "GBP",
       "currency": "GBP",
@@ -17173,19 +17143,6 @@
       "actual": "-2.9",
       "forecast": "-1.3",
       "previous": "-1.8"
-    },
-    {
-      "date": "11 May",
-      "dateISO": "2026-05-11",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "BoJ Summary of Opinions",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "12 May",
@@ -20854,7 +20811,7 @@
       "event": "Household Spending MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.6*",
+      "forecast": null,
       "previous": "-1.3"
     },
     {
@@ -21127,7 +21084,7 @@
       "event": "BRC Retail Sales Monitor YoY",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.8*",
+      "forecast": null,
       "previous": "-3.4"
     },
     {
@@ -21727,6 +21684,227 @@
       "actual": null,
       "forecast": "35*",
       "previous": "37"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "03:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "BoJ Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.75"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "04:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "RBA Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "4.35"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "05:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "RBA Press Conference",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ZEW Economic Sentiment Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "92.8*",
+      "previous": "-9.1"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ADP Employment Change Weekly",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "35.75"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Building Permits MoM Prel",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "4.4"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Building Permits Prel",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.39*",
+      "previous": "1.423"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Export Prices MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "3.3"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Housing Starts",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.41*",
+      "previous": "1.465"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Housing Starts MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "-2.8"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Import Prices MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "1.9"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "API Crude Oil Stock Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-4.1*",
+      "previous": "-3.327"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-4.78B*",
+      "previous": "-5.98"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Balance of Trade",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-29.7*",
+      "previous": "301.9"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Exports YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "14.8"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Machinery Orders MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-8.1*",
+      "previous": "-9.4"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Machinery Orders YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "4.5*",
+      "previous": "5.9"
     }
   ]
 }
