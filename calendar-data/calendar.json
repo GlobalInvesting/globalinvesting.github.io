@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-02T13:59:25Z",
-  "generatedAt": "2026-06-02T13:59:25Z",
+  "lastUpdate": "2026-06-02T14:01:19Z",
+  "generatedAt": "2026-06-02T14:01:19Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -400,6 +400,11 @@
       "n": 2,
       "mean": -1.25,
       "std": 0.919239
+    },
+    "USD/jolts job openings": {
+      "n": 2,
+      "mean": 0.382,
+      "std": 0.50346
     },
     "USD/api crude oil stock change": {
       "n": 3,
@@ -20503,9 +20508,9 @@
       "flag": "🇺🇸",
       "event": "JOLTs Job Openings",
       "impact": "high",
-      "actual": null,
+      "actual": "7.618",
       "forecast": "6.88",
-      "previous": "6.866"
+      "previous": "6.887"
     },
     {
       "date": "2 Jun",
