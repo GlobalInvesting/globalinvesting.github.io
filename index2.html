@@ -8,13 +8,15 @@
 <title>GLOBALINVESTING — FXIP [TEST]</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js" crossorigin="anonymous"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#07080f;--bg2:#0b0d18;--sid:#080a14;--sid-sel:#1a3870;
-  --red-hdr:#780008;--tab-bg:#0c1018;--tab-act:#162030;--tab-bdr:#0055cc;
-  --wh:#d0d8e8;--dim:#6878a0;--dim2:#2c3c52;
-  --grn:#00cc00;--red:#ff3333;--amb:#ff9900;--blu:#3388ff;--cyn:#00aacc;
+  --bg:#010206;--bg2:#040810;--sid:#020508;--sid-sel:#1a3d80;
+  --red-hdr:#6e0008;--tab-bg:#060c16;--tab-act:#0f1e2e;--tab-bdr:#0060dd;
+  --wh:#ddd5a8;--dim:#7890b0;--dim2:#2e3e54;
+  --grn:#00dd00;--red:#ff2424;--amb:#ffaa00;--blu:#3399ff;--cyn:#00bbdd;
   --mono:'IBM Plex Mono',Consolas,'Courier New',monospace;
 }
 html,body{height:100%;background:var(--bg);color:var(--wh);font-family:var(--mono);font-size:11px;overflow:hidden;-webkit-font-smoothing:none;font-smooth:never}
@@ -64,7 +66,8 @@ html,body{height:100%;background:var(--bg);color:var(--wh);font-family:var(--mon
 .si:hover{background:#0e1420;color:var(--wh)}
 .si.sel{background:var(--sid-sel);color:var(--wh);font-weight:bold}
 .si .in{color:#5a7090;font-size:9px;margin-right:3px;min-width:20px}
-.si .fl{margin-right:3px;font-size:12px}
+.si .fl{margin-right:3px;font-size:12px;line-height:1;display:inline-block;vertical-align:middle}
+.si .fl img{width:16px;height:12px;vertical-align:middle}
 #ct3{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 #tps{flex:1;overflow:hidden;display:flex;flex-direction:column}
 .tp{flex:1;overflow:hidden;display:none;flex-direction:column}
@@ -73,11 +76,11 @@ html,body{height:100%;background:var(--bg);color:var(--wh);font-family:var(--mon
 .sh .sn{color:var(--amb);font-weight:bold}.sh .st{color:var(--wh)}.sh .sc{color:#6878a0;font-size:9px}
 .sha{margin-left:auto;display:flex;gap:8px}.sha span{color:var(--dim);font-size:9px;cursor:pointer}.sha span:hover{color:var(--cyn)}
 .dt{width:100%;border-collapse:collapse;font-size:10.5px;letter-spacing:-0.01em}
-.dt th{background:#080c14;color:#7888a8;padding:1.5px 4px;font-size:9px;font-weight:400;border-bottom:1px solid #101820;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2}
+.dt th{background:#050c18;color:#8898b8;padding:1.5px 4px;font-size:9px;font-weight:400;border-bottom:1px solid #0c1820;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2}
 .dt th.l{text-align:left}
-.dt td{padding:1.5px 4px;border-bottom:1px solid #0a1018;white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;overflow:hidden;text-overflow:ellipsis}
+.dt td{padding:1.5px 4px;border-bottom:1px solid #07101a;white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;overflow:hidden;text-overflow:ellipsis}
 .dt td.l{text-align:left}
-.dt tr:hover td{background:#10182a}
+.dt tr:hover td{background:#0c1e36}
 .dt .rn{color:var(--amb);text-align:right;min-width:22px}
 .dt .cy{color:var(--wh);font-weight:bold;text-align:left}
 .up{color:var(--grn)!important}.dn{color:var(--red)!important}.neu{color:var(--dim)!important}
@@ -289,19 +292,8 @@ html,body{height:100%;background:var(--bg);color:var(--wh);font-family:var(--mon
     <div style="flex:1.0;display:flex;flex-direction:column;overflow:hidden">
       <div class="sh"><span class="sn">50)</span><span class="st">DXY Movers <span class="sc">(DXI)</span></span><div class="sha"><span>+ Track</span><span>Q Zoom</span></div></div>
       <div class="chc" style="flex:1;min-height:0">
-        <div class="chctl"><div class="cleg"><div class="csq" style="background:var(--grn)"></div><span style="color:var(--grn)">DXY Index 99.188</span></div></div>
-        <svg viewBox="0 0 600 65" preserveAspectRatio="none" style="width:100%;height:calc(100% - 20px);display:block">
-          <defs><linearGradient id="dg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00cc00" stop-opacity=".18"/><stop offset="100%" stop-color="#00cc00" stop-opacity="0"/></linearGradient></defs>
-          <path d="M0,55 L30,50 L60,53 L100,46 L130,49 L165,42 L200,46 L230,43 L265,49 L300,44 L330,40 L365,44 L400,38 L435,34 L470,30 L505,26 L540,22 L570,18 L600,15 L600,65 L0,65Z" fill="url(#dg)"/>
-          <path d="M0,55 L30,50 L60,53 L100,46 L130,49 L165,42 L200,46 L230,43 L265,49 L300,44 L330,40 L365,44 L400,38 L435,34 L470,30 L505,26 L540,22 L570,18 L600,15" fill="none" stroke="#00cc00" stroke-width="1"/>
-          <text x="5" y="10" fill="#3a6050" font-size="7" font-family="Consolas">100.5</text>
-          <text x="5" y="28" fill="#3a6050" font-size="7" font-family="Consolas">100.0</text>
-          <text x="5" y="46" fill="#3a6050" font-size="7" font-family="Consolas">99.0</text>
-          <text x="100" y="62" fill="#445870" font-size="6" font-family="Consolas">Apr 8</text>
-          <text x="230" y="62" fill="#445870" font-size="6" font-family="Consolas">Apr 22</text>
-          <text x="370" y="62" fill="#445870" font-size="6" font-family="Consolas">May 9</text>
-          <text x="510" y="62" fill="#445870" font-size="6" font-family="Consolas">May 23</text>
-        </svg>
+        <div class="chctl"><div class="cleg"><div class="csq" id="dxy-csq" style="background:var(--grn)"></div><span id="dxy-lbl" style="color:var(--grn)">DXY Index 99.188</span></div></div>
+        <div id="lwc-dxy" style="flex:1;min-height:0;width:100%;height:calc(100% - 20px)"></div>
       </div>
     </div>
     <div style="flex:0.55;display:flex;flex-direction:column;overflow:hidden">
@@ -335,15 +327,7 @@ html,body{height:100%;background:var(--bg);color:var(--wh);font-family:var(--mon
         <div class="sh"><span class="sn">30)</span><span class="st" id="ct-chtt">Spot Rate</span><div class="sha"><span>+ Track</span><span>Q Zoom</span></div></div>
         <div class="chc" style="flex:1;min-height:0">
           <div class="chctl"><div class="cleg"><div class="csq" id="ct-csq" style="background:var(--grn)"></div><span id="ct-clbl" style="color:var(--grn)">Spot</span></div></div>
-          <svg viewBox="0 0 400 55" preserveAspectRatio="none" style="width:100%;height:calc(100% - 18px);display:block">
-            <defs><linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00cc00" stop-opacity=".2"/><stop offset="100%" stop-color="#00cc00" stop-opacity="0"/></linearGradient></defs>
-            <path id="ct-cf" d="M0,18 L40,20 L80,16 L120,22 L160,19 L200,26 L240,22 L280,30 L320,26 L360,34 L400,30 L400,55 L0,55Z" fill="url(#sg2)"/>
-            <path id="ct-cl" d="M0,18 L40,20 L80,16 L120,22 L160,19 L200,26 L240,22 L280,30 L320,26 L360,34 L400,30" fill="none" stroke="#00cc00" stroke-width="1.2"/>
-            <text x="5" y="50" fill="#445870" font-size="5.5" font-family="Consolas">Apr 8</text>
-            <text x="130" y="50" fill="#445870" font-size="5.5" font-family="Consolas">Apr 22</text>
-            <text x="265" y="50" fill="#445870" font-size="5.5" font-family="Consolas">May 9</text>
-            <text x="360" y="50" fill="#445870" font-size="5.5" font-family="Consolas">May 23</text>
-          </svg>
+          <div id="lwc-cty" style="flex:1;min-height:0;width:100%;height:calc(100% - 20px)"></div>
         </div>
       </div>
       <div style="flex:1">
@@ -939,7 +923,7 @@ function buildRates(){
     const ic=r.ic===null?'<span class="neu">--</span>':`<span class="${cc(r.ic)}">${r.ic>0?'+':''}${r.ic.toFixed(2)}%</span>`;
     const spc=r.spd==='--'?'neu':r.spd.includes('-')?'dn':'up';
     const syc=r.ysp==='--'?'neu':r.ysp.includes('-')?'dn':'up';
-    return`<tr><td class="rn">${r.n})</td><td class="cy">${r.c}</td><td class="hi">${r.sp}</td><td>${pc}</td><td class="hi">${r.dep}</td><td class="${spc}">${r.spd}</td><td class="hi">${r.yld}%</td><td class="${syc}">${r.ysp}</td><td class="hi">${r.idx}</td><td>${ic}</td></tr>`;
+    return`<tr><td class="rn">${r.n})</td><td class="cy">${r.c}</td><td class="am">${r.sp}</td><td>${pc}</td><td class="am">${r.dep}</td><td class="${spc}">${r.spd}</td><td class="am">${r.yld}%</td><td class="${syc}">${r.ysp}</td><td class="hi">${r.idx}</td><td>${ic}</td></tr>`;
   }).join('');
 }
 
@@ -949,7 +933,7 @@ function buildRegionalRates(rows,titleEl){
     const ic=r.ic===null?'<span class="neu">--</span>':`<span class="${cc(r.ic)}">${r.ic>0?'+':''}${r.ic.toFixed(2)+'%'}</span>`;
     const spc=r.spd==='--'?'neu':r.spd.includes('-')?'dn':'up';
     const syc=r.ysp==='--'?'neu':r.ysp.includes('-')?'dn':'up';
-    return`<tr><td class="rn">${r.n})</td><td class="cy">${r.c}</td><td class="hi">${r.sp}</td><td>${pc}</td><td class="hi">${r.dep}</td><td class="${spc}">${r.spd}</td><td class="hi">${r.yld}</td><td class="${syc}">${r.ysp}</td><td class="hi">${r.idx}</td><td>${ic}</td></tr>`;
+    return`<tr><td class="rn">${r.n})</td><td class="cy">${r.c}</td><td class="am">${r.sp}</td><td>${pc}</td><td class="am">${r.dep}</td><td class="${spc}">${r.spd}</td><td class="am">${r.yld}</td><td class="${syc}">${r.ysp}</td><td class="hi">${r.idx}</td><td>${ic}</td></tr>`;
   }).join('');
 }
 
@@ -1207,6 +1191,10 @@ function clk(){
 buildRates();buildFwd();buildVol();buildEco();buildMetals();
 buildNews('nb-all',newsAll);buildNews('nb-eco',newsEco);buildNews('nb-vol',newsVol);
 setInterval(tick,350);setInterval(clk,1000);clk();
+// Twemoji: replace emoji flags with SVG images (fixes Edge/Windows rendering)
+if(typeof twemoji!=='undefined'){
+  twemoji.parse(document.getElementById('sb'),{folder:'svg',ext:'.svg',base:'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/'});
+}
 </script>
 <script src="assets/dashboard2.js"></script>
 </body>
