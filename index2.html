@@ -1,302 +1,484 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CJLGQET9KJ"></script>
 <script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Investing — FX Terminal [TEST]</title>
+<title>Global Investing — FX Terminal v2 [TEST]</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<!-- Fonts: blocking load = zero font CLS (per GUIDELINES §Core Web Vitals) -->
+<!-- Fonts: blocking load per GUIDELINES §Core Web Vitals — zero font CLS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
 
-<!-- Critical inline CSS: stable above-fold dimensions = zero layout shift -->
+<!-- Lightweight Charts v4 — pinned CDN, no unsafe-inline -->
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+
+<!-- Critical inline CSS: stable above-fold dimensions = zero CLS -->
 <style>
-html,body{height:100%;overflow:hidden;margin:0;padding:0;background:#000;color:#d1d4dc;font-family:'JetBrains Mono',Consolas,monospace;font-size:10px;}
-#cmd-bar{height:26px;background:#050709;}
-#ticker-strip{height:19px;background:#030406;}
-#terminal{display:grid;grid-template-columns:21fr 26fr 26fr 27fr;grid-template-rows:58fr 42fr;gap:1px;background:#141820;}
-#page-wrap{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
-.pnl{background:#000;}
-.ph{height:17px;background:#04060a;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#000;color:#d1d4dc;font-family:'JetBrains Mono',Consolas,monospace;font-size:10px;-webkit-font-smoothing:antialiased}
+#page-wrap{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+#chrome{height:24px;background:#000;border-bottom:1px solid #1a1f2e;display:flex;align-items:center;padding:0 6px;gap:3px;flex-shrink:0}
+#qstrip{height:20px;background:#030406;border-bottom:1px solid #0e1220;display:flex;align-items:center;padding:0 6px;gap:16px;overflow:hidden;flex-shrink:0}
+#red-hdr{height:20px;background:#780008;border-bottom:1px solid #3a0005;display:flex;align-items:center;padding:0 6px;flex-shrink:0}
+#tab-row{height:24px;background:#06080e;border-bottom:1px solid #141e2a;display:flex;align-items:flex-end;flex-shrink:0}
+#main-grid{flex:1;display:flex;min-height:0}
+#sidebar{width:148px;flex-shrink:0;background:#080a14;border-right:1px solid #141e2a;display:flex;flex-direction:column;overflow-y:auto}
+#content{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+#view-area{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
 </style>
 
 <link rel="stylesheet" href="assets/dashboard2.css">
 </head>
 
 <body>
-<a href="#main" class="skip-link">Skip to main content</a>
+<a href="#main-grid" class="skip-link">Skip to main content</a>
 
 <div id="page-wrap">
 
-  <!-- ── COMMAND BAR ──────────────────────────────────────────── -->
-  <div id="cmd-bar" role="banner" aria-label="Terminal command bar">
-    <span id="bbg-prompt" aria-hidden="true">GI&gt;</span>
-    <input id="bbg-input" type="text" value="FXIP <GO>" aria-label="Bloomberg command input" autocomplete="off" spellcheck="false">
-    <nav id="cmd-tabs" class="cmd-tabs" aria-label="Terminal function tabs">
-      <button class="ctab active" onclick="ctabClick(this,'FXIP')" aria-pressed="true">FXIP</button>
-      <button class="ctab" onclick="ctabClick(this,'CBRT')" aria-pressed="false">CBRT</button>
-      <button class="ctab" onclick="ctabClick(this,'YCUR')" aria-pressed="false">YCUR</button>
-      <button class="ctab" onclick="ctabClick(this,'COTS')" aria-pressed="false">COTS</button>
-      <button class="ctab" onclick="ctabClick(this,'VOLS')" aria-pressed="false">VOLS</button>
-      <button class="ctab" onclick="ctabClick(this,'RISK')" aria-pressed="false">RISK</button>
-    </nav>
-    <div id="cmd-right" aria-label="Status and time">
-      <span id="cmd-status">LIVE</span>
-      <span id="cmd-upd">Data: —</span>
-      <span id="cmd-clock" aria-live="polite">--:--:-- UTC</span>
+  <!-- ── CHROME BAR ──────────────────────────────────────────────── -->
+  <div id="chrome" role="banner" aria-label="Terminal toolbar">
+    <button class="chr-btn chr-grn">GO</button>
+    <button class="chr-btn chr-grn">PRINT</button>
+    <button class="chr-btn chr-grn">HELP</button>
+    <button class="chr-btn chr-grn">NEWS</button>
+    <button class="chr-btn chr-grn">MSG</button>
+    <button class="chr-btn chr-grn">MENU</button>
+    <button class="chr-btn chr-grn">BACK</button>
+    <button class="chr-btn chr-grn">FWD</button>
+    <span id="chr-title">GLOBALINVESTING PROFESSIONAL</span>
+    <div id="chr-right">
+      <span id="chr-clock" aria-live="polite">--:-- UTC</span>
+      <span class="chr-live">LIVE</span>
+      <button class="chr-btn chr-blue" onclick="window.location='/'">Main Terminal</button>
     </div>
   </div>
 
-  <!-- ── TICKER STRIP ─────────────────────────────────────────── -->
-  <div id="ticker-strip" role="marquee" aria-label="Live price ticker">
-    <div class="tk-item" id="tk-eurusd"><span class="tk-sym">EUR/USD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
-    <div class="tk-item" id="tk-gbpusd"><span class="tk-sym">GBP/USD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
-    <div class="tk-item" id="tk-usdjpy"><span class="tk-sym">USD/JPY</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
-    <div class="tk-item" id="tk-audusd"><span class="tk-sym">AUD/USD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
-    <div class="tk-item" id="tk-usdcad"><span class="tk-sym">USD/CAD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
-    <div class="tk-item" id="tk-dxy"><span class="tk-sym">DXY</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
-    <div class="tk-item" id="tk-gold"><span class="tk-sym">XAU/USD</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
-    <div class="tk-item" id="tk-spx"><span class="tk-sym">SPX</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
-    <div class="tk-item" id="tk-vix"><span class="tk-sym">VIX</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
-    <div class="tk-item" id="tk-us10y"><span class="tk-sym">US10Y</span><span class="tk-val">—</span><span class="tk-chg">—</span></div>
+  <!-- ── QUOTE STRIP ─────────────────────────────────────────────── -->
+  <div id="qstrip" role="marquee" aria-label="Live price strip">
+    <div class="qs-item" id="qs-eurusd"><span class="qs-sym">EUR/USD</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
+    <div class="qs-item" id="qs-gbpusd"><span class="qs-sym">GBP/USD</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
+    <div class="qs-item" id="qs-usdjpy"><span class="qs-sym">USD/JPY</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
+    <div class="qs-item" id="qs-audusd"><span class="qs-sym">AUD/USD</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
+    <div class="qs-item" id="qs-usdcad"><span class="qs-sym">USD/CAD</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
+    <div class="qs-item" id="qs-dxy"><span class="qs-sym">DXY</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
+    <div class="qs-item" id="qs-gold"><span class="qs-sym">XAU/USD</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
+    <div class="qs-item" id="qs-vix"><span class="qs-sym">VIX</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
+    <div class="qs-item" id="qs-us10y"><span class="qs-sym">US10Y</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
+    <div class="qs-item" id="qs-spx"><span class="qs-sym">SPX</span><span class="qs-val">—</span><span class="qs-chg">—</span></div>
   </div>
 
-  <!-- ── MAIN 4×2 TERMINAL GRID ───────────────────────────────── -->
-  <main id="main" role="main" aria-label="FX Terminal">
-  <div id="terminal">
+  <!-- ── RED HEADER ──────────────────────────────────────────────── -->
+  <div id="red-hdr">
+    <span id="rh-settings">98) Settings</span>
+    <span id="rh-feedback">99) Feedback</span>
+    <span id="rh-pair-bar"></span>
+    <span id="rh-title">FX Information Portal</span>
+  </div>
 
-    <!-- ╔═══════════════╗ -->
-    <!-- ║  P1: SPOT FX  ║  Row 1, Col 1 -->
-    <!-- ╚═══════════════╝ -->
-    <section class="pnl" aria-label="FX Spot Rates">
-      <div class="ph">
-        <span class="ph-title">FX Monitor</span>
-        <span class="ph-code">FXIP</span>
-      </div>
-      <div class="sub-hd">
-        <b>PAIR</b><span style="margin-left:auto">BID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ASK&nbsp;&nbsp;&nbsp;SPR&nbsp;&nbsp;CHG&nbsp;&nbsp;HV30</span>
-      </div>
-      <div class="pb">
-        <table class="t" aria-label="FX spot rates">
-          <thead>
-            <tr>
-              <th scope="col">Pair</th>
-              <th scope="col" class="r">Bid</th>
-              <th scope="col" class="r">Ask</th>
-              <th scope="col" class="r">Spr</th>
-              <th scope="col" class="r">Chg%</th>
-              <th scope="col" class="r">HV30</th>
-            </tr>
-          </thead>
-          <tbody id="spot-tbody"></tbody>
-        </table>
-      </div>
-    </section>
+  <!-- ── TAB ROW ─────────────────────────────────────────────────── -->
+  <div id="tab-row" role="tablist" aria-label="Terminal views">
+    <button class="t2tab active" role="tab" aria-selected="true"  onclick="switchView('fxov',this)">90) FX Markets Overview</button>
+    <button class="t2tab"        role="tab" aria-selected="false" onclick="switchView('fwds',this)">91) FX Forwards</button>
+    <button class="t2tab"        role="tab" aria-selected="false" onclick="switchView('vols',this)">92) FX Options and Volatility</button>
+    <button class="t2tab"        role="tab" aria-selected="false" onclick="switchView('cbrt',this)">93) Economics</button>
+    <button class="t2tab"        role="tab" aria-selected="false" onclick="switchView('risk',this)">Cross-Asset Risk</button>
+    <button class="t2tab"        role="tab" aria-selected="false" onclick="switchView('cots',this)">COT/Positioning</button>
+    <div class="t2-base-ccy">Base Currency <span class="t2-ccy-val">USD</span></div>
+  </div>
 
-    <!-- ╔════════════════╗ -->
-    <!-- ║  P2: VOL SURF  ║  Row 1, Col 2 -->
-    <!-- ╚════════════════╝ -->
-    <section class="pnl" aria-label="FX Volatility Surface">
-      <div class="ph">
-        <span class="ph-title" id="vol-ttl">Vol Structure — EUR/USD</span>
-        <span class="ph-code">OVDV</span>
-      </div>
-      <div id="vol-pair-sel" role="group" aria-label="Select currency pair">
-        <button class="vps-btn active" data-p="EURUSD" onclick="pairClick('EURUSD')">EUR/USD</button>
-        <button class="vps-btn" data-p="USDJPY" onclick="pairClick('USDJPY')">USD/JPY</button>
-        <button class="vps-btn" data-p="GBPUSD" onclick="pairClick('GBPUSD')">GBP/USD</button>
-        <button class="vps-btn" data-p="AUDUSD" onclick="pairClick('AUDUSD')">AUD/USD</button>
-        <button class="vps-btn" data-p="USDCAD" onclick="pairClick('USDCAD')">USD/CAD</button>
-        <button class="vps-btn" data-p="USDCHF" onclick="pairClick('USDCHF')">USD/CHF</button>
-        <button class="vps-btn" data-p="EURJPY" onclick="pairClick('EURJPY')">EUR/JPY</button>
-      </div>
-      <div id="vol-src" style="font-size:7.5px;color:#2e3845;padding:2px 5px;background:#020405;border-bottom:1px solid #0a0f14;flex-shrink:0;">ATM: HV30 est. · 25d RR: Saxo Bank indicative</div>
-      <div class="pb">
-        <table class="t" aria-label="Volatility surface by tenor">
-          <thead>
-            <tr>
-              <th scope="col">Tenor</th>
-              <th scope="col" class="r">ATM IV</th>
-              <th scope="col" class="r">25d RR</th>
-              <th scope="col" class="r">10d RR</th>
-            </tr>
-          </thead>
-          <tbody id="vol-tbody">
-            <tr><td class="dim" colspan="4" style="text-align:center;padding:12px 0;">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+  <!-- ── MAIN: SIDEBAR + CONTENT ────────────────────────────────── -->
+  <div id="main-grid" role="main">
 
-    <!-- ╔══════════════╗ -->
-    <!-- ║  P3: CB RATES ║  Row 1, Col 3 -->
-    <!-- ╚══════════════╝ -->
-    <section class="pnl" aria-label="Central Bank Rates and Policy">
-      <div class="ph">
-        <span class="ph-title">CB Rates &amp; Policy</span>
-        <span class="ph-code">CBRT</span>
-      </div>
-      <div class="sub-hd">
-        <b>OIS bias: market-implied forward direction (meetings-data/meetings.json)</b>
-      </div>
-      <div class="pb">
-        <table class="t" aria-label="Central bank rates and policy bias">
-          <thead>
-            <tr>
-              <th scope="col">CB</th>
-              <th scope="col" class="r">Rate</th>
-              <th scope="col" class="r">Trnd</th>
-              <th scope="col" class="r">Next Mtg</th>
-              <th scope="col" class="r">OIS Bias</th>
-              <th scope="col" class="r">Cut%</th>
-              <th scope="col" class="r">Hike%</th>
-            </tr>
-          </thead>
-          <tbody id="cb-tbody">
-            <tr><td class="dim" colspan="7" style="text-align:center;padding:12px 0;">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" aria-label="Currency and asset navigation">
 
-    <!-- ╔═══════════════════╗ -->
-    <!-- ║  P4: CROSS-ASSET  ║  Row 1, Col 4 -->
-    <!-- ╚═══════════════════╝ -->
-    <section class="pnl" aria-label="Cross-Asset Risk Monitor">
-      <div class="ph">
-        <span class="ph-title">Cross-Asset Risk</span>
-        <span id="risk-badge" class="ph-badge rb-on" role="status" aria-live="assertive">—</span>
-        <span class="ph-code">RISK</span>
+      <div class="sg-hdr" onclick="toggleGroup('grp-g10','sg-arr-g10')">
+        <span><span class="sg-n">1)</span> G10</span><span id="sg-arr-g10" class="sg-arr">▾</span>
       </div>
-      <div id="stress-row">
-        <span style="color:#3a4255">Score:</span>
-        <span id="stress-sc" class="amb bld">—</span>
-        <span id="stress-factors">Calculating…</span>
+      <div id="grp-g10" class="sg-group">
+        <div class="sg-item sel" onclick="sidebarSel(this,'all')"><span class="sg-num">11)</span>All G10</div>
+        <div class="sg-item" onclick="sidebarSel(this,'eurusd')"><span class="sg-num">12)</span>EUR/USD</div>
+        <div class="sg-item" onclick="sidebarSel(this,'usdjpy')"><span class="sg-num">13)</span>USD/JPY</div>
+        <div class="sg-item" onclick="sidebarSel(this,'gbpusd')"><span class="sg-num">14)</span>GBP/USD</div>
+        <div class="sg-item" onclick="sidebarSel(this,'usdcad')"><span class="sg-num">15)</span>USD/CAD</div>
+        <div class="sg-item" onclick="sidebarSel(this,'audusd')"><span class="sg-num">16)</span>AUD/USD</div>
+        <div class="sg-item" onclick="sidebarSel(this,'nzdusd')"><span class="sg-num">17)</span>NZD/USD</div>
+        <div class="sg-item" onclick="sidebarSel(this,'usdchf')"><span class="sg-num">18)</span>USD/CHF</div>
+        <div class="sg-item" onclick="sidebarSel(this,'eurgbp')"><span class="sg-num">19)</span>EUR/GBP</div>
+        <div class="sg-item" onclick="sidebarSel(this,'eurjpy')"><span class="sg-num">20)</span>EUR/JPY</div>
+        <div class="sg-item" onclick="sidebarSel(this,'gbpjpy')"><span class="sg-num">21)</span>GBP/JPY</div>
       </div>
-      <div class="pb">
-        <table class="t" aria-label="Cross-asset prices and changes">
-          <thead>
-            <tr>
-              <th scope="col">Asset</th>
-              <th scope="col" class="r">Last</th>
-              <th scope="col" class="r">1D%</th>
-              <th scope="col" class="r">1W%</th>
-            </tr>
-          </thead>
-          <tbody id="risk-tbody">
-            <tr><td class="dim" colspan="4" style="text-align:center;padding:12px 0;">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
 
-    <!-- ╔═══════════════╗ -->
-    <!-- ║  P5: COT/POS  ║  Row 2, Col 1 -->
-    <!-- ╚═══════════════╝ -->
-    <section class="pnl" aria-label="COT Positioning">
-      <div class="ph">
-        <span class="ph-title">COT Positioning</span>
-        <span class="ph-code">COTS</span>
+      <div class="sg-hdr" onclick="toggleGroup('grp-ca','sg-arr-ca')">
+        <span><span class="sg-n">2)</span> Cross-Asset</span><span id="sg-arr-ca" class="sg-arr">▸</span>
       </div>
-      <div class="sub-hd">
-        <b>CFTC Disaggregated TFF · Leveraged Funds · Options+Futures</b>
+      <div id="grp-ca" class="sg-group" style="display:none">
+        <div class="sg-item" onclick="sidebarSel(this,'dxy')"><span class="sg-num">11)</span>DXY Index</div>
+        <div class="sg-item" onclick="sidebarSel(this,'gold')"><span class="sg-num">12)</span>Gold (XAU)</div>
+        <div class="sg-item" onclick="sidebarSel(this,'wti')"><span class="sg-num">13)</span>WTI Crude</div>
+        <div class="sg-item" onclick="sidebarSel(this,'spx')"><span class="sg-num">14)</span>S&amp;P 500</div>
+        <div class="sg-item" onclick="sidebarSel(this,'vix')"><span class="sg-num">15)</span>VIX</div>
+        <div class="sg-item" onclick="sidebarSel(this,'us10y')"><span class="sg-num">16)</span>US 10Y</div>
       </div>
-      <div class="pb">
-        <table class="t" aria-label="CFTC COT leveraged funds net positions">
-          <thead>
-            <tr>
-              <th scope="col">Ccy</th>
-              <th scope="col" class="r">Net</th>
-              <th scope="col">Bar</th>
-              <th scope="col" class="r">WoW</th>
-              <th scope="col" class="r">%OI</th>
-              <th scope="col" class="r">Week</th>
-            </tr>
-          </thead>
-          <tbody id="cot-tbody">
-            <tr><td class="dim" colspan="6" style="text-align:center;padding:12px 0;">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
 
-    <!-- ╔═══════════════╗ -->
-    <!-- ║  P6: YIELD CV ║  Row 2, Col 2 -->
-    <!-- ╚═══════════════╝ -->
-    <section class="pnl" aria-label="US Yield Curve">
-      <div class="ph">
-        <span class="ph-title">US Yield Curve</span>
-        <span class="ph-code">YCUR</span>
+      <div class="sg-hdr" onclick="toggleGroup('grp-cot','sg-arr-cot')">
+        <span><span class="sg-n">3)</span> COT/Positioning</span><span id="sg-arr-cot" class="sg-arr">▸</span>
       </div>
-      <div class="sub-hd"><b>Treasury yields · yfinance · extended-data/USD.json</b></div>
-      <div id="yc-wrap">
-        <canvas id="yc-canvas" role="img" aria-label="US Treasury yield curve chart" style="min-height:80px;"></canvas>
-        <div id="yc-table-wrap">
-          <table class="t" id="yc-tbl" aria-label="Yield curve values by tenor">
-            <thead><tr><th scope="col">Tenor</th><th scope="col" class="r">Yield</th><th scope="col" class="r">Chg</th></tr></thead>
-            <tbody id="yc-tb"></tbody>
-          </table>
+      <div id="grp-cot" class="sg-group" style="display:none">
+        <div class="sg-item" onclick="switchView('cots',null)"><span class="sg-num">11)</span>All COT</div>
+        <div class="sg-item" onclick="cotChartCcy('EUR',null);switchView('cots',null)"><span class="sg-num">12)</span>EUR</div>
+        <div class="sg-item" onclick="cotChartCcy('GBP',null);switchView('cots',null)"><span class="sg-num">13)</span>GBP</div>
+        <div class="sg-item" onclick="cotChartCcy('JPY',null);switchView('cots',null)"><span class="sg-num">14)</span>JPY</div>
+        <div class="sg-item" onclick="cotChartCcy('AUD',null);switchView('cots',null)"><span class="sg-num">15)</span>AUD</div>
+      </div>
+
+    </aside>
+
+    <!-- CONTENT AREA -->
+    <div id="content">
+      <div id="view-area">
+
+        <!-- ══ VIEW: FX OVERVIEW ══ -->
+        <div id="view-fxov" class="t2view active">
+
+          <!-- Top row: FX table | DXY chart | Key Data -->
+          <div class="t2-row" style="flex:1.8">
+
+            <!-- FX Rates table -->
+            <div class="t2-pnl" style="flex:2.2">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">30) FX Rate vs USD</span>
+                <span class="t2-ph-src">Finnhub · live / yfinance · 15min delay</span>
+              </div>
+              <div class="t2-tb-wrap">
+                <table class="t2t" aria-label="FX spot rates">
+                  <thead><tr>
+                    <th scope="col" class="l">Ccy</th>
+                    <th scope="col" class="r">Spot</th>
+                    <th scope="col" class="r">%Chg</th>
+                    <th scope="col" class="r">1W%</th>
+                    <th scope="col" class="r">Hi</th>
+                    <th scope="col" class="r">Lo</th>
+                    <th scope="col" class="r">HV30</th>
+                  </tr></thead>
+                  <tbody id="fxov-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- DXY Chart (LWC) -->
+            <div class="t2-pnl" style="flex:1.8">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl" id="chart-main-ttl">50) DXY Movers (DXY)</span>
+                <span class="t2-ph-src">ohlc-data · daily</span>
+                <div class="t2-ph-right">
+                  <button class="t2-btn-sm" onclick="setChartTf('1M')">1M</button>
+                  <button class="t2-btn-sm active" onclick="setChartTf('3M')">3M</button>
+                  <button class="t2-btn-sm" onclick="setChartTf('6M')">6M</button>
+                  <button class="t2-btn-sm" onclick="setChartTf('1Y')">1Y</button>
+                </div>
+              </div>
+              <div id="lwc-main" style="flex:1;min-height:0"></div>
+            </div>
+
+            <!-- Key Data -->
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">Key Data</span>
+                <span class="t2-ph-src">rates/ · extended-data/</span>
+              </div>
+              <div id="keydata-body" class="t2-kd-wrap"></div>
+            </div>
+
+          </div><!-- /top row -->
+
+          <!-- Bottom row: pair chart | ratings -->
+          <div class="t2-row" style="flex:1">
+
+            <div class="t2-pnl" style="flex:2.5">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl" id="pair-ttl">30) Pair Chart — select a pair</span>
+                <span class="t2-ph-src" id="pair-src">ohlc-data · daily</span>
+              </div>
+              <div id="lwc-pair" style="flex:1;min-height:0"></div>
+            </div>
+
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">50) Credit Ratings</span>
+                <span class="t2-ph-src">S&amp;P · Moody's · Fitch · static reference</span>
+              </div>
+              <div class="t2-tb-wrap">
+                <table class="t2t" aria-label="Sovereign credit ratings">
+                  <thead><tr>
+                    <th scope="col" class="l">CB / Ccy</th>
+                    <th scope="col" class="r">S&amp;P</th>
+                    <th scope="col" class="r">Moody's</th>
+                    <th scope="col" class="r">Fitch</th>
+                  </tr></thead>
+                  <tbody id="ratings-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div><!-- /bottom row -->
+
+          <!-- News bar -->
+          <div class="t2-news-bar">
+            <div class="t2-ph">
+              <span class="t2-ph-ttl">60) FX News &amp; Research</span>
+              <span class="t2-ph-src">news-data/news.json · updated hourly</span>
+            </div>
+            <div id="fxov-news" class="t2-news-list">
+              <div class="news-row"><span class="nr-time dim">—</span><span class="nr-src">—</span><span class="nr-hl dim">Loading news…</span></div>
+            </div>
+          </div>
+
+        </div><!-- /view-fxov -->
+
+        <!-- ══ VIEW: FX FORWARDS ══ -->
+        <div id="view-fwds" class="t2view">
+          <div class="t2-row" style="flex:1.3">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">30) Forward Term Structures — Points</span>
+                <span class="t2-ph-src">Covered Interest Parity · rates/*.json · est.</span>
+              </div>
+              <div class="t2-tb-wrap">
+                <table class="t2t" aria-label="FX forward points by tenor">
+                  <thead><tr>
+                    <th scope="col" class="l">Tenor</th>
+                    <th scope="col" class="r">EUR/USD</th>
+                    <th scope="col" class="r">USD/JPY</th>
+                    <th scope="col" class="r">GBP/USD</th>
+                    <th scope="col" class="r">USD/CAD</th>
+                    <th scope="col" class="r">AUD/USD</th>
+                    <th scope="col" class="r">USD/CHF</th>
+                    <th scope="col" class="r">NZD/USD</th>
+                  </tr></thead>
+                  <tbody id="fwd-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="t2-row" style="flex:1">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">40) Term Structure Chart — Outrights (EUR/USD)</span>
+                <span class="t2-ph-src">CIP-derived outrights · est.</span>
+              </div>
+              <div id="lwc-fwd" style="flex:1;min-height:0"></div>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
 
-    <!-- ╔════════════════╗ -->
-    <!-- ║  P7: SIGNALS   ║  Row 2, Col 3 -->
-    <!-- ╚════════════════╝ -->
-    <section class="pnl" aria-label="Market Signals">
-      <div class="ph">
-        <span class="ph-title">Market Signals</span>
-        <span class="ph-code">MSIG</span>
-      </div>
-      <div class="sub-hd"><b>ai-analysis/signals.json · Groq LLM · updated every 6h</b></div>
-      <div class="pb" id="sigs-wire" role="log" aria-live="polite" aria-label="Market signal alerts">
-        <div style="padding:12px 6px;color:#2a3040;font-size:9px;">Loading signals…</div>
-      </div>
-    </section>
+        <!-- ══ VIEW: FX OPTIONS AND VOLATILITY ══ -->
+        <div id="view-vols" class="t2view">
+          <div class="t2-row" style="flex:1.3">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">30) Implied Volatility Surface</span>
+                <span class="t2-ph-src">ATM: HV30 est. · 25d RR: Saxo Bank indicative · rr-data/rr2.json</span>
+              </div>
+              <div id="vol-pair-sel" role="group" aria-label="Select pair for vol surface">
+                <button class="vps-btn active" data-p="EURUSD" onclick="volPairClick('EURUSD')">EUR/USD</button>
+                <button class="vps-btn" data-p="USDJPY" onclick="volPairClick('USDJPY')">USD/JPY</button>
+                <button class="vps-btn" data-p="GBPUSD" onclick="volPairClick('GBPUSD')">GBP/USD</button>
+                <button class="vps-btn" data-p="AUDUSD" onclick="volPairClick('AUDUSD')">AUD/USD</button>
+                <button class="vps-btn" data-p="USDCAD" onclick="volPairClick('USDCAD')">USD/CAD</button>
+                <button class="vps-btn" data-p="USDCHF" onclick="volPairClick('USDCHF')">USD/CHF</button>
+                <button class="vps-btn" data-p="EURJPY" onclick="volPairClick('EURJPY')">EUR/JPY</button>
+              </div>
+              <div class="t2-tb-wrap">
+                <table class="t2t" aria-label="Implied volatility surface by tenor">
+                  <thead><tr>
+                    <th scope="col" class="l">Tenor</th>
+                    <th scope="col" class="r">ATM Mid</th>
+                    <th scope="col" class="r">ATM Bid/Ask est.</th>
+                    <th scope="col" class="r">25d RR</th>
+                    <th scope="col" class="r">25d BF est.</th>
+                    <th scope="col" class="r">10d RR est.</th>
+                  </tr></thead>
+                  <tbody id="vol-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="t2-row" style="flex:1">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl" id="vol-chart-ttl">40) Realized Vol — EUR/USD (HV30)</span>
+                <span class="t2-ph-src">ohlc-data · computed · 30-day rolling window</span>
+              </div>
+              <div id="lwc-vol" style="flex:1;min-height:0"></div>
+            </div>
+          </div>
+        </div>
 
-    <!-- ╔════════════════╗ -->
-    <!-- ║  P8: MACRO     ║  Row 2, Col 4 -->
-    <!-- ╚════════════════╝ -->
-    <section class="pnl" aria-label="Macro Snapshot">
-      <div class="ph">
-        <span class="ph-title">Macro Snapshot</span>
-        <span class="ph-code">ECOS</span>
-      </div>
-      <div class="sub-hd"><b>economic-data/*.json · extended-data/*.json · rates/*.json</b></div>
-      <div class="pb">
-        <table class="t" aria-label="Macroeconomic indicators by central bank">
-          <thead>
-            <tr>
-              <th scope="col">CB</th>
-              <th scope="col" class="r">Rate</th>
-              <th scope="col" class="r">CPI</th>
-              <th scope="col" class="r">GDP</th>
-              <th scope="col" class="r">10Y</th>
-            </tr>
-          </thead>
-          <tbody id="macro-tbody">
-            <tr><td class="dim" colspan="5" style="text-align:center;padding:12px 0;">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+        <!-- ══ VIEW: ECONOMICS (CB RATES + MACRO) ══ -->
+        <div id="view-cbrt" class="t2view">
+          <div class="t2-row" style="flex:0 0 auto">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">CB Rates &amp; OIS Bias</span>
+                <span class="t2-ph-src">rates/*.json · meetings-data/meetings.json · OIS-implied per GUIDELINES</span>
+              </div>
+              <div class="t2-tb-wrap">
+                <table class="t2t" aria-label="Central bank rates and policy expectations">
+                  <thead><tr>
+                    <th scope="col" class="l">Central Bank</th>
+                    <th scope="col" class="r">Rate</th>
+                    <th scope="col" class="r">Trend</th>
+                    <th scope="col" class="r">Next Mtg</th>
+                    <th scope="col" class="r">OIS Bias</th>
+                    <th scope="col" class="r">Cut%</th>
+                    <th scope="col" class="r">Hold%</th>
+                    <th scope="col" class="r">Hike%</th>
+                  </tr></thead>
+                  <tbody id="cb-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="t2-row" style="flex:1">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">Current Policy Rates</span>
+                <span class="t2-ph-src">rates/*.json</span>
+              </div>
+              <div id="lwc-cbrt" style="flex:1;min-height:0"></div>
+            </div>
+            <div class="t2-pnl" style="flex:1.2">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">Regional Economic Matrix</span>
+                <span class="t2-ph-src">economic-data/*.json · extended-data/*.json</span>
+              </div>
+              <div class="t2-tb-wrap">
+                <table class="t2t" aria-label="Macroeconomic indicators by central bank">
+                  <thead><tr>
+                    <th scope="col" class="l">CB</th>
+                    <th scope="col" class="r">Rate</th>
+                    <th scope="col" class="r">CPI</th>
+                    <th scope="col" class="r">GDP</th>
+                    <th scope="col" class="r">10Y Yld</th>
+                    <th scope="col" class="r">Unemp</th>
+                  </tr></thead>
+                  <tbody id="macro-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  </div><!-- #terminal -->
-  </main>
+        <!-- ══ VIEW: CROSS-ASSET RISK ══ -->
+        <div id="view-risk" class="t2view">
+          <div class="t2-row" style="flex:0 0 auto">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">Cross-Asset Risk Monitor</span>
+                <span id="risk-badge" class="t2-badge rb-on" role="status" aria-live="assertive">—</span>
+                <span class="t2-ph-src">intraday-data/quotes.json · canonical thresholds per GUIDELINES</span>
+              </div>
+              <div id="stress-row">
+                <span class="dim">Score:</span>
+                <span id="stress-sc" class="amb bld">—/8</span>
+                <span id="stress-factors" class="dim">Computing…</span>
+              </div>
+              <div class="t2-tb-wrap">
+                <table class="t2t" aria-label="Cross-asset prices and risk indicators">
+                  <thead><tr>
+                    <th scope="col" class="l">Asset</th>
+                    <th scope="col" class="r">Last</th>
+                    <th scope="col" class="r">1D%</th>
+                    <th scope="col" class="r">1W%</th>
+                    <th scope="col" class="r">Hi</th>
+                    <th scope="col" class="r">Lo</th>
+                  </tr></thead>
+                  <tbody id="risk-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="t2-row" style="flex:1">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">VIX — Fear Index (6M)</span>
+                <span class="t2-ph-src">ohlc-data/vix.json · yfinance</span>
+              </div>
+              <div id="lwc-vix" style="flex:1;min-height:0"></div>
+            </div>
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">US Yield Curve</span>
+                <span class="t2-ph-src">intraday-data/quotes.json · FRED DGS2</span>
+              </div>
+              <div id="lwc-yc" style="flex:1;min-height:0"></div>
+            </div>
+          </div>
+        </div>
 
-</div><!-- #page-wrap -->
+        <!-- ══ VIEW: COT / POSITIONING ══ -->
+        <div id="view-cots" class="t2view">
+          <div class="t2-row" style="flex:0 0 auto">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl">COT Positioning — Leveraged Funds</span>
+                <span class="t2-ph-src">CFTC Disaggregated TFF · Leveraged Funds · Options+Futures Combined · cot-data/*.json</span>
+              </div>
+              <div class="t2-tb-wrap">
+                <table class="t2t" aria-label="CFTC COT leveraged funds net positions">
+                  <thead><tr>
+                    <th scope="col" class="l">Currency</th>
+                    <th scope="col" class="r">Net</th>
+                    <th scope="col">Direction</th>
+                    <th scope="col" class="r">WoW Δ</th>
+                    <th scope="col" class="r">Net %OI</th>
+                    <th scope="col" class="r">Long</th>
+                    <th scope="col" class="r">Short</th>
+                    <th scope="col" class="r">Week Ending</th>
+                  </tr></thead>
+                  <tbody id="cot-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="t2-row" style="flex:1">
+            <div class="t2-pnl" style="flex:1">
+              <div class="t2-ph">
+                <span class="t2-ph-ttl" id="cot-chart-ttl">COT Net Position History — EUR</span>
+                <span class="t2-ph-src">CFTC · 52-week history · cot-data/*.json</span>
+                <div class="t2-ph-right" id="cot-ccy-sel" role="group" aria-label="Select currency for chart">
+                  <button class="t2-btn-sm active" onclick="cotChartCcy('EUR',this)">EUR</button>
+                  <button class="t2-btn-sm" onclick="cotChartCcy('GBP',this)">GBP</button>
+                  <button class="t2-btn-sm" onclick="cotChartCcy('JPY',this)">JPY</button>
+                  <button class="t2-btn-sm" onclick="cotChartCcy('AUD',this)">AUD</button>
+                  <button class="t2-btn-sm" onclick="cotChartCcy('CAD',this)">CAD</button>
+                  <button class="t2-btn-sm" onclick="cotChartCcy('CHF',this)">CHF</button>
+                  <button class="t2-btn-sm" onclick="cotChartCcy('NZD',this)">NZD</button>
+                </div>
+              </div>
+              <div id="lwc-cot" style="flex:1;min-height:0"></div>
+            </div>
+          </div>
+        </div>
 
-<!-- TEST BANNER — marks this as a non-production build -->
+      </div><!-- /view-area -->
+    </div><!-- /content -->
+
+  </div><!-- /main-grid -->
+
+</div><!-- /page-wrap -->
+
+<!-- TEST BANNER -->
 <div id="test-banner" role="note" aria-label="Test build notice">
-  TEST BUILD — index2.html · Bloomberg-style layout · noindex,nofollow · Production terminal: <a href="/" style="color:#000;text-decoration:underline;">globalinvesting.github.io</a>
+  TEST BUILD — index2.html · noindex,nofollow · Production terminal: <a href="/" style="color:#000;text-decoration:underline;">globalinvesting.github.io</a>
 </div>
 
 <script src="assets/dashboard2.js" defer></script>
