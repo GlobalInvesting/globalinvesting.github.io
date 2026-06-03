@@ -7425,7 +7425,9 @@ async function fetchFedExpectations() {
         return 'flat';
       })();
       // Priority 1: meetings.json fwdRate (prob-weighted · workflow-computed)
-      if (meetings?.fwdRate != null && !isNaN(meetings.fwdRate) && meetings.fwdRate > 0) {
+      // Bloomberg standard: accept 0 and negative values — currencies like CHF and JPY
+      // can have OIS-implied rates below zero. Rejecting fwdRate=0 as "missing" is wrong.
+      if (meetings?.fwdRate != null && !isNaN(meetings.fwdRate)) {
         fwdDisplay = meetings.fwdRate.toFixed(2) + '%';
       } else {
         const pCut  = (meetings?.cutProb  != null && !isNaN(meetings.cutProb))  ? Math.min(100, Math.max(0, meetings.cutProb))  : null;
@@ -7438,16 +7440,18 @@ async function fetchFedExpectations() {
         const cbStep  = CB_STEP[ccy] ?? 0.25;
 
         if (pCut !== null || pHike !== null) {
-          // Priority 2: probability-weighted — Bloomberg WIRP standard
+          // Priority 2: probability-weighted — Bloomberg WIRP standard.
+          // No floor: OIS-implied rates below zero are valid (CHF 2015–2022, JPY ongoing).
           const cut  = pCut  ?? 0;
           const hike = pHike ?? 0;
           // Clamp residual so probabilities never exceed 100%
           const cutC  = Math.min(cut,  100);
           const hikeC = Math.min(hike, 100 - cutC);
           const implied = current + (hikeC / 100) * cbStep - (cutC / 100) * cbStep;
-          fwdDisplay = Math.max(0, implied).toFixed(2) + '%';
+          fwdDisplay = implied.toFixed(2) + '%';
         } else {
-          // Priority 3: no probabilities available — naive ±step, ~ signals estimate
+          // Priority 3: no OIS probabilities — naive ±step heuristic, ~ signals estimate.
+          // Floor retained here: without probability data the heuristic is directional only.
           const dir  = meetingBias ?? trendDir;
           const step = dir === 'down' ? -cbStep : dir === 'up' ? cbStep : 0;
           fwdDisplay = '~' + Math.max(0, current + step).toFixed(2) + '%';

@@ -341,12 +341,16 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   const bias=meetingData?.bias??null,nextMtg=meetingData?.nextMeeting??'—';
   const biasLabel=bias==='cut'?'\u2193 Cut':bias==='hike'?'\u2191 Hike':'\u2192 Hold';
   const biasCol=bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text2)';
+  // Bloomberg standard: accept fwdRate=0 and negative values.
+  // CHF/JPY OIS-implied rates can be below zero — rejecting 0 as "missing" is wrong.
   let fwdRate=null,fwdDisplay='—',fwdIsEst=false,fwdIsProbEst=false;
-  if(meetingData?.fwdRate!=null&&!isNaN(meetingData.fwdRate)&&meetingData.fwdRate>0){fwdRate=parseFloat(meetingData.fwdRate);fwdDisplay=fwdRate.toFixed(2)+'%';}
+  if(meetingData?.fwdRate!=null&&!isNaN(meetingData.fwdRate)){fwdRate=parseFloat(meetingData.fwdRate);fwdDisplay=fwdRate.toFixed(2)+'%';}
   else{
     const pCut=meetingData?.cutProb!=null?Math.min(100,Math.max(0,meetingData.cutProb)):null;
     const pHike=meetingData?.hikeProb!=null?Math.min(100,Math.max(0,meetingData.hikeProb)):null;
-    if(pCut!==null||pHike!==null){const cut=pCut??0,hike=Math.min(pHike??0,100-cut);const cbStepModal=ccy==='JPY'?0.10:0.25;fwdRate=Math.max(0,currentRate+(hike/100)*cbStepModal-(cut/100)*cbStepModal);fwdDisplay=fwdRate.toFixed(2)+'%';fwdIsProbEst=true;}
+    // Priority 2: probability-weighted — no floor, OIS-implied negative rates are valid.
+    if(pCut!==null||pHike!==null){const cut=pCut??0,hike=Math.min(pHike??0,100-cut);const cbStepModal=ccy==='JPY'?0.10:0.25;fwdRate=currentRate+(hike/100)*cbStepModal-(cut/100)*cbStepModal;fwdDisplay=fwdRate.toFixed(2)+'%';fwdIsProbEst=true;}
+    // Priority 3: heuristic only — floor retained (directional estimate, no probability data).
     else{const step=bias==='cut'?-0.25:bias==='hike'?0.25:0;fwdRate=Math.max(0,currentRate+step);fwdDisplay='~'+fwdRate.toFixed(2)+'%';fwdIsEst=true;}
   }
   const bankName=bankInfo?.name||ccy,bankShort=bankInfo?.short||ccy;
