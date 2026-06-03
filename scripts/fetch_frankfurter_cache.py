@@ -137,9 +137,42 @@ def main():
     print(f"  ✓ Written: {OUTPUT_PATH}")
 
 
+def _load_existing_cache() -> dict | None:
+    """Return existing frankfurter.json if it is valid and recent enough to use as fallback."""
+    if not os.path.exists(OUTPUT_PATH):
+        return None
+    try:
+        with open(OUTPUT_PATH) as f:
+            data = json.load(f)
+        # Must have a today block with at least one rate
+        if data.get("today", {}).get("rates"):
+            return data
+    except Exception:
+        pass
+    return None
+
+
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
         print(f"  ❌ Error: {e}", file=sys.stderr)
-        sys.exit(1)
+        # v8.4.5: Fallback to existing cache instead of exiting with code 1.
+        # A 520/503/timeout from api.frankfurter.app is transient (Cloudflare hiccup,
+        # ECB publishing delay). Failing the GitHub Actions step is disruptive and
+        # misleading — the cached data from the previous run is valid for the dashboard.
+        # If no prior cache exists, exit 1 so the problem is visible.
+        existing = _load_existing_cache()
+        if existing:
+            # Bump the updated timestamp so downstream consumers know we checked.
+            existing["updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+            with open(OUTPUT_PATH, "w") as f:
+                json.dump(existing, f, separators=(",", ":"))
+            print(f"  ⚠️  API unavailable — preserved previous cache "
+                  f"(today={existing['today']['date']}). Will retry on next scheduled run.",
+                  file=sys.stderr)
+            sys.exit(0)   # ← exit 0: step is yellow warning, not red failure
+        else:
+            print("  ❌ No prior cache available — cannot recover.", file=sys.stderr)
+            sys.exit(1)
