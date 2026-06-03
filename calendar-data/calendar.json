@@ -1,66 +1,31 @@
 {
-  "lastUpdate": "2026-06-02T23:35:02Z",
-  "generatedAt": "2026-06-02T23:35:02Z",
+  "lastUpdate": "2026-06-03T00:01:02Z",
+  "generatedAt": "2026-06-03T00:01:02Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Finnhub",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-02",
-  "rangeTo": "2026-06-16",
-  "totalEvents": 1650,
+  "rangeFrom": "2025-06-03",
+  "rangeTo": "2026-06-17",
+  "totalEvents": 1662,
   "currencyCounts": {
-    "CAD": 131,
-    "CHF": 89,
-    "USD": 628,
-    "AUD": 176,
+    "AUD": 175,
+    "CAD": 130,
+    "USD": 637,
     "JPY": 183,
-    "GBP": 180,
-    "NZD": 77,
+    "CHF": 89,
+    "GBP": 183,
+    "NZD": 79,
     "EUR": 186
   },
   "impactCounts": {
-    "medium": 1120,
-    "low": 146,
-    "high": 384
+    "low": 145,
+    "medium": 1129,
+    "high": 388
   },
   "surpriseStats": {
-    "AUD/gdp": {
-      "n": 2,
-      "mean": 0.25,
-      "std": 0.212132
-    },
-    "EUR/hcob eurozone composite pmi": {
-      "n": 2,
-      "mean": -0.25,
-      "std": 0.353553
-    },
-    "EUR/hcob eurozone services pmi": {
-      "n": 2,
-      "mean": -0.45,
-      "std": 0.777817
-    },
-    "GBP/s&p global composite pmi": {
-      "n": 2,
-      "mean": -1.0,
-      "std": 1.131371
-    },
-    "GBP/s&p global services pmi": {
-      "n": 2,
-      "mean": -0.8,
-      "std": 1.131371
-    },
-    "EUR/unemployment rate": {
-      "n": 3,
-      "mean": 0.133333,
-      "std": 0.251661
-    },
-    "USD/s&p global services pmi": {
-      "n": 2,
-      "mean": -0.75,
-      "std": 0.212132
-    },
     "USD/export price index": {
       "n": 2,
       "mean": 0.65,
@@ -271,6 +236,11 @@
       "mean": -0.7,
       "std": 0.141421
     },
+    "EUR/unemployment rate": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.353553
+    },
     "GBP/cpi": {
       "n": 2,
       "mean": 0.0,
@@ -423,54 +393,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CAD",
-      "event": "S&P Global Manufacturing PMI",
-      "dateISO": "2025-06-02",
-      "hourUTC": "13:30",
-      "actual": "46.1",
-      "forecast": null,
-      "previous": "45.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "CHF",
-      "event": "procure.ch Manufacturing PMI",
-      "dateISO": "2025-06-02",
-      "hourUTC": "07:30",
-      "actual": "42.1",
-      "forecast": "46.5",
-      "previous": "45.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Manufacturing PMI Final",
-      "dateISO": "2025-06-02",
-      "hourUTC": "13:45",
-      "actual": "52",
-      "forecast": "52.3",
-      "previous": "50.2",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "ISM Manufacturing PMI",
-      "dateISO": "2025-06-02",
-      "hourUTC": "14:00",
-      "actual": "48.5",
-      "forecast": "49.5",
-      "previous": "48.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "FH"
-    },
     {
       "currency": "AUD",
       "event": "Current Account",
@@ -17170,19 +17092,6 @@
     {
       "date": "12 May",
       "dateISO": "2026-05-12",
-      "timeUTC": "07:15",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Williams Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "12 May",
-      "dateISO": "2026-05-12",
       "timeUTC": "09:00",
       "country": "EUR",
       "currency": "EUR",
@@ -17192,19 +17101,6 @@
       "actual": "-9.1",
       "forecast": "-20",
       "previous": "-20.4"
-    },
-    {
-      "date": "12 May",
-      "dateISO": "2026-05-12",
-      "timeUTC": "09:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "2026-27 Federal Budget",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "12 May",
@@ -17296,19 +17192,6 @@
       "actual": "3.8",
       "forecast": "3.7",
       "previous": "3.3"
-    },
-    {
-      "date": "12 May",
-      "dateISO": "2026-05-12",
-      "timeUTC": "17:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Goolsbee Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "12 May",
@@ -20549,7 +20432,7 @@
       "impact": "medium",
       "actual": "-26.5",
       "forecast": null,
-      "previous": "-24.4"
+      "previous": "-25.5"
     },
     {
       "date": "3 Jun",
@@ -20680,6 +20563,19 @@
       "actual": null,
       "forecast": "-2.4*",
       "previous": "-2.572"
+    },
+    {
+      "date": "3 Jun",
+      "dateISO": "2026-06-03",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Goolsbee Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "3 Jun",
@@ -21928,6 +21824,240 @@
       "actual": null,
       "forecast": "4.5*",
       "previous": "5.9"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.6*",
+      "previous": "2.5"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.9*",
+      "previous": "0.7"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.6*",
+      "previous": "2.8"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "SECO Economic Forecasts",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "11:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "MBA 30-Year Mortgage Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "6.65"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Retail Sales Control Group MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.4*",
+      "previous": "0.5"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Retail Sales Ex Autos MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.6*",
+      "previous": "0.7"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Retail Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.5"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Business Inventories MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.8*",
+      "previous": "0.9"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Pending Home Sales MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1*",
+      "previous": "1.4"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Pending Home Sales YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "3.2"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-3.6*",
+      "previous": "-3.327"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-2.4*",
+      "previous": "-2.572"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "18:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "3.75"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "18:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "FOMC Economic Projections",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "18:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Press Conference",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "GDP Growth Rate QoQ",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.2"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "GDP Growth Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "1.3"
     }
   ]
 }
