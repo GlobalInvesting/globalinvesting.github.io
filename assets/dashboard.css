@@ -788,10 +788,13 @@
   .sb-sym { flex-shrink: 0; }
 
   /* ── CARRY TRADE RANKING ─────────────────────────────────────── */
-  .carry-rank-row { display:grid; grid-template-columns:10px 46px 36px 1fr 34px; align-items:center; gap:4px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
+  .carry-rank-row { display:grid; grid-template-columns:10px 14px 46px 36px 1fr 34px; align-items:center; gap:4px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
   .carry-rank-row:hover { background:var(--bg3); }
   .carry-rank-row:last-child { border-bottom:none; }
   .cr-rank { font-size:9px; color:var(--text3); font-family:var(--font-mono); text-align:left; }
+  .cr-dir { font-size:8px; font-weight:700; font-family:var(--font-mono); border-radius:2px; padding:0 2px; text-align:center; }
+  .cr-dir-long  { color:var(--up);   border:1px solid var(--up);   opacity:.85; }
+  .cr-dir-short { color:var(--down); border:1px solid var(--down); opacity:.85; }
   .cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; font-size:10px; }
   .cr-spread { font-family:var(--font-mono); font-size:8px; color:var(--text2); white-space:nowrap; }
   .cr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; min-width:8px; }
