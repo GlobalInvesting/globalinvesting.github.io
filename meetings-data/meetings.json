@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-06-01",
+  "lastUpdate": "2026-06-03",
   "meetings": {
     "USD": {
       "nextMeeting": "17 Jun",
@@ -28,7 +28,7 @@
       "bias": "hold",
       "biasSource": "CME 30-day Fed Funds futures (SOFR-implied)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-01",
+      "biasUpdated": "2026-06-03",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -60,7 +60,7 @@
       "bias": "hold",
       "biasSource": "ECB €STR overnight swap rate",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-01",
+      "biasUpdated": "2026-06-03",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.0
@@ -92,7 +92,7 @@
       "bias": "hold",
       "biasSource": "BoE 1-month OIS forward (SONIA)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-01",
+      "biasUpdated": "2026-06-03",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -124,7 +124,7 @@
       "bias": "hike",
       "biasSource": "TONA overnight rate + BoJ forward guidance",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-01",
+      "biasUpdated": "2026-06-03",
       "cutProb": 0,
       "hikeProb": 45,
       "fwdRate": 0.795
@@ -156,7 +156,7 @@
       "bias": "hold",
       "biasSource": "ASX 30-day Interbank Cash Rate Futures",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-01",
+      "biasUpdated": "2026-06-03",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 4.35
@@ -190,7 +190,7 @@
       "bias": "hold",
       "biasSource": "CORRA overnight rate (BoC)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-01",
+      "biasUpdated": "2026-06-03",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.25
@@ -214,10 +214,10 @@
       "bias": "cut",
       "biasSource": "SNB SARON overnight rate",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-01",
+      "biasUpdated": "2026-06-03",
       "cutProb": 24,
       "hikeProb": 0,
-      "fwdRate": 0.0
+      "fwdRate": -0.06
     },
     "NZD": {
       "nextMeeting": "8 Jul",
@@ -244,7 +244,7 @@
       "bias": "hike",
       "biasSource": "NZFBF OIS swap curve (RBNZ OCR)",
       "biasMethod": "spread",
-      "biasUpdated": "2026-06-01",
+      "biasUpdated": "2026-06-03",
       "cutProb": 0,
       "hikeProb": 20,
       "fwdRate": 2.3
