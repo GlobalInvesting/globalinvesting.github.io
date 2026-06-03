@@ -1,57 +1,53 @@
 {
-  "generated_at": "2026-06-03T03:56:42Z",
+  "generated_at": "2026-06-03T11:27:41Z",
   "signals": [
     {
-      "time": "03:56",
+      "time": "11:25",
       "priority": "critical",
-      "title": "USD/JPY — Carry + Intervention Risk + CESI",
-      "text": "USD/JPY at 159.88 testing the 160.00 psychological barrier where BoJ intervention risk historically escalates. Despite JPY net short -86,249 (COT) and a positive JPY CESI (+11), the +300bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 0.75%) continues to dominate spot direction. Options market remains cautious with a -1.10 25d RR put skew, signaling institutional hedging against a sharp JPY reversal or BoJ action. Carry remains the primary driver until VIX > 25.",
+      "title": "CHF/JPY — SNB Intervention + BoJ Tightening + Carry",
+      "text": "SNB Chairman Schlegel hints at near-term intervention readiness, stating medium-term inflation pressure is basically unchanged, while Rabobank highlights BoJ tightening and intervention risks for JPY. USD/JPY at 159.8, holding below 160.00, with a +292bp Fed-BoJ carry favoring USD. CHF/JPY at 202.544, with a -75bp carry premium favoring JPY, but SNB intervention risk could rapidly compress this further. JPY COT LF net short −86,249 (week ending 2026-05-26) vs BoJ hike bias (OIS), creating a crowded short-squeeze risk (USD/JPY downside if shorts cover) if BoJ acts. SNB's explicit intervention readiness introduces significant two-way volatility for JPY and CHF crosses. Watch for any official BoJ/SNB action or further verbal warnings.",
       "evidence": [
-        "USD/JPY: 159.88",
-        "Fed-BoJ Carry: +300bp",
-        "JPY COT net: -86,249",
-        "USDJPY 25d RR: -1.10"
+        "SNB Schlegel: 'increased readiness to intervene'",
+        "JPY COT LF net: −86,249",
+        "USD/JPY OIS carry: +292bp"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "03:52",
+      "time": "11:28",
+      "priority": "critical",
+      "title": "EUR/USD — ECB Hike Expectations + Volatility Premium",
+      "text": "Economists expect a June ECB rate hike as stagflation risk stays high (Reuters poll), with ECB policymaker Elderson noting prolonged war increases likelihood of second-round effects. EUR/USD at 1.1623. The options market shows an elevated vol premium with EUR/USD IV 7.1% vs HV30 3.9% (VRP +3.2%), indicating strong hedging demand. Despite hawkish headlines, EUR COT LF net short −26,311 (week ending 2026-05-26) suggests specs are not yet fully positioned for a hike. A confirmed ECB hike or hawkish forward guidance at the 11 Jun meeting is likely to trigger a short-squeeze.",
+      "evidence": [
+        "Reuters poll: June ECB hike expected",
+        "EUR/USD IV: 7.1% vs HV30: 3.9%",
+        "EUR COT LF net: −26,311"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "11:31",
       "priority": "warning",
-      "title": "GBP/CHF — G8 Bilateral Theme + Carry",
-      "text": "GBP/CHF at 1.0611 reflects a significant G8 bilateral divergence as GBP outperforms (+0.430%) while CHF laggards (-0.446%). The +375bp carry premium (BoE 3.75% vs SNB 0.0%) favors GBP, further supported by a restrictive GBP real rate of +0.77% vs CHF's accommodative -0.31%. The 0.876% G8 spread confirms a structural flow out of CHF into high-carry G8 peers. Watch for SNB meeting on 18 Jun for potential cut confirmation.",
+      "title": "NZD/USD — COT vs OIS Divergence + G8 Laggard",
+      "text": "NZD/USD COT LF net short −13,767 (week ending 2026-05-26) vs RBNZ hike bias (OIS) creates a short-squeeze risk if RBNZ delivers or signals a hike. NZD is also the weakest G8 currency this week, with a 1W avg of −0.461% (n=4 pairs), contributing to a 0.867% spread against the AUD leader. NZD/USD at 0.5900. The next RBNZ meeting (mkt: 20% hike priced) on 8 Jul is the key catalyst for this divergence.",
       "evidence": [
-        "GBP 1W avg: +0.430% (n=4)",
-        "CHF 1W avg: -0.446% (n=6)",
-        "G8 spread: 0.876%",
-        "GBP/CHF Carry: +375bp"
+        "NZD COT LF net: −13,767",
+        "RBNZ market bias: ↑ Hike",
+        "NZD 1W avg: -0.461% (n=4)"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "03:48",
+      "time": "11:34",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Vol + PMI Shock",
-      "text": "AUD/USD at 0.7175 faces immediate pressure after Australia Services PMI slipped to 48.7, signaling contraction. This macro headwind collides with a crowded AUD COT LF net long of +58,041 (76.1% long), creating liquidation risk. Options market is pricing extreme uncertainty with an AUD/USD VRP of +7.4% (IV 15.4% vs HV30 8.0%), the highest in the G10 space. Retail 77% short bias provides a contrarian cushion, but PMI weakness threatens the 0.7150 support level.",
+      "title": "AUD/USD — G8 Leader + Carry Advantage + Negative CESI",
+      "text": "AUD is the strongest G8 currency this week, with a 1W avg of +0.405% (n=4 pairs), leading NZD by 0.867%. AUD/USD at 0.7172 benefits from a -70bp carry premium favoring AUD (AONIA 4.35% vs SOFR 3.65%). However, AUD CESI net −7 misses indicates data is consistently disappointing expectations, posing a headwind to sustained strength. Watch for RBA's next meeting on 16 Jun for any shift in stance that is likely to impact carry and sentiment.",
       "evidence": [
-        "AUD Services PMI: 48.7",
-        "AUD COT net: +58,041",
-        "AUD/USD VRP: +7.4%",
-        "Retail: 77% Short"
+        "AUD 1W avg: +0.405% (n=4)",
+        "AUD/USD OIS carry: -70bp",
+        "AUD CESI net: -7 misses"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "03:42",
-      "priority": "info",
-      "title": "EUR/USD — Vol Premium + CESI Divergence",
-      "text": "EUR/USD at 1.1631 remains range-bound despite a +3.2% Vol Risk Premium (IV 7.1% vs HV30 3.9%), indicating the options market is paying for protection that realized volatility does not yet justify. While USD CESI (+22) significantly outperforms EUR CESI (+7), the +175bp USD carry advantage (Fed 3.75% vs ECB 2.0%) keeps upside capped. DXY vs SPX correlation at -0.581 (z=+1.68σ) suggests USD is beginning to trade on funding stress rather than pure risk-off flows. Watch ECB meeting on 11 Jun for policy shift.",
-      "evidence": [
-        "EUR/USD VRP: +3.2%",
-        "USD CESI: +22",
-        "USD/EUR Carry: +175bp",
-        "DXY vs SPX z-score: +1.68σ"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
