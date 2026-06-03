@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-03T12:03:06Z",
-  "generatedAt": "2026-06-03T12:03:06Z",
+  "lastUpdate": "2026-06-03T12:06:00Z",
+  "generatedAt": "2026-06-03T12:06:00Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-03",
   "rangeTo": "2026-06-17",
-  "totalEvents": 1662,
+  "totalEvents": 1665,
   "currencyCounts": {
     "AUD": 175,
     "CAD": 130,
-    "USD": 637,
+    "USD": 638,
     "JPY": 183,
     "CHF": 89,
-    "GBP": 183,
+    "GBP": 185,
     "NZD": 79,
     "EUR": 186
   },
   "impactCounts": {
     "low": 145,
-    "medium": 1129,
+    "medium": 1132,
     "high": 388
   },
   "surpriseStats": {
@@ -20701,11 +20701,37 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
+      "event": "Fed Barkin Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "4 Jun",
+      "dateISO": "2026-06-04",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
       "event": "Initial Jobless Claims",
       "impact": "medium",
       "actual": null,
       "forecast": "213",
       "previous": "215"
+    },
+    {
+      "date": "4 Jun",
+      "dateISO": "2026-06-04",
+      "timeUTC": "15:40",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE Gov Bailey Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "4 Jun",
@@ -20929,6 +20955,19 @@
       "previous": "57.7"
     },
     {
+      "date": "5 Jun",
+      "dateISO": "2026-06-05",
+      "timeUTC": "18:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE Gov Bailey Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
       "date": "6 Jun",
       "dateISO": "2026-06-06",
       "timeUTC": "16:00",
@@ -21147,7 +21186,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "-4*",
-      "previous": "-3.327"
+      "previous": "-6.75"
     },
     {
       "date": "10 Jun",
@@ -21354,7 +21393,7 @@
       "event": "Deposit Facility Rate",
       "impact": "high",
       "actual": null,
-      "forecast": null,
+      "forecast": "2.25",
       "previous": "2"
     },
     {
