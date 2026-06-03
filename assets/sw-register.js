@@ -48,16 +48,10 @@
     navigator.serviceWorker.register('/sw.js')
       .then(function (reg) {
         swReg = reg;
-        // Expose subscription helper for the terminal to call
+        // Expose subscription helper — called only from an explicit UI button or tour step.
+        // Never auto-prompts: browsers require a user gesture, and UX best practice requires
+        // the user to understand what they're signing up for before seeing the permission dialog.
         window.subscribeCoTPush = function () { _requestPushSubscription(reg); };
-        // Auto-prompt once after first user interaction (gesture requirement)
-        var alreadyPrompted = localStorage.getItem(PROMPT_KEY);
-        if (!alreadyPrompted && 'PushManager' in window) {
-          document.addEventListener('click', function _once() {
-            document.removeEventListener('click', _once);
-            _requestPushSubscription(reg);
-          }, { once: true });
-        }
       })
       .catch(function (err) {
         console.warn('[SW] Registration failed:', err);

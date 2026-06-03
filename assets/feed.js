@@ -47,7 +47,7 @@
 
     container.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <span style="font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--blue,#388bfd);text-transform:uppercase;">Subscribe</span>
+        <span style="font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--blue,#4f7fff);text-transform:uppercase;">Subscribe</span>
         <button id="rss-close" aria-label="Close feed popover" style="background:none;border:none;cursor:pointer;color:var(--text-dim,#8b949e);font-size:14px;padding:0;line-height:1;">&#x2715;</button>
       </div>
       <p style="font-size:11px;color:var(--text-dim,#8b949e);margin:0 0 10px;line-height:1.5;white-space:normal;word-wrap:break-word;">
@@ -87,7 +87,7 @@
       const el = container.querySelector('#' + id);
       if (!el) return;
       el.addEventListener('mouseenter', function () {
-        el.style.borderColor = 'var(--blue,#388bfd)';
+        el.style.borderColor = 'var(--blue,#4f7fff)';
       });
       el.addEventListener('mouseleave', function () {
         el.style.borderColor = 'var(--border,#30363d)';

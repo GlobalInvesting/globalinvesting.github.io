@@ -34,6 +34,16 @@
   function applyConsent(choice) {
     localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: choice, ts: Date.now() }));
     hideBanner();
+    // Update GA4 consent state — must be called before any gtag event fires.
+    // 'denied' keeps GA4 in consent-mode cookieless mode (no cookies, no PII sent).
+    if (typeof gtag === 'function') {
+      gtag('consent', 'update', {
+        analytics_storage:   choice === 'accepted' ? 'granted' : 'denied',
+        ad_storage:          choice === 'accepted' ? 'granted' : 'denied',
+        ad_user_data:        choice === 'accepted' ? 'granted' : 'denied',
+        ad_personalization:  choice === 'accepted' ? 'granted' : 'denied',
+      });
+    }
     if (choice === 'accepted') loadAdSense();
     else loadAdSenseNonPersonalized();
   }
@@ -56,6 +66,15 @@
       if (stored) {
         var parsed = JSON.parse(stored);
         if (parsed && parsed.ts && (Date.now() - parsed.ts) < 13 * 30 * 24 * 3600 * 1000) {
+          // Restore GA4 consent state from prior session before any events fire.
+          if (typeof gtag === 'function') {
+            gtag('consent', 'update', {
+              analytics_storage:  parsed.v === 'accepted' ? 'granted' : 'denied',
+              ad_storage:         parsed.v === 'accepted' ? 'granted' : 'denied',
+              ad_user_data:       parsed.v === 'accepted' ? 'granted' : 'denied',
+              ad_personalization: parsed.v === 'accepted' ? 'granted' : 'denied',
+            });
+          }
           if (parsed.v === 'accepted') loadAdSense();
           else loadAdSenseNonPersonalized();
           return;

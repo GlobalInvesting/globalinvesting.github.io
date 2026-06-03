@@ -974,13 +974,10 @@
     const grid = document.createElement('div');
     grid.className = 'sess-grid';
 
-    // Since quotes.json provides full-day pct only (no session-specific OHLC),
-    // all open/past session rows show the same day composite value.
-    // The state indicator (active/past/upcoming) conveys session timing.
-    // Bar color is always #388bfd (blue) — active at full opacity, past dimmed.
+    // Bar color: --blue (terminal design system) — active at full opacity, past dimmed.
     // This matches Proposal A: bars represent session window status, not directional sign.
     const compositePos = dayComposite != null && dayComposite >= 0;
-    const barClr = '#388bfd';
+    const barClr = getComputedStyle(document.documentElement).getPropertyValue('--blue').trim() || '#4f7fff';
 
     sessionData.forEach(s => {
       const lbl = document.createElement('div');
@@ -1119,7 +1116,7 @@
         const state = getBarSessionState(sess);
         const aiNote = convertUtcTimesInNote(groqSessions[sName] || '\u2014');
 
-        const labelColor = state === 'active'   ? '#388bfd'
+        const labelColor = state === 'active'   ? 'var(--blue,#4f7fff)'
                          : state === 'past'      ? 'var(--text3,#6b7280)'
                          :                         'var(--orange,#f6941c)';
         const textColor  = state === 'active'   ? 'var(--text,#d1d4dc)'
@@ -1131,7 +1128,7 @@
 
         // State chip on the header line: unambiguous before reading the note text
         const stateChip  = state === 'active'
-          ? '<span style="font-size:8px;background:rgba(56,139,253,.15);color:#388bfd;border-radius:2px;padding:1px 4px;letter-spacing:.07em;font-weight:700;margin-left:6px;vertical-align:middle">LIVE</span>'
+          ? '<span style="font-size:8px;background:rgba(79,127,255,.15);color:var(--blue,#4f7fff);border-radius:2px;padding:1px 4px;letter-spacing:.07em;font-weight:700;margin-left:6px;vertical-align:middle">LIVE</span>'
           : state === 'past'
           ? '<span style="font-size:8px;color:var(--text3,#6b7280);letter-spacing:.07em;opacity:.6;margin-left:6px;vertical-align:middle">CLOSED</span>'
           : '<span style="font-size:8px;background:rgba(246,148,28,.10);color:var(--orange,#f6941c);border-radius:2px;padding:1px 4px;letter-spacing:.07em;opacity:.8;margin-left:6px;vertical-align:middle">UPCOMING</span>';
@@ -1440,10 +1437,14 @@
     _csiSeriesMap = {};
     _csiHighlightCcy = null;
 
+    const _csiBg    = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()    || '#131722';
+    const _csiText2 = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim() || '#9096a0';
+    const _csiBlue  = getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()  || '#4f7fff';
+
     _csiChart = LWC.createChart(chartEl, {
       layout: {
-        background: { color: '#0d1117' },
-        textColor: '#8b949e',
+        background: { color: _csiBg },
+        textColor: _csiText2,
         attributionLogo: false,
       },
       grid: {
@@ -1484,7 +1485,7 @@
         priceLineVisible: false,
         crosshairMarkerVisible: isFocus,
         crosshairMarkerRadius: 4,
-        crosshairMarkerBorderColor: '#0d1117',
+        crosshairMarkerBorderColor: _csiBg,
         crosshairMarkerBackgroundColor: CSI_COLORS[c],
       });
       ls.setData(raw);
@@ -1617,10 +1618,10 @@
         const isFocus = r.ccy === ccy;
         const cls = r.val > 0 ? 'up' : r.val < 0 ? 'down' : 'flat';
         const fmt = v => v != null ? (v >= 0 ? '+' : '') + v.toFixed(2) + '%' : '—';
-        return '<tr style="' + (isFocus ? 'background:rgba(56,139,253,.07);' : '') + '">' +
+        return '<tr style="' + (isFocus ? 'background:rgba(79,127,255,.07);' : '') + '">' +
           '<td><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' +
             CSI_COLORS[r.ccy] + ';margin-right:6px;vertical-align:middle;"></span>' +
-            '<span class="sym" style="' + (isFocus ? 'color:#388bfd;' : '') + '">' + r.ccy + '</span></td>' +
+            '<span class="sym" style="' + (isFocus ? 'color:var(--blue,#4f7fff);' : '') + '">' + r.ccy + '</span></td>' +
           '<td class="' + cls + '">' + fmt(r.val) + '</td>' +
           '<td class="' + (r.min != null && r.min < 0 ? 'down' : r.min != null && r.min > 0 ? 'up' : 'flat') + '">' + fmt(r.min) + '</td>' +
           '<td class="' + (r.max != null && r.max > 0 ? 'up' : r.max != null && r.max < 0 ? 'down' : 'flat') + '">' + fmt(r.max) + '</td>' +
