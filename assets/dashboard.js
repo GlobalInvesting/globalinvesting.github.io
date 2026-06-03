@@ -6738,10 +6738,40 @@ async function fetchCarryRanking() {
   const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
 
   // TradingView symbol for a given long/short ccy pair
+
+  // Bloomberg/Refinitiv market convention: normalises a long/short pair to the
+  // canonical display label regardless of which leg has the higher rate.
+  // E.g. long=USD, short=NZD → "NZD/USD"; long=GBP, short=EUR → "EUR/GBP".
+  // ISO 4217 priority: EUR > GBP > AUD > NZD > USD > CAD > CHF > JPY (for crosses).
+  // Reference: Bloomberg FX convention table; Refinitiv Eikon pair naming.
+  const BBGFX_BASE = {
+    // Pairs where USD is quote (commodity / European currencies are base)
+    'USD-EUR':'EUR', 'USD-GBP':'GBP', 'USD-AUD':'AUD', 'USD-NZD':'NZD',
+    // USD is base vs funding currencies
+    'USD-JPY':'USD', 'USD-CAD':'USD', 'USD-CHF':'USD',
+    // EUR crosses (EUR always base)
+    'EUR-GBP':'EUR', 'EUR-JPY':'EUR', 'EUR-CHF':'EUR', 'EUR-CAD':'EUR',
+    'EUR-AUD':'EUR', 'EUR-NZD':'EUR',
+    // GBP crosses
+    'GBP-JPY':'GBP', 'GBP-CHF':'GBP', 'GBP-CAD':'GBP',
+    'GBP-AUD':'GBP', 'GBP-NZD':'GBP',
+    // AUD/NZD crosses
+    'AUD-JPY':'AUD', 'AUD-CAD':'AUD', 'AUD-CHF':'AUD', 'AUD-NZD':'AUD',
+    'NZD-JPY':'NZD', 'NZD-CHF':'NZD', 'NZD-CAD':'NZD',
+    // Remaining
+    'CAD-JPY':'CAD', 'CHF-JPY':'CHF', 'CAD-CHF':'CAD',
+  };
+  function carryDisplayPair(long, short) {
+    const key1 = long + '-' + short, key2 = short + '-' + long;
+    const base = BBGFX_BASE[key1] ?? BBGFX_BASE[key2] ?? long;
+    const quote = base === long ? short : long;
+    return base + '/' + quote;
+  }
   function carryTV(long, short) {
-    if (short === 'USD') return 'FX_IDC:' + long + 'USD';
-    if (long  === 'USD') return 'FX_IDC:USD' + short;
-    return 'FX_IDC:' + long + short;
+    // v8.4.5: delegate to carryDisplayPair() for Bloomberg market convention.
+    // Ensures FX_IDC:NZDUSD (not FX_IDC:USDNZD), FX_IDC:EURGBP (not FX_IDC:GBPEUR), etc.
+    const label = carryDisplayPair(long, short);  // e.g. "NZD/USD"
+    return 'FX_IDC:' + label.replace('/', '');    // → "FX_IDC:NZDUSD"
   }
 
   // Canonical pair ID used in quotes.json / hv30 map — FX market convention,
@@ -6973,11 +7003,13 @@ async function fetchCarryRanking() {
 
       const realStr = realCarryVal != null ? (realCarryVal >= 0 ? '+' : '') + realCarryVal.toFixed(2) + '%' : '—';
       const hvStr   = p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a';
-      const tip = `${p.long}/${p.short} · Nominal ${spreadLabel} · Real carry ${realStr} · HV30 ${hvStr} — Click for real rate analysis`;
+      // v8.4.5: normalise display pair to Bloomberg market convention (e.g. NZD/USD not USD/NZD, EUR/GBP not GBP/EUR)
+      const displayPair = carryDisplayPair(p.long, p.short);
+      const tip = `${displayPair} · Nominal ${spreadLabel} · Real carry ${realStr} · HV30 ${hvStr} — Click for real rate analysis`;
 
       return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
-        <span class="cr-pair">${p.long}/${p.short}</span>
+        <span class="cr-pair">${displayPair}</span>
         <span class="cr-spread">${spreadLabel}</span>
         <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
         <span class="cr-diff ${cls}">${displayVal}</span>
