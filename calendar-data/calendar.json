@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-03T13:45:57Z",
-  "generatedAt": "2026-06-03T13:45:57Z",
+  "lastUpdate": "2026-06-03T14:03:13Z",
+  "generatedAt": "2026-06-03T14:03:13Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -322,9 +322,9 @@
       "std": 0.565685
     },
     "USD/ism services pmi": {
-      "n": 2,
-      "mean": -0.55,
-      "std": 0.636396
+      "n": 3,
+      "mean": -0.133333,
+      "std": 0.85049
     },
     "CAD/ivey pmi s.a": {
       "n": 2,
@@ -370,6 +370,11 @@
       "n": 2,
       "mean": -1.25,
       "std": 0.919239
+    },
+    "USD/factory orders mom": {
+      "n": 2,
+      "mean": 0.6,
+      "std": 0.565685
     },
     "USD/jolts job openings": {
       "n": 2,
@@ -20497,7 +20502,7 @@
       "impact": "medium",
       "actual": "122",
       "forecast": "117",
-      "previous": "109"
+      "previous": "105"
     },
     {
       "date": "3 Jun",
@@ -20521,7 +20526,7 @@
       "flag": "🇺🇸",
       "event": "Factory Orders MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "4.8",
       "forecast": "4.6",
       "previous": "1.5"
     },
@@ -20534,7 +20539,7 @@
       "flag": "🇺🇸",
       "event": "ISM Services PMI",
       "impact": "high",
-      "actual": null,
+      "actual": "54.5",
       "forecast": "53.8",
       "previous": "53.6"
     },
@@ -21797,7 +21802,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "-4*",
-      "previous": "-3.327"
+      "previous": "-6.75"
     },
     {
       "date": "16 Jun",
