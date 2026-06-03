@@ -6,7 +6,7 @@
 //   • Everything else      → Network only
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v7.92.0';
+const CACHE_VERSION = 'gi-v8.4.3';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -14,8 +14,8 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 const STATIC_PRECACHE = [
   '/',
   '/index.html',
-  '/assets/dashboard.css?v=7.74.42',
-  '/assets/dashboard.js?v=7.89.1',
+  '/assets/dashboard.css?v=8.3.2',
+  '/assets/dashboard.js?v=8.3.2',
   '/assets/gdpr.js',
   '/assets/sw-register.js',
   '/favicon.ico',
