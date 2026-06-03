@@ -7019,7 +7019,6 @@ async function fetchCarryRanking() {
         <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%;background:${barColor}"></div></div>
         <span class="cr-diff ${cls}">${displayVal}</span>
       </div>`;
-      </div>`;
     }).join('');
 
     // ── 9. Row click → open Real Rate Carry Modal ────────────────────────────
