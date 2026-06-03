@@ -385,8 +385,9 @@ CURRENCY_KEYWORDS_WEIGHTED = {
     ],
     "AUD": [
         # v5.16: ("rba", 10) matched "urban" (u+rba+n) as substring → AUD false hits.
-        # Leading space prevents match inside longer words; explicit phrases cover RBA-specific contexts.
-        (" rba", 10), ("rba rate", 8), ("rba meeting", 8), ("rba decision", 8),
+        # Leading space prevents match inside longer words; trailing space covers RBA at title start.
+        # Both are needed: " rba" handles mid/end positions, "rba " handles start-of-title.
+        (" rba", 10), ("rba ", 10), ("rba rate", 8), ("rba meeting", 8), ("rba decision", 8),
         ("reserve bank of australia", 10), ("bullock", 10),
         ("banco de la reserva de australia", 10),
         ("australian dollar", 8), ("dólar australiano", 8), ("aussie dollar", 8),
