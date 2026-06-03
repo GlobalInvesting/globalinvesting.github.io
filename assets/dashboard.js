@@ -7017,12 +7017,15 @@ async function fetchCarryRanking() {
     }).join('');
 
     // ── 9. Row click → open Real Rate Carry Modal ────────────────────────────
+    // v8.4.6: pass Bloomberg canonical pair (base, quote) to the modal instead of
+    // (highRateCcy, lowRateCcy). The modal derives carry direction from data,
+    // so it never shows "LONG USD / SHORT NZD" when the display pair is NZD/USD.
     container.querySelectorAll('.carry-rank-row[data-long]').forEach(row => {
       row.addEventListener('click', () => {
-        const longCcy  = row.dataset.long;
-        const shortCcy = row.dataset.short;
-        if (typeof window.openRealCarryModal === 'function') {
-          window.openRealCarryModal(longCcy, shortCcy);
+        const displayPair = row.querySelector('.cr-pair')?.textContent || '';
+        const [baseCcy, quoteCcy] = displayPair.split('/');
+        if (typeof window.openRealCarryModal === 'function' && baseCcy && quoteCcy) {
+          window.openRealCarryModal(baseCcy, quoteCcy);
         } else {
           loadTVChart(row.dataset.sym);
         }

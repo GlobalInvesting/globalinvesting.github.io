@@ -614,24 +614,41 @@ function _rcmRenderMatrix() {
 }
 
 // ── Tab 3: Pair Detail ───────────────────────────────────────────────────────
-function _rcmRenderPairDetail(longCcy, shortCcy) {
+function _rcmRenderPairDetail(baseCcy, quoteCcy) {
+  // v8.4.6: baseCcy/quoteCcy are Bloomberg canonical (e.g. base=NZD, quote=USD).
+  // We derive the high-rate leg (highCcy) and low-rate leg (lowCcy) from actual
+  // rate data — not from argument order — so display is always correct regardless
+  // of which currency currently has the higher rate.
   const d = _rcmData;
-  if (!d || !longCcy || !shortCcy) {
+  if (!d || !baseCcy || !quoteCcy) {
     return `<div class="rcm-loading">Select a pair from the Carry Ranking to view detail.</div>`;
   }
 
-  const nomEntryL = d.nominalRates[longCcy];
-  const nomEntryS = d.nominalRates[shortCcy];
+  // Determine carry direction from real rates (or nominal if real unavailable)
+  const rrBase  = d.realRates[baseCcy];
+  const rrQuote = d.realRates[quoteCcy];
+  const nomBase  = d.nominalRates[baseCcy]?.rate;
+  const nomQuote = d.nominalRates[quoteCcy]?.rate;
+  // highCcy = leg earning higher real carry (falling back to nominal if real unavailable)
+  const baseScore  = rrBase  ?? nomBase  ?? -Infinity;
+  const quoteScore = rrQuote ?? nomQuote ?? -Infinity;
+  const highCcy = baseScore >= quoteScore ? baseCcy : quoteCcy;
+  const lowCcy  = highCcy === baseCcy ? quoteCcy : baseCcy;
+  // Carry direction indicator shown in the UI — replaces "LONG X / SHORT Y"
+  const carryDir = `${highCcy} carry advantage`;
+
+  const nomEntryL = d.nominalRates[highCcy];
+  const nomEntryS = d.nominalRates[lowCcy];
   const nomL = nomEntryL?.rate;
   const nomS = nomEntryS?.rate;
   const nomSrcL = nomEntryL?.source || 'policy';
   const nomSrcS = nomEntryS?.source || 'policy';
-  const ieL  = d.inflExp[longCcy]?.val;
-  const ieS  = d.inflExp[shortCcy]?.val;
-  const rrL  = d.realRates[longCcy];
-  const rrS  = d.realRates[shortCcy];
-  const biasL = d.biasMap[longCcy];
-  const biasS = d.biasMap[shortCcy];
+  const ieL  = d.inflExp[highCcy]?.val;
+  const ieS  = d.inflExp[lowCcy]?.val;
+  const rrL  = d.realRates[highCcy];
+  const rrS  = d.realRates[lowCcy];
+  const biasL = d.biasMap[highCcy];
+  const biasS = d.biasMap[lowCcy];
 
   const nomSpread  = (nomL != null && nomS != null) ? nomL - nomS : null;
   const realSpread = (rrL  != null && rrS  != null) ? rrL  - rrS  : null;
@@ -652,7 +669,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
     if (HV30_PAIRS.has(c2)) return c2;
     return a < b ? c1 : c2;
   }
-  const pid  = pairId(longCcy, shortCcy);
+  const pid  = pairId(baseCcy, quoteCcy);
   const hv30 = d.hv30Map[pid] ?? null;
   const nomCarryVol  = (hv30 && nomSpread  != null) ? (Math.abs(nomSpread)  / hv30).toFixed(2) : null;
   const realCarryVol = (hv30 && realSpread != null) ? (Math.abs(realSpread) / hv30).toFixed(2) : null;
@@ -671,7 +688,7 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
         sustainText = `<strong>Moderate</strong> — both legs positive real. Spread ${_rcmRrFmt(realSpread)} real vs ${nomSpread != null ? (nomSpread >= 0 ? '+' : '') + nomSpread.toFixed(2) + '%' : '—'} nominal. Watch for inflation convergence.`;
         sustainCls  = 'rcm-sustain-warn';
       } else {
-        sustainText = `<strong>Negative real spread</strong> — short leg has higher real rate. Nominal carry favors long ${longCcy}, but real carry favors long ${shortCcy}.`;
+        sustainText = `<strong>Negative real spread</strong> — ${lowCcy} has higher real rate. Nominal carry favors ${highCcy}, but real carry favors ${lowCcy}.`;
         sustainCls  = 'rcm-sustain-bad';
       }
     } else {
@@ -687,12 +704,12 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   const maxAbs = Math.max(...G8sorted.map(c => Math.abs(d.realRates[c] ?? 0)), 0.01);
   const barRows = G8sorted.map(ccy => {
     const rr = d.realRates[ccy];
-    const isLong  = ccy === longCcy;
-    const isShort = ccy === shortCcy;
+    const isHigh  = ccy === highCcy;
+    const isLow   = ccy === lowCcy;
     const pct = Math.abs(rr) / maxAbs * 42; // max 42% of track from center
     const rrCls = _rcmRrClass(rr);
     let barColor = rr >= 0 ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
-    let labelStyle = isLong ? 'color:var(--up,#26a69a);font-weight:700;' : isShort ? 'color:var(--down,#ef5350);font-weight:700;' : '';
+    let labelStyle = isHigh ? 'color:var(--up,#26a69a);font-weight:700;' : isLow ? 'color:var(--down,#ef5350);font-weight:700;' : '';
     let valStyle = `class="${rrCls}"`;
     // For positive: fill right of zero; for negative: fill left
     const fillStyle = rr >= 0
@@ -711,9 +728,9 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   return `
   <div class="rcm-pd-wrap">
   <div class="rcm-pd-header">
-    <div class="rcm-pd-pair">${longCcy} / ${shortCcy}</div>
+    <div class="rcm-pd-pair">${baseCcy} / ${quoteCcy}</div>
     <div class="rcm-pd-dir">—</div>
-    <div class="rcm-pd-dir">Long ${longCcy} / Short ${shortCcy}</div>
+    <div class="rcm-pd-dir">${carryDir}</div>
   </div>
   <div class="rcm-pd-row-grid">
     <div class="rcm-pd-cell">
@@ -727,18 +744,18 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
       <div class="rcm-pd-cell-sub">After inflation expectations</div>
     </div>
     <div class="rcm-pd-cell">
-      <div class="rcm-pd-cell-lbl">Long real rate (${longCcy})</div>
+      <div class="rcm-pd-cell-lbl">High real rate (${highCcy})</div>
       <div class="rcm-pd-cell-val ${_rcmRrClass(rrL)}">${_rcmRrFmt(rrL)}</div>
       <div class="rcm-pd-cell-sub">${nomL != null ? nomL.toFixed(2) + '%' : '—'} ${nomSrcL} − ${ieL != null ? ieL.toFixed(2) + '%' : '—'} infl.exp</div>
     </div>
   </div>
   <div class="rcm-rate-bars">
-    <div class="rcm-rb-title">Real rate positioning — G8_CURRENCIES (long ${longCcy} highlighted)</div>
+    <div class="rcm-rb-title">Real rate positioning — G8_CURRENCIES (${highCcy} highlighted)</div>
     ${barRows}
   </div>
   <div class="rcm-vol-row">
     <div class="rcm-vol-cell">
-      <div class="rcm-vol-lbl">Short real rate (${shortCcy})</div>
+      <div class="rcm-vol-lbl">Low real rate (${lowCcy})</div>
       <div class="rcm-vol-val ${_rcmRrClass(rrS)}">${_rcmRrFmt(rrS)}</div>
       <div class="rcm-vol-sub">${nomS != null ? nomS.toFixed(2) + '%' : '—'} ${nomSrcS} − ${ieS != null ? ieS.toFixed(2) + '%' : '—'} infl.exp</div>
     </div>
@@ -755,19 +772,19 @@ function _rcmRenderPairDetail(longCcy, shortCcy) {
   </div>
   <div class="rcm-ois-row">
     <div class="rcm-ois-cell">
-      <div class="rcm-ois-lbl">OIS bias (${longCcy})</div>
+      <div class="rcm-ois-lbl">OIS bias (${highCcy})</div>
       ${_rcmBiasChip(biasL)}
       <div class="rcm-ois-sub">${biasL?.method || '—'}</div>
     </div>
     <div class="rcm-ois-cell">
-      <div class="rcm-ois-lbl">OIS bias (${shortCcy})</div>
+      <div class="rcm-ois-lbl">OIS bias (${lowCcy})</div>
       ${_rcmBiasChip(biasS)}
       <div class="rcm-ois-sub">${biasS?.method || '—'}</div>
     </div>
   </div>
   ${sustainText ? `<div class="rcm-sustain ${sustainCls}">${sustainText}</div>` : ''}
   <div class="rcm-src-note" style="padding:8px 14px;font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);line-height:1.6;border-top:1px solid var(--border2);">
-    Infl. Exp. source — ${longCcy}: ${_RCM_IE_SRC[longCcy] || '—'} · ${shortCcy}: ${_RCM_IE_SRC[shortCcy] || '—'}<br>
+    Infl. Exp. source — ${highCcy}: ${_RCM_IE_SRC[highCcy] || '—'} · ${lowCcy}: ${_RCM_IE_SRC[lowCcy] || '—'}<br>
     Real carry/vol = |real spread| / HV30 (30-day realised vol, annualised)
   </div>
   </div>`;
@@ -853,15 +870,18 @@ function _rcmUpdateMetrics() {
 
 // ── Public API ───────────────────────────────────────────────────────────────
 // Called from fetchCarryRanking() when user clicks a row
-async function openRealCarryModal(longCcy, shortCcy) {
+async function openRealCarryModal(baseCcy, quoteCcy) {
+  // v8.4.6: Arguments are now Bloomberg canonical pair (base, quote) — e.g. NZD/USD
+  // not semantic (highRate, lowRate). _rcmRenderPairDetail derives carry direction
+  // internally from actual rate data, so the modal never shows inverted labels.
   // Build DOM if not present
   if (!document.getElementById('rcm-bd')) {
     _rcmBuildDOM();
   }
 
   // If a pair is provided, switch to detail tab
-  if (longCcy && shortCcy) {
-    _rcmActivePair = `${longCcy}/${shortCcy}`;
+  if (baseCcy && quoteCcy) {
+    _rcmActivePair = `${baseCcy}/${quoteCcy}`;  // stored as Bloomberg canonical
     _rcmActiveTab  = 'detail';
   } else {
     _rcmActiveTab = 'breakdown';
