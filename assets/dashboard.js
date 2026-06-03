@@ -6996,26 +6996,16 @@ async function fetchCarryRanking() {
 
       // v8.4.8: Bloomberg canonical pair + carry direction awareness
       // carryDisplayPair() normalises to Bloomberg convention (e.g. NZD/USD, EUR/GBP).
-      // When p.long is the BASE of the display pair → LONG the base captures carry → green bar.
-      // When p.long is the QUOTE  of the display pair → carry is on the quote leg → SHORT the base → red bar.
-      // Industry convention: Bloomberg FXFR shows the direction relative to the base. A red bar
-      // on EUR/GBP signals you must SHORT EUR (sell base) to capture the GBP carry advantage.
+      // Bar color: green = long the base (base has higher carry), red = short the base (carry on quote leg).
       const displayPair  = carryDisplayPair(p.long, p.short);
-      const displayBase  = displayPair.split('/')[0];            // e.g. "NZD" from "NZD/USD"
-      const isShortBase  = displayBase !== p.long;               // true when carry is on the quote leg
+      const displayBase  = displayPair.split('/')[0];
+      const isShortBase  = displayBase !== p.long;
 
-      // Bar color: green = long the base (standard carry), red = short the base (inverse carry)
       const barColor = isShortBase ? 'var(--down)' : 'var(--up)';
 
-      // Carry value color: same logic — positive carry is always pd-up, but direction label differs
       const cls = realCarryVal != null
         ? (realCarryVal >= 0.5 ? 'pd-up' : realCarryVal <= -0.1 ? 'pd-dim' : '')
         : (p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim');
-
-      // Direction badge: "L" (long base) or "S" (short base) — industry standard for carry tables
-      const dirBadge = isShortBase
-        ? `<span class="cr-dir cr-dir-short" title="Short ${displayBase} — carry advantage on ${p.long}">S</span>`
-        : `<span class="cr-dir cr-dir-long"  title="Long ${displayBase} — carry advantage on ${displayBase}">L</span>`;
 
       const realStr = realCarryVal != null ? (realCarryVal >= 0 ? '+' : '') + realCarryVal.toFixed(2) + '%' : '—';
       const hvStr   = p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a';
@@ -7024,11 +7014,11 @@ async function fetchCarryRanking() {
 
       return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
-        ${dirBadge}
         <span class="cr-pair">${displayPair}</span>
         <span class="cr-spread">${spreadLabel}</span>
         <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%;background:${barColor}"></div></div>
         <span class="cr-diff ${cls}">${displayVal}</span>
+      </div>`;
       </div>`;
     }).join('');
 
