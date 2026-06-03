@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T23:03:42Z",
+  "generated_at": "2026-06-03T00:00:40Z",
   "source": "Finnhub",
   "holidays": [
     {
@@ -14,171 +14,6 @@
     }
   ],
   "events": [
-    {
-      "title": "NAB Business Confidence",
-      "currency": "AUD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "01:30",
-      "impact": "high",
-      "forecast": null,
-      "previous": "-29",
-      "actual": "-24",
-      "released": true
-    },
-    {
-      "title": "Fed Williams Speech",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "07:15",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "ZEW Economic Sentiment Index",
-      "currency": "EUR",
-      "dateISO": "2026-05-12",
-      "timeUTC": "09:00",
-      "impact": "medium",
-      "forecast": "-20",
-      "previous": "-20.4",
-      "actual": "-9.1",
-      "released": true
-    },
-    {
-      "title": "2026-27 Federal Budget",
-      "currency": "AUD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "09:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "ADP Employment Change Weekly",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "12:15",
-      "impact": "medium",
-      "forecast": null,
-      "previous": "30.25",
-      "actual": "33",
-      "released": true
-    },
-    {
-      "title": "Core Inflation Rate MoM",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "0.3",
-      "previous": "0.2",
-      "actual": "0.4",
-      "released": true
-    },
-    {
-      "title": "Core Inflation Rate YoY",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "2.7",
-      "previous": "2.6",
-      "actual": "2.8",
-      "released": true
-    },
-    {
-      "title": "CPI",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "12:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": "330.21",
-      "actual": "333.02",
-      "released": true
-    },
-    {
-      "title": "CPI s.a",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "12:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": "330.293",
-      "actual": "332.407",
-      "released": true
-    },
-    {
-      "title": "Inflation Rate MoM",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "0.6",
-      "previous": "0.9",
-      "actual": "0.6",
-      "released": true
-    },
-    {
-      "title": "Inflation Rate YoY",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "3.7",
-      "previous": "3.3",
-      "actual": "3.8",
-      "released": true
-    },
-    {
-      "title": "Fed Goolsbee Speech",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "17:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "Monthly Budget Statement",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "18:00",
-      "impact": "medium",
-      "forecast": "220",
-      "previous": "-164",
-      "actual": "215",
-      "released": true
-    },
-    {
-      "title": "API Crude Oil Stock Change",
-      "currency": "USD",
-      "dateISO": "2026-05-12",
-      "timeUTC": "20:30",
-      "impact": "medium",
-      "forecast": "-1.65",
-      "previous": "-8.1",
-      "actual": "-2.188",
-      "released": true
-    },
-    {
-      "title": "Current Account",
-      "currency": "JPY",
-      "dateISO": "2026-05-12",
-      "timeUTC": "23:50",
-      "impact": "medium",
-      "forecast": "3879",
-      "previous": "3933",
-      "actual": "4682",
-      "released": true
-    },
     {
       "title": "Home Loans QoQ",
       "currency": "AUD",
@@ -2529,7 +2364,7 @@
       "timeUTC": "23:00",
       "impact": "medium",
       "forecast": null,
-      "previous": "-24.4",
+      "previous": "-25.5",
       "actual": "-26.5",
       "released": true
     },
@@ -2640,6 +2475,17 @@
       "impact": "medium",
       "forecast": "-2.4*",
       "previous": "-2.572",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Fed Goolsbee Speech",
+      "currency": "USD",
+      "dateISO": "2026-06-03",
+      "timeUTC": "15:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
       "actual": null,
       "released": false
     },
@@ -3696,6 +3542,204 @@
       "impact": "medium",
       "forecast": "4.5*",
       "previous": "5.9",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Core Inflation Rate YoY",
+      "currency": "GBP",
+      "dateISO": "2026-06-17",
+      "timeUTC": "06:00",
+      "impact": "medium",
+      "forecast": "2.6*",
+      "previous": "2.5",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Inflation Rate MoM",
+      "currency": "GBP",
+      "dateISO": "2026-06-17",
+      "timeUTC": "06:00",
+      "impact": "medium",
+      "forecast": "0.9*",
+      "previous": "0.7",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Inflation Rate YoY",
+      "currency": "GBP",
+      "dateISO": "2026-06-17",
+      "timeUTC": "06:00",
+      "impact": "high",
+      "forecast": "2.6*",
+      "previous": "2.8",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "SECO Economic Forecasts",
+      "currency": "CHF",
+      "dateISO": "2026-06-17",
+      "timeUTC": "07:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "MBA 30-Year Mortgage Rate",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "11:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "6.65",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Retail Sales Control Group MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "0.4*",
+      "previous": "0.5",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Retail Sales Ex Autos MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "0.6*",
+      "previous": "0.7",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Retail Sales MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": null,
+      "previous": "0.5",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Business Inventories MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:00",
+      "impact": "medium",
+      "forecast": "0.8*",
+      "previous": "0.9",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Pending Home Sales MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:00",
+      "impact": "medium",
+      "forecast": "1*",
+      "previous": "1.4",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Pending Home Sales YoY",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "3.2",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "EIA Crude Oil Stocks Change",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:30",
+      "impact": "medium",
+      "forecast": "-3.6*",
+      "previous": "-3.327",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "EIA Gasoline Stocks Change",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:30",
+      "impact": "medium",
+      "forecast": "-2.4*",
+      "previous": "-2.572",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Fed Interest Rate Decision",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "18:00",
+      "impact": "high",
+      "forecast": null,
+      "previous": "3.75",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "FOMC Economic Projections",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "18:00",
+      "impact": "high",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Fed Press Conference",
+      "currency": "USD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "18:30",
+      "impact": "high",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "GDP Growth Rate QoQ",
+      "currency": "NZD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "22:45",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "0.2",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "GDP Growth Rate YoY",
+      "currency": "NZD",
+      "dateISO": "2026-06-17",
+      "timeUTC": "22:45",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "1.3",
       "actual": null,
       "released": false
     }
