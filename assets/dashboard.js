@@ -7001,7 +7001,7 @@ async function fetchCarryRanking() {
       const displayBase  = displayPair.split('/')[0];
       const isShortBase  = displayBase !== p.long;
 
-      const barColor = isShortBase ? 'var(--down)' : 'var(--up)';
+      const barColor = 'var(--up)';
 
       const cls = realCarryVal != null
         ? (realCarryVal >= 0.5 ? 'pd-up' : realCarryVal <= -0.1 ? 'pd-dim' : '')
