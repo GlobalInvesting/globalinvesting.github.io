@@ -520,12 +520,12 @@ function populateHeatmap() {
 
   let strengths;
   if (rtAvailable) {
-    // Map each currency to its avg % change across all 28 major pairs.
+    // Map each currency to its avg % change across all 28 G8 pairs.
     // Each currency appears in exactly 7 pairs — equal statistical weight.
     const pctMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
     const countMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
 
-    // All 28 major pairs (8×7÷2) — industry-standard currency strength calculation.
+    // All 28 G8 pairs (8×7÷2) — industry-standard currency strength calculation.
     // Each of the 8 currencies appears in exactly 7 pairs, giving equal statistical weight.
     // sign: +1 means base strengthens when price rises; -1 means quote strengthens.
     const pairDefs = [
@@ -623,8 +623,8 @@ function populateHeatmap() {
   const _hmSubEl = document.getElementById('hm-panel-sub');
   if (_hmSubEl) {
     _hmSubEl.textContent = _hasFhHm
-      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 major currencies'
-      : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted \u00b7 8 major currencies';
+      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies'
+      : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies';
   }
 
   // ── Live-refresh open modal — if the heatmap modal is currently open, push ──
@@ -4507,7 +4507,7 @@ async function _renderLWChart(ohlcId, label) {
           const m=ml[i],s=sl2[si],h=m-s;
           macdD.push({time:bars[i].time,value:parseFloat(m.toFixed(6))});
           sigD.push( {time:bars[i].time,value:parseFloat(s.toFixed(6))});
-          histD.push({time:bars[i].time,value:parseFloat(h.toFixed(6)),color:h>=0?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'});
+          const hBase=_iC(id,0);histD.push({time:bars[i].time,value:parseFloat(h.toFixed(6)),color:h>=0?hBase:'rgba(239,83,80,0.7)'});
         }
         return [
           {data:histD,color:_iC(id,0),lineWidth:0,label:'Hist',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]},
@@ -4571,7 +4571,7 @@ async function _renderLWChart(ohlcId, label) {
         const data=s34.map((v,i)=>{
           const ao=s5[i+(34-5)]-v;
           const prev=i>0?s5[i+(34-5)-1]-s34[i-1]:ao;
-          return{time:bars[off+i].time,value:parseFloat(ao.toFixed(6)),color:ao>=prev?'rgba(38,166,154,0.7)':'rgba(239,83,80,0.7)'};
+          const aoBase=_iC(id,0);return{time:bars[off+i].time,value:parseFloat(ao.toFixed(6)),color:ao>=prev?aoBase:'rgba(239,83,80,0.7)'};
         });
         return [{data,color:_iC(id,0),lineWidth:0,label:'AO',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]}];
       }
@@ -5121,7 +5121,13 @@ async function _renderLWChart(ohlcId, label) {
         _saveIndParams();
         // Live-update series color if active
         if (window._lwIndState[id] && window._indSeries && window._indSeries[id] && window._indSeries[id][i]) {
-          try { window._indSeries[id][i].applyOptions({ color: e.target.value }); } catch(_) {}
+          const cfg2 = _IND_CATALOGUE.find(c => c.id === id);
+          if ((cfg2?.histoIdx || []).includes(i)) {
+            // Histogram uses per-bar colors — rebuild the whole pane to pick up new color
+            try { _buildIndicatorPane(id); } catch(_) {}
+          } else {
+            try { window._indSeries[id][i].applyOptions({ color: e.target.value }); } catch(_) {}
+          }
         }
       });
       wrap.appendChild(swatch);
@@ -5236,7 +5242,6 @@ async function _renderLWChart(ohlcId, label) {
           };
           const labels = seriesLabels[cfg.id] || cfg.colors.map((_,i) => `S${i+1}`);
           cfg.colors.forEach((_, ci) => {
-            if ((cfg.histoIdx || []).includes(ci)) return; // histogram bars use fixed green/red per-bar colors
             const sw = _makeColorSwatch(cfg.id, ci, labels[ci] || `Series ${ci+1}`);
             const lbl = document.createElement('span');
             lbl.style.cssText = 'color:#6b7280;font-size:9px;';
@@ -6694,7 +6699,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// CARRY TRADE RANKING — full 8 major currencies 28-pair differential, left sidebar
+// CARRY TRADE RANKING — full G8 28-pair differential, left sidebar
 // ═══════════════════════════════════════════════════════════════════
 // Institutional-grade carry ranking
 // and JP Morgan GBI conventions:
@@ -6710,7 +6715,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 // source used by the main FX table and the pair detail popover).
 // Falls back to gross differential ranking when HV30 unavailable.
 // ═══════════════════════════════════════════════════════════════════
-// CARRY TRADE RANKING — 8 major currencies · real carry · annualised
+// CARRY TRADE RANKING — G8 · real carry · annualised
 // ═══════════════════════════════════════════════════════════════════
 // Institutional-grade carry ranking per Bloomberg FXFR / Refinitiv conventions:
 //
@@ -6730,7 +6735,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 //   Tooltip:       long rate / short rate / real carry / HV30 / click for real rate analysis
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCarryRanking() {
-  const G8_CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+  const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
 
   // TradingView symbol for a given long/short ccy pair
   function carryTV(long, short) {
@@ -6763,7 +6768,7 @@ async function fetchCarryRanking() {
   try {
     // ── 1. CB policy rates (use STATE cache from fetchCBRates if available) ──
     const cbRates = {};
-    await Promise.all(G8_CURRENCIES.map(async ccy => {
+    await Promise.all(G8.map(async ccy => {
       const cached = STATE.cbRates?.[ccy.toLowerCase()];
       if (cached?.rate != null) { cbRates[ccy] = cached.rate; return; }
       try {
@@ -6796,7 +6801,7 @@ async function fetchCarryRanking() {
     }
     const rates       = {};
     const rateSource  = {}; // e.g. { USD: 'SOFR', EUR: '€STR', AUD: 'policy' }
-    for (const ccy of G8_CURRENCIES) {
+    for (const ccy of G8) {
       const ois = oisCache[ccy] ?? oisData?.rates?.[ccy] ?? null;
       const src = oisSrcs[ccy]  ?? oisData?.sources?.[ccy] ?? null;
       if (ois != null) {
@@ -6821,7 +6826,7 @@ async function fetchCarryRanking() {
     // Real rate = nominal CB rate − inflationExpectations
     // If modal was opened earlier, reuse _rcmData to avoid duplicate fetches.
     const inflExp = {};
-    await Promise.all(G8_CURRENCIES.map(async ccy => {
+    await Promise.all(G8.map(async ccy => {
       if (typeof _rcmData !== 'undefined' && _rcmData?.inflExp?.[ccy]?.val != null) {
         inflExp[ccy] = _rcmData.inflExp[ccy].val;
         return;
@@ -6835,13 +6840,13 @@ async function fetchCarryRanking() {
       } catch {}
     }));
 
-    // ── 4. Build all 28 major pairs ─────────────────────────────────────────────
+    // ── 4. Build all 28 G8 pairs ─────────────────────────────────────────────
     // Rates now use OIS benchmarks (SOFR/€STR/SONIA/TONA/CORRA/SARON/AONIA/OCR)
     // with per-currency policy-rate fallback — matching Bloomberg FXFR convention.
     const allPairs = [];
-    for (let i = 0; i < G8_CURRENCIES.length; i++) {
-      for (let j = i + 1; j < G8_CURRENCIES.length; j++) {
-        const a = G8_CURRENCIES[i], b = G8_CURRENCIES[j];
+    for (let i = 0; i < G8.length; i++) {
+      for (let j = i + 1; j < G8.length; j++) {
+        const a = G8[i], b = G8[j];
         const rA = rates[a] ?? null, rB = rates[b] ?? null;
         if (rA == null || rB == null) continue;
 
@@ -6903,8 +6908,8 @@ async function fetchCarryRanking() {
     const headSpan = container.closest('.sb-section')?.querySelector('.sb-head span');
     if (headSpan) {
       headSpan.textContent = hasRealCarryData
-        ? '8 major currencies · real carry · annualised'
-        : '8 major currencies · CB rate differential';
+        ? 'G8 · real carry · annualised'
+        : 'G8 · CB rate differential';
     }
 
     // ── 7. Attach header tooltip (once) ──────────────────────────────────────
@@ -9117,16 +9122,16 @@ function exportPanel(type, format = 'csv') {
 
   else if (type === 'carry') {
     headers = ['Long', 'Short', 'Carry_Diff_Pct', 'Long_Rate_Pct', 'Short_Rate_Pct'];
-    const G8_CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+    const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
     const rates = {};
-    G8_CURRENCIES.forEach(ccy => {
+    G8.forEach(ccy => {
       const r = STATE.cbRates?.[ccy.toLowerCase()]?.rate;
       if (r != null) rates[ccy] = r;
     });
     const pairs = [];
-    for (let i = 0; i < G8_CURRENCIES.length; i++) {
-      for (let j = i + 1; j < G8_CURRENCIES.length; j++) {
-        const a = G8_CURRENCIES[i], b = G8_CURRENCIES[j];
+    for (let i = 0; i < G8.length; i++) {
+      for (let j = i + 1; j < G8.length; j++) {
+        const a = G8[i], b = G8[j];
         if (rates[a] == null || rates[b] == null) continue;
         const diff = rates[a] - rates[b];
         pairs.push(diff >= 0
@@ -10000,7 +10005,7 @@ if (document.readyState === 'loading') {
 
 // ═══════════════════════════════════════════════════════════════════
 // NEW FEATURES v7.71.0 — CIP Forwards, RR Surface, HV Term Structure,
-//                         8 major currencies Rates tabs, Sovereign Spreads, Econ Surprises
+//                         G8 Rates tabs, Sovereign Spreads, Econ Surprises
 // ═══════════════════════════════════════════════════════════════════
 
 // ── Global cache: CB rates by currency (populated by fetchRiskData/renderCBRates) ──
@@ -10593,7 +10598,7 @@ async function renderDerivativesSection() {
           const totalSpot = byProd['FxSpot']?.notional_usd_bn ?? 0;
           const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
           const totRow = `<tr style="border-top:1px solid var(--border2);font-weight:600;">
-            <td style="font-size:10px;color:var(--text2);">TOTAL (G8_CURRENCIES)</td>
+            <td style="font-size:10px;color:var(--text2);">TOTAL (G8)</td>
             <td style="${mono}color:var(--text);">${totalNotional.toFixed(1)}</td>
             <td style="${mono}color:var(--text2);">${totals.trade_count.toLocaleString()}</td>
             <td style="${mono}color:var(--text2);">${totalSwap > 0 ? totalSwap.toFixed(1) : '—'}</td>
@@ -10617,7 +10622,7 @@ async function renderDerivativesSection() {
 }
 
 
-// ── 8 major currencies Rates Tabs ──
+// ── G8 Rates Tabs ──
 function initG8RatesTabs() {
   const tabBar = document.getElementById('rates-country-tabs');
   if (!tabBar) return;
@@ -10640,7 +10645,7 @@ function initG8RatesTabs() {
     const pane = document.getElementById('rates-pane-' + cty);
     if (pane) pane.style.display = '';
 
-    // Lazy-load 8 major currencies data on first open
+    // Lazy-load G8 data on first open
     if (cty !== 'us' && cty !== 'spreads') renderG8YieldPane(cty);
     if (cty === 'spreads') renderSovereignSpreads();
   });
@@ -10773,7 +10778,7 @@ async function renderSovereignSpreads() {
 }
 
 // ── Economic Surprises — CESI-style centred bar index (v7.76.0) ──────────────
-// Methodology: for each major currency, computes a normalised surprise index over
+// Methodology: for each G8 currency, computes a normalised surprise index over
 // a 90-day rolling window from Finnhub economic calendar (actual vs consensus).
 // Index = (beats − misses) / total scored, scaled to [−100, +100].
 // Bar chart centred at 0: green bar extends right for positive, red bar extends
@@ -10841,7 +10846,7 @@ async function renderEconSurprises() {
   const srcEl = document.getElementById('econ-surprise-source');
   if (srcEl) {
     if (calSource === 'Finnhub' || calSource.startsWith('Finnhub')) {
-      srcEl.textContent = 'Finnhub · actual vs consensus · 8 major currencies · 90d rolling';
+      srcEl.textContent = 'Finnhub · actual vs consensus · G8 · 90d rolling';
     } else if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
       srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
@@ -10849,7 +10854,7 @@ async function renderEconSurprises() {
       srcEl.textContent = 'ForexFactory · actual vs consensus · 90d rolling';
     } else if (calSource && calSource.includes('ForexFactory')) {
       // Legacy backfill sources: multi-source historical string
-      srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · 8 major currencies · 90d rolling';
+      srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · G8 · 90d rolling';
     } else if (calSource) {
       srcEl.textContent = calSource + ' · actual vs consensus · 90d rolling';
     } else {
@@ -10972,10 +10977,10 @@ async function renderEconSurprises() {
   // ── Normalise to [−100, +100] index (Citi CESI convention) ───────────────
   // index = (beats − misses) / total × 100
   // Bar fill: 50% of bar width per side (each side = 50% of container)
-  const G8_CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+  const G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
   const rows = tbody.querySelectorAll('tr');
 
-  G8_CURRENCIES.forEach((ccy, idx) => {
+  G8.forEach((ccy, idx) => {
     const row = rows[idx];
     if (!row) return;
     const tds = row.querySelectorAll('td');
@@ -11131,7 +11136,7 @@ async function loadOISRatesCache() {
 // Module state
 let _newsAllItems = [];
 let _newsMeta     = {};
-let _newsFilter   = { cur: 'ALL' };
+let _newsFilter   = { cur: 'ALL', impact: 'ALL' };
 
 function renderNewsSection(items, meta) {
   if (Array.isArray(items)) _newsAllItems = items;
@@ -11142,7 +11147,8 @@ function renderNewsSection(items, meta) {
 
   const filtered = _newsAllItems.filter(function(item) {
     const curOk    = _newsFilter.cur    === 'ALL' || item.cur    === _newsFilter.cur;
-    return curOk;
+    const impactOk = _newsFilter.impact === 'ALL' || item.impact === _newsFilter.impact;
+    return curOk && impactOk;
   });
 
   const tsEl = document.getElementById('news-section-ts');
@@ -11237,6 +11243,9 @@ function renderNewsSection(items, meta) {
     timeEl.appendChild(timeTop);
     if (timeBot.textContent) timeEl.appendChild(timeBot);
 
+    const dot = document.createElement('span');
+    dot.className = 'ns-dot ns-dot-' + impact;
+
     const headEl = document.createElement('span');
     headEl.className = 'ns-headline';
     headEl.textContent = headline;
@@ -11248,6 +11257,7 @@ function renderNewsSection(items, meta) {
     chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
 
     row.appendChild(timeEl);
+    row.appendChild(dot);
     row.appendChild(headEl);
 
     if (cur) {
@@ -11306,7 +11316,8 @@ function renderNewsSection(items, meta) {
 function _newsSetFilter(type, value) {
   _newsFilter[type] = value;
   // Update active pill styling
-  document.querySelectorAll('.ns-cur-pill').forEach(btn => {
+  const selector = type === 'cur' ? '.ns-cur-pill' : '.ns-imp-pill';
+  document.querySelectorAll(selector).forEach(btn => {
     btn.classList.toggle('ns-pill-active', btn.dataset.val === value);
   });
   renderNewsSection();
@@ -11320,12 +11331,20 @@ function initNewsNav() {
   if (!splitLowerRight) return;
 
   function showNews() {
+    // Flush any stale deriv-hidden state first so we snapshot clean display values.
+    // If Derivatives was active when News was clicked, hideDerivatives() runs in bubble
+    // phase (after this capture-phase handler) — but with the guard on the capture
+    // listener this path is now unreachable. Belt-and-suspenders: clean up anyway.
+    if (typeof window._derivNavHide === 'function') {
+      const derivSection = document.getElementById('section-derivatives');
+      if (derivSection && derivSection.style.display !== 'none') {
+        window._derivNavHide();
+      }
+    }
     Array.from(splitLowerRight.children).forEach(el => {
       if (el.id !== 'section-news') {
-        // Store only the inline style value ('' means no inline override — CSS controls it).
-        // Never read getComputedStyle here: that can return 'none' for CSS-hidden elements
-        // and cause them to be permanently hidden with display:none after restoring.
-        el.dataset.newsHidden = el.style.display;
+        const originalDisplay = el.style.display || window.getComputedStyle(el).display;
+        el.dataset.newsHidden = originalDisplay === 'none' ? 'none' : (el.style.display || '');
         el.style.display = 'none';
       }
     });
@@ -11339,9 +11358,8 @@ function initNewsNav() {
   function hideNews() {
     newsSection.style.display = 'none';
     splitLowerRight.querySelectorAll('[data-news-hidden]').forEach(el => {
-      // Restore the exact inline style that was saved ('' clears any inline override,
-      // letting the stylesheet take over again — prevents the black/blank right panel).
-      el.style.display = el.dataset.newsHidden;
+      const saved = el.dataset.newsHidden;
+      el.style.display = saved === '' ? '' : saved;
       delete el.dataset.newsHidden;
     });
     // Repaint canvases after display restore (same double-rAF pattern as Derivatives)
@@ -11363,24 +11381,25 @@ function initNewsNav() {
             }
           }
         }
-        // Repaint any canvas elements in the right panel that may have gone blank
-        splitLowerRight.querySelectorAll('canvas').forEach(c => {
-          c.dispatchEvent(new Event('resize'));
-        });
       });
     });
   }
 
-  // Capture phase so it runs before the main nav scroll handler
+  // Capture phase — only intercepts clicks ON the News link itself (not clicks away from News).
+  // stopImmediatePropagation is scoped to the newsLink only; other nav links must propagate
+  // normally so that hideNews() (bubble phase below) and hideDerivatives() run in the
+  // correct order without corrupting each other's data-*-hidden state.
   const newsLink = document.querySelector('.top-nav a[data-target="section-news"]');
   if (newsLink) {
     newsLink.addEventListener('click', (e) => {
       e.stopImmediatePropagation();
+      // Guard: if News is already visible, clicking the tab again is a no-op
+      if (newsSection.style.display !== 'none') return;
       showNews();
     }, true);
   }
 
-  // Hide when any other nav tab is clicked
+  // Hide when any other nav tab is clicked (bubble phase — runs after hideDerivatives etc.)
   document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
     if (link.dataset.target !== 'section-news') {
       link.addEventListener('click', () => {
@@ -11429,7 +11448,7 @@ function initDerivativesNavFixed() {
       el.style.display = saved === '' ? '' : saved;
       delete el.dataset.derivHidden;
     });
-    // Canvas and lazy-loaded 8 major currencies panes need a repaint after display is restored.
+    // Canvas and lazy-loaded G8 panes need a repaint after display is restored.
     // Double rAF: split-lower-right uses display:contents which requires two frames
     // for the browser to commit the layout change and expose correct clientWidth values.
     // (Same pattern as the ticker strip — 'Double rAF ensures layout before we measure'.)
@@ -11439,7 +11458,7 @@ function initDerivativesNavFixed() {
         if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
           drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
         }
-        // Re-trigger whichever Rates tab is currently active so 8 major currencies/Spreads panes re-render
+        // Re-trigger whichever Rates tab is currently active so G8/Spreads panes re-render
         const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
         if (activeRatesTab) {
           const cty = activeRatesTab.dataset.cty;
