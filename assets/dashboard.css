@@ -1785,7 +1785,7 @@ a:focus-visible,
 .ns-item:hover { background:var(--bg3); }
 .ns-item:last-child { border-bottom:none; }
 .ns-featured .ns-row { border-left:2px solid var(--blue);padding-left:12px; }
-.ns-row { display:flex;align-items:center;gap:8px;padding:5px 14px 2px;min-width:0; }
+.ns-row { display:flex;align-items:center;gap:8px;padding:0 14px;height:32px;min-width:0; }
 /* Time cell: fixed 38px — stacks HH:MM over Xh in a single column */
 .ns-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
 .ns-time-hm  { font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap; }
@@ -1801,8 +1801,8 @@ a:focus-visible,
 .ns-chevron { color:var(--text3);flex-shrink:0;display:flex;align-items:center;transition:transform .18s; }
 .ns-open .ns-chevron { transform:rotate(180deg); }
 /* Inline snippet — always visible below headline row (matches research excerpt pattern) */
-.ns-snippet-row { padding:0 14px 6px 60px;font-size:10px;color:var(--text3);font-family:var(--font-ui);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
-.ns-open .ns-snippet-row { display:block;overflow:visible;-webkit-line-clamp:unset; }
+.ns-snippet-row { display:none; }
+.ns-open .ns-snippet-row { display:block;padding:0 14px 8px 60px;font-size:10px;color:var(--text2);font-family:var(--font-ui);line-height:1.55;overflow:visible; }
 /* Accordion drawer — source attribution + read link only (snippet now always visible above) */
 .ns-drawer { display:none;padding:4px 14px 10px 60px;border-top:1px solid var(--border); }
 .ns-open .ns-drawer { display:block; }
@@ -1824,7 +1824,7 @@ a:focus-visible,
 .rs-item:hover { background:var(--bg3); }
 .rs-item:last-child { border-bottom:none; }
 .rs-item.rs-trade-idea .rs-row { border-left:2px solid var(--up);padding-left:12px; }
-.rs-row { display:flex;align-items:center;gap:7px;padding:5px 12px 2px;min-width:0; }
+.rs-row { display:flex;align-items:center;gap:7px;padding:0 12px;height:32px;min-width:0; }
 
 /* Time cell */
 .rs-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:36px;line-height:1; }
@@ -1846,8 +1846,8 @@ a:focus-visible,
 .rs-open .rs-chevron { transform:rotate(180deg); }
 
 /* Excerpt line — RSS description teaser, always visible below headline */
-.rs-excerpt-row { padding:0 12px 7px 55px;font-size:10px;color:var(--text3);font-family:var(--font-ui);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
-.rs-open .rs-excerpt-row { display:block;overflow:visible;-webkit-line-clamp:unset; }
+.rs-excerpt-row { display:none; }
+.rs-open .rs-excerpt-row { display:block;padding:0 12px 8px 55px;font-size:10px;color:var(--text2);font-family:var(--font-ui);line-height:1.55;overflow:visible; }
 .rs-excerpt-series { font-style:italic;opacity:.7; }
 
 /* Accordion drawer */
@@ -1874,18 +1874,18 @@ a:focus-visible,
    intel-scroll becomes just a flex column, no scrolling itself.
    ─────────────────────────────────────────────────────────────────────────── */
 #intel-scroll { display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden; }
-/* News/Analysis rows: headline (30px) + 2-line snippet (~26px) = ~56px each → 5 rows ≈ 280px */
+/* News/Analysis rows: compact headline-only ~32px → 7 rows ≈ 225px */
 #news-section-feed,
 #trading-section-feed {
-  max-height: 280px;
+  max-height: 225px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border2) transparent;
   flex-shrink: 0;
 }
-/* Research rows: headline row (~30px) + 3-line excerpt (~42px) = ~72px → 5 rows ≈ 360px */
+/* Research rows: compact headline ~34px → 7 rows ≈ 240px */
 #research-section-feed {
-  max-height: 360px;
+  max-height: 240px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border2) transparent;
