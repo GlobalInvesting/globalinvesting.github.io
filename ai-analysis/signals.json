@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-06-03T22:24:39Z",
+  "generated_at": "2026-06-04T03:53:20Z",
   "signals": [
     {
-      "time": "22:23",
+      "time": "03:51",
       "priority": "critical",
-      "title": "NZD/USD — G8 Bilateral Theme + Geopolitical Stress",
-      "text": "NZD/USD at 0.5867 — USD outperformance accelerates as US-Iran Gulf escalation triggers safe-haven funding stress (DXY vs SPX corr z=+1.72σ). NZD remains the G8 laggard with a -0.842% weekly average, while the Fed 3.75% vs RBNZ 2.25% (+150bp) carry advantage favors USD. Real rate differential (+1.23% USD vs -0.83% NZD) further penalizes NZD longs. Sustained break below 0.5850 targets 2024 lows.",
+      "title": "NZD/USD — G8 Bilateral Theme + Fed Hawkishness",
+      "text": "NZD/USD at 0.5868 — The pair anchors the dominant G8 theme as the USD (Leader) outperforms the NZD (Laggard) by 1.531%. Hawkish Fed rhetoric from Logan regarding persistent inflation and strong US data (ISM Services 54.5, ADP +122k) drive USD demand, while NZD plunges over 1% in response to the widening policy divergence. NZD COT LF net short -13,767 aligns with the bearish trend, though RBNZ hike bias (OIS) remains a tail risk for a short-squeeze if US data cools.",
       "evidence": [
-        "USD 1W avg: +0.691% (n=7)",
-        "NZD 1W avg: -0.842% (n=4)",
-        "G8 spread: 1.534%"
+        "USD 1W avg: +0.674% (n=7)",
+        "NZD 1W avg: -0.857% (n=4)",
+        "G8 spread: 1.531%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "22:20",
-      "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + Options Skew",
-      "text": "USD/JPY at 160.04 — Price is testing the 160.00 psychological barrier previously associated with BoJ verbal warnings and intervention. Despite a +292bp OIS carry advantage for USD, the options market is pricing downside protection with a -1.18 25d RR (moderate put skew). JPY COT LF net short -86,249 remains crowded; a break above 160.50 increases the risk of immediate MoF action.",
+      "time": "03:48",
+      "priority": "warning",
+      "title": "USD/JPY — Carry + Intervention Risk + Options Skew",
+      "text": "USD/JPY at 159.98 — Price is testing the 160.00 psychological level which previously triggered BoJ verbal warnings. Despite a +300bp Fed-BoJ OIS carry advantage supporting the bid, the options market is pricing downside protection with a 25d RR of -1.18 (moderate put skew). JPY COT LF net short -86,249 reflects a crowded carry trade vulnerable to rapid unwind if VIX (16.1) spikes above 25 or if the BoJ signals a June hike.",
       "evidence": [
-        "USD/JPY: 160.04",
-        "25d RR (Saxo): -1.18",
+        "USD/JPY OIS carry: +300bp",
+        "USD/JPY 25d RR: -1.18",
         "JPY COT LF net: -86,249"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "22:17",
+      "time": "03:46",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Volatility + Retail Divergence",
-      "text": "AUD/USD at 0.7131 — COT LF net long +58,041 (76.1%) indicates crowded institutional positioning while retail is 72% short, creating a sharp divergence. AUD IV at 16.1% vs HV30 at 8.1% (VRP +8.0%) signals extreme hedging demand ahead of RBA Governor Bullock's appearance. Negative CESI (-7) and geopolitical risk-off flows threaten the +70bp AUD carry advantage. Watch for retail capitulation if 0.7100 breaks.",
+      "title": "USD/CAD — Retail Divergence + CESI + Carry",
+      "text": "USD/CAD at 1.3903 — Retail sentiment is at an extreme 85% short, diverging from the institutional trend and a +150bp USD carry advantage. Strong US economic outperformance (CESI +25) vs moderate CAD data (CESI +4) supports the current upside. Retail is aggressively fading the move, creating a contrarian risk of further upside extension as retail shorts are forced to cover. Watch for a break above 1.4000 to accelerate the squeeze.",
       "evidence": [
-        "AUD COT long%: 76.1%",
-        "Retail: 72% short",
-        "VRP: +8.0%"
+        "Retail sentiment: 85% short",
+        "USD/CAD OIS carry: +150bp",
+        "USD CESI: +25"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "22:14",
-      "priority": "warning",
-      "title": "USD/CHF — Volatility Premium + CB Divergence",
-      "text": "USD/CHF at 0.7920 — IV at 31.3% vs HV30 at 6.5% creates a massive +24.8% VRP, indicating the options market is pricing a significant tail event. Fed 3.75% vs SNB 0% (+375bp) carry sustains the USD bid, while the SNB market bias remains for a cut. Real rate differential (+1.23% USD vs -0.31% CHF) supports structural upside. Watch for SNB meeting on 18 Jun to confirm the dovish path.",
-      "evidence": [
-        "USD/CHF VRP: +24.8%",
-        "Fed 3.75% vs SNB 0%: +375bp",
-        "USD/CHF: 0.7920"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "22:08",
+      "time": "03:42",
       "priority": "info",
-      "title": "EUR/USD — Data Outperformance vs Carry Headwinds",
-      "text": "EUR/USD at 1.1600 — Positive CESI (+7) and resilient growth in the Eurozone provide a marginal floor, but the +172bp OIS carry advantage for USD remains the dominant driver. Options market shows mild caution with a -0.34 25d RR (put skew) and elevated VRP (+3.1%). Fed's Logan signaling a slower return to 2% inflation reinforces the 'higher for longer' USD regime. Watch 1.1580 support level.",
+      "title": "USD/CHF — Volatility Risk Premium Extreme",
+      "text": "USD/CHF at 0.7912 — The pair exhibits an extreme Volatility Risk Premium (VRP) of +26.2%, with IV at 32.3% vs HV30 of 6.1%. This massive spread indicates the options market is pricing in significant tail-risk protection, likely tied to US-Iran Gulf escalations and safe-haven CHF demand, despite neutral speculative positioning (COT LF net -5,651). The +375bp USD carry advantage remains the structural floor unless geopolitical stress forces a VIX breakout.",
       "evidence": [
-        "EUR CESI: +7",
-        "EUR/USD VRP: +3.1%",
-        "OIS Carry: +172bp USD"
+        "USD/CHF VRP: +26.2%",
+        "USD/CHF IV: 32.3% vs HV30: 6.1%",
+        "USD/CHF OIS carry: +375bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
