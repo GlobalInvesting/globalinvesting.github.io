@@ -1433,7 +1433,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="intel-sub-head intel-sub-head--research">
           <div class="intel-sub-title">
             <span class="intel-sub-label">Research</span>
-            <span class="intel-sub-source" id="research-sources-label">ING &middot; Saxo &middot; MUFG &middot; CME &middot; UBS &middot; BIS</span>
+            <span class="intel-sub-source" id="research-sources-label">ING &middot; Saxo &middot; MUFG &middot; CME &middot; UBS &middot; BIS &middot; InvestMacro &middot; MtM &middot; FX Mkts</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
             <span id="research-section-count" class="intel-sub-count"></span>
@@ -1450,6 +1450,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <button class="rs-bank-pill" data-val="CME"   onclick="window._researchSetFilter('bank','CME')">CME</button>
           <button class="rs-bank-pill" data-val="UBS"   onclick="window._researchSetFilter('bank','UBS')">UBS</button>
           <button class="rs-bank-pill" data-val="BIS"   onclick="window._researchSetFilter('bank','BIS')">BIS</button>
+          <button class="rs-bank-pill" data-val="InvestMacro"    onclick="window._researchSetFilter('bank','InvestMacro')">InvestMacro</button>
+          <button class="rs-bank-pill" data-val="Marc to Market" onclick="window._researchSetFilter('bank','Marc to Market')">MtM</button>
+          <button class="rs-bank-pill" data-val="FX Markets"     onclick="window._researchSetFilter('bank','FX Markets')">FX Mkts</button>
         </div>
         <div id="research-section-feed">
           <div style="padding:14px;color:var(--text3);font-size:11px;">Loading research&hellip;</div>
@@ -1458,8 +1461,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <!-- ─── SUB-PANEL 3: TRADING — TA & retail analysis ───────────────────── -->
         <div class="intel-sub-head intel-sub-head--trading">
           <div class="intel-sub-title">
-            <span class="intel-sub-label">Trading</span>
-            <span class="intel-sub-source">technical · sentiment · signals</span>
+            <span class="intel-sub-label">Analysis</span>
+            <span class="intel-sub-source">technical · commentary · forecasts</span>
           </div>
           <span id="trading-section-count" class="intel-sub-count"></span>
         </div>
