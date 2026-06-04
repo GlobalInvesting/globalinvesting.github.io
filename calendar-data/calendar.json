@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-04T23:14:36Z",
-  "generatedAt": "2026-06-04T23:14:36Z",
+  "lastUpdate": "2026-06-04T23:30:36Z",
+  "generatedAt": "2026-06-04T23:30:36Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -385,6 +385,11 @@
       "n": 5,
       "mean": -3.2,
       "std": 6.534524
+    },
+    "JPY/household spending yoy": {
+      "n": 2,
+      "mean": -0.3,
+      "std": 1.838478
     }
   },
   "events": [
@@ -20662,7 +20667,7 @@
       "flag": "🇯🇵",
       "event": "Household Spending YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.5",
       "forecast": "-1.5",
       "previous": "-2.9"
     },
@@ -21327,7 +21332,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "213*",
-      "previous": "215"
+      "previous": "225"
     },
     {
       "date": "11 Jun",
@@ -21691,7 +21696,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "-4*",
-      "previous": "-6.75"
+      "previous": "-7.974"
     },
     {
       "date": "16 Jun",
