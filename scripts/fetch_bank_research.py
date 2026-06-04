@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_bank_research.py — v1.2
+fetch_bank_research.py — v1.3
 Fetches institutional FX research notes from public RSS feeds and writes
 research-data/bank-research.json.
 
@@ -391,12 +391,20 @@ def fetch_rss(source: dict, cutoff: datetime) -> list:
 
             ts = int(pub_date.timestamp() * 1000)
 
+            # Excerpt — first 160 chars of RSS description, cleaned.
+            # Stored as teaser for display (industry standard: Bloomberg/Reuters
+            # aggregators show RSS-provided summaries). No body content reproduction.
+            excerpt = summary[:160].strip()
+            if excerpt and not excerpt.endswith(('.', '…', '!')):
+                excerpt = excerpt.rsplit(' ', 1)[0] + '…'
+
             results.append({
                 "id":        item_id(bank, title),
                 "bank":      bank,
                 "bank_full": bank_full,
                 "series":    series,
                 "title":     title,
+                "excerpt":   excerpt,
                 "author":    author,
                 "url":       link,
                 "currencies": currencies,
@@ -553,6 +561,7 @@ def fetch_mufg_html(source: dict, cutoff: datetime) -> list:
                 "bank_full": bank_full,
                 "series":    series,
                 "title":     title,
+                "excerpt":   "",
                 "author":    "",
                 "url":       full_url,
                 "currencies": currencies,
