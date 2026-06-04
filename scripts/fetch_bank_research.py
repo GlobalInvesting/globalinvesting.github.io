@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_bank_research.py — v1.1
+fetch_bank_research.py — v1.2
 Fetches institutional FX research notes from public RSS feeds and writes
 research-data/bank-research.json.
 
@@ -12,6 +12,17 @@ Design principles:
     Each note shows: bank badge · series label · headline · currency tags ·
     category chip · relative age. Drawer shows: bank full name · author ·
     pairs · external link.
+
+Changes v1.2:
+  · SAXO BUG FIX: bank_counts[bank] = 0 was resetting the counter every time a future
+    completed — so when the second Saxo feed (0 items) finished after the first (7 items),
+    the counter reset to 0 and all 7 items were lost. Fixed with setdefault(bank, 0) which
+    only initialises the counter if the bank hasn't been seen yet.
+  · MUFG DEBUG: Added html[:600] debug print to GA log so we can see the live page
+    structure. Added 2 new extraction patterns (1b: data-title/aria-label attributes;
+    2b: any /[section]/fx/ path, catches /insights/fx/, /research/fx/, etc.).
+  · UBS: Added second URL fallback (UBS CIO Daily Updates) in case the investment bank
+    RSS returns empty. Both try in parallel; results are deduplicated by item_id.
 
 Changes v1.1:
   · ING: URL changed from /market/fx/feed/ (timeout in GA — likely geo-restricted) to
@@ -133,10 +144,20 @@ RSS_SOURCES = [
         "fx_filter": False,  # all content is FX-focused
     },
     # ── UBS Global Research — sell-side research from one of the largest FX desks globally.
+    # v1.2: Two UBS feeds tried in parallel; deduplicated by item_id.
     {
         "bank":      "UBS",
         "bank_full": "UBS Global Research",
         "url":       "https://www.ubs.com/global/en/investment-bank/insights-and-data/global-research/_jcr_content/root/contentarea/mainpar/toplevelgrid_copy/col_1/responsivepodcast.rss20.xml?campID=RSS",
+        "type":      "rss",
+        "fx_filter": True,
+    },
+    # UBS CIO Daily Updates — Chief Investment Office macro views. More broadly accessible
+    # than the IB research RSS. FX relevance filter applied.
+    {
+        "bank":      "UBS",
+        "bank_full": "UBS CIO — Chief Investment Office",
+        "url":       "https://www.ubs.com/global/en/wealth-management/chief-investment-office/daily-updates.rss",
         "type":      "rss",
         "fx_filter": True,
     },
@@ -424,10 +445,14 @@ def fetch_mufg_html(source: dict, cutoff: datetime) -> list:
             return []
 
         html = resp.text
+
+        # v1.2: debug — print first 600 chars of HTML so we can diagnose structure changes in GA
+        print(f"  [{bank}] DEBUG html[:600]: {html[:600]!r}")
+
         seen_slugs = set()
         candidates = []  # list of (slug_or_url, title)
 
-        # ── Pattern 1: relative href="/fx/[slug]/" with link text
+        # ── Pattern 1: relative href="/fx/[slug]/" with link text (original)
         for m in re.finditer(
             r'href=["\'](/fx/[a-z0-9][a-z0-9\-]+/)["\'][^>]*>([^<]{8,150})',
             html, re.I,
@@ -437,15 +462,37 @@ def fetch_mufg_html(source: dict, cutoff: datetime) -> list:
                 seen_slugs.add(slug)
                 candidates.append((base_url + slug, title))
 
-        # ── Pattern 2: absolute href with mufgresearch.com/fx/
+        # ── Pattern 1b: href="/fx/[slug]/" anywhere — title in data-title or aria-label attr
         for m in re.finditer(
-            r'href=["\']https?://www\.mufgresearch\.com(/fx/[a-z0-9][a-z0-9\-]+/)["\'][^>]*>([^<]{8,150})',
+            r'href=["\'](/fx/[a-z0-9][a-z0-9\-]+/)["\'][^>]*(?:data-title|aria-label|title)=["\']([^"\']{8,150})["\']',
             html, re.I,
         ):
             slug, title = m.group(1), clean_html(m.group(2)).strip()
             if slug not in seen_slugs and len(title) >= 8:
                 seen_slugs.add(slug)
                 candidates.append((base_url + slug, title))
+
+        # ── Pattern 2: absolute href with mufgresearch.com/fx/
+        for m in re.finditer(
+            r'href=["\']https?://(?:www\.)?mufgresearch\.com(/fx/[a-z0-9][a-z0-9\-]+/?)["\'][^>]*>([^<]{8,150})',
+            html, re.I,
+        ):
+            slug, title = m.group(1), clean_html(m.group(2)).strip()
+            if slug not in seen_slugs and len(title) >= 8:
+                seen_slugs.add(slug)
+                candidates.append((base_url + slug, title))
+
+        # ── Pattern 2b: any mufgresearch.com/[any-path]/ href (catches /insights/fx/, /research/fx/, etc.)
+        for m in re.finditer(
+            r'href=["\'](?:https?://(?:www\.)?mufgresearch\.com)?(/[a-z0-9\-]+/[a-z0-9][a-z0-9\-]+/)["\'][^>]*>\s*([^<]{8,150})',
+            html, re.I,
+        ):
+            slug, title = m.group(1), clean_html(m.group(2)).strip()
+            # Must contain "fx" or research keyword in slug
+            if any(kw in slug.lower() for kw in ["fx", "foreign", "currency", "research"]):
+                if slug not in seen_slugs and len(title) >= 8:
+                    seen_slugs.add(slug)
+                    candidates.append((base_url + slug, title))
 
         # ── Pattern 3: article/h-tag headline with nearby /fx/ link
         # Captures <a href="/fx/..."><h2>Title</h2></a> or <h2><a href="/fx/...">Title</a></h2>
@@ -529,7 +576,7 @@ def main():
     now_utc = datetime.now(timezone.utc)
     cutoff  = now_utc - timedelta(days=MAX_AGE_DAYS)
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_bank_research.py v1.1")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_bank_research.py v1.2")
     print(f"  Fetching {len(RSS_SOURCES)} sources in parallel (workers={FETCH_WORKERS})...")
 
     all_items   = []
@@ -553,7 +600,7 @@ def main():
 
             src  = futures[future]
             bank = src["bank"]
-            bank_counts[bank] = 0
+            bank_counts.setdefault(bank, 0)  # v1.2: do NOT reset — multiple feeds per bank
 
             for item in items:
                 if item["id"] in seen_ids:
