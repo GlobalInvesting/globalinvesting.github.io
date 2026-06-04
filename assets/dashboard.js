@@ -11246,7 +11246,15 @@ function _buildNsItem(item, containerEl) {
   row.appendChild(chevron);
   wrap.appendChild(row);
 
-  if (hasSnip || safeLink || source) {
+  // ── Inline snippet — always visible below headline (Reuters/Bloomberg pattern) ──
+  if (hasSnip) {
+    const snipInline = document.createElement('div');
+    snipInline.className = 'ns-snippet-row';
+    snipInline.textContent = snippet;
+    wrap.appendChild(snipInline);
+  }
+
+  if (safeLink || source) {
     const drawer = document.createElement('div');
     drawer.className = 'ns-drawer';
     if (source) {
@@ -11254,12 +11262,6 @@ function _buildNsItem(item, containerEl) {
       srcDrawer.className = 'ns-drawer-source';
       srcDrawer.textContent = source;
       drawer.appendChild(srcDrawer);
-    }
-    if (hasSnip) {
-      const snipEl = document.createElement('p');
-      snipEl.className = 'ns-snippet';
-      snipEl.textContent = snippet;
-      drawer.appendChild(snipEl);
     }
     if (safeLink) {
       const readLink = document.createElement('a');

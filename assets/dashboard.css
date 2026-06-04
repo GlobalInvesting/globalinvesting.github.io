@@ -1785,21 +1785,28 @@ a:focus-visible,
 .ns-item:hover { background:var(--bg3); }
 .ns-item:last-child { border-bottom:none; }
 .ns-featured .ns-row { border-left:2px solid var(--blue);padding-left:12px; }
-.ns-row { display:flex;align-items:center;gap:8px;padding:0 14px;height:30px;min-width:0; }
+.ns-row { display:flex;align-items:center;gap:8px;padding:5px 14px 2px;min-width:0; }
 /* Time cell: fixed 38px — stacks HH:MM over Xh in a single column */
 .ns-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
 .ns-time-hm  { font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap; }
 .ns-time-age { font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;white-space:nowrap;margin-top:1px; }
+/* Impact dot — Reuters/Bloomberg wire standard: red=high, amber=medium, dim=low */
+.ns-dot { width:5px;height:5px;border-radius:50%;flex-shrink:0; }
+.ns-dot-high { background:var(--down); }
+.ns-dot-med  { background:var(--orange);opacity:.85; }
+.ns-dot-low  { background:var(--border2); }
 .ns-headline { font-size:11px;color:var(--text);font-family:var(--font-ui);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0; }
 .ns-cur-tag { font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;font-family:var(--font-ui);flex-shrink:0; }
 .ns-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);flex-shrink:0;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
 .ns-chevron { color:var(--text3);flex-shrink:0;display:flex;align-items:center;transition:transform .18s; }
 .ns-open .ns-chevron { transform:rotate(180deg); }
-.ns-drawer { display:none;padding:6px 14px 10px 56px; }
+/* Inline snippet — always visible below headline row (matches research excerpt pattern) */
+.ns-snippet-row { padding:0 14px 6px 60px;font-size:10px;color:var(--text3);font-family:var(--font-ui);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+/* Accordion drawer — source attribution + read link only (snippet now always visible above) */
+.ns-drawer { display:none;padding:4px 14px 10px 60px;border-top:1px solid var(--border); }
 .ns-open .ns-drawer { display:block; }
 .ns-drawer-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);margin:0 0 4px 0;text-transform:uppercase;letter-spacing:.04em; }
-.ns-snippet { font-size:11px;color:var(--text2);line-height:1.5;font-family:var(--font-ui);margin:0; }
-.ns-read-link { display:inline-block;margin-top:6px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none; }
+.ns-read-link { display:inline-block;margin-top:4px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none; }
 .ns-read-link:hover { text-decoration:underline; }
 .ns-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
 .ns-cur-pill:hover { background:var(--bg3);color:var(--text); }
@@ -1838,7 +1845,7 @@ a:focus-visible,
 .rs-open .rs-chevron { transform:rotate(180deg); }
 
 /* Excerpt line — RSS description teaser, always visible below headline */
-.rs-excerpt-row { padding:0 12px 6px 55px;font-size:10px;color:var(--text3);font-family:var(--font-ui);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.rs-excerpt-row { padding:0 12px 7px 55px;font-size:10px;color:var(--text3);font-family:var(--font-ui);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
 .rs-excerpt-series { font-style:italic;opacity:.7; }
 
 /* Accordion drawer */
@@ -1865,10 +1872,18 @@ a:focus-visible,
    intel-scroll becomes just a flex column, no scrolling itself.
    ─────────────────────────────────────────────────────────────────────────── */
 #intel-scroll { display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden; }
+/* News/Analysis rows: headline (30px) + 2-line snippet (~26px) = ~56px each → 5 rows ≈ 280px */
 #news-section-feed,
-#research-section-feed,
 #trading-section-feed {
-  max-height: 230px;
+  max-height: 280px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+  flex-shrink: 0;
+}
+/* Research rows: headline row (~30px) + 3-line excerpt (~42px) = ~72px → 5 rows ≈ 360px */
+#research-section-feed {
+  max-height: 360px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border2) transparent;
