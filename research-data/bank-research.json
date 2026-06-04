@@ -1,13 +1,31 @@
 {
-  "updated_utc": "2026-06-04T01:58:39.024295+00:00",
-  "updated_label": "01:58 UTC",
-  "total": 26,
+  "updated_utc": "2026-06-04T03:00:35.571136+00:00",
+  "updated_label": "03:00 UTC",
+  "total": 36,
   "sources": [
     "BIS",
     "CME",
+    "ING",
     "Saxo"
   ],
   "items": [
+    {
+      "id": "da89c2d1439c",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "The Commodities Feed: Dwindling oil inventories leave market increasingly vulnerable",
+      "excerpt": "EUROPE: Oil prices remain tightly bound to events in the Middle East. Without a normalisation of regional oil flows, the market is increasingly exposed to…",
+      "author": "",
+      "url": "https://think.ing.com/articles/the-commodities-feed-oils-deflating-inventory-a/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780537680000,
+      "published": "2026-06-04T01:48:00+00:00"
+    },
     {
       "id": "afba079d09e0",
       "bank": "CME",
@@ -26,6 +44,23 @@
       "published": "2026-06-03T20:33:09+00:00"
     },
     {
+      "id": "54f9dc8d5122",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Rates Spark: Spread exposures",
+      "excerpt": "Geopolitics, via oil-driven volatility and hawkish central bank repricing, have left eurozone bond spreads wider, with Italy hardest hit. Retreating oil…",
+      "author": "",
+      "url": "https://think.ing.com/articles/rates-spark-spread-exposures/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780503060000,
+      "published": "2026-06-03T16:11:00+00:00"
+    },
+    {
       "id": "9b98247f706e",
       "bank": "CME",
       "bank_full": "CME Group FX",
@@ -41,6 +76,38 @@
       "category": "macro",
       "ts": 1780502170000,
       "published": "2026-06-03T15:56:10+00:00"
+    },
+    {
+      "id": "5bac28f878c0",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "National Bank of Poland’s governor says the current level of interest rates is adequate",
+      "excerpt": "POLAND: The current level of interest rates is sufficiently high to stabilise inflation, and the risk of rate hikes has declined, according to National Bank…",
+      "author": "",
+      "url": "https://think.ing.com/articles/national-bank-of-poland-governor-current-level-of-interest-rates-is-adequate/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780497720000,
+      "published": "2026-06-03T14:42:00+00:00"
+    },
+    {
+      "id": "ef6d7025d7fb",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "US Dollar Credit Supply: Supply continues at a strong pace",
+      "excerpt": "Supply remains hefty in May, pushing the year-to-date figures further ahead of previous…",
+      "author": "",
+      "url": "https://think.ing.com/reports/us-dollar-credit-supply-supply-continues-at-a-strong-pace/",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780493220000,
+      "published": "2026-06-03T13:27:00+00:00"
     },
     {
       "id": "e6897049ce80",
@@ -104,6 +171,23 @@
       "category": "macro",
       "ts": 1780488840000,
       "published": "2026-06-03T12:14:00+00:00"
+    },
+    {
+      "id": "4c0da8bd6fff",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "A rate hike and then what? Our ECB preview",
+      "excerpt": "With a rate hike looking like a done deal, all focus will be on whether the ECB gives any guidance on what will happen beyond next week’s…",
+      "author": "",
+      "url": "https://think.ing.com/articles/a-rate-hike-and-then-what-our-ecb-preview/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780482600000,
+      "published": "2026-06-03T10:30:00+00:00"
     },
     {
       "id": "457a9364787c",
@@ -205,6 +289,43 @@
       "published": "2026-06-03T07:59:00+00:00"
     },
     {
+      "id": "a5dc98835e7d",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "A Bank of England rate hike in July can’t be ruled out",
+      "excerpt": "UNITED KINGDOM: A June rate rise now looks unlikely amid a fall in oil prices and weaker economic data. Yet a hike in July is possible if energy flows through…",
+      "author": "",
+      "url": "https://think.ing.com/articles/a-bank-of-england-rate-hike-in-july-cant-be-ruled-out/",
+      "currencies": [
+        "GBP"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780471260000,
+      "published": "2026-06-03T07:21:00+00:00"
+    },
+    {
+      "id": "317dff686852",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "FX Daily",
+      "title": "FX Daily: Dollar support broadens",
+      "excerpt": "An encouraging, if slightly flattering, US JOLTS job openings figure gave the dollar broad support yesterday, and similar positive news could be incoming today.",
+      "author": "",
+      "url": "https://think.ing.com/articles/fx-daily-dollar-support-broadens/",
+      "currencies": [
+        "USD",
+        "CHF"
+      ],
+      "pairs": [
+        "USD/CHF"
+      ],
+      "category": "macro",
+      "ts": 1780468800000,
+      "published": "2026-06-03T06:40:00+00:00"
+    },
+    {
       "id": "54f999027022",
       "bank": "Saxo",
       "bank_full": "Saxo Bank (SaxoStrats) — Articles",
@@ -239,6 +360,53 @@
       "category": "macro",
       "ts": 1780435385000,
       "published": "2026-06-02T21:23:05+00:00"
+    },
+    {
+      "id": "0e2b24b4e5c1",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Rates Spark: The real deal",
+      "excerpt": "Oil and inflation dominate near-term direction for rates. But on a longer view, real rates highlight a backdrop, where better growth hopes and record bond…",
+      "author": "",
+      "url": "https://think.ing.com/articles/rates-spark-the-real-deal/",
+      "currencies": [],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1780415160000,
+      "published": "2026-06-02T15:46:00+00:00"
+    },
+    {
+      "id": "2f9c7c957ff4",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "The National Bank of Poland kept rates on hold in June",
+      "excerpt": "POLAND: In the wake of the decline in CPI inflation in May, the Monetary Policy Council (MPC) is not in a rush to hike interest rates. Policymakers have more…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/national-bank-of-poland-rates-on-hold-in-june/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780413240000,
+      "published": "2026-06-02T15:14:00+00:00"
+    },
+    {
+      "id": "ac5062dba11f",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Euro Credit Supply: Supply continues at a strong pace",
+      "excerpt": "EUROPE: Issuers continue to come to the primary market in full force with another heavy month of supply in…",
+      "author": "",
+      "url": "https://think.ing.com/reports/euro-credit-supply-supply-continues-at-a-strong-pace/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780410840000,
+      "published": "2026-06-02T14:34:00+00:00"
     },
     {
       "id": "f8265bc4ad7e",
