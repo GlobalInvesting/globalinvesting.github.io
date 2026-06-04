@@ -1871,3 +1871,46 @@ a:focus-visible,
 
 /* Empty state */
 .rs-empty { padding:20px 14px;color:var(--text3);font-size:11px; }
+
+/* ─── INTEL PANEL — sub-section dividers (News / Research / Trading) ──────────
+   Three stacked sub-panels inside #section-news, separated by sticky headers.
+   Pattern: Bloomberg Intelligence terminal section dividers.
+   Each header is position:sticky so it stays visible while scrolling content below.
+──────────────────────────────────────────────────────────────────────────────── */
+.intel-sub-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border2);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  flex-shrink: 0;
+}
+.intel-sub-head:first-child { border-top: none; }
+.intel-sub-head--research { background: color-mix(in srgb, var(--bg2) 85%, var(--blue) 15%); }
+.intel-sub-head--trading  { background: color-mix(in srgb, var(--bg2) 85%, var(--orange) 10%); }
+.intel-sub-title { display:flex;align-items:baseline;gap:6px; }
+.intel-sub-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text);
+  font-family: var(--font-ui);
+}
+.intel-sub-head--research .intel-sub-label { color: var(--blue); }
+.intel-sub-head--trading  .intel-sub-label { color: var(--orange); }
+.intel-sub-source {
+  font-size: 9px;
+  color: var(--text3);
+  font-family: var(--font-ui);
+}
+.intel-sub-count {
+  font-size: 9px;
+  color: var(--text3);
+  font-family: var(--font-ui);
+}

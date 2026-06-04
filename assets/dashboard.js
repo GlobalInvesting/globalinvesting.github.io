@@ -8919,7 +8919,6 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     k: 'section-tvcalendar',
     d: 'section-derivatives',
     n: 'section-news',
-    b: 'section-research',   // B = Bank research (R taken by Risk)
   };
 
   function navTo(target) {
@@ -8944,16 +8943,6 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
         if (typeof window._newsNavShow === 'function') window._newsNavShow();
       } else {
         if (typeof window._newsNavHide === 'function') window._newsNavHide();
-      }
-      return;
-    }
-    if (target === 'section-research') {
-      const resSection = window._researchNavSection;
-      if (!resSection) return;
-      if (resSection.style.display === 'none' || resSection.style.display === '') {
-        if (typeof window._researchNavShow === 'function') window._researchNavShow();
-      } else {
-        if (typeof window._researchNavHide === 'function') window._researchNavHide();
       }
       return;
     }
@@ -11150,181 +11139,193 @@ let _newsAllItems = [];
 let _newsMeta     = {};
 let _newsFilter   = { cur: 'ALL', impact: 'ALL' };
 
+// Sources classified as TA/retail — rendered in Trading sub-panel
+// All others (CB, macro wires, institutional) go to News sub-panel
+const _TRADING_SOURCES = new Set([
+  'Barchart', 'BabyPips', 'InvestMacro', 'ForexCrunch',
+  'DailyForex TA', 'InvestingLive', 'ActionForex',
+  'MyFXBook', 'Investing.com', 'DailyForex',
+]);
+
+// ── Helper: build one NS item element (shared by News and Trading feeds) ──────
+function _buildNsItem(item, containerEl) {
+  let time = item.time || '--:--';
+  let ageMs = 0;
+  let pubDate = null;
+  if (item.ts) {
+    pubDate = new Date(item.ts);
+    time = pubDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    ageMs = Date.now() - item.ts;
+  } else if (item.datetime) {
+    const d = new Date(item.datetime);
+    if (!isNaN(d)) {
+      pubDate = d;
+      time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      ageMs = Date.now() - d.getTime();
+    }
+  }
+
+  let ageLabel = '';
+  let showDate = false;
+  if (ageMs > 0) {
+    const ageMin  = Math.floor(ageMs / 60000);
+    const ageHr   = Math.floor(ageMs / 3600000);
+    const ageDays = Math.floor(ageMs / 86400000);
+    if (ageDays >= 1)      { showDate = true; }
+    else if (ageHr >= 1)   { ageLabel = ageHr + 'h'; }
+    else if (ageMin >= 1)  { ageLabel = ageMin + 'm'; }
+    else                   { ageLabel = 'now'; }
+  }
+
+  const headline = item.title  || '';
+  const snippet  = item.expand || '';
+  const cur      = item.cur    || '';
+  const source   = item.source || '';
+  const impact   = item.impact || 'low';
+  const rawLink  = item.link   || '';
+  const safeLink = rawLink.startsWith('https://') ? rawLink : '';
+  const hasSnip  = snippet.length > 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'ns-item' + (item.featured ? ' ns-featured' : '');
+
+  const row = document.createElement('div');
+  row.className = 'ns-row';
+
+  const timeEl = document.createElement('span');
+  timeEl.className = 'ns-time';
+  const timeTop = document.createElement('span');
+  timeTop.className = 'ns-time-hm';
+  const timeBot = document.createElement('span');
+  timeBot.className = 'ns-time-age';
+
+  if (showDate && pubDate) {
+    const dateStr = pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    timeTop.textContent = dateStr;
+    timeEl.title = time + ' · ' + pubDate.toLocaleDateString();
+  } else {
+    timeTop.textContent = time;
+    if (ageLabel && ageLabel !== 'now') timeBot.textContent = ageLabel;
+    if (ageLabel) timeEl.title = ageLabel + ' ago';
+  }
+  timeEl.appendChild(timeTop);
+  if (timeBot.textContent) timeEl.appendChild(timeBot);
+
+  const dot = document.createElement('span');
+  dot.className = 'ns-dot ns-dot-' + impact;
+
+  const headEl = document.createElement('span');
+  headEl.className = 'ns-headline';
+  headEl.textContent = headline;
+  headEl.title = headline;
+
+  const chevron = document.createElement('span');
+  chevron.className = 'ns-chevron';
+  chevron.setAttribute('aria-hidden', 'true');
+  chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
+
+  row.appendChild(timeEl);
+  row.appendChild(dot);
+  row.appendChild(headEl);
+  if (cur) {
+    const curTag = document.createElement('span');
+    curTag.className = 'ns-cur-tag';
+    curTag.textContent = cur;
+    row.appendChild(curTag);
+  }
+  row.appendChild(chevron);
+  wrap.appendChild(row);
+
+  if (hasSnip || safeLink || source) {
+    const drawer = document.createElement('div');
+    drawer.className = 'ns-drawer';
+    if (source) {
+      const srcDrawer = document.createElement('p');
+      srcDrawer.className = 'ns-drawer-source';
+      srcDrawer.textContent = source;
+      drawer.appendChild(srcDrawer);
+    }
+    if (hasSnip) {
+      const snipEl = document.createElement('p');
+      snipEl.className = 'ns-snippet';
+      snipEl.textContent = snippet;
+      drawer.appendChild(snipEl);
+    }
+    if (safeLink) {
+      const readLink = document.createElement('a');
+      readLink.className = 'ns-read-link';
+      readLink.textContent = 'Read full article';
+      readLink.href = safeLink;
+      readLink.target = '_blank';
+      readLink.rel = 'noopener noreferrer';
+      readLink.addEventListener('click', function(e) { e.stopPropagation(); });
+      drawer.appendChild(readLink);
+    }
+    wrap.appendChild(drawer);
+    row.addEventListener('click', function() {
+      const isOpen = wrap.classList.contains('ns-open');
+      containerEl.querySelectorAll('.ns-open').forEach(function(el) { el.classList.remove('ns-open'); });
+      if (!isOpen) wrap.classList.add('ns-open');
+    });
+  }
+
+  return wrap;
+}
+
 function renderNewsSection(items, meta) {
   if (Array.isArray(items)) _newsAllItems = items;
   if (meta) _newsMeta = meta;
 
-  const feed = document.getElementById('news-section-feed');
-  if (!feed) return;
+  const newsFeed    = document.getElementById('news-section-feed');
+  const tradingFeed = document.getElementById('trading-section-feed');
+  if (!newsFeed) return;
 
+  // Apply currency filter to all items
   const filtered = _newsAllItems.filter(function(item) {
-    const curOk    = _newsFilter.cur    === 'ALL' || item.cur    === _newsFilter.cur;
-    const impactOk = _newsFilter.impact === 'ALL' || item.impact === _newsFilter.impact;
-    return curOk && impactOk;
+    return _newsFilter.cur === 'ALL' || item.cur === _newsFilter.cur;
   });
 
-  const tsEl = document.getElementById('news-section-ts');
-  if (tsEl && _newsMeta.updated_label) tsEl.textContent = _newsMeta.updated_label;
+  // Split: Trading sources → tradingFeed; everything else → newsFeed
+  const newsItems    = filtered.filter(function(i) { return !_TRADING_SOURCES.has(i.source); });
+  const tradingItems = filtered.filter(function(i) { return  _TRADING_SOURCES.has(i.source); });
 
-  const countEl = document.getElementById('news-section-count');
-  if (countEl) countEl.textContent = filtered.length + ' stories';
+  // News count
+  const newsCountEl = document.getElementById('news-section-count');
+  if (newsCountEl) newsCountEl.textContent = newsItems.length + ' stories';
 
-  feed.innerHTML = '';
-  if (!filtered.length) {
+  // Trading count
+  const tradingCountEl = document.getElementById('trading-section-count');
+  if (tradingCountEl) tradingCountEl.textContent = tradingItems.length + ' signals';
+
+  // Render News feed
+  newsFeed.innerHTML = '';
+  if (!newsItems.length) {
     const empty = document.createElement('div');
-    empty.style.cssText = 'padding:20px 14px;color:var(--text3);font-size:11px;';
+    empty.style.cssText = 'padding:14px;color:var(--text3);font-size:11px;';
     empty.textContent = 'No stories match current filter.';
-    feed.appendChild(empty);
-    return;
+    newsFeed.appendChild(empty);
+  } else {
+    newsItems.forEach(function(item) {
+      newsFeed.appendChild(_buildNsItem(item, newsFeed));
+    });
   }
 
-  filtered.forEach(function(item) {
-    let time = item.time || '--:--';
-    let ageMs = 0;
-    let pubDate = null;
-    if (item.ts) {
-      pubDate = new Date(item.ts);
-      time = pubDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-      ageMs = Date.now() - item.ts;
-    } else if (item.datetime) {
-      const d = new Date(item.datetime);
-      if (!isNaN(d)) {
-        pubDate = d;
-        time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-        ageMs = Date.now() - d.getTime();
-      }
-    }
-
-    // Age label — Bloomberg compact: "<1h shows minutes, <24h shows hours, ≥24h shows date
-    let ageLabel = '';
-    let showDate = false;
-    if (ageMs > 0) {
-      const ageMin  = Math.floor(ageMs / 60000);
-      const ageHr   = Math.floor(ageMs / 3600000);
-      const ageDays = Math.floor(ageMs / 86400000);
-      if (ageDays >= 1) {
-        showDate = true;  // show date badge instead of relative age for old articles
-      } else if (ageHr >= 1) {
-        ageLabel = ageHr + 'h';
-      } else if (ageMin >= 1) {
-        ageLabel = ageMin + 'm';
-      } else {
-        ageLabel = 'now';
-      }
-    }
-
-    const headline = item.title  || '';
-    const snippet  = item.expand || '';
-    const cur      = item.cur    || '';
-    const source   = item.source || '';
-    const impact   = item.impact || 'low';
-    const rawLink  = item.link   || '';
-    const safeLink = rawLink.startsWith('https://') ? rawLink : '';
-    const hasSnip  = snippet.length > 0;
-
-    // ── Outer wrapper ────────────────────────────────────────────────────────
-    const wrap = document.createElement('div');
-    wrap.className = 'ns-item' + (item.featured ? ' ns-featured' : '');
-
-    // ── Single flex row: [time][dot][headline...][cur-tag][source][chevron] ──
-    const row = document.createElement('div');
-    row.className = 'ns-row';
-
-    // ── Time cell: stacked HH:MM / Xh — Bloomberg Anywhere compact pattern ──
-    // Single fixed-width container; no separate badge element in the flex row.
-    const timeEl = document.createElement('span');
-    timeEl.className = 'ns-time';
-
-    const timeTop = document.createElement('span');
-    timeTop.className = 'ns-time-hm';
-    const timeBot = document.createElement('span');
-    timeBot.className = 'ns-time-age';
-
-    if (showDate && pubDate) {
-      const dateStr = pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      timeTop.textContent = dateStr;
-      timeEl.title = time + ' · ' + pubDate.toLocaleDateString();
+  // Render Trading feed
+  if (tradingFeed) {
+    tradingFeed.innerHTML = '';
+    if (!tradingItems.length) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'padding:14px;color:var(--text3);font-size:11px;';
+      empty.textContent = 'No signals match current filter.';
+      tradingFeed.appendChild(empty);
     } else {
-      timeTop.textContent = time;
-      if (ageLabel && ageLabel !== 'now') {
-        timeBot.textContent = ageLabel;
-      }
-      if (ageLabel) timeEl.title = ageLabel + ' ago';
-    }
-
-    timeEl.appendChild(timeTop);
-    if (timeBot.textContent) timeEl.appendChild(timeBot);
-
-    const dot = document.createElement('span');
-    dot.className = 'ns-dot ns-dot-' + impact;
-
-    const headEl = document.createElement('span');
-    headEl.className = 'ns-headline';
-    headEl.textContent = headline;
-    headEl.title = headline;  // native tooltip — full headline on hover (Bloomberg compact pattern)
-
-    const chevron = document.createElement('span');
-    chevron.className = 'ns-chevron';
-    chevron.setAttribute('aria-hidden', 'true');
-    chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
-
-    row.appendChild(timeEl);
-    row.appendChild(dot);
-    row.appendChild(headEl);
-
-    if (cur) {
-      const curTag = document.createElement('span');
-      curTag.className = 'ns-cur-tag';
-      curTag.textContent = cur;
-      row.appendChild(curTag);
-    }
-    // Source moved to drawer — keeps headline full width (Bloomberg compact pattern)
-    row.appendChild(chevron);
-    wrap.appendChild(row);
-
-    // ── Accordion drawer (hidden, expands below the row on click) ───────────
-    if (hasSnip || safeLink || source) {
-      const drawer = document.createElement('div');
-      drawer.className = 'ns-drawer';
-
-      // Source label at top of drawer — subtle, secondary color
-      if (source) {
-        const srcDrawer = document.createElement('p');
-        srcDrawer.className = 'ns-drawer-source';
-        srcDrawer.textContent = source;
-        drawer.appendChild(srcDrawer);
-      }
-
-      if (hasSnip) {
-        const snipEl = document.createElement('p');
-        snipEl.className = 'ns-snippet';
-        snipEl.textContent = snippet;   // full text — no truncation
-        drawer.appendChild(snipEl);
-      }
-
-      if (safeLink) {
-        const readLink = document.createElement('a');
-        readLink.className = 'ns-read-link';
-        readLink.textContent = 'Read full article';
-        readLink.href = safeLink;
-        readLink.target = '_blank';
-        readLink.rel = 'noopener noreferrer';
-        readLink.addEventListener('click', function(e) { e.stopPropagation(); });
-        drawer.appendChild(readLink);
-      }
-      wrap.appendChild(drawer);
-
-      // Click the row → open/close accordion (only one open at a time)
-      row.addEventListener('click', function() {
-        const isOpen = wrap.classList.contains('ns-open');
-        feed.querySelectorAll('.ns-open').forEach(function(el) { el.classList.remove('ns-open'); });
-        if (!isOpen) wrap.classList.add('ns-open');
+      tradingItems.forEach(function(item) {
+        tradingFeed.appendChild(_buildNsItem(item, tradingFeed));
       });
     }
-
-    feed.appendChild(wrap);
-  });
+  }
 }
+
 function _newsSetFilter(type, value) {
   _newsFilter[type] = value;
   // Update active pill styling
@@ -11333,6 +11334,11 @@ function _newsSetFilter(type, value) {
     btn.classList.toggle('ns-pill-active', btn.dataset.val === value);
   });
   renderNewsSection();
+  // Apply same currency filter to research sub-panel if it has data
+  if (_researchAllItems.length && type === 'cur') {
+    _researchFilter.cur = value;
+    renderResearchSection();
+  }
 }
 
 function initNewsNav() {
@@ -11353,8 +11359,14 @@ function initNewsNav() {
     newsSection.style.display = '';
     const splitLower = document.getElementById('split-lower');
     if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
-    // Re-render with current data so pills and count are up to date
+    // Re-render news + trading sub-panels with current data
     renderNewsSection();
+    // Load or re-render research sub-panel
+    if (!_researchAllItems.length) {
+      loadBankResearch();
+    } else {
+      renderResearchSection();
+    }
   }
 
   function hideNews() {
@@ -11503,7 +11515,6 @@ function initDerivativesNavFixed() {
     initG8RatesTabs();
     initDerivativesNavFixed();
     initNewsNav();
-    initResearchNav();
 
     // Load CB policy rates, OIS benchmark rates, and intraday quotes in parallel.
     // _waitForQuotesPromise() polls until boot() has set window._quotesReadyPromise
