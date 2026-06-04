@@ -59,11 +59,11 @@
       "source": "ecb.europa.eu",
       "bias": "hold",
       "biasSource": "ECB €STR overnight swap rate",
-      "biasMethod": "ois",
+      "biasMethod": "heuristic",
       "biasUpdated": "2026-06-04",
-      "cutProb": 0,
-      "hikeProb": 0,
-      "fwdRate": 2.0
+      "cutProb": null,
+      "hikeProb": null,
+      "fwdRate": null
     },
     "GBP": {
       "nextMeeting": "18 Jun",
@@ -89,13 +89,13 @@
         "17 Dec"
       ],
       "source": "bankofengland.co.uk",
-      "bias": "hold",
+      "bias": "cut",
       "biasSource": "BoE 1-month OIS forward (SONIA)",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-04",
-      "cutProb": 0,
+      "cutProb": 100,
       "hikeProb": 0,
-      "fwdRate": 3.75
+      "fwdRate": 3.5
     },
     "JPY": {
       "nextMeeting": "16 Jun",
