@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-06-03",
+  "lastUpdate": "2026-06-04",
   "meetings": {
     "USD": {
       "nextMeeting": "17 Jun",
@@ -57,13 +57,13 @@
         "17 Dec"
       ],
       "source": "ecb.europa.eu",
-      "bias": "hold",
-      "biasSource": "ECB €STR overnight swap rate",
+      "bias": "hike",
+      "biasSource": "ECB Dated €STR Futures (WIRP consensus)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-03",
+      "biasUpdated": "2026-06-04",
       "cutProb": 0,
-      "hikeProb": 0,
-      "fwdRate": 2.0
+      "hikeProb": 97,
+      "fwdRate": 2.2425
     },
     "GBP": {
       "nextMeeting": "18 Jun",
