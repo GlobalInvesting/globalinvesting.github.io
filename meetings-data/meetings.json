@@ -59,11 +59,11 @@
       "source": "ecb.europa.eu",
       "bias": "cut",
       "biasSource": "ECB €STR overnight swap rate",
-      "biasMethod": "ois",
+      "biasMethod": "ois-preserved",
       "biasUpdated": "2026-06-04",
-      "cutProb": 100,
-      "hikeProb": 0,
-      "fwdRate": 1.75
+      "cutProb": null,
+      "hikeProb": null,
+      "fwdRate": 2.0
     },
     "GBP": {
       "nextMeeting": "18 Jun",
