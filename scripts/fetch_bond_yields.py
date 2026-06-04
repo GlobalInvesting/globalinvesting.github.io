@@ -1,5 +1,5 @@
 """
-fetch_bond_yields.py  v1.8  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v1.9  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
 
 CHANGELOG v1.6 (fixes vs v1.5)
 ────────────────────────────────
@@ -58,6 +58,7 @@ import json
 import os
 import sys
 import csv
+import time
 import requests
 from io import StringIO
 from datetime import datetime, timedelta
@@ -109,26 +110,37 @@ def _save(ccy: str, data: dict, dates: dict) -> None:
 # ── Source: FRED public CSV (no key) ─────────────────────────────────────────
 
 def _fred_csv_latest(series_id: str) -> tuple[str | None, float | None]:
-    try:
-        url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
-        r = requests.get(url, headers=HEADERS, timeout=20)
-        if r.status_code != 200:
-            print(f"    FRED CSV {series_id}: HTTP {r.status_code}")
+    """Fetch the latest observation from a FRED public CSV series.
+
+    Retries up to 3 times with exponential backoff (5s, 10s, 20s) to handle
+    transient timeouts in GitHub Actions — FRED is occasionally slow but reachable.
+    """
+    url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    delays = [5, 10, 20]
+    for attempt, delay in enumerate(delays, 1):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=25)
+            if r.status_code != 200:
+                print(f"    FRED CSV {series_id}: HTTP {r.status_code}")
+                return None, None
+            rows = []
+            reader = csv.reader(StringIO(r.text))
+            for row in reader:
+                if len(row) == 2 and row[0] != "DATE" and row[1] not in (".", ""):
+                    try:
+                        rows.append((row[0], float(row[1])))
+                    except ValueError:
+                        continue
+            if rows:
+                return rows[-1]
             return None, None
-        rows = []
-        reader = csv.reader(StringIO(r.text))
-        for row in reader:
-            if len(row) == 2 and row[0] != "DATE" and row[1] not in (".", ""):
-                try:
-                    rows.append((row[0], float(row[1])))
-                except ValueError:
-                    continue
-        if rows:
-            return rows[-1]
-        return None, None
-    except Exception as e:
-        print(f"    FRED CSV {series_id}: {e}")
-        return None, None
+        except Exception as e:
+            if attempt < len(delays):
+                print(f"    FRED CSV {series_id}: attempt {attempt} failed ({e}) — retrying in {delay}s")
+                time.sleep(delay)
+            else:
+                print(f"    FRED CSV {series_id}: {e} (all {len(delays)} attempts exhausted)")
+    return None, None
 
 
 def _is_stale(date_str: str | None, max_months: int = 18) -> bool:
@@ -319,6 +331,18 @@ def _boc_valet_latest(series_name: str, recent_weeks: int = 4) -> tuple[str | No
 
 # ── USD ───────────────────────────────────────────────────────────────────────
 
+
+def _cached_is_fresh(dates: dict, field: str, max_days: int = 7) -> bool:
+    """Return True if the cached date for *field* is within max_days of today."""
+    d = dates.get(field)
+    if not d:
+        return False
+    try:
+        age = (datetime.utcnow().date() - datetime.strptime(d, "%Y-%m-%d").date()).days
+        return age <= max_days
+    except Exception:
+        return False
+
 def fetch_usd(req_failures: list) -> None:
     print("\nUSD")
     data, dates = _load_existing("USD")
@@ -356,8 +380,11 @@ def fetch_usd(req_failures: list) -> None:
         dates["bond2y"] = dt
         print(f"    {val:.4f}%  ({dt})")
     else:
-        _gha_warning(f"USD bond2y: FRED DGS2 unavailable (val={val}) — keeping existing")
-        req_failures.append("USD.bond2y")
+        if _cached_is_fresh(dates, "bond2y"):
+            _gha_notice(f"USD bond2y: FRED DGS2 unavailable — using cached {dates.get('bond2y')} value ({data.get('bond2y')}%), fresh enough (<7d)")
+        else:
+            _gha_warning(f"USD bond2y: FRED DGS2 unavailable (val={val}) — cached value is stale or missing")
+            req_failures.append("USD.bond2y")
 
     print("  bond5y  (FRED:DGS5)")
     dt, val = _fred_csv_latest("DGS5")
@@ -366,8 +393,11 @@ def fetch_usd(req_failures: list) -> None:
         dates["bond5y"] = dt
         print(f"    {val:.4f}%  ({dt})")
     else:
-        _gha_warning(f"USD bond5y: FRED DGS5 unavailable (val={val}) — keeping existing")
-        req_failures.append("USD.bond5y")
+        if _cached_is_fresh(dates, "bond5y"):
+            _gha_notice(f"USD bond5y: FRED DGS5 unavailable — using cached {dates.get('bond5y')} value ({data.get('bond5y')}%), fresh enough (<7d)")
+        else:
+            _gha_warning(f"USD bond5y: FRED DGS5 unavailable (val={val}) — cached value is stale or missing")
+            req_failures.append("USD.bond5y")
 
     _save("USD", data, dates)
 
@@ -619,7 +649,7 @@ def fetch_nzd_2y(opt_failures: list) -> None:
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v1.8 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v1.9 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
