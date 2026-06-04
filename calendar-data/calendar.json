@@ -1,51 +1,31 @@
 {
-  "lastUpdate": "2026-06-03T23:55:08Z",
-  "generatedAt": "2026-06-03T23:55:08Z",
+  "lastUpdate": "2026-06-04T00:01:00Z",
+  "generatedAt": "2026-06-04T00:01:00Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Finnhub",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-03",
-  "rangeTo": "2026-06-17",
-  "totalEvents": 1665,
+  "rangeFrom": "2025-06-04",
+  "rangeTo": "2026-06-18",
+  "totalEvents": 1678,
   "currencyCounts": {
-    "AUD": 175,
     "CAD": 130,
     "USD": 638,
-    "JPY": 183,
-    "CHF": 89,
-    "GBP": 185,
+    "JPY": 186,
+    "AUD": 175,
+    "CHF": 91,
+    "GBP": 194,
     "NZD": 79,
-    "EUR": 186
+    "EUR": 185
   },
   "impactCounts": {
-    "low": 145,
-    "medium": 1132,
-    "high": 388
+    "low": 142,
+    "medium": 1145,
+    "high": 391
   },
   "surpriseStats": {
-    "USD/export price index": {
-      "n": 2,
-      "mean": 0.65,
-      "std": 0.494975
-    },
-    "USD/import price index": {
-      "n": 2,
-      "mean": 0.3,
-      "std": 0.565685
-    },
-    "USD/nonfarm productivity": {
-      "n": 2,
-      "mean": -0.05,
-      "std": 1.343503
-    },
-    "USD/unit labor costs": {
-      "n": 2,
-      "mean": 1.2,
-      "std": 0.565685
-    },
     "GBP/halifax house price index": {
       "n": 2,
       "mean": 0.2,
@@ -398,42 +378,6 @@
     }
   },
   "events": [
-    {
-      "currency": "AUD",
-      "event": "Current Account",
-      "dateISO": "2025-06-03",
-      "hourUTC": "01:30",
-      "actual": "-14.7",
-      "forecast": "-12",
-      "previous": "-16.3",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "AUD",
-      "event": "S&P Global Composite PMI Final",
-      "dateISO": "2025-06-03",
-      "hourUTC": "23:00",
-      "actual": "50.5",
-      "forecast": null,
-      "previous": "51",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "AUD",
-      "event": "S&P Global Services PMI Final",
-      "dateISO": "2025-06-03",
-      "hourUTC": "23:00",
-      "actual": "50.6",
-      "forecast": "50.5",
-      "previous": "51",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
     {
       "currency": "CAD",
       "event": "S&P Global Composite PMI",
@@ -17370,58 +17314,6 @@
     {
       "date": "13 May",
       "dateISO": "2026-05-13",
-      "timeUTC": "15:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Collins Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "13 May",
-      "dateISO": "2026-05-13",
-      "timeUTC": "17:15",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Kashkari Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "13 May",
-      "dateISO": "2026-05-13",
-      "timeUTC": "19:15",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "13 May",
-      "dateISO": "2026-05-13",
-      "timeUTC": "23:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Logan Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "13 May",
-      "dateISO": "2026-05-13",
       "timeUTC": "23:01",
       "country": "GBP",
       "currency": "GBP",
@@ -20605,7 +20497,7 @@
       "event": "Balance of Trade",
       "impact": "high",
       "actual": null,
-      "forecast": "-1.61",
+      "forecast": "1.8",
       "previous": "-1.841"
     },
     {
@@ -20683,7 +20575,7 @@
       "event": "S&P Global Construction PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": "40.4",
+      "forecast": "40.2",
       "previous": "39.7"
     },
     {
@@ -21360,7 +21252,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "-0.5*",
-      "previous": "-2.572"
+      "previous": "3.364"
     },
     {
       "date": "10 Jun",
@@ -21593,7 +21485,7 @@
       "event": "Industrial Production MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.3*",
+      "forecast": null,
       "previous": "0.2"
     },
     {
@@ -22102,6 +21994,266 @@
       "actual": null,
       "forecast": null,
       "previous": "1.3"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Employment Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "17.5*",
+      "previous": "-18.6"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Full Time Employment Chg",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "17.5*",
+      "previous": "-10.7"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Unemployment Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "4.3*",
+      "previous": "4.5"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "06:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "5.7B*",
+      "previous": "3.2"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Average Earnings incl. Bonus (3Mo/Yr)",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.8*",
+      "previous": "4.1"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Employment Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "107*",
+      "previous": "148"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Unemployment Rate",
+      "impact": "high",
+      "actual": null,
+      "forecast": "4.9*",
+      "previous": "5"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "07:30",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "SNB Interest Rate Decision",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE MPC Vote Cut",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "0"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE MPC Vote Hike",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "0"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE MPC Vote Unchanged",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "9"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "MPC Meeting Minutes",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Initial Jobless Claims",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "213*",
+      "previous": "215"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Philadelphia Fed Manufacturing Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "18*",
+      "previous": "-0.4"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "20:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Net Long-term TIC Flows",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "71.6B*",
+      "previous": "81.3"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "23:01",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Gfk Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-28*",
+      "previous": "-23"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.7*",
+      "previous": "1.4"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.7*",
+      "previous": "1.4"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "BoJ Monetary Policy Meeting Minutes",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     }
   ]
 }
