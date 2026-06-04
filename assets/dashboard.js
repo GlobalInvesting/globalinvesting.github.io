@@ -12316,7 +12316,7 @@ let _researchFilter   = { bank: 'ALL', cur: 'ALL' };
 
 // Bank badge CSS class helper
 function _resBankClass(bank) {
-  const map = { ING: 'ING', Saxo: 'Saxo', MUFG: 'MUFG', DailyFX: 'DailyFX', BIS: 'BIS' };
+  const map = { ING: 'ING', Saxo: 'Saxo', MUFG: 'MUFG', DailyFX: 'DailyFX', BIS: 'BIS', CME: 'CME', UBS: 'UBS' };
   return 'rs-bank-' + (map[bank] || 'other');
 }
 
