@@ -12434,17 +12434,19 @@ function renderResearchSection(items, meta) {
     const series     = item.series     || '';
     const author     = item.author     || '';
     const url        = item.url        || '';
+    const excerpt    = item.excerpt    || '';
     const currencies = item.currencies || [];
     const pairs      = item.pairs      || [];
     const category   = item.category   || 'macro';
     const safeUrl    = url.startsWith('https://') ? url : '';
     const isTradeIdea = category === 'trade_idea';
 
-    // ── Outer wrapper ─────────────────────────────────────────────────────────
+    // ── Outer wrapper
     const wrap = document.createElement('div');
     wrap.className = 'rs-item' + (isTradeIdea ? ' rs-trade-idea' : '');
 
-    // ── Row: [time][bank-badge][series?][headline][cur-tags][category][chevron] ─
+    // ── Main row: [time] [source] [headline] [cur-tags] [chevron] ─────────────
+    // Bloomberg/Refinitiv pattern: plain-text source prefix, no badge
     const row = document.createElement('div');
     row.className = 'rs-row';
 
@@ -12453,31 +12455,22 @@ function renderResearchSection(items, meta) {
     timeEl.className = 'rs-time';
     const timeTop = document.createElement('span');
     timeTop.className = 'rs-time-hm';
-    timeTop.textContent = showDate ? timeHM : timeHM;
+    timeTop.textContent = timeHM;
     const timeBot = document.createElement('span');
     timeBot.className = 'rs-time-age';
     if (!showDate && timeAge && timeAge !== 'now') timeBot.textContent = timeAge;
     timeEl.appendChild(timeTop);
     if (timeBot.textContent) timeEl.appendChild(timeBot);
 
-    // Bank badge
-    const bankBadge = document.createElement('span');
-    bankBadge.className = 'rs-bank-badge ' + _resBankClass(bank);
-    bankBadge.textContent = bank;
-    bankBadge.title = bankFull;
-
-    // Series label (e.g. "FX Daily")
-    const seriesEl = document.createElement('span');
-    seriesEl.className = 'rs-series';
-    if (series) {
-      seriesEl.textContent = series;
-      seriesEl.title = series;
-    }
+    // Source — plain text label, no badge (Bloomberg/Reuters standard)
+    const sourceEl = document.createElement('span');
+    sourceEl.className = 'rs-source';
+    sourceEl.textContent = bank;
+    sourceEl.title = bankFull;
 
     // Headline
     const headEl = document.createElement('span');
     headEl.className = 'rs-headline';
-    // If title starts with series prefix, strip it for cleaner display
     let displayTitle = title;
     if (series && title.toLowerCase().startsWith(series.toLowerCase())) {
       displayTitle = title.slice(series.length).replace(/^[\s:–—]+/, '');
@@ -12485,21 +12478,15 @@ function renderResearchSection(items, meta) {
     headEl.textContent = displayTitle || title;
     headEl.title = title;
 
-    // Currency tags (up to 3 to keep row compact)
+    // Currency tags (up to 2 — keep row tight)
     const curTagsEl = document.createElement('span');
     curTagsEl.className = 'rs-cur-tags';
-    currencies.slice(0, 3).forEach(function(cur) {
+    currencies.slice(0, 2).forEach(function(cur) {
       const tag = document.createElement('span');
       tag.className = 'rs-cur-tag';
       tag.textContent = cur;
       curTagsEl.appendChild(tag);
     });
-
-    // Category badge
-    const catEl = document.createElement('span');
-    catEl.className = 'rs-cat rs-cat-' + category;
-    const CAT_LABELS = { trade_idea: 'TRADE', macro: 'MACRO', technical: 'TECH', flow: 'FLOW' };
-    catEl.textContent = CAT_LABELS[category] || category.toUpperCase();
 
     // Chevron
     const chevron = document.createElement('span');
@@ -12508,30 +12495,27 @@ function renderResearchSection(items, meta) {
     chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
 
     row.appendChild(timeEl);
-    row.appendChild(bankBadge);
+    row.appendChild(sourceEl);
     row.appendChild(headEl);
     if (currencies.length) row.appendChild(curTagsEl);
-    row.appendChild(catEl);
     row.appendChild(chevron);
     wrap.appendChild(row);
 
-    // Subtitle row — series name + pairs (gives visual context without content reproduction)
-    if (series || pairs.length) {
-      const subRow = document.createElement('div');
-      subRow.className = 'rs-sub-row';
-      if (series) {
-        const subSeries = document.createElement('span');
-        subSeries.className = 'rs-sub-series';
-        subSeries.textContent = series;
-        subRow.appendChild(subSeries);
-      }
-      if (pairs.length) {
-        const subPairs = document.createElement('span');
-        subPairs.className = 'rs-sub-pairs';
-        subPairs.textContent = pairs.slice(0, 5).join(' · ');
-        subRow.appendChild(subPairs);
-      }
-      wrap.appendChild(subRow);
+    // ── Excerpt line — RSS description teaser, always visible ─────────────────
+    if (excerpt) {
+      const excRow = document.createElement('div');
+      excRow.className = 'rs-excerpt-row';
+      excRow.textContent = excerpt;
+      wrap.appendChild(excRow);
+    } else if (series || pairs.length) {
+      // Fallback when RSS had no description: show series + pairs
+      const excRow = document.createElement('div');
+      excRow.className = 'rs-excerpt-row rs-excerpt-series';
+      const parts = [];
+      if (series) parts.push(series);
+      if (pairs.length) parts.push(pairs.slice(0, 3).join(' · '));
+      excRow.textContent = parts.join('  ·  ');
+      wrap.appendChild(excRow);
     }
 
     // ── Accordion drawer ──────────────────────────────────────────────────────
