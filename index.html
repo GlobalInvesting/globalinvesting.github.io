@@ -550,7 +550,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <a href="#section-tvcalendar" data-target="section-tvcalendar">Calendar</a>
     <a href="#section-derivatives" data-target="section-derivatives" title="Implied forwards, RR surface, realized volatility · Shortcut: D">Derivatives</a>
     <a href="#section-news" data-target="section-news" title="FX headlines and macro news · Shortcut: N">News</a>
-    <a href="#section-research" data-target="section-research" title="Bank &amp; institutional FX research notes · Shortcut: R">Research</a>
+
   </nav>
   <div class="topbar-right">
     <!-- Site menu dropdown -->
@@ -1399,18 +1399,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- NEWS — Dedicated full-width panel (hidden by default; shown on "News" nav click) -->
     <div id="section-news" style="display:none;flex-direction:column;height:100%;">
-      <div class="panel-head" style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span class="panel-title">News Feed</span>
-          <span class="panel-sub">Finnhub · RSS · sorted by impact</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span id="news-section-count" style="font-size:9px;color:var(--text3);"></span>
-          <span style="font-size:9px;color:var(--text3);">Updated: <span id="news-section-ts" style="color:var(--text2);">—</span></span>
-        </div>
-      </div>
-      <!-- Currency + impact filter pills -->
-      <div id="ns-filter-bar" style="display:flex;gap:4px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+
+      <!-- ── GLOBAL FILTER BAR — shared currency filter across all 3 sub-panels ── -->
+      <div id="ns-filter-bar" style="display:flex;gap:4px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;">
         <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Currency</span>
         <button class="ns-cur-pill ns-pill-active" data-val="ALL"  onclick="window._newsSetFilter('cur','ALL')">All</button>
         <button class="ns-cur-pill" data-val="USD"  onclick="window._newsSetFilter('cur','USD')">USD</button>
@@ -1421,56 +1412,69 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="ns-cur-pill" data-val="CAD"  onclick="window._newsSetFilter('cur','CAD')">CAD</button>
         <button class="ns-cur-pill" data-val="CHF"  onclick="window._newsSetFilter('cur','CHF')">CHF</button>
         <button class="ns-cur-pill" data-val="NZD"  onclick="window._newsSetFilter('cur','NZD')">NZD</button>
+      </div>
 
-      </div>
-      <!-- News list -->
-      <div id="news-section-feed" style="overflow-y:auto;flex:1;min-height:0;" class="thin-scroll">
-        <div style="padding:14px;color:var(--text3);font-size:11px;">Loading news…</div>
-      </div>
+      <!-- ── Scrollable container for all 3 sub-panels stacked ── -->
+      <div id="intel-scroll" style="overflow-y:auto;flex:1;min-height:0;" class="thin-scroll">
+
+        <!-- ─── SUB-PANEL 1: NEWS — CB & macro headlines ─────────────────────── -->
+        <div class="intel-sub-head">
+          <div class="intel-sub-title">
+            <span class="intel-sub-label">News</span>
+            <span class="intel-sub-source">CB · macro · FX</span>
+          </div>
+          <span id="news-section-count" class="intel-sub-count"></span>
+        </div>
+        <div id="news-section-feed">
+          <div style="padding:14px;color:var(--text3);font-size:11px;">Loading news&hellip;</div>
+        </div>
+
+        <!-- ─── SUB-PANEL 2: RESEARCH — institutional bank notes ──────────────── -->
+        <div class="intel-sub-head intel-sub-head--research">
+          <div class="intel-sub-title">
+            <span class="intel-sub-label">Research</span>
+            <span class="intel-sub-source" id="research-sources-label">ING &middot; Saxo &middot; MUFG &middot; CME &middot; UBS &middot; BIS</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span id="research-section-count" class="intel-sub-count"></span>
+            <span style="font-size:9px;color:var(--text3);">Updated: <span id="research-section-ts" style="color:var(--text2);">&#8212;</span></span>
+          </div>
+        </div>
+        <!-- Research bank filter pills (inline, compact) -->
+        <div id="rs-filter-bar" style="display:flex;gap:3px;align-items:center;padding:4px 10px 4px;border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--bg);">
+          <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Bank</span>
+          <button class="rs-bank-pill rs-pill-active" data-val="ALL"  onclick="window._researchSetFilter('bank','ALL')">All</button>
+          <button class="rs-bank-pill" data-val="ING"   onclick="window._researchSetFilter('bank','ING')">ING</button>
+          <button class="rs-bank-pill" data-val="Saxo"  onclick="window._researchSetFilter('bank','Saxo')">Saxo</button>
+          <button class="rs-bank-pill" data-val="MUFG"  onclick="window._researchSetFilter('bank','MUFG')">MUFG</button>
+          <button class="rs-bank-pill" data-val="CME"   onclick="window._researchSetFilter('bank','CME')">CME</button>
+          <button class="rs-bank-pill" data-val="UBS"   onclick="window._researchSetFilter('bank','UBS')">UBS</button>
+          <button class="rs-bank-pill" data-val="BIS"   onclick="window._researchSetFilter('bank','BIS')">BIS</button>
+        </div>
+        <div id="research-section-feed">
+          <div style="padding:14px;color:var(--text3);font-size:11px;">Loading research&hellip;</div>
+        </div>
+
+        <!-- ─── SUB-PANEL 3: TRADING — TA & retail analysis ───────────────────── -->
+        <div class="intel-sub-head intel-sub-head--trading">
+          <div class="intel-sub-title">
+            <span class="intel-sub-label">Trading</span>
+            <span class="intel-sub-source">technical · sentiment · signals</span>
+          </div>
+          <span id="trading-section-count" class="intel-sub-count"></span>
+        </div>
+        <div id="trading-section-feed">
+          <div style="padding:14px;color:var(--text3);font-size:11px;">Loading&hellip;</div>
+        </div>
+
+      </div><!-- /#intel-scroll -->
     </div><!-- /#section-news -->
       </div><!-- /#split-lower-right -->
     </div><!-- /#split-lower -->
 
-
-    <!-- RESEARCH — Dedicated full-width panel (hidden by default; shown on "Research" nav click) -->
-    <!-- Industry pattern: Bloomberg Research Monitor / Refinitiv Research Hub              -->
-    <!-- No content reproduction — title + bank + url only (copyright compliant)           -->
-    <div id="section-research" style="display:none;flex-direction:column;height:100%;">
-      <div class="panel-head" style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span class="panel-title">Research</span>
-          <span class="panel-sub" id="research-sources-label">ING &middot; Saxo &middot; MUFG &middot; CME &middot; UBS &middot; BIS</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span id="research-section-count" style="font-size:9px;color:var(--text3);"></span>
-          <span style="font-size:9px;color:var(--text3);">Updated: <span id="research-section-ts" style="color:var(--text2);">&#8212;</span></span>
-        </div>
-      </div>
-      <div id="rs-filter-bar" style="display:flex;gap:4px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
-        <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Bank</span>
-        <button class="rs-bank-pill rs-pill-active" data-val="ALL"     onclick="window._researchSetFilter('bank','ALL')">All</button>
-        <button class="rs-bank-pill" data-val="ING"     onclick="window._researchSetFilter('bank','ING')">ING</button>
-        <button class="rs-bank-pill" data-val="Saxo"    onclick="window._researchSetFilter('bank','Saxo')">Saxo</button>
-        <button class="rs-bank-pill" data-val="MUFG"    onclick="window._researchSetFilter('bank','MUFG')">MUFG</button>
-        <button class="rs-bank-pill" data-val="CME"     onclick="window._researchSetFilter('bank','CME')">CME</button>
-        <button class="rs-bank-pill" data-val="UBS"     onclick="window._researchSetFilter('bank','UBS')">UBS</button>
-        <button class="rs-bank-pill" data-val="BIS"     onclick="window._researchSetFilter('bank','BIS')">BIS</button>
-        <span style="font-size:9px;color:var(--text3);margin-left:8px;margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Currency</span>
-        <button class="rs-cur-pill rs-pill-active" data-val="ALL" onclick="window._researchSetFilter('cur','ALL')">All</button>
-        <button class="rs-cur-pill" data-val="USD" onclick="window._researchSetFilter('cur','USD')">USD</button>
-        <button class="rs-cur-pill" data-val="EUR" onclick="window._researchSetFilter('cur','EUR')">EUR</button>
-        <button class="rs-cur-pill" data-val="GBP" onclick="window._researchSetFilter('cur','GBP')">GBP</button>
-        <button class="rs-cur-pill" data-val="JPY" onclick="window._researchSetFilter('cur','JPY')">JPY</button>
-        <button class="rs-cur-pill" data-val="AUD" onclick="window._researchSetFilter('cur','AUD')">AUD</button>
-        <button class="rs-cur-pill" data-val="CAD" onclick="window._researchSetFilter('cur','CAD')">CAD</button>
-        <button class="rs-cur-pill" data-val="CHF" onclick="window._researchSetFilter('cur','CHF')">CHF</button>
-        <button class="rs-cur-pill" data-val="NZD" onclick="window._researchSetFilter('cur','NZD')">NZD</button>
-      </div>
-      <div id="research-section-feed" style="overflow-y:auto;flex:1;min-height:0;" class="thin-scroll">
-        <div style="padding:14px;color:var(--text3);font-size:11px;">Loading research&#8230;</div>
-      </div>
-    </div><!-- /#section-research -->
   </main>
+
+
 
   <!-- RIGHT PANEL -->
   <aside id="rightpanel" aria-label="Market data panels">
