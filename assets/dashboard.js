@@ -11139,12 +11139,22 @@ let _newsAllItems = [];
 let _newsMeta     = {};
 let _newsFilter   = { cur: 'ALL', impact: 'ALL' };
 
-// Sources classified as TA/retail — rendered in Trading sub-panel
-// All others (CB, macro wires, institutional) go to News sub-panel
-const _TRADING_SOURCES = new Set([
-  'Barchart', 'BabyPips', 'InvestMacro', 'ForexCrunch',
+// Sources classified as TA/market analysis — rendered in Analysis sub-panel
+// (renamed from "Trading" — aligns with Bloomberg/Reuters/Risk.net terminology)
+// CB official feeds, macro wires, institutional press → News sub-panel
+const _ANALYSIS_SOURCES = new Set([
+  'Barchart', 'BabyPips', 'ForexCrunch',
   'DailyForex TA', 'InvestingLive', 'ActionForex',
-  'MyFXBook', 'Investing.com', 'DailyForex',
+  'MyFXBook', 'Investing.com',
+  'MarketPulse', 'FX Empire',        // reclassified from News: analysis/forecast, not macro wire
+]);
+
+// Sources from news feeds that belong in the Research sub-panel
+// (alongside bank-research.json institutional notes)
+const _RESEARCH_NEWS_SOURCES = new Set([
+  'InvestMacro',     // COT + positioning data — institutional
+  'Marc to Market',  // macro sell-side analysis (ex-HSBC/BBH CMO)
+  'FX Markets',      // Risk.net institutional FX press
 ]);
 
 // ── Helper: build one NS item element (shared by News and Trading feeds) ──────
@@ -11285,17 +11295,27 @@ function renderNewsSection(items, meta) {
     return _newsFilter.cur === 'ALL' || item.cur === _newsFilter.cur;
   });
 
-  // Split: Trading sources → tradingFeed; everything else → newsFeed
-  const newsItems    = filtered.filter(function(i) { return !_TRADING_SOURCES.has(i.source); });
-  const tradingItems = filtered.filter(function(i) { return  _TRADING_SOURCES.has(i.source); });
+  // Three-way split:
+  // Research news sources → injected into research panel (via _researchNewsItems)
+  // Analysis sources → analysisFeed
+  // Everything else (CB, macro wires) → newsFeed
+  const newsItems     = filtered.filter(function(i) { return !_ANALYSIS_SOURCES.has(i.source) && !_RESEARCH_NEWS_SOURCES.has(i.source); });
+  const analysisItems = filtered.filter(function(i) { return  _ANALYSIS_SOURCES.has(i.source); });
+  const researchNews  = filtered.filter(function(i) { return  _RESEARCH_NEWS_SOURCES.has(i.source); });
+
+  // Push research-news items into the research panel
+  if (researchNews.length) {
+    window._researchNewsItems = researchNews;
+    renderResearchSection();
+  }
 
   // News count
   const newsCountEl = document.getElementById('news-section-count');
   if (newsCountEl) newsCountEl.textContent = newsItems.length + ' stories';
 
-  // Trading count
+  // Analysis count
   const tradingCountEl = document.getElementById('trading-section-count');
-  if (tradingCountEl) tradingCountEl.textContent = tradingItems.length + ' signals';
+  if (tradingCountEl) tradingCountEl.textContent = analysisItems.length + ' items';
 
   // Render News feed
   newsFeed.innerHTML = '';
@@ -11310,16 +11330,16 @@ function renderNewsSection(items, meta) {
     });
   }
 
-  // Render Trading feed
+  // Render Analysis feed
   if (tradingFeed) {
     tradingFeed.innerHTML = '';
-    if (!tradingItems.length) {
+    if (!analysisItems.length) {
       const empty = document.createElement('div');
       empty.style.cssText = 'padding:14px;color:var(--text3);font-size:11px;';
-      empty.textContent = 'No signals match current filter.';
+      empty.textContent = 'No analysis items match current filter.';
       tradingFeed.appendChild(empty);
     } else {
-      tradingItems.forEach(function(item) {
+      analysisItems.forEach(function(item) {
         tradingFeed.appendChild(_buildNsItem(item, tradingFeed));
       });
     }
@@ -12321,9 +12341,10 @@ document.addEventListener('keydown', e => {
 // Copyright compliant: title + bank + url only — no content reproduction.
 // ═══════════════════════════════════════════════════════════════════════════
 
-let _researchAllItems = [];
-let _researchMeta     = {};
-let _researchFilter   = { bank: 'ALL', cur: 'ALL' };
+let _researchAllItems  = [];
+let _researchMeta      = {};
+let _researchFilter    = { bank: 'ALL', cur: 'ALL' };
+let _researchNewsItems = [];  // news-feed items reclassified as research (InvestMacro, Marc to Market, FX Markets)
 
 // Bank badge CSS class helper
 function _resBankClass(bank) {
@@ -12338,7 +12359,27 @@ function renderResearchSection(items, meta) {
   const feed = document.getElementById('research-section-feed');
   if (!feed) return;
 
-  const filtered = _researchAllItems.filter(function(item) {
+  // Convert _researchNewsItems (from news pipeline) to research-format objects
+  const newsAsResearch = (_researchNewsItems || []).map(function(ni) {
+    return {
+      bank:      ni.source || '',
+      bank_full: ni.source || '',
+      title:     ni.title  || '',
+      series:    '',
+      author:    '',
+      url:       ni.link   || ni.url || '',
+      currencies: ni.cur ? [ni.cur] : [],
+      pairs:     [],
+      category:  'macro',
+      ts:        ni.ts || (ni.datetime ? new Date(ni.datetime).getTime() : 0),
+    };
+  });
+
+  // Merge bank-research.json items + reclassified news items, sort newest first
+  const merged = _researchAllItems.concat(newsAsResearch).sort(function(a, b) {
+    return (b.ts || 0) - (a.ts || 0);
+  });
+  const filtered = merged.filter(function(item) {
     const bankOk = _researchFilter.bank === 'ALL' || item.bank === _researchFilter.bank;
     const curOk  = _researchFilter.cur  === 'ALL' ||
                    (Array.isArray(item.currencies) && item.currencies.includes(_researchFilter.cur));
