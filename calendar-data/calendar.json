@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-04T08:44:58Z",
-  "generatedAt": "2026-06-04T08:44:58Z",
+  "lastUpdate": "2026-06-04T09:02:00Z",
+  "generatedAt": "2026-06-04T09:02:00Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -375,6 +375,11 @@
       "n": 2,
       "mean": -3.05,
       "std": 4.300623
+    },
+    "EUR/retail sales mom": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.212132
     },
     "USD/initial jobless claims": {
       "n": 4,
@@ -20592,9 +20597,9 @@
       "flag": "🇪🇺",
       "event": "Retail Sales MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.4",
       "forecast": "-0.3",
-      "previous": "-0.1"
+      "previous": "0.8"
     },
     {
       "date": "4 Jun",
