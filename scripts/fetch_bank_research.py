@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_bank_research.py — v1.3
+fetch_bank_research.py — v1.4
 Fetches institutional FX research notes from public RSS feeds and writes
 research-data/bank-research.json.
 
@@ -12,6 +12,16 @@ Design principles:
     Each note shows: bank badge · series label · headline · currency tags ·
     category chip · relative age. Drawer shows: bank full name · author ·
     pairs · external link.
+
+Changes v1.4:
+  · EXCERPT LENGTH: summary buffer raised from 600 → 1200 chars; excerpt
+    limit raised from 400 → 800 chars. Prior limit was truncating RSS
+    descriptions prematurely — sources like Saxo and CME provide 400-700 char
+    summaries in their RSS feeds. Publishers include <description> in RSS
+    specifically for aggregators to display as a teaser (Bloomberg/Reuters
+    standard). 800 chars provides meaningful context without reproducing
+    full article body. Trimmed at word boundary with "…" if not a complete
+    sentence.
 
 Changes v1.2:
   · SAXO BUG FIX: bank_counts[bank] = 0 was resetting the counter every time a future
@@ -372,11 +382,11 @@ def fetch_rss(source: dict, cutoff: datetime) -> list:
             if pub_date < cutoff:
                 continue
 
-            # Summary — used only for currency/pair extraction and fx_filter (not stored)
+            # Summary — used for currency/pair extraction, fx_filter, and excerpt
             summary = clean_html(
                 getattr(entry, "summary", "") or
                 getattr(entry, "description", "") or ""
-            )[:400]
+            )[:1200]
 
             # Apply FX relevance filter for broad feeds
             if fx_filter and not is_fx_relevant(title, summary):
@@ -391,11 +401,11 @@ def fetch_rss(source: dict, cutoff: datetime) -> list:
 
             ts = int(pub_date.timestamp() * 1000)
 
-            # Excerpt — first 160 chars of RSS description, cleaned.
-            # Stored as teaser for display (industry standard: Bloomberg/Reuters
-            # aggregators show RSS-provided summaries). No body content reproduction.
-            excerpt = summary[:160].strip()
-            if excerpt and not excerpt.endswith(('.', '…', '!')):
+            # Excerpt — up to 800 chars of RSS description, trimmed at word boundary.
+            # Publishers include <description> in RSS specifically for aggregators to
+            # display as a teaser — this is the intended use (Bloomberg/Reuters standard).
+            excerpt = summary[:800].strip()
+            if excerpt and not excerpt.endswith(('.', '…', '!', '?')):
                 excerpt = excerpt.rsplit(' ', 1)[0] + '…'
 
             results.append({
@@ -585,7 +595,7 @@ def main():
     now_utc = datetime.now(timezone.utc)
     cutoff  = now_utc - timedelta(days=MAX_AGE_DAYS)
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_bank_research.py v1.2")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_bank_research.py v1.4")
     print(f"  Fetching {len(RSS_SOURCES)} sources in parallel (workers={FETCH_WORKERS})...")
 
     all_items   = []
