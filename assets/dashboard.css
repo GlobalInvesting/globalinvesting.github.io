@@ -1804,3 +1804,68 @@ a:focus-visible,
 .ns-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
 .ns-cur-pill:hover { background:var(--bg3);color:var(--text); }
 .ns-pill-active { background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important; }
+
+/* ─── RESEARCH SECTION (.rs-*) ──────────────────────────────────────────────
+   Bank & institutional FX research notes panel.
+   Mirrors .ns-* (News Section) visual language — same row anatomy, different
+   semantic layer. Industry standard: Bloomberg Research Monitor row layout.
+   Copyright-compliant: title + bank + url only — no content reproduction.
+   Added: v7.93.0 (2026-06-03)
+   ─────────────────────────────────────────────────────────────────────────── */
+.rs-item { display:block;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s; }
+.rs-item:hover { background:var(--bg3); }
+.rs-item:last-child { border-bottom:none; }
+.rs-item.rs-trade-idea .rs-row { border-left:2px solid var(--up);padding-left:12px; }
+.rs-row { display:flex;align-items:center;gap:8px;padding:0 14px;height:32px;min-width:0; }
+
+/* Time cell — stacked HH:MM / Xh (identical pattern to .ns-time) */
+.rs-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
+.rs-time-hm  { font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap; }
+.rs-time-age { font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;white-space:nowrap;margin-top:1px; }
+
+/* Bank badge — each institution gets a unique accent color */
+.rs-bank-badge { font-size:8px;font-weight:700;letter-spacing:.04em;padding:1px 4px;border-radius:2px;flex-shrink:0;font-family:var(--font-ui);text-transform:uppercase; }
+.rs-bank-ING     { background:rgba(255,96,0,.15);color:#ff6000; }
+.rs-bank-Saxo    { background:rgba(0,120,212,.15);color:#0078d4; }
+.rs-bank-MUFG    { background:rgba(180,0,0,.15);color:#b80000; }
+.rs-bank-DailyFX { background:rgba(0,160,80,.15);color:#00a050; }
+.rs-bank-BIS     { background:rgba(120,80,200,.15);color:#7850c8; }
+.rs-bank-other   { background:var(--bg3);color:var(--text3); }
+
+/* Series label — "FX Daily", "FX Weekly", etc. */
+.rs-series { font-size:9px;color:var(--text3);font-family:var(--font-ui);flex-shrink:0;max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+
+/* Headline — identical to .ns-headline */
+.rs-headline { font-size:11px;color:var(--text);font-family:var(--font-ui);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0; }
+
+/* Currency tags — up to 3 per row */
+.rs-cur-tags { display:flex;gap:2px;flex-shrink:0; }
+.rs-cur-tag  { font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 3px;border-radius:2px;font-family:var(--font-ui); }
+
+/* Category badge */
+.rs-cat { font-size:8px;font-weight:600;letter-spacing:.03em;padding:1px 4px;border-radius:2px;flex-shrink:0;font-family:var(--font-ui);text-transform:uppercase; }
+.rs-cat-trade_idea { background:rgba(0,200,80,.12);color:#00c850; }
+.rs-cat-macro      { background:rgba(80,140,255,.12);color:#508cff; }
+.rs-cat-technical  { background:rgba(255,200,0,.12);color:#b8900a; }
+.rs-cat-flow       { background:rgba(200,100,255,.12);color:#c864ff; }
+
+/* Chevron */
+.rs-chevron { color:var(--text3);flex-shrink:0;display:flex;align-items:center;transition:transform .18s; }
+.rs-open .rs-chevron { transform:rotate(180deg); }
+
+/* Accordion drawer */
+.rs-drawer { display:none;padding:6px 14px 10px 56px; }
+.rs-open .rs-drawer { display:block; }
+.rs-drawer-meta { font-size:9px;color:var(--text3);font-family:var(--font-ui);margin:0 0 4px 0; }
+.rs-read-link { display:inline-block;margin-top:4px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none; }
+.rs-read-link:hover { text-decoration:underline; }
+
+/* Filter pills — bank + currency (same geometry as .ns-cur-pill) */
+.rs-bank-pill,
+.rs-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
+.rs-bank-pill:hover,
+.rs-cur-pill:hover  { background:var(--bg3);color:var(--text); }
+.rs-pill-active     { background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important; }
+
+/* Empty state */
+.rs-empty { padding:20px 14px;color:var(--text3);font-size:11px; }

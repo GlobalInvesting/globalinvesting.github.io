@@ -6738,40 +6738,10 @@ async function fetchCarryRanking() {
   const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
 
   // TradingView symbol for a given long/short ccy pair
-
-  // Bloomberg/Refinitiv market convention: normalises a long/short pair to the
-  // canonical display label regardless of which leg has the higher rate.
-  // E.g. long=USD, short=NZD → "NZD/USD"; long=GBP, short=EUR → "EUR/GBP".
-  // ISO 4217 priority: EUR > GBP > AUD > NZD > USD > CAD > CHF > JPY (for crosses).
-  // Reference: Bloomberg FX convention table; Refinitiv Eikon pair naming.
-  const BBGFX_BASE = {
-    // Pairs where USD is quote (commodity / European currencies are base)
-    'USD-EUR':'EUR', 'USD-GBP':'GBP', 'USD-AUD':'AUD', 'USD-NZD':'NZD',
-    // USD is base vs funding currencies
-    'USD-JPY':'USD', 'USD-CAD':'USD', 'USD-CHF':'USD',
-    // EUR crosses (EUR always base)
-    'EUR-GBP':'EUR', 'EUR-JPY':'EUR', 'EUR-CHF':'EUR', 'EUR-CAD':'EUR',
-    'EUR-AUD':'EUR', 'EUR-NZD':'EUR',
-    // GBP crosses
-    'GBP-JPY':'GBP', 'GBP-CHF':'GBP', 'GBP-CAD':'GBP',
-    'GBP-AUD':'GBP', 'GBP-NZD':'GBP',
-    // AUD/NZD crosses
-    'AUD-JPY':'AUD', 'AUD-CAD':'AUD', 'AUD-CHF':'AUD', 'AUD-NZD':'AUD',
-    'NZD-JPY':'NZD', 'NZD-CHF':'NZD', 'NZD-CAD':'NZD',
-    // Remaining
-    'CAD-JPY':'CAD', 'CHF-JPY':'CHF', 'CAD-CHF':'CAD',
-  };
-  function carryDisplayPair(long, short) {
-    const key1 = long + '-' + short, key2 = short + '-' + long;
-    const base = BBGFX_BASE[key1] ?? BBGFX_BASE[key2] ?? long;
-    const quote = base === long ? short : long;
-    return base + '/' + quote;
-  }
   function carryTV(long, short) {
-    // v8.4.5: delegate to carryDisplayPair() for Bloomberg market convention.
-    // Ensures FX_IDC:NZDUSD (not FX_IDC:USDNZD), FX_IDC:EURGBP (not FX_IDC:GBPEUR), etc.
-    const label = carryDisplayPair(long, short);  // e.g. "NZD/USD"
-    return 'FX_IDC:' + label.replace('/', '');    // → "FX_IDC:NZDUSD"
+    if (short === 'USD') return 'FX_IDC:' + long + 'USD';
+    if (long  === 'USD') return 'FX_IDC:USD' + short;
+    return 'FX_IDC:' + long + short;
   }
 
   // Canonical pair ID used in quotes.json / hv30 map — FX market convention,
@@ -6938,8 +6908,8 @@ async function fetchCarryRanking() {
     const headSpan = container.closest('.sb-section')?.querySelector('.sb-head span');
     if (headSpan) {
       headSpan.textContent = hasRealCarryData
-        ? 'Major FX · real carry · annualised'
-        : 'Major FX · CB rate differential';
+        ? 'G8 · real carry · annualised'
+        : 'G8 · CB rate differential';
     }
 
     // ── 7. Attach header tooltip (once) ──────────────────────────────────────
@@ -6994,43 +6964,33 @@ async function fetchCarryRanking() {
       const barRaw = realCarryVal != null ? Math.max(realCarryVal, 0) : p.diff;
       const barPct = Math.max(Math.round((barRaw / maxDisplay) * 100), 4);
 
-      // v8.4.8: Bloomberg canonical pair + carry direction awareness
-      // carryDisplayPair() normalises to Bloomberg convention (e.g. NZD/USD, EUR/GBP).
-      // Bar color: green = long the base (base has higher carry), red = short the base (carry on quote leg).
-      const displayPair  = carryDisplayPair(p.long, p.short);
-      const displayBase  = displayPair.split('/')[0];
-      const isShortBase  = displayBase !== p.long;
-
-      const barColor = 'var(--up)';
-
+      // Color: green when real carry ≥+0.5% (positive after inflation)
+      //        neutral when 0%–0.5% (marginal carry)
+      //        dim when real carry is negative (inflation erodes the nominal spread)
       const cls = realCarryVal != null
         ? (realCarryVal >= 0.5 ? 'pd-up' : realCarryVal <= -0.1 ? 'pd-dim' : '')
         : (p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim');
 
       const realStr = realCarryVal != null ? (realCarryVal >= 0 ? '+' : '') + realCarryVal.toFixed(2) + '%' : '—';
       const hvStr   = p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a';
-      const dirTip  = isShortBase ? `Short ${displayBase} / Long ${p.long}` : `Long ${displayBase}`;
-      const tip = `${displayPair} · ${dirTip} · Nominal ${spreadLabel} · Real carry ${realStr} · HV30 ${hvStr} — Click for real rate analysis`;
+      const tip = `${p.long}/${p.short} · Nominal ${spreadLabel} · Real carry ${realStr} · HV30 ${hvStr} — Click for real rate analysis`;
 
       return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
-        <span class="cr-pair">${displayPair}</span>
+        <span class="cr-pair">${p.long}/${p.short}</span>
         <span class="cr-spread">${spreadLabel}</span>
-        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%;background:${barColor}"></div></div>
+        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
         <span class="cr-diff ${cls}">${displayVal}</span>
       </div>`;
     }).join('');
 
     // ── 9. Row click → open Real Rate Carry Modal ────────────────────────────
-    // v8.4.6: pass Bloomberg canonical pair (base, quote) to the modal instead of
-    // (highRateCcy, lowRateCcy). The modal derives carry direction from data,
-    // so it never shows "LONG USD / SHORT NZD" when the display pair is NZD/USD.
     container.querySelectorAll('.carry-rank-row[data-long]').forEach(row => {
       row.addEventListener('click', () => {
-        const displayPair = row.querySelector('.cr-pair')?.textContent || '';
-        const [baseCcy, quoteCcy] = displayPair.split('/');
-        if (typeof window.openRealCarryModal === 'function' && baseCcy && quoteCcy) {
-          window.openRealCarryModal(baseCcy, quoteCcy);
+        const longCcy  = row.dataset.long;
+        const shortCcy = row.dataset.short;
+        if (typeof window.openRealCarryModal === 'function') {
+          window.openRealCarryModal(longCcy, shortCcy);
         } else {
           loadTVChart(row.dataset.sym);
         }
@@ -7465,9 +7425,7 @@ async function fetchFedExpectations() {
         return 'flat';
       })();
       // Priority 1: meetings.json fwdRate (prob-weighted · workflow-computed)
-      // Bloomberg standard: accept 0 and negative values — currencies like CHF and JPY
-      // can have OIS-implied rates below zero. Rejecting fwdRate=0 as "missing" is wrong.
-      if (meetings?.fwdRate != null && !isNaN(meetings.fwdRate)) {
+      if (meetings?.fwdRate != null && !isNaN(meetings.fwdRate) && meetings.fwdRate > 0) {
         fwdDisplay = meetings.fwdRate.toFixed(2) + '%';
       } else {
         const pCut  = (meetings?.cutProb  != null && !isNaN(meetings.cutProb))  ? Math.min(100, Math.max(0, meetings.cutProb))  : null;
@@ -7480,18 +7438,16 @@ async function fetchFedExpectations() {
         const cbStep  = CB_STEP[ccy] ?? 0.25;
 
         if (pCut !== null || pHike !== null) {
-          // Priority 2: probability-weighted — Bloomberg WIRP standard.
-          // No floor: OIS-implied rates below zero are valid (CHF 2015–2022, JPY ongoing).
+          // Priority 2: probability-weighted — Bloomberg WIRP standard
           const cut  = pCut  ?? 0;
           const hike = pHike ?? 0;
           // Clamp residual so probabilities never exceed 100%
           const cutC  = Math.min(cut,  100);
           const hikeC = Math.min(hike, 100 - cutC);
           const implied = current + (hikeC / 100) * cbStep - (cutC / 100) * cbStep;
-          fwdDisplay = implied.toFixed(2) + '%';
+          fwdDisplay = Math.max(0, implied).toFixed(2) + '%';
         } else {
-          // Priority 3: no OIS probabilities — naive ±step heuristic, ~ signals estimate.
-          // Floor retained here: without probability data the heuristic is directional only.
+          // Priority 3: no probabilities available — naive ±step, ~ signals estimate
           const dir  = meetingBias ?? trendDir;
           const step = dir === 'down' ? -cbStep : dir === 'up' ? cbStep : 0;
           fwdDisplay = '~' + Math.max(0, current + step).toFixed(2) + '%';
@@ -8963,6 +8919,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     k: 'section-tvcalendar',
     d: 'section-derivatives',
     n: 'section-news',
+    b: 'section-research',   // B = Bank research (R taken by Risk)
   };
 
   function navTo(target) {
@@ -8987,6 +8944,16 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
         if (typeof window._newsNavShow === 'function') window._newsNavShow();
       } else {
         if (typeof window._newsNavHide === 'function') window._newsNavHide();
+      }
+      return;
+    }
+    if (target === 'section-research') {
+      const resSection = window._researchNavSection;
+      if (!resSection) return;
+      if (resSection.style.display === 'none' || resSection.style.display === '') {
+        if (typeof window._researchNavShow === 'function') window._researchNavShow();
+      } else {
+        if (typeof window._researchNavHide === 'function') window._researchNavHide();
       }
       return;
     }
@@ -9035,6 +9002,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
           <span class="kbl-key">K</span><span class="kbl-desc">Economic Calendar</span>
           <span class="kbl-key">D</span><span class="kbl-desc">Derivatives (toggle)</span>
           <span class="kbl-key">N</span><span class="kbl-desc">News Feed (toggle)</span>
+          <span class="kbl-key">B</span><span class="kbl-desc">Research (toggle)</span>
           <span class="kbl-key">&uarr;&darr;</span><span class="kbl-desc">Navigate FX rows</span>
           <span class="kbl-key">?</span><span class="kbl-desc">Close this panel</span>
         </div>
@@ -11375,16 +11343,6 @@ function initNewsNav() {
   if (!splitLowerRight) return;
 
   function showNews() {
-    // Flush any stale deriv-hidden state first so we snapshot clean display values.
-    // If Derivatives was active when News was clicked, hideDerivatives() runs in bubble
-    // phase (after this capture-phase handler) — but with the guard on the capture
-    // listener this path is now unreachable. Belt-and-suspenders: clean up anyway.
-    if (typeof window._derivNavHide === 'function') {
-      const derivSection = document.getElementById('section-derivatives');
-      if (derivSection && derivSection.style.display !== 'none') {
-        window._derivNavHide();
-      }
-    }
     Array.from(splitLowerRight.children).forEach(el => {
       if (el.id !== 'section-news') {
         const originalDisplay = el.style.display || window.getComputedStyle(el).display;
@@ -11429,21 +11387,16 @@ function initNewsNav() {
     });
   }
 
-  // Capture phase — only intercepts clicks ON the News link itself (not clicks away from News).
-  // stopImmediatePropagation is scoped to the newsLink only; other nav links must propagate
-  // normally so that hideNews() (bubble phase below) and hideDerivatives() run in the
-  // correct order without corrupting each other's data-*-hidden state.
+  // Capture phase so it runs before the main nav scroll handler
   const newsLink = document.querySelector('.top-nav a[data-target="section-news"]');
   if (newsLink) {
     newsLink.addEventListener('click', (e) => {
       e.stopImmediatePropagation();
-      // Guard: if News is already visible, clicking the tab again is a no-op
-      if (newsSection.style.display !== 'none') return;
       showNews();
     }, true);
   }
 
-  // Hide when any other nav tab is clicked (bubble phase — runs after hideDerivatives etc.)
+  // Hide when any other nav tab is clicked
   document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
     if (link.dataset.target !== 'section-news') {
       link.addEventListener('click', () => {
@@ -11550,6 +11503,7 @@ function initDerivativesNavFixed() {
     initG8RatesTabs();
     initDerivativesNavFixed();
     initNewsNav();
+    initResearchNav();
 
     // Load CB policy rates, OIS benchmark rates, and intraday quotes in parallel.
     // _waitForQuotesPromise() polls until boot() has set window._quotesReadyPromise
@@ -12347,3 +12301,314 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('lw-fullscreen-overlay')?.classList.contains('lw-fs-active'))
     _lwCloseFullscreen();
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RESEARCH SECTION — Bank & institutional FX research notes
+// Mirrors News/Derivatives show/hide pattern. Shortcut: B.
+// Data source: research-data/bank-research.json (fetch_bank_research.py)
+// Industry standard: Bloomberg Research Monitor row layout.
+// Copyright compliant: title + bank + url only — no content reproduction.
+// ═══════════════════════════════════════════════════════════════════════════
+
+let _researchAllItems = [];
+let _researchMeta     = {};
+let _researchFilter   = { bank: 'ALL', cur: 'ALL' };
+
+// Bank badge CSS class helper
+function _resBankClass(bank) {
+  const map = { ING: 'ING', Saxo: 'Saxo', MUFG: 'MUFG', DailyFX: 'DailyFX', BIS: 'BIS' };
+  return 'rs-bank-' + (map[bank] || 'other');
+}
+
+function renderResearchSection(items, meta) {
+  if (Array.isArray(items)) _researchAllItems = items;
+  if (meta) _researchMeta = meta;
+
+  const feed = document.getElementById('research-section-feed');
+  if (!feed) return;
+
+  const filtered = _researchAllItems.filter(function(item) {
+    const bankOk = _researchFilter.bank === 'ALL' || item.bank === _researchFilter.bank;
+    const curOk  = _researchFilter.cur  === 'ALL' ||
+                   (Array.isArray(item.currencies) && item.currencies.includes(_researchFilter.cur));
+    return bankOk && curOk;
+  });
+
+  const tsEl = document.getElementById('research-section-ts');
+  if (tsEl && _researchMeta.updated_label) tsEl.textContent = _researchMeta.updated_label;
+
+  const countEl = document.getElementById('research-section-count');
+  if (countEl) countEl.textContent = filtered.length + ' notes';
+
+  feed.innerHTML = '';
+
+  if (!filtered.length) {
+    const empty = document.createElement('div');
+    empty.className = 'rs-empty';
+    empty.textContent = 'No research notes match current filter.';
+    feed.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(function(item) {
+    // ── Time ─────────────────────────────────────────────────────────────────
+    let timeHM  = '--:--';
+    let timeAge = '';
+    let showDate = false;
+    let pubDate = null;
+
+    if (item.ts) {
+      pubDate = new Date(item.ts);
+      timeHM  = pubDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      const ageMs   = Date.now() - item.ts;
+      const ageMin  = Math.floor(ageMs / 60000);
+      const ageHr   = Math.floor(ageMs / 3600000);
+      const ageDays = Math.floor(ageMs / 86400000);
+      if (ageDays >= 1) {
+        showDate = true;
+        timeHM   = pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      } else if (ageHr >= 1) {
+        timeAge = ageHr + 'h';
+      } else if (ageMin >= 1) {
+        timeAge = ageMin + 'm';
+      } else {
+        timeAge = 'now';
+      }
+    }
+
+    const bank       = item.bank       || '';
+    const bankFull   = item.bank_full  || bank;
+    const title      = item.title      || '';
+    const series     = item.series     || '';
+    const author     = item.author     || '';
+    const url        = item.url        || '';
+    const currencies = item.currencies || [];
+    const pairs      = item.pairs      || [];
+    const category   = item.category   || 'macro';
+    const safeUrl    = url.startsWith('https://') ? url : '';
+    const isTradeIdea = category === 'trade_idea';
+
+    // ── Outer wrapper ─────────────────────────────────────────────────────────
+    const wrap = document.createElement('div');
+    wrap.className = 'rs-item' + (isTradeIdea ? ' rs-trade-idea' : '');
+
+    // ── Row: [time][bank-badge][series?][headline][cur-tags][category][chevron] ─
+    const row = document.createElement('div');
+    row.className = 'rs-row';
+
+    // Time
+    const timeEl = document.createElement('span');
+    timeEl.className = 'rs-time';
+    const timeTop = document.createElement('span');
+    timeTop.className = 'rs-time-hm';
+    timeTop.textContent = showDate ? timeHM : timeHM;
+    const timeBot = document.createElement('span');
+    timeBot.className = 'rs-time-age';
+    if (!showDate && timeAge && timeAge !== 'now') timeBot.textContent = timeAge;
+    timeEl.appendChild(timeTop);
+    if (timeBot.textContent) timeEl.appendChild(timeBot);
+
+    // Bank badge
+    const bankBadge = document.createElement('span');
+    bankBadge.className = 'rs-bank-badge ' + _resBankClass(bank);
+    bankBadge.textContent = bank;
+    bankBadge.title = bankFull;
+
+    // Series label (e.g. "FX Daily")
+    const seriesEl = document.createElement('span');
+    seriesEl.className = 'rs-series';
+    if (series) {
+      seriesEl.textContent = series;
+      seriesEl.title = series;
+    }
+
+    // Headline
+    const headEl = document.createElement('span');
+    headEl.className = 'rs-headline';
+    // If title starts with series prefix, strip it for cleaner display
+    let displayTitle = title;
+    if (series && title.toLowerCase().startsWith(series.toLowerCase())) {
+      displayTitle = title.slice(series.length).replace(/^[\s:–—]+/, '');
+    }
+    headEl.textContent = displayTitle || title;
+    headEl.title = title;
+
+    // Currency tags (up to 3 to keep row compact)
+    const curTagsEl = document.createElement('span');
+    curTagsEl.className = 'rs-cur-tags';
+    currencies.slice(0, 3).forEach(function(cur) {
+      const tag = document.createElement('span');
+      tag.className = 'rs-cur-tag';
+      tag.textContent = cur;
+      curTagsEl.appendChild(tag);
+    });
+
+    // Category badge
+    const catEl = document.createElement('span');
+    catEl.className = 'rs-cat rs-cat-' + category;
+    const CAT_LABELS = { trade_idea: 'TRADE', macro: 'MACRO', technical: 'TECH', flow: 'FLOW' };
+    catEl.textContent = CAT_LABELS[category] || category.toUpperCase();
+
+    // Chevron
+    const chevron = document.createElement('span');
+    chevron.className = 'rs-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
+
+    row.appendChild(timeEl);
+    row.appendChild(bankBadge);
+    if (series) row.appendChild(seriesEl);
+    row.appendChild(headEl);
+    if (currencies.length) row.appendChild(curTagsEl);
+    row.appendChild(catEl);
+    row.appendChild(chevron);
+    wrap.appendChild(row);
+
+    // ── Accordion drawer ──────────────────────────────────────────────────────
+    const drawer = document.createElement('div');
+    drawer.className = 'rs-drawer';
+
+    // Meta line: bank · author · pairs
+    const metaParts = [bankFull];
+    if (author) metaParts.push(author);
+    if (pairs.length) metaParts.push(pairs.join(', '));
+    const metaEl = document.createElement('p');
+    metaEl.className = 'rs-drawer-meta';
+    metaEl.textContent = metaParts.join(' · ');
+    drawer.appendChild(metaEl);
+
+    // "Read full note" link — opens original source in new tab
+    if (safeUrl) {
+      const readLink = document.createElement('a');
+      readLink.className = 'rs-read-link';
+      readLink.textContent = 'Read full note →';
+      readLink.href = safeUrl;
+      readLink.target = '_blank';
+      readLink.rel = 'noopener noreferrer';
+      readLink.addEventListener('click', function(e) { e.stopPropagation(); });
+      drawer.appendChild(readLink);
+    }
+
+    wrap.appendChild(drawer);
+
+    // Click row → toggle accordion (one open at a time)
+    row.addEventListener('click', function() {
+      const isOpen = wrap.classList.contains('rs-open');
+      feed.querySelectorAll('.rs-open').forEach(function(el) { el.classList.remove('rs-open'); });
+      if (!isOpen) wrap.classList.add('rs-open');
+    });
+
+    feed.appendChild(wrap);
+  });
+}
+
+function _researchSetFilter(type, value) {
+  _researchFilter[type] = value;
+  const selector = type === 'bank' ? '.rs-bank-pill' : '.rs-cur-pill';
+  document.querySelectorAll(selector).forEach(function(btn) {
+    btn.classList.toggle('rs-pill-active', btn.dataset.val === value);
+  });
+  renderResearchSection();
+}
+
+async function loadBankResearch() {
+  try {
+    const resp = await fetch('research-data/bank-research.json?v=' + Date.now());
+    if (!resp.ok) {
+      console.warn('[Research] bank-research.json not found — pipeline may not have run yet');
+      const feed = document.getElementById('research-section-feed');
+      if (feed) {
+        feed.innerHTML = '<div class="rs-empty">Research data not yet available. Pipeline runs every 4 hours.</div>';
+      }
+      return;
+    }
+    const data = await resp.json();
+    renderResearchSection(data.items || [], {
+      updated_label: data.updated_label || '',
+      total:         data.total || 0,
+    });
+  } catch (e) {
+    console.error('[Research] Load failed:', e);
+  }
+}
+
+function initResearchNav() {
+  const resSection = document.getElementById('section-research');
+  if (!resSection) return;
+
+  const splitLowerRight = document.getElementById('split-lower-right');
+  if (!splitLowerRight) return;
+
+  function showResearch() {
+    Array.from(splitLowerRight.children).forEach(function(el) {
+      if (el.id !== 'section-research') {
+        const orig = el.style.display || window.getComputedStyle(el).display;
+        el.dataset.researchHidden = orig === 'none' ? 'none' : (el.style.display || '');
+        el.style.display = 'none';
+      }
+    });
+    resSection.style.display = '';
+    const splitLower = document.getElementById('split-lower');
+    if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
+    // Load data on first show; re-render on subsequent shows
+    if (!_researchAllItems.length) {
+      loadBankResearch();
+    } else {
+      renderResearchSection();
+    }
+  }
+
+  function hideResearch() {
+    resSection.style.display = 'none';
+    splitLowerRight.querySelectorAll('[data-research-hidden]').forEach(function(el) {
+      const saved = el.dataset.researchHidden;
+      el.style.display = saved === '' ? '' : saved;
+      delete el.dataset.researchHidden;
+    });
+    // Repaint canvases — same double-rAF pattern as News/Derivatives
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
+          drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
+        }
+        const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
+        if (activeRatesTab) {
+          const cty = activeRatesTab.dataset.cty;
+          if (cty && cty !== 'us') {
+            if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
+              renderSovereignSpreads();
+            } else if (typeof renderG8YieldPane === 'function') {
+              const contentEl = document.getElementById('rates-g8-content-' + cty);
+              if (contentEl) delete contentEl.dataset.loaded;
+              renderG8YieldPane(cty);
+            }
+          }
+        }
+      });
+    });
+  }
+
+  // Capture phase — runs before main nav scroll handler
+  const resLink = document.querySelector('.top-nav a[data-target="section-research"]');
+  if (resLink) {
+    resLink.addEventListener('click', function(e) {
+      e.stopImmediatePropagation();
+      showResearch();
+    }, true);
+  }
+
+  // Hide when any other nav tab is clicked
+  document.querySelectorAll('.top-nav a[data-target]').forEach(function(link) {
+    if (link.dataset.target !== 'section-research') {
+      link.addEventListener('click', function() {
+        if (resSection.style.display !== 'none') hideResearch();
+      });
+    }
+  });
+
+  // Expose for keyboard shortcut
+  window._researchNavShow    = showResearch;
+  window._researchNavHide    = hideResearch;
+  window._researchNavSection = resSection;
+  window._researchSetFilter  = _researchSetFilter;
+}
