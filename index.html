@@ -550,6 +550,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <a href="#section-tvcalendar" data-target="section-tvcalendar">Calendar</a>
     <a href="#section-derivatives" data-target="section-derivatives" title="Implied forwards, RR surface, realized volatility · Shortcut: D">Derivatives</a>
     <a href="#section-news" data-target="section-news" title="FX headlines and macro news · Shortcut: N">News</a>
+    <a href="#section-research" data-target="section-research" title="Bank &amp; institutional FX research notes · Shortcut: R">Research</a>
   </nav>
   <div class="topbar-right">
     <!-- Site menu dropdown -->
@@ -1430,6 +1431,45 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div><!-- /#split-lower-right -->
     </div><!-- /#split-lower -->
 
+
+    <!-- RESEARCH — Dedicated full-width panel (hidden by default; shown on "Research" nav click) -->
+    <!-- Industry pattern: Bloomberg Research Monitor / Refinitiv Research Hub              -->
+    <!-- No content reproduction — title + bank + url only (copyright compliant)           -->
+    <div id="section-research" style="display:none;flex-direction:column;height:100%;">
+      <div class="panel-head" style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="panel-title">Research</span>
+          <span class="panel-sub" id="research-sources-label">ING &middot; Saxo &middot; MUFG &middot; CME &middot; UBS &middot; BIS</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="research-section-count" style="font-size:9px;color:var(--text3);"></span>
+          <span style="font-size:9px;color:var(--text3);">Updated: <span id="research-section-ts" style="color:var(--text2);">&#8212;</span></span>
+        </div>
+      </div>
+      <div id="rs-filter-bar" style="display:flex;gap:4px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+        <span style="font-size:9px;color:var(--text3);margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Bank</span>
+        <button class="rs-bank-pill rs-pill-active" data-val="ALL"     onclick="window._researchSetFilter('bank','ALL')">All</button>
+        <button class="rs-bank-pill" data-val="ING"     onclick="window._researchSetFilter('bank','ING')">ING</button>
+        <button class="rs-bank-pill" data-val="Saxo"    onclick="window._researchSetFilter('bank','Saxo')">Saxo</button>
+        <button class="rs-bank-pill" data-val="MUFG"    onclick="window._researchSetFilter('bank','MUFG')">MUFG</button>
+        <button class="rs-bank-pill" data-val="CME"     onclick="window._researchSetFilter('bank','CME')">CME</button>
+        <button class="rs-bank-pill" data-val="UBS"     onclick="window._researchSetFilter('bank','UBS')">UBS</button>
+        <button class="rs-bank-pill" data-val="BIS"     onclick="window._researchSetFilter('bank','BIS')">BIS</button>
+        <span style="font-size:9px;color:var(--text3);margin-left:8px;margin-right:2px;text-transform:uppercase;letter-spacing:.05em;">Currency</span>
+        <button class="rs-cur-pill rs-pill-active" data-val="ALL" onclick="window._researchSetFilter('cur','ALL')">All</button>
+        <button class="rs-cur-pill" data-val="USD" onclick="window._researchSetFilter('cur','USD')">USD</button>
+        <button class="rs-cur-pill" data-val="EUR" onclick="window._researchSetFilter('cur','EUR')">EUR</button>
+        <button class="rs-cur-pill" data-val="GBP" onclick="window._researchSetFilter('cur','GBP')">GBP</button>
+        <button class="rs-cur-pill" data-val="JPY" onclick="window._researchSetFilter('cur','JPY')">JPY</button>
+        <button class="rs-cur-pill" data-val="AUD" onclick="window._researchSetFilter('cur','AUD')">AUD</button>
+        <button class="rs-cur-pill" data-val="CAD" onclick="window._researchSetFilter('cur','CAD')">CAD</button>
+        <button class="rs-cur-pill" data-val="CHF" onclick="window._researchSetFilter('cur','CHF')">CHF</button>
+        <button class="rs-cur-pill" data-val="NZD" onclick="window._researchSetFilter('cur','NZD')">NZD</button>
+      </div>
+      <div id="research-section-feed" style="overflow-y:auto;flex:1;min-height:0;" class="thin-scroll">
+        <div style="padding:14px;color:var(--text3);font-size:11px;">Loading research&#8230;</div>
+      </div>
+    </div><!-- /#section-research -->
   </main>
 
   <!-- RIGHT PANEL -->
