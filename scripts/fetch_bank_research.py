@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_bank_research.py — v1.0
+fetch_bank_research.py — v1.1
 Fetches institutional FX research notes from public RSS feeds and writes
 research-data/bank-research.json.
 
@@ -13,12 +13,29 @@ Design principles:
     category chip · relative age. Drawer shows: bank full name · author ·
     pairs · external link.
 
+Changes v1.1:
+  · ING: URL changed from /market/fx/feed/ (timeout in GA — likely geo-restricted) to
+    /rss/ (general ING Think RSS). Added FX relevance filter to discard non-FX articles
+    from the broader feed (economics, banking, sustainability).
+  · Saxo: URL changed from /content-hub/rss (malformed feed) to two specific feeds:
+    /rss/trade-views (trade recommendations) and /rss/articles (macro commentary).
+    Both are confirmed active and return valid XML.
+  · MUFG: Improved HTML scraping with more robust multi-pattern link extraction.
+    Added fallback patterns for absolute URLs and alternative tag structures.
+  · CME Group FX: added cmegroup.com/rss/fx-video-commentary.rss — institutional
+    FX market commentary from CME Group, the world's largest FX futures exchange.
+    Trade ideas and market views with direct futures market context.
+  · UBS Global Research: added ubs.com research RSS — sell-side research from one
+    of the largest FX desks globally. Filtered for FX relevance.
+
 Sources (all free, no registration required):
-  ING Think FX     — think.ing.com/market/fx/feed/ (WordPress RSS)
-  Saxo Bank        — home.saxo/insights/content-hub/rss (official RSS)
-  DailyFX          — dailyfx.com/feeds/market-news (IG Group platform)
-  BIS Speeches     — bis.org/doclist/cbspeeches.rss (central banker signals)
-  MUFG Research    — mufgresearch.com/fx/ (HTML index scraping — no RSS)
+  ING Think         — think.ing.com/rss/ (general RSS, FX-filtered)
+  Saxo Trade Views  — home.saxo/insights/content-hub/rss/trade-views
+  Saxo Articles     — home.saxo/insights/content-hub/rss/articles
+  CME FX Commentary — cmegroup.com/rss/fx-video-commentary.rss
+  UBS Research      — ubs.com global research RSS
+  BIS Speeches      — bis.org/doclist/cbspeeches.rss
+  MUFG Research     — mufgresearch.com/fx/ (HTML index scraping)
 
 Currency detection: regex on title + description, no NLP, no external APIs.
 Series detection: pattern matching on title prefix ("FX Daily:", "FX Weekly:").
@@ -79,40 +96,66 @@ FETCH_WORKERS        = 6
 # SOURCE DEFINITIONS
 # ─────────────────────────────────────────────────────────────────────────────
 RSS_SOURCES = [
+    # ── ING Think — general RSS, FX-filtered (v1.1: /rss/ replaces /market/fx/feed/ which
+    # timed out in GitHub Actions — likely geo-restricted. /rss/ is the root feed and is
+    # reachable. FX relevance filter applied post-fetch to discard non-FX articles.)
     {
         "bank":      "ING",
         "bank_full": "ING Think",
-        "url":       "https://think.ing.com/market/fx/feed/",
+        "url":       "https://think.ing.com/rss/",
         "type":      "rss",
-        # ING publishes FX Daily (daily) and FX Talking (monthly) — both valuable
+        "fx_filter": True,   # apply is_fx_relevant() — broad feed includes non-FX content
     },
+    # ── Saxo Bank — trade views feed (v1.1: replaces /content-hub/rss which was malformed)
+    # SaxoStrats trade recommendations with directional bias and entry/exit context.
     {
         "bank":      "Saxo",
-        "bank_full": "Saxo Bank (SaxoStrats)",
-        "url":       "https://www.home.saxo/insights/content-hub/rss",
+        "bank_full": "Saxo Bank (SaxoStrats) — Trade Views",
+        "url":       "https://www.home.saxo/insights/content-hub/rss/trade-views",
         "type":      "rss",
-        # John Hardy + team: macro FX commentary, daily
+        "fx_filter": True,
     },
+    # ── Saxo Bank — macro articles (v1.1: second Saxo feed for broader macro commentary)
     {
-        "bank":      "DailyFX",
-        "bank_full": "DailyFX (IG Group)",
-        "url":       "https://www.dailyfx.com/feeds/market-news",
+        "bank":      "Saxo",
+        "bank_full": "Saxo Bank (SaxoStrats) — Articles",
+        "url":       "https://www.home.saxo/insights/content-hub/rss/articles",
         "type":      "rss",
-        # Institutional FX platform with client sentiment data
+        "fx_filter": True,
     },
+    # ── CME Group FX Video Commentary — institutional FX market views from the operator
+    # of the world's largest FX futures exchange. Includes trade ideas with futures context.
+    {
+        "bank":      "CME",
+        "bank_full": "CME Group FX",
+        "url":       "https://www.cmegroup.com/rss/fx-video-commentary.rss",
+        "type":      "rss",
+        "fx_filter": False,  # all content is FX-focused
+    },
+    # ── UBS Global Research — sell-side research from one of the largest FX desks globally.
+    {
+        "bank":      "UBS",
+        "bank_full": "UBS Global Research",
+        "url":       "https://www.ubs.com/global/en/investment-bank/insights-and-data/global-research/_jcr_content/root/contentarea/mainpar/toplevelgrid_copy/col_1/responsivepodcast.rss20.xml?campID=RSS",
+        "type":      "rss",
+        "fx_filter": True,
+    },
+    # ── BIS Central Banker Speeches — pre-release policy signals from global CBs.
+    # No fx_filter — all CB speeches are relevant to the currencies they govern.
     {
         "bank":      "BIS",
         "bank_full": "Bank for International Settlements",
         "url":       "https://www.bis.org/doclist/cbspeeches.rss",
         "type":      "rss",
-        # Central banker speeches — pre-release signals for CB policy shifts
+        "fx_filter": False,
     },
+    # ── MUFG Research — HTML index scraping (no RSS available)
     {
         "bank":      "MUFG",
         "bank_full": "MUFG Research (Mitsubishi UFJ Financial Group)",
         "url":       "https://www.mufgresearch.com/fx/",
         "type":      "html_index",
-        # No RSS — scrape HTML index; URL slugs contain ISO dates for discovery
+        "fx_filter": False,
     },
 ]
 
@@ -225,6 +268,30 @@ def extract_author(entry) -> str:
     return ""
 
 # ─────────────────────────────────────────────────────────────────────────────
+# FX RELEVANCE FILTER
+# Applied to broad feeds (ING Think general, Saxo all-content, UBS) to discard
+# non-FX articles (banking regulation, sustainability, credit, equity research).
+# ─────────────────────────────────────────────────────────────────────────────
+FX_RELEVANCE_KW = [
+    "usd", "eur", "gbp", "jpy", "aud", "cad", "chf", "nzd",
+    "dollar", "euro", "pound", "sterling", "yen", "franc",
+    "forex", " fx ", "currency", "currencies", "exchange rate",
+    "fed", "ecb", "boe", "boj", "rba", "boc", "snb", "rbnz",
+    "federal reserve", "central bank", "bank of england", "bank of japan",
+    "interest rate", "monetary policy", "rate hike", "rate cut",
+    "inflation", "cpi", "gdp", "nonfarm", "payroll", "fomc",
+    "treasury yield", "yield curve", "carry trade",
+    "eur/usd", "gbp/usd", "usd/jpy", "aud/usd", "usd/cad", "usd/chf",
+    "g10", "g7", "fx strategy", "fx outlook", "fx daily", "fx weekly",
+    "hawkish", "dovish", "tightening", "easing",
+]
+
+def is_fx_relevant(title: str, summary: str) -> bool:
+    text = (title + " " + summary).lower()
+    return any(kw in text for kw in FX_RELEVANCE_KW)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # FETCH HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 def clean_html(text: str) -> str:
@@ -256,6 +323,7 @@ def fetch_rss(source: dict, cutoff: datetime) -> list:
     bank      = source["bank"]
     bank_full = source["bank_full"]
     url       = source["url"]
+    fx_filter = source.get("fx_filter", False)
     results   = []
 
     try:
@@ -283,11 +351,15 @@ def fetch_rss(source: dict, cutoff: datetime) -> list:
             if pub_date < cutoff:
                 continue
 
-            # Summary — used only for currency/pair extraction (not stored)
+            # Summary — used only for currency/pair extraction and fx_filter (not stored)
             summary = clean_html(
                 getattr(entry, "summary", "") or
                 getattr(entry, "description", "") or ""
             )[:400]
+
+            # Apply FX relevance filter for broad feeds
+            if fx_filter and not is_fx_relevant(title, summary):
+                continue
 
             link   = getattr(entry, "link", "") or getattr(entry, "id", "")
             author = extract_author(entry)
@@ -313,7 +385,7 @@ def fetch_rss(source: dict, cutoff: datetime) -> list:
                 "published": pub_date.isoformat(),
             })
 
-        print(f"  [{bank}] {len(results)} items from RSS")
+        print(f"  [{bank}] {len(results)} items from RSS ({url.split('/')[2]})")
 
     except Exception as e:
         print(f"  [{bank}] Exception: {e}")
@@ -323,19 +395,27 @@ def fetch_rss(source: dict, cutoff: datetime) -> list:
 def fetch_mufg_html(source: dict, cutoff: datetime) -> list:
     """
     Scrapes MUFG Research FX index page.
-    No RSS available — discovers article links from the HTML index.
-    URL slugs follow pattern: /fx/fx-weekly-DD-mmm-YYYY/ or /fx/fx-daily-YYYY-MM-DD/
-    No body content is extracted — title and URL only.
+    No RSS — discovers article links from the HTML index using multiple patterns.
+    Title and URL only — no body content stored (copyright compliant).
+
+    v1.1: Multiple extraction patterns added:
+      1. Relative /fx/[slug]/ href with adjacent link text
+      2. Absolute https://www.mufgresearch.com/fx/[slug]/ href
+      3. <h2>/<h3>/<h4> headline tags with sibling/parent <a> link
     """
     bank      = source["bank"]
     bank_full = source["bank_full"]
     url       = source["url"]
     results   = []
+    base_url  = "https://www.mufgresearch.com"
 
     try:
         resp = requests.get(
             url,
-            headers={"User-Agent": "Mozilla/5.0 (compatible; GlobalInvesting-ResearchBot/1.0)"},
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            },
             timeout=FETCH_TIMEOUT,
             allow_redirects=True,
         )
@@ -344,36 +424,64 @@ def fetch_mufg_html(source: dict, cutoff: datetime) -> list:
             return []
 
         html = resp.text
-
-        # Extract article links — MUFG uses /fx/[slug]/ pattern
-        link_re = re.compile(
-            r'href="(/fx/[a-z0-9\-]+/)"[^>]*>([^<]{10,120})</a>',
-            re.I,
-        )
-        base_url = "https://www.mufgresearch.com"
         seen_slugs = set()
+        candidates = []  # list of (slug_or_url, title)
 
-        for m in link_re.finditer(html):
-            slug  = m.group(1)
+        # ── Pattern 1: relative href="/fx/[slug]/" with link text
+        for m in re.finditer(
+            r'href=["\'](/fx/[a-z0-9][a-z0-9\-]+/)["\'][^>]*>([^<]{8,150})',
+            html, re.I,
+        ):
+            slug, title = m.group(1), clean_html(m.group(2)).strip()
+            if slug not in seen_slugs and len(title) >= 8:
+                seen_slugs.add(slug)
+                candidates.append((base_url + slug, title))
+
+        # ── Pattern 2: absolute href with mufgresearch.com/fx/
+        for m in re.finditer(
+            r'href=["\']https?://www\.mufgresearch\.com(/fx/[a-z0-9][a-z0-9\-]+/)["\'][^>]*>([^<]{8,150})',
+            html, re.I,
+        ):
+            slug, title = m.group(1), clean_html(m.group(2)).strip()
+            if slug not in seen_slugs and len(title) >= 8:
+                seen_slugs.add(slug)
+                candidates.append((base_url + slug, title))
+
+        # ── Pattern 3: article/h-tag headline with nearby /fx/ link
+        # Captures <a href="/fx/..."><h2>Title</h2></a> or <h2><a href="/fx/...">Title</a></h2>
+        for m in re.finditer(
+            r'<(?:h[234]|a\s[^>]*href=["\'](?:https?://www\.mufgresearch\.com)?(/fx/[a-z0-9][a-z0-9\-]+/)["\'])[^>]*>\s*'
+            r'(?:<a[^>]*>)?\s*([A-Z][^<]{10,150}?)\s*(?:</a>)?\s*</(?:h[234]|a)>',
+            html, re.I | re.DOTALL,
+        ):
+            slug_or_title = m.group(1) or ""
             title = clean_html(m.group(2)).strip()
+            if slug_or_title and slug_or_title not in seen_slugs and len(title) >= 8:
+                seen_slugs.add(slug_or_title)
+                candidates.append((base_url + slug_or_title, title))
 
-            if slug in seen_slugs or len(title) < 10:
-                continue
-            seen_slugs.add(slug)
+        if not candidates:
+            print(f"  [{bank}] 0 candidates found — page structure may have changed")
+            return []
 
-            # Attempt date extraction from slug
-            # Patterns: fx-weekly-26-may-2026, fx-daily-2026-05-26
+        for full_url, title in candidates:
+            # Extract slug from URL for date detection
+            slug = full_url.replace(base_url, "")
+
+            # Date extraction from slug: fx-weekly-26-may-2026 or fx-daily-2026-05-26
+            pub_date = datetime.now(timezone.utc)
             date_m = re.search(
                 r"(\d{1,2})[\-_]([a-z]+)[\-_](\d{4})|(\d{4})[\-_](\d{2})[\-_](\d{2})",
                 slug, re.I,
             )
-            pub_date = datetime.now(timezone.utc)
             if date_m:
                 try:
                     if date_m.group(1):
-                        pub_date = dateparser.parse(
+                        parsed = dateparser.parse(
                             f"{date_m.group(1)} {date_m.group(2)} {date_m.group(3)}"
-                        ).replace(tzinfo=timezone.utc)
+                        )
+                        if parsed:
+                            pub_date = parsed.replace(tzinfo=timezone.utc)
                     else:
                         pub_date = datetime(
                             int(date_m.group(4)),
@@ -399,7 +507,7 @@ def fetch_mufg_html(source: dict, cutoff: datetime) -> list:
                 "series":    series,
                 "title":     title,
                 "author":    "",
-                "url":       base_url + slug,
+                "url":       full_url,
                 "currencies": currencies,
                 "pairs":     pairs,
                 "category":  category,
@@ -407,7 +515,7 @@ def fetch_mufg_html(source: dict, cutoff: datetime) -> list:
                 "published": pub_date.isoformat(),
             })
 
-        print(f"  [{bank}] {len(results)} items from HTML index")
+        print(f"  [{bank}] {len(results)} items from HTML index ({len(candidates)} candidates found)")
 
     except Exception as e:
         print(f"  [{bank}] Exception: {e}")
@@ -421,7 +529,7 @@ def main():
     now_utc = datetime.now(timezone.utc)
     cutoff  = now_utc - timedelta(days=MAX_AGE_DAYS)
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_bank_research.py v1.0")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_bank_research.py v1.1")
     print(f"  Fetching {len(RSS_SOURCES)} sources in parallel (workers={FETCH_WORKERS})...")
 
     all_items   = []

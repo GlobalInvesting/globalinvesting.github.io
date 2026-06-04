@@ -1,7 +1,21 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.16
+fetch_news.py — v5.17
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.17 (sobre v5.16):
+  NUEVAS FUENTES INSTITUCIONALES — BANCOS CENTRALES + FX:
+    · SNB Interest Rates: snb.ch/public/en/rss/interestRates — feed oficial de tasas del SNB.
+      Complementa pressrel/speeches/mopo ya existentes. Forzado a CHF.
+    · Bundesbank: bundesbank.de/service/rss/en/633292/feed.rss — research y comunicados del
+      Bundesbank. Relevante para EUR — el Bundesbank es el banco central con mayor influencia
+      dentro del BCE. Forzado a EUR.
+    · FX Markets Trading: fx-markets.com/feeds/rss/category/trading — categoría específica de
+      trading dentro del feed institucional de Risk.net. Complementa el feed general ya existente
+      (fx-markets.com/feeds/rss). NO en TECHNICAL_ANALYSIS_SOURCES — análisis institucional, no TA.
+    · Federal Reserve press_all: federalreserve.gov/feeds/press_all.xml — todos los comunicados
+      de la Fed (incluye press_monetary ya existente, más supervisión bancaria y regulatorio).
+      Forzado a USD. El filtro is_forex_relevant() descarta los comunicados no monetarios.
 
 CAMBIOS v5.16 (sobre v5.15):
   KEYWORD SUBSTRING BUGS — FALSOS POSITIVOS EN DETECCIÓN DE DIVISA:
@@ -587,6 +601,23 @@ FEEDS = [
     # Captura el tono hawkish/dovish entre reuniones — más frecuente que press releases.
     { "source": "ECB",              "url": "https://www.ecb.europa.eu/rss/blog.html",                         "lang": "en" },
 
+    # ── INGLÉS — nuevas fuentes institucionales añadidas (v5.17) ─────────────
+    # SNB Interest Rates: feed oficial de tasas del SNB — decisiones de tasas publicadas
+    # inmediatamente. 4º feed del SNB, complementa pressrel/speeches/mopo. Forzado a CHF.
+    { "source": "SNB",              "url": "https://www.snb.ch/public/en/rss/interestRates",                  "lang": "en" },
+    # Bundesbank: research y comunicados del banco central alemán. Relevante para EUR —
+    # el Bundesbank publica estadísticas, working papers y comentarios de política monetaria.
+    # La posición del Bundesbank es un proxy del ala hawkish del BCE. Forzado a EUR.
+    { "source": "Bundesbank",       "url": "https://www.bundesbank.de/service/rss/en/633292/feed.rss",        "lang": "en" },
+    # FX Markets Trading (Risk.net): categoría de trading dentro del feed institucional.
+    # Complementa el feed general fx-markets.com/feeds/rss ya existente.
+    # NO en TECHNICAL_ANALYSIS_SOURCES — es análisis institucional, no TA de precio.
+    { "source": "FX Markets",       "url": "https://www.fx-markets.com/feeds/rss/category/trading",           "lang": "en" },
+    # Federal Reserve press_all: todos los comunicados de la Fed. Incluye press_monetary
+    # ya existente más supervisión bancaria y regulatorio. is_forex_relevant() filtra los
+    # no monetarios. Forzado a USD — cualquier comunicado de la Fed es relevante para USD.
+    { "source": "Federal Reserve",  "url": "https://www.federalreserve.gov/feeds/press_all.xml",              "lang": "en" },
+
     # v5.10: DailyFX (3 feeds) removidos — dailyfx.com/feeds/* redirige a ig.com/uk,
     # los URLs no devuelven XML válido. Pendiente verificar feeds RSS en ig.com para v5.11.
 
@@ -719,6 +750,7 @@ SOURCE_CURRENCY = {
     "RBNZ":            "NZD",
     "SNB":             "CHF",
     "Federal Reserve": "USD",
+    "Bundesbank":      "EUR",   # v5.17: Bundesbank forzado a EUR
     # v5.7: NewsData — divisa ya asignada en fetch_newsdata(), esto es fallback defensivo
     "NewsData USD": "USD",
     "NewsData EUR": "EUR",
@@ -749,6 +781,7 @@ FOREX_SOURCES = {
     "Investing.com", "BabyPips", "InvestMacro", "ForexCrunch",
     "MarketPulse", "Reuters FX", "Reuters Markets", "Nasdaq FX", "FX Empire",
     "Barchart", "Marc to Market", "FX Markets",
+    "Bundesbank",   # v5.17
     # v5.7: NewsData API
     "NewsData USD", "NewsData EUR", "NewsData GBP", "NewsData JPY",
     "NewsData AUD", "NewsData CAD", "NewsData CHF", "NewsData NZD",
@@ -1254,7 +1287,7 @@ def main():
     filtered_no_currency = 0
     # v5.11: instaforex_count removed — InstaForex feeds eliminated
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.16 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.17 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
