@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-06-04T10:16:18Z",
+  "generated_at": "2026-06-04T17:27:52Z",
   "signals": [
     {
-      "time": "10:14",
+      "time": "17:26",
       "priority": "critical",
-      "title": "NZD/USD — G8 Bilateral Theme + Carry",
-      "text": "NZD/USD at 0.5875 — USD outperformance (avg +0.543%) vs NZD underperformance (avg -0.871%) creates a 1.414% G8 spread, the widest in the complex. Fed 3.75% vs RBNZ 2.25% provides a +150bp carry advantage to USD, further supported by a +1.23% US real rate vs -0.83% NZD real rate. CESI data confirms the divergence: USD net +25 beats vs NZD net -2 misses. Structural downside persists as long as G8 spread remains above 1.20%.",
+      "title": "NZD/USD — G8 Bilateral Theme + CESI Divergence",
+      "text": "NZD/USD at 0.5877 anchors the week's dominant G8 theme as the USD leader (+0.538%) faces the NZD laggard (-0.818%). The 1.355% spread is driven by a stark data divergence: USD CESI shows a +26 net beat (strong positive) while NZD remains in a negative bias. Despite the 150bp USD carry advantage (Fed 3.75% vs RBNZ 2.25%), NZD COT LF net short -13,767 suggests specs are already positioned for this weakness, though retail remains 78% long (contrarian bearish). Implication: structural NZD underperformance persists until CESI momentum shifts.",
       "evidence": [
-        "USD 1W avg: +0.543% (n=7)",
-        "NZD 1W avg: -0.871% (n=4)",
-        "G8 spread: 1.414%"
+        "USD 1W avg: +0.538% (n=7)",
+        "NZD 1W avg: -0.818% (n=4)",
+        "G8 spread: 1.355%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "10:11",
-      "priority": "critical",
-      "title": "USD/JPY — BoJ Hike + Carry + Retail Divergence",
-      "text": "USD/JPY at 159.88 — Reuters reports BoJ will raise rates at the June meeting, shifting the TONA 0.73% floor. Despite the +300bp Fed-BoJ carry advantage, JPY COT LF net short -86,249 (31.6% long) reflects a crowded carry trade vulnerable to the hawkish shift. Retail sentiment is 85% short, diverging from institutional positioning and signaling extreme reversal risk. 160.00 remains the critical threshold for BoJ intervention risk.",
-      "evidence": [
-        "USD/JPY: 159.878",
-        "JPY COT LF net: -86,249",
-        "Retail Sentiment: 85% Short"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "10:09",
+      "time": "17:23",
       "priority": "warning",
-      "title": "EUR/USD — Volatility Premium + Positioning",
-      "text": "EUR/USD at 1.1632 — IV at 7.1% vs HV30 at 3.8% generates a +3.3% Vol Risk Premium, signaling elevated hedging demand ahead of the June 11 ECB meeting. Options market maintains a -0.34 25d RR put skew despite the 1D +0.26% price bounce. EUR COT LF net short -26,311 aligns with the ECB's downward bias (ESTR 1.93% vs SOFR 3.63%). Elevated VRP suggests the market is paying for downside protection rather than chasing the intraday bid.",
+      "title": "USD/JPY — Carry + Intervention Risk + Options Skew",
+      "text": "USD/JPY at 159.99 tests the critical 160.00 threshold amid BoJ tightening signals and a massive +290bp OIS carry advantage (SOFR 3.63% vs TONA 0.73%). While JPY COT LF net short -86,249 shows crowded carry positioning, the options market is aggressively hedging the downside with a -1.15 25d RR put skew. This divergence between spot carry demand and options protection suggests high sensitivity to BoJ verbal intervention at 160.00. Implication: carry remains the primary driver but tail-risk hedging is accelerating.",
+      "evidence": [
+        "USD/JPY: 159.99",
+        "USD/JPY OIS Carry: +290bp",
+        "25d RR (Saxo): -1.15"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "17:21",
+      "priority": "warning",
+      "title": "AUD/USD — Positioning + Volatility + Retail Divergence",
+      "text": "AUD/USD at 0.7142 shows a significant multi-layer divergence. COT LF net long +58,041 (76.1% long) represents a crowded institutional long, while retail is 70% short, fading the move. This positioning tension is met with an extreme +8.4% Vol Risk Premium (IV 16.5% vs HV30 8.1%), indicating the options market is pricing in significantly more realized vol than currently observed. Despite the 60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%), the negative CESI (-8 misses) and hawkish Bullock tone suggest a 'sell the fact' regime. Watch for a break of the 100-pip range to trigger a spec long unwind.",
+      "evidence": [
+        "AUD COT LF long%: 76.1%",
+        "AUD/USD VRP: +8.4%",
+        "Retail Sentiment: 70% short"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "17:18",
+      "priority": "warning",
+      "title": "USD/CAD — Technical Correction + Retail Extreme",
+      "text": "USD/CAD at 1.3899 stalls its weekly upside run (+0.84%) as oil prices retreat (WTI $92.3, -3.91%). A massive retail divergence is active with 84% of retail traders short, fading the institutional USD bid. While the +150bp carry advantage (Fed 3.75% vs BoC 2.25%) and positive CAD CESI (+4) support the pair, technicals indicate a correction toward support as the upside momentum exhausts. Implication: retail capitulation risk remains high if 1.3950 is tested, but near-term mean reversion is favored.",
+      "evidence": [
+        "USD/CAD: 1.3899",
+        "Retail Sentiment: 84% short",
+        "USD/CAD Carry: +150bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "17:12",
+      "priority": "info",
+      "title": "EUR/USD — Volatility Premium + Real Rate Headwinds",
+      "text": "EUR/USD at 1.1624 maintains an elevated +3.3% Vol Risk Premium (IV 7.1% vs HV30 3.8%), signaling institutional demand for downside protection despite a quiet 1D change (+0.19%). The real rate differential of 149bp (USD +1.23% vs EUR -0.26%) continues to favor the USD structurally. With COT LF net short -26,311 and a mild -0.32 25d RR put skew, the path of least resistance remains lower. Watch the ECB meeting on 11 Jun for any shift in the accommodative real rate stance.",
       "evidence": [
         "EUR/USD VRP: +3.3%",
-        "EUR COT LF net: -26,311",
-        "25d RR: -0.34"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "10:06",
-      "priority": "warning",
-      "title": "AUD/USD — Technical Support + CESI Divergence",
-      "text": "AUD/USD at 0.7136 — Price is testing the 0.7120 support level following weaker Australian GDP data. AUD CESI at -8 misses confirms deteriorating macro momentum vs USD net +25 beats. While RBA 4.35% vs Fed 3.75% offers a -60bp carry premium for AUD, COT LF net long +58,041 (76.1% long) indicates a crowded institutional long position at risk of liquidation if 0.7120 fails. Watch for a break below 0.7120 to trigger a deeper correction.",
-      "evidence": [
-        "AUD/USD: 0.7136",
-        "AUD CESI: -8",
-        "AUD COT long%: 76.1%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "10:01",
-      "priority": "info",
-      "title": "GBP/USD — Volatility Complacency + Carry",
-      "text": "GBP/USD at 1.3438 — IV at 11.0% vs HV30 at 6.2% creates a +4.8% VRP, the highest in the G10, reflecting extreme hedging demand. SONIA 3.73% vs SOFR 3.63% provides a marginal -10bp carry advantage to GBP, but analysts warn of increasing downward momentum. GBP COT LF net long +26,377 (63.9% long) suggests specs remain positioned for resilience, but the high vol premium indicates institutional caution ahead of the June 18 BoE meeting.",
-      "evidence": [
-        "GBP/USD VRP: +4.8%",
-        "GBP COT LF net: +26,377",
-        "OIS Carry: -10bp"
+        "Real Rate Spread: 149bp",
+        "EUR COT LF net: -26,311"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
