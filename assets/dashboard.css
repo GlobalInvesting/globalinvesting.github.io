@@ -1816,26 +1816,24 @@ a:focus-visible,
 .rs-item:hover { background:var(--bg3); }
 .rs-item:last-child { border-bottom:none; }
 .rs-item.rs-trade-idea .rs-row { border-left:2px solid var(--up);padding-left:12px; }
-.rs-row { display:flex;align-items:center;gap:8px;padding:0 14px;height:32px;min-width:0; }
+.rs-row { display:flex;align-items:center;gap:8px;padding:5px 14px 2px;min-width:0; }
 
 /* Time cell — stacked HH:MM / Xh (identical pattern to .ns-time) */
 .rs-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
 .rs-time-hm  { font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap; }
 .rs-time-age { font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;white-space:nowrap;margin-top:1px; }
 
-/* Bank badge — each institution gets a unique accent color */
-.rs-bank-badge { font-size:8px;font-weight:700;letter-spacing:.04em;padding:1px 4px;border-radius:2px;flex-shrink:0;font-family:var(--font-ui);text-transform:uppercase; }
-.rs-bank-ING     { background:rgba(255,96,0,.15);color:#ff6000; }
-.rs-bank-Saxo    { background:rgba(0,120,212,.15);color:#0078d4; }
-.rs-bank-MUFG    { background:rgba(180,0,0,.15);color:#b80000; }
-.rs-bank-DailyFX { background:rgba(0,160,80,.15);color:#00a050; }
-.rs-bank-BIS     { background:rgba(120,80,200,.15);color:#7850c8; }
-.rs-bank-CME     { background:rgba(0,160,180,.15);color:#0096a8; }
-.rs-bank-UBS     { background:rgba(220,60,0,.15);color:#c83c00; }
-.rs-bank-other   { background:var(--bg3);color:var(--text3); }
+/* Bank badge — monochrome, no institution-specific colors */
+.rs-bank-badge { font-size:8px;font-weight:700;letter-spacing:.04em;padding:1px 4px;border-radius:2px;flex-shrink:0;font-family:var(--font-ui);text-transform:uppercase;background:var(--bg3);color:var(--text2);border:1px solid var(--border2); }
+.rs-bank-ING,.rs-bank-Saxo,.rs-bank-MUFG,.rs-bank-DailyFX,.rs-bank-BIS,.rs-bank-CME,.rs-bank-UBS,.rs-bank-other { background:var(--bg3);color:var(--text2); }
 
-/* Series label — "FX Daily", "FX Weekly", etc. */
+/* Series label — kept for potential future use */
 .rs-series { font-size:9px;color:var(--text3);font-family:var(--font-ui);flex-shrink:0;max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+
+/* Subtitle row — series + pairs shown below headline */
+.rs-sub-row { display:flex;align-items:center;gap:8px;padding:0 14px 5px 56px;min-width:0; }
+.rs-sub-series { font-size:9px;color:var(--text3);font-family:var(--font-ui);flex-shrink:0; }
+.rs-sub-pairs  { font-size:9px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.7; }
 
 /* Headline — identical to .ns-headline */
 .rs-headline { font-size:11px;color:var(--text);font-family:var(--font-ui);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0; }
@@ -1844,12 +1842,9 @@ a:focus-visible,
 .rs-cur-tags { display:flex;gap:2px;flex-shrink:0; }
 .rs-cur-tag  { font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 3px;border-radius:2px;font-family:var(--font-ui); }
 
-/* Category badge */
-.rs-cat { font-size:8px;font-weight:600;letter-spacing:.03em;padding:1px 4px;border-radius:2px;flex-shrink:0;font-family:var(--font-ui);text-transform:uppercase; }
-.rs-cat-trade_idea { background:rgba(0,200,80,.12);color:#00c850; }
-.rs-cat-macro      { background:rgba(80,140,255,.12);color:#508cff; }
-.rs-cat-technical  { background:rgba(255,200,0,.12);color:#b8900a; }
-.rs-cat-flow       { background:rgba(200,100,255,.12);color:#c864ff; }
+/* Category badge — monochrome */
+.rs-cat { font-size:8px;font-weight:600;letter-spacing:.03em;padding:1px 4px;border-radius:2px;flex-shrink:0;font-family:var(--font-ui);text-transform:uppercase;background:var(--bg3);color:var(--text3);border:1px solid var(--border2); }
+.rs-cat-trade_idea,.rs-cat-macro,.rs-cat-technical,.rs-cat-flow { background:var(--bg3);color:var(--text3); }
 
 /* Chevron */
 .rs-chevron { color:var(--text3);flex-shrink:0;display:flex;align-items:center;transition:transform .18s; }
@@ -1872,6 +1867,22 @@ a:focus-visible,
 /* Empty state */
 .rs-empty { padding:20px 14px;color:var(--text3);font-size:11px; }
 
+/* ─── Per-section scrollable feeds ───────────────────────────────────────────
+   Each sub-panel shows ~6-8 rows then scrolls internally.
+   Row height ~33px → 6 rows ≈ 200px, 8 rows ≈ 264px.
+   intel-scroll becomes just a flex column, no scrolling itself.
+   ─────────────────────────────────────────────────────────────────────────── */
+#intel-scroll { display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden; }
+#news-section-feed,
+#research-section-feed,
+#trading-section-feed {
+  max-height: 230px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+  flex-shrink: 0;
+}
+
 /* ─── INTEL PANEL — sub-section dividers (News / Research / Trading) ──────────
    Three stacked sub-panels inside #section-news, separated by sticky headers.
    Pattern: Bloomberg Intelligence terminal section dividers.
@@ -1884,26 +1895,26 @@ a:focus-visible,
   padding: 5px 10px;
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
-  border-top: 1px solid var(--border2);
+  border-top: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 2;
   flex-shrink: 0;
 }
 .intel-sub-head:first-child { border-top: none; }
-.intel-sub-head--research { background: color-mix(in srgb, var(--bg2) 85%, var(--blue) 15%); }
-.intel-sub-head--trading  { background: color-mix(in srgb, var(--bg2) 85%, var(--orange) 10%); }
+.intel-sub-head--research { background: var(--bg2); }
+.intel-sub-head--trading  { background: var(--bg2); }
 .intel-sub-title { display:flex;align-items:baseline;gap:6px; }
 .intel-sub-label {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
-  color: var(--text);
+  color: var(--text2);
   font-family: var(--font-ui);
 }
-.intel-sub-head--research .intel-sub-label { color: var(--blue); }
-.intel-sub-head--trading  .intel-sub-label { color: var(--orange); }
+.intel-sub-head--research .intel-sub-label { color: var(--text2); }
+.intel-sub-head--trading  .intel-sub-label { color: var(--text2); }
 .intel-sub-source {
   font-size: 9px;
   color: var(--text3);

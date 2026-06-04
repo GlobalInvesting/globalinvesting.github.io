@@ -12468,12 +12468,30 @@ function renderResearchSection(items, meta) {
 
     row.appendChild(timeEl);
     row.appendChild(bankBadge);
-    if (series) row.appendChild(seriesEl);
     row.appendChild(headEl);
     if (currencies.length) row.appendChild(curTagsEl);
     row.appendChild(catEl);
     row.appendChild(chevron);
     wrap.appendChild(row);
+
+    // Subtitle row — series name + pairs (gives visual context without content reproduction)
+    if (series || pairs.length) {
+      const subRow = document.createElement('div');
+      subRow.className = 'rs-sub-row';
+      if (series) {
+        const subSeries = document.createElement('span');
+        subSeries.className = 'rs-sub-series';
+        subSeries.textContent = series;
+        subRow.appendChild(subSeries);
+      }
+      if (pairs.length) {
+        const subPairs = document.createElement('span');
+        subPairs.className = 'rs-sub-pairs';
+        subPairs.textContent = pairs.slice(0, 5).join(' · ');
+        subRow.appendChild(subPairs);
+      }
+      wrap.appendChild(subRow);
+    }
 
     // ── Accordion drawer ──────────────────────────────────────────────────────
     const drawer = document.createElement('div');
