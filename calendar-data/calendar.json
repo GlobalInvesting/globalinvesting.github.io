@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-04T01:02:01Z",
-  "generatedAt": "2026-06-04T01:02:01Z",
+  "lastUpdate": "2026-06-04T01:31:57Z",
+  "generatedAt": "2026-06-04T01:31:57Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -370,6 +370,11 @@
       "n": 5,
       "mean": 0.5212,
       "std": 1.974368
+    },
+    "AUD/balance of trade": {
+      "n": 2,
+      "mean": -3.05,
+      "std": 4.300623
     },
     "USD/initial jobless claims": {
       "n": 4,
@@ -20496,7 +20501,7 @@
       "flag": "🇦🇺",
       "event": "Balance of Trade",
       "impact": "high",
-      "actual": null,
+      "actual": "1.791",
       "forecast": "1.8",
       "previous": "-1.841"
     },
@@ -21928,7 +21933,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "-0.5*",
-      "previous": "-2.572"
+      "previous": "3.364"
     },
     {
       "date": "17 Jun",
