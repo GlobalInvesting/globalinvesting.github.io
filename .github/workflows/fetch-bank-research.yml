@@ -1,0 +1,89 @@
+name: Fetch Bank Research
+
+on:
+  schedule:
+    - cron: '15 */4 * * *'   # Every 4h at :15 UTC — staggered from hourly news (:05)
+                               # ING publishes FX Daily around 07:00 CET (06:00 UTC);
+                               # the 06:15 UTC run captures it within 15 minutes.
+                               # Research has longer shelf life than news — 4h cadence
+                               # is appropriate and avoids GitHub Actions queue pressure.
+  workflow_dispatch:           # Manual trigger for testing
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in
+
+concurrency:
+  group: fetch-bank-research
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install feedparser==6.0.11 requests==2.32.3 python-dateutil==2.9.0.post0 \
+            --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p research-data
+
+      - name: Fetch bank research
+        run: python scripts/fetch_bank_research.py
+
+      - name: Commit updated research data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp research-data/bank-research.json /tmp/research_fresh.json
+          # Also backup context_snapshot if modified
+          [ -f ai-analysis/context_snapshot.json ] && \
+            cp ai-analysis/context_snapshot.json /tmp/context_snapshot_fresh.json || true
+
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Restore fresh outputs after reset
+            cp /tmp/research_fresh.json research-data/bank-research.json
+            [ -f /tmp/context_snapshot_fresh.json ] && \
+              cp /tmp/context_snapshot_fresh.json ai-analysis/context_snapshot.json || true
+
+            git add research-data/bank-research.json
+            git add ai-analysis/context_snapshot.json 2>/dev/null || true
+
+            if git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+
+            git commit -m "chore: fetch bank research [${TIMESTAMP}]"
+
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+
+          echo "⚠️  All push attempts exhausted — data refreshes on next scheduled run."
+          exit 0
