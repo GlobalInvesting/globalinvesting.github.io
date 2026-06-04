@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-04T12:30:02Z",
-  "generatedAt": "2026-06-04T12:30:02Z",
+  "lastUpdate": "2026-06-04T12:32:00Z",
+  "generatedAt": "2026-06-04T12:32:00Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-04",
   "rangeTo": "2026-06-18",
-  "totalEvents": 1678,
+  "totalEvents": 1677,
   "currencyCounts": {
     "CAD": 130,
     "USD": 638,
     "JPY": 186,
     "AUD": 175,
-    "CHF": 91,
+    "CHF": 90,
     "GBP": 194,
     "NZD": 79,
     "EUR": 185
   },
   "impactCounts": {
     "low": 142,
-    "medium": 1145,
+    "medium": 1144,
     "high": 391
   },
   "surpriseStats": {
@@ -382,9 +382,9 @@
       "std": 0.212132
     },
     "USD/initial jobless claims": {
-      "n": 4,
-      "mean": -1.0,
-      "std": 4.966555
+      "n": 5,
+      "mean": -3.2,
+      "std": 6.534524
     }
   },
   "events": [
@@ -20188,19 +20188,6 @@
     {
       "date": "2 Jun",
       "dateISO": "2026-06-02",
-      "timeUTC": "06:30",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Retail Sales YoY",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": "0.5"
-    },
-    {
-      "date": "2 Jun",
-      "dateISO": "2026-06-02",
       "timeUTC": "08:30",
       "country": "GBP",
       "currency": "GBP",
@@ -20623,9 +20610,9 @@
       "flag": "🇺🇸",
       "event": "Initial Jobless Claims",
       "impact": "medium",
-      "actual": null,
+      "actual": "225",
       "forecast": "213",
-      "previous": "215"
+      "previous": "212"
     },
     {
       "date": "4 Jun",
@@ -21249,7 +21236,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": "-4*",
-      "previous": "-6.75"
+      "previous": "-7.974"
     },
     {
       "date": "10 Jun",
@@ -22107,7 +22094,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "0"
     },
     {
       "date": "18 Jun",
