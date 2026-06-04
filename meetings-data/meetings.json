@@ -57,13 +57,13 @@
         "17 Dec"
       ],
       "source": "ecb.europa.eu",
-      "bias": "hold",
+      "bias": "cut",
       "biasSource": "ECB €STR overnight swap rate",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-04",
-      "cutProb": 0,
+      "cutProb": 89,
       "hikeProb": 0,
-      "fwdRate": 2.0
+      "fwdRate": 1.7775
     },
     "GBP": {
       "nextMeeting": "18 Jun",
@@ -126,8 +126,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-06-04",
       "cutProb": 0,
-      "hikeProb": 45,
-      "fwdRate": 0.795
+      "hikeProb": 50,
+      "fwdRate": 0.8
     },
     "AUD": {
       "nextMeeting": "16 Jun",
@@ -215,9 +215,9 @@
       "biasSource": "SNB SARON overnight rate",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-04",
-      "cutProb": 24,
+      "cutProb": 72,
       "hikeProb": 0,
-      "fwdRate": -0.06
+      "fwdRate": -0.18
     },
     "NZD": {
       "nextMeeting": "8 Jul",
@@ -241,13 +241,13 @@
         "9 Dec"
       ],
       "source": "rbnz.govt.nz",
-      "bias": "hike",
+      "bias": "hold",
       "biasSource": "NZFBF OIS swap curve (RBNZ OCR)",
       "biasMethod": "spread",
       "biasUpdated": "2026-06-04",
       "cutProb": 0,
-      "hikeProb": 20,
-      "fwdRate": 2.3
+      "hikeProb": 0,
+      "fwdRate": 2.25
     }
   }
 }
