@@ -1,11 +1,92 @@
 {
-  "updated_utc": "2026-06-04T00:31:56.111863+00:00",
-  "updated_label": "00:31 UTC",
-  "total": 10,
+  "updated_utc": "2026-06-04T01:02:40.656076+00:00",
+  "updated_label": "01:02 UTC",
+  "total": 36,
   "sources": [
-    "BIS"
+    "BIS",
+    "CME",
+    "ING",
+    "Saxo"
   ],
   "items": [
+    {
+      "id": "afba079d09e0",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "British Pound futures fell on U.S. tariff proposal.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/06/03/british-pound-futures-fell-on-u-s-tariff-proposal-6-3-26.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "GBP"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780518789000,
+      "published": "2026-06-03T20:33:09+00:00"
+    },
+    {
+      "id": "54f9dc8d5122",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Rates Spark: Spread exposures",
+      "author": "",
+      "url": "https://think.ing.com/articles/rates-spark-spread-exposures/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780503060000,
+      "published": "2026-06-03T16:11:00+00:00"
+    },
+    {
+      "id": "9b98247f706e",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "Markets fall as geopolitical tensions escalate and new U.S. tariffs loom.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/06/03/markets-fall-as-geopolitical-tensions-escalate-and-new-u-s-tari.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780502170000,
+      "published": "2026-06-03T15:56:10+00:00"
+    },
+    {
+      "id": "5bac28f878c0",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "National Bank of Poland’s governor says the current level of interest rates is adequate",
+      "author": "",
+      "url": "https://think.ing.com/articles/national-bank-of-poland-governor-current-level-of-interest-rates-is-adequate/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780497720000,
+      "published": "2026-06-03T14:42:00+00:00"
+    },
+    {
+      "id": "ef6d7025d7fb",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "US Dollar Credit Supply: Supply continues at a strong pace",
+      "author": "",
+      "url": "https://think.ing.com/reports/us-dollar-credit-supply-supply-continues-at-a-strong-pace/",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780493220000,
+      "published": "2026-06-03T13:27:00+00:00"
+    },
     {
       "id": "e6897049ce80",
       "bank": "BIS",
@@ -64,6 +145,22 @@
       "category": "macro",
       "ts": 1780488840000,
       "published": "2026-06-03T12:14:00+00:00"
+    },
+    {
+      "id": "4c0da8bd6fff",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "A rate hike and then what? Our ECB preview",
+      "author": "",
+      "url": "https://think.ing.com/articles/a-rate-hike-and-then-what-our-ecb-preview/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780482600000,
+      "published": "2026-06-03T10:30:00+00:00"
     },
     {
       "id": "457a9364787c",
@@ -157,6 +254,330 @@
       "category": "macro",
       "ts": 1780473540000,
       "published": "2026-06-03T07:59:00+00:00"
+    },
+    {
+      "id": "a5dc98835e7d",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "A Bank of England rate hike in July can’t be ruled out",
+      "author": "",
+      "url": "https://think.ing.com/articles/a-bank-of-england-rate-hike-in-july-cant-be-ruled-out/",
+      "currencies": [
+        "GBP"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780471260000,
+      "published": "2026-06-03T07:21:00+00:00"
+    },
+    {
+      "id": "317dff686852",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "FX Daily",
+      "title": "FX Daily: Dollar support broadens",
+      "author": "",
+      "url": "https://think.ing.com/articles/fx-daily-dollar-support-broadens/",
+      "currencies": [
+        "USD",
+        "CHF"
+      ],
+      "pairs": [
+        "USD/CHF"
+      ],
+      "category": "macro",
+      "ts": 1780468800000,
+      "published": "2026-06-03T06:40:00+00:00"
+    },
+    {
+      "id": "54f999027022",
+      "bank": "Saxo",
+      "bank_full": "Saxo Bank (SaxoStrats) — Articles",
+      "series": "",
+      "title": "Market Quick Take - 3 June 2026",
+      "author": "Saxo Bank",
+      "url": "https://www.home.saxo/content/articles/macro/market-quick-take---3-june-2026-03062026",
+      "currencies": [
+        "USD",
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780467180000,
+      "published": "2026-06-03T06:13:00+00:00"
+    },
+    {
+      "id": "1cb6c644853b",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "Australian Dollar futures gained as RBA held firm on inflation.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/06/02/australian-dollar-futures-gained-as-rba-held-firm-on-inflation-.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "USD",
+        "AUD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780435385000,
+      "published": "2026-06-02T21:23:05+00:00"
+    },
+    {
+      "id": "0e2b24b4e5c1",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Rates Spark: The real deal",
+      "author": "",
+      "url": "https://think.ing.com/articles/rates-spark-the-real-deal/",
+      "currencies": [],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1780415160000,
+      "published": "2026-06-02T15:46:00+00:00"
+    },
+    {
+      "id": "2f9c7c957ff4",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "The National Bank of Poland kept rates on hold in June",
+      "author": "",
+      "url": "https://think.ing.com/snaps/national-bank-of-poland-rates-on-hold-in-june/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780413240000,
+      "published": "2026-06-02T15:14:00+00:00"
+    },
+    {
+      "id": "ac5062dba11f",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Euro Credit Supply: Supply continues at a strong pace",
+      "author": "",
+      "url": "https://think.ing.com/reports/euro-credit-supply-supply-continues-at-a-strong-pace/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780410840000,
+      "published": "2026-06-02T14:34:00+00:00"
+    },
+    {
+      "id": "f9530f286f5c",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Czech National Bank’s June meeting poised to be live; reasoning will be key",
+      "author": "",
+      "url": "https://think.ing.com/articles/cnb-june-meeting-poised-to-be-live-while-reasoning-will-be-key/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1780401540000,
+      "published": "2026-06-02T11:59:00+00:00"
+    },
+    {
+      "id": "f8265bc4ad7e",
+      "bank": "Saxo",
+      "bank_full": "Saxo Bank (SaxoStrats) — Articles",
+      "series": "",
+      "title": "Market Quick Take - 2 June 2026",
+      "author": "Saxo Bank",
+      "url": "https://www.home.saxo/content/articles/macro/market-quick-take---2-june-2026-02062026",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780381920000,
+      "published": "2026-06-02T06:32:00+00:00"
+    },
+    {
+      "id": "9263eace7919",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "Euro futures reversed early gains as the dollar rallied.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/06/01/euro-futures-reversed-early-gains-as-the-dollar-rallied-6-1-26.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "USD",
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780349744000,
+      "published": "2026-06-01T21:35:44+00:00"
+    },
+    {
+      "id": "a720515efff1",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "Manufacturing hits four-year high as crude oil surges.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/06/01/manufacturing-hits-four-year-high-as-crude-oil-surges-6-1-26.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "USD",
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780331395000,
+      "published": "2026-06-01T16:29:55+00:00"
+    },
+    {
+      "id": "a1fca61b2eea",
+      "bank": "Saxo",
+      "bank_full": "Saxo Bank (SaxoStrats) — Articles",
+      "series": "",
+      "title": "Gold fell again in May as Middle East crisis reshaped market focus",
+      "author": "Ole Hansen",
+      "url": "https://www.home.saxo/content/articles/commodities/gold-fell-again-in-may-as-middle-east-crisis-reshaped-market-focus-01062026",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780318800000,
+      "published": "2026-06-01T13:00:00+00:00"
+    },
+    {
+      "id": "fdd8e5600e5d",
+      "bank": "Saxo",
+      "bank_full": "Saxo Bank (SaxoStrats) — Articles",
+      "series": "",
+      "title": "COT update: Peace deal hopes spark commodity liquidation as dollar longs surge",
+      "author": "Ole Hansen",
+      "url": "https://www.home.saxo/content/articles/commodities/cot-on-forex-and-commodities---week-to-26-may-2026-01062026",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780304400000,
+      "published": "2026-06-01T09:00:00+00:00"
+    },
+    {
+      "id": "b5fff26b60de",
+      "bank": "Saxo",
+      "bank_full": "Saxo Bank (SaxoStrats) — Articles",
+      "series": "",
+      "title": "Market Quick Take - 1 June 2026",
+      "author": "Saxo Bank",
+      "url": "https://www.home.saxo/content/articles/macro/market-quick-take---1-june-2026-01062026",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780296060000,
+      "published": "2026-06-01T06:41:00+00:00"
+    },
+    {
+      "id": "190213c7963c",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "British Pound futures rallied despite dovish BOE comments.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/05/29/british-pound-futures-rallied-despite-dovish-boe-comments-5-29-.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "EUR",
+        "GBP"
+      ],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1780082183000,
+      "published": "2026-05-29T19:16:23+00:00"
+    },
+    {
+      "id": "185019cd1636",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "April's 115 thousand job addition frames a crucial week ahead.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/05/29/april-s-115-thousand-job-addition-frames-a-crucial-week-ahead-6.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780081454000,
+      "published": "2026-05-29T19:04:14+00:00"
+    },
+    {
+      "id": "2a0b5d0884b6",
+      "bank": "Saxo",
+      "bank_full": "Saxo Bank (SaxoStrats) — Articles",
+      "series": "",
+      "title": "Market Quick Take - 29 May 2026",
+      "author": "Saxo Bank",
+      "url": "https://www.home.saxo/content/articles/macro/market-quick-take---29-may-2026-29052026",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780035180000,
+      "published": "2026-05-29T06:13:00+00:00"
+    },
+    {
+      "id": "87559c903c95",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "Euro futures rebounded to a 2-week high on weaker dollar.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/05/28/euro-futures-rebounded-to-a-2-week-high-on-weaker-dollar-5-28-2.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "USD",
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780003185000,
+      "published": "2026-05-28T21:19:45+00:00"
+    },
+    {
+      "id": "dd9f329134b2",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "Inflation pressures ease as core PCE cools.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/05/28/inflation-pressures-ease-as-core-pce-cools-5-28-26.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1779983862000,
+      "published": "2026-05-28T15:57:42+00:00"
+    },
+    {
+      "id": "90800db94082",
+      "bank": "Saxo",
+      "bank_full": "Saxo Bank (SaxoStrats) — Articles",
+      "series": "",
+      "title": "Market Quick Take - 28 May 2026",
+      "author": "Saxo Bank",
+      "url": "https://www.home.saxo/content/articles/macro/market-quick-take---28-may-2026-28052026",
+      "currencies": [
+        "USD",
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1779951180000,
+      "published": "2026-05-28T06:53:00+00:00"
     }
   ]
 }
