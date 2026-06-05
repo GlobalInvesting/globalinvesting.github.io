@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-05T12:23:09Z",
-  "generatedAt": "2026-06-05T12:23:09Z",
+  "lastUpdate": "2026-06-05T12:30:44Z",
+  "generatedAt": "2026-06-05T12:30:44Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -57,9 +57,9 @@
       "std": 0.360555
     },
     "CAD/unemployment rate": {
-      "n": 5,
-      "mean": -0.04,
-      "std": 0.207364
+      "n": 6,
+      "mean": 0.016667,
+      "std": 0.231661
     },
     "USD/core pce price index": {
       "n": 5,
@@ -380,6 +380,11 @@
       "n": 2,
       "mean": -0.35,
       "std": 0.212132
+    },
+    "CAD/employment change": {
+      "n": 2,
+      "mean": 22.55,
+      "std": 78.135299
     },
     "JPY/household spending mom": {
       "n": 2,
@@ -20557,7 +20562,7 @@
       "flag": "🇨🇦",
       "event": "Employment Change",
       "impact": "medium",
-      "actual": null,
+      "actual": "87.8",
       "forecast": "10",
       "previous": "-17.7"
     },
@@ -20596,7 +20601,7 @@
       "flag": "🇨🇦",
       "event": "Participation Rate",
       "impact": "medium",
-      "actual": null,
+      "actual": "65",
       "forecast": "65.1",
       "previous": "65"
     },
@@ -20609,7 +20614,7 @@
       "flag": "🇨🇦",
       "event": "Unemployment Rate",
       "impact": "high",
-      "actual": null,
+      "actual": "6.6",
       "forecast": "6.9",
       "previous": "6.9"
     },
