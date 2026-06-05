@@ -1,13 +1,149 @@
 {
-  "updated_utc": "2026-06-05T18:06:09.623474+00:00",
-  "updated_label": "18:06 UTC",
-  "total": 29,
+  "updated_utc": "2026-06-05T21:42:47.499664+00:00",
+  "updated_label": "21:42 UTC",
+  "total": 39,
   "sources": [
     "BIS",
     "CME",
+    "ING",
     "Saxo"
   ],
   "items": [
+    {
+      "id": "3e0e15f038f6",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "Euro futures dropped as shifting rate gaps capped gains.",
+      "excerpt": "Euro futures faced downward pressure as the June Euro currency futures contract moved toward its largest percentage decline since March 3. The contract fell 0.81% near the close, marking its fourth lower close in the last five sessions. A key driver behind the currency's movement is the shifting U.S.-EU interest rate differential, which narrowed from over 200 points to roughly 150 bps following late 2025 Fed cuts. Traders are closely watching the upcoming June 11 ECB policy decision, where markets have priced in a 90% probability of a 25 bps rate hike amid hot May Eurozone inflation numbers showing a 3.2% print. However, the U.S. dollar continues to cap the euro's upside potential as strong domestic data leads market participants to price in an additional Fed rate hike before year-end.",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/06/05/euro-futures-dropped-as-shifting-rate-gaps-capped-gains-6-5-26.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "USD",
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780689533000,
+      "published": "2026-06-05T19:58:53+00:00"
+    },
+    {
+      "id": "87e81116488d",
+      "bank": "CME",
+      "bank_full": "CME Group FX",
+      "series": "",
+      "title": "Rising 4.54% yields and hot inflation press global markets.",
+      "excerpt": "The upcoming trading week brings critical macro data into focus as Treasury yields reach multi-month highs following a strong payrolls report. With the 10-Year yield returning to 4.54%, market participants are closely tracking how fixed income pressure influences the Nasdaq-100 and broader equity markets. The upcoming May CPI report takes center stage on Wednesday, serving as a primary catalyst for inflation expectations after April figures hit 3.8% amid energy disruptions. Investors will watch whether core prices are absorbing energy pressures, a development that could eliminate flexibility for the Federal Reserve at its next meeting. Beyond inflation data, the market will navigate a light earnings schedule and key international central bank rate decisions. WTI Crude Oil futures and…",
+      "author": "CME Group",
+      "url": "https://www.cmegroup.com/videos/2026/06/05/a-4-54-yield-milestone-sets-a-tense-stage-for-may-cpi-data-6-8.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780686186000,
+      "published": "2026-06-05T19:03:06+00:00"
+    },
+    {
+      "id": "14ccd4b822b8",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Czech spending holds up amid softer inflation",
+      "excerpt": "CZECH REPUBLIC: Retail sales undershot expectations in April, yet largely due to a strong Easter effect in the food segment. Spending on non-food goods suggests further consumer strength, while inflation is set to behave relatively well due to receding fuel prices and a decelerating core rate. The key question is whether risks to growth…",
+      "author": "",
+      "url": "https://think.ing.com/articles/czech-spending-holds-up-amid-softer-inflation/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780670640000,
+      "published": "2026-06-05T14:44:00+00:00"
+    },
+    {
+      "id": "8c48ede134f7",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Bank of Canada still set to lean dovish",
+      "excerpt": "CANADA: Falling output, USMCA renegotiation risk, a mixed jobs picture, and softer-than-feared inflation suggest the Bank of Canada will continue to push back against the market pricing of rate hikes at its 10 June meeting. We don’t expect any tightening this year. The Canadian dollar should therefore remain a laggard among commodity…",
+      "author": "",
+      "url": "https://think.ing.com/articles/bank-of-canada-still-set-to-lean-dovish/",
+      "currencies": [
+        "USD",
+        "CAD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780668900000,
+      "published": "2026-06-05T14:15:00+00:00"
+    },
+    {
+      "id": "861711414fd8",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Firm US jobs numbers boost rate hike chances, but lack of breadth remains a concern",
+      "excerpt": "NORTH AMERICA: Yet another stronger-than-expected US jobs number in an environment of rising inflation is fuelling expectations of a Fed rate hike before the end of the year. Nonetheless, there is a lack of breadth in job creation and wage growth is slowing, meaning household finances are coming under increasing…",
+      "author": "",
+      "url": "https://think.ing.com/articles/firm-us-jobs-numbers-boost-rate-hike-chances-but-lack-of-breadth-remains-a-concern/",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780665120000,
+      "published": "2026-06-05T13:12:00+00:00"
+    },
+    {
+      "id": "3677410fa2da",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "THINK Ahead: Why an AI bust wouldn’t stop at tech",
+      "excerpt": "The stock market isn't the real economy. That's been a big lesson of the past one-and-a-half decades. So if the AI bubble really does explode on Wall Street, would it be a disaster for Main Street? James Smith argues that investment would take the strain and Europe would be better insulated. Read on as he and the team tackle the week…",
+      "author": "",
+      "url": "https://think.ing.com/opinions/think-ahead-why-an-ai-bust-wouldnt-stop-at-tech/",
+      "currencies": [
+        "EUR",
+        "CAD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780662600000,
+      "published": "2026-06-05T12:30:00+00:00"
+    },
+    {
+      "id": "7b5d52320f8b",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Kazakhstan makes a surprise rate cut, with next move to depend on the tenge",
+      "excerpt": "COMMONWEALTH OF INDEPENDENT STATES: Kazakhstan’s central bank cut the base rate by 100bp to 17.00%, surprising the market with an earlier and bolder move than we expected. Softer CPI, lower inflation expectations and supportive portfolio flows opened room for easing. Follow-up cuts would require continued KZT strength and a drop in CPI to a single-digit…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/kazakhstan-makes-a-surprise-cut-next-move-to-depend-on-the-tenge/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780654800000,
+      "published": "2026-06-05T10:20:00+00:00"
+    },
+    {
+      "id": "dfa33cc4afc6",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Tech and FX: short-term volatility may cloud long-term trend",
+      "excerpt": "It has been a tough week for chipmakers, especially those in Korea. Foreigners have withdrawn $10bn from Korean equities this week, driving USD/KRW to levels last seen in 2009. While we remain constructive on the fundamental picture for the technology sector, there could be more short-term volatility, outflows and pressure on tech-driven…",
+      "author": "",
+      "url": "https://think.ing.com/articles/tech-and-fx-short-term-volatility-may-cloud-long-term-trend/",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1780654620000,
+      "published": "2026-06-05T10:17:00+00:00"
+    },
     {
       "id": "a68459b4cbfc",
       "bank": "Saxo",
@@ -22,6 +158,73 @@
       "category": "macro",
       "ts": 1780653600000,
       "published": "2026-06-05T10:00:00+00:00"
+    },
+    {
+      "id": "54629839907a",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Bank of England survey questions need for rate hikes",
+      "excerpt": "EUROPE: The latest Decision Maker Panel, which surveys UK Chief Financial Officers (CFOs), is the latest indication that inflation is unlikely to take off in response to higher energy prices. We expect the Bank to keep rates on hold in…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/bank-of-england-survey-questions-need-for-rate-hikes/",
+      "currencies": [
+        "EUR",
+        "GBP"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780652160000,
+      "published": "2026-06-05T09:36:00+00:00"
+    },
+    {
+      "id": "708f3fdc642b",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Turkish inflation beats consensus again in May",
+      "excerpt": "TURKEY: Higher-than-expected May inflation led to a slight increase in the annual figure, driven mainly by processed food, clothing and transportation…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/turkish-inflation-beats-concensus-again-in-may/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780651800000,
+      "published": "2026-06-05T09:30:00+00:00"
+    },
+    {
+      "id": "69da1d874c24",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "June ECB cheat sheet: How to train your hawks",
+      "excerpt": "Here are our four scenarios for the 11 June ECB meeting, alongside implications for rates and FX. We think the ECB's current priority is solidifying markets' expectations on further tightening to hedge against inflation expectations de-anchoring. Our baseline is therefore a hawkish hike, with some indications the bank is prepared to raise rates…",
+      "author": "",
+      "url": "https://think.ing.com/articles/ecb-cheat-sheet-how-to-train-your-hawks/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780648200000,
+      "published": "2026-06-05T08:30:00+00:00"
+    },
+    {
+      "id": "da13d38081e3",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "FX Daily",
+      "title": "FX Daily: Subdued oil volatility preventing USD breakout",
+      "excerpt": "Upside volatility in oil prices has remained surprisingly limited, considering the lack of tangible progress in US-Iran negotiations. That is preventing the dollar from breaking higher despite the strong macro backdrop. Still, we expect another solid US jobs report today, underpinning the firm USD…",
+      "author": "",
+      "url": "https://think.ing.com/articles/fx-daily-subdued-oil-volatility-preventing-usd-breakout/",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1780642680000,
+      "published": "2026-06-05T06:58:00+00:00"
     },
     {
       "id": "5a14b62a13b3",
@@ -483,39 +686,6 @@
       "category": "technical",
       "ts": 1780318800000,
       "published": "2026-06-01T13:00:00+00:00"
-    },
-    {
-      "id": "190213c7963c",
-      "bank": "CME",
-      "bank_full": "CME Group FX",
-      "series": "",
-      "title": "British Pound futures rallied despite dovish BOE comments.",
-      "excerpt": "June British Pound futures gained for a second consecutive session, overcoming early weakness seen during the European session. The rebound occurred despite dovish comments from Bank of England Governor Andrew Bailey, who indicated the central bank could tolerate temporary inflation above target to sustain the weak domestic economy while pushing back against near-term interest rate hike pricing. Additionally, the currency continues to function as a risk-on asset heavily impacted by Middle East ceasefire developments. Market participants remain focused on fluctuating geopolitical headlines near the strait and potential memorandum updates, which continue to create a volatile trading environment for the pound.",
-      "author": "CME Group",
-      "url": "https://www.cmegroup.com/videos/2026/05/29/british-pound-futures-rallied-despite-dovish-boe-comments-5-29-.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
-      "currencies": [
-        "EUR",
-        "GBP"
-      ],
-      "pairs": [],
-      "category": "trade_idea",
-      "ts": 1780082183000,
-      "published": "2026-05-29T19:16:23+00:00"
-    },
-    {
-      "id": "185019cd1636",
-      "bank": "CME",
-      "bank_full": "CME Group FX",
-      "series": "",
-      "title": "April's 115 thousand job addition frames a crucial week ahead.",
-      "excerpt": "Market participants face a high-stakes week ahead as major macroeconomic catalysts converge. WTI Crude Oil futures remain highly sensitive to the unresolved U.S. and Iran memorandum of understanding regarding the Strait of Hormuz, where any weekend development could trigger an immediate repricing of risk across the commodity complex. Meanwhile, the upcoming labor market evaluation takes center stage following a previous deceleration to 115 thousand jobs. With near-term rate cut expectations compressed to zero, further cooling could pressure equities while supporting gold, forcing traders to reassess the policy path for the Nasdaq-100 and 10-Year yields.",
-      "author": "CME Group",
-      "url": "https://www.cmegroup.com/videos/2026/05/29/april-s-115-thousand-job-addition-frames-a-crucial-week-ahead-6.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
-      "currencies": [],
-      "pairs": [],
-      "category": "macro",
-      "ts": 1780081454000,
-      "published": "2026-05-29T19:04:14+00:00"
     }
   ]
 }
