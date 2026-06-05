@@ -1,61 +1,31 @@
 {
-  "lastUpdate": "2026-06-04T23:46:35Z",
-  "generatedAt": "2026-06-04T23:46:35Z",
+  "lastUpdate": "2026-06-05T00:00:45Z",
+  "generatedAt": "2026-06-05T00:00:45Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Finnhub",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-04",
-  "rangeTo": "2026-06-18",
-  "totalEvents": 1677,
+  "rangeFrom": "2025-06-05",
+  "rangeTo": "2026-06-19",
+  "totalEvents": 1670,
   "currencyCounts": {
-    "CAD": 130,
-    "USD": 638,
+    "CAD": 132,
     "JPY": 186,
     "AUD": 175,
     "CHF": 90,
-    "GBP": 194,
+    "GBP": 196,
     "NZD": 79,
-    "EUR": 185
+    "USD": 628,
+    "EUR": 184
   },
   "impactCounts": {
-    "low": 142,
-    "medium": 1144,
-    "high": 391
+    "high": 391,
+    "medium": 1142,
+    "low": 137
   },
   "surpriseStats": {
-    "GBP/halifax house price index": {
-      "n": 2,
-      "mean": 0.2,
-      "std": 0.282843
-    },
-    "EUR/gdp": {
-      "n": 2,
-      "mean": -0.1,
-      "std": 0.0
-    },
-    "USD/average hourly earnings": {
-      "n": 2,
-      "mean": 0.1,
-      "std": 0.0
-    },
-    "USD/retail sales": {
-      "n": 4,
-      "mean": 0.475,
-      "std": 0.556028
-    },
-    "USD/unemployment rate": {
-      "n": 5,
-      "mean": 0.0,
-      "std": 0.1
-    },
-    "USD/atlanta fed gdpnow": {
-      "n": 5,
-      "mean": -0.2,
-      "std": 0.552268
-    },
     "JPY/household spending": {
       "n": 2,
       "mean": -3.35,
@@ -75,6 +45,11 @@
       "n": 3,
       "mean": 5.733333,
       "std": 1.436431
+    },
+    "USD/atlanta fed gdpnow": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.45
     },
     "GBP/industrial production": {
       "n": 3,
@@ -185,6 +160,16 @@
       "n": 4,
       "mean": 0.75,
       "std": 0.7
+    },
+    "USD/retail sales": {
+      "n": 3,
+      "mean": 0.6,
+      "std": 0.608276
+    },
+    "USD/unemployment rate": {
+      "n": 4,
+      "mean": 0.025,
+      "std": 0.095743
     },
     "JPY/machinery orders": {
       "n": 2,
@@ -398,90 +383,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CAD",
-      "event": "S&P Global Composite PMI",
-      "dateISO": "2025-06-04",
-      "hourUTC": "13:30",
-      "actual": "45.5",
-      "forecast": null,
-      "previous": "41.7",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "CAD",
-      "event": "S&P Global Services PMI",
-      "dateISO": "2025-06-04",
-      "hourUTC": "13:30",
-      "actual": "45.6",
-      "forecast": null,
-      "previous": "41.5",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "ADP Employment Change",
-      "dateISO": "2025-06-04",
-      "hourUTC": "12:15",
-      "actual": "37",
-      "forecast": "115",
-      "previous": "60",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Composite PMI Final",
-      "dateISO": "2025-06-04",
-      "hourUTC": "13:45",
-      "actual": "53",
-      "forecast": "52.1",
-      "previous": "50.6",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Services PMI Final",
-      "dateISO": "2025-06-04",
-      "hourUTC": "13:45",
-      "actual": "53.7",
-      "forecast": "52.3",
-      "previous": "50.8",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "ISM Services Business Activity",
-      "dateISO": "2025-06-04",
-      "hourUTC": "14:00",
-      "actual": "50",
-      "forecast": null,
-      "previous": "53.7",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "ISM Services PMI",
-      "dateISO": "2025-06-04",
-      "hourUTC": "14:00",
-      "actual": "49.9",
-      "forecast": "52",
-      "previous": "51.6",
-      "impact": "high",
-      "importance": 3,
-      "source": "FH"
-    },
     {
       "currency": "CAD",
       "event": "Ivey PMI s.a",
@@ -17464,19 +17365,6 @@
     {
       "date": "14 May",
       "dateISO": "2026-05-14",
-      "timeUTC": "09:15",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "14 May",
-      "dateISO": "2026-05-14",
       "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
@@ -17568,58 +17456,6 @@
     {
       "date": "14 May",
       "dateISO": "2026-05-14",
-      "timeUTC": "14:15",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Schmid Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "14 May",
-      "dateISO": "2026-05-14",
-      "timeUTC": "17:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Bowman Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "14 May",
-      "dateISO": "2026-05-14",
-      "timeUTC": "17:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Hammack Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "14 May",
-      "dateISO": "2026-05-14",
-      "timeUTC": "21:45",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Williams Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "14 May",
-      "dateISO": "2026-05-14",
       "timeUTC": "22:30",
       "country": "NZD",
       "currency": "NZD",
@@ -17629,19 +17465,6 @@
       "actual": "50.5",
       "forecast": null,
       "previous": "52.8"
-    },
-    {
-      "date": "14 May",
-      "dateISO": "2026-05-14",
-      "timeUTC": "23:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Barr Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "15 May",
@@ -21401,7 +21224,7 @@
       "event": "GDP MoM",
       "impact": "high",
       "actual": null,
-      "forecast": "-0.2*",
+      "forecast": null,
       "previous": "0.3"
     },
     {
@@ -21440,7 +21263,7 @@
       "event": "Industrial Production MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "-0.3*",
+      "forecast": null,
       "previous": "-0.2"
     },
     {
@@ -21453,7 +21276,7 @@
       "event": "Manufacturing Production MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "-0.2*",
+      "forecast": null,
       "previous": "1.2"
     },
     {
@@ -21843,7 +21666,7 @@
       "event": "Retail Sales Control Group MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.4*",
+      "forecast": null,
       "previous": "0.5"
     },
     {
@@ -21856,7 +21679,7 @@
       "event": "Retail Sales Ex Autos MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.6*",
+      "forecast": null,
       "previous": "0.7"
     },
     {
@@ -21882,7 +21705,7 @@
       "event": "Business Inventories MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.8*",
+      "forecast": null,
       "previous": "0.9"
     },
     {
@@ -22261,6 +22084,84 @@
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "19 Jun",
+      "dateISO": "2026-06-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Retail Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "-1.3"
+    },
+    {
+      "date": "19 Jun",
+      "dateISO": "2026-06-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Retail Sales YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "0"
+    },
+    {
+      "date": "19 Jun",
+      "dateISO": "2026-06-19",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "New Housing Price Index MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0*",
+      "previous": "-0.4"
+    },
+    {
+      "date": "19 Jun",
+      "dateISO": "2026-06-19",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Retail Sales Ex Autos MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.9*",
+      "previous": "1.4"
+    },
+    {
+      "date": "19 Jun",
+      "dateISO": "2026-06-19",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Retail Sales MoM Final",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.6",
+      "previous": "0.9"
+    },
+    {
+      "date": "19 Jun",
+      "dateISO": "2026-06-19",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Retail Sales MoM Prel",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.6"
     }
   ]
 }
