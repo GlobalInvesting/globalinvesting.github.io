@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-05T12:30:44Z",
-  "generatedAt": "2026-06-05T12:30:44Z",
+  "lastUpdate": "2026-06-05T12:32:44Z",
+  "generatedAt": "2026-06-05T12:32:44Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -167,9 +167,9 @@
       "std": 0.608276
     },
     "USD/unemployment rate": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.095743
+      "n": 5,
+      "mean": 0.02,
+      "std": 0.083666
     },
     "JPY/machinery orders": {
       "n": 2,
@@ -383,8 +383,23 @@
     },
     "CAD/employment change": {
       "n": 2,
-      "mean": 22.55,
-      "std": 78.135299
+      "mean": 22.65,
+      "std": 78.276721
+    },
+    "USD/average hourly earnings mom": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.070711
+    },
+    "USD/average hourly earnings yoy": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.141421
+    },
+    "USD/non farm payrolls": {
+      "n": 2,
+      "mean": 70.0,
+      "std": 24.041631
     },
     "JPY/household spending mom": {
       "n": 2,
@@ -20562,7 +20577,7 @@
       "flag": "🇨🇦",
       "event": "Employment Change",
       "impact": "medium",
-      "actual": "87.8",
+      "actual": "88",
       "forecast": "10",
       "previous": "-17.7"
     },
@@ -20575,8 +20590,8 @@
       "flag": "🇨🇦",
       "event": "Full Time Employment Chg",
       "impact": "medium",
-      "actual": null,
-      "forecast": "15*",
+      "actual": "154",
+      "forecast": null,
       "previous": "-46.7"
     },
     {
@@ -20588,8 +20603,8 @@
       "flag": "🇨🇦",
       "event": "Part Time Employment Chg",
       "impact": "medium",
-      "actual": null,
-      "forecast": "15*",
+      "actual": "-66.2",
+      "forecast": null,
       "previous": "29"
     },
     {
@@ -20627,7 +20642,7 @@
       "flag": "🇺🇸",
       "event": "Average Hourly Earnings MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.3",
       "forecast": "0.3",
       "previous": "0.2"
     },
@@ -20640,7 +20655,7 @@
       "flag": "🇺🇸",
       "event": "Average Hourly Earnings YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.4",
       "forecast": "3.4",
       "previous": "3.6"
     },
@@ -20653,9 +20668,9 @@
       "flag": "🇺🇸",
       "event": "Non Farm Payrolls",
       "impact": "high",
-      "actual": null,
+      "actual": "172",
       "forecast": "85",
-      "previous": "115"
+      "previous": "179"
     },
     {
       "date": "5 Jun",
@@ -20666,7 +20681,7 @@
       "flag": "🇺🇸",
       "event": "Participation Rate",
       "impact": "medium",
-      "actual": null,
+      "actual": "61.8",
       "forecast": null,
       "previous": "61.8"
     },
@@ -20679,7 +20694,7 @@
       "flag": "🇺🇸",
       "event": "Unemployment Rate",
       "impact": "high",
-      "actual": null,
+      "actual": "4.3",
       "forecast": "4.3",
       "previous": "4.3"
     },
