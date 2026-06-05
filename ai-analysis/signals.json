@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-06-04T21:24:14Z",
+  "generated_at": "2026-06-05T03:38:14Z",
   "signals": [
     {
-      "time": "21:23",
+      "time": "03:36",
       "priority": "critical",
       "title": "NZD/USD — G8 Bilateral Theme + Geopolitical Shift",
-      "text": "NZD/USD at 0.5873 — USD outperformance (1W avg +0.564%) vs NZD laggard status (1W avg -0.903%) creates a 1.467% G8 spread, the widest in the complex. The move is accelerated by a pivot in geopolitical risk as Ukraine/Russia headlines suggest a potential path to peace, reducing the 'commodity-beta' bid for NZD while Fed's Schmid reaffirms inflation as the 'biggest risk,' supporting the USD 150bp carry advantage. NZD real rate at -0.83% vs USD +1.23% confirms structural downside. Watch for a break of 0.5850 to accelerate the trend.",
+      "text": "NZD/USD at 0.5865 remains under heavy pressure as the USD dominates the G8 scorecard while NZD lags. The announcement of a ceasefire between Israel and Hezbollah and Ukraine's peace proposal to Russia have triggered a sharp decline in crude oil prices, weighing on commodity-linked currencies. USD 1W avg +0.622% vs NZD -1.008% creates a 1.630% G8 spread, the widest in the complex. USD is further supported by a +150bp carry advantage over NZD and a strong positive economic surprise index (CESI +28). Watch for 0.5850 support; a break targets the 0.5800 handle as geopolitical de-escalation favors USD funding over high-beta commodity FX.",
       "evidence": [
-        "USD 1W avg: +0.564% (n=7)",
-        "NZD 1W avg: -0.903% (n=4)",
-        "G8 spread: 1.467%"
+        "USD 1W avg: +0.622% (n=7)",
+        "NZD 1W avg: -1.008% (n=4)",
+        "G8 spread: 1.630%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:20",
+      "time": "03:33",
       "priority": "warning",
-      "title": "USD/JPY — Positioning + Vol + Intervention Risk",
-      "text": "USD/JPY at 159.99 — Price is testing the critical 160.00 psychological level previously associated with BoJ intervention. JPY COT LF net short -86,249 (31.6% long) indicates a crowded carry trade, while the 25d RR at -1.15 (moderate put skew) shows the options market is aggressively hedging for JPY strength/USD downside despite the 300bp Fed-BoJ carry advantage. JPY CESI at +11 suggests domestic data outperformance is providing a fundamental floor. Sustained trade above 160.00 triggers immediate intervention risk.",
+      "title": "USD/JPY — Carry + Positioning + Vol",
+      "text": "USD/JPY at 159.97 is testing the critical 160.00 level, which has previously triggered BoJ verbal warnings. Despite the 300bp Fed-BoJ carry advantage sustaining the bid, the options market is pricing in significant downside protection with a 25d RR of -1.15 (moderate put skew). JPY COT LF net short -86,249 represents a crowded carry trade vulnerable to a squeeze if the BoJ signals a hawkish shift at the June 16 meeting. VIX at 15.4 (normal volatility) suggests carry remains the dominant regime until a break of 160.00 or a spike in volatility above 25.",
       "evidence": [
-        "USD/JPY: 159.99",
+        "USD/JPY: 159.97",
         "JPY COT LF net: -86,249",
-        "25d RR: -1.15 (Saxo)"
+        "25d RR: -1.15"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:18",
+      "time": "03:31",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol + Retail Divergence",
-      "text": "AUD/USD at 0.7140 — COT LF net long +58,041 (76.1% long) represents a positioning extreme, while retail sentiment is 70% short, creating a sharp institutional vs retail divergence. AUD IV at 17.0% vs HV30 at 8.1% (VRP +8.9%) signals an extreme volatility premium, suggesting the market is paying heavily for protection against a trend reversal. Negative AUD CESI (-8) contradicts the bullish spec positioning, raising the risk of a long-unwind. Watch for a break of 0.7100 to confirm a positioning flush.",
+      "text": "AUD/USD at 0.7128 faces a significant positioning-volatility mismatch. COT LF net long +58,041 (76.1% long) indicates a crowded institutional long, while retail sentiment is 70% short, creating a sharp divergence. AUD/USD IV at 17.6% vs HV30 at 8.1% generates a massive +9.5% VRP, signaling the options market is paying an extreme premium for protection. With a negative CESI (-8) and a bull flattener yield curve regime, the risk of a long-unwind toward 0.7050 is elevated if US NFP data surprises to the upside.",
       "evidence": [
         "AUD COT long%: 76.1%",
         "Retail: 70% short",
-        "VRP: +8.9%"
+        "VRP: +9.5%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:12",
+      "time": "03:28",
       "priority": "info",
-      "title": "EUR/USD — Volatility Premium + Carry Divergence",
-      "text": "EUR/USD at 1.1617 — IV at 7.1% vs HV30 at 3.8% (VRP +3.3%) indicates elevated hedging demand despite a relatively stable spot price. The 175bp USD carry advantage (Fed 3.75% vs ECB 2.0%) remains the primary anchor, though the ECB's hike bias vs Fed's hold stance creates a policy divergence. EUR CESI (+6) vs USD CESI (+26) shows both economies are outperforming expectations, but the USD real rate (+1.23%) remains significantly more restrictive than EUR (-0.26%). Watch the ECB meeting on 11 Jun for a hawkish shift to compress the carry spread.",
+      "title": "EUR/USD — Volatility Premium + CB Real Rate Gap",
+      "text": "EUR/USD at 1.1617 exhibits elevated hedging demand with IV at 7.1% vs HV30 at 3.8% (VRP +3.3%). The pair is structurally limited by a -1.49% real rate differential (USD +1.23% vs EUR -0.26%), favoring the USD. While the ECB bias is toward a hike on June 11, the DXY vs SPX correlation break (z=+1.77σ) suggests USD funding stress is providing a floor for the greenback regardless of equity performance. Watch the 1.1600 level; a sustained break confirms the bearish 1M trend (-0.93%).",
       "evidence": [
         "EUR/USD VRP: +3.3%",
-        "USD/EUR Carry: +175bp",
-        "USD CESI: +26"
+        "Real Rate Spread: 149bp (USD over EUR)",
+        "DXY vs SPX z-score: +1.77σ"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
