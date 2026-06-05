@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-05T05:32:41Z",
-  "generatedAt": "2026-06-05T05:32:41Z",
+  "lastUpdate": "2026-06-05T06:01:42Z",
+  "generatedAt": "2026-06-05T06:01:42Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -370,6 +370,16 @@
       "n": 5,
       "mean": -3.2,
       "std": 6.534524
+    },
+    "GBP/halifax house price index mom": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.141421
+    },
+    "GBP/halifax house price index yoy": {
+      "n": 2,
+      "mean": -0.35,
+      "std": 0.212132
     },
     "JPY/household spending mom": {
       "n": 2,
@@ -20521,7 +20531,7 @@
       "flag": "🇬🇧",
       "event": "Halifax House Price Index MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.1",
       "forecast": "0.1",
       "previous": "-0.1"
     },
@@ -20534,7 +20544,7 @@
       "flag": "🇬🇧",
       "event": "Halifax House Price Index YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.5",
       "forecast": "1",
       "previous": "0.4"
     },
