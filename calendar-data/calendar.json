@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-05T11:48:29Z",
-  "generatedAt": "2026-06-05T11:48:29Z",
+  "lastUpdate": "2026-06-05T12:06:50Z",
+  "generatedAt": "2026-06-05T12:06:50Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-05",
   "rangeTo": "2026-06-19",
-  "totalEvents": 1670,
+  "totalEvents": 1672,
   "currencyCounts": {
-    "CAD": 132,
+    "CAD": 133,
     "JPY": 186,
     "AUD": 175,
     "CHF": 90,
     "GBP": 196,
-    "NZD": 79,
+    "NZD": 80,
     "USD": 628,
     "EUR": 184
   },
   "impactCounts": {
     "high": 391,
-    "medium": 1142,
+    "medium": 1144,
     "low": 137
   },
   "surpriseStats": {
@@ -20727,7 +20727,7 @@
       "event": "Current Account",
       "impact": "medium",
       "actual": null,
-      "forecast": "3879*",
+      "forecast": "3137",
       "previous": "4682"
     },
     {
@@ -20740,7 +20740,7 @@
       "event": "GDP Growth Annualized Final",
       "impact": "medium",
       "actual": null,
-      "forecast": "2.1",
+      "forecast": "1.3",
       "previous": "0.8"
     },
     {
@@ -20753,7 +20753,7 @@
       "event": "GDP Growth Rate QoQ Final",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.5",
+      "forecast": "0.3",
       "previous": "0.2"
     },
     {
@@ -20766,7 +20766,7 @@
       "event": "Consumer Confidence",
       "impact": "medium",
       "actual": null,
-      "forecast": "-46*",
+      "forecast": "-38",
       "previous": "-40"
     },
     {
@@ -20857,7 +20857,7 @@
       "event": "Balance of Trade",
       "impact": "medium",
       "actual": null,
-      "forecast": "-86.5*",
+      "forecast": "-55.2",
       "previous": "-60.3"
     },
     {
@@ -20896,7 +20896,7 @@
       "event": "Existing Home Sales",
       "impact": "high",
       "actual": null,
-      "forecast": "4.05*",
+      "forecast": "4.05",
       "previous": "4.02"
     },
     {
@@ -20974,7 +20974,7 @@
       "event": "Core Inflation Rate MoM",
       "impact": "high",
       "actual": null,
-      "forecast": "0.3*",
+      "forecast": "0.3",
       "previous": "0.4"
     },
     {
@@ -20987,7 +20987,7 @@
       "event": "Core Inflation Rate YoY",
       "impact": "high",
       "actual": null,
-      "forecast": "2.7*",
+      "forecast": "2.9",
       "previous": "2.8"
     },
     {
@@ -21026,7 +21026,7 @@
       "event": "Inflation Rate MoM",
       "impact": "high",
       "actual": null,
-      "forecast": "0.3*",
+      "forecast": "0.5",
       "previous": "0.6"
     },
     {
@@ -21052,7 +21052,7 @@
       "event": "BoC Interest Rate Decision",
       "impact": "high",
       "actual": null,
-      "forecast": null,
+      "forecast": "2.25",
       "previous": "2.25"
     },
     {
@@ -21143,7 +21143,7 @@
       "event": "ECB Interest Rate Decision",
       "impact": "high",
       "actual": null,
-      "forecast": null,
+      "forecast": "2.4",
       "previous": "2.15"
     },
     {
@@ -21156,7 +21156,7 @@
       "event": "Core PPI MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.3*",
+      "forecast": "0.4",
       "previous": "1"
     },
     {
@@ -21182,7 +21182,7 @@
       "event": "PPI MoM",
       "impact": "high",
       "actual": null,
-      "forecast": "0.3*",
+      "forecast": "0.8",
       "previous": "1.4"
     },
     {
@@ -21670,6 +21670,19 @@
       "date": "17 Jun",
       "dateISO": "2026-06-17",
       "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "New Housing Price Index MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0*",
+      "previous": "-0.4"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
@@ -22042,6 +22055,19 @@
       "actual": null,
       "forecast": "71.6B*",
       "previous": "81.3"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.98*",
+      "previous": "1.92"
     },
     {
       "date": "18 Jun",
