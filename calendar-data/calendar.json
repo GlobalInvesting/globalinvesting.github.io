@@ -1,28 +1,28 @@
 {
-  "lastUpdate": "2026-06-05T23:46:31Z",
-  "generatedAt": "2026-06-05T23:46:31Z",
+  "lastUpdate": "2026-06-06T00:00:37Z",
+  "generatedAt": "2026-06-06T00:00:37Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Finnhub",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-05",
+  "rangeFrom": "2025-06-08",
   "rangeTo": "2026-06-19",
-  "totalEvents": 1672,
+  "totalEvents": 1671,
   "currencyCounts": {
-    "CAD": 133,
     "JPY": 186,
     "AUD": 175,
     "CHF": 90,
     "GBP": 196,
     "NZD": 80,
     "USD": 628,
+    "CAD": 132,
     "EUR": 184
   },
   "impactCounts": {
-    "high": 391,
     "medium": 1144,
+    "high": 390,
     "low": 137
   },
   "surpriseStats": {
@@ -413,18 +413,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CAD",
-      "event": "Ivey PMI s.a",
-      "dateISO": "2025-06-05",
-      "hourUTC": "14:00",
-      "actual": "48.9",
-      "forecast": "48.3",
-      "previous": "47.9",
-      "impact": "high",
-      "importance": 3,
-      "source": "FH"
-    },
     {
       "currency": "JPY",
       "event": "Current Account",
