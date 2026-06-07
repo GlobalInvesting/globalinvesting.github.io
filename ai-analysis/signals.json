@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-06-05T21:19:09Z",
+  "generated_at": "2026-06-07T21:01:14Z",
   "signals": [
     {
-      "time": "20:52",
+      "time": "21:00",
       "priority": "critical",
-      "title": "NZD/USD — G8 Bilateral Theme + US Labor Strength",
-      "text": "USD 1W outperformance (+1.328%) against the NZD laggard (-1.668%) creates a 2.996% G8 spread following the robust US NFP report. The 150bp USD/NZD carry advantage and NZD's -0.83% real rate disadvantage accelerate the plunge toward 0.5790 as risk assets tumble. The next Fed meeting (mkt: 100% hold priced) on 17 Jun determines if this hawkish USD repricing sustains the breakdown.",
+      "title": "NZD/USD — G8 Bilateral Theme + NFP Shock",
+      "text": "NZD/USD at 0.5784 — USD outperformance (avg +0.813%) vs NZD underperformance (avg -1.019%) creates a 1.833% G8 spread, the widest in the complex. The move is driven by the +150bp USD carry advantage (Fed 3.75% vs RBNZ 2.25%) and a strong US NFP report that has repriced Fed hike expectations. NZD/USD retail sentiment is 89% long, diverging from the -27,797 COT LF net short, signaling extreme retail capitulation risk if the 0.5780 support fails.",
       "evidence": [
-        "USD 1W avg: +1.328% (n=7)",
-        "NZD 1W avg: -1.668% (n=4)",
-        "G8 spread: 2.996%"
+        "USD 1W avg: +0.813% (n=7)",
+        "NZD 1W avg: -1.019% (n=4)",
+        "G8 spread: 1.833%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:52",
-      "priority": "critical",
-      "title": "USD/CAD — Oil Demand Slump + Retail Sentiment Extreme",
-      "text": "WTI crude's -3.00% drop to $90.2 on weak China demand and Iran peace hopes drives USD/CAD toward 1.3933. CAD COT net short -42.1k aligns with the fundamental weakness, though the 87% retail short position warns of a contrarian squeeze if oil stabilizes. The next BoC meeting (mkt: 100% hold priced) on 10 Jun is the catalyst for resolving the CAD's 137bp OIS carry disadvantage.",
-      "evidence": [
-        "WTI Oil: $90.2 (-3.00%)",
-        "CAD COT net short: -42,194",
-        "Retail Sentiment: 87% Short"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "20:49",
+      "time": "20:57",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Unwind + CESI Divergence",
-      "text": "AUD COT net long +58.041k (76% long) faces liquidation risk as the pair closed Friday at 0.7050 following the USD rally. Negative AUD economic surprises (CESI net -8) and a 74bp OIS carry disadvantage against the USD undermine the RBA's restrictive stance. The next RBA meeting (mkt: 100% hold priced) on 16 Jun determines if the hold bias can withstand the deteriorating data trend.",
+      "title": "USD/JPY — Carry + Intervention Risk + Vol",
+      "text": "USD/JPY at 160.21 — the pair holds above the critical 160.00 level following a bear steepener shift in the US yield curve (2s10s +55.6bp). While the +289bp OIS carry (SOFR 3.62% vs TONA 0.73%) sustains the bid, VIX at 21.5 and a -1.10 25d RR put skew signal institutional hedging against BoJ intervention. JPY COT LF net short remains extreme at -105,136, leaving the pair vulnerable to a rapid unwind if the BoJ signals a hike on June 16.",
       "evidence": [
-        "AUD COT net long: +58,041",
-        "AUD CESI: -8 misses",
-        "AUD/USD OIS Carry: -74bp"
+        "USD/JPY: 160.21",
+        "USD/JPY 25d RR: -1.10",
+        "JPY COT LF net: -105,136"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:39",
+      "time": "20:55",
       "priority": "warning",
-      "title": "USD/JPY — Carry Advantage vs Speculative Squeeze Risk",
-      "text": "USD/JPY closed at 160.293, supported by a 288bp OIS carry advantage and a bear-steepening US yield curve (2s10s +55.6bp). JPY COT net short -86.2k creates significant squeeze risk if elevated VIX (21.5) triggers a broader risk-off deleveraging. The next BoJ meeting (mkt: 97% hike priced) on 16 Jun is the catalyst for any shift in the JPY's -0.69% real rate disadvantage.",
+      "title": "AUD/USD — Positioning + Vol + CESI",
+      "text": "AUD/USD at 0.7027 — IV at 22.2% vs HV30 at 9.1% creates a massive +13.1% Vol Risk Premium, indicating the options market is pricing in significant downside protection. This aligns with a -0.80 25d RR put skew and a negative AUD CESI (-8 misses), which contradicts the crowded COT LF net long of +56,800 (76.5% long). This positioning-data divergence suggests a high risk of a long-unwind toward 0.6950.",
       "evidence": [
-        "USD/JPY OIS Carry: +288bp",
-        "JPY COT net short: -86,249",
-        "VIX: 21.5 (+33.94%)"
+        "AUD/USD VRP: +13.1%",
+        "AUD COT LF long%: 76.5%",
+        "AUD CESI: -8"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "19:21",
+      "time": "20:48",
       "priority": "info",
-      "title": "EUR/USD — ECB Hike Bias vs USD Data Dominance",
-      "text": "EUR/USD downside toward 1.1527 is reinforced by a 168bp OIS carry disadvantage and strong USD economic surprises (CESI +29). While the ECB maintains a hike bias, the EUR's -0.26% real rate remains accommodative compared to the USD's +1.23% restrictive stance. The next ECB meeting (mkt: 100% hike priced) on 11 Jun determines if hawkish rhetoric can offset the 1.75-month high in the DXY.",
+      "title": "EUR/USD — Vol Premium + Real Rate Divergence",
+      "text": "EUR/USD at 1.1517 — IV at 7.1% vs HV30 at 4.4% (+2.7% VRP) reflects rising hedging demand ahead of the June 11 ECB meeting. Despite a +175bp nominal carry advantage for USD (Fed 3.75% vs ECB 2.0%), the real rate differential is narrower at 1.49% (USD +1.23% vs EUR -0.26%). DXY vs SPX correlation at -0.496 (z=+1.69σ) confirms USD is currently trading as a pure risk-off beneficiary amid the 2.64% S&P 500 drawdown.",
       "evidence": [
-        "EUR/USD OIS Carry: +168bp (USD favored)",
-        "USD CESI: +29 beats",
-        "EUR Real Rate: -0.26%"
+        "EUR/USD VRP: +2.7%",
+        "Fed 3.75% vs ECB 2.0% — +175bp",
+        "DXY vs SPX z-score: +1.69σ"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
