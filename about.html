@@ -667,38 +667,60 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   </div>
 
   <div class="section">
-    <h2>Author</h2>
-    <p>Built and maintained by <strong style="color:var(--text);">Santiago Plá Casuriaga</strong>. Independent developer focused on professional-grade financial data tooling for traders and researchers.</p>
-    <p>Contact: 
-  <a href="mailto:globalinvestingmarkets@gmail.com" style="color:var(--blue);">globalinvestingmarkets@gmail.com</a>
-</p>
-
-  </div>
-
-  <div class="section">
     <h2>MetaTrader 5 Toolkit</h2>
-    <p>All panels in this web terminal are also available natively inside MetaTrader 5. The MT5 products share the same data pipelines and are built and maintained by the same author. Each product is free or available for rent — no one-time perpetual purchase required.</p>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px;">
+    <p>All panels on this terminal are also available natively inside MetaTrader 5, sharing the same data pipelines. Each product is available for rent — no one-time perpetual purchase required.</p>
+
+    <!-- GI FX Terminal — hero card -->
+    <div class="card" style="cursor:pointer;margin-top:12px;border-color:var(--blue);border-width:1.5px;position:relative;" onclick="window.open('https://www.mql5.com/en/market/product/180326','_blank')">
+      <div style="position:absolute;top:-1px;left:16px;background:var(--blue);color:#fff;font-size:10px;font-weight:600;letter-spacing:.06em;padding:2px 10px;border-radius:0 0 4px 4px;">FEATURED</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-top:8px;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div class="card-title" style="margin:0;">GI FX Terminal</div>
+            <span style="font-size:10px;font-weight:600;color:var(--blue);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:3px;padding:1px 7px;letter-spacing:.04em;">FROM $30/MO</span>
+          </div>
+          <div class="card-body" style="margin:0;">The native MT5 companion to this web terminal. All 13 data panels on a single zero-flicker canvas overlay — no browser, no tab switching. Carry rates use your broker's live swap feed. Open Positions pulls your real account data. Includes a full alert system: CB bias shifts, rate probability changes, new COT data, swap rate changes, and high-impact calendar events sent as MT5 popups or mobile push notifications.</div>
+        </div>
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:12px;min-width:120px;">
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:2px;">Rent from</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text);line-height:1;">$30</div>
+            <div style="font-size:11px;color:var(--text3);">per month</div>
+          </div>
+          <div style="font-size:10px;color:var(--blue);letter-spacing:.04em;font-weight:600;white-space:nowrap;">VIEW ON MQL5 &rarr;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Free companion tools -->
+    <p style="margin-top:20px;margin-bottom:8px;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;">Free companion tools</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
       <div class="card" style="cursor:pointer;" onclick="window.open('https://www.mql5.com/en/market/product/180317','_blank')">
-        <div class="card-title" style="color:var(--up);">Free</div>
+        <div class="card-title" style="color:var(--up);font-size:10px;letter-spacing:.04em;">FREE</div>
         <div class="card-title" style="margin-top:2px;">CSI Currency Strength</div>
         <div class="card-body">Multi-timeframe currency strength index rendered as a panel overlay. Z-score model across 28 pairs, configurable lookbacks, eight currencies color-coded.</div>
         <div style="margin-top:14px;font-size:10px;color:var(--blue);letter-spacing:.04em;font-weight:600;">VIEW ON MQL5 &rarr;</div>
       </div>
       <div class="card" style="cursor:pointer;" onclick="window.open('https://www.mql5.com/en/market/product/180322','_blank')">
-        <div class="card-title" style="color:var(--up);">Free</div>
+        <div class="card-title" style="color:var(--up);font-size:10px;letter-spacing:.04em;">FREE</div>
         <div class="card-title" style="margin-top:2px;">Carry Trade Monitor</div>
         <div class="card-body">Scans all Market Watch symbols and ranks pairs by annualised carry yield. Long/short swap rates, net carry, directional bias. No configuration needed.</div>
         <div style="margin-top:14px;font-size:10px;color:var(--blue);letter-spacing:.04em;font-weight:600;">VIEW ON MQL5 &rarr;</div>
       </div>
       <div class="card" style="cursor:pointer;" onclick="window.open('https://www.mql5.com/en/market/product/180324','_blank')">
-        <div class="card-title" style="color:var(--orange);">From $30/mo</div>
+        <div class="card-title" style="color:var(--blue);font-size:10px;letter-spacing:.04em;">FROM $30/MO</div>
         <div class="card-title" style="margin-top:2px;">Institutional Risk Manager</div>
         <div class="card-body">Professional trade management EA. Dynamic lot sizing, scaled exits at 1R/1.5R/2R, ATR trailing stop, news filter, hedge module, and live portfolio exposure panel.</div>
         <div style="margin-top:14px;font-size:10px;color:var(--blue);letter-spacing:.04em;font-weight:600;">VIEW ON MQL5 &rarr;</div>
       </div>
     </div>
-    <p style="margin-top:16px;font-size:13px;color:var(--text3);">The GI FX Terminal EA — a full MT5 canvas dashboard mirroring every panel on this site — is also available on MQL5 Market. <a href="https://www.mql5.com/es/users/santiagopla/seller" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">View all products &rarr;</a></p>
+    <p style="margin-top:14px;font-size:12px;color:var(--text3);">View the full product catalogue &rarr; <a href="https://www.mql5.com/es/users/santiagopla/seller" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">mql5.com/en/users/santiagopla/seller</a></p>
+  </div>
+
+  <div class="section">
+    <h2>Author</h2>
+    <p>Built and maintained by <strong style="color:var(--text);">Santiago Plá Casuriaga</strong>. Independent developer focused on professional-grade financial data tooling for traders and researchers.</p>
+    <p>Contact: <a href="mailto:globalinvestingmarkets@gmail.com" style="color:var(--blue);">globalinvestingmarkets@gmail.com</a></p>
   </div>
 
   <div class="disclaimer">
