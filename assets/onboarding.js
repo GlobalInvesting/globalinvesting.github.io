@@ -264,9 +264,9 @@
     {
       target:  null,
       side:    'bottom',
-      title:   'Trade in MetaTrader 5? There's a native version.',
+      title:   'Trade in MetaTrader 5? There\'s a native version.',
       badge:   'MT5',
-      body:    'GI FX Terminal is also available as a native MT5 Expert Advisor — all 13 panels on a single canvas overlay inside your charts. No browser tab, no switching: CB rates, COT positioning, carry, composite score, correlation matrix, and the full alert system (push to mobile) running directly in your trading environment. Carry rates use your broker's live swap feed; Open Positions pulls your real account data. <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer" style="color:var(--blue);font-weight:600;">View on MQL5 &rarr;</a>',
+      body:    'GI FX Terminal is also available as a native MT5 Expert Advisor — all 13 panels on a single canvas overlay inside your charts. No browser tab, no switching: CB rates, COT positioning, carry, composite score, correlation matrix, and the full alert system (push to mobile) running directly in your trading environment. Carry rates use your broker\'s live swap feed; Open Positions pulls your real account data. <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer" style="color:var(--blue);font-weight:600;">View on MQL5 &rarr;</a>',
       action:  function () {
         try { if (typeof window._derivNavHide === 'function') window._derivNavHide(); } catch (e) {}
       },
