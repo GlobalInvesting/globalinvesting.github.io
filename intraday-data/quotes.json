@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-07T07:40:25Z",
+  "updated": "2026-06-07T07:45:23Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,13 +35,13 @@
       "pct1w_date": "2026-06-05"
     },
     "gold": {
-      "close": 4330.1768,
+      "close": 4330.0849,
       "prev_close": 4330.1515,
-      "chg": 0.0253,
-      "pct": 0.0006,
+      "chg": -0.0666,
+      "pct": -0.0015,
       "source": "twelve_data",
-      "high": 4508.7,
-      "low": 4336.6,
+      "high": null,
+      "low": null,
       "open": 4503.0,
       "market_state": "REGULAR",
       "market_time": 1780693199
@@ -51,8 +51,8 @@
       "prev_close": 93.04,
       "chg": -2.5,
       "pct": -2.687,
-      "high": 93.63,
-      "low": 89.68,
+      "high": null,
+      "low": null,
       "open": 92.82,
       "bid": 90.2,
       "ask": 90.4,
@@ -199,35 +199,35 @@
       "pct1w_date": "2026-06-05"
     },
     "btc": {
-      "close": 62201.98,
+      "close": 62186.9,
       "prev_close": 60864.24,
-      "chg": 1337.74,
-      "pct": 2.1979,
-      "high": 62208.348,
+      "chg": 1322.66,
+      "pct": 2.1731,
+      "high": 62225.207,
       "low": 60759.047,
       "open": 60864.24,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780818025,
+      "market_time": 1780818325,
       "source": "yfinance",
-      "pct1w": 2.0999,
+      "pct1w": 2.0751,
       "pct1w_date": "2026-06-05"
     },
     "eth": {
-      "close": 1611.55,
+      "close": 1611.48,
       "prev_close": 1568.8722,
-      "chg": 42.6778,
-      "pct": 2.7203,
+      "chg": 42.6078,
+      "pct": 2.7158,
       "high": 1618.6057,
       "low": 1564.9485,
       "open": 1568.8722,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1780818023,
+      "market_time": 1780818324,
       "source": "yfinance",
-      "pct1w": 1.9413,
+      "pct1w": 1.9369,
       "pct1w_date": "2026-06-05"
     },
     "nasdaq": {
@@ -875,8 +875,8 @@
       "prev_close": 95.03,
       "chg": -1.94,
       "pct": -2.0415,
-      "high": null,
-      "low": null,
+      "high": 95.9,
+      "low": 92.68,
       "open": 95.07,
       "bid": 92.69,
       "ask": 93.5,
@@ -1428,14 +1428,14 @@
     {
       "a": "AUD/USD",
       "b": "Gold",
-      "corr30": 0.698,
+      "corr30": 0.686,
       "n30": 30,
-      "corr": 0.115,
+      "corr": 0.114,
       "n": 60,
-      "corr90": -0.103,
+      "corr90": -0.104,
       "n90": 90,
       "norm": 0.309,
-      "z_score": 0.82,
+      "z_score": 0.79,
       "std": 0.4753,
       "history": [
         0.017,
@@ -1659,7 +1659,7 @@
         0.347,
         0.417,
         0.541,
-        0.698
+        0.686
       ],
       "hist_dates": [
         "2025-07-30",
@@ -5120,14 +5120,14 @@
     {
       "a": "GBP/USD",
       "b": "Gold",
-      "corr30": 0.465,
+      "corr30": 0.457,
       "n30": 30,
-      "corr": 0.066,
+      "corr": 0.064,
       "n": 60,
-      "corr90": 0.153,
+      "corr90": 0.152,
       "n90": 90,
       "norm": 0.19,
-      "z_score": 0.64,
+      "z_score": 0.62,
       "std": 0.4287,
       "history": [
         0.286,
@@ -5351,7 +5351,7 @@
         0.283,
         0.318,
         0.373,
-        0.465
+        0.457
       ],
       "hist_dates": [
         "2025-07-30",
@@ -6040,14 +6040,14 @@
     {
       "a": "Gold",
       "b": "DXY",
-      "corr30": -0.867,
+      "corr30": -0.863,
       "n30": 30,
-      "corr": -0.142,
+      "corr": -0.139,
       "n": 60,
-      "corr90": -0.487,
+      "corr90": -0.486,
       "n90": 90,
       "norm": -0.326,
-      "z_score": -1.26,
+      "z_score": -1.25,
       "std": 0.4297,
       "history": [
         0.213,
@@ -6270,7 +6270,7 @@
         -0.758,
         -0.778,
         -0.806,
-        -0.867
+        -0.863
       ],
       "hist_dates": [
         "2025-07-22",
