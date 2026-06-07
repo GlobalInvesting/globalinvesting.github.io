@@ -1,11 +1,11 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.6 — production build
+ * v7.89.7 — production build
  *
  * Changes vs v7.81.5 (prior production):
- *   - 14-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
+ *   - 15-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
  *     Cross-Asset, COT Positioning (opens modal), Rates, Sessions, Heatmap, Derivatives,
- *     Signal Alerts
+ *     MT5 companion (new), Signal Alerts
  *   - ESI step opens openEconSurprisesModal('USD') — same pattern as COT step
  *   - dismiss() now also closes ESI modal via closeESModal()
  *   - Removed Install/RSS step (replaced by higher-value panels)
@@ -260,19 +260,26 @@
       },
     },
 
-    /* 13 — Signal alerts (last CTA) */
+    /* 13 — MT5 companion */
+    {
+      target:  null,
+      side:    'bottom',
+      title:   'Trade in MetaTrader 5? There's a native version.',
+      badge:   'MT5',
+      body:    'GI FX Terminal is also available as a native MT5 Expert Advisor — all 13 panels on a single canvas overlay inside your charts. No browser tab, no switching: CB rates, COT positioning, carry, composite score, correlation matrix, and the full alert system (push to mobile) running directly in your trading environment. Carry rates use your broker's live swap feed; Open Positions pulls your real account data. <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer" style="color:var(--blue);font-weight:600;">View on MQL5 &rarr;</a>',
+      action:  function () {
+        try { if (typeof window._derivNavHide === 'function') window._derivNavHide(); } catch (e) {}
+      },
+    },
+
+    /* 14 — Signal alerts (last CTA) */
     {
       target:  'sig-notif-btn',
       side:    'top',
       title:   'Stay ahead — enable signal alerts',
       badge:   'Alerts',
       body:    'The terminal publishes AI-generated signals when the regime shifts or a high-conviction setup appears. Enable browser notifications to catch the signal at session open, even when this tab is in the background — no account or email required.',
-      action:  function () {
-        // Hide Derivatives section before showing the alerts CTA.
-        // Step 11 called _derivNavShow() which hides sibling panels in split-lower-right.
-        // Without this, those siblings stay hidden and the section looks broken.
-        try { if (typeof window._derivNavHide === 'function') window._derivNavHide(); } catch (e) {}
-      },
+      action:  null,
       lastCta: true,
     },
   ];
