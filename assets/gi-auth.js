@@ -99,7 +99,7 @@
 #gi-auth-box input::placeholder { color: var(--border2, #404040); }
 #gi-auth-activate {
   width: 100%;
-  background: #4f7fff;
+  background: #f6941c;
   border: none;
   color: #fff;
   font-family: inherit;
@@ -111,7 +111,7 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-#gi-auth-activate:hover { background: #3a6de0; }
+#gi-auth-activate:hover { background: #ffa53a; }
 #gi-auth-activate:disabled { background: #444; cursor: default; }
 #gi-auth-err {
   font-size: 11px;
