@@ -1449,6 +1449,26 @@ function updateFxPairsTableRT() {
     const _hasFh = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
     _chartSub.textContent = _hasFh ? 'Finnhub \u00b7 live' : `yfinance \u00b7 ~5min delay`;
   }
+
+  // ── Pair detail live refresh ────────────────────────────────────────────────
+  // If the pair detail popover is open, re-render it with the latest cache values.
+  // Throttled to once per 3 s — Finnhub can fire 5–10 ticks/s and updatePairDetail()
+  // does a full innerHTML re-render (including async IV fetch). Without throttling,
+  // rapid ticks would saturate the browser with async work and cause visible flicker.
+  _throttledPairDetailRefresh();
+}
+
+// Throttle state — module-level so it persists across calls
+let _pairDetailRefreshTimer = null;
+function _throttledPairDetailRefresh() {
+  if (_pairDetailRefreshTimer) return;  // already scheduled
+  _pairDetailRefreshTimer = setTimeout(() => {
+    _pairDetailRefreshTimer = null;
+    const pop = document.getElementById('pd-popover');
+    if (!pop || pop.style.display === 'none') return;
+    const sym = pop.dataset.sym;
+    if (sym && typeof updatePairDetail === 'function') updatePairDetail(sym);
+  }, 3000);
 }
 
 // COMMODITY QUOTES — Gold (XAU) + WTI via free APIs
