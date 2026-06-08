@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-07T23:54:29Z",
-  "generatedAt": "2026-06-07T23:54:29Z",
+  "lastUpdate": "2026-06-08T00:00:41Z",
+  "generatedAt": "2026-06-08T00:00:41Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,29 +8,24 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-06-08",
-  "rangeTo": "2026-06-19",
-  "totalEvents": 1671,
+  "rangeTo": "2026-06-22",
+  "totalEvents": 1677,
   "currencyCounts": {
     "JPY": 186,
-    "AUD": 175,
+    "AUD": 177,
     "CHF": 90,
     "GBP": 196,
     "NZD": 80,
     "USD": 628,
-    "CAD": 132,
-    "EUR": 184
+    "CAD": 135,
+    "EUR": 185
   },
   "impactCounts": {
-    "medium": 1144,
-    "high": 390,
+    "medium": 1149,
+    "high": 391,
     "low": 137
   },
   "surpriseStats": {
-    "JPY/household spending": {
-      "n": 2,
-      "mean": -3.35,
-      "std": 0.070711
-    },
     "USD/core cpi": {
       "n": 5,
       "mean": 0.0,
@@ -22206,6 +22201,84 @@
       "actual": null,
       "forecast": null,
       "previous": "0.6"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.1*",
+      "previous": "2.1"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.7*",
+      "previous": "0.4"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.1*",
+      "previous": "2.8"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "14:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Confidence Flash",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-20.8*",
+      "previous": "-19"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "23:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "S&P Global Manufacturing PMI Flash",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "50.7"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "23:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "S&P Global Services PMI Flash",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "48.7"
     }
   ]
 }
