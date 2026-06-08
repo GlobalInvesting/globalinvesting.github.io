@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-08T22:58:59Z",
-  "generatedAt": "2026-06-08T22:58:59Z",
+  "lastUpdate": "2026-06-08T23:01:34Z",
+  "generatedAt": "2026-06-08T23:01:34Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -395,6 +395,11 @@
       "n": 2,
       "mean": 70.0,
       "std": 24.041631
+    },
+    "GBP/brc retail sales monitor yoy": {
+      "n": 2,
+      "mean": -0.7,
+      "std": 4.949747
     },
     "JPY/household spending mom": {
       "n": 2,
@@ -20781,7 +20786,7 @@
       "flag": "🇬🇧",
       "event": "BRC Retail Sales Monitor YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.4",
       "forecast": "0.6",
       "previous": "-3.4"
     },
