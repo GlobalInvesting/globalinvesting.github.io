@@ -200,7 +200,7 @@
            maxlength="20" autocomplete="off" />
 
     <label for="gi-inp-server">Broker Server Name</label>
-    <input id="gi-inp-server" type="text" placeholder="e.g. ICMarkets-Live01"
+    <input id="gi-inp-server" type="text" placeholder="e.g. Broker-Live01"
            maxlength="80" autocomplete="off" />
 
     <button id="gi-auth-activate">Activate</button>
