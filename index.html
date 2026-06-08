@@ -19,7 +19,7 @@ gtag('consent', 'default', {
 <script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Investing FX Terminal — COT Positioning, Economic Surprises &amp; AI Narrative</title>
+<title>Global Investing FX Terminal — COT Positioning, Economic Surprise Index &amp; AI Narrative</title>
 
 <!-- ═══════════════════════════════════════
      SEO — Core
@@ -51,7 +51,7 @@ gtag('consent', 'default', {
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://globalinvesting.github.io/">
 <meta property="og:site_name" content="Global Investing FX Terminal">
-<meta property="og:title" content="Global Investing FX Terminal — COT Positioning, Economic Surprises &amp; AI Narrative">
+<meta property="og:title" content="Global Investing FX Terminal — COT Positioning, Economic Surprise Index &amp; AI Narrative">
 <meta property="og:description" content="Professional FX terminal for major currency pairs. Economic Surprise Index with z-score scoring, CFTC COT institutional positioning, OIS-implied central bank rate expectations, AI market narrative updated 4x daily, cross-asset risk regime, carry rankings and yield curve.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -64,7 +64,7 @@ gtag('consent', 'default', {
      ═══════════════════════════════════════ -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://globalinvesting.github.io/">
-<meta name="twitter:title" content="Global Investing FX Terminal — COT Positioning, Economic Surprises &amp; AI Narrative">
+<meta name="twitter:title" content="Global Investing FX Terminal — COT Positioning, Economic Surprise Index &amp; AI Narrative">
 <meta name="twitter:description" content="Professional FX terminal: Economic Surprise Index (z-score), CFTC COT positioning, OIS-implied CB rate expectations, AI narrative 4x daily, cross-asset risk regime, carry rankings and yield curve.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <meta name="twitter:image:alt" content="Global Investing FX Terminal">
@@ -1130,7 +1130,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- COT POSITIONING — from cot-data/*.json -->
     <div class="panel" id="section-positioning">
-      <div class="panel-head"><span class="panel-title">CFTC Positioning (COT)</span><span class="panel-sub" id="cot-date-sub">Speculative net contracts · weekly · source: CFTC.gov</span><div class="export-btns" aria-label="Export COT data"><button class="export-btn" id="export-cot-csv" title="Export COT data as CSV">CSV</button><button class="export-btn" id="export-cot-json" title="Export COT data as JSON">JSON</button></div></div>
+      <div class="panel-head"><span class="panel-title">CFTC Positioning — Leveraged Funds</span><span class="panel-sub" id="cot-date-sub">Disaggregated TFF · net contracts · weekly · source: CFTC.gov</span><div class="export-btns" aria-label="Export COT data"><button class="export-btn" id="export-cot-csv" title="Export COT data as CSV">CSV</button><button class="export-btn" id="export-cot-json" title="Export COT data as JSON">JSON</button></div></div>
       <div style="padding:6px 10px;">
         <div class="cot-scroll-wrap">
         <div class="cot-header" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);margin-bottom:4px;">
@@ -1502,14 +1502,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </table>
 
     <div class="sb-head" style="margin-top:2px;display:flex;align-items:center;justify-content:space-between;">
-      <span>Key Correlations</span>
+      <span>Cross-Asset Correlations</span>
       <span id="corr-window-btns" style="display:flex;gap:2px;" role="group" aria-label="Correlation window">
         <button id="corr-btn-30" onclick="setCorrWindow(30)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;line-height:1.4;">30d</button>
         <button id="corr-btn-60" onclick="setCorrWindow(60)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:#fff;border-radius:2px;cursor:pointer;line-height:1.4;">60d</button>
         <button id="corr-btn-90" onclick="setCorrWindow(90)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;line-height:1.4;">90d</button>
       </span>
     </div>
-    <table aria-label="Key FX correlations">
+    <table aria-label="Cross-asset correlations">
       <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col" id="corr-th-window">60d</th><th scope="col" title="Z-score vs 252d norm · 30d Pearson vs rolling 30d-window baseline (apples-to-apples) · |z|>1.5 = stretched · |z|>2.5 = break">vs norm</th></tr></thead>
       <tbody id="correlations-tbody">
         <!-- 12 skeleton rows — exact real pairs from quotes.json to prevent CLS -->
@@ -1550,7 +1550,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- ECONOMIC SURPRISES — Finnhub calendar, beat/miss vs consensus, 8 major currencies -->
     <div id="section-econ-surprise" style="border-top:1px solid var(--border);padding:6px 0 0;">
-      <div class="sb-head" style="margin-bottom:1px;" title="Click any row to open the full surprise index chart">Economic Surprises</div>
+      <div class="sb-head" style="margin-bottom:1px;" title="Click any row to open the full surprise index chart">Economic Surprise Index</div>
       <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · 8 major currencies · 90d rolling</div>
       <table id="econ-surprise-table" aria-label="Economic surprise index by major currency" style="width:100%;border-collapse:collapse;">
         <thead>
