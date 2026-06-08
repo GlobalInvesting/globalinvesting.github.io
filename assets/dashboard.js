@@ -1450,18 +1450,17 @@ function updateFxPairsTableRT() {
     _chartSub.textContent = _hasFh ? 'Finnhub \u00b7 live' : `yfinance \u00b7 ~5min delay`;
   }
 
-  // ── Pair detail live refresh ────────────────────────────────────────────────
-  // If the pair detail popover is open, re-render it with the latest cache values.
-  // Throttled to once per 3 s — Finnhub can fire 5–10 ticks/s and updatePairDetail()
-  // does a full innerHTML re-render (including async IV fetch). Without throttling,
-  // rapid ticks would saturate the browser with async work and cause visible flicker.
+  // ── Pair detail live refresh ───────────────────────────────────────────────
+  // Re-render the pair detail popover (if open) with the latest cache values.
+  // Throttled to once per 3 s — Finnhub fires 5–10 ticks/s and updatePairDetail()
+  // does a full innerHTML rebuild including an async IV fetch.
   _throttledPairDetailRefresh();
 }
 
-// Throttle state — module-level so it persists across calls
+// Throttle state for pair detail live updates
 let _pairDetailRefreshTimer = null;
 function _throttledPairDetailRefresh() {
-  if (_pairDetailRefreshTimer) return;  // already scheduled
+  if (_pairDetailRefreshTimer) return;
   _pairDetailRefreshTimer = setTimeout(() => {
     _pairDetailRefreshTimer = null;
     const pop = document.getElementById('pd-popover');
@@ -5807,8 +5806,8 @@ async function buildInlineDetail(tvSym, container) {
   const pct1d = rt?.pct   ?? null;
   const pct1w = rt?.pct1w ?? null;
   const hv30  = rt?.hv30  ?? null;
-  const sessH = rt?.high  ?? null;
-  const sessL = rt?.low   ?? null;
+  const sessH = rt?.session_high ?? rt?.high ?? null;
+  const sessL = rt?.session_low  ?? rt?.low  ?? null;
 
   const pipVal     = dec === 3 ? 0.01 : 0.0001;
   const spreadPips = pairId ? (TYPICAL_SPREADS[pairId] || null) : null;
@@ -6316,8 +6315,10 @@ async function updatePairDetail(tvSym) {
   const price = rt?.close ?? null;
   const pct1d = rt?.pct   ?? null;
   const hv30  = rt?.hv30  ?? null;
-  const sessH = rt?.high  ?? null;
-  const sessL = rt?.low   ?? null;
+  // Use session_high/session_low (21:00 UTC FX session boundary) — same source as the FX pairs
+  // table and updateFxPairsTableRT(). Falls back to high/low if session values are null.
+  const sessH = rt?.session_high ?? rt?.high ?? null;
+  const sessL = rt?.session_low  ?? rt?.low  ?? null;
 
   // 1W from quotes.json pct1w field (prior-Friday-close convention, same source as FX table)
   let pct1w = null;
