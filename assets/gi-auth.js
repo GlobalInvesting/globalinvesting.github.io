@@ -53,7 +53,7 @@
 #gi-auth-box {
   background: var(--bg2, #141414);
   border: 1px solid var(--border, #323232);
-  border-top: 2px solid #D95000;
+  border-top: 2px solid #4f7fff;
   padding: 32px 36px 28px;
   width: 460px;
   max-width: 92vw;
@@ -72,7 +72,7 @@
   margin: 0 0 24px;
   line-height: 1.6;
 }
-.gi-auth-sub a { color: #D95000; text-decoration: none; }
+.gi-auth-sub a { color: #4f7fff; text-decoration: none; }
 .gi-auth-sub a:hover { text-decoration: underline; }
 #gi-auth-box label {
   display: block;
@@ -95,11 +95,11 @@
   outline: none;
   transition: border-color 0.15s;
 }
-#gi-auth-box input:focus { border-color: #D95000; }
+#gi-auth-box input:focus { border-color: #4f7fff; }
 #gi-auth-box input::placeholder { color: var(--border2, #404040); }
 #gi-auth-activate {
   width: 100%;
-  background: #D95000;
+  background: #4f7fff;
   border: none;
   color: #fff;
   font-family: inherit;
@@ -111,7 +111,7 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-#gi-auth-activate:hover { background: #F06010; }
+#gi-auth-activate:hover { background: #3a6de0; }
 #gi-auth-activate:disabled { background: #444; cursor: default; }
 #gi-auth-err {
   font-size: 11px;
@@ -152,7 +152,7 @@
   z-index: 100;
   gap: 10px;
 }
-.gi-gate-icon { font-size: 22px; color: #D95000; opacity: 0.65; }
+.gi-gate-icon { font-size: 22px; color: #4f7fff; opacity: 0.65; }
 .gi-gate-msg {
   font-family: var(--font-ui, 'Consolas', monospace);
   font-size: 11px;
@@ -167,15 +167,15 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #D95000;
+  color: #4f7fff;
   background: transparent;
-  border: 1px solid #D95000;
+  border: 1px solid #4f7fff;
   padding: 7px 18px;
   cursor: pointer;
   margin-top: 4px;
   transition: background 0.15s, color 0.15s;
 }
-.gi-gate-btn:hover { background: #D95000; color: #fff; }
+.gi-gate-btn:hover { background: #4f7fff; color: #fff; }
 `;
 
   // ── Modal HTML ─────────────────────────────────────────────────────────────
