@@ -81,7 +81,7 @@ a { color: inherit; text-decoration: none; }
 .page-hero-label { font-size: 9.9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .page-hero-label::before { content: ''; display: inline-block; width: 16px; height: 1px; background: var(--blue); }
 .page-hero h1 { font-size: 42px; font-weight: 800; color: #ffffff; line-height: 1.1; margin-bottom: 16px; letter-spacing: -.3px; }
-.page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; max-width: 620px; }
+.page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; }
 
 /* ── Section headings ── */
 .section { margin-bottom: 44px; }
@@ -97,7 +97,8 @@ a { color: inherit; text-decoration: none; }
 .card-body { font-size: 13.2px; color: var(--text2); line-height: 1.75; }
 
 /* ── Platform breakdown table ── */
-.platform-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 14px; border-radius: 6px; }
+.platform-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; min-width: 560px; }
 .platform-table th { font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 10px 14px; border-bottom: 1px solid var(--border2); text-align: left; background: var(--head-bg); }
 .platform-table td { font-size: 13.2px; color: var(--text2); padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; transition: background .12s; }
 .platform-table tbody tr:hover td { background: var(--bg2); }
@@ -150,6 +151,27 @@ a { color: inherit; text-decoration: none; }
 .disclaimer {  background: var(--bg2);  border: 1px solid var(--border);  border-radius: 4px;  padding: 20px 24px;  margin-top: 44px; } .disclaimer-label {  font-size: 9.9px; font-weight: 700;  color: var(--text3); letter-spacing: .14em;  text-transform: uppercase; margin-bottom: 12px;  display: flex; align-items: center; gap: 8px; } .disclaimer-label::before {  content: '';  display: inline-block; width: 12px; height: 1px;  background: var(--text3); } .disclaimer-body {  font-size: 12.1px; color: var(--text3);  line-height: 1.75; } .disclaimer-body p { margin-bottom: 8px; color: var(--text3); font-size: 12.1px; } .disclaimer-body p:last-child { margin-bottom: 0; }
 
 /* ── Responsive ── */
+/* ── Screenshots ── */
+.screenshot-section { margin-bottom: 44px; }
+.screenshot-figure { margin: 0 0 24px; }
+.screenshot-figure img {
+  width: 100%; height: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: block;
+}
+.screenshot-caption {
+  margin-top: 10px;
+  font-size: 12.1px; color: var(--text3);
+  line-height: 1.6;
+}
+.screenshot-caption strong { color: var(--text2); font-weight: 600; }
+.screenshot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
 @media (max-width: 900px) {
   #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
   #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
@@ -157,6 +179,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 680px) {
   .page-hero h1 { font-size: 28px; }
+  .screenshot-grid { grid-template-columns: 1fr; }
   .hero-product-inner { flex-direction: column; gap: 14px; }
   .hero-product-price { text-align: left; }
   .companion-grid { grid-template-columns: 1fr; }
@@ -237,7 +260,8 @@ a { color: inherit; text-decoration: none; }
   <!-- Platform breakdown -->
   <div class="section">
     <h2>What is included</h2>
-    <table class="platform-table" aria-label="Coverage by interface">
+    <div class="table-scroll">
+      <table class="platform-table" aria-label="Coverage by interface">
       <thead>
         <tr>
           <th scope="col">Panel / Feature</th>
@@ -269,6 +293,7 @@ a { color: inherit; text-decoration: none; }
         <tr><td>FX liquidity canvas</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span></td></tr>
       </tbody>
     </table>
+    </div>
     <p style="font-size:12.1px;color:var(--text3);">Both interfaces share the same underlying data pipelines for CB bias, COT, sentiment, and news.</p>
   </div>
 
@@ -353,6 +378,44 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
     <p style="margin-top:14px;font-size:12px;color:var(--text3);">Full product catalogue &rarr; <a href="https://www.mql5.com/es/users/santiagopla/seller" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">mql5.com/en/users/santiagopla/seller</a></p>
+  </div>
+
+  <!-- Screenshots -->
+  <div class="section screenshot-section">
+    <h2>Interface</h2>
+
+    <!-- Hero — web terminal full view -->
+    <figure class="screenshot-figure">
+      <img src="assets/screenshot-terminal.png"
+           alt="Global Investing FX Terminal — full dashboard view showing quote bar, price chart, CB rates, COT positioning, and AI narrative panels"
+           width="1280" height="720"
+           loading="lazy">
+      <figcaption class="screenshot-caption">
+        <strong>Web terminal.</strong> Single-page dashboard — live quote bar (28 pairs), price chart, CB rates &amp; bias, OIS rate expectations, COT positioning, carry monitor, derivatives suite, and AI narrative. Runs in any browser with no installation.
+      </figcaption>
+    </figure>
+
+    <!-- Side-by-side: MT5 EA + derivatives -->
+    <div class="screenshot-grid">
+      <figure class="screenshot-figure">
+        <img src="assets/screenshot-mt5-ea.png"
+             alt="GI FX Terminal MT5 EA — zero-flicker canvas overlay on a MetaTrader 5 chart"
+             width="640" height="480"
+             loading="lazy">
+        <figcaption class="screenshot-caption">
+          <strong>MT5 Expert Advisor.</strong> Zero-flicker canvas overlay inside MetaTrader 5. Includes live swaps, open positions, and MT5 push alerts — exclusive to the native layer.
+        </figcaption>
+      </figure>
+      <figure class="screenshot-figure">
+        <img src="assets/screenshot-derivatives.png"
+             alt="Derivatives section — 25-delta risk reversal term structure, implied forwards, and realized volatility"
+             width="640" height="480"
+             loading="lazy">
+        <figcaption class="screenshot-caption">
+          <strong>Derivatives suite.</strong> 25-delta risk reversal term structure (1W–1Y), CIP-derived implied forwards, realized vol vs RR skew, ECB official fixings, and DTCC OTC notional volume — web terminal only.
+        </figcaption>
+      </figure>
+    </div>
   </div>
 
   <div class="disclaimer" role="note" aria-label="Legal disclaimer">
