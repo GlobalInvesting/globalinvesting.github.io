@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Access — Global Investing FX Terminal</title>
+<meta name="description" content="Access the Global Investing FX Terminal and MT5 Expert Advisor. Professional-grade FX intelligence — live prices, CB bias, COT positioning, yield curve, derivatives, and AI narrative.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://globalinvesting.github.io/access.html">
+<meta name="google-adsense-account" content="ca-pub-7977942731354565">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://globalinvesting.github.io/access.html">
+<meta property="og:site_name" content="Global Investing FX Terminal">
+<meta property="og:title" content="Access — Global Investing FX Terminal">
+<meta property="og:description" content="Professional-grade FX intelligence for MetaTrader 5 and the web. Live prices, CB bias, COT, yield curve, derivatives, and AI narrative — included in a single EA rental.">
+<meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Access — Global Investing FX Terminal">
+<meta name="twitter:description" content="Professional-grade FX intelligence for MetaTrader 5 and the web.">
+<meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0b0e14; --bg2: #151921; --bg3: #2a2e39;
+  --border: #2a2e39; --border2: #363c4e;
+  --text: #c5cdd9; --text2: #8b98ad; --text3: #7a869a;
+  --up: #26a69a; --down: #ef5350; --blue: #4f7fff; --orange: #f6941c;
+  --head-bg: #10131a; --accent: #4f7fff;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 16px; line-height: 1.6; min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.skip-link:focus { position: fixed; left: 8px; top: 8px; width: auto; height: auto; padding: 6px 12px; background: var(--blue); color: #fff; font-size: 12px; font-weight: 600; border-radius: 4px; z-index: 9999; outline: 2px solid #fff; }
+#gdpr-banner { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 14px 18px; font-size: 12px; color: var(--text2); z-index: 9000; max-width: 520px; width: calc(100% - 32px); box-shadow: 0 8px 32px rgba(0,0,0,.4); display: flex; flex-direction: column; gap: 10px; }
+#gdpr-banner[hidden] { display: none !important; }
+.gdpr-btns { display: flex; gap: 8px; }
+#gdpr-accept { background: var(--blue); color: #fff; border: none; border-radius: 4px; padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); }
+#gdpr-reject { background: none; color: var(--text2); border: 1px solid var(--border2); border-radius: 4px; padding: 6px 14px; font-size: 11px; cursor: pointer; font-family: var(--font-ui); }
+
+#topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
+#topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; } #topbar .logo > span { display: flex; flex-direction: column; line-height: 1; }
+.logo-text { font-family: var(--font-ui); font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; }
+.logo-sub { font-family: var(--font-ui); font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
+.back-to-terminal { font-size: 11px; color: var(--text3); text-decoration: none; white-space: nowrap; transition: color .15s; }
+.back-to-terminal:hover { color: var(--text); }
+.site-menu { position: relative; display: flex; align-items: center; }
+.site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
+.site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 210px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
+.site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
+.site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
+.site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-panel a.current { color: #fff; }
+.site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; display: block; }
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; font-family: var(--font-ui); }
+.sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
+.sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
+
+/* ── Page layout ── */
+.page-wrap { max-width: 900px; margin: 0 auto; padding: 60px 24px 80px; animation: fadeUp .35s ease both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Hero ── */
+.page-hero { padding-bottom: 32px; margin-bottom: 40px; border-bottom: 1px solid var(--border); position: relative; }
+.page-hero::before { content: ''; position: absolute; left: 0; bottom: -1px; width: 48px; height: 1px; background: var(--blue); }
+.page-hero-label { font-size: 9.9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.page-hero-label::before { content: ''; display: inline-block; width: 16px; height: 1px; background: var(--blue); }
+.page-hero h1 { font-size: 42px; font-weight: 800; color: #ffffff; line-height: 1.1; margin-bottom: 16px; letter-spacing: -.3px; }
+.page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; max-width: 620px; }
+
+/* ── Section headings ── */
+.section { margin-bottom: 44px; }
+.section h2 { font-size: 11px; font-weight: 700; color: #ffffff; letter-spacing: .14em; text-transform: uppercase; padding-bottom: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.section h2::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--border2), transparent); }
+.section p { color: var(--text2); margin-bottom: 14px; font-size: 15.4px; line-height: 1.8; }
+.section p:last-child { margin-bottom: 0; }
+
+/* ── Cards ── */
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; margin-bottom: 10px; transition: border-color .15s; }
+.card:hover { border-color: var(--border2); }
+.card-title { font-size: 13.2px; font-weight: 700; color: var(--text); margin-bottom: 8px; letter-spacing: .01em; }
+.card-body { font-size: 13.2px; color: var(--text2); line-height: 1.75; }
+
+/* ── Platform breakdown table ── */
+.platform-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+.platform-table th { font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 10px 14px; border-bottom: 1px solid var(--border2); text-align: left; background: var(--head-bg); }
+.platform-table td { font-size: 13.2px; color: var(--text2); padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; transition: background .12s; }
+.platform-table tbody tr:hover td { background: var(--bg2); }
+.platform-table tr:last-child td { border-bottom: none; }
+.platform-table td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
+.check { color: var(--up); font-size: 12px; font-weight: 700; }
+.dash { color: var(--text3); }
+
+/* ── Steps ── */
+.steps { display: flex; flex-direction: column; gap: 0; }
+.step { display: flex; gap: 18px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+.step:last-child { border-bottom: none; }
+.step-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: rgba(79,127,255,.12); border: 1px solid rgba(79,127,255,.3); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--blue); font-family: var(--font-mono); margin-top: 1px; }
+.step-body { flex: 1; }
+.step-title { font-size: 14.3px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+.step-desc { font-size: 13.2px; color: var(--text2); line-height: 1.7; }
+.step-desc a { color: var(--blue); }
+.step-desc code { font-family: var(--font-mono); font-size: 11.5px; background: var(--bg3); padding: 1px 5px; border-radius: 3px; color: var(--text); }
+
+/* ── CTA button ── */
+.cta-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--blue); color: #fff; border: none; border-radius: 4px; padding: 10px 20px; font-size: 12.1px; font-weight: 700; letter-spacing: .04em; cursor: pointer; text-decoration: none; transition: opacity .15s; font-family: var(--font-ui); }
+.cta-btn:hover { opacity: .88; color: #fff; text-decoration: none; }
+.cta-secondary { display: inline-flex; align-items: center; gap: 8px; background: none; color: var(--text2); border: 1px solid var(--border2); border-radius: 4px; padding: 10px 20px; font-size: 12.1px; font-weight: 600; letter-spacing: .04em; cursor: pointer; text-decoration: none; transition: border-color .15s, color .15s; font-family: var(--font-ui); }
+.cta-secondary:hover { border-color: var(--border); color: var(--text); text-decoration: none; }
+
+/* ── Hero CTA card (featured product) ── */
+.hero-product { background: var(--bg2); border: 1.5px solid var(--blue); border-radius: 6px; padding: 24px 24px 20px; margin-bottom: 12px; cursor: pointer; position: relative; transition: border-color .15s; }
+.hero-product:hover { border-color: #7fa4ff; }
+.hero-product-badge { position: absolute; top: -1px; left: 16px; background: var(--blue); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 2px 10px; border-radius: 0 0 4px 4px; text-transform: uppercase; }
+.hero-product-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-top: 8px; }
+.hero-product-title { font-size: 16.5px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.hero-product-sub { font-size: 10px; font-weight: 600; color: var(--blue); background: rgba(79,127,255,.1); border: 1px solid rgba(79,127,255,.25); border-radius: 3px; padding: 1px 7px; letter-spacing: .04em; display: inline-block; margin-bottom: 10px; }
+.hero-product-body { font-size: 13.2px; color: var(--text2); line-height: 1.75; }
+.hero-product-price { flex-shrink: 0; text-align: right; min-width: 110px; }
+.hero-product-price-from { font-size: 11px; color: var(--text3); margin-bottom: 2px; }
+.hero-product-price-val { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
+.hero-product-price-mo { font-size: 11px; color: var(--text3); margin-bottom: 12px; }
+.hero-product-link { font-size: 10px; color: var(--blue); letter-spacing: .04em; font-weight: 600; white-space: nowrap; }
+
+/* ── Companion grid ── */
+.companion-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.companion-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; cursor: pointer; transition: border-color .15s; }
+.companion-card:hover { border-color: var(--border2); }
+.companion-tag { font-size: 10px; font-weight: 700; letter-spacing: .04em; margin-bottom: 5px; }
+.companion-name { font-size: 13.2px; font-weight: 700; color: var(--text); margin-bottom: 7px; }
+.companion-desc { font-size: 12.1px; color: var(--text2); line-height: 1.65; }
+.companion-link { margin-top: 12px; font-size: 10px; color: var(--blue); letter-spacing: .04em; font-weight: 600; }
+
+/* ── Disclaimer ── */
+.disclaimer { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--orange); border-radius: 4px; padding: 16px 20px; font-size: 13.2px; color: var(--text2); line-height: 1.7; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
+  #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
+  .topbar-right { margin-left: auto; font-size: 10px; padding: 4px 0; order: 2; flex-shrink: 0; gap: 8px !important; }
+}
+@media (max-width: 680px) {
+  .page-hero h1 { font-size: 28px; }
+  .hero-product-inner { flex-direction: column; gap: 14px; }
+  .hero-product-price { text-align: left; }
+  .companion-grid { grid-template-columns: 1fr; }
+  .page-wrap { padding: 32px 18px 60px; }
+}
+@media (max-width: 600px) {
+  #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  .footer-copy { display: none; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+<div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" aria-describedby="gdpr-desc" hidden>
+  <span id="gdpr-desc"><strong id="gdpr-title">Cookies &amp; Privacy</strong><br>
+    We use first- and third-party cookies (Google AdSense) to display relevant advertising.
+    See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms of Use</a>.</span>
+  <div class="gdpr-btns">
+    <button id="gdpr-reject" aria-label="Reject non-essential cookies">Essential only</button>
+    <button id="gdpr-accept" aria-label="Accept all cookies">Accept all</button>
+  </div>
+</div>
+<script src="assets/gdpr.js" defer></script>
+
+<header id="topbar" role="banner" aria-label="Global Investing FX Terminal">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="apple-touch-icon.png" alt="Global Investing" width="28" height="28" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;" fetchpriority="high">
+    <span>
+      <span class="logo-text">Global Investing</span>
+      <span class="logo-sub">FX Terminal</span>
+    </span>
+  </a>
+  <div class="topbar-right">
+    <a href="/" class="back-to-terminal" aria-label="Back to terminal">&#8592; Terminal</a>
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu" aria-expanded="false" aria-controls="site-menu-dropdown">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/>
+          <rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/>
+          <rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/>
+        </svg>
+        Menu
+      </button>
+      <div class="site-menu-panel" id="site-menu-dropdown">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="access.html" class="current">Access</a>
+        <a href="contact.html">Contact</a>
+        <a href="terms.html">Terms of Use</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html">How to Use the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html">Retail FX Positioning</a>
+        <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html">COT / CFTC Positioning</a>
+        <a href="guide-economic-surprises.html">Economic Surprise Index</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Market Research</span>
+        <a href="guide-gbpjpy-cot.html">GBP/JPY Bias Factors</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="page-wrap">
+
+  <div class="page-hero">
+    <div class="page-hero-label">Access</div>
+    <h1>Platform access</h1>
+    <p>The GI FX Terminal is a two-layer platform. The MT5 EA is the native trading layer — a zero-flicker canvas overlay running directly inside your charts. This web terminal is the analytical layer, extending coverage with the full macro suite. Both are included under a single EA rental.</p>
+  </div>
+
+  <!-- Platform breakdown -->
+  <div class="section">
+    <h2>What is included</h2>
+    <table class="platform-table" aria-label="Coverage by interface">
+      <thead>
+        <tr>
+          <th scope="col">Panel / Feature</th>
+          <th scope="col">MT5 EA</th>
+          <th scope="col">Web Terminal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Live FX prices — 28 pairs</td><td><span class="check">&#10003;</span> MT5 native (tick-by-tick)</td><td><span class="check">&#10003;</span> Finnhub WebSocket</td></tr>
+        <tr><td>CB rates &amp; policy bias</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>CB rate expectations (OIS)</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>COT / CFTC positioning</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>Carry trade monitor</td><td><span class="check">&#10003;</span> Live broker swaps</td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>Retail sentiment (Myfxbook)</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>Currency strength (CSI)</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>Economic calendar</td><td><span class="check">&#10003;</span> MT5 native</td><td><span class="check">&#10003;</span> Finnhub</td></tr>
+        <tr><td>Economic Surprise Index</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>Market sessions</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>Correlation matrix</td><td><span class="check">&#10003;</span> MT5 native</td><td><span class="check">&#10003;</span> 252-day rolling</td></tr>
+        <tr><td>Volatility &amp; options</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>News headlines</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>Open positions (live account)</td><td><span class="check">&#10003;</span> MT5 native</td><td><span class="dash">&mdash;</span></td></tr>
+        <tr><td>Alert system (popup / push)</td><td><span class="check">&#10003;</span></td><td><span class="dash">&mdash;</span></td></tr>
+        <tr><td>Full price chart (OHLC history)</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span> LightweightCharts</td></tr>
+        <tr><td>US Treasury yield curve</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span></td></tr>
+        <tr><td>Cross-asset correlations</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span> 252-day rolling window</td></tr>
+        <tr><td>Derivatives suite</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span> 25d RR, implied forwards, realized vol, ECB fixings, DTCC volume</td></tr>
+        <tr><td>AI narrative &amp; market signals</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span> 4&times;/day</td></tr>
+        <tr><td>FX liquidity canvas</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span></td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12.1px;color:var(--text3);">Both interfaces share the same underlying data pipelines for CB bias, COT, sentiment, and news.</p>
+  </div>
+
+  <!-- Subscription -->
+  <div class="section">
+    <h2>Subscription</h2>
+    <div class="hero-product" onclick="window.open('https://www.mql5.com/en/market/product/180326','_blank')" role="link" tabindex="0" aria-label="GI FX Terminal EA on MQL5 Market">
+      <div class="hero-product-badge">Featured</div>
+      <div class="hero-product-inner">
+        <div style="flex:1;">
+          <div class="hero-product-title">GI FX Terminal EA</div>
+          <div class="hero-product-sub">FROM $30/MO</div>
+          <div class="hero-product-body">The native MT5 Expert Advisor — 13 data panels on a single zero-flicker canvas overlay inside your charts. No browser, no tab switching. Carry rates use your broker's live swap feed; Open Positions pulls your real account data. Full alert system: CB bias shifts, rate probability changes, new COT data, swap rate changes, and high-impact calendar events via MT5 popups or mobile push. <strong style="color:var(--text);">Rental includes full access to this web terminal.</strong></div>
+        </div>
+        <div class="hero-product-price">
+          <div class="hero-product-price-from">Rent from</div>
+          <div class="hero-product-price-val">$30</div>
+          <div class="hero-product-price-mo">per month</div>
+          <div class="hero-product-link">VIEW ON MQL5 &rarr;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activation steps -->
+  <div class="section">
+    <h2>Activation</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Rent the EA on MQL5 Market</div>
+          <div class="step-desc">Purchase or rent the <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer">GI FX Terminal EA</a> from your MQL5 account. After payment, the product appears under MQL5 → My Products.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Attach the EA to a chart in MetaTrader 5</div>
+          <div class="step-desc">Open any chart in MT5, drag the EA from the Navigator panel, and enable <code>Allow WebRequest</code> for <code>raw.githubusercontent.com</code> under Tools → Options → Expert Advisors. The terminal canvas will render on the chart.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Copy your activation key from the MT5 terminal</div>
+          <div class="step-desc">The EA displays your key in the top bar of the canvas — formatted <code>XXXX-XXXX-XXXX</code>. Click the key to copy it. The key is derived from your MT5 account number and broker server name.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Activate the web terminal</div>
+          <div class="step-desc">On this web terminal, click <strong style="color:var(--text);">Activate</strong> in the top bar (or at the bottom of the right panel). Enter your key, MT5 account number, and broker server name. All panels unlock immediately and remain active for 365 days per device.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Companion tools -->
+  <div class="section">
+    <h2>Companion tools</h2>
+    <p>Standalone MT5 indicators available separately on MQL5 Market.</p>
+    <div class="companion-grid">
+      <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180317','_blank')">
+        <div class="companion-tag" style="color:var(--up);">FREE</div>
+        <div class="companion-name">CSI Currency Strength</div>
+        <div class="companion-desc">Multi-timeframe currency strength index as a panel overlay. Z-score model across 28 pairs, configurable lookbacks, eight currencies color-coded.</div>
+        <div class="companion-link">VIEW ON MQL5 &rarr;</div>
+      </div>
+      <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180322','_blank')">
+        <div class="companion-tag" style="color:var(--up);">FREE</div>
+        <div class="companion-name">Carry Trade Monitor</div>
+        <div class="companion-desc">Scans all Market Watch symbols and ranks pairs by annualised carry yield. Long/short swap rates, net carry, directional bias.</div>
+        <div class="companion-link">VIEW ON MQL5 &rarr;</div>
+      </div>
+      <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180324','_blank')">
+        <div class="companion-tag" style="color:var(--blue);">FROM $30/MO</div>
+        <div class="companion-name">Institutional Risk Manager</div>
+        <div class="companion-desc">Professional trade management EA. Dynamic lot sizing, scaled exits at 1R/1.5R/2R, ATR trailing stop, news filter, hedge module, live portfolio exposure panel.</div>
+        <div class="companion-link">VIEW ON MQL5 &rarr;</div>
+      </div>
+    </div>
+    <p style="margin-top:14px;font-size:12px;color:var(--text3);">Full product catalogue &rarr; <a href="https://www.mql5.com/es/users/santiagopla/seller" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">mql5.com/en/users/santiagopla/seller</a></p>
+  </div>
+
+  <div class="disclaimer">
+    <strong style="color:var(--orange);">Disclaimer.</strong> Content on this terminal is informational and educational only. It does not constitute financial advice, an investment recommendation, or an offer to buy or sell any financial instrument. FX trading involves significant risk and is not suitable for all investors.
+  </div>
+
+</div>
+</main>
+
+<footer id="statusbar" role="contentinfo" aria-label="Status bar">
+  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">ACCESS</span></div>
+  <div class="footer-copy">&copy; 2026 Santiago Pl&aacute; Casuriaga &middot; Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.1</span></div>
+</footer>
+
+<script>
+const btn = document.querySelector('.site-menu-btn');
+const menu = document.querySelector('.site-menu');
+if (btn && menu) {
+  const update = () => btn.setAttribute('aria-expanded', String(menu.matches(':hover') || menu.matches(':focus-within')));
+  menu.addEventListener('mouseenter', update);
+  menu.addEventListener('mouseleave', update);
+  menu.addEventListener('focusin', update);
+  menu.addEventListener('focusout', update);
+}
+// keyboard activation for hero product card
+document.querySelector('.hero-product')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.open('https://www.mql5.com/en/market/product/180326','_blank'); }
+});
+</script>
+</body>
+</html>

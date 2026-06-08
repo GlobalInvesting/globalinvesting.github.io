@@ -524,6 +524,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <div class="site-menu-panel" id="site-menu-dropdown">
         <span class="site-menu-section">Company</span>
         <a href="about.html" class="current">About</a>
+        <a href="access.html">Access</a>
         <a href="contact.html">Contact</a>
         <a href="terms.html">Terms of Use</a>
         <a href="privacy.html">Privacy Policy</a>
@@ -576,6 +577,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <h2>What it is</h2>
     <p>The FX Terminal is a single-page dashboard designed for serious FX market monitoring. It was built to address a specific gap: professional-quality FX context is fragmented across institutional terminals, broker platforms, and government data portals. This terminal aggregates the most signal-rich publicly available data into a coherent, fast, and always-accessible interface.</p>
     <p>Coverage spans live FX price feeds across all 28 major pairs via Finnhub WebSocket (tick-by-tick during market hours), CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, rolling cross-asset correlations with full 252-day history, live central bank policy rates, OIS-derived forward rate expectations for each major central bank, an AI-generated market regime narrative updated four times daily, and news headlines refreshed every hour. A native Economic Calendar panel renders major-economy medium- and high-impact events from Finnhub in terminal colors with local timezone conversion, auto-scrolling to the next upcoming event and displaying actual versus consensus coloring as data releases. An Economic Surprises panel provides a CESI-style (Citi Economic Surprise Index) beat/miss chart over a rolling 90-day window, upgrading to z-score normalization per series as history accumulates. The main price chart is a native LightweightCharts implementation with candlestick, line, area, and bar modes, multi-timeframe moving averages, central bank decision markers, and volume overlay — supplemented by a real-time TradingView widget. A dedicated Derivatives section consolidates implied forwards via Covered Interest Parity (CIP), the 25-delta Risk Reversal term structure, realized volatility versus RR skew, ECB official reference fixings, and DTCC GTR FX OTC notional volume.</p>
+    <p style="font-size:13.2px;color:var(--text3);">Access to this terminal and the MT5 Expert Advisor is managed on the <a href="access.html" style="color:var(--blue);">Access</a> page.</p>
   </div>
 
   <div class="section">
@@ -659,57 +661,6 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <div class="section">
     <h2>Currencies covered</h2>
     <p>USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight major currencies, accounting for the substantial majority of global daily FX turnover.</p>
-  </div>
-
-  <div class="section">
-    <h2>MetaTrader 5 Toolkit</h2>
-    <p>The GI FX Terminal EA is the native MT5 layer of this platform — a zero-flicker canvas overlay that brings the core data panels directly inside your charts. This web terminal is the analytical layer: broader macro coverage, full chart history, the derivatives suite, yield curve, cross-asset correlations, and AI-generated narrative are available here and are not replicated inside MT5. Both interfaces share the same underlying data pipelines and are included under a single EA rental.</p>
-
-    <!-- GI FX Terminal — hero card -->
-    <div class="card" style="cursor:pointer;margin-top:12px;border-color:var(--blue);border-width:1.5px;position:relative;" onclick="window.open('https://www.mql5.com/en/market/product/180326','_blank')">
-      <div style="position:absolute;top:-1px;left:16px;background:var(--blue);color:#fff;font-size:10px;font-weight:600;letter-spacing:.06em;padding:2px 10px;border-radius:0 0 4px 4px;">FEATURED</div>
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-top:8px;">
-        <div style="flex:1;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-            <div class="card-title" style="margin:0;">GI FX Terminal</div>
-            <span style="font-size:10px;font-weight:600;color:var(--blue);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:3px;padding:1px 7px;letter-spacing:.04em;">FROM $30/MO</span>
-          </div>
-          <div class="card-body" style="margin:0;">The native MT5 Expert Advisor — all 13 data panels on a single zero-flicker canvas overlay inside your charts. No browser, no tab switching. Carry rates use your broker's live swap feed; Open Positions pulls your real account data. Full alert system included: CB bias shifts, rate probability changes, new COT data, swap rate changes, and high-impact calendar events via MT5 popups or mobile push. <strong style="color:var(--text);">Rental includes full access to this web terminal.</strong></div>
-        </div>
-        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:12px;min-width:120px;">
-          <div style="text-align:right;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:2px;">Rent from</div>
-            <div style="font-size:20px;font-weight:700;color:var(--text);line-height:1;">$30</div>
-            <div style="font-size:11px;color:var(--text3);">per month</div>
-          </div>
-          <div style="font-size:10px;color:var(--blue);letter-spacing:.04em;font-weight:600;white-space:nowrap;">VIEW ON MQL5 &rarr;</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Free companion tools -->
-    <p style="margin-top:20px;margin-bottom:8px;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;">Free companion tools</p>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-      <div class="card" style="cursor:pointer;" onclick="window.open('https://www.mql5.com/en/market/product/180317','_blank')">
-        <div class="card-title" style="color:var(--up);font-size:10px;letter-spacing:.04em;">FREE</div>
-        <div class="card-title" style="margin-top:2px;">CSI Currency Strength</div>
-        <div class="card-body">Multi-timeframe currency strength index rendered as a panel overlay. Z-score model across 28 pairs, configurable lookbacks, eight currencies color-coded.</div>
-        <div style="margin-top:14px;font-size:10px;color:var(--blue);letter-spacing:.04em;font-weight:600;">VIEW ON MQL5 &rarr;</div>
-      </div>
-      <div class="card" style="cursor:pointer;" onclick="window.open('https://www.mql5.com/en/market/product/180322','_blank')">
-        <div class="card-title" style="color:var(--up);font-size:10px;letter-spacing:.04em;">FREE</div>
-        <div class="card-title" style="margin-top:2px;">Carry Trade Monitor</div>
-        <div class="card-body">Scans all Market Watch symbols and ranks pairs by annualised carry yield. Long/short swap rates, net carry, directional bias. No configuration needed.</div>
-        <div style="margin-top:14px;font-size:10px;color:var(--blue);letter-spacing:.04em;font-weight:600;">VIEW ON MQL5 &rarr;</div>
-      </div>
-      <div class="card" style="cursor:pointer;" onclick="window.open('https://www.mql5.com/en/market/product/180324','_blank')">
-        <div class="card-title" style="color:var(--blue);font-size:10px;letter-spacing:.04em;">FROM $30/MO</div>
-        <div class="card-title" style="margin-top:2px;">Institutional Risk Manager</div>
-        <div class="card-body">Professional trade management EA. Dynamic lot sizing, scaled exits at 1R/1.5R/2R, ATR trailing stop, news filter, hedge module, and live portfolio exposure panel.</div>
-        <div style="margin-top:14px;font-size:10px;color:var(--blue);letter-spacing:.04em;font-weight:600;">VIEW ON MQL5 &rarr;</div>
-      </div>
-    </div>
-    <p style="margin-top:14px;font-size:12px;color:var(--text3);">View the full product catalogue &rarr; <a href="https://www.mql5.com/es/users/santiagopla/seller" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">mql5.com/en/users/santiagopla/seller</a></p>
   </div>
 
   <div class="section">
