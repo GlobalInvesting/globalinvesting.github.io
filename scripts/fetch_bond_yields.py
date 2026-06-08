@@ -1,9 +1,24 @@
 """
-fetch_bond_yields.py  v1.9  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v2.0  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
 
-CHANGELOG v1.6 (fixes vs v1.5)
-────────────────────────────────
-IMPROVE-1  JPY bond2y: added FRED INTGSBJPM193N (IMF International Financial
+CHANGELOG v2.0 (2026-06-07)
+────────────────────────────
+FIX-23  USD bond2y / bond5y: added US Treasury XML feed as fallback source.
+        FRED DGS2/DGS5 CSV endpoint times out sporadically on GitHub Actions
+        runners (~3× 25s timeout = ~75s wasted then exit(1)). US Treasury
+        publishes the same daily yield curve data at a public XML endpoint
+        (no API key, no Cloudflare, confirmed accessible from GH Actions IPs).
+        Source: home.treasury.gov/.../data.xml?data=daily_treasury_yield_curve
+        Fields: BC_2YEAR, BC_5YEAR. Cascade: FRED → Treasury XML → cached.
+
+FIX-23b USD bond2y / bond5y: raised _cached_is_fresh threshold from 7d to 14d.
+        Treasury yield curve data changes daily but is low-volatility context
+        for the LLM narrative — a 9-day-old cached value (as was the case when
+        FRED was down for several days) is still actionable. 14d absorbs a full
+        two-week FRED outage without triggering exit(1) and alerting falsely.
+
+CHANGELOG v1.9 (prior)
+────────────────────────
            Statistics, Government Securities Yields 2Y, monthly) as primary source.
            Follows the same INTGSB*193N series family confirmed working for EUR
            (INTGSBEAM193N) and GBP (INTGSBGBM193N). If 404/unavailable, falls
@@ -29,7 +44,9 @@ Source cascade per currency:
                    FRED DGS10 public CSV (daily, no key) [fallback]
     USD vix      → ohlc-data/vix.json    (update-ohlc, daily)
     USD bond2y   → FRED DGS2  public CSV (daily, no key)           [REQUIRED]
+                   US Treasury XML feed (daily, no key)            [fallback]
     USD bond5y   → FRED DGS5  public CSV (daily, no key)           [REQUIRED]
+                   US Treasury XML feed (daily, no key)            [fallback]
     EUR bond10y  → ECB SDMX YC daily     (no key)                  [REQUIRED]
                    FRED IRLTLT01EZM156N  (monthly, no key) [fallback]
     EUR bond2y   → ECB SDMX YC daily SR_2Y (no key)                [REQUIRED]
@@ -105,6 +122,68 @@ def _save(ccy: str, data: dict, dates: dict) -> None:
     with open(path, "w") as f:
         json.dump({"data": data, "dates": dates}, f, separators=(",", ":"))
     print(f"  ✓ Wrote {path}")
+
+
+# ── Source: US Treasury XML feed ─────────────────────────────────────────────
+
+def _treasury_xml_latest(field: str) -> tuple[str | None, float | None]:
+    """Fetch the latest yield for a given field from the US Treasury daily XML feed.
+
+    Source: https://home.treasury.gov/resource-center/data-chart-center/interest-rates/
+            pages/xml/data.xml  (public, no key, no rate limit)
+    Fields: BC_2YEAR, BC_5YEAR, BC_10YEAR (and others).
+    Data updates each business day by ~17:00 ET. The XML contains the current month's
+    entries; we take the most recent non-null row.
+    Used as fallback when FRED public CSV times out — confirmed accessible from
+    GitHub Actions runners (no Cloudflare, no auth).
+    """
+    try:
+        from xml.etree import ElementTree as ET
+        now = datetime.utcnow()
+        # Treasury XML is organised by year+month; fetch current and prior month
+        # to ensure we always get at least one non-null observation.
+        urls = [
+            f"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
+            f"pages/xml/data.xml?data=daily_treasury_yield_curve&field_tdr_date_value="
+            f"{now.year}{now.month:02d}",
+            f"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
+            f"pages/xml/data.xml?data=daily_treasury_yield_curve&field_tdr_date_value="
+            f"{(now.replace(day=1) - timedelta(days=1)).strftime('%Y%m')}",
+        ]
+        ns = {"d": "http://schemas.microsoft.com/ado/2007/08/dataservices",
+              "m": "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"}
+        rows = []
+        for url in urls:
+            r = requests.get(url, headers=HEADERS, timeout=20)
+            if not r.ok:
+                print(f"    Treasury XML {field}: HTTP {r.status_code} for {url}")
+                continue
+            root = ET.fromstring(r.content)
+            for entry in root.iter("{http://www.w3.org/2005/Atom}entry"):
+                props = entry.find(".//{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata}properties")
+                if props is None:
+                    continue
+                date_el = props.find(f"d:NEW_DATE", ns)
+                val_el  = props.find(f"d:{field}", ns)
+                if date_el is None or val_el is None:
+                    continue
+                date_raw = (date_el.text or "")[:10]
+                val_raw  = val_el.text
+                if not date_raw or not val_raw or val_raw in ("", "null"):
+                    continue
+                try:
+                    rows.append((date_raw, float(val_raw)))
+                except ValueError:
+                    continue
+            if rows:
+                break  # got data from current month — no need to fetch prior month
+        if rows:
+            rows.sort(key=lambda x: x[0])
+            return rows[-1]
+        return None, None
+    except Exception as e:
+        print(f"    Treasury XML {field}: {e}")
+        return None, None
 
 
 # ── Source: FRED public CSV (no key) ─────────────────────────────────────────
@@ -373,30 +452,36 @@ def fetch_usd(req_failures: list) -> None:
         _gha_warning(f"USD vix: value {val} out of range or unavailable — keeping existing")
         req_failures.append("USD.vix")
 
-    print("  bond2y  (FRED:DGS2)")
+    print("  bond2y  (FRED:DGS2 → Treasury XML BC_2YEAR)")
     dt, val = _fred_csv_latest("DGS2")
+    if val is None or not (0 < val < 20):
+        print("    FRED DGS2 miss — trying US Treasury XML BC_2YEAR")
+        dt, val = _treasury_xml_latest("BC_2YEAR")
     if val is not None and 0 < val < 20:
         data["bond2y"]  = round(val, 4)
         dates["bond2y"] = dt
         print(f"    {val:.4f}%  ({dt})")
     else:
-        if _cached_is_fresh(dates, "bond2y"):
-            _gha_notice(f"USD bond2y: FRED DGS2 unavailable — using cached {dates.get('bond2y')} value ({data.get('bond2y')}%), fresh enough (<7d)")
+        if _cached_is_fresh(dates, "bond2y", max_days=14):
+            _gha_notice(f"USD bond2y: FRED DGS2 + Treasury XML unavailable — using cached {dates.get('bond2y')} value ({data.get('bond2y')}%), fresh enough (<14d)")
         else:
-            _gha_warning(f"USD bond2y: FRED DGS2 unavailable (val={val}) — cached value is stale or missing")
+            _gha_warning(f"USD bond2y: FRED DGS2 + Treasury XML unavailable (val={val}) — cached value is stale or missing")
             req_failures.append("USD.bond2y")
 
-    print("  bond5y  (FRED:DGS5)")
+    print("  bond5y  (FRED:DGS5 → Treasury XML BC_5YEAR)")
     dt, val = _fred_csv_latest("DGS5")
+    if val is None or not (0 < val < 20):
+        print("    FRED DGS5 miss — trying US Treasury XML BC_5YEAR")
+        dt, val = _treasury_xml_latest("BC_5YEAR")
     if val is not None and 0 < val < 20:
         data["bond5y"]  = round(val, 4)
         dates["bond5y"] = dt
         print(f"    {val:.4f}%  ({dt})")
     else:
-        if _cached_is_fresh(dates, "bond5y"):
-            _gha_notice(f"USD bond5y: FRED DGS5 unavailable — using cached {dates.get('bond5y')} value ({data.get('bond5y')}%), fresh enough (<7d)")
+        if _cached_is_fresh(dates, "bond5y", max_days=14):
+            _gha_notice(f"USD bond5y: FRED DGS5 + Treasury XML unavailable — using cached {dates.get('bond5y')} value ({data.get('bond5y')}%), fresh enough (<14d)")
         else:
-            _gha_warning(f"USD bond5y: FRED DGS5 unavailable (val={val}) — cached value is stale or missing")
+            _gha_warning(f"USD bond5y: FRED DGS5 + Treasury XML unavailable (val={val}) — cached value is stale or missing")
             req_failures.append("USD.bond5y")
 
     _save("USD", data, dates)
