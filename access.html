@@ -153,13 +153,21 @@ a { color: inherit; text-decoration: none; }
 /* ── Responsive ── */
 /* ── Screenshots ── */
 .screenshot-section { margin-bottom: 44px; }
-.screenshot-figure { margin: 0 0 24px; }
+.screenshot-figure { margin: 0 0 24px; cursor: zoom-in; }
 .screenshot-figure img {
   width: 100%; height: auto;
   border: 1px solid var(--border);
   border-radius: 6px;
   display: block;
+  transition: opacity .15s;
 }
+.screenshot-figure:hover img { opacity: .85; }
+.screenshot-zoom-hint {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10.5px; color: var(--text3); letter-spacing: .04em;
+  margin-bottom: 12px; user-select: none;
+}
+.screenshot-zoom-hint svg { opacity: .55; }
 .screenshot-caption {
   margin-top: 10px;
   font-size: 12.1px; color: var(--text3);
@@ -170,6 +178,47 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+}
+
+/* ── Lightbox ── */
+#gi-lightbox {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,.88);
+  align-items: center; justify-content: center;
+  padding: 24px;
+  cursor: zoom-out;
+  animation: lb-in .18s ease;
+}
+#gi-lightbox.open { display: flex; }
+@keyframes lb-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+#gi-lightbox-img {
+  max-width: min(100%, 1400px);
+  max-height: 90vh;
+  width: auto; height: auto;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 24px 80px rgba(0,0,0,.7);
+  display: block;
+  user-select: none;
+}
+#gi-lightbox-close {
+  position: fixed; top: 16px; right: 20px;
+  background: none; border: none;
+  color: rgba(255,255,255,.55); font-size: 22px; line-height: 1;
+  cursor: pointer; padding: 6px 10px;
+  transition: color .12s;
+}
+#gi-lightbox-close:hover { color: #fff; }
+#gi-lightbox-caption {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  font-size: 11.5px; color: rgba(255,255,255,.5);
+  background: rgba(0,0,0,.5); padding: 6px 14px; border-radius: 4px;
+  white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
+  pointer-events: none;
 }
 
 @media (max-width: 900px) {
@@ -381,11 +430,27 @@ a { color: inherit; text-decoration: none; }
   </div>
 
   <!-- Screenshots -->
+  <!-- Lightbox overlay -->
+  <div id="gi-lightbox" role="dialog" aria-modal="true" aria-label="Screenshot enlarged view">
+    <button id="gi-lightbox-close" aria-label="Close enlarged view">&#x2715;</button>
+    <img id="gi-lightbox-img" src="" alt="">
+    <div id="gi-lightbox-caption"></div>
+  </div>
+
   <div class="section screenshot-section">
     <h2>Interface</h2>
+    <p class="screenshot-zoom-hint">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="9" y1="9" x2="12.5" y2="12.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="5.5" y1="3.5" x2="5.5" y2="7.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="3.5" y1="5.5" x2="7.5" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Click any screenshot to enlarge
+    </p>
 
     <!-- Hero — web terminal full view -->
-    <figure class="screenshot-figure">
+    <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: Web terminal full view">
       <img src="assets/screenshot-terminal.png"
            alt="Global Investing FX Terminal — full dashboard view showing quote bar, price chart, CB rates, COT positioning, and AI narrative panels"
            width="1280" height="720"
@@ -397,7 +462,7 @@ a { color: inherit; text-decoration: none; }
 
     <!-- Side-by-side: MT5 EA + derivatives -->
     <div class="screenshot-grid">
-      <figure class="screenshot-figure">
+      <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: MT5 Expert Advisor view">
         <img src="assets/screenshot-mt5-ea.png"
              alt="GI FX Terminal MT5 EA — zero-flicker canvas overlay on a MetaTrader 5 chart"
              width="640" height="480"
@@ -406,7 +471,7 @@ a { color: inherit; text-decoration: none; }
           <strong>MT5 Expert Advisor.</strong> Zero-flicker canvas overlay inside MetaTrader 5. Includes live swaps, open positions, and MT5 push alerts — exclusive to the native layer.
         </figcaption>
       </figure>
-      <figure class="screenshot-figure">
+      <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: Derivatives suite view">
         <img src="assets/screenshot-derivatives.png"
              alt="Derivatives section — 25-delta risk reversal term structure, implied forwards, and realized volatility"
              width="640" height="480"
@@ -449,6 +514,47 @@ if (btn && menu) {
 document.querySelector('.hero-product')?.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.open('https://www.mql5.com/en/market/product/180326','_blank'); }
 });
+
+// ── Lightbox ──────────────────────────────────────────────────────────────────
+(function () {
+  const lb      = document.getElementById('gi-lightbox');
+  const lbImg   = document.getElementById('gi-lightbox-img');
+  const lbCap   = document.getElementById('gi-lightbox-caption');
+  const lbClose = document.getElementById('gi-lightbox-close');
+  if (!lb) return;
+
+  function open(fig) {
+    const img = fig.querySelector('img');
+    const cap = fig.querySelector('figcaption');
+    if (!img) return;
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    lbCap.textContent = cap ? cap.textContent.trim() : '';
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    lbClose.focus();
+  }
+
+  function close() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // click on any screenshot figure
+  document.querySelectorAll('.screenshot-figure').forEach(fig => {
+    fig.addEventListener('click', () => open(fig));
+    fig.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(fig); }
+    });
+  });
+
+  // close on overlay click (but not on image itself)
+  lb.addEventListener('click', e => { if (e.target !== lbImg) close(); });
+  lbClose.addEventListener('click', close);
+
+  // close on Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && lb.classList.contains('open')) close(); });
+})();
 </script>
 </body>
 </html>
