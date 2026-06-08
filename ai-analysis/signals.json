@@ -1,58 +1,65 @@
 {
-  "generated_at": "2026-06-08T17:34:09Z",
+  "generated_at": "2026-06-08T21:52:43Z",
   "signals": [
     {
-      "time": "17:33",
+      "time": "21:50",
       "priority": "critical",
-      "title": "AUD/USD — G10 Bilateral Theme + Data Divergence",
-      "text": "AUD/USD at 0.7053. USD is the strongest G10 currency this week, averaging +0.687% against its peers, while AUD is the weakest at -0.657%. This 1.344% spread highlights significant bilateral divergence. The AUD CESI at -8 (moderate negative bias) confirms data disappointment, while USD CESI at +29 (strong positive) supports USD strength. This fundamental divergence is driving AUD/USD lower. Watch for RBA's next meeting on 16 Jun for any shift in policy stance.",
+      "title": "AUD/USD — G10 Bilateral Theme + CESI Divergence",
+      "text": "AUD/USD at 0.7047 — USD outperformance (+0.692%) vs AUD underperformance (-0.734%) creates a 1.426% G10 spread, the widest bilateral theme in the complex. The divergence is fundamentally supported by the Economic Surprise Index (CESI), where USD net +29 beats contrast with AUD net -8 misses. Despite a 60bp nominal carry advantage for AUD (RBA 4.35% vs Fed 3.75%), the bear steepener regime (2s10s +92.7bp) and blowout US nonfarm payroll headlines favor the USD. Watch for a break of 0.7000 to confirm trend extension.",
       "evidence": [
-        "USD 1W avg: +0.687% (n=7)",
-        "AUD 1W avg: -0.657% (n=4)",
-        "G10 spread: 1.344%",
-        "AUD CESI: -8 (misses)",
-        "USD CESI: +29 (beats)"
+        "USD 1W avg: +0.692% (n=7)",
+        "AUD 1W avg: -0.734% (n=4)",
+        "G10 spread: 1.426%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:30",
+      "time": "21:47",
       "priority": "critical",
-      "title": "USD/JPY — BoJ Intervention Risk + Carry",
-      "text": "USD/JPY at 160.17, trading above the 160.00 level that has previously triggered BoJ verbal warnings. The 289bp Fed-BoJ OIS carry premium (SOFR 3.62% vs TONA 0.73%) continues to sustain the bid, despite JPY CESI at +16 (strong positive). JPY COT LF net short -105,136 (29.5% long) indicates a crowded carry trade. Intervention risk is elevated on a sustained break above 160.00. The next BoJ meeting (mkt: 50% hike priced) on 16 Jun is a key catalyst.",
+      "title": "USD/JPY — Intervention Risk + Carry + Options Skew",
+      "text": "USD/JPY at 160.105 — Price holds above the 160.00 psychological level, a zone previously triggering BoJ verbal warnings and intervention. While the +289bp OIS carry (SOFR 3.62% vs TONA 0.73%) sustains the bid, the options market is pricing downside protection with a 25d RR of -1.14 (moderate put skew). COT LF net short -105,136 remains extreme, suggesting a crowded carry trade vulnerable to BoJ policy shifts at the June 16 meeting. Sustained trading above 160.00 increases the probability of direct MoF intervention.",
       "evidence": [
-        "USD/JPY: 160.17",
-        "USD/JPY OIS carry: +289bp (favors USD)",
-        "JPY COT LF net: -105,136",
-        "JPY CESI: +16 (beats)"
+        "USD/JPY: 160.105",
+        "25d RR (Saxo): -1.14",
+        "JPY COT LF net: -105,136"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:28",
+      "time": "21:45",
       "priority": "warning",
-      "title": "NZD/USD — COT vs Retail Divergence + Volatility",
-      "text": "NZD/USD at 0.5816. COT LF net short -27,797 (15.1% long) indicates extreme speculative short positioning. Retail sentiment is extremely long at 87% (Myfxbook), creating a significant institutional vs. retail divergence. The options market shows NZD/USD IV 26.0% vs HV30 8.7%, with a VRP of +17.3%, signaling elevated hedging demand. This combination suggests potential for a sharp short-squeeze if price extends higher, catching retail long and institutional short offside. Watch for RBNZ's next meeting on 8 Jul for any policy shift.",
+      "title": "NZD/USD — Retail vs Institutional Divergence",
+      "text": "NZD/USD at 0.5813 — Retail sentiment is 88% long, directly fading the institutional trend where COT LF net short is -27,797 (15.1% long). This extreme retail long positioning at the bottom of a 1M -2.37% move signals high capitulation risk if price breaks recent lows. The real rate differential favors USD (+1.23%) over NZD (-0.83%), providing a structural headwind for the pair. Watch for retail long liquidation to accelerate the move toward 0.5750.",
       "evidence": [
+        "Retail: 88% Long",
         "NZD COT LF net: -27,797",
-        "NZD/USD Retail: 87% long",
-        "NZD/USD IV: 26.0%",
-        "NZD/USD HV30: 8.7%",
-        "NZD/USD VRP: +17.3%"
+        "NZD Real Rate: -0.83%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:25",
+      "time": "21:42",
       "priority": "warning",
-      "title": "USD/CAD — Retail Extreme + Carry + BoC Outlook",
-      "text": "USD/CAD at 1.3956. Retail sentiment is extremely short at 86% (Myfxbook), indicating a crowded contrarian position against the prevailing trend. The 138bp Fed-BoC OIS carry premium (SOFR 3.62% vs CORRA 2.24%) structurally favors USD. Recent headlines from NBC suggest the Bank of Canada is urged to focus on unemployment, implying a dovish bias that is likely to limit CAD upside. This retail extreme against strong carry and a potentially dovish BoC creates significant short-squeeze risk for CAD. The next BoC meeting (mkt: 100% hold priced) on 10 Jun is a key event.",
+      "title": "EUR/USD — Volatility Premium + ECB Event Risk",
+      "text": "EUR/USD at 1.1541 — Options market is pricing an elevated +3.0% Vol Risk Premium (IV 7.1% vs HV30 4.1%) ahead of the June 11 ECB meeting. Despite a +169bp OIS carry advantage for USD, EUR/USD intraday is +0.12% as markets assess a potential ECB hike bias. COT LF net short -22,320 indicates specs are positioned for further downside, but the high VRP suggests the market is paying up for protection against a hawkish ECB surprise. Watch the 1.1500 level for support ahead of the policy announcement.",
       "evidence": [
-        "USD/CAD Retail: 86% short",
-        "USD/CAD OIS carry: +138bp (favors USD)",
-        "BoC: Unemployment focus urged – NBC"
+        "EUR/USD VRP: +3.0%",
+        "EUR COT LF net: -22,320",
+        "OIS Carry: +169bp USD"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "21:35",
+      "priority": "info",
+      "title": "DXY vs SPX — Correlation Break + Funding Stress",
+      "text": "DXY vs SPX correlation at -0.456 vs 252d norm of -0.290 (z=+1.59σ) — The strengthening negative correlation during a period of USD outperformance (+0.692% 1W avg) signals a return to the 'USD as a safe-haven' regime. With the DXY testing 100.00 and US 10Y yields rising to 4.552%, the positive z-score indicates that equity strength is failing to dampen USD demand, likely due to unresolved U.S.-Iran geopolitical tensions and restrictive real rates (+1.23%).",
+      "evidence": [
+        "DXY vs SPX z-score: +1.59σ",
+        "US 10Y: 4.552%",
+        "DXY: 99.98"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
