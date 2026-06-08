@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-06-05",
+  "lastUpdate": "2026-06-08",
   "meetings": {
     "USD": {
       "nextMeeting": "17 Jun",
@@ -28,7 +28,7 @@
       "bias": "hold",
       "biasSource": "CME 30-day Fed Funds futures (SOFR-implied)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-05",
+      "biasUpdated": "2026-06-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -60,7 +60,7 @@
       "bias": "hike",
       "biasSource": "ECB €STR overnight swap rate",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-05",
+      "biasUpdated": "2026-06-08",
       "cutProb": 0,
       "hikeProb": 100,
       "fwdRate": 2.25
@@ -92,7 +92,7 @@
       "bias": "hold",
       "biasSource": "BoE 1-month OIS forward (SONIA)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-05",
+      "biasUpdated": "2026-06-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -124,10 +124,10 @@
       "bias": "hike",
       "biasSource": "TONA overnight rate + BoJ forward guidance",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-05",
+      "biasUpdated": "2026-06-08",
       "cutProb": 0,
-      "hikeProb": 97,
-      "fwdRate": 0.847
+      "hikeProb": 50,
+      "fwdRate": 0.8
     },
     "AUD": {
       "nextMeeting": "16 Jun",
@@ -156,7 +156,7 @@
       "bias": "hold",
       "biasSource": "ASX 30-day Interbank Cash Rate Futures",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-05",
+      "biasUpdated": "2026-06-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 4.35
@@ -190,7 +190,7 @@
       "bias": "hold",
       "biasSource": "CORRA overnight rate (BoC)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-05",
+      "biasUpdated": "2026-06-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.25
@@ -214,7 +214,7 @@
       "bias": "cut",
       "biasSource": "SNB SARON overnight rate",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-05",
+      "biasUpdated": "2026-06-08",
       "cutProb": 72,
       "hikeProb": 0,
       "fwdRate": -0.18
@@ -242,9 +242,9 @@
       ],
       "source": "rbnz.govt.nz",
       "bias": "hold",
-      "biasSource": "FRED IR3TIB01NZM156N (NZ 3M interbank, credit-adj)",
+      "biasSource": "NZFBF OIS swap curve (RBNZ OCR)",
       "biasMethod": "spread",
-      "biasUpdated": "2026-06-05",
+      "biasUpdated": "2026-06-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.25
