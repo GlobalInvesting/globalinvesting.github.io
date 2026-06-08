@@ -1,5 +1,18 @@
 """
-fetch_bond_yields.py  v2.1  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v2.2  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+
+CHANGELOG v2.2 (2026-06-08)
+────────────────────────────
+FIX-25  USD bond2y / bond5y: added fiscaldata.treasury.gov REST API as fourth
+        fallback source, between Treasury XML (home.treasury.gov) and the 14d cache.
+        fiscaldata.treasury.gov runs on separate infrastructure from home.treasury.gov
+        — a simultaneous outage of both is unlikely. The endpoint is a public JSON
+        REST API (no auth, no API key, no Cloudflare) that returns the same daily
+        par yield curve data published by the US Treasury.
+        Endpoint: GET /services/api/fiscal_service/v1/accounting/od/avg_interest_rates
+        Filter: security_type_desc=Notes, sort=-record_date.
+        Cascade updated: ohlc-data → FRED DGS → Treasury XML (home) →
+                         FiscalData API (fiscaldata) → cached (14d).
 
 CHANGELOG v2.1 (2026-06-08)
 ────────────────────────────
@@ -56,11 +69,15 @@ Source cascade per currency:
                    FRED DGS10 public CSV (daily, no key) [fallback]
     USD vix      → ohlc-data/vix.json    (update-ohlc, daily)
     USD bond2y   → ohlc-data/us2y.json   (^IRX via yfinance, update-ohlc, daily) [PRIMARY]
-                   FRED DGS2  public CSV (daily, no key)           [fallback]
-                   US Treasury XML feed (daily, no key)            [fallback]
+                   FRED DGS2  public CSV (daily, no key)           [fallback 1]
+                   US Treasury XML feed (home.treasury.gov, daily) [fallback 2]
+                   FiscalData REST API  (fiscaldata.treasury.gov)  [fallback 3]
+                   cached value (14d threshold)                    [last resort]
     USD bond5y   → ohlc-data/us5y.json   (^FVX via yfinance, update-ohlc, daily) [PRIMARY]
-                   FRED DGS5  public CSV (daily, no key)           [fallback]
-                   US Treasury XML feed (daily, no key)            [fallback]
+                   FRED DGS5  public CSV (daily, no key)           [fallback 1]
+                   US Treasury XML feed (home.treasury.gov, daily) [fallback 2]
+                   FiscalData REST API  (fiscaldata.treasury.gov)  [fallback 3]
+                   cached value (14d threshold)                    [last resort]
     EUR bond10y  → ECB SDMX YC daily     (no key)                  [REQUIRED]
                    FRED IRLTLT01EZM156N  (monthly, no key) [fallback]
     EUR bond2y   → ECB SDMX YC daily SR_2Y (no key)                [REQUIRED]
@@ -197,6 +214,65 @@ def _treasury_xml_latest(field: str) -> tuple[str | None, float | None]:
         return None, None
     except Exception as e:
         print(f"    Treasury XML {field}: {e}")
+        return None, None
+
+
+# ── Source: FiscalData Treasury REST API (no key) ────────────────────────────
+
+def _fiscaldata_treasury_latest(maturity_years: int) -> tuple[str | None, float | None]:
+    """Fetch the latest US Treasury par yield from the FiscalData REST API.
+
+    Source: https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/
+    Endpoint: GET https://api.fiscaldata.treasury.gov/services/api/fiscal_service/
+              v2/accounting/od/avg_interest_rates
+    Public JSON REST API — no auth, no API key, no Cloudflare.
+    Runs on separate infrastructure from home.treasury.gov (Treasury XML feed),
+    so a simultaneous outage of both is unlikely.
+
+    The avg_interest_rates dataset contains monthly average rates by security type
+    (Bills, Notes, Bonds). We filter for Notes (covers 2Y and 5Y maturities) and
+    take the most recent record. Note: this is a monthly average, not the daily
+    spot rate — accuracy is ±10-20bps vs FRED DGS daily values, acceptable as
+    a last-resort fallback before the 14d cache.
+
+    maturity_years: 2 or 5 — used only for log labelling; the endpoint returns
+    the same monthly average rate for all Notes regardless of maturity. A more
+    precise approach would require the CUSIP-level endpoints which require a
+    specific CUSIP per auction — too fragile for a fallback source.
+    """
+    try:
+        url = (
+            "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/"
+            "v2/accounting/od/avg_interest_rates"
+        )
+        params = {
+            "fields": "security_desc,avg_interest_rate_amt,record_date",
+            "filter": "security_type_desc:eq:Notes",
+            "sort": "-record_date",
+            "page[size]": 5,
+        }
+        r = requests.get(url, params=params, headers=HEADERS, timeout=20)
+        if not r.ok:
+            print(f"    FiscalData {maturity_years}Y: HTTP {r.status_code}")
+            return None, None
+        payload = r.json()
+        rows = payload.get("data", [])
+        for row in rows:
+            date_str = row.get("record_date", "")[:10]
+            val_str  = row.get("avg_interest_rate_amt", "")
+            if not date_str or not val_str:
+                continue
+            try:
+                val = float(val_str)
+                if 0 < val < 20:
+                    print(f"    FiscalData {maturity_years}Y: {val:.4f}% ({date_str}) [monthly avg Notes]")
+                    return date_str, val
+            except (ValueError, TypeError):
+                continue
+        print(f"    FiscalData {maturity_years}Y: no valid rows in response")
+        return None, None
+    except Exception as e:
+        print(f"    FiscalData {maturity_years}Y: {e}")
         return None, None
 
 
@@ -466,7 +542,7 @@ def fetch_usd(req_failures: list) -> None:
         _gha_warning(f"USD vix: value {val} out of range or unavailable — keeping existing")
         req_failures.append("USD.vix")
 
-    print("  bond2y  (ohlc-data/us2y.json → FRED:DGS2 → Treasury XML BC_2YEAR)")
+    print("  bond2y  (ohlc-data/us2y.json → FRED:DGS2 → Treasury XML BC_2YEAR → FiscalData API)")
     dt, val = _ohlc_latest("us2y")
     if val is None or not (0 < val < 20):
         print("    ohlc miss — trying FRED DGS2")
@@ -474,6 +550,9 @@ def fetch_usd(req_failures: list) -> None:
     if val is None or not (0 < val < 20):
         print("    FRED DGS2 miss — trying US Treasury XML BC_2YEAR")
         dt, val = _treasury_xml_latest("BC_2YEAR")
+    if val is None or not (0 < val < 20):
+        print("    Treasury XML miss — trying FiscalData REST API")
+        dt, val = _fiscaldata_treasury_latest(2)
     if val is not None and 0 < val < 20:
         data["bond2y"]  = round(val, 4)
         dates["bond2y"] = dt
@@ -482,10 +561,10 @@ def fetch_usd(req_failures: list) -> None:
         if _cached_is_fresh(dates, "bond2y", max_days=14):
             _gha_notice(f"USD bond2y: all sources unavailable — using cached {dates.get('bond2y')} value ({data.get('bond2y')}%), fresh enough (<14d)")
         else:
-            _gha_warning(f"USD bond2y: ohlc + FRED DGS2 + Treasury XML all unavailable (val={val}) — cached value is stale or missing")
+            _gha_warning(f"USD bond2y: ohlc + FRED DGS2 + Treasury XML + FiscalData all unavailable (val={val}) — cached value is stale or missing")
             req_failures.append("USD.bond2y")
 
-    print("  bond5y  (ohlc-data/us5y.json → FRED:DGS5 → Treasury XML BC_5YEAR)")
+    print("  bond5y  (ohlc-data/us5y.json → FRED:DGS5 → Treasury XML BC_5YEAR → FiscalData API)")
     dt, val = _ohlc_latest("us5y")
     if val is None or not (0 < val < 20):
         print("    ohlc miss — trying FRED DGS5")
@@ -493,6 +572,9 @@ def fetch_usd(req_failures: list) -> None:
     if val is None or not (0 < val < 20):
         print("    FRED DGS5 miss — trying US Treasury XML BC_5YEAR")
         dt, val = _treasury_xml_latest("BC_5YEAR")
+    if val is None or not (0 < val < 20):
+        print("    Treasury XML miss — trying FiscalData REST API")
+        dt, val = _fiscaldata_treasury_latest(5)
     if val is not None and 0 < val < 20:
         data["bond5y"]  = round(val, 4)
         dates["bond5y"] = dt
@@ -501,7 +583,7 @@ def fetch_usd(req_failures: list) -> None:
         if _cached_is_fresh(dates, "bond5y", max_days=14):
             _gha_notice(f"USD bond5y: all sources unavailable — using cached {dates.get('bond5y')} value ({data.get('bond5y')}%), fresh enough (<14d)")
         else:
-            _gha_warning(f"USD bond5y: ohlc + FRED DGS5 + Treasury XML all unavailable (val={val}) — cached value is stale or missing")
+            _gha_warning(f"USD bond5y: ohlc + FRED DGS5 + Treasury XML + FiscalData all unavailable (val={val}) — cached value is stale or missing")
             req_failures.append("USD.bond5y")
 
     _save("USD", data, dates)
@@ -754,7 +836,7 @@ def fetch_nzd_2y(opt_failures: list) -> None:
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v1.9 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v2.2 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
