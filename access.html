@@ -306,6 +306,83 @@ a { color: inherit; text-decoration: none; }
     <p>The GI FX Terminal is a two-layer platform. The MT5 EA is the native trading layer — a zero-flicker canvas overlay running directly inside your charts. This web terminal is the analytical layer, extending coverage with the full macro suite. Both are included under a single EA rental.</p>
   </div>
 
+  <!-- Interface — screenshots first, industry standard: show before features -->
+  <div class="section screenshot-section">
+    <h2>Interface</h2>
+    <p class="screenshot-zoom-hint">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="9" y1="9" x2="12.5" y2="12.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="5.5" y1="3.5" x2="5.5" y2="7.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="3.5" y1="5.5" x2="7.5" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Click any screenshot to enlarge
+    </p>
+
+    <!-- Hero — web terminal full view -->
+    <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: Web terminal full view">
+      <img src="assets/screenshot-terminal.png"
+           data-src="assets/screenshot-terminal.png"
+           alt="Global Investing FX Terminal — full dashboard view showing quote bar, price chart, CB rates, COT positioning, and AI narrative panels"
+           width="1280" height="720"
+           loading="eager">
+      <figcaption class="screenshot-caption">
+        <strong>Web terminal — overview.</strong> Single-page dashboard with live quote bar (28 pairs), price chart, CB rates &amp; expectations, COT positioning, carry ranking, derivatives suite, cross-asset monitor, and AI narrative. Runs in any browser with no installation.
+      </figcaption>
+    </figure>
+
+    <!-- Row 1: MT5 EA + derivatives -->
+    <div class="screenshot-grid">
+      <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: MT5 Expert Advisor view">
+        <img src="assets/screenshot-mt5-ea.png"
+             data-src="assets/screenshot-mt5-ea.png"
+             alt="GI FX Terminal MT5 EA — zero-flicker canvas overlay on a MetaTrader 5 chart"
+             width="640" height="480"
+             loading="eager">
+        <figcaption class="screenshot-caption">
+          <strong>MT5 Expert Advisor.</strong> Zero-flicker canvas overlay inside MetaTrader 5. Live broker swaps, open positions panel, and MT5 push alerts — native layer only.
+        </figcaption>
+      </figure>
+      <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: Derivatives suite">
+        <img src="assets/screenshot-derivatives.png"
+             data-src="assets/screenshot-derivatives.png"
+             alt="Derivatives section — 25-delta risk reversal term structure, implied forwards, and realized volatility"
+             width="640" height="480"
+             loading="eager">
+        <figcaption class="screenshot-caption">
+          <strong>Derivatives suite.</strong> 25-delta RR term structure (1W–1Y), CIP-implied forwards, realized vol vs RR skew, ECB official fixings, and DTCC OTC notional volume — web terminal only.
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- Row 2: COT positioning + CB Rate Expectations — add screenshots/screenshot-cot.png and screenshot-cb-rates.png -->
+    <div class="screenshot-grid">
+      <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: CFTC COT positioning panel">
+        <img src="assets/screenshot-cot.png"
+             data-src="assets/screenshot-cot.png"
+             alt="CFTC Positioning panel — Leveraged Funds net contracts with WoW change bars for 8 major currencies"
+             width="640" height="480"
+             loading="eager"
+             style="min-height:180px;background:var(--bg2);">
+        <figcaption class="screenshot-caption">
+          <strong>CFTC Positioning — Leveraged Funds.</strong> Weekly net contracts with week-over-week momentum bars. Disaggregated TFF report, updated Saturdays. The primary institutional positioning signal for speculative FX flows.
+        </figcaption>
+      </figure>
+      <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: CB Rate Expectations panel">
+        <img src="assets/screenshot-cb-rates.png"
+             data-src="assets/screenshot-cb-rates.png"
+             alt="CB Rate Expectations panel — OIS-implied forward probabilities for Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ"
+             width="640" height="480"
+             loading="eager"
+             style="min-height:180px;background:var(--bg2);">
+        <figcaption class="screenshot-caption">
+          <strong>CB Rate Expectations.</strong> OIS-implied cut/hold/hike probabilities for all 8 major central banks — derived from SOFR, ESTER, SONIA, TONA, and equivalent overnight swap markets. Same methodology as CME FedWatch.
+        </figcaption>
+      </figure>
+    </div>
+    <!-- TODO: remove screenshot-pending note once screenshot-cot.png and screenshot-cb-rates.png are added to assets/ -->
+  </div>
+
   <!-- Platform breakdown -->
   <div class="section">
     <h2>What is included</h2>
@@ -427,58 +504,6 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
     <p style="margin-top:14px;font-size:12px;color:var(--text3);">Full product catalogue &rarr; <a href="https://www.mql5.com/es/users/santiagopla/seller" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">mql5.com/en/users/santiagopla/seller</a></p>
-  </div>
-
-  <!-- Screenshots -->
-  <!-- Lightbox overlay -->
-
-  <div class="section screenshot-section">
-    <h2>Interface</h2>
-    <p class="screenshot-zoom-hint">
-      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" stroke-width="1.2"/>
-        <line x1="9" y1="9" x2="12.5" y2="12.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-        <line x1="5.5" y1="3.5" x2="5.5" y2="7.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-        <line x1="3.5" y1="5.5" x2="7.5" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-      Click any screenshot to enlarge
-    </p>
-
-    <!-- Hero — web terminal full view -->
-    <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: Web terminal full view">
-      <img src="assets/screenshot-terminal.png"
-           data-src="assets/screenshot-terminal.png"
-           alt="Global Investing FX Terminal — full dashboard view showing quote bar, price chart, CB rates, COT positioning, and AI narrative panels"
-           width="1280" height="720"
-           loading="eager">
-      <figcaption class="screenshot-caption">
-        <strong>Web terminal.</strong> Single-page dashboard — live quote bar (28 pairs), price chart, CB rates &amp; bias, OIS rate expectations, COT positioning, carry monitor, derivatives suite, and AI narrative. Runs in any browser with no installation.
-      </figcaption>
-    </figure>
-
-    <!-- Side-by-side: MT5 EA + derivatives -->
-    <div class="screenshot-grid">
-      <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: MT5 Expert Advisor view">
-        <img src="assets/screenshot-mt5-ea.png"
-             data-src="assets/screenshot-mt5-ea.png"
-             alt="GI FX Terminal MT5 EA — zero-flicker canvas overlay on a MetaTrader 5 chart"
-             width="640" height="480"
-             loading="eager">
-        <figcaption class="screenshot-caption">
-          <strong>MT5 Expert Advisor.</strong> Zero-flicker canvas overlay inside MetaTrader 5. Includes live swaps, open positions, and MT5 push alerts — exclusive to the native layer.
-        </figcaption>
-      </figure>
-      <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: Derivatives suite view">
-        <img src="assets/screenshot-derivatives.png"
-             data-src="assets/screenshot-derivatives.png"
-             alt="Derivatives section — 25-delta risk reversal term structure, implied forwards, and realized volatility"
-             width="640" height="480"
-             loading="eager">
-        <figcaption class="screenshot-caption">
-          <strong>Derivatives suite.</strong> 25-delta risk reversal term structure (1W–1Y), CIP-derived implied forwards, realized vol vs RR skew, ECB official fixings, and DTCC OTC notional volume — web terminal only.
-        </figcaption>
-      </figure>
-    </div>
   </div>
 
   <div class="disclaimer" role="note" aria-label="Legal disclaimer">
