@@ -826,7 +826,7 @@ async function fetchCOTData() {
   // Timestamp label — "CFTC · week ending 2026-03-28 · updated Sat 04 Apr · loaded HH:MM TZ · N days ago"
   const latest = results[0];
   const weekEnd = latest.weekEnding || latest.reportDate || '';
-  let updLabel = 'CFTC · week ending ' + weekEnd;
+  let updLabel = 'Disaggregated TFF · Leveraged Funds · week ending ' + weekEnd;
   if (latest.lastUpdate) {
     try {
       const d = new Date(latest.lastUpdate);
