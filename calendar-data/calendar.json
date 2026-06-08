@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-08T11:38:37Z",
-  "generatedAt": "2026-06-08T11:38:37Z",
+  "lastUpdate": "2026-06-08T12:06:39Z",
+  "generatedAt": "2026-06-08T12:06:39Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-08",
   "rangeTo": "2026-06-22",
-  "totalEvents": 1677,
+  "totalEvents": 1678,
   "currencyCounts": {
     "JPY": 186,
     "AUD": 177,
-    "CHF": 90,
+    "CHF": 91,
     "GBP": 196,
     "NZD": 80,
     "USD": 628,
@@ -21,7 +21,7 @@
     "EUR": 185
   },
   "impactCounts": {
-    "medium": 1149,
+    "medium": 1150,
     "high": 391,
     "low": 137
   },
@@ -20847,7 +20847,7 @@
       "event": "Balance of Trade",
       "impact": "medium",
       "actual": null,
-      "forecast": "1.9",
+      "forecast": "2.6",
       "previous": "1.78"
     },
     {
@@ -20860,7 +20860,7 @@
       "event": "Balance of Trade",
       "impact": "medium",
       "actual": null,
-      "forecast": "-55.5",
+      "forecast": "-56.4",
       "previous": "-60.3"
     },
     {
@@ -20899,7 +20899,7 @@
       "event": "Existing Home Sales",
       "impact": "high",
       "actual": null,
-      "forecast": "4.05",
+      "forecast": "4.06",
       "previous": "4.02"
     },
     {
@@ -21107,7 +21107,7 @@
       "event": "Monthly Budget Statement",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "-270",
       "previous": "215"
     },
     {
@@ -21172,7 +21172,7 @@
       "event": "Initial Jobless Claims",
       "impact": "medium",
       "actual": null,
-      "forecast": "225",
+      "forecast": "219",
       "previous": "225"
     },
     {
@@ -21185,7 +21185,7 @@
       "event": "PPI MoM",
       "impact": "high",
       "actual": null,
-      "forecast": "0.8",
+      "forecast": "0.7",
       "previous": "1.4"
     },
     {
@@ -21224,7 +21224,7 @@
       "event": "GDP 3-Month Avg",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.6*",
+      "forecast": "0.7",
       "previous": "0.6"
     },
     {
@@ -21250,7 +21250,7 @@
       "event": "Goods Trade Balance",
       "impact": "medium",
       "actual": null,
-      "forecast": "-27",
+      "forecast": "-22.85",
       "previous": "-27.22"
     },
     {
@@ -21276,7 +21276,7 @@
       "event": "Industrial Production MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "0.1",
       "previous": "-0.2"
     },
     {
@@ -21289,7 +21289,7 @@
       "event": "Manufacturing Production MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "-0.2",
       "previous": "1.2"
     },
     {
@@ -21304,6 +21304,19 @@
       "actual": null,
       "forecast": "46",
       "previous": "44.8"
+    },
+    {
+      "date": "15 Jun",
+      "dateISO": "2026-06-15",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-38",
+      "previous": "-40"
     },
     {
       "date": "15 Jun",
