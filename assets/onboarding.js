@@ -1,6 +1,6 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.8 — production build
+ * v7.89.9 — production build
  *
  * Changes vs v7.81.5 (prior production):
  *   - 15-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
@@ -260,13 +260,13 @@
       },
     },
 
-    /* 13 — EA access */
+    /* 13 — Web terminal as analytical layer */
     {
       target:  null,
       side:    'bottom',
-      title:   'This terminal is included with the GI FX Terminal EA.',
-      badge:   'Access',
-      body:    'Full access to all panels on this web terminal is included with a rental of the <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer" style="color:var(--blue);font-weight:600;">GI FX Terminal EA on MQL5 Market</a>. Once you have the EA running on an MT5 chart, click <strong style="color:var(--text);">Activate</strong> in the top bar of this page — or at the bottom of the right panel — and enter the key shown in your MT5 terminal to unlock all panels.',
+      title:   'This terminal is the analytical layer of the platform.',
+      badge:   'Platform',
+      body:    'The MT5 EA covers real-time prices, CB bias, COT, carry, sessions, and alerts — the live trading layer. This web terminal extends that with the full macro suite: yield curve, derivatives (25d risk reversals, implied forwards, realized vol), cross-asset correlations, AI-generated market narrative, and complete chart history. Both are included under the same EA rental.',
       action:  function () {
         try { if (typeof window._derivNavHide === 'function') window._derivNavHide(); } catch (e) {}
       },
