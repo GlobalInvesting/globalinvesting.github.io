@@ -1,6 +1,6 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.7 — production build
+ * v7.89.8 — production build
  *
  * Changes vs v7.81.5 (prior production):
  *   - 15-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
@@ -260,13 +260,13 @@
       },
     },
 
-    /* 13 — MT5 companion */
+    /* 13 — EA access */
     {
       target:  null,
       side:    'bottom',
-      title:   'Trade in MetaTrader 5? There\'s a native version.',
-      badge:   'MT5',
-      body:    'GI FX Terminal is also available as a native MT5 Expert Advisor — all 13 panels on a single canvas overlay inside your charts. No browser tab, no switching: CB rates, COT positioning, carry, composite score, correlation matrix, and the full alert system (push to mobile) running directly in your trading environment. Carry rates use your broker\'s live swap feed; Open Positions pulls your real account data. <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer" style="color:var(--blue);font-weight:600;">View on MQL5 &rarr;</a>',
+      title:   'This terminal is included with the GI FX Terminal EA.',
+      badge:   'Access',
+      body:    'Full access to all panels on this web terminal is included with a rental of the <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer" style="color:var(--blue);font-weight:600;">GI FX Terminal EA on MQL5 Market</a>. Once you have the EA running on an MT5 chart, click <strong style="color:var(--text);">Activate</strong> in the top bar of this page — or at the bottom of the right panel — and enter the key shown in your MT5 terminal to unlock all panels.',
       action:  function () {
         try { if (typeof window._derivNavHide === 'function') window._derivNavHide(); } catch (e) {}
       },
