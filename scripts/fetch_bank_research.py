@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_bank_research.py — v1.4
+fetch_bank_research.py — v1.5
 Fetches institutional FX research notes from public RSS feeds and writes
 research-data/bank-research.json.
 
@@ -12,6 +12,21 @@ Design principles:
     Each note shows: bank badge · series label · headline · currency tags ·
     category chip · relative age. Drawer shows: bank full name · author ·
     pairs · external link.
+
+Changes v1.5:
+  · BIS fx_filter True: BIS CB speeches feed covers fintech (Hong Kong summit),
+    India/EM banking, AI supervision — not G10 FX drivers. Changed fx_filter
+    from False to True so is_fx_relevant() gates the feed like ING/Saxo/UBS.
+  · NON_G10_CB_RE added to is_fx_relevant(): mirrors fetch_news.py NON_G8_CB_RE.
+    Blocks articles about EM/non-G10 CBs (RBI, PBOC, CBRT, Norges, etc.) that
+    pass the FX keyword gate because they contain "central bank"/"interest rate".
+  · EQUITY_NOISE_TITLE_RE added: discards Saxo "Options Brief" series and
+    single-stock/equity-index articles from broad feeds (ING Think, Saxo Articles).
+    "Options Brief" covers equity options flow and is not FX research.
+  · detect_pairs() bug fix: replace("", "/") inserted "/" between every character
+    when a no-slash match was found (e.g. "EURUSD" → "/E/U/R/U/S/D/"), producing
+    spurious currency tags like '/U/', '/D/J/P/Y/'. Fixed by stripping the slash
+    first then reconstructing as clean[:3] + "/" + clean[3:].
 
 Changes v1.4:
   · EXCERPT LENGTH: summary buffer raised from 600 → 1200 chars; excerpt
@@ -172,13 +187,15 @@ RSS_SOURCES = [
         "fx_filter": True,
     },
     # ── BIS Central Banker Speeches — pre-release policy signals from global CBs.
-    # No fx_filter — all CB speeches are relevant to the currencies they govern.
+    # v1.5: fx_filter set to True — BIS speeches cover a wide range of topics including
+    # fintech, digital finance, EM banking and non-G10 CB supervision. Only speeches
+    # explicitly referencing G10 currencies, CBs or macro drivers should pass through.
     {
         "bank":      "BIS",
         "bank_full": "Bank for International Settlements",
         "url":       "https://www.bis.org/doclist/cbspeeches.rss",
         "type":      "rss",
-        "fx_filter": False,
+        "fx_filter": True,
     },
     # ── MUFG Research — HTML index scraping (no RSS available)
     {
@@ -219,9 +236,15 @@ def detect_pairs(text: str) -> list:
     found = []
     seen = set()
     for m in PAIR_RE.finditer(text):
-        p = m.group(0).upper().replace("", "/") if "/" not in m.group(0) else m.group(0).upper()
-        # normalise: ensure slash
-        normed = p[:3] + "/" + p[-3:] if "/" not in p else p
+        raw = m.group(0).upper()
+        # v1.5: fix normalization bug — replace("", "/") inserted "/" between every character
+        # when the match had no slash (e.g. "EURUSD" → "/E/U/R/U/S/D/").
+        # Correct approach: extract first 3 chars as base and last 3 as quote.
+        clean = raw.replace("/", "")   # strip any slash present in the match
+        if len(clean) == 6:
+            normed = clean[:3] + "/" + clean[3:]
+        else:
+            continue  # unexpected length — skip
         if normed not in seen:
             seen.add(normed)
             found.append(normed)
@@ -317,9 +340,57 @@ FX_RELEVANCE_KW = [
     "hawkish", "dovish", "tightening", "easing",
 ]
 
+# v1.5: Non-G10 central bank filter — mirrors fetch_news.py NON_G8_CB_RE.
+# Articles about EM CBs pass is_fx_relevant() because they contain "central bank" /
+# "interest rate" / "inflation" but are irrelevant to G10 FX.
+# Applied after FX_RELEVANCE_KW pass so it only disqualifies confirmed passes.
+# Also covers EM country-primary titles (Czech, Turkish, Kazakhstan, etc.) that hit
+# "inflation" / "gdp" / "cpi" keywords — the same single-word FX_RELEVANCE_KW hits
+# that caused ING Think EM articles to slip through.
+NON_G10_CB_RE = re.compile(
+    r"\b(reserve bank of india|rbi (rate|policy|meeting|governor|hike|cut|decision)|\
+rbi monetary|bank of israel|qatar central bank|qcb|people'?s bank of china|pboc|\
+bank of korea|bank indonesia|bi rate|bank negara|\
+central bank of brazil|banco central do brasil|\
+south african reserve bank|sarb|banco de mexico|banxico|\
+central bank of turkey|cbrt|tcmb|\
+central bank of russia|bank of russia|\
+norges bank|riksbank|czech national bank|national bank of poland|\
+hong kong monetary|hkma|tenge|forint|zloty|koruna|\
+czech (spending|gdp|inflation|cpi|economy|republic rate|koruna)|\
+turkish (inflation|lira|economy|gdp|cpi|central bank)|\
+turkey (inflation|economy|rate|lira)|\
+kazakhstan|\
+polish (zloty|inflation|gdp|economy|rate)|\
+hungarian (forint|inflation|rate|economy))\b",
+    re.IGNORECASE,
+)
+
+# v1.5: Equity/commodity noise filter — catches non-FX articles from broad feeds
+# (Saxo Articles, ING Think) whose titles reference equity indexes, single stocks,
+# commodities, or options on equities. "Options Brief" from Saxo is the main offender:
+# the series covers equity options flow and uses stock/index tickers, not FX pairs.
+EQUITY_NOISE_TITLE_RE = re.compile(
+    r"\b(options brief|broadcom|nvidia|apple|microsoft|alphabet|meta |amazon|\
+s&p 500|nasdaq 100|dow jones|russell 2000|stoxx 600|dax |cac 40|nikkei 225|\
+copper|crude oil rally|oil rally|brent rally|gold fell|silver price|\
+bitcoin|ethereum|crypto|blockchain|semiconductors? (rally|surge|drop)|\
+chip (surge|slump|rally)|rotation wins?|streak snaps?)\b",
+    re.IGNORECASE,
+)
+
+
 def is_fx_relevant(title: str, summary: str) -> bool:
+    # v1.5: Equity/options noise — discard before keyword pass (fast path)
+    if EQUITY_NOISE_TITLE_RE.search(title):
+        return False
     text = (title + " " + summary).lower()
-    return any(kw in text for kw in FX_RELEVANCE_KW)
+    if not any(kw in text for kw in FX_RELEVANCE_KW):
+        return False
+    # v1.5: passes FX keyword check but is about a non-G10 CB — discard
+    if NON_G10_CB_RE.search(title + " " + summary[:200]):
+        return False
+    return True
 
 
 # ─────────────────────────────────────────────────────────────────────────────
