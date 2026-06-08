@@ -136,6 +136,8 @@ SYMBOLS: dict[str, str] = {
     "wti":   "CL=F",       # WTI Crude front-month futures
     "btc":   "BTC-USD",    # Bitcoin vs USD
     "us10y": "^TNX",       # US 10-Year Treasury yield
+    "us5y":  "^FVX",       # US 5-Year Treasury yield
+    "us2y":  "^IRX",       # US 2-Year Treasury yield (^IRX = 13-week T-Bill, best available proxy)
     # Equity indices
     "spx":    "^GSPC",     # S&P 500
     "nasdaq": "^NDX",       # Nasdaq 100 index — matches CFI:US100 chart tab; ^IXIC (Composite) has different levels (~19k vs ~5.8k)
@@ -165,7 +167,7 @@ DECIMALS: dict[str, int] = {
     "nzdchf": 5,
     "usdjpy": 3, "eurjpy": 3, "gbpjpy": 3, "audjpy": 3, "cadjpy": 3,
     "nzdjpy": 3, "chfjpy": 3,
-    "gold":  2, "wti": 2, "btc": 2, "us10y": 4,
+    "gold":  2, "wti": 2, "btc": 2, "us10y": 4, "us5y": 4, "us2y": 4,
     "spx": 2, "nasdaq": 2, "nikkei": 2, "stoxx": 2, "vix": 2,
     "move": 2,
     "eth": 2, "dxy": 3,
@@ -178,6 +180,8 @@ GUARDS: dict[str, tuple[float, float]] = {
     "wti":   (10.0,    300.0),
     "btc":   (100.0,   500000.0),
     "us10y": (0.01,    25.0),
+    "us5y":  (0.01,    25.0),
+    "us2y":  (0.01,    25.0),
     "spx":   (500.0,   15000.0),
     "nasdaq":(1000.0,  30000.0),  # ^NDX (Nasdaq 100): historical range ~1k to ~22k; upper headroom for growth
     "nikkei":(5000.0,  80000.0),
@@ -239,7 +243,7 @@ HL_MAX_SPREAD: dict[str, float] = {
 # Fix: download 1H bars and aggregate them over the 21:00 UTC → 21:00 UTC window.
 # Result: open/high/low/close exactly match what Yahoo Finance shows on its own
 # 4H chart, and match TradingView and Bloomberg FX daily candles.
-NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'move', 'eth', 'dxy', 'gold', 'silver', 'brent', 'dax', 'ftse', 'hsi', 'dji'}
+NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'us5y', 'us2y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'move', 'eth', 'dxy', 'gold', 'silver', 'brent', 'dax', 'ftse', 'hsi', 'dji'}
 # Equity indices routed to fetch_equity_ohlc_from_1h (1H aggregation over 21:00 UTC boundary).
 # These instruments close well before the 22:30 UTC workflow run, so their 1H bars are fully
 # available. Nikkei: TSE closes ~06:00 UTC. EuroStoxx: Euronext closes ~15:30 UTC.

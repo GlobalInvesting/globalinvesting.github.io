@@ -1,5 +1,17 @@
 """
-fetch_bond_yields.py  v2.0  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v2.1  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+
+CHANGELOG v2.1 (2026-06-08)
+────────────────────────────
+FIX-24  USD bond2y / bond5y: ohlc-data/us2y.json and ohlc-data/us5y.json added
+        as PRIMARY sources, matching the existing bond10y → ohlc-data/us10y.json
+        pattern. fetch_ohlc.py (update-ohlc.yml) already downloads ^TNX (10Y) via
+        yfinance on GitHub Actions IPs where Yahoo Finance works without issue.
+        The same workflow now also downloads ^IRX (2Y proxy) and ^FVX (5Y), producing
+        us2y.json and us5y.json that this script reads first.
+        Cascade: ohlc-data → FRED CSV → Treasury XML → cached (14d).
+        This makes USD bond2y/bond5y as reliable as bond10y — daily, fresh, zero
+        dependency on FRED uptime.
 
 CHANGELOG v2.0 (2026-06-07)
 ────────────────────────────
@@ -43,9 +55,11 @@ Source cascade per currency:
     USD bond10y  → ohlc-data/us10y.json  (update-ohlc, daily)
                    FRED DGS10 public CSV (daily, no key) [fallback]
     USD vix      → ohlc-data/vix.json    (update-ohlc, daily)
-    USD bond2y   → FRED DGS2  public CSV (daily, no key)           [REQUIRED]
+    USD bond2y   → ohlc-data/us2y.json   (^IRX via yfinance, update-ohlc, daily) [PRIMARY]
+                   FRED DGS2  public CSV (daily, no key)           [fallback]
                    US Treasury XML feed (daily, no key)            [fallback]
-    USD bond5y   → FRED DGS5  public CSV (daily, no key)           [REQUIRED]
+    USD bond5y   → ohlc-data/us5y.json   (^FVX via yfinance, update-ohlc, daily) [PRIMARY]
+                   FRED DGS5  public CSV (daily, no key)           [fallback]
                    US Treasury XML feed (daily, no key)            [fallback]
     EUR bond10y  → ECB SDMX YC daily     (no key)                  [REQUIRED]
                    FRED IRLTLT01EZM156N  (monthly, no key) [fallback]
@@ -452,8 +466,11 @@ def fetch_usd(req_failures: list) -> None:
         _gha_warning(f"USD vix: value {val} out of range or unavailable — keeping existing")
         req_failures.append("USD.vix")
 
-    print("  bond2y  (FRED:DGS2 → Treasury XML BC_2YEAR)")
-    dt, val = _fred_csv_latest("DGS2")
+    print("  bond2y  (ohlc-data/us2y.json → FRED:DGS2 → Treasury XML BC_2YEAR)")
+    dt, val = _ohlc_latest("us2y")
+    if val is None or not (0 < val < 20):
+        print("    ohlc miss — trying FRED DGS2")
+        dt, val = _fred_csv_latest("DGS2")
     if val is None or not (0 < val < 20):
         print("    FRED DGS2 miss — trying US Treasury XML BC_2YEAR")
         dt, val = _treasury_xml_latest("BC_2YEAR")
@@ -463,13 +480,16 @@ def fetch_usd(req_failures: list) -> None:
         print(f"    {val:.4f}%  ({dt})")
     else:
         if _cached_is_fresh(dates, "bond2y", max_days=14):
-            _gha_notice(f"USD bond2y: FRED DGS2 + Treasury XML unavailable — using cached {dates.get('bond2y')} value ({data.get('bond2y')}%), fresh enough (<14d)")
+            _gha_notice(f"USD bond2y: all sources unavailable — using cached {dates.get('bond2y')} value ({data.get('bond2y')}%), fresh enough (<14d)")
         else:
-            _gha_warning(f"USD bond2y: FRED DGS2 + Treasury XML unavailable (val={val}) — cached value is stale or missing")
+            _gha_warning(f"USD bond2y: ohlc + FRED DGS2 + Treasury XML all unavailable (val={val}) — cached value is stale or missing")
             req_failures.append("USD.bond2y")
 
-    print("  bond5y  (FRED:DGS5 → Treasury XML BC_5YEAR)")
-    dt, val = _fred_csv_latest("DGS5")
+    print("  bond5y  (ohlc-data/us5y.json → FRED:DGS5 → Treasury XML BC_5YEAR)")
+    dt, val = _ohlc_latest("us5y")
+    if val is None or not (0 < val < 20):
+        print("    ohlc miss — trying FRED DGS5")
+        dt, val = _fred_csv_latest("DGS5")
     if val is None or not (0 < val < 20):
         print("    FRED DGS5 miss — trying US Treasury XML BC_5YEAR")
         dt, val = _treasury_xml_latest("BC_5YEAR")
@@ -479,9 +499,9 @@ def fetch_usd(req_failures: list) -> None:
         print(f"    {val:.4f}%  ({dt})")
     else:
         if _cached_is_fresh(dates, "bond5y", max_days=14):
-            _gha_notice(f"USD bond5y: FRED DGS5 + Treasury XML unavailable — using cached {dates.get('bond5y')} value ({data.get('bond5y')}%), fresh enough (<14d)")
+            _gha_notice(f"USD bond5y: all sources unavailable — using cached {dates.get('bond5y')} value ({data.get('bond5y')}%), fresh enough (<14d)")
         else:
-            _gha_warning(f"USD bond5y: FRED DGS5 + Treasury XML unavailable (val={val}) — cached value is stale or missing")
+            _gha_warning(f"USD bond5y: ohlc + FRED DGS5 + Treasury XML all unavailable (val={val}) — cached value is stale or missing")
             req_failures.append("USD.bond5y")
 
     _save("USD", data, dates)
