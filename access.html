@@ -431,11 +431,6 @@ a { color: inherit; text-decoration: none; }
 
   <!-- Screenshots -->
   <!-- Lightbox overlay -->
-  <div id="gi-lightbox" role="dialog" aria-modal="true" aria-label="Screenshot enlarged view">
-    <button id="gi-lightbox-close" aria-label="Close enlarged view">&#x2715;</button>
-    <img id="gi-lightbox-img" src="" alt="">
-    <div id="gi-lightbox-caption"></div>
-  </div>
 
   <div class="section screenshot-section">
     <h2>Interface</h2>
@@ -452,9 +447,10 @@ a { color: inherit; text-decoration: none; }
     <!-- Hero — web terminal full view -->
     <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: Web terminal full view">
       <img src="assets/screenshot-terminal.png"
+           data-src="assets/screenshot-terminal.png"
            alt="Global Investing FX Terminal — full dashboard view showing quote bar, price chart, CB rates, COT positioning, and AI narrative panels"
            width="1280" height="720"
-           loading="lazy">
+           loading="eager">
       <figcaption class="screenshot-caption">
         <strong>Web terminal.</strong> Single-page dashboard — live quote bar (28 pairs), price chart, CB rates &amp; bias, OIS rate expectations, COT positioning, carry monitor, derivatives suite, and AI narrative. Runs in any browser with no installation.
       </figcaption>
@@ -464,18 +460,20 @@ a { color: inherit; text-decoration: none; }
     <div class="screenshot-grid">
       <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: MT5 Expert Advisor view">
         <img src="assets/screenshot-mt5-ea.png"
+             data-src="assets/screenshot-mt5-ea.png"
              alt="GI FX Terminal MT5 EA — zero-flicker canvas overlay on a MetaTrader 5 chart"
              width="640" height="480"
-             loading="lazy">
+             loading="eager">
         <figcaption class="screenshot-caption">
           <strong>MT5 Expert Advisor.</strong> Zero-flicker canvas overlay inside MetaTrader 5. Includes live swaps, open positions, and MT5 push alerts — exclusive to the native layer.
         </figcaption>
       </figure>
       <figure class="screenshot-figure" role="button" tabindex="0" aria-label="Enlarge: Derivatives suite view">
         <img src="assets/screenshot-derivatives.png"
+             data-src="assets/screenshot-derivatives.png"
              alt="Derivatives section — 25-delta risk reversal term structure, implied forwards, and realized volatility"
              width="640" height="480"
-             loading="lazy">
+             loading="eager">
         <figcaption class="screenshot-caption">
           <strong>Derivatives suite.</strong> 25-delta risk reversal term structure (1W–1Y), CIP-derived implied forwards, realized vol vs RR skew, ECB official fixings, and DTCC OTC notional volume — web terminal only.
         </figcaption>
@@ -499,6 +497,12 @@ a { color: inherit; text-decoration: none; }
   <div class="footer-copy">&copy; 2026 Santiago Pl&aacute; Casuriaga &middot; Global Investing. All rights reserved.</div>
   <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.1</span></div>
 </footer>
+
+<div id="gi-lightbox" role="dialog" aria-modal="true" aria-label="Screenshot enlarged view">
+  <button id="gi-lightbox-close" aria-label="Close enlarged view">&#x2715;</button>
+  <img id="gi-lightbox-img" src="" alt="" loading="eager">
+  <div id="gi-lightbox-caption"></div>
+</div>
 
 <script>
 const btn = document.querySelector('.site-menu-btn');
@@ -527,7 +531,8 @@ document.querySelector('.hero-product')?.addEventListener('keydown', e => {
     const img = fig.querySelector('img');
     const cap = fig.querySelector('figcaption');
     if (!img) return;
-    lbImg.src = img.src;
+    const src = img.dataset.src || img.getAttribute('src') || img.currentSrc || img.src;
+    lbImg.src = src;
     lbImg.alt = img.alt;
     lbCap.textContent = cap ? cap.textContent.trim() : '';
     lb.classList.add('open');
