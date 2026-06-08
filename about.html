@@ -279,14 +279,29 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Disclaimer ── */
 .disclaimer {
-  background: rgba(246,148,28,.05);
-  border: 1px solid rgba(246,148,28,.18);
-  border-left: 3px solid var(--orange);
+  background: var(--bg2);
+  border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 16px 20px;
-  font-size: 14.3px; color: var(--text2);
-  line-height: 1.7; margin-top: 40px;
+  padding: 20px 24px;
+  margin-top: 44px;
 }
+.disclaimer-label {
+  font-size: 9.9px; font-weight: 700;
+  color: var(--text3); letter-spacing: .14em;
+  text-transform: uppercase; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.disclaimer-label::before {
+  content: '';
+  display: inline-block; width: 12px; height: 1px;
+  background: var(--text3);
+}
+.disclaimer-body {
+  font-size: 12.1px; color: var(--text3);
+  line-height: 1.75;
+}
+.disclaimer-body p { margin-bottom: 8px; color: var(--text3); font-size: 12.1px; }
+.disclaimer-body p:last-child { margin-bottom: 0; }
 
 /* ── Contact list ── */
 .contact-list {
@@ -669,8 +684,12 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <p>Contact: <a href="mailto:globalinvestingmarkets@gmail.com" style="color:var(--blue);">globalinvestingmarkets@gmail.com</a></p>
   </div>
 
-  <div class="disclaimer">
-    <strong style="color:var(--orange);">Disclaimer.</strong> Content on this terminal is informational and educational only. It does not constitute financial advice, an investment recommendation, or an offer to buy or sell any financial instrument. FX trading involves significant risk and is not suitable for all investors. Past data does not guarantee future results.
+  <div class="disclaimer" role="note" aria-label="Legal disclaimer">
+    <div class="disclaimer-label">Disclaimer</div>
+    <div class="disclaimer-body">
+      <p>Market data, rates, positioning figures, and all other information published on this terminal are sourced from third-party providers and are provided on an as-is basis without warranty of accuracy, completeness, or timeliness. Global Investing FX Terminal makes no representation that any information is current or error-free. Data may be delayed, estimated, or derived; each panel carries a source label indicating its origin and update cadence. Users are responsible for independently verifying any information before relying on it.</p>
+      <p>Nothing on this terminal constitutes financial advice, investment research, a solicitation, or a recommendation to buy, sell, or hold any financial instrument or to adopt any investment strategy. FX and related markets involve substantial risk of loss. Past performance and historical data are not indicative of future results.</p>
+    </div>
   </div>
 
 </div>
