@@ -20,7 +20,7 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 // network-first so the browser always gets the latest entry point
 // (and therefore the latest asset query-string versions).
 const STATIC_PRECACHE = [
-  '/assets/dashboard.css?v=8.21.0',
+  '/assets/dashboard-v2.css?v=8.21.0',
   '/assets/dashboard.js?v=8.21.0',
   '/assets/yc-modal.js?v=7.74.41',
   '/assets/fx-websocket.js?v=1.0.0',
