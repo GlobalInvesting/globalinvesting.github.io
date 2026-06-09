@@ -63,7 +63,22 @@ const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
 // ═══════════════════════════════════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════════════════════════════════
-function fmt(val, dec) {
+
+// ── Theme color helpers — read resolved CSS variable values ─────────
+// Used by LWC chart init so colors update when theme switches.
+function _themeColor(cssVar) {
+  return getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
+}
+function _themeColorAlpha(cssVar, alpha) {
+  const hex = _themeColor(cssVar).replace('#', '');
+  if (!hex || hex.length < 6) return `rgba(0,0,0,${alpha})`;
+  const r = parseInt(hex.slice(0,2), 16);
+  const g = parseInt(hex.slice(2,4), 16);
+  const b = parseInt(hex.slice(4,6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+
   if (val == null || isNaN(val)) return '—';
   return Number(val).toFixed(dec);
 }
@@ -2721,32 +2736,33 @@ function drawYieldCurve(points, priorPoints) {
   const px = i => PAD_L+(i/(n-1))*cW;
   const py = v => PAD_T+(1-(v-minY)/yRange)*cH;
 
+  const _tc = v => _themeColor(v);
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#131722'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=_tc('--bg'); ctx.fillRect(0,0,W,H);
 
   // Grid lines
   const step = yRange <= 0.5 ? 0.1 : yRange <= 1 ? 0.25 : 0.5;
   const gridStart = Math.ceil(minY / step) * step;
   for (let v = gridStart; v <= maxY + 0.001; v = Math.round((v + step) * 1000) / 1000) {
     const y = py(v);
-    ctx.strokeStyle='#2a2e39'; ctx.lineWidth=0.5; ctx.setLineDash([2,4]);
+    ctx.strokeStyle=_tc('--border'); ctx.lineWidth=0.5; ctx.setLineDash([2,4]);
     ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle='#9ba1ae'; ctx.font='bold 8px Courier New'; ctx.textAlign='right';
+    ctx.fillStyle=_tc('--text2'); ctx.font='bold 8px Courier New'; ctx.textAlign='right';
     ctx.fillText(v.toFixed(2)+'%', PAD_L-3, y+3);
   }
 
   // Inverted zone — shade between shortest and longest tenor if inverted
   const firstV = vals[0], lastV = vals[n-1];
   if (firstV != null && lastV != null && firstV > lastV) {
-    ctx.fillStyle='#ef535012';
+    ctx.fillStyle=_themeColorAlpha('--down', 0.07);
     ctx.fillRect(PAD_L, PAD_T, cW, cH);
   }
 
   // Prior curve
   const priorPts = prevVals.map((v,i) => v != null ? [px(i), py(v)] : null).filter(Boolean);
   if (priorPts.length >= 2) {
-    ctx.beginPath(); ctx.strokeStyle='#363c4e'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.strokeStyle=_tc('--border2'); ctx.lineWidth=1;
     priorPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
     ctx.stroke();
   }
@@ -2759,10 +2775,10 @@ function drawYieldCurve(points, priorPoints) {
     ctx.lineTo(curPts[curPts.length-1][0], PAD_T+cH);
     ctx.lineTo(PAD_L, PAD_T+cH);
     ctx.closePath();
-    ctx.fillStyle='#4f7fff12'; ctx.fill();
+    ctx.fillStyle=_themeColorAlpha('--blue', 0.07); ctx.fill();
 
     // Current curve line
-    ctx.beginPath(); ctx.strokeStyle='#4f7fff'; ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.strokeStyle=_tc('--blue'); ctx.lineWidth=1.8;
     curPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
     ctx.stroke();
 
@@ -2771,24 +2787,24 @@ function drawYieldCurve(points, priorPoints) {
       if (v == null) return;
       const x = px(i), y = py(v);
       ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2);
-      ctx.fillStyle='#4f7fff'; ctx.fill();
+      ctx.fillStyle=_tc('--blue'); ctx.fill();
     });
   }
 
   // X-axis labels
-  ctx.fillStyle='#9ba1ae'; ctx.font='bold 8.5px Courier New'; ctx.textAlign='center';
+  ctx.fillStyle=_tc('--text2'); ctx.font='bold 8.5px Courier New'; ctx.textAlign='center';
   labels.forEach((t,i) => ctx.fillText(t, px(i), H-5));
 
   // Legend
   ctx.textAlign='left';
-  ctx.fillStyle='#4d8ffa'; ctx.fillText('● Current', PAD_L, PAD_T-2);
-  ctx.fillStyle='#6b7280'; ctx.fillText('● Prior',   PAD_L+52, PAD_T-2);
+  ctx.fillStyle=_tc('--blue'); ctx.fillText('● Current', PAD_L, PAD_T-2);
+  ctx.fillStyle=_tc('--text3'); ctx.fillText('● Prior',   PAD_L+52, PAD_T-2);
   if (!isLive) {
-    ctx.fillStyle='#6b7280'; ctx.fillText('(static)', PAD_L+92, PAD_T-2);
+    ctx.fillStyle=_tc('--text3'); ctx.fillText('(static)', PAD_L+92, PAD_T-2);
   } else {
     // Check inversion
     const spr = (vals[n-1] ?? 0) - (vals[0] ?? 0); // long - short
-    if (spr < 0) { ctx.fillStyle='#ef535099'; ctx.fillText('■ Inverted', PAD_L+92, PAD_T-2); }
+    if (spr < 0) { ctx.fillStyle=_themeColorAlpha('--down', 0.6); ctx.fillText('■ Inverted', PAD_L+92, PAD_T-2); }
   }
 
   // Update yield spread table using real 2Y and 10Y
@@ -3769,14 +3785,14 @@ async function _renderLWChart(ohlcId, label) {
     : { top: 0.10, bottom: 0.08 };
 
   _lwChart = LWC.createChart(chartDiv, {
-    layout:      { background: { color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
-    grid:        { vertLines: { color: 'rgba(42,46,57,0.5)' }, horzLines: { color: 'rgba(42,46,57,0.5)' } },
+    layout:      { background: { color: _themeColor('--bg') }, textColor: _themeColor('--text'), attributionLogo: false },
+    grid:        { vertLines: { color: _themeColorAlpha('--border', 0.5) }, horzLines: { color: _themeColorAlpha('--border', 0.5) } },
     crosshair:   { mode: LWC.CrosshairMode.Normal,
-                   vertLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' },
-                   horzLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' } },
-    rightPriceScale: { borderColor: '#2a2e39', minimumWidth: 65,
+                   vertLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') },
+                   horzLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') } },
+    rightPriceScale: { borderColor: _themeColor('--border'), minimumWidth: 65,
                        scaleMargins: mainScaleMargins },
-    timeScale:   { borderColor: '#2a2e39', timeVisible: false, secondsVisible: false,
+    timeScale:   { borderColor: _themeColor('--border'), timeVisible: false, secondsVisible: false,
                    rightOffset: 8, minBarSpacing: 1,
                    fixLeftEdge: false, fixRightEdge: false },
     handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
@@ -3863,13 +3879,13 @@ async function _renderLWChart(ohlcId, label) {
     // Bar (OHLC) series — same data as candlestick, different visual
     if (typeof LWC.BarSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.BarSeries, {
-        upColor: '#26a69a', downColor: '#ef5350',
+        upColor: _themeColor('--up'), downColor: _themeColor('--down'),
         openVisible: true, thinBars: false,
         priceFormat: _priceFormat,
       });
     } else {
       candleSeries = _lwChart.addBarSeries({
-        upColor: '#26a69a', downColor: '#ef5350',
+        upColor: _themeColor('--up'), downColor: _themeColor('--down'),
         priceFormat: _priceFormat,
       });
     }
@@ -3878,43 +3894,43 @@ async function _renderLWChart(ohlcId, label) {
     // Line series — close prices only
     if (typeof LWC.LineSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.LineSeries, {
-        color: '#4f7fff', lineWidth: 2,
+        color: _themeColor('--blue'), lineWidth: 2,
         priceLineVisible: false, lastValueVisible: true,
         crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
         priceFormat: _priceFormat,
       });
     } else {
-      candleSeries = _lwChart.addLineSeries({ color: '#4f7fff', lineWidth: 2, priceFormat: _priceFormat });
+      candleSeries = _lwChart.addLineSeries({ color: _themeColor('--blue'), lineWidth: 2, priceFormat: _priceFormat });
     }
     candleSeries.setData(closeBars);
   } else if (window._lwChartType === 'area') {
     // Area series — close prices with gradient fill
     if (typeof LWC.AreaSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.AreaSeries, {
-        lineColor: '#4f7fff', lineWidth: 2,
-        topColor: 'rgba(79,127,255,0.28)', bottomColor: 'rgba(79,127,255,0.02)',
+        lineColor: _themeColor('--blue'), lineWidth: 2,
+        topColor: _themeColorAlpha('--blue', 0.28), bottomColor: _themeColorAlpha('--blue', 0.02),
         priceLineVisible: false, lastValueVisible: true,
         crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
         priceFormat: _priceFormat,
       });
     } else {
-      candleSeries = _lwChart.addAreaSeries({ lineColor: '#4f7fff', lineWidth: 2, priceFormat: _priceFormat });
+      candleSeries = _lwChart.addAreaSeries({ lineColor: _themeColor('--blue'), lineWidth: 2, priceFormat: _priceFormat });
     }
     candleSeries.setData(closeBars);
   } else {
     // Default: Candlestick — LWC v5 API with v4 fallback
     if (typeof LWC.CandlestickSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.CandlestickSeries, {
-        upColor: '#26a69a', downColor: '#ef5350',
-        borderUpColor: '#26a69a', borderDownColor: '#ef5350',
-        wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+        upColor: _themeColor('--up'), downColor: _themeColor('--down'),
+        borderUpColor: _themeColor('--up'), borderDownColor: _themeColor('--down'),
+        wickUpColor: _themeColor('--up'), wickDownColor: _themeColor('--down'),
         priceFormat: _priceFormat,
       });
     } else {
       candleSeries = _lwChart.addCandlestickSeries({
-        upColor: '#26a69a', downColor: '#ef5350',
-        borderUpColor: '#26a69a', borderDownColor: '#ef5350',
-        wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+        upColor: _themeColor('--up'), downColor: _themeColor('--down'),
+        borderUpColor: _themeColor('--up'), borderDownColor: _themeColor('--down'),
+        wickUpColor: _themeColor('--up'), wickDownColor: _themeColor('--down'),
         priceFormat: _priceFormat,
       });
     }
@@ -4015,7 +4031,7 @@ async function _renderLWChart(ohlcId, label) {
         lineWidth: 1,
         lineStyle: 2, // LineStyle.Dashed
         axisLabelVisible: true,
-        axisLabelColor: '#2a2e39',
+        axisLabelColor: _themeColor('--border'),
         axisLabelTextColor: '#848ea0',
         title: 'Prev C',
       });
@@ -4377,7 +4393,7 @@ async function _renderLWChart(ohlcId, label) {
     const cfg = _IND_CATALOGUE.find(c => c.id === id);
     const defaults = cfg?.colors || [];
     const custom   = (window._lwIndParams[id] || {}).colors || [];
-    return custom[i] || defaults[i] || '#787b86';
+    return custom[i] || defaults[i] || _themeColor('--text3');
   }
 
   // ── Calculation functions — one per indicator id ───────────────────────────
@@ -4709,7 +4725,7 @@ async function _renderLWChart(ohlcId, label) {
     const el = document.createElement('div');
     el.id = id;
     el.style.cssText = 'position:absolute;top:4px;left:8px;z-index:3;pointer-events:none;'
-      + 'font-size:10px;font-family:var(--font-mono,monospace);line-height:1.3;user-select:none;color:#d1d4dc;';
+      + 'font-size:10px;font-family:var(--font-mono,monospace);line-height:1.3;user-select:none;color:var(--text);';
     el.innerHTML = html;
     paneEl.appendChild(el);
   }
@@ -4886,12 +4902,12 @@ async function _renderLWChart(ohlcId, label) {
     // MA pills
     window._lwMaList.forEach(ma => {
       const pill = document.createElement('span');
-      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:#1e222d;border:1px solid #2a2e39;border-radius:3px;padding:1px 5px;font-size:9px;font-family:var(--font-ui,sans-serif);white-space:nowrap;';
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:9px;font-family:var(--font-ui,sans-serif);white-space:nowrap;';
       const dot = `<span style="width:6px;height:6px;border-radius:50%;background:${ma.color};display:inline-block;flex-shrink:0"></span>`;
-      pill.innerHTML = `${dot}<span style="color:#787b86">${ma.type} ${ma.period}</span>`;
+      pill.innerHTML = `${dot}<span style="color:var(--text2)">${ma.type} ${ma.period}</span>`;
       const rm = document.createElement('span');
       rm.textContent = '\u00d7';
-      rm.style.cssText = 'color:#4a5060;cursor:pointer;font-size:10px;margin-left:1px;';
+      rm.style.cssText = 'color:var(--text3);cursor:pointer;font-size:10px;margin-left:1px;';
       rm.title = `Remove ${ma.type} ${ma.period}`;
       rm.addEventListener('click', e => {
         e.stopPropagation();
@@ -4907,11 +4923,11 @@ async function _renderLWChart(ohlcId, label) {
     // Other indicator pills
     _IND_CATALOGUE.filter(c => c.id !== 'ma' && window._lwIndState[c.id]).forEach(cfg => {
       const pill = document.createElement('span');
-      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:#1e222d;border:1px solid #2a2e39;border-radius:3px;padding:1px 5px;font-size:9px;font-family:var(--font-ui,sans-serif);white-space:nowrap;';
-      pill.innerHTML = `<span style="color:#787b86">${cfg.label}</span>`;
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:9px;font-family:var(--font-ui,sans-serif);white-space:nowrap;';
+      pill.innerHTML = `<span style="color:var(--text2)">${cfg.label}</span>`;
       const rm = document.createElement('span');
       rm.textContent = '\u00d7';
-      rm.style.cssText = 'color:#4a5060;cursor:pointer;font-size:10px;margin-left:1px;';
+      rm.style.cssText = 'color:var(--text3);cursor:pointer;font-size:10px;margin-left:1px;';
       rm.title = 'Remove ' + cfg.label;
       rm.addEventListener('click', e => {
         e.stopPropagation();
@@ -4955,11 +4971,11 @@ async function _renderLWChart(ohlcId, label) {
     const pop = document.createElement('div');
     pop.id = '_lw-ind-dropdown';
     pop.style.cssText = [
-      'position:fixed;z-index:9999;background:#1a1d29;border:1px solid #2a2e39;',
+      'position:fixed;z-index:9999;background:var(--head-bg);border:1px solid var(--border);',
       'border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,.7);',
       'font-size:11px;font-family:var(--font-ui,sans-serif);',
       'min-width:300px;max-height:520px;overflow-y:auto;',
-      'scrollbar-width:thin;scrollbar-color:#2a2e39 transparent;',
+      'scrollbar-width:thin;scrollbar-color:var(--border) transparent;',
     ].join('');
 
     // ── MA SECTION ────────────────────────────────────────────────────────────
@@ -4974,14 +4990,14 @@ async function _renderLWChart(ohlcId, label) {
 
     // MA group header
     const maHeader = document.createElement('div');
-    maHeader.style.cssText = 'padding:8px 12px 4px;color:#4a5060;font-size:9px;letter-spacing:.08em;font-weight:700;border-bottom:1px solid #2a2e39;display:flex;align-items:center;justify-content:space-between;';
+    maHeader.style.cssText = 'padding:8px 12px 4px;color:var(--text3);font-size:9px;letter-spacing:.08em;font-weight:700;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;';
     maHeader.innerHTML = '<span>MOVING AVERAGES</span>';
 
     const addMaBtn = document.createElement('button');
     addMaBtn.textContent = '+ Add MA';
-    addMaBtn.style.cssText = 'background:#4f7fff;color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:600;cursor:pointer;letter-spacing:.04em;';
-    addMaBtn.addEventListener('mouseenter', () => addMaBtn.style.background = '#5f8fff');
-    addMaBtn.addEventListener('mouseleave', () => addMaBtn.style.background = '#4f7fff');
+    addMaBtn.style.cssText = 'background:var(--blue);color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:600;cursor:pointer;letter-spacing:.04em;';
+    addMaBtn.addEventListener('mouseenter', () => addMaBtn.style.background = _themeColor('--blue') + 'cc');
+    addMaBtn.addEventListener('mouseleave', () => addMaBtn.style.background = 'var(--blue)');
     addMaBtn.addEventListener('click', e => {
       e.stopPropagation();
       const newMa = { uid: _genMaUid(), type:'EMA', period:20, color:_nextColor(), lineWidth:1, lineStyle:0 };
@@ -4997,7 +5013,7 @@ async function _renderLWChart(ohlcId, label) {
 
     if (window._lwMaList.length === 0) {
       const empty = document.createElement('div');
-      empty.style.cssText = 'padding:10px 12px;color:#4a5060;font-size:10px;font-style:italic;';
+      empty.style.cssText = 'padding:10px 12px;color:var(--text3);font-size:10px;font-style:italic;';
       empty.textContent = 'No moving averages — click "+ Add MA" to add one.';
       pop.appendChild(empty);
     }
@@ -5028,7 +5044,7 @@ async function _renderLWChart(ohlcId, label) {
 
       // MA type selector
       const typeSelect = document.createElement('select');
-      typeSelect.style.cssText = 'background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;';
+      typeSelect.style.cssText = 'background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;';
       MA_TYPES.forEach(t => {
         const opt = document.createElement('option');
         opt.value = t; opt.textContent = t;
@@ -5047,7 +5063,7 @@ async function _renderLWChart(ohlcId, label) {
       // Period input
       const periodInput = document.createElement('input');
       periodInput.type = 'number'; periodInput.value = ma.period; periodInput.min = 1; periodInput.max = 500;
-      periodInput.style.cssText = 'width:44px;background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;text-align:center;';
+      periodInput.style.cssText = 'width:44px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px;font-size:10px;text-align:center;';
       periodInput.addEventListener('click', e => e.stopPropagation());
       periodInput.addEventListener('change', e => {
         e.stopPropagation();
@@ -5058,7 +5074,7 @@ async function _renderLWChart(ohlcId, label) {
 
       // Line style selector
       const styleSelect = document.createElement('select');
-      styleSelect.style.cssText = 'background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;';
+      styleSelect.style.cssText = 'background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;';
       LINE_STYLES.forEach(ls => {
         const opt = document.createElement('option');
         opt.value = ls.v; opt.textContent = ls.l;
@@ -5075,7 +5091,7 @@ async function _renderLWChart(ohlcId, label) {
 
       // Line width selector
       const widthSelect = document.createElement('select');
-      widthSelect.style.cssText = 'background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;width:36px;';
+      widthSelect.style.cssText = 'background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;width:36px;';
       [1,2,3].forEach(w => {
         const opt = document.createElement('option');
         opt.value = w; opt.textContent = w + 'px';
@@ -5093,10 +5109,10 @@ async function _renderLWChart(ohlcId, label) {
       // Remove button
       const rmBtn = document.createElement('button');
       rmBtn.innerHTML = '&times;';
-      rmBtn.style.cssText = 'background:none;border:none;color:#4a5060;cursor:pointer;font-size:14px;margin-left:auto;padding:0 2px;line-height:1;flex-shrink:0;';
+      rmBtn.style.cssText = 'background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;margin-left:auto;padding:0 2px;line-height:1;flex-shrink:0;';
       rmBtn.title = `Remove ${ma.type} ${ma.period}`;
-      rmBtn.addEventListener('mouseenter', () => rmBtn.style.color = '#ef5350');
-      rmBtn.addEventListener('mouseleave', () => rmBtn.style.color = '#4a5060');
+      rmBtn.addEventListener('mouseenter', () => rmBtn.style.color = 'var(--down)');
+      rmBtn.addEventListener('mouseleave', () => rmBtn.style.color = 'var(--text3)');
       rmBtn.addEventListener('click', e => {
         e.stopPropagation();
         window._lwMaList = window._lwMaList.filter(m => m.uid !== ma.uid);
@@ -5157,7 +5173,7 @@ async function _renderLWChart(ohlcId, label) {
     Object.entries(groups).forEach(([groupName, items]) => {
       const header = document.createElement('div');
       header.textContent = groupName.toUpperCase();
-      header.style.cssText = 'padding:8px 12px 4px;color:#4a5060;font-size:9px;letter-spacing:.08em;font-weight:700;border-top:1px solid #2a2e39;';
+      header.style.cssText = 'padding:8px 12px 4px;color:var(--text3);font-size:9px;letter-spacing:.08em;font-weight:700;border-top:1px solid var(--border);';
       pop.appendChild(header);
 
       items.forEach(cfg => {
@@ -5174,14 +5190,14 @@ async function _renderLWChart(ohlcId, label) {
 
         // Checkbox
         const check = document.createElement('div');
-        check.style.cssText = `width:14px;height:14px;border-radius:3px;border:1px solid ${isOn?'#4f7fff':'#3a3f52'};background:${isOn?'#4f7fff':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;`;
+        check.style.cssText = `width:14px;height:14px;border-radius:3px;border:1px solid ${isOn?_themeColor('--blue'):_themeColor('--border2')};background:${isOn?_themeColor('--blue'):'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;`;
         if (isOn) check.innerHTML = '<svg width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1,3 3,5 7,1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
         // Label + desc
         const left = document.createElement('div');
         left.style.cssText = 'flex:1;min-width:0;';
-        left.innerHTML = `<div style="color:${isOn?'#d1d4dc':'#9da5b4'};font-weight:${isOn?'600':'400'};font-size:11px">${cfg.label}</div>`
-          + `<div style="color:#4a5060;font-size:9px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${cfg.desc}</div>`;
+        left.innerHTML = `<div style="color:${isOn?_themeColor('--text'):_themeColor('--text2')};font-weight:${isOn?'600':'400'};font-size:11px">${cfg.label}</div>`
+          + `<div style="color:var(--text3);font-size:9px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${cfg.desc}</div>`;
 
         row.appendChild(check);
         row.appendChild(left);
@@ -5213,7 +5229,7 @@ async function _renderLWChart(ohlcId, label) {
             inp.type = 'number';
             inp.value = _iP(cfg.id)[pd.key];
             inp.min = pd.min; inp.max = pd.max; inp.step = pd.step || 1;
-            inp.style.cssText = 'width:46px;background:#131722;color:#d1d4dc;border:1px solid #2a2e39;border-radius:3px;padding:2px 4px;font-size:10px;text-align:center;';
+            inp.style.cssText = 'width:46px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px;font-size:10px;text-align:center;';
             inp.addEventListener('click', e => e.stopPropagation());
             inp.addEventListener('change', e => {
               e.stopPropagation();
@@ -5347,7 +5363,7 @@ async function _renderLWChart(ohlcId, label) {
         }
         isUp = _pctForDir != null ? _pctForDir >= 0 : (bar.close != null && bar.close >= (bar.open ?? bar.close));
       }
-      const ohlcColor = isUp ? '#26a69a' : '#ef5350';
+      const ohlcColor = isUp ? _themeColor('--up') : _themeColor('--down');
       const _isOHLCType = (window._lwChartType === 'candle' || window._lwChartType === 'bar');
       // Hide O/H/L labels for Line/Area — only Close is meaningful
       const _ohlcWrap = document.getElementById('lw-hdr-ohlc-wrap');
@@ -5430,14 +5446,14 @@ async function _renderLWChart(ohlcId, label) {
     pointerEvents:  'none',
     boxSizing:      'border-box',
     width:          TOOLTIP_W + 'px',
-    background:     '#1e222d',
-    border:         '1px solid #363c4e',
+    background:     'var(--bg2)',
+    border:         '1px solid var(--border2)',
     borderRadius:   '4px',
     padding:        '6px 10px',
     fontSize:       '11px',
     lineHeight:     '1.5',
     fontFamily:     'var(--font-ui,sans-serif)',
-    color:          '#d1d4dc',
+    color:          'var(--text)',
     zIndex:         '50',
     boxShadow:      '0 4px 12px rgba(0,0,0,.6)',
   });
@@ -5570,8 +5586,7 @@ function loadCOTChart(longSym) {
     hide_side_toolbar: true, hide_top_toolbar: true, hide_legend: false,
     hide_volume: true, interval: 'W', locale: 'en', save_image: true,
     style: '2', symbol: longSym, theme: 'dark', timezone: 'Etc/UTC',
-    backgroundColor: '#131722', gridColor: 'rgba(42,46,57,0.8)',
-    withdateranges: false, compareSymbols: [{ symbol: shortSym, position: 'SameScale' }],
+    backgroundColor: _themeColor('--bg'), gridColor: _themeColorAlpha('--border', 0.8),
     scaleMode: 2, studies: [], autosize: true,
   });
   container.appendChild(script);
@@ -5619,7 +5634,7 @@ function _loadTVWidgetFallback(sym) {
     hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:false,
     hide_volume:true, interval:'D', locale:'en', save_image:false,
     style:chartStyle, symbol:sym, theme:'dark', timezone:'Etc/UTC',
-    backgroundColor:'#131722', gridColor:'rgba(42,46,57,0.8)',
+    backgroundColor:_themeColor('--bg'), gridColor:_themeColorAlpha('--border', 0.8),
     withdateranges:false, studies:[{id:'MASimple@tv-basicstudies',inputs:{length:20}}], autosize:true
   });
   container.appendChild(script);
@@ -8412,7 +8427,7 @@ function drawLiquidityChart() {
     ctx.fillStyle=gradFut; ctx.fill();
 
     // ── PAST: línea sólida azul ───────────────────────────────────────────
-    ctx.beginPath(); ctx.strokeStyle='#4f7fff'; ctx.lineWidth=1.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.strokeStyle=_themeColor('--blue'); ctx.lineWidth=1.5; ctx.setLineDash([]);
     for (let ci=0; ci<=nowCanvasSlot; ci++) {
       const v = hours[sa(ci)];
       ci===0 ? ctx.moveTo(px(ci),py(v)) : ctx.lineTo(px(ci),py(v));
@@ -8441,7 +8456,7 @@ function drawLiquidityChart() {
     }
     ctx.lineTo(px(47),PAD_T+cH); ctx.lineTo(px(0),PAD_T+cH); ctx.closePath();
     ctx.fillStyle=grad; ctx.fill();
-    ctx.beginPath(); ctx.strokeStyle='#363c4e'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.strokeStyle=_themeColor('--border2'); ctx.lineWidth=1.5;
     for (let ci=0; ci<48; ci++) {
       const v = hours[sa(ci)];
       ci===0 ? ctx.moveTo(px(ci),py(v)) : ctx.lineTo(px(ci),py(v));
@@ -8649,7 +8664,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
       hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:false,
       hide_volume:true, interval:'D', locale:'en', save_image:false,
       style:'1', symbol:sym, theme:'dark', timezone:'Etc/UTC',
-      backgroundColor:'#131722', gridColor:'rgba(42,46,57,0.8)',
+      backgroundColor:_themeColor('--bg'), gridColor:_themeColorAlpha('--border', 0.8),
       withdateranges:false, studies:[{id:'MASimple@tv-basicstudies',inputs:{length:20}}], autosize:true
     });
     container.appendChild(script);
@@ -8870,7 +8885,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     var widget = document.createElement('tv-economic-map');
     widget.setAttribute('theme', 'dark');
     widget.setAttribute('transparent', '');
-    widget.style.cssText = 'width:100%;height:100%;min-height:380px;display:block;background:#131722;';
+    widget.style.cssText = 'width:100%;height:100%;min-height:380px;display:block;background:var(--bg);';
     placeholder.replaceWith(widget);
     document.head.appendChild(s);
     _econmapLoaded = true;
@@ -11905,10 +11920,10 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
   const uid = cmpType + ':' + cmpId;
 
   // ── Colour per type ────────────────────────────────────────────────────────
-  const CMP_COLOR = cmpType === 'cot'  ? '#9c27b0'   // purple for COT
-                  : cmpType === 'rate' ? '#26a69a'   // teal for CB rate
-                  : cmpType === 'esi'  ? '#2196f3'   // blue for ESI
-                  :                      '#f0a500';  // amber for price overlay
+  const CMP_COLOR = cmpType === 'cot'  ? '#9c27b0'                // purple for COT
+                  : cmpType === 'rate' ? _themeColor('--up')      // up color for CB rate
+                  : cmpType === 'esi'  ? _themeColor('--blue')    // blue for ESI
+                  :                     _themeColor('--orange');   // orange for price overlay
 
   try {
     let seriesData = [];
