@@ -18,6 +18,63 @@
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   }
 
+  /* ── MT5 THEME ── */
+  [data-theme="mt5"] {
+    --bg: #10101e;
+    --bg2: #1a1a2e;
+    --bg3: #252540;
+    --border: #2d2d4a;
+    --border2: #3a3a5c;
+    --text: #e8e8f0;
+    --text2: #9090b8;
+    --text3: #6868a0;
+    --up: #00c896;
+    --down: #ff4444;
+    --blue: #5580ff;
+    --orange: #ff6600;
+    --head-bg: #0d0d1a;
+  }
+
+  /* ── THEME TOGGLE in menu ── */
+  .gi-theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 6px 14px 4px;
+    background: var(--bg3);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border2);
+  }
+  .gi-theme-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text3);
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 5px 0;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    white-space: nowrap;
+  }
+  .gi-theme-btn.active {
+    background: var(--border2);
+    color: var(--text);
+  }
+  .gi-theme-btn:hover:not(.active) { color: var(--text2); }
+  .gi-theme-label {
+    padding: 4px 14px 1px;
+    font-size: 9px;
+    color: var(--text3);
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
