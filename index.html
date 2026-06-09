@@ -1808,32 +1808,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     try { saved = localStorage.getItem(STORAGE_KEY) || 'dark'; } catch {}
     apply(saved);
 
+    window.GI_THEME = { set: apply, current: () => saved };
+  })();
+  </script>
   <script>
   // ── UI Scale control — mirrors EA zoom ──
   (function () {
-    const STORAGE_KEY = 'gi-ui-scale';
+    const SCALE_KEY = 'gi-ui-scale';
     const STEPS = [70, 80, 90, 100, 110, 120, 130, 140, 150];
-    let idx = STEPS.indexOf(100); // default 100%
+    let idx = STEPS.indexOf(100);
 
-    function apply(pct) {
+    function applyScale(pct) {
       document.documentElement.style.fontSize = (pct / 100) * 12 + 'px';
       const el = document.getElementById('gi-scale-pct');
       if (el) el.textContent = pct + '%';
     }
 
-    // Load saved scale
     try {
-      const saved = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+      const saved = parseInt(localStorage.getItem(SCALE_KEY), 10);
       if (STEPS.includes(saved)) idx = STEPS.indexOf(saved);
     } catch {}
-    apply(STEPS[idx]);
+    applyScale(STEPS[idx]);
 
     window.GI_SCALE = {
       inc() {
-        if (idx < STEPS.length - 1) { idx++; apply(STEPS[idx]); try { localStorage.setItem(STORAGE_KEY, STEPS[idx]); } catch {} }
+        if (idx < STEPS.length - 1) { idx++; applyScale(STEPS[idx]); try { localStorage.setItem(SCALE_KEY, STEPS[idx]); } catch {} }
       },
       dec() {
-        if (idx > 0) { idx--; apply(STEPS[idx]); try { localStorage.setItem(STORAGE_KEY, STEPS[idx]); } catch {} }
+        if (idx > 0) { idx--; applyScale(STEPS[idx]); try { localStorage.setItem(SCALE_KEY, STEPS[idx]); } catch {} }
       },
     };
   })();
