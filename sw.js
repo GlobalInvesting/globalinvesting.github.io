@@ -1,21 +1,29 @@
 // ═══════════════════════════════════════════════════════════════════
 // sw.js — Global Investing FX Terminal Service Worker
 // Strategy:
-//   • Static shell (HTML, CSS, JS, icons) → Cache-first, update in bg
-//   • JSON data endpoints  → Network-first, cache as fallback
-//   • Everything else      → Network only
+//   • index.html            → Network-first (always fresh entry point)
+//   • Static shell (CSS, JS, icons) → Cache-first, update in bg
+//   • JSON data endpoints   → Network-first, cache as fallback
+//   • Everything else       → Network only
+//
+// VERSIONING: bump CACHE_VERSION on every deploy that changes static
+// assets. The activate handler deletes all old-versioned caches so
+// users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.4.3';
+const CACHE_VERSION = 'gi-v8.21.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
-// Core shell files cached on install
+// Core shell files cached on install.
+// NOTE: index.html is intentionally excluded — it is handled via
+// network-first so the browser always gets the latest entry point
+// (and therefore the latest asset query-string versions).
 const STATIC_PRECACHE = [
-  '/',
-  '/index.html',
-  '/assets/dashboard.css?v=8.3.2',
-  '/assets/dashboard.js?v=8.3.2',
+  '/assets/dashboard.css?v=8.21.0',
+  '/assets/dashboard.js?v=8.21.0',
+  '/assets/yc-modal.js?v=7.74.41',
+  '/assets/fx-websocket.js?v=1.0.0',
   '/assets/gdpr.js',
   '/assets/sw-register.js',
   '/favicon.ico',
@@ -50,7 +58,7 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// ── Activate: delete old caches ─────────────────────────────────────
+// ── Activate: delete all caches from previous versions ──────────────
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -74,13 +82,19 @@ self.addEventListener('fetch', event => {
 
   const isData = DATA_PATH_PREFIXES.some(p => url.pathname.startsWith(p));
 
-  if (isData) {
-    // Network-first: fresh data preferred, cache as offline fallback
+  // index.html: always network-first so deploys are picked up immediately
+  const isEntryPoint = url.pathname === '/' || url.pathname === '/index.html';
+
+  if (isEntryPoint || isData) {
+    // Network-first: fresh content preferred, cache as offline fallback
     event.respondWith(
       fetch(request)
         .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_DATA).then(cache => cache.put(request, clone));
+          if (response.ok) {
+            const clone = response.clone();
+            const cacheName = isData ? CACHE_DATA : CACHE_STATIC;
+            caches.open(cacheName).then(cache => cache.put(request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(request))
@@ -95,7 +109,7 @@ self.addEventListener('fetch', event => {
             caches.open(CACHE_STATIC).then(cache => cache.put(request, clone));
           }
           return response;
-        });
+        }).catch(() => {});
         return cached || networkFetch;
       })
     );
@@ -118,7 +132,7 @@ self.addEventListener('push', event => {
       body:  body,
       icon:  icon,
       badge: badge,
-      tag:   'cot-update',          // replaces previous COT notification
+      tag:   'cot-update',
       renotify: false,
       data:  { url: url }
     })
@@ -134,14 +148,12 @@ self.addEventListener('notificationclick', event => {
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      // Focus existing tab if already open
       for (var i = 0; i < list.length; i++) {
         var c = list[i];
         if (c.url.includes('globalinvesting.github.io') && 'focus' in c) {
           return c.focus();
         }
       }
-      // Otherwise open a new tab
       if (clients.openWindow) return clients.openWindow(targetUrl);
     })
   );
