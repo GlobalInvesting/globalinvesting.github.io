@@ -336,7 +336,7 @@ gtag('consent', 'default', {
 <!-- Critical CSS inline — above-the-fold only -->
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#9096a0;--text3:#8290a0;--up:#26a69a;--down:#ef5350;--blue:#4f7fff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
+:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#9096a0;--text3:#8290a0;--up:#26a69a;--down:#ef5350;--blue:#4f7fff;--accent:#4f7fff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
 body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:12px;line-height:1.4;min-height:100vh}
 
 #topbar{background:var(--head-bg);border-bottom:1px solid var(--border);height:36px;display:flex;align-items:center;padding:0 10px;position:sticky;top:0;z-index:200}
@@ -355,25 +355,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .panel{border-bottom:1px solid var(--border)}
 .panel-head{background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between}
 .panel-title{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em}
-.skip-link{position:absolute;left:-9999px;top:8px;z-index:9999;padding:4px 8px;background:var(--blue);color:#fff;font-size:12px;border-radius:3px}
+.skip-link{position:absolute;left:-9999px;top:8px;z-index:9999;padding:4px 8px;background:var(--accent);color:#fff;font-size:12px;border-radius:3px}
 .skip-link:focus{left:8px}
 .tv-skeleton{background:var(--bg3);width:100%;height:100%}
 #tv-chart-wrap{height:290px;min-height:290px}
 .lw-range-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em}
 .lw-range-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
-.lw-range-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.lw-range-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .lw-tb-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em;white-space:nowrap}
 .lw-tb-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
-.lw-tb-btn.on{color:var(--text);border-color:var(--blue)}
-.lw-tb-btn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.lw-tb-btn.on{color:var(--text);border-color:var(--accent)}
+.lw-tb-btn.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
 .lw-tb-sep{width:1px;height:14px;background:var(--border2);margin:0 6px;flex-shrink:0}
 #lw-range-bar::-webkit-scrollbar,#lw-range-bar div::-webkit-scrollbar{display:none}
 .lw-tf-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em;white-space:nowrap}
 .lw-tf-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
-.lw-tf-btn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.lw-tf-btn.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
 .lw-cmp-item{padding:4px 12px;cursor:pointer;color:var(--text2);white-space:nowrap;font-family:var(--font-ui,sans-serif)}
 .lw-cmp-item:hover{background:var(--bg3,#2a2e39);color:var(--text)}
-.lw-cmp-item.active{color:var(--blue);font-weight:600}
+.lw-cmp-item.active{color:var(--accent);font-weight:600}
 .lw-cmp-pill{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 7px;font-size:9px;color:var(--text2);cursor:pointer;white-space:nowrap;font-family:var(--font-ui,sans-serif)}
 .lw-cmp-pill:hover{border-color:var(--down);color:var(--down)}
 #lw-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
@@ -393,7 +393,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #lw-chart-header .lw-hdr-val{color:var(--text)}
 #lw-chart-header .lw-hdr-chg.up{color:var(--up)}
 #lw-chart-header .lw-hdr-chg.dn{color:var(--down)}
-#lw-chart-header .lw-hdr-ma-val{color:var(--blue)}
+#lw-chart-header .lw-hdr-ma-val{color:var(--accent)}
 /* Hide LW Charts attribution logo (rendered as an anchor tag inside the chart div) */
 #tv-chart-wrap a[href*="tradingview"]{display:none!important}
 #tvcal-inner{overflow:hidden}
@@ -422,15 +422,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #main.split-layout #narrative:hover .narr-share-btn,#main.split-layout #narrative:focus-within .narr-share-btn{height:22px;overflow:visible;opacity:1;pointer-events:auto;margin-bottom:4px;border:1px solid transparent}
 /* drag handle — vertical bar between left and right */
 .split-drag-handle{width:2px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .15s;position:relative;height:100%}
-.split-drag-handle:hover,.split-drag-handle.dragging{background:var(--blue)}
+.split-drag-handle:hover,.split-drag-handle.dragging{background:var(--accent)}
 .split-drag-handle::after{display:none}
 /* toggle btn — subtle icon only */
 .split-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--border2);color:var(--text3);transition:border-color .15s,color .15s,background .15s;flex-shrink:0;position:relative}
-#split-tip{position:absolute;top:calc(100% + 7px);right:0;background:var(--head-bg);border:1px solid var(--blue);border-radius:4px;padding:6px 9px;white-space:nowrap;font-size:10px;color:var(--text2);pointer-events:none;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:0;transform:translateY(-3px);transition:opacity .2s,transform .2s}
+#split-tip{position:absolute;top:calc(100% + 7px);right:0;background:var(--head-bg);border:1px solid var(--accent);border-radius:4px;padding:6px 9px;white-space:nowrap;font-size:10px;color:var(--text2);pointer-events:none;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:0;transform:translateY(-3px);transition:opacity .2s,transform .2s}
 #split-tip.visible{opacity:1;transform:translateY(0)}
-#split-tip::before{content:'';position:absolute;top:-5px;right:6px;width:8px;height:8px;background:var(--head-bg);border-left:1px solid var(--blue);border-top:1px solid var(--blue);transform:rotate(45deg)}
-.split-toggle-btn:hover{border-color:var(--blue);color:var(--blue)}
-.split-toggle-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(79,127,255,.08)}
+#split-tip::before{content:'';position:absolute;top:-5px;right:6px;width:8px;height:8px;background:var(--head-bg);border-left:1px solid var(--accent);border-top:1px solid var(--accent);transform:rotate(45deg)}
+.split-toggle-btn:hover{border-color:var(--accent);color:var(--accent)}
+.split-toggle-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(79,127,255,.08)}
 .tv-econmap-wrap{min-height:380px;background:var(--bg);display:flex;align-items:stretch;width:100%;height:100%}
 @media(max-width:900px){
 #topbar{height:auto;flex-wrap:wrap;padding:0 6px}
@@ -500,7 +500,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.3.2">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.20.5">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -643,12 +643,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div id="liq-tooltip" style="display:none;position:fixed;z-index:999;background:var(--bg2);border:1px solid var(--border2);border-radius:3px;padding:4px 7px;font-family:var(--font-mono);font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);">
           <span id="liq-tt-time" style="color:var(--text3);"></span><br>
           <span id="liq-tt-session" style="color:var(--orange);font-size:8px;"></span><br>
-          <span id="liq-tt-vol" style="color:var(--blue);font-weight:600;"></span>
+          <span id="liq-tt-vol" style="color:var(--accent);font-weight:600;"></span>
         </div>
         <canvas id="liquidity-canvas" height="110" style="display:block;width:100%;cursor:crosshair;"></canvas>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
           <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">--:--</span>
-          <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
+          <span id="liq-peak-label" style="font-size:9px;color:var(--accent);text-align:right;"></span>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px;padding:0 1px;">
           <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(79,127,255,0.35);border-radius:1px;"></span>Tokyo</span>
@@ -696,7 +696,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="sb-section" id="watchlist-section">
       <div class="sb-head" style="display:flex;justify-content:space-between;align-items:center;">
         <span>Watchlist</span>
-        <button id="wl-add-btn" style="background:none;border:none;cursor:pointer;color:var(--blue);font-size:13px;line-height:1;padding:0 2px;" aria-label="Add pair to watchlist" title="Add pair">+</button>
+        <button id="wl-add-btn" style="background:none;border:none;cursor:pointer;color:var(--accent);font-size:13px;line-height:1;padding:0 2px;" aria-label="Add pair to watchlist" title="Add pair">+</button>
       </div>
       <div id="watchlist-rows" style="padding:0;min-height:24px;"></div>
       <div id="wl-input-row" style="display:none;padding:4px 8px 6px;">
@@ -1052,14 +1052,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
       <!-- Country tab bar -->
       <div id="rates-country-tabs" role="tablist" aria-label="Select country yield curve" style="display:flex;gap:2px;padding:0 8px 4px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);">
-        <button class="rates-ctab active" data-cty="us"  role="tab" aria-selected="true"  style="padding:2px 7px;font-size:10px;font-weight:600;border:none;border-radius:3px;background:var(--blue);color:#fff;cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">US</button>
+        <button class="rates-ctab active" data-cty="us"  role="tab" aria-selected="true"  style="padding:2px 7px;font-size:10px;font-weight:600;border:none;border-radius:3px;background:var(--accent);color:#fff;cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">US</button>
         <button class="rates-ctab"        data-cty="de"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">DE</button>
         <button class="rates-ctab"        data-cty="gb"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">GB</button>
         <button class="rates-ctab"        data-cty="jp"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">JP</button>
         <button class="rates-ctab"        data-cty="au"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">AU</button>
         <button class="rates-ctab"        data-cty="ca"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">CA</button>
         <button class="rates-ctab"        data-cty="nz"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">NZ</button>
-        <button class="rates-ctab"        data-cty="spreads" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--blue);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Spreads</button>
+        <button class="rates-ctab"        data-cty="spreads" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--accent);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Spreads</button>
       </div>
 
       <!-- US panel (default) -->
@@ -1715,7 +1715,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.0" defer></script>
-<script src="assets/dashboard.js?v=8.3.2" defer></script>
+<script src="assets/dashboard.js?v=8.20.5" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
@@ -1744,12 +1744,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div id="gi-onboard" role="dialog" aria-label="Set up your first alert" aria-modal="false" style="display:none;position:fixed;bottom:52px;right:16px;z-index:2000;width:280px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;box-shadow:0 4px 24px rgba(0,0,0,0.6);font-family:var(--font-ui);padding:14px 16px 12px;">
   <button onclick="giOnboardDismiss()" aria-label="Dismiss" style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text2);font-size:14px;cursor:pointer;line-height:1;">&#x2715;</button>
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:1px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:1px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     <span style="font-size:11px;font-weight:700;color:var(--text);letter-spacing:.06em;">CONFIGURE ALERT</span>
   </div>
   <p style="margin:0 0 10px;font-size:12px;color:var(--text2);line-height:1.6;">Get a browser notification when the macro regime shifts to <strong style="color:var(--down);">RISK-OFF</strong> — even with this tab closed.</p>
   <div style="display:flex;gap:8px;">
-    <button id="gi-onboard-cta" onclick="giOnboardActivate()" style="flex:1;padding:6px 0;background:var(--blue);color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-ui);letter-spacing:.04em;">SET ALERT</button>
+    <button id="gi-onboard-cta" onclick="giOnboardActivate()" style="flex:1;padding:6px 0;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-ui);letter-spacing:.04em;">SET ALERT</button>
     <button onclick="giOnboardDismiss()" style="flex:1;padding:6px 0;background:none;color:var(--text2);border:1px solid var(--border2);border-radius:4px;font-size:11px;cursor:pointer;font-family:var(--font-ui);">Maybe later</button>
   </div>
 </div>
