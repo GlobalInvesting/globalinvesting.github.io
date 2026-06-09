@@ -247,7 +247,7 @@ function _posLabel(z) {
 // ── Overview helpers ──────────────────────────────────────────────────────────
 function _cotSparkline(history, nWeeks) {
   const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0)));
-  if (vals.length < 2) return '<div style="height:72px;display:flex;align-items:center;font-size:9px;color:#6e7681">Insufficient data</div>';
+  if (vals.length < 2) return '<div style="height:72px;display:flex;align-items:center;font-size:9px;color:var(--text3)">Insufficient data</div>';
 
   const last = vals[vals.length - 1];
   const isPos = last >= 0;
@@ -269,8 +269,9 @@ function _cotSparkline(history, nWeeks) {
   // Polyline points for the area fill (close at bottom)
   const areaPts = `${firstX},${baseY} ${pts} ${lastX},${baseY}`;
 
-  // Crosshair dot — render at last point
+  // Crosshair dot — render at last point; stroke reads --bg at runtime for seamless ring on any theme bg
   const dotX = xOf(n-1).toFixed(1), dotY = yOf(last).toFixed(1);
+  const dotBg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#131722';
 
   return `<svg id="cot-ov-spark-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"
     style="width:100%;height:72px;display:block;overflow:visible;"
@@ -283,7 +284,7 @@ function _cotSparkline(history, nWeeks) {
     </defs>
     <polygon points="${areaPts}" fill="url(#cot-spark-grad)" stroke="none"/>
     <polyline points="${pts}" fill="none" stroke="${lineCol}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${dotX}" cy="${dotY}" r="4" fill="${lineCol}" stroke="#131722" stroke-width="1.5"/>
+    <circle cx="${dotX}" cy="${dotY}" r="4" fill="${lineCol}" stroke="${dotBg}" stroke-width="1.5"/>
   </svg>`;
 }
 
@@ -349,9 +350,12 @@ function _destroyCOTCharts(){
 }
 
 function _lwOpts(W,H){
+  const cs=getComputedStyle(document.documentElement);
+  const _bg=cs.getPropertyValue('--bg').trim()||'#131722';
+  const _t2=cs.getPropertyValue('--text3').trim()||'#6e7681';
   return {
     width:W,height:H,
-    layout:{background:{type:'solid',color:'#131722'},textColor:'#6e7681',fontFamily:_monoF,fontSize:10,attributionLogo:false},
+    layout:{background:{type:'solid',color:_bg},textColor:_t2,fontFamily:_monoF,fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{
       mode:window.LightweightCharts?.CrosshairMode?.Normal??1,

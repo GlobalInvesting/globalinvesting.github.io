@@ -133,6 +133,15 @@
     background: #111111;
     border-top: 1px solid #2a2a2a;
   }
+
+  /* MT5: heatmap cells — recalibrated to MT5 palette greens/reds (Bloomberg-style muted) */
+  /* Base cells use hardcoded dark-theme tints; MT5 overrides use matching but MT5-calibrated tints */
+  [data-theme="mt5"] .h-s-up   { background: #112b1e; } /* strong up — deep muted green */
+  [data-theme="mt5"] .h-up     { background: #0f2019; } /* mild up */
+  [data-theme="mt5"] .h-flat   { background: var(--bg3); }
+  [data-theme="mt5"] .h-down   { background: #2a1515; } /* mild down */
+  [data-theme="mt5"] .h-s-down { background: #361818; } /* strong down — deep muted red */
+
   .gi-theme-toggle {
     display: flex;
     align-items: center;

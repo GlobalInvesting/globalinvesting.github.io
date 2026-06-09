@@ -4038,7 +4038,7 @@ async function _renderLWChart(ohlcId, label) {
         lineStyle: 2, // LineStyle.Dashed
         axisLabelVisible: true,
         axisLabelColor: _themeColor('--border'),
-        axisLabelTextColor: '#848ea0',
+        axisLabelTextColor: _themeColor('--text3'),
         title: 'Prev C',
       });
     } catch(_plErr) {}
@@ -5500,11 +5500,11 @@ async function _renderLWChart(ohlcId, label) {
       return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:1px;">`
         + `<span style="display:inline-block;width:3px;height:12px;background:${ev.color};border-radius:1px;flex-shrink:0;"></span>`
         + `<span><span style="color:${ev.color};font-weight:700;">${ev.cb}</span>`
-        + ` <span style="color:#848ea0;font-size:10px;">${name}</span></span>`
+        + ` <span style="color:var(--text3);font-size:10px;">${name}</span></span>`
         + `</div>`;
     }).join('');
     _cbTooltip.innerHTML =
-      `<div style="font-size:9px;color:#6b7280;letter-spacing:.05em;margin-bottom:3px;">CB MEETING</div>`
+      `<div style="font-size:9px;color:var(--text3);letter-spacing:.05em;margin-bottom:3px;">CB MEETING</div>`
       + lines;
 
     // Position tooltip — floating-tooltip flip logic
@@ -8473,7 +8473,7 @@ function drawLiquidityChart() {
   }
 
   // Hour labels — starting 22:00 UTC, every 4h: 22,02,06,10,14,18
-  ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='center';
+  ctx.fillStyle=_themeColor('--text3'); ctx.font='8px Courier New'; ctx.textAlign='center';
   [{lbl:'22',ci:0},{lbl:'02',ci:8},{lbl:'06',ci:16},{lbl:'10',ci:24},{lbl:'14',ci:32},{lbl:'18',ci:40},{lbl:'22',ci:47}]
     .forEach(({lbl,ci}) => ctx.fillText(lbl, PAD_L+(ci/47)*cW, H-4));
 

@@ -476,17 +476,21 @@ function _esmRenderChart(ccy) {
 
   const series = _esmBuildSeries(_esmCalData.events || [], ccy);
 
+  const _esmBg    = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()    || '#131722';
+  const _esmText2 = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim() || '#9096a0';
+  const _esmBrd   = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#2a2e39';
+  const _esmBrd2  = getComputedStyle(document.documentElement).getPropertyValue('--bg3').trim()    || '#2a2e39';
   const chart = LWC.createChart(container, {
     width: W, height: H,
     layout: {
-      background: { type: 'solid', color: '#131722' },
-      textColor: '#6e7681', fontFamily: _esmMonoF, fontSize: 10, attributionLogo: false,
+      background: { type: 'solid', color: _esmBg },
+      textColor: _esmText2, fontFamily: _esmMonoF, fontSize: 10, attributionLogo: false,
     },
     grid: { vertLines: { color: 'rgba(255,255,255,0.04)' }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
     crosshair: {
       mode: LWC.CrosshairMode?.Normal ?? 1,
-      vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
-      horzLine: { color: 'rgba(255,255,255,0.15)', style: 2, labelVisible: true },
+      vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false, labelBackgroundColor: _esmBrd2 },
+      horzLine: { color: 'rgba(255,255,255,0.15)', style: 2, labelVisible: true, labelBackgroundColor: _esmBrd2 },
     },
     rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.12 } },
     timeScale: { borderVisible: false, fixRightEdge: true },
