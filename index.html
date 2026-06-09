@@ -1822,8 +1822,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     function applyScale(pct) {
       const z = pct / 100;
       // CSS zoom on body — scales all px-based layouts uniformly.
-      // The gap below 100% is covered by html { background: var(--bg) }.
+      // html { min-height: 100vh; background: var(--bg) } covers the gap below.
       document.body.style.zoom = z;
+      document.documentElement.style.overflow = ''; // clear any residual from old sessions
       const el = document.getElementById('gi-scale-pct');
       if (el) el.textContent = pct + '%';
     }
