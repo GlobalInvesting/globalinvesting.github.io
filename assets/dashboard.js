@@ -78,7 +78,7 @@ function _themeColorAlpha(cssVar, alpha) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-
+function fmtDec(val, dec = 2) {
   if (val == null || isNaN(val)) return '—';
   return Number(val).toFixed(dec);
 }
