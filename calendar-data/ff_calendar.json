@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-08T23:25:19Z",
+  "generated_at": "2026-06-09T00:00:23Z",
   "source": "Finnhub",
   "holidays": [
     {
@@ -9,94 +9,6 @@
     }
   ],
   "events": [
-    {
-      "title": "GDP Growth Rate QoQ Flash",
-      "currency": "CHF",
-      "dateISO": "2026-05-18",
-      "timeUTC": "07:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": "0.2",
-      "actual": "0.5",
-      "released": true
-    },
-    {
-      "title": "BoE Greene Speech",
-      "currency": "GBP",
-      "dateISO": "2026-05-18",
-      "timeUTC": "08:35",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "BoE L Mann Speech",
-      "currency": "GBP",
-      "dateISO": "2026-05-18",
-      "timeUTC": "09:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "Fed Venable Speech",
-      "currency": "USD",
-      "dateISO": "2026-05-18",
-      "timeUTC": "12:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "NAHB Housing Market Index",
-      "currency": "USD",
-      "dateISO": "2026-05-18",
-      "timeUTC": "14:00",
-      "impact": "medium",
-      "forecast": "35",
-      "previous": "34",
-      "actual": "37",
-      "released": true
-    },
-    {
-      "title": "Net Long-term TIC Flows",
-      "currency": "USD",
-      "dateISO": "2026-05-18",
-      "timeUTC": "20:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": "57",
-      "actual": "81.3",
-      "released": true
-    },
-    {
-      "title": "GDP Growth Annualized Prel",
-      "currency": "JPY",
-      "dateISO": "2026-05-18",
-      "timeUTC": "23:50",
-      "impact": "medium",
-      "forecast": "1.7",
-      "previous": "0.8",
-      "actual": "2.1",
-      "released": true
-    },
-    {
-      "title": "GDP Growth Rate QoQ Prel",
-      "currency": "JPY",
-      "dateISO": "2026-05-18",
-      "timeUTC": "23:50",
-      "impact": "high",
-      "forecast": "0.4",
-      "previous": "0.2",
-      "actual": "0.5",
-      "released": true
-    },
     {
       "title": "RBA Hunter Speech",
       "currency": "AUD",
@@ -2452,6 +2364,17 @@
       "released": false
     },
     {
+      "title": "RBA Bulletin",
+      "currency": "AUD",
+      "dateISO": "2026-06-09",
+      "timeUTC": "01:30",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
       "title": "ADP Employment Change Weekly",
       "currency": "USD",
       "dateISO": "2026-06-09",
@@ -2525,6 +2448,28 @@
       "impact": "medium",
       "forecast": null,
       "previous": "0.2",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "EIA Short-Term Energy Outlook",
+      "currency": "USD",
+      "dateISO": "2026-06-09",
+      "timeUTC": "16:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "ECB President Lagarde Speech",
+      "currency": "EUR",
+      "dateISO": "2026-06-09",
+      "timeUTC": "16:30",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
       "actual": null,
       "released": false
     },
@@ -3691,6 +3636,171 @@
       "impact": "medium",
       "forecast": null,
       "previous": "48.7",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Manufacturing PMI Flash",
+      "currency": "JPY",
+      "dateISO": "2026-06-23",
+      "timeUTC": "00:30",
+      "impact": "medium",
+      "forecast": "54.5*",
+      "previous": "54.5",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Services PMI Flash",
+      "currency": "JPY",
+      "dateISO": "2026-06-23",
+      "timeUTC": "00:30",
+      "impact": "medium",
+      "forecast": "53.8*",
+      "previous": "52.8",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "New Car Registrations YoY",
+      "currency": "EUR",
+      "dateISO": "2026-06-23",
+      "timeUTC": "04:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "5.1",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Current Account",
+      "currency": "CHF",
+      "dateISO": "2026-06-23",
+      "timeUTC": "07:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "7",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Composite PMI Flash",
+      "currency": "EUR",
+      "dateISO": "2026-06-23",
+      "timeUTC": "08:00",
+      "impact": "medium",
+      "forecast": "48.8*",
+      "previous": "48.5",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Manufacturing PMI Flash",
+      "currency": "EUR",
+      "dateISO": "2026-06-23",
+      "timeUTC": "08:00",
+      "impact": "medium",
+      "forecast": "51.8*",
+      "previous": "51.6",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Services PMI Flash",
+      "currency": "EUR",
+      "dateISO": "2026-06-23",
+      "timeUTC": "08:00",
+      "impact": "medium",
+      "forecast": "47.7*",
+      "previous": "47.7",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Manufacturing PMI Flash",
+      "currency": "GBP",
+      "dateISO": "2026-06-23",
+      "timeUTC": "08:30",
+      "impact": "high",
+      "forecast": "53*",
+      "previous": "53.9",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Services PMI Flash",
+      "currency": "GBP",
+      "dateISO": "2026-06-23",
+      "timeUTC": "08:30",
+      "impact": "high",
+      "forecast": "51.7*",
+      "previous": "49.3",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "ADP Employment Change Weekly",
+      "currency": "USD",
+      "dateISO": "2026-06-23",
+      "timeUTC": "12:15",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "35.75",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Composite PMI Flash",
+      "currency": "USD",
+      "dateISO": "2026-06-23",
+      "timeUTC": "13:45",
+      "impact": "medium",
+      "forecast": "52.3*",
+      "previous": "51.5",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Manufacturing PMI Flash",
+      "currency": "USD",
+      "dateISO": "2026-06-23",
+      "timeUTC": "13:45",
+      "impact": "medium",
+      "forecast": "53*",
+      "previous": "55.1",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "S&P Global Services PMI Flash",
+      "currency": "USD",
+      "dateISO": "2026-06-23",
+      "timeUTC": "13:45",
+      "impact": "medium",
+      "forecast": "53.8*",
+      "previous": "50.7",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "API Crude Oil Stock Change",
+      "currency": "USD",
+      "dateISO": "2026-06-23",
+      "timeUTC": "20:30",
+      "impact": "medium",
+      "forecast": "-4*",
+      "previous": "-7.974",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "BoJ Summary of Opinions",
+      "currency": "JPY",
+      "dateISO": "2026-06-23",
+      "timeUTC": "23:50",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
       "actual": null,
       "released": false
     }
