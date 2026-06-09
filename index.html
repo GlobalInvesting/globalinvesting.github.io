@@ -566,6 +566,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         Menu
       </button>
       <div class="site-menu-panel">
+        <span class="gi-theme-label">Theme</span>
+        <div class="gi-theme-toggle">
+          <button class="gi-theme-btn active" id="gi-theme-dark" onclick="window.GI_THEME&&window.GI_THEME.set('dark')">Dark</button>
+          <button class="gi-theme-btn" id="gi-theme-mt5" onclick="window.GI_THEME&&window.GI_THEME.set('mt5')">MT5 Style</button>
+        </div>
+        <div class="site-menu-divider"></div>
         <span class="site-menu-section">Company</span>
         <a href="about.html">About</a>
         <a href="access.html">Access</a>
@@ -1764,6 +1770,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
     <div id="lw-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
   </div>
+  <script>
+  // ── GI Theme Manager ──────────────────────────────────────────────────────
+  (function () {
+    const STORAGE_KEY = 'gi_theme';
+    const THEMES = ['dark', 'mt5'];
 
+    function apply(theme) {
+      if (!THEMES.includes(theme)) theme = 'dark';
+      if (theme === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+      // Update toggle button states
+      THEMES.forEach(t => {
+        const btn = document.getElementById('gi-theme-' + t);
+        if (btn) btn.classList.toggle('active', t === theme);
+      });
+      try { localStorage.setItem(STORAGE_KEY, theme); } catch {}
+    }
+
+    // Apply saved theme immediately
+    let saved = 'dark';
+    try { saved = localStorage.getItem(STORAGE_KEY) || 'dark'; } catch {}
+    apply(saved);
+
+    window.GI_THEME = { set: apply, current: () => saved };
+  })();
+  </script>
 </body>
 </html>
