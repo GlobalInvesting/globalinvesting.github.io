@@ -375,25 +375,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .lw-cmp-item:hover{background:var(--bg3,#2a2e39);color:var(--text)}
 .lw-cmp-item.active{color:var(--blue);font-weight:600}
 .lw-cmp-pill{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 7px;font-size:9px;color:var(--text2);cursor:pointer;white-space:nowrap;font-family:var(--font-ui,sans-serif)}
-.lw-cmp-pill:hover{border-color:#ef5350;color:#ef5350}
-#lw-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:#131722;flex-direction:column}
+.lw-cmp-pill:hover{border-color:var(--down);color:var(--down)}
+#lw-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
 #lw-fullscreen-overlay.lw-fs-active{display:flex}
 #lw-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 #lw-fullscreen-overlay.lw-fs-active #tv-chart-wrap{flex:1!important;height:100%!important;min-height:0!important}
-#lw-fs-toolbar{display:flex;align-items:stretch;justify-content:space-between;background:#1a1d2a;border-bottom:1px solid #2a2e39;flex-shrink:0;overflow:hidden}
+#lw-fs-toolbar{display:flex;align-items:stretch;justify-content:space-between;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow:hidden}
 #lw-fs-toolbar::-webkit-scrollbar{display:none}
-#lw-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid #2a2e39;color:#999;font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
-#lw-fs-close:hover{border-color:#ef5350;color:#ef5350}
+#lw-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
+#lw-fs-close:hover{border-color:var(--down);color:var(--down)}
 #lw-fullscreen-overlay.lw-fs-active #lw-fs-btn{display:none!important}
-#lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:#131722;border-bottom:1px solid #2a2e39;min-height:26px;flex-wrap:wrap;overflow:hidden}
-#lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
+#lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:var(--bg);border-bottom:1px solid var(--border);min-height:26px;flex-wrap:wrap;overflow:hidden}
+#lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
 #lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--font-mono,monospace)}
 #lw-chart-header .lw-hdr-o,.lw-hdr-h,.lw-hdr-l,.lw-hdr-c,.lw-hdr-chg,.lw-hdr-ma{white-space:nowrap}
-#lw-chart-header .lw-hdr-lbl{color:#787b86;margin-right:3px;font-size:9px}
-#lw-chart-header .lw-hdr-val{color:#d1d4dc}
-#lw-chart-header .lw-hdr-chg.up{color:#26a69a}
-#lw-chart-header .lw-hdr-chg.dn{color:#ef5350}
-#lw-chart-header .lw-hdr-ma-val{color:#2196f3}
+#lw-chart-header .lw-hdr-lbl{color:var(--text3);margin-right:3px;font-size:9px}
+#lw-chart-header .lw-hdr-val{color:var(--text)}
+#lw-chart-header .lw-hdr-chg.up{color:var(--up)}
+#lw-chart-header .lw-hdr-chg.dn{color:var(--down)}
+#lw-chart-header .lw-hdr-ma-val{color:var(--blue)}
 /* Hide LW Charts attribution logo (rendered as an anchor tag inside the chart div) */
 #tv-chart-wrap a[href*="tradingview"]{display:none!important}
 #tvcal-inner{overflow:hidden}
@@ -431,7 +431,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #split-tip::before{content:'';position:absolute;top:-5px;right:6px;width:8px;height:8px;background:var(--head-bg);border-left:1px solid var(--blue);border-top:1px solid var(--blue);transform:rotate(45deg)}
 .split-toggle-btn:hover{border-color:var(--blue);color:var(--blue)}
 .split-toggle-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(79,127,255,.08)}
-.tv-econmap-wrap{min-height:380px;background:#131722;display:flex;align-items:stretch;width:100%;height:100%}
+.tv-econmap-wrap{min-height:380px;background:var(--bg);display:flex;align-items:stretch;width:100%;height:100%}
 @media(max-width:900px){
 #topbar{height:auto;flex-wrap:wrap;padding:0 6px}
 .top-nav{display:flex;overflow-x:auto;overflow-y:hidden;width:100%;order:10;border-top:1px solid var(--border2);height:auto;min-height:30px;scrollbar-width:none}
@@ -640,10 +640,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="sb-section">
       <div class="sb-head">FX Liquidity</div>
       <div style="padding:6px 8px 4px;position:relative;">
-        <div id="liq-tooltip" style="display:none;position:fixed;z-index:999;background:#1e222d;border:1px solid #363c4e;border-radius:3px;padding:4px 7px;font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);">
-          <span id="liq-tt-time" style="color:#787b86;"></span><br>
-          <span id="liq-tt-session" style="color:#f6941c;font-size:8px;"></span><br>
-          <span id="liq-tt-vol" style="color:#4f7fff;font-weight:600;"></span>
+        <div id="liq-tooltip" style="display:none;position:fixed;z-index:999;background:var(--bg2);border:1px solid var(--border2);border-radius:3px;padding:4px 7px;font-family:var(--font-mono);font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+          <span id="liq-tt-time" style="color:var(--text3);"></span><br>
+          <span id="liq-tt-session" style="color:var(--orange);font-size:8px;"></span><br>
+          <span id="liq-tt-vol" style="color:var(--blue);font-weight:600;"></span>
         </div>
         <canvas id="liquidity-canvas" height="110" style="display:block;width:100%;cursor:crosshair;"></canvas>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
@@ -651,10 +651,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px;padding:0 1px;">
-          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(79,127,255,0.35);border-radius:1px;"></span>Tokyo</span>
-          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(38,166,154,0.45);border-radius:1px;"></span>London</span>
-          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(246,148,28,0.4);border-radius:1px;"></span>NY</span>
-          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:16px;height:1px;border-top:1px dashed rgba(79,127,255,0.5);margin-top:1px;"></span>30d avg</span>
+          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(79,127,255,0.35);border-radius:1px;"></span>Tokyo</span>
+          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(38,166,154,0.45);border-radius:1px;"></span>London</span>
+          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(246,148,28,0.4);border-radius:1px;"></span>NY</span>
+          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:16px;height:1px;border-top:1px dashed rgba(79,127,255,0.5);margin-top:1px;"></span>30d avg</span>
         </div>
         <div style="margin-top:3px;padding:0 1px;">
           <span id="liq-source-label" style="font-size:7.5px;color:var(--text3);font-family:var(--font-mono);">Historical avg · fixed reference</span>
@@ -1227,9 +1227,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <span class="panel-title">Economic Map</span>
         <span class="panel-sub">TradingView · World Economics</span>
       </div>
-      <div style="flex:1;overflow:hidden;background:#131722;display:flex;align-items:stretch;">
+      <div style="flex:1;overflow:hidden;background:var(--bg);display:flex;align-items:stretch;">
         <!-- Economic map loaded lazily — see initLazyWidgets() in dashboard.js -->
-        <div id="tv-econmap-placeholder" style="width:100%;height:100%;min-height:380px;background:#131722;"></div>
+        <div id="tv-econmap-placeholder" style="width:100%;height:100%;min-height:380px;background:var(--bg);"></div>
       </div>
     </div>
 
