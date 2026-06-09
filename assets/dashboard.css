@@ -11,6 +11,8 @@
     --text3: #8290a0;
     --up: #26a69a;
     --down: #ef5350;
+    --candle-up: #26a69a;   /* candlestick/bar up — always TradingView teal, both themes */
+    --candle-down: #ef5350; /* candlestick/bar down — always TradingView red, both themes */
     --blue: #4f7fff;
     --accent: #4f7fff;       /* UI accent — selected states, borders, highlights */
     --chart-line: #4f7fff;  /* dedicated chart/canvas line color */
@@ -32,6 +34,8 @@
     --text3: #727272;
     --up: #00d455;
     --down: #ff3c3c;
+    --candle-up: #26a69a;   /* candlestick up — fixed TradingView teal; --up is MT5 EA signal color */
+    --candle-down: #ef5350; /* candlestick down — fixed TradingView red; --down is MT5 EA signal color */
     --blue: #e8e8e8;      /* C_BLUE — instrument label (EA convention, not for charts) */
     --accent: #3a3f4b;    /* UI accent — muted grey in MT5; matches EA selected-state convention */
     --chart-line: #4f7fff; /* chart/canvas line — always visible blue regardless of theme */
@@ -95,6 +99,44 @@
     letter-spacing: .06em;
   }
 
+  /* ── UI Scale control — A- / % / A+ ── */
+  .gi-scale-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 2px 14px 6px;
+  }
+  .gi-scale-label {
+    font-size: 9px;
+    color: var(--text3);
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    flex: 1;
+  }
+  .gi-scale-pct {
+    font-size: 9px;
+    font-family: var(--font-mono);
+    color: var(--text2);
+    min-width: 28px;
+    text-align: center;
+  }
+  .gi-scale-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 3px;
+    color: var(--text2);
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    cursor: pointer;
+    line-height: 1;
+    transition: background .12s, color .12s;
+    white-space: nowrap;
+  }
+  .gi-scale-btn:hover { background: var(--border2); color: var(--text); }
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -154,7 +196,7 @@
     font-family: var(--font-ui);
     font-size: 8px;
     font-weight: 500;
-    color: var(--text3);
+    color: var(--text2);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     display: block;

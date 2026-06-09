@@ -107,6 +107,11 @@ function openYCModal(tenorData) {
   const labels    = tenorData.map(t => t.label);
   const todayVals = tenorData.map(t => t.close);
   const priorVals = tenorData.map(t => t.prev_close);
+  // Detect if all tenors lack prev_close (fromRepo FRED batch — no intraday prev available)
+  const noPrior   = tenorData.every(t => t.prev_close == null);
+  const subLabel  = noPrior
+    ? 'FRED \u00b7 daily batch \u00b7 prior close unavailable until market open'
+    : 'FRED \u00b7 today vs prior close \u00b7 basis points change';
 
   const _t = lbl => tenorData.find(t => t.label === lbl);
   const _t2y = _t('2Y'), _t10y = _t('10Y'), _t30y = _t('30Y');
@@ -141,7 +146,7 @@ function openYCModal(tenorData) {
   bd.innerHTML = `
 <div id="ycm-modal">
   <div id="ycm-hd">
-    <div><div id="ycm-title"><span class="fi fi-us" style="margin-right:6px;border-radius:2px;font-size:14px;vertical-align:middle;"></span>US Treasury Yield Curve</div><div id="ycm-sub">FRED \u00b7 today vs prior close \u00b7 basis points change</div></div>
+    <div><div id="ycm-title"><span class="fi fi-us" style="margin-right:6px;border-radius:2px;font-size:14px;vertical-align:middle;"></span>US Treasury Yield Curve</div><div id="ycm-sub">${subLabel}</div></div>
     <button id="ycm-close" onclick="closeYCModal()" aria-label="Close">\u00d7</button>
   </div>
   <div id="ycm-strip">${spreadMetrics}${metricsHtml}</div>
@@ -164,7 +169,7 @@ function openYCModal(tenorData) {
   (document.getElementById('main') || document.body).appendChild(bd);
   bd.addEventListener('click', e => { if (e.target === bd) closeYCModal(); });
   document.addEventListener('keydown', _ycKeydown);
-  requestAnimationFrame(() => _ycDrawChart(labels, todayVals, priorVals));
+  requestAnimationFrame(() => _ycDrawChart(labels, todayVals, noPrior ? null : priorVals));
 }
 
 function _ycDrawChart(labels, todayVals, priorVals) {

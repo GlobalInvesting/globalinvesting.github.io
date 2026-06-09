@@ -2435,7 +2435,9 @@ async function renderRiskData(byId) {
     label:      t.label,
     close:      byId[t.key]?.close ?? null,
     prev_close: byId[t.key]?.prev_close ?? null,
-    chg:        byId[t.key]?.chg ?? null,
+    // chg is in percentage-point units (0.001 = 0.1bp); null when prev_close unavailable
+    chg:        (byId[t.key]?.fromRepo || byId[t.key]?.prev_close == null) ? null : (byId[t.key]?.chg ?? null),
+    fromRepo:   byId[t.key]?.fromRepo ?? false,
   })).filter(t => t.close !== null);
 
   if (realPoints.length >= 2) {
@@ -3880,13 +3882,13 @@ async function _renderLWChart(ohlcId, label) {
     // Bar (OHLC) series — same data as candlestick, different visual
     if (typeof LWC.BarSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.BarSeries, {
-        upColor: _themeColor('--up'), downColor: _themeColor('--down'),
+        upColor: _themeColor('--candle-up'), downColor: _themeColor('--candle-down'),
         openVisible: true, thinBars: false,
         priceFormat: _priceFormat,
       });
     } else {
       candleSeries = _lwChart.addBarSeries({
-        upColor: _themeColor('--up'), downColor: _themeColor('--down'),
+        upColor: _themeColor('--candle-up'), downColor: _themeColor('--candle-down'),
         priceFormat: _priceFormat,
       });
     }
@@ -3922,16 +3924,16 @@ async function _renderLWChart(ohlcId, label) {
     // Default: Candlestick — LWC v5 API with v4 fallback
     if (typeof LWC.CandlestickSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.CandlestickSeries, {
-        upColor: _themeColor('--up'), downColor: _themeColor('--down'),
-        borderUpColor: _themeColor('--up'), borderDownColor: _themeColor('--down'),
-        wickUpColor: _themeColor('--up'), wickDownColor: _themeColor('--down'),
+        upColor: _themeColor('--candle-up'), downColor: _themeColor('--candle-down'),
+        borderUpColor: _themeColor('--candle-up'), borderDownColor: _themeColor('--candle-down'),
+        wickUpColor: _themeColor('--candle-up'), wickDownColor: _themeColor('--candle-down'),
         priceFormat: _priceFormat,
       });
     } else {
       candleSeries = _lwChart.addCandlestickSeries({
-        upColor: _themeColor('--up'), downColor: _themeColor('--down'),
-        borderUpColor: _themeColor('--up'), borderDownColor: _themeColor('--down'),
-        wickUpColor: _themeColor('--up'), wickDownColor: _themeColor('--down'),
+        upColor: _themeColor('--candle-up'), downColor: _themeColor('--candle-down'),
+        borderUpColor: _themeColor('--candle-up'), borderDownColor: _themeColor('--candle-down'),
+        wickUpColor: _themeColor('--candle-up'), wickDownColor: _themeColor('--candle-down'),
         priceFormat: _priceFormat,
       });
     }
@@ -12746,12 +12748,12 @@ window.addEventListener('gi-theme-change', function() {
         } else {
           // candle or bar
           window._candleSeries.applyOptions({
-            upColor:         _themeColor('--up'),
-            downColor:       _themeColor('--down'),
-            borderUpColor:   _themeColor('--up'),
-            borderDownColor: _themeColor('--down'),
-            wickUpColor:     _themeColor('--up'),
-            wickDownColor:   _themeColor('--down'),
+            upColor:         _themeColor('--candle-up'),
+            downColor:       _themeColor('--candle-down'),
+            borderUpColor:   _themeColor('--candle-up'),
+            borderDownColor: _themeColor('--candle-down'),
+            wickUpColor:     _themeColor('--candle-up'),
+            wickDownColor:   _themeColor('--candle-down'),
           });
         }
       } catch(_) {}
