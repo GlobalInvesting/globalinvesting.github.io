@@ -1778,6 +1778,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     function apply(theme) {
       if (!THEMES.includes(theme)) theme = 'dark';
+      const prev = saved;
+      saved = theme;
       if (theme === 'dark') {
         document.documentElement.removeAttribute('data-theme');
       } else {
@@ -1789,6 +1791,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         if (btn) btn.classList.toggle('active', t === theme);
       });
       try { localStorage.setItem(STORAGE_KEY, theme); } catch {}
+      // Notify dashboard to re-apply theme-dependent colors (LWC charts, canvases)
+      if (prev !== theme) {
+        window.dispatchEvent(new CustomEvent('gi-theme-change', { detail: { theme, prev } }));
+      }
     }
 
     // Apply saved theme immediately
