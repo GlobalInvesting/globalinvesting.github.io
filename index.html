@@ -1821,18 +1821,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     function applyScale(pct) {
       const z = pct / 100;
-      const b = document.body;
-      // transform: scale() on body — works in all browsers, no zoom API quirks.
-      // When z < 1 the body shrinks visually but its pre-transform layout box
-      // stays full-size (width/height set to 100/z vw/vh), so the html element
-      // (background: var(--bg)) seamlessly fills any remaining viewport space.
-      // overflow:hidden on html prevents scrollbars from the expanded layout box.
-      b.style.transformOrigin = 'top left';
-      b.style.transform       = 'scale(' + z + ')';
-      b.style.width           = (100 / z) + 'vw';
-      b.style.height          = (100 / z) + 'vh';
-      b.style.overflowX       = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
+      // CSS zoom on body — scales all px-based layouts uniformly.
+      // The gap below 100% is covered by html { background: var(--bg) }.
+      document.body.style.zoom = z;
       const el = document.getElementById('gi-scale-pct');
       if (el) el.textContent = pct + '%';
     }
