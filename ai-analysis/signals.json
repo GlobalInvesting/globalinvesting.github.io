@@ -1,58 +1,69 @@
 {
-  "generated_at": "2026-06-09T10:07:39Z",
+  "generated_at": "2026-06-09T17:10:22Z",
   "signals": [
     {
-      "time": "10:09",
+      "time": "17:07",
       "priority": "critical",
-      "title": "AUD/USD — G10 Bilateral Theme + Carry",
-      "text": "AUD/USD at 0.7056 — 60bp AUD carry advantage over USD. USD 1W avg: +0.521% (n=7) vs AUD 1W avg: -0.694% (n=4) — G10 spread: 1.215%. Strong theme favors USD; AUD weakness to continue as data disappoints. Watch for AUD/USD to test 0.70 on sustained USD strength.",
+      "title": "AUD/USD — G10 Bilateral Theme + CESI + Carry",
+      "text": "AUD/USD at 0.7022. USD is the strongest G10 currency this week (+0.740% vs peers), while AUD is the weakest (−1.033% vs peers), creating a significant 1.773% spread. This divergence is reinforced by AUD's negative CESI score (−8 beats) indicating disappointing data, and a -72bp OIS carry premium favoring AUD (AONIA 4.35% vs SOFR 3.63%) which is being ignored. The market is actively selling AUD despite its carry advantage, driven by USD strength and AUD data weakness. Watch for RBA's next meeting on 16 Jun for any shift in stance.",
       "evidence": [
-        "USD 1W avg: +0.521% (n=7)",
-        "AUD 1W avg: -0.694% (n=4)",
-        "G10 spread: 1.215%"
-      ]
+        "USD 1W avg: +0.740% (n=7)",
+        "AUD 1W avg: -1.033% (n=4)",
+        "G10 spread: 1.773%",
+        "AUD CESI: -8 misses",
+        "AUD/USD OIS carry: -72bp (favors AUD)"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "10:06",
+      "time": "17:04",
+      "priority": "critical",
+      "title": "USD/JPY — Intervention Risk + COT vs BoJ + Carry",
+      "text": "USD/JPY at 160.34, trading above the 160.00 level that has previously triggered BoJ verbal warnings. The pair is sustained by a +290bp OIS carry premium favoring USD (SOFR 3.63% vs TONA 0.73%). JPY COT shows an extreme net short of −105,136 contracts (week ending Jun 2), while the BoJ's market bias is to Hike. This creates a significant short-squeeze risk if the BoJ delivers a hawkish surprise or intervenes. Intervention risk is elevated on a sustained break above 160.00. The next BoJ meeting (mkt: 50% hike priced) on 16 Jun is the key catalyst.",
+      "evidence": [
+        "USD/JPY: 160.34",
+        "JPY COT LF net: -105,136",
+        "BoJ market bias: ↑ Hike",
+        "USD/JPY OIS carry: +290bp (favors USD)"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "17:01",
       "priority": "warning",
-      "title": "EUR/USD — Positioning + Vol",
-      "text": "EUR/USD at 1.1566 — EUR COT LF net short -22,320. IV at 7.1% vs HV30 at 4.5% — 2.6% vol-pt premium over realized. 25d RR at -0.54: mild put skew despite short speculative positioning. Market hedging, not chasing; late-trend caution. Watch for EUR/USD to hold below 1.16.",
+      "title": "EUR/USD — COT vs ECB Divergence + Options Skew",
+      "text": "EUR/USD at 1.1547. COT data shows EUR net short −22,320 (week ending Jun 2), while the ECB's market bias is to Hike. This divergence creates short-squeeze risk if the ECB delivers a hawkish surprise. Options market shows a mild put skew with 25d RR at -0.63, suggesting options traders are hedging against EUR weakness despite the potential for a hawkish ECB. The next ECB meeting (mkt: 100% hike priced) on 11 Jun is the immediate catalyst for a potential short-squeeze.",
       "evidence": [
         "EUR COT LF net: -22,320",
-        "EUR/USD IV: 7.1% vs HV30: 4.5%",
-        "25d RR: -0.54"
-      ]
+        "ECB market bias: ↑ Hike",
+        "EURUSD 25d RR: -0.63"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "10:03",
+      "time": "16:58",
       "priority": "warning",
-      "title": "USD/JPY — Carry + COT Divergence",
-      "text": "USD/JPY at 160.19 — 300bp USD carry advantage over JPY. JPY COT LF net short -105,136. USD/JPY 25d RR at -1.14: moderate put skew. Intervention risk rises on a sustained break above 160.00. Watch for USD/JPY to test 160.50 on carry and speculative positioning divergence.",
+      "title": "AUD/USD — Elevated Vol Premium + Options Skew",
+      "text": "AUD/USD at 0.7022. IV at 38.9% vs HV30 at 8.6% results in an extreme +30.3% VRP, indicating strong hedging demand above realized volatility. The 25d RR at -1.03 shows a moderate put skew, with options traders paying for AUD downside protection. This combination suggests significant market concern for further AUD weakness, despite the pair's -72bp OIS carry premium. Watch for a break below 0.7000 to confirm further downside pressure.",
       "evidence": [
-        "USD/JPY carry: 300bp",
-        "JPY COT LF net: -105,136",
-        "25d RR: -1.14"
-      ]
+        "AUD/USD IV: 38.9%",
+        "AUD/USD HV30: 8.6%",
+        "AUD/USD VRP: +30.3%",
+        "AUDUSD 25d RR: -1.03"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "10:00",
+      "time": "16:55",
       "priority": "info",
-      "title": "GBP/USD — Vol Regime",
-      "text": "GBP/USD at 1.339 — IV at 11.0% vs HV30 at 6.5% — 4.5% vol-pt premium over realized. Elevated hedging demand over realized vol; watch for GBP/USD to remain volatile. GBP/USD 25d RR at -0.73: mild put skew.",
+      "title": "USD/CAD — Retail Divergence + Correlation Break",
+      "text": "USD/CAD at 1.3959. Retail sentiment shows an extreme 87% short position, indicating contrarian reversal risk. This diverges from COT data which shows CAD net short -49,052 (week ending Jun 2), suggesting institutional positioning is aligned with USD strength. The USD/CAD vs WTI Oil correlation has broken to -0.050 (z=-1.52σ vs norm=-0.004), indicating the pair is no longer reacting to oil price movements as historically expected. The BoC Policy Rate Announcement today is the immediate event to watch.",
       "evidence": [
-        "GBP/USD IV: 11.0% vs HV30: 6.5%",
-        "25d RR: -0.73"
-      ]
-    },
-    {
-      "time": "09:57",
-      "priority": "info",
-      "title": "USD/CAD — Carry",
-      "text": "USD/CAD at 1.3935 — 150bp USD carry advantage over CAD. Watch for USD/CAD to hold above 1.39 on carry. USD/CAD 25d RR at +0.28: near neutral.",
-      "evidence": [
-        "USD/CAD carry: 150bp",
-        "25d RR: +0.28"
-      ]
+        "USD/CAD retail: 87% short",
+        "CAD COT LF net: -49,052",
+        "USD/CAD vs WTI Oil corr: -0.050 (z=-1.52σ)"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
