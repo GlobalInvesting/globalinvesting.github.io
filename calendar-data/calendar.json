@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-09T12:30:51Z",
-  "generatedAt": "2026-06-09T12:30:51Z",
+  "lastUpdate": "2026-06-09T12:33:42Z",
+  "generatedAt": "2026-06-09T12:33:42Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -335,6 +335,11 @@
       "n": 2,
       "mean": 0.6,
       "std": 0.565685
+    },
+    "CAD/balance of trade": {
+      "n": 2,
+      "mean": 2.4,
+      "std": 3.224407
     },
     "USD/balance of trade": {
       "n": 2,
@@ -20818,9 +20823,9 @@
       "flag": "🇨🇦",
       "event": "Balance of Trade",
       "impact": "medium",
-      "actual": null,
+      "actual": "2.72",
       "forecast": "2.6",
-      "previous": "1.78"
+      "previous": "1.75"
     },
     {
       "date": "9 Jun",
@@ -20844,7 +20849,7 @@
       "flag": "🇺🇸",
       "event": "Exports",
       "impact": "medium",
-      "actual": null,
+      "actual": "327.1",
       "forecast": null,
       "previous": "320.9"
     },
@@ -20857,7 +20862,7 @@
       "flag": "🇺🇸",
       "event": "Imports",
       "impact": "medium",
-      "actual": null,
+      "actual": "383",
       "forecast": null,
       "previous": "381.2"
     },
@@ -22432,7 +22437,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": "35.75"
+      "previous": "29"
     },
     {
       "date": "23 Jun",
