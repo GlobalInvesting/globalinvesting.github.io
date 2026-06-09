@@ -78,10 +78,11 @@ function _themeColorAlpha(cssVar, alpha) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-function fmtDec(val, dec = 2) {
+function fmt(val, dec) {
   if (val == null || isNaN(val)) return '—';
   return Number(val).toFixed(dec);
 }
+function fmtDec(val, dec = 2) { return fmt(val, dec); }
 
 function clsDir(val) {
   if (val > 0.0001) return 'up';
