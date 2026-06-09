@@ -12,6 +12,7 @@
     --up: #26a69a;
     --down: #ef5350;
     --blue: #4f7fff;
+    --accent: #4f7fff;       /* UI accent — selected states, borders, highlights */
     --chart-line: #4f7fff;  /* dedicated chart/canvas line color */
     --orange: #f6941c;
     --head-bg: #1a1d29;
@@ -32,6 +33,7 @@
     --up: #00d455;
     --down: #ff3c3c;
     --blue: #e8e8e8;      /* C_BLUE — instrument label (EA convention, not for charts) */
+    --accent: #4f7fff;    /* UI accent — stays blue in MT5; used for selected states, not EA labels */
     --chart-line: #4f7fff; /* chart/canvas line — always visible blue regardless of theme */
     --orange: #d95000;
     --head-bg: #222222;
@@ -275,7 +277,7 @@
   .ticker-label {
     padding: 0 10px; font-size: 9px; font-weight: 700;
     font-family: var(--font-ui);
-    color: var(--blue); text-transform: uppercase; letter-spacing: .10em;
+    color: var(--accent); text-transform: uppercase; letter-spacing: .10em;
     border-right: 1px solid var(--border2); white-space: nowrap; flex-shrink: 0;
   }
   .ticker-track {
@@ -460,10 +462,10 @@
     border: 1px solid var(--border2);
     cursor: pointer; transition: color .15s, border-color .15s, background .15s;
   }
-  .sig-notif-toggle:hover { color: var(--blue); border-color: var(--blue); }
+  .sig-notif-toggle:hover { color: var(--accent); border-color: var(--accent); }
   .sig-notif-toggle svg { flex-shrink: 0; display: block; }
   .sig-notif-toggle.sig-notif-on {
-    color: var(--blue); border-color: var(--blue);
+    color: var(--accent); border-color: var(--accent);
     background: rgba(79,127,255,.08);
   }
   .sig-notif-toggle.sig-notif-on:hover { background: rgba(79,127,255,.14); }
@@ -529,11 +531,11 @@
     pointer-events: auto;
   }
   .narr-share-btn:hover {
-    border-color: var(--blue);
-    color: var(--blue);
+    border-color: var(--accent);
+    color: var(--accent);
   }
   .narr-share-btn:focus-visible {
-    outline: 2px solid var(--blue);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
     opacity: 1;
     pointer-events: auto;
@@ -677,7 +679,7 @@
   .a-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
   .a-crit { background: var(--down); }
   .a-warn { background: var(--orange); }
-  .a-info { background: var(--blue); }
+  .a-info { background: var(--accent); }
   .a-text { color: var(--text2); flex: 1; font-size: 11px; line-height: 1.4; font-family: var(--font-ui); min-width: 0; }
   .a-text strong { color: var(--text); font-weight: 600; }
   /* Collapsible body — text + evidence chips. Hidden by default, expanded on row click. */
@@ -1534,7 +1536,7 @@ a:focus-visible,
 /* ── KEYBOARD ROW FOCUS ────────────────────────────────────────────── */
 #fx-pairs-tbody tr.kb-focus {
   background: var(--bg3) !important;
-  outline: 1px solid var(--blue);
+  outline: 1px solid var(--accent);
   outline-offset: -1px;
 }
 
@@ -1550,7 +1552,7 @@ a:focus-visible,
   transition: border-color .15s, color .15s;
   white-space: nowrap;
 }
-.export-btn:hover { border-color: var(--blue); color: var(--blue); }
+.export-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── KEYBOARD HINT BUTTON (statusbar) ──────────────────────────────── */
 .kb-hint-btn {
@@ -1561,7 +1563,7 @@ a:focus-visible,
   transition: border-color .15s, color .15s;
   white-space: nowrap;
 }
-.kb-hint-btn:hover { border-color: var(--blue); color: var(--blue); }
+.kb-hint-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── ETF OPTIONS IV PANEL ───────────────────────────────────────── */
 .etf-iv-row {
@@ -1624,7 +1626,7 @@ a:focus-visible,
   color: var(--text3); padding: 2px 8px; border-radius: 3px; cursor: pointer;
   transition: border-color .15s, color .15s; white-space: nowrap;
 }
-.alert-add-btn:hover { border-color: var(--blue); color: var(--blue); }
+.alert-add-btn:hover { border-color: var(--accent); color: var(--accent); }
 .alert-del {
   font-size: 9px; color: var(--text3); cursor: pointer; padding: 0 2px;
   line-height: 1; flex-shrink: 0;
@@ -1702,7 +1704,7 @@ a:focus-visible,
   }
   .gi-layout-handle:hover,
   .gi-layout-handle:active {
-    background: var(--blue);
+    background: var(--accent);
     opacity: 0.5;
   }
   /* Subtle indicator line at rest */
@@ -1859,7 +1861,7 @@ a:focus-visible,
 .ns-item { display:block;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s; }
 .ns-item:hover { background:var(--bg3); }
 .ns-item:last-child { border-bottom:none; }
-.ns-featured .ns-row { border-left:2px solid var(--blue);padding-left:12px; }
+.ns-featured .ns-row { border-left:2px solid var(--accent);padding-left:12px; }
 .ns-row { display:flex;align-items:center;gap:8px;padding:0 14px;height:32px;min-width:0; }
 /* Time cell: fixed 38px — stacks HH:MM over Xh in a single column */
 .ns-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
@@ -1882,11 +1884,11 @@ a:focus-visible,
 .ns-drawer { display:none;padding:4px 14px 10px 60px;border-top:1px solid var(--border); }
 .ns-open .ns-drawer { display:block; }
 .ns-drawer-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);margin:0 0 4px 0;text-transform:uppercase;letter-spacing:.04em; }
-.ns-read-link { display:inline-block;margin-top:4px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none; }
+.ns-read-link { display:inline-block;margin-top:4px;font-size:10px;color:var(--accent);font-family:var(--font-ui);text-decoration:none; }
 .ns-read-link:hover { text-decoration:underline; }
 .ns-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
 .ns-cur-pill:hover { background:var(--bg3);color:var(--text); }
-.ns-pill-active { background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important; }
+.ns-pill-active { background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important; }
 
 /* ─── RESEARCH SECTION (.rs-*) ──────────────────────────────────────────────
    Institutional FX research notes — Bloomberg Research Monitor row layout.
@@ -1929,7 +1931,7 @@ a:focus-visible,
 .rs-drawer { display:none;padding:4px 12px 10px 55px;border-top:1px solid var(--border); }
 .rs-open .rs-drawer { display:block; }
 .rs-drawer-meta { font-size:9px;color:var(--text3);font-family:var(--font-ui);margin:0 0 4px 0; }
-.rs-read-link { display:inline-block;margin-top:4px;font-size:10px;color:var(--blue);font-family:var(--font-ui);text-decoration:none; }
+.rs-read-link { display:inline-block;margin-top:4px;font-size:10px;color:var(--accent);font-family:var(--font-ui);text-decoration:none; }
 .rs-read-link:hover { text-decoration:underline; }
 
 /* Filter pills — source filter bar */
@@ -1937,7 +1939,7 @@ a:focus-visible,
 .rs-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.03em; }
 .rs-bank-pill:hover,
 .rs-cur-pill:hover  { background:var(--bg3);color:var(--text); }
-.rs-pill-active     { background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important; }
+.rs-pill-active     { background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important; }
 
 /* Empty state */
 .rs-empty { padding:20px 14px;color:var(--text3);font-size:11px; }

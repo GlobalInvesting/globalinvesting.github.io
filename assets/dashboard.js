@@ -4996,9 +4996,9 @@ async function _renderLWChart(ohlcId, label) {
 
     const addMaBtn = document.createElement('button');
     addMaBtn.textContent = '+ Add MA';
-    addMaBtn.style.cssText = 'background:var(--blue);color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:600;cursor:pointer;letter-spacing:.04em;';
+    addMaBtn.style.cssText = 'background:var(--accent);color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:600;cursor:pointer;letter-spacing:.04em;';
     addMaBtn.addEventListener('mouseenter', () => addMaBtn.style.background = _themeColor('--chart-line') + 'cc');
-    addMaBtn.addEventListener('mouseleave', () => addMaBtn.style.background = 'var(--blue)');
+    addMaBtn.addEventListener('mouseleave', () => addMaBtn.style.background = 'var(--accent)');
     addMaBtn.addEventListener('click', e => {
       e.stopPropagation();
       const newMa = { uid: _genMaUid(), type:'EMA', period:20, color:_nextColor(), lineWidth:1, lineStyle:0 };
@@ -10614,7 +10614,7 @@ async function renderDerivativesSection() {
             const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
             // Share cell: number + heat bar background
             const shareCell = `<td style="${mono}color:var(--text3);position:relative;padding-right:6px;">
-              <div style="position:absolute;left:0;top:0;bottom:0;width:${barPct.toFixed(1)}%;background:var(--blue);opacity:0.18;border-radius:0 2px 2px 0;"></div>
+              <div style="position:absolute;left:0;top:0;bottom:0;width:${barPct.toFixed(1)}%;background:var(--accent);opacity:0.18;border-radius:0 2px 2px 0;"></div>
               <span style="position:relative;">${sharePct.toFixed(1)}%</span>
             </td>`;
             return `<tr>
@@ -10673,8 +10673,8 @@ function initG8RatesTabs() {
     tabBar.querySelectorAll('.rates-ctab').forEach(b => {
       const isActive = b === btn;
       b.setAttribute('aria-selected', isActive ? 'true' : 'false');
-      b.style.background = isActive ? 'var(--blue)' : 'none';
-      b.style.color = isActive ? '#fff' : (b.dataset.cty === 'spreads' ? 'var(--blue)' : 'var(--text2)');
+      b.style.background = isActive ? 'var(--accent)' : 'none';
+      b.style.color = isActive ? '#fff' : (b.dataset.cty === 'spreads' ? 'var(--accent)' : 'var(--text2)');
       b.style.border = isActive ? 'none' : '1px solid var(--border2)';
     });
 
