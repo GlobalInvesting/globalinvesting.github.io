@@ -306,7 +306,7 @@ function _cotTrendLabel(history) {
 
 function _cotRangeCard(history, current) {
   const vals = history.map(h=>h.levNet??((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
-  if (vals.length<2) return '<div style="font-size:9px;color:#6e7681">Insufficient data</div>';
+  if (vals.length<2) return '<div style="font-size:9px;color:var(--text3,#6e7681)">Insufficient data</div>';
   const hi=Math.max(...vals),lo=Math.min(...vals);
   const pct = hi!==lo?Math.round((current-lo)/(hi-lo)*100):50;
   const bar=`<div style="margin:10px 0 8px;height:6px;background:rgba(255,255,255,.06);border-radius:3px;position:relative;">
@@ -315,7 +315,7 @@ function _cotRangeCard(history, current) {
   </div>`;
   const rows=[{label:vals.length+'w High',val:hi,cls:'cu'},{label:'Current',val:current,cls:_cotCls(current)},{label:vals.length+'w Low',val:lo,cls:'cd'}];
   return bar+rows.map(r=>`<div style="display:flex;justify-content:space-between;align-items:baseline;font-family:${_monoF};padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">
-    <span style="font-size:11px;color:#6e7681">${r.label}</span>
+    <span style="font-size:11px;color:var(--text3,#6e7681)">${r.label}</span>
     <span style="font-size:14px;font-weight:600" class="${r.cls}">${_cotFmt(r.val)}</span>
   </div>`).join('');
 }
@@ -353,14 +353,18 @@ function _lwOpts(W,H){
   const cs=getComputedStyle(document.documentElement);
   const _bg=cs.getPropertyValue('--bg').trim()||'#131722';
   const _t2=cs.getPropertyValue('--text3').trim()||'#6e7681';
+  const _border=cs.getPropertyValue('--border').trim()||'#2e2e2e';
+  const _text2=cs.getPropertyValue('--text2').trim()||'#9096a0';
+  // Grid: use border color with low opacity — works in both dark and MT5
+  const _grid=_border+'28'; // ~16% opacity
   return {
     width:W,height:H,
     layout:{background:{type:'solid',color:_bg},textColor:_t2,fontFamily:_monoF,fontSize:10,attributionLogo:false},
-    grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
+    grid:{vertLines:{color:_grid},horzLines:{color:_grid}},
     crosshair:{
       mode:window.LightweightCharts?.CrosshairMode?.Normal??1,
-      vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},
-      horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true},
+      vertLine:{color:_text2+'55',style:2,labelVisible:false},
+      horzLine:{color:_text2+'33',style:2,labelVisible:true},
     },
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
     timeScale:{borderVisible:false},
@@ -416,7 +420,7 @@ function _buildNetChart(container,dates,netData,ccy){
     const v=param.seriesData.get(hist);if(!v)return null;
     const mon=typeof param.time==='string'?param.time.slice(0,7):'';
     const col=v.value>=0?'#26a69a':'#ef5350';
-    return `<div style="font-size:9px;color:#6e7681;margin-bottom:4px;">${mon}</div><div>${ccy} LF Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
+    return `<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${mon}</div><div>${ccy} LF Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
   });
   return chart;
 }
@@ -433,7 +437,7 @@ function _buildSplitChart(container,dates,lngData,shrtData,ccy){
   _mkTooltip(container,chart,()=>lS,param=>{
     const lv=param.seriesData.get(lS),sv=param.seriesData.get(sS);if(!lv)return null;
     const mon=typeof param.time==='string'?param.time.slice(0,7):'';
-    return `<div style="font-size:9px;color:#6e7681;margin-bottom:4px;">${mon}</div>`+
+    return `<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${mon}</div>`+
       `<div>Long &nbsp;<span style="color:#26a69a;font-weight:700">${lv.value!=null?Math.round(lv.value).toLocaleString():'—'}</span></div>`+
       (sv?`<div>Short<span style="color:#ef5350;font-weight:700"> ${sv.value!=null?Math.round(sv.value).toLocaleString():'—'}</span></div>`:'');
   });
@@ -465,7 +469,7 @@ function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy){
   _mkTooltip(container,chart,()=>lfS,param=>{
     const lf=param.seriesData.get(lfS);if(!lf)return null;
     const mon=typeof param.time==='string'?param.time.slice(0,7):'';
-    let html=`<div style="font-size:9px;color:#6e7681;margin-bottom:4px;">${mon}</div>`;
+    let html=`<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${mon}</div>`;
     html+=`<div style="color:#4f7fff">LF &nbsp;&nbsp;${_cotFmt(lf.value)}</div>`;
     if(amS){const av=param.seriesData.get(amS);if(av)html+=`<div style="color:#ff9800">AM &nbsp;&nbsp;${_cotFmt(av.value)}</div>`;}
     if(ddS){const dv=param.seriesData.get(ddS);if(dv)html+=`<div style="color:#ef5350">DD &nbsp;&nbsp;${_cotFmt(dv.value)}</div>`;}
@@ -559,7 +563,7 @@ function openCOTModal(ccy,data){
             <div style="text-align:right"><div class="cot-ls-num cd">${short_.toLocaleString()}</div><div class="cot-ov-sub">Shorts</div></div>
           </div>
           <div class="cot-ls-bar"><div class="cot-ls-bar-fill" style="width:100%;background:linear-gradient(90deg,#26a69a ${lPct}%,#ef5350 ${lPct}%)"></div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:#6e7681"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:var(--text3,#6e7681)"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
         </div>
       </div>
 
@@ -658,7 +662,7 @@ function openCOTModal(ccy,data){
         <div id="cot-part-legend" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:8px;font-size:10px;font-family:${_monoF};color:#8b949e"></div>
         <div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-part"></div></div>
       </div>
-      <div class="cot-cw"><div style="font-size:10px;color:#6e7681;font-family:${_monoF};line-height:1.7">
+      <div class="cot-cw"><div style="font-size:10px;color:var(--text3,#6e7681);font-family:${_monoF};line-height:1.7">
         <strong style="color:#8b949e">LF (Leveraged Funds):</strong> Hedge funds and CTAs. Primary speculative momentum signal.<br>
         <strong style="color:#8b949e">AM (Asset Managers):</strong> Mutual funds and pensions. Slow trend-followers. Confluence with LF = stronger signal.<br>
         <strong style="color:#8b949e">DD (Dealers):</strong> Market-makers. Typically contra-positioned to speculators. Useful contrarian signal.

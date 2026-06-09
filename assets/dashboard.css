@@ -50,8 +50,8 @@
     --orange:  #e67e00;
     /* Header background: slightly lighter than bg for topbar/panel-head separation */
     --head-bg: #141414;
-    /* Font: MT5-style monospace only for data/numeric elements; UI labels stay in system sans */
-    --font-ui:   -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    /* Font: Consolas for all UI in MT5 mode — matches MT5 platform terminal aesthetic industry standard */
+    --font-ui:   'Consolas', 'Menlo', 'Courier New', monospace;
     --font-mono: 'Consolas', 'Menlo', 'Courier New', monospace;
   }
 
@@ -68,21 +68,21 @@
 
   /* MT5: topbar — subtle 1px separator, no decorative color accent */
   [data-theme="mt5"] #topbar {
-    border-bottom: 1px solid #2a2a2a;
-    background: #111111;
+    border-bottom: 1px solid var(--border);
+    background: var(--head-bg);
   }
 
   /* MT5: nav active tab — amber bottom border mirrors the EA selected-tab convention */
   [data-theme="mt5"] .top-nav a.active {
     border-bottom: 2px solid var(--orange);
-    background: #1e1e1e;
+    background: var(--bg2);
     color: var(--text);
   }
 
   /* MT5: panel headers — darker than panel bg for clear section delineation */
   [data-theme="mt5"] .panel-head {
-    background: #111111;
-    border-bottom: 1px solid #2e2e2e;
+    background: var(--head-bg);
+    border-bottom: 1px solid var(--border);
   }
 
   /* MT5: sidebar section heads — amber left accent bar, matches EA section dividers */
@@ -90,28 +90,28 @@
     border-left: 2px solid var(--orange);
     padding-left: 6px;
     color: var(--text2);
-    background: #141414;
+    background: var(--head-bg);
   }
 
   /* MT5: quote bar items — tighter, MT5-style data density */
   [data-theme="mt5"] .q-item {
-    border-right: 1px solid #2a2a2a;
+    border-right: 1px solid var(--border);
     padding: 0 10px;
   }
   [data-theme="mt5"] .q-sym {
-    color: #c8c4bc;
+    color: var(--text2);
     font-size: 10.5px;
     letter-spacing: 0.03em;
   }
 
   /* MT5: news ticker — slightly darker bg, tighter label */
   [data-theme="mt5"] #news-ticker {
-    background: #111111;
-    border-bottom: 1px solid #2a2a2a;
+    background: var(--head-bg);
+    border-bottom: 1px solid var(--border);
   }
   [data-theme="mt5"] .ticker-label {
     color: var(--orange);
-    border-right: 1px solid #2a2a2a;
+    border-right: 1px solid var(--border);
   }
 
   /* MT5: table zebra stripes — very subtle alternating rows (institutional convention) */
@@ -122,16 +122,16 @@
   /* MT5: scrollbars — match MT5 platform chrome */
   [data-theme="mt5"] #sidebar::-webkit-scrollbar-thumb,
   [data-theme="mt5"] ::-webkit-scrollbar-thumb {
-    background: #3a3a3a;
+    background: var(--border2);
   }
   [data-theme="mt5"] ::-webkit-scrollbar-track {
-    background: #111111;
+    background: var(--head-bg);
   }
 
   /* MT5: status bar — slightly elevated from body bg */
   [data-theme="mt5"] #statusbar {
-    background: #111111;
-    border-top: 1px solid #2a2a2a;
+    background: var(--head-bg);
+    border-top: 1px solid var(--border);
   }
 
   /* MT5: heatmap cells — recalibrated to MT5 palette greens/reds (Bloomberg-style muted) */

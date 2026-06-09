@@ -53,7 +53,7 @@
 #gi-auth-box {
   background: var(--bg2, #141414);
   border: 1px solid var(--border, #323232);
-  border-top: 2px solid #D95000;
+  border-top: 2px solid var(--blue,#4f7fff);
   padding: 32px 36px 28px;
   width: 460px;
   max-width: 92vw;
@@ -72,7 +72,7 @@
   margin: 0 0 24px;
   line-height: 1.6;
 }
-.gi-auth-sub a { color: #D95000; text-decoration: none; }
+.gi-auth-sub a { color: var(--blue,#4f7fff); text-decoration: none; }
 .gi-auth-sub a:hover { text-decoration: underline; }
 #gi-auth-box label {
   display: block;
@@ -95,11 +95,11 @@
   outline: none;
   transition: border-color 0.15s;
 }
-#gi-auth-box input:focus { border-color: #D95000; }
+#gi-auth-box input:focus { border-color: var(--blue,#4f7fff); }
 #gi-auth-box input::placeholder { color: var(--border2, #404040); }
 #gi-auth-activate {
   width: 100%;
-  background: #D95000;
+  background: var(--blue,#4f7fff);
   border: none;
   color: #fff;
   font-family: inherit;
@@ -111,25 +111,25 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-#gi-auth-activate:hover { background: #F06010; }
+#gi-auth-activate:hover { background: var(--blue,#4f7fff); }
 #gi-auth-activate:disabled { background: #444; cursor: default; }
 #gi-auth-err {
   font-size: 11px;
-  color: #FF3C3C;
+  color: var(--down,#e03030);
   margin-top: 10px;
   min-height: 16px;
   text-align: center;
 }
 #gi-auth-ok {
   font-size: 11px;
-  color: #00D455;
+  color: var(--up,#00b050);
   margin-top: 10px;
   min-height: 16px;
   text-align: center;
 }
 #gi-auth-hint {
   font-size: 10px;
-  color: #505050;
+  color: var(--text3,#666666);
   margin-top: 18px;
   line-height: 1.6;
   border-top: 1px solid var(--border, #222);
@@ -152,7 +152,7 @@
   z-index: 100;
   gap: 10px;
 }
-.gi-gate-icon { font-size: 22px; color: #D95000; opacity: 0.65; }
+.gi-gate-icon { font-size: 22px; color: var(--blue,#4f7fff); opacity: 0.65; }
 .gi-gate-msg {
   font-family: var(--font-ui, 'Consolas', monospace);
   font-size: 11px;
@@ -167,15 +167,15 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #D95000;
+  color: var(--blue,#4f7fff);
   background: transparent;
-  border: 1px solid #D95000;
+  border: 1px solid var(--blue,#4f7fff);
   padding: 7px 18px;
   cursor: pointer;
   margin-top: 4px;
   transition: background 0.15s, color 0.15s;
 }
-.gi-gate-btn:hover { background: #D95000; color: #fff; }
+.gi-gate-btn:hover { background: var(--blue,#4f7fff); color: #fff; }
 #gi-renew-banner {
   display: none;
   position: fixed;
@@ -183,7 +183,7 @@
   right: 20px;
   z-index: 9999;
   background: var(--bg2, #141414);
-  border: 1px solid #D95000;
+  border: 1px solid var(--blue,#4f7fff);
   padding: 10px 14px;
   font-family: var(--font-ui, 'Consolas', monospace);
   font-size: 11px;
@@ -194,11 +194,11 @@
 }
 #gi-renew-banner.visible { display: flex; }
 #gi-renew-banner span { color: var(--text3, #727272); }
-#gi-renew-banner strong { color: #D95000; }
+#gi-renew-banner strong { color: var(--blue,#4f7fff); }
 #gi-renew-btn {
   background: transparent;
-  border: 1px solid #D95000;
-  color: #D95000;
+  border: 1px solid var(--blue,#4f7fff);
+  color: var(--blue,#4f7fff);
   font-family: inherit;
   font-size: 10px;
   font-weight: 600;
@@ -209,7 +209,7 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
-#gi-renew-btn:hover { background: #D95000; color: #fff; }
+#gi-renew-btn:hover { background: var(--blue,#4f7fff); color: #fff; }
 #gi-renew-dismiss {
   background: none;
   border: none;
@@ -252,7 +252,7 @@
     <div id="gi-auth-ok"  role="status" aria-live="polite"></div>
 
     <div id="gi-auth-hint">
-      <strong style="color:#606060">Where is my key?</strong><br>
+      <strong style="color:var(--text3,#666666)">Where is my key?</strong><br>
       Open MetaTrader 5 → attach the <em>Global Investing FX Terminal EA</em> to any chart.
       The activation key appears in the terminal top bar as <code>KEY:XXXX-XXXX-XXXX</code>.
       Copy the 14-character code (dashes included) and paste it above.<br><br>
