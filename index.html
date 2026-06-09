@@ -500,7 +500,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.20.6">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.20.7">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -570,6 +570,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gi-theme-toggle">
           <button class="gi-theme-btn active" id="gi-theme-dark" onclick="window.GI_THEME&&window.GI_THEME.set('dark')">Dark</button>
           <button class="gi-theme-btn" id="gi-theme-mt5" onclick="window.GI_THEME&&window.GI_THEME.set('mt5')">MT5 Style</button>
+        </div>
+        <div class="gi-scale-row">
+          <span class="gi-scale-label">Scale</span>
+          <button class="gi-scale-btn" id="gi-scale-down" onclick="window.GI_SCALE&&window.GI_SCALE.dec()" aria-label="Decrease UI scale" title="Decrease scale">A−</button>
+          <span class="gi-scale-pct" id="gi-scale-pct">100%</span>
+          <button class="gi-scale-btn" id="gi-scale-up" onclick="window.GI_SCALE&&window.GI_SCALE.inc()" aria-label="Increase UI scale" title="Increase scale">A+</button>
         </div>
         <div class="site-menu-divider"></div>
         <span class="site-menu-section">Company</span>
@@ -1715,7 +1721,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.0" defer></script>
-<script src="assets/dashboard.js?v=8.20.6" defer></script>
+<script src="assets/dashboard.js?v=8.20.7" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
@@ -1802,7 +1808,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     try { saved = localStorage.getItem(STORAGE_KEY) || 'dark'; } catch {}
     apply(saved);
 
-    window.GI_THEME = { set: apply, current: () => saved };
+  <script>
+  // ── UI Scale control — mirrors EA zoom ──
+  (function () {
+    const STORAGE_KEY = 'gi-ui-scale';
+    const STEPS = [70, 80, 90, 100, 110, 120, 130, 140, 150];
+    let idx = STEPS.indexOf(100); // default 100%
+
+    function apply(pct) {
+      document.documentElement.style.fontSize = (pct / 100) * 12 + 'px';
+      const el = document.getElementById('gi-scale-pct');
+      if (el) el.textContent = pct + '%';
+    }
+
+    // Load saved scale
+    try {
+      const saved = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+      if (STEPS.includes(saved)) idx = STEPS.indexOf(saved);
+    } catch {}
+    apply(STEPS[idx]);
+
+    window.GI_SCALE = {
+      inc() {
+        if (idx < STEPS.length - 1) { idx++; apply(STEPS[idx]); try { localStorage.setItem(STORAGE_KEY, STEPS[idx]); } catch {} }
+      },
+      dec() {
+        if (idx > 0) { idx--; apply(STEPS[idx]); try { localStorage.setItem(STORAGE_KEY, STEPS[idx]); } catch {} }
+      },
+    };
   })();
   </script>
 </body>
