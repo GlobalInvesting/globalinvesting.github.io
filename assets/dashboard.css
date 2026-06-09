@@ -18,21 +18,21 @@
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   }
 
-  /* ── MT5 THEME ── */
+  /* ── MT5 THEME — exact colors from EA color constants ── */
   [data-theme="mt5"] {
-    --bg: #0d1117;
-    --bg2: #111820;
-    --bg3: #1a1f28;
-    --border: #1a1f28;
-    --border2: #2a3040;
-    --text: #c8cdd4;
-    --text2: #8a9cae;
-    --text3: #3a4455;
-    --up: #1fd17a;
-    --down: #e84040;
-    --blue: #7fbaff;
-    --orange: #e6a817;
-    --head-bg: #0a0c0f;
+    --bg: #0d0d0d;        /* C_BG      — near-black base        */
+    --bg2: #141414;       /* C_PANEL   — panel fill              */
+    --bg3: #1e1e1e;       /* C_PANEL2  — alternate row           */
+    --border: #323232;    /* C_BORDER  — dividers                */
+    --border2: #262626;   /* C_SEP     — panel gap               */
+    --text: #e8e4dc;      /* C_WHITE   — primary text warm white */
+    --text2: #a0a0a0;     /* C_GRAY    — neutral secondary       */
+    --text3: #727272;     /* C_DIM     — dimmed col headers      */
+    --up: #00d455;        /* C_GREEN   — vivid green             */
+    --down: #ff3c3c;      /* C_RED     — vivid red               */
+    --blue: #e8e8e8;      /* C_BLUE    — instrument label white  */
+    --orange: #d95000;    /* C_ORANGE  — Bloomberg orange        */
+    --head-bg: #222222;   /* C_HEADER  — panel header bar        */
     --font-ui: 'Consolas', 'Menlo', 'Courier New', monospace;
     --font-mono: 'Consolas', 'Menlo', 'Courier New', monospace;
   }
