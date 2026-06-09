@@ -1821,10 +1821,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     function applyScale(pct) {
       const z = pct / 100;
-      // CSS zoom on body — scales all px-based layouts uniformly.
-      // html { min-height: 100vh; background: var(--bg) } covers the gap below.
       document.body.style.zoom = z;
-      document.documentElement.style.overflow = ''; // clear any residual from old sessions
+      document.documentElement.style.overflow = '';
+      // --vh compensates for CSS zoom: 100vh in CSS pixels shrinks with zoom,
+      // so #layout height: calc(var(--vh) - 92px) needs the real visual height.
+      // At zoom z, we need (100vh / z) CSS pixels to fill the visual viewport.
+      document.documentElement.style.setProperty('--vh', (100 / z) + 'vh');
       const el = document.getElementById('gi-scale-pct');
       if (el) el.textContent = pct + '%';
     }
