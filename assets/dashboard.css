@@ -137,6 +137,10 @@
   }
   .gi-scale-btn:hover { background: var(--border2); color: var(--text); }
 
+  html {
+    background: var(--bg);
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
