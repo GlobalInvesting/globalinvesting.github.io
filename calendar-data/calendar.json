@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-09T12:22:23Z",
-  "generatedAt": "2026-06-09T12:22:23Z",
+  "lastUpdate": "2026-06-09T12:30:51Z",
+  "generatedAt": "2026-06-09T12:30:51Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -335,6 +335,11 @@
       "n": 2,
       "mean": 0.6,
       "std": 0.565685
+    },
+    "USD/balance of trade": {
+      "n": 2,
+      "mean": 0.4,
+      "std": 0.282843
     },
     "USD/jolts job openings": {
       "n": 2,
@@ -20826,7 +20831,7 @@
       "flag": "🇺🇸",
       "event": "Balance of Trade",
       "impact": "medium",
-      "actual": null,
+      "actual": "-55.9",
       "forecast": "-56.1",
       "previous": "-60.3"
     },
@@ -21452,7 +21457,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": "35.75"
+      "previous": "29"
     },
     {
       "date": "16 Jun",
