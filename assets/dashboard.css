@@ -22,43 +22,116 @@
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   }
 
-  /* ── MT5 THEME — exact colors from EA color constants ── */
+  /* ── MT5 THEME — calibrated to MT5 platform native + Bloomberg/Refinitiv conventions ── */
   [data-theme="mt5"] {
-    --bg: #0d0d0d;
-    --bg2: #141414;
-    --bg3: #1e1e1e;
-    --border: #323232;
-    --border2: #262626;
-    --text: #e8e4dc;
-    --text2: #a0a0a0;
-    --text3: #727272;
-    --up: #00d455;
-    --down: #ff3c3c;
-    --candle-up: #26a69a;   /* candlestick up — fixed TradingView teal; --up is MT5 EA signal color */
-    --candle-down: #ef5350; /* candlestick down — fixed TradingView red; --down is MT5 EA signal color */
-    --blue: #e8e8e8;      /* C_BLUE — instrument label (EA convention, not for charts) */
-    --accent: #3a3f4b;    /* UI accent — muted grey in MT5; matches EA selected-state convention */
-    --chart-line: #4f7fff; /* chart/canvas line — always visible blue regardless of theme */
-    --orange: #d95000;
-    --head-bg: #222222;
-    --font-ui: 'Consolas', 'Menlo', 'Courier New', monospace;
+    /* Near-black backgrounds matching MT5 platform native (slightly cooler than pure #000) */
+    --bg:      #0f0f0f;
+    --bg2:     #1a1a1a;
+    --bg3:     #222222;
+    --border:  #2e2e2e;
+    --border2: #3a3a3a;
+    /* Text: warm off-white for primary (matches MT5 EA C_TEXT), cooler greys for secondary */
+    --text:    #e2ddd6;
+    --text2:   #9a9a9a;
+    --text3:   #666666;
+    /* Up/Down: Bloomberg-style muted greens/reds — not neon, not oversaturated */
+    --up:      #00b050;
+    --down:    #e03030;
+    /* Candle colors: unchanged — TradingView teal/red are correct for OHLC bars */
+    --candle-up: #26a69a;
+    --candle-down: #ef5350;
+    /* Blue: restore as a proper accent (was incorrectly set to #e8e8e8 which broke all blue UI) */
+    --blue:    #4f8eff;
+    /* Accent: subtle grey matching MT5 EA selected-state */
+    --accent:  #3a3a3a;
+    /* Chart line: kept as-is — visible blue on dark bg */
+    --chart-line: #4f7fff;
+    /* Orange: toned down from #d95000 to a more muted amber — Bloomberg uses #e0c040 for alerts */
+    --orange:  #e67e00;
+    /* Header background: slightly lighter than bg for topbar/panel-head separation */
+    --head-bg: #141414;
+    /* Font: MT5-style monospace only for data/numeric elements; UI labels stay in system sans */
+    --font-ui:   -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
     --font-mono: 'Consolas', 'Menlo', 'Courier New', monospace;
   }
 
-  /* MT5: global font override — forces Consolas on all modal/JS-injected elements */
-  [data-theme="mt5"],
-  [data-theme="mt5"] * {
+  /* MT5: monospace ONLY on numeric/data elements — not on nav, titles, labels */
+  [data-theme="mt5"] .q-price,
+  [data-theme="mt5"] .q-chg,
+  [data-theme="mt5"] .q-sym,
+  [data-theme="mt5"] #clock,
+  [data-theme="mt5"] .font-mono,
+  [data-theme="mt5"] td.num,
+  [data-theme="mt5"] .mono {
     font-family: 'Consolas', 'Menlo', 'Courier New', monospace !important;
   }
-  /* Restore icon fonts that must not inherit monospace */
-  [data-theme="mt5"] .fi,
-  [data-theme="mt5"] [class*="fi-"],
-  [data-theme="mt5"] .twemoji {
-    font-family: inherit !important;
+
+  /* MT5: topbar — subtle 1px separator, no decorative color accent */
+  [data-theme="mt5"] #topbar {
+    border-bottom: 1px solid #2a2a2a;
+    background: #111111;
   }
 
-  [data-theme="mt5"] #topbar {
+  /* MT5: nav active tab — amber bottom border mirrors the EA selected-tab convention */
+  [data-theme="mt5"] .top-nav a.active {
     border-bottom: 2px solid var(--orange);
+    background: #1e1e1e;
+    color: var(--text);
+  }
+
+  /* MT5: panel headers — darker than panel bg for clear section delineation */
+  [data-theme="mt5"] .panel-head {
+    background: #111111;
+    border-bottom: 1px solid #2e2e2e;
+  }
+
+  /* MT5: sidebar section heads — amber left accent bar, matches EA section dividers */
+  [data-theme="mt5"] .sb-head {
+    border-left: 2px solid var(--orange);
+    padding-left: 6px;
+    color: var(--text2);
+    background: #141414;
+  }
+
+  /* MT5: quote bar items — tighter, MT5-style data density */
+  [data-theme="mt5"] .q-item {
+    border-right: 1px solid #2a2a2a;
+    padding: 0 10px;
+  }
+  [data-theme="mt5"] .q-sym {
+    color: #c8c4bc;
+    font-size: 10.5px;
+    letter-spacing: 0.03em;
+  }
+
+  /* MT5: news ticker — slightly darker bg, tighter label */
+  [data-theme="mt5"] #news-ticker {
+    background: #111111;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  [data-theme="mt5"] .ticker-label {
+    color: var(--orange);
+    border-right: 1px solid #2a2a2a;
+  }
+
+  /* MT5: table zebra stripes — very subtle alternating rows (institutional convention) */
+  [data-theme="mt5"] table tbody tr:nth-child(even) td {
+    background: rgba(255,255,255,0.022);
+  }
+
+  /* MT5: scrollbars — match MT5 platform chrome */
+  [data-theme="mt5"] #sidebar::-webkit-scrollbar-thumb,
+  [data-theme="mt5"] ::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+  }
+  [data-theme="mt5"] ::-webkit-scrollbar-track {
+    background: #111111;
+  }
+
+  /* MT5: status bar — slightly elevated from body bg */
+  [data-theme="mt5"] #statusbar {
+    background: #111111;
+    border-top: 1px solid #2a2a2a;
   }
   .gi-theme-toggle {
     display: flex;
