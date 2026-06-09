@@ -1,69 +1,67 @@
 {
-  "generated_at": "2026-06-09T17:10:22Z",
+  "generated_at": "2026-06-09T21:51:09Z",
   "signals": [
     {
-      "time": "17:07",
+      "time": "21:48",
       "priority": "critical",
-      "title": "AUD/USD — G10 Bilateral Theme + CESI + Carry",
-      "text": "AUD/USD at 0.7022. USD is the strongest G10 currency this week (+0.740% vs peers), while AUD is the weakest (−1.033% vs peers), creating a significant 1.773% spread. This divergence is reinforced by AUD's negative CESI score (−8 beats) indicating disappointing data, and a -72bp OIS carry premium favoring AUD (AONIA 4.35% vs SOFR 3.63%) which is being ignored. The market is actively selling AUD despite its carry advantage, driven by USD strength and AUD data weakness. Watch for RBA's next meeting on 16 Jun for any shift in stance.",
+      "title": "AUD/USD — G10 Bilateral Theme + Positioning + Vol",
+      "text": "AUD/USD at 0.7026 — USD outperformance (+0.717%) vs AUD laggard status (-0.985%) creates a 1.701% G10 spread, the widest in the complex. Despite a 60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%), AUD/USD is testing the 200-day SMA as commodity-linked weakness dominates. COT LF net long +56,800 (76.5% long) represents a crowded bullish extreme vulnerable to liquidation. Options market confirms downside risk with AUD/USD 25d RR at -1.03 (put skew) and an extreme VRP of +18.4% (IV 27.0% vs HV30 8.6%), signaling aggressive hedging against further AUD depreciation.",
       "evidence": [
-        "USD 1W avg: +0.740% (n=7)",
-        "AUD 1W avg: -1.033% (n=4)",
-        "G10 spread: 1.773%",
-        "AUD CESI: -8 misses",
-        "AUD/USD OIS carry: -72bp (favors AUD)"
+        "USD 1W avg: +0.717% (n=7)",
+        "AUD 1W avg: -0.985% (n=4)",
+        "G10 spread: 1.701%",
+        "AUD VRP: +18.4%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:04",
-      "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + COT vs BoJ + Carry",
-      "text": "USD/JPY at 160.34, trading above the 160.00 level that has previously triggered BoJ verbal warnings. The pair is sustained by a +290bp OIS carry premium favoring USD (SOFR 3.63% vs TONA 0.73%). JPY COT shows an extreme net short of −105,136 contracts (week ending Jun 2), while the BoJ's market bias is to Hike. This creates a significant short-squeeze risk if the BoJ delivers a hawkish surprise or intervenes. Intervention risk is elevated on a sustained break above 160.00. The next BoJ meeting (mkt: 50% hike priced) on 16 Jun is the key catalyst.",
+      "time": "21:45",
+      "priority": "warning",
+      "title": "USD/JPY — Carry + Intervention Risk + Options",
+      "text": "USD/JPY at 160.36 — price holds above the critical 160.00 threshold previously associated with BoJ intervention. A 290bp OIS carry advantage (SOFR 3.63% vs TONA 0.73%) sustains the bid despite strong Japanese GDP data. However, the options market is pricing reversal risk with a 25d RR of -1.10 (moderate put skew), diverging from the crowded COT LF net short of -105,136. This positioning extreme suggests a high-velocity unwind if the BoJ signals a hawkish shift at the June 16 meeting.",
       "evidence": [
-        "USD/JPY: 160.34",
+        "USD/JPY: 160.36",
+        "USD/JPY 25d RR: -1.10",
         "JPY COT LF net: -105,136",
-        "BoJ market bias: ↑ Hike",
-        "USD/JPY OIS carry: +290bp (favors USD)"
+        "Fed-BoJ OIS spread: +290bp"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:01",
+      "time": "21:43",
       "priority": "warning",
-      "title": "EUR/USD — COT vs ECB Divergence + Options Skew",
-      "text": "EUR/USD at 1.1547. COT data shows EUR net short −22,320 (week ending Jun 2), while the ECB's market bias is to Hike. This divergence creates short-squeeze risk if the ECB delivers a hawkish surprise. Options market shows a mild put skew with 25d RR at -0.63, suggesting options traders are hedging against EUR weakness despite the potential for a hawkish ECB. The next ECB meeting (mkt: 100% hike priced) on 11 Jun is the immediate catalyst for a potential short-squeeze.",
+      "title": "USD/CAD — BoC Policy + Retail Divergence",
+      "text": "USD/CAD at 1.3948 — 150bp USD carry advantage (Fed 3.75% vs BoC 2.25%) supports the pair ahead of Governor Macklem's press conference. Retail sentiment is at an 89% short extreme, fading the move higher, while COT LF net positioning remains short -49,052. This retail-institutional alignment on the short side typically precedes a continuation of the primary trend; retail capitulation risk rises if price clears 1.4000. Watch for BoC stagflation commentary to catalyze the next leg.",
       "evidence": [
-        "EUR COT LF net: -22,320",
-        "ECB market bias: ↑ Hike",
-        "EURUSD 25d RR: -0.63"
-      ],
-      "_source": "gemini:gemini-2.5-flash"
-    },
-    {
-      "time": "16:58",
-      "priority": "warning",
-      "title": "AUD/USD — Elevated Vol Premium + Options Skew",
-      "text": "AUD/USD at 0.7022. IV at 38.9% vs HV30 at 8.6% results in an extreme +30.3% VRP, indicating strong hedging demand above realized volatility. The 25d RR at -1.03 shows a moderate put skew, with options traders paying for AUD downside protection. This combination suggests significant market concern for further AUD weakness, despite the pair's -72bp OIS carry premium. Watch for a break below 0.7000 to confirm further downside pressure.",
-      "evidence": [
-        "AUD/USD IV: 38.9%",
-        "AUD/USD HV30: 8.6%",
-        "AUD/USD VRP: +30.3%",
-        "AUDUSD 25d RR: -1.03"
-      ],
-      "_source": "gemini:gemini-2.5-flash"
-    },
-    {
-      "time": "16:55",
-      "priority": "info",
-      "title": "USD/CAD — Retail Divergence + Correlation Break",
-      "text": "USD/CAD at 1.3959. Retail sentiment shows an extreme 87% short position, indicating contrarian reversal risk. This diverges from COT data which shows CAD net short -49,052 (week ending Jun 2), suggesting institutional positioning is aligned with USD strength. The USD/CAD vs WTI Oil correlation has broken to -0.050 (z=-1.52σ vs norm=-0.004), indicating the pair is no longer reacting to oil price movements as historically expected. The BoC Policy Rate Announcement today is the immediate event to watch.",
-      "evidence": [
-        "USD/CAD retail: 87% short",
+        "USD/CAD Retail: 89% Short",
         "CAD COT LF net: -49,052",
-        "USD/CAD vs WTI Oil corr: -0.050 (z=-1.52σ)"
+        "USD/CAD carry: +150bp"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "21:38",
+      "priority": "info",
+      "title": "NZD/USD — COT vs Retail Extreme Divergence",
+      "text": "NZD/USD at 0.5826 — retail sentiment is 88% long (extreme) while COT LF specs are net short -27,797 (15.1% long). This sharp divergence indicates retail is catching a falling knife against institutional momentum. With a -0.83% real policy rate (accommodative) and a 150bp carry deficit vs USD, NZD remains structurally heavy. Retail long capitulation is the primary risk if 0.5800 is breached.",
+      "evidence": [
+        "NZD/USD Retail: 88% Long",
+        "NZD COT long%: 15.1%",
+        "NZD real rate: -0.83%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "21:33",
+      "priority": "info",
+      "title": "USD/CHF — Volatility Premium + Funding Stress",
+      "text": "USD/CHF at 0.7982 — the pair exhibits an extreme VRP of +26.1% (IV 32.8% vs HV30 6.7%), signaling the options market is pricing a massive volatility expansion relative to recent realized moves. DXY vs SPX correlation at z=+1.46σ suggests USD is being bid as a funding/safe-haven asset rather than on growth. 375bp carry advantage (Fed 3.75% vs SNB 0%) remains the structural floor unless VIX clears 25.",
+      "evidence": [
+        "USD/CHF VRP: +26.1%",
+        "DXY vs SPX z-score: +1.46σ",
+        "USD/CHF carry: +375bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
