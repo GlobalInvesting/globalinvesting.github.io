@@ -1821,15 +1821,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     function applyScale(pct) {
       const z = pct / 100;
-      // Apply zoom on <html> not <body> — so the root element fills the viewport
-      // and the html background (var(--bg)) covers any area exposed by shrinking.
-      document.documentElement.style.zoom = z;
-      // Firefox fallback: zoom not supported on documentElement — use body transform
-      if (typeof document.documentElement.style.zoom === 'undefined' || document.documentElement.style.zoom === '') {
-        document.body.style.transform = 'scale(' + z + ')';
-        document.body.style.transformOrigin = 'top left';
-        document.body.style.width = (100 / z) + '%';
-      }
+      const b = document.body;
+      // transform: scale() on body — works in all browsers, no zoom API quirks.
+      // When z < 1 the body shrinks visually but its pre-transform layout box
+      // stays full-size (width/height set to 100/z vw/vh), so the html element
+      // (background: var(--bg)) seamlessly fills any remaining viewport space.
+      // overflow:hidden on html prevents scrollbars from the expanded layout box.
+      b.style.transformOrigin = 'top left';
+      b.style.transform       = 'scale(' + z + ')';
+      b.style.width           = (100 / z) + 'vw';
+      b.style.height          = (100 / z) + 'vh';
+      b.style.overflowX       = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       const el = document.getElementById('gi-scale-pct');
       if (el) el.textContent = pct + '%';
     }
