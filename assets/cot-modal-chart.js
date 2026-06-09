@@ -762,3 +762,27 @@ function closeCOTModal(){
 }
 
 window.openCOTModal=openCOTModal;window.closeCOTModal=closeCOTModal;window.cotTab=cotTab;
+
+// ── Theme-change listener — rebuild LWC charts when dark↔MT5 switches ────────
+// Charts are built once with _built=true flag and LWC series colors are fixed at
+// addSeries() time. On theme switch: destroy existing charts, clear _built flags,
+// and re-trigger the active tab so charts rebuild with the new CSS var values.
+window.addEventListener('gi-theme-change', function() {
+  const bd = document.getElementById('cot-bd');
+  if (!bd) return; // modal not open — nothing to do
+
+  // Destroy existing LWC instances (clears canvas, removes resize observers)
+  _destroyCOTCharts();
+
+  // Clear _built flag on all chart containers so builders re-run
+  ['cot-lw-net','cot-lw-split','cot-lw-part'].forEach(function(id) {
+    const w = document.getElementById(id);
+    if (w) { w._built = false; if (w._lwResize) { window.removeEventListener('resize', w._lwResize); w._lwResize = null; } if (w._lwRo) { w._lwRo.disconnect(); w._lwRo = null; } }
+  });
+
+  // Re-trigger the currently active tab so the chart rebuilds immediately
+  const activeTab = bd.querySelector('.cot-tab.active, .cot-tab.on');
+  if (activeTab && typeof cotTab === 'function') {
+    cotTab(activeTab, activeTab.dataset.tab || 'overview');
+  }
+});
