@@ -9035,6 +9035,8 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
           <span class="kbl-key">N</span><span class="kbl-desc">News Feed (toggle)</span>
           <span class="kbl-key">B</span><span class="kbl-desc">Research (toggle)</span>
           <span class="kbl-key">&uarr;&darr;</span><span class="kbl-desc">Navigate FX rows</span>
+          <span class="kbl-key">+</span><span class="kbl-desc">Zoom in</span>
+          <span class="kbl-key">−</span><span class="kbl-desc">Zoom out</span>
           <span class="kbl-key">?</span><span class="kbl-desc">Close this panel</span>
         </div>
         <div class="kbl-footer">Press any key or click to close</div>
@@ -9055,6 +9057,10 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     const key = e.key;
 
     if (key === '?') { e.preventDefault(); toggleLegend(); return; }
+
+    // Zoom in/out via + and - keys
+    if (key === '+' || key === '=') { e.preventDefault(); window.GI_SCALE?.inc(); return; }
+    if (key === '-' || key === '_') { e.preventDefault(); window.GI_SCALE?.dec(); return; }
 
     // Close legend on any key if open
     const legend = document.getElementById('kb-legend');
