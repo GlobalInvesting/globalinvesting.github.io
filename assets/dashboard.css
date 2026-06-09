@@ -37,9 +37,9 @@
     /* Up/Down: Bloomberg-style muted greens/reds — not neon, not oversaturated */
     --up:      #00b050;
     --down:    #e03030;
-    /* Candle colors: unchanged — TradingView teal/red are correct for OHLC bars */
-    --candle-up: #26a69a;
-    --candle-down: #ef5350;
+    /* Candle colors: MT5-native green/red matching platform EA palette */
+    --candle-up: #00b061;
+    --candle-down: #ff3a3a;
     /* Blue: restore as a proper accent (was incorrectly set to #e8e8e8 which broke all blue UI) */
     --blue:    #4f8eff;
     /* Accent: subtle grey matching MT5 EA selected-state */
