@@ -99,53 +99,6 @@
     letter-spacing: .06em;
   }
 
-  /* ── UI Scale control — A- / % / A+ ── */
-  .gi-scale-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin: 2px 14px 6px;
-  }
-  .gi-scale-label {
-    font-size: 9px;
-    color: var(--text3);
-    font-family: var(--font-ui);
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    flex: 1;
-  }
-  .gi-scale-pct {
-    font-size: 9px;
-    font-family: var(--font-mono);
-    color: var(--text2);
-    min-width: 28px;
-    text-align: center;
-  }
-  .gi-scale-btn {
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-radius: 3px;
-    color: var(--text2);
-    font-family: var(--font-ui);
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 6px;
-    cursor: pointer;
-    line-height: 1;
-    transition: background .12s, color .12s;
-    white-space: nowrap;
-  }
-  .gi-scale-btn:hover { background: var(--border2); color: var(--text); }
-
-  html {
-    background: var(--bg);
-    min-height: 100vh;
-  }
-
-  :root {
-    --vh: 100vh;
-  }
-
   body {
     background: var(--bg);
     color: var(--text);
@@ -351,7 +304,8 @@
   #layout {
     display: grid;
     grid-template-columns: 180px minmax(0,1fr) 220px;
-    height: calc(var(--vh, 100vh) - 92px);
+    height: calc(100vh - 92px);
+    height: calc(100dvh - 92px);
     overflow: hidden;
     min-width: 0;
     width: 100%;
@@ -462,13 +416,6 @@
     padding-bottom: 24px;
     min-width: 0;
     width: 100%;
-  }
-  /* Fill any remaining space after the last visible panel so the bg
-     covers the full grid cell at all zoom levels */
-  #main::after {
-    content: '';
-    flex: 1 0 0;
-    min-height: 0;
   }
   #main::-webkit-scrollbar { width: 4px; }
   #main::-webkit-scrollbar-thumb { background: var(--border2); }
