@@ -176,6 +176,50 @@
   transition: background 0.15s, color 0.15s;
 }
 .gi-gate-btn:hover { background: #D95000; color: #fff; }
+#gi-renew-banner {
+  display: none;
+  position: fixed;
+  bottom: 16px;
+  right: 20px;
+  z-index: 9999;
+  background: var(--bg2, #141414);
+  border: 1px solid #D95000;
+  padding: 10px 14px;
+  font-family: var(--font-ui, 'Consolas', monospace);
+  font-size: 11px;
+  color: var(--text, #E8E4DC);
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+#gi-renew-banner.visible { display: flex; }
+#gi-renew-banner span { color: var(--text3, #727272); }
+#gi-renew-banner strong { color: #D95000; }
+#gi-renew-btn {
+  background: transparent;
+  border: 1px solid #D95000;
+  color: #D95000;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#gi-renew-btn:hover { background: #D95000; color: #fff; }
+#gi-renew-dismiss {
+  background: none;
+  border: none;
+  color: var(--text3, #727272);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
 `;
 
   // ── Modal HTML ─────────────────────────────────────────────────────────────
@@ -218,6 +262,14 @@
 </div>
 `;
 
+  const RENEW_HTML = `
+<div id="gi-renew-banner" role="status" aria-live="polite">
+  <span>License expires in <strong id="gi-renew-days">?</strong> days &mdash; re-enter your key to renew</span>
+  <button id="gi-renew-btn">Renew</button>
+  <button id="gi-renew-dismiss" aria-label="Dismiss">&times;</button>
+</div>
+`;
+
   // ── JWT helpers ────────────────────────────────────────────────────────────
   function parseJWT(token) {
     try {
@@ -232,6 +284,13 @@
     const p = parseJWT(token);
     if (!p || !p.exp) return false;
     return p.exp > Math.floor(Date.now() / 1000);
+  }
+
+  function jwtDaysRemaining(token) {
+    if (!token) return 0;
+    const p = parseJWT(token);
+    if (!p || !p.exp) return 0;
+    return Math.floor((p.exp - Math.floor(Date.now() / 1000)) / 86400);
   }
 
   function saveToken(t) {
@@ -333,6 +392,7 @@
     document.head.appendChild(style);
 
     document.body.insertAdjacentHTML('beforeend', MODAL_HTML);
+    document.body.insertAdjacentHTML('beforeend', RENEW_HTML);
 
     document.getElementById('gi-auth-activate')
       ?.addEventListener('click', activate);
@@ -354,9 +414,27 @@
       });
     }
 
+    // Renewal banner wiring
+    document.getElementById('gi-renew-btn')
+      ?.addEventListener('click', () => {
+        document.getElementById('gi-renew-banner')?.classList.remove('visible');
+        showModal();
+      });
+    document.getElementById('gi-renew-dismiss')
+      ?.addEventListener('click', () => {
+        document.getElementById('gi-renew-banner')?.classList.remove('visible');
+      });
+
     const token = loadToken();
     if (isJWTValid(token)) {
       window.GI_AUTH.isActive = true;
+      // Show renewal banner if fewer than 7 days remain
+      const daysLeft = jwtDaysRemaining(token);
+      if (daysLeft < 7) {
+        const daysEl = document.getElementById('gi-renew-days');
+        if (daysEl) daysEl.textContent = daysLeft;
+        document.getElementById('gi-renew-banner')?.classList.add('visible');
+      }
     } else {
       try { sessionStorage.removeItem(JWT_KEY); } catch {}
       try { localStorage.removeItem(JWT_KEY); }   catch {}
