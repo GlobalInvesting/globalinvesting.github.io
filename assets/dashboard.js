@@ -3937,6 +3937,9 @@ async function _renderLWChart(ohlcId, label) {
     }
     candleSeries.setData(bars);
   }
+  // Expose to module scope so gi-theme-change listener can recolor on theme switch
+  window._candleSeries = candleSeries;
+  window._candleSeriesType = window._lwChartType || 'candle';
 
   // ── Store last completed bar close for H1/H4 live-bar open (Bloomberg standard) ──
   // Bloomberg H1 open = first real tick of that hour = close of the last completed H1 bar.
@@ -12727,6 +12730,32 @@ window.addEventListener('gi-theme-change', function() {
         timeScale:       { borderColor: _themeColor('--border') },
       });
     } catch(_) {}
+
+    // 1b. Recolor the main price series (candle/bar up-down colors, line/area chart-line)
+    if (window._candleSeries) {
+      try {
+        const t = window._candleSeriesType;
+        if (t === 'line') {
+          window._candleSeries.applyOptions({ color: _themeColor('--chart-line') });
+        } else if (t === 'area') {
+          window._candleSeries.applyOptions({
+            lineColor: _themeColor('--chart-line'),
+            topColor:  _themeColorAlpha('--chart-line', 0.28),
+            bottomColor: _themeColorAlpha('--chart-line', 0.02),
+          });
+        } else {
+          // candle or bar
+          window._candleSeries.applyOptions({
+            upColor:         _themeColor('--up'),
+            downColor:       _themeColor('--down'),
+            borderUpColor:   _themeColor('--up'),
+            borderDownColor: _themeColor('--down'),
+            wickUpColor:     _themeColor('--up'),
+            wickDownColor:   _themeColor('--down'),
+          });
+        }
+      } catch(_) {}
+    }
   }
 
   // 2. Yield curve canvas — redraw with new theme colors
