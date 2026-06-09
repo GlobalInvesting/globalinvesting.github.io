@@ -1715,7 +1715,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
-    <span class="sb-v">FX Terminal v8.1.2</span>
+    <span class="sb-v">FX Terminal v8.1.3</span>
   </div>
 </footer>
 
@@ -1821,9 +1821,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     function applyScale(pct) {
       const z = pct / 100;
-      document.body.style.zoom = z;
-      // Firefox fallback: zoom not supported — use transform on a wrapper if present
-      if (typeof document.body.style.zoom === 'undefined' || document.body.style.zoom === '') {
+      // Apply zoom on <html> not <body> — so the root element fills the viewport
+      // and the html background (var(--bg)) covers any area exposed by shrinking.
+      document.documentElement.style.zoom = z;
+      // Firefox fallback: zoom not supported on documentElement — use body transform
+      if (typeof document.documentElement.style.zoom === 'undefined' || document.documentElement.style.zoom === '') {
         document.body.style.transform = 'scale(' + z + ')';
         document.body.style.transformOrigin = 'top left';
         document.body.style.width = (100 / z) + '%';
