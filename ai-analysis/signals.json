@@ -1,53 +1,58 @@
 {
-  "generated_at": "2026-06-09T02:43:56Z",
+  "generated_at": "2026-06-09T10:07:39Z",
   "signals": [
     {
-      "time": "02:42",
+      "time": "10:09",
       "priority": "critical",
-      "title": "AUD/USD — G10 Bilateral Theme + CESI Divergence",
-      "text": "AUD/USD at 0.7053 reflects a dominant G10 theme as USD outperforms (+0.676% avg) while AUD lags (-0.648% avg). Despite a 72bp OIS carry advantage for AUD, the pair is pressured by a sharp divergence in economic surprises: USD CESI net +29 (strong beats) vs AUD CESI net -8 (misses). Institutional positioning remains heavily long AUD (COT LF net +56,800, 76.5% long), creating significant liquidation risk if US CPI on June 10 surprises to the upside. The 1.324% G10 spread confirms a high-conviction bilateral trend favoring USD.",
+      "title": "AUD/USD — G10 Bilateral Theme + Carry",
+      "text": "AUD/USD at 0.7056 — 60bp AUD carry advantage over USD. USD 1W avg: +0.521% (n=7) vs AUD 1W avg: -0.694% (n=4) — G10 spread: 1.215%. Strong theme favors USD; AUD weakness to continue as data disappoints. Watch for AUD/USD to test 0.70 on sustained USD strength.",
       "evidence": [
-        "USD 1W avg: +0.676% (n=7)",
-        "AUD 1W avg: -0.648% (n=4)",
-        "G10 spread: 1.324%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+        "USD 1W avg: +0.521% (n=7)",
+        "AUD 1W avg: -0.694% (n=4)",
+        "G10 spread: 1.215%"
+      ]
     },
     {
-      "time": "02:39",
+      "time": "10:06",
       "priority": "warning",
-      "title": "USD/JPY — Intervention Risk + Retail Divergence",
-      "text": "USD/JPY at 160.19 has breached the critical 160.00 threshold, a level previously associated with BoJ verbal and physical intervention. While the 300bp Fed-BoJ carry sustains the bid, retail sentiment is at an extreme 85% short, diverging from the crowded institutional short (COT LF net -105,136). Options markets are pricing in downside protection with a -1.14 25d RR put skew. Sustained trading above 160.00 increases the probability of immediate BoJ action, especially ahead of the June 16 policy meeting.",
+      "title": "EUR/USD — Positioning + Vol",
+      "text": "EUR/USD at 1.1566 — EUR COT LF net short -22,320. IV at 7.1% vs HV30 at 4.5% — 2.6% vol-pt premium over realized. 25d RR at -0.54: mild put skew despite short speculative positioning. Market hedging, not chasing; late-trend caution. Watch for EUR/USD to hold below 1.16.",
       "evidence": [
-        "USD/JPY: 160.19",
-        "Retail Sentiment: 85% Short",
-        "25d RR: -1.14 (Saxo)"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+        "EUR COT LF net: -22,320",
+        "EUR/USD IV: 7.1% vs HV30: 4.5%",
+        "25d RR: -0.54"
+      ]
     },
     {
-      "time": "02:37",
+      "time": "10:03",
       "priority": "warning",
-      "title": "NZD/USD — COT vs Retail Divergence + Real Rates",
-      "text": "NZD/USD at 0.5816 shows a stark positioning conflict: retail traders are 88% long (extreme) while institutional speculators are net short -27,797 (15.1% long). The RBNZ's real rate of -0.83% is the most accommodative in the G10, trailing the Fed's restrictive +1.23% real rate. This 206bp real yield disadvantage, combined with institutional selling, suggests retail is catching a falling knife. Downside momentum is likely to persist toward 0.5750 unless RBNZ shifts its neutral bias at the July 8 meeting.",
+      "title": "USD/JPY — Carry + COT Divergence",
+      "text": "USD/JPY at 160.19 — 300bp USD carry advantage over JPY. JPY COT LF net short -105,136. USD/JPY 25d RR at -1.14: moderate put skew. Intervention risk rises on a sustained break above 160.00. Watch for USD/JPY to test 160.50 on carry and speculative positioning divergence.",
       "evidence": [
-        "NZD COT LF long%: 15.1%",
-        "Retail Sentiment: 88% Long",
-        "NZD Real Rate: -0.83%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+        "USD/JPY carry: 300bp",
+        "JPY COT LF net: -105,136",
+        "25d RR: -1.14"
+      ]
     },
     {
-      "time": "02:32",
+      "time": "10:00",
       "priority": "info",
-      "title": "USD/CHF — Volatility Premium + Carry Advantage",
-      "text": "USD/CHF at 0.7974 is supported by a massive 375bp carry advantage (Fed 3.75% vs SNB 0.0%). The options market is pricing in significant tail risk with IV at 15.4% vs HV30 of 6.7%, resulting in a +8.7% Vol Risk Premium (VRP). This elevated premium suggests traders are paying up for protection against a sharp reversal, likely tied to Middle East geopolitical headlines (Iran-Israel tensions). However, carry remains the dominant driver while VIX remains in 'normal' territory at 18.9.",
+      "title": "GBP/USD — Vol Regime",
+      "text": "GBP/USD at 1.339 — IV at 11.0% vs HV30 at 6.5% — 4.5% vol-pt premium over realized. Elevated hedging demand over realized vol; watch for GBP/USD to remain volatile. GBP/USD 25d RR at -0.73: mild put skew.",
       "evidence": [
-        "USD/CHF VRP: +8.7%",
-        "Fed-SNB Carry: 375bp",
-        "VIX: 18.9"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+        "GBP/USD IV: 11.0% vs HV30: 6.5%",
+        "25d RR: -0.73"
+      ]
+    },
+    {
+      "time": "09:57",
+      "priority": "info",
+      "title": "USD/CAD — Carry",
+      "text": "USD/CAD at 1.3935 — 150bp USD carry advantage over CAD. Watch for USD/CAD to hold above 1.39 on carry. USD/CAD 25d RR at +0.28: near neutral.",
+      "evidence": [
+        "USD/CAD carry: 150bp",
+        "25d RR: +0.28"
+      ]
     }
   ]
 }
