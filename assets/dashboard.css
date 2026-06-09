@@ -463,6 +463,13 @@
     min-width: 0;
     width: 100%;
   }
+  /* Fill any remaining space after the last visible panel so the bg
+     covers the full grid cell at all zoom levels */
+  #main::after {
+    content: '';
+    flex: 1 0 0;
+    min-height: 0;
+  }
   #main::-webkit-scrollbar { width: 4px; }
   #main::-webkit-scrollbar-thumb { background: var(--border2); }
 
