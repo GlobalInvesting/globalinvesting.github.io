@@ -1813,13 +1813,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   </script>
   <script>
   // ── UI Scale control — mirrors EA zoom ──
+  // Uses CSS zoom on <body> — scales all px-based layouts without modifying font-size vars.
   (function () {
     const SCALE_KEY = 'gi-ui-scale';
     const STEPS = [70, 80, 90, 100, 110, 120, 130, 140, 150];
     let idx = STEPS.indexOf(100);
 
     function applyScale(pct) {
-      document.documentElement.style.fontSize = (pct / 100) * 12 + 'px';
+      const z = pct / 100;
+      document.body.style.zoom = z;
+      // Firefox fallback: zoom not supported — use transform on a wrapper if present
+      if (typeof document.body.style.zoom === 'undefined' || document.body.style.zoom === '') {
+        document.body.style.transform = 'scale(' + z + ')';
+        document.body.style.transformOrigin = 'top left';
+        document.body.style.width = (100 / z) + '%';
+      }
       const el = document.getElementById('gi-scale-pct');
       if (el) el.textContent = pct + '%';
     }
@@ -1828,7 +1836,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       const saved = parseInt(localStorage.getItem(SCALE_KEY), 10);
       if (STEPS.includes(saved)) idx = STEPS.indexOf(saved);
     } catch {}
-    applyScale(STEPS[idx]);
+    // Apply on DOMContentLoaded to ensure body exists
+    if (document.body) {
+      applyScale(STEPS[idx]);
+    } else {
+      document.addEventListener('DOMContentLoaded', () => applyScale(STEPS[idx]));
+    }
 
     window.GI_SCALE = {
       inc() {
@@ -1837,6 +1850,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       dec() {
         if (idx > 0) { idx--; applyScale(STEPS[idx]); try { localStorage.setItem(SCALE_KEY, STEPS[idx]); } catch {} }
       },
+      current() { return STEPS[idx]; },
     };
   })();
   </script>
