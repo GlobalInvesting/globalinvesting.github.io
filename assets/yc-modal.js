@@ -102,7 +102,7 @@ function openYCModal(tenorData) {
   closeYCModal();
   if (!Array.isArray(tenorData) || tenorData.length === 0) return;
   const shape = _ycShape(tenorData);
-  const shapeColors = { Inverted: 'var(--down)', Flat: 'var(--orange)', Normal: 'var(--up)', Steep: 'var(--blue)' };
+  const shapeColors = { Inverted: 'var(--down)', Flat: 'var(--orange)', Normal: 'var(--up)', Steep: 'var(--chart-line)' };
   const shapeCol = shapeColors[shape] || 'var(--text2)';
   const labels    = tenorData.map(t => t.label);
   const todayVals = tenorData.map(t => t.close);
@@ -147,7 +147,7 @@ function openYCModal(tenorData) {
   <div id="ycm-strip">${spreadMetrics}${metricsHtml}</div>
   <div id="ycm-chart-wrap">
     <div id="ycm-legend">
-      <div class="ycm-leg-item"><div class="ycm-leg-dot" style="background:var(--blue);height:2px;"></div>Today</div>
+      <div class="ycm-leg-item"><div class="ycm-leg-dot" style="background:var(--chart-line);height:2px;"></div>Today</div>
       <div class="ycm-leg-item"><div class="ycm-leg-dot dashed" style="color:var(--text2);"></div>Prior close</div>
       ${shape ? `<div class="ycm-leg-item" style="margin-left:auto;color:${shapeCol};font-weight:600;">${shape}</div>` : ''}
     </div>
@@ -179,7 +179,7 @@ function _ycDrawChart(labels, todayVals, priorVals) {
   if (_ycChart) { _ycChart.destroy(); _ycChart = null; }
   const cs = getComputedStyle(document.documentElement);
   const bg  = cs.getPropertyValue('--bg').trim()   || '#131722';
-  const blue = cs.getPropertyValue('--blue').trim() || '#4f7fff';
+  const blue = cs.getPropertyValue('--chart-line').trim() || '#4f7fff';
   const text2 = cs.getPropertyValue('--text2').trim() || '#9096a0';
   const ctx = canvas.getContext('2d');
 
@@ -212,8 +212,8 @@ function _ycDrawChart(labels, todayVals, priorVals) {
         legend:{display:false},
         tooltip:{
           backgroundColor:bg, borderColor:'rgba(255,255,255,.12)', borderWidth:1,
-          titleFont:{family:"'JetBrains Mono','Courier New',monospace",size:10},
-          bodyFont:{family:"'JetBrains Mono','Courier New',monospace",size:10},
+          titleFont:{family:getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||"'Courier New',monospace",size:10},
+          bodyFont:{family:getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||"'Courier New',monospace",size:10},
           padding:8,
           callbacks:{
             title:items=>items[0]?.label+' Treasury',
@@ -230,8 +230,8 @@ function _ycDrawChart(labels, todayVals, priorVals) {
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:text2,font:{family:"'JetBrains Mono','Courier New',monospace",size:9}}},
-        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:text2,font:{family:"'JetBrains Mono','Courier New',monospace",size:9},callback:v=>v.toFixed(2)+'%'},grace:'5%'}
+        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:text2,font:{family:getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||"'Courier New',monospace",size:9}}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:text2,font:{family:getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||"'Courier New',monospace",size:9},callback:v=>v.toFixed(2)+'%'},grace:'5%'}
       }
     }
   });

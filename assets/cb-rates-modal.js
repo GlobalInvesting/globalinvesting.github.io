@@ -173,7 +173,7 @@ function _cbrLwOptions(){
   const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#131722';
   const text2=getComputedStyle(document.documentElement).getPropertyValue('--text2').trim()||'#9096a0';
   return{
-    layout:{background:{type:'solid',color:bg},textColor:text2,fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:9,attributionLogo:false},
+    layout:{background:{type:'solid',color:bg},textColor:text2,fontFamily:getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||"'Courier New',monospace",fontSize:9,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:window.LightweightCharts?.CrosshairMode?.Normal??1,vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.15,bottom:0.1}},
@@ -213,7 +213,8 @@ function _buildDecisionOverlay(container,lwChart,decisions){
     });
     let html='';
     assigned.forEach(d=>{
-      const x=d.x,col=d.delta>0?'#26a69a':'#ef5350';
+      const cs2=getComputedStyle(document.documentElement);
+      const x=d.x,col=d.delta>0?(cs2.getPropertyValue('--up').trim()||'#26a69a'):(cs2.getPropertyValue('--down').trim()||'#ef5350');
       const colA=d.delta>0?'rgba(38,166,154,0.35)':'rgba(239,83,80,0.35)';
       const colB=d.delta>0?'rgba(38,166,154,0.12)':'rgba(239,83,80,0.12)';
       const sign=d.delta>0?'+':'',label=sign+Math.round(d.delta*100)+'bp';
@@ -221,7 +222,7 @@ function _buildDecisionOverlay(container,lwChart,decisions){
       const stemTop=ty+LABEL_H+2;
       html+=`<line x1="${x.toFixed(1)}" y1="${stemTop}" x2="${x.toFixed(1)}" y2="${(H-16).toFixed(1)}" stroke="${colA}" stroke-width="1" stroke-dasharray="2,3"/>`;
       html+=`<rect x="${(x-LABEL_W/2).toFixed(1)}" y="${ty}" width="${LABEL_W}" height="${LABEL_H}" rx="3" fill="${colB}" stroke="${col}" stroke-width="0.5" stroke-opacity="0.6"/>`;
-      html+=`<text x="${x.toFixed(1)}" y="${(ty+LABEL_H-3).toFixed(1)}" text-anchor="middle" font-size="8.5" font-family="'JetBrains Mono','Courier New',monospace" fill="${col}" font-weight="700">${label}</text>`;
+      html+=`<text x="${x.toFixed(1)}" y="${(ty+LABEL_H-3).toFixed(1)}" text-anchor="middle" font-size="8.5" font-family=getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||"'Courier New',monospace" fill="${col}" font-weight="700">${label}</text>`;
     });
     svg.innerHTML=html;
   }
@@ -288,7 +289,7 @@ function _buildCBRChart(data){
   opts.kineticScroll={touch:false,mouse:false};
   _cbrLwChart=LWC.createChart(container,opts);
   const{chronData,decisions,fwdRate,bias}=data;
-  const blue=getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()||'#4f7fff';
+  const blue=getComputedStyle(document.documentElement).getPropertyValue('--chart-line').trim()||'#4f7fff';
   const mainSeries=_cbrLwChart.addSeries(LWC.AreaSeries,{lineColor:blue,topColor:'rgba(79,127,255,0.16)',bottomColor:'rgba(79,127,255,0.01)',lineWidth:2,lineType:LWC.LineType?.WithSteps??1,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'rgba(0,0,0,.5)',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:true});
   mainSeries.setData(chronData);
   let fwdSeries=null;

@@ -12,6 +12,7 @@
     --up: #26a69a;
     --down: #ef5350;
     --blue: #4f7fff;
+    --chart-line: #4f7fff;  /* dedicated chart/canvas line color */
     --orange: #f6941c;
     --head-bg: #1a1d29;
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -20,21 +21,34 @@
 
   /* ── MT5 THEME — exact colors from EA color constants ── */
   [data-theme="mt5"] {
-    --bg: #0d0d0d;        /* C_BG      — near-black base        */
-    --bg2: #141414;       /* C_PANEL   — panel fill              */
-    --bg3: #1e1e1e;       /* C_PANEL2  — alternate row           */
-    --border: #323232;    /* C_BORDER  — dividers                */
-    --border2: #262626;   /* C_SEP     — panel gap               */
-    --text: #e8e4dc;      /* C_WHITE   — primary text warm white */
-    --text2: #a0a0a0;     /* C_GRAY    — neutral secondary       */
-    --text3: #727272;     /* C_DIM     — dimmed col headers      */
-    --up: #00d455;        /* C_GREEN   — vivid green             */
-    --down: #ff3c3c;      /* C_RED     — vivid red               */
-    --blue: #e8e8e8;      /* C_BLUE    — instrument label white  */
-    --orange: #d95000;    /* C_ORANGE  — Bloomberg orange        */
-    --head-bg: #222222;   /* C_HEADER  — panel header bar        */
+    --bg: #0d0d0d;
+    --bg2: #141414;
+    --bg3: #1e1e1e;
+    --border: #323232;
+    --border2: #262626;
+    --text: #e8e4dc;
+    --text2: #a0a0a0;
+    --text3: #727272;
+    --up: #00d455;
+    --down: #ff3c3c;
+    --blue: #e8e8e8;      /* C_BLUE — instrument label (EA convention, not for charts) */
+    --chart-line: #4f7fff; /* chart/canvas line — always visible blue regardless of theme */
+    --orange: #d95000;
+    --head-bg: #222222;
     --font-ui: 'Consolas', 'Menlo', 'Courier New', monospace;
     --font-mono: 'Consolas', 'Menlo', 'Courier New', monospace;
+  }
+
+  /* MT5: global font override — forces Consolas on all modal/JS-injected elements */
+  [data-theme="mt5"],
+  [data-theme="mt5"] * {
+    font-family: 'Consolas', 'Menlo', 'Courier New', monospace !important;
+  }
+  /* Restore icon fonts that must not inherit monospace */
+  [data-theme="mt5"] .fi,
+  [data-theme="mt5"] [class*="fi-"],
+  [data-theme="mt5"] .twemoji {
+    font-family: inherit !important;
   }
 
   [data-theme="mt5"] #topbar {

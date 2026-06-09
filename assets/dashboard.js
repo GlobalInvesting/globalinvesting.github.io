@@ -2776,10 +2776,10 @@ function drawYieldCurve(points, priorPoints) {
     ctx.lineTo(curPts[curPts.length-1][0], PAD_T+cH);
     ctx.lineTo(PAD_L, PAD_T+cH);
     ctx.closePath();
-    ctx.fillStyle=_themeColorAlpha('--blue', 0.07); ctx.fill();
+    ctx.fillStyle=_themeColorAlpha('--chart-line', 0.07); ctx.fill();
 
     // Current curve line
-    ctx.beginPath(); ctx.strokeStyle=_tc('--blue'); ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.strokeStyle=_tc('--chart-line'); ctx.lineWidth=1.8;
     curPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
     ctx.stroke();
 
@@ -2788,7 +2788,7 @@ function drawYieldCurve(points, priorPoints) {
       if (v == null) return;
       const x = px(i), y = py(v);
       ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2);
-      ctx.fillStyle=_tc('--blue'); ctx.fill();
+      ctx.fillStyle=_tc('--chart-line'); ctx.fill();
     });
   }
 
@@ -2798,7 +2798,7 @@ function drawYieldCurve(points, priorPoints) {
 
   // Legend
   ctx.textAlign='left';
-  ctx.fillStyle=_tc('--blue'); ctx.fillText('● Current', PAD_L, PAD_T-2);
+  ctx.fillStyle=_tc('--chart-line'); ctx.fillText('● Current', PAD_L, PAD_T-2);
   ctx.fillStyle=_tc('--text3'); ctx.fillText('● Prior',   PAD_L+52, PAD_T-2);
   if (!isLive) {
     ctx.fillStyle=_tc('--text3'); ctx.fillText('(static)', PAD_L+92, PAD_T-2);
@@ -3895,27 +3895,27 @@ async function _renderLWChart(ohlcId, label) {
     // Line series — close prices only
     if (typeof LWC.LineSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.LineSeries, {
-        color: _themeColor('--blue'), lineWidth: 2,
+        color: _themeColor('--chart-line'), lineWidth: 2,
         priceLineVisible: false, lastValueVisible: true,
         crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
         priceFormat: _priceFormat,
       });
     } else {
-      candleSeries = _lwChart.addLineSeries({ color: _themeColor('--blue'), lineWidth: 2, priceFormat: _priceFormat });
+      candleSeries = _lwChart.addLineSeries({ color: _themeColor('--chart-line'), lineWidth: 2, priceFormat: _priceFormat });
     }
     candleSeries.setData(closeBars);
   } else if (window._lwChartType === 'area') {
     // Area series — close prices with gradient fill
     if (typeof LWC.AreaSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.AreaSeries, {
-        lineColor: _themeColor('--blue'), lineWidth: 2,
-        topColor: _themeColorAlpha('--blue', 0.28), bottomColor: _themeColorAlpha('--blue', 0.02),
+        lineColor: _themeColor('--chart-line'), lineWidth: 2,
+        topColor: _themeColorAlpha('--chart-line', 0.28), bottomColor: _themeColorAlpha('--chart-line', 0.02),
         priceLineVisible: false, lastValueVisible: true,
         crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
         priceFormat: _priceFormat,
       });
     } else {
-      candleSeries = _lwChart.addAreaSeries({ lineColor: _themeColor('--blue'), lineWidth: 2, priceFormat: _priceFormat });
+      candleSeries = _lwChart.addAreaSeries({ lineColor: _themeColor('--chart-line'), lineWidth: 2, priceFormat: _priceFormat });
     }
     candleSeries.setData(closeBars);
   } else {
@@ -4997,7 +4997,7 @@ async function _renderLWChart(ohlcId, label) {
     const addMaBtn = document.createElement('button');
     addMaBtn.textContent = '+ Add MA';
     addMaBtn.style.cssText = 'background:var(--blue);color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:9px;font-weight:600;cursor:pointer;letter-spacing:.04em;';
-    addMaBtn.addEventListener('mouseenter', () => addMaBtn.style.background = _themeColor('--blue') + 'cc');
+    addMaBtn.addEventListener('mouseenter', () => addMaBtn.style.background = _themeColor('--chart-line') + 'cc');
     addMaBtn.addEventListener('mouseleave', () => addMaBtn.style.background = 'var(--blue)');
     addMaBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -5191,7 +5191,7 @@ async function _renderLWChart(ohlcId, label) {
 
         // Checkbox
         const check = document.createElement('div');
-        check.style.cssText = `width:14px;height:14px;border-radius:3px;border:1px solid ${isOn?_themeColor('--blue'):_themeColor('--border2')};background:${isOn?_themeColor('--blue'):'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;`;
+        check.style.cssText = `width:14px;height:14px;border-radius:3px;border:1px solid ${isOn?_themeColor('--chart-line'):_themeColor('--border2')};background:${isOn?_themeColor('--chart-line'):'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;`;
         if (isOn) check.innerHTML = '<svg width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1,3 3,5 7,1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
         // Label + desc
@@ -8428,7 +8428,7 @@ function drawLiquidityChart() {
     ctx.fillStyle=gradFut; ctx.fill();
 
     // ── PAST: línea sólida azul ───────────────────────────────────────────
-    ctx.beginPath(); ctx.strokeStyle=_themeColor('--blue'); ctx.lineWidth=1.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.strokeStyle=_themeColor('--chart-line'); ctx.lineWidth=1.5; ctx.setLineDash([]);
     for (let ci=0; ci<=nowCanvasSlot; ci++) {
       const v = hours[sa(ci)];
       ci===0 ? ctx.moveTo(px(ci),py(v)) : ctx.lineTo(px(ci),py(v));
@@ -11923,7 +11923,7 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
   // ── Colour per type ────────────────────────────────────────────────────────
   const CMP_COLOR = cmpType === 'cot'  ? '#9c27b0'                // purple for COT
                   : cmpType === 'rate' ? _themeColor('--up')      // up color for CB rate
-                  : cmpType === 'esi'  ? _themeColor('--blue')    // blue for ESI
+                  : cmpType === 'esi'  ? _themeColor('--chart-line')    // blue for ESI
                   :                     _themeColor('--orange');   // orange for price overlay
 
   try {
@@ -12705,3 +12705,38 @@ function initResearchNav() {
   window._researchNavSection = resSection;
   window._researchSetFilter  = _researchSetFilter;
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// THEME-CHANGE HANDLER
+// Re-applies color-sensitive components when the user switches theme.
+// ═══════════════════════════════════════════════════════════════════
+window.addEventListener('gi-theme-change', function() {
+  // 1. LWC price chart — update layout colors live
+  if (typeof _lwChart !== 'undefined' && _lwChart) {
+    try {
+      _lwChart.applyOptions({
+        layout: {
+          background: { color: _themeColor('--bg') },
+          textColor:  _themeColor('--text'),
+        },
+        grid: {
+          vertLines: { color: _themeColorAlpha('--border', 0.5) },
+          horzLines: { color: _themeColorAlpha('--border', 0.5) },
+        },
+        rightPriceScale: { borderColor: _themeColor('--border') },
+        timeScale:       { borderColor: _themeColor('--border') },
+      });
+    } catch(_) {}
+  }
+
+  // 2. Yield curve canvas — redraw with new theme colors
+  if (typeof drawYieldCurve === 'function' &&
+      typeof _lastDrawnYields !== 'undefined' && _lastDrawnYields) {
+    drawYieldCurve(_lastDrawnYields, _lastDrawnPrior);
+  }
+
+  // 3. Liquidity chart — redraw
+  if (typeof drawLiquidityChart === 'function') {
+    try { drawLiquidityChart(); } catch(_) {}
+  }
+});

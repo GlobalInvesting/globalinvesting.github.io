@@ -100,9 +100,9 @@ function _cmDrawChart(container, history, histDates, norm, std) {
   const text2 = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim() || '#9096a0';
 
   _cmChart = LWC.createChart(container, {
-    layout: { background: { type: 'solid', color: bg }, textColor: text2, fontSize: 9, fontFamily: "'JetBrains Mono','Courier New',monospace", attributionLogo: false },
+    layout: { background: { type: 'solid', color: bg }, textColor: text2, fontSize: 9, fontFamily: getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||"'Courier New',monospace", attributionLogo: false },
     grid: { vertLines: { color: 'rgba(255,255,255,.04)' }, horzLines: { color: 'rgba(255,255,255,.04)' } },
-    crosshair: { mode: LWC.CrosshairMode.Magnet, vertLine: { color: 'rgba(255,255,255,.25)', width: 1, style: 2, labelBackgroundColor: '#2a2e39' }, horzLine: { color: 'rgba(255,255,255,.25)', width: 1, style: 2, labelBackgroundColor: '#2a2e39' } },
+    crosshair: { mode: LWC.CrosshairMode.Magnet, vertLine: { color: 'rgba(255,255,255,.25)', width: 1, style: 2, labelBackgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg3').trim() || '#2a2e39' }, horzLine: { color: 'rgba(255,255,255,.25)', width: 1, style: 2, labelBackgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg3').trim() || '#2a2e39' } },
     rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.06, bottom: 0.06 } },
     timeScale: { borderVisible: false, tickMarkFormatter: hasRealDates ? (time) => { try { const d = new Date(Date.UTC(time.year, time.month - 1, time.day)); return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit', timeZone: 'UTC' }); } catch (_) { return ''; } } : undefined },
     handleScroll: false, handleScale: false,
@@ -120,7 +120,7 @@ function _cmDrawChart(container, history, histDates, norm, std) {
       });
     }
   }
-  const blue = getComputedStyle(document.documentElement).getPropertyValue('--blue').trim() || '#4f7fff';
+  const blue = getComputedStyle(document.documentElement).getPropertyValue('--chart-line').trim() || '#4f7fff';
   const mainSer = _cmChart.addSeries(LWC.LineSeries, { color: blue, lineWidth: 2, lastValueVisible: true, priceLineVisible: false, crosshairMarkerRadius: 4, priceFormat: { type: 'custom', formatter: fmt } });
   mainSer.setData(history.map((v, i) => mkPt(i, v)));
   [30, 60, 90].forEach((days) => {
