@@ -39,7 +39,7 @@
  *                  actuals payload (calendar:payload:v3)
  *
  * CRON: every 2 minutes (star-slash-2 * * * *)
- *   wrangler.toml: crons = ["*/2 * * * *"]
+ *   wrangler.toml: crons = ["* /2 * * * *"]
  *
  * ENDPOINTS:
  *   /trigger     — manual poll trigger
