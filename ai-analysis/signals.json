@@ -1,65 +1,58 @@
 {
-  "generated_at": "2026-06-10T10:38:17Z",
+  "generated_at": "2026-06-10T17:43:01Z",
   "signals": [
     {
-      "time": "10:37",
+      "time": "17:41",
       "priority": "critical",
-      "title": "AUD/USD — G10 Bilateral Theme + Macro Divergence",
-      "text": "AUD/USD at 0.7011 testing a critical breakdown level as the G10's primary laggard. USD outperformance (avg +0.714%) vs AUD weakness (avg -1.205%) creates a 1.919% spread, the widest in the G10 complex. Despite a -72bp OIS carry advantage for AUD, the pair is pressured by negative economic surprises (CESI -8) and headline risk ahead of US CPI. A core CPI print above 3% accelerates the breakdown toward 0.6950. COT LF net long +56,800 (76.5%) remains a significant liquidation risk if price fails to hold 0.7000.",
+      "title": "AUD/USD — G10 Bilateral Theme + RBA Outlook + CESI",
+      "text": "AUD/USD at 0.7015. The Australian Dollar is the weakest G10 currency this week, averaging -1.111% against peers, while the USD is the strongest at +0.758%. This 1.869% spread highlights a significant bilateral theme. NAB forecasts for future RBA rate cuts are weighing on AUD, despite the RBA's current hiking stance (4.35%) and a +0.17% mildly restrictive real rate. Australian economic data is also disappointing, with a CESI net of -8 misses. This fundamental weakness is driving AUD/USD lower, with options market showing moderate put skew (AUD/USD 25d RR -1.15). Watch for RBA's next meeting on 16 Jun for any shift in forward guidance.",
       "evidence": [
-        "USD 1W avg: +0.714% (n=7)",
-        "AUD 1W avg: -1.205% (n=4)",
-        "G10 spread: 1.919%"
+        "AUD 1W avg: -1.111% (n=4)",
+        "USD 1W avg: +0.758% (n=7)",
+        "G10 spread: 1.869%",
+        "AUD CESI: -8 misses",
+        "AUD/USD 25d RR: -1.15"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "10:34",
+      "time": "17:44",
+      "priority": "critical",
+      "title": "USD/JPY — Intervention Risk + Carry + Positioning",
+      "text": "USD/JPY at 160.51, trading above the 160.00 level that has previously triggered BoJ verbal warnings. Intervention risk is elevated on a sustained break higher. The pair is supported by a significant +290bp carry premium favoring USD (SOFR 3.63% vs TONA 0.73%). Speculative positioning shows a crowded JPY net short of -105,136 (long%=29.5%), making it vulnerable to a short-squeeze if the BoJ intervenes or shifts its hawkish bias (BoJ hike priced for 16 Jun). The current yield curve regime is a BEAR STEEPENER, which typically supports carry trades. Watch for any official BoJ comments or price action above 160.50.",
+      "evidence": [
+        "USD/JPY: 160.51",
+        "USD/JPY carry: +290bp (favors USD)",
+        "JPY COT LF net: -105,136",
+        "BoJ next meeting: 16 Jun"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "17:48",
       "priority": "warning",
-      "title": "USD/JPY — Carry + Intervention Risk + Retail Divergence",
-      "text": "USD/JPY at 160.47 holding above the 160.00 psychological handle, a level previously associated with BoJ verbal intervention. The +290bp OIS carry advantage (SOFR 3.63% vs TONA 0.73%) continues to support the bid despite a moderate options put skew (25d RR -1.10). Retail sentiment is 73% short, diverging from the institutional carry-driven trend. Sustained trading above 160.00 increases the probability of direct BoJ action, though CESI (+17) suggests JPY fundamental resilience is improving.",
+      "title": "GBP/USD — CPI Reaction + Volatility Premium + Carry",
+      "text": "GBP/USD at 1.3382, rising after US May CPI matched estimates, which weighed on the USD. The pair benefits from a -10bp carry premium favoring GBP (SONIA 3.73% vs SOFR 3.63%). Options market shows an elevated volatility risk premium (GBP/USD IV 11.0% vs HV30 6.5%, VRP +4.5%), indicating strong hedging demand for GBP upside. However, 25d RR at -0.81 shows a moderate put skew, suggesting options traders are still hedging against GBP weakness despite the recent rally. Watch for the next BoE meeting (mkt: 100% hold priced) on 18 Jun for further directional cues.",
       "evidence": [
-        "USD/JPY: 160.47",
-        "OIS Carry: +290bp",
-        "Retail: 73% Short"
+        "GBP/USD: 1.3382",
+        "GBP/USD carry: -10bp (favors GBP)",
+        "GBP/USD IV: 11.0% vs HV30: 6.5%",
+        "GBP/USD 25d RR: -0.81"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "10:32",
+      "time": "17:52",
       "priority": "warning",
-      "title": "GBP/USD — Volatility Premium + Options Skew",
-      "text": "GBP/USD IV at 11.0% vs HV30 at 6.5% generates a +4.5% Vol Risk Premium, the highest in the G10. This elevated premium combined with a moderate put skew (25d RR -0.78) indicates the market is paying a significant premium for downside protection ahead of the June 18 BoE meeting. While OIS carry is neutral (-10bp), the real rate differential (+0.77% UK vs +1.23% US) favors USD. Watch for a break of 1.3350 to confirm the options market's bearish bias.",
+      "title": "NZD/USD — COT vs Retail Divergence + Carry",
+      "text": "NZD/USD at 0.5813. Speculative positioning shows a crowded NZD net short of -27,797 (long%=15.1%), indicating institutional bearishness. However, retail sentiment is extremely long at 88% (vs 12% short), creating a significant divergence. This suggests retail traders are fading the institutional short, posing a contrarian reversal risk if the institutional short unwinds. The pair faces structural headwinds from a +150bp carry premium favoring USD (SOFR 3.63% vs OCR 2.25%). Watch for the next RBNZ meeting (mkt: 100% hold priced) on 8 Jul for any shift in policy stance that is likely to trigger a short-squeeze.",
       "evidence": [
-        "GBP/USD VRP: +4.5%",
-        "25d RR: -0.78",
-        "Real Rate Diff: -46bp"
+        "NZD/USD: 0.5813",
+        "NZD COT LF net: -27,797",
+        "NZD/USD retail: 88% long",
+        "NZD/USD carry: +150bp (favors USD)"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "10:28",
-      "priority": "info",
-      "title": "NZD/USD — Retail vs COT Positioning Extreme",
-      "text": "NZD/USD at 0.5813 exhibits a sharp positioning conflict: retail traders are 88% long (extreme contrarian sell signal) while COT LF specs are net short -27,797 (long% 15.1%). This alignment of institutional shorts and retail longs typically precedes further downside extension. The -0.83% real policy rate (most accommodative in G10) provides no structural support against the +150bp USD carry advantage. Invalidation of the bearish bias requires a recovery above 0.5900.",
-      "evidence": [
-        "Retail: 88% Long",
-        "COT LF Long%: 15.1%",
-        "NZD Real Rate: -0.83%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "10:22",
-      "priority": "info",
-      "title": "DXY vs SPX — Correlation Break + Funding Stress",
-      "text": "The correlation between DXY and S&P 500 has shifted to -0.348 (z=+1.66σ from 252d norm), signaling a move toward USD funding stress dynamics. As VIX rises to 21.3 (elevated volatility), the USD is attracting a risk-off bid that deviates from its standard equity-inverse relationship. This regime shift suggests USD strength may persist even if US yields soften, as liquidity preference dominates. Watch VIX 25.0 for a transition to full risk-off JPY/CHF outperformance.",
-      "evidence": [
-        "DXY vs SPX z-score: +1.66σ",
-        "VIX: 21.3",
-        "DXY: 99.88"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
