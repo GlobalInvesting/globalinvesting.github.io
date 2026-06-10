@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T13:47:17Z",
+  "generated_at": "2026-06-10T14:31:20Z",
   "source": "Finnhub",
   "holidays": [
     {
@@ -2386,6 +2386,28 @@
       "released": false
     },
     {
+      "title": "EIA Crude Oil Stocks Change",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "impact": "medium",
+      "forecast": "-4",
+      "previous": "-7.974",
+      "actual": "-7.228",
+      "released": true
+    },
+    {
+      "title": "EIA Gasoline Stocks Change",
+      "currency": "USD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "impact": "medium",
+      "forecast": "-0.5",
+      "previous": "3.364",
+      "actual": "0.186",
+      "released": true
+    },
+    {
       "title": "Monthly Budget Statement",
       "currency": "USD",
       "dateISO": "2026-06-10",
@@ -2921,28 +2943,6 @@
       "impact": "medium",
       "forecast": null,
       "previous": "3.2",
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "EIA Crude Oil Stocks Change",
-      "currency": "USD",
-      "dateISO": "2026-06-17",
-      "timeUTC": "14:30",
-      "impact": "medium",
-      "forecast": "-4*",
-      "previous": "-9.119",
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "EIA Gasoline Stocks Change",
-      "currency": "USD",
-      "dateISO": "2026-06-17",
-      "timeUTC": "14:30",
-      "impact": "medium",
-      "forecast": "-0.5*",
-      "previous": "3.364",
       "actual": null,
       "released": false
     },
