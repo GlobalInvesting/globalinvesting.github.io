@@ -1,8 +1,19 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.14
+fetch_ff_calendar.py — v3.15
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.15 changes (2026-06-09):
+- Cross-day dedup (Step 2d extension): Finnhub occasionally emits the same weekly event
+  twice — once with an actual (the release that already occurred) and again 1-7 days later
+  as an unreleased "upcoming" entry with the same timeUTC (e.g. Westpac Consumer Confidence
+  at 00:30 on Jun 9 with actual=-2.9, AND again on Jun 10 with no actual). This caused the
+  panel to show both the old released row AND a phantom duplicate for the "next" occurrence.
+  Fix: after the same-day dedup pass, a cross-day pass removes any unreleased event
+  (actual=None, released=False) when an entry for the same (title, currency, timeUTC)
+  already has an actual within the prior 7 days. The released entry is kept; the duplicate
+  phantom upcoming entry is dropped.
 
 v3.14 changes (2026-06-09):
 - Impact override table (_IMPACT_UPGRADES): events that Finnhub classifies as "low" impact
@@ -1383,6 +1394,41 @@ def main():
     if dedup_removed:
         print(f"  Deduped: removed {dedup_removed} duplicate entries (same title+currency+date+actual)")
     fresh = deduped
+
+    # Step 2e: Cross-day dedup — Finnhub sometimes re-emits a weekly event as an "upcoming"
+    # entry 1-7 days after the actual release, with the same timeUTC. This creates phantom
+    # duplicates like "Westpac Jun 9 (actual=-2.9)" + "Westpac Jun 10 (no actual, same time)".
+    # Strategy: for each unreleased event, check if a released copy exists within the prior
+    # 7 days with the same (title, currency, timeUTC). If so, drop the unreleased phantom.
+    from datetime import datetime, timedelta
+    # Build lookup: (title, currency, timeUTC) -> set of dateISO that have actuals
+    released_index: dict = {}
+    for ev in fresh:
+        if ev.get("actual") is not None:
+            key = (ev["title"], ev["currency"], ev.get("timeUTC", ""))
+            if key not in released_index:
+                released_index[key] = []
+            released_index[key].append(ev["dateISO"])
+    cross_day_removed = 0
+    cross_day_deduped: list = []
+    for ev in fresh:
+        if ev.get("actual") is not None or ev.get("released"):
+            cross_day_deduped.append(ev)
+            continue
+        key = (ev["title"], ev["currency"], ev.get("timeUTC", ""))
+        prior_dates = released_index.get(key, [])
+        ev_date = datetime.strptime(ev["dateISO"], "%Y-%m-%d").date()
+        is_phantom = any(
+            0 < (ev_date - datetime.strptime(d, "%Y-%m-%d").date()).days <= 7
+            for d in prior_dates
+        )
+        if is_phantom:
+            cross_day_removed += 1
+        else:
+            cross_day_deduped.append(ev)
+    if cross_day_removed:
+        print(f"  Cross-day dedup: removed {cross_day_removed} phantom upcoming entries (released copy exists within 7d)")
+    fresh = cross_day_deduped
 
     # Step 3: Sort
     fresh.sort(key=lambda e: (e["dateISO"], e["timeUTC"], e["currency"]))
