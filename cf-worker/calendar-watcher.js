@@ -63,8 +63,9 @@
 
 const G8_CURRENCIES = new Set(["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]);
 
-// ForexFactory public JSON — no API key required
-const FF_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
+// ForexFactory public JSONs — no API key required
+const FF_URL         = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
+const FF_NEXTWEEK_URL = "https://nfs.faireconomy.media/ff_calendar_nextweek.json";
 
 // KV key for the last known fingerprint
 const KV_FINGERPRINT_KEY = "calendar:fingerprint:v2";
@@ -169,13 +170,13 @@ async function runCalendarWatch(env) {
 // ── ForexFactory fetch ────────────────────────────────────────────────────────
 
 async function fetchForexFactory() {
-  const resp = await fetch(FF_URL, {
-    headers: {
-      "User-Agent": "globalinvesting-calendar-watcher/2.0 (https://globalinvesting.github.io)",
-      "Accept": "application/json",
-    },
-    signal: AbortSignal.timeout(10000),
-  });
+  const HEADERS = {
+    "User-Agent": "globalinvesting-calendar-watcher/2.0 (https://globalinvesting.github.io)",
+    "Accept": "application/json",
+  };
+
+  // Fetch thisweek
+  const resp = await fetch(FF_URL, { headers: HEADERS, signal: AbortSignal.timeout(10000) });
 
   // FF returns "Request Denied" HTML when rate limit is exceeded
   const contentType = resp.headers.get("content-type") || "";
@@ -192,9 +193,22 @@ async function fetchForexFactory() {
     throw new Error("ForexFactory response is not an array");
   }
 
-  // Filter to G8 medium+high impact only
+  // Fetch nextweek (best-effort — rate limit or network failure just skips next-week)
+  let rawNw = [];
+  try {
+    const resp2 = await fetch(FF_NEXTWEEK_URL, { headers: HEADERS, signal: AbortSignal.timeout(10000) });
+    const ct2 = resp2.headers.get("content-type") || "";
+    if (resp2.ok && ct2.includes("application/json")) {
+      const parsed = await resp2.json();
+      if (Array.isArray(parsed)) rawNw = parsed;
+    }
+  } catch (_) { /* nextweek failure is non-fatal */ }
+
+  const combined = [...raw, ...rawNw];
+
+  // Filter to G8 medium+high impact only (include events with forecast/previous even if no actual yet)
   const events = [];
-  for (const ev of raw) {
+  for (const ev of combined) {
     const country = (ev.country || "").trim().toUpperCase();
     if (!G8_CURRENCIES.has(country)) continue;
 
@@ -204,9 +218,6 @@ async function fetchForexFactory() {
     const actual   = cleanVal(ev.actual);
     const forecast = cleanVal(ev.forecast);
     const previous = cleanVal(ev.previous);
-
-    // Only include events with at least one data point
-    if (actual === null && forecast === null && previous === null) continue;
 
     events.push({
       title:    (ev.title || "").trim(),
