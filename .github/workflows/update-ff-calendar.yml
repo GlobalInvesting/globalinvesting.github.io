@@ -3,7 +3,7 @@ name: Update ForexFactory Calendar
 # TWO-TIER TRIGGER ARCHITECTURE (v5.0)
 #
 # TIER 1 — Cloudflare Worker (primary, ~2–3 min latency):
-#   cf-worker/calendar-watcher.js polls Finnhub every 1 minute.
+#   cf-worker/calendar-watcher.js polls ForexFactory public JSON every 6 minutes.
 #   When actuals/forecasts change it fires a repository_dispatch event
 #   (event_type: "calendar-data-changed") which triggers this workflow
 #   immediately — bypassing the 5-min GitHub cron minimum entirely.
@@ -160,10 +160,8 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: pip install requests --break-system-packages
 
-      - name: Fetch economic calendar (Finnhub)
+      - name: Fetch economic calendar (ForexFactory)
         if: steps.gate.outputs.run == 'true'
-        env:
-          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: python scripts/fetch_ff_calendar.py
 
       - name: Display summary
