@@ -1,58 +1,65 @@
 {
-  "generated_at": "2026-06-10T17:43:01Z",
+  "generated_at": "2026-06-10T22:05:17Z",
   "signals": [
     {
-      "time": "17:41",
+      "time": "22:04",
       "priority": "critical",
-      "title": "AUD/USD — G10 Bilateral Theme + RBA Outlook + CESI",
-      "text": "AUD/USD at 0.7015. The Australian Dollar is the weakest G10 currency this week, averaging -1.111% against peers, while the USD is the strongest at +0.758%. This 1.869% spread highlights a significant bilateral theme. NAB forecasts for future RBA rate cuts are weighing on AUD, despite the RBA's current hiking stance (4.35%) and a +0.17% mildly restrictive real rate. Australian economic data is also disappointing, with a CESI net of -8 misses. This fundamental weakness is driving AUD/USD lower, with options market showing moderate put skew (AUD/USD 25d RR -1.15). Watch for RBA's next meeting on 16 Jun for any shift in forward guidance.",
+      "title": "AUD/USD — G10 Bilateral Theme + Geopolitical Shock",
+      "text": "AUD/USD at 0.6999 — USD outperformance (1W avg +0.886%) vs AUD laggard status (1W avg -1.300%) creates a critical 2.187% G10 spread. Middle East hostilities and the Strait of Hormuz disruption drive a risk-off flight to USD, while AUD is pressured by a negative CESI (net -8 misses) and a crowded COT LF net long (+56,800, 76.5% long). The bear steepener regime (2s10s +91.4bp) and VIX at 22.2 favor USD funding over high-beta AUD carry (-60bp OIS deficit). Implication: AUD/USD remains the primary G10 expression for geopolitical risk-off and commodity supply shocks.",
       "evidence": [
-        "AUD 1W avg: -1.111% (n=4)",
-        "USD 1W avg: +0.758% (n=7)",
-        "G10 spread: 1.869%",
-        "AUD CESI: -8 misses",
-        "AUD/USD 25d RR: -1.15"
+        "USD 1W avg: +0.886% (n=7)",
+        "AUD 1W avg: -1.300% (n=4)",
+        "G10 spread: 2.187%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:44",
+      "time": "22:01",
       "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + Carry + Positioning",
-      "text": "USD/JPY at 160.51, trading above the 160.00 level that has previously triggered BoJ verbal warnings. Intervention risk is elevated on a sustained break higher. The pair is supported by a significant +290bp carry premium favoring USD (SOFR 3.63% vs TONA 0.73%). Speculative positioning shows a crowded JPY net short of -105,136 (long%=29.5%), making it vulnerable to a short-squeeze if the BoJ intervenes or shifts its hawkish bias (BoJ hike priced for 16 Jun). The current yield curve regime is a BEAR STEEPENER, which typically supports carry trades. Watch for any official BoJ comments or price action above 160.50.",
+      "title": "USD/JPY — Carry + Intervention Risk + Correlation Break",
+      "text": "USD/JPY at 160.51 — the pair holds above the 160.00 threshold despite previous BoJ verbal warnings, as the +290bp OIS carry advantage (Fed 3.75% vs BoJ 0.73%) dominates. A significant correlation break vs US 10Y (z=+1.73σ) suggests USD/JPY is ignoring yield stabilization in favor of safe-haven USD demand amid Middle East escalation. COT LF net short -105,136 (29.5% long) indicates a crowded carry trade vulnerable to BoJ intervention, though 25d RR at -1.19 shows the options market is already paying for downside protection. Implication: Sustained trade above 160.00 increases the probability of direct BoJ action.",
       "evidence": [
         "USD/JPY: 160.51",
-        "USD/JPY carry: +290bp (favors USD)",
-        "JPY COT LF net: -105,136",
-        "BoJ next meeting: 16 Jun"
+        "OIS Carry: +290bp",
+        "JPY COT LF net: -105,136"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:48",
+      "time": "21:59",
       "priority": "warning",
-      "title": "GBP/USD — CPI Reaction + Volatility Premium + Carry",
-      "text": "GBP/USD at 1.3382, rising after US May CPI matched estimates, which weighed on the USD. The pair benefits from a -10bp carry premium favoring GBP (SONIA 3.73% vs SOFR 3.63%). Options market shows an elevated volatility risk premium (GBP/USD IV 11.0% vs HV30 6.5%, VRP +4.5%), indicating strong hedging demand for GBP upside. However, 25d RR at -0.81 shows a moderate put skew, suggesting options traders are still hedging against GBP weakness despite the recent rally. Watch for the next BoE meeting (mkt: 100% hold priced) on 18 Jun for further directional cues.",
+      "title": "NZD/USD — COT vs Retail Divergence + Real Rate Gap",
+      "text": "NZD/USD at 0.5795 — extreme retail sentiment (88% long) diverges from institutional positioning (COT LF net short -27,797, 15.1% long). This institutional-retail gap occurs as NZD faces a deeply negative real policy rate of -0.83% vs USD +1.31%, a 214bp real yield disadvantage. With NZD/USD down -1.28% on the week and retail attempting to fade the move, the risk of a retail capitulation flush remains high. Implication: Institutional short bias is supported by the real rate differential; retail longs are likely to be squeezed if 0.5750 fails.",
       "evidence": [
-        "GBP/USD: 1.3382",
-        "GBP/USD carry: -10bp (favors GBP)",
-        "GBP/USD IV: 11.0% vs HV30: 6.5%",
-        "GBP/USD 25d RR: -0.81"
+        "NZD/USD Retail: 88% Long",
+        "NZD COT LF long%: 15.1%",
+        "Real Rate Spread: 214bp (USD over NZD)"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:52",
+      "time": "21:55",
       "priority": "warning",
-      "title": "NZD/USD — COT vs Retail Divergence + Carry",
-      "text": "NZD/USD at 0.5813. Speculative positioning shows a crowded NZD net short of -27,797 (long%=15.1%), indicating institutional bearishness. However, retail sentiment is extremely long at 88% (vs 12% short), creating a significant divergence. This suggests retail traders are fading the institutional short, posing a contrarian reversal risk if the institutional short unwinds. The pair faces structural headwinds from a +150bp carry premium favoring USD (SOFR 3.63% vs OCR 2.25%). Watch for the next RBNZ meeting (mkt: 100% hold priced) on 8 Jul for any shift in policy stance that is likely to trigger a short-squeeze.",
+      "title": "GBP/USD — Volatility Premium + Options Skew",
+      "text": "GBP/USD at 1.3368 — IV at 11.0% vs HV30 at 6.4% generates a +4.6% Vol Risk Premium (VRP), signaling aggressive institutional hedging ahead of the June 18 BoE meeting. Despite a neutral nominal carry (0bp), the 25d RR at -0.81 (moderate put skew) aligns with the broader USD bid. GBP COT LF net long +27,022 (65.6% long) represents a positioning overhang that is likely to unwind if Middle East tensions continue to support the DXY. Implication: High VRP suggests the market is pricing a larger-than-realized move; downside protection is being actively bid.",
       "evidence": [
-        "NZD/USD: 0.5813",
-        "NZD COT LF net: -27,797",
-        "NZD/USD retail: 88% long",
-        "NZD/USD carry: +150bp (favors USD)"
+        "GBP/USD VRP: +4.6%",
+        "25d RR: -0.81 (put skew)",
+        "GBP COT LF net: +27,022"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "21:50",
+      "priority": "info",
+      "title": "USD/CAD — Correlation Break + Retail Extreme",
+      "text": "USD/CAD at 1.3942 — the pair exhibits a correlation break vs WTI Oil (z=-1.71σ), as CAD fails to benefit from the +2.02% surge in crude prices. Retail sentiment is at an extreme 86% short, attempting to fade the 1M +1.92% rally. The +139bp OIS carry advantage (Fed 3.75% vs BoC 2.24%) and the BoC's signal of policy patience on June 10 support the USD/CAD bid regardless of energy prices. Implication: CAD's traditional link to oil is secondary to USD funding demand and carry; retail shorts face further squeeze risk toward 1.4000.",
+      "evidence": [
+        "USD/CAD vs WTI z-score: -1.71σ",
+        "Retail Sentiment: 86% Short",
+        "USD/CAD OIS Carry: +139bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
