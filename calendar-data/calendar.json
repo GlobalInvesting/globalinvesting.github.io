@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-10T23:13:01Z",
-  "generatedAt": "2026-06-10T23:13:01Z",
+  "lastUpdate": "2026-06-10T23:16:12Z",
+  "generatedAt": "2026-06-10T23:16:12Z",
   "fetchMode": "ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-10",
   "rangeTo": "2026-06-12",
-  "totalEvents": 1540,
+  "totalEvents": 1545,
   "currencyCounts": {
-    "AUD": 162,
+    "AUD": 163,
     "CHF": 86,
-    "GBP": 167,
+    "GBP": 168,
     "NZD": 73,
-    "USD": 579,
+    "USD": 581,
     "CAD": 126,
     "EUR": 173,
-    "JPY": 174
+    "JPY": 175
   },
   "impactCounts": {
     "high": 378,
-    "medium": 1025,
+    "medium": 1030,
     "low": 137
   },
   "surpriseStats": {
@@ -20409,6 +20409,19 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
+      "event": "Crude Oil Inventories",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-3.0M",
+      "previous": "-8.0M"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
       "event": "EIA Crude Oil Stocks Change",
       "impact": "medium",
       "actual": "-7.228",
@@ -20427,6 +20440,58 @@
       "actual": "0.186",
       "forecast": "-0.5",
       "previous": "3.364"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "17:59",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Federal Budget Balance",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-282.9B",
+      "previous": "215.0B"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "23:01",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "RICS House Price Balance",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-32%",
+      "previous": "-34%"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "BSI Manufacturing Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "4.2",
+      "previous": "3.8"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "01:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "MI Inflation Expectations",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "5.6%"
     },
     {
       "date": "11 Jun",
