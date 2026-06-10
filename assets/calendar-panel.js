@@ -1,6 +1,6 @@
 /**
- * calendar-panel.js v1.3 — Native economic calendar renderer
- * Reads calendar-data/ff_calendar.json (Finnhub, 8 major currencies, medium+high impact)
+ * calendar-panel.js v1.4 — Native economic calendar renderer
+ * Reads calendar-data/ff_calendar.json (ForexFactory, 8 major currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
  * v1.1 (2026-06-09): Display window filter — show only yesterday through +14 days.
@@ -10,11 +10,14 @@
  *   a display cutoff the panel rendered 3 weeks of past events above today. Now clamped
  *   to yesterday–today+14 so the panel stays focused on current and upcoming events.
  * v1.3 (2026-06-10): Reduced poll interval from 5 min to 2 min. The CF Worker + GitHub
- *   Actions pipeline delivers updated ff_calendar.json within ~2 min of a Finnhub actual
+ *   Actions pipeline delivers updated ff_calendar.json within ~2 min of a ForexFactory actual
  *   publishing. The previous 5-min client poll added up to 3 min of unnecessary lag on top
  *   of the pipeline latency. At 2 min the worst-case end-to-end delay is ~4 min; best-case
  *   (visibilitychange fires on tab focus) is near-instant. Cache-bust in index.html bumped
  *   to v=1.3.0 so all browsers discard the previously cached v1.0.0 file immediately.
+ * v1.4 (2026-06-10): Source label corrected from 'Finnhub' to 'ForexFactory'. The calendar
+ *   data has always been sourced from ForexFactory (ff_calendar.json via fetch_ff_calendar.py);
+ *   the Finnhub label was a stale reference from the original CF Worker implementation.
  */
 (function () {
   'use strict';
@@ -188,7 +191,7 @@
   }
 
   function buildPanel(events, source, holidays) {
-    source   = source   || 'Finnhub';
+    source   = source   || 'ForexFactory';
     holidays = holidays || [];
     const container = document.getElementById('cal-events-body');
     const sourceEl  = document.getElementById('cal-panel-sub');
@@ -389,7 +392,7 @@
     try {
       let events = [];
       let holidays = [];
-      let source = 'Finnhub';
+      let source = 'ForexFactory';
       for (const path of ['./calendar-data/ff_calendar.json', './calendar-data/calendar.json']) {
         const res = await fetch(path, { cache: 'no-store' }).catch(() => null);
         if (!res?.ok) continue;
