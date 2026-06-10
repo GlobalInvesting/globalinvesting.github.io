@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-10T12:43:59Z",
-  "generatedAt": "2026-06-10T12:43:59Z",
+  "lastUpdate": "2026-06-10T12:54:25Z",
+  "generatedAt": "2026-06-10T12:54:25Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,10 +9,10 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-10",
   "rangeTo": "2026-06-24",
-  "totalEvents": 1695,
+  "totalEvents": 1694,
   "currencyCounts": {
     "AUD": 181,
-    "CHF": 92,
+    "CHF": 91,
     "GBP": 196,
     "NZD": 81,
     "USD": 631,
@@ -22,7 +22,7 @@
   },
   "impactCounts": {
     "high": 391,
-    "medium": 1167,
+    "medium": 1166,
     "low": 137
   },
   "surpriseStats": {
@@ -142,9 +142,9 @@
       "std": 0.15
     },
     "USD/cpi": {
-      "n": 3,
-      "mean": 0.2,
-      "std": 0.360555
+      "n": 4,
+      "mean": 0.1525,
+      "std": 0.309341
     },
     "USD/core cpi": {
       "n": 3,
@@ -425,6 +425,26 @@
       "n": 2,
       "mean": -0.3,
       "std": 1.838478
+    },
+    "USD/core inflation rate mom": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.141421
+    },
+    "USD/core inflation rate yoy": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.070711
+    },
+    "USD/inflation rate mom": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "USD/inflation rate yoy": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.070711
     }
   },
   "events": [
@@ -20666,19 +20686,6 @@
     {
       "date": "8 Jun",
       "dateISO": "2026-06-08",
-      "timeUTC": "07:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Consumer Confidence",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "-38",
-      "previous": "-40"
-    },
-    {
-      "date": "8 Jun",
-      "dateISO": "2026-06-08",
       "timeUTC": "23:01",
       "country": "GBP",
       "currency": "GBP",
@@ -20919,7 +20926,7 @@
       "flag": "🇺🇸",
       "event": "Core Inflation Rate MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.2",
       "forecast": "0.3",
       "previous": "0.4"
     },
@@ -20932,7 +20939,7 @@
       "flag": "🇺🇸",
       "event": "Core Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.9",
       "forecast": "2.9",
       "previous": "2.8"
     },
@@ -20945,7 +20952,7 @@
       "flag": "🇺🇸",
       "event": "CPI",
       "impact": "medium",
-      "actual": null,
+      "actual": "335.12",
       "forecast": "335.11",
       "previous": "333.02"
     },
@@ -20958,8 +20965,8 @@
       "flag": "🇺🇸",
       "event": "CPI s.a",
       "impact": "medium",
-      "actual": null,
-      "forecast": "0.3%*",
+      "actual": "333.979",
+      "forecast": null,
       "previous": "332.407"
     },
     {
@@ -20971,7 +20978,7 @@
       "flag": "🇺🇸",
       "event": "Inflation Rate MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.5",
       "forecast": "0.5",
       "previous": "0.6"
     },
@@ -20984,7 +20991,7 @@
       "flag": "🇺🇸",
       "event": "Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "4.2",
       "forecast": "4.2",
       "previous": "3.8"
     },
