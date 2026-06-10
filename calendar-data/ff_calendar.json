@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T01:32:18Z",
+  "generated_at": "2026-06-10T01:45:49Z",
   "source": "Finnhub",
   "holidays": [
     {
@@ -1451,6 +1451,17 @@
       "released": true
     },
     {
+      "title": "Private House Approvals MoM Prel",
+      "currency": "AUD",
+      "dateISO": "2026-06-02",
+      "timeUTC": "01:30",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "0.5",
+      "actual": "-1",
+      "released": true
+    },
+    {
       "title": "Fed Kashkari Speech",
       "currency": "USD",
       "dateISO": "2026-06-02",
@@ -2155,6 +2166,17 @@
       "released": false
     },
     {
+      "title": "Machine Tool Orders YoY",
+      "currency": "JPY",
+      "dateISO": "2026-06-09",
+      "timeUTC": "06:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "45.1",
+      "actual": "37.4",
+      "released": true
+    },
+    {
       "title": "ADP Employment Change Weekly",
       "currency": "USD",
       "dateISO": "2026-06-09",
@@ -2283,6 +2305,28 @@
       "impact": "medium",
       "forecast": "-10.0*",
       "previous": "83",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Private House Approvals MoM Final",
+      "currency": "AUD",
+      "dateISO": "2026-06-10",
+      "timeUTC": "01:30",
+      "impact": "medium",
+      "forecast": "-1",
+      "previous": "0.5",
+      "actual": "-1",
+      "released": true
+    },
+    {
+      "title": "Machine Tool Orders YoY",
+      "currency": "JPY",
+      "dateISO": "2026-06-10",
+      "timeUTC": "06:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "45.1",
       "actual": null,
       "released": false
     },
