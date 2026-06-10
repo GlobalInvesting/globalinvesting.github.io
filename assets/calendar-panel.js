@@ -5,6 +5,8 @@
  * TEST FILE — not yet merged into dashboard.js.
  *
  * v1.1 (2026-06-09): Display window filter — show only yesterday through +14 days.
+ * v1.2 (2026-06-09): Client-side cross-day dedup — mirrors Step 2e of fetch_ff_calendar.py
+ *   so phantom upcoming entries are removed immediately, even from stale cached JSON.
  *   ff_calendar.json carries 21 days of actuals history for backfill purposes; without
  *   a display cutoff the panel rendered 3 weeks of past events above today. Now clamped
  *   to yesterday–today+14 so the panel stays focused on current and upcoming events.
@@ -395,6 +397,26 @@
           break;
         }
       }
+
+      // Client-side cross-day dedup: remove phantom "upcoming" entries that duplicate
+      // an already-released event within the prior 7 days (same title+currency+timeUTC).
+      // Mirrors Step 2e in fetch_ff_calendar.py; handles stale JSON cached before
+      // the server-side fix was deployed.
+      const _relIdx = {};
+      for (const ev of events) {
+        if (ev.actual != null || ev.released) {
+          const k = (ev.title || ev.event || '') + '|' + ev.currency + '|' + (ev.timeUTC || ev.hourUTC || '');
+          (_relIdx[k] = _relIdx[k] || []).push(ev.dateISO);
+        }
+      }
+      events = events.filter(ev => {
+        if (ev.actual != null || ev.released) return true;
+        const k = (ev.title || ev.event || '') + '|' + ev.currency + '|' + (ev.timeUTC || ev.hourUTC || '');
+        const prior = _relIdx[k] || [];
+        const evMs = new Date(ev.dateISO).getTime();
+        return !prior.some(d => { const diff = (evMs - new Date(d).getTime()) / 86400000; return diff > 0 && diff <= 7; });
+      });
+
       buildPanel(events, source, holidays);
     } catch {
       const c = document.getElementById('cal-events-body');
