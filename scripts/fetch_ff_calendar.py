@@ -1,6 +1,22 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.19
+fetch_ff_calendar.py — v3.20
+v3.20 changes (2026-06-10):
+- FIX: Actuals carried forward from prev_events when FF JSON returns actual=None for
+  an already-released event. New Step 2a: for each event in `fresh` that matches a
+  prev_event by (currency, dateISO, timeUTC, title), if fresh.actual is None and
+  prev.actual is not None, carry prev.actual and prev.released into fresh. This prevents
+  FF JSON lag (or transient misses) from erasing actuals that were successfully fetched in
+  a prior run. Fixes: CPI, BOC, etc. showing "—" hours after release.
+- FIX: Expand _IMPACT_UPGRADES with medium-impact events that FF JSON consistently
+  mislabels as "Low": EIA Crude Oil Inventories (USD), Federal Budget Balance (USD),
+  RICS House Price Balance (GBP), BSI Manufacturing Index (JPY), MI Inflation
+  Expectations (AUD), ANZ Business Confidence (NZD). These events were silently
+  dropped despite appearing as orange (medium) on FF's HTML calendar.
+- FIX: Also fetch ff_calendar_nextweek.json (second FF request) to include next-week
+  events in the panel. Previously only thisweek.json was fetched, leaving Mon-Sun+1
+  through Mon-Sun+2 events absent from the calendar panel.
+
 v3.19 changes (2026-06-10):
 - FF-only pipeline: removed all calendar.json (FRED + Finnhub) dependencies.
   CALENDAR_PATH constant removed. enrich_from_calendar_json() converted to no-op
@@ -320,7 +336,8 @@ import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
 OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
-FF_BASE_URL      = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"  # primary source (public, no key required)
+FF_BASE_URL      = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"   # current week
+FF_NEXTWEEK_URL  = "https://nfs.faireconomy.media/ff_calendar_nextweek.json"   # next week (second request)
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
@@ -485,10 +502,24 @@ def fetch_forexfactory_json(raw: list) -> list[dict]:
     # The HTML calendar (orange = medium) is the authoritative source; the JSON feed
     # occasionally lags on impact classification for less common events.
     _IMPACT_UPGRADES = [
+        # ── JPY ──────────────────────────────────────────────────────────────────
         ("JPY", "producer price",           "medium"),  # JPY PPI MoM & YoY — FF HTML: medium
         ("JPY", "machine tool orders",      "medium"),  # JPY Prelim Machine Tool Orders — FF HTML: medium
+        ("JPY", "bsi manufacturing",        "medium"),  # JPY BSI Manufacturing Index — FF HTML: medium
+        # ── AUD ──────────────────────────────────────────────────────────────────
         ("AUD", "building approvals",       "medium"),  # AUD Building Approvals — FF HTML: medium
         ("AUD", "private house approvals",  "medium"),  # AUD Private House Approvals — FF HTML: medium
+        ("AUD", "mi inflation expectations","medium"),  # AUD MI Inflation Expectations — FF HTML: medium
+        ("AUD", "inflation expectations",   "medium"),  # AUD MI Inflation Expectations alt title
+        # ── USD ──────────────────────────────────────────────────────────────────
+        ("USD", "crude oil inventories",    "medium"),  # EIA Crude Oil Inventories — FF HTML: medium
+        ("USD", "federal budget balance",   "medium"),  # Federal Budget Balance — FF HTML: medium
+        ("USD", "api crude oil",            "medium"),  # API Crude Oil Stock Change — FF HTML: medium
+        # ── GBP ──────────────────────────────────────────────────────────────────
+        ("GBP", "rics house price",         "medium"),  # RICS House Price Balance — FF HTML: medium
+        # ── NZD ──────────────────────────────────────────────────────────────────
+        ("NZD", "anz business confidence",  "medium"),  # ANZ Business Confidence — FF HTML: medium
+        ("NZD", "business confidence",      "medium"),  # ANZ Business Confidence alt title
     ]
 
     events = []
@@ -1101,14 +1132,15 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.19")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.20")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
 
-    # Step 1: Single fetch from ForexFactory public JSON — shared for both events and holidays.
-    # FF rate limit is 2 req/5 min per IP; fetching once and passing the raw list to both
-    # parsers ensures we never exceed 1 request per run regardless of cron frequency.
+    # Step 1: Fetch this-week and next-week ForexFactory public JSONs.
+    # FF rate limit is 2 req/5 min per IP. We make exactly 2 requests per run:
+    # thisweek.json (events + holidays) and nextweek.json (upcoming events only).
+    # Both are passed to the same parser — no extra code paths needed.
     print(f"  ForexFactory: fetching {FF_BASE_URL} ...")
     try:
         r = requests.get(
@@ -1128,12 +1160,37 @@ def main():
         if not isinstance(ff_raw, list):
             print("  ERROR: ForexFactory response is not a JSON array — preserving previous file.")
             sys.exit(0)
-        print(f"  ForexFactory: {len(ff_raw)} raw items received")
+        print(f"  ForexFactory: {len(ff_raw)} raw items received (thisweek)")
     except Exception as e:
         print(f"  ERROR: ForexFactory request failed — {e}")
         sys.exit(0)
 
-    # Step 1a: Parse events (medium + high impact, G8)
+    # Step 1 (nextweek): fetch next-week JSON for upcoming events. Best-effort —
+    # rate-limit or network failure just means next-week events come from prev_events.
+    try:
+        r2 = requests.get(
+            FF_NEXTWEEK_URL,
+            headers={**HEADERS, "Accept": "application/json"},
+            timeout=FETCH_TIMEOUT,
+        )
+        ct2 = r2.headers.get("Content-Type", "")
+        if r2.status_code == 200 and "application/json" in ct2:
+            ff_raw_nw = r2.json()
+            if isinstance(ff_raw_nw, list):
+                print(f"  ForexFactory: {len(ff_raw_nw)} raw items received (nextweek)")
+                ff_raw = ff_raw + ff_raw_nw   # merge; parser deduplicates downstream
+            else:
+                print("  ForexFactory nextweek: skipped (not a JSON array)")
+        else:
+            body_nw = r2.text[:80].strip()
+            if "Request Denied" in body_nw or "DOCTYPE" in body_nw:
+                print(f"  ForexFactory nextweek: rate limit hit — skipping next-week events")
+            else:
+                print(f"  ForexFactory nextweek: HTTP {r2.status_code} — skipping")
+    except Exception as e2:
+        print(f"  ForexFactory nextweek: request failed ({e2}) — skipping")
+
+    # Step 1a: Parse events (medium + high impact, G8) from combined thisweek+nextweek raw list
     fresh = fetch_forexfactory_json(ff_raw)
     source = "ForexFactory"
 
@@ -1144,7 +1201,7 @@ def main():
     released_fresh = sum(1 for e in fresh if e.get("released"))
     print(f"  Fetched: {len(fresh)} events ({released_fresh} with actuals)")
 
-    # Step 1b: Parse holidays from the same raw payload — no second HTTP request needed.
+    # Step 1b: Parse holidays from the thisweek raw payload only (holidays don't span weeks).
     holidays = fetch_ff_holidays(ff_raw)
 
     # Step 2: Historical merge — preserve events from prev_events not covered by the fresh fetch.
@@ -1167,6 +1224,28 @@ def main():
             fresh_keys.add(k)
             merged += 1
     print(f"  Merged: {merged} historical events from previous file (within {LOOKBACK_DAYS}-day window)")
+
+    # Step 2a: Carry-forward actuals from prev_events for events that are IN fresh but
+    # where fresh.actual is None. FF JSON occasionally returns actual="" for an event that
+    # was successfully fetched in a prior run (API lag, transient miss, or week rollover).
+    # Without this guard, a stale FF response silently erases actuals that are already known.
+    # Rule: if fresh.actual is None AND prev had actual=X for the same event key, carry X forward.
+    prev_actual_map = {
+        (ev.get("currency",""), ev.get("dateISO",""), ev.get("timeUTC",""), ev.get("title","")): ev
+        for ev in prev_events
+        if ev.get("actual") is not None
+    }
+    carried = 0
+    for ev in fresh:
+        if ev.get("actual") is not None:
+            continue   # fresh already has an actual — no carry needed
+        k = (ev.get("currency",""), ev.get("dateISO",""), ev.get("timeUTC",""), ev.get("title",""))
+        if k in prev_actual_map:
+            ev["actual"]   = prev_actual_map[k]["actual"]
+            ev["released"] = True
+            carried += 1
+    if carried:
+        print(f"  Carried forward: {carried} actual(s) from previous file (FF JSON lag guard)")
 
     # Step 2b: Enrich from calendar.json backfill (fills actuals/previous Finnhub can't provide)
     enrich_from_calendar_json(fresh)
