@@ -1400,7 +1400,6 @@ def main():
     # duplicates like "Westpac Jun 9 (actual=-2.9)" + "Westpac Jun 10 (no actual, same time)".
     # Strategy: for each unreleased event, check if a released copy exists within the prior
     # 7 days with the same (title, currency, timeUTC). If so, drop the unreleased phantom.
-    from datetime import datetime, timedelta
     # Build lookup: (title, currency, timeUTC) -> set of dateISO that have actuals
     released_index: dict = {}
     for ev in fresh:
