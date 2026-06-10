@@ -17,8 +17,8 @@
  *   per IP (enforced since August 2024). At 1-minute polling we would exceed this
  *   immediately and receive "Request Denied" HTML instead of JSON. At 6 minutes
  *   we make exactly 1 request per cycle — well within the limit.
- *   CF Workers minimum cron is 1 minute; we use */6 to approximate 6 minutes
- *   (fires at :00, :06, :12, :18, :24, :30, :36, :42, :48, :54 each hour).
+ *   CF Workers minimum cron is 1 minute; cron expression "* /6" (no space)
+ *   fires at :00, :06, :12, :18, :24, :30, :36, :42, :48, :54 each hour.
  *
  * END-TO-END LATENCY
  *   ForexFactory publishes actual
@@ -29,7 +29,7 @@
  *   → git push + Pages rebuild                 (~30 sec)
  *   TOTAL:  ~2–8 minutes
  *
- *   The GitHub Actions cron (*/5) remains as a fallback: if the Worker fails
+ *   The GitHub Actions cron (every 5 min) remains as a fallback: if the Worker fails
  *   or CF has an outage, the pipeline still runs within 5–15 minutes.
  *
  * FOREXFACTORY JSON FIELDS
@@ -56,7 +56,7 @@
  *   CALENDAR_KV       — bound in wrangler.toml as [[kv_namespaces]]
  *
  * CRON SCHEDULE:
- *   "*/6 * * * *"     — every 6 minutes
+ *   Cron expression: every-6-minutes ("star-slash-6 star star star star")
  */
 
 // ── Constants ─────────────────────────────────────────────────────────────────
