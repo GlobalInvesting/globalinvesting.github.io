@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-10T01:44:56Z",
-  "generatedAt": "2026-06-10T01:44:56Z",
+  "lastUpdate": "2026-06-10T01:46:12Z",
+  "generatedAt": "2026-06-10T01:46:12Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-10",
   "rangeTo": "2026-06-24",
-  "totalEvents": 1699,
+  "totalEvents": 1703,
   "currencyCounts": {
-    "AUD": 181,
+    "AUD": 183,
     "CHF": 92,
     "GBP": 196,
     "NZD": 81,
     "USD": 636,
     "CAD": 135,
     "EUR": 190,
-    "JPY": 188
+    "JPY": 190
   },
   "impactCounts": {
     "high": 392,
-    "medium": 1170,
+    "medium": 1174,
     "low": 137
   },
   "surpriseStats": {
@@ -19899,6 +19899,19 @@
     {
       "date": "2 Jun",
       "dateISO": "2026-06-02",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Private House Approvals MoM Prel",
+      "impact": "medium",
+      "actual": "-1",
+      "forecast": null,
+      "previous": "0.5"
+    },
+    {
+      "date": "2 Jun",
+      "dateISO": "2026-06-02",
       "timeUTC": "05:50",
       "country": "USD",
       "currency": "USD",
@@ -20731,6 +20744,19 @@
     {
       "date": "9 Jun",
       "dateISO": "2026-06-09",
+      "timeUTC": "06:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Machine Tool Orders YoY",
+      "impact": "medium",
+      "actual": "37.4",
+      "forecast": null,
+      "previous": "45.1"
+    },
+    {
+      "date": "9 Jun",
+      "dateISO": "2026-06-09",
       "timeUTC": "12:15",
       "country": "USD",
       "currency": "USD",
@@ -20883,6 +20909,32 @@
       "actual": null,
       "forecast": "-10.0*",
       "previous": "83"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Private House Approvals MoM Final",
+      "impact": "medium",
+      "actual": "-1",
+      "forecast": "-1",
+      "previous": "0.5"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "06:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Machine Tool Orders YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "45.1"
     },
     {
       "date": "10 Jun",
