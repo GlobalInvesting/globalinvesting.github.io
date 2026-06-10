@@ -1,8 +1,28 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.16
-Fetches the G8 economic calendar with real-time actuals from Finnhub
-and writes calendar-data/ff_calendar.json to the public site repo.
+fetch_ff_calendar.py — v3.17
+Fetches the G8 economic calendar with real-time actuals from the ForexFactory
+public JSON feed and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.17 changes (2026-06-10):
+- PRIMARY SOURCE MIGRATED: Finnhub → ForexFactory public JSON
+  (https://nfs.faireconomy.media/ff_calendar_thisweek.json).
+  Finnhub free tier blocks the /api/v1/calendar/economic endpoint with HTTP 403.
+  The same ForexFactory public JSON already used by fetch_ff_holidays() and by
+  the Cloudflare Worker (calendar-watcher.js v2.0) is now the primary fetch source.
+  New function: fetch_forexfactory_json() — fetches the current-week events JSON,
+  parses title/country/date/impact/actual/forecast/previous fields, converts ET→UTC,
+  filters to G8 medium+high impact, and returns the normalised event list.
+  The Playwright HTML fallback (fetch_forexfactory_fallback()) is removed — it was
+  fragile, slow, and required headless Chromium. The historical merge (Step 2) in
+  main() now carries the full weight of multi-week history, using prev_events from
+  the previous ff_calendar.json to preserve actuals outside the current-week window.
+  FINNHUB_API_KEY is no longer read or required. The workflow step that passed
+  FINNHUB_API_KEY as an env var has been updated accordingly.
+  _IMPACT_UPGRADES table retained — FF may still need minor override corrections.
+- FETCH WINDOW: current-week JSON covers Mon–Sun of the current week (FF convention).
+  Events outside this window are merged from prev_events as before (21-day lookback).
+- NO CHANGE to enrichment, dedup, scoring, forecast derivation, or output schema.
 
 v3.16 changes (2026-06-10):
 - Structural change detection: the smart change-detection block (Step 5) now also
@@ -234,33 +254,14 @@ calendar-data/calendar.json (the FRED+FH backfill) to fill in `actual` and
 `previous` for events that Finnhub left empty, using fuzzy title matching
 on (currency, date, keyword overlap).
 
-WHY FINNHUB (v3.0 change from v2.0)
-  v2.0 used Playwright to scrape ForexFactory HTML. FF HTML parsing proved
-  fragile: date separators were mis-assigned when FF regrouped past events
-  under the current week, producing incorrect dateISO/timeUTC for released
-  events (e.g. Claimant Count Change appeared as 2026-05-23 00:00 instead
-  of 2026-05-22 06:00). Actuals from today's events were also missed because
-  FF's JS-rendered page uses a structure that changes layout once events
-  move into the "last week" bucket.
-
-  Finnhub economic calendar API (finnhub.io):
-  - Returns `actual`, `estimate` (consensus), `prev`, `impact`, `country`
-    per event in a clean JSON payload — no HTML parsing needed.
-  - `time` field is ISO UTC — no ET→UTC conversion risk.
-  - Free tier: 60 req/min, no CC required. Already used in backfill_economic_calendar.py.
-  - Covers all G8 currencies, medium & high impact events.
-  - Actuals populate the same run the event releases — no multi-day lag.
-
-  ForexFactory HTML (Playwright) remains as fallback when FINNHUB_API_KEY
-  is unset, preserving backward compatibility.
-
 SOURCE
-  Primary:  https://finnhub.io/api/v1/calendar/economic (requires FINNHUB_API_KEY secret)
-  Fallback: https://www.forexfactory.com/calendar (Playwright, no key needed)
+  Primary:  https://nfs.faireconomy.media/ff_calendar_thisweek.json (public, no key required)
+  Coverage: current calendar week (Mon–Sun, ET). Prior-week actuals preserved via
+            historical merge from prev_events (21-day rolling lookback in main()).
 
 OUTPUT SCHEMA (ff_calendar.json) — v3.7
   generated_at  — ISO UTC timestamp
-  source        — "Finnhub" or "ForexFactory"
+  source        — "ForexFactory"
   holidays[]    — bank/market holidays this week from ForexFactory public JSON
     title       — holiday name (e.g. "Memorial Day", "Bank Holiday")
     currency    — G8 currency code of the affected market
@@ -271,9 +272,9 @@ OUTPUT SCHEMA (ff_calendar.json) — v3.7
     dateISO     — YYYY-MM-DD (UTC)
     timeUTC     — HH:MM (UTC)
     impact      — "high" | "medium" | "low"
-    forecast    — string or null (Finnhub: estimate/consensus)
+    forecast    — string or null (ForexFactory consensus estimate)
     previous    — string or null
-    actual      — string or null  ← populated in real-time by Finnhub
+    actual      — string or null  ← populated in real-time by ForexFactory
     released    — bool
 
 FETCH WINDOW
@@ -293,9 +294,7 @@ SCHEDULE (update-ff-calendar.yml)
 
 import json
 import os
-import re
 import sys
-import time
 from datetime import datetime, timezone, timedelta
 
 import requests
@@ -303,15 +302,12 @@ import requests
 # ── Config ────────────────────────────────────────────────────────────────────
 OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
 CALENDAR_PATH = "calendar-data/calendar.json"    # backfill — FRED + Finnhub historical (read-only)
-FINNHUB_API_KEY  = os.environ.get("FINNHUB_API_KEY", "")
-FH_BASE          = "https://finnhub.io/api/v1/calendar/economic"
-FF_HOLIDAYS_URL  = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"  # public, no key needed
+FF_BASE_URL      = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"  # primary source (public, no key required)
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
-FH_RATE_SLEEP    = 0.6   # seconds between calls (60 req/min free tier)
-FETCH_TIMEOUT    = 30    # seconds — requests.get timeout for Finnhub API calls
+FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
-FETCH_PAST_DAYS  = 21    # fetch actuals from last 21 days (covers 3 weeks of history)
-FETCH_FUTURE_DAYS = 14   # fetch upcoming events 2 weeks out
+FETCH_PAST_DAYS  = 21    # historical merge lookback (prev_events preserved up to 21 days)
+FETCH_FUTURE_DAYS = 14   # upcoming events window (for reference — FF JSON covers current week)
 
 G8 = {
     "US": "USD", "EU": "EUR", "GB": "GBP", "JP": "JPY",
@@ -334,35 +330,22 @@ HEADERS = {"User-Agent": "globalinvesting-bot/3.0 (https://globalinvesting.githu
 
 # ── ForexFactory holiday fetch ────────────────────────────────────────────────
 
-def fetch_ff_holidays() -> list[dict]:
+def fetch_ff_holidays(raw: list) -> list[dict]:
     """
-    Fetch bank/market holidays for the current week from the ForexFactory public
-    JSON feed (nfs.faireconomy.media/ff_calendar_thisweek.json). No API key needed.
+    Parse bank/market holidays from the pre-fetched ForexFactory JSON list.
+    raw — the parsed JSON array from nfs.faireconomy.media/ff_calendar_thisweek.json,
+    already fetched in main() and shared with fetch_forexfactory_json().
 
     FF marks holidays with impact == "Holiday" (case-insensitive). The `country`
     field in the FF public JSON is the 3-letter G8 currency code (e.g. "USD", "EUR",
-    "GBP", "CHF") — NOT the ISO2 country code. This differs from Finnhub's economic
-    calendar API which uses ISO2. Dedup key is (currency, dateISO, title) so that
-    distinct holidays for the same currency on the same day are preserved
+    "GBP", "CHF") — NOT the ISO2 country code. Dedup key is (currency, dateISO, title)
+    so that distinct holidays for the same currency on the same day are preserved
     (e.g. "French Bank Holiday" and "German Bank Holiday" both under EUR).
 
-    Returns [] on any network or parse error — holiday data is supplementary and
+    Returns [] on any parse error — holiday data is supplementary and
     must never block the main calendar write.
     """
-    print("  Holidays: fetching from ForexFactory public JSON ...")
-    try:
-        r = requests.get(
-            FF_HOLIDAYS_URL,
-            headers={**HEADERS, "Accept": "application/json"},
-            timeout=15,
-        )
-        if r.status_code != 200:
-            print(f"  Holidays: HTTP {r.status_code} — skipping.")
-            return []
-        raw = r.json()
-    except Exception as e:
-        print(f"  Holidays: request failed — {e}")
-        return []
+    print("  Holidays: parsing from ForexFactory JSON ...")
 
     if not isinstance(raw, list):
         print("  Holidays: unexpected response format — skipping.")
@@ -455,93 +438,93 @@ def _impact(raw: str | None) -> str:
     )
 
 
-# ── Finnhub fetch ─────────────────────────────────────────────────────────────
+# ── ForexFactory public JSON fetch ───────────────────────────────────────────
+# Primary source: https://nfs.faireconomy.media/ff_calendar_thisweek.json
+# Public endpoint, no API key required. Same feed used by the CF Worker v2.0
+# and by fetch_ff_holidays(). Rate limit: 2 req/5 min per IP — this script
+# runs at most once per 5-min cron cycle so it stays well within limits.
+#
+# FF JSON date field is in ET (Eastern Time). We convert to UTC using the same
+# DST logic as the old Playwright fallback. Coverage: current calendar week
+# (Mon–Sun ET). Prior-week actuals are preserved via historical merge (Step 2
+# in main()) using prev_events from the previous ff_calendar.json.
+#
+# _IMPACT_UPGRADES retained: FF itself sets impact on this feed, so upgrades
+# are rarely needed — but kept for defensive correctness in case FF under-tags
+# certain events on the JSON feed vs the HTML calendar.
 
-def fetch_finnhub(date_from: str, date_to: str) -> list[dict]:
+def fetch_forexfactory_json(raw: list) -> list[dict]:
     """
-    Fetch ALL G8 economic events from Finnhub for the given UTC date range.
+    Parse G8 medium/high economic events from the pre-fetched ForexFactory JSON list.
+    raw — the parsed JSON array from nfs.faireconomy.media/ff_calendar_thisweek.json.
     Returns list of normalised ff_calendar.json event dicts.
-    Finnhub endpoint returns all countries in one call when no country filter
-    is applied — we filter to G8 on our side.
+    The HTTP fetch is done once in main() and shared with fetch_ff_holidays().
     """
-    print(f"  Finnhub: fetching {date_from} → {date_to} ...")
-    params = {"from": date_from, "to": date_to, "token": FINNHUB_API_KEY}
-    try:
-        r = requests.get(FH_BASE, params=params, headers=HEADERS, timeout=FETCH_TIMEOUT)
-        if r.status_code == 401:
-            print("  ERROR: Finnhub auth failed — FINNHUB_API_KEY invalid or not set.")
-            return []
-        if r.status_code == 429:
-            print("  WARNING: Finnhub rate limit hit — sleeping 30s and retrying.")
-            time.sleep(30)
-            r = requests.get(FH_BASE, params=params, headers=HEADERS, timeout=FETCH_TIMEOUT)
-        if r.status_code != 200:
-            print(f"  ERROR: Finnhub HTTP {r.status_code}")
-            return []
-        data = r.json()
-    except Exception as e:
-        print(f"  ERROR: Finnhub request failed — {e}")
-        return []
 
-    raw_events = data.get("economicCalendar", []) if isinstance(data, dict) else []
-    print(f"  Finnhub: {len(raw_events)} raw events received")
+    G8_CCY = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"}
 
-    events = []
-    skipped_country = 0
-    skipped_impact  = 0
-
-    # Impact overrides: events Finnhub classifies "low" that ForexFactory marks "medium".
-    # Keyed on (currency, title_fragment_lower) — fragment matched as case-insensitive substring.
-    # Verified against ForexFactory and FXStreet on 2026-06-09.
+    # _IMPACT_UPGRADES: defensive overrides for events FF may under-tag on the JSON feed.
+    # The HTML calendar (orange = medium) is the authoritative source; the JSON feed
+    # occasionally lags on impact classification for less common events.
     _IMPACT_UPGRADES = [
-        ("JPY", "producer price",           "medium"),  # JPY PPI MoM & YoY — FF: medium (orange)
-        ("JPY", "machine tool orders",      "medium"),  # JPY Prelim Machine Tool Orders — FF: medium
-        ("AUD", "building approvals",       "medium"),  # AUD Building Approvals — FF: medium
-        ("AUD", "private house approvals",  "medium"),  # AUD Private House Approvals — FF: medium
+        ("JPY", "producer price",           "medium"),  # JPY PPI MoM & YoY — FF HTML: medium
+        ("JPY", "machine tool orders",      "medium"),  # JPY Prelim Machine Tool Orders — FF HTML: medium
+        ("AUD", "building approvals",       "medium"),  # AUD Building Approvals — FF HTML: medium
+        ("AUD", "private house approvals",  "medium"),  # AUD Private House Approvals — FF HTML: medium
     ]
 
-    for ev in raw_events:
-        # Country → currency
-        iso2 = (ev.get("country") or "").upper()
-        currency = G8.get(iso2)
-        if not currency:
-            skipped_country += 1
+    events = []
+    skipped_ccy    = 0
+    skipped_impact = 0
+    skipped_holiday = 0
+
+    for ev in raw:
+        # country field is the 3-letter currency code on this feed
+        currency = (ev.get("country") or "").strip().upper()
+        if currency not in G8_CCY:
+            skipped_ccy += 1
             continue
 
-        # Impact filter — keep medium + high only (same as FF panel filter)
-        impact = _impact(ev.get("impact"))
-        # Apply impact override if Finnhub under-classifies vs ForexFactory
-        title_lower_for_impact = (ev.get("event") or "").lower()
+        # Impact filter
+        impact_raw = (ev.get("impact") or "").strip().lower()
+        if impact_raw == "holiday":
+            skipped_holiday += 1
+            continue   # holidays handled separately by fetch_ff_holidays()
+        impact = _impact(impact_raw)
+
+        # Apply impact override
+        title_lower = (ev.get("title") or "").lower()
         if impact == "low":
             for upg_ccy, upg_frag, upg_impact in _IMPACT_UPGRADES:
-                if currency == upg_ccy and upg_frag in title_lower_for_impact:
+                if currency == upg_ccy and upg_frag in title_lower:
                     impact = upg_impact
                     break
         if impact == "low":
             skipped_impact += 1
             continue
 
-        # Title
-        title = (ev.get("event") or "").strip()
+        title = (ev.get("title") or "").strip()
         if not title:
             continue
 
-        # Time: Finnhub `time` is ISO UTC e.g. "2026-05-22T06:00:00+00:00"
-        time_raw = ev.get("time") or ""
+        # Date: FF JSON `date` is an ISO string in ET timezone
+        # e.g. "2026-06-10T08:30:00-04:00" (EDT) or "2026-06-10T08:30:00-05:00" (EST)
+        date_raw = (ev.get("date") or "").strip()
         try:
-            dt = datetime.fromisoformat(time_raw.replace("Z", "+00:00"))
-            dt_utc  = dt.astimezone(timezone.utc)
+            dt = datetime.fromisoformat(date_raw.replace("Z", "+00:00"))
+            dt_utc   = dt.astimezone(timezone.utc)
             date_iso = dt_utc.strftime("%Y-%m-%d")
             time_utc = dt_utc.strftime("%H:%M")
         except Exception:
-            date_iso = time_raw[:10] if len(time_raw) >= 10 else ""
+            # Fallback: treat as date-only string
+            date_iso = date_raw[:10] if len(date_raw) >= 10 else ""
             time_utc = "00:00"
         if not date_iso:
             continue
 
         actual   = _clean(ev.get("actual"))
-        forecast = _clean(ev.get("estimate"))   # Finnhub uses "estimate" for consensus
-        previous = _clean(ev.get("prev"))
+        forecast = _clean(ev.get("forecast"))
+        previous = _clean(ev.get("previous"))
 
         events.append({
             "title":    title,
@@ -555,142 +538,16 @@ def fetch_finnhub(date_from: str, date_to: str) -> list[dict]:
             "released": actual is not None,
         })
 
-    print(f"  Finnhub: {len(events)} G8 medium/high events "
-          f"(skipped {skipped_country} non-G8, {skipped_impact} low-impact)")
-    return events
-
-
-# ── ForexFactory HTML fallback (Playwright) ───────────────────────────────────
-
-def fetch_forexfactory_fallback() -> list[dict]:
-    """
-    Fallback: scrape FF HTML with Playwright when FINNHUB_API_KEY is not set.
-    Returns list of normalised events (medium+high only).
-    NOTE: FF HTML does not reliably include actuals for events that have
-    moved out of the current week. Use Finnhub for production.
-    """
-    print("  Fallback: loading ForexFactory HTML via Playwright ...")
-    try:
-        from bs4 import BeautifulSoup
-        from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
-    except ImportError as e:
-        print(f"  ERROR: Playwright/bs4 not available — {e}")
-        return []
-
-    FF_URL = "https://www.forexfactory.com/calendar"
-    IMPACT_MAP = {"red": "high", "orange": "medium", "yellow": "low", "gray": "low"}
-    G8_CCY = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"}
-
-    def _et_to_utc(date_iso: str, time_str: str):
-        time_str = (time_str or "").strip().lower()
-        if not time_str or time_str in ("all day", "tentative", ""):
-            return date_iso, "00:00"
-        try:
-            m = re.match(r"(\d{1,2}):(\d{2})(am|pm)", time_str)
-            if not m:
-                return date_iso, "00:00"
-            h, mn, ampm = int(m.group(1)), int(m.group(2)), m.group(3)
-            if ampm == "pm" and h != 12: h += 12
-            if ampm == "am" and h == 12: h = 0
-            y, mo, da = int(date_iso[:4]), int(date_iso[5:7]), int(date_iso[8:10])
-            is_edt = (mo > 3 and mo < 11) or (mo == 3 and da >= 8) or (mo == 11 and da < 7)
-            off = -4 if is_edt else -5
-            dt = datetime(y, mo, da, h, mn, tzinfo=timezone(timedelta(hours=off)))
-            u = dt.astimezone(timezone.utc)
-            return u.strftime("%Y-%m-%d"), u.strftime("%H:%M")
-        except Exception:
-            return date_iso, "00:00"
-
-    try:
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
-            ctx = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                locale="en-US", timezone_id="America/New_York"
-            )
-            page = ctx.new_page()
-            page.goto(FF_URL, wait_until="domcontentloaded", timeout=45_000)
-            try:
-                page.wait_for_selector("table.calendar__table", timeout=20_000)
-            except PlaywrightTimeout:
-                pass
-            html = page.content()
-            browser.close()
-    except Exception as e:
-        print(f"  ERROR: Playwright failed — {e}")
-        return []
-
-    soup = BeautifulSoup(html, "html.parser")
-    table = soup.find("table", class_=re.compile(r"calendar__table"))
-    if not table:
-        print("  ERROR: calendar__table not found.")
-        return []
-
-    rows = table.find_all("tr", class_=re.compile(r"calendar__row"))
-    now_utc = datetime.now(timezone.utc)
-    events, current_date_iso = [], None
-
-    for row in rows:
-        if "calendar__row--day-breaker" in row.get("class", []):
-            dc = row.find("td", class_=re.compile(r"calendar__date"))
-            if dc:
-                txt = dc.get_text(strip=True)
-                try:
-                    parsed = datetime.strptime(f"{txt} {now_utc.year}", "%a %b %d %Y")
-                    if abs((parsed - now_utc.replace(tzinfo=None)).days) > 180:
-                        parsed = parsed.replace(year=now_utc.year + 1)
-                    current_date_iso = parsed.strftime("%Y-%m-%d")
-                except ValueError:
-                    pass
-            continue
-        if not row.find("td", class_=re.compile(r"calendar__event")):
-            continue
-        cc = row.find("td", class_=re.compile(r"calendar__currency"))
-        ccy = cc.get_text(strip=True).upper() if cc else ""
-        if ccy not in G8_CCY:
-            continue
-        imp_cell = row.find("td", class_=re.compile(r"calendar__impact"))
-        impact = "low"
-        if imp_cell:
-            sp = imp_cell.find("span")
-            if sp:
-                cs = " ".join(sp.get("class", []))
-                for col, lvl in IMPACT_MAP.items():
-                    if col in cs:
-                        impact = lvl; break
-        if impact == "low":
-            continue
-        ev_cell = row.find("td", class_=re.compile(r"calendar__event"))
-        title = ""
-        if ev_cell:
-            sp = ev_cell.find("span", class_=re.compile(r"calendar__event-title"))
-            title = sp.get_text(strip=True) if sp else ev_cell.get_text(strip=True)
-        if not title:
-            continue
-        tc = row.find("td", class_=re.compile(r"calendar__time"))
-        time_et = tc.get_text(strip=True) if tc else ""
-        ac = row.find("td", class_=re.compile(r"calendar__actual"))
-        fc = row.find("td", class_=re.compile(r"calendar__forecast"))
-        pc = row.find("td", class_=re.compile(r"calendar__previous"))
-        def cv(x): s = x.get_text().strip() if x else ""; return None if s in ("","—","-") else s
-        actual = cv(ac); forecast = cv(fc); previous = cv(pc)
-        if current_date_iso:
-            date_iso_u, time_utc = _et_to_utc(current_date_iso, time_et)
-        else:
-            date_iso_u, time_utc = now_utc.strftime("%Y-%m-%d"), "00:00"
-        events.append({
-            "title": title, "currency": ccy, "dateISO": date_iso_u,
-            "timeUTC": time_utc, "impact": impact, "forecast": forecast,
-            "previous": previous, "actual": actual, "released": actual is not None,
-        })
-    print(f"  FF fallback: {len(events)} medium/high events parsed")
+    print(f"  ForexFactory: {len(events)} G8 medium/high events "
+          f"(skipped {skipped_ccy} non-G8, {skipped_impact} low-impact, "
+          f"{skipped_holiday} holidays — holidays fetched separately)")
     return events
 
 
 # ── calendar.json enrichment ──────────────────────────────────────────────────
-# Finnhub does not carry licensed actuals for Flash PMIs (EUR/GBP/AUD/JPY) or
-# certain other events. This step reads calendar-data/calendar.json (the FRED+FH
-# backfill) and fills in `actual` and `previous` for events that Finnhub left null.
+# ForexFactory JSON does not carry licensed actuals for Flash PMIs (EUR/GBP/AUD/JPY)
+# or certain other events. This step reads calendar-data/calendar.json (the FRED+FH
+# backfill) and fills in `actual` and `previous` for events that FF left null.
 #
 # Matching strategy: same currency + same date + fuzzy title keyword overlap (>=2 words).
 # The backfill uses different provider names (e.g. "HCOB Manufacturing PMI Flash" vs
@@ -1321,31 +1178,51 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.16")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.17")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
 
-    # Step 1: Fetch fresh events
-    if FINNHUB_API_KEY:
-        fresh = fetch_finnhub(date_from, date_to)
-        source = "Finnhub"
-    else:
-        print("  WARNING: FINNHUB_API_KEY not set — using ForexFactory fallback.")
-        print("           Register free at https://finnhub.io and add FINNHUB_API_KEY secret.")
-        fresh = fetch_forexfactory_fallback()
-        source = "ForexFactory"
+    # Step 1: Single fetch from ForexFactory public JSON — shared for both events and holidays.
+    # FF rate limit is 2 req/5 min per IP; fetching once and passing the raw list to both
+    # parsers ensures we never exceed 1 request per run regardless of cron frequency.
+    print(f"  ForexFactory: fetching {FF_BASE_URL} ...")
+    try:
+        r = requests.get(
+            FF_BASE_URL,
+            headers={**HEADERS, "Accept": "application/json"},
+            timeout=FETCH_TIMEOUT,
+        )
+        content_type = r.headers.get("Content-Type", "")
+        if r.status_code != 200 or "application/json" not in content_type:
+            body_preview = r.text[:120].strip()
+            if "Request Denied" in body_preview or "DOCTYPE" in body_preview:
+                print(f"  ERROR: ForexFactory rate limit hit (HTTP {r.status_code}) — preserving previous file.")
+            else:
+                print(f"  ERROR: ForexFactory HTTP {r.status_code} — {body_preview[:80]}")
+            sys.exit(0)
+        ff_raw = r.json()
+        if not isinstance(ff_raw, list):
+            print("  ERROR: ForexFactory response is not a JSON array — preserving previous file.")
+            sys.exit(0)
+        print(f"  ForexFactory: {len(ff_raw)} raw items received")
+    except Exception as e:
+        print(f"  ERROR: ForexFactory request failed — {e}")
+        sys.exit(0)
+
+    # Step 1a: Parse events (medium + high impact, G8)
+    fresh = fetch_forexfactory_json(ff_raw)
+    source = "ForexFactory"
 
     if not fresh:
-        print("  ERROR: No events fetched — preserving previous file.")
+        print("  ERROR: No G8 medium/high events parsed — preserving previous file.")
         sys.exit(0)
 
     released_fresh = sum(1 for e in fresh if e.get("released"))
     print(f"  Fetched: {len(fresh)} events ({released_fresh} with actuals)")
 
-    # Step 1b: Fetch bank/market holidays from ForexFactory public JSON
-    # Always attempted — holidays can appear/disappear mid-week independently of actuals.
-    holidays = fetch_ff_holidays()
+    # Step 1b: Parse holidays from the same raw payload — no second HTTP request needed.
+    holidays = fetch_ff_holidays(ff_raw)
 
     # Step 2: Historical merge — keep past events outside the fetch window
     cutoff = (now_utc - timedelta(days=LOOKBACK_DAYS)).strftime("%Y-%m-%d")
