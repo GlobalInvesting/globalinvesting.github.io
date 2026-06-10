@@ -4,10 +4,11 @@ compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 # ── Cron triggers ─────────────────────────────────────────────────────────────
-# Every 6 minutes — respects ForexFactory rate limit (2 req / 5 min).
-# CF Workers minimum cron is 1 minute; */6 fires at :00, :06, :12, ... :54.
+# Every 2 minutes — v3.0 switched from FF JSON to FF HTML which has no per-IP rate limit.
+# (FF JSON rate limit was 2 req/5 min — not applicable to HTML scraping.)
+# CF Workers minimum cron is 1 minute; */2 fires at :00, :02, :04, ... :58.
 [triggers]
-crons = ["*/6 * * * *"]
+crons = ["*/2 * * * *"]
 
 # ── KV Namespace ──────────────────────────────────────────────────────────────
 # Create this namespace first:
