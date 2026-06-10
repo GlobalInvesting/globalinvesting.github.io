@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.17
+fetch_ff_calendar.py — v3.18
+v3.18 changes (2026-06-10):
+- Historical merge fixed: removed `d >= date_from` guard that excluded all events
+  within the 21-day lookback when FF JSON only covers the current week (v3.17+).
+  Now merges all prev_events not in fresh_keys; dedup handles duplicates downstream.
+- `_title_keywords()` normalises FF slash-notation before split: m/m→mom, y/y→yoy,
+  q/q→qoq. Fixes CPI index level (335.12) contaminating CPI m/m/y/y actuals via the
+  enrich_from_calendar_json step — variant guard now fires correctly for FF titles.
+
 Fetches the G8 economic calendar with real-time actuals from the ForexFactory
 public JSON feed and writes calendar-data/ff_calendar.json to the public site repo.
 
@@ -654,7 +662,14 @@ _VARIANT_WORDS = frozenset({'mom', 'yoy', 'qoq', 'weekly'})
 _STRONG_NON_VARIANT = _STRONG_SINGLE_OK
 
 def _title_keywords(title: str) -> frozenset:
-    words = title.lower().replace('/', ' ').replace('-', ' ').split()
+    # Normalise ForexFactory slash-notation variants to the canonical _VARIANT_WORDS
+    # used by the scoring model. FF uses "m/m", "y/y", "q/q" — these become single
+    # characters after the '/' replace and get dropped by the len>2 filter, causing
+    # "CPI m/m" to reduce to {cpi} (same as "CPI" the index level) and defeating
+    # the variant guard that blocks CPI level (335.12) from filling CPI MoM (%).
+    t = title.lower()
+    t = t.replace('m/m', 'mom').replace('y/y', 'yoy').replace('q/q', 'qoq')
+    words = t.replace('/', ' ').replace('-', ' ').split()
     return frozenset(w for w in words if w not in _TITLE_IGNORE and len(w) > 2)
 
 
@@ -1178,7 +1193,7 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.17")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.18")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -1224,21 +1239,26 @@ def main():
     # Step 1b: Parse holidays from the same raw payload — no second HTTP request needed.
     holidays = fetch_ff_holidays(ff_raw)
 
-    # Step 2: Historical merge — keep past events outside the fetch window
+    # Step 2: Historical merge — preserve events from prev_events not covered by the fresh fetch.
+    # With Finnhub (old), fresh covered a 21-day window so the guard `d >= date_from` correctly
+    # excluded events already refreshed. With ForexFactory public JSON (v3.17+), fresh covers
+    # only the current calendar week — so we must merge ALL prev_events within the lookback
+    # window that are not already in fresh_keys (keyed on currency+dateISO+timeUTC+title).
+    # The dedup step (Step 2d) downstream handles any true duplicates.
     cutoff = (now_utc - timedelta(days=LOOKBACK_DAYS)).strftime("%Y-%m-%d")
     prev_events, prev_fingerprint = load_previous()
     fresh_keys = {(e["currency"], e["dateISO"], e["timeUTC"], e["title"]) for e in fresh}
     merged = 0
     for ev in prev_events:
         d = ev.get("dateISO", "")
-        if d < cutoff or d >= date_from:   # skip if outside lookback OR inside fetch window (already refreshed)
-            continue
+        if d < cutoff:
+            continue   # outside 21-day lookback window — drop
         k = (ev.get("currency",""), d, ev.get("timeUTC",""), ev.get("title",""))
         if k not in fresh_keys:
             fresh.append(ev)
             fresh_keys.add(k)
             merged += 1
-    print(f"  Merged: {merged} historical events outside fetch window")
+    print(f"  Merged: {merged} historical events from previous file (within {LOOKBACK_DAYS}-day window)")
 
     # Step 2b: Enrich from calendar.json backfill (fills actuals/previous Finnhub can't provide)
     enrich_from_calendar_json(fresh)
