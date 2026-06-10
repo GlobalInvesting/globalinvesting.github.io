@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.18
+fetch_ff_calendar.py — v3.19
+v3.19 changes (2026-06-10):
+- FF-only pipeline: removed all calendar.json (FRED + Finnhub) dependencies.
+  CALENDAR_PATH constant removed. enrich_from_calendar_json() converted to no-op
+  stub. derive_forecast_from_history() and derive_previous_from_history() now
+  source history exclusively from the ff_calendar.json rolling accumulation
+  (fresh events + merged prev_events). The FMP 90-day backfill
+  (backfill_ff_calendar.py) seeds this history so all three derivation functions
+  have sufficient data from day one. Eliminates the cross-source naming-mismatch
+  bugs (e.g. FRED CPI index level 335.12 contaminating FF CPI m/m percentage
+  actuals via fuzzy title matching).
+
 v3.18 changes (2026-06-10):
 - Historical merge fixed: removed `d >= date_from` guard that excluded all events
   within the 21-day lookback when FF JSON only covers the current week (v3.17+).
@@ -309,7 +320,6 @@ import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
 OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
-CALENDAR_PATH = "calendar-data/calendar.json"    # backfill — FRED + Finnhub historical (read-only)
 FF_BASE_URL      = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"  # primary source (public, no key required)
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
@@ -675,70 +685,19 @@ def _title_keywords(title: str) -> frozenset:
 
 def enrich_from_calendar_json(events: list[dict]) -> int:
     """
-    Fill in missing `actual` and `previous` fields by cross-referencing
-    calendar-data/calendar.json (FRED + Finnhub backfill).
-    Returns count of events enriched.
+    Retained as a no-op stub — calendar.json (FRED + Finnhub backfill) is no
+    longer used as an enrichment source.  ForexFactory is the sole data provider;
+    historical actuals/previous values are carried by the ff_calendar.json rolling
+    accumulation (seeded by backfill_ff_calendar.py / FMP one-shot).
+
+    Removing the cross-source enrichment eliminates the naming-mismatch bugs
+    where FRED absolute index values (e.g. CPI level = 335.12) contaminated
+    ForexFactory percentage actuals (CPI m/m = 0.2%) via fuzzy title matching.
+
+    v3.19 (2026-06-10): Converted to stub — no calendar.json read.
     """
-    if not os.path.exists(CALENDAR_PATH):
-        print("  Enrichment: calendar.json not found — skipping.")
-        return 0
-
-    try:
-        with open(CALENDAR_PATH, encoding="utf-8") as f:
-            cal = json.load(f)
-        cal_events = cal.get("events", [])
-    except Exception as e:
-        print(f"  Enrichment: could not read calendar.json — {e}")
-        return 0
-
-    # Build lookup: (currency, dateISO) → list of calendar events with actuals
-    from collections import defaultdict
-    cal_by_cd = defaultdict(list)
-    for ce in cal_events:
-        if ce.get("actual") is not None:
-            cal_by_cd[(ce.get("currency", ""), ce.get("dateISO", ""))].append(ce)
-
-    enriched = 0
-    for ev in events:
-        needs_actual   = ev.get("actual")   is None
-        needs_previous = ev.get("previous") is None
-        if not needs_actual and not needs_previous:
-            continue
-
-        candidates = cal_by_cd.get((ev["currency"], ev["dateISO"]), [])
-        if not candidates:
-            continue
-
-        ff_kw = _title_keywords(ev["title"])
-        if not ff_kw:
-            continue
-
-        best, best_score = None, 0
-        for ce in candidates:
-            cal_kw = _title_keywords(ce.get("event") or ce.get("title") or "")
-            overlap = ff_kw & cal_kw
-            score   = len(overlap - _VARIANT_WORDS)   # only non-variant words count
-            if score == 1 and not (overlap & _STRONG_NON_VARIANT):
-                score = 0
-            elif score == 2 and not (overlap & _ANCHOR):
-                score = 0
-            if score > best_score:
-                best_score, best = score, ce
-
-        if best and best_score >= 1:
-            changed = False
-            if needs_actual and best.get("actual") is not None:
-                ev["actual"]   = str(best["actual"])
-                ev["released"] = True
-                changed = True
-            if needs_previous and best.get("previous") is not None:
-                ev["previous"] = str(best["previous"])
-                changed = True
-            if changed:
-                enriched += 1
-
-    print(f"  Enrichment from calendar.json: {enriched} events updated")
-    return enriched
+    print("  Enrichment from calendar.json: skipped (FF-only pipeline)")
+    return 0
 
 
 # ── Forecast derivation from historical series ───────────────────────────────
@@ -809,33 +768,11 @@ def derive_forecast_from_history(events: list[dict]) -> int:
     now_utc = datetime.now(timezone.utc)
     eligibility_cutoff = (now_utc - timedelta(days=ELIGIBILITY_WINDOW_DAYS)).strftime("%Y-%m-%d")
 
-    # ── Build forecast history from calendar.json ─────────────────────────────
-    # calendar.json stores forecast values from the Finnhub backfill pipeline.
-    cal_fc_history: list[tuple] = []  # (dateISO, currency, event_name, forecast, kw_frozenset)
-    if os.path.exists(CALENDAR_PATH):
-        try:
-            with open(CALENDAR_PATH, encoding="utf-8") as f:
-                cal = json.load(f)
-            for ce in cal.get("events", []):
-                raw_fc = ce.get("forecast")
-                if raw_fc is None:
-                    continue
-                fc_str = str(raw_fc).strip()
-                if not fc_str or fc_str in ("—", "-", "N/A", "--"):
-                    continue
-                kw = _title_keywords(ce.get("event") or "")
-                if kw:
-                    cal_fc_history.append((
-                        ce.get("dateISO", ""),
-                        ce.get("currency", ""),
-                        ce.get("event", ""),
-                        fc_str,
-                        kw,
-                    ))
-        except Exception:
-            pass
-
-    # ── Also include forecasts already present in the current ff_calendar batch ─
+    # ── Build forecast history from ff_calendar batch (FF-only pipeline) ───────
+    # v3.19: calendar.json (FRED + Finnhub) removed as history source.
+    # Forecast history now comes entirely from the current ff_calendar.json events
+    # list (fresh + merged prev_events).  The FMP 90-day backfill (backfill_ff_calendar.py)
+    # seeds this history so the eligibility gate fires correctly from day one.
     ff_fc_history: list[tuple] = []
     for ev in events:
         raw_fc = ev.get("forecast")
@@ -856,11 +793,10 @@ def derive_forecast_from_history(events: list[dict]) -> int:
                 kw,
             ))
 
-    combined = cal_fc_history + ff_fc_history
+    combined = ff_fc_history
 
-    # ── Build actual history from ff_calendar batch (Finnhub-sourced only) ────
+    # ── Build actual history from ff_calendar batch ───────────────────────────
     # Used by z-score guard to validate candidate forecast magnitudes.
-    # Only Finnhub-sourced actuals are used — FRED actuals may be in different units.
     ff_actual_history: list[tuple] = []  # (dateISO, currency, actual_float, kw_frozenset)
     for ev in events:
         raw_act = ev.get("actual")
@@ -1052,41 +988,13 @@ def derive_forecast_from_history(events: list[dict]) -> int:
 def derive_previous_from_history(events: list[dict]) -> int:
     """
     Derive missing `previous` values from historical actuals of the same event
-    series. Reads both calendar-data/calendar.json and the current ff_calendar
-    events list. Returns count of events updated.
+    series. Uses the current ff_calendar events list (fresh + merged prev_events).
+    v3.19: calendar.json (FRED + Finnhub) removed as history source — FF-only pipeline.
+    Returns count of events updated.
     """
     from collections import defaultdict
 
-    # Load calendar.json for additional history
-    cal_history: list[tuple] = []   # (dateISO, currency, event_name, value, kw_frozenset)
-    if os.path.exists(CALENDAR_PATH):
-        try:
-            with open(CALENDAR_PATH, encoding="utf-8") as f:
-                cal = json.load(f)
-            for ce in cal.get("events", []):
-                # Prefer actual; fall back to previous when actual is empty/null
-                # (calendar.json sometimes stores actual="" for events that have been
-                # released but where the backfill script didn't capture the value)
-                raw = ce.get("actual")
-                val = str(raw).strip() if raw is not None else None
-                if not val:
-                    raw_prev = ce.get("previous")
-                    val = str(raw_prev).strip() if raw_prev is not None else None
-                if not val:
-                    continue
-                kw = _title_keywords(ce.get("event") or "")
-                if kw:
-                    cal_history.append((
-                        ce.get("dateISO", ""),
-                        ce.get("currency", ""),
-                        ce.get("event", ""),
-                        val,
-                        kw,
-                    ))
-        except Exception:
-            pass
-
-    # Also include actuals already in the current ff_calendar batch
+    # Build history from ff_calendar batch only (v3.19: calendar.json removed)
     ff_history: list[tuple] = []
     for ev in events:
         if ev.get("actual") is not None:
@@ -1100,7 +1008,7 @@ def derive_previous_from_history(events: list[dict]) -> int:
                     kw,
                 ))
 
-    combined = cal_history + ff_history
+    combined = ff_history
 
     # Group by currency for fast lookup
     by_ccy: dict[str, list] = defaultdict(list)
@@ -1193,7 +1101,7 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.18")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.19")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
