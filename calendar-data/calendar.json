@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-09T23:52:37Z",
-  "generatedAt": "2026-06-09T23:52:37Z",
+  "lastUpdate": "2026-06-10T00:00:46Z",
+  "generatedAt": "2026-06-10T00:00:46Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,34 +8,24 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-06-10",
-  "rangeTo": "2026-06-23",
-  "totalEvents": 1693,
+  "rangeTo": "2026-06-24",
+  "totalEvents": 1699,
   "currencyCounts": {
-    "AUD": 179,
+    "AUD": 181,
     "CHF": 92,
     "GBP": 196,
-    "NZD": 80,
-    "USD": 633,
+    "NZD": 81,
+    "USD": 636,
     "CAD": 135,
     "EUR": 190,
     "JPY": 188
   },
   "impactCounts": {
-    "high": 393,
-    "medium": 1163,
+    "high": 392,
+    "medium": 1170,
     "low": 137
   },
   "surpriseStats": {
-    "USD/core cpi": {
-      "n": 5,
-      "mean": 0.0,
-      "std": 0.070711
-    },
-    "USD/cpi": {
-      "n": 5,
-      "mean": 0.12,
-      "std": 0.277489
-    },
     "CAD/building permits": {
       "n": 3,
       "mean": 5.733333,
@@ -150,6 +140,16 @@
       "n": 4,
       "mean": 0.025,
       "std": 0.15
+    },
+    "USD/cpi": {
+      "n": 3,
+      "mean": 0.2,
+      "std": 0.360555
+    },
+    "USD/core cpi": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.1
     },
     "USD/ppi": {
       "n": 4,
@@ -18018,19 +18018,6 @@
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
-      "event": "RBA Hunter Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "19 May",
-      "dateISO": "2026-05-19",
-      "timeUTC": "00:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
       "event": "Westpac Consumer Confidence Change",
       "impact": "high",
       "actual": "3.5",
@@ -18049,19 +18036,6 @@
       "actual": "83",
       "forecast": null,
       "previous": "80.1"
-    },
-    {
-      "date": "19 May",
-      "dateISO": "2026-05-19",
-      "timeUTC": "01:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "RBA Meeting Minutes",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "19 May",
@@ -18114,19 +18088,6 @@
       "actual": "7.8",
       "forecast": "5.4",
       "previous": "11.1"
-    },
-    {
-      "date": "19 May",
-      "dateISO": "2026-05-19",
-      "timeUTC": "09:10",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "BoE Breeden Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "19 May",
@@ -18196,19 +18157,6 @@
     {
       "date": "19 May",
       "dateISO": "2026-05-19",
-      "timeUTC": "13:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Waller Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "19 May",
-      "dateISO": "2026-05-19",
       "timeUTC": "14:00",
       "country": "USD",
       "currency": "USD",
@@ -18244,32 +18192,6 @@
       "actual": "-9.1",
       "forecast": "-3.4",
       "previous": "-2.188"
-    },
-    {
-      "date": "19 May",
-      "dateISO": "2026-05-19",
-      "timeUTC": "23:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Paulson Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "19 May",
-      "dateISO": "2026-05-19",
-      "timeUTC": "23:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Venable Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "20 May",
@@ -21011,7 +20933,7 @@
       "event": "CPI",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.3%*",
+      "forecast": "335.11",
       "previous": "333.02"
     },
     {
@@ -21089,7 +21011,7 @@
       "event": "EIA Crude Oil Stocks Change",
       "impact": "medium",
       "actual": null,
-      "forecast": "-3.4*",
+      "forecast": "-5.1",
       "previous": "-7.974"
     },
     {
@@ -21115,7 +21037,7 @@
       "event": "Monthly Budget Statement",
       "impact": "medium",
       "actual": null,
-      "forecast": "-270",
+      "forecast": "-275",
       "previous": "215"
     },
     {
@@ -21128,7 +21050,7 @@
       "event": "RICS House Price Balance",
       "impact": "medium",
       "actual": null,
-      "forecast": "-25*",
+      "forecast": "-31",
       "previous": "-34"
     },
     {
@@ -21713,7 +21635,7 @@
       "event": "New Housing Price Index MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0*",
+      "forecast": null,
       "previous": "-0.4"
     },
     {
@@ -21778,7 +21700,7 @@
       "event": "Pending Home Sales MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "1*",
+      "forecast": null,
       "previous": "1.4"
     },
     {
@@ -22246,7 +22168,7 @@
       "event": "Core Inflation Rate YoY",
       "impact": "medium",
       "actual": null,
-      "forecast": "3.1*",
+      "forecast": null,
       "previous": "2.1"
     },
     {
@@ -22259,7 +22181,7 @@
       "event": "Inflation Rate MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.7*",
+      "forecast": null,
       "previous": "0.4"
     },
     {
@@ -22272,7 +22194,7 @@
       "event": "Inflation Rate YoY",
       "impact": "high",
       "actual": null,
-      "forecast": "3.1*",
+      "forecast": null,
       "previous": "2.8"
     },
     {
@@ -22508,6 +22430,162 @@
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.6*",
+      "previous": "0.4"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "4.4*",
+      "previous": "4.2"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "RBA Trimmed Mean CPI MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3*",
+      "previous": "0.3"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "RBA Trimmed Mean CPI YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.4*",
+      "previous": "3.4"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "10:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "CBI Industrial Trends Orders",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-40*",
+      "previous": "-41"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "11:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "MBA 30-Year Mortgage Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "6.57"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "-190.7"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "New Home Sales",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.67*",
+      "previous": "0.622"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "New Home Sales MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "-6.2"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-3.4*",
+      "previous": "-7.974"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.5*",
+      "previous": "3.364"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.98*",
+      "previous": "1.92"
     }
   ]
 }
