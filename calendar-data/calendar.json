@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-10T14:26:20Z",
-  "generatedAt": "2026-06-10T14:26:20Z",
+  "lastUpdate": "2026-06-10T14:31:51Z",
+  "generatedAt": "2026-06-10T14:31:51Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -217,9 +217,9 @@
       "std": 0.0
     },
     "USD/eia crude oil stocks change": {
-      "n": 6,
-      "mean": -0.493167,
-      "std": 4.164237
+      "n": 7,
+      "mean": -0.883857,
+      "std": 3.939441
     },
     "GBP/gfk consumer confidence": {
       "n": 3,
@@ -362,9 +362,9 @@
       "std": 2.247764
     },
     "USD/eia gasoline stocks change": {
-      "n": 5,
-      "mean": 0.5212,
-      "std": 1.974368
+      "n": 6,
+      "mean": 0.548667,
+      "std": 1.767209
     },
     "AUD/balance of trade": {
       "n": 2,
@@ -21029,6 +21029,32 @@
     {
       "date": "10 Jun",
       "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "-7.228",
+      "forecast": "-4",
+      "previous": "-7.974"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "0.186",
+      "forecast": "-0.5",
+      "previous": "3.364"
+    },
+    {
+      "date": "10 Jun",
+      "dateISO": "2026-06-10",
       "timeUTC": "18:00",
       "country": "USD",
       "currency": "USD",
@@ -21662,32 +21688,6 @@
       "actual": null,
       "forecast": null,
       "previous": "3.2"
-    },
-    {
-      "date": "17 Jun",
-      "dateISO": "2026-06-17",
-      "timeUTC": "14:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "EIA Crude Oil Stocks Change",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "-4*",
-      "previous": "-9.119"
-    },
-    {
-      "date": "17 Jun",
-      "dateISO": "2026-06-17",
-      "timeUTC": "14:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "EIA Gasoline Stocks Change",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "-0.5*",
-      "previous": "3.364"
     },
     {
       "date": "17 Jun",
