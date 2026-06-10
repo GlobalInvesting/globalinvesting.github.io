@@ -1,8 +1,7 @@
 /**
- * calendar-panel.js v1.1 — Native economic calendar renderer
+ * calendar-panel.js v1.3 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (Finnhub, 8 major currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
- * TEST FILE — not yet merged into dashboard.js.
  *
  * v1.1 (2026-06-09): Display window filter — show only yesterday through +14 days.
  * v1.2 (2026-06-09): Client-side cross-day dedup — mirrors Step 2e of fetch_ff_calendar.py
@@ -10,6 +9,12 @@
  *   ff_calendar.json carries 21 days of actuals history for backfill purposes; without
  *   a display cutoff the panel rendered 3 weeks of past events above today. Now clamped
  *   to yesterday–today+14 so the panel stays focused on current and upcoming events.
+ * v1.3 (2026-06-10): Reduced poll interval from 5 min to 2 min. The CF Worker + GitHub
+ *   Actions pipeline delivers updated ff_calendar.json within ~2 min of a Finnhub actual
+ *   publishing. The previous 5-min client poll added up to 3 min of unnecessary lag on top
+ *   of the pipeline latency. At 2 min the worst-case end-to-end delay is ~4 min; best-case
+ *   (visibilitychange fires on tab focus) is near-instant. Cache-bust in index.html bumped
+ *   to v=1.3.0 so all browsers discard the previously cached v1.0.0 file immediately.
  */
 (function () {
   'use strict';
@@ -425,7 +430,7 @@
   }
 
   // Refresh every 5 minutes so actuals appear shortly after each release
-  setInterval(fetchEconomicCalendar, 5 * 60 * 1000);
+  setInterval(fetchEconomicCalendar, 2 * 60 * 1000);
 
   // Also refresh immediately when the tab regains focus (user returns to terminal)
   document.addEventListener('visibilitychange', function () {
