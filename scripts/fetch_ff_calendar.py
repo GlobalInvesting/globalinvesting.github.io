@@ -1,8 +1,24 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.13
+fetch_ff_calendar.py — v3.14
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.14 changes (2026-06-09):
+- Impact override table (_IMPACT_UPGRADES): events that Finnhub classifies as "low" impact
+  but ForexFactory and FXStreet list as "medium" (orange) are now upgraded before the
+  low-impact filter runs. This corrects systematic under-classification for:
+    • JPY Producer Price Index MoM and YoY (forexfactory.com: medium/orange)
+    • JPY Prelim Machine Tool Orders YoY (forexfactory.com: medium/orange)
+    • AUD Building Approvals MoM / YoY (forexfactory.com: medium/orange)
+    • AUD Private House Approvals MoM (forexfactory.com: medium/orange)
+  These events were previously silently dropped from ff_calendar.json, causing the
+  economic calendar panel to show gaps for JPY data releases (e.g. JPY PPI on 2026-06-09
+  was absent from the panel despite being a market-moving release at 6.3% YoY actual).
+  The override table is defined once before the event loop (not per-iteration) and uses
+  case-insensitive substring matching on the event title — robust to minor Finnhub naming
+  variations. Upgrades are logged implicitly via the existing skipped_impact counter
+  (upgraded events do not increment skipped_impact).
 
 v3.13 changes (2026-05-27):
 - Industry-standard audit of last-known-consensus (derive_forecast_from_history):
@@ -450,6 +466,16 @@ def fetch_finnhub(date_from: str, date_to: str) -> list[dict]:
     skipped_country = 0
     skipped_impact  = 0
 
+    # Impact overrides: events Finnhub classifies "low" that ForexFactory marks "medium".
+    # Keyed on (currency, title_fragment_lower) — fragment matched as case-insensitive substring.
+    # Verified against ForexFactory and FXStreet on 2026-06-09.
+    _IMPACT_UPGRADES = [
+        ("JPY", "producer price",           "medium"),  # JPY PPI MoM & YoY — FF: medium (orange)
+        ("JPY", "machine tool orders",      "medium"),  # JPY Prelim Machine Tool Orders — FF: medium
+        ("AUD", "building approvals",       "medium"),  # AUD Building Approvals — FF: medium
+        ("AUD", "private house approvals",  "medium"),  # AUD Private House Approvals — FF: medium
+    ]
+
     for ev in raw_events:
         # Country → currency
         iso2 = (ev.get("country") or "").upper()
@@ -460,6 +486,13 @@ def fetch_finnhub(date_from: str, date_to: str) -> list[dict]:
 
         # Impact filter — keep medium + high only (same as FF panel filter)
         impact = _impact(ev.get("impact"))
+        # Apply impact override if Finnhub under-classifies vs ForexFactory
+        title_lower_for_impact = (ev.get("event") or "").lower()
+        if impact == "low":
+            for upg_ccy, upg_frag, upg_impact in _IMPACT_UPGRADES:
+                if currency == upg_ccy and upg_frag in title_lower_for_impact:
+                    impact = upg_impact
+                    break
         if impact == "low":
             skipped_impact += 1
             continue
@@ -1264,7 +1297,7 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.13")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.14")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
