@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.20
+fetch_ff_calendar.py — v3.21
+v3.21 changes (2026-06-10):
+- FIX: Add Step 1c — fetch actuals from Cloudflare Worker KV payload (/payload endpoint)
+  immediately after FF JSON fetch. The CF Worker v3.0 scrapes the FF HTML calendar (which
+  shows actuals within seconds of release) and stores the parsed events in KV. Step 1c reads
+  this payload (best-effort, 5s timeout) and injects actuals into `fresh` events that still
+  have actual=None. This eliminates the FF JSON lag (10+ hours observed) for events where the
+  CF Worker has already parsed the HTML. Falls back silently to carry-forward (Step 2a) if
+  the KV payload is unavailable.
 v3.20 changes (2026-06-10):
 - FIX: Actuals carried forward from prev_events when FF JSON returns actual=None for
   an already-released event. New Step 2a: for each event in `fresh` that matches a
@@ -338,6 +346,7 @@ import requests
 OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
 FF_BASE_URL      = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"   # current week
 FF_NEXTWEEK_URL  = "https://nfs.faireconomy.media/ff_calendar_nextweek.json"   # next week (second request)
+KV_PAYLOAD_URL   = "https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/payload"  # CF Worker HTML-scraped actuals
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
@@ -1132,7 +1141,7 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.20")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.21")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -1203,6 +1212,67 @@ def main():
 
     # Step 1b: Parse holidays from the thisweek raw payload only (holidays don't span weeks).
     holidays = fetch_ff_holidays(ff_raw)
+
+    # Step 1c: Inject actuals from CF Worker KV payload (HTML-scraped, near-zero lag).
+    # The CF Worker v3.0 scrapes forexfactory.com/calendar HTML every 2 minutes — actuals
+    # appear there within seconds of release. It stores parsed events in KV at /payload.
+    # GitHub Actions IPs are blocked by FF, but the CF Worker is not — so we read the payload
+    # here and inject actuals into `fresh` events that FF JSON hasn't updated yet.
+    # Matching: currency + title + date (YYYY-MM-DD, derived from "Jun 10" + current year).
+    # Best-effort: any failure (blocked, timeout, no payload) is logged and skipped silently.
+    try:
+        kv_resp = requests.get(KV_PAYLOAD_URL, timeout=5)
+        if kv_resp.status_code == 200 and kv_resp.text.strip() not in ("null", ""):
+            kv_events = kv_resp.json()
+            if isinstance(kv_events, list) and kv_events:
+                # Build a lookup: (currency, dateISO, title_lower) → actual
+                # KV payload date format: "Jun 10" (ET) — convert to YYYY-MM-DD
+                year = now_utc.year
+                kv_actual_map = {}
+                for kv_ev in kv_events:
+                    raw_date = (kv_ev.get("date") or "").strip()   # "Jun 10"
+                    try:
+                        # Parse "Jun 10" → date object; use current year, handle Dec→Jan
+                        dt = datetime.strptime(f"{raw_date} {year}", "%b %d %Y")
+                        # If parsed month < current month by more than 6 months, it's next year
+                        if (now_utc.month - dt.month) > 6:
+                            dt = datetime.strptime(f"{raw_date} {year + 1}", "%b %d %Y")
+                        date_iso = dt.strftime("%Y-%m-%d")
+                    except ValueError:
+                        date_iso = raw_date   # fallback: use as-is (ISO or unknown)
+                    actual_val = (kv_ev.get("actual") or "").strip()
+                    if not actual_val:
+                        continue
+                    key = (
+                        (kv_ev.get("currency") or "").strip().upper(),
+                        date_iso,
+                        (kv_ev.get("title") or "").strip().lower(),
+                    )
+                    kv_actual_map[key] = actual_val
+
+                kv_injected = 0
+                for ev in fresh:
+                    if ev.get("actual") is not None:
+                        continue
+                    k = (ev.get("currency",""), ev.get("dateISO",""), (ev.get("title","")).lower())
+                    if k in kv_actual_map:
+                        raw_actual = kv_actual_map[k]
+                        # Strip trailing % if the pipeline stores numbers without it
+                        ev["actual"]   = raw_actual.rstrip("%") if raw_actual.endswith("%") and "%" not in ev.get("title","") else raw_actual
+                        ev["released"] = True
+                        kv_injected += 1
+                if kv_injected:
+                    print(f"  KV payload: injected {kv_injected} actual(s) from CF Worker HTML scrape")
+                else:
+                    print(f"  KV payload: {len(kv_events)} events fetched, 0 new actuals to inject")
+            else:
+                print("  KV payload: empty or invalid JSON — skipping")
+        elif kv_resp.status_code == 200 and kv_resp.text.strip() == "null":
+            print("  KV payload: not yet populated (Worker not polled since last reset)")
+        else:
+            print(f"  KV payload: HTTP {kv_resp.status_code} — skipping")
+    except Exception as e_kv:
+        print(f"  KV payload: request failed ({e_kv}) — skipping")
 
     # Step 2: Historical merge — preserve events from prev_events not covered by the fresh fetch.
     # With Finnhub (old), fresh covered a 21-day window so the guard `d >= date_from` correctly
