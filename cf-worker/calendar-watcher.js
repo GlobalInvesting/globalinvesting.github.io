@@ -1,39 +1,53 @@
 /**
- * calendar-watcher.js — Cloudflare Worker v1.0
+ * calendar-watcher.js — Cloudflare Worker v2.0
  *
- * Polls Finnhub every 1 minute for major-economy economic calendar actuals/forecasts.
- * When new data is detected, fires a repository_dispatch event to GitHub Actions,
- * which triggers the full fetch_ff_calendar.py pipeline.
+ * Polls ForexFactory public JSON every 6 minutes for G8 economic calendar
+ * actuals/forecasts. When new data is detected, fires a repository_dispatch
+ * event to GitHub Actions, which triggers the full fetch_ff_calendar.py pipeline.
  *
- * WHY THIS EXISTS
- *   GitHub Actions minimum cron interval is 5 minutes, with 0–15 min runner
- *   queue delay. During active economic release windows (NFP, CPI, etc.) this
- *   means a 5–20 minute lag between Finnhub publishing an actual and the
- *   terminal showing it.
+ * MIGRATION FROM v1.0 (Finnhub → ForexFactory public JSON)
+ *   v1.0 used Finnhub /api/v1/calendar/economic, which requires a paid plan.
+ *   The free tier returns HTTP 403 for that endpoint. This version migrates to
+ *   https://nfs.faireconomy.media/ff_calendar_thisweek.json — the same public
+ *   ForexFactory JSON feed already used by fetch_ff_calendar.py for holidays.
+ *   This feed includes actual, forecast, and previous fields for all events.
  *
- *   Cloudflare Workers support 1-minute cron triggers on the free tier.
- *   By polling Finnhub every minute and only triggering GitHub when real data
- *   changes, we achieve ~2–3 min end-to-end latency:
- *     Finnhub publishes actual
- *     → CF Worker detects on next 1-min poll  (~0–60 sec)
- *     → repository_dispatch fires             (~1 sec)
- *     → GitHub runner starts                  (~15–30 sec)
- *     → fetch_ff_calendar.py runs             (~45 sec)
- *     → git push + Pages rebuild              (~30 sec)
- *     TOTAL:  ~2–3 minutes
+ * WHY 6 MINUTES (not 1 minute)
+ *   ForexFactory rate-limits the weekly JSON exports to 2 requests per 5 minutes
+ *   per IP (enforced since August 2024). At 1-minute polling we would exceed this
+ *   immediately and receive "Request Denied" HTML instead of JSON. At 6 minutes
+ *   we make exactly 1 request per cycle — well within the limit.
+ *   CF Workers minimum cron is 1 minute; we use */6 to approximate 6 minutes
+ *   (fires at :00, :06, :12, :18, :24, :30, :36, :42, :48, :54 each hour).
+ *
+ * END-TO-END LATENCY
+ *   ForexFactory publishes actual
+ *   → CF Worker detects on next 6-min poll     (~0–6 min)
+ *   → repository_dispatch fires                (~1 sec)
+ *   → GitHub runner starts                     (~15–30 sec)
+ *   → fetch_ff_calendar.py runs                (~45 sec)
+ *   → git push + Pages rebuild                 (~30 sec)
+ *   TOTAL:  ~2–8 minutes
  *
  *   The GitHub Actions cron (*/5) remains as a fallback: if the Worker fails
  *   or CF has an outage, the pipeline still runs within 5–15 minutes.
  *
- * CLOUDFLARE FREE TIER USAGE
- *   Worker invocations:  1,440/day   (<<< 100,000/day limit)
- *   KV reads:            1,440/day   (<<< 100,000/day limit)
- *   KV writes:           ~10–50/day  (<<< 1,000/day limit)
- *   repository_dispatch: ~10–50/day  (no GitHub documented limit)
- *   Cost: $0
+ * FOREXFACTORY JSON FIELDS
+ *   title     — event name
+ *   country   — G8 currency code (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD)
+ *   date      — ISO datetime string (ET timezone)
+ *   impact    — "High" | "Medium" | "Low" | "Holiday"
+ *   actual    — string or "" (populated in real-time after release)
+ *   forecast  — string or "" (consensus estimate)
+ *   previous  — string or "" (prior period value)
  *
- * REQUIRED SECRETS (set via wrangler CLI or CF dashboard):
- *   FINNHUB_API_KEY   — Finnhub free API key (finnhub.io)
+ * CLOUDFLARE FREE TIER USAGE
+ *   Worker invocations:  240/day    (<<< 100,000/day limit)
+ *   KV reads:            240/day    (<<< 100,000/day limit)
+ *   KV writes:           ~5–20/day  (<<< 1,000/day limit)
+ *   repository_dispatch: ~5–20/day  (no GitHub documented limit)
+ *
+ * REQUIRED SECRETS (FINNHUB_API_KEY no longer needed):
  *   GITHUB_PAT        — GitHub Personal Access Token (scope: public_repo)
  *   GITHUB_OWNER      — e.g. "globalinvesting"
  *   GITHUB_REPO       — e.g. "globalinvesting.github.io"
@@ -42,40 +56,26 @@
  *   CALENDAR_KV       — bound in wrangler.toml as [[kv_namespaces]]
  *
  * CRON SCHEDULE:
- *   "* * * * *"       — every 1 minute (CF Workers minimum)
- *
- * SETUP INSTRUCTIONS: see cf-worker/README.md
+ *   "*/6 * * * *"     — every 6 minutes
  */
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const G8_COUNTRIES = new Set(["US", "EU", "GB", "JP", "AU", "CA", "CH", "NZ"]);
-const COUNTRY_TO_CCY = {
-  US: "USD", EU: "EUR", GB: "GBP", JP: "JPY",
-  AU: "AUD", CA: "CAD", CH: "CHF", NZ: "NZD",
-};
+const G8_CURRENCIES = new Set(["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]);
 
-// Look ahead 2 days and back 3 days to catch today's releases
-const FETCH_PAST_DAYS  = 3;
-const FETCH_FUTURE_DAYS = 2;
+// ForexFactory public JSON — no API key required
+const FF_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
 
 // KV key for the last known fingerprint
-const KV_FINGERPRINT_KEY = "calendar:fingerprint:v1";
+const KV_FINGERPRINT_KEY = "calendar:fingerprint:v2";
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 export default {
-  /**
-   * Scheduled handler — fires every 1 minute via cron trigger.
-   */
   async scheduled(event, env, ctx) {
     ctx.waitUntil(runCalendarWatch(env));
   },
 
-  /**
-   * HTTP handler — allows manual trigger via GET /trigger and health checks via GET /.
-   * Useful for testing without waiting for the cron.
-   */
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
@@ -102,7 +102,9 @@ export default {
 
     return new Response(JSON.stringify({
       worker: "calendar-watcher",
-      version: "1.0",
+      version: "2.0",
+      source: "ForexFactory public JSON (nfs.faireconomy.media)",
+      schedule: "every 6 minutes",
       endpoints: ["/trigger", "/fingerprint", "/reset"],
       ts: new Date().toISOString(),
     }), { headers: { "Content-Type": "application/json" } });
@@ -114,30 +116,28 @@ export default {
 async function runCalendarWatch(env) {
   const now = new Date();
   const label = `[${now.toISOString().slice(0, 16)}Z]`;
-  console.log(`${label} calendar-watcher: starting poll`);
+  console.log(`${label} calendar-watcher v2.0: starting poll (source: ForexFactory)`);
 
-  // Step 1: Build date range (narrow window — just enough to catch today's releases)
-  const dateFrom = fmtDate(addDays(now, -FETCH_PAST_DAYS));
-  const dateTo   = fmtDate(addDays(now, FETCH_FUTURE_DAYS));
-
-  // Step 2: Fetch from Finnhub
+  // Step 1: Fetch from ForexFactory public JSON
   let events;
   try {
-    events = await fetchFinnhub(dateFrom, dateTo, env.FINNHUB_API_KEY);
+    events = await fetchForexFactory();
   } catch (err) {
-    console.error(`${label} Finnhub fetch failed: ${err.message}`);
-    return; // do not trigger GitHub — wait for next poll
-  }
-
-  if (!events || events.length === 0) {
-    console.log(`${label} No 8 major currencies events returned from Finnhub — skipping.`);
+    console.error(`${label} ForexFactory fetch failed: ${err.message}`);
     return;
   }
 
-  // Step 3: Compute fingerprint of actuals + forecasts
+  if (!events || events.length === 0) {
+    console.log(`${label} No G8 medium/high events returned — skipping.`);
+    return;
+  }
+
+  console.log(`${label} Fetched ${events.length} G8 medium/high events`);
+
+  // Step 2: Compute fingerprint of actuals + forecasts
   const newFingerprint = buildFingerprint(events);
 
-  // Step 4: Compare with stored fingerprint
+  // Step 3: Compare with stored fingerprint
   const prevFingerprint = await env.CALENDAR_KV.get(KV_FINGERPRINT_KEY) ?? "";
 
   if (newFingerprint === prevFingerprint) {
@@ -145,15 +145,15 @@ async function runCalendarWatch(env) {
     return;
   }
 
-  // Step 5: Data changed — store new fingerprint
-  const diff = describeDiff(prevFingerprint, newFingerprint, events);
+  // Step 4: Data changed — store new fingerprint
+  const diff = describeDiff(prevFingerprint, newFingerprint);
   console.log(`${label} CHANGE DETECTED: ${diff}`);
 
   await env.CALENDAR_KV.put(KV_FINGERPRINT_KEY, newFingerprint, {
-    expirationTtl: 60 * 60 * 24 * 7, // expire after 7 days (auto-cleanup)
+    expirationTtl: 60 * 60 * 24 * 7,
   });
 
-  // Step 6: Fire repository_dispatch to GitHub Actions
+  // Step 5: Fire repository_dispatch to GitHub Actions
   try {
     await triggerGitHubWorkflow(env, diff);
     console.log(`${label} repository_dispatch sent — GitHub Actions pipeline triggered.`);
@@ -166,55 +166,55 @@ async function runCalendarWatch(env) {
   }
 }
 
-// ── Finnhub fetch ─────────────────────────────────────────────────────────────
+// ── ForexFactory fetch ────────────────────────────────────────────────────────
 
-async function fetchFinnhub(dateFrom, dateTo, apiKey) {
-  if (!apiKey) throw new Error("FINNHUB_API_KEY secret not set");
-
-  const url = `https://finnhub.io/api/v1/calendar/economic?from=${dateFrom}&to=${dateTo}&token=${apiKey}`;
-  const resp = await fetch(url, {
-    headers: { "User-Agent": "globalinvesting-calendar-watcher/1.0" },
-    signal: AbortSignal.timeout(8000), // 8s timeout
+async function fetchForexFactory() {
+  const resp = await fetch(FF_URL, {
+    headers: {
+      "User-Agent": "globalinvesting-calendar-watcher/2.0 (https://globalinvesting.github.io)",
+      "Accept": "application/json",
+    },
+    signal: AbortSignal.timeout(10000),
   });
 
-  if (resp.status === 429) {
-    throw new Error("Finnhub rate limit (429) — will retry next minute");
-  }
-  if (resp.status === 401) {
-    throw new Error("Finnhub auth failed (401) — check FINNHUB_API_KEY secret");
-  }
-  if (!resp.ok) {
-    throw new Error(`Finnhub HTTP ${resp.status}`);
+  // FF returns "Request Denied" HTML when rate limit is exceeded
+  const contentType = resp.headers.get("content-type") || "";
+  if (!resp.ok || !contentType.includes("application/json")) {
+    const body = await resp.text().catch(() => "");
+    if (body.includes("Request Denied") || body.includes("DOCTYPE")) {
+      throw new Error(`ForexFactory rate limit hit (${resp.status}) — will retry next poll`);
+    }
+    throw new Error(`ForexFactory HTTP ${resp.status}`);
   }
 
-  const data = await resp.json();
-  const raw = Array.isArray(data?.economicCalendar) ? data.economicCalendar : [];
+  const raw = await resp.json();
+  if (!Array.isArray(raw)) {
+    throw new Error("ForexFactory response is not an array");
+  }
 
-  // Filter to major-economy medium+high impact only, with actual or forecast
+  // Filter to G8 medium+high impact only
   const events = [];
   for (const ev of raw) {
-    const iso2 = (ev.country || "").toUpperCase();
-    if (!G8_COUNTRIES.has(iso2)) continue;
+    const country = (ev.country || "").trim().toUpperCase();
+    if (!G8_CURRENCIES.has(country)) continue;
 
-    const impact = (ev.impact || "low").toLowerCase();
-    if (impact === "low") continue;
+    const impact = (ev.impact || "").trim().toLowerCase();
+    if (impact !== "high" && impact !== "medium") continue;
 
     const actual   = cleanVal(ev.actual);
-    const forecast = cleanVal(ev.estimate);
+    const forecast = cleanVal(ev.forecast);
+    const previous = cleanVal(ev.previous);
 
-    // Only include events with actual OR forecast (future events may only have forecast)
-    if (actual === null && forecast === null) continue;
-
-    const dt = parseISODate(ev.time || "");
-    if (!dt) continue;
+    // Only include events with at least one data point
+    if (actual === null && forecast === null && previous === null) continue;
 
     events.push({
-      title:    (ev.event || "").trim(),
-      currency: COUNTRY_TO_CCY[iso2],
-      dateISO:  fmtDate(dt),
+      title:    (ev.title || "").trim(),
+      country,
+      date:     (ev.date  || "").trim(),
       actual,
       forecast,
-      released: actual !== null,
+      previous,
     });
   }
 
@@ -224,21 +224,18 @@ async function fetchFinnhub(dateFrom, dateTo, apiKey) {
 // ── Fingerprint ───────────────────────────────────────────────────────────────
 
 /**
- * Build a compact, deterministic fingerprint of all actuals and forecasts.
- * Sorted for stability regardless of Finnhub response order.
- * Format: "YYYY-MM-DD|CCY|title|actual|forecast" per line, joined with \n.
+ * Fingerprint covers actual + forecast fields only.
+ * previous rarely changes and would cause spurious dispatches if included.
+ * Sorted for stability regardless of FF response order.
  */
 function buildFingerprint(events) {
   const lines = events
-    .map(ev => `${ev.dateISO}|${ev.currency}|${ev.title}|${ev.actual ?? ""}|${ev.forecast ?? ""}`)
+    .map(ev => `${ev.date}|${ev.country}|${ev.title}|${ev.actual ?? ""}|${ev.forecast ?? ""}`)
     .sort();
   return lines.join("\n");
 }
 
-/**
- * Produce a human-readable diff summary for the commit message / log.
- */
-function describeDiff(prevFP, newFP, events) {
+function describeDiff(prevFP, newFP) {
   const prevLines = new Set(prevFP ? prevFP.split("\n") : []);
   const newLines  = new Set(newFP.split("\n"));
 
@@ -263,9 +260,9 @@ function describeDiff(prevFP, newFP, events) {
 async function triggerGitHubWorkflow(env, description) {
   const { GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO } = env;
 
-  if (!GITHUB_PAT)    throw new Error("GITHUB_PAT secret not set");
-  if (!GITHUB_OWNER)  throw new Error("GITHUB_OWNER secret not set");
-  if (!GITHUB_REPO)   throw new Error("GITHUB_REPO secret not set");
+  if (!GITHUB_PAT)   throw new Error("GITHUB_PAT secret not set");
+  if (!GITHUB_OWNER) throw new Error("GITHUB_OWNER secret not set");
+  if (!GITHUB_REPO)  throw new Error("GITHUB_REPO secret not set");
 
   const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`;
   const resp = await fetch(url, {
@@ -274,7 +271,7 @@ async function triggerGitHubWorkflow(env, description) {
       "Authorization": `Bearer ${GITHUB_PAT}`,
       "Accept":        "application/vnd.github+json",
       "Content-Type":  "application/json",
-      "User-Agent":    "globalinvesting-calendar-watcher/1.0",
+      "User-Agent":    "globalinvesting-calendar-watcher/2.0",
       "X-GitHub-Api-Version": "2022-11-28",
     },
     body: JSON.stringify({
@@ -282,13 +279,12 @@ async function triggerGitHubWorkflow(env, description) {
       client_payload: {
         description,
         triggered_at: new Date().toISOString(),
-        source: "cloudflare-worker",
+        source: "cloudflare-worker-ff",
       },
     }),
     signal: AbortSignal.timeout(10000),
   });
 
-  // GitHub returns 204 No Content on success
   if (resp.status !== 204) {
     const body = await resp.text().catch(() => "");
     throw new Error(`GitHub API returned ${resp.status}: ${body}`);
@@ -301,23 +297,4 @@ function cleanVal(v) {
   if (v == null) return null;
   const s = String(v).trim();
   return s === "" || s === "None" || s === "null" || s === "N/A" || s === "—" ? null : s;
-}
-
-function fmtDate(d) {
-  return d.toISOString().slice(0, 10);
-}
-
-function addDays(d, n) {
-  const r = new Date(d);
-  r.setUTCDate(r.getUTCDate() + n);
-  return r;
-}
-
-function parseISODate(s) {
-  try {
-    const d = new Date(s.replace("Z", "+00:00"));
-    return isNaN(d.getTime()) ? null : d;
-  } catch {
-    return null;
-  }
 }
