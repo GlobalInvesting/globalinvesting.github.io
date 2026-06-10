@@ -1,0 +1,100 @@
+name: Backfill FF Calendar (FMP 90 days)
+
+# One-shot workflow — run once via workflow_dispatch to populate ff_calendar.json
+# with 90 days of historical data from Financial Modeling Prep (FMP) free API.
+#
+# WHEN TO RUN
+#   After the Finnhub → ForexFactory migration (fetch_ff_calendar.py v3.17+),
+#   ff_calendar.json only covers the current week from the live FF feed.
+#   Running this workflow injects up to 90 days of G8 medium/high-impact events
+#   so the Economic Surprises panel has a full history immediately.
+#
+# SETUP (one-time)
+#   1. Register at https://financialmodelingprep.com → copy free API key
+#   2. Add secret: Settings → Secrets → Actions → New secret
+#      Name: FMP_API_KEY  |  Value: your key
+#   3. Run this workflow once via Actions → "Backfill FF Calendar" → Run workflow
+#
+# AFTER RUNNING
+#   - ff_calendar.json will have ~90 days of G8 events merged with the current week
+#   - update-ff-calendar.yml (ForexFactory live feed) continues as the sole ongoing source
+#   - This workflow does NOT need to run again unless ff_calendar.json is wiped
+#
+# MERGE STRATEGY
+#   Existing events (from the live ForexFactory feed) always take priority.
+#   FMP only fills gaps — events already in ff_calendar.json are never overwritten.
+#
+# RATE LIMITS
+#   FMP free tier: 250 req/day. This workflow makes exactly 1 API call (one 90-day range).
+#   No chunking needed. Well within free tier limits.
+
+on:
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: backfill-ff-calendar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Run FMP backfill
+        env:
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+        run: python scripts/backfill_ff_calendar.py
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          for i in 1 2 3; do
+            echo "--- Push attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Re-run script against fresh main to avoid race conditions
+            FMP_API_KEY="${{ secrets.FMP_API_KEY }}" python scripts/backfill_ff_calendar.py || true
+
+            git add calendar-data/ff_calendar.json
+            if git diff --cached --quiet; then
+              echo "No changes vs remote HEAD — nothing to commit."
+              exit 0
+            fi
+
+            EVENTS=$(python3 -c "import json; d=json.load(open('calendar-data/ff_calendar.json')); print(len(d.get('events',[])))" 2>/dev/null || echo "?")
+            ACTUALS=$(python3 -c "import json; d=json.load(open('calendar-data/ff_calendar.json')); print(sum(1 for e in d.get('events',[]) if e.get('released')))" 2>/dev/null || echo "?")
+            TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+            git commit -m "FF calendar backfill ${TIMESTAMP} [FMP] — ${EVENTS} events, ${ACTUALS} with actuals"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 3))s..."
+            sleep $((i * 3))
+          done
+          echo "⚠️  All push attempts exhausted."
+          exit 1
