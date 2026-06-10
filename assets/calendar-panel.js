@@ -1,8 +1,13 @@
 /**
- * calendar-panel.js — Native economic calendar renderer
+ * calendar-panel.js v1.1 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (Finnhub, 8 major currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  * TEST FILE — not yet merged into dashboard.js.
+ *
+ * v1.1 (2026-06-09): Display window filter — show only yesterday through +14 days.
+ *   ff_calendar.json carries 21 days of actuals history for backfill purposes; without
+ *   a display cutoff the panel rendered 3 weeks of past events above today. Now clamped
+ *   to yesterday–today+14 so the panel stays focused on current and upcoming events.
  */
 (function () {
   'use strict';
@@ -182,8 +187,20 @@
     const sourceEl  = document.getElementById('cal-panel-sub');
     if (!container) return;
 
+    // Display window: yesterday through 14 days ahead.
+    // ff_calendar.json carries 21 days of history for actuals backfill — without
+    // a display cutoff the panel renders 3 weeks of past events above today.
+    // Showing yesterday preserves today's overnight events (e.g. JPY releases
+    // that appear in the "yesterday" slot for users in UTC-ahead timezones).
+    const _now       = new Date();
+    const _yesterday = new Date(_now); _yesterday.setDate(_now.getDate() - 1);
+    const _maxAhead  = new Date(_now); _maxAhead.setDate(_now.getDate() + 14);
+    const _yISO = _yesterday.toISOString().slice(0, 10);
+    const _mISO = _maxAhead.toISOString().slice(0, 10);
+
     const filtered = events.filter(ev =>
-      G8_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact)
+      G8_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact) &&
+      ev.dateISO >= _yISO && ev.dateISO <= _mISO
     );
 
     // Build holiday lookup: dateISO → [{title, currency}]
