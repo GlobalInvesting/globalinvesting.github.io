@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-10T13:36:45Z",
-  "generatedAt": "2026-06-10T13:36:45Z",
+  "lastUpdate": "2026-06-10T13:47:48Z",
+  "generatedAt": "2026-06-10T13:47:48Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -165,6 +165,11 @@
       "n": 5,
       "mean": 0.02,
       "std": 0.083666
+    },
+    "CAD/boc interest rate decision": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
     },
     "JPY/machinery orders": {
       "n": 2,
@@ -21004,7 +21009,7 @@
       "flag": "🇨🇦",
       "event": "BoC Interest Rate Decision",
       "impact": "high",
-      "actual": null,
+      "actual": "2.25",
       "forecast": "2.25",
       "previous": "2.25"
     },
