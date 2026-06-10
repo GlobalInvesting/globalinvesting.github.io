@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.15
+fetch_ff_calendar.py — v3.16
 Fetches the G8 economic calendar with real-time actuals from Finnhub
 and writes calendar-data/ff_calendar.json to the public site repo.
+
+v3.16 changes (2026-06-10):
+- Structural change detection: the smart change-detection block (Step 5) now also
+  triggers a write when dedup passes (same-day Step 2d or cross-day Step 2e) remove
+  phantom upcoming entries that existed in the previous ff_calendar.json. Previously,
+  a run that only removed phantoms (no new actuals/forecasts/holidays) computed
+  data_changed=False and skipped the write, leaving stale phantom rows in the file
+  until the next run with a genuine actual change. Fix: compares the set of unreleased
+  upcoming events in prev_events vs fresh; any phantom removed by either dedup pass
+  sets structural_changed=True and forces a write+commit. On subsequent runs, both
+  sets are identical (phantoms gone from both) so structural_changed=False and the
+  no-op path is restored. This is self-healing: exactly one extra commit is produced
+  (the one that actually removes the phantoms), then it goes silent.
 
 v3.15 changes (2026-06-09):
 - Cross-day dedup (Step 2d extension): Finnhub occasionally emits the same weekly event
@@ -1308,7 +1321,7 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.14")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.16")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -1496,7 +1509,29 @@ def main():
         if removed_h:
             print(f"  REMOVED holidays: {', '.join(f'{c} {d}' for c,d,_ in sorted(removed_h))}")
 
-    data_changed = bool(new_actuals_added or new_forecasts_added or holidays_changed)
+    # Detect structural changes: phantom upcoming entries removed by cross-day dedup
+    # (or same-day dedup) that existed in the previous file but are absent in the new one.
+    # These are unreleased events dropped from the panel — the file should be rewritten
+    # so the client no longer serves the phantom rows. Without this check, a run that
+    # only removes phantoms (no new actuals/forecasts) would compute data_changed=False
+    # and skip the write, leaving the stale phantoms in ff_calendar.json until the next
+    # run that happens to have a real actual/forecast change.
+    prev_upcoming_fp = {
+        (e["title"], e["currency"], e["dateISO"], e.get("timeUTC",""))
+        for e in prev_events
+        if not e.get("released") and e.get("actual") is None
+    }
+    new_upcoming_fp = {
+        (e["title"], e["currency"], e["dateISO"], e.get("timeUTC",""))
+        for e in fresh
+        if not e.get("released") and e.get("actual") is None
+    }
+    phantoms_removed = prev_upcoming_fp - new_upcoming_fp
+    structural_changed = bool(phantoms_removed)
+    if structural_changed:
+        print(f"  STRUCTURAL: {len(phantoms_removed)} phantom upcoming entries removed by dedup")
+
+    data_changed = bool(new_actuals_added or new_forecasts_added or holidays_changed or structural_changed)
 
     if data_changed:
         if new_actuals_added:
