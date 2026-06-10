@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-10T12:03:22Z",
-  "generatedAt": "2026-06-10T12:03:22Z",
+  "lastUpdate": "2026-06-10T12:06:37Z",
+  "generatedAt": "2026-06-10T12:06:37Z",
   "fetchMode": "Finnhub via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-10",
   "rangeTo": "2026-06-24",
-  "totalEvents": 1694,
+  "totalEvents": 1695,
   "currencyCounts": {
     "AUD": 181,
     "CHF": 92,
     "GBP": 196,
     "NZD": 81,
-    "USD": 630,
+    "USD": 631,
     "CAD": 135,
     "EUR": 190,
     "JPY": 189
   },
   "impactCounts": {
     "high": 391,
-    "medium": 1166,
+    "medium": 1167,
     "low": 137
   },
   "surpriseStats": {
@@ -21076,7 +21076,7 @@
       "event": "Core PPI MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.4",
+      "forecast": "0.5",
       "previous": "1"
     },
     {
@@ -21154,7 +21154,7 @@
       "event": "Goods Trade Balance",
       "impact": "medium",
       "actual": null,
-      "forecast": "-22.85",
+      "forecast": "-22.5",
       "previous": "-27.22"
     },
     {
@@ -22508,6 +22508,19 @@
       "actual": null,
       "forecast": "-0.5*",
       "previous": "3.364"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "20:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Bank Stress Test Results",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "24 Jun",
