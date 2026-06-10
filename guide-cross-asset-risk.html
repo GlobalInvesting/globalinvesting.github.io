@@ -115,7 +115,7 @@ a { color: inherit; text-decoration: none; }
 .page-hero-label { font-size: 9.9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .page-hero-label::before { content: ""; display: inline-block; width: 16px; height: 1px; background: var(--blue); }
 .page-hero h1 { font-size: 42px; font-weight: 800; color: #ffffff; line-height: 1.25; margin-bottom: 12px; letter-spacing: -.3px; }
-.page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; max-width: 580px; }
+.page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; }
 
 /* ── Sections ── */
 .guide-section { margin-bottom: 44px; scroll-margin-top: 52px; }
@@ -930,7 +930,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <tr><td class="t-hi">&gt; 40</td><td>Crisis / Panic</td><td>All correlations compress. Every safe haven bid simultaneously. Historical reference: COVID spike 85, GFC peak 89.</td></tr>
         </tbody>
       </table>
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Direction matters more than level.</strong> A VIX at 25 and falling is less concerning than a VIX at 18 and rising rapidly. The <em>rate of change</em> of VIX — particularly a spike from below 20 to above 25 in a single session — is the most actionable signal for FX traders, as it triggers systematic carry trade unwinding.
       </div>
     </div>
@@ -1057,7 +1057,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <p><strong style="color:var(--text);">ES/VaR ratio</strong> — CVaR divided by VaR. A ratio near 1.2–1.5 is typical for normally-distributed returns. Ratios above 2.0 indicate fat tails — the distribution has extreme outliers that the VaR alone does not capture. Color: green below 1.5x, amber 1.5–2.0x, red above 2.0x.</p>
       <p><strong style="color:var(--text);">n</strong> — Number of daily returns used in the computation. Target is 252 trading days (one year). A lower value means less historical data is available for that instrument.</p>
 
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Data source:</strong> VaR and CVaR are computed by the daily engine update using yfinance price history. The table reflects end-of-day data from the most recent engine run — it does not update intraday. Hover over any instrument name in the terminal for a tooltip describing its specific risk context.
       </div>
     </div>
@@ -1079,7 +1079,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <tr><td>US 10Y yield</td><td>Rose from 1.5% to 4.25% through the year</td><td>USD carry premium dominated; JPY hit multi-decade lows vs USD</td></tr>
         </tbody>
       </table>
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Key diagnostic:</strong> MOVE sustained above 130 with VIX below 30 is the signature of a rates-driven regime — not an equity-driven one. In this environment, USD strength is the primary FX theme, not JPY/CHF flight. The MOVE/VIX divergence was the critical differentiator between a conventional risk-off episode and a policy-driven repricing.
       </div>
 
@@ -1126,7 +1126,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <tr><td>Gold</td><td>Set successive all-time highs above $3,000 through Q1</td><td>Gold/USD positive correlation alongside DXY weakness = structural USD confidence erosion, not a typical risk-off episode</td></tr>
         </tbody>
       </table>
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Key diagnostic:</strong> When gold and DXY are both rising, the standard framework (gold up = USD down) has broken down — typically a geopolitical or fiscal stress signal rather than a cyclical one. When gold rises while DXY falls, it indicates USD-specific concern. The correlation rows in the Risk Monitor panel are designed to surface this distinction in real time.
       </div>
     </div>
@@ -1163,7 +1163,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <li><strong style="color:var(--text);">Late-cycle carry regimes</strong> — in strongly trending carry environments (e.g., early 2024), FX carry pairs can maintain their trend even as BTC corrects, because the carry differential outweighs the risk sentiment signal.</li>
         <li><strong style="color:var(--text);">Crisis-level VIX</strong> — when VIX is above 40, traditional safe-haven flows (JPY, CHF, USD) dominate and the BTC signal is subsumed by the broader risk-off environment. At extreme stress levels, all correlations compress and cross-asset relationships become unreliable.</li>
       </ul>
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Institutional framing:</strong> Professional FX desks use BTC as one of several Asia session risk monitors alongside Nikkei futures, US equity futures (CME Globex), and CFTC COT positioning — not as a standalone signal. Its value is as a real-time, continuously available sentiment proxy during the session gap, weighted alongside other inputs. This terminal's cross-asset panel is designed to support exactly this multi-signal approach.
       </div>
     </div>

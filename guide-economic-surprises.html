@@ -236,7 +236,7 @@ a { color: inherit; text-decoration: none; }
 .page-hero-label { font-size: 9.9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .page-hero-label::before { content: ""; display: inline-block; width: 16px; height: 1px; background: var(--blue); }
 .page-hero h1 { font-size: 38px; font-weight: 800; color: #ffffff; line-height: 1.25; margin-bottom: 12px; letter-spacing: -.3px; }
-.page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; max-width: 580px; }
+.page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; }
 
 .guide-section { margin-bottom: 44px; scroll-margin-top: 52px; }
 .guide-section h2 { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .14em; text-transform: uppercase; padding-bottom: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
@@ -469,7 +469,7 @@ a { color: inherit; text-decoration: none; }
       <p>The z-score formula is:</p>
       <p style="font-family:var(--font-mono);font-size:13px;background:var(--bg2);border:1px solid var(--border);padding:12px 16px;border-radius:4px;margin:12px 0;color:var(--text);">z = (actual − forecast − historical_mean) / historical_std</p>
       <p>Where <code style="font-family:var(--font-mono);font-size:12px;">historical_mean</code> and <code style="font-family:var(--font-mono);font-size:12px;">historical_std</code> are computed from all prior instances of the same release in the engine's statistics database. A minimum of 5 historical observations is required before z-score is used — below that threshold, the simpler beat/miss score is applied.</p>
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Why this matters:</strong> A surprise of +0.2pp on US CPI is a very different signal depending on context. If the historical standard deviation of US CPI surprises is 0.05pp, a +0.2pp beat is a 4-sigma event — exceptionally rare and high-impact. If the standard deviation is 0.4pp, a +0.2pp beat is routine noise. The z-score captures this distinction; beat/miss alone does not.
       </div>
       <p>When z-score scoring is available for a subset of events and beat/miss for the rest, both are combined proportionally, maintaining consistent decay weighting throughout. The ESI index value displayed maps a ±2-sigma z-score to approximately ±100 on the index scale.</p>
@@ -561,7 +561,7 @@ a { color: inherit; text-decoration: none; }
       </table>
       <p>Hovering over any row shows the full tooltip: beats, misses, in-line count, beat rate percentage, raw index value, and decay method.</p>
       <p>Clicking a row opens the detail modal with the individual event log — each release listed with its date, actual vs forecast, beat/miss result, and decay-adjusted weight. This is the full audit trail behind the aggregate index value.</p>
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Source label:</strong> The panel subtitle shows the active data source (investing.com, ForexFactory, or FRED + Finnhub + ForexFactory for historical backfill) and the rolling window. The source can vary depending on which data pipeline ran most recently. The scoring methodology is identical across sources.
       </div>
     </div>

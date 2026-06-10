@@ -115,7 +115,7 @@ a { color: inherit; text-decoration: none; }
 .page-hero-label { font-size: 9.9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .page-hero-label::before { content: ""; display: inline-block; width: 16px; height: 1px; background: var(--blue); }
 .page-hero h1 { font-size: 42px; font-weight: 800; color: #ffffff; line-height: 1.25; margin-bottom: 12px; letter-spacing: -.3px; }
-.page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; max-width: 580px; }
+.page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; }
 
 /* ── Sections ── */
 .guide-section { margin-bottom: 44px; scroll-margin-top: 52px; }
@@ -946,7 +946,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <div class="regime-desc">Elevated but not acute stress. VIX in the 18–30 range or one additional risk-off factor active (yield curve, gold, MOVE). Markets are pricing tail risk; risk-sensitive currencies (AUD, NZD, CAD) typically underperform.</div>
         </div>
       </div>
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Frequency:</strong> The narrative and regime update 4× daily (00:00, 06:30, 14:30, 20:00 UTC). The timestamp is shown next to the label. Do not rely on the narrative for intraday tick-by-tick changes — use the live price feeds and VIX/MOVE data in the Risk Monitor for real-time regime shifts.
       </div>
       <div class="callout">
@@ -1296,7 +1296,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
       <p><strong style="color:var(--text);">CSI</strong> — Currency Strength Index: a multi-series LightweightCharts chart showing the cumulative log-return of all 8 major currencies over selectable periods (1M / 3M / 6M / 1Y / All). Computed from the full OHLC dataset across all 28 pairs — the same data as the heatmap. The focal currency's line is highlighted; all series start at 0% at the beginning of the selected period. A crosshair tooltip shows all 8 values simultaneously ordered strongest to weakest. A legend table below shows cumulative return, min, max, and range for each currency over the period.</p>
 
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Note on session attribution:</strong> The session-weighted composite in the Session tab is a volume-proxy decomposition of the intraday move. Exact per-session attribution requires tick data, which is not publicly available. Treat session contributions as directional indicators, not precise measurements.
       </div>
     </div>
@@ -1699,7 +1699,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
       <h3>Positioning Bias <span style="font-weight:normal;color:var(--text3);">CBOE/CME Vol · COT · 25d RR</span></h3>
       <p>A directional bias table for major pairs, synthesised from three complementary sources. The <strong>ATM IV</strong> column shows annualised implied volatility sourced primarily from the <strong>CBOE/CME FX Volatility Indexes</strong> (^EUVIX for EUR/USD, ^BPVIX for GBP/USD, ^JYVIX for USD/JPY, ^AUDVIX for AUD/USD) — the same variance-swap replication methodology used by the VIX, published jointly by CBOE and CME, and the underlying benchmark for institutional FX volatility indices. These are clean index values, not derived from bid/ask option chains, and carry a ~15-minute delay. For USD/CHF and USD/CAD (no dedicated CBOE/CME index), the cascade falls back to CME FX futures options (6S, 6C) and then CBOE ETF options as a last resort. NZD/USD is derived from ^AUDVIX × 1.08 (long-run NZD/AUD realised vol ratio) and labeled as estimated. The <strong>COT bias</strong> column shows the net position of <strong>Leveraged Funds</strong> (hedge funds, CTAs) from the CFTC Disaggregated TFF report — Options+Futures Combined — as a directional proxy on a ±1.5 scale. The <strong>25d RR</strong> chip in the Direction cell shows the 25-delta Risk Reversal from Saxo Bank's public options page (1M tenor, indicative mid-market): positive means calls are bid over puts — the market is skewed for upside on the base currency; negative means puts are bid — downside protection is dominant. When all three signals align, the read is most reliable. Divergence — e.g. IV elevated, COT flat, RR neutral — signals uncertainty or a positioning squeeze risk.</p>
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>ATM IV color = cost of hedging, not direction.</strong> Green (≤7%) means options are historically cheap; red (&gt;12%) means hedging is expensive. In a risk-off or high-uncertainty environment, all pairs may show red — that is accurate information, not a bearish signal on the pair. Do not confuse elevated IV with a short bias. The 25d RR chip is the directional signal from the options market: its sign shows which side (calls or puts) investors are paying a premium to own.
       </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 0;max-width:280px;">
@@ -1876,7 +1876,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           </div>
         </div>
       </div>
-      <div class="callout callout-orange">
+      <div class="callout">
         <strong>Important:</strong> These signals are informational context, not trade recommendations. Confidence labels reflect internal cross-factor alignment, not a probability of directional outcome. Always apply your own analysis and risk management before acting on any market signal.
       </div>
     </div>
@@ -1936,11 +1936,12 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <h3>FX OTC Notional Volume — DTCC GTR</h3>
     <p>Shows aggregated FX OTC notional volume from the <strong>DTCC Global Trade Repository</strong>, the largest trade repository for OTC derivatives in the US under Dodd-Frank reporting obligations. Data is the public CFTC Recast dissemination — T+1 (published by ~13:00 UTC the following business day), covering new trades only (ACTION = NEWT). Amendments, terminations, and lifecycle events are excluded to avoid double-counting.</p>
     <p>Columns shown: <strong>Notional ($bn)</strong> — USD-equivalent notional, capped at $250M per trade per CFTC Dodd-Frank rules; <strong>Trades</strong> — count of new trade records; <strong>Swap $bn / Fwd $bn / Spot $bn</strong> — product-type breakdown where available (product type is derived from the UPI FISN field); <strong>% Total</strong> — each pair's share of the 8 major currencies aggregate, with a proportional intensity bar (standard terminal convention for volume data — directionally neutral, so blue intensity rather than green/red).</p>
-    <div class="callout callout-orange">
+    <div class="callout">
       <strong>Coverage note:</strong> The DTCC GTR captures a significant subset of OTC FX trades reported under US Dodd-Frank rules — not total global FX volume. Spot FX rarely appears in the DTCC file because spot settles T+2 and is infrequently SDR-reportable. The $250M/trade notional cap suppresses large institutional block trades. Use this panel to identify relative activity across pairs, not as a measure of absolute global FX turnover.
     </div>
   </div>
 </div>
+<div style="max-width:860px;margin:0 auto;padding:32px 24px 0;">
   <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.05);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
     <div>
       <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">Open the FX Terminal</div>
