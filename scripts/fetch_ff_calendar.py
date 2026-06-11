@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.28
+fetch_ff_calendar.py — v3.29
+v3.29 changes (2026-06-11):
+- **FIX: Ghost-title guard in Step 2 merge.** prev_events from older pipeline sources
+  (e.g. Worker KV populated by a FF-JSON-based Worker version) contained verbose
+  "United States X" / "Euro Area X" titles that do not match Myfxbook RSS short titles.
+  These entries have actual=None and no source to ever fill them — they create phantom
+  duplicate rows in the calendar panel (8 events at USD 12:30 instead of 3).
+  Fix: in Step 2 merge, if a prev_event has actual=None AND its (currency, dateISO,
+  timeUTC) slot is already covered by fresh RSS events, AND the prev_event title is
+  NOT among the fresh titles for that slot → skip it (ghost_dropped counter added).
+  Events with actuals are always preserved — carry-forward path is unaffected.
+  Self-healing: after one run, the ghost events are no longer in prev_events and the
+  guard does nothing. No one-time cleanup script needed.
 v3.28 changes (2026-06-11):
 - PRIMARY SOURCE REVERTED TO RSS: Myfxbook HTML confirmed blocked from GH Actions
   (TCP hang — same firewall as CF Worker edge IPs). RSS is the only source accessible
@@ -1410,7 +1422,7 @@ def fetch_worker_payload() -> list[dict]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.28")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.29")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -1475,19 +1487,46 @@ def main():
     # only the current calendar week — so we must merge ALL prev_events within the lookback
     # window that are not already in fresh_keys (keyed on currency+dateISO+timeUTC+title).
     # The dedup step (Step 2d) downstream handles any true duplicates.
+    #
+    # Ghost-title guard (v3.29): prev_events may contain stale entries from older pipeline
+    # sources (e.g. Worker KV populated by a FF-JSON-based Worker version) that used verbose
+    # "United States X" / "Euro Area X" style titles different from Myfxbook RSS short titles.
+    # These ghost entries have actual=None and no valid source to ever fill them — they create
+    # phantom rows in the calendar panel alongside the correct RSS-titled events.
+    # Rule: if a prev_event has actual=None AND its (currency, dateISO, timeUTC) slot is
+    # already covered by fresh (RSS source), AND the prev_event title is NOT among the fresh
+    # titles for that slot → skip it (it's a stale ghost, not a legitimate second instrument).
+    # Events with actuals are always preserved regardless of title — carry-forward must be safe.
     cutoff = (now_utc - timedelta(days=LOOKBACK_DAYS)).strftime("%Y-%m-%d")
     prev_events, prev_fingerprint = load_previous()
     fresh_keys = {(e["currency"], e["dateISO"], e["timeUTC"], e["title"]) for e in fresh}
+    # Build slot → set of fresh titles for ghost-title guard
+    fresh_slot_titles: dict[tuple, set] = {}
+    for e in fresh:
+        slot = (e["currency"], e["dateISO"], e["timeUTC"])
+        if slot not in fresh_slot_titles:
+            fresh_slot_titles[slot] = set()
+        fresh_slot_titles[slot].add(e["title"])
     merged = 0
+    ghost_dropped = 0
     for ev in prev_events:
         d = ev.get("dateISO", "")
         if d < cutoff:
             continue   # outside 21-day lookback window — drop
         k = (ev.get("currency",""), d, ev.get("timeUTC",""), ev.get("title",""))
-        if k not in fresh_keys:
-            fresh.append(ev)
-            fresh_keys.add(k)
-            merged += 1
+        if k in fresh_keys:
+            continue   # already in fresh — skip (normal path)
+        slot = (ev.get("currency",""), d, ev.get("timeUTC",""))
+        if ev.get("actual") is None and slot in fresh_slot_titles:
+            # Slot is already covered by fresh; this prev title is absent from fresh.
+            # It's a ghost entry from a stale source — drop it.
+            ghost_dropped += 1
+            continue
+        fresh.append(ev)
+        fresh_keys.add(k)
+        merged += 1
+    if ghost_dropped:
+        print(f"  Ghost-title drop: {ghost_dropped} stale prev_event(s) removed (slot covered by RSS, no actual)")
     print(f"  Merged: {merged} historical events from previous file (within {LOOKBACK_DAYS}-day window)")
 
     # Step 2a: Carry-forward actuals from prev_events for events that are IN fresh but
