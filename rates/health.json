@@ -1,5 +1,5 @@
 {
-  "runTimestamp": "2026-06-11T12:05:38.322471Z",
+  "runTimestamp": "2026-06-11T21:52:36.904268Z",
   "runDate": "2026-06-11",
   "frankfurterOk": true,
   "currencies": {
@@ -7,13 +7,13 @@
       "status": "ok",
       "rate": "3.75",
       "source": "NYFed-EFFR",
-      "date": "2026-06-09",
+      "date": "2026-06-10",
       "issues": []
     },
     "EUR": {
-      "status": "fallback",
-      "rate": "2.00",
-      "source": "ECB-HTML",
+      "status": "ok",
+      "rate": "2.25",
+      "source": "manual-override",
       "date": "2026-06-11",
       "issues": []
     },
@@ -35,7 +35,7 @@
       "status": "ok",
       "rate": "2.25",
       "source": "BoC-Valet",
-      "date": "2026-06-03",
+      "date": "2026-06-04",
       "issues": []
     },
     "AUD": {
