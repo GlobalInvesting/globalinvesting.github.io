@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.29
+fetch_ff_calendar.py — v3.30
+v3.30 changes (2026-06-11):
+- Port _IMPACT_UPGRADES table to fetch_myfxbook_rss(): the table existed in the old
+  Finnhub/FF JSON code path but was never ported when the RSS path replaced it.
+  Added "consumer inflation expectations" to the set, fixing AUD Consumer Inflation
+  Expectations being silently dropped (Myfxbook RSS tags it low-impact; FF/FXStreet
+  list it as medium/orange). The upgrade check runs before the low-impact continue,
+  so actuals for these events are now captured and written to ff_calendar.json.
+  Existing entries: producer price index, machine tool orders, building approvals,
+  private house approvals.
+
 v3.29 changes (2026-06-11):
 - **FIX: Ghost-title guard in Step 2 merge.** prev_events from older pipeline sources
   (e.g. Worker KV populated by a FF-JSON-based Worker version) contained verbose
@@ -526,6 +536,17 @@ def fetch_myfxbook_rss(xml: str) -> tuple[list[dict], list[dict]]:
     }
     G8_CCY = set(SLUG_TO_CCY.values())
 
+    # Impact upgrade table: titles (case-insensitive substrings) that Myfxbook RSS
+    # classifies as "low" but ForexFactory/FXStreet list as "medium" or higher.
+    # These would otherwise be silently dropped by the low-impact filter.
+    _IMPACT_UPGRADES: set[str] = {
+        "producer price index",   # JPY PPI MoM/YoY
+        "machine tool orders",    # JPY Prelim Machine Tool Orders YoY
+        "building approvals",     # AUD Building Approvals MoM/YoY
+        "private house approvals",# AUD Private House Approvals MoM
+        "consumer inflation expectations",  # AUD Consumer Inflation Expectations
+    }
+
     events: list[dict] = []
     skipped_ccy = skipped_impact = 0
 
@@ -576,8 +597,12 @@ def fetch_myfxbook_rss(xml: str) -> tuple[list[dict], list[dict]]:
         imp_m = _re.search(r'sprite-(high|medium|low)-impact', desc)
         impact = imp_m.group(1) if imp_m else "low"
         if impact == "low":
-            skipped_impact += 1
-            continue
+            title_lower = title.lower()
+            if any(u in title_lower for u in _IMPACT_UPGRADES):
+                impact = "medium"  # upgrade: FF/FXStreet classify as medium
+            else:
+                skipped_impact += 1
+                continue
 
         # Values: extract all <td> text nodes from data row (skip header <th> row)
         tds = _re.findall(r'<td>(.*?)</td>', desc, _re.DOTALL)
