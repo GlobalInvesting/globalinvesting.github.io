@@ -1,13 +1,7 @@
 {
-  "generated_at": "2026-06-10T23:15:50Z",
-  "source": "ForexFactory",
-  "holidays": [
-    {
-      "title": "Bank Holiday",
-      "currency": "AUD",
-      "dateISO": "2026-06-07"
-    }
-  ],
+  "generated_at": "2026-06-11T01:34:59Z",
+  "source": "Myfxbook",
+  "holidays": [],
   "events": [
     {
       "title": "Prelim Machine Tool Orders y/y",
@@ -153,6 +147,28 @@
       "released": false
     },
     {
+      "title": "Euro Area ECB Interest Rate Decision",
+      "currency": "EUR",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:15",
+      "impact": "high",
+      "forecast": "2.4%",
+      "previous": "2.15%",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "Euro Area Deposit Facility Rate",
+      "currency": "EUR",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:15",
+      "impact": "high",
+      "forecast": "2.25%",
+      "previous": "2.0%",
+      "actual": null,
+      "released": false
+    },
+    {
       "title": "Main Refinancing Rate",
       "currency": "EUR",
       "dateISO": "2026-06-11",
@@ -171,6 +187,61 @@
       "impact": "high",
       "forecast": null,
       "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "United States Jobless Claims 4-week Average",
+      "currency": "USD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "216.5K",
+      "previous": "214.75K",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "United States PPI MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "0.7%",
+      "previous": "1.4%",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "United States Core PPI MoM",
+      "currency": "USD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "0.5%",
+      "previous": "1.0%",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "United States Initial Jobless Claims",
+      "currency": "USD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "219.0K",
+      "previous": "225.0K",
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "United States Continuing Jobless Claims",
+      "currency": "USD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "1780.0K",
+      "previous": "1777.0K",
       "actual": null,
       "released": false
     },
@@ -208,6 +279,17 @@
       "released": false
     },
     {
+      "title": "Euro Area ECB Press Conference",
+      "currency": "EUR",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:45",
+      "impact": "high",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
       "title": "ECB Press Conference",
       "currency": "EUR",
       "dateISO": "2026-06-11",
@@ -215,6 +297,17 @@
       "impact": "high",
       "forecast": null,
       "previous": null,
+      "actual": null,
+      "released": false
+    },
+    {
+      "title": "New Zealand Business NZ PMI",
+      "currency": "NZD",
+      "dateISO": "2026-06-11",
+      "timeUTC": "22:30",
+      "impact": "medium",
+      "forecast": "50.0",
+      "previous": "50.5",
       "actual": null,
       "released": false
     },
