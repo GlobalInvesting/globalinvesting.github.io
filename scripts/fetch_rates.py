@@ -108,6 +108,11 @@ MANUAL_OVERRIDES: dict[str, tuple[str, str]] = {
     # Never add EUR here — unverified estimates cause more harm than a stale-but-labeled value.
     # Example (remove once primary source updates):
     # 'XXX': ('rate', 'YYYY-MM-DD'),  # Bank decision date — remove when primary source updates
+    #
+    # 2026-06-11: ECB raised DFR 25bp → 2.25% at the June 2026 meeting.
+    # ECB SDMX API and BIS both return 403 from GitHub Actions IPs on decision day,
+    # so the daily 08:00 UTC run missed it. Remove this entry once ECB SDMX updates.
+    'EUR': ('2.25', '2026-06-11'),   # ECB DFR decision 2026-06-11 — remove once SDMX updates
 }
 
 
