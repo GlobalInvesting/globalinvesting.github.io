@@ -1,78 +1,70 @@
 /**
- * calendar-watcher.js — Cloudflare Worker v3.1
+ * calendar-watcher.js — Cloudflare Worker v4.0
  *
- * PRIMARY SOURCE: FCS API economy_cal endpoint
- *   https://api-v4.fcsapi.com/forex/economy_cal?access_key=KEY
+ * PRIMARY SOURCE: Myfxbook HTML calendar
+ *   https://www.myfxbook.com/forex-economic-calendar
  *
- * WHY FCS API INSTEAD OF FF HTML
- *   ForexFactory HTML returns HTTP 403 to Cloudflare Worker IPs — FF protects its
- *   HTML with Cloudflare Bot Management (__cf_bm cookie requiring JS execution).
- *   CF Worker edge IPs are identified and blocked by FF's WAF rules.
- *   FCS API is a REST API that explicitly supports programmatic access from any IP.
- *   It returns actual, forecast, previous for G8 med/high events with near-zero lag.
+ *   CF Worker edge IPs are NOT blocked by Myfxbook's Cloudflare setup (confirmed:
+ *   3,300 DOM nodes returned from CF Worker fetch with browser User-Agent).
+ *   GitHub Actions runner IPs ARE blocked (TCP-level hang — Cloudflare holds
+ *   connection open indefinitely). Solution: route all Myfxbook fetches through
+ *   this Worker. GH Actions calls /myfxbook on this Worker; Worker calls Myfxbook.
  *
- * ARCHITECTURE
- *   CF Worker polls FCS API every 30 minutes (free tier: 500 req/month limit).
- *   On-demand polls via /trigger endpoint — called by fetch_ff_calendar.py after
- *   detecting new upcoming events, ensuring fresh actuals when they release.
- *   Filters to G8 currencies, medium+high importance.
- *   Computes fingerprint of actuals+forecasts.
- *   On change: writes event array to KV (/payload) + fires repository_dispatch.
- *   fetch_ff_calendar.py Step 1c reads /payload and injects actuals into fresh events.
+ * FALLBACK: ForexFactory JSON (nfs.faireconomy.media)
+ *   No WAF on FF JSON. Accessible from both CF edge and GH Actions.
+ *   Used if Myfxbook fetch fails.
  *
- * FCS API free plan: 500 credits/month, 1 credit/request.
- *   At every-30-min cron: 48 req/day = ~1,440 req/month (exceeds 500 free tier).
- *   NOTE: Rely on /trigger (on-demand from GH Actions) for release-window accuracy;
- *   reduce cron to every-60-min if credits run low.
+ * REMOVED: FCS API (api-v4.fcsapi.com) — free tier credits exhausted.
  *
- * CRON: every 30 minutes.
- *   wrangler.toml: crons = ["0,30 * * * *"]
- *
- * REQUIRED SECRETS:
- *   GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO  — unchanged
- *   FCS_API_KEY                             — NEW: add via `npx wrangler secret put FCS_API_KEY`
- *
- * REQUIRED KV NAMESPACE:
- *   CALENDAR_KV  — calendar:fingerprint:v3, calendar:payload:v3
+ * CRON: every 30 minutes — fetches Myfxbook, fingerprints actuals,
+ *   fires repository_dispatch on change.
  *
  * ENDPOINTS:
- *   /trigger     — manual/on-demand poll (called by fetch_ff_calendar.py)
+ *   /myfxbook    — fetch + parse Myfxbook HTML, return events JSON array
+ *                  called by fetch_ff_calendar.py Step 1 (replaces direct HTTP)
+ *   /trigger     — manual on-demand poll (cron logic, fires dispatch if changed)
  *   /fingerprint — view current fingerprint
- *   /payload     — read the latest parsed events (JSON array) — used by fetch_ff_calendar.py
- *   /reset       — clear fingerprint + payload
+ *   /payload     — latest parsed events from last cron/trigger run
+ *   /reset       — clear KV state
  *
- * FCS API economy_cal response fields (per event):
- *   id, event, title, country (ISO-2), currency, importance (0=low,1=med,2=high),
- *   period, actual, forecast, previous, source, date ("YYYY-MM-DD HH:MM:SS" UTC)
+ * REQUIRED SECRETS (unchanged): GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO
+ * FCS_API_KEY no longer required.
  *
- * v3.1 changes (2026-06-10):
- * - Primary source: FCS API (accessible from CF edge IPs, not blocked by WAF)
- * - Removed FF HTML scraping (CF edge IPs receive HTTP 403 from FF WAF — confirmed)
- * - FF JSON retained as in-process fallback (best-effort, no extra request cost)
- * - Cron: every 30 min (FCS free tier: 500 req/month)
- * - /trigger endpoint: called by fetch_ff_calendar.py Step 1c for on-demand FCS poll
- * - FCS_API_KEY secret required (add separately: npx wrangler secret put FCS_API_KEY)
- * - KV payload date format: YYYY-MM-DD HH:MM:SS UTC (Step 1c updated accordingly)
- *
- * v3.0 changes (2026-06-10):
- * - Primary source migrated from FF JSON to FF HTML (later found to be blocked — see v3.1)
- * - Added /payload KV endpoint for Step 1c injection
- * - Cron: star-slash-2 (reverted to star-slash-30 in v3.1 due to FCS rate limit)
+ * v4.0 changes (2026-06-10):
+ * - PRIMARY: Myfxbook HTML replaces FCS API (credits exhausted)
+ * - NEW: /myfxbook endpoint — proxies Myfxbook HTML fetch + parsing for GH Actions
+ * - NEW: parseMyfxbookHTML() — JS regex parser matching Python v3.23 logic
+ * - FALLBACK: FF JSON retained (accessible from CF edge, no WAF)
+ * - REMOVED: fetchFCSAPI() — FCS free tier exhausted
+ * - Cron: every 30 minutes (unchanged)
  */
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const G8 = new Set(["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]);
 
-// FCS API economy calendar — G8 country filter
-const FCS_URL = "https://api-v4.fcsapi.com/forex/economy_cal";
+const MFB_URL     = "https://www.myfxbook.com/forex-economic-calendar";
+const FF_JSON_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
+const FF_JSON_NW  = "https://nfs.faireconomy.media/ff_calendar_nextweek.json";
 
-// FF JSON fallback (no IP block from CF edge, but has lag — used only if FCS fails)
-const FF_JSON_URL    = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
-const FF_JSON_NW_URL = "https://nfs.faireconomy.media/ff_calendar_nextweek.json";
+const KV_FINGERPRINT = "calendar:fingerprint:v4";
+const KV_PAYLOAD     = "calendar:payload:v4";
 
-const KV_FINGERPRINT = "calendar:fingerprint:v3";
-const KV_PAYLOAD     = "calendar:payload:v3";
+const MFB_HEADERS = {
+  "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.5",
+};
+
+// Country slug → G8 currency (matches Python v3.23 SLUG_TO_CCY)
+const SLUG_TO_CCY = {
+  "united-states": "USD", "euro-area": "EUR", "germany": "EUR",
+  "france": "EUR", "italy": "EUR", "spain": "EUR", "netherlands": "EUR",
+  "belgium": "EUR", "ireland": "EUR", "portugal": "EUR", "finland": "EUR",
+  "austria": "EUR", "greece": "EUR", "european-union": "EUR",
+  "united-kingdom": "GBP", "japan": "JPY", "canada": "CAD",
+  "australia": "AUD", "new-zealand": "NZD", "switzerland": "CHF",
+};
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 
@@ -83,6 +75,21 @@ export default {
 
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    // /myfxbook — proxy endpoint for GH Actions (bypasses WAF block on runner IPs)
+    if (url.pathname === "/myfxbook") {
+      try {
+        const { events, holidays } = await fetchMyfxbook();
+        return new Response(JSON.stringify({ events, holidays, ts: new Date().toISOString() }), {
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), {
+          status: 502,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
 
     if (url.pathname === "/trigger") {
       ctx.waitUntil(runCalendarWatch(env));
@@ -113,40 +120,37 @@ export default {
 
     return new Response(JSON.stringify({
       worker:    "calendar-watcher",
-      version:   "3.1",
-      source:    "FCS API (api-v4.fcsapi.com/forex/economy_cal)",
+      version:   "4.0",
+      source:    "Myfxbook HTML (myfxbook.com/forex-economic-calendar)",
       fallback:  "ForexFactory JSON (nfs.faireconomy.media)",
-      schedule:  "every 30 minutes (FCS free tier limit)",
-      endpoints: ["/trigger", "/fingerprint", "/payload", "/reset"],
+      schedule:  "every 30 minutes",
+      endpoints: ["/myfxbook", "/trigger", "/fingerprint", "/payload", "/reset"],
       ts:        new Date().toISOString(),
     }), { headers: { "Content-Type": "application/json" } });
   },
 };
 
-// ── Core logic ────────────────────────────────────────────────────────────────
+// ── Core cron logic ───────────────────────────────────────────────────────────
 
 async function runCalendarWatch(env) {
   const now   = new Date();
   const label = `[${now.toISOString().slice(0, 16)}Z]`;
-  console.log(`${label} calendar-watcher v3.1: starting poll`);
+  console.log(`${label} calendar-watcher v4.0: starting poll`);
 
   let events = [];
   let source  = "unknown";
 
-  // Step 1: Try FCS API (primary — REST API, not blocked from CF edge IPs)
-  if (env.FCS_API_KEY) {
-    try {
-      events = await fetchFCSAPI(env.FCS_API_KEY);
-      source  = "fcs";
-      console.log(`${label} FCS API: ${events.length} G8 med/high events`);
-    } catch (err) {
-      console.warn(`${label} FCS API failed (${err.message}) — trying FF JSON fallback`);
-    }
-  } else {
-    console.warn(`${label} FCS_API_KEY not set — skipping FCS, trying FF JSON fallback`);
+  // Step 1: Myfxbook HTML (primary — CF edge IPs not blocked)
+  try {
+    const result = await fetchMyfxbook();
+    events = result.events;
+    source  = "myfxbook";
+    console.log(`${label} Myfxbook: ${events.length} G8 med/high events`);
+  } catch (err) {
+    console.warn(`${label} Myfxbook failed (${err.message}) — trying FF JSON fallback`);
   }
 
-  // Step 2: FF JSON fallback if FCS failed or key missing
+  // Step 2: FF JSON fallback
   if (!events.length) {
     try {
       events = await fetchFFJSON();
@@ -185,71 +189,158 @@ async function runCalendarWatch(env) {
     console.log(`${label} repository_dispatch sent.`);
   } catch (err) {
     console.error(`${label} repository_dispatch failed: ${err.message}`);
-    // Roll back fingerprint so the next poll retries the dispatch
     await env.CALENDAR_KV.put(KV_FINGERPRINT, prevFP, { expirationTtl: 60 * 60 * 24 * 7 });
   }
 }
 
-// ── FCS API fetch ─────────────────────────────────────────────────────────────
+// ── Myfxbook HTML fetch + parse ───────────────────────────────────────────────
 
-async function fetchFCSAPI(apiKey) {
-  // G8 country codes for FCS API country filter (ISO-2)
-  const g8Countries = "US,EU,GB,JP,AU,CA,CH,NZ";
-  const url = `${FCS_URL}?country=${g8Countries}&access_key=${apiKey}`;
-
-  const resp = await fetch(url, {
-    headers: {
-      "Accept":     "application/json",
-      "User-Agent": "globalinvesting-calendar-watcher/3.1",
-    },
-    signal: AbortSignal.timeout(12000),
+async function fetchMyfxbook() {
+  const resp = await fetch(MFB_URL, {
+    headers: MFB_HEADERS,
+    signal:  AbortSignal.timeout(20000),
   });
 
   if (!resp.ok) {
-    const body = await resp.text().catch(() => "");
-    throw new Error(`FCS API HTTP ${resp.status}: ${body.slice(0, 80)}`);
+    throw new Error(`Myfxbook HTTP ${resp.status}`);
   }
 
-  const data = await resp.json();
+  const html = await resp.text();
 
-  // FCS response: { status: true, response: [...], info: {...} }
-  if (!data.status || !Array.isArray(data.response)) {
-    throw new Error(`FCS API unexpected response: ${JSON.stringify(data).slice(0, 120)}`);
+  if (!html.includes("calendarToggleCell")) {
+    throw new Error("Myfxbook response missing calendar data — WAF block or layout change");
   }
 
-  const events = [];
-  for (const ev of data.response) {
-    const currency = (ev.currency || "").trim().toUpperCase();
-    if (!G8.has(currency)) continue;
+  return parseMyfxbookHTML(html);
+}
 
-    // importance: 0=low, 1=medium, 2=high — skip low
-    const imp = Number(ev.importance ?? -1);
-    if (imp < 1) continue;
+function parseMyfxbookHTML(html) {
+  // ── Build OID lookup maps from full HTML ──────────────────────────────────
+
+  // previous-value: data-previous="OID" ... previous-value="VALUE"
+  const prevMap = {};
+  for (const m of html.matchAll(/data-previous="(\d+)"[^>]*previous-value="([^"]*)"/g)) {
+    prevMap[m[1]] = m[2];
+  }
+
+  // forecast/consensus: data-concensus="OID" concensus="VALUE" consistconcensus
+  const consMap = {};
+  for (const m of html.matchAll(/<td[^>]*data-concensus="(\d+)" concensus="([^"]*)" consistconcensus/g)) {
+    consMap[m[1]] = m[2];
+  }
+
+  // actual: data-actual="OID" ... actualCell ... innermost span value
+  const actualMap = {};
+  for (const m of html.matchAll(/data-actual="(\d+)"[\s\S]*?class="actualCell">([\s\S]*?)<\/span>\s*<\/span>/g)) {
+    const oid   = m[1];
+    const inner = m[2];
+    // Extract innermost span text
+    const spans = [...inner.matchAll(/<span[^>]*>\s*([^<]+?)\s*<\/span>/g)];
+    const raw   = spans.length ? spans[spans.length - 1][1].trim() : inner.replace(/<[^>]+>/g, "").trim();
+    // Skip countdown strings ("min", "h ")
+    if (raw && !raw.includes("min") && !raw.includes("h ") && raw !== "-") {
+      actualMap[oid] = raw;
+    }
+  }
+
+  // ── Parse <tr> event rows from <tbody> ───────────────────────────────────
+
+  const tbodyM = html.match(/<tbody>([\s\S]*?)<\/tbody>/);
+  if (!tbodyM) throw new Error("No <tbody> found in Myfxbook HTML");
+  const tbody = tbodyM[1];
+
+  // Split into rows — use non-greedy match
+  const trBlocks = [...tbody.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)].map(m => m[1]);
+
+  const events   = [];
+  const holidays = [];
+
+  for (const tr of trBlocks) {
+    // OID
+    const oidM = tr.match(/id="itemOid" value="(\d+)"/);
+    if (!oidM) continue;
+    const oid = oidM[1];
+
+    // Datetime (UTC)
+    const dtM = tr.match(/data-calendardatetd="([^"]+)"/);
+    if (!dtM) continue;
+    const dtRaw  = dtM[1];        // "2026-06-10 12:30:00.0"
+    const dateISO = dtRaw.slice(0, 10);
+    const timeUTC = dtRaw.slice(11, 16);  // "12:30"
+
+    // Currency from standalone <td> with exactly 3 uppercase letters
+    const curM = tr.match(/<td[^>]*calendarToggleCell[^>]*>\s*([A-Z]{3})\s*<\/td>/);
+    let currency = curM ? curM[1].trim() : "";
+
+    // Impact from importance attribute
+    const impM = tr.match(/importance="(\d)"/);
+    const impNum = impM ? parseInt(impM[1]) : 0;
+    const impact = impNum === 3 ? "high" : impNum === 2 ? "medium" : "low";
+
+    // Event link — href comes before class in myfxbook HTML
+    const evM = tr.match(/<a href="(?:https?:\/\/[^/]+)?(\/forex-economic-calendar\/[^"]+)"[^>]*calendar-event-link[^>]*>([^<]+)<\/a>/);
+
+    if (!evM) {
+      // Holiday row (no event link)
+      if (tr.includes("impact_no") || tr.includes("data-is-holiday=\"true\"")) {
+        const titleM = tr.match(/class="[^"]*calendarToggleCell[^"]*text-left[^"]*"[^>]*>([\s\S]*?)<\/td>/);
+        const title  = titleM ? titleM[1].replace(/<[^>]+>/g, "").trim() : "Bank Holiday";
+        if (currency && G8.has(currency) && dateISO) {
+          holidays.push({ title: title || "Bank Holiday", currency, dateISO });
+        }
+      }
+      continue;
+    }
+
+    const slugUrl   = evM[1];   // "/forex-economic-calendar/united-states/cpi-s-a"
+    let   eventName = evM[2].trim();
+
+    // Period suffix e.g. "(May)"
+    const periodM = tr.match(/<span>\(([^)]+)\)<\/span>/);
+    if (periodM) eventName = `${eventName} (${periodM[1]})`;
+
+    // Derive currency from URL slug if td extraction failed
+    if (!currency || !G8.has(currency)) {
+      const parts = slugUrl.replace(/^\//, "").split("/");
+      // parts: ["forex-economic-calendar", "united-states", "cpi-s-a"]
+      const countrySlug = parts[1] || "";
+      currency = SLUG_TO_CCY[countrySlug] || "";
+    }
+
+    if (!currency || !G8.has(currency)) continue;
+    if (impact === "low") continue;
+
+    const previous = cleanVal(prevMap[oid]);
+    const forecast = cleanVal(consMap[oid]);
+    const actual   = cleanVal(actualMap[oid]);
+    const isPassed = tr.includes('ispassed="1"');
+    const released = actual !== null || isPassed;
 
     events.push({
-      date:     (ev.date || "").trim(),    // "YYYY-MM-DD HH:MM:SS" UTC
-      timeET:   "",                         // FCS provides UTC dates, not ET times
+      date:     `${dateISO} ${timeUTC}:00`,  // "YYYY-MM-DD HH:MM:SS" UTC — consistent with KV payload format
       currency,
-      impact:   imp === 2 ? "high" : "medium",
-      title:    (ev.title || "").trim(),
-      actual:   cleanVal(ev.actual),
-      forecast: cleanVal(ev.forecast),
-      previous: cleanVal(ev.previous),
+      impact,
+      title:    eventName,
+      actual,
+      forecast,
+      previous,
+      dateISO,
+      timeUTC,
+      released,
     });
   }
 
-  if (!events.length) {
-    throw new Error("FCS API returned 0 G8 med/high events (key invalid or no events this week)");
-  }
+  events.sort((a, b) => a.date.localeCompare(b.date) || a.currency.localeCompare(b.currency));
 
-  return events;
+  console.log(`parseMyfxbookHTML: ${events.length} events (${events.filter(e => e.actual).length} with actuals), ${holidays.length} holidays`);
+  return { events, holidays };
 }
 
 // ── FF JSON fallback ──────────────────────────────────────────────────────────
 
 async function fetchFFJSON() {
   const HEADERS = {
-    "User-Agent": "globalinvesting-calendar-watcher/3.1 (https://globalinvesting.github.io)",
+    "User-Agent": "globalinvesting-calendar-watcher/4.0 (https://globalinvesting.github.io)",
     "Accept":     "application/json",
   };
 
@@ -262,10 +353,9 @@ async function fetchFFJSON() {
   const raw = await resp.json();
   if (!Array.isArray(raw)) throw new Error("FF JSON not an array");
 
-  // Best-effort nextweek
   let rawNw = [];
   try {
-    const r2 = await fetch(FF_JSON_NW_URL, { headers: HEADERS, signal: AbortSignal.timeout(8000) });
+    const r2  = await fetch(FF_JSON_NW, { headers: HEADERS, signal: AbortSignal.timeout(8000) });
     const ct2 = r2.headers.get("content-type") || "";
     if (r2.ok && ct2.includes("application/json")) {
       const p = await r2.json();
@@ -279,9 +369,11 @@ async function fetchFFJSON() {
     if (!G8.has(currency)) continue;
     const impact = (ev.impact || "").trim().toLowerCase();
     if (impact !== "high" && impact !== "medium") continue;
+
+    // FF JSON date is ET — normalise to YYYY-MM-DD HH:MM:SS prefix for consistency
+    const dateRaw = (ev.date || "").trim();
     events.push({
-      date:     (ev.date || "").trim(),
-      timeET:   "",
+      date:     dateRaw,
       currency,
       impact,
       title:    (ev.title || "").trim(),
@@ -334,7 +426,7 @@ async function triggerGitHubWorkflow(env, description, source) {
         "Authorization":        `Bearer ${GITHUB_PAT}`,
         "Accept":               "application/vnd.github+json",
         "Content-Type":         "application/json",
-        "User-Agent":           "globalinvesting-calendar-watcher/3.1",
+        "User-Agent":           "globalinvesting-calendar-watcher/4.0",
         "X-GitHub-Api-Version": "2022-11-28",
       },
       body: JSON.stringify({
@@ -360,5 +452,5 @@ async function triggerGitHubWorkflow(env, description, source) {
 function cleanVal(v) {
   if (v == null) return null;
   const s = String(v).trim();
-  return s === "" || s === "None" || s === "null" || s === "N/A" || s === "—" ? null : s;
+  return s === "" || s === "None" || s === "null" || s === "N/A" || s === "—" || s === "-" ? null : s;
 }
