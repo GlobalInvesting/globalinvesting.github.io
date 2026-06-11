@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.17
+fetch_news.py — v5.18
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
 
 CAMBIOS v5.17 (sobre v5.16):
@@ -209,6 +209,13 @@ INSTAFOREX_MAX        = 2           # v5.4: InstaForex limitado a 2 artículos p
 # FIX C-01: CURRENCIES importado desde fx_config.py (ver imports al inicio del archivo)
 FETCH_TIMEOUT         = 12
 FETCH_WORKERS         = 14          # v5.3: subido para más feeds en paralelo
+
+# v5.18: NEWS_MODE — controls whether NewsData API is called.
+#   'fast'  → RSS + Finnhub only. Used by the 10-min cron. Preserves NewsData daily quota.
+#   'full'  → RSS + Finnhub + NewsData. Used by the hourly cron (8 queries × 24 = 192/200 free limit).
+# RSS + Finnhub cover all breaking news; NewsData adds depth, not speed.
+# Default 'full' preserves backward compatibility for direct invocations without the env var.
+NEWS_MODE = os.environ.get('NEWS_MODE', 'full').lower()
 MIN_DESCRIPTION_WORDS = 12
 
 # v5.3: subido de 3 a 5 para reducir falsos positivos
@@ -1287,16 +1294,20 @@ def main():
     filtered_no_currency = 0
     # v5.11: instaforex_count removed — InstaForex feeds eliminated
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.17 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.18 — {len(FEEDS)} feeds — NEWS_MODE={NEWS_MODE}")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
     print(f"  Descarga completada.")
 
     # v5.7: NewsData API — fetch separado, resultados se añaden a raw_articles al final
+    # v5.18: NewsData only runs in 'full' mode to stay within the 200 req/day free quota.
+    # 'fast' mode (10-min cron) skips it entirely — RSS + Finnhub cover breaking news.
     newsdata_api_key = os.environ.get(NEWSDATA_API_KEY_ENV, "").strip()
     newsdata_articles = []
-    if newsdata_api_key:
+    if NEWS_MODE == 'fast':
+        print(f"  [NewsData] skipped — NEWS_MODE=fast (quota preservation)")
+    elif newsdata_api_key:
         print(f"  Consultando NewsData.io API ({len(NEWSDATA_QUERIES)} divisas)...")
         newsdata_articles = fetch_newsdata(newsdata_api_key, now_utc)
         print(f"  NewsData: {len(newsdata_articles)} artículos obtenidos")
