@@ -1054,7 +1054,7 @@ PRIMARY_FETCHERS = {
     'GBP': fetch_gbp_boe,
     'USD': lambda: fetch_usd_nyfed() or fetch_usd_fred(),
     'JPY': fetch_jpy_boj,   # BIS primero, luego BoJ scraping
-    'CHF': lambda: fetch_bis_policy_rate('CHF') or fetch_chf_snb(),
+    'CHF': lambda: fetch_chf_snb() or fetch_bis_policy_rate('CHF'),  # SNB scraping same-day; BIS monthly fallback
     'NZD': fetch_nzd_rbnz,  # BIS primero, luego RBNZ
 }
 
