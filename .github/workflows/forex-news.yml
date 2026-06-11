@@ -1,13 +1,24 @@
 name: Fetch Forex News
 on:
   schedule:
-    - cron: '5 * * * *'  # Every 1 hour at :05 UTC — staggered from update-fx-liquidity (:00)
-                          # Both workflows previously ran at '0 * * * *', causing GitHub to
-                          # queue them simultaneously. With cancel-in-progress: false, queued
-                          # runs block the next scheduled trigger, producing 30–60 min delays
-                          # and occasional skipped runs (observed: 10:00, 11:00, 13:00, 15:00
-                          # missing on 2026-04-27). The 5-min offset eliminates the collision.
+    # ── Fast runs: every 10 min — RSS + Finnhub only (no NewsData quota consumed) ──
+    # GitHub Actions public repo: unlimited minutes. Runtime ~60-90s per run.
+    # 10-min interval reduces worst-case breaking-news lag from ~60 min to ~10 min.
+    # FXStreet/ForexLive/CB feeds post breaking news anytime; this catches it within
+    # one poll cycle. NEWS_MODE=fast skips NewsData entirely (quota preservation).
+    - cron: '0,10,20,30,40,50 * * * *'   # every 10 min — NEWS_MODE=fast
+
+    # ── Full run: once per hour at :05 UTC — RSS + Finnhub + NewsData ──────────
+    # Staggered 5 min from update-fx-liquidity (:00) to avoid runner queue collision.
+    # NewsData free plan: 200 req/day. 8 queries × 24 runs = 192/day — within limit.
+    - cron: '5 * * * *'                   # hourly at :05 — NEWS_MODE=full
+
   workflow_dispatch:
+    inputs:
+      news_mode:
+        description: 'NEWS_MODE override: fast (RSS+Finnhub only) or full (all sources incl. NewsData)'
+        required: false
+        default: 'full'
 
 # Runs in the PUBLIC repo → minutos ilimitados (sin consumo de cuota privada).
 # Scripts movidos desde el engine privado en auditoría 2026-03-31.
@@ -41,10 +52,32 @@ jobs:
       - name: Create output directory
         run: mkdir -p news-data
 
+      - name: Set NEWS_MODE
+        id: news_mode
+        run: |
+          # v5.18: Determine NEWS_MODE for this run.
+          # workflow_dispatch: use the input value (default 'full').
+          # Scheduled: 'full' only at :05 (hourly cron). All other minutes → 'fast'.
+          # This lets one job definition serve both schedules without duplication.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            MODE="${{ inputs.news_mode }}"
+            MODE="${MODE:-full}"
+          else
+            MINUTE=$(date -u +%M)
+            if [ "$MINUTE" = "05" ]; then
+              MODE="full"
+            else
+              MODE="fast"
+            fi
+          fi
+          echo "mode=$MODE" >> $GITHUB_OUTPUT
+          echo "NEWS_MODE=$MODE"
+
       - name: Fetch news from RSS feeds
         env:
           NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          NEWS_MODE: ${{ steps.news_mode.outputs.mode }}
         run: python scripts/fetch_news.py
 
       - name: Commit updated news data
