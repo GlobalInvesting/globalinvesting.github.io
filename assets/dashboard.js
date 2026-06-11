@@ -9413,10 +9413,51 @@ const ADV_ALERT_TYPES = {
 };
 
 // ── Regime alert — special singleton type ────────────────────────────────────
-// Stored as { type:'regime', id, target:'RISK-OFF'|'CAUTION'|'MIXED'|'RISK-ON', fired, firedAt }
-// Evaluated against the live computed regime (DOM element #risk-regime)
+// Stored as { type:'regime', id, target:'RISK-OFF'|'CAUTION'|'MIXED'|'RISK-ON', fired, firedAt }\n// Evaluated against the live computed regime (DOM element #risk-regime)
 function _liveRegime() {
   return document.getElementById('risk-regime')?.textContent?.trim() ?? null;
+}
+
+// ── Eco Actual alert — event-driven type ─────────────────────────────────────
+// Stored as { type:'eco_actual', id, currencies:['USD','EUR',...] or [] for all G8, fired:false }
+// Fires once when a NEW actual appears in calendar-data/ff_calendar.json for the
+// selected currency set. Resets automatically at midnight UTC (new trading day).
+// localStorage key 'gi_eco_fp' → fingerprint of last-seen actuals set.
+const ECO_FP_KEY = 'gi_eco_fp';
+
+async function _buildEcoActualFp(currencies) {
+  // Returns a fingerprint string of all today's actuals for the given currency set.
+  // Empty string if no actuals yet.
+  try {
+    const res = await fetch('./calendar-data/ff_calendar.json', { cache: 'no-store' }).catch(() => null);
+    if (!res?.ok) return null;
+    const ffj = await res.json();
+    const todayISO = new Date().toISOString().slice(0, 10);
+    const events = (ffj?.events || []).filter(ev => {
+      const matchDate = ev.dateISO === todayISO;
+      const hasActual = ev.actual && ev.actual !== '' && ev.actual !== '-';
+      const matchCcy  = !currencies.length || currencies.includes(ev.currency);
+      return matchDate && hasActual && matchCcy;
+    });
+    if (!events.length) return '';
+    return events.map(ev => `${ev.currency}|${ev.dateISO}|${ev.timeUTC || ''}|${ev.event||ev.title||''}|${ev.actual}`).sort().join(';;');
+  } catch { return null; }
+}
+
+function _ecoFpLoad() {
+  try {
+    const raw = localStorage.getItem(ECO_FP_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    // Auto-expire: reset at midnight UTC
+    const todayISO = new Date().toISOString().slice(0, 10);
+    if (parsed.date !== todayISO) return {};
+    return parsed;
+  } catch { return {}; }
+}
+
+function _ecoFpSave(fp, date) {
+  try { localStorage.setItem(ECO_FP_KEY, JSON.stringify({ fp, date })); } catch {}
 }
 
 // Expose to window for inline onchange handlers in the popover HTML
@@ -9533,6 +9574,10 @@ function alertsCurrentValue(a, intra) {
 function alertFormatValue(a, v) {
   if (v == null) return null;
   if (a.type === 'regime') return v;
+  if (a.type === 'eco_actual') {
+    if (a.lastActuals?.length) return a.lastActuals.map(n => `${n.ccy}: ${n.actual}`).join(' · ');
+    return 'new actual';
+  }
   const def = ADV_ALERT_TYPES[a.sym];
   if (def?.formatValue) return def.formatValue(v);
   // Price alert: standard numeric
@@ -9541,6 +9586,10 @@ function alertFormatValue(a, v) {
 
 function alertDescribeCondition(a) {
   if (a.type === 'regime') return `Regime = ${a.target}`;
+  if (a.type === 'eco_actual') {
+    const ccyLabel = a.currencies?.length ? a.currencies.join('/') : 'All G8';
+    return `Eco actual released — ${ccyLabel}`;
+  }
   const label = ADV_ALERT_TYPES[a.sym]?.label ?? ALERTS_LABELS[a.sym] ?? a.sym;
   const dirSym = a.dir === 'above' ? '>' : '<';
   return `${label} ${dirSym} ${a.threshold}`;
@@ -9573,8 +9622,8 @@ function alertsRender(intra) {
     const curTxt   = curFmt != null ? ` · now ${curFmt}` : '';
     const condTxt  = alertDescribeCondition(a);
     // Category badge
-    const cat = a.type === 'regime' ? 'regime' : (ADV_ALERT_TYPES[a.sym]?.category ?? 'price');
-    const catColors = { price:'var(--text2)', spread:'#1D9E75', ivrank:'#185FA5', corr:'#854F0B', var:'#A32D2D', regime:'#533AB7' };
+    const cat = a.type === 'regime' ? 'regime' : a.type === 'eco_actual' ? 'eco' : (ADV_ALERT_TYPES[a.sym]?.category ?? 'price');
+    const catColors = { price:'var(--text2)', spread:'#1D9E75', ivrank:'#185FA5', corr:'#854F0B', var:'#A32D2D', regime:'#533AB7', eco:'#B87A0A' };
     const catStyle  = `color:${catColors[cat]||'var(--text2)'};font-size:9px;margin-right:4px;`;
     return `<div class="${cls}" data-id="${a.id}">
       <span class="alert-lbl"><span style="${catStyle}">[${cat.toUpperCase()}]</span>${condTxt}${curTxt}${firedTxt}</span>
@@ -9630,17 +9679,69 @@ async function alertsCheck() {
   const arr = alertsLoad();
   if (!arr.length) return;
 
-  // Load intraday data once for all advanced alerts (uses 90s cache — no extra fetch)
+  // Load intraday data once for all advanced threshold alerts
   let intra = null;
-  const needsIntra = arr.some(a => a.type && a.type !== 'price' && a.type !== 'regime');
+  const needsIntra = arr.some(a => a.type && a.type !== 'price' && a.type !== 'regime' && a.type !== 'eco_actual');
   if (needsIntra) {
     intra = await loadIntradayQuotes().catch(() => null);
   }
 
   let changed = false;
 
+  // ── eco_actual alerts: async fingerprint-based, event-driven ─────────────
+  const ecoAlerts = arr.filter(a => a.type === 'eco_actual' && !a.fired);
+  if (ecoAlerts.length) {
+    const todayISO = new Date().toISOString().slice(0, 10);
+    const stored   = _ecoFpLoad();
+    const prevFp   = stored.fp ?? null;
+    const allCcys  = [...new Set(ecoAlerts.flatMap(a => a.currencies || []))];
+    const newFp    = await _buildEcoActualFp(allCcys);
+
+    if (newFp !== null) {
+      if (prevFp === null) {
+        _ecoFpSave(newFp, todayISO);   // First load — baseline only, no notification
+      } else if (newFp !== prevFp && newFp !== '') {
+        const prevSet    = new Set(prevFp.split(';;').filter(Boolean));
+        const newSet     = new Set(newFp.split(';;').filter(Boolean));
+        const added      = [...newSet].filter(x => !prevSet.has(x));
+        _ecoFpSave(newFp, todayISO);
+
+        if (added.length) {
+          const newActuals = added.map(s => {
+            const [ccy, , time, title, actual] = s.split('|');
+            return { ccy, time, title, actual };
+          });
+
+          ecoAlerts.forEach(a => {
+            const matching = newActuals.filter(n => !a.currencies.length || a.currencies.includes(n.ccy));
+            if (!matching.length) return;
+
+            a.fired       = true;
+            a.firedAt     = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            a.lastActuals = matching.slice(0, 3);
+            changed       = true;
+
+            if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+              const ccyLabel = a.currencies.length ? a.currencies.join('/') : 'G8';
+              const preview  = matching.slice(0, 2).map(n => `${n.ccy} ${n.title}: ${n.actual}`).join(' · ');
+              try {
+                new Notification(`GI Terminal — ${ccyLabel} Economic Release`, {
+                  body : preview || `${matching.length} new actual(s)`,
+                  icon : '/favicon-192x192.png',
+                  tag  : 'gi-eco-' + a.id,
+                });
+              } catch {}
+            }
+          });
+        }
+      }
+    }
+  }
+
+  // ── Threshold alerts: price, spread, ivrank, corr, var, regime ───────────
   arr.forEach(a => {
     if (a.fired) return;
+    if (a.type === 'eco_actual') return;
     const cur = alertsCurrentValue(a, intra);
     if (cur == null) return;
 
