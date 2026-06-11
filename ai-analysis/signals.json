@@ -1,54 +1,56 @@
 {
-  "generated_at": "2026-06-11T17:51:30Z",
+  "generated_at": "2026-06-11T22:05:15Z",
   "signals": [
     {
-      "time": "17:49",
+      "time": "22:04",
       "priority": "critical",
-      "title": "AUD/USD — G10 Bilateral Theme + Positioning + Vol",
-      "text": "AUD/USD at 0.7034 — USD (Leader) vs AUD (Laggard) spread hits 1.618% as hawkish Fed concerns and war-driven US PPI fuel a dollar rally. AUD COT LF net long +56,800 (76.5% long) faces liquidation risk as negative CESI (-9 misses) confirms deteriorating fundamentals. Volatility premium is extreme with VRP at +10.4% (IV 18.7% vs HV30 8.3%), signaling heavy institutional hedging against further AUD downside. 60bp AUD carry advantage is insufficient to offset the G10 underperformance theme.",
+      "title": "AUD/JPY — G10 Bilateral Theme + Carry Divergence",
+      "text": "AUD/JPY at 112.808 — G10 scorecard confirms a critical divergence as AUD underperforms peers by -0.848% while JPY leads at +0.453%. Despite a +360bp carry advantage for AUD (RBA 4.35% vs BoJ 0.75%), the pair is failing to catch a bid as JPY safe-haven demand and positive economic surprises (CESI net +16) dominate. The 1.300% G10 spread indicates a structural rotation out of high-beta AUD into JPY. Sustained JPY strength persists unless VIX (19.4) retreats significantly.",
       "evidence": [
-        "USD 1W avg: +0.624% (n=7)",
-        "AUD 1W avg: -0.994% (n=4)",
-        "G10 spread: 1.618%",
-        "AUD VRP: +10.4%"
+        "JPY 1W avg: +0.453% (n=7)",
+        "AUD 1W avg: -0.848% (n=4)",
+        "G10 spread: 1.300%"
       ],
+      "watch_level": "Next BoJ meeting on 16 Jun for hawkish shift confirmation",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:45",
-      "priority": "critical",
-      "title": "USD/JPY — Intervention Watch + Carry + Retail Divergence",
-      "text": "USD/JPY at 160.07 — Price holds above the 160.00 psychological level previously associated with BoJ verbal warnings. Despite 287bp OIS carry favoring USD, 25d RR at -1.09 (moderate put skew) confirms the options market is paying for JPY strength/downside protection. Retail sentiment is 79% short, diverging from the massive COT LF net short of -105,136; retail is fading the institutional carry trade at the intervention trigger. Sustained trade above 160.00 increases the risk of direct BoJ action.",
-      "evidence": [
-        "USD/JPY: 160.07",
-        "JPY COT LF net: -105,136",
-        "USD/JPY 25d RR: -1.09",
-        "Retail: 79% short"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "17:42",
+      "time": "22:01",
       "priority": "warning",
-      "title": "NZD/USD — Retail vs Institutional Divergence",
-      "text": "NZD/USD at 0.5821 — Retail sentiment is 91% long, directly contradicting the institutional COT LF net short of -27,797 (only 15.1% long). This extreme divergence at the 0.5800 handle signals high risk of a retail capitulation flush if USD strength persists. NZD real rate of -0.83% remains the most accommodative in the G10, providing no structural support against the 150bp USD carry advantage.",
+      "title": "NZD/USD — COT vs Retail Divergence + CESI",
+      "text": "NZD/USD at 0.5834 — extreme retail sentiment (89% long) directly contradicts institutional positioning (COT LF net short -27,797). With NZD inflation expectations at 3.08% resulting in a -0.83% real policy rate (the most accommodative in G10), the fundamental backdrop supports the spec short bias. Retail 'bottom-fishing' at 0.5834 faces capitulation risk if the negative CESI trend (net -9) continues to weigh on the kiwi.",
       "evidence": [
-        "NZD/USD Retail: 91% long",
-        "NZD COT LF long%: 15.1%",
+        "NZD COT LF net: -27,797",
+        "Retail Sentiment: 89% Long",
         "NZD Real Rate: -0.83%"
       ],
+      "watch_level": "Break below 0.5800 triggers retail stop-loss cascade",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:38",
+      "time": "21:58",
       "priority": "warning",
-      "title": "EUR/USD — ECB Policy Dilemma + Vol Premium",
-      "text": "EUR/USD at 1.1565 — ECB raised rates today but signaled a potential July pause if energy prices stabilize, creating a 'dovish hike' narrative. EUR COT LF net short -22,320 aligns with the 175bp USD carry advantage. VRP at +2.8% (IV 7.1% vs HV30 4.3%) indicates the market is pricing in higher volatility than realized as the ECB path becomes less clear. Watch for a break of 1.1500 if energy-driven inflation concerns subside.",
+      "title": "USD/JPY — Carry + Volatility + Intervention Risk",
+      "text": "USD/JPY at 159.961 — the pair is testing the 160.00 psychological barrier where BoJ intervention risk is historically acute. While the +300bp Fed-BoJ carry spread (Fed 3.75% vs BoJ 0.75%) sustains the bid, the options market is pricing protection against a sharp reversal with a -1.09 25d RR put skew. Elevated VRP (+3.7%) confirms the market is paying a premium for volatility protection at these levels. Carry remains the dominant driver until a breach of 160.00 or a VIX spike above 25.",
       "evidence": [
-        "EUR/USD: 1.1565",
-        "USD/EUR Carry: +175bp",
-        "EUR VRP: +2.8%"
+        "USD/JPY Carry: +300bp",
+        "25d RR: -1.09 (put skew)",
+        "VRP: +3.7% (IV 7.2% vs HV30 3.5%)"
       ],
+      "watch_level": "160.00 level for BoJ verbal or physical intervention",
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "21:52",
+      "priority": "info",
+      "title": "USD/CAD — Correlation Break + Retail Extreme",
+      "text": "USD/CAD at 1.3965 — the pair's correlation with WTI Oil has broken significantly (z = -1.72σ), with USD/CAD rising despite oil price volatility. Retail traders are heavily fading this move (89% short), creating a contrarian signal for further upside. The +150bp carry advantage (Fed 3.75% vs BoC 2.25%) and strong USD CESI (+30) suggest the path of least resistance remains higher despite the retail positioning extreme.",
+      "evidence": [
+        "USD/CAD vs WTI Corr: -0.183 (z=-1.72σ)",
+        "Retail Sentiment: 89% Short",
+        "USD CESI: +30"
+      ],
+      "watch_level": "1.4000 psychological resistance",
       "_source": "gemini:gemini-3-flash-preview"
     }
   ]
