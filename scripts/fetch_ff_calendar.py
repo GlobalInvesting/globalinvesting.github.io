@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.21
+fetch_ff_calendar.py — v3.22
+v3.22 changes (2026-06-10):
+- UPDATE: CF Worker v3.1 source switch: FCS API replaces FF HTML scraping.
+  FF HTML returns HTTP 403 to CF Worker edge IPs (blocked by FF's Cloudflare WAF).
+  FCS API (api-v4.fcsapi.com/forex/economy_cal) is a REST API that accepts programmatic
+  access from CF edge IPs. Provides actual/forecast/previous for G8 med/high events.
+- FIX: Step 1c updated for FCS API date format: "YYYY-MM-DD HH:MM:SS" UTC — was "Jun 10"
+  ET format from FF HTML parser. Date extraction now takes raw_date[:10] (YYYY-MM-DD).
+- NEW: Step 1c now calls CF Worker /trigger before reading /payload. This fires an
+  on-demand FCS poll (1 API credit) so actuals are fresh rather than waiting for the
+  30-min cron. 6-second sleep gives the Worker time to complete the async FCS fetch.
+- Added CF_WORKER_TRIGGER_URL constant alongside KV_PAYLOAD_URL.
+- KV_PAYLOAD_URL comment updated: "HTML-scraped" → "FCS-API actuals (v3.1)".
 v3.21 changes (2026-06-10):
-- FIX: Add Step 1c — fetch actuals from Cloudflare Worker KV payload (/payload endpoint)
-  immediately after FF JSON fetch. The CF Worker v3.0 scrapes the FF HTML calendar (which
-  shows actuals within seconds of release) and stores the parsed events in KV. Step 1c reads
-  this payload (best-effort, 5s timeout) and injects actuals into `fresh` events that still
-  have actual=None. This eliminates the FF JSON lag (10+ hours observed) for events where the
-  CF Worker has already parsed the HTML. Falls back silently to carry-forward (Step 2a) if
-  the KV payload is unavailable.
-v3.20 changes (2026-06-10):
 - FIX: Actuals carried forward from prev_events when FF JSON returns actual=None for
   an already-released event. New Step 2a: for each event in `fresh` that matches a
   prev_event by (currency, dateISO, timeUTC, title), if fresh.actual is None and
@@ -346,7 +350,8 @@ import requests
 OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
 FF_BASE_URL      = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"   # current week
 FF_NEXTWEEK_URL  = "https://nfs.faireconomy.media/ff_calendar_nextweek.json"   # next week (second request)
-KV_PAYLOAD_URL   = "https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/payload"  # CF Worker HTML-scraped actuals
+KV_PAYLOAD_URL        = "https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/payload"   # CF Worker FCS-API actuals (v3.1)
+CF_WORKER_TRIGGER_URL = "https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/trigger"  # On-demand FCS poll trigger
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
@@ -1213,33 +1218,47 @@ def main():
     # Step 1b: Parse holidays from the thisweek raw payload only (holidays don't span weeks).
     holidays = fetch_ff_holidays(ff_raw)
 
-    # Step 1c: Inject actuals from CF Worker KV payload (HTML-scraped, near-zero lag).
-    # The CF Worker v3.0 scrapes forexfactory.com/calendar HTML every 2 minutes — actuals
-    # appear there within seconds of release. It stores parsed events in KV at /payload.
-    # GitHub Actions IPs are blocked by FF, but the CF Worker is not — so we read the payload
-    # here and inject actuals into `fresh` events that FF JSON hasn't updated yet.
-    # Matching: currency + title + date (YYYY-MM-DD, derived from "Jun 10" + current year).
-    # Best-effort: any failure (blocked, timeout, no payload) is logged and skipped silently.
+    # Step 1c: On-demand FCS poll + inject actuals from CF Worker KV payload (v3.1).
+    #
+    # CF Worker v3.1 uses FCS API (api-v4.fcsapi.com) as primary source — FCS is a REST
+    # API that accepts programmatic access from any IP. The CF Worker cron fires every 30
+    # minutes (FCS free tier limit). To get fresh actuals faster during release windows,
+    # fetch_ff_calendar.py calls /trigger first (costs 1 FCS credit) to force an on-demand
+    # poll, then reads /payload which the Worker writes to KV immediately after any change.
+    #
+    # Date format from FCS API: "YYYY-MM-DD HH:MM:SS" (UTC) — take the date portion only.
+    # FF JSON fallback in the Worker writes the same YYYY-MM-DD format.
+    # Matching: (currency, dateISO YYYY-MM-DD, title_lower).
+    # Best-effort: any failure (network, key exhausted, no payload) is logged and skipped.
+    #
+    # On-demand /trigger: called unconditionally each run (1 FCS credit). The Worker only
+    # fires repository_dispatch if data actually changed, so extra triggers are harmless.
+    try:
+        trig_resp = requests.get(CF_WORKER_TRIGGER_URL, timeout=8)
+        if trig_resp.status_code == 200:
+            print(f"  KV payload: /trigger fired ({trig_resp.json().get('ts','?')})")
+        else:
+            print(f"  KV payload: /trigger HTTP {trig_resp.status_code} — skipping trigger")
+    except Exception as e_trig:
+        print(f"  KV payload: /trigger failed ({e_trig}) — skipping trigger")
+
+    # Small delay to allow the Worker's async FCS fetch to complete before we read /payload
+    import time as _time
+    _time.sleep(6)
+
     try:
         kv_resp = requests.get(KV_PAYLOAD_URL, timeout=5)
         if kv_resp.status_code == 200 and kv_resp.text.strip() not in ("null", ""):
             kv_events = kv_resp.json()
             if isinstance(kv_events, list) and kv_events:
                 # Build a lookup: (currency, dateISO, title_lower) → actual
-                # KV payload date format: "Jun 10" (ET) — convert to YYYY-MM-DD
-                year = now_utc.year
+                # KV payload date format from FCS API: "YYYY-MM-DD HH:MM:SS" UTC
+                # FF JSON fallback: same YYYY-MM-DD prefix
                 kv_actual_map = {}
                 for kv_ev in kv_events:
-                    raw_date = (kv_ev.get("date") or "").strip()   # "Jun 10"
-                    try:
-                        # Parse "Jun 10" → date object; use current year, handle Dec→Jan
-                        dt = datetime.strptime(f"{raw_date} {year}", "%b %d %Y")
-                        # If parsed month < current month by more than 6 months, it's next year
-                        if (now_utc.month - dt.month) > 6:
-                            dt = datetime.strptime(f"{raw_date} {year + 1}", "%b %d %Y")
-                        date_iso = dt.strftime("%Y-%m-%d")
-                    except ValueError:
-                        date_iso = raw_date   # fallback: use as-is (ISO or unknown)
+                    raw_date = (kv_ev.get("date") or "").strip()
+                    # Extract YYYY-MM-DD from "YYYY-MM-DD HH:MM:SS" or use as-is if already ISO
+                    date_iso = raw_date[:10] if len(raw_date) >= 10 else raw_date
                     actual_val = (kv_ev.get("actual") or "").strip()
                     if not actual_val:
                         continue
@@ -1257,18 +1276,18 @@ def main():
                     k = (ev.get("currency",""), ev.get("dateISO",""), (ev.get("title","")).lower())
                     if k in kv_actual_map:
                         raw_actual = kv_actual_map[k]
-                        # Strip trailing % if the pipeline stores numbers without it
+                        # Strip trailing % if event title doesn't imply % units
                         ev["actual"]   = raw_actual.rstrip("%") if raw_actual.endswith("%") and "%" not in ev.get("title","") else raw_actual
                         ev["released"] = True
                         kv_injected += 1
                 if kv_injected:
-                    print(f"  KV payload: injected {kv_injected} actual(s) from CF Worker HTML scrape")
+                    print(f"  KV payload: injected {kv_injected} actual(s) from CF Worker FCS API")
                 else:
                     print(f"  KV payload: {len(kv_events)} events fetched, 0 new actuals to inject")
             else:
                 print("  KV payload: empty or invalid JSON — skipping")
         elif kv_resp.status_code == 200 and kv_resp.text.strip() == "null":
-            print("  KV payload: not yet populated (Worker not polled since last reset)")
+            print("  KV payload: not yet populated (no FCS data received yet)")
         else:
             print(f"  KV payload: HTTP {kv_resp.status_code} — skipping")
     except Exception as e_kv:
