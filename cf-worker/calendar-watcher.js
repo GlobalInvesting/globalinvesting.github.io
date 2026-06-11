@@ -1,71 +1,78 @@
 /**
- * calendar-watcher.js — Cloudflare Worker v3.0
+ * calendar-watcher.js — Cloudflare Worker v3.1
  *
- * PRIMARY SOURCE MIGRATED: ForexFactory public JSON → ForexFactory HTML calendar
+ * PRIMARY SOURCE: FCS API economy_cal endpoint
+ *   https://api-v4.fcsapi.com/forex/economy_cal?access_key=KEY
  *
- * WHY HTML INSTEAD OF JSON
- *   The nfs.faireconomy.media JSON feed has a significant lag (observed: 10+ hours)
- *   before publishing actuals after an event releases. The FF HTML calendar
- *   (forexfactory.com/calendar) shows actuals within seconds of release.
- *   Cloudflare Worker IPs (CF edge network) are NOT datacenter IPs and consistently
- *   receive the full HTML without a JS challenge — the calendar table is server-rendered
- *   and present in the raw HTML response before any client-side JS runs.
- *   GitHub Actions runners (Azure datacenter IPs) would be blocked, but the Worker
- *   acts as the detection layer and only dispatches to GitHub when data changes.
+ * WHY FCS API INSTEAD OF FF HTML
+ *   ForexFactory HTML returns HTTP 403 to Cloudflare Worker IPs — FF protects its
+ *   HTML with Cloudflare Bot Management (__cf_bm cookie requiring JS execution).
+ *   CF Worker edge IPs are identified and blocked by FF's WAF rules.
+ *   FCS API is a REST API that explicitly supports programmatic access from any IP.
+ *   It returns actual, forecast, previous for G8 med/high events with near-zero lag.
  *
  * ARCHITECTURE
- *   CF Worker polls FF HTML every 2 minutes (was 6 min for JSON due to rate limit;
- *   HTML has no documented rate limit at this cadence — 1 req/2 min per IP).
- *   Parses the calendar table with regex (no DOM parser needed in Workers).
- *   Computes fingerprint of actuals+forecasts for G8 medium+high events.
- *   On change → stores actuals payload in KV → fires repository_dispatch.
- *   GitHub Actions fetch_ff_calendar.py reads the KV payload via /payload endpoint
- *   (Step 1c) to inject actuals without re-fetching FF (avoids the lag entirely).
+ *   CF Worker polls FCS API every 30 minutes (free tier: 500 req/month limit).
+ *   On-demand polls via /trigger endpoint — called by fetch_ff_calendar.py after
+ *   detecting new upcoming events, ensuring fresh actuals when they release.
+ *   Filters to G8 currencies, medium+high importance.
+ *   Computes fingerprint of actuals+forecasts.
+ *   On change: writes event array to KV (/payload) + fires repository_dispatch.
+ *   fetch_ff_calendar.py Step 1c reads /payload and injects actuals into fresh events.
  *
- * END-TO-END LATENCY (v3.0)
- *   ForexFactory publishes actual on HTML
- *   → CF Worker detects on next 2-min poll     (~0–2 min)  ← was 6 min
- *   → KV payload written + repository_dispatch (~1 sec)
- *   → GitHub runner starts                     (~15–30 sec)
- *   → fetch_ff_calendar.py reads KV /payload   (~1 sec)    ← was 45 sec FF fetch
- *   → git push + Pages rebuild                 (~30 sec)
- *   TOTAL: ~1–3 minutes  (was 2–8 min; actual lag eliminated)
+ * FCS API free plan: 500 credits/month, 1 credit/request.
+ *   At every-30-min cron: 48 req/day = ~1,440 req/month (exceeds 500 free tier).
+ *   NOTE: Rely on /trigger (on-demand from GH Actions) for release-window accuracy;
+ *   reduce cron to every-60-min if credits run low.
  *
- * REQUIRED SECRETS (unchanged):
- *   GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO
+ * CRON: every 30 minutes.
+ *   wrangler.toml: crons = ["0,30 * * * *"]
+ *
+ * REQUIRED SECRETS:
+ *   GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO  — unchanged
+ *   FCS_API_KEY                             — NEW: add via `npx wrangler secret put FCS_API_KEY`
  *
  * REQUIRED KV NAMESPACE:
- *   CALENDAR_KV  — stores fingerprint (calendar:fingerprint:v3) and
- *                  actuals payload (calendar:payload:v3)
- *
- * CRON: every 2 minutes (star-slash-2 * * * *)
- *   wrangler.toml: crons = ["* /2 * * * *"]
+ *   CALENDAR_KV  — calendar:fingerprint:v3, calendar:payload:v3
  *
  * ENDPOINTS:
- *   /trigger     — manual poll trigger
+ *   /trigger     — manual/on-demand poll (called by fetch_ff_calendar.py)
  *   /fingerprint — view current fingerprint
  *   /payload     — read the latest parsed events (JSON array) — used by fetch_ff_calendar.py
  *   /reset       — clear fingerprint + payload
  *
+ * FCS API economy_cal response fields (per event):
+ *   id, event, title, country (ISO-2), currency, importance (0=low,1=med,2=high),
+ *   period, actual, forecast, previous, source, date ("YYYY-MM-DD HH:MM:SS" UTC)
+ *
+ * v3.1 changes (2026-06-10):
+ * - Primary source: FCS API (accessible from CF edge IPs, not blocked by WAF)
+ * - Removed FF HTML scraping (CF edge IPs receive HTTP 403 from FF WAF — confirmed)
+ * - FF JSON retained as in-process fallback (best-effort, no extra request cost)
+ * - Cron: every 30 min (FCS free tier: 500 req/month)
+ * - /trigger endpoint: called by fetch_ff_calendar.py Step 1c for on-demand FCS poll
+ * - FCS_API_KEY secret required (add separately: npx wrangler secret put FCS_API_KEY)
+ * - KV payload date format: YYYY-MM-DD HH:MM:SS UTC (Step 1c updated accordingly)
+ *
  * v3.0 changes (2026-06-10):
- * - Primary source: FF HTML calendar (forexfactory.com/calendar) instead of nfs.faireconomy.media JSON
- * - HTML parser: regex-based, handles new-day/no-grid rows correctly
- * - KV payload: full event array written to KV so fetch_ff_calendar.py can read without re-fetching FF
- * - Cron: 2 min (was 6 min — HTML has no per-IP rate limit at this cadence)
- * - Fallback: JSON feed attempted if HTML parse fails (CF block, structure change)
- * - /payload endpoint added for GitHub Actions Step 1c integration
+ * - Primary source migrated from FF JSON to FF HTML (later found to be blocked — see v3.1)
+ * - Added /payload KV endpoint for Step 1c injection
+ * - Cron: star-slash-2 (reverted to star-slash-30 in v3.1 due to FCS rate limit)
  */
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const G8_CURRENCIES = new Set(["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]);
+const G8 = new Set(["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]);
 
-const FF_HTML_URL    = "https://www.forexfactory.com/calendar";
+// FCS API economy calendar — G8 country filter
+const FCS_URL = "https://api-v4.fcsapi.com/forex/economy_cal";
+
+// FF JSON fallback (no IP block from CF edge, but has lag — used only if FCS fails)
 const FF_JSON_URL    = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
 const FF_JSON_NW_URL = "https://nfs.faireconomy.media/ff_calendar_nextweek.json";
 
 const KV_FINGERPRINT = "calendar:fingerprint:v3";
-const KV_PAYLOAD     = "calendar:payload:v3";   // JSON array of parsed events for GH Actions
+const KV_PAYLOAD     = "calendar:payload:v3";
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 
@@ -106,10 +113,10 @@ export default {
 
     return new Response(JSON.stringify({
       worker:    "calendar-watcher",
-      version:   "3.0",
-      source:    "ForexFactory HTML (forexfactory.com/calendar)",
+      version:   "3.1",
+      source:    "FCS API (api-v4.fcsapi.com/forex/economy_cal)",
       fallback:  "ForexFactory JSON (nfs.faireconomy.media)",
-      schedule:  "every 2 minutes",
+      schedule:  "every 30 minutes (FCS free tier limit)",
       endpoints: ["/trigger", "/fingerprint", "/payload", "/reset"],
       ts:        new Date().toISOString(),
     }), { headers: { "Content-Type": "application/json" } });
@@ -121,186 +128,128 @@ export default {
 async function runCalendarWatch(env) {
   const now   = new Date();
   const label = `[${now.toISOString().slice(0, 16)}Z]`;
-  console.log(`${label} calendar-watcher v3.0: starting poll`);
+  console.log(`${label} calendar-watcher v3.1: starting poll`);
 
-  // Step 1: Fetch and parse FF HTML (primary) — fall back to JSON if blocked
   let events = [];
   let source  = "unknown";
 
-  try {
-    events = await fetchAndParseHTML();
-    source  = "html";
-    console.log(`${label} HTML parse: ${events.length} G8 med/high events`);
-  } catch (htmlErr) {
-    console.warn(`${label} HTML fetch failed (${htmlErr.message}) — trying JSON fallback`);
+  // Step 1: Try FCS API (primary — REST API, not blocked from CF edge IPs)
+  if (env.FCS_API_KEY) {
     try {
-      events = await fetchJSON();
-      source  = "json";
-      console.log(`${label} JSON fallback: ${events.length} G8 med/high events`);
-    } catch (jsonErr) {
-      console.error(`${label} Both sources failed — JSON: ${jsonErr.message}`);
+      events = await fetchFCSAPI(env.FCS_API_KEY);
+      source  = "fcs";
+      console.log(`${label} FCS API: ${events.length} G8 med/high events`);
+    } catch (err) {
+      console.warn(`${label} FCS API failed (${err.message}) — trying FF JSON fallback`);
+    }
+  } else {
+    console.warn(`${label} FCS_API_KEY not set — skipping FCS, trying FF JSON fallback`);
+  }
+
+  // Step 2: FF JSON fallback if FCS failed or key missing
+  if (!events.length) {
+    try {
+      events = await fetchFFJSON();
+      source  = "ff-json";
+      console.log(`${label} FF JSON fallback: ${events.length} G8 med/high events`);
+    } catch (err) {
+      console.error(`${label} FF JSON also failed: ${err.message}`);
       return;
     }
   }
 
   if (!events.length) {
-    console.log(`${label} No events parsed — skipping.`);
+    console.log(`${label} No events — skipping.`);
     return;
   }
 
-  // Step 2: Fingerprint (actuals + forecasts only — previous excluded to avoid spurious fires)
+  // Step 3: Fingerprint
   const newFP  = buildFingerprint(events);
   const prevFP = (await env.CALENDAR_KV.get(KV_FINGERPRINT)) ?? "";
 
   if (newFP === prevFP) {
-    console.log(`${label} No change detected.`);
+    console.log(`${label} No change detected [source: ${source}].`);
     return;
   }
 
   const diff = describeDiff(prevFP, newFP);
   console.log(`${label} CHANGE: ${diff} [source: ${source}]`);
 
-  // Step 3: Write new fingerprint + full payload to KV
+  // Step 4: Write KV
   await env.CALENDAR_KV.put(KV_FINGERPRINT, newFP,               { expirationTtl: 60 * 60 * 24 * 7 });
   await env.CALENDAR_KV.put(KV_PAYLOAD, JSON.stringify(events),  { expirationTtl: 60 * 60 * 24 * 7 });
 
-  // Step 4: Fire repository_dispatch
+  // Step 5: Fire repository_dispatch
   try {
     await triggerGitHubWorkflow(env, diff, source);
     console.log(`${label} repository_dispatch sent.`);
   } catch (err) {
     console.error(`${label} repository_dispatch failed: ${err.message}`);
-    // Roll back fingerprint so next poll retries
+    // Roll back fingerprint so the next poll retries the dispatch
     await env.CALENDAR_KV.put(KV_FINGERPRINT, prevFP, { expirationTtl: 60 * 60 * 24 * 7 });
   }
 }
 
-// ── FF HTML parser ────────────────────────────────────────────────────────────
+// ── FCS API fetch ─────────────────────────────────────────────────────────────
 
-async function fetchAndParseHTML() {
-  const resp = await fetch(FF_HTML_URL, {
+async function fetchFCSAPI(apiKey) {
+  // G8 country codes for FCS API country filter (ISO-2)
+  const g8Countries = "US,EU,GB,JP,AU,CA,CH,NZ";
+  const url = `${FCS_URL}?country=${g8Countries}&access_key=${apiKey}`;
+
+  const resp = await fetch(url, {
     headers: {
-      "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "Accept-Language": "en-US,en;q=0.9",
-      "Referer":         "https://www.forexfactory.com/",
-      "Cache-Control":   "no-cache",
+      "Accept":     "application/json",
+      "User-Agent": "globalinvesting-calendar-watcher/3.1",
     },
-    signal: AbortSignal.timeout(15000),
+    signal: AbortSignal.timeout(12000),
   });
 
   if (!resp.ok) {
-    throw new Error(`FF HTML HTTP ${resp.status}`);
+    const body = await resp.text().catch(() => "");
+    throw new Error(`FCS API HTTP ${resp.status}: ${body.slice(0, 80)}`);
   }
 
-  const html = await resp.text();
+  const data = await resp.json();
 
-  // Detect Cloudflare challenge page (no calendar data)
-  if (html.includes("Just a moment") || html.includes("cf-browser-verification") ||
-      html.includes("Checking your browser") || !html.includes("calendar__table")) {
-    throw new Error("CF challenge page returned — no calendar data");
+  // FCS response: { status: true, response: [...], info: {...} }
+  if (!data.status || !Array.isArray(data.response)) {
+    throw new Error(`FCS API unexpected response: ${JSON.stringify(data).slice(0, 120)}`);
   }
 
-  return parseFFHTML(html);
-}
+  const events = [];
+  for (const ev of data.response) {
+    const currency = (ev.currency || "").trim().toUpperCase();
+    if (!G8.has(currency)) continue;
 
-/**
- * Parse ForexFactory HTML calendar table.
- *
- * Row types:
- *   calendar__row--new-day : contains the date cell (rowspan); first event of a day
- *   calendar__row--no-grid : shares time with preceding row (time cell is empty: <!-->)
- *   calendar__row--day-breaker: visual separator, no data — skip
- *
- * Returns: Array of { date, timeET, currency, impact, title, actual, forecast, previous }
- *   date   — "Jun 10" (no year; inferred by fetch_ff_calendar.py from context)
- *   timeET — "9:30am" ET (ForexFactory native timezone display)
- */
-function parseFFHTML(html) {
-  const rowRe = /(<tr[^>]+class="[^"]*calendar__row[^"]*"[^>]*>)([\s\S]*?)<\/tr>/g;
-
-  const events   = [];
-  let currentDate = null;
-  let lastTime    = null;
-  let match;
-
-  while ((match = rowRe.exec(html)) !== null) {
-    const trTag  = match[1];
-    const trBody = match[2];
-
-    if (trTag.includes("day-breaker")) continue;
-
-    // Track date from new-day rows
-    const dateM = trBody.match(/calendar__date[\s\S]*?<span[^>]*>(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+<span>([\s\S]*?)<\/span>/);
-    if (dateM) currentDate = dateM[1].trim();  // e.g. "Jun 10"
-
-    // Skip rows without event-id
-    if (!trTag.includes("data-event-id")) continue;
-
-    // Currency
-    const curM = trBody.match(/translate="no"[^>]*>([\s\S]*?)<\/span>/);
-    if (!curM) continue;
-    const currency = curM[1].trim();
-    if (!G8_CURRENCIES.has(currency)) continue;
-
-    // Impact
-    const impM   = trBody.match(/title="(High|Medium|Low) Impact/);
-    const impact = impM ? impM[1].toLowerCase() : "low";
-    if (impact === "low") continue;
-
-    // Title
-    const titleM = trBody.match(/calendar__event-title">([\s\S]*?)<\/span>/);
-    if (!titleM) continue;
-    const title = titleM[1].trim();
-
-    // Time — no-grid rows have empty time cell (<!-->); inherit lastTime
-    const timeCellM = trBody.match(/calendar__time[^>]*>([\s\S]*?)<\/td>/);
-    if (timeCellM) {
-      const timeSpanM = timeCellM[1].match(/<span>([^<]+)<\/span>/);
-      if (timeSpanM) {
-        const t = timeSpanM[1].trim();
-        if (t) lastTime = t;
-      }
-    }
-    const timeET = lastTime || "";
-
-    // Actual, forecast, previous — strip all HTML tags
-    const actualCellM   = trBody.match(/calendar__actual[^>]*>([\s\S]*?)<\/td>/);
-    const forecastCellM = trBody.match(/calendar__forecast[^>]*>([\s\S]*?)<\/td>/);
-    const prevCellM     = trBody.match(/calendar__previous[^>]*>([\s\S]*?)<\/td>/);
-
-    const actual   = actualCellM   ? stripTags(actualCellM[1])   : "";
-    const forecast = forecastCellM ? stripTags(forecastCellM[1]) : "";
-    const previous = prevCellM     ? stripTags(prevCellM[1])     : "";
+    // importance: 0=low, 1=medium, 2=high — skip low
+    const imp = Number(ev.importance ?? -1);
+    if (imp < 1) continue;
 
     events.push({
-      date:     currentDate || "",
-      timeET,
+      date:     (ev.date || "").trim(),    // "YYYY-MM-DD HH:MM:SS" UTC
+      timeET:   "",                         // FCS provides UTC dates, not ET times
       currency,
-      impact,
-      title,
-      actual:   actual   || null,
-      forecast: forecast || null,
-      previous: previous || null,
+      impact:   imp === 2 ? "high" : "medium",
+      title:    (ev.title || "").trim(),
+      actual:   cleanVal(ev.actual),
+      forecast: cleanVal(ev.forecast),
+      previous: cleanVal(ev.previous),
     });
   }
 
-  if (events.length === 0) {
-    throw new Error("HTML parsed but 0 G8 med/high events found — page structure may have changed");
+  if (!events.length) {
+    throw new Error("FCS API returned 0 G8 med/high events (key invalid or no events this week)");
   }
 
   return events;
 }
 
-function stripTags(html) {
-  return html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
-}
-
 // ── FF JSON fallback ──────────────────────────────────────────────────────────
 
-async function fetchJSON() {
+async function fetchFFJSON() {
   const HEADERS = {
-    "User-Agent": "globalinvesting-calendar-watcher/3.0 (https://globalinvesting.github.io)",
+    "User-Agent": "globalinvesting-calendar-watcher/3.1 (https://globalinvesting.github.io)",
     "Accept":     "application/json",
   };
 
@@ -308,12 +257,12 @@ async function fetchJSON() {
   const ct   = resp.headers.get("content-type") || "";
   if (!resp.ok || !ct.includes("application/json")) {
     const body = await resp.text().catch(() => "");
-    throw new Error(`JSON HTTP ${resp.status}: ${body.slice(0, 60)}`);
+    throw new Error(`FF JSON HTTP ${resp.status}: ${body.slice(0, 60)}`);
   }
   const raw = await resp.json();
-  if (!Array.isArray(raw)) throw new Error("JSON response is not an array");
+  if (!Array.isArray(raw)) throw new Error("FF JSON not an array");
 
-  // Best-effort nextweek fetch
+  // Best-effort nextweek
   let rawNw = [];
   try {
     const r2 = await fetch(FF_JSON_NW_URL, { headers: HEADERS, signal: AbortSignal.timeout(8000) });
@@ -327,7 +276,7 @@ async function fetchJSON() {
   const events = [];
   for (const ev of [...raw, ...rawNw]) {
     const currency = (ev.country || "").trim().toUpperCase();
-    if (!G8_CURRENCIES.has(currency)) continue;
+    if (!G8.has(currency)) continue;
     const impact = (ev.impact || "").trim().toLowerCase();
     if (impact !== "high" && impact !== "medium") continue;
     events.push({
@@ -357,10 +306,8 @@ function describeDiff(prevFP, newFP) {
   const prev  = new Set(prevFP ? prevFP.split("\n") : []);
   const next  = new Set(newFP.split("\n"));
   const added = [...next].filter(l => !prev.has(l));
-
   const newActuals   = added.filter(l => l.split("|")[3] !== "");
   const newForecasts = added.filter(l => l.split("|")[3] === "" && l.split("|")[4] !== "");
-
   const parts = [];
   if (newActuals.length) {
     const samples = newActuals.slice(0, 2)
@@ -387,7 +334,7 @@ async function triggerGitHubWorkflow(env, description, source) {
         "Authorization":        `Bearer ${GITHUB_PAT}`,
         "Accept":               "application/vnd.github+json",
         "Content-Type":         "application/json",
-        "User-Agent":           "globalinvesting-calendar-watcher/3.0",
+        "User-Agent":           "globalinvesting-calendar-watcher/3.1",
         "X-GitHub-Api-Version": "2022-11-28",
       },
       body: JSON.stringify({
