@@ -1,5 +1,5 @@
 /**
- * calendar-watcher.js — Cloudflare Worker v5.0
+ * calendar-watcher.js — Cloudflare Worker v5.1
  *
  * PRIMARY SOURCE: Myfxbook RSS feed
  *   https://www.myfxbook.com/rss/forex-economic-calendar-events
@@ -19,6 +19,12 @@
  *   /reset       — clear KV state
  *
  * REQUIRED SECRETS (unchanged): GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO
+ *
+ * v5.1 changes (2026-06-11):
+ * - SECURITY: /payload endpoint now requires Authorization: Bearer <token> header.
+ *   Token validated against env.PAYLOAD_TOKEN secret. Returns 401 if missing or
+ *   incorrect. Allows GitHub Actions to read the KV payload without exposing it
+ *   publicly. All other endpoints (/trigger, /fingerprint, /reset) unchanged.
  *
  * v5.0 changes (2026-06-11):
  * - PRIMARY SOURCE REPLACED: Myfxbook HTML → Myfxbook RSS feed.
@@ -85,8 +91,17 @@ export default {
     }
 
     if (url.pathname === "/payload") {
+      // Require Authorization: Bearer <PAYLOAD_TOKEN>
+      const authHeader = request.headers.get("Authorization") || "";
+      const expected   = `Bearer ${env.PAYLOAD_TOKEN || ""}`;
+      if (!env.PAYLOAD_TOKEN || authHeader !== expected) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
       const payload = await env.CALENDAR_KV.get(KV_PAYLOAD);
-      return new Response(payload || "null", { headers: { "Content-Type": "application/json" } });
+      return new Response(payload || "[]", { headers: { "Content-Type": "application/json" } });
     }
 
     if (url.pathname === "/reset") {
@@ -99,7 +114,7 @@ export default {
 
     return new Response(JSON.stringify({
       worker:    "calendar-watcher",
-      version:   "5.0",
+      version:   "5.1",
       source:    "Myfxbook RSS (myfxbook.com/rss/forex-economic-calendar-events)",
       schedule:  "every 30 minutes",
       endpoints: ["/trigger", "/fingerprint", "/payload", "/reset"],
@@ -113,7 +128,7 @@ export default {
 async function runCalendarWatch(env) {
   const now   = new Date();
   const label = `[${now.toISOString().slice(0, 16)}Z]`;
-  console.log(`${label} calendar-watcher v5.0: starting poll`);
+  console.log(`${label} calendar-watcher v5.1: starting poll`);
 
   let events = [];
 
