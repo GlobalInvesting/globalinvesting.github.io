@@ -1,0 +1,53 @@
+name = "globalinvesting-calendar-watcher"
+main = "calendar-watcher.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ── Cron triggers ─────────────────────────────────────────────────────────────
+# Every 30 minutes — FCS API free tier: 500 req/month limit.
+# At 48 req/day that is ~1,440 req/month, which exceeds the 500 limit.
+# Practical recommendation: rely on /trigger (on-demand from fetch_ff_calendar.py)
+# for release-window accuracy; cron serves as a guaranteed background refresh.
+# If usage becomes an issue, set to "0 * * * *" (once per hour, 720 req/month).
+# CF Workers minimum cron interval: 1 minute.
+[triggers]
+crons = ["*/30 * * * *"]
+
+# ── KV Namespace ──────────────────────────────────────────────────────────────
+# Create this namespace first:
+#   npx wrangler kv namespace create CALENDAR_KV
+# Then paste the returned id below.
+[[kv_namespaces]]
+binding = "CALENDAR_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# ── Environment variables (non-secret) ───────────────────────────────────────
+# Secrets are set separately via: npx wrangler secret put SECRET_NAME
+# Do NOT put secrets here — this file is committed to the repo.
+
+# ── Deployment notes ──────────────────────────────────────────────────────────
+# v3.1: FCS API replaces FF HTML scraping (FF returns 403 to CF Worker IPs).
+#
+# Required secrets:
+#   npx wrangler secret put GITHUB_PAT        (scope: public_repo)
+#   npx wrangler secret put GITHUB_OWNER      (value: globalinvesting)
+#   npx wrangler secret put GITHUB_REPO       (value: globalinvesting.github.io)
+#   npx wrangler secret put FCS_API_KEY       (NEW in v3.1 — FCS API access key)
+#
+# After updating wrangler.toml with the real KV id, deploy:
+#   cd C:\globalinvesting-fx\calendar-watcher && npx wrangler deploy
+#
+# Add the FCS API key secret (do this AFTER deploy):
+#   npx wrangler secret put FCS_API_KEY
+#
+# Reset the fingerprint after deployment so the first poll runs fresh:
+#   curl https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/reset
+#
+# Trigger an immediate on-demand poll:
+#   curl https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/trigger
+#
+# Verify in real time:
+#   npx wrangler tail globalinvesting-calendar-watcher
+#
+# Verify payload is populated (wait ~5 sec after /trigger):
+#   curl https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/payload
