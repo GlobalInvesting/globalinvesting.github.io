@@ -162,6 +162,8 @@ jobs:
 
       - name: Fetch economic calendar (ForexFactory)
         if: steps.gate.outputs.run == 'true'
+        env:
+          CF_PAYLOAD_TOKEN: ${{ secrets.CF_PAYLOAD_TOKEN }}
         run: python scripts/fetch_ff_calendar.py
 
       - name: Display summary
