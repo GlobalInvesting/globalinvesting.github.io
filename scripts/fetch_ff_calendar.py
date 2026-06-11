@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.27
+fetch_ff_calendar.py — v3.28
+v3.28 changes (2026-06-11):
+- PRIMARY SOURCE REVERTED TO RSS: Myfxbook HTML confirmed blocked from GH Actions
+  (TCP hang — same firewall as CF Worker edge IPs). RSS is the only source accessible
+  from GH Actions runners — confirmed working in v3.25 production (127KB instant).
+- main() Step 1: GET MFB_RSS_URL with browser User-Agent, parse with fetch_myfxbook_rss().
+  Same failsafe as v3.25: exit(0) on HTTP error, empty parse, or exception.
+- Layer 2 (Worker KV inject) unchanged — Step 1b still reads /payload to enrich actuals.
+- carry-forward (Step 2a) unchanged — prev_events actuals preserved across RSS expiry.
+- MFB_HTML_URL constant kept for reference but no longer used in main().
+- Version bump in main() print statement: v3.27 → v3.28.
 v3.27 changes (2026-06-11):
 - LAYER 2 ADDED: Worker KV payload as actual enrichment source.
   After Step 1 (Myfxbook HTML) and Step 2 merge, Step 1b fetches the CF Worker
@@ -1400,22 +1410,20 @@ def fetch_worker_payload() -> list[dict]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.27")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.28")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
 
-    # Step 1: Fetch Myfxbook HTML calendar page.
+    # Step 1: Fetch Myfxbook RSS feed.
     #
-    # URL: https://www.myfxbook.com/forex-economic-calendar
-    # Accessible from GitHub Actions (confirmed in v3.23: no WAF, full HTML returned).
-    # Covers current week + ~1 week ahead. Actuals are permanently retained in HTML
-    # attributes (data-actual OID, span.actualCell) once an event releases — no rolling
-    # expiry unlike the RSS feed which only covers ~24h and drops actuals after the fact.
-    # fetch_myfxbook_calendar() parses the full page including holidays.
+    # URL: https://www.myfxbook.com/rss/forex-economic-calendar-events
+    # Accessible from GitHub Actions (confirmed: no WAF, ~127KB instant response).
+    # Covers rolling ~24h window. Actuals present during the ~30min active window
+    # after release; Worker KV (Step 1b) bridges the gap for events already expired.
     fresh    = []
     holidays = []
-    source   = "Myfxbook"
+    source   = "Myfxbook RSS"
 
     MFB_HEADERS = {
         "User-Agent": (
@@ -1423,22 +1431,22 @@ def main():
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/124.0.0.0 Safari/537.36"
         ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept": "application/rss+xml,application/xml,text/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
     }
-    print(f"  Myfxbook HTML: fetching {MFB_HTML_URL} ...")
+    print(f"  Myfxbook RSS: fetching {MFB_RSS_URL} ...")
     try:
-        r = requests.get(MFB_HTML_URL, headers=MFB_HEADERS, timeout=FETCH_TIMEOUT)
+        r = requests.get(MFB_RSS_URL, headers=MFB_HEADERS, timeout=FETCH_TIMEOUT)
         if r.status_code != 200:
-            print(f"  ERROR: Myfxbook HTML HTTP {r.status_code} — preserving previous file.")
+            print(f"  ERROR: Myfxbook RSS HTTP {r.status_code} — preserving previous file.")
             sys.exit(0)
-        if "economicCalendarRow" not in r.text:
-            print("  ERROR: Myfxbook HTML missing calendar rows — unexpected response or WAF block.")
+        if "<item>" not in r.text:
+            print("  ERROR: Myfxbook RSS missing items — unexpected response or feed empty.")
             sys.exit(0)
-        print(f"  Myfxbook HTML: {len(r.text):,} bytes received")
-        fresh, holidays = fetch_myfxbook_calendar(r.text)
+        print(f"  Myfxbook RSS: {len(r.text):,} bytes received")
+        fresh, holidays = fetch_myfxbook_rss(r.text)
     except Exception as e:
-        print(f"  ERROR: Myfxbook HTML request failed — {e}")
+        print(f"  ERROR: Myfxbook RSS request failed — {e}")
         sys.exit(0)
 
     # Step 1a: Validate
