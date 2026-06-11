@@ -1,6 +1,36 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.22
+fetch_ff_calendar.py — v3.23
+v3.23 changes (2026-06-10):
+- PRIMARY SOURCE REPLACED: ForexFactory JSON → Myfxbook HTML calendar.
+  FF JSON has a 10h+ actual lag and limited forecast coverage. Myfxbook HTML
+  (myfxbook.com/forex-economic-calendar) is accessible from GitHub Actions
+  (confirmed: 3300 DOM nodes returned with User-Agent header, no WAF block).
+  Data is embedded in HTML attributes — no JS execution required:
+    previous-value="..."  on <td data-previous="OID">
+    concensus="..."       on <td data-concensus="OID" concensus="VALUE">
+    <span class="actualCell"><span>VALUE</span></span>
+  Myfxbook covers ~8 days ahead (current + next week visible on one page) and
+  retains today's actuals post-release. Actual injection lag: unknown but fast
+  (HTML calendar updates within minutes on the myfxbook.com site).
+- NEW: fetch_myfxbook_calendar() replaces fetch_forexfactory_json(). Parses
+  the HTML table using only stdlib `re`. Country slug in URL maps to G8 currency.
+  Impact extracted from impact_high/impact_medium/impact_low CSS classes.
+  `previous-value` attribute used directly (avoids unit/symbol in display text).
+  `concensus` attribute (note: myfxbook typo, preserved) for forecast value.
+  Actual: innermost <span> inside class="actualCell", stripped of time-left
+  strings ("Xh Ymin") — those indicate event not yet released.
+- REMOVED: FF JSON fetch (Steps 1 and nextweek), CF Worker /trigger call,
+  FCS API path. KV_PAYLOAD_URL and CF_WORKER_TRIGGER_URL constants removed.
+  FF_BASE_URL, FF_NEXTWEEK_URL constants removed.
+- RENAMED: source field in ff_calendar.json now "Myfxbook" instead of
+  "ForexFactory". Print statements updated accordingly.
+- HOLIDAYS: fetch_ff_holidays() now parses Myfxbook HTML for holiday rows
+  (impact_no class). Falls back gracefully if no holidays found.
+- Step 1b (holidays): sourced from Myfxbook HTML same request, no second fetch.
+- Step 1c (CF Worker KV inject): REMOVED — FCS API free tier exhausted and
+  has same actual lag. Myfxbook HTML actuals are the direct replacement.
+- Version bump in main() print statement: v3.22 → v3.23.
 v3.22 changes (2026-06-10):
 - UPDATE: CF Worker v3.1 source switch: FCS API replaces FF HTML scraping.
   FF HTML returns HTTP 403 to CF Worker edge IPs (blocked by FF's Cloudflare WAF).
@@ -348,10 +378,7 @@ import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
 OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
-FF_BASE_URL      = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"   # current week
-FF_NEXTWEEK_URL  = "https://nfs.faireconomy.media/ff_calendar_nextweek.json"   # next week (second request)
-KV_PAYLOAD_URL        = "https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/payload"   # CF Worker FCS-API actuals (v3.1)
-CF_WORKER_TRIGGER_URL = "https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/trigger"  # On-demand FCS poll trigger
+MFB_URL          = "https://www.myfxbook.com/forex-economic-calendar"          # primary source
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
@@ -377,98 +404,169 @@ FF_COUNTRY_NAME_TO_CCY = {
 }
 HEADERS = {"User-Agent": "globalinvesting-bot/3.0 (https://globalinvesting.github.io)"}
 
-# ── ForexFactory holiday fetch ────────────────────────────────────────────────
+# ── Myfxbook HTML calendar fetch ────────────────────────────────────────────────
 
-def fetch_ff_holidays(raw: list) -> list[dict]:
+def fetch_myfxbook_calendar(html: str) -> tuple[list[dict], list[dict]]:
     """
-    Parse bank/market holidays from the pre-fetched ForexFactory JSON list.
-    raw — the parsed JSON array from nfs.faireconomy.media/ff_calendar_thisweek.json,
-    already fetched in main() and shared with fetch_forexfactory_json().
+    Parse G8 economic events AND bank holidays from the Myfxbook HTML calendar page.
 
-    FF marks holidays with impact == "Holiday" (case-insensitive). The `country`
-    field in the FF public JSON is the 3-letter G8 currency code (e.g. "USD", "EUR",
-    "GBP", "CHF") — NOT the ISO2 country code. Dedup key is (currency, dateISO, title)
-    so that distinct holidays for the same currency on the same day are preserved
-    (e.g. "French Bank Holiday" and "German Bank Holiday" both under EUR).
+    Data is embedded in HTML attributes — no JS execution required:
+      data-calendardatetd="YYYY-MM-DD HH:MM:SS.0"  (UTC — myfxbook stores in UTC)
+      importance="1|2|3"                             (1=Low, 2=Medium, 3=High)
+      currency 3-letter code in a plain <td>
+      <a href="https://www.myfxbook.com/forex-economic-calendar/{country}/{slug}" class="calendar-event-link" ...>
+      previous-value="..."
+      concensus="VALUE" on <td data-concensus="OID" concensus="VALUE">
+      <span class="actualCell"><span>VALUE</span> or countdown text</span>
 
-    Returns [] on any parse error — holiday data is supplementary and
-    must never block the main calendar write.
+    Returns (events, holidays) where:
+      events  — list of normalised ff_calendar.json event dicts (medium + high, G8)
+      holidays — list of holiday dicts {title, currency, dateISO}
     """
-    print("  Holidays: parsing from ForexFactory JSON ...")
+    import re as _re
 
-    if not isinstance(raw, list):
-        print("  Holidays: unexpected response format — skipping.")
-        return []
+    G8_CCY = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"}
 
-    # G8 currency codes — FF `country` field is the 3-letter currency code directly
-    G8_CURRENCIES = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"}
+    # Country slug → currency code for G8 countries + EUR-area members
+    SLUG_TO_CCY: dict[str, str] = {
+        "united-states": "USD", "euro-area": "EUR", "germany": "EUR",
+        "france": "EUR", "italy": "EUR", "spain": "EUR", "netherlands": "EUR",
+        "belgium": "EUR", "ireland": "EUR", "portugal": "EUR", "finland": "EUR",
+        "austria": "EUR", "greece": "EUR", "european-union": "EUR",
+        "united-kingdom": "GBP", "japan": "JPY", "canada": "CAD",
+        "australia": "AUD", "new-zealand": "NZD", "switzerland": "CHF",
+    }
 
+    # Build lookup dicts by OID from the raw HTML (full page)
+    # previous-value
+    prev_map: dict[str, str] = dict(
+        _re.findall(r'data-previous="(\d+)"[^>]*previous-value="([^"]*)"', html)
+    )
+    # forecast/consensus — pattern: data-concensus="OID" concensus="VALUE" consistconcensus
+    cons_map: dict[str, str] = {}
+    for oid, val in _re.findall(
+        r'<td[^>]*data-concensus="(\d+)" concensus="([^"]*)" consistconcensus', html
+    ):
+        cons_map[oid] = val
+
+    # actual — innermost <span> inside actualCell; exclude countdown strings (contain "min" / "h ")
+    actual_map: dict[str, str] = {}
+    for m in _re.finditer(
+        r'data-actual="(\d+)".*?class="actualCell">(.*?)</span>\s*</span>',
+        html, _re.DOTALL
+    ):
+        oid = m.group(1)
+        inner = m.group(2)
+        spans = _re.findall(r'<span[^>]*>\s*([^<]+?)\s*</span>', inner)
+        raw_val = (spans[-1].strip() if spans else _re.sub(r'<[^>]+>', '', inner).strip())
+        # Skip countdown strings — event not yet released
+        if raw_val and "min" not in raw_val and "h " not in raw_val and raw_val not in ("", "-"):
+            actual_map[oid] = raw_val
+
+    # Split into <tr> blocks
+    tbody_m = _re.search(r'<tbody>(.*?)</tbody>', html, _re.DOTALL)
+    if not tbody_m:
+        print("  Myfxbook: <tbody> not found in HTML — source may have changed.")
+        return [], []
+    tbody = tbody_m.group(1)
+    all_trs = _re.findall(r'<tr[^>]*>(.*?)</tr>', tbody, _re.DOTALL)
+
+    events: list[dict] = []
     holidays: list[dict] = []
-    seen: set[tuple] = set()
+    skipped_ccy = skipped_impact = 0
 
-    for ev in raw:
-        # FF signals holidays via the "impact" field (value: "Holiday")
-        impact = (ev.get("impact") or "").strip().lower()
-        event_type = (ev.get("type") or "").strip().lower()
-        title = (ev.get("title") or ev.get("name") or "").strip()
-
-        is_holiday = (
-            impact == "holiday"
-            or event_type == "holiday"
-            or "holiday" in title.lower()
-        )
-        if not is_holiday:
+    for tr in all_trs:
+        oid_m = _re.search(r'id="itemOid" value="(\d+)"', tr)
+        if not oid_m:
             continue
+        oid = oid_m.group(1)
 
-        # FF `country` field is the 3-letter currency code (USD, EUR, GBP, etc.)
-        country_raw = (ev.get("country") or "").strip().upper()
-        if country_raw in G8_CURRENCIES:
-            currency = country_raw
+        dt_m = _re.search(r'data-calendardatetd="([^"]+)"', tr)
+        if not dt_m:
+            continue
+        dt_raw = dt_m.group(1)          # "2026-06-10 12:30:00.0" UTC
+        date_iso = dt_raw[:10]
+        time_utc = dt_raw[11:16]        # "12:30"
+
+        # Currency: standalone <td> with exactly 3 uppercase letters
+        cur_m = _re.search(r'<td[^>]*calendarToggleCell[^>]*>\s*([A-Z]{3})\s*</td>', tr)
+        currency = cur_m.group(1).strip() if cur_m else ""
+
+        # Impact from importance attribute (1=Low, 2=Medium, 3=High)
+        imp_m = _re.search(r'importance="(\d)"', tr)
+        imp_num = int(imp_m.group(1)) if imp_m else 0
+        if imp_num == 3:
+            impact = "high"
+        elif imp_num == 2:
+            impact = "medium"
         else:
-            # Fallback: try ISO2 → currency map (in case FF changes format)
-            currency = G8.get(country_raw)
-            if not currency:
-                # Last resort: name-based lookup
-                country_name = country_raw.lower()
-                for cn, ccy in FF_COUNTRY_NAME_TO_CCY.items():
-                    if cn in country_name:
-                        currency = ccy
-                        break
-        if not currency:
-            continue  # not a G8 currency
+            impact = "low"
 
-        # Parse date — FF public JSON uses "YYYY-MM-DDTHH:MM:SS±HH:MM"
-        date_raw = (ev.get("date") or ev.get("dateISO") or "").strip()
-        if not date_raw:
-            continue
-        try:
-            if "T" in date_raw:
-                dt = datetime.fromisoformat(date_raw.replace("Z", "+00:00"))
-                date_iso = dt.astimezone(timezone.utc).strftime("%Y-%m-%d")
-            else:
-                date_iso = date_raw[:10]
-            datetime.strptime(date_iso, "%Y-%m-%d")  # validate
-        except Exception:
+        # Event name from calendar-event-link anchor
+        # href attribute comes before class in myfxbook HTML.
+        # href may be absolute (https://www.myfxbook.com/...) or relative.
+        ev_m = _re.search(r'<a href="(?:https?://[^/]+)?(/forex-economic-calendar/[^"]+)"[^>]*calendar-event-link[^>]*>([^<]+)</a>', tr)
+        if not ev_m:
+            # Holiday rows have no calendar-event-link
+            # Check for holiday: impact_no class or "Holiday" in title
+            if _re.search(r'impact_no', tr):
+                # extract title text from td
+                title_m = _re.search(r'class="[^"]*calendarToggleCell[^"]*text-left[^"]*"[^>]*>(.*?)</td>', tr, _re.DOTALL)
+                title = _re.sub(r'<[^>]+>', '', title_m.group(1)).strip() if title_m else "Bank Holiday"
+                if currency in G8_CCY and date_iso:
+                    holidays.append({"title": title or "Bank Holiday", "currency": currency, "dateISO": date_iso})
             continue
 
-        # Dedup by (currency, dateISO, normalised title) — preserves distinct holidays
-        # for the same currency on the same day (e.g. French vs German Bank Holiday, both EUR)
-        norm_title = title.lower().strip()
-        key = (currency, date_iso, norm_title)
-        if key in seen:
-            continue
-        seen.add(key)
+        event_slug_url = ev_m.group(1)   # "/forex-economic-calendar/united-states/cpi-s-a"
+        event_name = ev_m.group(2).strip()
 
-        holidays.append({
-            "title":    title if title else "Bank Holiday",
+        # Period suffix e.g. "(May)"
+        period_m = _re.search(r'<span>\(([^)]+)\)</span>', tr)
+        if period_m:
+            event_name = f"{event_name} ({period_m.group(1)})"
+
+        # Derive currency from URL slug if td extraction failed
+        if not currency or currency not in G8_CCY:
+            parts = event_slug_url.strip("/").split("/")
+            # parts[0]="forex-economic-calendar", parts[1]=country_slug, parts[2]=event_slug
+            country_slug = parts[1] if len(parts) >= 2 else ""
+            currency = SLUG_TO_CCY.get(country_slug, "")
+
+        if not currency or currency not in G8_CCY:
+            skipped_ccy += 1
+            continue
+
+        if impact == "low":
+            skipped_impact += 1
+            continue
+
+        # Values from attribute lookup
+        previous = _clean(prev_map.get(oid, ""))
+        forecast = _clean(cons_map.get(oid, ""))
+        actual   = _clean(actual_map.get(oid, ""))
+
+        # Mark released if actual present OR if ispassed="1" on the calendarLeft span
+        is_passed = bool(_re.search(r'ispassed="1"', tr))
+        released  = actual is not None or is_passed
+
+        events.append({
+            "title":    event_name,
             "currency": currency,
             "dateISO":  date_iso,
+            "timeUTC":  time_utc,
+            "impact":   impact,
+            "forecast": forecast,
+            "previous": previous,
+            "actual":   actual,
+            "released": released,
         })
 
-    holidays.sort(key=lambda h: (h["dateISO"], h["currency"], h["title"]))
-    print(f"  Holidays: {len(holidays)} G8 bank/market holidays found "
-          f"({', '.join(h['currency'] + ' ' + h['dateISO'] for h in holidays) or 'none'})")
-    return holidays
+    events.sort(key=lambda e: (e["dateISO"], e["timeUTC"], e["currency"]))
+    released_count = sum(1 for e in events if e.get("released"))
+    print(f"  Myfxbook: {len(events)} G8 medium/high events "
+          f"({released_count} with actuals; skipped {skipped_ccy} non-G8, "
+          f"{skipped_impact} low-impact, {len(holidays)} holidays)")
+    return events, holidays
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -485,126 +583,6 @@ def _impact(raw: str | None) -> str:
     return {"high": "high", "medium": "medium", "low": "low"}.get(
         (raw or "low").lower(), "low"
     )
-
-
-# ── ForexFactory public JSON fetch ───────────────────────────────────────────
-# Primary source: https://nfs.faireconomy.media/ff_calendar_thisweek.json
-# Public endpoint, no API key required. Same feed used by the CF Worker v2.0
-# and by fetch_ff_holidays(). Rate limit: 2 req/5 min per IP — this script
-# runs at most once per 5-min cron cycle so it stays well within limits.
-#
-# FF JSON date field is in ET (Eastern Time). We convert to UTC using the same
-# DST logic as the old Playwright fallback. Coverage: current calendar week
-# (Mon–Sun ET). Prior-week actuals are preserved via historical merge (Step 2
-# in main()) using prev_events from the previous ff_calendar.json.
-#
-# _IMPACT_UPGRADES retained: FF itself sets impact on this feed, so upgrades
-# are rarely needed — but kept for defensive correctness in case FF under-tags
-# certain events on the JSON feed vs the HTML calendar.
-
-def fetch_forexfactory_json(raw: list) -> list[dict]:
-    """
-    Parse G8 medium/high economic events from the pre-fetched ForexFactory JSON list.
-    raw — the parsed JSON array from nfs.faireconomy.media/ff_calendar_thisweek.json.
-    Returns list of normalised ff_calendar.json event dicts.
-    The HTTP fetch is done once in main() and shared with fetch_ff_holidays().
-    """
-
-    G8_CCY = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"}
-
-    # _IMPACT_UPGRADES: defensive overrides for events FF may under-tag on the JSON feed.
-    # The HTML calendar (orange = medium) is the authoritative source; the JSON feed
-    # occasionally lags on impact classification for less common events.
-    _IMPACT_UPGRADES = [
-        # ── JPY ──────────────────────────────────────────────────────────────────
-        ("JPY", "producer price",           "medium"),  # JPY PPI MoM & YoY — FF HTML: medium
-        ("JPY", "machine tool orders",      "medium"),  # JPY Prelim Machine Tool Orders — FF HTML: medium
-        ("JPY", "bsi manufacturing",        "medium"),  # JPY BSI Manufacturing Index — FF HTML: medium
-        # ── AUD ──────────────────────────────────────────────────────────────────
-        ("AUD", "building approvals",       "medium"),  # AUD Building Approvals — FF HTML: medium
-        ("AUD", "private house approvals",  "medium"),  # AUD Private House Approvals — FF HTML: medium
-        ("AUD", "mi inflation expectations","medium"),  # AUD MI Inflation Expectations — FF HTML: medium
-        ("AUD", "inflation expectations",   "medium"),  # AUD MI Inflation Expectations alt title
-        # ── USD ──────────────────────────────────────────────────────────────────
-        ("USD", "crude oil inventories",    "medium"),  # EIA Crude Oil Inventories — FF HTML: medium
-        ("USD", "federal budget balance",   "medium"),  # Federal Budget Balance — FF HTML: medium
-        ("USD", "api crude oil",            "medium"),  # API Crude Oil Stock Change — FF HTML: medium
-        # ── GBP ──────────────────────────────────────────────────────────────────
-        ("GBP", "rics house price",         "medium"),  # RICS House Price Balance — FF HTML: medium
-        # ── NZD ──────────────────────────────────────────────────────────────────
-        ("NZD", "anz business confidence",  "medium"),  # ANZ Business Confidence — FF HTML: medium
-        ("NZD", "business confidence",      "medium"),  # ANZ Business Confidence alt title
-    ]
-
-    events = []
-    skipped_ccy    = 0
-    skipped_impact = 0
-    skipped_holiday = 0
-
-    for ev in raw:
-        # country field is the 3-letter currency code on this feed
-        currency = (ev.get("country") or "").strip().upper()
-        if currency not in G8_CCY:
-            skipped_ccy += 1
-            continue
-
-        # Impact filter
-        impact_raw = (ev.get("impact") or "").strip().lower()
-        if impact_raw == "holiday":
-            skipped_holiday += 1
-            continue   # holidays handled separately by fetch_ff_holidays()
-        impact = _impact(impact_raw)
-
-        # Apply impact override
-        title_lower = (ev.get("title") or "").lower()
-        if impact == "low":
-            for upg_ccy, upg_frag, upg_impact in _IMPACT_UPGRADES:
-                if currency == upg_ccy and upg_frag in title_lower:
-                    impact = upg_impact
-                    break
-        if impact == "low":
-            skipped_impact += 1
-            continue
-
-        title = (ev.get("title") or "").strip()
-        if not title:
-            continue
-
-        # Date: FF JSON `date` is an ISO string in ET timezone
-        # e.g. "2026-06-10T08:30:00-04:00" (EDT) or "2026-06-10T08:30:00-05:00" (EST)
-        date_raw = (ev.get("date") or "").strip()
-        try:
-            dt = datetime.fromisoformat(date_raw.replace("Z", "+00:00"))
-            dt_utc   = dt.astimezone(timezone.utc)
-            date_iso = dt_utc.strftime("%Y-%m-%d")
-            time_utc = dt_utc.strftime("%H:%M")
-        except Exception:
-            # Fallback: treat as date-only string
-            date_iso = date_raw[:10] if len(date_raw) >= 10 else ""
-            time_utc = "00:00"
-        if not date_iso:
-            continue
-
-        actual   = _clean(ev.get("actual"))
-        forecast = _clean(ev.get("forecast"))
-        previous = _clean(ev.get("previous"))
-
-        events.append({
-            "title":    title,
-            "currency": currency,
-            "dateISO":  date_iso,
-            "timeUTC":  time_utc,
-            "impact":   impact,
-            "forecast": forecast,
-            "previous": previous,
-            "actual":   actual,
-            "released": actual is not None,
-        })
-
-    print(f"  ForexFactory: {len(events)} G8 medium/high events "
-          f"(skipped {skipped_ccy} non-G8, {skipped_impact} low-impact, "
-          f"{skipped_holiday} holidays — holidays fetched separately)")
-    return events
 
 
 # ── calendar.json enrichment ──────────────────────────────────────────────────
@@ -1146,67 +1124,42 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.21")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.23")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
 
-    # Step 1: Fetch this-week and next-week ForexFactory public JSONs.
-    # FF rate limit is 2 req/5 min per IP. We make exactly 2 requests per run:
-    # thisweek.json (events + holidays) and nextweek.json (upcoming events only).
-    # Both are passed to the same parser — no extra code paths needed.
-    print(f"  ForexFactory: fetching {FF_BASE_URL} ...")
+    # Step 1: Fetch Myfxbook HTML economic calendar.
+    # Single request — the page covers current + next ~8 days with all G8 events.
+    # No API key required. Data embedded in HTML attributes (no JS execution needed).
+    # Accessible from GitHub Actions runners (confirmed: no WAF block with User-Agent).
+    MFB_HEADERS = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+    }
+    print(f"  Myfxbook: fetching {MFB_URL} ...")
     try:
-        r = requests.get(
-            FF_BASE_URL,
-            headers={**HEADERS, "Accept": "application/json"},
-            timeout=FETCH_TIMEOUT,
-        )
-        content_type = r.headers.get("Content-Type", "")
-        if r.status_code != 200 or "application/json" not in content_type:
-            body_preview = r.text[:120].strip()
-            if "Request Denied" in body_preview or "DOCTYPE" in body_preview:
-                print(f"  ERROR: ForexFactory rate limit hit (HTTP {r.status_code}) — preserving previous file.")
-            else:
-                print(f"  ERROR: ForexFactory HTTP {r.status_code} — {body_preview[:80]}")
+        r = requests.get(MFB_URL, headers=MFB_HEADERS, timeout=FETCH_TIMEOUT)
+        if r.status_code != 200:
+            print(f"  ERROR: Myfxbook HTTP {r.status_code} — preserving previous file.")
             sys.exit(0)
-        ff_raw = r.json()
-        if not isinstance(ff_raw, list):
-            print("  ERROR: ForexFactory response is not a JSON array — preserving previous file.")
+        if "calendarToggleCell" not in r.text:
+            print("  ERROR: Myfxbook response missing calendar data — WAF block or layout change.")
             sys.exit(0)
-        print(f"  ForexFactory: {len(ff_raw)} raw items received (thisweek)")
+        mfb_html = r.text
+        print(f"  Myfxbook: HTML received ({len(mfb_html):,} bytes)")
     except Exception as e:
-        print(f"  ERROR: ForexFactory request failed — {e}")
+        print(f"  ERROR: Myfxbook request failed — {e}")
         sys.exit(0)
 
-    # Step 1 (nextweek): fetch next-week JSON for upcoming events. Best-effort —
-    # rate-limit or network failure just means next-week events come from prev_events.
-    try:
-        r2 = requests.get(
-            FF_NEXTWEEK_URL,
-            headers={**HEADERS, "Accept": "application/json"},
-            timeout=FETCH_TIMEOUT,
-        )
-        ct2 = r2.headers.get("Content-Type", "")
-        if r2.status_code == 200 and "application/json" in ct2:
-            ff_raw_nw = r2.json()
-            if isinstance(ff_raw_nw, list):
-                print(f"  ForexFactory: {len(ff_raw_nw)} raw items received (nextweek)")
-                ff_raw = ff_raw + ff_raw_nw   # merge; parser deduplicates downstream
-            else:
-                print("  ForexFactory nextweek: skipped (not a JSON array)")
-        else:
-            body_nw = r2.text[:80].strip()
-            if "Request Denied" in body_nw or "DOCTYPE" in body_nw:
-                print(f"  ForexFactory nextweek: rate limit hit — skipping next-week events")
-            else:
-                print(f"  ForexFactory nextweek: HTTP {r2.status_code} — skipping")
-    except Exception as e2:
-        print(f"  ForexFactory nextweek: request failed ({e2}) — skipping")
-
-    # Step 1a: Parse events (medium + high impact, G8) from combined thisweek+nextweek raw list
-    fresh = fetch_forexfactory_json(ff_raw)
-    source = "ForexFactory"
+    # Step 1a: Parse events and holidays from HTML
+    fresh, holidays = fetch_myfxbook_calendar(mfb_html)
+    source = "Myfxbook"
 
     if not fresh:
         print("  ERROR: No G8 medium/high events parsed — preserving previous file.")
@@ -1214,84 +1167,6 @@ def main():
 
     released_fresh = sum(1 for e in fresh if e.get("released"))
     print(f"  Fetched: {len(fresh)} events ({released_fresh} with actuals)")
-
-    # Step 1b: Parse holidays from the thisweek raw payload only (holidays don't span weeks).
-    holidays = fetch_ff_holidays(ff_raw)
-
-    # Step 1c: On-demand FCS poll + inject actuals from CF Worker KV payload (v3.1).
-    #
-    # CF Worker v3.1 uses FCS API (api-v4.fcsapi.com) as primary source — FCS is a REST
-    # API that accepts programmatic access from any IP. The CF Worker cron fires every 30
-    # minutes (FCS free tier limit). To get fresh actuals faster during release windows,
-    # fetch_ff_calendar.py calls /trigger first (costs 1 FCS credit) to force an on-demand
-    # poll, then reads /payload which the Worker writes to KV immediately after any change.
-    #
-    # Date format from FCS API: "YYYY-MM-DD HH:MM:SS" (UTC) — take the date portion only.
-    # FF JSON fallback in the Worker writes the same YYYY-MM-DD format.
-    # Matching: (currency, dateISO YYYY-MM-DD, title_lower).
-    # Best-effort: any failure (network, key exhausted, no payload) is logged and skipped.
-    #
-    # On-demand /trigger: called unconditionally each run (1 FCS credit). The Worker only
-    # fires repository_dispatch if data actually changed, so extra triggers are harmless.
-    try:
-        trig_resp = requests.get(CF_WORKER_TRIGGER_URL, timeout=8)
-        if trig_resp.status_code == 200:
-            print(f"  KV payload: /trigger fired ({trig_resp.json().get('ts','?')})")
-        else:
-            print(f"  KV payload: /trigger HTTP {trig_resp.status_code} — skipping trigger")
-    except Exception as e_trig:
-        print(f"  KV payload: /trigger failed ({e_trig}) — skipping trigger")
-
-    # Small delay to allow the Worker's async FCS fetch to complete before we read /payload
-    import time as _time
-    _time.sleep(6)
-
-    try:
-        kv_resp = requests.get(KV_PAYLOAD_URL, timeout=5)
-        if kv_resp.status_code == 200 and kv_resp.text.strip() not in ("null", ""):
-            kv_events = kv_resp.json()
-            if isinstance(kv_events, list) and kv_events:
-                # Build a lookup: (currency, dateISO, title_lower) → actual
-                # KV payload date format from FCS API: "YYYY-MM-DD HH:MM:SS" UTC
-                # FF JSON fallback: same YYYY-MM-DD prefix
-                kv_actual_map = {}
-                for kv_ev in kv_events:
-                    raw_date = (kv_ev.get("date") or "").strip()
-                    # Extract YYYY-MM-DD from "YYYY-MM-DD HH:MM:SS" or use as-is if already ISO
-                    date_iso = raw_date[:10] if len(raw_date) >= 10 else raw_date
-                    actual_val = (kv_ev.get("actual") or "").strip()
-                    if not actual_val:
-                        continue
-                    key = (
-                        (kv_ev.get("currency") or "").strip().upper(),
-                        date_iso,
-                        (kv_ev.get("title") or "").strip().lower(),
-                    )
-                    kv_actual_map[key] = actual_val
-
-                kv_injected = 0
-                for ev in fresh:
-                    if ev.get("actual") is not None:
-                        continue
-                    k = (ev.get("currency",""), ev.get("dateISO",""), (ev.get("title","")).lower())
-                    if k in kv_actual_map:
-                        raw_actual = kv_actual_map[k]
-                        # Strip trailing % if event title doesn't imply % units
-                        ev["actual"]   = raw_actual.rstrip("%") if raw_actual.endswith("%") and "%" not in ev.get("title","") else raw_actual
-                        ev["released"] = True
-                        kv_injected += 1
-                if kv_injected:
-                    print(f"  KV payload: injected {kv_injected} actual(s) from CF Worker FCS API")
-                else:
-                    print(f"  KV payload: {len(kv_events)} events fetched, 0 new actuals to inject")
-            else:
-                print("  KV payload: empty or invalid JSON — skipping")
-        elif kv_resp.status_code == 200 and kv_resp.text.strip() == "null":
-            print("  KV payload: not yet populated (no FCS data received yet)")
-        else:
-            print(f"  KV payload: HTTP {kv_resp.status_code} — skipping")
-    except Exception as e_kv:
-        print(f"  KV payload: request failed ({e_kv}) — skipping")
 
     # Step 2: Historical merge — preserve events from prev_events not covered by the fresh fetch.
     # With Finnhub (old), fresh covered a 21-day window so the guard `d >= date_from` correctly
