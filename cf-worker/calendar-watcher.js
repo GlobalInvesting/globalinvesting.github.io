@@ -1,62 +1,56 @@
 /**
- * calendar-watcher.js — Cloudflare Worker v4.0
+ * calendar-watcher.js — Cloudflare Worker v5.0
  *
- * PRIMARY SOURCE: Myfxbook HTML calendar
- *   https://www.myfxbook.com/forex-economic-calendar
+ * PRIMARY SOURCE: Myfxbook RSS feed
+ *   https://www.myfxbook.com/rss/forex-economic-calendar-events
  *
- *   CF Worker edge IPs are NOT blocked by Myfxbook's Cloudflare setup (confirmed:
- *   3,300 DOM nodes returned from CF Worker fetch with browser User-Agent).
- *   GitHub Actions runner IPs ARE blocked (TCP-level hang — Cloudflare holds
- *   connection open indefinitely). Solution: route all Myfxbook fetches through
- *   this Worker. GH Actions calls /myfxbook on this Worker; Worker calls Myfxbook.
+ *   RSS is accessible from both GH Actions and CF edge IPs (no WAF).
+ *   Covers a rolling ~24h window. Actuals appear within minutes of release.
+ *   Single source — FF JSON removed to avoid title-key mismatches that cause
+ *   duplicate events or erased carry-forward actuals.
  *
- * FALLBACK: ForexFactory JSON (nfs.faireconomy.media)
- *   No WAF on FF JSON. Accessible from both CF edge and GH Actions.
- *   Used if Myfxbook fetch fails.
- *
- * REMOVED: FCS API (api-v4.fcsapi.com) — free tier credits exhausted.
- *
- * CRON: every 30 minutes — fetches Myfxbook, fingerprints actuals,
- *   fires repository_dispatch on change.
+ * CRON: every 30 minutes — fetches RSS, fingerprints actuals+forecasts,
+ *   fires repository_dispatch if any change detected.
  *
  * ENDPOINTS:
- *   /myfxbook    — fetch + parse Myfxbook HTML, return events JSON array
- *                  called by fetch_ff_calendar.py Step 1 (replaces direct HTTP)
- *   /trigger     — manual on-demand poll (cron logic, fires dispatch if changed)
- *   /fingerprint — view current fingerprint
+ *   /trigger     — manual on-demand poll (fires dispatch if changed)
+ *   /fingerprint — view current KV fingerprint
  *   /payload     — latest parsed events from last cron/trigger run
  *   /reset       — clear KV state
  *
  * REQUIRED SECRETS (unchanged): GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO
- * FCS_API_KEY no longer required.
+ *
+ * v5.0 changes (2026-06-11):
+ * - PRIMARY SOURCE REPLACED: Myfxbook HTML → Myfxbook RSS feed.
+ *   HTML fetch blocked (CF edge IPs in same Cloudflare-blocked datacenter
+ *   ranges as GH Actions — error 1102). RSS has no WAF — accessible from
+ *   both CF edge and GH Actions (confirmed: 127KB, instant).
+ * - NEW: fetchMyfxbookRSS() — RSS fetch with browser User-Agent.
+ * - NEW: parseMyfxbookRSS() — parses RSS XML: iterates <item> blocks,
+ *   derives currency from country slug in <link>, decodes HTML entities in
+ *   <description>, extracts impact from sprite class, reads previous/forecast/
+ *   actual from <td> positions. Released: actual present OR time_left negative.
+ * - REMOVED: fetchMyfxbook(), parseMyfxbookHTML() — HTML approach abandoned.
+ * - REMOVED: fetchFFJSON(), FF_JSON_URL, FF_JSON_NW constants — single source
+ *   only to prevent title-key mismatches in (currency+date+time+title) dedup.
+ * - REMOVED: /myfxbook endpoint — no longer proxying HTML fetch.
+ * - KV keys bumped: calendar:fingerprint:v5, calendar:payload:v5.
  *
  * v4.0 changes (2026-06-10):
- * - PRIMARY: Myfxbook HTML replaces FCS API (credits exhausted)
- * - NEW: /myfxbook endpoint — proxies Myfxbook HTML fetch + parsing for GH Actions
- * - NEW: parseMyfxbookHTML() — JS regex parser matching Python v3.23 logic
- * - FALLBACK: FF JSON retained (accessible from CF edge, no WAF)
- * - REMOVED: fetchFCSAPI() — FCS free tier exhausted
- * - Cron: every 30 minutes (unchanged)
+ * - PRIMARY: Myfxbook HTML (CF edge IPs not blocked — since disproven).
+ * - REMOVED: FCS API (free tier exhausted).
  */
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const G8 = new Set(["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]);
 
-const MFB_URL     = "https://www.myfxbook.com/forex-economic-calendar";
-const FF_JSON_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
-const FF_JSON_NW  = "https://nfs.faireconomy.media/ff_calendar_nextweek.json";
+const MFB_RSS_URL = "https://www.myfxbook.com/rss/forex-economic-calendar-events";
 
-const KV_FINGERPRINT = "calendar:fingerprint:v4";
-const KV_PAYLOAD     = "calendar:payload:v4";
+const KV_FINGERPRINT = "calendar:fingerprint:v5";
+const KV_PAYLOAD     = "calendar:payload:v5";
 
-const MFB_HEADERS = {
-  "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-  "Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-  "Accept-Language": "en-US,en;q=0.5",
-};
-
-// Country slug → G8 currency (matches Python v3.23 SLUG_TO_CCY)
+// Country slug → G8 currency
 const SLUG_TO_CCY = {
   "united-states": "USD", "euro-area": "EUR", "germany": "EUR",
   "france": "EUR", "italy": "EUR", "spain": "EUR", "netherlands": "EUR",
@@ -75,21 +69,6 @@ export default {
 
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-
-    // /myfxbook — proxy endpoint for GH Actions (bypasses WAF block on runner IPs)
-    if (url.pathname === "/myfxbook") {
-      try {
-        const { events, holidays } = await fetchMyfxbook();
-        return new Response(JSON.stringify({ events, holidays, ts: new Date().toISOString() }), {
-          headers: { "Content-Type": "application/json" },
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), {
-          status: 502,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-    }
 
     if (url.pathname === "/trigger") {
       ctx.waitUntil(runCalendarWatch(env));
@@ -120,11 +99,10 @@ export default {
 
     return new Response(JSON.stringify({
       worker:    "calendar-watcher",
-      version:   "4.0",
-      source:    "Myfxbook HTML (myfxbook.com/forex-economic-calendar)",
-      fallback:  "ForexFactory JSON (nfs.faireconomy.media)",
+      version:   "5.0",
+      source:    "Myfxbook RSS (myfxbook.com/rss/forex-economic-calendar-events)",
       schedule:  "every 30 minutes",
-      endpoints: ["/myfxbook", "/trigger", "/fingerprint", "/payload", "/reset"],
+      endpoints: ["/trigger", "/fingerprint", "/payload", "/reset"],
       ts:        new Date().toISOString(),
     }), { headers: { "Content-Type": "application/json" } });
   },
@@ -135,192 +113,132 @@ export default {
 async function runCalendarWatch(env) {
   const now   = new Date();
   const label = `[${now.toISOString().slice(0, 16)}Z]`;
-  console.log(`${label} calendar-watcher v4.0: starting poll`);
+  console.log(`${label} calendar-watcher v5.0: starting poll`);
 
   let events = [];
-  let source  = "unknown";
 
-  // Step 1: Myfxbook HTML (primary — CF edge IPs not blocked)
   try {
-    const result = await fetchMyfxbook();
-    events = result.events;
-    source  = "myfxbook";
-    console.log(`${label} Myfxbook: ${events.length} G8 med/high events`);
+    events = await fetchMyfxbookRSS();
+    console.log(`${label} Myfxbook RSS: ${events.length} G8 med/high events (${events.filter(e => e.actual).length} with actuals)`);
   } catch (err) {
-    console.warn(`${label} Myfxbook failed (${err.message}) — trying FF JSON fallback`);
-  }
-
-  // Step 2: FF JSON fallback
-  if (!events.length) {
-    try {
-      events = await fetchFFJSON();
-      source  = "ff-json";
-      console.log(`${label} FF JSON fallback: ${events.length} G8 med/high events`);
-    } catch (err) {
-      console.error(`${label} FF JSON also failed: ${err.message}`);
-      return;
-    }
-  }
-
-  if (!events.length) {
-    console.log(`${label} No events — skipping.`);
+    console.error(`${label} Myfxbook RSS failed: ${err.message} — skipping.`);
     return;
   }
 
-  // Step 3: Fingerprint
+  if (!events.length) {
+    console.log(`${label} No G8 med/high events parsed — skipping.`);
+    return;
+  }
+
+  // Fingerprint actuals + forecasts
   const newFP  = buildFingerprint(events);
   const prevFP = (await env.CALENDAR_KV.get(KV_FINGERPRINT)) ?? "";
 
   if (newFP === prevFP) {
-    console.log(`${label} No change detected [source: ${source}].`);
+    console.log(`${label} No change detected.`);
     return;
   }
 
   const diff = describeDiff(prevFP, newFP);
-  console.log(`${label} CHANGE: ${diff} [source: ${source}]`);
+  console.log(`${label} CHANGE: ${diff}`);
 
-  // Step 4: Write KV
-  await env.CALENDAR_KV.put(KV_FINGERPRINT, newFP,               { expirationTtl: 60 * 60 * 24 * 7 });
-  await env.CALENDAR_KV.put(KV_PAYLOAD, JSON.stringify(events),  { expirationTtl: 60 * 60 * 24 * 7 });
+  // Write KV
+  await env.CALENDAR_KV.put(KV_FINGERPRINT, newFP,              { expirationTtl: 60 * 60 * 24 * 7 });
+  await env.CALENDAR_KV.put(KV_PAYLOAD, JSON.stringify(events), { expirationTtl: 60 * 60 * 24 * 7 });
 
-  // Step 5: Fire repository_dispatch
+  // Fire repository_dispatch
   try {
-    await triggerGitHubWorkflow(env, diff, source);
+    await triggerGitHubWorkflow(env, diff, "myfxbook-rss");
     console.log(`${label} repository_dispatch sent.`);
   } catch (err) {
     console.error(`${label} repository_dispatch failed: ${err.message}`);
+    // Roll back fingerprint so next cron retries
     await env.CALENDAR_KV.put(KV_FINGERPRINT, prevFP, { expirationTtl: 60 * 60 * 24 * 7 });
   }
 }
 
-// ── Myfxbook HTML fetch + parse ───────────────────────────────────────────────
+// ── Myfxbook RSS fetch + parse ────────────────────────────────────────────────
 
-async function fetchMyfxbook() {
-  const resp = await fetch(MFB_URL, {
-    headers: MFB_HEADERS,
-    signal:  AbortSignal.timeout(20000),
+async function fetchMyfxbookRSS() {
+  const resp = await fetch(MFB_RSS_URL, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+      "Accept":     "application/rss+xml, application/xml, text/xml, */*",
+    },
+    signal: AbortSignal.timeout(20000),
   });
 
-  if (!resp.ok) {
-    throw new Error(`Myfxbook HTTP ${resp.status}`);
-  }
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
-  const html = await resp.text();
+  const xml = await resp.text();
+  if (!xml.includes("<item>")) throw new Error("RSS response missing <item> elements");
 
-  if (!html.includes("calendarToggleCell")) {
-    throw new Error("Myfxbook response missing calendar data — WAF block or layout change");
-  }
-
-  return parseMyfxbookHTML(html);
+  return parseMyfxbookRSS(xml);
 }
 
-function parseMyfxbookHTML(html) {
-  // ── Build OID lookup maps from full HTML ──────────────────────────────────
+function parseMyfxbookRSS(xml) {
+  const events = [];
+  let skippedCcy = 0, skippedImpact = 0;
 
-  // previous-value: data-previous="OID" ... previous-value="VALUE"
-  const prevMap = {};
-  for (const m of html.matchAll(/data-previous="(\d+)"[^>]*previous-value="([^"]*)"/g)) {
-    prevMap[m[1]] = m[2];
-  }
+  // Iterate <item> blocks
+  for (const itemM of xml.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
+    const block = itemM[1];
 
-  // forecast/consensus: data-concensus="OID" concensus="VALUE" consistconcensus
-  const consMap = {};
-  for (const m of html.matchAll(/<td[^>]*data-concensus="(\d+)" concensus="([^"]*)" consistconcensus/g)) {
-    consMap[m[1]] = m[2];
-  }
+    // Currency from country slug in <link>
+    const linkM = block.match(/<link>https?:\/\/[^/]+\/forex-economic-calendar\/([^/]+)\/[^<]+<\/link>/);
+    if (!linkM) continue;
+    const currency = SLUG_TO_CCY[linkM[1]] || "";
+    if (!currency) { skippedCcy++; continue; }
 
-  // actual: data-actual="OID" ... actualCell ... innermost span value
-  const actualMap = {};
-  for (const m of html.matchAll(/data-actual="(\d+)"[\s\S]*?class="actualCell">([\s\S]*?)<\/span>\s*<\/span>/g)) {
-    const oid   = m[1];
-    const inner = m[2];
-    // Extract innermost span text
-    const spans = [...inner.matchAll(/<span[^>]*>\s*([^<]+?)\s*<\/span>/g)];
-    const raw   = spans.length ? spans[spans.length - 1][1].trim() : inner.replace(/<[^>]+>/g, "").trim();
-    // Skip countdown strings ("min", "h ")
-    if (raw && !raw.includes("min") && !raw.includes("h ") && raw !== "-") {
-      actualMap[oid] = raw;
-    }
-  }
+    // Event title
+    const titleM = block.match(/<title>([^<]+)<\/title>/);
+    const title  = titleM ? titleM[1].trim() : "";
+    if (!title) continue;
 
-  // ── Parse <tr> event rows from <tbody> ───────────────────────────────────
-
-  const tbodyM = html.match(/<tbody>([\s\S]*?)<\/tbody>/);
-  if (!tbodyM) throw new Error("No <tbody> found in Myfxbook HTML");
-  const tbody = tbodyM[1];
-
-  // Split into rows — use non-greedy match
-  const trBlocks = [...tbody.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)].map(m => m[1]);
-
-  const events   = [];
-  const holidays = [];
-
-  for (const tr of trBlocks) {
-    // OID
-    const oidM = tr.match(/id="itemOid" value="(\d+)"/);
-    if (!oidM) continue;
-    const oid = oidM[1];
-
-    // Datetime (UTC)
-    const dtM = tr.match(/data-calendardatetd="([^"]+)"/);
-    if (!dtM) continue;
-    const dtRaw  = dtM[1];        // "2026-06-10 12:30:00.0"
-    const dateISO = dtRaw.slice(0, 10);
-    const timeUTC = dtRaw.slice(11, 16);  // "12:30"
-
-    // Currency from standalone <td> with exactly 3 uppercase letters
-    const curM = tr.match(/<td[^>]*calendarToggleCell[^>]*>\s*([A-Z]{3})\s*<\/td>/);
-    let currency = curM ? curM[1].trim() : "";
-
-    // Impact from importance attribute
-    const impM = tr.match(/importance="(\d)"/);
-    const impNum = impM ? parseInt(impM[1]) : 0;
-    const impact = impNum === 3 ? "high" : impNum === 2 ? "medium" : "low";
-
-    // Event link — href comes before class in myfxbook HTML
-    const evM = tr.match(/<a href="(?:https?:\/\/[^/]+)?(\/forex-economic-calendar\/[^"]+)"[^>]*calendar-event-link[^>]*>([^<]+)<\/a>/);
-
-    if (!evM) {
-      // Holiday row (no event link)
-      if (tr.includes("impact_no") || tr.includes("data-is-holiday=\"true\"")) {
-        const titleM = tr.match(/class="[^"]*calendarToggleCell[^"]*text-left[^"]*"[^>]*>([\s\S]*?)<\/td>/);
-        const title  = titleM ? titleM[1].replace(/<[^>]+>/g, "").trim() : "Bank Holiday";
-        if (currency && G8.has(currency) && dateISO) {
-          holidays.push({ title: title || "Bank Holiday", currency, dateISO });
-        }
+    // Date/time from <pubDate> (RFC 2822 UTC)
+    const pubM = block.match(/<pubDate>([^<]+)<\/pubDate>/);
+    let dateISO = "", timeUTC = "00:00";
+    if (pubM) {
+      const d = new Date(pubM[1].trim());
+      if (!isNaN(d)) {
+        dateISO = d.toISOString().slice(0, 10);
+        timeUTC = d.toISOString().slice(11, 16);
       }
-      continue;
     }
+    if (!dateISO) continue;
 
-    const slugUrl   = evM[1];   // "/forex-economic-calendar/united-states/cpi-s-a"
-    let   eventName = evM[2].trim();
+    // Decode HTML entities in <description>
+    const descM = block.match(/<description>([\s\S]*?)<\/description>/);
+    if (!descM) continue;
+    const desc = descM[1]
+      .replace(/&#60;/g, "<").replace(/&#62;/g, ">")
+      .replace(/&#39;/g, "'").replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 
-    // Period suffix e.g. "(May)"
-    const periodM = tr.match(/<span>\(([^)]+)\)<\/span>/);
-    if (periodM) eventName = `${eventName} (${periodM[1]})`;
+    // Impact from sprite class
+    const impM  = desc.match(/sprite-(high|medium|low)-impact/);
+    const impact = impM ? impM[1] : "low";
+    if (impact === "low") { skippedImpact++; continue; }
 
-    // Derive currency from URL slug if td extraction failed
-    if (!currency || !G8.has(currency)) {
-      const parts = slugUrl.replace(/^\//, "").split("/");
-      // parts: ["forex-economic-calendar", "united-states", "cpi-s-a"]
-      const countrySlug = parts[1] || "";
-      currency = SLUG_TO_CCY[countrySlug] || "";
-    }
+    // Values from <td> positions in data row (skip <th> header row)
+    const tds = [...desc.matchAll(/<td>([\s\S]*?)<\/td>/g)].map(m =>
+      m[1].replace(/<[^>]+>/g, "").trim()
+    );
 
-    if (!currency || !G8.has(currency)) continue;
-    if (impact === "low") continue;
+    const timeLeftRaw = tds[0] || "";
+    const previous    = cleanVal(tds[2]);
+    const forecast    = cleanVal(tds[3]);
+    const actual      = cleanVal(tds[4]);
 
-    const previous = cleanVal(prevMap[oid]);
-    const forecast = cleanVal(consMap[oid]);
-    const actual   = cleanVal(actualMap[oid]);
-    const isPassed = tr.includes('ispassed="1"');
+    // Released: actual present OR time_left is negative seconds (event passed)
+    const isPassed = timeLeftRaw.startsWith("-") && timeLeftRaw.includes("second");
     const released = actual !== null || isPassed;
 
     events.push({
-      date:     `${dateISO} ${timeUTC}:00`,  // "YYYY-MM-DD HH:MM:SS" UTC — consistent with KV payload format
+      date:     `${dateISO} ${timeUTC}:00`,
       currency,
       impact,
-      title:    eventName,
+      title,
       actual,
       forecast,
       previous,
@@ -332,56 +250,7 @@ function parseMyfxbookHTML(html) {
 
   events.sort((a, b) => a.date.localeCompare(b.date) || a.currency.localeCompare(b.currency));
 
-  console.log(`parseMyfxbookHTML: ${events.length} events (${events.filter(e => e.actual).length} with actuals), ${holidays.length} holidays`);
-  return { events, holidays };
-}
-
-// ── FF JSON fallback ──────────────────────────────────────────────────────────
-
-async function fetchFFJSON() {
-  const HEADERS = {
-    "User-Agent": "globalinvesting-calendar-watcher/4.0 (https://globalinvesting.github.io)",
-    "Accept":     "application/json",
-  };
-
-  const resp = await fetch(FF_JSON_URL, { headers: HEADERS, signal: AbortSignal.timeout(10000) });
-  const ct   = resp.headers.get("content-type") || "";
-  if (!resp.ok || !ct.includes("application/json")) {
-    const body = await resp.text().catch(() => "");
-    throw new Error(`FF JSON HTTP ${resp.status}: ${body.slice(0, 60)}`);
-  }
-  const raw = await resp.json();
-  if (!Array.isArray(raw)) throw new Error("FF JSON not an array");
-
-  let rawNw = [];
-  try {
-    const r2  = await fetch(FF_JSON_NW, { headers: HEADERS, signal: AbortSignal.timeout(8000) });
-    const ct2 = r2.headers.get("content-type") || "";
-    if (r2.ok && ct2.includes("application/json")) {
-      const p = await r2.json();
-      if (Array.isArray(p)) rawNw = p;
-    }
-  } catch (_) {}
-
-  const events = [];
-  for (const ev of [...raw, ...rawNw]) {
-    const currency = (ev.country || "").trim().toUpperCase();
-    if (!G8.has(currency)) continue;
-    const impact = (ev.impact || "").trim().toLowerCase();
-    if (impact !== "high" && impact !== "medium") continue;
-
-    // FF JSON date is ET — normalise to YYYY-MM-DD HH:MM:SS prefix for consistency
-    const dateRaw = (ev.date || "").trim();
-    events.push({
-      date:     dateRaw,
-      currency,
-      impact,
-      title:    (ev.title || "").trim(),
-      actual:   cleanVal(ev.actual),
-      forecast: cleanVal(ev.forecast),
-      previous: cleanVal(ev.previous),
-    });
-  }
+  console.log(`parseMyfxbookRSS: ${events.length} G8 med/high events (${events.filter(e => e.actual).length} with actuals; skipped ${skippedCcy} non-G8, ${skippedImpact} low-impact)`);
   return events;
 }
 
@@ -426,7 +295,7 @@ async function triggerGitHubWorkflow(env, description, source) {
         "Authorization":        `Bearer ${GITHUB_PAT}`,
         "Accept":               "application/vnd.github+json",
         "Content-Type":         "application/json",
-        "User-Agent":           "globalinvesting-calendar-watcher/4.0",
+        "User-Agent":           "globalinvesting-calendar-watcher/5.0",
         "X-GitHub-Api-Version": "2022-11-28",
       },
       body: JSON.stringify({
