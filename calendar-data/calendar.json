@@ -1,41 +1,31 @@
 {
-  "lastUpdate": "2026-06-10T23:57:06Z",
-  "generatedAt": "2026-06-10T23:57:06Z",
-  "fetchMode": "ForexFactory via ff_calendar.json",
+  "lastUpdate": "2026-06-11T01:35:17Z",
+  "generatedAt": "2026-06-11T01:35:17Z",
+  "fetchMode": "Myfxbook via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
-  "source": "ForexFactory",
+  "source": "Myfxbook",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-10",
+  "rangeFrom": "2025-06-12",
   "rangeTo": "2026-06-12",
-  "totalEvents": 1545,
+  "totalEvents": 1547,
   "currencyCounts": {
-    "AUD": 163,
-    "CHF": 86,
-    "GBP": 168,
     "NZD": 73,
-    "USD": 581,
+    "USD": 586,
+    "AUD": 160,
     "CAD": 126,
-    "EUR": 173,
+    "CHF": 85,
+    "EUR": 176,
+    "GBP": 166,
     "JPY": 175
   },
   "impactCounts": {
-    "high": 378,
-    "medium": 1030,
-    "low": 137
+    "medium": 1029,
+    "high": 383,
+    "low": 135
   },
   "surpriseStats": {
-    "CAD/building permits": {
-      "n": 3,
-      "mean": 5.733333,
-      "std": 1.436431
-    },
-    "USD/atlanta fed gdpnow": {
-      "n": 4,
-      "mean": -0.025,
-      "std": 0.45
-    },
     "GBP/industrial production": {
       "n": 3,
       "mean": -0.5,
@@ -71,6 +61,11 @@
       "mean": -0.26,
       "std": 2.642537
     },
+    "USD/atlanta fed gdpnow": {
+      "n": 3,
+      "mean": -0.233333,
+      "std": 0.208167
+    },
     "USD/ny empire state manufacturing index": {
       "n": 2,
       "mean": 3.95,
@@ -95,6 +90,11 @@
       "n": 5,
       "mean": -0.12,
       "std": 0.109545
+    },
+    "CAD/building permits": {
+      "n": 2,
+      "mean": 5.2,
+      "std": 1.555635
     },
     "CAD/industrial production": {
       "n": 2,
@@ -453,90 +453,6 @@
     }
   },
   "events": [
-    {
-      "currency": "AUD",
-      "event": "Westpac Consumer Confidence Change",
-      "dateISO": "2025-06-10",
-      "hourUTC": "00:30",
-      "actual": "0.5",
-      "forecast": null,
-      "previous": "2.2",
-      "impact": "high",
-      "importance": 3,
-      "source": "FH"
-    },
-    {
-      "currency": "AUD",
-      "event": "Westpac Consumer Confidence Index",
-      "dateISO": "2025-06-10",
-      "hourUTC": "00:30",
-      "actual": "92.6",
-      "forecast": null,
-      "previous": "92.1",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "AUD",
-      "event": "NAB Business Confidence",
-      "dateISO": "2025-06-10",
-      "hourUTC": "01:30",
-      "actual": "2",
-      "forecast": null,
-      "previous": "-1",
-      "impact": "high",
-      "importance": 3,
-      "source": "FH"
-    },
-    {
-      "currency": "CHF",
-      "event": "Consumer Confidence",
-      "dateISO": "2025-06-10",
-      "hourUTC": "07:00",
-      "actual": "-37",
-      "forecast": "-38",
-      "previous": "-42",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "GBP",
-      "event": "Average Earnings excl. Bonus (3Mo/Yr)",
-      "dateISO": "2025-06-10",
-      "hourUTC": "06:00",
-      "actual": "5.2",
-      "forecast": "5.4",
-      "previous": "5.5",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "GBP",
-      "event": "Average Earnings incl. Bonus (3Mo/Yr)",
-      "dateISO": "2025-06-10",
-      "hourUTC": "06:00",
-      "actual": "5.3",
-      "forecast": "5.5",
-      "previous": "5.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "NZD",
-      "event": "Visitor Arrivals YoY",
-      "dateISO": "2025-06-10",
-      "hourUTC": "22:45",
-      "actual": "18.8",
-      "forecast": null,
-      "previous": "-8.4",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
     {
       "currency": "NZD",
       "event": "Business NZ PMI",
@@ -20500,6 +20416,32 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
+      "event": "Euro Area ECB Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.4%",
+      "previous": "2.15%"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Deposit Facility Rate",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.25%",
+      "previous": "2.0%"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
       "event": "Main Refinancing Rate",
       "impact": "high",
       "actual": null,
@@ -20518,6 +20460,71 @@
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Jobless Claims 4-week Average",
+      "impact": "high",
+      "actual": null,
+      "forecast": "216.5K",
+      "previous": "214.75K"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States PPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.7%",
+      "previous": "1.4%"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Core PPI MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "1.0%"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": null,
+      "forecast": "219.0K",
+      "previous": "225.0K"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1780.0K",
+      "previous": "1777.0K"
     },
     {
       "date": "11 Jun",
@@ -20565,11 +20572,37 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
+      "event": "Euro Area ECB Press Conference",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "12:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
       "event": "ECB Press Conference",
       "impact": "high",
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "22:30",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Business NZ PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "50.0",
+      "previous": "50.5"
     },
     {
       "date": "12 Jun",
