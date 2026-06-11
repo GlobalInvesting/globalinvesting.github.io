@@ -1,21 +1,31 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.24
+fetch_ff_calendar.py — v3.25
+v3.25 changes (2026-06-11):
+- PRIMARY SOURCE: Myfxbook RSS feed (myfxbook.com/rss/forex-economic-calendar-events).
+  RSS is accessible from GitHub Actions (no WAF — confirmed ~127KB response, instant).
+  Covers a rolling ~24h window. Impact from sprite class. Actuals appear within
+  minutes of release. Accumulation strategy: each run captures newly-released
+  actuals; prev_events carry-forward preserves them indefinitely across 21-day window.
+- NEW: fetch_myfxbook_rss() — parses RSS XML, extracts G8 med/high events,
+  previous/consensus/actual from HTML-encoded <description> <td> fields.
+  Country slug from <link> URL maps to G8 currency (same SLUG_TO_CCY as HTML parser).
+  Released detection: actual present OR time_left starts with "-" (negative seconds).
+- SINGLE SOURCE: FF JSON removed entirely — mixing FF and Myfxbook titles causes
+  key mismatches in the (currency, dateISO, timeUTC, title) dedup, silently creating
+  duplicates or erasing carry-forward actuals. Myfxbook RSS is the sole source.
+  If RSS fetch fails → exit 0 (preserve previous file, same behavior as any failure).
+- REMOVED: fetch_myfxbook_calendar() — direct HTML scraping, blocked from both
+  GH Actions and CF Worker IPs (Cloudflare WAF / error 1102).
+- REMOVED: _normalise_worker_events() — CF Worker /myfxbook endpoint also blocked
+  (error 1102 from CF edge to myfxbook.com). CF_WORKER_MFB_URL constant removed.
+- REMOVED: FF_BASE_URL, FF_NEXTWEEK_URL constants, FF JSON fetch path in main().
+  fetch_forexfactory_json(), fetch_ff_holidays() kept as dead code for reference only.
+- Version bump in main() print statement: v3.24 → v3.25.
+
 v3.24 changes (2026-06-10):
 - FIX: Myfxbook HTML fetch routed through CF Worker proxy endpoint /myfxbook.
-  GitHub Actions runner IPs are blocked by Myfxbook at TCP level (Cloudflare
-  holds connection open indefinitely — requests.get() hangs despite FETCH_TIMEOUT).
-  CF Worker edge IPs are NOT blocked by Myfxbook (confirmed: HTML returned OK).
-  Solution: CF Worker v4.0 adds /myfxbook endpoint that fetches+parses Myfxbook
-  HTML and returns events JSON. GH Actions calls workers.dev/myfxbook instead of
-  myfxbook.com directly. Fast (~500ms round-trip via CF edge).
-- NEW: CF_WORKER_MFB_URL constant for the /myfxbook Worker endpoint.
-- UPDATED: Step 1 in main() calls CF Worker /myfxbook with short timeout (15s).
-  Fallback: FF JSON (thisweek+nextweek) if Worker call fails.
-- UPDATED: Step 1a maps Worker response to the same normalised event dicts.
-- REMOVED: MFB_URL (direct Myfxbook URL) — no longer fetched by Python.
-- REMOVED: Step 1c (CF Worker /trigger + /payload KV inject) — superseded by
-  the new /myfxbook endpoint which returns full events directly, not just actuals.
+  CF Worker also blocked by Myfxbook WAF (error 1102). Approach abandoned.
 - Version bump in main() print statement: v3.23 → v3.24.
 
 v3.23 changes (2026-06-10):
@@ -395,16 +405,13 @@ import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
 OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
-# CF Worker /myfxbook proxies Myfxbook HTML fetch (GH Actions IPs blocked by Myfxbook WAF)
-CF_WORKER_MFB_URL = "https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/myfxbook"
-# ForexFactory JSON — fallback if CF Worker /myfxbook fails (no WAF, accessible from GH Actions)
-FF_BASE_URL       = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
-FF_NEXTWEEK_URL   = "https://nfs.faireconomy.media/ff_calendar_nextweek.json"
-CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
+# Myfxbook RSS — primary and only source (no WAF, accessible from GH Actions, ~24h rolling window)
+MFB_RSS_URL  = "https://www.myfxbook.com/rss/forex-economic-calendar-events"
+CHANGED_FLAG = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
 FETCH_PAST_DAYS  = 21    # historical merge lookback (prev_events preserved up to 21 days)
-FETCH_FUTURE_DAYS = 14   # upcoming events window (for reference — FF JSON covers current week)
+FETCH_FUTURE_DAYS = 14   # upcoming events window
 
 G8 = {
     "US": "USD", "EU": "EUR", "GB": "GBP", "JP": "JPY",
@@ -425,7 +432,132 @@ FF_COUNTRY_NAME_TO_CCY = {
 }
 HEADERS = {"User-Agent": "globalinvesting-bot/3.0 (https://globalinvesting.github.io)"}
 
-# ── Myfxbook HTML calendar fetch ────────────────────────────────────────────────
+# ── Myfxbook RSS calendar fetch ──────────────────────────────────────────────
+
+def fetch_myfxbook_rss(xml: str) -> tuple[list[dict], list[dict]]:
+    """
+    Parse G8 economic events from the Myfxbook RSS feed XML.
+
+    Feed URL: https://www.myfxbook.com/rss/forex-economic-calendar-events
+    No WAF — accessible from GitHub Actions runner IPs (confirmed).
+    Covers a rolling ~24h window. Medium+high events only.
+
+    Each <item> has:
+      <title>   — event name
+      <link>    — https://www.myfxbook.com/forex-economic-calendar/{country_slug}/{event_slug}
+      <pubDate> — RFC 2822 datetime in UTC (e.g. "Thu, 11 Jun 2026 12:15 GMT")
+      <description> — HTML-encoded <table> with one data row:
+          <td> time_left </td>       e.g. "10h 49min" or "-1534 seconds"
+          <td> <span class="sprite sprite-common sprite-{impact}-impact"> </td>
+          <td> previous_value </td>
+          <td> consensus_value </td>
+          <td> actual_value </td>
+
+    Returns (events, holidays):
+      events  — list of normalised ff_calendar.json event dicts (medium + high, G8)
+      holidays — empty list (RSS does not include bank holiday entries)
+    """
+    import re as _re
+    from email.utils import parsedate_to_datetime as _parse_dt
+
+    SLUG_TO_CCY: dict[str, str] = {
+        "united-states": "USD", "euro-area": "EUR", "germany": "EUR",
+        "france": "EUR", "italy": "EUR", "spain": "EUR", "netherlands": "EUR",
+        "belgium": "EUR", "ireland": "EUR", "portugal": "EUR", "finland": "EUR",
+        "austria": "EUR", "greece": "EUR", "european-union": "EUR",
+        "united-kingdom": "GBP", "japan": "JPY", "canada": "CAD",
+        "australia": "AUD", "new-zealand": "NZD", "switzerland": "CHF",
+    }
+    G8_CCY = set(SLUG_TO_CCY.values())
+
+    events: list[dict] = []
+    skipped_ccy = skipped_impact = 0
+
+    for item in _re.finditer(r'<item>(.*?)</item>', xml, _re.DOTALL):
+        block = item.group(1)
+
+        # Currency from country slug in <link>
+        link_m = _re.search(
+            r'<link>https?://[^/]+/forex-economic-calendar/([^/]+)/[^<]+</link>', block
+        )
+        if not link_m:
+            continue
+        currency = SLUG_TO_CCY.get(link_m.group(1), "")
+        if not currency:
+            skipped_ccy += 1
+            continue
+
+        # Event title
+        title_m = _re.search(r'<title>([^<]+)</title>', block)
+        title = title_m.group(1).strip() if title_m else ""
+        if not title:
+            continue
+
+        # Date/time from <pubDate> (RFC 2822, UTC)
+        date_iso, time_utc = "", "00:00"
+        pub_m = _re.search(r'<pubDate>([^<]+)</pubDate>', block)
+        if pub_m:
+            try:
+                dt = _parse_dt(pub_m.group(1).strip())
+                date_iso = dt.strftime("%Y-%m-%d")
+                time_utc = dt.strftime("%H:%M")
+            except Exception:
+                pass
+        if not date_iso:
+            continue
+
+        # Decode HTML entities in <description> (&#60; = <, &#62; = >, &#39; = ')
+        desc_m = _re.search(r'<description>(.*?)</description>', block, _re.DOTALL)
+        if not desc_m:
+            continue
+        desc_raw = desc_m.group(1)
+        desc = (desc_raw
+                .replace('&#60;', '<').replace('&#62;', '>')
+                .replace('&#39;', "'").replace('&lt;', '<')
+                .replace('&gt;', '>').replace('&amp;', '&'))
+
+        # Impact from sprite class in decoded description
+        imp_m = _re.search(r'sprite-(high|medium|low)-impact', desc)
+        impact = imp_m.group(1) if imp_m else "low"
+        if impact == "low":
+            skipped_impact += 1
+            continue
+
+        # Values: extract all <td> text nodes from data row (skip header <th> row)
+        tds = _re.findall(r'<td>(.*?)</td>', desc, _re.DOTALL)
+
+        def _td(s: str) -> str | None:
+            v = _re.sub(r'<[^>]+>', '', s).strip()
+            return v if v and v not in ('-', '') else None
+
+        time_left_raw = _td(tds[0]) if tds else None
+        previous = _td(tds[2]) if len(tds) > 2 else None
+        forecast = _td(tds[3]) if len(tds) > 3 else None
+        actual   = _td(tds[4]) if len(tds) > 4 else None
+
+        # Released: actual present OR time_left is negative seconds (already passed)
+        is_passed = bool(time_left_raw and time_left_raw.startswith("-") and "second" in time_left_raw)
+        released  = actual is not None or is_passed
+
+        events.append({
+            "title":    title,
+            "currency": currency,
+            "dateISO":  date_iso,
+            "timeUTC":  time_utc,
+            "impact":   impact,
+            "forecast": _clean(forecast),
+            "previous": _clean(previous),
+            "actual":   _clean(actual),
+            "released": released,
+        })
+
+    events.sort(key=lambda e: (e["dateISO"], e["timeUTC"], e["currency"]))
+    released_count = sum(1 for e in events if e.get("released"))
+    print(f"  Myfxbook RSS: {len(events)} G8 medium/high events "
+          f"({released_count} with actuals; skipped {skipped_ccy} non-G8, "
+          f"{skipped_impact} low-impact)")
+    return events, []
+
 
 def fetch_myfxbook_calendar(html: str) -> tuple[list[dict], list[dict]]:
     """
@@ -1194,82 +1326,44 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.24")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.25")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
 
-    # Step 1: Fetch Myfxbook calendar via CF Worker /myfxbook proxy.
+    # Step 1: Fetch Myfxbook RSS feed.
     #
-    # GitHub Actions runner IPs are blocked by Myfxbook at TCP level — requests.get()
-    # hangs indefinitely despite FETCH_TIMEOUT (Cloudflare holds the connection open
-    # without sending data, bypassing the requests socket timeout).
-    # CF Worker edge IPs are NOT blocked by Myfxbook (confirmed accessible).
-    # Solution: CF Worker v4.0 adds /myfxbook endpoint that fetches+parses Myfxbook
-    # HTML from its edge IP and returns the event JSON to GH Actions.
-    #
-    # Fallback: FF JSON (thisweek + nextweek) if Worker call fails for any reason.
-    # FF JSON has no WAF and is accessible from GH Actions runner IPs.
+    # RSS URL: https://www.myfxbook.com/rss/forex-economic-calendar-events
+    # Accessible from GitHub Actions (no WAF — confirmed).
+    # Covers a rolling ~24h window of events.
+    # Actuals appear within minutes of release; accumulated via prev_events carry-forward.
+    # Single source — FF JSON removed to avoid title-key mismatches and duplicate events.
     fresh    = []
     holidays = []
-    source   = "unknown"
+    source   = "Myfxbook"
 
-    print(f"  Myfxbook proxy: fetching {CF_WORKER_MFB_URL} ...")
+    MFB_HEADERS = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/rss+xml, application/xml, text/xml, */*",
+    }
+    print(f"  Myfxbook RSS: fetching {MFB_RSS_URL} ...")
     try:
-        r = requests.get(CF_WORKER_MFB_URL, headers=HEADERS, timeout=15)
-        if r.status_code == 200:
-            data = r.json()
-            if isinstance(data.get("events"), list) and data["events"]:
-                raw_events = data["events"]
-                holidays   = data.get("holidays", [])
-                source     = "Myfxbook"
-                # Normalise Worker event dicts to ff_calendar.json schema
-                fresh = _normalise_worker_events(raw_events)
-                print(f"  Myfxbook proxy: {len(fresh)} events ({sum(1 for e in fresh if e.get('released'))} with actuals)")
-            else:
-                print(f"  Myfxbook proxy: empty or malformed response — {str(data)[:80]}")
-        else:
-            print(f"  Myfxbook proxy: HTTP {r.status_code} — falling back to FF JSON")
-    except Exception as e:
-        print(f"  Myfxbook proxy: request failed ({e}) — falling back to FF JSON")
-
-    # Step 1 fallback: FF JSON (thisweek + nextweek)
-    if not fresh:
-        print(f"  FF JSON fallback: fetching {FF_BASE_URL} ...")
-        try:
-            r = requests.get(FF_BASE_URL, headers={**HEADERS, "Accept": "application/json"}, timeout=FETCH_TIMEOUT)
-            ct = r.headers.get("Content-Type", "")
-            if r.status_code == 200 and "application/json" in ct:
-                ff_raw = r.json()
-                if isinstance(ff_raw, list):
-                    print(f"  FF JSON: {len(ff_raw)} raw items (thisweek)")
-                    # nextweek best-effort
-                    try:
-                        r2 = requests.get(FF_NEXTWEEK_URL, headers={**HEADERS, "Accept": "application/json"}, timeout=FETCH_TIMEOUT)
-                        ct2 = r2.headers.get("Content-Type", "")
-                        if r2.status_code == 200 and "application/json" in ct2:
-                            nw = r2.json()
-                            if isinstance(nw, list):
-                                ff_raw = ff_raw + nw
-                                print(f"  FF JSON: +{len(nw)} nextweek items")
-                    except Exception as e2:
-                        print(f"  FF JSON nextweek: skipped ({e2})")
-                    fresh    = fetch_forexfactory_json(ff_raw)
-                    holidays = fetch_ff_holidays(ff_raw)
-                    source   = "ForexFactory"
-                else:
-                    print("  ERROR: FF JSON not a list — preserving previous file.")
-                    sys.exit(0)
-            else:
-                body = r.text[:80].strip()
-                if "Request Denied" in body or "DOCTYPE" in body:
-                    print(f"  ERROR: FF JSON rate limit (HTTP {r.status_code}) — preserving previous file.")
-                else:
-                    print(f"  ERROR: FF JSON HTTP {r.status_code} — preserving previous file.")
-                sys.exit(0)
-        except Exception as e:
-            print(f"  ERROR: FF JSON request failed — {e}")
+        r = requests.get(MFB_RSS_URL, headers=MFB_HEADERS, timeout=FETCH_TIMEOUT)
+        if r.status_code != 200:
+            print(f"  ERROR: Myfxbook RSS HTTP {r.status_code} — preserving previous file.")
             sys.exit(0)
+        if "<item>" not in r.text:
+            print("  ERROR: Myfxbook RSS missing <item> elements — unexpected response.")
+            sys.exit(0)
+        print(f"  Myfxbook RSS: {len(r.text):,} bytes received")
+        fresh, holidays = fetch_myfxbook_rss(r.text)
+    except Exception as e:
+        print(f"  ERROR: Myfxbook RSS request failed — {e}")
+        sys.exit(0)
 
     # Step 1a: Validate
     if not fresh:
