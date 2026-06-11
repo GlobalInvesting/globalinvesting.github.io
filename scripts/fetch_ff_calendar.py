@@ -1,6 +1,26 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.25
+fetch_ff_calendar.py — v3.26
+v3.26 changes (2026-06-11):
+- PRIMARY SOURCE SWITCHED: Myfxbook RSS → Myfxbook HTML page.
+  RSS feed only covers a rolling ~24h window and does NOT expose actuals for
+  events that have already passed — by the time a cron runs, the actual has
+  left the feed. The HTML page (myfxbook.com/forex-economic-calendar) shows
+  the full current-week calendar with actuals permanently retained in the
+  HTML attributes once released (data-actual OID + span.actualCell). This is
+  the same source that was confirmed accessible from GH Actions in v3.23.
+  The parser fetch_myfxbook_calendar() already exists (written in v3.23) and
+  handles all extraction including holidays. No new parsing code needed.
+- REMOVED: fetch_myfxbook_rss() call in main(). MFB_RSS_URL constant kept for
+  reference but no longer used. MFB_HTML_URL replaces it as the active constant.
+- main() Step 1: GET https://www.myfxbook.com/forex-economic-calendar with
+  browser User-Agent + Accept text/html. On failure → exit 0 (preserve previous
+  file), same failsafe as v3.25. On success → fetch_myfxbook_calendar(html).
+- CF Worker (v5.0) still polls RSS every 30min for near-real-time actual
+  detection and dispatch — RSS is fine for that use-case (event is in the feed
+  while it is happening). Python script uses HTML for full historical actuals.
+- Version bump in main() print statement: v3.25 → v3.26.
+
 v3.25 changes (2026-06-11):
 - PRIMARY SOURCE: Myfxbook RSS feed (myfxbook.com/rss/forex-economic-calendar-events).
   RSS is accessible from GitHub Actions (no WAF — confirmed ~127KB response, instant).
@@ -406,7 +426,8 @@ import requests
 # ── Config ────────────────────────────────────────────────────────────────────
 OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
 # Myfxbook RSS — primary and only source (no WAF, accessible from GH Actions, ~24h rolling window)
-MFB_RSS_URL  = "https://www.myfxbook.com/rss/forex-economic-calendar-events"
+MFB_RSS_URL  = "https://www.myfxbook.com/rss/forex-economic-calendar-events"  # kept for CF Worker reference
+MFB_HTML_URL = "https://www.myfxbook.com/forex-economic-calendar"
 CHANGED_FLAG = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
@@ -1326,18 +1347,19 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.25")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.26")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
 
-    # Step 1: Fetch Myfxbook RSS feed.
+    # Step 1: Fetch Myfxbook HTML calendar page.
     #
-    # RSS URL: https://www.myfxbook.com/rss/forex-economic-calendar-events
-    # Accessible from GitHub Actions (no WAF — confirmed).
-    # Covers a rolling ~24h window of events.
-    # Actuals appear within minutes of release; accumulated via prev_events carry-forward.
-    # Single source — FF JSON removed to avoid title-key mismatches and duplicate events.
+    # URL: https://www.myfxbook.com/forex-economic-calendar
+    # Accessible from GitHub Actions (confirmed in v3.23: no WAF, full HTML returned).
+    # Covers current week + ~1 week ahead. Actuals are permanently retained in HTML
+    # attributes (data-actual OID, span.actualCell) once an event releases — no rolling
+    # expiry unlike the RSS feed which only covers ~24h and drops actuals after the fact.
+    # fetch_myfxbook_calendar() parses the full page including holidays.
     fresh    = []
     holidays = []
     source   = "Myfxbook"
@@ -1348,21 +1370,22 @@ def main():
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/124.0.0.0 Safari/537.36"
         ),
-        "Accept": "application/rss+xml, application/xml, text/xml, */*",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
     }
-    print(f"  Myfxbook RSS: fetching {MFB_RSS_URL} ...")
+    print(f"  Myfxbook HTML: fetching {MFB_HTML_URL} ...")
     try:
-        r = requests.get(MFB_RSS_URL, headers=MFB_HEADERS, timeout=FETCH_TIMEOUT)
+        r = requests.get(MFB_HTML_URL, headers=MFB_HEADERS, timeout=FETCH_TIMEOUT)
         if r.status_code != 200:
-            print(f"  ERROR: Myfxbook RSS HTTP {r.status_code} — preserving previous file.")
+            print(f"  ERROR: Myfxbook HTML HTTP {r.status_code} — preserving previous file.")
             sys.exit(0)
-        if "<item>" not in r.text:
-            print("  ERROR: Myfxbook RSS missing <item> elements — unexpected response.")
+        if "economicCalendarRow" not in r.text:
+            print("  ERROR: Myfxbook HTML missing calendar rows — unexpected response or WAF block.")
             sys.exit(0)
-        print(f"  Myfxbook RSS: {len(r.text):,} bytes received")
-        fresh, holidays = fetch_myfxbook_rss(r.text)
+        print(f"  Myfxbook HTML: {len(r.text):,} bytes received")
+        fresh, holidays = fetch_myfxbook_calendar(r.text)
     except Exception as e:
-        print(f"  ERROR: Myfxbook RSS request failed — {e}")
+        print(f"  ERROR: Myfxbook HTML request failed — {e}")
         sys.exit(0)
 
     # Step 1a: Validate
