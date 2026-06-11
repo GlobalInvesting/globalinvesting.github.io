@@ -9675,6 +9675,68 @@ function alertsAddFromUI() {
 
 // ── Check cycle ───────────────────────────────────────────────────────────────
 
+// ── alertsCheckEco — dedicated eco_actual check (runs every 2 min) ───────────
+// Extracted from alertsCheck so eco_actual alerts can run on a 2-min cycle
+// independent of the 5-min price/regime alert cycle. Both functions share the
+// same fingerprint store (_ecoFpLoad/_ecoFpSave) and alert array (alertsLoad).
+async function alertsCheckEco() {
+  const arr      = alertsLoad();
+  const ecoAlerts = arr.filter(a => a.type === 'eco_actual' && !a.fired);
+  if (!ecoAlerts.length) return;
+
+  const todayISO = new Date().toISOString().slice(0, 10);
+  const stored   = _ecoFpLoad();
+  const prevFp   = stored.fp ?? null;
+  const allCcys  = [...new Set(ecoAlerts.flatMap(a => a.currencies || []))];
+  const newFp    = await _buildEcoActualFp(allCcys);
+
+  if (newFp === null) return;   // fetch failed — skip silently
+
+  if (prevFp === null) {
+    _ecoFpSave(newFp, todayISO);   // First load — baseline only, no notification
+    return;
+  }
+
+  if (newFp === prevFp || newFp === '') return;   // no change
+
+  const prevSet = new Set(prevFp.split(';;').filter(Boolean));
+  const newSet  = new Set(newFp.split(';;').filter(Boolean));
+  const added   = [...newSet].filter(x => !prevSet.has(x));
+  _ecoFpSave(newFp, todayISO);
+
+  if (!added.length) return;
+
+  const newActuals = added.map(s => {
+    const [ccy, , time, title, actual] = s.split('|');
+    return { ccy, time, title, actual };
+  });
+
+  let changed = false;
+  ecoAlerts.forEach(a => {
+    const matching = newActuals.filter(n => !a.currencies.length || a.currencies.includes(n.ccy));
+    if (!matching.length) return;
+
+    a.fired       = true;
+    a.firedAt     = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    a.lastActuals = matching.slice(0, 3);
+    changed       = true;
+
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      const ccyLabel = a.currencies.length ? a.currencies.join('/') : 'G8';
+      const preview  = matching.slice(0, 2).map(n => `${n.ccy} ${n.title}: ${n.actual}`).join(' · ');
+      try {
+        new Notification(`GI Terminal — ${ccyLabel} Economic Release`, {
+          body : preview || `${matching.length} new actual(s)`,
+          icon : '/favicon-192x192.png',
+          tag  : 'gi-eco-' + a.id,
+        });
+      } catch {}
+    }
+  });
+
+  if (changed) { alertsSave(arr); alertsRender(null); }
+}
+
 async function alertsCheck() {
   const arr = alertsLoad();
   if (!arr.length) return;
@@ -9688,55 +9750,10 @@ async function alertsCheck() {
 
   let changed = false;
 
-  // ── eco_actual alerts: async fingerprint-based, event-driven ─────────────
-  const ecoAlerts = arr.filter(a => a.type === 'eco_actual' && !a.fired);
-  if (ecoAlerts.length) {
-    const todayISO = new Date().toISOString().slice(0, 10);
-    const stored   = _ecoFpLoad();
-    const prevFp   = stored.fp ?? null;
-    const allCcys  = [...new Set(ecoAlerts.flatMap(a => a.currencies || []))];
-    const newFp    = await _buildEcoActualFp(allCcys);
-
-    if (newFp !== null) {
-      if (prevFp === null) {
-        _ecoFpSave(newFp, todayISO);   // First load — baseline only, no notification
-      } else if (newFp !== prevFp && newFp !== '') {
-        const prevSet    = new Set(prevFp.split(';;').filter(Boolean));
-        const newSet     = new Set(newFp.split(';;').filter(Boolean));
-        const added      = [...newSet].filter(x => !prevSet.has(x));
-        _ecoFpSave(newFp, todayISO);
-
-        if (added.length) {
-          const newActuals = added.map(s => {
-            const [ccy, , time, title, actual] = s.split('|');
-            return { ccy, time, title, actual };
-          });
-
-          ecoAlerts.forEach(a => {
-            const matching = newActuals.filter(n => !a.currencies.length || a.currencies.includes(n.ccy));
-            if (!matching.length) return;
-
-            a.fired       = true;
-            a.firedAt     = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            a.lastActuals = matching.slice(0, 3);
-            changed       = true;
-
-            if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-              const ccyLabel = a.currencies.length ? a.currencies.join('/') : 'G8';
-              const preview  = matching.slice(0, 2).map(n => `${n.ccy} ${n.title}: ${n.actual}`).join(' · ');
-              try {
-                new Notification(`GI Terminal — ${ccyLabel} Economic Release`, {
-                  body : preview || `${matching.length} new actual(s)`,
-                  icon : '/favicon-192x192.png',
-                  tag  : 'gi-eco-' + a.id,
-                });
-              } catch {}
-            }
-          });
-        }
-      }
-    }
-  }
+  // ── eco_actual alerts: handled by alertsCheckEco() (2-min dedicated loop) ───
+  // eco_actual is event-driven and runs independently of price/regime alerts.
+  // alertsCheckEco() shares the same fingerprint store and alert array; no
+  // duplicate handling needed here.
 
   // ── Threshold alerts: price, spread, ivrank, corr, var, regime ───────────
   arr.forEach(a => {
@@ -9789,7 +9806,28 @@ function initAlerts() {
   // 8 s is well within the observed p95 round-trip for fetchQuoteBarRT (~2–3 s)
   // and fetchRiskData (~3–5 s), so the cache is reliably warm by then.
   setTimeout(alertsCheck, 8000);
-  setInterval(alertsCheck, 5 * 60 * 1000);
+
+  // ── Two separate loops: eco_actual (2 min) vs price/regime (5 min) ────────
+  // eco_actual alerts poll ff_calendar.json — the CF Worker + GitHub Actions
+  // pipeline delivers new actuals within ~2 min. Running eco checks on the same
+  // 5-min cycle as price alerts added up to 3 min of unnecessary lag on top of
+  // the pipeline latency. Mirrors calendar-panel.js v1.3 which uses 2 min for
+  // the same reason. Price/regime alerts depend on intraday quotes (STOOQ_RT_CACHE)
+  // which update every 5 min — no benefit from a faster cycle there.
+  setInterval(alertsCheckEco, 2 * 60 * 1000);
+  setInterval(alertsCheck,    5 * 60 * 1000);
+
+  // visibilitychange fast-path: if the user focuses the tab after the pipeline
+  // has delivered a new actual, eco check fires immediately rather than waiting
+  // up to 2 min for the next interval. Mirrors calendar-panel.js behaviour.
+  let _lastVisCheck = 0;
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState !== 'visible') return;
+    const now = Date.now();
+    if (now - _lastVisCheck < 30 * 1000) return;   // debounce: max once per 30s
+    _lastVisCheck = now;
+    alertsCheckEco();
+  });
 
   // Init signal notification button state from localStorage
   updateSignalNotifBtn();
