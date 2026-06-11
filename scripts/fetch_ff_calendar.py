@@ -1,6 +1,23 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.23
+fetch_ff_calendar.py — v3.24
+v3.24 changes (2026-06-10):
+- FIX: Myfxbook HTML fetch routed through CF Worker proxy endpoint /myfxbook.
+  GitHub Actions runner IPs are blocked by Myfxbook at TCP level (Cloudflare
+  holds connection open indefinitely — requests.get() hangs despite FETCH_TIMEOUT).
+  CF Worker edge IPs are NOT blocked by Myfxbook (confirmed: HTML returned OK).
+  Solution: CF Worker v4.0 adds /myfxbook endpoint that fetches+parses Myfxbook
+  HTML and returns events JSON. GH Actions calls workers.dev/myfxbook instead of
+  myfxbook.com directly. Fast (~500ms round-trip via CF edge).
+- NEW: CF_WORKER_MFB_URL constant for the /myfxbook Worker endpoint.
+- UPDATED: Step 1 in main() calls CF Worker /myfxbook with short timeout (15s).
+  Fallback: FF JSON (thisweek+nextweek) if Worker call fails.
+- UPDATED: Step 1a maps Worker response to the same normalised event dicts.
+- REMOVED: MFB_URL (direct Myfxbook URL) — no longer fetched by Python.
+- REMOVED: Step 1c (CF Worker /trigger + /payload KV inject) — superseded by
+  the new /myfxbook endpoint which returns full events directly, not just actuals.
+- Version bump in main() print statement: v3.23 → v3.24.
+
 v3.23 changes (2026-06-10):
 - PRIMARY SOURCE REPLACED: ForexFactory JSON → Myfxbook HTML calendar.
   FF JSON has a 10h+ actual lag and limited forecast coverage. Myfxbook HTML
@@ -378,7 +395,11 @@ import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
 OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script writes here
-MFB_URL          = "https://www.myfxbook.com/forex-economic-calendar"          # primary source
+# CF Worker /myfxbook proxies Myfxbook HTML fetch (GH Actions IPs blocked by Myfxbook WAF)
+CF_WORKER_MFB_URL = "https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/myfxbook"
+# ForexFactory JSON — fallback if CF Worker /myfxbook fails (no WAF, accessible from GH Actions)
+FF_BASE_URL       = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
+FF_NEXTWEEK_URL   = "https://nfs.faireconomy.media/ff_calendar_nextweek.json"
 CHANGED_FLAG     = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
@@ -568,6 +589,55 @@ def fetch_myfxbook_calendar(html: str) -> tuple[list[dict], list[dict]]:
           f"{skipped_impact} low-impact, {len(holidays)} holidays)")
     return events, holidays
 
+
+
+def _normalise_worker_events(raw_events: list) -> list[dict]:
+    """
+    Normalise CF Worker /myfxbook response events to ff_calendar.json event schema.
+
+    Worker events have:
+      date     — "YYYY-MM-DD HH:MM:SS" UTC
+      dateISO  — "YYYY-MM-DD"
+      timeUTC  — "HH:MM"
+      currency — 3-letter G8 code
+      impact   — "high" | "medium"
+      title    — event name (may include period suffix)
+      actual   — string or null
+      forecast — string or null
+      previous — string or null
+      released — bool
+
+    Returns list of normalised dicts matching the ff_calendar.json schema.
+    """
+    events = []
+    for ev in raw_events:
+        date_iso = ev.get("dateISO") or (ev.get("date") or "")[:10]
+        time_utc = ev.get("timeUTC") or (ev.get("date") or " 00:00")[11:16]
+        if not date_iso:
+            continue
+        currency = (ev.get("currency") or "").strip().upper()
+        G8_CCY = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"}
+        if currency not in G8_CCY:
+            continue
+        impact_raw = (ev.get("impact") or "").lower()
+        if impact_raw not in ("high", "medium"):
+            continue
+        actual   = _clean(ev.get("actual"))
+        forecast = _clean(ev.get("forecast"))
+        previous = _clean(ev.get("previous"))
+        released = bool(ev.get("released")) or actual is not None
+        events.append({
+            "title":    (ev.get("title") or "").strip(),
+            "currency": currency,
+            "dateISO":  date_iso,
+            "timeUTC":  time_utc,
+            "impact":   impact_raw,
+            "forecast": forecast,
+            "previous": previous,
+            "actual":   actual,
+            "released": released,
+        })
+    return events
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -1124,49 +1194,90 @@ def load_previous() -> tuple[list, set]:
 
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.23")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.24")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
 
-    # Step 1: Fetch Myfxbook HTML economic calendar.
-    # Single request — the page covers current + next ~8 days with all G8 events.
-    # No API key required. Data embedded in HTML attributes (no JS execution needed).
-    # Accessible from GitHub Actions runners (confirmed: no WAF block with User-Agent).
-    MFB_HEADERS = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/124.0.0.0 Safari/537.36"
-        ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-    }
-    print(f"  Myfxbook: fetching {MFB_URL} ...")
+    # Step 1: Fetch Myfxbook calendar via CF Worker /myfxbook proxy.
+    #
+    # GitHub Actions runner IPs are blocked by Myfxbook at TCP level — requests.get()
+    # hangs indefinitely despite FETCH_TIMEOUT (Cloudflare holds the connection open
+    # without sending data, bypassing the requests socket timeout).
+    # CF Worker edge IPs are NOT blocked by Myfxbook (confirmed accessible).
+    # Solution: CF Worker v4.0 adds /myfxbook endpoint that fetches+parses Myfxbook
+    # HTML from its edge IP and returns the event JSON to GH Actions.
+    #
+    # Fallback: FF JSON (thisweek + nextweek) if Worker call fails for any reason.
+    # FF JSON has no WAF and is accessible from GH Actions runner IPs.
+    fresh    = []
+    holidays = []
+    source   = "unknown"
+
+    print(f"  Myfxbook proxy: fetching {CF_WORKER_MFB_URL} ...")
     try:
-        r = requests.get(MFB_URL, headers=MFB_HEADERS, timeout=FETCH_TIMEOUT)
-        if r.status_code != 200:
-            print(f"  ERROR: Myfxbook HTTP {r.status_code} — preserving previous file.")
-            sys.exit(0)
-        if "calendarToggleCell" not in r.text:
-            print("  ERROR: Myfxbook response missing calendar data — WAF block or layout change.")
-            sys.exit(0)
-        mfb_html = r.text
-        print(f"  Myfxbook: HTML received ({len(mfb_html):,} bytes)")
+        r = requests.get(CF_WORKER_MFB_URL, headers=HEADERS, timeout=15)
+        if r.status_code == 200:
+            data = r.json()
+            if isinstance(data.get("events"), list) and data["events"]:
+                raw_events = data["events"]
+                holidays   = data.get("holidays", [])
+                source     = "Myfxbook"
+                # Normalise Worker event dicts to ff_calendar.json schema
+                fresh = _normalise_worker_events(raw_events)
+                print(f"  Myfxbook proxy: {len(fresh)} events ({sum(1 for e in fresh if e.get('released'))} with actuals)")
+            else:
+                print(f"  Myfxbook proxy: empty or malformed response — {str(data)[:80]}")
+        else:
+            print(f"  Myfxbook proxy: HTTP {r.status_code} — falling back to FF JSON")
     except Exception as e:
-        print(f"  ERROR: Myfxbook request failed — {e}")
-        sys.exit(0)
+        print(f"  Myfxbook proxy: request failed ({e}) — falling back to FF JSON")
 
-    # Step 1a: Parse events and holidays from HTML
-    fresh, holidays = fetch_myfxbook_calendar(mfb_html)
-    source = "Myfxbook"
-
+    # Step 1 fallback: FF JSON (thisweek + nextweek)
     if not fresh:
-        print("  ERROR: No G8 medium/high events parsed — preserving previous file.")
+        print(f"  FF JSON fallback: fetching {FF_BASE_URL} ...")
+        try:
+            r = requests.get(FF_BASE_URL, headers={**HEADERS, "Accept": "application/json"}, timeout=FETCH_TIMEOUT)
+            ct = r.headers.get("Content-Type", "")
+            if r.status_code == 200 and "application/json" in ct:
+                ff_raw = r.json()
+                if isinstance(ff_raw, list):
+                    print(f"  FF JSON: {len(ff_raw)} raw items (thisweek)")
+                    # nextweek best-effort
+                    try:
+                        r2 = requests.get(FF_NEXTWEEK_URL, headers={**HEADERS, "Accept": "application/json"}, timeout=FETCH_TIMEOUT)
+                        ct2 = r2.headers.get("Content-Type", "")
+                        if r2.status_code == 200 and "application/json" in ct2:
+                            nw = r2.json()
+                            if isinstance(nw, list):
+                                ff_raw = ff_raw + nw
+                                print(f"  FF JSON: +{len(nw)} nextweek items")
+                    except Exception as e2:
+                        print(f"  FF JSON nextweek: skipped ({e2})")
+                    fresh    = fetch_forexfactory_json(ff_raw)
+                    holidays = fetch_ff_holidays(ff_raw)
+                    source   = "ForexFactory"
+                else:
+                    print("  ERROR: FF JSON not a list — preserving previous file.")
+                    sys.exit(0)
+            else:
+                body = r.text[:80].strip()
+                if "Request Denied" in body or "DOCTYPE" in body:
+                    print(f"  ERROR: FF JSON rate limit (HTTP {r.status_code}) — preserving previous file.")
+                else:
+                    print(f"  ERROR: FF JSON HTTP {r.status_code} — preserving previous file.")
+                sys.exit(0)
+        except Exception as e:
+            print(f"  ERROR: FF JSON request failed — {e}")
+            sys.exit(0)
+
+    # Step 1a: Validate
+    if not fresh:
+        print("  ERROR: No G8 medium/high events parsed from any source — preserving previous file.")
         sys.exit(0)
 
     released_fresh = sum(1 for e in fresh if e.get("released"))
-    print(f"  Fetched: {len(fresh)} events ({released_fresh} with actuals)")
+    print(f"  Fetched: {len(fresh)} events ({released_fresh} with actuals) [source: {source}]")
 
     # Step 2: Historical merge — preserve events from prev_events not covered by the fresh fetch.
     # With Finnhub (old), fresh covered a 21-day window so the guard `d >= date_from` correctly
