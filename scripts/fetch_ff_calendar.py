@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.26
+fetch_ff_calendar.py — v3.27
+v3.27 changes (2026-06-11):
+- LAYER 2 ADDED: Worker KV payload as actual enrichment source.
+  After Step 1 (Myfxbook HTML) and Step 2 merge, Step 1b fetches the CF Worker
+  /payload endpoint (token-gated, Authorization: Bearer CF_PAYLOAD_TOKEN) and
+  builds a kv_map of events with actuals. Step 2a then applies kv_map to all
+  events in `fresh` (including prev_events merged in Step 2) where actual is None.
+  This bridges the gap when Myfxbook HTML is stale/blocked and carry-forward has
+  nothing (e.g. first run after a major release on a fresh deploy).
+- NEW: fetch_worker_payload() helper — GET /payload with auth header, returns list.
+- NEW: KV_PAYLOAD_URL constant — CF Worker calendar-watcher /payload endpoint.
+- WORKFLOW: CF_PAYLOAD_TOKEN secret passed to fetch step via env.CF_PAYLOAD_TOKEN.
+- Version bump in main() print statement: v3.26 → v3.27.
 v3.26 changes (2026-06-11):
 - PRIMARY SOURCE SWITCHED: Myfxbook RSS → Myfxbook HTML page.
   RSS feed only covers a rolling ~24h window and does NOT expose actuals for
@@ -428,6 +440,7 @@ OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script write
 # Myfxbook RSS — primary and only source (no WAF, accessible from GH Actions, ~24h rolling window)
 MFB_RSS_URL  = "https://www.myfxbook.com/rss/forex-economic-calendar-events"  # kept for CF Worker reference
 MFB_HTML_URL = "https://www.myfxbook.com/forex-economic-calendar"
+KV_PAYLOAD_URL = "https://globalinvesting-calendar-watcher.globalinvesting-io.workers.dev/payload"
 CHANGED_FLAG = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
@@ -1345,9 +1358,49 @@ def load_previous() -> tuple[list, set]:
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def fetch_worker_payload() -> list[dict]:
+    """Fetch the CF Worker KV payload (real-time actuals captured at event release).
+
+    The Worker polls Myfxbook RSS every 30min and persists actuals to KV the moment
+    they appear in the feed (the ~5-30min window when an event is active). This is
+    the complement to the HTML parser: HTML gives permanent schedule + actuals but
+    may be stale; KV gives the freshest actuals captured at release time.
+
+    Requires CF_PAYLOAD_TOKEN env var (matches env.PAYLOAD_TOKEN in the Worker).
+    Returns [] on any failure — always safe to ignore.
+    """
+    import os
+    token = os.environ.get("CF_PAYLOAD_TOKEN", "")
+    if not token:
+        print("  Step 1b: CF_PAYLOAD_TOKEN not set — skipping KV inject.")
+        return []
+    try:
+        r = requests.get(
+            KV_PAYLOAD_URL,
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=10,
+        )
+        if r.status_code == 401:
+            print("  Step 1b: Worker /payload 401 Unauthorized — check CF_PAYLOAD_TOKEN secret.")
+            return []
+        if r.status_code != 200:
+            print(f"  Step 1b: Worker /payload HTTP {r.status_code} — skipping KV inject.")
+            return []
+        data = r.json()
+        if not isinstance(data, list):
+            print("  Step 1b: Worker /payload returned non-list — skipping.")
+            return []
+        actuals_count = sum(1 for e in data if e.get("actual") is not None)
+        print(f"  Step 1b: Worker KV payload — {len(data)} events, {actuals_count} with actuals")
+        return data
+    except Exception as e:
+        print(f"  Step 1b: Worker /payload fetch failed — {e} — skipping KV inject.")
+        return []
+
+
 def main():
     now_utc = datetime.now(timezone.utc)
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.26")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_ff_calendar.py v3.27")
 
     date_from = (now_utc - timedelta(days=FETCH_PAST_DAYS)).strftime("%Y-%m-%d")
     date_to   = (now_utc + timedelta(days=FETCH_FUTURE_DAYS)).strftime("%Y-%m-%d")
@@ -1396,6 +1449,18 @@ def main():
     released_fresh = sum(1 for e in fresh if e.get("released"))
     print(f"  Fetched: {len(fresh)} events ({released_fresh} with actuals) [source: {source}]")
 
+    # Step 1b: Enrich with Worker KV actuals (real-time layer).
+    # The CF Worker captures actuals in the RSS feed during the ~30min window they are
+    # active and persists them to KV. This supplements the HTML source for cases where
+    # the HTML is served stale (CDN cache) or the cron runs during a gap.
+    kv_events = fetch_worker_payload()
+    kv_map: dict = {}
+    if kv_events:
+        for ev in kv_events:
+            if ev.get("actual") is not None:
+                k = (ev.get("currency",""), ev.get("dateISO",""), ev.get("timeUTC",""), ev.get("title",""))
+                kv_map[k] = ev["actual"]
+
     # Step 2: Historical merge — preserve events from prev_events not covered by the fresh fetch.
     # With Finnhub (old), fresh covered a 21-day window so the guard `d >= date_from` correctly
     # excluded events already refreshed. With ForexFactory public JSON (v3.17+), fresh covers
@@ -1438,6 +1503,20 @@ def main():
             carried += 1
     if carried:
         print(f"  Carried forward: {carried} actual(s) from previous file (FF JSON lag guard)")
+
+    # Step 2a-ii: Apply Worker KV actuals for any event still missing actual after carry-forward.
+    kv_injected = 0
+    if kv_map:
+        for ev in fresh:
+            if ev.get("actual") is not None:
+                continue
+            k = (ev.get("currency",""), ev.get("dateISO",""), ev.get("timeUTC",""), ev.get("title",""))
+            if k in kv_map:
+                ev["actual"]   = kv_map[k]
+                ev["released"] = True
+                kv_injected += 1
+        if kv_injected:
+            print(f"  KV inject: {kv_injected} actual(s) from Worker KV payload")
 
     # Step 2b: Enrich from calendar.json backfill (fills actuals/previous Finnhub can't provide)
     enrich_from_calendar_json(fresh)
