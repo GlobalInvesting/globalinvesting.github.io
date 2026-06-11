@@ -11,7 +11,27 @@ name: Update Interest Rates (Scraping + Frankfurter validation)
 
 on:
   schedule:
-    - cron: '0 8 * * *'   # Daily at 08:00 UTC — after Asia close, before EU open
+    # ── Asia close / EU pre-open base run ─────────────────────────────────────
+    # Captures: JPY (BoJ ~02:30 UTC), AUD (RBA ~04:30 UTC), NZD (RBNZ ~02:00 UTC).
+    # These three CBs publish before 08:00 UTC so a single daily run suffices.
+    - cron: '0 8 * * *'    # Daily 08:00 UTC — base run, catches overnight decisions
+
+    # ── CBs that decide AFTER 08:00 UTC ───────────────────────────────────────
+    # SNB:  09:30 CET = 08:30 UTC Thu (quarterly: Mar/Jun/Sep/Dec)
+    - cron: '0 10 * * 4'   # Thu 10:00 UTC — SNB post-decision capture
+
+    # ECB:  12:15 UTC Thu (occasionally Fri) — SDMX confirmed available post-decision
+    # BoE:  12:00 UTC Thu (occasionally Fri)
+    - cron: '0 14 * * 4'   # Thu 14:00 UTC — ECB + BoE post-decision capture
+    - cron: '0 14 * * 5'   # Fri 14:00 UTC — ECB/BoE on Fri (e.g. Jan 30, Mar 6 2026)
+
+    # BoC:  14:45 ET = 19:45 UTC Wed (occasionally Thu)
+    - cron: '0 21 * * 3'   # Wed 21:00 UTC — BoC post-decision capture
+    - cron: '0 21 * * 4'   # Thu 21:00 UTC — BoC on Thu (e.g. Jan 29, Apr 29 2026)
+
+    # FOMC: 19:00 ET = 00:00 UTC Thu — FRED DFF has 1-day lag; base run at 08:00
+    #        UTC Thu captures it naturally. No extra cron needed.
+
   repository_dispatch:
     types: [cb-rate-decision]   # Fired by calendar-watcher.js when a CB rate actual is detected
   workflow_dispatch:
