@@ -440,7 +440,7 @@ OUTPUT_PATH   = "calendar-data/ff_calendar.json"  # output — this script write
 # Myfxbook RSS — primary and only source (no WAF, accessible from GH Actions, ~24h rolling window)
 MFB_RSS_URL  = "https://www.myfxbook.com/rss/forex-economic-calendar-events"  # kept for CF Worker reference
 MFB_HTML_URL = "https://www.myfxbook.com/forex-economic-calendar"
-KV_PAYLOAD_URL = "https://globalinvesting-calendar-watcher.globalinvesting-io.workers.dev/payload"
+KV_PAYLOAD_URL = "https://globalinvesting-calendar-watcher.globalinvestingmarkets.workers.dev/payload"
 CHANGED_FLAG = "/tmp/cal_changed"    # written "1" if actuals/forecasts changed vs prev file
 FETCH_TIMEOUT    = 30    # seconds — requests.get timeout
 LOOKBACK_DAYS    = 21
