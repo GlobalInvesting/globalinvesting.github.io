@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-11T03:34:23Z",
-  "generatedAt": "2026-06-11T03:34:23Z",
+  "lastUpdate": "2026-06-11T06:25:14Z",
+  "generatedAt": "2026-06-11T06:25:14Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-12",
   "rangeTo": "2026-06-12",
-  "totalEvents": 1541,
+  "totalEvents": 1542,
   "currencyCounts": {
     "NZD": 73,
     "USD": 583,
-    "AUD": 160,
+    "AUD": 161,
     "CAD": 126,
     "CHF": 85,
     "EUR": 173,
@@ -21,7 +21,7 @@
     "JPY": 175
   },
   "impactCounts": {
-    "medium": 1028,
+    "medium": 1029,
     "high": 378,
     "low": 135
   },
@@ -450,6 +450,11 @@
       "n": 2,
       "mean": 0.05,
       "std": 0.070711
+    },
+    "GBP/rics house price balance": {
+      "n": 2,
+      "mean": -6.0,
+      "std": 4.242641
     }
   },
   "events": [
@@ -20145,7 +20150,7 @@
       "flag": "🇺🇸",
       "event": "Core CPI m/m",
       "impact": "high",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.3%",
       "previous": "0.4%"
     },
@@ -20158,7 +20163,7 @@
       "flag": "🇺🇸",
       "event": "Core CPI y/y",
       "impact": "high",
-      "actual": null,
+      "actual": "2.9%",
       "forecast": "2.9%",
       "previous": "2.8%"
     },
@@ -20171,7 +20176,7 @@
       "flag": "🇺🇸",
       "event": "CPI m/m",
       "impact": "high",
-      "actual": null,
+      "actual": "0.5%",
       "forecast": "0.5%",
       "previous": "0.6%"
     },
@@ -20184,7 +20189,7 @@
       "flag": "🇺🇸",
       "event": "CPI y/y",
       "impact": "high",
-      "actual": null,
+      "actual": "4.2%",
       "forecast": "4.2%",
       "previous": "3.8%"
     },
@@ -20288,7 +20293,7 @@
       "flag": "🇨🇦",
       "event": "Overnight Rate",
       "impact": "high",
-      "actual": null,
+      "actual": "2.25%",
       "forecast": "2.25%",
       "previous": "2.25%"
     },
@@ -20327,7 +20332,7 @@
       "flag": "🇺🇸",
       "event": "Crude Oil Inventories",
       "impact": "medium",
-      "actual": null,
+      "actual": "-7.228M",
       "forecast": "-3.0M",
       "previous": "-8.0M"
     },
@@ -20366,7 +20371,7 @@
       "flag": "🇺🇸",
       "event": "Federal Budget Balance",
       "impact": "medium",
-      "actual": null,
+      "actual": "-293B",
       "forecast": "-282.9B",
       "previous": "215.0B"
     },
@@ -20379,7 +20384,7 @@
       "flag": "🇬🇧",
       "event": "RICS House Price Balance",
       "impact": "medium",
-      "actual": null,
+      "actual": "-35%",
       "forecast": "-32%",
       "previous": "-34%"
     },
@@ -20392,7 +20397,7 @@
       "flag": "🇯🇵",
       "event": "BSI Manufacturing Index",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.8",
       "forecast": "4.2",
       "previous": "3.8"
     },
@@ -20407,6 +20412,19 @@
       "impact": "medium",
       "actual": "5.5%",
       "forecast": "6.5%",
+      "previous": "5.6%"
+    },
+    {
+      "date": "11 Jun",
+      "dateISO": "2026-06-11",
+      "timeUTC": "01:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "MI Inflation Expectations",
+      "impact": "medium",
+      "actual": "5.5%",
+      "forecast": null,
       "previous": "5.6%"
     },
     {
