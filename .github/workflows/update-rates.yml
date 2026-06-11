@@ -12,6 +12,8 @@ name: Update Interest Rates (Scraping + Frankfurter validation)
 on:
   schedule:
     - cron: '0 8 * * *'   # Daily at 08:00 UTC — after Asia close, before EU open
+  repository_dispatch:
+    types: [cb-rate-decision]   # Fired by calendar-watcher.js when a CB rate actual is detected
   workflow_dispatch:
 
 env:
