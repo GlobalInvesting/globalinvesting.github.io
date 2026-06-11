@@ -1623,15 +1623,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             onchange="(function(){
               const t=this.value;
               document.getElementById('alp-price-row').style.display=(t==='price')?'flex':'none';
-              document.getElementById('alp-adv-row').style.display=(t!=='price'&&t!=='regime')?'flex':'none';
+              document.getElementById('alp-adv-row').style.display=(t!=='price'&&t!=='regime'&&t!=='eco_actual')?'flex':'none';
               document.getElementById('alp-regime-row').style.display=(t==='regime')?'flex':'none';
+              document.getElementById('alp-eco-row').style.display=(t==='eco_actual')?'flex':'none';
               const symSel=document.getElementById('alert-sym-sel');
-              if(symSel&&t!=='price'&&t!=='regime'){
+              if(symSel&&t!=='price'&&t!=='regime'&&t!=='eco_actual'){
                 const opts=Object.entries(window._ADV_OPTS||{}).filter(([k,v])=>v.category===t);
                 symSel.innerHTML=opts.map(([k,v])=>`<option value='${k}'>${v.label}</option>`).join('');
               }
             }).call(this)">
             <option value="price">Price / Level</option>
+            <option value="eco_actual">Economic actual released</option>
             <option value="spread">HV30 vs IV spread</option>
             <option value="ivrank">IV Rank</option>
             <option value="corr">Correlation Z-score</option>
@@ -1695,6 +1697,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             </select>
             <button class="alert-add-btn" onclick="alertsAddFromUI()">+ Add</button>
           </div>
+          <!-- Row 5: Economic actual alert -->
+          <div id="alp-eco-row" style="display:none;gap:4px;flex-wrap:wrap;align-items:center;">
+            <select id="alert-eco-ccy" class="alert-select" aria-label="Currency filter" style="flex:1;min-width:100px;">
+              <option value="">All G8 currencies</option>
+              <option value="USD">USD only</option>
+              <option value="EUR">EUR only</option>
+              <option value="GBP">GBP only</option>
+              <option value="JPY">JPY only</option>
+              <option value="AUD">AUD only</option>
+              <option value="CAD">CAD only</option>
+              <option value="NZD">NZD only</option>
+              <option value="CHF">CHF only</option>
+              <option value="USD,EUR">USD + EUR</option>
+              <option value="USD,GBP">USD + GBP</option>
+              <option value="USD,JPY">USD + JPY</option>
+            </select>
+            <button class="alert-add-btn" onclick="(function(){
+              const sel=document.getElementById('alert-eco-ccy');
+              const raw=sel?.value||'';
+              const currencies=raw?raw.split(',').map(s=>s.trim()).filter(Boolean):[];
+              const arr=alertsLoad();
+              // Only one eco_actual alert per currency set
+              const key=currencies.sort().join(',');
+              if(arr.find(a=>a.type==='eco_actual'&&(a.currencies||[]).sort().join(',')=== key))return;
+              arr.push({id:Date.now().toString(36),type:'eco_actual',currencies,fired:false,firedAt:null,lastActuals:[]});
+              alertsSave(arr);alertsRender(null);
+              if(typeof Notification!=='undefined'&&Notification.permission==='default')Notification.requestPermission();
+            })()">+ Add</button>
+          </div>
         </div>
         <div class="alp-footer">Checks every 5 min · browser notification on trigger</div>
       </div>
@@ -1707,7 +1738,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.0" defer></script>
-<script src="assets/dashboard.js?v=8.21.0" defer></script>
+<script src="assets/dashboard.js?v=8.21.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
