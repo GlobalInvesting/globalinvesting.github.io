@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-06-12T10:47:28Z",
+  "generated_at": "2026-06-12T17:22:29Z",
   "signals": [
     {
-      "time": "10:45",
+      "time": "17:20",
       "priority": "critical",
-      "title": "AUD/USD — G10 Bilateral Theme + US-Iran Deal",
-      "text": "AUD/USD at 0.7046 — US-Iran MoU signing in Geneva and Hormuz optimism drive a 3.24% collapse in WTI oil, stripping the commodity-linked AUD of its primary support. The G10 scorecard confirms a strong bilateral theme with USD outperforming peers by +0.521% while AUD lags at -0.885%. Despite a -60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%), the 1.406% G10 spread and negative CESI (-9 misses) for AUD signal a structural shift toward USD dominance as geopolitical risk premia deflate.",
+      "title": "AUD/USD — G10 Bilateral Theme + Carry + CESI",
+      "text": "AUD/USD at 0.7051 anchors the week's dominant G10 theme as the USD leader-to-AUD laggard spread hits 1.295%. Despite a 60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%), AUD is underperforming due to a negative CESI (net -9 misses) and extreme COT positioning (LF net long +56,800, 76.5% long). USD strength is reinforced by a bear steepener regime (2s10s +86bp) and a positive CESI (+31 beats). The divergence between high AUD carry and weak price action signals a structural trend shift rather than a temporary dip.",
       "evidence": [
-        "USD 1W avg: +0.521% (n=7)",
-        "AUD 1W avg: -0.885% (n=4)",
-        "G10 spread: 1.406%"
+        "USD 1W avg: +0.528% (n=7)",
+        "AUD 1W avg: -0.767% (n=4)",
+        "G10 spread: 1.295%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "10:42",
-      "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + Vol Premium",
-      "text": "USD/JPY at 160.11 — price holds above the 160.00 psychological barrier previously associated with BoJ verbal warnings. Options markets are pricing extreme caution with a +3.8% Vol Risk Premium (IV 7.2% vs HV30 3.4%) and a moderate -1.09 25d RR put skew, signaling institutional demand for JPY protection despite the +300bp Fed-BoJ carry advantage. JPY COT LF net short -105,136 remains crowded; a sustained break above 160.00 increases the probability of direct intervention.",
-      "evidence": [
-        "USD/JPY: 160.11",
-        "VRP: +3.8% (IV 7.2% vs HV30 3.4%)",
-        "25d RR: -1.09 (Saxo)"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "10:40",
+      "time": "17:17",
       "priority": "warning",
-      "title": "GBP/USD — Positioning + Vol + CB Bias",
-      "text": "GBP/USD at 1.3416 — COT LF net long +27,022 (65.6% long) faces a massive +5.0% Vol Risk Premium (IV 11.0% vs HV30 6.0%), the highest in the G10 space. While Deutsche Bank notes hawkish risks for the BoE, the -0.81 25d RR put skew suggests the options market is fading the speculative long position. With the Fed-BoE carry neutral at 0bp, GBP/USD remains vulnerable to a long-unwind if the BoE holds a neutral stance at the June 18 meeting.",
+      "title": "USD/JPY — Positioning + Vol + Intervention Risk",
+      "text": "USD/JPY at 160.21 trades above the critical 160.00 threshold, increasing the risk of BoJ intervention. JPY COT LF net short -105,136 remains crowded, while the options market is pricing a moderate put skew (25d RR at -1.10) as a hedge against JPY strength. Elevated vol premium (IV 7.2% vs HV30 3.4%, VRP +3.9%) indicates institutional demand for protection despite the 300bp Fed-BoJ carry bid. Carry remains the primary driver until VIX crosses 25, but the break of 160.00 shifts the regime toward intervention-watch.",
       "evidence": [
-        "GBP COT LF net: +27,022",
-        "VRP: +5.0% (IV 11.0% vs HV30 6.0%)",
-        "Fed 3.75% vs BoE 3.75%: 0bp"
+        "USD/JPY: 160.21",
+        "JPY COT LF net: -105,136",
+        "VRP: +3.9%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "10:35",
+      "time": "17:15",
       "priority": "warning",
-      "title": "USD/CAD — Retail Divergence + Correlation Break",
-      "text": "USD/CAD at 1.3981 — retail sentiment is at an extreme 92% short, diverging from the COT LF net short -49,052 (CAD weakness). This institutional vs retail divergence occurs as the USD/CAD vs WTI correlation breaks (z = -1.57σ), with the pair rising despite the oil collapse. The +150bp USD carry advantage (Fed 3.75% vs BoC 2.25%) and positive USD CESI (+30) support further upside; retail capitulation risk is high as the pair tests the 1.4000 handle.",
+      "title": "USD/CAD — Retail Divergence + Oil Shock",
+      "text": "USD/CAD at 1.3973 tests new 2026 highs as WTI crude prices drop -3.32% to $84.8 on Iran peace headlines. A significant correlation break (z = -1.57σ) vs oil suggests the pair is overextending relative to energy fundamentals. Retail sentiment is at an extreme 91% short, diverging from the COT net short CAD position (-49,052). This institutional vs retail divergence at multi-year highs creates a high-velocity reversal risk if oil stabilizes or retail capitulates. Watch for a failure to hold 1.4000 to trigger a squeeze.",
       "evidence": [
-        "Retail: 92% Short",
-        "USD/CAD vs WTI: z=-1.57σ",
-        "Fed 3.75% vs BoC 2.25%: +150bp"
+        "Retail: 91% Short",
+        "WTI Oil: $84.8 (-3.32%)",
+        "USD/CAD vs WTI z-score: -1.57σ"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "10:30",
+      "time": "17:10",
       "priority": "info",
-      "title": "EUR/USD — ECB Hike vs USD Carry",
-      "text": "EUR/USD at 1.1579 — ECB's Kocher reaffirms the hiking cycle to stabilize inflation, yet the pair remains capped by a +150bp USD carry advantage (Fed 3.75% vs ECB 2.25%). EUR COT LF net short -22,320 suggests specs are already positioned for weakness, while a +2.8% VRP indicates the market is paying a premium for protection. Upside remains structurally limited by the real rate differential (USD +1.31% vs EUR +0.03%) until the Fed signals a pivot.",
+      "title": "GBP/USD — Macro + Vol Complacency",
+      "text": "GBP/USD at 1.3416 remains under pressure following weak UK GDP data and a neutral CESI (+3). While the Fed-BoE carry is neutral (0bp), the options market is pricing an extreme vol premium (IV 11.0% vs HV30 6.0%, VRP +5.0%), the highest among G10 majors excluding AUD. This suggests the market is paying a significant premium for downside protection (25d RR -0.71) ahead of the June 18 BoE meeting. GBP COT LF net long +27,022 (65.6%) is vulnerable to further liquidation if BoE signals a dovish shift relative to the Fed.",
       "evidence": [
-        "Fed 3.75% vs ECB 2.25%: +150bp",
-        "Real Rate Diff: 128bp favors USD",
-        "EUR COT LF net: -22,320"
+        "GBP VRP: +5.0%",
+        "GBP COT long%: 65.6%",
+        "Fed-BoE spread: 0bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
