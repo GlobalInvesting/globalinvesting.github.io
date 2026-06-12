@@ -58,7 +58,7 @@ const CB_CONFIG = [
 ];
 
 // COT currencies available
-const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
 
 // ═══════════════════════════════════════════════════════════════════
 // UTILITIES
