@@ -285,8 +285,9 @@
         let actualHtml = '<span style="color:var(--text3)">—</span>';
         if (isReleased && ev.actual != null) {
           const forecastRaw = ev.forecast ? String(ev.forecast).replace(/\*$/, '') : null;
-          const actualN   = parseFloat(String(ev.actual).replace(/[%,KMB\s]/gi,''));
-          const forecastN = parseFloat(String(forecastRaw || ev.previous || '').replace(/[%,KMB\s]/gi,''));
+          const stripNum  = s => s.replace(/&#\d+;/g, '').replace(/[%,KMBT\s]/gi, '');
+          const actualN   = parseFloat(stripNum(String(ev.actual)));
+          const forecastN = parseFloat(stripNum(String(forecastRaw || ev.previous || '')));
           let cls = '';
           if (!isNaN(actualN) && !isNaN(forecastN) && actualN !== forecastN) {
             cls = actualN > forecastN ? ' class="up"' : ' class="down"';
