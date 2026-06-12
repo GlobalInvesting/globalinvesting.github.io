@@ -1,57 +1,69 @@
 {
-  "generated_at": "2026-06-11T22:05:15Z",
+  "generated_at": "2026-06-12T03:31:40Z",
   "signals": [
     {
-      "time": "22:04",
+      "time": "03:29",
       "priority": "critical",
-      "title": "AUD/JPY — G10 Bilateral Theme + Carry Divergence",
-      "text": "AUD/JPY at 112.808 — G10 scorecard confirms a critical divergence as AUD underperforms peers by -0.848% while JPY leads at +0.453%. Despite a +360bp carry advantage for AUD (RBA 4.35% vs BoJ 0.75%), the pair is failing to catch a bid as JPY safe-haven demand and positive economic surprises (CESI net +16) dominate. The 1.300% G10 spread indicates a structural rotation out of high-beta AUD into JPY. Sustained JPY strength persists unless VIX (19.4) retreats significantly.",
+      "title": "EUR/USD — ECB Hike + COT vs OIS Divergence + G10 Bilateral Theme",
+      "text": "ECB hikes interest rates for the first time since 2023, driving EUR/USD to 1.1571. This move contradicts EUR COT LF net short −22,320 (specs fading a hawkish CB) vs ECB hike bias. If ECB maintains hawkish stance, a significant short-squeeze risk is elevated for EUR/USD. The G10 scorecard shows USD +0.607% vs AUD -0.943% (spread 1.550%), but the ECB hike provides a strong counter-narrative for EUR. Watch for further ECB commentary on 23 Jul.",
       "evidence": [
-        "JPY 1W avg: +0.453% (n=7)",
-        "AUD 1W avg: -0.848% (n=4)",
-        "G10 spread: 1.300%"
+        "ECB hikes interest rates (headline)",
+        "EUR COT LF net: -22,320",
+        "ECB CB bias: ↑ Hike",
+        "EUR/USD: 1.1571"
       ],
-      "watch_level": "Next BoJ meeting on 16 Jun for hawkish shift confirmation",
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "22:01",
+      "time": "03:26",
+      "priority": "critical",
+      "title": "USD/JPY — BoJ Intervention Risk + Carry + COT vs OIS Divergence",
+      "text": "USD/JPY at 160.25 has broken above the 160.00 level, which has previously triggered BoJ verbal warnings; intervention risk is now elevated. The 286bp Fed-BoJ carry premium (SOFR 3.59% vs TONA 0.73%) continues to sustain the bid, despite JPY COT LF net short −105,136 (specs fading a hawkish CB) vs BoJ hike bias. This extreme speculative short positioning against a hawkish BoJ creates significant short-squeeze risk for JPY (downside for USD/JPY) if the BoJ acts or signals a hike. The next BoJ meeting (mkt: 50% hike priced) on 16 Jun is the immediate catalyst.",
+      "evidence": [
+        "USD/JPY: 160.25",
+        "USD/JPY OIS carry: +286bp",
+        "JPY COT LF net: -105,136",
+        "BoJ CB bias: ↑ Hike"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "03:23",
       "priority": "warning",
-      "title": "NZD/USD — COT vs Retail Divergence + CESI",
-      "text": "NZD/USD at 0.5834 — extreme retail sentiment (89% long) directly contradicts institutional positioning (COT LF net short -27,797). With NZD inflation expectations at 3.08% resulting in a -0.83% real policy rate (the most accommodative in G10), the fundamental backdrop supports the spec short bias. Retail 'bottom-fishing' at 0.5834 faces capitulation risk if the negative CESI trend (net -9) continues to weigh on the kiwi.",
+      "title": "AUD/USD — G10 Bilateral Theme + Volatility + CESI",
+      "text": "AUD is the weakest G10 currency this week, with AUD 1W avg -0.943% (n=4 pairs) vs USD 1W avg +0.607% (n=7 pairs), creating a 1.550% leader-to-laggard spread. This weakness is compounded by AUD CESI net -9 (data disappointing). AUD/USD IV at 27.0% vs HV30 at 8.1% shows an extreme +18.9% VRP, indicating strong hedging demand for AUD downside protection. The RBA's next meeting on 16 Jun is a key watch for any shift in stance that could alleviate pressure.",
       "evidence": [
-        "NZD COT LF net: -27,797",
-        "Retail Sentiment: 89% Long",
-        "NZD Real Rate: -0.83%"
+        "AUD 1W avg: -0.943% (n=4)",
+        "USD 1W avg: +0.607% (n=7)",
+        "G10 spread: 1.550%",
+        "AUD/USD VRP: +18.9%"
       ],
-      "watch_level": "Break below 0.5800 triggers retail stop-loss cascade",
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "21:58",
+      "time": "03:20",
       "priority": "warning",
-      "title": "USD/JPY — Carry + Volatility + Intervention Risk",
-      "text": "USD/JPY at 159.961 — the pair is testing the 160.00 psychological barrier where BoJ intervention risk is historically acute. While the +300bp Fed-BoJ carry spread (Fed 3.75% vs BoJ 0.75%) sustains the bid, the options market is pricing protection against a sharp reversal with a -1.09 25d RR put skew. Elevated VRP (+3.7%) confirms the market is paying a premium for volatility protection at these levels. Carry remains the dominant driver until a breach of 160.00 or a VIX spike above 25.",
+      "title": "USD/CAD — Retail Divergence + Correlation Break + Trade Friction",
+      "text": "USD/CAD at 1.3976 sees extreme retail sentiment with 89% short, diverging from COT LF net short −49,052 (institutional short). This creates contrarian reversal risk if retail capitulates. The pair's correlation with WTI Oil has broken, with corr=-0.184 vs 252d norm=+0.013 (z=-1.72σ), indicating CAD is not benefiting from oil price movements as historically expected. Adding to pressure, the US-Canada delay of the Gordie Howe bridge opening signals renewed Trump-era trade friction. Watch for BoC commentary on 15 Jul.",
       "evidence": [
-        "USD/JPY Carry: +300bp",
-        "25d RR: -1.09 (put skew)",
-        "VRP: +3.7% (IV 7.2% vs HV30 3.5%)"
+        "USD/CAD retail: 89% short",
+        "USD/CAD COT LF net: -49,052",
+        "USD/CAD vs WTI Oil corr: -0.184 (z=-1.72σ)",
+        "US, Canada delay Gordie Howe bridge (headline)"
       ],
-      "watch_level": "160.00 level for BoJ verbal or physical intervention",
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "21:52",
+      "time": "03:15",
       "priority": "info",
-      "title": "USD/CAD — Correlation Break + Retail Extreme",
-      "text": "USD/CAD at 1.3965 — the pair's correlation with WTI Oil has broken significantly (z = -1.72σ), with USD/CAD rising despite oil price volatility. Retail traders are heavily fading this move (89% short), creating a contrarian signal for further upside. The +150bp carry advantage (Fed 3.75% vs BoC 2.25%) and strong USD CESI (+30) suggest the path of least resistance remains higher despite the retail positioning extreme.",
+      "title": "NZD/USD — Retail Extreme + Accommodative Real Rate",
+      "text": "NZD/USD at 0.5818 shows extreme retail positioning with 88% long, indicating potential contrarian reversal risk if these positions unwind. The RBNZ's real policy rate is -0.83% (CB rate 2.25% vs inflation expectations 3.08%), signaling a mildly accommodative stance that offers little fundamental support for NZD strength. The next RBNZ meeting (mkt: 100% hold priced) on 8 Jul is the key event for directional clarity.",
       "evidence": [
-        "USD/CAD vs WTI Corr: -0.183 (z=-1.72σ)",
-        "Retail Sentiment: 89% Short",
-        "USD CESI: +30"
+        "NZD/USD retail: 88% long",
+        "NZD real rate: -0.83%",
+        "NZD/USD: 0.5818"
       ],
-      "watch_level": "1.4000 psychological resistance",
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
