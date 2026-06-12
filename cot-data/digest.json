@@ -1,76 +1,76 @@
 {
-  "weekEnding": "2026-06-02",
-  "topCcy": "JPY",
-  "topWow": -18887,
-  "topWowStr": "-18.9k",
-  "topNet": -105136,
-  "topNetPct": -41.1,
-  "topZScore": -1.71,
-  "message": "JPY shorts increased 18.9k contracts \u00b7 NET -105.1k (-41.1%)",
+  "weekEnding": "2026-06-09",
+  "topCcy": "EUR",
+  "topWow": -26970,
+  "topWowStr": "-27.0k",
+  "topNet": -49290,
+  "topNetPct": -25.2,
+  "topZScore": -4.38,
+  "message": "EUR shorts increased 27.0k contracts \u00b7 NET -49.3k (-25.2%)",
   "summary": [
     {
+      "ccy": "EUR",
+      "net": -49290,
+      "wow": -26970,
+      "net_pct": -25.2,
+      "z_score": -4.38,
+      "percentile": 2
+    },
+    {
+      "ccy": "AUD",
+      "net": 38092,
+      "wow": -18708,
+      "net_pct": 37.6,
+      "z_score": 0.65,
+      "percentile": 62
+    },
+    {
+      "ccy": "CAD",
+      "net": -60671,
+      "wow": -11619,
+      "net_pct": -50.6,
+      "z_score": -0.77,
+      "percentile": 21
+    },
+    {
       "ccy": "JPY",
-      "net": -105136,
-      "wow": -18887,
-      "net_pct": -41.1,
-      "z_score": -1.71,
+      "net": -115036,
+      "wow": -9900,
+      "net_pct": -41.6,
+      "z_score": -2.0,
       "percentile": 2
     },
     {
       "ccy": "NZD",
-      "net": -27797,
-      "wow": -14030,
-      "net_pct": -69.9,
-      "z_score": -2.54,
-      "percentile": 2
-    },
-    {
-      "ccy": "CAD",
-      "net": -49052,
-      "wow": -6858,
-      "net_pct": -45.3,
-      "z_score": -0.01,
-      "percentile": 44
-    },
-    {
-      "ccy": "CHF",
-      "net": -10782,
-      "wow": -5131,
-      "net_pct": -51.7,
-      "z_score": -2.93,
-      "percentile": 2
-    },
-    {
-      "ccy": "EUR",
-      "net": -22320,
-      "wow": 3991,
-      "net_pct": -11.8,
-      "z_score": -2.3,
+      "net": -22354,
+      "wow": 5443,
+      "net_pct": -52.1,
+      "z_score": -1.75,
       "percentile": 4
     },
     {
-      "ccy": "USD",
-      "net": -11176,
-      "wow": 1397,
-      "net_pct": -28.9,
-      "z_score": -0.62,
-      "percentile": 29
-    },
-    {
-      "ccy": "AUD",
-      "net": 56800,
-      "wow": -1241,
-      "net_pct": 52.9,
-      "z_score": 1.28,
-      "percentile": 87
-    },
-    {
       "ccy": "GBP",
-      "net": 27022,
-      "wow": 645,
-      "net_pct": 31.2,
-      "z_score": -0.34,
-      "percentile": 35
+      "net": 21961,
+      "wow": -5061,
+      "net_pct": 23.3,
+      "z_score": -0.73,
+      "percentile": 23
+    },
+    {
+      "ccy": "USD",
+      "net": -13661,
+      "wow": -2485,
+      "net_pct": -30.1,
+      "z_score": -0.9,
+      "percentile": 19
+    },
+    {
+      "ccy": "CHF",
+      "net": -12079,
+      "wow": -1297,
+      "net_pct": -49.9,
+      "z_score": -3.08,
+      "percentile": 2
     }
   ]
 }
