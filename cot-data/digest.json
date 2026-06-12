@@ -5,55 +5,72 @@
   "topWowStr": "-18.9k",
   "topNet": -105136,
   "topNetPct": -41.1,
+  "topZScore": -1.71,
   "message": "JPY shorts increased 18.9k contracts \u00b7 NET -105.1k (-41.1%)",
   "summary": [
     {
       "ccy": "JPY",
       "net": -105136,
       "wow": -18887,
-      "net_pct": -41.1
+      "net_pct": -41.1,
+      "z_score": -1.71,
+      "percentile": 2
     },
     {
       "ccy": "NZD",
       "net": -27797,
       "wow": -14030,
-      "net_pct": -69.9
+      "net_pct": -69.9,
+      "z_score": -2.54,
+      "percentile": 2
     },
     {
       "ccy": "CAD",
       "net": -49052,
       "wow": -6858,
-      "net_pct": -45.3
+      "net_pct": -45.3,
+      "z_score": -0.01,
+      "percentile": 44
     },
     {
       "ccy": "CHF",
       "net": -10782,
       "wow": -5131,
-      "net_pct": -51.7
+      "net_pct": -51.7,
+      "z_score": -2.93,
+      "percentile": 2
     },
     {
       "ccy": "EUR",
       "net": -22320,
       "wow": 3991,
-      "net_pct": -11.8
+      "net_pct": -11.8,
+      "z_score": -2.3,
+      "percentile": 4
     },
     {
       "ccy": "USD",
       "net": -11176,
       "wow": 1397,
-      "net_pct": -28.9
+      "net_pct": -28.9,
+      "z_score": -0.62,
+      "percentile": 29
     },
     {
       "ccy": "AUD",
       "net": 56800,
       "wow": -1241,
-      "net_pct": 52.9
+      "net_pct": 52.9,
+      "z_score": 1.28,
+      "percentile": 87
     },
     {
       "ccy": "GBP",
       "net": 27022,
       "wow": 645,
-      "net_pct": 31.2
+      "net_pct": 31.2,
+      "z_score": -0.34,
+      "percentile": 35
     }
   ]
 }
