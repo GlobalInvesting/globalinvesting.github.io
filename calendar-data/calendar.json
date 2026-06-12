@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-11T23:12:58Z",
-  "generatedAt": "2026-06-11T23:12:58Z",
+  "lastUpdate": "2026-06-12T00:01:05Z",
+  "generatedAt": "2026-06-12T00:01:05Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,63 +9,23 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-12",
   "rangeTo": "2026-06-12",
-  "totalEvents": 1542,
+  "totalEvents": 1546,
   "currencyCounts": {
     "NZD": 73,
-    "USD": 583,
+    "USD": 582,
     "AUD": 161,
     "CAD": 126,
     "CHF": 85,
     "EUR": 173,
-    "GBP": 166,
+    "GBP": 171,
     "JPY": 175
   },
   "impactCounts": {
-    "medium": 1029,
-    "high": 378,
+    "medium": 1030,
+    "high": 381,
     "low": 135
   },
   "surpriseStats": {
-    "GBP/industrial production": {
-      "n": 3,
-      "mean": -0.5,
-      "std": 0.360555
-    },
-    "CAD/unemployment rate": {
-      "n": 6,
-      "mean": 0.016667,
-      "std": 0.231661
-    },
-    "USD/core pce price index": {
-      "n": 5,
-      "mean": 0.0,
-      "std": 0.070711
-    },
-    "USD/pce price index": {
-      "n": 5,
-      "mean": 0.06,
-      "std": 0.151658
-    },
-    "USD/michigan 1-year inflation expectations": {
-      "n": 2,
-      "mean": -0.1,
-      "std": 0.141421
-    },
-    "USD/michigan consumer expectations": {
-      "n": 2,
-      "mean": -1.4,
-      "std": 1.414214
-    },
-    "USD/michigan consumer sentiment": {
-      "n": 5,
-      "mean": -0.26,
-      "std": 2.642537
-    },
-    "USD/atlanta fed gdpnow": {
-      "n": 3,
-      "mean": -0.233333,
-      "std": 0.208167
-    },
     "USD/ny empire state manufacturing index": {
       "n": 2,
       "mean": 3.95,
@@ -101,6 +61,11 @@
       "mean": -0.35,
       "std": 1.909188
     },
+    "CAD/unemployment rate": {
+      "n": 5,
+      "mean": 0.04,
+      "std": 0.250998
+    },
     "CHF/business confidence": {
       "n": 3,
       "mean": 1.566667,
@@ -126,6 +91,11 @@
       "mean": -1.4,
       "std": 2.515949
     },
+    "GBP/industrial production": {
+      "n": 2,
+      "mean": -0.55,
+      "std": 0.494975
+    },
     "JPY/consumer confidence": {
       "n": 6,
       "mean": -1.266667,
@@ -150,6 +120,21 @@
       "n": 3,
       "mean": 0.0,
       "std": 0.1
+    },
+    "USD/core pce price index": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.1
+    },
+    "USD/michigan consumer sentiment": {
+      "n": 4,
+      "mean": -0.45,
+      "std": 3.011644
+    },
+    "USD/pce price index": {
+      "n": 3,
+      "mean": 0.133333,
+      "std": 0.152753
     },
     "USD/ppi": {
       "n": 4,
@@ -195,6 +180,11 @@
       "n": 2,
       "mean": -4.5,
       "std": 0.707107
+    },
+    "USD/atlanta fed gdpnow": {
+      "n": 2,
+      "mean": -0.35,
+      "std": 0.070711
     },
     "EUR/producer price index": {
       "n": 2,
@@ -20551,7 +20541,72 @@
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
-      "event": "GDP m/m",
+      "event": "United Kingdom GDP 3-Month Avg",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.7%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Goods Trade Balance",
+      "impact": "high",
+      "actual": null,
+      "forecast": "&#163;-22.5B",
+      "previous": "&#163;-27.22B"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Industrial Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.1%",
+      "previous": "-0.2%"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Manufacturing Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.2%",
+      "previous": "1.2%"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Goods Trade Balance Non-EU",
+      "impact": "high",
+      "actual": null,
+      "forecast": "&#163;-9.8B",
+      "previous": "&#163;-15.195B"
+    },
+    {
+      "date": "12 Jun",
+      "dateISO": "2026-06-12",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom GDP MoM",
       "impact": "high",
       "actual": null,
       "forecast": "-0.1%",
@@ -20564,24 +20619,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Prelim UoM Consumer Sentiment",
-      "impact": "medium",
+      "event": "United States Michigan Consumer Sentiment",
+      "impact": "high",
       "actual": null,
-      "forecast": "46.1",
-      "previous": "48.2"
-    },
-    {
-      "date": "12 Jun",
-      "dateISO": "2026-06-12",
-      "timeUTC": "14:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Prelim UoM Inflation Expectations",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": "4.5%"
+      "forecast": "46.0",
+      "previous": "44.8"
     }
   ]
 }
