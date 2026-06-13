@@ -1,28 +1,28 @@
 {
-  "lastUpdate": "2026-06-12T23:54:38Z",
-  "generatedAt": "2026-06-12T23:54:38Z",
+  "lastUpdate": "2026-06-13T00:01:11Z",
+  "generatedAt": "2026-06-13T00:01:11Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-12",
+  "rangeFrom": "2025-06-13",
   "rangeTo": "2026-06-12",
-  "totalEvents": 1546,
+  "totalEvents": 1545,
   "currencyCounts": {
-    "NZD": 73,
     "USD": 582,
     "AUD": 161,
     "CAD": 126,
     "CHF": 85,
     "EUR": 173,
     "GBP": 171,
-    "JPY": 175
+    "JPY": 175,
+    "NZD": 72
   },
   "impactCounts": {
-    "medium": 1030,
     "high": 381,
+    "medium": 1029,
     "low": 135
   },
   "surpriseStats": {
@@ -448,18 +448,6 @@
     }
   },
   "events": [
-    {
-      "currency": "NZD",
-      "event": "Business NZ PMI",
-      "dateISO": "2025-06-12",
-      "hourUTC": "22:30",
-      "actual": "47.5",
-      "forecast": null,
-      "previous": "53.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
     {
       "currency": "USD",
       "event": "Michigan Consumer Sentiment Prel",
