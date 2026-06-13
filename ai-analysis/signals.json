@@ -1,66 +1,57 @@
 {
-  "generated_at": "2026-06-12T21:48:18Z",
+  "generated_at": "2026-06-13T21:19:11Z",
   "signals": [
     {
       "time": "20:16",
       "priority": "critical",
-      "title": "AUD/USD — G10 Bilateral Theme + Crowded Long Unwind Risk",
-      "text": "AUD NET LONG +56,800 (76.5% long) creates significant crowded-long unwind risk for AUD/USD, which closed 0.7049 Friday. The G10 scorecard highlights AUD as the weakest currency this week (-0.799% avg) against a strong USD (+0.558% avg), with a 1.357% spread reinforcing downside pressure. Any disappointment from the RBA's next meeting on 16 Jun is likely to trigger a sharp unwind.",
+      "title": "EUR/USD — US-IRAN PEACE DEAL RISK",
+      "text": "Reports of a possible interim peace deal between the US and Iran create downside risk for the USD safe-haven bid, potentially lifting EUR/USD from its 1.1573 Friday close. This geopolitical de-escalation would likely compress the USD's risk premium, though the +167bp OIS carry advantage and EUR COT net short of -49.3k (37.4% long) remain structural headwinds. The next ECB meeting (mkt: 100% hike priced) on 23 July is the primary catalyst for resolving the current policy divergence.",
       "evidence": [
-        "AUD COT: NET LONG +56,800",
-        "USD 1W avg: +0.558% (n=7)",
-        "AUD 1W avg: -0.799% (n=4)",
-        "G10 spread: 1.357%"
+        "EUR/USD Friday close 1.1573",
+        "Headline: US-Iran peace deal under assessment",
+        "EUR COT net short -49,290 contracts",
+        "OIS carry +167bp in favor of USD"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
       "time": "17:44",
       "priority": "warning",
-      "title": "USD/JPY — Intervention Risk + Crowded Short Squeeze",
-      "text": "JPY NET SHORT -105,136 (29.5% long) creates extreme short-squeeze risk for USD/JPY, which closed 160.19 Friday. Scotiabank highlights elevated JPY weakness raising intervention concerns, while the 286bp USD/JPY carry advantage (SOFR 3.59% vs TONA 0.73%) continues to attract long positions. The next BoJ meeting (mkt: 50% hike priced) on 16 Jun is the catalyst for resolving the yield gap and potential policy shift.",
+      "title": "USD/JPY — BOJ HIKE BIAS VS INTERVENTION RISK",
+      "text": "JPY COT net short of -115k (29.2% long) creates significant short-squeeze risk as USD/JPY holds near 160.19 amid heightened intervention warnings. While the +287bp OIS carry advantage heavily favors the USD, the JPY Economic Surprise Index (net +16) suggests domestic data outperformance is building a case for policy normalization. The BoJ meeting on 16 June is the catalyst for determining if a hawkish shift will trigger a liquidation of crowded JPY shorts.",
       "evidence": [
-        "JPY COT: NET SHORT -105,136",
-        "USD/JPY carry: +286bp",
-        "Japanese Yen: Weakness raises intervention concerns – Scotiabank"
+        "USD/JPY Friday close 160.185",
+        "JPY COT net short -115,036 contracts",
+        "Scotiabank reports intervention concerns at elevated levels",
+        "BoJ meeting 16 June with hike bias"
       ],
-      "_source": "gemini:gemini-2.5-flash"
-    },
-    {
-      "time": "19:44",
-      "priority": "warning",
-      "title": "EUR/USD — US-Iran Peace Deal & USD Directional Uncertainty",
-      "text": "EUR/USD closed 1.1573 Friday, holding steady as markets await clarity on a possible US-Iran peace deal, which is likely to introduce USD downside pressure. EUR NET SHORT -22,320 (44.1% long) suggests some room for a short covering rally if the USD weakens. The next ECB meeting (mkt: 100% hike priced) on 23 Jul will determine if the hiking bias can overcome USD-specific event risk.",
-      "evidence": [
-        "EUR COT: NET SHORT -22,320",
-        "Dollar Little Changed as Markets Assess Odds for US-Iran Peace Deal",
-        "Euro holds steady against the US Dollar as markets await clarity on a possible US-Iran peace deal"
-      ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
       "time": "18:17",
       "priority": "warning",
-      "title": "USD/CAD — Oil Price Weakness & Retail Extreme Short",
-      "text": "USD/CAD closed 1.3987 Friday, trading on the front foot as lower WTI Oil prices ($84.3, -3.90% 1D) weigh on the commodity-linked CAD. Retail sentiment shows an EXTREME SHORT bias (91% short) in USD/CAD, creating contrarian reversal risk if the pair continues its rally. The next BoC meeting (mkt: 100% hold priced) on 15 Jul is the catalyst for any shift in policy divergence.",
+      "title": "USD/CAD — OIL WEAKNESS VS EXTREME RETAIL SHORTING",
+      "text": "WTI Oil's 3.23% Friday slide to $84.9 pressures the CAD, but an extreme 92% retail short position in USD/CAD suggests a contrarian exhaustion risk near the 1.4000 handle. CAD COT net short of -60.6k reinforces the bearish fundamental bias, even as the pair enters overbought territory on technical indicators. The next BoC meeting (mkt: 100% hold priced) is the catalyst for confirming if the current hold bias can withstand softening energy prices.",
       "evidence": [
-        "WTI Oil: $84.3 1D:-3.90%",
-        "USD/CAD retail sentiment: 9% long / 91% short",
-        "USD/CAD Price Forecast: RSI enters overbought territory as bears defend 1.4000"
+        "USD/CAD Friday close 1.3989",
+        "WTI Oil 1D change -3.23%",
+        "Retail sentiment 92% short USD/CAD",
+        "CAD COT net short -60,671 contracts"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "19:11",
+      "time": "20:39",
       "priority": "info",
-      "title": "GBP/USD — BoE Hold Bias & Elevated Volatility Risk",
-      "text": "GBP/USD closed 1.3407 Friday, with the BoE on hold at 3.75% and market bias for continued hold. Elevated GBP/USD implied volatility (IV=11.0% vs HV30=6.0%, VRP=+5.0%) indicates strong hedging demand ahead of the next BoE meeting (mkt: 100% hold priced) on 18 Jun. Deutsche Bank notes UK growth resilience but softer inflation, which limits upside for GBP.",
+      "title": "AUD/USD — RBA POLICY DIVERGENCE",
+      "text": "AUD COT net long of +38.1k (68.8% long) faces a test as the pair closed Friday at 0.7049 ahead of a heavy central bank calendar. The -75bp OIS carry advantage for AUD and a mildly restrictive real rate of +0.17% provide fundamental support, though recent data misses (CESI net -9) suggest the RBA may struggle to maintain its hawkish relative stance. The RBA meeting on 16 June is the catalyst for validating the current long positioning.",
       "evidence": [
-        "BoE (GBP): 3.75% [ON HOLD]",
-        "GBP/USD IV=11.0% | HV30=6.0% | VRP=+5.0%",
-        "United Kingdom: Growth resilience but softer inflation – Deutsche Bank"
+        "AUD/USD Friday close 0.7049",
+        "AUD COT net long +38,092 contracts",
+        "AUD OIS carry advantage +75bp vs USD",
+        "AUD CESI net -9 misses"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
