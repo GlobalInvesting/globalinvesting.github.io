@@ -1,7 +1,7 @@
 {
-  "updated": "2026-06-13T11:25:36Z",
+  "updated": "2026-06-13T14:31:37Z",
   "source": "myfxbook",
-  "apiBlocked": false,
+  "apiBlocked": true,
   "pairs": [
     {
       "sym": "EUR/USD",
@@ -301,5 +301,6 @@
     "averageDeposit": "82,265.30",
     "averageAccountProfit": "101,429.60",
     "averageAccountLoss": "-83,892.83"
-  }
+  },
+  "blockReason": "Network error on login: HTTP Error 403: Forbidden"
 }
