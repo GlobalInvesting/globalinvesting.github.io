@@ -1,28 +1,28 @@
 {
-  "lastUpdate": "2026-06-13T23:41:23Z",
-  "generatedAt": "2026-06-13T23:41:23Z",
+  "lastUpdate": "2026-06-14T00:02:40Z",
+  "generatedAt": "2026-06-14T00:02:40Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-13",
+  "rangeFrom": "2025-06-14",
   "rangeTo": "2026-06-12",
-  "totalEvents": 1545,
+  "totalEvents": 1544,
   "currencyCounts": {
-    "USD": 582,
     "AUD": 161,
     "CAD": 126,
     "CHF": 85,
     "EUR": 173,
     "GBP": 171,
     "JPY": 175,
-    "NZD": 72
+    "NZD": 72,
+    "USD": 581
   },
   "impactCounts": {
-    "high": 381,
     "medium": 1029,
+    "high": 380,
     "low": 135
   },
   "surpriseStats": {
@@ -448,18 +448,6 @@
     }
   },
   "events": [
-    {
-      "currency": "USD",
-      "event": "Michigan Consumer Sentiment Prel",
-      "dateISO": "2025-06-13",
-      "hourUTC": "14:00",
-      "actual": "60.5",
-      "forecast": "53.5",
-      "previous": "52.2",
-      "impact": "high",
-      "importance": 3,
-      "source": "FH"
-    },
     {
       "date": "14 Jun",
       "dateISO": "2025-06-14",
