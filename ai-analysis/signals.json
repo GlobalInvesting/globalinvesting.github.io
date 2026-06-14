@@ -1,55 +1,63 @@
 {
-  "generated_at": "2026-06-13T21:19:11Z",
+  "generated_at": "2026-06-14T21:15:03Z",
   "signals": [
     {
-      "time": "20:16",
+      "time": "21:14",
       "priority": "critical",
-      "title": "EUR/USD — US-IRAN PEACE DEAL RISK",
-      "text": "Reports of a possible interim peace deal between the US and Iran create downside risk for the USD safe-haven bid, potentially lifting EUR/USD from its 1.1573 Friday close. This geopolitical de-escalation would likely compress the USD's risk premium, though the +167bp OIS carry advantage and EUR COT net short of -49.3k (37.4% long) remain structural headwinds. The next ECB meeting (mkt: 100% hike priced) on 23 July is the primary catalyst for resolving the current policy divergence.",
+      "title": "USD/JPY — Intervention Risk + Carry + Geopolitics",
+      "text": "USD/JPY at 160.11 — 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on this sustained break. 300bp Fed-BoJ carry sustains the bid, but headlines of an interim US-Iran peace deal introduce downside volatility. JPY COT LF net short -115,036 (crowded carry) faces squeeze risk if geopolitical de-escalation or BoJ hike bias (16 Jun) triggers a cover. Carry dominates until VIX > 25.",
       "evidence": [
-        "EUR/USD Friday close 1.1573",
-        "Headline: US-Iran peace deal under assessment",
-        "EUR COT net short -49,290 contracts",
-        "OIS carry +167bp in favor of USD"
+        "USD/JPY: 160.11",
+        "Fed 3.75% vs BoJ 0.75% — 300bp",
+        "JPY COT LF net: -115,036"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:44",
+      "time": "21:11",
       "priority": "warning",
-      "title": "USD/JPY — BOJ HIKE BIAS VS INTERVENTION RISK",
-      "text": "JPY COT net short of -115k (29.2% long) creates significant short-squeeze risk as USD/JPY holds near 160.19 amid heightened intervention warnings. While the +287bp OIS carry advantage heavily favors the USD, the JPY Economic Surprise Index (net +16) suggests domestic data outperformance is building a case for policy normalization. The BoJ meeting on 16 June is the catalyst for determining if a hawkish shift will trigger a liquidation of crowded JPY shorts.",
+      "title": "USD/CAD — Retail Divergence + Oil + Technicals",
+      "text": "USD/CAD at 1.3984 testing the 1.4000 psychological resistance. Retail sentiment is at an extreme 92% short, diverging from the COT LF net short of -60,671 (specs also short). This institutional-retail alignment in fading the move suggests a squeeze higher if 1.4000 breaks. Lower WTI oil at $84.9 and a +150bp USD carry advantage provide fundamental support for the pair despite overbought RSI signals.",
       "evidence": [
-        "USD/JPY Friday close 160.185",
-        "JPY COT net short -115,036 contracts",
-        "Scotiabank reports intervention concerns at elevated levels",
-        "BoJ meeting 16 June with hike bias"
+        "USD/CAD Retail: 92% Short",
+        "USD/CAD: 1.3984",
+        "Fed 3.75% vs BoC 2.25% — +150bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:17",
+      "time": "21:09",
       "priority": "warning",
-      "title": "USD/CAD — OIL WEAKNESS VS EXTREME RETAIL SHORTING",
-      "text": "WTI Oil's 3.23% Friday slide to $84.9 pressures the CAD, but an extreme 92% retail short position in USD/CAD suggests a contrarian exhaustion risk near the 1.4000 handle. CAD COT net short of -60.6k reinforces the bearish fundamental bias, even as the pair enters overbought territory on technical indicators. The next BoC meeting (mkt: 100% hold priced) is the catalyst for confirming if the current hold bias can withstand softening energy prices.",
+      "title": "AUD/USD — Volatility Premium + CESI Divergence",
+      "text": "AUD/USD IV at 32.1% vs HV30 at 8.2% generates a massive +23.9% Vol Risk Premium, signaling extreme hedging demand for downside protection. This aligns with a negative CESI (net -9 misses) and a 25d RR of -1.05 (put skew). Despite a +60bp AUD carry advantage, the options market is pricing significant tail risk. Watch for the RBA meeting on 16 Jun to either validate the carry bid or trigger a vol-led liquidation.",
       "evidence": [
-        "USD/CAD Friday close 1.3989",
-        "WTI Oil 1D change -3.23%",
-        "Retail sentiment 92% short USD/CAD",
-        "CAD COT net short -60,671 contracts"
+        "AUD/USD VRP: +23.9%",
+        "AUD CESI: -9 misses",
+        "AUD/USD 25d RR: -1.05"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:39",
+      "time": "21:05",
       "priority": "info",
-      "title": "AUD/USD — RBA POLICY DIVERGENCE",
-      "text": "AUD COT net long of +38.1k (68.8% long) faces a test as the pair closed Friday at 0.7049 ahead of a heavy central bank calendar. The -75bp OIS carry advantage for AUD and a mildly restrictive real rate of +0.17% provide fundamental support, though recent data misses (CESI net -9) suggest the RBA may struggle to maintain its hawkish relative stance. The RBA meeting on 16 June is the catalyst for validating the current long positioning.",
+      "title": "EUR/USD — Positioning + Volatility Regime",
+      "text": "EUR/USD at 1.1579 remains under pressure from a +150bp USD carry advantage. COT LF net short -49,290 (37.4% long) shows specs are positioned for further downside, supported by a positive USD CESI (+30 beats). However, a +2.9% VRP (IV 7.1% vs HV30 4.2%) indicates the market is paying a premium for protection, suggesting late-trend caution. Watch the Fed meeting on 17 Jun for a shift in the real rate differential (+1.31% USD vs +0.03% EUR).",
       "evidence": [
-        "AUD/USD Friday close 0.7049",
-        "AUD COT net long +38,092 contracts",
-        "AUD OIS carry advantage +75bp vs USD",
-        "AUD CESI net -9 misses"
+        "EUR/USD: 1.1579",
+        "Fed 3.75% vs ECB 2.25% — +150bp",
+        "EUR COT LF net: -49,290"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "21:00",
+      "priority": "info",
+      "title": "GBP/USD — Carry Neutrality + Data Resilience",
+      "text": "GBP/USD at 1.3410 is fundamentally supported by a neutral 0bp carry spread (Fed 3.75% vs BoE 3.75%) and a positive real rate of +0.77%. COT LF net long +21,961 (61.7% long) reflects speculative confidence in UK growth resilience. Options market remains cautious with a -0.71 25d RR put skew, but a high VRP of +5.0% suggests this is hedging rather than a directional reversal. Watch the BoE meeting on 18 Jun for hold confirmation.",
+      "evidence": [
+        "Fed 3.75% vs BoE 3.75% — 0bp",
+        "GBP COT LF net: +21,961",
+        "GBP/USD VRP: +5.0%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
