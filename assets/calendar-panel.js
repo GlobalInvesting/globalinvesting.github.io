@@ -208,10 +208,26 @@
     const _yISO = _yesterday.toISOString().slice(0, 10);
     const _mISO = _maxAhead.toISOString().slice(0, 10);
 
-    const filtered = events.filter(ev =>
+    let filtered = events.filter(ev =>
       G8_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact) &&
       ev.dateISO >= _yISO && ev.dateISO <= _mISO
     );
+
+    // Fallback (v3.30): if the pipeline hasn't run for a day or more (e.g. a quiet
+    // weekend with no qualifying RSS events), the strict [yesterday, +14d] window can
+    // be entirely empty even though the file has recent, valid data. Rather than show
+    // "No events available", fall back to the most recent events on file within the
+    // G8/impact filter, anchored to the latest available date.
+    if (!filtered.length) {
+      const g8 = events.filter(ev => G8_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact));
+      if (g8.length) {
+        const latestISO = g8.reduce((max, ev) => ev.dateISO > max ? ev.dateISO : max, g8[0].dateISO);
+        const fallbackFrom = new Date(latestISO + 'T00:00:00Z');
+        fallbackFrom.setUTCDate(fallbackFrom.getUTCDate() - 3);
+        const fallbackFromISO = fallbackFrom.toISOString().slice(0, 10);
+        filtered = g8.filter(ev => ev.dateISO >= fallbackFromISO && ev.dateISO <= latestISO);
+      }
+    }
 
     // Build holiday lookup: dateISO → [{title, currency}]
     const holidayByDate = {};
