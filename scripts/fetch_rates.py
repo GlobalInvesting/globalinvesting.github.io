@@ -53,7 +53,7 @@ FRED_API_KEY = os.environ.get('FRED_API_KEY', '')
 
 # Series FRED — usadas como fallback
 FRED_RATE_SERIES = {
-    'USD': 'FEDFUNDS',
+    'USD': 'DFEDTARU',    # Fed Funds Target Rate - Upper Limit (Bloomberg std); NOT FEDFUNDS (effective rate = midpoint of range)
     'EUR': 'ECBDFR',
     'GBP': 'BOERUKM',
     'JPY': 'IRSTCB01JPM156N',
@@ -94,7 +94,7 @@ STALE_SOURCES = (
 # Fuentes consideradas "ok" (no se marcan como fallback en health.json)
 OFFICIAL_SOURCES = {
     'RBA-HTML', 'RBA-CSV', 'BoC-Valet', 'ECB-SDMX', 'BoE-CSV',
-    'NYFed-EFFR', 'FRED:FEDFUNDS', 'BoJ-API', 'BoJ-scraping',
+    'NYFed-EFFR', 'FRED:FEDFUNDS', 'FRED:DFEDTARU', 'BoJ-API', 'BoJ-scraping',
     'SNB-scraping', 'RBNZ-CSV', 'BIS-CBPOL',
     'manual-override',
 }
@@ -604,7 +604,7 @@ def fetch_usd_fred():
         return None
     try:
         params = {
-            'series_id':  'FEDFUNDS',
+            'series_id':  'DFEDTARU',  # Upper bound of target range; FEDFUNDS is effective rate (midpoint)
             'api_key':    FRED_API_KEY,
             'file_type':  'json',
             'sort_order': 'desc',
@@ -621,8 +621,8 @@ def fetch_usd_fred():
             if obs.get('value') not in ('.', '', None):
                 rate = clean_rate(obs['value'])
                 if rate:
-                    print(f'    ✓ USD: {rate}%  date={obs["date"]}  [FRED FEDFUNDS]')
-                    return make_result(rate, obs['date'], 'FRED:FEDFUNDS')
+                    print(f'    ✓ USD: {rate}%  date={obs["date"]}  [FRED DFEDTARU]')
+                    return make_result(rate, obs['date'], 'FRED:DFEDTARU')
         print('    ✗ USD: FRED API — sin observaciones válidas')
     except Exception as e:
         print(f'    ✗ USD: FRED API — {e}')
