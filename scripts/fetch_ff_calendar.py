@@ -1487,9 +1487,16 @@ def main():
         sys.exit(0)
 
     # Step 1a: Validate
+    # NOTE (v3.30): previously this hard-exited via sys.exit(0) when the RSS rolling
+    # 24h window contained zero qualifying medium/high G8 events — common on quiet
+    # weekend days (e.g. Sun, only low-impact regional releases). That left
+    # ff_calendar.json frozen on its last successful date, and once "today" advances
+    # past that date the panel's [yesterday, today+14] display window has nothing to
+    # show ("No events available"). Instead, proceed with fresh=[] so Step 2
+    # carry-forward repopulates from prev_events and generated_at advances.
     if not fresh:
-        print("  ERROR: No G8 medium/high events parsed from any source — preserving previous file.")
-        sys.exit(0)
+        print("  WARNING: No G8 medium/high events parsed from RSS (likely a quiet day) — "
+              "proceeding with carry-forward merge only.")
 
     released_fresh = sum(1 for e in fresh if e.get("released"))
     print(f"  Fetched: {len(fresh)} events ({released_fresh} with actuals) [source: {source}]")
@@ -1767,7 +1774,24 @@ def main():
                 print(f"    {d} [{ccy}] {t[:50]} → actual={act}" + (f" (fc was {fc})" if fc else ""))
         if new_forecasts_added:
             print(f"  NEW forecasts: {len(new_forecasts_added)} event(s) updated")
-    else:
+
+    # Staleness check (v3.30): even with no actual/forecast/holiday/structural changes,
+    # the file must be rewritten at least once per day so generated_at advances and
+    # the panel's [yesterday, today+14] display window stays populated. Without this,
+    # a quiet day with data_changed=False leaves the file frozen on yesterday's
+    # generated_at, and the day after that the window has nothing to show.
+    prev_generated_date = None
+    try:
+        if os.path.exists(OUTPUT_PATH):
+            with open(OUTPUT_PATH, encoding="utf-8") as f:
+                prev_output = json.load(f)
+            prev_generated_date = prev_output.get("generated_at", "")[:10]
+    except Exception:
+        pass
+    today_str = now_utc.strftime("%Y-%m-%d")
+    file_stale = prev_generated_date is not None and prev_generated_date != today_str
+
+    if not (data_changed or file_stale):
         print("\n  No new actuals, forecasts, or holiday changes — skipping write and commit.")
         # Clear the flag file so the workflow knows to skip the commit step
         try:
@@ -1777,6 +1801,10 @@ def main():
             pass
         print(f"✓ No changes — {OUTPUT_PATH} unchanged.")
         return
+
+    if file_stale and not data_changed:
+        print(f"\n  No data changes, but file is stale (generated_at date {prev_generated_date} != today {today_str}) "
+              f"— rewriting to refresh generated_at and display-window coverage.")
 
     # Step 5b: Write
     output = {
