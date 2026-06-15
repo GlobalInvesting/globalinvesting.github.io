@@ -18,6 +18,9 @@
  * v1.4 (2026-06-10): Source label corrected from 'Finnhub' to 'ForexFactory'. The calendar
  *   data has always been sourced from ForexFactory (ff_calendar.json via fetch_ff_calendar.py);
  *   the Finnhub label was a stale reference from the original CF Worker implementation.
+ * v1.5 (2026-06-15): Display window extended from yesterday to 3 days back. Industry standard
+ *   (Bloomberg, Refinitiv Eikon) shows 2–3 prior sessions alongside current day. Also ensures
+ *   Friday sessions remain visible on Monday morning and covers overnight JPY/AUD releases.
  */
 (function () {
   'use strict';
@@ -197,15 +200,17 @@
     const sourceEl  = document.getElementById('cal-panel-sub');
     if (!container) return;
 
-    // Display window: yesterday through 14 days ahead.
-    // ff_calendar.json carries 21 days of history for actuals backfill — without
-    // a display cutoff the panel renders 3 weeks of past events above today.
-    // Showing yesterday preserves today's overnight events (e.g. JPY releases
-    // that appear in the "yesterday" slot for users in UTC-ahead timezones).
+    // Display window: 3 days back through 14 days ahead.
+    // ff_calendar.json carries 21 days of history for actuals backfill.
+    // Industry standard (Bloomberg, Refinitiv Eikon): economic calendar panels
+    // show 2–3 prior sessions alongside the current day and forward events.
+    // 3-day lookback ensures Friday's COT-adjacent releases remain visible on
+    // Monday morning and covers overnight JPY/AUD releases that display under
+    // the prior local date for users in UTC-ahead timezones.
     const _now       = new Date();
-    const _yesterday = new Date(_now); _yesterday.setDate(_now.getDate() - 1);
+    const _lookback  = new Date(_now); _lookback.setDate(_now.getDate() - 3);
     const _maxAhead  = new Date(_now); _maxAhead.setDate(_now.getDate() + 14);
-    const _yISO = _yesterday.toISOString().slice(0, 10);
+    const _yISO = _lookback.toISOString().slice(0, 10);
     const _mISO = _maxAhead.toISOString().slice(0, 10);
 
     let filtered = events.filter(ev =>

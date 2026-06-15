@@ -1,6 +1,9 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CB RATES MODAL  v2.1 — inline-panel edition
+// CB RATES MODAL  v2.2 — CB News tab added
 // Fluid layout, terminal CSS variables throughout.
+// v2.2 (2026-06-15): New "CB News" tab fetches news-data/news.json, filters
+//   by the selected central bank's currency, and renders up to 20 recent
+//   articles sorted newest-first. Source: institutional RSS pipeline.
 // ═══════════════════════════════════════════════════════════════════════════
 (function(){
   if(document.getElementById('cbr-modal-css'))return;
@@ -65,6 +68,20 @@
 .cbr-ctx-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono);}
 .cbr-ctx-val{font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text);}
 .cbr-next-fwd{display:grid;grid-template-columns:1fr 1fr;flex-shrink:0;border-top:1px solid var(--border,#252d3d);}
+#cbr-p-news.on{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
+#cbr-p-news.on::-webkit-scrollbar{width:3px!important;}
+#cbr-p-news.on::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.cbr-news-item{padding:9px 14px;border-bottom:1px solid var(--border,#252d3d);cursor:pointer;transition:background .1s;}
+.cbr-news-item:hover{background:rgba(255,255,255,.025);}
+.cbr-news-item:last-child{border-bottom:none;}
+.cbr-news-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.cbr-news-source{font-size:8px;color:var(--text2);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em;}
+.cbr-news-time{font-size:8px;color:var(--text2);font-family:var(--font-mono);}
+.cbr-news-title{font-size:11px;color:var(--text);line-height:1.4;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.cbr-news-expand{font-size:10px;color:var(--text2);line-height:1.4;margin-top:4px;display:none;}
+.cbr-news-item.open .cbr-news-expand{display:block;}
+.cbr-news-empty{padding:20px 14px;color:var(--text2);font-size:11px;font-family:var(--font-mono);}
+.cbr-news-sub{font-size:9px;color:var(--text2);font-family:var(--font-mono);padding:6px 14px 4px;border-bottom:1px solid var(--border,#252d3d);}
 @media(max-width:480px){
   #cbr-m-metrics{grid-template-columns:repeat(3,1fr);}
   .cbr-ctx-grid{grid-template-columns:repeat(2,1fr);}
@@ -375,6 +392,7 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   <div id="cbr-m-tabs" role="tablist" aria-label="CB rate chart views">
     <div class="cbr-tab on" data-tab="chart"    onclick="cbRatesTab(this,'chart')"    role="tab" aria-selected="true">Rate Chart</div>
     <div class="cbr-tab"    data-tab="decisions" onclick="cbRatesTab(this,'decisions')" role="tab" aria-selected="false">Decisions</div>
+    <div class="cbr-tab"    data-tab="news"      onclick="cbRatesTab(this,'news')"      role="tab" aria-selected="false">CB News</div>
   </div>
   <div id="cbr-m-body">
     <div id="cbr-p-chart" class="cbr-panel on">
@@ -404,6 +422,10 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
         <div style="padding:10px 14px;"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Decisions</div><div style="font-size:16px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nDecisions}</div></div>
       </div>
     </div>
+    <div id="cbr-p-news" class="cbr-panel">
+      <div class="cbr-news-sub" id="cbr-news-sub">Loading…</div>
+      <div id="cbr-news-list"></div>
+    </div>
   </div>
 </div>`;
 
@@ -425,7 +447,52 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   const esc=e=>{if(e.key==='Escape')closeCBRatesModal();};
   document.addEventListener('keydown',esc);bd._esc=esc;
   bd._chartData={chronData,decisions,fwdRate,bias,currentRate};
+  bd._ccy=ccy;
   requestAnimationFrame(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)));
+}
+
+// CB News feed — filters news.json by currency, renders in the CB News tab.
+// Displays articles tagged with the currency of the selected central bank,
+// sorted by recency (newest first). Source: institutional RSS pipeline (news-data/news.json).
+async function _cbrLoadNews(ccy){
+  const listEl=document.getElementById('cbr-news-list');
+  const subEl=document.getElementById('cbr-news-sub');
+  if(!listEl)return;
+  if(listEl.dataset.loadedFor===ccy)return; // already loaded for this ccy
+  listEl.innerHTML='<div class="cbr-news-empty">Loading…</div>';
+  try{
+    const res=await fetch('./news-data/news.json',{cache:'no-store'}).catch(()=>null);
+    if(!res?.ok)throw new Error('fetch failed');
+    const j=await res.json();
+    const articles=(j.articles||[])
+      .filter(a=>a.cur===ccy)
+      .sort((a,b)=>(b.ts||0)-(a.ts||0))
+      .slice(0,20);
+    const updLabel=j.updated_label||'';
+    if(subEl)subEl.textContent=`${articles.length} article${articles.length!==1?'s':''} · ${ccy} · ${updLabel} · institutional RSS`;
+    if(!articles.length){
+      listEl.innerHTML=`<div class="cbr-news-empty">No recent articles found for ${ccy}.</div>`;
+      return;
+    }
+    listEl.innerHTML=articles.map(a=>{
+      const timeStr=a.time||a.datetime||'';
+      const dateStr=a.date||'';
+      const snippet=(a.expand||'').replace(/<[^>]+>/g,'').slice(0,160).trim();
+      const hasExpand=snippet.length>0;
+      return`<div class="cbr-news-item"${hasExpand?' onclick="this.classList.toggle(\'open\')"':''}>
+        <div class="cbr-news-meta">
+          <span class="cbr-news-source">${a.source||''}</span>
+          <span class="cbr-news-time">${dateStr}${dateStr&&timeStr?' · ':''} ${timeStr}</span>
+        </div>
+        <div class="cbr-news-title"><a href="${a.link||'#'}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${a.title||''}</a></div>
+        ${hasExpand?`<div class="cbr-news-expand">${snippet}…</div>`:''}
+      </div>`;
+    }).join('');
+    listEl.dataset.loadedFor=ccy;
+  }catch{
+    if(subEl)subEl.textContent='News unavailable';
+    listEl.innerHTML='<div class="cbr-news-empty">Could not load news feed.</div>';
+  }
 }
 
 function cbRatesTab(el,tabId){
@@ -436,6 +503,7 @@ function cbRatesTab(el,tabId){
   const body=document.getElementById('cbr-m-body');
   if(body)body.style.overflowY=tabId==='decisions'?'auto':'hidden';
   if(tabId==='chart'){const bd=document.getElementById('cbr-bd');if(bd?._chartData)requestAnimationFrame(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)));}
+  if(tabId==='news'){const bd=document.getElementById('cbr-bd');if(bd?._ccy)_cbrLoadNews(bd._ccy);}
 }
 
 function closeCBRatesModal(){
