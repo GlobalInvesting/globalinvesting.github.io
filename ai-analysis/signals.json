@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-06-14T21:15:03Z",
+  "generated_at": "2026-06-15T03:42:44Z",
   "signals": [
     {
-      "time": "21:14",
+      "time": "03:42",
       "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + Carry + Geopolitics",
-      "text": "USD/JPY at 160.11 — 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on this sustained break. 300bp Fed-BoJ carry sustains the bid, but headlines of an interim US-Iran peace deal introduce downside volatility. JPY COT LF net short -115,036 (crowded carry) faces squeeze risk if geopolitical de-escalation or BoJ hike bias (16 Jun) triggers a cover. Carry dominates until VIX > 25.",
+      "title": "USD/JPY — Intervention Risk + Carry + Options",
+      "text": "USD/JPY at 160.065 — price is testing the 160.00 psychological level which previously triggered BoJ verbal warnings. Despite 287bp SOFR-TONA carry favoring USD, intervention risk rises on a sustained break above 160. JPY COT LF net short -115,036 (long% 29.2%) indicates a crowded carry trade vulnerable to a squeeze. Options market is pricing downside protection with a -1.10 moderate put skew (25d RR) and an elevated 3.8pt Vol Risk Premium (IV 7.2% vs HV30 3.4%).",
       "evidence": [
-        "USD/JPY: 160.11",
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "JPY COT LF net: -115,036"
+        "USD/JPY: 160.065",
+        "JPY COT LF net: -115,036",
+        "USD/JPY VRP: +3.8%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:11",
+      "time": "03:39",
       "priority": "warning",
-      "title": "USD/CAD — Retail Divergence + Oil + Technicals",
-      "text": "USD/CAD at 1.3984 testing the 1.4000 psychological resistance. Retail sentiment is at an extreme 92% short, diverging from the COT LF net short of -60,671 (specs also short). This institutional-retail alignment in fading the move suggests a squeeze higher if 1.4000 breaks. Lower WTI oil at $84.9 and a +150bp USD carry advantage provide fundamental support for the pair despite overbought RSI signals.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD COT LF net short -22,354 (long% 23.9%) shows specs heavily fading the currency despite a neutral RBNZ bias. With NZD CESI at -4 (moderate negative bias) and the weakest labor market in ten years, RBNZ's Silk speaking today determines if the dovish shift is realized. If the labor market data forces a dovish pivot, the spec short is justified; however, any hawkish surprise risks a crowded short-unwind toward 0.5900. NZD/USD at 0.5852.",
       "evidence": [
-        "USD/CAD Retail: 92% Short",
-        "USD/CAD: 1.3984",
-        "Fed 3.75% vs BoC 2.25% — +150bp"
+        "NZD COT LF net: -22,354",
+        "NZD CESI: -4",
+        "NZD/USD: 0.5852"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:09",
+      "time": "03:37",
       "priority": "warning",
-      "title": "AUD/USD — Volatility Premium + CESI Divergence",
-      "text": "AUD/USD IV at 32.1% vs HV30 at 8.2% generates a massive +23.9% Vol Risk Premium, signaling extreme hedging demand for downside protection. This aligns with a negative CESI (net -9 misses) and a 25d RR of -1.05 (put skew). Despite a +60bp AUD carry advantage, the options market is pricing significant tail risk. Watch for the RBA meeting on 16 Jun to either validate the carry bid or trigger a vol-led liquidation.",
+      "title": "USD/CAD — Retail Divergence + Correlation Break",
+      "text": "USD/CAD at 1.3966 — retail sentiment is 92% short, diverging from the COT LF net short of -60,671 (long% 24.7%). This extreme retail shorting into institutional selling creates a complex reversal risk. USD/CAD vs WTI Oil correlation has broken to -0.225 (z=-1.60σ vs -0.019 norm), meaning CAD is no longer benefiting from oil price stability. 150bp Fed-BoC carry advantage supports USD upside while bears defend 1.4000.",
       "evidence": [
-        "AUD/USD VRP: +23.9%",
-        "AUD CESI: -9 misses",
-        "AUD/USD 25d RR: -1.05"
+        "Retail Sentiment: 92% Short",
+        "USD/CAD vs WTI Corr: -0.225 (z=-1.60σ)",
+        "Fed-BoC Spread: +150bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:05",
+      "time": "03:32",
       "priority": "info",
-      "title": "EUR/USD — Positioning + Volatility Regime",
-      "text": "EUR/USD at 1.1579 remains under pressure from a +150bp USD carry advantage. COT LF net short -49,290 (37.4% long) shows specs are positioned for further downside, supported by a positive USD CESI (+30 beats). However, a +2.9% VRP (IV 7.1% vs HV30 4.2%) indicates the market is paying a premium for protection, suggesting late-trend caution. Watch the Fed meeting on 17 Jun for a shift in the real rate differential (+1.31% USD vs +0.03% EUR).",
+      "title": "GBP/USD — Volatility Premium + Carry Neutrality",
+      "text": "GBP/USD at 1.3445 — options market pricing significant tail risk with a 5.0pt Vol Risk Premium (IV 11.0% vs HV30 6.0%). Fed 3.75% vs BoE 3.75% results in a 0bp carry differential, leaving the pair sensitive to data surprises. GBP COT LF net long +21,961 (long% 61.7%) aligns with UK growth resilience headlines, but the high VRP suggests traders are paying up for protection ahead of the BoE meeting on 18 Jun.",
       "evidence": [
-        "EUR/USD: 1.1579",
-        "Fed 3.75% vs ECB 2.25% — +150bp",
-        "EUR COT LF net: -49,290"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "21:00",
-      "priority": "info",
-      "title": "GBP/USD — Carry Neutrality + Data Resilience",
-      "text": "GBP/USD at 1.3410 is fundamentally supported by a neutral 0bp carry spread (Fed 3.75% vs BoE 3.75%) and a positive real rate of +0.77%. COT LF net long +21,961 (61.7% long) reflects speculative confidence in UK growth resilience. Options market remains cautious with a -0.71 25d RR put skew, but a high VRP of +5.0% suggests this is hedging rather than a directional reversal. Watch the BoE meeting on 18 Jun for hold confirmation.",
-      "evidence": [
-        "Fed 3.75% vs BoE 3.75% — 0bp",
-        "GBP COT LF net: +21,961",
-        "GBP/USD VRP: +5.0%"
+        "GBP/USD VRP: +5.0%",
+        "Fed-BoE Spread: 0bp",
+        "GBP COT LF net: +21,961"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
