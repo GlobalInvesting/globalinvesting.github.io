@@ -1,54 +1,53 @@
 {
-  "generated_at": "2026-06-15T18:50:47Z",
+  "generated_at": "2026-06-15T22:21:21Z",
   "signals": [
     {
-      "time": "18:49",
+      "time": "22:20",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Intervention Risk + Carry",
-      "text": "USD/JPY at 160.28, trading above the 160.00 intervention watch level following the US-Iran agreement to reopen the Strait of Hormuz. This geopolitical de-escalation typically reduces safe-haven demand for JPY, but the 287bp Fed-BoJ carry premium (SOFR 3.60% vs TONA 0.73%) remains the primary driver for the pair's bid. JPY COT LF net short −115,036 (week ending Jun 9) indicates crowded carry positioning. The BoJ's next meeting on 16 Jun is a key catalyst for any shift in yield gap direction. Intervention risk is elevated on sustained trading above 160.00.",
+      "title": "USD/JPY — Geopolitical Shock + Carry + Vol",
+      "text": "USD/JPY at 160.31 — the pair holds above the 160.00 threshold despite a US-Iran peace agreement and a -4.87% crash in crude oil. While the reopening of the Strait of Hormuz triggers a risk-on equity rally (Nikkei +4.99%), the 300bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 0.75%) sustains the bid. JPY COT LF net short -115,036 remains crowded, and the 25d RR at -1.20 indicates the options market is paying for downside protection against BoJ intervention risk, which rises on a sustained break above 160. Carry dominates the flow until VIX > 25.",
       "evidence": [
-        "USD/JPY: 160.28",
-        "US-Iran agreement: Strait of Hormuz reopening",
-        "USD/JPY carry: +287bp (favors USD)",
-        "JPY COT LF net: -115,036"
+        "USD/JPY: 160.31",
+        "Fed-BoJ OIS Spread: +287bp",
+        "WTI Oil: -4.87%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:52",
+      "time": "22:17",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Volatility + CESI Divergence",
-      "text": "AUD/USD at 0.7078. COT LF net long +38,092 (week ending Jun 9) indicates significant speculative long positioning. However, the AUD CESI net −8 misses suggests data is consistently underperforming expectations, creating a divergence between speculative positioning and economic fundamentals. Options market shows elevated vol premium with IV 15.0% vs HV30 8.3% (VRP +6.7%), indicating strong hedging demand. Watch for RBA's next meeting on 16 Jun for a shift in bias or further data disappointment to trigger long unwinds.",
+      "title": "USD/CAD — Retail Divergence + Correlation Break",
+      "text": "USD/CAD at 1.3993 — retail sentiment is 92% short (extreme), diverging from COT LF net short -60,671 (institutional short). This retail-institutional alignment on the short side is fractured by a significant correlation break: USD/CAD vs WTI Oil corr at -0.231 (z=-1.62σ) vs the norm of -0.019. The 150bp Fed-BoC carry advantage (Fed 3.75% vs BoC 2.25%) and positive USD CESI (+22) support the topside, suggesting retail shorts face capitulation risk if the pair tests 1.4000.",
       "evidence": [
-        "AUD COT LF net: +38,092",
-        "AUD CESI: net -8 misses",
-        "AUD/USD VRP: +6.7%"
+        "Retail Sentiment: 92% Short",
+        "USD/CAD vs WTI Corr: -0.231 (z=-1.62σ)",
+        "Fed-BoC Carry: +150bp"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:55",
+      "time": "22:15",
       "priority": "warning",
-      "title": "GBP/USD — Volatility Premium + Carry Neutrality",
-      "text": "GBP/USD at 1.3421. The pair exhibits an elevated volatility risk premium with IV 11.0% vs HV30 6.0% (VRP +5.0%), indicating strong options hedging demand above realized volatility. This occurs despite a neutral carry differential of 0bp (SOFR 3.60% vs SONIA 3.73%) between the Fed and BoE. The next BoE meeting (mkt: 100% hold priced) on 18 Jun is the immediate catalyst for any shift in policy or market expectations, which is likely to impact the elevated vol pricing.",
+      "title": "AUD/USD — CB Stance + Vol Premium + COT",
+      "text": "AUD/USD at 0.7073 — RBA 4.35% (HIKING) vs Fed 3.75% (ON HOLD) provides a -60bp carry premium favoring AUD. Despite the hawkish CB stance and COT LF net long +38,092 (68.8% long), the options market remains cautious with a 25d RR of -0.80 (put skew). AUD/USD IV at 14.8% vs HV30 at 8.2% creates a +6.5% VRP, the second highest in G10, signaling that the market is pricing in significant volatility ahead of the RBA meeting on 16 Jun.",
       "evidence": [
-        "GBP/USD VRP: +5.0%",
-        "GBP/USD carry: 0bp",
-        "BoE next meeting: 18 Jun"
+        "RBA-Fed OIS Spread: -75bp",
+        "AUD/USD VRP: +6.5%",
+        "AUD COT LF Net: +38,092"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:58",
+      "time": "22:10",
       "priority": "info",
-      "title": "USD/CAD — Retail Extreme + Correlation Break",
-      "text": "USD/CAD at 1.3986. Retail sentiment shows an extreme 91% short bias (Myfxbook, 18:03 UTC), signaling potential contrarian reversal risk if price extends higher. This is compounded by a significant correlation break with WTI Oil (corr=−0.229 vs 252d norm=−0.019, z=−1.61σ), indicating the typical inverse relationship has weakened. The recent US-Iran deal has sent WTI Oil down 4.76% (1D), but USD/CAD has only moved -0.01% (1D), suggesting other factors are at play. Watch for sustained WTI recovery or a shift in retail positioning to invalidate the contrarian read.",
+      "title": "NZD/USD — Positioning + CESI Divergence",
+      "text": "NZD/USD at 0.5823 — COT LF net short -22,354 (specs short) aligns with a negative NZD CESI (-4 misses), confirming a fundamental weakness bias. The RBNZ real policy rate of -0.83% (accommodative) vs the USD real rate of +1.31% (restrictive) creates a structural headwind for the pair. Retail sentiment is 83% long, positioning for a reversal that lacks institutional or data support. Watch for a break of 0.5800 to accelerate spec shorting.",
       "evidence": [
-        "USD/CAD retail: 91% short",
-        "USD/CAD vs WTI Oil corr: z=-1.61σ",
-        "WTI Oil: -4.76% (1D)"
+        "NZD Real Rate: -0.83%",
+        "NZD CESI: -4",
+        "NZD COT LF Net: -22,354"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
