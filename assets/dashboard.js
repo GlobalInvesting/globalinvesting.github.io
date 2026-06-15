@@ -11611,12 +11611,37 @@ function initNewsNav() {
     }, true);
   }
 
-  // Hide when any other nav tab is clicked
+  // Hide when any other nav tab is clicked — CAPTURE PHASE so this fires before
+  // the main nav scroll handler (registered in bubble phase in initNavScroll).
+  // Without capture, the main scroll fires first while sections are still display:none
+  // (set by showNews()), causing scrollIntoView to no-op and leaving a black panel.
+  // stopImmediatePropagation() blocks the main nav scroll; we re-trigger it ourselves
+  // below, after hideNews() has restored all section displays.
   document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
     if (link.dataset.target !== 'section-news') {
-      link.addEventListener('click', () => {
-        if (newsSection.style.display !== 'none') hideNews();
-      });
+      link.addEventListener('click', (e) => {
+        if (newsSection.style.display === 'none') return; // news not active — let main handler run
+        e.stopImmediatePropagation();
+        hideNews();
+        // Re-run the nav scroll logic ourselves now that sections are visible again
+        const target = link.dataset.target;
+        const el = document.getElementById(target);
+        if (el) {
+          requestAnimationFrame(() => {
+            const main = document.getElementById('main');
+            const mainScrollable = main && main.scrollHeight > main.clientHeight && getComputedStyle(main).overflowY !== 'visible';
+            if (mainScrollable) {
+              const offset = el.offsetTop - (main.offsetTop || 0);
+              main.scrollTo({ top: offset - 4, behavior: 'smooth' });
+            } else {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        }
+        // Re-apply active class to the clicked nav link
+        document.querySelectorAll('.top-nav a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      }, true); // capture phase
     }
   });
 
@@ -11698,12 +11723,34 @@ function initDerivativesNavFixed() {
     }, true);
   }
 
-  // Restore on any other nav click
+  // Restore on any other nav click — CAPTURE PHASE (same fix as initNewsNav).
+  // Without capture, the main nav scroll fires before hideDerivatives() restores
+  // sections, causing scrollIntoView to target a display:none element → black panel.
   document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
     if (link.dataset.target !== 'section-derivatives') {
-      link.addEventListener('click', () => {
-        if (derivSection.style.display !== 'none') hideDerivatives();
-      });
+      link.addEventListener('click', (e) => {
+        if (derivSection.style.display === 'none') return; // derivatives not active — let main handler run
+        e.stopImmediatePropagation();
+        hideDerivatives();
+        // Re-run the nav scroll after sections are restored
+        const target = link.dataset.target;
+        const el = document.getElementById(target);
+        if (el) {
+          requestAnimationFrame(() => {
+            const main = document.getElementById('main');
+            const mainScrollable = main && main.scrollHeight > main.clientHeight && getComputedStyle(main).overflowY !== 'visible';
+            if (mainScrollable) {
+              const offset = el.offsetTop - (main.offsetTop || 0);
+              main.scrollTo({ top: offset - 4, behavior: 'smooth' });
+            } else {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        }
+        // Re-apply active class to the clicked nav link
+        document.querySelectorAll('.top-nav a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      }, true); // capture phase
     }
   });
 
