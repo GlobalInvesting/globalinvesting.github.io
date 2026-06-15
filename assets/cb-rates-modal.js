@@ -1,9 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CB RATES MODAL  v2.2 — CB News tab added
+// CB RATES MODAL  v2.3 — Inline Policy Summary block
 // Fluid layout, terminal CSS variables throughout.
-// v2.2 (2026-06-15): New "CB News" tab fetches news-data/news.json, filters
-//   by the selected central bank's currency, and renders up to 20 recent
-//   articles sorted newest-first. Source: institutional RSS pipeline.
+// v2.2 (2026-06-15): CB News tab added (superseded by v2.3).
+// v2.3 (2026-06-15): Tab approach replaced with inline Policy Summary block.
+//   Renders below context strip in Rate Chart panel. Fetches news-data/news.json,
+//   filters to 3 most recent CB-relevant articles for the selected currency,
+//   displays source + title (linked) + full expand paragraph. Lazy, non-blocking.
 // ═══════════════════════════════════════════════════════════════════════════
 (function(){
   if(document.getElementById('cbr-modal-css'))return;
@@ -68,20 +70,23 @@
 .cbr-ctx-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono);}
 .cbr-ctx-val{font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text);}
 .cbr-next-fwd{display:grid;grid-template-columns:1fr 1fr;flex-shrink:0;border-top:1px solid var(--border,#252d3d);}
-#cbr-p-news.on{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;}
-#cbr-p-news.on::-webkit-scrollbar{width:3px!important;}
-#cbr-p-news.on::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
-.cbr-news-item{padding:9px 14px;border-bottom:1px solid var(--border,#252d3d);cursor:pointer;transition:background .1s;}
-.cbr-news-item:hover{background:rgba(255,255,255,.025);}
-.cbr-news-item:last-child{border-bottom:none;}
-.cbr-news-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
-.cbr-news-source{font-size:8px;color:var(--text2);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em;}
-.cbr-news-time{font-size:8px;color:var(--text2);font-family:var(--font-mono);}
-.cbr-news-title{font-size:11px;color:var(--text);line-height:1.4;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
-.cbr-news-expand{font-size:10px;color:var(--text2);line-height:1.4;margin-top:4px;display:none;}
-.cbr-news-item.open .cbr-news-expand{display:block;}
-.cbr-news-empty{padding:20px 14px;color:var(--text2);font-size:11px;font-family:var(--font-mono);}
-.cbr-news-sub{font-size:9px;color:var(--text2);font-family:var(--font-mono);padding:6px 14px 4px;border-bottom:1px solid var(--border,#252d3d);}
+.cbr-ps-wrap{flex-shrink:0;border-top:1px solid var(--border,#252d3d);overflow-y:auto;max-height:220px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;background:var(--bg);}
+.cbr-ps-wrap::-webkit-scrollbar{width:3px!important;}
+.cbr-ps-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
+.cbr-ps-hdr{display:flex;align-items:center;justify-content:space-between;padding:5px 14px 4px;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;}
+.cbr-ps-hdr-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;font-family:var(--font-mono);}
+.cbr-ps-hdr-src{font-size:8px;color:var(--text2);font-family:var(--font-mono);}
+.cbr-ps-article{padding:9px 14px 10px;border-bottom:1px solid rgba(54,60,78,.35);}
+.cbr-ps-article:last-child{border-bottom:none;}
+.cbr-ps-art-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.cbr-ps-art-source{font-size:8px;font-weight:600;color:var(--accent,var(--blue));font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em;}
+.cbr-ps-art-time{font-size:8px;color:var(--text2);font-family:var(--font-mono);}
+.cbr-ps-art-title{font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:5px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.cbr-ps-art-title a{color:inherit;text-decoration:none;}
+.cbr-ps-art-title a:hover{text-decoration:underline;text-decoration-color:var(--text2);}
+.cbr-ps-art-body{font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.cbr-ps-loading{padding:14px;font-size:10px;color:var(--text2);font-family:var(--font-mono);}
+.cbr-ps-empty{padding:14px;font-size:10px;color:var(--text2);font-family:var(--font-mono);}
 @media(max-width:480px){
   #cbr-m-metrics{grid-template-columns:repeat(3,1fr);}
   .cbr-ctx-grid{grid-template-columns:repeat(2,1fr);}
@@ -392,7 +397,6 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   <div id="cbr-m-tabs" role="tablist" aria-label="CB rate chart views">
     <div class="cbr-tab on" data-tab="chart"    onclick="cbRatesTab(this,'chart')"    role="tab" aria-selected="true">Rate Chart</div>
     <div class="cbr-tab"    data-tab="decisions" onclick="cbRatesTab(this,'decisions')" role="tab" aria-selected="false">Decisions</div>
-    <div class="cbr-tab"    data-tab="news"      onclick="cbRatesTab(this,'news')"      role="tab" aria-selected="false">CB News</div>
   </div>
   <div id="cbr-m-body">
     <div id="cbr-p-chart" class="cbr-panel on">
@@ -405,6 +409,9 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
         <div style="padding:10px 14px;" title="${fwdIsEst?'Bias-only estimate — no OIS probability data.':'Probability-weighted expected rate at next meeting: E[rate] = current + P(hike)×step − P(cut)×step, where step = 25bp (10bp for BoJ). Derived from OIS/futures market probabilities (OIS-implied probability methodology).'}" ><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Fwd Rate</div><div style="font-size:13px;font-weight:600;font-family:var(--font-mono);color:${bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text)'}">${fwdDisplay}</div><div style="font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:2px;">${fwdIsEst?'~ est \u00b7 bias only':'prob. weighted \u00b7 OIS'}</div></div>
       </div>
       ${_cbrBuildContextStrip(decisions,chronData,currentRate,meetingData,nMonths)}
+      <div id="cbr-policy-summary" class="cbr-ps-wrap">
+        <div class="cbr-ps-loading">Loading market commentary…</div>
+      </div>
     </div>
     <div id="cbr-p-decisions" class="cbr-panel">
       <div class="cbr-cw" style="flex:1;min-height:0;overflow:auto;">
@@ -421,10 +428,6 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
         <div style="padding:10px 14px;border-right:1px solid var(--border,#252d3d);"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Period Low</div><div style="font-size:16px;font-weight:600;font-family:var(--font-mono);color:var(--down)">${Math.min(...rates).toFixed(2)}%</div></div>
         <div style="padding:10px 14px;"><div style="font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono)">Decisions</div><div style="font-size:16px;font-weight:600;font-family:var(--font-mono);color:var(--text)">${nDecisions}</div></div>
       </div>
-    </div>
-    <div id="cbr-p-news" class="cbr-panel">
-      <div class="cbr-news-sub" id="cbr-news-sub">Loading…</div>
-      <div id="cbr-news-list"></div>
     </div>
   </div>
 </div>`;
@@ -449,49 +452,73 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   bd._chartData={chronData,decisions,fwdRate,bias,currentRate};
   bd._ccy=ccy;
   requestAnimationFrame(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)));
+  // Load policy summary non-blocking after chart render
+  setTimeout(()=>_cbrLoadPolicySummary(ccy, bankShort), 100);
 }
 
-// CB News feed — filters news.json by currency, renders in the CB News tab.
-// Displays articles tagged with the currency of the selected central bank,
-// sorted by recency (newest first). Source: institutional RSS pipeline (news-data/news.json).
-async function _cbrLoadNews(ccy){
-  const listEl=document.getElementById('cbr-news-list');
-  const subEl=document.getElementById('cbr-news-sub');
-  if(!listEl)return;
-  if(listEl.dataset.loadedFor===ccy)return; // already loaded for this ccy
-  listEl.innerHTML='<div class="cbr-news-empty">Loading…</div>';
+// Policy Summary — Bloomberg/TE-style text block rendered inline below the context strip.
+// Fetches news-data/news.json, selects up to 3 most recent high-quality articles tagged
+// with the selected CB's currency, and renders title + full expand paragraph for each.
+// Lazy-fetched: triggered on modal open, non-blocking (runs after chart render).
+async function _cbrLoadPolicySummary(ccy, bankShort){
+  const wrap=document.getElementById('cbr-policy-summary');
+  if(!wrap)return;
   try{
     const res=await fetch('./news-data/news.json',{cache:'no-store'}).catch(()=>null);
     if(!res?.ok)throw new Error('fetch failed');
     const j=await res.json();
+    const CB_KW=['rate','hike','cut','hold','hawkish','dovish','inflation','gdp','policy','central bank',
+      'meeting','basis point','monetary','forecast','outlook','economy'];
+    // Filter by currency, prefer articles with substantive expand text and CB-relevant content
     const articles=(j.articles||[])
-      .filter(a=>a.cur===ccy)
+      .filter(a=>{
+        if(a.cur!==ccy)return false;
+        const exp=(a.expand||'').replace(/<[^>]+>/g,'').trim();
+        if(exp.length<80)return false;
+        const combined=(a.title+' '+exp).toLowerCase();
+        return CB_KW.some(k=>combined.includes(k));
+      })
       .sort((a,b)=>(b.ts||0)-(a.ts||0))
-      .slice(0,20);
+      .slice(0,3);
+
     const updLabel=j.updated_label||'';
-    if(subEl)subEl.textContent=`${articles.length} article${articles.length!==1?'s':''} · ${ccy} · ${updLabel} · institutional RSS`;
+
     if(!articles.length){
-      listEl.innerHTML=`<div class="cbr-news-empty">No recent articles found for ${ccy}.</div>`;
+      wrap.innerHTML=`<div class="cbr-ps-empty">No ${bankShort} commentary available.</div>`;
       return;
     }
-    listEl.innerHTML=articles.map(a=>{
-      const timeStr=a.time||a.datetime||'';
-      const dateStr=a.date||'';
-      const snippet=(a.expand||'').replace(/<[^>]+>/g,'').slice(0,160).trim();
-      const hasExpand=snippet.length>0;
-      return`<div class="cbr-news-item"${hasExpand?' onclick="this.classList.toggle(\'open\')"':''}>
-        <div class="cbr-news-meta">
-          <span class="cbr-news-source">${a.source||''}</span>
-          <span class="cbr-news-time">${dateStr}${dateStr&&timeStr?' · ':''} ${timeStr}</span>
+
+    const hdrHtml=`<div class="cbr-ps-hdr">
+      <span class="cbr-ps-hdr-lbl">Market Commentary · ${bankShort}</span>
+      <span class="cbr-ps-hdr-src">Institutional RSS · ${updLabel}</span>
+    </div>`;
+
+    const articlesHtml=articles.map(a=>{
+      const timeStr=[a.date,a.time].filter(Boolean).join(' · ');
+      const exp=(a.expand||'').replace(/&#\d+;/g,'').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+      // Truncate at last full sentence within ~500 chars
+      let body=exp;
+      if(body.length>500){
+        const cut=body.slice(0,500);
+        const lastPeriod=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('? '),cut.lastIndexOf('! '));
+        body=(lastPeriod>200?cut.slice(0,lastPeriod+1):cut)+'…';
+      }
+      const titleHtml=a.link
+        ?`<a href="${a.link}" target="_blank" rel="noopener noreferrer">${a.title||''}</a>`
+        :(a.title||'');
+      return`<div class="cbr-ps-article">
+        <div class="cbr-ps-art-meta">
+          <span class="cbr-ps-art-source">${a.source||''}</span>
+          <span class="cbr-ps-art-time">${timeStr}</span>
         </div>
-        <div class="cbr-news-title"><a href="${a.link||'#'}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${a.title||''}</a></div>
-        ${hasExpand?`<div class="cbr-news-expand">${snippet}…</div>`:''}
+        <div class="cbr-ps-art-title">${titleHtml}</div>
+        <div class="cbr-ps-art-body">${body}</div>
       </div>`;
     }).join('');
-    listEl.dataset.loadedFor=ccy;
+
+    wrap.innerHTML=hdrHtml+articlesHtml;
   }catch{
-    if(subEl)subEl.textContent='News unavailable';
-    listEl.innerHTML='<div class="cbr-news-empty">Could not load news feed.</div>';
+    wrap.innerHTML=`<div class="cbr-ps-empty">Market commentary unavailable.</div>`;
   }
 }
 
@@ -503,7 +530,6 @@ function cbRatesTab(el,tabId){
   const body=document.getElementById('cbr-m-body');
   if(body)body.style.overflowY=tabId==='decisions'?'auto':'hidden';
   if(tabId==='chart'){const bd=document.getElementById('cbr-bd');if(bd?._chartData)requestAnimationFrame(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)));}
-  if(tabId==='news'){const bd=document.getElementById('cbr-bd');if(bd?._ccy)_cbrLoadNews(bd._ccy);}
 }
 
 function closeCBRatesModal(){
