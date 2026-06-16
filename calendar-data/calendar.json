@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-15T23:28:13Z",
-  "generatedAt": "2026-06-15T23:28:13Z",
+  "lastUpdate": "2026-06-16T00:00:32Z",
+  "generatedAt": "2026-06-16T00:00:32Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,143 +8,38 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-06-16",
-  "rangeTo": "2026-06-15",
-  "totalEvents": 1525,
+  "rangeTo": "2026-06-16",
+  "totalEvents": 1543,
   "currencyCounts": {
     "CAD": 124,
-    "EUR": 177,
-    "JPY": 172,
-    "NZD": 72,
-    "AUD": 158,
-    "USD": 571,
+    "EUR": 179,
+    "JPY": 177,
+    "NZD": 73,
+    "AUD": 160,
+    "USD": 579,
     "GBP": 168,
     "CHF": 83
   },
   "impactCounts": {
-    "medium": 1025,
+    "medium": 1036,
     "low": 135,
-    "high": 365
+    "high": 372
   },
   "surpriseStats": {
-    "AUD/rba interest rate decision": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "AUD/building permits": {
+    "EUR/core cpi": {
       "n": 3,
-      "mean": 2.066667,
-      "std": 26.725518
-    },
-    "AUD/consumer confidence": {
-      "n": 3,
-      "mean": -1.0,
-      "std": 2.645751
-    },
-    "AUD/unemployment rate": {
-      "n": 5,
-      "mean": -0.12,
-      "std": 0.109545
-    },
-    "CAD/building permits": {
-      "n": 2,
-      "mean": 5.2,
-      "std": 1.555635
-    },
-    "CAD/industrial production": {
-      "n": 2,
-      "mean": -0.35,
-      "std": 1.909188
-    },
-    "CAD/unemployment rate": {
-      "n": 5,
-      "mean": 0.04,
-      "std": 0.250998
-    },
-    "CHF/business confidence": {
-      "n": 3,
-      "mean": 1.566667,
-      "std": 2.500667
+      "mean": 0.533333,
+      "std": 0.472582
     },
     "EUR/cpi": {
-      "n": 5,
-      "mean": 0.26,
-      "std": 0.74364
-    },
-    "EUR/consumer confidence": {
-      "n": 2,
-      "mean": 2.2,
-      "std": 1.979899
-    },
-    "EUR/core cpi": {
       "n": 4,
-      "mean": 0.125,
-      "std": 0.903235
-    },
-    "GBP/consumer confidence": {
-      "n": 3,
-      "mean": -1.4,
-      "std": 2.515949
-    },
-    "GBP/industrial production": {
-      "n": 2,
-      "mean": -0.55,
-      "std": 0.494975
-    },
-    "JPY/consumer confidence": {
-      "n": 6,
-      "mean": -1.266667,
-      "std": 3.512644
-    },
-    "JPY/industrial production": {
-      "n": 4,
-      "mean": 0.85,
-      "std": 2.471841
-    },
-    "JPY/unemployment rate": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.15
-    },
-    "USD/cpi": {
-      "n": 4,
-      "mean": 0.1525,
-      "std": 0.309341
-    },
-    "USD/core cpi": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.1
-    },
-    "USD/core pce price index": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.1
-    },
-    "USD/michigan consumer sentiment": {
-      "n": 4,
-      "mean": -0.45,
-      "std": 3.011644
-    },
-    "USD/pce price index": {
-      "n": 3,
-      "mean": 0.133333,
-      "std": 0.152753
+      "mean": 0.475,
+      "std": 0.655108
     },
     "USD/ppi": {
-      "n": 4,
-      "mean": 0.75,
-      "std": 0.7
-    },
-    "USD/retail sales": {
       "n": 3,
-      "mean": 0.6,
-      "std": 0.608276
-    },
-    "USD/unemployment rate": {
-      "n": 5,
-      "mean": 0.02,
-      "std": 0.083666
+      "mean": 0.666667,
+      "std": 0.832666
     },
     "CAD/boc interest rate decision": {
       "n": 2,
@@ -155,6 +50,16 @@
       "n": 2,
       "mean": 3.65,
       "std": 0.636396
+    },
+    "AUD/unemployment rate": {
+      "n": 4,
+      "mean": -0.15,
+      "std": 0.1
+    },
+    "JPY/industrial production": {
+      "n": 3,
+      "mean": 0.033333,
+      "std": 2.272297
     },
     "GBP/unemployment rate": {
       "n": 2,
@@ -226,6 +131,11 @@
       "mean": 0.3,
       "std": 0.141421
     },
+    "USD/michigan consumer sentiment": {
+      "n": 3,
+      "mean": -1.766667,
+      "std": 1.789786
+    },
     "CHF/kof leading indicators": {
       "n": 2,
       "mean": -2.95,
@@ -286,6 +196,11 @@
       "mean": 652.333333,
       "std": 232.968524
     },
+    "JPY/consumer confidence": {
+      "n": 5,
+      "mean": -1.66,
+      "std": 3.776639
+    },
     "CHF/consumer confidence": {
       "n": 2,
       "mean": -2.5,
@@ -295,6 +210,66 @@
       "n": 2,
       "mean": -2.85,
       "std": 2.192031
+    },
+    "AUD/building permits": {
+      "n": 2,
+      "mean": 12.8,
+      "std": 27.1529
+    },
+    "AUD/consumer confidence": {
+      "n": 2,
+      "mean": -0.5,
+      "std": 3.535534
+    },
+    "CAD/unemployment rate": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.236291
+    },
+    "CHF/business confidence": {
+      "n": 2,
+      "mean": 0.3,
+      "std": 1.697056
+    },
+    "GBP/consumer confidence": {
+      "n": 2,
+      "mean": -2.85,
+      "std": 0.212132
+    },
+    "JPY/unemployment rate": {
+      "n": 3,
+      "mean": 0.066667,
+      "std": 0.152753
+    },
+    "USD/cpi": {
+      "n": 3,
+      "mean": 0.236667,
+      "std": 0.317857
+    },
+    "USD/core cpi": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.070711
+    },
+    "USD/core pce price index": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.070711
+    },
+    "USD/pce price index": {
+      "n": 2,
+      "mean": 0.2,
+      "std": 0.141421
+    },
+    "USD/retail sales": {
+      "n": 2,
+      "mean": 0.95,
+      "std": 0.070711
+    },
+    "USD/unemployment rate": {
+      "n": 4,
+      "mean": 0.0,
+      "std": 0.08165
     },
     "CAD/housing starts": {
       "n": 2,
@@ -20311,6 +20286,240 @@
       "actual": "35.0",
       "forecast": "36.0",
       "previous": "37.0"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "03:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan BoJ Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.0%",
+      "previous": "0.75%"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "04:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": "4.35%",
+      "previous": "4.35%"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "05:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Press Conference",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ZEW Economic Sentiment Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-7.6",
+      "previous": "-9.1"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany ZEW Economic Sentiment Index",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-6.0",
+      "previous": "-10.2"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States ADP Employment Change Weekly",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "29.0K"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Housing Starts",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.43M",
+      "previous": "1.465M"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Building Permits MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.6%",
+      "previous": "4.4%"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Import Prices MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.0%",
+      "previous": "1.9%"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Housing Starts MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-2.0%",
+      "previous": "-2.8%"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Export Prices MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.2%",
+      "previous": "3.3%"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Building Permits",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.42M",
+      "previous": "1.423M"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States API Crude Oil Stock Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-4.5M",
+      "previous": "-9.119M"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "NZ$-1.19B",
+      "previous": "NZ$-5.98B"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Balance of Trade",
+      "impact": "high",
+      "actual": null,
+      "forecast": "&#165;-564.6B",
+      "previous": "&#165;301.9B"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Exports YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "16.2%",
+      "previous": "14.8%"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Machinery Orders YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "9.3%",
+      "previous": "5.9%"
+    },
+    {
+      "date": "16 Jun",
+      "dateISO": "2026-06-16",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Machinery Orders MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.9%",
+      "previous": "-9.4%"
     }
   ]
 }
