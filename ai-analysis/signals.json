@@ -1,58 +1,65 @@
 {
-  "generated_at": "2026-06-16T03:38:34Z",
+  "generated_at": "2026-06-16T11:41:18Z",
   "signals": [
     {
-      "time": "03:37",
+      "time": "11:39",
       "priority": "critical",
-      "title": "USD/JPY — BoJ Decision + Intervention Risk + Carry",
-      "text": "USD/JPY at 160.21 — BoJ is set to announce its monetary policy decision today (16 Jun), with market expectations for a rate hike as prices rise. This comes as the pair trades above the 160.00 intervention watch level, increasing the risk of BoJ action. The 292bp Fed-BoJ OIS carry differential (SOFR 3.65% vs TONA 0.73%) continues to favor USD, sustaining the bid despite JPY strength ahead of the decision. JPY COT LF net short −115,036 (long%=29.2%) indicates a crowded short, vulnerable to a squeeze if the BoJ delivers a hawkish surprise. The 25d RR at -1.20 shows moderate put skew, suggesting options market hedging against JPY strength. Watch for BoJ's forward guidance and any explicit comments on FX levels.",
+      "title": "USD/JPY — Intervention Risk + Carry + Vol",
+      "text": "USD/JPY at 160.32 — price holds above the 160.00 psychological handle, a level previously associated with BoJ verbal and physical intervention. Despite the breach, 300bp Fed-BoJ carry (Fed 3.75% vs BoJ 0.75%) sustains the bid while VIX at 16.1 (normal volatility) limits safe-haven JPY demand. Options market is pricing significant tail risk with a -1.20 25d RR put skew and a +3.8% VRP (IV 7.2% vs HV30 3.4%), signaling that institutions are paying a heavy premium for downside protection against a sudden BoJ-induced reversal. Sustained trading above 160.00 increases the probability of immediate MoF action.",
       "evidence": [
-        "USD/JPY: 160.21",
-        "USD/JPY OIS carry: +292bp favors USD",
-        "JPY COT LF net: -115,036",
-        "USD/JPY 25d RR: -1.20"
+        "USD/JPY: 160.32",
+        "Fed 3.75% vs BoJ 0.75% — 300bp",
+        "USD/JPY VRP: +3.8% (IV 7.2% vs HV30 3.4%)"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "03:34",
+      "time": "11:36",
       "priority": "warning",
-      "title": "AUD/USD — RBA Decision + Negative CESI + Vol Premium",
-      "text": "AUD/USD at 0.7065 — The RBA is widely expected to keep rates on hold at 4.35% today (16 Jun), marking its first pause of 2026. This aligns with a moderate negative bias in the AUD CESI (net=-8 misses), indicating data is consistently disappointing expectations. AUD COT LF net long +38,092 (long%=68.8%) shows significant speculative long positioning, which is likely to unwind if the RBA signals a dovish pause or if future hike bets weaken further. The AUD/USD IV at 15.1% vs HV30 at 8.1% (VRP +7.0%) indicates elevated options market hedging demand, pricing in higher volatility around the RBA decision. Watch for RBA's statement language on future policy path and inflation outlook.",
+      "title": "USD/CHF — SNB Yield Shock + Carry",
+      "text": "SNB sight deposit rates confirmed at 0.00% (up to threshold) and -0.25% (above threshold) as of June 16, while 10Y Swiss bond yields retreat to 0.393%. USD/CHF at 0.7947 remains supported by a massive +375bp carry advantage (Fed 3.75% vs SNB 0.0%). The real rate differential (+1.31% USD vs -0.31% CHF) further favors USD, though the pair's 1M gain of +1.34% faces technical resistance as Swiss yields stabilize. Watch the SNB meeting on June 18 for any shift in the sight deposit tiering mechanism.",
       "evidence": [
-        "AUD/USD: 0.7065",
-        "RBA policy rate: 4.35% (ON HOLD)",
-        "AUD CESI: net=-8 misses",
-        "AUD COT LF net: +38,092",
-        "AUD/USD VRP: +7.0%"
+        "SNB sight deposit rate: 0.00%",
+        "Fed 3.75% vs SNB 0.0% — 375bp",
+        "USD/CHF: 0.7947"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "03:31",
+      "time": "11:34",
       "priority": "warning",
-      "title": "USD/CAD — COT vs Retail Divergence + Oil Price Impact",
-      "text": "USD/CAD at 1.3998 — Retail sentiment shows an extreme 92% short position, indicating strong contrarian reversal risk. This diverges from institutional positioning, where CAD COT LF net short −60,671 (long%=24.7%) suggests a crowded short in CAD futures. The recent news of crude oil prices sinking on the deal to reopen the Strait of Hormuz puts downward pressure on WTI, which typically correlates negatively with USD/CAD. However, the USD/CAD vs WTI Oil correlation has broken to -0.278 vs 252d norm=+0.007 (z=-1.74σ), suggesting the usual inverse relationship is currently weaker. The 140bp OIS carry differential (SOFR 3.65% vs CORRA 2.25%) favors USD. Watch for WTI oil price stability and any shift in retail positioning to confirm a reversal.",
+      "title": "NZD/USD — COT vs Retail Divergence",
+      "text": "NZD/USD at 0.5833 exhibits a sharp positioning divergence: COT LF net short -22,354 (specs bearish) vs retail 86% long (extreme retail bullish). This contrarian setup is reinforced by a negative CESI (net -4 misses), suggesting fundamental data is failing to support the retail long thesis. With RBNZ at 2.25% vs Fed 3.75% creating a -150bp carry deficit for the Kiwi, the retail long position is highly vulnerable to a capitulation squeeze if price breaks the recent lows. Watch for RBNZ hike signaling on July 8 to potentially rescue the retail position; otherwise, the path of least resistance remains lower.",
       "evidence": [
-        "USD/CAD: 1.3998",
-        "USD/CAD retail: 92% short",
-        "CAD COT LF net: -60,671",
-        "USD/CAD vs WTI Oil corr: -0.278 (z=-1.74σ)"
+        "NZD COT LF net: -22,354",
+        "Retail Sentiment: 86% Long",
+        "Fed 3.75% vs RBNZ 2.25% — 150bp"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "03:28",
+      "time": "11:31",
       "priority": "info",
-      "title": "EUR/USD — Options Skew + Vol Premium",
-      "text": "EUR/USD at 1.159 — The 25d RR at -0.34 indicates a mild put skew, signaling options market participants are paying for downside protection for EUR. This is despite the EUR/USD IV at 7.1% vs HV30 at 4.2%, resulting in a +2.9% VRP, which suggests elevated hedging demand over realized volatility. EUR COT LF net short −49,290 (long%=37.4%) shows a significant speculative short position. The 172bp OIS carry differential (SOFR 3.65% vs €STR 1.93%) favors USD, structurally limiting EUR/USD upside. Watch for a sustained break above 1.1600 to challenge the options market's downside bias.",
+      "title": "GBP/USD — Volatility Premium + Positioning",
+      "text": "GBP/USD at 1.3423 shows the highest volatility risk premium in the G10 space at +5.0% (IV 11.0% vs HV30 6.0%). This suggests the options market is pricing in significant event risk for the BoE meeting on June 18, despite a neutral 0bp carry spread (Fed 3.75% vs BoE 3.75%). COT LF net long +21,961 (61.7% long) indicates specs are moderately positioned for GBP outperformance, but the high VRP warns that the cost of hedging is currently prohibitive for new trend followers. Watch for a vol crush post-BoE to signal a cleaner entry.",
       "evidence": [
-        "EUR/USD: 1.159",
-        "EUR/USD 25d RR: -0.34",
-        "EUR/USD VRP: +2.9%",
-        "EUR COT LF net: -49,290"
+        "GBP/USD VRP: +5.0% (IV 11.0% vs HV30 6.0%)",
+        "GBP COT LF net: +21,961",
+        "BoE 3.75% vs Fed 3.75% — 0bp"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "11:28",
+      "priority": "info",
+      "title": "USD/CAD — Correlation Break + Retail Extreme",
+      "text": "USD/CAD at 1.3999 is trading at a significant dislocation from energy prices, with the USD/CAD vs WTI correlation falling to -0.284 (z = -1.61σ). While retail is 92% short (extreme contrarian signal), the +150bp carry advantage (Fed 3.75% vs BoC 2.25%) and positive USD CESI (+22) support the current USD strength. The breakdown in the oil-link suggests USD/CAD is currently functioning as a pure interest-rate and data-divergence play rather than a commodity proxy. Watch for a return to the 1.4000 level to trigger retail stops.",
+      "evidence": [
+        "USD/CAD vs WTI corr: -0.284 (z=-1.61σ)",
+        "Retail Sentiment: 92% Short",
+        "Fed 3.75% vs BoC 2.25% — 150bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
