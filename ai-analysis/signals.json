@@ -1,65 +1,57 @@
 {
-  "generated_at": "2026-06-16T11:41:18Z",
+  "generated_at": "2026-06-16T18:43:37Z",
   "signals": [
     {
-      "time": "11:39",
+      "time": "18:42",
       "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + Carry + Vol",
-      "text": "USD/JPY at 160.32 — price holds above the 160.00 psychological handle, a level previously associated with BoJ verbal and physical intervention. Despite the breach, 300bp Fed-BoJ carry (Fed 3.75% vs BoJ 0.75%) sustains the bid while VIX at 16.1 (normal volatility) limits safe-haven JPY demand. Options market is pricing significant tail risk with a -1.20 25d RR put skew and a +3.8% VRP (IV 7.2% vs HV30 3.4%), signaling that institutions are paying a heavy premium for downside protection against a sudden BoJ-induced reversal. Sustained trading above 160.00 increases the probability of immediate MoF action.",
+      "title": "USD/JPY — BoJ Hike + Intervention Risk + Carry",
+      "text": "USD/JPY at 160.45 — BoJ raised rates to 1.0% (highest since 1995), narrowing the Fed 3.75% vs BoJ 0.75% carry differential to +275bp (from +300bp). Despite the hike, the pair has broken above 160.00, indicating carry trade resilience and potential for further BoJ intervention. JPY COT LF net short −115,036 (extreme crowded short) faces short-squeeze risk (USD/JPY downside if shorts cover) if BoJ signals further tightening or intervenes. Options market shows moderate put skew (25d RR -1.06) despite the price action, suggesting hedging for JPY strength. Watch for BoJ follow-up statements or direct intervention above 160.00.",
       "evidence": [
-        "USD/JPY: 160.32",
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "USD/JPY VRP: +3.8% (IV 7.2% vs HV30 3.4%)"
+        "USD/JPY: 160.45",
+        "BoJ Rate Hike: 1.0%",
+        "JPY COT LF net: -115,036",
+        "USD/JPY 25d RR: -1.06"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "11:36",
+      "time": "18:39",
+      "priority": "critical",
+      "title": "USD/CAD — Oil Plunge + Carry + Correlation Break",
+      "text": "USD/CAD at 1.3993 — WTI Oil plunged -5.15% on reports of a US-Iran deal allowing Tehran to immediately sell oil, directly pressuring CAD. The USD/CAD vs WTI Oil correlation has broken significantly (corr=-0.286 vs 252d norm=-0.022, z=-1.60σ), indicating CAD is not benefiting from its typical inverse relationship with oil. The Fed 3.75% vs BoC 2.25% carry differential of +150bp continues to favor USD. CAD COT LF net short −60,671 (extreme short) suggests further downside risk if oil weakness persists. Watch for WTI Oil price stabilization or further supply news.",
+      "evidence": [
+        "USD/CAD: 1.3993",
+        "WTI Oil: -5.15%",
+        "USD/CAD vs WTI Oil corr: -0.286 (z=-1.60σ)",
+        "USD/CAD carry: +150bp"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "18:35",
       "priority": "warning",
-      "title": "USD/CHF — SNB Yield Shock + Carry",
-      "text": "SNB sight deposit rates confirmed at 0.00% (up to threshold) and -0.25% (above threshold) as of June 16, while 10Y Swiss bond yields retreat to 0.393%. USD/CHF at 0.7947 remains supported by a massive +375bp carry advantage (Fed 3.75% vs SNB 0.0%). The real rate differential (+1.31% USD vs -0.31% CHF) further favors USD, though the pair's 1M gain of +1.34% faces technical resistance as Swiss yields stabilize. Watch the SNB meeting on June 18 for any shift in the sight deposit tiering mechanism.",
+      "title": "AUD/USD — RBA Pause + Negative CESI + Elevated Vol",
+      "text": "AUD/USD at 0.7074 — RBA paused rate hikes at 4.35% in June 2026 after three consecutive hikes, signaling a shift in monetary policy. This comes as AUD CESI is negative (net=-8 misses), indicating data is consistently disappointing expectations. Options market shows elevated vol premium (IV 21.3% vs HV30 8.1%, VRP +13.2%), suggesting strong hedging demand for AUD downside protection. The Fed 3.75% vs RBA 4.35% carry differential of -60bp still favors AUD, but the RBA pause and weak data could erode this advantage. Watch for RBA forward guidance at the next meeting on 11 Aug.",
       "evidence": [
-        "SNB sight deposit rate: 0.00%",
-        "Fed 3.75% vs SNB 0.0% — 375bp",
-        "USD/CHF: 0.7947"
+        "AUD/USD: 0.7074",
+        "RBA Policy: ON HOLD at 4.35%",
+        "AUD CESI: net=-8 misses",
+        "AUD/USD VRP: +13.2%"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "11:34",
-      "priority": "warning",
-      "title": "NZD/USD — COT vs Retail Divergence",
-      "text": "NZD/USD at 0.5833 exhibits a sharp positioning divergence: COT LF net short -22,354 (specs bearish) vs retail 86% long (extreme retail bullish). This contrarian setup is reinforced by a negative CESI (net -4 misses), suggesting fundamental data is failing to support the retail long thesis. With RBNZ at 2.25% vs Fed 3.75% creating a -150bp carry deficit for the Kiwi, the retail long position is highly vulnerable to a capitulation squeeze if price breaks the recent lows. Watch for RBNZ hike signaling on July 8 to potentially rescue the retail position; otherwise, the path of least resistance remains lower.",
-      "evidence": [
-        "NZD COT LF net: -22,354",
-        "Retail Sentiment: 86% Long",
-        "Fed 3.75% vs RBNZ 2.25% — 150bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "11:31",
+      "time": "18:30",
       "priority": "info",
-      "title": "GBP/USD — Volatility Premium + Positioning",
-      "text": "GBP/USD at 1.3423 shows the highest volatility risk premium in the G10 space at +5.0% (IV 11.0% vs HV30 6.0%). This suggests the options market is pricing in significant event risk for the BoE meeting on June 18, despite a neutral 0bp carry spread (Fed 3.75% vs BoE 3.75%). COT LF net long +21,961 (61.7% long) indicates specs are moderately positioned for GBP outperformance, but the high VRP warns that the cost of hedging is currently prohibitive for new trend followers. Watch for a vol crush post-BoE to signal a cleaner entry.",
+      "title": "NZD/USD — Retail Extreme + Negative CESI",
+      "text": "NZD/USD at 0.5838 — Retail sentiment shows an extreme long bias (85% long), which typically acts as a contrarian indicator for potential reversals. This aligns with a negative NZD CESI (net=-4 misses), indicating disappointing economic data. The RBNZ is on hold at 2.25% with a market bias for a hike, but the Fed 3.75% vs RBNZ 2.25% carry differential of +150bp favors USD. If economic data continues to disappoint, retail longs face unwind risk. Watch for upcoming RBNZ statements for any shift in hawkish bias.",
       "evidence": [
-        "GBP/USD VRP: +5.0% (IV 11.0% vs HV30 6.0%)",
-        "GBP COT LF net: +21,961",
-        "BoE 3.75% vs Fed 3.75% — 0bp"
+        "NZD/USD: 0.5838",
+        "NZD/USD Retail: 85% long",
+        "NZD CESI: net=-4 misses",
+        "NZD/USD carry: +150bp"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "11:28",
-      "priority": "info",
-      "title": "USD/CAD — Correlation Break + Retail Extreme",
-      "text": "USD/CAD at 1.3999 is trading at a significant dislocation from energy prices, with the USD/CAD vs WTI correlation falling to -0.284 (z = -1.61σ). While retail is 92% short (extreme contrarian signal), the +150bp carry advantage (Fed 3.75% vs BoC 2.25%) and positive USD CESI (+22) support the current USD strength. The breakdown in the oil-link suggests USD/CAD is currently functioning as a pure interest-rate and data-divergence play rather than a commodity proxy. Watch for a return to the 1.4000 level to trigger retail stops.",
-      "evidence": [
-        "USD/CAD vs WTI corr: -0.284 (z=-1.61σ)",
-        "Retail Sentiment: 92% Short",
-        "Fed 3.75% vs BoC 2.25% — 150bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
