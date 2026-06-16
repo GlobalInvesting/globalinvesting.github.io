@@ -1,8 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CB RATES MODAL  v2.3 — Inline Policy Summary block
+// CB RATES MODAL  v2.4 — Fix: chart height grows on each Decisions→Rate Chart tab-switch
 // Fluid layout, terminal CSS variables throughout.
 // v2.2 (2026-06-15): CB News tab added (superseded by v2.3).
 // v2.3 (2026-06-15): Tab approach replaced with inline Policy Summary block.
+// v2.4 (2026-06-15): Fix infinite chart height grow on Decisions→Rate Chart round-trip.
+//   Root cause: _cbrDims() re-measured from flex layout that had already been
+//   influenced by the chart container's own explicit px height (circular dependency).
+//   Fix: first open stores the measured height on bd._chartH; all tab-switch rebuilds
+//   return the cached value directly via _cbrDims(), breaking the measurement loop.
 //   Renders below context strip in Rate Chart panel. Fetches news-data/news.json,
 //   filters to 3 most recent CB-relevant articles for the selected currency,
 //   displays source + title (linked) + full expand paragraph. Lazy, non-blocking.
@@ -274,25 +279,65 @@ function _attachCBRTooltip(container,lwChart,mainSeries,fwdSeries,decisions){
 function _cbrDims(){
   const modal=document.getElementById('cbr-modal');
   if(!modal)return{w:600,h:300};
-  const totalH=modal.offsetHeight;
-  const hd=document.getElementById('cbr-m-hd');
-  const metrics=document.getElementById('cbr-m-metrics');
-  const tabs=document.getElementById('cbr-m-tabs');
-  const infoBar=document.querySelector('#cbr-p-chart .cbr-next-fwd');
-  const hdH=hd?hd.offsetHeight:0;
-  const metH=metrics?metrics.offsetHeight:0;
-  const tabH=tabs?tabs.offsetHeight:0;
-  const infoH=infoBar?infoBar.offsetHeight:0;
-  const padH=12; // 8px top + 4px bottom padding inside cbr-chart-area
-  // On mobile the modal has height:auto — totalH includes the chart itself which creates
-  // an infinite-expand loop. Use a fixed chart height on narrow viewports instead.
-  if(window.innerWidth<=600){
-    const w=Math.max(modal.offsetWidth-28,200);
-    return{w,h:220};
-  }
-  const h=Math.max(totalH-hdH-metH-tabH-infoH-padH,180);
-  // Width: modal width minus price scale area padding (14px each side)
+
+  // Width is always safe to compute from the modal.
   const w=Math.max(modal.offsetWidth-28,200);
+
+  // Mobile: use fixed chart height to avoid any measurement loop.
+  if(window.innerWidth<=600) return{w,h:220};
+
+  // Height strategy — two-phase to avoid infinite-grow circular dependency.
+  //
+  // THE PROBLEM: the modal has height:auto, so modal.offsetHeight includes
+  // the chart container's own explicit px height (cbr-lw-wrap style.height).
+  // Every rebuild reads a taller modal → computes larger h → sets taller
+  // container → modal grows again → next rebuild taller still → infinite grow.
+  // Zeroing container.style.height before measuring doesn't fully solve this
+  // because cbr-p-chart uses flex:1 in a height:auto modal — it collapses to
+  // just its flex-shrink:0 children, making panelH ≈ fixed-child-sum, so
+  // h = panelH - fixed-children ≈ 0 → clamped to 180 → same loop.
+  //
+  // FIX: the FIRST open measures the available height from the panel wrapper
+  // that contains the CB rates section. That measurement is done BEFORE any
+  // chart px height has been set, so the modal is at its natural content
+  // height (minus the chart). The result is stored on bd._chartH.
+  // All subsequent calls (tab-switch rebuilds) return the cached value
+  // directly — no re-measurement, no circular dependency.
+  const bd=document.getElementById('cbr-bd');
+  if(bd?._chartH){return{w,h:bd._chartH};}
+
+  // First open: chart container has no explicit height yet, so zeroing it
+  // is a no-op. We measure the section that wraps the CB rates inline panel
+  // (the sidebar panel section), subtract the modal's non-chart elements,
+  // and fall back to a generous fixed height if measurement is unreliable.
+  //
+  // Read from the nearest scrollable ancestor that has a known px height —
+  // typically the inline-panel's content area. Use the chart panel's
+  // own offsetHeight only if it is non-zero (i.e. set by the flex chain
+  // before the first rAF).
+  const chartPanel=document.getElementById('cbr-p-chart');
+  let panelH=chartPanel?chartPanel.offsetHeight:0;
+
+  // If flex hasn't resolved yet (panelH===0), fall back to the inline-panel
+  // section height via closest scrollable ancestor, then subtract headers.
+  if(panelH<10){
+    const sect=bd.closest('.panel-section')||bd.parentElement;
+    const sectH=sect?sect.clientHeight:0;
+    const hd=document.getElementById('cbr-m-hd');
+    const met=document.getElementById('cbr-m-metrics');
+    const tabs=document.getElementById('cbr-m-tabs');
+    panelH=sectH-(hd?hd.offsetHeight:0)-(met?met.offsetHeight:0)-(tabs?tabs.offsetHeight:0);
+  }
+
+  const infoBar=chartPanel?.querySelector('.cbr-next-fwd');
+  const ctxWrap=chartPanel?.querySelector('.cbr-ctx-wrap');
+  const psWrap=chartPanel?.querySelector('.cbr-ps-wrap');
+  const infoH=infoBar?infoBar.offsetHeight:0;
+  const ctxH=ctxWrap?ctxWrap.offsetHeight:0;
+  const psH=psWrap?psWrap.offsetHeight:0;
+  const padH=12;
+
+  const h=Math.max(panelH-infoH-ctxH-psH-padH,180);
   return{w,h};
 }
 
@@ -302,6 +347,10 @@ function _buildCBRChart(data){
   _destroyCBRChart();
   const parent=container.parentElement;
   const{w:initW,h:initH}=_cbrDims();
+  // Cache the measured height on bd so tab-switch rebuilds reuse it
+  // without re-measuring (re-measurement causes infinite grow — see _cbrDims).
+  const bd=document.getElementById('cbr-bd');
+  if(bd&&!bd._chartH)bd._chartH=initH;
   // Set explicit px height on the wrapper so LWC measures it correctly
   // regardless of whether the flex chain has resolved yet.
   container.style.width=initW+'px';
