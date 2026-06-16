@@ -1,57 +1,54 @@
 {
-  "generated_at": "2026-06-16T18:43:37Z",
+  "generated_at": "2026-06-16T22:14:43Z",
   "signals": [
     {
-      "time": "18:42",
+      "time": "22:13",
       "priority": "critical",
-      "title": "USD/JPY — BoJ Hike + Intervention Risk + Carry",
-      "text": "USD/JPY at 160.45 — BoJ raised rates to 1.0% (highest since 1995), narrowing the Fed 3.75% vs BoJ 0.75% carry differential to +275bp (from +300bp). Despite the hike, the pair has broken above 160.00, indicating carry trade resilience and potential for further BoJ intervention. JPY COT LF net short −115,036 (extreme crowded short) faces short-squeeze risk (USD/JPY downside if shorts cover) if BoJ signals further tightening or intervenes. Options market shows moderate put skew (25d RR -1.06) despite the price action, suggesting hedging for JPY strength. Watch for BoJ follow-up statements or direct intervention above 160.00.",
+      "title": "USD/JPY — Intervention Risk + Carry + Vol",
+      "text": "USD/JPY at 160.42 — price holds above the 160.00 psychological level which previously triggered BoJ verbal warnings. Despite intervention risk, the +292bp SOFR-TONA carry advantage sustains the bid while VIX remains at 16.4 (normal volatility). JPY COT LF net short -115,036 (long%=29.2%) indicates a crowded carry trade, while USD/JPY 25d RR at -1.06 signals the options market is paying a premium for downside protection against a potential BoJ/MoF response. Carry dominates until VIX > 25 or physical intervention occurs.",
       "evidence": [
-        "USD/JPY: 160.45",
-        "BoJ Rate Hike: 1.0%",
-        "JPY COT LF net: -115,036",
-        "USD/JPY 25d RR: -1.06"
+        "USD/JPY: 160.42",
+        "OIS Carry: +292bp",
+        "JPY COT LF Net: -115,036",
+        "25d RR: -1.06"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:39",
-      "priority": "critical",
-      "title": "USD/CAD — Oil Plunge + Carry + Correlation Break",
-      "text": "USD/CAD at 1.3993 — WTI Oil plunged -5.15% on reports of a US-Iran deal allowing Tehran to immediately sell oil, directly pressuring CAD. The USD/CAD vs WTI Oil correlation has broken significantly (corr=-0.286 vs 252d norm=-0.022, z=-1.60σ), indicating CAD is not benefiting from its typical inverse relationship with oil. The Fed 3.75% vs BoC 2.25% carry differential of +150bp continues to favor USD. CAD COT LF net short −60,671 (extreme short) suggests further downside risk if oil weakness persists. Watch for WTI Oil price stabilization or further supply news.",
-      "evidence": [
-        "USD/CAD: 1.3993",
-        "WTI Oil: -5.15%",
-        "USD/CAD vs WTI Oil corr: -0.286 (z=-1.60σ)",
-        "USD/CAD carry: +150bp"
-      ],
-      "_source": "gemini:gemini-2.5-flash"
-    },
-    {
-      "time": "18:35",
+      "time": "22:10",
       "priority": "warning",
-      "title": "AUD/USD — RBA Pause + Negative CESI + Elevated Vol",
-      "text": "AUD/USD at 0.7074 — RBA paused rate hikes at 4.35% in June 2026 after three consecutive hikes, signaling a shift in monetary policy. This comes as AUD CESI is negative (net=-8 misses), indicating data is consistently disappointing expectations. Options market shows elevated vol premium (IV 21.3% vs HV30 8.1%, VRP +13.2%), suggesting strong hedging demand for AUD downside protection. The Fed 3.75% vs RBA 4.35% carry differential of -60bp still favors AUD, but the RBA pause and weak data could erode this advantage. Watch for RBA forward guidance at the next meeting on 11 Aug.",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail",
+      "text": "NZD/USD COT LF net short -22,354 (specs fading hawkish bias) vs RBNZ hike bias priced for the July 8 meeting. Retail sentiment is 85% long, creating a sharp divergence where retail is fighting the institutional short. With NZD real rates at -0.83% (mildly accommodative) and CESI at -4 (negative bias), the pair faces structural headwinds. If RBNZ fails to deliver a hawkish surprise, retail capitulation risk targets 0.5800. NZD/USD at 0.5833.",
       "evidence": [
-        "AUD/USD: 0.7074",
-        "RBA Policy: ON HOLD at 4.35%",
-        "AUD CESI: net=-8 misses",
-        "AUD/USD VRP: +13.2%"
+        "NZD COT LF Net: -22,354",
+        "Retail Sentiment: 85% Long",
+        "NZD Real Rate: -0.83%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:30",
-      "priority": "info",
-      "title": "NZD/USD — Retail Extreme + Negative CESI",
-      "text": "NZD/USD at 0.5838 — Retail sentiment shows an extreme long bias (85% long), which typically acts as a contrarian indicator for potential reversals. This aligns with a negative NZD CESI (net=-4 misses), indicating disappointing economic data. The RBNZ is on hold at 2.25% with a market bias for a hike, but the Fed 3.75% vs RBNZ 2.25% carry differential of +150bp favors USD. If economic data continues to disappoint, retail longs face unwind risk. Watch for upcoming RBNZ statements for any shift in hawkish bias.",
+      "time": "22:08",
+      "priority": "warning",
+      "title": "AUD/USD — RBA Hawkish Pause + Vol Premium",
+      "text": "AUD/USD at 0.7070 — RBA held rates at 4.35% but maintained a hawkish bias, signaling further hikes remain possible. AUD/USD IV at 21.8% vs HV30 at 8.1% creates a massive +13.7% Vol Risk Premium, indicating the options market is pricing in significant tail risk relative to recent realized movement. COT LF net long +38,092 (68.8%) shows specs are positioned for the hawkish outcome, but the -70bp SOFR-AONIA carry deficit vs USD limits upside momentum ahead of the FOMC.",
       "evidence": [
-        "NZD/USD: 0.5838",
-        "NZD/USD Retail: 85% long",
-        "NZD CESI: net=-4 misses",
-        "NZD/USD carry: +150bp"
+        "AUD/USD VRP: +13.7%",
+        "RBA Rate: 4.35%",
+        "AUD COT LF Net: +38,092"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "22:05",
+      "priority": "info",
+      "title": "USD/CAD — Correlation Break + Retail Extreme",
+      "text": "USD/CAD at 1.3992 — correlation with WTI Oil has broken to -0.286 (z = -1.60σ), suggesting the pair is decoupling from energy prices to follow USD-centric yield drivers. Retail sentiment is 92% short, marking an extreme contrarian signal as retail fades the 1M +1.96% rally. Fed 3.75% vs BoC 2.25% provides a +150bp carry advantage for USD, supporting the trend despite retail positioning. Watch for a break of 1.4000 to trigger retail stops.",
+      "evidence": [
+        "USD/CAD vs WTI Corr: -0.286 (z=-1.60σ)",
+        "Retail Sentiment: 92% Short",
+        "USD/CAD Carry: +150bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
