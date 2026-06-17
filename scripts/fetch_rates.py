@@ -97,7 +97,7 @@ OFFICIAL_SOURCES = {
     'NYFed-EFFR', 'FRED:FEDFUNDS', 'FRED:DFEDTARU', 'BoJ-API', 'BoJ-scraping',
     'SNB-scraping', 'RBNZ-CSV', 'BIS-CBPOL',
     'manual-override',
-    'ff-calendar-actual',  # v14.0: calendar actual = same-day CB decision (highest priority)
+    'ff-calendar-actual',  # v14.1: calendar actual = CB decision within 3-day lookback (highest priority)
 }
 
 # ── Overrides manuales ─────────────────────────────────────────────────────────
@@ -1068,22 +1068,24 @@ def main():
     run_ts            = datetime.utcnow().isoformat() + 'Z'
 
     print(f'\nRun date:  {today}')
-    print(f'Version:   fetch_rates.py v14.0 — calendar-actual priority source')
+    print(f'Version:   fetch_rates.py v14.1 — 3-day calendar lookback window')
     os.makedirs('rates', exist_ok=True)
 
     final_rates = {}
 
-    # ── Paso 0-A: ff_calendar.json actuals (HIGHEST priority — v14.0) ─────
-    # When update-ff-calendar.yml writes a released "Interest Rate Decision"
-    # actual for today, that is the most authoritative same-day source —
-    # more current than BIS (monthly lag), BoJ scraping (page may not yet
-    # reflect the new rate), or FRED (1-day lag).
+    # ── Paso 0-A: ff_calendar.json actuals (HIGHEST priority — v14.1) ─────
+    # Reads released high-impact Interest Rate Decision actuals from the
+    # calendar file. Uses a 3-day lookback window so decisions made yesterday
+    # or 2 days ago (e.g. BoJ deciding at 03:00 UTC when the next run is
+    # 08:00 UTC the following day) are still captured correctly.
+    # Only the MOST RECENT decision per currency within the window is used.
     # Industry standard: Bloomberg reads CB press releases in real-time;
     # our calendar pipeline is the closest equivalent available.
     print('\n' + '=' * 70)
-    print('SOURCE 0-A: ff_calendar.json actuals (highest priority, v14.0)')
+    print('SOURCE 0-A: ff_calendar.json actuals (highest priority, v14.1)')
     print('=' * 70)
     FF_CAL_PATH = 'calendar-data/ff_calendar.json'
+    CAL_LOOKBACK_DAYS = 3  # capture decisions from today back to 3 days ago
     _RATE_DEC_KW = [
         'interest rate decision', 'interest rate', 'rate decision',
         'monetary policy decision', 'monetary policy statement',
@@ -1094,11 +1096,18 @@ def main():
             with open(FF_CAL_PATH) as _ff:
                 _ff_cal = json.load(_ff)
             _ff_events = _ff_cal.get('events', [])
-            _cal_hits = []
+            # Build lookback date set: today and up to CAL_LOOKBACK_DAYS-1 days prior
+            _lookback_dates = set(
+                (date.today() - timedelta(days=_d)).strftime('%Y-%m-%d')
+                for _d in range(CAL_LOOKBACK_DAYS)
+            )
+            # Collect all qualifying events, then pick most recent per currency
+            _ccy_best: dict = {}  # currency -> (dateISO, actual_float, title)
             for _ev in _ff_events:
                 if not _ev.get('released'):
                     continue
-                if _ev.get('dateISO') != today:
+                _ev_date = _ev.get('dateISO', '')
+                if _ev_date not in _lookback_dates:
                     continue
                 if _ev.get('impact') not in ('high',):
                     continue
@@ -1106,25 +1115,35 @@ def main():
                 if not any(_kw in _title_lc for _kw in _RATE_DEC_KW):
                     continue
                 _ccy = _ev.get('currency', '')
+                if _ccy not in CURRENCIES:
+                    continue
                 _actual_str = (_ev.get('actual') or '').strip().rstrip('%')
-                if not _actual_str or _ccy not in CURRENCIES:
+                if not _actual_str:
                     continue
                 try:
                     _new_rate = float(_actual_str)
                     if not (MIN_POLICY_RATE_PP <= _new_rate <= MAX_POLICY_RATE_PP):
                         continue
-                    final_rates[_ccy] = make_result(
-                        str(_new_rate), today, 'ff-calendar-actual'
-                    )
-                    _cal_hits.append(f'{_ccy}:{_new_rate}%')
-                    print(f'  ✓ {_ccy}: {_new_rate}%  date={today}  '
-                          f'[ff-calendar-actual "{_ev.get("title")}"]')
+                    # Keep most recent decision if multiple in window
+                    if _ccy not in _ccy_best or _ev_date > _ccy_best[_ccy][0]:
+                        _ccy_best[_ccy] = (_ev_date, _new_rate, _ev.get('title', ''))
                 except ValueError:
                     print(f'  ✗ {_ccy}: could not parse calendar actual '
-                          f'"{_ev.get("actual")}" — skip')
+                          f'\"{_ev.get("actual")}\" — skip')
+            _cal_hits = []
+            for _ccy, (_dec_date, _new_rate, _dec_title) in _ccy_best.items():
+                _days_ago = (date.today() - date.fromisoformat(_dec_date)).days
+                _age_label = 'today' if _days_ago == 0 else f'{_days_ago}d ago ({_dec_date})'
+                final_rates[_ccy] = make_result(
+                    str(_new_rate), _dec_date, 'ff-calendar-actual'
+                )
+                _cal_hits.append(f'{_ccy}:{_new_rate}%')
+                print(f'  ✓ {_ccy}: {_new_rate}%  decision={_age_label}  '
+                      f'[ff-calendar-actual \"{_dec_title}\"]')
             if not _cal_hits:
-                print(f'  No released high-impact rate-decision actuals for today '
-                      f'({today}) in ff_calendar.json')
+                _window_str = ', '.join(sorted(_lookback_dates, reverse=True))
+                print(f'  No released high-impact rate-decision actuals in '
+                      f'{CAL_LOOKBACK_DAYS}-day window [{_window_str}]')
         else:
             print(f'  {FF_CAL_PATH} not found — skipping calendar source')
     except Exception as _e0a:
