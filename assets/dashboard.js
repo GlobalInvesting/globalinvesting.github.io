@@ -7474,8 +7474,12 @@ async function fetchFedExpectations() {
       const CB_STEP_P1 = { JPY: 0.10, CHF: 0.25 };
       const cbStepP1 = CB_STEP_P1[ccy] ?? 0.25;
       const fwdRateRaw = meetings?.fwdRate;
+      // Staleness guard: fwdRate must be within [current − cbStep, current + cbStep].
+      // If outside that range, it was computed with a different (pre-hike/cut) base rate
+      // and would show a misleading implied rate. Fall through to on-the-fly Priority 2.
+      // Example: BoJ hikes 0.75→1.0 but meetings.json still has fwdRate=0.80 (from 0.75 base).
       const fwdRateStale = fwdRateRaw != null && !isNaN(fwdRateRaw) &&
-        Math.abs(fwdRateRaw - current) > cbStepP1 * 3;
+        (fwdRateRaw < current - cbStepP1 - 0.001 || fwdRateRaw > current + cbStepP1 + 0.001);
       if (fwdRateRaw != null && !isNaN(fwdRateRaw) && fwdRateRaw > 0 && !fwdRateStale) {
         fwdDisplay = fwdRateRaw.toFixed(2) + '%';
       } else {
