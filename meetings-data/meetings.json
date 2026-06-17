@@ -121,13 +121,13 @@
         "18 Dec"
       ],
       "source": "boj.or.jp",
-      "bias": "cut",
+      "bias": "hike",
       "biasSource": "TONA overnight rate + BoJ forward guidance",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-17",
-      "cutProb": 100,
-      "hikeProb": 0,
-      "fwdRate": 0.75
+      "cutProb": 0,
+      "hikeProb": 50,
+      "fwdRate": 1.125
     },
     "AUD": {
       "nextMeeting": "11 Aug",
