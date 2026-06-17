@@ -7382,7 +7382,19 @@ async function fetchFedExpectations() {
       const current = parseFloat(obs[0].value);
 
       const meetings = meetingsRes?.meetings?.[ccy];
-      const nextMtg  = meetings?.nextMeeting || '—';
+      // Auto-advance nextMtg display: if nextMeetingISO is today or past and allMeetings
+      // has a future date, show the next upcoming one. Prevents "17 Jun" showing stale
+      // on the evening of FOMC day until the weekly workflow runs Monday.
+      // Bloomberg WIRP auto-advances the meeting date column the moment the meeting passes.
+      const _todayISO = new Date().toISOString().slice(0, 10);
+      let nextMtg = meetings?.nextMeeting || '—';
+      if (meetings?.nextMeetingISO && meetings.nextMeetingISO <= _todayISO && Array.isArray(meetings.allMeetings)) {
+        const _nextFuture = meetings.allMeetings.find(d => d > _todayISO);
+        if (_nextFuture) {
+          const _nf = new Date(_nextFuture + 'T12:00:00Z');
+          nextMtg = _nf.getDate() + ' ' + _nf.toLocaleString('en-GB', { month: 'short', timeZone: 'UTC' });
+        }
+      }
 
       // ── Bias: prefer explicit market-consensus field from meetings.json ──
       // meetings.bias       = 'cut' | 'hold' | 'hike' — OIS/overnight rate implied direction
@@ -7408,18 +7420,31 @@ async function fetchFedExpectations() {
       const biasTip = buildBiasTooltip();
 
       // ── Market-implied move probability (CME/ASX where available; null otherwise) ──
-      // Show cut probability chip for cut/hold bias; hike probability chip for hike bias.
-      // Bloomberg WIRP standard: display the probability of the expected direction.
+      // Bloomberg WIRP standard: display the dominant-direction probability matching the bias.
+      //   Hike bias → P(hike)%↑   Cut bias → P(cut)%↓   Hold bias → P(hold)%→
+      // Hold probability is the residual: holdProb = 100 − cutProb − hikeProb.
+      // Previously, the "else if (cutProb !== null)" branch fired for hold currencies,
+      // showing "0%↓" (cut=0%) — misleading. Fixed: hold bias explicitly shows holdProb.
       const cutProb  = meetings?.cutProb  ?? null;  // number (0–100) or null
       const hikeProb = meetings?.hikeProb ?? null;  // number (0–100) or null
       const probSrc  = biasSource || 'OIS/futures';
+      const _haveProbData = cutProb !== null || hikeProb !== null;
       let probSuffix = '';
-      if (meetingsBias === 'hike' && hikeProb !== null) {
-        const probCls = hikeProb >= 60 ? 'up' : hikeProb >= 40 ? '' : 'flat';
-        probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of a hike at next meeting · ${probSrc}">${hikeProb}%↑</span>`;
-      } else if (cutProb !== null) {
-        const probCls = cutProb >= 60 ? 'down' : cutProb >= 40 ? '' : 'flat';
-        probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of a cut at next meeting · ${probSrc}">${cutProb}%↓</span>`;
+      if (_haveProbData) {
+        if (meetingsBias === 'hike') {
+          const hp = hikeProb ?? 0;
+          const probCls = hp >= 60 ? 'up' : hp >= 40 ? '' : 'flat';
+          probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of a hike at next meeting · ${probSrc}">${hp}%↑</span>`;
+        } else if (meetingsBias === 'cut') {
+          const cp = cutProb ?? 0;
+          const probCls = cp >= 60 ? 'down' : cp >= 40 ? '' : 'flat';
+          probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of a cut at next meeting · ${probSrc}">${cp}%↓</span>`;
+        } else {
+          // Hold (or unrecognised bias): show hold probability = residual
+          const holdProb = Math.max(0, 100 - (cutProb ?? 0) - (hikeProb ?? 0));
+          const probCls = holdProb >= 60 ? 'flat' : '';
+          probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of no change at next meeting · ${probSrc}">${holdProb}%→</span>`;
+        }
       }
 
       let biasLabel;
