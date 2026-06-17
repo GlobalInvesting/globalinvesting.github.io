@@ -258,12 +258,13 @@ jobs:
           # Uses printf to write the script (avoids YAML heredoc parsing issues).
           printf '%s\n' \
             'import json,sys' \
-            'from datetime import datetime,timezone' \
+            'from datetime import datetime,timezone,timedelta' \
             'cal=json.load(open("calendar-data/ff_calendar.json"))' \
             'events=cal.get("events",[])' \
-            'today=datetime.now(timezone.utc).strftime("%Y-%m-%d")' \
+            'today=datetime.now(timezone.utc).date()' \
+            'window=set((today-timedelta(days=d)).strftime("%Y-%m-%d") for d in range(3))' \
             'kw=["interest rate decision","interest rate","rate decision","monetary policy decision","policy rate","cash rate"]' \
-            'hits=[ev["currency"]+":"+ev["actual"].strip() for ev in events if ev.get("released") and ev.get("dateISO")==today and ev.get("impact")=="high" and ev.get("actual","").strip() and any(k in (ev.get("title") or "").lower() for k in kw)]' \
+            'hits=[ev["currency"]+":"+ev["actual"].strip() for ev in events if ev.get("released") and ev.get("dateISO") in window and ev.get("impact")=="high" and ev.get("actual","").strip() and any(k in (ev.get("title") or "").lower() for k in kw)]' \
             'print(",".join(hits) if hits else "")' \
             > /tmp/check_rate_dec.py
           RATE_DEC=$(python3 /tmp/check_rate_dec.py 2>/dev/null || echo "")
