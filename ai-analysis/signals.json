@@ -1,54 +1,57 @@
 {
-  "generated_at": "2026-06-16T22:14:43Z",
+  "generated_at": "2026-06-17T03:37:33Z",
   "signals": [
     {
-      "time": "22:13",
+      "time": "03:36",
       "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + Carry + Vol",
-      "text": "USD/JPY at 160.42 — price holds above the 160.00 psychological level which previously triggered BoJ verbal warnings. Despite intervention risk, the +292bp SOFR-TONA carry advantage sustains the bid while VIX remains at 16.4 (normal volatility). JPY COT LF net short -115,036 (long%=29.2%) indicates a crowded carry trade, while USD/JPY 25d RR at -1.06 signals the options market is paying a premium for downside protection against a potential BoJ/MoF response. Carry dominates until VIX > 25 or physical intervention occurs.",
+      "title": "USD/JPY — BoJ Intervention Risk + Carry",
+      "text": "USD/JPY at 160.33, trading above the 160.00 level that has previously triggered BoJ verbal warnings. Despite the recent BoJ hike, the yen remains weak, underscoring deeply entrenched bearish positioning. The 296bp Fed-BoJ OIS carry premium (SOFR 3.69% vs TONA 0.73%) continues to sustain the bid, while JPY COT LF net short −115,036 (week ending Jun 9) indicates a crowded carry trade. Intervention risk is elevated on a sustained break above 160.00. Watch for any official comments from MoF/BoJ officials.",
       "evidence": [
-        "USD/JPY: 160.42",
-        "OIS Carry: +292bp",
-        "JPY COT LF Net: -115,036",
-        "25d RR: -1.06"
+        "USD/JPY: 160.33",
+        "USD/JPY OIS carry: +296bp favors USD",
+        "JPY COT LF net: -115,036",
+        "Yen stays weak after BoJ hike as analysts eye intervention risk"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "22:10",
+      "time": "03:39",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + Retail",
-      "text": "NZD/USD COT LF net short -22,354 (specs fading hawkish bias) vs RBNZ hike bias priced for the July 8 meeting. Retail sentiment is 85% long, creating a sharp divergence where retail is fighting the institutional short. With NZD real rates at -0.83% (mildly accommodative) and CESI at -4 (negative bias), the pair faces structural headwinds. If RBNZ fails to deliver a hawkish surprise, retail capitulation risk targets 0.5800. NZD/USD at 0.5833.",
+      "title": "NZD/USD — COT vs OIS Divergence + Domestic Data",
+      "text": "NZD/USD COT LF net short −22,354 (week ending Jun 9) vs RBNZ hike bias (Hike prob: 40% priced for 8 Jul). Specs are fading a hawkish CB, creating a short-squeeze risk if the RBNZ delivers or signals a hike. This is compounded by a sharply narrowing Q1 current account deficit (-NZ$1.008B vs exp -NZ$0.967B), but offset by a drop in consumer confidence to its lowest since 2023. NZD/USD at 0.5829. A clear hawkish signal from the RBNZ or a sustained improvement in economic data is likely to trigger a crowded spec short unwind.",
       "evidence": [
-        "NZD COT LF Net: -22,354",
-        "Retail Sentiment: 85% Long",
-        "NZD Real Rate: -0.83%"
+        "NZD COT LF net: -22,354",
+        "RBNZ hike prob: 40%",
+        "NZ Q1 current account: -NZ$1.008B",
+        "NZ consumer confidence: lowest since 2023"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "22:08",
+      "time": "03:42",
       "priority": "warning",
-      "title": "AUD/USD — RBA Hawkish Pause + Vol Premium",
-      "text": "AUD/USD at 0.7070 — RBA held rates at 4.35% but maintained a hawkish bias, signaling further hikes remain possible. AUD/USD IV at 21.8% vs HV30 at 8.1% creates a massive +13.7% Vol Risk Premium, indicating the options market is pricing in significant tail risk relative to recent realized movement. COT LF net long +38,092 (68.8%) shows specs are positioned for the hawkish outcome, but the -70bp SOFR-AONIA carry deficit vs USD limits upside momentum ahead of the FOMC.",
+      "title": "EUR/USD — ECB Hike + Geopolitical Trade Tensions",
+      "text": "EUR/USD at 1.1616. The ECB is seen hiking one more time in September before rates plateau through 2027, with the ECB's first rate increase since 2023 largely anticipated. However, Chinese export flood puts EU tariff wall firmly on the G7 agenda, signaling potential trade tensions that is likely to weigh on EUR exports. The 176bp OIS carry differential (SOFR 3.69% vs €STR 1.93%) favors USD, structurally limiting EUR/USD upside. Watch for G7 statements on trade tariffs and the next ECB meeting (mkt: 94% hike priced) on 23 Jul.",
       "evidence": [
-        "AUD/USD VRP: +13.7%",
-        "RBA Rate: 4.35%",
-        "AUD COT LF Net: +38,092"
+        "EUR/USD: 1.1616",
+        "EUR/USD OIS carry: +176bp favors USD",
+        "One more ECB hike seen in September",
+        "Chinese export flood puts EU tariff wall on G7 agenda"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "22:05",
+      "time": "03:45",
       "priority": "info",
-      "title": "USD/CAD — Correlation Break + Retail Extreme",
-      "text": "USD/CAD at 1.3992 — correlation with WTI Oil has broken to -0.286 (z = -1.60σ), suggesting the pair is decoupling from energy prices to follow USD-centric yield drivers. Retail sentiment is 92% short, marking an extreme contrarian signal as retail fades the 1M +1.96% rally. Fed 3.75% vs BoC 2.25% provides a +150bp carry advantage for USD, supporting the trend despite retail positioning. Watch for a break of 1.4000 to trigger retail stops.",
+      "title": "AUD/USD — Volatility Premium + Negative CESI",
+      "text": "AUD/USD IV at 22.2% vs HV30 at 7.9% — a significant +14.3% VRP above realized volatility, indicating strong hedging demand. This elevated options premium suggests market participants are pricing in higher future volatility despite a relatively neutral COT LF net long +38,092 (week ending Jun 9). The AUD CESI net -8 misses (data disappointing) supports AUD weakness bias. AUD/USD at 0.7065. Watch for a shift in economic data surprises to alleviate the negative CESI pressure.",
       "evidence": [
-        "USD/CAD vs WTI Corr: -0.286 (z=-1.60σ)",
-        "Retail Sentiment: 92% Short",
-        "USD/CAD Carry: +150bp"
+        "AUD/USD IV: 22.2%, HV30: 7.9%",
+        "AUD/USD VRP: +14.3%",
+        "AUD CESI: net -8 misses",
+        "AUD COT LF net: +38,092"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
