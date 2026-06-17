@@ -322,9 +322,10 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
     const miss = isInverse ? actual > forecast : actual < forecast;
     const surprise = isInverse ? -(actual - forecast) : (actual - forecast);
 
-    // Decay weight anchored to window right edge
-    const ageDays = (endMs - t) / 86400000;
-    const w = Math.exp(-_ESM_DECAY_LAMBDA * ageDays);
+    // Decay weight × impact weight anchored to window right edge
+    const ageDays    = (endMs - t) / 86400000;
+    const impactMult = ev.impact === 'high' ? 1.0 : 0.5;
+    const w          = Math.exp(-_ESM_DECAY_LAMBDA * ageDays) * impactMult;
 
     const st = stats[`${ccy}/${canon}`];
     const useZ = st && st.n >= 5 && st.std > 0;

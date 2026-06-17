@@ -11006,7 +11006,7 @@ async function renderSovereignSpreads() {
   tbody.dataset.loaded = '2';
 }
 
-// ── Economic Surprises — CESI-style centred bar index (v7.76.0) ──────────────
+// ── Economic Surprises — CESI-style centred bar index (v7.76.1) ──────────────
 // Methodology: for each G8 currency, computes a normalised surprise index over
 // a 90-day rolling window from Finnhub economic calendar (actual vs consensus).
 // Index = (beats − misses) / total scored, scaled to [−100, +100].
@@ -11166,10 +11166,13 @@ async function renderEconSurprises() {
     const rawSurprise = actual - forecast;
     const surprise    = isInverse ? -rawSurprise : rawSurprise;
 
-    // ── Exponential decay weight ─────────────────────────────────────────────────────────────
-    // w = e^(-λ · ageDays). Recent events weight 1.0; older events fade smoothly.
-    const ageDays = (nowMs - evTime) / 86400000;
-    const w = Math.exp(-DECAY_LAMBDA * ageDays);
+    // ── Exponential decay × impact weight ────────────────────────────────────────────────────
+    // w = e^(-λ · ageDays) × impactMult. Recent events dominate; high-impact releases
+    // score twice the weight of medium (HIGH=1.0, MEDIUM=0.5) — consistent with EA
+    // ComputeESI() and closer to Citi/DB institutional weighting conventions.
+    const ageDays    = (nowMs - evTime) / 86400000;
+    const impactMult = ev.impact === 'high' ? 1.0 : 0.5;
+    const w = Math.exp(-DECAY_LAMBDA * ageDays) * impactMult;
 
     // ── Z-score scoring (hybrid: z-score when stats available, beat/miss otherwise) ──
     // As history accumulates in surpriseStats (engine v3.1+), more events
@@ -12326,8 +12329,9 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
             const beat    = inv ? actual < forecast : actual > forecast;
             const miss    = inv ? actual > forecast : actual < forecast;
             const surp    = inv ? -(actual-forecast) : (actual-forecast);
-            const ageDays = (endMs - t) / 86400000;
-            const w       = Math.exp(-DECAY_LAMBDA * ageDays);
+            const ageDays    = (endMs - t) / 86400000;
+            const impactMult = ev.impact === 'high' ? 1.0 : 0.5;
+            const w          = Math.exp(-DECAY_LAMBDA * ageDays) * impactMult;
             const st      = stats[`${cmpId}/${canon}`];
             const useZ    = st && st.n >= 5 && st.std > 0;
             const z       = useZ ? (surp - st.mean) / st.std : null;
