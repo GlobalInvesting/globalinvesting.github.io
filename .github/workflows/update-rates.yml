@@ -13,8 +13,25 @@ on:
   schedule:
     # ── Asia close / EU pre-open base run ─────────────────────────────────────
     # Captures: JPY (BoJ ~02:30 UTC), AUD (RBA ~04:30 UTC), NZD (RBNZ ~02:00 UTC).
-    # These three CBs publish before 08:00 UTC so a single daily run suffices.
     - cron: '0 8 * * *'    # Daily 08:00 UTC — base run, catches overnight decisions
+
+    # ── BoJ (JPY) early capture ────────────────────────────────────────────────
+    # BoJ publishes at ~02:00–03:00 UTC (11:00–12:00 JST). Meeting days in 2026:
+    # Jan=Sat, Mar=Thu, Apr/Jun=Tue, Jul/Sep/Oct/Dec=Fri.
+    # Extra crons at 04:00 UTC ensure rates/JPY.json updates before EU open.
+    # Without these, the 08:00 UTC base run is the first catch — 5h after decision.
+    - cron: '0 4 * * 2'   # Tue 04:00 UTC — BoJ on Tue (Apr 28, Jun 16 2026)
+    - cron: '0 4 * * 4'   # Thu 04:00 UTC — BoJ on Thu (Mar 19 2026)
+    - cron: '0 4 * * 5'   # Fri 04:00 UTC — BoJ on Fri (Jul 31, Sep 18, Oct 30, Dec 18 2026)
+
+    # ── RBA (AUD) early capture ────────────────────────────────────────────────
+    # RBA publishes at 14:30 AEST (UTC+10) = 04:30 UTC. Decisions: dominantly Tuesdays.
+    - cron: '30 5 * * 2'  # Tue 05:30 UTC — RBA (04:30 UTC + 60 min buffer)
+
+    # ── RBNZ (NZD) early capture ───────────────────────────────────────────────
+    # RBNZ publishes at 14:00 NZST (UTC+12) = 02:00 UTC. Decisions: Wed/Thu.
+    - cron: '30 3 * * 3'  # Wed 03:30 UTC — RBNZ (02:00 UTC + 90 min buffer)
+    - cron: '30 3 * * 4'  # Thu 03:30 UTC — RBNZ alternate day
 
     # ── CBs that decide AFTER 08:00 UTC ───────────────────────────────────────
     # SNB:  09:30 CET = 08:30 UTC Thu (quarterly: Mar/Jun/Sep/Dec)

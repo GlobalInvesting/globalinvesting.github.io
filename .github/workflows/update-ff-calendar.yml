@@ -88,6 +88,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write   # required for repository_dispatch to trigger update-rates.yml
 
 jobs:
   update-ff-calendar:
@@ -234,3 +235,78 @@ jobs:
           done
           echo "⚠️  All push attempts exhausted — data refreshes on next scheduled run."
           exit 0
+
+      - name: Dispatch cb-rate-decision if interest rate actual detected
+        # v5.2: When ff_calendar.json is updated with a released high-impact
+        # Interest Rate Decision actual, immediately trigger update-rates.yml
+        # via repository_dispatch so rates/*.json reflects the new rate before
+        # the next narrative run — without waiting for the next scheduled cron.
+        # The update-rates.yml already has `repository_dispatch: types: [cb-rate-decision]`
+        # so no changes are needed there beyond this trigger.
+        # Only fires when cal_changed=1 (i.e. an actual/forecast was written).
+        if: steps.gate.outputs.run == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CHANGED=$(cat /tmp/cal_changed 2>/dev/null || echo "0")
+          if [ "${CHANGED}" != "1" ]; then
+            echo "No calendar changes — skipping rate-decision dispatch check."
+            exit 0
+          fi
+
+          # Check if any of the newly-written actuals is an Interest Rate Decision.
+          # We read ff_calendar.json directly after the commit to check today's events.
+          RATE_DEC=$(python3 << 'EOFPY'
+import json, sys
+from datetime import datetime, timezone
+
+try:
+    with open('calendar-data/ff_calendar.json') as f:
+        cal = json.load(f)
+    events = cal.get('events', [])
+    today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    keywords = [
+        'interest rate decision', 'interest rate', 'rate decision',
+        'monetary policy decision', 'policy rate', 'cash rate',
+    ]
+    hits = []
+    for ev in events:
+        if not ev.get('released'):
+            continue
+        if ev.get('dateISO') != today:
+            continue
+        if ev.get('impact') not in ('high',):
+            continue
+        title_lc = (ev.get('title') or '').lower()
+        if not any(kw in title_lc for kw in keywords):
+            continue
+        actual = (ev.get('actual') or '').strip()
+        if not actual:
+            continue
+        hits.append(f"{ev['currency']}:{actual}")
+    if hits:
+        print(','.join(hits))
+    else:
+        print('')
+except Exception as e:
+    print('')
+    import sys; print(f'Error: {e}', file=sys.stderr)
+EOFPY
+)
+
+          if [ -z "${RATE_DEC}" ]; then
+            echo "No Interest Rate Decision actuals detected — skipping dispatch."
+            exit 0
+          fi
+
+          echo "Interest Rate Decision actual(s) detected: ${RATE_DEC}"
+          echo "Firing repository_dispatch[cb-rate-decision] → update-rates.yml"
+
+          curl -s -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/dispatches" \
+            -d "{\"event_type\":\"cb-rate-decision\",\"client_payload\":{\"currencies\":\"${RATE_DEC}\",\"source\":\"ff-calendar\",\"date\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}}"
+
+          echo "✅ Dispatch sent — update-rates.yml will start shortly."
