@@ -7467,8 +7467,17 @@ async function fetchFedExpectations() {
         return 'flat';
       })();
       // Priority 1: meetings.json fwdRate (prob-weighted · workflow-computed)
-      if (meetings?.fwdRate != null && !isNaN(meetings.fwdRate) && meetings.fwdRate > 0) {
-        fwdDisplay = meetings.fwdRate.toFixed(2) + '%';
+      // Guard: if the fwdRate implies a base rate that differs from the current
+      // rates/*.json value by more than 2×cbStep, the meetings.json was computed
+      // with a stale rate (e.g. BoJ hiked after the last workflow_meetings run).
+      // In that case fall through to Priority 2 on-the-fly recalculation.
+      const CB_STEP_P1 = { JPY: 0.10, CHF: 0.25 };
+      const cbStepP1 = CB_STEP_P1[ccy] ?? 0.25;
+      const fwdRateRaw = meetings?.fwdRate;
+      const fwdRateStale = fwdRateRaw != null && !isNaN(fwdRateRaw) &&
+        Math.abs(fwdRateRaw - current) > cbStepP1 * 3;
+      if (fwdRateRaw != null && !isNaN(fwdRateRaw) && fwdRateRaw > 0 && !fwdRateStale) {
+        fwdDisplay = fwdRateRaw.toFixed(2) + '%';
       } else {
         const pCut  = (meetings?.cutProb  != null && !isNaN(meetings.cutProb))  ? Math.min(100, Math.max(0, meetings.cutProb))  : null;
         const pHike = (meetings?.hikeProb != null && !isNaN(meetings.hikeProb)) ? Math.min(100, Math.max(0, meetings.hikeProb)) : null;
@@ -8220,6 +8229,8 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
         console.log('[CB Rates poll] New rates run detected (' + runTs + ') — refreshing…');
         await fetchCBRates();
         fetchCarryRanking();
+        // Also refresh expectations panel — fwdRate uses current rate as base
+        if (typeof fetchFedExpectations === 'function') fetchFedExpectations();
       }
     } catch (_e) { /* network error — skip silently */ }
   }
