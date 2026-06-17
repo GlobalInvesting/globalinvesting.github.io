@@ -8194,6 +8194,38 @@ setInterval(fetchFrankfurter, 30 * 60 * 1000);
 setInterval(fetchNewsData, 2 * 60 * 1000);   // every 2 min — ETag returns 304 when unchanged (zero cost); server updates hourly
 // Refresh narrative every 5 minutes
 setInterval(buildRichNarrative, 15 * 60 * 1000);
+
+// ── CB RATES LIVE POLL — health.json sentinel ─────────────────────────────
+// Polls rates/health.json every 5 min (tiny JSON ~300B). If the `run`
+// timestamp changed since last check, a new update-rates workflow ran and
+// we call fetchCBRates() + fetchCarryRanking() to refresh the table silently.
+// Zero flicker — only re-renders if data actually changed.
+(function initCBRatesPoll() {
+  let _lastRatesRun = null;  // ISO timestamp of the last-seen health.json run
+  async function _pollCBRates() {
+    try {
+      const res = await fetch('./rates/health.json', { cache: 'no-store' });
+      if (!res.ok) return;
+      const h = await res.json();
+      const runTs = h.run || h.timestamp || null;
+      if (!runTs) return;
+      if (_lastRatesRun === null) {
+        // First poll — record baseline, don't refresh (already loaded at boot)
+        _lastRatesRun = runTs;
+        return;
+      }
+      if (runTs !== _lastRatesRun) {
+        // New run detected — refresh rates silently
+        _lastRatesRun = runTs;
+        console.log('[CB Rates poll] New rates run detected (' + runTs + ') — refreshing…');
+        await fetchCBRates();
+        fetchCarryRanking();
+      }
+    } catch (_e) { /* network error — skip silently */ }
+  }
+  setInterval(_pollCBRates, 5 * 60 * 1000);  // 5-min interval (health.json is ~300B)
+})();
+// ─────────────────────────────────────────────────────────────────────────────
 // Refresh risk/yield data every 5 minutes
 
 // ═══════════════════════════════════════════════════════════════════
