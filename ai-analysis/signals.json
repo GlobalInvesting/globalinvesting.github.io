@@ -1,65 +1,58 @@
 {
-  "generated_at": "2026-06-17T17:30:35Z",
+  "generated_at": "2026-06-17T22:03:42Z",
   "signals": [
     {
-      "time": "17:28",
+      "time": "22:01",
       "priority": "critical",
-      "title": "USD — FOMC Decision + Warsh Debut",
-      "text": "Fed 3.75% (ON HOLD) vs ECB 2.25% (HIKING) — 150bp carry advantage favors USD as the FOMC prepares to announce its first decision under Chairman Kevin Warsh. USD CESI net +25 (strong positive) confirms a resilient macro backdrop supporting the 'higher-for-longer' stance despite the ECB's hiking cycle. Market pricing remains centered on a hold, shifting focus entirely to the post-meeting press conference for Warsh's policy lean. USD/EUR carry remains the structural floor for DXY at 99.69.",
+      "title": "USD/JPY — Hawkish Fed + Intervention Risk + Carry",
+      "text": "USD/JPY at 160.59, breaking above the 160.00 intervention watch level following the hawkish Fed dot plot and Chair Warsh's comments. The Fed held rates but signaled hikes ahead, lifting dollar yields. The 296bp Fed-BoJ OIS carry premium (SOFR 3.69% vs TONA 0.73%) continues to sustain the bid, despite extreme JPY COT LF net short −115,036. Options market shows moderate put skew (25d RR -1.09), indicating hedging demand for JPY strength, but this is currently overwhelmed by carry and USD strength. Intervention risk is elevated on a sustained break above 160.00. Watch for any BoJ verbal warnings or direct action.",
       "evidence": [
-        "Fed: 3.75% vs ECB: 2.25%",
-        "USD CESI: +25",
-        "DXY: 99.69"
+        "USD/JPY: 160.59",
+        "Fed-BoJ OIS carry: +296bp",
+        "JPY COT LF net: -115,036",
+        "USD/JPY 25d RR: -1.09"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "17:25",
+      "time": "22:04",
+      "priority": "critical",
+      "title": "NZD/USD — G10 Bilateral Theme + COT vs OIS Divergence + Hawkish Fed",
+      "text": "NZD is the weakest G10 currency this week (NZD 1W avg: -0.715% vs USD 1W avg: +0.677%, G10 spread: 1.391%), exacerbated by the hawkish Fed. NZD/USD COT LF net short −22,354 (long%=23.9%) indicates crowded speculative short positioning, while the RBNZ has a market bias for a hike. This COT vs OIS divergence creates significant short-squeeze risk if the RBNZ delivers on its hawkish bias or if Q1 GDP (due Thursday) surprises to the upside. The current -83bp real rate (RBNZ 2.25% vs infl_exp 3.08%) suggests an accommodative stance, making a hike more impactful. Watch for NZD Q1 GDP data tomorrow.",
+      "evidence": [
+        "NZD 1W avg: -0.715% (n=4)",
+        "USD 1W avg: +0.677% (n=7)",
+        "G10 spread: 1.391%",
+        "NZD COT LF net: -22,354",
+        "RBNZ market bias: ↑ Hike"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "22:07",
       "priority": "warning",
-      "title": "USD/JPY — Intervention Risk + Options Skew",
-      "text": "USD/JPY at 160.20 — price is holding above the 160.00 psychological level that previously triggered BoJ verbal warnings. Despite the BoJ hiking to 1.0%, the 275bp Fed-BoJ carry advantage continues to drive JPY weakness. Options market is aggressively hedging for a reversal with 25d RR at -1.09 (moderate put skew) and IV at 7.2% vs HV30 at 3.3% (VRP +3.9%). The elevated vol premium and put skew signal institutional preparation for BoJ intervention or a carry unwind if the FOMC surprises dovish.",
+      "title": "GBP/USD — Hawkish Fed + Soft UK CPI + Elevated Vol Premium",
+      "text": "GBP/USD at 1.3290 is under pressure from both a hawkish Fed and softer-than-expected UK CPI data. The Fed's hawkish tilt supports USD strength, while the BoE remains on hold at 3.75% (0bp carry vs Fed). Options market shows elevated vol premium (GBP/USD IV 11.0% vs HV30 6.5%, VRP +4.5%) and a mild put skew (25d RR -0.67), indicating strong hedging demand for GBP downside protection. This suggests traders are pricing in further weakness for GBP/USD. The next BoE meeting (mkt: 100% hold priced) tomorrow (18 Jun) is a key watch level for any shift in stance.",
       "evidence": [
-        "USD/JPY: 160.20",
-        "25d RR: -1.09",
-        "VRP: +3.9%"
+        "GBP/USD: 1.3290",
+        "GBP/USD IV: 11.0% vs HV30: 6.5%",
+        "GBP/USD 25d RR: -0.67",
+        "BoE market bias: → Hold"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "17:23",
+      "time": "22:10",
       "priority": "warning",
-      "title": "GBP/USD — CPI Miss + Positioning Divergence",
-      "text": "GBP/USD at 1.3397 — soft UK CPI data has clipped BoE hike bets, yet COT LF net remains long +21,961 (61.7% long). This creates a long-unwind risk as the macro data (GBP CESI net 0) fails to support the crowded speculative long position. Options market aligns with the downside risk, showing a 25d RR of -0.67 (put skew) and an elevated VRP of +5.1% (IV 11.0% vs HV30 5.9%). Failure to hold 1.3400 targets the 1.3350 support zone.",
+      "title": "EUR/USD — COT vs OIS Divergence + Hawkish Fed + Elevated Vol",
+      "text": "EUR/USD at 1.1506 faces headwinds from the hawkish Fed, with the 176bp USD carry premium (SOFR 3.69% vs ESTR 1.93%) favoring the dollar. Speculative positioning shows EUR COT LF net short −49,290, while the ECB has a market bias for a hike. This COT vs OIS divergence creates short-squeeze risk if the ECB delivers on its hawkish bias at the next meeting (23 Jul). Options market shows elevated vol premium (EUR/USD IV 7.1% vs HV30 4.7%, VRP +2.4%) and a mild put skew (25d RR -0.36), indicating hedging demand for EUR downside. Watch for ECB commentary ahead of their next meeting.",
       "evidence": [
-        "GBP COT LF net: +21,961",
-        "VRP: +5.1%",
-        "GBP/USD: 1.3397"
+        "EUR/USD: 1.1506",
+        "EUR COT LF net: -49,290",
+        "ECB market bias: ↑ Hike",
+        "EUR/USD IV: 7.1% vs HV30: 4.7%"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "17:18",
-      "priority": "info",
-      "title": "NZD/USD — Retail vs Institutional Divergence",
-      "text": "NZD/USD at 0.5818 — retail sentiment is 85% long (extreme) while COT LF net is short -22,354 (specs fading NZD). This extreme divergence at the 0.5800 handle suggests retail is attempting to catch a bottom while institutions remain positioned for further downside, supported by a negative NZD CESI (-4). Retail capitulation risk is high if the FOMC delivers a hawkish hold, potentially driving a break toward 0.5750.",
-      "evidence": [
-        "Retail: 85% Long",
-        "COT LF net: -22,354",
-        "NZD CESI: -4"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "17:15",
-      "priority": "info",
-      "title": "USD/CAD — Correlation Break + Carry",
-      "text": "USD/CAD at 1.4029 — the pair is decoupling from energy prices with USD/CAD vs WTI correlation at -0.354 (z = -1.64σ). The 150bp Fed-BoC carry advantage (Fed 3.75% vs BoC 2.25%) is currently the primary driver, overriding the 0.49% intraday gain in WTI oil. CAD remains the G10 laggard (1W avg -0.424%) as speculative shorts (COT net -60,671) remain crowded. Watch for a sustained break above 1.4050 to confirm the carry-dominant regime.",
-      "evidence": [
-        "USD/CAD vs WTI z-score: -1.64σ",
-        "Fed-BoC Spread: 150bp",
-        "CAD 1W avg: -0.424%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
