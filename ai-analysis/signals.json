@@ -1,55 +1,65 @@
 {
-  "generated_at": "2026-06-17T11:21:14Z",
+  "generated_at": "2026-06-17T17:30:35Z",
   "signals": [
     {
-      "time": "11:20",
+      "time": "17:28",
       "priority": "critical",
-      "title": "CHF — SNB Meeting + Positioning + Yields",
-      "text": "SNB Interest rates on sight deposits remain at 0.00% (up to threshold) and -0.25% (above threshold) as of today's SNB update, ahead of the 18 June meeting. Swiss 10Y bond yields have declined to 0.386% (from 0.406% on 15 June), indicating easing financial conditions. CHF COT LF net short −12,079 (long%=25.1%) represents an extreme speculative short position. This combination of unchanged policy rates, falling yields, and crowded short positioning creates significant short-squeeze risk if the SNB signals any hawkish shift or if risk-off flows emerge. USD/CHF at 0.7926. The SNB's official statement and press conference later today are the immediate catalysts.",
+      "title": "USD — FOMC Decision + Warsh Debut",
+      "text": "Fed 3.75% (ON HOLD) vs ECB 2.25% (HIKING) — 150bp carry advantage favors USD as the FOMC prepares to announce its first decision under Chairman Kevin Warsh. USD CESI net +25 (strong positive) confirms a resilient macro backdrop supporting the 'higher-for-longer' stance despite the ECB's hiking cycle. Market pricing remains centered on a hold, shifting focus entirely to the post-meeting press conference for Warsh's policy lean. USD/EUR carry remains the structural floor for DXY at 99.69.",
       "evidence": [
-        "SNB Interest rate on sight deposits: 0.00% / -0.25%",
-        "CH 10Y Yield: 0.386% (2026-06-17)",
-        "CHF COT LF net: -12,079 (long%=25.1%)"
+        "Fed: 3.75% vs ECB: 2.25%",
+        "USD CESI: +25",
+        "DXY: 99.69"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "11:17",
+      "time": "17:25",
       "priority": "warning",
-      "title": "USD/JPY — Intervention Risk + Carry + Vol",
-      "text": "USD/JPY at 160.27 has broken above the 160.00 level, a threshold that has previously triggered BoJ verbal warnings. The 296bp Fed-BoJ OIS carry premium (SOFR 3.69% vs TONA 0.73%) continues to sustain the bid, while USD/JPY IV at 7.2% vs HV30 at 3.3% (VRP +3.9%) indicates elevated options market hedging for upside. JPY COT LF net short −115,036 (long%=29.2%) is an extreme crowded short, increasing the risk of a sharp unwind if intervention occurs. Watch for official BoJ/MoF comments or a sustained move above 160.50.",
+      "title": "USD/JPY — Intervention Risk + Options Skew",
+      "text": "USD/JPY at 160.20 — price is holding above the 160.00 psychological level that previously triggered BoJ verbal warnings. Despite the BoJ hiking to 1.0%, the 275bp Fed-BoJ carry advantage continues to drive JPY weakness. Options market is aggressively hedging for a reversal with 25d RR at -1.09 (moderate put skew) and IV at 7.2% vs HV30 at 3.3% (VRP +3.9%). The elevated vol premium and put skew signal institutional preparation for BoJ intervention or a carry unwind if the FOMC surprises dovish.",
       "evidence": [
-        "USD/JPY: 160.27",
-        "USD/JPY OIS carry: +296bp",
-        "USD/JPY VRP: +3.9%",
-        "JPY COT LF net: -115,036"
+        "USD/JPY: 160.20",
+        "25d RR: -1.09",
+        "VRP: +3.9%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "11:14",
+      "time": "17:23",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + Retail",
-      "text": "NZD/USD COT LF net short −22,354 (long%=23.9%) indicates extreme speculative short positioning, diverging from the RBNZ's hawkish bias with a hike priced for the next meeting. Retail sentiment is 85% long, creating a strong institutional vs. retail divergence. The RBNZ's mildly accommodative real rate of -0.83% (policy 2.25% vs infl_exp 3.08%) suggests room for a hawkish surprise. If RBNZ delivers or signals a hike, a short-squeeze is likely, targeting 0.5900+. NZD/USD at 0.5812. The next RBNZ meeting (mkt: 20% hike priced) on 8 July is the key catalyst.",
+      "title": "GBP/USD — CPI Miss + Positioning Divergence",
+      "text": "GBP/USD at 1.3397 — soft UK CPI data has clipped BoE hike bets, yet COT LF net remains long +21,961 (61.7% long). This creates a long-unwind risk as the macro data (GBP CESI net 0) fails to support the crowded speculative long position. Options market aligns with the downside risk, showing a 25d RR of -0.67 (put skew) and an elevated VRP of +5.1% (IV 11.0% vs HV30 5.9%). Failure to hold 1.3400 targets the 1.3350 support zone.",
       "evidence": [
-        "NZD COT LF net: -22,354",
-        "RBNZ Market bias: ↑ Hike",
-        "NZD/USD Retail: 85% long",
-        "NZD real rate: -0.83%"
+        "GBP COT LF net: +21,961",
+        "VRP: +5.1%",
+        "GBP/USD: 1.3397"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "11:11",
+      "time": "17:18",
       "priority": "info",
-      "title": "USD/CAD — Correlation Break + Retail Sentiment",
-      "text": "USD/CAD vs WTI Oil correlation has broken to −0.350 (vs 252d norm=−0.026, z=−1.63σ), indicating a decoupling where CAD is not strengthening with rising oil prices. WTI Oil is up +0.56% today, but USD/CAD is also up +0.17% at 1.4013. Retail sentiment is extremely short at 93% (7% long / 93% short), suggesting contrarian reversal risk if the correlation break persists. The 144bp OIS carry premium favors USD (SOFR 3.69% vs CORRA 2.25%), providing a structural bid for USD/CAD despite oil strength. Watch for a sustained move above 1.4050 to confirm the retail capitulation.",
+      "title": "NZD/USD — Retail vs Institutional Divergence",
+      "text": "NZD/USD at 0.5818 — retail sentiment is 85% long (extreme) while COT LF net is short -22,354 (specs fading NZD). This extreme divergence at the 0.5800 handle suggests retail is attempting to catch a bottom while institutions remain positioned for further downside, supported by a negative NZD CESI (-4). Retail capitulation risk is high if the FOMC delivers a hawkish hold, potentially driving a break toward 0.5750.",
       "evidence": [
-        "USD/CAD vs WTI Oil corr: -0.350 (z=-1.63σ)",
-        "USD/CAD Retail: 93% short",
-        "USD/CAD OIS carry: +144bp"
+        "Retail: 85% Long",
+        "COT LF net: -22,354",
+        "NZD CESI: -4"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "17:15",
+      "priority": "info",
+      "title": "USD/CAD — Correlation Break + Carry",
+      "text": "USD/CAD at 1.4029 — the pair is decoupling from energy prices with USD/CAD vs WTI correlation at -0.354 (z = -1.64σ). The 150bp Fed-BoC carry advantage (Fed 3.75% vs BoC 2.25%) is currently the primary driver, overriding the 0.49% intraday gain in WTI oil. CAD remains the G10 laggard (1W avg -0.424%) as speculative shorts (COT net -60,671) remain crowded. Watch for a sustained break above 1.4050 to confirm the carry-dominant regime.",
+      "evidence": [
+        "USD/CAD vs WTI z-score: -1.64σ",
+        "Fed-BoC Spread: 150bp",
+        "CAD 1W avg: -0.424%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
