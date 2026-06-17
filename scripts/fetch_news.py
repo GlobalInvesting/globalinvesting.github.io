@@ -1,7 +1,23 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.18
+fetch_news.py — v5.19
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.19 (sobre v5.18):
+  SNB STATISTICAL DATA HALLUCINATION FIX:
+    · Removed SNB interestRates feed (snb.ch/public/en/rss/interestRates).
+      Root cause: feed publishes daily statistical rate series as high-impact articles
+      — SNBGIRO1 "SNB Interest rate on sight deposits up to threshold" (0.00%) and
+      SNBGIRO2 "SNB Interest rate on sight deposits above threshold" (-0.25%).
+      These contain "interest rate" → detect_impact() returns "high" → they enter the
+      LLM headline pool → model synthesises "SNB keeps interest rates on sight deposits
+      unchanged, with rates at 0.00% and -0.25% above threshold" on non-decision days.
+      Guard 7 in generate_narrative_signals.py cannot intercept because the hallucination
+      is synthesised from news context, not copied from a calendar field.
+      SNB policy decisions are covered by the existing pressrel + mopo feeds.
+    · Added SNB statistical data title filter in RSS processing loop (defence-in-depth):
+      rejects any article from source="SNB" whose title matches SNBGIRO / sight deposits /
+      Swiss Confederation bonds / "CH: <value> <code> <date>" pattern.
 
 CAMBIOS v5.17 (sobre v5.16):
   NUEVAS FUENTES INSTITUCIONALES — BANCOS CENTRALES + FX:
@@ -609,9 +625,14 @@ FEEDS = [
     { "source": "ECB",              "url": "https://www.ecb.europa.eu/rss/blog.html",                         "lang": "en" },
 
     # ── INGLÉS — nuevas fuentes institucionales añadidas (v5.17) ─────────────
-    # SNB Interest Rates: feed oficial de tasas del SNB — decisiones de tasas publicadas
-    # inmediatamente. 4º feed del SNB, complementa pressrel/speeches/mopo. Forzado a CHF.
-    { "source": "SNB",              "url": "https://www.snb.ch/public/en/rss/interestRates",                  "lang": "en" },
+    # SNB Interest Rates feed (snb.ch/public/en/rss/interestRates) REMOVED in v5.19.
+    # Root cause: feed publishes daily statistical series (SNBGIRO1 "sight deposits up to
+    # threshold" 0.00%, SNBGIRO2 "sight deposits above threshold" -0.25%) as high-impact
+    # articles. LLM receives them as headlines and hallucinates "SNB keeps interest rates
+    # on sight deposits unchanged" even on days with no SNB policy meeting.
+    # Guard 7 in generate_narrative_signals.py cannot intercept it because the hallucinated
+    # sentence is synthesised from the news context, not a copy of a calendar event.
+    # Policy decisions are already covered by pressrel + mopo feeds below.
     # Bundesbank: research y comunicados del banco central alemán. Relevante para EUR —
     # el Bundesbank publica estadísticas, working papers y comentarios de política monetaria.
     # La posición del Bundesbank es un proxy del ala hawkish del BCE. Forzado a EUR.
@@ -1380,6 +1401,23 @@ def main():
             if cur is None:
                 filtered_no_currency += 1
                 continue
+
+            # v5.19: SNB statistical data guard — reject daily rate-series entries that
+            # the LLM misreads as CB policy decisions. Patterns: SNBGIRO1/SNBGIRO2 (sight
+            # deposit rates), R10 (confederation bond yield), and any title matching the
+            # "CH: <value> <series_code> <date>" format that the interestRates feed emits.
+            # Defence-in-depth: interestRates feed removed, but guard catches any future
+            # SNB statistical feed or mis-tagged equivalent.
+            if source == "SNB":
+                _t_low = title.lower()
+                if (
+                    "snbgiro" in _t_low
+                    or "sight deposits" in _t_low
+                    or "swiss confederation bonds" in _t_low
+                    or (title.startswith("CH:") and "SNB" in title and re.search(r"\d{4}-\d{2}-\d{2}", title))
+                ):
+                    filtered_relevance += 1
+                    continue
 
             impact    = detect_impact(title, summary)
 
