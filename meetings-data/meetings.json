@@ -28,7 +28,7 @@
       "bias": "hold",
       "biasSource": "CME 30-day Fed Funds futures (SOFR-implied)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-16",
+      "biasUpdated": "2026-06-17",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -60,10 +60,10 @@
       "bias": "hike",
       "biasSource": "ECB €STR overnight swap rate",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-16",
+      "biasUpdated": "2026-06-17",
       "cutProb": 0,
-      "hikeProb": 94,
-      "fwdRate": 2.485
+      "hikeProb": 80,
+      "fwdRate": 2.45
     },
     "GBP": {
       "nextMeeting": "18 Jun",
@@ -92,7 +92,7 @@
       "bias": "hold",
       "biasSource": "BoE 1-month OIS forward (SONIA)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-16",
+      "biasUpdated": "2026-06-17",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -121,14 +121,13 @@
         "18 Dec"
       ],
       "source": "boj.or.jp",
-      "bias": "hold",
+      "bias": "cut",
       "biasSource": "TONA overnight rate + BoJ forward guidance",
-      "biasMethod": "ois-preserved",
+      "biasMethod": "ois",
       "biasUpdated": "2026-06-17",
-      "cutProb": 0,
+      "cutProb": 100,
       "hikeProb": 0,
-      "fwdRate": 1.0,
-      "_note": "Manual patch 2026-06-17: BoJ hiked to 1.0% on Jun 16. TONA settlement lag guard suppressed cut signal. Hold bias reflects post-hike pause expectation. Will self-correct on next workflow run."
+      "fwdRate": 0.75
     },
     "AUD": {
       "nextMeeting": "11 Aug",
@@ -157,7 +156,7 @@
       "bias": "hold",
       "biasSource": "ASX 30-day Interbank Cash Rate Futures",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-16",
+      "biasUpdated": "2026-06-17",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 4.35
@@ -191,7 +190,7 @@
       "bias": "hold",
       "biasSource": "CORRA overnight rate (BoC)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-16",
+      "biasUpdated": "2026-06-17",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.25
@@ -215,7 +214,7 @@
       "bias": "hold",
       "biasSource": "SNB SARON overnight rate",
       "biasMethod": "ois",
-      "biasUpdated": "2026-06-16",
+      "biasUpdated": "2026-06-17",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 0.0
@@ -245,7 +244,7 @@
       "bias": "hike",
       "biasSource": "NZFBF OIS swap curve (RBNZ OCR)",
       "biasMethod": "spread",
-      "biasUpdated": "2026-06-16",
+      "biasUpdated": "2026-06-17",
       "cutProb": 0,
       "hikeProb": 20,
       "fwdRate": 2.3
