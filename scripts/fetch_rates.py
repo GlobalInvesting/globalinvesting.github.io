@@ -97,6 +97,7 @@ OFFICIAL_SOURCES = {
     'NYFed-EFFR', 'FRED:FEDFUNDS', 'FRED:DFEDTARU', 'BoJ-API', 'BoJ-scraping',
     'SNB-scraping', 'RBNZ-CSV', 'BIS-CBPOL',
     'manual-override',
+    'ff-calendar-actual',  # v14.0: calendar actual = same-day CB decision (highest priority)
 }
 
 # ── Overrides manuales ─────────────────────────────────────────────────────────
@@ -1067,18 +1068,81 @@ def main():
     run_ts            = datetime.utcnow().isoformat() + 'Z'
 
     print(f'\nRun date:  {today}')
-    print(f'Version:   fetch_rates.py v13.0 — fuentes oficiales primarias')
+    print(f'Version:   fetch_rates.py v14.0 — calendar-actual priority source')
     os.makedirs('rates', exist_ok=True)
 
     final_rates = {}
 
-    # ── Paso 0: overrides manuales (máxima prioridad) ─────────────────────
+    # ── Paso 0-A: ff_calendar.json actuals (HIGHEST priority — v14.0) ─────
+    # When update-ff-calendar.yml writes a released "Interest Rate Decision"
+    # actual for today, that is the most authoritative same-day source —
+    # more current than BIS (monthly lag), BoJ scraping (page may not yet
+    # reflect the new rate), or FRED (1-day lag).
+    # Industry standard: Bloomberg reads CB press releases in real-time;
+    # our calendar pipeline is the closest equivalent available.
+    print('\n' + '=' * 70)
+    print('SOURCE 0-A: ff_calendar.json actuals (highest priority, v14.0)')
+    print('=' * 70)
+    FF_CAL_PATH = 'calendar-data/ff_calendar.json'
+    _RATE_DEC_KW = [
+        'interest rate decision', 'interest rate', 'rate decision',
+        'monetary policy decision', 'monetary policy statement',
+        'policy rate', 'cash rate target', 'overnight rate',
+    ]
+    try:
+        if os.path.exists(FF_CAL_PATH):
+            with open(FF_CAL_PATH) as _ff:
+                _ff_cal = json.load(_ff)
+            _ff_events = _ff_cal.get('events', [])
+            _cal_hits = []
+            for _ev in _ff_events:
+                if not _ev.get('released'):
+                    continue
+                if _ev.get('dateISO') != today:
+                    continue
+                if _ev.get('impact') not in ('high',):
+                    continue
+                _title_lc = (_ev.get('title') or '').lower()
+                if not any(_kw in _title_lc for _kw in _RATE_DEC_KW):
+                    continue
+                _ccy = _ev.get('currency', '')
+                _actual_str = (_ev.get('actual') or '').strip().rstrip('%')
+                if not _actual_str or _ccy not in CURRENCIES:
+                    continue
+                try:
+                    _new_rate = float(_actual_str)
+                    if not (MIN_POLICY_RATE_PP <= _new_rate <= MAX_POLICY_RATE_PP):
+                        continue
+                    final_rates[_ccy] = make_result(
+                        str(_new_rate), today, 'ff-calendar-actual'
+                    )
+                    _cal_hits.append(f'{_ccy}:{_new_rate}%')
+                    print(f'  ✓ {_ccy}: {_new_rate}%  date={today}  '
+                          f'[ff-calendar-actual "{_ev.get("title")}"]')
+                except ValueError:
+                    print(f'  ✗ {_ccy}: could not parse calendar actual '
+                          f'"{_ev.get("actual")}" — skip')
+            if not _cal_hits:
+                print(f'  No released high-impact rate-decision actuals for today '
+                      f'({today}) in ff_calendar.json')
+        else:
+            print(f'  {FF_CAL_PATH} not found — skipping calendar source')
+    except Exception as _e0a:
+        print(f'  ff_calendar.json read failed: {_e0a} — continuing')
+
+    # ── Paso 0-B: overrides manuales ──────────────────────────────────────
+    # Manual overrides are now LOWER priority than calendar actuals.
+    # A calendar actual already resolved above will NOT be overwritten.
     if MANUAL_OVERRIDES:
         print('\n' + '=' * 70)
-        print('SOURCE 0: MANUAL OVERRIDES (highest priority)')
+        print('SOURCE 0-B: MANUAL OVERRIDES')
         print('=' * 70)
         for currency, (rate_val, ref_date) in MANUAL_OVERRIDES.items():
             if currency in CURRENCIES:
+                if currency in final_rates and final_rates[currency]['source'] == 'ff-calendar-actual':
+                    print(f'  ↷ {currency}: calendar actual {final_rates[currency]["rate"]}% '
+                          f'takes priority over manual override {rate_val}%')
+                    continue
                 final_rates[currency] = make_result(rate_val, ref_date, 'manual-override')
                 print(f'  ✓ {currency}: {rate_val}%  date={ref_date}  [MANUAL OVERRIDE]')
 
@@ -1088,7 +1152,8 @@ def main():
     print('=' * 70)
     for currency in CURRENCIES:
         if currency in final_rates:
-            print(f'  ↷ {currency}: skipped (manual override active)')
+            src = final_rates[currency]['source']
+            print(f'  ↷ {currency}: skipped ({src} active)')
             continue
         fetcher = PRIMARY_FETCHERS.get(currency)
         if fetcher:
