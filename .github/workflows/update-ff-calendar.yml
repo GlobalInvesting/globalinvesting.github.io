@@ -254,45 +254,19 @@ jobs:
             exit 0
           fi
 
-          # Check if any of the newly-written actuals is an Interest Rate Decision.
-          # We read ff_calendar.json directly after the commit to check today's events.
-          RATE_DEC=$(python3 << 'EOFPY'
-import json, sys
-from datetime import datetime, timezone
-
-try:
-    with open('calendar-data/ff_calendar.json') as f:
-        cal = json.load(f)
-    events = cal.get('events', [])
-    today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-    keywords = [
-        'interest rate decision', 'interest rate', 'rate decision',
-        'monetary policy decision', 'policy rate', 'cash rate',
-    ]
-    hits = []
-    for ev in events:
-        if not ev.get('released'):
-            continue
-        if ev.get('dateISO') != today:
-            continue
-        if ev.get('impact') not in ('high',):
-            continue
-        title_lc = (ev.get('title') or '').lower()
-        if not any(kw in title_lc for kw in keywords):
-            continue
-        actual = (ev.get('actual') or '').strip()
-        if not actual:
-            continue
-        hits.append(f"{ev['currency']}:{actual}")
-    if hits:
-        print(','.join(hits))
-    else:
-        print('')
-except Exception as e:
-    print('')
-    import sys; print(f'Error: {e}', file=sys.stderr)
-EOFPY
-)
+          # Check if any newly-written actuals is an Interest Rate Decision.
+          # Uses printf to write the script (avoids YAML heredoc parsing issues).
+          printf '%s\n' \
+            'import json,sys' \
+            'from datetime import datetime,timezone' \
+            'cal=json.load(open("calendar-data/ff_calendar.json"))' \
+            'events=cal.get("events",[])' \
+            'today=datetime.now(timezone.utc).strftime("%Y-%m-%d")' \
+            'kw=["interest rate decision","interest rate","rate decision","monetary policy decision","policy rate","cash rate"]' \
+            'hits=[ev["currency"]+":"+ev["actual"].strip() for ev in events if ev.get("released") and ev.get("dateISO")==today and ev.get("impact")=="high" and ev.get("actual","").strip() and any(k in (ev.get("title") or "").lower() for k in kw)]' \
+            'print(",".join(hits) if hits else "")' \
+            > /tmp/check_rate_dec.py
+          RATE_DEC=$(python3 /tmp/check_rate_dec.py 2>/dev/null || echo "")
 
           if [ -z "${RATE_DEC}" ]; then
             echo "No Interest Rate Decision actuals detected — skipping dispatch."
