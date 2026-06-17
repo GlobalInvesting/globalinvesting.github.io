@@ -1,56 +1,31 @@
 {
-  "lastUpdate": "2026-06-16T23:57:09Z",
-  "generatedAt": "2026-06-16T23:57:09Z",
+  "lastUpdate": "2026-06-17T00:01:22Z",
+  "generatedAt": "2026-06-17T00:01:22Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-16",
-  "rangeTo": "2026-06-16",
-  "totalEvents": 1543,
+  "rangeFrom": "2025-06-17",
+  "rangeTo": "2026-06-17",
+  "totalEvents": 1566,
   "currencyCounts": {
-    "CAD": 124,
-    "EUR": 179,
+    "EUR": 181,
     "JPY": 177,
-    "NZD": 73,
-    "AUD": 160,
-    "USD": 579,
-    "GBP": 168,
-    "CHF": 83
+    "NZD": 75,
+    "AUD": 161,
+    "USD": 593,
+    "GBP": 171,
+    "CHF": 84,
+    "CAD": 124
   },
   "impactCounts": {
-    "medium": 1036,
+    "medium": 1049,
     "low": 135,
-    "high": 372
+    "high": 382
   },
   "surpriseStats": {
-    "EUR/core cpi": {
-      "n": 3,
-      "mean": 0.533333,
-      "std": 0.472582
-    },
-    "EUR/cpi": {
-      "n": 4,
-      "mean": 0.475,
-      "std": 0.655108
-    },
-    "USD/ppi": {
-      "n": 3,
-      "mean": 0.666667,
-      "std": 0.832666
-    },
-    "CAD/boc interest rate decision": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "JPY/machinery orders": {
-      "n": 2,
-      "mean": 3.65,
-      "std": 0.636396
-    },
     "AUD/unemployment rate": {
       "n": 4,
       "mean": -0.15,
@@ -231,6 +206,16 @@
       "mean": 0.3,
       "std": 1.697056
     },
+    "EUR/cpi": {
+      "n": 2,
+      "mean": 1.0,
+      "std": 0.424264
+    },
+    "EUR/core cpi": {
+      "n": 2,
+      "mean": 0.8,
+      "std": 0.141421
+    },
     "GBP/consumer confidence": {
       "n": 2,
       "mean": -2.85,
@@ -260,6 +245,11 @@
       "n": 2,
       "mean": 0.2,
       "std": 0.141421
+    },
+    "USD/ppi": {
+      "n": 2,
+      "mean": 0.8,
+      "std": 1.131371
     },
     "USD/retail sales": {
       "n": 2,
@@ -418,18 +408,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CAD",
-      "event": "Housing Starts",
-      "dateISO": "2025-06-16",
-      "hourUTC": "12:15",
-      "actual": "279.5",
-      "forecast": "248",
-      "previous": "280.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
     {
       "currency": "EUR",
       "event": "ZEW Economic Sentiment Index",
@@ -20520,6 +20498,318 @@
       "actual": "8.7%",
       "forecast": "0.9%",
       "previous": "-9.4%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Jones Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.7%",
+      "previous": "2.5%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.0%",
+      "previous": "2.8%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.4%",
+      "previous": "0.7%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland SECO Economic Forecasts",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area CPI",
+      "impact": "high",
+      "actual": null,
+      "forecast": "103.15",
+      "previous": "103.04"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "10:50",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB President Lagarde Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "11:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States MBA 30-Year Mortgage Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "6.6"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada New Housing Price Index MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.1%",
+      "previous": "-0.4%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales Ex Autos MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "0.7%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales Control Group MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.4%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "4.0%",
+      "previous": "4.9%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales Ex Gas/Autos MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Pending Home Sales MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.8%",
+      "previous": "1.4%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Business Inventories MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "0.9%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Pending Home Sales YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.0%",
+      "previous": "3.2%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-1.4M",
+      "previous": "0.186M"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-4.5M",
+      "previous": "-7.228M"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "18:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.75%",
+      "previous": "3.75%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "18:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States FOMC Economic Projections",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "18:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Press Conference",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand GDP Growth Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.1%",
+      "previous": "1.3%"
+    },
+    {
+      "date": "17 Jun",
+      "dateISO": "2026-06-17",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand GDP Growth Rate QoQ",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.9%",
+      "previous": "0.2%"
     }
   ]
 }
