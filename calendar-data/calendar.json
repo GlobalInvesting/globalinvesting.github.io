@@ -1,66 +1,31 @@
 {
-  "lastUpdate": "2026-06-17T23:56:50Z",
-  "generatedAt": "2026-06-17T23:56:50Z",
+  "lastUpdate": "2026-06-18T00:01:21Z",
+  "generatedAt": "2026-06-18T00:01:21Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-17",
-  "rangeTo": "2026-06-17",
-  "totalEvents": 1566,
+  "rangeFrom": "2025-06-18",
+  "rangeTo": "2026-06-18",
+  "totalEvents": 1582,
   "currencyCounts": {
-    "EUR": 181,
-    "JPY": 177,
-    "NZD": 75,
     "AUD": 161,
-    "USD": 593,
-    "GBP": 171,
-    "CHF": 84,
-    "CAD": 124
+    "EUR": 182,
+    "USD": 595,
+    "GBP": 180,
+    "CHF": 87,
+    "CAD": 124,
+    "JPY": 179,
+    "NZD": 74
   },
   "impactCounts": {
-    "medium": 1049,
-    "low": 135,
-    "high": 382
+    "low": 133,
+    "high": 387,
+    "medium": 1062
   },
   "surpriseStats": {
-    "AUD/unemployment rate": {
-      "n": 4,
-      "mean": -0.15,
-      "std": 0.1
-    },
-    "JPY/industrial production": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 2.272297
-    },
-    "GBP/unemployment rate": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.141421
-    },
-    "USD/philadelphia fed manufacturing index": {
-      "n": 2,
-      "mean": -4.3,
-      "std": 19.940411
-    },
-    "USD/new home sales": {
-      "n": 3,
-      "mean": -6.112,
-      "std": 10.572514
-    },
-    "USD/eia natural gas storage change": {
-      "n": 2,
-      "mean": -4.5,
-      "std": 0.707107
-    },
-    "USD/atlanta fed gdpnow": {
-      "n": 2,
-      "mean": -0.35,
-      "std": 0.070711
-    },
     "EUR/producer price index": {
       "n": 2,
       "mean": -0.7,
@@ -196,6 +161,11 @@
       "mean": -0.5,
       "std": 3.535534
     },
+    "AUD/unemployment rate": {
+      "n": 3,
+      "mean": -0.133333,
+      "std": 0.11547
+    },
     "CAD/unemployment rate": {
       "n": 4,
       "mean": -0.025,
@@ -220,6 +190,11 @@
       "n": 2,
       "mean": -2.85,
       "std": 0.212132
+    },
+    "JPY/industrial production": {
+      "n": 2,
+      "mean": -1.0,
+      "std": 1.979899
     },
     "JPY/unemployment rate": {
       "n": 3,
@@ -305,6 +280,11 @@
       "n": 2,
       "mean": 0.382,
       "std": 0.50346
+    },
+    "USD/new home sales": {
+      "n": 2,
+      "mean": -0.008,
+      "std": 0.056569
     },
     "USD/api crude oil stock change": {
       "n": 5,
@@ -408,54 +388,6 @@
     }
   },
   "events": [
-    {
-      "currency": "EUR",
-      "event": "ZEW Economic Sentiment Index",
-      "dateISO": "2025-06-17",
-      "hourUTC": "09:00",
-      "actual": "35.3",
-      "forecast": "23.5",
-      "previous": "11.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "JPY",
-      "event": "Reuters Tankan Index",
-      "dateISO": "2025-06-17",
-      "hourUTC": "23:00",
-      "actual": "6",
-      "forecast": null,
-      "previous": "8",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "NZD",
-      "event": "Westpac Consumer Confidence",
-      "dateISO": "2025-06-17",
-      "hourUTC": "21:00",
-      "actual": "91.2",
-      "forecast": null,
-      "previous": "89.2",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
-    {
-      "currency": "NZD",
-      "event": "Current Account",
-      "dateISO": "2025-06-17",
-      "hourUTC": "22:45",
-      "actual": "-2.32",
-      "forecast": "-2.2",
-      "previous": "-7.04",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
     {
       "currency": "AUD",
       "event": "Westpac Leading Index MoM",
@@ -20810,6 +20742,266 @@
       "actual": "0.8%",
       "forecast": "0.9%",
       "previous": "0.5%"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "04:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Netherlands Unemployment Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "4.1",
+      "previous": "3.9"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "06:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "CHF3.5B",
+      "previous": "CHF3.2B"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Employment Change",
+      "impact": "high",
+      "actual": null,
+      "forecast": "75.0K",
+      "previous": "148.0K"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Unemployment Rate",
+      "impact": "high",
+      "actual": null,
+      "forecast": "5.0%",
+      "previous": "5.0%"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Average Earnings incl. Bonus (3Mo/Yr)",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "4.0%",
+      "previous": "4.1%"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland SECO Economic Forecasts",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "07:30",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland SNB Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.0%",
+      "previous": "0.0%"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "European Union European Council Meeting",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom BoE Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.75%",
+      "previous": "3.75%"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom MPC Meeting Minutes",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom BoE MPC Vote Cut",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "9.0",
+      "previous": "9.0"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom BoE MPC Vote Hike",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "29.0",
+      "previous": "19.0"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom BoE MPC Vote Unchanged",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "79.0",
+      "previous": "89.0"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Philadelphia Fed Manufacturing Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "10.0",
+      "previous": "-0.4"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "20:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Net Long-term TIC Flows",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "$75.0B",
+      "previous": "$81.3B"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "NZ$0.875B",
+      "previous": "NZ$1.92B"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "23:01",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Gfk Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-24.0",
+      "previous": "-23.0"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.6%",
+      "previous": "1.4%"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.4%",
+      "previous": "1.4%"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan BoJ Monetary Policy Meeting Minutes",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     }
   ]
 }
