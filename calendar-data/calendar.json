@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-18T11:01:28Z",
-  "generatedAt": "2026-06-18T11:01:28Z",
+  "lastUpdate": "2026-06-18T12:31:24Z",
+  "generatedAt": "2026-06-18T12:31:24Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-18",
   "rangeTo": "2026-06-18",
-  "totalEvents": 1582,
+  "totalEvents": 1585,
   "currencyCounts": {
     "AUD": 161,
     "EUR": 182,
-    "USD": 595,
+    "USD": 598,
     "GBP": 180,
     "CHF": 87,
     "CAD": 124,
@@ -22,7 +22,7 @@
   },
   "impactCounts": {
     "low": 133,
-    "high": 387,
+    "high": 390,
     "medium": 1062
   },
   "surpriseStats": {
@@ -20921,9 +20921,48 @@
       "flag": "🇺🇸",
       "event": "United States Philadelphia Fed Manufacturing Index",
       "impact": "medium",
-      "actual": null,
+      "actual": "10.3",
       "forecast": "10.0",
       "previous": "-0.4"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Jobless Claims 4-week Average",
+      "impact": "high",
+      "actual": "223.25K",
+      "forecast": "223.0K",
+      "previous": "219.25K"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "high",
+      "actual": "1810.0K",
+      "forecast": "1800.0K",
+      "previous": "1786.0K"
+    },
+    {
+      "date": "18 Jun",
+      "dateISO": "2026-06-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": "226.0K",
+      "forecast": "225.0K",
+      "previous": "230.0K"
     },
     {
       "date": "18 Jun",
