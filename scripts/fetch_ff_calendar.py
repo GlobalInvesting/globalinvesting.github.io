@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-fetch_ff_calendar.py — v3.30
+fetch_ff_calendar.py — v3.31
+v3.31 changes (2026-06-19):
+- G10 extension: NOK/SEK added to all currency filters (G8 dict, SLUG_TO_CCY x2, G8_CCY x3, FF_COUNTRY_NAME_TO_CCY).
+  Norges Bank and Riksbank economic calendar events now included in ff_calendar.json.
+
 v3.30 changes (2026-06-11):
 - Port _IMPACT_UPGRADES table to fetch_myfxbook_rss(): the table existed in the old
   Finnhub/FF JSON code path but was never ported when the RSS path replaced it.
@@ -482,6 +486,7 @@ FETCH_FUTURE_DAYS = 14   # upcoming events window
 G8 = {
     "US": "USD", "EU": "EUR", "GB": "GBP", "JP": "JPY",
     "AU": "AUD", "CA": "CAD", "CH": "CHF", "NZ": "NZD",
+    "NO": "NOK", "SE": "SEK",  # G10 Scandinavian extension
 }
 # Reverse map: currency → ISO2 country code (for holiday matching)
 G8_CCY_TO_COUNTRY = {v: k for k, v in G8.items()}
@@ -495,6 +500,8 @@ FF_COUNTRY_NAME_TO_CCY = {
     "canada": "CAD", "canadian": "CAD",
     "switzerland": "CHF", "swiss": "CHF",
     "new zealand": "NZD",
+    "norway": "NOK", "norwegian": "NOK",
+    "sweden": "SEK", "swedish": "SEK",
 }
 HEADERS = {"User-Agent": "globalinvesting-bot/3.0 (https://globalinvesting.github.io)"}
 
@@ -533,6 +540,7 @@ def fetch_myfxbook_rss(xml: str) -> tuple[list[dict], list[dict]]:
         "austria": "EUR", "greece": "EUR", "european-union": "EUR",
         "united-kingdom": "GBP", "japan": "JPY", "canada": "CAD",
         "australia": "AUD", "new-zealand": "NZD", "switzerland": "CHF",
+        "norway": "NOK", "sweden": "SEK",
     }
     G8_CCY = set(SLUG_TO_CCY.values())
 
@@ -659,7 +667,7 @@ def fetch_myfxbook_calendar(html: str) -> tuple[list[dict], list[dict]]:
     """
     import re as _re
 
-    G8_CCY = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"}
+    G8_CCY = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD", "NOK", "SEK"}
 
     # Country slug → currency code for G8 countries + EUR-area members
     SLUG_TO_CCY: dict[str, str] = {
@@ -669,6 +677,7 @@ def fetch_myfxbook_calendar(html: str) -> tuple[list[dict], list[dict]]:
         "austria": "EUR", "greece": "EUR", "european-union": "EUR",
         "united-kingdom": "GBP", "japan": "JPY", "canada": "CAD",
         "australia": "AUD", "new-zealand": "NZD", "switzerland": "CHF",
+        "norway": "NOK", "sweden": "SEK",
     }
 
     # Build lookup dicts by OID from the raw HTML (full page)
@@ -829,7 +838,7 @@ def _normalise_worker_events(raw_events: list) -> list[dict]:
         if not date_iso:
             continue
         currency = (ev.get("currency") or "").strip().upper()
-        G8_CCY = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"}
+        G8_CCY = {"USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD", "NOK", "SEK"}
         if currency not in G8_CCY:
             continue
         impact_raw = (ev.get("impact") or "").lower()

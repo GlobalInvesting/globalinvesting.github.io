@@ -47,7 +47,7 @@ HEADERS = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 }
 
-CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
+CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD', 'NOK', 'SEK']
 
 FRED_API_KEY = os.environ.get('FRED_API_KEY', '')
 
@@ -73,11 +73,13 @@ GLOBAL_RATES_URLS = {
     'CAD': 'central-bank-canada/boc-interest-rate.aspx',
     'AUD': 'central-bank-australia/rba-interest-rate.aspx',
     'NZD': 'central-bank-new-zealand/rbnz-interest-rate.aspx',
+    'NOK': 'central-bank-norway/norges-bank-interest-rate.aspx',
+    'SEK': 'central-bank-sweden/riksbank-interest-rate.aspx',
 }
 
 MAX_POLICY_RATE_PP    = 15.0
 MIN_POLICY_RATE_PP    = -2.0
-MAX_CHANGE_VS_PREV_PP = 0.75  # G8: máximo movimiento en un run (~75bp emergencia)
+MAX_CHANGE_VS_PREV_PP = 0.75  # G10: máximo movimiento en un run (~75bp emergencia)
 
 # Fuentes con lag conocido — no bloquean la validación al corregir
 STALE_SOURCES = (
@@ -757,6 +759,7 @@ def fetch_bis_policy_rate(currency):
     BIS_COUNTRY = {
         'NZD': 'NZ', 'JPY': 'JP', 'AUD': 'AU', 'CHF': 'CH',
         'CAD': 'CA', 'GBP': 'GB', 'EUR': 'XM', 'USD': 'US',
+        'NOK': 'NO', 'SEK': 'SE',  # G10 Scandinavian — BIS WS_CBPOL primary
     }
     country = BIS_COUNTRY.get(currency)
     if not country:

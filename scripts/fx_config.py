@@ -6,7 +6,7 @@ duplication across fetch_news.py, generate_narrative_signals.py and
 other pipeline scripts.
 """
 
-CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
+CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD", "NOK", "SEK"]
 
 CURRENCY_NAMES = {
     "USD": "US Dollar",
@@ -17,6 +17,8 @@ CURRENCY_NAMES = {
     "CAD": "Canadian Dollar",
     "CHF": "Swiss Franc",
     "NZD": "New Zealand Dollar",
+    "NOK": "Norwegian Krone",
+    "SEK": "Swedish Krona",
 }
 
 COUNTRY_META = {
@@ -28,6 +30,8 @@ COUNTRY_META = {
     "CAD": {"name": "Canada",          "bank": "Bank of Canada (BoC)"},
     "CHF": {"name": "Switzerland",     "bank": "Swiss National Bank (SNB)"},
     "NZD": {"name": "New Zealand",     "bank": "Reserve Bank of New Zealand (RBNZ)"},
+    "NOK": {"name": "Norway",          "bank": "Norges Bank (NB)"},
+    "SEK": {"name": "Sweden",          "bank": "Sveriges Riksbank (Riksbank)"},
 }
 
 CURRENCY_MACRO_CONTEXT = {
@@ -67,5 +71,18 @@ CURRENCY_MACRO_CONTEXT = {
     "NZD": (
         "High-beta risk currency. Falls in crises/wars due to global risk-off (not direct "
         "oil correlation). RBNZ policy and domestic NZ data are the primary fundamental drivers."
+    ),
+    "NOK": (
+        "Commodity-linked G10 currency with the strongest structural correlation to Brent crude: "
+        "Norway is a major oil and gas exporter. Risk-sensitive — falls in global risk-off "
+        "environments. Norges Bank is one of the most forward-guidance-driven CBs in G10; "
+        "the rate path signal at each meeting is a primary driver of NOK volatility."
+    ),
+    "SEK": (
+        "European risk proxy. Highly sensitive to global risk appetite and Eurozone growth "
+        "given Sweden's trade links. The Riksbank has run one of the most volatile policy "
+        "cycles in G10 (negative rates, QE, rapid normalization 2022-2024). "
+        "EUR/SEK is the institutional benchmark pair — watched closely as a barometer "
+        "of European financial stress."
     ),
 }

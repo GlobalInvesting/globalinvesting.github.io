@@ -6,7 +6,7 @@ Downloads 3 years of daily OHLC bars via yfinance for all symbols
 used by the Lightweight Charts panel (replaces TradingView widget).
 
 Symbols covered:
-  FX Majors   (7): EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD
+  FX Majors   (9): EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD, USD/NOK, USD/SEK
   FX Crosses (21): all pairs in PAIRS[] that have chart click support
   Cross-asset (4): Gold (GC=F), WTI (CL=F), BTC (BTC-USD), US 10Y (^TNX)
   Indices     (4): S&P 500 (^GSPC), Nasdaq 100 (^NDX), Nikkei 225 (^N225), EuroStoxx 50 (^STOXX50E)
@@ -156,6 +156,11 @@ SYMBOLS: dict[str, str] = {
     "ftse":   "^FTSE",      # FTSE 100 Index (London)
     "hsi":    "^HSI",       # Hang Seng Index (Hong Kong)
     "dji":    "^DJI",       # Dow Jones Industrial Average
+    # G10 Scandinavian extension (v8.3.0)
+    "usdnok": "USDNOK=X",
+    "usdsek": "USDSEK=X",
+    "eurnok": "EURNOK=X",
+    "eursek": "EURSEK=X",
 }
 
 # Decimal precision per symbol (for display only — not stored in OHLC)
@@ -172,6 +177,7 @@ DECIMALS: dict[str, int] = {
     "move": 2,
     "eth": 2, "dxy": 3,
     "silver": 2, "brent": 2, "dax": 2, "ftse": 2, "hsi": 2, "dji": 2,
+    "usdnok": 4, "usdsek": 4, "eurnok": 4, "eursek": 4,
 }
 
 # Plausibility guards — reject bars outside these ranges

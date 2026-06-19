@@ -39,7 +39,7 @@ OUTPUT_PATH = os.path.join("fx-data", "frankfurter.json")
 # Currencies to fetch (USD base — mirrors what dashboard.js needs for FX table / STATE.rates)
 ALL_CURRENCIES = "EUR,GBP,JPY,AUD,CAD,CHF,NZD,HKD,SEK,NOK,DKK,SGD,MXN,ZAR,PLN,HUF,CZK,TRY"
 # EUR-base currencies for the ECB Reference Rates panel (USD must appear as a key)
-ECB_CURRENCIES = "USD,GBP,JPY,AUD,CAD,CHF,NZD"
+ECB_CURRENCIES = "USD,GBP,JPY,AUD,CAD,CHF,NZD,NOK,SEK"
 # Liquidity series currencies (EUR base — mirrors fetchLiquidityData)
 SERIES_CURRENCIES = "USD,GBP,JPY"
 

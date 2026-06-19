@@ -180,6 +180,11 @@ YFINANCE_SYMBOLS = {
     "cadchf": "CADCHF=X",
     "nzdcad": "NZDCAD=X",
     "nzdchf": "NZDCHF=X",
+    # G10 Scandinavian (v8.3.0)
+    "usdnok": "USDNOK=X",
+    "usdsek": "USDSEK=X",
+    "eurnok": "EURNOK=X",
+    "eursek": "EURSEK=X",
     # Additional cross-asset instruments
     "silver": "SI=F",      # Silver front-month futures (CME)
     "brent":  "BZ=F",      # Brent Crude front-month futures (ICE)
@@ -257,6 +262,8 @@ HV30_FX_PAIRS = [
     "audjpy", "audnzd", "audchf",
     "cadjpy", "chfjpy", "nzdjpy",
     "eurnzd", "gbpaud", "gbpnzd", "audcad", "cadchf", "nzdcad", "nzdchf",
+    # G10 Scandinavian (v8.3.0)
+    "usdnok", "usdsek", "eurnok", "eursek",
 ]
 
 # FX pairs map for session H/L computation (same 28 pairs, yfinance tickers).
