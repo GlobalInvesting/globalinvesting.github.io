@@ -156,7 +156,7 @@
     var panels = _ensureSplit();
     if (!panels) { _origOpenRCM && _origOpenRCM(longCcy, shortCcy); return; }
 
-    var label = (longCcy && shortCcy) ? longCcy + '/' + shortCcy : '8 major currencies';
+    var label = (longCcy && shortCcy) ? longCcy + '/' + shortCcy : 'G10 currencies';
     var body  = _makeShell(panels.upper, 'Real Rate Carry · ' + label, function() {
       _restore('rcm-bd', 'rcm-close',
         'position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:16px;',
@@ -256,12 +256,28 @@
     var bdPre = document.getElementById('cbr-bd');
     if (bdPre) bdPre.style.display = 'none';
 
-    _origOpenCBR && _origOpenCBR(ccy, obs, bankInfo, meetingData);
+    // openCBRatesModal (cb-rates-modal.js) is async: when meetingData is not
+    // pre-cached in window._STATE_meetings (e.g. NOK/SEK, which workflow_meetings.yml
+    // does not populate yet), it awaits a fetch('./meetings-data/meetings.json')
+    // before creating #cbr-bd. That await yields the event loop, so a synchronous
+    // _transplant() call right after firing the function would run BEFORE #cbr-bd
+    // exists — hence the "CB rate data unavailable." placeholder for those currencies.
+    // Currencies with cached meetingData never await and resolve immediately, so
+    // wrapping in Promise.resolve() here is a no-op for them.
+    var result = _origOpenCBR && _origOpenCBR(ccy, obs, bankInfo, meetingData);
 
-    if (!_transplant(body, 'cbr-bd', 'cbr-modal', 'cbr-m-close', '')) {
-      body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">CB rate data unavailable.</div>';
+    function doTransplant() {
+      if (!_transplant(body, 'cbr-bd', 'cbr-modal', 'cbr-m-close', '')) {
+        body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">CB rate data unavailable.</div>';
+      }
+      document.body.style.overflow = '';
     }
-    document.body.style.overflow = '';
+
+    if (result && typeof result.then === 'function') {
+      result.then(doTransplant).catch(doTransplant);
+    } else {
+      doTransplant();
+    }
   };
 
   // ═══════════════════════════════════════════════════════════════════

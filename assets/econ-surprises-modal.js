@@ -10,7 +10,7 @@
 //   #esm-bd    (outer wrapper — position:static when transplanted)
 //     #esm-modal (inner flex column — full width/height)
 //
-// Tabs: 8 major currencies with flag-icons (.fi.fi-xx) matching CB Rates convention.
+// Tabs: 10 major currencies (G10) with flag-icons (.fi.fi-xx) matching CB Rates convention.
 // Chart: LightweightCharts v5 AreaSeries — rolling 30d surprise index, weekly.
 // Table: Individual releases 90d window — beat/miss/in-line badge, H/M impact.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -704,7 +704,7 @@ async function openEconSurprisesModal(initialCcy) {
     <div id="esm-hd-left">
       <div>
         <div id="esm-title">${initFlag}Economic Surprises &middot; ${ccy}</div>
-        <div id="esm-sub">Actual vs consensus &middot; 8 major currencies &middot; 90d rolling &middot; decay-weighted (45d ½life) &middot; [&minus;100, +100]</div>
+        <div id="esm-sub">Actual vs consensus &middot; G10 major currencies &middot; 90d rolling &middot; decay-weighted (45d ½life) &middot; [&minus;100, +100]</div>
       </div>
     </div>
     <button id="esm-close" onclick="closeESModal()" aria-label="Close">&times;</button>
