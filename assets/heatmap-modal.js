@@ -672,7 +672,7 @@
     </div>
   </div>
   <div id="hm-footer">
-    <div id="hm-footer-meta">yfinance · ~5min delay · 28-pair equal-weighted model</div>
+    <div id="hm-footer-meta">yfinance · ~5min delay · G10 composite · 32 pairs</div>
   </div>
 </div>`;
     document.body.appendChild(el);
@@ -746,7 +746,7 @@
       w1SubEl.textContent = 'no data';
     }
 
-    document.getElementById('hm-m-rank').textContent = '#' + rank + ' / 8';
+    document.getElementById('hm-m-rank').textContent = '#' + rank + ' / ' + sorted.length;
     document.getElementById('hm-m-won').textContent  = won + ' / ' + myPairs.length;
 
     const strongEl    = document.getElementById('hm-m-strong');
@@ -1402,7 +1402,7 @@
       });
     });
 
-    // Normalize by number of pairs each ccy participates in (7 for G8, 2 for NOK/SEK with current pair coverage)
+    // Normalize by number of pairs each ccy participates in (7 for G10 majors, varies for NOK/SEK per PAIR_DEFS)
     // then accumulate to get the CSI series
     const series = {};
     CCY_ORDER.forEach(ccy => {
@@ -1639,7 +1639,7 @@
       }).join('') +
       '</tbody></table>' +
       '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
-      'ohlc-data · yfinance · 28-pair equal-weighted CSI · Accum. Return = total from period start · Drawdown/Peak = lowest/highest CSI value within period</div>';
+      'ohlc-data · yfinance · 32-pair G10 composite CSI · Accum. Return = total from period start · Drawdown/Peak = lowest/highest CSI value within period</div>';
   }
 
   async function populateCSI(ccy) {
@@ -1790,8 +1790,8 @@
       ? 'Finnhub \u00b7 live \u00b7 G10 composite \u00b7 32 pairs'
       : 'G10 composite \u00b7 32 pairs \u00b7 yfinance \u00b7 ~5min delay';
     const footerLabel = hasFh
-      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted model'
-      : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted model';
+      ? 'Finnhub \u00b7 live \u00b7 G10 composite \u00b7 32 pairs'
+      : 'yfinance \u00b7 ~5min delay \u00b7 G10 composite \u00b7 32 pairs';
     const subEl    = document.getElementById('hm-sub');
     const footerEl = document.getElementById('hm-footer-meta');
     if (subEl)    subEl.textContent    = srcLabel;

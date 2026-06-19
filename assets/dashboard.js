@@ -337,6 +337,7 @@ const ECN_FLOOR_SPREADS = {
   gbpjpy:1.2, gbpchf:1.2, gbpcad:1.5,
   audjpy:0.8, audnzd:1.5, audchf:1.5,
   cadjpy:1.0, chfjpy:1.5, nzdjpy:1.8,
+  usdnok:2.0, usdsek:2.0,
 };
 // Live spread cache — populated by fetchReferenceSpreads() from HV30+VIX+MOVE model.
 // Using a Proxy so TYPICAL_SPREADS reads from LIVE_SPREADS when a key has been set,
@@ -652,8 +653,8 @@ function populateHeatmap() {
   const _hmSubEl = document.getElementById('hm-panel-sub');
   if (_hmSubEl) {
     _hmSubEl.textContent = _hasFhHm
-      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies'
-      : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted \u00b7 8 G8 currencies';
+      ? 'Finnhub \u00b7 live \u00b7 G10 composite \u00b7 32 pairs'
+      : 'yfinance \u00b7 ~5min delay \u00b7 G10 composite \u00b7 32 pairs';
   }
 
   // ── Live-refresh open modal — if the heatmap modal is currently open, push ──
@@ -1195,6 +1196,10 @@ const QB_STOOQ_PAIRS = [
   { sym: 'cadchf',  id: 'cadchf',  dec: 5 },
   { sym: 'nzdcad',  id: 'nzdcad',  dec: 5 },
   { sym: 'nzdchf',  id: 'nzdchf',  dec: 5 },
+  { sym: 'usdnok',  id: 'usdnok',  dec: 4 },
+  { sym: 'usdsek',  id: 'usdsek',  dec: 4 },
+  { sym: 'eurnok',  id: 'eurnok',  dec: 4 },
+  { sym: 'eursek',  id: 'eursek',  dec: 4 },
 ];
 
 // ── Intraday quotes cache (from GitHub Action — Twelve Data + Alpha Vantage) ──
