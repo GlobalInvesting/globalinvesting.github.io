@@ -120,7 +120,7 @@ gtag('consent', 'default', {
     "US Treasury Yield Curve — 3M to 30Y with 2Y-10Y spread and inversion flag",
     "Historical VaR 95% and CVaR (Expected Shortfall) — 252-day window for all major pairs",
     "Cross-Asset Risk Monitor — SPX, Gold, WTI, BTC, Nikkei, Stoxx 50, DXY, US10Y",
-    "Currency Strength Heatmap — 28-pair equal-weighted model, all 8 major currencies",
+    "Currency Strength Heatmap — 32-pair G10 composite model, all 10 G10 currencies",
     "Customisable price alerts with browser notifications",
     "FX Session Liquidity Map — Tokyo, London, New York overlap tracking",
     "Retail FX Positioning — Myfxbook community sentiment, long/short % and avg entry",
@@ -937,7 +937,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="panel" id="split-upper-heatmap">
       <div class="panel-head">
         <span class="panel-title">Currency Strength Heatmap</span>
-        <span class="panel-sub" id="hm-panel-sub">G8 pairs + NOK/SEK · yfinance · ~5min delay · Click any currency to expand</span>
+        <span class="panel-sub" id="hm-panel-sub">G10 composite · 32 pairs · yfinance · ~5min delay · Click any currency to expand</span>
       </div>
       <div class="heatmap" id="heatmap-grid">
         <!-- 10 skeleton cells — G8 + NOK + SEK; heatmap JS overwrites on load -->
@@ -1756,7 +1756,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.0" defer></script>
-<script src="assets/dashboard.js?v=8.21.2" defer></script>
+<script src="assets/dashboard.js?v=8.21.3" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
@@ -1768,7 +1768,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <script src="assets/corr-modal.js?v=2.1.1" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/yc-modal.js?v=7.74.41" defer></script>
-<script src="assets/heatmap-modal.js?v=2.1.0" defer></script>
+<script src="assets/heatmap-modal.js?v=2.1.1" defer></script>
 <script src="assets/econ-surprises-modal.js?v=1.3.4" defer></script>
 <script src="assets/onboarding.js?v=7.89.7" defer></script>
 <script src="assets/layout-resizer.js?v=1.0.0" defer></script>
