@@ -657,7 +657,7 @@
   /* HEATMAP */
   .heatmap {
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
+    grid-template-columns: repeat(5, 1fr);  /* G10: 10 cells, 5 per row */
     gap: 2px; padding: 6px 10px;
   }
   .hm-cell {

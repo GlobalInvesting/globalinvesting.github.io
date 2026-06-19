@@ -380,7 +380,7 @@
     SEK: { flag: 'se', full: 'Swedish Krona' },
   };
 
-  // All 28 8 major currencies pair definitions (same as populateHeatmap in dashboard.js)
+  // All 28 10 G10 currency pair definitions (same as populateHeatmap in dashboard.js)
   const PAIR_DEFS = [
     { id:'eurusd', base:'EUR', quote:'USD', sign:1 },
     { id:'gbpusd', base:'GBP', quote:'USD', sign:1 },
@@ -553,7 +553,7 @@
       <div id="hm-title-row">
         <div id="hm-title"></div>
       </div>
-      <div id="hm-sub">28-pair equal-weighted model · 8 major currencies · yfinance · ~5min delay</div>
+      <div id="hm-sub">G10 composite · 32 pairs · yfinance · ~5min delay</div>
     </div>
     <button id="hm-close" aria-label="Close" title="Close">&#10005;</button>
   </div>
@@ -571,7 +571,7 @@
     <div class="hm-mm">
       <div class="hm-mm-lbl">Rank</div>
       <div class="hm-mm-val flat" id="hm-m-rank">—</div>
-      <div class="hm-mm-sub">of 8 major currencies</div>
+      <div class="hm-mm-sub">of 10 G10 currencies</div>
     </div>
     <div class="hm-mm">
       <div class="hm-mm-lbl">Pairs won</div>
@@ -849,7 +849,7 @@
       });
     }
 
-    // 1W Ranking — compute 8 major currencies composite weekly strength from pct1w across all 28 pairs
+    // 1W Ranking — compute G10 composite weekly strength from pct1w across all G10 pairs
     const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
     const w1map = {};
     ccys.forEach(c => { w1map[c] = { sum: 0, n: 0 }; });
@@ -1270,7 +1270,7 @@
       <span style="color:var(--text3,#4e5c70)">Diagonal = intraday composite · Values = equal-weighted Δ%, not Pearson correlations</span>
     </div>`;
 
-    wrap.innerHTML = `<table class="corr-matrix" aria-label="Intraday strength differential matrix 8 major currencies">
+    wrap.innerHTML = `<table class="corr-matrix" aria-label="Intraday strength differential matrix G10 currencies">
       <thead><tr>${headerCells}</tr></thead>
       <tbody>${bodyRows}${footRow}</tbody>
     </table>`;
@@ -1341,9 +1341,11 @@
     CHF: '#34d399',  // emerald
     NZD: '#fb923c',  // amber
     USD: '#94a3b8',  // slate (USD neutral)
+    NOK: '#0097b2',  // Norges Bank blue
+    SEK: '#fecc00',  // Riksbank gold
   };
 
-  const CCY_ORDER = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+  const CCY_ORDER = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
 
   // Pairs sign convention for deriving ccy strength from OHLC:
   // +1 = pair close goes up → base strengthens; -1 = inverse
@@ -1400,7 +1402,7 @@
       });
     });
 
-    // Normalize by number of pairs each ccy participates in (always 7 for 8 major currencies)
+    // Normalize by number of pairs each ccy participates in (7 for G8, 2 for NOK/SEK with current pair coverage)
     // then accumulate to get the CSI series
     const series = {};
     CCY_ORDER.forEach(ccy => {
@@ -1785,8 +1787,8 @@
       ? Object.values(window.STOOQ_RT_CACHE).some(e => e?.fromFinnhub)
       : false;
     const srcLabel = hasFh
-      ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted \u00b7 8 major currencies'
-      : '28-pair equal-weighted model \u00b7 8 major currencies \u00b7 yfinance \u00b7 ~5min delay';
+      ? 'Finnhub \u00b7 live \u00b7 G10 composite \u00b7 32 pairs'
+      : 'G10 composite \u00b7 32 pairs \u00b7 yfinance \u00b7 ~5min delay';
     const footerLabel = hasFh
       ? 'Finnhub \u00b7 live \u00b7 28-pair equal-weighted model'
       : 'yfinance \u00b7 ~5min delay \u00b7 28-pair equal-weighted model';
