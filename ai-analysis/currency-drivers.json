@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-06-18T10:12:18Z",
+  "generated_at": "2026-06-19T10:17:53Z",
   "drivers": {
     "EUR": {
-      "EUR/USD": "USD steady. Fed on hold. Gold and Silver Rejected Key Resistance",
-      "EUR/GBP": "GBP soft. BoE on hold",
+      "EUR/USD": "USD steady. Fed on hold. 150bp carry favors USD",
+      "EUR/GBP": "GBP on hold. BoE 3.75% vs ECB 2.25% → +150bp",
       "EUR/JPY": "JPY COT LF short -115.0k. BoJ hike priced in",
       "EUR/AUD": "AUD COT LF long +38.1k. RBA on hold",
       "EUR/CAD": "CAD COT LF short -60.7k. BoC on hold",
-      "EUR/CHF": "CHF steady. SNB on hold",
-      "EUR/NZD": "NZD soft. RBNZ hike expected"
+      "EUR/CHF": "CHF steady. SNB on hold. 225bp carry favors EUR",
+      "EUR/NZD": "NZD COT LF short -22.4k. RBNZ hike priced in"
     },
     "GBP": {
-      "GBP/USD": "USD 1W avg: +0.971% (n=7), GBP 1W avg: -0.755% (n=4), G10 spread: 1.726%",
+      "GBP/USD": "USD steady. Fed on hold. US-Iran talks collapse",
       "GBP/JPY": "JPY COT LF short -115.0k. BoJ hike priced in",
       "EUR/GBP": "EUR COT LF short -49.3k. ECB hike expected",
       "GBP/AUD": "AUD COT LF long +38.1k. RBA on hold",
@@ -21,105 +21,105 @@
     },
     "JPY": {
       "USD/JPY": "USD carry bid intact. Fed on hold",
-      "EUR/JPY": "EUR COT LF short -49.3k. Hike expected",
+      "EUR/JPY": "EUR COT LF short -49.3k. ECB hike expected",
       "GBP/JPY": "GBP COT LF long +21.9k. BoE on hold",
       "AUD/JPY": "AUD COT LF long +38.1k. RBA on hold",
       "CAD/JPY": "CAD COT LF short -60.7k. BoC on hold",
-      "CHF/JPY": "CHF steady. SNB on hold",
-      "NZD/JPY": "NZD COT LF short -22.4k. Hike expected"
+      "CHF/JPY": "CHF steady. SNB on hold. Carry drag limits demand",
+      "NZD/JPY": "NZD COT LF short -22.4k. RBNZ hike expected"
     },
     "AUD": {
-      "AUD/USD": "USD steady. Fed on hold. Gold and Silver Rejected Key Resistance",
-      "EUR/AUD": "EUR COT LF short -49.3k. ECB hike expected",
+      "AUD/USD": "USD steady. Fed on hold. US-Iran talks collapse",
+      "EUR/AUD": "EUR COT LF short -49.3k. ECB hike priced in",
       "GBP/AUD": "GBP COT LF long +21.9k. BoE on hold",
-      "AUD/JPY": "JPY COT LF short -115.0k. BoJ hike expected",
+      "AUD/JPY": "JPY COT LF short -115.0k. BoJ hike priced in",
       "AUD/CAD": "CAD COT LF short -60.7k. BoC on hold",
       "AUD/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
-      "AUD/NZD": "NZD COT LF short -22.4k. RBNZ hike expected"
+      "AUD/NZD": "NZD COT LF short -22.4k. RBNZ hike priced in"
     },
     "CAD": {
-      "USD/CAD": "USD steady. Fed on hold. Carry favors USD +150bp",
-      "EUR/CAD": "EUR COT LF short -49.3k. Hike priced in. ECB 2.25% vs BoC 2.25% → 0bp",
-      "GBP/CAD": "GBP COT LF long +21.9k. BoE on hold. BoE 3.75% vs BoC 2.25% → +150bp",
-      "AUD/CAD": "AUD COT LF long +38.1k. RBA on hold. RBA 4.35% vs BoC 2.25% → +210bp",
-      "CAD/JPY": "JPY COT LF short -115.0k. BoJ hike priced in. BoJ 1.0% vs BoC 2.25% → -125bp",
-      "CAD/CHF": "CHF COT LF short -12.1k. SNB on hold. SNB 0.0% vs BoC 2.25% → -225bp",
-      "NZD/CAD": "NZD COT LF short -22.4k. RBNZ hike priced in. RBNZ 2.25% vs BoC 2.25% → 0bp"
+      "USD/CAD": "USD steady. Fed on hold. US-Iran talks collapse",
+      "EUR/CAD": "EUR COT LF short -49.3k. ECB hike expected",
+      "GBP/CAD": "GBP COT LF long +21.9k. BoE on hold",
+      "AUD/CAD": "AUD COT LF long +38.1k. RBA on hold",
+      "CAD/JPY": "JPY COT LF short -115.0k. BoJ hike expected",
+      "CAD/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
+      "NZD/CAD": "NZD COT LF short -22.4k. RBNZ hike expected"
     },
     "CHF": {
-      "USD/CHF": "USD steady. Fed on hold. Carry favors USD +375bp",
-      "EUR/CHF": "EUR COT LF short -49.3k. ECB hike expected. Carry favors EUR +225bp",
-      "GBP/CHF": "GBP COT LF long +21.9k. BoE on hold. Carry favors GBP +375bp",
-      "AUD/CHF": "AUD COT LF long +38.1k. RBA on hold. Carry favors AUD +435bp",
-      "CAD/CHF": "CAD COT LF short -60.7k. BoC on hold. Carry favors CAD +125bp is incorrect, use CAD/CHF: CAD COT LF",
-      "CHF/JPY": "JPY COT LF short -115.0k. BoJ hike expected. Carry favors JPY -100bp",
-      "NZD/CHF": "NZD COT LF short -22.4k. RBNZ hike expected. Carry favors NZD +225bp"
+      "USD/CHF": "USD steady. Fed on hold. US-Iran talks collapse",
+      "EUR/CHF": "EUR COT LF short -49.3k. ECB hike expected",
+      "GBP/CHF": "GBP COT LF long +21.9k. BoE on hold",
+      "AUD/CHF": "AUD COT LF long +38.1k. RBA on hold",
+      "CAD/CHF": "CAD COT LF short -60.7k. BoC on hold",
+      "CHF/JPY": "JPY COT LF short -115.0k. BoJ hike expected",
+      "NZD/CHF": "NZD COT LF short -22.4k. RBNZ hike expected"
     },
     "NZD": {
-      "NZD/USD": "USD steady. Fed on hold. Gold and Silver Rejected Key Resistance",
+      "NZD/USD": "USD steady. Fed on hold. US-Iran talks collapse",
       "EUR/NZD": "EUR COT LF short -49.3k. ECB hike expected",
       "GBP/NZD": "GBP COT LF long +21.9k. BoE on hold",
       "AUD/NZD": "AUD COT LF long +38.1k. RBA on hold",
-      "NZD/JPY": "JPY COT LF short -115.0k. BoJ hike priced in",
+      "NZD/JPY": "JPY COT LF short -115.0k. BoJ hike expected",
       "NZD/CAD": "CAD COT LF short -60.7k. BoC on hold",
       "NZD/CHF": "CHF steady. SNB on hold. Carry drag limits demand"
     },
     "USD": {
-      "EUR/USD": "EUR COT LF short -49.3k. Hike priced in. Fed-ECB +150bp carry favors USD",
-      "GBP/USD": "GBP COT LF long +21.9k. BoE on hold. USD bid on Gold and Silver rejected key resistance",
-      "USD/JPY": "JPY COT LF short -115.0k. Hike priced in. USD-JPY +275bp carry favors USD",
-      "AUD/USD": "AUD COT LF long +38.1k. RBA on hold. AUD-USD -60bp carry favors AUD",
-      "USD/CAD": "CAD COT LF short -60.7k. BoC on hold. USD-CAD +150bp carry favors USD",
-      "USD/CHF": "CHF COT LF short -12.1k. SNB on hold. USD-CHF +375bp carry favors USD",
-      "NZD/USD": "NZD COT LF short -22.4k. RBNZ hike priced in. USD-NZD +150bp carry favors USD"
+      "EUR/USD": "EUR COT LF short -49.3k. ECB hike priced in. Fed-ECB +150bp carry favors USD",
+      "GBP/USD": "GBP COT LF long +21.9k. BoE on hold. USD bid on US-Iran talks collapse",
+      "USD/JPY": "JPY COT LF short -115.0k. BoJ hike priced in. Fed 3.75% vs BoJ 1.0% +275bp carry favors USD",
+      "AUD/USD": "AUD COT LF long +38.1k. RBA on hold. Fed 3.75% vs RBA 4.35% -60bp carry favors AUD",
+      "USD/CAD": "CAD COT LF short -60.7k. BoC on hold. Fed 3.75% vs BoC 2.25% +150bp carry favors USD",
+      "USD/CHF": "CHF COT LF short -12.1k. SNB on hold. Fed 3.75% vs SNB 0.0% +375bp carry favors USD",
+      "NZD/USD": "NZD COT LF short -22.4k. RBNZ hike expected. Fed 3.75% vs RBNZ 2.25% +150bp carry favors USD"
     }
   },
   "_inputs_snap": {
     "USD": {
       "cot_we": "2026-06-09",
-      "rate_updated": "2026-06-18",
+      "rate_updated": "2026-06-19",
       "bias": "hold",
       "bias_updated": "2026-06-17"
     },
     "EUR": {
       "cot_we": "2026-06-09",
-      "rate_updated": "2026-06-18",
+      "rate_updated": "2026-06-19",
       "bias": "hike",
       "bias_updated": "2026-06-17"
     },
     "GBP": {
       "cot_we": "2026-06-09",
-      "rate_updated": "2026-06-18",
+      "rate_updated": "2026-06-19",
       "bias": "hold",
       "bias_updated": "2026-06-17"
     },
     "JPY": {
       "cot_we": "2026-06-09",
-      "rate_updated": "2026-06-18",
+      "rate_updated": "2026-06-19",
       "bias": "hike",
       "bias_updated": "2026-06-17"
     },
     "AUD": {
       "cot_we": "2026-06-09",
-      "rate_updated": "2026-06-18",
+      "rate_updated": "2026-06-19",
       "bias": "hold",
       "bias_updated": "2026-06-17"
     },
     "CAD": {
       "cot_we": "2026-06-09",
-      "rate_updated": "2026-06-18",
+      "rate_updated": "2026-06-19",
       "bias": "hold",
       "bias_updated": "2026-06-17"
     },
     "CHF": {
       "cot_we": "2026-06-09",
-      "rate_updated": "2026-06-18",
+      "rate_updated": "2026-06-19",
       "bias": "hold",
       "bias_updated": "2026-06-17"
     },
     "NZD": {
       "cot_we": "2026-06-09",
-      "rate_updated": "2026-06-18",
+      "rate_updated": "2026-06-19",
       "bias": "hike",
       "bias_updated": "2026-06-17"
     }
