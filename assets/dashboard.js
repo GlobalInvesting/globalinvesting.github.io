@@ -303,7 +303,7 @@ function populateQuoteBar() {
 
 
 function populateCrossRows() {
-  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','nzdcad','nzdchf'];
+  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','nzdcad','nzdchf','eurnok','eursek'];
   crossIds.forEach(id => {
     const pair = PAIRS.find(p=>p.id===id);
     if (!pair) return;
@@ -534,18 +534,18 @@ let _hmThrottleTimer = null;
 const _HM_THROTTLE_MS = 800;
 
 function populateHeatmap() {
-  const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD'];
+  const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD','NOK','SEK'];
 
   // Prefer STOOQ_RT_CACHE (intraday ~5min delay) over ECB daily rates
   // because ECB daily rates have zero intraday movement (same open/close on weekends)
-  const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 21; // need ≥75% of 28 pairs for reliable composite
+  const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 21; // need ≥75% of 32 pairs (G8 + 4 Scandi) for reliable composite
 
   let strengths;
   if (rtAvailable) {
     // Map each currency to its avg % change across all 28 G8 pairs.
     // Each currency appears in exactly 7 pairs — equal statistical weight.
-    const pctMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
-    const countMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
+    const pctMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0, NOK: 0, SEK: 0 };
+    const countMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0, NOK: 0, SEK: 0 };
 
     // All 28 G8 pairs (8×7÷2) — industry-standard currency strength calculation.
     // Each of the 8 currencies appears in exactly 7 pairs, giving equal statistical weight.
@@ -586,6 +586,11 @@ function populateHeatmap() {
       { id: 'cadchf', base: 'CAD', quote: 'CHF', sign: 1 },
       // 1 CHF cross
       { id: 'chfjpy', base: 'CHF', quote: 'JPY', sign: 1 },
+      // G10 Scandinavian — 4 live pairs
+      { id: 'usdnok', base: 'USD', quote: 'NOK', sign: -1 },
+      { id: 'usdsek', base: 'USD', quote: 'SEK', sign: -1 },
+      { id: 'eurnok', base: 'EUR', quote: 'NOK', sign:  1 },
+      { id: 'eursek', base: 'EUR', quote: 'SEK', sign:  1 },
     ];
 
     pairDefs.forEach(({ id, base, quote, sign }) => {
@@ -615,7 +620,9 @@ function populateHeatmap() {
       const pct = ratePrev ? (rateCur - ratePrev) / ratePrev * 100 : 0;
       return { ccy, pct };
     });
-    strengths.find(s=>s.ccy==='USD').pct = -strengths.filter(s=>s.ccy!=='USD').reduce((a,b)=>a+b.pct,0)/7;
+    const _nonUsd = strengths.filter(s=>s.ccy!=='USD');
+    const _usdS = strengths.find(s=>s.ccy==='USD');
+    if (_usdS) _usdS.pct = -_nonUsd.reduce((a,b)=>a+b.pct,0)/_nonUsd.length;
   }
 
   strengths.sort((a,b)=>b.pct-a.pct);
@@ -1406,7 +1413,7 @@ function updateFxPairsTableRT() {
   }
 
   // ── Update Crosses sidebar from the same RT cache ──
-  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','nzdcad','nzdchf'];
+  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','nzdcad','nzdchf','eurnok','eursek'];
   crossIds.forEach(id => {
     const data = STOOQ_RT_CACHE[id];
     if (!data) return;
@@ -2890,6 +2897,9 @@ const _TV_TO_OHLC = {
   'FX_IDC:CADJPY': 'cadjpy',  'FX_IDC:CADCHF': 'cadchf',
   'FX_IDC:NZDJPY': 'nzdjpy',  'FX_IDC:NZDCAD': 'nzdcad',
   'FX_IDC:NZDCHF': 'nzdchf',  'FX_IDC:CHFJPY': 'chfjpy',
+  // G10 Scandinavian
+  'FX_IDC:USDNOK': 'usdnok',  'FX_IDC:USDSEK': 'usdsek',
+  'FX_IDC:EURNOK': 'eurnok',  'FX_IDC:EURSEK': 'eursek',
   // Metals
   'OANDA:XAUUSD':         'gold',
   'CMCMARKETS:GOLDM2026': 'gold',   // legacy alias
@@ -2994,9 +3004,11 @@ function _calcMA(bars, n) {
 // a phantom doji candle after the last real Friday bar.
 const _LW_FX_IDS = new Set([
   'eurusd','gbpusd','usdjpy','audusd','usdcad','usdchf','nzdusd',
+  'usdnok','usdsek',                               // G10 Scandinavian majors
   'eurgbp','eurjpy','eurchf','eurcad','euraud','eurnzd','gbpjpy',
   'gbpchf','gbpcad','gbpaud','gbpnzd','audjpy','audnzd','audchf',
   'audcad','cadjpy','cadchf','nzdjpy','nzdcad','nzdchf','chfjpy',
+  'eurnok','eursek',                               // G10 Scandinavian crosses
   // DXY (DX-Y.NYB) excluded: ICE futures contract, not OTC FX.
   // Its JSON uses native yfinance 1D (UTC midnight boundary, same as SPX/WTI/Gold).
   // Must use the non-FX today-bar path; market_state guard handles phantom bars.

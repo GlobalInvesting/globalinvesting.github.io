@@ -376,6 +376,8 @@
     CAD: { flag: 'ca', full: 'Can. Dollar' },
     NZD: { flag: 'nz', full: 'NZ Dollar' },
     USD: { flag: 'us', full: 'US Dollar' },
+    NOK: { flag: 'no', full: 'Norwegian Krone' },
+    SEK: { flag: 'se', full: 'Swedish Krona' },
   };
 
   // All 28 8 major currencies pair definitions (same as populateHeatmap in dashboard.js)
@@ -408,6 +410,11 @@
     { id:'cadjpy', base:'CAD', quote:'JPY', sign:1 },
     { id:'cadchf', base:'CAD', quote:'CHF', sign:1 },
     { id:'chfjpy', base:'CHF', quote:'JPY', sign:1 },
+    // G10 Scandinavian
+    { id:'usdnok', base:'USD', quote:'NOK', sign:-1 },
+    { id:'usdsek', base:'USD', quote:'SEK', sign:-1 },
+    { id:'eurnok', base:'EUR', quote:'NOK', sign:1 },
+    { id:'eursek', base:'EUR', quote:'SEK', sign:1 },
   ];
 
   // Session windows (UTC hours, start inclusive)
@@ -608,7 +615,7 @@
         </table>
       </div>
       <div class="hm-cw">
-        <div class="hm-ct">FULL RANKING · ALL 8 MAJOR CURRENCIES · COMPOSITE STRENGTH</div>
+        <div class="hm-ct">FULL RANKING · ALL 10 G10 CURRENCIES · COMPOSITE STRENGTH</div>
         <div style="display:flex;gap:16px;">
           <div style="flex:1;">
             <div class="hm-rank-sublbl">Day %</div>
@@ -633,7 +640,7 @@
     </div>
     <div class="hm-panel" id="hm-p-correlations">
       <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-        <div class="hm-ct">RELATIVE STRENGTH DIFFERENTIAL · ALL 8 MAJOR · % COMPOSITE vs PREV CLOSE</div>
+        <div class="hm-ct">RELATIVE STRENGTH DIFFERENTIAL · ALL 10 G10 · % COMPOSITE vs PREV CLOSE</div>
         <div id="hm-corr-matrix" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;"></div>
       </div>
       <div class="hm-cw">
@@ -843,7 +850,7 @@
     }
 
     // 1W Ranking — compute 8 major currencies composite weekly strength from pct1w across all 28 pairs
-    const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+    const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
     const w1map = {};
     ccys.forEach(c => { w1map[c] = { sum: 0, n: 0 }; });
     PAIR_DEFS.forEach(p => {
@@ -1190,7 +1197,7 @@
     document.getElementById('hm-drivers-title').textContent =
       ccy + ' STRENGTH DRIVERS · TOP 3 PAIRS BY CONTRIBUTION';
 
-    const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD'];
+    const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD','NOK','SEK'];
 
     // Build 8×8 strength differential matrix
     // cell[i][j] = strengths[i] - strengths[j]  (positive = row ccy stronger)
@@ -1888,7 +1895,7 @@
     // Update 1W ranking in-place
     const cont1w = document.getElementById('hm-ranking-1w-rows');
     if (cont1w && cont1w.querySelector('[data-rank-ccy]')) {
-      const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+      const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
       const w1map = {};
       ccys.forEach(c => { w1map[c] = { sum: 0, n: 0 }; });
       PAIR_DEFS.forEach(p => {
@@ -1933,7 +1940,7 @@
     }
 
     // Re-compute pctMap
-    const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+    const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
     const pctMap = {};
     ccys.forEach(c => { pctMap[c] = null; });
     strengths.forEach(s => { pctMap[s.ccy] = s.pct; });
