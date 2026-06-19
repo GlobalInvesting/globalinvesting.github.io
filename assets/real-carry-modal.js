@@ -251,9 +251,9 @@
 })();
 
 // ── Constants ───────────────────────────────────────────────────────────────
-const _RCM_G8 = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD'];
-const _RCM_CB = { USD: 'Fed', EUR: 'ECB', GBP: 'BoE', JPY: 'BoJ', AUD: 'RBA', CAD: 'BoC', CHF: 'SNB', NZD: 'RBNZ' };
-const _RCM_FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CAD: 'ca', CHF: 'ch', NZD: 'nz' };
+const _RCM_G8 = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'NOK', 'SEK'];
+const _RCM_CB = { USD: 'Fed', EUR: 'ECB', GBP: 'BoE', JPY: 'BoJ', AUD: 'RBA', CAD: 'BoC', CHF: 'SNB', NZD: 'RBNZ', NOK: 'NB', SEK: 'Riksbank' };
+const _RCM_FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CAD: 'ca', CHF: 'ch', NZD: 'nz', NOK: 'no', SEK: 'se' };
 
 // Inflation expectation source labels — shown in the source column for transparency
 // Sources reflect update-inflation-expectations.yml v5.0 (forward-looking cascade)
@@ -266,6 +266,8 @@ const _RCM_IE_SRC = {
   CAD: 'FRED CAINFIMPCPI · 5Y breakeven',
   CHF: 'CPI YoY · IMF SDMX',
   NZD: 'RBNZ survey · 2Y-ahead',
+  NOK: 'SSB CPI YoY · Statistics Norway',
+  SEK: 'SCB CPIF YoY · Statistics Sweden (Riksbank target)',
 };
 
 // ── State ───────────────────────────────────────────────────────────────────
@@ -518,6 +520,7 @@ function _rcmRenderBreakdown() {
     'USD/EUR infl.exp: FRED 5Y breakeven (market-implied, daily). ' +
     'GBP: BOE SDIE household survey 2Y-ahead. CAD: FRED 5Y breakeven. NZD: RBNZ survey 2Y-ahead. ' +
     'JPY/AUD/CHF: CPI YoY (IMF SDMX 3.0, weekly). ' +
+    'NOK: SSB headline CPI YoY (Statistics Norway). SEK: SCB CPIF YoY (Riksbank target measure). ' +
     'Real rate = Nominal OIS − Inflation Expectation. OIS Bias reflects forward market consensus at next CB meeting. ' +
     'Note: real carry ≠ CIP — no FX forward adjustment applied.';
 
@@ -750,7 +753,7 @@ function _rcmRenderPairDetail(baseCcy, quoteCcy) {
     </div>
   </div>
   <div class="rcm-rate-bars">
-    <div class="rcm-rb-title">Real rate positioning — G8_CURRENCIES (${highCcy} highlighted)</div>
+    <div class="rcm-rb-title">Real rate positioning — G10 (${highCcy} highlighted)</div>
     ${barRows}
   </div>
   <div class="rcm-vol-row">
@@ -916,7 +919,7 @@ function _rcmBuildDOM() {
     <div id="rcm-hd">
       <div id="rcm-hd-left">
         <div id="rcm-title">Real Rate Carry Analysis</div>
-        <div id="rcm-sub">Nominal OIS rate &minus; Inflation Expectation &middot; Real carry &middot; G8_CURRENCIES</div>
+        <div id="rcm-sub">Nominal OIS rate &minus; Inflation Expectation &middot; Real carry &middot; G10</div>
       </div>
       <button id="rcm-close" aria-label="Close real rate carry modal">&times;</button>
     </div>
@@ -939,7 +942,7 @@ function _rcmBuildDOM() {
       <div class="rcm-mm" id="rcm-mm-positive">
         <div class="rcm-mm-lbl">Pairs w/ + real</div>
         <div class="rcm-mm-val" style="color:var(--text2);">—</div>
-        <div class="rcm-mm-sub">G8_CURRENCIES</div>
+        <div class="rcm-mm-sub">G10</div>
       </div>
       <div class="rcm-mm" id="rcm-mm-src">
         <div class="rcm-mm-lbl">Infl. Exp.</div>
