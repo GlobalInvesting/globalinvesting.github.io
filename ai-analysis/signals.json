@@ -1,56 +1,58 @@
 {
-  "generated_at": "2026-06-19T11:03:01Z",
+  "generated_at": "2026-06-19T16:57:10Z",
   "signals": [
     {
-      "time": "11:00",
+      "time": "16:56",
       "priority": "critical",
-      "title": "USD/NZD — G10 Bilateral Theme + Carry + COT + Retail",
-      "text": "USD is the strongest G10 currency this week (+1.116% vs peers) while NZD is the weakest (−0.812%), creating a 1.928% spread. This divergence is driven by the +150bp Fed-RBNZ carry premium favoring USD (SOFR 3.63% vs OCR 2.25%) and strong US data (CESI +30). NZD COT LF net short −22,354 (week ending Jun 9) indicates institutional bearishness, aligning with the G10 weakness. However, retail sentiment is 95% long NZD/USD, presenting an extreme contrarian signal. If the RBNZ signals a hike at the next meeting (Jul 8), a short-squeeze is likely to be amplified by retail capitulation. USD/NZD at 1.7418 (implied from NZD/USD 0.5741).",
+      "title": "USD/CAD — G10 Bilateral Theme + Carry + Positioning + Correlation Break",
+      "text": "USD is the strongest G10 currency this week (+1.182% vs 7 peers) while CAD is the weakest (−0.897% vs 3 peers), creating a 2.079% spread. This divergence is reinforced by a +138bp USD carry premium (SOFR 3.63% vs CORRA 2.25%) and hawkish Fed expectations. CAD COT LF net short −60,671 (24.7% long) indicates crowded speculative short positioning. Furthermore, the USD/CAD vs WTI Oil correlation has broken significantly (corr=−0.465 vs 252d norm=−0.034, z=−1.79σ), suggesting CAD is not benefiting from rising oil prices. USD/CAD at 1.4178. Watch for further USD strength as Fed tightening expectations continue to support the greenback.",
       "evidence": [
-        "USD 1W avg: +1.116% (n=7)",
-        "NZD 1W avg: -0.812% (n=4)",
-        "G10 spread: 1.928%",
-        "USD/NZD carry: +150bp",
+        "USD 1W avg: +1.182% (n=7)",
+        "CAD 1W avg: -0.897% (n=3)",
+        "G10 spread: 2.079%",
+        "USD/CAD carry: +138bp (favors USD)",
+        "CAD COT LF net: -60,671",
+        "USD/CAD vs WTI Oil: z=-1.79σ"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "16:53",
+      "priority": "warning",
+      "title": "USD/JPY — Intervention Risk + Carry + Volatility",
+      "text": "USD/JPY at 161.33 has broken above the 160.00 level, increasing BoJ intervention risk. The pair is sustained by a significant +290bp USD carry premium (SOFR 3.63% vs TONA 0.73%) and a mildly accommodative JPY real rate (−0.44%). Options market shows elevated volatility premium (IV 7.2% vs HV30 2.5%, VRP +4.7%) and a moderate put skew (25d RR −1.16), indicating hedging demand for JPY strength despite the carry-driven rally. JPY COT LF net short −115,036 (29.2% long) highlights crowded speculative short positioning, vulnerable to a short squeeze if intervention occurs. Watch for BoJ verbal warnings or direct action above 161.00.",
+      "evidence": [
+        "USD/JPY: 161.33",
+        "USD/JPY carry: +290bp (favors USD)",
+        "USD/JPY VRP: +4.7%",
+        "USD/JPY 25d RR: -1.16",
+        "JPY COT LF net: -115,036"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "16:49",
+      "priority": "warning",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme + Volatility",
+      "text": "NZD/USD COT LF net short −22,354 (23.9% long) indicates speculative shorts fading a hawkish RBNZ bias, with a hike priced for the next meeting on 8 Jul. This creates short-squeeze risk if the RBNZ delivers or signals a hike. Retail sentiment is at an extreme 95% long, diverging from institutional positioning and suggesting potential capitulation if the pair extends lower. Elevated volatility premium (IV 14.7% vs HV30 7.9%, VRP +6.8%) suggests options traders are pricing in significant downside protection. NZD/USD at 0.5738. Watch RBNZ commentary for confirmation of hike bias.",
+      "evidence": [
         "NZD COT LF net: -22,354",
-        "NZD/USD retail: 95% long"
+        "RBNZ Market bias: ↑ Hike",
+        "NZD/USD Retail: 95% long",
+        "NZD/USD VRP: +6.8%"
       ],
       "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "10:57",
-      "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry + Vol + COT",
-      "text": "USD/JPY at 161.28 continues its ascent, driven by the significant +290bp Fed-BoJ carry premium (SOFR 3.63% vs TONA 0.73%) and a crowded JPY COT LF net short −115,036 (week ending Jun 9). Elevated USD/JPY IV at 7.2% vs HV30 2.5% (VRP +4.8%) indicates strong options hedging demand, likely due to rising geopolitical tensions (US-Iran talks collapse, Gold languishes amid Iran uncertainty) and the pair holding above the 160.00 intervention watch level. Intervention risk remains high on sustained moves higher. The next BoJ meeting (mkt: 50% hike priced) (Jul 31) is the key catalyst for any shift in the yield gap.",
+      "time": "16:44",
+      "priority": "info",
+      "title": "EUR/USD — Policy Divergence + Options Skew",
+      "text": "EUR/USD at 1.1469 faces structural headwinds from policy divergence, with the Fed on hold at 3.75% vs ECB hiking at 2.25%, resulting in a +145bp USD carry premium (SOFR 3.63% vs ESTR 2.18%). Nordea research highlights limited EUR/USD upside due to this interest rate differential. Options market shows a mild put skew (25d RR −0.67) and an elevated vol premium (IV 7.1% vs HV30 4.9%, VRP +2.2%), indicating hedging demand for EUR downside despite neutral speculative positioning (EUR COT LF net short −49,290, 37.4% long). Watch for ECB forward guidance at the next meeting on 23 Jul for any shift in policy outlook.",
       "evidence": [
-        "USD/JPY: 161.28",
-        "USD/JPY carry: +290bp",
-        "JPY COT LF net: -115,036",
-        "USD/JPY VRP: +4.8%"
-      ],
-      "_source": "gemini:gemini-2.5-flash"
-    },
-    {
-      "time": "10:54",
-      "priority": "warning",
-      "title": "EUR/USD — ECB Dovish Shift + Carry + Vol",
-      "text": "ECB policymaker Wunsch's comments on potential rate cuts when 'dynamics turn' introduce a dovish bias, weighing on EUR/USD at 1.1463. The pair faces structural headwinds from the +145bp Fed-ECB carry premium favoring USD (SOFR 3.63% vs ESTR 2.18%). Despite the dovish headline, EUR/USD IV at 7.1% vs HV30 4.9% (VRP +2.2%) suggests elevated options hedging demand, indicating market caution. The next ECB meeting (mkt: 80% hike priced) on Jul 23 will clarify the forward guidance on rate policy.",
-      "evidence": [
-        "ECB Wunsch: 'may cut rates'",
+        "EUR/USD: 1.1469",
         "EUR/USD carry: +145bp (favors USD)",
+        "EUR/USD 25d RR: -0.67",
         "EUR/USD VRP: +2.2%"
-      ],
-      "_source": "gemini:gemini-2.5-flash"
-    },
-    {
-      "time": "10:50",
-      "priority": "warning",
-      "title": "GBP/USD — Political Crisis + Carry + Vol",
-      "text": "GBP/USD at 1.3227 slides to a fresh low amid the UK political crisis and a neutral Fed-BoE carry differential (SOFR 3.63% vs SONIA 3.73% -> -10bp carry favors GBP). The options market shows elevated hedging demand, with GBP/USD IV at 11.0% vs HV30 6.6% (VRP +4.4%), reflecting heightened uncertainty. The BoE's next meeting has already passed (Jun 18), leaving political developments as the primary driver for near-term GBP direction. Watch for further political headlines to confirm downside risk.",
-      "evidence": [
-        "GBP/USD: 1.3227",
-        "British Pound slides amid UK political crisis",
-        "GBP/USD carry: -10bp (favors GBP)",
-        "GBP/USD VRP: +4.4%"
       ],
       "_source": "gemini:gemini-2.5-flash"
     }
