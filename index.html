@@ -116,7 +116,7 @@ gtag('consent', 'default', {
     "AI-powered market narrative — synthesises COT, OIS bias, cross-asset risk and carry differentials, updated 4x daily with directional bias and key signals",
     "Implied Volatility from CBOE/CME FX Volatility Indexes (EUR, GBP, JPY, AUD) — same variance-swap methodology as VIX",
     "25-delta Risk Reversal term structure — 1M tenor, all major pairs",
-    "Carry Trade Ranking — CIP-adjusted 8 major currencies carry with OIS benchmark rates",
+    "Carry Trade Ranking — CIP-adjusted G10 currencies carry with OIS benchmark rates",
     "US Treasury Yield Curve — 3M to 30Y with 2Y-10Y spread and inversion flag",
     "Historical VaR 95% and CVaR (Expected Shortfall) — 252-day window for all major pairs",
     "Cross-Asset Risk Monitor — SPX, Gold, WTI, BTC, Nikkei, Stoxx 50, DXY, US10Y",
@@ -298,7 +298,7 @@ gtag('consent', 'default', {
       "name": "What is the carry trade ranking?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The Carry Trade Ranking shows the net interest rate differential for all major currency pairs, adjusted for Covered Interest Parity (CIP) — the same methodology used by institutional FX desks. It ranks all 28 major pairs from highest to lowest carry, displaying benchmark OIS rates for both currencies and the net spread in basis points."
+        "text": "The Carry Trade Ranking shows the net interest rate differential for all major currency pairs, adjusted for Covered Interest Parity (CIP) — the same methodology used by institutional FX desks. It ranks all 45 G10 pairs from highest to lowest carry, displaying benchmark OIS rates for both currencies and the net spread in basis points."
       }
     },
     {
@@ -677,10 +677,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="sb-row" data-sym="FX_IDC:CADJPY" style="cursor:pointer;" title="Click: chart · detail"><span class="sb-sym">CAD/JPY</span><span class="sb-price" id="sb-cadjpy">—</span><span class="sb-chg" id="sbc-cadjpy">—</span></div>
       <div class="sb-row" data-sym="FX_IDC:CADCHF" style="cursor:pointer;" title="Click: chart · detail"><span class="sb-sym">CAD/CHF</span><span class="sb-price" id="sb-cadchf">—</span><span class="sb-chg" id="sbc-cadchf">—</span></div>
       <div class="sb-row" data-sym="FX_IDC:CHFJPY" style="cursor:pointer;" title="Click: chart · detail"><span class="sb-sym">CHF/JPY</span><span class="sb-price" id="sb-chfjpy">—</span><span class="sb-chg" id="sbc-chfjpy">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:EURNOK" style="cursor:pointer;" title="Click: chart · detail"><span class="sb-sym">EUR/NOK</span><span class="sb-price" id="sb-eurnok">—</span><span class="sb-chg" id="sbc-eurnok">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:EURSEK" style="cursor:pointer;" title="Click: chart · detail"><span class="sb-sym">EUR/SEK</span><span class="sb-price" id="sb-eursek">—</span><span class="sb-chg" id="sbc-eursek">—</span></div>
     </div>
     </div>
     <div class="sb-section">
-      <div class="sb-head" style="display:flex;flex-direction:column;gap:1px;padding-bottom:5px;">Carry Trade Ranking <span style="font-size:8px;color:var(--text3);font-weight:normal;letter-spacing:.04em;">8 major currencies &middot; CIP-adjusted &middot; click for real rate</span></div>
+      <div class="sb-head" style="display:flex;flex-direction:column;gap:1px;padding-bottom:5px;">Carry Trade Ranking <span style="font-size:8px;color:var(--text3);font-weight:normal;letter-spacing:.04em;">G10 &middot; CIP-adjusted &middot; click for real rate</span></div>
       <div id="carry-rank-rows" style="padding:0;">
         <div style="padding:4px 8px;font-size:10px;color:var(--text3);">Loading…</div>
       </div>
@@ -741,9 +743,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:USDCAD">USD/CAD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:USDCHF">USD/CHF</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:USDJPY">USD/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:USDNOK">USD/NOK</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:USDSEK">USD/SEK</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURGBP">EUR/GBP</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURAUD">EUR/AUD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURNZD">EUR/NZD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURNOK">EUR/NOK</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURSEK">EUR/SEK</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURCAD">EUR/CAD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURCHF">EUR/CHF</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURJPY">EUR/JPY</button>
@@ -931,7 +937,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="panel" id="split-upper-heatmap">
       <div class="panel-head">
         <span class="panel-title">Currency Strength Heatmap</span>
-        <span class="panel-sub" id="hm-panel-sub">28-pair equal-weighted model · 8 major currencies · yfinance · ~5min delay · Click any currency to expand</span>
+        <span class="panel-sub" id="hm-panel-sub">G8 pairs + NOK/SEK · yfinance · ~5min delay · Click any currency to expand</span>
       </div>
       <div class="heatmap" id="heatmap-grid">
         <!-- 10 skeleton cells — G8 + NOK + SEK; heatmap JS overwrites on load -->
