@@ -279,6 +279,11 @@ FX_SESSION_HL_MAP = {
     "eurnzd": "EURNZD=X", "gbpaud": "GBPAUD=X", "gbpnzd": "GBPNZD=X",
     "audcad": "AUDCAD=X", "cadchf": "CADCHF=X", "nzdcad": "NZDCAD=X",
     "nzdchf": "NZDCHF=X",
+    # G10 Scandinavian pairs
+    "usdnok": "USDNOK=X",
+    "usdsek": "USDSEK=X",
+    "eurnok": "EURNOK=X",
+    "eursek": "EURSEK=X",
     # Additional cross-asset instruments
     "silver": "SI=F",      # Silver front-month futures (CME)
     "brent":  "BZ=F",      # Brent Crude front-month futures (ICE)
