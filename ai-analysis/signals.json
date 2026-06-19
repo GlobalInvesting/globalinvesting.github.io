@@ -1,56 +1,53 @@
 {
-  "generated_at": "2026-06-18T22:11:56Z",
+  "generated_at": "2026-06-19T03:52:08Z",
   "signals": [
     {
-      "time": "22:10",
+      "time": "03:51",
       "priority": "critical",
-      "title": "USD/JPY — Fed Hawkishness + BoJ Hike + Carry + Positioning",
-      "text": "USD/JPY at 161.41, surging to near 2024 highs following the Fed's hawkish policy update, which held rates at 3.75% and stripped cut-bias language. This reinforces the significant +290bp carry advantage for USD (SOFR 3.63% vs TONA 0.73%). Despite the BoJ's recent rate hike to 1.0% and a 'Hike' market bias, JPY COT LF net short −115,036 (week ending Jun 9) indicates extreme crowded speculative short positioning against a hawkish BoJ. This creates significant short-squeeze risk if the BoJ signals further tightening or intervenes. The 160.00 level has been breached, raising intervention risk. Watch for BoJ verbal warnings or direct action above 161.50.",
+      "title": "GBP/USD — G10 Bilateral Theme + Carry",
+      "text": "GBP/USD at 1.3191 — USD outperformance dominates the G10 scorecard with a +1.206% average gain, while GBP lags at -0.848%. Despite a neutral 0bp nominal carry spread (Fed 3.75% vs BoE 3.75%), the USD real rate of +1.39% offers a +62bp restrictive premium over GBP's +0.77%. Strong USD data (CESI +30) vs neutral GBP data (+2) reinforces the bilateral divergence. Watch for a break of 1.3150 to accelerate the trend.",
       "evidence": [
-        "USD/JPY: 161.41",
-        "USD/JPY OIS carry: +290bp favors USD",
-        "JPY COT LF net: -115,036 (week ending Jun 9)",
-        "BoJ Market bias: ↑ Hike"
+        "USD 1W avg: +1.206% (n=7)",
+        "GBP 1W avg: -0.848% (n=4)",
+        "G10 spread: 2.054%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "22:13",
-      "priority": "critical",
-      "title": "GBP/USD — G10 Bilateral Theme + BoE Hold + Options Skew",
-      "text": "GBP/USD at 1.3208, with GBP as the weakest G10 currency this week (avg -0.818% vs peers) while USD is the strongest (avg +1.056%). The 1.874% leader-to-laggard spread highlights significant bilateral divergence. The BoE held rates at 3.75% (Market bias: Hold), contrasting with the hawkish Fed. Options market shows a moderate put skew (25d RR at -0.76), indicating demand for GBP downside protection. This combination of G10 underperformance, neutral BoE stance, and options hedging suggests continued GBP weakness. Watch for any shift in BoE forward guidance or UK economic data to alleviate pressure.",
-      "evidence": [
-        "USD 1W avg: +1.056% (n=7)",
-        "GBP 1W avg: -0.818% (n=4)",
-        "G10 spread: 1.874%",
-        "GBP/USD 25d RR: -0.76"
-      ],
-      "_source": "gemini:gemini-2.5-flash"
-    },
-    {
-      "time": "22:16",
+      "time": "03:48",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
-      "text": "NZD/USD at 0.5754. COT LF net short −22,354 (week ending Jun 9) indicates speculative positioning is heavily short NZD, while the RBNZ has a 'Hike' market bias. This divergence creates short-squeeze risk if the RBNZ delivers or signals a hike at its next meeting. Further compounding this, retail sentiment shows an extreme 93% long bias, diverging from institutional shorts. If RBNZ delivers a hawkish surprise, a crowded spec short unwind combined with retail capitulation is likely to target 0.5800+. The next RBNZ meeting (mkt: 20% hike priced) on 8 Jul is the key catalyst.",
+      "title": "USD/JPY — BoJ Hawkish Shift + Vol Premium",
+      "text": "USD/JPY at 161.28 — BoJ Deputy Governor Himino warns that yen weakness carries a 'bigger inflation punch' and signals further hikes, contradicting the crowded COT LF net short of -115,036. Options market is pricing significant tail risk with a +4.8% VRP (IV 7.2% vs HV30 2.4%) and a -1.08 25d RR put skew. Intervention risk is acute above 161.80 as hawkish BoJ rhetoric meets extreme spec positioning.",
       "evidence": [
-        "NZD COT LF net: -22,354 (week ending Jun 9)",
-        "RBNZ Market bias: ↑ Hike",
-        "NZD/USD Retail: 93% long / 7% short"
+        "JPY COT LF net: -115,036",
+        "USD/JPY VRP: +4.8%",
+        "25d RR: -1.08 (Saxo)"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "22:19",
+      "time": "03:45",
       "priority": "warning",
-      "title": "USD/CHF — Elevated Vol Premium + Carry + Geopolitical",
-      "text": "USD/CHF at 0.8043, rallying to a new yearly high. The pair benefits from a substantial +375bp carry advantage (Fed 3.75% vs SNB 0.0%). Options market is pricing an elevated vol premium (IV 14.0% vs HV30 6.9% — VRP +7.1%), indicating strong demand for USD upside protection. The US and Iran formally signing a peace memorandum and reopening the Strait of Hormuz has lifted stocks, but the underlying geopolitical tensions and safe-haven demand for USD persist. The SNB's next meeting on 18 Jun (today) is on hold, reinforcing the carry differential. Watch for any shift in global risk sentiment or SNB commentary.",
+      "title": "NZD/USD — COT vs Retail Divergence + RBNZ",
+      "text": "NZD/USD at 0.5740 — Retail sentiment is at a 93% long extreme, directly fading the institutional COT LF net short of -22,354. While RBNZ holds at 2.25% with a hawkish bias, the -0.83% real rate remains the most accommodative in G10, fueling the 150bp USD carry advantage. Retail capitulation risk is high if the pair fails to hold the April lows; institutional short-covering requires a hawkish RBNZ surprise on July 8.",
       "evidence": [
-        "USD/CHF: 0.8043",
-        "USD/CHF carry: +375bp favors USD",
-        "USD/CHF VRP: +7.1%",
-        "SNB Market bias: → Hold"
+        "NZD Retail: 93% Long",
+        "NZD COT LF net: -22,354",
+        "USD/NZD carry: +150bp"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "03:40",
+      "priority": "info",
+      "title": "USD/CAD — Correlation Break + Vol Complacency",
+      "text": "USD/CAD at 1.4148 — The pair's correlation with WTI Oil has collapsed to -0.465 (z=-1.89σ), indicating that CAD is decoupling from energy prices to trade purely on the 138bp OIS carry deficit vs USD. Unlike other majors, USD/CAD options show relative complacency with a neutral +0.25 25d RR despite retail being 95% short. The carry-driven bid remains intact while the oil correlation is broken.",
+      "evidence": [
+        "USD/CAD vs WTI: z=-1.89σ",
+        "USD/CAD OIS carry: +138bp",
+        "Retail: 95% Short"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
