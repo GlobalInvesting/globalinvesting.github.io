@@ -912,7 +912,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </tr>
         </thead>
         <tbody id="fx-pairs-tbody">
-          <!-- 7 skeleton rows — reserve exact height of real data, prevents CLS when JS loads -->
+          <!-- 9 skeleton rows — G8 majors + USD/NOK + USD/SEK — prevents CLS when JS loads -->
           <tr><td class="sym">EUR/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
           <tr><td class="sym">GBP/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
           <tr><td class="sym">USD/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
@@ -920,6 +920,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <tr><td class="sym">USD/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
           <tr><td class="sym">USD/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
           <tr><td class="sym">NZD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/NOK</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/SEK</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="fwd-cell" style="color:var(--text3);">—</td><td class="rr-cell" style="color:var(--text3);">—</td><td>—</td><td>—</td></tr>
         </tbody>
       </table>
       </div>
@@ -932,7 +934,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <span class="panel-sub" id="hm-panel-sub">28-pair equal-weighted model · 8 major currencies · yfinance · ~5min delay · Click any currency to expand</span>
       </div>
       <div class="heatmap" id="heatmap-grid">
-        <!-- 8 skeleton cells — reserve exact height of real data, prevents CLS when JS loads -->
+        <!-- 10 skeleton cells — G8 + NOK + SEK; heatmap JS overwrites on load -->
         <div class="hm-cell h-flat"><span class="hm-sym">EUR</span><span class="hm-val flat">—</span></div>
         <div class="hm-cell h-flat"><span class="hm-sym">USD</span><span class="hm-val flat">—</span></div>
         <div class="hm-cell h-flat"><span class="hm-sym">GBP</span><span class="hm-val flat">—</span></div>
@@ -941,6 +943,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="hm-cell h-flat"><span class="hm-sym">CAD</span><span class="hm-val flat">—</span></div>
         <div class="hm-cell h-flat"><span class="hm-sym">CHF</span><span class="hm-val flat">—</span></div>
         <div class="hm-cell h-flat"><span class="hm-sym">NZD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">NOK</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">SEK</span><span class="hm-val flat">—</span></div>
       </div>
     </div>
 
@@ -957,7 +961,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
       <div class="panel-head">
         <span class="panel-title">Economic Calendar</span>
-        <span class="panel-sub" id="cal-panel-sub">Finnhub · 8 major currencies · medium &amp; high impact</span>
+        <span class="panel-sub" id="cal-panel-sub">Finnhub · G10 major currencies · medium &amp; high impact</span>
       </div>
       <!-- Column headers -->
       <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
@@ -1365,6 +1369,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <tr><td>EUR/AUD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
               <tr><td>EUR/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
               <tr><td>EUR/NZD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/NOK</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>EUR/SEK</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
             </tbody>
           </table>
         </div>
@@ -1487,7 +1493,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <table id="cbrates-table" aria-label="Central bank interest rates">
       <thead><tr><th style="text-align:left" scope="col">Bank</th><th scope="col">Rate</th><th scope="col">Trend</th></tr></thead>
       <tbody id="cbrates-tbody">
-        <!-- 8 skeleton rows — matches JS render structure to prevent CLS -->
+        <!-- 10 skeleton rows — G8 + Norges Bank (NOK) + Riksbank (SEK) — matches JS render to prevent CLS -->
         <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">Fed</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
         <tr><td style="white-space:nowrap;"><span class="fi fi-eu" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">ECB</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
         <tr><td style="white-space:nowrap;"><span class="fi fi-gb" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">BoE</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
@@ -1496,6 +1502,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <tr><td style="white-space:nowrap;"><span class="fi fi-ch" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">SNB</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
         <tr><td style="white-space:nowrap;"><span class="fi fi-ca" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">BoC</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
         <tr><td style="white-space:nowrap;"><span class="fi fi-nz" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">RBNZ</span></td><td class="up">—</td><td><span class="flat">—</span></td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-no" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">NB</span></td><td>—</td><td><span class="flat">—</span></td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-se" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">Riksbank</span></td><td>—</td><td><span class="flat">—</span></td></tr>
       </tbody>
     </table>
 
@@ -1533,7 +1541,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <colgroup><col style="width:42%;"><col style="width:33%;"><col style="width:25%;"></colgroup>
       <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col" title="Market consensus direction · % chip = market-implied cut probability (CME/ASX where available)" style="overflow:hidden;">Bias</th><th scope="col" title="Expected policy rate at next meeting · derived from OIS markets where available, otherwise from trend bias (±25bp step)" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Impl.</th></tr></thead>
       <tbody id="fed-exp-tbody">
-        <!-- 8 skeleton rows — exact structure matches JS render to prevent CLS -->
+        <!-- 10 skeleton rows — G8 + NB (NOK) + Riksbank (SEK) — matches JS render to prevent CLS -->
         <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">Fed</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
         <tr><td style="white-space:nowrap;"><span class="fi fi-eu" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">ECB</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
         <tr><td style="white-space:nowrap;"><span class="fi fi-gb" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">BoE</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
@@ -1542,6 +1550,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <tr><td style="white-space:nowrap;"><span class="fi fi-ca" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">BoC</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
         <tr><td style="white-space:nowrap;"><span class="fi fi-ch" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">SNB</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
         <tr><td style="white-space:nowrap;"><span class="fi fi-nz" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">RBNZ</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-no" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">NB</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
+        <tr><td style="white-space:nowrap;"><span class="fi fi-se" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">Riksbank</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
       </tbody>
     </table>
     </div><!-- /#section-cb-expectations -->
@@ -1549,7 +1559,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <!-- ECONOMIC SURPRISES — Finnhub calendar, beat/miss vs consensus, 8 major currencies -->
     <div id="section-econ-surprise" style="border-top:1px solid var(--border);padding:6px 0 0;">
       <div class="sb-head" style="margin-bottom:1px;" title="Click any row to open the full surprise index chart">Economic Surprise Index</div>
-      <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · 8 major currencies · 90d rolling</div>
+      <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · G10 major currencies · 90d rolling</div>
       <table id="econ-surprise-table" aria-label="Economic surprise index by major currency" style="width:100%;border-collapse:collapse;">
         <thead>
           <tr>
@@ -1567,9 +1577,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <tr style="cursor:pointer;" onclick="openEconSurprisesModal('CAD')" title="Click to view CAD surprise index detail" tabindex="0" role="button" aria-label="CAD economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">CAD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
           <tr style="cursor:pointer;" onclick="openEconSurprisesModal('CHF')" title="Click to view CHF surprise index detail" tabindex="0" role="button" aria-label="CHF economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">CHF</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
           <tr style="cursor:pointer;" onclick="openEconSurprisesModal('NZD')" title="Click to view NZD surprise index detail" tabindex="0" role="button" aria-label="NZD economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">NZD</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('NOK')" title="Click to view NOK surprise index detail" tabindex="0" role="button" aria-label="NOK economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">NOK</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
+          <tr style="cursor:pointer;" onclick="openEconSurprisesModal('SEK')" title="Click to view SEK surprise index detail" tabindex="0" role="button" aria-label="SEK economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">SEK</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
         </tbody>
       </table>
-      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">Finnhub · actual vs consensus · 8 major currencies · 90d rolling</div>
+      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">Finnhub · actual vs consensus · G10 · 90d rolling</div>
     </div>
 
     <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
