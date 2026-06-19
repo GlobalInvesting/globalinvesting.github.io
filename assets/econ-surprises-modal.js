@@ -232,9 +232,11 @@ const _ESM_CCY_META = {
   CAD: { flag: 'ca', label: 'Loonie'    },
   CHF: { flag: 'ch', label: 'Swissie'   },
   NZD: { flag: 'nz', label: 'Kiwi'     },
+  NOK: { flag: 'no', label: 'Krone'    },
+  SEK: { flag: 'se', label: 'Krona'    },
 };
 
-const _ESM_G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+const _ESM_G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
 
 const _ESM_INVERSE_KW = ['unemployment','jobless','claims','deficit','trade balance'];
 

@@ -22,6 +22,10 @@ const PAIRS = [
   { id:'usdchf', base:'CHF', quote:'USD', invert:false, dec:5, label:'USD/CHF' },
   { id:'usdcad', base:'CAD', quote:'USD', invert:false, dec:5, label:'USD/CAD' },
   { id:'nzdusd', base:'NZD', quote:'USD', invert:true,  dec:5, label:'NZD/USD' },
+  { id:'usdnok', base:'NOK', quote:'USD', invert:false, dec:4, label:'USD/NOK' },
+  { id:'usdsek', base:'SEK', quote:'USD', invert:false, dec:4, label:'USD/SEK' },
+  { id:'eurnok', base:'EUR', quote:'NOK', cross:['EUR','NOK'], dec:4, label:'EUR/NOK' },
+  { id:'eursek', base:'EUR', quote:'SEK', cross:['EUR','SEK'], dec:4, label:'EUR/SEK' },
   { id:'eurgbp', base:'EUR', quote:'GBP', cross:['EUR','GBP'], dec:5 },
   { id:'eurjpy', base:'EUR', quote:'JPY', cross:['EUR','JPY'], dec:3 },
   { id:'eurchf', base:'EUR', quote:'CHF', cross:['EUR','CHF'], dec:5 },
@@ -55,10 +59,12 @@ const CB_CONFIG = [
   { id:'chf', file:'CHF', label:'SNB (CH)' },
   { id:'cad', file:'CAD', label:'BoC (CA)' },
   { id:'nzd', file:'NZD', label:'RBNZ (NZ)' },
+  { id:'nok', file:'NOK', label:'NB (NO)' },
+  { id:'sek', file:'SEK', label:'Riksbank (SE)' },
 ];
 
 // COT currencies available
-const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
 
 // ═══════════════════════════════════════════════════════════════════
 // UTILITIES
@@ -758,6 +764,8 @@ async function fetchCBRates() {
       chf: { flag: 'ch', name: 'Swiss National Bank',      short: 'SNB'  },
       cad: { flag: 'ca', name: 'Bank of Canada',           short: 'BoC'  },
       nzd: { flag: 'nz', name: 'Reserve Bank of NZ',       short: 'RBNZ' },
+      nok: { flag: 'no', name: 'Norges Bank',              short: 'NB'   },
+      sek: { flag: 'se', name: 'Sveriges Riksbank',        short: 'Riksbank' },
     };
     // Expose bankInfo globally so onclick handlers can look it up without embedding JSON in HTML
     window._STATE_bankInfo = bankInfo;
@@ -6741,7 +6749,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// CARRY TRADE RANKING — full G8 28-pair differential, left sidebar
+// CARRY TRADE RANKING — full G10 45-pair differential, left sidebar
 // ═══════════════════════════════════════════════════════════════════
 // Institutional-grade carry ranking
 // and JP Morgan GBI conventions:
@@ -6757,7 +6765,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 // source used by the main FX table and the pair detail popover).
 // Falls back to gross differential ranking when HV30 unavailable.
 // ═══════════════════════════════════════════════════════════════════
-// CARRY TRADE RANKING — G8 · real carry · annualised
+// CARRY TRADE RANKING — G10 · real carry · annualised
 // ═══════════════════════════════════════════════════════════════════
 // Institutional-grade carry ranking per Bloomberg FXFR / Refinitiv conventions:
 //
@@ -6777,7 +6785,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 //   Tooltip:       long rate / short rate / real carry / HV30 / click for real rate analysis
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCarryRanking() {
-  const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+  const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD','NOK','SEK'];
 
   // TradingView symbol for a given long/short ccy pair
   function carryTV(long, short) {
@@ -6791,6 +6799,7 @@ async function fetchCarryRanking() {
   function pairId(a, b) {
     const HV30_PAIRS = new Set([
       'eurusd','gbpusd','usdjpy','audusd','usdchf','usdcad','nzdusd',
+      'usdnok','usdsek','eurnok','eursek',
       'eurgbp','eurjpy','eurchf','eurcad','euraud',
       'gbpjpy','gbpchf','gbpcad',
       'audjpy','audnzd','audchf',
@@ -6950,8 +6959,8 @@ async function fetchCarryRanking() {
     const headSpan = container.closest('.sb-section')?.querySelector('.sb-head span');
     if (headSpan) {
       headSpan.textContent = hasRealCarryData
-        ? 'G8 · real carry · annualised'
-        : 'G8 · CB rate differential';
+        ? 'G10 · real carry · annualised'
+        : 'G10 · CB rate differential';
     }
 
     // ── 7. Attach header tooltip (once) ──────────────────────────────────────
@@ -7049,9 +7058,10 @@ async function fetchCarryRanking() {
 // CARRY TRADE SIDEBAR — from rates/*.json + extended-data/*.json
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCarryData() {
-  const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+  const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD','NOK','SEK'];
   const LABELS = { USD:'USD Fed', EUR:'EUR ECB', GBP:'GBP BoE', JPY:'JPY BoJ',
-                   AUD:'AUD RBA', CHF:'CHF SNB', CAD:'CAD BoC', NZD:'NZD RBNZ' };
+                   AUD:'AUD RBA', CHF:'CHF SNB', CAD:'CAD BoC', NZD:'NZD RBNZ',
+                   NOK:'NOK NB', SEK:'SEK Riksbank' };
 
   try {
     // Fetch rates from repo
@@ -7075,6 +7085,8 @@ async function fetchCarryData() {
       { long: 'AUD', short: 'CHF' },
       { long: 'NZD', short: 'CHF' },
       { long: 'USD', short: 'JPY' },
+      { long: 'NOK', short: 'JPY' },
+      { long: 'SEK', short: 'JPY' },
     ].map(p => {
       const diff = (rateData[p.long] ?? 0) - (rateData[p.short] ?? 0);
       return { ...p, diff };
@@ -7349,21 +7361,23 @@ async function fetchFedExpectations() {
     // Load meetings and all rates in parallel
     const [meetingsRes, ...rateResponses] = await Promise.all([
       fetch('./meetings-data/meetings.json').then(r => r.ok ? r.json() : null).catch(() => null),
-      ...['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].map(c =>
+      ...['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'].map(c =>
         fetch(`./rates/${c}.json`).then(r => r.ok ? r.json() : null).catch(() => null)
       )
     ]);
 
-    const currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+    const currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
     const bankMeta = {
-      USD: { flag:'us', short:'Fed'  },
-      EUR: { flag:'eu', short:'ECB'  },
-      GBP: { flag:'gb', short:'BoE'  },
-      JPY: { flag:'jp', short:'BoJ'  },
-      AUD: { flag:'au', short:'RBA'  },
-      CAD: { flag:'ca', short:'BoC'  },
-      CHF: { flag:'ch', short:'SNB'  },
-      NZD: { flag:'nz', short:'RBNZ' },
+      USD: { flag:'us', short:'Fed'    },
+      EUR: { flag:'eu', short:'ECB'    },
+      GBP: { flag:'gb', short:'BoE'    },
+      JPY: { flag:'jp', short:'BoJ'    },
+      AUD: { flag:'au', short:'RBA'    },
+      CAD: { flag:'ca', short:'BoC'    },
+      CHF: { flag:'ch', short:'SNB'    },
+      NZD: { flag:'nz', short:'RBNZ'  },
+      NOK: { flag:'no', short:'NB'     },
+      SEK: { flag:'se', short:'Riksbank' },
     };
 
     // CIP spot sources — quote convention (how many USD per 1 unit of ccy, or inverse)
@@ -9237,10 +9251,9 @@ function exportPanel(type, format = 'csv') {
 
   else if (type === 'carry') {
     headers = ['Long', 'Short', 'Carry_Diff_Pct', 'Long_Rate_Pct', 'Short_Rate_Pct'];
-    const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+    const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD','NOK','SEK'];
     const rates = {};
     G8.forEach(ccy => {
-      const r = STATE.cbRates?.[ccy.toLowerCase()]?.rate;
       if (r != null) rates[ccy] = r;
     });
     const pairs = [];
@@ -10749,10 +10762,12 @@ async function renderDerivativesSection() {
           { label: 'EUR/AUD', ccy: 'AUD' },
           { label: 'EUR/CAD', ccy: 'CAD' },
           { label: 'EUR/NZD', ccy: 'NZD' },
+          { label: 'EUR/NOK', ccy: 'NOK' },
+          { label: 'EUR/SEK', ccy: 'SEK' },
         ];
 
         const rows = ecbTbody.querySelectorAll('tr');
-        const MN = { USD: 4, GBP: 4, JPY: 2, CHF: 4, AUD: 4, CAD: 4, NZD: 4 };
+        const MN = { USD: 4, GBP: 4, JPY: 2, CHF: 4, AUD: 4, CAD: 4, NZD: 4, NOK: 4, SEK: 4 };
 
         ecbPairs.forEach(({ label, ccy }, i) => {
           const row = rows[i];
@@ -11100,7 +11115,7 @@ async function renderEconSurprises() {
   const srcEl = document.getElementById('econ-surprise-source');
   if (srcEl) {
     if (calSource === 'Finnhub' || calSource.startsWith('Finnhub')) {
-      srcEl.textContent = 'Finnhub · actual vs consensus · G8 · 90d rolling';
+      srcEl.textContent = 'Finnhub · actual vs consensus · G10 · 90d rolling';
     } else if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
       srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
     } else if (calSource === 'ForexFactory') {
@@ -11108,7 +11123,7 @@ async function renderEconSurprises() {
       srcEl.textContent = 'ForexFactory · actual vs consensus · 90d rolling';
     } else if (calSource && calSource.includes('ForexFactory')) {
       // Legacy backfill sources: multi-source historical string
-      srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · G8 · 90d rolling';
+      srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · G10 · 90d rolling';
     } else if (calSource) {
       srcEl.textContent = calSource + ' · actual vs consensus · 90d rolling';
     } else {
@@ -11134,7 +11149,7 @@ async function renderEconSurprises() {
     if (!ev.released || ev.actual == null) return;
     if (!['medium','high'].includes(ev.impact)) return;
     const ccy = ev.currency;
-    if (!['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].includes(ccy)) return;
+    if (!['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'].includes(ccy)) return;
 
     // ── Noise filter: exclude non-macro events ─────────────────────────────
     // CESI-style indices (Citi, DB, MS) only score fundamental macro releases.
@@ -11234,7 +11249,7 @@ async function renderEconSurprises() {
   // ── Normalise to [−100, +100] index (Citi CESI convention) ───────────────
   // index = (beats − misses) / total × 100
   // Bar fill: 50% of bar width per side (each side = 50% of container)
-  const G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+  const G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
   const rows = tbody.querySelectorAll('tr');
 
   G8.forEach((ccy, idx) => {

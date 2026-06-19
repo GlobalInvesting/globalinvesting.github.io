@@ -1,79 +1,77 @@
 /**
- * calendar-watcher.js — Cloudflare Worker v3.1
+ * calendar-watcher.js — Cloudflare Worker v5.6
  *
- * PRIMARY SOURCE: FCS API economy_cal endpoint
- *   https://api-v4.fcsapi.com/forex/economy_cal?access_key=KEY
+ * PRIMARY SOURCE: Myfxbook RSS feed
+ *   https://www.myfxbook.com/rss/forex-economic-calendar-events
+ *   — Provides full event list: currencies, dates, times, impact, forecasts,
+ *     and actuals (actuals appear ~1h post-release based on observed behaviour).
  *
- * WHY FCS API INSTEAD OF FF HTML
- *   ForexFactory HTML returns HTTP 403 to Cloudflare Worker IPs — FF protects its
- *   HTML with Cloudflare Bot Management (__cf_bm cookie requiring JS execution).
- *   CF Worker edge IPs are identified and blocked by FF's WAF rules.
- *   FCS API is a REST API that explicitly supports programmatic access from any IP.
- *   It returns actual, forecast, previous for G8 med/high events with near-zero lag.
+ * SECONDARY SOURCE: Myfxbook HTML calendar (anonymous, no cookie required)
+ *   https://www.myfxbook.com/forex-economic-calendar
+ *   — Confirmed accessible from CF Workers edge IPs (200 OK, 1.9MB, 332 rows,
+ *     31 actuals found — tested 2026-06-11). No WAF block on HTML endpoint.
+ *   — Actuals appear in HTML minutes after release vs ~1h in RSS.
+ *   — Runs on every cron tick, unconditionally. Failure is non-fatal: if HTML
+ *     fetch fails, RSS actuals (delayed) are used as natural fallback.
+ *   — MFB_SESSION_COOKIE is no longer required. Cookie path kept for
+ *     potential future use but HTML is fetched anonymously first.
  *
- * ARCHITECTURE
- *   CF Worker polls FCS API every 30 minutes (free tier: 500 req/month limit).
- *   On-demand polls via /trigger endpoint — called by fetch_ff_calendar.py after
- *   detecting new upcoming events, ensuring fresh actuals when they release.
- *   Filters to G8 currencies, medium+high importance.
- *   Computes fingerprint of actuals+forecasts.
- *   On change: writes event array to KV (/payload) + fires repository_dispatch.
- *   fetch_ff_calendar.py Step 1c reads /payload and injects actuals into fresh events.
+ * FALLBACK CHAIN (fully automatic, zero manual intervention):
+ *   1. RSS → full event structure + actuals (~1h delay post-release)
+ *   2. HTML anonymous → overlay actuals minutes post-release (non-fatal)
+ *   3. If HTML fails → RSS actuals fill in when available (~1h)
+ *   4. POST /inject-actuals → emergency manual override (auth required)
  *
- * FCS API free plan: 500 credits/month, 1 credit/request.
- *   At */30 cron: 48 req/day = 1,440 req/month — WITHIN free tier (500/month).
- *   NOTE: 500 req/month cap. At 48/day that's ~10 days before hitting the limit.
- *   If the limit becomes an issue, set cron to */60 (720 req/month still too high)
- *   or rely on /trigger only (on-demand from GH Actions).
+ * v5.6 changes (2026-06-19):
+ * - G10 extension: NOK/SEK added. G8 aliased to G10 for backward compat.
+ *   SLUG_TO_CCY extended: norway→NOK, sweden→SEK.
  *
- * CRON: every 30 minutes.
- *   wrangler.toml: crons = ["*/30 * * * *"]
+ * v5.5 changes (2026-06-11):
+ * - HTML secondary source now runs unconditionally on every cron tick.
+ *   Previously gated on env.MFB_SESSION_COOKIE — now always attempted
+ *   anonymously. Confirmed working from CF edge: 200 OK, actuals present.
+ * - fetchMyfxbookHTMLActuals() no longer requires env param — fetches
+ *   anonymously. Cookie path removed from this function.
+ * - /test-html endpoint retained for ongoing diagnostics.
+ * - Cron sequence: RSS fetch → HTML merge (non-fatal) → fingerprint → dispatch.
  *
- * REQUIRED SECRETS:
- *   GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO  — unchanged
- *   FCS_API_KEY                             — NEW: add via `npx wrangler secret put FCS_API_KEY`
+ * v5.4 changes (2026-06-11):
+ * - GET /test-html diagnostic endpoint added.
  *
- * REQUIRED KV NAMESPACE:
- *   CALENDAR_KV  — calendar:fingerprint:v3, calendar:payload:v3
+ * v5.3 changes (2026-06-11):
+ * - HTML secondary source (cookie-gated), POST /inject-actuals, /payload public.
  *
- * ENDPOINTS:
- *   /trigger     — manual/on-demand poll (called by fetch_ff_calendar.py)
- *   /fingerprint — view current fingerprint
- *   /payload     — read the latest parsed events (JSON array) — used by fetch_ff_calendar.py
- *   /reset       — clear fingerprint + payload
+ * v5.2 changes (2026-06-11):
+ * - CRON every 30 min → every 1 min.
  *
- * FCS API economy_cal response fields (per event):
- *   id, event, title, country (ISO-2), currency, importance (0=low,1=med,2=high),
- *   period, actual, forecast, previous, source, date ("YYYY-MM-DD HH:MM:SS" UTC)
+ * v5.0 changes (2026-06-11):
+ * - PRIMARY replaced: Myfxbook HTML → RSS (HTML blocked from CF edge at that time).
  *
- * v3.1 changes (2026-06-10):
- * - Primary source: FCS API (accessible from CF edge IPs, not blocked by WAF)
- * - Removed FF HTML scraping (CF edge IPs receive HTTP 403 from FF WAF — confirmed)
- * - FF JSON retained as in-process fallback (best-effort, no extra request cost)
- * - Cron: */30 (FCS free tier: 500 req/month)
- * - /trigger endpoint: called by fetch_ff_calendar.py Step 1c for on-demand FCS poll
- * - FCS_API_KEY secret required (add separately: npx wrangler secret put FCS_API_KEY)
- * - KV payload date format: YYYY-MM-DD HH:MM:SS UTC (Step 1c updated accordingly)
- *
- * v3.0 changes (2026-06-10):
- * - Primary source migrated from FF JSON to FF HTML (later found to be blocked — see v3.1)
- * - Added /payload KV endpoint for Step 1c injection
- * - Cron: star-slash-2 (reverted to star-slash-30 in v3.1 due to FCS rate limit)
+ * REQUIRED SECRETS: GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO
+ * OPTIONAL SECRETS: PAYLOAD_TOKEN (for /inject-actuals auth)
+ *                   MFB_SESSION_COOKIE (no longer needed — kept for future use)
  */
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const G8 = new Set(["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]);
+const G10 = new Set(["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD", "NOK", "SEK"]);
+const G8 = G10; // alias — G10 active universe since v5.6
 
-// FCS API economy calendar — G8 country filter
-const FCS_URL = "https://api-v4.fcsapi.com/forex/economy_cal";
+const MFB_RSS_URL  = "https://www.myfxbook.com/rss/forex-economic-calendar-events";
+const MFB_HTML_URL = "https://www.myfxbook.com/forex-economic-calendar";
 
-// FF JSON fallback (no IP block from CF edge, but has lag — used only if FCS fails)
-const FF_JSON_URL    = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
-const FF_JSON_NW_URL = "https://nfs.faireconomy.media/ff_calendar_nextweek.json";
+const KV_FINGERPRINT = "calendar:fingerprint:v5";
+const KV_PAYLOAD     = "calendar:payload:v5";
 
-const KV_FINGERPRINT = "calendar:fingerprint:v3";
-const KV_PAYLOAD     = "calendar:payload:v3";
+const SLUG_TO_CCY = {
+  "united-states": "USD", "euro-area": "EUR", "germany": "EUR",
+  "france": "EUR", "italy": "EUR", "spain": "EUR", "netherlands": "EUR",
+  "belgium": "EUR", "ireland": "EUR", "portugal": "EUR", "finland": "EUR",
+  "austria": "EUR", "greece": "EUR", "european-union": "EUR",
+  "united-kingdom": "GBP", "japan": "JPY", "canada": "CAD",
+  "australia": "AUD", "new-zealand": "NZD", "switzerland": "CHF",
+  "norway": "NOK", "sweden": "SEK",
+};
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 
@@ -101,7 +99,11 @@ export default {
 
     if (url.pathname === "/payload") {
       const payload = await env.CALENDAR_KV.get(KV_PAYLOAD);
-      return new Response(payload || "null", { headers: { "Content-Type": "application/json" } });
+      return new Response(payload || "[]", { headers: { "Content-Type": "application/json" } });
+    }
+
+    if (url.pathname === "/inject-actuals" && request.method === "POST") {
+      return handleInjectActuals(request, env);
     }
 
     if (url.pathname === "/reset") {
@@ -112,186 +114,377 @@ export default {
       });
     }
 
+    if (url.pathname === "/test-html") {
+      return handleTestHTML(env);
+    }
+
     return new Response(JSON.stringify({
       worker:    "calendar-watcher",
-      version:   "3.1",
-      source:    "FCS API (api-v4.fcsapi.com/forex/economy_cal)",
-      fallback:  "ForexFactory JSON (nfs.faireconomy.media)",
-      schedule:  "every 30 minutes (FCS free tier limit)",
-      endpoints: ["/trigger", "/fingerprint", "/payload", "/reset"],
+      version:   "5.5",
+      sources:   ["Myfxbook RSS (primary — full events)", "Myfxbook HTML anonymous (secondary — fast actuals)"],
+      schedule:  "every 1 minute",
+      endpoints: ["/trigger", "/fingerprint", "/payload", "/inject-actuals (POST)", "/reset", "/test-html"],
       ts:        new Date().toISOString(),
     }), { headers: { "Content-Type": "application/json" } });
   },
 };
 
-// ── Core logic ────────────────────────────────────────────────────────────────
+// ── Core cron logic ───────────────────────────────────────────────────────────
 
 async function runCalendarWatch(env) {
   const now   = new Date();
   const label = `[${now.toISOString().slice(0, 16)}Z]`;
-  console.log(`${label} calendar-watcher v3.1: starting poll`);
+  console.log(`${label} calendar-watcher v5.5: starting poll`);
 
+  // ── Step 1: RSS — full event structure ───────────────────────────────────
   let events = [];
-  let source  = "unknown";
-
-  // Step 1: Try FCS API (primary — REST API, not blocked from CF edge IPs)
-  if (env.FCS_API_KEY) {
-    try {
-      events = await fetchFCSAPI(env.FCS_API_KEY);
-      source  = "fcs";
-      console.log(`${label} FCS API: ${events.length} G8 med/high events`);
-    } catch (err) {
-      console.warn(`${label} FCS API failed (${err.message}) — trying FF JSON fallback`);
-    }
-  } else {
-    console.warn(`${label} FCS_API_KEY not set — skipping FCS, trying FF JSON fallback`);
-  }
-
-  // Step 2: FF JSON fallback if FCS failed or key missing
-  if (!events.length) {
-    try {
-      events = await fetchFFJSON();
-      source  = "ff-json";
-      console.log(`${label} FF JSON fallback: ${events.length} G8 med/high events`);
-    } catch (err) {
-      console.error(`${label} FF JSON also failed: ${err.message}`);
-      return;
-    }
-  }
-
-  if (!events.length) {
-    console.log(`${label} No events — skipping.`);
+  try {
+    events = await fetchMyfxbookRSS();
+    console.log(`${label} RSS: ${events.length} G10 med/high events (${events.filter(e => e.actual).length} with actuals)`);
+  } catch (err) {
+    console.error(`${label} RSS failed: ${err.message} — aborting poll.`);
     return;
   }
 
-  // Step 3: Fingerprint
+  if (!events.length) {
+    console.log(`${label} No G10 med/high events — skipping.`);
+    return;
+  }
+
+  // ── Step 2: HTML — fast actuals overlay (non-fatal) ──────────────────────
+  try {
+    const htmlActuals = await fetchMyfxbookHTMLActuals();
+    const merged = mergeHTMLActuals(events, htmlActuals);
+    const total  = Object.keys(htmlActuals).length;
+    if (merged > 0) {
+      console.log(`${label} HTML: merged ${merged} new actual(s) (${total} found in page)`);
+    } else {
+      console.log(`${label} HTML: ${total} actuals in page, 0 new merges (RSS already had them or no match)`);
+    }
+  } catch (err) {
+    console.warn(`${label} HTML fetch failed (non-fatal, RSS fallback active): ${err.message}`);
+  }
+
+  // ── Step 3: Fingerprint + dispatch if changed ─────────────────────────────
   const newFP  = buildFingerprint(events);
   const prevFP = (await env.CALENDAR_KV.get(KV_FINGERPRINT)) ?? "";
 
   if (newFP === prevFP) {
-    console.log(`${label} No change detected [source: ${source}].`);
+    console.log(`${label} No change detected.`);
     return;
   }
 
   const diff = describeDiff(prevFP, newFP);
-  console.log(`${label} CHANGE: ${diff} [source: ${source}]`);
+  console.log(`${label} CHANGE: ${diff}`);
 
-  // Step 4: Write KV
-  await env.CALENDAR_KV.put(KV_FINGERPRINT, newFP,               { expirationTtl: 60 * 60 * 24 * 7 });
-  await env.CALENDAR_KV.put(KV_PAYLOAD, JSON.stringify(events),  { expirationTtl: 60 * 60 * 24 * 7 });
+  await env.CALENDAR_KV.put(KV_FINGERPRINT, newFP,              { expirationTtl: 60 * 60 * 24 * 7 });
+  await env.CALENDAR_KV.put(KV_PAYLOAD, JSON.stringify(events), { expirationTtl: 60 * 60 * 24 * 7 });
 
-  // Step 5: Fire repository_dispatch
   try {
-    await triggerGitHubWorkflow(env, diff, source);
+    await triggerGitHubWorkflow(env, diff, "myfxbook-rss+html");
     console.log(`${label} repository_dispatch sent.`);
   } catch (err) {
     console.error(`${label} repository_dispatch failed: ${err.message}`);
-    // Roll back fingerprint so the next poll retries the dispatch
+    // Roll back fingerprint so next cron retries the dispatch
     await env.CALENDAR_KV.put(KV_FINGERPRINT, prevFP, { expirationTtl: 60 * 60 * 24 * 7 });
   }
 }
 
-// ── FCS API fetch ─────────────────────────────────────────────────────────────
+// ── Myfxbook RSS ──────────────────────────────────────────────────────────────
 
-async function fetchFCSAPI(apiKey) {
-  // G8 country codes for FCS API country filter (ISO-2)
-  const g8Countries = "US,EU,GB,JP,AU,CA,CH,NZ";
-  const url = `${FCS_URL}?country=${g8Countries}&access_key=${apiKey}`;
-
-  const resp = await fetch(url, {
+async function fetchMyfxbookRSS() {
+  const resp = await fetch(MFB_RSS_URL, {
     headers: {
-      "Accept":     "application/json",
-      "User-Agent": "globalinvesting-calendar-watcher/3.1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+      "Accept":     "application/rss+xml, application/xml, text/xml, */*",
     },
-    signal: AbortSignal.timeout(12000),
+    signal: AbortSignal.timeout(20000),
   });
 
-  if (!resp.ok) {
-    const body = await resp.text().catch(() => "");
-    throw new Error(`FCS API HTTP ${resp.status}: ${body.slice(0, 80)}`);
-  }
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const xml = await resp.text();
+  if (!xml.includes("<item>")) throw new Error("RSS response missing <item> elements");
+  return parseMyfxbookRSS(xml);
+}
 
-  const data = await resp.json();
-
-  // FCS response: { status: true, response: [...], info: {...} }
-  if (!data.status || !Array.isArray(data.response)) {
-    throw new Error(`FCS API unexpected response: ${JSON.stringify(data).slice(0, 120)}`);
-  }
-
+function parseMyfxbookRSS(xml) {
   const events = [];
-  for (const ev of data.response) {
-    const currency = (ev.currency || "").trim().toUpperCase();
-    if (!G8.has(currency)) continue;
+  let skippedCcy = 0, skippedImpact = 0;
 
-    // importance: 0=low, 1=medium, 2=high — skip low
-    const imp = Number(ev.importance ?? -1);
-    if (imp < 1) continue;
+  for (const itemM of xml.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
+    const block = itemM[1];
 
-    events.push({
-      date:     (ev.date || "").trim(),    // "YYYY-MM-DD HH:MM:SS" UTC
-      timeET:   "",                         // FCS provides UTC dates, not ET times
-      currency,
-      impact:   imp === 2 ? "high" : "medium",
-      title:    (ev.title || "").trim(),
-      actual:   cleanVal(ev.actual),
-      forecast: cleanVal(ev.forecast),
-      previous: cleanVal(ev.previous),
-    });
+    const linkM = block.match(/<link>https?:\/\/[^/]+\/forex-economic-calendar\/([^/]+)\/[^<]+<\/link>/);
+    if (!linkM) continue;
+    const currency = SLUG_TO_CCY[linkM[1]] || "";
+    if (!currency) { skippedCcy++; continue; }
+
+    const titleM = block.match(/<title>([^<]+)<\/title>/);
+    const title  = titleM ? titleM[1].trim() : "";
+    if (!title) continue;
+
+    const pubM = block.match(/<pubDate>([^<]+)<\/pubDate>/);
+    let dateISO = "", timeUTC = "00:00";
+    if (pubM) {
+      const d = new Date(pubM[1].trim());
+      if (!isNaN(d)) {
+        dateISO = d.toISOString().slice(0, 10);
+        timeUTC = d.toISOString().slice(11, 16);
+      }
+    }
+    if (!dateISO) continue;
+
+    const descM = block.match(/<description>([\s\S]*?)<\/description>/);
+    if (!descM) continue;
+    const desc = descM[1]
+      .replace(/&#60;/g, "<").replace(/&#62;/g, ">")
+      .replace(/&#39;/g, "'").replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+
+    const impM   = desc.match(/sprite-(high|medium|low)-impact/);
+    const impact = impM ? impM[1] : "low";
+    if (impact === "low") { skippedImpact++; continue; }
+
+    const tds = [...desc.matchAll(/<td>([\s\S]*?)<\/td>/g)].map(m =>
+      m[1].replace(/<[^>]+>/g, "").trim()
+    );
+
+    const timeLeftRaw = tds[0] || "";
+    const previous    = cleanVal(tds[2]);
+    const forecast    = cleanVal(tds[3]);
+    const actual      = cleanVal(tds[4]);
+    const isPassed    = timeLeftRaw.startsWith("-") && timeLeftRaw.includes("second");
+    const released    = actual !== null || isPassed;
+
+    events.push({ date: `${dateISO} ${timeUTC}:00`, currency, impact, title,
+                  actual, forecast, previous, dateISO, timeUTC, released });
   }
 
-  if (!events.length) {
-    throw new Error("FCS API returned 0 G8 med/high events (key invalid or no events this week)");
-  }
-
+  events.sort((a, b) => a.date.localeCompare(b.date) || a.currency.localeCompare(b.currency));
+  console.log(`parseMyfxbookRSS: ${events.length} events (${events.filter(e=>e.actual).length} with actuals; skipped ${skippedCcy} non-G10, ${skippedImpact} low-impact)`);
   return events;
 }
 
-// ── FF JSON fallback ──────────────────────────────────────────────────────────
+// ── Myfxbook HTML (anonymous) ─────────────────────────────────────────────────
 
-async function fetchFFJSON() {
-  const HEADERS = {
-    "User-Agent": "globalinvesting-calendar-watcher/3.1 (https://globalinvesting.github.io)",
-    "Accept":     "application/json",
+async function fetchMyfxbookHTMLActuals() {
+  const resp = await fetch(MFB_HTML_URL, {
+    headers: {
+      "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+      "Accept":          "text/html,application/xhtml+xml,*/*",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Referer":         "https://www.myfxbook.com/",
+    },
+    signal: AbortSignal.timeout(25000),
+  });
+
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const html = await resp.text();
+  if (!html.includes("economicCalendarTable")) throw new Error("Calendar table not found in HTML response");
+  return parseMyfxbookHTMLActuals(html);
+}
+
+function parseMyfxbookHTMLActuals(html) {
+  const actuals = {};
+  let parsed = 0, found = 0;
+
+  for (const rowM of html.matchAll(/<tr[^>]+data-row-id="(\d+)"[^>]*>([\s\S]*?)<\/tr>/g)) {
+    const rowBody = rowM[2];
+    parsed++;
+
+    const dateM = rowBody.match(/data-calendarDateTd="(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/);
+    if (!dateM) continue;
+    const dateISO = dateM[1];
+    const timeUTC = dateM[2];
+
+    const ccyM = rowBody.match(/<td[^>]*>\s*([A-Z]{3})\s*<\/td>/);
+    if (!ccyM || !G8.has(ccyM[1])) continue;
+    const currency = ccyM[1];
+
+    const titleM = rowBody.match(/class="calendar-event-link"[^>]*>([^<]+)<\/a>/);
+    if (!titleM) continue;
+    const title = titleM[1].trim();
+
+    const actualM = rowBody.match(/class="actualCell"[^>]*>([\s\S]*?)<\/span>/);
+    if (!actualM) continue;
+    const actualRaw = actualM[1].replace(/<[^>]+>/g, "").trim();
+    const actual = cleanVal(actualRaw);
+    if (!actual) continue;
+
+    actuals[`${currency}|${dateISO}|${timeUTC}|${normTitle(title)}`] = actual;
+    found++;
+  }
+
+  console.log(`parseMyfxbookHTMLActuals: parsed ${parsed} rows, found ${found} G8 actuals`);
+  return actuals;
+}
+
+function mergeHTMLActuals(events, htmlActuals) {
+  let merged = 0;
+  for (const ev of events) {
+    if (ev.actual) continue; // RSS already has it
+    const key = `${ev.currency}|${ev.dateISO}|${ev.timeUTC}|${normTitle(ev.title)}`;
+    if (htmlActuals[key]) {
+      ev.actual   = htmlActuals[key];
+      ev.released = true;
+      merged++;
+    }
+  }
+  return merged;
+}
+
+function normTitle(t) {
+  return t.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+// ── /test-html diagnostic ─────────────────────────────────────────────────────
+
+async function handleTestHTML(env) {
+  const baseResult = {
+    ts:             new Date().toISOString(),
+    url:            MFB_HTML_URL,
+    cookie_set:     !!env.MFB_SESSION_COOKIE,
+    http_status:    null,
+    http_error:     null,
+    bytes_received: null,
+    has_table:      false,
+    rows_parsed:    0,
+    actuals_found:  0,
+    examples:       [],
   };
 
-  const resp = await fetch(FF_JSON_URL, { headers: HEADERS, signal: AbortSignal.timeout(10000) });
-  const ct   = resp.headers.get("content-type") || "";
-  if (!resp.ok || !ct.includes("application/json")) {
-    const body = await resp.text().catch(() => "");
-    throw new Error(`FF JSON HTTP ${resp.status}: ${body.slice(0, 60)}`);
+  // Always test anon; also test with cookie if set
+  const attempts = [{ label: "anon", cookie: null }];
+  if (env.MFB_SESSION_COOKIE) {
+    attempts.push({ label: "cookie", cookie: env.MFB_SESSION_COOKIE });
   }
-  const raw = await resp.json();
-  if (!Array.isArray(raw)) throw new Error("FF JSON not an array");
 
-  // Best-effort nextweek
-  let rawNw = [];
-  try {
-    const r2 = await fetch(FF_JSON_NW_URL, { headers: HEADERS, signal: AbortSignal.timeout(8000) });
-    const ct2 = r2.headers.get("content-type") || "";
-    if (r2.ok && ct2.includes("application/json")) {
-      const p = await r2.json();
-      if (Array.isArray(p)) rawNw = p;
+  const allResults = [];
+
+  for (const attempt of attempts) {
+    const r = { ...baseResult, attempt: attempt.label, examples: [] };
+
+    try {
+      const headers = {
+        "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept":          "text/html,application/xhtml+xml,*/*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer":         "https://www.myfxbook.com/",
+      };
+      if (attempt.cookie) headers["Cookie"] = attempt.cookie;
+
+      const resp = await fetch(MFB_HTML_URL, { headers, signal: AbortSignal.timeout(25000) });
+      r.http_status = resp.status;
+
+      if (!resp.ok) {
+        r.http_error = `HTTP ${resp.status} ${resp.statusText}`;
+        allResults.push(r);
+        continue;
+      }
+
+      const html = await resp.text();
+      r.bytes_received = html.length;
+      r.has_table = html.includes("economicCalendarTable");
+
+      if (!r.has_table) {
+        r.http_error = "Response OK but calendar table not found";
+        allResults.push(r);
+        continue;
+      }
+
+      for (const rowM of html.matchAll(/<tr[^>]+data-row-id="(\d+)"[^>]*>([\s\S]*?)<\/tr>/g)) {
+        const rowBody = rowM[2];
+        r.rows_parsed++;
+
+        const dateM = rowBody.match(/data-calendarDateTd="(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/);
+        if (!dateM) continue;
+        const ccyM = rowBody.match(/<td[^>]*>\s*([A-Z]{3})\s*<\/td>/);
+        if (!ccyM || !G8.has(ccyM[1])) continue;
+        const titleM = rowBody.match(/class="calendar-event-link"[^>]*>([^<]+)<\/a>/);
+        if (!titleM) continue;
+        const actualM = rowBody.match(/class="actualCell"[^>]*>([\s\S]*?)<\/span>/);
+        if (!actualM) continue;
+        const actual = cleanVal(actualM[1].replace(/<[^>]+>/g, "").trim());
+        if (!actual) continue;
+
+        r.actuals_found++;
+        if (r.examples.length < 5) {
+          r.examples.push({
+            currency: ccyM[1], dateISO: dateM[1], timeUTC: dateM[2],
+            title: titleM[1].trim(), actual,
+          });
+        }
+      }
+    } catch (err) {
+      r.http_error = err.message;
     }
-  } catch (_) {}
 
-  const events = [];
-  for (const ev of [...raw, ...rawNw]) {
-    const currency = (ev.country || "").trim().toUpperCase();
-    if (!G8.has(currency)) continue;
-    const impact = (ev.impact || "").trim().toLowerCase();
-    if (impact !== "high" && impact !== "medium") continue;
-    events.push({
-      date:     (ev.date || "").trim(),
-      timeET:   "",
-      currency,
-      impact,
-      title:    (ev.title || "").trim(),
-      actual:   cleanVal(ev.actual),
-      forecast: cleanVal(ev.forecast),
-      previous: cleanVal(ev.previous),
+    allResults.push(r);
+  }
+
+  return new Response(JSON.stringify(allResults, null, 2), {
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+// ── /inject-actuals ───────────────────────────────────────────────────────────
+
+async function handleInjectActuals(request, env) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const expected   = `Bearer ${env.PAYLOAD_TOKEN || ""}`;
+  if (!env.PAYLOAD_TOKEN || authHeader !== expected) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { "Content-Type": "application/json" },
     });
   }
-  return events;
+
+  let injected;
+  try {
+    injected = await request.json();
+    if (!Array.isArray(injected)) throw new Error("Expected array");
+  } catch (e) {
+    return new Response(JSON.stringify({ error: `Invalid JSON: ${e.message}` }), {
+      status: 400, headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const raw    = await env.CALENDAR_KV.get(KV_PAYLOAD);
+  const events = raw ? JSON.parse(raw) : [];
+  let merged = 0;
+
+  for (const inj of injected) {
+    const { currency, dateISO, timeUTC, title, actual } = inj;
+    if (!currency || !dateISO || !title || !actual) continue;
+    const ev = events.find(e =>
+      e.currency === currency && e.dateISO === dateISO &&
+      normTitle(e.title) === normTitle(title)
+    );
+    if (ev && !ev.actual) {
+      ev.actual = actual; ev.released = true;
+      if (timeUTC) ev.timeUTC = timeUTC;
+      merged++;
+    }
+  }
+
+  if (!merged) {
+    return new Response(JSON.stringify({ status: "no_match", merged: 0 }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const newFP = buildFingerprint(events);
+  await env.CALENDAR_KV.put(KV_FINGERPRINT, newFP,              { expirationTtl: 60 * 60 * 24 * 7 });
+  await env.CALENDAR_KV.put(KV_PAYLOAD, JSON.stringify(events), { expirationTtl: 60 * 60 * 24 * 7 });
+
+  try {
+    await triggerGitHubWorkflow(env, `manual inject: ${merged} actual(s)`, "manual-inject");
+  } catch (err) {
+    console.error(`inject-actuals: dispatch failed: ${err.message}`);
+  }
+
+  return new Response(JSON.stringify({ status: "ok", merged }), {
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 // ── Fingerprint ───────────────────────────────────────────────────────────────
@@ -299,8 +492,7 @@ async function fetchFFJSON() {
 function buildFingerprint(events) {
   return events
     .map(ev => `${ev.date}|${ev.currency}|${ev.title}|${ev.actual ?? ""}|${ev.forecast ?? ""}`)
-    .sort()
-    .join("\n");
+    .sort().join("\n");
 }
 
 function describeDiff(prevFP, newFP) {
@@ -312,14 +504,14 @@ function describeDiff(prevFP, newFP) {
   const parts = [];
   if (newActuals.length) {
     const samples = newActuals.slice(0, 2)
-      .map(l => { const p = l.split("|"); return `${p[1]} ${p[2].slice(0, 25)}=${p[3]}`; });
+      .map(l => { const p = l.split("|"); return `${p[1]} ${p[2].slice(0,25)}=${p[3]}`; });
     parts.push(`${newActuals.length} actual(s): ${samples.join(", ")}`);
   }
   if (newForecasts.length) parts.push(`${newForecasts.length} forecast(s)`);
   return parts.join(" | ") || `${added.length} change(s)`;
 }
 
-// ── GitHub repository_dispatch ────────────────────────────────────────────────
+// ── GitHub dispatch ───────────────────────────────────────────────────────────
 
 async function triggerGitHubWorkflow(env, description, source) {
   const { GITHUB_PAT, GITHUB_OWNER, GITHUB_REPO } = env;
@@ -335,23 +527,22 @@ async function triggerGitHubWorkflow(env, description, source) {
         "Authorization":        `Bearer ${GITHUB_PAT}`,
         "Accept":               "application/vnd.github+json",
         "Content-Type":         "application/json",
-        "User-Agent":           "globalinvesting-calendar-watcher/3.1",
+        "User-Agent":           "globalinvesting-calendar-watcher/5.5",
         "X-GitHub-Api-Version": "2022-11-28",
       },
       body: JSON.stringify({
         event_type: "calendar-data-changed",
-        client_payload: {
-          description,
-          triggered_at: new Date().toISOString(),
-          source: `cloudflare-worker-${source}`,
-        },
+        client_payload: { description, triggered_at: new Date().toISOString(),
+                          source: `cloudflare-worker-${source}` },
       }),
       signal: AbortSignal.timeout(10000),
     }
   );
 
   if (resp.status !== 204) {
-    const body = await resp.text().catch(() => "");
+    const body = await resp.text().catch(() => "(unreadable)");
+    console.error(`GitHub dispatch URL: https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`);
+    console.error(`GitHub API ${resp.status} body: ${body}`);
     throw new Error(`GitHub API ${resp.status}: ${body}`);
   }
 }
@@ -361,5 +552,5 @@ async function triggerGitHubWorkflow(env, description, source) {
 function cleanVal(v) {
   if (v == null) return null;
   const s = String(v).trim();
-  return s === "" || s === "None" || s === "null" || s === "N/A" || s === "—" ? null : s;
+  return s === "" || s === "None" || s === "null" || s === "N/A" || s === "—" || s === "-" ? null : s;
 }
