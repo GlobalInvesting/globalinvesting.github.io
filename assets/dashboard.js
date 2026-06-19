@@ -64,7 +64,7 @@ const CB_CONFIG = [
 ];
 
 // COT currencies available
-const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
+const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD']; // NOK/SEK: not in CFTC TFF report (ICE futures, not CME)
 
 // ═══════════════════════════════════════════════════════════════════
 // UTILITIES
