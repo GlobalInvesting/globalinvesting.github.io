@@ -305,13 +305,13 @@
         "22 Dec"
       ],
       "source": "riksbank.se",
-      "bias": "cut",
+      "bias": "hold",
       "biasSource": "Rate trajectory (no free daily OIS/overnight source available)",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-20",
-      "cutProb": 45,
+      "cutProb": 15,
       "hikeProb": 0,
-      "fwdRate": 1.6375
+      "fwdRate": 1.7125
     }
   }
 }
