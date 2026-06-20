@@ -1,4 +1,4 @@
-name: Probe Riksbank SWESTR endpoints v2 (diagnostic)
+name: Probe Riksbank SWESTR endpoints v3 (diagnostic, rate-limit aware)
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -16,128 +16,136 @@ jobs:
       - name: Install dependencies
         run: pip install requests --break-system-packages
 
-      - name: Run SWESTR series-ID + group sweep
+      - name: Run SWESTR probe (rate-limit aware)
         run: |
           python3 << 'EOFPYTHON'
           #!/usr/bin/env python3
           """
-          fetch_bias_sek_test_v2.py — Riksbank SWESTR series-ID probe (round 2)
+          fetch_bias_sek_test_v3.py — Riksbank SWESTR series-ID probe (round 3, rate-limit aware)
 
-          CONTEXT FROM ROUND 1
-          ---------------------
-          Round 1 confirmed the working PATH pattern:
+          CONTEXT FROM ROUNDS 1 & 2
+          --------------------------
+          Round 1 confirmed the PATH is valid:
               https://api.riksbank.se/swea/v1/Observations/Latest/{seriesId}
-          returns 200 + JSON for known series (e.g. seknokpmi), and crucially
-          returned 204 (not 404) for "SWESTR" and "swestr" -- meaning the *path*
-          is valid but "SWESTR" is not the right seriesId string. A 204 is very
-          different from the 404s every other namespace guess produced.
+          "SWESTR" / "swestr" -> 204 (valid path, wrong seriesId).
 
-          This round stays entirely within the confirmed-working swea/v1 path and
-          only varies the seriesId, following the Riksbank's real naming
-          convention observed in other series (e.g. SEDP2MSTIBOR, SEKEURPMI --
-          prefix "SE" + category + tenor/detail, all uppercase, no underscores).
+          Round 2 confirmed (before hitting the rate limit) that several more
+          naming guesses ALSO return 204 (SESWESTR, SESTR, SEDPSWESTR,
+          SEDPTNSWESTR) -- still wrong, but still valid path. Then we hit
+          HTTP 429 ("Rate limit is exceeded. Try again in N seconds") for every
+          subsequent call, including the entire GroupId sweep, so Part 2 never
+          actually ran.
 
-          Also tries the GroupId listing endpoint (which needs no seriesId guess
-          at all) for groups likely to contain SWESTR, since ByGroup/130 (FX) was
-          confirmed working and returned a clean list -- if we find the right
-          GroupId for "Swedish market rates" / "Riksbank rates" we get the full
-          series list back with one call, no guessing needed.
+          This round:
+            1. Respects the Retry-After-style message in the 429 body (parses the
+               "Try again in N seconds" text and sleeps that long, with a safety
+               cap) instead of just failing.
+            2. Adds a fixed delay between EVERY call regardless (conservative:
+               ~13s apart), since the anonymous tier looks like ~5 req/min.
+            3. Runs Part 2 (GroupId sweep) FIRST this time, since a single group
+               listing call can reveal the seriesId directly without us guessing
+               30 more series-id strings one at a time -- much more
+               request-efficient than the seriesId sweep.
+            4. Trims the GroupId sweep to a smaller, more targeted range plus a
+               few likely-named "Riksbank rates" groups, to fit in fewer calls.
           """
 
           import json
+          import re
+          import time
           from datetime import date
 
           import requests
 
           TIMEOUT = 15
-          HEADERS = {"User-Agent": "GlobalInvestingFXTerminal/diagnostic-v2 (riksbank-swestr-probe)"}
+          HEADERS = {"User-Agent": "GlobalInvestingFXTerminal/diagnostic-v3 (riksbank-swestr-probe)"}
+
+          # Anonymous-tier rate limit appears to be roughly 5 req/min based on the
+          # 429 message observed ("Try again in 58 seconds" right after a burst of
+          # ~6-7 calls). Space calls out conservatively.
+          DELAY_BETWEEN_CALLS = 13  # seconds
+          MAX_RETRY_WAIT = 65       # safety cap if a 429 tells us to wait longer
 
           today = date.today()
           today_str = today.isoformat()
 
-          # ── Round 2: seriesId guesses within the CONFIRMED-WORKING swea/v1 path ──
+          # GroupId sweep -- run this FIRST since one hit here ends the search
+          # immediately. Includes the two already-confirmed groups (5, 130) as
+          # controls plus a tighter spread of nearby low integers.
+          GROUP_ID_CANDIDATES = [5, 130, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 15, 20]
+
+          # SeriesId guesses -- only the ones NOT yet tried in round 2, to avoid
+          # burning calls on confirmed-204 candidates again.
           SERIES_ID_CANDIDATES = [
-              "SWESTR",
-              "SESWESTR",
-              "SESTR",
-              "SEDPSWESTR",
-              "SEDPTNSWESTR",
-              "SEDPT/NSWESTR",
-              "SESTIBORTN",
+              "SEDPT_NSWESTR",   # slash caused a path issue last time; try underscore
+              "SETNSWESTR",
+              "RBSWESTR",
               "SWESTRAVG",
               "SWESTR1W",
               "SEDPSTIBORTN",
-              "SETNSWESTR",
-              "RBSWESTR",
+              "SESTIBORTN",
           ]
 
-          # ── GroupId sweep: find the group that holds SWESTR / Riksbank rates ─────
-          # We know 5 = STIBOR, 130 = FX vs SEK. Sweep a wider range of small
-          # integers since groups are a flat enumerated list and SWESTR/Riksbank
-          # rates are core series likely living in a low group number too.
-          GROUP_ID_CANDIDATES = list(range(1, 21))
+
+          def parse_retry_seconds(body_text):
+              m = re.search(r"Try again in (\d+) second", body_text or "")
+              if m:
+                  return min(int(m.group(1)) + 2, MAX_RETRY_WAIT)
+              return None
 
 
-          def get_json(url):
-              try:
-                  resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
-                  ct = resp.headers.get("content-type", "")
-                  body_snippet = resp.text[:200]
-                  parsed = None
-                  if resp.status_code == 200:
-                      try:
-                          parsed = resp.json()
-                      except (json.JSONDecodeError, ValueError):
-                          pass
-                  return {
-                      "url": url,
-                      "status": resp.status_code,
-                      "content_type": ct,
-                      "body_snippet": body_snippet,
-                      "parsed": parsed,
-                  }
-              except requests.exceptions.RequestException as exc:
-                  return {"url": url, "status": None, "error": "%s: %s" % (type(exc).__name__, exc)}
+          def get_json(url, max_retries=1):
+              attempt = 0
+              while True:
+                  attempt += 1
+                  try:
+                      resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+                      ct = resp.headers.get("content-type", "")
+                      body_snippet = resp.text[:200]
+                      parsed = None
+                      if resp.status_code == 200:
+                          try:
+                              parsed = resp.json()
+                          except (json.JSONDecodeError, ValueError):
+                              pass
+
+                      if resp.status_code == 429 and attempt <= max_retries:
+                          wait = parse_retry_seconds(resp.text) or MAX_RETRY_WAIT
+                          print("    (429 received, waiting %ds before retry...)" % wait)
+                          time.sleep(wait)
+                          continue
+
+                      return {
+                          "url": url,
+                          "status": resp.status_code,
+                          "content_type": ct,
+                          "body_snippet": body_snippet,
+                          "parsed": parsed,
+                      }
+                  except requests.exceptions.RequestException as exc:
+                      return {"url": url, "status": None, "error": "%s: %s" % (type(exc).__name__, exc)}
 
 
           def main():
               print("=" * 78)
-              print("RIKSBANK SWESTR SERIES-ID PROBE — round 2 (diagnostic)")
+              print("RIKSBANK SWESTR PROBE — round 3 (rate-limit aware)")
               print("Run date: %s" % today_str)
+              print("Delay between calls: %ds" % DELAY_BETWEEN_CALLS)
               print("=" * 78)
 
-              all_results = {"series_id_sweep": [], "group_id_sweep": []}
-
-              print("\n--- PART 1: seriesId guesses on confirmed-working path ---")
-              print("    GET https://api.riksbank.se/swea/v1/Observations/Latest/{seriesId}\n")
-
+              all_results = {"group_id_sweep": [], "series_id_sweep": []}
+              group_hits = []
               found_series = []
-              for sid in SERIES_ID_CANDIDATES:
-                  url = "https://api.riksbank.se/swea/v1/Observations/Latest/" + sid
-                  r = get_json(url)
-                  entry = {"seriesId": sid}
-                  entry.update(r)
-                  all_results["series_id_sweep"].append(entry)
-                  status = r.get("status")
-                  if status == 200 and r.get("parsed"):
-                      marker = "FOUND"
-                      found_series.append(sid)
-                  elif status == 204:
-                      marker = "valid path, no data (wrong id)"
-                  elif status == 404:
-                      marker = "404"
-                  else:
-                      marker = "status=%r" % (status,)
-                  detail = r.get("body_snippet") or r.get("error") or ""
-                  print("  [%-20s] %-35s -> %s" % (sid, marker, detail[:80]))
 
-              print("\n--- PART 2: GroupId sweep (1-20) via ByGroup listing ---")
+              print("\n--- PART 1: GroupId sweep (most request-efficient) ---")
               print("    GET https://api.riksbank.se/swea/v1/Observations/Latest/ByGroup/{groupId}\n")
 
-              group_hits = []
-              for gid in GROUP_ID_CANDIDATES:
+              for i, gid in enumerate(GROUP_ID_CANDIDATES):
+                  if i > 0:
+                      time.sleep(DELAY_BETWEEN_CALLS)
+
                   url = "https://api.riksbank.se/swea/v1/Observations/Latest/ByGroup/%d" % gid
-                  r = get_json(url)
+                  r = get_json(url, max_retries=1)
                   status = r.get("status")
                   parsed = r.get("parsed")
                   series_ids_in_group = []
@@ -153,42 +161,76 @@ jobs:
                       "seriesIds": series_ids_in_group,
                   })
 
-                  has_swestr_like = []
-                  for s in series_ids_in_group:
-                      if s and "SWESTR" in s.upper():
-                          has_swestr_like.append(s)
-
+                  has_swestr_like = [s for s in series_ids_in_group if s and "SWESTR" in s.upper()]
                   if has_swestr_like:
                       group_hits.append((gid, has_swestr_like))
-                      marker = "SWESTR-LIKE SERIES FOUND: %s" % (has_swestr_like,)
+                      marker = "*** SWESTR-LIKE SERIES FOUND: %s ***" % (has_swestr_like,)
                   elif status == 200:
-                      marker = "%d series (sample: %s)" % (len(series_ids_in_group), series_ids_in_group[:4])
+                      marker = "%d series (sample: %s)" % (len(series_ids_in_group), series_ids_in_group[:5])
                   elif status == 204:
                       marker = "valid groupId, empty"
                   elif status == 404:
                       marker = "no such group"
+                  elif status == 429:
+                      marker = "still rate-limited after retry"
                   else:
-                      marker = "status=%r" % (status,)
+                      marker = "status=%r error=%s" % (status, r.get("error"))
                   print("  [group %3d] %s" % (gid, marker))
+
+                  if has_swestr_like:
+                      print("\n  >>> Found it early, stopping GroupId sweep to save calls. <<<")
+                      break
+
+              if not group_hits:
+                  print("\n--- PART 2: targeted seriesId guesses (only if Part 1 found nothing) ---")
+                  print("    GET https://api.riksbank.se/swea/v1/Observations/Latest/{seriesId}\n")
+
+                  for i, sid in enumerate(SERIES_ID_CANDIDATES):
+                      time.sleep(DELAY_BETWEEN_CALLS)
+                      url = "https://api.riksbank.se/swea/v1/Observations/Latest/" + sid
+                      r = get_json(url, max_retries=1)
+                      entry = {"seriesId": sid}
+                      entry.update(r)
+                      all_results["series_id_sweep"].append(entry)
+                      status = r.get("status")
+                      if status == 200 and r.get("parsed"):
+                          marker = "FOUND"
+                          found_series.append(sid)
+                      elif status == 204:
+                          marker = "valid path, no data (wrong id)"
+                      elif status == 404:
+                          marker = "404"
+                      elif status == 429:
+                          marker = "still rate-limited after retry"
+                      else:
+                          marker = "status=%r" % (status,)
+                      detail = r.get("body_snippet") or r.get("error") or ""
+                      print("  [%-20s] %-35s -> %s" % (sid, marker, detail[:80]))
+              else:
+                  print("\n(Skipping Part 2 -- already found a SWESTR-like series in Part 1.)")
 
               print("\n" + "=" * 78)
               print("SUMMARY")
               print("=" * 78)
-              if found_series:
-                  print("Working SWESTR seriesId(s): %s" % (found_series,))
-              else:
-                  print("No seriesId guess in Part 1 returned data.")
-
               if group_hits:
                   print("Group(s) containing a SWESTR-like series: %s" % (group_hits,))
+                  for gid, series in group_hits:
+                      print("  -> Use: https://api.riksbank.se/swea/v1/Observations/Latest/%s" % series[0])
               else:
-                  print("No group in range 1-20 contains a series with 'SWESTR' in its id.")
-                  print("Consider widening the GroupId range or checking riksbank.se's")
-                  print("own 'Search SWESTR data' page network tab for the literal seriesId.")
+                  print("No group in the swept range contains a series with 'SWESTR' in its id.")
 
-              with open("riksbank_probe_v2_results.json", "w", encoding="utf-8") as f:
+              if found_series:
+                  print("Working SWESTR seriesId(s) from Part 2: %s" % (found_series,))
+              elif not group_hits:
+                  print("No seriesId guess in Part 2 returned data either.")
+                  print("Next step: capture the literal seriesId from riksbank.se's own")
+                  print("'Search SWESTR data' page network tab (browser devtools), since")
+                  print("guessing within the swea/v1 namespace has been exhausted for the")
+                  print("most plausible candidates.")
+
+              with open("riksbank_probe_v3_results.json", "w", encoding="utf-8") as f:
                   json.dump(all_results, f, indent=2, ensure_ascii=False)
-              print("\nFull results: riksbank_probe_v2_results.json")
+              print("\nFull results: riksbank_probe_v3_results.json")
 
 
           if __name__ == "__main__":
@@ -200,6 +242,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: riksbank-probe-v2-results
-          path: riksbank_probe_v2_results.json
+          name: riksbank-probe-v3-results
+          path: riksbank_probe_v3_results.json
           if-no-files-found: warn
