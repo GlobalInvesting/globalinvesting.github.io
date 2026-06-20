@@ -57,6 +57,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD · NOK · SEK — the ten G
 |------|-------------|
 | `index.html` | Main FX Terminal dashboard |
 | `about.html` | Product overview |
+| `access.html` | Platform access — MT5 EA + web terminal subscription |
 | `contact.html` | Contact information |
 | `terms.html` | Terms of use |
 | `privacy.html` | Privacy policy |
@@ -66,6 +67,9 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD · NOK · SEK — the ten G
 | `guide-market-sentiment.html` | Market sentiment guide |
 | `guide-fx-liquidity.html` | FX liquidity & sessions guide |
 | `guide-cot.html` | COT / CFTC positioning guide |
+| `guide-economic-surprises.html` | Economic Surprise Index guide |
+| `guide-gbpjpy-cot.html` | GBP/JPY bias factors (market research) |
+| `guide-mt5-ea.html` | MetaTrader 5 Expert Advisor setup & feature guide (market research) |
 
 ---
 
