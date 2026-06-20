@@ -1,0 +1,268 @@
+name: Probe Riksbank SWESTR endpoints (diagnostic)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Run SWESTR endpoint probe
+        run: |
+          python3 << 'EOFPYTHON'
+          #!/usr/bin/env python3
+          """
+          fetch_bias_sek_test.py — Riksbank SWESTR/TORA endpoint probe (diagnostic only)
+
+          PURPOSE
+          -------
+          This is NOT meant to be wired into workflow_meetings.yml as-is. It's a
+          standalone diagnostic to run inside a GitHub Actions job (or any host with
+          unrestricted outbound HTTPS) to find the real, working endpoint + series
+          name for SWESTR, since:
+
+            1. The Riksbank API portal (developer.api.riksbank.se) is a JS SPA —
+               its endpoint docs don't render via static fetch, so the exact path
+               can't be confirmed from a sandboxed fetch tool.
+            2. The known-working SWEA API (https://api.riksbank.se/swea/v1/...,
+               confirmed working with NO key, just IP rate-limiting) covers STIBOR
+               and FX rates but NOT SWESTR as a series.
+            3. SWESTR has its own documented REST API, separate from SWEA, also
+               confirmed (per riksbank.se) to be usable "free of charge" with only
+               IP-based rate limiting — no registration required for light use.
+               The likely namespace is /tora/v1/... by analogy with /swea/v1/...,
+               but the exact path segments and series identifier are unconfirmed.
+
+          This script tries a spread of plausible candidates and reports which ones
+          return HTTP 200 + parseable JSON, so we can hardcode the *verified* one
+          into fetch_bias_sek() in workflow_meetings.yml afterward — never guessing
+          in the production workflow itself.
+
+          USAGE
+          -----
+              pip install requests --break-system-packages
+              python3 fetch_bias_sek_test.py
+
+          Run this from a GH Actions step (ubuntu-latest runner) or any machine
+          with normal internet access — NOT from a sandboxed/proxied environment,
+          since riksbank.se / api.riksbank.se are not on most sandbox allowlists.
+
+          OUTPUT
+          ------
+          For each candidate URL: HTTP status, content-type, and first ~300 chars
+          of the response body (truncated). A 200 with JSON containing a numeric
+          "value" or list of observations is what we're looking for.
+
+          Per GUIDELINES.md ("do not invent conventions"): this script invents
+          NOTHING in production — it only reports what each endpoint actually
+          returns, so the engine code change that follows can cite a verified URL.
+          """
+
+          import json
+          import sys
+          from datetime import date, timedelta
+
+          import requests
+
+          TIMEOUT = 15
+          HEADERS = {
+              "User-Agent": "GlobalInvestingFXTerminal/diagnostic (riksbank-swestr-probe)"
+          }
+
+          today = date.today()
+          today_str = today.isoformat()
+          week_ago_str = (today - timedelta(days=10)).isoformat()
+
+          # ── Candidate endpoints ──────────────────────────────────────────────────
+          # Grouped by hypothesis. We already KNOW the swea/v1 pattern works (no key),
+          # so most candidates follow that exact shape under a different namespace.
+
+          CANDIDATES = [
+              # ── Hypothesis A: /tora/v1/ namespace, mirroring swea/v1/ shape ──────
+              ("tora_latest_swestr",
+               "https://api.riksbank.se/tora/v1/Observations/Latest/SWESTR"),
+              ("tora_latest_swestr_lower",
+               "https://api.riksbank.se/tora/v1/Observations/Latest/swestr"),
+              ("tora_v1_swestr_latest_alt",
+               "https://api.riksbank.se/tora/v1/swestr/latest"),
+              ("tora_v1_swestr_root",
+               "https://api.riksbank.se/tora/v1/swestr"),
+
+              # ── Hypothesis B: a dedicated /swestr/ namespace (not tora, not swea) ─
+              ("swestr_ns_latest",
+               "https://api.riksbank.se/swestr/v1/Observations/Latest/SWESTR"),
+              ("swestr_ns_root",
+               "https://api.riksbank.se/swestr/v1/Latest"),
+
+              # ── Hypothesis C: SWESTR exposed as a series under swea/v1 after all ──
+              # (worth re-checking explicitly even though FAQ docs didn't list it
+              # under GroupId 130/5 — Riksbank may have added it post-2023 launch)
+              ("swea_latest_swestr_upper",
+               "https://api.riksbank.se/swea/v1/Observations/Latest/SWESTR"),
+              ("swea_latest_swestr_lower",
+               "https://api.riksbank.se/swea/v1/Observations/Latest/swestr"),
+
+              # ── Hypothesis D: TORA average-rates / index sub-resource ────────────
+              # (SWESTR average rates & index are a documented separate product)
+              ("tora_avg_rates_latest",
+               "https://api.riksbank.se/tora/v1/AverageRates/Latest"),
+              ("tora_index_latest",
+               "https://api.riksbank.se/tora/v1/Index/Latest"),
+
+              # ── Reference / control: known-GOOD swea endpoints (sanity check) ────
+              # If these fail too, the problem is network access, not our hypothesis.
+              ("CONTROL_swea_seknokpmi",
+               "https://api.riksbank.se/swea/v1/Observations/Latest/seknokpmi"),
+              ("CONTROL_swea_group130",
+               "https://api.riksbank.se/swea/v1/Observations/Latest/ByGroup/130"),
+          ]
+
+
+          def probe(name: str, url: str) -> dict:
+              result = {"name": name, "url": url, "ok": False}
+              try:
+                  resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+                  result["status"] = resp.status_code
+                  result["content_type"] = resp.headers.get("content-type", "")
+                  body = resp.text
+                  result["body_snippet"] = body[:300]
+
+                  if resp.status_code == 200:
+                      try:
+                          parsed = resp.json()
+                          result["ok"] = True
+                          result["parsed_type"] = type(parsed).__name__
+                          if isinstance(parsed, dict):
+                              result["keys"] = list(parsed.keys())
+                          elif isinstance(parsed, list) and parsed:
+                              result["list_len"] = len(parsed)
+                              result["first_item_keys"] = (
+                                  list(parsed[0].keys())
+                                  if isinstance(parsed[0], dict) else None
+                              )
+                      except (json.JSONDecodeError, ValueError):
+                          result["ok"] = False
+                          result["parse_error"] = "response was 200 but not valid JSON"
+              except requests.exceptions.RequestException as exc:
+                  result["status"] = None
+                  result["error"] = f"{type(exc).__name__}: {exc}"
+              return result
+
+
+          def probe_date_range(name: str, base_url_template: str) -> dict:
+              """For endpoints that need a date range, try a recent 10-day window."""
+              url = base_url_template.format(date_from=week_ago_str, date_to=today_str)
+              return probe(name, url)
+
+
+          def main() -> None:
+              print("=" * 78)
+              print("RIKSBANK SWESTR/TORA ENDPOINT PROBE — diagnostic, not production")
+              print(f"Run date: {today_str}")
+              print("=" * 78)
+
+              results = []
+              for name, url in CANDIDATES:
+                  r = probe(name, url)
+                  results.append(r)
+                  status = r.get("status")
+                  marker = "✅ OK " if r["ok"] else ("❌ FAIL" if status else "⚠️  ERR ")
+                  print(f"\n{marker} [{name}]")
+                  print(f"    URL:    {url}")
+                  print(f"    Status: {status}")
+                  if r.get("error"):
+                      print(f"    Error:  {r['error']}")
+                  if r.get("content_type"):
+                      print(f"    CT:     {r['content_type']}")
+                  if r.get("parse_error"):
+                      print(f"    Note:   {r['parse_error']}")
+                  if r["ok"]:
+                      print(f"    Parsed: {r.get('parsed_type')}", end="")
+                      if "keys" in r:
+                          print(f"  keys={r['keys']}")
+                      elif "list_len" in r:
+                          print(f"  len={r['list_len']}  first_item_keys={r.get('first_item_keys')}")
+                      else:
+                          print()
+                  snippet = r.get("body_snippet", "").replace("\n", " ")
+                  if snippet:
+                      print(f"    Body:   {snippet[:200]}{'...' if len(snippet) > 200 else ''}")
+
+              # ── Also try a couple of date-ranged variants on the most likely path ─
+              print("\n" + "=" * 78)
+              print("DATE-RANGED VARIANTS (Observations/{from}/{to} pattern)")
+              print("=" * 78)
+              ranged_candidates = [
+                  ("tora_ranged_swestr",
+                   "https://api.riksbank.se/tora/v1/Observations/SWESTR/{date_from}/{date_to}"),
+                  ("swea_ranged_swestr_control",
+                   "https://api.riksbank.se/swea/v1/Observations/SWESTR/{date_from}/{date_to}"),
+              ]
+              for name, tmpl in ranged_candidates:
+                  r = probe_date_range(name, tmpl)
+                  results.append(r)
+                  status = r.get("status")
+                  marker = "✅ OK " if r["ok"] else ("❌ FAIL" if status else "⚠️  ERR ")
+                  print(f"\n{marker} [{name}]")
+                  print(f"    URL:    {tmpl.format(date_from=week_ago_str, date_to=today_str)}")
+                  print(f"    Status: {status}")
+                  if r.get("error"):
+                      print(f"    Error:  {r['error']}")
+                  snippet = r.get("body_snippet", "").replace("\n", " ")
+                  if snippet:
+                      print(f"    Body:   {snippet[:200]}{'...' if len(snippet) > 200 else ''}")
+
+              # ── Summary ────────────────────────────────────────────────────────
+              print("\n" + "=" * 78)
+              print("SUMMARY")
+              print("=" * 78)
+              working = [r for r in results if r["ok"]]
+              controls = [r for r in results if r["name"].startswith("CONTROL_")]
+
+              control_ok = all(r["ok"] for r in controls) if controls else None
+              if control_ok is False:
+                  print("⚠️  CONTROL endpoints (known-good swea/v1) FAILED too.")
+                  print("    This means the runner has no path to api.riksbank.se at all —")
+                  print("    treat all results above as inconclusive, not as 'SWESTR has no API'.")
+              elif control_ok is True:
+                  print("✅ Control endpoints OK — runner has working access to api.riksbank.se.")
+
+              if working:
+                  print(f"\n{len(working)} candidate(s) returned valid JSON:")
+                  for r in working:
+                      if r["name"].startswith("CONTROL_"):
+                          continue
+                      print(f"  - {r['name']}: {r['url']}")
+                  if len(working) == len(controls):
+                      print("\n  (Only the CONTROL endpoints worked — no SWESTR candidate succeeded.")
+                      print("   Next step: pull the network tab on riksbank.se's own 'Search SWESTR")
+                      print("   data' page to capture the exact XHR URL it calls.)")
+              else:
+                  print("\nNo candidates returned valid JSON. See errors above.")
+
+              print("\nRaw JSON results dumped to: riksbank_probe_results.json")
+              with open("riksbank_probe_results.json", "w", encoding="utf-8") as f:
+                  json.dump(results, f, indent=2, ensure_ascii=False)
+
+
+          if __name__ == "__main__":
+              main()
+
+          EOFPYTHON
+
+      - name: Upload raw results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riksbank-probe-results
+          path: riksbank_probe_results.json
+          if-no-files-found: warn
