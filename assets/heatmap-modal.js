@@ -1227,7 +1227,7 @@
     // Header row
     const headerCells = `<th class="row-head" scope="col" title="Row − Column = strength differential. Positive = row currency outperforms column currency today.">Δ Strength (row − col)</th>` +
       ccys.map(c => `<th scope="col"${c === ccy ? ' class="focal"' : ''}>${c}</th>`).join('') +
-      `<th scope="col" class="focal" title="Equal-weighted composite — avg % vs all 7 major currency peers">Comp.</th>`;
+      `<th scope="col" class="focal" title="Equal-weighted composite — avg % vs all ${ccys.length - 1} major currency peers">Comp.</th>`;
 
     // Data rows
     const bodyRows = ccys.map(rowCcy => {
