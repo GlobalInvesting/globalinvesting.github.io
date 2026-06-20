@@ -1542,16 +1542,16 @@ def fetch_yfinance_all(symbols_map):
                     #   Fri (4) → 4−4 mod 7 = 0 → today (this Friday)       ✓ (current week)
                     #   Sat (5) → 5−4 mod 7 = 1 → yesterday (this Friday)   ✓
                     #   Sun (6) → 6−4 mod 7 = 2 → two days ago (this Friday) ✓
-                    # days_back == 0 only when wb == 4 (Friday).  On any Friday we want
-                    # the PRIOR week's Friday (7 days back), not today's close (which
-                    # would give pct1w ≈ 0 all day Friday).  Remove the erroneous wb < 4
-                    # guard — it incorrectly excluded Friday from the +7 adjustment.
-                    _wb = today_utc.weekday()  # Mon=0, Tue=1, …, Sat=5, Sun=6
-                    _days_back = (_wb - 4) % 7
-                    if _days_back == 0:
-                        # Today IS Friday — 1W compares vs prior week's Friday (7d ago)
-                        _days_back = 7
-                    reference_friday = today_utc - timedelta(days=_days_back)
+                    # ISO-week anchor (v3.4 fix): prior_friday = current_week_monday − 3d.
+                    # current_week_monday = today − weekday() for all 7 days:
+                    #   Mon(0) → today−0=Mon; Mon−3=prior Fri  ✓
+                    #   Fri(4) → today−4=Mon; Mon−3=prior Fri  ✓ (not today's Fri)
+                    #   Sat(5) → today−5=Mon; Mon−3=prior Fri  ✓ (not yesterday's Fri)
+                    #   Sun(6) → today−6=Mon; Mon−3=prior Fri  ✓
+                    # Bug in v3.3: (_wb−4)%7 found "most recent Friday" which on
+                    # Sat returned yesterday (this week's close), giving pct1w≈0%.
+                    _current_week_monday = today_utc - timedelta(days=today_utc.weekday())
+                    reference_friday = _current_week_monday - timedelta(days=3)
 
                     # Step 3: look up reference_friday in history
                     # Build a date→index map for O(1) lookup
