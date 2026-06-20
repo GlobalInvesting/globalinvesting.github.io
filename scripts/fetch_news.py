@@ -1,7 +1,34 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.19
+fetch_news.py — v5.20
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.20 (sobre v5.19):
+  G10 SCANDI ROLLOUT — NOK/SEK NEWS COVERAGE:
+    · 3 official CB RSS feeds added: Norges Bank Speeches (covers rate-decision press
+      conference statements + pure speeches, forced NOK), Riksbank press-releases and
+      Riksbank speeches (forced SEK).
+    · Evaluated and rejected: Norges Bank Monetary Policy Report and Financial Stability
+      Report feeds — both publish empty <description/> on every item, which
+      is_calendar_entry()/has_real_content() would always reject (MIN_DESCRIPTION_WORDS=12,
+      not bypassed by forced_currency). Wiring a feed that structurally never produces a
+      visible article adds nothing.
+    · SOURCE_CURRENCY / FOREX_SOURCES: "Norges Bank" → NOK, "Riksbank" → SEK.
+    · NON_G8_CB_RE renamed NON_G10_CB_RE; removed "norwegian krone|riksbank|norges bank"
+      from its exclusion pattern — this was a pre-G10-rollout leftover that was actively
+      blocking any NOK/SEK article (even from RSS/NewsData sources unrelated to the new
+      official feeds) by misclassifying Norges Bank/Riksbank as a non-covered central bank.
+    · CURRENCY_KEYWORDS_WEIGHTED: added "NOK" and "SEK" keys (previously absent entirely —
+      general-source articles mentioning Norway/Sweden could never accumulate a NOK/SEK
+      score). Same weighting pattern as CHF/NZD: bank name + governor surname at 10,
+      currency name at 8, country macro releases at 5, bare country name at 1.
+    · FOREX_RELEVANCE_KW: added norges bank/riksbank/norwegian krone/swedish krona/nok/sek.
+    · HIGH_IMPACT_KW: added governor surnames "wolden bache"/"thedéen" for impact detection,
+      consistent with existing orr/bullock/schlegel/ueda entries.
+    · NEWSDATA_QUERIES/NEWSDATA_REQUIRED_TERMS deliberately NOT extended to NOK/SEK — see
+      quota note above NEWSDATA_QUERIES. Full-mode NewsData usage is already at 192/200
+      credits/day (96%); adding 2 currencies would push it to 240/day and degrade coverage
+      for all 10, not just the 2 new ones. RSS + keyword detection cover NOK/SEK instead.
 
 CAMBIOS v5.19 (sobre v5.18):
   SNB STATISTICAL DATA HALLUCINATION FIX:
@@ -326,11 +353,13 @@ EQUITY_INDEX_TITLE_RE = re.compile(
     re.IGNORECASE,
 )
 
-# v5.14: filter articles whose primary subject is a non-G8 central bank.
+# v5.14: filter articles whose primary subject is a non-G10 central bank.
 # These articles pass is_forex_relevant() because they contain "central bank",
 # "interest rate", "inflation" etc., but they are about the Indian RBI, Qatar QCB,
-# Indonesia BI, etc. — not the 8 currencies this terminal covers.
-NON_G8_CB_RE = re.compile(
+# Indonesia BI, etc. — not the 10 currencies this terminal covers.
+# v5.20: Norges Bank / Riksbank removed from this list — NOK/SEK are now covered
+# currencies (G10 Scandi rollout), not excluded ones.
+NON_G10_CB_RE = re.compile(
     r"\b(reserve bank of india|rbi (rate|policy|meeting|governor|hike|cut|likely|expected|decision)|"
     r"rbi monetary|bank of israel|qatar central bank|qcb|people'?s bank of china|pboc|"
     r"bank of korea|bank indonesia|bi rate|bank negara|"
@@ -338,7 +367,6 @@ NON_G8_CB_RE = re.compile(
     r"south african reserve bank|sarb|banco de mexico|banxico|"
     r"central bank of turkey|cbrt|tcmb|"
     r"central bank of russia|bank of russia|"
-    r"norwegian krone|riksbank|norges bank|"
     r"czech national bank|national bank of poland)\b",
     re.IGNORECASE,
 )
@@ -474,6 +502,27 @@ CURRENCY_KEYWORDS_WEIGHTED = {
         ("nzd/", 5), ("/nzd", 5), ("nzd ", 3), ("kiwi ", 3),
         ("new zealand", 1),
     ],
+    # v5.20: G10 Scandi rollout.
+    "NOK": [
+        ("norges bank", 10), ("wolden bache", 10), ("ida wolden bache", 10),
+        ("banco central de noruega", 10),
+        ("norwegian krone", 8), ("corona noruega", 8),
+        ("norway gdp", 5), ("norway cpi", 5), ("norway inflation", 5),
+        ("norwegian inflation", 5), ("norway pmi", 5), ("norwegian economy", 5),
+        ("norway trade", 5), ("noruega", 5),
+        ("nok/", 5), ("/nok", 5), ("nok ", 3),
+        ("norway", 1), ("norwegian", 1),
+    ],
+    "SEK": [
+        ("riksbank", 10), ("thedéen", 10), ("thedeen", 10),
+        ("banco central de suecia", 10),
+        ("swedish krona", 8), ("corona sueca", 8),
+        ("sweden gdp", 5), ("sweden cpi", 5), ("sweden inflation", 5),
+        ("swedish inflation", 5), ("sweden pmi", 5), ("swedish economy", 5),
+        ("sweden trade", 5), ("suecia", 5),
+        ("sek/", 5), ("/sek", 5), ("sek ", 3),
+        ("sweden", 1), ("swedish", 1),
+    ],
 }
 
 # ─────────────────────────────────────────────
@@ -570,6 +619,24 @@ FEEDS = [
     { "source": "SNB",              "url": "https://www.snb.ch/en/snb/medmit/medienmitteilungen/id/rss",       "lang": "en" },
     { "source": "Bank of Japan",    "url": "https://www.boj.or.jp/en/about/press/index.htm/rss.xml",           "lang": "en" },
 
+    # ── INGLÉS — bancos centrales oficiales añadidos (v5.20, G10 Scandi) ─────
+    # Norges Bank Speeches: incluye las introductory statements de Governor Ida Wolden
+    # Bache en las press conferences de cada rate decision, además de discursos puros —
+    # equivalente en función a "ForexLive centralbank" para NOK. Verificado con contenido
+    # real (no vacío): cada item trae description sustantiva, pasa has_real_content().
+    # Forzado a NOK. Otros feeds oficiales de Norges Bank evaluados y descartados:
+    # Monetary Policy Report / Financial Stability Report publican <description/> vacía
+    # en cada item → is_calendar_entry()/has_real_content() los descartarían siempre
+    # (MIN_DESCRIPTION_WORDS=12, no bypasseado por forced_currency). No cablear fuentes
+    # que estructuralmente nunca producen un artículo visible.
+    { "source": "Norges Bank",      "url": "https://www.norges-bank.no/en/rss-feeds/Speeches---Norges-Bank/", "lang": "en" },
+    # Riksbank press releases: decisiones de tasa, minutes, financial stability — la fuente
+    # primaria de mayor señal para SEK. Forzado a SEK.
+    { "source": "Riksbank",         "url": "https://www.riksbank.se/en-gb/rss/press-releases/",                "lang": "en" },
+    # Riksbank speeches: discursos del Governor Thedéen y Deputy Governors — equivalente
+    # a Bank of England speeches / SNB speeches en función. Forzado a SEK.
+    { "source": "Riksbank",         "url": "https://www.riksbank.se/en-gb/rss/speeches/",                      "lang": "en" },
+
     # ── INGLÉS — bancos centrales oficiales añadidos (v5.9) ──────────────────
     # Federal Reserve: fuente primaria oficial (speeches + monetary policy press releases)
     # Forzado a USD — cualquier comunicado de la Fed es directamente relevante para USD.
@@ -665,6 +732,14 @@ NEWSDATA_API_KEY_ENV  = "NEWSDATA_API_KEY"
 NEWSDATA_MAX_RESULTS  = 5                    # por query (plan free: max 10)
 NEWSDATA_BASE_URL     = "https://newsdata.io/api/1/news"
 
+# v5.20: NOK/SEK deliberately NOT added here. Free-tier quota is already near its
+# ceiling — 8 currencies × 24 hourly full-mode runs/day = 192/200 credits (96%).
+# Adding 2 more currencies would push usage to 240/day, exceeding the limit and
+# degrading NewsData coverage for all 10 currencies, not just the 2 new ones.
+# NOK/SEK news coverage instead comes from: the official RSS feeds added below
+# (Norges Bank Speeches, Riksbank press-releases/speeches), and general-source
+# keyword detection now that CURRENCY_KEYWORDS_WEIGHTED/FOREX_RELEVANCE_KW/
+# NON_G10_CB_RE all recognize NOK/SEK. Revisit only if the NewsData plan is upgraded.
 NEWSDATA_QUERIES = {
     # v5.15: queries relaxed back to single-term OR (multi-word quoted phrases like
     # "RBA rate" / "Bullock rate" / "MPC sterling" caused 0 results for AUD/CAD/CHF
@@ -737,7 +812,7 @@ HIGH_IMPACT_KW = [
     "military strike", "ataque militar", "sanctions", "sanciones",
     "statement on monetary policy", "minutes of", "board decision",
     "official cash rate", "cash rate target", "policy rate",
-    "orr", "bullock", "schlegel", "ueda",
+    "orr", "bullock", "schlegel", "ueda", "wolden bache", "thedéen", "thedeen",
 ]
 
 MED_IMPACT_KW = [
@@ -790,6 +865,9 @@ SOURCE_CURRENCY = {
     "NewsData NZD": "NZD",
     # v5.9: new CB feeds — force-assign currency
     "Bank of Canada": "CAD",
+    # v5.20: G10 Scandi — force-assign currency
+    "Norges Bank": "NOK",
+    "Riksbank":     "SEK",
     # Google News — divisa ya asignada en fetch function, fallback defensivo (mirrors NewsData pattern)
     "Google News USD": "USD",
     "Google News EUR": "EUR",
@@ -810,6 +888,7 @@ FOREX_SOURCES = {
     "MarketPulse", "Reuters FX", "Reuters Markets", "Nasdaq FX", "FX Empire",
     "Barchart", "Marc to Market", "FX Markets",
     "Bundesbank",   # v5.17
+    "Norges Bank", "Riksbank",   # v5.20
     # v5.7: NewsData API
     "NewsData USD", "NewsData EUR", "NewsData GBP", "NewsData JPY",
     "NewsData AUD", "NewsData CAD", "NewsData CHF", "NewsData NZD",
@@ -849,10 +928,10 @@ def is_forex_relevant(title: str, summary: str) -> bool:
     if EMERGING_MARKET_TITLE_RE.search(title):
         return False
 
-    # v5.14: filter articles whose primary subject is a non-G8 central bank.
+    # v5.14: filter articles whose primary subject is a non-G10 central bank.
     # These pass the keyword check below because they contain "central bank"/"interest rate"
-    # but cover the Indian RBI, Qatar QCB, Indonesia BI, etc. — not G8 FX drivers.
-    if NON_G8_CB_RE.search(title + " " + summary[:150]):
+    # but cover the Indian RBI, Qatar QCB, Indonesia BI, etc. — not G10 FX drivers.
+    if NON_G10_CB_RE.search(title + " " + summary[:150]):
         return False
 
     if CRYPTO_NOISE_RE.search(title):
@@ -873,6 +952,8 @@ def is_forex_relevant(title: str, summary: str) -> bool:
         "tariff", "arancel", "oil", "petróleo",
         "official cash rate", "cash rate", "policy rate", "rbnz", "rba",
         "reserve bank", "swiss national", "snb",
+        "norges bank", "riksbank", "norwegian krone", "swedish krona",
+        " nok", "nok/", "/nok", " sek", "sek/", "/sek",
     ]
     text = (title + " " + summary).lower()
     return any(kw in text for kw in FOREX_RELEVANCE_KW)
@@ -1095,8 +1176,9 @@ def fetch_newsdata(api_key: str, now_utc: datetime) -> list:
                 # must appear in title+summary. Blocks articles that match the query
                 # loosely (e.g. India RBI tagged EUR, ASEAN-6 tagged JPY, Hormuz
                 # tagged GBP) without making queries so narrow that AUD/CAD/CHF
-                # return 0 results. NON_G8_CB_RE is the first filter; this is the
+                # return 0 results. NON_G10_CB_RE is the first filter; this is the
                 # second — a positive requirement that the G8 currency is actually named.
+                # (NewsData stays G8-only — see v5.20 quota note above NEWSDATA_QUERIES.)
                 required = NEWSDATA_REQUIRED_TERMS.get(cur, [])
                 text_lc = (title + " " + summary[:600]).lower()
                 if required and not any(term in text_lc for term in required):
