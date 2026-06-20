@@ -26,7 +26,7 @@ jobs:
           CONTEXT FROM ROUND 1
           ---------------------
           Round 1 confirmed the working PATH pattern:
-              https://api.riksbank.se/swea/v1/Observations/Latest/{{seriesId}}
+              https://api.riksbank.se/swea/v1/Observations/Latest/{seriesId}
           returns 200 + JSON for known series (e.g. seknokpmi), and crucially
           returned 204 (not 404) for "SWESTR" and "swestr" -- meaning the *path*
           is valid but "SWESTR" is not the right seriesId string. A 204 is very
@@ -45,12 +45,12 @@ jobs:
           """
 
           import json
-          from datetime import date, timedelta
+          from datetime import date
 
           import requests
 
           TIMEOUT = 15
-          HEADERS = {{"User-Agent": "GlobalInvestingFXTerminal/diagnostic-v2 (riksbank-swestr-probe)"}}
+          HEADERS = {"User-Agent": "GlobalInvestingFXTerminal/diagnostic-v2 (riksbank-swestr-probe)"}
 
           today = date.today()
           today_str = today.isoformat()
@@ -89,91 +89,102 @@ jobs:
                           parsed = resp.json()
                       except (json.JSONDecodeError, ValueError):
                           pass
-                  return {{
+                  return {
                       "url": url,
                       "status": resp.status_code,
                       "content_type": ct,
                       "body_snippet": body_snippet,
                       "parsed": parsed,
-                  }}
+                  }
               except requests.exceptions.RequestException as exc:
-                  return {{"url": url, "status": None, "error": f"{{type(exc).__name__}}: {{exc}}"}}
+                  return {"url": url, "status": None, "error": "%s: %s" % (type(exc).__name__, exc)}
 
 
           def main():
               print("=" * 78)
               print("RIKSBANK SWESTR SERIES-ID PROBE — round 2 (diagnostic)")
-              print(f"Run date: {{today_str}}")
+              print("Run date: %s" % today_str)
               print("=" * 78)
 
-              all_results = {{"series_id_sweep": [], "group_id_sweep": []}}
+              all_results = {"series_id_sweep": [], "group_id_sweep": []}
 
               print("\n--- PART 1: seriesId guesses on confirmed-working path ---")
-              print("    GET https://api.riksbank.se/swea/v1/Observations/Latest/{{seriesId}}\n")
+              print("    GET https://api.riksbank.se/swea/v1/Observations/Latest/{seriesId}\n")
 
               found_series = []
               for sid in SERIES_ID_CANDIDATES:
-                  url = f"https://api.riksbank.se/swea/v1/Observations/Latest/{{sid}}"
+                  url = "https://api.riksbank.se/swea/v1/Observations/Latest/" + sid
                   r = get_json(url)
-                  all_results["series_id_sweep"].append({{"seriesId": sid, **r}})
+                  entry = {"seriesId": sid}
+                  entry.update(r)
+                  all_results["series_id_sweep"].append(entry)
                   status = r.get("status")
                   if status == 200 and r.get("parsed"):
-                      marker = "✅ FOUND"
+                      marker = "FOUND"
                       found_series.append(sid)
                   elif status == 204:
-                      marker = "➖ valid path, no data (wrong id)"
+                      marker = "valid path, no data (wrong id)"
                   elif status == 404:
-                      marker = "❌ 404"
+                      marker = "404"
                   else:
-                      marker = f"⚠️  {{status}}"
-                  print(f"  [{{sid:20s}}] {{marker:35s}} -> {{r.get('body_snippet', r.get('error',''))[:80]}}")
+                      marker = "status=%r" % (status,)
+                  detail = r.get("body_snippet") or r.get("error") or ""
+                  print("  [%-20s] %-35s -> %s" % (sid, marker, detail[:80]))
 
               print("\n--- PART 2: GroupId sweep (1-20) via ByGroup listing ---")
-              print("    GET https://api.riksbank.se/swea/v1/Observations/Latest/ByGroup/{{groupId}}\n")
+              print("    GET https://api.riksbank.se/swea/v1/Observations/Latest/ByGroup/{groupId}\n")
 
               group_hits = []
               for gid in GROUP_ID_CANDIDATES:
-                  url = f"https://api.riksbank.se/swea/v1/Observations/Latest/ByGroup/{{gid}}"
+                  url = "https://api.riksbank.se/swea/v1/Observations/Latest/ByGroup/%d" % gid
                   r = get_json(url)
                   status = r.get("status")
                   parsed = r.get("parsed")
                   series_ids_in_group = []
                   if status == 200 and isinstance(parsed, list):
-                      series_ids_in_group = [item.get("seriesId") for item in parsed if isinstance(item, dict)]
-                  all_results["group_id_sweep"].append({{
+                      for item in parsed:
+                          if isinstance(item, dict):
+                              series_ids_in_group.append(item.get("seriesId"))
+
+                  all_results["group_id_sweep"].append({
                       "groupId": gid,
                       "status": status,
                       "count": len(series_ids_in_group),
                       "seriesIds": series_ids_in_group,
-                  }})
-                  has_swestr_like = [s for s in series_ids_in_group if s and "SWESTR" in s.upper()]
+                  })
+
+                  has_swestr_like = []
+                  for s in series_ids_in_group:
+                      if s and "SWESTR" in s.upper():
+                          has_swestr_like.append(s)
+
                   if has_swestr_like:
                       group_hits.append((gid, has_swestr_like))
-                      marker = f"🎯 SWESTR-LIKE SERIES FOUND: {{has_swestr_like}}"
+                      marker = "SWESTR-LIKE SERIES FOUND: %s" % (has_swestr_like,)
                   elif status == 200:
-                      marker = f"{{len(series_ids_in_group)}} series (sample: {{series_ids_in_group[:4]}})"
+                      marker = "%d series (sample: %s)" % (len(series_ids_in_group), series_ids_in_group[:4])
                   elif status == 204:
                       marker = "valid groupId, empty"
                   elif status == 404:
                       marker = "no such group"
                   else:
-                      marker = f"status={{status}}"
-                  print(f"  [group {{gid:3d}}] {{marker}}")
+                      marker = "status=%r" % (status,)
+                  print("  [group %3d] %s" % (gid, marker))
 
               print("\n" + "=" * 78)
               print("SUMMARY")
               print("=" * 78)
               if found_series:
-                  print(f"✅ Working SWESTR seriesId(s): {{found_series}}")
+                  print("Working SWESTR seriesId(s): %s" % (found_series,))
               else:
-                  print("❌ No seriesId guess in Part 1 returned data.")
+                  print("No seriesId guess in Part 1 returned data.")
 
               if group_hits:
-                  print(f"🎯 Group(s) containing a SWESTR-like series: {{group_hits}}")
+                  print("Group(s) containing a SWESTR-like series: %s" % (group_hits,))
               else:
-                  print("❌ No group in range 1-20 contains a series with 'SWESTR' in its id.")
-                  print("   Consider widening the GroupId range or checking riksbank.se's")
-                  print("   own 'Search SWESTR data' page network tab for the literal seriesId.")
+                  print("No group in range 1-20 contains a series with 'SWESTR' in its id.")
+                  print("Consider widening the GroupId range or checking riksbank.se's")
+                  print("own 'Search SWESTR data' page network tab for the literal seriesId.")
 
               with open("riksbank_probe_v2_results.json", "w", encoding="utf-8") as f:
                   json.dump(all_results, f, indent=2, ensure_ascii=False)
