@@ -35,7 +35,7 @@ jobs:
         run: mkdir -p extended-data
 
       - name: Fetch inflation expectations
-        # Sources (v5.0) — methodologically consistent forward-looking cascade:
+        # Sources (v5.1) — methodologically consistent forward-looking cascade:
         #   USD: FRED T5YIE (5Y TIPS breakeven, market-implied, daily)
         #   EUR: FRED T5YIFR (EUR 5Y5Y inflation swap, market-implied, daily)
         #   GBP: BOE SDIE BEAPFF (2Y-ahead household survey, quarterly) → IMF → OECD → FRED → WB
@@ -44,11 +44,16 @@ jobs:
         #   JPY: IMF SDMX 3.0 → OECD → FRED → WB  (no liquid traded breakeven)
         #   AUD: IMF SDMX 3.0 → OECD → FRED → WB  (calendar supplements with MI survey)
         #   CHF: IMF SDMX 3.0 → OECD → FRED → WB  (no liquid traded breakeven)
+        #   NOK: IMF SDMX 3.0 → OECD → FRED → WB  (no liquid traded breakeven)
+        #   SEK: IMF SDMX 3.0 → OECD → FRED → WB  (no liquid traded breakeven)
         #
         # v5.0 upgrade: GBP/CAD/NZD now use forward-looking market-implied or survey
         # sources as primary, consistent with USD/EUR methodology. Previous v4.3
         # used backward-looking CPI YoY for all G6, creating a methodological
         # inconsistency that distorted the real-carry ranking.
+        #
+        # v5.1: NOK/SEK added (G10 Scandi rollout), following the same IMF→OECD→
+        # FRED→WB cascade as JPY/CHF — neither has a liquid inflation breakeven.
         #
         # Script: scripts/fetch_inflation_expectations.py in this repo.
         # Patches extended-data/{CCY}.json updating only:
@@ -65,7 +70,7 @@ jobs:
           echo "========================================"
           echo "   INFLATION EXPECTATIONS SUMMARY"
           echo "========================================"
-          for ccy in USD EUR GBP JPY AUD CAD CHF NZD; do
+          for ccy in USD EUR GBP JPY AUD CAD CHF NZD NOK SEK; do
             file="extended-data/${ccy}.json"
             if [ -f "$file" ]; then
               val=$(jq -r '.data.inflationExpectations // "n/a"' "$file")
@@ -85,7 +90,7 @@ jobs:
             echo "No changes to commit"
             exit 0
           fi
-          git commit -m "Inflation expectations $(date +'%Y-%m-%d') -- FRED breakevens / BOE survey / RBNZ survey / IMF SDMX"
+          git commit -m "Inflation expectations $(date +'%Y-%m-%d') -- FRED breakevens / BOE survey / RBNZ survey / IMF SDMX (G10)"
           for i in 1 2 3; do
             git push && echo "Push succeeded" && exit 0
             echo "Push rejected (attempt $i) -- rebasing..."
