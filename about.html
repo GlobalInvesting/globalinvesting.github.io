@@ -572,7 +572,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
   <div class="stat-row">
     <div class="stat-item">
-      <div class="stat-val">28<span>pairs</span></div>
+      <div class="stat-val">32<span>pairs</span></div>
       <div class="stat-label">FX pairs tracked</div>
     </div>
     <div class="stat-item">
@@ -584,15 +584,15 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <div class="stat-label">FX quote bar</div>
     </div>
     <div class="stat-item">
-      <div class="stat-val">8<span>Major</span></div>
-      <div class="stat-label">Major currencies</div>
+      <div class="stat-val">10<span>G10</span></div>
+      <div class="stat-label">Currencies covered</div>
     </div>
   </div>
 
   <div class="section">
     <h2>What it is</h2>
     <p>The FX Terminal is a single-page dashboard designed for serious FX market monitoring. It was built to address a specific gap: professional-quality FX context is fragmented across institutional terminals, broker platforms, and government data portals. This terminal aggregates the most signal-rich publicly available data into a coherent, fast, and always-accessible interface.</p>
-    <p>Coverage spans live FX price feeds across all 28 major pairs via Finnhub WebSocket (tick-by-tick during market hours), CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, rolling cross-asset correlations with full 252-day history, live central bank policy rates, OIS-derived forward rate expectations for each major central bank, an AI-generated market regime narrative updated four times daily, and news headlines refreshed every hour.</p>
+    <p>Coverage spans live FX price feeds across all 32 G10 pairs via Finnhub WebSocket (tick-by-tick during market hours), CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, rolling cross-asset correlations with full 252-day history, live central bank policy rates, OIS-derived forward rate expectations for each major central bank, an AI-generated market regime narrative updated four times daily, and news headlines refreshed every hour.</p>
     <p>The Economic Calendar renders major-economy medium- and high-impact events from Finnhub in terminal colors with local timezone conversion, auto-scrolling to the next upcoming event and displaying actual versus consensus coloring as data releases. The Economic Surprises panel provides a CESI-style (Citi Economic Surprise Index) beat/miss chart over a rolling 90-day window, upgrading to z-score normalization per series as history accumulates.</p>
     <p>The main price chart is a native LightweightCharts implementation with candlestick, line, area, and bar modes, multi-timeframe moving averages, central bank decision markers, and volume overlay — supplemented by a real-time TradingView widget. A dedicated Derivatives section consolidates implied forwards via Covered Interest Parity (CIP), the 25-delta Risk Reversal term structure, realized volatility versus RR skew, ECB official reference fixings, and DTCC GTR FX OTC notional volume.</p>
     <p style="font-size:13.2px;color:var(--text3);">Access to this terminal and the MT5 Expert Advisor is managed on the <a href="access.html" style="color:var(--blue);">Access</a> page.</p>
@@ -607,7 +607,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <tbody>
         <tr><td>Price Chart — native (candlestick / line / area)</td><td>yfinance · OHLC history (daily bars) · Finnhub WebSocket for today's live bar</td><td><span class="badge-rt">LIVE</span></td></tr>
         <tr><td>Price Chart — live widget (fallback)</td><td>TradingView — active for symbols without OHLC data</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
-        <tr><td>Quote bar — FX pairs (28 pairs)</td><td>Finnhub WebSocket via Cloudflare Worker proxy · yfinance fallback (~5 min)</td><td><span class="badge-rt">LIVE</span></td></tr>
+        <tr><td>Quote bar &amp; FX Pairs Table — FX pairs (32 pairs)</td><td>Finnhub WebSocket via Cloudflare Worker proxy · yfinance fallback (~5 min)</td><td><span class="badge-rt">LIVE</span></td></tr>
         <tr><td>Quote bar — XAU, WTI, BTC, DXY, US10Y</td><td>yfinance</td><td><span class="badge-daily">~5 MIN</span></td></tr>
         <tr><td>Currency Strength Heatmap</td><td>Finnhub WebSocket ticks · yfinance fallback (~5 min)</td><td><span class="badge-rt">LIVE</span></td></tr>
         <tr><td>Economic Calendar</td><td>Finnhub · G10 currencies · medium &amp; high impact</td><td><span class="badge-daily">~1–3 MIN</span></td></tr>
@@ -616,7 +616,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <tr><td>CB Rate Expectations</td><td>OIS/overnight rate markets — CME FedWatch (USD · SOFR futures), ECB SDW ESTER (EUR), BoE SONIA (GBP), BoJ TONA (JPY), ASX Rate Indicator (AUD), BoC CORRA (CAD), SNB SARON (CHF), RBNZ OCR overnight (NZD), Norges Bank overnight (NOK), Riksbank SWESTR (SEK)</td><td><span class="badge-weekly">WEEKLY</span></td></tr>
         <tr><td>Carry Trade Ranking (carry-to-vol)</td><td>Official central bank sources · yfinance HV30</td><td><span class="badge-daily">~30 MIN</span></td></tr>
         <tr><td>CFTC COT Positioning</td><td>CFTC.gov</td><td><span class="badge-weekly">WEEKLY</span></td></tr>
-        <tr><td>Derivatives — Implied Forwards (CIP)</td><td>OIS/overnight rate markets (SOFR, €STR, SONIA, TONA, AONIA, CORRA, SARON, OCR overnight) · Covered Interest Parity formula · not a live quoted price</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>Derivatives — Implied Forwards (CIP)</td><td>OIS/overnight rate markets (SOFR, €STR, SONIA, TONA, AONIA, CORRA, SARON, OCR overnight) for the 8 G8 majors · Norges Bank / Riksbank policy rate fallback for NOK/SEK · Covered Interest Parity formula · not a live quoted price</td><td><span class="badge-daily">DAILY</span></td></tr>
         <tr><td>Derivatives — 25d RR Term Structure</td><td>Saxo Bank · indicative mid-market · 1W / 1M / 3M / 6M / 1Y tenors</td><td><span class="badge-daily">DAILY</span></td></tr>
         <tr><td>Derivatives — Realized Vol (HV 30d vs RR Skew)</td><td>yfinance OHLC · std(log returns)×√252 · HV 10d vs HV 30d trend · Saxo Bank RR 1M</td><td><span class="badge-daily">DAILY</span></td></tr>
         <tr><td>Derivatives — ECB Reference Exchange Rates</td><td>ECB · official daily fixing · published ~16:00 CET · Frankfurter API cache</td><td><span class="badge-daily">DAILY</span></td></tr>
@@ -638,7 +638,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <div class="section">
     <h2>Methodology</h2>
     <p>Every panel in this terminal is benchmarked against institutional-grade FX and macro tools. Where industry conventions are well-established, we follow them exactly. Where a deliberate deviation is warranted, it is documented internally. This is the minimum bar — not an aspiration.</p>
-    <p><strong style="color:var(--text);">Rate expectations from OIS markets, not forecasts.</strong> The CB Rate Expectations panel is derived exclusively from overnight index swap (OIS) markets — SOFR futures for USD, ESTER for EUR, SONIA for GBP, TONA for JPY, and equivalent instruments for AUD, CAD, CHF, and NZD. This is the same methodology used by institutional rate monitors and professional FX desks. Analyst consensus forecasts and editorial opinions are explicitly excluded. The classification threshold is ±10bp from the current policy rate — consistent with standard practice on institutional rate-monitoring platforms.</p>
+    <p><strong style="color:var(--text);">Rate expectations from OIS markets, not forecasts.</strong> The CB Rate Expectations panel is derived exclusively from overnight index swap (OIS) markets — SOFR futures for USD, ESTER for EUR, SONIA for GBP, TONA for JPY, and equivalent instruments for AUD, CAD, CHF, and NZD, plus the Norges Bank and Riksbank policy rate for NOK and SEK. This is the same methodology used by institutional rate monitors and professional FX desks. Analyst consensus forecasts and editorial opinions are explicitly excluded. The classification threshold is ±10bp from the current policy rate — consistent with standard practice on institutional rate-monitoring platforms.</p>
     <p><strong style="color:var(--text);">Central bank rate direction from recent decisions, not raw data.</strong> The rate trend arrow in the CB Rates panel reflects the direction of the most recent policy decision — not a naive numeric comparison. Standard practice on institutional platforms resets the directional indicator to neutral after a sustained period without a move; this terminal applies the same pause-detection logic. A bank that cut last year but has held for nine months shows neutral (—), not a lingering down arrow.</p>
     <p><strong style="color:var(--text);">Estimated data is always labeled.</strong> Any value that is derived, proxied, or not sourced from a live feed carries an explicit label. ATM implied volatility estimated from COT data is labeled <em>est. via COT</em>. NZD implied volatility derived from the AUD/USD CBOE/CME vol index (^AUDVIX) carries a <em>~</em> marker and tooltip. Session volatility baselines derived from historical averages are labeled <em>5yr historical avg · fixed reference</em>. Removing these labels to make data appear more authoritative than it is would be a methodological failure.</p>
     <p><strong style="color:var(--text);">No artificial noise.</strong> All displayed values are deterministic and reproducible. No random variation is applied to any indicator, baseline, or chart value. If real data is unavailable, the terminal shows the static reference value with a clear label — it does not simulate live-looking fluctuations.</p>
@@ -657,7 +657,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <div class="card-body">Five to seven prioritized market signals published alongside the narrative — critical alerts, warnings, and informational notes covering CB decisions, key technical levels, positioning extremes, and regime shifts.</div>      </div>
       <div class="card">
         <div class="card-title">Currency Drivers</div>
-        <div class="card-body">One declarative note per direct pair (max 85 characters) explaining the structural driver behind the move: CB stance differential, COT positioning extreme, or carry differential. Generated per currency (8 calls/run) and displayed in the Strength Drivers tab of the Currency Strength Heatmap modal. Updated 4&times; daily alongside the narrative.</div>
+        <div class="card-body">One declarative note per direct pair (max 85 characters) explaining the structural driver behind the move: CB stance differential, COT positioning extreme, or carry differential. Generated per currency (10 G10 currencies/run) and displayed in the Strength Drivers tab of the Currency Strength Heatmap modal. Updated 4&times; daily alongside the narrative.</div>
       </div>
       <div class="card">
         <div class="card-title">Session Context</div>
@@ -665,7 +665,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
     </div>
     <p style="margin-top:16px;">All other sections — prices, COT data, yield curve, heatmap, news — consume market data directly. AI does not generate, filter, or modify price data.</p>
-    <p style="margin-top:10px;font-size:14.3px;color:var(--text2);line-height:1.8;">The <strong style="color:var(--text);">Currency Strength Heatmap modal</strong> also includes a <strong style="color:var(--text);">Currency Strength Index (CSI)</strong> tab: a multi-series chart showing the cumulative log-return of each major currency over 1M / 3M / 6M / 1Y horizons, computed from the full OHLC dataset across all 28 pairs. The focal currency is highlighted; all eight series update on period selection without re-fetching data. An intraday and weekly composite, pair-by-pair breakdown, and currency ranking are shown alongside.</p>
+    <p style="margin-top:10px;font-size:14.3px;color:var(--text2);line-height:1.8;">The <strong style="color:var(--text);">Currency Strength Heatmap modal</strong> also includes a <strong style="color:var(--text);">Currency Strength Index (CSI)</strong> tab: a multi-series chart showing the cumulative log-return of each G10 currency over 1M / 3M / 6M / 1Y horizons, computed from the full OHLC dataset across all 32 pairs. The focal currency is highlighted; all ten series update on period selection without re-fetching data. An intraday and weekly composite, pair-by-pair breakdown, and currency ranking are shown alongside.</p>
   </div>
 
   <div class="section">
@@ -677,7 +677,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
   <div class="section">
     <h2>Currencies covered</h2>
-    <p>USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight major currencies, accounting for the substantial majority of global daily FX turnover.</p>
+    <p>USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD · NOK · SEK — the ten G10 currencies, accounting for the substantial majority of global daily FX turnover.</p>
   </div>
 
   <div class="section">
@@ -700,7 +700,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">ABOUT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.1</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.3</span></div>
 </footer>
 
 
