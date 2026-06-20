@@ -32,7 +32,7 @@ A professional-grade foreign exchange monitoring platform for serious market par
 - **News Feed** — Dedicated tab (shortcut: N) with 52 FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Finnhub, NewsData.io, Marc to Market and others. Single-row accordion layout with impact dot, currency tag, relative age indicator, and full-headline tooltip. Filterable by currency (8 major currencies) and impact level (High / Med / All). Headlines refresh hourly; the terminal re-checks every 2 minutes via HTTP ETag.
 - **Bank Research** — Dedicated tab (shortcut: B) showing institutional FX research notes from ING Think, Saxo Bank (SaxoStrats), MUFG Research, DailyFX (IG Group), and BIS central banker speeches. Metadata-only: title · bank · date · currency tags · source URL — no content reproduction (copyright compliant). Bank-colour-coded row badges, series labels (FX Daily, FX Weekly, FX Talking), category chips (MACRO / TRADE / TECH / FLOW), and accordion drawer with direct link to the original note. Filterable by bank and by currency. Refreshes every 4 hours. Top 20 recent notes also enrich the daily AI narrative with institutional context.
 - **Market signals** — 4–5 AI-generated signals updated 4× daily
-- **Carry Trade Ranking** — G10 currencies carry-to-vol ranking for all 45 pairs, sorted by nominal rate differential divided by 30-day realised volatility. Clicking any row opens the Real Rate Carry Analysis modal with three tabs: (1) Rates Breakdown — 10 currencies sorted by real rate (nominal CB rate minus inflation expectation), with OIS bias chip and data-age transparency; (2) Real Rate Matrix — 10×10 differential grid color-coded by carry sustainability; (3) Pair Detail — nominal carry, real carry, carry-to-vol on both bases, OIS probability for each leg, and carry sustainability assessment (sustainable / moderate / carry trap). Inflation expectations sourced live from FRED (T5YIE for USD, T5YIFR for EUR) and from `extended-data/*.json` batch for remaining currencies. Matches Bloomberg FXFR / FXFC layout convention.
+- **Carry Trade Ranking** — G10 currencies carry-to-vol ranking for all 45 pairs, sorted by nominal rate differential divided by 30-day realised volatility. Clicking any row opens the Real Rate Carry Analysis modal with three tabs: (1) Rates Breakdown — 10 currencies sorted by real rate (nominal CB rate minus inflation expectation), with OIS bias chip and data-age transparency; (2) Real Rate Matrix — 10×10 differential grid color-coded by carry sustainability; (3) Pair Detail — nominal carry, real carry, carry-to-vol on both bases, OIS probability for each leg, and carry sustainability assessment (sustainable / moderate / carry trap). Inflation expectations sourced live from FRED (T5YIE for USD, T5YIFR for EUR) and from batch macro data for remaining currencies. Matches Bloomberg FXFR / FXFC layout convention.
 - **Derivatives section** — Implied forwards (CIP, 1M/3M/6M/1Y), 25-delta Risk Reversal term structure (Saxo Bank), realized vol vs RR skew, ECB official reference exchange rates (daily fixing, 7 EUR pairs), and FX OTC notional volume by pair and product type (DTCC GTR CFTC Recast public dissemination, T+1).
 
 ---
@@ -48,27 +48,6 @@ Data is refreshed on a regular cadence behind the scenes and committed to this r
 ## Currencies covered
 
 USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD · NOK · SEK — the ten G10 currencies, covering the substantial majority of global daily FX turnover.
-
----
-
-## Data directories
-
-| Directory | Contents |
-|-----------|----------|
-| `ai-analysis/` | AI regime label, market narrative, and market signals |
-| `calendar-data/` | Economic calendar events used to ground session context and macro enrichment |
-| `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer), with a rolling weekly history window |
-| `economic-data/` | Macro indicators |
-| `extended-data/` | Implied volatility, carry trade inputs, cross-asset fallback values, inflation expectations |
-| `fx-data/` | ECB reference rates cache and FX liquidity reference data |
-| `intraday-data/` | Intraday quotes for non-FX instruments (VIX, SPX, Gold, WTI, etc.), HV30/H-L/weekly-change fields for FX pairs, and rolling IV history |
-| `meetings-data/` | Central bank meeting schedules and OIS-implied policy bias |
-| `news-data/` | News feed headlines |
-| `research-data/` | Bank and institutional FX research note metadata (title, bank, date, currency tags, source link — no content reproduction) |
-| `rates/` | Central bank policy rates |
-| `rr-data/` | 25-delta Risk Reversal quotes |
-| `sentiment-data/` | Retail positioning sentiment |
-| `dtcc-data/` | FX OTC notional volume by pair and product type |
 
 ---
 
