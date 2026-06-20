@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-fetch_inflation_expectations.py  —  v5.0
+fetch_inflation_expectations.py  —  v5.1
 =========================================
-Fetch forward-looking inflation expectations for G8 FX currencies and patch
+Fetch forward-looking inflation expectations for G10 FX currencies and patch
 extended-data/{CCY}.json with the result.
 
 SOURCE CASCADE (v5.0):
@@ -19,6 +19,14 @@ SOURCE CASCADE (v5.0):
   CHF  →  IMF SDMX 3.0 → OECD → FRED → WB (no liquid traded breakeven)        [backward]
   NZD  →  RBNZ Inflation Expectations 2Y-ahead survey (DBnomics)               [forward]
        →  IMF SDMX 3.0 → OECD → FRED → WB (fallbacks)                         [backward]
+  NOK  →  IMF SDMX 3.0 → OECD → FRED → WB (no liquid traded breakeven)        [backward]
+  SEK  →  IMF SDMX 3.0 → OECD → FRED → WB (no liquid traded breakeven)        [backward]
+
+WHY v5.1 (G10 rollout):
+  NOK/SEK added following the same cascade as JPY/CHF — neither has a liquid,
+  publicly-accessible inflation breakeven or swap market, so IMF CPI YoY is
+  the correct primary (institutional convention: realised CPI is the standard
+  proxy for Scandi inflation expectations absent a survey or breakeven).
 
 WHY v5.0 (methodological upgrade from v4.3):
   The previous pipeline used backward-looking CPI YoY (what inflation WAS) for
@@ -86,6 +94,8 @@ IMF_COUNTRY = {
     "CAD": "CAN",
     "CHF": "CHE",
     "NZD": "NZL",
+    "NOK": "NOR",   # v5.1 — Norway (OECD/IMF member, monthly CPI)
+    "SEK": "SWE",   # v5.1 — Sweden (OECD/IMF member, monthly CPI)
 }
 
 # OECD country codes + quarterly flag (AUD/NZD are quarterly in DF_PRICES_ALL)
@@ -96,6 +106,8 @@ OECD_COUNTRY = {
     "CAD": ("CAN", "M"),
     "CHF": ("CHE", "M"),
     "NZD": ("NZL", "Q"),
+    "NOK": ("NOR", "M"),   # v5.1
+    "SEK": ("SWE", "M"),   # v5.1
 }
 
 FRED_INDEX_SERIES = {
@@ -105,11 +117,14 @@ FRED_INDEX_SERIES = {
     "CAD": ("CANCPIALLMINMEI",  "monthly"),
     "CHF": ("CHECPIALLMINMEI",  "monthly"),
     "NZD": ("NZLCPIALLQINMEI",  "quarterly"),
+    "NOK": ("NORCPIALLMINMEI",  "monthly"),   # v5.1
+    "SEK": ("SWECPIALLMINMEI",  "monthly"),   # v5.1
 }
 
 WB_COUNTRY = {
     "GBP": "GB", "JPY": "JP", "AUD": "AU",
     "CAD": "CA", "CHF": "CH", "NZD": "NZ",
+    "NOK": "NO", "SEK": "SE",               # v5.1
 }
 
 # ---------------------------------------------------------------------------
@@ -465,7 +480,7 @@ def fetch_nzd_rbnz_survey():
 
 
 # ---------------------------------------------------------------------------
-# G6 PRIMARY  —  IMF SDMX 3.0 API (monthly CPI index → YoY)
+# G8 PRIMARY  —  IMF SDMX 3.0 API (monthly CPI index → YoY)
 # Endpoint: api.imf.org/external/sdmx/3.0/data/dataflow/IMF.STA/CPI/~/{key}
 # Key:  {ISO3}.CPI._T.IX.M
 # Time: ?c[TIME_PERIOD]=ge:YYYY-M01
@@ -539,7 +554,7 @@ def fetch_imf_cpi(currency):
 
 
 # ---------------------------------------------------------------------------
-# G6 FALLBACK 1  —  OECD Data Explorer SDMX CSV (direct YoY series)
+# G8 FALLBACK 1  —  OECD Data Explorer SDMX CSV (direct YoY series)
 # Key: {country}.{M|Q}.N.CPI.PA._T.N.GY  (TRANSFORMATION=GY = annual % change)
 # AUS/NZD use quarterly (Q); time format "2024-Q4" is now parsed correctly.
 # JPN will return 404 (COICOP 2018 only — not in DF_PRICES_ALL).
@@ -608,7 +623,7 @@ def fetch_oecd_explorer(currency):
 
 
 # ---------------------------------------------------------------------------
-# G6 FALLBACK 2  —  FRED index series → YoY
+# G8 FALLBACK 2  —  FRED index series → YoY
 # Structural ~12-14 month lag as of 2026. Will almost always be stale.
 # ---------------------------------------------------------------------------
 
@@ -648,7 +663,7 @@ def fetch_fred_index_yoy(currency):
 
 
 # ---------------------------------------------------------------------------
-# G6 LAST RESORT  —  World Bank (annual, lag >12 months)
+# G8 LAST RESORT  —  World Bank (annual, lag >12 months)
 # ---------------------------------------------------------------------------
 
 def fetch_world_bank(currency):
@@ -725,7 +740,7 @@ def main():
         )
 
     print("=" * 60)
-    print("INFLATION EXPECTATIONS — G8 currencies  (v5.0)")
+    print("INFLATION EXPECTATIONS — G10 currencies  (v5.1)")
     print(f"Run: {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"Site root: {os.path.abspath(site_root)}")
     print("Sources: FRED T5YIE/T5YIFR/CAINFIMPCPI · BOE SDIE BEAPFF · RBNZ Survey · IMF SDMX")
@@ -850,6 +865,36 @@ def main():
         failures.append("NZD")
         print("Warning: fetch_inflation_expectations: NZD stale or unavailable", file=sys.stderr)
 
+    # ── NOK: IMF CPI YoY → OECD → FRED → WB (no liquid breakeven) ──────────
+    print("[NOK]")
+    r = fetch_imf_cpi("NOK")
+    if r is None:
+        r = fetch_oecd_explorer("NOK")
+    if r is None:
+        r = fetch_fred_index_yoy("NOK")
+    if r is None:
+        r = fetch_world_bank("NOK")
+    if r:
+        results["NOK"] = r
+    else:
+        failures.append("NOK")
+        print("Warning: fetch_inflation_expectations: NOK stale or unavailable", file=sys.stderr)
+
+    # ── SEK: IMF CPI YoY → OECD → FRED → WB (no liquid breakeven) ──────────
+    print("[SEK]")
+    r = fetch_imf_cpi("SEK")
+    if r is None:
+        r = fetch_oecd_explorer("SEK")
+    if r is None:
+        r = fetch_fred_index_yoy("SEK")
+    if r is None:
+        r = fetch_world_bank("SEK")
+    if r:
+        results["SEK"] = r
+    else:
+        failures.append("SEK")
+        print("Warning: fetch_inflation_expectations: SEK stale or unavailable", file=sys.stderr)
+
     print()
     print("=" * 60)
     print("SUMMARY")
@@ -865,9 +910,15 @@ def main():
     for ccy, (val, date, _src) in results.items():
         patch_extended_data(site_root, ccy, val, date)
 
-    g6_failures = [c for c in failures if c not in ("USD", "EUR")]
-    if len(g6_failures) >= 3:
-        print("Error: fetch_inflation_expectations: >=3 G6 currencies failed — likely upstream outage",
+    # G8 = all currencies except USD/EUR (which have their own dedicated
+    # market-implied breakevens and are never expected to fall back).
+    # Threshold scaled to preserve the original 50% sensitivity (was 3-of-6
+    # under v5.0's G6 pool; now 4-of-8 with NOK/SEK added in v5.1) — keeps
+    # the outage-detection gate equally strict rather than silently relaxing
+    # it as the currency pool grows.
+    g8_failures = [c for c in failures if c not in ("USD", "EUR")]
+    if len(g8_failures) >= 4:
+        print("Error: fetch_inflation_expectations: >=4 G8 currencies failed — likely upstream outage",
               file=sys.stderr)
         sys.exit(1)
 
