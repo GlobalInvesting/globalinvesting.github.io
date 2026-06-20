@@ -1,13 +1,15 @@
 {
   "rates": {
     "USD": 3.63,
-    "EUR": 2.182,
-    "GBP": 3.7304,
+    "EUR": 2.18,
+    "GBP": 3.7303,
     "JPY": 0.727,
     "AUD": 4.35,
     "CAD": 2.25,
     "CHF": -0.04,
-    "NZD": 2.25
+    "NZD": 2.25,
+    "NOK": 4.25,
+    "SEK": 1.75
   },
   "sources": {
     "USD": "SOFR",
@@ -17,17 +19,21 @@
     "AUD": "AONIA",
     "CAD": "policy-fallback",
     "CHF": "SARON",
-    "NZD": "OCR-overnight"
+    "NZD": "OCR-overnight",
+    "NOK": "policy-overnight",
+    "SEK": "policy-overnight"
   },
   "dates": {
     "USD": "2026-06-17",
-    "EUR": "2026-06-17",
-    "GBP": "2026-06-16",
+    "EUR": "2026-06-18",
+    "GBP": "2026-06-17",
     "JPY": "2026-05",
     "AUD": "2026-06-01",
     "CAD": "2026-06-01",
     "CHF": "2026-06-12",
-    "NZD": "2026-06-01"
+    "NZD": "2026-06-01",
+    "NOK": "2026-06-01",
+    "SEK": "2026-06-01"
   },
-  "updated": "2026-06-19T02:04:58Z"
+  "updated": "2026-06-20T00:14:25Z"
 }
