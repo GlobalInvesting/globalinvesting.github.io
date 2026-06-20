@@ -1,64 +1,64 @@
 {
-  "generated_at": "2026-06-19T21:12:30Z",
+  "generated_at": "2026-06-20T21:20:27Z",
   "signals": [
     {
-      "time": "20:00",
+      "time": "13:30",
       "priority": "critical",
-      "title": "NZD/USD — G10 Bilateral Theme + Geopolitical De-escalation",
-      "text": "NZD/USD downside pressure intensifies as the USD leads G10 performance (+1.097% 1W avg) while NZD lags (-0.792% 1W avg), creating a 1.889% performance spread. The Israel-Hezbollah ceasefire reduces safe-haven demand for gold, further weighing on the commodity-linked NZD which already faces a -150bp carry disadvantage against the USD. The next RBNZ meeting (mkt: 20% hike priced) on 8 July is the catalyst for determining if the current hike bias can offset this structural weakness.",
+      "title": "NZD/USD — G10 Bilateral Theme + Geopolitical Risk",
+      "text": "USD 1W outperformance (+1.097%) and NZD weakness (-0.792%) create a 1.889% G10 spread that favors further downside toward 0.5700. Iran's closure of the Strait of Hormuz triggers a safe-haven bid for the USD, while NZD COT net short -22.3k and a -0.83% real rate disadvantage reinforce the laggard profile. The next RBNZ meeting (mkt: 20% hike priced) on 8 July is the catalyst for assessing if the hike bias can offset this structural weakness.",
       "evidence": [
         "USD 1W avg: +1.097% (n=7)",
         "NZD 1W avg: -0.792% (n=4)",
         "G10 spread: 1.889%",
-        "NZD/USD carry: +150bp (favors USD)"
+        "Iran closing Strait of Hormuz headline"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:24",
+      "time": "22:01",
       "priority": "warning",
-      "title": "AUD/USD — COT Crowded Long + CESI Divergence",
-      "text": "AUD COT LF net long +38.1k (68.8% long) creates significant unwind risk as recent Australian economic data consistently disappoints with a CESI net of -8 misses. While the RBA maintains a 4.35% rate with a hold bias, the -72bp OIS carry disadvantage against the USD limits upside potential despite the hawkish rhetoric. The next RBA meeting (mkt: 100% hold priced) on 11 August determines if the policy hold can withstand the deteriorating data trend.",
+      "title": "EUR/USD — Hawkish Fed Repricing + ECB Divergence",
+      "text": "EUR COT net short -49.2k (37.4% long) aligns with the 150bp carry disadvantage to keep pressure on the 1.1469 Friday close. Hawkish Fed debut by Warsh and a restrictive +1.48% US real rate contrast with the ECB's neutral data surprises (CESI +0), driving the pair toward the 1.1400 handle. The next ECB meeting (mkt: 100% hold priced) on 23 July determines if the current hiking cycle can sustain any recovery against USD dominance.",
       "evidence": [
-        "AUD COT net long: +38,092",
+        "EUR COT net short -49.2k",
+        "USD/EUR carry: +150bp favors USD",
+        "US real rate: +1.48% vs EUR: +0.02%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "18:11",
+      "priority": "warning",
+      "title": "USD/JPY — Carry Advantage vs Squeeze Risk",
+      "text": "JPY COT net short -115k creates significant short-squeeze risk despite the 275bp USD carry advantage and the pair's Friday close at 161.28. While the BoJ maintains a hike bias and JPY shows a strong positive CESI (+17), the 2.90% US-JGB yield gap continues to incentivize carry trades until a volatility spike occurs. The next BoJ meeting (mkt: 50% hike priced) on 31 July is the catalyst for a shift in the yield regime.",
+      "evidence": [
+        "JPY COT net short -115k",
+        "USD/JPY carry: +275bp favors USD",
+        "US-JGB 10Y yield gap: 180bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "22:03",
+      "priority": "info",
+      "title": "USD/CAD — Retail Sentiment Extreme + Correlation Break",
+      "text": "USD/CAD retail sentiment at 95% short signals a contrarian continuation risk as the pair decouples from WTI oil (z = -1.94σ). CAD COT net short -60.6k and a 150bp carry disadvantage against the USD support the 1W trend (+1.29%), even as oil prices remain elevated due to Middle East tensions. The next BoC meeting (mkt: 100% hold priced) on 15 July serves as the catalyst to resolve the current divergence from energy prices.",
+      "evidence": [
+        "Retail sentiment: 95% short USD/CAD",
+        "CAD COT net short -60.6k",
+        "USD/CAD vs WTI corr: -0.507 (z=-1.94σ)"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "15:01",
+      "priority": "info",
+      "title": "AUD/USD — Crowded Long Unwind + Data Misses",
+      "text": "AUD COT net long +38.1k (68.8% long) faces liquidation risk as the pair closed Friday at 0.7016 amid a negative economic surprise index (CESI -8). Although the AUD maintains a 60bp carry advantage over the USD, the hawkish Fed repricing and 15.0% IV (VRP +7.2%) suggest hedging demand is rising against the Aussie. The next RBA meeting (mkt: 100% hold priced) on 11 August is the catalyst for confirming the sustainability of the current yield advantage.",
+      "evidence": [
+        "AUD COT net long +38.1k",
         "AUD CESI: -8 misses",
-        "AUD/USD OIS carry: -72bp (favors AUD)"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "16:37",
-      "priority": "warning",
-      "title": "USD/JPY — JPY COT Short Squeeze + Yield Gap Resistance",
-      "text": "JPY COT net short -115.0k (29.2% long) sets up a high-conviction squeeze risk as USD/JPY hovers near 161.28 following a fade in USD momentum. The 290bp US-JGB yield advantage remains the primary structural anchor for the pair, but JPY's strong positive CESI (+17 beats) suggests domestic data outperformance is challenging the carry trade. The next BoJ meeting (mkt: 50% hike priced) on 31 July is the catalyst for a potential hawkish shift to narrow the real rate differential.",
-      "evidence": [
-        "JPY COT net short: -115,036",
-        "USD/JPY OIS carry: +290bp (favors USD)",
-        "JPY CESI: +17 beats"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "16:29",
-      "priority": "info",
-      "title": "EUR/USD — COT Short Alignment + Restrictive Real Rate Gap",
-      "text": "EUR COT net short -49.3k reinforces the downside bias toward 1.14 as market sentiment shifts toward the USD following hawkish Fed signals. The USD maintains a superior real rate of +1.39% compared to the EUR's +0.03%, providing a fundamental yield cushion that offsets the ECB's hiking bias. The next ECB meeting (mkt: 80% hike priced) on 23 July determines if a further hike can compress the +145bp OIS carry disadvantage.",
-      "evidence": [
-        "EUR COT net short: -49,290",
-        "USD real rate: +1.39% vs EUR: +0.03%",
-        "EUR/USD OIS carry: +145bp (favors USD)"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "16:12",
-      "priority": "info",
-      "title": "USD/CHF — Volatility Risk Premium + Carry Advantage",
-      "text": "USD/CHF upside momentum is supported by a massive +375bp carry advantage and a significant volatility risk premium (IV 14.3% vs HV30 6.2%). The SNB's dovish stance and mildly accommodative real rate of -0.60% contrast sharply with the Fed's restrictive posture, driving the pair toward seven-month highs. The next SNB meeting (mkt: 100% hold priced) is the catalyst for any intervention rhetoric that might counter the current 1W CHF laggard trend (-0.606% avg).",
-      "evidence": [
-        "USD/CHF OIS carry: +375bp (favors USD)",
-        "USD/CHF VRP: +8.1%",
-        "CHF 1W avg: -0.606% (n=6)"
+        "AUD/USD IV: 15.0% (VRP +7.2%)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
