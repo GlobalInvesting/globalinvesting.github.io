@@ -36,6 +36,20 @@ PAGES = [
         "changefreq": "weekly",
     },
     {
+        "loc": "/guide-mt5-ea.html",
+        "file": "guide-mt5-ea.html",
+        "deps": [],
+        "priority": "0.9",
+        "changefreq": "monthly",
+    },
+    {
+        "loc": "/access.html",
+        "file": "access.html",
+        "deps": [],
+        "priority": "0.9",
+        "changefreq": "monthly",
+    },
+    {
         "loc": "/guide-cot.html",
         "file": "guide-cot.html",
         "deps": ["cot-data/cot_data.json"],
