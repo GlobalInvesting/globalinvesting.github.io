@@ -1061,6 +1061,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="rates-ctab"        data-cty="au"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">AU</button>
         <button class="rates-ctab"        data-cty="ca"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">CA</button>
         <button class="rates-ctab"        data-cty="nz"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">NZ</button>
+        <button class="rates-ctab"        data-cty="no"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">NO</button>
+        <button class="rates-ctab"        data-cty="se"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">SE</button>
         <button class="rates-ctab"        data-cty="spreads" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--accent);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Spreads</button>
       </div>
 
@@ -1109,6 +1111,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div id="rates-pane-nz" class="rates-country-pane" style="display:none;padding:6px 10px;">
         <div id="rates-g8-content-nz" style="color:var(--text3);font-size:11px;">Loading NZ yields…</div>
       </div>
+      <div id="rates-pane-no" class="rates-country-pane" style="display:none;padding:6px 10px;">
+        <div id="rates-g8-content-no" style="color:var(--text3);font-size:11px;">Loading NO yields…</div>
+      </div>
+      <div id="rates-pane-se" class="rates-country-pane" style="display:none;padding:6px 10px;">
+        <div id="rates-g8-content-se" style="color:var(--text3);font-size:11px;">Loading SE yields…</div>
+      </div>
 
       <!-- Sovereign Spreads pane -->
       <div id="rates-pane-spreads" class="rates-country-pane" style="display:none;padding:6px 10px 2px;">
@@ -1130,6 +1138,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <tr><td>Australia</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
             <tr><td>Canada</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
             <tr><td>New Zealand</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Norway</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Sweden</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
           </tbody>
         </table>
         <div style="font-size:9px;color:var(--text3);margin-top:4px;">Daily sovereign yield pipeline · yfinance · FRED · ECB · BOE</div>
@@ -1281,6 +1291,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <tr data-pair="USD/CHF"><td>USD/CHF</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
               <tr data-pair="USD/CAD"><td>USD/CAD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
               <tr data-pair="NZD/USD"><td>NZD/USD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="USD/NOK"><td>USD/NOK</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="USD/SEK"><td>USD/SEK</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
               <tr style="border-top:1px solid var(--border2);"><td style="color:var(--text3);font-size:9px;padding-top:4px;" colspan="7">Cross pairs</td></tr>
               <tr data-pair="EUR/GBP"><td>EUR/GBP</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
               <tr data-pair="EUR/JPY"><td>EUR/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
@@ -1288,6 +1300,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <tr data-pair="AUD/JPY"><td>AUD/JPY</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
               <tr data-pair="EUR/AUD"><td>EUR/AUD</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
               <tr data-pair="EUR/CHF"><td>EUR/CHF</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="EUR/NOK"><td>EUR/NOK</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
+              <tr data-pair="EUR/SEK"><td>EUR/SEK</td><td class="fwd-spot">—</td><td class="fwd-1m">—</td><td class="fwd-3m">—</td><td class="fwd-6m">—</td><td class="fwd-1y">—</td><td class="fwd-diff">—</td></tr>
             </tbody>
           </table>
         </div>
@@ -1317,6 +1331,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <tr><td>AUD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
               <tr><td>USD/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
               <tr><td>USD/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
+              <tr><td>USD/NOK</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
+              <tr><td>USD/SEK</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
               <tr><td>EUR/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td style="color:var(--text3);">—</td></tr>
             </tbody>
           </table>
@@ -1346,6 +1362,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <tr><td>USD/CHF</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
               <tr><td>USD/CAD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
               <tr><td>NZD/USD</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>USD/NOK</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
+              <tr><td>USD/SEK</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
             </tbody>
           </table>
         </div>
@@ -1756,7 +1774,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.0" defer></script>
-<script src="assets/dashboard.js?v=8.21.3" defer></script>
+<script src="assets/dashboard.js?v=8.21.4" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
