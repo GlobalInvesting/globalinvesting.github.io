@@ -1,6 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.1 — inline-panel edition
+// YIELD CURVE MODAL  v2.2 — Market Commentary section added
 // Fluid layout, terminal CSS variables throughout.
+// v2.2 (2026-06-20): Market Commentary block added below the tenor table.
+//   Renders below #ycm-table-wrap. Fetches news-data/news.json, filters by
+//   topic keywords (Treasury/yield-curve terminology, not currency tag — see
+//   _ycLoadPolicySummary() docstring for rationale), displays up to 3 most
+//   recent matching articles. Lazy, non-blocking — mirrors the CB Rates
+//   modal's Market Commentary pattern (cb-rates-modal.js _cbrLoadPolicySummary()).
 // ═══════════════════════════════════════════════════════════════════════════
 (function () {
   if (document.getElementById('ycm-css')) return;
@@ -65,6 +71,23 @@
 #ycm-table tr:hover td { background:rgba(255,255,255,.02); }
 #ycm-table td.up { color:var(--up); }
 #ycm-table td.down { color:var(--down); }
+.ycm-ps-wrap{flex-shrink:0;border-top:1px solid var(--border2);overflow-y:auto;max-height:220px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;background:var(--bg);}
+.ycm-ps-wrap::-webkit-scrollbar{width:3px!important;}
+.ycm-ps-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.ycm-ps-hdr{display:flex;align-items:center;justify-content:space-between;padding:5px 14px 4px;border-bottom:1px solid var(--border2);flex-shrink:0;}
+.ycm-ps-hdr-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;font-family:var(--font-mono);}
+.ycm-ps-hdr-src{font-size:8px;color:var(--text2);font-family:var(--font-mono);}
+.ycm-ps-article{padding:9px 14px 10px;border-bottom:1px solid rgba(54,60,78,.35);}
+.ycm-ps-article:last-child{border-bottom:none;}
+.ycm-ps-art-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.ycm-ps-art-source{font-size:8px;font-weight:600;color:var(--blue);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em;}
+.ycm-ps-art-time{font-size:8px;color:var(--text2);font-family:var(--font-mono);}
+.ycm-ps-art-title{font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:5px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.ycm-ps-art-title a{color:inherit;text-decoration:none;}
+.ycm-ps-art-title a:hover{text-decoration:underline;text-decoration-color:var(--text2);}
+.ycm-ps-art-body{font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
+.ycm-ps-loading{padding:14px;font-size:10px;color:var(--text2);font-family:var(--font-mono);}
+.ycm-ps-empty{padding:14px;font-size:10px;color:var(--text2);font-family:var(--font-mono);}
 `;
   document.head.appendChild(s);
 })();
@@ -164,12 +187,89 @@ function openYCModal(tenorData) {
       <tbody>${tableRows}</tbody>
     </table>
   </div>
+  <div id="ycm-policy-summary" class="ycm-ps-wrap">
+    <div class="ycm-ps-loading">Loading market commentary…</div>
+  </div>
 </div>`;
 
   (document.getElementById('main') || document.body).appendChild(bd);
   bd.addEventListener('click', e => { if (e.target === bd) closeYCModal(); });
   document.addEventListener('keydown', _ycKeydown);
   requestAnimationFrame(() => _ycDrawChart(labels, todayVals, noPrior ? null : priorVals));
+  // Load market commentary non-blocking after chart render (same lazy pattern as CB Rates modal)
+  setTimeout(() => _ycLoadPolicySummary(), 100);
+}
+
+// Market Commentary — Bloomberg/TE-style text block rendered inline below the yield
+// table. Fetches news-data/news.json and selects up to 3 most recent articles whose
+// title or expand text references US Treasuries / the yield curve. Unlike the CB Rates
+// modal's Market Commentary (filtered by currency tag), this panel has no single
+// currency to key off — US Treasury yield news is generally tagged "USD" but so is
+// every other USD macro headline (jobs, CPI, Fed speeches unrelated to the curve), so
+// filtering by cur==='USD' alone would surface irrelevant articles. Instead this uses
+// a topic keyword filter against title+expand, scoped to Treasury/yield/curve/auction
+// terminology. Lazy-fetched: triggered on modal open, non-blocking (runs after chart
+// render), same as _cbrLoadPolicySummary() in cb-rates-modal.js.
+async function _ycLoadPolicySummary(){
+  const wrap=document.getElementById('ycm-policy-summary');
+  if(!wrap)return;
+  try{
+    const res=await fetch('./news-data/news.json',{cache:'no-store'}).catch(()=>null);
+    if(!res?.ok)throw new Error('fetch failed');
+    const j=await res.json();
+    const YC_KW=['treasury','treasuries','yield curve','10-year yield','10-year treasury',
+      '10-year note','10-year bond','2-year yield','2-year treasury','2-year note',
+      '30-year yield','30-year treasury','30-year bond','t-bill','t-bond',
+      'treasury auction','treasury yield','bond yield','fed funds rate','tnx','tyx',
+      'gilt yield','bund yield'];
+    const articles=(j.articles||[])
+      .filter(a=>{
+        const exp=(a.expand||'').replace(/<[^>]+>/g,'').trim();
+        if(exp.length<80)return false;
+        const combined=(a.title+' '+exp).toLowerCase();
+        return YC_KW.some(k=>combined.includes(k));
+      })
+      .sort((a,b)=>(b.ts||0)-(a.ts||0))
+      .slice(0,3);
+
+    const updLabel=j.updated_label||'';
+
+    if(!articles.length){
+      wrap.innerHTML=`<div class="ycm-ps-empty">No yield curve commentary available.</div>`;
+      return;
+    }
+
+    const hdrHtml=`<div class="ycm-ps-hdr">
+      <span class="ycm-ps-hdr-lbl">Market Commentary · US Treasuries</span>
+      <span class="ycm-ps-hdr-src">Institutional RSS · ${updLabel}</span>
+    </div>`;
+
+    const articlesHtml=articles.map(a=>{
+      const timeStr=[a.date,a.time].filter(Boolean).join(' · ');
+      const exp=(a.expand||'').replace(/&#\d+;/g,'').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+      let body=exp;
+      if(body.length>500){
+        const cut=body.slice(0,500);
+        const lastPeriod=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('? '),cut.lastIndexOf('! '));
+        body=(lastPeriod>200?cut.slice(0,lastPeriod+1):cut)+'…';
+      }
+      const titleHtml=a.link
+        ?`<a href="${a.link}" target="_blank" rel="noopener noreferrer">${a.title||''}</a>`
+        :(a.title||'');
+      return`<div class="ycm-ps-article">
+        <div class="ycm-ps-art-meta">
+          <span class="ycm-ps-art-source">${a.source||''}</span>
+          <span class="ycm-ps-art-time">${timeStr}</span>
+        </div>
+        <div class="ycm-ps-art-title">${titleHtml}</div>
+        <div class="ycm-ps-art-body">${body}</div>
+      </div>`;
+    }).join('');
+
+    wrap.innerHTML=hdrHtml+articlesHtml;
+  }catch{
+    wrap.innerHTML=`<div class="ycm-ps-empty">Market commentary unavailable.</div>`;
+  }
 }
 
 function _ycDrawChart(labels, todayVals, priorVals) {
