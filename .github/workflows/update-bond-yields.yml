@@ -11,6 +11,8 @@ name: Update Bond Yields
 #   extended-data/AUD.json  → bond2y (AU 2Y)
 #   extended-data/CAD.json  → bond2y (CA 2Y)
 #   extended-data/NZD.json  → bond2y (NZ 2Y)
+#   extended-data/NOK.json  → bond10y (NO 10Y), bond2y (NO 2Y)  — v2.3 G10 rollout
+#   extended-data/SEK.json  → bond10y (SE 10Y), bond2y (SE 2Y)  — v2.3 G10 rollout
 #
 # Consumed by:
 #   generate_narrative_signals.py  → bond10y (USD/EUR/GBP/JPY), bond2y, bond5y (LLM context)
@@ -82,7 +84,7 @@ jobs:
           echo "========================================"
           echo "       BOND YIELDS SUMMARY"
           echo "========================================"
-          for ccy in USD EUR GBP JPY; do
+          for ccy in USD EUR GBP JPY NOK SEK; do
             if [ -f "extended-data/${ccy}.json" ]; then
               python3 -c "
           import json
@@ -114,12 +116,13 @@ jobs:
             git add extended-data/USD.json extended-data/EUR.json \
                     extended-data/GBP.json extended-data/JPY.json \
                     extended-data/AUD.json extended-data/CAD.json \
-                    extended-data/NZD.json
+                    extended-data/NZD.json extended-data/NOK.json \
+                    extended-data/SEK.json
             if git diff --quiet && git diff --staged --quiet; then
               echo "No changes vs remote HEAD — skipping commit."
               exit 0
             fi
-            git commit -m "Bond yields ${TIMESTAMP} (US10Y/2Y/5Y, DE10Y, UK10Y, JP10Y)"
+            git commit -m "Bond yields ${TIMESTAMP} (US10Y/2Y/5Y, DE10Y, UK10Y, JP10Y, NO10Y, SE10Y)"
             if git push origin main; then
               echo "✅ Push succeeded on attempt $i."
               exit 0
