@@ -1,7 +1,49 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.20
+fetch_news.py — v5.21
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.21 (sobre v5.20):
+  RTT NEWS — NUEVA FUENTE INSTITUCIONAL (CURRENCY + MACRO TOP STORY):
+    · RTT News Currency Alerts (rttnews.com/RSS/CurrencyAlerts.xml): cobertura
+      dedicada a movimientos intradía de las 8 divisas mayores (USD/EUR/GBP/JPY/
+      AUD/CAD/CHF/NZD) — sesión asiática/europea, reacciones a datos económicos,
+      comentario de bancos centrales. Verificado: descripciones sustantivas
+      (20-50 palabras), pasa MIN_DESCRIPTION_WORDS sin ajuste. Sin divisa forzada
+      — procesa por detect_currency() como FXStreet/ForexLive (multi-divisa).
+    · RTT News Forex Top Story (rttnews.com/RSS/ForexTopStory.xml): feed más amplio
+      — decisiones de tasas G10 (verificado: Fed, BoE, SNB, BoJ aparecen junto con
+      bancos no-G10 que NON_G10_CB_RE ya filtra correctamente), datos macro US/UK/EU
+      (CPI, retail sales, jobless claims, PMI) y previews económicos. Mismo
+      tratamiento sin divisa forzada.
+    · Ambos feeds: sin API key, sin cuota — se ejecutan en NEWS_MODE=fast (cada 10 min)
+      igual que el resto de fuentes RSS.
+
+  FT BONDS — NUEVA FUENTE PARA YIELD CURVE / TREASURY COVERAGE:
+    · Financial Times Bonds (ft.com/bonds?format=rss): añadida a petición del usuario
+      para alimentar la nueva sección de Market Commentary del modal de Yield Curve
+      (ver yc-modal.js v2.2). Cobertura institucional de bonos soberanos, Treasuries,
+      y yield curve — nivel Bloomberg/Reuters.
+    · NO VERIFICADA end-to-end: el sandbox de desarrollo no tiene acceso de red a
+      ft.com (egress proxy: host_not_allowed), así que no se pudo confirmar el
+      content-type ni si el feed publica <description> completa o requiere
+      suscripción (paywall) y devuelve solo metadata. El pipeline ya tolera esto de
+      forma segura — fetch_via_feedparser() retorna [] silenciosamente en cualquier
+      status_code != 200 o excepción, y has_real_content()/MIN_DESCRIPTION_WORDS
+      descartarían artículos con descripción vacía o truncada — pero no hay garantía
+      de que el feed contribuya artículos reales hasta el primer run en producción.
+      Verificar en el log de GitHub Actions ("[EN] FT Bonds: N noticias") tras el
+      primer despliegue; si N=0 de forma consistente, evaluar reemplazo o remoción.
+    · Forzado a USD vía "currency": "USD" en el feed config — Treasuries/bonos
+      soberanos US son el driver primario del panel Yield Curve (US-only en su
+      versión actual; el modal no desagrega por país). Esto también permite que
+      is_forex_relevant() se relaje (mismo patrón que ECB/BoE/Fed), ya que el
+      feed es por definición relevante para el panel aunque el artículo individual
+      no contenga keywords de FX explícitas (p.ej. "10-year Treasury auction").
+    · SOURCE_CURRENCY["FT Bonds"] = "USD" añadido como fallback defensivo, mismo
+      patrón que el resto de fuentes con divisa forzada.
+    · FOREX_SOURCES: "FT Bonds" añadida — entra en la selección normal de
+      smart_select() junto a las demás fuentes institucionales.
 
 CAMBIOS v5.20 (sobre v5.19):
   G10 SCANDI ROLLOUT — NOK/SEK NEWS COVERAGE:
@@ -612,6 +654,17 @@ FEEDS = [
     { "source": "InvestMacro",      "url": "https://investmacro.com/feed/",                                    "lang": "en" },
     { "source": "ForexCrunch",      "url": "https://forexcrunch.com/feed/",                                    "lang": "en" },
 
+    # ── INGLÉS — RTT News añadido (v5.21) ────────────────────────────────────
+    # RTT News Currency Alerts: cobertura dedicada a las 8 divisas mayores, sesión
+    # asiática/europea, reacciones a datos económicos. Sin divisa forzada — multi-
+    # divisa por naturaleza, igual que FXStreet/ForexLive. Verificado con contenido
+    # real (descripciones 20-50 palabras), pasa MIN_DESCRIPTION_WORDS sin ajuste.
+    { "source": "RTT News",         "url": "https://www.rttnews.com/RSS/CurrencyAlerts.xml",                   "lang": "en" },
+    # RTT News Forex Top Story: feed más amplio — decisiones de tasas G10, datos
+    # macro US/UK/EU (CPI, retail sales, jobless claims, PMI), previews económicos.
+    # Bancos centrales no-G10 (Rusia, Filipinas, etc.) ya filtrados por NON_G10_CB_RE.
+    { "source": "RTT News",         "url": "https://www.rttnews.com/RSS/ForexTopStory.xml",                    "lang": "en" },
+
     # ── INGLÉS — bancos centrales oficiales (v5.2) ───────────────────────────
     { "source": "RBA",              "url": "https://www.rba.gov.au/rss/rss-cb-speeches.xml",                  "lang": "en" },
     { "source": "RBA",              "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml",            "lang": "en" },
@@ -669,7 +722,18 @@ FEEDS = [
     # NO en TECHNICAL_ANALYSIS_SOURCES — es prensa financiera institucional, no TA.
     { "source": "FX Markets",       "url": "https://www.fx-markets.com/feeds/rss",                            "lang": "en" },
 
-    # ── INGLÉS — bancos centrales añadidos/actualizados (v5.13) ─────────────
+    # ── INGLÉS — FT Bonds añadido (v5.21) ────────────────────────────────────
+    # Financial Times Bonds: cobertura institucional de bonos soberanos, Treasuries
+    # y yield curve — nivel Bloomberg/Reuters. Añadido específicamente para
+    # alimentar la sección Market Commentary del modal de Yield Curve (yc-modal.js).
+    # Forzado a USD: el panel Yield Curve es US-only en su versión actual, y forzar
+    # la divisa permite relajar is_forex_relevant() igual que con ECB/BoE/Fed —
+    # artículos como "10-year Treasury auction" son relevantes para el panel aunque
+    # no contengan keywords de FX explícitas.
+    # NO VERIFICADO end-to-end (sandbox sin acceso de red a ft.com) — confirmar en
+    # el primer run de producción que el feed efectivamente contribuye artículos
+    # (ver nota completa en el docstring de versión arriba).
+    { "source": "FT Bonds",         "url": "https://www.ft.com/bonds?format=rss",                              "lang": "en", "currency": "USD" },
     # Bank of Canada speeches: discursos del Gobernador y miembros del Consejo.
     # Canal más market-moving del BoC — complementa el feed de press releases.
     { "source": "Bank of Canada",   "url": "https://www.bankofcanada.ca/content_type/speeches/feed/",         "lang": "en" },
@@ -865,6 +929,8 @@ SOURCE_CURRENCY = {
     "NewsData NZD": "NZD",
     # v5.9: new CB feeds — force-assign currency
     "Bank of Canada": "CAD",
+    # v5.21: FT Bonds forced to USD — yield curve / Treasury coverage
+    "FT Bonds": "USD",
     # v5.20: G10 Scandi — force-assign currency
     "Norges Bank": "NOK",
     "Riksbank":     "SEK",
@@ -889,6 +955,7 @@ FOREX_SOURCES = {
     "Barchart", "Marc to Market", "FX Markets",
     "Bundesbank",   # v5.17
     "Norges Bank", "Riksbank",   # v5.20
+    "RTT News", "FT Bonds",   # v5.21
     # v5.7: NewsData API
     "NewsData USD", "NewsData EUR", "NewsData GBP", "NewsData JPY",
     "NewsData AUD", "NewsData CAD", "NewsData CHF", "NewsData NZD",
