@@ -110,8 +110,8 @@ gtag('consent', 'default', {
   "featureList": [
     "Live FX rates for all 28 major pairs — EUR/USD, GBP/USD, USD/JPY and all crosses — streaming in real time via Finnhub WebSocket during market hours",
     "Economic Surprise Index (ESI) — decay-weighted major currency scores from actual vs forecast data, with z-score normalisation per event series and 90-day rolling chart",
-    "8 major currencies Economic Calendar — Finnhub medium/high-impact events with actual vs consensus beat/miss scoring, updated within 2-3 minutes of release",
-    "OIS-implied central bank rate expectations for Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ — with market-implied cut/hike probability",
+    "G10 Economic Calendar — Finnhub medium/high-impact events with actual vs consensus beat/miss scoring, updated within 2-3 minutes of release",
+    "OIS-implied central bank rate expectations for Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ, Norges Bank, Riksbank — with market-implied cut/hike probability",
     "CFTC Commitment of Traders (COT) — Leveraged Funds and Asset Manager net positioning, WoW change, % of OI",
     "AI-powered market narrative — synthesises COT, OIS bias, cross-asset risk and carry differentials, updated 4x daily with directional bias and key signals",
     "Implied Volatility from CBOE/CME FX Volatility Indexes (EUR, GBP, JPY, AUD) — same variance-swap methodology as VIX",
@@ -125,7 +125,7 @@ gtag('consent', 'default', {
     "FX Session Liquidity Map — Tokyo, London, New York overlap tracking",
     "Retail FX Positioning — Myfxbook community sentiment, long/short % and avg entry",
     "Implied Forwards via Covered Interest Parity (CIP) — 1M, 3M, 6M, 1Y",
-    "DTCC GTR FX OTC notional volume — 8 major currencies pair flow data, public dissemination T+1",
+    "DTCC GTR FX OTC notional volume — G10 pair flow data, public dissemination T+1",
     "Reference ECN Bid-Ask Spreads — volatility-adjusted model for all major pairs",
     "Rolling Cross-Asset Correlations — 30d/60d/90d Pearson with z-score vs 252d norm"
   ],
@@ -314,7 +314,7 @@ gtag('consent', 'default', {
       "name": "How does the Economic Calendar work in the terminal?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The Economic Calendar shows medium and high-impact 8 major currencies events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data is sourced from Finnhub and updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically."
+        "text": "The Economic Calendar shows medium and high-impact G10 currency events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data is sourced from Finnhub and updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically."
       }
     }
   ]
@@ -704,7 +704,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
   <!-- MAIN PANEL -->
   <main id="main" role="main" aria-label="Dashboard">
-    <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Global Investing FX Terminal — Live 8 major currencies Rates, CB Rate Expectations &amp; Market Intelligence</h1>
+    <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Global Investing FX Terminal — Live G10 Rates, CB Rate Expectations &amp; Market Intelligence</h1>
 
     <!-- SPLIT UPPER: narrative + chart (always visible) -->
     <div id="split-upper">
@@ -1049,7 +1049,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
-    <!-- RATES & YIELD CURVE — 8 major currencies multi-country -->
+    <!-- RATES & YIELD CURVE — G10 multi-country -->
     <div class="panel" id="section-rates">
       <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve</span><span class="panel-sub" id="yield-panel-sub">Nominal yields · yfinance · daily pipeline</span></div>
 
@@ -1093,7 +1093,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
 
-      <!-- 8 major currencies foreign country panes — populated by JS from extended-data/*.json -->
+      <!-- G10 foreign country panes — populated by JS from extended-data/*.json -->
       <div id="rates-pane-de" class="rates-country-pane" style="display:none;padding:6px 10px;">
         <div id="rates-g8-content-de" style="color:var(--text3);font-size:11px;">Loading DE yields…</div>
       </div>
@@ -1415,7 +1415,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
                 <th scope="col" title="FX Swap notional in billions">Swap $bn</th>
                 <th scope="col" title="FX Forward notional in billions">Fwd $bn</th>
                 <th scope="col" title="FX Spot notional in billions">Spot $bn</th>
-                <th scope="col" title="Share of total DTCC-reported 8 major currencies notional">% Total</th>
+                <th scope="col" title="Share of total DTCC-reported G10 notional">% Total</th>
               </tr>
             </thead>
             <tbody id="dtcc-tbody">
@@ -1583,7 +1583,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </table>
     </div><!-- /#section-cb-expectations -->
 
-    <!-- ECONOMIC SURPRISES — Finnhub calendar, beat/miss vs consensus, 8 major currencies -->
+    <!-- ECONOMIC SURPRISES — Finnhub calendar, beat/miss vs consensus, G10 -->
     <div id="section-econ-surprise" style="border-top:1px solid var(--border);padding:6px 0 0;">
       <div class="sb-head" style="margin-bottom:1px;" title="Click any row to open the full surprise index chart">Economic Surprise Index</div>
       <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast · G10 major currencies · 90d rolling</div>

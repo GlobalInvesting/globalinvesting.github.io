@@ -382,7 +382,7 @@ a { color: inherit; text-decoration: none; }
       <div class="layout-visual">
 <svg width="100%" viewBox="0 0 680 370" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>FX Terminal layout diagram — three-column split view</title>
-  <desc>Three-column terminal layout: left sidebar (FX Liquidity, Crosses, Carry), main area split into left column (chart, FX table, heatmap) and right column (cross-asset, risk, rates, COT, sessions), and right panel (CB Rates, Correlations, Rate Expectations, Positioning Bias).</desc>
+  <desc>Three-column terminal layout: left sidebar (FX Liquidity, Crosses, Carry), main area split into left column (chart, FX table, heatmap) and right column (cross-asset, risk, rates, COT, sessions), and right panel (CB Rates, Correlations, Rate Expectations, Economic Surprise Index).</desc>
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
       <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -488,7 +488,7 @@ a { color: inherit; text-decoration: none; }
   <rect x="570" y="131" width="3" height="9" rx="1" fill="#f6941c"/>
   <text x="578" y="140" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Rate Expectations</text>
   <rect x="570" y="148" width="3" height="9" rx="1" fill="#f6941c"/>
-  <text x="578" y="157" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Positioning Bias</text>
+  <text x="578" y="157" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Economic Surprise Idx</text>
 
   <!-- STATUS BAR -->
   <rect x="0" y="370" width="680" height="0" fill="#1a1d29"/>
@@ -576,7 +576,7 @@ a { color: inherit; text-decoration: none; }
         <strong>Frequency:</strong> The narrative and regime update 4× daily (00:00, 06:30, 14:30, 20:00 UTC). The timestamp is shown next to the label. Do not rely on the narrative for intraday tick-by-tick changes — use the live price feeds and VIX/MOVE data in the Risk Monitor for real-time regime shifts.
       </div>
       <div class="callout">
-        <strong>Bank holidays:</strong> When a 8 major currencies market is closed (e.g. Memorial Day for USD markets), the AI engine automatically omits percentage-change figures for affected instruments — Gold, SPX, WTI, US yields, and DXY — rather than reporting a misleading +0.00%. The narrative will note the closure context instead.
+        <strong>Bank holidays:</strong> When a market is closed (e.g. Memorial Day for USD markets), the AI engine automatically omits percentage-change figures for affected instruments — Gold, SPX, WTI, US yields, and DXY — rather than reporting a misleading +0.00%. The narrative will note the closure context instead.
       </div>
     </div>
 
@@ -825,19 +825,23 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="heatmap">
       <h2>Currency Strength Heatmap</h2>
-      <p>A ranked row of 8 cells — one per major currency (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD) — sorted from strongest to weakest. Each cell shows the currency's average percentage change computed across all 28 major pairs (the industry standard), giving each currency exactly 7 observations and a true basket-weighted strength score.</p>
+      <p>A ranked row of 10 cells — one per G10 currency (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) — sorted from strongest to weakest. Each cell shows the currency's average percentage change across the pairs that include it, computed from 32 live pairs in total: the 28 classic G8 crosses (each of the 8 majors appears in 7 pairs) plus 4 Scandinavian pairs (USD/NOK, USD/SEK, EUR/NOK, EUR/SEK). NOK and SEK are therefore each averaged across only 2 pairs rather than 7 — a thinner, noisier read than the eight majors, reflecting NOK/SEK's narrower direct cross-pair coverage rather than a data quality issue.</p>
       <!-- MOCK: Currency Strength Heatmap -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">Currency Strength Heatmap</span>
           <span style="font-size:9px;color:var(--text3);">Relative performance vs USD basket · yfinance RT</span>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:0;">
+        <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:0;">
+          <div style="background:#0d3d2e;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">NOK</div>
+            <div style="font-size:10px;color:var(--up);margin-top:3px;">+0.92</div>
+          </div>
           <div style="background:#0d3d2e;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
             <div style="font-size:11px;font-weight:700;color:var(--text);">CHF</div>
             <div style="font-size:10px;color:var(--up);margin-top:3px;">+0.85</div>
           </div>
-          <div style="background:#0d3d2e;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+          <div style="background:#1a3a2a;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
             <div style="font-size:11px;font-weight:700;color:var(--text);">CAD</div>
             <div style="font-size:10px;color:var(--up);margin-top:3px;">+0.30</div>
           </div>
@@ -848,6 +852,10 @@ a { color: inherit; text-decoration: none; }
           <div style="background:#1a3a2a;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
             <div style="font-size:11px;font-weight:700;color:var(--text);">JPY</div>
             <div style="font-size:10px;color:var(--up);margin-top:3px;">+0.13</div>
+          </div>
+          <div style="background:#3d1a1a;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">SEK</div>
+            <div style="font-size:10px;color:var(--down);margin-top:3px;">−0.11</div>
           </div>
           <div style="background:#3d1a1a;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
             <div style="font-size:11px;font-weight:700;color:var(--text);">EUR</div>
@@ -868,9 +876,9 @@ a { color: inherit; text-decoration: none; }
         </div>
         <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Sorted strongest → weakest · Finnhub live ticks · yfinance fallback (~5 min) · fallback: ECB daily</div>
       </div>
-      <p>Strength is computed using the <strong>industry-standard 28-pair method</strong>: all combinations of the 8 major currencies (8×7÷2 = 28 pairs). Each currency appears in exactly 7 pairs, so every score carries equal statistical weight — no currency is over- or under-represented. When market is open, each currency's score updates in real time from Finnhub WebSocket ticks; during off-hours yfinance (~5 min delay) provides the baseline. For example, JPY's score averages its move in USD/JPY, EUR/JPY, GBP/JPY, AUD/JPY, NZD/JPY, CAD/JPY and CHF/JPY — giving a true basket reading rather than a single-pair proxy. ECB daily rates serve as a silent fallback only when RT data is unavailable. Cells are color-coded by intensity: dark green (strong), light green (mild), flat (near zero), light red (mild weakness), dark red (weak).</p>
+      <p>Strength is computed across <strong>32 live pairs</strong>: the classic 28-pair combination of the 8 G8 majors (8×7÷2 = 28, each currency appearing in exactly 7 pairs) plus 4 added Scandinavian pairs (USD/NOK, USD/SEK, EUR/NOK, EUR/SEK) to bring NOK and SEK into the same heatmap. When market is open, each currency's score updates in real time from Finnhub WebSocket ticks; during off-hours yfinance (~5 min delay) provides the baseline. For example, JPY's score averages its move in USD/JPY, EUR/JPY, GBP/JPY, AUD/JPY, NZD/JPY, CAD/JPY and CHF/JPY — a true 7-pair basket reading. NOK and SEK, having no direct cross-pairs against GBP, AUD, CAD, CHF, or NZD, average only their 2 available pairs each (vs. USD and vs. EUR) — a valid but thinner read than the 8 majors. ECB daily rates serve as a silent fallback only when RT data is unavailable. Cells are color-coded by intensity: dark green (strong), light green (mild), flat (near zero), light red (mild weakness), dark red (weak).</p>
       <div class="callout callout-green">
-        <strong>Why 28 pairs?</strong> A meter based on fewer pairs creates asymmetric scoring — currencies with fewer pair observations get noisier, less reliable scores. The 28-pair standard ensures each currency is measured against all 7 of its peers simultaneously, making the ranking meaningful even when individual pairs are moving for idiosyncratic reasons.
+        <strong>Why does each currency have a different number of observations?</strong> The 8 G8 majors are each measured against all 7 of their peers, since every major-to-major cross is liquid enough to track live. NOK and SEK currently have only USD and EUR crosses in the live pair set, so their score is a 2-pair average rather than a 7-pair one — still directionally meaningful, but noisier and more exposed to a single pair's idiosyncratic move than the majors' readings.
       </div>
       <div class="callout">
         <strong>How to read it:</strong> Currencies on the left are outperforming; currencies on the right are underperforming. A large gap in scores between adjacent cells signals a decisive move. Compare the far left and far right to identify the highest-conviction long/short pair of the session.
@@ -884,7 +892,7 @@ a { color: inherit; text-decoration: none; }
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:12px;">
           <span style="font-size:11px;font-weight:700;color:var(--text);">CHF</span>
           <span style="font-size:11px;color:var(--up);font-family:var(--font-mono);">+0.85%</span>
-          <span style="font-size:10px;color:var(--text3);">Rank #1 / 8 &middot; 7/7 pairs won</span>
+          <span style="font-size:10px;color:var(--text3);">Rank #1 / 10 &middot; 7/7 pairs won</span>
         </div>
         <div style="display:flex;border-bottom:1px solid var(--border);gap:0;">
           <div style="padding:7px 16px;font-size:11px;font-weight:700;color:var(--blue);border-bottom:2px solid var(--blue);">Pair Breakdown</div>
@@ -910,17 +918,17 @@ a { color: inherit; text-decoration: none; }
             <div style="color:var(--up);text-align:right;">+0.91%</div>
             <div style="text-align:right;"><span style="display:inline-block;width:38px;height:6px;background:var(--up);opacity:.7;border-radius:2px;"></span></div>
           </div>
-          <div style="padding:8px 0 2px;font-size:10px;color:var(--text3);">AI Analytics &middot; ~5min delay &middot; 28-pair equal-weighted model</div>
+          <div style="padding:8px 0 2px;font-size:10px;color:var(--text3);">AI Analytics &middot; ~5min delay &middot; 32-pair model</div>
         </div>
       </div>
 
-      <p><strong style="color:var(--text);">Pair Breakdown</strong> — shows the 7 direct pairs for the selected currency with close price, previous close, percentage change, day % and 1W %, and a proportional impact bar. A composite ranking row shows the full 8-currency strength order with animated horizontal bars. The metrics strip above the table shows six tiles: Composite (intraday), 1W Strength, Rank, Pairs won, Strongest vs, and Weakest vs.</p>
+      <p><strong style="color:var(--text);">Pair Breakdown</strong> — shows the direct pairs for the selected currency (7 for the 8 G8 majors; 2 for NOK and SEK) with close price, previous close, percentage change, day % and 1W %, and a proportional impact bar. A composite ranking row shows the full 10-currency strength order with animated horizontal bars. The metrics strip above the table shows six tiles: Composite (intraday), 1W Strength, Rank, Pairs won, Strongest vs, and Weakest vs.</p>
 
       <p><strong style="color:var(--text);">Session</strong> — shows the selected currency's strength contribution weighted by trading session volume (New York 38%, London 35%, Tokyo 18%, Sydney 9%). The active session is highlighted in blue. Below the session bars, an <strong>AI Session Context</strong> block provides per-session notes for the currency: a concise recap of the catalyst that drove price action in each session (CLOSED), current session dynamics (ACTIVE), and the upcoming scheduled event to watch (UPCOMING). Session context notes are generated 4&times; daily alongside the main narrative and are grounded in actual economic calendar events. All displayed times are converted to your local timezone.</p>
 
-      <p><strong style="color:var(--text);">Correlations</strong> — shows an 8&times;8 strength differential matrix with a Composite column: each cell is the composite % difference between the row currency and the column currency, with color intensity proportional to the divergence. Below the matrix, a <strong>Strength Drivers</strong> block lists the top 3 pairs by absolute contribution, each with an AI-generated one-line note (max 85 characters) explaining the structural driver — CB stance differential, COT positioning extreme, or carry differential. Attribution footer: <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">AI Analytics &middot; ~5min delay</span>. Clicking any row in the Key Correlations panel (right panel) opens a dedicated correlation modal with a 252-day history sparkline showing real calendar dates, z-score, and a regime signal.</p>
+      <p><strong style="color:var(--text);">Correlations</strong> — shows a 10&times;10 strength differential matrix with a Composite column: each cell is the composite % difference between the row currency and the column currency, with color intensity proportional to the divergence. Below the matrix, a <strong>Strength Drivers</strong> block lists the top 3 pairs by absolute contribution, each with an AI-generated one-line note (max 85 characters) explaining the structural driver — CB stance differential, COT positioning extreme, or carry differential. Attribution footer: <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">AI Analytics &middot; ~5min delay</span>. Clicking any row in the Key Correlations panel (right panel) opens a dedicated correlation modal with a 252-day history sparkline showing real calendar dates, z-score, and a regime signal.</p>
 
-      <p><strong style="color:var(--text);">CSI</strong> — Currency Strength Index: a multi-series LightweightCharts chart showing the cumulative log-return of all 8 major currencies over selectable periods (1M / 3M / 6M / 1Y / All). Computed from the full OHLC dataset across all 28 pairs — the same data as the heatmap. The focal currency's line is highlighted; all series start at 0% at the beginning of the selected period. A crosshair tooltip shows all 8 values simultaneously ordered strongest to weakest. A legend table below shows cumulative return, min, max, and range for each currency over the period.</p>
+      <p><strong style="color:var(--text);">CSI</strong> — Currency Strength Index: a multi-series LightweightCharts chart showing the cumulative log-return of all 10 G10 currencies over selectable periods (1M / 3M / 6M / 1Y / All). Computed from the full OHLC dataset across all 32 pairs — the same data as the heatmap. The focal currency's line is highlighted; all series start at 0% at the beginning of the selected period. A crosshair tooltip shows all 10 values simultaneously ordered strongest to weakest. A legend table below shows cumulative return, min, max, and range for each currency over the period.</p>
 
       <div class="callout">
         <strong>Note on session attribution:</strong> The session-weighted composite in the Session tab is a volume-proxy decomposition of the intraday move. Exact per-session attribution requires tick data, which is not publicly available. Treat session contributions as directional indicators, not precise measurements.
@@ -999,13 +1007,13 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
       <h3>Carry Trade — Top Pairs</h3>
-      <p>A ranked list of the top 10 carry trade pair candidates across all 28 8 major currencies combinations, sorted by <strong>real carry</strong> — the nominal OIS rate differential minus the inflation expectations differential between the two legs. This equals the real rate of the long leg minus the real rate of the short leg, and is the primary metric used by institutional FX carry screens. The tiebreak is carry-to-vol: real carry divided by 30-day realised volatility (HV30), filtering for efficiency of return per unit of risk. When inflation expectations data is unavailable, the panel falls back to gross nominal differential ranking and the subtitle updates to reflect this.</p>
+      <p>A ranked list of the top 10 carry trade pair candidates across all 45 G10 currency combinations, sorted by <strong>real carry</strong> — the nominal OIS rate differential minus the inflation expectations differential between the two legs. This equals the real rate of the long leg minus the real rate of the short leg, and is the primary metric used by institutional FX carry screens. The tiebreak is carry-to-vol: real carry divided by 30-day realised volatility (HV30), filtering for efficiency of return per unit of risk. When inflation expectations data is unavailable, the panel falls back to gross nominal differential ranking and the subtitle updates to reflect this.</p>
       <p>Each row shows: the rank, the pair, the <em>nominal</em> OIS spread as context (e.g. <code style="font-family:var(--font-mono);font-size:11px;">+2.83%</code>), a proportional bar, and the <em>real carry</em> value on the right (what actually ranks the pair). A positive real carry means the long leg earns positive carry after inflation erodes the nominal spread. Clicking any row opens the Real Rate Carry Modal for a full breakdown. Hovering shows: long rate / short rate / real carry / HV30.</p>
       <!-- MOCK: Carry Trade Ranking — values match current OIS rates (May 2026) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:200px;font-size:11px;">
         <div style="padding:5px 8px 4px;border-bottom:1px solid var(--border);background:var(--head-bg);display:flex;flex-direction:column;gap:1px;">
           <span style="font-size:9px;font-weight:700;color:var(--text2);font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em;">Carry Trade Ranking</span>
-          <span style="font-size:8px;color:var(--text3);letter-spacing:.04em;">8 major currencies &middot; real carry &middot; annualised</span>
+          <span style="font-size:8px;color:var(--text3);letter-spacing:.04em;">G10 &middot; CIP-adjusted &middot; click for real rate</span>
         </div>
         <!-- rows: rank / pair / nominal OIS spread / bar / real carry value -->
         <div style="display:grid;grid-template-columns:10px 46px 36px 1fr 38px;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);cursor:pointer;">
@@ -1046,7 +1054,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <p style="font-size:12px;color:var(--text2);margin:4px 0 16px;">The right column shows <strong>real carry</strong> (nominal OIS spread minus inflation differential) — the primary ranking value. The middle column shows the <strong>nominal OIS spread</strong> as reference context. Color coding: <span style="color:var(--up);">green</span> = real carry &ge;+0.5% (positive after inflation), neutral = 0%&ndash;0.5%, <span style="color:var(--text3);">dim</span> = negative real carry (inflation erodes nominal spread). Note: this is inflation-adjusted carry, not Covered Interest Parity (CIP) — no FX forward adjustment is applied.</p>
       <h3>Upcoming Events</h3>
-      <p>A native Economic Calendar panel embedded in the left sidebar, showing major-economy medium- and high-impact events. The primary source is <strong>ForexFactory</strong> (fetched server-side every ~6 hours); the fallback is Finnhub. Columns: local time (your browser timezone), currency flag, impact dot (red = high, orange = medium), event name, actual result with beat/miss coloring, consensus forecast, and previous reading. The source label reflects the active feed (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">ForexFactory · 8 major currencies · medium &amp; high impact · GMT-3</span>). The panel auto-scrolls to today or the next upcoming event on load. A floating pill button appears when upcoming events are off-screen, with an adaptive arrow pointing toward them.</p>
+      <p>A native Economic Calendar panel embedded in the left sidebar, showing G10 medium- and high-impact events. The primary source is <strong>ForexFactory</strong> (fetched server-side every ~6 hours); the fallback is Finnhub. Columns: local time (your browser timezone), currency flag, impact dot (red = high, orange = medium), event name, actual result with beat/miss coloring, consensus forecast, and previous reading. The source label reflects the active feed (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">ForexFactory · actual vs consensus · 90d rolling</span>). The panel auto-scrolls to today or the next upcoming event on load. A floating pill button appears when upcoming events are off-screen, with an adaptive arrow pointing toward them.</p>
       <p>On <strong>bank holidays</strong>, one or more dedicated holiday rows appear at the top of the affected day — one row per market closure. Each row shows the currency flag, 3-letter code (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">🇺🇸 USD</span>), the holiday title (e.g. "Memorial Day"), and "All Day" in the time column. A tooltip on hover shows the full label: "<em>Memorial Day — USD market closed</em>". This makes it immediately visible why quotes for Gold, SPX, WTI, and USD pairs may be frozen on those days.</p>
 
       <h3 id="econ-surprises">Economic Surprises</h3>
@@ -1056,7 +1064,7 @@ a { color: inherit; text-decoration: none; }
       <!-- MOCK: Economic Surprises panel -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px 0 4px;max-width:220px;margin:16px 0 20px;">
         <div style="padding:0 8px 2px;font-size:10px;font-weight:700;color:var(--text);letter-spacing:.04em;">Economic Surprises</div>
-        <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast &middot; 8 major currencies &middot; 90d rolling</div>
+        <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast &middot; G10 &middot; 90d rolling</div>
         <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
           <thead>
             <tr>
@@ -1323,31 +1331,8 @@ a { color: inherit; text-decoration: none; }
         </table>
       </div>
 
-      <h3>Positioning Bias <span style="font-weight:normal;color:var(--text3);">CBOE/CME Vol · COT · 25d RR</span></h3>
-      <p>A directional bias table for major pairs, synthesised from three complementary sources. The <strong>ATM IV</strong> column shows annualised implied volatility sourced primarily from the <strong>CBOE/CME FX Volatility Indexes</strong> (^EUVIX for EUR/USD, ^BPVIX for GBP/USD, ^JYVIX for USD/JPY, ^AUDVIX for AUD/USD) — the same variance-swap replication methodology used by the VIX, published jointly by CBOE and CME, and the underlying benchmark for institutional FX volatility indices. These are clean index values, not derived from bid/ask option chains, and carry a ~15-minute delay. For USD/CHF and USD/CAD (no dedicated CBOE/CME index), the cascade falls back to CME FX futures options (6S, 6C) and then CBOE ETF options as a last resort. NZD/USD is derived from ^AUDVIX × 1.08 (long-run NZD/AUD realised vol ratio) and labeled as estimated. The <strong>COT bias</strong> column shows the net position of <strong>Leveraged Funds</strong> (hedge funds, CTAs) from the CFTC Disaggregated TFF report — Options+Futures Combined — as a directional proxy on a ±1.5 scale. The <strong>25d RR</strong> chip in the Direction cell shows the 25-delta Risk Reversal from Saxo Bank's public options page (1M tenor, indicative mid-market): positive means calls are bid over puts — the market is skewed for upside on the base currency; negative means puts are bid — downside protection is dominant. When all three signals align, the read is most reliable. Divergence — e.g. IV elevated, COT flat, RR neutral — signals uncertainty or a positioning squeeze risk.</p>
-      <div class="callout">
-        <strong>ATM IV color = cost of hedging, not direction.</strong> Green (≤7%) means options are historically cheap; red (&gt;12%) means hedging is expensive. In a risk-off or high-uncertainty environment, all pairs may show red — that is accurate information, not a bearish signal on the pair. Do not confuse elevated IV with a short bias. The 25d RR chip is the directional signal from the options market: its sign shows which side (calls or puts) investors are paying a premium to own.
-      </div>
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 0;max-width:280px;">
-        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
-          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Positioning Bias</span>
-          <span style="font-size:9px;color:var(--text3);font-weight:normal;"> CBOE/CME Vol · 25d RR · Saxo</span>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:10px;">
-          <thead><tr style="color:var(--text3);font-size:9px;">
-            <th style="text-align:left;padding:3px 8px;">Pair</th>
-            <th style="padding:3px 6px;">ATM IV</th>
-            <th style="padding:3px 6px;">COT bias</th>
-          </tr></thead>
-          <tbody>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">EUR/USD</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-family:var(--font-mono);">20.0%</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-size:10px;">−0.93</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">GBP/USD</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-family:var(--font-mono);">16.5%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+0.60</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">USD/JPY</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-family:var(--font-mono);">12.6%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+1.37</td></tr>
-            <tr><td style="padding:4px 8px;color:var(--text);">AUD/USD</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-family:var(--font-mono);">28.1%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+1.05</td></tr>
-          </tbody>
-        </table>
-        <div style="padding:4px 8px 5px;font-size:9px;color:var(--text3);">ATM IV: red &gt;12% · neutral 7–12% · green ≤7% (cheap) · COT: ±1.5 scale · 25d RR: + = calls bid · − = puts bid</div>
-      </div>
+      <h3>25-Delta Risk Reversal &amp; Implied Vol</h3>
+      <p>The standalone Positioning Bias table (ATM IV + COT bias + 25d RR in a single row per pair) shown in earlier terminal versions has been retired. Its components now live in two places: COT-derived directional bias is covered in the dedicated <a href="guide-cot.html">COT / CFTC Positioning</a> guide, and options-market data — 25-delta Risk Reversal term structure, realized volatility, and CIP-implied forwards — has moved to the dedicated <strong>Derivatives</strong> tab, covered in full under <a href="#derivatives">Derivatives Suite</a> below.</p>
     </div>
 
     <div class="guide-section" id="news-feed">
@@ -1517,7 +1502,7 @@ a { color: inherit; text-decoration: none; }
     <p>The <strong>Derivatives</strong> section is accessible via the topbar navigation tab (keyboard shortcut: <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">D</kbd>). It is hidden by default and replaces the main content area when selected. It consolidates five derivative and reference data panels not found elsewhere in the terminal.</p>
 
     <h3>Implied Forwards — Covered Interest Parity (CIP)</h3>
-    <p>Shows the theoretically fair forward rate for 8 major currencies major and cross pairs at four tenors (1M, 3M, 6M, 1Y), computed using the <strong>Covered Interest Parity formula</strong>: <code style="font-family:var(--font-mono);font-size:12px;">F = S × (1 + r_left × T) / (1 + r_right × T)</code>. The overnight benchmark rates (SOFR for USD, €STR for EUR, SONIA for GBP, TONA for JPY, AONIA for AUD, CORRA for CAD, SARON for CHF, OCR overnight for NZD) are used as discount rates — not the CB policy rates. This is the same methodology used by institutional FX desks for CIP pricing.</p>
+    <p>Shows the theoretically fair forward rate for G10 major and cross pairs at four tenors (1M, 3M, 6M, 1Y), computed using the <strong>Covered Interest Parity formula</strong>: <code style="font-family:var(--font-mono);font-size:12px;">F = S × (1 + r_left × T) / (1 + r_right × T)</code>. The overnight benchmark rates (SOFR for USD, €STR for EUR, SONIA for GBP, TONA for JPY, AONIA for AUD, CORRA for CAD, SARON for CHF, OCR overnight for NZD) are used as discount rates — not the CB policy rates — for the 8 G8 majors. NOK and SEK pairs (USD/NOK, USD/SEK, EUR/NOK, EUR/SEK) use the Norges Bank and Riksbank policy rate as a fallback where a dedicated daily overnight benchmark is not yet wired in. This is the same methodology used by institutional FX desks for CIP pricing.</p>
     <p>The <strong>Rate Diff</strong> column shows the annualized differential between the left-hand and right-hand currency's overnight benchmark. A positive value means the base currency is at a forward discount — the left-hand currency's interest rate is higher, so the forward rate is below spot per CIP. These are <em>not live quoted prices</em> — they are theoretical fair-value estimates based on OIS benchmarks and the current spot rate. Actual market forward prices incorporate credit, liquidity, and balance sheet premia.</p>
     <!-- MOCK: Implied Forwards table -->
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:16px 0 20px;overflow-x:auto;">
@@ -1561,7 +1546,7 @@ a { color: inherit; text-decoration: none; }
 
     <h3>FX OTC Notional Volume — DTCC GTR</h3>
     <p>Shows aggregated FX OTC notional volume from the <strong>DTCC Global Trade Repository</strong>, the largest trade repository for OTC derivatives in the US under Dodd-Frank reporting obligations. Data is the public CFTC Recast dissemination — T+1 (published by ~13:00 UTC the following business day), covering new trades only (ACTION = NEWT). Amendments, terminations, and lifecycle events are excluded to avoid double-counting.</p>
-    <p>Columns shown: <strong>Notional ($bn)</strong> — USD-equivalent notional, capped at $250M per trade per CFTC Dodd-Frank rules; <strong>Trades</strong> — count of new trade records; <strong>Swap $bn / Fwd $bn / Spot $bn</strong> — product-type breakdown where available (product type is derived from the UPI FISN field); <strong>% Total</strong> — each pair's share of the 8 major currencies aggregate, with a proportional intensity bar (standard terminal convention for volume data — directionally neutral, so blue intensity rather than green/red).</p>
+    <p>Columns shown: <strong>Notional ($bn)</strong> — USD-equivalent notional, capped at $250M per trade per CFTC Dodd-Frank rules; <strong>Trades</strong> — count of new trade records; <strong>Swap $bn / Fwd $bn / Spot $bn</strong> — product-type breakdown where available (product type is derived from the UPI FISN field); <strong>% Total</strong> — each pair's share of the G10 aggregate, with a proportional intensity bar (standard terminal convention for volume data — directionally neutral, so blue intensity rather than green/red).</p>
     <div class="callout">
       <strong>Coverage note:</strong> The DTCC GTR captures a significant subset of OTC FX trades reported under US Dodd-Frank rules — not total global FX volume. Spot FX rarely appears in the DTCC file because spot settles T+2 and is infrequently SDR-reportable. The $250M/trade notional cap suppresses large institutional block trades. Use this panel to identify relative activity across pairs, not as a measure of absolute global FX turnover.
     </div>
@@ -1571,7 +1556,7 @@ a { color: inherit; text-decoration: none; }
   <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.05);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
     <div>
       <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">Open the FX Terminal</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;">8 major currencies live rates, AI market narrative, COT positioning, yield curve, cross-asset risk, and session liquidity — all in one professional dashboard.</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">G10 live rates, AI market narrative, COT positioning, yield curve, cross-asset risk, and session liquidity — all in one professional dashboard.</div>
     </div>
     <a href="/" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:var(--blue);color:#fff;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
   </div>
