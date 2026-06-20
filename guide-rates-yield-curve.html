@@ -363,6 +363,7 @@ a { color: inherit; text-decoration: none; }
     <a class="toc-item" href="#us-de">US–DE 10Y Spread</a>
     <a class="toc-item" href="#us-jp">US–JP 10Y Spread</a>
     <a class="toc-item" href="#country-tabs">Country Tabs &amp; Spreads</a>
+    <a class="toc-item" href="#market-commentary">Detail View &amp; Market Commentary</a>
     <a class="toc-item" href="#fx-implication">FX Implications</a>
     <div class="toc-divider"></div>
     <a class="toc-item" href="guide-cross-asset-risk.html">← Cross-Asset Risk</a>
@@ -575,6 +576,15 @@ a { color: inherit; text-decoration: none; }
       <p>A final <strong>Spreads</strong> tab replaces the country grid with a single consolidated table: each of the eight non-US G10 economies shown above, with its 10Y yield, the spread versus the US 10Y in basis points, its 2Y yield where available, and a curve-slope indicator. This is the fastest way to scan all cross-country spreads at once rather than switching tabs one at a time.</p>
       <div class="callout">
         <strong>Two different things called "spreads."</strong> The US pane's own spread table (2Y–10Y, US–DE, US–JP) is fixed and always visible without switching tabs — it covers the two most-watched relationships by default. The <strong>Spreads</strong> tab is a separate, broader view covering all eight non-US economies at once. Use the US pane's table for a quick read on EUR/USD and USD/JPY specifically; use the Spreads tab to scan the full G10 set, including NOK and SEK.
+      </div>
+    </div>
+
+    <div class="guide-section" id="market-commentary">
+      <h2>Detail View &amp; Market Commentary</h2>
+      <p>Clicking the Rates &amp; Yield Curve panel opens a detail view with a larger curve chart, the 10Y–2Y and 30Y–2Y spread metrics, and the full tenor table (today, prior close, change in bp). Below the table, a <strong>Market Commentary</strong> block surfaces up to three of the most recent institutional headlines specifically about US Treasury yields and the yield curve — the same Bloomberg/Refinitiv-style commentary pattern used in the CB Rates detail view, applied here to Treasury-specific coverage rather than a single central bank.</p>
+      <p>Articles are pulled from the terminal's news pipeline and filtered by topic — Treasury yield, yield curve, and tenor-specific terminology (10-year, 2-year, 30-year, T-Bill) — rather than by currency tag, since a generic "USD" filter would also surface unrelated USD headlines (payrolls, CPI, Fed speeches with no bearing on the curve itself). Each entry shows the source, a relative timestamp, the headline (linked to the original article), and a short excerpt. If no qualifying article exists in the current news window, the panel shows an empty state rather than an unrelated headline.</p>
+      <div class="callout">
+        <strong>Data source:</strong> Market Commentary draws from the same institutional RSS pipeline as the rest of the terminal's News Feed — sourced from outlets with dedicated bond and Treasury coverage. The block refreshes whenever the detail view is reopened; it does not poll while the view is closed.
       </div>
     </div>
 
