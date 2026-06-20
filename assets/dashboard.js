@@ -10335,6 +10335,7 @@ function _resolveRate(ccy) {
 const CIP_CCY_RATES = new Set([
   'EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD',
   'EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CHF',
+  'USD/NOK','USD/SEK','EUR/NOK','EUR/SEK',
 ]);
 
 // ── Render CIP Forwards in main FX Pairs table (tds[7]=Fwd1M, tds[8]=Fwd3M) ──
@@ -10475,10 +10476,11 @@ async function renderDerivativesSection() {
     }
   } catch { /* rr2.json not yet deployed — graceful fallback */ }
 
-  const pairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD'];
+  const pairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD','USD/NOK','USD/SEK'];
   const rrKeys = {
     'EUR/USD':'EURUSD','GBP/USD':'GBPUSD','USD/JPY':'USDJPY',
-    'AUD/USD':'AUDUSD','USD/CHF':'USDCHF','USD/CAD':'USDCAD','NZD/USD':'NZDUSD'
+    'AUD/USD':'AUDUSD','USD/CHF':'USDCHF','USD/CAD':'USDCAD','NZD/USD':'NZDUSD',
+    'USD/NOK':'USDNOK','USD/SEK':'USDSEK'
   };
 
   // ── Forwards table ──
@@ -10534,7 +10536,7 @@ async function renderDerivativesSection() {
     });
 
     // ── Cross pairs CIP forwards ──
-    const crossFwdPairs = ['EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CHF'];
+    const crossFwdPairs = ['EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CHF','EUR/NOK','EUR/SEK'];
     crossFwdPairs.forEach(pair => {
       const row = fwdTbody.querySelector(`tr[data-pair="${pair}"]`);
       if (!row) return;
@@ -10626,7 +10628,7 @@ async function renderDerivativesSection() {
   const hvTermTbody = document.getElementById('hv-term-tbody');
   if (hvTermTbody) {
     const rows = hvTermTbody.querySelectorAll('tr');
-    const termPairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD'];
+    const termPairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','NZD/USD','USD/NOK','USD/SEK'];
     termPairs.forEach((pair, idx) => {
       const row = rows[idx];
       if (!row) return;
@@ -10945,6 +10947,8 @@ const G8_YIELD_MAP = {
   au: { file: 'AUD', label: 'Australia', subtitle: 'AUSTRALIA · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond10y', label: '10Y ACGB' }] },
   ca: { file: 'CAD', label: 'Canada',  subtitle: 'CANADA · SOVEREIGN BOND YIELDS',  tenors: [{ k: 'bond2y', label: '2Y CGB' }, { k: 'bond10y', label: '10Y CGB' }] },
   nz: { file: 'NZD', label: 'New Zealand', subtitle: 'NEW ZEALAND · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond10y', label: '10Y NZGB' }] },
+  no: { file: 'NOK', label: 'Norway',   subtitle: 'NORWAY · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond2y', label: '2Y NGB' }, { k: 'bond10y', label: '10Y NGB' }] },
+  se: { file: 'SEK', label: 'Sweden',   subtitle: 'SWEDEN · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond2y', label: '2Y SGB' }, { k: 'bond10y', label: '10Y SGB' }] },
 };
 
 async function renderG8YieldPane(cty) {
@@ -11003,6 +11007,8 @@ async function renderSovereignSpreads() {
     { code: 'au', file: 'AUD', label: 'AU' },
     { code: 'ca', file: 'CAD', label: 'CA' },
     { code: 'nz', file: 'NZD', label: 'NZ' },
+    { code: 'no', file: 'NOK', label: 'NO' },
+    { code: 'se', file: 'SEK', label: 'SE' },
   ];
 
   // Load US first
