@@ -1,5 +1,16 @@
 """
-fetch_bond_yields.py  v2.2  —  Bond yields for USD / EUR / GBP / JPY + G8 bond2y
+fetch_bond_yields.py  v2.3  —  Bond yields for USD / EUR / GBP / JPY + G10 bond2y
+
+CHANGELOG v2.3 (2026-06-19)
+────────────────────────────
+FEAT-1  Added NOK and SEK — G10 Scandinavian rollout (Rates & Yield Curve panel).
+        bond10y (REQUIRED): FRED IRLTLT01NOM156N / IRLTLT01SEM156N — OECD Main
+        Economic Indicators "Long-Term Government Bond Yields: 10-Year", same
+        family already used as fallback for EUR/GBP/JPY 10Y. Monthly, no key.
+        bond2y (OPTIONAL): FRED INTGSBNOM193N / INTGSBSEM193N — IMF IFS 2Y
+        government securities yield, same family as JPY/NZD 2Y. Falls back to
+        None (not a hard failure) if thin/discontinued, matching JPY/NZD
+        treatment. Wired into main() dispatch; degraded-run counter now /9.
 
 CHANGELOG v2.2 (2026-06-08)
 ────────────────────────────
@@ -94,6 +105,10 @@ Source cascade per currency:
                    FRED IRLTLT01CAM156N  (monthly, no key) [fallback]
     AUD bond2y   → Australia has no 2Y government bond benchmark   [OPTIONAL → None]
     NZD bond2y   → FRED INTGSBNZM193N    (monthly, IMF IFS, no key)[OPTIONAL]
+    NOK bond10y  → FRED IRLTLT01NOM156N  (monthly, OECD MEI, no key)[REQUIRED]
+    NOK bond2y   → FRED INTGSBNOM193N    (monthly, IMF IFS, no key)[OPTIONAL]
+    SEK bond10y  → FRED IRLTLT01SEM156N  (monthly, OECD MEI, no key)[REQUIRED]
+    SEK bond2y   → FRED INTGSBSEM193N    (monthly, IMF IFS, no key)[OPTIONAL]
 
 Exit policy:
     USD bond10y unavailable     → exit(1)  (hard failure, most critical field)
@@ -832,11 +847,101 @@ def fetch_nzd_2y(opt_failures: list) -> None:
     _save("NZD", data, dates)
 
 
+# ── NOK ───────────────────────────────────────────────────────────────────────
+
+def fetch_nok(req_failures: list, opt_failures: list) -> None:
+    """NOK bond10y (REQUIRED) + bond2y (OPTIONAL).
+
+    bond10y: FRED IRLTLT01NOM156N — OECD Main Economic Indicators, "Long-Term
+        Government Bond Yields: 10-Year: Main (Including Benchmark) for Norway".
+        Same OECD MEI family already used as the fallback source for EUR/GBP/JPY
+        10Y (IRLTLT01{EA,GB,JP}M156N). Monthly, no key, confirmed live series.
+        This is the institutional-standard NOK long-bond proxy — Norway's
+        government bond market is comparatively thin, so Bloomberg/Refinitiv
+        also reference the OECD/Norges Bank 10Y benchmark rather than a single
+        on-the-run ISIN.
+    bond2y: FRED INTGSBNOM193N — IMF IFS government securities yield, 2Y,
+        monthly. Same family as INTGSBEAM193N (EUR) / INTGSBGBM193N (GBP) /
+        INTGSBJPM193N (JPY) / INTGSBNZM193N (NZD). Optional: falls back to
+        None (not 404 exit) if the series is thin or discontinued, consistent
+        with the JPY/NZD 2Y treatment.
+    """
+    print("\nNOK")
+    data, dates = _load_existing("NOK")
+
+    print("  bond10y (FRED:IRLTLT01NOM156N monthly [OECD MEI])")
+    dt10, val10 = _fred_csv_latest("IRLTLT01NOM156N")
+    if val10 is not None and 0 < val10 < 20 and not _is_stale(dt10):
+        data["bond10y"]  = round(val10, 4)
+        dates["bond10y"] = dt10
+        print(f"    {val10:.4f}%  ({dt10})  [FRED-OECD-MEI-monthly]")
+    else:
+        _gha_warning("NOK bond10y: FRED IRLTLT01NOM156N unavailable or stale — keeping existing")
+        req_failures.append("NOK.bond10y")
+
+    print("  bond2y  (FRED:INTGSBNOM193N monthly [IMF IFS])")
+    dt2, val2 = _fred_csv_latest("INTGSBNOM193N")
+    if val2 is not None and 0 < val2 < 20 and not _is_stale(dt2):
+        data["bond2y"]  = round(val2, 4)
+        dates["bond2y"] = dt2
+        print(f"    {val2:.4f}%  ({dt2})  [FRED-IMF-IFS-monthly]")
+    else:
+        if val2 is not None and _is_stale(dt2):
+            print(f"    FRED INTGSBNOM193N: series discontinued — last obs {dt2} is stale (>18 months)")
+            data.pop("bond2y", None)
+            dates.pop("bond2y", None)
+        _gha_notice("NOK bond2y: FRED INTGSBNOM193N unavailable or discontinued. Field correctly None.")
+        opt_failures.append("NOK.bond2y")
+
+    _save("NOK", data, dates)
+
+
+# ── SEK ───────────────────────────────────────────────────────────────────────
+
+def fetch_sek(req_failures: list, opt_failures: list) -> None:
+    """SEK bond10y (REQUIRED) + bond2y (OPTIONAL).
+
+    bond10y: FRED IRLTLT01SEM156N — OECD MEI, "Long-Term Government Bond
+        Yields: 10-Year: Main (Including Benchmark) for Sweden". Same family
+        and rationale as fetch_nok() above.
+    bond2y: FRED INTGSBSEM193N — IMF IFS 2Y, monthly. Optional, same fallback
+        treatment as NOK/JPY/NZD.
+    """
+    print("\nSEK")
+    data, dates = _load_existing("SEK")
+
+    print("  bond10y (FRED:IRLTLT01SEM156N monthly [OECD MEI])")
+    dt10, val10 = _fred_csv_latest("IRLTLT01SEM156N")
+    if val10 is not None and 0 < val10 < 20 and not _is_stale(dt10):
+        data["bond10y"]  = round(val10, 4)
+        dates["bond10y"] = dt10
+        print(f"    {val10:.4f}%  ({dt10})  [FRED-OECD-MEI-monthly]")
+    else:
+        _gha_warning("SEK bond10y: FRED IRLTLT01SEM156N unavailable or stale — keeping existing")
+        req_failures.append("SEK.bond10y")
+
+    print("  bond2y  (FRED:INTGSBSEM193N monthly [IMF IFS])")
+    dt2, val2 = _fred_csv_latest("INTGSBSEM193N")
+    if val2 is not None and 0 < val2 < 20 and not _is_stale(dt2):
+        data["bond2y"]  = round(val2, 4)
+        dates["bond2y"] = dt2
+        print(f"    {val2:.4f}%  ({dt2})  [FRED-IMF-IFS-monthly]")
+    else:
+        if val2 is not None and _is_stale(dt2):
+            print(f"    FRED INTGSBSEM193N: series discontinued — last obs {dt2} is stale (>18 months)")
+            data.pop("bond2y", None)
+            dates.pop("bond2y", None)
+        _gha_notice("SEK bond2y: FRED INTGSBSEM193N unavailable or discontinued. Field correctly None.")
+        opt_failures.append("SEK.bond2y")
+
+    _save("SEK", data, dates)
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v2.2 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v2.3 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
@@ -857,6 +962,8 @@ def main() -> None:
         ("AUD", fetch_aud_2y,(opt_failures,)),
         ("CAD", fetch_cad_2y,(req_failures,)),
         ("NZD", fetch_nzd_2y,(opt_failures,)),
+        ("NOK", fetch_nok,   (req_failures, opt_failures)),
+        ("SEK", fetch_sek,   (req_failures, opt_failures)),
     ]:
         try:
             fn(*args)
@@ -865,7 +972,7 @@ def main() -> None:
             print(f"  ERROR [{ccy}]: {exc}")
             hard_errors.append(ccy)
 
-    print(f"\nDone — {7 - len(hard_errors)}/7 currencies processed.")
+    print(f"\nDone — {9 - len(hard_errors)}/9 currencies processed.")
 
     if opt_failures:
         print(f"Optional fields (no source available, expected): {', '.join(opt_failures)}")

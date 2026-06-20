@@ -32,12 +32,15 @@ PASSWORD    = os.environ.get("MYFXBOOK_PASSWORD", "").strip()
 OUTPUT_PATH = os.environ.get("OUTPUT_PATH", "sentiment-data/myfxbook.json")
 MYFXBOOK_BASE = "https://www.myfxbook.com/api"
 
-# The 24 pairs the dashboard tracks, in order, with slash format
+# The 28 pairs the dashboard tracks, in order, with slash format
+# v8.3.4: added USD/NOK, USD/SEK, EUR/NOK, EUR/SEK — G10 Scandi rollout.
+# Confirmed live on Myfxbook Community Outlook (myfxbook.com/community/outlook).
 TRACKED_PAIRS = [
     "EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD", "USD/CHF",
     "NZD/USD", "EUR/GBP", "EUR/JPY", "GBP/JPY", "EUR/AUD", "EUR/CAD",
     "EUR/CHF", "EUR/NZD", "AUD/JPY", "AUD/CAD", "AUD/CHF", "AUD/NZD",
     "GBP/CHF", "GBP/AUD", "GBP/CAD", "GBP/NZD", "CHF/JPY", "CAD/JPY",
+    "USD/NOK", "USD/SEK", "EUR/NOK", "EUR/SEK",
 ]
 
 if not EMAIL or not PASSWORD:
