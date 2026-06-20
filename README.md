@@ -79,8 +79,8 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight major currenc
 
 | Workflow | Schedule (UTC) | Output |
 |---|---|---|
-| `update-bond-yields.yml` | 23:00 daily | `extended-data/{USD,EUR,GBP,JPY}.json` — bond10y, bond2y, bond5y, vix (FRED + ECB + BOE) |
-| `update-inflation-expectations.yml` | Monday 06:00 | `extended-data/{USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD}.json` — inflationExpectations (FRED + World Bank) |
+| `update-bond-yields.yml` | 23:00 daily | `extended-data/{USD,EUR,GBP,JPY,AUD,CAD,NZD,NOK,SEK}.json` — bond10y, bond2y, bond5y, vix (FRED + ECB + BOE) |
+| `update-inflation-expectations.yml` | Wednesday 07:00 | `extended-data/{USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD,NOK,SEK}.json` — inflationExpectations (FRED + BOE + RBNZ + IMF + OECD + World Bank) |
 | `update-ohlc.yml` | Every :30 Mon–Fri (H1/H4); 01:30 Tue–Sat (D1 finalization); 23:30 Sat–Sun (crypto) | `ohlc-data/`, `ohlc-data/h1/`, `ohlc-data/h4/` — OHLC bars for all 38 chart symbols |
 | `fetch-bank-research.yml` | Every 4h at :15 UTC (Mon–Sun) | `research-data/bank-research.json` — institutional FX research metadata (ING, Saxo, MUFG, DailyFX, BIS); injects `research_context` block into `ai-analysis/context_snapshot.json` |
 
