@@ -69,7 +69,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD · NOK · SEK — the ten G
 | `guide-cot.html` | COT / CFTC positioning guide |
 | `guide-economic-surprises.html` | Economic Surprise Index guide |
 | `guide-gbpjpy-cot.html` | GBP/JPY bias factors (market research) |
-| `guide-mt5-ea.html` | MetaTrader 5 Expert Advisor setup & feature guide (market research) |
+| `guide-mt5-ea.html` | MetaTrader 5 Expert Advisor setup & feature guide |
 
 ---
 
