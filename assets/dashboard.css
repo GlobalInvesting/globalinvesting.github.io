@@ -1941,37 +1941,37 @@ a:focus-visible,
 }
 
 /* ─── NEWS SECTION (.ns-*) ──────────────────────────────────────────────────
-   Single-row calendar-style accordion. Layout per item:
-   [time-stacked][dot][headline…truncated][cur-tag][source][chevron] — one line.
-   Moved from inline <style> block in index.html (v8.3.2 — non-critical, hidden tab). */
-.ns-item { display:block;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s; }
-.ns-item:hover { background:var(--bg3); }
-.ns-item:last-child { border-bottom:none; }
-.ns-featured .ns-row { border-left:2px solid var(--accent);padding-left:12px; }
-.ns-row { display:flex;align-items:center;gap:8px;padding:0 14px;height:32px;min-width:0; }
-/* Time cell: fixed 38px — stacks HH:MM over Xh in a single column */
-.ns-time { display:flex;flex-direction:column;justify-content:center;flex-shrink:0;width:38px;line-height:1; }
-.ns-time-hm  { font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap; }
-.ns-time-age { font-size:8px;color:var(--text3);font-family:var(--font-mono);opacity:.65;white-space:nowrap;margin-top:1px; }
+   Always-expanded article blocks — CB Rates Market Commentary aesthetic (v8.8.2).
+   Layout per item: [meta row: dot · source · time · cur-tag] / [title] / [body].
+   No accordion/drawer — content always visible, matching cbr-ps-* pattern. */
+
+/* Article block */
+.ns-article { padding:9px 14px 10px;border-bottom:1px solid rgba(54,60,78,.35); }
+.ns-article:last-child { border-bottom:none; }
+.ns-featured { border-left:2px solid var(--accent);padding-left:12px; }
+
+/* Meta row: impact dot · source · time · currency tag — all inline */
+.ns-art-meta { display:flex;align-items:center;gap:6px;margin-bottom:4px; }
+
 /* Impact dot — Reuters/Bloomberg wire standard: red=high, amber=medium, dim=low */
 .ns-dot { width:5px;height:5px;border-radius:50%;flex-shrink:0; }
 .ns-dot-high { background:var(--down); }
 .ns-dot-med  { background:var(--orange);opacity:.85; }
 .ns-dot-low  { background:var(--border2); }
-.ns-headline { font-size:11px;color:var(--text);font-family:var(--font-ui);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0; }
-.ns-cur-tag { font-size:9px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;font-family:var(--font-ui);flex-shrink:0; }
-.ns-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);flex-shrink:0;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-.ns-chevron { color:var(--text3);flex-shrink:0;display:flex;align-items:center;transition:transform .18s; }
-.ns-open .ns-chevron { transform:rotate(180deg); }
-/* Inline snippet — always visible below headline row (matches research excerpt pattern) */
-.ns-snippet-row { display:none; }
-.ns-open .ns-snippet-row { display:block;padding:0 14px 8px 60px;font-size:10px;color:var(--text2);font-family:var(--font-ui);line-height:1.55;overflow:visible; }
-/* Accordion drawer — source attribution + read link only (snippet now always visible above) */
-.ns-drawer { display:none;padding:4px 14px 10px 60px;border-top:1px solid var(--border); }
-.ns-open .ns-drawer { display:block; }
-.ns-drawer-source { font-size:9px;color:var(--text3);font-family:var(--font-ui);margin:0 0 4px 0;text-transform:uppercase;letter-spacing:.04em; }
-.ns-read-link { display:inline-block;margin-top:4px;font-size:10px;color:var(--accent);font-family:var(--font-ui);text-decoration:none; }
-.ns-read-link:hover { text-decoration:underline; }
+
+.ns-art-source { font-size:8px;font-weight:600;color:var(--accent,var(--blue));font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em; }
+.ns-art-time   { font-size:8px;color:var(--text2);font-family:var(--font-mono); }
+.ns-cur-tag    { font-size:8px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;font-family:var(--font-mono);flex-shrink:0; }
+
+/* Headline — semibold, clickable when a safe link is available */
+.ns-art-title { font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:5px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+.ns-art-title a { color:inherit;text-decoration:none; }
+.ns-art-title a:hover { text-decoration:underline;text-decoration-color:var(--text2); }
+
+/* Body excerpt — always visible (no collapse) */
+.ns-art-body { font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+
+/* Currency filter pills — shared across all three sub-panels */
 .ns-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
 .ns-cur-pill:hover { background:var(--bg3);color:var(--text); }
 .ns-pill-active { background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important; }

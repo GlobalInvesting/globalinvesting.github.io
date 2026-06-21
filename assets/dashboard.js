@@ -11452,6 +11452,10 @@ const _RESEARCH_NEWS_SOURCES = new Set([
 ]);
 
 // ── Helper: build one NS item element (shared by News and Trading feeds) ──────
+// Styled to match the CB Rates modal's Market Commentary block (cbr-ps-art-*):
+// a always-expanded newswire article — meta row (impact dot · source · time · currency),
+// title (clickable headline when a safe link is available), and body excerpt below.
+// No collapse/expand interaction — Bloomberg/Reuters wire panels read top-to-bottom.
 function _buildNsItem(item, containerEl) {
   let time = item.time || '--:--';
   let ageMs = 0;
@@ -11469,110 +11473,91 @@ function _buildNsItem(item, containerEl) {
     }
   }
 
-  let ageLabel = '';
-  let showDate = false;
+  // Time label: "HH:MM · Ns" for recent items, "HH:MM · Mon D" once a day has passed
+  let timeLabel = time;
   if (ageMs > 0) {
     const ageMin  = Math.floor(ageMs / 60000);
     const ageHr   = Math.floor(ageMs / 3600000);
     const ageDays = Math.floor(ageMs / 86400000);
-    if (ageDays >= 1)      { showDate = true; }
-    else if (ageHr >= 1)   { ageLabel = ageHr + 'h'; }
-    else if (ageMin >= 1)  { ageLabel = ageMin + 'm'; }
-    else                   { ageLabel = 'now'; }
+    if (ageDays >= 1 && pubDate) {
+      timeLabel = time + ' \u00b7 ' + pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    } else if (ageHr >= 1) {
+      timeLabel = time + ' \u00b7 ' + ageHr + 'h';
+    } else if (ageMin >= 1) {
+      timeLabel = time + ' \u00b7 ' + ageMin + 'm';
+    } else {
+      timeLabel = time + ' \u00b7 now';
+    }
   }
 
   const headline = item.title  || '';
-  const snippet  = item.expand || '';
   const cur      = item.cur    || '';
   const source   = item.source || '';
   const impact   = item.impact || 'low';
   const rawLink  = item.link   || '';
   const safeLink = rawLink.startsWith('https://') ? rawLink : '';
-  const hasSnip  = snippet.length > 0;
+
+  // Body excerpt — truncate at the last full sentence within ~500 chars
+  // (same convention as the CB Rates Market Commentary block).
+  let body = (item.expand || '').replace(/\s+/g, ' ').trim();
+  if (body.length > 500) {
+    const cut = body.slice(0, 500);
+    const lastPeriod = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
+    body = (lastPeriod > 200 ? cut.slice(0, lastPeriod + 1) : cut) + '\u2026';
+  }
 
   const wrap = document.createElement('div');
-  wrap.className = 'ns-item' + (item.featured ? ' ns-featured' : '');
+  wrap.className = 'ns-article' + (item.featured ? ' ns-featured' : '');
 
-  const row = document.createElement('div');
-  row.className = 'ns-row';
-
-  const timeEl = document.createElement('span');
-  timeEl.className = 'ns-time';
-  const timeTop = document.createElement('span');
-  timeTop.className = 'ns-time-hm';
-  const timeBot = document.createElement('span');
-  timeBot.className = 'ns-time-age';
-
-  if (showDate && pubDate) {
-    const dateStr = pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
-    timeTop.textContent = dateStr;
-    timeEl.title = time + ' · ' + pubDate.toLocaleDateString();
-  } else {
-    timeTop.textContent = time;
-    if (ageLabel && ageLabel !== 'now') timeBot.textContent = ageLabel;
-    if (ageLabel) timeEl.title = ageLabel + ' ago';
-  }
-  timeEl.appendChild(timeTop);
-  if (timeBot.textContent) timeEl.appendChild(timeBot);
+  // ── Meta row: impact dot · source · time · currency tag ──
+  const meta = document.createElement('div');
+  meta.className = 'ns-art-meta';
 
   const dot = document.createElement('span');
   dot.className = 'ns-dot ns-dot-' + impact;
+  meta.appendChild(dot);
 
-  const headEl = document.createElement('span');
-  headEl.className = 'ns-headline';
-  headEl.textContent = headline;
-  headEl.title = headline;
+  if (source) {
+    const srcEl = document.createElement('span');
+    srcEl.className = 'ns-art-source';
+    srcEl.textContent = source;
+    meta.appendChild(srcEl);
+  }
 
-  const chevron = document.createElement('span');
-  chevron.className = 'ns-chevron';
-  chevron.setAttribute('aria-hidden', 'true');
-  chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
+  const timeEl = document.createElement('span');
+  timeEl.className = 'ns-art-time';
+  timeEl.textContent = timeLabel;
+  meta.appendChild(timeEl);
 
-  row.appendChild(timeEl);
-  row.appendChild(dot);
-  row.appendChild(headEl);
   if (cur) {
     const curTag = document.createElement('span');
     curTag.className = 'ns-cur-tag';
     curTag.textContent = cur;
-    row.appendChild(curTag);
+    meta.appendChild(curTag);
   }
-  row.appendChild(chevron);
-  wrap.appendChild(row);
+  wrap.appendChild(meta);
 
-  // ── Inline snippet — always visible below headline (Reuters/Bloomberg pattern) ──
-  if (hasSnip) {
-    const snipInline = document.createElement('div');
-    snipInline.className = 'ns-snippet-row';
-    snipInline.textContent = snippet;
-    wrap.appendChild(snipInline);
+  // ── Title — clickable headline when a safe link is available ──
+  const titleEl = document.createElement('div');
+  titleEl.className = 'ns-art-title';
+  if (safeLink) {
+    const a = document.createElement('a');
+    a.href = safeLink;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = headline;
+    titleEl.appendChild(a);
+  } else {
+    titleEl.textContent = headline;
   }
+  wrap.appendChild(titleEl);
 
-  if (safeLink || source) {
-    const drawer = document.createElement('div');
-    drawer.className = 'ns-drawer';
-    if (source) {
-      const srcDrawer = document.createElement('p');
-      srcDrawer.className = 'ns-drawer-source';
-      srcDrawer.textContent = source;
-      drawer.appendChild(srcDrawer);
-    }
-    if (safeLink) {
-      const readLink = document.createElement('a');
-      readLink.className = 'ns-read-link';
-      readLink.textContent = 'Read full article';
-      readLink.href = safeLink;
-      readLink.target = '_blank';
-      readLink.rel = 'noopener noreferrer';
-      readLink.addEventListener('click', function(e) { e.stopPropagation(); });
-      drawer.appendChild(readLink);
-    }
-    wrap.appendChild(drawer);
-    row.addEventListener('click', function() {
-      const isOpen = wrap.classList.contains('ns-open');
-      containerEl.querySelectorAll('.ns-open').forEach(function(el) { el.classList.remove('ns-open'); });
-      if (!isOpen) wrap.classList.add('ns-open');
-    });
+  // ── Body — always visible excerpt ──
+  if (body) {
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'ns-art-body';
+    bodyEl.textContent = body;
+    wrap.appendChild(bodyEl);
   }
 
   return wrap;
@@ -11711,6 +11696,15 @@ function initNewsNav() {
             }
           }
         }
+        // Force-repaint the main LWC chart — canvas backing store can go stale when
+        // the chart container's layout was recomputed while News was visible.
+        const _chartWrapN = document.getElementById('tv-chart-wrap');
+        if (typeof _lwChart !== 'undefined' && _lwChart && _chartWrapN) {
+          const w = _chartWrapN.offsetWidth, h = _chartWrapN.offsetHeight;
+          if (w > 0 && h > 0) try { _lwChart.resize(w, h); } catch(_) {}
+        }
+        // Sidebar liquidity canvas — same repaint-after-restore pattern.
+        if (typeof drawLiquidityChart === 'function') drawLiquidityChart();
       });
     });
   }
@@ -11823,6 +11817,15 @@ function initDerivativesNavFixed() {
             }
           }
         }
+        // Force-repaint the main LWC chart — canvas backing store can go stale when
+        // the chart container's layout was recomputed while Derivatives was visible.
+        const _chartWrapD = document.getElementById('tv-chart-wrap');
+        if (typeof _lwChart !== 'undefined' && _lwChart && _chartWrapD) {
+          const w = _chartWrapD.offsetWidth, h = _chartWrapD.offsetHeight;
+          if (w > 0 && h > 0) try { _lwChart.resize(w, h); } catch(_) {}
+        }
+        // Sidebar liquidity canvas — same repaint-after-restore pattern.
+        if (typeof drawLiquidityChart === 'function') drawLiquidityChart();
       });
     });
   }
