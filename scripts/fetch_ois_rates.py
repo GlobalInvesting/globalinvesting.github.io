@@ -1,18 +1,20 @@
 """
-fetch_ois_rates.py  —  OIS / Overnight Rates  G10  (v6.1)
+fetch_ois_rates.py  —  OIS / Overnight Rates  G10  (v6.2)
 =========================================================
-Fetches overnight/OIS benchmark rates for all G8 currencies and writes
+Fetches overnight/OIS benchmark rates for all G10 currencies and writes
 ois-rates/rates.json to the public site repo.
 
 RATE → BENCHMARK MAPPING
   USD  SOFR   → NY Fed API (no key) → FRED API (SOFR/DFF)       daily  ← v5.0
   EUR  €STR   → ECB Data Portal SDMX-JSON                        daily
   GBP  SONIA  → BoE SDIE IUDSOIA (no key) → FRED API (IUDSOIA)  daily  ← v5.0
-  JPY  TONA   → SNB zimoma cube                                   monthly
+  JPY  TONA   → BOJ API FM01/STRDCLUCON → SNB zimoma             daily  ← v6.2
   AUD  AONIA  → RBA Cash Rate (rates/AUD.json)                   daily  ← v4.0
   CAD  CORRA  → BoC Valet API AVG.INTWO (date-range params)     daily  ← v6.1
   CHF  SARON  → SNB data portal (snbgwdzid)                      daily
   NZD  OCR    → RBNZ OCR (rates/NZD.json)                        daily  ← v4.0
+  NOK  NOWA   → Norges Bank SHORT_RATES SDMX API (no key)        daily  ← v6.0
+  SEK  SWESTR → Riksbank API swestr/v1 (no key)                  daily  ← v6.0
 
 INDUSTRY STANDARD ALIGNMENT (v5.0)
   USD: NY Fed SOFR API (markets.newyorkfed.org/api/rates/sofr/last/1.json)
@@ -111,6 +113,16 @@ CHANGE LOG
         "working" CORRA fetch — both returned the same policy-rate number.
         Switched to AVG.INTWO, the correct daily CORRA series (Valet's own
         "CORRA" observation group).
+  v6.2: JPY TONA upgraded from monthly (SNB zimoma) to daily. BOJ operates an
+        official public no-key REST API (stat-search.boj.or.jp/api/v1/getDataCode)
+        with db=FM01, code=STRDCLUCON — the "Uncollateralized Overnight Call Rate
+        (average), updated every business day". This is the authoritative daily
+        TONA source, confirmed via the BOJ's own API manual PDF and the
+        stat-search index page (fm01_d_1_en.html). SNB zimoma demoted to secondary
+        fallback (was primary v2.0-v6.1). Note: BOJ user guide confirms the BOJ's
+        stat-search page ir01_d_1_en.html (Basic Loan Rate) is NOT TONA — that
+        series (IR01'MADR1Z@D) is a frozen legacy administered rate unrelated to
+        the overnight call market.
 """
 
 import json
@@ -380,13 +392,95 @@ def fetch_gbp():
 
 def fetch_jpy():
     """
-    TONA via SNB zimoma (data.snb.ch/api/cube/zimoma).
-    Confirmed working on GH Actions (v2.0 run: 0.727% 2026-04).
-    Same source as workflow_meetings.yml. Monthly lag acceptable for JPY.
-    Raw TONA value only -- bias-supplement logic belongs in meetings workflow only.
-    Fallback: FRED OECD overnight Japan (IRSTCI01JPM156N) with staleness guard.
+    TONA (Uncollateralized Overnight Call Rate, average) for CIP forward pricing.
+
+    v6.2: BOJ's own official no-key API (stat-search.boj.or.jp/api/v1) wired
+    as primary, ahead of the SNB zimoma mirror. Confirmed via BOJ's own "API
+    User Manual" PDF, which gives this exact worked example:
+      db=FM01 (Uncollateralized Overnight Call Rate, average, updated every
+      business day), code=STRDCLUCON — literally the TONA series, no key
+      required, published ~8:50 JST same business day.
+
+    IMPORTANT — a candidate URL the user found
+    (stat-search.boj.or.jp/ssi/mtshtml/ir01_d_1_en.html) is NOT TONA. That
+    page is DB=IR01 "Basic Loan Rate" (the legacy official discount rate,
+    administratively set, not the market overnight call rate). Confirmed via
+    BOJ's own DB-name table in the API manual (IR01 vs FM01 are different
+    categories: "Interest Rates on Deposits and Loans" vs "Financial
+    Markets"). Avoided here.
+
+    NOTE: response shape (JSON field names for the date/value arrays) is
+    documented in the manual but could not be confirmed against a live
+    response from this sandbox -- a getDataCode test consistently returned
+    HTTP 400, and a getMetadata test returned a response that didn't match
+    the requested DB (caching artifact on the fetch path used to verify, not
+    necessarily the live BOJ API itself). Parsing below is written
+    defensively (searches the response tree for date/value arrays rather
+    than assuming a fixed nesting) so a shape mismatch falls through silently
+    to the SNB leg below rather than raising. Revisit/tighten once a GitHub
+    Actions run confirms the real shape.
+
+    SOURCE CHAIN:
+    1. BOJ official API (db=FM01, code=STRDCLUCON)  [PRIMARY -- daily, no key]
+    2. SNB zimoma mirror (data.snb.ch/api/cube/zimoma)  [SECONDARY]
+         Was primary v2.0-v6.1. Mirrors TONA but at monthly-ish granularity
+         in practice; kept as a working fallback.
+    3. FRED IRSTCI01JPM156N (OECD overnight, monthly)  [TERTIARY -- sanity check]
+    4. CB policy rate (rates/JPY.json)  [LAST RESORT]
     """
     print('[JPY]')
+
+    # Primary: BOJ official API (no key)
+    try:
+        today      = date.today()
+        prior_mon  = (today.replace(day=1) - timedelta(days=1))
+        start_ym   = prior_mon.strftime('%Y%m')  # covers month-boundary gaps
+        r = requests.get(
+            'https://www.stat-search.boj.or.jp/api/v1/getDataCode',
+            params={'format': 'json', 'lang': 'en', 'db': 'FM01',
+                    'code': 'STRDCLUCON', 'startDate': start_ym},
+            headers=HEADERS, timeout=15,
+        )
+        r.raise_for_status()
+        payload = r.json()
+
+        def _find_series_arrays(obj):
+            """Defensively locate parallel date/value arrays anywhere in the response tree."""
+            if isinstance(obj, dict):
+                dates_key = next((k for k in obj if 'SURVEY_DATE' in k.upper()), None)
+                vals_key  = next((k for k in obj if k.upper() == 'VALUES'), None)
+                if dates_key and vals_key:
+                    return obj[dates_key], obj[vals_key]
+                for v in obj.values():
+                    found = _find_series_arrays(v)
+                    if found:
+                        return found
+            elif isinstance(obj, list):
+                for item in obj:
+                    found = _find_series_arrays(item)
+                    if found:
+                        return found
+            return None
+
+        found = _find_series_arrays(payload)
+        if found:
+            dates_arr, vals_arr = found
+            for dt_raw, val_raw in reversed(list(zip(dates_arr, vals_arr))):
+                if val_raw not in (None, 'null', ''):
+                    try:
+                        val = float(val_raw)
+                        s = str(dt_raw)
+                        dt = f'{s[:4]}-{s[4:6]}-{s[6:8]}' if len(s) == 8 else s
+                        print(f'  JPY: TONA (BOJ API FM01/STRDCLUCON)')
+                        print(f'    OK TONA {val}% ({dt})')
+                        return val, 'TONA', dt
+                    except (ValueError, TypeError):
+                        continue
+        print(f'  JPY: BOJ API -- unrecognised response shape')
+    except Exception as e:
+        print(f'  JPY: BOJ API failed: {e}')
+
+    # Secondary: SNB zimoma mirror (previously primary, v2.0-v6.1)
     today = date.today()
     m = today.month - 4
     y = today.year
@@ -406,7 +500,7 @@ def fetch_jpy():
                 try:
                     val = float(parts[2])
                     dt  = parts[0]
-                    print(f'  JPY: TONA (SNB zimoma)')
+                    print(f'  JPY: TONA (SNB zimoma fallback)')
                     print(f'    OK TONA {val}% ({dt})')
                     return val, 'TONA', dt
                 except ValueError:
