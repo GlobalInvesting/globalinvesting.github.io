@@ -1,6 +1,6 @@
 {
-  "runTimestamp": "2026-06-20T10:28:12.089655Z",
-  "runDate": "2026-06-20",
+  "runTimestamp": "2026-06-21T11:11:39.050905Z",
+  "runDate": "2026-06-21",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
@@ -20,7 +20,7 @@
     "GBP": {
       "status": "ok",
       "rate": "3.75",
-      "source": "ff-calendar-actual",
+      "source": "BoE-CSV",
       "date": "2026-06-18",
       "issues": []
     },
@@ -47,9 +47,9 @@
     },
     "CHF": {
       "status": "ok",
-      "rate": "0.0",
-      "source": "ff-calendar-actual",
-      "date": "2026-06-18",
+      "rate": "0.00",
+      "source": "SNB-scraping",
+      "date": "2026-06-21",
       "issues": []
     },
     "NZD": {
