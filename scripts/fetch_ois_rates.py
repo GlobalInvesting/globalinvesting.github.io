@@ -838,15 +838,31 @@ def fetch_nok():
     through on a column-name mismatch — and is simply returning the wrong
     number for that date (4.0 vs the confirmed 4.25 print on Norges Bank's own
     "Nowa - daily" page for 2026-06-18, "Normal" qualifier, not a thin-
-    liquidity default). Whether that's Norges Bank's SDMX warehouse lagging
-    its own HTML quick-view table, or a column inside the live CSV response
-    binding to an unintended numeric field, could not be confirmed further
-    from this sandbox (data.norges-bank.no is outside the network allowlist).
-    Two changes land here regardless of which it is:
+    liquidity default).
+
+    CONFIRMED (not just suspected): the live `format=csv` response is NOT the
+    same schema as the website's "Nowa - daily" CSV download (`R|Rate` etc.) —
+    that's a bespoke human-readable export specific to that one HTML page.
+    Real `format=csv` responses from this same API, for the EXR dataflow,
+    found via web search (e.g. `EXR/B.MYR.NOK.SP?format=csv`), use the
+    standard SDMX-CSV header
+    `FREQ;Frequency;...;TIME_PERIOD;OBS_VALUE` — i.e. the literal column name
+    `OBS_VALUE`, which this script has matched since v6.0. So PRIMARY's
+    success was never in doubt and never depended on the `R|RATE`/`R`
+    candidates added below — it was reading the genuine `OBS_VALUE` field
+    from Norges Bank's own SDMX warehouse the whole time. The 4.0 vs 4.25
+    gap for 2026-06-18 is therefore a genuine discrepancy *inside Norges
+    Bank's own systems* between that warehouse and their public HTML
+    quick-view table for that date — not a parsing fault on our end, and not
+    something fixable from this codebase. The `R|RATE`/`R` widening below is
+    kept as harmless defensive coverage in case the warehouse's column naming
+    ever changes, but it is not what makes PRIMARY work.
+    Two changes land here:
       1. `val_col` candidates widened to include the bare SDMX-CSV attribute
          code `R` and its labelled form `R|RATE` (the column name confirmed
          in Norges Bank's website CSV export) — purely additive, does not
-         change behaviour for any column name already matched.
+         change behaviour for any column name already matched, and per the
+         above is not the operative fix.
       2. A plausibility guard: per Norges Bank's own methodology quoted above,
          NOWA tracks the policy rate to within a few bp under normal
          conditions (confirmed in the user-supplied historical NOWA series —
@@ -857,7 +873,9 @@ def fetch_nok():
          used for OIS bias elsewhere in this codebase) is therefore treated as
          unreliable rather than shipped, and execution falls through to the
          SECONDARY policy-rate leg, which is institutionally correct by
-         Norges Bank's own definition either way.
+         Norges Bank's own definition either way. This is the actual fix —
+         it papers over a real Norges Bank data inconsistency that no amount
+         of column-name correctness could have caught.
 
     SOURCE CHAIN:
     1. NOWA direct (data.norges-bank.no/api/data/SHORT_RATES/B.NOWA.ON.) [PRIMARY]
