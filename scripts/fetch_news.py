@@ -1,7 +1,55 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.21
+fetch_news.py — v5.22
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.22 (sobre v5.21):
+  AUDITORÍA DE PARIDAD G10 — NOK/SEK TENÍAN 4 BRECHAS REALES (detectadas por el usuario
+  al revisar el archivo; este pase confirma y corrige las 4):
+    · PAIR_PROTAGONIST_MAP (Paso 1 de detect_currency, par explícito en título):
+      NOK/SEK no tenían NINGÚN par registrado (EUR/NOK, USD/SEK, NOK/SEK, etc.).
+      Esto forzaba a todo titular con un cruce NOK/SEK explícito a caer al Paso 2
+      (scoring acumulativo), donde el resultado dependía de qué keyword pesaba más
+      en ese título específico — no de la convención determinística "protagonista
+      por jerarquía de divisa" que ya aplican los 28 pares G8 existentes. Caso de
+      regresión verificado: "NOK/SEK trims weekly gains" resolvía a SEK (por peso
+      relativo de "swedish krona" vs "norwegian krone" en ese texto concreto) en vez
+      de NOK (protagonista esperado por convención, igual que EUR/USD→EUR). Añadidos
+      8 pares (EUR/NOK, EUR/SEK, GBP/NOK, GBP/SEK, USD/NOK, USD/SEK, NOK/SEK + formas
+      sin slash) siguiendo la misma jerarquía ya implícita en el mapa existente
+      (EUR > GBP > AUD > NZD > USD > CAD > CHF > JPY; NOK/SEK se insertan como quote
+      currencies frente a todo el G8, igual que CAD/CHF/JPY). Pares cruzados de
+      NOK/SEK contra AUD/CAD/CHF/JPY/NZD deliberadamente omitidos — cobertura de
+      prensa financiera insignificante, no vale inventar protagonista sin evidencia.
+    · TA_MACRO_OVERRIDE_KW (detect_impact, fuentes de análisis técnico): le faltaban
+      "norges bank"/"riksbank". Un artículo de Barchart/BabyPips/InvestMacro/
+      ForexCrunch/DailyForex TA/InvestingLive sobre una decisión de tasas de esos
+      bancos se degradaba de "high" a "med" — mismo artículo sobre Fed/ECB/BoE/BoJ/
+      RBA/RBNZ/BoC/SNB preservaba "high". Verificado con caso real: "Riksbank
+      Surprises With Rate Hike" — antes de este fix, en una fuente TA habría
+      bajado a "med" a pesar de ser una sorpresa de política monetaria.
+    · CALENDAR_TITLE_PATTERNS (is_calendar_entry, filtro de ruido de calendario):
+      el regex `^(fomc|ecb|boe|boj|rba|rbnz|boc|snb) (meeting|statement|...)$` lista
+      los 8 bancos mayores pero no Norges Bank/Riksbank (nombres multi-palabra, no
+      caben en el mismo grupo de alternación de un token). Un titular genérico tipo
+      "Norges Bank decision" sin contenido sustantivo no se filtraba por este patrón
+      específico (aunque MIN_DESCRIPTION_WORDS=12 probablemente lo atrapa de todos
+      modos si la descripción es corta — esto cierra el gap específico, no es el
+      único guard). Añadido patrón separado para los dos nombres multi-palabra.
+    · EQUITY_INDEX_TITLE_RE (is_forex_relevant, filtro de índices bursátiles no-FX):
+      "omx" cerraba con \\b, lo que NO matchea "OMXS30" (token continuo sin espacio
+      antes de "S30") — solo capturaba "OMX" aislado o "OMX Stockholm" con espacio.
+      Verificado con regex de prueba: \\bomx\\b sobre "OMXS30 rises" → False. Esto
+      dejaba a NOK/SEK con un guard de exclusión de ruido bursátil más débil que
+      DAX/CAC/IBEX/etc. (G8/Europa continental). Cambiado "omx" a prefijo abierto
+      (sin \\b de cierre) para cubrir OMXS30/OMXC25/OMXH25, y añadidos "obx" (índice
+      noruego) y "oslo bors" (nombre del mercado) — antes ausentes por completo.
+      Impacto práctico verificado como bajo en los datos actuales (el caso de prueba
+      ya se descartaba por otra vía — detect_currency devolvía None — pero el guard
+      en sí era real e inconsistente con el resto del G10, así que se corrige).
+  Las 4 correcciones verificadas contra la suite de 102 tests existentes (sin
+  regresiones en USD/EUR/GBP/JPY/AUD/CAD/CHF/NZD) y con casos funcionales nuevos
+  específicos para cada fix.
 
 CAMBIOS v5.21 (sobre v5.20):
   RTT NEWS — NUEVA FUENTE INSTITUCIONAL (CURRENCY + MACRO TOP STORY):
@@ -337,6 +385,23 @@ PAIR_PROTAGONIST_MAP = {
     'CHF/JPY': 'CHF', 'CHFJPY': 'CHF',
     'NZD/CHF': 'NZD', 'NZDCHF': 'NZD',
     'AUD/CAD': 'AUD', 'AUDCAD': 'AUD',
+    # v5.22: G10 Scandi cross pairs — follow the same major-currency-hierarchy
+    # convention as the rest of this map (EUR > GBP > AUD > NZD > USD > CAD > CHF > JPY).
+    # NOK/SEK sit below USD/CAD/CHF in that hierarchy — they are quote currencies
+    # against every G8 major, exactly like CAD/CHF/JPY are quote currencies against
+    # USD/EUR/GBP above. Pairs limited to those that actually appear in financial
+    # press (EUR/USD/GBP crosses + the NOK/SEK direct cross); AUD/CAD/CHF/JPY/NZD
+    # crosses against NOK/SEK have negligible press coverage and are deliberately
+    # omitted rather than guessed.
+    'EUR/NOK': 'EUR', 'EURNOK': 'EUR',
+    'EUR/SEK': 'EUR', 'EURSEK': 'EUR',
+    'GBP/NOK': 'GBP', 'GBPNOK': 'GBP',
+    'GBP/SEK': 'GBP', 'GBPSEK': 'GBP',
+    'USD/NOK': 'NOK', 'USDNOK': 'NOK',
+    'USD/SEK': 'SEK', 'USDSEK': 'SEK',
+    # NOK/SEK direct cross: NOK is the conventional base currency (matches the
+    # interbank quoting convention used by Norges Bank/Riksbank reference rates).
+    'NOK/SEK': 'NOK', 'NOKSEK': 'NOK',
 }
 
 # ─────────────────────────────────────────────
@@ -365,6 +430,12 @@ CALENDAR_TITLE_PATTERNS = [
     r"^interest rate announcement",
     r"^monetary policy (report|decision|statement|meeting)$",
     r"^(fomc|ecb|boe|boj|rba|rbnz|boc|snb) (meeting|statement|decision|minutes)$",
+    # v5.22: Norges Bank / Riksbank were missing here — a bare "Norges Bank decision"
+    # or "Riksbank statement" title (no real content) would skip the calendar-noise
+    # filter that catches the same generic pattern for the other 8 G10 central banks.
+    # Names are multi-word, so this is a separate alternation rather than fitting the
+    # single-token group above.
+    r"^(norges bank|riksbank) (meeting|statement|decision|minutes)$",
     r"^rate (announcement|decision|statement)$",
     r"^upcoming (event|release|data)",
     r"^economic (calendar|data release)",
@@ -389,9 +460,17 @@ EMERGING_MARKET_TITLE_RE = re.compile(
 )
 
 # v5.3: nuevo filtro para índices bursátiles europeos que no son relevantes para divisas
+# v5.22: "omx" cerraba con \b, lo que NO matchea "OMXS30" (token continuo, sin espacio
+# antes de "S30") — solo capturaba "OMX" como palabra aislada o "OMX Stockholm"/"OMX
+# Copenhagen" con espacio. "omx" ahora es prefijo abierto (sin \b de cierre) para
+# cubrir OMXS30, OMXC25, OMXH25, etc. Añadidos "obx" (índice noruego) y "oslo bors"
+# (nombre del mercado) en un segundo patrón separado — antes solo los índices G8/
+# Europa continental tenían cobertura, dejando NOK/SEK con un guard más débil que
+# el resto del G10. Dos patrones en vez de uno para evitar mezclar estilos de
+# límite de palabra (\b de cierre vs prefijo abierto) dentro de la misma alternación.
 EQUITY_INDEX_TITLE_RE = re.compile(
     r"\b(dax|cac 40|eurostoxx|euro stoxx|ibex 35|ftse mib|stoxx 600|aex|"
-    r"bel 20|omx|wig20)\b.{0,40}\b(rises?|falls?|gains?|drops?|points?|higher|lower|climbs?|slides?)\b",
+    r"bel 20|omx|wig20|obx|oslo bors).{0,40}\b(rises?|falls?|gains?|drops?|points?|higher|lower|climbs?|slides?)\b",
     re.IGNORECASE,
 )
 
@@ -907,6 +986,11 @@ TA_MACRO_OVERRIDE_KW = [
     "rate decision", "rate hike", "rate cut", "fomc", "inflation", "cpi", "gdp",
     "nonfarm", "non-farm", "unemployment", "monetary policy",
     "iran", "hormuz", "sanctions", "war", "geopolitical", "opec",
+    # v5.22: Norges Bank / Riksbank were missing from this list — a TA-source article
+    # about a NOK/SEK rate decision would be capped to "med" while the equivalent
+    # article about any of the 8 other G10 central banks stayed at "high". This is
+    # the same TA-source impact-cap mechanism, just extended for G10 parity.
+    "norges bank", "riksbank",
 ]
 
 SOURCE_CURRENCY = {
