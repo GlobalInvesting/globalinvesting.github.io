@@ -121,13 +121,13 @@
         "18 Dec"
       ],
       "source": "boj.or.jp",
-      "bias": "hike",
-      "biasSource": "TONA overnight rate + BoJ forward guidance",
+      "bias": "hold",
+      "biasSource": "cbonds OIS TONA curve + BoJ API daily spot",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-21",
       "cutProb": 0,
-      "hikeProb": 50,
-      "fwdRate": 1.125
+      "hikeProb": 0,
+      "fwdRate": 1.0
     },
     "AUD": {
       "nextMeeting": "11 Aug",
@@ -274,7 +274,7 @@
       ],
       "source": "norges-bank.no",
       "bias": "hold",
-      "biasSource": "OECD overnight interbank rate vs Norges Bank policy rate",
+      "biasSource": "NOWA overnight rate (Norges Bank) — OECD monthly fallback",
       "biasMethod": "spread",
       "biasUpdated": "2026-06-21",
       "cutProb": 0,
@@ -306,7 +306,7 @@
       ],
       "source": "riksbank.se",
       "bias": "hold",
-      "biasSource": "Rate trajectory (no free daily OIS/overnight source available)",
+      "biasSource": "SWESTR overnight rate (Riksbank)",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-21",
       "cutProb": 15,
