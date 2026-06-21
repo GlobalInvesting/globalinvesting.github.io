@@ -11453,7 +11453,7 @@ const _RESEARCH_NEWS_SOURCES = new Set([
 
 // ── Helper: build one NS item element (shared by News and Trading feeds) ──────
 // Styled to match the CB Rates modal's Market Commentary block (cbr-ps-art-*):
-// a always-expanded newswire article — meta row (impact dot · source · time · currency),
+// a always-expanded newswire article — meta row (source · time · currency),
 // title (clickable headline when a safe link is available), and body excerpt below.
 // No collapse/expand interaction — Bloomberg/Reuters wire panels read top-to-bottom.
 function _buildNsItem(item, containerEl) {
@@ -11493,7 +11493,6 @@ function _buildNsItem(item, containerEl) {
   const headline = item.title  || '';
   const cur      = item.cur    || '';
   const source   = item.source || '';
-  const impact   = item.impact || 'low';
   const rawLink  = item.link   || '';
   const safeLink = rawLink.startsWith('https://') ? rawLink : '';
 
@@ -11509,13 +11508,9 @@ function _buildNsItem(item, containerEl) {
   const wrap = document.createElement('div');
   wrap.className = 'ns-article' + (item.featured ? ' ns-featured' : '');
 
-  // ── Meta row: impact dot · source · time · currency tag ──
+  // ── Meta row: source · time · currency tag ──
   const meta = document.createElement('div');
   meta.className = 'ns-art-meta';
-
-  const dot = document.createElement('span');
-  dot.className = 'ns-dot ns-dot-' + impact;
-  meta.appendChild(dot);
 
   if (source) {
     const srcEl = document.createElement('span');
@@ -12750,28 +12745,23 @@ function renderResearchSection(items, meta) {
   }
 
   filtered.forEach(function(item) {
-    // ── Time ─────────────────────────────────────────────────────────────────
-    let timeHM  = '--:--';
-    let timeAge = '';
-    let showDate = false;
-    let pubDate = null;
-
+    // ── Time label: "HH:MM · Ns" for recent items, "HH:MM · Mon D" past a day ──
+    let timeLabel = '--:--';
     if (item.ts) {
-      pubDate = new Date(item.ts);
-      timeHM  = pubDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      const pubDate = new Date(item.ts);
+      const hm      = pubDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
       const ageMs   = Date.now() - item.ts;
       const ageMin  = Math.floor(ageMs / 60000);
       const ageHr   = Math.floor(ageMs / 3600000);
       const ageDays = Math.floor(ageMs / 86400000);
       if (ageDays >= 1) {
-        showDate = true;
-        timeHM   = pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        timeLabel = hm + ' \u00b7 ' + pubDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
       } else if (ageHr >= 1) {
-        timeAge = ageHr + 'h';
+        timeLabel = hm + ' \u00b7 ' + ageHr + 'h';
       } else if (ageMin >= 1) {
-        timeAge = ageMin + 'm';
+        timeLabel = hm + ' \u00b7 ' + ageMin + 'm';
       } else {
-        timeAge = 'now';
+        timeLabel = hm + ' \u00b7 now';
       }
     }
 
@@ -12779,7 +12769,6 @@ function renderResearchSection(items, meta) {
     const bankFull   = item.bank_full  || bank;
     const title      = item.title      || '';
     const series     = item.series     || '';
-    const author     = item.author     || '';
     const url        = item.url        || '';
     const excerpt    = item.excerpt    || '';
     const currencies = item.currencies || [];
@@ -12788,116 +12777,71 @@ function renderResearchSection(items, meta) {
     const safeUrl    = url.startsWith('https://') ? url : '';
     const isTradeIdea = category === 'trade_idea';
 
-    // ── Outer wrapper
-    const wrap = document.createElement('div');
-    wrap.className = 'rs-item' + (isTradeIdea ? ' rs-trade-idea' : '');
-
-    // ── Main row: [time] [source] [headline] [cur-tags] [chevron] ─────────────
-    // Bloomberg/Refinitiv pattern: plain-text source prefix, no badge
-    const row = document.createElement('div');
-    row.className = 'rs-row';
-
-    // Time
-    const timeEl = document.createElement('span');
-    timeEl.className = 'rs-time';
-    const timeTop = document.createElement('span');
-    timeTop.className = 'rs-time-hm';
-    timeTop.textContent = timeHM;
-    const timeBot = document.createElement('span');
-    timeBot.className = 'rs-time-age';
-    if (!showDate && timeAge && timeAge !== 'now') timeBot.textContent = timeAge;
-    timeEl.appendChild(timeTop);
-    if (timeBot.textContent) timeEl.appendChild(timeBot);
-
-    // Source — plain text label, no badge (Bloomberg/Reuters standard)
-    const sourceEl = document.createElement('span');
-    sourceEl.className = 'rs-source';
-    sourceEl.textContent = bank;
-    sourceEl.title = bankFull;
-
-    // Headline
-    const headEl = document.createElement('span');
-    headEl.className = 'rs-headline';
     let displayTitle = title;
     if (series && title.toLowerCase().startsWith(series.toLowerCase())) {
       displayTitle = title.slice(series.length).replace(/^[\s:–—]+/, '');
     }
-    headEl.textContent = displayTitle || title;
-    headEl.title = title;
+    displayTitle = displayTitle || title;
 
-    // Currency tags (up to 2 — keep row tight)
-    const curTagsEl = document.createElement('span');
-    curTagsEl.className = 'rs-cur-tags';
+    // ── Article block — always-expanded, matching News/Analysis (.ns-art-*) ────
+    const wrap = document.createElement('div');
+    wrap.className = 'rs-article' + (isTradeIdea ? ' rs-art-trade-idea' : '');
+
+    // Meta row: source · time · currency tags
+    const meta = document.createElement('div');
+    meta.className = 'rs-art-meta';
+
+    if (bank) {
+      const srcEl = document.createElement('span');
+      srcEl.className = 'rs-art-source';
+      srcEl.textContent = bank;
+      srcEl.title = bankFull;
+      meta.appendChild(srcEl);
+    }
+
+    const timeEl = document.createElement('span');
+    timeEl.className = 'rs-art-time';
+    timeEl.textContent = timeLabel;
+    meta.appendChild(timeEl);
+
     currencies.slice(0, 2).forEach(function(cur) {
       const tag = document.createElement('span');
       tag.className = 'rs-cur-tag';
       tag.textContent = cur;
-      curTagsEl.appendChild(tag);
+      meta.appendChild(tag);
     });
+    wrap.appendChild(meta);
 
-    // Chevron
-    const chevron = document.createElement('span');
-    chevron.className = 'rs-chevron';
-    chevron.setAttribute('aria-hidden', 'true');
-    chevron.innerHTML = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="2,3.5 5,6.5 8,3.5"/></svg>';
+    // Title — clickable headline when a safe link is available
+    const titleEl = document.createElement('div');
+    titleEl.className = 'rs-art-title';
+    if (safeUrl) {
+      const a = document.createElement('a');
+      a.href = safeUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = displayTitle;
+      titleEl.appendChild(a);
+    } else {
+      titleEl.textContent = displayTitle;
+    }
+    wrap.appendChild(titleEl);
 
-    row.appendChild(timeEl);
-    row.appendChild(sourceEl);
-    row.appendChild(headEl);
-    if (currencies.length) row.appendChild(curTagsEl);
-    row.appendChild(chevron);
-    wrap.appendChild(row);
-
-    // ── Excerpt line — RSS description teaser, always visible ─────────────────
-    if (excerpt) {
-      const excRow = document.createElement('div');
-      excRow.className = 'rs-excerpt-row';
-      excRow.textContent = excerpt;
-      wrap.appendChild(excRow);
-    } else if (series || pairs.length) {
-      // Fallback when RSS had no description: show series + pairs
-      const excRow = document.createElement('div');
-      excRow.className = 'rs-excerpt-row rs-excerpt-series';
+    // Body — excerpt always visible; falls back to series + pairs when the
+    // source provided no description (e.g. RSS items without a summary)
+    let body = excerpt;
+    if (!body && (series || pairs.length)) {
       const parts = [];
       if (series) parts.push(series);
-      if (pairs.length) parts.push(pairs.slice(0, 3).join(' · '));
-      excRow.textContent = parts.join('  ·  ');
-      wrap.appendChild(excRow);
+      if (pairs.length) parts.push(pairs.slice(0, 3).join(' \u00b7 '));
+      body = parts.join('  \u00b7  ');
     }
-
-    // ── Accordion drawer ──────────────────────────────────────────────────────
-    const drawer = document.createElement('div');
-    drawer.className = 'rs-drawer';
-
-    // Meta line: bank · author · pairs
-    const metaParts = [bankFull];
-    if (author) metaParts.push(author);
-    if (pairs.length) metaParts.push(pairs.join(', '));
-    const metaEl = document.createElement('p');
-    metaEl.className = 'rs-drawer-meta';
-    metaEl.textContent = metaParts.join(' · ');
-    drawer.appendChild(metaEl);
-
-    // "Read full note" link — opens original source in new tab
-    if (safeUrl) {
-      const readLink = document.createElement('a');
-      readLink.className = 'rs-read-link';
-      readLink.textContent = 'Read full note →';
-      readLink.href = safeUrl;
-      readLink.target = '_blank';
-      readLink.rel = 'noopener noreferrer';
-      readLink.addEventListener('click', function(e) { e.stopPropagation(); });
-      drawer.appendChild(readLink);
+    if (body) {
+      const bodyEl = document.createElement('div');
+      bodyEl.className = 'rs-art-body';
+      bodyEl.textContent = body;
+      wrap.appendChild(bodyEl);
     }
-
-    wrap.appendChild(drawer);
-
-    // Click row → toggle accordion (one open at a time)
-    row.addEventListener('click', function() {
-      const isOpen = wrap.classList.contains('rs-open');
-      feed.querySelectorAll('.rs-open').forEach(function(el) { el.classList.remove('rs-open'); });
-      if (!isOpen) wrap.classList.add('rs-open');
-    });
 
     feed.appendChild(wrap);
   });
