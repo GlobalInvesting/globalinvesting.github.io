@@ -9068,26 +9068,25 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 
   function navTo(target) {
     if (target === 'section-derivatives') {
-      // Derivatives uses a custom show/hide toggle, not scroll-into-view
-      const derivSection = window._derivNavSection;
-      if (!derivSection) return;
-      if (derivSection.style.display === 'none' || derivSection.style.display === '') {
-        // If currently hidden, show it
-        if (typeof window._derivNavShow === 'function') window._derivNavShow();
-      } else {
-        // Already visible — treat D as a toggle back to Overview
+      // Derivatives uses a custom show/hide toggle, not scroll-into-view.
+      // v8.21.5: was checking `display === 'none' || display === ''`, which
+      // matches both possible states — the toggle-off branch below was
+      // unreachable, so pressing D while Derivatives was already open just
+      // called showDerivatives() again instead of closing it. Now checks
+      // the shared _activeExclusivePanel flag set by _setExclusivePanel().
+      if (window._activeExclusivePanel === 'section-derivatives') {
         if (typeof window._derivNavHide === 'function') window._derivNavHide();
+      } else {
+        if (typeof window._derivNavShow === 'function') window._derivNavShow();
       }
       return;
     }
     if (target === 'section-news') {
-      // News uses same show/hide toggle pattern as Derivatives
-      const newsSection = window._newsNavSection;
-      if (!newsSection) return;
-      if (newsSection.style.display === 'none' || newsSection.style.display === '') {
-        if (typeof window._newsNavShow === 'function') window._newsNavShow();
-      } else {
+      // News uses the same show/hide toggle pattern as Derivatives — same fix.
+      if (window._activeExclusivePanel === 'section-news') {
         if (typeof window._newsNavHide === 'function') window._newsNavHide();
+      } else {
+        if (typeof window._newsNavShow === 'function') window._newsNavShow();
       }
       return;
     }
@@ -11637,245 +11636,171 @@ function _newsSetFilter(type, value) {
   }
 }
 
-function initNewsNav() {
-  const newsSection = document.getElementById('section-news');
-  if (!newsSection) return;
+// ═══════════════════════════════════════════════════════════════════
+// EXCLUSIVE FULL-PANEL TABS — News & Derivatives
+// ═══════════════════════════════════════════════════════════════════
+// News and Derivatives are "exclusive" panels: when one is active it takes
+// over the whole #split-lower-right area, replacing the regular sections
+// that live there as siblings (Risk, FX Pairs, etc).
+//
+// v8.21.5: REWRITTEN. The previous implementation gave News and Derivatives
+// each their own independent show/hide pair, each with a private dataset
+// key (data-news-hidden / data-deriv-hidden) used to snapshot and later
+// restore sibling display values, plus a capture-phase click listener on
+// every OTHER nav link that called stopImmediatePropagation() to make sure
+// it ran before the generic scroll handler.
+//
+// stopImmediatePropagation() halts ALL subsequent listeners on the same
+// element — not just the bubble-phase one it was meant to block, but also
+// any other capture-phase listeners registered after it on that same node.
+// Derivatives' own "show myself" listener was registered (at boot) directly
+// on the Derivatives link, before News' "hide me, a different tab was
+// clicked" listener got attached to that same link. So clicking Derivatives
+// while News was open ran Derivatives' listener first, which called
+// stopImmediatePropagation() immediately — News' teardown never got a
+// chance to run. showDerivatives() then re-snapshotted every sibling's
+// CURRENT display (since News' hideNews() never restored them), capturing
+// "display:none" as #section-risk's "original" value to restore to later
+// instead of its true pre-News state. The next time the user navigated to
+// a regular section (e.g. Risk), whichever exclusive panel was open
+// restored Risk from that corrupted snapshot — display:none — leaving a
+// black panel. This only reproduced after visiting News and Derivatives
+// back-to-back, which is why it didn't show up on every single News→Risk
+// or Derivatives→Risk transition in isolation.
+//
+// Fixed by removing the snapshot/restore bookkeeping entirely. The set of
+// exclusive panels is fixed and known ahead of time, so there's nothing to
+// snapshot: regular siblings are simply visible whenever no exclusive panel
+// is active, hidden whenever one is — one deterministic function of the
+// current target, not per-element saved state that two independent modules
+// can race over. One shared click listener replaces the two independent
+// ones, so each nav link only ever has a single capture-phase listener and
+// stopImmediatePropagation isn't needed at all.
+const _EXCLUSIVE_PANEL_IDS = ['section-news', 'section-derivatives'];
+window._activeExclusivePanel = null;
 
+function _setExclusivePanel(targetId) {
   const splitLowerRight = document.getElementById('split-lower-right');
   if (!splitLowerRight) return;
-
-  function showNews() {
-    Array.from(splitLowerRight.children).forEach(el => {
-      if (el.id !== 'section-news') {
-        const originalDisplay = el.style.display || window.getComputedStyle(el).display;
-        el.dataset.newsHidden = originalDisplay === 'none' ? 'none' : (el.style.display || '');
-        el.style.display = 'none';
-      }
-    });
-    newsSection.style.display = '';
-    const splitLower = document.getElementById('split-lower');
-    if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
-    // Re-render news + trading sub-panels with current data
-    renderNewsSection();
-    // Load or re-render research sub-panel
-    if (!_researchAllItems.length) {
-      loadBankResearch();
+  Array.from(splitLowerRight.children).forEach(el => {
+    if (_EXCLUSIVE_PANEL_IDS.includes(el.id)) {
+      el.style.display = (el.id === targetId) ? '' : 'none';
     } else {
-      renderResearchSection();
-    }
-  }
-
-  function hideNews() {
-    newsSection.style.display = 'none';
-    splitLowerRight.querySelectorAll('[data-news-hidden]').forEach(el => {
-      const saved = el.dataset.newsHidden;
-      el.style.display = saved === '' ? '' : saved;
-      delete el.dataset.newsHidden;
-    });
-    // Repaint canvases after display restore (same double-rAF pattern as Derivatives)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
-          drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
-        }
-        const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
-        if (activeRatesTab) {
-          const cty = activeRatesTab.dataset.cty;
-          if (cty && cty !== 'us') {
-            if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
-              renderSovereignSpreads();
-            } else if (typeof renderG8YieldPane === 'function') {
-              const contentEl = document.getElementById('rates-g8-content-' + cty);
-              if (contentEl) delete contentEl.dataset.loaded;
-              renderG8YieldPane(cty);
-            }
-          }
-        }
-        // Force-repaint the main LWC chart — canvas backing store can go stale when
-        // the chart container's layout was recomputed while News was visible.
-        const _chartWrapN = document.getElementById('tv-chart-wrap');
-        if (typeof _lwChart !== 'undefined' && _lwChart && _chartWrapN) {
-          const w = _chartWrapN.offsetWidth, h = _chartWrapN.offsetHeight;
-          if (w > 0 && h > 0) try { _lwChart.resize(w, h); } catch(_) {}
-        }
-        // Sidebar liquidity canvas — same repaint-after-restore pattern.
-        if (typeof drawLiquidityChart === 'function') drawLiquidityChart();
-      });
-    });
-  }
-
-  // Capture phase so it runs before the main nav scroll handler
-  const newsLink = document.querySelector('.top-nav a[data-target="section-news"]');
-  if (newsLink) {
-    newsLink.addEventListener('click', (e) => {
-      e.stopImmediatePropagation();
-      showNews();
-    }, true);
-  }
-
-  // Hide when any other nav tab is clicked — CAPTURE PHASE so this fires before
-  // the main nav scroll handler (registered in bubble phase in initNavScroll).
-  // Without capture, the main scroll fires first while sections are still display:none
-  // (set by showNews()), causing scrollIntoView to no-op and leaving a black panel.
-  // stopImmediatePropagation() blocks the main nav scroll; we re-trigger it ourselves
-  // below, after hideNews() has restored all section displays.
-  document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
-    if (link.dataset.target !== 'section-news') {
-      link.addEventListener('click', (e) => {
-        if (newsSection.style.display === 'none') return; // news not active — let main handler run
-        e.stopImmediatePropagation();
-        hideNews();
-        // Re-run the nav scroll logic ourselves now that sections are visible again
-        const target = link.dataset.target;
-        const el = document.getElementById(target);
-        if (el) {
-          requestAnimationFrame(() => {
-            const main = document.getElementById('main');
-            const mainScrollable = main && main.scrollHeight > main.clientHeight && getComputedStyle(main).overflowY !== 'visible';
-            if (mainScrollable) {
-              const offset = el.offsetTop - (main.offsetTop || 0);
-              main.scrollTo({ top: offset - 4, behavior: 'smooth' });
-            } else {
-              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-          });
-        }
-        // Re-apply active class to the clicked nav link
-        document.querySelectorAll('.top-nav a').forEach(a => a.classList.remove('active'));
-        link.classList.add('active');
-      }, true); // capture phase
+      el.style.display = targetId ? 'none' : '';
     }
   });
-
-  // Expose for keyboard shortcut
-  window._newsNavShow    = showNews;
-  window._newsNavHide    = hideNews;
-  window._newsNavSection = newsSection;
-
-  // Expose filter setter for inline onclick
-  window._newsSetFilter  = _newsSetFilter;
+  window._activeExclusivePanel = targetId || null;
 }
 
-function initDerivativesNavFixed() {
-  const derivSection = document.getElementById('section-derivatives');
-  if (!derivSection) return;
-
-  const splitLowerRight = document.getElementById('split-lower-right');
-  if (!splitLowerRight) return;
-
-  function showDerivatives() {
-    Array.from(splitLowerRight.children).forEach(el => {
-      if (el.id !== 'section-derivatives') {
-        // Store original computed display so we can restore it exactly
-        const originalDisplay = el.style.display || window.getComputedStyle(el).display;
-        el.dataset.derivHidden = originalDisplay === 'none' ? 'none' : (el.style.display || '');
-        el.style.display = 'none';
-      }
-    });
-    derivSection.style.display = '';
-    // Scroll split-lower to top so derivatives is visible
-    const splitLower = document.getElementById('split-lower');
-    if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
-    renderDerivativesSection();
-  }
-
-  function hideDerivatives() {
-    derivSection.style.display = 'none';
-    splitLowerRight.querySelectorAll('[data-deriv-hidden]').forEach(el => {
-      // Restore the exact inline display value that was set before hiding
-      const saved = el.dataset.derivHidden;
-      el.style.display = saved === '' ? '' : saved;
-      delete el.dataset.derivHidden;
-    });
-    // Canvas and lazy-loaded G8 panes need a repaint after display is restored.
-    // Double rAF: split-lower-right uses display:contents which requires two frames
-    // for the browser to commit the layout change and expose correct clientWidth values.
-    // (Same pattern as the ticker strip — 'Double rAF ensures layout before we measure'.)
+function _repaintAfterExclusivePanelClosed() {
+  // Canvas/chart containers can go stale while sized 0×0 behind an exclusive
+  // panel. Double rAF: #split-lower-right uses display:contents, which needs
+  // two frames for the browser to commit the layout change before
+  // clientWidth/offsetWidth are trustworthy again (same pattern used by the
+  // ticker strip elsewhere in this file).
+  requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        // Yield curve canvas: redraws using cached data (_lastDrawnYields / _lastDrawnPrior)
-        if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
-          drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
-        }
-        // Re-trigger whichever Rates tab is currently active so G8/Spreads panes re-render
-        const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
-        if (activeRatesTab) {
-          const cty = activeRatesTab.dataset.cty;
-          if (cty && cty !== 'us') {
-            if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
-              renderSovereignSpreads();
-            } else if (typeof renderG8YieldPane === 'function') {
-              // Reset loaded flag so the pane re-renders with correct dimensions
-              const contentEl = document.getElementById('rates-g8-content-' + cty);
-              if (contentEl) delete contentEl.dataset.loaded;
-              renderG8YieldPane(cty);
-            }
+      if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
+        drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
+      }
+      const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
+      if (activeRatesTab) {
+        const cty = activeRatesTab.dataset.cty;
+        if (cty && cty !== 'us') {
+          if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
+            renderSovereignSpreads();
+          } else if (typeof renderG8YieldPane === 'function') {
+            const contentEl = document.getElementById('rates-g8-content-' + cty);
+            if (contentEl) delete contentEl.dataset.loaded;
+            renderG8YieldPane(cty);
           }
         }
-        // Force-repaint the main LWC chart — canvas backing store can go stale when
-        // the chart container's layout was recomputed while Derivatives was visible.
-        const _chartWrapD = document.getElementById('tv-chart-wrap');
-        if (typeof _lwChart !== 'undefined' && _lwChart && _chartWrapD) {
-          const w = _chartWrapD.offsetWidth, h = _chartWrapD.offsetHeight;
-          if (w > 0 && h > 0) try { _lwChart.resize(w, h); } catch(_) {}
-        }
-        // Sidebar liquidity canvas — same repaint-after-restore pattern.
-        if (typeof drawLiquidityChart === 'function') drawLiquidityChart();
-      });
+      }
+      // Force-repaint the main LWC chart — canvas backing store can go stale
+      // when the chart container's layout was recomputed while hidden.
+      const _chartWrap = document.getElementById('tv-chart-wrap');
+      if (typeof _lwChart !== 'undefined' && _lwChart && _chartWrap) {
+        const w = _chartWrap.offsetWidth, h = _chartWrap.offsetHeight;
+        if (w > 0 && h > 0) try { _lwChart.resize(w, h); } catch(_) {}
+      }
+      // Sidebar liquidity canvas — same repaint-after-restore pattern.
+      if (typeof drawLiquidityChart === 'function') drawLiquidityChart();
     });
-  }
+  });
+}
 
-  // Use capture phase on Derivatives link to run before the main nav scroll handler
-  const derivLink = document.querySelector('.top-nav a[data-target="section-derivatives"]');
-  if (derivLink) {
-    derivLink.addEventListener('click', (e) => {
-      e.stopImmediatePropagation();
-      showDerivatives();
-    }, true);
+function showNews() {
+  _setExclusivePanel('section-news');
+  const splitLower = document.getElementById('split-lower');
+  if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
+  // Re-render news + trading sub-panels with current data
+  renderNewsSection();
+  // Load or re-render research sub-panel
+  if (!_researchAllItems.length) {
+    loadBankResearch();
+  } else {
+    renderResearchSection();
   }
+}
 
-  // Restore on any other nav click — CAPTURE PHASE (same fix as initNewsNav).
-  // Without capture, the main nav scroll fires before hideDerivatives() restores
-  // sections, causing scrollIntoView to target a display:none element → black panel.
+function hideNews() {
+  _setExclusivePanel(null);
+  _repaintAfterExclusivePanelClosed();
+}
+
+function showDerivatives() {
+  _setExclusivePanel('section-derivatives');
+  const splitLower = document.getElementById('split-lower');
+  if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
+  renderDerivativesSection();
+}
+
+function hideDerivatives() {
+  _setExclusivePanel(null);
+  _repaintAfterExclusivePanelClosed();
+}
+
+function initExclusivePanelNav() {
+  const newsSection  = document.getElementById('section-news');
+  const derivSection = document.getElementById('section-derivatives');
+  if (!newsSection || !derivSection) return;
+  if (!document.getElementById('split-lower-right')) return;
+
+  // One capture-phase listener per nav link. Capture phase still runs before
+  // the generic bubble-phase scroll handler (registered elsewhere in this
+  // file), so panel visibility is always resolved before that handler tries
+  // to scroll/scrollIntoView — but unlike before, there's nothing left to
+  // block, so no stopImmediatePropagation.
   document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
-    if (link.dataset.target !== 'section-derivatives') {
-      link.addEventListener('click', (e) => {
-        if (derivSection.style.display === 'none') return; // derivatives not active — let main handler run
-        e.stopImmediatePropagation();
-        hideDerivatives();
-        // Re-run the nav scroll after sections are restored
-        const target = link.dataset.target;
-        const el = document.getElementById(target);
-        if (el) {
-          requestAnimationFrame(() => {
-            const main = document.getElementById('main');
-            const mainScrollable = main && main.scrollHeight > main.clientHeight && getComputedStyle(main).overflowY !== 'visible';
-            if (mainScrollable) {
-              const offset = el.offsetTop - (main.offsetTop || 0);
-              main.scrollTo({ top: offset - 4, behavior: 'smooth' });
-            } else {
-              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-          });
-        }
-        // Re-apply active class to the clicked nav link
-        document.querySelectorAll('.top-nav a').forEach(a => a.classList.remove('active'));
-        link.classList.add('active');
-      }, true); // capture phase
-    }
+    link.addEventListener('click', () => {
+      const target = link.dataset.target;
+      if (target === 'section-news') {
+        showNews();
+      } else if (target === 'section-derivatives') {
+        showDerivatives();
+      } else if (window._activeExclusivePanel) {
+        _setExclusivePanel(null);
+        _repaintAfterExclusivePanelClosed();
+      }
+    }, true);
   });
 
-  // Expose for keyboard shortcut
-  window._derivNavShow = showDerivatives;
-  window._derivNavHide = hideDerivatives;
+  // Expose for keyboard shortcuts (N / D)
+  window._newsNavShow     = showNews;
+  window._newsNavHide     = hideNews;
+  window._newsNavSection  = newsSection;
+  window._derivNavShow    = showDerivatives;
+  window._derivNavHide    = hideDerivatives;
   window._derivNavSection = derivSection;
+
+  // Expose filter setter for inline onclick
+  window._newsSetFilter   = _newsSetFilter;
 }
 
 (function bootNewFeatures() {
   const run = async () => {
     initG8RatesTabs();
-    initDerivativesNavFixed();
-    initNewsNav();
+    initExclusivePanelNav();
 
     // Load CB policy rates, OIS benchmark rates, and intraday quotes in parallel.
     // _waitForQuotesPromise() polls until boot() has set window._quotesReadyPromise
@@ -12855,6 +12780,9 @@ function _researchSetFilter(type, value) {
   });
   renderResearchSection();
 }
+// Exposed for the bank-filter pills' onclick handlers in index.html
+// (data-val buttons under the News→Research sub-panel).
+window._researchSetFilter = _researchSetFilter;
 
 async function loadBankResearch() {
   try {
@@ -12877,86 +12805,12 @@ async function loadBankResearch() {
   }
 }
 
-function initResearchNav() {
-  const resSection = document.getElementById('section-research');
-  if (!resSection) return;
-
-  const splitLowerRight = document.getElementById('split-lower-right');
-  if (!splitLowerRight) return;
-
-  function showResearch() {
-    Array.from(splitLowerRight.children).forEach(function(el) {
-      if (el.id !== 'section-research') {
-        const orig = el.style.display || window.getComputedStyle(el).display;
-        el.dataset.researchHidden = orig === 'none' ? 'none' : (el.style.display || '');
-        el.style.display = 'none';
-      }
-    });
-    resSection.style.display = '';
-    const splitLower = document.getElementById('split-lower');
-    if (splitLower) splitLower.scrollTo({ top: 0, behavior: 'smooth' });
-    // Load data on first show; re-render on subsequent shows
-    if (!_researchAllItems.length) {
-      loadBankResearch();
-    } else {
-      renderResearchSection();
-    }
-  }
-
-  function hideResearch() {
-    resSection.style.display = 'none';
-    splitLowerRight.querySelectorAll('[data-research-hidden]').forEach(function(el) {
-      const saved = el.dataset.researchHidden;
-      el.style.display = saved === '' ? '' : saved;
-      delete el.dataset.researchHidden;
-    });
-    // Repaint canvases — same double-rAF pattern as News/Derivatives
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        if (typeof drawYieldCurve === 'function' && typeof _lastDrawnYields !== 'undefined') {
-          drawYieldCurve(_lastDrawnYields, typeof _lastDrawnPrior !== 'undefined' ? _lastDrawnPrior : null);
-        }
-        const activeRatesTab = document.querySelector('.rates-ctab[aria-selected="true"]');
-        if (activeRatesTab) {
-          const cty = activeRatesTab.dataset.cty;
-          if (cty && cty !== 'us') {
-            if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
-              renderSovereignSpreads();
-            } else if (typeof renderG8YieldPane === 'function') {
-              const contentEl = document.getElementById('rates-g8-content-' + cty);
-              if (contentEl) delete contentEl.dataset.loaded;
-              renderG8YieldPane(cty);
-            }
-          }
-        }
-      });
-    });
-  }
-
-  // Capture phase — runs before main nav scroll handler
-  const resLink = document.querySelector('.top-nav a[data-target="section-research"]');
-  if (resLink) {
-    resLink.addEventListener('click', function(e) {
-      e.stopImmediatePropagation();
-      showResearch();
-    }, true);
-  }
-
-  // Hide when any other nav tab is clicked
-  document.querySelectorAll('.top-nav a[data-target]').forEach(function(link) {
-    if (link.dataset.target !== 'section-research') {
-      link.addEventListener('click', function() {
-        if (resSection.style.display !== 'none') hideResearch();
-      });
-    }
-  });
-
-  // Expose for keyboard shortcut
-  window._researchNavShow    = showResearch;
-  window._researchNavHide    = hideResearch;
-  window._researchNavSection = resSection;
-  window._researchSetFilter  = _researchSetFilter;
-}
+// NOTE: there used to be an initResearchNav() here, an independent
+// show/hide pair for a standalone "Research" tab. It targeted
+// #section-research, which no longer exists in index.html (Research is now
+// a sub-panel rendered inside News via renderResearchSection(), driven from
+// showNews() above) and the function was never called from anywhere.
+// Removed as dead code during the v8.21.5 exclusive-panel-nav rewrite.
 
 // ═══════════════════════════════════════════════════════════════════
 // THEME-CHANGE HANDLER
