@@ -11679,6 +11679,34 @@ function _newsSetFilter(type, value) {
 const _EXCLUSIVE_PANEL_IDS = ['section-news', 'section-derivatives'];
 window._activeExclusivePanel = null;
 
+// v8.21.6 FIX: `el.style.display = ''` does NOT restore an element's
+// original inline display value — it clears the inline `display` property
+// entirely, falling back to whatever a stylesheet rule says (UA default
+// `block` for a <div> if nothing matches). Three non-exclusive siblings of
+// #split-lower-right declare display on purpose in their inline style:
+// section-tvcalendar (display:flex + fixed height:180px), the sessions-row
+// wrapper (display:grid, no id), and section-econmap (display:flex + fixed
+// height:440px). Once toggled to 'none' and back to '', they silently fell
+// back to display:block — breaking their flex/grid-dependent internal
+// sizing while the fixed inline height stayed put with no overflow:hidden
+// to contain it. Content then overflowed the fixed-height box and visually
+// spilled onto whatever sat below it in source order — e.g. Economic
+// Calendar bleeding into Cross-Asset/Risk after a News/Derivatives round
+// trip. Fix: cache each sibling's TRUE original display value once, read
+// directly from the DOM before any toggle ever runs, and restore to that
+// cached value instead of an empty string. Cached by element reference
+// (not id) since the sessions-row wrapper has none.
+const _origSiblingDisplay = new WeakMap();
+(function _cacheOriginalSiblingDisplay() {
+  const splitLowerRight = document.getElementById('split-lower-right');
+  if (!splitLowerRight) return;
+  Array.from(splitLowerRight.children).forEach(el => {
+    if (!_EXCLUSIVE_PANEL_IDS.includes(el.id)) {
+      _origSiblingDisplay.set(el, el.style.display || '');
+    }
+  });
+})();
+
 function _setExclusivePanel(targetId) {
   const splitLowerRight = document.getElementById('split-lower-right');
   if (!splitLowerRight) return;
@@ -11686,7 +11714,7 @@ function _setExclusivePanel(targetId) {
     if (_EXCLUSIVE_PANEL_IDS.includes(el.id)) {
       el.style.display = (el.id === targetId) ? '' : 'none';
     } else {
-      el.style.display = targetId ? 'none' : '';
+      el.style.display = targetId ? 'none' : (_origSiblingDisplay.get(el) || '');
     }
   });
   window._activeExclusivePanel = targetId || null;
