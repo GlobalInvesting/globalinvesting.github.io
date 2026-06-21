@@ -1,5 +1,20 @@
 """
-fetch_bond_yields.py  v2.3  —  Bond yields for USD / EUR / GBP / JPY + G10 bond2y
+fetch_bond_yields.py  v2.4  —  Bond yields for USD / EUR / GBP / JPY + G10 bond2y
+
+CHANGELOG v2.4 (2026-06-21)
+────────────────────────────
+FIX-26  _ohlc_latest(): added staleness guard (max_stale_days=5, default).
+        Root cause of a 9-day-stuck USD bond10y/bond2y/bond5y: update-ohlc.yml
+        fully replaces the D1 JSON every run (no incremental merge), and
+        yfinance silently kept returning the SAME final bar for ^TNX/^IRX/^FVX
+        run after run — zero exceptions raised, ohlc-data/meta.json showed
+        errors: [] the entire time. _ohlc_latest() only checked that bars[-1]
+        existed, never that its date was recent, so the stuck feed was read as
+        a perfectly valid "fresh" primary and the FRED/Treasury XML/FiscalData
+        fallback cascade never triggered. Now any primary bar older than
+        max_stale_days is treated as a miss and falls through to the next
+        source in the cascade, same as a True None response. Affects all 4
+        call sites (USD bond10y, vix, bond2y, bond5y) — single fix point.
 
 CHANGELOG v2.3 (2026-06-19)
 ────────────────────────────
@@ -344,7 +359,22 @@ def _is_stale(date_str: str | None, max_months: int = 18) -> bool:
 
 # ── Source: ohlc-data/<symbol>.json ──────────────────────────────────────────
 
-def _ohlc_latest(symbol: str) -> tuple[str | None, float | None]:
+def _ohlc_latest(symbol: str, max_stale_days: int = 5) -> tuple[str | None, float | None]:
+    """
+    FIX-26 (v2.4): staleness guard. Previously this only validated that
+    bars[-1] existed — it never checked whether that last bar's date was
+    recent. update-ohlc.yml fully REPLACES the D1 JSON on every run (no
+    incremental merge), so a silently-stuck yfinance feed for a specific
+    ticker (e.g. ^TNX/^IRX/^FVX returning the same final bar run after run,
+    with zero exceptions raised — confirmed via ohlc-data/meta.json showing
+    errors: [] while us10y/us2y/us5y stayed pinned at the same date for 9
+    days) was being read here as a perfectly valid, "fresh" primary source.
+    No downstream fallback (FRED DGS10/2/5, Treasury XML, FiscalData) was
+    ever triggered because this function never reported a miss.
+    max_stale_days=5 absorbs a normal weekend + a 1-day bank holiday without
+    a false trip, but reliably surfaces a multi-day-stuck feed within one
+    extra run instead of staying silent indefinitely.
+    """
     path = os.path.join(OHLC_DIR, f"{symbol}.json")
     if not os.path.exists(path):
         print(f"    ohlc-data/{symbol}.json not found — skipping")
@@ -354,7 +384,19 @@ def _ohlc_latest(symbol: str) -> tuple[str | None, float | None]:
             bars = json.load(f)
         if bars:
             last = bars[-1]
-            return last["time"], round(float(last["close"]), 4)
+            dt = last["time"]
+            try:
+                age_days = (datetime.utcnow() - datetime.strptime(dt, "%Y-%m-%d")).days
+                if age_days > max_stale_days:
+                    msg = (f"ohlc-data/{symbol}.json stale — last bar {dt} "
+                           f"({age_days}d old, max {max_stale_days}d) — "
+                           f"treating as miss, falling through to next source")
+                    _gha_warning(msg)
+                    print(f"    {msg}")
+                    return None, None
+            except ValueError:
+                pass  # malformed date string — fall through to use the value as-is
+            return dt, round(float(last["close"]), 4)
         return None, None
     except Exception as e:
         print(f"    ohlc-data/{symbol}.json read error: {e}")
@@ -941,7 +983,7 @@ def fetch_sek(req_failures: list, opt_failures: list) -> None:
 
 def main() -> None:
     now_utc = datetime.utcnow()
-    print(f"fetch_bond_yields.py v2.3 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
+    print(f"fetch_bond_yields.py v2.4 — {now_utc.strftime('%Y-%m-%d %H:%M')} UTC")
     print(f"SITE_DIR : {os.path.abspath(SITE_DIR)}")
     print(f"OHLC_DIR : {os.path.abspath(OHLC_DIR)}")
     print(f"OUT_DIR  : {os.path.abspath(OUT_DIR)}")
