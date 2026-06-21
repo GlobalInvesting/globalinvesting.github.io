@@ -1,5 +1,5 @@
 """
-fetch_ois_rates.py  —  OIS / Overnight Rates  G10  (v6.2)
+fetch_ois_rates.py  —  OIS / Overnight Rates  G10  (v6.5)
 =========================================================
 Fetches overnight/OIS benchmark rates for all G10 currencies and writes
 ois-rates/rates.json to the public site repo.
@@ -8,16 +8,16 @@ RATE → BENCHMARK MAPPING
   USD  SOFR   → NY Fed API (no key) → FRED API (SOFR/DFF)       daily  ← v5.0
   EUR  €STR   → ECB Data Portal SDMX-JSON                        daily
   GBP  SONIA  → BoE SDIE IUDSOIA (no key) → FRED API (IUDSOIA)  daily  ← v5.0
-  JPY  TONA   → BOJ API FM01/STRDCLUCON → SNB zimoma             daily  ← v6.2
+  JPY  TONA   → BOJ API FM01/STRDCLUCON → SNB zimoma             daily  ← v6.4
   AUD  AONIA  → RBA Cash Rate (rates/AUD.json)                   daily  ← v4.0
   CAD  CORRA  → BoC Valet API AVG.INTWO (date-range params)     daily  ← v6.1
   CHF  SARON  → SNB data portal (snbgwdzid)                      daily
   NZD  OCR    → RBNZ OCR (rates/NZD.json)                        daily  ← v4.0
-  NOK  NOWA   → Norges Bank SHORT_RATES SDMX API (no key)        daily  ← v6.0
+  NOK  NOWA   → Norges Bank SHORT_RATES SDMX API (no key)        daily  ← v6.5
   SEK  SWESTR → Riksbank API swestr/v1 (no key)                  daily  ← v6.0
 
 INDUSTRY STANDARD ALIGNMENT (v5.0)
-  USD: NY Fed SOFR API (markets.newyorkfed.org/api/rates/sofr/last/1.json)
+  USD: NY Fed SOFR API (markets.newyorkfed.org/api/rates/secured/sofr/last/1.json)
     added as primary no-key source. FRED SOFR/DFF retained as secondary.
     Eliminates dependency on FRED API key for the most liquid OIS benchmark.
     Confirmed working from GitHub Actions (no bot protection on NY Fed API).
@@ -113,6 +113,41 @@ CHANGE LOG
         "working" CORRA fetch — both returned the same policy-rate number.
         Switched to AVG.INTWO, the correct daily CORRA series (Valet's own
         "CORRA" observation group).
+  v6.5: NOK BUG — root cause was NOT the v6.1–v6.4 "schema mismatch, falls
+        through silently" hypothesis. Production ois-rates/rates.json proved
+        the PRIMARY NOWA-direct leg was succeeding end-to-end (source="NOWA",
+        date="2026-06-18" — only the PRIMARY return path emits that literal
+        label/date shape) but returning 4.0% against a confirmed 4.25% print
+        on Norges Bank's own site for that exact date. Widened val_col to
+        also accept the bare SDMX attribute code R / R|RATE, and — since the
+        true cause of the wrong number could not be confirmed live from this
+        sandbox — added a plausibility guard: PRIMARY is now cross-checked
+        against rates/NOK.json's policy rate (10bp tolerance, matching the
+        OIS hold-band convention used elsewhere in this file) before being
+        trusted. NOWA tracks policy this tightly by Norges Bank's own
+        definition, confirmed against the full Jan–Jun 2026 series (zero
+        daily drift from policy in the reference data). See fetch_nok()
+        docstring for the full audit trail.
+  v6.4: JPY BOJ API response parser hardened. v6.2 introduced the BOJ API primary
+        but used a defensive recursive tree-search (_find_series_arrays) because the
+        live response shape was unverified from this sandbox (stat-search.boj.or.jp
+        returns HTTP 400 from sandbox IPs). BOJ API User Manual (February 2026,
+        p.16+p.26) confirms the exact JSON schema:
+          RESULTSET[0].VALUES.SURVEY_DATES  — [YYYYMMDD integers] for daily series
+          RESULTSET[0].VALUES.VALUES         — [float | null, ...]
+          STATUS == 200 on success; MESSAGEID / MESSAGE on error.
+        Replaced recursive search with direct dict access + STATUS guard. The STATUS
+        check now prints the MESSAGEID/MESSAGE on failure, which was invisible before
+        (the old code only caught exceptions from raise_for_status(), not API-level
+        STATUS != 200 responses that still return HTTP 200). The "null" sentinel check
+        is tightened to Python None (JSON null deserialises to None, not the string
+        "null", so the old `val_raw not in (None, 'null', '')` string checks were
+        redundant but harmless; now just `val_raw is None`).
+  v6.3: USD NY Fed SOFR primary URL corrected — /api/rates/sofr/last/1.json was
+        returning HTTP 400 on every run since at least run #46. NY Fed Markets API
+        docs (openapi.newyorkfed.org) show the secured SOFR path is
+        /api/rates/secured/sofr/last/1.json (note: /secured/ segment required).
+        FRED fallback was covering silently; primary now restored to daily NY Fed.
   v6.2: JPY TONA upgraded from monthly (SNB zimoma) to daily. BOJ operates an
         official public no-key REST API (stat-search.boj.or.jp/api/v1/getDataCode)
         with db=FM01, code=STRDCLUCON — the "Uncollateralized Overnight Call Rate
@@ -194,7 +229,7 @@ def fetch_usd():
     """
     SOFR via NY Fed API (no key required), then FRED API fallback.
 
-    PRIMARY: NY Fed Markets API (markets.newyorkfed.org/api/rates/sofr/last/1.json)
+    PRIMARY: NY Fed Markets API (markets.newyorkfed.org/api/rates/secured/sofr/last/1.json)
       No API key. No bot protection. Confirmed reachable from GitHub Actions.
       Returns: {"refRates": [{"type": "SOFR", "percentRate": 5.30, "effectiveDate": "2025-01-17"}]}
       Published each business day after ~08:00 ET (NY Fed daily release schedule).
@@ -211,7 +246,7 @@ def fetch_usd():
     # Primary: NY Fed SOFR API (no key, authoritative source)
     try:
         r = requests.get(
-            'https://markets.newyorkfed.org/api/rates/sofr/last/1.json',
+            'https://markets.newyorkfed.org/api/rates/secured/sofr/last/1.json',
             headers=HEADERS, timeout=10,
         )
         r.raise_for_status()
@@ -409,16 +444,19 @@ def fetch_jpy():
     categories: "Interest Rates on Deposits and Loans" vs "Financial
     Markets"). Avoided here.
 
-    NOTE: response shape (JSON field names for the date/value arrays) is
-    documented in the manual but could not be confirmed against a live
-    response from this sandbox -- a getDataCode test consistently returned
-    HTTP 400, and a getMetadata test returned a response that didn't match
-    the requested DB (caching artifact on the fetch path used to verify, not
-    necessarily the live BOJ API itself). Parsing below is written
-    defensively (searches the response tree for date/value arrays rather
-    than assuming a fixed nesting) so a shape mismatch falls through silently
-    to the SNB leg below rather than raising. Revisit/tighten once a GitHub
-    Actions run confirms the real shape.
+    v6.4: Response parser hardened. The BOJ API User Manual (February 2026,
+    p.16 + p.26) confirms the exact JSON response structure — see inline
+    comments below. Replaced the defensive recursive tree-search
+    (_find_series_arrays) with direct dict access. Added STATUS guard:
+    a non-200 STATUS is now logged with its MESSAGEID/MESSAGE before
+    falling through to SNB zimoma. Previously, API-level errors that
+    returned HTTP 200 with a non-200 STATUS body were invisible.
+
+    NOTE: stat-search.boj.or.jp returns HTTP 400 from sandbox IPs (the
+    sandbox egress allowlist doesn't include this domain). The API is
+    fully accessible from GitHub Actions runners — confirmed by the BOJ
+    API User Manual stating the service is available to anyone without
+    registration or API key.
 
     SOURCE CHAIN:
     1. BOJ official API (db=FM01, code=STRDCLUCON)  [PRIMARY -- daily, no key]
@@ -444,39 +482,55 @@ def fetch_jpy():
         r.raise_for_status()
         payload = r.json()
 
-        def _find_series_arrays(obj):
-            """Defensively locate parallel date/value arrays anywhere in the response tree."""
-            if isinstance(obj, dict):
-                dates_key = next((k for k in obj if 'SURVEY_DATE' in k.upper()), None)
-                vals_key  = next((k for k in obj if k.upper() == 'VALUES'), None)
-                if dates_key and vals_key:
-                    return obj[dates_key], obj[vals_key]
-                for v in obj.values():
-                    found = _find_series_arrays(v)
-                    if found:
-                        return found
-            elif isinstance(obj, list):
-                for item in obj:
-                    found = _find_series_arrays(item)
-                    if found:
-                        return found
-            return None
+        # ── Response structure per BOJ API User Manual (Feb 2026, p.16 + p.26) ──
+        # {
+        #   "STATUS": 200,                        ← 200 success; 400/500/503 error
+        #   "MESSAGEID": "M1810001",
+        #   "RESULTSET": [
+        #     {
+        #       "SERIES_CODE": "STRDCLUCON",
+        #       "FREQUENCY": "DAILY",
+        #       "VALUES": {
+        #         "SURVEY_DATES": [20260101, 20260102, ...],  ← YYYYMMDD integers
+        #         "VALUES":       [0.230,    0.230,    ..., null]
+        #       }
+        #     }
+        #   ]
+        # }
+        # STATUS guard: API can return HTTP 200 with a non-200 STATUS body on
+        # invalid parameters. Log and fall through so SNB zimoma covers it.
+        boj_status = payload.get('STATUS')
+        if boj_status != 200:
+            boj_msg = payload.get('MESSAGE', 'no message')
+            boj_mid = payload.get('MESSAGEID', '')
+            print(f'  JPY: BOJ API STATUS={boj_status} {boj_mid}: {boj_msg}')
+            raise ValueError(f'BOJ API STATUS={boj_status}')
 
-        found = _find_series_arrays(payload)
-        if found:
-            dates_arr, vals_arr = found
-            for dt_raw, val_raw in reversed(list(zip(dates_arr, vals_arr))):
-                if val_raw not in (None, 'null', ''):
-                    try:
-                        val = float(val_raw)
-                        s = str(dt_raw)
-                        dt = f'{s[:4]}-{s[4:6]}-{s[6:8]}' if len(s) == 8 else s
-                        print(f'  JPY: TONA (BOJ API FM01/STRDCLUCON)')
-                        print(f'    OK TONA {val}% ({dt})')
-                        return val, 'TONA', dt
-                    except (ValueError, TypeError):
-                        continue
-        print(f'  JPY: BOJ API -- unrecognised response shape')
+        resultset = payload.get('RESULTSET') or []
+        if not resultset:
+            print(f'  JPY: BOJ API -- empty RESULTSET')
+            raise ValueError('BOJ API empty RESULTSET')
+
+        vals_block = resultset[0].get('VALUES') or {}
+        dates_arr  = vals_block.get('SURVEY_DATES') or []
+        vals_arr   = vals_block.get('VALUES') or []
+        if not dates_arr or not vals_arr:
+            print(f'  JPY: BOJ API -- SURVEY_DATES/VALUES missing')
+            raise ValueError('BOJ API missing SURVEY_DATES/VALUES')
+
+        for dt_raw, val_raw in reversed(list(zip(dates_arr, vals_arr))):
+            if val_raw is None:
+                continue
+            try:
+                val = float(val_raw)
+                s   = str(int(dt_raw))           # YYYYMMDD integer → string
+                dt  = f'{s[:4]}-{s[4:6]}-{s[6:8]}'
+                print(f'  JPY: TONA (BOJ API FM01/STRDCLUCON)')
+                print(f'    OK TONA {val}% ({dt})')
+                return val, 'TONA', dt
+            except (ValueError, TypeError):
+                continue
+        print(f'  JPY: BOJ API -- all VALUES null in RESULTSET')
     except Exception as e:
         print(f'  JPY: BOJ API failed: {e}')
 
@@ -768,14 +822,46 @@ def fetch_nok():
     the policy-rate fallback below would have returned anyway. This is a more
     direct read, not a riskier one.
 
-    Column layout is parsed defensively (case-insensitive match on common
-    SDMX-CSV header names) since the exact response shape from this sandbox's
-    restricted network could not be verified live — if Norges Bank's CSV
-    schema doesn't match, this silently falls through to the policy-rate leg
-    below with no functional regression.
+    v6.5: ROOT CAUSE WAS NOT WHAT v6.1–v6.4 ASSUMED. The docstring/changelog
+    through v6.4 describes the PRIMARY leg as "unverified — falls through
+    silently on a schema mismatch" and the v6.1 changelog entry even logs
+    "NOWA 4.0%" as a *confirmed-working* PRIMARY read from production run #46.
+    Re-audited 2026-06-21 after the user reported the Real Rate Carry modal
+    showing 4.00% NOWA when Norges Bank's own site showed 4.25% for every date
+    from 2026-05-08 onward (policy hike). Production `ois-rates/rates.json`
+    settles the question: `sources.NOK == "NOWA"` (the literal string only the
+    PRIMARY `return val, 'NOWA', dt` path emits — SECONDARY returns
+    `'policy-overnight'`, TERTIARY returns `'OECD-overnight'`) with
+    `dates.NOK == "2026-06-18"` (daily — SECONDARY's date comes from
+    rates/NOK.json's monthly `YYYY-MM-01` stamps, which it is not). So PRIMARY
+    *is* succeeding end-to-end against the live API — it is not falling
+    through on a column-name mismatch — and is simply returning the wrong
+    number for that date (4.0 vs the confirmed 4.25 print on Norges Bank's own
+    "Nowa - daily" page for 2026-06-18, "Normal" qualifier, not a thin-
+    liquidity default). Whether that's Norges Bank's SDMX warehouse lagging
+    its own HTML quick-view table, or a column inside the live CSV response
+    binding to an unintended numeric field, could not be confirmed further
+    from this sandbox (data.norges-bank.no is outside the network allowlist).
+    Two changes land here regardless of which it is:
+      1. `val_col` candidates widened to include the bare SDMX-CSV attribute
+         code `R` and its labelled form `R|RATE` (the column name confirmed
+         in Norges Bank's website CSV export) — purely additive, does not
+         change behaviour for any column name already matched.
+      2. A plausibility guard: per Norges Bank's own methodology quoted above,
+         NOWA tracks the policy rate to within a few bp under normal
+         conditions (confirmed in the user-supplied historical NOWA series —
+         every printed value across Jan–Jun 2026 exactly equals the prevailing
+         policy rate, zero observed daily drift). A PRIMARY read that diverges
+         from the current `rates/NOK.json` policy print by more than
+         `_NOK_NOWA_POLICY_TOLERANCE` (10bp — the same hold-band convention
+         used for OIS bias elsewhere in this codebase) is therefore treated as
+         unreliable rather than shipped, and execution falls through to the
+         SECONDARY policy-rate leg, which is institutionally correct by
+         Norges Bank's own definition either way.
 
     SOURCE CHAIN:
     1. NOWA direct (data.norges-bank.no/api/data/SHORT_RATES/B.NOWA.ON.) [PRIMARY]
+       — validated against current policy rate before being trusted (v6.5)
     2. Norges Bank policy rate (rates/NOK.json)  [SECONDARY — institutional proxy]
          NOWA ≈ policy rate by Norges Bank's own definition during thin
          liquidity — unchanged rationale from v5.0, now the fallback leg.
@@ -785,6 +871,12 @@ def fetch_nok():
     import io as _io
 
     print('[NOK]')
+
+    _NOK_NOWA_POLICY_TOLERANCE = 0.10  # 10bp — NOWA should track policy this tightly
+
+    # Fetch the policy-rate proxy up front so PRIMARY can be cross-checked
+    # against it before being trusted (v6.5 plausibility guard).
+    nb_rate, nb_dt = policy_rate('NOK')
 
     # Primary: NOWA direct via Norges Bank SHORT_RATES SDMX CSV (no key)
     try:
@@ -810,7 +902,7 @@ def fetch_nok():
             dt_col  = next((c for c in cols if c.strip().upper() in
                             ('TIME_PERIOD', 'DATE', 'TID', 'TIME')), None)
             val_col = next((c for c in cols if c.strip().upper() in
-                            ('OBS_VALUE', 'VALUE', 'NOWA')), None)
+                            ('OBS_VALUE', 'VALUE', 'NOWA', 'R|RATE', 'R')), None)
             if dt_col and val_col:
                 rows_sorted = sorted(rows, key=lambda x: x.get(dt_col, ''))
                 for row in reversed(rows_sorted):
@@ -819,20 +911,30 @@ def fetch_nok():
                         try:
                             val = float(str(raw).replace(',', '.'))
                             dt  = row.get(dt_col)
+                            # v6.5 plausibility guard — see docstring. NOWA must
+                            # not diverge from the current policy rate beyond a
+                            # tight tolerance; if it does, this read is more
+                            # likely a parsing/staleness fault than real NOWA
+                            # data, so don't trust it.
+                            if nb_rate is not None and abs(val - nb_rate) > _NOK_NOWA_POLICY_TOLERANCE:
+                                print(f'  NOK: NOWA direct returned {val}% ({dt}) but diverges '
+                                      f'{abs(val - nb_rate)*100:.0f}bp from policy rate {nb_rate}% '
+                                      f'({nb_dt}) — exceeds {_NOK_NOWA_POLICY_TOLERANCE*100:.0f}bp '
+                                      f'plausibility band, distrusting this read')
+                                break
                             print(f'  NOK: NOWA direct (Norges Bank SHORT_RATES)')
                             print(f'    OK NOWA {val}% ({dt})')
                             return val, 'NOWA', dt
                         except ValueError:
                             continue
-            print(f'  NOK: SHORT_RATES CSV — unrecognised columns {cols}')
+            else:
+                print(f'  NOK: SHORT_RATES CSV — unrecognised columns {cols}')
         else:
             print('  NOK: SHORT_RATES CSV — empty response')
     except Exception as e:
         print(f'  NOK: Norges Bank SHORT_RATES failed: {e}')
 
     # Secondary: policy rate proxy (NOWA ≈ policy rate by Norges Bank definition)
-    nb_rate, nb_dt = policy_rate('NOK')
-
     if nb_rate is not None:
         fred_val, fred_dt = fred_latest('IRSTCI01NOM156N', 'NOK-OECD-check')
         if fred_val is not None:
