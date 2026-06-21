@@ -1,21 +1,21 @@
 {
-  "lastUpdate": "2026-06-20T23:45:14Z",
-  "generatedAt": "2026-06-20T23:45:14Z",
+  "lastUpdate": "2026-06-21T02:04:41Z",
+  "generatedAt": "2026-06-21T02:04:41Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-20",
+  "rangeFrom": "2025-06-22",
   "rangeTo": "2026-06-19",
-  "totalEvents": 1822,
+  "totalEvents": 1820,
   "currencyCounts": {
-    "CHF": 87,
-    "EUR": 182,
     "AUD": 160,
     "USD": 596,
+    "CHF": 86,
     "CAD": 127,
+    "EUR": 181,
     "GBP": 183,
     "JPY": 179,
     "NZD": 74,
@@ -23,8 +23,8 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1068,
     "low": 358,
+    "medium": 1066,
     "high": 396
   },
   "surpriseStats": {
@@ -580,30 +580,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CHF",
-      "event": "Current Account",
-      "dateISO": "2025-06-20",
-      "hourUTC": "08:00",
-      "actual": "19.4",
-      "forecast": null,
-      "previous": "9.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "EUR",
-      "event": "Consumer Confidence Flash",
-      "dateISO": "2025-06-20",
-      "hourUTC": "14:00",
-      "actual": "-15.3",
-      "forecast": "-14.5",
-      "previous": "-15.1",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
     {
       "currency": "AUD",
       "event": "S&P Global Composite PMI Flash",
