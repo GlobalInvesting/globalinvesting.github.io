@@ -1,5 +1,5 @@
 """
-fetch_ois_rates.py  —  OIS / Overnight Rates  G10  (v6.0)
+fetch_ois_rates.py  —  OIS / Overnight Rates  G10  (v6.1)
 =========================================================
 Fetches overnight/OIS benchmark rates for all G8 currencies and writes
 ois-rates/rates.json to the public site repo.
@@ -10,7 +10,7 @@ RATE → BENCHMARK MAPPING
   GBP  SONIA  → BoE SDIE IUDSOIA (no key) → FRED API (IUDSOIA)  daily  ← v5.0
   JPY  TONA   → SNB zimoma cube                                   monthly
   AUD  AONIA  → RBA Cash Rate (rates/AUD.json)                   daily  ← v4.0
-  CAD  CORRA  → BoC Valet API V122514 (date-range params)        daily  ← v5.0
+  CAD  CORRA  → BoC Valet API AVG.INTWO (date-range params)     daily  ← v6.1
   CHF  SARON  → SNB data portal (snbgwdzid)                      daily
   NZD  OCR    → RBNZ OCR (rates/NZD.json)                        daily  ← v4.0
 
@@ -101,6 +101,16 @@ CHANGE LOG
         CAD: added one retry per BoC Valet series to absorb transient failures
         observed in production (policy-fallback was triggering despite the API
         being healthy on the next run).
+  v6.1: CAD BUG FIX — confirmed live in production (run #46) that NOK/SEK direct
+        wiring worked correctly (NOWA 4.0%, SWESTR 1.638%) but CAD still failed,
+        this time with "no observations in window" on a successful HTTP 200.
+        Root cause: V122514/V122530 (used since v3.0) are not CORRA at all —
+        V122514 is Valet's "Overnight rate" series (the policy target, monthly,
+        end-of-month dated), confirmed via Valet's own series metadata. Likely
+        explains years of CAD policy-fallback being indistinguishable from a
+        "working" CORRA fetch — both returned the same policy-rate number.
+        Switched to AVG.INTWO, the correct daily CORRA series (Valet's own
+        "CORRA" observation group).
 """
 
 import json
@@ -483,57 +493,56 @@ def fetch_aud():
 
 def fetch_cad():
     """
-    CORRA via Bank of Canada Valet API (series V122514).
+    CORRA via Bank of Canada Valet API.
 
-    FIX v5.0: Switched from params={'recent': 3} to start_date/end_date date-range
-      parameters (6-week window). 'recent=3' was returning the 3 most recent entries
-      in the series file as stored by the BoC Valet backend, which for V122514
-      resolved to monthly average observations (last seen: 2026-03-01, 89 days stale)
-      rather than the current daily fixing. Date-range params reliably return all
-      observations between the specified dates, matching the pattern used by
-      fetch_bond_yields.py (_boc_valet_latest) which returns the current trading day.
+    v6.1 BUG FIX: series IDs V122514/V122530 (used since v3.0) are NOT CORRA.
+    Confirmed by inspecting Valet's own series metadata: V122514 = "Overnight
+    rate" (the policy target rate, end-of-month, monthly frequency) — part of
+    the ATABLE_POLICY_INSTRUMENT table, not the CORRA group. This explains the
+    persistent policy-fallback: even on the runs where it "worked", it was
+    silently returning the same number policy_rate('CAD') already returns,
+    just via a slower path — and recently it stopped returning anything at
+    all for the queried window, likely because monthly observations land
+    outside a 6-week date-range query depending on publication timing.
 
-    V122514 = canonical daily CORRA series (aligned with workflow_meetings.yml).
-    V122530 retained as fallback (daily CORRA, alternative BoC Valet ID).
-    Confirmed working from GitHub Actions (CORRA ~2.25% current target range).
+    CORRECT series: AVG.INTWO — "Canadian Overnight Repo Rate Average (CORRA)
+    (%)", member of Valet's own "CORRA" observation group, published daily.
 
-    v6.0: one retry per series (2s backoff) — transient timeouts/5xx on BoC
-    Valet were observed to occasionally exhaust both series in a single run,
-    dropping to policy-fallback even though the API itself was healthy.
+    v6.0: added one retry (2s backoff) to absorb transient timeouts/5xx.
     """
     import time as _time
     print('[CAD]')
     end_date   = date.today().strftime('%Y-%m-%d')
     start_date = (date.today() - timedelta(days=42)).strftime('%Y-%m-%d')  # 6-week window
+    series = 'AVG.INTWO'
 
-    for series in ('V122514', 'V122530'):
-        for attempt in (1, 2):
-            try:
-                r = requests.get(
-                    f'https://www.bankofcanada.ca/valet/observations/{series}/json',
-                    params={'start_date': start_date, 'end_date': end_date},
-                    headers=HEADERS, timeout=15,
-                )
-                r.raise_for_status()
-                obs = r.json().get('observations', [])
-                # Walk backwards from most recent to find latest non-empty value
-                for entry in reversed(obs):
-                    raw = entry.get(series, {}).get('v')
-                    if raw and raw not in ('', 'Bank holiday', 'nd'):
-                        try:
-                            val = float(raw)
-                            dt  = entry.get('d', str(date.today()))
-                            print(f'  CAD: CORRA (BoC Valet {series})')
-                            print(f'    OK CORRA {val}% ({dt})')
-                            return val, 'CORRA', dt
-                        except (ValueError, TypeError):
-                            continue
-                print(f'  CAD: BoC Valet {series} — no observations in window ({start_date} → {end_date})')
-                break  # request succeeded (even if empty) — no point retrying same series
-            except Exception as e:
-                print(f'  CAD: BoC Valet {series} attempt {attempt} failed: {e}')
-                if attempt == 1:
-                    _time.sleep(2)
+    for attempt in (1, 2):
+        try:
+            r = requests.get(
+                f'https://www.bankofcanada.ca/valet/observations/{series}/json',
+                params={'start_date': start_date, 'end_date': end_date},
+                headers=HEADERS, timeout=15,
+            )
+            r.raise_for_status()
+            obs = r.json().get('observations', [])
+            # Walk backwards from most recent to find latest non-empty value
+            for entry in reversed(obs):
+                raw = entry.get(series, {}).get('v')
+                if raw and raw not in ('', 'Bank holiday', 'nd'):
+                    try:
+                        val = float(raw)
+                        dt  = entry.get('d', str(date.today()))
+                        print(f'  CAD: CORRA (BoC Valet {series})')
+                        print(f'    OK CORRA {val}% ({dt})')
+                        return val, 'CORRA', dt
+                    except (ValueError, TypeError):
+                        continue
+            print(f'  CAD: BoC Valet {series} — no observations in window ({start_date} → {end_date})')
+            break  # request succeeded (even if empty) — no point retrying
+        except Exception as e:
+            print(f'  CAD: BoC Valet {series} attempt {attempt} failed: {e}')
+            if attempt == 1:
+                _time.sleep(2)
 
     val, dt = policy_rate('CAD')
     if val is not None:
