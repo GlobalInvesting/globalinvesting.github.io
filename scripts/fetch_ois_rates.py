@@ -1,5 +1,5 @@
 """
-fetch_ois_rates.py  —  OIS / Overnight Rates  G8  (v5.0)
+fetch_ois_rates.py  —  OIS / Overnight Rates  G10  (v6.0)
 =========================================================
 Fetches overnight/OIS benchmark rates for all G8 currencies and writes
 ois-rates/rates.json to the public site repo.
@@ -32,6 +32,24 @@ INDUSTRY STANDARD ALIGNMENT (v5.0)
     daily observations, causing 89-day stale dates (2026-03-01) in production.
     Date-range params match the pattern used by fetch_bond_yields.py
     (_boc_valet_latest) which reliably returns the current trading day value.
+    v6.0: added one retry per series (transient network/5xx on BoC Valet was
+    observed to occasionally exhaust both V122514 and V122530 in a single GH
+    Actions run, dropping straight to policy-fallback even though the API
+    itself was healthy).
+
+  NOK: NOWA wired directly via Norges Bank's own public SDMX API
+    (data.norges-bank.no/api/data/SHORT_RATES, no key) as of v6.0 — same
+    URL pattern Norges Bank's own website uses for its "Daily data for Nowa"
+    download link, confirmed by fetching that page directly. Policy rate
+    (previously primary) is now the secondary/sanity-check leg; per Norges
+    Bank's own methodology, NOWA is *defined* to equal the policy rate during
+    thin-liquidity days, so this is strictly more accurate, never less.
+
+  SEK: SWESTR wired directly via Riksbank's public API (api.riksbank.se/
+    swestr/v1) as of v6.0. The v5.0 comment assumed anonymous access required
+    an unconfirmed subscription key; Riksbank's own API docs clarify public
+    access is allowed, just rate-limited (5 req/min) — no key needed. Policy
+    rate is now the secondary/sanity-check leg.
 
   AUD: AONIA is defined by AFMA as identical to the RBA Cash Rate (AFMA
     benchmark notice; RBA Cash Rate Methodology). Bloomberg and Refinitiv
@@ -76,6 +94,13 @@ CHANGE LOG
         GBP: BoE SDIE IUDSOIA added as primary no-key source before FRED.
         CAD: BoC Valet switched from 'recent=3' to date-range params (fixes stale dates).
         FRED timeout reduced 15s → 8s for faster fallthrough on gateway timeouts.
+  v6.0: NOK: NOWA wired directly via Norges Bank SHORT_RATES SDMX API (no key).
+        SEK: SWESTR wired directly via Riksbank public API (no key, 5 req/min).
+        Both demote the policy-rate proxy to secondary/sanity-check, matching
+        the pattern already used for CAD/USD/GBP (direct benchmark primary).
+        CAD: added one retry per BoC Valet series to absorb transient failures
+        observed in production (policy-fallback was triggering despite the API
+        being healthy on the next run).
 """
 
 import json
@@ -471,35 +496,44 @@ def fetch_cad():
     V122514 = canonical daily CORRA series (aligned with workflow_meetings.yml).
     V122530 retained as fallback (daily CORRA, alternative BoC Valet ID).
     Confirmed working from GitHub Actions (CORRA ~2.25% current target range).
+
+    v6.0: one retry per series (2s backoff) — transient timeouts/5xx on BoC
+    Valet were observed to occasionally exhaust both series in a single run,
+    dropping to policy-fallback even though the API itself was healthy.
     """
+    import time as _time
     print('[CAD]')
     end_date   = date.today().strftime('%Y-%m-%d')
     start_date = (date.today() - timedelta(days=42)).strftime('%Y-%m-%d')  # 6-week window
 
     for series in ('V122514', 'V122530'):
-        try:
-            r = requests.get(
-                f'https://www.bankofcanada.ca/valet/observations/{series}/json',
-                params={'start_date': start_date, 'end_date': end_date},
-                headers=HEADERS, timeout=15,
-            )
-            r.raise_for_status()
-            obs = r.json().get('observations', [])
-            # Walk backwards from most recent to find latest non-empty value
-            for entry in reversed(obs):
-                raw = entry.get(series, {}).get('v')
-                if raw and raw not in ('', 'Bank holiday', 'nd'):
-                    try:
-                        val = float(raw)
-                        dt  = entry.get('d', str(date.today()))
-                        print(f'  CAD: CORRA (BoC Valet {series})')
-                        print(f'    OK CORRA {val}% ({dt})')
-                        return val, 'CORRA', dt
-                    except (ValueError, TypeError):
-                        continue
-            print(f'  CAD: BoC Valet {series} — no observations in window ({start_date} → {end_date})')
-        except Exception as e:
-            print(f'  CAD: BoC Valet {series} failed: {e}')
+        for attempt in (1, 2):
+            try:
+                r = requests.get(
+                    f'https://www.bankofcanada.ca/valet/observations/{series}/json',
+                    params={'start_date': start_date, 'end_date': end_date},
+                    headers=HEADERS, timeout=15,
+                )
+                r.raise_for_status()
+                obs = r.json().get('observations', [])
+                # Walk backwards from most recent to find latest non-empty value
+                for entry in reversed(obs):
+                    raw = entry.get(series, {}).get('v')
+                    if raw and raw not in ('', 'Bank holiday', 'nd'):
+                        try:
+                            val = float(raw)
+                            dt  = entry.get('d', str(date.today()))
+                            print(f'  CAD: CORRA (BoC Valet {series})')
+                            print(f'    OK CORRA {val}% ({dt})')
+                            return val, 'CORRA', dt
+                        except (ValueError, TypeError):
+                            continue
+                print(f'  CAD: BoC Valet {series} — no observations in window ({start_date} → {end_date})')
+                break  # request succeeded (even if empty) — no point retrying same series
+            except Exception as e:
+                print(f'  CAD: BoC Valet {series} attempt {attempt} failed: {e}')
+                if attempt == 1:
+                    _time.sleep(2)
 
     val, dt = policy_rate('CAD')
     if val is not None:
@@ -618,31 +652,82 @@ def fetch_nok():
     """
     NOWA (Norwegian Overnight Weighted Average) for CIP forward pricing.
 
-    INDUSTRY STANDARD: NOWA, published daily by Norges Bank, is the official NOK
-    risk-free overnight reference rate (replaced NIBOR O/N in 2020). Per Norges
-    Bank's own methodology note: "If there is insufficient transaction data...
-    Nowa is set equal to the prevailing policy rate" — i.e. NOWA ≈ policy rate
-    by construction whenever NOK overnight interbank volume is thin, exactly the
-    same institutional convention already used for AUD (AONIA=RBA Cash Rate) and
-    NZD (NZONIA≈RBNZ OCR) below.
+    v6.0: NOWA wired directly via Norges Bank's own public SDMX API
+    (data.norges-bank.no/api/data/SHORT_RATES, no key). URL pattern confirmed
+    by fetching Norges Bank's own "Nowa - daily" page directly — this is the
+    literal query their site uses for its own "Daily data for Nowa (csv)"
+    download link, key B.NOWA.ON. (FREQ=B business-daily, RATE_TYPE=NOWA,
+    TENOR=ON overnight).
+
+    Per Norges Bank's own methodology note: "If there is insufficient
+    transaction data... Nowa is set equal to the prevailing policy rate" —
+    so a thin-liquidity reading from this primary source IS the same number
+    the policy-rate fallback below would have returned anyway. This is a more
+    direct read, not a riskier one.
+
+    Column layout is parsed defensively (case-insensitive match on common
+    SDMX-CSV header names) since the exact response shape from this sandbox's
+    restricted network could not be verified live — if Norges Bank's CSV
+    schema doesn't match, this silently falls through to the policy-rate leg
+    below with no functional regression.
 
     SOURCE CHAIN:
-    1. Norges Bank policy rate (rates/NOK.json)  [PRIMARY — daily effective rate]
-         NOWA ≈ policy rate by Norges Bank's own definition during thin liquidity.
-         Always current (BIS WS_CBPOL primary fetcher already covers NOK).
-         Labelled 'policy-overnight' — accurate description of the proxy basis.
-    2. FRED IRSTCI01NOM156N (OECD short-term rate, monthly)  [SECONDARY — sanity check]
-         Same OECD MEI family confirmed for NZD (IRSTCI01NZM156N). Best-effort —
-         absence does not block the primary value.
-
-    NOTE: Norges Bank also publishes NOWA directly via a public SDMX API
-    (data.norges-bank.no/api/data/SHORT_RATES, no key) — not wired here because
-    it requires SDMX-JSON parsing unverified against a live response from this
-    environment's sandboxed network. The policy-rate proxy is the documented
-    institutional fallback and is not a degradation in accuracy during normal
-    (non-crisis) conditions. Revisit if direct NOWA wiring is prioritized.
+    1. NOWA direct (data.norges-bank.no/api/data/SHORT_RATES/B.NOWA.ON.) [PRIMARY]
+    2. Norges Bank policy rate (rates/NOK.json)  [SECONDARY — institutional proxy]
+         NOWA ≈ policy rate by Norges Bank's own definition during thin
+         liquidity — unchanged rationale from v5.0, now the fallback leg.
+    3. FRED IRSTCI01NOM156N (OECD short-term rate, monthly)  [TERTIARY — sanity check]
     """
+    import csv as _csv
+    import io as _io
+
     print('[NOK]')
+
+    # Primary: NOWA direct via Norges Bank SHORT_RATES SDMX CSV (no key)
+    try:
+        end_date   = date.today().strftime('%Y-%m-%d')
+        start_date = (date.today() - timedelta(days=21)).strftime('%Y-%m-%d')
+        r = requests.get(
+            'https://data.norges-bank.no/api/data/SHORT_RATES/B.NOWA.ON.',
+            params={
+                'format': 'csv', 'locale': 'en',
+                'startPeriod': start_date, 'endPeriod': end_date,
+            },
+            headers=HEADERS, timeout=15,
+        )
+        r.raise_for_status()
+        text = r.text.lstrip('\ufeff')
+        try:
+            dialect = _csv.Sniffer().sniff(text.splitlines()[0])
+        except Exception:
+            dialect = _csv.excel
+        rows = list(_csv.DictReader(_io.StringIO(text), dialect=dialect))
+        if rows:
+            cols    = list(rows[0].keys())
+            dt_col  = next((c for c in cols if c.strip().upper() in
+                            ('TIME_PERIOD', 'DATE', 'TID', 'TIME')), None)
+            val_col = next((c for c in cols if c.strip().upper() in
+                            ('OBS_VALUE', 'VALUE', 'NOWA')), None)
+            if dt_col and val_col:
+                rows_sorted = sorted(rows, key=lambda x: x.get(dt_col, ''))
+                for row in reversed(rows_sorted):
+                    raw = row.get(val_col)
+                    if raw not in (None, '', '.'):
+                        try:
+                            val = float(str(raw).replace(',', '.'))
+                            dt  = row.get(dt_col)
+                            print(f'  NOK: NOWA direct (Norges Bank SHORT_RATES)')
+                            print(f'    OK NOWA {val}% ({dt})')
+                            return val, 'NOWA', dt
+                        except ValueError:
+                            continue
+            print(f'  NOK: SHORT_RATES CSV — unrecognised columns {cols}')
+        else:
+            print('  NOK: SHORT_RATES CSV — empty response')
+    except Exception as e:
+        print(f'  NOK: Norges Bank SHORT_RATES failed: {e}')
+
+    # Secondary: policy rate proxy (NOWA ≈ policy rate by Norges Bank definition)
     nb_rate, nb_dt = policy_rate('NOK')
 
     if nb_rate is not None:
@@ -675,29 +760,49 @@ def fetch_sek():
     """
     SWESTR (Swedish krona Short Term Rate) for CIP forward pricing.
 
-    INDUSTRY STANDARD: SWESTR, published daily by Sveriges Riksbank since 2021,
-    is the official SEK risk-free overnight reference rate (replaced STIBOR T/N).
-    SWESTR tracks the Riksbank's repo-rate corridor tightly by construction —
-    same convention as AUD/NZD/NOK below, where the policy rate is the
-    institutionally accepted overnight RFR proxy.
+    v6.0: SWESTR wired directly via Riksbank's public API (api.riksbank.se/
+    swestr/v1, no key). The v5.0 comment assumed anonymous access required an
+    unconfirmed subscription key; Riksbank's own API docs clarify public
+    access is permitted, just throttled to 5 req/min — no registration or key
+    needed for a once-daily fetch.
 
     SOURCE CHAIN:
-    1. Riksbank policy rate (rates/SEK.json)  [PRIMARY — daily effective rate]
-         SWESTR trades within a few bp of the repo rate under normal conditions.
-         Always current (BIS WS_CBPOL primary fetcher already covers SEK).
-         Labelled 'policy-overnight' — accurate description of the proxy basis.
-    2. FRED IRSTCI01SEM156N (OECD short-term rate, monthly)  [SECONDARY — sanity check]
-         Same OECD MEI family as NOK/NZD. Best-effort — absence does not block
-         the primary value.
-
-    NOTE: Riksbank's own SWESTR API (developer.api.riksbank.se) requires an
-    Ocp-Apim-Subscription-Key for registered/high-volume use; documentation is
-    ambiguous on whether anonymous low-volume access is permitted without
-    registration. Rather than introduce an unconfirmed-auth dependency, this
-    fetcher uses the same policy-rate-primary pattern as NOK/AUD/NZD, which is
-    itself the institutionally correct proxy, not merely a workaround.
+    1. SWESTR direct (api.riksbank.se/swestr/v1/all/SWESTR)  [PRIMARY]
+    2. Riksbank policy rate (rates/SEK.json)  [SECONDARY — institutional proxy]
+         SWESTR trades within a few bp of the repo rate under normal
+         conditions — unchanged rationale from v5.0, now the fallback leg.
+    3. FRED IRSTCI01SEM156N (OECD short-term rate, monthly)  [TERTIARY — sanity check]
     """
     print('[SEK]')
+
+    # Primary: SWESTR direct via Riksbank public API (no key, 5 req/min)
+    try:
+        end_date   = date.today().strftime('%Y-%m-%d')
+        start_date = (date.today() - timedelta(days=10)).strftime('%Y-%m-%d')
+        r = requests.get(
+            'https://api.riksbank.se/swestr/v1/all/SWESTR',
+            params={'fromDate': start_date, 'toDate': end_date},
+            headers=HEADERS, timeout=15,
+        )
+        r.raise_for_status()
+        obs = r.json()
+        if isinstance(obs, list) and obs:
+            obs_sorted = sorted(obs, key=lambda o: o.get('date', ''))
+            for entry in reversed(obs_sorted):
+                raw = entry.get('rate')
+                if raw is not None:
+                    val = float(raw)
+                    dt  = entry.get('date', str(date.today()))
+                    print(f'  SEK: SWESTR direct (Riksbank API)')
+                    print(f'    OK SWESTR {val}% ({dt})')
+                    return val, 'SWESTR', dt
+            print('  SEK: Riksbank SWESTR — no usable rate values in window')
+        else:
+            print('  SEK: Riksbank SWESTR — empty response in window')
+    except Exception as e:
+        print(f'  SEK: Riksbank SWESTR failed: {e}')
+
+    # Secondary: policy rate proxy (SWESTR ≈ repo rate under normal conditions)
     rb_rate, rb_dt = policy_rate('SEK')
 
     if rb_rate is not None:
