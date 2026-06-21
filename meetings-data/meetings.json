@@ -273,13 +273,13 @@
         "17 Dec"
       ],
       "source": "norges-bank.no",
-      "bias": "cut",
+      "bias": "hold",
       "biasSource": "NOWA overnight rate (Norges Bank) — OECD monthly fallback",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-21",
-      "cutProb": 100,
+      "cutProb": 0,
       "hikeProb": 0,
-      "fwdRate": 4.0
+      "fwdRate": 4.25
     },
     "SEK": {
       "nextMeeting": "25 Aug",
