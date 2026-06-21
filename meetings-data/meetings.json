@@ -188,7 +188,7 @@
       ],
       "source": "bankofcanada.ca",
       "bias": "hold",
-      "biasSource": "CORRA overnight rate (BoC)",
+      "biasSource": "cbonds OIS CORRA curve, meeting-bracketed forward",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-21",
       "cutProb": 0,
@@ -212,7 +212,7 @@
       ],
       "source": "snb.ch",
       "bias": "hold",
-      "biasSource": "SNB SARON overnight rate",
+      "biasSource": "cbonds OIS SARON curve, meeting-bracketed forward",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-21",
       "cutProb": 0,
@@ -273,13 +273,13 @@
         "17 Dec"
       ],
       "source": "norges-bank.no",
-      "bias": "hold",
-      "biasSource": "NOWA overnight rate (Norges Bank) — OECD monthly fallback",
+      "bias": "hike",
+      "biasSource": "cbonds OIS NOWA curve, meeting-bracketed forward",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-21",
       "cutProb": 0,
-      "hikeProb": 0,
-      "fwdRate": 4.25
+      "hikeProb": 69,
+      "fwdRate": 4.4225
     },
     "SEK": {
       "nextMeeting": "25 Aug",
@@ -306,12 +306,12 @@
       ],
       "source": "riksbank.se",
       "bias": "hold",
-      "biasSource": "SWESTR overnight rate (Riksbank)",
+      "biasSource": "cbonds OIS STINA curve, meeting-bracketed forward",
       "biasMethod": "ois",
       "biasUpdated": "2026-06-21",
-      "cutProb": 15,
+      "cutProb": 0,
       "hikeProb": 0,
-      "fwdRate": 1.7125
+      "fwdRate": 1.75
     }
   }
 }
