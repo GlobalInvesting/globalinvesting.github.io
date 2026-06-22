@@ -1,55 +1,55 @@
 {
-  "generated_at": "2026-06-22T18:35:36Z",
+  "generated_at": "2026-06-22T22:05:05Z",
   "sessions": {
     "EUR": {
-      "Sydney": "EUR/USD range-bound. ECB on hold.",
-      "Tokyo": "EUR/JPY -0.25%. BoJ passivity.",
-      "London": "EUR/USD -0.34%. ECB speakers broadly neutral.",
-      "New York": "Dollar bid on hawkish Fed. EUR/USD -0.34%."
+      "Sydney": "Thin range. EUR/USD 1.1430 anchored by 145bp Fed-ECB OIS carry disadvantage",
+      "Tokyo": "EUR/JPY -0.22% during session. JPY strength on data beats offsets 120bp carry",
+      "London": "EUR/USD -0.34% session. Dollar gains on Euro weakness and higher T-note yields",
+      "New York": "EUR/USD soft at 1.1430. ECB on hold at 2.25% with neutral CESI score of +1"
     },
     "GBP": {
-      "Sydney": "GBP/USD +0.05%. BoE on hold.",
-      "Tokyo": "GBP/JPY +0.19%. Risk-on.",
-      "London": "GBP/USD +0.05%. BoE speakers neutral.",
-      "New York": "GBP/USD holds 1.3244. Hawkish Fed bid."
+      "Sydney": "GBP/USD 1.3252. SONIA 3.73% vs SOFR 3.63% provides 10bp carry support in active trade",
+      "Tokyo": "GBP/JPY +0.27% during session. JPY weakness vs GBP 1W outperformance of +0.589%",
+      "London": "Range-bound. GBP/USD +0.12% session. BoE 3.75% hold limits volatility",
+      "New York": "GBP/USD holds 1.3252. Moderate put skew (RR -0.82) reflects hedging demand"
     },
     "JPY": {
-      "Sydney": "USD/JPY +0.11%. BoJ passivity.",
-      "Tokyo": "JPY weakness. EUR/JPY -0.25%.",
-      "London": "USD/JPY +0.14%. BoJ on hold.",
-      "New York": "USD/JPY +0.14%. Hawkish Fed bid."
+      "Sydney": "USD/JPY 161.538. 265bp OIS carry favors USD as JPY net short positioning persists",
+      "Tokyo": "JPY strength on CESI +17 beat. USD/JPY knocked down twice during session",
+      "London": "USD/JPY +0.16% session. Yield curve bear steepener supports USD/JPY carry bid",
+      "New York": "USD/JPY 161.538. High hedging demand with IV 7.2% vs HV30 2.4% (VRP +4.8%)"
     },
     "AUD": {
-      "Sydney": "AUD/USD -0.16%. RBA on hold.",
-      "Tokyo": "AUD/JPY -0.04%. Risk-on.",
-      "London": "AUD/USD -0.16%. RBA neutral.",
-      "New York": "AUD/USD -0.16%. Carry favors AUD."
+      "Sydney": "AUD/USD 0.7003. RBA 4.35% hold provides 72bp OIS carry advantage over USD",
+      "Tokyo": "AUD/JPY -0.04%. Range-bound as RBA-BoJ 335bp carry spread meets JPY data beats",
+      "London": "AUD/USD -0.18% session. Risk-off sentiment and S&P 500 -0.37% weigh on AUD",
+      "New York": "AUD/USD soft. Negative CESI -8 and moderate put skew (RR -0.90) cap upside"
     },
     "CAD": {
-      "Sydney": "USD/CAD +0.07%. BoC on hold.",
-      "Tokyo": "CAD/JPY +0.09%. Risk-on.",
-      "London": "USD/CAD +0.07%. Canada CPI beats.",
-      "New York": "USD/CAD +0.07%. Canada inflation data."
+      "Sydney": "USD/CAD 1.4158. 133bp OIS carry favors USD; BoC 2.25% hold remains structural anchor",
+      "Tokyo": "CAD/JPY +0.09%. Range-bound. CAD supported by CESI +9 data outperformance",
+      "London": "USD/CAD +0.06% session. WTI +3.63% surge provides CAD support against USD bid",
+      "New York": "USD/CAD 1.4158. Mild call skew (RR +0.33) aligns with USD strength theme"
     },
     "CHF": {
-      "Sydney": "USD/CHF +0.34%. SNB on hold.",
-      "Tokyo": "CHF/JPY -0.13%. Risk-off.",
-      "London": "USD/CHF +0.34%. SNB neutral.",
-      "New York": "USD/CHF +0.34%. Carry favors USD."
+      "Sydney": "USD/CHF 0.8084. 375bp carry favors USD; SNB 0.0% hold keeps CHF as funding leg",
+      "Tokyo": "CHF/JPY -0.02%. Range-bound. JPY data beats counter CHF safe-haven premium",
+      "London": "USD/CHF +0.25% session. Dollar bid on higher T-note yields drives the cross",
+      "New York": "USD/CHF 0.8084. High VRP +6.2% (IV 12.4% vs HV30 6.2%) reflects hedging demand"
     },
     "NZD": {
-      "Sydney": "NZD/USD -0.47%. RBNZ hike priced.",
-      "Tokyo": "NZD/JPY -0.04%. Risk-on.",
-      "London": "NZD/USD -0.47%. RBNZ on hold.",
-      "New York": "NZD/USD -0.47%. RBNZ hike expected."
+      "Sydney": "NZD/USD 0.5715. RBNZ hike expected (83% prob) provides structural support",
+      "Tokyo": "NZD/JPY -0.28%. JPY strength on data beats pressures NZD/JPY cross",
+      "London": "NZD/USD -0.48% session. NZD/USD trades to new lows, stretching toward year lows",
+      "New York": "NZD/USD 0.5715. Weakest G10 currency (1W avg -0.507%) on data misses (CESI -3)"
     },
     "USD": {
-      "Sydney": "USD/JPY +0.11%. Fed on hold.",
-      "Tokyo": "USD/JPY +0.14%. Hawkish Fed.",
-      "London": "USD/JPY +0.14%. Fed speakers hawkish.",
-      "New York": "Dollar rallies on hawkish Fed. USD/JPY +0.14%."
+      "Sydney": "USD/JPY 161.538. Dollar bid on bear steepener regime and 4.509% 10Y yield",
+      "Tokyo": "USD/JPY +0.16% session. Fed-BoJ carry intact; USD/JPY knocked down twice",
+      "London": "EUR/USD -0.34%. Dollar gains on Euro weakness and higher T-note yields",
+      "New York": "USD/JPY 161.538. Warsh Humphrey-Hawkins testimony tests inflation resolve"
     }
   },
-  "session_bucket": "new_york",
-  "news_hash": "['Dollar Rallies and Gold Retreats on Hawkish Fed', 'Gold Edges Lower Amid Interest Rate Concerns, Gains In US Dollar', 'New Zealand Dollar falls as hawkish Fed, fragile US-Iran truce boost the US Dollar', 'Crude oil trades above and below its key 200 day MA at $73.63', 'Pound Sterling Price News and Forecast: GBP/USD rises as US-Iran talks offset UK political shock', 'Premium Watchlist Recap: FOMC Statement (June 2026)', 'Euro languishes near three-month lows against US Dollar despite progress in US-Iran talks', 'British Pound rises as US-Iran talks offset UK political shock']"
+  "session_bucket": "sydney",
+  "news_hash": "[\"Warsh's first Humphrey-Hawkins testimony will test his inflation resolve with lawmakers\", 'investingLive Americas market news wrap: USD/JPY knocked down twice', 'Dollar Gains on Euro Weakness and Higher T-note Yields', 'NZDUSD trades to new lows. Stretches toward lows for the year', 'Malaysian Ringgit: Stays pressured against US Dollar as trades cautiously – OCBC', 'For the Canadian Dollar, the trade war beats the data', 'New Zealand Dollar falls as hawkish Fed, fragile US-Iran truce boost the US Dollar', 'Crude oil trades above and below its key 200 day MA at $73.63']"
 }
