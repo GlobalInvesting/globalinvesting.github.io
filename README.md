@@ -1,6 +1,6 @@
 # Global Investing — FX Terminal
 
-A professional-grade foreign exchange monitoring platform for serious market participants. Consolidates live FX prices (Finnhub WebSocket, tick-by-tick), central bank policy rates, institutional positioning, cross-asset flows, and AI-assisted market narrative into a single unified dashboard.
+A professional-grade foreign exchange monitoring platform for serious market participants. Consolidates live FX prices (tick-by-tick), central bank policy rates, institutional positioning, cross-asset flows, and AI-assisted market narrative into a single unified dashboard.
 
 **[globalinvesting.github.io](https://globalinvesting.github.io/)**
 
