@@ -3639,15 +3639,42 @@ async function _renderLWChart(ohlcId, label) {
     }
     bars = Object.values(agg).sort((a, b) => a.time < b.time ? -1 : 1);
     if (bars.length < 4) throw new Error('insufficient aggregated data');
+
+    // ── Current-period key, computed from "now" — NOT assumed from bars[] ───
+    // Bug history: the snapshot below used to assume bars[bars.length-1] was
+    // always the current incomplete period. That's false right after a period
+    // boundary with no D1 bar yet for the new period — most commonly every
+    // Monday between the FX session open (Sun 21:00 UTC) and the daily OHLC
+    // workflow run (~22:30 UTC) that writes Monday's D1 bar. In that window the
+    // last aggregated bar is the just-COMPLETED prior week, so using its O/H/L
+    // made the live today-bar mimic the prior week's exact range — a visual
+    // "duplicate candle" of the previous period (reported by user; confirmed
+    // against production ohlc-data/eurusd.json on 2026-06-22: last D1 bar was
+    // Fri 06-19, no 06-22 bar yet, so the aggregated 06-15 week was wrongly
+    // snapshotted as "current").
+    const _nowKeyD = new Date();
+    let _currentPeriodKey;
+    if (_activeTf === 'W1') {
+      const _kDow = _nowKeyD.getUTCDay() || 7;
+      const _kMon = new Date(_nowKeyD);
+      _kMon.setUTCDate(_nowKeyD.getUTCDate() - (_kDow - 1));
+      _currentPeriodKey = _kMon.toISOString().slice(0, 10);
+    } else {
+      _currentPeriodKey = _nowKeyD.toISOString().slice(0, 7) + '-01';
+    }
+
     // ── Snapshot current-period O/H/L for _lwBuildTodayBar ─────────────────
-    // The last aggregated bar IS the current incomplete period (it will be stripped
-    // below and replaced by the live today-bar). Capture its accumulated O/H/L now
-    // so _lwBuildTodayBar can produce a bar with the REAL period open and cumulative
-    // period H/L rather than prev_close + session H/L (today only).
+    // Only use the last aggregated bar's O/H/L if it actually IS the current
+    // period. Otherwise leave the globals null (already null from
+    // _destroyLWChart above) so _lwBuildTodayBar falls back to its normal
+    // prev_close + session H/L computation — the correct behaviour for a
+    // period that has no D1 data yet.
     const _curPeriodBar = bars[bars.length - 1];
-    _lwPeriodOpen = _curPeriodBar ? _curPeriodBar.open : null;
-    _lwPeriodHigh = _curPeriodBar ? _curPeriodBar.high : null;
-    _lwPeriodLow  = _curPeriodBar ? _curPeriodBar.low  : null;
+    if (_curPeriodBar && _curPeriodBar.time === _currentPeriodKey) {
+      _lwPeriodOpen = _curPeriodBar.open;
+      _lwPeriodHigh = _curPeriodBar.high;
+      _lwPeriodLow  = _curPeriodBar.low;
+    }
   }
 
   // ── Today-bar strip and gap-window injection (D1/W1/MN only) ─────────────────
