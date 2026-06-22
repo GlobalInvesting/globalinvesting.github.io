@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-21T23:55:40Z",
-  "generatedAt": "2026-06-21T23:55:40Z",
+  "lastUpdate": "2026-06-22T00:00:44Z",
+  "generatedAt": "2026-06-22T00:00:44Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,14 +8,14 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-06-22",
-  "rangeTo": "2026-06-19",
-  "totalEvents": 1820,
+  "rangeTo": "2026-06-22",
+  "totalEvents": 1830,
   "currencyCounts": {
     "AUD": 160,
-    "USD": 596,
+    "USD": 597,
     "CHF": 86,
-    "CAD": 127,
-    "EUR": 181,
+    "CAD": 133,
+    "EUR": 184,
     "GBP": 183,
     "JPY": 179,
     "NZD": 74,
@@ -24,15 +24,10 @@
   },
   "impactCounts": {
     "low": 358,
-    "medium": 1066,
-    "high": 396
+    "medium": 1072,
+    "high": 400
   },
   "surpriseStats": {
-    "NOK/loan growth yoy": {
-      "n": 3,
-      "mean": 0.1,
-      "std": 0.264575
-    },
     "SEK/ppi yoy": {
       "n": 3,
       "mean": 0.0,
@@ -427,6 +422,11 @@
       "n": 3,
       "mean": -0.366667,
       "std": 1.101514
+    },
+    "NOK/loan growth yoy": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.070711
     },
     "SEK/gdp growth rate yoy": {
       "n": 2,
@@ -24062,6 +24062,136 @@
       "actual": "3.7%",
       "forecast": "2.9%",
       "previous": "3.4%"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "04:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Netherlands Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-43.0",
+      "previous": "-46.0"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada CPI Common YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.5%",
+      "previous": "2.5%"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada CPI Median YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.1%",
+      "previous": "2.1%"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.2%",
+      "previous": "2.1%"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.7%",
+      "previous": "0.4%"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada CPI Trimmed-Mean YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.0%",
+      "previous": "2.0%"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.9%",
+      "previous": "2.8%"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "13:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Waller Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "14:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-18.0",
+      "previous": "-19.0"
+    },
+    {
+      "date": "22 Jun",
+      "dateISO": "2026-06-22",
+      "timeUTC": "15:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB President Lagarde Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     }
   ]
 }
