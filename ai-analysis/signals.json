@@ -1,65 +1,56 @@
 {
-  "generated_at": "2026-06-22T12:30:56Z",
+  "generated_at": "2026-06-22T18:33:54Z",
   "signals": [
     {
-      "time": "12:29",
+      "time": "18:31",
       "priority": "critical",
-      "title": "USD/JPY — Fed Hawkishness + Carry + Retail Divergence",
-      "text": "USD/JPY at 161.74 testing levels above the 160.00 intervention threshold as Fed Chairman Warsh signals a tighter policy path. Despite BoJ verbal warnings, the +275bp OIS carry advantage (SOFR 3.63% vs TONA 0.98%) sustains the bid. Retail sentiment is 85% short, diverging from the institutional carry-driven trend; this extreme retail shorting increases the risk of a squeeze higher toward 163.00 unless the BoJ intervenes. JPY COT LF net short -115,036 reflects crowded carry positioning.",
+      "title": "USD/JPY — Hawkish Fed + Intervention Risk + Carry",
+      "text": "USD/JPY at 161.504 — the pair is trading above the 160.00 level, which has previously triggered BoJ verbal warnings. Intervention risk is elevated on a sustained break higher. The hawkish Fed surprise (June FOMC) and strong US data (USD CESI net +30) are driving dollar strength, while the 265bp Fed-BoJ OIS carry premium (SOFR 3.63% vs TONA 0.98%) continues to support the pair. JPY COT LF net short −115,036 (week ending Jun 9) indicates crowded spec short positioning, increasing volatility risk around the 160.00 level. Watch for BoJ commentary or a move towards 162.00 to confirm intervention intent.",
       "evidence": [
-        "USD/JPY: 161.74",
-        "OIS Carry: +275bp",
-        "Retail: 85% Short"
+        "USD/JPY: 161.504",
+        "USD CESI net: +30",
+        "USD/JPY OIS carry: +265bp",
+        "JPY COT LF net: -115,036"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "12:25",
+      "time": "18:28",
       "priority": "warning",
-      "title": "GBP/CHF — G10 Bilateral Theme + Political Shock",
-      "text": "GBP/CHF at 1.0704 reflects a dominant G10 bilateral theme as GBP outperforms despite PM Starmer's resignation. The pair is supported by a massive +375bp carry premium (BoE 3.75% vs SNB 0.0%) and a restrictive real rate of +0.77% in the UK vs -0.60% in Switzerland. Options market remains cautious with a -0.82 moderate put skew on GBP/USD, suggesting hedging against political volatility even as the carry trade remains intact.",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
+      "text": "NZD/USD COT LF net short −22,354 (specs fading a hawkish CB) vs RBNZ hike 40% priced for 8 Jul. If RBNZ delivers or signals a hike, short-squeeze risk is elevated — crowded spec short unwind targets 0.5800+. NZD/USD at 0.5715. Retail sentiment shows 94% long, an extreme contrarian signal, suggesting retail is fading the institutional short. This divergence amplifies potential volatility. Watch for RBNZ forward guidance at the next meeting.",
       "evidence": [
-        "GBP 1W avg: +0.567% (n=4)",
-        "CHF 1W avg: -0.283% (n=6)",
-        "G10 spread: 0.850%"
+        "NZD COT LF net: -22,354",
+        "RBNZ hike prob: 40%",
+        "NZD/USD retail: 94% long",
+        "NZD/USD: 0.5715"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "12:20",
+      "time": "18:25",
       "priority": "warning",
-      "title": "USD/CAD — COT vs Retail Divergence + CPI Risk",
-      "text": "USD/CAD at 1.4155 shows extreme retail vs institutional divergence ahead of Canada's May CPI release. Retail traders are 95% short (extreme), fading the move, while COT LF net positioning is -60,671 (specs short CAD). The +150bp carry advantage (Fed 3.75% vs BoC 2.25%) favors USD. A higher-than-expected CPI print is required to trigger a retail-led reversal; otherwise, the path of least resistance remains higher toward 1.4200.",
+      "title": "GBP/NZD — G10 Bilateral Theme + Carry",
+      "text": "GBP is the strongest G10 currency this week, averaging +0.545% vs peers, while NZD is the weakest at −0.487%. This creates a 1.032% leader-to-laggard spread, indicating a strong bilateral theme. The GBP/NZD cross is supported by a significant 150bp carry premium (BoE 3.75% vs RBNZ 2.25%) favoring GBP. This divergence is driven by relative central bank stances and G10 performance. Watch for RBNZ's next meeting on 8 Jul for potential shifts in carry dynamics.",
       "evidence": [
-        "Retail: 95% Short",
-        "COT CAD LF Net: -60,671",
-        "USD/CAD Carry: +150bp"
+        "GBP 1W avg: +0.545% (n=4)",
+        "NZD 1W avg: -0.487% (n=4)",
+        "G10 spread: 1.032%",
+        "GBP/NZD carry: +150bp"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "12:15",
+      "time": "18:20",
       "priority": "info",
-      "title": "EUR/USD — Volatility Premium + Positioning Stall",
-      "text": "EUR/USD at 1.1464 exhibits an elevated vol risk premium (VRP) of +2.3%, with IV at 7.1% vs HV30 at 4.8%. This suggests the options market is pricing in significant protection relative to recent realized movement. COT LF net short -49,290 aligns with the +150bp USD carry advantage. The negative 25d RR (-0.67) confirms a persistent put skew, indicating that despite the 1W flat performance, the market remains biased toward EUR downside protection.",
+      "title": "AUD/USD — Volatility Premium + CESI Weakness",
+      "text": "AUD/USD IV 13.4% vs HV30 7.8% — a +5.6% VRP indicates elevated hedging demand for downside protection, significantly above realized volatility. This suggests market participants are pricing in higher future volatility despite current price action. AUD CESI net −8 misses (moderate negative bias) points to disappointing data, which could fuel further AUD weakness. Watch for upcoming Australian employment data to confirm the CESI trend.",
       "evidence": [
-        "EUR/USD VRP: +2.3%",
-        "COT EUR LF Net: -49,290",
-        "25d RR: -0.67"
+        "AUD/USD IV: 13.4%",
+        "AUD/USD HV30: 7.8%",
+        "AUD CESI net: -8"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "12:10",
-      "priority": "info",
-      "title": "USD/CAD vs WTI — Correlation Break",
-      "text": "USD/CAD vs WTI Oil correlation has decoupled to -0.512 vs a 252d norm of -0.005 (z = -1.95σ). The Canadian Dollar is failing to respond to oil price fluctuations, with the pair instead being driven by the +150bp Fed-BoC carry spread and hawkish Fed rhetoric. This break suggests CAD has lost its commodity-link sensitivity in the current high-yield USD regime. Watch for a return to norm if US yields stabilize.",
-      "evidence": [
-        "Correlation: -0.512",
-        "Z-Score: -1.95σ",
-        "WTI Oil: $74.9"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
