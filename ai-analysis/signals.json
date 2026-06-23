@@ -1,64 +1,56 @@
 {
-  "generated_at": "2026-06-23T10:08:40Z",
+  "generated_at": "2026-06-23T17:01:46Z",
   "signals": [
     {
-      "time": "10:08",
+      "time": "16:59",
       "priority": "critical",
-      "title": "GBP/NZD — G10 Bilateral Theme + RBNZ Divergence",
-      "text": "GBP/NZD spread at 1.242% marks a strong G10 theme as NZD 1W avg performance hits -0.771% (n=4). NZD COT LF net short -22,454 (long% 18.4%) represents a positioning extreme, yet specs are correctly aligned with the -0.83% negative real rate. Despite RBNZ hike bias, the 'Antipodean slide' headline and risk-off mood (VIX +14.5%) accelerate the divergence. GBP remains the G10 leader (+0.471%) supported by a +0.77% real rate. GBP/NZD at 2.3219.",
+      "title": "NZD/USD — G10 Bilateral Theme + CESI Divergence",
+      "text": "NZD/USD at 0.5671 anchors the week's dominant G10 theme as the USD hits one-year highs following PMI beats. USD outperformance (CESI net +30) contrasts with NZD weakness despite a hawkish RBNZ bias. The 1.803% G10 spread and 150bp USD carry advantage. lower; however, NZD COT LF net short -22,454 vs RBNZ hike bias creates a structural short-squeeze risk if the July 8 meeting delivers a hawkish surprise. Retail 96% long positioning marks an extreme contrarian warning against chasing the move at these levels.",
       "evidence": [
-        "GBP 1W avg: +0.471% (n=4)",
-        "NZD 1W avg: -0.771% (n=4)",
-        "G10 spread: 1.242%"
+        "USD 1W avg: +0.684% (n=7)",
+        "NZD 1W avg: -1.119% (n=4)",
+        "G10 spread: 1.803%"
       ],
+      "watch level": "RBNZ meeting on 8 Jul",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "10:05",
-      "priority": "critical",
-      "title": "USD/JPY — Carry + Volatility + Retail Divergence",
-      "text": "USD/JPY at 161.39 holds above the 160.00 intervention threshold as +275bp Fed-BoJ carry dominates. VRP at +4.8% (IV 7.2% vs HV30 2.4%) signals the options market is pricing significant tail risk despite 'normal' VIX 19.8. Retail sentiment is 86% short, diverging from the JPY COT LF net short of -112,092. This institutional-retail divergence at 161+ suggests retail is fading a carry trade that remains fundamentally supported by the +1.48% US real rate vs -0.44% JPY real rate.",
-      "evidence": [
-        "USD/JPY Carry: +275bp",
-        "VRP: +4.8%",
-        "Retail: 86% Short"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "10:03",
+      "time": "16:55",
       "priority": "warning",
-      "title": "USD/CAD — Correlation Break + CESI Divergence",
-      "text": "USD/CAD vs WTI Oil correlation at -0.566 vs -0.010 norm (z=-2.00σ) signals a significant regime break where CAD is failing to track energy prices. USD CESI net +30 (strong positive) vs CAD net +9 confirms US data outperformance is the primary driver. CAD COT LF net short -67,668 (long% 23.4%) is approaching extreme levels while retail is 95% short. The combination of data beats and the 150bp OIS carry advantage supports USD/CAD at 1.4179.",
+      "title": "USD/CAD — Positioning + Vol + Retail Divergence",
+      "text": "USD/CAD at 1.4205 testing multi-month highs as Fed hike bets rise and oil prices weigh. COT LF net short -67,668 (long% 23.4%) indicates a crowded institutional short being squeezed, while retail 95% short positioning confirms extreme contrarian upside pressure. 150bp USD carry advantage supports the bid. Volatility pricing shows complacency with IV at 11.5% vs HV30 6.2%, suggesting the options market is not yet fully pricing the extension risk.",
       "evidence": [
-        "USD/CAD vs WTI: z=-2.00σ",
-        "USD CESI: +30",
-        "Retail: 95% Short"
+        "CAD COT LF net: -67,668",
+        "Retail Sentiment: 95% short",
+        "USD/CAD carry: +150bp"
       ],
+      "watch level": "BoC meeting on 15 Jul",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:58",
+      "time": "16:52",
       "priority": "warning",
-      "title": "EUR/JPY — Options Skew + Positioning",
-      "text": "EUR/JPY 25d RR at -1.51 (Strong Put Skew) signals the options market is paying a premium for EUR downside protection despite a +125bp carry advantage. EUR COT LF net short -40,372 (long% 39.1%) aligns with this cautious outlook. While Eurozone PMIs (Services 48.9) show stabilization, the negative options skew suggests the market is hedging against a JPY safe-haven bid or carry unwind. Watch for a break of 184.00 to confirm downside momentum.",
+      "title": "USD/JPY — Carry + Vol + Intervention Risk",
+      "text": "USD/JPY at 161.56 holding above the critical 160.00 threshold where BoJ intervention risk historically escalates. Despite JPY 1W outperformance (+0.502%), the 275bp Fed-BoJ carry advantage keeps the pair bid. Options market is pricing significant protection with a 25d RR of -1.38 (put skew) and an elevated VRP of +4.8% (IV 7.2% vs HV30 2.4%). Institutional hedging for a JPY move is active even as spot remains elevated.",
       "evidence": [
-        "EUR/JPY 25d RR: -1.51",
-        "EUR COT long%: 39.1%",
-        "EUR/JPY Carry: +125bp"
+        "USD/JPY: 161.56",
+        "25d RR: -1.38 (Saxo)",
+        "VRP: +4.8%"
       ],
+      "watch level": "160.00 psychological support",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:53",
+      "time": "16:48",
       "priority": "info",
-      "title": "GBP/USD — Volatility Premium + Carry Neutrality",
-      "text": "GBP/USD IV at 11.0% vs HV30 6.7% generates a +4.3% VRP, the second highest in G10, indicating heavy hedging ahead of the July 30 BoE meeting. With OIS carry neutral (-11bp), price action at 1.3228 is driven by the +0.77% real rate advantage over the USD. Speculative positioning remains net long (+17,711), but the high vol premium suggests traders are not adding to length at these levels. Watch for US 10Y yield shifts to break the 1.32 handle.",
+      "title": "EUR/USD — Positioning + Vol + Real Rates",
+      "text": "EUR/USD at 1.1384 breaks below 1.1400 as hawkish Fed bets and PMI beats support the USD. COT LF net short -40,372 aligns with a restrictive US real rate (+1.48%) vs EUR (+0.02%). Options market shows elevated hedging demand with a VRP of +2.1% (IV 7.1% vs HV30 5.0%) and a -0.63 25d RR put skew, signaling institutional preference for downside protection as the pair tests one-year lows.",
       "evidence": [
-        "GBP/USD VRP: +4.3%",
-        "GBP Real Rate: +0.77%",
-        "GBP COT net: +17,711"
+        "EUR/USD: 1.1384",
+        "US Real Rate: +1.48%",
+        "EUR COT LF net: -40,372"
       ],
+      "watch level": "ECB meeting on 23 Jul",
       "_source": "gemini:gemini-3-flash-preview"
     }
   ]
