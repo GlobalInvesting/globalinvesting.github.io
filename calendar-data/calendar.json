@@ -1,78 +1,33 @@
 {
-  "lastUpdate": "2026-06-23T23:35:22Z",
-  "generatedAt": "2026-06-23T23:35:22Z",
+  "lastUpdate": "2026-06-24T00:00:48Z",
+  "generatedAt": "2026-06-24T00:00:48Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-23",
-  "rangeTo": "2026-06-23",
-  "totalEvents": 1844,
+  "rangeFrom": "2025-06-24",
+  "rangeTo": "2026-06-24",
+  "totalEvents": 1857,
   "currencyCounts": {
-    "USD": 599,
+    "USD": 600,
     "CHF": 88,
-    "AUD": 158,
-    "CAD": 135,
-    "EUR": 188,
+    "AUD": 166,
+    "CAD": 136,
+    "EUR": 189,
     "GBP": 186,
-    "JPY": 181,
+    "JPY": 183,
     "NZD": 75,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1086,
+    "medium": 1091,
     "low": 357,
-    "high": 401
+    "high": 409
   },
   "surpriseStats": {
-    "SEK/ppi yoy": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.4
-    },
-    "SEK/ppi mom": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.4
-    },
-    "SEK/consumer inflation expectations": {
-      "n": 3,
-      "mean": -0.4,
-      "std": 0.888819
-    },
-    "SEK/economic tendency indicator": {
-      "n": 3,
-      "mean": 1.566667,
-      "std": 0.945163
-    },
-    "SEK/business confidence": {
-      "n": 3,
-      "mean": 1.3,
-      "std": 1.0
-    },
-    "SEK/consumer confidence": {
-      "n": 3,
-      "mean": 0.3,
-      "std": 2.523886
-    },
-    "GBP/cpi": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "GBP/retail price index": {
-      "n": 2,
-      "mean": -0.1,
-      "std": 0.0
-    },
-    "USD/eia crude oil stocks change": {
-      "n": 7,
-      "mean": -0.883857,
-      "std": 3.939441
-    },
     "NOK/unemployment rate": {
       "n": 3,
       "mean": 0.066667,
@@ -423,6 +378,16 @@
       "mean": -0.366667,
       "std": 1.101514
     },
+    "SEK/ppi mom": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.565685
+    },
+    "SEK/ppi yoy": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.565685
+    },
     "NOK/loan growth yoy": {
       "n": 2,
       "mean": -0.05,
@@ -437,6 +402,26 @@
       "n": 2,
       "mean": -0.2,
       "std": 0.141421
+    },
+    "SEK/consumer inflation expectations": {
+      "n": 2,
+      "mean": -0.9,
+      "std": 0.282843
+    },
+    "SEK/economic tendency indicator": {
+      "n": 2,
+      "mean": 1.4,
+      "std": 1.272792
+    },
+    "SEK/consumer confidence": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 3.464823
+    },
+    "SEK/business confidence": {
+      "n": 2,
+      "mean": 1.8,
+      "std": 0.707107
     },
     "USD/housing starts": {
       "n": 2,
@@ -477,6 +462,11 @@
       "n": 5,
       "mean": -4.0814,
       "std": 2.247764
+    },
+    "USD/eia crude oil stocks change": {
+      "n": 6,
+      "mean": -2.102167,
+      "std": 2.480947
     },
     "USD/eia gasoline stocks change": {
       "n": 6,
@@ -580,42 +570,6 @@
     }
   },
   "events": [
-    {
-      "currency": "USD",
-      "event": "S&P Global Composite PMI Flash",
-      "dateISO": "2025-06-23",
-      "hourUTC": "13:45",
-      "actual": "52.8",
-      "forecast": null,
-      "previous": "53",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Manufacturing PMI Flash",
-      "dateISO": "2025-06-23",
-      "hourUTC": "13:45",
-      "actual": "52",
-      "forecast": "51",
-      "previous": "52",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P Global Services PMI Flash",
-      "dateISO": "2025-06-23",
-      "hourUTC": "13:45",
-      "actual": "53.1",
-      "forecast": "52.9",
-      "previous": "53.7",
-      "impact": "medium",
-      "importance": 2,
-      "source": "FH"
-    },
     {
       "currency": "USD",
       "event": "Current Account",
@@ -24373,6 +24327,214 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "Japan BoJ Summary of Opinions",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Weighted Median CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Weighted Median CPI YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.6%",
+      "previous": "3.5%"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia CPI",
+      "impact": "high",
+      "actual": null,
+      "forecast": "102.5",
+      "previous": "102.8"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "4.4%",
+      "previous": "4.2%"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Trimmed Mean CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Trimmed Mean CPI YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.5%",
+      "previous": "3.4%"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.3%",
+      "previous": "0.4%"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "06:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Hauser Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "06:40",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan BoJ Himino Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Ifo Business Climate",
+      "impact": "high",
+      "actual": null,
+      "forecast": "85.6",
+      "previous": "84.9"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "11:15",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada BoC Rogers Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "$-217.5B",
+      "previous": "$-190.7B"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States New Home Sales",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.64M",
+      "previous": "0.622M"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States New Home Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.9%",
+      "previous": "-6.2%"
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "20:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan BOJ Gov Ueda Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "24 Jun",
+      "dateISO": "2026-06-24",
+      "timeUTC": "20:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Bank Stress Test Results",
       "impact": "medium",
       "actual": null,
       "forecast": null,
