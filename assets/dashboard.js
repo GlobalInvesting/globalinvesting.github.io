@@ -10611,10 +10611,18 @@ async function renderDerivativesSection() {
   // ── RR Surface table ──
   const rrSurfaceTbody = document.getElementById('rr-surface-tbody');
   if (rrSurfaceTbody) {
-    // EUR/JPY is the only cross pair Saxo consistently publishes — include it.
-    // NZD/USD excluded: Saxo does not publish NZD/USD 25d RR on their public page.
-    const rrPairs = [...pairs.filter(p => p !== 'NZD/USD'), 'EUR/JPY'];
-    const rrPairKeys = { ...rrKeys, 'EUR/JPY': 'EURJPY' };
+    // Dedicated list — independent from `pairs` above (which also feeds the CIP
+    // Forwards table and legitimately includes NZD/USD, USD/NOK, USD/SEK since
+    // forward points don't need Saxo data). Saxo's 25d RR table does NOT cover
+    // NZD/USD, USD/NOK, or USD/SEK — confirmed against the live page 2026-06-23.
+    // EUR/GBP and EUR/CHF added — confirmed present on Saxo's live page but never
+    // wired up before. XAU/USD and XAG/USD are also on Saxo's page but intentionally
+    // excluded — out of scope for an FX-pairs-only panel (product decision).
+    const rrPairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','EUR/JPY','EUR/GBP','EUR/CHF'];
+    const rrPairKeys = {
+      'EUR/USD':'EURUSD','GBP/USD':'GBPUSD','USD/JPY':'USDJPY','AUD/USD':'AUDUSD',
+      'USD/CHF':'USDCHF','USD/CAD':'USDCAD','EUR/JPY':'EURJPY','EUR/GBP':'EURGBP','EUR/CHF':'EURCHF'
+    };
     const rows = rrSurfaceTbody.querySelectorAll('tr');
     rrPairs.forEach((pair, idx) => {
       const row = rows[idx];
