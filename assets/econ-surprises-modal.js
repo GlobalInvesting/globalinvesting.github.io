@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.3.4
+// ECONOMIC SURPRISES MODAL  v1.3.5
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -396,20 +396,42 @@ function _esmBuildSeries(events, ccy) {
   return series;
 }
 function _esmCurrentScore(events, ccy) {
-  const nowMs = Date.now();
-  return _esmScoreWindow(events, ccy, nowMs - 90 * 24 * 60 * 60 * 1000, nowMs);
+  const nowMs  = Date.now();
+  const W90_MS  = 90  * 24 * 60 * 60 * 1000;
+  const W180_MS = 180 * 24 * 60 * 60 * 1000;
+  // Pass 0: standard 90d window — mirrors dashboard.js renderEconSurprises() pass 0.
+  const r0 = _esmScoreWindow(events, ccy, nowMs - W90_MS, nowMs);
+  if (r0 !== null) return { ...r0, widened: false };
+  // Pass 1: 90–180d extension band — only reached when no 90d data exists.
+  // Applies the same impact filter and decay function as pass 0; widening the
+  // window does NOT lower methodology standards (identical to EA v8.4.3+).
+  const r1 = _esmScoreWindow(events, ccy, nowMs - W180_MS, nowMs - W90_MS);
+  return r1 ? { ...r1, widened: true } : null;
 }
 
 function _esmGetEvents(events, ccy) {
   const nowMs  = Date.now();
-  const W90_MS = 90 * 24 * 60 * 60 * 1000;
+  const W90_MS  = 90  * 24 * 60 * 60 * 1000;
+  const W180_MS = 180 * 24 * 60 * 60 * 1000;
+
+  // Determine effective window: check if any medium/high events exist in 90d.
+  // Matches the adaptive window logic in _esmCurrentScore / dashboard.js pass 0/1.
+  const has90d = events.some(ev => {
+    if (ev.currency !== ccy) return false;
+    const t = new Date(ev.dateISO).getTime();
+    if (isNaN(t) || t > nowMs || nowMs - t > W90_MS) return false;
+    return !!(ev.actual && ev.actual !== '' && ev.actual !== '-') &&
+           ['medium','high'].includes(ev.impact);
+  });
+  const windowMs = has90d ? W90_MS : W180_MS;
+
   const seen   = new Set();
   const result = [];
 
   events.forEach(ev => {
     if (ev.currency !== ccy) return;
     const t = new Date(ev.dateISO).getTime();
-    if (isNaN(t) || t > nowMs || nowMs - t > W90_MS) return;
+    if (isNaN(t) || t > nowMs || nowMs - t > windowMs) return;
     if (!ev.actual || ev.actual === '' || ev.actual === '-') return;
     if (!['medium','high'].includes(ev.impact)) return;
 
@@ -446,7 +468,7 @@ function _esmGetEvents(events, ccy) {
   });
 
   result.sort((a, b) => b.dateISO.localeCompare(a.dateISO));
-  return result;
+  return { rows: result, widened: !has90d };
 }
 
 // ── Chart ─────────────────────────────────────────────────────────────────────
@@ -609,6 +631,11 @@ function _esmRenderMetrics(ccy) {
   const idxCol = idx > 5 ? 'var(--up,#26a69a)' : idx < -5 ? 'var(--down,#ef5350)' : 'var(--text,#d1d4dc)';
   const beatRt = s.total > 0 ? (s.beats / s.total * 100).toFixed(0) + '%' : '—';
 
+  // Update the "N (90d)" metric label — when widened, change to "N (90d/180d)" to
+  // match EA's subtitle "Citi methodology * 90D/180D" convention (g_esi_window_days).
+  const nLbl = el('esm-m-n')?.closest('.esm-mm')?.querySelector('.esm-mm-lbl');
+  if (nLbl) nLbl.textContent = s.widened ? 'N (90d/180d)' : 'N (90d)';
+
   const mi = el('esm-m-index');
   if (mi) { mi.textContent = (idx >= 0 ? '+' : '') + idx.toFixed(1); mi.style.color = idxCol; }
   const mb = el('esm-m-beats');  if (mb) { mb.textContent = s.beats;  mb.style.color = 'var(--up,#26a69a)'; }
@@ -619,6 +646,18 @@ function _esmRenderMetrics(ccy) {
     mr.textContent = beatRt;
     mr.style.color = parseFloat(beatRt) >= 50 ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
   }
+
+  // Update the Index metric label and sub-header when widened.
+  const indexLbl = el('esm-m-index')?.closest('.esm-mm')?.querySelector('.esm-mm-lbl');
+  if (indexLbl) indexLbl.textContent = s.widened ? 'Index (90d/180d)' : 'Index (90d)';
+
+  // Update the header sub-line to reflect the adaptive window when in use.
+  const sub = el('esm-sub');
+  if (sub) {
+    sub.textContent = s.widened
+      ? 'Actual vs consensus · G10 major currencies · 90d/180d adaptive rolling · decay-weighted (45d ½life) · [−100, +100]'
+      : 'Actual vs consensus · G10 major currencies · 90d rolling · decay-weighted (45d ½life) · [−100, +100]';
+  }
 }
 
 // ── Events table ──────────────────────────────────────────────────────────────
@@ -627,7 +666,12 @@ function _esmRenderTable(ccy) {
   if (!tbody) return;
   if (!_esmCalData) { tbody.innerHTML = '<tr><td colspan="5" class="esm-no-data">Loading…</td></tr>'; return; }
 
-  const rows = _esmGetEvents(_esmCalData.events || [], ccy);
+  const { rows, widened } = _esmGetEvents(_esmCalData.events || [], ccy);
+
+  // Update the "Events · 90d rolling window" header label when widened.
+  const evHdTitle = document.getElementById('esm-events-hd-title');
+  if (evHdTitle) evHdTitle.textContent = widened ? `Events · 90d/180d adaptive window` : `Events · 90d rolling window`;
+
   if (!rows.length) {
     tbody.innerHTML = `<tr><td colspan="5" class="esm-no-data">No released events with actuals in the 90d window for ${ccy}.</td></tr>`;
     return;

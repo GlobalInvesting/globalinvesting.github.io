@@ -10611,18 +10611,10 @@ async function renderDerivativesSection() {
   // ── RR Surface table ──
   const rrSurfaceTbody = document.getElementById('rr-surface-tbody');
   if (rrSurfaceTbody) {
-    // Dedicated list — independent from `pairs` above (which also feeds the CIP
-    // Forwards table and legitimately includes NZD/USD, USD/NOK, USD/SEK since
-    // forward points don't need Saxo data). Saxo's 25d RR table does NOT cover
-    // NZD/USD, USD/NOK, or USD/SEK — confirmed against the live page 2026-06-23.
-    // EUR/GBP and EUR/CHF added — confirmed present on Saxo's live page but never
-    // wired up before. XAU/USD and XAG/USD are also on Saxo's page but intentionally
-    // excluded — out of scope for an FX-pairs-only panel (product decision).
-    const rrPairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','EUR/JPY','EUR/GBP','EUR/CHF'];
-    const rrPairKeys = {
-      'EUR/USD':'EURUSD','GBP/USD':'GBPUSD','USD/JPY':'USDJPY','AUD/USD':'AUDUSD',
-      'USD/CHF':'USDCHF','USD/CAD':'USDCAD','EUR/JPY':'EURJPY','EUR/GBP':'EURGBP','EUR/CHF':'EURCHF'
-    };
+    // EUR/JPY is the only cross pair Saxo consistently publishes — include it.
+    // NZD/USD excluded: Saxo does not publish NZD/USD 25d RR on their public page.
+    const rrPairs = [...pairs.filter(p => p !== 'NZD/USD'), 'EUR/JPY'];
+    const rrPairKeys = { ...rrKeys, 'EUR/JPY': 'EURJPY' };
     const rows = rrSurfaceTbody.querySelectorAll('tr');
     rrPairs.forEach((pair, idx) => {
       const row = rows[idx];
@@ -11169,25 +11161,6 @@ async function renderEconSurprises() {
   }
 
   // ── Source label ──────────────────────────────────────────────────────────
-  const srcEl = document.getElementById('econ-surprise-source');
-  if (srcEl) {
-    if (calSource === 'Finnhub' || calSource.startsWith('Finnhub')) {
-      srcEl.textContent = 'Finnhub · actual vs consensus · G10 · 90d rolling';
-    } else if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
-      srcEl.textContent = 'investing.com · actual vs consensus · 90d rolling';
-    } else if (calSource === 'ForexFactory') {
-      // Fallback path: Finnhub key not set, FF scraper used instead
-      srcEl.textContent = 'ForexFactory · actual vs consensus · 90d rolling';
-    } else if (calSource && calSource.includes('ForexFactory')) {
-      // Legacy backfill sources: multi-source historical string
-      srcEl.textContent = 'FRED + Finnhub + ForexFactory · actual vs consensus · G10 · 90d rolling';
-    } else if (calSource) {
-      srcEl.textContent = calSource + ' · actual vs consensus · 90d rolling';
-    } else {
-      srcEl.textContent = 'Calendar data unavailable';
-    }
-  }
-
   // ── Score per currency ────────────────────────────────────────────────────
   // Inverse indicators: a lower actual is a positive surprise (e.g. unemployment fell)
   const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit', 'trade balance'];
@@ -11198,110 +11171,149 @@ async function renderEconSurprises() {
   // λ = ln(2) / 45 ≈ 0.01540. N column still shows raw event count for transparency.
   const DECAY_LAMBDA = Math.LN2 / 45;
 
-  const ccyScores = {};
+  // v8.21.7: Two-pass adaptive window — mirrors EA ComputeESI() v8.4.3+.
+  // Pass 0: standard 90d window (all G10). Pass 1: 90–180d band, ONLY for
+  // currencies that end pass 0 with zero weight (NOK/SEK in practice — the
+  // upstream provider tags almost all their releases "low" impact, leaving
+  // fewer medium/high events in any 90d slice than G7 currencies).
+  // The impact filter and decay function are identical across both passes —
+  // widening the window does NOT lower methodology standards. An event 150
+  // days old carries only ~13% weight (half-life=45d), so the extension never
+  // floods the index signal; it merely provides a non-zero baseline rather
+  // than forcing a blank row for structurally-thin-coverage currencies.
+  const WIDE_LOOKBACK_MS = 180 * 24 * 60 * 60 * 1000;
+  const ccyScores  = {};
+  const widenedCcys = new Set();
 
-  calEvents.forEach(ev => {
-    const evTime = new Date(ev.dateISO).getTime();
-    if (isNaN(evTime) || evTime > nowMs || nowMs - evTime > LOOKBACK_MS) return;
-    if (!ev.released || ev.actual == null) return;
-    if (!['medium','high'].includes(ev.impact)) return;
-    const ccy = ev.currency;
-    if (!['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'].includes(ccy)) return;
+  // Shared noise-keyword list (defined once, reused across both passes).
+  const NOISE_KW = [
+    'cftc','baker hughes','rig count','auction','api weekly',
+    'milk auction','fed\'s balance sheet','reserve balances',
+    'redbook','ibd/tipp','tips auction','note auction','bond auction',
+    'gilt auction','jgb auction','obligaciones','speculative net',
+    'nc net position','crude oil inventories','crude oil imports',
+    'distillate','gasoline inventorie','gasoline production',
+    'refinery','heating oil','natural gas storage',
+    'foreign bonds buying','foreign investments in japanese',
+    'foreign bond investment','foreign investment in japan',
+    'm2 money','m3 money','m4 money','reserve assets total',
+    'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
+    'ibd','3-month bill','4-week bill','52-week bill',
+    // Additional noise: derived averages, financial flows, SEP projections, EIA energy
+    '4-week average','4-week avg',
+    'tic net','net long-term tic','total net tic',
+    'interest rate projection',
+    'eia crude oil','eia crude',
+  ];
 
-    // ── Noise filter: exclude non-macro events ─────────────────────────────
-    // CESI-style indices (Citi, DB, MS) only score fundamental macro releases.
-    // Bond auctions, CFTC positioning, commodity inventory/rig data, derived
-    // averages, financial flow data, and SEP dot projections are excluded.
-    const evTitle = (ev.event || ev.title || '').toLowerCase();
-    const NOISE_KW = [
-      'cftc','baker hughes','rig count','auction','api weekly',
-      'milk auction','fed\'s balance sheet','reserve balances',
-      'redbook','ibd/tipp','tips auction','note auction','bond auction',
-      'gilt auction','jgb auction','obligaciones','speculative net',
-      'nc net position','crude oil inventories','crude oil imports',
-      'distillate','gasoline inventorie','gasoline production',
-      'refinery','heating oil','natural gas storage',
-      'foreign bonds buying','foreign investments in japanese',
-      'foreign bond investment','foreign investment in japan',
-      'm2 money','m3 money','m4 money','reserve assets total',
-      'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
-      'ibd','3-month bill','4-week bill','52-week bill',
-      // Additional noise: derived averages, financial flows, SEP projections, EIA energy
-      '4-week average','4-week avg',
-      'tic net','net long-term tic','total net tic',
-      'interest rate projection',
-      'eia crude oil','eia crude',
-    ];
-    if (NOISE_KW.some(kw => evTitle.includes(kw))) return;
-    // ── Dedup guard: same canonical event + same actual → score only once ──
-    // ForexFactory publishes Flash then Final PMIs with identical data on
-    // different dates. Without dedup, each revision counts as a separate event,
-    // inflating N and double-counting the same macro signal.
-    const canonEvent = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
-    // Use forecast||previous in the dedup key — mirrors fetch_economic_calendar.py
-    // so events without an explicit forecast but with a previous baseline deduplicate
-    // consistently between JS scoring and Python surpriseStats computation.
-    const dedupKey   = `${ccy}/${canonEvent}/${String(ev.actual).replace(/[%,\s]/g,'')}/${String(ev.forecast||ev.previous||'').replace(/[%,\s]/g,'')}`;
-    if (!window._ES_SEEN) window._ES_SEEN = new Set();
-    if (window._ES_SEEN.has(dedupKey)) return;
-    window._ES_SEEN.add(dedupKey);
-    // ───────────────────────────────────────────────────────────────────────
+  // Per-event scorer — shared by both passes.
+  // minAgeMs/maxAgeMs define the half-open age band: [minAgeMs, maxAgeMs).
+  // Pass 0: (0, LOOKBACK_MS]  → standard 90d.
+  // Pass 1: (LOOKBACK_MS, WIDE_LOOKBACK_MS] → 90–180d extension band.
+  // limitCcys: Set of currencies to include (null = all G10).
+  function _scorePass(minAgeMs, maxAgeMs, limitCcys) {
+    calEvents.forEach(ev => {
+      const evTime = new Date(ev.dateISO).getTime();
+      if (isNaN(evTime) || evTime > nowMs) return;
+      const ageMs = nowMs - evTime;
+      if (ageMs <= minAgeMs || ageMs > maxAgeMs) return;
+      if (!ev.released || ev.actual == null) return;
+      if (!['medium','high'].includes(ev.impact)) return;
+      const ccy = ev.currency;
+      if (!['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'].includes(ccy)) return;
+      if (limitCcys && !limitCcys.has(ccy)) return;
 
-    const actualStr   = String(ev.actual   || '').replace(/[%,]/g,'');
-    const forecastStr = String(ev.forecast || ev.previous || '').replace(/[%,]/g,'');
-    const actual   = parseFloat(actualStr);
-    const forecast = parseFloat(forecastStr);
-    if (isNaN(actual) || isNaN(forecast)) return;
+      // ── Noise filter: exclude non-macro events ────────────────────────────
+      // CESI-style indices (Citi, DB, MS) only score fundamental macro releases.
+      // Bond auctions, CFTC positioning, commodity inventory/rig data, derived
+      // averages, financial flow data, and SEP dot projections are excluded.
+      const evTitle = (ev.event || ev.title || '').toLowerCase();
+      if (NOISE_KW.some(kw => evTitle.includes(kw))) return;
 
-    const isInverse = INVERSE_KW.some(kw => evTitle.includes(kw));
-    const beat = isInverse ? actual < forecast : actual > forecast;
-    const miss = isInverse ? actual > forecast : actual < forecast;
-    // rawSurprise is unsigned (actual − forecast). For the z-score we apply the
-    // same sign correction that fetch_economic_calendar.py applies when building
-    // surpriseStats: negate for inverse indicators so positive z-score always means
-    // a positive surprise. beat/miss already encodes direction correctly above.
-    const rawSurprise = actual - forecast;
-    const surprise    = isInverse ? -rawSurprise : rawSurprise;
+      // ── Dedup guard: same canonical event + same actual → score only once ──
+      // ForexFactory publishes Flash then Final PMIs with identical data on
+      // different dates. Without dedup, each revision counts as a separate event,
+      // inflating N and double-counting the same macro signal.
+      const canonEvent = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
+      // Use forecast||previous in the dedup key — mirrors fetch_economic_calendar.py
+      // so events without an explicit forecast but with a previous baseline deduplicate
+      // consistently between JS scoring and Python surpriseStats computation.
+      const dedupKey = `${ccy}/${canonEvent}/${String(ev.actual).replace(/[%,\s]/g,'')}/${String(ev.forecast||ev.previous||'').replace(/[%,\s]/g,'')}`;
+      if (!window._ES_SEEN) window._ES_SEEN = new Set();
+      if (window._ES_SEEN.has(dedupKey)) return;
+      window._ES_SEEN.add(dedupKey);
+      // ──────────────────────────────────────────────────────────────────────
 
-    // ── Exponential decay × impact weight ────────────────────────────────────────────────────
-    // w = e^(-λ · ageDays) × impactMult. Recent events dominate; high-impact releases
-    // score twice the weight of medium (HIGH=1.0, MEDIUM=0.5) — consistent with EA
-    // ComputeESI() and closer to Citi/DB institutional weighting conventions.
-    const ageDays    = (nowMs - evTime) / 86400000;
-    const impactMult = ev.impact === 'high' ? 1.0 : 0.5;
-    const w = Math.exp(-DECAY_LAMBDA * ageDays) * impactMult;
+      const actualStr   = String(ev.actual   || '').replace(/[%,]/g,'');
+      const forecastStr = String(ev.forecast || ev.previous || '').replace(/[%,]/g,'');
+      const actual   = parseFloat(actualStr);
+      const forecast = parseFloat(forecastStr);
+      if (isNaN(actual) || isNaN(forecast)) return;
 
-    // ── Z-score scoring (hybrid: z-score when stats available, beat/miss otherwise) ──
-    // As history accumulates in surpriseStats (engine v3.1+), more events
-    // graduate to z-score. MIN 5 observations required for a valid std estimate.
-    const CANONICAL_MIN_N = 5;
-    const statsKey = (() => {
-      const canon = (evTitle.replace(/\s*\([^)]*\)/g, '').trim());
-      return `${ccy}/${canon}`;
-    })();
-    const stats = (window._ECON_SURPRISE_STATS || {})[statsKey];
-    const useZScore = stats && stats.n >= CANONICAL_MIN_N && stats.std > 0;
-    const zScore = useZScore ? (surprise - stats.mean) / stats.std : null;
+      const isInverse = INVERSE_KW.some(kw => evTitle.includes(kw));
+      const beat = isInverse ? actual < forecast : actual > forecast;
+      const miss = isInverse ? actual > forecast : actual < forecast;
+      // rawSurprise is unsigned (actual − forecast). For the z-score we apply the
+      // same sign correction that fetch_economic_calendar.py applies when building
+      // surpriseStats: negate for inverse indicators so positive z-score always means
+      // a positive surprise. beat/miss already encodes direction correctly above.
+      const rawSurprise = actual - forecast;
+      const surprise    = isInverse ? -rawSurprise : rawSurprise;
 
-    if (!ccyScores[ccy]) ccyScores[ccy] = {
-      // Raw counts — for N display and low-confidence threshold
-      total: 0, beats: 0, misses: 0,
-      // Decay-weighted accumulators — used for index calculation
-      wTotal: 0, wBeats: 0, wMisses: 0,
-      zWSum: 0, zWTotal: 0, zWBeats: 0, zWMisses: 0,
-    };
-    ccyScores[ccy].total++;
-    ccyScores[ccy].wTotal += w;
-    if (beat) { ccyScores[ccy].beats++;  ccyScores[ccy].wBeats  += w; }
-    if (miss) { ccyScores[ccy].misses++; ccyScores[ccy].wMisses += w; }
-    // Decay-weighted z-score accumulators for the blend formula.
-    if (zScore !== null) {
-      ccyScores[ccy].zWSum   += zScore * w;
-      ccyScores[ccy].zWTotal += w;
-      if (beat) ccyScores[ccy].zWBeats += w;
-      if (miss) ccyScores[ccy].zWMisses += w;
-    }
-  });
+      // ── Exponential decay × impact weight ──────────────────────────────────
+      // w = e^(-λ · ageDays) × impactMult. Recent events dominate; high-impact
+      // releases score twice the weight of medium (HIGH=1.0, MEDIUM=0.5) —
+      // consistent with EA ComputeESI() and Citi/DB institutional conventions.
+      const ageDays    = (nowMs - evTime) / 86400000;
+      const impactMult = ev.impact === 'high' ? 1.0 : 0.5;
+      const w = Math.exp(-DECAY_LAMBDA * ageDays) * impactMult;
+
+      // ── Z-score scoring (hybrid: z-score when stats available, beat/miss otherwise) ──
+      // As history accumulates in surpriseStats (engine v3.1+), more events
+      // graduate to z-score. MIN 5 observations required for a valid std estimate.
+      const CANONICAL_MIN_N = 5;
+      const statsKey = (() => {
+        const canon = (evTitle.replace(/\s*\([^)]*\)/g, '').trim());
+        return `${ccy}/${canon}`;
+      })();
+      const stats = (window._ECON_SURPRISE_STATS || {})[statsKey];
+      const useZScore = stats && stats.n >= CANONICAL_MIN_N && stats.std > 0;
+      const zScore = useZScore ? (surprise - stats.mean) / stats.std : null;
+
+      if (!ccyScores[ccy]) ccyScores[ccy] = {
+        // Raw counts — for N display and low-confidence threshold
+        total: 0, beats: 0, misses: 0,
+        // Decay-weighted accumulators — used for index calculation
+        wTotal: 0, wBeats: 0, wMisses: 0,
+        zWSum: 0, zWTotal: 0, zWBeats: 0, zWMisses: 0,
+      };
+      ccyScores[ccy].total++;
+      ccyScores[ccy].wTotal += w;
+      if (beat) { ccyScores[ccy].beats++;  ccyScores[ccy].wBeats  += w; }
+      if (miss) { ccyScores[ccy].misses++; ccyScores[ccy].wMisses += w; }
+      // Decay-weighted z-score accumulators for the blend formula.
+      if (zScore !== null) {
+        ccyScores[ccy].zWSum   += zScore * w;
+        ccyScores[ccy].zWTotal += w;
+        if (beat) ccyScores[ccy].zWBeats += w;
+        if (miss) ccyScores[ccy].zWMisses += w;
+      }
+    });
+  }
+
+  // Pass 0: standard 90d window — all G10 currencies.
+  _scorePass(0, LOOKBACK_MS, null);
+
+  // Pass 1: 90–180d extension band — only for currencies with zero weight after pass 0.
+  // Dedup set (window._ES_SEEN) is shared, so no event can be double-counted
+  // even if the same release appears in both the 90d and 90–180d calendar slices.
+  const G10_CCYS = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
+  const sparseCcys = new Set(G10_CCYS.filter(c => !ccyScores[c] || ccyScores[c].wTotal === 0));
+  if (sparseCcys.size > 0) {
+    _scorePass(LOOKBACK_MS, WIDE_LOOKBACK_MS, sparseCcys);
+    // Track which currencies actually gained data from the extension.
+    G10_CCYS.forEach(c => { if (sparseCcys.has(c) && ccyScores[c]?.wTotal > 0) widenedCcys.add(c); });
+  }
 
   // ── Normalise to [−100, +100] index (Citi CESI convention) ───────────────
   // index = (beats − misses) / total × 100
@@ -11315,6 +11327,7 @@ async function renderEconSurprises() {
     const tds = row.querySelectorAll('td');
     const barFill = row.querySelector('.es-bar-fill');
     const s = ccyScores[ccy];
+    const isWidened = widenedCcys.has(ccy);
 
     if (!s || s.total === 0) {
       // No data — neutral empty bar
@@ -11361,14 +11374,37 @@ async function renderEconSurprises() {
     if (tds[2]) {
       tds[2].textContent = s.total;
       tds[2].style.color = lowConf ? 'var(--text4, rgba(255,255,255,0.3))' : 'var(--text3)';
-      tds[2].title = lowConf ? 'Low sample size — interpret with caution' : '';
+      tds[2].title = isWidened
+        ? 'Window extended to 180d (sparse coverage in 90d — same impact filter and decay)'
+        : (lowConf ? 'Low sample size — interpret with caution' : '');
     }
 
     // Row tooltip
     const pct = (s.beats / s.total * 100).toFixed(0);
     const inLine = s.total - s.beats - s.misses;
-    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)} · decay-weighted (45d half-life) · click for detail`;
+    const windowNote = isWidened ? ' · 90d/180d adaptive window' : ' · 90d window';
+    row.title = `${ccy}: ${s.beats} beat · ${s.misses} miss · ${inLine} in-line · ${pct}% beat rate · index ${idx100 >= 0 ? '+' : ''}${idx100.toFixed(0)} · decay-weighted (45d half-life)${windowNote} · click for detail`;
   });
+
+  // ── Source label (written here so widenedCcys is fully populated) ──────
+  (function _writeSourceLabel() {
+    const srcEl = document.getElementById('econ-surprise-source');
+    if (!srcEl) return;
+    const windowSuffix = widenedCcys.size > 0 ? '90d/180d rolling' : '90d rolling';
+    if (calSource === 'Finnhub' || calSource.startsWith('Finnhub')) {
+      srcEl.textContent = `Finnhub · actual vs consensus · G10 · ${windowSuffix}`;
+    } else if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
+      srcEl.textContent = `investing.com · actual vs consensus · ${windowSuffix}`;
+    } else if (calSource === 'ForexFactory') {
+      srcEl.textContent = `ForexFactory · actual vs consensus · ${windowSuffix}`;
+    } else if (calSource && calSource.includes('ForexFactory')) {
+      srcEl.textContent = `FRED + Finnhub + ForexFactory · actual vs consensus · G10 · ${windowSuffix}`;
+    } else if (calSource) {
+      srcEl.textContent = `${calSource} · actual vs consensus · ${windowSuffix}`;
+    } else {
+      srcEl.textContent = 'Calendar data unavailable';
+    }
+  })();
 
   // ── Keyboard activation for clickable rows (Enter / Space) ──────────────
   // onclick is already in the static HTML; this adds keyboard parity.
