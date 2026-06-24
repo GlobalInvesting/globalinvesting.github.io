@@ -1,57 +1,53 @@
 {
-  "generated_at": "2026-06-24T02:49:13Z",
+  "generated_at": "2026-06-24T09:54:52Z",
   "signals": [
     {
-      "time": "02:48",
+      "time": "09:54",
       "priority": "critical",
-      "title": "NZD/USD — G10 Bilateral Theme + Carry + Risk-Off",
-      "text": "NZD is the weakest G10 currency this week, with NZD 1W avg -1.296% (n=4 pairs) vs USD 1W avg +0.729% (n=7 pairs), creating a significant 2.025% leader-to-laggard spread. This divergence is driven by broad USD strength and risk aversion, with NZD/USD at 0.5660. The 150bp Fed-RBNZ carry premium further favors USD. Elevated VIX at 19.5 (normal volatility) and S&P 500 down -1.44% suggest a risk-off tilt, exacerbating NZD weakness. Watch for RBNZ's next meeting on 8 Jul for any hawkish shift to counter the current trend.",
+      "title": "NZD/USD — G10 Bilateral Theme + RBNZ Hike Bets",
+      "text": "NZD/USD at 0.5641 as RBNZ hike bets collapse following a break of critical support. USD outperformance (1W avg +0.945%) vs NZD underperformance (1W avg -1.471%) creates a 2.416% G10 spread. Despite RBNZ OIS bias signaling a hike, retail is 96% long against a COT LF net short of -22,454 (long% 18.4%), signaling extreme institutional vs retail divergence. The collapse in hike pricing suggests a long-unwind regime toward 0.5580.",
       "evidence": [
-        "USD 1W avg: +0.729% (n=7)",
-        "NZD 1W avg: -1.296% (n=4)",
-        "G10 spread: 2.025%",
-        "USD/NZD carry: +150bp"
+        "USD 1W avg: +0.945% (n=7)",
+        "NZD 1W avg: -1.471% (n=4)",
+        "G10 spread: 2.416%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:45",
-      "priority": "critical",
-      "title": "USD/JPY — BoJ Summary + COT vs Options Divergence + Carry",
-      "text": "USD/JPY at 161.56 continues to push higher despite BoJ's June summary revealing broad support for rate hikes and a sharp deflation warning. This confirms the BoJ's hawkish bias (BoJ 1.0% HIKING). However, JPY COT LF net short -112,092 (long%=29.7%) indicates extreme speculative short positioning, while the 25d RR at -1.52 shows strong put skew, signaling options market hedging for JPY strength. This creates a significant divergence between speculative futures positioning and options market sentiment, with both contradicting the BoJ's hawkish stance. The 263bp Fed-BoJ carry premium continues to support USD/JPY, but intervention risk rises on a sustained break above 160.00. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is key for policy clarity.",
-      "evidence": [
-        "JPY COT LF net: -112,092",
-        "USDJPY 25d RR: -1.52",
-        "USD/JPY carry: +263bp",
-        "USD/JPY: 161.56"
-      ],
-      "_source": "gemini:gemini-2.5-flash"
-    },
-    {
-      "time": "02:42",
+      "time": "09:51",
       "priority": "warning",
-      "title": "AUD/USD — CPI Risk + CESI + Volatility",
-      "text": "AUD/USD at 0.6913 is under pressure as Australia's CPI is set to accelerate in May, despite earlier hopes for inflation relief. The AUD has tumbled over 1.20% today due to risk aversion and Fed rate hike bets. AUD CESI net -8 misses indicates data consistently disappointing expectations, reinforcing AUD weakness. The options market is pricing elevated volatility, with AUD/USD IV 20.2% vs HV30 8.3%, resulting in a significant +11.9% VRP, suggesting strong hedging demand for downside protection. This combination of negative data surprises, high vol premium, and risk-off sentiment points to continued AUD vulnerability. The upcoming Australian CPI release is the immediate catalyst.",
+      "title": "USD/JPY — Carry + Vol + Options Skew",
+      "text": "USD/JPY at 161.75 holding above the 160.00 intervention threshold. Fed 3.75% vs BoJ 1.0% provides a +275bp carry advantage for USD, supported by a positive USD CESI (+28). However, 25d RR at -1.52 (strong put skew) and a VRP of +4.9% (IV 7.2% vs HV30 2.3%) indicate the options market is aggressively paying for downside protection against BoJ intervention risk. Carry remains the dominant driver while VIX remains at 19.2 (normal volatility).",
       "evidence": [
-        "AUD CESI net: -8",
-        "AUD/USD IV: 20.2%",
-        "AUD/USD VRP: +11.9%",
-        "AUD/USD: 0.6913"
+        "USD/JPY Carry: +275bp",
+        "25d RR: -1.52 (Saxo)",
+        "VRP: +4.9%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:39",
-      "priority": "info",
-      "title": "USD/CAD — Correlation Break + Retail Sentiment",
-      "text": "USD/CAD at 1.4209 is showing a significant correlation break with WTI Oil, with corr=-0.601 vs 252d norm=+0.036 (z=-2.17σ). This suggests CAD is decoupling from its traditional oil price sensitivity, likely due to broader USD strength and the 131bp Fed-BoC carry premium favoring USD. Retail sentiment is extremely short USD/CAD at 95% short, presenting a contrarian reversal risk if the pair extends higher, potentially triggering a retail capitulation. Watch for WTI Oil price action to confirm if the correlation break persists.",
+      "time": "09:49",
+      "priority": "warning",
+      "title": "USD/CAD — Correlation Break + Retail Divergence",
+      "text": "USD/CAD at 1.4233 exhibits a significant correlation break vs WTI Oil (z = -2.01σ), with the pair rallying despite oil holding near four-month lows. Retail sentiment is 96% short (extreme), diverging from a COT LF net short of -67,668 (long% 23.4%). The institutional and retail alignment in shorting the CAD suggests a structural move higher in USD/CAD, supported by a +150bp Fed-BoC carry advantage.",
       "evidence": [
-        "USD/CAD vs WTI Oil corr: -0.601 (z=-2.17σ)",
-        "USD/CAD retail: 95% short",
-        "USD/CAD carry: +131bp",
-        "USD/CAD: 1.4209"
+        "USD/CAD vs WTI: z=-2.01σ",
+        "Retail: 96% Short",
+        "Fed-BoC Carry: +150bp"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "09:45",
+      "priority": "info",
+      "title": "AUD/USD — Vol Complacency + CESI Divergence",
+      "text": "AUD/USD at 0.6892 faces headwinds as the AUD CESI (-8) confirms data underperformance. Despite a -60bp carry deficit for USD, AUD/USD IV at 3.1% sits 5.6% below HV30 (8.7%), signaling unusual vol complacency. With COT LF net long at +38,548 (70.2% long), the pair is vulnerable to a positioning squeeze if realized volatility mean-reverts higher amid broader G10 AUD weakness.",
+      "evidence": [
+        "AUD VRP: -5.6%",
+        "AUD CESI: -8",
+        "COT LF Long%: 70.2%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
