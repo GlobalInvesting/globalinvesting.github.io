@@ -1,0 +1,51 @@
+name: Cleanup — Remove migrated scripts and workflows
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Remove migrated scripts
+        run: |
+          git rm --ignore-unmatch \
+            scripts/fetch_news.py \
+            scripts/fetch_ff_calendar.py \
+            scripts/fetch_economic_calendar.py \
+            scripts/fetch_bank_research.py \
+            scripts/fetch_rates.py \
+            scripts/fetch_dtcc_fx.py \
+            scripts/fetch_inflation_expectations.py \
+            scripts/fetch_myfxbook_sentiment.py \
+            scripts/fx_config.py
+
+      - name: Remove migrated workflow stubs
+        run: |
+          git rm --ignore-unmatch \
+            .github/workflows/fetch-bank-research.yml \
+            .github/workflows/forex-news.yml \
+            .github/workflows/update-dtcc-fx.yml \
+            .github/workflows/update-economic-calendar.yml \
+            .github/workflows/update-ff-calendar.yml \
+            .github/workflows/update-inflation-expectations.yml \
+            .github/workflows/update-myfxbook-sentiment.yml \
+            .github/workflows/update-rates.yml
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --staged --quiet && echo "Nothing to remove." && exit 0
+          git commit -m "chore: remove scripts and workflow stubs migrated to private repo"
+          git push origin main
+
+      - name: Self-destruct
+        run: |
+          git rm .github/workflows/cleanup-migrated-files.yml
+          git commit -m "chore: remove one-shot cleanup workflow"
+          git push origin main
