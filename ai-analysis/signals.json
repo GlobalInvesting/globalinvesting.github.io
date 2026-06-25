@@ -1,57 +1,56 @@
 {
-  "generated_at": "2026-06-25T16:40:18Z",
+  "generated_at": "2026-06-25T21:45:10Z",
   "signals": [
     {
-      "time": "16:39",
+      "time": "21:44",
       "priority": "critical",
-      "title": "NZD/USD — G10 Bilateral Theme + CB Real Rate Divergence",
-      "text": "NZD/USD at 0.5658 anchors the week's dominant G10 theme as the USD leader-to-laggard spread hits 2.004%. Despite RBNZ hike bias, NZD remains under pressure with a -0.83% real policy rate (accommodative) vs USD +1.56% (restrictive). COT LF net short -22,454 (long% 18.4%) confirms institutional selling while retail 93% long creates extreme contrarian risk. USD outperformance is reinforced by a +29 CESI net beat score, signaling sustained US data strength.",
+      "title": "USD — Fed Stance + Inflation + Yield Curve",
+      "text": "US May PCE inflation topped 4.1% (vs 4.1% expected), reinforcing NY Fed Williams's remarks on delaying the 2% inflation target to 2028 while maintaining a 'higher-for-longer' policy stance. Despite today's DXY -0.15% weakness, the underlying inflation pressure and Fed's resolve suggest continued USD support. The 2s10s yield curve at +70.2bp (BULL STEEPENER) indicates recession pricing, which typically favors safe-haven USD. Watch for further Fed commentary on inflation trajectory.",
       "evidence": [
-        "USD 1W avg: +0.662% (n=7)",
-        "NZD 1W avg: -1.342% (n=4)",
-        "G10 spread: 2.004%",
-        "NZD real rate: -0.83% vs USD: +1.56%"
+        "US May PCE inflation: 4.1%",
+        "NY Fed Williams: 2% target to 2028",
+        "2s10s spread: +70.2bp (BULL STEEPENER)"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "16:35",
+      "time": "21:41",
+      "priority": "critical",
+      "title": "NZD/USD — G10 Bilateral Theme + COT + RBNZ",
+      "text": "NZD is the weakest G10 currency this week, averaging -1.502% against peers, while USD is the strongest at +0.767%, creating a 2.269% spread. This divergence is amplified by NZD/USD COT LF net short -22,454 (long%=18.4%), indicating extreme speculative short positioning against an RBNZ with an active hike bias. If RBNZ delivers or signals a hike at the next meeting, a crowded spec short unwind risk is elevated. NZD/USD at 0.5647. The next RBNZ meeting (mkt: 83% hike priced) on 8 Jul is the key catalyst.",
+      "evidence": [
+        "USD 1W avg: +0.767% (n=7)",
+        "NZD 1W avg: -1.502% (n=4)",
+        "G10 spread: 2.269%",
+        "NZD COT LF net: -22,454",
+        "RBNZ Market bias: ↑ Hike"
+      ],
+      "_source": "gemini:gemini-2.5-flash"
+    },
+    {
+      "time": "21:38",
       "priority": "warning",
-      "title": "USD/JPY — Intervention Risk + Vol Premium + Carry",
-      "text": "USD/JPY at 161.71 trades in the critical intervention zone identified by Scotiabank (162.00). A +264bp OIS carry advantage (SOFR vs TONA) sustains the bid despite JPY COT LF net short -112,092. Options market pricing reflects acute anxiety with IV at 7.2% vs HV30 2.3%, creating a +4.9% VRP. 25d RR at -1.20 confirms a moderate put skew as traders pay for JPY protection against potential BoJ action.",
+      "title": "USD/JPY — Intervention Risk + Carry + Vol",
+      "text": "USD/JPY at 161.76 continues to test levels above 160.00, increasing BoJ intervention risk. The 264bp SOFR-TONA carry premium strongly favors USD, sustaining the bid despite the BoJ's recent hike. Options market shows elevated vol premium with IV 7.2% vs HV30 2.3% (VRP +4.9%), indicating strong hedging demand for JPY weakness. JPY COT LF net short -112,092 (long%=29.7%) is a crowded carry trade. A sustained break above 162.00 is likely to trigger official BoJ action; watch for any verbal warnings.",
       "evidence": [
-        "USD/JPY: 161.71",
-        "VRP: +4.9% (IV 7.2% / HV30 2.3%)",
-        "25d RR: -1.20 (Saxo)",
-        "OIS Carry: +264bp"
+        "USD/JPY: 161.76",
+        "USD/JPY OIS carry: +264bp",
+        "USD/JPY VRP: +4.9%",
+        "JPY COT LF net: -112,092"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "16:32",
+      "time": "21:35",
       "priority": "warning",
-      "title": "USD/CAD — Correlation Break + Retail Divergence",
-      "text": "USD/CAD at 1.4183 exhibits a significant correlation break vs WTI Oil (z = -1.99σ), with the pair trending higher despite a 1.81% daily gain in crude. Retail sentiment is at a 94% short extreme, directly diverging from the COT LF net short -67,668 (23.4% long), suggesting retail is aggressively fading the institutional trend. A double top formation noted in recent headlines serves as the immediate technical resistance.",
+      "title": "AUD/USD — Positioning + Vol + CESI",
+      "text": "AUD/USD COT LF net long +38,548 (long%=70.2%) indicates significant speculative bullish positioning. However, the pair faces headwinds from a negative CESI score for AUD (net -7 misses), suggesting disappointing economic data. Options market shows extreme vol premium with IV 16.0% vs HV30 8.2% (VRP +7.8%), signaling strong hedging demand for AUD downside protection. AUD/USD at 0.6910. Watch for RBA commentary on economic data to confirm or invalidate the current positioning.",
       "evidence": [
-        "USD/CAD vs WTI: z=-1.99σ",
-        "Retail: 94% Short",
-        "COT LF long%: 23.4%",
-        "USD/CAD: 1.4183"
+        "AUD COT LF net: +38,548",
+        "AUD CESI: net -7 misses",
+        "AUD/USD VRP: +7.8%"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "16:28",
-      "priority": "info",
-      "title": "AUD/USD — Volatility Premium + CESI Divergence",
-      "text": "AUD/USD at 0.6924 faces headwinds as the CESI net score of -7 reflects consistent data misses. Options markets show the highest G10 volatility risk premium at +7.0% (IV 15.2% vs HV30 8.2%), signaling extreme hedging demand. While the +73bp OIS carry favors AUD, the 25d RR at -1.11 indicates the options market remains biased toward downside protection. Watch 0.6900 for a sustained break to confirm further weakness.",
-      "evidence": [
-        "AUD VRP: +7.0%",
-        "AUD CESI: -7",
-        "25d RR: -1.11",
-        "AUD/USD: 0.6924"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
