@@ -1,4 +1,4 @@
-name: Update Intraday Quotes — v1.5 (Twelve Data + Alpha Vantage)
+name: Update Intraday Quotes — v1.6 (Twelve Data + Alpha Vantage)
 
 # ESTRATEGIA DE TRIGGER — v1.5
 #
@@ -42,6 +42,11 @@ name: Update Intraday Quotes — v1.5 (Twelve Data + Alpha Vantage)
 # API usage estimate (24/7 a 5 min):
 #   288 runs/día × 1 batch yfinance call = 288 calls yfinance (sin límite formal) ✅
 #   Twelve Data: solo fallback gold → estimado < 10 calls/día ✅
+#
+# Script fetch_intraday_quotes.py vive en el repo privado globalinvesting-scripts
+# (checkout explícito vía SCRIPTS_PAT) para proteger la lógica propietaria del fetcher
+# y las claves de API (Twelve Data, Alpha Vantage). Los minutos de Actions se consumen
+# en este repo público → ilimitados y sin costo.
 
 on:
   repository_dispatch:
@@ -86,8 +91,15 @@ jobs:
     timeout-minutes: 8
 
     steps:
-      - name: Checkout repo
+      - name: Checkout public repo
         uses: actions/checkout@v4
+
+      - name: Checkout private scripts
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting-scripts
+          token: ${{ secrets.SCRIPTS_PAT }}
+          path: private-scripts
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -105,7 +117,7 @@ jobs:
           TWELVE_DATA_API_KEY:   ${{ secrets.TWELVE_DATA_API_KEY }}
           ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
           SITE_PATH: .
-        run: python3 scripts/fetch_intraday_quotes.py
+        run: python3 private-scripts/fetch_intraday_quotes.py
 
       - name: Commit and push quotes
         run: |

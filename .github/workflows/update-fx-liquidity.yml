@@ -1,4 +1,4 @@
-name: Update FX Liquidity Profile
+name: Update FX Liquidity Profile — v2.0 (private scripts)
 
 # ESTRATEGIA DE TRIGGER
 #
@@ -11,8 +11,9 @@ name: Update FX Liquidity Profile
 # DURACIÓN ESTIMADA: ~45 seg (5 pares × 35d × 1h = ~840 filas por par, yfinance batch)
 # Sin riesgo de solapamiento a 1h de intervalo.
 #
-# PLACEMENT: público repo — yfinance, sin API keys, sin ventaja competitiva.
-# Minutos de Actions ilimitados en el repo público.
+# PLACEMENT: script fetch_fx_liquidity.py vive en el repo privado globalinvesting-scripts
+# (checkout explícito vía SCRIPTS_PAT). Los minutos de Actions se consumen en este
+# repo público → ilimitados y sin costo.
 
 on:
   schedule:
@@ -38,8 +39,15 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout repo
+      - name: Checkout public repo
         uses: actions/checkout@v4
+
+      - name: Checkout private scripts
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting-scripts
+          token: ${{ secrets.SCRIPTS_PAT }}
+          path: private-scripts
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -55,7 +63,7 @@ jobs:
       - name: Fetch FX liquidity profile
         env:
           SITE_PATH: .
-        run: python3 scripts/fetch_fx_liquidity.py
+        run: python3 private-scripts/fetch_fx_liquidity.py
 
       - name: Display summary
         if: always()
