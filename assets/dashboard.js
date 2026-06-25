@@ -541,17 +541,10 @@ function populateHeatmap() {
   // because ECB daily rates have zero intraday movement (same open/close on weekends)
   const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 21; // need ≥75% of 32 pairs (G8 + 4 Scandi) for reliable composite
 
-  let strengths;
-  if (rtAvailable) {
-    // Map each currency to its avg % change across all 28 G8 pairs.
-    // Each currency appears in exactly 7 pairs — equal statistical weight.
-    const pctMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0, NOK: 0, SEK: 0 };
-    const countMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0, NOK: 0, SEK: 0 };
-
-    // All 28 G8 pairs (8×7÷2) — industry-standard currency strength calculation.
-    // Each of the 8 currencies appears in exactly 7 pairs, giving equal statistical weight.
-    // sign: +1 means base strengthens when price rises; -1 means quote strengthens.
-    const pairDefs = [
+  // pairDefs hoisted to function scope — used both inside the rtAvailable branch
+  // (strength computation) and outside it (pairCountByCcy tooltip counts).
+  // Declaring inside the if-block caused ReferenceError when rtAvailable=false.
+  const pairDefs = [
       // 7 USD majors
       { id: 'eurusd', base: 'EUR', quote: 'USD', sign: 1 },
       { id: 'gbpusd', base: 'GBP', quote: 'USD', sign: 1 },
@@ -593,6 +586,13 @@ function populateHeatmap() {
       { id: 'eurnok', base: 'EUR', quote: 'NOK', sign:  1 },
       { id: 'eursek', base: 'EUR', quote: 'SEK', sign:  1 },
     ];
+
+  let strengths;
+  if (rtAvailable) {
+    // Map each currency to its avg % change across all 28 G8 pairs.
+    // Each currency appears in exactly 7 pairs — equal statistical weight.
+    const pctMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0, NOK: 0, SEK: 0 };
+    const countMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0, NOK: 0, SEK: 0 };
 
     pairDefs.forEach(({ id, base, quote, sign }) => {
       const d = STOOQ_RT_CACHE[id];
