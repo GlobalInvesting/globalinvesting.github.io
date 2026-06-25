@@ -21,7 +21,8 @@ on:
         default: 'full'
 
 # Runs in the PUBLIC repo → minutos ilimitados (sin consumo de cuota privada).
-# Scripts movidos desde el engine privado en auditoría 2026-03-31.
+# Script fetch_news.py vive en el repo privado globalinvesting-scripts (checkout
+# explícito vía SCRIPTS_PAT) para proteger la lógica propietaria del scraper.
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
