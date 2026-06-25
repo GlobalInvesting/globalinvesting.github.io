@@ -633,6 +633,16 @@ function populateHeatmap() {
   // Store strengths in a module-level variable so the modal can read them
   // without embedding JSON in an HTML attribute (which breaks on double-quotes).
   window._hmStrengths = strengths;
+  // Per-currency direct-pair count, structural (independent of live data
+  // availability) — matches heatmap-modal.js's `PAIR_DEFS.filter(p => p.base
+  // === ccy || p.quote === ccy).length` exactly, so the tooltip never drifts
+  // out of sync with what the modal actually shows. Was hardcoded "7" before
+  // — wrong for EUR/USD (9 pairs each) and NOK/SEK (2 pairs each, structurally
+  // asymmetric vs the rest of G10).
+  const pairCountByCcy = {};
+  ccys.forEach(c => {
+    pairCountByCcy[c] = pairDefs.filter(p => p.base === c || p.quote === c).length;
+  });
   grid.innerHTML = strengths.map(s => {
     let bg = 'h-flat';
     if (s.pct > 0.15) bg = 'h-s-up';
@@ -641,7 +651,8 @@ function populateHeatmap() {
     else if (s.pct < -0.05) bg = 'h-down';
     const cls = s.pct > 0 ? 'up' : s.pct < 0 ? 'down' : 'flat';
     const sign = s.pct >= 0 ? '+' : '';
-    return `<div class="hm-cell ${bg}" role="button" tabindex="0" aria-label="${s.ccy} currency strength ${sign}${s.pct.toFixed(2)}%" style="cursor:pointer" title="Click to open ${s.ccy} breakdown · 7 direct pairs · COT · vol · correlations" onclick="if(window.openHeatmapModal)openHeatmapModal('${s.ccy}',window._hmStrengths,STOOQ_RT_CACHE)">
+    const nPairs = pairCountByCcy[s.ccy] || 0;
+    return `<div class="hm-cell ${bg}" role="button" tabindex="0" aria-label="${s.ccy} currency strength ${sign}${s.pct.toFixed(2)}%" style="cursor:pointer" title="Click to open ${s.ccy} breakdown · ${nPairs} direct pair${nPairs===1?'':'s'} · COT · vol · correlations" onclick="if(window.openHeatmapModal)openHeatmapModal('${s.ccy}',window._hmStrengths,STOOQ_RT_CACHE)">
       <span class="hm-sym">${s.ccy}</span>
       <span class="hm-val ${cls}">${sign}${s.pct.toFixed(2)}</span>
     </div>`;

@@ -228,7 +228,7 @@
       side:    'top',
       title:   'Currency Strength Heatmap',
       badge:   'Heatmap',
-      body:    'Eight currencies ranked by intraday strength across all direct major pairs. Click any cell to open the currency detail modal: all 7 direct pairs, live carry, COT bias, realized vol, and pair correlations — the complete single-currency picture without switching views.',
+      body:    'G10 currencies ranked by intraday strength across all direct major pairs. Click any cell to open the currency detail modal: direct pairs, live carry, COT bias, realized vol, and pair correlations — the complete single-currency picture without switching views.',
       action:  null,
     },
 

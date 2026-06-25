@@ -1,6 +1,6 @@
 /**
  * calendar-panel.js v1.4 — Native economic calendar renderer
- * Reads calendar-data/ff_calendar.json (ForexFactory, 8 major currencies, medium+high impact)
+ * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
  * v1.1 (2026-06-09): Display window filter — show only yesterday through +14 days.
@@ -404,7 +404,7 @@
     }));
 
     if (sourceEl) {
-      sourceEl.textContent = `${source} · 8 major currencies · medium & high impact · ${tzLabel()}`;
+      sourceEl.textContent = `${source} · G10 currencies · medium & high impact · ${tzLabel()}`;
     }
     const thTime = document.getElementById('cal-th-time');
     if (thTime) thTime.textContent = tzLabel();
