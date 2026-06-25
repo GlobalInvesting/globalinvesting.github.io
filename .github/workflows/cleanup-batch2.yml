@@ -1,0 +1,41 @@
+name: Cleanup — Remove batch 2 migrated scripts and workflows
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Remove migrated scripts
+        run: |
+          git rm --ignore-unmatch \
+            scripts/fetch_bond_yields.py \
+            scripts/fetch_ois_rates.py \
+            scripts/fetch_frankfurter_cache.py \
+            scripts/test_cme_fx_options.py
+
+      - name: Remove migrated workflows
+        run: |
+          git rm --ignore-unmatch \
+            .github/workflows/update-bond-yields.yml \
+            .github/workflows/update-ois-rates.yml \
+            .github/workflows/update-frankfurter-cache.yml
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --staged --quiet && echo "Nothing to remove." && exit 0
+          git commit -m "chore: remove batch 2 scripts and workflows migrated to private repo"
+          git push origin main
+
+      - name: Self-destruct
+        run: |
+          git rm .github/workflows/cleanup-batch2.yml
+          git commit -m "chore: remove batch 2 cleanup workflow"
+          git push origin main
