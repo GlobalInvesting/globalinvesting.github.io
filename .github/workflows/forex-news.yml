@@ -1,17 +1,31 @@
 name: Fetch Forex News
 on:
-  schedule:
-    # ── Fast runs: every 10 min — RSS + Finnhub only (no NewsData quota consumed) ──
-    # GitHub Actions public repo: unlimited minutes. Runtime ~60-90s per run.
-    # 10-min interval reduces worst-case breaking-news lag from ~60 min to ~10 min.
-    # FXStreet/ForexLive/CB feeds post breaking news anytime; this catches it within
-    # one poll cycle. NEWS_MODE=fast skips NewsData entirely (quota preservation).
-    - cron: '0,10,20,30,40,50 * * * *'   # every 10 min — NEWS_MODE=fast
+  # ── PRIMARY TRIGGER: cron-job.org (reliable external clock) ─────────────────
+  # cron-job.org fires a repository_dispatch every 10 minutes via HTTP POST.
+  # This bypasses GitHub's scheduler entirely — no throttling, no skipped runs.
+  #
+  # SETUP (one-time, already done):
+  #   URL:    https://api.github.com/repos/GlobalInvesting/globalinvesting.github.io/dispatches
+  #   Method: POST
+  #   Headers:
+  #     Authorization: Bearer <CRONJOB_PAT>
+  #     Accept: application/vnd.github+json
+  #     Content-Type: application/json
+  #     X-GitHub-Api-Version: 2022-11-28
+  #   Body:   {"event_type":"trigger-forex-news"}
+  #   Schedule: every 10 minutes
+  #
+  # NEWS_MODE logic (applied on both dispatch and schedule triggers):
+  #   Minute :05 of any hour → MODE=full (RSS + Finnhub + NewsData)
+  #   All other minutes      → MODE=fast (RSS + Finnhub only, no NewsData quota)
+  repository_dispatch:
+    types: [trigger-forex-news]   # ← fired by cron-job.org every 10 min
 
-    # ── Full run: once per hour at :05 UTC — RSS + Finnhub + NewsData ──────────
-    # Staggered 5 min from update-fx-liquidity (:00) to avoid runner queue collision.
-    # NewsData free plan: 200 req/day. 8 queries × 24 runs = 192/day — within limit.
-    - cron: '5 * * * *'                   # hourly at :05 — NEWS_MODE=full
+  # ── FALLBACK: GitHub native cron (unreliable at high frequency, kept as safety net) ──
+  # GitHub may skip or delay these under load. cron-job.org above is the primary clock.
+  schedule:
+    - cron: '0,10,20,30,40,50 * * * *'   # every 10 min fallback — NEWS_MODE=fast
+    - cron: '5 * * * *'                   # hourly at :05 fallback — NEWS_MODE=full
 
   workflow_dispatch:
     inputs:
@@ -64,10 +78,11 @@ jobs:
       - name: Set NEWS_MODE
         id: news_mode
         run: |
-          # v5.18: Determine NEWS_MODE for this run.
+          # Determine NEWS_MODE for this run.
           # workflow_dispatch: use the input value (default 'full').
-          # Scheduled: 'full' only at :05 (hourly cron). All other minutes → 'fast'.
-          # This lets one job definition serve both schedules without duplication.
+          # repository_dispatch (cron-job.org) + schedule (fallback): use clock minute.
+          #   :05 of any hour → full (RSS + Finnhub + NewsData, hourly quota run)
+          #   all other minutes → fast (RSS + Finnhub only, no NewsData quota consumed)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             MODE="${{ inputs.news_mode }}"
             MODE="${MODE:-full}"
