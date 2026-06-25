@@ -108,9 +108,9 @@ gtag('consent', 'default', {
   "operatingSystem": "Any",
   "browserRequirements": "Requires JavaScript",
   "featureList": [
-    "Live FX rates for all 28 major pairs — EUR/USD, GBP/USD, USD/JPY and all crosses — streaming in real time via Finnhub WebSocket during market hours",
+    "Live FX rates for all 28 major pairs — EUR/USD, GBP/USD, USD/JPY and all crosses — streaming in real time during market hours",
     "Economic Surprise Index (ESI) — decay-weighted major currency scores from actual vs forecast data, with z-score normalisation per event series and 90-day rolling chart",
-    "G10 Economic Calendar — Finnhub medium/high-impact events with actual vs consensus beat/miss scoring, updated within 2-3 minutes of release",
+    "G10 Economic Calendar — medium/high-impact events with actual vs consensus beat/miss scoring, updated within 2-3 minutes of release",
     "OIS-implied central bank rate expectations for Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ, Norges Bank, Riksbank — with market-implied cut/hike probability",
     "CFTC Commitment of Traders (COT) — Leveraged Funds and Asset Manager net positioning, WoW change, % of OI",
     "AI-powered market narrative — synthesises COT, OIS bias, cross-asset risk and carry differentials, updated 4x daily with directional bias and key signals",
@@ -242,7 +242,7 @@ gtag('consent', 'default', {
       "name": "How real-time is the forex data?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "FX pair prices stream in real time during market hours via Finnhub WebSocket — a Cloudflare Worker proxy maintains one connection to Finnhub and fans ticks out to all browsers simultaneously. The quote bar label changes from 'yfinance · HH:MM' to 'Finnhub · live' on first tick. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 minutes via yfinance. During weekends and off-hours when the FX market is closed, the last available closing price is displayed."
+        "text": "FX pair prices stream in real time during market hours via WebSocket. The quote bar label changes from a delayed timestamp to 'Live' on the first tick. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 minutes. During weekends and off-hours when the FX market is closed, the last available closing price is displayed."
       }
     },
     {
@@ -314,7 +314,7 @@ gtag('consent', 'default', {
       "name": "How does the Economic Calendar work in the terminal?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The Economic Calendar shows medium and high-impact G10 currency events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data is sourced from Finnhub and updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically."
+        "text": "The Economic Calendar shows medium and high-impact G10 currency events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically."
       }
     }
   ]
@@ -610,7 +610,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="q-item" data-sym="FRED:DGS10" style="cursor:pointer;" title="Click: chart"><span class="q-sym">US 10Y</span><span class="q-price" id="q-us10y">—</span><span class="q-chg" id="qc-us10y">—</span></div>
       <div class="q-item" data-sym="PEPPERSTONE:USDX" style="cursor:pointer;" title="Click: chart"><span class="q-sym">DXY</span><span class="q-price" id="q-dxy">—</span><span class="q-chg" id="qc-dxy">—</span></div>
     </div>
-    <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">Finnhub · live</span>
+    <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">Live</span>
   </div>
   <button id="qb-next" class="qb-arrow" aria-label="Scroll quotes right">&#8250;</button>
 </div>
@@ -938,7 +938,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="panel" id="split-upper-heatmap">
       <div class="panel-head">
         <span class="panel-title">Currency Strength Heatmap</span>
-        <span class="panel-sub" id="hm-panel-sub">G10 composite · 32 pairs · yfinance · ~5min delay · Click any currency to expand</span>
+        <span class="panel-sub" id="hm-panel-sub">G10 composite · 32 pairs · Delayed ~5min · Click any currency to expand</span>
       </div>
       <div class="heatmap" id="heatmap-grid">
         <!-- 10 skeleton cells — G8 + NOK + SEK; heatmap JS overwrites on load -->
@@ -968,7 +968,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
       <div class="panel-head">
         <span class="panel-title">Economic Calendar</span>
-        <span class="panel-sub" id="cal-panel-sub">Finnhub · G10 major currencies · medium &amp; high impact</span>
+        <span class="panel-sub" id="cal-panel-sub">ForexFactory · G10 major currencies · medium &amp; high impact</span>
       </div>
       <!-- Column headers -->
       <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
@@ -1051,7 +1051,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- RATES & YIELD CURVE — G10 multi-country -->
     <div class="panel" id="section-rates">
-      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve</span><span class="panel-sub" id="yield-panel-sub">Nominal yields · yfinance · daily pipeline</span></div>
+      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve</span><span class="panel-sub" id="yield-panel-sub">Nominal yields · daily pipeline</span></div>
 
       <!-- Country tab bar -->
       <div id="rates-country-tabs" role="tablist" aria-label="Select country yield curve" style="display:flex;gap:2px;padding:0 8px 4px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);">
@@ -1143,7 +1143,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <tr><td>Sweden</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
           </tbody>
         </table>
-        <div style="font-size:9px;color:var(--text3);margin-top:4px;">Daily sovereign yield pipeline · yfinance · FRED · ECB · BOE</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:4px;">Daily sovereign yield pipeline · FRED · ECB · BOE</div>
       </div>
     </div>
 
@@ -1343,7 +1343,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
       <!-- HV Term Structure -->
       <div style="padding:8px 10px 2px;border-top:1px solid var(--border);">
-        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Realized Vol · yfinance OHLC · HV 30d vs RR Skew</div>
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Realized Vol · OHLC · HV 30d vs RR Skew</div>
         <div style="overflow-x:auto;">
           <table id="hv-term-table" aria-label="Historical volatility term structure" style="width:100%;">
             <thead>
@@ -1368,7 +1368,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             </tbody>
           </table>
         </div>
-        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Realized volatility · annualized · yfinance OHLC · Trend: HV 10d vs HV 30d</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px;">Realized volatility · annualized · OHLC · Trend: HV 10d vs HV 30d</div>
       </div>
 
       <!-- ECB Reference Exchange Rates -->
@@ -1560,7 +1560,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <tr><td>Gold</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
       </tbody>
     </table>
-    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling Pearson · 30d / 60d / 90d · yfinance · vs norm = z-score vs 252d</div>
+    <div style="padding:2px 6px 5px;font-size:9px;color:var(--text3);">Rolling Pearson · 30d / 60d / 90d · vs norm = z-score vs 252d</div>
 
     <div id="section-cb-expectations" style="margin-top:2px;">
     <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
@@ -1608,11 +1608,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <tr style="cursor:pointer;" onclick="openEconSurprisesModal('SEK')" title="Click to view SEK surprise index detail" tabindex="0" role="button" aria-label="SEK economic surprises — click for detail"><td style="padding:2px 8px;font-size:10px;">SEK</td><td style="padding:2px 4px;"><div class="es-bar-wrap"><div class="es-bar-fill" style="width:0%;"></div></div></td><td style="text-align:right;padding:2px 8px;font-size:9px;color:var(--text3);">—</td></tr>
         </tbody>
       </table>
-      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">Finnhub · actual vs consensus · G10 · 90d rolling</div>
+      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);" id="econ-surprise-source">Economic calendar · actual vs consensus · G10 · 90d rolling</div>
     </div>
 
     <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
-      ECB · CFTC · yfinance · Myfxbook · TradingView · AI
+      ECB · CFTC · Myfxbook · TradingView · AI
     </div>
   </aside>
 
