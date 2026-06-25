@@ -1,60 +1,26 @@
 name: Update Interest Rates (Scraping + Frankfurter validation)
-
-# Fetches G8 central bank policy rates from official CB sources and writes
-# rates/{CCY}.json + rates/health.json to THIS (public) repo.
-#
-# Moved from private engine repo (v7.80.0) — no private API keys required.
-# All sources are public: RBA CSV, BoC Valet API, ECB Data Portal, BoE Database,
-# NY Fed EFFR API, BoJ/SNB/RBNZ scraping. FRED_API_KEY optional (uses public CSV fallback).
-# Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
-# Public repos have unlimited GitHub Actions minutes → no budget impact.
-
+# PUBLIC STUB — all schedules + repository_dispatch trigger.
+# Fetch/commit logic lives in the private reusable workflow.
 on:
   schedule:
-    # ── Asia close / EU pre-open base run ─────────────────────────────────────
-    # Captures: JPY (BoJ ~02:30 UTC), AUD (RBA ~04:30 UTC), NZD (RBNZ ~02:00 UTC).
-    - cron: '0 8 * * *'    # Daily 08:00 UTC — base run, catches overnight decisions
-
-    # ── BoJ (JPY) early capture ────────────────────────────────────────────────
-    # BoJ publishes at ~02:00–03:00 UTC (11:00–12:00 JST). Meeting days in 2026:
-    # Jan=Sat, Mar=Thu, Apr/Jun=Tue, Jul/Sep/Oct/Dec=Fri.
-    # Extra crons at 04:00 UTC ensure rates/JPY.json updates before EU open.
-    # Without these, the 08:00 UTC base run is the first catch — 5h after decision.
-    - cron: '0 4 * * 2'   # Tue 04:00 UTC — BoJ on Tue (Apr 28, Jun 16 2026)
-    - cron: '0 4 * * 4'   # Thu 04:00 UTC — BoJ on Thu (Mar 19 2026)
-    - cron: '0 4 * * 5'   # Fri 04:00 UTC — BoJ on Fri (Jul 31, Sep 18, Oct 30, Dec 18 2026)
-
-    # ── RBA (AUD) early capture ────────────────────────────────────────────────
-    # RBA publishes at 14:30 AEST (UTC+10) = 04:30 UTC. Decisions: dominantly Tuesdays.
-    - cron: '30 5 * * 2'  # Tue 05:30 UTC — RBA (04:30 UTC + 60 min buffer)
-
-    # ── RBNZ (NZD) early capture ───────────────────────────────────────────────
-    # RBNZ publishes at 14:00 NZST (UTC+12) = 02:00 UTC. Decisions: Wed/Thu.
-    - cron: '30 3 * * 3'  # Wed 03:30 UTC — RBNZ (02:00 UTC + 90 min buffer)
-    - cron: '30 3 * * 4'  # Thu 03:30 UTC — RBNZ alternate day
-
-    # ── CBs that decide AFTER 08:00 UTC ───────────────────────────────────────
-    # SNB:  09:30 CET = 08:30 UTC Thu (quarterly: Mar/Jun/Sep/Dec)
-    - cron: '0 10 * * 4'   # Thu 10:00 UTC — SNB post-decision capture
-
-    # ECB:  12:15 UTC Thu (occasionally Fri) — SDMX confirmed available post-decision
-    # BoE:  12:00 UTC Thu (occasionally Fri)
-    - cron: '0 14 * * 4'   # Thu 14:00 UTC — ECB + BoE post-decision capture
-    - cron: '0 14 * * 5'   # Fri 14:00 UTC — ECB/BoE on Fri (e.g. Jan 30, Mar 6 2026)
-
-    # BoC:  14:45 ET = 19:45 UTC Wed (occasionally Thu)
-    - cron: '0 21 * * 3'   # Wed 21:00 UTC — BoC post-decision capture
-    - cron: '0 21 * * 4'   # Thu 21:00 UTC — BoC on Thu (e.g. Jan 29, Apr 29 2026)
-
-    # FOMC: 19:00 ET = 00:00 UTC Thu — FRED DFF has 1-day lag; base run at 08:00
-    #        UTC Thu captures it naturally. No extra cron needed.
-
+    - cron: '0 8 * * *'
+    - cron: '0 4 * * 2'
+    - cron: '0 4 * * 4'
+    - cron: '0 4 * * 5'
+    - cron: '30 5 * * 2'
+    - cron: '30 3 * * 3'
+    - cron: '30 3 * * 4'
+    - cron: '0 10 * * 4'
+    - cron: '0 14 * * 4'
+    - cron: '0 14 * * 5'
+    - cron: '0 21 * * 3'
+    - cron: '0 21 * * 4'
   repository_dispatch:
-    types: [cb-rate-decision]   # Fired by calendar-watcher.js when a CB rate actual is detected
+    types: [cb-rate-decision]
   workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 concurrency:
   group: update-rates
@@ -64,101 +30,6 @@ permissions:
   contents: write
 
 jobs:
-  update-rates:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install requests beautifulsoup4 lxml --break-system-packages
-
-      - name: Create rates directory
-        run: mkdir -p rates
-
-      - name: Fetch and validate rates
-        # fetch_rates.py exits with code 1 if it detects:
-        #   - Rate outside the plausible range [-2%, 15%]
-        #   - Change > 1pp vs the last saved observation (unusual between daily runs)
-        # health.json is always saved with status of each currency for frontend alerts.
-        run: python scripts/fetch_rates.py
-
-      - name: Display summary
-        if: always()
-        run: |
-          echo ""
-          echo "========================================"
-          echo "         INTEREST RATES SUMMARY"
-          echo "========================================"
-          echo ""
-          for currency in USD EUR GBP JPY CAD AUD CHF NZD NOK SEK; do
-            if [ -f "rates/$currency.json" ]; then
-              echo "[$currency]"
-              python3 -c "
-          import json
-          with open('rates/$currency.json') as f:
-              data = json.load(f)
-          obs = data['observations']
-          print(f'  Rate:     {obs[0][\"value\"]}%')
-          print(f'  Date:     {obs[0][\"date\"]}')
-          print(f'  History:  {len(obs)} observations')
-          "
-              echo ""
-            fi
-          done
-          echo "[Health Status]"
-          if [ -f "rates/health.json" ]; then
-            python3 -c "
-          import json
-          with open('rates/health.json') as f:
-              h = json.load(f)
-          print(f'  Overall: {h[\"overallStatus\"]}')
-          print(f'  Run:     {h[\"runTimestamp\"]}')
-          print(f'  Frankfurter validation: {\"OK\" if h[\"frankfurterOk\"] else \"UNAVAILABLE\"}')
-          for ccy, info in h['currencies'].items():
-              status = info['status']
-              rate = info['rate']
-              src = info['source'] or 'N/A'
-              print(f'  {ccy}: {rate}%  [{status}]  source={src}')
-          if h[\"issues\"]:
-              print(f'  Issues:')
-              for i in h[\"issues\"]:
-                  print(f'    - {i}')
-          "
-          fi
-
-      - name: Commit and push
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          mkdir -p /tmp/rates_fresh
-          cp -r rates/. /tmp/rates_fresh/
-          TIMESTAMP=$(date -u '+%Y-%m-%d')
-
-          for i in 1 2 3 4 5; do
-            echo "--- Attempt $i ---"
-            git fetch origin main
-            git reset --hard origin/main
-            cp -r /tmp/rates_fresh/. rates/
-            git add rates/
-            if git diff --quiet && git diff --staged --quiet; then
-              echo "No changes vs remote HEAD — skipping commit."
-              exit 0
-            fi
-            git commit -m "Rates ${TIMESTAMP} — scraping + validation"
-            if git push origin main; then
-              echo "✅ Push succeeded on attempt $i."
-              exit 0
-            fi
-            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
-            sleep $((i * 2))
-          done
-          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
-          exit 0
+  call:
+    uses: GlobalInvesting/globalinvesting-scripts/.github/workflows/update-rates.yml@main
+    secrets: inherit
