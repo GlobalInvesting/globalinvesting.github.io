@@ -380,13 +380,13 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="what-it-shows">
       <h2>What It Shows</h2>
       <p>The Rates &amp; Yield Curve section of the terminal displays five US Treasury nominal yields (3-month T-Bill, 2-year Note, 5-year Note, 10-year Bond, 30-year Bond), a canvas-drawn yield curve connecting them, and a table of three key spreads: the 2Y–10Y domestic spread, the US–Germany 10Y differential, and the US–Japan 10Y differential.</p>
-      <p>Data updates approximately every 5 minutes during US market hours via yfinance. Outside market hours or when the intraday feed is unavailable, the terminal falls back to FRED DGS2 daily batch values; the panel subtitle reflects the active source. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
+      <p>Data updates approximately every 5 minutes during US market hours. Outside market hours or when the intraday feed is unavailable, the terminal falls back to FRED DGS2 daily batch values; the panel subtitle reflects the active source. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
 
       <!-- MOCK: Full-width Rates & Yield Curve panel (mirrors index) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:20px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">Rates &amp; Yield Curve — US Treasuries</span>
-          <span style="font-size:9.5px;color:var(--text3);">Nominal yields · yfinance</span>
+          <span style="font-size:9.5px;color:var(--text3);">Nominal yields · delayed ~5min</span>
         </div>
         <!-- 5 tenor cells -->
         <div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border);">
@@ -599,7 +599,7 @@ a { color: inherit; text-decoration: none; }
         <li>Bear steepening (10Y rising, 2Y stable) → watch for gold and AUD pressure as real rates rise</li>
       </ul>
       <div class="callout">
-        <strong>Data source:</strong> US Treasury yields update approximately every 5 minutes during US market hours via yfinance (^TNX, ^TYX, ^FVX, ^IRX, DGS2). Outside market hours or when the intraday feed is unavailable, the terminal falls back to FRED DGS2/DGS10 daily batch values — the panel subtitle reflects the active source. For real-time tick data on Treasury yields, use the TradingView chart (US10Y, US02Y, etc.) in the price chart panel.
+        <strong>Data source:</strong> US Treasury yields update approximately every 5 minutes during US market hours (^TNX, ^TYX, ^FVX, ^IRX, DGS2). Outside market hours or when the intraday feed is unavailable, the terminal falls back to FRED DGS2/DGS10 daily batch values — the panel subtitle reflects the active source. For real-time tick data on Treasury yields, use the TradingView chart (US10Y, US02Y, etc.) in the price chart panel.
       </div>
     </div>
 

@@ -541,9 +541,9 @@ a { color: inherit; text-decoration: none; }
       <h3>Session indicator</h3>
       <p>The top-right of the topbar shows the current active trading session (Sydney, Tokyo, London, New York, or an overlap) based on your browser's local time converted to UTC. A blinking green dot indicates the clock is live.</p>
       <h3>Quote bar</h3>
-      <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, GOLD FUT, WTI FUT, BTC/USD, US 10Y Yield, and DXY. FX pair prices update in real time during market hours via Finnhub WebSocket (tick-by-tick). Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min via yfinance; on days when yfinance data appears frozen (e.g. a bank holiday), the engine automatically falls back to Twelve Data for commodities and equity indices. ECB/Frankfurter rates serve as a silent fallback when all primary sources are unavailable.</p>
+      <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, GOLD FUT, WTI FUT, BTC/USD, US 10Y Yield, and DXY. FX pair prices update in real time during market hours via WebSocket (tick-by-tick). Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min; on days when the primary feed appears frozen (e.g. a bank holiday), the terminal automatically switches to a backup feed for commodities and equity indices. Official daily reference rates serve as a silent fallback when all primary sources are unavailable.</p>
       <div class="callout">
-        <strong>Update cadence:</strong> FX pair prices stream in real time via Finnhub WebSocket — a Cloudflare Worker proxy maintains one upstream connection to Finnhub and fans ticks out to all browser tabs. When the market is open you will see the source label change from <code style="font-family:var(--font-mono);font-size:11px;">yfinance · HH:MM</code> to <code style="font-family:var(--font-mono);font-size:11px;">Finnhub · live</code>. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min via yfinance; when yfinance data is detected as frozen, the engine falls back automatically to Twelve Data for commodities and equity indices. Click any pair to jump directly to the price chart with that symbol pre-selected.
+        <strong>Update cadence:</strong> FX pair prices stream in real time via WebSocket. When the market is open you will see the source label change from <code style="font-family:var(--font-mono);font-size:11px;">Delayed ~5min · HH:MM</code> to <code style="font-family:var(--font-mono);font-size:11px;">Live</code>. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min; when the primary feed is detected as frozen, the terminal switches automatically to a backup feed for commodities and equity indices. Click any pair to jump directly to the price chart with that symbol pre-selected.
       </div>
       <p>Click any pair in the quote bar to jump to the Price Chart with that symbol pre-selected.</p>
       <h3>News ticker</h3>
@@ -582,8 +582,8 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="price-chart">
       <h2>Price Chart</h2>
-      <p>A native LightweightCharts price chart — the primary chart for all symbols with OHLC data (all major FX majors and crosses, Gold FUT, WTI FUT, DXY, BTC/USD, and others). 22 instruments are accessible via the tab row above the chart. For symbols without OHLC data, the chart falls back to an embedded TradingView widget.</p>
-      <p>The LW chart loads in candlestick mode with a D1 (daily) timeframe and a 3-month default range. The toolbar above the chart gives you full control: <strong>timeframe</strong> (H1 / H4 / D1 / W1 / MN), chart type (Candle / Bar / Line / Area), <strong>range</strong> (3M / 6M / 1Y / 3Y / ALL), overlay toggles (WM — symbol watermark; PC — previous close line; VOL — volume histogram; CB — central bank meeting markers), logarithmic scale, and a multi-MA selector (periods: 5, 10, 20, 50, 100, 200 — up to three simultaneous MAs). The OHLC header updates on hover showing O/H/L/C values and the daily change. For H1/H4, bars are sourced from Finnhub OANDA candles; D1 bars come from yfinance. W1 and MN bars are aggregated from the daily dataset — the current incomplete bar's open, high, and low reflect the full period to date (not just the current session).</p>
+      <p>A native price chart — the primary chart for all symbols with OHLC data (all major FX majors and crosses, Gold FUT, WTI FUT, DXY, BTC/USD, and others). 22 instruments are accessible via the tab row above the chart. For symbols without OHLC data, the chart falls back to an embedded TradingView widget.</p>
+      <p>The LW chart loads in candlestick mode with a D1 (daily) timeframe and a 3-month default range. The toolbar above the chart gives you full control: <strong>timeframe</strong> (H1 / H4 / D1 / W1 / MN), chart type (Candle / Bar / Line / Area), <strong>range</strong> (3M / 6M / 1Y / 3Y / ALL), overlay toggles (WM — symbol watermark; PC — previous close line; VOL — volume histogram; CB — central bank meeting markers), logarithmic scale, and a multi-MA selector (periods: 5, 10, 20, 50, 100, 200 — up to three simultaneous MAs). The OHLC header updates on hover showing O/H/L/C values and the daily change. For H1/H4, bars are sourced from intraday candles; D1 bars come from daily OHLC history. W1 and MN bars are aggregated from the daily dataset — the current incomplete bar's open, high, and low reflect the full period to date (not just the current session).</p>
       <!-- MOCK: interactive LightweightCharts v5 — EUR/USD hardcoded OHLC, mirrors terminal -->
       <div id="guide-chart-wrap" style="background:#131722;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;">
         <!-- Tab row — scroll-able, matches terminal exactly -->
@@ -632,7 +632,7 @@ a { color: inherit; text-decoration: none; }
         <!-- OHLC header bar -->
         <div id="gct-ohlc-bar" style="display:flex;align-items:center;gap:10px;padding:4px 10px;background:#131722;font-size:10px;font-family:'JetBrains Mono',monospace;border-bottom:1px solid #2a2e39;min-height:24px;">
           <span style="font-size:11px;font-weight:700;color:#d1d4dc;font-family:Inter,sans-serif;">EUR / U.S. Dollar &middot; 1D</span>
-          <span style="font-size:9px;color:#6b7280;margin-left:2px;">Finnhub · live · yfinance fallback (~5 min)</span>
+          <span style="font-size:9px;color:#6b7280;margin-left:2px;">Live · delayed fallback</span>
           <span id="gct-ohlc-vals" style="display:flex;gap:8px;margin-left:4px;">
             <span><span style="color:#6b7280;font-size:9px;">O </span><span id="gct-o" style="color:#d1d4dc;">1.17060</span></span>
             <span><span style="color:#6b7280;font-size:9px;">H </span><span id="gct-h" style="color:#26a69a;">1.17275</span></span>
@@ -809,15 +809,15 @@ a { color: inherit; text-decoration: none; }
             </tr>
           </tbody>
         </table>
-        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Spread color: <span style="color:var(--up);">green &lt;1.5 pip</span> · <span style="color:var(--orange);">orange 1.5–3</span> · <span style="color:var(--down);">red &gt;3</span> · Source: Finnhub live · yfinance fallback / ECB</div>
+        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Spread color: <span style="color:var(--up);">green &lt;1.5 pip</span> · <span style="color:var(--orange);">orange 1.5–3</span> · <span style="color:var(--down);">red &gt;3</span> · Source: Live · delayed fallback / ECB</div>
       </div>
       <ul style="list-style:none;padding:0;">
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Pair</strong> <span style="color:var(--text2);">Currency pair identifier (e.g., EUR/USD)</span></li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Bid / Ask</strong> <span style="color:var(--text2);">Current bid and ask prices — FX pairs sourced from Finnhub WebSocket (live); non-FX from yfinance (~5 min delay)</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Bid / Ask</strong> <span style="color:var(--text2);">Current bid and ask prices — FX pairs sourced live during market hours; non-FX instruments delayed ~5 min</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Spread</strong> <span style="color:var(--text2);">Estimated current spread in pips, color-coded (green &lt;1.5 pip, orange 1.5–3, red &gt;3)</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">1D</strong> <span style="color:var(--text2);">Percentage change vs. yesterday's closing price</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">1W</strong> <span style="color:var(--text2);">Percentage change vs. last week's close</span></li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">HV 30d</strong> <span style="color:var(--text2);">30-day historical (realized) volatility — annualized standard deviation of daily log returns, computed from yfinance data. Not implied volatility.</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">HV 30d</strong> <span style="color:var(--text2);">30-day historical (realized) volatility — annualized standard deviation of daily log returns, computed from daily OHLC data. Not implied volatility.</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Sess H</strong> <span style="color:var(--text2);">Intraday session high price.</span></li>
         <li style="padding:6px 0;display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Sess L</strong> <span style="color:var(--text2);">Intraday session low price.</span></li>
       </ul>
@@ -830,7 +830,7 @@ a { color: inherit; text-decoration: none; }
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">Currency Strength Heatmap</span>
-          <span style="font-size:9px;color:var(--text3);">Relative performance vs USD basket · yfinance RT</span>
+          <span style="font-size:9px;color:var(--text3);">Relative performance vs USD basket · real-time</span>
         </div>
         <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:0;">
           <div style="background:#0d3d2e;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
@@ -874,9 +874,9 @@ a { color: inherit; text-decoration: none; }
             <div style="font-size:10px;color:var(--down);margin-top:3px;">−1.05</div>
           </div>
         </div>
-        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Sorted strongest → weakest · Finnhub live ticks · yfinance fallback (~5 min) · fallback: ECB daily</div>
+        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Sorted strongest → weakest · Live · delayed fallback (~5 min) · ECB daily</div>
       </div>
-      <p>Strength is computed across <strong>32 live pairs</strong>: the classic 28-pair combination of the 8 G8 majors (8×7÷2 = 28, each currency appearing in exactly 7 pairs) plus 4 added Scandinavian pairs (USD/NOK, USD/SEK, EUR/NOK, EUR/SEK) to bring NOK and SEK into the same heatmap. When market is open, each currency's score updates in real time from Finnhub WebSocket ticks; during off-hours yfinance (~5 min delay) provides the baseline. For example, JPY's score averages its move in USD/JPY, EUR/JPY, GBP/JPY, AUD/JPY, NZD/JPY, CAD/JPY and CHF/JPY — a true 7-pair basket reading. NOK and SEK, having no direct cross-pairs against GBP, AUD, CAD, CHF, or NZD, average only their 2 available pairs each (vs. USD and vs. EUR) — a valid but thinner read than the 8 majors. ECB daily rates serve as a silent fallback only when RT data is unavailable. Cells are color-coded by intensity: dark green (strong), light green (mild), flat (near zero), light red (mild weakness), dark red (weak).</p>
+      <p>Strength is computed across <strong>32 live pairs</strong>: the classic 28-pair combination of the 8 G8 majors (8×7÷2 = 28, each currency appearing in exactly 7 pairs) plus 4 added Scandinavian pairs (USD/NOK, USD/SEK, EUR/NOK, EUR/SEK) to bring NOK and SEK into the same heatmap. When market is open, each currency's score updates in real time; during off-hours delayed data (~5 min) provides the baseline. For example, JPY's score averages its move in USD/JPY, EUR/JPY, GBP/JPY, AUD/JPY, NZD/JPY, CAD/JPY and CHF/JPY — a true 7-pair basket reading. NOK and SEK, having no direct cross-pairs against GBP, AUD, CAD, CHF, or NZD, average only their 2 available pairs each (vs. USD and vs. EUR) — a valid but thinner read than the 8 majors. ECB daily rates serve as a silent fallback only when RT data is unavailable. Cells are color-coded by intensity: dark green (strong), light green (mild), flat (near zero), light red (mild weakness), dark red (weak).</p>
       <div class="callout callout-green">
         <strong>Why does each currency have a different number of observations?</strong> The 8 G8 majors are each measured against all 7 of their peers, since every major-to-major cross is liquid enough to track live. NOK and SEK currently have only USD and EUR crosses in the live pair set, so their score is a 2-pair average rather than a 7-pair one — still directionally meaningful, but noisier and more exposed to a single pair's idiosyncratic move than the majors' readings.
       </div>
@@ -938,7 +938,7 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="sidebar">
       <h2>Left Sidebar</h2>
       <h3>FX Liquidity</h3>
-      <p>A canvas-drawn chart showing estimated FX market liquidity across the 24-hour trading day. The curve peaks at London–New York overlap (~13:00–17:00 UTC), which historically accounts for the highest volume and tightest spreads. A vertical orange line marks the current UTC time — everything to its left is scaled to today's actual volatility; everything to its right is a historical projection. A small source label below the legend shows the active data source (<code style="font-family:var(--font-mono);font-size:11px;">yfinance · H-L range proxy · 30d avg</code> when live data is available, <code style="font-family:var(--font-mono);font-size:11px;">Historical avg · fixed reference</code> as fallback). See the dedicated <a href="guide-fx-liquidity.html" style="color:var(--blue);">FX Liquidity &amp; Sessions guide</a> for a full explanation.</p>
+      <p>A canvas-drawn chart showing estimated FX market liquidity across the 24-hour trading day. The curve peaks at London–New York overlap (~13:00–17:00 UTC), which historically accounts for the highest volume and tightest spreads. A vertical orange line marks the current UTC time — everything to its left is scaled to today's actual volatility; everything to its right is a historical projection. A small source label below the legend shows the active data source (<code style="font-family:var(--font-mono);font-size:11px;">Delayed ~5min · H-L range proxy · 30d avg</code> when live data is available, <code style="font-family:var(--font-mono);font-size:11px;">Historical avg · fixed reference</code> as fallback). See the dedicated <a href="guide-fx-liquidity.html" style="color:var(--blue);">FX Liquidity &amp; Sessions guide</a> for a full explanation.</p>
       <!-- MOCK: Liquidity chart -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:300px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
@@ -1054,11 +1054,11 @@ a { color: inherit; text-decoration: none; }
       </div>
       <p style="font-size:12px;color:var(--text2);margin:4px 0 16px;">The right column shows <strong>real carry</strong> (nominal OIS spread minus inflation differential) — the primary ranking value. The middle column shows the <strong>nominal OIS spread</strong> as reference context. Color coding: <span style="color:var(--up);">green</span> = real carry &ge;+0.5% (positive after inflation), neutral = 0%&ndash;0.5%, <span style="color:var(--text3);">dim</span> = negative real carry (inflation erodes nominal spread). Note: this is inflation-adjusted carry, not Covered Interest Parity (CIP) — no FX forward adjustment is applied.</p>
       <h3>Upcoming Events</h3>
-      <p>A native Economic Calendar panel embedded in the left sidebar, showing G10 medium- and high-impact events. The primary source is <strong>ForexFactory</strong> (fetched server-side every ~6 hours); the fallback is Finnhub. Columns: local time (your browser timezone), currency flag, impact dot (red = high, orange = medium), event name, actual result with beat/miss coloring, consensus forecast, and previous reading. The source label reflects the active feed (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">ForexFactory · actual vs consensus · 90d rolling</span>). The panel auto-scrolls to today or the next upcoming event on load. A floating pill button appears when upcoming events are off-screen, with an adaptive arrow pointing toward them.</p>
+      <p>A native Economic Calendar panel embedded in the left sidebar, showing G10 medium- and high-impact events. The primary source is <strong>ForexFactory</strong> (fetched server-side every ~6 hours), with automatic fallback to alternative calendar feeds. Columns: local time (your browser timezone), currency flag, impact dot (red = high, orange = medium), event name, actual result with beat/miss coloring, consensus forecast, and previous reading. The source label reflects the active feed (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">ForexFactory · actual vs consensus · 90d rolling</span>). The panel auto-scrolls to today or the next upcoming event on load. A floating pill button appears when upcoming events are off-screen, with an adaptive arrow pointing toward them.</p>
       <p>On <strong>bank holidays</strong>, one or more dedicated holiday rows appear at the top of the affected day — one row per market closure. Each row shows the currency flag, 3-letter code (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">🇺🇸 USD</span>), the holiday title (e.g. "Memorial Day"), and "All Day" in the time column. A tooltip on hover shows the full label: "<em>Memorial Day — USD market closed</em>". This makes it immediately visible why quotes for Gold, SPX, WTI, and USD pairs may be frozen on those days.</p>
 
       <h3 id="econ-surprises">Economic Surprises</h3>
-      <p>A CESI-style (Citi Economic Surprise Index) centred bar chart showing whether each major currency&#8217;s macro data is beating or missing consensus forecasts over a rolling 90-day window. The panel scores medium- and high-impact ForexFactory/Finnhub releases only &#8212; low-impact events and non-macro noise (auctions, inventory data, financial flows) are excluded to match the methodology of institutional surprise indices.</p>
+      <p>A CESI-style (Citi Economic Surprise Index) centred bar chart showing whether each major currency&#8217;s macro data is beating or missing consensus forecasts over a rolling 90-day window. The panel scores medium- and high-impact ForexFactory releases only &#8212; low-impact events and non-macro noise (auctions, inventory data, financial flows) are excluded to match the methodology of institutional surprise indices.</p>
       <p>The bar is centred at zero: a green bar extending right means data is beating consensus on net; a red bar extending left means data is missing. The N column shows how many events with actuals are in the current window &#8212; entries with fewer than 15 events are dimmed to flag low statistical confidence.</p>
 
       <!-- MOCK: Economic Surprises panel -->
@@ -1116,12 +1116,12 @@ a { color: inherit; text-decoration: none; }
             </tr>
           </tbody>
         </table>
-        <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">ForexFactory &middot; Finnhub &middot; actual vs consensus &middot; 90d rolling</div>
+        <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">ForexFactory &middot; actual vs consensus &middot; 90d rolling</div>
       </div>
 
       <p>How to read the index: an event where actual exceeds consensus counts as a beat (+1), below consensus as a miss (&#8722;1), equal as in-line (0). Index = (beats &#8722; misses) / total scored &times; 100, ranging from &#8722;100 (all misses) to +100 (all beats). This is the same beat/miss approach used as the basis of institutional economic surprise indices (Citi CESI and equivalents) before they apply their proprietary weighting. As 12&#8211;24 months of history accumulate, the panel upgrades each event to a z-score (actual &#8722; forecast relative to historical standard deviation), providing a magnitude-weighted signal that matches the full institutional index methodology.</p>
       <p>Hover any row for a detailed breakdown: beat count, miss count, in-line count, beat rate, and current index value.</p>
-      <p><strong>Attribution:</strong> <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">ForexFactory &middot; Finnhub &middot; actual vs consensus &middot; 90d rolling</span></p>
+      <p><strong>Attribution:</strong> <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">ForexFactory &middot; actual vs consensus &middot; 90d rolling</span></p>
     </div>
 
     <div class="guide-section" id="pair-detail">
@@ -1281,7 +1281,7 @@ a { color: inherit; text-decoration: none; }
             <tr><td style="padding:3px 6px;color:var(--text);">Gold</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">DXY</td><td style="padding:3px 6px;color:var(--down);text-align:center;font-weight:700;">−0.51</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
           </tbody>
         </table>
-        <div style="padding:2px 6px 5px;font-size:9px;color:var(--text3);">Rolling Pearson · 30d / 60d / 90d · yfinance · vs norm = z-score vs 252d</div>
+        <div style="padding:2px 6px 5px;font-size:9px;color:var(--text3);">Rolling Pearson · 30d / 60d / 90d · daily OHLC · vs norm = z-score vs 252d</div>
       </div>
 
       <h3>CB Rate Expectations</h3>
@@ -1337,14 +1337,14 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="news-feed">
       <h2>News Feed</h2>
-      <p>The <strong>News</strong> tab in the topbar (keyboard shortcut: <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">N</kbd>) opens the dedicated News Feed panel, replacing the main content area — the same pattern as the Derivatives section. It shows FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Norges Bank, Riksbank, Federal Reserve, Finnhub, NewsData.io, Marc to Market and others, sorted by estimated market impact. The feed refreshes hourly; the terminal re-checks for new data every 2 minutes using HTTP ETags — no bandwidth cost when there are no changes.</p>
+      <p>The <strong>News</strong> tab in the topbar (keyboard shortcut: <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">N</kbd>) opens the dedicated News Feed panel, replacing the main content area — the same pattern as the Derivatives section. It shows FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Norges Bank, Riksbank, Federal Reserve, NewsData.io, Marc to Market and others, sorted by estimated market impact. The feed refreshes hourly; the terminal re-checks for new data every 2 minutes using HTTP ETags — no bandwidth cost when there are no changes.</p>
       <!-- MOCK: News Feed panel — matches production single-row accordion layout -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:700px;">
         <!-- Panel header -->
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
           <div style="display:flex;align-items:center;gap:10px;">
             <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">News Feed</span>
-            <span style="font-size:9px;color:var(--text3);">Finnhub · RSS · sorted by impact</span>
+            <span style="font-size:9px;color:var(--text3);">FX-relevant · sorted by impact</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:9px;color:var(--text3);">52 stories</span>
@@ -1542,7 +1542,7 @@ a { color: inherit; text-decoration: none; }
 
     <h3>ECB Reference Exchange Rates</h3>
     <p>The ECB publishes official daily reference exchange rates for all major currency pairs against EUR, typically around 16:00 CET. This panel shows the official fixing for seven EUR-base pairs (EUR/USD, EUR/GBP, EUR/JPY, EUR/CHF, EUR/AUD, EUR/CAD, EUR/NZD) alongside the previous day's fix, the day-over-day change, and the offset between the current spot rate and the official fixing.</p>
-    <p>The ECB fixing is the industry standard reference rate used in FX contracts, derivative valuations, and regulatory reporting. It differs from interbank mid prices — use the <strong>vs Spot</strong> column to see how far the live market has moved from the official reference. Data is sourced from the ECB Frankfurter API cache, updated daily after ~16:00 CET (T+1 settlement basis).</p>
+    <p>The ECB fixing is the industry standard reference rate used in FX contracts, derivative valuations, and regulatory reporting. It differs from interbank mid prices — use the <strong>vs Spot</strong> column to see how far the live market has moved from the official reference. Data is sourced from the ECB reference rate cache, updated daily after ~16:00 CET (T+1 settlement basis).</p>
 
     <h3>FX OTC Notional Volume — DTCC GTR</h3>
     <p>Shows aggregated FX OTC notional volume from the <strong>DTCC Global Trade Repository</strong>, the largest trade repository for OTC derivatives in the US under Dodd-Frank reporting obligations. Data is the public CFTC Recast dissemination — T+1 (published by ~13:00 UTC the following business day), covering new trades only (ACTION = NEWT). Amendments, terminations, and lifecycle events are excluded to avoid double-counting.</p>
