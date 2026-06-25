@@ -1,0 +1,295 @@
+name: Update ForexFactory Calendar
+
+# TWO-TIER TRIGGER ARCHITECTURE (v5.0)
+#
+# TIER 1 — Cloudflare Worker (primary, ~2–3 min latency):
+#   cf-worker/calendar-watcher.js polls ForexFactory public JSON every 6 minutes.
+#   When actuals/forecasts change it fires a repository_dispatch event
+#   (event_type: "calendar-data-changed") which triggers this workflow
+#   immediately — bypassing the 5-min GitHub cron minimum entirely.
+#   Setup: see cf-worker/README.md
+#
+# TIER 2 — GitHub Actions cron (fallback, ~5–15 min latency):
+#   If the CF Worker is down or misconfigured, the 5-min cron and
+#   off-peak sparse crons below ensure data still updates within 15 min.
+#   The bash time-gate stops the dense cron from running Python outside
+#   release windows, keeping runner minutes efficient.
+#
+# END-TO-END LATENCY:
+#   Normal (CF Worker active):   ~2–3 min
+#   Fallback (cron only):        ~5–15 min during windows; ~30 min off-peak
+#   Bloomberg Terminal:          <1 sec (paid proprietary feed — not achievable
+#                                with free REST APIs regardless of architecture)
+#
+# KEY DESIGN: smart commit — the Python script compares new actuals/forecasts
+# against the previous ff_calendar.json and writes a /tmp/cal_changed flag.
+# The commit step only runs when the flag is "1", so git history stays clean.
+#
+# RELEASE WINDOWS for cron time-gate:
+#   Asia/NZ:   22:00–02:30 UTC  (JPY, AUD, NZD data — AUD/NZD releases from 22:30 UTC)
+#   EU/UK:     05:30–10:00 UTC  (EUR, GBP, CHF data)
+#   US:        12:00–15:30 UTC  (USD data — NFP, CPI, PCE all at 12:30 UTC)
+#
+# GITHUB ACTIONS LIMITS:
+#   - Minimum cron interval: 5 minutes (*/5 * * * *)
+#   - Runner queue: adds 0–15 min delay, especially 12:00–14:00 UTC
+#   - Public repos: unlimited Actions minutes
+#   - Scheduled workflows disabled after 60 days of repo inactivity
+#
+# v5.1 (2026-05-27): Extended Asia/NZ window from 23:00 → 22:00 UTC to cover AUD/NZD releases
+#   at 22:30 UTC (08:30 AEST / 10:30 NZST). Added sparse crons at 20:30–22:30 UTC.
+# v5.0 (2026-05-23): Added repository_dispatch trigger (CF Worker integration).
+# v4.0 (2026-05-23): 5-min polling + time-gate + smart commit.
+
+on:
+  repository_dispatch:
+    types: [calendar-data-changed]
+  schedule:
+    # ── Every 5 minutes (GitHub minimum) — time gate in bash filters to windows ──
+    - cron: '*/5 * * * *'
+    # ── Off-peak sparse runs — 30-min interval, no gate needed ──
+    # 02:30–05:30 UTC window (between Asia close and EU open)
+    - cron: '30 2 * * *'
+    - cron: '0 3 * * *'
+    - cron: '30 3 * * *'
+    - cron: '0 4 * * *'
+    - cron: '30 4 * * *'
+    - cron: '0 5 * * *'
+    # 10:00–12:00 UTC window (between EU close and US open)
+    - cron: '0 10 * * *'
+    - cron: '30 10 * * *'
+    - cron: '0 11 * * *'
+    - cron: '30 11 * * *'
+    # 15:30–23:00 UTC window (US afternoon through Asia pre-open)
+    - cron: '30 15 * * *'
+    - cron: '0 16 * * *'
+    - cron: '30 16 * * *'
+    - cron: '0 17 * * *'
+    - cron: '30 17 * * *'
+    - cron: '0 18 * * *'
+    - cron: '30 18 * * *'
+    - cron: '0 19 * * *'
+    - cron: '30 19 * * *'
+    - cron: '0 20 * * *'
+    - cron: '30 20 * * *'
+    - cron: '0 21 * * *'
+    - cron: '30 21 * * *'
+    - cron: '0 22 * * *'
+    - cron: '30 22 * * *'
+    # (22:30 covered by */5 which now falls inside the Asia/NZ window starting at 22:00)
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
+concurrency:
+  group: update-ff-calendar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write   # required for repository_dispatch to trigger update-rates.yml
+
+jobs:
+  update-ff-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v4
+
+      - name: Checkout private scripts
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting-scripts
+          token: ${{ secrets.SCRIPTS_PAT }}
+          path: private-scripts
+
+
+      - name: Time-window gate (release windows only for */5 runs)
+        id: gate
+        run: |
+          # repository_dispatch (from CF Worker) always proceeds — no gate needed.
+          # The CF Worker already verified data changed before firing the dispatch.
+          EVENT="${{ github.event_name }}"
+          if [ "$EVENT" = "repository_dispatch" ]; then
+            DESC="${{ github.event.client_payload.description }}"
+            SRC="${{ github.event.client_payload.source }}"
+            echo "Triggered by repository_dispatch (${SRC}): ${DESC}"
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Only apply the gate to the */5 cron — off-peak sparse crons always proceed.
+          HOUR=$(date -u +%H)
+          MIN=$(date -u +%M)
+          echo "Current UTC time: ${HOUR}:${MIN} (cron trigger)"
+
+          # Off-peak sparse cron: minute is not a multiple of 5 → always run
+          if [ $(( 10#$MIN % 5 )) -ne 0 ]; then
+            echo "Sparse off-peak cron — proceeding unconditionally."
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Dense */5 cron: check if we're in a release window
+          HOUR_INT=$(( 10#$HOUR ))
+          # Asia/NZ window: 22:00–02:30 UTC (AUD/NZD releases from 22:30 UTC; was 23:00 — v5.1 fix)
+          if [ $HOUR_INT -ge 22 ] || [ $HOUR_INT -lt 2 ] || \
+             ( [ $HOUR_INT -eq 2 ] && [ $(( 10#$MIN )) -lt 30 ] ); then
+            echo "In Asia/NZ release window (22:00–02:30 UTC) — proceeding."
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          # EU/UK window: 05:30–10:00 UTC
+          if ( [ $HOUR_INT -eq 5 ] && [ $(( 10#$MIN )) -ge 30 ] ) || \
+             ( [ $HOUR_INT -ge 6 ] && [ $HOUR_INT -lt 10 ] ); then
+            echo "In EU/UK release window (05:30–10:00 UTC) — proceeding."
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          # US window: 12:00–15:30 UTC
+          if [ $HOUR_INT -ge 12 ] && \
+             ( [ $HOUR_INT -lt 15 ] || ( [ $HOUR_INT -eq 15 ] && [ $(( 10#$MIN )) -le 30 ] ) ); then
+            echo "In US release window (12:00–15:30 UTC) — proceeding."
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Off-peak hour — skipping fetch (not in any release window)."
+          echo "run=false" >> $GITHUB_OUTPUT
+
+      - name: Setup Python
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: pip install requests --break-system-packages
+
+      - name: Fetch economic calendar (ForexFactory)
+        if: steps.gate.outputs.run == 'true'
+        env:
+          CF_PAYLOAD_TOKEN: ${{ secrets.CF_PAYLOAD_TOKEN }}
+        run: python3 private-scripts/fetch_ff_calendar.py
+
+      - name: Display summary
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          echo ""
+          echo "========================================"
+          echo "    ECONOMIC CALENDAR FETCH SUMMARY"
+          echo "========================================"
+          CHANGED=$(cat /tmp/cal_changed 2>/dev/null || echo "0")
+          echo "  Changed flag: ${CHANGED}"
+          if [ -f "calendar-data/ff_calendar.json" ]; then
+            python3 -c "
+          import json
+          from datetime import datetime, timezone
+          with open('calendar-data/ff_calendar.json') as f:
+              cal = json.load(f)
+          events = cal.get('events', [])
+          today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+          released_all = [e for e in events if e.get('released')]
+          today_evs = [e for e in events if e['dateISO'] == today]
+          released_today = [e for e in today_evs if e.get('released')]
+          high_today = [e for e in today_evs if e['impact'] == 'high']
+          print(f'  Source: {cal.get(\"source\",\"?\")}')
+          print(f'  Total events: {len(events)} | with actuals: {len(released_all)}')
+          print(f'  Today ({today}): {len(today_evs)} events | {len(released_today)} released')
+          for e in high_today:
+              status = e.get('actual') or 'pending'
+              print(f'    {e[\"timeUTC\"]} [{e[\"currency\"]}] {e[\"title\"]} | actual={status} est={e.get(\"forecast\",\"—\")}')
+          "
+          fi
+
+      - name: Commit and push (only if actuals/forecasts changed)
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          CHANGED=$(cat /tmp/cal_changed 2>/dev/null || echo "0")
+          if [ "${CHANGED}" != "1" ]; then
+            echo "No new actuals or forecasts — skipping commit."
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp calendar-data/ff_calendar.json /tmp/ff_calendar_fresh.json
+          SOURCE=$(python3 -c "import json; print(json.load(open('/tmp/ff_calendar_fresh.json')).get('source','?'))" 2>/dev/null || echo "?")
+          RELEASED=$(python3 -c "import json; c=json.load(open('/tmp/ff_calendar_fresh.json')); print(sum(1 for e in c['events'] if e.get('released')))" 2>/dev/null || echo "?")
+          HIGH=$(python3 -c "import json; c=json.load(open('/tmp/ff_calendar_fresh.json')); print(sum(1 for e in c['events'] if e['impact']=='high'))" 2>/dev/null || echo "?")
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/ff_calendar_fresh.json calendar-data/ff_calendar.json
+            git add calendar-data/ff_calendar.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit (race condition resolved)."
+              exit 0
+            fi
+            git commit -m "Calendar ${TIMESTAMP} [${SOURCE}] — ${HIGH} high-impact, ${RELEASED} with actuals"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data refreshes on next scheduled run."
+          exit 0
+
+      - name: Dispatch cb-rate-decision if interest rate actual detected
+        # v5.2: When ff_calendar.json is updated with a released high-impact
+        # Interest Rate Decision actual, immediately trigger update-rates.yml
+        # via repository_dispatch so rates/*.json reflects the new rate before
+        # the next narrative run — without waiting for the next scheduled cron.
+        # The update-rates.yml already has `repository_dispatch: types: [cb-rate-decision]`
+        # so no changes are needed there beyond this trigger.
+        # Only fires when cal_changed=1 (i.e. an actual/forecast was written).
+        if: steps.gate.outputs.run == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CHANGED=$(cat /tmp/cal_changed 2>/dev/null || echo "0")
+          if [ "${CHANGED}" != "1" ]; then
+            echo "No calendar changes — skipping rate-decision dispatch check."
+            exit 0
+          fi
+
+          # Check if any newly-written actuals is an Interest Rate Decision.
+          # Uses printf to write the script (avoids YAML heredoc parsing issues).
+          printf '%s\n' \
+            'import json,sys' \
+            'from datetime import datetime,timezone,timedelta' \
+            'cal=json.load(open("calendar-data/ff_calendar.json"))' \
+            'events=cal.get("events",[])' \
+            'today=datetime.now(timezone.utc).date()' \
+            'window=set((today-timedelta(days=d)).strftime("%Y-%m-%d") for d in range(3))' \
+            'kw=["interest rate decision","interest rate","rate decision","monetary policy decision","policy rate","cash rate"]' \
+            'hits=[ev["currency"]+":"+ev["actual"].strip() for ev in events if ev.get("released") and ev.get("dateISO") in window and ev.get("impact")=="high" and ev.get("actual","").strip() and any(k in (ev.get("title") or "").lower() for k in kw)]' \
+            'print(",".join(hits) if hits else "")' \
+            > /tmp/check_rate_dec.py
+          RATE_DEC=$(python3 /tmp/check_rate_dec.py 2>/dev/null || echo "")
+
+          if [ -z "${RATE_DEC}" ]; then
+            echo "No Interest Rate Decision actuals detected — skipping dispatch."
+            exit 0
+          fi
+
+          echo "Interest Rate Decision actual(s) detected: ${RATE_DEC}"
+          echo "Firing repository_dispatch[cb-rate-decision] → update-rates.yml"
+
+          curl -s -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/dispatches" \
+            -d "{\"event_type\":\"cb-rate-decision\",\"client_payload\":{\"currencies\":\"${RATE_DEC}\",\"source\":\"ff-calendar\",\"date\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}}"
+
+          echo "✅ Dispatch sent — update-rates.yml will start shortly."

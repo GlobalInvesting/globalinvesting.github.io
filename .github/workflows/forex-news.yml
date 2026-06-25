@@ -1,0 +1,118 @@
+name: Fetch Forex News
+on:
+  schedule:
+    # ── Fast runs: every 10 min — RSS + Finnhub only (no NewsData quota consumed) ──
+    # GitHub Actions public repo: unlimited minutes. Runtime ~60-90s per run.
+    # 10-min interval reduces worst-case breaking-news lag from ~60 min to ~10 min.
+    # FXStreet/ForexLive/CB feeds post breaking news anytime; this catches it within
+    # one poll cycle. NEWS_MODE=fast skips NewsData entirely (quota preservation).
+    - cron: '0,10,20,30,40,50 * * * *'   # every 10 min — NEWS_MODE=fast
+
+    # ── Full run: once per hour at :05 UTC — RSS + Finnhub + NewsData ──────────
+    # Staggered 5 min from update-fx-liquidity (:00) to avoid runner queue collision.
+    # NewsData free plan: 200 req/day. 8 queries × 24 runs = 192/day — within limit.
+    - cron: '5 * * * *'                   # hourly at :05 — NEWS_MODE=full
+
+  workflow_dispatch:
+    inputs:
+      news_mode:
+        description: 'NEWS_MODE override: fast (RSS+Finnhub only) or full (all sources incl. NewsData)'
+        required: false
+        default: 'full'
+
+# Runs in the PUBLIC repo → minutos ilimitados (sin consumo de cuota privada).
+# Scripts movidos desde el engine privado en auditoría 2026-03-31.
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
+concurrency:
+  group: forex-news
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v4
+
+      - name: Checkout private scripts
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting-scripts
+          token: ${{ secrets.SCRIPTS_PAT }}
+          path: private-scripts
+
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install feedparser==6.0.11 requests==2.32.3 python-dateutil==2.9.0.post0 --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p news-data
+
+      - name: Set NEWS_MODE
+        id: news_mode
+        run: |
+          # v5.18: Determine NEWS_MODE for this run.
+          # workflow_dispatch: use the input value (default 'full').
+          # Scheduled: 'full' only at :05 (hourly cron). All other minutes → 'fast'.
+          # This lets one job definition serve both schedules without duplication.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            MODE="${{ inputs.news_mode }}"
+            MODE="${MODE:-full}"
+          else
+            MINUTE=$(date -u +%M)
+            if [ "$MINUTE" = "05" ]; then
+              MODE="full"
+            else
+              MODE="fast"
+            fi
+          fi
+          echo "mode=$MODE" >> $GITHUB_OUTPUT
+          echo "NEWS_MODE=$MODE"
+
+      - name: Fetch news from RSS feeds
+        env:
+          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          NEWS_MODE: ${{ steps.news_mode.outputs.mode }}
+        run: python3 private-scripts/fetch_news.py
+
+      - name: Commit updated news data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp news-data/news.json /tmp/news_fresh.json
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/news_fresh.json news-data/news.json
+            git add news-data/news.json
+            if git diff --staged --quiet; then
+              echo "Sin cambios vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "chore: fetch news [${TIMESTAMP}]"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rechazado (intento $i) — reintentando en $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0
