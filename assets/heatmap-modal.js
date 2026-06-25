@@ -553,7 +553,7 @@
       <div id="hm-title-row">
         <div id="hm-title"></div>
       </div>
-      <div id="hm-sub">G10 composite · 32 pairs · yfinance · ~5min delay</div>
+      <div id="hm-sub">G10 composite · 32 pairs · Delayed ~5min</div>
     </div>
     <button id="hm-close" aria-label="Close" title="Close">&#10005;</button>
   </div>
@@ -672,7 +672,7 @@
     </div>
   </div>
   <div id="hm-footer">
-    <div id="hm-footer-meta">yfinance · ~5min delay · G10 composite · 32 pairs</div>
+    <div id="hm-footer-meta">Delayed ~5min · G10 composite · 32 pairs</div>
   </div>
 </div>`;
     document.body.appendChild(el);
@@ -1639,7 +1639,7 @@
       }).join('') +
       '</tbody></table>' +
       '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
-      'ohlc-data · yfinance · 32-pair G10 composite CSI · Accum. Return = total from period start · Drawdown/Peak = lowest/highest CSI value within period</div>';
+      'Daily OHLC history · 32-pair G10 composite CSI · Accum. Return = total from period start · Drawdown/Peak = lowest/highest CSI value within period</div>';
   }
 
   async function populateCSI(ccy) {
@@ -1787,11 +1787,11 @@
       ? Object.values(window.STOOQ_RT_CACHE).some(e => e?.fromFinnhub)
       : false;
     const srcLabel = hasFh
-      ? 'Finnhub \u00b7 live \u00b7 G10 composite \u00b7 32 pairs'
-      : 'G10 composite \u00b7 32 pairs \u00b7 yfinance \u00b7 ~5min delay';
+      ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
+      : 'G10 composite \u00b7 32 pairs \u00b7 Delayed ~5min';
     const footerLabel = hasFh
-      ? 'Finnhub \u00b7 live \u00b7 G10 composite \u00b7 32 pairs'
-      : 'yfinance \u00b7 ~5min delay \u00b7 G10 composite \u00b7 32 pairs';
+      ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
+      : 'Delayed ~5min \u00b7 G10 composite \u00b7 32 pairs';
     const subEl    = document.getElementById('hm-sub');
     const footerEl = document.getElementById('hm-footer-meta');
     if (subEl)    subEl.textContent    = srcLabel;

@@ -664,8 +664,8 @@ function populateHeatmap() {
   const _hmSubEl = document.getElementById('hm-panel-sub');
   if (_hmSubEl) {
     _hmSubEl.textContent = _hasFhHm
-      ? 'Finnhub \u00b7 live \u00b7 G10 composite \u00b7 32 pairs'
-      : 'yfinance \u00b7 ~5min delay \u00b7 G10 composite \u00b7 32 pairs';
+      ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
+      : 'Delayed ~5min \u00b7 G10 composite \u00b7 32 pairs';
   }
 
   // ── Live-refresh open modal — if the heatmap modal is currently open, push ──
@@ -1352,7 +1352,7 @@ async function fetchQuoteBarRT() {
     const hh = now.getHours().toString().padStart(2,'0');
     const mm = now.getMinutes().toString().padStart(2,'0');
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-    const srcLabel = 'yfinance';  // sole source
+    const srcLabel = 'Delayed ~5min';  // sole source
     const qbLabel = document.getElementById('qb-source-label');
     if (qbLabel) qbLabel.textContent = `${srcLabel} · ${hh}:${mm} ${tzAbbr}`;
   }
@@ -1484,17 +1484,17 @@ function updateFxPairsTableRT() {
     const _rtWeekend = _rtDay === 6 || (_rtDay === 0 && _rtH < 21) || (_rtDay === 5 && _rtH >= 21);
     const _hasFinnhub = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
     upd.textContent = _rtWeekend
-      ? `yfinance · Last close: Fri · ~5min delay`
+      ? `Last close: Fri · delayed`
       : _hasFinnhub
-        ? `Finnhub · live`
-        : `yfinance · ${hh}:${mm} ${tzAbbr} · ~5min delay`;
+        ? `Live`
+        : `${hh}:${mm} ${tzAbbr} · delayed ~5min`;
   }
 
   // Update Price Chart panel-sub label to match active source
   const _chartSub = document.querySelector('#section-fxpairs .panel-sub');
   if (_chartSub && _chartSub.textContent !== 'TradingView \u00b7 live data') {
     const _hasFh = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
-    _chartSub.textContent = _hasFh ? 'Finnhub \u00b7 live' : `yfinance \u00b7 ~5min delay`;
+    _chartSub.textContent = _hasFh ? 'Live' : `Delayed ~5min`;
   }
 
   // ── Pair detail live refresh ───────────────────────────────────────────────
@@ -1903,13 +1903,13 @@ function renderSentiment(pairs, sourceLabel, general) {
 
   const isCOT = sourceLabel && sourceLabel.includes('COT');
   const isHistorical = sourceLabel && sourceLabel.includes('Historical');
-  const isDukascopy = sourceLabel && sourceLabel.includes('Dukascopy');
+  const isAltFeed = sourceLabel && sourceLabel.includes('Retail \u00b7 live');
   const subEl = document.getElementById('sent-source-sub');
   if (subEl) {
     const _sentTime = lh + ':' + lm + ' ' + tzAbbr2;
     if (isCOT) subEl.textContent = `CFTC COT · speculative positioning · loaded ${_sentTime}`;
     else if (isHistorical) subEl.textContent = `Static fallback · live feeds unavailable · loaded ${_sentTime}`;
-    else if (isDukascopy) subEl.textContent = `Dukascopy · retail positioning · updated ${_sentTime}`;
+    else if (isAltFeed) subEl.textContent = `Retail positioning · live · updated ${_sentTime}`;
     else subEl.textContent = `Myfxbook · retail positioning · updated ${_sentTime}`;
   }
 }
@@ -1977,7 +1977,7 @@ async function fetchSentiment() {
           buy:  Math.round(d.longVolume || d.buy || 50),
           sell: Math.round(d.shortVolume || d.sell || 50),
         })).filter(d=>d.sym);
-        if (mapped.length) { renderSentiment(mapped, 'Dukascopy live'); return; }
+        if (mapped.length) { renderSentiment(mapped, 'Retail \u00b7 live'); return; }
       }
     }
   } catch {}
@@ -2551,7 +2551,7 @@ async function renderRiskData(byId) {
     const now = new Date();
     const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-    const yieldSrc = (byId.us2y && !byId.us2y.fromRepo) ? 'yfinance ~5min delay' : 'FRED DGS2 · daily batch';
+    const yieldSrc = (byId.us2y && !byId.us2y.fromRepo) ? 'Live ~5min delay' : 'FRED DGS2 · daily batch';
     yieldSub.textContent = 'Nominal yields · ' + yieldSrc + ' · updated ' + hhmm + ' ' + tzAbbr;
   }
 
@@ -2629,7 +2629,7 @@ async function renderRiskData(byId) {
     const now = new Date();
     const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-    riskSub.textContent = 'VIX · MOVE · HV30 · yfinance ~5min delay · updated ' + hhmm + ' ' + tzAbbr;
+    riskSub.textContent = 'VIX · MOVE · HV30 · ~5min delay · updated ' + hhmm + ' ' + tzAbbr;
   }
 
   // ── VaR/CVaR panel ───────────────────────────────────────────────────
@@ -5487,7 +5487,7 @@ async function _renderLWChart(ohlcId, label) {
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
   if (panelSub) {
     const _hasFinnhubLive = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
-    panelSub.textContent = _hasFinnhubLive ? 'Finnhub \u00b7 live' : 'yfinance \u00b7 ~5min delay';
+    panelSub.textContent = _hasFinnhubLive ? 'Live' : 'Delayed ~5min';
   }
 
   // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
@@ -7366,18 +7366,14 @@ async function fetchCrossAssetData() {
   const now = new Date();
   const localHHMM = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
   const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-  // Show the actual source — intraday JSON (yfinance) when fresh, Stooq otherwise
-  let sourceLabel = 'yfinance';
+  // Show the actual freshness state — live intraday feed when fresh, repo snapshot otherwise
+  let sourceLabel = 'Delayed';
   if (_caIntraday?.source && _caIntraday.source !== 'repo') {
-    const srcName = _caIntraday.source === 'yfinance'      ? 'yfinance'
-                  : _caIntraday.source === 'twelve_data'   ? 'Twelve Data'
-                  : _caIntraday.source === 'alpha_vantage' ? 'Alpha Vantage'
-                  : 'mixed APIs';
     // Check if the file is fresh (under 8 min old — 5 min interval + 3 min margin)
     const fileAge = _caIntraday.updated
       ? (Date.now() - new Date(_caIntraday.updated).getTime()) / 60000
       : 999;
-    sourceLabel = fileAge < 8 ? `${srcName} · ~5min delay` : 'yfinance';
+    sourceLabel = fileAge < 8 ? `Live · ~5min delay` : 'Delayed';
   }
   if (upd) upd.textContent = sourceLabel + ' · ' + localHHMM + ' ' + tzAbbr;
 
@@ -8449,7 +8445,7 @@ async function fetchLiquidityData() {
     });
 
     _liqData   = _liqTo48(today24);
-    _liqSource = d.fallback ? 'Historical avg · fixed reference' : 'yfinance · H-L range proxy · 30d avg';
+    _liqSource = d.fallback ? 'Historical avg · fixed reference' : 'H-L range proxy · 30d avg';
     return;
   } catch(e) {
     // fall through to legacy fallback
@@ -11403,13 +11399,13 @@ async function renderEconSurprises() {
     if (!srcEl) return;
     const windowSuffix = widenedCcys.size > 0 ? '90d/180d rolling' : '90d rolling';
     if (calSource === 'Finnhub' || calSource.startsWith('Finnhub')) {
-      srcEl.textContent = `Finnhub · actual vs consensus · G10 · ${windowSuffix}`;
+      srcEl.textContent = `Economic calendar · actual vs consensus · G10 · ${windowSuffix}`;
     } else if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
       srcEl.textContent = `investing.com · actual vs consensus · ${windowSuffix}`;
     } else if (calSource === 'ForexFactory') {
       srcEl.textContent = `ForexFactory · actual vs consensus · ${windowSuffix}`;
     } else if (calSource && calSource.includes('ForexFactory')) {
-      srcEl.textContent = `FRED + Finnhub + ForexFactory · actual vs consensus · G10 · ${windowSuffix}`;
+      srcEl.textContent = `FRED + ForexFactory · actual vs consensus · G10 · ${windowSuffix}`;
     } else if (calSource) {
       srcEl.textContent = `${calSource} · actual vs consensus · ${windowSuffix}`;
     } else {
