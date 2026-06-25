@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-25T12:00:25Z",
-  "generatedAt": "2026-06-25T12:00:25Z",
+  "lastUpdate": "2026-06-25T15:57:39Z",
+  "generatedAt": "2026-06-25T15:57:39Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-25",
   "rangeTo": "2026-06-25",
-  "totalEvents": 1880,
+  "totalEvents": 1883,
   "currencyCounts": {
     "CHF": 88,
     "AUD": 169,
@@ -18,14 +18,14 @@
     "GBP": 187,
     "JPY": 184,
     "NZD": 75,
-    "USD": 615,
+    "USD": 618,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
     "low": 357,
     "medium": 1103,
-    "high": 420
+    "high": 423
   },
   "surpriseStats": {
     "GBP/gfk consumer confidence": {
@@ -24663,7 +24663,7 @@
       "flag": "🇺🇸",
       "event": "United States GDP Growth Rate QoQ",
       "impact": "high",
-      "actual": null,
+      "actual": "2.1%",
       "forecast": "1.6%",
       "previous": "0.5%"
     },
@@ -24676,9 +24676,9 @@
       "flag": "🇺🇸",
       "event": "United States Durable Goods Orders ex Defense MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "-4.6%",
       "forecast": "-3.9%",
-      "previous": "8.1%"
+      "previous": "8.4%"
     },
     {
       "date": "25 Jun",
@@ -24689,7 +24689,7 @@
       "flag": "🇺🇸",
       "event": "United States Core PCE Price Index YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "3.4%",
       "forecast": "3.4%",
       "previous": "3.3%"
     },
@@ -24702,9 +24702,9 @@
       "flag": "🇺🇸",
       "event": "United States GDP Price Index QoQ",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.6%",
       "forecast": "3.5%",
-      "previous": "3.6%"
+      "previous": "3.7%"
     },
     {
       "date": "25 Jun",
@@ -24715,9 +24715,9 @@
       "flag": "🇺🇸",
       "event": "United States Durable Goods Orders Ex Transp MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "1.3%",
       "forecast": "0.6%",
-      "previous": "1.1%"
+      "previous": "1.4%"
     },
     {
       "date": "25 Jun",
@@ -24728,7 +24728,7 @@
       "flag": "🇺🇸",
       "event": "United States PCE Price Index YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "4.1%",
       "forecast": "4.1%",
       "previous": "3.8%"
     },
@@ -24741,9 +24741,9 @@
       "flag": "🇺🇸",
       "event": "United States Core PCE Price Index MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "0.3%",
-      "previous": "0.2%"
+      "previous": "0.3%"
     },
     {
       "date": "25 Jun",
@@ -24754,9 +24754,9 @@
       "flag": "🇺🇸",
       "event": "United States Chicago Fed National Activity Index",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.1",
       "forecast": "0.12",
-      "previous": "0.14"
+      "previous": "0.19"
     },
     {
       "date": "25 Jun",
@@ -24767,9 +24767,9 @@
       "flag": "🇺🇸",
       "event": "United States Personal Spending MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.7%",
       "forecast": "0.6%",
-      "previous": "0.5%"
+      "previous": "0.4%"
     },
     {
       "date": "25 Jun",
@@ -24780,7 +24780,7 @@
       "flag": "🇺🇸",
       "event": "United States PCE Price Index MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.4%",
       "forecast": "0.5%",
       "previous": "0.4%"
     },
@@ -24791,9 +24791,48 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "high",
+      "actual": "1821.0K",
+      "forecast": "1800.0K",
+      "previous": "1800.0K"
+    },
+    {
+      "date": "25 Jun",
+      "dateISO": "2026-06-25",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": "215.0K",
+      "forecast": "225.0K",
+      "previous": "227.0K"
+    },
+    {
+      "date": "25 Jun",
+      "dateISO": "2026-06-25",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Jobless Claims 4-week Average",
+      "impact": "high",
+      "actual": "224.25K",
+      "forecast": "226.0K",
+      "previous": "223.5K"
+    },
+    {
+      "date": "25 Jun",
+      "dateISO": "2026-06-25",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
       "event": "United States Personal Income MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.7%",
       "forecast": "0.4%",
       "previous": "0.0%"
     },
@@ -24806,7 +24845,7 @@
       "flag": "🇺🇸",
       "event": "United States Durable Goods Orders MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "-4.5%",
       "forecast": "-4.5%",
       "previous": "7.9%"
     },
