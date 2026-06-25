@@ -698,7 +698,7 @@ a { color: inherit; text-decoration: none; }
       <p>A weekly line chart overlaying LF longs (teal) and LF shorts (red) on the same scale. Where the two lines converge, the position is close to neutral. Where they diverge, the gap represents the absolute size of the net position. Useful for seeing whether a net move is driven by new positions being added or existing positions being unwound.</p>
 
       <h3>Participants tab</h3>
-      <p>A multi-line chart overlaying LF, Asset Manager, and Dealer net positions over the available history. Lines use resolved hex values (LF = <span style="color:#4f7fff;font-weight:700;">#4f7fff</span>, AM = <span style="color:#ff9800;font-weight:700;">#ff9800</span>, DD = <span style="color:#ef5350;font-weight:700;">#ef5350</span>) so they render correctly on all devices. Below the chart, a brief text legend explains each category's typical behavior and how to interpret divergences.</p>
+      <p>A multi-line chart overlaying LF, Asset Manager, and Dealer net positions over the available history. Each series uses a fixed color (LF = <span style="color:#4f7fff;font-weight:700;">blue</span>, AM = <span style="color:#ff9800;font-weight:700;">orange</span>, DD = <span style="color:#ef5350;font-weight:700;">red</span>) so they render consistently on all devices. Below the chart, a brief text legend explains each category's typical behavior and how to interpret divergences.</p>
       <div class="callout">
         <strong>Dealer divergence:</strong> When Dealers are positioned opposite to Leveraged Funds at historical extremes, it is a squeeze risk signal — dealers are absorbing the other side of a crowded LF trade. Watch for rapid reversals when this configuration coincides with a catalyst.
       </div>

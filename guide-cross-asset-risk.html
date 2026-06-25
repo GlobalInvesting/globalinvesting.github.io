@@ -572,7 +572,7 @@ a { color: inherit; text-decoration: none; }
       <p>The two correlation rows at the bottom of the table are regime-diagnostic: <strong>DXY vs SPX 60d</strong> normally runs negative (USD weakens in risk-on environments). When it turns positive, it signals USD funding stress — both USD and equities moving together, which historically precedes sharp risk-off moves. <strong>Gold vs DXY 60d</strong> normally runs negative. When it turns positive, it means both safe havens are rallying simultaneously — typically inflation-driven or geopolitical, rather than the usual USD-strength-suppresses-gold relationship. Hover over any row for a tooltip explaining the signal context.</p>
 
       <h3 id="scoring-model" style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:28px 0 14px;scroll-margin-top:52px;">Stress Scoring Model</h3>
-      <p>The REGIME badge is computed from a composite stress score. Each factor contributes a fixed number of points; the total determines the regime label. This is the same model used in the terminal's <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">fetchRiskData()</code> function — no smoothing, no lag.</p>
+      <p>The REGIME badge is computed from a composite stress score. Each factor contributes a fixed number of points; the total determines the regime label. This is the same model used in the terminal's live regime calculation — no smoothing, no lag.</p>
       <table class="threshold-table" aria-label="Stress scoring factors and point values">
         <thead><tr><th>Factor</th><th>Threshold</th><th style="text-align:center;">Points</th><th>Rationale</th></tr></thead>
         <tbody>
