@@ -195,6 +195,8 @@ function openYCModal(tenorData) {
   (document.getElementById('main') || document.body).appendChild(bd);
   bd.addEventListener('click', e => { if (e.target === bd) closeYCModal(); });
   document.addEventListener('keydown', _ycKeydown);
+  // Scroll modal into view on mobile — same double-rAF pattern as heatmap-modal and cb-rates-modal
+  requestAnimationFrame(() => requestAnimationFrame(() => { bd.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
   requestAnimationFrame(() => _ycDrawChart(labels, todayVals, noPrior ? null : priorVals));
   // Load market commentary non-blocking after chart render (same lazy pattern as CB Rates modal)
   setTimeout(() => _ycLoadPolicySummary(), 100);
