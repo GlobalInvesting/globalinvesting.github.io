@@ -1,79 +1,88 @@
-# Global Investing — FX Terminal
+# Global Investing FX Terminal
 
-A professional-grade foreign exchange monitoring platform for serious market participants. Consolidates live FX prices (tick-by-tick), central bank policy rates, institutional positioning, cross-asset flows, and AI-assisted market narrative into a single unified dashboard.
+Professional-grade foreign exchange intelligence for active traders and macro analysts. Consolidates live FX prices, central bank policy data, institutional positioning, derivatives analytics, and AI-assisted market narrative into a single unified platform — available as a native MetaTrader 5 overlay and a companion web terminal.
 
-**[globalinvesting.github.io](https://globalinvesting.github.io/)**
+**[globalinvesting.github.io](https://globalinvesting.github.io/)** &nbsp;·&nbsp; **[Get Access on MQL5](https://www.mql5.com/en/market/product/180326)**
 
 ![Status](https://img.shields.io/badge/Status-Live-success) ![License](https://img.shields.io/badge/License-Proprietary-red)
 
 ---
 
-## What it covers
+## Platform Access
 
-- **Real-time price feeds** — Major FX pairs, commodities (XAU, WTI), crypto (BTC), DXY, and US 10Y yield
-- **Currency strength heatmap** — 10×10 grid showing major currency performance across all pairs
-- **AI market narrative** — 2–3 sentence regime summary updated 4× daily alongside market signals
-- **CFTC COT positioning** — Leveraged Funds net positioning (Disaggregated TFF, Options+Futures Combined) from CFTC.gov, updated weekly
-- **US Treasury yield curve** — 3M, 2Y, 5Y, 10Y, 30Y, updated daily
-- **Cross-asset risk monitor** — SPX, Gold, WTI, BTC, DXY, Nikkei, Stoxx correlations with stress scoring
-- **Central bank policy rates** — All 10 G10 currencies' CBs with rate cycle direction
-- **CB Rate Expectations** — OIS-derived forward consensus direction (Cut/Hold/Hike) and 30-day CIP forward rate for each central bank at their next meeting; sourced from CME FedWatch, ECB SDW ESTER, BoE SONIA, BoJ TONA, ASX Rate Indicator, BoC CORRA, SNB SARON, RBNZ OCR overnight, and OECD overnight rate references for NOK/SEK
-- **FX liquidity & sessions** — 24-hour liquidity profile with live session indicator
-- **Positioning Bias (retired)** — the standalone ATM IV + COT bias + 25d RR table from earlier versions has been removed. Its components now live in the COT panel (directional bias) and the Derivatives section below (RR term structure, realized vol).
-- **Pair detail panel** — Linked right-panel showing price, 1W change, HV30, ATM IV, IV−HV, LF net, AM net, carry differential, and LF/AM alignment badge for the currently selected chart pair (Eikon-style linked panel). Hover tooltips on every metric cell explain the data source and interpretation.
-- **Configurable price alerts** — Threshold alerts for VIX, EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CHF, USD/CAD, NZD/USD, Gold, WTI, DXY, SPX, BTC, US 10Y, and MOVE. Direction (`>` / `<`) and numeric threshold configurable per alert. Fires browser Notifications API on trigger. Persisted in localStorage across sessions. Checks every 5 minutes.
-- **Panel data export** — CSV and JSON export for FX pairs, COT positioning, yield curve, and carry data; timestamped filenames, downloaded client-side from in-memory caches
-- **Keyboard navigation** — `G`/`C`/`R`/`X`/`M`/`Y`/`K`/`D`/`N` jump to panels; `↑`/`↓` navigate FX table rows and load chart; `?` opens shortcut legend
-- **Per-panel timestamps** — Every data panel displays its source and last update time in the user's local timezone. Panels with AI-generated signals also show when that data was last refreshed.
-- **AI signal evidence traceability** — Each AI-generated market signal carries an `evidence[]` field listing the exact data values that motivated it (e.g. "VIX: 23.9", "Fed rate: 4.50%"). Evidence chips are hidden by default and revealed by clicking the signal row.
-- **Economic calendar** — TradingView embed with real-time event actuals
-- **Economic Surprises** — CESI-style normalised surprise index for all 10 G10 currencies, computed from ForexFactory calendar actual-vs-consensus over a 90-day rolling window. Clicking any currency row opens a full-screen detail modal with: (1) LightweightCharts v5 area series showing the 30-day rolling index history stepped weekly; (2) metrics bar (index, beats, misses, N, beat rate); (3) individual events table with beat / miss / in-line badges for the full 90-day window. Methodology mirrors Citi CESI convention — beat rate scaled to [−100, +100].
-- **News Feed** — Dedicated tab (shortcut: N) with 52 FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Norges Bank, Riksbank, Federal Reserve, RTT News, FT Bonds, Finnhub, NewsData.io, Marc to Market and others. Single-row accordion layout with impact dot, currency tag, relative age indicator, and full-headline tooltip. Filterable by currency (10 G10 currencies) and impact level (High / Med / All). Headlines refresh hourly; the terminal re-checks every 2 minutes via HTTP ETag.
-- **Bank Research** — Dedicated tab (shortcut: B) showing institutional FX research notes from ING Think, Saxo Bank (SaxoStrats), MUFG Research, DailyFX (IG Group), and BIS central banker speeches. Metadata-only: title · bank · date · currency tags · source URL — no content reproduction (copyright compliant). Bank-colour-coded row badges, series labels (FX Daily, FX Weekly, FX Talking), category chips (MACRO / TRADE / TECH / FLOW), and accordion drawer with direct link to the original note. Filterable by bank and by currency. Refreshes every 4 hours. Top 20 recent notes also enrich the daily AI narrative with institutional context.
-- **Market signals** — 4–5 AI-generated signals updated 4× daily
-- **Carry Trade Ranking** — G10 currencies carry-to-vol ranking for all 45 pairs, sorted by nominal rate differential divided by 30-day realised volatility. Clicking any row opens the Real Rate Carry Analysis modal with three tabs: (1) Rates Breakdown — 10 currencies sorted by real rate (nominal CB rate minus inflation expectation), with OIS bias chip and data-age transparency; (2) Real Rate Matrix — 10×10 differential grid color-coded by carry sustainability; (3) Pair Detail — nominal carry, real carry, carry-to-vol on both bases, OIS probability for each leg, and carry sustainability assessment (sustainable / moderate / carry trap). Inflation expectations sourced live from FRED (T5YIE for USD, T5YIFR for EUR) and from batch macro data for remaining currencies. Matches Bloomberg FXFR / FXFC layout convention.
-- **Derivatives section** — Implied forwards (CIP, 1M/3M/6M/1Y), 25-delta Risk Reversal term structure (Saxo Bank), realized vol vs RR skew, ECB official reference exchange rates (daily fixing, 7 EUR pairs), and FX OTC notional volume by pair and product type (DTCC GTR CFTC Recast public dissemination, T+1).
+Access to the Global Investing FX Terminal is granted through the **MT5 Expert Advisor**, available for rent on the MQL5 Marketplace. A single subscription unlocks both the native MT5 overlay and the full web terminal.
+
+| Product | Platform | Link |
+|---|---|---|
+| GI FX Terminal EA | MetaTrader 5 (overlay) + Web Terminal | [MQL5 Market →](https://www.mql5.com/en/market/product/180326) |
+| Institutional Risk Manager | MetaTrader 5 | [MQL5 Market →](https://www.mql5.com/en/market/product/180324) |
+| CSI Currency Strength | MetaTrader 5 | [MQL5 Market →](https://www.mql5.com/en/market/product/180317) |
+| Carry Trade Monitor | MetaTrader 5 | [MQL5 Market →](https://www.mql5.com/en/market/product/180322) |
+
+The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — live broker swap rates, MT5 push alerts, and the full macro intelligence suite without leaving your trading platform. The companion web terminal covers the complete analytical suite from any browser.
 
 ---
 
-## Architecture
+## Coverage
 
-The terminal is a static frontend. All data is delivered as JSON files fetched directly by the browser — no backend server, no API keys exposed to the client. TradingView widgets provide live charting, heatmap, economic calendar, and economic map without requiring any API key.
+**Universe:** USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD · NOK · SEK — the ten G10 currencies, covering the substantial majority of global daily FX turnover.
 
-Data is refreshed on a regular cadence behind the scenes and committed to this repo, so every panel reflects current market conditions without the user needing to do anything.
+### Real-Time Data
+- Tick-by-tick FX prices across major, minor, and G10 cross pairs
+- Currency strength heatmap with per-currency pair breakdown, live carry, COT bias, realized vol, and correlations
+- FX liquidity profile with live session indicator (Sydney · Tokyo · London · New York)
+- Configurable price alerts with browser notifications
+
+### Central Bank Intelligence
+- Policy rates for all 10 G10 central banks with rate cycle direction
+- OIS-derived forward rate expectations (Cut / Hold / Hike consensus) at each CB's next meeting
+- CIP-adjusted 30-day forward rate per currency pair
+
+### Institutional Positioning
+- CFTC Commitments of Traders — Leveraged Funds net positioning (Disaggregated TFF, Options+Futures Combined), updated weekly
+- 52-week positioning history with momentum scoring
+
+### Macro Analytics
+- Economic Surprise Index — CESI-style normalized surprise for all 10 G10 currencies, 90-day rolling window, beat-rate scaled [−100, +100] per Citi convention
+- US Treasury yield curve (3M · 2Y · 5Y · 10Y · 30Y)
+- Cross-asset risk monitor (SPX · Gold · WTI · BTC · DXY · Nikkei · Stoxx) with stress scoring
+- Carry Trade Ranking — G10 carry-to-vol for all 45 pairs with real rate breakdown and sustainability assessment
+
+### Derivatives & Flow
+- 25-delta Risk Reversal term structure (1M · 3M · 6M · 1Y) with skew vs realized vol
+- Implied CIP forwards (1M · 3M · 6M · 1Y)
+- ECB official reference exchange rates (daily fixing, 7 EUR pairs)
+- FX OTC notional volume by pair and product type (DTCC GTR public dissemination, T+1)
+
+### News & Research
+- FX news feed — 50+ headlines refreshed every 10 minutes from major FX newswires, central bank communications, and institutional sources; filterable by currency and impact
+- Bank research — Institutional FX notes from ING, Saxo Bank, MUFG, DailyFX, and BIS; metadata-only with direct links to source publications
+- AI market narrative — 2–3 sentence regime summary updated 4× daily at major FX session transitions, with supporting signal evidence
 
 ---
 
-## Currencies covered
+## Currencies & Instruments
 
-USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD · NOK · SEK — the ten G10 currencies, covering the substantial majority of global daily FX turnover.
+In addition to the 10 G10 FX currencies, the terminal monitors cross-asset context through: XAU/USD (Gold), WTI Crude, BTC/USD, DXY (US Dollar Index), SPX, Nikkei 225, Euro Stoxx 50, and US Treasury yields (3M–30Y).
 
 ---
 
-## Pages
+## Guides
 
-| Page | Description |
-|------|-------------|
-| `index.html` | Main FX Terminal dashboard |
-| `about.html` | Product overview |
-| `access.html` | Platform access — MT5 EA + web terminal subscription |
-| `contact.html` | Contact information |
-| `terms.html` | Terms of use |
-| `privacy.html` | Privacy policy |
-| `guide-dashboard.html` | How to use the terminal |
-| `guide-cross-asset-risk.html` | Cross-asset risk monitor guide |
-| `guide-rates-yield-curve.html` | Rates & yield curve guide |
-| `guide-market-sentiment.html` | Market sentiment guide |
-| `guide-fx-liquidity.html` | FX liquidity & sessions guide |
-| `guide-cot.html` | COT / CFTC positioning guide |
-| `guide-economic-surprises.html` | Economic Surprise Index guide |
-| `guide-gbpjpy-cot.html` | GBP/JPY bias factors (market research) |
-| `guide-mt5-ea.html` | MetaTrader 5 Expert Advisor setup & feature guide |
+Full documentation is available at [globalinvesting.github.io](https://globalinvesting.github.io/):
+
+- [Terminal Guide](https://globalinvesting.github.io/guide-dashboard.html) — How to use the dashboard
+- [COT Positioning Guide](https://globalinvesting.github.io/guide-cot.html) — Reading CFTC data
+- [Rates & Yield Curve Guide](https://globalinvesting.github.io/guide-rates-yield-curve.html)
+- [Cross-Asset Risk Guide](https://globalinvesting.github.io/guide-cross-asset-risk.html)
+- [Economic Surprises Guide](https://globalinvesting.github.io/guide-economic-surprises.html)
+- [FX Liquidity Guide](https://globalinvesting.github.io/guide-fx-liquidity.html)
+- [MT5 EA Guide](https://globalinvesting.github.io/guide-mt5-ea.html) — Setup and features
 
 ---
 
 ## Disclaimer
 
-Content on this terminal is informational and educational only. It does not constitute financial advice, an investment recommendation, or an offer to buy or sell any financial instrument. FX trading involves significant risk.
+Content on this platform is informational and educational only. It does not constitute financial advice, an investment recommendation, or an offer to buy or sell any financial instrument. FX and CFD trading involves significant risk of loss and may not be suitable for all investors.
 
 © 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.
