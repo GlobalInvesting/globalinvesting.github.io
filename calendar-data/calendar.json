@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-26T11:57:56Z",
-  "generatedAt": "2026-06-26T11:57:56Z",
+  "lastUpdate": "2026-06-26T15:34:16Z",
+  "generatedAt": "2026-06-26T15:34:16Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -552,6 +552,11 @@
       "n": 2,
       "mean": -6.0,
       "std": 4.242641
+    },
+    "USD/united states michigan consumer sentiment": {
+      "n": 2,
+      "mean": 1.2,
+      "std": 2.404163
     }
   },
   "events": [
@@ -24914,9 +24919,9 @@
       "flag": "🇺🇸",
       "event": "United States Goods Trade Balance",
       "impact": "high",
-      "actual": null,
+      "actual": "$-105.8B",
       "forecast": "$-85.0B",
-      "previous": "$-83.0B"
+      "previous": "$-83.01B"
     },
     {
       "date": "26 Jun",
@@ -24927,9 +24932,9 @@
       "flag": "🇺🇸",
       "event": "United States Wholesale Inventories MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "0.2%",
-      "previous": "0.6%"
+      "previous": "0.7%"
     },
     {
       "date": "26 Jun",
@@ -24940,9 +24945,9 @@
       "flag": "🇺🇸",
       "event": "United States Retail Inventories Ex Autos MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.4%",
       "forecast": "0.1%",
-      "previous": "0.6%"
+      "previous": "0.7%"
     },
     {
       "date": "26 Jun",
@@ -24953,7 +24958,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan Consumer Sentiment",
       "impact": "high",
-      "actual": null,
+      "actual": "49.5",
       "forecast": "50.0",
       "previous": "44.8"
     },
