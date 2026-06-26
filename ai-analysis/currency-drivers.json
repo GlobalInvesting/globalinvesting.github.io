@@ -1,137 +1,136 @@
 {
-  "generated_at": "2026-06-25T08:51:37Z",
+  "generated_at": "2026-06-26T08:54:25Z",
   "drivers": {
     "EUR": {
-      "EUR/USD": "USD steady. Fed on hold. 150bp carry favors USD",
-      "EUR/GBP": "GBP on hold. BoE 3.75% vs ECB 2.25% → +150bp carry favors GBP",
-      "EUR/JPY": "JPY COT LF short -112.1k. BoJ on hold. 125bp carry favors EUR",
-      "EUR/AUD": "AUD COT LF long +38.5k. RBA on hold. -60bp carry favors AUD",
-      "EUR/CAD": "CAD COT LF short -67.7k. BoC on hold. 100bp carry favors EUR",
-      "EUR/CHF": "CHF on hold. ECB 2.25% vs SNB 0.0% → +225bp carry favors EUR",
-      "EUR/NZD": "NZD hike priced in. RBNZ 2.25% vs ECB 2.25% → 0bp carry neutral"
+      "EUR/USD": "USD steady. Gold $4,049 anchors. Fed on hold. +150bp carry favors USD",
+      "EUR/GBP": "GBP steady. BoE on hold. SONIA 3.73% vs ESTR 2.18% anchors range",
+      "EUR/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry bid intact at +125bp",
+      "EUR/AUD": "AUD COT LF long +38.5k. RBA on hold. Carry favors AUD by 60bp",
+      "EUR/CAD": "CAD COT LF short -67.7k. BoC on hold. WTI -3.56% limits CAD bid",
+      "EUR/CHF": "CHF steady. SNB on hold. Carry drag limits demand. EUR/CHF +225bp",
+      "EUR/NZD": "NZD hike priced in for July. RBNZ bias ↑. NZD/USD carry +150bp"
     },
     "GBP": {
-      "GBP/USD": "USD steady. Fed on hold. Consumer resilience in focus",
-      "GBP/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry bid intact",
-      "EUR/GBP": "EUR COT LF short -40.4k. ECB on hold. Carry drag limits demand",
-      "GBP/AUD": "AUD COT LF long +38.5k. RBA on hold. Carry favors AUD",
-      "GBP/CAD": "CAD COT LF short -67.7k. BoC on hold. Carry favors GBP",
-      "GBP/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
-      "GBP/NZD": "NZD COT LF short -22.5k. RBNZ hike priced in. Carry favors GBP"
+      "GBP/USD": "USD steady. Gold $4,049 anchors. Fed on hold. Carry neutral at 0bp",
+      "GBP/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry bid intact at +275bp",
+      "EUR/GBP": "GBP steady. BoE on hold. SONIA 3.73% vs ESTR 2.18% anchors range",
+      "GBP/AUD": "AUD COT LF long +38.5k. RBA on hold. AONIA 4.35% vs SONIA 3.73%",
+      "GBP/CAD": "CAD COT LF short -67.7k. BoC on hold. WTI -3.56% limits CAD bid",
+      "GBP/CHF": "CHF steady. SNB on hold. Carry favors GBP by +375bp",
+      "GBP/NZD": "NZD hike priced in for July. RBNZ bias ↑. GBP/NZD soft on NZD bid"
     },
     "JPY": {
-      "USD/JPY": "USD on hold",
-      "EUR/JPY": "EUR COT LF short -40.4k. ECB on hold",
-      "GBP/JPY": "GBP COT LF long +17.7k. BoE on hold",
-      "AUD/JPY": "AUD COT LF long +38.5k. RBA on hold",
-      "CAD/JPY": "CAD COT LF short -67.7k. BoC on hold",
-      "CHF/JPY": "CHF steady. SNB on hold",
-      "NZD/JPY": "NZD hike priced in"
+      "USD/JPY": "USD steady. Gold $4,049 anchors. Fed on hold. Carry favors USD +275bp",
+      "EUR/JPY": "EUR COT LF short -40.4k. ECB on hold. Carry favors EUR +125bp",
+      "GBP/JPY": "GBP COT LF long +17.7k. BoE on hold. Carry favors GBP +275bp",
+      "AUD/JPY": "AUD COT LF long +38.5k. RBA on hold. Carry favors AUD +335bp",
+      "CAD/JPY": "CAD COT LF short -67.7k. BoC on hold. WTI -3.56% limits CAD bid",
+      "CHF/JPY": "CHF steady. SNB on hold. Carry favors JPY by 100bp",
+      "NZD/JPY": "NZD hike priced in for July. RBNZ bias ↑. Carry bid intact"
     },
     "AUD": {
-      "AUD/USD": "USD steady. Fed on hold. Consumer resilience in focus",
-      "EUR/AUD": "EUR COT LF short -40.4k. ECB on hold",
-      "GBP/AUD": "GBP COT LF long +17.7k. BoE on hold",
-      "AUD/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry bid intact",
-      "AUD/CAD": "CAD COT LF short -67.7k. BoC on hold",
-      "AUD/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
-      "AUD/NZD": "NZD COT LF short -22.5k. RBNZ hike priced in"
+      "AUD/USD": "USD steady. Gold $4,049 anchors. Fed on hold. Carry favors AUD +60bp",
+      "EUR/AUD": "EUR COT LF short -40.4k. ECB on hold. Carry favors AUD +60bp",
+      "GBP/AUD": "GBP COT LF long +17.7k. BoE on hold. AONIA 4.35% vs SONIA 3.73%",
+      "AUD/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry bid intact at +335bp",
+      "AUD/CAD": "CAD COT LF short -67.7k. BoC on hold. WTI -3.56% limits CAD bid",
+      "AUD/CHF": "CHF steady. SNB on hold. Carry favors AUD by +435bp",
+      "AUD/NZD": "NZD hike priced in for July. RBNZ bias ↑. NZD bid compresses spread"
     },
     "CAD": {
-      "USD/CAD": "USD steady. Consumer resilience and GDP under scrutiny – UBS",
-      "EUR/CAD": "EUR COT LF short -40.4k. ECB on hold",
-      "GBP/CAD": "GBP COT LF long +17.7k. BoE on hold",
-      "AUD/CAD": "AUD COT LF long +38.5k. RBA on hold",
-      "CAD/JPY": "JPY COT LF short -112.1k. BoJ on hold",
-      "CAD/CHF": "CHF steady. SNB on hold",
-      "NZD/CAD": "NZD COT LF short -22.5k. RBNZ hike expected"
+      "USD/CAD": "USD steady. Gold $4,049 anchors. Fed on hold. Carry favors USD +150bp",
+      "EUR/CAD": "EUR COT LF short -40.4k. ECB on hold. Carry favors EUR +125bp",
+      "GBP/CAD": "GBP COT LF long +17.7k. BoE on hold. Carry favors GBP +275bp",
+      "AUD/CAD": "AUD COT LF long +38.5k. RBA on hold. Carry favors AUD +335bp",
+      "CAD/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry bid intact at +125bp",
+      "CAD/CHF": "CHF steady. SNB on hold. Carry favors CAD by +225bp",
+      "NZD/CAD": "NZD hike priced in for July. RBNZ bias ↑. NZD bid outpaces CAD"
     },
     "CHF": {
-      "USD/CHF": "USD steady. Fed on hold. Consumer resilience and GDP under scrutiny",
+      "USD/CHF": "USD steady. Gold $4,049 anchors. Fed on hold. Carry favors USD +375bp",
       "EUR/CHF": "EUR COT LF short -40.4k. ECB on hold. Carry favors EUR +225bp",
       "GBP/CHF": "GBP COT LF long +17.7k. BoE on hold. Carry favors GBP +375bp",
       "AUD/CHF": "AUD COT LF long +38.5k. RBA on hold. Carry favors AUD +435bp",
-      "CAD/CHF": "CAD COT LF short -67.7k. BoC on hold. Carry favors CAD +225bp",
-      "CHF/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry favors JPY -100bp",
-      "NZD/CHF": "NZD COT LF short -22.5k. RBNZ hike priced. Carry favors NZD +225bp"
+      "CAD/CHF": "CAD COT LF short -67.7k. BoC on hold. WTI -3.56% limits CAD bid",
+      "CHF/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry favors JPY by 100bp",
+      "NZD/CHF": "NZD hike priced in for July. RBNZ bias ↑. Carry favors NZD +225bp"
     },
     "NZD": {
-      "NZD/USD": "USD 1W avg: +0.825% (n=7), NZD 1W avg: -1.395% (n=4), G10 spread: 2.221%",
-      "EUR/NZD": "EUR COT LF short -40.4k. ECB on hold. RBNZ hike priced in",
-      "GBP/NZD": "GBP COT LF long +17.7k. BoE on hold. RBNZ hike priced in",
-      "AUD/NZD": "AUD COT LF long +38.5k. RBA on hold. RBNZ hike priced in",
-      "NZD/JPY": "JPY COT LF short -112.1k. BoJ on hold. RBNZ hike priced in",
-      "NZD/CAD": "CAD COT LF short -67.7k. BoC on hold. RBNZ hike priced in",
-      "NZD/CHF": "CHF steady. SNB on hold. RBNZ hike priced in"
+      "EUR/NZD": "EUR COT LF short -40.4k. ECB on hold. NZD bid on July hike pricing",
+      "GBP/NZD": "GBP COT LF long +17.7k. BoE on hold. NZD bid on July hike pricing",
+      "AUD/NZD": "AUD COT LF long +38.5k. RBA on hold. NZD bid on July hike pricing",
+      "NZD/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry bid intact",
+      "NZD/CAD": "CAD COT LF short -67.7k. BoC on hold. WTI -3.56% limits CAD bid",
+      "NZD/CHF": "CHF steady. SNB on hold. Carry favors NZD by +225bp"
     },
     "USD": {
-      "EUR/USD": "EUR COT LF short -40.4k. ECB on hold",
-      "GBP/USD": "GBP COT LF long +17.7k. BoE on hold",
-      "USD/JPY": "JPY COT LF short -112.1k. BoJ on hold",
-      "AUD/USD": "AUD COT LF long +38.5k. RBA on hold",
-      "USD/CAD": "CAD COT LF short -67.7k. BoC on hold",
-      "USD/CHF": "CHF COT LF short -13.1k. SNB on hold",
-      "NZD/USD": "NZD COT LF short -22.5k. RBNZ hike priced in"
+      "EUR/USD": "EUR COT LF short -40.4k. ECB on hold. Fed-ECB +150bp carry anchors",
+      "GBP/USD": "GBP COT LF long +17.7k. BoE on hold. Carry neutral at 0bp",
+      "USD/JPY": "JPY COT LF short -112.1k. BoJ on hold. Carry bid intact at +275bp",
+      "AUD/USD": "AUD COT LF long +38.5k. RBA on hold. Carry favors AUD by 60bp",
+      "USD/CAD": "CAD COT LF short -67.7k. BoC on hold. WTI -3.56% limits CAD bid",
+      "USD/CHF": "CHF steady. SNB on hold. Carry favors USD by +375bp",
+      "NZD/USD": "NZD hike priced in for July. RBNZ bias ↑. NZD/USD carry +150bp"
     }
   },
   "_inputs_snap": {
     "USD": {
       "cot_we": "2026-06-16",
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hold",
       "bias_updated": "2026-06-22"
     },
     "EUR": {
       "cot_we": "2026-06-16",
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hold",
       "bias_updated": "2026-06-22"
     },
     "GBP": {
       "cot_we": "2026-06-16",
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hold",
       "bias_updated": "2026-06-22"
     },
     "JPY": {
       "cot_we": "2026-06-16",
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hold",
       "bias_updated": "2026-06-22"
     },
     "AUD": {
       "cot_we": "2026-06-16",
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hold",
       "bias_updated": "2026-06-22"
     },
     "CAD": {
       "cot_we": "2026-06-16",
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hold",
       "bias_updated": "2026-06-22"
     },
     "CHF": {
       "cot_we": "2026-06-16",
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hold",
       "bias_updated": "2026-06-22"
     },
     "NZD": {
       "cot_we": "2026-06-16",
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hike",
       "bias_updated": "2026-06-22"
     },
     "NOK": {
       "cot_we": null,
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hike",
       "bias_updated": "2026-06-22"
     },
     "SEK": {
       "cot_we": null,
-      "rate_updated": "2026-06-25",
+      "rate_updated": "2026-06-26",
       "bias": "hold",
       "bias_updated": "2026-06-22"
     }
