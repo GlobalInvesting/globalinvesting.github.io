@@ -1,68 +1,33 @@
 {
-  "lastUpdate": "2026-06-25T21:58:29Z",
-  "generatedAt": "2026-06-25T21:58:29Z",
+  "lastUpdate": "2026-06-26T08:38:29Z",
+  "generatedAt": "2026-06-26T08:38:29Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-06-25",
-  "rangeTo": "2026-06-25",
-  "totalEvents": 1883,
+  "rangeFrom": "2025-07-15",
+  "rangeTo": "2026-06-26",
+  "totalEvents": 1892,
   "currencyCounts": {
-    "CHF": 88,
     "AUD": 169,
     "CAD": 136,
-    "EUR": 192,
+    "CHF": 87,
+    "EUR": 196,
     "GBP": 187,
     "JPY": 184,
     "NZD": 75,
-    "USD": 618,
+    "USD": 624,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "low": 357,
-    "medium": 1103,
-    "high": 423
+    "medium": 1111,
+    "high": 425,
+    "low": 356
   },
   "surpriseStats": {
-    "GBP/gfk consumer confidence": {
-      "n": 3,
-      "mean": 2.333333,
-      "std": 3.05505
-    },
-    "NOK/registered jobless rate": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 0.152753
-    },
-    "NOK/retail sales mom": {
-      "n": 3,
-      "mean": -0.1,
-      "std": 0.87178
-    },
-    "USD/michigan consumer sentiment final": {
-      "n": 3,
-      "mean": -0.633333,
-      "std": 2.800595
-    },
-    "GBP/core retail sales": {
-      "n": 2,
-      "mean": 0.45,
-      "std": 0.070711
-    },
-    "GBP/retail sales": {
-      "n": 2,
-      "mean": 0.3,
-      "std": 0.141421
-    },
-    "USD/michigan consumer sentiment": {
-      "n": 3,
-      "mean": -1.766667,
-      "std": 1.789786
-    },
     "CHF/kof leading indicators": {
       "n": 2,
       "mean": -2.95,
@@ -323,6 +288,11 @@
       "mean": -0.05,
       "std": 0.070711
     },
+    "USD/michigan consumer sentiment": {
+      "n": 2,
+      "mean": -1.55,
+      "std": 2.474874
+    },
     "USD/pce price index": {
       "n": 2,
       "mean": 0.2,
@@ -363,6 +333,11 @@
       "mean": -0.366667,
       "std": 1.101514
     },
+    "GBP/gfk consumer confidence": {
+      "n": 2,
+      "mean": 2.0,
+      "std": 4.242641
+    },
     "NOK/unemployment rate": {
       "n": 2,
       "mean": 0.25,
@@ -378,10 +353,20 @@
       "mean": 0.0,
       "std": 0.565685
     },
+    "USD/michigan consumer sentiment final": {
+      "n": 2,
+      "mean": -0.6,
+      "std": 3.959798
+    },
     "NOK/loan growth yoy": {
       "n": 2,
       "mean": -0.05,
       "std": 0.070711
+    },
+    "NOK/retail sales mom": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 1.131371
     },
     "SEK/gdp growth rate yoy": {
       "n": 2,
@@ -417,6 +402,11 @@
       "n": 2,
       "mean": 0.0785,
       "std": 0.033234
+    },
+    "NOK/registered jobless rate": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.070711
     },
     "AUD/building permits mom prel": {
       "n": 2,
@@ -565,18 +555,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CHF",
-      "event": "Economic Sentiment Index",
-      "dateISO": "2025-06-25",
-      "hourUTC": "08:00",
-      "actual": "-2.1",
-      "forecast": null,
-      "previous": "-22",
-      "impact": "low",
-      "importance": 1,
-      "source": "FH"
-    },
     {
       "date": "15 Jul",
       "dateISO": "2025-07-15",
@@ -24870,6 +24848,136 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "United States Fed Goolsbee Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB Consumer Inflation Expectations",
+      "impact": "medium",
+      "actual": "3.5%",
+      "forecast": "3.9%",
+      "previous": "4.0%"
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Italy Business Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "88.4",
+      "previous": "87.9"
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Italy Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "94.5",
+      "previous": "93.4"
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Unemployment Benefit Claims",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-12.0K",
+      "previous": "-9.0K"
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Goods Trade Balance",
+      "impact": "high",
+      "actual": null,
+      "forecast": "$-85.0B",
+      "previous": "$-83.0B"
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Wholesale Inventories MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Inventories Ex Autos MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.1%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Michigan Consumer Sentiment",
+      "impact": "high",
+      "actual": null,
+      "forecast": "50.0",
+      "previous": "44.8"
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Williams Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "26 Jun",
+      "dateISO": "2026-06-26",
+      "timeUTC": "15:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Kashkari Speech",
       "impact": "medium",
       "actual": null,
       "forecast": null,
