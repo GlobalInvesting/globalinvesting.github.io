@@ -1,62 +1,55 @@
 {
-  "generated_at": "2026-06-26T21:20:52Z",
+  "generated_at": "2026-06-27T21:05:32Z",
   "signals": [
     {
-      "time": "20:52",
+      "time": "18:25",
       "priority": "critical",
-      "title": "NZD/USD — G10 Bilateral Theme + Carry Disadvantage",
-      "text": "NZD is the weakest G10 currency this week (-1.628% avg) against the strongest USD (+0.767% avg), creating a 2.395% spread that points to further NZD/USD downside. The pair faces significant carry disadvantage with USD offering +150bp over NZD, reinforced by USD's strong positive CESI (+30) and NZD's mildly accommodative real rate (-0.83%). The next RBNZ meeting (mkt: 83% hike priced) on 8 Jul is the catalyst to see if a hike bias can offset the strong USD momentum and negative carry. Retail positioning is extremely long NZD (93% long), setting up contrarian unwind risk.",
+      "title": "NZD/USD — G10 Bilateral Theme + Hawkish Fed Divergence",
+      "text": "NZD is the G10 laggard (-1.692% 1W avg) against the USD leader (+0.771% 1W avg), creating a 2.464% spread; this strong bilateral theme sets up NZD/USD downside pressure. The hawkish Fed narrative, with the Fed removing easing bias from its statement, reinforces USD strength against NZD's mildly accommodative real rate (-0.83%). The next RBNZ meeting (mkt: 83% hike priced) on 8 Jul is the catalyst for any shift in the RBNZ's hike bias.",
       "evidence": [
-        "USD 1W avg: +0.767% (n=7)",
-        "NZD 1W avg: -1.628% (n=4)",
-        "G10 spread: 2.395%",
-        "NZD/USD closed 0.5641 Friday",
-        "USD/NZD carry: +150bp (favors USD)",
-        "RBNZ next meeting: 8 Jul",
-        "NZD: NET SHORT, lev_net=-22,454",
-        "NZD/USD: 93% long / 7% short"
+        "USD 1W avg: +0.771% (n=7)",
+        "NZD 1W avg: -1.692% (n=4)",
+        "G10 spread: 2.464%",
+        "Fed Removed This 1 Key Phrase From the Inflation Report (18:25)",
+        "NZD COT net short -23,314"
       ],
       "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "19:10",
+      "time": "14:37",
       "priority": "warning",
-      "title": "USD/JPY — Crowded Short Squeeze Risk + Yield Gap",
-      "text": "JPY COT net short -112,092 (29.7% long) creates significant short-squeeze risk for USD/JPY, especially as the pair presses multi-decade highs near 162.00. Despite JPY's positive CESI (+17), the substantial +264bp USD/JPY carry advantage for USD and the BoJ's market bias to hold limit JPY's ability to sustain gains. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for any shift in the yield gap or policy stance that is likely to trigger a deeper JPY short squeeze.",
+      "title": "USD/JPY — Crowded Short Squeeze Risk + Yield Divergence",
+      "text": "JPY COT net short -115,033 (28.4% long) is an extreme crowded short position, creating short-squeeze risk (USD/JPY downside if shorts cover) for USD/JPY. This positioning runs against the substantial +266bp carry advantage favoring USD (SOFR 3.64% vs TONA 0.98%) and the hawkish Fed narrative. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for any shift in the yield gap or JPY's accommodative real rate (-0.52%).",
       "evidence": [
-        "JPY: NET SHORT, lev_net=-112,092",
+        "JPY COT net short -115,033",
         "USD/JPY closed 161.69 Friday",
-        "USD/JPY carry: +264bp (favors USD)",
-        "BoJ next meeting: 31 Jul",
-        "USD/JPY: IV=7.2%, HV30=2.2%, VRP=+5.0%"
+        "USD/JPY OIS carry: +266bp",
+        "Hawkish Fed Bets Hit Silver as Hormuz Risk Returns (14:37)"
       ],
       "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "16:36",
+      "time": "21:05",
       "priority": "warning",
-      "title": "EUR/USD — Trump Tariff Threat + ECB Hold Bias",
-      "text": "Trump's threat of 100% tariffs on European countries implementing digital services tax sets up downside pressure for EUR/USD. This geopolitical risk compounds the EUR's net short COT positioning (-40,372) and the ECB's market bias to hold, which limits EUR upside against a restrictive USD (+1.56% real rate). The next ECB meeting (mkt: 100% hold priced) on 23 Jul is the catalyst for any policy divergence that could exacerbate or mitigate the tariff-induced weakness.",
+      "title": "AUD/USD — Crowded Long Unwind Risk + Negative CESI",
+      "text": "AUD COT net long +29,035 (64.9% long) creates crowded-long unwind risk for AUD/USD, which closed 0.6901 Friday. This is exacerbated by AUD's neutral CESI score (+0) and the strong USD momentum (+0.771% 1W avg). The next RBA meeting (mkt: 100% hold priced) on 11 Aug determines whether the current mildly restrictive real rate (+0.17%) can sustain the bid against USD strength.",
       "evidence": [
-        "Trump says any European country that implements digital services tax will get 100% tariff",
-        "EUR/USD closed 1.139 Friday",
-        "EUR: NET SHORT, lev_net=-40,372",
-        "ECB next meeting: 23 Jul",
-        "EUR/USD carry: +144bp (favors USD)"
+        "AUD COT net long +29,035",
+        "AUD/USD closed 0.6901 Friday",
+        "AUD CESI: +0 (Neutral)",
+        "USD 1W avg: +0.771% (n=7)"
       ],
       "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "20:52",
+      "time": "21:05",
       "priority": "info",
-      "title": "AUD/USD — Negative CESI + Carry Advantage",
-      "text": "AUD/USD closed 0.6901 Friday; AUD's moderate negative CESI (-7 misses) suggests underlying data disappointment, which is likely to weigh on the pair. However, AUD maintains a +73bp carry advantage over USD, which provides some support against the negative data flow. The next RBA meeting (mkt: 100% hold priced) on 11 Aug is the catalyst to see if the current hike bias can be sustained despite the weakening economic data.",
+      "title": "EUR/USD — Negative CESI + Moderate Put Skew",
+      "text": "EUR's moderate negative CESI score (-5 misses) indicates data is consistently disappointing expectations, suggesting a fundamental headwind for EUR/USD. This aligns with a moderate put skew (-0.59 1M 25d RR) in options markets, indicating a bias for EUR weakness. The next ECB meeting (mkt: 100% hold priced) on 23 Jul is the catalyst for any change in the mildly restrictive real rate (+0.08%).",
       "evidence": [
-        "AUD: net=-7 misses",
-        "AUD/USD closed 0.6901 Friday",
-        "AUD/USD carry: -73bp (favors AUD)",
-        "RBA next meeting: 11 Aug",
-        "AUD: NET LONG, lev_net=+38,548"
+        "EUR CESI: -5 misses",
+        "EUR/USD 25-Delta Risk Reversal: -0.59",
+        "EUR/USD closed 1.139 Friday"
       ],
       "_source": "gemini:gemini-2.5-flash"
     }
