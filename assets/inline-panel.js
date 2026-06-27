@@ -91,11 +91,24 @@
     closeBtn.style.cssText = 'background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;line-height:1;padding:2px 5px;border-radius:3px;transition:color .1s;';
     closeBtn.onmouseenter = function() { closeBtn.style.color = 'var(--text)'; };
     closeBtn.onmouseleave = function() { closeBtn.style.color = 'var(--text3)'; };
-    closeBtn.onclick = function() {
+    // Shared close logic — removes shell, restores hidden children, and
+    // tears down the ESC listener before calling the modal's own onClose.
+    function _doClose() {
+      document.removeEventListener('keydown', _ipEscHandler, true);
       wrap.remove();
       restoreChildren();
       if (typeof onClose === 'function') onClose();
+    }
+    closeBtn.onclick = _doClose;
+
+    // Capture-phase ESC handler — fires BEFORE the modal's own keydown handler
+    // so restoreChildren() runs even when the modal removes its own DOM node first.
+    // Without this, pressing ESC hides the modal content but leaves the inline-panel
+    // shell in place with all original children still display:none → black panel.
+    var _ipEscHandler = function(e) {
+      if (e.key === 'Escape') _doClose();
     };
+    document.addEventListener('keydown', _ipEscHandler, { capture: true });
 
     hd.appendChild(titleEl);
     hd.appendChild(closeBtn);

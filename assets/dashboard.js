@@ -10906,7 +10906,7 @@ async function renderDerivativesSection() {
           const totalSpot = byProd['FxSpot']?.notional_usd_bn ?? 0;
           const mono = 'font-family:var(--font-mono);font-size:10px;text-align:right;';
           const totRow = `<tr style="border-top:1px solid var(--border2);font-weight:600;">
-            <td style="font-size:10px;color:var(--text2);">TOTAL (G8)</td>
+            <td style="font-size:10px;color:var(--text2);">TOTAL (G10)</td>
             <td style="${mono}color:var(--text);">${totalNotional.toFixed(1)}</td>
             <td style="${mono}color:var(--text2);">${totals.trade_count.toLocaleString()}</td>
             <td style="${mono}color:var(--text2);">${totalSwap > 0 ? totalSwap.toFixed(1) : '—'}</td>
