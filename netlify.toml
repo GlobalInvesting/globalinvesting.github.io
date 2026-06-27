@@ -40,9 +40,9 @@
       script-src 'self'
         cdn.jsdelivr.net unpkg.com
         www.googletagmanager.com
-        s3.tradingview.com widgets.tradingview-widget.com
+        s3.tradingview.com
         pagead2.googlesyndication.com partner.googleadservices.com tpc.googlesyndication.com;
-      style-src 'self' 'unsafe-inline' fonts.googleapis.com s3.tradingview.com widgets.tradingview-widget.com;
+      style-src 'self' 'unsafe-inline' fonts.googleapis.com s3.tradingview.com;
       font-src fonts.gstatic.com;
       img-src 'self' data: https: flagcdn.com;
       connect-src 'self'
@@ -52,7 +52,7 @@
         https://sdmx.oecd.org
         https://freeserv.dukascopy.com https://www.myfxbook.com
         https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com;
-      frame-src googleads.g.doubleclick.net tpc.googlesyndication.com s3.tradingview.com widgets.tradingview-widget.com;
+      frame-src googleads.g.doubleclick.net tpc.googlesyndication.com s3.tradingview.com;
       frame-ancestors 'self';
       upgrade-insecure-requests
     """
