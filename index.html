@@ -492,7 +492,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.21.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.23.0">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -1234,15 +1234,43 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     </div>
 
-    <!-- ECONOMIC MAP — full width (News Feed moved to dedicated News tab) -->
+    <!-- ECONOMIC MATRIX — full width, native G10 macro snapshot (v8.23.0 — replaces TradingView Economic Map widget; see assets/econ-matrix.js) -->
     <div id="section-econmap" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);height:440px;">
       <div class="panel-head">
-        <span class="panel-title">Economic Map</span>
-        <span class="panel-sub">TradingView · World Economics</span>
+        <span class="panel-title">Economic Matrix</span>
+        <span class="panel-sub" id="econmx-sub">Economic Calendar · latest actuals · G10</span>
       </div>
-      <div style="flex:1;overflow:hidden;background:var(--bg);display:flex;align-items:stretch;">
-        <!-- Economic map loaded lazily — see initLazyWidgets() in dashboard.js -->
-        <div id="tv-econmap-placeholder" style="width:100%;height:100%;min-height:380px;background:var(--bg);"></div>
+      <div class="econmx-wrap" style="flex:1;overflow:auto;background:var(--bg);">
+        <table class="econmx-table" aria-label="G10 economic matrix — latest GDP, CPI, unemployment, industrial production, business confidence, retail sales, current account, trade balance, 10-year yield, and central bank policy rate per currency">
+          <thead>
+            <tr>
+              <th scope="col">Ccy</th>
+              <th scope="col">GDP</th>
+              <th scope="col">CPI</th>
+              <th scope="col">Unemp</th>
+              <th scope="col">Ind Prod</th>
+              <th scope="col">Bus Cond</th>
+              <th scope="col">Rtl Sales</th>
+              <th scope="col">Cur Acct</th>
+              <th scope="col">Trade Bal</th>
+              <th scope="col">10Y Yld</th>
+              <th scope="col">CB Rate</th>
+            </tr>
+          </thead>
+          <tbody id="econmx-tbody">
+            <!-- 10 skeleton rows — G10, matches assets/econ-matrix.js render to prevent CLS -->
+            <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">USD</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+            <tr><td style="white-space:nowrap;"><span class="fi fi-eu" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">EUR</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+            <tr><td style="white-space:nowrap;"><span class="fi fi-gb" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">GBP</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+            <tr><td style="white-space:nowrap;"><span class="fi fi-jp" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">JPY</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+            <tr><td style="white-space:nowrap;"><span class="fi fi-au" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">AUD</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+            <tr><td style="white-space:nowrap;"><span class="fi fi-ch" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">CHF</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+            <tr><td style="white-space:nowrap;"><span class="fi fi-ca" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">CAD</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+            <tr><td style="white-space:nowrap;"><span class="fi fi-nz" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">NZD</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+            <tr><td style="white-space:nowrap;"><span class="fi fi-no" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">NOK</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+            <tr><td style="white-space:nowrap;"><span class="fi fi-se" style="margin-right:5px;border-radius:2px;"></span><span style="font-size:10px;">SEK</span></td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td><td class="flat">—</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -1777,7 +1805,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.0" defer></script>
-<script src="assets/dashboard.js?v=8.22.7" defer></script>
+<script src="assets/dashboard.js?v=8.23.0" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
@@ -1820,6 +1848,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
 
 <script src="assets/calendar-panel.js?v=1.5.0" defer></script>
+<script src="assets/econ-matrix.js?v=1.0.0" defer></script>
   <!-- Fullscreen chart overlay — chart panel DOM is moved here on open, restored on close -->
   <div id="lw-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen chart">
     <div id="lw-fs-toolbar">
