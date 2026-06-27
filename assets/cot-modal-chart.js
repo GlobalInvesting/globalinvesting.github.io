@@ -362,28 +362,31 @@ function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded) {
 }
 
 // ── Spot price helpers (for Net Position overlay) ─────────────────────────────
+// ohlc-data pair filename + inversion flag for each COT currency
 const _COT_SPOT = {
-  AUD: 'AUD', EUR: 'EUR', GBP: 'GBP', JPY: 'JPY',
-  CHF: 'CHF', CAD: 'CAD', NZD: 'NZD', NOK: 'NOK', SEK: 'SEK',
+  AUD: { file: 'audusd', inv: false },
+  EUR: { file: 'eurusd', inv: false },
+  GBP: { file: 'gbpusd', inv: false },
+  JPY: { file: 'usdjpy', inv: true  },
+  CHF: { file: 'usdchf', inv: true  },
+  CAD: { file: 'usdcad', inv: true  },
+  NZD: { file: 'nzdusd', inv: false },
+  NOK: { file: 'usdnok', inv: true  },
+  SEK: { file: 'usdsek', inv: true  },
 };
 
-// Fetch daily closes from Frankfurter ECB API (CORS-safe), returns [{time, value}] as CCY/USD
-async function _fetchCOTSpot(ccy, dates) {
-  if (!_COT_SPOT[ccy] || !dates || !dates.length) return null;
-  const start = dates[0], end = dates[dates.length - 1];
-  const url = `https://api.frankfurter.app/${start}..${end}?from=USD&to=${ccy}`;
+// Fetch daily closes from local ohlc-data/ (yfinance — same source as dashboard charts)
+// Returns [{time:'YYYY-MM-DD', value:n}] expressed as CCY/USD strength
+async function _fetchCOTSpot(ccy) {
+  const cfg = _COT_SPOT[ccy];
+  if (!cfg) return null;
   try {
-    const resp = await fetch(url);
+    const resp = await fetch(`./ohlc-data/${cfg.file}.json`);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const json = await resp.json();
-    // rates: { 'YYYY-MM-DD': { 'AUD': 1.4488 }, ... } — USD→CCY, invert to get CCY/USD
-    return Object.entries(json.rates || {})
-      .map(([date, r]) => {
-        const v = r[ccy];
-        return (v && !isNaN(v)) ? { time: date, value: 1 / v } : null;
-      })
-      .filter(Boolean)
-      .sort((a, b) => a.time.localeCompare(b.time));
+    const rows = await resp.json(); // [{time, open, high, low, close, volume}, ...]
+    return rows
+      .map(r => (r.time && r.close) ? { time: r.time, value: cfg.inv ? 1 / r.close : r.close } : null)
+      .filter(Boolean);
   } catch (_) { return null; }
 }
 
@@ -879,8 +882,9 @@ function cotTab(el,tabId){
         _buildNetChart(w,d.dates,d.netData,d.ccy);
         // Async: fetch spot and overlay it
         const statusEl=document.getElementById('cot-net-price-status');
-        _fetchCOTSpot(d.ccy, d.dates).then(spotData=>{
+        _fetchCOTSpot(d.ccy).then(spotData=>{
           if(!w._addPriceSeries)return;
+          const cfg=_COT_SPOT[d.ccy];
           if(spotData&&spotData.length){
             w._addPriceSeries(spotData, d.ccy+'/USD');
             if(statusEl)statusEl.textContent='Right axis: '+d.ccy+'/USD';
@@ -894,14 +898,23 @@ function cotTab(el,tabId){
     }
     if(tabId==='split'){
       const w=document.getElementById('cot-lw-split');
-      if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}
-      else if(w&&w._lwResize)w._lwResize();
       const wo=document.getElementById('cot-lw-oi');
-      if(wo&&!wo._built){
-        wo._built=true;
-        const oiData=d.lngData.map((l,i)=>(l??0)+(d.shrtData[i]??0));
-        _buildOIChart(wo,d.dates,oiData,d.ccy);
-      } else if(wo&&wo._lwResize)wo._lwResize();
+      if((w&&!w._built)||(wo&&!wo._built)){
+        // Delay first build by 80ms so flex layout settles before LWC reads container size
+        setTimeout(()=>{
+          if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}
+          if(wo&&!wo._built){
+            wo._built=true;
+            const oiData=d.lngData.map((l,i)=>(l??0)+(d.shrtData[i]??0));
+            _buildOIChart(wo,d.dates,oiData,d.ccy);
+          }
+          // Follow-up resize after charts are built
+          setTimeout(()=>{[w,wo].forEach(el=>{if(el&&el._lwResize)el._lwResize();});},200);
+        },80);
+      } else {
+        if(w&&w._lwResize)w._lwResize();
+        if(wo&&wo._lwResize)wo._lwResize();
+      }
     }
     if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
     if(tabId==='overview'){ /* sparkline is inline SVG — no build needed */ }
