@@ -5969,8 +5969,11 @@ async function buildInlineDetail(tvSym, container) {
     carryDiff = meta?.cross ? cbBase - cbQuote : (invert ? cbBase - cbQuote : cbQuote - cbBase);
   }
 
-  // RR
-  const rrKey = base && quote ? (base + quote).toUpperCase() : null;
+  // RR — use pairId (ISO convention) not base+quote (PAIRS internal field)
+  // base/quote in PAIRS represent commodity/money ccy, not ISO order.
+  // e.g. usdjpy → base='JPY',quote='USD' → base+quote='JPYUSD' ≠ rr.json key 'USDJPY'.
+  // pairId is always the ISO-convention name (no slash) matching rr.json keys exactly.
+  const rrKey = pairId ? pairId.toUpperCase() : null;
   const rrVal = rrKey ? (RR_DATA_CACHE[rrKey]?.rr25d ?? null) : null;
 
   // Retail
@@ -6535,9 +6538,10 @@ async function updatePairDetail(tvSym) {
   const retBarL = retL != null ? retL : 50;
 
   // 25d Risk Reversal — from RR_DATA_CACHE (populated by fetchOptionSkew)
-  // rrKey = base+quote uppercase, no slash (e.g. EURUSD, USDJPY)
-  // Saxo data covers the 7 majors in the Positioning Bias table; crosses show '—'
-  const rrKey  = base && quote ? (base + quote).toUpperCase() : null;
+  // Use pairId (ISO convention, e.g. 'usdjpy') not base+quote — PAIRS.base/quote are
+  // commodity/money fields, not ISO order: usdjpy has base='JPY',quote='USD', so
+  // base+quote='JPYUSD' which does not match rr.json key 'USDJPY'. pairId always matches.
+  const rrKey  = pairId ? pairId.toUpperCase() : null;
   const rrVal  = rrKey ? (RR_DATA_CACHE[rrKey]?.rr25d ?? null) : null;
   // Direction label from base-currency perspective (same convention as RR chip in positioning table)
   const rrBase = base || (label.split('/')[0] || '');
@@ -10596,10 +10600,15 @@ async function renderDerivativesSection() {
   // ── RR Surface table ──
   const rrSurfaceTbody = document.getElementById('rr-surface-tbody');
   if (rrSurfaceTbody) {
-    // EUR/JPY is the only cross pair Saxo consistently publishes — include it.
-    // NZD/USD excluded: Saxo does not publish NZD/USD 25d RR on their public page.
-    const rrPairs = [...pairs.filter(p => p !== 'NZD/USD'), 'EUR/JPY'];
-    const rrPairKeys = { ...rrKeys, 'EUR/JPY': 'EURJPY' };
+    // EUR/JPY, EUR/GBP, EUR/CHF are all in rr2.json from Saxo.
+    // NZD/USD, USD/NOK, USD/SEK excluded (Saxo does not publish these RRs publicly).
+    // Order must match HTML #rr-surface-tbody skeleton row order exactly (index-based write).
+    const rrPairs = ['EUR/USD','GBP/USD','USD/JPY','AUD/USD','USD/CHF','USD/CAD','EUR/JPY','EUR/GBP','EUR/CHF'];
+    const rrPairKeys = {
+      'EUR/USD':'EURUSD','GBP/USD':'GBPUSD','USD/JPY':'USDJPY',
+      'AUD/USD':'AUDUSD','USD/CHF':'USDCHF','USD/CAD':'USDCAD',
+      'EUR/JPY':'EURJPY','EUR/GBP':'EURGBP','EUR/CHF':'EURCHF'
+    };
     const rows = rrSurfaceTbody.querySelectorAll('tr');
     rrPairs.forEach((pair, idx) => {
       const row = rows[idx];
