@@ -120,11 +120,11 @@
 #p-overview .cot-ov-spark-row .cot-spark { max-width:100%;width:100%;height:72px;display:block;box-sizing:border-box; }
 #cot-ov-spark-lw { width:100%;max-width:100%!important;box-sizing:border-box;overflow:hidden; }
 
-#p-net.on .cot-cw,
-#p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
-#p-net.on .cot-cw > .cot-chart-area,
+#p-net.on .cot-cw { flex:1;min-height:0;margin-bottom:0;border-bottom:none;display:flex;flex-direction:column; }
+#p-net.on .cot-cw > .cot-chart-area { flex:1;min-height:0;display:flex;flex-direction:column; }
+#p-net.on .cot-cw > .cot-chart-area > .cot-lw-wrap { flex:1;min-height:0;height:100%; }
+#p-split.on { display:flex;flex:1;flex-direction:column;min-height:0; }
 #p-split.on .cot-cw > .cot-chart-area { flex:1;min-height:0;display:flex;flex-direction:column; }
-#p-net.on .cot-cw > .cot-chart-area > .cot-lw-wrap,
 #p-split.on .cot-cw > .cot-chart-area > .cot-lw-wrap { flex:1;min-height:0;height:100%; }
 #p-participants .cot-chart-area { height:300px;position:relative; }
 #p-participants.on { overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
@@ -186,7 +186,14 @@
 .cn { color:var(--text2); }
 
 /* Price overlay legend (Net Position tab) */
-#cot-net-legend {\n  display:flex;align-items:center;justify-content:space-between;\n  padding:0 14px 8px;flex-shrink:0;\n}\n#cot-net-legend .cot-nl-items {\n  display:flex;flex-wrap:wrap;gap:12px;align-items:center;\n  font-size:9.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);\n}\n#cot-net-legend .cot-nl-item {\n  display:flex;align-items:center;gap:5px;\n}\n#cot-net-legend .cot-nl-dot {\n  display:inline-block;width:14px;height:3px;border-radius:2px;\n}\n#cot-net-price-status {\n  font-size:9px;color:var(--text3);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);\n  transition:opacity .2s;\n}\n/* OI section in Long/Short tab */\n#p-split .cot-oi-section {\n  flex-shrink:0;\n}\n.cot-oi-note {\n  font-size:9px;color:var(--text3);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);\n  margin-top:4px;\n}
+#cot-net-legend { display:flex;align-items:center;justify-content:space-between;padding:0 14px 8px;flex-shrink:0; }
+#cot-net-legend .cot-nl-items { display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:9.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2); }
+#cot-net-legend .cot-nl-item { display:flex;align-items:center;gap:5px; }
+#cot-net-legend .cot-nl-dot { display:inline-block;width:14px;height:3px;border-radius:2px; }
+#cot-net-price-status { font-size:9px;color:var(--text3);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);transition:opacity .2s; }
+/* OI section in Long/Short tab */
+#p-split .cot-oi-section { flex-shrink:0; }
+.cot-oi-note { font-size:9px;color:var(--text3);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px; }
 @media (max-width:480px){
   #cot-modal{width:100%;height:93vh;border-radius:12px 12px 0 0;border-bottom:none;}
   #cot-m-metrics{grid-template-columns:repeat(3,1fr);}
@@ -356,32 +363,27 @@ function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded) {
 
 // ── Spot price helpers (for Net Position overlay) ─────────────────────────────
 const _COT_SPOT = {
-  AUD: { s: 'audusd', inv: false, label: 'AUD/USD' },
-  EUR: { s: 'eurusd', inv: false, label: 'EUR/USD' },
-  GBP: { s: 'gbpusd', inv: false, label: 'GBP/USD' },
-  JPY: { s: 'usdjpy', inv: true,  label: 'USD/JPY (inv)' },
-  CHF: { s: 'usdchf', inv: true,  label: 'USD/CHF (inv)' },
-  CAD: { s: 'usdcad', inv: true,  label: 'USD/CAD (inv)' },
-  NZD: { s: 'nzdusd', inv: false, label: 'NZD/USD' },
-  NOK: { s: 'usdnok', inv: true,  label: 'USD/NOK (inv)' },
-  SEK: { s: 'usdsek', inv: true,  label: 'USD/SEK (inv)' },
+  AUD: 'AUD', EUR: 'EUR', GBP: 'GBP', JPY: 'JPY',
+  CHF: 'CHF', CAD: 'CAD', NZD: 'NZD', NOK: 'NOK', SEK: 'SEK',
 };
 
-// Fetch weekly spot closes from Stooq — returns [{time:'YYYY-MM-DD', value:n}, …]
-async function _fetchCOTSpot(ccy) {
-  const cfg = _COT_SPOT[ccy];
-  if (!cfg) return null;
+// Fetch daily closes from Frankfurter ECB API (CORS-safe), returns [{time, value}] as CCY/USD
+async function _fetchCOTSpot(ccy, dates) {
+  if (!_COT_SPOT[ccy] || !dates || !dates.length) return null;
+  const start = dates[0], end = dates[dates.length - 1];
+  const url = `https://api.frankfurter.app/${start}..${end}?from=USD&to=${ccy}`;
   try {
-    const resp = await fetch(`https://stooq.com/q/d/l/?s=${cfg.s}&i=w`);
+    const resp = await fetch(url);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const text = await resp.text();
-    const lines = text.trim().split('\n').slice(1); // skip header
-    return lines.map(line => {
-      const cols = line.split(',');
-      const close = parseFloat(cols[4]);
-      if (!cols[0] || isNaN(close)) return null;
-      return { time: cols[0], value: cfg.inv ? 1 / close : close };
-    }).filter(Boolean);
+    const json = await resp.json();
+    // rates: { 'YYYY-MM-DD': { 'AUD': 1.4488 }, ... } — USD→CCY, invert to get CCY/USD
+    return Object.entries(json.rates || {})
+      .map(([date, r]) => {
+        const v = r[ccy];
+        return (v && !isNaN(v)) ? { time: date, value: 1 / v } : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.time.localeCompare(b.time));
   } catch (_) { return null; }
 }
 
@@ -479,7 +481,7 @@ function _buildNetChart(container, dates, netData, ccy) {
     html += `<div>${ccy} LF Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
     if (priceS) {
       const pv = param.seriesData.get(priceS);
-      if (pv) html += `<div style="color:var(--text2);margin-top:2px;">${(_COT_SPOT[ccy]||{}).label||'Spot'} <span style="color:var(--text);font-weight:600">${pv.value.toFixed(4)}</span></div>`;
+      if (pv) html += `<div style="color:var(--text2);margin-top:2px;">${ccy}/USD <span style="color:var(--text);font-weight:600">${pv.value.toFixed(4)}</span></div>`;
     }
     return html;
   });
@@ -787,12 +789,12 @@ function openCOTModal(ccy,data){
         <div class="cot-chart-area" style="flex:1;min-height:0;"><div class="cot-lw-wrap" id="cot-lw-net"></div></div>
       </div>
     </div>
-    <div id="p-split" class="cot-panel" style="display:none;flex-direction:column;min-height:0;">
-      <div class="cot-cw" style="flex:0 0 55%;min-height:0;display:flex;flex-direction:column;">
+    <div id="p-split" class="cot-panel">
+      <div class="cot-cw" style="flex:3;min-height:0;display:flex;flex-direction:column;">
         <div class="cot-ct">LONGS VS SHORTS · LEVERAGED FUNDS · CONTRACTS</div>
         <div class="cot-chart-area" style="flex:1;min-height:0;"><div class="cot-lw-wrap" id="cot-lw-split"></div></div>
       </div>
-      <div class="cot-cw cot-oi-section" style="flex:0 0 42%;min-height:0;display:flex;flex-direction:column;">
+      <div class="cot-cw cot-oi-section" style="flex:2;min-height:0;display:flex;flex-direction:column;">
         <div class="cot-ct">LF OPEN INTEREST · LEVERAGED FUNDS · CONTRACTS</div>
         <div class="cot-oi-note">Total contracts held by Leveraged Funds (longs + shorts). Rising OI = growing participation. Declining OI = de-risking.</div>
         <div class="cot-chart-area" style="flex:1;min-height:0;margin-top:6px;"><div class="cot-lw-wrap" id="cot-lw-oi"></div></div>
@@ -877,12 +879,11 @@ function cotTab(el,tabId){
         _buildNetChart(w,d.dates,d.netData,d.ccy);
         // Async: fetch spot and overlay it
         const statusEl=document.getElementById('cot-net-price-status');
-        _fetchCOTSpot(d.ccy).then(spotData=>{
+        _fetchCOTSpot(d.ccy, d.dates).then(spotData=>{
           if(!w._addPriceSeries)return;
-          const cfg=_COT_SPOT[d.ccy];
           if(spotData&&spotData.length){
-            w._addPriceSeries(spotData, cfg?cfg.label:'Spot');
-            if(statusEl)statusEl.textContent=cfg?.inv?'Right axis inverted (USD-quoted pair)':'Right axis';
+            w._addPriceSeries(spotData, d.ccy+'/USD');
+            if(statusEl)statusEl.textContent='Right axis: '+d.ccy+'/USD';
           } else {
             if(statusEl)statusEl.textContent='Spot data unavailable';
           }
