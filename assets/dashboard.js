@@ -11170,6 +11170,20 @@ async function renderEconSurprises() {
   const ccyScores  = {};
   const widenedCcys = new Set();
 
+  // Canonical ESI series key: strip parentheticals then country-name prefix.
+  // Prevents fragmentation when Myfxbook RSS alternates between short-form
+  // ("Initial Jobless Claims") and country-prefixed ("United States Initial
+  // Jobless Claims") titles for the same recurring monthly/weekly event.
+  // Must stay in sync with Python compute_surprise_stats() in fetch_economic_calendar.py
+  // and _canonEsi in econ-surprises-modal.js.
+  const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
+    'australia ','canada ','switzerland ','new zealand ','norway ','sweden '];
+  const _canonEsi = t => {
+    let s = t.replace(/\s*\([^)]*\)/g,'').trim();
+    for (const p of _CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
+    return s;
+  };
+
   // Shared noise-keyword list (defined once, reused across both passes).
   const NOISE_KW = [
     'cftc','baker hughes','rig count','auction','api weekly',
@@ -11219,7 +11233,7 @@ async function renderEconSurprises() {
       // ForexFactory publishes Flash then Final PMIs with identical data on
       // different dates. Without dedup, each revision counts as a separate event,
       // inflating N and double-counting the same macro signal.
-      const canonEvent = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
+      const canonEvent = _canonEsi(evTitle);
       // Use forecast||previous in the dedup key — mirrors fetch_economic_calendar.py
       // so events without an explicit forecast but with a previous baseline deduplicate
       // consistently between JS scoring and Python surpriseStats computation.
@@ -11257,10 +11271,7 @@ async function renderEconSurprises() {
       // As history accumulates in surpriseStats (engine v3.1+), more events
       // graduate to z-score. MIN 5 observations required for a valid std estimate.
       const CANONICAL_MIN_N = 5;
-      const statsKey = (() => {
-        const canon = (evTitle.replace(/\s*\([^)]*\)/g, '').trim());
-        return `${ccy}/${canon}`;
-      })();
+      const statsKey = `${ccy}/${_canonEsi(evTitle)}`;
       const stats = (window._ECON_SURPRISE_STATS || {})[statsKey];
       const useZScore = stats && stats.n >= CANONICAL_MIN_N && stats.std > 0;
       const zScore = useZScore ? (surprise - stats.mean) / stats.std : null;
@@ -12386,7 +12397,7 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
             if (!['medium','high'].includes(ev.impact)) return;
             const name = (ev.event || '').toLowerCase();
             if (NOISE_KW.some(k => name.includes(k))) return;
-            const canon = name.replace(/\s*\([^)]*\)/g,'').trim();
+            const canon = _canonEsi(name);
             const aS = String(ev.actual||'').replace(/[%,\s]/g,'');
             const fS = String(ev.forecast||ev.previous||'').replace(/[%,\s]/g,'');
             const key = `${cmpId}/${canon}/${aS}/${fS}`;

@@ -240,6 +240,16 @@ const _ESM_G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
 
 const _ESM_INVERSE_KW = ['unemployment','jobless','claims','deficit','trade balance'];
 
+// Canonical ESI series key — must stay in sync with dashboard.js _canonEsi and
+// Python compute_surprise_stats() in fetch_economic_calendar.py.
+const _ESM_CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
+  'australia ','canada ','switzerland ','new zealand ','norway ','sweden '];
+const _canonEsi = t => {
+  let s = t.replace(/\s*\([^)]*\)/g,'').trim();
+  for (const p of _ESM_CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
+  return s;
+};
+
 const _ESM_NOISE_KW = [
   'cftc','baker hughes','rig count','auction','api weekly',
   'milk auction','fed\'s balance sheet','reserve balances',
@@ -308,7 +318,7 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
     const evTitle = (ev.event || ev.title || '').toLowerCase();
     if (_ESM_NOISE_KW.some(kw => evTitle.includes(kw))) return;
 
-    const canon     = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
+    const canon     = _canonEsi(evTitle);
     const actualS   = String(ev.actual   || '').replace(/[%,\s]/g, '');
     const forecastS = String(ev.forecast || ev.previous || '').replace(/[%,\s]/g, '');
     const key = `${ccy}/${canon}/${actualS}/${forecastS}`;
@@ -438,7 +448,7 @@ function _esmGetEvents(events, ccy) {
     const evTitle   = (ev.event || ev.title || '').toLowerCase();
     if (_ESM_NOISE_KW.some(kw => evTitle.includes(kw))) return;
 
-    const canon     = evTitle.replace(/\s*\([^)]*\)/g, '').trim();
+    const canon     = _canonEsi(evTitle);
     const actualS   = String(ev.actual   || '').replace(/[%,\s]/g, '');
     const forecastS = String(ev.forecast || ev.previous || '').replace(/[%,\s]/g, '');
     const key = `${ccy}/${canon}/${actualS}/${forecastS}`;
