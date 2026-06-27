@@ -47,6 +47,7 @@ The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — li
 - US Treasury yield curve (3M · 2Y · 5Y · 10Y · 30Y)
 - Cross-asset risk monitor (SPX · Gold · WTI · BTC · DXY · Nikkei · Stoxx) with stress scoring
 - Carry Trade Ranking — G10 carry-to-vol for all 45 pairs with real rate breakdown and sustainability assessment
+- Economic Matrix — latest GDP, CPI, unemployment, industrial production, business confidence, retail sales, current account, and trade balance for all 10 G10 economies, alongside 10-year sovereign yield and central bank policy rate, sourced from the live economic calendar
 
 ### Derivatives & Flow
 - 25-delta Risk Reversal term structure (1M · 3M · 6M · 1Y) with skew vs realized vol
