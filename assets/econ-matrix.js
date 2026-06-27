@@ -1,5 +1,5 @@
 /**
- * econ-matrix.js v1.0.0 — Native Economic Matrix panel
+ * econ-matrix.js v1.0.1 — Native Economic Matrix panel
  *
  * Replaces the third-party TradingView Economic Map widget (tv-economic-map.js)
  * with a native table in the style of an institutional regional economic matrix
@@ -34,12 +34,22 @@
  *     currency prefix, some don't), so dividing by a GDP denominator would
  *     manufacture false precision. Trend coloring still works (see below).
  *
- * Two cells are intentionally left blank ("—") because the underlying release
- * does not exist in the current source for that currency:
- *   - Ind Prod: AUD, NZD — neither economy publishes a standalone industrial
- *     production series in this feed.
- *   - CPI: NZD — not currently tracked in the source feed for NZD (a feed
- *     gap, not a "doesn't exist" fact — NZ does publish quarterly CPI).
+ * Cells are intentionally left blank ("—") where the underlying release does
+ * not exist in the current source for that currency:
+ *   - Ind Prod: AUD, NZD, CAD — none of the three publishes a standalone
+ *     industrial production series in this feed.
+ *   - Cur Acct: EUR, AUD — not currently tracked in the source feed for
+ *     these two (a feed gap, not a "doesn't exist" fact — both the ECB and
+ *     the ABS do publish a current account series).
+ *
+ * Bus Cond fallback — these three currencies have no Manufacturing PMI in
+ * the current source, so the column falls back to each economy's standard
+ * business/industrial confidence survey instead (per the column definition
+ * above):
+ *   - EUR: Business Confidence (Eurozone business climate survey)
+ *   - GBP: CBI Industrial Trends Orders (CBI manufacturing orders survey)
+ *   - JPY: Tankan Large Manufacturers Index (BoJ's quarterly tankan survey —
+ *     the benchmark Japanese manufacturer-sentiment gauge)
  *
  * Color convention: every calendar-derived cell is colored by the direction
  * of change vs. the previous reading (delta = actual − previous), not by the
@@ -81,13 +91,13 @@
       trade: ['Trade Balance', 'Balance of Trade', 'Goods Trade Balance', 'United States Goods Trade Balance'],
     },
     EUR: {
-      gdp:   ['Gross Domestic Product s.a (QoQ)', 'GDP (QoQ)'],
-      cpi:   ['Inflation Rate YoY Flash', 'CPI (YoY)', 'Consumer Price Index (YoY)', 'Euro Area CPI'],
+      gdp:   ['Gross Domestic Product s.a (QoQ)', 'GDP (QoQ)', 'GDP Growth Rate QoQ'],
+      cpi:   ['Inflation Rate YoY Flash', 'CPI (YoY)', 'Consumer Price Index (YoY)', 'Euro Area CPI', 'Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM', 'Euro Area Industrial Production MoM', 'Industrial Production (MoM)'],
-      conf:  ['HCOB Eurozone Manufacturing PMI', 'HCOB Manufacturing PMI Flash'],
+      conf:  ['HCOB Eurozone Manufacturing PMI', 'HCOB Manufacturing PMI Flash', 'Business Confidence'],
       rtl:   ['Retail Sales (MoM)', 'Retail Sales MoM'],
-      ca:    ['Current Account'],
+      ca:    [], // not currently tracked in the source feed for EUR
       trade: ['Balance of Trade', 'Trade Balance EU', 'Euro Area Balance of Trade'],
     },
     GBP: {
@@ -95,17 +105,17 @@
       cpi:   ['Inflation Rate YoY', 'CPI (YoY)', 'United Kingdom Inflation Rate YoY'],
       unemp: ['Unemployment Rate', 'United Kingdom Unemployment Rate'],
       prod:  ['Industrial Production MoM', 'United Kingdom Industrial Production MoM', 'Industrial Production (MoM)'],
-      conf:  ['S&P Global Manufacturing PMI'],
+      conf:  ['S&P Global Manufacturing PMI', 'CBI Industrial Trends Orders'],
       rtl:   ['Retail Sales MoM', 'United Kingdom Retail Sales MoM'],
       ca:    ['Current Account'],
       trade: ['Trade Balance', 'Goods Trade Balance', 'United Kingdom Goods Trade Balance'],
     },
     JPY: {
-      gdp:   ['GDP Growth Rate QoQ Final', 'GDP Growth Rate QoQ Prel', 'GDP (QoQ)'],
+      gdp:   ['GDP Growth Rate QoQ Final', 'GDP Growth Rate QoQ Prel', 'GDP (QoQ)', 'GDP Growth Rate QoQ'],
       cpi:   ['National Core CPI (YoY)', 'Inflation Rate YoY', 'Core Inflation Rate YoY', 'Japan Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Industrial Production (MoM)', 'Industrial Production MoM Prel'],
-      conf:  ['Jibun Bank Manufacturing PMI'],
+      prod:  ['Industrial Production (MoM)', 'Industrial Production MoM Prel', 'Industrial Production MoM'],
+      conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
       rtl:   ['Retail Sales YoY', 'Retail Sales (QoQ)'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade', 'Trade Balance', 'Japan Balance of Trade'],
@@ -116,15 +126,15 @@
       unemp: ['Australia Unemployment Rate', 'Unemployment Rate'],
       prod:  [], // not published as a standalone release in the current source
       conf:  ['NAB Business Confidence'],
-      rtl:   ['Retail Sales (QoQ)'],
-      ca:    ['Current Account'],
+      rtl:   ['Retail Sales (QoQ)', 'Retail Sales MoM'],
+      ca:    [], // not currently tracked in the source feed for AUD
       trade: ['Balance of Trade', 'Trade Balance'],
     },
     CAD: {
       gdp:   ['GDP Growth Rate Annualized', 'GDP MoM'],
       cpi:   ['Canada Inflation Rate YoY', 'Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Industrial Production (YoY)'],
+      prod:  [], // not published as a standalone release in the current source
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
       rtl:   ['Retail Sales MoM', 'Canada Retail Sales MoM', 'Retail Sales MoM Final'],
       ca:    ['Current Account'],
@@ -141,12 +151,12 @@
       trade: ['Balance of Trade', 'Switzerland Balance of Trade', 'Trade Balance'],
     },
     NZD: {
-      gdp:   ['New Zealand GDP Growth Rate QoQ', 'Gross Domestic Product (QoQ)', 'New Zealand GDP Growth Rate YoY'],
-      cpi:   [], // not currently tracked in the source feed for NZD
+      gdp:   ['New Zealand GDP Growth Rate QoQ', 'Gross Domestic Product (QoQ)', 'New Zealand GDP Growth Rate YoY', 'GDP Growth Rate QoQ'],
+      cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly) CPI under this title
       unemp: ['Unemployment Rate'],
       prod:  [], // not published as a standalone release in the current source
       conf:  ['New Zealand Business NZ PMI', 'Business NZ PMI'],
-      rtl:   ['Retail Sales (QoQ)'],
+      rtl:   ['Retail Sales (QoQ)', 'Retail Sales QoQ'],
       ca:    ['New Zealand Current Account', 'Current Account'],
       trade: ['Balance of Trade', 'New Zealand Balance of Trade', 'Trade Balance NZD (MoM)'],
     },
@@ -174,7 +184,7 @@
 
   const GAP_TITLE = {
     prod: 'Not published as a standalone release in the current source for this currency',
-    cpi:  'Not currently tracked in the source feed for this currency',
+    ca:   'Not currently tracked in the source feed for this currency',
   };
 
   // ── Value parsing — sign-aware, unit-agnostic ──────────────────────────────
