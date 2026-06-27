@@ -125,12 +125,19 @@
   }
 
   // ── Synchronously transplant modal into inline body ────────────────
-  function _transplant(body, bdId, modalId, closeId, modalExtraCSS) {
+  // bdExtraCSS (optional, 6th arg): extra rules appended to #*-bd's own
+  // inline style. Default behaviour (omitted) is unchanged for every
+  // existing caller — #*-bd stays 'display:block', sized to its content.
+  // COT passes a value here to give #cot-bd a *definite* resolved height
+  // (flex:1;min-height:0 inside the inline-panel `body`, which is itself
+  // a definite-height flex item). See _transplant() callsite comment in
+  // the COT intercept below for why this is needed.
+  function _transplant(body, bdId, modalId, closeId, modalExtraCSS, bdExtraCSS) {
     var bd    = document.getElementById(bdId);
     var modal = document.getElementById(modalId);
     if (!bd || !modal) return false;
 
-    bd.style.cssText = 'display:block!important;position:static!important;background:none!important;padding:0!important;animation:none!important;z-index:auto!important;';
+    bd.style.cssText = 'display:block!important;position:static!important;background:none!important;padding:0!important;animation:none!important;z-index:auto!important;' + (bdExtraCSS || '');
 
     var base = 'width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;background:var(--bg)!important;position:static!important;';
     modal.style.cssText = base + (modalExtraCSS || '');
@@ -313,7 +320,25 @@
 
     _origOpenCOT && _origOpenCOT(ccy, data);
 
-    if (!_transplant(body, 'cot-bd', 'cot-modal', 'cot-m-close', '')) {
+    // #cot-bd needs an explicit flex:1;min-height:0 here (6th arg) — without
+    // it, #cot-bd stays 'display:block' with NO definite height of its own,
+    // so #cot-modal's 'height:100%!important' (set above in _transplant's
+    // `base`) has nothing real to resolve against and computes to 'auto'.
+    // That breaks the entire flex:1 chain the COT charts depend on to fill
+    // available space (#cot-m-body → .cot-panel.on → .cot-cw → .cot-chart-area
+    // → .cot-lw-wrap), so every chart container reports ~0px height the
+    // first time a tab is built — LightweightCharts then bakes that tiny
+    // (or hardcoded-fallback) height into the DOM, and only LATER, once a
+    // chart's own injected content gives the chain something real to size
+    // against, does the panel appear to "grow into" the correct height.
+    // This is why the bug was timing-shaped (looked like a flex-settling
+    // race) but no setTimeout/rAF delay could ever fix it: the container's
+    // real height was never available to read, at any delay, until a chart
+    // had already (badly) built once. Giving #cot-bd a real resolved height
+    // up front fixes both Net Position and Long/Short on the very first
+    // render, with zero delay.
+    if (!_transplant(body, 'cot-bd', 'cot-modal', 'cot-m-close', '',
+        'display:flex!important;flex-direction:column!important;flex:1!important;min-height:0!important;')) {
       body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">COT data unavailable.</div>';
     }
     document.body.style.overflow = '';
