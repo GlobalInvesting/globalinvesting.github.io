@@ -219,6 +219,26 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 16px;
   letter-spacing: -.3px;
 }
+/* ── pd-inline: Pair Detail expand strip (mirrored from dashboard.css) ─────── */
+.pd-inline-scroll{display:flex;overflow-x:auto;overflow-y:hidden;width:100%;box-sizing:border-box;}
+.pd-inline{display:flex;align-items:stretch;padding:0;font-family:var(--font-ui);width:100%;}
+.pd-inline-price{display:flex;flex-direction:column;justify-content:center;padding:6px 10px;border-right:1px solid var(--border2);min-width:100px;flex-shrink:0;}
+.pd-inline-sym{font-size:13px;font-weight:700;color:var(--text);letter-spacing:.02em;line-height:1;}
+.pd-inline-rate{font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--text);line-height:1.2;margin-top:3px;}
+.pd-inline-chg{font-size:10px;font-family:var(--font-mono);font-weight:600;line-height:1;margin-top:2px;}
+.pd-inline-meta{font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:2px;}
+.pd-inline-group{display:flex;flex-direction:column;justify-content:flex-start;padding:5px 8px;border-right:1px solid var(--border2);flex:1;min-width:0;}
+.pd-inline-group-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:4px;white-space:nowrap;}
+.pd-inline-metrics{display:flex;gap:8px;flex-wrap:wrap;}
+.pd-inline-metric{display:flex;flex-direction:column;}
+.pd-inline-lbl{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;margin-bottom:1px;}
+.pd-inline-val{font-size:11px;font-family:var(--font-mono);font-weight:600;color:var(--text);white-space:nowrap;}
+.pd-inline-val.pd-up,.pd-up{color:var(--up);}
+.pd-inline-val.pd-dn,.pd-dn{color:var(--down);}
+.pd-inline-retail-bar{height:3px;width:100%;max-width:90px;background:var(--bg3);border-radius:2px;overflow:hidden;margin:3px 0;}
+.pd-inline-retail-fill{height:100%;background:var(--up);border-radius:2px;opacity:.7;}
+.pd-inline-retail-row{display:flex;align-items:center;gap:2px;font-size:10px;font-family:var(--font-mono);font-weight:600;}
+.pd-inline-footer{font-size:8px;color:var(--text3);font-family:var(--font-mono);padding:2px 10px;border-top:1px solid var(--border);background:var(--bg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 </style>
 <meta property="article:published_time" content="2026-01-10T00:00:00Z">
@@ -761,9 +781,10 @@ a { color: inherit; text-decoration: none; }
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">FX Pairs — Majors</span>
-          <span style="font-size:9px;color:var(--text3);">Bid / Ask · Spread · 1D · 1W · HV 30d · Session Range</span>
+          <span style="font-size:9px;color:var(--text3);">Bid / Ask · Spread · 1D · 1W · HV 30d · Fwd · RR 1M · Session Range</span>
         </div>
-        <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono, monospace);">
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono, monospace);min-width:740px;">
           <thead>
             <tr style="background:var(--bg3);color:var(--text3);text-transform:uppercase;font-size:9px;letter-spacing:.05em;">
               <th style="text-align:left;padding:4px 8px;">Pair</th>
@@ -771,44 +792,55 @@ a { color: inherit; text-decoration: none; }
               <th style="padding:4px 6px;">Spread</th>
               <th style="padding:4px 6px;">1D Chg</th><th style="padding:4px 6px;">1W Chg</th>
               <th style="padding:4px 6px;">HV 30d</th>
+              <th style="padding:4px 6px;">Fwd 1M</th><th style="padding:4px 6px;">Fwd 3M</th>
+              <th style="padding:4px 6px;">RR 1M</th>
               <th style="padding:4px 6px;">Sess H</th><th style="padding:4px 6px;">Sess L</th>
             </tr>
           </thead>
           <tbody>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:5px 8px;font-weight:700;color:var(--text);">EUR/USD</td>
-              <td style="padding:5px 6px;color:var(--text2);">1.1510</td><td style="padding:5px 6px;color:var(--text2);">1.1512</td>
-              <td style="padding:5px 6px;color:var(--up);">0.9p</td>
-              <td style="padding:5px 6px;color:var(--up);">+0.21%</td><td style="padding:5px 6px;color:var(--down);">−0.44%</td>
-              <td style="padding:5px 6px;color:var(--text2);">6.8%</td>
-              <td style="padding:5px 6px;color:var(--text2);">1.1528</td><td style="padding:5px 6px;color:var(--text2);">1.1498</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.13898</td><td style="padding:5px 6px;color:var(--text2);">1.13902</td>
+              <td style="padding:5px 6px;color:var(--up);">0.3p</td>
+              <td style="padding:5px 6px;color:var(--up);">+0.11%</td><td style="padding:5px 6px;color:var(--down);">−0.60%</td>
+              <td style="padding:5px 6px;color:var(--text2);">4.8%</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.14038</td><td style="padding:5px 6px;color:var(--text2);">1.14313</td>
+              <td style="padding:5px 6px;color:var(--down);">−0.59</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.13895</td><td style="padding:5px 6px;color:var(--text2);">1.13781</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:5px 8px;font-weight:700;color:var(--text);">GBP/USD</td>
-              <td style="padding:5px 6px;color:var(--text2);">1.2931</td><td style="padding:5px 6px;color:var(--text2);">1.2934</td>
-              <td style="padding:5px 6px;color:var(--up);">1.1p</td>
-              <td style="padding:5px 6px;color:var(--up);">+0.14%</td><td style="padding:5px 6px;color:var(--up);">+0.32%</td>
-              <td style="padding:5px 6px;color:var(--text2);">7.2%</td>
-              <td style="padding:5px 6px;color:var(--text2);">1.2951</td><td style="padding:5px 6px;color:var(--text2);">1.2908</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.31978</td><td style="padding:5px 6px;color:var(--text2);">1.31983</td>
+              <td style="padding:5px 6px;color:var(--up);">0.5p</td>
+              <td style="padding:5px 6px;color:var(--up);">+0.00%</td><td style="padding:5px 6px;color:var(--down);">−0.03%</td>
+              <td style="padding:5px 6px;color:var(--text2);">6.2%</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.31976</td><td style="padding:5px 6px;color:var(--text2);">1.31951</td>
+              <td style="padding:5px 6px;color:var(--down);">−0.98</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.31988</td><td style="padding:5px 6px;color:var(--text2);">1.31865</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:5px 8px;font-weight:700;color:var(--text);">USD/JPY</td>
-              <td style="padding:5px 6px;color:var(--text2);">149.78</td><td style="padding:5px 6px;color:var(--text2);">149.80</td>
-              <td style="padding:5px 6px;color:var(--orange);">2.0p</td>
-              <td style="padding:5px 6px;color:var(--down);">−0.33%</td><td style="padding:5px 6px;color:var(--down);">−0.81%</td>
-              <td style="padding:5px 6px;color:var(--text2);">9.1%</td>
-              <td style="padding:5px 6px;color:var(--text2);">150.24</td><td style="padding:5px 6px;color:var(--text2);">149.42</td>
+              <td style="padding:5px 6px;color:var(--text2);">161.684</td><td style="padding:5px 6px;color:var(--text2);">161.686</td>
+              <td style="padding:5px 6px;color:var(--up);">0.2p</td>
+              <td style="padding:5px 6px;color:var(--down);">−0.06%</td><td style="padding:5px 6px;color:var(--up);">+0.25%</td>
+              <td style="padding:5px 6px;color:var(--text2);">2.2%</td>
+              <td style="padding:5px 6px;color:var(--text2);">161.327</td><td style="padding:5px 6px;color:var(--text2);">160.618</td>
+              <td style="padding:5px 6px;color:var(--down);">−1.16</td>
+              <td style="padding:5px 6px;color:var(--text2);">161.730</td><td style="padding:5px 6px;color:var(--text2);">161.685</td>
             </tr>
             <tr>
-              <td style="padding:5px 8px;font-weight:700;color:var(--text);color:var(--text3);">AUD/USD</td>
-              <td style="padding:5px 6px;color:var(--text3);">0.6519</td><td style="padding:5px 6px;color:var(--text3);">0.6522</td>
+              <td style="padding:5px 8px;font-weight:700;color:var(--text3);">AUD/USD</td>
+              <td style="padding:5px 6px;color:var(--text3);">0.6443</td><td style="padding:5px 6px;color:var(--text3);">0.6446</td>
               <td style="padding:5px 6px;color:var(--orange);">2.0p</td>
-              <td style="padding:5px 6px;color:var(--down);">−0.18%</td><td style="padding:5px 6px;color:var(--down);">−0.55%</td>
-              <td style="padding:5px 6px;color:var(--text3);">8.4%</td>
-              <td style="padding:5px 6px;color:var(--text3);">0.6541</td><td style="padding:5px 6px;color:var(--text3);">0.6505</td>
+              <td style="padding:5px 6px;color:var(--down);">−0.12%</td><td style="padding:5px 6px;color:var(--down);">−0.43%</td>
+              <td style="padding:5px 6px;color:var(--text3);">7.1%</td>
+              <td style="padding:5px 6px;color:var(--text3);">0.6418</td><td style="padding:5px 6px;color:var(--text3);">0.6371</td>
+              <td style="padding:5px 6px;color:var(--down);">−0.98</td>
+              <td style="padding:5px 6px;color:var(--text3);">0.6461</td><td style="padding:5px 6px;color:var(--text3);">0.6435</td>
             </tr>
           </tbody>
         </table>
+        </div>
         <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Spread color: <span style="color:var(--up);">green &lt;1.5 pip</span> · <span style="color:var(--orange);">orange 1.5–3</span> · <span style="color:var(--down);">red &gt;3</span> · Source: Live · delayed fallback / ECB</div>
       </div>
       <ul style="list-style:none;padding:0;">
@@ -1128,87 +1160,90 @@ a { color: inherit; text-decoration: none; }
       <h2>Pair Detail</h2>
 
       <p>When you click any pair in the FX Pairs table or any cross in the sidebar, an inline detail strip expands directly below the selected row. It updates instantly on every click with no page reload — click the same row again to collapse it. Data is organized into four labeled sections — <strong style="color:var(--text);">Price · Volatility · COT Positioning · Retail Sentiment</strong> — matching the grouping convention of institutional FX terminals:</p>
-      <!-- MOCK: Pair Detail inline strip (EUR/USD example) — mirrors pd-inline layout from dashboard.js expand row -->
+      <!-- MOCK: Pair Detail inline strip (USD/JPY example) — mirrors pd-inline layout from dashboard.js expand row -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;">
         <!-- Simulated FX table row above the expand strip -->
         <div style="display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border2);background:var(--bg2);padding:0;">
-          <div style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;min-width:80px;border-right:1px solid var(--border2);">EUR/USD</div>
-          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">1.17258</div>
-          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">1.17262</div>
-          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">0.4</div>
-          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--up);border-right:1px solid var(--border2);">+0.33%</div>
-          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--down);border-right:1px solid var(--border2);">-0.48%</div>
-          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">8.0%</div>
-          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">1.17270</div>
-          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);">1.16770</div>
+          <div style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;min-width:80px;border-right:1px solid var(--border2);">USD/JPY</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">161.684</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">161.686</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--up);border-right:1px solid var(--border2);">0.2p</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--down);border-right:1px solid var(--border2);">-0.06%</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--up);border-right:1px solid var(--border2);">+0.25%</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">2.2%</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">161.327</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">160.618</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--down);border-right:1px solid var(--border2);">-1.16</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">161.730</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);">161.685</div>
         </div>
         <!-- Inline expand strip — pd-inline layout -->
         <div class="pd-inline-scroll">
           <div class="pd-inline">
             <!-- Price block -->
             <div class="pd-inline-price">
-              <div class="pd-inline-sym">EUR/USD</div>
-              <div class="pd-inline-rate">1.17260</div>
-              <div class="pd-inline-chg pd-up">+0.33%</div>
-              <div class="pd-inline-meta">H 1.17275 · L 1.16778</div>
+              <div class="pd-inline-sym">USD/JPY</div>
+              <div class="pd-inline-rate">161.685</div>
+              <div class="pd-inline-chg pd-dn">-0.06%</div>
+              <div class="pd-inline-meta">H 161.730 &middot; L 161.685</div>
             </div>
             <!-- Price group -->
             <div class="pd-inline-group">
               <div class="pd-inline-group-lbl">Price</div>
               <div class="pd-inline-metrics">
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">1W CHG</div><div class="pd-inline-val pd-dn">-0.48%</div></div>
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">Carry</div><div class="pd-inline-val pd-dn">-1.75%</div></div>
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">ADR</div><div class="pd-inline-val">59 pip</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">1W CHG</div><div class="pd-inline-val pd-up">+0.25%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">Carry</div><div class="pd-inline-val pd-up">+2.66%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">ADR</div><div class="pd-inline-val">22 pip</div></div>
               </div>
               <div style="margin-top:5px;">
-                <div class="pd-inline-lbl">EUR Rate</div>
-                <div class="pd-inline-val">2.00%</div>
+                <div class="pd-inline-lbl">JPY Rate</div>
+                <div class="pd-inline-val">0.98%</div>
               </div>
             </div>
             <!-- Volatility group -->
             <div class="pd-inline-group">
               <div class="pd-inline-group-lbl">Volatility</div>
               <div class="pd-inline-metrics">
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">HV 30D</div><div class="pd-inline-val">8.0%</div></div>
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">ATM IV</div><div class="pd-inline-val pd-up">7.1%</div></div>
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">IV &minus; HV</div><div class="pd-inline-val pd-dn">-0.9%</div></div>
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">25D RR</div><div class="pd-inline-val pd-dn">-0.45</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">HV 30D</div><div class="pd-inline-val">2.2%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">ATM IV</div><div class="pd-inline-val pd-up">7.2%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">IV &minus; HV</div><div class="pd-inline-val pd-up">+5.0%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">25D RR</div><div class="pd-inline-val pd-dn">-1.16</div></div>
               </div>
               <div style="margin-top:5px;">
                 <div class="pd-inline-lbl">Spread</div>
-                <div class="pd-inline-val">0.4 pip</div>
+                <div class="pd-inline-val">0.2 pip</div>
               </div>
             </div>
             <!-- COT Positioning group -->
             <div class="pd-inline-group">
               <div class="pd-inline-group-lbl">COT Positioning</div>
               <div class="pd-inline-metrics">
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val pd-dn">-8,352</div></div>
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">LF WoW &Delta;</div><div class="pd-inline-val pd-dn">-8,280</div></div>
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">AM Net</div><div class="pd-inline-val pd-up">+309,031</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val pd-dn">-115,033</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">LF WoW &Delta;</div><div class="pd-inline-val pd-dn">-2,941</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">AM Net</div><div class="pd-inline-val pd-dn">-75,525</div></div>
               </div>
               <div class="pd-inline-metrics" style="margin-top:5px;">
-                <div class="pd-inline-metric"><div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val pd-dn">-4.3%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val pd-dn">-43.1%</div></div>
               </div>
               <div style="margin-top:4px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">
-                <span class="pd-dn">Short</span> LF · <span class="pd-up">Long</span> AM · <span style="color:var(--text3);">diverging</span>
+                <span class="pd-dn">Short</span> LF &middot; <span class="pd-dn">Short</span> AM &middot; <span style="color:var(--text3);">aligned</span>
               </div>
             </div>
-            <!-- Retail group — EUR/USD: 30% long / 70% short, majority short, AVG S 1.14750 -->
+            <!-- Retail group — USD/JPY: 16% long / 84% short, heavily short -->
             <div class="pd-inline-group" style="border-right:none;min-width:80px;max-width:110px;">
               <div class="pd-inline-group-lbl">Retail</div>
-              <div style="font-size:9px;font-weight:700;color:var(--down);font-family:var(--font-mono);letter-spacing:.04em;margin-bottom:2px;">MAJORITY SHORT</div>
-              <div class="pd-inline-retail-bar"><div class="pd-inline-retail-fill" style="width:30%;background:var(--up);"></div></div>
-              <div class="pd-inline-retail-row"><span style="color:var(--up);">30%</span><span style="color:var(--text3);margin:0 2px;">L</span><span style="color:var(--down);">70%</span><span style="color:var(--text3);margin:0 2px;">S</span></div>
+              <div style="font-size:9px;font-weight:700;color:var(--down);font-family:var(--font-mono);letter-spacing:.04em;margin-bottom:2px;">HEAVILY SHORT</div>
+              <div class="pd-inline-retail-bar"><div class="pd-inline-retail-fill" style="width:16%;background:var(--up);"></div></div>
+              <div class="pd-inline-retail-row"><span style="color:var(--up);">16%</span><span style="color:var(--text3);margin:0 2px;">L</span><span style="color:var(--down);">84%</span><span style="color:var(--text3);margin:0 2px;">S</span></div>
               <div style="margin-top:4px;">
                 <div class="pd-inline-lbl">AVG S</div>
-                <div class="pd-inline-val pd-dn" style="font-size:10px;">1.14750 ▼</div>
+                <div class="pd-inline-val pd-dn" style="font-size:10px;">158.501 &#9660;</div>
               </div>
             </div>
           </div>
         </div>
         <!-- Footer -->
-        <div class="pd-inline-footer">COT 2026-04-21 · Myfxbook · Saxo RR</div>
+        <div class="pd-inline-footer">COT 2026-06-23 &middot; Myfxbook &middot; Saxo RR</div>
       </div>
       <p style="font-size:12px;color:var(--text2);margin:4px 0 6px;">Fields are grouped into four sections:</p>
       <ul style="list-style:none;padding:0;margin-bottom:20px;">
