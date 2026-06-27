@@ -185,6 +185,8 @@
 .cd { color:var(--down); }
 .cn { color:var(--text2); }
 
+/* Price overlay legend (Net Position tab) */
+#cot-net-legend {\n  display:flex;align-items:center;justify-content:space-between;\n  padding:0 14px 8px;flex-shrink:0;\n}\n#cot-net-legend .cot-nl-items {\n  display:flex;flex-wrap:wrap;gap:12px;align-items:center;\n  font-size:9.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);\n}\n#cot-net-legend .cot-nl-item {\n  display:flex;align-items:center;gap:5px;\n}\n#cot-net-legend .cot-nl-dot {\n  display:inline-block;width:14px;height:3px;border-radius:2px;\n}\n#cot-net-price-status {\n  font-size:9px;color:var(--text3);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);\n  transition:opacity .2s;\n}\n/* OI section in Long/Short tab */\n#p-split .cot-oi-section {\n  flex-shrink:0;\n}\n.cot-oi-note {\n  font-size:9px;color:var(--text3);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);\n  margin-top:4px;\n}
 @media (max-width:480px){
   #cot-modal{width:100%;height:93vh;border-radius:12px 12px 0 0;border-bottom:none;}
   #cot-m-metrics{grid-template-columns:repeat(3,1fr);}
@@ -352,7 +354,38 @@ function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded) {
   </div>`).join('');
 }
 
-// ── LWC chart instances ───────────────────────────────────────────────────────
+// ── Spot price helpers (for Net Position overlay) ─────────────────────────────
+const _COT_SPOT = {
+  AUD: { s: 'audusd', inv: false, label: 'AUD/USD' },
+  EUR: { s: 'eurusd', inv: false, label: 'EUR/USD' },
+  GBP: { s: 'gbpusd', inv: false, label: 'GBP/USD' },
+  JPY: { s: 'usdjpy', inv: true,  label: 'USD/JPY (inv)' },
+  CHF: { s: 'usdchf', inv: true,  label: 'USD/CHF (inv)' },
+  CAD: { s: 'usdcad', inv: true,  label: 'USD/CAD (inv)' },
+  NZD: { s: 'nzdusd', inv: false, label: 'NZD/USD' },
+  NOK: { s: 'usdnok', inv: true,  label: 'USD/NOK (inv)' },
+  SEK: { s: 'usdsek', inv: true,  label: 'USD/SEK (inv)' },
+};
+
+// Fetch weekly spot closes from Stooq — returns [{time:'YYYY-MM-DD', value:n}, …]
+async function _fetchCOTSpot(ccy) {
+  const cfg = _COT_SPOT[ccy];
+  if (!cfg) return null;
+  try {
+    const resp = await fetch(`https://stooq.com/q/d/l/?s=${cfg.s}&i=w`);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const text = await resp.text();
+    const lines = text.trim().split('\n').slice(1); // skip header
+    return lines.map(line => {
+      const cols = line.split(',');
+      const close = parseFloat(cols[4]);
+      if (!cols[0] || isNaN(close)) return null;
+      return { time: cols[0], value: cfg.inv ? 1 / close : close };
+    }).filter(Boolean);
+  } catch (_) { return null; }
+}
+
+
 const _cotLwCharts=[];
 function _destroyCOTCharts(){
   _cotLwCharts.forEach(c=>{try{c.remove();}catch(_){}});
@@ -418,23 +451,97 @@ function _lwResize(container,lwChart){
 }
 
 // ── Chart builders ────────────────────────────────────────────────────────────
-function _buildNetChart(container,dates,netData,ccy){
-  const LWC=window.LightweightCharts;if(!LWC||!container)return null;
-  const W=container.offsetWidth||600,H=container.offsetHeight||container.parentElement?.offsetHeight||280;
-  const chart=LWC.createChart(container,_lwOpts(W,H));
+function _buildNetChart(container, dates, netData, ccy) {
+  const LWC = window.LightweightCharts; if (!LWC || !container) return null;
+  const W = container.offsetWidth || 600, H = container.offsetHeight || container.parentElement?.offsetHeight || 280;
+  const opts = _lwOpts(W, H);
+  opts.leftPriceScale  = { visible: true,  borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.08 } };
+  opts.rightPriceScale = { visible: false, borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.08 } };
+  const chart = LWC.createChart(container, opts);
   _cotLwCharts.push(chart);
-  const _up=_cotTC('--up','#26a69a'),_dn=_cotTC('--down','#ef5350');
-  const hist=chart.addSeries(LWC.HistogramSeries,{color:'#4f7fff',priceLineVisible:false,lastValueVisible:true,base:0});
-  hist.setData(dates.map((d,i)=>({time:d,value:netData[i]??0,color:(netData[i]??0)>=0?(_up+'d1'):(_dn+'d1')})));
-  chart.timeScale().fitContent();_lwResize(container,chart);
-  _mkTooltip(container,chart,()=>hist,param=>{
-    const v=param.seriesData.get(hist);if(!v)return null;
-    const mon=typeof param.time==='string'?param.time.slice(0,7):'';
-    const col=v.value>=0?_cotTC('--up','#26a69a'):_cotTC('--down','#ef5350');
-    return `<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${mon}</div><div>${ccy} LF Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
+  const _up = _cotTC('--up', '#26a69a'), _dn = _cotTC('--down', '#ef5350');
+
+  // Left axis — net LF histogram
+  const hist = chart.addSeries(LWC.HistogramSeries, {
+    priceScaleId: 'left',
+    color: '#4f7fff', priceLineVisible: false, lastValueVisible: true, base: 0,
+  });
+  hist.setData(dates.map((d, i) => ({ time: d, value: netData[i] ?? 0, color: (netData[i] ?? 0) >= 0 ? (_up + 'd1') : (_dn + 'd1') })));
+
+  chart.timeScale().fitContent();
+  _lwResize(container, chart);
+
+  _mkTooltip(container, chart, () => hist, param => {
+    const v = param.seriesData.get(hist); if (!v) return null;
+    const col = v.value >= 0 ? _cotTC('--up', '#26a69a') : _cotTC('--down', '#ef5350');
+    const priceS = container._priceS;
+    let html = `<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${typeof param.time === 'string' ? param.time : ''}</div>`;
+    html += `<div>${ccy} LF Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
+    if (priceS) {
+      const pv = param.seriesData.get(priceS);
+      if (pv) html += `<div style="color:var(--text2);margin-top:2px;">${(_COT_SPOT[ccy]||{}).label||'Spot'} <span style="color:var(--text);font-weight:600">${pv.value.toFixed(4)}</span></div>`;
+    }
+    return html;
+  });
+
+  // Expose chart + addPriceSeries helper on the container element
+  container._lwChart = chart;
+  container._addPriceSeries = function(spotData, label) {
+    if (!chart || !spotData?.length) return;
+    const _bl = _cotTC('--blue', '#4f7fff');
+    const pS = chart.addSeries(LWC.LineSeries, {
+      priceScaleId: 'right',
+      color: _bl + 'cc', lineWidth: 1.5,
+      priceLineVisible: false, lastValueVisible: true, crosshairMarkerRadius: 3,
+    });
+    pS.setData(spotData);
+    container._priceS = pS;
+    // Now that price scale has data, make right scale visible
+    chart.applyOptions({ rightPriceScale: { visible: true, borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.08 } } });
+    // Update legend
+    const legend = container.closest('.cot-cw')?.querySelector('#cot-net-legend');
+    if (legend) {
+      const statusEl = legend.querySelector('#cot-net-price-status');
+      if (statusEl) statusEl.textContent = label;
+      const nlItems = legend.querySelector('.cot-nl-items');
+      if (nlItems) {
+        const existing = nlItems.querySelector('[data-price-item]');
+        if (!existing) {
+          nlItems.insertAdjacentHTML('beforeend',
+            `<span class="cot-nl-item" data-price-item="1">` +
+            `<span class="cot-nl-dot" style="background:${_bl}cc;opacity:.8"></span>` +
+            `<span>${label}</span></span>`);
+        }
+      }
+    }
+    chart.timeScale().fitContent();
+  };
+
+  return chart;
+}
+
+function _buildOIChart(container, dates, oiData, ccy) {
+  const LWC = window.LightweightCharts; if (!LWC || !container) return null;
+  const W = container.offsetWidth || 600, H = container.offsetHeight || container.parentElement?.offsetHeight || 160;
+  const chart = LWC.createChart(container, _lwOpts(W, H));
+  _cotLwCharts.push(chart);
+  const _bl = _cotTC('--blue', '#4f7fff');
+  const oiS = chart.addSeries(LWC.AreaSeries, {
+    lineColor: _bl + 'bb', topColor: _bl + '28', bottomColor: _bl + '04',
+    lineWidth: 2, priceLineVisible: false, lastValueVisible: true, crosshairMarkerRadius: 4,
+  });
+  oiS.setData(dates.map((d, i) => ({ time: d, value: oiData[i] ?? 0 })).filter(p => p.value > 0));
+  chart.timeScale().fitContent();
+  _lwResize(container, chart);
+  _mkTooltip(container, chart, () => oiS, param => {
+    const v = param.seriesData.get(oiS); if (!v) return null;
+    return `<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${typeof param.time === 'string' ? param.time : ''}</div>` +
+      `<div>LF OI &nbsp;<span style="color:var(--blue,#4f7fff);font-weight:700">${Math.round(v.value).toLocaleString()}</span></div>`;
   });
   return chart;
 }
+
+
 
 function _buildSplitChart(container,dates,lngData,shrtData,ccy){
   const LWC=window.LightweightCharts;if(!LWC||!container)return null;
@@ -666,10 +773,30 @@ function openCOTModal(ccy,data){
 
     </div>
     <div id="p-net" class="cot-panel">
-      <div class="cot-cw"><div class="cot-ct">NET POSITION · LEVERAGED FUNDS · WEEKLY CONTRACTS</div><div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-net"></div></div></div>
+      <div class="cot-cw" style="flex:1;min-height:0;display:flex;flex-direction:column;">
+        <div class="cot-ct">NET POSITION · LEVERAGED FUNDS · WEEKLY CONTRACTS</div>
+        <div id="cot-net-legend">
+          <div class="cot-nl-items">
+            <span class="cot-nl-item">
+              <span class="cot-nl-dot" style="background:var(--up);opacity:.82"></span>
+              <span>LF Net (left)</span>
+            </span>
+          </div>
+          <span id="cot-net-price-status">Loading spot data…</span>
+        </div>
+        <div class="cot-chart-area" style="flex:1;min-height:0;"><div class="cot-lw-wrap" id="cot-lw-net"></div></div>
+      </div>
     </div>
-    <div id="p-split" class="cot-panel">
-      <div class="cot-cw"><div class="cot-ct">LONGS VS SHORTS · LEVERAGED FUNDS · CONTRACTS</div><div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-split"></div></div></div>
+    <div id="p-split" class="cot-panel" style="display:none;flex-direction:column;min-height:0;">
+      <div class="cot-cw" style="flex:0 0 55%;min-height:0;display:flex;flex-direction:column;">
+        <div class="cot-ct">LONGS VS SHORTS · LEVERAGED FUNDS · CONTRACTS</div>
+        <div class="cot-chart-area" style="flex:1;min-height:0;"><div class="cot-lw-wrap" id="cot-lw-split"></div></div>
+      </div>
+      <div class="cot-cw cot-oi-section" style="flex:0 0 42%;min-height:0;display:flex;flex-direction:column;">
+        <div class="cot-ct">LF OPEN INTEREST · LEVERAGED FUNDS · CONTRACTS</div>
+        <div class="cot-oi-note">Total contracts held by Leveraged Funds (longs + shorts). Rising OI = growing participation. Declining OI = de-risking.</div>
+        <div class="cot-chart-area" style="flex:1;min-height:0;margin-top:6px;"><div class="cot-lw-wrap" id="cot-lw-oi"></div></div>
+      </div>
     </div>
     <div id="p-participants" class="cot-panel">
       <div class="cot-cw">
@@ -743,11 +870,41 @@ function cotTab(el,tabId){
   const bd=document.getElementById('cot-bd');if(!bd?._cotData)return;
   const d=bd._cotData;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    if(tabId==='net'){const w=document.getElementById('cot-lw-net');if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
-    if(tabId==='split'){const w=document.getElementById('cot-lw-split');if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
+    if(tabId==='net'){
+      const w=document.getElementById('cot-lw-net');
+      if(w&&!w._built){
+        w._built=true;
+        _buildNetChart(w,d.dates,d.netData,d.ccy);
+        // Async: fetch spot and overlay it
+        const statusEl=document.getElementById('cot-net-price-status');
+        _fetchCOTSpot(d.ccy).then(spotData=>{
+          if(!w._addPriceSeries)return;
+          const cfg=_COT_SPOT[d.ccy];
+          if(spotData&&spotData.length){
+            w._addPriceSeries(spotData, cfg?cfg.label:'Spot');
+            if(statusEl)statusEl.textContent=cfg?.inv?'Right axis inverted (USD-quoted pair)':'Right axis';
+          } else {
+            if(statusEl)statusEl.textContent='Spot data unavailable';
+          }
+        }).catch(()=>{
+          if(statusEl)statusEl.textContent='Spot data unavailable';
+        });
+      } else if(w&&w._lwResize)w._lwResize();
+    }
+    if(tabId==='split'){
+      const w=document.getElementById('cot-lw-split');
+      if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}
+      else if(w&&w._lwResize)w._lwResize();
+      const wo=document.getElementById('cot-lw-oi');
+      if(wo&&!wo._built){
+        wo._built=true;
+        const oiData=d.lngData.map((l,i)=>(l??0)+(d.shrtData[i]??0));
+        _buildOIChart(wo,d.dates,oiData,d.ccy);
+      } else if(wo&&wo._lwResize)wo._lwResize();
+    }
     if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
     if(tabId==='overview'){ /* sparkline is inline SVG — no build needed */ }
-    setTimeout(()=>{['cot-lw-net','cot-lw-split','cot-lw-part'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
+    setTimeout(()=>{['cot-lw-net','cot-lw-split','cot-lw-oi','cot-lw-part'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
   }));
 }
 
@@ -775,7 +932,7 @@ window.addEventListener('gi-theme-change', function() {
   _destroyCOTCharts();
 
   // Clear _built flag on all chart containers so builders re-run
-  ['cot-lw-net','cot-lw-split','cot-lw-part'].forEach(function(id) {
+  ['cot-lw-net','cot-lw-split','cot-lw-oi','cot-lw-part'].forEach(function(id) {
     const w = document.getElementById(id);
     if (w) { w._built = false; if (w._lwResize) { window.removeEventListener('resize', w._lwResize); w._lwResize = null; } if (w._lwRo) { w._lwRo.disconnect(); w._lwRo = null; } }
   });
