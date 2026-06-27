@@ -862,28 +862,34 @@ function cotTab(el,tabId){
     if(tabId==='net'){
       const w=document.getElementById('cot-lw-net');
       const ws=document.getElementById('cot-lw-spot');
-      if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}
-      else if(w&&w._lwResize)w._lwResize();
-      if(ws&&!ws._built){
-        ws._built=true;
+      if((w&&!w._built)||(ws&&!ws._built)){
+        // Build both charts together after flex heights settle (same pattern as split tab)
         const statusEl=document.getElementById('cot-net-price-status');
         const titleEl=document.getElementById('cot-spot-ct');
         if(titleEl)titleEl.textContent=d.ccy+'/USD · DAILY SPOT CLOSE';
-        // Build spot chart after a brief delay (same flex-settle pattern as split tab)
+        // Kick off async fetch immediately so it overlaps with the 150ms wait
+        const spotPromise=_fetchCOTSpot(d.ccy);
         setTimeout(()=>requestAnimationFrame(()=>{
-          _fetchCOTSpot(d.ccy).then(spotData=>{
-            const cotStart=d.dates[0];
-            const filtered=(spotData||[]).filter(p=>p.time>=cotStart);
-            if(filtered.length){
-              if(statusEl)statusEl.textContent='';
-              _buildSpotChart(ws,filtered,d.ccy);
-            } else {
-              if(statusEl)statusEl.textContent='Spot data unavailable';
-              ws._built=false; // allow retry on next tab switch
-            }
-          }).catch(()=>{if(statusEl)statusEl.textContent='Spot data unavailable';ws._built=false;});
-        }),80);
-      } else if(ws&&ws._lwResize)ws._lwResize();
+          if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}
+          if(ws&&!ws._built){
+            ws._built=true;
+            spotPromise.then(spotData=>{
+              const filtered=(spotData||[]).filter(p=>p.time>=d.dates[0]);
+              if(filtered.length){
+                if(statusEl)statusEl.textContent='';
+                _buildSpotChart(ws,filtered,d.ccy);
+              } else {
+                if(statusEl)statusEl.textContent='Spot data unavailable';
+                ws._built=false;
+              }
+            }).catch(()=>{if(statusEl)statusEl.textContent='Spot data unavailable';ws._built=false;});
+          }
+          setTimeout(()=>{[w,ws].forEach(el=>{if(el&&el._lwResize)el._lwResize();});},250);
+        }),150);
+      } else {
+        if(w&&w._lwResize)w._lwResize();
+        if(ws&&ws._lwResize)ws._lwResize();
+      }
     }
     if(tabId==='split'){
       const w=document.getElementById('cot-lw-split');
