@@ -1862,6 +1862,21 @@ a:focus-visible,
 #econ-surprise-table td:last-child {
   width: 28px;
 }
+/* ── Economic Matrix (v8.23.0) — native G10 macro snapshot, replaces TradingView Economic Map ── */
+.econmx-wrap {
+  overflow: auto;
+}
+.econmx-table {
+  min-width: 760px;
+}
+.econmx-table th,
+.econmx-table td {
+  white-space: nowrap;
+}
+.econmx-table td:first-child {
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
 .es-bar-wrap {
   position: relative;
   height: 6px;

@@ -8997,7 +8997,6 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 (function initTVWidgets() {
   var _chartLoaded   = false;
   var _eventsLoaded  = false;
-  var _econmapLoaded = false;
 
   function loadTVEvents() {
     var scaleWrap = document.getElementById('tvcal-scale');
@@ -9019,26 +9018,10 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     _eventsLoaded = true;
   }
 
-  function loadTVEconMap() {
-    var placeholder = document.getElementById('tv-econmap-placeholder');
-    if (!placeholder) return;
-    var s = document.createElement('script');
-    s.type = 'module';
-    s.src  = 'https://widgets.tradingview-widget.com/w/en/tv-economic-map.js';
-    var widget = document.createElement('tv-economic-map');
-    widget.setAttribute('theme', 'dark');
-    widget.setAttribute('transparent', '');
-    widget.style.cssText = 'width:100%;height:100%;min-height:380px;display:block;background:var(--bg);';
-    placeholder.replaceWith(widget);
-    document.head.appendChild(s);
-    _econmapLoaded = true;
-  }
-
   if (typeof IntersectionObserver === 'undefined') {
     // Fallback for very old browsers: load everything immediately
     if (typeof loadTVChart === 'function') loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
     loadTVEvents();
-    loadTVEconMap();
     return;
   }
 
@@ -9055,9 +9038,6 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
       } else if (id === 'tvcal-inner' && !_eventsLoaded) {
         loadTVEvents();
         io.unobserve(entry.target);
-      } else if (id === 'section-econmap' && !_econmapLoaded) {
-        loadTVEconMap();
-        io.unobserve(entry.target);
       }
     });
   }, { rootMargin: '150px' });
@@ -9067,10 +9047,8 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
   function attachObservers() {
     var chartWrap = document.getElementById('tv-chart-wrap');
     var calInner  = document.getElementById('tvcal-inner');
-    var econMap   = document.getElementById('section-econmap');
     if (chartWrap) io.observe(chartWrap);
     if (calInner)  io.observe(calInner);
-    if (econMap)   io.observe(econMap);
   }
 
   if (document.readyState === 'loading') {
