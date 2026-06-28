@@ -1,57 +1,53 @@
 {
-  "generated_at": "2026-06-27T21:05:32Z",
+  "generated_at": "2026-06-28T21:03:30Z",
   "signals": [
     {
-      "time": "18:25",
+      "time": "21:03",
       "priority": "critical",
-      "title": "NZD/USD — G10 Bilateral Theme + Hawkish Fed Divergence",
-      "text": "NZD is the G10 laggard (-1.692% 1W avg) against the USD leader (+0.771% 1W avg), creating a 2.464% spread; this strong bilateral theme sets up NZD/USD downside pressure. The hawkish Fed narrative, with the Fed removing easing bias from its statement, reinforces USD strength against NZD's mildly accommodative real rate (-0.83%). The next RBNZ meeting (mkt: 83% hike priced) on 8 Jul is the catalyst for any shift in the RBNZ's hike bias.",
+      "title": "NZD/USD — G10 Bilateral Theme + Hawkish Fed Bets",
+      "text": "NZD/USD at 0.5638 — USD outperformance (avg +0.811%) vs NZD underperformance (avg -1.691%) creates a 250bp G10 spread. Hawkish Fed bets and Hormuz geopolitical risk drive USD demand despite dialled-back aggressive pricing earlier in the week. NZD real rate at -0.83% (accommodative) vs USD +1.56% (restrictive) reinforces the structural downside. Retail 93% long vs COT LF net short -23,314 confirms a retail-fading-institutional-trend divergence; retail capitulation risk is high if 0.5600 breaks.",
       "evidence": [
-        "USD 1W avg: +0.771% (n=7)",
-        "NZD 1W avg: -1.692% (n=4)",
-        "G10 spread: 2.464%",
-        "Fed Removed This 1 Key Phrase From the Inflation Report (18:25)",
-        "NZD COT net short -23,314"
+        "USD 1W avg: +0.811% (n=7)",
+        "NZD 1W avg: -1.691% (n=4)",
+        "G10 spread: 2.502%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "14:37",
+      "time": "20:59",
       "priority": "warning",
-      "title": "USD/JPY — Crowded Short Squeeze Risk + Yield Divergence",
-      "text": "JPY COT net short -115,033 (28.4% long) is an extreme crowded short position, creating short-squeeze risk (USD/JPY downside if shorts cover) for USD/JPY. This positioning runs against the substantial +266bp carry advantage favoring USD (SOFR 3.64% vs TONA 0.98%) and the hawkish Fed narrative. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for any shift in the yield gap or JPY's accommodative real rate (-0.52%).",
+      "title": "USD/JPY — Carry + Vol + Retail Divergence",
+      "text": "USD/JPY at 161.72 — 275bp Fed-BoJ carry sustains the bid, but 160.00 remains the critical level for BoJ intervention risk. COT LF net short -115,033 (crowded carry) vs retail 84% short creates a rare alignment where both specs and retail are fading the upside, yet price remains bid. IV 7.2% vs HV30 2.1% (VRP +5.0%) signals the options market is paying a heavy premium for protection against a sharp carry unwind. Carry dominates while VIX remains at 18.4 (normal volatility).",
       "evidence": [
-        "JPY COT net short -115,033",
-        "USD/JPY closed 161.69 Friday",
-        "USD/JPY OIS carry: +266bp",
-        "Hawkish Fed Bets Hit Silver as Hormuz Risk Returns (14:37)"
+        "USD/JPY carry: +275bp",
+        "VRP: +5.0%",
+        "Retail: 84% short"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:05",
+      "time": "20:55",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Unwind Risk + Negative CESI",
-      "text": "AUD COT net long +29,035 (64.9% long) creates crowded-long unwind risk for AUD/USD, which closed 0.6901 Friday. This is exacerbated by AUD's neutral CESI score (+0) and the strong USD momentum (+0.771% 1W avg). The next RBA meeting (mkt: 100% hold priced) on 11 Aug determines whether the current mildly restrictive real rate (+0.17%) can sustain the bid against USD strength.",
+      "title": "AUD/USD — Positioning + Vol + CESI",
+      "text": "AUD/USD at 0.6893 — COT LF net long +29,035 (64.9% long) faces extreme options hedging as VRP hits +14.6% (IV 22.1% vs HV30 7.5%). While RBA 4.35% vs Fed 3.75% provides a 60bp carry advantage for AUD, the USD CESI (+291) significantly outperforms AUD (+6), suggesting US data resilience is overmatching the carry draw. 25d RR at -0.98 confirms a moderate put skew as the market hedges for a break below 0.6850.",
       "evidence": [
-        "AUD COT net long +29,035",
-        "AUD/USD closed 0.6901 Friday",
-        "AUD CESI: +0 (Neutral)",
-        "USD 1W avg: +0.771% (n=7)"
+        "AUD COT LF net: +29,035",
+        "VRP: +14.6%",
+        "USD CESI: +291"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:05",
+      "time": "20:48",
       "priority": "info",
-      "title": "EUR/USD — Negative CESI + Moderate Put Skew",
-      "text": "EUR's moderate negative CESI score (-5 misses) indicates data is consistently disappointing expectations, suggesting a fundamental headwind for EUR/USD. This aligns with a moderate put skew (-0.59 1M 25d RR) in options markets, indicating a bias for EUR weakness. The next ECB meeting (mkt: 100% hold priced) on 23 Jul is the catalyst for any change in the mildly restrictive real rate (+0.08%).",
+      "title": "USD/CAD — Correlation Break + Retail Extreme",
+      "text": "USD/CAD at 1.4197 — Correlation with WTI Oil has inverted to -0.732 (z = -2.13σ) vs the 252d norm of +0.024, indicating CAD is decoupling from energy prices to follow the 150bp USD carry advantage. Retail 92% short vs COT LF net short -87,096 shows retail is aggressively fading the move while institutions remain short CAD. Watch for a squeeze toward 1.4300 if US NFP data next week exceeds expectations.",
       "evidence": [
-        "EUR CESI: -5 misses",
-        "EUR/USD 25-Delta Risk Reversal: -0.59",
-        "EUR/USD closed 1.139 Friday"
+        "USD/CAD vs WTI corr: -0.732 (z=-2.13σ)",
+        "Retail: 92% short",
+        "USD/CAD carry: +150bp"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
