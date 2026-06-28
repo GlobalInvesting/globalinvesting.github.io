@@ -11157,7 +11157,14 @@ async function renderEconSurprises() {
   // ── Source label ──────────────────────────────────────────────────────────
   // ── Score per currency ────────────────────────────────────────────────────
   // Inverse indicators: a lower actual is a positive surprise (e.g. unemployment fell)
-  const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit', 'trade balance'];
+  // v8.27.0: "trade balance" removed — Trade Balance is a SIGNED net level (deficit
+  // negative, surplus positive), same as Current Account which this list already
+  // correctly excludes. For a signed balance, actual > forecast already means a
+  // smaller deficit / bigger surplus than expected — the good direction — with no
+  // inversion needed. Confirmed against calendar.json: 36/36 Trade Balance prints
+  // (GBP/USD) are negative-signed, matching the same convention as Current Account.
+  // Inverting it was double-flipping genuine beats into misses (and vice versa).
+  const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit'];
 
   // ── Exponential time-decay (CESI convention) ────────────────────────────────────────
   // CESI applies decay so recent surprises dominate and old data fades.
@@ -12406,7 +12413,8 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
           'interest rate projection',
           'eia crude oil','eia crude',
         ];
-        const INVERSE_KW   = ['unemployment','jobless','claims','deficit','trade balance'];
+        // v8.27.0: "trade balance" removed — see renderEconSurprises() for rationale.
+        const INVERSE_KW   = ['unemployment','jobless','claims','deficit'];
         const stats        = window._ECON_SURPRISE_STATS || {};
 
         function _scoreWin(startMs, endMs) {

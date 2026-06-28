@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.3.6
+// ECONOMIC SURPRISES MODAL  v1.3.7
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -238,7 +238,11 @@ const _ESM_CCY_META = {
 
 const _ESM_G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
 
-const _ESM_INVERSE_KW = ['unemployment','jobless','claims','deficit','trade balance'];
+// v8.27.0: "trade balance" removed — Trade Balance is a SIGNED net level (deficit
+// negative, surplus positive), same as Current Account which this list already
+// correctly excludes. No inversion needed for a signed balance. Must stay in sync
+// with INVERSE_KW in dashboard.js and INVERSE_EVENTS in fetch_economic_calendar.py.
+const _ESM_INVERSE_KW = ['unemployment','jobless','claims','deficit'];
 
 // Canonical ESI series key — must stay in sync with dashboard.js _canonEsi and
 // Python compute_surprise_stats() in fetch_economic_calendar.py.
