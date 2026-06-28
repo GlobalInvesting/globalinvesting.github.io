@@ -1,5 +1,5 @@
 /**
- * econ-matrix.js v1.0.3 — Native Economic Matrix panel
+ * econ-matrix.js v1.0.4 — Native Economic Matrix panel
  *
  * Replaces the third-party TradingView Economic Map widget (tv-economic-map.js)
  * with a native table in the style of an institutional regional economic matrix
@@ -97,7 +97,7 @@
       prod:  ['Industrial Production MoM', 'Euro Area Industrial Production MoM', 'Industrial Production (MoM)'],
       conf:  ['HCOB Eurozone Manufacturing PMI', 'HCOB Manufacturing PMI Flash', 'Business Confidence'],
       rtl:   ['Retail Sales (MoM)', 'Retail Sales MoM'],
-      ca:    [], // not currently tracked in the source feed for EUR
+      ca:    ['Current Account'], // ECB BP6 monthly — injected by fetch_supplementary_indicators.py
       trade: ['Balance of Trade', 'Trade Balance EU', 'Euro Area Balance of Trade'],
     },
     GBP: {
@@ -127,14 +127,14 @@
       prod:  ['Ai Group Industry Index'], // Ai Group Performance of Manufacturing — published monthly by Ai Group Australia
       conf:  ['NAB Business Confidence'],
       rtl:   ['Retail Sales (QoQ)', 'Retail Sales MoM'],
-      ca:    [], // not currently tracked in the source feed for AUD
+      ca:    ['Current Account'], // ABS BOP quarterly — injected by fetch_supplementary_indicators.py
       trade: ['Balance of Trade', 'Trade Balance'],
     },
     CAD: {
       gdp:   ['GDP Growth Rate Annualized', 'GDP MoM'],
       cpi:   ['Canada Inflation Rate YoY', 'Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
-      prod:  [], // not published as a standalone release in the current source
+      prod:  ['Manufacturing Sales MoM'], // StatCan via FRED CANSLMNTO02MLSAM — injected by fetch_supplementary_indicators.py
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
       rtl:   ['Retail Sales MoM', 'Canada Retail Sales MoM', 'Retail Sales MoM Final'],
       ca:    ['Current Account'],
@@ -154,7 +154,7 @@
       gdp:   ['New Zealand GDP Growth Rate QoQ', 'Gross Domestic Product (QoQ)', 'New Zealand GDP Growth Rate YoY', 'GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly) CPI under this title
       unemp: ['Unemployment Rate'],
-      prod:  [], // not published as a standalone release in the current source
+      prod:  ['Manufacturing Sales YoY'], // OECD MEI / Stats NZ — injected by fetch_supplementary_indicators.py
       conf:  ['New Zealand Business NZ PMI', 'Business NZ PMI'],
       rtl:   ['Retail Sales (QoQ)', 'Retail Sales QoQ'],
       ca:    ['New Zealand Current Account', 'Current Account'],
