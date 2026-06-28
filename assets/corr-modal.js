@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CORRELATION MODAL  v2.1  — inline-panel edition
+// CORRELATION MODAL  v2.2  — inline-panel edition
 // Fluid layout, terminal CSS variables throughout.
 // ═══════════════════════════════════════════════════════════════════════════
 (function () {
@@ -75,6 +75,13 @@
 .cm-signal.warn .cm-signal-tag { color:var(--down); }
 .cm-signal.ok   .cm-signal-tag { color:var(--up); }
 .cm-signal-body { color:var(--text2); }
+.cm-related-title { font-size:8.5px;font-weight:600;color:var(--text3,#4e5c70);text-transform:uppercase;letter-spacing:.08em;padding:10px 14px 4px;border-top:1px solid var(--border,#252d3d); }
+.cm-related-row { display:flex;justify-content:space-between;align-items:baseline;padding:6px 14px;border-bottom:1px solid var(--border,#252d3d); }
+.cm-related-row:last-child { border-bottom:none; }
+.cm-related-key { font-size:9.5px;color:var(--text2);font-family:var(--font-mono); }
+.cm-related-val { font-size:10px;font-weight:600;font-family:var(--font-mono);color:var(--text); }
+.cm-related-val.up   { color:var(--up); }
+.cm-related-val.down { color:var(--down); }
 `;
   document.head.appendChild(s);
 })();
@@ -204,6 +211,20 @@ function openCorrModal(corrObj) {
   let dateRangeLabel = '';
   if (dates.length >= 2) dateRangeLabel = ' \u00b7 ' + _cmFmtDate(dates[0]) + ' \u2013 ' + _cmFmtDate(dates[dates.length - 1]);
 
+  // Related correlations — other cached pairs sharing an instrument with this one (a or b).
+  // Cross-asset confluence check: a Bloomberg CORR matrix reduced to "what else moves with this pair right now".
+  const _cache = Array.isArray(window._corrDataCache) ? window._corrDataCache : [];
+  const related = _cache
+    .filter(c => c && c !== corrObj && (c.a === a || c.b === a || c.a === b || c.b === b))
+    .map(c => ({ label: c.a + ' vs ' + c.b, val: c.corr ?? c.corr30 ?? c.corr90 ?? null }))
+    .filter(r => r.val != null)
+    .sort((p, q) => Math.abs(q.val) - Math.abs(p.val))
+    .slice(0, 4);
+  const relatedHtml = related.length
+    ? '<div class="cm-related-title">Related Correlations \u00b7 60d</div>' +
+      related.map(r => '<div class="cm-related-row"><span class="cm-related-key">' + r.label + '</span><span class="cm-related-val ' + _cmCls(r.val) + '">' + _cmFmt(r.val) + '</span></div>').join('')
+    : '';
+
   const bd = document.createElement('div');
   bd.id = 'cm-bd';
   bd.setAttribute('role', 'dialog');
@@ -237,6 +258,7 @@ function openCorrModal(corrObj) {
         '<div class="cm-regime-row"><span class="cm-regime-key">Z-score</span><span class="cm-regime-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</span></div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">252d range</span><span class="cm-regime-val">' + rangeHtml + '</span></div>' +
         (sigTxt ? '<div class="cm-signal ' + sigCls + '"><span class="cm-signal-tag">' + sigTag + '</span><span class="cm-signal-body">' + sigTxt + '</span></div>' : '') +
+        relatedHtml +
       '</div>' +
     '</div>';
 

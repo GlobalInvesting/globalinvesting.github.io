@@ -1,4 +1,4 @@
-// COT MODAL CHART  v2.2 — full theme-var pass (up/down hardcodes eliminated)
+// COT MODAL CHART  v2.3 — Participants tab: per-category breakdown table (LF/AM/DD Long/Short/Net/WoW)
 // COT MODAL CHART  v2.0 — LightweightCharts v5 (replaces Chart.js)
 // File: assets/cot-modal-chart.js
 // ═══════════════════════════════════════════════════════════════════════════
@@ -250,6 +250,18 @@ function _calcPct(history) {
   if (vals.length < 4) return null;
   const cur = vals[vals.length-1];
   return Math.round(vals.filter(v=>v<=cur).length/vals.length*100);
+}
+function _cotPartRow(label,long_,short_,net,wow){
+  const total=(long_||0)+(short_||0);
+  const lPct=total>0&&long_!=null?Math.round(long_/total*100):null;
+  return `<tr>
+    <td>${label}</td>
+    <td>${long_!=null?Math.round(long_).toLocaleString():'—'}</td>
+    <td>${short_!=null?Math.round(short_).toLocaleString():'—'}</td>
+    <td class="${_cotCls(net)}">${_cotFmt(net)}</td>
+    <td>${lPct!=null?lPct+'%':'—'}</td>
+    <td class="${_cotCls(wow)}">${_cotFmt(wow)}</td>
+  </tr>`;
 }
 function _posLabel(z) {
   if (z == null) return {txt:'—',col:_cotTC('--text2','#8b949e')};
@@ -607,9 +619,15 @@ function openCOTModal(ccy,data){
   const net=data.netPosition||0,long_=data.longPositions||0,short_=data.shortPositions||0;
   const total=long_+short_,lPct=total>0?Math.round(long_/total*100):50;
   const amNet=data.assetManagerNet,ddNet=data.dealerNet,weekEnd=data.weekEnding||'',nWks=history.length;
+  const amLong_=data.assetManagerLong,amShort_=data.assetManagerShort,ddLong_=data.dealerLong,ddShort_=data.dealerShort;
   const zScore=_calcZ(history),pctHist=_calcPct(history),zInfo=_posLabel(zScore),isCrowded=Math.abs(zScore||0)>=1.5;
-  let wow=null;
-  if(history.length>=2){const prev=history[history.length-2];wow=net-(prev.levNet??((prev.levLong||0)-(prev.levShort||0)));}
+  let wow=null,amWow=null,ddWow=null;
+  if(history.length>=2){
+    const prev=history[history.length-2];
+    wow=net-(prev.levNet??((prev.levLong||0)-(prev.levShort||0)));
+    if(amNet!=null&&prev.assetManagerNet!=null)amWow=amNet-prev.assetManagerNet;
+    if(ddNet!=null&&prev.dealerNet!=null)ddWow=ddNet-prev.dealerNet;
+  }
   const netPctOI=total>0?(net/total*100):null;
   const netPctStr=netPctOI!=null?(netPctOI>0?'+':'')+netPctOI.toFixed(1)+'%':'—';
   const zStr=zScore!=null?(zScore>0?'+':'')+zScore.toFixed(2):'—';
@@ -798,6 +816,17 @@ function openCOTModal(ccy,data){
         <strong style="color:#8b949e">AM (Asset Managers):</strong> Mutual funds and pensions. Slow trend-followers. Confluence with LF = stronger signal.<br>
         <strong style="color:#8b949e">DD (Dealers):</strong> Market-makers. Typically contra-positioned to speculators. Useful contrarian signal.
       </div></div>
+      <div class="cot-cw">
+        <div class="cot-ct">PARTICIPANT BREAKDOWN · WEEK ENDING ${weekEnd}</div>
+        <table class="cot-tbl">
+          <thead><tr><th>Category</th><th>Long</th><th>Short</th><th>Net</th><th>Long%</th><th>WoW Δ</th></tr></thead>
+          <tbody>
+            ${_cotPartRow('Leveraged Funds',long_,short_,net,wow)}
+            ${_cotPartRow('Asset Managers',amLong_,amShort_,amNet,amWow)}
+            ${_cotPartRow('Dealers',ddLong_,ddShort_,ddNet,ddWow)}
+          </tbody>
+        </table>
+      </div>
     </div>
     <div id="p-history" class="cot-panel">
       <div class="cot-cw">
