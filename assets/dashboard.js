@@ -11096,6 +11096,78 @@ async function renderSovereignSpreads() {
 // Bar chart centred at 0: green bar extends right for positive, red bar extends
 // left for negative — matching Citi CESI / Bloomberg BEEI visual convention.
 // N column shows count of events with actuals (sample size transparency).
+// ── Shared ESI scoring helpers ──────────────────────────────────────────────
+// v8.28.0: hoisted out of renderEconSurprises() to module scope. Previously
+// _canonEsi/_parseNum/NOISE_KW/INVERSE_KW were const-declared INSIDE
+// renderEconSurprises() only, so _lwLoadCompare() (a separate top-level
+// function, used by the chart's "Compare ESI" overlay) could not see them.
+// _lwLoadCompare() kept its own second copy of NOISE_KW/INVERSE_KW (drift
+// risk — exactly what caused the Trade Balance double-inversion bug to need
+// fixing in four places) and called the undefined _canonEsi() directly,
+// which threw a ReferenceError on every "Compare ESI" click, silently
+// swallowed by _lwLoadCompare's try/catch (console.warn only — the overlay
+// just never rendered). One definition now, used by both call sites.
+
+// Canonical ESI series key: strip parentheticals then country-name prefix.
+// Prevents fragmentation when Myfxbook RSS alternates between short-form
+// ("Initial Jobless Claims") and country-prefixed ("United States Initial
+// Jobless Claims") titles for the same recurring monthly/weekly event.
+// Must stay in sync with Python compute_surprise_stats() in fetch_economic_calendar.py
+// and _canonEsi in econ-surprises-modal.js.
+const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
+  'australia ','canada ','switzerland ','new zealand ','norway ','sweden '];
+const _canonEsi = t => {
+  let s = t.replace(/\s*\([^)]*\)/g,'').trim();
+  for (const p of _CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
+  return s;
+};
+
+// ── Numeric parser for macro actual/forecast values ──────────────────────
+// parseFloat() alone fails on currency-symbol-prefixed strings such as
+// "$-226.8B", "A$1.791B", "¥3907B", "CHF15.5B", "NOK62.6B", "-€5.2B".
+// All Trade Balance and Current Account events carry these prefixes, so they
+// were silently excluded from ESI scoring (isNaN check returned false).
+// Strategy: strip everything except digits and the decimal point, then restore
+// the sign by checking whether the original string contained a minus anywhere.
+// This is safe because macro data strings never contain two separate numbers.
+const _parseNum = s => {
+  if (s == null || s === '') return NaN;
+  const str = String(s).replace(/,/g, '');
+  const neg  = str.includes('-');
+  const digits = str.replace(/[^\d.]/g, '');
+  const n = parseFloat(digits);
+  return isNaN(n) ? NaN : (neg ? -n : n);
+};
+
+// Shared noise-keyword list (defined once, reused by every scorer).
+const NOISE_KW = [
+  'cftc','baker hughes','rig count','auction','api weekly',
+  'milk auction','fed\'s balance sheet','reserve balances',
+  'redbook','ibd/tipp','tips auction','note auction','bond auction',
+  'gilt auction','jgb auction','obligaciones','speculative net',
+  'nc net position','crude oil inventories','crude oil imports',
+  'distillate','gasoline inventorie','gasoline production',
+  'refinery','heating oil','natural gas storage',
+  'foreign bonds buying','foreign investments in japanese',
+  'foreign bond investment','foreign investment in japan',
+  'm2 money','m3 money','m4 money','reserve assets total',
+  'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
+  'ibd','3-month bill','4-week bill','52-week bill',
+  '4-week average','4-week avg',
+  'tic net','net long-term tic','total net tic',
+  'interest rate projection',
+  'eia crude oil','eia crude',
+];
+
+// Inverse indicators: a lower actual is a positive surprise (e.g. unemployment fell).
+// v8.27.0: "trade balance" removed — Trade Balance is a SIGNED net level (deficit
+// negative, surplus positive), same as Current Account which this list already
+// correctly excludes. For a signed balance, actual > forecast already means a
+// smaller deficit / bigger surplus than expected — the good direction — with no
+// inversion needed. Confirmed against calendar.json: 36/36 Trade Balance prints
+// (GBP/USD) are negative-signed, matching the same convention as Current Account.
+const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit'];
+
 async function renderEconSurprises() {
   const tbody = document.getElementById('econ-surprise-tbody');
   if (!tbody) return;
@@ -11160,12 +11232,6 @@ async function renderEconSurprises() {
   // v8.27.0: "trade balance" removed — Trade Balance is a SIGNED net level (deficit
   // negative, surplus positive), same as Current Account which this list already
   // correctly excludes. For a signed balance, actual > forecast already means a
-  // smaller deficit / bigger surplus than expected — the good direction — with no
-  // inversion needed. Confirmed against calendar.json: 36/36 Trade Balance prints
-  // (GBP/USD) are negative-signed, matching the same convention as Current Account.
-  // Inverting it was double-flipping genuine beats into misses (and vice versa).
-  const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit'];
-
   // ── Exponential time-decay (CESI convention) ────────────────────────────────────────
   // CESI applies decay so recent surprises dominate and old data fades.
   // Half-life = 45 days: w(0d)=1.00, w(45d)=0.50, w(90d)=0.25.
@@ -11185,63 +11251,6 @@ async function renderEconSurprises() {
   const WIDE_LOOKBACK_MS = 180 * 24 * 60 * 60 * 1000;
   const ccyScores  = {};
   const widenedCcys = new Set();
-
-  // Canonical ESI series key: strip parentheticals then country-name prefix.
-  // Prevents fragmentation when Myfxbook RSS alternates between short-form
-  // ("Initial Jobless Claims") and country-prefixed ("United States Initial
-  // Jobless Claims") titles for the same recurring monthly/weekly event.
-  // Must stay in sync with Python compute_surprise_stats() in fetch_economic_calendar.py
-  // and _canonEsi in econ-surprises-modal.js.
-  const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
-    'australia ','canada ','switzerland ','new zealand ','norway ','sweden '];
-  const _canonEsi = t => {
-    let s = t.replace(/\s*\([^)]*\)/g,'').trim();
-    for (const p of _CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
-    return s;
-  };
-
-  // Shared noise-keyword list (defined once, reused across both passes).
-  const NOISE_KW = [
-    'cftc','baker hughes','rig count','auction','api weekly',
-    'milk auction','fed\'s balance sheet','reserve balances',
-    'redbook','ibd/tipp','tips auction','note auction','bond auction',
-    'gilt auction','jgb auction','obligaciones','speculative net',
-    'nc net position','crude oil inventories','crude oil imports',
-    'distillate','gasoline inventorie','gasoline production',
-    'refinery','heating oil','natural gas storage',
-    'foreign bonds buying','foreign investments in japanese',
-    'foreign bond investment','foreign investment in japan',
-    'm2 money','m3 money','m4 money','reserve assets total',
-    'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
-    'ibd','3-month bill','4-week bill','52-week bill',
-    // Additional noise: derived averages, financial flows, SEP projections, EIA energy
-    '4-week average','4-week avg',
-    'tic net','net long-term tic','total net tic',
-    'interest rate projection',
-    'eia crude oil','eia crude',
-  ];
-
-  // Per-event scorer — shared by both passes.
-  // minAgeMs/maxAgeMs define the half-open age band: [minAgeMs, maxAgeMs).
-  // Pass 0: (0, LOOKBACK_MS]  → standard 90d.
-  // Pass 1: (LOOKBACK_MS, WIDE_LOOKBACK_MS] → 90–180d extension band.
-  // limitCcys: Set of currencies to include (null = all G10).
-  // ── Numeric parser for macro actual/forecast values ──────────────────────
-  // parseFloat() alone fails on currency-symbol-prefixed strings such as
-  // "$-226.8B", "A$1.791B", "¥3907B", "CHF15.5B", "NOK62.6B", "-€5.2B".
-  // All Trade Balance and Current Account events carry these prefixes, so they
-  // were silently excluded from ESI scoring (isNaN check returned false).
-  // Strategy: strip everything except digits and the decimal point, then restore
-  // the sign by checking whether the original string contained a minus anywhere.
-  // This is safe because macro data strings never contain two separate numbers.
-  const _parseNum = s => {
-    if (s == null || s === '') return NaN;
-    const str = String(s).replace(/,/g, '');
-    const neg  = str.includes('-');
-    const digits = str.replace(/[^\d.]/g, '');
-    const n = parseFloat(digits);
-    return isNaN(n) ? NaN : (neg ? -n : n);
-  };
 
   function _scorePass(minAgeMs, maxAgeMs, limitCcys) {
     calEvents.forEach(ev => {
@@ -12395,26 +12404,7 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
         const DECAY_LAMBDA = Math.LN2 / 45;
         const WINDOW_MS    = 90 * 24 * 60 * 60 * 1000;
         const STEP_MS      =  7 * 24 * 60 * 60 * 1000;
-        const NOISE_KW     = [
-          'cftc','baker hughes','rig count','auction','api weekly',
-          'milk auction','fed\'s balance sheet','reserve balances',
-          'redbook','ibd/tipp','tips auction','note auction','bond auction',
-          'gilt auction','jgb auction','obligaciones','speculative net',
-          'nc net position','crude oil inventories','crude oil imports',
-          'distillate','gasoline inventorie','gasoline production',
-          'refinery','heating oil','natural gas storage',
-          'foreign bonds buying','foreign investments in japanese',
-          'foreign bond investment','foreign investment in japan',
-          'm2 money','m3 money','m4 money','reserve assets total',
-          'cb leading index','atlanta fed gdpnow','ny fed','cleveland cpi',
-          'ibd','3-month bill','4-week bill','52-week bill',
-          '4-week average','4-week avg',
-          'tic net','net long-term tic','total net tic',
-          'interest rate projection',
-          'eia crude oil','eia crude',
-        ];
-        // v8.27.0: "trade balance" removed — see renderEconSurprises() for rationale.
-        const INVERSE_KW   = ['unemployment','jobless','claims','deficit'];
+        // NOISE_KW / INVERSE_KW — use module-level shared consts (hoisted v8.28.0).
         const stats        = window._ECON_SURPRISE_STATS || {};
 
         function _scoreWin(startMs, endMs) {
@@ -12435,8 +12425,8 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
             const key = `${cmpId}/${canon}/${aS}/${fS}`;
             if (seen.has(key)) return;
             seen.add(key);
-            const actual   = parseFloat(String(ev.actual||'').replace(/[%,]/g,''));
-            const forecast = parseFloat(String(ev.forecast||ev.previous||'').replace(/[%,]/g,''));
+            const actual   = _parseNum(ev.actual);
+            const forecast = _parseNum(ev.forecast || ev.previous);
             if (isNaN(actual) || isNaN(forecast)) return;
             const inv     = INVERSE_KW.some(k => name.includes(k));
             const beat    = inv ? actual < forecast : actual > forecast;
