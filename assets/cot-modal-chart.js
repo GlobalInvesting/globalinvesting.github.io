@@ -1,4 +1,4 @@
-// COT MODAL CHART  v2.3 — Participants tab: per-category breakdown table (LF/AM/DD Long/Short/Net/WoW)
+// COT MODAL CHART  v2.4 — fix .cu/.cd specificity in cot-tbl; fix Net Position left-axis regression
 // COT MODAL CHART  v2.0 — LightweightCharts v5 (replaces Chart.js)
 // File: assets/cot-modal-chart.js
 // ═══════════════════════════════════════════════════════════════════════════
@@ -181,6 +181,9 @@
 .cot-tbl td { text-align:right;padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);vertical-align:middle;white-space:nowrap; }
 .cot-tbl td:first-child { text-align:left;color:var(--text2); }
 .cot-tbl tr:last-child td { border-bottom:none; }
+.cot-tbl td.cu { color:var(--up); }
+.cot-tbl td.cd { color:var(--down); }
+.cot-tbl td.cn { color:var(--text2); }
 .cu { color:var(--up); }
 .cd { color:var(--down); }
 .cn { color:var(--text2); }
@@ -472,13 +475,10 @@ function _buildNetChart(container, dates, netData, ccy) {
   const LWC = window.LightweightCharts; if (!LWC || !container) return null;
   const W = container.offsetWidth || 600, H = container.offsetHeight || container.parentElement?.offsetHeight || 280;
   const opts = _lwOpts(W, H);
-  opts.leftPriceScale  = { visible: true, borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.08 } };
-  opts.rightPriceScale = { visible: false, borderVisible: false };
   const chart = LWC.createChart(container, opts);
   _cotLwCharts.push(chart);
   const _up = _cotTC('--up', '#26a69a'), _dn = _cotTC('--down', '#ef5350');
   const hist = chart.addSeries(LWC.HistogramSeries, {
-    priceScaleId: 'left',
     color: '#4f7fff', priceLineVisible: false, lastValueVisible: true, base: 0,
   });
   hist.setData(dates.map((d, i) => ({ time: d, value: netData[i] ?? 0, color: (netData[i] ?? 0) >= 0 ? (_up + 'd1') : (_dn + 'd1') })));
