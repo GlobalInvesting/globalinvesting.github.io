@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.3.7
+// ECONOMIC SURPRISES MODAL  v1.3.8
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -244,15 +244,8 @@ const _ESM_G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
 // with INVERSE_KW in dashboard.js and INVERSE_EVENTS in fetch_economic_calendar.py.
 const _ESM_INVERSE_KW = ['unemployment','jobless','claims','deficit'];
 
-// Canonical ESI series key — must stay in sync with dashboard.js _canonEsi and
-// Python compute_surprise_stats() in fetch_economic_calendar.py.
-const _ESM_CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
-  'australia ','canada ','switzerland ','new zealand ','norway ','sweden '];
-const _canonEsi = t => {
-  let s = t.replace(/\s*\([^)]*\)/g,'').trim();
-  for (const p of _ESM_CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
-  return s;
-};
+// _canonEsi — shared global defined in dashboard.js (loads before this file).
+// _ESM_CCY_PFXS removed: _CCY_PFXS in dashboard.js is the single source of truth.
 
 const _ESM_NOISE_KW = [
   'cftc','baker hughes','rig count','auction','api weekly',
