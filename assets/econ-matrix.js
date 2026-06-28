@@ -1,5 +1,5 @@
 /**
- * econ-matrix.js v1.0.4 — Native Economic Matrix panel
+ * econ-matrix.js v1.0.5 — Native Economic Matrix panel
  *
  * Replaces the third-party TradingView Economic Map widget (tv-economic-map.js)
  * with a native table in the style of an institutional regional economic matrix
@@ -134,7 +134,7 @@
       gdp:   ['GDP Growth Rate Annualized', 'GDP MoM'],
       cpi:   ['Canada Inflation Rate YoY', 'Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Manufacturing Sales MoM'], // StatCan via FRED CANSLMNTO02MLSAM — injected by fetch_supplementary_indicators.py
+      prod:  ['Manufacturing Sales MoM', 'Manufacturing Sales YoY'], // StatCan via FRED (MoM) or OECD MEI (YoY fallback) — injected by fetch_supplementary_indicators.py
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
       rtl:   ['Retail Sales MoM', 'Canada Retail Sales MoM', 'Retail Sales MoM Final'],
       ca:    ['Current Account'],
