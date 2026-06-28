@@ -1,5 +1,5 @@
 /**
- * econ-matrix.js v1.0.1 — Native Economic Matrix panel
+ * econ-matrix.js v1.0.3 — Native Economic Matrix panel
  *
  * Replaces the third-party TradingView Economic Map widget (tv-economic-map.js)
  * with a native table in the style of an institutional regional economic matrix
@@ -124,7 +124,7 @@
       gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
       cpi:   ['Australia CPI', 'Inflation Rate YoY', 'Australia Inflation Rate YoY'],
       unemp: ['Australia Unemployment Rate', 'Unemployment Rate'],
-      prod:  [], // not published as a standalone release in the current source
+      prod:  ['Ai Group Industry Index'], // Ai Group Performance of Manufacturing — published monthly by Ai Group Australia
       conf:  ['NAB Business Confidence'],
       rtl:   ['Retail Sales (QoQ)', 'Retail Sales MoM'],
       ca:    [], // not currently tracked in the source feed for AUD
