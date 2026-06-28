@@ -92,7 +92,7 @@
     },
     EUR: {
       gdp:   ['Gross Domestic Product s.a (QoQ)', 'GDP (QoQ)', 'GDP Growth Rate QoQ'],
-      cpi:   ['Inflation Rate YoY Flash', 'CPI (YoY)', 'Consumer Price Index (YoY)', 'Euro Area CPI', 'Inflation Rate YoY'],
+      cpi:   ['Inflation Rate YoY Flash', 'CPI (YoY)', 'Consumer Price Index (YoY)', 'Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM', 'Euro Area Industrial Production MoM', 'Industrial Production (MoM)'],
       conf:  ['HCOB Eurozone Manufacturing PMI', 'HCOB Manufacturing PMI Flash', 'Business Confidence'],

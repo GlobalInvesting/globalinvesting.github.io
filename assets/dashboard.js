@@ -11219,6 +11219,23 @@ async function renderEconSurprises() {
   // Pass 0: (0, LOOKBACK_MS]  → standard 90d.
   // Pass 1: (LOOKBACK_MS, WIDE_LOOKBACK_MS] → 90–180d extension band.
   // limitCcys: Set of currencies to include (null = all G10).
+  // ── Numeric parser for macro actual/forecast values ──────────────────────
+  // parseFloat() alone fails on currency-symbol-prefixed strings such as
+  // "$-226.8B", "A$1.791B", "¥3907B", "CHF15.5B", "NOK62.6B", "-€5.2B".
+  // All Trade Balance and Current Account events carry these prefixes, so they
+  // were silently excluded from ESI scoring (isNaN check returned false).
+  // Strategy: strip everything except digits and the decimal point, then restore
+  // the sign by checking whether the original string contained a minus anywhere.
+  // This is safe because macro data strings never contain two separate numbers.
+  const _parseNum = s => {
+    if (s == null || s === '') return NaN;
+    const str = String(s).replace(/,/g, '');
+    const neg  = str.includes('-');
+    const digits = str.replace(/[^\d.]/g, '');
+    const n = parseFloat(digits);
+    return isNaN(n) ? NaN : (neg ? -n : n);
+  };
+
   function _scorePass(minAgeMs, maxAgeMs, limitCcys) {
     calEvents.forEach(ev => {
       const evTime = new Date(ev.dateISO).getTime();
@@ -11252,10 +11269,8 @@ async function renderEconSurprises() {
       window._ES_SEEN.add(dedupKey);
       // ──────────────────────────────────────────────────────────────────────
 
-      const actualStr   = String(ev.actual   || '').replace(/[%,]/g,'');
-      const forecastStr = String(ev.forecast || ev.previous || '').replace(/[%,]/g,'');
-      const actual   = parseFloat(actualStr);
-      const forecast = parseFloat(forecastStr);
+      const actual   = _parseNum(ev.actual);
+      const forecast = _parseNum(ev.forecast || ev.previous);
       if (isNaN(actual) || isNaN(forecast)) return;
 
       const isInverse = INVERSE_KW.some(kw => evTitle.includes(kw));
