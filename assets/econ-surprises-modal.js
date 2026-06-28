@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.3.5
+// ECONOMIC SURPRISES MODAL  v1.3.6
 // File: assets/econ-surprises-modal.js
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
@@ -296,6 +296,23 @@ let _esmResizeApply  = null;   // active window 'resize' handler — removed on 
 // w = e^(-λ·ageDays), λ = ln(2)/45. Mirrors DECAY_LAMBDA in dashboard.js exactly.
 const _ESM_DECAY_LAMBDA = Math.LN2 / 45;
 
+// ── Sign-aware numeric parser — mirrors dashboard.js _scorePass exactly ────────
+// parseFloat("$-226.8B") / parseFloat("CHF15.5B") / parseFloat("NZ$-1.01B") all
+// return NaN because parseFloat cannot parse a leading currency-symbol prefix.
+// Every Trade Balance / Current Account event for every G10 currency carries
+// one of these prefixes, so the old parseFloat-based scoring here silently
+// dropped them — same bug as dashboard.js _scorePass (fixed v8.25.8), just not
+// yet ported to this file. Strip everything except digits/decimal, then
+// restore the sign from the presence of '-' anywhere in the original string.
+const _esmParseNum = s => {
+  if (s == null || s === '') return NaN;
+  const str = String(s).replace(/,/g, '');
+  const neg = str.includes('-');
+  const digits = str.replace(/[^\d.]/g, '');
+  const n = parseFloat(digits);
+  return isNaN(n) ? NaN : (neg ? -n : n);
+};
+
 // ── Score helpers ─────────────────────────────────────────────────────
 // Decay-weighted scorer — mirrors dashboard.js renderEconSurprises() exactly.
 // w = e^(-_ESM_DECAY_LAMBDA · ageDays), anchored to endMs (window right edge).
@@ -325,8 +342,8 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
     if (seen.has(key)) return;
     seen.add(key);
 
-    const actual   = parseFloat(String(ev.actual   || '').replace(/[%,]/g, ''));
-    const forecast = parseFloat(String(ev.forecast || ev.previous || '').replace(/[%,]/g, ''));
+    const actual   = _esmParseNum(ev.actual);
+    const forecast = _esmParseNum(ev.forecast || ev.previous);
     if (isNaN(actual) || isNaN(forecast)) return;
 
     const isInverse = _ESM_INVERSE_KW.some(kw => evTitle.includes(kw));
@@ -389,7 +406,19 @@ function _esmBuildSeries(events, ccy) {
   if (!ccyEvts.length) return [];
 
   const minDate = Math.min(...ccyEvts.map(ev => new Date(ev.dateISO).getTime()).filter(t => !isNaN(t)));
-  const series  = [];
+  // Map, not array — keyed by calendar-day ISO string. The last weekly cursor
+  // before the loop exits is clamped to nowMs (`Math.min(cursor, nowMs)`), and
+  // whenever that clamp lands on the same calendar day as the preceding
+  // regular weekly step (happens whenever minDate's 7-day grid aligns with
+  // "today" — roughly 1-in-7 currencies on any given day), both iterations
+  // format to the identical ISO date string. LightweightCharts' setData()
+  // requires strictly ascending, unique times and throws on a duplicate —
+  // an uncaught throw here (observed on GBP/CHF/NZD/SEK) silently aborted the
+  // rest of _esmRenderChart, leaving an empty chart with axes but no series.
+  // Map.set on an existing key updates the value in place without moving its
+  // position, so chronological order is preserved and the later (more
+  // current, nowMs-anchored) score simply wins for that day.
+  const byDate  = new Map();
   let cursor    = minDate + WINDOW_MS;
 
   while (cursor <= nowMs + STEP_MS) {
@@ -399,11 +428,11 @@ function _esmBuildSeries(events, ccy) {
     if (r !== null) {
       const dt  = new Date(endMs);
       const iso = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-      series.push({ time: iso, value: parseFloat(r.idx.toFixed(2)) });
+      byDate.set(iso, parseFloat(r.idx.toFixed(2)));
     }
     cursor += STEP_MS;
   }
-  return series;
+  return Array.from(byDate, ([time, value]) => ({ time, value }));
 }
 function _esmCurrentScore(events, ccy) {
   const nowMs  = Date.now();
@@ -455,8 +484,8 @@ function _esmGetEvents(events, ccy) {
     if (seen.has(key)) return;
     seen.add(key);
 
-    const actual   = parseFloat(String(ev.actual   || '').replace(/[%,]/g, ''));
-    const forecast = parseFloat(String(ev.forecast || ev.previous || '').replace(/[%,]/g, ''));
+    const actual   = _esmParseNum(ev.actual);
+    const forecast = _esmParseNum(ev.forecast || ev.previous);
     const hasFc    = !isNaN(actual) && !isNaN(forecast);
 
     const isInverse = _ESM_INVERSE_KW.some(kw => evTitle.includes(kw));
