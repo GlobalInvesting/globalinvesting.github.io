@@ -544,15 +544,22 @@ function populateHeatmap() {
   // pairDefs hoisted to function scope — used both inside the rtAvailable branch
   // (strength computation) and outside it (pairCountByCcy tooltip counts).
   // Declaring inside the if-block caused ReferenceError when rtAvailable=false.
+  //
+  // sign is always +1: log(close/prevClose) of any base/quote pair already
+  // represents the base currency's return, regardless of which currency is
+  // base. v8.28.4: removed sign:-1 from usdjpy/usdchf/usdcad/usdnok/usdsek —
+  // that inversion was the root cause of the composite/CSI divergence between
+  // the web terminal and the EA (EA's CSI_Score() has never special-cased
+  // USD-base pairs: `sum += is_base ? ret : -ret`). Do not reintroduce it.
   const pairDefs = [
       // 7 USD majors
       { id: 'eurusd', base: 'EUR', quote: 'USD', sign: 1 },
       { id: 'gbpusd', base: 'GBP', quote: 'USD', sign: 1 },
       { id: 'audusd', base: 'AUD', quote: 'USD', sign: 1 },
       { id: 'nzdusd', base: 'NZD', quote: 'USD', sign: 1 },
-      { id: 'usdjpy', base: 'USD', quote: 'JPY', sign: -1 },
-      { id: 'usdchf', base: 'USD', quote: 'CHF', sign: -1 },
-      { id: 'usdcad', base: 'USD', quote: 'CAD', sign: -1 },
+      { id: 'usdjpy', base: 'USD', quote: 'JPY', sign: 1 },
+      { id: 'usdchf', base: 'USD', quote: 'CHF', sign: 1 },
+      { id: 'usdcad', base: 'USD', quote: 'CAD', sign: 1 },
       // 6 EUR crosses
       { id: 'eurgbp', base: 'EUR', quote: 'GBP', sign: 1 },
       { id: 'eurjpy', base: 'EUR', quote: 'JPY', sign: 1 },
@@ -581,8 +588,8 @@ function populateHeatmap() {
       // 1 CHF cross
       { id: 'chfjpy', base: 'CHF', quote: 'JPY', sign: 1 },
       // G10 Scandinavian — 4 live pairs
-      { id: 'usdnok', base: 'USD', quote: 'NOK', sign: -1 },
-      { id: 'usdsek', base: 'USD', quote: 'SEK', sign: -1 },
+      { id: 'usdnok', base: 'USD', quote: 'NOK', sign:  1 },
+      { id: 'usdsek', base: 'USD', quote: 'SEK', sign:  1 },
       { id: 'eurnok', base: 'EUR', quote: 'NOK', sign:  1 },
       { id: 'eursek', base: 'EUR', quote: 'SEK', sign:  1 },
     ];

@@ -386,9 +386,9 @@
     { id:'gbpusd', base:'GBP', quote:'USD', sign:1 },
     { id:'audusd', base:'AUD', quote:'USD', sign:1 },
     { id:'nzdusd', base:'NZD', quote:'USD', sign:1 },
-    { id:'usdjpy', base:'USD', quote:'JPY', sign:-1 },
-    { id:'usdchf', base:'USD', quote:'CHF', sign:-1 },
-    { id:'usdcad', base:'USD', quote:'CAD', sign:-1 },
+    { id:'usdjpy', base:'USD', quote:'JPY', sign:1 },
+    { id:'usdchf', base:'USD', quote:'CHF', sign:1 },
+    { id:'usdcad', base:'USD', quote:'CAD', sign:1 },
     { id:'eurgbp', base:'EUR', quote:'GBP', sign:1 },
     { id:'eurjpy', base:'EUR', quote:'JPY', sign:1 },
     { id:'eurchf', base:'EUR', quote:'CHF', sign:1 },
@@ -411,8 +411,8 @@
     { id:'cadchf', base:'CAD', quote:'CHF', sign:1 },
     { id:'chfjpy', base:'CHF', quote:'JPY', sign:1 },
     // G10 Scandinavian
-    { id:'usdnok', base:'USD', quote:'NOK', sign:-1 },
-    { id:'usdsek', base:'USD', quote:'SEK', sign:-1 },
+    { id:'usdnok', base:'USD', quote:'NOK', sign:1 },
+    { id:'usdsek', base:'USD', quote:'SEK', sign:1 },
     { id:'eurnok', base:'EUR', quote:'NOK', sign:1 },
     { id:'eursek', base:'EUR', quote:'SEK', sign:1 },
   ];
@@ -1348,7 +1348,14 @@
   const CCY_ORDER = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
 
   // Pairs sign convention for deriving ccy strength from OHLC:
-  // +1 = pair close goes up → base strengthens; -1 = inverse
+  // +1 = pair close goes up → base strengthens; -1 = inverse.
+  // v8.28.4: every entry is +1 by definition — log(close/prevClose) of any
+  // base/quote pair already represents the base currency's return, regardless
+  // of which currency is base. There is no pair that needs inversion. Matches
+  // the EA's CSI_Score(): `sum += is_base ? ret : -ret` with no per-pair
+  // special-casing. Do not reintroduce sign:-1 for USD-base pairs (usdjpy,
+  // usdchf, usdcad, usdnok, usdsek) — that was the root cause of the CSI/
+  // composite divergence between the web terminal and the EA fixed in v8.28.4.
   const PAIR_SIGN = {};
   PAIR_DEFS.forEach(p => { PAIR_SIGN[p.id] = p.sign; });
 
