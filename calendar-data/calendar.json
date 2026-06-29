@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-28T21:35:11Z",
-  "generatedAt": "2026-06-28T21:35:11Z",
+  "lastUpdate": "2026-06-29T10:06:56Z",
+  "generatedAt": "2026-06-29T10:06:56Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,106 +8,26 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-06-29",
-  "rangeTo": "2026-06-28",
-  "totalEvents": 3913,
+  "rangeTo": "2026-06-29",
+  "totalEvents": 3937,
   "currencyCounts": {
-    "JPY": 252,
-    "CHF": 161,
-    "EUR": 841,
-    "GBP": 466,
-    "NZD": 121,
-    "USD": 1245,
-    "AUD": 286,
-    "CAD": 307,
+    "JPY": 256,
+    "CHF": 162,
+    "EUR": 851,
+    "GBP": 470,
+    "NZD": 122,
+    "USD": 1246,
+    "AUD": 288,
+    "CAD": 308,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2054,
-    "high": 1631,
+    "medium": 2076,
+    "high": 1633,
     "low": 228
   },
   "surpriseStats": {
-    "CHF/kof leading indicators": {
-      "n": 3,
-      "mean": -1.3,
-      "std": 4.107311
-    },
-    "EUR/retail sales mom": {
-      "n": 12,
-      "mean": -0.233333,
-      "std": 0.81946
-    },
-    "EUR/retail sales yoy": {
-      "n": 13,
-      "mean": -0.307692,
-      "std": 1.532134
-    },
-    "EUR/economic sentiment": {
-      "n": 3,
-      "mean": -0.566667,
-      "std": 1.484363
-    },
-    "EUR/inflation rate mom": {
-      "n": 6,
-      "mean": -0.05,
-      "std": 0.13784
-    },
-    "EUR/inflation rate yoy": {
-      "n": 6,
-      "mean": -0.116667,
-      "std": 0.231661
-    },
-    "EUR/business confidence": {
-      "n": 7,
-      "mean": 0.128571,
-      "std": 1.155731
-    },
-    "GBP/mortgage approvals": {
-      "n": 3,
-      "mean": 3.016667,
-      "std": 1.545326
-    },
-    "GBP/mortgage lending": {
-      "n": 3,
-      "mean": 0.42,
-      "std": 1.712571
-    },
-    "GBP/boe consumer credit": {
-      "n": 3,
-      "mean": 0.196333,
-      "std": 0.124279
-    },
-    "JPY/unemployment rate": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 0.152753
-    },
-    "JPY/retail sales yoy": {
-      "n": 3,
-      "mean": 0.233333,
-      "std": 1.069268
-    },
-    "JPY/industrial production mom": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 1.650253
-    },
-    "SEK/retail sales mom": {
-      "n": 3,
-      "mean": 1.533333,
-      "std": 2.11266
-    },
-    "SEK/retail sales yoy": {
-      "n": 3,
-      "mean": 0.6,
-      "std": 2.778489
-    },
-    "USD/dallas fed manufacturing index": {
-      "n": 3,
-      "mean": -0.333333,
-      "std": 1.530795
-    },
     "AUD/ai group industry index": {
       "n": 3,
       "mean": -4.5,
@@ -117,6 +37,26 @@
       "n": 3,
       "mean": 0.2,
       "std": 0.264575
+    },
+    "EUR/inflation rate yoy": {
+      "n": 5,
+      "mean": -0.14,
+      "std": 0.250998
+    },
+    "EUR/retail sales yoy": {
+      "n": 12,
+      "mean": -0.2,
+      "std": 1.548019
+    },
+    "EUR/retail sales mom": {
+      "n": 11,
+      "mean": -0.218182,
+      "std": 0.857692
+    },
+    "EUR/inflation rate mom": {
+      "n": 5,
+      "mean": -0.06,
+      "std": 0.151658
     },
     "EUR/unemployment rate": {
       "n": 12,
@@ -948,6 +888,11 @@
       "mean": 1.966667,
       "std": 4.461315
     },
+    "EUR/business confidence": {
+      "n": 6,
+      "mean": 0.383333,
+      "std": 1.028429
+    },
     "GBP/cbi industrial trends orders": {
       "n": 4,
       "mean": -7.25,
@@ -1038,10 +983,20 @@
       "mean": -8.0,
       "std": 15.033296
     },
+    "JPY/unemployment rate": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.212132
+    },
     "NOK/loan growth yoy": {
       "n": 2,
       "mean": -0.05,
       "std": 0.070711
+    },
+    "USD/dallas fed manufacturing index": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 2.05061
     },
     "EUR/unemployment benefit claims": {
       "n": 3,
@@ -1098,15 +1053,40 @@
       "mean": 0.0,
       "std": 0.0
     },
+    "EUR/economic sentiment": {
+      "n": 3,
+      "mean": -0.266667,
+      "std": 1.674316
+    },
+    "JPY/retail sales yoy": {
+      "n": 3,
+      "mean": 1.266667,
+      "std": 0.723418
+    },
+    "JPY/industrial production mom": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 2.333452
+    },
     "NOK/retail sales mom": {
       "n": 2,
       "mean": 0.1,
       "std": 1.131371
     },
+    "SEK/retail sales yoy": {
+      "n": 2,
+      "mean": 1.5,
+      "std": 3.252691
+    },
     "SEK/gdp growth rate yoy": {
       "n": 2,
       "mean": -0.4,
       "std": 0.141421
+    },
+    "SEK/retail sales mom": {
+      "n": 2,
+      "mean": 2.75,
+      "std": 0.212132
     },
     "SEK/gdp growth rate qoq": {
       "n": 2,
@@ -1168,6 +1148,11 @@
       "mean": 0.0,
       "std": 0.0
     },
+    "CHF/kof leading indicators": {
+      "n": 2,
+      "mean": 1.0,
+      "std": 1.414214
+    },
     "EUR/ecb interest rate decision": {
       "n": 3,
       "mean": 0.0,
@@ -1207,6 +1192,21 @@
       "n": 2,
       "mean": -0.45,
       "std": 0.353553
+    },
+    "GBP/boe consumer credit": {
+      "n": 3,
+      "mean": 0.038667,
+      "std": 0.156308
+    },
+    "GBP/mortgage approvals": {
+      "n": 3,
+      "mean": 0.36,
+      "std": 6.115791
+    },
+    "GBP/mortgage lending": {
+      "n": 3,
+      "mean": -0.396667,
+      "std": 2.037089
     },
     "AUD/rba interest rate decision": {
       "n": 3,
@@ -48473,9 +48473,321 @@
       "flag": "🇯🇵",
       "event": "Japan Retail Sales YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "5.3%",
       "forecast": "3.2%",
       "previous": "2.1%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "00:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB Forum on Central Banking",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "05:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Housing Starts YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "31.8%",
+      "previous": "11.4%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Retail Sales MoM",
+      "impact": "high",
+      "actual": "0.6%",
+      "forecast": "1.0%",
+      "previous": "-1.5%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Inflation Rate MoM",
+      "impact": "medium",
+      "actual": "0.6%",
+      "forecast": "0.4%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Inflation Rate YoY",
+      "impact": "medium",
+      "actual": "3.2%",
+      "forecast": "3.2%",
+      "previous": "3.2%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Retail Sales YoY",
+      "impact": "high",
+      "actual": "1.3%",
+      "forecast": "1.2%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Myfxbook AUDUSD Sentiment",
+      "impact": "medium",
+      "actual": "72.0%",
+      "forecast": null,
+      "previous": "42.0%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:00",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Myfxbook USDCAD Sentiment",
+      "impact": "medium",
+      "actual": "8.0%",
+      "forecast": null,
+      "previous": "5.0%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Myfxbook USDCHF Sentiment",
+      "impact": "medium",
+      "actual": "35.0%",
+      "forecast": null,
+      "previous": "42.0%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "European Union Myfxbook EURUSD Sentiment",
+      "impact": "medium",
+      "actual": "61.0%",
+      "forecast": null,
+      "previous": "61.0%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
+      "impact": "medium",
+      "actual": "55.0%",
+      "forecast": null,
+      "previous": "58.0%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Myfxbook USDJPY Sentiment",
+      "impact": "medium",
+      "actual": "22.0%",
+      "forecast": null,
+      "previous": "16.0%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:00",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Myfxbook NZDUSD Sentiment",
+      "impact": "medium",
+      "actual": "95.0%",
+      "forecast": null,
+      "previous": "94.0%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom BoE Consumer Credit",
+      "impact": "medium",
+      "actual": "&#163;1.662B",
+      "forecast": "&#163;1.8B",
+      "previous": "&#163;1.713B"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Mortgage Approvals",
+      "impact": "medium",
+      "actual": "56.21K",
+      "forecast": "62.9K",
+      "previous": "66.03K"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "08:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Mortgage Lending",
+      "impact": "medium",
+      "actual": "&#163;2.89B",
+      "forecast": "&#163;4.6B",
+      "previous": "&#163;4.44B"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Consumer Inflation Expectations",
+      "impact": "medium",
+      "actual": "34.0",
+      "forecast": "42.0",
+      "previous": "40.4"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Economic Sentiment",
+      "impact": "medium",
+      "actual": "95.0",
+      "forecast": "94.3",
+      "previous": "93.7"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Business Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-2.1",
+      "previous": "-3.7"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "11:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Kent Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Dallas Fed Manufacturing Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.0",
+      "previous": "0.4"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "17:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB President Lagarde Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Unemployment Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.5%",
+      "previous": "2.5%"
+    },
+    {
+      "date": "29 Jun",
+      "dateISO": "2026-06-29",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Industrial Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.1%",
+      "previous": "0.5%"
     }
   ]
 }
