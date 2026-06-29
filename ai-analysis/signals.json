@@ -1,65 +1,57 @@
 {
-  "generated_at": "2026-06-29T02:59:19Z",
+  "generated_at": "2026-06-29T11:29:24Z",
   "signals": [
     {
-      "time": "02:58",
+      "time": "11:29",
       "priority": "critical",
-      "title": "USD/JPY — Carry + Intervention Risk + Retail Divergence",
-      "text": "USD/JPY at 161.78 — 275bp Fed-BoJ carry (Fed 3.75% vs BoJ 1.0%) sustains the bid despite Japan's retail sales smashing forecasts (5.3% vs 2.3% exp). 160.00 remains the key level previously triggering BoJ verbal warnings; intervention risk is acute as price holds above this threshold. Retail 84% short vs COT LF net short -115,033 (28.4% long) creates a massive institutional vs retail divergence. Institutional carry-chasing dominates until VIX > 25.",
+      "title": "USD/JPY — Intervention Risk + Carry + Vol",
+      "text": "USD/JPY at 161.83, pushing further into the intervention zone. BoJ 1.0% vs Fed 3.75% — +266bp OIS carry premium continues to sustain the bid, despite the 160.00 level being a known trigger for verbal warnings. JPY COT LF net short −115,033 (week ending Jun 23) indicates crowded speculative short positioning, increasing short-squeeze risk if BoJ acts. Options market pricing elevated protection with IV 7.2% vs HV30 2.1% (VRP +5.1%). Intervention risk rises on a sustained break above 160.00; watch for BoJ comments or direct action.",
       "evidence": [
-        "USD/JPY: 161.78",
-        "Fed 3.75% vs BoJ 1.0% — +275bp",
-        "Retail: 84% short"
+        "USD/JPY: 161.83",
+        "USD/JPY OIS carry: +266bp favors USD",
+        "JPY COT LF net: −115,033",
+        "USD/JPY VRP: +5.1%"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "02:55",
+      "time": "11:26",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
-      "text": "NZD/USD COT LF net short -23,314 (specs fading hawkish bias) vs RBNZ hike priced for 8 Jul. Retail sentiment is at an extreme 93% long, directly opposing the institutional short position. If RBNZ delivers the priced hike, short-squeeze risk is elevated as crowded spec shorts and retail longs collide. NZD/USD at 0.5644 remains under pressure from a +150bp USD carry advantage (Fed 3.75% vs RBNZ 2.25%).",
+      "title": "EUR/USD — ECB Sintra + Policy Divergence",
+      "text": "EUR/USD at 1.1406. ECB Sintra forum signals and sticky hike premium (Commerzbank, ING) support EUR gains against the USD, despite the ECB being on hold at 2.25% vs Fed 3.75%. The OIS carry differential of +146bp still favors USD, but the market is focusing on potential ECB hawkish shifts. Euro area economic climate saw a slight pick up in June (confidence 95.0 vs 94.0 expected). Watch for further ECB commentary from Sintra to confirm a hawkish bias.",
       "evidence": [
-        "NZD COT LF net: -23,314",
-        "Retail: 93% long",
-        "Fed 3.75% vs RBNZ 2.25% — +150bp"
+        "EUR/USD: 1.1406",
+        "ECB Policy Rate: 2.25% (HIKING)",
+        "EUR/USD OIS carry: +146bp favors USD",
+        "Euro area economic confidence: 95.0"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "02:53",
+      "time": "11:23",
       "priority": "warning",
-      "title": "USD/CAD — Correlation Break + Vol Premium",
-      "text": "USD/CAD vs WTI Oil correlation at -0.743 vs 252d norm of -0.027 (z=-1.96σ) — the traditional CAD/Oil link is broken as macro drivers decouple. USD/CAD at 1.4188 is supported by a +150bp carry advantage (Fed 3.75% vs BoC 2.25%). Options market is pricing elevated protection with IV at 30.8% vs HV30 at 6.2% (VRP +24.6%). Retail 92% short suggests a contrarian extension higher if data continues to support USD.",
+      "title": "NZD/USD — COT vs Retail Divergence + RBNZ",
+      "text": "NZD/USD at 0.5654. COT LF net short −23,314 (week ending Jun 23) indicates speculative shorts, while retail sentiment is extremely long at 94% (Myfxbook). This institutional vs retail divergence suggests potential for a retail capitulation if price extends lower, or a short-squeeze if RBNZ delivers on its 'Hike' bias. RBNZ has a hike priced for the next meeting on 8 Jul. The RBNZ's real rate is -0.83% (mildly accommodative), contrasting with the market's hike bias.",
       "evidence": [
-        "USD/CAD vs WTI z-score: -1.96σ",
-        "VRP: +24.6%",
-        "Retail: 92% short"
+        "NZD/USD: 0.5654",
+        "NZD COT LF net: −23,314",
+        "NZD/USD Retail: 94% long",
+        "RBNZ Market bias: ↑ Hike"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "02:50",
+      "time": "11:18",
       "priority": "info",
-      "title": "AUD/USD — RBA Stance + Options Skew",
-      "text": "AUD/USD at 0.6893 — RBA's Kent signals less tolerance for inflation, supporting the 4.35% policy rate. Despite a -60bp carry deficit vs USD (Fed 3.75% vs RBA 4.35%), AUD/USD 25d RR at -0.98 confirms a moderate put skew as the options market pays for downside protection. High VRP of +15.2% (IV 22.7% vs HV30 7.5%) indicates significant hedging demand ahead of US NFP data.",
+      "title": "AUD/USD — Volatility Complacency + Positioning",
+      "text": "AUD/USD at 0.6900. Options market shows unusual complacency with IV 3.1% below HV30 7.5% (VRP -4.4%). This negative vol risk premium suggests options are cheap, potentially underpricing future volatility. Meanwhile, COT LF net long +29,035 (week ending Jun 23) indicates a moderate speculative long position. The RBA is hiking at 4.35% vs Fed 3.75%, providing a -71bp AUD carry premium. The low vol pricing combined with existing long positioning could lead to sharp moves if a catalyst emerges. Watch for a shift in IV or a break of the 0.6900 level.",
       "evidence": [
-        "RBA: 4.35% (HIKING)",
-        "25d RR: -0.98",
-        "VRP: +15.2%"
+        "AUD/USD: 0.6900",
+        "AUD/USD VRP: -4.4%",
+        "AUD COT LF net: +29,035",
+        "AUD/USD OIS carry: -71bp favors AUD"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "02:45",
-      "priority": "info",
-      "title": "EUR/USD — Volatility Premium + CESI Divergence",
-      "text": "EUR/USD at 1.1392 — IV at 7.1% vs HV30 at 4.7% (VRP +2.4%) signals an elevated volatility premium as the market hedges against EUR weakness. CESI at -4 (net misses) supports a bearish EUR bias vs USD CESI at +291 (strong beats). The +150bp USD carry advantage (Fed 3.75% vs ECB 2.25%) structurally limits EUR upside despite the ECB's hiking stance. Watch 1.1400 for technical resistance.",
-      "evidence": [
-        "EUR/USD VRP: +2.4%",
-        "USD CESI: +291",
-        "Fed 3.75% vs ECB 2.25% — +150bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-2.5-flash"
     }
   ]
 }
