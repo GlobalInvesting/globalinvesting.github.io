@@ -125,6 +125,11 @@ a { color: inherit; text-decoration: none; }
 /* SCREENSHOTS */
 .scr-gallery { margin-top: 32px; }
 .scr-gallery-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--text3); margin-bottom: 16px; }
+
+/* WALKTHROUGH VIDEO */
+.av-wrap { margin-top: 32px; }
+.av-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); background: var(--bg2); }
+.av-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
 .scr-hero { margin-bottom: 8px; cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
 .scr-hero:hover { border-color: var(--border2); }
 .scr-hero img { width: 100%; height: auto; display: block; }
@@ -461,6 +466,14 @@ a { color: inherit; text-decoration: none; }
           <div class="platform-feat"><span class="dot blue"></span>AI narrative &amp; market signals — 4&times;/day</div>
         </div>
       </div>
+    </div>
+
+    <div class="av-wrap">
+      <div class="scr-gallery-label">Watch it in action</div>
+      <div class="av-frame">
+        <iframe src="https://www.youtube-nocookie.com/embed/C0pNgXF1Gug" title="Global Investing FX Terminal — Web Terminal walkthrough" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+      <p class="scr-meta"><strong>Web Terminal — full walkthrough.</strong> Live tour of every panel: FX pairs, AI narrative, economic calendar, currency strength, real rate carry, COT positioning, economic surprises, CB rates, correlations, derivatives, and news.</p>
     </div>
 
     <div class="scr-gallery">
