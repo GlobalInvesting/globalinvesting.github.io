@@ -1,55 +1,51 @@
 {
-  "generated_at": "2026-06-29T11:29:24Z",
+  "generated_at": "2026-06-29T17:16:27Z",
   "signals": [
     {
-      "time": "11:29",
+      "time": "17:15",
       "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + Carry + Vol",
-      "text": "USD/JPY at 161.83, pushing further into the intervention zone. BoJ 1.0% vs Fed 3.75% — +266bp OIS carry premium continues to sustain the bid, despite the 160.00 level being a known trigger for verbal warnings. JPY COT LF net short −115,033 (week ending Jun 23) indicates crowded speculative short positioning, increasing short-squeeze risk if BoJ acts. Options market pricing elevated protection with IV 7.2% vs HV30 2.1% (VRP +5.1%). Intervention risk rises on a sustained break above 160.00; watch for BoJ comments or direct action.",
+      "title": "USD/JPY — Geopolitical + Carry + Positioning",
+      "text": "USD/JPY at 161.94 continues to test higher, driven by the significant +266bp Fed-BoJ carry premium (SOFR 3.64% vs TONA 0.98%). JPY COT LF net short −115,033 (long%=28.4%) indicates crowded speculative short positioning, making it vulnerable to a short squeeze. The BoJ's recent hike to 1.0% and 'Hold' bias from OIS suggests a shift in policy, increasing intervention risk above 162.00. Watch for any BoJ verbal intervention or a sustained break above 162.00 to trigger further short covering.",
       "evidence": [
-        "USD/JPY: 161.83",
-        "USD/JPY OIS carry: +266bp favors USD",
-        "JPY COT LF net: −115,033",
-        "USD/JPY VRP: +5.1%"
+        "USD/JPY: 161.94",
+        "USD/JPY carry: +266bp (favors USD)",
+        "JPY COT LF net: -115,033"
       ],
       "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "11:26",
+      "time": "17:18",
       "priority": "warning",
-      "title": "EUR/USD — ECB Sintra + Policy Divergence",
-      "text": "EUR/USD at 1.1406. ECB Sintra forum signals and sticky hike premium (Commerzbank, ING) support EUR gains against the USD, despite the ECB being on hold at 2.25% vs Fed 3.75%. The OIS carry differential of +146bp still favors USD, but the market is focusing on potential ECB hawkish shifts. Euro area economic climate saw a slight pick up in June (confidence 95.0 vs 94.0 expected). Watch for further ECB commentary from Sintra to confirm a hawkish bias.",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
+      "text": "NZD/USD COT LF net short −23,314 (long%=21.6%) indicates a crowded speculative short position, diverging from the RBNZ's 'Hike' bias with a hike probability priced for the next meeting. Retail sentiment is at an extreme 94% long, creating a strong institutional vs. retail divergence. If the RBNZ delivers or signals a hike at the 8 Jul meeting, a significant short-squeeze risk is elevated, targeting 0.5700+. NZD/USD currently at 0.5653.",
       "evidence": [
-        "EUR/USD: 1.1406",
-        "ECB Policy Rate: 2.25% (HIKING)",
-        "EUR/USD OIS carry: +146bp favors USD",
-        "Euro area economic confidence: 95.0"
+        "NZD COT LF net: -23,314",
+        "RBNZ bias: ↑ Hike",
+        "NZD/USD Retail: 94% long"
       ],
       "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "11:23",
+      "time": "17:21",
       "priority": "warning",
-      "title": "NZD/USD — COT vs Retail Divergence + RBNZ",
-      "text": "NZD/USD at 0.5654. COT LF net short −23,314 (week ending Jun 23) indicates speculative shorts, while retail sentiment is extremely long at 94% (Myfxbook). This institutional vs retail divergence suggests potential for a retail capitulation if price extends lower, or a short-squeeze if RBNZ delivers on its 'Hike' bias. RBNZ has a hike priced for the next meeting on 8 Jul. The RBNZ's real rate is -0.83% (mildly accommodative), contrasting with the market's hike bias.",
+      "title": "EUR/AUD — G10 Bilateral Theme + Carry",
+      "text": "EUR is the strongest G10 currency this week with an average +0.463% performance across 7 pairs, while AUD is the weakest at -0.387% across 4 pairs, creating a significant 0.850% spread. This divergence occurs despite AUD having over USD (AONIA 4.35% vs SOFR 3.64%), suggesting fundamental weakness in AUD. The EUR's relative strength is notable given its moderate negative CESI score. Watch for AUD data releases to confirm or reverse this underperformance.",
       "evidence": [
-        "NZD/USD: 0.5654",
-        "NZD COT LF net: −23,314",
-        "NZD/USD Retail: 94% long",
-        "RBNZ Market bias: ↑ Hike"
+        "EUR 1W avg: +0.463% (n=7)",
+        "AUD 1W avg: -0.387% (n=4)",
+        "G10 spread: 0.850%"
       ],
       "_source": "gemini:gemini-2.5-flash"
     },
     {
-      "time": "11:18",
+      "time": "17:24",
       "priority": "info",
-      "title": "AUD/USD — Volatility Complacency + Positioning",
-      "text": "AUD/USD at 0.6900. Options market shows unusual complacency with IV 3.1% below HV30 7.5% (VRP -4.4%). This negative vol risk premium suggests options are cheap, potentially underpricing future volatility. Meanwhile, COT LF net long +29,035 (week ending Jun 23) indicates a moderate speculative long position. The RBA is hiking at 4.35% vs Fed 3.75%, providing a -71bp AUD carry premium. The low vol pricing combined with existing long positioning could lead to sharp moves if a catalyst emerges. Watch for a shift in IV or a break of the 0.6900 level.",
+      "title": "USD/CAD — Retail Extreme + Correlation Break",
+      "text": "USD/CAD retail sentiment shows an extreme 93% short bias, indicating potential contrarian reversal risk. This is occurring as the USD/CAD vs WTI Oil correlation breaks significantly to -0.743 (z=-1.96σ vs norm=-0.027), suggesting CAD is not benefiting from the WTI Oil rebound (+2.20% today) as it historically would. The pair is at 1.4202, consolidating around 1.4210. Watch for a sustained break below 1.4200 to invalidate the retail contrarian read.",
       "evidence": [
-        "AUD/USD: 0.6900",
-        "AUD/USD VRP: -4.4%",
-        "AUD COT LF net: +29,035",
-        "AUD/USD OIS carry: -71bp favors AUD"
+        "USD/CAD Retail: 93% short",
+        "USD/CAD vs WTI Oil: corr=-0.743 (z=-1.96σ)",
+        "USD/CAD: 1.4202"
       ],
       "_source": "gemini:gemini-2.5-flash"
     }
