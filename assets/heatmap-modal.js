@@ -658,13 +658,14 @@
       </div>
     </div>
     <div class="hm-panel" id="hm-p-correlations">
-      <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-        <div class="hm-ct">RELATIVE STRENGTH DIFFERENTIAL · ALL 10 G10 · % COMPOSITE vs PREV CLOSE</div>
-        <div id="hm-corr-matrix" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;"></div>
-      </div>
       <div class="hm-cw">
         <div class="hm-ct" id="hm-catalyst-title">CURRENCY CATALYSTS</div>
         <div id="hm-catalyst"></div>
+      </div>
+      <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+        <div class="hm-ct">RELATIVE STRENGTH DIFFERENTIAL · ALL 10 G10 · % COMPOSITE vs PREV CLOSE</div>
+        <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);margin:-2px 0 6px;">Click a currency to pivot this panel</div>
+        <div id="hm-corr-matrix" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;"></div>
       </div>
       <div class="hm-cw">
         <div class="hm-ct" id="hm-drivers-title">STRENGTH DRIVERS · TOP 3 PAIRS BY CONTRIBUTION</div>
@@ -1244,7 +1245,7 @@
           ${ccyCatalyst.catalyst}
         </div>
         ${sourcesHtml}
-        <div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">AI Analytics · Google Search grounded · updated 1×/day</div>
+        <div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">AI Analytics · updated 1×/day</div>
       `;
     } else {
       catalystEl.innerHTML = '<div style="font-size:11px;color:var(--text3,#6b7280);font-family:var(--font-mono)">No catalyst data available yet</div>';
@@ -1279,7 +1280,7 @@
 
     // Header row
     const headerCells = `<th class="row-head" scope="col" title="Row − Column = strength differential. Positive = row currency outperforms column currency today.">Δ Strength (row − col)</th>` +
-      ccys.map(c => `<th scope="col"${c === ccy ? ' class="focal"' : ''}>${c}</th>`).join('') +
+      ccys.map(c => `<th scope="col"${c === ccy ? ' class="focal"' : ''} style="cursor:pointer" title="Click to pivot this panel to ${c}" onclick="hmPivotCcy('${c}')">${c}</th>`).join('') +
       `<th scope="col" class="focal" title="Equal-weighted composite — avg % vs all ${ccys.length - 1} major currency peers">Comp.</th>`;
 
     // Data rows
@@ -1303,7 +1304,7 @@
       const compFocalCls = isFocalRow ? ' corr-cell-focal' : '';
       const compCell = `<td class="${compCls} comp-col${compFocalCls}" data-comp-row="${rowCcy}" style="font-weight:700" title="${rowCcy} composite vs major currency peers: ${corrFmt(rowComp)}">${corrFmt(rowComp)}</td>`;
 
-      return `<tr><td class="row-head${isFocalRow ? ' focal' : ''}">${rowCcy}</td>${cells}${compCell}</tr>`;
+      return `<tr><td class="row-head${isFocalRow ? ' focal' : ''}" style="cursor:pointer" title="Click to pivot this panel to ${rowCcy}" onclick="hmPivotCcy('${rowCcy}')">${rowCcy}</td>${cells}${compCell}</tr>`;
     }).join('');
 
     // Footer row (column composites)
@@ -1389,7 +1390,7 @@
         </div>
       </div>`;
     }).join('') + sourcesLine + (ccyNotes
-      ? `<div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">AI Analytics · Google Search grounded</div>`
+      ? `<div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">AI Analytics</div>`
       : '');
   }
 
@@ -1853,6 +1854,26 @@
     } else if (tabId === 'csi' && _ccy) {
       populateCSI(_ccy);
     }
+  };
+
+  // Pivot the whole modal to a different focal currency without closing it — clicking
+  // a row/column header in the Rel. Strength matrix calls this (Bloomberg/Eikon-style
+  // in-panel instrument pivot, instead of forcing the user to close and reopen from
+  // the heatmap for every currency they want to inspect).
+  window.hmPivotCcy = function(newCcy) {
+    if (!newCcy || newCcy === _ccy || !_strengths || !_rtCache) return;
+    _ccy = newCcy;
+
+    const meta = CCY_META[newCcy] || { flag: 'un', full: newCcy };
+    const titleEl = document.getElementById('hm-title');
+    const titleRow = document.getElementById('hm-title-row');
+    titleEl.textContent = `${newCcy} — ${meta.full} Strength`;
+    const flagSpan = titleRow.querySelector('.fi');
+    if (flagSpan) flagSpan.className = `fi fi-${meta.flag}`;
+
+    populateMetrics(newCcy, _strengths, _rtCache);
+    populateBreakdown(newCcy, _strengths, _rtCache, true);
+    populateCorrelations(newCcy, _strengths, _rtCache);
   };
 
   // ── Live source label — updates hm-sub and hm-footer-meta to reflect active source ──
