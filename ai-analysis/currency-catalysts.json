@@ -1,127 +1,65 @@
 {
-  "generated_at": "2026-06-30T12:04:34Z",
+  "generated_at": "2026-06-30T17:49:01Z",
   "currencies": {
     "USD": {
-      "catalyst": "The dollar leads G10 on a hawkish pivot at the Fed under new Chair Kevin Warsh, who has dropped the dovish bias from official communications; markets now price at least one further 25bp hike this year, lifting expectations above the current 3.50%-3.75% range. PCE inflation forecasts were revised sharply higher to 3.6%, pushing easing further out. Renewed US-Iran tensions have driven energy prices and safe-haven flows into the dollar, while resilient US growth -- underpinned by an AI-led tech boom and a tight labor market -- continues to outperform other regions.",
-      "sources": [
-        {
-          "title": "Fed interest rate decision June 2026",
-          "url": "https://www.cnbc.com/2026/06/17/fed-interest-rate-decision-june-2026.html"
-        }
-      ],
-      "updated": "2026-06-30T13:19:00Z",
-      "source_model": "manual"
+      "catalyst": "The US dollar remains under pressure, with Euro trimming losses but gains capped by Fed rate-hike bets, as seen in comments from Fed's Hammack who noted that \"inflation is still too high, Fed may need to consider rate hikes\". Additionally, gold prices steadied after sliding to a fresh seven-month low, also weighed by Fed rate-hike expectations. The USD/CAD pair is at 1.4207, where Canada's April GDP beat forecasts at 0.5% but May guidance remains soft, limiting CAD recovery, with institutional bearishness contrasting with extreme retail short positioning.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     },
     "GBP": {
-      "catalyst": "Sterling is supported by a structural yield advantage as the Bank of England holds Bank Rate at 3.75% even as other G10 central banks have moved toward cuts, keeping carry attractive against the euro, Swiss franc and yen. MPC member Taylor has signaled an extended hold to keep fighting domestic inflation, limiting near-term rate-cut pricing. Investor perception of UK fiscal policy has remained stable, with limited concern over fiscal slippage, reinforcing confidence in the currency.",
-      "sources": [
-        {
-          "title": "Bank Rate -- Bank of England",
-          "url": "https://www.bankofengland.co.uk/monetary-policy/the-interest-rate-bank-rate"
-        },
-        {
-          "title": "BoE's Taylor backs extended hold on interest rates",
-          "url": "https://www.reuters.com/business/boes-taylor-backs-extended-hold-interest-rates-2026-06-23/"
-        }
-      ],
-      "updated": "2026-06-30T13:19:00Z",
-      "source_model": "manual"
+      "catalyst": "The British Pound is steady, with BOE's Bailey noting that there is time to judge the pass-through of higher energy prices. The UK economy grew by 0.6% at the start of the year, while Rabobank expects no change in policy in 2026. The Pound's near-term direction appears to be consolidative.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     },
     "EUR": {
-      "catalyst": "The ECB delivered a 25bp hike on 11 June, lifting the deposit, refi and marginal lending rates to 2.25%/2.40%/2.65%, citing inflation pressure from the Middle East war; staff now see headline inflation averaging 3.0% in 2026 even as the growth outlook was trimmed to 0.8%. The move marks a genuine hawkish turn after a long hold, narrowing the policy gap with the Fed and supporting the euro on rate-differential grounds. Eurozone growth remains uneven -- resilient in Spain and France, flat in Germany and Italy -- but the bloc's institutional stability and the ECB's inflation-fighting credibility continue to anchor investor confidence in the currency.",
-      "sources": [
-        {
-          "title": "Monetary policy decisions -- European Central Bank",
-          "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp260611~4d41bd5e83.en.html"
-        }
-      ],
-      "updated": "2026-06-30T13:45:00Z",
-      "source_model": "manual"
+      "catalyst": "The Euro is seeing resistance at 1.1450 against the US dollar, according to Scotiabank, as the European Central Bank is reportedly debating doubling banks' minimum reserve requirement to 2% from 1%. ING expects a hawkish bias to be sustained with one more hike. The Euro's upside is being capped, suggesting a cautious approach from traders.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     },
     "JPY": {
-      "catalyst": "The Bank of Japan raised its policy rate 25bp to 1.00% on 16 June, the highest level since 1995, with the board voting 7-1 in favor as inflation concerns outweighed growth risks. Wholesale inflation hit 6.3% in May, the highest since 2023, driven by oil prices tied to the US-Iran conflict, while the yen had weakened past 160 per dollar despite earlier intervention by Japanese authorities. Deputy Governor Himino reiterated on 24 June that the BoJ will keep tightening as underlying inflation risks staying above target, and board member Tamura has floated a path toward a 2% neutral rate -- a hawkish signal that narrows the BoJ's policy gap with other G10 central banks and supports the yen.",
-      "sources": [
-        {
-          "title": "Bank of Japan hikes rates to 1%, highest since 1995, as yen and inflation worries take hold",
-          "url": "https://www.cnbc.com/2026/06/16/boj-rate-hike-historic-inflation.html"
-        },
-        {
-          "title": "Japan Interest Rate",
-          "url": "https://tradingeconomics.com/japan/interest-rate"
-        }
-      ],
-      "updated": "2026-06-30T13:45:00Z",
-      "source_model": "manual"
+      "catalyst": "The Japanese Yen is seeing significant movement, with USD/JPY at 162.61, driven by a 275bp Fed-BoJ carry advantage and despite a moderate put skew signaling intervention hedging. BOJ policymaker Sato expressed concern over short-term volatile moves in the exchange rate. The correlation between USD/JPY and US 10Y yields has broken.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     },
     "AUD": {
-      "catalyst": "The RBA left the cash rate unchanged at 4.35% in June, pausing after three consecutive hikes earlier in 2026 as it assesses the impact of prior tightening on a slowing economy. Governor Bullock said inflation is still too high and remains a central concern, with the Board focused on preventing the recent oil-driven price impulse from becoming embedded. Markets are pricing roughly even odds of one further hike later this year, and major banks are split on the timing of any eventual cut, leaving the Aussie's rate path more uncertain than most G10 peers.",
-      "sources": [
-        {
-          "title": "Statement by the Monetary Policy Board -- RBA Media Releases",
-          "url": "https://www.rba.gov.au/media-releases/2026/mr-26-15.html"
-        },
-        {
-          "title": "RBA pauses on rates for first time this year but doesn't rule out more hikes",
-          "url": "https://www.sbs.com.au/news/live-blog/rba-june-2026-interest-rates-decision-live/ntpgs9xc6"
-        }
-      ],
-      "updated": "2026-06-30T13:45:00Z",
-      "source_model": "manual"
+      "catalyst": "The Australian Dollar is advancing, with hawkish RBA Minutes meeting firmer US confidence data, and buyers testing the 100-hour MA following hawkish Fed commentary. AUD/USD's volatility premium is at a massive +10.6%, the highest in G10, signaling significant tail risk priced in options. Despite a 60bp carry advantage, markets are doubting an August hike.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     },
     "CAD": {
-      "catalyst": "The Bank of Canada held its overnight rate at 2.25% on 10 June for a fifth consecutive meeting, balancing a soft domestic economy -- GDP contracted in Q1 and unemployment sits near 7% -- against fresh inflation risk from Middle East-driven energy prices, which pushed headline CPI to 2.8% in April. Governor Macklem described the situation as a genuine dilemma for policy, with the Bank keeping the door open to both a cut, if US trade restrictions worsen, and further hikes, if energy-driven inflation broadens. As a major net oil exporter, Canada's terms of trade benefit from elevated crude prices even as consumers face higher costs at the pump.",
-      "sources": [
-        {
-          "title": "Bank of Canada maintains the policy rate at 2 1/4%",
-          "url": "https://www.bankofcanada.ca/2026/06/fad-press-release-2026-06-10/"
-        }
-      ],
-      "updated": "2026-06-30T13:45:00Z",
-      "source_model": "manual"
+      "catalyst": "The Canadian Dollar gained after Canada's GDP growth topped forecasts, with April GDP at 0.5% and a firmer second-quarter signal. However, May guidance remains soft, limiting CAD recovery, and an institutional vs retail divergence at the 1.42 level in USD/CAD suggests potential for movement.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     },
     "CHF": {
-      "catalyst": "The SNB held its policy rate at 0% on 18 June, as expected, judging current conditions sufficient to support both price stability and growth even as Middle East-linked energy costs lift the inflation outlook modestly. The Bank reiterated it sees room to intervene directly in currency markets to manage franc strength rather than move rates, reflecting persistent safe-haven demand for the franc during periods of geopolitical stress. With inflation forecasts still anchored below 1% through 2027, the SNB remains the most dovish G10 central bank by a wide margin, even as the franc continues to draw flows on risk-aversion grounds.",
-      "sources": [
-        {
-          "title": "Switzerland Interest Rate -- Swiss National Bank",
-          "url": "https://tradingeconomics.com/switzerland/interest-rate"
-        }
-      ],
-      "updated": "2026-06-30T13:45:00Z",
-      "source_model": "manual"
+      "catalyst": "The Swiss Franc is seeing converging and coiling technicals in USD/CHF, with traders eyeing a break. The Swiss KOF Barometer has climbed above the long-term average, indicating an improving economic outlook. The trend move higher in USD/CHF stalled last week.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     },
     "NZD": {
-      "catalyst": "The RBNZ held the Official Cash Rate at 2.25% at its 29 May meeting, but the decision was split three-three, with Governor Breman casting the deciding vote, and the central bank's updated projections show rates running meaningfully higher through 2026-27 than previously signaled. Breman has said rates are likely to rise sooner and by more than earlier guidance indicated, as Middle East-linked energy costs push near-term inflation toward a projected 4.3% peak. The hawkish shift in tone, even without an immediate hike, has been read by markets as RBNZ effectively closing the door on further easing and opening one toward tightening, supporting the kiwi against lower-yielding peers.",
-      "sources": [
-        {
-          "title": "RBNZ recap: Rates may need to rise sooner and faster",
-          "url": "https://www.fxstreet.com/news/rbnz-recap-rates-may-need-to-rise-sooner-and-faster-202605271348"
-        }
-      ],
-      "updated": "2026-06-30T13:45:00Z",
-      "source_model": "manual"
+      "catalyst": "The New Zealand Dollar is leading G10 performance, with NZD/JPY at 92.41, supported by a hawkish RBNZ bias and a +335bp OIS carry advantage over JPY. A crowded JPY short positioning reflects the carry trade dynamics.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     },
     "NOK": {
-      "catalyst": "Norges Bank held its policy rate at 4.25% on 17 June after an out-of-consensus hike in May, but flagged that capacity utilization, while drifting down, still leaves room for another increase if inflation proves stickier than projected. The Committee is watching whether a potential reopening of the Strait of Hormuz eases energy-driven price pressure, but Governor Wolden Bache has stressed elevated business costs are likely to keep inflation high regardless. With the policy rate already among the highest in the G10 and forecasts pointing modestly above 4.5% by year-end, NOK continues to carry one of the widest yield advantages in the bloc.",
-      "sources": [
-        {
-          "title": "Rate decision June 2026 -- Norges Bank",
-          "url": "https://www.norges-bank.no/en/topics/monetary-policy/Monetary-policy-meetings/2026/june-2026/"
-        }
-      ],
-      "updated": "2026-06-30T13:45:00Z",
-      "source_model": "manual"
+      "catalyst": "The Norwegian Krone is supported against the Euro, driven by increased NOK flows, according to Nordea. This suggests a relatively positive outlook for the Krone.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     },
     "SEK": {
-      "catalyst": "The Riksbank held its policy rate at 1.75% on 17 June, the fifth straight hold, but raised the probability of a hike later this year, citing growing inflation risk from prolonged Middle East supply disruptions even as the 2026 inflation forecast was cut to 0.6%. Policymakers described current Swedish economic activity as weak, with disinflation running well below target through the first half of the year, leaving the Riksbank notably more dovish than Norges Bank despite facing a similar energy-price shock. The krona remains the most rate-disadvantaged Nordic currency in the near term, with any hawkish repricing now contingent on the conflict's duration.",
-      "sources": [
-        {
-          "title": "Sweden Interest Rate",
-          "url": "https://tradingeconomics.com/sweden/interest-rate"
-        }
-      ],
-      "updated": "2026-06-30T13:45:00Z",
-      "source_model": "manual"
+      "catalyst": "The Swedish Krona is trading range-bound pending fresh catalysts, with no significant headlines or signals to dictate a clear direction. Traders are likely waiting for new information to drive SEK price action.",
+      "sources": [],
+      "updated": "2026-06-30T17:46:24Z",
+      "source_model": "groq-internal-data"
     }
   }
 }
