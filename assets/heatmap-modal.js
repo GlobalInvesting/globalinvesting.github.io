@@ -431,6 +431,8 @@
   let _rtCache  = null;
   let _driversCache  = null;   // { generated_at, drivers: { USD: "...", EUR: "...", ... } }
   let _driversFetched = false;
+  let _catalystsCache  = null; // { generated_at, currencies: { EUR: { catalyst, sources, updated }, ... } }
+  let _catalystsFetched = false;
   let _sessionCtxCache = null; // { generated_at, sessions: { EUR: { Sydney: "...", ... }, ... } }
   let _sessionCtxFetched = false;
   let _sessionCtxIsWeekend = false; // true when session-context.json was generated in closed-market mode
@@ -456,6 +458,23 @@
         }
       })
       .catch(() => { /* silent fallback — drivers are additive */ });
+  }
+
+  // Fetch currency-catalysts.json once per page load (lazy, on first modal open).
+  // Substantive per-currency catalyst paragraph with named sources (v8.32.0) — distinct
+  // from currency-drivers.json (pair-level COT/carry boilerplate repeated across pairs).
+  // Falls back silently — the catalyst block is additive, never blocking.
+  function fetchCatalysts() {
+    if (_catalystsFetched) return;
+    _catalystsFetched = true;
+    fetch('./ai-analysis/currency-catalysts.json?_=' + Date.now())
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.currencies && typeof data.currencies === 'object') {
+          _catalystsCache = data;
+        }
+      })
+      .catch(() => { /* silent fallback — catalyst block is additive */ });
   }
 
   // Fetch session-context.json once per page load (lazy, on first modal open).
@@ -642,6 +661,10 @@
       <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
         <div class="hm-ct">RELATIVE STRENGTH DIFFERENTIAL · ALL 10 G10 · % COMPOSITE vs PREV CLOSE</div>
         <div id="hm-corr-matrix" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;"></div>
+      </div>
+      <div class="hm-cw">
+        <div class="hm-ct" id="hm-catalyst-title">CURRENCY CATALYSTS</div>
+        <div id="hm-catalyst"></div>
       </div>
       <div class="hm-cw">
         <div class="hm-ct" id="hm-drivers-title">STRENGTH DRIVERS · TOP 3 PAIRS BY CONTRIBUTION</div>
@@ -1196,6 +1219,36 @@
   function populateCorrelations(ccy, strengths, rtCache) {
     document.getElementById('hm-drivers-title').textContent =
       ccy + ' STRENGTH DRIVERS · TOP 3 PAIRS BY CONTRIBUTION';
+    document.getElementById('hm-catalyst-title').textContent =
+      ccy + ' CATALYSTS';
+
+    // Per-currency catalyst paragraph + named sources (v8.32.0).
+    // Distinct from the pair-level driver notes below: this is a substantive, sourced
+    // writeup of WHY the currency is moving (named officials, decisions, dates), in the
+    // style of Bloomberg FXFB / Reuters wires — not a repeated COT/carry boilerplate.
+    const catalystEl = document.getElementById('hm-catalyst');
+    const ccyCatalyst = (_catalystsCache && _catalystsCache.currencies)
+      ? _catalystsCache.currencies[ccy]
+      : null;
+    if (ccyCatalyst && ccyCatalyst.catalyst) {
+      const sources = Array.isArray(ccyCatalyst.sources) ? ccyCatalyst.sources : [];
+      const sourcesHtml = sources.length
+        ? `<div style="margin-top:6px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);line-height:1.6;">
+             Sources: ${sources.slice(0,4).map(s =>
+               `<a href="${s.url}" target="_blank" rel="noopener noreferrer" style="color:var(--text3,#6b7280);text-decoration:underline;">${(s.title||s.url).slice(0,40)}</a>`
+             ).join(' · ')}
+           </div>`
+        : '';
+      catalystEl.innerHTML = `
+        <div style="font-size:11px;color:var(--text2,#787b86);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.6;">
+          ${ccyCatalyst.catalyst}
+        </div>
+        ${sourcesHtml}
+        <div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">AI Analytics · Google Search grounded · updated 1×/day</div>
+      `;
+    } else {
+      catalystEl.innerHTML = '<div style="font-size:11px;color:var(--text3,#6b7280);font-family:var(--font-mono)">No catalyst data available yet</div>';
+    }
 
     const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD','NOK','SEK'];
 
@@ -1722,6 +1775,7 @@
     populateMetrics(ccy, strengths, rtCache);
     populateBreakdown(ccy, strengths, rtCache);
     fetchDrivers();        // lazy-load AI driver notes in the background
+    fetchCatalysts();      // lazy-load AI per-currency catalyst notes in the background
     fetchSessionContext(); // lazy-load AI session context notes in the background
 
     // Update source labels to reflect active data source (Finnhub live vs yfinance)
