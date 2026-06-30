@@ -1,36 +1,76 @@
 {
-  "generated_at": "2026-06-30T18:37:28Z",
+  "generated_at": "2026-06-30T18:52:07Z",
   "drivers": {
     "EUR": {
-      "EUR/USD": "The Euro is seeing resistance at 1.1450 against the US dollar, as the European Central Bank is reportedly debating doubling banks' minimum reserve requirement to 2% from 1%. ING expects a hawkish bias to be sustained with one more hike. The Euro's upside is being capped, suggesting a cautious approach from traders",
-      "EUR/GBP": "The Euro is underpinned by a hawkish ECB bias, while the British Pound is steady, with BOE's Bailey noting that there is time to judge the pass-through of higher energy prices. EUR/GBP is likely to remain underpinned by the ECB's hawkish stance",
-      "EUR/JPY": "The Euro is benefiting from a moderate carry advantage against the Japanese Yen, with a 275bp Fed-BoJ carry advantage keeping USD/JPY bid. EUR/JPY is likely to be influenced by the ECB's hawkish bias and the JPY's crowded carry positioning"
+      "EUR/USD": "The euro is under pressure as European Central Bank officials debate doubling banks' minimum reserve requirement to 2% from 1%, according to a report. EUR/USD is facing resistance at 1.1450 against the US dollar. The ECB is expected to sustain a hawkish bias with one more hike, according to ING",
+      "EUR/GBP": "The euro is seeing moderate gains against the pound, with EUR/GBP trading slightly higher. The European Central Bank's debate on doubling banks' minimum reserve requirement is being watched, while the BoE's stance remains steady. The EUR COT LF short -67.5k reflects a bearish positioning",
+      "EUR/JPY": "The euro is trading higher against the yen, with EUR/JPY at 163.41. The ECB's potential doubling of banks' minimum reserve requirement is being weighed against the BoJ's steady stance. JPY COT LF short -115,033 reflects crowded carry positioning",
+      "EUR/AUD": "The euro is steady against the Australian dollar, with EUR/AUD trading flat. The RBA's hawkish minutes met firmer US confidence data, supporting AUD. However, the ECB's debate on reserve requirements is being watched",
+      "EUR/CAD": "The euro is gaining against the Canadian dollar, with EUR/CAD trading higher. Canada's GDP growth topped forecasts, but May guidance remains soft, limiting CAD recovery. CAD COT LF short -87,096 shows institutional bearishness",
+      "EUR/CHF": "The euro is steady against the Swiss franc, with EUR/CHF trading flat. The Swiss KOF Barometer climbed above the long-term average, improving the economic outlook. The SNB is on hold",
+      "EUR/NZD": "The euro is trading lower against the New Zealand dollar, with EUR/NZD at 1.7683. NZD leads G10 performance, supported by a hawkish RBNZ bias and a +335bp OIS carry advantage over JPY"
     },
     "GBP": {
-      "GBP/USD": "The British Pound is steady, with BOE's Bailey noting that there is time to judge the pass-through of higher energy prices. The UK economy grew by 0.6% at the start of the year, while Rabobank expects no change in policy in 2026. GBP/USD's near-term direction appears to be consolidative",
-      "GBP/JPY": "The British Pound is underpinned by a relatively hawkish BOE stance, while the Japanese Yen is seeing significant movement, driven by a 275bp Fed-BoJ carry advantage. GBP/JPY is likely to be influenced by the JPY's crowded carry positioning"
+      "GBP/USD": "The British pound is steady after Bank of England Governor Bailey stated that the BoE has time to judge the pass-through of higher energy prices. The UK economy grew by 0.6% at the start of the year. The BoE is on hold, with no change in policy expected in 2026",
+      "GBP/JPY": "The pound is trading higher against the yen, with GBP/JPY at 163.11. BOJ policymaker Sato stated that short-term volatile moves in the exchange rate are undesirable. JPY COT LF short -115,033 reflects crowded carry positioning",
+      "GBP/AUD": "The pound is steady against the Australian dollar, with GBP/AUD trading flat. The RBA's hawkish minutes supported AUD. The BoE's stance remains steady",
+      "GBP/CAD": "The pound is gaining against the Canadian dollar, with GBP/CAD trading higher. Canada's GDP growth topped forecasts, but May guidance remains soft. CAD COT LF short -87,096 shows institutional bearishness",
+      "GBP/CHF": "The pound is steady against the Swiss franc, with GBP/CHF trading flat. The SNB is on hold, with the Swiss KOF Barometer improving",
+      "GBP/NZD": "The pound is trading lower against the New Zealand dollar, with GBP/NZD at 2.0323. NZD leads G10 performance, supported by a hawkish RBNZ bias"
     },
     "JPY": {
-      "USD/JPY": "The Japanese Yen is seeing significant movement, with USD/JPY at 162.61, driven by a 275bp Fed-BoJ carry advantage and despite a moderate put skew signaling intervention hedging. BOJ policymaker Sato expressed concern over short-term volatile moves in the exchange rate. The correlation between USD/JPY and US 10Y yields has broken",
-      "EUR/JPY": "The Euro is benefiting from a moderate carry advantage against the Japanese Yen, with a 275bp Fed-BoJ carry advantage keeping USD/JPY bid. EUR/JPY is likely to be influenced by the ECB's hawkish bias and the JPY's crowded carry positioning",
-      "GBP/JPY": "The British Pound is underpinned by a relatively hawkish BOE stance, while the Japanese Yen is seeing significant movement, driven by a 275bp Fed-BoJ carry advantage. GBP/JPY is likely to be influenced by the JPY's crowded carry positioning"
+      "USD/JPY": "The US dollar is higher against the yen, with USD/JPY at 162.61. The 275bp Fed-BoJ carry advantage keeps the pair bid, despite a moderate put skew signaling intervention hedging. JPY COT LF short -115,033 reflects crowded carry positioning",
+      "EUR/JPY": "The euro is trading higher against the yen, with EUR/JPY at 163.41. The ECB's potential doubling of banks' minimum reserve requirement is being weighed against the BoJ's steady stance",
+      "GBP/JPY": "The pound is trading higher against the yen, with GBP/JPY at 163.11. BOJ policymaker Sato stated that short-term volatile moves in the exchange rate are undesirable",
+      "AUD/JPY": "The Australian dollar is trading higher against the yen, with AUD/JPY at 92.98. The RBA's hawkish minutes supported AUD",
+      "CAD/JPY": "The Canadian dollar is trading lower against the yen, with CAD/JPY at 89.41. Canada's GDP growth topped forecasts, but May guidance remains soft",
+      "CHF/JPY": "The Swiss franc is trading lower against the yen, with CHF/JPY at 111.41. The SNB is on hold",
+      "NZD/JPY": "The New Zealand dollar is trading higher against the yen, with NZD/JPY at 92.41. NZD leads G10 performance, supported by a hawkish RBNZ bias"
     },
     "AUD": {
-      "AUD/USD": "The Australian Dollar is advancing, with hawkish RBA Minutes meeting firmer US confidence data, and buyers testing the 100-hour MA following hawkish Fed commentary. AUD/USD's volatility premium is at a massive +10.6%, the highest in G10, signaling significant tail risk priced in options. Despite a 60bp carry advantage, markets are doubting an August hike"
+      "AUD/USD": "The Australian dollar is advancing as hawkish RBA minutes met firmer US confidence data, with AUD/USD buyers testing the 100-hour MA. The AUD/USD volatility premium is at 17.9% vs HV30 at 7.3%, signaling significant tail risk",
+      "EUR/AUD": "The euro is steady against the Australian dollar, with EUR/AUD trading flat. The RBA's hawkish minutes met firmer US confidence data",
+      "GBP/AUD": "The pound is steady against the Australian dollar, with GBP/AUD trading flat. The RBA's hawkish minutes supported AUD",
+      "AUD/JPY": "The Australian dollar is trading higher against the yen, with AUD/JPY at 92.98. The RBA's hawkish minutes supported AUD",
+      "AUD/CAD": "The Australian dollar is trading higher against the Canadian dollar, with AUD/CAD at 0.9863. Canada's GDP growth topped forecasts",
+      "AUD/CHF": "The Australian dollar is trading higher against the Swiss franc, with AUD/CHF at 0.5953. The SNB is on hold",
+      "AUD/NZD": "The Australian dollar is trading lower against the New Zealand dollar, with AUD/NZD at 1.0813. NZD leads G10 performance"
     },
     "CAD": {
-      "USD/CAD": "The Canadian Dollar gained after Canada's GDP growth topped forecasts, with April GDP at 0.5% and a firmer second-quarter signal. However, May guidance remains soft, limiting CAD recovery, and an institutional vs retail divergence at the 1.42 level in USD/CAD suggests potential for movement. CAD COT LF short -87,096"
+      "USD/CAD": "The US dollar is steady against the Canadian dollar, with USD/CAD at 1.4207. Canada's GDP growth topped forecasts, but May guidance remains soft. CAD COT LF short -87,096 shows institutional bearishness",
+      "EUR/CAD": "The euro is gaining against the Canadian dollar, with EUR/CAD trading higher. Canada's GDP growth topped forecasts",
+      "GBP/CAD": "The pound is gaining against the Canadian dollar, with GBP/CAD trading higher. Canada's GDP growth topped forecasts",
+      "AUD/CAD": "The Australian dollar is trading higher against the Canadian dollar, with AUD/CAD at 0.9863. Canada's GDP growth topped forecasts",
+      "CAD/JPY": "The Canadian dollar is trading lower against the yen, with CAD/JPY at 89.41. Canada's GDP growth topped forecasts",
+      "CAD/CHF": "The Canadian dollar is trading lower against the Swiss franc, with CAD/CHF at 0.7133. The SNB is on hold",
+      "NZD/CAD": "The New Zealand dollar is trading higher against the Canadian dollar, with NZD/CAD at 0.8763. NZD leads G10 performance"
     },
     "CHF": {
-      "USD/CHF": "The Swiss Franc is seeing converging and coiling technicals in USD/CHF, with traders eyeing a break. The Swiss KOF Barometer has climbed above the long-term average, indicating an improving economic outlook. The trend move higher in USD/CHF stalled last week"
+      "USD/CHF": "The US dollar is steady against the Swiss franc, with USD/CHF at 0.8933. The SNB is on hold",
+      "EUR/CHF": "The euro is steady against the Swiss franc, with EUR/CHF trading flat. The Swiss KOF Barometer improved",
+      "GBP/CHF": "The pound is steady against the Swiss franc, with GBP/CHF trading flat. The SNB is on hold",
+      "AUD/CHF": "The Australian dollar is trading higher against the Swiss franc, with AUD/CHF at 0.5953. The SNB is on hold",
+      "CAD/CHF": "The Canadian dollar is trading higher against the Swiss franc, with CAD/CHF at 0.7133. The SNB is on hold",
+      "CHF/JPY": "The Swiss franc is trading lower against the yen, with CHF/JPY at 111.41. The SNB is on hold",
+      "NZD/CHF": "The New Zealand dollar is trading higher against the Swiss franc, with NZD/CHF at 0.6153. NZD leads G10 performance"
     },
     "NZD": {
-      "NZD/USD": "The New Zealand Dollar is leading G10 performance, with NZD/JPY at 92.41, supported by a hawkish RBNZ bias and a +335bp OIS carry advantage over JPY. A hike is priced in for 8 July"
+      "NZD/USD": "The New Zealand dollar is leading G10 performance, with NZD/USD at 0.6321. A hawkish RBNZ bias supports NZD",
+      "EUR/NZD": "The euro is trading lower against the New Zealand dollar, with EUR/NZD at 1.7683. NZD leads G10 performance",
+      "GBP/NZD": "The pound is trading lower against the New Zealand dollar, with GBP/NZD at 2.0323. NZD leads G10 performance",
+      "AUD/NZD": "The Australian dollar is trading lower against the New Zealand dollar, with AUD/NZD at 1.0813. NZD leads G10 performance",
+      "NZD/JPY": "The New Zealand dollar is trading higher against the yen, with NZD/JPY at 92.41. NZD leads G10 performance",
+      "NZD/CAD": "The New Zealand dollar is trading higher against the Canadian dollar, with NZD/CAD at 0.8763. NZD leads G10 performance",
+      "NZD/CHF": "The New Zealand dollar is trading higher against the Swiss franc, with NZD/CHF at 0.6153. NZD leads G10 performance"
     },
     "USD": {
-      "EUR/USD": "The Euro is seeing resistance at 1.1450 against the US dollar, as the European Central Bank is reportedly debating doubling banks' minimum reserve requirement to 2% from 1%. ING expects a hawkish bias to be sustained with one more hike. The Euro's upside is being capped, suggesting a cautious approach from traders. Euro trims losses but Fed rate-hike bets keep gains in check",
-      "GBP/USD": "The British Pound is steady, with BOE's Bailey noting that there is time to judge the pass-through of higher energy prices. The UK economy grew by 0.6% at the start of the year, while Rabobank expects no change in policy in 2026. GBP/USD's near-term direction appears to be consolidative. Euro trims losses but Fed rate-hike bets keep gains in check",
-      "AUD/USD": "The Australian Dollar is advancing, with hawkish RBA Minutes meeting firmer US confidence data, and buyers testing the 100-hour MA following hawkish Fed commentary. AUD/USD's volatility premium is at a massive +10.6%, the highest in G10, signaling significant tail risk priced in options. Despite a 60bp carry advantage, markets are doubting an August hike. Euro trims losses but Fed rate-hike bets keep gains in check"
+      "EUR/USD": "The euro is under pressure as European Central Bank officials debate doubling banks' minimum reserve requirement to 2% from 1%, according to a report. EUR/USD is facing resistance at 1.1450 against the US dollar",
+      "GBP/USD": "The British pound is steady after Bank of England Governor Bailey stated that the BoE has time to judge the pass-through of higher energy prices. The UK economy grew by 0.6% at the start of the year",
+      "USD/JPY": "The US dollar is higher against the yen, with USD/JPY at 162.61. The 275bp Fed-BoJ carry advantage keeps the pair bid",
+      "AUD/USD": "The Australian dollar is advancing as hawkish RBA minutes met firmer US confidence data, with AUD/USD buyers testing the 100-hour MA",
+      "USD/CAD": "The US dollar is steady against the Canadian dollar, with USD/CAD at 1.4207. Canada's GDP growth topped forecasts",
+      "USD/CHF": "The US dollar is steady against the Swiss franc, with USD/CHF at 0.8933. The SNB is on hold",
+      "NZD/USD": "The New Zealand dollar is leading G10 performance, with NZD/USD at 0.6321. A hawkish RBNZ bias supports NZD"
     }
   },
   "driver_sources": {
