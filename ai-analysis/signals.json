@@ -1,57 +1,54 @@
 {
-  "generated_at": "2026-06-29T21:27:51Z",
+  "generated_at": "2026-06-30T02:52:47Z",
   "signals": [
     {
-      "time": "21:27",
+      "time": "02:52",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry + Intervention Risk",
-      "text": "USD/JPY at 161.86, well above the 160.00 intervention watch level. Reduced tanker flows through the Strait of Hormuz (WTI Oil $70.4, +1.72%) and Iran's President's 'unfounded threats' rhetoric escalate geopolitical tensions. JPY COT LF net short −115,033 (28.4% long) is an extreme crowded short, while the USD/JPY OIS carry of +266bp continues to support the pair. Intervention risk is elevated on sustained price action above 160.00, with a crowded short vulnerable to a BoJ-induced squeeze. The next BoJ meeting (mkt: 100% hold priced) determines the yield gap direction.",
+      "title": "USD/JPY — Carry + Volatility + Intervention Risk",
+      "text": "USD/JPY trades at 162.14, holding above the critical 160.00 threshold where BoJ verbal and physical intervention risks escalate. The 264bp SOFR-TONA carry advantage continues to support the USD bid, while JPY speculative positioning remains heavily short with COT LF net short at -115,033 contracts. However, the options market is actively hedging downside risk, with USD/JPY 25d risk reversals showing a moderate put skew of -1.08 and a significant volatility risk premium of +5.0% (IV 7.2% vs HV30 2.2%). This options skew contradicts the spot trend, signaling institutional hedging against sudden JPY appreciation. Carry remains the dominant driver under the current normal volatility regime (VIX at 17.6), but a break above 162.50 or a spike in VIX above 25 will trigger rapid carry unwinds.",
       "evidence": [
-        "USD/JPY: 161.86",
+        "USD/JPY: 162.14",
         "JPY COT LF net: -115,033",
-        "USD/JPY OIS carry: +266bp",
-        "WTI Oil: $70.4"
+        "USD/JPY 25d RR: -1.08",
+        "USD/JPY IV vs HV30: 7.2% vs 2.2%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:24",
+      "time": "02:49",
       "priority": "warning",
-      "title": "EUR/USD — ECB Hawkishness vs Political Risk + Positioning",
-      "text": "ECB’s Lagarde states the ECB can raise rates to address inflation without fear, signaling hawkish intent despite HSBC noting political and growth risks pointing lower for EUR/USD. EUR COT LF net short −67,504 (34.5% long) indicates significant speculative short positioning. EUR/USD OIS carry is +146bp favoring USD, structurally limiting EUR upside. The next ECB meeting (mkt: 100% hold priced) on 23 Jul is key for rate guidance.",
+      "title": "EUR/AUD — G10 Bilateral Theme + RBA Minutes",
+      "text": "The G10 Currency Strength Scorecard triggers a bilateral theme warning with a 0.971% spread between leader EUR (+0.414% avg) and laggard AUD (-0.556% avg). This divergence is driven by the RBA June Minutes, which revealed policymakers opted to leave rates on hold and chose patience over a hawkish policy pivot, disappointing markets positioned for an immediate hike. This policy stance clashes with the -60bp carry disadvantage for EUR/USD (Fed 3.75% vs RBA 4.35%), showing that policy momentum is overriding nominal carry. EUR/AUD strength is further supported by extreme retail positioning, with EUR/AUD retail sentiment at 67% short, providing contrarian fuel for further upside. Watch the 1.6700 level on EUR/AUD to confirm a structural breakout.",
       "evidence": [
-        "ECB Lagarde comments",
-        "EUR COT LF net: -67,504",
-        "EUR/USD OIS carry: +146bp",
-        "EUR/USD: 1.143"
+        "EUR 1W avg: +0.414% (n=7)",
+        "AUD 1W avg: -0.556% (n=4)",
+        "G10 spread: 0.971%"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:21",
+      "time": "02:47",
       "priority": "warning",
-      "title": "AUD/USD — G10 Bilateral Theme + Volatility Premium",
-      "text": "AUD is the weakest G10 currency this week with an average of −0.438% vs peers, while EUR is the strongest at +0.437%, creating a 0.875% spread. AUD/USD IV at 23.0% vs HV30 at 7.5% shows an extreme +15.5% VRP, indicating strong hedging demand for AUD downside protection. This suggests options traders are paying up for AUD weakness despite neutral speculative positioning (AUD COT LF net long +29,035). The next RBA meeting (mkt: 100% hold priced) on 11 Aug is the catalyst.",
+      "title": "NZD/USD — COT vs Retail Sentiment Divergence",
+      "text": "NZD/USD trades at 0.5646, exhibiting an extreme divergence between institutional and retail positioning. COT LF speculative positioning is net short -23,314 contracts, while retail sentiment is at an extreme 94% long. This represents a major contrarian reversal risk as retail traders attempt to fade the institutional downtrend. The downward pressure is fundamentally supported by a +150bp carry advantage favoring the USD (Fed 3.75% vs RBNZ 2.25%) and a deeply negative NZD real policy rate of -0.83% (inflation expectations at 3.08% vs policy rate of 2.25%). Retail capitulation risk remains high; a break below 0.5600 will accelerate the sell-off. Watch the RBNZ policy meeting on July 8 for any hawkish pivot to invalidate the short bias.",
       "evidence": [
-        "AUD 1W avg: -0.438% (n=4)",
-        "EUR 1W avg: +0.437% (n=7)",
-        "G10 spread: 0.875%",
-        "AUD/USD VRP: +15.5%"
+        "NZD/USD: 0.5646",
+        "NZD COT LF net: -23,314",
+        "NZD/USD Retail: 94% long / 6% short"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:18",
+      "time": "02:42",
       "priority": "info",
-      "title": "USD/CAD — Retail Divergence + Extreme Volatility Premium",
-      "text": "USD/CAD retail sentiment is extremely short at 94% short, diverging from COT data which shows CAD NET SHORT, lev_net=-87,096 (20.6% long), indicating institutional short positioning. USD/CAD IV at 13.8% vs HV30 at 6.4% shows a +7.4% VRP, signaling elevated options market demand for protection. This retail extreme against institutional positioning and high vol premium suggests potential for a short squeeze if CAD data disappoints. Watch for the next BoC meeting (mkt: 100% hold priced) on 15 Jul.",
+      "title": "USD/CAD — Correlation Break + Volatility Complacency",
+      "text": "USD/CAD trades at 1.4229, showing a significant cross-asset correlation break against WTI crude oil. The current correlation stands at -0.761 vs a 252-day norm of +0.020 (z = -2.11σ), indicating that the traditional CAD-commodity link has broken down as the pair is driven entirely by the +150bp Fed-BoC carry advantage and a positive US Economic Surprise Index (CESI net +290 beats vs CAD net -6 misses). Speculative positioning is heavily short CAD (COT LF net short -87,096), while retail sentiment is at an extreme 94% short. Despite the strong upward trend, the options market shows mild call skew (+0.37) and lacks a significant volatility premium, suggesting complacency. Watch for a reversal if WTI oil breaks above $72.0 or if US jobs data misses expectations.",
       "evidence": [
-        "USD/CAD retail: 94% short",
+        "USD/CAD vs WTI Oil corr: -0.761 (norm: +0.020, z: -2.11σ)",
         "CAD COT LF net: -87,096",
-        "USD/CAD VRP: +7.4%",
-        "USD/CAD: 1.4206"
+        "USD/CAD Retail: 6% long / 94% short"
       ],
-      "_source": "gemini:gemini-2.5-flash"
+      "_source": "gemini:gemini-3.5-flash"
     }
   ]
 }
