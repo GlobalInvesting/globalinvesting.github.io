@@ -659,7 +659,7 @@
     </div>
     <div class="hm-panel" id="hm-p-correlations">
       <div class="hm-cw">
-        <div class="hm-ct" id="hm-catalyst-title">CURRENCY CATALYSTS</div>
+        <div class="hm-ct" id="hm-catalyst-title">MACRO DRIVERS</div>
         <div id="hm-catalyst"></div>
       </div>
       <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
@@ -1221,7 +1221,7 @@
     document.getElementById('hm-drivers-title').textContent =
       ccy + ' STRENGTH DRIVERS · TOP 3 PAIRS BY CONTRIBUTION';
     document.getElementById('hm-catalyst-title').textContent =
-      ccy + ' CATALYSTS';
+      ccy + ' MACRO DRIVERS';
 
     // Per-currency catalyst paragraph + named sources (v8.32.0).
     // Distinct from the pair-level driver notes below: this is a substantive, sourced
@@ -1248,7 +1248,7 @@
         <div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">AI Analytics · updated 1×/day</div>
       `;
     } else {
-      catalystEl.innerHTML = '<div style="font-size:11px;color:var(--text3,#6b7280);font-family:var(--font-mono)">No catalyst data available yet</div>';
+      catalystEl.innerHTML = '<div style="font-size:11px;color:var(--text3,#6b7280);font-family:var(--font-mono)">No macro driver data available yet</div>';
     }
 
     const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD','NOK','SEK'];
