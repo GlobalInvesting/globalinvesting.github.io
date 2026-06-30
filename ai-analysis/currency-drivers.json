@@ -1,77 +1,77 @@
 {
-  "generated_at": "2026-06-29T20:26:23Z",
+  "generated_at": "2026-06-30T00:59:34Z",
   "drivers": {
     "EUR": {
-      "EUR/USD": "USD steady. Fed on hold. 150bp carry favors USD",
-      "EUR/GBP": "GBP on hold. BoE 3.75% vs ECB 2.25%",
-      "EUR/JPY": "JPY COT LF short -115.0k. BoJ on hold. 120bp carry favors EUR",
-      "EUR/AUD": "AUD on hold. RBA 4.35% vs ECB 2.25%",
-      "EUR/CAD": "CAD COT LF short -87.1k. BoC on hold. 150bp carry favors USD",
-      "EUR/CHF": "CHF on hold. SNB 0.0% vs ECB 2.25% → +225bp carry favors EUR",
-      "EUR/NZD": "NZD hike priced in. RBNZ 2.25% vs ECB 2.25%"
+      "EUR/USD": "USD bid on Fed hawkishness. Fed 3.75% vs ECB 2.25%. +150bp carry favors USD",
+      "EUR/GBP": "GBP steady. BoE on hold. CESI net +24 supports GBP vs EUR negative bias",
+      "EUR/JPY": "JPY COT LF short -115.0k. BoJ on hold. EUR/JPY carry +125bp bid intact",
+      "EUR/AUD": "AUD COT LF long +29.0k. RBA on hold. AUD/USD carry -73bp anchors pair",
+      "EUR/CAD": "CAD COT LF short -87.1k. BoC on hold. CAD CESI net -6 misses weighs",
+      "EUR/CHF": "CHF flat. SNB on hold. ECB-SNB +225bp carry differential anchors pair",
+      "EUR/NZD": "NZD hike priced in for July. RBNZ bias ↑. NZD real rate -0.83% vs EUR +0.08%"
     },
     "GBP": {
-      "GBP/USD": "USD steady. Fed on hold. Yield steady",
-      "GBP/JPY": "JPY COT LF short -115.0k. BoJ on hold",
-      "EUR/GBP": "EUR COT LF short -67.5k. ECB on hold",
-      "GBP/AUD": "AUD COT LF long +29.0k. RBA on hold",
-      "GBP/CAD": "CAD COT LF short -87.1k. BoC on hold",
-      "GBP/CHF": "CHF steady. SNB on hold",
-      "GBP/NZD": "NZD hike expected. RBNZ hike priced"
+      "GBP/USD": "USD bid on Fed hawkishness. Fed-BoE carry neutral at 3.75%. GBP/USD soft",
+      "GBP/JPY": "JPY COT LF short -115.0k. BoJ on hold. GBP/JPY carry +275bp bid intact",
+      "EUR/GBP": "GBP firm on CESI net +24. BoE on hold. EUR CESI net -4 weighs on cross",
+      "GBP/AUD": "AUD COT LF long +29.0k. RBA on hold. GBP/AUD carry -60bp favors AUD",
+      "GBP/CAD": "CAD COT LF short -87.1k. BoC on hold. GBP outperforming on data beats",
+      "GBP/CHF": "CHF steady. SNB on hold. GBP/CHF carry +375bp favors GBP demand",
+      "GBP/NZD": "NZD hike priced in for July. RBNZ bias ↑. NZD/USD carry +150bp vs GBP"
     },
     "JPY": {
-      "USD/JPY": "USD on hold",
-      "EUR/JPY": "EUR COT LF short -67.5k. ECB on hold",
-      "GBP/JPY": "GBP COT LF long +631k. BoE on hold",
-      "AUD/JPY": "AUD COT LF long +29k. RBA on hold",
-      "CAD/JPY": "CAD COT LF short -87.1k. BoC on hold",
-      "CHF/JPY": "CHF COT LF short -14.8k. SNB on hold",
-      "NZD/JPY": "NZD COT LF short -23.3k. Hike expected"
+      "USD/JPY": "JPY COT LF short -115.0k. Fed hawkishness drives USD. Carry +275bp favors USD",
+      "EUR/JPY": "JPY COT LF short -115.0k. BoJ on hold. EUR/JPY carry +125bp bid intact",
+      "GBP/JPY": "JPY COT LF short -115.0k. BoJ on hold. GBP/JPY carry +275bp bid intact",
+      "AUD/JPY": "JPY COT LF short -115.0k. RBA on hold. AUD/JPY carry +335bp bid intact",
+      "CAD/JPY": "JPY COT LF short -115.0k. BoC on hold. CAD/JPY carry +125bp bid intact",
+      "CHF/JPY": "JPY COT LF short -115.0k. SNB on hold. JPY carry advantage +100bp vs CHF",
+      "NZD/JPY": "JPY COT LF short -115.0k. NZD hike priced in. NZD/JPY carry bid intact"
     },
     "AUD": {
-      "AUD/USD": "USD steady. Fed on hold. Carry favors AUD -60bp",
-      "EUR/AUD": "EUR COT LF short -67.5k. ECB on hold",
-      "GBP/AUD": "GBP COT LF long +631. BoE on hold",
-      "AUD/JPY": "JPY COT LF short -115.0k. BoJ on hold. Carry favors AUD +337bp",
-      "AUD/CAD": "CAD COT LF short -87.1k. BoC on hold",
-      "AUD/CHF": "CHF steady. SNB on hold. Carry favors AUD +435bp",
-      "AUD/NZD": "NZD hike expected. RBNZ hike priced in"
+      "AUD/USD": "AUD COT LF long +29.0k. USD bid on Fed hawkishness. Carry +60bp favors AUD",
+      "EUR/AUD": "AUD COT LF long +29.0k. RBA on hold. EUR/AUD carry -210bp favors AUD",
+      "GBP/AUD": "AUD COT LF long +29.0k. RBA on hold. GBP/AUD carry -60bp favors AUD",
+      "AUD/JPY": "JPY COT LF short -115.0k. BoJ on hold. AUD/JPY carry +335bp bid intact",
+      "AUD/CAD": "AUD COT LF long +29.0k. CAD COT LF short -87.1k. AUD outperforming CAD",
+      "AUD/CHF": "AUD COT LF long +29.0k. SNB on hold. AUD/CHF carry +435bp favors AUD",
+      "AUD/NZD": "NZD hike priced in for July. RBNZ bias ↑. NZD real rate -0.83% vs AUD +0.17%"
     },
     "CAD": {
-      "USD/CAD": "USD steady. Fed on hold. 150bp carry favors USD",
-      "EUR/CAD": "EUR COT LF short -67.5k. ECB on hold. 225bp EUR/CHF carry favors EUR",
-      "GBP/CAD": "GBP COT LF long +631k. BoE on hold. GBP/USD carry neutral",
-      "AUD/CAD": "AUD COT LF long +29k. RBA on hold. 210bp AUD/CHF carry favors AUD",
-      "CAD/JPY": "JPY COT LF short -115.0k. BoJ on hold. 125bp CAD/JPY carry favors CAD",
-      "CAD/CHF": "CHF COT LF short -15k. SNB on hold. 225bp EUR/CHF carry favors EUR",
-      "NZD/CAD": "NZD COT LF short -23k. RBNZ hike expected. 0bp NZD/USD carry neutral"
+      "USD/CAD": "CAD COT LF short -87.1k. USD bid on Fed hawkishness. Carry +150bp favors USD",
+      "EUR/CAD": "CAD COT LF short -87.1k. BoC on hold. CAD CESI net -6 weighs on pair",
+      "GBP/CAD": "CAD COT LF short -87.1k. BoC on hold. GBP CESI net +24 supports cross",
+      "AUD/CAD": "CAD COT LF short -87.1k. AUD COT LF long +29.0k. AUD outperforming CAD",
+      "CAD/JPY": "CAD COT LF short -87.1k. JPY COT LF short -115.0k. Carry +125bp favors CAD",
+      "CAD/CHF": "CAD COT LF short -87.1k. SNB on hold. CAD/CHF carry +225bp favors CAD",
+      "NZD/CAD": "NZD hike priced in for July. CAD COT LF short -87.1k. NZD bid on RBNZ bias"
     },
     "CHF": {
-      "USD/CHF": "USD steady. Fed on hold. Carry favors USD +375bp",
-      "EUR/CHF": "EUR COT LF short -67.5k. ECB on hold. Carry favors EUR +225bp",
-      "GBP/CHF": "GBP COT LF long +0.6k. BoE on hold. Carry favors GBP +375bp",
-      "AUD/CHF": "AUD COT LF long +29.0k. RBA on hold. Carry favors AUD +435bp",
-      "CAD/CHF": "CAD COT LF short -87.1k. BoC on hold. Carry favors CAD +0bp",
-      "CHF/JPY": "JPY COT LF short -115.0k. BoJ on hold. Carry favors JPY -100bp",
-      "NZD/CHF": "NZD COT LF short -23.3k. RBNZ hike expected. Carry favors NZD +225bp"
+      "USD/CHF": "CHF steady. USD bid on Fed hawkishness. USD/CHF carry +375bp favors USD",
+      "EUR/CHF": "CHF steady. SNB on hold. EUR/CHF carry +225bp anchors range",
+      "GBP/CHF": "CHF steady. SNB on hold. GBP/CHF carry +375bp favors GBP",
+      "AUD/CHF": "CHF steady. RBA on hold. AUD/CHF carry +435bp favors AUD",
+      "CAD/CHF": "CHF steady. BoC on hold. CAD/CHF carry +225bp favors CAD",
+      "CHF/JPY": "JPY COT LF short -115.0k. BoJ on hold. JPY carry advantage +100bp vs CHF",
+      "NZD/CHF": "NZD hike priced in for July. RBNZ bias ↑. NZD/CHF carry +225bp favors NZD"
     },
     "NZD": {
-      "NZD/USD": "USD steady. Fed on hold. Carry favors USD +150bp",
-      "EUR/NZD": "EUR COT LF short -67.5k. ECB on hold. Carry favors EUR +225bp vs NZD",
-      "GBP/NZD": "GBP COT LF long +631k. BoE on hold. Carry neutral",
-      "AUD/NZD": "AUD COT LF long +29k. RBA on hold. Carry favors AUD +210bp",
-      "NZD/JPY": "JPY COT LF short -115.0k. BoJ on hold. Carry favors NZD +225bp",
-      "NZD/CAD": "CAD COT LF short -87.1k. BoC on hold. Carry favors NZD +0bp",
-      "NZD/CHF": "NZD COT LF short -23.3k. SNB on hold. Carry favors NZD +225bp"
+      "NZD/USD": "NZD hike priced in for July. USD bid on Fed hawkishness. Carry +150bp favors USD",
+      "EUR/NZD": "NZD hike priced in for July. RBNZ bias ↑. NZD real rate -0.83% vs EUR +0.08%",
+      "GBP/NZD": "NZD hike priced in for July. RBNZ bias ↑. NZD/USD carry +150bp vs GBP",
+      "AUD/NZD": "NZD hike priced in for July. RBNZ bias ↑. AUD/NZD real rate spread favors NZD",
+      "NZD/JPY": "NZD hike priced in for July. JPY COT LF short -115.0k. Carry bid intact",
+      "NZD/CAD": "NZD hike priced in for July. CAD COT LF short -87.1k. NZD outperforming CAD",
+      "NZD/CHF": "NZD hike priced in for July. SNB on hold. NZD/CHF carry +225bp favors NZD"
     },
     "USD": {
-      "EUR/USD": "EUR COT LF short -67.5k. ECB on hold",
-      "GBP/USD": "GBP COT LF long +631k. BoE on hold",
-      "USD/JPY": "JPY COT LF short -115.0k. BoJ on hold",
-      "AUD/USD": "AUD COT LF long +29.0k. RBA on hold",
-      "USD/CAD": "CAD COT LF short -87.1k. BoC on hold",
-      "USD/CHF": "CHF COT LF short -14.8k. SNB on hold",
-      "NZD/USD": "NZD COT LF short -23.3k. RBNZ hike expected"
+      "EUR/USD": "USD bid on Fed hawkishness. Fed 3.75% vs ECB 2.25%. +150bp carry favors USD",
+      "GBP/USD": "USD bid on Fed hawkishness. Fed-BoE carry neutral at 3.75%. GBP/USD soft",
+      "USD/JPY": "USD bid on Fed hawkishness. JPY COT LF short -115.0k. Carry +275bp favors USD",
+      "AUD/USD": "USD bid on Fed hawkishness. AUD COT LF long +29.0k. Carry +60bp favors AUD",
+      "USD/CAD": "USD bid on Fed hawkishness. CAD COT LF short -87.1k. Carry +150bp favors USD",
+      "USD/CHF": "USD bid on Fed hawkishness. SNB on hold. USD/CHF carry +375bp favors USD",
+      "NZD/USD": "USD bid on Fed hawkishness. NZD hike priced in. Carry +150bp favors USD"
     }
   },
   "_inputs_snap": {
