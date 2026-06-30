@@ -1353,21 +1353,34 @@
       return;
     }
 
-    // Per-pair AI notes from ai-analysis/currency-drivers.json
-    // Structure: { drivers: { EUR: { "EUR/JPY": "...", "EUR/GBP": "...", ... }, ... } }
+    // Per-pair AI notes from ai-analysis/currency-drivers.json (v8.34.0: free
+    // institutional prose, web-search grounded — replaces the old per-field
+    // COT/carry/CB-hold template). Sources are captured per CURRENCY (one grounded
+    // call covers all 7 of that currency's pairs), not per individual pair.
     const ccyNotes = (_driversCache && _driversCache.drivers && _driversCache.drivers[ccy])
       ? _driversCache.drivers[ccy]
       : null;
+    const ccySources = (_driversCache && _driversCache.driver_sources && _driversCache.driver_sources[ccy])
+      ? _driversCache.driver_sources[ccy]
+      : [];
+
+    const sourcesLine = (ccyNotes && ccySources.length)
+      ? `<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);line-height:1.6;">
+           Sources: ${ccySources.slice(0,4).map(s =>
+             `<a href="${s.url}" target="_blank" rel="noopener noreferrer" style="color:var(--text3,#6b7280);text-decoration:underline;">${(s.title||s.url).slice(0,36)}</a>`
+           ).join(' · ')}
+         </div>`
+      : '';
 
     driversEl.innerHTML = top3.map((d,i) => {
       const cls    = pctClass(d.impact);
       const note   = ccyNotes ? (ccyNotes[d.label] || ccyNotes[d.canon] || null) : null;
       const noteEl = note
-        ? `<div style="font-size:10px;color:var(--text2,#787b86);font-family:var(--font-mono);margin-top:3px;line-height:1.5;">${note}</div>`
+        ? `<div style="font-size:10.5px;color:var(--text2,#787b86);font-family:var(--font-mono);margin-top:4px;line-height:1.6;">${note}</div>`
         : '';
-      return `<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:${note ? 10 : 6}px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);">
-        <div style="font-size:11px;font-weight:600;color:var(--text);width:70px;padding-top:1px">${d.label}</div>
-        <div style="flex:1">
+      return `<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:${note ? 14 : 6}px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);">
+        <div style="font-size:11px;font-weight:600;color:var(--text);width:70px;padding-top:1px;flex-shrink:0;">${d.label}</div>
+        <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:11px;font-weight:600" class="${cls}" data-driver-idx="${i}">${fmt2(d.impact)}</span>
             <span style="font-size:11px;color:var(--text2,#787b86)">vs ${d.opp}</span>
@@ -1375,8 +1388,8 @@
           ${noteEl}
         </div>
       </div>`;
-    }).join('') + (ccyNotes
-      ? `<div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">AI Analytics · ~5min delay</div>`
+    }).join('') + sourcesLine + (ccyNotes
+      ? `<div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">AI Analytics · Google Search grounded</div>`
       : '');
   }
 
