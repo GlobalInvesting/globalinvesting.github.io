@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-06-30T11:57:36Z",
-  "generatedAt": "2026-06-30T11:57:36Z",
+  "lastUpdate": "2026-06-30T15:44:31Z",
+  "generatedAt": "2026-06-30T15:44:31Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2025-06-30",
   "rangeTo": "2026-06-30",
-  "totalEvents": 3975,
+  "totalEvents": 3976,
   "currencyCounts": {
     "CHF": 163,
     "EUR": 878,
@@ -18,12 +18,12 @@
     "NZD": 123,
     "USD": 1250,
     "AUD": 290,
-    "CAD": 309,
+    "CAD": 310,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2091,
+    "medium": 2092,
     "high": 1656,
     "low": 228
   },
@@ -949,9 +949,9 @@
       "std": 0.0
     },
     "USD/cb consumer confidence": {
-      "n": 2,
-      "mean": 2.45,
-      "std": 1.909188
+      "n": 3,
+      "mean": 0.466667,
+      "std": 3.69098
     },
     "AUD/inflation rate yoy": {
       "n": 4,
@@ -1099,9 +1099,9 @@
       "std": 0.0
     },
     "CAD/gdp mom": {
-      "n": 2,
-      "mean": 0.25,
-      "std": 0.353553
+      "n": 4,
+      "mean": 0.15,
+      "std": 0.238048
     },
     "CHF/kof leading indicators": {
       "n": 3,
@@ -1169,9 +1169,9 @@
       "std": 34.504492
     },
     "USD/chicago pmi": {
-      "n": 2,
-      "mean": 4.2,
-      "std": 11.313708
+      "n": 3,
+      "mean": 2.333333,
+      "std": 8.628634
     },
     "GBP/nationwide housing prices mom": {
       "n": 2,
@@ -1219,9 +1219,9 @@
       "std": 0.040893
     },
     "USD/jolts job openings": {
-      "n": 2,
-      "mean": 0.382,
-      "std": 0.50346
+      "n": 3,
+      "mean": 0.352667,
+      "std": 0.359607
     },
     "NOK/norges bank interest rate decision": {
       "n": 2,
@@ -49126,7 +49126,7 @@
       "impact": "medium",
       "actual": "&#8364;1.88B",
       "forecast": "&#8364;4.3B",
-      "previous": "&#8364;4.61B"
+      "previous": "&#8364;4.16B"
     },
     {
       "date": "30 Jun",
@@ -49157,7 +49157,7 @@
     {
       "date": "30 Jun",
       "dateISO": "2026-06-30",
-      "timeUTC": "10:00",
+      "timeUTC": "09:00",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
@@ -49176,7 +49176,7 @@
       "flag": "🇪🇺",
       "event": "Germany Inflation Rate MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.3%",
       "forecast": "0.0%",
       "previous": "-0.2%"
     },
@@ -49189,7 +49189,7 @@
       "flag": "🇪🇺",
       "event": "Germany Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.3%",
       "forecast": "2.6%",
       "previous": "2.6%"
     },
@@ -49202,9 +49202,22 @@
       "flag": "🇨🇦",
       "event": "Canada GDP MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.1%",
       "forecast": "0.1%",
       "previous": "0.4%"
+    },
+    {
+      "date": "30 Jun",
+      "dateISO": "2026-06-30",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada GDP MoM",
+      "impact": "medium",
+      "actual": "0.5%",
+      "forecast": "0.4%",
+      "previous": "-0.1%"
     },
     {
       "date": "30 Jun",
@@ -49215,9 +49228,9 @@
       "flag": "🇺🇸",
       "event": "United States S&#38;P/Case-Shiller Home Price YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "1.1%",
       "forecast": "0.9%",
-      "previous": "0.8%"
+      "previous": "0.9%"
     },
     {
       "date": "30 Jun",
@@ -49228,7 +49241,7 @@
       "flag": "🇺🇸",
       "event": "United States Chicago PMI",
       "impact": "medium",
-      "actual": null,
+      "actual": "56.7",
       "forecast": "58.1",
       "previous": "62.7"
     },
@@ -49241,7 +49254,7 @@
       "flag": "🇺🇸",
       "event": "United States CB Consumer Confidence",
       "impact": "medium",
-      "actual": null,
+      "actual": "91.2",
       "forecast": "94.7",
       "previous": "93.1"
     },
@@ -49254,9 +49267,9 @@
       "flag": "🇺🇸",
       "event": "United States JOLTs Job Openings",
       "impact": "high",
-      "actual": null,
+      "actual": "7.594M",
       "forecast": "7.3M",
-      "previous": "7.618M"
+      "previous": "7.585M"
     },
     {
       "date": "30 Jun",
