@@ -1,52 +1,56 @@
 {
-  "generated_at": "2026-06-30T02:52:47Z",
+  "generated_at": "2026-06-30T10:05:47Z",
   "signals": [
     {
-      "time": "02:52",
+      "time": "10:05",
       "priority": "critical",
-      "title": "USD/JPY — Carry + Volatility + Intervention Risk",
-      "text": "USD/JPY trades at 162.14, holding above the critical 160.00 threshold where BoJ verbal and physical intervention risks escalate. The 264bp SOFR-TONA carry advantage continues to support the USD bid, while JPY speculative positioning remains heavily short with COT LF net short at -115,033 contracts. However, the options market is actively hedging downside risk, with USD/JPY 25d risk reversals showing a moderate put skew of -1.08 and a significant volatility risk premium of +5.0% (IV 7.2% vs HV30 2.2%). This options skew contradicts the spot trend, signaling institutional hedging against sudden JPY appreciation. Carry remains the dominant driver under the current normal volatility regime (VIX at 17.6), but a break above 162.50 or a spike in VIX above 25 will trigger rapid carry unwinds.",
+      "title": "USD/JPY — Positioning + Vol + Retail Divergence",
+      "text": "USD/JPY trades at 162.3, holding above the critical 160.00 threshold where BoJ intervention risk escalates. JPY COT LF net short is highly crowded at -115,033 (28.4% long), while retail sentiment is at an extreme 85% short, creating a sharp institutional-to-retail divergence. The options market is heavily hedging downside protection, with the 25d Risk Reversal at -1.08 (moderate put skew) and a massive +5.0% Vol Risk Premium (IV 7.2% vs HV30 2.2%). This combination indicates that while the +275bp Fed-BoJ carry advantage keeps the pair bid, institutional players are aggressively buying downside protection against intervention, while retail traders are prematurely fading the trend. Carry dominates until VIX (currently 17.6) breaks above 25, but the risk of a sharp, intervention-driven long unwind is elevated.",
       "evidence": [
-        "USD/JPY: 162.14",
-        "JPY COT LF net: -115,033",
+        "USD/JPY Spot: 162.3",
+        "JPY COT LF Net: -115,033",
+        "USD/JPY Retail Sentiment: 85% short",
         "USD/JPY 25d RR: -1.08",
-        "USD/JPY IV vs HV30: 7.2% vs 2.2%"
+        "USD/JPY VRP: +5.0% (IV 7.2% vs HV30 2.2%)"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "02:49",
+      "time": "10:02",
       "priority": "warning",
-      "title": "EUR/AUD — G10 Bilateral Theme + RBA Minutes",
-      "text": "The G10 Currency Strength Scorecard triggers a bilateral theme warning with a 0.971% spread between leader EUR (+0.414% avg) and laggard AUD (-0.556% avg). This divergence is driven by the RBA June Minutes, which revealed policymakers opted to leave rates on hold and chose patience over a hawkish policy pivot, disappointing markets positioned for an immediate hike. This policy stance clashes with the -60bp carry disadvantage for EUR/USD (Fed 3.75% vs RBA 4.35%), showing that policy momentum is overriding nominal carry. EUR/AUD strength is further supported by extreme retail positioning, with EUR/AUD retail sentiment at 67% short, providing contrarian fuel for further upside. Watch the 1.6700 level on EUR/AUD to confirm a structural breakout.",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
+      "text": "NZD/USD trades at 0.5657, showing a stark divergence between speculative positioning and central bank pricing. COT LF specs are net short -23,314 (21.6% long), while the RBNZ maintains a hawkish bias with a market-priced hike bias for the upcoming July 8 meeting. This institutional short is further opposed by retail sentiment, which sits at an extreme 94% long. With the RBNZ real policy rate deeply accommodative at -0.83% (cb_rate 2.25% minus inflation expectations 3.08%), any hawkish delivery or hike on July 8 risks triggering a severe short-squeeze. The crowded speculative short position is highly vulnerable to an unwind toward 0.5800 if the RBNZ validates the hawkish OIS bias.",
       "evidence": [
-        "EUR 1W avg: +0.414% (n=7)",
-        "AUD 1W avg: -0.556% (n=4)",
-        "G10 spread: 0.971%"
+        "NZD COT LF Net: -23,314",
+        "RBNZ Bias: Hike (July 8)",
+        "NZD/USD Retail Sentiment: 94% long",
+        "NZD Real Rate: -0.83%"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "02:47",
+      "time": "10:00",
       "priority": "warning",
-      "title": "NZD/USD — COT vs Retail Sentiment Divergence",
-      "text": "NZD/USD trades at 0.5646, exhibiting an extreme divergence between institutional and retail positioning. COT LF speculative positioning is net short -23,314 contracts, while retail sentiment is at an extreme 94% long. This represents a major contrarian reversal risk as retail traders attempt to fade the institutional downtrend. The downward pressure is fundamentally supported by a +150bp carry advantage favoring the USD (Fed 3.75% vs RBNZ 2.25%) and a deeply negative NZD real policy rate of -0.83% (inflation expectations at 3.08% vs policy rate of 2.25%). Retail capitulation risk remains high; a break below 0.5600 will accelerate the sell-off. Watch the RBNZ policy meeting on July 8 for any hawkish pivot to invalidate the short bias.",
+      "title": "USD/CAD — Correlation Break + Vol Complacency",
+      "text": "USD/CAD trades at 1.4235, supported by a +150bp Fed-BoC carry advantage (Fed 3.75% vs BoC 2.25%). However, the pair's relationship with its primary commodity driver has broken down, with the USD/CAD vs WTI Oil correlation collapsing to -0.794 vs its 252-day norm of -0.029 (a -1.94σ deviation). This decoupling occurs as the options market exhibits extreme complacency, with AUD/USD options showing a negative VRP of -4.1% (IV 3.1% vs HV30 7.2%), signaling thin options supply and underpriced risk across dollar-bloc crosses. The correlation break indicates that USD/CAD is trading purely on USD rate premium and domestic growth drags rather than energy flows. Watch the BoC meeting on July 15 to confirm if the growth drag forces a dovish shift, cementing the 1.4200 floor.",
       "evidence": [
-        "NZD/USD: 0.5646",
-        "NZD COT LF net: -23,314",
-        "NZD/USD Retail: 94% long / 6% short"
+        "USD/CAD Spot: 1.4235",
+        "USD/CAD vs WTI Correlation: -0.794 (z = -1.94σ)",
+        "USD/CAD Carry: +150bp",
+        "CAD Economic Surprise Index: -6 net misses"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "02:42",
+      "time": "09:55",
       "priority": "info",
-      "title": "USD/CAD — Correlation Break + Volatility Complacency",
-      "text": "USD/CAD trades at 1.4229, showing a significant cross-asset correlation break against WTI crude oil. The current correlation stands at -0.761 vs a 252-day norm of +0.020 (z = -2.11σ), indicating that the traditional CAD-commodity link has broken down as the pair is driven entirely by the +150bp Fed-BoC carry advantage and a positive US Economic Surprise Index (CESI net +290 beats vs CAD net -6 misses). Speculative positioning is heavily short CAD (COT LF net short -87,096), while retail sentiment is at an extreme 94% short. Despite the strong upward trend, the options market shows mild call skew (+0.37) and lacks a significant volatility premium, suggesting complacency. Watch for a reversal if WTI oil breaks above $72.0 or if US jobs data misses expectations.",
+      "title": "GBP/USD — Positioning + Vol Premium",
+      "text": "GBP/USD trades at 1.3236, holding below 1.3250 following a downward revision to UK GDP. Speculative positioning is neutral-to-flat with COT LF net long at a marginal +631 (50.3% long). Despite this flat positioning, the options market is pricing in significant risk, with the GBP/USD 25d Risk Reversal showing a moderate put skew of -0.90 and an elevated Vol Risk Premium of +5.7% (IV 11.0% vs HV30 5.3%). This indicates that institutional desks are paying a high premium for downside protection, anticipating GBP weakness despite a positive Economic Surprise Index (net +24 beats). The neutral carry (0bp OIS spread) leaves the pair highly sensitive to growth data. Watch the upcoming US JOLTS release today to determine if USD strength forces a break below 1.3200.",
       "evidence": [
-        "USD/CAD vs WTI Oil corr: -0.761 (norm: +0.020, z: -2.11σ)",
-        "CAD COT LF net: -87,096",
-        "USD/CAD Retail: 6% long / 94% short"
+        "GBP/USD Spot: 1.3236",
+        "GBP COT LF Net: +631",
+        "GBP/USD VRP: +5.7% (IV 11.0% vs HV30 5.3%)",
+        "GBP/USD 25d RR: -0.90"
       ],
       "_source": "gemini:gemini-3.5-flash"
     }
