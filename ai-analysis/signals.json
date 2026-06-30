@@ -1,57 +1,62 @@
 {
-  "generated_at": "2026-06-30T16:37:40Z",
+  "generated_at": "2026-06-30T21:39:57Z",
   "signals": [
     {
-      "time": "16:35",
+      "time": "21:35",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme + RBNZ Hike Bias",
-      "text": "NZD/JPY at 92.41 — NZD leads G10 performance while JPY remains the primary laggard. Despite a -0.83% real rate, NZD is supported by a hawkish RBNZ bias (hike priced for 8 July) and a +335bp OIS carry advantage over JPY. JPY COT LF net short -115,033 (28.4% long) reflects crowded carry positioning, while NZD CESI (+7) confirms data outperformance. The 1.258% G10 spread signals a dominant bilateral trend.",
+      "title": "USD/JPY — G10 Bilateral Theme + Carry",
+      "text": "NZD 1W avg: +0.503% (n=4) vs JPY 1W avg: -0.793% (n=7) — G10 spread: 1.296%. 275bp Fed-BoJ carry differential sustains USD/JPY bid; intervention risk on a break above 160.00. Carry dominates until VIX > 25.",
       "evidence": [
-        "NZD 1W avg: +0.477% (n=4)",
-        "JPY 1W avg: -0.781% (n=7)",
-        "G10 spread: 1.258%"
-      ],
-      "watch_level": "RBNZ policy decision on 8 July determines if the NZD outperformance persists.",
-      "_source": "gemini:gemini-3-flash-preview"
+        "NZD 1W avg: +0.503% (n=4)",
+        "JPY 1W avg: -0.793% (n=7)",
+        "G10 spread: 1.296%",
+        "Fed 3.75% vs BoJ 1.0% — 275bp"
+      ]
     },
     {
-      "time": "16:32",
+      "time": "21:30",
       "priority": "warning",
-      "title": "USD/CAD — GDP Surprise + Positioning + Retail Divergence",
-      "text": "USD/CAD at 1.4207 — Canada April GDP beat at 0.5% vs forecasts, yet May guidance remains soft, limiting CAD recovery. COT LF net short -87,096 (20.6% long) shows institutional bearishness, while retail sentiment is 94% short (extreme). This institutional vs retail divergence at the 1.42 level suggests retail is fading the trend; a break higher triggers a retail capitulation squeeze. USD CESI (+290) vs CAD CESI (-5) supports the 150bp Fed-BoC carry advantage.",
+      "title": "AUD/USD — Positioning + Vol",
+      "text": "AUD/USD COT LF net long +29,035 (bullish spec positioning) vs IV 17.3% and HV30 7.4% — VRP +9.9%. Elevated vol premium and net long positioning signal late-trend caution.",
       "evidence": [
-        "Canada GDP: 0.5% (April)",
-        "Retail Sentiment: 94% Short",
-        "CAD COT LF long%: 20.6%"
-      ],
-      "watch_level": "Watch for a sustained break above 1.4250 to confirm retail capitulation.",
-      "_source": "gemini:gemini-3-flash-preview"
+        "AUD/USD COT LF net: +29,035",
+        "IV 17.3%",
+        "HV30 7.4%",
+        "VRP +9.9%"
+      ]
     },
     {
-      "time": "16:30",
+      "time": "21:25",
       "priority": "warning",
-      "title": "AUD/USD — Volatility Premium + Technical Break",
-      "text": "AUD/USD at 0.6913 — Buyers are testing the 100-hour MA following hawkish Fed commentary from Hammack. AUD/USD IV at 17.9% vs HV30 at 7.3% creates a massive +10.6% VRP, the highest in G10, signaling the options market is pricing significant tail risk. Despite a 60bp carry advantage for AUD, the 25d RR at -0.97 shows a persistent put skew as traders hedge against USD strength. COT LF net long +29,035 (64.9% long) suggests specs are already positioned for the bounce.",
+      "title": "EUR/USD — COT vs OIS Divergence",
+      "text": "EUR/USD COT LF net short -67,504 (specs short) vs ECB hike prob 0% priced for 23 Jul. Short-squeeze risk if ECB hikes or signals further tightening — crowded spec short unwind targets 1.15+.",
       "evidence": [
-        "AUD/USD VRP: +10.6%",
-        "AUD/USD 25d RR: -0.97",
-        "AUD COT LF net: +29,035"
-      ],
-      "watch_level": "US Nonfarm Payrolls on 3 July is the next volatility catalyst for the 0.6900 handle.",
-      "_source": "gemini:gemini-3-flash-preview"
+        "EUR COT LF net: -67,504",
+        "ECB hike prob: 40%"
+      ]
     },
     {
-      "time": "16:25",
+      "time": "21:20",
       "priority": "info",
-      "title": "USD/JPY — Carry vs Options Skew + Correlation Break",
-      "text": "USD/JPY at 162.61 — The 275bp Fed-BoJ carry advantage keeps the pair bid despite a moderate put skew (25d RR -1.23) signaling intervention hedging. The USD/JPY vs US 10Y correlation has broken (z = -1.79σ), with JPY failing to track the rise in US yields to 4.40%. VIX at 16.7 (normal volatility) suggests carry remains the dominant regime driver over safe-haven flows until cross-asset stress intensifies.",
+      "title": "GBP/USD — Options Skew",
+      "text": "GBP/USD 25d RR at -0.80 — moderate put skew signals market biased for GBP weakness. However, GBP/USD IV 11.0% and HV30 5.4% — VRP +5.6% supports hedging demand.",
       "evidence": [
-        "USD/JPY Carry: +275bp",
-        "USD/JPY 25d RR: -1.23",
-        "Corr USDJPY/US10Y: +0.154 (z=-1.79σ)"
-      ],
-      "watch_level": "BoJ meeting on 31 July determines if the TONA 0.98% rate floor shifts.",
-      "_source": "gemini:gemini-3-flash-preview"
+        "25d RR: -0.80",
+        "IV 11.0%",
+        "HV30 5.4%",
+        "VRP +5.6%"
+      ]
+    },
+    {
+      "time": "21:28",
+      "priority": "warning",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "The NZD/USD carry disadvantage of -150bp (NZD 2.25% vs USD 3.75%) weighs on the pair, which currently trades at 0.5678. Despite this, specs remain short NZD −23.1k, positioning against the RBNZ's hawkish bias with 62% of a hike priced. This COT-OIS divergence sets up a short-squeeze risk, as the market is positioned for a dovish surprise, but the RBNZ's forward guidance points to further rate hikes. The next RBNZ meeting (mkt: 62% hike priced) on 8 Jul will be a key catalyst for this unwind.",
+      "evidence": [
+        "COT LF net: -23.3k",
+        "RBNZ bias: hike (62% priced)",
+        "NZD/USD at 0.5678"
+      ]
     }
   ]
 }
