@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-01T12:19:31Z",
-  "generatedAt": "2026-07-01T12:19:31Z",
+  "lastUpdate": "2026-07-01T15:59:41Z",
+  "generatedAt": "2026-07-01T15:59:41Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,21 +9,21 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-01",
   "rangeTo": "2026-07-01",
-  "totalEvents": 3976,
+  "totalEvents": 3979,
   "currencyCounts": {
     "AUD": 292,
     "CHF": 165,
-    "EUR": 873,
+    "EUR": 874,
     "GBP": 470,
     "JPY": 256,
-    "USD": 1254,
+    "USD": 1256,
     "CAD": 310,
     "NZD": 122,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2096,
+    "medium": 2099,
     "high": 1652,
     "low": 228
   },
@@ -249,14 +249,14 @@
       "std": 0.0
     },
     "USD/eia gasoline stocks change": {
-      "n": 14,
-      "mean": -0.189571,
-      "std": 2.390155
+      "n": 15,
+      "mean": -0.269133,
+      "std": 2.323732
     },
     "USD/eia crude oil stocks change": {
-      "n": 14,
-      "mean": -1.768071,
-      "std": 2.752057
+      "n": 15,
+      "mean": -1.561867,
+      "std": 2.769592
     },
     "EUR/exports mom": {
       "n": 3,
@@ -1169,14 +1169,14 @@
       "std": 2.037089
     },
     "USD/ism manufacturing pmi": {
-      "n": 2,
-      "mean": 0.35,
-      "std": 0.919239
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.888819
     },
     "USD/ism manufacturing employment": {
-      "n": 2,
-      "mean": -0.3,
-      "std": 3.252691
+      "n": 3,
+      "mean": 0.033333,
+      "std": 2.371357
     },
     "AUD/building permits mom": {
       "n": 3,
@@ -49222,6 +49222,19 @@
     {
       "date": "1 Jul",
       "dateISO": "2026-07-01",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Netherlands Inflation Rate YoY",
+      "impact": "medium",
+      "actual": "2.9%",
+      "forecast": null,
+      "previous": "3.5%"
+    },
+    {
+      "date": "1 Jul",
+      "dateISO": "2026-07-01",
       "timeUTC": "11:00",
       "country": "USD",
       "currency": "USD",
@@ -49306,7 +49319,7 @@
       "flag": "🇺🇸",
       "event": "United States ISM Manufacturing PMI",
       "impact": "high",
-      "actual": null,
+      "actual": "53.3",
       "forecast": "54.0",
       "previous": "54.0"
     },
@@ -49319,9 +49332,35 @@
       "flag": "🇺🇸",
       "event": "United States ISM Manufacturing Employment",
       "impact": "medium",
-      "actual": null,
+      "actual": "49.7",
       "forecast": "49.0",
       "previous": "48.6"
+    },
+    {
+      "date": "1 Jul",
+      "dateISO": "2026-07-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "-3.775M",
+      "forecast": "-5.1M",
+      "previous": "-6.088M"
+    },
+    {
+      "date": "1 Jul",
+      "dateISO": "2026-07-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "-2.333M",
+      "forecast": "-0.95M",
+      "previous": "2.064M"
     }
   ]
 }
