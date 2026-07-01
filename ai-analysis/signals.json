@@ -1,62 +1,57 @@
 {
-  "generated_at": "2026-06-30T21:39:57Z",
+  "generated_at": "2026-07-01T02:59:04Z",
   "signals": [
     {
-      "time": "21:35",
+      "time": "02:57",
       "priority": "critical",
-      "title": "USD/JPY — G10 Bilateral Theme + Carry",
-      "text": "NZD 1W avg: +0.503% (n=4) vs JPY 1W avg: -0.793% (n=7) — G10 spread: 1.296%. 275bp Fed-BoJ carry differential sustains USD/JPY bid; intervention risk on a break above 160.00. Carry dominates until VIX > 25.",
+      "title": "USD/JPY — Positioning + Vol + Retail Divergence",
+      "text": "USD/JPY trades at 162.753, holding well above the critical 160.00 threshold as verbal intervention warnings from Japanese officials fail to deter buyers. JPY speculative positioning is heavily crowded with COT LF net short at -115,033 (28.4% long), while retail sentiment sits at an extreme 87% short, creating a sharp institutional-retail divergence. Despite the spot uptrend, the options market is actively hedging downside risk with a moderate put skew of -1.23 on the 25d Risk Reversal (Saxo, 1M tenor, indicative mid). This options protection is expensive, with USD/JPY ATM IV at 7.2% vs HV30 at 2.5%, yielding an elevated Vol Risk Premium (VRP) of +4.7%. The massive +264bp OIS carry advantage (SOFR 3.62% vs TONA 0.98%) continues to support the pair, but the combination of extreme short positioning, retail fading, and protective options skew signals high risk of a sharp, intervention-triggered squeeze. Watch for a break below 162.00 or actual BoJ market entry to trigger a rapid unwind toward 158.50.",
       "evidence": [
-        "NZD 1W avg: +0.503% (n=4)",
-        "JPY 1W avg: -0.793% (n=7)",
-        "G10 spread: 1.296%",
-        "Fed 3.75% vs BoJ 1.0% — 275bp"
-      ]
+        "USD/JPY Spot: 162.753",
+        "JPY COT LF Net: -115,033",
+        "USD/JPY 25d RR: -1.23",
+        "USD/JPY VRP: +4.7% (IV 7.2% vs HV30 2.5%)"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:30",
+      "time": "02:54",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD COT LF net long +29,035 (bullish spec positioning) vs IV 17.3% and HV30 7.4% — VRP +9.9%. Elevated vol premium and net long positioning signal late-trend caution.",
+      "title": "NZD/JPY — G10 Bilateral Theme + RBNZ Divergence",
+      "text": "NZD/JPY is the primary vehicle for this week's dominant G10 bilateral theme, driven by a massive 1.188% performance spread between the leading NZD and the lagging JPY. The RBNZ holds a hawkish bias with a rate hike priced for the upcoming July 8 meeting, contrasting with the BoJ's hold bias. This policy divergence is reinforced by a +127bp OIS carry premium favoring NZD (OCR-overnight 2.25% vs TONA 0.98%). Speculators are heavily short NZD with COT LF net short at -23,314, creating a severe COT-OIS divergence. If the RBNZ delivers a hawkish hold or hikes on July 8, a massive short-squeeze is expected to propel NZD/JPY higher, fueled by JPY's broad weakness (1W avg -0.759%). Watch the July 8 RBNZ policy decision to confirm the hawkish continuation.",
       "evidence": [
-        "AUD/USD COT LF net: +29,035",
-        "IV 17.3%",
-        "HV30 7.4%",
-        "VRP +9.9%"
-      ]
+        "NZD 1W avg: +0.430% (n=4)",
+        "JPY 1W avg: -0.759% (n=7)",
+        "G10 spread: 1.188%",
+        "NZD COT LF Net: -23,314"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:25",
+      "time": "02:52",
       "priority": "warning",
-      "title": "EUR/USD — COT vs OIS Divergence",
-      "text": "EUR/USD COT LF net short -67,504 (specs short) vs ECB hike prob 0% priced for 23 Jul. Short-squeeze risk if ECB hikes or signals further tightening — crowded spec short unwind targets 1.15+.",
+      "title": "EUR/USD — Macro Divergence + Vol Premium",
+      "text": "EUR/USD trades at 1.14100, testing key support near 1.1400 as softer German inflation data undercuts ECB hike expectations. This macro drag is reinforced by a persistent negative economic surprise trend (EUR CESI net -11 misses) and a structural +137bp OIS carry deficit (SOFR 3.62% vs €STR 2.25%). Speculators are already net short EUR (COT LF net -67,504), and the options market is pricing in elevated hedging demand with EUR/USD IV at 7.1% vs HV30 at 4.5% (VRP of +2.5%) alongside a mild put skew (25d RR at -0.44). The combination of deteriorating Eurozone data, a carry disadvantage, and defensive options pricing suggests further downside. Watch for a sustained break below 1.1400 to open the door to 1.1320, with the upcoming US NFP report on July 3 serving as the next major volatility catalyst.",
       "evidence": [
-        "EUR COT LF net: -67,504",
-        "ECB hike prob: 40%"
-      ]
+        "EUR/USD Spot: 1.14100",
+        "EUR CESI Net: -11",
+        "EUR COT LF Net: -67,504",
+        "EUR/USD VRP: +2.5% (IV 7.1% vs HV30 4.5%)"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:20",
+      "time": "02:48",
       "priority": "info",
-      "title": "GBP/USD — Options Skew",
-      "text": "GBP/USD 25d RR at -0.80 — moderate put skew signals market biased for GBP weakness. However, GBP/USD IV 11.0% and HV30 5.4% — VRP +5.6% supports hedging demand.",
+      "title": "USD/CAD — Correlation Break + Vol Complacency",
+      "text": "USD/CAD trades at 1.42180, showing a significant cross-asset correlation break against WTI crude oil. The rolling correlation has shifted to -0.797 vs a 252-day historical norm of +0.017 (a z-score of -2.09σ), indicating that the traditional oil-CAD link is broken as USD strength and domestic factors dominate. Speculative positioning is heavily short CAD (COT LF net -87,096, 20.6% long), while retail sentiment is extremely contrarian with 93% short USD/CAD. Despite the strong upward momentum (+3.06% over the past month), the options market shows a very mild call skew of +0.41, suggesting institutional complacency. Watch the BoC policy meeting on July 15 to determine if a hawkish shift can mend the correlation and trigger a CAD recovery.",
       "evidence": [
-        "25d RR: -0.80",
-        "IV 11.0%",
-        "HV30 5.4%",
-        "VRP +5.6%"
-      ]
-    },
-    {
-      "time": "21:28",
-      "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "The NZD/USD carry disadvantage of -150bp (NZD 2.25% vs USD 3.75%) weighs on the pair, which currently trades at 0.5678. Despite this, specs remain short NZD −23.1k, positioning against the RBNZ's hawkish bias with 62% of a hike priced. This COT-OIS divergence sets up a short-squeeze risk, as the market is positioned for a dovish surprise, but the RBNZ's forward guidance points to further rate hikes. The next RBNZ meeting (mkt: 62% hike priced) on 8 Jul will be a key catalyst for this unwind.",
-      "evidence": [
-        "COT LF net: -23.3k",
-        "RBNZ bias: hike (62% priced)",
-        "NZD/USD at 0.5678"
-      ]
+        "USD/CAD Spot: 1.42180",
+        "USD/CAD vs WTI Corr: -0.797 (norm +0.017, z = -2.09σ)",
+        "CAD COT LF Net: -87,096",
+        "USD/CAD Retail Sentiment: 93% Short"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     }
   ]
 }
