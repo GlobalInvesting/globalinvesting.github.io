@@ -1,70 +1,65 @@
 {
-  "generated_at": "2026-07-02T09:41:53Z",
+  "generated_at": "2026-07-02T16:20:12Z",
   "signals": [
     {
-      "time": "09:39",
+      "time": "16:18",
       "priority": "critical",
-      "title": "GBP/USD — G10 Bilateral Theme + NFP Risk",
-      "text": "GBP/USD trades at 1.3342 as the G10 currency strength scorecard triggers a critical bilateral theme. GBP is the strongest G10 currency this week, averaging +0.791% across 4 pairs, while the USD is the weakest, averaging -0.503% across 7 pairs, resulting in a 1.294% spread. This divergence is supported by a neutral OIS carry basis (SOFR 3.68% vs SONIA 3.73% yielding a -5bp spread favoring GBP) and a positive GBP economic surprise index (CESI net +24 beats). However, the options market signals caution ahead of today's US Nonfarm Payrolls release, with the 25d risk reversal showing a moderate put skew of -0.80 and GBP/USD ATM IV at 11.0% vs HV30 at 5.6% (VRP +5.4%), indicating heavy institutional hedging against a USD-bullish NFP surprise.",
+      "title": "GBP/USD — G10 Bilateral Theme + NFP Surprise",
+      "text": "GBP/USD at 1.3360 — June Nonfarm Payrolls miss estimates, driving the USD to a two-week low as Fed rate hike fears subside. GBP is the week's G10 leader (+0.714%) while USD is the laggard (-0.757%), creating a 1.471% spread. Despite a neutral 0bp OIS carry spread (Fed 3.68% vs BoE 3.73%), GBP outperformance is supported by a positive CESI (+24) vs USD's potential peak data regime. Bull steepener in the US curve (+76.1bp) confirms recessionary pricing following the jobs miss.",
       "evidence": [
-        "GBP 1W avg: +0.791% (n=4)",
-        "USD 1W avg: -0.503% (n=7)",
-        "G10 spread: 1.294%"
+        "GBP 1W avg: +0.714% (n=4)",
+        "USD 1W avg: -0.757% (n=7)",
+        "G10 spread: 1.471%"
       ],
-      "watch_level": "Watch the US Nonfarm Payrolls release at 12:30 UTC; a strong print threatens to unwind the GBP outperformance theme back toward 1.3250.",
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:35",
+      "time": "16:15",
       "priority": "critical",
-      "title": "USD/JPY — Intervention Shock + Vol Premium",
-      "text": "USD/JPY plummeted 0.5% to 161.210 on suspected deliberate Japanese MoF/BoJ intervention, interrupting the dominant +270bp OIS carry advantage (SOFR 3.68% vs TONA 0.98%). JPY speculative positioning remains heavily short with COT LF net short at -115,033 contracts (28.4% long), representing a highly crowded carry trade vulnerable to rapid unwinds. The options market is aggressively pricing downside protection, with the 1M 25d risk reversal showing a moderate put skew of -1.24 and USD/JPY IV at 7.2% vs HV30 at 3.6% (VRP +3.6%), confirming that institutional desks are paying a premium to hedge JPY strength despite the massive carry deficit.",
+      "title": "USD/JPY — Intervention Risk + Options Skew",
+      "text": "USD/JPY at 160.95 — Price holds above the critical 160.00 threshold previously associated with BoJ intervention. Options market is aggressively hedging downside with a 25d RR of -1.09 (moderate put skew) and an elevated VRP of +3.2% (IV 7.2% vs HV30 4.0%). JPY COT LF net short -115,033 remains crowded; a sustained break above 160.00 increases the probability of direct BoJ action despite the +275bp Fed-BoJ carry advantage.",
       "evidence": [
-        "USD/JPY: 161.210",
-        "JPY COT LF net: -115,033",
-        "USD/JPY VRP: +3.6%"
+        "USD/JPY: 160.95",
+        "25d RR (Saxo): -1.09",
+        "VRP: +3.2%"
       ],
-      "watch_level": "Watch for a sustained break below 160.00 to confirm a deeper intervention-driven unwind, or a rebound to test 162.00 if US NFP beats expectations.",
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:31",
+      "time": "16:12",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + Retail Extreme",
-      "text": "NZD/USD trades at 0.5687, exhibiting a multi-layer divergence. Speculators are heavily short with COT LF net short at -23,314 contracts (21.6% long), directly contradicting the hawkish RBNZ market bias which prices a rate hike for the upcoming July 8 meeting. This institutional short-squeeze risk is amplified by extreme retail sentiment, with Myfxbook community outlook showing retail traders are 88% long. This rare institutional-retail divergence, combined with a negative real policy rate of -0.83% (cb_rate 2.25% minus inflation expectations 3.08%), sets up a high-velocity short-squeeze if the RBNZ delivers a hawkish hike.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD at 0.5706 — COT LF net short -23,314 (specs fading hawkishness) contradicts the RBNZ hike bias priced for the 8 July meeting. With NZD real rates at -0.83% (accommodative) and a positive CESI (+6), a hawkish delivery or signal from the RBNZ triggers significant short-squeeze risk. Retail sentiment is 80% long, aligning with the institutional squeeze potential if the 0.5800 level is reclaimed.",
       "evidence": [
         "NZD COT LF net: -23,314",
-        "NZD/USD Retail: 88% long",
-        "NZD/USD: 0.5687"
+        "RBNZ Bias: Hike (8 Jul)",
+        "NZD/USD: 0.5706"
       ],
-      "watch_level": "Confirm the bullish squeeze on a break above 0.5750, or invalidation if the RBNZ holds rates unchanged on July 8.",
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:26",
+      "time": "16:08",
       "priority": "warning",
-      "title": "USD/CAD — Correlation Break + Retail Extreme",
-      "text": "USD/CAD trades at 1.4199, showing a significant cross-asset correlation break against WTI Oil. The USD/CAD vs WTI correlation has collapsed to -0.871 vs its 252-day norm of -0.033 (z = -1.94σ), indicating that the pair is trading almost exclusively on USD strength and domestic CAD weakness (CESI net -6 misses) rather than energy market drivers. Speculators are heavily short CAD with COT LF net short at -87,096 (20.6% long), while retail traders have reached an extreme 93% short USD/CAD. This extreme retail positioning suggests a high risk of a contrarian squeeze higher if US NFP data supports the Fed's +150bp OIS carry advantage.",
+      "title": "USD/CAD — Retail Divergence + Correlation Break",
+      "text": "USD/CAD at 1.4184 — Retail sentiment is 92% short (extreme), diverging from the COT LF net short of -87,096 (specs also short). This rare alignment of retail and institutional shorts suggests extreme CAD bearishness. However, the USD/CAD vs WTI correlation has broken to -0.871 (z = -1.94σ), indicating the pair is ignoring oil weakness ($67.8) to trade purely on USD macro. Watch for retail capitulation if USD/CAD tests 1.4300.",
       "evidence": [
-        "USD/CAD vs WTI corr: -0.871 (z = -1.94σ)",
-        "USD/CAD Retail: 93% short",
-        "CAD COT LF net: -87,096"
+        "Retail Sentiment: 92% Short",
+        "COT LF Net: -87,096",
+        "z-score (WTI corr): -1.94σ"
       ],
-      "watch_level": "Watch for a break above 1.4250 to trigger retail capitulation, or a drop below 1.4100 to signal a return to oil-driven correlation norms.",
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:20",
+      "time": "16:03",
       "priority": "info",
-      "title": "AUD/USD — Vol Complacency + Carry Advantage",
-      "text": "AUD/USD trades at 0.6905, consolidating ahead of US NFP. The pair exhibits unusual volatility complacency with AUD/USD 1M IV at 3.1% vs HV30 at 6.7%, resulting in a negative Vol Risk Premium (VRP) of -3.6%. This thin options pricing suggests the market is underpricing AUD risk despite a supportive -67bp OIS carry premium favoring AUD (SOFR 3.68% vs AONIA 4.35%) and a positive real policy rate of +0.39%. Speculators remain net long AUD (COT LF net +29,035), indicating institutional backing that contrasts with the cheapness of options protection.",
+      "title": "AUD/USD — Volatility Premium + Carry",
+      "text": "AUD/USD at 0.6932 — Options market pricing extreme protection with IV at 23.5% vs HV30 6.8% (VRP +16.7%). Despite the high vol premium, the +60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%) and COT LF net long +29,035 support the pair on dips. 25d RR at -0.89 indicates the market is paying for downside protection despite the bullish positioning and carry profile.",
       "evidence": [
-        "AUD/USD VRP: -3.6%",
-        "AUD COT LF net: +29,035",
-        "AUD/USD: 0.6905"
+        "AUD/USD VRP: +16.7%",
+        "AUD/USD Carry: +60bp",
+        "COT LF Net: +29,035"
       ],
-      "watch_level": "Watch for a volatility expansion and test of 0.6980 if US NFP misses, or a drop to 0.6820 if the US dollar strengthens.",
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
