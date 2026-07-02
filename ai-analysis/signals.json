@@ -1,65 +1,53 @@
 {
-  "generated_at": "2026-07-02T16:20:12Z",
+  "generated_at": "2026-07-02T21:09:54Z",
   "signals": [
     {
-      "time": "16:18",
+      "time": "21:09",
       "priority": "critical",
-      "title": "GBP/USD — G10 Bilateral Theme + NFP Surprise",
-      "text": "GBP/USD at 1.3360 — June Nonfarm Payrolls miss estimates, driving the USD to a two-week low as Fed rate hike fears subside. GBP is the week's G10 leader (+0.714%) while USD is the laggard (-0.757%), creating a 1.471% spread. Despite a neutral 0bp OIS carry spread (Fed 3.68% vs BoE 3.73%), GBP outperformance is supported by a positive CESI (+24) vs USD's potential peak data regime. Bull steepener in the US curve (+76.1bp) confirms recessionary pricing following the jobs miss.",
+      "title": "GBP/USD — G10 Bilateral Theme + NFP Shock",
+      "text": "US June Nonfarm Payrolls print at +57k vs +110k expected, triggering a broad USD sell-off and driving the G10 leader-to-laggard spread to a critical 1.345% gap. GBP leads G10 performance (+0.677% 1W average across 4 pairs) while USD lags (-0.668% 1W average across 7 pairs). The macroeconomic shock of the jobs miss eases Fed rate hike fears, overriding the neutral OIS carry differential (SOFR 3.68% vs SONIA 3.73% — -5bp favoring GBP). GBP/USD trades at 1.3343, supported by a positive GBP economic surprise index (CESI net +24 beats) vs a stalling USD data regime. The options market remains cautious, with 25d risk reversals at -0.80 showing a moderate put skew, indicating hedging against a rapid GBP pullback despite the spot breakout. Watch for a sustained break above 1.3400 to confirm structural USD weakness, or next week's US CPI release to invalidate the soft-landing narrative.",
       "evidence": [
-        "GBP 1W avg: +0.714% (n=4)",
-        "USD 1W avg: -0.757% (n=7)",
-        "G10 spread: 1.471%"
+        "GBP 1W avg: +0.677% (n=4)",
+        "USD 1W avg: -0.668% (n=7)",
+        "G10 spread: 1.345%"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "16:15",
-      "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + Options Skew",
-      "text": "USD/JPY at 160.95 — Price holds above the critical 160.00 threshold previously associated with BoJ intervention. Options market is aggressively hedging downside with a 25d RR of -1.09 (moderate put skew) and an elevated VRP of +3.2% (IV 7.2% vs HV30 4.0%). JPY COT LF net short -115,033 remains crowded; a sustained break above 160.00 increases the probability of direct BoJ action despite the +275bp Fed-BoJ carry advantage.",
-      "evidence": [
-        "USD/JPY: 160.95",
-        "25d RR (Saxo): -1.09",
-        "VRP: +3.2%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "16:12",
+      "time": "21:05",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD at 0.5706 — COT LF net short -23,314 (specs fading hawkishness) contradicts the RBNZ hike bias priced for the 8 July meeting. With NZD real rates at -0.83% (accommodative) and a positive CESI (+6), a hawkish delivery or signal from the RBNZ triggers significant short-squeeze risk. Retail sentiment is 80% long, aligning with the institutional squeeze potential if the 0.5800 level is reclaimed.",
+      "title": "USD/JPY — Technical + Options Skew at Key Level",
+      "text": "USD/JPY trades at 161.023, holding just above the critical 160.00 threshold that historically triggers Bank of Japan verbal and physical intervention. Despite a massive +270bp OIS carry advantage favoring the USD (SOFR 3.68% vs TONA 0.98%), the pair fell -0.92% intraday following the weak US jobs report. JPY speculative positioning remains heavily short with COT LF net short at -115,033 (28.4% long), presenting severe short-squeeze risk if US yields continue to decline. The options market is aggressively pricing downside protection, with the USD/JPY 25d risk reversal at -1.09 (moderate put skew) and an elevated Vol Risk Premium of +3.3% (IV 7.2% vs HV30 3.9%). Watch for a daily close below 160.00 to signal a structural trend reversal and trigger a rapid unwind of crowded carry positions.",
       "evidence": [
-        "NZD COT LF net: -23,314",
-        "RBNZ Bias: Hike (8 Jul)",
-        "NZD/USD: 0.5706"
+        "USD/JPY: 161.023",
+        "USD/JPY 25d RR: -1.09",
+        "JPY COT LF net: -115,033"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "16:08",
+      "time": "21:01",
       "priority": "warning",
-      "title": "USD/CAD — Retail Divergence + Correlation Break",
-      "text": "USD/CAD at 1.4184 — Retail sentiment is 92% short (extreme), diverging from the COT LF net short of -87,096 (specs also short). This rare alignment of retail and institutional shorts suggests extreme CAD bearishness. However, the USD/CAD vs WTI correlation has broken to -0.871 (z = -1.94σ), indicating the pair is ignoring oil weakness ($67.8) to trade purely on USD macro. Watch for retail capitulation if USD/CAD tests 1.4300.",
+      "title": "USD/CAD — Positioning + Retail Divergence",
+      "text": "USD/CAD trades at 1.4179, showing a stark divergence between institutional and retail positioning. CFTC COT data shows leveraged funds are heavily net short CAD at -87,096 (20.6% long), which translates to structural USD/CAD long exposure. Conversely, retail sentiment is at an extreme 92% short on USD/CAD, actively fading the institutional trend. This extreme retail short positioning creates a contrarian risk of a further squeeze higher if USD/CAD breaks key resistance. However, the US jobs miss acts as a near-term headwind, and the USD/CAD vs WTI Oil correlation has broken significantly to -0.871 vs its 252-day norm of -0.033 (z = -1.94σ), meaning CAD is failing to benefit from oil price dynamics. Watch for retail capitulation or a break of 1.4250 to confirm the next leg higher.",
       "evidence": [
-        "Retail Sentiment: 92% Short",
-        "COT LF Net: -87,096",
-        "z-score (WTI corr): -1.94σ"
+        "USD/CAD Retail: 8% Long / 92% Short",
+        "CAD COT LF net: -87,096",
+        "USD/CAD vs WTI corr: -0.871 (z = -1.94σ)"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "16:03",
+      "time": "20:55",
       "priority": "info",
-      "title": "AUD/USD — Volatility Premium + Carry",
-      "text": "AUD/USD at 0.6932 — Options market pricing extreme protection with IV at 23.5% vs HV30 6.8% (VRP +16.7%). Despite the high vol premium, the +60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%) and COT LF net long +29,035 support the pair on dips. 25d RR at -0.89 indicates the market is paying for downside protection despite the bullish positioning and carry profile.",
+      "title": "AUD/USD — Volatility Risk Premium Extreme",
+      "text": "AUD/USD trades at 0.6921, up +0.34% intraday as the weak US jobs report softens the USD. The options market is pricing an extreme Vol Risk Premium (VRP) of +17.2%, with implied volatility at 23.9% vs a realized 30-day volatility of just 6.7%. This massive premium indicates intense hedging demand and fear of downside risk, which is further reflected in the 25d risk reversal of -0.89 (moderate put skew). This options caution contrasts with bullish speculative positioning, where COT LF net is long +29,035 (64.9% long). The RBA holds a nominal rate of 4.35% vs Fed 3.75%, providing a -67bp OIS carry advantage to the AUD (SOFR 3.68% vs AONIA 4.35%). Watch for a break above 0.7000 to shift the bearish options bias, or the upcoming RBA meeting on 11 Aug to redefine the carry narrative.",
       "evidence": [
-        "AUD/USD VRP: +16.7%",
-        "AUD/USD Carry: +60bp",
-        "COT LF Net: +29,035"
+        "AUD/USD VRP: +17.2% (IV 23.9% vs HV30 6.7%)",
+        "AUD/USD 25d RR: -0.89",
+        "AUD COT LF net: +29,035"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     }
   ]
 }
