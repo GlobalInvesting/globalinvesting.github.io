@@ -425,6 +425,22 @@
         document.getElementById('gi-renew-banner')?.classList.remove('visible');
       });
 
+    // Founder/promo grant links (?grant=<jwt>) — one-click activation for
+    // pre-minted tokens issued via POST /admin/grant on the license worker.
+    // Bypasses the key/account/server form entirely; used for giveaways where
+    // the recipient has no MT5 account running the EA.
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const grantToken = params.get('grant');
+      if (grantToken && isJWTValid(grantToken)) {
+        saveToken(grantToken);
+        params.delete('grant');
+        const qs = params.toString();
+        const cleanUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+    } catch {}
+
     const token = loadToken();
     if (isJWTValid(token)) {
       window.GI_AUTH.isActive = true;
