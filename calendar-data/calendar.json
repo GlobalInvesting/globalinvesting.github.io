@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-03T11:43:45Z",
-  "generatedAt": "2026-07-03T11:43:45Z",
+  "lastUpdate": "2026-07-03T15:31:18Z",
+  "generatedAt": "2026-07-03T15:31:18Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-03",
   "rangeTo": "2026-07-03",
-  "totalEvents": 3974,
+  "totalEvents": 3975,
   "currencyCounts": {
     "AUD": 290,
     "CAD": 308,
@@ -17,14 +17,14 @@
     "GBP": 470,
     "JPY": 255,
     "USD": 1259,
-    "EUR": 873,
+    "EUR": 874,
     "NZD": 122,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
     "high": 1650,
-    "medium": 2096,
+    "medium": 2097,
     "low": 228
   },
   "surpriseStats": {
@@ -49305,14 +49305,27 @@
     {
       "date": "3 Jul",
       "dateISO": "2026-07-03",
+      "timeUTC": "11:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Belgium Current Account",
+      "impact": "medium",
+      "actual": "&#8364;-179.0M",
+      "forecast": null,
+      "previous": "&#8364;-3889.0M"
+    },
+    {
+      "date": "3 Jul",
+      "dateISO": "2026-07-03",
       "timeUTC": "13:00",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Belgium Current Account",
       "impact": "medium",
-      "actual": null,
-      "forecast": "&#8364;25.1B*",
+      "actual": "-179.0",
+      "forecast": null,
       "previous": "-3889.0"
     },
     {
