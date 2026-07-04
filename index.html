@@ -1805,7 +1805,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.0" defer></script>
-<script src="assets/dashboard.js?v=8.28.4" defer></script>
+<script src="assets/dashboard.js?v=8.41.0" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
@@ -1861,40 +1861,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
     <div id="lw-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
   </div>
-  <script>
-  // ── GI Theme Manager ──────────────────────────────────────────────────────
-  (function () {
-    const STORAGE_KEY = 'gi_theme';
-    const THEMES = ['dark', 'mt5'];
-
-    function apply(theme) {
-      if (!THEMES.includes(theme)) theme = 'dark';
-      const prev = saved;
-      saved = theme;
-      if (theme === 'dark') {
-        document.documentElement.removeAttribute('data-theme');
-      } else {
-        document.documentElement.setAttribute('data-theme', theme);
-      }
-      // Update toggle button states
-      THEMES.forEach(t => {
-        const btn = document.getElementById('gi-theme-' + t);
-        if (btn) btn.classList.toggle('active', t === theme);
-      });
-      try { localStorage.setItem(STORAGE_KEY, theme); } catch {}
-      // Notify dashboard to re-apply theme-dependent colors (LWC charts, canvases)
-      if (prev !== theme) {
-        window.dispatchEvent(new CustomEvent('gi-theme-change', { detail: { theme, prev } }));
-      }
-    }
-
-    // Apply saved theme immediately
-    let saved = 'dark';
-    try { saved = localStorage.getItem(STORAGE_KEY) || 'dark'; } catch {}
-    apply(saved);
-
-    window.GI_THEME = { set: apply, current: () => saved };
-  })();
-  </script>
+  <!-- GI Theme Manager moved to assets/dashboard.js (v8.41.0) -->
 </body>
 </html>
