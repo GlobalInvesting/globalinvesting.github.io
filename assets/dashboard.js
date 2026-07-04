@@ -4,6 +4,45 @@
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
 // ═══════════════════════════════════════════════════════════════════
+// GI THEME MANAGER — moved from inline <script> in index.html (v8.41.0)
+// Runs at the same point in document order as before (index.html's script tag
+// sat right before </body>; dashboard.js loads via `defer`, which executes in
+// document order right after parsing completes — same effective timing).
+// ═══════════════════════════════════════════════════════════════════
+(function () {
+  const STORAGE_KEY = 'gi_theme';
+  const THEMES = ['dark', 'mt5'];
+
+  function apply(theme) {
+    if (!THEMES.includes(theme)) theme = 'dark';
+    const prev = saved;
+    saved = theme;
+    if (theme === 'dark') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    // Update toggle button states
+    THEMES.forEach(t => {
+      const btn = document.getElementById('gi-theme-' + t);
+      if (btn) btn.classList.toggle('active', t === theme);
+    });
+    try { localStorage.setItem(STORAGE_KEY, theme); } catch {}
+    // Notify dashboard to re-apply theme-dependent colors (LWC charts, canvases)
+    if (prev !== theme) {
+      window.dispatchEvent(new CustomEvent('gi-theme-change', { detail: { theme, prev } }));
+    }
+  }
+
+  // Apply saved theme immediately
+  let saved = 'dark';
+  try { saved = localStorage.getItem(STORAGE_KEY) || 'dark'; } catch {}
+  apply(saved);
+
+  window.GI_THEME = { set: apply, current: () => saved };
+})();
+
+// ═══════════════════════════════════════════════════════════════════
 // GLOBAL STATE
 // ═══════════════════════════════════════════════════════════════════
 const STATE = {
@@ -129,15 +168,46 @@ function isOpen(openH, closeH, h) {
   return openH < closeH ? (h >= openH && h < closeH) : (h >= openH || h < closeH);
 }
 
-function updateSessions(h) {
-  const sessions = [
-    { id:'sydney',  open:22, close:7  },
-    { id:'tokyo',   open:0,  close:9  },
-    { id:'london',  open:8,  close:17 },
-    { id:'newyork', open:13, close:22 },
-  ];
+// ── DST-aware session boundaries (v8.41.0) ──────────────────────────────────
+// Previously hardcoded fixed UTC hours (e.g. London 8-17 UTC, New York 13-22 UTC).
+// That is only correct for roughly half the year — London shifts GMT(+0)/BST(+1)
+// and New York shifts EST(-5)/EDT(-4) across DST changes, so a fixed UTC boundary
+// drifts 1 hour off the real local trading day for the other half of the year.
+// Fix: define each session by its NOMINAL LOCAL hours + IANA timezone, and convert
+// to today's UTC boundary dynamically — Intl.DateTimeFormat resolves each zone's
+// current DST state automatically (no manual DST date-range table to maintain).
+const SESSION_DEFS = [
+  { id:'sydney',  zone:'Australia/Sydney', openLocal:8, closeLocal:17 },
+  { id:'tokyo',   zone:'Asia/Tokyo',       openLocal:9, closeLocal:18 },
+  { id:'london',  zone:'Europe/London',    openLocal:8, closeLocal:17 },
+  { id:'newyork', zone:'America/New_York', openLocal:8, closeLocal:17 },
+];
 
+// Current UTC offset (whole hours) for an IANA zone, as of `now` — reflects
+// that zone's DST state for today's date, not a fixed year-round assumption.
+function getUTCOffsetHours(timeZone, now) {
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'shortOffset' }).formatToParts(now);
+    const tzPart = parts.find(p => p.type === 'timeZoneName');
+    const m = tzPart && tzPart.value.match(/GMT([+-]\d+)/);
+    return m ? parseInt(m[1], 10) : 0;
+  } catch { return 0; } // Unknown zone / Intl unsupported — falls back to UTC (no shift)
+}
+
+// Nominal local hour (0-23) in `timeZone` → equivalent UTC hour (0-23) for `now`'s date.
+function localHourToUTC(timeZone, localHour, now) {
+  const offset = getUTCOffsetHours(timeZone, now);
+  return ((localHour - offset) % 24 + 24) % 24;
+}
+
+function updateSessions(h) {
   const now = new Date();
+  const sessions = SESSION_DEFS.map(s => ({
+    id: s.id,
+    open: localHourToUTC(s.zone, s.openLocal, now),
+    close: localHourToUTC(s.zone, s.closeLocal, now),
+  }));
+
   const utcDay = now.getUTCDay();   // 0=Sun, 6=Sat
   const utcHour = now.getUTCHours();
   // FX market: opens Sun 21:00 UTC, closes Fri 21:00 UTC
@@ -8304,9 +8374,9 @@ boot();
 setInterval(fetchQuoteBarRT, 60 * 1000);
 // Refresh ECB rates every 30 minutes (FX table + heatmap + cross rows)
 setInterval(fetchFrankfurter, 30 * 60 * 1000);
-// Refresh news every 10 minutes
-setInterval(fetchNewsData, 2 * 60 * 1000);   // every 2 min — ETag returns 304 when unchanged (zero cost); server updates hourly
-// Refresh narrative every 5 minutes
+// Refresh news every 2 minutes — ETag returns 304 when unchanged (zero cost); server updates hourly
+setInterval(fetchNewsData, 2 * 60 * 1000);
+// Refresh narrative every 15 minutes
 setInterval(buildRichNarrative, 15 * 60 * 1000);
 
 // ── CB RATES LIVE POLL — health.json sentinel ─────────────────────────────
