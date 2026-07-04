@@ -3531,7 +3531,11 @@ function _lwSetRange(days, totalBars) {
   _lwActiveDays = days;
 }
 
-let _lwActiveDays = 91; // default: 3M (calendar days)
+// Default D1 "macro" zoom level — wider than a literal 3 calendar months so the
+// main chart opens at the more zoomed-out view Santiago prefers (previously reached
+// by scrolling the mouse wheel out ~5 notches from the old 91-day default).
+const LW_D1_DEFAULT_ZOOM_DAYS = 132;
+let _lwActiveDays = LW_D1_DEFAULT_ZOOM_DAYS; // default: "3M" button (calendar days)
 let _lwActiveTf   = 'D1'; // active timeframe: H1 | H4 | D1 | W1 | MN
 let _lwCompareSeries = null;  // LineSeries for compare overlay
 let _lwCompareId     = null;  // ohlcId of the compared symbol
@@ -12267,11 +12271,11 @@ function initExclusivePanelNav() {
 const _TF_RANGE_SETS = {
   H1: [{days:1,label:'1D'},{days:5,label:'1W'},{days:14,label:'2W'},{days:30,label:'1M'}],
   H4: [{days:14,label:'2W'},{days:30,label:'1M'},{days:91,label:'3M'},{days:182,label:'6M'}],
-  D1: [{days:91,label:'3M'},{days:182,label:'6M'},{days:365,label:'1Y'},{days:1095,label:'3Y'},{days:0,label:'ALL'}],
+  D1: [{days:LW_D1_DEFAULT_ZOOM_DAYS,label:'3M'},{days:182,label:'6M'},{days:365,label:'1Y'},{days:1095,label:'3Y'},{days:0,label:'ALL'}],
   W1: [{days:182,label:'6M'},{days:365,label:'1Y'},{days:730,label:'2Y'},{days:1095,label:'3Y'},{days:0,label:'ALL'}],
   MN: [{days:365,label:'1Y'},{days:1095,label:'3Y'},{days:1825,label:'5Y'},{days:0,label:'ALL'}],
 };
-const _TF_DEFAULT_DAYS = {H1:5,H4:14,D1:91,W1:365,MN:1095};
+const _TF_DEFAULT_DAYS = {H1:5,H4:14,D1:LW_D1_DEFAULT_ZOOM_DAYS,W1:365,MN:1095};
 
 function _lwUpdateRangeBtns() {
   const wrap = document.getElementById('lw-range-btns');
