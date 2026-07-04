@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-04T15:35:23Z",
+  "updated": "2026-07-04T15:36:13Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -203,35 +203,35 @@
       "pct1w_date": "2026-06-26"
     },
     "btc": {
-      "close": 62892.8,
+      "close": 62862.11,
       "prev_close": 62548.598,
-      "chg": 344.202,
-      "pct": 0.5503,
+      "chg": 313.512,
+      "pct": 0.5012,
       "high": 62856.25,
       "low": 62292.277,
       "open": 62548.598,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783179324,
+      "market_time": 1783179374,
       "source": "yfinance",
-      "pct1w": 4.7926,
+      "pct1w": 4.7415,
       "pct1w_date": "2026-06-26"
     },
     "eth": {
-      "close": 1792.74,
+      "close": 1790.5,
       "prev_close": 1756.8468,
-      "chg": 35.8932,
-      "pct": 2.043,
+      "chg": 33.6532,
+      "pct": 1.9155,
       "high": 1794.5116,
       "low": 1743.8412,
       "open": 1756.8468,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783179325,
+      "market_time": 1783179370,
       "source": "yfinance",
-      "pct1w": 13.7081,
+      "pct1w": 13.566,
       "pct1w_date": "2026-06-26"
     },
     "nasdaq": {
@@ -6909,8 +6909,10 @@
   ],
   "fx_etf_iv": {
     "eurusd": {
-      "iv": 7.1,
-      "source": "CBOE ^EUVIX",
+      "iv": 9.0,
+      "expiry": "2026-07-17",
+      "atm": 105.0,
+      "source": "FXE options",
       "iv_rank": null,
       "iv_pct_rank": null,
       "iv_hist_n": 1
