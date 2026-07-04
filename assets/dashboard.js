@@ -3531,7 +3531,11 @@ function _lwSetRange(days, totalBars) {
   _lwActiveDays = days;
 }
 
-let _lwActiveDays = 182; // default: 6M (calendar days)
+// D1 default zoom: 3M on mobile/tablet viewports (less clutter on small screens),
+// 6M on desktop. Same 900px breakpoint used elsewhere in this file (e.g. split-layout isMobile()).
+function _lwDefaultD1Days() { return (window.innerWidth <= 900) ? 91 : 182; }
+
+let _lwActiveDays = _lwDefaultD1Days(); // default: 3M (mobile) / 6M (desktop), calendar days
 let _lwActiveTf   = 'D1'; // active timeframe: H1 | H4 | D1 | W1 | MN
 let _lwCompareSeries = null;  // LineSeries for compare overlay
 let _lwCompareId     = null;  // ohlcId of the compared symbol
@@ -12271,7 +12275,7 @@ const _TF_RANGE_SETS = {
   W1: [{days:182,label:'6M'},{days:365,label:'1Y'},{days:730,label:'2Y'},{days:1095,label:'3Y'},{days:0,label:'ALL'}],
   MN: [{days:365,label:'1Y'},{days:1095,label:'3Y'},{days:1825,label:'5Y'},{days:0,label:'ALL'}],
 };
-const _TF_DEFAULT_DAYS = {H1:5,H4:14,D1:182,W1:365,MN:1095};
+const _TF_DEFAULT_DAYS = {H1:5,H4:14,get D1(){ return _lwDefaultD1Days(); },W1:365,MN:1095};
 
 function _lwUpdateRangeBtns() {
   const wrap = document.getElementById('lw-range-btns');
