@@ -873,7 +873,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
       <!-- Symbol legend bar — shown only when LW chart is active -->
-      <div id="lw-chart-header" aria-live="polite">
+      <div id="lw-chart-header">
         <span class="lw-hdr-sym" id="lw-hdr-sym"></span>
         <div class="lw-hdr-ohlc" id="lw-hdr-ohlc">
           <span id="lw-hdr-ohlc-wrap" style="display:contents"><span class="lw-hdr-o"><span class="lw-hdr-lbl">O</span><span class="lw-hdr-val" id="lw-hdr-o-val"></span></span>
@@ -1005,7 +1005,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="panel" id="section-risk" style="border-bottom:none;" role="region" aria-label="Risk Monitor">
           <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub" id="risk-panel-sub">Volatility &amp; regime · HV 10/30/60d</span></div>
-          <div class="risk-grid" aria-live="polite" aria-atomic="false">
+          <div class="risk-grid">
             <div class="risk-cell" style="cursor:pointer;" title="Click: chart"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
             <div class="risk-cell" style="cursor:pointer;" title="Click: chart"><div class="risk-lbl">MOVE Index</div><div class="risk-val" id="risk-move">—</div><div class="risk-sub" id="risk-move-sub">Bond vol</div></div>
             <div class="risk-cell"><div class="risk-lbl">EUR/USD HV 30d</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Hist. volatility</div></div>
