@@ -1,53 +1,70 @@
 {
-  "generated_at": "2026-07-03T21:08:51Z",
+  "generated_at": "2026-07-04T20:59:57Z",
   "signals": [
     {
-      "time": "20:27",
+      "time": "19:39",
       "priority": "critical",
-      "title": "GBP/USD — G10 Bilateral Theme + Fed Hike Doubt",
-      "text": "GBP/USD closed Friday at 1.3350 as weaker-than-expected US Nonfarm Payrolls dial back Fed rate hike expectations and fuel a broad USD selloff. This macro shift aligns with a strong G10 bilateral theme where GBP leads G10 performance (+0.759% 1W average across 4 pairs) and USD lags (-0.718% 1W average across 7 pairs), creating a 1.477% performance spread. The next Fed meeting (mkt: 100% hold priced) on 29 July is the catalyst for confirming whether this policy divergence and USD weakness persist.",
+      "title": "GBP/USD — G10 Bilateral Theme + Fed Hike Doubts",
+      "text": "GBP/USD upside momentum is driven by a 1.477% G10 performance spread as weak US Nonfarm Payrolls data forces a repricing of the Fed's terminal rate. The pair closed Friday at 1.3350, supported by a positive Economic Surprise Index (net +23) and a neutral carry profile (0bp OIS spread) that removes the traditional USD advantage. The next BoE meeting (mkt: 100% hold priced) on 30 Jul is the catalyst for determining if the current 0.78% real rate remains sufficiently restrictive to sustain the bid.",
       "evidence": [
         "GBP 1W avg: +0.759% (n=4)",
         "USD 1W avg: -0.718% (n=7)",
-        "G10 spread: 1.477%"
+        "G10 spread: 1.477%",
+        "GBP/USD Friday Close: 1.3350"
       ],
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
       "time": "18:01",
       "priority": "warning",
-      "title": "USD/JPY — Crowded Short Squeeze Risk",
-      "text": "USD/JPY closed Friday at 161.337 with a strong options put skew of -1.67, signaling elevated hedging demand for downside protection. JPY speculative positioning is heavily crowded short with a net position of -115,033 contracts, leaving the pair highly vulnerable to a rapid short-squeeze unwind if US yields continue to soften. The next BoJ meeting (mkt: 100% hold priced) on 31 July is the catalyst for resolving whether JPY's positive economic surprise index (net +12 beats) triggers a structural trend reversal.",
+      "title": "USD/JPY — Carry Advantage vs Squeeze Risk",
+      "text": "JPY COT LF net short -115.0k (28.4% long) creates significant short-squeeze risk as USD/JPY faces downside pressure from disappointing US data. While the +268bp OIS carry advantage favors USD, the strong options put skew (RR -1.67) indicates heavy hedging demand for a move below the 161.34 Friday close. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul serves as the catalyst for a shift in the -0.52% real rate accommodative stance.",
       "evidence": [
-        "JPY speculative net short: -115,033 contracts",
-        "USD/JPY 1M 25d Risk Reversal: -1.67 put skew",
-        "USD/JPY Friday close: 161.337"
+        "JPY COT net short -115,033",
+        "USD/JPY OIS carry: +268bp",
+        "USD/JPY 25d RR: -1.67",
+        "USD/JPY Friday Close: 161.34"
       ],
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:47",
+      "time": "17:24",
       "priority": "warning",
-      "title": "USD/CAD — Contrarian Reversal Risk",
-      "text": "USD/CAD closed Friday at 1.4198 amid an extreme retail sentiment imbalance where 93% of retail traders are short. This extreme positioning runs directly counter to a heavily crowded speculative short on CAD (net -87,096 contracts, 20.6% long) and a negative Canadian economic surprise index (net -6 misses), which support a higher USD/CAD bias. The next BoC meeting (mkt: 100% hold priced) on 15 July is the catalyst for determining whether domestic data disappointments force a dovish shift that triggers a retail short squeeze.",
+      "title": "NZD/USD — RBNZ Hike Bias vs Crowded Retail Long",
+      "text": "NZD/USD upside is supported by an active RBNZ hike bias and a +0.706% G10 weekly outperformance, yet faces headwinds from a 74% retail long concentration. The pair closed at 0.5712 Friday, but the -0.83% real rate remains the most accommodative in the G10, suggesting the rally relies on policy divergence rather than fundamental value. The RBNZ meeting on 8 Jul is the catalyst to validate the hike pricing and clear the retail overhang.",
       "evidence": [
-        "CAD speculative net short: -87,096 contracts",
-        "Myfxbook USD/CAD retail sentiment: 93% short",
-        "Canada Economic Surprise Index: -6 misses"
+        "NZD 1W avg: +0.706% (n=4)",
+        "Retail Sentiment: 74% Long",
+        "RBNZ Market Bias: Hike",
+        "NZD/USD Friday Close: 0.5712"
       ],
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "14:52",
+      "time": "14:58",
+      "priority": "info",
+      "title": "USD/CAD — Retail Extreme vs COT Alignment",
+      "text": "USD/CAD retail positioning is at an extreme 93% short, creating a contrarian risk for further upside despite the pair's 1.4198 Friday close. This retail bias conflicts with the CAD COT net short of -87.0k, which aligns with a negative Economic Surprise Index (net -6) and a +136bp OIS carry advantage for the USD. The BoC meeting on 15 Jul is the catalyst to resolve this positioning conflict through updated growth guidance.",
+      "evidence": [
+        "CAD COT net short -87,096",
+        "Retail Sentiment: 93% Short",
+        "USD/CAD OIS carry: +136bp",
+        "USD/CAD Friday Close: 1.4198"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "11:10",
       "priority": "info",
       "title": "AUD/USD — Crowded Long Unwind Risk",
-      "text": "AUD/USD closed Friday at 0.6943 supported by a -69bp OIS carry advantage over the USD, but a crowded speculative net long of +29,035 contracts (64.9% long) creates unwind risk if global risk sentiment sours. While the RBA remains on hold at 4.35% with a mildly restrictive real rate of +0.39%, the options market remains cautious with a moderate put skew of -0.78. The next RBA meeting (mkt: 100% hold priced) on 11 August is the catalyst for confirming whether the central bank maintains its restrictive policy stance.",
+      "text": "AUD COT LF net long +29.0k (64.9% long) creates an unwind risk if the 0.6943 Friday close fails to hold amid broader USD volatility. While the +69bp OIS carry advantage and a positive Economic Surprise Index (+8) support the AUD, the moderate options put skew (RR -0.78) suggests markets are pricing protection against a reversal. The next RBA meeting (mkt: 100% hold priced) on 11 Aug determines if the 4.35% hold remains sufficient to protect the long positioning.",
       "evidence": [
-        "AUD speculative net long: +29,035 contracts",
-        "AUD/USD 1M 25d Risk Reversal: -0.78 put skew",
-        "AUD/USD OIS carry differential: -69bp (favors AUD)"
+        "AUD COT net long +29,035",
+        "AUD/USD OIS carry: +69bp",
+        "AUD/USD 25d RR: -0.78",
+        "AUD/USD Friday Close: 0.6943"
       ],
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
