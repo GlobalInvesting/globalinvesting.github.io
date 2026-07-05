@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-05T13:25:27Z",
+  "updated": "2026-07-05T13:30:43Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,10 +35,10 @@
       "pct1w_date": "2026-06-26"
     },
     "gold": {
-      "close": 4174.952,
+      "close": 4174.9982,
       "prev_close": 4174.9411,
-      "chg": 0.0109,
-      "pct": 0.0003,
+      "chg": 0.0571,
+      "pct": 0.0014,
       "source": "twelve_data",
       "high": 4208.3,
       "low": 4133.8,
@@ -52,7 +52,7 @@
       "chg": 0.09,
       "pct": 0.131,
       "high": 69.26,
-      "low": 68.1,
+      "low": 68.08,
       "open": 68.43,
       "bid": 68.7,
       "ask": 68.83,
@@ -199,35 +199,35 @@
       "pct1w_date": "2026-06-26"
     },
     "btc": {
-      "close": 62694.77,
+      "close": 62633.81,
       "prev_close": 63087.742,
-      "chg": -392.972,
-      "pct": -0.6229,
+      "chg": -453.932,
+      "pct": -0.7195,
       "high": 63087.742,
       "low": 62468.13,
       "open": 63087.742,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783257926,
+      "market_time": 1783258243,
       "source": "yfinance",
-      "pct1w": 4.4627,
+      "pct1w": 4.3611,
       "pct1w_date": "2026-06-26"
     },
     "eth": {
-      "close": 1763.88,
+      "close": 1761.47,
       "prev_close": 1779.066,
-      "chg": -15.186,
-      "pct": -0.8536,
+      "chg": -17.596,
+      "pct": -0.9891,
       "high": 1779.066,
       "low": 1750.4539,
       "open": 1779.066,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783257924,
+      "market_time": 1783258240,
       "source": "yfinance",
-      "pct1w": 11.8776,
+      "pct1w": 11.7247,
       "pct1w_date": "2026-06-26"
     },
     "nasdaq": {
@@ -395,23 +395,23 @@
       "pct1m_date": "2026-06-03"
     },
     "usdcad": {
-      "close": 1.4198,
+      "close": 1.4196,
       "prev_close": 1.4183,
-      "chg": 0.0015,
-      "pct": 0.1051,
+      "chg": 0.0013,
+      "pct": 0.091,
       "high": 1.4198,
-      "low": 1.4198,
+      "low": 1.4196,
       "open": 1.4198,
       "bid": 1.4194,
       "ask": 1.4195,
       "market_state": "CLOSED",
-      "market_time": 1783225271,
+      "market_time": 1783258074,
       "source": "yfinance",
-      "pct1w": -0.0183,
+      "pct1w": -0.0324,
       "pct1w_date": "2026-06-26",
       "hv30": 3.47,
       "hv10": 2.96,
-      "pct1m": 2.5534,
+      "pct1m": 2.5389,
       "pct1m_date": "2026-06-03"
     },
     "nzdusd": {
@@ -2899,7 +2899,7 @@
     {
       "a": "USD/CAD",
       "b": "WTI Oil",
-      "corr30": -0.933,
+      "corr30": -0.932,
       "n30": 30,
       "corr": -0.875,
       "n": 60,
@@ -3130,7 +3130,7 @@
         -0.924,
         -0.928,
         -0.934,
-        -0.933
+        -0.932
       ],
       "hist_dates": [
         "2025-08-27",
