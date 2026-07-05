@@ -1,30 +1,30 @@
 {
-  "lastUpdate": "2026-07-04T21:25:28Z",
-  "generatedAt": "2026-07-04T21:25:28Z",
+  "lastUpdate": "2026-07-05T08:24:31Z",
+  "generatedAt": "2026-07-05T08:24:31Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-04",
+  "rangeFrom": "2025-07-07",
   "rangeTo": "2026-07-03",
-  "totalEvents": 3954,
+  "totalEvents": 3948,
   "currencyCounts": {
-    "CHF": 162,
-    "EUR": 874,
+    "EUR": 869,
     "GBP": 469,
     "JPY": 253,
     "AUD": 289,
     "CAD": 307,
     "USD": 1244,
     "NZD": 122,
+    "CHF": 161,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "high": 1639,
-    "medium": 2087,
+    "medium": 2084,
+    "high": 1636,
     "low": 228
   },
   "surpriseStats": {
@@ -1290,78 +1290,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CHF",
-      "event": "Unemployment Rate",
-      "dateISO": "2025-07-04",
-      "hourUTC": "07:00",
-      "actual": "2.7%",
-      "forecast": "2.7",
-      "previous": "2.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Factory Orders MoM",
-      "dateISO": "2025-07-04",
-      "hourUTC": "06:00",
-      "actual": "-1.4%",
-      "forecast": "-0.1",
-      "previous": "1.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Industrial Production MoM",
-      "dateISO": "2025-07-04",
-      "hourUTC": "06:45",
-      "actual": "-0.5%",
-      "forecast": "0.3",
-      "previous": "-1.4",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Retail Sales MoM",
-      "dateISO": "2025-07-04",
-      "hourUTC": "08:00",
-      "actual": "-0.4%",
-      "forecast": "0.5",
-      "previous": "0.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Retail Sales YoY",
-      "dateISO": "2025-07-04",
-      "hourUTC": "08:00",
-      "actual": "1.3%",
-      "forecast": "2.5",
-      "previous": "3.8",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Consumer Confidence",
-      "dateISO": "2025-07-04",
-      "hourUTC": "10:30",
-      "actual": "82.5",
-      "forecast": "76.0",
-      "previous": "76.5",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
     {
       "currency": "EUR",
       "event": "Industrial Production MoM",
