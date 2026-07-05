@@ -440,6 +440,9 @@ a { color: inherit; text-decoration: none; }
       <a class="toc-item" href="#cb-panel">CB Bias &amp; Rates</a>
       <a class="toc-item" href="#carry-panel">Carry Monitor</a>
       <a class="toc-item" href="#calendar-panel">Economic Calendar</a>
+      <a class="toc-item" href="#composite-panel">Composite Score</a>
+      <a class="toc-item" href="#esi-panel">Economic Surprise Index</a>
+      <a class="toc-item" href="#sessions-panel">Market Sessions</a>
       <a class="toc-item" href="#other-panels">Sentiment, CSI, Correlation, Volatility</a>
       <a class="toc-item" href="#narrative">AI Market Narrative</a>
       <a class="toc-item" href="#alerts">MT5 Alerts &amp; Push Notifications</a>
@@ -511,6 +514,21 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="calendar-panel">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Economic Calendar</h3>
       <p>A native MT5 economic calendar panel built from MetaTrader's own calendar feed, showing upcoming high- and medium-impact releases for the major economies without needing a separate calendar app or browser tab open alongside the chart.</p>
+    </div>
+
+    <div class="guide-section" id="composite-panel">
+      <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Composite Score</h3>
+      <p>A single blended score per currency that combines six of the panels above into one number on a &plusmn;10 scale: COT positioning (25%), momentum (15%), retail sentiment (18%), CB bias (18%), carry (12%), and the Economic Surprise Index (12%). It follows the standard four-factor skeleton (value/carry/momentum/positioning) used by institutional composite proxies, rather than a bespoke weighting scheme. For NOK and SEK, which have no liquid CFTC futures, the COT weight is redistributed proportionally across the remaining five components instead of injecting a misleading neutral zero.</p>
+    </div>
+
+    <div class="guide-section" id="esi-panel">
+      <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Economic Surprise Index</h3>
+      <p>A per-currency read on whether recent economic releases have beaten or missed consensus, following the same construction convention as Citigroup's Economic Surprise Index. Each of the ten currencies is scored over a rolling 90-day window of importance-eligible releases, extending automatically to 180 days for currencies whose calendar has too few releases in the shorter window to produce a stable reading. A currency with no eligible releases in either window shows N/A rather than a misleading zero.</p>
+    </div>
+
+    <div class="guide-section" id="sessions-panel">
+      <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Market Sessions</h3>
+      <p>Open/closed status and a progress bar for the four major trading sessions — Sydney, Tokyo, London, and New York — converted to your broker's server time, with each zone's daylight-saving boundary calculated independently so the displayed open and close hours stay accurate as regions shift on and off DST at different points in the year. A footer summarizes the current overlap condition (e.g. the London/New York overlap, the highest-liquidity window of the trading day) and flags the weekend when all four sessions are closed.</p>
     </div>
 
     <div class="guide-section" id="other-panels">

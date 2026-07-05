@@ -323,7 +323,7 @@ a { color: inherit; text-decoration: none; }
       "name": "How is the CSI calculated?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Each currency's score sums the return of every pair it appears in, adding the return when the currency is the base and subtracting it when the currency is the quote, over a selected lookback horizon. The standalone MT5 indicator additionally normalises this into a z-score across a configurable lookback."
+        "text": "Each currency's score sums the return of every pair it appears in, adding the return when the currency is the base and subtracting it when the currency is the quote, over a selected lookback horizon. The standalone MT5 indicator goes further: it computes this independently across three lookback horizons (short, medium, long), normalises each into a cross-sectional z-score, and blends the three with configurable weights (25%/35%/40% by default) — a multi-lookback weighted z-score model based on Asness, Moskowitz &amp; Pedersen (2013), designed to avoid the cliff-edge artifact a single fixed lookback produces."
       }
     },
     {
@@ -451,7 +451,7 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="methodology">
       <h2>Methodology</h2>
       <p>Each currency's score is built from the cumulative log-return of every pair it appears in over the selected horizon: the return is added when the currency is the base of the pair and subtracted when it is the quote, so a currency's score reflects its net direction across the entire G10 cross-rate set rather than one isolated pair.</p>
-      <p>On the standalone MT5 indicator, this is additionally normalised into a z-score across a configurable lookback, so readings are comparable across currencies and over time regardless of each pair's raw volatility.</p>
+      <p>On the standalone MT5 indicator, this goes a step further. Rather than a single lookback, it computes the return independently across three horizons — short, medium and long — and normalises each into a cross-sectional z-score, so readings are comparable across currencies and over time regardless of each pair's raw volatility. The three z-scores are then combined with configurable weights (25% short / 35% medium / 40% long by default) into one composite score per currency. This multi-lookback weighted approach follows the momentum model of Asness, Moskowitz &amp; Pedersen (2013) and is designed specifically to avoid the "cliff-edge" artifact a single fixed lookback produces, where a score can jump sharply the moment one old data point rolls out of the window.</p>
     </div>
 
     <div class="guide-section" id="web-panel">
@@ -461,7 +461,7 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="mt5-indicator">
       <h2>CSI on MetaTrader 5</h2>
-      <p>For traders who want the same read without switching to a browser, <strong>CSI Currency Strength</strong> is available separately as a native MetaTrader 5 indicator (MQL5 Market product #180317). It renders currency strength directly as a panel overlay on the chart, using a z-score model with configurable lookback periods, covering 28 pairs across eight currencies, each color-coded for quick scanning.</p>
+      <p>For traders who want the same read without switching to a browser, <strong>CSI Currency Strength</strong> is available separately as a native MetaTrader 5 indicator (MQL5 Market product #180317). It renders currency strength directly as a panel overlay on the chart, using a multi-lookback weighted z-score model (short/medium/long horizons, based on Asness, Moskowitz &amp; Pedersen 2013), covering 28 pairs across eight currencies, each color-coded for quick scanning.</p>
       <div class="scr-hero-wrap">
         <div class="scr-hero">
           <img src="assets/screenshot-csi.png" alt="CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD" width="960" height="466" loading="lazy">
