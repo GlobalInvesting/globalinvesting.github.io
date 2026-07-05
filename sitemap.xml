@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://globalinvesting.github.io/</loc>
     <lastmod>2026-07-05</lastmod>
@@ -19,10 +19,36 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://globalinvesting.github.io/guide-csi-indicator.html</loc>
+    <lastmod>2026-07-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-csi.png</image:loc>
+      <image:caption>CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://globalinvesting.github.io/access.html</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-mt5-ea.png</image:loc>
+      <image:caption>Global Investing FX Terminal MT5 Expert Advisor — canvas overlay inside a MetaTrader 5 chart</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-derivatives.png</image:loc>
+      <image:caption>Derivatives section — 25-delta risk reversal term structure</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-cot.png</image:loc>
+      <image:caption>CFTC Positioning panel</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-cb-rates.png</image:loc>
+      <image:caption>CB Rate Expectations panel</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://globalinvesting.github.io/guide-cot.html</loc>
@@ -41,6 +67,14 @@
     <lastmod>2026-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-esi-panel.png</image:loc>
+      <image:caption>Economic Surprise Index panel ranking all 10 G10 currencies by 90-day surprise index with beat/miss bar chart</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-esi-detail-usd.png</image:loc>
+      <image:caption>Economic Surprise Index detail modal for USD showing the 90-day rolling chart and individual event log</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://globalinvesting.github.io/guide-cross-asset-risk.html</loc>

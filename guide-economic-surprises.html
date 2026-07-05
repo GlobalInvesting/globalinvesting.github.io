@@ -18,7 +18,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-05-23T00:00:00Z">
-<meta property="article:modified_time" content="2026-05-23T00:00:00Z">
+<meta property="article:modified_time" content="2026-07-05T00:00:00Z">
 <meta property="article:section" content="Guides">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Economic Surprise Index (ESI) Explained: Methodology, Signals, and FX Impact">
@@ -30,9 +30,25 @@
   "@type": "Article",
   "headline": "Economic Surprise Index (ESI) Explained: Methodology, Signals, and FX Impact",
   "description": "How the Economic Surprise Index works in the FX Terminal: decay-weighted z-score methodology, major currency scoring, beat/miss classification, inverse indicators, and what a rising or falling ESI means for currency direction.",
-  "image": "https://globalinvesting.github.io/og-image.png",
+  "image": [
+    "https://globalinvesting.github.io/og-image.png",
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-esi-panel.png",
+      "width": 366,
+      "height": 268,
+      "caption": "Economic Surprise Index panel ranking all 10 G10 currencies by 90-day surprise index"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-esi-detail-usd.png",
+      "width": 608,
+      "height": 826,
+      "caption": "Economic Surprise Index detail modal for USD with rolling chart and event log"
+    }
+  ],
   "datePublished": "2026-05-23T00:00:00Z",
-  "dateModified": "2026-05-23T00:00:00Z",
+  "dateModified": "2026-07-05T00:00:00Z",
   "author": {
     "@type": "Person",
     "name": "Santiago Plá Casuriaga",
@@ -246,6 +262,15 @@ a { color: inherit; text-decoration: none; }
 .guide-section p:last-child { margin-bottom: 0; }
 .guide-section ul, .guide-section ol { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
+
+.scr-hero-wrap { margin: 18px 0 24px; }
+.scr-hero { cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
+.scr-hero:hover { border-color: var(--border2); }
+.scr-hero img { width: 100%; height: auto; display: block; }
+.scr-hero-contain { display: flex; justify-content: center; background: var(--bg2); }
+.scr-hero-contain img { width: auto; max-width: 100%; height: auto; margin: 0 auto; }
+.guide-section p.scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-top: 10px; padding: 0 2px; }
+.scr-meta strong { color: var(--text2); font-weight: 600; }
 
 .callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 .callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
@@ -535,6 +560,12 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="reading-panel">
       <h2>Reading the ESI Panel</h2>
       <p>The Economic Surprises panel in the terminal displays one row per G10 currency. Each row contains:</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-esi-panel.png" alt="Economic Surprise Index panel in the Global Investing FX terminal, ranking all 10 G10 currencies by their 90-day surprise index with beat/miss bar chart and event count N" width="366" height="268" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The Economic Surprises panel.</strong> Each currency gets a centred bar (green = more beats than misses, red = more misses than beats) and an event count N for confidence, ranked strongest to weakest.</p>
+      </div>
       <table class="data-table" aria-label="ESI panel columns and their meaning">
         <thead>
           <tr>
@@ -563,6 +594,12 @@ a { color: inherit; text-decoration: none; }
       </table>
       <p>Hovering over any row shows the full tooltip: beats, misses, in-line count, beat rate percentage, raw index value, and decay method.</p>
       <p>Clicking a row opens the detail modal with the individual event log — each release listed with its date, actual vs forecast, beat/miss result, and decay-adjusted weight. This is the full audit trail behind the aggregate index value.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-esi-detail-usd.png" alt="Economic Surprise Index detail modal for USD, showing the 90-day rolling surprise chart, beats/misses/N summary, and the individual event log with actual vs forecast values" width="608" height="826" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The USD detail modal.</strong> The rolling index chart sits above beats/misses/N summary tiles and the full event log, so every input behind the aggregate score can be checked against its actual vs forecast value.</p>
+      </div>
       <div class="callout">
         <strong>Source label:</strong> The panel subtitle shows the active data source (investing.com, ForexFactory, or FRED + ForexFactory for historical backfill) and the rolling window. The source can vary depending on which data pipeline ran most recently. The scoring methodology is identical across sources.
       </div>
