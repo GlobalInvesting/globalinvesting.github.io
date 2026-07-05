@@ -1,0 +1,61 @@
+name: Deploy GitHub Pages
+
+# ─────────────────────────────────────────────────────────────────────────
+# Reemplaza el pipeline implícito de Pages ("Deploy from a branch"), que
+# tiene un límite BLANDO de 10 builds/hora documentado por GitHub. Con 6
+# workflows de datos pusheando a main cada 5-30 min, ese límite se supera
+# regularmente y produce el error "Deployment failed, try again later."
+#
+# Un workflow de GitHub Actions explícito (este archivo) NO está sujeto a
+# ese límite: https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits
+#
+# Requisito único: en Settings → Pages → Build and deployment → Source,
+# cambiar de "Deploy from a branch" a "GitHub Actions".
+# ─────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:   # permite disparo manual desde la UI para test/backfill
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# "pages" agrupa todos los despliegues bajo la misma cola. cancel-in-progress
+# en false evita cancelar un deploy a mitad de camino (eso fue una causa
+# probable de las fallas intermitentes vistas antes) — en su lugar, los
+# despliegues se encolan y corren en orden, uno detrás del otro.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Sitio estático servido tal cual desde la raíz del repo — sin
+          # paso de build. Ajustar `path` si en algún momento se agrega
+          # un bundler (Vite/Webpack/etc.) con salida a /dist.
+          path: '.'
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
