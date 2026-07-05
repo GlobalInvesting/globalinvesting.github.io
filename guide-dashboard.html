@@ -789,17 +789,17 @@ a { color: inherit; text-decoration: none; }
           <span style="font-size:9px;color:var(--text3);">Bid / Ask · Spread · 1D · 1W · HV 30d · Fwd · RR 1M · Session Range</span>
         </div>
         <div style="overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono, monospace);min-width:740px;">
+        <table aria-label="FX Pairs — Majors quotes and stats" style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono, monospace);min-width:740px;">
           <thead>
             <tr style="background:var(--bg3);color:var(--text3);text-transform:uppercase;font-size:9px;letter-spacing:.05em;">
-              <th style="text-align:left;padding:4px 8px;">Pair</th>
-              <th style="padding:4px 6px;">Bid</th><th style="padding:4px 6px;">Ask</th>
-              <th style="padding:4px 6px;">Spread</th>
-              <th style="padding:4px 6px;">1D Chg</th><th style="padding:4px 6px;">1W Chg</th>
-              <th style="padding:4px 6px;">HV 30d</th>
-              <th style="padding:4px 6px;">Fwd 1M</th><th style="padding:4px 6px;">Fwd 3M</th>
-              <th style="padding:4px 6px;">RR 1M</th>
-              <th style="padding:4px 6px;">Sess H</th><th style="padding:4px 6px;">Sess L</th>
+              <th scope="col" style="text-align:left;padding:4px 8px;">Pair</th>
+              <th scope="col" style="padding:4px 6px;">Bid</th><th scope="col" style="padding:4px 6px;">Ask</th>
+              <th scope="col" style="padding:4px 6px;">Spread</th>
+              <th scope="col" style="padding:4px 6px;">1D Chg</th><th scope="col" style="padding:4px 6px;">1W Chg</th>
+              <th scope="col" style="padding:4px 6px;">HV 30d</th>
+              <th scope="col" style="padding:4px 6px;">Fwd 1M</th><th scope="col" style="padding:4px 6px;">Fwd 3M</th>
+              <th scope="col" style="padding:4px 6px;">RR 1M</th>
+              <th scope="col" style="padding:4px 6px;">Sess H</th><th scope="col" style="padding:4px 6px;">Sess L</th>
             </tr>
           </thead>
           <tbody>
@@ -1102,12 +1102,12 @@ a { color: inherit; text-decoration: none; }
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px 0 4px;max-width:220px;margin:16px 0 20px;">
         <div style="padding:0 8px 2px;font-size:10px;font-weight:700;color:var(--text);letter-spacing:.04em;">Economic Surprises</div>
         <div style="padding:0 8px 3px;font-size:9px;color:var(--text3);">Actual vs consensus forecast &middot; G10 &middot; 90d rolling</div>
-        <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <table aria-label="Economic surprises by currency" style="width:100%;border-collapse:collapse;table-layout:fixed;">
           <thead>
             <tr>
-              <th style="text-align:left;font-size:9px;padding:1px 8px;width:34px;color:var(--text3);">CCY</th>
-              <th style="font-size:9px;text-align:center;padding:1px 4px;color:var(--text3);">Index</th>
-              <th style="font-size:9px;text-align:right;padding:1px 8px;width:28px;color:var(--text3);">N</th>
+              <th scope="col" style="text-align:left;font-size:9px;padding:1px 8px;width:34px;color:var(--text3);">CCY</th>
+              <th scope="col" style="font-size:9px;text-align:center;padding:1px 4px;color:var(--text3);">Index</th>
+              <th scope="col" style="font-size:9px;text-align:right;padding:1px 8px;width:28px;color:var(--text3);">N</th>
             </tr>
           </thead>
           <tbody>
@@ -1273,11 +1273,11 @@ a { color: inherit; text-decoration: none; }
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Central Bank Rates</span>
         </div>
-        <table style="width:100%;border-collapse:collapse;font-size:10px;">
+        <table aria-label="Central bank rates" style="width:100%;border-collapse:collapse;font-size:10px;">
           <thead><tr style="color:var(--text3);font-size:9px;">
-            <th style="text-align:left;padding:3px 8px;">Bank</th>
-            <th style="padding:3px 6px;">Rate</th>
-            <th style="padding:3px 6px;">Trend</th>
+            <th scope="col" style="text-align:left;padding:3px 8px;">Bank</th>
+            <th scope="col" style="padding:3px 6px;">Rate</th>
+            <th scope="col" style="padding:3px 6px;">Trend</th>
           </tr></thead>
           <tbody>
             <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td></tr>
@@ -1299,12 +1299,12 @@ a { color: inherit; text-decoration: none; }
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Key Correlations</span>
         </div>
-        <table style="width:100%;border-collapse:collapse;font-size:10px;">
+        <table aria-label="Key correlations" style="width:100%;border-collapse:collapse;font-size:10px;">
           <thead><tr style="color:var(--text3);font-size:9px;">
-            <th style="text-align:left;padding:3px 6px;">Pair A</th>
-            <th style="padding:3px 6px;">Pair B</th>
-            <th style="padding:3px 6px;">60d</th>
-            <th style="padding:3px 6px;color:var(--text3);" title="z-score vs 252d norm">vs norm</th>
+            <th scope="col" style="text-align:left;padding:3px 6px;">Pair A</th>
+            <th scope="col" style="padding:3px 6px;">Pair B</th>
+            <th scope="col" style="padding:3px 6px;">60d</th>
+            <th scope="col" style="padding:3px 6px;color:var(--text3);" title="z-score vs 252d norm">vs norm</th>
           </tr></thead>
           <tbody>
             <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">EUR/USD</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">DXY</td><td style="padding:3px 6px;color:var(--down);text-align:center;font-weight:700;">−0.94</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
@@ -1328,7 +1328,7 @@ a { color: inherit; text-decoration: none; }
       <p>Forward-looking rate expectations for all eight major central banks at their next scheduled meeting, sourced from OIS (Overnight Index Swap) and futures market pricing — not analyst forecasts, not editorial opinion. This panel is <strong>distinct from the CB Rates table above it</strong>: the CB Rates table shows what the rate <em>is</em> today; this panel shows what the market expects the rate <em>to become</em> at the next meeting. FX reacts to expectations, not to the current rate — which is why this signal matters at the margin.</p>
       <p>Each Bias field is computed from the overnight rate market specific to that currency:</p>
       <div style="overflow-x:auto;margin:10px 0 16px;">
-        <table style="width:100%;border-collapse:collapse;font-size:10px;">
+        <table aria-label="CB rate expectations bias methodology by currency" style="width:100%;border-collapse:collapse;font-size:10px;">
           <thead><tr style="color:var(--text3);font-size:9px;border-bottom:1px solid var(--border);">
             <th style="text-align:left;padding:4px 8px;" scope="col">Currency</th>
             <th style="text-align:left;padding:4px 8px;" scope="col">OIS Instrument</th>
@@ -1351,12 +1351,12 @@ a { color: inherit; text-decoration: none; }
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">CB Rate Expectations</span>
         </div>
-        <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed;">
+        <table aria-label="CB rate expectations" style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed;">
           <colgroup><col style="width:42%;"><col style="width:33%;"><col style="width:25%;"></colgroup>
           <thead><tr style="color:var(--text3);font-size:9px;">
-            <th style="text-align:left;padding:3px 8px;" title="Bank and next scheduled meeting date">Bank · Meeting</th>
-            <th style="padding:3px 6px;overflow:hidden;" title="Market-implied direction at next meeting. Chip = probability of the expected move: %↓ cut (CME FedWatch / ASX) or %↑ hike (same sources)">Bias</th>
-            <th style="padding:3px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="Expected policy rate at next meeting · derived from OIS markets where available">Impl.</th>
+            <th scope="col" style="text-align:left;padding:3px 8px;" title="Bank and next scheduled meeting date">Bank · Meeting</th>
+            <th scope="col" style="padding:3px 6px;overflow:hidden;" title="Market-implied direction at next meeting. Chip = probability of the expected move: %↓ cut (CME FedWatch / ASX) or %↑ hike (same sources)">Bias</th>
+            <th scope="col" style="padding:3px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="Expected policy rate at next meeting · derived from OIS markets where available">Impl.</th>
           </tr></thead>
           <tbody>
             <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed · 17 Jun</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td><td style="padding:4px 3px;color:var(--text2);text-align:center;white-space:nowrap;">3.75%</td></tr>
@@ -1468,7 +1468,7 @@ a { color: inherit; text-decoration: none; }
       <h3>Price &amp; Advanced Alerts</h3>
       <p>Configurable alerts are available via the <strong>alerts</strong> button in the status bar at the bottom of the screen. An alert type selector lets you choose from six categories:</p>
       <div style="overflow-x:auto;margin:12px 0 16px;">
-        <table class="data-table">
+        <table aria-label="Alert types" class="data-table">
           <thead><tr>
             <th scope="col">Type</th>
             <th scope="col">What it monitors</th>
@@ -1549,15 +1549,15 @@ a { color: inherit; text-decoration: none; }
       <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;">
         <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Implied Forwards — CIP · not a live quoted price</span>
       </div>
-      <table style="width:100%;min-width:500px;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
+      <table aria-label="Implied forwards via CIP" style="width:100%;min-width:500px;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
         <thead><tr style="color:var(--text3);font-size:9px;border-bottom:1px solid var(--border);">
-          <th style="text-align:left;padding:4px 10px;">Pair</th>
-          <th style="padding:4px 8px;">Spot</th>
-          <th style="padding:4px 8px;">1M Fwd</th>
-          <th style="padding:4px 8px;">3M Fwd</th>
-          <th style="padding:4px 8px;">6M Fwd</th>
-          <th style="padding:4px 8px;">1Y Fwd</th>
-          <th style="padding:4px 8px;">Rate Diff</th>
+          <th scope="col" style="text-align:left;padding:4px 10px;">Pair</th>
+          <th scope="col" style="padding:4px 8px;">Spot</th>
+          <th scope="col" style="padding:4px 8px;">1M Fwd</th>
+          <th scope="col" style="padding:4px 8px;">3M Fwd</th>
+          <th scope="col" style="padding:4px 8px;">6M Fwd</th>
+          <th scope="col" style="padding:4px 8px;">1Y Fwd</th>
+          <th scope="col" style="padding:4px 8px;">Rate Diff</th>
         </tr></thead>
         <tbody>
           <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px;color:var(--text);">EUR/USD</td><td style="padding:4px 8px;color:var(--text2);">1.1245</td><td style="padding:4px 8px;color:var(--text2);">1.1261</td><td style="padding:4px 8px;color:var(--text2);">1.1304</td><td style="padding:4px 8px;color:var(--text2);">1.1364</td><td style="padding:4px 8px;color:var(--text2);">1.1487</td><td style="padding:4px 8px;color:var(--down);">−2.31%</td></tr>

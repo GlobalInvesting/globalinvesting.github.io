@@ -560,8 +560,8 @@ a { color: inherit; text-decoration: none; }
       <h2>Open Interest (OI)</h2>
       <p>The <strong>OI</strong> column shows the total Leveraged Funds open interest for each currency — the sum of all long and short contracts held by speculative accounts (hedge funds, CTAs, prop trading firms). This is distinct from net positioning: it measures the total size of the speculative bet, not its direction.</p>
       <p>Open interest is the institutional standard for gauging conviction and participation level in a positioning move. It answers the question: is the current net position backed by large, active participation, or is it a thin, easy-to-unwind position?</p>
-      <table class="cot-signal-table">
-        <thead><tr><th>OI Change</th><th>Net Direction</th><th>Interpretation</th></tr></thead>
+      <table aria-label="Open interest change interpretation" class="cot-signal-table">
+        <thead><tr><th scope="col">OI Change</th><th scope="col">Net Direction</th><th scope="col">Interpretation</th></tr></thead>
         <tbody>
           <tr><td>Rising OI ▲</td><td>Net long growing</td><td style="color:var(--text2);">New money entering long — strong conviction</td></tr>
           <tr><td>Rising OI ▲</td><td>Net short growing</td><td style="color:var(--text2);">New money entering short — strong bearish conviction</td></tr>
@@ -640,9 +640,9 @@ a { color: inherit; text-decoration: none; }
             <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-bottom:8px;"><span>LONGS 42%</span><span>SHORTS 58%</span></div>
             <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;">
               <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:6px;font-family:var(--font-mono);">PARTICIPANTS · NET BY CATEGORY</div>
-              <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);">
+              <table aria-label="COT participants net positioning by category" style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);">
                 <thead><tr style="color:var(--text3);font-size:8px;">
-                  <th style="text-align:left;padding:2px 0;">Category</th><th style="text-align:right;padding:2px 0;">Net</th><th style="text-align:right;padding:2px 0;">Dir</th>
+                  <th scope="col" style="text-align:left;padding:2px 0;">Category</th><th scope="col" style="text-align:right;padding:2px 0;">Net</th><th scope="col" style="text-align:right;padding:2px 0;">Dir</th>
                 </tr></thead>
                 <tbody>
                   <tr><td style="padding:3px 0;color:var(--text2);">Leveraged Funds</td><td style="padding:3px 0;color:var(--down);text-align:right;">−31,777</td><td style="padding:3px 0;color:var(--down);text-align:right;">▼ Short</td></tr>

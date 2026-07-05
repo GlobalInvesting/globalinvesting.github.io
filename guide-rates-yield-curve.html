@@ -446,12 +446,12 @@ a { color: inherit; text-decoration: none; }
         </div>
         <!-- Spreads table — signal labels match production output -->
         <div style="padding:4px 12px 10px;">
-          <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+          <table aria-label="US yield spreads" style="width:100%;border-collapse:collapse;font-size:11.5px;">
             <thead>
               <tr style="border-bottom:1px solid var(--border2);">
-                <th style="text-align:left;padding:5px 0;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;">Spread</th>
-                <th style="text-align:center;padding:5px 0;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;">Value</th>
-                <th style="text-align:right;padding:5px 0;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;">Signal</th>
+                <th scope="col" style="text-align:left;padding:5px 0;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;">Spread</th>
+                <th scope="col" style="text-align:center;padding:5px 0;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;">Value</th>
+                <th scope="col" style="text-align:right;padding:5px 0;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;">Signal</th>
               </tr>
             </thead>
             <tbody>
@@ -532,8 +532,8 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="2y-10y">
       <h2>2Y–10Y Spread</h2>
       <p>The most widely-watched domestic yield curve spread: the difference between the 10-year Treasury yield and the 2-year Treasury yield, expressed in basis points (bps). Calculated as <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">10Y yield − 2Y yield</code>.</p>
-      <table class="spread-table">
-        <thead><tr><th>Value</th><th>Signal</th><th>FX Context</th></tr></thead>
+      <table aria-label="2Y–10Y spread signals" class="spread-table">
+        <thead><tr><th scope="col">Value</th><th scope="col">Signal</th><th scope="col">FX Context</th></tr></thead>
         <tbody>
           <tr><td style="color:var(--up);">+100 bps or more</td><td>Strongly normal curve</td><td>Robust growth expectations. Strong carry trades. Risk-on currencies supported.</td></tr>
           <tr><td style="color:var(--up);">+50 to +100 bps</td><td>Moderately normal</td><td>Healthy environment. Gradual USD normalization cycle typically ongoing.</td></tr>

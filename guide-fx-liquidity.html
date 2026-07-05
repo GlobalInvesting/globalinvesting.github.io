@@ -573,8 +573,8 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="vol-profile">
       <h2>Session Volatility Profile</h2>
       <p>The <strong>Session Vol</strong> table within the Market Sessions panel shows historical average daily pip ranges for EUR/USD and USD/JPY across each session. These are long-run averages — individual sessions vary significantly based on news flow and market regime.</p>
-      <table class="vol-table">
-        <thead><tr><th>Session</th><th>EUR/USD Avg Range</th><th>USD/JPY Avg Range</th><th>Character</th></tr></thead>
+      <table aria-label="Session volatility profile" class="vol-table">
+        <thead><tr><th scope="col">Session</th><th scope="col">EUR/USD Avg Range</th><th scope="col">USD/JPY Avg Range</th><th scope="col">Character</th></tr></thead>
         <tbody>
           <tr><td>Sydney</td><td>±18 pip</td><td>±22 pip</td><td>Thin, drift, consolidation</td></tr>
           <tr><td>Tokyo</td><td>±28 pip</td><td>±44 pip</td><td>JPY-driven, rangy, data-reactive</td></tr>

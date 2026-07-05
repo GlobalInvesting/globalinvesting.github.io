@@ -554,9 +554,9 @@ a { color: inherit; text-decoration: none; }
           </div>
         </div>
         <div style="padding:4px 12px 0;border-top:1px solid var(--border);overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;font-size:10px;">
+          <table aria-label="Cross-asset risk indicators — MOVE, HV, regime" style="width:100%;border-collapse:collapse;font-size:10px;">
             <thead><tr style="color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:.05em;">
-              <th style="text-align:left;padding:4px 0;">Indicator</th><th style="padding:4px 6px;">Value</th><th style="padding:4px 6px;">Signal</th>
+              <th scope="col" style="text-align:left;padding:4px 0;">Indicator</th><th scope="col" style="padding:4px 6px;">Value</th><th scope="col" style="padding:4px 6px;">Signal</th>
             </tr></thead>
             <tbody>
               <tr style="border-top:1px solid var(--border);"><td style="padding:5px 0;color:var(--text2);">US–EU Spread 10Y</td><td style="padding:5px 6px;color:var(--text2);text-align:center;font-family:var(--font-mono);">+186bp</td><td style="padding:5px 6px;color:var(--text2);text-align:center;">USD+</td></tr>
@@ -575,7 +575,7 @@ a { color: inherit; text-decoration: none; }
       <h3 id="scoring-model" style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:28px 0 14px;scroll-margin-top:52px;">Stress Scoring Model</h3>
       <p>The REGIME badge is computed from a composite stress score. Each factor contributes a fixed number of points; the total determines the regime label. This is the same model used in the terminal's live regime calculation — no smoothing, no lag.</p>
       <table class="threshold-table" aria-label="Stress scoring factors and point values">
-        <thead><tr><th>Factor</th><th>Threshold</th><th style="text-align:center;">Points</th><th>Rationale</th></tr></thead>
+        <thead><tr><th scope="col">Factor</th><th scope="col">Threshold</th><th scope="col" style="text-align:center;">Points</th><th scope="col">Rationale</th></tr></thead>
         <tbody>
           <tr><td>VIX</td><td>&gt; 30</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+3</td><td>Crisis / acute stress — GFC, COVID, 2022 spike</td></tr>
           <tr><td>VIX</td><td>25 – 30</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+2</td><td>Elevated stress — tail risk visible</td></tr>
@@ -590,7 +590,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <table class="threshold-table" style="margin-top:10px;" aria-label="Regime score to label mapping">
-        <thead><tr><th>Total Score</th><th>Regime Label</th><th>Color</th></tr></thead>
+        <thead><tr><th scope="col">Total Score</th><th scope="col">Regime Label</th><th scope="col">Color</th></tr></thead>
         <tbody>
           <tr><td style="font-family:var(--font-mono);">0</td><td><strong style="color:var(--up);">RISK-ON</strong></td><td>Green — low stress, favorable for carry and momentum</td></tr>
           <tr><td style="font-family:var(--font-mono);">1</td><td><strong style="color:var(--text);">MIXED</strong></td><td>Neutral — conflicting signals, no strong bias</td></tr>
@@ -604,8 +604,8 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="vix">
       <h2>VIX — CBOE Volatility Index</h2>
       <p>VIX measures the 30-day implied volatility of S&amp;P 500 options. It is constructed from real option prices and represents the market's consensus expectation of near-term equity volatility. It is often called the "fear gauge."</p>
-      <table class="threshold-table">
-        <thead><tr><th>VIX Level</th><th>Regime</th><th>FX Implication</th></tr></thead>
+      <table aria-label="VIX level regimes and FX implications" class="threshold-table">
+        <thead><tr><th scope="col">VIX Level</th><th scope="col">Regime</th><th scope="col">FX Implication</th></tr></thead>
         <tbody>
           <tr><td class="t-low">&lt; 18</td><td>Low / Complacency</td><td>Risk-on dominant. Carry trades perform. JPY/CHF weak. AUD/NZD/EM supported.</td></tr>
           <tr><td class="t-mid">18 – 25</td><td>Moderate / Transitional</td><td>No strong directional bias from vol alone. Look at rate differentials for direction.</td></tr>
@@ -679,8 +679,8 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="flows">
       <h2>Asset Flow Logic — FX Implications</h2>
       <p>The following flows are structurally reliable across market cycles. Use them as a starting framework:</p>
-      <table class="threshold-table">
-        <thead><tr><th>If you see…</th><th>Expect pressure on…</th><th>Expect bid in…</th></tr></thead>
+      <table aria-label="Asset flow logic and FX implications" class="threshold-table">
+        <thead><tr><th scope="col">If you see…</th><th scope="col">Expect pressure on…</th><th scope="col">Expect bid in…</th></tr></thead>
         <tbody>
           <tr><td>VIX spike &gt; 25</td><td>AUD, NZD, CAD, EM</td><td>JPY, CHF, USD</td></tr>
           <tr><td>Equities rallying broadly</td><td>JPY, CHF</td><td>AUD, NZD, CAD, EUR</td></tr>
@@ -717,13 +717,13 @@ a { color: inherit; text-decoration: none; }
           <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Historical VaR 95% · 1-day · 252d window</span>
           <span style="font-size:8px;color:var(--text3);">* = 60d VaR &gt;125% of 252d baseline</span>
         </div>
-        <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);">
+        <table aria-label="Historical VaR 95% by instrument" style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);">
           <thead><tr style="color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:.05em;">
-            <th style="text-align:left;padding:4px 8px;">Instrument</th>
-            <th style="padding:4px 6px;text-align:right;">VaR 95%</th>
-            <th style="padding:4px 6px;text-align:right;">CVaR 95%</th>
-            <th style="padding:4px 6px;text-align:right;">ES/VaR</th>
-            <th style="padding:4px 6px;text-align:right;">n</th>
+            <th scope="col" style="text-align:left;padding:4px 8px;">Instrument</th>
+            <th scope="col" style="padding:4px 6px;text-align:right;">VaR 95%</th>
+            <th scope="col" style="padding:4px 6px;text-align:right;">CVaR 95%</th>
+            <th scope="col" style="padding:4px 6px;text-align:right;">ES/VaR</th>
+            <th scope="col" style="padding:4px 6px;text-align:right;">n</th>
           </tr></thead>
           <tbody>
             <tr style="border-top:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">EUR/USD</td><td style="text-align:right;padding:4px 6px;color:var(--up);">0.700%</td><td style="text-align:right;padding:4px 6px;color:var(--text2);">0.947%</td><td style="text-align:right;padding:4px 6px;color:var(--up);">1.35x</td><td style="text-align:right;padding:4px 6px;color:var(--text3);">252</td></tr>
@@ -753,8 +753,8 @@ a { color: inherit; text-decoration: none; }
 
       <h3>2022 — Rates shock: simultaneous equity and bond selloff</h3>
       <p>The Fed's fastest hiking cycle since the 1980s produced a regime that broke the standard equity/bond correlation. Bonds and equities fell together — the traditional 60/40 diversification mechanism failed. Cross-asset implications were severe and unusual.</p>
-      <table class="threshold-table">
-        <thead><tr><th>Indicator</th><th>Observed behavior</th><th>FX implication</th></tr></thead>
+      <table aria-label="2022 rates shock case study — observed behavior and FX implication" class="threshold-table">
+        <thead><tr><th scope="col">Indicator</th><th scope="col">Observed behavior</th><th scope="col">FX implication</th></tr></thead>
         <tbody>
           <tr><td>VIX</td><td>Ranged 20–36, repeatedly spiked but did not sustain crisis levels</td><td>Intermittent JPY/CHF bids, no sustained safe-haven flow</td></tr>
           <tr><td>MOVE Index</td><td>Sustained above 130; peaked near 160 in Oct 2022</td><td>USD dominant — policy uncertainty drove USD liquidity premium across all pairs</td></tr>
@@ -769,8 +769,8 @@ a { color: inherit; text-decoration: none; }
 
       <h3>2023 Q1 — Regional banking stress: MOVE spike, VIX lagged</h3>
       <p>The failure of Silicon Valley Bank and Signature Bank in March 2023 generated acute stress in US regional bank credit — but equity markets recovered quickly. MOVE spiked to 180 (its highest since the 2008–09 crisis) while VIX peaked near 26 and retreated. This divergence had specific FX consequences.</p>
-      <table class="threshold-table">
-        <thead><tr><th>Indicator</th><th>Observed behavior</th><th>FX implication</th></tr></thead>
+      <table aria-label="2023 Q1 regional banking stress case study — observed behavior and FX implication" class="threshold-table">
+        <thead><tr><th scope="col">Indicator</th><th scope="col">Observed behavior</th><th scope="col">FX implication</th></tr></thead>
         <tbody>
           <tr><td>MOVE Index</td><td>Spiked to 180 in March 2023 — highest since GFC</td><td>USD initially weakened as rate cut expectations surged; the market priced Fed pivoting within months</td></tr>
           <tr><td>VIX</td><td>Peaked near 26, then retreated below 20 by April</td><td>Equity market did not treat this as a systemic crisis — carry trades recovered quickly</td></tr>
@@ -784,8 +784,8 @@ a { color: inherit; text-decoration: none; }
 
       <h3>2024 August — JPY carry unwind: VIX spike, Nikkei collapse</h3>
       <p>In early August 2024, the Bank of Japan raised rates and signaled further tightening. The JPY carry trade — where investors borrow in JPY at near-zero rates to fund positions in higher-yielding assets — unwound at speed. The episode is the canonical example of how a single CB policy shift can trigger cross-asset deleveraging.</p>
-      <table class="threshold-table">
-        <thead><tr><th>Indicator</th><th>Observed behavior</th><th>FX implication</th></tr></thead>
+      <table aria-label="2024 August JPY carry unwind case study — observed behavior and FX implication" class="threshold-table">
+        <thead><tr><th scope="col">Indicator</th><th scope="col">Observed behavior</th><th scope="col">FX implication</th></tr></thead>
         <tbody>
           <tr><td>VIX</td><td>Spiked from 16 to 65 intraday on 5 August — fastest spike in the index's history</td><td>Extreme risk-off; all carry trades unwound simultaneously</td></tr>
           <tr><td>Nikkei 225</td><td>Fell 12.4% on 5 August — largest single-day drop since 1987</td><td>USD/JPY fell from 158 to 142 within days; JPY strengthened across all crosses</td></tr>
@@ -800,8 +800,8 @@ a { color: inherit; text-decoration: none; }
 
       <h3>2025 Q1 — Tariff shock: gold/USD positive correlation</h3>
       <p>The announcement of broad US import tariffs in early 2025 produced a cross-asset configuration that was initially misread by markets: the USD weakened while gold rallied, and US equities fell while European equities outperformed. This violated several standard risk-off assumptions.</p>
-      <table class="threshold-table">
-        <thead><tr><th>Indicator</th><th>Observed behavior</th><th>FX implication</th></tr></thead>
+      <table aria-label="2025 Q1 tariff shock case study — observed behavior and FX implication" class="threshold-table">
+        <thead><tr><th scope="col">Indicator</th><th scope="col">Observed behavior</th><th scope="col">FX implication</th></tr></thead>
         <tbody>
           <tr><td>Gold vs DXY 60d corr.</td><td>Turned sharply positive — gold and USD moving in the same direction was rare</td><td>USD funding stress signal; markets questioned USD reserve status in the medium term</td></tr>
           <tr><td>DXY vs SPX 60d corr.</td><td>Also turned positive — USD weakened alongside equities</td><td>Unusual: typically USD strengthens in risk-off. Suggested US-specific risk premium</td></tr>
@@ -822,8 +822,8 @@ a { color: inherit; text-decoration: none; }
 
       <h3>The Asia session leading indicator</h3>
       <p>The most operationally relevant BTC/FX relationship occurs between approximately 18:00 and 02:00 UTC — the period when US and European equity markets are closed but Asia equity markets are either approaching open (Tokyo: 00:00 UTC) or in early session. During this window, BTC/USD is one of the only continuously traded, institutionally relevant risk assets available.</p>
-      <table class="threshold-table">
-        <thead><tr><th>BTC behavior</th><th>Asia session implication</th><th>FX pairs to watch</th></tr></thead>
+      <table aria-label="BTC Asia session leading indicator" class="threshold-table">
+        <thead><tr><th scope="col">BTC behavior</th><th scope="col">Asia session implication</th><th scope="col">FX pairs to watch</th></tr></thead>
         <tbody>
           <tr><td>BTC falls &gt;3% in Asia pre-session (18:00–00:00 UTC)</td><td>Risk-off impulse likely to carry into Nikkei open; USD/JPY may weaken as Tokyo opens</td><td>USD/JPY, AUD/JPY, AUD/USD</td></tr>
           <tr><td>BTC rallies &gt;3% with Nikkei futures bid</td><td>Risk-on Asia session; carry trades supported through London open</td><td>AUD/USD, NZD/USD, AUD/JPY</td></tr>

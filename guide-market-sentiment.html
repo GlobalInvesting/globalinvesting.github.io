@@ -409,8 +409,8 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="myfxbook">
       <h2>Myfxbook Data</h2>
       <p>Myfxbook is a third-party platform where retail forex traders voluntarily connect their live broker accounts for automated trade tracking and performance analysis. The "Community Outlook" feature aggregates the open positions of all connected accounts by pair and direction.</p>
-      <table class="contra-table">
-        <thead><tr><th>Property</th><th>Detail</th></tr></thead>
+      <table aria-label="Myfxbook data properties" class="contra-table">
+        <thead><tr><th scope="col">Property</th><th scope="col">Detail</th></tr></thead>
         <tbody>
           <tr><td>What it measures</td><td>The current open position balance of Myfxbook-connected accounts — not recent trade flow, not closed trades.</td></tr>
           <tr><td>Update frequency</td><td>Every hour. The timestamp shown in the panel footer reflects the age of the data.</td></tr>
@@ -492,8 +492,8 @@ a { color: inherit; text-decoration: none; }
       <h2>Open Positions Count</h2>
       <p>Below the pair symbol, the panel shows the total number of open positions tracked by Myfxbook for that pair. This number is the primary sort key — pairs with the most positions appear at the top.</p>
       <p>Why does this matter? A sentiment reading of 80% short on AUD/NZD with 300 open positions is statistically weak. The same reading on EUR/USD with 54,000 positions carries real weight — it represents a massive, coordinated crowd exposure that market makers and institutional players will react to.</p>
-      <table class="contra-table">
-        <thead><tr><th>Position count</th><th>Statistical weight</th><th>How to treat it</th></tr></thead>
+      <table aria-label="Open positions count and statistical weight" class="contra-table">
+        <thead><tr><th scope="col">Position count</th><th scope="col">Statistical weight</th><th scope="col">How to treat it</th></tr></thead>
         <tbody>
           <tr><td>&gt; 20,000</td><td style="color:var(--up);">High</td><td>Strong signal — enough accounts to be actionable. Major pairs only.</td></tr>
           <tr><td>5,000–20,000</td><td style="color:var(--orange);">Medium</td><td>Useful directional context. Confirm with price action.</td></tr>
@@ -539,8 +539,8 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="general-stats">
       <h2>Community Stats Footer</h2>
       <p>At the bottom of the panel, a compact footer shows aggregate statistics for the entire Myfxbook community sample. These numbers provide context for interpreting the pair-level data.</p>
-      <table class="contra-table">
-        <thead><tr><th>Metric</th><th>What it tells you</th></tr></thead>
+      <table aria-label="Community stats footer metrics" class="contra-table">
+        <thead><tr><th scope="col">Metric</th><th scope="col">What it tells you</th></tr></thead>
         <tbody>
           <tr><td>Profitable %</td><td>Percentage of accounts with a positive balance right now. Above 60% is typical in trending markets. A sharp drop signals broad retail drawdown — potential capitulation signal.</td></tr>
           <tr><td>Real accts %</td><td>Share of accounts that are live (real money) vs. demo. Higher real-account percentage makes the sentiment data more behaviorally meaningful — real money creates different psychological anchors than demo.</td></tr>
@@ -554,8 +554,8 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="contrarian">
       <h2>Contrarian Logic</h2>
       <p>Retail sentiment is most useful as a <strong>contrarian indicator</strong>. The logic: retail traders as a group tend to be wrong at extremes because they enter trends late, hold losers too long, and close winners too early. When the crowd is overwhelmingly positioned one way, the easy money in that direction has typically already been made.</p>
-      <table class="contra-table">
-        <thead><tr><th>Sentiment reading</th><th>Contrarian interpretation</th><th>Strength</th></tr></thead>
+      <table aria-label="Contrarian sentiment logic" class="contra-table">
+        <thead><tr><th scope="col">Sentiment reading</th><th scope="col">Contrarian interpretation</th><th scope="col">Strength</th></tr></thead>
         <tbody>
           <tr><td>70–80% Long</td><td>Moderate contrarian short bias. Crowd is bullish but not at extreme. Watch for trend exhaustion signals.</td><td style="color:var(--orange);">Medium</td></tr>
           <tr><td>&gt; 80% Long</td><td>Strong contrarian short signal. Historically precedes meaningful reversals, especially combined with trapped status.</td><td style="color:var(--down);">High</td></tr>
