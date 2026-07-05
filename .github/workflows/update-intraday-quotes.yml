@@ -1,79 +1,79 @@
 name: Update Intraday Quotes — v1.6 (Twelve Data + Alpha Vantage)
 
-# ESTRATEGIA DE TRIGGER — v1.5
+# TRIGGER STRATEGY — v1.5
 #
-# El cron nativo de GitHub Actions (schedule) NO es confiable para intervalos cortos:
-# en la práctica salta ejecuciones bajo carga del sistema de GitHub.
+# GitHub Actions' native cron (schedule) is NOT reliable for short intervals:
+# in practice it skips runs under GitHub system load.
 #
-# Solución: cron-job.org (gratuito) actúa como reloj externo y dispara este workflow
-# exactamente cada 5 minutos vía HTTP POST al endpoint de repository_dispatch.
+# Solution: cron-job.org (free) acts as an external clock and dispatches this
+# workflow exactly every 5 minutes via HTTP POST to the repository_dispatch endpoint.
 #
-# FLUJO:
-#   cron-job.org (cada 5 min)
+# FLOW:
+#   cron-job.org (every 5 min)
 #     → POST https://api.github.com/repos/<owner>/<repo>/dispatches
 #     → event_type: "trigger-intraday-quotes"
-#     → Este workflow se ejecuta ✅
+#     → This workflow runs ✅
 #
-# El schedule de GitHub se mantiene como RED DE SEGURIDAD (fallback),
-# pero corriendo solo cada 5 min — así si cron-job.org falla, el gap máximo es 5 min.
+# GitHub's schedule is kept as a SAFETY NET (fallback),
+# but running only every 5 min — so if cron-job.org fails, the max gap is 5 min.
 #
-# ✅ Duración promedio del job: ~30 seg → sin riesgo de solapamiento a 5 min de intervalo.
+# ✅ Average job duration: ~30 sec → no overlap risk at a 5-min interval.
 #
-# SETUP REQUERIDO (una sola vez):
-#   1. Crear un Personal Access Token (PAT) en GitHub:
+# ONE-TIME SETUP REQUIRED:
+#   1. Create a Personal Access Token (PAT) on GitHub:
 #      → GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
-#      → Permissions: "Actions" = Read and Write  (o "workflows" + "contents")
-#      → Guardar el token como secret CRONJOB_PAT en este repo
+#      → Permissions: "Actions" = Read and Write  (or "workflows" + "contents")
+#      → Save the token as secret CRONJOB_PAT in this repo
 #
-#   2. Crear un job en https://cron-job.org con:
+#   2. Create a job at https://cron-job.org with:
 #      → URL:    https://api.github.com/repos/<OWNER>/<REPO>/dispatches
 #      → Method: POST
 #      → Headers:
-#            Authorization: Bearer <tu-PAT>
+#            Authorization: Bearer <your-PAT>
 #            Accept: application/vnd.github+json
 #            Content-Type: application/json
 #            X-GitHub-Api-Version: 2022-11-28
 #      → Body:   {"event_type":"trigger-intraday-quotes"}
-#      → Schedule: cada 5 minutos
+#      → Schedule: every 5 minutes
 #
-# ✅ cron-job.org free tier: hasta 60 jobs, ejecuciones cada 1 min mínimo — más que suficiente.
-# ✅ yfinance sin límite formal. Twelve Data fallback: < 10 calls/día del free tier (800/día).
+# ✅ cron-job.org free tier: up to 60 jobs, runs every 1 min minimum — more than enough.
+# ✅ yfinance has no formal rate limit. Twelve Data fallback: < 10 calls/day of the free tier (800/day).
 #
-# API usage estimate (24/7 a 5 min):
-#   288 runs/día × 1 batch yfinance call = 288 calls yfinance (sin límite formal) ✅
-#   Twelve Data: solo fallback gold → estimado < 10 calls/día ✅
+# API usage estimate (24/7 at 5 min):
+#   288 runs/day × 1 batch yfinance call = 288 yfinance calls (no formal limit) ✅
+#   Twelve Data: gold fallback only → estimated < 10 calls/day ✅
 #
-# Script fetch_intraday_quotes.py vive en el repo privado globalinvesting-scripts
-# (checkout explícito vía SCRIPTS_PAT) para proteger la lógica propietaria del fetcher
-# y las claves de API (Twelve Data, Alpha Vantage). Los minutos de Actions se consumen
-# en este repo público → ilimitados y sin costo.
+# fetch_intraday_quotes.py lives in the private globalinvesting-scripts repo
+# (explicit checkout via SCRIPTS_PAT) to protect the fetcher's proprietary logic
+# and API keys (Twelve Data, Alpha Vantage). Actions minutes are consumed
+# in this public repo → unlimited and at no cost.
 
 on:
   repository_dispatch:
-    types: [trigger-intraday-quotes]   # ← disparado por cron-job.org cada 5 min exactos
+    types: [trigger-intraday-quotes]   # ← dispatched by cron-job.org every 5 min exactly
 
-  # schedule: RED DE SEGURIDAD (v7.58.6) — solo actúa cuando cron-job.org está caído.
+  # schedule: SAFETY NET (v7.58.6) — only kicks in when cron-job.org is down.
   #
-  # Historial:
-  #   v7.14.4: schedule eliminado porque el cron de GitHub colisionaba con cron-job.org
-  #            → dos runs simultáneos → git rebase fallaba → email de fallo repetido.
-  #   v7.14.5: exit 1 del push reemplazado por exit 0. Runs simultáneos ya no causan fallos.
-  #   v7.58.6: schedule restaurado como fallback. El push-loop + concurrency:
-  #            cancel-in-progress:false ya serializa runs simultáneos sin errores.
-  #            Si cron-job.org cae (PAT expirado, cuenta suspendida, etc.), quotes.json
-  #            se congela indefinidamente — el dashboard muestra datos viejos para siempre.
-  #            El schedule de GitHub cubre ese gap: máximo ~15 min de datos viejos
-  #            en vez de horas o días. No envía emails de fallo (exit 0 en push-loop).
+  # History:
+  #   v7.14.4: schedule removed because GitHub's cron collided with cron-job.org
+  #            → two simultaneous runs → git rebase failed → repeated failure emails.
+  #   v7.14.5: exit 1 on push replaced with exit 0. Simultaneous runs no longer cause failures.
+  #   v7.58.6: schedule restored as fallback. The push-loop + concurrency:
+  #            cancel-in-progress:false already serializes simultaneous runs without errors.
+  #            If cron-job.org goes down (expired PAT, suspended account, etc.), quotes.json
+  #            freezes indefinitely — the dashboard shows stale data forever.
+  #            GitHub's schedule covers that gap: at most ~15 min of stale data
+  #            instead of hours or days. Doesn't send failure emails (exit 0 in the push-loop).
   #
-  # Frecuencia: */5 es el mínimo permitido por GitHub. En la práctica corre cada 5–15 min
-  # bajo carga, lo cual es aceptable como fallback (no como reloj primario).
-  # Fuera de horario FX (sábado 21:00 UTC – domingo 21:00 UTC) las ejecuciones corren
-  # pero fetch_intraday_quotes.py escribe datos de fin de semana sin cambios reales —
-  # el push-loop detecta "No changes vs remote HEAD" y hace exit 0 sin commit.
+  # Frequency: */5 is the minimum GitHub allows. In practice it runs every 5–15 min
+  # under load, which is acceptable as a fallback (not as the primary clock).
+  # Outside FX trading hours (Saturday 21:00 UTC – Sunday 21:00 UTC) runs still fire,
+  # but fetch_intraday_quotes.py writes weekend data with no real changes —
+  # the push-loop detects "No changes vs remote HEAD" and exits 0 without a commit.
   schedule:
-    - cron: '*/5 * * * *'             # fallback: corre cada 5 min si cron-job.org cae
+    - cron: '*/5 * * * *'             # fallback: runs every 5 min if cron-job.org goes down
 
-  workflow_dispatch:                   # trigger manual desde GitHub UI
+  workflow_dispatch:                   # manual trigger from the GitHub UI
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
