@@ -553,8 +553,11 @@ test('too short (n=1) → null', () => {
 });
 
 test('result is bounded [-1, 1]', () => {
-  const xs = Array.from({ length: 60 }, (_, i) => Math.sin(i * 0.3) + Math.random() * 0.1);
-  const ys = Array.from({ length: 60 }, (_, i) => Math.cos(i * 0.3) + Math.random() * 0.1);
+  // Deterministic pseudo-noise (not Math.random()) — GUIDELINES requires tests
+  // to be deterministic. A second sine at an unrelated frequency/phase perturbs
+  // the series without an exact correlation, same purpose as noise would serve.
+  const xs = Array.from({ length: 60 }, (_, i) => Math.sin(i * 0.3) + Math.sin(i * 7.1) * 0.1);
+  const ys = Array.from({ length: 60 }, (_, i) => Math.cos(i * 0.3) + Math.sin(i * 5.3) * 0.1);
   const r = pearson(xs, ys);
   expect(r).toBeGreaterThan(-1.0001);
   expect(r).toBeLessThan(1.0001);
