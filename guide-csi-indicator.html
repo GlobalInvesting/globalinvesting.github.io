@@ -154,6 +154,14 @@ a { color: inherit; text-decoration: none; }
 .callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
 .callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
 
+/* ── Screenshot ── */
+.scr-hero-wrap { margin: 18px 0 24px; }
+.scr-hero { cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
+.scr-hero:hover { border-color: var(--border2); }
+.scr-hero img { width: 100%; height: auto; display: block; }
+.scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-top: 10px; padding: 0 2px; }
+.scr-meta strong { color: var(--text2); font-weight: 600; font-family: var(--font-ui); font-size: 11px; }
+
 /* ── COT demo table ── */
 .cot-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 18px 0; }
 .cot-header { display: grid; grid-template-columns: 40px 1fr 48px 90px; gap: 8px; padding: 8px 14px; background: var(--head-bg); font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border2); }
@@ -235,7 +243,16 @@ a { color: inherit; text-decoration: none; }
   "@type": "Article",
   "headline": "Currency Strength Indicator for MetaTrader 5: CSI Methodology & Setup Guide",
   "description": "How the Currency Strength Index (CSI) is calculated, how to read it in the web terminal's Currency Strength Heatmap, and how to install the standalone CSI Currency Strength indicator on a MetaTrader 5 chart.",
-  "image": "https://globalinvesting.github.io/og-image.png",
+  "image": [
+    "https://globalinvesting.github.io/og-image.png",
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-csi.png",
+      "width": 1145,
+      "height": 556,
+      "caption": "CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5"
+    }
+  ],
   "datePublished": "2026-07-05T00:00:00Z",
   "dateModified": "2026-07-05T00:00:00Z",
   "author": {
@@ -445,6 +462,12 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="mt5-indicator">
       <h2>CSI on MetaTrader 5</h2>
       <p>For traders who want the same read without switching to a browser, <strong>CSI Currency Strength</strong> is available separately as a native MetaTrader 5 indicator (MQL5 Market product #180317). It renders currency strength directly as a panel overlay on the chart, using a z-score model with configurable lookback periods, covering 28 pairs across eight currencies, each color-coded for quick scanning.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero">
+          <img src="assets/screenshot-csi.png" alt="CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD" width="960" height="466" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The CSI Currency Strength panel overlay.</strong> Each of the eight currencies gets an index score and a color-coded strength bar, ranked strongest to weakest, alongside a directional read on the active chart's pair.</p>
+      </div>
       <div class="callout callout-orange">
         <strong>Two related but separate products.</strong> The web terminal's CSI tab (32 pairs, all 10 G10 currencies, part of the terminal subscription) and the standalone MQL5 indicator (28 pairs, eight currencies, sold separately) use the same underlying strength concept but are independent products with their own pair coverage — check each page for the exact scope before assuming parity between them.
       </div>
