@@ -1,68 +1,64 @@
 {
-  "generated_at": "2026-07-04T20:59:57Z",
+  "generated_at": "2026-07-05T21:02:20Z",
   "signals": [
     {
-      "time": "19:39",
+      "time": "21:01",
       "priority": "critical",
-      "title": "GBP/USD — G10 Bilateral Theme + Fed Hike Doubts",
-      "text": "GBP/USD upside momentum is driven by a 1.477% G10 performance spread as weak US Nonfarm Payrolls data forces a repricing of the Fed's terminal rate. The pair closed Friday at 1.3350, supported by a positive Economic Surprise Index (net +23) and a neutral carry profile (0bp OIS spread) that removes the traditional USD advantage. The next BoE meeting (mkt: 100% hold priced) on 30 Jul is the catalyst for determining if the current 0.78% real rate remains sufficiently restrictive to sustain the bid.",
+      "title": "NZD/USD — G10 Bilateral Theme + RBNZ Hike Bias",
+      "text": "NZD/USD at 0.5715 leads G10 performance as the RBNZ is set to hike rates to 2.50% on July 8. Despite a -150bp nominal carry deficit vs the Fed (3.75%), NZD is the week's top performer while the USD lags following disappointing NFP data. COT LF net short -23,314 (21.6% long) creates a high-conviction short-squeeze regime if the RBNZ delivers the hike, as specs are positioned against the hawkish CB bias. NZD real rate at -0.83% remains accommodative, supporting the case for further tightening.",
       "evidence": [
-        "GBP 1W avg: +0.759% (n=4)",
-        "USD 1W avg: -0.718% (n=7)",
-        "G10 spread: 1.477%",
-        "GBP/USD Friday Close: 1.3350"
+        "NZD 1W avg: +0.776% (n=4)",
+        "USD 1W avg: -0.716% (n=7)",
+        "G10 spread: 1.492%",
+        "NZD COT LF net: -23,314"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:01",
+      "time": "20:58",
       "priority": "warning",
-      "title": "USD/JPY — Carry Advantage vs Squeeze Risk",
-      "text": "JPY COT LF net short -115.0k (28.4% long) creates significant short-squeeze risk as USD/JPY faces downside pressure from disappointing US data. While the +268bp OIS carry advantage favors USD, the strong options put skew (RR -1.67) indicates heavy hedging demand for a move below the 161.34 Friday close. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul serves as the catalyst for a shift in the -0.52% real rate accommodative stance.",
+      "title": "USD/JPY — Intervention Risk + Options Skew",
+      "text": "USD/JPY at 161.27 holds above the critical 160.00 psychological level, increasing the risk of BoJ/MoF intervention. While the +275bp Fed-BoJ carry sustains the bid, the options market is aggressively hedging downside protection with a 25d RR of -1.67 (strong put skew). COT LF net short -115,033 (28.4% long) shows a crowded carry trade vulnerable to a rapid unwind if intervention occurs or if VIX (15.8) spikes above 25.",
       "evidence": [
-        "JPY COT net short -115,033",
-        "USD/JPY OIS carry: +268bp",
-        "USD/JPY 25d RR: -1.67",
-        "USD/JPY Friday Close: 161.34"
+        "USD/JPY: 161.27",
+        "25d RR (Saxo): -1.67",
+        "JPY COT LF net: -115,033"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "17:24",
+      "time": "20:56",
       "priority": "warning",
-      "title": "NZD/USD — RBNZ Hike Bias vs Crowded Retail Long",
-      "text": "NZD/USD upside is supported by an active RBNZ hike bias and a +0.706% G10 weekly outperformance, yet faces headwinds from a 74% retail long concentration. The pair closed at 0.5712 Friday, but the -0.83% real rate remains the most accommodative in the G10, suggesting the rally relies on policy divergence rather than fundamental value. The RBNZ meeting on 8 Jul is the catalyst to validate the hike pricing and clear the retail overhang.",
+      "title": "USD/CAD — Retail Divergence + Correlation Break",
+      "text": "USD/CAD at 1.4198 exhibits a severe divergence between retail sentiment (93% short) and institutional positioning (COT LF net short -87,096). The pair is decoupling from its traditional energy link with a USD/CAD vs WTI correlation of -0.875 (z = -2.06σ), suggesting the 150bp USD carry advantage and disappointing Canadian data (CESI net -6) are dominating oil price action. Retail capitulation risk is elevated if the pair extends toward 1.43.",
       "evidence": [
-        "NZD 1W avg: +0.706% (n=4)",
-        "Retail Sentiment: 74% Long",
-        "RBNZ Market Bias: Hike",
-        "NZD/USD Friday Close: 0.5712"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "14:58",
-      "priority": "info",
-      "title": "USD/CAD — Retail Extreme vs COT Alignment",
-      "text": "USD/CAD retail positioning is at an extreme 93% short, creating a contrarian risk for further upside despite the pair's 1.4198 Friday close. This retail bias conflicts with the CAD COT net short of -87.0k, which aligns with a negative Economic Surprise Index (net -6) and a +136bp OIS carry advantage for the USD. The BoC meeting on 15 Jul is the catalyst to resolve this positioning conflict through updated growth guidance.",
-      "evidence": [
-        "CAD COT net short -87,096",
         "Retail Sentiment: 93% Short",
-        "USD/CAD OIS carry: +136bp",
-        "USD/CAD Friday Close: 1.4198"
+        "COT LF net: -87,096",
+        "USD/CAD vs WTI corr: -0.875 (z=-2.06σ)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "11:10",
+      "time": "20:52",
       "priority": "info",
-      "title": "AUD/USD — Crowded Long Unwind Risk",
-      "text": "AUD COT LF net long +29.0k (64.9% long) creates an unwind risk if the 0.6943 Friday close fails to hold amid broader USD volatility. While the +69bp OIS carry advantage and a positive Economic Surprise Index (+8) support the AUD, the moderate options put skew (RR -0.78) suggests markets are pricing protection against a reversal. The next RBA meeting (mkt: 100% hold priced) on 11 Aug determines if the 4.35% hold remains sufficient to protect the long positioning.",
+      "title": "AUD/USD — Volatility Risk Premium Extreme",
+      "text": "AUD/USD at 0.6939 shows an extreme Volatility Risk Premium (VRP) of +19.6%, with IV at 26.5% vs HV30 of 6.9%. This indicates the options market is pricing in significant tail-risk protection relative to recent realized movement. Despite the 69bp AONIA-SOFR carry advantage supporting AUD, the 25d RR of -0.78 (put skew) suggests traders are paying up for downside hedges ahead of the August RBA meeting.",
       "evidence": [
-        "AUD COT net long +29,035",
-        "AUD/USD OIS carry: +69bp",
-        "AUD/USD 25d RR: -0.78",
-        "AUD/USD Friday Close: 0.6943"
+        "AUD/USD VRP: +19.6%",
+        "AUD/USD IV: 26.5%",
+        "25d RR: -0.78"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "20:48",
+      "priority": "info",
+      "title": "GBP/USD — Data Outperformance + Carry Neutrality",
+      "text": "GBP/USD at 1.3351 is supported by a positive CESI (net +23), reflecting sustained UK data beats against a weakening US data backdrop (USD CESI +282 but slowing). With the Fed-BoE carry spread at 0bp, the pair is driven by growth differentials and real rates (GBP +0.78% vs USD +1.49%). Retail is 72% short, providing a contrarian tailwind for a test of 1.3500 if FOMC minutes confirm a dovish shift.",
+      "evidence": [
+        "GBP CESI net: +23",
+        "Fed 3.75% vs BoE 3.75%: 0bp",
+        "Retail Sentiment: 72% Short"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
