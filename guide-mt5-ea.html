@@ -124,6 +124,14 @@ a { color: inherit; text-decoration: none; }
 .guide-section h3 { font-size: 13.2px; font-weight: 700; color: var(--text); margin: 20px 0 8px; text-transform: uppercase; letter-spacing: .06em; }
 .guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 15.4px; line-height: 1.8; }
 .guide-section p:last-child { margin-bottom: 0; }
+.scr-hero-wrap { margin: 18px 0 24px; }
+.scr-hero { cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
+.scr-hero:hover { border-color: var(--border2); }
+.scr-hero img { width: 100%; height: auto; display: block; }
+.scr-hero-contain { width: fit-content; max-width: 100%; margin: 0 auto; }
+.scr-hero-contain img { width: auto; max-width: 100%; height: auto; display: block; margin: 0; }
+.guide-section p.scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-top: 10px; padding: 0 2px; }
+.scr-meta strong { color: var(--text2); font-weight: 600; }
 .guide-section ul { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
 
@@ -234,7 +242,7 @@ a { color: inherit; text-decoration: none; }
 
 </style>
 <meta property="article:published_time" content="2026-06-20T00:00:00Z">
-<meta property="article:modified_time" content="2026-06-20T00:00:00Z">
+<meta property="article:modified_time" content="2026-07-05T00:00:00Z">
 <meta property="article:section" content="Guides">
 <script type="application/ld+json">
 {
@@ -242,9 +250,25 @@ a { color: inherit; text-decoration: none; }
   "@type": "Article",
   "headline": "MetaTrader 5 Expert Advisor for FX Analytics: Setup & Feature Guide",
   "description": "How to install and configure the Global Investing FX Terminal MT5 Expert Advisor: licensing and activation, panel-by-panel overview, MT5 alert setup, and how the EA relates to the companion web terminal.",
-  "image": "https://globalinvesting.github.io/og-image.png",
+  "image": [
+    "https://globalinvesting.github.io/og-image.png",
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-cot.png",
+      "width": 393,
+      "height": 195,
+      "caption": "CFTC COT — Leveraged Funds panel rendered natively inside the MT5 Expert Advisor canvas, showing net percent positioning by currency"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-cb-rates.png",
+      "width": 501,
+      "height": 214,
+      "caption": "CB Rates & Bias panel rendered natively inside the MT5 Expert Advisor canvas, showing rate, trend, OIS-implied bias, and next meeting date per currency"
+    }
+  ],
   "datePublished": "2026-06-20T00:00:00Z",
-  "dateModified": "2026-06-20T00:00:00Z",
+  "dateModified": "2026-07-05T00:00:00Z",
   "author": {
     "@type": "Person",
     "name": "Santiago Plá Casuriaga",
@@ -499,11 +523,23 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="cot-panel">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">CFTC COT Positioning</h3>
       <p>Weekly net positioning from the CFTC's Traders in Financial Futures report, for the Leveraged Funds category — the institutional speculative accounts most often used as a directional proxy in FX. Net positioning is normalized to a 52-week rolling z-score so readings are comparable across currencies despite differing futures contract sizes, alongside the week-over-week change in net positioning to distinguish a currency at an extreme that is still building from one that is already unwinding.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-cot.png" alt="CFTC COT — Leveraged Funds panel rendered natively inside the MT5 Expert Advisor canvas, showing net percent positioning by currency with week-over-week change" width="393" height="195" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The COT panel, rendered inside MT5.</strong> Native canvas overlay — no browser tab — showing net leveraged-fund positioning by currency with the weekly change alongside it.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="cb-panel">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">CB Bias &amp; Rate Expectations</h3>
       <p>Two distinct signals per central bank: a retrospective trend (the direction of the most recent policy decision) and a prospective bias (what OIS-equivalent market pricing currently expects at the next meeting). These two signals are deliberately allowed to diverge — a rate held flat for months with a market-implied cut priced for the next meeting is a normal, intentional reading, not a contradiction the panel tries to resolve.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-cb-rates.png" alt="CB Rates & Bias panel rendered natively inside the MT5 Expert Advisor canvas, showing rate, retrospective trend, OIS-implied probability, and next meeting date per currency" width="501" height="214" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>CB Rates &amp; Bias, rendered inside MT5.</strong> Native canvas overlay showing the current rate, retrospective trend, OIS-implied hike/cut probability, and the next scheduled meeting date per currency.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="carry-panel">
