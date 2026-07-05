@@ -278,7 +278,15 @@ a { color: inherit; text-decoration: none; }
   "offers": {
     "@type": "Offer",
     "url": "https://www.mql5.com/en/market/product/180326",
+    "price": "30",
     "priceCurrency": "USD",
+    "priceSpecification": {
+      "@type": "UnitPriceSpecification",
+      "price": "30",
+      "priceCurrency": "USD",
+      "unitText": "MONTH",
+      "billingIncrement": 1
+    },
     "availability": "https://schema.org/InStock",
     "seller": {
       "@type": "Organization",
@@ -369,6 +377,7 @@ a { color: inherit; text-decoration: none; }
         <a href="guide-cot.html">COT / CFTC Positioning</a>
         <a href="guide-economic-surprises.html">Economic Surprise Index</a>
         <a href="guide-mt5-ea.html">MetaTrader 5 EA Guide</a>
+        <a href="guide-csi-indicator.html">Currency Strength Index (CSI)</a>
         <div class="site-menu-divider"></div>
         <span class="site-menu-section">Market Research</span>
         <a href="guide-gbpjpy-cot.html">GBP/JPY Bias Factors</a>
@@ -620,6 +629,7 @@ a { color: inherit; text-decoration: none; }
         <div class="companion-name">CSI Currency Strength</div>
         <div class="companion-desc">Multi-timeframe currency strength index as a panel overlay. Z-score model across 28 pairs, configurable lookbacks, eight currencies color-coded.</div>
         <div class="companion-link">View on MQL5 &#8594;</div>
+        <div class="companion-link"><a href="guide-csi-indicator.html" onclick="event.stopPropagation()" style="color:var(--blue);">Read the guide &#8594;</a></div>
       </div>
       <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180322','_blank')">
         <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>

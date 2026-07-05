@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MetaTrader 5 Expert Advisor for FX Analytics: Setup &amp; Feature Guide — Global Investing</title>
-<meta name="description" content="Install and configure the Global Investing FX Terminal MT5 Expert Advisor — a native MetaTrader 5 forex dashboard with COT positioning, CB rate bias, carry ranking, economic calendar, and AI narrative. Step-by-step setup, panel overview, and MT5 alert configuration.">
+<title>Currency Strength Indicator for MetaTrader 5: CSI Methodology &amp; Setup Guide — Global Investing</title>
+<meta name="description" content="Currency Strength Index (CSI) for MetaTrader 5 and the web terminal — a multi-timeframe, z-score-based currency strength indicator across G10 pairs. Methodology, how to read it, and how to install the standalone MT5 indicator.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<link rel="canonical" href="https://globalinvesting.github.io/guide-mt5-ea.html">
+<link rel="canonical" href="https://globalinvesting.github.io/guide-csi-indicator.html">
 <meta name="google-adsense-account" content="ca-pub-7977942731354565">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://globalinvesting.github.io/guide-mt5-ea.html">
+<meta property="og:url" content="https://globalinvesting.github.io/guide-csi-indicator.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
-<meta property="og:title" content="MetaTrader 5 Expert Advisor for FX Analytics: Setup &amp; Feature Guide — Global Investing">
-<meta property="og:description" content="Install and configure the Global Investing FX Terminal MT5 Expert Advisor — a native MetaTrader 5 forex dashboard with COT positioning, CB rate bias, carry ranking, economic calendar, and AI narrative.">
+<meta property="og:title" content="Currency Strength Indicator for MetaTrader 5: CSI Methodology &amp; Setup Guide — Global Investing">
+<meta property="og:description" content="Currency Strength Index (CSI) for MetaTrader 5 and the web terminal — multi-timeframe, z-score-based currency strength across G10 pairs. Methodology and setup.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="MetaTrader 5 Expert Advisor for FX Analytics: Setup &amp; Feature Guide — Global Investing">
-<meta name="twitter:description" content="Native MT5 forex dashboard EA: COT positioning, CB rate bias, carry ranking, economic calendar, and AI narrative inside your MetaTrader 5 charts. Setup guide and panel overview.">
+<meta name="twitter:title" content="Currency Strength Indicator for MetaTrader 5: CSI Methodology &amp; Setup Guide — Global Investing">
+<meta name="twitter:description" content="Currency Strength Index (CSI) for MetaTrader 5 and the web terminal: multi-timeframe, z-score-based currency strength across G10 pairs.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -233,11 +233,11 @@ a { color: inherit; text-decoration: none; }
 {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "MetaTrader 5 Expert Advisor for FX Analytics: Setup & Feature Guide",
-  "description": "How to install and configure the Global Investing FX Terminal MT5 Expert Advisor: licensing and activation, panel-by-panel overview, MT5 alert setup, and how the EA relates to the companion web terminal.",
+  "headline": "Currency Strength Indicator for MetaTrader 5: CSI Methodology & Setup Guide",
+  "description": "How the Currency Strength Index (CSI) is calculated, how to read it in the web terminal's Currency Strength Heatmap, and how to install the standalone CSI Currency Strength indicator on a MetaTrader 5 chart.",
   "image": "https://globalinvesting.github.io/og-image.png",
-  "datePublished": "2026-06-20T00:00:00Z",
-  "dateModified": "2026-06-20T00:00:00Z",
+  "datePublished": "2026-07-05T00:00:00Z",
+  "dateModified": "2026-07-05T00:00:00Z",
   "author": {
     "@type": "Person",
     "name": "Santiago Plá Casuriaga",
@@ -257,9 +257,9 @@ a { color: inherit; text-decoration: none; }
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://globalinvesting.github.io/guide-mt5-ea.html"
+    "@id": "https://globalinvesting.github.io/guide-csi-indicator.html"
   },
-  "keywords": "metatrader 5 expert advisor, mt5 forex dashboard, mt5 ea forex analytics, mt5 cot indicator, mt5 economic calendar expert advisor, mt5 analytical tools"
+  "keywords": "currency strength indicator mt5, currency strength meter metatrader, mt5 currency strength index, csi indicator forex, currency strength heatmap, z-score currency strength"
 }
 </script>
 <script type="application/ld+json">
@@ -282,8 +282,8 @@ a { color: inherit; text-decoration: none; }
     {
       "@type": "ListItem",
       "position": 3,
-      "name": "MetaTrader 5 Expert Advisor",
-      "item": "https://globalinvesting.github.io/guide-mt5-ea.html"
+      "name": "Currency Strength Index (CSI)",
+      "item": "https://globalinvesting.github.io/guide-csi-indicator.html"
     }
   ]
 }
@@ -295,42 +295,42 @@ a { color: inherit; text-decoration: none; }
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "What does the Global Investing MT5 Expert Advisor do?",
+      "name": "What is the Currency Strength Index (CSI)?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "It is a MetaTrader 5 Expert Advisor that renders a multi-panel FX analytics dashboard as a native canvas overlay inside your MT5 chart window — covering CB rate bias, CFTC COT positioning, carry trade ranking, currency strength, an economic calendar, retail sentiment, correlation, volatility, and an AI-generated market narrative, without requiring a browser."
+        "text": "The CSI is a composite measure of how strong or weak each G10 currency is relative to all the others at once, computed from the cumulative log-return of every pair a currency appears in, rather than looking at a single pair in isolation."
       }
     },
     {
       "@type": "Question",
-      "name": "Is this MT5 EA an automated trading robot?",
+      "name": "How is the CSI calculated?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. It does not place trades or manage positions. It is an analytical overlay — a forex dashboard that displays institutional-style market data panels inside MetaTrader 5 so the trader can make their own discretionary decisions."
+        "text": "Each currency's score sums the return of every pair it appears in, adding the return when the currency is the base and subtracting it when the currency is the quote, over a selected lookback horizon. The standalone MT5 indicator additionally normalises this into a z-score across a configurable lookback."
       }
     },
     {
       "@type": "Question",
-      "name": "How do I install the MT5 EA on my chart?",
+      "name": "Where can I see the CSI: on the web terminal or in MetaTrader 5?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Rent or purchase the EA from MQL5 Market, download it from the MQL5 Market tab inside MetaTrader 5, then drag it onto any chart. The EA renders its panels as a canvas overlay; no further configuration is required for the default layout."
+        "text": "Both. The web terminal shows CSI as a tab inside the Currency Strength Heatmap modal, covering all 10 G10 currencies across 1M/3M/6M/1Y horizons. A separate MQL5 Market product, CSI Currency Strength, renders the same concept as a native panel overlay directly on an MT5 chart, for traders who prefer not to switch to a browser."
       }
     },
     {
       "@type": "Question",
-      "name": "Does the MT5 EA work with any broker?",
+      "name": "How do I install the standalone CSI indicator in MetaTrader 5?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. The EA runs inside MetaTrader 5 regardless of broker, since it does not place trades. Panels that reference swap rates or open positions (such as the Carry Monitor) read live values directly from your broker's own MT5 feed."
+        "text": "Purchase or download the CSI Currency Strength indicator from MQL5 Market, then drag it from the Navigator panel onto any MT5 chart. It renders its own panel overlay; no additional configuration is required for the default lookback and pair set."
       }
     },
     {
       "@type": "Question",
-      "name": "What is the difference between the MT5 EA and the web terminal?",
+      "name": "Does CSI predict future price direction?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Both share the same underlying data pipelines for CB bias, COT, carry, sentiment, and news. The MT5 EA adds account-specific panels not possible in a browser — live broker swap rates, an open positions panel, and native MT5 popup and mobile push alerts. The web terminal adds panels not present in the EA, such as the Cross-Asset Risk Monitor, the yield curve, and the derivatives suite. A single subscription unlocks both."
+        "text": "No. It is descriptive, not predictive — a snapshot of relative strength based on realised price moves over the selected lookback period. It does not generate trade signals or forecasts."
       }
     }
   ]
@@ -388,8 +388,8 @@ a { color: inherit; text-decoration: none; }
         <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
         <a href="guide-cot.html">COT / CFTC Positioning</a>
         <a href="guide-economic-surprises.html">Economic Surprise Index</a>
-        <a href="guide-mt5-ea.html" class="current">MetaTrader 5 EA Guide</a>
-        <a href="guide-csi-indicator.html">Currency Strength Index (CSI)</a>
+        <a href="guide-mt5-ea.html">MetaTrader 5 EA Guide</a>
+        <a href="guide-csi-indicator.html" class="current">Currency Strength Index (CSI)</a>
         <div class="site-menu-divider"></div>
         <span class="site-menu-section">Market Research</span>
         <a href="guide-gbpjpy-cot.html">GBP/JPY Bias Factors</a>
@@ -403,20 +403,15 @@ a { color: inherit; text-decoration: none; }
   <nav class="toc" aria-label="Guide sections">
     <div class="toc-inner">
       <div class="toc-head">Contents</div>
-      <a class="toc-item" href="#what-is-it">What the MT5 EA Is</a>
-      <a class="toc-item" href="#install">Installing the EA</a>
-      <a class="toc-item" href="#panels">Panel-by-Panel Overview</a>
-      <a class="toc-item" href="#cot-panel">COT Positioning</a>
-      <a class="toc-item" href="#cb-panel">CB Bias &amp; Rates</a>
-      <a class="toc-item" href="#carry-panel">Carry Monitor</a>
-      <a class="toc-item" href="#calendar-panel">Economic Calendar</a>
-      <a class="toc-item" href="#other-panels">Sentiment, CSI, Correlation, Volatility</a>
-      <a class="toc-item" href="#narrative">AI Market Narrative</a>
-      <a class="toc-item" href="#alerts">MT5 Alerts &amp; Push Notifications</a>
-      <a class="toc-item" href="#vs-web">EA vs. Web Terminal</a>
+      <a class="toc-item" href="#what-is-it">What the CSI Is</a>
+      <a class="toc-item" href="#methodology">Methodology</a>
+      <a class="toc-item" href="#web-panel">CSI on the Web Terminal</a>
+      <a class="toc-item" href="#mt5-indicator">CSI on MetaTrader 5</a>
+      <a class="toc-item" href="#reading-csi">How to Read It</a>
+      <a class="toc-item" href="#vs-single-pair">CSI vs. a Single Pair Chart</a>
       <a class="toc-item" href="#further-reading">Further Reading</a>
       <div class="toc-divider"></div>
-      <a class="toc-item toc-related" href="guide-cot.html">COT / CFTC Positioning Guide</a>
+      <a class="toc-item toc-related" href="guide-mt5-ea.html">MetaTrader 5 EA Guide</a>
       <a class="toc-item toc-related" href="guide-dashboard.html">How to Use the Terminal</a>
     </div>
   </nav>
@@ -424,89 +419,55 @@ a { color: inherit; text-decoration: none; }
   <div class="guide-content">
     <div class="page-hero">
       <div class="page-hero-label">Guide</div>
-      <h1>MetaTrader 5 Expert Advisor for FX Analytics</h1>
-      <p>A walkthrough of the Global Investing FX Terminal MT5 Expert Advisor — what it is, how to install it, what each panel shows, and how it relates to the companion web terminal. If you trade inside MetaTrader 5 and want institutional-style FX analytics without leaving the chart window, this guide covers the setup end to end.</p>
+      <h1>Currency Strength Indicator for MetaTrader 5</h1>
+      <p>How the Currency Strength Index (CSI) works, how to read it inside the web terminal, and how to install the standalone CSI Currency Strength indicator on a MetaTrader 5 chart. If you want a single read on which G10 currency is genuinely strong or weak right now — rather than piecing it together pair by pair — this guide covers the methodology and both places it's available.</p>
     </div>
 
     <div class="guide-section" id="what-is-it">
-      <h2>What the MT5 EA Is</h2>
-      <p>The Global Investing FX Terminal is a MetaTrader 5 Expert Advisor that renders as a native canvas overlay directly inside your chart window. It is not an automated trading robot — it does not place trades or manage positions. It is a multi-panel forex dashboard: a single overlay that surfaces CFTC COT positioning, central bank rate bias, a carry trade ranking, an economic calendar, retail sentiment, currency strength, correlation, volatility, and an AI-generated market narrative, all updating on their own schedules without requiring a browser tab.</p>
+      <h2>What the CSI Is</h2>
+      <p>The Currency Strength Index (CSI) is a composite measure of how strong or weak each G10 currency is relative to all the others at once, rather than against a single counterpart. A currency can be rising against one pair while falling against another; the CSI nets these movements together into one ranking per currency, so a trader can see which side of a pair is actually driving the move.</p>
       <div class="callout">
-        <strong>MT5 native, zero-flicker rendering.</strong> The EA draws its panels using MQL5's canvas object directly on the chart, rather than overlaying browser content or a separate window. This avoids the flicker and redraw artifacts common to chart-based dashboard indicators, and means the overlay behaves like any other native MT5 chart object — it persists across timeframe changes and chart reloads.
+        <strong>Descriptive, not predictive.</strong> The CSI reflects realised price action over the selected lookback — it is not a forecast and does not generate trade signals. It is a read on what has already happened across the full pair set, not a projection of what happens next.
       </div>
     </div>
 
-    <div class="guide-section" id="install">
-      <h2>Installing the EA</h2>
-      <p>The EA is distributed through MQL5 Market (product #180326), MetaTrader's built-in marketplace, rather than as a standalone download. Installation follows the standard MQL5 Market flow:</p>
-      <ul>
-        <li>Open MetaTrader 5 and go to the <strong>Market</strong> tab in the Toolbox panel, or visit the product page directly on the MQL5 website.</li>
-        <li>Rent or purchase the Global Investing FX Terminal license.</li>
-        <li>From the Market tab inside MT5, click <strong>Download</strong> — the EA installs into your terminal's <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">Experts</code> folder automatically.</li>
-        <li>Drag the EA from the Navigator panel onto any chart. The default panel layout renders immediately; no input parameters are required to get started.</li>
-        <li>If prompted, enable <strong>Allow WebRequest</strong> in the EA's Common tab — this is required for the EA to fetch the licensing check and periodic data refreshes from its backend.</li>
-      </ul>
+    <div class="guide-section" id="methodology">
+      <h2>Methodology</h2>
+      <p>Each currency's score is built from the cumulative log-return of every pair it appears in over the selected horizon: the return is added when the currency is the base of the pair and subtracted when it is the quote, so a currency's score reflects its net direction across the entire G10 cross-rate set rather than one isolated pair.</p>
+      <p>On the standalone MT5 indicator, this is additionally normalised into a z-score across a configurable lookback, so readings are comparable across currencies and over time regardless of each pair's raw volatility.</p>
+    </div>
+
+    <div class="guide-section" id="web-panel">
+      <h2>CSI on the Web Terminal</h2>
+      <p>On the web terminal, CSI appears as a tab inside the <strong>Currency Strength Heatmap</strong> modal: a multi-series chart showing the cumulative log-return of each of the 10 G10 currencies over 1M / 3M / 6M / 1Y horizons, computed from the full OHLC dataset across all 32 pairs. The focal currency is highlighted and all ten series update on period selection without re-fetching data. A crosshair tooltip shows all 10 values simultaneously, ordered strongest to weakest, and a legend table below shows cumulative return, min, max, and range for each currency over the period.</p>
+    </div>
+
+    <div class="guide-section" id="mt5-indicator">
+      <h2>CSI on MetaTrader 5</h2>
+      <p>For traders who want the same read without switching to a browser, <strong>CSI Currency Strength</strong> is available separately as a native MetaTrader 5 indicator (MQL5 Market product #180317). It renders currency strength directly as a panel overlay on the chart, using a z-score model with configurable lookback periods, covering 28 pairs across eight currencies, each color-coded for quick scanning.</p>
       <div class="callout callout-orange">
-        <strong>One license, one chart at a time per terminal instance.</strong> The license is validated against your MQL5 account when the EA initializes. Running the EA on multiple charts within the same terminal is supported; running the same rented license across unrelated MT5 installations is governed by the standard MQL5 Market rental terms.
+        <strong>Two related but separate products.</strong> The web terminal's CSI tab (32 pairs, all 10 G10 currencies, part of the terminal subscription) and the standalone MQL5 indicator (28 pairs, eight currencies, sold separately) use the same underlying strength concept but are independent products with their own pair coverage — check each page for the exact scope before assuming parity between them.
       </div>
     </div>
 
-    <div class="guide-section" id="panels">
-      <h2>Panel-by-Panel Overview</h2>
-      <p>All panels render inside the same canvas overlay, organized into tabs so the chart underneath stays visible and uncluttered. The data sources and calculation methodology behind each panel are documented in full in the terminal's published methodology — see <a href="https://www.mql5.com/en/blogs/post/771498" target="_blank" rel="noopener noreferrer">Global Investing FX Terminal — Methodology</a> for the complete technical reference. The sections below summarize what each panel shows inside MT5.</p>
+    <div class="guide-section" id="reading-csi">
+      <h2>How to Read It</h2>
+      <p>Currencies at the top of the ranking have been broadly bought across the pair set over the selected horizon; currencies at the bottom have been broadly sold. The distance between the strongest and weakest currency — the range — gives a sense of how dispersed the current regime is: a wide range points to a clear directional theme (e.g. a broad dollar move), while a narrow range suggests no single currency is dominating and moves are more pair-specific.</p>
+      <p>Because the score is cumulative over the selected horizon, switching between 1M / 3M / 6M / 1Y can reorder the ranking — a currency can be the weakest performer over the past month while still net-strong over the past year. Comparing more than one horizon is generally more informative than reading a single one in isolation.</p>
     </div>
 
-    <div class="guide-section" id="cot-panel">
-      <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">CFTC COT Positioning</h3>
-      <p>Weekly net positioning from the CFTC's Traders in Financial Futures report, for the Leveraged Funds category — the institutional speculative accounts most often used as a directional proxy in FX. Net positioning is normalized to a 52-week rolling z-score so readings are comparable across currencies despite differing futures contract sizes, alongside the week-over-week change in net positioning to distinguish a currency at an extreme that is still building from one that is already unwinding.</p>
-    </div>
-
-    <div class="guide-section" id="cb-panel">
-      <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">CB Bias &amp; Rate Expectations</h3>
-      <p>Two distinct signals per central bank: a retrospective trend (the direction of the most recent policy decision) and a prospective bias (what OIS-equivalent market pricing currently expects at the next meeting). These two signals are deliberately allowed to diverge — a rate held flat for months with a market-implied cut priced for the next meeting is a normal, intentional reading, not a contradiction the panel tries to resolve.</p>
-    </div>
-
-    <div class="guide-section" id="carry-panel">
-      <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Carry Monitor</h3>
-      <p>Because the EA runs inside your own MT5 terminal, the Carry Monitor reads your broker's actual live swap rates rather than a generic estimate — annualized and then adjusted for each pair's trailing 30-day realized volatility, following the same Sharpe-adjusted carry convention used by institutional carry trade monitors. A high nominal swap in a high-volatility regime is flagged differently from the same swap in a calm one.</p>
-    </div>
-
-    <div class="guide-section" id="calendar-panel">
-      <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Economic Calendar</h3>
-      <p>A native MT5 economic calendar panel built from MetaTrader's own calendar feed, showing upcoming high- and medium-impact releases for the major economies without needing a separate calendar app or browser tab open alongside the chart.</p>
-    </div>
-
-    <div class="guide-section" id="other-panels">
-      <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Sentiment, Currency Strength, Correlation &amp; Volatility</h3>
-      <p>Rounding out the 13-panel set: retail positioning (used as a contrarian read against the institutional COT signal), a currency strength index ranking the majors against each other across selectable timeframes, a cross-pair correlation matrix, and a volatility &amp; options panel covering realized volatility and risk reversal skew.</p>
-    </div>
-
-    <div class="guide-section" id="narrative">
-      <h2>AI Market Narrative</h2>
-      <p>Alongside the quantitative panels, the EA displays a qualitative market signal per currency pair, refreshed on a periodic cycle and presented with a priority indicator and supporting narrative text. This is a qualitative complement to the quantitative panels — it does not feed into any composite score and is descriptive of current conditions, not a recommendation to take a position.</p>
-    </div>
-
-    <div class="guide-section" id="alerts">
-      <h2>MT5 Alerts &amp; Push Notifications</h2>
-      <p>Because the EA runs natively inside MetaTrader 5, it can use MT5's own alert infrastructure directly — in-terminal popup alerts and, where the terminal is linked to the MetaQuotes ID for mobile push notifications, alerts on your phone. This is one of the two capabilities the MT5 layer has that a browser-based dashboard cannot replicate (the other being live broker-specific swap and account data) — alerts arrive through the same channel traders already use for price and order alerts, with no separate app or webhook to configure.</p>
-    </div>
-
-    <div class="guide-section" id="vs-web">
-      <h2>EA vs. Web Terminal</h2>
-      <p>The MT5 EA and the companion web terminal at <a href="https://globalinvesting.github.io/">globalinvesting.github.io</a> share the same underlying data pipelines for CB bias, COT, carry, sentiment, and news — so the core read on positioning and policy expectations is consistent whichever you have open. Each layer then adds capabilities the other cannot:</p>
-      <ul>
-        <li><strong>MT5 EA only:</strong> live broker swap rates, an open positions panel reading your actual account, MT5 native economic calendar, and MT5 popup / mobile push alerts.</li>
-        <li><strong>Web terminal only:</strong> full OHLC price chart history, the US Treasury yield curve, the derivatives suite (25-delta risk reversals, CIP-implied forwards, ECB fixings, DTCC OTC volume), and the Cross-Asset Risk Monitor.</li>
-      </ul>
-      <p>A single subscription unlocks both, so the two are best used together rather than as alternatives to each other — see the <a href="access.html">Access page</a> for the full feature breakdown table.</p>
+    <div class="guide-section" id="vs-single-pair">
+      <h2>CSI vs. a Single Pair Chart</h2>
+      <p>A single pair chart only shows the relationship between two currencies. If EUR/USD is rising, that could mean EUR is strong, USD is weak, or both — a single chart can't distinguish between those cases. The CSI resolves this by aggregating each currency's performance across every pair it trades in, isolating the currency-specific component of the move from the pair-specific one.</p>
     </div>
 
     <div class="guide-section" id="further-reading">
       <h2>Further Reading</h2>
-      <p>For the full calculation methodology behind every panel referenced above — z-score normalization, OIS-implied probability mechanics, the Composite Score weighting, and documented limitations — see the published methodology document:</p>
+      <p>For the full calculation methodology across every terminal panel — z-score normalisation, OIS-implied probability mechanics, and documented limitations — see the published methodology document:</p>
       <ul>
         <li><a href="https://www.mql5.com/en/blogs/post/771498" target="_blank" rel="noopener noreferrer">Global Investing FX Terminal — Methodology</a></li>
-        <li><a href="https://www.mql5.com/en/blogs/post/771341" target="_blank" rel="noopener noreferrer">Multi-Factor FX Analysis in MT5: COT, CB Rates, Carry, and ESI in One Terminal</a></li>
+        <li><a href="guide-mt5-ea.html">MetaTrader 5 Expert Advisor for FX Analytics</a></li>
+        <li><a href="guide-dashboard.html">How to Use the Terminal</a></li>
       </ul>
     </div>
 
@@ -516,10 +477,10 @@ a { color: inherit; text-decoration: none; }
 <div style="max-width:860px;margin:0 auto;padding:32px 24px 48px;">
   <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.05);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
     <div>
-      <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">Get the MT5 Expert Advisor</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;">13 data panels rendered natively inside MetaTrader 5 — COT, CB bias, carry, calendar, sentiment, and AI narrative — plus the full web terminal under the same subscription.</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">Get CSI Currency Strength for MT5</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">A native MetaTrader 5 panel overlay — z-score currency strength across 28 pairs and eight currencies, color-coded for quick scanning.</div>
     </div>
-    <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:var(--blue);color:#fff;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">View on MQL5 Market &rarr;</a>
+    <a href="https://www.mql5.com/en/market/product/180317" target="_blank" rel="noopener noreferrer" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:var(--blue);color:#fff;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">CSI Indicator on MQL5 &rarr;</a>
   </div>
 </div>
 <div style="max-width:860px;margin:0 auto;padding:12px 24px 24px;">
@@ -547,7 +508,7 @@ a { color: inherit; text-decoration: none; }
 
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
-  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · MT5 EXPERT ADVISOR</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · CURRENCY STRENGTH INDEX</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
   <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.3</span></div>
 </footer>

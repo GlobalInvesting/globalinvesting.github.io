@@ -359,6 +359,7 @@ a { color: inherit; text-decoration: none; }
         <a href="guide-cot.html">COT / CFTC Positioning</a>
         <a href="guide-economic-surprises.html">Economic Surprise Index</a>
         <a href="guide-mt5-ea.html">MetaTrader 5 EA Guide</a>
+        <a href="guide-csi-indicator.html">Currency Strength Index (CSI)</a>
         <div class="site-menu-divider"></div>
         <span class="site-menu-section">Market Research</span>
         <a href="guide-gbpjpy-cot.html">GBP/JPY Bias Factors</a>
@@ -964,7 +965,7 @@ a { color: inherit; text-decoration: none; }
 
       <p><strong style="color:var(--text);">Correlations</strong> — shows a 10&times;10 strength differential matrix with a Composite column: each cell is the composite % difference between the row currency and the column currency, with color intensity proportional to the divergence. Below the matrix, a <strong>Strength Drivers</strong> block lists the top 3 pairs by absolute contribution, each with an AI-generated one-line note (max 85 characters) explaining the structural driver — CB stance differential, COT positioning extreme, or carry differential. Attribution footer: <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">AI Analytics &middot; ~5min delay</span>. Clicking any row in the Key Correlations panel (right panel) opens a dedicated correlation modal with a 252-day history sparkline showing real calendar dates, z-score, and a regime signal.</p>
 
-      <p><strong style="color:var(--text);">CSI</strong> — Currency Strength Index: a multi-series LightweightCharts chart showing the cumulative log-return of all 10 G10 currencies over selectable periods (1M / 3M / 6M / 1Y / All). Computed from the full OHLC dataset across all 32 pairs — the same data as the heatmap. The focal currency's line is highlighted; all series start at 0% at the beginning of the selected period. A crosshair tooltip shows all 10 values simultaneously ordered strongest to weakest. A legend table below shows cumulative return, min, max, and range for each currency over the period.</p>
+      <p><a href="guide-csi-indicator.html" style="color:var(--blue);"><strong style="color:var(--text);">CSI</strong></a> — Currency Strength Index: a multi-series LightweightCharts chart showing the cumulative log-return of all 10 G10 currencies over selectable periods (1M / 3M / 6M / 1Y / All). Computed from the full OHLC dataset across all 32 pairs — the same data as the heatmap. The focal currency's line is highlighted; all series start at 0% at the beginning of the selected period. A crosshair tooltip shows all 10 values simultaneously ordered strongest to weakest. A legend table below shows cumulative return, min, max, and range for each currency over the period.</p>
 
       <div class="callout">
         <strong>Note on session attribution:</strong> The session-weighted composite in the Session tab is a volume-proxy decomposition of the intraday move. Exact per-session attribution requires tick data, which is not publicly available. Treat session contributions as directional indicators, not precise measurements.

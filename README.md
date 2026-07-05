@@ -79,6 +79,7 @@ Full documentation is available at [globalinvesting.github.io](https://globalinv
 - [Economic Surprises Guide](https://globalinvesting.github.io/guide-economic-surprises.html)
 - [FX Liquidity Guide](https://globalinvesting.github.io/guide-fx-liquidity.html)
 - [MT5 EA Guide](https://globalinvesting.github.io/guide-mt5-ea.html) — Setup and features
+- [Currency Strength Index (CSI) Guide](https://globalinvesting.github.io/guide-csi-indicator.html) — Methodology and MT5 indicator setup
 
 ---
 
