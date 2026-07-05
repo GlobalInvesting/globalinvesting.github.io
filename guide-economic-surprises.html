@@ -35,15 +35,15 @@
     {
       "@type": "ImageObject",
       "url": "https://globalinvesting.github.io/assets/screenshot-esi-panel.png",
-      "width": 366,
+      "width": 364,
       "height": 268,
       "caption": "Economic Surprise Index panel ranking all 10 G10 currencies by 90-day surprise index"
     },
     {
       "@type": "ImageObject",
       "url": "https://globalinvesting.github.io/assets/screenshot-esi-detail-usd.png",
-      "width": 608,
-      "height": 826,
+      "width": 600,
+      "height": 824,
       "caption": "Economic Surprise Index detail modal for USD with rolling chart and event log"
     }
   ],
@@ -267,8 +267,8 @@ a { color: inherit; text-decoration: none; }
 .scr-hero { cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
 .scr-hero:hover { border-color: var(--border2); }
 .scr-hero img { width: 100%; height: auto; display: block; }
-.scr-hero-contain { display: flex; justify-content: center; background: var(--bg2); }
-.scr-hero-contain img { width: auto; max-width: 100%; height: auto; margin: 0 auto; }
+.scr-hero-contain { width: fit-content; max-width: 100%; margin: 0 auto; }
+.scr-hero-contain img { width: auto; max-width: 100%; height: auto; display: block; margin: 0; }
 .guide-section p.scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-top: 10px; padding: 0 2px; }
 .scr-meta strong { color: var(--text2); font-weight: 600; }
 
@@ -562,7 +562,7 @@ a { color: inherit; text-decoration: none; }
       <p>The Economic Surprises panel in the terminal displays one row per G10 currency. Each row contains:</p>
       <div class="scr-hero-wrap">
         <div class="scr-hero scr-hero-contain">
-          <img src="assets/screenshot-esi-panel.png" alt="Economic Surprise Index panel in the Global Investing FX terminal, ranking all 10 G10 currencies by their 90-day surprise index with beat/miss bar chart and event count N" width="366" height="268" loading="lazy">
+          <img src="assets/screenshot-esi-panel.png" alt="Economic Surprise Index panel in the Global Investing FX terminal, ranking all 10 G10 currencies by their 90-day surprise index with beat/miss bar chart and event count N" width="364" height="268" loading="lazy">
         </div>
         <p class="scr-meta"><strong>The Economic Surprises panel.</strong> Each currency gets a centred bar (green = more beats than misses, red = more misses than beats) and an event count N for confidence, ranked strongest to weakest.</p>
       </div>
@@ -596,7 +596,7 @@ a { color: inherit; text-decoration: none; }
       <p>Clicking a row opens the detail modal with the individual event log — each release listed with its date, actual vs forecast, beat/miss result, and decay-adjusted weight. This is the full audit trail behind the aggregate index value.</p>
       <div class="scr-hero-wrap">
         <div class="scr-hero scr-hero-contain">
-          <img src="assets/screenshot-esi-detail-usd.png" alt="Economic Surprise Index detail modal for USD, showing the 90-day rolling surprise chart, beats/misses/N summary, and the individual event log with actual vs forecast values" width="608" height="826" loading="lazy">
+          <img src="assets/screenshot-esi-detail-usd.png" alt="Economic Surprise Index detail modal for USD, showing the 90-day rolling surprise chart, beats/misses/N summary, and the individual event log with actual vs forecast values" width="600" height="824" loading="lazy">
         </div>
         <p class="scr-meta"><strong>The USD detail modal.</strong> The rolling index chart sits above beats/misses/N summary tiles and the full event log, so every input behind the aggregate score can be checked against its actual vs forecast value.</p>
       </div>
