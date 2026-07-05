@@ -1,5 +1,5 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.0.0
+ * GlobalInvesting FX Terminal — License Auth Module  v1.0.1
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
  *
  * Flow:
@@ -233,6 +233,9 @@
         Global Investing FX Terminal EA
       </a>
       on MQL5 Market. Enter the activation key shown in your MT5 terminal to unlock all panels.
+    </p>
+    <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-8px;">
+      New here? <a href="access.html">See the full walkthrough &amp; pricing &rarr;</a>
     </p>
 
     <label for="gi-inp-key">Activation Key (from MT5 terminal top bar)</label>
