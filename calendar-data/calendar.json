@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-05T21:32:16Z",
-  "generatedAt": "2026-07-05T21:32:16Z",
+  "lastUpdate": "2026-07-06T09:35:07Z",
+  "generatedAt": "2026-07-06T09:35:07Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,46 +8,26 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-07-07",
-  "rangeTo": "2026-07-03",
-  "totalEvents": 3948,
+  "rangeTo": "2026-07-06",
+  "totalEvents": 3966,
   "currencyCounts": {
-    "EUR": 869,
-    "GBP": 469,
-    "JPY": 253,
-    "AUD": 289,
-    "CAD": 307,
-    "USD": 1244,
-    "NZD": 122,
-    "CHF": 161,
+    "EUR": 874,
+    "GBP": 470,
+    "JPY": 256,
+    "AUD": 290,
+    "CAD": 310,
+    "USD": 1246,
+    "NZD": 123,
+    "CHF": 163,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2084,
-    "high": 1636,
+    "medium": 2098,
+    "high": 1640,
     "low": 228
   },
   "surpriseStats": {
-    "EUR/unemployment change": {
-      "n": 5,
-      "mean": 12.56,
-      "std": 29.234107
-    },
-    "JPY/household spending mom": {
-      "n": 3,
-      "mean": -0.733333,
-      "std": 1.386843
-    },
-    "JPY/household spending yoy": {
-      "n": 3,
-      "mean": -0.566667,
-      "std": 1.379613
-    },
-    "USD/ism services pmi": {
-      "n": 3,
-      "mean": -0.133333,
-      "std": 0.85049
-    },
     "CAD/ivey pmi s.a": {
       "n": 3,
       "mean": 1.6,
@@ -99,9 +79,9 @@
       "std": 2.083987
     },
     "CHF/unemployment rate": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 0.11547
+      "n": 4,
+      "mean": 0.075,
+      "std": 0.125831
     },
     "EUR/factory orders mom": {
       "n": 3,
@@ -114,14 +94,14 @@
       "std": 46397.348469
     },
     "EUR/retail sales mom": {
-      "n": 9,
-      "mean": -0.133333,
-      "std": 0.930054
+      "n": 10,
+      "mean": -0.13,
+      "std": 0.876926
     },
     "EUR/retail sales yoy": {
-      "n": 10,
-      "mean": -0.12,
-      "std": 1.692992
+      "n": 11,
+      "mean": -0.109091,
+      "std": 1.606521
     },
     "GBP/halifax house price index yoy": {
       "n": 3,
@@ -1003,6 +983,11 @@
       "mean": -0.0035,
       "std": 0.043134
     },
+    "EUR/unemployment change": {
+      "n": 4,
+      "mean": 7.4,
+      "std": 31.016232
+    },
     "EUR/core inflation rate yoy": {
       "n": 3,
       "mean": -0.066667,
@@ -1168,6 +1153,11 @@
       "mean": -0.03575,
       "std": 0.040893
     },
+    "USD/ism services pmi": {
+      "n": 2,
+      "mean": 0.3,
+      "std": 0.565685
+    },
     "USD/jolts job openings": {
       "n": 3,
       "mean": 0.352667,
@@ -1232,6 +1222,16 @@
       "n": 3,
       "mean": -0.0,
       "std": 0.173205
+    },
+    "JPY/household spending yoy": {
+      "n": 2,
+      "mean": -0.3,
+      "std": 1.838478
+    },
+    "JPY/household spending mom": {
+      "n": 2,
+      "mean": -0.55,
+      "std": 1.909188
     },
     "EUR/employment change qoq": {
       "n": 2,
@@ -49016,6 +49016,240 @@
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Factory Orders MoM",
+      "impact": "medium",
+      "actual": "1.9%",
+      "forecast": "1.2%",
+      "previous": "-3.2%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Unemployment Rate",
+      "impact": "high",
+      "actual": "2.9%",
+      "forecast": "3.1%",
+      "previous": "3.0%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "08:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Myfxbook AUDUSD Sentiment",
+      "impact": "medium",
+      "actual": "52.0%",
+      "forecast": null,
+      "previous": "72.0%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "08:00",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Myfxbook USDCAD Sentiment",
+      "impact": "medium",
+      "actual": "7.0%",
+      "forecast": null,
+      "previous": "8.0%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "08:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Myfxbook USDCHF Sentiment",
+      "impact": "medium",
+      "actual": "51.0%",
+      "forecast": null,
+      "previous": "35.0%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "European Union Myfxbook EURUSD Sentiment",
+      "impact": "medium",
+      "actual": "58.0%",
+      "forecast": null,
+      "previous": "61.0%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "08:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
+      "impact": "medium",
+      "actual": "29.0%",
+      "forecast": null,
+      "previous": "55.0%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "08:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Myfxbook USDJPY Sentiment",
+      "impact": "medium",
+      "actual": "18.0%",
+      "forecast": null,
+      "previous": "22.0%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "08:00",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Myfxbook NZDUSD Sentiment",
+      "impact": "medium",
+      "actual": "76.0%",
+      "forecast": null,
+      "previous": "95.0%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Retail Sales MoM",
+      "impact": "high",
+      "actual": "0.2%",
+      "forecast": "0.3%",
+      "previous": "-0.3%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Retail Sales YoY",
+      "impact": "high",
+      "actual": "1.6%",
+      "forecast": "1.6%",
+      "previous": "0.9%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States ISM Services PMI",
+      "impact": "high",
+      "actual": null,
+      "forecast": "54.0",
+      "previous": "54.5"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "14:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada BoC Business Outlook Survey",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "14:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada BoC Survey of Consumer Expectations",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Waller Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "16:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB President Lagarde Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Household Spending YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-2.5%",
+      "previous": "-0.5%"
+    },
+    {
+      "date": "6 Jul",
+      "dateISO": "2026-07-06",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Household Spending MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.4%",
+      "previous": "1.6%"
     }
   ]
 }
