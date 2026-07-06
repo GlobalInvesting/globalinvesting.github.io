@@ -1,7 +1,7 @@
 {
-  "updated_utc": "2026-07-06T20:31:43.401485+00:00",
-  "updated_label": "20:31 UTC",
-  "total": 50,
+  "updated_utc": "2026-07-06T20:41:23.731155+00:00",
+  "updated_label": "20:41 UTC",
+  "total": 51,
   "total_high": 35,
   "total_med": 5,
   "sources_active": [
@@ -11,19 +11,36 @@
     "FXStreet",
     "ForexLive",
     "InvestMacro",
-    "InvestingLive"
+    "InvestingLive",
+    "Nasdaq FX"
   ],
   "lang_counts": {
     "es": 0,
-    "en": 50
+    "en": 51
   },
   "articles": [
     {
-      "id": "a947d98a3be9",
+      "id": "2503d114c452",
+      "cur": "CAD",
+      "impact": "low",
+      "title": "Shares of FXC Now Oversold",
+      "expand": "In trading on Monday, shares of the Invesco CurrencyShares Canadian Dollar Trust ETF (Symbol: FXC) entered into oversold territory, changing hands as low as $68.71 per share. We define oversold territory using the Relative Strength Index, or RSI, which is a technical analysis i",
+      "source": "Nasdaq FX",
+      "link": "https://www.nasdaq.com/articles/shares-fxc-now-oversold",
+      "time": "20:36",
+      "ts": 1783370180000,
+      "featured": false,
+      "lang": "en",
+      "date": "06 Jul",
+      "datetime": "2026-07-06T20:36:20+00:00",
+      "recent": true
+    },
+    {
+      "id": "109bb9d9159c",
       "cur": "USD",
       "impact": "high",
-      "title": "Australian Dollar rises as softer Fed bets offsets resilient US data",
-      "expand": "The Australian Dollar extends its rally for three straight trading sessions, up 0.25%, as investors adjust their interest rate expectations for the Federal Reserve, following a soft US jobs report.",
+      "title": "Australian Dollar rises as softer Fed bets offset resilient US data",
+      "expand": "The Australian Dollar (AUD) extends its rally into a third straight trading session, up 0.25% on Monday, as investors adjust their interest rate expectations for the Federal Reserve (Fed) following a soft US jobs report last week.",
       "source": "FXStreet",
       "link": "https://www.fxstreet.com/news/australian-dollar-rises-as-softer-fed-bets-offsets-resilient-us-data-202607062009",
       "time": "20:09",
@@ -396,7 +413,7 @@
       "link": "https://www.fxstreet.com/news/euro-soft-tone-against-us-dollar-with-stable-ecb-expectations-scotiabank-202607061433",
       "time": "14:33",
       "ts": 1783348391000,
-      "featured": true,
+      "featured": false,
       "lang": "en",
       "date": "06 Jul",
       "datetime": "2026-07-06T14:33:11+00:00",
