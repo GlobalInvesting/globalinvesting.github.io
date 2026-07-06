@@ -1,9 +1,9 @@
 {
-  "updated_utc": "2026-07-06T07:51:20.897474+00:00",
-  "updated_label": "07:51 UTC",
+  "updated_utc": "2026-07-06T08:01:45.705485+00:00",
+  "updated_label": "08:01 UTC",
   "total": 52,
   "total_high": 38,
-  "total_med": 8,
+  "total_med": 7,
   "sources_active": [
     "ActionForex",
     "BabyPips",
@@ -14,13 +14,30 @@
     "InvestMacro",
     "InvestingLive",
     "Marc to Market",
-    "MarketPulse"
+    "MarketPulse",
+    "RTT News"
   ],
   "lang_counts": {
     "es": 0,
     "en": 52
   },
   "articles": [
+    {
+      "id": "ef3eddd31f7b",
+      "cur": "AUD",
+      "impact": "low",
+      "title": "Australian Dollar: Downside bias within broader neutral band against US Dollar – UOB",
+      "expand": "United Overseas Bank’s (UOB) Quek Ser Leang reports AUD/USD has stalled after last week’s sharp rise, with a tentative build-up in downside momentum pointing to a limited dip toward 0.6910 intraday. For the next 1–3 weeks, the bank stays neutral, expecting consolidation between 0.6870 and 0.6980.",
+      "source": "FXStreet",
+      "link": "https://www.fxstreet.com/news/australian-dollar-downside-bias-within-broader-neutral-band-against-us-dollar-uob-202607060731",
+      "time": "07:31",
+      "ts": 1783323101000,
+      "featured": false,
+      "lang": "en",
+      "date": "06 Jul",
+      "datetime": "2026-07-06T07:31:41+00:00",
+      "recent": true
+    },
     {
       "id": "085894e8945f",
       "cur": "USD",
@@ -390,51 +407,19 @@
       "recent": true
     },
     {
-      "id": "bbeeb1b164fc",
+      "id": "d8e510ce22a0",
       "cur": "NZD",
-      "impact": "med",
-      "title": "New Zealand Dollar declines as NZIER splits on July decision",
-      "expand": "NZD/USD depreciates after two days of gains, trading around 0.5690 during the Asian hours on Monday. The pair loses ground as the New Zealand Dollar (NZD) weakens following the ANZ World Commodity Price Index, which fell 1.0% in June as easing Middle East tensions and lower oil prices weighed.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/new-zealand-dollar-declines-as-nzier-splits-on-july-decision-202607060156",
-      "time": "01:56",
-      "ts": 1783303007000,
-      "featured": false,
-      "lang": "en",
-      "date": "06 Jul",
-      "datetime": "2026-07-06T01:56:47+00:00",
-      "recent": true
-    },
-    {
-      "id": "d7c368e1aca3",
-      "cur": "GBP",
       "impact": "low",
-      "title": "British Pound flat lines around mid-1.3300s vs USD amid Iran tensions",
-      "expand": "The GBP/USD pair struggles to capitalize on last week's strong move higher and oscillates in a narrow band, around the 1.3350 area during the Asian session on Monday.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/british-pound-flat-lines-around-mid-13300s-vs-usd-amid-iran-tensions-202607060153",
-      "time": "01:53",
-      "ts": 1783302799000,
+      "title": "New Zealand data - ANZ commodity index rises as wool, aluminium lead year-on-year gains",
+      "expand": "The divergence between the world price index, up 1.3% year on year, and the NZD-denominated index, down 0.3% in May on currency strength, highlights how much of the recent gains are being offset for New Zealand exporters by exchange rate movements rather than being passed through in full. Aluminium remains the clearest read-through from the Middle East conflict, with regional production still running well below pre-conflict levels and raw material import constraints likely to keep upward pressure on the metal even as broader oil-linked inflation pressures ease elsewhere. The forestry sector il...",
+      "source": "ForexLive",
+      "link": "https://investinglive.com/news/new-zealand-data-anz-commodity-index-rises-as-wool-aluminium-lead-year-on-year-gains-20260706/",
+      "time": "01:18",
+      "ts": 1783300737000,
       "featured": false,
       "lang": "en",
       "date": "06 Jul",
-      "datetime": "2026-07-06T01:53:19+00:00",
-      "recent": true
-    },
-    {
-      "id": "695707dfc5b9",
-      "cur": "JPY",
-      "impact": "low",
-      "title": "Japanese Yen weakens under high import costs despite JGB yield hitting 30-year highs",
-      "expand": "USD/JPY extends its gains for the second successive day, trading around 161.70 during the Asian hours on Monday. The Japanese Yen (JPY) is caught in a high-stakes tug-of-war, buckling under surging import costs even as 10-year JGB yields hit a fresh 30-year high of 2.79%.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/japanese-yen-weakens-under-high-import-costs-despite-jgb-yield-hitting-30-year-highs-202607060123",
-      "time": "01:23",
-      "ts": 1783300983000,
-      "featured": false,
-      "lang": "en",
-      "date": "06 Jul",
-      "datetime": "2026-07-06T01:23:03+00:00",
+      "datetime": "2026-07-06T01:18:57+00:00",
       "recent": true
     },
     {
@@ -835,6 +820,22 @@
       "lang": "en",
       "date": "02 Jul",
       "datetime": "2026-07-02T12:12:30+00:00",
+      "recent": false
+    },
+    {
+      "id": "674b812a060c",
+      "cur": "JPY",
+      "impact": "low",
+      "title": "Yen Rises Amid Intervention Risks",
+      "expand": "The Japanese yen strengthened against other major currencies in the European session on Thursday, due to rising investor expectations of government intervention.",
+      "source": "RTT News",
+      "link": "https://www.rttnews.com/story.aspx?Id=3664311",
+      "time": "11:38",
+      "ts": 1782992318000,
+      "featured": false,
+      "lang": "en",
+      "date": "02 Jul",
+      "datetime": "2026-07-02T11:38:38+00:00",
       "recent": false
     },
     {
