@@ -1,67 +1,63 @@
 {
-  "generated_at": "2026-07-06T11:10:47Z",
+  "generated_at": "2026-07-06T17:20:00Z",
   "signals": [
     {
-      "time": "11:10",
+      "time": "17:18",
       "priority": "critical",
-      "title": "USD/JPY — Positioning + Vol + Retail Divergence",
-      "text": "USD/JPY trades at 162.31, holding above the critical 160.00 level where BoJ verbal intervention risk historically escalates. JPY COT LF net short stands at an extreme −115,033 (28.4% long), representing a highly crowded carry trade. This positioning is heavily challenged by the options market, where the 25d risk reversal shows a strong put skew of −1.67, signaling institutional demand for JPY upside protection. Concurrently, retail sentiment is 84% short USD/JPY, creating a sharp divergence where retail is fading the institutional long. While the +268bp SOFR-TONA carry advantage structurally supports USD, the combination of extreme short positioning, intervention risk above 160.00, and institutional hedging via options points to elevated risk of a rapid carry unwind. Volatility pricing confirms this caution, with USD/JPY IV at 7.2% vs HV30 at 3.5%, yielding an elevated +3.7% vol risk premium.",
-      "evidence": [
-        "USD/JPY: 162.31",
-        "JPY COT LF net: -115,033",
-        "USDJPY 25d RR: -1.67",
-        "USD/JPY Retail: 84% short"
-      ],
-      "_source": "gemini:gemini-3.5-flash"
-    },
-    {
-      "time": "11:07",
-      "priority": "warning",
       "title": "AUD/JPY — G10 Bilateral Theme + Carry",
-      "text": "The G10 Currency Strength Scorecard triggers a bilateral theme warning with a 0.922% spread between leader AUD and laggard JPY. AUD/JPY trades at 112.522, supported by a massive +337bp carry premium (AONIA 4.35% vs TONA 0.98%). This carry advantage is reinforced by a positive real rate differential, with AUD real rate at +0.39% vs JPY real rate at −0.52%. Speculative positioning aligns with this divergence, as AUD COT LF net long sits at +29,035 (64.9% long) while JPY remains heavily short. However, options pricing suggests caution as EUR/JPY and USD/JPY risk reversals show strong put skews, indicating that broader JPY cross-unwind risks are rising despite the dominant carry. The next RBNZ policy decision on 8 Jul serves as the immediate regional catalyst for risk-sensitive Oceania crosses.",
+      "text": "AUD/JPY trades at 112.772 as the G10 currency scorecard triggers a critical bilateral theme signal. Weekly performance shows AUD outperforming peers by +0.652% while JPY lags by -0.592%, generating a 1.244% spread. This divergence is structurally supported by a +335bp OIS carry premium (RBA AONIA 4.35% vs BoJ TONA 0.98%). Despite JPY net short positioning remaining highly crowded at -115,033 contracts (CFTC, week ending Jun 23), the carry advantage dominates in this normal volatility regime (VIX at 15.9). Watch for a break below 112.000 or a spike in VIX above 25 to trigger a rapid carry unwind.",
       "evidence": [
-        "AUD 1W avg: +0.440% (n=4)",
-        "JPY 1W avg: -0.482% (n=7)",
-        "G10 spread: 0.922%",
-        "AUD/JPY: 112.522"
+        "AUD 1W avg: +0.652% (n=4)",
+        "JPY 1W avg: -0.592% (n=7)",
+        "G10 spread: 1.244%"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "11:05",
+      "time": "17:15",
       "priority": "warning",
-      "title": "GBP/USD — Volatility Premium + CESI Alignment",
-      "text": "GBP/USD trades at 1.3337 with a neutral nominal carry spread (SOFR 3.66% vs SONIA 3.73% yielding a minor −7bp spread favoring GBP). However, the options market is pricing an extreme volatility risk premium, with GBP/USD IV at 11.0% vs HV30 at 5.3%, resulting in a +5.7% VRP. This elevated premium indicates heavy institutional hedging demand ahead of upcoming macro catalysts. Fundamental data supports GBP resilience, with the UK Economic Surprise Index (CESI) at a strong positive +23 net beats, while the US CESI remains highly positive at +282. Speculative positioning is balanced with GBP COT LF net long at a marginal +631 (50.3% long), while retail sentiment is 71% short, suggesting contrarian upside potential if US data softens. Watch the FOMC minutes release on 8 Jul to resolve the volatility premium.",
+      "title": "USD/JPY — Positioning + Vol + Retail Divergence",
+      "text": "USD/JPY trades at 162.248, holding above the critical 160.00 level where BoJ intervention risk rises. The options market is actively hedging downside risk with a moderate put skew of -1.43 on the 25d risk reversal (Saxo, 1M tenor), while the volatility risk premium is elevated at +3.8% (IV 7.2% vs HV30 3.4%). This institutional caution contrasts sharply with retail sentiment, which is at an extreme 86% short, and CFTC speculative positioning, which remains heavily net short JPY at -115,033 contracts. The +268bp OIS carry premium (SOFR 3.66% vs TONA 0.98%) keeps the pair bid, but the options skew and intervention threat signal late-trend vulnerability. Watch the next BoJ meeting (mkt: 100% hold priced) on 31 Jul for policy action to trigger a squeeze.",
       "evidence": [
-        "GBP/USD: 1.3337",
-        "GBP/USD IV vs HV30: 11.0% vs 5.3%",
-        "GBP CESI net: +23",
-        "GBP COT LF net: +631"
+        "USD/JPY: 162.248",
+        "USDJPY 25d RR: -1.43",
+        "USD/JPY VRP: +3.8% (IV 7.2% vs HV30 3.4%)"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "11:02",
+      "time": "17:13",
       "priority": "warning",
-      "title": "USD/CAD — Correlation Break + Retail Extreme",
-      "text": "USD/CAD trades at 1.4221, showing a significant cross-asset correlation break against WTI Oil. The USD/CAD vs WTI correlation stands at −0.876 vs a 252-day norm of +0.014 (z = −2.06σ), indicating that the traditional CAD-commodity link has broken down as domestic growth concerns dominate. This weakness is reflected in the Canadian Economic Surprise Index (CESI) at −6 net misses, while the US CESI stands at +282. Speculative positioning is heavily short CAD with COT LF net short at −87,096 (20.6% long). Retail sentiment has reached an extreme 93% short USD/CAD, signaling extreme contrarian reversal risk. While the +136bp SOFR-CORRA carry advantage supports USD, the extreme retail short positioning and crowded spec short CAD trade suggest a high risk of a sharp squeeze if domestic data improves. Watch the Bank of Canada Q2 Business Outlook Survey on 15 Jul to gauge domestic confidence.",
+      "title": "AUD/USD — Volatility Risk Premium Extreme",
+      "text": "AUD/USD trades at 0.6953 amid an extreme volatility risk premium of +30.0%, with 1M implied volatility at 37.1% vs a 30-day realized volatility of 7.1%. This massive premium indicates intense institutional hedging demand and options market fear, despite spot price action remaining relatively stable (+0.53% on the week). Speculators remain net long AUD at +29,035 contracts, supported by a -69bp OIS carry premium favoring AUD (SOFR 3.66% vs AONIA 4.35%). The extreme options pricing suggests the market is bracing for a major directional break. Watch the next RBA meeting (mkt: 100% hold priced) on 11 Aug to resolve this volatility pricing anomaly.",
       "evidence": [
-        "USD/CAD: 1.4221",
-        "USD/CAD vs WTI corr: -0.876 (z=-2.06σ)",
-        "CAD COT LF net: -87,096",
-        "USD/CAD Retail: 93% short"
-      ],
-      "_source": "gemini:gemini-3.5-flash"
-    },
-    {
-      "time": "10:55",
-      "priority": "info",
-      "title": "AUD/USD — Volatility Complacency + Carry Support",
-      "text": "AUD/USD trades at 0.6935, supported by a +69bp carry premium (AONIA 4.35% vs SOFR 3.66%) and a positive real rate of +0.39%. Speculators are net long AUD with COT LF net long at +29,035 (64.9% long). Despite the supportive carry and positive G10 performance, the options market exhibits unusual complacency. AUD/USD IV is priced at 3.1% vs HV30 of 6.9%, resulting in a negative vol risk premium of −3.8%. This negative VRP indicates a thin options supply and underpriced risk, leaving the pair vulnerable to a sharp volatility spike if global risk sentiment deteriorates. The next RBA meeting (mkt: 100% hold priced) on 11 Aug remains the primary domestic catalyst to watch for carry sustainability.",
-      "evidence": [
-        "AUD/USD: 0.6935",
-        "AUD/USD IV vs HV30: 3.1% vs 6.9%",
+        "AUD/USD IV vs HV30: 37.1% vs 7.1%",
+        "AUD/USD VRP: +30.0%",
         "AUD COT LF net: +29,035"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
+    },
+    {
+      "time": "17:10",
+      "priority": "warning",
+      "title": "USD/CAD — Correlation Break + CESI Divergence",
+      "text": "USD/CAD trades at 1.4213 as its correlation with WTI Oil breaks to -0.876, deviating by -2.06σ from the 252-day norm of +0.014. This decoupling is driven by divergent macroeconomic data: the US Economic Surprise Index (CESI) is exceptionally strong at +282 net beats, while Canada's CESI lags at -6 net misses, reinforced by a weaker Q2 BOC Business Outlook Survey showing future sales indicators falling to +15 from +24. This fundamental divergence is backed by a +136bp OIS carry premium (SOFR 3.66% vs CORRA 2.30%) and a heavily crowded CAD net short position of -87,096 contracts. The correlation break signals that US-Canada growth and interest rate differentials have completely superseded oil price dynamics. Watch the next BoC meeting (mkt: 100% hold priced) on 15 Jul to confirm this policy divergence.",
+      "evidence": [
+        "USD/CAD vs WTI Oil correlation: -0.876 (z=-2.06σ)",
+        "US CESI vs CAD CESI: +282 vs -6",
+        "CAD COT LF net: -87,096"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
+    },
+    {
+      "time": "17:05",
+      "priority": "info",
+      "title": "USD/CHF — Swiss Franc Weakness + Real Rate Advantage",
+      "text": "USD/CHF trades at 0.8058, gaining 0.39% on the session following a Swiss unemployment surprise and broad USD strength. The pair is structurally supported by a massive +375bp OIS carry premium (SOFR 3.66% vs SARON -0.04%) and a highly restrictive US real policy rate of +1.49% compared to Switzerland's accommodative real rate of -0.60%. Speculators are net short CHF at -14,846 contracts, while the options market prices in an extreme volatility risk premium of +27.7% (IV 33.7% vs HV30 6.0%), indicating heavy demand for tail-risk protection. The combination of carry advantage and real rate divergence keeps USD/CHF structurally bid. Watch the next SNB meeting (mkt: 100% hold priced) on 24 Sep for any shift in their accommodative stance.",
+      "evidence": [
+        "USD/CHF carry: +375bp",
+        "US vs CHF Real Rate: +1.49% vs -0.60%",
+        "USD/CHF VRP: +27.7% (IV 33.7% vs HV30 6.0%)"
       ],
       "_source": "gemini:gemini-3.5-flash"
     }
