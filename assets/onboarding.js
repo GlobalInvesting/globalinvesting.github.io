@@ -1,6 +1,13 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.9 — production build
+ * v7.89.10 — production build
+ *
+ * Changes vs v7.89.9:
+ *   - BUG FIX: Economic Calendar step targeted 'section-tvcalendar-top', an ID that
+ *     does not exist in index.html (actual element is 'section-tvcalendar'). Since
+ *     getElementById returned null, positionPopover() fell back to applyBottomCenter(),
+ *     pinning the popover to the bottom of the viewport instead of anchoring it below
+ *     the calendar panel. Fixed target to 'section-tvcalendar'.
  *
  * Changes vs v7.81.5 (prior production):
  *   - 15-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
@@ -77,7 +84,7 @@
 
     /* 3 — Economic Calendar */
     {
-      target:  'section-tvcalendar-top',
+      target:  'section-tvcalendar',
       side:    'bottom',
       title:   'Economic Calendar',
       badge:   'Calendar',
