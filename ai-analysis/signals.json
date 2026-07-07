@@ -1,70 +1,65 @@
 {
-  "generated_at": "2026-07-07T21:26:53Z",
+  "generated_at": "2026-07-07T22:24:49Z",
   "signals": [
     {
-      "time": "21:25",
+      "time": "22:24",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Shock + Options Skew + Carry",
-      "text": "USD/JPY at 162.09 — 275bp Fed-BoJ carry sustains the bid despite the U.S. revoking Iranian oil waivers following Strait of Hormuz tanker attacks. JPY COT LF net short -137,828 (25.3% long) remains crowded, but 25d RR at -1.52 (strong put skew) signals the options market is aggressively paying for JPY protection against intervention or escalation. Carry dominates while VIX remains at 16.1, but intervention risk is acute above 162.00.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ Decision",
+      "text": "NZD/USD COT LF net short −25,757 (specs heavily short with long% at 19.5%) vs RBNZ hike bias priced for the July 8 meeting. If the RBNZ delivers a 25bp hike to 2.50% or signals a hawkish path, short-squeeze risk is elevated. The crowded speculative short unwind targets a recovery toward 0.5800, while a hold or dovish shift risks capitulation toward 0.5600. NZD/USD is currently trading at 0.5678.",
       "evidence": [
-        "USD/JPY: 162.087",
-        "25d RR: -1.52 (Strong Put Skew)",
-        "Fed 3.75% vs BoJ 1.0%: +275bp"
+        "NZD COT LF net: -25,757",
+        "NZD/USD: 0.5678",
+        "RBNZ bias: Hike"
       ],
-      "watch_level": "Watch for BoJ verbal intervention or a VIX spike above 25 to trigger carry unwinds.",
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:22",
-      "priority": "critical",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short -25,757 (19.5% long) shows speculators heavily fading the RBNZ despite a consensus-expected rate hike at the July 8 meeting. With NZD/USD at 0.5678 and CESI at +6 (positive data beats), a hawkish delivery or hike tomorrow creates a high-conviction short-squeeze risk as crowded spec shorts are forced to unwind. NZD real rate at -0.83% remains accommodative, supporting the RBNZ's hiking bias.",
-      "evidence": [
-        "NZD COT LF net: -25,757 (19.5% long)",
-        "RBNZ Bias: Hike (July 8)",
-        "NZD/USD: 0.5678"
-      ],
-      "watch_level": "RBNZ rate decision on July 8 is the primary catalyst for a short-squeeze.",
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "21:20",
+      "time": "22:21",
       "priority": "warning",
-      "title": "USD/CAD — Correlation Break + Positioning + Vol",
-      "text": "USD/CAD at 1.4197 — the 252d correlation with WTI Oil has broken to -0.881 (z=-2.04σ), as the pair remains bid despite WTI climbing +5.31% to $72.2 on supply disruptions. CAD COT LF net short -92,861 (20.6% long) reflects extreme institutional bearishness, while retail sentiment is 84% short (diverging from COT). This institutional vs retail divergence at the 1.42 level suggests a late-trend exhaustion; however, the 150bp Fed-BoC carry advantage continues to anchor the USD bid.",
+      "title": "USD/JPY — Geopolitical Risk + Carry + Options Skew",
+      "text": "USD/JPY is holding at 162.09, well above the 160.00 level that previously triggered verbal intervention warnings. While the +266bp SOFR-TONA carry advantage structurally supports the pair, escalating Middle East tensions and the US revocation of Iran's crude oil waiver introduce sharp intervention risks. The options market is actively hedging downside protection, with the 1M 25d RR showing a strong put skew of -1.52, diverging from the crowded COT LF net short of -137,828. Watch for sudden BoJ or MoF verbal warnings to trigger a rapid unwind toward 159.50.",
       "evidence": [
-        "USD/CAD vs WTI Corr: -0.881 (z=-2.04σ)",
-        "CAD COT LF net: -92,861",
-        "Retail Sentiment: 84% Short"
+        "USD/JPY: 162.09",
+        "USD/JPY carry: +266bp",
+        "USDJPY 25d RR: -1.52"
       ],
-      "watch_level": "Watch for a break of 1.4200 or the BoC meeting on July 15 to shift the regime.",
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:15",
+      "time": "22:19",
       "priority": "warning",
-      "title": "AUD/USD — Volatility Premium + Carry",
-      "text": "AUD/USD at 0.6928 — IV at 27.8% vs HV30 at 6.9% creates a massive +20.9% Vol Risk Premium, signaling the options market is pricing in extreme tail-risk protection relative to recent realized movement. Despite the high vol premium, the 60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%) and positive CESI (+8) support the pair on dips. COT LF net long +21,597 confirms institutional support for the carry trade.",
+      "title": "AUD/CHF — G10 Bilateral Theme + Carry Divergence",
+      "text": "AUD/CHF triggers a G10 bilateral theme warning with a 0.810% leader-to-laggard spread. AUD is the strongest G10 currency this week (1W average +0.403% across 4 pairs) while CHF is the weakest (1W average -0.408% across 6 pairs). The divergence is fundamentally driven by a massive +435bp carry premium favoring AUD (RBA 4.35% vs SNB 0.0%), which dominates price action in the current normal volatility regime (VIX at 16.1). Watch for any escalation in global risk-off sentiment to rapidly compress this carry spread and bid CHF.",
       "evidence": [
-        "AUD/USD VRP: +20.9% (IV 27.8% / HV30 6.9%)",
-        "RBA 4.35% vs Fed 3.75%: -60bp (AUD favors)",
-        "AUD COT LF net: +21,597"
+        "AUD 1W avg: +0.403% (n=4)",
+        "CHF 1W avg: -0.408% (n=6)",
+        "G10 spread: 0.810%"
       ],
-      "watch_level": "Watch for IV compression or RBA meeting on Aug 11 to validate the carry bid.",
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:10",
+      "time": "22:15",
+      "priority": "warning",
+      "title": "AUD/USD — Volatility Risk Premium Extreme",
+      "text": "AUD/USD options are pricing an extreme volatility risk premium, with 1M implied volatility at 27.8% vs a 30-day realized volatility of 6.9%, resulting in a +20.9% VRP. This massive premium indicates intense institutional demand for downside hedging despite neutral speculative positioning (COT LF net long +21,597, 62.1% long) and a flat retail sentiment split (50% long / 50% short). The options market is pricing in significant tail risk ahead of the next RBA meeting (mkt: 100% hold priced) on August 11. AUD/USD is trading at 0.6928.",
+      "evidence": [
+        "AUD/USD IV: 27.8%",
+        "AUD/USD HV30: 6.9%",
+        "AUD/USD VRP: +20.9%"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
+    },
+    {
+      "time": "22:09",
       "priority": "info",
-      "title": "EUR/USD — Data Underperformance + Hedging Demand",
-      "text": "EUR/USD at 1.1410 — persistent data misses (CESI -10) and a hawkish Fed's Williams support the 150bp USD carry advantage. EUR COT LF net short -83,016 (31.6% long) aligns with the negative data trend. EUR/USD IV at 7.1% vs HV30 at 4.8% (+2.3% VRP) indicates elevated hedging demand as the pair tests the 1.1400 handle. Upside remains structurally limited by the real rate differential (USD +1.49% vs EUR +0.03%).",
+      "title": "USD/CAD — Cross-Asset Correlation Break",
+      "text": "USD/CAD vs WTI Crude Oil 252-day correlation has broken down to -0.881, representing a -2.03σ deviation from its historical norm of +0.010. While WTI crude oil surged +2.73% to $72.4 on Middle East supply disruptions, USD/CAD remained virtually flat at 1.4203. This decoupling indicates that the +133bp SOFR-CORRA carry advantage and safe-haven USD demand amid stock weakness are completely overriding the traditional Canadian oil-export link. Watch the next BoC rate decision on July 15 to see if monetary policy divergence reinforces this break.",
       "evidence": [
-        "EUR CESI: -10 (Strong Negative)",
-        "Fed 3.75% vs ECB 2.25%: +150bp",
-        "EUR/USD VRP: +2.3%"
+        "USD/CAD vs WTI corr: -0.881",
+        "z-score: -2.03σ",
+        "USD/CAD: 1.4203"
       ],
-      "watch_level": "Watch for the ECB meeting on July 23 to address the widening data divergence.",
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     }
   ]
 }
