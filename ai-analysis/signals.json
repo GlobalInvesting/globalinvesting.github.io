@@ -1,60 +1,68 @@
 {
-  "generated_at": "2026-07-07T02:39:21Z",
+  "generated_at": "2026-07-07T10:07:18Z",
   "signals": [
     {
-      "time": "02:40",
+      "time": "10:04",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry",
-      "text": "USD/JPY at 161.89 — 275bp Fed-BoJ carry sustains bid; BoJ meeting on 31 Jul may introduce intervention risk on a break above 160.00. JPY COT LF short −137,828 (crowded carry). Carry dominates until VIX > 25.",
+      "title": "USD/JPY — Geopolitical Shock + Carry + Volatility",
+      "text": "USD/JPY trades at 161.931 as Middle East tensions escalate following reports of a damaged Saudi-flagged crude oil tanker near the Strait of Hormuz. Despite the geopolitical shock, the +275bp USD/JPY carry advantage (Fed 3.75% vs BoJ 1.0%) keeps the pair highly bid, holding just below the critical 162.00 level. JPY speculative positioning remains heavily short with COT LF net short at -137,828 contracts, exposing the market to severe squeeze risk if intervention occurs. However, the options market is actively pricing protection against a sharp downside reversal, with USD/JPY 25d Risk Reversals showing a moderate put skew of -1.43 and the Volatility Risk Premium elevated at +3.9% (IV 7.2% vs HV30 3.3%). Carry continues to dominate the spot trend while VIX remains at 15.8, but intervention risk rises exponentially on a sustained break above 162.00.",
       "evidence": [
-        "USD/JPY: 161.89",
-        "Fed 3.75% vs BoJ 1.0% — 275bp",
-        "JPY COT LF net: −137,828"
-      ]
+        "USD/JPY: 161.931",
+        "USD/JPY carry: +275bp",
+        "JPY COT LF net: -137,828",
+        "USDJPY 25d RR: -1.43"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "02:38",
+      "time": "10:01",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD COT LF net long +21,597 vs elevated IV 38.1% — positioning stalling, vol premium +31.1% signals market hedging. AUD/USD at 0.6956. Watch for RBA meeting on 11 Aug.",
+      "title": "AUD/CHF — G10 Bilateral Theme + Carry",
+      "text": "The G10 Currency Strength Scorecard triggers a bilateral warning as AUD outperformance diverges sharply from CHF weakness, establishing a 0.944% leader-to-laggard spread. This divergence is fundamentally supported by a massive +435bp carry premium favoring the Australian Dollar (RBA 4.35% vs SNB 0.0%). Speculators are positioned for this trend with AUD COT LF net long at +21,597 contracts, while CHF speculative positioning remains net short at -11,011 contracts. With cross-asset volatility contained (VIX at 15.8), the carry-seeking environment continues to support AUD/CHF upside. Watch the RBNZ rate decision on 8 Jul for broader risk-proxy sentiment spillovers.",
       "evidence": [
-        "AUD/USD: 0.6956",
-        "AUD COT LF net: +21,597",
-        "AUD/USD IV: 38.1%"
-      ]
+        "AUD 1W avg: +0.555% (n=4)",
+        "CHF 1W avg: -0.389% (n=6)",
+        "G10 spread: 0.944%",
+        "AUD/CHF carry: +435bp"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "02:37",
+      "time": "09:59",
       "priority": "warning",
-      "title": "EUR/USD — G10 Bilateral Theme + Carry",
-      "text": "AUD (LEADER) +0.612% vs JPY (LAGGARD) −0.427% — G10 bilateral theme (spread 1.039%). EUR/USD at 1.1446; ECB 2.25% vs Fed 3.75% — 150bp carry favors USD.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD/USD trades at 0.56910 as markets brace for the RBNZ policy meeting on 8 Jul. A stark divergence is active: speculative positioning is heavily short with NZD COT LF net short at -25,757 contracts (only 19.5% long), while the RBNZ maintains a hawkish market bias with OIS pricing pointing to a potential hike. This positioning is highly crowded, creating a severe short-squeeze risk if the RBNZ delivers a hawkish hike or signals a restrictive path. However, the real policy rate differential remains a headwind for the Kiwi, with NZD real rate at -0.83% vs USD real rate at +1.49%. A hawkish RBNZ surprise is required to trigger a short unwind toward 0.5800.",
       "evidence": [
-        "AUD 1W avg: +0.612%",
-        "JPY 1W avg: -0.427%",
-        "G10 spread: 1.039%",
-        "EUR/USD: 1.1446"
-      ]
+        "NZD COT LF net: -25,757",
+        "NZD/USD: 0.56910",
+        "NZD real rate: -0.83% vs USD: +1.49%"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "02:36",
-      "priority": "info",
-      "title": "NZD/USD — COT vs OIS Divergence",
-      "text": "NZD/USD COT LF net short −25,757 vs RBNZ hike prob  priced for 27 Jul. If RBNZ delivers or signals hike, short-squeeze risk is elevated — crowded spec short unwind targets 0.5900+. NZD/USD at 0.5703.",
+      "time": "09:54",
+      "priority": "warning",
+      "title": "USD/CAD — Correlation Break + Retail Divergence",
+      "text": "USD/CAD trades at 1.42150, showing a severe correlation break against WTI crude oil with the rolling correlation falling to -0.882 (z-score of -2.04σ vs the 252-day norm of +0.010). While rising oil prices ($69.3, +1.08% intraday) typically support the Canadian Dollar, USD/CAD remains bid due to a +150bp carry advantage (Fed 3.75% vs BoC 2.25%) and a strong positive US Economic Surprise Index (CESI net +282) vs Canada's disappointing data (CESI net -6). Retail traders are heavily fighting this institutional trend, with Myfxbook sentiment showing an extreme 84% short bias on USD/CAD, diverging from the massive institutional short position on CAD (COT LF net short -92,861). This retail-institutional divergence suggests further upside squeeze potential for USD/CAD as retail shorts are forced to capitulate.",
       "evidence": [
-        "NZD/USD: 0.5703",
-        "NZD COT LF net: −25,757",
-        "RBNZ hike prob: {X}%"
-      ]
+        "USD/CAD vs WTI Oil corr: -0.882 (z=-2.04σ)",
+        "USD/CAD retail: 84% short",
+        "CAD COT LF net: -92,861",
+        "USD/CAD carry: +150bp"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "02:35",
+      "time": "09:49",
       "priority": "info",
-      "title": "GBP/USD — Options Skew",
-      "text": "GBP/USD 25d RR at −0.67 — mild put skew signals options market biased for GBP weakness. GBP/USD at 1.3395.",
+      "title": "GBP/USD — Volatility Risk Premium Extreme",
+      "text": "GBP/USD trades at 1.33800 with the options market pricing an extreme Volatility Risk Premium (VRP) of +5.6%, driven by ATM implied volatility at 11.0% vs a realized HV30 of only 5.4%. This represents a significant premium for GBP options, signaling intense institutional hedging demand ahead of the BoE meeting on 30 Jul, despite relatively flat spot price action (+0.31% over 1W). Speculators remain moderately long (GBP COT LF net long +9,753), while retail sentiment is heavily short at 75%. The elevated VRP suggests that while spot remains range-bound, the options market is pricing in a high-impact volatility expansion.",
       "evidence": [
-        "GBP/USD: 1.3395",
-        "GBP/USD 25d RR: −0.67"
-      ]
+        "GBP/USD: 1.33800",
+        "GBP/USD VRP: +5.6% (IV 11.0% vs HV30 5.4%)",
+        "GBP COT LF net: +9,753"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     }
   ]
 }
