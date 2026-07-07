@@ -1,182 +1,91 @@
 {
   "fx": {
-    "eurusd": 1.1444,
-    "gbpusd": 1.3389,
-    "usdjpy": 162.05,
-    "audusd": 0.6958,
-    "usdchf": 0.8045,
-    "usdcad": 1.4207,
-    "nzdusd": 0.57
+    "eurusd": 1.1446,
+    "gbpusd": 1.3395,
+    "usdjpy": 161.889,
+    "audusd": 0.6956,
+    "usdchf": 0.8053,
+    "usdcad": 1.4212,
+    "nzdusd": 0.5703
   },
   "cross": {
     "vix": 15.57,
     "spx": 7537.43,
-    "gold": 4165.274,
-    "wti": 68.78,
-    "dxy": 100.867,
+    "gold": 4156.7,
+    "wti": 69.23,
+    "dxy": 100.843,
     "move": 65.7632,
-    "us2y": 4.17,
+    "us2y": 3.69,
     "us10y": 4.479
   },
   "cot": {
     "USD": {
-      "net": -5369,
-      "we": "2026-06-23"
+      "net": -5584,
+      "we": "2026-06-30"
     },
     "EUR": {
-      "net": -67504,
-      "we": "2026-06-23"
+      "net": -83016,
+      "we": "2026-06-30"
     },
     "GBP": {
-      "net": 631,
-      "we": "2026-06-23"
+      "net": 9753,
+      "we": "2026-06-30"
     },
     "JPY": {
-      "net": -115033,
-      "we": "2026-06-23"
+      "net": -137828,
+      "we": "2026-06-30"
     },
     "AUD": {
-      "net": 29035,
-      "we": "2026-06-23"
+      "net": 21597,
+      "we": "2026-06-30"
     },
     "CAD": {
-      "net": -87096,
-      "we": "2026-06-23"
+      "net": -92861,
+      "we": "2026-06-30"
     },
     "CHF": {
-      "net": -14846,
-      "we": "2026-06-23"
+      "net": -11011,
+      "we": "2026-06-30"
     },
     "NZD": {
-      "net": -23314,
-      "we": "2026-06-23"
+      "net": -25757,
+      "we": "2026-06-30"
     }
   },
   "headlines": [
     {
-      "t": "investingLive Americas FX news wrap 6 Jul: Dow Hits Record, USD and yields mixed",
-      "time": "21:01"
+      "t": "WTI rises above $69.00 as Iran strikes commercial vessels in Hormuz",
+      "time": "02:24"
     },
     {
-      "t": "Forex Today: US Dollar stays neutral as Fed’s Waller reinforces inflation commitment",
-      "time": "20:41"
+      "t": "FX Watch: NZD/CHF and AUD/NZD Trend Lines for a Hawkish RBNZ Decision",
+      "time": "02:05"
     },
     {
-      "t": "Australian Dollar rises as softer Fed bets offset resilient US data",
-      "time": "20:09"
+      "t": "Softer Japan wage data unlikely to derail BOJ hikes, even as yen risk grows",
+      "time": "01:54"
     },
     {
-      "t": "Dollar Erases Early Gains as Fed Rate Hike Prospects Ease",
-      "time": "19:35"
+      "t": "British Pound gains as easing Fed hike bets weigh on US Dollar",
+      "time": "01:42"
     },
     {
-      "t": "New Zealand Dollar pressured by hawkish Fed tone",
-      "time": "18:53"
+      "t": "Event Guide: RBNZ Monetary Policy Statement (July 2026)",
+      "time": "01:33"
     },
     {
-      "t": "Gold slips as firm US yields cap post-NFP rebound",
-      "time": "18:43"
+      "t": "Australian Dollar declines as ANZ\u2013Indeed Job Ads drop in June",
+      "time": "00:55"
     },
     {
-      "t": "United States Dollar Index trims gains as Fed hike bets fade",
-      "time": "18:12"
+      "t": "New Zealand dollar gains seen limited even if RBNZ hikes this week",
+      "time": "22:58"
     },
     {
-      "t": "New Zealand Dollar: Hawkish RBNZ risks and range trading – Rabobank",
-      "time": "17:57"
+      "t": "Fed's Waller and Warsh diverge over role of forward guidance. Public split at the Fed?",
+      "time": "21:54"
     }
   ],
   "market_closed": false,
-  "saved_at": "2026-07-06T21:48:31.612768+00:00",
-  "research_context": {
-    "updated_utc": "2026-07-06T21:48:31.612768+00:00",
-    "items": [
-      {
-        "bank": "CME",
-        "title": "Japanese Yen futures fell back toward multi-decade lows.",
-        "pairs": [],
-        "ts": 1783364508000
-      },
-      {
-        "bank": "ING",
-        "title": "US Dollar Credit Supply: Supply continues at a strong pace",
-        "pairs": [],
-        "ts": 1783349940000
-      },
-      {
-        "bank": "CME",
-        "title": "Inflation data and Fed speakers drive market sentiment.",
-        "pairs": [],
-        "ts": 1783349409000
-      },
-      {
-        "bank": "ING",
-        "title": "Euro Credit Supply: Supply continues at a strong pace",
-        "pairs": [],
-        "ts": 1783348680000
-      },
-      {
-        "bank": "ING",
-        "title": "EUR Money Markets: Some signs of tightening conditions",
-        "pairs": [],
-        "ts": 1783345800000
-      },
-      {
-        "bank": "ING",
-        "title": "GBP Money Markets: Bank of England is supporting liquidity",
-        "pairs": [],
-        "ts": 1783343880000
-      },
-      {
-        "bank": "ING",
-        "title": "US Money Markets: Circumstances auger for terming out",
-        "pairs": [],
-        "ts": 1783343700000
-      },
-      {
-        "bank": "Saxo",
-        "title": "From liquidation to consolidation: precious metals seek a floor",
-        "pairs": [],
-        "ts": 1783338000000
-      },
-      {
-        "bank": "ING",
-        "title": "Hungary’s second-quarter growth supported by consumption and exports",
-        "pairs": [],
-        "ts": 1783335600000
-      },
-      {
-        "bank": "ING",
-        "title": "RBNZ set to deliver July insurance hike",
-        "pairs": [],
-        "ts": 1783334880000
-      },
-      {
-        "bank": "ING",
-        "title": "Europe’s push for sustainable aviation fuels needs more than mandates",
-        "pairs": [],
-        "ts": 1783328100000
-      },
-      {
-        "bank": "Saxo",
-        "title": "Bending Spoons and the software comeback: why this IPO matters for SaaS investors",
-        "pairs": [],
-        "ts": 1783326600000
-      },
-      {
-        "bank": "Saxo",
-        "title": "Market Quick Take - Investors await the next trigger - 6 July 2026",
-        "pairs": [],
-        "ts": 1783319880000
-      },
-      {
-        "bank": "ING",
-        "title": "FX Daily: More insights into the Fed this week",
-        "pairs": [
-          "USD/JPY"
-        ],
-        "ts": 1783319280000
-      }
-    ]
-  }
+  "saved_at": "2026-07-07T02:40:59Z"
 }
