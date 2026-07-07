@@ -1,64 +1,69 @@
 {
-  "generated_at": "2026-07-07T16:46:07Z",
+  "generated_at": "2026-07-07T21:26:53Z",
   "signals": [
     {
-      "time": "16:43",
+      "time": "21:25",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry + Vol",
-      "text": "USD/JPY at 161.94 — Middle East tensions following Hormuz traffic reports revive USD safe-haven demand, while the +275bp Fed-BoJ carry (Fed 3.75% vs BoJ 1.0%) sustains the structural bid. JPY COT LF net short -137,828 (long% 25.3%) remains crowded, while USDJPY IV at 7.2% vs HV30 3.3% (VRP +3.9%) indicates the options market is pricing a significant premium for protection. 25d RR at -1.52 confirms a strong put skew as traders hedge against BoJ intervention or a sharp carry unwind. Carry dominates the regime while VIX remains at 15.8 (normal volatility), but intervention risk is acute above 162.00.",
+      "title": "USD/JPY — Geopolitical Shock + Options Skew + Carry",
+      "text": "USD/JPY at 162.09 — 275bp Fed-BoJ carry sustains the bid despite the U.S. revoking Iranian oil waivers following Strait of Hormuz tanker attacks. JPY COT LF net short -137,828 (25.3% long) remains crowded, but 25d RR at -1.52 (strong put skew) signals the options market is aggressively paying for JPY protection against intervention or escalation. Carry dominates while VIX remains at 16.1, but intervention risk is acute above 162.00.",
       "evidence": [
-        "USD/JPY: 161.94",
-        "Fed 3.75% vs BoJ 1.0% — +275bp",
-        "USDJPY 25d RR: -1.52 (Strong Put Skew)"
+        "USD/JPY: 162.087",
+        "25d RR: -1.52 (Strong Put Skew)",
+        "Fed 3.75% vs BoJ 1.0%: +275bp"
       ],
+      "watch_level": "Watch for BoJ verbal intervention or a VIX spike above 25 to trigger carry unwinds.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:40",
-      "priority": "warning",
+      "time": "21:22",
+      "priority": "critical",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD at 0.5685 — COT LF net short -25,757 (long% 19.5%) shows specs are heavily positioned for NZD weakness, yet OIS markets price a hike bias for the RBNZ meeting on 8 July. This creates a high-conviction short-squeeze risk if the RBNZ delivers a hike or hawkish guidance. NZD real rate at -0.83% remains the most accommodative in the G10, providing a fundamental anchor for the spec short despite the OIS pricing. Watch for the RBNZ decision to trigger a crowded spec unwind toward 0.5800.",
+      "text": "NZD/USD COT LF net short -25,757 (19.5% long) shows speculators heavily fading the RBNZ despite a consensus-expected rate hike at the July 8 meeting. With NZD/USD at 0.5678 and CESI at +6 (positive data beats), a hawkish delivery or hike tomorrow creates a high-conviction short-squeeze risk as crowded spec shorts are forced to unwind. NZD real rate at -0.83% remains accommodative, supporting the RBNZ's hiking bias.",
       "evidence": [
-        "NZD COT LF net: -25,757 (19.5% Long)",
-        "NZD/USD: 0.5685",
-        "RBNZ Market Bias: Hike"
+        "NZD COT LF net: -25,757 (19.5% long)",
+        "RBNZ Bias: Hike (July 8)",
+        "NZD/USD: 0.5678"
       ],
+      "watch_level": "RBNZ rate decision on July 8 is the primary catalyst for a short-squeeze.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:38",
+      "time": "21:20",
       "priority": "warning",
-      "title": "AUD/CHF — G10 Bilateral Theme + Carry",
-      "text": "AUD/CHF at 0.5598 — G10 scorecard identifies a bilateral theme with a 0.806% spread between leader AUD and laggard CHF. The divergence is fundamentally supported by a massive +435bp carry advantage (RBA 4.35% vs SNB 0.0%). AUD COT LF net long +21,597 (62.1%) aligns with the outperformance, while CHF net short -11,011 reflects the funding currency status. The theme persists as long as cross-asset volatility remains contained; a VIX spike above 20 would threaten this carry-driven outperformance.",
+      "title": "USD/CAD — Correlation Break + Positioning + Vol",
+      "text": "USD/CAD at 1.4197 — the 252d correlation with WTI Oil has broken to -0.881 (z=-2.04σ), as the pair remains bid despite WTI climbing +5.31% to $72.2 on supply disruptions. CAD COT LF net short -92,861 (20.6% long) reflects extreme institutional bearishness, while retail sentiment is 84% short (diverging from COT). This institutional vs retail divergence at the 1.42 level suggests a late-trend exhaustion; however, the 150bp Fed-BoC carry advantage continues to anchor the USD bid.",
       "evidence": [
-        "AUD 1W avg: +0.447% (n=4)",
-        "CHF 1W avg: -0.358% (n=6)",
-        "G10 spread: 0.806%"
+        "USD/CAD vs WTI Corr: -0.881 (z=-2.04σ)",
+        "CAD COT LF net: -92,861",
+        "Retail Sentiment: 84% Short"
       ],
+      "watch_level": "Watch for a break of 1.4200 or the BoC meeting on July 15 to shift the regime.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:35",
+      "time": "21:15",
       "priority": "warning",
-      "title": "USD/CAD — Positioning + Vol + Retail",
-      "text": "USD/CAD at 1.4196 — CAD COT LF net short -92,861 (long% 20.6%) shows extreme institutional bearishness, while retail sentiment is 85% short, creating a rare institutional vs retail alignment that often precedes trend exhaustion. USD/CAD vs WTI Oil correlation at -0.881 (z=-2.04σ) indicates a significant break from the historical norm (+0.010), with CAD failing to benefit from the +2.87% intraday rally in WTI ($70.5). USD/CAD upside is structurally supported by a +150bp carry advantage (Fed 3.75% vs BoC 2.25%), but the correlation break and crowded positioning suggest a move toward 1.4300 will face heavy supply.",
+      "title": "AUD/USD — Volatility Premium + Carry",
+      "text": "AUD/USD at 0.6928 — IV at 27.8% vs HV30 at 6.9% creates a massive +20.9% Vol Risk Premium, signaling the options market is pricing in extreme tail-risk protection relative to recent realized movement. Despite the high vol premium, the 60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%) and positive CESI (+8) support the pair on dips. COT LF net long +21,597 confirms institutional support for the carry trade.",
       "evidence": [
-        "CAD COT long%: 20.6%",
-        "Retail Sentiment: 85% Short",
-        "USD/CAD vs WTI Corr: -0.881 (z=-2.04σ)"
+        "AUD/USD VRP: +20.9% (IV 27.8% / HV30 6.9%)",
+        "RBA 4.35% vs Fed 3.75%: -60bp (AUD favors)",
+        "AUD COT LF net: +21,597"
       ],
+      "watch_level": "Watch for IV compression or RBA meeting on Aug 11 to validate the carry bid.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:30",
+      "time": "21:10",
       "priority": "info",
-      "title": "EUR/USD — Vol Premium + CESI Divergence",
-      "text": "EUR/USD at 1.1423 — IV at 7.1% vs HV30 4.7% (VRP +2.4%) signals elevated hedging demand despite a near-neutral 25d RR of -0.29. The pair faces fundamental headwinds as the Economic Surprise Index (CESI) shows a strong negative bias for EUR (net -10) vs a strong positive bias for USD (net +282). The +150bp carry advantage (Fed 3.75% vs ECB 2.25%) favors USD, keeping EUR/USD upside capped at 1.1500. Watch the ECB meeting on 23 July for any shift in the hiking stance to counter the persistent data misses.",
+      "title": "EUR/USD — Data Underperformance + Hedging Demand",
+      "text": "EUR/USD at 1.1410 — persistent data misses (CESI -10) and a hawkish Fed's Williams support the 150bp USD carry advantage. EUR COT LF net short -83,016 (31.6% long) aligns with the negative data trend. EUR/USD IV at 7.1% vs HV30 at 4.8% (+2.3% VRP) indicates elevated hedging demand as the pair tests the 1.1400 handle. Upside remains structurally limited by the real rate differential (USD +1.49% vs EUR +0.03%).",
       "evidence": [
-        "EUR/USD VRP: +2.4% (IV 7.1% / HV 4.7%)",
-        "USD CESI: +282 vs EUR CESI: -10",
-        "Fed 3.75% vs ECB 2.25% — +150bp"
+        "EUR CESI: -10 (Strong Negative)",
+        "Fed 3.75% vs ECB 2.25%: +150bp",
+        "EUR/USD VRP: +2.3%"
       ],
+      "watch_level": "Watch for the ECB meeting on July 23 to address the widening data divergence.",
       "_source": "gemini:gemini-3-flash-preview"
     }
   ]
