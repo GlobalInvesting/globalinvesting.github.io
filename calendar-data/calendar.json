@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-07T15:59:21Z",
-  "generatedAt": "2026-07-07T15:59:21Z",
+  "lastUpdate": "2026-07-07T21:49:53Z",
+  "generatedAt": "2026-07-07T21:49:53Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,21 +9,21 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-07",
   "rangeTo": "2026-07-07",
-  "totalEvents": 3977,
+  "totalEvents": 3978,
   "currencyCounts": {
     "EUR": 875,
     "GBP": 472,
     "JPY": 257,
     "AUD": 290,
     "CAD": 312,
-    "USD": 1251,
+    "USD": 1252,
     "NZD": 123,
     "CHF": 163,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2107,
+    "medium": 2108,
     "high": 1642,
     "low": 228
   },
@@ -394,9 +394,9 @@
       "std": 0.471699
     },
     "USD/api crude oil stock change": {
-      "n": 11,
-      "mean": -2.557182,
-      "std": 3.680796
+      "n": 12,
+      "mean": -2.252333,
+      "std": 3.664941
     },
     "NOK/balance of trade": {
       "n": 3,
@@ -49377,9 +49377,22 @@
       "flag": "🇺🇸",
       "event": "United States Consumer Inflation Expectations",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.7%",
       "forecast": "3.2%",
       "previous": "3.5%"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States API Crude Oil Stock Change",
+      "impact": "medium",
+      "actual": "-0.399M",
+      "forecast": "-1.5M",
+      "previous": "-6.072M"
     },
     {
       "date": "7 Jul",
