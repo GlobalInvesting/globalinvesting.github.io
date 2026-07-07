@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-06T21:52:34Z",
-  "generatedAt": "2026-07-06T21:52:34Z",
+  "lastUpdate": "2026-07-07T08:48:49Z",
+  "generatedAt": "2026-07-07T08:48:49Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,76 +8,26 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-07-07",
-  "rangeTo": "2026-07-06",
-  "totalEvents": 3966,
+  "rangeTo": "2026-07-07",
+  "totalEvents": 3977,
   "currencyCounts": {
-    "EUR": 874,
-    "GBP": 470,
-    "JPY": 256,
+    "EUR": 875,
+    "GBP": 472,
+    "JPY": 257,
     "AUD": 290,
-    "CAD": 310,
-    "USD": 1246,
+    "CAD": 312,
+    "USD": 1251,
     "NZD": 123,
     "CHF": 163,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2098,
-    "high": 1640,
+    "medium": 2107,
+    "high": 1642,
     "low": 228
   },
   "surpriseStats": {
-    "CAD/ivey pmi s.a": {
-      "n": 3,
-      "mean": 1.6,
-      "std": 7.135825
-    },
-    "JPY/current account": {
-      "n": 3,
-      "mean": 652.333333,
-      "std": 232.968524
-    },
-    "SEK/cpif yoy": {
-      "n": 6,
-      "mean": -0.1,
-      "std": 0.244949
-    },
-    "SEK/cpif mom": {
-      "n": 6,
-      "mean": -0.083333,
-      "std": 0.271416
-    },
-    "SEK/inflation rate yoy": {
-      "n": 6,
-      "mean": -0.1,
-      "std": 0.268328
-    },
-    "SEK/inflation rate mom": {
-      "n": 6,
-      "mean": -0.083333,
-      "std": 0.271416
-    },
-    "SEK/services pmi": {
-      "n": 3,
-      "mean": 0.9,
-      "std": 2.170253
-    },
-    "USD/durable goods orders ex defense mom": {
-      "n": 5,
-      "mean": 0.4,
-      "std": 3.091925
-    },
-    "USD/durable goods orders ex transp mom": {
-      "n": 5,
-      "mean": 0.56,
-      "std": 0.167332
-    },
-    "USD/durable goods orders mom": {
-      "n": 5,
-      "mean": 0.76,
-      "std": 2.083987
-    },
     "CHF/unemployment rate": {
       "n": 4,
       "mean": 0.075,
@@ -104,14 +54,14 @@
       "std": 1.606521
     },
     "GBP/halifax house price index yoy": {
-      "n": 3,
-      "mean": -0.466667,
-      "std": 0.251661
+      "n": 4,
+      "mean": -0.275,
+      "std": 0.434933
     },
     "GBP/halifax house price index mom": {
-      "n": 3,
-      "mean": -0.266667,
-      "std": 0.305505
+      "n": 4,
+      "mean": -0.175,
+      "std": 0.30957
     },
     "GBP/rics house price balance": {
       "n": 3,
@@ -412,6 +362,26 @@
       "n": 4,
       "mean": 7.55,
       "std": 6.212085
+    },
+    "SEK/inflation rate yoy": {
+      "n": 5,
+      "mean": -0.04,
+      "std": 0.250998
+    },
+    "SEK/cpif yoy": {
+      "n": 5,
+      "mean": -0.04,
+      "std": 0.219089
+    },
+    "SEK/cpif mom": {
+      "n": 5,
+      "mean": -0.02,
+      "std": 0.248998
+    },
+    "SEK/inflation rate mom": {
+      "n": 5,
+      "mean": -0.02,
+      "std": 0.248998
     },
     "USD/ppi mom": {
       "n": 4,
@@ -928,6 +898,21 @@
       "mean": 1.8,
       "std": 0.707107
     },
+    "USD/durable goods orders ex transp mom": {
+      "n": 4,
+      "mean": 0.625,
+      "std": 0.095743
+    },
+    "USD/durable goods orders mom": {
+      "n": 4,
+      "mean": 1.175,
+      "std": 2.154646
+    },
+    "USD/durable goods orders ex defense mom": {
+      "n": 4,
+      "mean": 0.875,
+      "std": 3.352984
+    },
     "USD/goods trade balance": {
       "n": 4,
       "mean": -9.5925,
@@ -1163,6 +1148,16 @@
       "mean": 0.352667,
       "std": 0.359607
     },
+    "CAD/ivey pmi s.a": {
+      "n": 2,
+      "mean": 5.5,
+      "std": 3.252691
+    },
+    "SEK/services pmi": {
+      "n": 2,
+      "mean": 0.2,
+      "std": 2.545584
+    },
     "USD/adp employment change": {
       "n": 3,
       "mean": 0.0,
@@ -1224,14 +1219,19 @@
       "std": 0.173205
     },
     "JPY/household spending yoy": {
-      "n": 2,
-      "mean": -0.3,
-      "std": 1.838478
+      "n": 3,
+      "mean": 0.5,
+      "std": 1.9
     },
     "JPY/household spending mom": {
+      "n": 3,
+      "mean": 0.4,
+      "std": 2.12838
+    },
+    "JPY/current account": {
       "n": 2,
-      "mean": -0.55,
-      "std": 1.909188
+      "mean": 786.5,
+      "std": 23.334524
     },
     "EUR/employment change qoq": {
       "n": 2,
@@ -43650,19 +43650,6 @@
     {
       "date": "15 Jun",
       "dateISO": "2026-06-15",
-      "timeUTC": "07:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "15 Jun",
-      "dateISO": "2026-06-15",
       "timeUTC": "08:00",
       "country": "AUD",
       "currency": "AUD",
@@ -49234,7 +49221,7 @@
       "flag": "🇯🇵",
       "event": "Japan Household Spending YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.4%",
       "forecast": "-2.5%",
       "previous": "-0.5%"
     },
@@ -49247,9 +49234,165 @@
       "flag": "🇯🇵",
       "event": "Japan Household Spending MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.7%",
       "forecast": "1.4%",
       "previous": "1.6%"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Industrial Production MoM",
+      "impact": "medium",
+      "actual": "0.9%",
+      "forecast": "0.2%",
+      "previous": "0.4%"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Halifax House Price Index MoM",
+      "impact": "medium",
+      "actual": "0.2%",
+      "forecast": "0.1%",
+      "previous": "-0.2%"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Halifax House Price Index YoY",
+      "impact": "medium",
+      "actual": "0.6%",
+      "forecast": "0.3%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Balance of Trade",
+      "impact": "medium",
+      "actual": "&#8364;-6.9B",
+      "forecast": "&#8364;-5.2B",
+      "previous": "&#8364;-5.4B"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "12:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States ADP Employment Change Weekly",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "30.75K"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "C$2.7B",
+      "previous": "C$2.72B"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "$-78.0B",
+      "previous": "$-55.9B"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Imports",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "$394.0B",
+      "previous": "$383.0B"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Exports",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "$314.0B",
+      "previous": "$327.1B"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "14:00",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Ivey PMI s.a",
+      "impact": "high",
+      "actual": null,
+      "forecast": "59.1",
+      "previous": "58.2"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Consumer Inflation Expectations",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.2%",
+      "previous": "3.5%"
+    },
+    {
+      "date": "7 Jul",
+      "dateISO": "2026-07-07",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "&#165;4121.3B",
+      "previous": "&#165;3907.0B"
     }
   ]
 }
