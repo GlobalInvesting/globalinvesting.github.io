@@ -694,7 +694,17 @@
   .cot-row:hover { background: var(--bg3); }
   .cot-row:last-child { border-bottom: none; }
   .cot-sym { font-weight: 700; color: #fff; font-family: var(--font-ui); }
-  .cot-bar-outer { height: 10px; background: var(--bg3); position: relative; overflow: hidden; }
+  /* Contained horizontal scroll when #rightpanel is resized narrower than the grid's
+     fixed-column total (378px) — matches institutional dense-grid convention: scroll
+     the row set, never silently squeeze the Long/Short bar to unreadable width or
+     clip a column with no way to reach it. min-width on cot-bar-outer sets the grid's
+     automatic minimum for the 1fr track, so the whole row's intrinsic min-width
+     becomes ~414px (322px fixed cols + 56px gaps + 36px bar floor). */
+  .cot-scroll-wrap { overflow-x: auto; }
+  .cot-scroll-wrap::-webkit-scrollbar { height: 3px; }
+  .cot-scroll-wrap::-webkit-scrollbar-thumb { background: var(--border2); }
+  .cot-header, .cot-row { min-width: 414px; }
+  .cot-bar-outer { height: 10px; min-width: 36px; background: var(--bg3); position: relative; overflow: hidden; }
   .cot-long-fill  { position: absolute; left: 0;  top: 0; height: 100%; background: var(--up);   opacity: .75; }
   .cot-short-fill { position: absolute; right: 0; top: 0; height: 100%; background: var(--down); opacity: .75; }
   .cot-pct { font-size: 10px; font-family: var(--font-mono); }
