@@ -1,102 +1,42 @@
 {
-  "lastUpdate": "2026-07-07T21:49:53Z",
-  "generatedAt": "2026-07-07T21:49:53Z",
+  "lastUpdate": "2026-07-08T07:53:05Z",
+  "generatedAt": "2026-07-08T07:53:05Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-07",
-  "rangeTo": "2026-07-07",
+  "rangeFrom": "2025-07-08",
+  "rangeTo": "2026-07-08",
   "totalEvents": 3978,
   "currencyCounts": {
-    "EUR": 875,
-    "GBP": 472,
-    "JPY": 257,
-    "AUD": 290,
+    "AUD": 291,
     "CAD": 312,
-    "USD": 1252,
-    "NZD": 123,
+    "EUR": 873,
+    "USD": 1253,
+    "GBP": 471,
+    "NZD": 125,
     "CHF": 163,
+    "JPY": 256,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2108,
-    "high": 1642,
+    "high": 1641,
+    "medium": 2109,
     "low": 228
   },
   "surpriseStats": {
-    "CHF/unemployment rate": {
-      "n": 4,
-      "mean": 0.075,
-      "std": 0.125831
-    },
-    "EUR/factory orders mom": {
-      "n": 3,
-      "mean": 0.1,
-      "std": 3.459769
-    },
-    "EUR/balance of trade": {
-      "n": 13,
-      "mean": -12869.090308,
-      "std": 46397.348469
-    },
-    "EUR/retail sales mom": {
-      "n": 10,
-      "mean": -0.13,
-      "std": 0.876926
-    },
-    "EUR/retail sales yoy": {
-      "n": 11,
-      "mean": -0.109091,
-      "std": 1.606521
-    },
-    "GBP/halifax house price index yoy": {
-      "n": 4,
-      "mean": -0.275,
-      "std": 0.434933
-    },
-    "GBP/halifax house price index mom": {
-      "n": 4,
-      "mean": -0.175,
-      "std": 0.30957
-    },
-    "GBP/rics house price balance": {
-      "n": 3,
-      "mean": -5.666667,
-      "std": 3.05505
-    },
-    "NOK/house price index mom": {
-      "n": 3,
-      "mean": -0.033333,
-      "std": 0.378594
-    },
-    "NOK/house price index yoy": {
-      "n": 3,
-      "mean": -0.066667,
-      "std": 0.416333
-    },
-    "NZD/rbnz interest rate decision": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "USD/eia gasoline stocks change": {
-      "n": 15,
-      "mean": -0.269133,
-      "std": 2.323732
-    },
-    "USD/eia crude oil stocks change": {
-      "n": 15,
-      "mean": -1.561867,
-      "std": 2.769592
-    },
     "EUR/exports mom": {
       "n": 3,
       "mean": 2.0,
       "std": 0.72111
+    },
+    "EUR/balance of trade": {
+      "n": 12,
+      "mean": -13941.231167,
+      "std": 48291.960107
     },
     "EUR/industrial production mom": {
       "n": 12,
@@ -422,6 +362,16 @@
       "n": 4,
       "mean": -0.75,
       "std": 2.061553
+    },
+    "USD/eia gasoline stocks change": {
+      "n": 14,
+      "mean": -0.274857,
+      "std": 2.411341
+    },
+    "USD/eia crude oil stocks change": {
+      "n": 14,
+      "mean": -1.8435,
+      "std": 2.641857
     },
     "USD/net long-term tic flows": {
       "n": 3,
@@ -762,6 +712,16 @@
       "n": 3,
       "mean": -0.7,
       "std": 1.835756
+    },
+    "EUR/retail sales mom": {
+      "n": 9,
+      "mean": -0.144444,
+      "std": 0.928858
+    },
+    "EUR/retail sales yoy": {
+      "n": 10,
+      "mean": -0.13,
+      "std": 1.691843
     },
     "EUR/unemployment benefit claims": {
       "n": 3,
@@ -1153,6 +1113,16 @@
       "mean": 2.7,
       "std": 5.367495
     },
+    "NOK/house price index mom": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.494975
+    },
+    "NOK/house price index yoy": {
+      "n": 2,
+      "mean": -0.0,
+      "std": 0.565685
+    },
     "SEK/services pmi": {
       "n": 2,
       "mean": 0.2,
@@ -1168,6 +1138,16 @@
       "mean": -3.772667,
       "std": 3.288529
     },
+    "CHF/unemployment rate": {
+      "n": 3,
+      "mean": 0.066667,
+      "std": 0.152753
+    },
+    "EUR/factory orders mom": {
+      "n": 2,
+      "mean": 0.7,
+      "std": 4.666905
+    },
     "NOK/norges bank interest rate decision": {
       "n": 2,
       "mean": 0.125,
@@ -1182,6 +1162,16 @@
       "n": 2,
       "mean": 0.0,
       "std": 0.0
+    },
+    "GBP/halifax house price index yoy": {
+      "n": 3,
+      "mean": -0.133333,
+      "std": 0.404145
+    },
+    "GBP/halifax house price index mom": {
+      "n": 3,
+      "mean": -0.033333,
+      "std": 0.152753
     },
     "USD/non farm payrolls": {
       "n": 3,
@@ -1229,9 +1219,9 @@
       "std": 2.12838
     },
     "JPY/current account": {
-      "n": 2,
-      "mean": 786.5,
-      "std": 23.334524
+      "n": 3,
+      "mean": -550298.110667,
+      "std": 954506.545087
     },
     "EUR/employment change qoq": {
       "n": 2,
@@ -1243,6 +1233,11 @@
       "mean": 0.0,
       "std": 0.0
     },
+    "GBP/rics house price balance": {
+      "n": 2,
+      "mean": -6.0,
+      "std": 4.242641
+    },
     "JPY/gdp growth annualized": {
       "n": 2,
       "mean": 0.45,
@@ -1252,6 +1247,11 @@
       "n": 2,
       "mean": 0.15,
       "std": 0.070711
+    },
+    "NZD/rbnz interest rate decision": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
     },
     "GBP/dmp 1y cpi expectations": {
       "n": 2,
@@ -1287,81 +1287,14 @@
       "n": 2,
       "mean": -9.3,
       "std": 0.0
+    },
+    "AUD/private house approvals mom": {
+      "n": 2,
+      "mean": 1.5,
+      "std": 2.12132
     }
   },
   "events": [
-    {
-      "currency": "EUR",
-      "event": "Industrial Production MoM",
-      "dateISO": "2025-07-07",
-      "hourUTC": "06:00",
-      "actual": "1.2%",
-      "forecast": "0.0",
-      "previous": "-1.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Retail Sales YoY",
-      "dateISO": "2025-07-07",
-      "hourUTC": "09:00",
-      "actual": "1.8%",
-      "forecast": "1.2",
-      "previous": "2.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Retail Sales MoM",
-      "dateISO": "2025-07-07",
-      "hourUTC": "09:00",
-      "actual": "-0.7%",
-      "forecast": "-0.7",
-      "previous": "0.3",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Halifax House Price Index MoM",
-      "dateISO": "2025-07-07",
-      "hourUTC": "06:00",
-      "actual": "0%",
-      "forecast": "0.0",
-      "previous": "-0.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Halifax House Price Index YoY",
-      "dateISO": "2025-07-07",
-      "hourUTC": "06:00",
-      "actual": "2.5%",
-      "forecast": "2.2",
-      "previous": "2.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Current Account",
-      "dateISO": "2025-07-07",
-      "hourUTC": "23:50",
-      "actual": "¥3436.4B",
-      "forecast": "2940.0",
-      "previous": "2258.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
     {
       "currency": "AUD",
       "event": "NAB Business Confidence",
@@ -44063,19 +43996,6 @@
     {
       "date": "16 Jun",
       "dateISO": "2026-06-16",
-      "timeUTC": "05:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Press Conference",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "16 Jun",
-      "dateISO": "2026-06-16",
       "timeUTC": "09:00",
       "country": "EUR",
       "currency": "EUR",
@@ -49403,9 +49323,100 @@
       "flag": "🇯🇵",
       "event": "Japan Current Account",
       "impact": "medium",
-      "actual": null,
+      "actual": "&#165;3.968B",
       "forecast": "&#165;4121.3B",
-      "previous": "&#165;3907.0B"
+      "previous": "&#165;3.908B"
+    },
+    {
+      "date": "8 Jul",
+      "dateISO": "2026-07-08",
+      "timeUTC": "01:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Hunter Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "8 Jul",
+      "dateISO": "2026-07-08",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Private House Approvals MoM",
+      "impact": "medium",
+      "actual": "2.8%",
+      "forecast": "2.8%",
+      "previous": "-0.4%"
+    },
+    {
+      "date": "8 Jul",
+      "dateISO": "2026-07-08",
+      "timeUTC": "02:00",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand RBNZ Interest Rate Decision",
+      "impact": "medium",
+      "actual": "2.5%",
+      "forecast": "2.5%",
+      "previous": "2.25%"
+    },
+    {
+      "date": "8 Jul",
+      "dateISO": "2026-07-08",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "&#8364;-1.8B",
+      "previous": "&#8364;-0.2B"
+    },
+    {
+      "date": "8 Jul",
+      "dateISO": "2026-07-08",
+      "timeUTC": "18:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States FOMC Minutes",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "8 Jul",
+      "dateISO": "2026-07-08",
+      "timeUTC": "22:30",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Business NZ PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "49.0",
+      "previous": "49.9"
+    },
+    {
+      "date": "8 Jul",
+      "dateISO": "2026-07-08",
+      "timeUTC": "23:01",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom RICS House Price Balance",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-32.0%",
+      "previous": "-34.0%"
     }
   ]
 }
