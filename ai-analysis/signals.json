@@ -1,68 +1,51 @@
 {
-  "generated_at": "2026-07-08T09:06:35Z",
+  "generated_at": "2026-07-08T16:15:49Z",
   "signals": [
     {
-      "time": "09:04",
+      "time": "16:13",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Escalation + Options Skew + Carry",
-      "text": "USD/JPY trades at 162.48, holding above the 162.40 resistance area as US President Trump declares the Iran Memorandum of Understanding over at the NATO summit, triggering fresh US airstrikes. Despite the geopolitical shock, the massive +275bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 1.0%) continues to support the pair, as VIX at 18.4 remains in normal volatility territory, preventing a broad safe-haven JPY unwind. However, the options market is aggressively hedging downside risk, with the 25d Risk Reversal at -1.52 showing a strong put skew, while speculative positioning is heavily short JPY with COT LF net short at -137,828 contracts. This extreme positioning combined with the options skew indicates that while carry dominates the spot trend, the pair is highly vulnerable to a rapid unwind if geopolitical escalation pushes VIX above 25 or triggers BoJ verbal intervention. Watch for a sustained break above 162.50 to accelerate spot gains, or a drop below 161.80 to confirm options-led hedging is turning into spot capitulation.",
+      "title": "GBP/JPY — G10 Bilateral Theme + Middle East Oil Shock",
+      "text": "GBP/JPY trades at 217.344, driven by a widening G10 performance spread where GBP leads (+0.594% 1W avg) and JPY lags (-0.621% 1W avg). The Middle East geopolitical escalation and subsequent +7.81% surge in WTI crude oil to $75.9 act as a severe terms-of-trade shock for energy-importing Japan, compounding JPY weakness. This macro shock overrides the JPY safe-haven function as VIX remains at 18.3 (normal volatility). The SONIA 3.73% vs TONA 0.98% (+275bp) OIS carry premium structurally favors GBP, keeping the pair heavily bid. JPY COT speculative positioning is crowded short at net -137,828, leaving it highly vulnerable to any sudden risk-off deleveraging, though carry dominates while VIX remains below 25. Watch the next BoE meeting (mkt: 100% hold priced) on 30 Jul and BoJ meeting on 31 Jul to determine if the yield gap direction shifts.",
       "evidence": [
-        "USD/JPY Spot: 162.48",
-        "USD/JPY Carry Spread: +275bp",
-        "USDJPY 25d RR: -1.52",
-        "JPY COT LF Net: -137,828"
+        "GBP 1W avg: +0.594% (n=4)",
+        "JPY 1W avg: -0.621% (n=7)",
+        "G10 spread: 1.215%"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "09:01",
+      "time": "16:10",
       "priority": "warning",
-      "title": "CAD/JPY — G10 Bilateral Theme + Oil Supply Shock",
-      "text": "CAD/JPY trades at 114.719, driven by a prominent G10 bilateral theme where CAD is the weekly leader and JPY is the laggard, generating a 1.054% spread. The divergence is amplified by a +5.64% surge in WTI crude oil to $74.4 following US airstrikes in Iran, which directly benefits the CAD terms of trade while punishing the energy-importing JPY. This fundamental divergence is supported by a +125bp carry advantage favoring CAD (BoC 2.25% vs BoJ 1.0%). Speculative positioning is highly asymmetric with CAD COT LF net short at -92,861 contracts and JPY net short at -137,828 contracts, suggesting that any further oil-driven CAD outperformance will trigger a rapid short-covering rally in CAD/JPY. Watch the BoC policy decision on 15 Jul and ongoing oil price action to confirm the continuation of this bilateral trend.",
+      "title": "USD/JPY — Positioning + Vol + Intervention Risk",
+      "text": "USD/JPY trades at 162.642, holding well above the critical 160.00 level that has previously triggered Bank of Japan verbal and physical intervention. The pair is supported by a massive +275bp OIS carry advantage (SOFR 3.63% vs TONA 0.98%) and a positive US Economic Surprise Index (CESI net +284 beats). However, the options market is actively hedging downside risk: the 25d Risk Reversal shows a moderate put skew of -1.47 (Saxo, 1M tenor, indicative mid), and USD/JPY ATM implied volatility of 7.2% trades 3.8 vol-pts above its 3.4% 30-day realized volatility (VRP +3.8%). This elevated volatility risk premium indicates institutional demand for downside protection despite the spot uptrend. Speculative positioning is heavily short JPY (COT net -137,828), creating extreme short-squeeze risk if the BoJ intervenes. Watch for verbal warnings from Japanese officials or a sudden drop in spot below 162.00 to trigger a rapid unwind of crowded carry trades.",
       "evidence": [
-        "CAD 1W avg: +0.439% (n=3)",
-        "JPY 1W avg: -0.615% (n=7)",
-        "G10 spread: 1.054%",
-        "WTI Oil: $74.4"
+        "USD/JPY: 162.642",
+        "USD/JPY 25d RR: -1.47",
+        "USD/JPY VRP: +3.8% (IV 7.2% vs HV30 3.4%)"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "08:59",
+      "time": "16:07",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ Hike Bias",
-      "text": "NZD/USD trades at 0.5701 following the RBNZ policy decision where the central bank raised its policy rate to 2.25%. A stark divergence exists between speculative positioning and the central bank's forward bias: COT LF net positioning is heavily short at -25,757 contracts (long% at an extreme 19.5%), while the RBNZ maintains an active hike bias. This positioning mismatch creates a severe short-squeeze risk as MUFG reports the RBNZ hike is seen as moderate tightening, forcing specs to cover. The squeeze is structurally limited by a +150bp carry advantage favoring the USD (Fed 3.75% vs RBNZ 2.25%) and a restrictive US real rate of +1.49% vs NZD's accommodative real rate of -0.83%. However, the extreme net short positioning suggests immediate upside pressure on NZD/USD toward 0.5780 as crowded shorts unwind. Watch the FOMC Minutes release later today to confirm if USD strength caps the squeeze.",
+      "title": "USD/CAD vs WTI Oil — Cross-Asset Correlation Break",
+      "text": "The rolling correlation between USD/CAD and WTI crude oil has collapsed to corr=-0.884, representing a -2.01σ deviation from its 252-day historical norm of +0.009. Typically, rising oil prices support the Canadian Dollar, driving USD/CAD lower. However, the +7.81% intraday surge in WTI oil to $75.9 has failed to lift CAD, with USD/CAD holding flat at 1.41840. This decoupling is driven by a strong +150bp nominal carry advantage favoring the USD (Fed 3.75% vs BoC 2.25%) and persistent Canadian data disappointments (CESI net -7 misses vs US net +284 beats). Speculators are heavily short CAD (COT net -92,861, 20.6% long), while retail sentiment is 83% short USD/CAD. This extreme retail short bias creates a contrarian risk of further USD/CAD upside if institutional shorts continue to hold. Watch the BoC policy decision on 15 Jul to confirm if a dovish hold invalidates the CAD recovery thesis.",
       "evidence": [
-        "NZD COT LF Net: -25,757",
-        "NZD COT Long%: 19.5%",
-        "RBNZ Bias: Hike",
-        "NZD/USD Spot: 0.5701"
+        "USD/CAD vs WTI Oil corr: -0.884 (norm: +0.009, z: -2.01σ)",
+        "USD/CAD: 1.41840",
+        "CAD COT LF net: -92,861"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "08:56",
-      "priority": "warning",
-      "title": "USD/CAD — Correlation Break + Vol Complacency",
-      "text": "USD/CAD trades at 1.4162, exhibiting a severe cross-asset correlation break against WTI Oil with the rolling correlation falling to -0.884 vs its 252-day norm of +0.009 (a -2.01σ deviation). While the +5.64% surge in WTI oil to $74.4 has dragged USD/CAD below 1.4200, the pair's downside remains structurally insulated by a +150bp carry advantage favoring the USD (Fed 3.75% vs BoC 2.25%) and a massive divergence in economic data, with the US Economic Surprise Index at a strong positive +284 vs Canada's negative -7. Speculative positioning is heavily short CAD with COT LF net short at -92,861 contracts, while retail sentiment is extremely short USD/CAD at 84% short. This retail-institutional alignment suggests that if oil prices stabilize, USD/CAD is poised to rapidly reclaim 1.4200+. Watch the BoC policy decision on 15 Jul to confirm if the central bank's stance validates the negative Canadian data trend.",
-      "evidence": [
-        "USD/CAD vs WTI Oil Corr: -0.884 (z=-2.01σ)",
-        "USD/CAD Spot: 1.4162",
-        "USD/CAD Retail Sentiment: 84% short",
-        "CAD COT LF Net: -92,861"
-      ],
-      "_source": "gemini:gemini-3.5-flash"
-    },
-    {
-      "time": "08:52",
+      "time": "16:02",
       "priority": "info",
-      "title": "GBP/USD — Volatility Risk Premium Extreme",
-      "text": "GBP/USD trades at 1.3346 with the options market pricing in an extreme volatility risk premium (VRP) of +5.5%, as ATM implied volatility stands at 11.0% vs a 30-day realized volatility of 5.5%. This elevated premium indicates intense hedging demand for GBP protection ahead of the FOMC Minutes and upcoming central bank meetings, despite relatively flat spot price action (1W +0.05%). The options skew is mildly defensive with a 25d Risk Reversal of -0.61, while speculative positioning remains net long GBP at +9,753 contracts. The high VRP suggests that options players are overpaying for protection relative to actual spot movement, making implied volatility sales or range-bound strategies attractive if geopolitical tensions do not spill over into broader cross-asset volatility. Watch the BoE policy meeting on 30 Jul to see if the central bank maintains its hold stance, which would likely crush the elevated implied volatility premium.",
+      "title": "AUD/USD — Volatility Risk Premium Extreme",
+      "text": "AUD/USD trades at 0.69160, exhibiting an extreme volatility risk premium (VRP) of +17.2%. ATM implied volatility has spiked to 24.3% (FXA options) against a 30-day realized volatility of 7.1%, signaling that the options market is pricing in massive forward-looking risk relative to recent price action. This elevated premium reflects intense hedging demand amid Middle East tensions and commodity volatility, despite a supportive -72bp OIS carry premium favoring the AUD (SOFR 3.63% vs AONIA 4.35%). Speculative positioning remains net long (COT net +21,597, 62.1% long), while retail sentiment is neutral at 52% long. The extreme VRP suggests that the options market is overpaying for protection; if geopolitical tensions ease, a rapid collapse in implied volatility will favor carry-seeking longs. Watch the next RBA meeting (mkt: 100% hold priced) on 11 Aug to confirm if the hawkish hold stance remains intact.",
       "evidence": [
-        "GBP/USD Implied Vol (IV): 11.0%",
-        "GBP/USD Realized Vol (HV30): 5.5%",
-        "GBP/USD VRP: +5.5%",
-        "GBP/USD Spot: 1.3346"
+        "AUD/USD VRP: +17.2% (IV 24.3% vs HV30 7.1%)",
+        "AUD/USD: 0.69160",
+        "AUD COT LF net: +21,597"
       ],
       "_source": "gemini:gemini-3.5-flash"
     }
