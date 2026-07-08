@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-07-06",
+  "lastUpdate": "2026-07-08",
   "meetings": {
     "USD": {
       "nextMeeting": "29 Jul",
@@ -28,7 +28,7 @@
       "bias": "hold",
       "biasSource": "CME 30-day Fed Funds futures (SOFR-implied)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -60,7 +60,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS €STR curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.25
@@ -92,7 +92,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS SONIA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -124,7 +124,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS TONA curve + BoJ API daily spot",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 1.0
@@ -156,7 +156,7 @@
       "bias": "hold",
       "biasSource": "ASX 30-day Interbank Cash Rate Futures",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 4.35
@@ -190,7 +190,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS CORRA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.25
@@ -214,14 +214,14 @@
       "bias": "hold",
       "biasSource": "cbonds OIS SARON curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 0.0
     },
     "NZD": {
-      "nextMeeting": "2 Sep",
-      "nextMeetingISO": "2026-09-02",
+      "nextMeeting": "8 Jul",
+      "nextMeetingISO": "2026-07-08",
       "allMeetings": [
         "2026-02-19",
         "2026-04-09",
@@ -242,8 +242,8 @@
       ],
       "source": "rbnz.govt.nz",
       "bias": "hold",
-      "biasSource": "Manual interim placeholder pending post-hike OIS recalculation (see CHANGELOG v8.44.5)",
-      "biasMethod": "heuristic",
+      "biasSource": "cbonds OIS NZIONA curve, meeting-bracketed forward",
+      "biasMethod": "spread",
       "biasUpdated": "2026-07-08",
       "cutProb": 0,
       "hikeProb": 0,
@@ -276,10 +276,10 @@
       "bias": "hike",
       "biasSource": "cbonds OIS NOWA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
-      "hikeProb": 75,
-      "fwdRate": 4.4375
+      "hikeProb": 78,
+      "fwdRate": 4.445
     },
     "SEK": {
       "nextMeeting": "25 Aug",
@@ -308,7 +308,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS STINA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 1.75
