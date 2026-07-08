@@ -220,8 +220,8 @@
       "fwdRate": 0.0
     },
     "NZD": {
-      "nextMeeting": "8 Jul",
-      "nextMeetingISO": "2026-07-08",
+      "nextMeeting": "2 Sep",
+      "nextMeetingISO": "2026-09-02",
       "allMeetings": [
         "2026-02-19",
         "2026-04-09",
@@ -241,13 +241,13 @@
         "9 Dec"
       ],
       "source": "rbnz.govt.nz",
-      "bias": "hike",
-      "biasSource": "cbonds OIS NZIONA curve, meeting-bracketed forward",
-      "biasMethod": "ois",
-      "biasUpdated": "2026-07-06",
+      "bias": "hold",
+      "biasSource": "Manual interim placeholder pending post-hike OIS recalculation (see CHANGELOG v8.44.5)",
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-07-08",
       "cutProb": 0,
-      "hikeProb": 82,
-      "fwdRate": 2.455
+      "hikeProb": 0,
+      "fwdRate": 2.5
     },
     "NOK": {
       "nextMeeting": "13 Aug",
