@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-08T11:21:08Z",
-  "generatedAt": "2026-07-08T11:21:08Z",
+  "lastUpdate": "2026-07-08T15:38:49Z",
+  "generatedAt": "2026-07-08T15:38:49Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,12 +9,12 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-08",
   "rangeTo": "2026-07-08",
-  "totalEvents": 3980,
+  "totalEvents": 3982,
   "currencyCounts": {
     "AUD": 291,
     "CAD": 312,
     "EUR": 874,
-    "USD": 1254,
+    "USD": 1256,
     "GBP": 471,
     "NZD": 125,
     "CHF": 163,
@@ -23,8 +23,8 @@
     "NOK": 81
   },
   "impactCounts": {
-    "high": 1641,
-    "medium": 2111,
+    "high": 1642,
+    "medium": 2112,
     "low": 228
   },
   "surpriseStats": {
@@ -364,14 +364,14 @@
       "std": 2.061553
     },
     "USD/eia gasoline stocks change": {
-      "n": 14,
-      "mean": -0.274857,
-      "std": 2.411341
+      "n": 15,
+      "mean": -0.2768,
+      "std": 2.323639
     },
     "USD/eia crude oil stocks change": {
-      "n": 14,
-      "mean": -1.8435,
-      "std": 2.641857
+      "n": 15,
+      "mean": -1.360733,
+      "std": 3.158613
     },
     "USD/net long-term tic flows": {
       "n": 3,
@@ -49361,7 +49361,7 @@
       "currency": "NZD",
       "flag": "🇳🇿",
       "event": "New Zealand RBNZ Interest Rate Decision",
-      "impact": "medium",
+      "impact": "high",
       "actual": "2.5%",
       "forecast": "2.5%",
       "previous": "2.25%"
@@ -49401,9 +49401,35 @@
       "flag": "🇺🇸",
       "event": "United States MBA 30-Year Mortgage Rate",
       "impact": "medium",
-      "actual": "6.58",
+      "actual": "6.58%",
       "forecast": null,
-      "previous": "6.57"
+      "previous": "6.57%"
+    },
+    {
+      "date": "8 Jul",
+      "dateISO": "2026-07-08",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "-1.904M",
+      "forecast": "-1.6M",
+      "previous": "-2.333M"
+    },
+    {
+      "date": "8 Jul",
+      "dateISO": "2026-07-08",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "2.998M",
+      "forecast": "-2.4M",
+      "previous": "-3.775M"
     },
     {
       "date": "8 Jul",
