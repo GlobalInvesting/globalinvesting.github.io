@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-07-07T22:24:49Z",
+  "generated_at": "2026-07-08T02:15:12Z",
   "signals": [
     {
-      "time": "22:24",
+      "time": "02:12",
       "priority": "critical",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ Decision",
-      "text": "NZD/USD COT LF net short −25,757 (specs heavily short with long% at 19.5%) vs RBNZ hike bias priced for the July 8 meeting. If the RBNZ delivers a 25bp hike to 2.50% or signals a hawkish path, short-squeeze risk is elevated. The crowded speculative short unwind targets a recovery toward 0.5800, while a hold or dovish shift risks capitulation toward 0.5600. NZD/USD is currently trading at 0.5678.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ Policy Shock",
+      "text": "The RBNZ raised the Official Cash Rate by 25 bps to 2.50% and flagged further hikes to combat persistent inflation risks. This hawkish guidance directly contradicts speculative positioning, where COT LF net short stands at -25,757 (only 19.5% long), creating an acute long-unwind and short-squeeze risk. The policy tightening reduces the USD/NZD carry advantage to +125bp on a nominal basis, while the NZD real rate remains accommodative at -0.83%. NZD/USD at 0.5697 faces immediate short-covering pressure targeting 0.5800 as specs are forced to cover. Watch for follow-through buying or further hawkish RBNZ commentary to confirm the squeeze.",
       "evidence": [
         "NZD COT LF net: -25,757",
-        "NZD/USD: 0.5678",
-        "RBNZ bias: Hike"
+        "RBNZ OCR: 2.50%",
+        "NZD/USD: 0.5697"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "22:21",
+      "time": "02:09",
       "priority": "warning",
-      "title": "USD/JPY — Geopolitical Risk + Carry + Options Skew",
-      "text": "USD/JPY is holding at 162.09, well above the 160.00 level that previously triggered verbal intervention warnings. While the +266bp SOFR-TONA carry advantage structurally supports the pair, escalating Middle East tensions and the US revocation of Iran's crude oil waiver introduce sharp intervention risks. The options market is actively hedging downside protection, with the 1M 25d RR showing a strong put skew of -1.52, diverging from the crowded COT LF net short of -137,828. Watch for sudden BoJ or MoF verbal warnings to trigger a rapid unwind toward 159.50.",
+      "title": "AUD/JPY — G10 Bilateral Theme + Carry Divergence",
+      "text": "AUD/JPY is the primary vehicle for this week's dominant G10 bilateral theme, with AUD outperforming as the weekly leader (+0.653% avg across 4 pairs) and JPY lagging as the weakest currency (-0.528% avg across 7 pairs). The bilateral spread of 1.181% is driven by a massive +337bp OIS carry premium favoring AUD (AONIA 4.35% vs TONA 0.98%). Hawkish comments from RBA's Hunter emphasizing that supply shocks cannot be ignored and that the board will intervene to curb inflation reinforce the AUD bid. Meanwhile, BoJ's Asada dampened JPY support by stating demand-driven inflation is required before another hike. AUD/JPY at 112.660 remains highly bid, supported by carry and monetary divergence. Watch the next RBA policy meeting on 11 Aug to confirm the hawkish trajectory.",
       "evidence": [
-        "USD/JPY: 162.09",
-        "USD/JPY carry: +266bp",
+        "AUD 1W avg: +0.653% (n=4)",
+        "JPY 1W avg: -0.528% (n=7)",
+        "G10 spread: 1.181%"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
+    },
+    {
+      "time": "02:07",
+      "priority": "warning",
+      "title": "USD/JPY — Positioning + Options Skew + Geopolitical Risk",
+      "text": "USD/JPY trades at 162.379, holding well above the critical 160.00 level that previously triggered BoJ verbal warnings, elevating unilateral intervention risk. Speculative positioning is heavily short JPY with COT LF net short at -137,828 (25.3% long), while retail sentiment is also extremely short USD/JPY at 83% short. However, the options market is actively hedging JPY strength, with the 25d Risk Reversal showing a strong put skew of -1.52, signaling institutional demand for USD/JPY downside protection. Fresh US military strikes on Iran introduce geopolitical risk, but the +265bp OIS carry advantage (SOFR 3.63% vs TONA 0.98%) keeps the pair bid. The options skew suggests smart money is positioning for a sharp reversal via intervention or safe-haven JPY repatriation if Middle East tensions escalate further. Watch for direct BoJ action or a break below 161.50 to confirm a trend reversal.",
+      "evidence": [
+        "USD/JPY: 162.379",
+        "JPY COT LF net: -137,828",
         "USDJPY 25d RR: -1.52"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "22:19",
+      "time": "02:04",
       "priority": "warning",
-      "title": "AUD/CHF — G10 Bilateral Theme + Carry Divergence",
-      "text": "AUD/CHF triggers a G10 bilateral theme warning with a 0.810% leader-to-laggard spread. AUD is the strongest G10 currency this week (1W average +0.403% across 4 pairs) while CHF is the weakest (1W average -0.408% across 6 pairs). The divergence is fundamentally driven by a massive +435bp carry premium favoring AUD (RBA 4.35% vs SNB 0.0%), which dominates price action in the current normal volatility regime (VIX at 16.1). Watch for any escalation in global risk-off sentiment to rapidly compress this carry spread and bid CHF.",
+      "title": "USD/CAD — Correlation Break + Volatility Premium",
+      "text": "USD/CAD exhibits a severe cross-asset correlation break against WTI Oil, with the rolling correlation collapsing to -0.865 vs a 252-day norm of +0.055 (a -2.08σ deviation). This decoupling occurs as WTI rises 2.21% to $72.0, which would typically support the CAD, but USD/CAD remains elevated at 1.4200 due to a +132bp OIS carry advantage (SOFR 3.63% vs CORRA 2.31%) and a negative Canadian Economic Surprise Index (CESI net -7). Speculators are heavily short CAD with COT LF net short at -92,861 (20.6% long), while retail is fighting the trend with 84% short USD/CAD. The options market is pricing in significant uncertainty, with AUD/USD and USD/CHF showing extreme VRPs, while USD/CAD's structural divergence from oil suggests carry and data divergence dominate commodity flows. Watch the BoC policy meeting on 15 Jul to see if a dovish stance validates the CAD weakness.",
       "evidence": [
-        "AUD 1W avg: +0.403% (n=4)",
-        "CHF 1W avg: -0.408% (n=6)",
-        "G10 spread: 0.810%"
+        "USD/CAD vs WTI Oil corr: -0.865",
+        "CAD COT LF net: -92,861",
+        "USD/CAD: 1.42000"
       ],
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "22:15",
-      "priority": "warning",
-      "title": "AUD/USD — Volatility Risk Premium Extreme",
-      "text": "AUD/USD options are pricing an extreme volatility risk premium, with 1M implied volatility at 27.8% vs a 30-day realized volatility of 6.9%, resulting in a +20.9% VRP. This massive premium indicates intense institutional demand for downside hedging despite neutral speculative positioning (COT LF net long +21,597, 62.1% long) and a flat retail sentiment split (50% long / 50% short). The options market is pricing in significant tail risk ahead of the next RBA meeting (mkt: 100% hold priced) on August 11. AUD/USD is trading at 0.6928.",
-      "evidence": [
-        "AUD/USD IV: 27.8%",
-        "AUD/USD HV30: 6.9%",
-        "AUD/USD VRP: +20.9%"
-      ],
-      "_source": "gemini:gemini-3.5-flash"
-    },
-    {
-      "time": "22:09",
+      "time": "01:57",
       "priority": "info",
-      "title": "USD/CAD — Cross-Asset Correlation Break",
-      "text": "USD/CAD vs WTI Crude Oil 252-day correlation has broken down to -0.881, representing a -2.03σ deviation from its historical norm of +0.010. While WTI crude oil surged +2.73% to $72.4 on Middle East supply disruptions, USD/CAD remained virtually flat at 1.4203. This decoupling indicates that the +133bp SOFR-CORRA carry advantage and safe-haven USD demand amid stock weakness are completely overriding the traditional Canadian oil-export link. Watch the next BoC rate decision on July 15 to see if monetary policy divergence reinforces this break.",
+      "title": "EUR/USD — Volatility Premium + Geopolitical Headwinds",
+      "text": "EUR/USD is holding at 1.14090, struggling to maintain ground above 1.1400 as fresh US strikes on Iran drive safe-haven USD demand ahead of the FOMC Minutes. The options market shows an elevated volatility risk premium, with EUR/USD 1M implied volatility at 7.1% vs a realized HV30 of 4.8% (+2.3% VRP), indicating strong hedging demand over realized price action. This defensive posture is supported by a persistent negative Eurozone Economic Surprise Index (CESI net -10) and a structural +145bp OIS carry deficit (SOFR 3.63% vs €STR 2.18%) favoring the USD. Speculators remain net short EUR (COT LF net -83,016), aligning with the options market's cautious stance. Watch the FOMC Minutes release later today as the primary catalyst for a break of the 1.1400 support level.",
       "evidence": [
-        "USD/CAD vs WTI corr: -0.881",
-        "z-score: -2.03σ",
-        "USD/CAD: 1.4203"
+        "EUR/USD IV: 7.1% vs HV30: 4.8%",
+        "EUR/USD OIS Carry: +145bp",
+        "EUR/USD: 1.14090"
       ],
       "_source": "gemini:gemini-3.5-flash"
     }
