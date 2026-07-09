@@ -141,6 +141,10 @@ a { color: inherit; text-decoration: none; }
 .mobile-shots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 0 0 24px; }
 .mobile-shots-grid .scr-hero-wrap { margin: 0; }
 @media (max-width: 700px) { .mobile-shots-grid { grid-template-columns: 1fr; } }
+.phone-frame { background: var(--bg); border: 1px solid var(--border2); border-radius: 34px; padding: 10px; cursor: zoom-in; }
+.phone-frame-screen { position: relative; border-radius: 22px; overflow: hidden; border: 1px solid var(--border); }
+.phone-frame-notch { position: absolute; top: 7px; left: 50%; transform: translateX(-50%); width: 64px; height: 16px; background: var(--bg); border-radius: 8px; z-index: 2; }
+.phone-frame-screen img { display: block; width: 100%; height: auto; }
 .scr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 4px; }
 .scr-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 4px; }
 .scr-item { cursor: zoom-in; }
@@ -164,8 +168,8 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden; transition: border-color .18s;
 }
 .feat-card:hover { border-color: var(--border2); }
-.feat-card-thumb { aspect-ratio: 16 / 10; background: var(--bg3); cursor: zoom-in; overflow: hidden; }
-.feat-card-thumb img { width: 100%; height: 100%; object-fit: contain; object-position: top; display: block; }
+.feat-card-thumb { background: var(--bg3); cursor: zoom-in; overflow: hidden; }
+.feat-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .feat-card-body { padding: 12px 14px 14px; }
 .feat-card-title { font-size: 12.5px; font-weight: 700; color: #e8edf8; margin-bottom: 6px; letter-spacing: -.1px; }
 .feat-card-desc { font-family: var(--font-mono); font-size: 9.5px; color: var(--text3); line-height: 1.55; }
@@ -668,7 +672,7 @@ a { color: inherit; text-decoration: none; }
 
       <div class="feat-card-grid">
         <div class="feat-card">
-          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Cross-Asset Correlations">
+          <div class="feat-card-thumb" style="aspect-ratio: 408 / 458;" role="button" tabindex="0" aria-label="Enlarge: Cross-Asset Correlations">
             <img src="assets/screenshot-correlations.png" data-src="assets/screenshot-correlations.png" alt="Key Correlations table showing rolling 60-day Pearson correlation between FX pairs and reference assets, with a vs-norm z-score column flagging stretched or broken correlations" width="408" height="458" loading="lazy">
           </div>
           <div class="feat-card-body">
@@ -677,7 +681,7 @@ a { color: inherit; text-decoration: none; }
           </div>
         </div>
         <div class="feat-card">
-          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Derivatives detail">
+          <div class="feat-card-thumb" style="aspect-ratio: 767 / 419;" role="button" tabindex="0" aria-label="Enlarge: Derivatives detail">
             <img src="assets/screenshot-rr-term-structure.png" data-src="assets/screenshot-rr-term-structure.png" alt="25-Delta Risk Reversal term structure table showing RR values across 1W, 1M, 3M, 6M, and 1Y tenors for six major pairs, with a Skew column summarizing put or call skew" width="767" height="419" loading="lazy">
           </div>
           <div class="feat-card-body">
@@ -686,7 +690,7 @@ a { color: inherit; text-decoration: none; }
           </div>
         </div>
         <div class="feat-card">
-          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: FX Liquidity Canvas">
+          <div class="feat-card-thumb" style="aspect-ratio: 574 / 391;" role="button" tabindex="0" aria-label="Enlarge: FX Liquidity Canvas">
             <img src="assets/screenshot-fx-liquidity.png" data-src="assets/screenshot-fx-liquidity.png" alt="FX Liquidity panel showing estimated market liquidity across the 24-hour trading day, with Tokyo, London, and New York session shading, a 30-day average dotted line, and a vertical marker for the current time" width="574" height="391" loading="lazy">
           </div>
           <div class="feat-card-body">
@@ -695,7 +699,7 @@ a { color: inherit; text-decoration: none; }
           </div>
         </div>
         <div class="feat-card">
-          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Currency Strength (CSI)">
+          <div class="feat-card-thumb" style="aspect-ratio: 690 / 575;" role="button" tabindex="0" aria-label="Enlarge: Currency Strength (CSI)">
             <img src="assets/screenshot-csi-web-terminal.png" data-src="assets/screenshot-csi-web-terminal.png" alt="Currency Strength Heatmap modal in the Global Investing web terminal, CSI tab, showing accumulated percent-return lines for all 10 G10 currencies with composite score, 1-week strength, rank, pairs won, and strongest/weakest crosses" width="690" height="575" loading="lazy">
           </div>
           <div class="feat-card-body">
@@ -707,7 +711,7 @@ a { color: inherit; text-decoration: none; }
 
       <div class="feat-card-grid feat-card-grid-2" style="margin-top:16px;">
         <div class="feat-card">
-          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Alerts and Market Signals">
+          <div class="feat-card-thumb" style="aspect-ratio: 897 / 621;" role="button" tabindex="0" aria-label="Enlarge: Alerts and Market Signals">
             <img src="assets/screenshot-alerts-signals.png" data-src="assets/screenshot-alerts-signals.png" alt="Alerts &amp; Market Signals panel showing AI-generated entries combining COT positioning, OIS-implied central bank bias, carry, and options skew, each with a priority dot, timestamp, title, and supporting data chips" width="897" height="621" loading="lazy">
           </div>
           <div class="feat-card-body">
@@ -716,7 +720,7 @@ a { color: inherit; text-decoration: none; }
           </div>
         </div>
         <div class="feat-card">
-          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: News Feed">
+          <div class="feat-card-thumb" style="aspect-ratio: 704 / 347;" role="button" tabindex="0" aria-label="Enlarge: News Feed">
             <img src="assets/screenshot-news-feed.png" data-src="assets/screenshot-news-feed.png" alt="News Feed panel with currency filter pills (All, USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) and a list of FX-relevant headlines with source, timestamp, and summary" width="704" height="347" loading="lazy">
           </div>
           <div class="feat-card-body">
@@ -729,20 +733,29 @@ a { color: inherit; text-decoration: none; }
       <div class="scr-gallery-label" style="margin-top:28px;">Any Device</div>
       <div class="mobile-shots-grid">
         <div class="scr-hero-wrap">
-          <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, top of scroll">
-            <img src="assets/screenshot-mobile-overview-top.png" data-src="assets/screenshot-mobile-overview-top.png" alt="Global Investing FX Terminal on mobile, top of the scrollable single-column view, showing FX Pairs — Majors table, Currency Strength Heatmap, and Economic Calendar" width="375" height="668" loading="lazy">
+          <div class="phone-frame scr-hero" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, top of scroll">
+            <div class="phone-frame-notch"></div>
+            <div class="phone-frame-screen">
+              <img src="assets/screenshot-mobile-overview-top.png" data-src="assets/screenshot-mobile-overview-top.png" alt="Global Investing FX Terminal on mobile, top of the scrollable single-column view, showing FX Pairs — Majors table, Currency Strength Heatmap, and Economic Calendar" width="375" height="668" loading="lazy">
+            </div>
           </div>
           <p class="scr-meta"><strong>Full terminal on mobile.</strong> The three-column desktop layout collapses into a single scrollable column — every panel, same data.</p>
         </div>
         <div class="scr-hero-wrap">
-          <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, narrative and chart">
-            <img src="assets/screenshot-mobile-narrative-chart.png" data-src="assets/screenshot-mobile-narrative-chart.png" alt="Global Investing FX Terminal on mobile, showing the AI market narrative panel and the price chart panel in the scrollable single-column view" width="374" height="667" loading="lazy">
+          <div class="phone-frame scr-hero" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, narrative and chart">
+            <div class="phone-frame-notch"></div>
+            <div class="phone-frame-screen">
+              <img src="assets/screenshot-mobile-narrative-chart.png" data-src="assets/screenshot-mobile-narrative-chart.png" alt="Global Investing FX Terminal on mobile, showing the AI market narrative panel and the price chart panel in the scrollable single-column view" width="374" height="667" loading="lazy">
+            </div>
           </div>
           <p class="scr-meta"><strong>AI narrative and chart.</strong> Fold into the same scroll flow as the rest of the terminal.</p>
         </div>
         <div class="scr-hero-wrap">
-          <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, cross-asset and risk">
-            <img src="assets/screenshot-mobile-cross-asset-risk.png" data-src="assets/screenshot-mobile-cross-asset-risk.png" alt="Global Investing FX Terminal on mobile, showing the Cross-Asset panel and Risk Monitor panel in the scrollable single-column view" width="374" height="667" loading="lazy">
+          <div class="phone-frame scr-hero" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, cross-asset and risk">
+            <div class="phone-frame-notch"></div>
+            <div class="phone-frame-screen">
+              <img src="assets/screenshot-mobile-cross-asset-risk.png" data-src="assets/screenshot-mobile-cross-asset-risk.png" alt="Global Investing FX Terminal on mobile, showing the Cross-Asset panel and Risk Monitor panel in the scrollable single-column view" width="374" height="667" loading="lazy">
+            </div>
           </div>
           <p class="scr-meta"><strong>Cross-asset and risk.</strong> The full desktop right-panel content, reflowed for a single column.</p>
         </div>
