@@ -138,9 +138,19 @@ a { color: inherit; text-decoration: none; }
 .scr-hero-wrap { margin: 0; }
 .scr-hero-contain { width: fit-content; max-width: 100%; margin: 0 auto; }
 .scr-hero-contain img { width: auto; max-width: 100%; height: auto; display: block; margin: 0; }
-.mobile-shots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 0 0 24px; }
-.mobile-shots-grid .scr-hero-wrap { margin: 0; }
-@media (max-width: 700px) { .mobile-shots-grid { grid-template-columns: 1fr; } }
+.mobile-feature-row { display: grid; grid-template-columns: 1fr 260px; gap: 40px; align-items: center; padding: 36px 0; border-top: 1px solid var(--border); }
+.mobile-feature-row:first-of-type { border-top: none; padding-top: 4px; }
+.mobile-feature-eyebrow { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+.mobile-feature-title { font-size: 21px; font-weight: 700; color: #e8edf8; line-height: 1.3; margin-bottom: 12px; }
+.mobile-feature-desc { font-size: 13.5px; color: var(--text2); line-height: 1.8; max-width: 460px; }
+.mobile-feature-desc strong { color: var(--text); font-weight: 600; }
+.mobile-feature-img { width: 260px; justify-self: end; }
+.mobile-feature-img .scr-hero { margin-bottom: 0; }
+@media (max-width: 700px) {
+  .mobile-feature-row { grid-template-columns: 1fr; gap: 20px; padding: 28px 0; }
+  .mobile-feature-img { width: 220px; justify-self: center; margin: 0 auto; }
+  .mobile-feature-desc { max-width: none; }
+}
 .scr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 4px; }
 .scr-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 4px; }
 .scr-item { cursor: zoom-in; }
@@ -728,24 +738,50 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <div class="scr-gallery-label" style="margin-top:28px;">Any Device</div>
-      <div class="mobile-shots-grid">
-        <div class="scr-hero-wrap">
-          <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, top of scroll">
-            <img src="assets/screenshot-mobile-overview-top-framed.png" data-src="assets/screenshot-mobile-overview-top-framed.png" alt="Global Investing FX Terminal on mobile, top of the scrollable single-column view, showing FX Pairs — Majors table, Currency Strength Heatmap, and Economic Calendar" width="720" height="1440" loading="lazy">
-          </div>
-          <p class="scr-meta"><strong>Full terminal on mobile.</strong> The three-column desktop layout collapses into a single scrollable column — every panel, same data.</p>
+      <p class="section-desc" style="margin-bottom:8px;">The three-column desktop layout reflows into a single scrollable view on any phone or tablet — every panel, same data, no reduced feature set.</p>
+
+      <div class="mobile-feature-row">
+        <div>
+          <div class="mobile-feature-eyebrow">Full Terminal</div>
+          <div class="mobile-feature-title">Every panel, one scroll.</div>
+          <p class="mobile-feature-desc">The desktop's three-column layout collapses into a single scrollable column — <strong>FX Pairs, Currency Strength Heatmap, and the Economic Calendar</strong> sit at the top of the same feed as everything else below. Same data pipelines, same refresh cadence, no separate mobile build.</p>
         </div>
-        <div class="scr-hero-wrap">
-          <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, narrative and chart">
-            <img src="assets/screenshot-mobile-narrative-chart-framed.png" data-src="assets/screenshot-mobile-narrative-chart-framed.png" alt="Global Investing FX Terminal on mobile, showing the AI market narrative panel and the price chart panel in the scrollable single-column view" width="720" height="1441" loading="lazy">
+        <div class="mobile-feature-img">
+          <div class="scr-hero-wrap">
+            <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Global Investing FX Terminal on mobile — top of scroll: FX Pairs — Majors table, Currency Strength Heatmap, and Economic Calendar">
+              <img src="assets/screenshot-mobile-overview-top-framed.png" data-src="assets/screenshot-mobile-overview-top-framed.png" alt="Global Investing FX Terminal on mobile, top of the scrollable single-column view, showing FX Pairs — Majors table, Currency Strength Heatmap, and Economic Calendar" width="720" height="1440" loading="lazy">
+            </div>
           </div>
-          <p class="scr-meta"><strong>AI narrative and chart.</strong> Fold into the same scroll flow as the rest of the terminal.</p>
         </div>
-        <div class="scr-hero-wrap">
-          <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, cross-asset and risk">
-            <img src="assets/screenshot-mobile-cross-asset-risk-framed.png" data-src="assets/screenshot-mobile-cross-asset-risk-framed.png" alt="Global Investing FX Terminal on mobile, showing the Cross-Asset panel and Risk Monitor panel in the scrollable single-column view" width="720" height="1440" loading="lazy">
+      </div>
+
+      <div class="mobile-feature-row">
+        <div>
+          <div class="mobile-feature-eyebrow">AI Narrative</div>
+          <div class="mobile-feature-title">Narrative and chart, in flow.</div>
+          <p class="mobile-feature-desc">The <strong>AI market narrative</strong> panel and the full OHLC <strong>price chart</strong> fold directly into the scroll — read the AI's read on the session, then check the same pair's price action, without switching views or losing your place.</p>
+        </div>
+        <div class="mobile-feature-img">
+          <div class="scr-hero-wrap">
+            <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Global Investing FX Terminal on mobile — AI market narrative panel and price chart panel">
+              <img src="assets/screenshot-mobile-narrative-chart-framed.png" data-src="assets/screenshot-mobile-narrative-chart-framed.png" alt="Global Investing FX Terminal on mobile, showing the AI market narrative panel and the price chart panel in the scrollable single-column view" width="720" height="1441" loading="lazy">
+            </div>
           </div>
-          <p class="scr-meta"><strong>Cross-asset and risk.</strong> The full desktop right-panel content, reflowed for a single column.</p>
+        </div>
+      </div>
+
+      <div class="mobile-feature-row">
+        <div>
+          <div class="mobile-feature-eyebrow">Cross-Asset &amp; Risk</div>
+          <div class="mobile-feature-title">The full right panel, reflowed.</div>
+          <p class="mobile-feature-desc">The desktop's entire <strong>Cross-Asset</strong> and <strong>Risk Monitor</strong> content — equities, gold, oil, yields, VIX, regime scoring — reflows into the same single column. Nothing gets cut for space; it just moves down the page.</p>
+        </div>
+        <div class="mobile-feature-img">
+          <div class="scr-hero-wrap">
+            <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Global Investing FX Terminal on mobile — Cross-Asset panel and Risk Monitor panel">
+              <img src="assets/screenshot-mobile-cross-asset-risk-framed.png" data-src="assets/screenshot-mobile-cross-asset-risk-framed.png" alt="Global Investing FX Terminal on mobile, showing the Cross-Asset panel and Risk Monitor panel in the scrollable single-column view" width="720" height="1440" loading="lazy">
+            </div>
+          </div>
         </div>
       </div>
     </div>
