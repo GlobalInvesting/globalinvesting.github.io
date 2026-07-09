@@ -135,6 +135,12 @@ a { color: inherit; text-decoration: none; }
 .scr-hero img { width: 100%; height: auto; display: block; }
 .scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-bottom: 28px; padding: 0 2px; }
 .scr-meta strong { color: var(--text2); font-weight: 600; }
+.scr-hero-wrap { margin: 0; }
+.scr-hero-contain { width: fit-content; max-width: 100%; margin: 0 auto; }
+.scr-hero-contain img { width: auto; max-width: 100%; height: auto; display: block; margin: 0; }
+.mobile-shots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 0 0 24px; }
+.mobile-shots-grid .scr-hero-wrap { margin: 0; }
+@media (max-width: 700px) { .mobile-shots-grid { grid-template-columns: 1fr; } }
 .scr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 4px; }
 .scr-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 4px; }
 .scr-item { cursor: zoom-in; }
@@ -159,7 +165,7 @@ a { color: inherit; text-decoration: none; }
 }
 .feat-card:hover { border-color: var(--border2); }
 .feat-card-thumb { aspect-ratio: 16 / 10; background: var(--bg3); cursor: zoom-in; overflow: hidden; }
-.feat-card-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.feat-card-thumb img { width: 100%; height: 100%; object-fit: contain; object-position: top; display: block; }
 .feat-card-body { padding: 12px 14px 14px; }
 .feat-card-title { font-size: 12.5px; font-weight: 700; color: #e8edf8; margin-bottom: 6px; letter-spacing: -.1px; }
 .feat-card-desc { font-family: var(--font-mono); font-size: 9.5px; color: var(--text3); line-height: 1.55; }
@@ -717,6 +723,28 @@ a { color: inherit; text-decoration: none; }
             <div class="feat-card-title">News Feed</div>
             <div class="feat-card-desc">FX-relevant headlines filterable by currency, with source and timestamp on every entry.</div>
           </div>
+        </div>
+      </div>
+
+      <div class="scr-gallery-label" style="margin-top:28px;">Any Device</div>
+      <div class="mobile-shots-grid">
+        <div class="scr-hero-wrap">
+          <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, top of scroll">
+            <img src="assets/screenshot-mobile-overview-top.png" data-src="assets/screenshot-mobile-overview-top.png" alt="Global Investing FX Terminal on mobile, top of the scrollable single-column view, showing FX Pairs — Majors table, Currency Strength Heatmap, and Economic Calendar" width="375" height="668" loading="lazy">
+          </div>
+          <p class="scr-meta"><strong>Full terminal on mobile.</strong> The three-column desktop layout collapses into a single scrollable column — every panel, same data.</p>
+        </div>
+        <div class="scr-hero-wrap">
+          <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, narrative and chart">
+            <img src="assets/screenshot-mobile-narrative-chart.png" data-src="assets/screenshot-mobile-narrative-chart.png" alt="Global Investing FX Terminal on mobile, showing the AI market narrative panel and the price chart panel in the scrollable single-column view" width="374" height="667" loading="lazy">
+          </div>
+          <p class="scr-meta"><strong>AI narrative and chart.</strong> Fold into the same scroll flow as the rest of the terminal.</p>
+        </div>
+        <div class="scr-hero-wrap">
+          <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Enlarge: Terminal on mobile, cross-asset and risk">
+            <img src="assets/screenshot-mobile-cross-asset-risk.png" data-src="assets/screenshot-mobile-cross-asset-risk.png" alt="Global Investing FX Terminal on mobile, showing the Cross-Asset panel and Risk Monitor panel in the scrollable single-column view" width="374" height="667" loading="lazy">
+          </div>
+          <p class="scr-meta"><strong>Cross-asset and risk.</strong> The full desktop right-panel content, reflowed for a single column.</p>
         </div>
       </div>
     </div>
