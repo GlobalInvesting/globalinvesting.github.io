@@ -1,123 +1,33 @@
 {
-  "lastUpdate": "2026-07-08T21:37:23Z",
-  "generatedAt": "2026-07-08T21:37:23Z",
+  "lastUpdate": "2026-07-09T08:51:26Z",
+  "generatedAt": "2026-07-09T08:51:26Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-08",
-  "rangeTo": "2026-07-08",
-  "totalEvents": 3982,
+  "rangeFrom": "2025-07-09",
+  "rangeTo": "2026-07-09",
+  "totalEvents": 3979,
   "currencyCounts": {
-    "AUD": 291,
-    "CAD": 312,
-    "EUR": 874,
-    "USD": 1256,
     "GBP": 471,
     "NZD": 125,
-    "CHF": 163,
-    "JPY": 256,
+    "USD": 1257,
+    "EUR": 874,
+    "CAD": 311,
+    "CHF": 162,
+    "JPY": 257,
+    "AUD": 288,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "high": 1642,
     "medium": 2112,
+    "high": 1639,
     "low": 228
   },
   "surpriseStats": {
-    "EUR/exports mom": {
-      "n": 3,
-      "mean": 2.0,
-      "std": 0.72111
-    },
-    "EUR/balance of trade": {
-      "n": 12,
-      "mean": -13941.231167,
-      "std": 48291.960107
-    },
-    "EUR/industrial production mom": {
-      "n": 12,
-      "mean": -0.108333,
-      "std": 0.599179
-    },
-    "JPY/consumer confidence": {
-      "n": 4,
-      "mean": -1.05,
-      "std": 2.651415
-    },
-    "NOK/ppi yoy": {
-      "n": 3,
-      "mean": 9.966667,
-      "std": 14.931957
-    },
-    "NZD/business nz pmi": {
-      "n": 4,
-      "mean": -0.65,
-      "std": 1.167619
-    },
-    "USD/corporate profits qoq": {
-      "n": 2,
-      "mean": -2.15,
-      "std": 5.586144
-    },
-    "USD/initial jobless claims": {
-      "n": 16,
-      "mean": 0.625,
-      "std": 9.891916
-    },
-    "USD/jobless claims 4-week average": {
-      "n": 16,
-      "mean": 2.078125,
-      "std": 4.962962
-    },
-    "USD/continuing jobless claims": {
-      "n": 16,
-      "mean": 1.4375,
-      "std": 20.412312
-    },
-    "USD/pce price index mom": {
-      "n": 5,
-      "mean": -0.06,
-      "std": 0.054772
-    },
-    "USD/personal income mom": {
-      "n": 5,
-      "mean": 0.02,
-      "std": 0.383406
-    },
-    "USD/gdp price index qoq": {
-      "n": 5,
-      "mean": -0.04,
-      "std": 0.614817
-    },
-    "USD/core pce price index mom": {
-      "n": 5,
-      "mean": -0.02,
-      "std": 0.044721
-    },
-    "USD/core pce price index yoy": {
-      "n": 5,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "USD/pce price index yoy": {
-      "n": 5,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "USD/personal spending mom": {
-      "n": 5,
-      "mean": 0.04,
-      "std": 0.054772
-    },
-    "USD/gdp growth rate qoq": {
-      "n": 5,
-      "mean": 0.02,
-      "std": 0.443847
-    },
     "CAD/part time employment chg": {
       "n": 3,
       "mean": -7.0,
@@ -147,6 +57,11 @@
       "n": 4,
       "mean": -1.25,
       "std": 7.088723
+    },
+    "EUR/industrial production mom": {
+      "n": 11,
+      "mean": -0.009091,
+      "std": 0.514693
     },
     "NOK/core inflation rate yoy": {
       "n": 3,
@@ -433,10 +348,25 @@
       "mean": 0.55,
       "std": 0.737111
     },
+    "USD/jobless claims 4-week average": {
+      "n": 15,
+      "mean": 1.783333,
+      "std": 4.99005
+    },
     "USD/philadelphia fed manufacturing index": {
       "n": 4,
       "mean": -0.275,
       "std": 14.344889
+    },
+    "USD/initial jobless claims": {
+      "n": 15,
+      "mean": 1.266667,
+      "std": 9.888425
+    },
+    "USD/continuing jobless claims": {
+      "n": 15,
+      "mean": -1.533333,
+      "std": 17.179168
     },
     "USD/industrial production mom": {
       "n": 4,
@@ -447,6 +377,11 @@
       "n": 4,
       "mean": 8.2,
       "std": 23.942431
+    },
+    "EUR/balance of trade": {
+      "n": 11,
+      "mean": -15208.734,
+      "std": 50439.251727
     },
     "NZD/balance of trade": {
       "n": 4,
@@ -973,6 +908,11 @@
       "mean": -0.933333,
       "std": 3.10215
     },
+    "JPY/consumer confidence": {
+      "n": 3,
+      "mean": 0.166667,
+      "std": 1.289703
+    },
     "NOK/registered jobless rate": {
       "n": 2,
       "mean": 0.15,
@@ -987,6 +927,46 @@
       "n": 3,
       "mean": 2.0,
       "std": 34.504492
+    },
+    "USD/core pce price index mom": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.05
+    },
+    "USD/pce price index yoy": {
+      "n": 4,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "USD/gdp price index qoq": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.708872
+    },
+    "USD/core pce price index yoy": {
+      "n": 4,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "USD/personal spending mom": {
+      "n": 4,
+      "mean": 0.05,
+      "std": 0.057735
+    },
+    "USD/personal income mom": {
+      "n": 4,
+      "mean": 0.125,
+      "std": 0.35
+    },
+    "USD/gdp growth rate qoq": {
+      "n": 4,
+      "mean": 0.075,
+      "std": 0.492443
+    },
+    "USD/pce price index mom": {
+      "n": 4,
+      "mean": -0.075,
+      "std": 0.05
     },
     "USD/chicago pmi": {
       "n": 3,
@@ -1163,6 +1143,11 @@
       "mean": 0.0,
       "std": 0.0
     },
+    "EUR/exports mom": {
+      "n": 2,
+      "mean": 1.7,
+      "std": 0.707107
+    },
     "GBP/halifax house price index yoy": {
       "n": 3,
       "mean": -0.133333,
@@ -1218,6 +1203,11 @@
       "mean": 0.4,
       "std": 2.12838
     },
+    "NOK/ppi yoy": {
+      "n": 2,
+      "mean": 1.6,
+      "std": 5.091169
+    },
     "JPY/current account": {
       "n": 3,
       "mean": -550298.110667,
@@ -1234,9 +1224,14 @@
       "std": 0.0
     },
     "GBP/rics house price balance": {
-      "n": 2,
-      "mean": -6.0,
-      "std": 4.242641
+      "n": 3,
+      "mean": -5.0,
+      "std": 3.464102
+    },
+    "NZD/business nz pmi": {
+      "n": 4,
+      "mean": 2.625,
+      "std": 5.38354
     },
     "JPY/gdp growth annualized": {
       "n": 2,
@@ -1295,78 +1290,6 @@
     }
   },
   "events": [
-    {
-      "currency": "AUD",
-      "event": "NAB Business Confidence",
-      "dateISO": "2025-07-08",
-      "hourUTC": "01:30",
-      "actual": "5",
-      "forecast": "-5.0",
-      "previous": "2.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "AUD",
-      "event": "RBA Interest Rate Decision",
-      "dateISO": "2025-07-08",
-      "hourUTC": "04:30",
-      "actual": "3.85%",
-      "forecast": "3.6",
-      "previous": "3.85",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Ivey PMI s.a",
-      "dateISO": "2025-07-08",
-      "hourUTC": "14:00",
-      "actual": "53.3",
-      "forecast": "49.1",
-      "previous": "48.9",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Exports MoM",
-      "dateISO": "2025-07-08",
-      "hourUTC": "06:00",
-      "actual": "-1.4%",
-      "forecast": "-0.2",
-      "previous": "-1.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Balance of Trade",
-      "dateISO": "2025-07-08",
-      "hourUTC": "06:00",
-      "actual": "€18.4B",
-      "forecast": "15.5",
-      "previous": "15.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "API Crude Oil Stock Change",
-      "dateISO": "2025-07-08",
-      "hourUTC": "20:30",
-      "actual": "7.1M",
-      "forecast": "-2.8",
-      "previous": "0.68",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
     {
       "currency": "GBP",
       "event": "RICS House Price Balance",
@@ -44455,19 +44378,6 @@
     {
       "date": "17 Jun",
       "dateISO": "2026-06-17",
-      "timeUTC": "01:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Jones Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "17 Jun",
-      "dateISO": "2026-06-17",
       "timeUTC": "06:00",
       "country": "GBP",
       "currency": "GBP",
@@ -44507,19 +44417,6 @@
     {
       "date": "17 Jun",
       "dateISO": "2026-06-17",
-      "timeUTC": "07:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland SECO Economic Forecasts",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "17 Jun",
-      "dateISO": "2026-06-17",
       "timeUTC": "09:00",
       "country": "EUR",
       "currency": "EUR",
@@ -44529,19 +44426,6 @@
       "actual": "103.13",
       "forecast": "103.15",
       "previous": "103.04"
-    },
-    {
-      "date": "17 Jun",
-      "dateISO": "2026-06-17",
-      "timeUTC": "10:50",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "17 Jun",
@@ -44711,32 +44595,6 @@
       "actual": "3.75%",
       "forecast": "3.75%",
       "previous": "3.75%"
-    },
-    {
-      "date": "17 Jun",
-      "dateISO": "2026-06-17",
-      "timeUTC": "18:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States FOMC Economic Projections",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "17 Jun",
-      "dateISO": "2026-06-17",
-      "timeUTC": "18:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Press Conference",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "17 Jun",
@@ -49453,9 +49311,9 @@
       "flag": "🇳🇿",
       "event": "New Zealand Business NZ PMI",
       "impact": "medium",
-      "actual": null,
+      "actual": "59.7",
       "forecast": "49.0",
-      "previous": "49.9"
+      "previous": "51.3"
     },
     {
       "date": "8 Jul",
@@ -49466,9 +49324,113 @@
       "flag": "🇬🇧",
       "event": "United Kingdom RICS House Price Balance",
       "impact": "medium",
-      "actual": null,
+      "actual": "-33.0%",
       "forecast": "-30.0%",
       "previous": "-34.0%"
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Balance of Trade",
+      "impact": "high",
+      "actual": "&#8364;19.1B",
+      "forecast": "&#8364;14.8B",
+      "previous": "&#8364;14.5B"
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Exports MoM",
+      "impact": "medium",
+      "actual": "0.9%",
+      "forecast": "-0.3%",
+      "previous": "0.8%"
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "06:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Machine Tool Orders YoY",
+      "impact": "medium",
+      "actual": "52.8%",
+      "forecast": "37.4%",
+      "previous": "37.4%"
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "11:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB Monetary Policy Meeting Accounts",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "13:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Williams Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Existing Home Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.7%",
+      "previous": "3.2%"
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Existing Home Sales",
+      "impact": "high",
+      "actual": null,
+      "forecast": "4.2M",
+      "previous": "4.17M"
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "17:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Logan Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     }
   ]
 }
