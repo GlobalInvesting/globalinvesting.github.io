@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-09T12:18:52Z",
-  "generatedAt": "2026-07-09T12:18:52Z",
+  "lastUpdate": "2026-07-09T16:10:29Z",
+  "generatedAt": "2026-07-09T16:10:29Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-09",
   "rangeTo": "2026-07-09",
-  "totalEvents": 3979,
+  "totalEvents": 3982,
   "currencyCounts": {
     "GBP": 471,
     "NZD": 125,
-    "USD": 1257,
+    "USD": 1260,
     "EUR": 874,
     "CAD": 311,
     "CHF": 162,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "medium": 2112,
-    "high": 1639,
+    "high": 1642,
     "low": 228
   },
   "surpriseStats": {
@@ -174,14 +174,14 @@
       "std": 3.879863
     },
     "USD/existing home sales mom": {
-      "n": 3,
-      "mean": -0.266667,
-      "std": 2.573584
+      "n": 4,
+      "mean": -0.975,
+      "std": 2.534265
     },
     "USD/existing home sales": {
-      "n": 3,
-      "mean": -0.003333,
-      "std": 0.092916
+      "n": 4,
+      "mean": -0.03,
+      "std": 0.092736
     },
     "AUD/westpac consumer confidence index": {
       "n": 3,
@@ -349,9 +349,9 @@
       "std": 0.737111
     },
     "USD/jobless claims 4-week average": {
-      "n": 15,
-      "mean": 1.783333,
-      "std": 4.99005
+      "n": 16,
+      "mean": 1.75,
+      "std": 4.822689
     },
     "USD/philadelphia fed manufacturing index": {
       "n": 4,
@@ -359,14 +359,14 @@
       "std": 14.344889
     },
     "USD/initial jobless claims": {
-      "n": 15,
-      "mean": 1.266667,
-      "std": 9.888425
+      "n": 16,
+      "mean": 1.375,
+      "std": 9.562949
     },
     "USD/continuing jobless claims": {
-      "n": 15,
-      "mean": -1.533333,
-      "std": 17.179168
+      "n": 16,
+      "mean": -1.0625,
+      "std": 16.703168
     },
     "USD/industrial production mom": {
       "n": 4,
@@ -49383,6 +49383,45 @@
     {
       "date": "9 Jul",
       "dateISO": "2026-07-09",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Jobless Claims 4-week Average",
+      "impact": "high",
+      "actual": "218.75K",
+      "forecast": "220.0K",
+      "previous": "222.5K"
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": "215.0K",
+      "forecast": "218.0K",
+      "previous": "217.0K"
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "high",
+      "actual": "1814.0K",
+      "forecast": "1820.0K",
+      "previous": "1806.0K"
+    },
+    {
+      "date": "9 Jul",
+      "dateISO": "2026-07-09",
       "timeUTC": "13:00",
       "country": "USD",
       "currency": "USD",
@@ -49402,9 +49441,9 @@
       "flag": "🇺🇸",
       "event": "United States Existing Home Sales MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "-2.4%",
       "forecast": "0.7%",
-      "previous": "3.2%"
+      "previous": "3.7%"
     },
     {
       "date": "9 Jul",
@@ -49415,9 +49454,9 @@
       "flag": "🇺🇸",
       "event": "United States Existing Home Sales",
       "impact": "high",
-      "actual": null,
+      "actual": "4.09M",
       "forecast": "4.2M",
-      "previous": "4.17M"
+      "previous": "4.19M"
     },
     {
       "date": "9 Jul",
