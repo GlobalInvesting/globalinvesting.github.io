@@ -150,6 +150,20 @@ a { color: inherit; text-decoration: none; }
 .scr-item-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.55; padding: 0 2px; }
 .scr-item-meta strong { color: var(--text2); font-weight: 600; }
 
+/* ADDITIONAL COVERAGE — compact feature cards */
+.feat-card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.feat-card-grid.feat-card-grid-2 { grid-template-columns: repeat(2, 1fr); max-width: 620px; }
+.feat-card {
+  border: 1px solid var(--border); border-radius: 4px; background: var(--bg2);
+  overflow: hidden; transition: border-color .18s;
+}
+.feat-card:hover { border-color: var(--border2); }
+.feat-card-thumb { aspect-ratio: 16 / 10; background: var(--bg3); cursor: zoom-in; overflow: hidden; }
+.feat-card-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.feat-card-body { padding: 12px 14px 14px; }
+.feat-card-title { font-size: 12.5px; font-weight: 700; color: #e8edf8; margin-bottom: 6px; letter-spacing: -.1px; }
+.feat-card-desc { font-family: var(--font-mono); font-size: 9.5px; color: var(--text3); line-height: 1.55; }
+
 /* FEATURE TABLE */
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 28px; border: 1px solid var(--border); border-radius: 4px; }
 .platform-table { width: 100%; border-collapse: collapse; min-width: 560px; }
@@ -245,6 +259,7 @@ a { color: inherit; text-decoration: none; }
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
+  .feat-card-grid { grid-template-columns: repeat(2, 1fr); }
   .hero-inner { grid-template-columns: 1fr; gap: 36px; }
   .hero-price-card { max-width: 380px; }
   .steps-grid { grid-template-columns: 1fr; }
@@ -260,6 +275,7 @@ a { color: inherit; text-decoration: none; }
   .hero-inner, .page-body { padding-left: 20px; padding-right: 20px; }
   .hero h1 { font-size: 26px; }
   .scr-grid, .scr-grid-3 { grid-template-columns: 1fr; }
+  .feat-card-grid, .feat-card-grid.feat-card-grid-2 { grid-template-columns: 1fr; max-width: none; }
   .companion-grid { grid-template-columns: 1fr; }
   .companion-card + .companion-card { border-left: none; border-top: 1px solid var(--border); }
   .sub-card-body { grid-template-columns: 1fr; }
@@ -332,6 +348,48 @@ a { color: inherit; text-decoration: none; }
       "width": 389,
       "height": 336,
       "caption": "Carry Trade Ranking panel in the Global Investing web terminal, showing G10 real carry annualized ranking by currency pair"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-correlations.png",
+      "width": 408,
+      "height": 458,
+      "caption": "Key Correlations table showing rolling 60-day Pearson correlation between FX pairs and reference assets, with a vs-norm z-score column flagging stretched or broken correlations"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-rr-term-structure.png",
+      "width": 767,
+      "height": 419,
+      "caption": "25-Delta Risk Reversal term structure table showing RR values across 1W, 1M, 3M, 6M, and 1Y tenors for six major pairs, with a Skew column summarizing put or call skew"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-fx-liquidity.png",
+      "width": 574,
+      "height": 391,
+      "caption": "FX Liquidity panel showing estimated market liquidity across the 24-hour trading day, with Tokyo, London, and New York session shading, a 30-day average dotted line, and a vertical marker for the current time"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-csi.png",
+      "width": 1145,
+      "height": 556,
+      "caption": "CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-alerts-signals.png",
+      "width": 897,
+      "height": 621,
+      "caption": "Alerts & Market Signals panel showing AI-generated entries combining COT positioning, OIS-implied central bank bias, carry, and options skew, each with a priority dot, timestamp, title, and supporting data chips"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-news-feed.png",
+      "width": 704,
+      "height": 347,
+      "caption": "News Feed panel with currency filter pills (All, USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) and a list of FX-relevant headlines with source, timestamp, and summary"
     }
   ],
   "offers": {
@@ -551,7 +609,7 @@ a { color: inherit; text-decoration: none; }
           <div class="platform-feat"><span class="dot blue"></span>Full OHLC price chart with LightweightCharts</div>
           <div class="platform-feat"><span class="dot blue"></span>US Treasury yield curve (live FRED feed)</div>
           <div class="platform-feat"><span class="dot blue"></span>Derivatives suite — 25d RR, implied forwards, realized vol, ECB fixings, DTCC OTC volume</div>
-          <div class="platform-feat"><span class="dot blue"></span>Cross-asset correlation matrix (252-day rolling)</div>
+          <div class="platform-feat"><span class="dot blue"></span>Cross-asset correlation matrix (60-day rolling, z-scored vs 252-day norm)</div>
           <div class="platform-feat"><span class="dot blue"></span>Economic Surprise Index — G10 currencies</div>
           <div class="platform-feat"><span class="dot blue"></span>FX liquidity canvas — session depth visualization</div>
           <div class="platform-feat"><span class="dot blue"></span>AI narrative &amp; market signals — 4&times;/day</div>
@@ -622,7 +680,70 @@ a { color: inherit; text-decoration: none; }
           <p class="scr-item-meta"><strong>Carry Trade Ranking.</strong> G10 real carry, annualized, ranked pair by pair — the market's payoff for the rate bias shown alongside it.</p>
         </div>
       </div>
+
+      <div class="scr-gallery-label" style="margin-top:28px;">Additional Coverage</div>
+
+      <div class="feat-card-grid">
+        <div class="feat-card">
+          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Cross-Asset Correlations">
+            <img src="assets/screenshot-correlations.png" data-src="assets/screenshot-correlations.png" alt="Key Correlations table showing rolling 60-day Pearson correlation between FX pairs and reference assets, with a vs-norm z-score column flagging stretched or broken correlations" width="408" height="458" loading="lazy">
+          </div>
+          <div class="feat-card-body">
+            <div class="feat-card-title">Cross-Asset Correlations</div>
+            <div class="feat-card-desc">60-day rolling Pearson correlation vs VIX, S&amp;P 500, Gold and DXY, z-scored against a 252-day norm to flag stretched or broken regimes.</div>
+          </div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Derivatives detail">
+            <img src="assets/screenshot-rr-term-structure.png" data-src="assets/screenshot-rr-term-structure.png" alt="25-Delta Risk Reversal term structure table showing RR values across 1W, 1M, 3M, 6M, and 1Y tenors for six major pairs, with a Skew column summarizing put or call skew" width="767" height="419" loading="lazy">
+          </div>
+          <div class="feat-card-body">
+            <div class="feat-card-title">Derivatives Detail</div>
+            <div class="feat-card-desc">25-delta RR term structure (1W&ndash;1Y) with put/call skew, CIP-implied forwards, and realized vol vs RR skew &mdash; the underlying tables behind the Derivatives suite above.</div>
+          </div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: FX Liquidity Canvas">
+            <img src="assets/screenshot-fx-liquidity.png" data-src="assets/screenshot-fx-liquidity.png" alt="FX Liquidity panel showing estimated market liquidity across the 24-hour trading day, with Tokyo, London, and New York session shading, a 30-day average dotted line, and a vertical marker for the current time" width="574" height="391" loading="lazy">
+          </div>
+          <div class="feat-card-body">
+            <div class="feat-card-title">FX Liquidity Canvas</div>
+            <div class="feat-card-desc">Estimated liquidity across the 24-hour session, with Tokyo/London/New York shading, a 30-day average line, and a live time marker.</div>
+          </div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Currency Strength (CSI)">
+            <img src="assets/screenshot-csi.png" data-src="assets/screenshot-csi.png" alt="CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD" width="1145" height="556" loading="lazy">
+          </div>
+          <div class="feat-card-body">
+            <div class="feat-card-title">Currency Strength (CSI)</div>
+            <div class="feat-card-desc">Per-currency index and strength bars for all 8 majors, overlaid directly on the MT5 chart. Free standalone indicator, included with the EA.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feat-card-grid feat-card-grid-2" style="margin-top:16px;">
+        <div class="feat-card">
+          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Alerts and Market Signals">
+            <img src="assets/screenshot-alerts-signals.png" data-src="assets/screenshot-alerts-signals.png" alt="Alerts &amp; Market Signals panel showing AI-generated entries combining COT positioning, OIS-implied central bank bias, carry, and options skew, each with a priority dot, timestamp, title, and supporting data chips" width="897" height="621" loading="lazy">
+          </div>
+          <div class="feat-card-body">
+            <div class="feat-card-title">Alerts &amp; Market Signals</div>
+            <div class="feat-card-desc">AI-generated entries combining COT positioning, OIS-implied CB bias, carry, and options skew, each timestamped with a priority indicator.</div>
+          </div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: News Feed">
+            <img src="assets/screenshot-news-feed.png" data-src="assets/screenshot-news-feed.png" alt="News Feed panel with currency filter pills (All, USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) and a list of FX-relevant headlines with source, timestamp, and summary" width="704" height="347" loading="lazy">
+          </div>
+          <div class="feat-card-body">
+            <div class="feat-card-title">News Feed</div>
+            <div class="feat-card-desc">FX-relevant headlines filterable by currency, with source and timestamp on every entry.</div>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
   <!-- COVERAGE TABLE -->
   <section class="ac-section" aria-labelledby="coverage-heading">
@@ -648,14 +769,14 @@ a { color: inherit; text-decoration: none; }
           <tr><td>Economic calendar</td><td><span class="check">&#10003;</span> MT5 native</td><td><span class="check">&#10003;</span> Native panel</td></tr>
           <tr><td>Economic Surprise Index</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
           <tr><td>Market sessions</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
-          <tr><td>Correlation matrix</td><td><span class="check">&#10003;</span> MT5 native</td><td><span class="check">&#10003;</span> 252-day rolling</td></tr>
+          <tr><td>Correlation matrix</td><td><span class="check">&#10003;</span> MT5 native</td><td><span class="check">&#10003;</span> 60-day rolling</td></tr>
           <tr><td>Volatility &amp; options</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
           <tr><td>News headlines</td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
           <tr><td>Open positions (live account)</td><td><span class="check">&#10003;</span> MT5 native</td><td><span class="dash">&mdash;</span></td></tr>
           <tr><td>Alert system (popup / push)</td><td><span class="check">&#10003;</span></td><td><span class="dash">&mdash;</span></td></tr>
           <tr><td>Full price chart (OHLC history)</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span> LightweightCharts</td></tr>
           <tr><td>US Treasury yield curve</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span></td></tr>
-          <tr><td>Cross-asset correlations</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span> 252-day rolling window</td></tr>
+          <tr><td>Cross-asset correlations</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span> 60-day rolling window</td></tr>
           <tr><td>Derivatives suite</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span> 25d RR, implied forwards, realized vol, ECB fixings, DTCC volume</td></tr>
           <tr><td>AI narrative &amp; market signals</td><td><span class="check">&#10003;</span> Per-pair, in popup</td><td><span class="check">&#10003;</span> 4&times;/day</td></tr>
           <tr><td>FX liquidity canvas</td><td><span class="dash">&mdash;</span></td><td><span class="check">&#10003;</span></td></tr>
@@ -805,9 +926,10 @@ a { color: inherit; text-decoration: none; }
       if (!img) return;
       lbImg.src = img.dataset.src || img.src;
       lbImg.alt = img.alt;
-      // Caption: for scr-hero the next sibling is .scr-meta; for scr-item it's .scr-item-meta inside same parent
+      // Caption: for scr-hero the next sibling is .scr-meta; for scr-item it's .scr-item-meta inside same parent;
+      // for feat-card-thumb it's .feat-card-body (title + desc) inside the same parent .feat-card
       const metaHero = el.nextElementSibling;
-      const metaItem = el.parentElement && el.parentElement.querySelector('.scr-item-meta');
+      const metaItem = el.parentElement && el.parentElement.querySelector('.scr-item-meta, .feat-card-body');
       const capEl = (metaHero && metaHero.classList.contains('scr-meta')) ? metaHero : metaItem;
       lbCap.textContent = capEl ? capEl.textContent.trim() : (el.getAttribute('aria-label') || '');
       lb.classList.add('open');
@@ -815,7 +937,7 @@ a { color: inherit; text-decoration: none; }
       lbClose.focus();
     }
     function closeLb() { lb.classList.remove('open'); document.body.style.overflow = ''; }
-    document.querySelectorAll('.scr-hero, .scr-item').forEach(el => {
+    document.querySelectorAll('.scr-hero, .scr-item, .feat-card-thumb').forEach(el => {
       el.addEventListener('click', () => openLb(el));
       el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(el); } });
     });
