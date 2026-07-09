@@ -136,6 +136,7 @@ a { color: inherit; text-decoration: none; }
 .scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-bottom: 28px; padding: 0 2px; }
 .scr-meta strong { color: var(--text2); font-weight: 600; }
 .scr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 4px; }
+.scr-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 4px; }
 .scr-item { cursor: zoom-in; }
 .scr-item-frame {
   border-radius: 4px; overflow: hidden; border: 1px solid var(--border);
@@ -258,7 +259,7 @@ a { color: inherit; text-decoration: none; }
   .hero { padding: 36px 0; }
   .hero-inner, .page-body { padding-left: 20px; padding-right: 20px; }
   .hero h1 { font-size: 26px; }
-  .scr-grid { grid-template-columns: 1fr; }
+  .scr-grid, .scr-grid-3 { grid-template-columns: 1fr; }
   .companion-grid { grid-template-columns: 1fr; }
   .companion-card + .companion-card { border-left: none; border-top: 1px solid var(--border); }
   .sub-card-body { grid-template-columns: 1fr; }
@@ -324,6 +325,13 @@ a { color: inherit; text-decoration: none; }
       "width": 407,
       "height": 336,
       "caption": "Economic Surprise Index (ESI) panel in the Global Investing web terminal, showing decay-weighted actual-vs-forecast scores by G10 currency"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-carry-ranking-new.png",
+      "width": 389,
+      "height": 336,
+      "caption": "Carry Trade Ranking panel in the Global Investing web terminal, showing G10 real carry annualized ranking by currency pair"
     }
   ],
   "offers": {
@@ -594,18 +602,24 @@ a { color: inherit; text-decoration: none; }
 
       <div class="scr-gallery-label" style="margin-top:28px;">Panel Views</div>
 
-      <div class="scr-grid">
+      <div class="scr-grid-3">
         <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: CB Rate Expectations">
-          <div class="scr-item-frame" style="aspect-ratio: 406 / 364; max-width: 300px; margin: 0 auto 8px;">
+          <div class="scr-item-frame" style="aspect-ratio: 406 / 364;">
             <img src="assets/screenshot-cb-rate-expectations.png" data-src="assets/screenshot-cb-rate-expectations.png" alt="CB Rate Expectations panel in the Global Investing web terminal, showing OIS-implied cut/hold/hike probabilities for all 10 G10 central banks" width="406" height="364" loading="eager">
           </div>
-          <p class="scr-item-meta" style="max-width: 300px; margin: 0 auto;"><strong>CB Rate Expectations.</strong> OIS-implied cut/hold/hike probabilities for all 10 G10 central banks — SOFR, ESTER, SONIA, TONA methodology.</p>
+          <p class="scr-item-meta"><strong>CB Rate Expectations.</strong> OIS-implied cut/hold/hike probabilities for all 10 G10 central banks — SOFR, ESTER, SONIA, TONA methodology.</p>
         </div>
         <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: Economic Surprise Index">
-          <div class="scr-item-frame" style="aspect-ratio: 407 / 336; max-width: 300px; margin: 0 auto 8px;">
+          <div class="scr-item-frame" style="aspect-ratio: 407 / 336;">
             <img src="assets/screenshot-econ-surprises-new.png" data-src="assets/screenshot-econ-surprises-new.png" alt="Economic Surprise Index (ESI) panel in the Global Investing web terminal, showing decay-weighted actual-vs-forecast scores by G10 currency" width="407" height="336" loading="eager">
           </div>
-          <p class="scr-item-meta" style="max-width: 300px; margin: 0 auto;"><strong>Economic Surprise Index.</strong> Decay-weighted actual-vs-forecast scoring per G10 currency, normalized with a 90-day rolling z-score.</p>
+          <p class="scr-item-meta"><strong>Economic Surprise Index.</strong> Decay-weighted actual-vs-forecast scoring per G10 currency, normalized with a 90-day rolling z-score.</p>
+        </div>
+        <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: Carry Trade Ranking">
+          <div class="scr-item-frame" style="aspect-ratio: 389 / 336;">
+            <img src="assets/screenshot-carry-ranking-new.png" data-src="assets/screenshot-carry-ranking-new.png" alt="Carry Trade Ranking panel in the Global Investing web terminal, showing G10 real carry annualized ranking by currency pair" width="389" height="336" loading="eager">
+          </div>
+          <p class="scr-item-meta"><strong>Carry Trade Ranking.</strong> G10 real carry, annualized, ranked pair by pair — the market's payoff for the rate bias shown alongside it.</p>
         </div>
       </div>
     </div>
