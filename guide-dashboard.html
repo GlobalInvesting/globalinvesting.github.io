@@ -181,6 +181,12 @@ a { color: inherit; text-decoration: none; }
 .regime-desc { font-size: 13.8px; color: var(--text2); line-height: 1.7; }
 @media (max-width: 600px) { .regime-grid { grid-template-columns: 1fr; } }
 
+/* ── Mobile layout screenshots ── */
+.mobile-shots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0 24px; }
+.mobile-shots-grid .scr-hero-wrap { margin: 0; }
+@media (max-width: 700px) { .mobile-shots-grid { grid-template-columns: 1fr; } }
+
+
 
 /* ═══════════════════════════════════════════
    SHARED PAGE STYLES — improved aesthetic
@@ -564,6 +570,26 @@ a { color: inherit; text-decoration: none; }
       <p>The main content area is split into two scrollable columns by default — the chart, FX table, and heatmap on the left; cross-asset, risk, rates, COT, sessions, and signals on the right. This is the recommended view on desktop as it keeps the chart visible while scrolling through data panels on the right. The split ratio is adjustable: drag the vertical divider bar between the two columns left or right to resize. Your preferred split width is saved automatically.</p>
       <p>To toggle split mode on or off, click the <strong>split icon button</strong> <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:16px;border:1px solid var(--border2);border-radius:3px;vertical-align:middle;font-size:9px;color:var(--text2);">⊟</span> in the top-right corner of the Price Chart panel header — next to the panel subtitle. When split layout is active, the button is highlighted in blue. Clicking it again collapses back to a single full-width scroll. Split layout is disabled automatically on mobile viewports.</p>
       <p>On mobile, the layout collapses into a single scrollable column regardless of the split setting. The sidebar and right panel fold into the main flow.</p>
+      <div class="mobile-shots-grid">
+        <div class="scr-hero-wrap">
+          <div class="scr-hero scr-hero-contain">
+            <img src="assets/screenshot-mobile-overview-top.png" alt="Global Investing FX Terminal on mobile, top of the scrollable single-column view, showing FX Pairs — Majors table, Currency Strength Heatmap, and Economic Calendar" width="375" height="668" loading="lazy">
+          </div>
+          <p class="scr-meta"><strong>Top of the mobile view.</strong> FX Pairs table, currency strength heatmap, and economic calendar stack directly below the topbar.</p>
+        </div>
+        <div class="scr-hero-wrap">
+          <div class="scr-hero scr-hero-contain">
+            <img src="assets/screenshot-mobile-narrative-chart.png" alt="Global Investing FX Terminal on mobile, showing the AI market narrative panel and the price chart panel in the scrollable single-column view" width="374" height="667" loading="lazy">
+          </div>
+          <p class="scr-meta"><strong>Narrative and chart.</strong> The AI narrative and price chart panels, normally in the main split column, fold into the same scroll flow.</p>
+        </div>
+        <div class="scr-hero-wrap">
+          <div class="scr-hero scr-hero-contain">
+            <img src="assets/screenshot-mobile-cross-asset-risk.png" alt="Global Investing FX Terminal on mobile, showing the Cross-Asset panel and Risk Monitor panel in the scrollable single-column view" width="374" height="667" loading="lazy">
+          </div>
+          <p class="scr-meta"><strong>Cross-asset and risk.</strong> The right-panel content — cross-asset levels and the risk monitor — appears further down the same column.</p>
+        </div>
+      </div>
       <p>The sticky topbar navigation links jump you directly to major sections: <strong>FX Pairs</strong>, <strong>Macro</strong>, <strong>Rates</strong>, <strong>Cross-Asset</strong>, <strong>Risk</strong>, <strong>Positioning</strong>, <strong>Calendar</strong>, <strong>Derivatives</strong>, and <strong>News</strong>.</p>
     </div>
 
