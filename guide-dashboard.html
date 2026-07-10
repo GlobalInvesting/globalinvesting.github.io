@@ -114,7 +114,7 @@ a { color: inherit; text-decoration: none; }
 .page-hero::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 48px; height: 1px; background: var(--blue); }
 .page-hero-label { font-size: 9.9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .page-hero-label::before { content: ""; display: inline-block; width: 16px; height: 1px; background: var(--blue); }
-.page-hero h1 { font-size: 42px; font-weight: 800; color: #ffffff; line-height: 1.25; margin-bottom: 12px; letter-spacing: -.3px; }
+.page-hero h1 { font-size: 42px; font-weight: 700; color: #e8edf8; line-height: 1.25; margin-bottom: 12px; letter-spacing: -.3px; }
 .page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; }
 .hero-video-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 16px; font-family: var(--font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: .04em; color: var(--blue); text-decoration: none; }
 .hero-video-link:hover { opacity: .85; }
@@ -187,57 +187,6 @@ a { color: inherit; text-decoration: none; }
 .mobile-shots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0 24px; }
 .mobile-shots-grid .scr-hero-wrap { margin: 0; }
 @media (max-width: 700px) { .mobile-shots-grid { grid-template-columns: 1fr; } }
-
-
-
-/* ═══════════════════════════════════════════
-   SHARED PAGE STYLES — improved aesthetic
-   Applies to: about, contact, privacy, terms
-═══════════════════════════════════════════ */
-
-.page-wrap {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 60px 24px 80px;
-  animation: fadeUp .35s ease both;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Hero ── */
-.page-hero {
-  padding-bottom: 32px;
-  margin-bottom: 40px;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-}
-.page-hero::before {
-  content: '';
-  position: absolute;
-  left: 0; bottom: -1px;
-  width: 48px; height: 1px;
-  background: var(--blue);
-}
-.page-hero-label {
-  font-size: 9.9px; font-weight: 700;
-  letter-spacing: .18em; text-transform: uppercase;
-  color: var(--blue); margin-bottom: 14px;
-  display: flex; align-items: center; gap: 8px;
-}
-.page-hero-label::before {
-  content: '';
-  display: inline-block; width: 16px; height: 1px;
-  background: var(--blue);
-}
-.page-hero h1 {
-  font-size: 42px; font-weight: 800;
-  color: #e8eaf0; line-height: 1.2;
-  margin-bottom: 16px;
-  letter-spacing: -.3px;
-}
 /* ── pd-inline: Pair Detail expand strip (mirrored from dashboard.css) ─────── */
 .pd-inline-scroll{display:flex;overflow-x:auto;overflow-y:hidden;width:100%;box-sizing:border-box;}
 .pd-inline{display:flex;align-items:stretch;padding:0;font-family:var(--font-ui);width:100%;}
