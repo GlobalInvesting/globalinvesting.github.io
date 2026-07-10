@@ -139,7 +139,7 @@ a { color: inherit; text-decoration: none; }
 .scr-hero-contain { width: fit-content; max-width: 100%; margin: 0 auto; }
 .scr-hero-contain img { width: auto; max-width: 100%; height: auto; display: block; margin: 0; }
 .mobile-feature-row { display: grid; grid-template-columns: 1fr 260px; gap: 40px; align-items: center; padding: 36px 0; border-top: 1px solid var(--border); }
-.mobile-feature-row:first-of-type { border-top: none; padding-top: 4px; }
+.scr-gallery-label + .mobile-feature-row { border-top: none; padding-top: 4px; }
 .mobile-feature-eyebrow { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
 .mobile-feature-title { font-size: 21px; font-weight: 700; color: #e8edf8; line-height: 1.3; margin-bottom: 12px; }
 .mobile-feature-desc { font-size: 13.5px; color: var(--text2); line-height: 1.8; max-width: 460px; }
@@ -152,13 +152,14 @@ a { color: inherit; text-decoration: none; }
   .mobile-feature-desc { max-width: none; }
 }
 .panel-feature-row { display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: center; padding: 32px 0; border-top: 1px solid var(--border); }
-.panel-feature-row:first-of-type { border-top: none; padding-top: 4px; }
+.scr-gallery-label + .panel-feature-row { border-top: none; padding-top: 4px; }
 .panel-feature-row.reverse { grid-template-columns: 340px 1fr; }
 .panel-feature-row.reverse .panel-feature-text { order: 2; }
 .panel-feature-row.reverse .panel-feature-img { order: 1; }
 .panel-feature-img { justify-self: center; }
 .panel-feature-img .scr-hero { margin-bottom: 0; }
-.panel-feature-desc { max-width: 460px; }
+.panel-feature-desc { font-size: 13.5px; color: var(--text2); line-height: 1.8; max-width: 460px; }
+.panel-feature-desc strong { color: var(--text); font-weight: 600; }
 @media (max-width: 700px) {
   .panel-feature-row, .panel-feature-row.reverse { grid-template-columns: 1fr; gap: 20px; padding: 24px 0; }
   .panel-feature-row.reverse .panel-feature-text, .panel-feature-row.reverse .panel-feature-img { order: initial; }
@@ -668,7 +669,7 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
 
-      <div class="scr-gallery-label" style="margin-top:28px;">Panel Views</div>
+      <div class="scr-gallery-label gallery-break">Panel Views</div>
 
       <div class="panel-feature-row">
         <div class="panel-feature-text">
