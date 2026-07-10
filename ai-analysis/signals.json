@@ -1,53 +1,65 @@
 {
-  "generated_at": "2026-07-10T02:36:56Z",
+  "generated_at": "2026-07-10T09:58:22Z",
   "signals": [
     {
-      "time": "02:33",
+      "time": "09:57",
       "priority": "critical",
-      "title": "NZD/USD — G10 Bilateral Theme",
-      "text": "NZD/USD trades at 0.5791 as the G10 currency scorecard triggers a critical bilateral theme. NZD outperformance is driven by the RBNZ hiking stance (2.5% policy rate, market bias pointing to further hikes) while the USD weakens as stocks rally. This divergence is highly pronounced given the extreme speculative positioning, with NZD COT LF net short at -25,757 (long% at 19.5%), setting up a major short-squeeze risk as the currency leads the G10. The next RBNZ meeting (mkt: 46% hike priced) on 2 Sep is the primary catalyst to confirm this structural squeeze.",
+      "title": "NZD/CHF — G10 Bilateral Theme",
+      "text": "NZD/CHF at 0.7156 — NZD leads G10 performance (+1.509%) while CHF lags (-0.651%), creating a 2.160% spread. The divergence is fundamentally anchored by the RBNZ 2.5% (HIKING) vs SNB 0.0% (ON HOLD) stance, yielding a +250bp carry advantage for NZD. RBNZ 2.5%.",
       "evidence": [
-        "NZD 1W avg: +1.612% (n=4)",
-        "USD 1W avg: -0.572% (n=7)",
-        "G10 spread: 2.185%"
+        "NZD 1W avg: +1.509% (n=4)",
+        "CHF 1W avg: -0.651% (n=6)",
+        "G10 spread: 2.160%"
       ],
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:30",
+      "time": "09:54",
+      "priority": "critical",
+      "title": "USD/JPY — Carry + Vol + Intervention Risk",
+      "text": "USD/JPY at 161.83 — 275bp Fed-BoJ carry sustains the bid, but price is now testing levels above the 160.00 threshold where BoJ verbal warnings previously intensified. Options market is pricing heavy protection against a reversal with a -1.28 25d RR put skew and an elevated VRP of +3.6% (IV 7.2% vs HV30 3.5%). BoJ 1.0%.",
+      "evidence": [
+        "USD/JPY: 161.83",
+        "25d RR: -1.28 (put skew)",
+        "VRP: +3.6%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "09:52",
       "priority": "warning",
-      "title": "USD/JPY — Positioning + Vol + Intervention Risk",
-      "text": "USD/JPY trades at 161.446, holding above the critical 160.00 threshold where verbal and physical BoJ intervention risks rise. JPY speculative positioning remains heavily short with COT LF net short at -137,828 (long% at 25.3%), while the options market shows a moderate put skew with 25d RR at -1.28, signaling institutional demand for downside protection. This options skew, combined with an elevated volatility risk premium (IV 7.2% vs HV30 3.9%, VRP +3.3%), indicates that despite the +275bp carry advantage favoring USD (Fed 3.75% vs BoJ 1.0%), the market is actively hedging a sharp JPY reversal. Watch for verbal intervention from the Ministry of Finance to trigger a rapid squeeze of crowded shorts.",
+      "title": "USD/CAD — Positioning + CESI + Retail Divergence",
+      "text": "USD/CAD at 1.4166 — COT LF net short -92,861 (20.6% long) aligns with a negative CESI (-8), signaling persistent CAD data disappointment. Retail sentiment is 83% short, diverging from the institutional short-CAD/long-USD bias. This retail fade at extreme levels increases the risk of a squeeze higher if the June jobs report confirms the expected slowdown. Fed 3.75% vs BoC 2.25% provides a +150bp carry tailwind for the pair.",
       "evidence": [
-        "USD/JPY: 161.446",
-        "JPY COT LF net: -137,828",
-        "USD/JPY 25d RR: -1.28"
-      ],
-      "_source": "gemini:gemini-3.5-flash"
-    },
-    {
-      "time": "02:27",
-      "priority": "warning",
-      "title": "GBP/USD — Positioning + Vol + Retail Divergence",
-      "text": "GBP/USD trades at 1.34460, supported by a positive economic surprise index (GBP CESI net +23 beats) and a neutral carry profile (Fed 3.75% vs BoE 3.75%). Speculators are net long (COT LF net +9,753, long% 55.5%), while retail traders are heavily short at 72%, creating a strong contrarian tailwind as retail fades the institutional trend. However, the options market is pricing in significant hedging demand with an elevated volatility risk premium (IV 11.0% vs HV30 5.6%, VRP +5.4%) and a mild put skew (25d RR at -0.66), indicating institutional caution near the range highs. The next BoE meeting (mkt: 100% hold priced) on 30 Jul will determine if the upward momentum can be sustained.",
-      "evidence": [
-        "GBP/USD: 1.34460",
-        "GBP/USD Retail: 72% short",
-        "GBP/USD VRP: +5.4%"
-      ],
-      "_source": "gemini:gemini-3.5-flash"
-    },
-    {
-      "time": "02:20",
-      "priority": "info",
-      "title": "USD/CAD — Correlation Break + Extreme Retail Short",
-      "text": "USD/CAD trades at 1.41390, exhibiting a significant cross-asset correlation break against WTI crude oil (corr -0.871 vs 252d norm +0.052, z = -2.04σ), indicating that the traditional CAD-commodity link is entirely broken as domestic factors and rate differentials dominate. Speculators are heavily short CAD (COT LF net short -92,861, long% 20.6%), which aligns with the +150bp carry advantage favoring USD (Fed 3.75% vs BoC 2.25%). However, retail sentiment has reached an extreme 83% short bias on USD/CAD, presenting a contrarian risk of further upside extension if retail traders are forced to capitulate. The next BoC meeting (mkt: 100% hold priced) on 15 Jul is the key near-term catalyst.",
-      "evidence": [
-        "USD/CAD vs WTI corr: -0.871",
         "CAD COT LF net: -92,861",
-        "USD/CAD Retail: 83% short"
+        "Retail: 83% short",
+        "USD/CAD carry: +150bp"
       ],
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "09:48",
+      "priority": "warning",
+      "title": "GBP/USD — Vol Premium + G10 Outperformance",
+      "text": "GBP/USD at 1.3413 — GBP is the second strongest G10 currency (+0.663%) supported by a positive CESI (+22). Options market shows extreme hedging demand with a +5.5% VRP (IV 11.0% vs HV30 5.5%), the highest in the G10 space. While carry is neutral (Fed 3.75% vs BoE 3.75%), the real rate differential (+0.78% GBP vs +1.47% USD) suggests USD remains structurally more restrictive, capping GBP upside despite the data beats.",
+      "evidence": [
+        "GBP 1W avg: +0.663% (n=4)",
+        "VRP: +5.5%",
+        "GBP CESI: +22"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "09:42",
+      "priority": "info",
+      "title": "AUD/USD — Vol Complacency + Gold Correlation",
+      "text": "AUD/USD at 0.6949 — The pair shows unusual vol complacency with a negative VRP of -3.8% (IV 3.1% vs HV30 6.8%). AUD/USD remains highly correlated to Gold (corr=+0.886, z=+1.02σ), making the pair vulnerable to the current Gold retreat toward $4,100. RBA 4.35% vs Fed 3.75% provides a +60bp carry cushion, but thin options supply suggests the market is underpricing potential downside volatility.",
+      "evidence": [
+        "AUD/USD VRP: -3.8%",
+        "AUD/USD vs Gold corr: +0.886",
+        "RBA-Fed spread: +60bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
