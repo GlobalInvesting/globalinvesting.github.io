@@ -167,31 +167,21 @@ a { color: inherit; text-decoration: none; }
   .panel-feature-desc { max-width: none; }
 }
 .gallery-break { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--border); }
-.scr-tabs-wrap { display: grid; grid-template-columns: 220px 1fr; gap: 44px; align-items: start; margin-top: 4px; }
-.scr-tabs { display: flex; flex-direction: column; border-top: 1px solid var(--border); }
-.scr-tab {
-  all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-  gap: 8px; padding: 15px 2px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text3);
-  transition: color .15s;
-}
-.scr-tab:hover { color: var(--text2); }
-.scr-tab:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-.scr-tab.active { color: var(--text); font-weight: 600; }
-.scr-tab-arrow { flex: none; color: var(--blue); opacity: 0; transform: translateX(-4px); transition: opacity .15s, transform .15s; font-size: 13px; }
-.scr-tab.active .scr-tab-arrow, .scr-tab:hover .scr-tab-arrow { opacity: 1; transform: translateX(0); }
-.scr-tabpanel { display: none; }
-.scr-tabpanel.active { display: block; }
-.scr-tabpanel-title { font-size: 21px; font-weight: 700; color: #e8edf8; line-height: 1.3; margin-bottom: 14px; }
-.scr-tabpanel .scr-hero { margin-bottom: 10px; }
-.scr-tabpanel-meta { font-family: var(--font-mono); font-size: 10.5px; color: var(--text3); line-height: 1.65; padding: 0 2px; }
-.scr-tabpanel-meta a { color: var(--blue); }
-@media (max-width: 780px) {
-  .scr-tabs-wrap { grid-template-columns: 1fr; gap: 20px; }
-  .scr-tabs { flex-direction: row; overflow-x: auto; border-top: none; border-bottom: 1px solid var(--border); -webkit-overflow-scrolling: touch; }
-  .scr-tab { border-bottom: none; white-space: nowrap; padding: 10px 14px; }
-  .scr-tab-arrow { display: none; }
-}
 .gallery-break-desc { font-size: 13px; color: var(--text3); line-height: 1.7; max-width: 560px; margin: -8px 0 20px; }
+.scr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 4px; }
+.scr-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 4px; }
+.scr-item { cursor: zoom-in; }
+.scr-item-frame {
+  border-radius: 4px; overflow: hidden; border: 1px solid var(--border);
+  transition: border-color .18s, box-shadow .18s; margin-bottom: 8px;
+  box-shadow: 0 10px 28px -10px rgba(0,0,0,.55);
+  aspect-ratio: 1.95; background: var(--bg2);
+  display: flex; align-items: center; justify-content: center;
+}
+.scr-item:hover .scr-item-frame { border-color: var(--border2); box-shadow: 0 12px 32px -8px rgba(0,0,0,.65); }
+.scr-item img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.scr-item-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.55; padding: 0 2px; }
+.scr-item-meta strong { color: var(--text2); font-weight: 600; }
 
 /* ADDITIONAL COVERAGE — compact feature cards */
 .feat-card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
@@ -318,6 +308,7 @@ a { color: inherit; text-decoration: none; }
   .hero { padding: 36px 0; }
   .hero-inner, .page-body { padding-left: 20px; padding-right: 20px; }
   .hero h1 { font-size: 26px; }
+  .scr-grid, .scr-grid-3 { grid-template-columns: 1fr; }
   .feat-card-grid, .feat-card-grid.feat-card-grid-2 { grid-template-columns: 1fr; max-width: none; }
   .companion-grid { grid-template-columns: 1fr; }
   .companion-card + .companion-card { border-left: none; border-top: 1px solid var(--border); }
@@ -648,54 +639,33 @@ a { color: inherit; text-decoration: none; }
     <div class="scr-gallery">
       <div class="scr-gallery-label">Screenshots</div>
 
-      <div class="scr-tabs-wrap">
-        <div class="scr-tabs" role="tablist" aria-label="Screenshots">
-          <button type="button" class="scr-tab active" role="tab" aria-selected="true" aria-controls="scr-panel-0" id="scr-tab-0" data-panel="0">MT5 Expert Advisor <span class="scr-tab-arrow">&rarr;</span></button>
-          <button type="button" class="scr-tab" role="tab" aria-selected="false" aria-controls="scr-panel-1" id="scr-tab-1" data-panel="1" tabindex="-1">Web Terminal <span class="scr-tab-arrow">&rarr;</span></button>
-          <button type="button" class="scr-tab" role="tab" aria-selected="false" aria-controls="scr-panel-2" id="scr-tab-2" data-panel="2" tabindex="-1">Derivatives Suite <span class="scr-tab-arrow">&rarr;</span></button>
-          <button type="button" class="scr-tab" role="tab" aria-selected="false" aria-controls="scr-panel-3" id="scr-tab-3" data-panel="3" tabindex="-1">CFTC Positioning <span class="scr-tab-arrow">&rarr;</span></button>
+      <div class="scr-grid">
+        <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: MT5 Expert Advisor">
+          <div class="scr-item-frame">
+            <img src="assets/screenshot-mt5-ea.png" data-src="assets/screenshot-mt5-ea.png" alt="MetaTrader 5 (MT5) trading terminal interface screenshot — Global Investing FX Expert Advisor canvas overlay with live prices, COT positioning, CB rates, and economic calendar" width="1919" height="1009" loading="eager">
+          </div>
+          <p class="scr-item-meta"><strong>MT5 Expert Advisor.</strong> Zero-flicker canvas overlay inside MetaTrader 5. Live broker swaps, open positions panel, and MT5 push alerts. See the <a href="guide-mt5-ea.html">setup &amp; feature guide</a>.</p>
         </div>
-
-        <div class="scr-tabpanels">
-          <div class="scr-tabpanel active" id="scr-panel-0" role="tabpanel" aria-labelledby="scr-tab-0">
-            <div class="scr-tabpanel-title">MT5 Expert Advisor</div>
-            <div class="scr-hero-wrap">
-              <div class="scr-hero" role="button" tabindex="0" aria-label="Enlarge: MT5 Expert Advisor">
-                <img src="assets/screenshot-mt5-ea.png" data-src="assets/screenshot-mt5-ea.png" alt="MetaTrader 5 (MT5) trading terminal interface screenshot — Global Investing FX Expert Advisor canvas overlay with live prices, COT positioning, CB rates, and economic calendar" width="1919" height="1009" loading="eager">
-              </div>
-            </div>
-            <p class="scr-tabpanel-meta">Zero-flicker canvas overlay inside MetaTrader 5. Live broker swaps, open positions panel, and MT5 push alerts. See the <a href="guide-mt5-ea.html">setup &amp; feature guide</a>.</p>
+        <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: Web Terminal">
+          <div class="scr-item-frame">
+            <img src="assets/screenshot-terminal.png" data-src="assets/screenshot-terminal.png" alt="Global Investing web-based FX terminal dashboard, browser view with FX pairs, economic calendar, currency strength, and AI market narrative panels" width="1910" height="947" loading="eager">
           </div>
+          <p class="scr-item-meta"><strong>Web Terminal.</strong> The same institutional dataset in any browser — no MT5 required. FX pairs, AI narrative, calendar, currency strength, and carry side by side.</p>
+        </div>
+      </div>
 
-          <div class="scr-tabpanel" id="scr-panel-1" role="tabpanel" aria-labelledby="scr-tab-1" hidden>
-            <div class="scr-tabpanel-title">Web Terminal</div>
-            <div class="scr-hero-wrap">
-              <div class="scr-hero" role="button" tabindex="0" aria-label="Enlarge: Web Terminal">
-                <img src="assets/screenshot-terminal.png" data-src="assets/screenshot-terminal.png" alt="Global Investing web-based FX terminal dashboard, browser view with FX pairs, economic calendar, currency strength, and AI market narrative panels" width="1910" height="947" loading="eager">
-              </div>
-            </div>
-            <p class="scr-tabpanel-meta">The same institutional dataset in any browser — no MT5 required. FX pairs, AI narrative, calendar, currency strength, and carry side by side.</p>
+      <div class="scr-grid" style="margin-top:20px;">
+        <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: Derivatives suite">
+          <div class="scr-item-frame">
+            <img src="assets/screenshot-derivatives.png" data-src="assets/screenshot-derivatives.png" alt="Derivatives section — 25-delta risk reversal term structure" width="1360" height="649" loading="eager">
           </div>
-
-          <div class="scr-tabpanel" id="scr-panel-2" role="tabpanel" aria-labelledby="scr-tab-2" hidden>
-            <div class="scr-tabpanel-title">Derivatives Suite</div>
-            <div class="scr-hero-wrap">
-              <div class="scr-hero" role="button" tabindex="0" aria-label="Enlarge: Derivatives suite">
-                <img src="assets/screenshot-derivatives.png" data-src="assets/screenshot-derivatives.png" alt="Derivatives section — 25-delta risk reversal term structure" width="1360" height="649" loading="eager">
-              </div>
-            </div>
-            <p class="scr-tabpanel-meta">25-delta RR term structure (1W&ndash;1Y), CIP-implied forwards, realized vol vs RR skew, ECB official fixings, and DTCC OTC notional volume.</p>
+          <p class="scr-item-meta"><strong>Derivatives suite.</strong> 25-delta RR term structure (1W–1Y), CIP-implied forwards, realized vol vs RR skew, ECB official fixings, and DTCC OTC notional volume.</p>
+        </div>
+        <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: CFTC COT positioning">
+          <div class="scr-item-frame">
+            <img src="assets/screenshot-cot.png" data-src="assets/screenshot-cot.png" alt="CFTC COT — Leveraged Funds positioning panel in the Global Investing web terminal, showing weekly net contracts and week-over-week momentum by currency" width="552" height="273" loading="eager">
           </div>
-
-          <div class="scr-tabpanel" id="scr-panel-3" role="tabpanel" aria-labelledby="scr-tab-3" hidden>
-            <div class="scr-tabpanel-title">CFTC Positioning &mdash; Leveraged Funds</div>
-            <div class="scr-hero-wrap">
-              <div class="scr-hero" role="button" tabindex="0" aria-label="Enlarge: CFTC COT positioning">
-                <img src="assets/screenshot-cot.png" data-src="assets/screenshot-cot.png" alt="CFTC COT — Leveraged Funds positioning panel in the Global Investing web terminal, showing weekly net contracts and week-over-week momentum by currency" width="552" height="273" loading="eager">
-              </div>
-            </div>
-            <p class="scr-tabpanel-meta">Weekly net contracts with WoW momentum bars. The primary institutional positioning signal for speculative FX flows.</p>
-          </div>
+          <p class="scr-item-meta"><strong>CFTC Positioning — Leveraged Funds.</strong> Weekly net contracts with WoW momentum bars. The primary institutional positioning signal for speculative FX flows.</p>
         </div>
       </div>
 
@@ -998,36 +968,6 @@ a { color: inherit; text-decoration: none; }
   const sc = document.querySelector('.sub-card');
   if (sc) sc.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.open('https://www.mql5.com/en/market/product/180326','_blank'); } });
 
-  // Screenshots tabs
-  const scrTabs = Array.from(document.querySelectorAll('.scr-tab'));
-  if (scrTabs.length) {
-    const scrPanels = Array.from(document.querySelectorAll('.scr-tabpanel'));
-    function activateTab(tab) {
-      scrTabs.forEach(t => {
-        const isActive = t === tab;
-        t.classList.toggle('active', isActive);
-        t.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        t.tabIndex = isActive ? 0 : -1;
-      });
-      scrPanels.forEach(p => {
-        const isActive = p.id === tab.getAttribute('aria-controls');
-        p.classList.toggle('active', isActive);
-        p.hidden = !isActive;
-      });
-    }
-    scrTabs.forEach((tab, i) => {
-      tab.addEventListener('click', () => activateTab(tab));
-      tab.addEventListener('keydown', e => {
-        let idx = null;
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') idx = (i + 1) % scrTabs.length;
-        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') idx = (i - 1 + scrTabs.length) % scrTabs.length;
-        else if (e.key === 'Home') idx = 0;
-        else if (e.key === 'End') idx = scrTabs.length - 1;
-        if (idx !== null) { e.preventDefault(); scrTabs[idx].focus(); activateTab(scrTabs[idx]); }
-      });
-    });
-  }
-
   // Lightbox
   const lb = document.getElementById('gi-lightbox');
   const lbImg = document.getElementById('gi-lightbox-img');
@@ -1039,10 +979,10 @@ a { color: inherit; text-decoration: none; }
       if (!img) return;
       lbImg.src = img.dataset.src || img.src;
       lbImg.alt = img.alt;
-      // Caption: for scr-hero the next sibling is .scr-meta (falls back to aria-label if absent);
+      // Caption: for scr-hero the next sibling is .scr-meta; for scr-item it's .scr-item-meta inside same parent;
       // for feat-card-thumb it's .feat-card-body (title + desc) inside the same parent .feat-card
       const metaHero = el.nextElementSibling;
-      const metaItem = el.parentElement && el.parentElement.querySelector('.feat-card-body');
+      const metaItem = el.parentElement && el.parentElement.querySelector('.scr-item-meta, .feat-card-body');
       const capEl = (metaHero && metaHero.classList.contains('scr-meta')) ? metaHero : metaItem;
       lbCap.textContent = capEl ? capEl.textContent.trim() : (el.getAttribute('aria-label') || '');
       lb.classList.add('open');
@@ -1050,7 +990,7 @@ a { color: inherit; text-decoration: none; }
       lbClose.focus();
     }
     function closeLb() { lb.classList.remove('open'); document.body.style.overflow = ''; }
-    document.querySelectorAll('.scr-hero, .feat-card-thumb').forEach(el => {
+    document.querySelectorAll('.scr-hero, .scr-item, .feat-card-thumb').forEach(el => {
       el.addEventListener('click', () => openLb(el));
       el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(el); } });
     });
