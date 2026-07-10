@@ -863,8 +863,9 @@ a { color: inherit; text-decoration: none; }
   <!-- SUBSCRIPTION -->
   <section class="ac-section" aria-labelledby="sub-heading">
     <div class="section-label">Subscription</div>
-    <h2 class="section-title" id="sub-heading">Pricing</h2>
-    <div class="sub-card" onclick="window.open('https://www.mql5.com/en/market/product/180326','_blank')" role="link" tabindex="0" aria-label="GI FX Terminal EA on MQL5 Market">
+    <h2 class="section-title" id="sub-heading">Pricing &amp; access</h2>
+    <p class="section-desc">Two paths to full web terminal access: rent the MT5 Expert Advisor, or open a verified account with our partner broker.</p>
+    <div class="sub-card" data-url="https://www.mql5.com/en/market/product/180326" role="link" tabindex="0" aria-label="GI FX Terminal EA on MQL5 Market">
       <div class="sub-card-head">
         <span class="sub-card-tag">Featured</span>
         <span class="sub-card-tagline">MQL5 Market &middot; Rental</span>
@@ -880,6 +881,25 @@ a { color: inherit; text-decoration: none; }
           <div class="sub-price-val">$30</div>
           <div class="sub-price-mo">per month</div>
           <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer" class="sub-link" onclick="event.stopPropagation()">View on MQL5 &#8594;</a>
+        </div>
+      </div>
+    </div>
+    <div class="sub-card" data-url="https://portal.tmgm.com/register?r_code=IB1510589870B" role="link" tabindex="0" aria-label="Open a TMGM account for web terminal access">
+      <div class="sub-card-head">
+        <span class="sub-card-tag">Alternative</span>
+        <span class="sub-card-tagline">TMGM &middot; Verified Account</span>
+      </div>
+      <div class="sub-card-body">
+        <div>
+          <div class="sub-card-title">Web Terminal via TMGM</div>
+          <div class="sub-card-subtitle">Full Web Terminal Access &middot; No EA Rental Required</div>
+          <div class="sub-card-desc">Open and verify a live trading account with TMGM through the link below to unlock full web terminal access — every panel, no MT5 EA purchase needed. Access is granted for 30 days and renews while the account remains active.</div>
+        </div>
+        <div class="sub-price-col">
+          <div class="sub-price-from">Included with</div>
+          <div class="sub-price-val">30 days</div>
+          <div class="sub-price-mo">verified TMGM account</div>
+          <a href="https://portal.tmgm.com/register?r_code=IB1510589870B" target="_blank" rel="noopener noreferrer" class="sub-link" onclick="event.stopPropagation()">Open a TMGM account &#8594;</a>
         </div>
       </div>
     </div>
@@ -985,9 +1005,12 @@ a { color: inherit; text-decoration: none; }
   const hpc = document.querySelector('[aria-label="GI FX Terminal EA on MQL5 Market"]');
   if (hpc) hpc.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.open('https://www.mql5.com/en/market/product/180326','_blank'); } });
 
-  // Sub card keyboard
-  const sc = document.querySelector('.sub-card');
-  if (sc) sc.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.open('https://www.mql5.com/en/market/product/180326','_blank'); } });
+  // Sub cards — click + keyboard, generalized via data-url (supports any number of cards)
+  document.querySelectorAll('.sub-card[data-url]').forEach(card => {
+    const url = card.dataset.url;
+    card.addEventListener('click', () => window.open(url, '_blank'));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.open(url, '_blank'); } });
+  });
 
   // Lightbox
   const lb = document.getElementById('gi-lightbox');
