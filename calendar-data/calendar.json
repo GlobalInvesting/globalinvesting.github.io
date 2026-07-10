@@ -1,173 +1,33 @@
 {
-  "lastUpdate": "2026-07-09T21:54:08Z",
-  "generatedAt": "2026-07-09T21:54:08Z",
+  "lastUpdate": "2026-07-10T08:47:40Z",
+  "generatedAt": "2026-07-10T08:47:40Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-09",
-  "rangeTo": "2026-07-09",
-  "totalEvents": 3982,
+  "rangeFrom": "2025-07-10",
+  "rangeTo": "2026-07-13",
+  "totalEvents": 3983,
   "currencyCounts": {
-    "GBP": 471,
-    "NZD": 125,
-    "USD": 1260,
     "EUR": 874,
-    "CAD": 311,
-    "CHF": 162,
-    "JPY": 257,
+    "NZD": 124,
+    "USD": 1257,
+    "CAD": 316,
+    "CHF": 165,
+    "GBP": 469,
+    "JPY": 256,
     "AUD": 288,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2112,
-    "high": 1642,
+    "medium": 2111,
+    "high": 1644,
     "low": 228
   },
   "surpriseStats": {
-    "CAD/part time employment chg": {
-      "n": 3,
-      "mean": -7.0,
-      "std": 35.151671
-    },
-    "CAD/unemployment rate": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 0.251661
-    },
-    "CAD/full time employment chg": {
-      "n": 3,
-      "mean": 14.4,
-      "std": 94.467508
-    },
-    "CAD/participation rate": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 0.23094
-    },
-    "CAD/employment change": {
-      "n": 3,
-      "mean": 14.8,
-      "std": 56.995526
-    },
-    "CHF/consumer confidence": {
-      "n": 4,
-      "mean": -1.25,
-      "std": 7.088723
-    },
-    "EUR/industrial production mom": {
-      "n": 11,
-      "mean": -0.009091,
-      "std": 0.514693
-    },
-    "NOK/core inflation rate yoy": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 0.152753
-    },
-    "NOK/inflation rate yoy": {
-      "n": 3,
-      "mean": -0.066667,
-      "std": 0.11547
-    },
-    "NOK/inflation rate mom": {
-      "n": 3,
-      "mean": -0.1,
-      "std": 0.1
-    },
-    "NOK/core inflation rate mom": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 0.152753
-    },
-    "NOK/manufacturing production mom": {
-      "n": 3,
-      "mean": 0.166667,
-      "std": 1.123981
-    },
-    "SEK/new orders yoy": {
-      "n": 3,
-      "mean": 1.0,
-      "std": 8.960469
-    },
-    "SEK/household consumption yoy": {
-      "n": 3,
-      "mean": -0.3,
-      "std": 2.954657
-    },
-    "SEK/industrial production mom": {
-      "n": 3,
-      "mean": 0.833333,
-      "std": 3.139002
-    },
-    "SEK/industrial production yoy": {
-      "n": 3,
-      "mean": 3.3,
-      "std": 2.165641
-    },
-    "SEK/gdp mom": {
-      "n": 3,
-      "mean": 0.366667,
-      "std": 1.096966
-    },
-    "SEK/construction output yoy": {
-      "n": 3,
-      "mean": 1.266667,
-      "std": 5.500303
-    },
-    "SEK/household consumption mom": {
-      "n": 3,
-      "mean": -0.133333,
-      "std": 1.250333
-    },
-    "USD/cpi": {
-      "n": 3,
-      "mean": 0.176667,
-      "std": 0.482113
-    },
-    "USD/cpi s.a": {
-      "n": 3,
-      "mean": 0.326333,
-      "std": 0.162263
-    },
-    "USD/core inflation rate mom": {
-      "n": 3,
-      "mean": -0.033333,
-      "std": 0.11547
-    },
-    "USD/inflation rate mom": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "USD/core inflation rate yoy": {
-      "n": 3,
-      "mean": -0.0,
-      "std": 0.1
-    },
-    "USD/inflation rate yoy": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 0.057735
-    },
-    "USD/factory orders mom": {
-      "n": 4,
-      "mean": 0.475,
-      "std": 0.377492
-    },
-    "USD/michigan consumer sentiment": {
-      "n": 8,
-      "mean": -0.2625,
-      "std": 2.78308
-    },
-    "USD/monthly budget statement": {
-      "n": 3,
-      "mean": -101.691667,
-      "std": 165.443892
-    },
     "GBP/brc retail sales monitor yoy": {
       "n": 3,
       "mean": 0.266667,
@@ -252,6 +112,11 @@
       "n": 12,
       "mean": -2.252333,
       "std": 3.664941
+    },
+    "EUR/industrial production mom": {
+      "n": 10,
+      "mean": 0.03,
+      "std": 0.52504
     },
     "NOK/balance of trade": {
       "n": 3,
@@ -623,6 +488,11 @@
       "mean": 0.0,
       "std": 0.565685
     },
+    "USD/michigan consumer sentiment": {
+      "n": 7,
+      "mean": 0.328571,
+      "std": 2.403272
+    },
     "EUR/gfk consumer confidence": {
       "n": 3,
       "mean": -0.4,
@@ -772,6 +642,11 @@
       "n": 2,
       "mean": -0.2,
       "std": 0.141421
+    },
+    "SEK/gdp mom": {
+      "n": 2,
+      "mean": 0.8,
+      "std": 1.131371
     },
     "SEK/consumer inflation expectations": {
       "n": 2,
@@ -1033,6 +908,11 @@
       "mean": 1.3,
       "std": 0.565685
     },
+    "USD/factory orders mom": {
+      "n": 3,
+      "mean": 0.566667,
+      "std": 0.404145
+    },
     "AUD/rba interest rate decision": {
       "n": 3,
       "mean": 0.0,
@@ -1143,6 +1023,36 @@
       "mean": 0.0,
       "std": 0.0
     },
+    "CAD/employment change": {
+      "n": 2,
+      "mean": 22.65,
+      "std": 78.276721
+    },
+    "CAD/part time employment chg": {
+      "n": 2,
+      "mean": -8.1,
+      "std": 49.638896
+    },
+    "CAD/unemployment rate": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.353553
+    },
+    "CAD/full time employment chg": {
+      "n": 2,
+      "mean": 27.15,
+      "std": 129.895516
+    },
+    "CAD/participation rate": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 0.282843
+    },
+    "CHF/consumer confidence": {
+      "n": 5,
+      "mean": 0.8,
+      "std": 2.949576
+    },
     "EUR/exports mom": {
       "n": 2,
       "mean": 1.7,
@@ -1157,6 +1067,41 @@
       "n": 3,
       "mean": -0.033333,
       "std": 0.152753
+    },
+    "NOK/manufacturing production mom": {
+      "n": 2,
+      "mean": 0.65,
+      "std": 1.06066
+    },
+    "SEK/industrial production yoy": {
+      "n": 2,
+      "mean": 2.65,
+      "std": 2.616295
+    },
+    "SEK/new orders yoy": {
+      "n": 2,
+      "mean": 0.4,
+      "std": 12.586501
+    },
+    "SEK/household consumption mom": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 1.767767
+    },
+    "SEK/construction output yoy": {
+      "n": 2,
+      "mean": 1.3,
+      "std": 7.778175
+    },
+    "SEK/industrial production mom": {
+      "n": 2,
+      "mean": 0.3,
+      "std": 4.242641
+    },
+    "SEK/household consumption yoy": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 4.030509
     },
     "USD/non farm payrolls": {
       "n": 3,
@@ -1208,10 +1153,65 @@
       "mean": 1.6,
       "std": 5.091169
     },
+    "NOK/core inflation rate mom": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 0.141421
+    },
+    "NOK/core inflation rate yoy": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 0.141421
+    },
+    "NOK/inflation rate yoy": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.141421
+    },
+    "NOK/inflation rate mom": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.070711
+    },
     "JPY/current account": {
       "n": 3,
       "mean": -550298.110667,
       "std": 954506.545087
+    },
+    "USD/inflation rate yoy": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.070711
+    },
+    "USD/core inflation rate mom": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.141421
+    },
+    "USD/cpi": {
+      "n": 2,
+      "mean": 0.365,
+      "std": 0.502046
+    },
+    "USD/cpi s.a": {
+      "n": 2,
+      "mean": 0.393,
+      "std": 0.16122
+    },
+    "USD/inflation rate mom": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "USD/core inflation rate yoy": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.070711
+    },
+    "USD/monthly budget statement": {
+      "n": 2,
+      "mean": -148.8625,
+      "std": 203.452299
     },
     "EUR/employment change qoq": {
       "n": 2,
@@ -1290,66 +1290,6 @@
     }
   },
   "events": [
-    {
-      "currency": "GBP",
-      "event": "RICS House Price Balance",
-      "dateISO": "2025-07-09",
-      "hourUTC": "23:01",
-      "actual": "-7%",
-      "forecast": "-8.0",
-      "previous": "-7.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "RBNZ Interest Rate Decision",
-      "dateISO": "2025-07-09",
-      "hourUTC": "02:00",
-      "actual": "3.25%",
-      "forecast": "3.25",
-      "previous": "3.25",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "MBA 30-Year Mortgage Rate",
-      "dateISO": "2025-07-09",
-      "hourUTC": "11:00",
-      "actual": "6.77%",
-      "forecast": "",
-      "previous": "6.79",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "EIA Gasoline Stocks Change",
-      "dateISO": "2025-07-09",
-      "hourUTC": "14:30",
-      "actual": "-2.658M",
-      "forecast": "-1.7",
-      "previous": "4.188",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "EIA Crude Oil Stocks Change",
-      "dateISO": "2025-07-09",
-      "hourUTC": "14:30",
-      "actual": "7.07M",
-      "forecast": "-2.0",
-      "previous": "3.845",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
     {
       "currency": "EUR",
       "event": "Industrial Production MoM",
@@ -44930,19 +44870,6 @@
     {
       "date": "18 Jun",
       "dateISO": "2026-06-18",
-      "timeUTC": "07:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland SECO Economic Forecasts",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "18 Jun",
-      "dateISO": "2026-06-18",
       "timeUTC": "07:30",
       "country": "CHF",
       "currency": "CHF",
@@ -44952,19 +44879,6 @@
       "actual": "0.0%",
       "forecast": "0.0%",
       "previous": "0.0%"
-    },
-    {
-      "date": "18 Jun",
-      "dateISO": "2026-06-18",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "European Union European Council Meeting",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "18 Jun",
@@ -44991,19 +44905,6 @@
       "actual": "3.75%",
       "forecast": "3.75%",
       "previous": "3.75%"
-    },
-    {
-      "date": "18 Jun",
-      "dateISO": "2026-06-18",
-      "timeUTC": "11:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom MPC Meeting Minutes",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "18 Jun",
@@ -45160,19 +45061,6 @@
       "actual": "1.4%",
       "forecast": "1.4%",
       "previous": "1.4%"
-    },
-    {
-      "date": "18 Jun",
-      "dateISO": "2026-06-18",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan BoJ Monetary Policy Meeting Minutes",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "currency": "CAD",
@@ -49470,6 +49358,136 @@
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "10 Jul",
+      "dateISO": "2026-07-10",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-35.0",
+      "previous": "-38.0"
+    },
+    {
+      "date": "10 Jul",
+      "dateISO": "2026-07-10",
+      "timeUTC": "07:20",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Consumer Confidence",
+      "impact": "medium",
+      "actual": "-36.0",
+      "forecast": "-35.0",
+      "previous": "-38.0"
+    },
+    {
+      "date": "10 Jul",
+      "dateISO": "2026-07-10",
+      "timeUTC": "08:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Consumer Confidence",
+      "impact": "medium",
+      "actual": "-36.0",
+      "forecast": "-35.0",
+      "previous": "-38.0"
+    },
+    {
+      "date": "10 Jul",
+      "dateISO": "2026-07-10",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Italy Industrial Production MoM",
+      "impact": "medium",
+      "actual": "-0.3%",
+      "forecast": "-0.2%",
+      "previous": "0.4%"
+    },
+    {
+      "date": "10 Jul",
+      "dateISO": "2026-07-10",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Unemployment Rate",
+      "impact": "high",
+      "actual": null,
+      "forecast": "6.6%",
+      "previous": "6.6%"
+    },
+    {
+      "date": "10 Jul",
+      "dateISO": "2026-07-10",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Participation Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "65.2",
+      "previous": "65.0"
+    },
+    {
+      "date": "10 Jul",
+      "dateISO": "2026-07-10",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Full Time Employment Chg",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-15.0",
+      "previous": "154.0"
+    },
+    {
+      "date": "10 Jul",
+      "dateISO": "2026-07-10",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Employment Change",
+      "impact": "high",
+      "actual": null,
+      "forecast": "10.0K",
+      "previous": "88.0K"
+    },
+    {
+      "date": "10 Jul",
+      "dateISO": "2026-07-10",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Part Time Employment Chg",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "25.0",
+      "previous": "-66.2"
+    },
+    {
+      "date": "13 Jul",
+      "dateISO": "2026-07-13",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-35.0",
+      "previous": "-38.0"
     }
   ]
 }
