@@ -201,6 +201,7 @@ a { color: inherit; text-decoration: none; }
 .feat-card-thumb { aspect-ratio: 16 / 10; background: var(--bg3); cursor: zoom-in; overflow: hidden; }
 .feat-card-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
 .feat-card-thumb-contain img { object-fit: contain; object-position: center; }
+.feat-card-thumb-crop-center img { object-position: center; }
 .feat-card-body { padding: 12px 14px 14px; }
 .feat-card-title { font-size: 12.5px; font-weight: 700; color: #e8edf8; margin-bottom: 6px; letter-spacing: -.1px; }
 .feat-card-desc { font-family: var(--font-mono); font-size: 9.5px; color: var(--text3); line-height: 1.55; }
@@ -757,7 +758,7 @@ a { color: inherit; text-decoration: none; }
           </div>
         </div>
         <div class="feat-card">
-          <div class="feat-card-thumb feat-card-thumb-contain" role="button" tabindex="0" aria-label="Enlarge: Carry Trade Ranking">
+          <div class="feat-card-thumb feat-card-thumb-crop-center" role="button" tabindex="0" aria-label="Enlarge: Carry Trade Ranking">
             <img src="assets/screenshot-carry-ranking-new.png" data-src="assets/screenshot-carry-ranking-new.png" alt="Carry Trade Ranking panel in the Global Investing web terminal, showing G10 real carry annualized ranking by currency pair" width="389" height="336" loading="lazy">
           </div>
           <div class="feat-card-body">
