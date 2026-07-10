@@ -1,56 +1,52 @@
 {
-  "generated_at": "2026-07-09T21:25:50Z",
+  "generated_at": "2026-07-10T02:36:56Z",
   "signals": [
     {
-      "time": "21:24",
+      "time": "02:33",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme + Carry Divergence",
-      "text": "NZD/JPY spot at 112.591 is the focal point of a massive G10 divergence theme as NZD outperformance collides with JPY weakness. The RBNZ is in a hiking cycle at 2.5% vs BoJ at 1.0%, and the OIS market prices a +152bp carry premium favoring NZD (OCR-overnight 2.50% vs TONA 0.98%). This carry advantage fuels the bilateral divergence despite JPY's positive economic surprise index (CESI net +13). The massive weekly performance spread confirms a strong G10 theme, leaving JPY vulnerable to further carry-seeking outflows unless global risk sentiment deteriorates sharply.",
+      "title": "NZD/USD — G10 Bilateral Theme",
+      "text": "NZD/USD trades at 0.5791 as the G10 currency scorecard triggers a critical bilateral theme. NZD outperformance is driven by the RBNZ hiking stance (2.5% policy rate, market bias pointing to further hikes) while the USD weakens as stocks rally. This divergence is highly pronounced given the extreme speculative positioning, with NZD COT LF net short at -25,757 (long% at 19.5%), setting up a major short-squeeze risk as the currency leads the G10. The next RBNZ meeting (mkt: 46% hike priced) on 2 Sep is the primary catalyst to confirm this structural squeeze.",
       "evidence": [
-        "NZD 1W avg: +1.275% (n=4)",
-        "JPY 1W avg: -0.826% (n=7)",
-        "G10 spread: 2.101%"
+        "NZD 1W avg: +1.612% (n=4)",
+        "USD 1W avg: -0.572% (n=7)",
+        "G10 spread: 2.185%"
       ],
-      "watch_level": "Watch the next BoC policy decision on 15 Jul for broader G10 rate sentiment, followed by the ECB meeting on 23 Jul.",
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:20",
+      "time": "02:30",
       "priority": "warning",
-      "title": "USD/JPY — Positioning + Volatility + Intervention Risk",
-      "text": "USD/JPY trades at 162.349, holding well above the critical 160.00 psychological threshold where BoJ verbal and physical intervention risks escalate. Speculative positioning is heavily short JPY with COT LF net short at -137,828 contracts, representing a highly crowded carry trade. The options market is actively hedging downside protection, with 25d Risk Reversals showing a moderate put skew of -1.28. This options skew aligns with an elevated Volatility Risk Premium (VRP) of +3.9% (IV 7.2% vs HV30 3.3%), indicating that institutional desks are paying a premium for JPY call options to hedge against a sudden, sharp unwind of the +264bp SOFR-TONA carry advantage.",
+      "title": "USD/JPY — Positioning + Vol + Intervention Risk",
+      "text": "USD/JPY trades at 161.446, holding above the critical 160.00 threshold where verbal and physical BoJ intervention risks rise. JPY speculative positioning remains heavily short with COT LF net short at -137,828 (long% at 25.3%), while the options market shows a moderate put skew with 25d RR at -1.28, signaling institutional demand for downside protection. This options skew, combined with an elevated volatility risk premium (IV 7.2% vs HV30 3.9%, VRP +3.3%), indicates that despite the +275bp carry advantage favoring USD (Fed 3.75% vs BoJ 1.0%), the market is actively hedging a sharp JPY reversal. Watch for verbal intervention from the Ministry of Finance to trigger a rapid squeeze of crowded shorts.",
       "evidence": [
+        "USD/JPY: 161.446",
         "JPY COT LF net: -137,828",
-        "USD/JPY 25d RR: -1.28",
-        "USD/JPY IV vs HV30: 7.2% vs 3.3%"
+        "USD/JPY 25d RR: -1.28"
       ],
-      "watch_level": "A sustained break below 160.00 or a sudden spike in VIX above 25.0 triggers a rapid unwind of JPY shorts.",
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:17",
+      "time": "02:27",
       "priority": "warning",
-      "title": "USD/CAD — Correlation Break + Positioning Divergence",
-      "text": "USD/CAD trades at 1.4165, showing a severe cross-asset correlation break against WTI crude oil. The rolling correlation has collapsed to -0.888 vs its 252-day norm of +0.007 (a -1.99σ deviation), meaning the pair is rising on oil price weakness rather than trading on its historical neutral relationship. This move is supported by a massive +134bp OIS carry advantage (SOFR 3.62% vs CORRA 2.28%) and a negative Canadian Economic Surprise Index (CESI net -8). Speculators are heavily short CAD with COT LF net short at -92,861 contracts (20.6% long), while retail traders are heavily fighting this institutional trend with an 83% short bias on USD/CAD. This extreme retail-institutional divergence increases the risk of a short squeeze toward multi-month highs.",
+      "title": "GBP/USD — Positioning + Vol + Retail Divergence",
+      "text": "GBP/USD trades at 1.34460, supported by a positive economic surprise index (GBP CESI net +23 beats) and a neutral carry profile (Fed 3.75% vs BoE 3.75%). Speculators are net long (COT LF net +9,753, long% 55.5%), while retail traders are heavily short at 72%, creating a strong contrarian tailwind as retail fades the institutional trend. However, the options market is pricing in significant hedging demand with an elevated volatility risk premium (IV 11.0% vs HV30 5.6%, VRP +5.4%) and a mild put skew (25d RR at -0.66), indicating institutional caution near the range highs. The next BoE meeting (mkt: 100% hold priced) on 30 Jul will determine if the upward momentum can be sustained.",
       "evidence": [
-        "USD/CAD vs WTI Oil correlation: -0.888 (z = -1.99σ)",
-        "CAD COT LF net: -92,861",
-        "USD/CAD Retail Sentiment: 17% long / 83% short"
+        "GBP/USD: 1.34460",
+        "GBP/USD Retail: 72% short",
+        "GBP/USD VRP: +5.4%"
       ],
-      "watch_level": "Watch the Bank of Canada policy decision on 15 Jul to confirm or invalidate the CAD weakness bias.",
       "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "21:12",
+      "time": "02:20",
       "priority": "info",
-      "title": "AUD/USD — Volatility Risk Premium Extreme",
-      "text": "AUD/USD trades at 0.6941, exhibiting an extreme Volatility Risk Premium (VRP) of +23.0% as 1M implied volatility sits at 30.0% against a realized 30-day historical volatility of just 7.0%. This massive premium indicates that the options market is pricing in an extraordinary level of forward-looking risk relative to actual spot movement. The 25d Risk Reversals show a moderate put skew of -0.80, confirming that this hedging demand is heavily biased toward protecting against AUD downside. This defensive options pricing contrasts with a supportive +73bp OIS carry premium (AONIA 4.35% vs SOFR 3.62%) and a net long speculative position (COT LF net +21,597), suggesting institutional players are paying up for tail-risk protection while remaining long in the spot market.",
+      "title": "USD/CAD — Correlation Break + Extreme Retail Short",
+      "text": "USD/CAD trades at 1.41390, exhibiting a significant cross-asset correlation break against WTI crude oil (corr -0.871 vs 252d norm +0.052, z = -2.04σ), indicating that the traditional CAD-commodity link is entirely broken as domestic factors and rate differentials dominate. Speculators are heavily short CAD (COT LF net short -92,861, long% 20.6%), which aligns with the +150bp carry advantage favoring USD (Fed 3.75% vs BoC 2.25%). However, retail sentiment has reached an extreme 83% short bias on USD/CAD, presenting a contrarian risk of further upside extension if retail traders are forced to capitulate. The next BoC meeting (mkt: 100% hold priced) on 15 Jul is the key near-term catalyst.",
       "evidence": [
-        "AUD/USD IV vs HV30: 30.0% vs 7.0% (VRP +23.0%)",
-        "AUD/USD 25d RR: -0.80",
-        "AUD COT LF net: +21,597"
+        "USD/CAD vs WTI corr: -0.871",
+        "CAD COT LF net: -92,861",
+        "USD/CAD Retail: 83% short"
       ],
-      "watch_level": "Watch the next RBA policy meeting on 11 Aug to see if the central bank maintains its restrictive stance.",
       "_source": "gemini:gemini-3.5-flash"
     }
   ]
