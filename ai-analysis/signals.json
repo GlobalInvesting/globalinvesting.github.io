@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-07-10T09:58:22Z",
+  "generated_at": "2026-07-10T16:37:23Z",
   "signals": [
     {
-      "time": "09:57",
+      "time": "16:35",
       "priority": "critical",
       "title": "NZD/CHF — G10 Bilateral Theme",
-      "text": "NZD/CHF at 0.7156 — NZD leads G10 performance (+1.509%) while CHF lags (-0.651%), creating a 2.160% spread. The divergence is fundamentally anchored by the RBNZ 2.5% (HIKING) vs SNB 0.0% (ON HOLD) stance, yielding a +250bp carry advantage for NZD. RBNZ 2.5%.",
+      "text": "NZD/CHF at 0.7165 (implied) — NZD is the week's G10 leader (+1.480%) while CHF laggard status (-0.739%) creates a 2.218% spread. Despite NZD COT LF net short -25,757 (19.5% long), the RBNZ hiking bias and +250bp OIS carry advantage over SNB drive the bilateral divergence. NZD/USD recovery faces overhead SMAs, but the NZD/CHF cross remains the primary expression of G10 strength vs weakness. RBNZ 2.5%.",
       "evidence": [
-        "NZD 1W avg: +1.509% (n=4)",
-        "CHF 1W avg: -0.651% (n=6)",
-        "G10 spread: 2.160%"
+        "NZD 1W avg: +1.480% (n=4)",
+        "CHF 1W avg: -0.739% (n=6)",
+        "G10 spread: 2.218%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:54",
-      "priority": "critical",
-      "title": "USD/JPY — Carry + Vol + Intervention Risk",
-      "text": "USD/JPY at 161.83 — 275bp Fed-BoJ carry sustains the bid, but price is now testing levels above the 160.00 threshold where BoJ verbal warnings previously intensified. Options market is pricing heavy protection against a reversal with a -1.28 25d RR put skew and an elevated VRP of +3.6% (IV 7.2% vs HV30 3.5%). BoJ 1.0%.",
-      "evidence": [
-        "USD/JPY: 161.83",
-        "25d RR: -1.28 (put skew)",
-        "VRP: +3.6%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "09:52",
+      "time": "16:32",
       "priority": "warning",
-      "title": "USD/CAD — Positioning + CESI + Retail Divergence",
-      "text": "USD/CAD at 1.4166 — COT LF net short -92,861 (20.6% long) aligns with a negative CESI (-8), signaling persistent CAD data disappointment. Retail sentiment is 83% short, diverging from the institutional short-CAD/long-USD bias. This retail fade at extreme levels increases the risk of a squeeze higher if the June jobs report confirms the expected slowdown. Fed 3.75% vs BoC 2.25% provides a +150bp carry tailwind for the pair.",
+      "title": "USD/JPY — Positioning + Vol + Intervention Risk",
+      "text": "USD/JPY at 161.36 — Price holds above the 160.00 psychological level previously associated with BoJ intervention warnings. JPY COT LF net short -137,828 (25.3% long) remains crowded, while the 25d RR at -1.38 (moderate put skew) signals the options market is paying for downside protection against a carry unwind. IV at 7.2% vs HV30 at 4.0% creates a +3.2% VRP, pricing in elevated event risk. Japan's urge for pension funds to invest domestically provides a fundamental catalyst for JPY repatriation, threatening the +275bp USD carry advantage.",
       "evidence": [
-        "CAD COT LF net: -92,861",
-        "Retail: 83% short",
-        "USD/CAD carry: +150bp"
+        "USD/JPY: 161.36",
+        "JPY COT LF net: -137,828",
+        "USD/JPY VRP: +3.2%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:48",
+      "time": "16:30",
       "priority": "warning",
-      "title": "GBP/USD — Vol Premium + G10 Outperformance",
-      "text": "GBP/USD at 1.3413 — GBP is the second strongest G10 currency (+0.663%) supported by a positive CESI (+22). Options market shows extreme hedging demand with a +5.5% VRP (IV 11.0% vs HV30 5.5%), the highest in the G10 space. While carry is neutral (Fed 3.75% vs BoE 3.75%), the real rate differential (+0.78% GBP vs +1.47% USD) suggests USD remains structurally more restrictive, capping GBP upside despite the data beats.",
+      "title": "AUD/USD — Volatility + Positioning Divergence",
+      "text": "AUD/USD at 0.6967 — Options market pricing reflects extreme caution with IV at 30.7% vs HV30 of 7.0%, a +23.7% VRP. This massive vol premium coincides with a 25d RR of -0.86 (put skew), suggesting traders are hedging for a sharp reversal despite AUD COT LF net long +21,597 (62.1% long). The -60bp carry deficit vs USD and Middle East tensions cap upside potential; a break of the weekly trend would trigger a liquidation of the spec long position.",
       "evidence": [
-        "GBP 1W avg: +0.663% (n=4)",
-        "VRP: +5.5%",
-        "GBP CESI: +22"
+        "AUD/USD VRP: +23.7%",
+        "AUD COT LF net: +21,597",
+        "AUD/USD 25d RR: -0.86"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:42",
+      "time": "16:25",
       "priority": "info",
-      "title": "AUD/USD — Vol Complacency + Gold Correlation",
-      "text": "AUD/USD at 0.6949 — The pair shows unusual vol complacency with a negative VRP of -3.8% (IV 3.1% vs HV30 6.8%). AUD/USD remains highly correlated to Gold (corr=+0.886, z=+1.02σ), making the pair vulnerable to the current Gold retreat toward $4,100. RBA 4.35% vs Fed 3.75% provides a +60bp carry cushion, but thin options supply suggests the market is underpricing potential downside volatility.",
+      "title": "USD/CAD — Correlation Break + CESI Divergence",
+      "text": "USD/CAD at 1.4122 — The pair's correlation with WTI Oil has collapsed to -0.893 (z = -2.00σ) vs the 252d norm of +0.006, indicating CAD is no longer trading as a pure petro-currency. CAD weakness is instead driven by deteriorating fundamentals, with a negative CESI (-9 misses) vs USD's strong positive CESI (+278 beats). CAD COT LF net short -92,861 (20.6% long) is approaching extreme levels, but the +150bp USD carry advantage and superior US data flow support the current trend. Watch the BoC meeting on 15 Jul for a shift in hold bias.",
       "evidence": [
-        "AUD/USD VRP: -3.8%",
-        "AUD/USD vs Gold corr: +0.886",
-        "RBA-Fed spread: +60bp"
+        "USD/CAD vs WTI corr: -0.893 (z=-2.00σ)",
+        "USD CESI: +278",
+        "CAD COT long%: 20.6%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
