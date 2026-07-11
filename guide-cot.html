@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CFTC COT Positioning — Live FX Data | Global Investing</title>
-<meta name="description" content="Live CFTC COT positioning for GBP, JPY, EUR, AUD: net contracts, Long%, WoW change, extreme crowding signals. Updated within 1h of Friday release.">
+<meta name="description" content="Live CFTC COT positioning for EUR, GBP, JPY, AUD, CAD, CHF, NZD: net contracts, Long%, WoW change, extreme crowding signals. Updated within 1h of Friday release.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-cot.html">
 <meta name="google-adsense-account" content="ca-pub-7977942731354565">
@@ -183,8 +183,8 @@ a { color: inherit; text-decoration: none; }
 {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "CFTC COT Positioning: Live Institutional FX Data for GBP, JPY, EUR, AUD",
-  "description": "How to interpret CFTC Commitments of Traders data for FX trading: net contracts, Long%, WoW changes, and how institutional positioning in GBP, JPY, EUR, AUD and others signals medium-term currency bias.",
+  "headline": "CFTC COT Positioning: Live Institutional FX Data for EUR, GBP, JPY, AUD, CAD, CHF, NZD",
+  "description": "How to interpret CFTC Commitments of Traders data for FX trading: net contracts, Long%, WoW changes, and how institutional positioning across all 7 CFTC-covered currencies signals medium-term currency bias.",
   "image": "https://globalinvesting.github.io/og-image.png",
   "datePublished": "2026-01-15T00:00:00Z",
   "dateModified": "2026-05-14T00:00:00Z",
@@ -264,7 +264,7 @@ a { color: inherit; text-decoration: none; }
       "name": "What is Long% in the COT terminal and what does it signal?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Long% (also called the Bullish Percent Index) is the share of total open interest held on the long side by leveraged funds: Long% = longs / (longs + shorts) × 100. Values above 60% signal a crowded long; below 40% signal a crowded short. These extremes are contrarian warning signals — not directional calls — indicating elevated reversal risk when a catalyst appears."
+        "text": "Long% is the share of total leveraged-fund open interest held on the long side: Long% = longs / (longs + shorts) × 100. It gives a quick read of the current split, but the terminal does not flag crowding from a fixed Long% cutoff — the COT detail modal instead scores each currency's net position as a z-score against its trailing 52-week history: beyond ±1.5σ is labelled Crowded, beyond ±2σ is labelled Extreme. These extremes are contrarian warning signals — not directional calls — indicating elevated reversal risk when a catalyst appears."
       }
     },
     {
@@ -457,17 +457,6 @@ a { color: inherit; text-decoration: none; }
             <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
             <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▼ 199k</span>
           </div>
-          <!-- USD -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">USD</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:35%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:65%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">35%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-8,724</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge — LF short · AM long">○</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 28k</span>
-          </div>
           <!-- CAD -->
           <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
             <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">CAD</span>
@@ -503,6 +492,24 @@ a { color: inherit; text-decoration: none; }
       </ul>
       <div class="callout">
         <strong>Reading raw values on crosses:</strong> Because the CFTC tracks each currency vs USD, a JPY net short (large negative number) means speculators are short JPY futures — which is bearish JPY and therefore <em>bullish</em> GBP/JPY. The terminal shows the raw CFTC values so you can cross-reference directly with the main COT panel. The footer alignment label does the directional interpretation for you.
+      </div>
+    </div>
+
+    <div class="guide-section" id="net-contracts">
+      <h2>Net Contracts</h2>
+      <p>Net contracts — shown as the <strong>Net</strong> column — is Leveraged Funds' long positions minus their short positions: <code style="font-family:var(--font-mono);font-size:12px;color:var(--blue);">Net = LF longs − LF shorts</code>. It is the single most-referenced number in the panel because it condenses direction and conviction into one signed figure: positive means speculators are net long that currency vs. USD, negative means net short.</p>
+      <p>Net alone tells you the current state. Pairing it with the <strong>WoW Δ</strong> column — the change in Net since the prior week's release — tells you the trend: whether that positioning is building, fading, or reversing. A large net position with a shrinking WoW Δ is a different signal than the same net position still expanding week over week.</p>
+      <div class="callout">
+        <strong>Sign convention:</strong> All CFTC futures are quoted vs. USD, so Net is always read as "speculators' stance on this currency vs. the dollar." A positive JPY Net is bullish JPY (bearish USD/JPY); a negative EUR Net is bearish EUR (bearish EUR/USD). For crosses, combine both legs' Net direction — see "COT in the Pair Detail strip" above.
+      </div>
+    </div>
+
+    <div class="guide-section" id="long-pct">
+      <h2>Long %</h2>
+      <p>Long% is the share of total Leveraged Funds open interest held on the long side: <code style="font-family:var(--font-mono);font-size:12px;color:var(--blue);">Long% = longs / (longs + shorts) × 100</code>. It is the same information as Net expressed as a ratio rather than an absolute contract count, which makes it easier to compare positioning across currencies with very different open interest sizes (e.g. EUR vs. CHF).</p>
+      <p>The panel's rows are sorted by Long% descending by default — the most bullishly positioned currencies surface at the top, the most bearishly positioned at the bottom, so the full cross-currency picture is scannable at a glance without opening any single row.</p>
+      <div class="warn-box">
+        <strong>Long% is not the terminal's crowding signal.</strong> A high or low Long% on its own doesn't trigger a "crowded" label — the terminal's actual extreme-positioning logic uses a z-score of Net against 52-week history (see "Positioning Extremes" below). Long% is a useful snapshot of the current split, but treat the modal's gauge, not a fixed Long% cutoff, as the authoritative crowding read.
       </div>
     </div>
 
@@ -658,39 +665,110 @@ a { color: inherit; text-decoration: none; }
       <p>A scrollable table of the last 52 weeks of raw CFTC data for the selected currency, with columns: Week, Net LF, WoW Δ (week-over-week change in net), Longs, Shorts, Long%, Net%OI, AM Net, and Dealer Net. This is the same source data that feeds all other tabs, presented in full for manual analysis or reference.</p>
     </div>
 
+    <div class="guide-section" id="categories">
+      <h2>Trader Categories</h2>
+      <p>The CFTC Disaggregated TFF (Traders in Financial Futures) report splits open interest into distinct trader categories. The terminal tracks the three most relevant to FX positioning analysis:</p>
+      <ul>
+        <li><strong style="color:var(--text);">Leveraged Funds (LF)</strong> — hedge funds, CTAs, and other money managers trading with leverage for speculative or relative-value purposes. This is the terminal's primary series: the main panel's Net, Long%, WoW Δ, and Net%OI columns are all LF figures. LF is the fastest-moving, most trend-sensitive category and the one most often referenced as "the COT signal."</li>
+        <li><strong style="color:var(--text);">Asset Managers (AM)</strong> — institutional investors, pension funds, and other real-money accounts. AM positioning tends to be stickier and more structurally driven than LF, which is why the LF/AM alignment dot matters: when both categories agree, the positioning view is reinforced by two independent, differently-motivated participant types.</li>
+        <li><strong style="color:var(--text);">Dealers / Intermediaries</strong> — banks and swap dealers that mostly warehouse risk from client flow rather than expressing directional views. Because dealers are largely reactive, a dealer book positioned opposite to LF at an extreme often reflects dealers absorbing the other side of a crowded trade — see the Dealer divergence callout under the Participants tab.</li>
+      </ul>
+      <p>All three categories are visible together in the COT modal's Participants tab and Participants section of the Overview tab, and as columns (AM Net, Dealer Net) in the History tab table.</p>
+    </div>
+
+    <div class="guide-section" id="signal-logic">
+      <h2>Signal Logic</h2>
+      <p>Rather than a single composite score, the terminal surfaces COT positioning as a small set of independent, plain-language signals — visible as the Signal Summary block in the COT detail modal's Overview tab. Each signal is generated from a distinct piece of the underlying data:</p>
+      <table aria-label="COT signal logic" class="cot-signal-table">
+        <thead><tr><th scope="col">Signal</th><th scope="col">Trigger</th></tr></thead>
+        <tbody>
+          <tr><td>LF net long / LF net short</td><td style="color:var(--text2);">Sign of the current LF Net figure</td></tr>
+          <tr><td>LF/AM aligned / diverging</td><td style="color:var(--text2);">Whether LF Net and Asset Manager Net share the same sign</td></tr>
+          <tr><td>Crowded trade / Not crowded</td><td style="color:var(--text2);">Whether the LF Net z-score (vs. 52-week history) is at or beyond ±1.5σ</td></tr>
+          <tr><td>Dealers contra-positioned / aligned with LF</td><td style="color:var(--text2);">Whether Dealer Net has the opposite sign to LF Net</td></tr>
+        </tbody>
+      </table>
+      <p>Each signal is deliberately independent — the terminal does not collapse them into a single buy/sell score. Reading them together (e.g. "LF net short" + "LF/AM aligned" + "Crowded trade" + "Dealers contra-positioned") builds a fuller picture than any single column: in that combination, both speculative categories agree on a bearish view, the position is already stretched relative to its own history, and dealers are on the other side — a classic setup for a sharp reversal if a catalyst appears, not a simple continuation signal.</p>
+    </div>
+
+    <div class="guide-section" id="extremes">
+      <h2>Positioning Extremes</h2>
+      <p>The terminal's crowding read is a z-score of the current LF Net contracts against the trailing 52-week distribution for that currency — not a fixed contract count or Long% cutoff, since "large" varies by currency (see the Open Interest context note above). The Positioning Gauge in the modal's Overview tab maps that z-score to a labelled spectrum:</p>
+      <table aria-label="Positioning extreme labels by z-score" class="cot-signal-table">
+        <thead><tr><th scope="col">Z-score</th><th scope="col">Label</th></tr></thead>
+        <tbody>
+          <tr><td>&gt; +2σ</td><td style="color:var(--down);">Extreme Long</td></tr>
+          <tr><td>+1.5σ to +2σ</td><td style="color:#ff9800;">Crowded Long</td></tr>
+          <tr><td>+0.5σ to +1.5σ</td><td style="color:var(--up);">Long</td></tr>
+          <tr><td>−0.5σ to +0.5σ</td><td style="color:var(--text2);">Neutral</td></tr>
+          <tr><td>−1.5σ to −0.5σ</td><td style="color:var(--up);">Short</td></tr>
+          <tr><td>−2σ to −1.5σ</td><td style="color:#ff9800;">Crowded Short</td></tr>
+          <tr><td>&lt; −2σ</td><td style="color:var(--down);">Extreme Short</td></tr>
+        </tbody>
+      </table>
+      <div class="warn-box">
+        <strong>Extremes are contrarian warnings, not directional calls.</strong> An Extreme Long reading means positioning is stretched relative to its own recent history — it flags elevated reversal risk if a catalyst appears, not an imminent reversal on its own. Crowded/Extreme trades can stay crowded for weeks; use the reading alongside price action and a catalyst, not as a standalone trigger.
+      </div>
+    </div>
+
+    <div class="guide-section" id="lag">
+      <h2>The Lag Problem</h2>
+      <p>COT data carries a structural reporting lag: the CFTC publishes Friday afternoon, but the figures reflect positions as of the prior Tuesday's close — a 3-day-old snapshot the moment it's released. The terminal updates the panel shortly after each Friday release (see the CTA below), which still leaves a multi-day gap between what the data shows and current market positioning.</p>
+      <p>To keep that gap visible rather than hidden, the panel header shows a lag indicator next to the week-ending date, colour- and dot-coded by freshness:</p>
+      <ul>
+        <li><strong style="color:var(--up);">● ≤7 days</strong> — just published, the most current data available</li>
+        <li><strong style="color:#c8952a;">◐ 8–14 days</strong> — one release cycle old (e.g. viewing Monday–Thursday before the next Friday update)</li>
+        <li><strong style="color:var(--down);">○ &gt;14 days</strong> — stale; a CFTC publication delay or an interrupted update likely occurred</li>
+      </ul>
+      <div class="callout">
+        <strong>Why this matters for timing:</strong> Because of the lag, COT positioning is best used as a medium-term bias input, not a short-term timing tool. A currency can move significantly between the Tuesday snapshot and the Friday release — always cross-check COT extremes against current price action before treating them as actionable.
+      </div>
+    </div>
+
+    <div class="guide-section" id="combining">
+      <h2>Combining with Other Data</h2>
+      <p>COT positioning is most useful as one input among several, not a standalone signal. A few ways it pairs with other panels in the terminal:</p>
+      <ul>
+        <li><strong style="color:var(--text);">Retail sentiment (contrarian cross-check):</strong> Retail positioning (see the Retail FX Positioning guide) tends to skew opposite to smart-money flow at extremes. LF and retail positioned on the same side reinforces a crowded-trade read from two independent sources; LF and retail diverging is worth investigating further before acting on either alone.</li>
+        <li><strong style="color:var(--text);">Rate expectations:</strong> A currency with LF building net longs alongside a hawkish shift in OIS-implied central bank pricing suggests positioning and macro catalyst are aligned — a stronger setup than positioning extremes in isolation.</li>
+        <li><strong style="color:var(--text);">Price action:</strong> Positioning extremes flag <em>risk</em>, not <em>timing</em>. Waiting for price to actually confirm a reversal (a break of trend structure, a failed breakout) alongside a Crowded/Extreme COT reading reduces the risk of acting too early on a trade that stays crowded for weeks.</li>
+      </ul>
+      <p>None of this is a mechanical rule set — it's a framework for weighing COT positioning against the terminal's other panels rather than reading it in isolation.</p>
+    </div>
+
+    <div style="margin-top:32px;">
+      <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.05);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">View live COT positioning in the terminal</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">CFTC Disaggregated TFF — Leveraged Funds, Asset Managers, and Dealers across all 7 CFTC-covered currencies, updated weekly after each Friday release.</div>
+        </div>
+        <a href="/" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:var(--blue);color:#fff;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <div style="border:1px solid var(--border);border-radius:6px;background:var(--bg2);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">AI Market Narrative — Updated 4x Daily</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">The terminal publishes an AI-generated market narrative at each major session transition. Subscribe via RSS or JSON Feed to receive updates in your reader.</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;">
+          <a href="/feed.xml" style="display:inline-block;padding:8px 16px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap;">RSS Feed</a>
+          <a href="/feed.json" style="display:inline-block;padding:8px 16px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap;">JSON Feed</a>
+        </div>
+      </div>
+    </div>
+    <div style="margin:12px 0 40px;">
+      <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.04);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">MT5 Expert Advisor + Web Terminal</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">All data panels — including this one — are available inside MetaTrader 5 as a native overlay and on the web terminal. Both unlock under a single EA rental on MQL5 Market.</div>
+        </div>
+        <a href="access.html" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:transparent;color:var(--blue);border:1px solid rgba(79,127,255,.45);border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">View access &rarr;</a>
+      </div>
+    </div>
+
   </div><!-- /.guide-content -->
 </div><!-- /.guide-wrap -->
-
-<div style="max-width:860px;margin:0 auto;padding:32px 24px 48px;">
-  <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.05);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
-    <div>
-      <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">View live COT positioning in the terminal</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;">CFTC Disaggregated TFF — Leveraged Funds, Asset Managers, and Dealers across all 7 CFTC-covered currencies, updated weekly after each Friday release.</div>
-    </div>
-    <a href="/" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:var(--blue);color:#fff;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
-  </div>
-</div>
-<div style="max-width:860px;margin:0 auto;padding:12px 24px 24px;">
-  <div style="border:1px solid var(--border);border-radius:6px;background:var(--bg2);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
-    <div>
-      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">AI Market Narrative — Updated 4x Daily</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;">The terminal publishes an AI-generated market narrative at each major session transition. Subscribe via RSS or JSON Feed to receive updates in your reader.</div>
-    </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;">
-      <a href="/feed.xml" style="display:inline-block;padding:8px 16px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap;">RSS Feed</a>
-      <a href="/feed.json" style="display:inline-block;padding:8px 16px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap;">JSON Feed</a>
-    </div>
-  </div>
-</div>
-<div style="max-width:860px;margin:0 auto;padding:12px 24px 40px;">
-  <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.04);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
-    <div>
-      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">MT5 Expert Advisor + Web Terminal</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;">All data panels — including this one — are available inside MetaTrader 5 as a native overlay and on the web terminal. Both unlock under a single EA rental on MQL5 Market.</div>
-    </div>
-    <a href="access.html" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:transparent;color:var(--blue);border:1px solid rgba(79,127,255,.45);border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">View access &rarr;</a>
-  </div>
-</div>
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
