@@ -33,11 +33,12 @@
       "priority": "warning",
       "priority_reason": "Large CAD COT short position (-87k) and strong retail short bias (80%) ahead of BoC meeting.",
       "title": "USD/CAD — COT Crowding + BoC Policy Decision",
-      "text": "CAD COT net short -87,846 (22.6% long) and an 80% retail short bias on USD/CAD signal a heavily one-sided market ahead of Wednesday's rate decision. Despite the +124bp OIS carry favoring USD, the -2.06σ correlation break with WTI oil suggests the pair is decoupling from energy fundamentals. The BoC meeting on 15 July is the catalyst for either a short-covering rally or a breakdown toward 1.40.",
+      "text": "CAD COT net short -87,846 (22.6% long) and an 80% retail short bias on USD/CAD signal a heavily one-sided market ahead of Wednesday's rate decision. Despite the +124bp OIS carry favoring USD, the -2.06\u03c3 correlation break with WTI oil suggests the pair is decoupling from energy fundamentals. The next BoC meeting (mkt: 100% hold priced) on 15 July is the catalyst for either a short-covering rally or a breakdown toward 1.40.",
       "evidence": [
         "CAD COT net short: -87,846",
         "Retail sentiment: 80% short USD/CAD",
-        "USD/CAD vs WTI correlation: -0.878 (z=-2.06σ)"
+        "USD/CAD vs WTI correlation: -0.878 (z=-2.06\u03c3)",
+        "USD/CAD OIS carry: +124bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
@@ -46,7 +47,7 @@
       "priority": "info",
       "priority_reason": "EUR COT short position and negative CESI data trend.",
       "title": "EUR/USD — COT Short Bias + CESI Data Underperformance",
-      "text": "EUR COT net short -66,057 (34.7% long) aligns with a negative CESI score of -9, reflecting persistent Eurozone data misses. The +135bp OIS carry advantage for USD and a bear steepener in the US yield curve maintain downside pressure on the 1.1419 Friday close. The next ECB meeting (mkt: 100% hold priced) on 23 July is the catalyst for assessing if the current 'hiking' bias shifts to a hold.",
+      "text": "EUR COT net short -66,057 (34.7% long) aligns with a negative CESI score of -9, reflecting persistent Eurozone data misses. The +135bp OIS carry advantage for USD and a bear steepener in the US yield curve maintain downside pressure on the 1.1419 Friday close. The next ECB meeting (mkt: 100% hold priced) on 23 July is the catalyst for testing whether the current hold bias tilts toward a cut if the negative CESI trend and short positioning persist.",
       "evidence": [
         "EUR COT net short: -66,057",
         "EUR CESI: -9 (Moderate negative)",
@@ -59,11 +60,12 @@
       "priority": "info",
       "priority_reason": "GBP COT long position and positive 1W momentum.",
       "title": "GBP/USD — COT Long Positioning + Yield Support",
-      "text": "GBP COT net long +17,228 (59.0% long) supports the pair's 1.3398 Friday close as it outperforms most G10 peers. A restrictive real rate of +0.78% and a neutral OIS carry spread (-20bp) against the USD provide a stable floor for Sterling. The next BoE meeting (mkt: 100% hold priced) on 30 July is the catalyst for determining if the hold bias can withstand cooling inflation expectations.",
+      "text": "GBP COT net long +17,228 (59.0% long) supports the pair's 1.3398 Friday close as it outperforms most G10 peers. A restrictive real rate of +0.78% and a narrow OIS carry spread (+20bp, favors GBP) against the USD provide a stable floor for Sterling. The next BoE meeting (mkt: 100% hold priced) on 30 July is the catalyst for determining if the hold bias can withstand cooling inflation expectations.",
       "evidence": [
         "GBP COT net long: +17,228",
         "GBP 1W avg: +0.636% (n=4)",
-        "GBP real rate: +0.78%"
+        "GBP real rate: +0.78%",
+        "GBP/USD OIS carry: +20bp (favors GBP)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
