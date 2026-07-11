@@ -126,6 +126,14 @@ a { color: inherit; text-decoration: none; }
 .guide-section p:last-child { margin-bottom: 0; }
 .guide-section ul { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
+.scr-hero-wrap { margin: 18px 0 24px; }
+.scr-hero { cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
+.scr-hero:hover { border-color: var(--border2); }
+.scr-hero img { width: 100%; height: auto; display: block; }
+.scr-hero-contain { width: fit-content; max-width: 100%; margin: 0 auto; }
+.scr-hero-contain img { width: auto; max-width: 100%; height: auto; display: block; margin: 0; }
+.guide-section p.scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-top: 10px; padding: 0 2px; }
+.scr-meta strong { color: var(--text2); font-weight: 600; }
 
 /* ── Info / warn boxes ── */
 .info-box { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
@@ -177,7 +185,7 @@ a { color: inherit; text-decoration: none; }
 
 </style>
 <meta property="article:published_time" content="2026-01-15T00:00:00Z">
-<meta property="article:modified_time" content="2026-05-14T00:00:00Z">
+<meta property="article:modified_time" content="2026-07-11T00:00:00Z">
 <meta property="article:section" content="Guides">
 <script type="application/ld+json">
 {
@@ -187,7 +195,7 @@ a { color: inherit; text-decoration: none; }
   "description": "How to interpret CFTC Commitments of Traders data for FX trading: net contracts, Long%, WoW changes, and how institutional positioning across all 7 CFTC-covered currencies signals medium-term currency bias.",
   "image": "https://globalinvesting.github.io/og-image.png",
   "datePublished": "2026-01-15T00:00:00Z",
-  "dateModified": "2026-05-14T00:00:00Z",
+  "dateModified": "2026-07-11T00:00:00Z",
   "author": {
     "@type": "Person",
     "name": "Santiago Plá Casuriaga",
@@ -550,119 +558,51 @@ a { color: inherit; text-decoration: none; }
         <li><strong>12-Week Net Trend section</strong> (full-width): A 12-week SVG sparkline of LF net contracts with a trend label (e.g. <em>Accumulating · 3 consecutive weeks</em>).</li>
       </ul>
 
-      <!-- MOCK: COT Modal — Overview tab v1.2 (2-col top + 3-col bottom) -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:18px 0;font-size:11px;">
-        <!-- Header -->
-        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <span style="font-size:13px;font-weight:700;color:var(--text);font-family:var(--font-ui);">CFTC Positioning · EUR · Leveraged Funds</span><br>
-            <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">week ending 2026-04-07 · 52w history · CFTC TFF Disaggregated</span>
-          </div>
-          <span style="font-size:14px;color:var(--text3);">✕</span>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-cot-modal-overview.png" alt="COT detail modal, Overview tab, showing the Positioning Gauge with z-score and percentile, the Long/Short Split, Key Metrics (Net%OI, Week-on-Week Change, Crowd Alignment, Trend Pattern), the Participants breakdown by category, the 52-Week Range, and the 12-Week Net Trend sparkline" width="696" height="834" loading="lazy">
         </div>
-        <!-- Tabs -->
-        <div style="display:flex;border-bottom:1px solid var(--border);padding:0 8px;">
-          <div style="padding:7px 12px;font-size:11px;color:var(--text);border-bottom:2px solid var(--blue);font-family:var(--font-ui);">Overview</div>
-          <div style="padding:7px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">Net Position</div>
-          <div style="padding:7px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">Long / Short</div>
-          <div style="padding:7px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">Participants</div>
-          <div style="padding:7px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">History</div>
-        </div>
-        <!-- Body: 2-col top -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 0;">
-          <!-- Left: Gauge -->
-          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
-            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;font-family:var(--font-mono);">POSITIONING GAUGE · 52W HISTORY</div>
-            <div style="background:linear-gradient(to right,#ef5350 0%,#ef5350 20%,#ff9800 20%,#ff9800 35%,#888 35%,#888 65%,#4caf50 65%,#4caf50 80%,#26a69a 80%);border-radius:4px;height:8px;position:relative;margin-bottom:6px;">
-              <div style="position:absolute;left:calc(30% - 7px);top:-5px;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--bg2);box-shadow:0 0 0 2px #ef5350;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--text3);font-family:var(--font-mono);margin-bottom:8px;">
-              <span>Extreme Short<br>&lt;−2σ</span><span style="text-align:center">Short<br>−1.5σ</span><span style="text-align:center">Neutral</span><span style="text-align:center">Long<br>+1.5σ</span><span style="text-align:right">Extreme Long<br>&gt;+2σ</span>
-            </div>
-            <div style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">
-              Positioning: <strong style="color:#ef5350;">Moderately Short</strong> · Percentile <strong>22%</strong>
-              <span style="display:inline-block;margin-left:4px;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(38,166,154,.12);color:#26a69a;border:1px solid rgba(38,166,154,.2);">Within normal range</span>
-            </div>
-          </div>
-          <!-- Right: Long/Short + Participants -->
-          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
-            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;font-family:var(--font-mono);">LONG / SHORT SPLIT · LF OI</div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-              <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);min-width:44px;">82,140</span>
-              <div style="flex:1;height:8px;background:rgba(239,83,80,.25);border-radius:3px;overflow:hidden;position:relative;">
-                <div style="position:absolute;left:0;top:0;height:100%;width:42%;background:rgba(38,166,154,.7);"></div>
-              </div>
-              <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);min-width:44px;text-align:right;">113,917</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-bottom:8px;"><span>LONGS 42%</span><span>SHORTS 58%</span></div>
-            <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;">
-              <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:6px;font-family:var(--font-mono);">PARTICIPANTS · NET BY CATEGORY</div>
-              <table aria-label="COT participants net positioning by category" style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);">
-                <thead><tr style="color:var(--text3);font-size:8px;">
-                  <th scope="col" style="text-align:left;padding:2px 0;">Category</th><th scope="col" style="text-align:right;padding:2px 0;">Net</th><th scope="col" style="text-align:right;padding:2px 0;">Dir</th>
-                </tr></thead>
-                <tbody>
-                  <tr><td style="padding:3px 0;color:var(--text2);">Leveraged Funds</td><td style="padding:3px 0;color:var(--down);text-align:right;">−31,777</td><td style="padding:3px 0;color:var(--down);text-align:right;">▼ Short</td></tr>
-                  <tr><td style="padding:3px 0;color:var(--text2);">Asset Managers</td><td style="padding:3px 0;color:var(--up);text-align:right;">+18,420</td><td style="padding:3px 0;color:var(--up);text-align:right;">▲ Long</td></tr>
-                  <tr><td style="padding:3px 0;color:var(--text2);">Dealers</td><td style="padding:3px 0;color:var(--up);text-align:right;">+9,244</td><td style="padding:3px 0;color:var(--up);text-align:right;">▲ Long</td></tr>
-                  <tr><td colspan="3" style="padding:3px 0;font-size:9px;color:#f6941c;">○ Diverging — LF and AM opposed · exercise caution</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <!-- Body: 3-col bottom row -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:10px 14px 14px;">
-          <!-- Sparkline -->
-          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
-            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:6px;font-family:var(--font-mono);">NET TREND · 8W</div>
-            <svg viewBox="0 0 160 40" style="width:100%;height:40px;">
-              <polyline points="0,32 20,28 40,35 60,22 80,18 100,25 120,14 140,20 160,12" fill="none" stroke="#ef5350" stroke-width="1.5" stroke-linejoin="round"/>
-              <line x1="0" y1="36" x2="160" y2="36" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/>
-              <circle cx="160" cy="12" r="3" fill="#ef5350"/>
-            </svg>
-            <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:3px;">Distributing · 3 weeks</div>
-          </div>
-          <!-- Range -->
-          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
-            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;font-family:var(--font-mono);">RANGE · 52W</div>
-            <div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:8px;position:relative;">
-              <div style="position:absolute;left:0;height:100%;width:28%;background:var(--down);border-radius:2px;"></div>
-              <div style="position:absolute;left:calc(28% - 4px);top:-2px;width:8px;height:8px;border-radius:50%;background:#d1d4dc;border:1.5px solid var(--bg2);"></div>
-            </div>
-            <div style="font-size:10px;font-family:var(--font-mono);display:flex;flex-direction:column;gap:3px;">
-              <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">52w High</span><span style="color:var(--up);">+42k</span></div>
-              <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Current</span><span style="color:var(--text);">−31k</span></div>
-              <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">52w Low</span><span style="color:var(--down);">−85k</span></div>
-            </div>
-          </div>
-          <!-- Signals -->
-          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
-            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;font-family:var(--font-mono);">SIGNAL SUMMARY</div>
-            <div style="display:flex;flex-direction:column;gap:5px;font-family:var(--font-mono);">
-              <div style="display:flex;align-items:center;gap:6px;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:#ef5350;flex-shrink:0;"></span><span style="color:var(--text2);">LF net short</span></div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:#f6941c;flex-shrink:0;"></span><span style="color:var(--text2);">LF/AM diverging</span></div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:#26a69a;flex-shrink:0;"></span><span style="color:var(--text2);">Not crowded</span></div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:#f6941c;flex-shrink:0;"></span><span style="color:var(--text2);">Dealers contra</span></div>
-            </div>
-          </div>
-        </div>
+        <p class="scr-meta"><strong>The Overview tab.</strong> Positioning Gauge and Long/Short Split at top, followed by Key Metrics, the Participants breakdown, the 52-Week Range, and the 12-Week Net Trend sparkline.</p>
       </div>
 
       <h3>Net Position tab</h3>
-      <p>A weekly bar chart of LF net contracts over the available history (up to 52 weeks). Bars are <span style="color:#26a69a;font-weight:700;">green (teal)</span> for net-long weeks and <span style="color:#ef5350;font-weight:700;">red</span> for net-short weeks — direction is encoded in both the bar color and the y-axis. This matches the terminal's standard up/down color convention.</p>
+      <p>A weekly bar chart of LF net contracts over the available history (up to 52 weeks). Bars are <span style="color:#26a69a;font-weight:700;">green (teal)</span> for net-long weeks and <span style="color:#ef5350;font-weight:700;">red</span> for net-short weeks — direction is encoded in both the bar color and the y-axis. This matches the terminal's standard up/down color convention. Below the net-position chart, a second panel plots the currency's daily spot close against USD over the same period, so a positioning shift can be read directly against price action.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-cot-modal-net-position.png" alt="COT detail modal, Net Position tab, showing a weekly bar chart of Leveraged Funds net contracts colored teal for net-long and red for net-short, with a daily spot close line chart for the currency pair below it" width="699" height="836" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The Net Position tab.</strong> Weekly LF net contracts as a color-coded bar chart, with the currency's daily spot close plotted below for direct comparison against price.</p>
+      </div>
 
       <h3>Long / Short tab</h3>
-      <p>A weekly line chart overlaying LF longs (teal) and LF shorts (red) on the same scale. Where the two lines converge, the position is close to neutral. Where they diverge, the gap represents the absolute size of the net position. Useful for seeing whether a net move is driven by new positions being added or existing positions being unwound.</p>
+      <p>A weekly line chart overlaying LF longs (teal) and LF shorts (red) on the same scale. Where the two lines converge, the position is close to neutral. Where they diverge, the gap represents the absolute size of the net position. Useful for seeing whether a net move is driven by new positions being added or existing positions being unwound. Below it, a second chart plots total LF open interest (longs + shorts combined) over the same history, so a positioning move can be checked against whether participation is expanding or contracting.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-cot-modal-long-short.png" alt="COT detail modal, Long/Short tab, showing weekly LF longs versus shorts as overlaid line charts in teal and red, with a total LF open interest chart below it" width="699" height="837" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The Long/Short tab.</strong> LF longs and shorts overlaid on one scale, with total LF open interest charted below to gauge participation alongside direction.</p>
+      </div>
 
       <h3>Participants tab</h3>
-      <p>A multi-line chart overlaying LF, Asset Manager, and Dealer net positions over the available history. Each series uses a fixed color (LF = <span style="color:#4f7fff;font-weight:700;">blue</span>, AM = <span style="color:#ff9800;font-weight:700;">orange</span>, DD = <span style="color:#ef5350;font-weight:700;">red</span>) so they render consistently on all devices. Below the chart, a brief text legend explains each category's typical behavior and how to interpret divergences.</p>
+      <p>A multi-line chart overlaying LF, Asset Manager, and Dealer net positions over the available history. Each series uses a fixed color (LF = <span style="color:#4f7fff;font-weight:700;">blue</span>, AM = <span style="color:#ff9800;font-weight:700;">orange</span>, DD = <span style="color:#ef5350;font-weight:700;">red</span>) so they render consistently on all devices. Below the chart, a brief text legend explains each category's typical behavior, followed by a table breaking down long, short, net, long%, and week-over-week change for each of the three categories at the current week.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-cot-modal-participants.png" alt="COT detail modal, Participants tab, showing a multi-line chart of LF, Asset Manager, and Dealer net positions over time, a text legend describing each category, and a participant breakdown table with long, short, net, long percent, and week-over-week columns" width="697" height="669" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The Participants tab.</strong> LF, AM, and Dealer net positions charted together, with the category legend and current-week breakdown table below.</p>
+      </div>
       <div class="callout">
         <strong>Dealer divergence:</strong> When Dealers are positioned opposite to Leveraged Funds at historical extremes, it is a squeeze risk signal — dealers are absorbing the other side of a crowded LF trade. Watch for rapid reversals when this configuration coincides with a catalyst.
       </div>
 
       <h3>History tab</h3>
       <p>A scrollable table of the last 52 weeks of raw CFTC data for the selected currency, with columns: Week, Net LF, WoW Δ (week-over-week change in net), Longs, Shorts, Long%, Net%OI, AM Net, and Dealer Net. This is the same source data that feeds all other tabs, presented in full for manual analysis or reference.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-cot-modal-history.png" alt="COT detail modal, History tab, showing a 52-week scrollable table with columns for week, net LF, week-over-week change, longs, shorts, long percent, net percent of open interest, asset manager net, and dealer net" width="699" height="836" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The History tab.</strong> The full 52-week raw data table underlying every other tab in the modal.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="categories">
