@@ -1,30 +1,30 @@
 {
-  "lastUpdate": "2026-07-10T21:32:15Z",
-  "generatedAt": "2026-07-10T21:32:15Z",
+  "lastUpdate": "2026-07-11T07:23:44Z",
+  "generatedAt": "2026-07-11T07:23:44Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-10",
+  "rangeFrom": "2025-07-11",
   "rangeTo": "2026-07-13",
-  "totalEvents": 3983,
+  "totalEvents": 3977,
   "currencyCounts": {
-    "EUR": 874,
-    "NZD": 124,
-    "USD": 1257,
     "CAD": 316,
     "CHF": 165,
+    "EUR": 872,
     "GBP": 469,
+    "USD": 1254,
     "JPY": 256,
     "AUD": 288,
+    "NZD": 123,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2111,
-    "high": 1644,
+    "medium": 2108,
+    "high": 1641,
     "low": 228
   },
   "surpriseStats": {
@@ -1290,66 +1290,6 @@
     }
   },
   "events": [
-    {
-      "currency": "EUR",
-      "event": "Industrial Production MoM",
-      "dateISO": "2025-07-10",
-      "hourUTC": "07:50",
-      "actual": "-0.7%",
-      "forecast": "0.0",
-      "previous": "0.9",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Business NZ PMI",
-      "dateISO": "2025-07-10",
-      "hourUTC": "22:30",
-      "actual": "48.8",
-      "forecast": "48.0",
-      "previous": "47.4",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "Initial Jobless Claims",
-      "dateISO": "2025-07-10",
-      "hourUTC": "12:30",
-      "actual": "227K",
-      "forecast": "235.0",
-      "previous": "232.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "Continuing Jobless Claims",
-      "dateISO": "2025-07-10",
-      "hourUTC": "12:30",
-      "actual": "1965K",
-      "forecast": "1980.0",
-      "previous": "1955.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "Jobless Claims 4-week Average",
-      "dateISO": "2025-07-10",
-      "hourUTC": "12:30",
-      "actual": "235.5K",
-      "forecast": "243.0",
-      "previous": "241.25",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
     {
       "currency": "CAD",
       "event": "Participation Rate",
@@ -45222,19 +45162,6 @@
       "actual": "4.6%",
       "forecast": "3.3%",
       "previous": "1.1%"
-    },
-    {
-      "date": "19 Jun",
-      "dateISO": "2026-06-19",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "European Union European Council Meeting",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "19 Jun",
