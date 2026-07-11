@@ -22,7 +22,7 @@
 <meta property="article:section" content="Market Research">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="GBP/JPY COT Positioning & Bias Factors — Live Data">
-<meta name="twitter:description" content="Live CFTC COT positioning for GBP and JPY leveraged funds, BoE vs BoJ rate differential, and cross-asset risk regime — the three factors that drive GBP/JPY bias. Updated every Friday after CFTC publication.">
+<meta name="twitter:description" content="Live CFTC COT positioning for GBP and JPY leveraged funds, BoE vs BoJ rate differential, cross-asset risk regime, and retail sentiment — the five factors that drive GBP/JPY bias. Updated every Friday after CFTC publication.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <script type="application/ld+json">
 {
@@ -97,7 +97,7 @@
       "name": "What are the main factors that drive GBP/JPY directional bias?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "GBP/JPY directional bias is driven by four primary factors: (1) CFTC COT net positioning for GBP and JPY futures by leveraged funds — showing institutional conviction in each leg; (2) the BoE vs BoJ rate differential — GBP/JPY is structurally sensitive to the interest rate gap between the two central banks; (3) the cross-asset risk regime — GBP/JPY is a high-beta pair that rallies in risk-on environments (low VIX, SPX strength) and sells off sharply in risk-off; (4) intraday session dynamics, particularly the London open and the London-Tokyo overlap."
+        "text": "GBP/JPY directional bias is driven by five primary factors: (1) CFTC COT net positioning for GBP futures by leveraged funds; (2) CFTC COT net positioning for JPY futures by leveraged funds — read directly, since JPY is the base currency of its CME futures contract; (3) the BoE vs BoJ rate differential — GBP/JPY is structurally sensitive to the interest rate gap between the two central banks; (4) the cross-asset risk regime — GBP/JPY is a high-beta pair that rallies in risk-on environments (low VIX, SPX strength) and sells off sharply in risk-off; (5) retail FX positioning, used as a contrarian confirmation signal at extremes."
       }
     },
     {
@@ -113,7 +113,7 @@
       "name": "Why does JPY COT positioning need to be inverted when reading GBP/JPY?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "JPY futures on the CME are quoted as Japanese yen per US dollar (JPY/USD), not USD/JPY. This means a net long position in JPY futures is actually bullish JPY — which is bearish for GBP/JPY. When reading the COT panel for cross pairs, the terminal automatically inverts the JPY sign so that positive net positioning represents JPY strength (downward pressure on GBP/JPY), consistent with how the pair is quoted."
+        "text": "JPY futures on the CME are quoted as US dollars per Japanese yen — the opposite convention from the interbank USD/JPY quote, which is yen per dollar. Because JPY is the base currency of the futures contract, a net long position in JPY futures is directly a bullish JPY view, with no sign inversion needed to read it. A bullish JPY view is bearish for GBP/JPY, since JPY strength means fewer yen are needed to buy one pound, pushing the pair lower. The terminal displays the JPY leg's CFTC net position as-is for this reason; readers should apply the direction (long JPY = bearish GBP/JPY, short JPY = bullish GBP/JPY) when cross-referencing the two COT legs."
       }
     },
     {
@@ -159,8 +159,8 @@
     },
     {
       "@type": "HowToStep",
-      "name": "Read JPY COT positioning (inverted)",
-      "text": "Locate the JPY COT section. Remember that JPY futures are USD per JPY — net short JPY is bullish GBP/JPY, net long JPY is bearish. Check whether the LF/AM dot is aligned.",
+      "name": "Read JPY COT positioning (base currency of its futures contract)",
+      "text": "Locate the JPY COT section. Remember that JPY futures are quoted USD per JPY, so the raw net position is read directly: net short JPY is bullish GBP/JPY, net long JPY is bearish. Check whether the LF/AM dot is aligned.",
       "url": "https://globalinvesting.github.io/guide-gbpjpy-cot.html#cot-jpy"
     },
     {
@@ -391,7 +391,7 @@ a { color: inherit; text-decoration: none; }
     <div class="page-hero">
       <div class="page-hero-label">Market Research</div>
       <h1>GBP/JPY Bias Factors: What Drives and Changes the Directional Bias</h1>
-      <p>GBP/JPY directional bias is determined by four factors: GBP COT positioning (CFTC Leveraged Funds net contracts), JPY COT positioning (inverted — net short JPY is bullish GBP/JPY), the BoE vs BoJ rate differential trend, and the cross-asset risk regime. This guide explains each factor, what a bullish or bearish reading looks like, and the five specific catalysts most likely to change the current bias — with links to the live data panels in the terminal where each factor is tracked.</p>
+      <p>GBP/JPY directional bias is determined by five factors: GBP COT positioning (CFTC Leveraged Funds net contracts), JPY COT positioning (net short JPY is bullish GBP/JPY), the BoE vs BoJ rate differential trend, the cross-asset risk regime, and retail FX positioning as a contrarian confirmation signal. This guide explains each factor, what a bullish or bearish reading looks like, and the five specific catalysts most likely to change the current bias — with links to the live data panels in the terminal where each factor is tracked.</p>
     </div>
 
     <div class="guide-section" id="quick-reference">
@@ -412,7 +412,7 @@ a { color: inherit; text-decoration: none; }
             <td>Net short GBP, negative WoW delta, split or red dot</td>
           </tr>
           <tr>
-            <td>JPY COT (CFTC, inverted)</td>
+            <td>JPY COT (CFTC, read directly)</td>
             <td>Net short JPY (negative contracts) — bearish JPY = bullish GBP/JPY</td>
             <td>Net long JPY (positive contracts) — bullish JPY = bearish GBP/JPY</td>
           </tr>
@@ -442,7 +442,7 @@ a { color: inherit; text-decoration: none; }
       <p>This is what makes GBP/JPY unique: you are simultaneously watching institutional positioning in a higher-yielding currency (GBP) and a traditional safe-haven / carry-funding currency (JPY). When both signals align — institutions net long GBP and net short JPY — the bias is unambiguous. When they diverge, caution is warranted.</p>
       <p>The pair also carries an unusually strong sensitivity to global risk appetite. The JPY leg functions as a risk barometer: when equity markets sell off sharply (VIX spike, risk-off regime), institutions unwind JPY shorts at speed regardless of the GBP leg's fundamentals. This means a well-constructed GBP bullish thesis can be overridden in hours by a macro shock that has nothing to do with UK data.</p>
       <div class="callout">
-        <strong>Key principle:</strong> GBP/JPY bias = GBP COT direction + JPY COT direction (inverted) + rate differential trend + risk regime. All four must be considered together. A signal from any single factor in isolation is insufficient.
+        <strong>Key principle:</strong> GBP/JPY bias = GBP COT direction + JPY COT direction + rate differential trend + risk regime + retail positioning. All five must be considered together. A signal from any single factor in isolation is insufficient.
       </div>
     </div>
 
@@ -487,7 +487,7 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="cot-jpy">
       <h2>JPY COT Positioning</h2>
-      <p>JPY futures (6J) are quoted as USD per JPY — so a net long position in JPY futures means institutions are bullish JPY, which is <strong style="color:var(--text);">bearish for GBP/JPY</strong>. This inversion is the single most common error in reading GBP/JPY COT data.</p>
+      <p>JPY futures (6J) are quoted as USD per JPY — so a net long position in JPY futures means institutions are bullish JPY, which is <strong style="color:var(--text);">bearish for GBP/JPY</strong>. Confusing this with a GBP-style "long = bullish for the pair" reading is the single most common error in reading GBP/JPY COT data.</p>
       <p>The correct interpretation matrix:</p>
       <table class="data-table" aria-label="JPY COT positioning and implied GBP/JPY directional bias">
         <thead>
@@ -616,7 +616,7 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="combining">
       <h2>Multi-Factor Framework</h2>
-      <p>Cross-referencing all four factors produces a more reliable directional read than any single signal in isolation. The table below maps each factor's bullish and bearish signal and its source in the terminal:</p>
+      <p>Cross-referencing all five factors produces a more reliable directional read than any single signal in isolation. The table below maps each factor's bullish and bearish signal and its source in the terminal:</p>
       <table class="data-table" aria-label="GBP/JPY multi-factor bias scoring framework">
         <thead>
           <tr>
