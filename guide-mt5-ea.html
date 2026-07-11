@@ -192,7 +192,7 @@ a { color: inherit; text-decoration: none; }
 
 </style>
 <meta property="article:published_time" content="2026-06-20T00:00:00Z">
-<meta property="article:modified_time" content="2026-07-05T00:00:00Z">
+<meta property="article:modified_time" content="2026-07-11T00:00:00Z">
 <meta property="article:section" content="Guides">
 <script type="application/ld+json">
 {
@@ -215,10 +215,73 @@ a { color: inherit; text-decoration: none; }
       "width": 501,
       "height": 214,
       "caption": "CB Rates & Bias panel rendered natively inside the MT5 Expert Advisor canvas, showing rate, trend, OIS-implied bias, and next meeting date per currency"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-carry.png",
+      "width": 379,
+      "height": 333,
+      "caption": "Carry Monitor panel rendered natively inside the MT5 Expert Advisor canvas, showing annualized swap-based carry adjusted for 30-day volatility per pair"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-calendar.png",
+      "width": 498,
+      "height": 307,
+      "caption": "Economic Calendar panel rendered natively inside the MT5 Expert Advisor canvas, sourced from MetaTrader's own calendar feed"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-composite.png",
+      "width": 257,
+      "height": 231,
+      "caption": "Composite Score panel rendered natively inside the MT5 Expert Advisor canvas, showing the six-factor blended score per currency"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-esi.png",
+      "width": 293,
+      "height": 288,
+      "caption": "Economic Surprise Index panel rendered natively inside the MT5 Expert Advisor canvas, showing beat/miss bars per currency over a rolling 90-day window"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-sessions.png",
+      "width": 383,
+      "height": 287,
+      "caption": "Market Sessions panel rendered natively inside the MT5 Expert Advisor canvas, showing open/closed status for Sydney, Tokyo, London, and New York"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-sentiment.png",
+      "width": 250,
+      "height": 233,
+      "caption": "Retail Sentiment panel rendered natively inside the MT5 Expert Advisor canvas, showing long/short percent split per pair"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-csi.png",
+      "width": 426,
+      "height": 288,
+      "caption": "Currency Strength panel rendered natively inside the MT5 Expert Advisor canvas, showing a multi-line strength index for the majors"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-correlation.png",
+      "width": 292,
+      "height": 288,
+      "caption": "Correlation matrix panel rendered natively inside the MT5 Expert Advisor canvas, showing 30-day rolling Pearson correlation between the majors and DXY"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-ea-volatility.png",
+      "width": 865,
+      "height": 352,
+      "caption": "Volatility & Options panel rendered natively inside the MT5 Expert Advisor canvas, showing realized volatility and risk reversal skew per pair"
     }
   ],
   "datePublished": "2026-06-20T00:00:00Z",
-  "dateModified": "2026-07-05T00:00:00Z",
+  "dateModified": "2026-07-11T00:00:00Z",
   "author": {
     "@type": "Person",
     "name": "Santiago Plá Casuriaga",
@@ -472,31 +535,85 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="carry-panel">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Carry Monitor</h3>
       <p>Because the EA runs inside your own MT5 terminal, the Carry Monitor reads your broker's actual live swap rates rather than a generic estimate — annualized and then adjusted for each pair's trailing 30-day realized volatility, following the same Sharpe-adjusted carry convention used by institutional carry trade monitors. A high nominal swap in a high-volatility regime is flagged differently from the same swap in a calm one.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-carry.png" alt="Carry Monitor panel rendered natively inside the MT5 Expert Advisor canvas, showing long and short swap points, annualized carry percent, 30-day volatility, Sharpe ratio, and long/short signal per pair" width="379" height="333" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Carry Monitor, rendered inside MT5.</strong> Live broker swap points converted to annualized carry, adjusted by 30-day realized volatility into a Sharpe ratio, ranked long-to-short across 18 pairs.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="calendar-panel">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Economic Calendar</h3>
       <p>A native MT5 economic calendar panel built from MetaTrader's own calendar feed, showing upcoming high- and medium-impact releases for the major economies without needing a separate calendar app or browser tab open alongside the chart.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-calendar.png" alt="Economic Calendar panel rendered natively inside the MT5 Expert Advisor canvas, showing today's scheduled releases by currency with actual, forecast, and previous values sourced from MT5's own calendar feed" width="498" height="307" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Economic Calendar, rendered inside MT5.</strong> MetaTrader's native calendar feed, filtered to the day's releases with actual/forecast/previous columns and a sentiment bar at the bottom.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="composite-panel">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Composite Score</h3>
       <p>A single blended score per currency that combines six of the panels above into one number on a &plusmn;10 scale: COT positioning (25%), momentum (15%), retail sentiment (18%), CB bias (18%), carry (12%), and the Economic Surprise Index (12%). It follows the standard four-factor skeleton (value/carry/momentum/positioning) used by institutional composite proxies, rather than a bespoke weighting scheme. For NOK and SEK, which have no liquid CFTC futures, the COT weight is redistributed proportionally across the remaining five components instead of injecting a misleading neutral zero.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-composite.png" alt="Composite Score panel rendered natively inside the MT5 Expert Advisor canvas, showing the blended score bar and CB bias label per currency" width="257" height="231" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Composite Score, rendered inside MT5.</strong> The six-factor blend per currency as a single &plusmn;10 bar, with the CB bias label alongside for quick cross-reference.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="esi-panel">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Economic Surprise Index</h3>
       <p>A per-currency read on whether recent economic releases have beaten or missed consensus, following the same construction convention as Citigroup's Economic Surprise Index. Each of the ten currencies is scored over a rolling 90-day window of importance-eligible releases, extending automatically to 180 days for currencies whose calendar has too few releases in the shorter window to produce a stable reading. A currency with no eligible releases in either window shows N/A rather than a misleading zero.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-esi.png" alt="Economic Surprise Index panel rendered natively inside the MT5 Expert Advisor canvas, showing the beat/miss bar per currency over a rolling 90-day window" width="293" height="288" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Economic Surprise Index, rendered inside MT5.</strong> Beat/miss bars per currency over the rolling 90-day window, following the Citigroup ESI construction convention.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="sessions-panel">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Market Sessions</h3>
       <p>Open/closed status and a progress bar for the four major trading sessions — Sydney, Tokyo, London, and New York — converted to your broker's server time, with each zone's daylight-saving boundary calculated independently so the displayed open and close hours stay accurate as regions shift on and off DST at different points in the year. A footer summarizes the current overlap condition (e.g. the London/New York overlap, the highest-liquidity window of the trading day) and flags the weekend when all four sessions are closed.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-sessions.png" alt="Market Sessions panel rendered natively inside the MT5 Expert Advisor canvas, showing open/closed status and progress bars for Sydney, Tokyo, London, and New York" width="383" height="287" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Market Sessions, rendered inside MT5.</strong> Live open/closed status and progress bars for all four sessions, with the current overlap condition called out at the bottom.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="other-panels">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Sentiment, Currency Strength, Correlation &amp; Volatility</h3>
       <p>Rounding out the 13-panel set: retail positioning (used as a contrarian read against the institutional COT signal), a currency strength index ranking the majors against each other across selectable timeframes, a cross-pair correlation matrix, and a volatility &amp; options panel covering realized volatility and risk reversal skew.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-sentiment.png" alt="Retail Sentiment panel rendered natively inside the MT5 Expert Advisor canvas, showing long/short percent split per pair as a bar" width="250" height="233" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Retail Sentiment, rendered inside MT5.</strong> Long/short percent split per pair, used as a contrarian read against the institutional COT panel.</p>
+      </div>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-csi.png" alt="Currency Strength panel rendered natively inside the MT5 Expert Advisor canvas, showing a multi-line strength index for the majors over a selectable timeframe" width="426" height="288" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Currency Strength, rendered inside MT5.</strong> A multi-line index ranking the majors against each other over a selectable lookback, from timeframe tabs (M5–D1) at the top of the panel.</p>
+      </div>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-correlation.png" alt="Correlation matrix panel rendered natively inside the MT5 Expert Advisor canvas, showing 30-day rolling Pearson correlation between the majors and DXY" width="292" height="288" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Correlation matrix, rendered inside MT5.</strong> 30-day rolling Pearson correlation between every major currency and DXY, color-coded from strongly negative to strongly positive.</p>
+      </div>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-ea-volatility.png" alt="Volatility & Options panel rendered natively inside the MT5 Expert Advisor canvas, showing 7/20-day and 3-month realized volatility, 1-week/1-month/3-month risk reversal, and skew bar per pair" width="865" height="352" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Volatility &amp; Options, rendered inside MT5.</strong> Realized volatility across three lookbacks alongside 25-delta risk reversal and skew, sourced from Saxo Bank options data.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="narrative">
