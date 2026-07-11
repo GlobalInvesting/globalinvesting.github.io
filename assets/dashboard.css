@@ -265,6 +265,7 @@
   .top-nav a.active { color: #fff; background: var(--bg3); }
 
   .topbar-right {
+    position: relative;
     margin-left: auto;
     display: flex;
     align-items: center;
@@ -1453,7 +1454,7 @@
   }
 
   /* ── Site menu dropdown ── */
-  .site-menu { position: relative; display: flex; align-items: center; }
+  .site-menu { display: flex; align-items: center; }
   .site-menu-btn {
     display: flex; align-items: center; gap: 5px;
     background: none; border: 1px solid var(--border2);
