@@ -6751,7 +6751,7 @@ async function updatePairDetail(tvSym) {
 
     <div class="pd-section pd-section--last">
       <div class="pd-section-lbl">Retail Sentiment</div>
-      <div class="pd-cell pd-cell--wide fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community outlook — retail traders only, not institutional. Contrarian indicator: extreme retail long bias historically aligns with institutional short positioning. Source: Myfxbook, updated every 30min." data-tip-ex="Extreme readings — above 70% long or below 30% long — have historically coincided with elevated positioning risk in the dominant direction. Retail extremes are one input among many; always cross-reference with COT and CB differential data.">
+      <div class="pd-cell pd-cell--wide fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community outlook — retail traders only, not institutional. Contrarian indicator: extreme retail long bias historically aligns with institutional short positioning. Source: Myfxbook, updated every hour." data-tip-ex="Extreme readings — above 70% long or below 30% long — have historically coincided with elevated positioning risk in the dominant direction. Retail extremes are one input among many; always cross-reference with COT and CB differential data.">
         <div class="pd-retail-bar"><div class="pd-retail-fill" style="width:${retBarL}%"></div></div>
         <div class="pd-retail-nums">${retL != null ? retL+'% L' : '—'}<span class="pd-retail-sep">/</span>${retS != null ? retS+'% S' : '—'}</div>
       </div>
@@ -8848,7 +8848,7 @@ setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes
 setInterval(fetchCarryData,    30 * 60 * 1000);
 setInterval(fetchCarryRanking, 30 * 60 * 1000);
 // Refresh sentiment every 30 seconds
-setInterval(fetchSentiment, 10 * 60 * 1000);   // every 10 min — sentiment source updates every 30min
+setInterval(fetchSentiment, 10 * 60 * 1000);   // every 10 min — Myfxbook source updates hourly (cron '20 * * * *')
 // Refresh calendar & expectations every 30 minutes
 setInterval(fetchFedExpectations, 30 * 60 * 1000);
 
