@@ -157,7 +157,7 @@
       "name": "What are inverse indicators in the ESI?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Inverse indicators are economic releases where a lower actual reading is a positive surprise for the economy. Examples include unemployment rate, jobless claims, trade deficits, and budget deficits. If the unemployment rate was forecast at 4.1% and the actual came in at 3.8%, that is a positive surprise (fewer unemployed than expected) — but the raw actual is lower than forecast. The ESI scoring inverts the sign for these indicators so that a positive economic surprise always results in a positive contribution to the index, regardless of whether the metric is 'higher = better' or 'lower = better'."
+        "text": "Inverse indicators are economic releases where a lower actual reading is a positive surprise for the economy. Examples include unemployment rate, jobless claims, and budget deficits. If the unemployment rate was forecast at 4.1% and the actual came in at 3.8%, that is a positive surprise (fewer unemployed than expected) — but the raw actual is lower than forecast. The ESI scoring inverts the sign for these indicators so that a positive economic surprise always results in a positive contribution to the index, regardless of whether the metric is 'higher = better' or 'lower = better'. Trade balance is not on this list: it is already a signed net level (deficit negative, surplus positive), so a smaller-than-forecast deficit already scores correctly as a beat with no inversion needed — the same convention already used for Current Account."
       }
     }
   ]
@@ -444,6 +444,7 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--text);">Decay weighting:</strong> Each event's contribution is multiplied by an exponential decay weight based on its age. Recent events carry more weight; older events fade. Half-life is 45 days — matching the Citi CESI convention.</li>
         <li><strong style="color:var(--text);">Z-score normalization:</strong> When an event has at least 5 historical observations in the engine's statistics database, the magnitude of the surprise is normalized using the historical mean and standard deviation. This gives more weight to statistically significant surprises and less to routine noise. Events without sufficient history use a simpler beat/miss score.</li>
         <li><strong style="color:var(--text);">Index normalization:</strong> The final index is scaled to the range [−100, +100], matching the visual convention of the Citi CESI. The zero line is centered; green bars extend right for positive values, red bars extend left for negative values.</li>
+        <li><strong style="color:var(--text);">Adaptive window for sparse currencies:</strong> The standard scoring window is 90 days for every G10 currency. If a currency ends that pass with zero scored events — in practice this only happens for NOK and SEK, whose upstream provider tags nearly all their releases as low-impact — the window widens to a 90–180 day band for that currency only, using the identical impact filter and decay function. Widening the window never lowers the bar: an event at 150 days old still carries only ~13% of its original weight under the 45-day half-life, so it provides a non-zero baseline rather than materially changing the signal.</li>
       </ol>
     </div>
 
@@ -477,7 +478,7 @@ a { color: inherit; text-decoration: none; }
           </tr>
           <tr>
             <td>67 days</td>
-            <td>0.35</td>
+            <td>0.36</td>
             <td>Two months ago — diminishing influence</td>
           </tr>
           <tr>
@@ -526,11 +527,6 @@ a { color: inherit; text-decoration: none; }
             <td>Fewer new unemployment filings than forecast signals labour market strength</td>
           </tr>
           <tr>
-            <td>Trade balance deficit</td>
-            <td>Actual &lt; forecast (less negative)</td>
-            <td>A smaller deficit than expected is an improvement for the currency</td>
-          </tr>
-          <tr>
             <td>Budget deficit</td>
             <td>Actual &lt; forecast (less negative)</td>
             <td>A smaller fiscal shortfall than expected reduces sovereign risk premium</td>
@@ -538,6 +534,9 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <p>This inversion ensures that a positive z-score always indicates a positive economic surprise regardless of which direction "positive" runs for a given indicator — matching the convention used by the Citi and Bloomberg indices.</p>
+      <div class="callout callout-orange">
+        <strong>Trade balance is not inverted.</strong> Unlike the indicators above, Trade Balance is already a signed net level — a deficit prints negative, a surplus positive — the same convention as Current Account. A smaller-than-forecast deficit already means <code style="font-family:var(--font-mono);font-size:12px;">actual &gt; forecast</code>, which scores correctly as a beat with no sign flip required.
+      </div>
     </div>
 
     <div class="guide-section" id="excluded">
@@ -587,8 +586,8 @@ a { color: inherit; text-decoration: none; }
           </tr>
           <tr>
             <td>N</td>
-            <td>Raw count of scored events with actuals in the 90-day window</td>
-            <td>Dimmed N indicates low confidence (below 15 events). Higher N = more statistically robust index</td>
+            <td>Raw count of scored events with actuals in the scoring window (90 days, or 90–180 days if widened)</td>
+            <td>Dimmed N indicates low confidence (below 15 events). For NOK/SEK, the row tooltip flags when the window was widened to 180 days due to sparse 90-day coverage. Higher N = more statistically robust index</td>
           </tr>
         </tbody>
       </table>
