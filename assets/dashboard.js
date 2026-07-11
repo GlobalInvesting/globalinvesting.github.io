@@ -10925,7 +10925,7 @@ async function renderDerivativesSection() {
         });
 
         const footer = document.getElementById('ecb-fixings-footer');
-        if (footer && fxDate) footer.textContent = `ECB · official reference fixing · ${fxDate} · published ~16:00 CET · source: frankfurter.json`;
+        if (footer && fxDate) footer.textContent = `ECB · official reference fixing · ${fxDate} · published ~16:00 CET · source: ECB via Frankfurter`;
       }
     } catch { /* graceful — table shows dashes */ }
   }
