@@ -332,23 +332,23 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="overview">
       <h2>Panel Overview</h2>
-      <p>Each row in the panel represents one currency pair. The pairs are sorted by total open positions — the most actively-traded pairs appear at the top. Every row contains four distinct pieces of information:</p>
+      <p>Each row in the panel represents one currency pair, sorted by total open positions — the most actively-traded pairs appear at the top. Every row is a compact single-line grid with the following columns:</p>
       <div class="sent-grid">
         <div class="sent-card">
+          <div class="sent-title">Pair + avg entry subtext</div>
+          <div class="sent-desc">The pair symbol, with a small line underneath showing the dominant side's average entry price and an arrow: ▼ if that side is currently underwater (trapped), ▲ if in profit. This subtext only appears once the pair has a full data sample (position count and both average entry prices available).</div>
+        </div>
+        <div class="sent-card">
           <div class="sent-title">Long / Short bar</div>
-          <div class="sent-desc">A split bar showing the percentage of retail traders who are currently long (green, left) vs. short (red, right). The white vertical line on the bar marks the current price relative to the retail average entry range.</div>
+          <div class="sent-desc">A split bar showing the percentage of retail traders who are currently long (green, left) vs. short (red, right), with a white vertical tick marking where the current price sits within the range spanned by the average long and average short entry prices.</div>
+        </div>
+        <div class="sent-card">
+          <div class="sent-title">L% / S% / bias letter</div>
+          <div class="sent-desc">Two right-aligned columns give the exact long and short percentages, followed by a single bold letter (L or S) marking which side currently holds the majority.</div>
         </div>
         <div class="sent-card">
           <div class="sent-title">Open positions count</div>
-          <div class="sent-desc">The total number of open positions in the Myfxbook community for this pair right now. EUR/USD typically leads with 50,000+ positions. Higher count = more statistically reliable data.</div>
-        </div>
-        <div class="sent-card">
-          <div class="sent-title">Avg entry price</div>
-          <div class="sent-desc">The volume-weighted average price at which the dominant side (longs or shorts) entered their positions. This is the price level the crowd is anchored to.</div>
-        </div>
-        <div class="sent-card">
-          <div class="sent-title">Price distance</div>
-          <div class="sent-desc">How far the current price is from the dominant side's average entry, expressed as a percentage and in pips. Shown in red if the dominant side is losing (trapped), green if they are in profit.</div>
+          <div class="sent-desc">The total number of open positions in the Myfxbook community for this pair right now, shown in compact form (e.g. 55.2K). Higher count = more statistically reliable data. This is also the panel's sort key.</div>
         </div>
       </div>
       <div class="callout">
@@ -369,7 +369,7 @@ a { color: inherit; text-decoration: none; }
           <tr><td>Pairs shown</td><td>28 pairs sorted by total open positions. Majors (EUR/USD, GBP/USD, USD/JPY…), the major crosses, plus USD/NOK, USD/SEK, EUR/NOK, and EUR/SEK.</td></tr>
         </tbody>
       </table>
-      <p style="margin-top:14px;">When Myfxbook data is unavailable — for example during a temporary API outage — the panel falls back to a secondary retail sentiment feed, fetched in real time from an alternative public source. The secondary feed reflects the open positions of accounts on that provider's platform; the underlying data is real and directionally useful but measured on a different population than Myfxbook. The panel footer label updates to indicate which source is active (<span style="font-family:var(--font-mono);font-size:11px;">Myfxbook · retail positioning</span> vs <span style="font-family:var(--font-mono);font-size:11px;">Retail · live</span>). The aggregate statistics block (profitable %, real account %, total funds, average deposit) is only shown when Myfxbook is the active source, as the secondary feed does not expose equivalent account-level statistics.</p>
+      <p style="margin-top:14px;">When Myfxbook data is unavailable — for example during a temporary API outage — the panel falls back to a secondary retail sentiment feed, fetched in real time from an alternative public source. The secondary feed reflects the open positions of accounts on that provider's platform; the underlying data is real and directionally useful but measured on a different population than Myfxbook. The panel footer label updates to indicate which source is active (<span style="font-family:var(--font-mono);font-size:11px;">Myfxbook · retail positioning</span> vs <span style="font-family:var(--font-mono);font-size:11px;">Retail positioning · live</span>). The aggregate statistics block (profitable %, real account %, total funds, average deposit) is only shown when Myfxbook is the active source, as the secondary feed does not expose equivalent account-level statistics.</p>
     </div>
 
     <div class="guide-section" id="reading-bar">
@@ -379,60 +379,73 @@ a { color: inherit; text-decoration: none; }
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 12px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">RETAIL FX POSITIONING</span>
-          <span style="font-size:9.5px;color:var(--text3);">Myfxbook · retail positioning</span>
+          <span style="font-size:9.5px;color:var(--text3);">Myfxbook · 42min ago</span>
         </div>
-        <!-- EUR/USD row -->
-        <div style="border-bottom:1px solid var(--border);padding:6px 12px 4px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-            <span style="font-size:12px;font-weight:700;color:var(--text);font-family:var(--font-mono);">EUR/USD</span>
-            <span style="font-size:10px;color:var(--text3);">47% <span style="color:var(--up);">L</span> · 53% <span style="color:var(--down);">S</span></span>
-          </div>
-          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">55.2K pos</div>
-          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;margin-bottom:5px;">
-            <div style="position:absolute;left:0;top:0;height:100%;width:47%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
-            <div style="position:absolute;right:0;top:0;height:100%;width:53%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
-            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:50%;"></div>
-          </div>
-          <div style="font-size:10px;color:var(--down);">▼ +1.78% · 201pip · trapped</div>
+        <div style="display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px;background:var(--head-bg);border-bottom:1px solid var(--border2);">
+          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Pair</span>
+          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Long / Short</span>
+          <span style="font-size:9px;color:var(--up);text-transform:uppercase;letter-spacing:.05em;text-align:right;">L%</span>
+          <span style="font-size:9px;color:var(--down);text-transform:uppercase;letter-spacing:.05em;text-align:right;">S%</span>
+          <span style="font-size:9px;color:var(--text3);text-align:center;"> </span>
+          <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Pos</span>
         </div>
-        <!-- GBP/USD row -->
-        <div style="border-bottom:1px solid var(--border);padding:6px 12px 4px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-            <span style="font-size:12px;font-weight:700;color:var(--text);font-family:var(--font-mono);">GBP/USD</span>
-            <span style="font-size:10px;color:var(--text3);">63% <span style="color:var(--up);">L</span> · 37% <span style="color:var(--down);">S</span></span>
+        <!-- EUR/USD row — dominant side short, currently trapped -->
+        <div style="display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px;border-bottom:1px solid var(--border);">
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <span style="font-size:10px;font-weight:700;color:#fff;">EUR/USD</span>
+            <span style="font-size:8px;font-family:var(--font-mono);color:var(--down);">1.1368 ▼</span>
           </div>
-          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">33.3K pos</div>
-          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;margin-bottom:5px;">
-            <div style="position:absolute;left:0;top:0;height:100%;width:63%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
-            <div style="position:absolute;right:0;top:0;height:100%;width:37%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
-            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:56%;"></div>
+          <div style="position:relative;height:6px;background:var(--bg3);border-radius:1px;overflow:visible;margin:0 4px;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:47%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
+            <div style="position:absolute;right:0;top:0;height:100%;width:53%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
+            <div style="position:absolute;top:-3px;width:2px;height:12px;background:#fff;opacity:.9;border-radius:1px;left:58%;"></div>
           </div>
-          <div style="font-size:10px;color:var(--down);">▼ -1.89% · 254pip · trapped</div>
+          <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right;">47%</span>
+          <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right;">53%</span>
+          <span style="font-size:9px;font-weight:700;color:var(--down);text-align:center;">S</span>
+          <span style="font-size:9px;color:var(--text3);text-align:right;">55.2K</span>
         </div>
-        <!-- AUD/CAD row -->
-        <div style="border-bottom:1px solid var(--border);padding:6px 12px 4px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-            <span style="font-size:12px;font-weight:700;color:var(--text);font-family:var(--font-mono);">AUD/CAD</span>
-            <span style="font-size:10px;color:var(--text3);">31% <span style="color:var(--up);">L</span> · 69% <span style="color:var(--down);">S</span></span>
+        <!-- GBP/USD row — dominant side long, currently trapped -->
+        <div style="display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px;border-bottom:1px solid var(--border);">
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <span style="font-size:10px;font-weight:700;color:#fff;">GBP/USD</span>
+            <span style="font-size:8px;font-family:var(--font-mono);color:var(--down);">1.2694 ▼</span>
           </div>
-          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">32.8K pos</div>
-          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;margin-bottom:5px;">
-            <div style="position:absolute;left:0;top:0;height:100%;width:31%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
-            <div style="position:absolute;right:0;top:0;height:100%;width:69%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
-            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:45%;"></div>
+          <div style="position:relative;height:6px;background:var(--bg3);border-radius:1px;overflow:visible;margin:0 4px;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:63%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
+            <div style="position:absolute;right:0;top:0;height:100%;width:37%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
+            <div style="position:absolute;top:-3px;width:2px;height:12px;background:#fff;opacity:.9;border-radius:1px;left:34%;"></div>
           </div>
-          <div style="font-size:10px;color:var(--up);">▲ +3.17% · 295pip · trapped</div>
+          <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right;">63%</span>
+          <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right;">37%</span>
+          <span style="font-size:9px;font-weight:700;color:var(--up);text-align:center;">L</span>
+          <span style="font-size:9px;color:var(--text3);text-align:right;">33.3K</span>
+        </div>
+        <!-- AUD/CAD row — dominant side short, currently in profit -->
+        <div style="display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px;">
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <span style="font-size:10px;font-weight:700;color:#fff;">AUD/CAD</span>
+            <span style="font-size:8px;font-family:var(--font-mono);color:var(--up);">0.9142 ▲</span>
+          </div>
+          <div style="position:relative;height:6px;background:var(--bg3);border-radius:1px;overflow:visible;margin:0 4px;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:31%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
+            <div style="position:absolute;right:0;top:0;height:100%;width:69%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
+            <div style="position:absolute;top:-3px;width:2px;height:12px;background:#fff;opacity:.9;border-radius:1px;left:22%;"></div>
+          </div>
+          <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right;">31%</span>
+          <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right;">69%</span>
+          <span style="font-size:9px;font-weight:700;color:var(--down);text-align:center;">S</span>
+          <span style="font-size:9px;color:var(--text3);text-align:right;">32.8K</span>
         </div>
         <!-- Footer stats -->
-        <div style="padding:5px 12px;display:flex;gap:16px;font-size:10px;color:var(--text3);">
+        <div style="padding:5px 12px;display:flex;gap:16px;font-size:10px;color:var(--text3);border-top:1px solid var(--border);">
           <span>Profitable <span style="color:var(--text);">67%</span></span>
           <span>Real <span style="color:var(--text);">59%</span></span>
           <span>Funds <span style="color:var(--text);">$1.68B</span></span>
           <span>Avg dep <span style="color:var(--text);">$94,870</span></span>
         </div>
-        <div style="padding:2px 12px 6px;font-size:9px;color:var(--text3);">Myfxbook · 2h ago · 01:04 GMT-3</div>
       </div>
-      <p>The <strong style="color:#fff;">white vertical line</strong> on the bar marks where the current market price sits relative to the range between the average long entry and the average short entry. If the line is shifted toward the short side, price is closer to where shorts entered — useful for gauging who is under more pressure.</p>
+      <p>The subtext under each pair symbol shows the dominant side's average entry price with an arrow: ▼ (colored red) means that side is currently underwater, ▲ (colored green) means it's in profit — this arrow reflects trapped/profit status, not the direction of the last price move. The <strong style="color:#fff;">white vertical tick</strong> on the bar marks where the current market price sits within the range spanned by the average long and average short entry prices — useful for gauging who is under more pressure at a glance.</p>
       <div class="callout">
         <strong>Readings near 50/50 carry no signal.</strong> Retail is split and no crowd bias exists. Focus your attention on readings above 65% or below 35% on either side — those are where useful contrarian information starts to appear.
       </div>
@@ -454,8 +467,8 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="avg-price">
       <h2>Average Entry Price</h2>
-      <p>The panel shows the volume-weighted average entry price for both the long side and the short side of the dominant group. This is the price level around which retail's crowd psychology is anchored.</p>
-      <p>Example: EUR/USD longs entered at an average of <span style="font-family:var(--font-mono);color:var(--text);">1.1691</span>, shorts at <span style="font-family:var(--font-mono);color:var(--text);">1.1368</span>. If the current price is <span style="font-family:var(--font-mono);color:var(--text);">1.1566</span>, longs are underwater by about 125 pips while shorts are roughly breakeven. These levels act as invisible support and resistance — when price approaches the average entry of a large trapped crowd, the risk of a flush (stop-out cascade) increases significantly.</p>
+      <p>The panel's compact row shows the volume-weighted average entry price for the <strong>dominant side only</strong> (whichever of longs/shorts holds the majority), as the small subtext under the pair symbol. Opening a pair's detail view in the terminal shows both the average long and average short entry prices side by side, each with its own trapped/profit arrow.</p>
+      <p>Example: EUR/USD longs entered at an average of <span style="font-family:var(--font-mono);color:var(--text);">1.1691</span>, shorts at <span style="font-family:var(--font-mono);color:var(--text);">1.1368</span>. If the current price is <span style="font-family:var(--font-mono);color:var(--text);">1.1566</span>, longs are underwater while shorts are in profit. These levels act as invisible support and resistance — when price approaches the average entry of a large trapped crowd, the risk of a flush (stop-out cascade) increases significantly.</p>
       <div class="callout callout-green">
         <strong>Practical use:</strong> Mark the average long and average short price on your chart. Treat them as soft S/R levels. A rally into the average short entry of a heavily short retail crowd often stalls or reverses — because shorts start closing (buying) around their entry level, creating supply pressure that institutional players can sell into.
       </div>
@@ -463,26 +476,26 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="price-distance">
       <h2>Price Distance — Trapped vs. In Profit</h2>
-      <p>The small number below the percentage bar shows how far the current price is from the dominant side's average entry, in both percentage terms and pips. The color tells you the situation at a glance:</p>
+      <p>The arrow next to the average entry price in each row tells you the dominant side's status at a glance — the panel does not display a numeric percentage or pip distance inline; that arrow and its color are the visible signal, and hovering over the row surfaces the exact average entry and current price levels:</p>
       <div style="display:flex;flex-direction:column;gap:8px;margin:16px 0;">
         <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--down);border-radius:4px;">
           <div style="min-width:80px;font-family:var(--font-mono);font-size:12px;color:var(--down);font-weight:700;">▼ trapped</div>
-          <div style="font-size:13.5px;color:var(--text2);">The dominant side is losing. Their positions are underwater. If the move continues against them, forced stop-outs or panic closes can accelerate the trend — a potential fuel-for-move scenario.</div>
+          <div style="font-size:13.5px;color:var(--text2);">The dominant side is losing — current price has moved past their average entry against them. If the move continues, forced stop-outs or panic closes can accelerate the trend — a potential fuel-for-move scenario.</div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--up);border-radius:4px;">
           <div style="min-width:80px;font-family:var(--font-mono);font-size:12px;color:var(--up);font-weight:700;">▲ profit</div>
           <div style="font-size:13.5px;color:var(--text2);">The dominant side is winning. They may take profits soon, creating pressure in the opposite direction. A large crowd in profit often creates a ceiling — they sell (or buy to close) as price moves further in their favor.</div>
         </div>
       </div>
-      <h3>Reading the pip distance</h3>
-      <p>The pip distance tells you how much pain (or gain) the crowd is sitting on. A retail crowd trapped 200 pips offside on EUR/USD is in a very different psychological state than one trapped 5 pips offside. Larger pip distances suggest:</p>
+      <h3>Gauging how far offside the crowd is</h3>
+      <p>Since the panel doesn't print an exact pip or percentage figure, compare the displayed average entry price against the pair's current price yourself (or open the pair's detail view, which shows both average long and average short prices). A retail crowd trapped a small distance offside is in a very different psychological state than one trapped far offside. A larger gap suggests:</p>
       <ul>
         <li>More pain — higher probability of eventual forced liquidation</li>
         <li>A larger potential stop-hunt target for institutional players</li>
         <li>The crowd has been holding through a significant adverse move, suggesting stubborn conviction that often breaks suddenly</li>
       </ul>
       <div class="callout callout-red">
-        <strong>The most powerful setups</strong> occur when a large crowd (20,000+ positions) is heavily trapped (one-sided, 70%+ on the losing side, 100+ pips offside) and price begins to move further against them. That combination can produce fast, sharp moves as stops cascade.
+        <strong>The most powerful setups</strong> occur when a large crowd (20,000+ positions) is heavily trapped (one-sided, 70%+ on the losing side, well offside from their average entry) and price begins to move further against them. That combination can produce fast, sharp moves as stops cascade.
       </div>
     </div>
 
@@ -507,11 +520,11 @@ a { color: inherit; text-decoration: none; }
       <table aria-label="Contrarian sentiment logic" class="contra-table">
         <thead><tr><th scope="col">Sentiment reading</th><th scope="col">Contrarian interpretation</th><th scope="col">Strength</th></tr></thead>
         <tbody>
-          <tr><td>70–80% Long</td><td>Moderate contrarian short bias. Crowd is bullish but not at extreme. Watch for trend exhaustion signals.</td><td style="color:var(--orange);">Medium</td></tr>
-          <tr><td>&gt; 80% Long</td><td>Strong contrarian short signal. Historically precedes meaningful reversals, especially combined with trapped status.</td><td style="color:var(--down);">High</td></tr>
-          <tr><td>45–55% either side</td><td>No useful signal. Defer to COT, rate differentials, and price action.</td><td style="color:var(--text2);">None</td></tr>
-          <tr><td>70–80% Short</td><td>Moderate contrarian long bias. Crowded shorts suggest limited further downside without a catalyst.</td><td style="color:var(--orange);">Medium</td></tr>
-          <tr><td>&gt; 80% Short</td><td>Strong contrarian long signal. Extreme short positioning often precedes sharp short squeezes.</td><td style="color:var(--up);">High</td></tr>
+          <tr><td>65–75% Long</td><td>"Majority Long" in the terminal. Moderate contrarian short bias — crowd is bullish but not at extreme. Watch for trend exhaustion signals.</td><td style="color:var(--orange);">Medium</td></tr>
+          <tr><td>&gt; 75% Long</td><td>"Heavily Long" in the terminal. Strong contrarian short signal. Historically precedes meaningful reversals, especially combined with trapped status.</td><td style="color:var(--down);">High</td></tr>
+          <tr><td>35–65% either side</td><td>"Mixed" in the terminal. No useful signal. Defer to COT, rate differentials, and price action.</td><td style="color:var(--text2);">None</td></tr>
+          <tr><td>65–75% Short</td><td>"Majority Short" in the terminal. Moderate contrarian long bias — crowded shorts suggest limited further downside without a catalyst.</td><td style="color:var(--orange);">Medium</td></tr>
+          <tr><td>&gt; 75% Short</td><td>"Heavily Short" in the terminal. Strong contrarian long signal. Extreme short positioning often precedes sharp short squeezes.</td><td style="color:var(--up);">High</td></tr>
         </tbody>
       </table>
       <div class="callout callout-red">
