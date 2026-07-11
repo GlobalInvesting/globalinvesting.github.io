@@ -11238,6 +11238,16 @@ const NOISE_KW = [
   'tic net','net long-term tic','total net tic',
   'interest rate projection',
   'eia crude oil','eia crude',
+  // v8.51.15: Myfxbook retail-positioning "Sentiment" releases are not official
+  // macro data — they carry no real consensus forecast. calendar.json backfills
+  // their missing `forecast` from `previous` (last week's sentiment %), which
+  // fabricates a beat/miss against last week's reading rather than an actual
+  // survey/estimate. Scoring them inflates N and distorts beat rate / index
+  // (confirmed: ~12-34% of scored G10 events in some 90d windows were Myfxbook
+  // Sentiment noise). Keyword is 'myfxbook' specifically (not 'sentiment') so
+  // legitimate sentiment surveys — Michigan Consumer Sentiment, ZEW Economic
+  // Sentiment, IFO, GfK — are NOT excluded.
+  'myfxbook',
 ];
 
 // Inverse indicators: a lower actual is a positive surprise (e.g. unemployment fell).
