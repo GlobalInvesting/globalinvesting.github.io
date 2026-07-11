@@ -264,6 +264,12 @@ const _ESM_NOISE_KW = [
   'tic net','net long-term tic','total net tic',
   'interest rate projection',
   'eia crude oil','eia crude',
+  // v8.51.15: keep in sync with NOISE_KW in dashboard.js — Myfxbook retail
+  // "Sentiment" releases are not official macro data (no real consensus
+  // forecast; calendar.json backfills `forecast` from `previous`, fabricating
+  // a beat/miss vs. last week's reading). Keyword is 'myfxbook' specifically
+  // so legitimate sentiment surveys (Michigan, ZEW, IFO, GfK) stay scored.
+  'myfxbook',
 ];
 
 // ── LWC loader ───────────────────────────────────────────────────────────────
