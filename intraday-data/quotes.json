@@ -1,7 +1,23 @@
 {
-  "updated": "2026-07-11T00:30:33Z",
+  "updated": "2026-07-11T00:35:29Z",
   "source": "mixed",
   "quotes": {
+    "vix": {
+      "close": 15.03,
+      "prev_close": 15.84,
+      "chg": -0.81,
+      "pct": -5.1136,
+      "high": 16.16,
+      "low": 14.96,
+      "open": 16.06,
+      "bid": null,
+      "ask": null,
+      "market_state": "POSTPOST",
+      "market_time": 1783714501,
+      "source": "yfinance",
+      "pct1w": -6.935,
+      "pct1w_date": "2026-07-02"
+    },
     "spx": {
       "close": 7575.39,
       "prev_close": 7543.64,
@@ -19,10 +35,10 @@
       "pct1w_date": "2026-07-02"
     },
     "gold": {
-      "close": 4111.4254,
+      "close": 4111.5124,
       "prev_close": 4119.3248,
-      "chg": -7.8994,
-      "pct": -0.1918,
+      "chg": -7.8124,
+      "pct": -0.1897,
       "source": "twelve_data",
       "high": 4144.6,
       "low": 4081.7,
@@ -183,35 +199,35 @@
       "pct1w_date": "2026-07-02"
     },
     "btc": {
-      "close": 64084.93,
+      "close": 64069.19,
       "prev_close": 64125.902,
-      "chg": -40.972,
-      "pct": -0.0639,
+      "chg": -56.712,
+      "pct": -0.0884,
       "high": 64125.902,
       "low": 64006.88,
       "open": 64125.902,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783729832,
+      "market_time": 1783730128,
       "source": "yfinance",
-      "pct1w": 2.4634,
+      "pct1w": 2.4383,
       "pct1w_date": "2026-07-03"
     },
     "eth": {
-      "close": 1792.68,
+      "close": 1791.85,
       "prev_close": 1795.6898,
-      "chg": -3.0098,
-      "pct": -0.1676,
+      "chg": -3.8398,
+      "pct": -0.2138,
       "high": 1795.6898,
       "low": 1790.3363,
       "open": 1795.6898,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783729832,
+      "market_time": 1783730128,
       "source": "yfinance",
-      "pct1w": 2.0587,
+      "pct1w": 2.0114,
       "pct1w_date": "2026-07-03"
     },
     "nasdaq": {
@@ -1318,15 +1334,6 @@
         "low": 52266.80859,
         "close": 52640.30859
       }
-    },
-    "vix": {
-      "close": 15.03,
-      "prev_close": 15.03,
-      "chg": 0,
-      "pct": 0,
-      "source": "repo",
-      "stale": true,
-      "sourceDate": "2026-07-10"
     }
   },
   "hv30": {
