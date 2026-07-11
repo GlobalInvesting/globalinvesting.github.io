@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-11T20:55:25Z",
+  "updated": "2026-07-11T21:00:48Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -175,13 +175,13 @@
       "prev_close": 5.053,
       "chg": 0.018,
       "pct": 0.3562,
-      "high": 5.076,
-      "low": 5.054,
-      "open": 5.06,
+      "high": null,
+      "low": null,
+      "open": null,
       "bid": null,
       "ask": null,
-      "market_state": null,
-      "market_time": null,
+      "market_state": "CLOSED",
+      "market_time": 1783709994,
       "source": "yfinance",
       "pct1w": 1.7252,
       "pct1w_date": "2026-07-02"
@@ -203,35 +203,35 @@
       "pct1w_date": "2026-07-02"
     },
     "btc": {
-      "close": 64345.54,
+      "close": 64355.12,
       "prev_close": 64125.902,
-      "chg": 219.638,
-      "pct": 0.3425,
+      "chg": 229.218,
+      "pct": 0.3574,
       "high": 64430.63,
       "low": 63964.973,
       "open": 64125.902,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783803355,
+      "market_time": 1783803652,
       "source": "yfinance",
-      "pct1w": 2.8801,
+      "pct1w": 2.8954,
       "pct1w_date": "2026-07-03"
     },
     "eth": {
-      "close": 1825.56,
+      "close": 1825.43,
       "prev_close": 1795.6898,
-      "chg": 29.8702,
-      "pct": 1.6634,
+      "chg": 29.7402,
+      "pct": 1.6562,
       "high": 1827.1251,
       "low": 1788.2904,
       "open": 1795.6898,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783803353,
+      "market_time": 1783803650,
       "source": "yfinance",
-      "pct1w": 3.9306,
+      "pct1w": 3.9232,
       "pct1w_date": "2026-07-03"
     },
     "nasdaq": {
@@ -313,15 +313,6 @@
       "source": "yfinance",
       "pct1w": -0.0285,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.14194,
-      "session_low": 1.14194,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.14377,
-        "high": 1.14639,
-        "low": 1.14155,
-        "close": 1.14168
-      },
       "hv30": 4.72,
       "hv10": 3.66,
       "pct1m": -0.9455,
@@ -342,15 +333,6 @@
       "source": "yfinance",
       "pct1w": 0.4459,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.33982,
-      "session_low": 1.33982,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.34064,
-        "high": 1.34515,
-        "low": 1.33933,
-        "close": 1.34018
-      },
       "hv30": 5.48,
       "hv10": 3.79,
       "pct1m": 0.4863,
@@ -371,13 +353,6 @@
       "source": "yfinance",
       "pct1w": 0.1381,
       "pct1w_date": "2026-07-03",
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 162.342,
-        "high": 162.429,
-        "low": 161.276,
-        "close": 161.672
-      },
       "hv30": 3.68,
       "hv10": 5.34,
       "pct1m": 0.9352,
@@ -398,15 +373,6 @@
       "source": "yfinance",
       "pct1w": 0.5649,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.69551,
-      "session_low": 0.69551,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.6943,
-        "high": 0.69716,
-        "low": 0.69367,
-        "close": 0.69556
-      },
       "hv30": 6.8,
       "hv10": 4.64,
       "pct1m": -1.2134,
@@ -427,15 +393,6 @@
       "source": "yfinance",
       "pct1w": 0.4214,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.8078,
-      "session_low": 0.8078,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.80598,
-        "high": 0.80894,
-        "low": 0.803,
-        "close": 0.80829
-      },
       "hv30": 5.78,
       "hv10": 4.4,
       "pct1m": 1.2065,
@@ -456,15 +413,6 @@
       "source": "yfinance",
       "pct1w": -0.2629,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.4153,
-      "session_low": 1.4152,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.4166,
-        "high": 1.41727,
-        "low": 1.4113,
-        "close": 1.4152
-      },
       "hv30": 3.29,
       "hv10": 1.89,
       "pct1m": 1.4094,
@@ -485,15 +433,6 @@
       "source": "yfinance",
       "pct1w": 1.2315,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.5763,
-      "session_low": 0.5763,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.57554,
-        "high": 0.57934,
-        "low": 0.57527,
-        "close": 0.5765
-      },
       "hv30": 7.94,
       "hv10": 5.71,
       "pct1m": -0.6991,
@@ -514,15 +453,6 @@
       "source": "yfinance",
       "pct1w": -0.5175,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.85167,
-      "session_low": 0.85167,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.85231,
-        "high": 0.85306,
-        "low": 0.85082,
-        "close": 0.85155
-      },
       "hv30": 3.03,
       "hv10": 3.02,
       "pct1m": -1.4898,
@@ -543,15 +473,6 @@
       "source": "yfinance",
       "pct1w": 0.0819,
       "pct1w_date": "2026-07-03",
-      "session_high": 184.554,
-      "session_low": 184.554,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 185.532,
-        "high": 185.679,
-        "low": 184.46,
-        "close": 184.495
-      },
       "hv30": 4.7,
       "hv10": 5.48,
       "pct1m": -0.052,
@@ -572,15 +493,6 @@
       "source": "yfinance",
       "pct1w": 0.4093,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.9224,
-      "session_low": 0.9224,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.92212,
-        "high": 0.92324,
-        "low": 0.91975,
-        "close": 0.9227
-      },
       "hv30": 3.26,
       "hv10": 2.41,
       "pct1m": 0.2489,
@@ -601,15 +513,6 @@
       "source": "yfinance",
       "pct1w": -0.3511,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.61525,
-      "session_low": 1.61502,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.6186,
-        "high": 1.6207,
-        "low": 1.61379,
-        "close": 1.61491
-      },
       "hv30": 3.71,
       "hv10": 3.83,
       "pct1m": 0.3829,
@@ -630,15 +533,6 @@
       "source": "yfinance",
       "pct1w": -0.6333,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.64114,
-      "session_low": 1.64114,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.64641,
-        "high": 1.64854,
-        "low": 1.64057,
-        "close": 1.64063
-      },
       "hv30": 4.75,
       "hv10": 4.38,
       "pct1m": 0.2125,
@@ -659,15 +553,6 @@
       "source": "yfinance",
       "pct1w": 0.6227,
       "pct1w_date": "2026-07-03",
-      "session_high": 216.688,
-      "session_low": 216.688,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 217.684,
-        "high": 217.8,
-        "low": 216.454,
-        "close": 216.575
-      },
       "hv30": 5.23,
       "hv10": 5.6,
       "pct1m": 1.458,
@@ -688,15 +573,6 @@
       "source": "yfinance",
       "pct1w": 0.9592,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.0831,
-      "session_low": 1.0831,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.08107,
-        "high": 1.08391,
-        "low": 1.0796,
-        "close": 1.08332
-      },
       "hv30": 3.74,
       "hv10": 2.73,
       "pct1m": 1.7836,
@@ -717,15 +593,6 @@
       "source": "yfinance",
       "pct1w": 0.2166,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.89685,
-      "session_low": 1.89658,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.89866,
-        "high": 1.90344,
-        "low": 1.89376,
-        "close": 1.89577
-      },
       "hv30": 4.0,
       "hv10": 4.11,
       "pct1m": 1.9212,
@@ -746,15 +613,6 @@
       "source": "yfinance",
       "pct1w": 0.6852,
       "pct1w_date": "2026-07-03",
-      "session_high": 112.417,
-      "session_low": 112.417,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 112.66,
-        "high": 112.752,
-        "low": 112.179,
-        "close": 112.357
-      },
       "hv30": 6.92,
       "hv10": 6.51,
       "pct1m": -0.2918,
@@ -775,15 +633,6 @@
       "source": "yfinance",
       "pct1w": -0.7136,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.20622,
-      "session_low": 1.20622,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.20488,
-        "high": 1.20655,
-        "low": 1.20101,
-        "close": 1.20538
-      },
       "hv30": 4.58,
       "hv10": 4.84,
       "pct1m": -0.5524,
@@ -804,15 +653,6 @@
       "source": "yfinance",
       "pct1w": 0.7018,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.56143,
-      "session_low": 0.5602,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.55958,
-        "high": 0.56231,
-        "low": 0.55822,
-        "close": 0.56209
-      },
       "hv30": 5.15,
       "hv10": 4.77,
       "pct1m": -0.258,
@@ -833,15 +673,6 @@
       "source": "yfinance",
       "pct1w": 0.3938,
       "pct1w_date": "2026-07-03",
-      "session_high": 114.214,
-      "session_low": 114.198,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 114.555,
-        "high": 114.633,
-        "low": 113.982,
-        "close": 114.194
-      },
       "hv30": 4.27,
       "hv10": 5.08,
       "pct1m": -0.4706,
@@ -862,15 +693,6 @@
       "source": "yfinance",
       "pct1w": -0.3513,
       "pct1w_date": "2026-07-03",
-      "session_high": 199.973,
-      "session_low": 199.973,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 201.208,
-        "high": 201.379,
-        "low": 199.913,
-        "close": 200.0
-      },
       "hv30": 4.86,
       "hv10": 4.61,
       "pct1m": -0.3408,
@@ -891,15 +713,6 @@
       "source": "yfinance",
       "pct1w": 1.3799,
       "pct1w_date": "2026-07-03",
-      "session_high": 93.158,
-      "session_low": 93.158,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 93.388,
-        "high": 93.572,
-        "low": 93.09,
-        "close": 93.182
-      },
       "hv30": 7.63,
       "hv10": 6.31,
       "pct1m": 0.2389,
@@ -920,15 +733,6 @@
       "source": "yfinance",
       "pct1w": -1.2953,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.98049,
-      "session_low": 1.98049,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.9854,
-        "high": 1.98851,
-        "low": 1.97762,
-        "close": 1.97954
-      },
       "hv30": 5.76,
       "hv10": 5.56,
       "pct1m": -0.2875,
@@ -949,15 +753,6 @@
       "source": "yfinance",
       "pct1w": -0.056,
       "pct1w_date": "2026-07-03",
-      "session_high": 1.92744,
-      "session_low": 1.92744,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 1.92983,
-        "high": 1.93378,
-        "low": 1.92458,
-        "close": 1.92588
-      },
       "hv30": 5.37,
       "hv10": 4.84,
       "pct1m": 1.7597,
@@ -978,15 +773,6 @@
       "source": "yfinance",
       "pct1w": -0.749,
       "pct1w_date": "2026-07-03",
-      "session_high": 2.32544,
-      "session_low": 2.32544,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 2.32875,
-        "high": 2.3308,
-        "low": 2.32152,
-        "close": 2.32413
-      },
       "hv30": 5.94,
       "hv10": 5.46,
       "pct1m": 1.2165,
@@ -1007,15 +793,6 @@
       "source": "yfinance",
       "pct1w": 0.1936,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.98323,
-      "session_low": 0.98309,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.98289,
-        "high": 0.98521,
-        "low": 0.9816,
-        "close": 0.98354
-      },
       "hv30": 5.75,
       "hv10": 4.19,
       "pct1m": 0.0886,
@@ -1036,15 +813,6 @@
       "source": "yfinance",
       "pct1w": 0.6563,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.57052,
-      "session_low": 0.57044,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.56896,
-        "high": 0.57155,
-        "low": 0.56733,
-        "close": 0.57096
-      },
       "hv30": 4.7,
       "hv10": 4.15,
       "pct1m": -0.2204,
@@ -1065,15 +833,6 @@
       "source": "yfinance",
       "pct1w": 0.9646,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.81538,
-      "session_low": 0.81526,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.81443,
-        "high": 0.81886,
-        "low": 0.81364,
-        "close": 0.81581
-      },
       "hv30": 6.21,
       "hv10": 5.48,
       "pct1m": 0.6853,
@@ -1094,15 +853,6 @@
       "source": "yfinance",
       "pct1w": 1.4176,
       "pct1w_date": "2026-07-03",
-      "session_high": 0.46562,
-      "session_low": 0.4643,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 0.46371,
-        "high": 0.4662,
-        "low": 0.46073,
-        "close": 0.46561
-      },
       "hv30": 5.01,
       "hv10": 4.86,
       "pct1m": 0.2767,
@@ -1123,15 +873,6 @@
       "source": "yfinance",
       "pct1w": -0.8397,
       "pct1w_date": "2026-07-03",
-      "session_high": 9.7703,
-      "session_low": 9.7703,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 9.72058,
-        "high": 9.7864,
-        "low": 9.67768,
-        "close": 9.77525
-      },
       "hv30": 9.07,
       "hv10": 6.88,
       "pct1m": 3.1694,
@@ -1152,15 +893,6 @@
       "source": "yfinance",
       "pct1w": -0.258,
       "pct1w_date": "2026-07-03",
-      "session_high": 9.6498,
-      "session_low": 9.6498,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 9.66181,
-        "high": 9.67141,
-        "low": 9.61815,
-        "close": 9.6546
-      },
       "hv30": 8.7,
       "hv10": 5.27,
       "pct1m": 2.3177,
@@ -1181,15 +913,6 @@
       "source": "yfinance",
       "pct1w": -0.8202,
       "pct1w_date": "2026-07-03",
-      "session_high": 11.16298,
-      "session_low": 11.16298,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 11.11174,
-        "high": 11.1716,
-        "low": 11.09017,
-        "close": 11.161
-      },
       "hv30": 6.27,
       "hv10": 5.82,
       "pct1m": 2.2401,
@@ -1210,15 +933,6 @@
       "source": "yfinance",
       "pct1w": -0.3198,
       "pct1w_date": "2026-07-03",
-      "session_high": 11.02775,
-      "session_low": 11.02488,
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 11.04329,
-        "high": 11.05315,
-        "low": 11.00469,
-        "close": 11.02794
-      },
       "hv30": 5.21,
       "hv10": 3.51,
       "pct1m": 1.331,
@@ -1238,14 +952,7 @@
       "market_time": 1783717186,
       "source": "yfinance",
       "pct1w": -0.7882,
-      "pct1w_date": "2026-07-02",
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 60.415,
-        "high": 61.195,
-        "low": 59.245,
-        "close": 60.165
-      }
+      "pct1w_date": "2026-07-02"
     },
     "brent": {
       "close": 76.01,
@@ -1261,14 +968,7 @@
       "market_time": 1783717174,
       "source": "yfinance",
       "pct1w": 5.8635,
-      "pct1w_date": "2026-07-02",
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 75.97,
-        "high": 77.56,
-        "low": 75.31,
-        "close": 76.01
-      }
+      "pct1w_date": "2026-07-02"
     },
     "dax": {
       "close": 25067.09,
@@ -1284,14 +984,7 @@
       "market_time": 1783699200,
       "source": "yfinance",
       "pct1w": -2.7628,
-      "pct1w_date": "2026-07-03",
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 25081.18945,
-        "high": 25195.83008,
-        "low": 24937.51953,
-        "close": 25083.5293
-      }
+      "pct1w_date": "2026-07-03"
     },
     "hsi": {
       "close": 24175.12,
@@ -1307,14 +1000,7 @@
       "market_time": 1783670944,
       "source": "yfinance",
       "pct1w": 3.5336,
-      "pct1w_date": "2026-07-03",
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 24213.43945,
-        "high": 24499.63086,
-        "low": 24064.61914,
-        "close": 24175.11914
-      }
+      "pct1w_date": "2026-07-03"
     },
     "dji": {
       "close": 52637.01,
@@ -1330,14 +1016,7 @@
       "market_time": 1783718915,
       "source": "yfinance",
       "pct1w": -0.4973,
-      "pct1w_date": "2026-07-02",
-      "prev_bar": {
-        "time": "2026-07-10",
-        "open": 52622.92188,
-        "high": 52709.75,
-        "low": 52266.80859,
-        "close": 52640.30859
-      }
+      "pct1w_date": "2026-07-02"
     }
   },
   "hv30": {
