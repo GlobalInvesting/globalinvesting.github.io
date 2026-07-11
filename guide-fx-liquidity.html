@@ -251,7 +251,7 @@ a { color: inherit; text-decoration: none; }
       "name": "When is the FX market most liquid?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "FX liquidity peaks during the London session (08:00–17:00 UTC) and reaches its daily maximum during the London-New York overlap (13:00–17:00 UTC). EUR/USD, GBP/USD, and USD/JPY see the tightest spreads and deepest order books during this window. The Sydney-Tokyo overlap (00:00–02:00 UTC) is the second most active period for JPY and AUD pairs. The quietest period is the New York-Tokyo gap (22:00–00:00 UTC)."
+        "text": "FX liquidity peaks during the London session (08:00–17:00 UTC) and reaches its daily maximum during the London-New York overlap (13:00–17:00 UTC). EUR/USD, GBP/USD, and USD/JPY see the tightest spreads and deepest order books during this window. Tokyo overlaps Sydney from 00:00–07:00 UTC, a period of elevated JPY and AUD activity as Asian institutional participants come online. The quietest period is the Tokyo-London gap (06:00–08:00 UTC), after Tokyo desks wind down and before London opens."
       }
     },
     {
@@ -407,7 +407,7 @@ a { color: inherit; text-decoration: none; }
       <h3 style="font-size:13px;font-weight:600;color:var(--text);margin:16px 0 8px;">How to read it</h3>
       <p>The chart is divided into two visual zones separated by a dashed orange vertical line marking the <strong>current UTC time</strong>:</p>
       <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;">
-        <li><strong style="color:#4f7fff;">Solid blue area (left of the line)</strong> — the past. Activity levels already observed today, scaled by a volatility scalar derived from the 30-day average daily H-L range for EUR/USD, GBP/USD, and USD/JPY (source: <code style="font-family:var(--font-mono);font-size:11px;">Delayed ~5min · H-L range proxy · 30d avg</code> when available). Higher volatility environments push the curve up; quieter markets pull it down.</li>
+        <li><strong style="color:#4f7fff;">Solid blue area (left of the line)</strong> — the past. Activity levels already observed today, scaled by a volatility scalar derived from the 30-day average daily H-L range across five pairs — EUR/USD, GBP/USD, USD/JPY, USD/CHF, and AUD/USD (source: <code style="font-family:var(--font-mono);font-size:11px;">H-L range proxy · 30d avg</code> when available). Higher volatility environments push the curve up; quieter markets pull it down.</li>
         <li><strong style="color:rgba(79,127,255,0.5);">Dashed blue line (right of the line)</strong> — the projected remainder of the day, based on historical session-overlap patterns. This is an estimate, not a live feed.</li>
         <li><strong style="color:#f6941c;">Orange dashed vertical line</strong> — the current UTC moment. Everything to its left has happened; everything to its right is projected.</li>
       </ul>
@@ -416,15 +416,14 @@ a { color: inherit; text-decoration: none; }
       <p>Hover anywhere on the canvas to see a tooltip showing the UTC time for that point, the active trading session(s) at that hour, and the relative activity level as a percentage of the day's peak — labeled Very High, High, Moderate, Low, or Very Low. Points in the projected future are marked <em>(est.)</em>.</p>
 
       <h3 style="font-size:13px;font-weight:600;color:var(--text);margin:16px 0 8px;">Data source &amp; refresh</h3>
-      <p>The liquidity chart scales its baseline curve using a volatility scalar derived from recent EUR/USD, GBP/USD, and USD/JPY daily ranges. Higher-volatility market environments push the curve up; quieter periods pull it down. The chart redraws every 60 seconds.</p>
-      <p>The terminal resolves the scalar through a three-tier fallback chain, and the active source is shown in the small label below the chart legend:</p>
+      <p>The liquidity chart scales its baseline curve using a volatility scalar derived from recent EUR/USD, GBP/USD, USD/JPY, USD/CHF, and AUD/USD daily ranges. Higher-volatility market environments push the curve up; quieter periods pull it down. The chart redraws every 60 seconds.</p>
+      <p>The terminal resolves the scalar through a three-tier fallback chain, though only two distinct labels ever appear below the chart legend — the two fallback tiers share the same on-screen label:</p>
       <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:2.0;margin-bottom:14px;">
-        <li><strong style="color:var(--text);">Delayed ~5min · H-L range proxy · 30d avg</strong> — primary source. A server-side cache file (<code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">fx-liquidity.json</code>) is updated hourly by the data pipeline, computing the 30-day average daily High-Low range for EUR/USD, GBP/USD, and USD/JPY. When this file is fresh and valid, the panel uses it directly — no browser-side API call needed.</li>
-        <li><strong style="color:var(--text);">ECB daily fallback</strong> — if <code style="font-family:var(--font-mono);font-size:11px;">fx-liquidity.json</code> is unavailable, the terminal derives a rougher volatility scalar from the ECB reference rate series (7-day EUR base), cached server-side for other panels. Less precise than the H-L proxy but still directionally useful.</li>
-        <li><strong style="color:var(--text);">Historical avg · fixed reference</strong> — if both upstream sources are unavailable, the chart falls back to a static session-overlap baseline with no volatility scaling. The curve shape remains accurate; only the amplitude scaling is lost. This label is also shown on initial page load before the data fetch completes.</li>
+        <li><strong style="color:var(--text);">H-L range proxy · 30d avg</strong> — primary source. A server-side cache file (<code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">fx-liquidity.json</code>) is updated hourly by the data pipeline, computing the 30-day average daily High-Low range across five pairs (EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD). When this file is fresh and valid, the panel uses it directly — no browser-side API call needed.</li>
+        <li><strong style="color:var(--text);">Historical avg · fixed reference</strong> — covers two distinct fallback cases that render the same label: if <code style="font-family:var(--font-mono);font-size:11px;">fx-liquidity.json</code> is unavailable, the terminal derives a rougher volatility scalar from the ECB reference rate series (cached server-side for other panels); if that is also unavailable, the chart falls back further to a static session-overlap baseline with no volatility scaling. Either way the curve shape remains accurate — only the amplitude scaling may be lost. This label is also shown on initial page load before the first data fetch completes.</li>
       </ul>
       <div class="callout">
-        <strong>Reading the source label:</strong> The small label below the chart legend (e.g. <code style="font-family:var(--font-mono);font-size:11px;">Delayed ~5min · H-L range proxy · 30d avg</code>) updates dynamically after each data fetch. If you see <code style="font-family:var(--font-mono);font-size:11px;">Historical avg · fixed reference</code> after the page has fully loaded, it means the live data pipeline is temporarily unavailable — the chart shape is still accurate, just not amplitude-scaled to current volatility.
+        <strong>Reading the source label:</strong> The small label below the chart legend (e.g. <code style="font-family:var(--font-mono);font-size:11px;">H-L range proxy · 30d avg</code>) updates dynamically after each data fetch. If you see <code style="font-family:var(--font-mono);font-size:11px;">Historical avg · fixed reference</code> after the page has fully loaded, it means the live data pipeline is temporarily unavailable — the chart shape is still accurate, just not amplitude-scaled to current volatility.
       </div>
       <p>On weekends (Saturday–Sunday UTC), the chart displays a flat baseline with a "MARKET CLOSED" label, since FX spot trading is inactive.</p>
     </div>
@@ -522,7 +521,7 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="vol-profile">
       <h2>Session Volatility Profile</h2>
-      <p>The <strong>Session Vol</strong> table within the Market Sessions panel shows historical average daily pip ranges for EUR/USD and USD/JPY across each session. These are long-run averages — individual sessions vary significantly based on news flow and market regime.</p>
+      <p>The <strong>Session Vol</strong> table within the Market Sessions panel shows an estimated pip range per session for EUR/USD and USD/JPY, computed live from each pair's current 30-day historical volatility (HV30) and split across sessions using empirical session/daily range ratios (5-year Myfxbook averages). The table refreshes with each intraday data update (roughly every 5 minutes) — it reflects the current volatility regime, not a fixed historical figure, so the numbers shift as HV30 moves.</p>
       <table aria-label="Session volatility profile" class="vol-table">
         <thead><tr><th scope="col">Session</th><th scope="col">EUR/USD Avg Range</th><th scope="col">USD/JPY Avg Range</th><th scope="col">Character</th></tr></thead>
         <tbody>
@@ -533,7 +532,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout">
-        <strong>Note:</strong> These are historical reference averages, not current ATR values. During high-impact events (FOMC, NFP, CPI), individual sessions can easily produce 3–5× these ranges. During holiday periods or low-conviction markets, sessions may produce less than half these averages.
+        <strong>Note:</strong> These figures move with the pair's current HV30 — they are a live volatility-regime estimate, not a fixed historical reference. The numbers above are one illustrative snapshot. During high-impact events (FOMC, NFP, CPI), individual sessions can easily produce 3–5× these ranges intraday even before HV30 itself has caught up. During holiday periods or low-conviction markets, expect noticeably smaller ranges.
       </div>
     </div>
 
