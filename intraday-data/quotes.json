@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-11T08:55:26Z",
+  "updated": "2026-07-11T09:00:37Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -1082,17 +1082,17 @@
     "nzdchf": {
       "close": 0.4646,
       "prev_close": 0.464,
-      "chg": 0.0006,
-      "pct": 0.1358,
+      "chg": 0.0007,
+      "pct": 0.1423,
       "high": 0.4652,
       "low": 0.462,
       "open": 0.4639,
       "bid": 0.4608,
       "ask": 0.46091,
       "market_state": "CLOSED",
-      "market_time": 1783664268,
+      "market_time": 1783664308,
       "source": "yfinance",
-      "pct1w": 1.4831,
+      "pct1w": 1.4897,
       "pct1w_date": "2026-07-03",
       "session_high": 0.46562,
       "session_low": 0.4643,
@@ -1167,19 +1167,19 @@
       "pct1m_date": "2026-06-09"
     },
     "eurnok": {
-      "close": 11.1653,
+      "close": 11.1616,
       "prev_close": 11.112,
-      "chg": 0.0533,
-      "pct": 0.4793,
+      "chg": 0.0496,
+      "pct": 0.446,
       "high": 11.1706,
       "low": 11.0902,
       "open": 11.1099,
       "bid": 11.1658,
       "ask": 11.1685,
       "market_state": "CLOSED",
-      "market_time": 1783692044,
+      "market_time": 1783692079,
       "source": "yfinance",
-      "pct1w": -0.7996,
+      "pct1w": -0.8325,
       "pct1w_date": "2026-07-03",
       "session_high": 11.16298,
       "session_low": 11.16298,
@@ -6922,7 +6922,13 @@
       "iv_pct_rank": null,
       "iv_hist_n": 1
     },
-    "gbpusd": null,
+    "gbpusd": {
+      "iv": 11.0,
+      "source": "CBOE ^BPVIX",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    },
     "usdjpy": {
       "iv": 7.2,
       "source": "CBOE ^JYVIX",
