@@ -162,6 +162,14 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Shape grid ── */
 .shape-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
+.scr-hero-wrap { margin: 18px 0 24px; }
+.scr-hero { cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
+.scr-hero:hover { border-color: var(--border2); }
+.scr-hero img { width: 100%; height: auto; display: block; }
+.scr-hero-contain { width: fit-content; max-width: 100%; margin: 0 auto; }
+.scr-hero-contain img { width: auto; max-width: 100%; height: auto; display: block; margin: 0; }
+.guide-section p.scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-top: 10px; padding: 0 2px; }
+.scr-meta strong { color: var(--text2); font-weight: 600; }
 .shape-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; transition: border-color .15s; }
 .shape-card:hover { border-color: var(--border2); }
 .shape-name { font-size: 12.1px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
@@ -179,7 +187,7 @@ a { color: inherit; text-decoration: none; }
 
 </style>
 <meta property="article:published_time" content="2026-02-05T00:00:00Z">
-<meta property="article:modified_time" content="2026-05-02T00:00:00Z">
+<meta property="article:modified_time" content="2026-07-11T00:00:00Z">
 <meta property="article:section" content="Guides">
 <script type="application/ld+json">
 {
@@ -189,7 +197,7 @@ a { color: inherit; text-decoration: none; }
   "description": "How central bank rate differentials, yield curve shape, and OIS-implied forward rates drive FX trends. How to use the CB Rates, CB Rate Expectations, and Yield Curve panels in the terminal.",
   "image": "https://globalinvesting.github.io/og-image.png",
   "datePublished": "2026-02-05T00:00:00Z",
-  "dateModified": "2026-05-02T00:00:00Z",
+  "dateModified": "2026-07-11T00:00:00Z",
   "author": {
     "@type": "Person",
     "name": "Santiago Plá Casuriaga",
@@ -330,99 +338,14 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="what-it-shows">
       <h2>What It Shows</h2>
-      <p>The Rates &amp; Yield Curve section of the terminal displays five US Treasury nominal yields (3-month T-Bill, 2-year Note, 5-year Note, 10-year Bond, 30-year Bond), a canvas-drawn yield curve connecting them, and a table of three key spreads: the 2Y–10Y domestic spread, the US–Germany 10Y differential, and the US–Japan 10Y differential.</p>
+      <p>The Rates &amp; Yield Curve section of the terminal covers five US Treasury nominal yields (3-month T-Bill, 2-year Note, 5-year Note, 10-year Bond, 30-year Bond). Four of them — 3M, 2Y, 5Y, and 10Y — are broken out as individual data cells above the chart; the 30Y is not a separate cell in this compact view but is plotted as the final point on the curve chart itself, and all five are broken out together in the detail view (see <a href="#market-commentary">Detail View &amp; Market Commentary</a> below). Below the cells and chart sits a table of three key spreads: the 2Y–10Y domestic spread, the US–Germany 10Y differential, and the US–Japan 10Y differential.</p>
       <p>The 3M, 5Y, 10Y, and 30Y tenors update approximately every 5 minutes during US market hours via live yield tickers. The 2Y tenor is always sourced from FRED's daily DGS2 series — it only changes once per day, even though the panel subtitle labels it "Live" alongside the other four. Outside market hours, or when the intraday feed is unavailable, the 10Y, 2Y, and 5Y tenors fall back to FRED's daily batch values (DGS10, DGS2, DGS5); the 3M and 30Y tenors have no repo fallback and show a dash if the intraday feed fails. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
 
-      <!-- MOCK: Full-width Rates & Yield Curve panel (mirrors index) -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:20px;">
-        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">Rates &amp; Yield Curve — US Treasuries</span>
-          <span style="font-size:9.5px;color:var(--text3);">Nominal yields · delayed ~5min</span>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-rates-yield-curve.png" alt="Rates & Yield Curve panel, US tab, showing the 3M/2Y/5Y/10Y rate cells, the yield curve chart with all five tenors plotted, and the 2Y-10Y, US-DE, and US-JP spread table" width="634" height="389" loading="lazy">
         </div>
-        <!-- 5 tenor cells -->
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border);">
-          <div style="padding:10px 10px;border-right:1px solid var(--border);">
-            <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">3M T-Bill</div>
-            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.29%</div>
-            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.01</div>
-          </div>
-          <div style="padding:10px 10px;border-right:1px solid var(--border);">
-            <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">2Y Note</div>
-            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">3.79%</div>
-            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.03</div>
-          </div>
-          <div style="padding:10px 10px;border-right:1px solid var(--border);">
-            <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">5Y Note</div>
-            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.02%</div>
-            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.02</div>
-          </div>
-          <div style="padding:10px 10px;border-right:1px solid var(--border);">
-            <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">10Y Bond</div>
-            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.31%</div>
-            <div style="font-size:10px;color:var(--up);margin-top:2px;">+0.02</div>
-          </div>
-          <div style="padding:10px 10px;">
-            <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">30Y Bond</div>
-            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.58%</div>
-            <div style="font-size:10px;color:var(--up);margin-top:2px;">+0.03</div>
-          </div>
-        </div>
-        <!-- Yield curve canvas area — 5 tenors: 3M, 2Y, 5Y, 10Y, 30Y -->
-        <div style="padding:8px 12px;border-bottom:1px solid var(--border);">
-          <svg viewBox="0 0 700 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
-            <defs>
-              <linearGradient id="yc-grad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#4f7fff" stop-opacity="0.18"/>
-                <stop offset="100%" stop-color="#4f7fff" stop-opacity="0.02"/>
-              </linearGradient>
-            </defs>
-            <!-- 3M=4.29→y=15, 2Y=3.79→y=51, 5Y=4.02→y=35, 10Y=4.31→y=13, 30Y=4.58→y=0 -->
-            <path d="M 60,15 C 120,55 260,38 435,13 L 630,0 L 630,88 L 60,88 Z" fill="url(#yc-grad)"/>
-            <path d="M 60,15 C 120,55 260,38 435,13 L 630,0" fill="none" stroke="#4f7fff" stroke-width="2"/>
-            <circle cx="60"  cy="15" r="3.5" fill="#4f7fff"/>
-            <circle cx="192" cy="51" r="3.5" fill="#4f7fff"/>
-            <circle cx="324" cy="35" r="3.5" fill="#4f7fff"/>
-            <circle cx="456" cy="13" r="3.5" fill="#4f7fff"/>
-            <circle cx="630" cy="0"  r="3.5" fill="#4f7fff"/>
-            <text x="60"  y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">3M</text>
-            <text x="192" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">2Y</text>
-            <text x="324" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">5Y</text>
-            <text x="456" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">10Y</text>
-            <text x="630" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">30Y</text>
-            <text x="4" y="18" fill="#787b86" font-size="8.5" font-family="monospace">4.30%</text>
-            <text x="4" y="38" fill="#787b86" font-size="8.5" font-family="monospace">4.00%</text>
-            <text x="4" y="58" fill="#787b86" font-size="8.5" font-family="monospace">3.80%</text>
-          </svg>
-        </div>
-        <!-- Spreads table — signal labels match production output -->
-        <div style="padding:4px 12px 10px;">
-          <table aria-label="US yield spreads" style="width:100%;border-collapse:collapse;font-size:11.5px;">
-            <thead>
-              <tr style="border-bottom:1px solid var(--border2);">
-                <th scope="col" style="text-align:left;padding:5px 0;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;">Spread</th>
-                <th scope="col" style="text-align:center;padding:5px 0;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;">Value</th>
-                <th scope="col" style="text-align:right;padding:5px 0;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;">Signal</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:6px 0;color:var(--text2);">2Y–10Y</td>
-                <td style="text-align:center;color:var(--up);font-family:var(--font-mono);padding:6px 0;">+52bp</td>
-                <td style="text-align:right;color:var(--up);font-size:10px;padding:6px 0;">Normal</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:6px 0;color:var(--text2);">US–DE 10Y</td>
-                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+131bp</td>
-                <td style="text-align:right;font-size:10px;padding:6px 0;">US Premium</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 0;color:var(--text2);">US–JP 10Y</td>
-                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+199bp</td>
-                <td style="text-align:right;font-size:10px;padding:6px 0;">US Premium</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <p class="scr-meta"><strong>The Rates &amp; Yield Curve panel, US tab.</strong> Four rate cells (3M, 2Y, 5Y, 10Y), a curve chart plotting all five tenors including 30Y, and the fixed spread table below.</p>
       </div>
     </div>
 
@@ -528,6 +451,12 @@ a { color: inherit; text-decoration: none; }
       <div class="callout">
         <strong>Two different things called "spreads."</strong> The US pane's own spread table (2Y–10Y, US–DE, US–JP) is fixed and always visible without switching tabs — it covers the two most-watched relationships by default. The <strong>Spreads</strong> tab is a separate, broader view covering all eight non-US economies at once. Use the US pane's table for a quick read on EUR/USD and USD/JPY specifically; use the Spreads tab to scan the full G10 set, including NOK and SEK.
       </div>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-rates-spreads.png" alt="Rates & Yield Curve panel, Spreads tab, showing sovereign 10Y spreads versus the US for DE, GB, JP, AU, CA, NZ, NO, and SE alongside 2Y yields and a curve-slope indicator" width="700" height="339" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The Spreads tab.</strong> All eight non-US G10 economies at once — 10Y yield, spread versus the US 10Y in basis points, 2Y yield where available, and curve-slope indicator.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="market-commentary">
@@ -536,6 +465,12 @@ a { color: inherit; text-decoration: none; }
       <p>Articles are pulled from the terminal's news pipeline and filtered by topic — Treasury yield, yield curve, and tenor-specific terminology (10-year, 2-year, 30-year, T-Bill) — rather than by currency tag, since a generic "USD" filter would also surface unrelated USD headlines (payrolls, CPI, Fed speeches with no bearing on the curve itself). Each entry shows the source, a relative timestamp, the headline (linked to the original article), and a short excerpt. If no qualifying article exists in the current news window, the panel shows an empty state rather than an unrelated headline.</p>
       <div class="callout">
         <strong>Data source:</strong> Market Commentary draws from the same institutional RSS pipeline as the rest of the terminal's News Feed — sourced from outlets with dedicated bond and Treasury coverage. The block refreshes whenever the detail view is reopened; it does not poll while the view is closed.
+      </div>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-yield-curve-modal.png" alt="US Treasury Yield Curve detail view, showing the 10Y-2Y and 30Y-2Y spread callouts, a larger curve chart with today vs prior close, the full five-tenor table with change in basis points, and the Market Commentary block" width="656" height="838" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The detail view, opened by clicking the panel.</strong> 10Y–2Y and 30Y–2Y spread callouts, a larger today-vs-prior-close chart, the full five-tenor table, and Market Commentary below it.</p>
       </div>
     </div>
 
