@@ -1,5 +1,5 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.1.0
+ * GlobalInvesting FX Terminal — License Auth Module  v1.1.1
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
  *
  * Flow:
@@ -9,7 +9,9 @@
  *   4. Store JWT; remove gate overlays; expose window.GI_AUTH
  *   5. Once active, ping the Worker's /session/ping every 3 minutes so the
  *      license backend can track which activated accounts currently have
- *      the terminal open (best-effort — a failed ping never blocks the UI)
+ *      the terminal open (best-effort — a failed ping never blocks the UI).
+ *      Each ping carries X-Session-Id (see getOrCreateSessionId()) so two
+ *      devices sharing one token don't overwrite each other's presence row.
  *
  * Premium sections gated (real index.html IDs):
  *   section-positioning   — CFTC COT
