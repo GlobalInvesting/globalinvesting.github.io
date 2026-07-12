@@ -291,6 +291,15 @@ a { color: inherit; text-decoration: none; }
 .callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
 .callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
 
+.scr-hero-wrap { margin: 18px 0 24px; }
+.scr-hero { cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
+.scr-hero:hover { border-color: var(--border2); }
+.scr-hero img { width: 100%; height: auto; display: block; }
+.scr-hero-contain { width: fit-content; max-width: 100%; margin: 0 auto; }
+.scr-hero-contain img { width: auto; max-width: 100%; height: auto; display: block; margin: 0; }
+.guide-section p.scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-top: 10px; padding: 0 2px; }
+.scr-meta strong { color: var(--text2); font-weight: 600; }
+
 .data-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
 .data-table thead { background: var(--head-bg); }
 .data-table th { text-align: left; font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
@@ -379,6 +388,7 @@ a { color: inherit; text-decoration: none; }
       <a class="toc-item" href="#rate-differential">Rate Differential</a>
       <a class="toc-item" href="#risk-regime">Risk Regime</a>
       <a class="toc-item" href="#retail-sentiment">Retail Sentiment</a>
+      <a class="toc-item" href="#terminal-view">Terminal View</a>
       <a class="toc-item" href="#combining">Multi-Factor Framework</a>
       <a class="toc-item" href="#change-factors">What Changes Bias</a>
       <a class="toc-item" href="#asian-session">Asian Session Range</a>
@@ -614,6 +624,17 @@ a { color: inherit; text-decoration: none; }
       </table>
       <p>Average entry price is a secondary signal: if retail is net long with an average entry significantly above the current price, those positions are in loss — increasing the probability of a stop-loss cascade on the downside. If retail is net long with an average entry below current price, those positions are in profit and more likely to be closed into strength rather than force a panic flush.</p>
       <p style="margin-top:14px;font-size:13.5px;"><a href="/" style="color:var(--blue);font-weight:500;">→ See current GBP/JPY retail long/short ratio in the Retail FX Positioning panel</a></p>
+    </div>
+
+    <div class="guide-section" id="terminal-view">
+      <h2>Seeing It Together in the Terminal</h2>
+      <p>The screenshot below is a single Crosses + Pair Detail view for GBP/JPY, cropped from the live terminal. It shows most of the factors this guide covers side by side — GBP and JPY COT positioning, the carry and rate differential, volatility, and the retail long/short split — next to the D1 price chart for the same pair.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-gbpjpy-terminal.png" alt="GBP/JPY Crosses and Pair Detail panel in the terminal, showing price change, carry, ADR, GBP rate, volatility, GBP and JPY COT positioning, retail long/short split, and the D1 candlestick chart" width="896" height="375" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>GBP/JPY, cross-referenced in one view.</strong> Crosses panel with COT, carry, and retail sentiment alongside the D1 chart — the same terminal view used throughout this guide, cropped to the GBP/JPY row.</p>
+      </div>
     </div>
 
     <div class="guide-section" id="combining">
