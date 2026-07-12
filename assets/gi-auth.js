@@ -1,5 +1,5 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.0.1
+ * GlobalInvesting FX Terminal — License Auth Module  v1.1.0
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
  *
  * Flow:
@@ -7,6 +7,9 @@
  *   2. If none, show activation modal after panels have rendered (~400ms)
  *   3. POST key+account+server to the Cloudflare Worker → receive JWT
  *   4. Store JWT; remove gate overlays; expose window.GI_AUTH
+ *   5. Once active, ping the Worker's /session/ping every 3 minutes so the
+ *      license backend can track which activated accounts currently have
+ *      the terminal open (best-effort — a failed ping never blocks the UI)
  *
  * Premium sections gated (real index.html IDs):
  *   section-positioning   — CFTC COT
@@ -25,6 +28,11 @@
   const WORKER_URL = 'https://gi-license-worker.globalinvestingmarkets.workers.dev';
   const JWT_KEY    = 'gi_license_token';
   const MODAL_ID   = 'gi-auth-modal';
+
+  // Periodic presence ping — lets the license worker track which activated
+  // accounts currently have the terminal open (best-effort, silent on failure).
+  const SESSION_PING_INTERVAL_MS = 3 * 60 * 1000; // 3 minutes
+  let sessionPingTimer = null;
 
   const PREMIUM_SECTIONS = [
     'section-positioning',       // CFTC COT
@@ -296,6 +304,22 @@
     return Math.floor((p.exp - Math.floor(Date.now() / 1000)) / 86400);
   }
 
+  // ── Presence ping ──────────────────────────────────────────────────────────
+  function pingSession(token) {
+    if (!token) return;
+    fetch(`${WORKER_URL}/session/ping`, {
+      method:  'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+    }).catch(() => {}); // best-effort — must never disrupt the terminal
+  }
+
+  function startSessionPing(token) {
+    if (!token) return;
+    if (sessionPingTimer) clearInterval(sessionPingTimer);
+    pingSession(token);
+    sessionPingTimer = setInterval(() => pingSession(loadToken()), SESSION_PING_INTERVAL_MS);
+  }
+
   function saveToken(t) {
     try { sessionStorage.setItem(JWT_KEY, t); } catch {}
     try { localStorage.setItem(JWT_KEY, t); }   catch {}
@@ -352,6 +376,7 @@
       if (res.ok && data.token) {
         saveToken(data.token);
         window.GI_AUTH.isActive = true;
+        startSessionPing(data.token);
         okEl.textContent = 'Activated. Loading terminal\u2026';
         setTimeout(() => { hideModal(); unlockPremiumPanels(); }, 900);
       } else {
@@ -447,6 +472,7 @@
     const token = loadToken();
     if (isJWTValid(token)) {
       window.GI_AUTH.isActive = true;
+      startSessionPing(token);
       // Show renewal banner if fewer than 7 days remain
       const daysLeft = jwtDaysRemaining(token);
       if (daysLeft < 7) {
