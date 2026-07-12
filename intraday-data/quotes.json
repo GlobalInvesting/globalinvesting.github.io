@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-12T10:30:38Z",
+  "updated": "2026-07-12T10:35:35Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,13 +35,13 @@
       "pct1w_date": "2026-07-02"
     },
     "gold": {
-      "close": 4111.5369,
+      "close": 4111.5273,
       "prev_close": 4111.5324,
-      "chg": 0.0045,
-      "pct": 0.0001,
+      "chg": -0.0051,
+      "pct": -0.0001,
       "source": "twelve_data",
       "high": 4144.6,
-      "low": 4093.7,
+      "low": 4081.7,
       "open": 4135.4,
       "market_state": "REGULAR",
       "market_time": 1783717197
@@ -83,7 +83,7 @@
       "prev_close": 67743.85,
       "chg": 813.88,
       "pct": 1.2014,
-      "high": 69184.55,
+      "high": 69374.86,
       "low": 68271.91,
       "open": 68526.72,
       "bid": null,
@@ -199,35 +199,35 @@
       "pct1w_date": "2026-07-02"
     },
     "btc": {
-      "close": 63838.29,
+      "close": 63866.44,
       "prev_close": 63777.508,
-      "chg": 60.782,
-      "pct": 0.0953,
+      "chg": 88.932,
+      "pct": 0.1394,
       "high": 64171.848,
       "low": 63630.297,
       "open": 63777.508,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783852241,
+      "market_time": 1783852537,
       "source": "yfinance",
-      "pct1w": 2.0691,
+      "pct1w": 2.1141,
       "pct1w_date": "2026-07-03"
     },
     "eth": {
-      "close": 1799.53,
+      "close": 1800.6,
       "prev_close": 1786.8636,
-      "chg": 12.6664,
-      "pct": 0.7089,
+      "chg": 13.7364,
+      "pct": 0.7687,
       "high": 1811.3861,
       "low": 1782.5044,
       "open": 1786.8636,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783852230,
+      "market_time": 1783852539,
       "source": "yfinance",
-      "pct1w": 2.4487,
+      "pct1w": 2.5096,
       "pct1w_date": "2026-07-03"
     },
     "nasdaq": {
@@ -720,7 +720,7 @@
       "chg": -0.0041,
       "pct": -0.2091,
       "high": 1.9865,
-      "low": 1.98,
+      "low": 1.9776,
       "open": 1.985,
       "bid": 1.98049,
       "ask": 1.98149,
@@ -987,8 +987,8 @@
       "prev_close": 24030.18,
       "chg": 144.94,
       "pct": 0.6032,
-      "high": 24353.76,
-      "low": 23917.32,
+      "high": 24499.63,
+      "low": 24064.62,
       "open": 24213.44,
       "bid": null,
       "ask": null,
@@ -6588,10 +6588,8 @@
       "iv_hist_n": 1
     },
     "gbpusd": {
-      "iv": 9.2,
-      "expiry": "2026-07-17",
-      "atm": 129.0,
-      "source": "FXB options",
+      "iv": 11.0,
+      "source": "CBOE ^BPVIX",
       "iv_rank": null,
       "iv_pct_rank": null,
       "iv_hist_n": 1
