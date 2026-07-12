@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://globalinvesting.github.io/</loc>
     <lastmod>2026-07-12</lastmod>
@@ -17,6 +17,20 @@
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guide-csi-indicator.html</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-csi-web-terminal.png</image:loc>
+      <image:caption>Currency Strength Index tab inside the web terminal's Currency Strength Heatmap modal</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-csi.png</image:loc>
+      <image:caption>CSI Currency Strength indicator panel overlay on a MetaTrader 5 chart</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://globalinvesting.github.io/access.html</loc>
