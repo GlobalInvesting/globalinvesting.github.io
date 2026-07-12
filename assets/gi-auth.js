@@ -27,6 +27,7 @@
   // Update after: wrangler deploy  →  copy the workers.dev URL here
   const WORKER_URL = 'https://gi-license-worker.globalinvestingmarkets.workers.dev';
   const JWT_KEY    = 'gi_license_token';
+  const SESSION_ID_KEY = 'gi_session_id'; // per-browser device id — see getOrCreateSessionId()
   const MODAL_ID   = 'gi-auth-modal';
 
   // Periodic presence ping — lets the license worker track which activated
@@ -305,11 +306,41 @@
   }
 
   // ── Presence ping ──────────────────────────────────────────────────────────
+  // getOrCreateSessionId() — one random id per browser/device, persisted in
+  // localStorage. This is what lets the admin dashboard tell apart two
+  // different browsers using the *same* JWT (e.g. an admin testing a
+  // founder/promo grant link, then handing it to the real recipient) —
+  // without it, both pings collapse into one active_sessions row and each
+  // overwrites the other's IP/location. It is NOT a fingerprint or tracking
+  // id in the analytics sense — it's just a random UUID, generated locally,
+  // used only to avoid two devices being mistaken for one on this admin view.
+  function getOrCreateSessionId() {
+    try {
+      let id = localStorage.getItem(SESSION_ID_KEY);
+      if (id) return id;
+      id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : randomIdFallback();
+      localStorage.setItem(SESSION_ID_KEY, id);
+      return id;
+    } catch {
+      // localStorage unavailable (private mode, etc.) — fall back to an
+      // in-memory id that's stable for this page load only.
+      if (!getOrCreateSessionId._mem) getOrCreateSessionId._mem = randomIdFallback();
+      return getOrCreateSessionId._mem;
+    }
+  }
+
+  function randomIdFallback() {
+    return 'sess-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+  }
+
   function pingSession(token) {
     if (!token) return;
     fetch(`${WORKER_URL}/session/ping`, {
       method:  'POST',
-      headers: { 'Authorization': `Bearer ${token}` },
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'X-Session-Id':  getOrCreateSessionId(),
+      },
     }).catch(() => {}); // best-effort — must never disrupt the terminal
   }
 
