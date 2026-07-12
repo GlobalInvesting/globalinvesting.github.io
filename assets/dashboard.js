@@ -11288,7 +11288,7 @@ async function renderEconSurprises() {
         const t = new Date(ev.dateISO).getTime();
         return !isNaN(t) && nowMs - t <= LOOKBACK_MS && ev.released;
       });
-      if (hasReleased) { calEvents = evts; calSource = calj.source || 'investing.com'; }
+      if (hasReleased) { calEvents = evts; calSource = calj.source || ''; }
       // Store surprise stats for z-score scoring (populated by engine v3.1+)
       window._ECON_SURPRISE_STATS = calj.surpriseStats || {};
     }
@@ -11312,7 +11312,7 @@ async function renderEconSurprises() {
           const t = new Date(ev.dateISO).getTime();
           return !isNaN(t) && nowMs - t <= win21 && ev.released && ev.actual != null;
         });
-        if (hasReleased) { calEvents = evts; calSource = 'ForexFactory'; }
+        if (hasReleased) { calEvents = evts; calSource = ffj.source || 'ForexFactory'; }
       }
     } catch { /* no fallback */ }
   }
@@ -11518,19 +11518,9 @@ async function renderEconSurprises() {
     const srcEl = document.getElementById('econ-surprise-source');
     if (!srcEl) return;
     const windowSuffix = widenedCcys.size > 0 ? '90d/180d rolling' : '90d rolling';
-    if (calSource === 'Finnhub' || calSource.startsWith('Finnhub')) {
-      srcEl.textContent = `Economic calendar · actual vs consensus · G10 · ${windowSuffix}`;
-    } else if (calSource.startsWith('investing.com') || calSource.startsWith('TradingEconomics')) {
-      srcEl.textContent = `investing.com · actual vs consensus · ${windowSuffix}`;
-    } else if (calSource === 'ForexFactory') {
-      srcEl.textContent = `ForexFactory · actual vs consensus · ${windowSuffix}`;
-    } else if (calSource && calSource.includes('ForexFactory')) {
-      srcEl.textContent = `FRED + ForexFactory · actual vs consensus · G10 · ${windowSuffix}`;
-    } else if (calSource) {
-      srcEl.textContent = `${calSource} · actual vs consensus · ${windowSuffix}`;
-    } else {
-      srcEl.textContent = 'Calendar data unavailable';
-    }
+    srcEl.textContent = calSource
+      ? `${calSource} · actual vs consensus · ${windowSuffix}`
+      : 'Calendar data unavailable';
   })();
 
   // ── Keyboard activation for clickable rows (Enter / Space) ──────────────
