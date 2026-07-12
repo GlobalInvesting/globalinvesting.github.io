@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-12T14:20:33Z",
+  "updated": "2026-07-12T14:25:24Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,10 +35,10 @@
       "pct1w_date": "2026-07-02"
     },
     "gold": {
-      "close": 4111.497,
+      "close": 4111.532,
       "prev_close": 4111.5324,
-      "chg": -0.0354,
-      "pct": -0.0009,
+      "chg": -0.0004,
+      "pct": -0.0,
       "source": "twelve_data",
       "high": 4144.6,
       "low": 4093.7,
@@ -199,35 +199,35 @@
       "pct1w_date": "2026-07-02"
     },
     "btc": {
-      "close": 63946.44,
+      "close": 63958.21,
       "prev_close": 63777.508,
-      "chg": 168.932,
-      "pct": 0.2649,
+      "chg": 180.702,
+      "pct": 0.2833,
       "high": 64171.848,
       "low": 63630.297,
       "open": 63777.508,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783866034,
+      "market_time": 1783866324,
       "source": "yfinance",
-      "pct1w": 2.242,
+      "pct1w": 2.2608,
       "pct1w_date": "2026-07-03"
     },
     "eth": {
-      "close": 1804.22,
+      "close": 1804.58,
       "prev_close": 1786.8636,
-      "chg": 17.3564,
-      "pct": 0.9713,
+      "chg": 17.7164,
+      "pct": 0.9915,
       "high": 1811.3861,
       "low": 1782.5044,
       "open": 1786.8636,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1783866033,
+      "market_time": 1783866320,
       "source": "yfinance",
-      "pct1w": 2.7157,
+      "pct1w": 2.7362,
       "pct1w_date": "2026-07-03"
     },
     "nasdaq": {
@@ -296,16 +296,16 @@
     },
     "eurusd": {
       "close": 1.1419,
-      "prev_close": 1.1422,
-      "chg": -0.0003,
-      "pct": -0.0228,
+      "prev_close": 1.1434,
+      "chg": -0.0014,
+      "pct": -0.1256,
       "high": 1.1464,
       "low": 1.1416,
       "open": 1.1435,
-      "bid": null,
-      "ask": null,
-      "market_state": null,
-      "market_time": null,
+      "bid": 1.14129,
+      "ask": 1.14194,
+      "market_state": "CLOSED",
+      "market_time": 1783718947,
       "source": "yfinance",
       "pct1w": -0.0285,
       "pct1w_date": "2026-07-03",
@@ -6581,10 +6581,8 @@
   ],
   "fx_etf_iv": {
     "eurusd": {
-      "iv": 18.5,
-      "expiry": "2026-07-17",
-      "atm": 105.0,
-      "source": "FXE options",
+      "iv": 7.1,
+      "source": "CBOE ^EUVIX",
       "iv_rank": null,
       "iv_pct_rank": null,
       "iv_hist_n": 1
