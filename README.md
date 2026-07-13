@@ -10,7 +10,7 @@ Professional-grade foreign exchange intelligence for active traders and macro an
 
 ## Platform Access
 
-Access to the Global Investing FX Terminal is granted through the **MT5 Expert Advisor**, available for rent on the MQL5 Marketplace. A single subscription unlocks both the native MT5 overlay and the full web terminal.
+Access to the Global Investing FX Terminal is granted through one of two independent paths: the **MT5 Expert Advisor**, available for rent on the MQL5 Marketplace, or a verified live trading account opened through a partner broker. Either path unlocks full web terminal access on its own — no need to combine them. The EA additionally runs the native MT5 chart overlay; the partner-broker path does not require MT5 at all.
 
 | Product | Platform | Link |
 |---|---|---|
@@ -19,7 +19,7 @@ Access to the Global Investing FX Terminal is granted through the **MT5 Expert A
 | CSI Currency Strength | MetaTrader 5 | [MQL5 Market →](https://www.mql5.com/en/market/product/180317) |
 | Carry Trade Monitor | MetaTrader 5 | [MQL5 Market →](https://www.mql5.com/en/market/product/180322) |
 
-The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — live broker swap rates, MT5 push alerts, and the full macro intelligence suite without leaving your trading platform. The companion web terminal covers the complete analytical suite from any browser.
+The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — live broker swap rates, MT5 push alerts, and the full macro intelligence suite without leaving your trading platform. The companion web terminal covers the complete analytical suite from any browser. See [Pricing & Access](https://globalinvesting.github.io/access.html) for details on both paths.
 
 ---
 
