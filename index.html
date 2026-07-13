@@ -3,15 +3,14 @@
 <head>
 <!-- Google Analytics — consent-first (GDPR/ePrivacy compliant)
      analytics_storage defaults to 'denied'; gdpr.js upgrades to 'granted' on accept.
-     gtag.js loads immediately so the library is ready, but no data is sent until consent. -->
+     gtag.js loads immediately so the library is ready, but no data is sent until consent.
+     No ad_storage/ad_user_data/ad_personalization signals — the Terminal does not use
+     Google AdSense or any ad-serving network (removed in v8.53.2). -->
 <script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('consent', 'default', {
   analytics_storage: 'denied',
-  ad_storage: 'denied',
-  ad_user_data: 'denied',
-  ad_personalization: 'denied',
   wait_for_update: 500
 });
 </script>
@@ -40,10 +39,9 @@ gtag('consent', 'default', {
 <link rel="sitemap" type="application/xml" href="https://globalinvesting.github.io/sitemap.xml">
 
 <!-- ═══════════════════════════════════════
-     Google Verification & AdSense account
+     Google Search Console verification
      ═══════════════════════════════════════ -->
 <meta name="google-site-verification" content="FaJrk8fMNmvhnE6pImDpOW08No9C7fbGzOGX5zJhJ7M">
-<meta name="google-adsense-account" content="ca-pub-7977942731354565">
 
 <!-- ═══════════════════════════════════════
      Open Graph
@@ -512,7 +510,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" aria-describedby="gdpr-desc" hidden>
   <p>
     <strong id="gdpr-title">Cookies &amp; Privacy</strong><br>
-    <span id="gdpr-desc">We use first- and third-party cookies (Google AdSense) to display relevant advertising.
+    <span id="gdpr-desc">We use first-party cookies for analytics to understand how the Terminal is used.
     You can accept all cookies or reject non-essential ones.
     See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms of Use</a>.</span>
   </p>
