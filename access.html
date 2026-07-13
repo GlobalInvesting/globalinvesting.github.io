@@ -220,6 +220,9 @@ a { color: inherit; text-decoration: none; }
 .check { color: var(--up); font-family: var(--font-mono); font-size: 11px; }
 .dash { color: var(--text3); font-family: var(--font-mono); }
 .table-note { font-family: var(--font-mono); font-size: 10px; color: var(--text3); letter-spacing: .03em; margin-top: 12px; }
+.qa-box { margin-top: 24px; padding: 18px 22px; background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; }
+.qa-box .qa-q { font-size: 14px; font-weight: 600; color: #e8edf8; margin-bottom: 6px; }
+.qa-box .qa-a { font-size: 13.5px; color: var(--text2); line-height: 1.8; }
 
 /* TWO-PLATFORM SPLIT */
 .platform-split { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 28px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
@@ -918,7 +921,10 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
     </div>
-    <p class="table-note" style="font-family:var(--font-ui); font-size:13px; letter-spacing:normal; color:var(--text2); margin-top:20px; max-width:640px;"><strong style="color:var(--text);">Do I need to buy the EA to use the web terminal?</strong><br>No. The MT5 Expert Advisor and the TMGM verified-account path are independent — either one unlocks full access to the web terminal on its own. The EA additionally runs the native MT5 chart overlay; the TMGM path does not require MT5 at all.</p>
+    <div class="qa-box">
+      <div class="qa-q">Do I need to buy the EA to use the web terminal?</div>
+      <div class="qa-a">No. The MT5 Expert Advisor and the TMGM verified-account path are independent — either one unlocks full access to the web terminal on its own. The EA additionally runs the native MT5 chart overlay; the TMGM path does not require MT5 at all.</div>
+    </div>
   </section>
 
   <!-- ACTIVATION -->
