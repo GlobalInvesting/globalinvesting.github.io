@@ -8,6 +8,16 @@
 #   - Las cabeceras van indentadas debajo, como "  Nombre: valor"
 #   - Los comentarios solo pueden ser líneas que empiezan con #
 #   - /* */ NO es sintaxis de comentario — es un path glob (coincide con todo)
+#
+# ⚠ INERTE EN PRODUCCIÓN (confirmado en auditoría SEO, 2026-07-12): el sitio
+# se despliega exclusivamente vía .github/workflows/deploy-pages.yml
+# (actions/deploy-pages, GitHub Pages puro, sin CNAME). GitHub Pages NO lee
+# este archivo — ninguna cabecera (CSP, X-Robots-Tag, Cache-Control) de aquí
+# abajo se aplica hoy. En particular, /guia-cot.html, /en.html,
+# /tecnico-vs-fundamental.html y /news.html ya no existen como archivos
+# (404 real) — los bloques X-Robots-Tag: noindex de más abajo para esas
+# rutas son inofensivos pero no están activos. Ver GUIDELINES.md §
+# "Hosting & deployment".
 # ─────────────────────────────────────────────────────────────────────────────
 
 /*

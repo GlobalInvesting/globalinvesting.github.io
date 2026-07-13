@@ -1,6 +1,14 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # netlify.toml — Configuración de despliegue para Netlify
 # Alternativa: Si se usa Cloudflare Pages, las cabeceras se definen en _headers
+#
+# ⚠ INERTE EN PRODUCCIÓN (confirmado en auditoría SEO, 2026-07-12): el sitio
+# se despliega exclusivamente vía .github/workflows/deploy-pages.yml
+# (actions/deploy-pages, GitHub Pages puro sobre globalinvesting.github.io,
+# sin CNAME). GitHub Pages NO lee este archivo — ningún redirect, header o
+# regla de CSP de aquí abajo se aplica hoy. Se conserva por si el proyecto
+# migra alguna vez a Netlify/Cloudflare Pages, pero no debe asumirse como
+# protección activa. Ver GUIDELINES.md § "Hosting & deployment".
 # ─────────────────────────────────────────────────────────────────────────────
 
 [build]
