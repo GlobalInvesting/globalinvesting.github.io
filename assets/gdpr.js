@@ -1,29 +1,6 @@
 (function() {
   'use strict';
   var CONSENT_KEY = 'gdpr_consent_v2';
-  var ADSENSE_CLIENT = 'ca-pub-7977942731354565';
-
-  function loadAdSense() {
-    if (document.getElementById('adsense-script')) return;
-    var s = document.createElement('script');
-    s.id = 'adsense-script';
-    s.async = true;
-    s.crossOrigin = 'anonymous';
-    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADSENSE_CLIENT;
-    document.head.appendChild(s);
-  }
-
-  function loadAdSenseNonPersonalized() {
-    if (document.getElementById('adsense-script')) return;
-    var s = document.createElement('script');
-    s.id = 'adsense-script';
-    s.async = true;
-    s.crossOrigin = 'anonymous';
-    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADSENSE_CLIENT;
-    s.setAttribute('data-ad-channel', 'non-personalized');
-    document.head.appendChild(s);
-    (window.adsbygoogle = window.adsbygoogle || []).push({ params: { google_npa: '1' } });
-  }
 
   function hideBanner() {
     var banner = document.getElementById('gdpr-banner');
@@ -36,16 +13,14 @@
     hideBanner();
     // Update GA4 consent state — must be called before any gtag event fires.
     // 'denied' keeps GA4 in consent-mode cookieless mode (no cookies, no PII sent).
+    // The Terminal does not use Google AdSense or any ad-serving network, so
+    // only analytics_storage is relevant here (ad_storage/ad_user_data/
+    // ad_personalization were removed along with AdSense — see CHANGELOG.md).
     if (typeof gtag === 'function') {
       gtag('consent', 'update', {
-        analytics_storage:   choice === 'accepted' ? 'granted' : 'denied',
-        ad_storage:          choice === 'accepted' ? 'granted' : 'denied',
-        ad_user_data:        choice === 'accepted' ? 'granted' : 'denied',
-        ad_personalization:  choice === 'accepted' ? 'granted' : 'denied',
+        analytics_storage: choice === 'accepted' ? 'granted' : 'denied',
       });
     }
-    if (choice === 'accepted') loadAdSense();
-    else loadAdSenseNonPersonalized();
   }
 
   document.addEventListener('click', function(e) {
@@ -69,14 +44,9 @@
           // Restore GA4 consent state from prior session before any events fire.
           if (typeof gtag === 'function') {
             gtag('consent', 'update', {
-              analytics_storage:  parsed.v === 'accepted' ? 'granted' : 'denied',
-              ad_storage:         parsed.v === 'accepted' ? 'granted' : 'denied',
-              ad_user_data:       parsed.v === 'accepted' ? 'granted' : 'denied',
-              ad_personalization: parsed.v === 'accepted' ? 'granted' : 'denied',
+              analytics_storage: parsed.v === 'accepted' ? 'granted' : 'denied',
             });
           }
-          if (parsed.v === 'accepted') loadAdSense();
-          else loadAdSenseNonPersonalized();
           return;
         }
       }
