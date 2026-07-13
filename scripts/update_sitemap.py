@@ -11,7 +11,10 @@ Output: sitemap.xml in the repo root.
 
 import subprocess
 import os
+import re
+import html
 from datetime import datetime, timezone
+from xml.sax.saxutils import escape as xml_escape
 
 BASE_URL = "https://globalinvesting.github.io"
 
@@ -19,6 +22,15 @@ BASE_URL = "https://globalinvesting.github.io"
 # Dependencies: if any listed file has a newer commit than the page itself,
 # that date is used as lastmod instead (keeps the sitemap honest for pages
 # with daily-updated data but infrequent HTML edits).
+#
+# "images": auto-derived at build time by scan_page_images() below — do not
+# hand-maintain a static list here. This was the root cause of the
+# guide-csi-indicator.html drift (page existed in the GUIDELINES.md sitemap
+# list and had real content screenshots, but was simply never added to this
+# PAGES array, so every automated run silently omitted it). Scanning the
+# actual HTML at build time means a page can never again have a screenshot
+# that isn't reflected in the sitemap, and a page's presence here is the
+# only thing that needs to be kept in sync with GUIDELINES.md.
 PAGES = [
     {
         "loc": "/",
@@ -99,6 +111,13 @@ PAGES = [
         "changefreq": "weekly",
     },
     {
+        "loc": "/guide-csi-indicator.html",
+        "file": "guide-csi-indicator.html",
+        "deps": [],
+        "priority": "0.7",
+        "changefreq": "monthly",
+    },
+    {
         "loc": "/about.html",
         "file": "about.html",
         "deps": [],
@@ -127,6 +146,37 @@ PAGES = [
         "changefreq": "yearly",
     },
 ]
+
+IMG_TAG_RE = re.compile(r"<img\b[^>]*>")
+SRC_RE = re.compile(r'src="([^"]*)"')
+ALT_RE = re.compile(r'alt="([^"]*)"')
+
+
+def scan_page_images(filepath: str) -> list[dict]:
+    """Scan a page's HTML for real content screenshots (assets/screenshot-*).
+
+    Skips favicons/icons/logos automatically since those never match the
+    'screenshot' filename convention used for every real UI capture in this
+    repo. Returns a de-duplicated list of {"loc", "caption"} dicts in
+    document order.
+    """
+    if not os.path.exists(filepath):
+        return []
+    txt = open(filepath, encoding="utf-8").read()
+    seen_srcs = set()
+    images = []
+    for tag in IMG_TAG_RE.findall(txt):
+        src_m = SRC_RE.search(tag)
+        if not src_m or "screenshot" not in src_m.group(1):
+            continue
+        src = src_m.group(1)
+        if src in seen_srcs:
+            continue
+        seen_srcs.add(src)
+        alt_m = ALT_RE.search(tag)
+        caption = html.unescape(alt_m.group(1)) if alt_m else ""
+        images.append({"loc": f"{BASE_URL}/{src}", "caption": caption})
+    return images
 
 
 def git_last_commit_date(filepath: str) -> datetime | None:
@@ -164,7 +214,8 @@ def get_lastmod(page: dict) -> str:
 def build_sitemap(pages: list[dict]) -> str:
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+        ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
     ]
     for page in pages:
         lastmod = get_lastmod(page)
@@ -173,6 +224,14 @@ def build_sitemap(pages: list[dict]) -> str:
         lines.append(f"    <lastmod>{lastmod}</lastmod>")
         lines.append(f"    <changefreq>{page['changefreq']}</changefreq>")
         lines.append(f"    <priority>{page['priority']}</priority>")
+        for img in scan_page_images(page["file"]):
+            lines.append("    <image:image>")
+            lines.append(f"      <image:loc>{xml_escape(img['loc'])}</image:loc>")
+            if img["caption"]:
+                lines.append(
+                    f"      <image:caption>{xml_escape(img['caption'])}</image:caption>"
+                )
+            lines.append("    </image:image>")
         lines.append("  </url>")
     lines.append("</urlset>")
     return "\n".join(lines) + "\n"
