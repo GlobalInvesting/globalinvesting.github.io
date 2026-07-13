@@ -4,18 +4,22 @@ Disallow: /news.html
 Disallow: /en.html
 Disallow: /guia-cot.html
 Disallow: /tecnico-vs-fundamental.html
+Disallow: /scripts/
+Disallow: /ai-analysis/
+Disallow: /calendar-data/
+Disallow: /cot-data/
+Disallow: /dtcc-data/
+Disallow: /economic-data/
+Disallow: /extended-data/
+Disallow: /fx-data/
+Disallow: /intraday-data/
+Disallow: /meetings-data/
+Disallow: /news-data/
+Disallow: /ohlc-data/
+Disallow: /ois-rates/
+Disallow: /rates/
+Disallow: /research-data/
+Disallow: /rr-data/
+Disallow: /sentiment-data/
 
 Sitemap: https://globalinvesting.github.io/sitemap.xml
-
-User-agent: Googlebot
-Allow: /
-Disallow: /news.html
-Disallow: /en.html
-Disallow: /guia-cot.html
-Disallow: /tecnico-vs-fundamental.html
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
