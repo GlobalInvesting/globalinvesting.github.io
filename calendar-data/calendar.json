@@ -1,103 +1,33 @@
 {
-  "lastUpdate": "2026-07-13T21:26:17Z",
-  "generatedAt": "2026-07-13T21:26:17Z",
+  "lastUpdate": "2026-07-14T07:24:12Z",
+  "generatedAt": "2026-07-14T07:24:12Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-13",
-  "rangeTo": "2026-07-13",
-  "totalEvents": 3975,
+  "rangeFrom": "2025-07-14",
+  "rangeTo": "2026-07-14",
+  "totalEvents": 3990,
   "currencyCounts": {
-    "JPY": 257,
     "GBP": 465,
-    "AUD": 289,
+    "AUD": 292,
     "CAD": 312,
-    "EUR": 873,
-    "USD": 1256,
+    "EUR": 874,
+    "USD": 1267,
+    "JPY": 257,
     "CHF": 165,
     "NZD": 124,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2110,
-    "high": 1637,
+    "high": 1646,
+    "medium": 2116,
     "low": 228
   },
   "surpriseStats": {
-    "AUD/westpac consumer confidence index": {
-      "n": 3,
-      "mean": -2.166667,
-      "std": 6.384617
-    },
-    "AUD/westpac consumer confidence change": {
-      "n": 3,
-      "mean": -2.6,
-      "std": 7.689603
-    },
-    "AUD/nab business confidence": {
-      "n": 3,
-      "mean": -2.333333,
-      "std": 17.897858
-    },
-    "EUR/wholesale prices yoy": {
-      "n": 3,
-      "mean": 0.833333,
-      "std": 2.411086
-    },
-    "EUR/wholesale prices mom": {
-      "n": 3,
-      "mean": 0.633333,
-      "std": 1.877054
-    },
-    "JPY/machinery orders mom": {
-      "n": 4,
-      "mean": 7.25,
-      "std": 6.562774
-    },
-    "JPY/machinery orders yoy": {
-      "n": 4,
-      "mean": 7.55,
-      "std": 6.212085
-    },
-    "SEK/inflation rate yoy": {
-      "n": 5,
-      "mean": -0.04,
-      "std": 0.250998
-    },
-    "SEK/cpif yoy": {
-      "n": 5,
-      "mean": -0.04,
-      "std": 0.219089
-    },
-    "SEK/cpif mom": {
-      "n": 5,
-      "mean": -0.02,
-      "std": 0.248998
-    },
-    "SEK/inflation rate mom": {
-      "n": 5,
-      "mean": -0.02,
-      "std": 0.248998
-    },
-    "USD/ppi mom": {
-      "n": 4,
-      "mean": 0.275,
-      "std": 0.629153
-    },
-    "USD/core ppi mom": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.471699
-    },
-    "USD/api crude oil stock change": {
-      "n": 12,
-      "mean": -2.252333,
-      "std": 3.664941
-    },
     "EUR/industrial production mom": {
       "n": 10,
       "mean": 0.03,
@@ -347,6 +277,11 @@
       "n": 4,
       "mean": 1.375,
       "std": 2.298369
+    },
+    "USD/api crude oil stock change": {
+      "n": 11,
+      "mean": -3.129818,
+      "std": 2.14738
     },
     "CAD/new housing price index mom": {
       "n": 4,
@@ -968,6 +903,26 @@
       "mean": -0.0,
       "std": 0.565685
     },
+    "SEK/inflation rate mom": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.287228
+    },
+    "SEK/inflation rate yoy": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.287228
+    },
+    "SEK/cpif mom": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.287228
+    },
+    "SEK/cpif yoy": {
+      "n": 4,
+      "mean": -0.05,
+      "std": 0.251661
+    },
     "SEK/services pmi": {
       "n": 2,
       "mean": 0.2,
@@ -1124,9 +1079,9 @@
       "std": 0.173205
     },
     "GBP/brc retail sales monitor yoy": {
-      "n": 2,
-      "mean": -0.7,
-      "std": 4.949747
+      "n": 3,
+      "mean": -0.866667,
+      "std": 3.511885
     },
     "JPY/household spending yoy": {
       "n": 3,
@@ -1173,6 +1128,11 @@
       "mean": -0.013333,
       "std": 0.105987
     },
+    "AUD/nab business confidence": {
+      "n": 3,
+      "mean": 7.666667,
+      "std": 0.57735
+    },
     "JPY/current account": {
       "n": 3,
       "mean": -550298.110667,
@@ -1213,6 +1173,16 @@
       "mean": -94.975,
       "std": 171.487629
     },
+    "EUR/wholesale prices mom": {
+      "n": 2,
+      "mean": -0.2,
+      "std": 1.697056
+    },
+    "EUR/wholesale prices yoy": {
+      "n": 2,
+      "mean": -0.3,
+      "std": 1.979899
+    },
     "EUR/employment change qoq": {
       "n": 2,
       "mean": 0.0,
@@ -1227,6 +1197,16 @@
       "n": 3,
       "mean": -5.0,
       "std": 3.464102
+    },
+    "USD/core ppi mom": {
+      "n": 3,
+      "mean": 0.166667,
+      "std": 0.46188
+    },
+    "USD/ppi mom": {
+      "n": 3,
+      "mean": 0.566667,
+      "std": 0.288675
     },
     "NZD/business nz pmi": {
       "n": 4,
@@ -1243,6 +1223,26 @@
       "mean": 0.15,
       "std": 0.070711
     },
+    "AUD/westpac consumer confidence index": {
+      "n": 3,
+      "mean": 1.233333,
+      "std": 2.600641
+    },
+    "AUD/westpac consumer confidence change": {
+      "n": 3,
+      "mean": 1.5,
+      "std": 3.15119
+    },
+    "JPY/machinery orders mom": {
+      "n": 3,
+      "mean": 4.766667,
+      "std": 5.253887
+    },
+    "JPY/machinery orders yoy": {
+      "n": 3,
+      "mean": 4.666667,
+      "std": 2.829016
+    },
     "NZD/rbnz interest rate decision": {
       "n": 2,
       "mean": 0.0,
@@ -1252,6 +1252,16 @@
       "n": 2,
       "mean": -0.45,
       "std": 0.070711
+    },
+    "EUR/germany wholesale prices yoy": {
+      "n": 2,
+      "mean": -1.5,
+      "std": 0.282843
+    },
+    "EUR/germany wholesale prices mom": {
+      "n": 2,
+      "mean": -1.3,
+      "std": 0.141421
     },
     "NZD/current account": {
       "n": 2,
@@ -1290,30 +1300,6 @@
     }
   },
   "events": [
-    {
-      "currency": "JPY",
-      "event": "Machinery Orders YoY",
-      "dateISO": "2025-07-13",
-      "hourUTC": "23:50",
-      "actual": "4.4%",
-      "forecast": "3.4",
-      "previous": "6.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Machinery Orders MoM",
-      "dateISO": "2025-07-13",
-      "hourUTC": "23:50",
-      "actual": "-0.6%",
-      "forecast": "-1.5",
-      "previous": "-9.1",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
     {
       "currency": "GBP",
       "event": "BRC Retail Sales Monitor YoY",
@@ -45297,32 +45283,6 @@
     {
       "date": "22 Jun",
       "dateISO": "2026-06-22",
-      "timeUTC": "08:30",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom Prime Minister Starmer Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
       "timeUTC": "12:30",
       "country": "CAD",
       "currency": "CAD",
@@ -45397,19 +45357,6 @@
       "actual": "3.2%",
       "forecast": "3.0%",
       "previous": "2.8%"
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
-      "timeUTC": "13:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Waller Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "22 Jun",
@@ -49401,9 +49348,269 @@
       "flag": "🇬🇧",
       "event": "United Kingdom BRC Retail Sales Monitor YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "1.7%",
       "forecast": "2.9%",
       "previous": "3.4%"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Westpac Consumer Confidence Index",
+      "impact": "medium",
+      "actual": "83.9",
+      "forecast": "82.6",
+      "previous": "80.6"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Westpac Consumer Confidence Change",
+      "impact": "high",
+      "actual": "4.1%",
+      "forecast": "2.5%",
+      "previous": "-2.9%"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia NAB Business Confidence",
+      "impact": "high",
+      "actual": "-5.0",
+      "forecast": "-12.0",
+      "previous": "-14.0"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Wholesale Prices YoY",
+      "impact": "medium",
+      "actual": "4.9%",
+      "forecast": "6.2%",
+      "previous": "5.9%"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Wholesale Prices MoM",
+      "impact": "medium",
+      "actual": "-0.7%",
+      "forecast": "0.5%",
+      "previous": "-0.6%"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "08:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom BoE Gov Bailey Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Core Inflation Rate MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States CPI",
+      "impact": "high",
+      "actual": null,
+      "forecast": "334.71",
+      "previous": "335.12"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.8%",
+      "previous": "4.2%"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Inflation Rate MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-0.1%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Core Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.9%",
+      "previous": "2.9%"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States CPI s.a",
+      "impact": "high",
+      "actual": null,
+      "forecast": "334.0",
+      "previous": "333.979"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Chair Warsh Testimony",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "16:40",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Barr Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Goolsbee Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "17:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Cook Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "18:55",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Bowman Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "20:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Net Long-term TIC Flows",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "$128.0B",
+      "previous": "$103.1B"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Machinery Orders MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-4.2%",
+      "previous": "8.7%"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Machinery Orders YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "12.9%",
+      "previous": "15.6%"
     }
   ]
 }
