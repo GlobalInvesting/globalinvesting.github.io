@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-14T15:06:05Z",
-  "generatedAt": "2026-07-14T15:06:05Z",
+  "lastUpdate": "2026-07-14T21:28:11Z",
+  "generatedAt": "2026-07-14T21:28:11Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,13 +9,13 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-14",
   "rangeTo": "2026-07-14",
-  "totalEvents": 3992,
+  "totalEvents": 3993,
   "currencyCounts": {
     "GBP": 465,
     "AUD": 292,
     "CAD": 312,
     "EUR": 875,
-    "USD": 1268,
+    "USD": 1269,
     "JPY": 257,
     "CHF": 165,
     "NZD": 124,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "high": 1647,
-    "medium": 2117,
+    "medium": 2118,
     "low": 228
   },
   "surpriseStats": {
@@ -69,9 +69,9 @@
       "std": 3.158613
     },
     "USD/net long-term tic flows": {
-      "n": 3,
-      "mean": 26.066667,
-      "std": 3.521837
+      "n": 4,
+      "mean": 45.725,
+      "std": 39.421684
     },
     "AUD/employment change": {
       "n": 4,
@@ -279,9 +279,9 @@
       "std": 2.298369
     },
     "USD/api crude oil stock change": {
-      "n": 11,
-      "mean": -3.129818,
-      "std": 2.14738
+      "n": 12,
+      "mean": -2.648667,
+      "std": 2.640098
     },
     "CAD/new housing price index mom": {
       "n": 4,
@@ -49613,9 +49613,22 @@
       "flag": "🇺🇸",
       "event": "United States Net Long-term TIC Flows",
       "impact": "medium",
-      "actual": null,
+      "actual": "$232.7B",
       "forecast": "$128.0B",
-      "previous": "$103.1B"
+      "previous": "$104.8B"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States API Crude Oil Stock Change",
+      "impact": "medium",
+      "actual": "-0.056M",
+      "forecast": "-2.7M",
+      "previous": "-0.399M"
     },
     {
       "date": "14 Jul",
