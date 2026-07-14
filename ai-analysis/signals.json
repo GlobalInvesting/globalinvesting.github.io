@@ -1,63 +1,52 @@
 {
-  "generated_at": "2026-07-14T02:01:13Z",
+  "generated_at": "2026-07-14T08:32:08Z",
   "signals": [
     {
-      "time": "02:00",
+      "time": "08:31",
       "priority": "critical",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "RBNZ 2.5%. RBNZ's Conway warns oil-driven inflation is persistent, fueling rate hike bets. Crowded spec shorts face significant unwind risk if the RBNZ delivers a hawkish surprise; NZD/USD at 0.5758 stalls previous declines as dip-buyers emerge. Real rate at -0.58% remains accommodative despite hiking cycle.",
+      "title": "NZD/CHF — G10 Bilateral Theme + Geopolitical Risk",
+      "text": "NZD/CHF at 0.4706 — G10 scorecard leader NZD (+0.664%) vs laggard CHF (-0.812%) creates a 1.476% spread, the widest in the G10 complex. Despite the 250bp NZD/CHF carry advantage, the pair faces immediate pressure as WTI Oil hits $85 on Strait of Hormuz tensions. CHF safe-haven demand typically compresses this carry spread during energy-driven risk-off shocks. NZD COT LF net short -27,675 (18% long) indicates extreme bearish positioning, leaving the pair vulnerable to a squeeze if geopolitical tensions de-escalate before the RBNZ meeting.",
       "evidence": [
-        "NZD COT LF net: -27,675 (18.0% long)",
-        "RBNZ Bias: ↑ Hike",
-        "NZD/USD: 0.5758"
+        "NZD 1W avg: +0.664% (n=4)",
+        "CHF 1W avg: -0.812% (n=6)",
+        "G10 spread: 1.476%",
+        "WTI Oil: $80.0 (+2.38%)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:57",
+      "time": "08:28",
       "priority": "warning",
-      "title": "USD/CHF — G10 Bilateral Theme + Carry",
-      "text": "USD/CHF at 0.8147 driven by a 1.115% G10 leader-to-laggard spread. USD outperformance (avg +0.338%) vs CHF weakness (avg -0.777%) is supported by a +375bp Fed-SNB carry advantage. Despite normal volatility (VIX 17.2), the options market prices an extreme +13.9% VRP, suggesting heavy hedging for a CHF reversal that has yet to materialize in spot. USD CESI (+65) confirms sustained data outperformance vs CHF neutral data.",
+      "title": "USD/JPY — Positioning + Options + Carry",
+      "text": "USD/JPY at 162.33 — 275bp Fed-BoJ carry sustains the bid, but institutional positioning signals exhaustion. COT LF net short -104,231 (29.1% long) is crowded, while the 25d RR at -1.58 shows a strong put skew as the market pays for downside protection. VRP at +3.7% (IV 7.2% vs HV30 3.5%) confirms elevated fear of a sharp reversal. Price is holding above 160.00, a level previously associated with BoJ intervention risk. Carry dominates until VIX > 25, but the options skew suggests a local top is forming.",
       "evidence": [
-        "USD 1W avg: +0.338% (n=7)",
-        "CHF 1W avg: -0.777% (n=6)",
-        "G10 spread: 1.115%"
+        "USD/JPY carry: +275bp",
+        "25d RR: -1.58 (Saxo)",
+        "JPY COT LF net: -104,231"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:55",
+      "time": "08:26",
       "priority": "warning",
-      "title": "USD/JPY — Positioning + Options Skew + Carry",
-      "text": "USD/JPY at 162.44 holding above the critical 160.00 intervention threshold. +275bp Fed-BoJ carry sustains the bid, but 25d RR at -1.58 (Strong Put Skew) signals institutional demand for downside protection against BoJ action. JPY COT LF net short -104,231 (29.1% long) remains crowded; any intervention or hawkish shift at the July 31 BoJ meeting risks a violent carry unwind. VIX at 17.2 keeps carry dominant for now.",
+      "title": "USD/CAD — COT vs Retail Divergence + Oil Shock",
+      "text": "USD/CAD at 1.4146 — Institutional vs retail divergence at extreme. COT LF net short -87,846 (22.6% long) shows specs are heavily short, while retail is 78% short, fading the recent move. USD/CAD vs WTI Oil correlation has broken to -0.900 (z=-2.02σ), meaning the pair is no longer tracking the crude rally. This decoupling suggests the 150bp USD carry advantage and US data outperformance (CESI +65) are overriding the CAD's traditional oil link. Watch the BoC Monetary Policy Report at 10:45 for a shift in the 2.25% policy stance.",
       "evidence": [
-        "USD/JPY 25d RR: -1.58",
-        "JPY COT LF net: -104,231",
-        "Fed-BoJ Carry: +275bp"
+        "USD/CAD vs WTI corr: -0.900 (z=-2.02σ)",
+        "Retail sentiment: 78% short",
+        "CAD COT LF net: -87,846"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:50",
-      "priority": "warning",
-      "title": "USD/CAD — Correlation Break + BoC MPR",
-      "text": "USD/CAD vs WTI Oil correlation at -0.885 vs +0.049 norm (z=-2.05σ) marks a significant regime break; CAD is failing to track the 0.92% intraday rise in WTI. Market focus shifts to today's BoC Monetary Policy Report and Governor Macklem's press conference. CAD COT LF net short -87,846 (22.6% long) reflects heavy bearish sentiment ahead of the 15 Jul meeting. Watch for BoC growth revisions to confirm or invalidate the CAD laggard status.",
-      "evidence": [
-        "USD/CAD vs WTI Corr: -0.885 (z=-2.05σ)",
-        "CAD COT LF net: -87,846",
-        "USD/CAD: 1.4153"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "01:45",
+      "time": "08:21",
       "priority": "info",
-      "title": "EUR/USD — Volatility Premium + CESI Divergence",
-      "text": "EUR/USD at 1.1386 shows a +2.3% VRP (IV 7.1% vs HV30 4.8%), indicating the options market is pricing in US CPI event risk. EUR CESI (-12) continues to signal persistent data misses relative to the USD CESI (+65) strength. While spot remains bid near 1.1385, the +150bp USD carry advantage and negative data surprises for the Eurozone limit upside potential ahead of the July 23 ECB meeting.",
+      "title": "AUD/USD — Volatility Premium + CESI Divergence",
+      "text": "AUD/USD at 0.6922 — Options market pricing extreme protection with a VRP of +8.5% (IV 15.3% vs HV30 6.8%). While the 60bp AUD carry advantage supports the pair, the Economic Surprise Index (CESI) shows a strong negative bias for AUD (-10) vs a strong positive for USD (+65). This data divergence suggests the AUD's recent resilience is at risk if US CPI (due today) surprises to the upside. Moderate put skew (25d RR -0.92) confirms the market is leaning toward AUD downside protection.",
       "evidence": [
-        "EUR/USD VRP: +2.3%",
-        "EUR CESI: -12 vs USD CESI: +65",
-        "USD/EUR Carry: +150bp"
+        "AUD/USD VRP: +8.5%",
+        "USD CESI: +65",
+        "AUD CESI: -10"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
