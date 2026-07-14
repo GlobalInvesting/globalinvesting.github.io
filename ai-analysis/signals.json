@@ -1,53 +1,65 @@
 {
-  "generated_at": "2026-07-14T15:58:16Z",
+  "generated_at": "2026-07-14T21:01:48Z",
   "signals": [
     {
-      "time": "15:54",
+      "time": "21:01",
       "priority": "critical",
-      "title": "NZD/CHF — G10 Bilateral Theme + CB Divergence",
-      "text": "NZD/CHF is driving the G10 currency scorecard with a 1.337% leader-to-laggard spread. The bilateral theme is supported by a stark central bank policy divergence: the RBNZ is in a hiking cycle at 2.5% with a hawkish market bias, while the SNB remains on hold at 0.00%. This rate differential translates to a +250bp NZD/CHF carry premium. RBNZ 2.5%. Watch the next RBNZ policy decision on 2 Sep to confirm the continuation of this G10 outperformance trend.",
+      "title": "NZD/CHF — G10 Bilateral Theme",
+      "text": "NZD/CHF at 0.7182 (implied) — NZD outperformance dominates G10 as the RBNZ remains in a hiking cycle (2.5% rate) vs SNB on hold at 0.0%. The +250bp carry advantage for NZD is amplified by a 1.448% G10 performance spread. RBNZ 2.5%. CHF remains the G10 laggard as safe-haven demand stays muted with VIX at 16.5.",
       "evidence": [
-        "NZD 1W avg: +0.870% (n=4)",
-        "CHF 1W avg: -0.468% (n=6)",
-        "G10 spread: 1.337%"
+        "NZD 1W avg: +0.939% (n=4)",
+        "CHF 1W avg: -0.509% (n=6)",
+        "G10 spread: 1.448%"
       ],
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:51",
+      "time": "20:58",
+      "priority": "critical",
+      "title": "USD/CHF — US CPI Miss + Options Volatility",
+      "text": "USD/CHF at 0.8093 — The pair tumbled 0.70% following a softer-than-expected US June CPI report, triggering a slide in US 2Y yields to 3.728% (-0.75%). Options market pricing shows an elevated 4.8pt Vol Risk Premium (IV 10.5% vs HV30 5.7%), indicating high demand for protection as the pair tests the 0.8100 handle. The bull steepener regime in the US curve (+85.7bp) confirms recession/disinflation pricing, weighing on the USD despite its +375bp carry advantage over CHF.",
+      "evidence": [
+        "USD/CHF: 0.8093",
+        "US 2Y Yield: 3.728%",
+        "VRP: +4.8%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "20:55",
       "priority": "warning",
-      "title": "USD/CAD — Correlation Break + Positioning Divergence",
-      "text": "USD/CAD is trading at 1.4065, down -0.62% intraday as the Canadian Dollar climbs to a four-week high following a soft US CPI report and a reversal in Trump's proposed 20% Hormuz toll. This price action triggers a severe correlation break between USD/CAD and WTI Oil, with the correlation collapsing to -0.900 against a 252-day norm of +0.001 (z = -2.02σ). Speculative positioning is heavily short CAD with COT net short at -87,846 contracts (22.6% long), while retail sentiment is heavily short USD/CAD at 73%. This extreme institutional short positioning combined with retail short bias creates a high-conviction setup for a rapid CAD short-squeeze if oil prices sustain their recovery. Watch the BoC Monetary Policy Report press conference today for any hawkish policy shifts from Governor Macklem.",
+      "title": "USD/JPY — Positioning + Options Skew + Intervention Risk",
+      "text": "USD/JPY at 162.23 — Price remains well above the 160.00 psychological level previously associated with BoJ intervention warnings. COT LF net short -104,231 (29.1% long) shows extreme crowded short JPY positioning, while the 25d Risk Reversal at -1.42 (moderate put skew) signals the options market is paying a premium for USD/JPY downside protection. Elevated IV (7.2%) vs HV30 (3.5%) results in a +3.8pt VRP, reflecting institutional hedging against a sharp carry unwind or BoJ action.",
       "evidence": [
-        "USD/CAD vs WTI Oil: corr=-0.900 (z=-2.02σ)",
-        "CAD COT LF net: -87,846",
-        "USD/CAD Retail: 27% long / 73% short"
-      ],
-      "_source": "gemini:gemini-3.5-flash"
-    },
-    {
-      "time": "15:49",
-      "priority": "warning",
-      "title": "AUD/USD — Positioning + Volatility + Retail Divergence",
-      "text": "AUD/USD has traded to a new intraday high of 0.6979, up +0.83% on risk-on flows following the soft US CPI report and Fed Chair Warsh's testimony. The options market is pricing in significant hedging demand, with AUD/USD ATM implied volatility at 12.8% versus a 30-day realized volatility of 7.0%, generating an elevated Vol Risk Premium (VRP) of +5.8%. The 25d Risk Reversal shows a moderate put skew of -1.09, indicating that institutional options traders are actively hedging downside risk despite the spot rally. This cautious options positioning aligns with a negative economic surprise index (CESI net -10), suggesting the macro data backdrop remains weak. Watch the next RBA meeting (mkt: 100% hold priced) on 11 Aug to see if the central bank maintains its 4.35% hold stance to support the -80bp AUD carry premium.",
-      "evidence": [
-        "AUD/USD VRP: +5.8% (IV 12.8% vs HV30 7.0%)",
-        "AUD/USD 25d RR: -1.09",
-        "AUD CESI net: -10"
-      ],
-      "_source": "gemini:gemini-3.5-flash"
-    },
-    {
-      "time": "15:45",
-      "priority": "info",
-      "title": "USD/JPY — Carry Support vs Options Skew",
-      "text": "USD/JPY is holding at 162.144, down -0.18% intraday following the soft US CPI print. The pair remains structurally supported by a massive +275bp carry premium (Fed 3.75% vs BoJ 1.0%). However, the options market is signaling caution with a moderate 25d Risk Reversal put skew of -1.42, showing that institutional desks are paying a premium for JPY call options (USD/JPY puts) to hedge against potential BoJ intervention. This options skew persists despite a heavily crowded speculative short JPY position (COT net short -104,231 contracts). With the VIX at 16.4 (normal volatility), carry remains the dominant driver, but intervention risk rises significantly above the 160.00 level. Watch the next BoJ meeting (mkt: 100% hold priced) on 31 Jul for any hawkish policy shifts that is likely to trigger a rapid unwind of the carry trade.",
-      "evidence": [
-        "USD/JPY 25d RR: -1.42",
         "JPY COT LF net: -104,231",
-        "USD/JPY Carry: +275bp"
+        "USD/JPY 25d RR: -1.42",
+        "VRP: +3.8%"
       ],
-      "_source": "gemini:gemini-3.5-flash"
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "20:50",
+      "priority": "warning",
+      "title": "AUD/USD — COT vs CESI Divergence + Volatility",
+      "text": "AUD/USD at 0.6976 — COT LF net long +24,098 (63.8% long) indicates bullish speculative positioning, yet the AUD Economic Surprise Index (CESI) shows a strong negative bias (-10 net misses). This divergence suggests specs are overextended relative to deteriorating domestic data. IV at 12.9% vs HV30 7.0% creates a significant +5.9pt VRP, the highest in G10, signaling that the options market is pricing in a volatility spike. Watch for a failure to hold 0.7000 to trigger a long-unwind.",
+      "evidence": [
+        "AUD COT LF net: +24,098",
+        "AUD CESI: -10",
+        "AUD/USD VRP: +5.9%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "20:45",
+      "priority": "info",
+      "title": "USD/CAD — Correlation Break + BoC Decision",
+      "text": "USD/CAD at 1.4056 — The pair's correlation with WTI Oil has collapsed to -0.900 vs a 252d norm of +0.001 (z = -2.02σ), indicating a total decoupling from energy prices as macro drivers take precedence. Despite WTI rising 2.35% to $80.0, CAD strength is driven by the upcoming BoC meeting on 15 July. USD/CAD remains supported by a +150bp Fed-BoC carry advantage, but the negative CESI for USD (+59 beats) vs neutral CAD data suggests the USD outperformance is likely to be peaking.",
+      "evidence": [
+        "USD/CAD vs WTI Corr: -0.900",
+        "WTI Oil: $80.0",
+        "USD/CAD Carry: +150bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
     }
   ]
 }
