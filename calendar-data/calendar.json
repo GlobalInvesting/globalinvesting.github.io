@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-14T11:02:27Z",
-  "generatedAt": "2026-07-14T11:02:27Z",
+  "lastUpdate": "2026-07-14T15:06:05Z",
+  "generatedAt": "2026-07-14T15:06:05Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,13 +9,13 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-14",
   "rangeTo": "2026-07-14",
-  "totalEvents": 3990,
+  "totalEvents": 3992,
   "currencyCounts": {
     "GBP": 465,
     "AUD": 292,
     "CAD": 312,
-    "EUR": 874,
-    "USD": 1267,
+    "EUR": 875,
+    "USD": 1268,
     "JPY": 257,
     "CHF": 165,
     "NZD": 124,
@@ -23,8 +23,8 @@
     "NOK": 81
   },
   "impactCounts": {
-    "high": 1646,
-    "medium": 2116,
+    "high": 1647,
+    "medium": 2117,
     "low": 228
   },
   "surpriseStats": {
@@ -1139,34 +1139,34 @@
       "std": 954506.545087
     },
     "USD/inflation rate yoy": {
-      "n": 2,
-      "mean": 0.05,
-      "std": 0.070711
+      "n": 3,
+      "mean": -0.066667,
+      "std": 0.208167
     },
     "USD/core inflation rate mom": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.141421
+      "n": 3,
+      "mean": -0.066667,
+      "std": 0.152753
     },
     "USD/cpi": {
-      "n": 2,
-      "mean": 0.365,
-      "std": 0.502046
+      "n": 3,
+      "mean": -0.006667,
+      "std": 0.735142
     },
     "USD/cpi s.a": {
-      "n": 2,
-      "mean": 0.393,
-      "std": 0.16122
+      "n": 3,
+      "mean": -0.215333,
+      "std": 1.059813
     },
     "USD/inflation rate mom": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
+      "n": 3,
+      "mean": -0.1,
+      "std": 0.173205
     },
     "USD/core inflation rate yoy": {
-      "n": 2,
-      "mean": 0.05,
-      "std": 0.070711
+      "n": 3,
+      "mean": -0.033333,
+      "std": 0.152753
     },
     "USD/monthly budget statement": {
       "n": 3,
@@ -1297,6 +1297,11 @@
       "n": 2,
       "mean": 1.5,
       "std": 2.12132
+    },
+    "EUR/spain consumer confidence": {
+      "n": 2,
+      "mean": 0.95,
+      "std": 1.767767
     }
   },
   "events": [
@@ -49433,13 +49438,39 @@
     {
       "date": "14 Jul",
       "dateISO": "2026-07-14",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Consumer Confidence",
+      "impact": "medium",
+      "actual": "81.2",
+      "forecast": "79.0",
+      "previous": "77.7"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
+      "timeUTC": "12:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States ADP Employment Change Weekly",
+      "impact": "high",
+      "actual": "19.75K",
+      "forecast": null,
+      "previous": "21.0K"
+    },
+    {
+      "date": "14 Jul",
+      "dateISO": "2026-07-14",
       "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "United States Core Inflation Rate MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.0%",
       "forecast": "0.2%",
       "previous": "0.2%"
     },
@@ -49452,7 +49483,7 @@
       "flag": "🇺🇸",
       "event": "United States CPI",
       "impact": "high",
-      "actual": null,
+      "actual": "333.95",
       "forecast": "334.7",
       "previous": "335.12"
     },
@@ -49465,7 +49496,7 @@
       "flag": "🇺🇸",
       "event": "United States Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "3.5%",
       "forecast": "3.8%",
       "previous": "4.2%"
     },
@@ -49478,7 +49509,7 @@
       "flag": "🇺🇸",
       "event": "United States Inflation Rate MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "-0.4%",
       "forecast": "-0.1%",
       "previous": "0.5%"
     },
@@ -49491,7 +49522,7 @@
       "flag": "🇺🇸",
       "event": "United States Core Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.6%",
       "forecast": "2.8%",
       "previous": "2.9%"
     },
@@ -49504,7 +49535,7 @@
       "flag": "🇺🇸",
       "event": "United States CPI s.a",
       "impact": "high",
-      "actual": null,
+      "actual": "332.568",
       "forecast": "334.0",
       "previous": "333.979"
     },
