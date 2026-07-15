@@ -1,58 +1,56 @@
 {
-  "generated_at": "2026-07-15T08:39:58Z",
+  "generated_at": "2026-07-15T16:02:30Z",
   "signals": [
     {
-      "time": "08:39",
+      "time": "15:59",
       "priority": "critical",
-      "title": "NZD/CHF — G10 Bilateral Theme + RBNZ Hawkishness",
-      "text": "NZD/CHF at 0.4713 — NZD outperformance (1W avg +1.152%) vs CHF weakness (1W avg -0.657%) creates a 1.81% G10 spread. Despite a -0.58% real rate, NZD is supported by RBNZ hawkishness and a +250bp OIS carry advantage over SNB. Retail sentiment is at an 87% short extreme on AUD/CHF, suggesting broader CHF-cross short-covering risk if the NZD/CHF bilateral theme persists. RBNZ 2.5%.",
+      "title": "NZD/USD — G10 Bilateral Theme + Fed Testimony",
+      "text": "NZD/USD at 0.5842 reflects a dominant G10 theme as NZD outperforms all peers while USD lags following softer PPI data and Fed Chair Warsh's testimony. Despite a 125bp carry deficit (Fed 3.75% vs RBNZ 2.5%), NZD strength is driven by its G10-leading 1W performance. Fed 3.75%. NZD COT LF net short -27,675 (18.0% long) creates a massive short-squeeze risk as the RBNZ maintains a hiking bias (real rate -0.58%) against a softening USD macro backdrop.",
       "evidence": [
-        "NZD 1W avg: +1.152% (n=4)",
-        "CHF 1W avg: -0.657% (n=6)",
-        "G10 spread: 1.810%",
-        "NZD/CHF OIS carry: +250bp"
+        "NZD 1W avg: +1.323% (n=4)",
+        "USD 1W avg: -0.542% (n=7)",
+        "G10 spread: 1.865%"
       ],
-      "watch_level": "RBNZ meeting on 2 Sep for hike confirmation",
+      "watch_level": "Watch for a break above 0.5900; next catalyst is the Fed meeting on 29 Jul.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "08:36",
+      "time": "15:55",
       "priority": "warning",
-      "title": "USD/JPY — Carry + Volatility + Options Skew",
-      "text": "USD/JPY at 162.3 — 275bp Fed-BoJ carry sustains the bid despite the pair testing levels well above the 160.00 intervention threshold. Options market shows a moderate put skew (25d RR at -1.42) and elevated vol premium (IV 7.2% vs HV30 3.5%), signaling institutional hedging against a sharp JPY reversal. JPY COT LF net short -104,231 remains crowded, while USD CESI (+57) supports the greenback against JPY's safe-haven function, which remains impaired (z=-1.13σ vs VIX).",
+      "title": "GBP/USD — Positioning + Vol + CESI Divergence",
+      "text": "GBP/USD at 1.3498 tests session highs following weaker US PPI, but internal metrics signal exhaustion. While COT LF net long +17,228 (59.0% long) shows spec support, the negative CESI (net -7 misses) suggests UK data is consistently underperforming expectations. Options markets are pricing a significant 4.5pt Vol Risk Premium (IV 11.0% vs HV30 6.5%) with a mild put skew (25d RR -0.62), indicating that institutional desks are paying up for downside protection despite the spot rally. This divergence suggests the move is driven by USD weakness rather than GBP strength.",
       "evidence": [
-        "USD/JPY OIS carry: +262bp",
-        "USD/JPY 25d RR: -1.42",
-        "VRP: +3.7%",
-        "USD CESI: +57"
+        "GBP VRP: +4.5% (IV 11.0% vs HV30 6.5%)",
+        "GBP CESI: -7 net misses",
+        "GBP COT LF net: +17,228"
       ],
-      "watch_level": "BoC Monetary Policy Report at 10:45 for broader USD sentiment shift",
+      "watch_level": "Watch for failure at 1.3520; BoE meeting on 30 Jul is the primary risk.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "08:34",
+      "time": "15:52",
       "priority": "warning",
-      "title": "USD/CAD — Correlation Break + BoC MPR Risk",
-      "text": "USD/CAD at 1.4050 — The pair exhibits a significant correlation break vs WTI Oil (corr -0.918 vs norm -0.001, z=-2.00σ), with CAD failing to track the +1.34% intraday rise in crude. COT LF net short -87,846 (22.6% long) reflects heavy spec positioning against the CAD ahead of today's BoC Monetary Policy Report. A +150bp USD carry advantage persists, but the extreme correlation deviation suggests CAD is pricing in a dovish BoC shift rather than energy fundamentals.",
+      "title": "USD/JPY — Carry + Vol + Intervention Risk",
+      "text": "USD/JPY at 162.13 remains held above the 160.00 psychological threshold by a +262bp OIS carry advantage (SOFR 3.60% vs TONA 0.98%). However, the options market is heavily skewed toward JPY calls (25d RR -1.39), signaling acute hedging against BoJ intervention or a carry unwind. A correlation break (z=-1.51σ) shows JPY is failing to attract safe-haven flows despite normal VIX levels (16.1), leaving the pair purely dependent on the yield gap. With JPY COT LF net short -104,231, any hawkish shift at the next BoJ meeting (mkt: 100% hold priced) risks a violent liquidation.",
       "evidence": [
-        "USD/CAD vs WTI z-score: -2.00σ",
-        "CAD COT LF long%: 22.6%",
-        "USD/CAD OIS carry: +130bp"
+        "USD/JPY 25d RR: -1.39 (Saxo)",
+        "USD/JPY OIS Carry: +262bp",
+        "JPY COT LF net: -104,231"
       ],
-      "watch_level": "BoC Press Conference at 10:45 UTC",
+      "watch_level": "160.00 remains the critical support; watch BoJ meeting on 31 Jul.",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "08:25",
+      "time": "15:48",
       "priority": "info",
-      "title": "EUR/USD — Positioning + Volatility Premium",
-      "text": "EUR/USD at 1.1429 — EUR 1W avg -0.346% reflects persistent data misses (CESI -13) and ECB Nagel's signal that rates are at an 'appropriate level.' Options market prices an elevated premium (VRP +2.1%) with a mild put skew (25d RR -0.57), while COT LF net short -66,057 shows specs are already positioned for downside. The +150bp USD carry advantage remains the structural ceiling for EUR recovery.",
+      "title": "AUD/CHF — Retail Divergence + Carry",
+      "text": "AUD/CHF at 0.5646 exhibits an extreme retail sentiment divergence with 90% of retail traders short. This contrarian signal aligns with a massive +435bp carry premium (RBA 4.35% vs SNB 0.0%) favoring the AUD. While AUD COT positioning is net long (+24,098), the retail crowd is aggressively fading the trend. In a 'normal volatility' regime (VIX 16.1), the carry trade remains the path of least resistance, suggesting retail capitulation risk if the pair extends higher.",
       "evidence": [
-        "EUR/USD OIS carry: +142bp",
-        "EUR CESI: -13",
-        "EUR/USD VRP: +2.1%"
+        "Retail Sentiment: 90% Short",
+        "AUD/CHF Carry: +435bp",
+        "VIX: 16.1 (normal)"
       ],
-      "watch_level": "ECB meeting on 23 Jul",
+      "watch_level": "Watch for retail short covering above 0.5700; RBA meeting on 11 Aug.",
       "_source": "gemini:gemini-3-flash-preview"
     }
   ]
