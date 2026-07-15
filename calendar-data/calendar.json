@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-15T07:27:49Z",
-  "generatedAt": "2026-07-15T07:27:49Z",
+  "lastUpdate": "2026-07-15T11:06:44Z",
+  "generatedAt": "2026-07-15T11:06:44Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,12 +9,12 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-15",
   "rangeTo": "2026-07-15",
-  "totalEvents": 4004,
+  "totalEvents": 4005,
   "currencyCounts": {
     "AUD": 292,
     "CAD": 315,
     "EUR": 876,
-    "USD": 1277,
+    "USD": 1278,
     "GBP": 465,
     "JPY": 256,
     "CHF": 165,
@@ -23,7 +23,7 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2125,
+    "medium": 2126,
     "high": 1651,
     "low": 228
   },
@@ -859,9 +859,9 @@
       "std": 5.367495
     },
     "EUR/industrial production mom": {
-      "n": 9,
-      "mean": 0.022222,
-      "std": 0.556277
+      "n": 10,
+      "mean": -0.02,
+      "std": 0.541192
     },
     "NOK/house price index mom": {
       "n": 2,
@@ -49640,9 +49640,22 @@
       "flag": "🇪🇺",
       "event": "Euro Area Industrial Production MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.2%",
       "forecast": "0.2%",
-      "previous": "0.1%"
+      "previous": "0.3%"
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "11:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States MBA 30-Year Mortgage Rate",
+      "impact": "medium",
+      "actual": "6.65",
+      "forecast": null,
+      "previous": "6.58"
     },
     {
       "date": "15 Jul",
