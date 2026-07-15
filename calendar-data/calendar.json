@@ -1,78 +1,33 @@
 {
-  "lastUpdate": "2026-07-14T21:28:11Z",
-  "generatedAt": "2026-07-14T21:28:11Z",
+  "lastUpdate": "2026-07-15T07:27:49Z",
+  "generatedAt": "2026-07-15T07:27:49Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-14",
-  "rangeTo": "2026-07-14",
-  "totalEvents": 3993,
+  "rangeFrom": "2025-07-15",
+  "rangeTo": "2026-07-15",
+  "totalEvents": 4004,
   "currencyCounts": {
-    "GBP": 465,
     "AUD": 292,
-    "CAD": 312,
-    "EUR": 875,
-    "USD": 1269,
-    "JPY": 257,
+    "CAD": 315,
+    "EUR": 876,
+    "USD": 1277,
+    "GBP": 465,
+    "JPY": 256,
     "CHF": 165,
     "NZD": 124,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "high": 1647,
-    "medium": 2118,
+    "medium": 2125,
+    "high": 1651,
     "low": 228
   },
   "surpriseStats": {
-    "EUR/industrial production mom": {
-      "n": 10,
-      "mean": 0.03,
-      "std": 0.52504
-    },
-    "NOK/balance of trade": {
-      "n": 3,
-      "mean": -3.666667,
-      "std": 36.913457
-    },
-    "USD/export prices mom": {
-      "n": 4,
-      "mean": 0.625,
-      "std": 1.05
-    },
-    "USD/ny empire state manufacturing index": {
-      "n": 4,
-      "mean": 1.75,
-      "std": 11.607325
-    },
-    "USD/import prices mom": {
-      "n": 4,
-      "mean": 0.375,
-      "std": 1.05
-    },
-    "USD/nahb housing market index": {
-      "n": 4,
-      "mean": -0.75,
-      "std": 2.061553
-    },
-    "USD/eia gasoline stocks change": {
-      "n": 15,
-      "mean": -0.2768,
-      "std": 2.323639
-    },
-    "USD/eia crude oil stocks change": {
-      "n": 15,
-      "mean": -1.360733,
-      "std": 3.158613
-    },
-    "USD/net long-term tic flows": {
-      "n": 4,
-      "mean": 45.725,
-      "std": 39.421684
-    },
     "AUD/employment change": {
       "n": 4,
       "mean": -4.4,
@@ -317,6 +272,16 @@
       "n": 3,
       "mean": -0.366667,
       "std": 1.101514
+    },
+    "USD/eia crude oil stocks change": {
+      "n": 14,
+      "mean": -1.378429,
+      "std": 3.277076
+    },
+    "USD/eia gasoline stocks change": {
+      "n": 14,
+      "mean": 0.005429,
+      "std": 2.127892
     },
     "EUR/new car registrations yoy": {
       "n": 3,
@@ -893,6 +858,11 @@
       "mean": 2.7,
       "std": 5.367495
     },
+    "EUR/industrial production mom": {
+      "n": 9,
+      "mean": 0.022222,
+      "std": 0.556277
+    },
     "NOK/house price index mom": {
       "n": 2,
       "mean": 0.05,
@@ -1213,6 +1183,26 @@
       "mean": 2.625,
       "std": 5.38354
     },
+    "USD/export prices mom": {
+      "n": 3,
+      "mean": 0.8,
+      "std": 1.212436
+    },
+    "USD/import prices mom": {
+      "n": 3,
+      "mean": 0.9,
+      "std": 0.0
+    },
+    "NOK/balance of trade": {
+      "n": 2,
+      "mean": -24.85,
+      "std": 5.727565
+    },
+    "USD/ny empire state manufacturing index": {
+      "n": 3,
+      "mean": -1.5,
+      "std": 11.777945
+    },
     "JPY/gdp growth annualized": {
       "n": 2,
       "mean": 0.45,
@@ -1222,6 +1212,11 @@
       "n": 2,
       "mean": 0.15,
       "std": 0.070711
+    },
+    "USD/nahb housing market index": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 1.732051
     },
     "AUD/westpac consumer confidence index": {
       "n": 3,
@@ -1234,14 +1229,14 @@
       "std": 3.15119
     },
     "JPY/machinery orders mom": {
-      "n": 3,
-      "mean": 4.766667,
-      "std": 5.253887
+      "n": 4,
+      "mean": 1.525,
+      "std": 7.774049
     },
     "JPY/machinery orders yoy": {
-      "n": 3,
-      "mean": 4.666667,
-      "std": 2.829016
+      "n": 4,
+      "mean": -0.2,
+      "std": 10.003666
     },
     "NZD/rbnz interest rate decision": {
       "n": 2,
@@ -1283,6 +1278,11 @@
       "mean": 0.0,
       "std": 0.0
     },
+    "USD/net long-term tic flows": {
+      "n": 3,
+      "mean": 53.633333,
+      "std": 44.225031
+    },
     "CHF/current account": {
       "n": 2,
       "mean": 3.6,
@@ -1305,18 +1305,6 @@
     }
   },
   "events": [
-    {
-      "currency": "GBP",
-      "event": "BRC Retail Sales Monitor YoY",
-      "dateISO": "2025-07-14",
-      "hourUTC": "23:01",
-      "actual": "2.7%",
-      "forecast": "0.2",
-      "previous": "0.6",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
     {
       "currency": "AUD",
       "event": "Westpac Consumer Confidence Index",
@@ -45541,19 +45529,6 @@
     {
       "date": "23 Jun",
       "dateISO": "2026-06-23",
-      "timeUTC": "13:25",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada BoC Gov Macklem Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "23 Jun",
-      "dateISO": "2026-06-23",
       "timeUTC": "20:30",
       "country": "USD",
       "currency": "USD",
@@ -45563,19 +45538,6 @@
       "actual": "-0.765M",
       "forecast": null,
       "previous": "-8.33M"
-    },
-    {
-      "date": "23 Jun",
-      "dateISO": "2026-06-23",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan BoJ Summary of Opinions",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "currency": "AUD",
@@ -49639,7 +49601,7 @@
       "flag": "🇯🇵",
       "event": "Japan Machinery Orders MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-12.4%",
       "forecast": "-4.2%",
       "previous": "8.7%"
     },
@@ -49652,9 +49614,191 @@
       "flag": "🇯🇵",
       "event": "Japan Machinery Orders YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "-1.9%",
       "forecast": "12.9%",
       "previous": "15.6%"
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "00:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Chancellor Reeves Mansion House Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "-33.0%"
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Industrial Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Manufacturing Sales MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.1%",
+      "previous": "4.2%"
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Core PPI MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.4%",
+      "previous": "0.4%"
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States NY Empire State Manufacturing Index",
+      "impact": "high",
+      "actual": null,
+      "forecast": "8.8",
+      "previous": "5.7"
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States PPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.0%",
+      "previous": "1.1%"
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "12:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Williams Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "13:45",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada BoC Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.25%",
+      "previous": "2.25%"
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "13:45",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada BoC Monetary Policy Report",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Chair Warsh Testimony",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "14:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada BoC Press Conference",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Cook Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "18:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Beige Book",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "15 Jul",
+      "dateISO": "2026-07-15",
+      "timeUTC": "22:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Musalem Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     }
   ]
 }
