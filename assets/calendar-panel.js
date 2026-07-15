@@ -21,6 +21,14 @@
  * v1.5 (2026-06-15): Display window extended from yesterday to 3 days back. Industry standard
  *   (Bloomberg, Refinitiv Eikon) shows 2–3 prior sessions alongside current day. Also ensures
  *   Friday sessions remain visible on Monday morning and covers overnight JPY/AUD releases.
+ * v1.6 (2026-07-15): Cache-bust the data fetch itself. `fetchEconomicCalendar()` used
+ *   `cache: 'no-store'` (browser-cache-only) with a static URL on every poll — GitHub Pages'
+ *   CDN (Fastly) can hold an edge copy of that exact URL for several minutes regardless of the
+ *   browser's own cache directive, so a workflow run that updated ff_calendar.json wasn't
+ *   reflected in the panel until the CDN's TTL expired, well past the 2-min poll interval.
+ *   Found live 2026-07-15: workflow run committed 4 new actuals, panel still showed "—" 23min
+ *   later. Now appends a minute-bucketed cache-buster (mirrors the existing pattern on
+ *   ./intraday-data/quotes.json) so each poll hits a URL the CDN hasn't served before.
  */
 (function () {
   'use strict';
@@ -415,7 +423,16 @@
       let events = [];
       let holidays = [];
       let source = 'ForexFactory';
-      for (const path of ['./calendar-data/ff_calendar.json', './calendar-data/calendar.json']) {
+      // Cache-bust: GitHub Pages serves via a CDN (Fastly) that can hold an edge
+      // copy of the same URL for several minutes independent of the browser's own
+      // cache. `cache: 'no-store'` only controls the browser's local cache — it
+      // does not force the CDN to revalidate. Bucketing the query string to this
+      // panel's own 2-min refresh cadence (mirrors the pattern already used for
+      // ./intraday-data/quotes.json) guarantees each poll hits a URL the CDN
+      // hasn't served before, so a fresh commit is picked up within one cycle
+      // instead of waiting out the CDN's TTL.
+      const _cb = '?_=' + Math.floor(Date.now() / 120000);
+      for (const path of ['./calendar-data/ff_calendar.json' + _cb, './calendar-data/calendar.json' + _cb]) {
         const res = await fetch(path, { cache: 'no-store' }).catch(() => null);
         if (!res?.ok) continue;
         const j = await res.json();
