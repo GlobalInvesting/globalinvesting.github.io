@@ -1,6 +1,6 @@
 {
-  "updated_utc": "2026-07-15T10:51:22.874789+00:00",
-  "updated_label": "10:51 UTC",
+  "updated_utc": "2026-07-15T11:01:48.410252+00:00",
+  "updated_label": "11:01 UTC",
   "total": 52,
   "total_high": 42,
   "total_med": 9,
@@ -8,11 +8,11 @@
     "ActionForex",
     "BabyPips",
     "Bank of Canada",
+    "FT Bonds",
     "FXStreet",
     "ForexLive",
     "InvestingLive",
     "Marc to Market",
-    "Nasdaq FX",
     "RTT News"
   ],
   "lang_counts": {
@@ -20,6 +20,22 @@
     "en": 52
   },
   "articles": [
+    {
+      "id": "0aaf22f5cf4b",
+      "cur": "USD",
+      "impact": "high",
+      "title": "Patrick Drahi’s Altice International accused of defaulting on €2bn of debt",
+      "expand": "Creditors say transactions that moved assets out of their reach breached borrowing terms",
+      "source": "FT Bonds",
+      "link": "https://www.ft.com/content/394c33d7-43cb-448e-97da-63fcb2c02b0b",
+      "time": "10:50",
+      "ts": 1784112623000,
+      "featured": true,
+      "lang": "en",
+      "date": "15 Jul",
+      "datetime": "2026-07-15T10:50:23+00:00",
+      "recent": true
+    },
     {
       "id": "4900037a8c93",
       "cur": "USD",
@@ -114,22 +130,6 @@
       "lang": "en",
       "date": "15 Jul",
       "datetime": "2026-07-15T09:45:00+00:00",
-      "recent": true
-    },
-    {
-      "id": "050054aee3f4",
-      "cur": "USD",
-      "impact": "high",
-      "title": "Oil Extends Gains As Trump Ramps Up Threats Against Iran",
-      "expand": "(RTTNews) - Oil prices traded higher for a third consecutive session on Wednesday as the U.S and Iran escalated a standoff over control of the Strait of Hormuz, raising fears of prolonged disruptions to energy supplies.",
-      "source": "Nasdaq FX",
-      "link": "https://www.nasdaq.com/articles/oil-extends-gains-trump-ramps-threats-against-iran",
-      "time": "09:28",
-      "ts": 1784107710000,
-      "featured": true,
-      "lang": "en",
-      "date": "15 Jul",
-      "datetime": "2026-07-15T09:28:30+00:00",
       "recent": true
     },
     {
@@ -526,7 +526,7 @@
       "link": "https://investinglive.com/news/cooler-us-inflation-keeps-the-calm-in-markets-for-now-at-least/",
       "time": "04:53",
       "ts": 1784091209000,
-      "featured": true,
+      "featured": false,
       "lang": "en",
       "date": "15 Jul",
       "datetime": "2026-07-15T04:53:29+00:00",
