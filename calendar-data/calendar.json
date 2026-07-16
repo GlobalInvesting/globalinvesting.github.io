@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-16T11:15:43Z",
-  "generatedAt": "2026-07-16T11:15:43Z",
+  "lastUpdate": "2026-07-16T15:16:02Z",
+  "generatedAt": "2026-07-16T15:16:02Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,13 +9,13 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-16",
   "rangeTo": "2026-07-16",
-  "totalEvents": 4009,
+  "totalEvents": 4012,
   "currencyCounts": {
     "CAD": 310,
     "EUR": 877,
     "GBP": 471,
     "JPY": 254,
-    "USD": 1283,
+    "USD": 1286,
     "AUD": 290,
     "CHF": 166,
     "NZD": 124,
@@ -24,14 +24,14 @@
   },
   "impactCounts": {
     "medium": 2133,
-    "high": 1648,
+    "high": 1651,
     "low": 228
   },
   "surpriseStats": {
     "CAD/housing starts": {
-      "n": 4,
-      "mean": 8.2,
-      "std": 23.942431
+      "n": 5,
+      "mean": 2.76,
+      "std": 24.039509
     },
     "EUR/balance of trade": {
       "n": 12,
@@ -114,44 +114,44 @@
       "std": 343.66667
     },
     "USD/retail sales ex gas/autos mom": {
-      "n": 4,
-      "mean": 0.05,
-      "std": 0.251661
+      "n": 5,
+      "mean": 0.06,
+      "std": 0.219089
     },
     "USD/retail sales control group mom": {
-      "n": 4,
-      "mean": 0.3,
-      "std": 0.163299
+      "n": 5,
+      "mean": 0.24,
+      "std": 0.194936
     },
     "USD/retail sales yoy": {
-      "n": 4,
-      "mean": 2.25,
-      "std": 0.750555
+      "n": 5,
+      "mean": 1.8,
+      "std": 1.197915
     },
     "USD/retail sales mom": {
-      "n": 4,
-      "mean": 0.275,
-      "std": 0.189297
+      "n": 5,
+      "mean": 0.22,
+      "std": 0.204939
     },
     "USD/retail sales ex autos mom": {
-      "n": 4,
-      "mean": 0.3,
-      "std": 0.163299
+      "n": 5,
+      "mean": 0.22,
+      "std": 0.228035
     },
     "USD/business inventories mom": {
-      "n": 4,
-      "mean": 0.05,
-      "std": 0.057735
+      "n": 5,
+      "mean": 0.04,
+      "std": 0.054772
     },
     "USD/pending home sales mom": {
-      "n": 4,
-      "mean": 1.95,
-      "std": 1.279323
+      "n": 5,
+      "mean": 0.58,
+      "std": 3.257606
     },
     "USD/pending home sales yoy": {
-      "n": 4,
-      "mean": 1.375,
-      "std": 2.298369
+      "n": 5,
+      "mean": 0.58,
+      "std": 2.668708
     },
     "USD/api crude oil stock change": {
       "n": 12,
@@ -239,19 +239,19 @@
       "std": 0.353553
     },
     "USD/continuing jobless claims": {
-      "n": 15,
-      "mean": -0.6,
-      "std": 17.183048
+      "n": 16,
+      "mean": 0.375,
+      "std": 17.05237
     },
     "USD/initial jobless claims": {
-      "n": 15,
-      "mean": 0.933333,
-      "std": 9.728211
+      "n": 16,
+      "mean": 1.4375,
+      "std": 9.612275
     },
     "USD/jobless claims 4-week average": {
-      "n": 15,
-      "mean": 1.316667,
-      "std": 4.65839
+      "n": 16,
+      "mean": 1.34375,
+      "std": 4.501736
     },
     "USD/chicago fed national activity index": {
       "n": 4,
@@ -1194,9 +1194,9 @@
       "std": 0.070711
     },
     "USD/nahb housing market index": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 1.732051
+      "n": 4,
+      "mean": -0.25,
+      "std": 1.5
     },
     "AUD/westpac consumer confidence index": {
       "n": 3,
@@ -1229,9 +1229,9 @@
       "std": 26.789052
     },
     "USD/philadelphia fed manufacturing index": {
-      "n": 3,
-      "mean": -5.933333,
-      "std": 10.79645
+      "n": 4,
+      "mean": 2.65,
+      "std": 19.297755
     },
     "NZD/rbnz interest rate decision": {
       "n": 2,
@@ -49721,7 +49721,7 @@
       "impact": "medium",
       "actual": "&#8364;4.793B",
       "forecast": "&#8364;4.5B",
-      "previous": "&#8364;4.293B"
+      "previous": "&#8364;4.421B"
     },
     {
       "date": "16 Jul",
@@ -49732,9 +49732,9 @@
       "flag": "🇨🇦",
       "event": "Canada Housing Starts",
       "impact": "medium",
-      "actual": null,
+      "actual": "239.0K",
       "forecast": "258.0K",
-      "previous": "261.4K"
+      "previous": "253.1K"
     },
     {
       "date": "16 Jul",
@@ -49745,9 +49745,22 @@
       "flag": "🇺🇸",
       "event": "United States Retail Sales MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.2%",
-      "previous": "0.9%"
+      "previous": "1.0%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Jobless Claims 4-week Average",
+      "impact": "high",
+      "actual": "214.25K",
+      "forecast": "216.0K",
+      "previous": "219.0K"
     },
     {
       "date": "16 Jul",
@@ -49758,7 +49771,7 @@
       "flag": "🇺🇸",
       "event": "United States Philadelphia Fed Manufacturing Index",
       "impact": "medium",
-      "actual": null,
+      "actual": "41.4",
       "forecast": "13.0",
       "previous": "10.3"
     },
@@ -49771,9 +49784,9 @@
       "flag": "🇺🇸",
       "event": "United States Retail Sales Control Group MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.5%",
       "forecast": "0.5%",
-      "previous": "0.7%"
+      "previous": "0.8%"
     },
     {
       "date": "16 Jul",
@@ -49784,9 +49797,35 @@
       "flag": "🇺🇸",
       "event": "United States Retail Sales YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "6.7%",
       "forecast": "6.7%",
-      "previous": "6.9%"
+      "previous": "7.3%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": "208.0K",
+      "forecast": "217.0K",
+      "previous": "216.0K"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "high",
+      "actual": "1805.0K",
+      "forecast": "1820.0K",
+      "previous": "1821.0K"
     },
     {
       "date": "16 Jul",
@@ -49797,9 +49836,9 @@
       "flag": "🇺🇸",
       "event": "United States Retail Sales Ex Autos MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "-0.2%",
       "forecast": "-0.1%",
-      "previous": "0.8%"
+      "previous": "1.0%"
     },
     {
       "date": "16 Jul",
@@ -49810,9 +49849,9 @@
       "flag": "🇺🇸",
       "event": "United States Retail Sales Ex Gas/Autos MoM",
       "impact": "high",
-      "actual": null,
-      "forecast": "0.3",
-      "previous": "0.5"
+      "actual": "0.4%",
+      "forecast": "0.3%",
+      "previous": "0.8%"
     },
     {
       "date": "16 Jul",
@@ -49823,9 +49862,9 @@
       "flag": "🇺🇸",
       "event": "United States Pending Home Sales MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-5.4%",
       "forecast": "-0.5%",
-      "previous": "3.8%"
+      "previous": "3.5%"
     },
     {
       "date": "16 Jul",
@@ -49836,7 +49875,7 @@
       "flag": "🇺🇸",
       "event": "United States Pending Home Sales YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.3%",
       "forecast": "2.3%",
       "previous": "4.8%"
     },
@@ -49849,7 +49888,7 @@
       "flag": "🇺🇸",
       "event": "United States Business Inventories MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "0.3%",
       "previous": "0.5%"
     },
@@ -49862,9 +49901,9 @@
       "flag": "🇺🇸",
       "event": "United States NAHB Housing Market Index",
       "impact": "medium",
-      "actual": null,
+      "actual": "34.0",
       "forecast": "35.0",
-      "previous": "35.0"
+      "previous": "36.0"
     },
     {
       "date": "16 Jul",
