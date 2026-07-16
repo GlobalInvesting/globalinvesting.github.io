@@ -1,113 +1,33 @@
 {
-  "lastUpdate": "2026-07-15T21:27:27Z",
-  "generatedAt": "2026-07-15T21:27:27Z",
+  "lastUpdate": "2026-07-16T07:35:43Z",
+  "generatedAt": "2026-07-16T07:35:43Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-15",
-  "rangeTo": "2026-07-15",
-  "totalEvents": 4007,
+  "rangeFrom": "2025-07-16",
+  "rangeTo": "2026-07-16",
+  "totalEvents": 4009,
   "currencyCounts": {
-    "AUD": 292,
-    "CAD": 315,
-    "EUR": 876,
-    "USD": 1280,
-    "GBP": 465,
-    "JPY": 256,
-    "CHF": 165,
+    "CAD": 310,
+    "EUR": 877,
+    "GBP": 471,
+    "JPY": 254,
+    "USD": 1283,
+    "AUD": 290,
+    "CHF": 166,
     "NZD": 124,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2128,
-    "high": 1651,
+    "medium": 2133,
+    "high": 1648,
     "low": 228
   },
   "surpriseStats": {
-    "AUD/employment change": {
-      "n": 4,
-      "mean": -4.4,
-      "std": 21.926848
-    },
-    "AUD/unemployment rate": {
-      "n": 4,
-      "mean": -0.05,
-      "std": 0.1
-    },
-    "AUD/full time employment chg": {
-      "n": 2,
-      "mean": -9.1,
-      "std": 58.831284
-    },
-    "EUR/unemployment rate": {
-      "n": 11,
-      "mean": -0.111818,
-      "std": 0.395394
-    },
-    "EUR/cpi": {
-      "n": 7,
-      "mean": -0.05,
-      "std": 0.127932
-    },
-    "GBP/goods trade balance non-eu": {
-      "n": 4,
-      "mean": -3670.14875,
-      "std": 7335.401637
-    },
-    "GBP/gdp mom": {
-      "n": 4,
-      "mean": 0.225,
-      "std": 0.262996
-    },
-    "GBP/gdp 3-month avg": {
-      "n": 4,
-      "mean": 0.075,
-      "std": 0.15
-    },
-    "GBP/goods trade balance": {
-      "n": 4,
-      "mean": -3.2275,
-      "std": 3.542808
-    },
-    "GBP/industrial production mom": {
-      "n": 4,
-      "mean": 0.05,
-      "std": 0.191485
-    },
-    "GBP/manufacturing production mom": {
-      "n": 4,
-      "mean": 0.55,
-      "std": 0.737111
-    },
-    "USD/jobless claims 4-week average": {
-      "n": 16,
-      "mean": 1.75,
-      "std": 4.822689
-    },
-    "USD/philadelphia fed manufacturing index": {
-      "n": 4,
-      "mean": -0.275,
-      "std": 14.344889
-    },
-    "USD/initial jobless claims": {
-      "n": 16,
-      "mean": 1.375,
-      "std": 9.562949
-    },
-    "USD/continuing jobless claims": {
-      "n": 16,
-      "mean": -1.0625,
-      "std": 16.703168
-    },
-    "USD/industrial production mom": {
-      "n": 4,
-      "mean": -0.15,
-      "std": 0.412311
-    },
     "CAD/housing starts": {
       "n": 4,
       "mean": 8.2,
@@ -318,6 +238,21 @@
       "mean": 0.25,
       "std": 0.353553
     },
+    "USD/continuing jobless claims": {
+      "n": 15,
+      "mean": -0.6,
+      "std": 17.183048
+    },
+    "USD/initial jobless claims": {
+      "n": 15,
+      "mean": 0.933333,
+      "std": 9.728211
+    },
+    "USD/jobless claims 4-week average": {
+      "n": 15,
+      "mean": 1.316667,
+      "std": 4.65839
+    },
     "USD/chicago fed national activity index": {
       "n": 4,
       "mean": -0.1,
@@ -402,6 +337,11 @@
       "n": 3,
       "mean": -0.7,
       "std": 1.835756
+    },
+    "EUR/unemployment rate": {
+      "n": 10,
+      "mean": -0.133,
+      "std": 0.41015
     },
     "EUR/retail sales mom": {
       "n": 9,
@@ -627,6 +567,11 @@
       "n": 4,
       "mean": 7.4,
       "std": 31.016232
+    },
+    "EUR/cpi": {
+      "n": 6,
+      "mean": -0.063333,
+      "std": 0.13471
     },
     "EUR/core inflation rate yoy": {
       "n": 3,
@@ -1178,6 +1123,36 @@
       "mean": 0.35,
       "std": 0.493288
     },
+    "GBP/goods trade balance": {
+      "n": 4,
+      "mean": -2.345,
+      "std": 5.155609
+    },
+    "GBP/industrial production mom": {
+      "n": 4,
+      "mean": -0.125,
+      "std": 0.206155
+    },
+    "GBP/gdp 3-month avg": {
+      "n": 4,
+      "mean": 0.05,
+      "std": 0.1
+    },
+    "GBP/goods trade balance non-eu": {
+      "n": 4,
+      "mean": -3670.05875,
+      "std": 7335.461713
+    },
+    "GBP/manufacturing production mom": {
+      "n": 4,
+      "mean": 0.725,
+      "std": 0.471699
+    },
+    "GBP/gdp mom": {
+      "n": 4,
+      "mean": 0.125,
+      "std": 0.25
+    },
     "NZD/business nz pmi": {
       "n": 4,
       "mean": 2.625,
@@ -1202,6 +1177,11 @@
       "n": 4,
       "mean": 0.575,
       "std": 10.473896
+    },
+    "USD/industrial production mom": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.34641
     },
     "JPY/gdp growth annualized": {
       "n": 2,
@@ -1238,6 +1218,21 @@
       "mean": -0.2,
       "std": 10.003666
     },
+    "AUD/unemployment rate": {
+      "n": 3,
+      "mean": -0.066667,
+      "std": 0.11547
+    },
+    "AUD/employment change": {
+      "n": 3,
+      "mean": -5.166667,
+      "std": 26.789052
+    },
+    "USD/philadelphia fed manufacturing index": {
+      "n": 3,
+      "mean": -5.933333,
+      "std": 10.79645
+    },
     "NZD/rbnz interest rate decision": {
       "n": 2,
       "mean": 0.0,
@@ -1247,6 +1242,11 @@
       "n": 2,
       "mean": -0.45,
       "std": 0.070711
+    },
+    "AUD/consumer inflation expectations": {
+      "n": 2,
+      "mean": -0.9,
+      "std": 0.141421
     },
     "EUR/germany wholesale prices yoy": {
       "n": 2,
@@ -1283,6 +1283,11 @@
       "mean": 53.633333,
       "std": 44.225031
     },
+    "EUR/netherlands unemployment rate": {
+      "n": 2,
+      "mean": 0.25,
+      "std": 0.070711
+    },
     "CHF/current account": {
       "n": 2,
       "mean": 3.6,
@@ -1305,210 +1310,6 @@
     }
   },
   "events": [
-    {
-      "currency": "AUD",
-      "event": "Westpac Consumer Confidence Index",
-      "dateISO": "2025-07-15",
-      "hourUTC": "00:30",
-      "actual": "93.1",
-      "forecast": "93.0",
-      "previous": "92.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "AUD",
-      "event": "Westpac Consumer Confidence Change",
-      "dateISO": "2025-07-15",
-      "hourUTC": "00:30",
-      "actual": "0.6%",
-      "forecast": "0.4",
-      "previous": "0.5",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Core Inflation Rate YoY",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "2.7%",
-      "forecast": "2.6",
-      "previous": "2.5",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "CPI Trimmed-Mean YoY",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "3%",
-      "forecast": "3.0",
-      "previous": "3.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Inflation Rate MoM",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "0.1%",
-      "forecast": "0.1",
-      "previous": "0.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Inflation Rate YoY",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "1.9%",
-      "forecast": "1.9",
-      "previous": "1.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "CPI Median YoY",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "3.1%",
-      "forecast": "3.0",
-      "previous": "3.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Industrial Production MoM",
-      "dateISO": "2025-07-15",
-      "hourUTC": "09:00",
-      "actual": "1.7%",
-      "forecast": "0.9",
-      "previous": "-2.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "ZEW Economic Sentiment Index",
-      "dateISO": "2025-07-15",
-      "hourUTC": "09:00",
-      "actual": "36.1",
-      "forecast": "37.8",
-      "previous": "35.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "CPI s.a",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "321.5",
-      "forecast": "321.5",
-      "previous": "320.58",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "Inflation Rate MoM",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "0.3%",
-      "forecast": "0.3",
-      "previous": "0.1",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "Inflation Rate YoY",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "2.7%",
-      "forecast": "2.7",
-      "previous": "2.4",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "CPI",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "322.56",
-      "forecast": "322.5",
-      "previous": "321.46",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "Core Inflation Rate YoY",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "2.9%",
-      "forecast": "3.0",
-      "previous": "2.8",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "Core Inflation Rate MoM",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "0.2%",
-      "forecast": "0.3",
-      "previous": "0.1",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "NY Empire State Manufacturing Index",
-      "dateISO": "2025-07-15",
-      "hourUTC": "12:30",
-      "actual": "5.5",
-      "forecast": "-9.0",
-      "previous": "-16.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "USD",
-      "event": "API Crude Oil Stock Change",
-      "dateISO": "2025-07-15",
-      "hourUTC": "20:30",
-      "actual": "19.1M",
-      "forecast": "-2.0",
-      "previous": "7.1",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
     {
       "currency": "CAD",
       "event": "Housing Starts",
@@ -45801,32 +45602,6 @@
     {
       "date": "24 Jun",
       "dateISO": "2026-06-24",
-      "timeUTC": "06:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Hauser Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "24 Jun",
-      "dateISO": "2026-06-24",
-      "timeUTC": "06:40",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan BoJ Himino Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "24 Jun",
-      "dateISO": "2026-06-24",
       "timeUTC": "08:00",
       "country": "EUR",
       "currency": "EUR",
@@ -45849,19 +45624,6 @@
       "actual": "6.59%",
       "forecast": null,
       "previous": "6.6%"
-    },
-    {
-      "date": "24 Jun",
-      "dateISO": "2026-06-24",
-      "timeUTC": "11:15",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada BoC Rogers Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "24 Jun",
@@ -45940,32 +45702,6 @@
       "actual": "-6.088M",
       "forecast": "-4.5M",
       "previous": "-8.263M"
-    },
-    {
-      "date": "24 Jun",
-      "dateISO": "2026-06-24",
-      "timeUTC": "20:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan BOJ Gov Ueda Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "24 Jun",
-      "dateISO": "2026-06-24",
-      "timeUTC": "20:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Bank Stress Test Results",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "currency": "AUD",
@@ -49834,6 +49570,318 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "United States Fed Musalem Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "01:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Consumer Inflation Expectations",
+      "impact": "medium",
+      "actual": "4.7%",
+      "forecast": "5.5%",
+      "previous": "5.5%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "04:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Netherlands Unemployment Rate",
+      "impact": "medium",
+      "actual": "3.8%",
+      "forecast": "4.1%",
+      "previous": "3.9%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom GDP 3-Month Avg",
+      "impact": "medium",
+      "actual": "0.7%",
+      "forecast": "0.5%",
+      "previous": "0.8%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Industrial Production MoM",
+      "impact": "medium",
+      "actual": "-0.5%",
+      "forecast": "-0.1%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Goods Trade Balance",
+      "impact": "high",
+      "actual": "&#163;-18.66B",
+      "forecast": "&#163;-23.6B",
+      "previous": "&#163;-24.58B"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Goods Trade Balance Non-EU",
+      "impact": "high",
+      "actual": "&#163;-7.14B",
+      "forecast": "&#163;-9.6B",
+      "previous": "&#163;-12.21B"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Manufacturing Production MoM",
+      "impact": "medium",
+      "actual": "0.1%",
+      "forecast": "-0.2%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom GDP MoM",
+      "impact": "high",
+      "actual": "0.1%",
+      "forecast": "0.1%",
+      "previous": "-0.1%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "07:30",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland SNB Monetary Policy Meeting Minutes",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "&#8364;-1.6B",
+      "previous": "&#8364;-1.0B"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Italy Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "&#8364;4.5B",
+      "previous": "&#8364;4.293B"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:15",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Housing Starts",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "258.0K",
+      "previous": "261.4K"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.9%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Philadelphia Fed Manufacturing Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "13.0",
+      "previous": "10.3"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales Control Group MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "0.7%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "6.7%",
+      "previous": "6.9%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales Ex Autos MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-0.1%",
+      "previous": "0.8%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Sales Ex Gas/Autos MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.3",
+      "previous": "0.5"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Pending Home Sales MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.5%",
+      "previous": "3.8%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Pending Home Sales YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.3%",
+      "previous": "4.8%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Business Inventories MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States NAHB Housing Market Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "35.0",
+      "previous": "35.0"
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "16:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Logan Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "16 Jul",
+      "dateISO": "2026-07-16",
+      "timeUTC": "23:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Jefferson Speech",
       "impact": "medium",
       "actual": null,
       "forecast": null,
