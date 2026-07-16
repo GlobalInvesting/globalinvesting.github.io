@@ -1,5 +1,5 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.1.1
+ * GlobalInvesting FX Terminal — License Auth Module  v1.2.0
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
  *
  * Flow:
@@ -12,6 +12,15 @@
  *      the terminal open (best-effort — a failed ping never blocks the UI).
  *      Each ping carries X-Session-Id (see getOrCreateSessionId()) so two
  *      devices sharing one token don't overwrite each other's presence row.
+ *   6. On pagehide/visibilitychange (tab close, navigation away, backgrounding),
+ *      fire one last /session/ping via navigator.sendBeacon() (v1.2.0) — a
+ *      regular periodic ping can be up to 3 minutes stale by the time a user
+ *      closes the tab; sendBeacon is designed to reliably complete even as
+ *      the page is being torn down, which a normal fetch() is not guaranteed
+ *      to do. sendBeacon cannot set custom headers, so the token and session
+ *      id ride as ?token=&session_id= query params on this call only —
+ *      see handleSessionPing()'s header-first, query-param-fallback logic
+ *      in worker.js.
  *
  * Premium sections gated (real index.html IDs):
  *   section-positioning   — CFTC COT
@@ -352,6 +361,34 @@
     pingSession(token);
     sessionPingTimer = setInterval(() => pingSession(loadToken()), SESSION_PING_INTERVAL_MS);
   }
+
+  // Fires one last presence ping as the page is being torn down (tab close,
+  // navigation away, or backgrounding on mobile). A regular fetch() started
+  // in a pagehide/visibilitychange handler is not guaranteed to complete —
+  // the browser can abort it once the page unloads. navigator.sendBeacon()
+  // exists specifically for this case: the browser queues it and completes
+  // it independently of the page's lifetime. sendBeacon cannot set custom
+  // request headers, so token/session id go as query params instead of the
+  // usual Authorization/X-Session-Id headers — the Worker's /session/ping
+  // accepts either (see handleSessionPing() in worker.js).
+  function pingSessionOnUnload() {
+    const token = loadToken();
+    if (!token || !navigator.sendBeacon) return;
+    const params = new URLSearchParams({
+      token:      token,
+      session_id: getOrCreateSessionId(),
+    });
+    try {
+      navigator.sendBeacon(`${WORKER_URL}/session/ping?${params.toString()}`);
+    } catch {
+      // best-effort — must never disrupt the page unload
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') pingSessionOnUnload();
+  });
+  window.addEventListener('pagehide', pingSessionOnUnload);
 
   function saveToken(t) {
     try { sessionStorage.setItem(JWT_KEY, t); } catch {}
