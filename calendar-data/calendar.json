@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-17T11:03:09Z",
-  "generatedAt": "2026-07-17T11:03:09Z",
+  "lastUpdate": "2026-07-17T14:55:00Z",
+  "generatedAt": "2026-07-17T14:55:00Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -304,9 +304,9 @@
       "std": 0.565685
     },
     "USD/michigan consumer sentiment": {
-      "n": 7,
-      "mean": 0.328571,
-      "std": 2.403272
+      "n": 8,
+      "mean": 0.7125,
+      "std": 2.475848
     },
     "EUR/gfk consumer confidence": {
       "n": 3,
@@ -519,24 +519,24 @@
       "std": 0.189297
     },
     "USD/housing starts mom": {
-      "n": 4,
-      "mean": -5.975,
-      "std": 8.595493
+      "n": 5,
+      "mean": -0.98,
+      "std": 13.422444
     },
     "USD/building permits": {
-      "n": 4,
-      "mean": 0.054,
-      "std": 0.08722
+      "n": 5,
+      "mean": 0.0366,
+      "std": 0.084966
     },
     "USD/building permits mom": {
-      "n": 4,
-      "mean": 4.475,
-      "std": 6.10594
+      "n": 5,
+      "mean": 3.12,
+      "std": 6.094424
     },
     "USD/housing starts": {
-      "n": 4,
-      "mean": -0.12375,
-      "std": 0.154621
+      "n": 5,
+      "mean": -0.0756,
+      "std": 0.171822
     },
     "USD/fed interest rate decision": {
       "n": 3,
@@ -1154,14 +1154,14 @@
       "std": 5.38354
     },
     "USD/export prices mom": {
-      "n": 3,
-      "mean": 0.8,
-      "std": 1.212436
+      "n": 4,
+      "mean": 0.55,
+      "std": 1.109054
     },
     "USD/import prices mom": {
-      "n": 3,
-      "mean": 0.9,
-      "std": 0.0
+      "n": 4,
+      "mean": 0.925,
+      "std": 0.05
     },
     "CAD/housing starts": {
       "n": 4,
@@ -1179,9 +1179,9 @@
       "std": 10.473896
     },
     "USD/industrial production mom": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.34641
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.287228
     },
     "JPY/gdp growth annualized": {
       "n": 2,
@@ -49797,7 +49797,7 @@
       "flag": "🇺🇸",
       "event": "United States Building Permits",
       "impact": "high",
-      "actual": null,
+      "actual": "1.367M",
       "forecast": "1.4M",
       "previous": "1.41M"
     },
@@ -49810,9 +49810,9 @@
       "flag": "🇺🇸",
       "event": "United States Housing Starts",
       "impact": "high",
-      "actual": null,
+      "actual": "1.427M",
       "forecast": "1.31M",
-      "previous": "1.177M"
+      "previous": "1.199M"
     },
     {
       "date": "17 Jul",
@@ -49823,7 +49823,7 @@
       "flag": "🇺🇸",
       "event": "United States Building Permits MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-3.0%",
       "forecast": "-0.7%",
       "previous": "-0.9%"
     },
@@ -49836,9 +49836,9 @@
       "flag": "🇺🇸",
       "event": "United States Housing Starts MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "19.0%",
       "forecast": "0.0%",
-      "previous": "-15.4%"
+      "previous": "-15.2%"
     },
     {
       "date": "17 Jul",
@@ -49849,9 +49849,9 @@
       "flag": "🇺🇸",
       "event": "United States Import Prices MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "-0.7%",
-      "previous": "1.9%"
+      "previous": "1.7%"
     },
     {
       "date": "17 Jul",
@@ -49862,9 +49862,9 @@
       "flag": "🇺🇸",
       "event": "United States Export Prices MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.6%",
       "forecast": "-0.4%",
-      "previous": "1.3%"
+      "previous": "1.2%"
     },
     {
       "date": "17 Jul",
@@ -49875,7 +49875,7 @@
       "flag": "🇺🇸",
       "event": "United States Industrial Production MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.1%",
       "forecast": "0.2%",
       "previous": "0.1%"
     },
@@ -49888,7 +49888,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan Consumer Sentiment",
       "impact": "high",
-      "actual": null,
+      "actual": "54.4",
       "forecast": "51.0",
       "previous": "49.5"
     }
