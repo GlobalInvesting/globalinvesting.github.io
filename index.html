@@ -548,7 +548,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div class="topbar-right">
     <!-- MT5 EA — always-visible companion product link (kept outside the hamburger menu on purpose) -->
     <a class="site-menu-btn" href="guide-mt5-ea.html" title="MetaTrader 5 Expert Advisor — companion product">MT5 EA</a>
-    <!-- Site menu dropdown -->
+    <span id="session-label">DETECTING...</span>
+    <span><span class="live-dot"></span><span id="clock">--:--:-- UTC</span></span>
+    <!-- Site menu dropdown — kept as the last child of .topbar-right so its
+         right:0 (relative to itself, see dashboard.css v8.55.1) lines up with
+         the true right edge of the header, matching guide-dashboard.html's
+         already-correct layout. -->
     <div class="site-menu">
       <button class="site-menu-btn" aria-label="Site menu" aria-expanded="false" aria-controls="site-menu-dropdown">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -588,8 +593,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <a href="guide-gbpjpy-cot.html">GBP/JPY Bias Factors</a>
       </div>
     </div>
-    <span id="session-label">DETECTING...</span>
-    <span><span class="live-dot"></span><span id="clock">--:--:-- UTC</span></span>
   </div>
 </header>
 
