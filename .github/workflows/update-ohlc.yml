@@ -37,6 +37,12 @@ name: Update OHLC Chart Data — v2.0 (private scripts)
 # Placement: script fetch_ohlc.py vive en el repo privado globalinvesting-scripts
 # (checkout explícito vía SCRIPTS_PAT). Los minutos de Actions se consumen en este
 # repo público → ilimitados y sin costo. Sin API keys adicionales requeridas.
+#
+# Technical levels (v8.57.2): calculate_technical_levels.py (mismo repo privado,
+# mismo checkout) lee ohlc-data/*.json ya escrito por fetch_ohlc.py y escribe
+# ai-analysis/technical-levels.json — determinístico (SMA20/50/200), sin API keys.
+# Corre SOLO en los runs autoritativos de D1 (01:30 UTC Tue-Sat) para no recalcular
+# en cada intraday run de 30 min; las medias móviles solo cambian con el cierre diario.
 
 on:
   schedule:
@@ -82,10 +88,20 @@ jobs:
       - name: Create output directories
         run: mkdir -p ohlc-data ohlc-data/h1 ohlc-data/h4
 
+      - name: Create ai-analysis directory (D1 finalization run only)
+        if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
+        run: mkdir -p ai-analysis
+
       - name: Fetch OHLC data
         env:
           SITE_DIR: .
         run: python3 private-scripts/fetch_ohlc.py
+
+      - name: Calculate technical levels (D1 finalization run only)
+        if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
+        env:
+          SITE_DIR: .
+        run: python3 private-scripts/calculate_technical_levels.py
 
       - name: Display summary
         if: always()
@@ -124,6 +140,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           cp -r ohlc-data/ /tmp/ohlc_fresh/
+          if [ -f ai-analysis/technical-levels.json ]; then
+            mkdir -p /tmp/ai_analysis_fresh
+            cp ai-analysis/technical-levels.json /tmp/ai_analysis_fresh/
+          fi
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
 
           for i in 1 2 3 4 5; do
@@ -132,6 +152,11 @@ jobs:
             git reset --hard origin/main
             cp -r /tmp/ohlc_fresh/. ohlc-data/
             git add ohlc-data/
+            if [ -f /tmp/ai_analysis_fresh/technical-levels.json ]; then
+              mkdir -p ai-analysis
+              cp /tmp/ai_analysis_fresh/technical-levels.json ai-analysis/
+              git add ai-analysis/technical-levels.json
+            fi
             if git diff --quiet && git diff --staged --quiet; then
               echo "No changes vs remote HEAD — skipping commit."
               exit 0
