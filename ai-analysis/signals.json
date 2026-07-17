@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-07-17T08:32:25Z",
+  "generated_at": "2026-07-17T15:53:43Z",
   "signals": [
     {
-      "time": "08:31",
+      "time": "15:53",
       "priority": "critical",
       "title": "NZD/JPY — G10 Bilateral Theme",
-      "text": "NZD/JPY at 113.307 — NZD is the strongest G10 performer (avg +1.284%) while JPY remains the laggard. Despite NZD COT LF net short -27,675 (18% long), the RBNZ 2.5% [HIKING] stance vs BoJ 1.0% [HIKING] creates a +150bp nominal carry advantage for NZD. RBNZ 2.5%.",
+      "text": "NZD/JPY at 218.369 — NZD is the week's G10 leader (+1.423%) while JPY lags (-0.516%), creating a 1.939% spread. RBNZ 2.5%. JPY COT LF net short -104,231 remains crowded, leaving the pair vulnerable to carry-trade extensions unless VIX (18.1) spikes above 25. NZD/JPY upside remains the dominant bilateral theme.",
       "evidence": [
-        "NZD 1W avg: +1.284% (n=4)",
-        "JPY 1W avg: -0.469% (n=7)",
-        "G10 spread: 1.753%"
+        "NZD 1W avg: +1.423% (n=4)",
+        "JPY 1W avg: -0.516% (n=7)",
+        "G10 spread: 1.939%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "08:28",
-      "priority": "warning",
-      "title": "USD/JPY — Carry + Vol + Geopolitical Risk",
-      "text": "USD/JPY at 162.403 — Pair remains bid on +275bp Fed-BoJ carry (SOFR 3.64% vs TONA 0.98%). However, US-Iran tensions and a bear steepener regime (+87.2bp 2s10s) introduce tail risk. Options market is pricing protection: IV 7.2% vs HV30 3.6% (VRP +3.6%) with a moderate -1.37 25d RR put skew. JPY COT LF net short -104,231 is crowded; intervention risk rises on a sustained hold above 160.00.",
+      "time": "15:50",
+      "priority": "critical",
+      "title": "USD/JPY — Geopolitical Risk + Carry + Vol",
+      "text": "USD/JPY at 162.415 — Pair holding above the 160.00 intervention threshold as Brent crude jumps +3% on Bab al-Mandab threats. 266bp SOFR-TONA carry advantage sustains the bid despite a -1.37 moderate put skew in 25d risk reversals, signaling institutional hedging against BoJ action. JPY safe-haven function remains impaired (z=-1.88σ vs VIX) as carry dominates the flow.",
       "evidence": [
+        "USD/JPY: 162.415",
         "USD/JPY OIS Carry: +266bp",
-        "VRP: +3.6%",
-        "25d RR: -1.37 (Saxo)"
+        "USD/JPY 25d RR: -1.37"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "08:25",
+      "time": "15:47",
       "priority": "warning",
-      "title": "EUR/USD — Positioning + CESI Divergence",
-      "text": "EUR/USD at 1.1443 — ECB 2.25% [HIKING] vs Fed 3.75% [ON HOLD] maintains a -150bp carry deficit for EUR. CESI data shows a strong negative bias for EUR (net -15) vs USD (net +51), suggesting macro fundamentals favor USD. COT LF net short -66,057 (34.7% long) aligns with the data trend. Watch for the final Eurozone CPI report today to confirm if ECB 'September hike' bets remain viable.",
+      "title": "AUD/USD — Positioning + Vol + CESI Divergence",
+      "text": "AUD/USD at 0.6984 — COT LF net long +24,098 (63.8%) contradicts a strong negative CESI (-13 misses), suggesting speculative positioning is overextended relative to deteriorating data. IV at 12.2% vs HV30 7.4% (VRP +4.8%) indicates the options market is pricing a significant volatility premium. Risk of long-unwind rises if data continues to miss, targeting 0.6900.",
       "evidence": [
-        "EUR CESI: -15 net",
-        "USD CESI: +51 net",
-        "EUR COT LF long%: 34.7%"
+        "AUD COT LF net: +24,098",
+        "AUD CESI: -13",
+        "AUD/USD VRP: +4.8%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "08:20",
-      "priority": "info",
-      "title": "GBP/USD — Vol Premium + Retail Divergence",
-      "text": "GBP/USD at 1.3449 — Options market shows extreme hedging demand with IV 11.0% vs HV30 6.8% (VRP +4.2%). While COT LF net long +17,228 (59% long) suggests institutional support, retail is 61% short. Carry is neutral (Fed 3.75% vs BoE 3.75%), but the UK 10Y at 5.01% vs US 10Y at 4.57% provides a yield cushion. Watch for a break of the near-term range as noted by UOB.",
+      "time": "15:42",
+      "priority": "warning",
+      "title": "EUR/USD — Positioning + CESI + ECB",
+      "text": "EUR/USD at 1.1443 — COT LF net short -66,057 (34.7% long) aligns with a strong negative CESI (-16 misses), confirming a bearish fundamental/positioning consensus. 146bp SOFR-ESTR carry advantage favors USD. Market expects ECB to hold at 2.25% on 23 July; any dovish shift regarding September would accelerate the move toward 1.1350.",
       "evidence": [
-        "VRP: +4.2%",
-        "GBP COT LF net: +17,228",
-        "Retail: 61% short"
+        "EUR COT LF net: -66,057",
+        "EUR CESI: -16",
+        "EUR/USD OIS Carry: +146bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "08:15",
+      "time": "15:38",
       "priority": "info",
-      "title": "AUD/CHF — Retail Extreme + Carry Divergence",
-      "text": "AUD/CHF at 0.5630 — Retail sentiment is at an extreme 89% short, diverging from the +435bp carry advantage (RBA 4.35% vs SNB 0.0%). AUD COT LF net long +24,098 (63.8% long) confirms institutional long bias. Retail capitulation risk is high if AUD/CHF holds above recent lows, though AUD CESI (net -13) remains a headwind. Watch the next RBA meeting (mkt: 100% hold priced) on 11 Aug for carry sustainability.",
+      "title": "EUR/GBP — Retail Sentiment Extreme",
+      "text": "EUR/GBP retail sentiment at 88% long vs 12% short — an extreme contrarian signal for further downside. This retail long-bias diverges from the broader EUR bearishness seen in COT and CESI data. Institutional flow likely to fade retail attempts to bottom-fish the cross. Watch for retail capitulation to drive a break toward 0.8400.",
       "evidence": [
-        "Retail: 89% short",
-        "AUD/CHF Carry: +435bp",
-        "AUD COT LF net: +24,098"
+        "EUR/GBP Retail: 88% Long",
+        "EUR CESI: -16",
+        "GBP CESI: -6"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
