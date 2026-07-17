@@ -1454,7 +1454,13 @@
   }
 
   /* ── Site menu dropdown ── */
-  .site-menu { display: flex; align-items: center; }
+  /* position: relative is required here — without it, .site-menu-panel and the
+     .site-menu::after hover-bridge below fall back to positioning against
+     .topbar-right (the nearest positioned ancestor), which is a taller row
+     (clock, session label, etc.). That mismatch opens a real gap between the
+     button and the bridge, so the pointer loses :hover before reaching the
+     panel and the dropdown closes on the way down. Root-caused 2026-07-17. */
+  .site-menu { display: flex; align-items: center; position: relative; }
   .site-menu-btn {
     display: flex; align-items: center; gap: 5px;
     background: none; border: 1px solid var(--border2);
