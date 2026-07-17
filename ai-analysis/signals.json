@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-07-17T15:53:43Z",
+  "generated_at": "2026-07-17T20:57:30Z",
   "signals": [
     {
-      "time": "15:53",
+      "time": "20:57",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme",
-      "text": "NZD/JPY at 218.369 — NZD is the week's G10 leader (+1.423%) while JPY lags (-0.516%), creating a 1.939% spread. RBNZ 2.5%. JPY COT LF net short -104,231 remains crowded, leaving the pair vulnerable to carry-trade extensions unless VIX (18.1) spikes above 25. NZD/JPY upside remains the dominant bilateral theme.",
+      "title": "NZD/JPY — G10 Bilateral Theme + Geopolitical Risk",
+      "text": "NZD/JPY at 94.93 — NZD is the week's G10 leader (+1.432%) while JPY remains the laggard (-0.496%), creating a 1.927% spread. Despite the NZD outperformance, surging Brent oil prices and Iran-related geopolitical tensions introduce acute downside risk for the cross. JPY COT LF net short -104,231 represents a crowded carry trade vulnerable to unwind if VIX (18.8, +12.19%) continues to climb toward the 25.0 risk-off threshold. NZD/JPY carry at +150bp (RBNZ 2.5% vs BoJ 1.0%) is currently secondary to safe-haven flows.",
       "evidence": [
-        "NZD 1W avg: +1.423% (n=4)",
-        "JPY 1W avg: -0.516% (n=7)",
-        "G10 spread: 1.939%"
+        "NZD 1W avg: +1.432% (n=4)",
+        "JPY 1W avg: -0.496% (n=7)",
+        "G10 spread: 1.927%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:50",
-      "priority": "critical",
-      "title": "USD/JPY — Geopolitical Risk + Carry + Vol",
-      "text": "USD/JPY at 162.415 — Pair holding above the 160.00 intervention threshold as Brent crude jumps +3% on Bab al-Mandab threats. 266bp SOFR-TONA carry advantage sustains the bid despite a -1.37 moderate put skew in 25d risk reversals, signaling institutional hedging against BoJ action. JPY safe-haven function remains impaired (z=-1.88σ vs VIX) as carry dominates the flow.",
+      "time": "20:54",
+      "priority": "warning",
+      "title": "USD/JPY — Positioning + Vol + Intervention Risk",
+      "text": "USD/JPY at 162.41 — Price holds above the 160.00 psychological level where BoJ intervention risk is historically elevated. Options market is pricing aggressive protection against a reversal, with 25d RR at -1.37 (moderate put skew) and a +3.6% Vol Risk Premium (IV 7.2% vs HV30 3.6%). COT LF net short -104,231 (29.1% long) confirms a crowded short-JPY position. The combination of extreme positioning and negative options skew suggests a high-conviction hedge against a sharp JPY recovery.",
       "evidence": [
-        "USD/JPY: 162.415",
-        "USD/JPY OIS Carry: +266bp",
-        "USD/JPY 25d RR: -1.37"
+        "USD/JPY: 162.41",
+        "25d RR: -1.37 (Saxo)",
+        "VRP: +3.6%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:47",
+      "time": "20:52",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol + CESI Divergence",
-      "text": "AUD/USD at 0.6984 — COT LF net long +24,098 (63.8%) contradicts a strong negative CESI (-13 misses), suggesting speculative positioning is overextended relative to deteriorating data. IV at 12.2% vs HV30 7.4% (VRP +4.8%) indicates the options market is pricing a significant volatility premium. Risk of long-unwind rises if data continues to miss, targeting 0.6900.",
+      "text": "AUD/USD at 0.6984 — COT LF net long +24,098 (63.8% long) contradicts a strong negative Economic Surprise Index (net -13 misses), signaling speculative overextension in the face of deteriorating fundamentals. Options market aligns with the downside risk, showing an elevated +4.2% VRP (IV 11.6% vs HV30 7.4%) and a -0.74 put skew. Institutional longs are vulnerable to a liquidation event if US data continues to outperform (USD CESI +51).",
       "evidence": [
         "AUD COT LF net: +24,098",
         "AUD CESI: -13",
-        "AUD/USD VRP: +4.8%"
+        "VRP: +4.2%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:42",
-      "priority": "warning",
-      "title": "EUR/USD — Positioning + CESI + ECB",
-      "text": "EUR/USD at 1.1443 — COT LF net short -66,057 (34.7% long) aligns with a strong negative CESI (-16 misses), confirming a bearish fundamental/positioning consensus. 146bp SOFR-ESTR carry advantage favors USD. Market expects ECB to hold at 2.25% on 23 July; any dovish shift regarding September would accelerate the move toward 1.1350.",
+      "time": "20:48",
+      "priority": "info",
+      "title": "USD/CAD — Correlation Break + Tariff Risk",
+      "text": "USD/CAD at 1.4019 — The 252-day correlation between USD/CAD and WTI Oil has collapsed to -0.930 (z = -1.92σ), indicating the pair is no longer trading on energy fundamentals. Trump's headline regarding Canadian wildfire-related tariffs introduces a political risk premium that decouples CAD from the +4.57% surge in WTI. Fed 3.75% vs BoC 2.25% (+150bp carry) supports the USD bid despite the oil rally. Watch for a break of 1.4100 to confirm tariff-driven CAD weakness.",
       "evidence": [
-        "EUR COT LF net: -66,057",
-        "EUR CESI: -16",
-        "EUR/USD OIS Carry: +146bp"
+        "USD/CAD vs WTI: z=-1.92σ",
+        "WTI Oil: $81.9 (+4.57%)",
+        "USD/CAD carry: +150bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:38",
+      "time": "20:42",
       "priority": "info",
       "title": "EUR/GBP — Retail Sentiment Extreme",
-      "text": "EUR/GBP retail sentiment at 88% long vs 12% short — an extreme contrarian signal for further downside. This retail long-bias diverges from the broader EUR bearishness seen in COT and CESI data. Institutional flow likely to fade retail attempts to bottom-fish the cross. Watch for retail capitulation to drive a break toward 0.8400.",
+      "text": "EUR/GBP retail sentiment at 88% long vs 12% short — retail positioning is at a contrarian extreme. This diverges from the institutional bias where EUR CESI (-16) shows persistent data misses compared to GBP (-6). Retail is fading the EUR weakness ahead of the July 23 ECB decision; a hawkish hold is required to prevent retail capitulation. Watch for a move toward 0.8400 to trigger stop-loss hunting of the retail long position.",
       "evidence": [
-        "EUR/GBP Retail: 88% Long",
+        "Retail Sentiment: 88% Long",
         "EUR CESI: -16",
-        "GBP CESI: -6"
+        "ECB Rate: 2.25%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
