@@ -472,6 +472,12 @@
       .then(data => {
         if (data && data.currencies && typeof data.currencies === 'object') {
           _catalystsCache = data;
+          // Macro Drivers is now a persistent block rendered synchronously at modal
+          // open — if this fetch resolves afterward (the common case), re-render it
+          // in place with real data instead of leaving the "not available yet" copy.
+          if (_ccy && document.getElementById('hm-bd')?.style.display !== 'none') {
+            populateMacroDrivers(_ccy);
+          }
         }
       })
       .catch(() => { /* silent fallback — catalyst block is additive */ });
@@ -608,6 +614,10 @@
       <div class="hm-mm-sub down" id="hm-m-weak-sub">—</div>
     </div>
   </div>
+  <div class="hm-cw" id="hm-macro">
+    <div class="hm-ct" id="hm-catalyst-title">MACRO DRIVERS</div>
+    <div id="hm-catalyst"></div>
+  </div>
   <div id="hm-tabs" role="tablist" aria-label="Heatmap breakdown tabs">
     <button class="hm-tab on" role="tab" aria-selected="true"  data-tab="breakdown"    onclick="hmTab(this,'breakdown')">Pair Breakdown</button>
     <button class="hm-tab"    role="tab" aria-selected="false" data-tab="session"      onclick="hmTab(this,'session')">Session</button>
@@ -658,10 +668,6 @@
       </div>
     </div>
     <div class="hm-panel" id="hm-p-correlations">
-      <div class="hm-cw">
-        <div class="hm-ct" id="hm-catalyst-title">MACRO DRIVERS</div>
-        <div id="hm-catalyst"></div>
-      </div>
       <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
         <div class="hm-ct">RELATIVE STRENGTH DIFFERENTIAL · ALL 10 G10 · % COMPOSITE vs PREV CLOSE</div>
         <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);margin:-2px 0 6px;">Click a currency to pivot this panel</div>
@@ -1217,17 +1223,20 @@
     }
   }
 
-  function populateCorrelations(ccy, strengths, rtCache) {
-    document.getElementById('hm-drivers-title').textContent =
-      ccy + ' STRENGTH DRIVERS · TOP 3 PAIRS BY CONTRIBUTION';
-    document.getElementById('hm-catalyst-title').textContent =
-      ccy + ' MACRO DRIVERS';
+  // Per-currency catalyst paragraph + named sources (v8.32.0; v8.56.1: relocated to a
+  // persistent block above the tabs — see hm-macro — so it's visible regardless of
+  // which tab is active, matching Bloomberg's separation of narrative (NI) from
+  // quantitative ranking functions (WCRS) rather than nesting one inside the other).
+  // Distinct from the pair-level driver notes in the Rel. Strength tab: this is a
+  // substantive, sourced writeup of WHY the currency is moving (named officials,
+  // decisions, dates), in the style of Bloomberg FXFB / Reuters wires — not a
+  // repeated COT/carry boilerplate.
+  function populateMacroDrivers(ccy) {
+    const titleEl = document.getElementById('hm-catalyst-title');
+    if (titleEl) titleEl.textContent = ccy + ' MACRO DRIVERS';
 
-    // Per-currency catalyst paragraph + named sources (v8.32.0).
-    // Distinct from the pair-level driver notes below: this is a substantive, sourced
-    // writeup of WHY the currency is moving (named officials, decisions, dates), in the
-    // style of Bloomberg FXFB / Reuters wires — not a repeated COT/carry boilerplate.
     const catalystEl = document.getElementById('hm-catalyst');
+    if (!catalystEl) return;
     const ccyCatalyst = (_catalystsCache && _catalystsCache.currencies)
       ? _catalystsCache.currencies[ccy]
       : null;
@@ -1250,6 +1259,11 @@
     } else {
       catalystEl.innerHTML = '<div style="font-size:11px;color:var(--text3,#6b7280);font-family:var(--font-mono)">No macro driver data available yet</div>';
     }
+  }
+
+  function populateCorrelations(ccy, strengths, rtCache) {
+    document.getElementById('hm-drivers-title').textContent =
+      ccy + ' STRENGTH DRIVERS · TOP 3 PAIRS BY CONTRIBUTION';
 
     const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD','NOK','SEK'];
 
@@ -1788,8 +1802,9 @@
 
     populateMetrics(ccy, strengths, rtCache);
     populateBreakdown(ccy, strengths, rtCache);
+    populateMacroDrivers(ccy); // persistent block — render immediately with whatever's cached so far
     fetchDrivers();        // lazy-load AI driver notes in the background
-    fetchCatalysts();      // lazy-load AI per-currency catalyst notes in the background
+    fetchCatalysts();      // lazy-load AI per-currency catalyst notes; re-renders macro drivers on arrival
     fetchSessionContext(); // lazy-load AI session context notes in the background
 
     // Update source labels to reflect active data source (Finnhub live vs yfinance)
@@ -1873,6 +1888,7 @@
 
     populateMetrics(newCcy, _strengths, _rtCache);
     populateBreakdown(newCcy, _strengths, _rtCache, true);
+    populateMacroDrivers(newCcy); // persistent block — must follow the pivot too, not just the active tab
     populateCorrelations(newCcy, _strengths, _rtCache);
   };
 
