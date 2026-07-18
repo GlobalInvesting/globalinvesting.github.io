@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-18T03:25:26Z",
+  "updated": "2026-07-18T03:30:25Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -9,7 +9,7 @@
       "pct": 12.1937,
       "high": 19.5,
       "low": 17.68,
-      "open": null,
+      "open": 18.01,
       "bid": null,
       "ask": null,
       "market_state": "POSTPOST",
@@ -35,20 +35,16 @@
       "pct1w_date": "2026-07-10"
     },
     "gold": {
-      "close": 4023.0,
-      "prev_close": 3985.6001,
-      "chg": 37.3999,
-      "pct": 0.9384,
-      "high": 4028.8999,
+      "close": 4010.631,
+      "prev_close": 4016.9758,
+      "chg": -6.3448,
+      "pct": -0.1579,
+      "source": "twelve_data",
+      "high": 4028.9,
       "low": 3963.0,
-      "open": 3980.1001,
-      "bid": null,
-      "ask": null,
-      "market_state": null,
-      "market_time": null,
-      "source": "yfinance",
-      "pct1w": -1.9761,
-      "pct1w_date": "2026-07-10"
+      "open": 3980.1,
+      "market_state": "REGULAR",
+      "market_time": 1784321999
     },
     "wti": {
       "close": 81.77,
@@ -203,35 +199,35 @@
       "pct1w_date": "2026-07-10"
     },
     "btc": {
-      "close": 63905.78,
+      "close": 63903.21,
       "prev_close": 63888.2,
-      "chg": 17.58,
-      "pct": 0.0275,
+      "chg": 15.01,
+      "pct": 0.0235,
       "high": 63968.11,
       "low": 63854.43,
       "open": 63888.2,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1784345132,
+      "market_time": 1784345422,
       "source": "yfinance",
-      "pct1w": -0.3452,
+      "pct1w": -0.3492,
       "pct1w_date": "2026-07-10"
     },
     "eth": {
-      "close": 1842.36,
+      "close": 1842.32,
       "prev_close": 1840.656,
-      "chg": 1.704,
-      "pct": 0.0926,
+      "chg": 1.664,
+      "pct": 0.0904,
       "high": 1843.7052,
       "low": 1839.038,
       "open": 1840.656,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1784345130,
+      "market_time": 1784345425,
       "source": "yfinance",
-      "pct1w": 2.5988,
+      "pct1w": 2.5966,
       "pct1w_date": "2026-07-10"
     },
     "nasdaq": {
