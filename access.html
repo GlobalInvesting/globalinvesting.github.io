@@ -191,21 +191,22 @@ a { color: inherit; text-decoration: none; }
 .scr-item-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.55; padding: 0 2px; }
 .scr-item-meta strong { color: var(--text2); font-weight: 600; }
 
-/* ADDITIONAL COVERAGE — compact feature cards */
-.feat-card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.feat-card-grid.feat-card-grid-2 { grid-template-columns: repeat(2, 1fr); max-width: 620px; }
-.feat-card {
-  border: 1px solid var(--border); border-radius: 4px; background: var(--bg2);
-  overflow: hidden; transition: border-color .18s;
-}
-.feat-card:hover { border-color: var(--border2); }
-.feat-card-thumb { aspect-ratio: 16 / 10; background: var(--bg3); cursor: zoom-in; overflow: hidden; }
-.feat-card-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
-.feat-card-thumb-contain img { object-fit: contain; object-position: center; }
-.feat-card-thumb-crop-center img { object-position: center; }
-.feat-card-body { padding: 12px 14px 14px; }
-.feat-card-title { font-size: 12.5px; font-weight: 700; color: #e8edf8; margin-bottom: 6px; letter-spacing: -.1px; }
-.feat-card-desc { font-family: var(--font-mono); font-size: 9.5px; color: var(--text3); line-height: 1.55; }
+/* ADDITIONAL COVERAGE — interactive tabbed showcase */
+.showcase { display: grid; grid-template-columns: 280px 1fr; gap: 28px; align-items: start; }
+.showcase-tabs { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--bg2); }
+.showcase-tab { display: block; width: 100%; text-align: left; background: none; border: none; border-left: 2px solid transparent; padding: 13px 16px; cursor: pointer; font-family: var(--font-ui); transition: background .15s, border-color .15s; }
+.showcase-tab + .showcase-tab { border-top: 1px solid var(--border); }
+.showcase-tab:hover { background: var(--bg3); }
+.showcase-tab.active { background: var(--bg3); border-left-color: var(--blue); }
+.showcase-tab-title { display: block; font-size: 12px; font-weight: 700; color: var(--text2); letter-spacing: -.1px; transition: color .15s; }
+.showcase-tab.active .showcase-tab-title { color: #e8edf8; }
+.showcase-tab-desc { display: block; font-family: var(--font-mono); font-size: 9.5px; color: var(--text3); line-height: 1.55; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .2s ease, opacity .15s ease, margin-top .2s ease; }
+.showcase-tab.active .showcase-tab-desc { max-height: 120px; opacity: 1; margin-top: 6px; }
+.showcase-preview-frame { position: relative; height: 420px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 4px; overflow: hidden; }
+.showcase-slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .18s ease; cursor: zoom-in; padding: 14px; }
+.showcase-slide.active { opacity: 1; pointer-events: auto; z-index: 2; }
+.showcase-slide img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; }
+.showcase-index { position: absolute; bottom: 10px; right: 12px; font-family: var(--font-mono); font-size: 9.5px; color: var(--text3); background: rgba(11,14,20,.75); border: 1px solid var(--border2); border-radius: 2px; padding: 2px 7px; pointer-events: none; z-index: 3; }
 
 /* FEATURE TABLE */
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 28px; border: 1px solid var(--border); border-radius: 4px; }
@@ -305,7 +306,8 @@ a { color: inherit; text-decoration: none; }
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
-  .feat-card-grid { grid-template-columns: repeat(2, 1fr); }
+  .showcase { grid-template-columns: 1fr; }
+  .showcase-preview-frame { height: 320px; }
   .hero-inner { grid-template-columns: 1fr; gap: 36px; }
   .hero-price-card { max-width: 380px; }
   .steps-grid { grid-template-columns: 1fr; }
@@ -321,7 +323,7 @@ a { color: inherit; text-decoration: none; }
   .hero-inner, .page-body, .subnav-inner { padding-left: 20px; padding-right: 20px; }
   .hero h1 { font-size: 26px; }
   .scr-grid, .scr-grid-3 { grid-template-columns: 1fr; }
-  .feat-card-grid, .feat-card-grid.feat-card-grid-2 { grid-template-columns: 1fr; max-width: none; }
+  .showcase-preview-frame { height: 260px; }
   .companion-grid { grid-template-columns: 1fr; }
   .companion-card + .companion-card { border-left: none; border-top: 1px solid var(--border); }
   .sub-card-body { grid-template-columns: 1fr; }
@@ -755,64 +757,56 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <div class="scr-gallery-label gallery-break">Additional Coverage</div>
-      <p class="gallery-break-desc">Six more panels covered at reference density — cross-asset correlations, derivatives, carry, currency strength, AI alerts, and news.</p>
+      <p class="gallery-break-desc">Six more panels — cross-asset correlations, derivatives, carry, currency strength, AI alerts, and news. Select one to preview it at full size.</p>
 
-      <div class="feat-card-grid">
-        <div class="feat-card">
-          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Cross-Asset Correlations">
-            <img src="assets/screenshot-correlations.png" data-src="assets/screenshot-correlations.png" alt="Key Correlations table showing rolling 60-day Pearson correlation between FX pairs and reference assets, with a vs-norm z-score column flagging stretched or broken correlations" width="408" height="458" loading="lazy">
-          </div>
-          <div class="feat-card-body">
-            <div class="feat-card-title">Cross-Asset Correlations</div>
-            <div class="feat-card-desc">60-day rolling Pearson correlation vs VIX, S&amp;P 500, Gold and DXY, z-scored against a 252-day norm to flag stretched or broken regimes.</div>
-          </div>
+      <div class="showcase">
+        <div class="showcase-tabs" role="tablist" aria-label="Additional coverage panels">
+          <button type="button" class="showcase-tab active" role="tab" aria-selected="true" aria-controls="showcase-frame" id="showcase-tab-0" data-idx="0">
+            <span class="showcase-tab-title">Cross-Asset Correlations</span>
+            <span class="showcase-tab-desc">60-day rolling Pearson correlation vs VIX, S&amp;P 500, Gold and DXY, z-scored against a 252-day norm to flag stretched or broken regimes.</span>
+          </button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-1" data-idx="1">
+            <span class="showcase-tab-title">Derivatives Detail</span>
+            <span class="showcase-tab-desc">25-delta RR term structure (1W&ndash;1Y) with put/call skew, CIP-implied forwards, and realized vol vs RR skew &mdash; the underlying tables behind the Derivatives suite above.</span>
+          </button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-2" data-idx="2">
+            <span class="showcase-tab-title">Carry Trade Ranking</span>
+            <span class="showcase-tab-desc">G10 real carry, annualized and ranked pair by pair — the nominal OIS differential net of expected inflation.</span>
+          </button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-3" data-idx="3">
+            <span class="showcase-tab-title">Currency Strength (CSI)</span>
+            <span class="showcase-tab-desc">Accumulated % return by currency (1M&ndash;All), with composite score, 1W strength, G10 rank, and strongest/weakest crosses per currency.</span>
+          </button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-4" data-idx="4">
+            <span class="showcase-tab-title">Alerts &amp; Market Signals</span>
+            <span class="showcase-tab-desc">AI-generated entries combining COT positioning, OIS-implied CB bias, carry, and options skew, each timestamped with a priority indicator.</span>
+          </button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-5" data-idx="5">
+            <span class="showcase-tab-title">News Feed</span>
+            <span class="showcase-tab-desc">FX-relevant headlines filterable by currency, with source and timestamp on every entry.</span>
+          </button>
         </div>
-        <div class="feat-card">
-          <div class="feat-card-thumb feat-card-thumb-contain" role="button" tabindex="0" aria-label="Enlarge: Derivatives detail">
-            <img src="assets/screenshot-rr-term-structure.png" data-src="assets/screenshot-rr-term-structure.png" alt="25-Delta Risk Reversal term structure table showing RR values across 1W, 1M, 3M, 6M, and 1Y tenors for six major pairs, with a Skew column summarizing put or call skew" width="767" height="419" loading="lazy">
-          </div>
-          <div class="feat-card-body">
-            <div class="feat-card-title">Derivatives Detail</div>
-            <div class="feat-card-desc">25-delta RR term structure (1W&ndash;1Y) with put/call skew, CIP-implied forwards, and realized vol vs RR skew &mdash; the underlying tables behind the Derivatives suite above.</div>
-          </div>
-        </div>
-        <div class="feat-card">
-          <div class="feat-card-thumb feat-card-thumb-crop-center" role="button" tabindex="0" aria-label="Enlarge: Carry Trade Ranking">
-            <img src="assets/screenshot-carry-ranking-new.png" data-src="assets/screenshot-carry-ranking-new.png" alt="Carry Trade Ranking panel in the Global Investing web terminal, showing G10 real carry annualized ranking by currency pair" width="389" height="336" loading="lazy">
-          </div>
-          <div class="feat-card-body">
-            <div class="feat-card-title">Carry Trade Ranking</div>
-            <div class="feat-card-desc">G10 real carry, annualized and ranked pair by pair — the nominal OIS differential net of expected inflation.</div>
-          </div>
-        </div>
-        <div class="feat-card">
-          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Currency Strength (CSI)">
-            <img src="assets/screenshot-csi-web-terminal.png" data-src="assets/screenshot-csi-web-terminal.png" alt="Currency Strength Heatmap modal in the Global Investing web terminal, CSI tab, showing accumulated percent-return lines for all 10 G10 currencies with composite score, 1-week strength, rank, pairs won, and strongest/weakest crosses" width="690" height="575" loading="lazy">
-          </div>
-          <div class="feat-card-body">
-            <div class="feat-card-title">Currency Strength (CSI)</div>
-            <div class="feat-card-desc">Accumulated % return by currency (1M&ndash;All), with composite score, 1W strength, G10 rank, and strongest/weakest crosses per currency.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="feat-card-grid feat-card-grid-2" style="margin-top:16px;">
-        <div class="feat-card">
-          <div class="feat-card-thumb" role="button" tabindex="0" aria-label="Enlarge: Alerts and Market Signals">
-            <img src="assets/screenshot-alerts-signals.png" data-src="assets/screenshot-alerts-signals.png" alt="Alerts &amp; Market Signals panel showing AI-generated entries combining COT positioning, OIS-implied central bank bias, carry, and options skew, each with a priority dot, timestamp, title, and supporting data chips" width="897" height="621" loading="lazy">
-          </div>
-          <div class="feat-card-body">
-            <div class="feat-card-title">Alerts &amp; Market Signals</div>
-            <div class="feat-card-desc">AI-generated entries combining COT positioning, OIS-implied CB bias, carry, and options skew, each timestamped with a priority indicator.</div>
-          </div>
-        </div>
-        <div class="feat-card">
-          <div class="feat-card-thumb feat-card-thumb-contain" role="button" tabindex="0" aria-label="Enlarge: News Feed">
-            <img src="assets/screenshot-news-feed.png" data-src="assets/screenshot-news-feed.png" alt="News Feed panel with currency filter pills (All, USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) and a list of FX-relevant headlines with source, timestamp, and summary" width="704" height="347" loading="lazy">
-          </div>
-          <div class="feat-card-body">
-            <div class="feat-card-title">News Feed</div>
-            <div class="feat-card-desc">FX-relevant headlines filterable by currency, with source and timestamp on every entry.</div>
+        <div class="showcase-preview">
+          <div class="showcase-preview-frame" id="showcase-frame" role="tabpanel" aria-labelledby="showcase-tab-0">
+            <div class="showcase-slide active" data-idx="0" role="button" tabindex="0" aria-label="Enlarge: Cross-Asset Correlations" data-caption="Cross-Asset Correlations — 60-day rolling Pearson correlation vs VIX, S&amp;P 500, Gold and DXY, z-scored against a 252-day norm to flag stretched or broken regimes.">
+              <img src="assets/screenshot-correlations.png" data-src="assets/screenshot-correlations.png" alt="Key Correlations table showing rolling 60-day Pearson correlation between FX pairs and reference assets, with a vs-norm z-score column flagging stretched or broken correlations" width="408" height="458" loading="eager">
+            </div>
+            <div class="showcase-slide" data-idx="1" role="button" tabindex="-1" aria-label="Enlarge: Derivatives detail" data-caption="Derivatives Detail — 25-delta RR term structure (1W&ndash;1Y) with put/call skew, CIP-implied forwards, and realized vol vs RR skew.">
+              <img src="assets/screenshot-rr-term-structure.png" data-src="assets/screenshot-rr-term-structure.png" alt="25-Delta Risk Reversal term structure table showing RR values across 1W, 1M, 3M, 6M, and 1Y tenors for six major pairs, with a Skew column summarizing put or call skew" width="767" height="419" loading="lazy">
+            </div>
+            <div class="showcase-slide" data-idx="2" role="button" tabindex="-1" aria-label="Enlarge: Carry Trade Ranking" data-caption="Carry Trade Ranking — G10 real carry, annualized and ranked pair by pair, the nominal OIS differential net of expected inflation.">
+              <img src="assets/screenshot-carry-ranking-new.png" data-src="assets/screenshot-carry-ranking-new.png" alt="Carry Trade Ranking panel in the Global Investing web terminal, showing G10 real carry annualized ranking by currency pair" width="389" height="336" loading="lazy">
+            </div>
+            <div class="showcase-slide" data-idx="3" role="button" tabindex="-1" aria-label="Enlarge: Currency Strength (CSI)" data-caption="Currency Strength (CSI) — accumulated % return by currency (1M&ndash;All), with composite score, 1W strength, G10 rank, and strongest/weakest crosses per currency.">
+              <img src="assets/screenshot-csi-web-terminal.png" data-src="assets/screenshot-csi-web-terminal.png" alt="Currency Strength Heatmap modal in the Global Investing web terminal, CSI tab, showing accumulated percent-return lines for all 10 G10 currencies with composite score, 1-week strength, rank, pairs won, and strongest/weakest crosses" width="690" height="575" loading="lazy">
+            </div>
+            <div class="showcase-slide" data-idx="4" role="button" tabindex="-1" aria-label="Enlarge: Alerts and Market Signals" data-caption="Alerts &amp; Market Signals — AI-generated entries combining COT positioning, OIS-implied CB bias, carry, and options skew, each timestamped with a priority indicator.">
+              <img src="assets/screenshot-alerts-signals.png" data-src="assets/screenshot-alerts-signals.png" alt="Alerts &amp; Market Signals panel showing AI-generated entries combining COT positioning, OIS-implied central bank bias, carry, and options skew, each with a priority dot, timestamp, title, and supporting data chips" width="897" height="621" loading="lazy">
+            </div>
+            <div class="showcase-slide" data-idx="5" role="button" tabindex="-1" aria-label="Enlarge: News Feed" data-caption="News Feed — FX-relevant headlines filterable by currency, with source and timestamp on every entry.">
+              <img src="assets/screenshot-news-feed.png" data-src="assets/screenshot-news-feed.png" alt="News Feed panel with currency filter pills (All, USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) and a list of FX-relevant headlines with source, timestamp, and summary" width="704" height="347" loading="lazy">
+            </div>
+            <div class="showcase-index" id="showcase-index" aria-hidden="true">01 / 06</div>
           </div>
         </div>
       </div>
@@ -1044,24 +1038,62 @@ a { color: inherit; text-decoration: none; }
       if (!img) return;
       lbImg.src = img.dataset.src || img.src;
       lbImg.alt = img.alt;
-      // Caption: for scr-hero the next sibling is .scr-meta; for scr-item it's .scr-item-meta inside same parent;
-      // for feat-card-thumb it's .feat-card-body (title + desc) inside the same parent .feat-card
+      // Caption: showcase-slide carries its own data-caption; for scr-hero the next sibling is .scr-meta;
+      // for scr-item it's .scr-item-meta inside same parent; for feat-card-thumb it's .feat-card-body (title + desc)
       const metaHero = el.nextElementSibling;
       const metaItem = el.parentElement && el.parentElement.querySelector('.scr-item-meta, .feat-card-body');
       const capEl = (metaHero && metaHero.classList.contains('scr-meta')) ? metaHero : metaItem;
-      lbCap.textContent = capEl ? capEl.textContent.trim() : (el.getAttribute('aria-label') || '');
+      lbCap.textContent = el.dataset.caption || (capEl ? capEl.textContent.trim() : (el.getAttribute('aria-label') || ''));
       lb.classList.add('open');
       document.body.style.overflow = 'hidden';
       lbClose.focus();
     }
     function closeLb() { lb.classList.remove('open'); document.body.style.overflow = ''; }
-    document.querySelectorAll('.scr-hero, .scr-item, .feat-card-thumb').forEach(el => {
+    document.querySelectorAll('.scr-hero, .scr-item, .feat-card-thumb, .showcase-slide').forEach(el => {
       el.addEventListener('click', () => openLb(el));
       el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(el); } });
     });
     lb.addEventListener('click', e => { if (e.target !== lbImg) closeLb(); });
     lbClose.addEventListener('click', closeLb);
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && lb.classList.contains('open')) closeLb(); });
+  }
+
+  // Additional Coverage — interactive tabbed showcase
+  const showcaseTabs = Array.from(document.querySelectorAll('.showcase-tab'));
+  if (showcaseTabs.length) {
+    const slides = Array.from(document.querySelectorAll('.showcase-slide'));
+    const indexEl = document.getElementById('showcase-index');
+    const frame = document.getElementById('showcase-frame');
+    const total = showcaseTabs.length;
+    function activate(idx) {
+      showcaseTabs.forEach(t => {
+        const on = t.dataset.idx === String(idx);
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', String(on));
+      });
+      slides.forEach(s => {
+        const on = s.dataset.idx === String(idx);
+        s.classList.toggle('active', on);
+        s.setAttribute('tabindex', on ? '0' : '-1');
+      });
+      if (frame) frame.setAttribute('aria-labelledby', 'showcase-tab-' + idx);
+      if (indexEl) indexEl.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+    }
+    showcaseTabs.forEach(tab => {
+      tab.addEventListener('click', () => activate(tab.dataset.idx));
+    });
+    // Arrow-key navigation across tabs (standard tablist behavior)
+    const tabsContainer = document.querySelector('.showcase-tabs');
+    if (tabsContainer) {
+      tabsContainer.addEventListener('keydown', e => {
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        e.preventDefault();
+        const current = showcaseTabs.findIndex(t => t.classList.contains('active'));
+        const next = e.key === 'ArrowDown' ? (current + 1) % total : (current - 1 + total) % total;
+        showcaseTabs[next].focus();
+        activate(String(next));
+      });
+    }
   }
 
   // Subnav scroll-spy
