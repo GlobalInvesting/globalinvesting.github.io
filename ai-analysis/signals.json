@@ -1,64 +1,64 @@
 {
-  "generated_at": "2026-07-17T23:14:21Z",
+  "generated_at": "2026-07-18T20:50:58Z",
   "signals": [
     {
-      "time": "22:11",
+      "time": "20:16",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme + Geopolitical Energy Risk",
-      "text": "NZD 1W avg +1.425% (n=4) vs JPY -0.489% (n=7) creates a 1.915% G10 spread that faces immediate pressure from surging energy prices and Middle East tensions. Surging natural gas and crude oil prices (+4.46%) typically weigh on the energy-importing JPY, while the NZD COT net short of -29,582 (15.2% long) provides fuel for a short-squeeze if risk appetite holds. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for determining if the JPY's yield disadvantage (266bp vs USD) will be addressed.",
+      "title": "NZD/JPY — G10 Bilateral Theme + Geopolitical Risk Premium",
+      "text": "NZD 1W momentum (+1.390%) faces a sharp reversal risk as the 11% surge in WTI crude and US-Iran escalation drive safe-haven demand into the laggard JPY. The 1.879% G10 scorecard spread is vulnerable to compression as the Nikkei's 4.03% drop signals a massive unwind of carry-funded risk positions. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul remains the primary anchor for JPY normalization against the NZD's accommodative -0.58% real rate.",
       "evidence": [
-        "NZD 1W avg: +1.425% (n=4)",
+        "NZD 1W avg: +1.390% (n=4)",
         "JPY 1W avg: -0.489% (n=7)",
-        "G10 spread: 1.915%",
-        "WTI Oil: $81.8 (+4.46%)"
+        "G10 spread: 1.879%",
+        "WTI Oil: $81.8 (+4.47%)"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "19:36",
+      "priority": "critical",
+      "title": "USD/JPY — JPY COT Short Squeeze + Inflationary Oil Shock",
+      "text": "Fed 3.75%. While the +264bp OIS carry advantage favors USD, the 12.19% spike in VIX and JPY's positive economic surprise index (net +8) support a tactical JPY recovery from Friday's 162.35 close. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for determining if the yield gap narrows further.",
+      "evidence": [
+        "JPY COT net short -105,238",
+        "VIX: 18.8 (+12.19%)",
+        "USD/JPY OIS carry: +264bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
       "time": "19:35",
       "priority": "warning",
-      "title": "USD/CAD — Trade Friction + COT Positioning Risk",
-      "text": "CAD COT net short -93,515 (20.6% long) leaves the pair vulnerable to a short-squeeze as Trump threatens new Canadian tariffs linked to wildfire smoke. While the +133bp OIS carry advantage favors USD, the extreme CAD short positioning and a -1.92σ correlation break with WTI oil suggest the pair is decoupled from energy tailwinds. The next BoC meeting (mkt: 100% hold priced) is the catalyst for resolving the divergence between trade risks and restrictive real rates (+0.19%).",
+      "title": "USD/CAD — CAD COT Short + Trade Tariff Escalation",
+      "text": "CAD COT net short -93,515 (79.4% short) reinforces downside pressure on the Loonie following Trump's weekend threats of new Canadian tariffs. Despite the 11% weekly surge in WTI oil typically supporting CAD, the -1.97σ correlation break suggests trade war fears and the +132bp USD carry advantage are the dominant drivers. The next BoC meeting (mkt: 100% hold priced) determines if the central bank can maintain its hold against deteriorating trade relations.",
       "evidence": [
-        "CAD COT net short: -93,515",
-        "USD/CAD vs WTI corr: -0.930 (z=-1.92σ)",
-        "Trump tariff headline (19:35)"
+        "CAD COT net short -93,515",
+        "USD/CAD vs WTI corr: -0.917 (z=-1.97σ)",
+        "USD/CAD OIS carry: +132bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
       "time": "18:35",
       "priority": "warning",
-      "title": "EUR/USD — ECB Policy Divergence + CESI Underperformance",
-      "text": "EUR COT net short -74,637 (33.3% long) aligns with a strong negative CESI (-16 net misses) to maintain downside pressure toward the 1.1446 Friday close. The +146bp OIS carry advantage for USD is reinforced by the Fed's restrictive real rate (+1.47%) compared to the ECB's near-neutral stance (+0.03%). The next ECB meeting (mkt: 100% hold priced) on 23 Jul is the catalyst for confirming the hold bias amid surging energy-driven inflation risks.",
+      "title": "EUR/USD — ECB Policy Divergence + Data Underperformance",
+      "text": "EUR COT net short -74,637 aligns with a strong negative economic surprise index (net -16) to keep the bias tilted toward 1.1400. The +144bp OIS carry advantage for USD is reinforced by the US real rate of +1.47% vs the EUR's near-zero +0.03%, limiting upside ahead of the ECB decision. The next ECB meeting (mkt: 100% hold priced) on 23 Jul is the catalyst for confirming the hold bias amidst rising energy-driven inflation risks.",
       "evidence": [
-        "EUR COT net short: -74,637",
-        "EUR CESI: -16 net misses",
-        "EUR/USD OIS carry: +146bp (USD advantage)"
+        "EUR COT net short -74,637",
+        "EUR CESI: -16 misses",
+        "EUR/USD OIS carry: +144bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:19",
+      "time": "19:36",
       "priority": "info",
-      "title": "GBP/USD — Volatility Risk + Positioning Crowding",
-      "text": "GBP COT net long +28,278 (64.8% long) creates an unwind risk as GBP/USD IV (11.0%) shows an elevated +4.2% premium over realized volatility (HV30 6.8%). Despite a neutral nominal carry (0bp), the GBP real rate of +0.78% is significantly lower than the USD real rate of +1.47%, suggesting the long position is fundamentally stretched. The next BoE meeting (mkt: 100% hold priced) on 30 Jul is the catalyst for testing the sustainability of the current long bias.",
+      "title": "EUR/GBP — Retail Sentiment Extreme + Negative CESI Alignment",
+      "text": "Retail positioning is 88% long EUR/GBP, creating a contrarian signal for downside as the pair's 1.1446 close faces pressure from the Euro's persistent data misses. While the carry spread is narrow, the GBP's mildly restrictive +0.78% real rate offers a superior yield profile compared to the EUR's +0.03%. The next BoE meeting (mkt: 100% hold priced) on 30 Jul serves as the resolution point for this relative value divergence.",
       "evidence": [
-        "GBP COT net long: +28,278",
-        "GBP/USD VRP: +4.2% (IV 11.0% vs HV30 6.8%)",
-        "USD-GBP real rate gap: 69bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "23:11",
-      "priority": "info",
-      "title": "AUD/USD — Retail Sentiment Divergence + CESI Weakness",
-      "text": "AUD COT net long +21,946 (63.2% long) faces a contrarian headwind from 67% retail short positioning and a strong negative CESI of -13 misses. While the -71bp OIS carry advantage favors AUD, persistent data disappointments and a bull flattener yield curve regime limit the upside potential from the 0.6985 Friday close. The next RBA meeting (mkt: 100% hold priced) on 11 Aug is the catalyst for assessing if the 4.35% hold bias remains appropriate.",
-      "evidence": [
-        "AUD COT net long: +21,946",
-        "AUD CESI: -13 net misses",
-        "Retail sentiment: 67% short"
+        "EUR/GBP retail: 88% long",
+        "EUR CESI: -16 misses",
+        "GBP real rate: +0.78%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
