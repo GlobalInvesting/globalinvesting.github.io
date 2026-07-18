@@ -441,8 +441,7 @@
   let _csiData       = null;  // { dates: [...], series: { EUR: [...], GBP: [...], ... } }
   let _csiChart      = null;  // LWC chart instance
   let _csiPeriodDays = 63;    // default 3M
-  let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for highlight toggling
-  let _csiHighlightCcy = null; // currently highlighted ccy (null = use modal focal ccy)
+  let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for focal-line styling
   let _csiInited     = false;
 
   // Fetch currency-drivers.json once per page load (lazy, on first modal open).
@@ -1532,7 +1531,6 @@
       chartEl.innerHTML = '';
     }
     _csiSeriesMap = {};
-    _csiHighlightCcy = null;
 
     const _csiBg    = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()    || '#131722';
     const _csiText2 = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim() || '#9096a0';
@@ -1664,7 +1662,7 @@
       const isFocus = r.ccy === ccy;
       const cls = r.val > 0 ? 'up' : r.val < 0 ? 'down' : 'flat';
       const valStr = r.val != null ? (r.val >= 0 ? '+' : '') + r.val.toFixed(2) + '%' : '—';
-      return '<div class="hm-csi-leg" onclick="csiHighlight(\'' + r.ccy + '\')" style="cursor:pointer" title="Click to highlight ' + r.ccy + '">' +
+      return '<div class="hm-csi-leg" onclick="hmPivotCcy(\'' + r.ccy + '\')" style="cursor:pointer" title="Click to view ' + r.ccy + '">' +
         '<div class="hm-csi-leg-dot" style="background:' + CSI_COLORS[r.ccy] + ';' +
           (isFocus ? 'height:3px;' : '') + '"></div>' +
         '<span class="hm-csi-leg-lbl" style="' + (isFocus ? 'color:var(--text,#d1d4dc);font-weight:600;' : '') + '">' +
@@ -1824,26 +1822,6 @@
     }
   };
 
-  // Toggle highlight on a CSI series — clicking active focal ccy resets to modal ccy
-  window.csiHighlight = function(clickedCcy) {
-    if (!_csiChart || !_csiSeriesMap[clickedCcy]) return;
-    const newFocus = (_csiHighlightCcy === clickedCcy) ? _ccy : clickedCcy;
-    _csiHighlightCcy = (newFocus === _ccy) ? null : newFocus;
-    CCY_ORDER.forEach(c => {
-      const isFocus = c === newFocus;
-      _csiSeriesMap[c].applyOptions({
-        lineWidth: isFocus ? 2.5 : 1,
-        color: isFocus ? CSI_COLORS[c] : CSI_COLORS[c] + 'aa',
-        crosshairMarkerVisible: isFocus,
-      });
-    });
-    // Re-render legend to update bold/active state
-    const allDates = _csiData.dates;
-    let startIdx = 0;
-    if (_csiPeriodDays > 0) startIdx = Math.max(0, allDates.length - _csiPeriodDays);
-    _updateCSILegend(newFocus, allDates[startIdx]);
-  };
-
   window.closeHeatmapModal = function() {
     const bd = document.getElementById('hm-bd');
     if (bd) bd.style.display = 'none';
@@ -1872,9 +1850,10 @@
   };
 
   // Pivot the whole modal to a different focal currency without closing it — clicking
-  // a row/column header in the Rel. Strength matrix calls this (Bloomberg/Eikon-style
-  // in-panel instrument pivot, instead of forcing the user to close and reopen from
-  // the heatmap for every currency they want to inspect).
+  // a row/column header in the Rel. Strength matrix, or a currency chip in the CSI
+  // legend, calls this (Bloomberg/Eikon-style in-panel instrument pivot, instead of
+  // forcing the user to close and reopen from the heatmap for every currency they
+  // want to inspect).
   window.hmPivotCcy = function(newCcy) {
     if (!newCcy || newCcy === _ccy || !_strengths || !_rtCache) return;
     _ccy = newCcy;
@@ -1890,6 +1869,11 @@
     populateBreakdown(newCcy, _strengths, _rtCache, true);
     populateMacroDrivers(newCcy); // persistent block — must follow the pivot too, not just the active tab
     populateCorrelations(newCcy, _strengths, _rtCache);
+    // CSI has its own chart canvas that needs a visible container to size correctly,
+    // so only refresh it when that tab is actually the one on screen — matching the
+    // lazy-populate pattern hmTab() already uses for session/correlations/csi.
+    const csiPanel = document.getElementById('hm-p-csi');
+    if (csiPanel && csiPanel.classList.contains('on')) populateCSI(newCcy);
   };
 
   // ── Live source label — updates hm-sub and hm-footer-meta to reflect active source ──
