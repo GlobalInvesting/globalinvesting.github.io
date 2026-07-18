@@ -133,27 +133,21 @@
 }
 #gi-auth-activate:hover { background: var(--blue,#4f7fff); }
 #gi-auth-activate:disabled { background: #444; cursor: default; }
-#gi-auth-err {
+#gi-auth-status {
   font-size: 11px;
-  color: var(--down,#e03030);
-  margin-top: 10px;
-  min-height: 16px;
+  margin-top: 6px;
+  min-height: 14px;
   text-align: center;
 }
-#gi-auth-ok {
-  font-size: 11px;
-  color: var(--up,#00b050);
-  margin-top: 10px;
-  min-height: 16px;
-  text-align: center;
-}
+#gi-auth-status.is-err { color: var(--down,#e03030); }
+#gi-auth-status.is-ok  { color: var(--up,#00b050); }
 #gi-auth-hint {
   font-size: 10px;
   color: var(--text3,#666666);
-  margin-top: 18px;
+  margin-top: 12px;
   line-height: 1.6;
   border-top: 1px solid var(--border, #222);
-  padding-top: 14px;
+  padding-top: 12px;
 }
 #gi-auth-hint code {
   color: var(--text2, #A0A0A0);
@@ -274,8 +268,7 @@
            maxlength="80" autocomplete="off" />
 
     <button id="gi-auth-activate">Activate</button>
-    <div id="gi-auth-err" role="alert" aria-live="assertive"></div>
-    <div id="gi-auth-ok"  role="status" aria-live="polite"></div>
+    <div id="gi-auth-status" role="alert" aria-live="assertive"></div>
 
     <div id="gi-auth-hint">
       <strong style="color:var(--text3,#666666)">Where is my key?</strong><br>
@@ -414,25 +407,31 @@
   }
 
   // ── Activate ───────────────────────────────────────────────────────────────
+  function setStatus(el, text, kind) {
+    el.textContent = text;
+    el.classList.remove('is-err', 'is-ok');
+    if (kind) el.classList.add(kind === 'ok' ? 'is-ok' : 'is-err');
+    el.setAttribute('role', kind === 'ok' ? 'status' : 'alert');
+    el.setAttribute('aria-live', kind === 'ok' ? 'polite' : 'assertive');
+  }
+
   async function activate() {
     const key     = (document.getElementById('gi-inp-key')?.value     || '').trim();
     const account = (document.getElementById('gi-inp-account')?.value  || '').trim();
     const server  = (document.getElementById('gi-inp-server')?.value   || '').trim();
-    const errEl   = document.getElementById('gi-auth-err');
-    const okEl    = document.getElementById('gi-auth-ok');
+    const statusEl = document.getElementById('gi-auth-status');
     const btn     = document.getElementById('gi-auth-activate');
 
-    errEl.textContent = '';
-    okEl.textContent  = '';
+    setStatus(statusEl, '', null);
 
     if (!/^[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}$/.test(key)) {
-      errEl.textContent = 'Key must be in XXXX-XXXX-XXXX format.'; return;
+      setStatus(statusEl, 'Key must be in XXXX-XXXX-XXXX format.', 'err'); return;
     }
     if (!account || !/^\d+$/.test(account)) {
-      errEl.textContent = 'Account number must be numeric.'; return;
+      setStatus(statusEl, 'Account number must be numeric.', 'err'); return;
     }
     if (!server || server.length < 2) {
-      errEl.textContent = 'Please enter your broker server name.'; return;
+      setStatus(statusEl, 'Please enter your broker server name.', 'err'); return;
     }
 
     btn.disabled    = true;
@@ -450,14 +449,14 @@
         saveToken(data.token);
         window.GI_AUTH.isActive = true;
         startSessionPing(data.token);
-        okEl.textContent = 'Activated. Loading terminal\u2026';
+        setStatus(statusEl, 'Activated. Loading terminal\u2026', 'ok');
         setTimeout(() => { hideModal(); unlockPremiumPanels(); }, 900);
       } else {
-        errEl.textContent = data.error ||
-          'Activation failed. Check your key, account number, and server name.';
+        setStatus(statusEl, data.error ||
+          'Activation failed. Check your key, account number, and server name.', 'err');
       }
     } catch {
-      errEl.textContent = 'Could not reach activation server. Check your connection.';
+      setStatus(statusEl, 'Could not reach activation server. Check your connection.', 'err');
     } finally {
       btn.disabled    = false;
       btn.textContent = 'Activate';
