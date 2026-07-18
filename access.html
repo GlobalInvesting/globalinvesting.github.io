@@ -208,7 +208,6 @@ a { color: inherit; text-decoration: none; }
 .showcase-slide img { max-width: 100%; width: auto; height: auto; object-fit: contain; display: block; border: 1px solid var(--border2); border-radius: 4px; box-shadow: 0 14px 32px -10px rgba(0,0,0,.65); transition: box-shadow .18s ease; }
 .showcase-slide:hover img { box-shadow: 0 16px 38px -8px rgba(0,0,0,.75); }
 .showcase-preview { display: flex; flex-direction: column; align-items: center; }
-.showcase-index { margin-top: 10px; align-self: flex-end; font-family: var(--font-mono); font-size: 9.5px; color: var(--text3); border: 1px solid var(--border2); border-radius: 2px; padding: 2px 7px; }
 
 /* FEATURE TABLE */
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 28px; border: 1px solid var(--border); border-radius: 4px; }
@@ -806,7 +805,6 @@ a { color: inherit; text-decoration: none; }
             <div class="showcase-slide" data-idx="5" role="button" tabindex="-1" aria-label="Enlarge: News Feed" data-caption="News Feed — FX-relevant headlines filterable by currency, with source and timestamp on every entry.">
               <img src="assets/screenshot-news-feed.png" data-src="assets/screenshot-news-feed.png" alt="News Feed panel with currency filter pills (All, USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) and a list of FX-relevant headlines with source, timestamp, and summary" width="704" height="347" loading="lazy">
             </div>
-            <div class="showcase-index" id="showcase-index" aria-hidden="true">01 / 06</div>
           </div>
         </div>
       </div>
@@ -1062,7 +1060,6 @@ a { color: inherit; text-decoration: none; }
   const showcaseTabs = Array.from(document.querySelectorAll('.showcase-tab'));
   if (showcaseTabs.length) {
     const slides = Array.from(document.querySelectorAll('.showcase-slide'));
-    const indexEl = document.getElementById('showcase-index');
     const frame = document.getElementById('showcase-frame');
     const total = showcaseTabs.length;
     function activate(idx) {
@@ -1077,7 +1074,6 @@ a { color: inherit; text-decoration: none; }
         s.setAttribute('tabindex', on ? '0' : '-1');
       });
       if (frame) frame.setAttribute('aria-labelledby', 'showcase-tab-' + idx);
-      if (indexEl) indexEl.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
     }
     showcaseTabs.forEach(tab => {
       tab.addEventListener('click', () => activate(tab.dataset.idx));
