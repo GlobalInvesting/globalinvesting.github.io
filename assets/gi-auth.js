@@ -254,6 +254,9 @@
       </a>
       on MQL5 Market. Enter the activation key shown in your MT5 terminal to unlock all panels.
     </p>
+    <p class="gi-auth-sub" style="font-size:12px;opacity:0.85;margin-top:-10px;">
+      Opened a verified TMGM account instead? <a href="contact.html">Contact us</a> to receive your access link &mdash; no MT5 key required.
+    </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-8px;">
       New here? <a href="access.html">See the full walkthrough &amp; pricing &rarr;</a>
     </p>
@@ -473,7 +476,7 @@
       ov.className = 'gi-gate-overlay';
       ov.innerHTML =
         '<div class="gi-gate-icon">&#128274;</div>' +
-        '<div class="gi-gate-msg">Premium \u2014 included with EA purchase<br>Activate with your MT5 license key</div>' +
+        '<div class="gi-gate-msg">Premium \u2014 included with EA rental or verified TMGM account</div>' +
         '<button class="gi-gate-btn" onclick="window.GI_AUTH.showModal()">Activate Access</button>';
       el.appendChild(ov);
     });
