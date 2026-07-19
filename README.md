@@ -18,6 +18,7 @@ Access to the Global Investing FX Terminal is granted through one of two indepen
 | Institutional Risk Manager | MetaTrader 5 | [MQL5 Market →](https://www.mql5.com/en/market/product/180324) |
 | CSI Currency Strength | MetaTrader 5 | [MQL5 Market →](https://www.mql5.com/en/market/product/180317) |
 | Carry Trade Monitor | MetaTrader 5 | [MQL5 Market →](https://www.mql5.com/en/market/product/180322) |
+| Monte Carlo Equity Projection | MetaTrader 5 | [MQL5 Market →](https://www.mql5.com/en/market/product/186259) |
 
 The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — live broker swap rates, MT5 push alerts, and the full macro intelligence suite without leaving your trading platform. The companion web terminal covers the complete analytical suite from any browser. See [Pricing & Access](https://globalinvesting.github.io/access.html) for details on both paths.
 
