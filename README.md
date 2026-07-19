@@ -80,6 +80,7 @@ Full documentation is available at [globalinvesting.github.io](https://globalinv
 - [FX Liquidity Guide](https://globalinvesting.github.io/guide-fx-liquidity.html)
 - [MT5 EA Guide](https://globalinvesting.github.io/guide-mt5-ea.html) — Setup and features
 - [Currency Strength Index (CSI) Guide](https://globalinvesting.github.io/guide-csi-indicator.html) — Methodology and MT5 indicator setup
+- [Monte Carlo Equity Projection Guide](https://globalinvesting.github.io/guide-monte-carlo-simulator.html) — Bootstrap simulation methodology and MT5 indicator setup
 
 ---
 
