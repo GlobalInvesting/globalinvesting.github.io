@@ -273,18 +273,27 @@ a { color: inherit; text-decoration: none; }
 .sub-link { font-family: var(--font-mono); font-size: 9.5px; color: var(--blue); letter-spacing: .06em; font-weight: 700; text-transform: uppercase; }
 .sub-link:hover { color: #7fa4ff; }
 
-/* COMPANION GRID */
-.companion-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 28px; }
-.companion-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; cursor: pointer; transition: background .15s, border-color .15s; }
-.companion-card:hover { background: var(--bg3); border-color: var(--border2); }
-.companion-thumb { aspect-ratio: 1.95; overflow: hidden; border-bottom: 1px solid var(--border); background: var(--bg2); display: flex; align-items: center; justify-content: center; }
-.companion-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; transition: transform .25s ease; }
-.companion-card:hover .companion-thumb img { transform: scale(1.035); }
-.companion-card-body { padding: 18px 20px 20px; }
-.companion-tag { font-family: var(--font-mono); font-size: 8.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
-.companion-name { font-size: 12.5px; font-weight: 700; color: #e8edf8; margin-bottom: 8px; line-height: 1.3; }
-.companion-desc { font-size: 11.5px; color: var(--text2); line-height: 1.65; }
-.companion-link { margin-top: 14px; font-family: var(--font-mono); font-size: 9px; color: var(--blue); letter-spacing: .06em; font-weight: 700; text-transform: uppercase; }
+/* COMPANION TOOLS — list + large detail panel (separate from Additional Coverage showcase: own classes/JS, own CTAs) */
+.companion-showcase { display: grid; grid-template-columns: 230px 1fr; gap: 28px; align-items: start; margin-top: 28px; }
+.companion-tabs { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--bg2); }
+.companion-tab { display: block; width: 100%; text-align: left; background: none; border: none; border-left: 2px solid transparent; padding: 13px 16px; cursor: pointer; font-family: var(--font-ui); transition: background .15s, border-color .15s; }
+.companion-tab + .companion-tab { border-top: 1px solid var(--border); }
+.companion-tab:hover { background: var(--bg3); }
+.companion-tab.active { background: var(--bg3); border-left-color: var(--blue); }
+.companion-tab-name { display: block; font-size: 12px; font-weight: 700; color: var(--text2); letter-spacing: -.1px; transition: color .15s; }
+.companion-tab.active .companion-tab-name { color: #e8edf8; }
+.companion-tab-tag { display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.companion-preview-frame { position: relative; aspect-ratio: 1.95; border: 1px solid var(--border2); border-radius: 4px; overflow: hidden; background: var(--bg2); box-shadow: 0 14px 32px -10px rgba(0,0,0,.65); }
+.companion-slide { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; cursor: zoom-in; }
+.companion-slide.active { display: flex; }
+.companion-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.companion-preview-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+.companion-preview-desc { font-size: 11.5px; color: var(--text2); line-height: 1.7; max-width: 420px; }
+.companion-preview-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+.companion-pill { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text2); border: 1px solid var(--border2); border-radius: 3px; padding: 9px 16px; text-decoration: none; display: inline-block; transition: border-color .15s, color .15s; cursor: pointer; }
+.companion-pill:hover { border-color: var(--text3); color: var(--text); }
+.companion-pill-accent { color: var(--blue); border-color: rgba(79,127,255,.35); }
+.companion-pill-accent:hover { border-color: var(--blue); }
 
 /* DISCLAIMER */
 .disclaimer { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 20px 24px; margin-top: 52px; }
@@ -311,6 +320,7 @@ a { color: inherit; text-decoration: none; }
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .showcase { grid-template-columns: 1fr; }
+  .companion-showcase { grid-template-columns: 1fr; }
   .hero-inner { grid-template-columns: 1fr; gap: 36px; }
   .hero-price-card { max-width: 380px; }
   .steps-grid { grid-template-columns: 1fr; }
@@ -326,7 +336,6 @@ a { color: inherit; text-decoration: none; }
   .hero-inner, .page-body, .subnav-inner { padding-left: 20px; padding-right: 20px; }
   .hero h1 { font-size: 26px; }
   .scr-grid, .scr-grid-3 { grid-template-columns: 1fr; }
-  .companion-grid { grid-template-columns: 1fr; }
   .sub-card-body { grid-template-columns: 1fr; }
   .sub-price-col { text-align: left; }
 }
@@ -959,43 +968,51 @@ a { color: inherit; text-decoration: none; }
     <div class="section-label">Companion Tools</div>
     <h2 class="section-title" id="companion-heading">Standalone MT5 indicators</h2>
     <p class="section-desc">Available separately on MQL5 Market. Each integrates with the terminal data pipelines.</p>
-    <div class="companion-grid">
-      <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180317','_blank')">
-        <div class="companion-thumb"><img src="assets/screenshot-csi.png" data-src="assets/screenshot-csi.png" alt="CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD" width="1145" height="556" loading="lazy"></div>
-        <div class="companion-card-body">
-          <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
-          <div class="companion-name">CSI Currency Strength</div>
-          <div class="companion-desc">Multi-timeframe currency strength index as a panel overlay. Z-score model across 28 pairs, configurable lookbacks, eight currencies color-coded.</div>
-          <div class="companion-link">View on MQL5 &#8594;</div>
-          <div class="companion-link"><a href="guide-csi-indicator.html" onclick="event.stopPropagation()" style="color:var(--blue);">Read the guide &#8594;</a></div>
-        </div>
+    <div class="companion-showcase">
+      <div class="companion-tabs" role="tablist" aria-label="Standalone MT5 indicators">
+        <button type="button" class="companion-tab active" role="tab" aria-selected="true" aria-controls="companion-frame" id="companion-tab-0" data-idx="0">
+          <span class="companion-tab-name">CSI Currency Strength</span>
+          <span class="companion-tab-tag" style="color:var(--up);">Available on MQL5</span>
+        </button>
+        <button type="button" class="companion-tab" role="tab" aria-selected="false" aria-controls="companion-frame" id="companion-tab-1" data-idx="1">
+          <span class="companion-tab-name">Carry Trade Monitor</span>
+          <span class="companion-tab-tag" style="color:var(--up);">Available on MQL5</span>
+        </button>
+        <button type="button" class="companion-tab" role="tab" aria-selected="false" aria-controls="companion-frame" id="companion-tab-2" data-idx="2">
+          <span class="companion-tab-name">Institutional Risk Manager</span>
+          <span class="companion-tab-tag" style="color:var(--blue);">From $30/mo</span>
+        </button>
+        <button type="button" class="companion-tab" role="tab" aria-selected="false" aria-controls="companion-frame" id="companion-tab-3" data-idx="3">
+          <span class="companion-tab-name">Monte Carlo Equity Projection</span>
+          <span class="companion-tab-tag" style="color:var(--up);">Available on MQL5</span>
+        </button>
       </div>
-      <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180322','_blank')">
-        <div class="companion-thumb"><img src="assets/screenshot-carry-trade-indicator.png" data-src="assets/screenshot-carry-trade-indicator.png" alt="Carry Trade Indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, ranking pairs by annualised swap-implied carry yield with long/short signals" width="1150" height="614" loading="lazy"></div>
-        <div class="companion-card-body">
-          <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
-          <div class="companion-name">Carry Trade Monitor</div>
-          <div class="companion-desc">Scans all Market Watch symbols and ranks pairs by annualised carry yield. Long/short swap rates, net carry, directional bias.</div>
-          <div class="companion-link">View on MQL5 &#8594;</div>
+      <div>
+        <div class="companion-preview-frame" id="companion-frame" role="tabpanel" aria-labelledby="companion-tab-0">
+          <div class="companion-slide active" data-idx="0" role="button" tabindex="0" aria-label="Enlarge: CSI Currency Strength" data-caption="CSI Currency Strength — Multi-timeframe currency strength index as a panel overlay. Z-score model across 28 pairs, configurable lookbacks, eight currencies color-coded.">
+            <img src="assets/screenshot-csi.png" data-src="assets/screenshot-csi.png" alt="CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD" width="1145" height="556" loading="lazy">
+          </div>
+          <div class="companion-slide" data-idx="1" role="button" tabindex="-1" aria-label="Enlarge: Carry Trade Monitor" data-caption="Carry Trade Monitor — Scans all Market Watch symbols and ranks pairs by annualised carry yield. Long/short swap rates, net carry, directional bias.">
+            <img src="assets/screenshot-carry-trade-indicator.png" data-src="assets/screenshot-carry-trade-indicator.png" alt="Carry Trade Indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, ranking pairs by annualised swap-implied carry yield with long/short signals" width="1150" height="614" loading="lazy">
+          </div>
+          <div class="companion-slide" data-idx="2" role="button" tabindex="-1" aria-label="Enlarge: Institutional Risk Manager" data-caption="Institutional Risk Manager — Professional trade management EA. Dynamic lot sizing, scaled exits at 1R/1.5R/2R, ATR trailing stop, news filter, hedge module, live portfolio exposure panel.">
+            <img src="assets/screenshot-ea-risk-manager.png" data-src="assets/screenshot-ea-risk-manager.png" alt="Institutional Risk Manager panel on an MT5 chart, showing risk-per-trade sizing, scaled-exit modules, and live portfolio exposure by currency" width="1163" height="692" loading="lazy">
+          </div>
+          <div class="companion-slide" data-idx="3" role="button" tabindex="-1" aria-label="Enlarge: Monte Carlo Equity Projection" data-caption="Monte Carlo Equity Projection — Bootstrap simulation on the account's own closed-trade history. Percentile equity cone, full risk metrics strip, and a tradeable / caution / needs-review checklist verdict.">
+            <img src="assets/screenshot-monte-carlo-equity.png" data-src="assets/screenshot-monte-carlo-equity.png" alt="Monte Carlo Equity Projection indicator on an MT5 chart, showing a bootstrap-simulated percentile equity cone and a full risk metrics strip" width="1121" height="631" loading="lazy">
+          </div>
         </div>
-      </div>
-      <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180324','_blank')">
-        <div class="companion-thumb"><img src="assets/screenshot-ea-risk-manager.png" data-src="assets/screenshot-ea-risk-manager.png" alt="Institutional Risk Manager panel on an MT5 chart, showing risk-per-trade sizing, scaled-exit modules, and live portfolio exposure by currency" width="1163" height="692" loading="lazy"></div>
-        <div class="companion-card-body">
-          <div class="companion-tag" style="color:var(--blue);">From $30/mo</div>
-          <div class="companion-name">Institutional Risk Manager</div>
-          <div class="companion-desc">Professional trade management EA. Dynamic lot sizing, scaled exits at 1R/1.5R/2R, ATR trailing stop, news filter, hedge module, live portfolio exposure panel.</div>
-          <div class="companion-link">View on MQL5 &#8594;</div>
-        </div>
-      </div>
-      <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/186259','_blank')">
-        <div class="companion-thumb"><img src="assets/screenshot-monte-carlo-equity.png" data-src="assets/screenshot-monte-carlo-equity.png" alt="Monte Carlo Equity Projection indicator on an MT5 chart, showing a bootstrap-simulated percentile equity cone and a full risk metrics strip" width="1121" height="631" loading="lazy"></div>
-        <div class="companion-card-body">
-          <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
-          <div class="companion-name">Monte Carlo Equity Projection</div>
-          <div class="companion-desc">Bootstrap simulation on the account's own closed-trade history. Percentile equity cone, full risk metrics strip, and a tradeable / caution / needs-review checklist verdict.</div>
-          <div class="companion-link">View on MQL5 &#8594;</div>
-          <div class="companion-link"><a href="guide-monte-carlo-simulator.html" onclick="event.stopPropagation()" style="color:var(--blue);">Read the guide &#8594;</a></div>
+        <div class="companion-preview-meta">
+          <div class="companion-preview-desc" id="companion-desc-0" data-idx="0">Multi-timeframe currency strength index as a panel overlay. Z-score model across 28 pairs, configurable lookbacks, eight currencies color-coded.</div>
+          <div class="companion-preview-desc" id="companion-desc-1" data-idx="1" hidden>Scans all Market Watch symbols and ranks pairs by annualised carry yield. Long/short swap rates, net carry, directional bias.</div>
+          <div class="companion-preview-desc" id="companion-desc-2" data-idx="2" hidden>Professional trade management EA. Dynamic lot sizing, scaled exits at 1R/1.5R/2R, ATR trailing stop, news filter, hedge module, live portfolio exposure panel.</div>
+          <div class="companion-preview-desc" id="companion-desc-3" data-idx="3" hidden>Bootstrap simulation on the account's own closed-trade history. Percentile equity cone, full risk metrics strip, and a tradeable / caution / needs-review checklist verdict.</div>
+          <div class="companion-preview-actions">
+            <div class="companion-actions-set" data-idx="0"><a class="companion-pill" href="https://www.mql5.com/en/market/product/180317" target="_blank" rel="noopener noreferrer">View on MQL5 &#8594;</a><a class="companion-pill companion-pill-accent" href="guide-csi-indicator.html">Read the guide &#8594;</a></div>
+            <div class="companion-actions-set" data-idx="1" hidden><a class="companion-pill" href="https://www.mql5.com/en/market/product/180322" target="_blank" rel="noopener noreferrer">View on MQL5 &#8594;</a></div>
+            <div class="companion-actions-set" data-idx="2" hidden><a class="companion-pill" href="https://www.mql5.com/en/market/product/180324" target="_blank" rel="noopener noreferrer">View on MQL5 &#8594;</a></div>
+            <div class="companion-actions-set" data-idx="3" hidden><a class="companion-pill" href="https://www.mql5.com/en/market/product/186259" target="_blank" rel="noopener noreferrer">View on MQL5 &#8594;</a><a class="companion-pill companion-pill-accent" href="guide-monte-carlo-simulator.html">Read the guide &#8594;</a></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1069,7 +1086,7 @@ a { color: inherit; text-decoration: none; }
       lbClose.focus();
     }
     function closeLb() { lb.classList.remove('open'); document.body.style.overflow = ''; }
-    document.querySelectorAll('.scr-hero, .scr-item, .feat-card-thumb, .showcase-slide').forEach(el => {
+    document.querySelectorAll('.scr-hero, .scr-item, .feat-card-thumb, .showcase-slide, .companion-slide').forEach(el => {
       el.addEventListener('click', () => openLb(el));
       el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(el); } });
     });
@@ -1110,6 +1127,46 @@ a { color: inherit; text-decoration: none; }
         const next = e.key === 'ArrowDown' ? (current + 1) % total : (current - 1 + total) % total;
         showcaseTabs[next].focus();
         activate(String(next));
+      });
+    }
+  }
+
+  // Companion Tools — list + large detail panel (separate from Additional Coverage showcase, own scope)
+  const companionTabs = Array.from(document.querySelectorAll('.companion-tab'));
+  if (companionTabs.length) {
+    const companionSlides = Array.from(document.querySelectorAll('.companion-slide'));
+    const companionDescs = Array.from(document.querySelectorAll('.companion-preview-desc'));
+    const companionActionSets = Array.from(document.querySelectorAll('.companion-actions-set'));
+    const companionFrame = document.getElementById('companion-frame');
+    const companionTotal = companionTabs.length;
+    function activateCompanion(idx) {
+      companionTabs.forEach(t => {
+        const on = t.dataset.idx === String(idx);
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', String(on));
+      });
+      companionSlides.forEach(s => {
+        const on = s.dataset.idx === String(idx);
+        s.classList.toggle('active', on);
+        s.setAttribute('tabindex', on ? '0' : '-1');
+      });
+      companionDescs.forEach(d => { d.hidden = d.dataset.idx !== String(idx); });
+      companionActionSets.forEach(a => { a.hidden = a.dataset.idx !== String(idx); });
+      if (companionFrame) companionFrame.setAttribute('aria-labelledby', 'companion-tab-' + idx);
+    }
+    companionTabs.forEach(tab => {
+      tab.addEventListener('click', () => activateCompanion(tab.dataset.idx));
+    });
+    // Arrow-key navigation across tabs (standard tablist behavior)
+    const companionTabsContainer = document.querySelector('.companion-tabs');
+    if (companionTabsContainer) {
+      companionTabsContainer.addEventListener('keydown', e => {
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        e.preventDefault();
+        const current = companionTabs.findIndex(t => t.classList.contains('active'));
+        const next = e.key === 'ArrowDown' ? (current + 1) % companionTotal : (current - 1 + companionTotal) % companionTotal;
+        companionTabs[next].focus();
+        activateCompanion(String(next));
       });
     }
   }
