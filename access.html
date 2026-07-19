@@ -277,8 +277,8 @@ a { color: inherit; text-decoration: none; }
 .companion-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 28px; }
 .companion-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; cursor: pointer; transition: background .15s, border-color .15s; }
 .companion-card:hover { background: var(--bg3); border-color: var(--border2); }
-.companion-thumb { height: 150px; overflow: hidden; border-bottom: 1px solid var(--border); background: var(--bg); }
-.companion-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; transition: transform .25s ease; }
+.companion-thumb { aspect-ratio: 1.95; overflow: hidden; border-bottom: 1px solid var(--border); background: var(--bg2); display: flex; align-items: center; justify-content: center; }
+.companion-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; transition: transform .25s ease; }
 .companion-card:hover .companion-thumb img { transform: scale(1.035); }
 .companion-card-body { padding: 18px 20px 20px; }
 .companion-tag { font-family: var(--font-mono); font-size: 8.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
@@ -961,7 +961,7 @@ a { color: inherit; text-decoration: none; }
     <p class="section-desc">Available separately on MQL5 Market. Each integrates with the terminal data pipelines.</p>
     <div class="companion-grid">
       <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180317','_blank')">
-        <div class="companion-thumb"><img src="assets/screenshot-ea-csi.png" data-src="assets/screenshot-ea-csi.png" alt="CSI Currency Strength indicator panel overlay on an MT5 chart, showing per-currency index and color-coded strength bars" width="426" height="288" loading="lazy"></div>
+        <div class="companion-thumb"><img src="assets/screenshot-csi.png" data-src="assets/screenshot-csi.png" alt="CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD" width="1145" height="556" loading="lazy"></div>
         <div class="companion-card-body">
           <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
           <div class="companion-name">CSI Currency Strength</div>
@@ -971,7 +971,7 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
       <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180322','_blank')">
-        <div class="companion-thumb"><img src="assets/screenshot-ea-carry.png" data-src="assets/screenshot-ea-carry.png" alt="Carry Trade Monitor panel overlay on an MT5 chart, ranking pairs by annualised swap-implied carry yield" width="379" height="333" loading="lazy"></div>
+        <div class="companion-thumb"><img src="assets/screenshot-carry-trade-indicator.png" data-src="assets/screenshot-carry-trade-indicator.png" alt="Carry Trade Indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, ranking pairs by annualised swap-implied carry yield with long/short signals" width="1150" height="614" loading="lazy"></div>
         <div class="companion-card-body">
           <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
           <div class="companion-name">Carry Trade Monitor</div>
