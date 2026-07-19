@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Currency Strength Indicator for MT5: CSI Setup Guide</title>
-<meta name="description" content="Currency Strength Index (CSI) for MT5 and the web terminal: a multi-timeframe, z-score strength indicator across G10 pairs. Methodology and MT5 install steps.">
+<title>Monte Carlo Equity Projection for MT5: Setup &amp; Methodology Guide</title>
+<meta name="description" content="Monte Carlo Equity Projection for MetaTrader 5: bootstrap simulation on your account's own closed-trade history, percentile equity cone, risk metrics, and checklist verdict. Methodology and setup.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<link rel="canonical" href="https://globalinvesting.github.io/guide-csi-indicator.html">
+<link rel="canonical" href="https://globalinvesting.github.io/guide-monte-carlo-simulator.html">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://globalinvesting.github.io/guide-csi-indicator.html">
+<meta property="og:url" content="https://globalinvesting.github.io/guide-monte-carlo-simulator.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
-<meta property="og:title" content="Currency Strength Indicator for MetaTrader 5: CSI Methodology &amp; Setup Guide — Global Investing">
-<meta property="og:description" content="Currency Strength Index (CSI) for MetaTrader 5 and the web terminal — multi-timeframe, z-score-based currency strength across G10 pairs. Methodology and setup.">
+<meta property="og:title" content="Monte Carlo Equity Projection for MetaTrader 5: Methodology &amp; Setup Guide — Global Investing">
+<meta property="og:description" content="Bootstrap Monte Carlo simulation on your account's own closed-trade history — percentile equity cone, VaR/CVaR, drawdown probabilities, and a tradeable/caution/review checklist verdict.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Currency Strength Indicator for MetaTrader 5: CSI Methodology &amp; Setup Guide — Global Investing">
-<meta name="twitter:description" content="Currency Strength Index (CSI) for MetaTrader 5 and the web terminal: multi-timeframe, z-score-based currency strength across G10 pairs.">
+<meta name="twitter:title" content="Monte Carlo Equity Projection for MetaTrader 5: Methodology &amp; Setup Guide — Global Investing">
+<meta name="twitter:description" content="Bootstrap Monte Carlo simulation on your account's own closed-trade history — percentile equity cone, risk metrics strip, and a checklist verdict.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -141,12 +141,6 @@ a { color: inherit; text-decoration: none; }
 .data-table td:first-child { color: var(--text); font-weight: 500; }
 .data-table tr:last-child td { border-bottom: none; }
 
-/* ── Tags ── */
-.tag { display: inline-block; font-size: 9.9px; font-weight: 700; padding: 2px 7px; border-radius: 3px; letter-spacing: .04em; vertical-align: middle; }
-.tag-bull { background: rgba(38,166,154,.12); color: var(--up); border: 1px solid rgba(38,166,154,.2); }
-.tag-bear { background: rgba(239,83,80,.10); color: var(--down); border: 1px solid rgba(239,83,80,.2); }
-.tag-neut { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
-
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
@@ -163,49 +157,28 @@ a { color: inherit; text-decoration: none; }
 .guide-section p.scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-top: 10px; padding: 0 2px; }
 .scr-meta strong { color: var(--text2); font-weight: 600; }
 
-/* ── COT demo table ── */
-.cot-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 18px 0; }
-.cot-header { display: grid; grid-template-columns: 40px 1fr 48px 90px; gap: 8px; padding: 8px 14px; background: var(--head-bg); font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border2); }
-.cot-row-d { display: grid; grid-template-columns: 40px 1fr 48px 90px; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--border); align-items: center; transition: background .12s; }
-.cot-row-d:last-child { border-bottom: none; }
-.cot-row-d:hover { background: var(--bg3); }
-.cot-ccy { font-size: 13.2px; font-weight: 700; color: var(--text); }
-.cot-bar-wrap { background: var(--bg3); border-radius: 2px; height: 6px; overflow: hidden; }
-.cot-bar-long { height: 100%; border-radius: 2px; transition: width .3s; }
-.cot-pct { font-size: 12.1px; color: var(--text2); font-family: var(--font-mono); text-align: right; }
-.cot-net { font-size: 12.1px; font-family: var(--font-mono); font-weight: 600; text-align: right; }
-
-/* ── COT signal table ── */
-.cot-signal-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
-.cot-signal-table thead { background: var(--head-bg); }
-.cot-signal-table th { text-align: left; font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
-.cot-signal-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text2); font-size: 14.3px; transition: background .12s; }
-.cot-signal-table tbody tr:hover td { background: var(--bg2); }
-.cot-signal-table tr:last-child td { border-bottom: none; }
-.cot-signal-table td:first-child { color: var(--text); font-weight: 600; font-family: var(--font-mono); font-size: 13.2px; }
-
 </style>
-<meta property="article:published_time" content="2026-06-20T00:00:00Z">
-<meta property="article:modified_time" content="2026-07-11T00:00:00Z">
+<meta property="article:published_time" content="2026-07-19T00:00:00Z">
+<meta property="article:modified_time" content="2026-07-19T00:00:00Z">
 <meta property="article:section" content="Guides">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "Currency Strength Indicator for MetaTrader 5: CSI Methodology & Setup Guide",
-  "description": "How the Currency Strength Index (CSI) is calculated, how to read it in the web terminal's Currency Strength Heatmap, and how to install the standalone CSI Currency Strength indicator on a MetaTrader 5 chart.",
+  "headline": "Monte Carlo Equity Projection for MetaTrader 5: Methodology & Setup Guide",
+  "description": "How the Monte Carlo Equity Projection indicator's bootstrap simulation works, how to read the percentile equity cone and risk metrics strip, and how to install it on a MetaTrader 5 chart.",
   "image": [
     "https://globalinvesting.github.io/og-image.png",
     {
       "@type": "ImageObject",
-      "url": "https://globalinvesting.github.io/assets/screenshot-csi.png",
-      "width": 1145,
-      "height": 556,
-      "caption": "CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5"
+      "url": "https://globalinvesting.github.io/assets/screenshot-monte-carlo-equity.png",
+      "width": 1121,
+      "height": 631,
+      "caption": "Monte Carlo Equity Projection indicator on an MT5 chart, showing a bootstrap-simulated percentile equity cone and a full risk metrics strip"
     }
   ],
-  "datePublished": "2026-07-05T00:00:00Z",
-  "dateModified": "2026-07-11T00:00:00Z",
+  "datePublished": "2026-07-19T00:00:00Z",
+  "dateModified": "2026-07-19T00:00:00Z",
   "author": {
     "@type": "Person",
     "name": "Santiago Plá Casuriaga",
@@ -225,9 +198,9 @@ a { color: inherit; text-decoration: none; }
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://globalinvesting.github.io/guide-csi-indicator.html"
+    "@id": "https://globalinvesting.github.io/guide-monte-carlo-simulator.html"
   },
-  "keywords": "currency strength indicator mt5, currency strength meter metatrader, mt5 currency strength index, csi indicator forex, currency strength heatmap, z-score currency strength"
+  "keywords": "monte carlo simulation mt5, monte carlo equity simulator, trading risk simulator metatrader, bootstrap simulation trading, equity curve simulation mt5, probability of ruin calculator, what is monte carlo simulation"
 }
 </script>
 <script type="application/ld+json">
@@ -250,8 +223,8 @@ a { color: inherit; text-decoration: none; }
     {
       "@type": "ListItem",
       "position": 3,
-      "name": "Currency Strength Index (CSI)",
-      "item": "https://globalinvesting.github.io/guide-csi-indicator.html"
+      "name": "Monte Carlo Equity Projection",
+      "item": "https://globalinvesting.github.io/guide-monte-carlo-simulator.html"
     }
   ]
 }
@@ -263,42 +236,50 @@ a { color: inherit; text-decoration: none; }
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "What is the Currency Strength Index (CSI)?",
+      "name": "What is Monte Carlo Equity Projection?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The CSI is a composite measure of how strong or weak each G10 currency is relative to all the others at once, computed from the cumulative log-return of every pair a currency appears in, rather than looking at a single pair in isolation."
+        "text": "A MetaTrader 5 indicator that runs a bootstrap simulation on an account's own closed-trade history and projects a percentile cone of future equity paths directly on the chart, using no assumed return distribution and no external data feed."
       }
     },
     {
       "@type": "Question",
-      "name": "How is the CSI calculated?",
+      "name": "How does the bootstrap simulation work?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Each currency's score sums the return of every pair it appears in, adding the return when the currency is the base and subtracting it when the currency is the quote, over a selected lookback horizon. The standalone MT5 indicator goes further: it computes this independently across three lookback horizons (short, medium, long), normalises each into a cross-sectional z-score, and blends the three with configurable weights (25%/35%/40% by default) — a multi-lookback weighted z-score model based on Asness, Moskowitz &amp; Pedersen (2013), designed to avoid the cliff-edge artifact a single fixed lookback produces."
+        "text": "The indicator draws from the account's closed deals with replacement — bootstrap resampling — running a configurable number of simulations (default 10,000) to project a configurable number of forward trades (default 500). Percentile bands (p5, p25, p50, p75, p95) are plotted as a cone over the equity curve, with faint background paths showing individual simulation runs."
       }
     },
     {
       "@type": "Question",
-      "name": "Where can I see the CSI: on the web terminal or in MetaTrader 5?",
+      "name": "Does it predict future returns?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Both. The web terminal shows CSI as a tab inside the Currency Strength Heatmap modal, covering all 10 G10 currencies across 1M/3M/6M/1Y horizons. A separate MQL5 Market product, CSI Currency Strength, renders the same concept as a native panel overlay directly on an MT5 chart, for traders who prefer not to switch to a browser."
+        "text": "No. It is a statistical projection built from the distribution of trades already closed on the account, not a forecast or a guarantee. If the underlying strategy or market regime changes, the historical sample the simulation draws from may no longer be representative."
       }
     },
     {
       "@type": "Question",
-      "name": "How do I install the standalone CSI indicator in MetaTrader 5?",
+      "name": "Is it connected to any external data source?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Purchase or download the CSI Currency Strength indicator from MQL5 Market, then drag it from the Navigator panel onto any MT5 chart. It renders its own panel overlay; no additional configuration is required for the default lookback and pair set."
+        "text": "No. All computation runs locally from the account's own closed-deal history via the native MT5 API. There is no external server, no WebRequest call, and no internet permission required."
       }
     },
     {
       "@type": "Question",
-      "name": "Does CSI predict future price direction?",
+      "name": "How do I install Monte Carlo Equity Projection in MetaTrader 5?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. It is descriptive, not predictive — a snapshot of relative strength based on realised price moves over the selected lookback period. It does not generate trade signals or forecasts."
+        "text": "Download it from MQL5 Market, then drag it from the Navigator panel onto any MT5 chart. It reads the account's closed trade history directly — no WebRequest permission or additional configuration is required to see the default cone."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is probability of ruin in this context?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The share of the 10,000 simulated equity paths in which account balance falls below 20% of starting capital at any point during the projected trade sequence — one of the probabilities shown in the risk metrics strip below the cone."
       }
     }
   ]
@@ -357,8 +338,8 @@ a { color: inherit; text-decoration: none; }
         <a href="guide-cot.html">COT / CFTC Positioning</a>
         <a href="guide-economic-surprises.html">Economic Surprise Index</a>
         <a href="guide-mt5-ea.html">MetaTrader 5 EA Guide</a>
-        <a href="guide-csi-indicator.html" class="current">Currency Strength Index (CSI)</a>
-        <a href="guide-monte-carlo-simulator.html">Monte Carlo Equity Projection</a>
+        <a href="guide-csi-indicator.html">Currency Strength Index (CSI)</a>
+        <a href="guide-monte-carlo-simulator.html" class="current">Monte Carlo Equity Projection</a>
         <div class="site-menu-divider"></div>
         <span class="site-menu-section">Market Research</span>
         <a href="guide-gbpjpy-cot.html">GBP/JPY Bias Factors</a>
@@ -372,74 +353,92 @@ a { color: inherit; text-decoration: none; }
   <nav class="toc" aria-label="Guide sections">
     <div class="toc-inner">
       <div class="toc-head">Contents</div>
-      <a class="toc-item" href="#what-is-it">What the CSI Is</a>
-      <a class="toc-item" href="#methodology">Methodology</a>
-      <a class="toc-item" href="#web-panel">CSI on the Web Terminal</a>
-      <a class="toc-item" href="#mt5-indicator">CSI on MetaTrader 5</a>
-      <a class="toc-item" href="#reading-csi">How to Read It</a>
-      <a class="toc-item" href="#vs-single-pair">CSI vs. a Single Pair Chart</a>
+      <a class="toc-item" href="#what-is-it">What It Is</a>
+      <a class="toc-item" href="#methodology">How the Simulation Works</a>
+      <a class="toc-item" href="#reading-cone">Reading the Equity Cone</a>
+      <a class="toc-item" href="#risk-strip">Risk Metrics Strip</a>
+      <a class="toc-item" href="#checklist">Checklist Verdict</a>
+      <a class="toc-item" href="#inputs">Configurable Inputs &amp; CSV Export</a>
+      <a class="toc-item" href="#install">Installing on MetaTrader 5</a>
       <a class="toc-item" href="#further-reading">Further Reading</a>
       <div class="toc-divider"></div>
       <a class="toc-item toc-related" href="guide-mt5-ea.html">MetaTrader 5 EA Guide</a>
-      <a class="toc-item toc-related" href="guide-dashboard.html">How to Use the Terminal</a>
+      <a class="toc-item toc-related" href="guide-csi-indicator.html">Currency Strength Index (CSI)</a>
     </div>
   </nav>
 
   <div class="guide-content">
     <div class="page-hero">
       <div class="page-hero-label">Guide</div>
-      <h1>Currency Strength Indicator for MetaTrader 5</h1>
-      <p>How the Currency Strength Index (CSI) works, how to read it inside the web terminal, and how to install the standalone CSI Currency Strength indicator on a MetaTrader 5 chart. If you want a single read on which G10 currency is genuinely strong or weak right now — rather than piecing it together pair by pair — this guide covers the methodology and both places it's available.</p>
+      <h1>Monte Carlo Equity Projection for MetaTrader 5</h1>
+      <p>How the Monte Carlo Equity Projection indicator turns an account's own closed-trade history into a percentile cone of future equity outcomes, how to read the risk metrics strip and checklist verdict underneath it, and how to install it on a MetaTrader 5 chart.</p>
     </div>
 
     <div class="guide-section" id="what-is-it">
-      <h2>What the CSI Is</h2>
-      <p>The Currency Strength Index (CSI) is a composite measure of how strong or weak each G10 currency is relative to all the others at once, rather than against a single counterpart. A currency can be rising against one pair while falling against another; the CSI nets these movements together into one ranking per currency, so a trader can see which side of a pair is actually driving the move.</p>
+      <h2>What It Is</h2>
+      <p><strong>Monte Carlo Equity Projection</strong> is a standalone MetaTrader 5 indicator (MQL5 Market product #186259) that reads an account's real closed deals via the native MT5 API and runs a bootstrap Monte Carlo simulation on them, drawing a percentile cone of projected equity paths directly on the chart. It answers a narrower, more concrete question than a macro dashboard: given the trading statistics an account has actually produced so far, what is the realistic range of outcomes ahead — and do those statistics currently support scaling up?</p>
       <div class="callout">
-        <strong>Descriptive, not predictive.</strong> The CSI reflects realised price action over the selected lookback — it is not a forecast and does not generate trade signals. It is a read on what has already happened across the full pair set, not a projection of what happens next.
+        <strong>Descriptive, not predictive.</strong> The cone is a statistical projection built from the distribution of trades already closed on the account — it is not a forecast, a guarantee, or a recommendation to trade differently. If the underlying strategy, position sizing, or market regime changes, the historical sample the simulation draws from may no longer be representative of what comes next.
       </div>
     </div>
 
     <div class="guide-section" id="methodology">
-      <h2>Methodology</h2>
-      <p>Each currency's score is built from the cumulative log-return of every pair it appears in over the selected horizon: the return is added when the currency is the base of the pair and subtracted when it is the quote, so a currency's score reflects its net direction across the entire G10 cross-rate set rather than one isolated pair.</p>
-      <p>On the standalone MT5 indicator, this goes a step further. Rather than a single lookback, it computes the return independently across three horizons — short, medium and long — and normalises each into a cross-sectional z-score, so readings are comparable across currencies and over time regardless of each pair's raw volatility. The three z-scores are then combined with configurable weights (25% short / 35% medium / 40% long by default) into one composite score per currency. This multi-lookback weighted approach follows the momentum model of Asness, Moskowitz &amp; Pedersen (2013) and is designed specifically to avoid the "cliff-edge" artifact a single fixed lookback produces, where a score can jump sharply the moment one old data point rolls out of the window.</p>
-    </div>
-
-    <div class="guide-section" id="web-panel">
-      <h2>CSI on the Web Terminal</h2>
-      <p>On the web terminal, CSI appears as a tab inside the <strong>Currency Strength Heatmap</strong> modal: a multi-series chart showing the cumulative log-return of each of the 10 G10 currencies over 1M / 3M / 6M / 1Y horizons, computed from the full OHLC dataset across all 32 pairs. The focal currency is highlighted and all ten series update on period selection without re-fetching data. A crosshair tooltip shows all 10 values simultaneously, ordered strongest to weakest, and a legend below the chart ranks each currency by its return over the period. A separate CSI Snapshot table shows each currency's accumulated return, drawdown (low), peak (high), and peak-to-trough range for the same period.</p>
-      <div class="scr-hero-wrap">
-        <div class="scr-hero">
-          <img src="assets/screenshot-csi-web-terminal.png" alt="Currency Strength Index tab inside the web terminal's Currency Strength Heatmap modal, showing a multi-series chart of cumulative log-returns for all 10 G10 currencies with a ranked legend and CSI Snapshot table" width="690" height="575" loading="lazy">
-        </div>
-        <p class="scr-meta"><strong>The CSI tab inside the Currency Strength Heatmap.</strong> All 10 G10 currencies plotted together across the selected horizon, with the focal currency highlighted and a legend ranking each by return.</p>
-      </div>
-    </div>
-
-    <div class="guide-section" id="mt5-indicator">
-      <h2>CSI on MetaTrader 5</h2>
-      <p>For traders who want the same read without switching to a browser, <strong>CSI Currency Strength</strong> is available separately as a native MetaTrader 5 indicator (MQL5 Market product #180317). It renders currency strength directly as a panel overlay on the chart, using a multi-lookback weighted z-score model (short/medium/long horizons, based on Asness, Moskowitz &amp; Pedersen 2013), covering 28 pairs across eight currencies, each color-coded for quick scanning.</p>
-      <div class="scr-hero-wrap">
-        <div class="scr-hero">
-          <img src="assets/screenshot-csi.png" alt="CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD" width="1145" height="556" loading="lazy">
-        </div>
-        <p class="scr-meta"><strong>The CSI Currency Strength panel overlay.</strong> Each of the eight currencies gets an index score and a color-coded strength bar, ranked strongest to weakest, alongside a directional read on the active chart's pair.</p>
-      </div>
+      <h2>How the Simulation Works</h2>
+      <p>The indicator draws from the account's closed deals <strong>with replacement</strong> — bootstrap resampling — rather than assuming any fixed return distribution (normal, log-normal, or otherwise). Each simulated path resamples the account's own trade-by-trade results in a new random order, so the projection reflects the actual shape of the account's win/loss distribution, including its skew and tail behaviour, instead of a theoretical bell curve.</p>
+      <p>By default the indicator runs <strong>10,000 simulations</strong> projecting <strong>500 forward trades</strong> each, both configurable. Across all simulated paths, it computes the p5, p25, p50, p75, and p95 percentile equity value at each trade step, plotting these five percentile curves as a cone over the live equity curve. A set of faint background paths — a sample of individual raw simulation runs — sits behind the cone to give a visual sense of path dispersion beyond the five summary percentiles.</p>
       <div class="callout callout-orange">
-        <strong>Two related but separate products.</strong> The web terminal's CSI tab (32 pairs, all 10 G10 currencies, part of the terminal subscription) and the standalone MQL5 indicator (28 pairs, eight currencies, sold separately) use the same underlying strength concept but are independent products with their own pair coverage — check each page for the exact scope before assuming parity between them.
+        <strong>Fully local — no external data.</strong> All computation runs from the account's own closed-deal history read through the native MT5 API. There is no external server, no <code>WebRequest</code> call, and no internet permission required to run it — unlike the Global Investing terminal products, which pull live macro data from outside MT5.
       </div>
     </div>
 
-    <div class="guide-section" id="reading-csi">
-      <h2>How to Read It</h2>
-      <p>Currencies at the top of the ranking have been broadly bought across the pair set over the selected horizon; currencies at the bottom have been broadly sold. The distance between the strongest and weakest currency — the range — gives a sense of how dispersed the current regime is: a wide range points to a clear directional theme (e.g. a broad dollar move), while a narrow range suggests no single currency is dominating and moves are more pair-specific.</p>
-      <p>Because the score is cumulative over the selected horizon, switching between 1M / 3M / 6M / 1Y can reorder the ranking — a currency can be the weakest performer over the past month while still net-strong over the past year. Comparing more than one horizon is generally more informative than reading a single one in isolation.</p>
+    <div class="guide-section" id="reading-cone">
+      <h2>Reading the Equity Cone</h2>
+      <p>The cone widens as the projection extends further from "NOW" — more simulated trades means more accumulated variance across paths, so the gap between the p5 (worst-case band) and p95 (best-case band) curves grows the further right you read the chart. The p50 (median) curve is the single most likely path through the middle of the distribution, not an average, and is not more probable than any other point inside the p25–p75 band.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero" role="button" tabindex="0" aria-label="Enlarge: Monte Carlo Equity Projection cone and risk metrics strip">
+          <img src="assets/screenshot-monte-carlo-equity.png" data-src="assets/screenshot-monte-carlo-equity.png" alt="Monte Carlo Equity Projection indicator on an MT5 chart, showing a bootstrap-simulated percentile equity cone (p5/p25/p50/p75/p95) over the account equity curve, with a full risk metrics strip below covering account history, projected returns, drawdown and risk, and probabilities" width="1121" height="631" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The percentile equity cone with the risk metrics strip below it.</strong> Five percentile curves (p5–p95) bound the projected range of outcomes from "NOW", with faint individual simulation paths in the background and a full statistics panel underneath.</p>
+      </div>
     </div>
 
-    <div class="guide-section" id="vs-single-pair">
-      <h2>CSI vs. a Single Pair Chart</h2>
-      <p>A single pair chart only shows the relationship between two currencies. If EUR/USD is rising, that could mean EUR is strong, USD is weak, or both — a single chart can't distinguish between those cases. The CSI resolves this by aggregating each currency's performance across every pair it trades in, isolating the currency-specific component of the move from the pair-specific one.</p>
+    <div class="guide-section" id="risk-strip">
+      <h2>Risk Metrics Strip</h2>
+      <p>A full statistics panel sits below the cone, split into four groups:</p>
+      <table class="data-table">
+        <thead><tr><th>Group</th><th>Metrics</th></tr></thead>
+        <tbody>
+          <tr><td>Account history</td><td>Trades, win rate, profit factor, expectancy, standard deviation</td></tr>
+          <tr><td>Returns (projected)</td><td>Median (p50), scenario p5 / p95, VaR 95%, CVaR 95%</td></tr>
+          <tr><td>Drawdown &amp; risk</td><td>Average drawdown, DD p95 / p99, Calmar ratio, worst losing streak at p95</td></tr>
+          <tr><td>Probabilities</td><td>Probability of gain, probability of DD &gt;30%, probability of DD &gt;50%, probability of ruin</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Probability of ruin</strong> is the share of simulated paths in which account balance falls below 20% of starting capital at any point during the projection — a fixed reference threshold, not a per-account setting.</p>
+    </div>
+
+    <div class="guide-section" id="checklist">
+      <h2>Checklist Verdict</h2>
+      <p>A configurable checklist — minimum trade count, minimum profit factor, maximum tolerable p95 drawdown, maximum ruin probability, and minimum probability of gain — rolls the full statistics panel into a single verdict: <strong>tradeable</strong>, <strong>caution</strong>, <strong>needs review</strong>, or <strong>not tradeable</strong>. It is a one-glance read on whether the account's current statistics clear the bar the checklist defines, not an assessment of the strategy itself.</p>
+    </div>
+
+    <div class="guide-section" id="inputs">
+      <h2>Configurable Inputs &amp; CSV Export</h2>
+      <ul>
+        <li><strong>History filter</strong> — days of history to include (0 = all available), with an option to restrict to the current chart's symbol only.</li>
+        <li><strong>Simulation</strong> — number of bootstrap simulations, number of trades to project, reference capital used for percent calculations, and a random seed for reproducible runs.</li>
+        <li><strong>Risk thresholds</strong> — the five checklist inputs described above.</li>
+        <li><strong>Panel</strong> — full color customization for accents, background, border, dividers, and text.</li>
+        <li><strong>CSV export</strong> — one-click export of results to the shared MT5 <code>Common\Files</code> folder (File → Open Data Folder, one level up from the terminal-specific folder), named <code>ESI_&lt;symbol&gt;_&lt;date&gt;.csv</code>.</li>
+      </ul>
+    </div>
+
+    <div class="guide-section" id="install">
+      <h2>Installing on MetaTrader 5</h2>
+      <p>Download <strong>Monte Carlo Equity Projection</strong> from MQL5 Market, then drag it from the Navigator panel onto any MT5 chart. Because it reads only the account's own closed-deal history through the native MT5 API, no <code>WebRequest</code> whitelist entry or additional permission is required to see the default cone and risk metrics strip.</p>
+      <div class="callout callout-orange">
+        <strong>Part of the Global Investing suite.</strong> It complements the <a href="https://www.mql5.com/en/market/product/180324" target="_blank" rel="noopener noreferrer">Institutional Risk Manager</a> and the <a href="access.html">Global Investing FX Terminal</a> — where the Risk Manager handles execution and the Terminal provides macro context, Monte Carlo Equity Projection answers a different question: given an account's actual trading statistics so far, what is the realistic range of outcomes ahead.
+      </div>
     </div>
 
     <div class="guide-section" id="further-reading">
@@ -448,17 +447,17 @@ a { color: inherit; text-decoration: none; }
       <ul>
         <li><a href="https://www.mql5.com/en/blogs/post/771498" target="_blank" rel="noopener noreferrer">Global Investing FX Terminal — Methodology</a></li>
         <li><a href="guide-mt5-ea.html">MetaTrader 5 Expert Advisor for FX Analytics</a></li>
-        <li><a href="guide-dashboard.html">How to Use the Terminal</a></li>
+        <li><a href="guide-csi-indicator.html">Currency Strength Indicator for MetaTrader 5</a></li>
       </ul>
     </div>
 
     <div style="margin-top:32px;">
   <div style="border:1px solid rgba(79,127,255,.22);border-left:3px solid var(--blue);border-radius:6px;background:rgba(79,127,255,.05);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
     <div>
-      <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">Get CSI Currency Strength for MT5</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;">A native MetaTrader 5 panel overlay — z-score currency strength across 28 pairs and eight currencies, color-coded for quick scanning.</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);letter-spacing:.03em;margin-bottom:6px;">Get Monte Carlo Equity Projection for MT5</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;">A native MetaTrader 5 indicator — bootstrap Monte Carlo simulation on the account's own closed-trade history, with a percentile equity cone and full risk metrics strip.</div>
     </div>
-    <a href="https://www.mql5.com/en/market/product/180317" target="_blank" rel="noopener noreferrer" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:var(--blue);color:#fff;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">CSI Indicator on MQL5 &rarr;</a>
+    <a href="https://www.mql5.com/en/market/product/186259" target="_blank" rel="noopener noreferrer" style="display:inline-block;white-space:nowrap;padding:10px 22px;background:var(--blue);color:#fff;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;">Monte Carlo Equity Projection on MQL5 &rarr;</a>
   </div>
     </div>
     <div style="margin-top:12px;">
@@ -489,9 +488,9 @@ a { color: inherit; text-decoration: none; }
 
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
-  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · CURRENCY STRENGTH INDEX</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · MONTE CARLO EQUITY PROJECTION</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.3</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.58.6</span></div>
 </footer>
 
 
@@ -521,6 +520,18 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { rootMargin: '-40px 0px -60% 0px' });
 sections.forEach(s => observer.observe(s));
+</script>
+
+<script>
+// Screenshot lightbox (single hero image on this page)
+(function() {
+  const hero = document.querySelector('.scr-hero[role="button"]');
+  if (!hero) return;
+  const img = hero.querySelector('img');
+  const open = () => window.open(img.dataset.src || img.src, '_blank');
+  hero.addEventListener('click', open);
+  hero.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+})();
 </script>
 </body>
 </html>

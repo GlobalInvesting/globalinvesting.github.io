@@ -274,10 +274,13 @@ a { color: inherit; text-decoration: none; }
 .sub-link:hover { color: #7fa4ff; }
 
 /* COMPANION GRID */
-.companion-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 28px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-.companion-card { background: var(--bg2); padding: 20px 20px 22px; cursor: pointer; transition: background .15s; }
-.companion-card + .companion-card { border-left: 1px solid var(--border); }
-.companion-card:hover { background: var(--bg3); }
+.companion-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 28px; }
+.companion-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; cursor: pointer; transition: background .15s, border-color .15s; }
+.companion-card:hover { background: var(--bg3); border-color: var(--border2); }
+.companion-thumb { height: 150px; overflow: hidden; border-bottom: 1px solid var(--border); background: var(--bg); }
+.companion-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; transition: transform .25s ease; }
+.companion-card:hover .companion-thumb img { transform: scale(1.035); }
+.companion-card-body { padding: 18px 20px 20px; }
 .companion-tag { font-family: var(--font-mono); font-size: 8.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
 .companion-name { font-size: 12.5px; font-weight: 700; color: #e8edf8; margin-bottom: 8px; line-height: 1.3; }
 .companion-desc { font-size: 11.5px; color: var(--text2); line-height: 1.65; }
@@ -324,7 +327,6 @@ a { color: inherit; text-decoration: none; }
   .hero h1 { font-size: 26px; }
   .scr-grid, .scr-grid-3 { grid-template-columns: 1fr; }
   .companion-grid { grid-template-columns: 1fr; }
-  .companion-card + .companion-card { border-left: none; border-top: 1px solid var(--border); }
   .sub-card-body { grid-template-columns: 1fr; }
   .sub-price-col { text-align: left; }
 }
@@ -557,6 +559,7 @@ a { color: inherit; text-decoration: none; }
         <a href="guide-economic-surprises.html">Economic Surprise Index</a>
         <a href="guide-mt5-ea.html">MetaTrader 5 EA Guide</a>
         <a href="guide-csi-indicator.html">Currency Strength Index (CSI)</a>
+        <a href="guide-monte-carlo-simulator.html">Monte Carlo Equity Projection</a>
         <div class="site-menu-divider"></div>
         <span class="site-menu-section">Market Research</span>
         <a href="guide-gbpjpy-cot.html">GBP/JPY Bias Factors</a>
@@ -958,23 +961,42 @@ a { color: inherit; text-decoration: none; }
     <p class="section-desc">Available separately on MQL5 Market. Each integrates with the terminal data pipelines.</p>
     <div class="companion-grid">
       <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180317','_blank')">
-        <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
-        <div class="companion-name">CSI Currency Strength</div>
-        <div class="companion-desc">Multi-timeframe currency strength index as a panel overlay. Z-score model across 28 pairs, configurable lookbacks, eight currencies color-coded.</div>
-        <div class="companion-link">View on MQL5 &#8594;</div>
-        <div class="companion-link"><a href="guide-csi-indicator.html" onclick="event.stopPropagation()" style="color:var(--blue);">Read the guide &#8594;</a></div>
+        <div class="companion-thumb"><img src="assets/screenshot-ea-csi.png" data-src="assets/screenshot-ea-csi.png" alt="CSI Currency Strength indicator panel overlay on an MT5 chart, showing per-currency index and color-coded strength bars" width="426" height="288" loading="lazy"></div>
+        <div class="companion-card-body">
+          <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
+          <div class="companion-name">CSI Currency Strength</div>
+          <div class="companion-desc">Multi-timeframe currency strength index as a panel overlay. Z-score model across 28 pairs, configurable lookbacks, eight currencies color-coded.</div>
+          <div class="companion-link">View on MQL5 &#8594;</div>
+          <div class="companion-link"><a href="guide-csi-indicator.html" onclick="event.stopPropagation()" style="color:var(--blue);">Read the guide &#8594;</a></div>
+        </div>
       </div>
       <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180322','_blank')">
-        <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
-        <div class="companion-name">Carry Trade Monitor</div>
-        <div class="companion-desc">Scans all Market Watch symbols and ranks pairs by annualised carry yield. Long/short swap rates, net carry, directional bias.</div>
-        <div class="companion-link">View on MQL5 &#8594;</div>
+        <div class="companion-thumb"><img src="assets/screenshot-ea-carry.png" data-src="assets/screenshot-ea-carry.png" alt="Carry Trade Monitor panel overlay on an MT5 chart, ranking pairs by annualised swap-implied carry yield" width="379" height="333" loading="lazy"></div>
+        <div class="companion-card-body">
+          <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
+          <div class="companion-name">Carry Trade Monitor</div>
+          <div class="companion-desc">Scans all Market Watch symbols and ranks pairs by annualised carry yield. Long/short swap rates, net carry, directional bias.</div>
+          <div class="companion-link">View on MQL5 &#8594;</div>
+        </div>
       </div>
       <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/180324','_blank')">
-        <div class="companion-tag" style="color:var(--blue);">From $30/mo</div>
-        <div class="companion-name">Institutional Risk Manager</div>
-        <div class="companion-desc">Professional trade management EA. Dynamic lot sizing, scaled exits at 1R/1.5R/2R, ATR trailing stop, news filter, hedge module, live portfolio exposure panel.</div>
-        <div class="companion-link">View on MQL5 &#8594;</div>
+        <div class="companion-thumb"><img src="assets/screenshot-ea-risk-manager.png" data-src="assets/screenshot-ea-risk-manager.png" alt="Institutional Risk Manager panel on an MT5 chart, showing risk-per-trade sizing, scaled-exit modules, and live portfolio exposure by currency" width="1163" height="692" loading="lazy"></div>
+        <div class="companion-card-body">
+          <div class="companion-tag" style="color:var(--blue);">From $30/mo</div>
+          <div class="companion-name">Institutional Risk Manager</div>
+          <div class="companion-desc">Professional trade management EA. Dynamic lot sizing, scaled exits at 1R/1.5R/2R, ATR trailing stop, news filter, hedge module, live portfolio exposure panel.</div>
+          <div class="companion-link">View on MQL5 &#8594;</div>
+        </div>
+      </div>
+      <div class="companion-card" onclick="window.open('https://www.mql5.com/en/market/product/186259','_blank')">
+        <div class="companion-thumb"><img src="assets/screenshot-monte-carlo-equity.png" data-src="assets/screenshot-monte-carlo-equity.png" alt="Monte Carlo Equity Projection indicator on an MT5 chart, showing a bootstrap-simulated percentile equity cone and a full risk metrics strip" width="1121" height="631" loading="lazy"></div>
+        <div class="companion-card-body">
+          <div class="companion-tag" style="color:var(--up);">Available on MQL5</div>
+          <div class="companion-name">Monte Carlo Equity Projection</div>
+          <div class="companion-desc">Bootstrap simulation on the account's own closed-trade history. Percentile equity cone, full risk metrics strip, and a tradeable / caution / needs-review checklist verdict.</div>
+          <div class="companion-link">View on MQL5 &#8594;</div>
+          <div class="companion-link"><a href="guide-monte-carlo-simulator.html" onclick="event.stopPropagation()" style="color:var(--blue);">Read the guide &#8594;</a></div>
+        </div>
       </div>
     </div>
     <p style="margin-top:14px;font-family:var(--font-mono);font-size:9.5px;color:var(--text3);letter-spacing:.03em;">Full catalogue &#8594; <a href="https://www.mql5.com/es/users/santiagopla/seller" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">mql5.com/en/users/santiagopla/seller</a></p>
@@ -1102,9 +1124,19 @@ a { color: inherit; text-decoration: none; }
       subnavLinks.forEach(link => link.classList.toggle('active', link.dataset.target === id));
     };
     if ('IntersectionObserver' in window && targets.length) {
+      // Track intersection state per target rather than trusting entries[0]: when an anchor
+      // jump (click, not scroll) fires several targets in one batch, the batch order reflects
+      // observe() registration order, not document/visual order — e.g. #activation was still
+      // intersecting the top band when #companion-heading appeared right after it, and since
+      // #activation was registered first it won the old `visible[0]` pick even though the user
+      // had jumped past it. Instead, keep a running intersecting/not map for every target and,
+      // on each callback, pick the last (bottom-most) target in document order that is currently
+      // intersecting — that one correctly reflects "where the user is now".
+      const intersecting = new Map(targets.map(t => [t.id, false]));
       const io = new IntersectionObserver((entries) => {
-        const visible = entries.filter(e => e.isIntersecting);
-        if (visible.length) setActive(visible[0].target.id);
+        entries.forEach(e => intersecting.set(e.target.id, e.isIntersecting));
+        const activeId = targets.map(t => t.id).filter(id => intersecting.get(id)).pop();
+        if (activeId) setActive(activeId);
       }, { rootMargin: '-84px 0px -70% 0px', threshold: 0 });
       targets.forEach(t => io.observe(t));
     }
