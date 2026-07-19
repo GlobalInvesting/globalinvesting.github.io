@@ -1,9 +1,10 @@
 {
-  "updated_utc": "2026-07-19T03:56:29.527549+00:00",
-  "updated_label": "03:56 UTC",
-  "total": 19,
+  "updated_utc": "2026-07-19T06:43:47.349853+00:00",
+  "updated_label": "06:43 UTC",
+  "total": 26,
   "sources": [
     "CME",
+    "ING",
     "Saxo"
   ],
   "items": [
@@ -44,6 +45,21 @@
       "published": "2026-07-17T18:28:44+00:00"
     },
     {
+      "id": "3f1482a25187",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "THINK Ahead: No football? Watch these market fixtures instead",
+      "excerpt": "Fill the World Cup-shaped hole in your diary with James Smith's guide to a hot summer in financial markets. From central banks to inflation, it's a line-up promising upsets and maybe even the occasional own goal...",
+      "author": "",
+      "url": "https://think.ing.com/articles/think-ahead-no-football-watch-these-market-fixtures-instead/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784284200000,
+      "published": "2026-07-17T10:30:00+00:00"
+    },
+    {
       "id": "8d9a8b4b7c1d",
       "bank": "Saxo",
       "bank_full": "Saxo Bank (SaxoStrats) — Articles",
@@ -77,6 +93,27 @@
       "published": "2026-07-17T06:55:00+00:00"
     },
     {
+      "id": "fff8e48e2f02",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "FX Daily",
+      "title": "FX Daily: Unpacking the low-vol puzzle",
+      "excerpt": "DXY-weighted short-term implied volatility has continued to fall, now at 2021 levels, ignoring geopolitical and rate dynamics. The main reason could be the overall contained response to this spring’s events. Risks are definitely of a pick-up in volatility from now on, and of short-term USD gains. The GBP rally has stalled; we expect more EUR/GBP…",
+      "author": "",
+      "url": "https://think.ing.com/articles/fx-daily-unpacking-the-low-vol-puzzle/",
+      "currencies": [
+        "USD",
+        "EUR",
+        "GBP"
+      ],
+      "pairs": [
+        "EUR/GBP"
+      ],
+      "category": "macro",
+      "ts": 1784270100000,
+      "published": "2026-07-17T06:35:00+00:00"
+    },
+    {
       "id": "4cc484df6db5",
       "bank": "Saxo",
       "bank_full": "Saxo Bank (SaxoStrats) — Articles",
@@ -98,6 +135,21 @@
       "published": "2026-07-17T06:18:00+00:00"
     },
     {
+      "id": "9d2def69251a",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Asia week ahead: Indonesian rate call and key data on Korea, Singapore, Taiwan",
+      "excerpt": "ASIA/PACIFIC: Indonesia’s interest rate decision and South Korea's second-quarter GDP are the highlights of the week. Key data includes Singaporean inflation and Taiwanese export orders. China will mull changes to loan prime…",
+      "author": "",
+      "url": "https://think.ing.com/articles/asia-week-ahead-170726/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784257980000,
+      "published": "2026-07-17T03:13:00+00:00"
+    },
+    {
       "id": "9a813fd909b3",
       "bank": "CME",
       "bank_full": "CME Group FX",
@@ -114,6 +166,23 @@
       "category": "macro",
       "ts": 1784227372000,
       "published": "2026-07-16T18:42:52+00:00"
+    },
+    {
+      "id": "321fb5db42b5",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Real wage growth fuels Hungary’s economy",
+      "excerpt": "CENTRAL AND EASTERN EUROPE: With real wages continuing to grow fast in May, it is difficult to imagine anything other than consumption being the main driver of the Hungarian economy. A tight labour market will influence future wage decisions, but uncertainty surrounding economic – particularly labour-related – policy looms…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/real-wage-growth-fuels-hungarys-economy/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784193360000,
+      "published": "2026-07-16T09:16:00+00:00"
     },
     {
       "id": "4c501b4d6898",
@@ -150,6 +219,39 @@
       "published": "2026-07-16T08:00:00+00:00"
     },
     {
+      "id": "fd46fc6739f3",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Data doubts linger as UK growth beats expectations",
+      "excerpt": "UNITED KINGDOM: Ongoing strength in UK monthly GDP fits a familiar pattern seen in recent years, with growth tending to outperform in the opening months of the year before losing momentum later on. We expect activity to slow into the…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/data-doubts-linger-as-uk-growth-beats-expectations/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784185200000,
+      "published": "2026-07-16T07:00:00+00:00"
+    },
+    {
+      "id": "cb14eb0c6101",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "FX Daily",
+      "title": "FX Daily: The big GBP short unwinding continues",
+      "excerpt": "The dollar stayed under pressure as PPI confirmed that inflation pressure eased in June. Still, with the Gulf situation apparently far from de-escalation, we don’t see much more USD downside potential in the near term. Instead, sterling is emerging as a major outperformer on the back of further positioning…",
+      "author": "",
+      "url": "https://think.ing.com/articles/fx-daily-the-big-gbp-short-unwinding-continues/",
+      "currencies": [
+        "USD",
+        "GBP"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784183400000,
+      "published": "2026-07-16T06:30:00+00:00"
+    },
+    {
       "id": "65c12a88eec1",
       "bank": "Saxo",
       "bank_full": "Saxo Bank (SaxoStrats) — Articles",
@@ -169,6 +271,23 @@
       "category": "macro",
       "ts": 1784182920000,
       "published": "2026-07-16T06:22:00+00:00"
+    },
+    {
+      "id": "e0def80e1037",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "ECB preview: Not yet ready for the beach break",
+      "excerpt": "EUROPE: While we expect the European Central Bank to stay on hold next week, a surprise hike should not entirely be ruled…",
+      "author": "",
+      "url": "https://think.ing.com/articles/ecb-preview-not-ready-for-the-beach-break-yet/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784175000000,
+      "published": "2026-07-16T04:10:00+00:00"
     },
     {
       "id": "e534d10123bf",
