@@ -150,10 +150,12 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
-.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
-.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
-.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
-.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+.callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
+.callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
+.callout-orange .callout-label { color: var(--orange); }
+.callout-green  .callout-label { color: var(--up); }
+.callout-red    .callout-label { color: var(--down); }
 
 /* ── Spread demo ── */
 .spread-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; margin: 18px 0; }
@@ -354,6 +356,7 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Hover over any element in the panel</strong> to see a tooltip explaining what it means and how to use it. Underlined elements are interactive.
       </div>
     </div>
@@ -449,6 +452,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <p>The subtext under each pair symbol shows the dominant side's average entry price with an arrow: ▼ (colored red) means that side is currently underwater, ▲ (colored green) means it's in profit — this arrow reflects trapped/profit status, not the direction of the last price move. The <strong style="color:#fff;">white vertical tick</strong> on the bar marks where the current market price sits within the range spanned by the average long and average short entry prices — useful for gauging who is under more pressure at a glance.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Readings near 50/50 carry no signal.</strong> Retail is split and no crowd bias exists. Focus your attention on readings above 65% or below 35% on either side — those are where useful contrarian information starts to appear.
       </div>
     </div>
@@ -472,6 +476,7 @@ a { color: inherit; text-decoration: none; }
       <p>The panel's compact row shows the volume-weighted average entry price for the <strong>dominant side only</strong> (whichever of longs/shorts holds the majority), as the small subtext under the pair symbol. Opening a pair's detail view in the terminal shows both the average long and average short entry prices side by side, each with its own trapped/profit arrow.</p>
       <p>Example: EUR/USD longs entered at an average of <span style="font-family:var(--font-mono);color:var(--text);">1.1691</span>, shorts at <span style="font-family:var(--font-mono);color:var(--text);">1.1368</span>. If the current price is <span style="font-family:var(--font-mono);color:var(--text);">1.1566</span>, longs are underwater while shorts are in profit. These levels act as invisible support and resistance — when price approaches the average entry of a large trapped crowd, the risk of a flush (stop-out cascade) increases significantly.</p>
       <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
         <strong>Practical use:</strong> Mark the average long and average short price on your chart. Treat them as soft S/R levels. A rally into the average short entry of a heavily short retail crowd often stalls or reverses — because shorts start closing (buying) around their entry level, creating supply pressure that institutional players can sell into.
       </div>
     </div>
@@ -497,6 +502,7 @@ a { color: inherit; text-decoration: none; }
         <li>The crowd has been holding through a significant adverse move, suggesting stubborn conviction that often breaks suddenly</li>
       </ul>
       <div class="callout callout-red">
+        <div class="callout-label">Caution</div>
         <strong>The most powerful setups</strong> occur when a large crowd (20,000+ positions) is heavily trapped (one-sided, 70%+ on the losing side, well offside from their average entry) and price begins to move further against them. That combination can produce fast, sharp moves as stops cascade.
       </div>
     </div>
@@ -530,6 +536,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout callout-red">
+        <div class="callout-label">Caution</div>
         <strong>Extreme readings can persist for weeks.</strong> A pair can sit at 85% short while continuing to fall — retail holds losing longs (or adds to them) far longer than expected. Sentiment extremes flag <em>elevated reversal risk</em>, not immediate entry points; price action confirmation typically precedes any turn following an extreme reading.
       </div>
       <p>The highest-quality setups arise when retail sentiment extremes align with institutional COT positioning in the opposite direction — retail crowded one way, smart money positioned the other. That is the core confluence signal the panel is designed to help you identify.</p>

@@ -158,10 +158,12 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
-.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
-.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
-.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
-.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+.callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
+.callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
+.callout-orange .callout-label { color: var(--orange); }
+.callout-green  .callout-label { color: var(--up); }
+.callout-red    .callout-label { color: var(--down); }
 
 /* ── COT demo table ── */
 .cot-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 18px 0; }
@@ -394,6 +396,7 @@ a { color: inherit; text-decoration: none; }
       <p>The Commitments of Traders (COT) report is a weekly publication from the US Commodity Futures Trading Commission (CFTC). It shows the aggregate open positions of different categories of traders in futures and options markets regulated by the CFTC — including currency futures traded on the Chicago Mercantile Exchange (CME).</p>
       <p>For FX traders, the report provides a window into the positioning of the most sophisticated market participants: hedge funds, commodity trading advisors (CTAs), proprietary trading firms, and other large speculative accounts. This is institutional-level data, published by the CFTC every Friday afternoon.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Data source in the terminal:</strong> The COT panel pulls directly from <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">CFTC.gov</code>. Data is updated weekly (Friday release covers positions as of the prior Tuesday). The panel header shows the "week ending" date so you always know how current the data is.
       </div>
     </div>
@@ -501,6 +504,7 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--text);">Cross pairs (EUR/GBP, GBP/JPY, etc.):</strong> Two independent legs shown — base currency and quote currency separately, each with its own LF Net, LF WoW Δ, and Net%OI. Both values are raw CFTC figures as reported (no inversion). The footer line summarises alignment: <em>GBP LF Long · JPY LF Short · aligned</em> means both legs favour the same directional bias for the cross (long base, short quote = bullish cross).</li>
       </ul>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Reading raw values on crosses:</strong> Because the CFTC tracks each currency vs USD, a JPY net short (large negative number) means speculators are short JPY futures — which is bearish JPY and therefore <em>bullish</em> GBP/JPY. The terminal shows the raw CFTC values so you can cross-reference directly with the main COT panel. The footer alignment label does the directional interpretation for you.
       </div>
     </div>
@@ -510,6 +514,7 @@ a { color: inherit; text-decoration: none; }
       <p>Net contracts — shown as the <strong>Net</strong> column — is Leveraged Funds' long positions minus their short positions: <code style="font-family:var(--font-mono);font-size:12px;color:var(--blue);">Net = LF longs − LF shorts</code>. It is the single most-referenced number in the panel because it condenses direction and conviction into one signed figure: positive means speculators are net long that currency vs. USD, negative means net short.</p>
       <p>Net alone tells you the current state. Pairing it with the <strong>WoW Δ</strong> column — the change in Net since the prior week's release — tells you the trend: whether that positioning is building, fading, or reversing. A large net position with a shrinking WoW Δ is a different signal than the same net position still expanding week over week.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Sign convention:</strong> All CFTC futures are quoted vs. USD, so Net is always read as "speculators' stance on this currency vs. the dollar." A positive JPY Net is bullish JPY (bearish USD/JPY); a negative EUR Net is bearish EUR (bearish EUR/USD). For crosses, combine both legs' Net direction — see "COT in the Pair Detail strip" above.
       </div>
     </div>
@@ -537,6 +542,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Context matters:</strong> EUR and JPY typically carry the largest absolute OI because they have the deepest futures markets. CHF's OI is structurally smaller — a "large" CHF position of 20k contracts is proportionally significant, while 20k EUR contracts is modest. Always compare OI to each currency's own history, not across currencies.
       </div>
       <p>A directional arrow (▲ green / ▼ red) appears alongside the OI number when the prior week's data is available, showing whether participation is expanding or contracting week-over-week.</p>
@@ -594,6 +600,7 @@ a { color: inherit; text-decoration: none; }
         <p class="scr-meta"><strong>The Participants tab.</strong> LF, AM, and Dealer net positions charted together, with the category legend and current-week breakdown table below.</p>
       </div>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Dealer divergence:</strong> When Dealers are positioned opposite to Leveraged Funds at historical extremes, it is a squeeze risk signal — dealers are absorbing the other side of a crowded LF trade. Watch for rapid reversals when this configuration coincides with a catalyst.
       </div>
 
@@ -663,6 +670,7 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--down);">○ &gt;14 days</strong> — stale; a CFTC publication delay or an interrupted update likely occurred</li>
       </ul>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Why this matters for timing:</strong> Because of the lag, COT positioning is best used as a medium-term bias input, not a short-term timing tool. A currency can move significantly between the Tuesday snapshot and the Friday release — always cross-check COT extremes against current price action before treating them as actionable.
       </div>
     </div>

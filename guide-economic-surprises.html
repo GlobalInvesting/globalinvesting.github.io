@@ -273,10 +273,12 @@ a { color: inherit; text-decoration: none; }
 .guide-section p.scr-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text3); line-height: 1.6; margin-top: 10px; padding: 0 2px; }
 .scr-meta strong { color: var(--text2); font-weight: 600; }
 
-.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
-.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
-.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
-.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+.callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
+.callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
+.callout-orange .callout-label { color: var(--orange); }
+.callout-green  .callout-label { color: var(--up); }
+.callout-red    .callout-label { color: var(--down); }
 
 .data-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
 .data-table thead { background: var(--head-bg); }
@@ -431,6 +433,7 @@ a { color: inherit; text-decoration: none; }
       <p>Central bank rate decisions — the primary driver of medium-term FX direction — are made in response to incoming economic data. When data consistently beats expectations, it reduces the probability of rate cuts and increases the probability of rate hikes, both of which attract capital inflows and strengthen the currency. When data consistently misses, the opposite occurs.</p>
       <p>The ESI captures this dynamic before it shows up in OIS pricing or CB meeting decisions, because the OIS market takes time to reprice and CB decisions are infrequent. A currency's ESI turning positive several weeks before the next meeting is an early signal that the next meeting's language may be less dovish than the market expects — or that a priced-in cut may be pushed back.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>The signal is the direction of change, not the absolute level.</strong> An ESI that has been strongly positive for 6 weeks and is now flattening or declining is a more bearish signal than a moderately negative ESI that has been stable. What matters is whether the flow of surprises is improving or deteriorating.
       </div>
       <p>The ESI also reflects the relationship between market consensus and reality. As data consistently beats, analysts revise their forecasts upward — eventually the bar becomes harder to clear and the ESI naturally mean-reverts. This mean-reversion behavior (well-documented in the Citigroup CESI) makes the ESI a cyclical signal rather than a persistent one.</p>
@@ -500,6 +503,7 @@ a { color: inherit; text-decoration: none; }
       <p style="font-family:var(--font-mono);font-size:13px;background:var(--bg2);border:1px solid var(--border);padding:12px 16px;border-radius:4px;margin:12px 0;color:var(--text);">z = (actual − forecast − historical_mean) / historical_std</p>
       <p>Where <code style="font-family:var(--font-mono);font-size:12px;">historical_mean</code> and <code style="font-family:var(--font-mono);font-size:12px;">historical_std</code> are computed from all prior instances of the same release on file. A minimum of 5 historical observations is required before z-score is used — below that threshold, the simpler beat/miss score is applied.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Why this matters:</strong> A surprise of +0.2pp on US CPI is a very different signal depending on context. If the historical standard deviation of US CPI surprises is 0.05pp, a +0.2pp beat is a 4-sigma event — exceptionally rare and high-impact. If the standard deviation is 0.4pp, a +0.2pp beat is routine noise. The z-score captures this distinction; beat/miss alone does not.
       </div>
       <p>When z-score scoring is available for a subset of events and beat/miss for the rest, both are combined proportionally, maintaining consistent decay weighting throughout. The ESI index value displayed maps a ±2-sigma z-score to approximately ±100 on the index scale.</p>
@@ -537,6 +541,7 @@ a { color: inherit; text-decoration: none; }
       </table>
       <p>This inversion ensures that a positive z-score always indicates a positive economic surprise regardless of which direction "positive" runs for a given indicator — matching the convention used by the Citi and Bloomberg indices.</p>
       <div class="callout callout-orange">
+        <div class="callout-label">Important</div>
         <strong>Trade balance is not inverted.</strong> Unlike the indicators above, Trade Balance is already a signed net level — a deficit prints negative, a surplus positive — the same convention as Current Account. A smaller-than-forecast deficit already means <code style="font-family:var(--font-mono);font-size:12px;">actual &gt; forecast</code>, which scores correctly as a beat with no sign flip required.
       </div>
     </div>
@@ -554,6 +559,7 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--text);">Sentiment surveys without consensus:</strong> IBD/TIPP Economic Optimism and similar surveys that lack a reliable Bloomberg consensus baseline.</li>
       </ul>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>The filter matches institutional practice.</strong> The Citigroup CESI, Deutsche Bank ESI, and Morgan Stanley Economic Surprise Index all apply equivalent noise filters. Including auction results or positioning data would dilute the signal with events that are not relevant to the rate-setting function of central banks.
       </div>
     </div>
@@ -602,6 +608,7 @@ a { color: inherit; text-decoration: none; }
         <p class="scr-meta"><strong>The USD detail modal.</strong> The rolling index chart sits above beats/misses/N summary tiles and the full event log, so every input behind the aggregate score can be checked against its actual vs forecast value.</p>
       </div>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Source label:</strong> The panel subtitle names the active data source and rolling window — e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">Myfxbook &middot; actual vs consensus &middot; 90d rolling</span> (widening to 90d/180d when coverage is sparse for a given release). The scoring methodology is identical regardless of which source is shown.
       </div>
     </div>
@@ -642,6 +649,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
         <strong>Best practice:</strong> Use ESI divergence as a confirmation signal rather than a standalone entry trigger. A currency pair where ESI divergence aligns with COT positioning divergence and CB rate expectations divergence provides a three-factor confirmation that is significantly more reliable than any single signal.
       </div>
     </div>

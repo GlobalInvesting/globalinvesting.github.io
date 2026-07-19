@@ -150,10 +150,12 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
-.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
-.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
-.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
-.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+.callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
+.callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
+.callout-orange .callout-label { color: var(--orange); }
+.callout-green  .callout-label { color: var(--up); }
+.callout-red    .callout-label { color: var(--down); }
 
 /* ── Session cards ── */
 .session-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 18px 0; }
@@ -425,6 +427,7 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--text);">Historical avg · fixed reference</strong> — covers two distinct fallback cases that render the same label: if the primary source above is unavailable, the terminal derives a rougher volatility scalar from the ECB reference rate series; if that is also unavailable, the chart falls back further to a static session-overlap baseline with no volatility scaling. Either way the curve shape remains accurate — only the amplitude scaling may be lost. This label is also shown on initial page load before the first data fetch completes.</li>
       </ul>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Reading the source label:</strong> The small label below the chart legend (e.g. <code style="font-family:var(--font-mono);font-size:11px;">H-L range proxy · 30d avg</code>) updates dynamically after each data fetch. If you see <code style="font-family:var(--font-mono);font-size:11px;">Historical avg · fixed reference</code> after the page has fully loaded, it means the live data source is temporarily unavailable — the chart shape is still accurate, just not amplitude-scaled to current volatility.
       </div>
       <p>On weekends (Saturday–Sunday UTC), the chart displays a flat baseline with a "MARKET CLOSED" label, since FX spot trading is inactive.</p>
@@ -440,6 +443,7 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--text);">The current time marker</strong> — the orange dashed line tells you whether you are in a high-liquidity window or a thin period at a glance.</li>
       </ul>
       <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
         <strong>Practical use:</strong> Before placing a trade, glance at the liquidity canvas. If the orange line is in a trough (low curve), expect wider spreads and potentially erratic, low-conviction price moves. If you're at or near the London–NY peak, spreads are tight and moves are more likely to have follow-through.
       </div>
     </div>
@@ -487,6 +491,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <p>The 08:00–09:00 UTC window is one of the highest-conviction entry periods of the day. European PMI data, ECB speeches, UK economic releases, and institutional order flow all concentrate here. Trends that start in the first hour of London frequently define the direction for the rest of the European session.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>London fix (16:00 UTC):</strong> The 4pm London WM/Reuters fix is when corporate, fund, and custody accounts execute large foreign exchange benchmarking orders. The 30-minute window before (15:30–16:00) and after (16:00–16:30) can see sharp directional moves as market makers position around anticipated fix flows, followed by a reversal. This is a well-documented intraday pattern.
       </div>
     </div>
@@ -534,6 +539,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Note:</strong> These figures move with the pair's current HV30 — they are a live volatility-regime estimate, not a fixed historical reference. The numbers above are one illustrative snapshot. During high-impact events (FOMC, NFP, CPI), individual sessions can easily produce 3–5× these ranges intraday even before HV30 itself has caught up. During holiday periods or low-conviction markets, expect noticeably smaller ranges.
       </div>
     </div>
@@ -548,6 +554,7 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--text);">Avoiding thin liquidity</strong> — the 06:00–08:00 UTC window (between Tokyo close and London open) is the highest spread, lowest volume, most erratic period for EUR/USD. A common mistake is entering positions in this window and being "stopped out by the spread."</li>
       </ul>
       <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
         <strong>Using the terminal:</strong> Check the FX Liquidity canvas and the current time marker before entering a trade. If you're at or beyond the New York close (22:00 UTC), the market is entering its thinnest window. If you're approaching or within the London open (08:00 UTC), you're entering the highest-conviction period.
       </div>
     </div>

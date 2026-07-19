@@ -150,10 +150,12 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
-.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
-.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
-.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
-.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+.callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
+.callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
+.callout-orange .callout-label { color: var(--orange); }
+.callout-green  .callout-label { color: var(--up); }
+.callout-red    .callout-label { color: var(--down); }
 
 /* ── Screenshot ── */
 .scr-hero-wrap { margin: 18px 0 24px; }
@@ -396,6 +398,7 @@ a { color: inherit; text-decoration: none; }
       <h2>What the CSI Is</h2>
       <p>The Currency Strength Index (CSI) is a composite measure of how strong or weak each G10 currency is relative to all the others at once, rather than against a single counterpart. A currency can be rising against one pair while falling against another; the CSI nets these movements together into one ranking per currency, so a trader can see which side of a pair is actually driving the move.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Descriptive, not predictive.</strong> The CSI reflects realised price action over the selected lookback — it is not a forecast and does not generate trade signals. It is a read on what has already happened across the full pair set, not a projection of what happens next.
       </div>
     </div>
@@ -427,6 +430,7 @@ a { color: inherit; text-decoration: none; }
         <p class="scr-meta"><strong>The CSI Currency Strength panel overlay.</strong> Each of the eight currencies gets an index score and a color-coded strength bar, ranked strongest to weakest, alongside a directional read on the active chart's pair.</p>
       </div>
       <div class="callout callout-orange">
+        <div class="callout-label">Important</div>
         <strong>Two related but separate products.</strong> The web terminal's CSI tab (32 pairs, all 10 G10 currencies, part of the terminal subscription) and the standalone MQL5 indicator (28 pairs, eight currencies, sold separately) use the same underlying strength concept but are independent products with their own pair coverage — check each page for the exact scope before assuming parity between them.
       </div>
     </div>

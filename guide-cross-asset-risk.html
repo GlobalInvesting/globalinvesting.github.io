@@ -150,10 +150,12 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
-.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
-.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
-.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
-.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+.callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
+.callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
+.callout-orange .callout-label { color: var(--orange); }
+.callout-green  .callout-label { color: var(--up); }
+.callout-red    .callout-label { color: var(--down); }
 
 /* ── Metric grid ── */
 .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
@@ -567,6 +569,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Direction matters more than level.</strong> A VIX at 25 and falling is less concerning than a VIX at 18 and rising rapidly. The <em>rate of change</em> of VIX — particularly a spike from below 20 to above 25 in a single session — is the most actionable signal for FX traders, as it triggers systematic carry trade unwinding.
       </div>
     </div>
@@ -599,6 +602,7 @@ a { color: inherit; text-decoration: none; }
       <p>The <strong>HV30</strong> (30-day realized historical volatility) of EUR/USD is calculated as the annualized standard deviation of daily log returns using daily OHLC price data. Unlike implied volatility, this is backward-looking — it measures how much the pair actually moved over the past 30 days, not how much the options market expects it to move. The HV30 value is also displayed inline in the FX Pairs table for each major pair.</p>
       <p>Historical average is approximately 5–8%. Readings above 10% indicate an elevated recent volatility regime; above 12% reflects a period of genuine market stress (e.g., post-FOMC surprise, geopolitical shock). Low readings (below 5%) suggest a consolidation phase where breakouts are statistically more likely.</p>
       <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
         <strong>HV 30d in context:</strong> Compare EUR/USD HV 30d against VIX and MOVE to gauge whether FX volatility is in line with broader market stress. If VIX and MOVE are elevated but EUR/USD HV remains low, FX may be lagging equity and rate markets — a potential leading signal. If HV has spiked but VIX is calm, the stress may be EUR/USD-specific (ECB policy, Eurozone political risk) rather than systemic.
       </div>
     </div>
@@ -650,9 +654,11 @@ a { color: inherit; text-decoration: none; }
       <h2>Divergence Signals</h2>
       <p>The most actionable signals come from <em>divergences</em> between cross-asset panels — when different asset classes are sending conflicting messages about risk appetite. These situations create high-probability setups because one market must eventually reprice toward the other.</p>
       <div class="callout callout-red">
+        <div class="callout-label">Caution</div>
         <strong>Key divergence example:</strong> S&amp;P 500 making new highs while VIX refuses to fall below 20, and MOVE remains elevated. This signals that bond and options markets are skeptical of the equity rally — historically a precursor to equity correction and risk-off FX flows. Watch for JPY strength and AUD weakness to lead.
       </div>
       <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
         <strong>Bullish divergence example:</strong> VIX declining, Stoxx and Nikkei both rallying, DXY softening simultaneously. Multiple risk-on signals aligning. Supports long commodity currencies (AUD, CAD, NZD) vs. JPY and CHF.
       </div>
       <p>When the Cross-Asset and Risk Monitor panels are all pointing the same direction, confidence in the regime signal is high. When they diverge, lower position sizing and wait for confirmation.</p>
@@ -694,6 +700,7 @@ a { color: inherit; text-decoration: none; }
       <p><strong style="color:var(--text);">n</strong> — Number of daily returns used in the computation. Target is 252 trading days (one year). A lower value means less historical data is available for that instrument.</p>
 
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Data source:</strong> VaR and CVaR are computed daily using historical price data. The table reflects end-of-day data from the most recent daily update — it does not update intraday. Hover over any instrument name in the terminal for a tooltip describing its specific risk context.
       </div>
     </div>
@@ -716,6 +723,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Key diagnostic:</strong> MOVE sustained above 130 with VIX below 30 is the signature of a rates-driven regime — not an equity-driven one. In this environment, USD strength is the primary FX theme, not JPY/CHF flight. The MOVE/VIX divergence was the critical differentiator between a conventional risk-off episode and a policy-driven repricing.
       </div>
 
@@ -731,6 +739,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout callout-red">
+        <div class="callout-label">Caution</div>
         <strong>Key diagnostic:</strong> MOVE high / VIX moderate = credit or policy stress, not broad risk-off. In this configuration, the usual safe-haven playbook (long JPY/CHF, short AUD/NZD) is unreliable. The primary FX signal is the rate expectation repricing — tracked in the CB Rate Expectations panel — not the equity volatility gauge.
       </div>
 
@@ -747,6 +756,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout callout-red">
+        <div class="callout-label">Caution</div>
         <strong>Key diagnostic:</strong> VIX spike / MOVE stable = equity-driven carry unwind, not a bond or credit crisis. The FX expression is JPY and CHF strength, not broad USD dominance. AUD/JPY and NZD/JPY are the most direct carry unwind pairs to monitor. The BTC move preceding the Nikkei open by several hours was consistent with crypto's role as a high-beta leading indicator in Asia session.
       </div>
 
@@ -763,6 +773,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Key diagnostic:</strong> When gold and DXY are both rising, the standard framework (gold up = USD down) has broken down — typically a geopolitical or fiscal stress signal rather than a cyclical one. When gold rises while DXY falls, it indicates USD-specific concern. The correlation rows in the Risk Monitor panel are designed to surface this distinction in real time.
       </div>
     </div>
@@ -787,9 +798,11 @@ a { color: inherit; text-decoration: none; }
       <h3>BTC and AUD/USD — structural positive correlation</h3>
       <p>Among major FX pairs, AUD/USD has shown the most consistent positive correlation with BTC/USD over rolling 60-day windows. Both assets are high-beta risk proxies with significant Asia-Pacific institutional ownership. The correlation is not static — it strengthens during risk-off episodes (both fall together) and weakens during crypto-specific narratives (e.g., ETF approvals, halving events) when BTC moves independently of macro conditions.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Reading this manually:</strong> The terminal does not currently compute a dedicated BTC/USD–AUD/USD correlation figure. The Key Correlations panel does track other risk-relevant pairs that serve a similar diagnostic purpose — AUD/USD vs. Gold and AUD/USD vs. ASX 200 among them. To gauge the BTC–AUD relationship directly, compare BTC/USD price action (Cross-Asset panel) against AUD/USD (quote bar or price chart) side by side; a reading that collapses toward zero or turns negative typically coincides with crypto-specific catalysts decoupling BTC from macro.
       </div>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>How to use this in practice:</strong> Monitor BTC/USD intraday change alongside the AUD/USD rate in the quote bar. If BTC is down more than 5% on the session and AUD/USD has not yet moved proportionally, the FX market may be lagging — a potential leading signal. If BTC has already moved and AUD/USD has followed, the cross-asset transmission has occurred and the setup is less actionable.
       </div>
 
@@ -802,6 +815,7 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--text);">Crisis-level VIX</strong> — when VIX is above 40, traditional safe-haven flows (JPY, CHF, USD) dominate and the BTC signal is subsumed by the broader risk-off environment. At extreme stress levels, all correlations compress and cross-asset relationships become unreliable.</li>
       </ul>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Institutional framing:</strong> Professional FX desks use BTC as one of several Asia session risk monitors alongside Nikkei futures, US equity futures (CME Globex), and CFTC COT positioning — not as a standalone signal. Its value is as a real-time, continuously available sentiment proxy during the session gap, weighted alongside other inputs. This terminal's cross-asset panel is designed to support exactly this multi-signal approach.
       </div>
     </div>

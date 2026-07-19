@@ -163,10 +163,12 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
-.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
-.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
-.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
-.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+.callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
+.callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
+.callout-orange .callout-label { color: var(--orange); }
+.callout-green  .callout-label { color: var(--up); }
+.callout-red    .callout-label { color: var(--down); }
 
 /* ── Layout visual diagram ── */
 .layout-visual { margin-bottom: 20px; }
@@ -559,6 +561,7 @@ a { color: inherit; text-decoration: none; }
       <h3>Quote bar</h3>
       <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, GOLD FUT, WTI FUT, BTC/USD, US 10Y Yield, and DXY. FX pair prices update in real time during market hours via WebSocket (tick-by-tick). Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min; on days when the primary feed appears frozen (e.g. a bank holiday), the terminal automatically switches to a backup feed for commodities and equity indices. Official daily reference rates serve as a silent fallback when all primary sources are unavailable.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Update cadence:</strong> FX pair prices stream in real time via WebSocket. When the market is open you will see the source label change from <code style="font-family:var(--font-mono);font-size:11px;">Delayed ~5min · HH:MM</code> to <code style="font-family:var(--font-mono);font-size:11px;">Live</code>. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 min; when the primary feed is detected as frozen, the terminal switches automatically to a backup feed for commodities and equity indices. Click any pair to jump directly to the price chart with that symbol pre-selected.
       </div>
       <h3>News ticker</h3>
@@ -588,9 +591,11 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Frequency:</strong> The narrative and regime update 4× daily (00:00, 06:30, 14:30, 20:00 UTC). The timestamp is shown next to the label. Do not rely on the narrative for intraday tick-by-tick changes — use the live price feeds and VIX/MOVE data in the Risk Monitor for real-time regime shifts.
       </div>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Bank holidays:</strong> When a market is closed (e.g. Memorial Day for USD markets), the AI narrative automatically omits percentage-change figures for affected instruments — Gold, SPX, WTI, US yields, and DXY — rather than reporting a misleading +0.00%. The narrative will note the closure context instead.
       </div>
     </div>
@@ -639,9 +644,11 @@ a { color: inherit; text-decoration: none; }
       </div>
       <p>Strength is computed across <strong>32 live pairs</strong>: the classic 28-pair combination of the 8 G8 majors (8×7÷2 = 28, each currency appearing in exactly 7 pairs) plus 4 added Scandinavian pairs (USD/NOK, USD/SEK, EUR/NOK, EUR/SEK) to bring NOK and SEK into the same heatmap. When market is open, each currency's score updates in real time; during off-hours delayed data (~5 min) provides the baseline. For example, JPY's score averages its move in USD/JPY, EUR/JPY, GBP/JPY, AUD/JPY, NZD/JPY, CAD/JPY and CHF/JPY — a true 7-pair basket reading. NOK and SEK, having no direct cross-pairs against GBP, AUD, CAD, CHF, or NZD, average only their 2 available pairs each (vs. USD and vs. EUR) — a valid but thinner read than the 8 majors. ECB daily rates serve as a silent fallback only when RT data is unavailable. Cells are color-coded by intensity: dark green (strong), light green (mild), flat (near zero), light red (mild weakness), dark red (weak).</p>
       <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
         <strong>Why does each currency have a different number of observations?</strong> The 8 G8 majors are each measured against all 7 of their peers, since every major-to-major cross is liquid enough to track live. NOK and SEK currently have only USD and EUR crosses in the live pair set, so their score is a 2-pair average rather than a 7-pair one — still directionally meaningful, but noisier and more exposed to a single pair's idiosyncratic move than the majors' readings.
       </div>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>How to read it:</strong> Currencies on the left are outperforming; currencies on the right are underperforming. A large gap in scores between adjacent cells signals a decisive move. Compare the far left and far right to identify the highest-conviction long/short pair of the session.
       </div>
 
@@ -664,6 +671,7 @@ a { color: inherit; text-decoration: none; }
       <p><a href="guide-csi-indicator.html" style="color:var(--blue);"><strong style="color:var(--text);">CSI</strong></a> — Currency Strength Index: a multi-series LightweightCharts chart showing the cumulative log-return of all 10 G10 currencies over selectable periods (1M / 3M / 6M / 1Y / All). Computed from the full OHLC dataset across all 32 pairs — the same data as the heatmap. The focal currency's line is highlighted; all series start at 0% at the beginning of the selected period. A crosshair tooltip shows all 10 values simultaneously ordered strongest to weakest. A legend table below shows cumulative return, min, max, and range for each currency over the period.</p>
 
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Note on session attribution:</strong> The session-weighted composite in the Session tab is a volume-proxy decomposition of the intraday move. Exact per-session attribution requires tick data, which is not publicly available. Treat session contributions as directional indicators, not precise measurements.
       </div>
     </div>
@@ -728,6 +736,7 @@ a { color: inherit; text-decoration: none; }
         <li style="padding:5px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Retail Sentiment</strong> Long/short ratio from Myfxbook community — retail traders only. Contrarian indicator: extreme retail long bias typically precedes institutional short positioning.</li>
       </ul>
       <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
         <strong>Tip:</strong> Click once on any major or cross to open the chart and expand the inline detail. Click the same row again to collapse it. The strip stays expanded while you scroll — use this to compare COT or IV data across pairs without losing your place.
       </div>
     </div>
@@ -855,6 +864,7 @@ a { color: inherit; text-decoration: none; }
         <p class="scr-meta"><strong>The Alerts popover.</strong> Alert type, instrument, condition, and value — plus any recently fired alerts at the top.</p>
       </div>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Important:</strong> These signals are informational context, not trade recommendations. Confidence labels reflect internal cross-factor alignment, not a probability of directional outcome. Always apply your own analysis and risk management before acting on any market signal.
       </div>
     </div>
@@ -919,6 +929,7 @@ a { color: inherit; text-decoration: none; }
       <p class="scr-meta"><strong>The FX OTC Notional Volume panel.</strong> DTCC GTR data, T+1, new trades only — ranked by share of the G10 aggregate.</p>
     </div>
     <div class="callout">
+        <div class="callout-label">Note</div>
       <strong>Coverage note:</strong> The DTCC GTR captures a significant subset of OTC FX trades reported under US Dodd-Frank rules — not total global FX volume. Spot FX rarely appears in the DTCC file because spot settles T+2 and is infrequently SDR-reportable. The $250M/trade notional cap suppresses large institutional block trades. Use this panel to identify relative activity across pairs, not as a measure of absolute global FX turnover.
     </div>
     </div>

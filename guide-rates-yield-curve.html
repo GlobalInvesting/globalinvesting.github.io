@@ -150,10 +150,12 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
-.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
-.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
-.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
-.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+.callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
+.callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
+.callout-orange .callout-label { color: var(--orange); }
+.callout-green  .callout-label { color: var(--up); }
+.callout-red    .callout-label { color: var(--down); }
 
 /* ── Curve grid ── */
 .curve-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 18px 0; }
@@ -418,6 +420,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>The 2Y–10Y re-steepening trap:</strong> When an inverted curve re-steepens (the spread moves from negative back toward zero), it does not mean conditions are improving. A re-steepening from deep inversion typically happens as the Fed begins cutting rates in response to an already-deteriorating economy — which is historically when equities and risk FX begin their most significant declines. This is a common misread.
       </div>
     </div>
@@ -432,6 +435,7 @@ a { color: inherit; text-decoration: none; }
       <p>The difference between the US 10-year Treasury yield and the German 10-year Bund yield. This spread is the primary structural driver of EUR/USD over medium-to-long timeframes.</p>
       <p>When the US–DE spread widens (US yields rise faster or fall slower than German yields), the USD becomes more attractive relative to the EUR, and EUR/USD tends to fall. When the spread narrows, EUR/USD tends to rise.</p>
       <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
         <strong>How to read it in the terminal:</strong> The spread value shows in basis points alongside a signal label. A widening spread (US outperforming) carries a bearish EUR/USD implication. A narrowing spread (Germany outperforming, or ECB falling behind the Fed in rate normalisation) carries a bullish EUR/USD implication. The signal label reflects the direction and magnitude of recent change.
       </div>
       <p>The correlation between US–DE 10Y spread and EUR/USD typically runs at -0.80 or better over rolling 6-month windows. Divergences between the spread and EUR/USD price action are often mean-reversion setups.</p>
@@ -442,6 +446,7 @@ a { color: inherit; text-decoration: none; }
       <p>The difference between the US 10-year Treasury yield and the Japanese 10-year JGB yield. This is arguably the single most important structural driver of USD/JPY — the pair with the world's highest daily volume.</p>
       <p>Japan's yield curve control (YCC) policy (now largely unwound as of 2024) historically capped JGB yields near 0%, meaning the US–JP spread widened and narrowed almost entirely based on US yield movements. This made USD/JPY one of the purest expressions of US rate expectations in FX markets.</p>
       <div class="callout callout-red">
+        <div class="callout-label">Caution</div>
         <strong>Post-YCC Japan:</strong> As the BoJ has normalized policy and allowed JGB yields to rise, the US–JP spread relationship has become more symmetric. Japanese rate hikes now compress the spread from the JP side as well. This means carry trade unwinds in USD/JPY can be triggered by either US yield declines or JP yield increases — monitor both.</div>
       <p>The terminal displays the signal as <strong>US Premium</strong> when the US 10Y yield exceeds Japan's (spread positive — carry incentive to be long USD/JPY), or <strong>JP Premium</strong> when the Japanese 10Y yield exceeds the US (spread negative — carry incentive compressed or reversed). The spread value is shown in basis points alongside the signal.</p>
     </div>
@@ -451,6 +456,7 @@ a { color: inherit; text-decoration: none; }
       <p>Above the US yield grid, a row of country tabs (<strong>US · DE · GB · JP · AU · CA · NZ · NO · SE</strong>) lets you switch the panel to that country's own yield data — its own tenor grid and curve where available, sourced from the same daily G10 rates data as the US panel. This covers nine of the ten G10 economies directly; Switzerland is not currently broken out as its own tab.</p>
       <p>A final <strong>Spreads</strong> tab replaces the country grid with a single consolidated table: each of the eight non-US G10 economies shown above, with its 10Y yield, the spread versus the US 10Y in basis points, its 2Y yield where available, and a curve-slope indicator. This is the fastest way to scan all cross-country spreads at once rather than switching tabs one at a time.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Two different things called "spreads."</strong> The US pane's own spread table (2Y–10Y, US–DE, US–JP) is fixed and always visible without switching tabs — it covers the two most-watched relationships by default. The <strong>Spreads</strong> tab is a separate, broader view covering all eight non-US economies at once. Use the US pane's table for a quick read on EUR/USD and USD/JPY specifically; use the Spreads tab to scan the full G10 set, including NOK and SEK.
       </div>
       <div class="scr-hero-wrap">
@@ -466,6 +472,7 @@ a { color: inherit; text-decoration: none; }
       <p>Clicking the Rates &amp; Yield Curve panel opens a detail view with a larger curve chart, the 10Y–2Y and 30Y–2Y spread metrics, and the full tenor table (today, prior close, change in bp). Below the table, a <strong>Market Commentary</strong> block surfaces up to three of the most recent institutional headlines specifically about US Treasury yields and the yield curve — the same Bloomberg/Refinitiv-style commentary pattern used in the CB Rates detail view, applied here to Treasury-specific coverage rather than a single central bank.</p>
       <p>Articles are pulled from the terminal's news pipeline and filtered by topic — Treasury yield, yield curve, and tenor-specific terminology (10-year, 2-year, 30-year, T-Bill) — rather than by currency tag, since a generic "USD" filter would also surface unrelated USD headlines (payrolls, CPI, Fed speeches with no bearing on the curve itself). Each entry shows the source, a relative timestamp, the headline (linked to the original article), and a short excerpt. If no qualifying article exists in the current news window, the panel shows an empty state rather than an unrelated headline.</p>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Data source:</strong> Market Commentary draws from the same institutional news feed as the rest of the terminal's News Feed — sourced from outlets with dedicated bond and Treasury coverage. The block refreshes whenever the detail view is reopened; it does not poll while the view is closed.
       </div>
       <div class="scr-hero-wrap">
@@ -487,6 +494,7 @@ a { color: inherit; text-decoration: none; }
         <li>Bear steepening (10Y rising, 2Y stable) → watch for gold and AUD pressure as real rates rise</li>
       </ul>
       <div class="callout">
+        <div class="callout-label">Note</div>
         <strong>Data source:</strong> The 10Y, 5Y, 30Y, and 3M tenors update approximately every 5 minutes during US market hours via yfinance yield tickers (^TNX, ^FVX, ^TYX, ^IRX). The 2Y tenor is intentionally excluded from that live feed — ^IRX is the 13-week T-Bill, not a 2Y yield, so the terminal always substitutes FRED's daily DGS2 series for 2Y instead, meaning that figure updates once per day regardless of market hours. Outside market hours, or when the intraday feed is unavailable, the 10Y, 2Y, and 5Y tenors fall back to FRED's daily batch values (DGS10, DGS2, DGS5) — the panel subtitle reflects the active source, though the label is driven by the 2Y feed status specifically. The 3M and 30Y tenors have no such fallback. For a full historical candlestick view of the 10Y yield, click <strong>US 10Y</strong> in the Cross-Asset panel or quote bar to open it in the Price Chart panel.
       </div>
     </div>
