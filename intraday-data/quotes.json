@@ -1,23 +1,7 @@
 {
-  "updated": "2026-07-19T01:30:32Z",
+  "updated": "2026-07-19T01:35:29Z",
   "source": "mixed",
   "quotes": {
-    "vix": {
-      "close": 18.77,
-      "prev_close": 16.73,
-      "chg": 2.04,
-      "pct": 12.1937,
-      "high": 19.5,
-      "low": 17.68,
-      "open": 18.01,
-      "bid": null,
-      "ask": null,
-      "market_state": "CLOSED",
-      "market_time": 1784319301,
-      "source": "yfinance",
-      "pct1w": 24.8836,
-      "pct1w_date": "2026-07-10"
-    },
     "spx": {
       "close": 7457.69,
       "prev_close": 7533.77,
@@ -203,35 +187,35 @@
       "pct1w_date": "2026-07-10"
     },
     "btc": {
-      "close": 64730.01,
+      "close": 64732.3,
       "prev_close": 64794.25,
-      "chg": -64.24,
-      "pct": -0.0991,
+      "chg": -61.95,
+      "pct": -0.0956,
       "high": 64810.223,
-      "low": 64731.527,
+      "low": 64725.117,
       "open": 64794.25,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1784424632,
+      "market_time": 1784424929,
       "source": "yfinance",
-      "pct1w": 0.9401,
+      "pct1w": 0.9437,
       "pct1w_date": "2026-07-10"
     },
     "eth": {
-      "close": 1858.88,
+      "close": 1858.76,
       "prev_close": 1861.4141,
-      "chg": -2.5341,
-      "pct": -0.1361,
+      "chg": -2.6541,
+      "pct": -0.1426,
       "high": 1861.5444,
-      "low": 1858.5677,
+      "low": 1858.4932,
       "open": 1861.4141,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1784424632,
+      "market_time": 1784424926,
       "source": "yfinance",
-      "pct1w": 3.5188,
+      "pct1w": 3.5121,
       "pct1w_date": "2026-07-10"
     },
     "nasdaq": {
@@ -257,7 +241,7 @@
       "pct": 0.2661,
       "high": 10623.69,
       "low": 10527.65,
-      "open": 10572.39,
+      "open": 10514.96,
       "bid": null,
       "ask": null,
       "market_state": "CLOSED",
@@ -329,7 +313,7 @@
       "bid": 1.35428,
       "ask": 1.35437,
       "market_state": "CLOSED",
-      "market_time": 1784424619,
+      "market_time": 1784424859,
       "source": "yfinance",
       "pct1w": 0.2744,
       "pct1w_date": "2026-07-10",
@@ -1017,6 +1001,15 @@
       "source": "yfinance",
       "pct1w": -0.932,
       "pct1w_date": "2026-07-10"
+    },
+    "vix": {
+      "close": 18.77,
+      "prev_close": 18.77,
+      "chg": 0,
+      "pct": 0,
+      "source": "repo",
+      "stale": true,
+      "sourceDate": "2026-07-17"
     }
   },
   "hv30": {
