@@ -1,8 +1,8 @@
 {
-  "updated_utc": "2026-07-20T11:01:24.298828+00:00",
-  "updated_label": "11:01 UTC",
-  "total": 48,
-  "total_high": 32,
+  "updated_utc": "2026-07-20T11:09:39.135190+00:00",
+  "updated_label": "11:09 UTC",
+  "total": 50,
+  "total_high": 33,
   "total_med": 5,
   "sources_active": [
     "ActionForex",
@@ -13,11 +13,13 @@
     "Federal Reserve",
     "ForexLive",
     "InvestingLive",
-    "Marc to Market"
+    "Marc to Market",
+    "Nasdaq FX",
+    "RTT News"
   ],
   "lang_counts": {
     "es": 0,
-    "en": 48
+    "en": 50
   },
   "articles": [
     {
@@ -34,6 +36,38 @@
       "lang": "en",
       "date": "20 Jul",
       "datetime": "2026-07-20T10:40:37.276000+00:00",
+      "recent": true
+    },
+    {
+      "id": "648620cf3118",
+      "cur": "USD",
+      "impact": "high",
+      "title": "Dollar Drops As Soft Inflation Dims Fed Hike Bets",
+      "expand": "Better-than-expected inflation readings from the U.S aided and abetted the dollar's mild retreat during the week ended July 17.",
+      "source": "RTT News",
+      "link": "https://www.rttnews.com/story.aspx?Id=3668335",
+      "time": "10:32",
+      "ts": 1784543575000,
+      "featured": true,
+      "lang": "en",
+      "date": "20 Jul",
+      "datetime": "2026-07-20T10:32:55+00:00",
+      "recent": true
+    },
+    {
+      "id": "44084bf5e4cd",
+      "cur": "GBP",
+      "impact": "low",
+      "title": "Boeing Signs Deal With Riyadh Air For 28 Additional 787 Dreamliners",
+      "expand": "(RTTNews) - Boeing Co. (BA), an American aerospace company, on Monday said that it has signed an agreement with Riyadh Air for the purchase of 28 additional 787 Dreamliner aircraft as part of the airline's fleet expansion strategy.",
+      "source": "Nasdaq FX",
+      "link": "https://www.nasdaq.com/articles/boeing-signs-deal-riyadh-air-28-additional-787-dreamliners",
+      "time": "10:27",
+      "ts": 1784543238000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Jul",
+      "datetime": "2026-07-20T10:27:18+00:00",
       "recent": true
     },
     {
@@ -293,6 +327,22 @@
       "recent": true
     },
     {
+      "id": "4d0a281c094a",
+      "cur": "CAD",
+      "impact": "high",
+      "title": "Commodity Currencies Rise As Crude Oil Prices Climb",
+      "expand": "The commodity currencies such as Australia, the New Zealand and the Canadian dollars strengthened against their major currencies in the European session on Monday, as the crude oil prices surged after the hostilities between the U.S. and Iran intensified raising the possibility of a full-scale conflict and closing the Strait of Hormuz to maritime traffic.",
+      "source": "RTT News",
+      "link": "https://www.rttnews.com/story.aspx?Id=3668300",
+      "time": "08:45",
+      "ts": 1784537128000,
+      "featured": true,
+      "lang": "en",
+      "date": "20 Jul",
+      "datetime": "2026-07-20T08:45:28+00:00",
+      "recent": true
+    },
+    {
       "id": "056748470b30",
       "cur": "EUR",
       "impact": "high",
@@ -462,7 +512,7 @@
       "link": "https://investinglive.com/news/oil-prices-continue-to-ramp-up-to-start-the-new-week/",
       "time": "05:03",
       "ts": 1784523798000,
-      "featured": true,
+      "featured": false,
       "lang": "en",
       "date": "20 Jul",
       "datetime": "2026-07-20T05:03:18+00:00",
@@ -562,22 +612,6 @@
       "lang": "en",
       "date": "18 Jul",
       "datetime": "2026-07-18T08:59:11+00:00",
-      "recent": false
-    },
-    {
-      "id": "23bbfa852d2a",
-      "cur": "USD",
-      "impact": "high",
-      "title": "investingLive Americas market news wrap: Stock markets struggle on Kimi, higher oil and NFLX",
-      "expand": "US June import prices +0.3% vs -0.7% expected US housing starts for June 1.427 million versus 1.310 million estimate. US June industrial production +0.1% vs +0.2% expected Why Kimi K3 is adding to the market worries US July prelim UMich consumer sentiment 54.4 vs 51.0 expected Meta weighs multibillion-dollar AI infrastructure deal with Anthropic Baker Hughes oil rig count up 7 to 452 Iran targeted a ship trying to pass through Hormuz - Tasnim Trump says he will add to Canadian tariffs due to wildfire smoke as two Minnesota fires cross into Canada Markets: Nasdaq down 1.3% WTI crude oil up $2.9...",
-      "source": "ForexLive",
-      "link": "https://investinglive.com/news/investinglive-americas-market-news-wrap-us-stock-markets-struggle-into-the-close-as-chipmakers-higher-oil-and-nflx-weigh/",
-      "time": "20:11",
-      "ts": 1784319063000,
-      "featured": false,
-      "lang": "en",
-      "date": "17 Jul",
-      "datetime": "2026-07-17T20:11:03+00:00",
       "recent": false
     },
     {
