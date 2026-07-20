@@ -1,63 +1,53 @@
 {
-  "generated_at": "2026-07-19T20:51:44Z",
+  "generated_at": "2026-07-20T02:32:16Z",
   "signals": [
     {
-      "time": "20:16",
+      "time": "02:31",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Risk + Energy Inflation",
-      "text": "JPY COT net short -105.2k (28% long) creates short-squeeze risk (USD/JPY downside if shorts cover) as WTI crude surged 11% on Iran war escalation. While the 264bp OIS carry advantage favors USD, the 162.35 close is vulnerable to a safe-haven JPY bid if the Hormuz risk premium triggers a broader equity liquidation. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for determining if energy-driven inflation forces a hawkish shift.",
+      "title": "USD/JPY — Geopolitical Escalation + Carry + Intervention Risk",
+      "text": "USD/JPY at 162.34 — 275bp Fed-BoJ carry sustains the bid despite US-Iran hostilities. JPY COT LF net short -105,238 (crowded carry) remains vulnerable to a sharp unwind if VIX exceeds 25, though current VIX at 18.8 (normal volatility) keeps carry dominant. 160.00 remains the key level previously triggering BoJ warnings; intervention risk is acute on sustained trading above 162.00. Options market is pricing protection against a reversal with 25d RR at -1.37 (moderate put skew).",
       "evidence": [
-        "JPY COT net short -105.2k",
-        "WTI Crude +11% weekend surge",
-        "USD/JPY OIS carry +264bp"
+        "USD/JPY: 162.34",
+        "Fed 3.75% vs BoJ 1.0% — +275bp",
+        "JPY COT LF net: -105,238",
+        "USD/JPY 25d RR: -1.37"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:51",
-      "priority": "critical",
-      "title": "NZD/CHF — G10 Bilateral Theme",
-      "text": "NZD 1W performance (+1.320%) vs CHF laggard status (-0.458%) establishes a 1.778% G10 spread favoring the cross. The RBNZ 2.5% hike bias contrasts with the SNB 0.0% hold, providing a +250bp carry advantage that offsets the NZD COT net short of -29.5k. The next RBNZ meeting (mkt: 90% hike priced) on 2 Sep remains the primary anchor for this yield-seeking momentum.",
-      "evidence": [
-        "NZD 1W avg: +1.320% (n=4)",
-        "CHF 1W avg: -0.458% (n=6)",
-        "G10 spread: 1.778%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "19:35",
+      "time": "02:28",
       "priority": "warning",
-      "title": "USD/CAD — Tariff Escalation + COT Crowding",
-      "text": "CAD COT net short -93.5k (20.6% long) faces further downside pressure following Trump's weekend threat of new Canadian tariffs. This protectionist shift reinforces the 132bp OIS carry advantage for USD/CAD, potentially driving the pair above the 1.4011 Friday close. The next BoC meeting (mkt: 100% hold priced) is the catalyst for assessing if trade risks override the recent 1.10% CAD weekly outperformance.",
+      "title": "NZD/USD — COT vs OIS Divergence",
+      "text": "RBNZ 2.5%. With NZD CESI at neutral (net 0) and COT long% at an extreme low of 15.2%, a hawkish RBNZ delivery creates significant short-squeeze risk. NZD/USD at 0.5854 is supported by a -0.58% real rate, which is less accommodative than JPY (-0.52%). Retail sentiment is 85% short, diverging from the hawkish CB bias, signaling potential retail capitulation if price extends higher.",
       "evidence": [
-        "CAD COT net short -93.5k",
-        "Trump tariff threat on Canada",
-        "USD/CAD OIS carry +132bp"
+        "NZD COT LF net: -29,582",
+        "NZD COT long%: 15.2%",
+        "Retail: 85% short",
+        "RBNZ bias: ↑ Hike"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:35",
+      "time": "02:25",
       "priority": "warning",
-      "title": "EUR/USD — ECB Hold Bias + Data Underperformance",
-      "text": "EUR COT net short -74.6k aligns with a strong negative CESI (-17 net misses), suggesting sustained downward pressure toward 1.14. The 144bp OIS carry advantage for USD is reinforced by the ECB's expected hold at the next meeting on 23 Jul. This meeting is the catalyst for confirming the divergence between the Fed's restrictive +1.47% real rate and the ECB's +0.03%.",
+      "title": "AUD/USD — Volatility + CESI Divergence",
+      "text": "AUD/USD at 0.6991 — IV at 12.1% vs HV30 at 6.4% generates a +5.7% VRP, signaling elevated institutional hedging demand. AUD CESI at -13 (strong negative) confirms persistent data misses, weighing on the 60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%). COT LF net long +21,946 (63.2% long) faces liquidation risk if data continues to disappoint. Watch for a break of 0.6950 to confirm a shift in the carry regime.",
       "evidence": [
-        "EUR COT net short -74.6k",
-        "EUR CESI net -17",
-        "ECB meeting 23 Jul"
+        "AUD/USD VRP: +5.7%",
+        "AUD CESI: -13",
+        "RBA 4.35% vs Fed 3.75% — -60bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "18:19",
+      "time": "02:20",
       "priority": "info",
-      "title": "AUD/USD — Data Misses vs Carry Advantage",
-      "text": "AUD COT net long +21.9k (63.2% long) is at risk of an unwind as the AUD CESI shows a strong negative -13 net miss. While the -73bp OIS carry favors AUD, the 0.6970 Friday close faces headwinds from the Iran-driven risk-off sentiment and falling T-note yields. The next RBA meeting (mkt: 100% hold priced) on 11 Aug determines if the 4.35% hold stance can withstand deteriorating domestic data.",
+      "title": "USD/CAD — Correlation Break + Tariff Risk",
+      "text": "USD/CAD at 1.4007 — Correlation vs WTI Oil at -0.933 vs norm of -0.006 (z=-1.91σ) indicates a severe breakdown in the traditional CAD-energy link. CAD is outperforming (1W avg +0.232%) despite Trump's tariff threats related to wildfire smoke. Fed 3.75% vs BoC 2.25% (+150bp) carry favors USD, but CAD resilience suggests the market is discounting tariff headlines. Watch the next BoC meeting (mkt: 100% hold priced) for a shift in the 132bp OIS carry spread.",
       "evidence": [
-        "AUD COT net long +21.9k",
-        "AUD CESI net -13",
-        "AUD/USD OIS carry -73bp"
+        "USD/CAD vs WTI z-score: -1.91σ",
+        "USD/CAD carry: +150bp",
+        "CAD 1W avg: +0.232%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
