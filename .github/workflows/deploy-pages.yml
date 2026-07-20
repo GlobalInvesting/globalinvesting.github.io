@@ -23,17 +23,44 @@ permissions:
   pages: write
   id-token: write
 
-# "pages" agrupa todos los despliegues bajo la misma cola. cancel-in-progress
-# en false evita cancelar un deploy a mitad de camino (eso fue una causa
-# probable de las fallas intermitentes vistas antes) — en su lugar, los
-# despliegues se encolan y corren en orden, uno detrás del otro.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+# v2 (2026-07-20): concurrency moved from workflow-level to per-job (see BUG
+# note on the "build" job below). No workflow-level concurrency block here
+# anymore — each job declares its own group.
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # BUG FOUND 2026-07-20: the original v1 setup had ONE workflow-level
+    # "pages" concurrency group shared by both build and deploy, with
+    # cancel-in-progress:false — kept deliberately so a *deploy* is never
+    # cut off mid-way (a probable cause of intermittent failures seen
+    # before v1; see the header comment above). But sharing that single
+    # group meant EVERY push's build+deploy also queued and ran to full
+    # completion in FIFO order, with none skipped. With ~5 data workflows
+    # (update-ff-calendar, update-intraday-quotes, forex-news,
+    # update-fx-liquidity, update-ohlc) pushing every 2-10 min — more
+    # overlap during release windows — a commit that had just written a
+    # fresh actual into ff_calendar.json could sit behind several minutes
+    # of already-queued deploys of now-superseded commits before its own
+    # deploy even started. calendar-panel.js's v1.6 minute-bucketed
+    # cache-buster can't help here — it only defeats Fastly's URL-level edge
+    # cache; the URL it fetches still resolves to whatever artifact GitHub
+    # Pages has actually published, which was stuck behind the backlog.
+    # Matches the 2026-07-15 incident logged in calendar-panel.js v1.6's own
+    # header ("4 new actuals, panel still showed '—' 23min later") — that
+    # fix addressed CDN caching only and never touched this queue-depth
+    # cause, so the same symptom (workflow confirms the write, frontend
+    # doesn't show it for many minutes) kept recurring.
+    # Fix: give the BUILD job its OWN group with cancel-in-progress:true.
+    # Packaging the artifact has no external side effects, so cancelling a
+    # superseded build is safe — only the build for the latest commit on
+    # main needs to survive to the deploy step. The DEPLOY job below keeps
+    # a separate group with cancel-in-progress:false, so a publish that has
+    # actually started is still never interrupted — preserving the original
+    # v1 guarantee while eliminating the backlog.
+    concurrency:
+      group: "pages-build"
+      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,6 +82,12 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    # Own group, cancel-in-progress:false — never interrupt a deploy that
+    # has already started (the guarantee the old workflow-level block
+    # protected; unchanged here).
+    concurrency:
+      group: "pages-deploy"
+      cancel-in-progress: false
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
