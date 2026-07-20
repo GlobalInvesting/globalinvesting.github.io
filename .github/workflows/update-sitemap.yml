@@ -15,6 +15,14 @@ name: Update Sitemap
 #
 # No secrets required — reads only public git history.
 # Schedule: also runs weekly (Sunday 01:00 UTC) as a safety net.
+#
+# TRIGGER STRATEGY: the push trigger above already fires this workflow constantly
+# (every data-pipeline commit that touches the watched paths), so the weekly cron
+# is a rarely-exercised last resort. Since it's a single weekly shot with no buffer,
+# a GitHub cron skip means a full week of stale lastmod dates. cron-job.org adds a
+# reliable external clock for that same weekly slot.
+# Setup: job en cron-job.org → POST https://api.github.com/repos/GlobalInvesting/globalinvesting.github.io/dispatches
+# con header Authorization: Bearer <CRONJOB_PAT>, body {"event_type":"trigger-sitemap"}, semanal (domingo 01:00 UTC).
 
 on:
   push:
@@ -29,8 +37,12 @@ on:
       - 'sentiment-data/**'
       - 'scripts/update_sitemap.py'
       - '.github/workflows/update-sitemap.yml'
+
+  repository_dispatch:
+    types: [trigger-sitemap]   # ← dispatched by cron-job.org, weekly (Sunday 01:00 UTC)
+
   schedule:
-    - cron: '0 1 * * 0'   # Sunday 01:00 UTC — weekly safety run
+    - cron: '0 1 * * 0'   # Fallback — Sunday 01:00 UTC weekly safety run
   workflow_dispatch:
 
 concurrency:
