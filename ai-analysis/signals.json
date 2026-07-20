@@ -1,54 +1,56 @@
 {
-  "generated_at": "2026-07-20T02:32:16Z",
+  "generated_at": "2026-07-20T09:40:17Z",
   "signals": [
     {
-      "time": "02:31",
+      "time": "09:39",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Escalation + Carry + Intervention Risk",
-      "text": "USD/JPY at 162.34 — 275bp Fed-BoJ carry sustains the bid despite US-Iran hostilities. JPY COT LF net short -105,238 (crowded carry) remains vulnerable to a sharp unwind if VIX exceeds 25, though current VIX at 18.8 (normal volatility) keeps carry dominant. 160.00 remains the key level previously triggering BoJ warnings; intervention risk is acute on sustained trading above 162.00. Options market is pricing protection against a reversal with 25d RR at -1.37 (moderate put skew).",
+      "title": "USD/JPY — Carry + Vol + Correlation Break",
+      "text": "USD/JPY at 162.41 — 275bp Fed-BoJ carry sustains the bid despite Nikkei -4.03% rout. JPY safe-haven function is broken (z=-2.00σ vs VIX), with carry flows dominating risk-off sentiment. However, 25d RR at -1.37 and VRP at +3.7% (IV 7.2% vs HV30 3.5%) signal the options market is paying a steep premium for downside protection, likely hedging BoJ intervention risk as price holds above 160.00.",
       "evidence": [
-        "USD/JPY: 162.34",
-        "Fed 3.75% vs BoJ 1.0% — +275bp",
-        "JPY COT LF net: -105,238",
-        "USD/JPY 25d RR: -1.37"
+        "Fed 3.75% vs BoJ 1.0% — 275bp",
+        "USD/JPY vs VIX z-score: -2.00σ",
+        "USD/JPY VRP: +3.7%"
       ],
+      "watch_level": "Sustained trade above 162.50 or BoJ meeting on 31 Jul",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:28",
+      "time": "09:35",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence",
-      "text": "RBNZ 2.5%. With NZD CESI at neutral (net 0) and COT long% at an extreme low of 15.2%, a hawkish RBNZ delivery creates significant short-squeeze risk. NZD/USD at 0.5854 is supported by a -0.58% real rate, which is less accommodative than JPY (-0.52%). Retail sentiment is 85% short, diverging from the hawkish CB bias, signaling potential retail capitulation if price extends higher.",
+      "title": "EUR/USD — Macro + Positioning + CESI",
+      "text": "EUR/USD at 1.1435 — 150bp Fed-ECB carry advantage favors USD while Brent > $90 adds terms-of-trade pressure. COT LF net short -74,637 (long% 33.3%) aligns with a strong negative CESI (-16 net misses), suggesting institutional positioning is correctly fading Eurozone data underperformance. VRP at +2.5% indicates the market is pricing in tail-risk ahead of the ECB meeting.",
       "evidence": [
-        "NZD COT LF net: -29,582",
+        "Fed 3.75% vs ECB 2.25% — 150bp",
+        "EUR COT LF net: -74,637",
+        "EUR CESI: -16 net misses"
+      ],
+      "watch_level": "ECB meeting on 23 Jul",
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "09:32",
+      "priority": "warning",
+      "title": "NZD/USD — COT vs OIS Divergence + Retail",
+      "text": "RBNZ 2.5%. This institutional short-bias is further diverged from retail sentiment (71% short), creating a high-conviction short-squeeze setup if the RBNZ maintains its hawkish stance. Real rate at -0.58% remains accommodative, supporting the case for further tightening.",
+      "evidence": [
         "NZD COT long%: 15.2%",
-        "Retail: 85% short",
-        "RBNZ bias: ↑ Hike"
+        "RBNZ bias: Hike",
+        "Retail sentiment: 71% short"
       ],
+      "watch_level": "RBNZ meeting on 2 Sep",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:25",
-      "priority": "warning",
-      "title": "AUD/USD — Volatility + CESI Divergence",
-      "text": "AUD/USD at 0.6991 — IV at 12.1% vs HV30 at 6.4% generates a +5.7% VRP, signaling elevated institutional hedging demand. AUD CESI at -13 (strong negative) confirms persistent data misses, weighing on the 60bp AUD carry advantage (RBA 4.35% vs Fed 3.75%). COT LF net long +21,946 (63.2% long) faces liquidation risk if data continues to disappoint. Watch for a break of 0.6950 to confirm a shift in the carry regime.",
-      "evidence": [
-        "AUD/USD VRP: +5.7%",
-        "AUD CESI: -13",
-        "RBA 4.35% vs Fed 3.75% — -60bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "02:20",
+      "time": "09:28",
       "priority": "info",
-      "title": "USD/CAD — Correlation Break + Tariff Risk",
-      "text": "USD/CAD at 1.4007 — Correlation vs WTI Oil at -0.933 vs norm of -0.006 (z=-1.91σ) indicates a severe breakdown in the traditional CAD-energy link. CAD is outperforming (1W avg +0.232%) despite Trump's tariff threats related to wildfire smoke. Fed 3.75% vs BoC 2.25% (+150bp) carry favors USD, but CAD resilience suggests the market is discounting tariff headlines. Watch the next BoC meeting (mkt: 100% hold priced) for a shift in the 132bp OIS carry spread.",
+      "title": "USD/CAD — Oil Correlation + CESI Divergence",
+      "text": "USD/CAD at 1.4027 — The pair exhibits a significant correlation break vs WTI Oil (z=-1.90σ), with CAD failing to benefit from the commodity bid. While 150bp carry favors USD, the USD CESI (+48 beats) vs CAD CESI (+2 net) suggests the fundamental divergence is driven by US data outperformance rather than energy prices. BoC pause remains supported by soft inflation headlines.",
       "evidence": [
-        "USD/CAD vs WTI z-score: -1.91σ",
-        "USD/CAD carry: +150bp",
-        "CAD 1W avg: +0.232%"
+        "USD/CAD vs WTI z-score: -1.90σ",
+        "USD CESI: +48 beats",
+        "Fed 3.75% vs BoC 2.25% — 150bp"
       ],
+      "watch_level": "Next BoC meeting",
       "_source": "gemini:gemini-3-flash-preview"
     }
   ]
