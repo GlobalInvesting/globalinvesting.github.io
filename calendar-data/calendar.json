@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-19T21:11:37Z",
-  "generatedAt": "2026-07-19T21:11:37Z",
+  "lastUpdate": "2026-07-20T08:22:51Z",
+  "generatedAt": "2026-07-20T08:22:51Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,61 +8,26 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-07-20",
-  "rangeTo": "2026-07-19",
-  "totalEvents": 3974,
+  "rangeTo": "2026-07-20",
+  "totalEvents": 3987,
   "currencyCounts": {
-    "NZD": 125,
-    "USD": 1265,
-    "CAD": 309,
-    "EUR": 875,
-    "GBP": 465,
+    "NZD": 127,
+    "USD": 1264,
+    "CAD": 316,
+    "EUR": 877,
+    "GBP": 466,
     "AUD": 287,
-    "CHF": 165,
-    "JPY": 249,
+    "CHF": 166,
+    "JPY": 250,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2111,
-    "high": 1635,
+    "medium": 2120,
+    "high": 1639,
     "low": 228
   },
   "surpriseStats": {
-    "CAD/inflation rate yoy": {
-      "n": 4,
-      "mean": 0.0,
-      "std": 0.244949
-    },
-    "CAD/core inflation rate yoy": {
-      "n": 4,
-      "mean": -0.1,
-      "std": 0.270801
-    },
-    "CAD/cpi median yoy": {
-      "n": 4,
-      "mean": -0.025,
-      "std": 0.05
-    },
-    "CAD/inflation rate mom": {
-      "n": 4,
-      "mean": 0.0,
-      "std": 0.244949
-    },
-    "CAD/cpi trimmed-mean yoy": {
-      "n": 4,
-      "mean": -0.05,
-      "std": 0.057735
-    },
-    "CAD/cpi common yoy": {
-      "n": 4,
-      "mean": 0.0,
-      "std": 0.244949
-    },
-    "EUR/ppi yoy": {
-      "n": 3,
-      "mean": 0.5,
-      "std": 0.984886
-    },
     "CHF/balance of trade": {
       "n": 4,
       "mean": 0.825,
@@ -1203,6 +1168,41 @@
       "mean": 1.5,
       "std": 3.15119
     },
+    "CAD/inflation rate mom": {
+      "n": 3,
+      "mean": 0.033333,
+      "std": 0.288675
+    },
+    "CAD/core inflation rate yoy": {
+      "n": 3,
+      "mean": -0.166667,
+      "std": 0.288675
+    },
+    "CAD/cpi median yoy": {
+      "n": 3,
+      "mean": -0.033333,
+      "std": 0.057735
+    },
+    "CAD/cpi trimmed-mean yoy": {
+      "n": 3,
+      "mean": -0.033333,
+      "std": 0.057735
+    },
+    "CAD/inflation rate yoy": {
+      "n": 3,
+      "mean": 0.033333,
+      "std": 0.288675
+    },
+    "CAD/cpi common yoy": {
+      "n": 3,
+      "mean": 0.1,
+      "std": 0.173205
+    },
+    "EUR/ppi yoy": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.353553
+    },
     "JPY/machinery orders mom": {
       "n": 4,
       "mean": 1.525,
@@ -1214,9 +1214,9 @@
       "std": 10.003666
     },
     "NZD/balance of trade": {
-      "n": 3,
-      "mean": 0.263333,
-      "std": 0.586011
+      "n": 4,
+      "mean": 0.14,
+      "std": 0.538315
     },
     "AUD/unemployment rate": {
       "n": 3,
@@ -1292,6 +1292,11 @@
       "n": 2,
       "mean": 0.25,
       "std": 0.070711
+    },
+    "EUR/germany ppi yoy": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.212132
     },
     "CHF/current account": {
       "n": 2,
@@ -45871,32 +45876,6 @@
     {
       "date": "28 Jun",
       "dateISO": "2026-06-28",
-      "timeUTC": "12:15",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Gov Bullock Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "28 Jun",
-      "dateISO": "2026-06-28",
-      "timeUTC": "16:35",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Barkin Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "28 Jun",
-      "dateISO": "2026-06-28",
       "timeUTC": "23:50",
       "country": "JPY",
       "currency": "JPY",
@@ -49478,9 +49457,204 @@
       "flag": "🇳🇿",
       "event": "New Zealand Balance of Trade",
       "impact": "medium",
-      "actual": null,
+      "actual": "NZ$0.02B",
       "forecast": "NZ$0.25B",
       "previous": "NZ$0.8B"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany PPI YoY",
+      "impact": "medium",
+      "actual": "1.8%",
+      "forecast": "1.8%",
+      "previous": "2.2%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "08:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Myfxbook AUDUSD Sentiment",
+      "impact": "medium",
+      "actual": "33.0%",
+      "forecast": null,
+      "previous": "44.0%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "08:00",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Myfxbook USDCAD Sentiment",
+      "impact": "medium",
+      "actual": "43.0%",
+      "forecast": null,
+      "previous": "20.0%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "08:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Myfxbook USDCHF Sentiment",
+      "impact": "medium",
+      "actual": "46.0%",
+      "forecast": null,
+      "previous": "40.0%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "European Union Myfxbook EURUSD Sentiment",
+      "impact": "medium",
+      "actual": "57.0%",
+      "forecast": null,
+      "previous": "62.0%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "08:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
+      "impact": "medium",
+      "actual": "44.0%",
+      "forecast": null,
+      "previous": "34.0%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "08:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Myfxbook USDJPY Sentiment",
+      "impact": "medium",
+      "actual": "20.0%",
+      "forecast": null,
+      "previous": "25.0%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "08:00",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Myfxbook NZDUSD Sentiment",
+      "impact": "medium",
+      "actual": "29.0%",
+      "forecast": null,
+      "previous": "50.0%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada CPI Median YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.1%",
+      "previous": "2.1%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.2%",
+      "previous": "2.2%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada CPI Trimmed-Mean YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.0%",
+      "previous": "2.0%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.9%",
+      "previous": "3.2%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.2%",
+      "previous": "1.0%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada CPI Common YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.6%",
+      "previous": "2.7%"
+    },
+    {
+      "date": "20 Jul",
+      "dateISO": "2026-07-20",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Inflation Rate QoQ",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.4%",
+      "previous": "0.9%"
     }
   ]
 }
