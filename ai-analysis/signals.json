@@ -1,68 +1,56 @@
 {
-  "generated_at": "2026-07-20T16:07:30Z",
+  "generated_at": "2026-07-20T21:14:39Z",
   "signals": [
     {
-      "time": "16:07",
+      "time": "21:12",
       "priority": "critical",
-      "title": "USD/JPY — Carry + Intervention Risk + Correlation Break",
-      "text": "USD/JPY at 162.55 holding above the critical 160.00 threshold where BoJ intervention risk historically intensifies. Fed 3.75% vs BoJ 1.0% provides a +275bp OIS carry advantage sustaining the bid despite a bear steepener regime. USD/JPY vs VIX correlation at -0.124 (z=-2.03σ) confirms the JPY safe-haven function is broken; carry dominance persists while VIX remains at 17.9 (normal volatility). JPY COT LF net short -105,238 reflects crowded carry positioning vulnerable only to acute risk-off or BoJ policy shift.",
+      "title": "NZD/USD — COT vs OIS Divergence + Inflation Shock",
+      "text": "RBNZ 2.5%. With NZD long% at a 15.2% extreme and Q2 CPI data due July 21, an upside surprise triggers a high-conviction short-squeeze. NZD/USD at 0.5841.",
       "evidence": [
-        "USD/JPY: 162.55",
-        "OIS Carry: +275bp",
-        "JPY COT LF Net: -105,238",
-        "VIX Corr Z-score: -2.03σ"
+        "NZD COT LF net: -29,582",
+        "NZD long%: 15.2%",
+        "NZD/USD: 0.5841"
       ],
+      "watch level": "New Zealand Q2 CPI release July 21",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:04",
+      "time": "21:09",
       "priority": "warning",
-      "title": "USD/CAD — Macro Divergence + CESI + Positioning",
-      "text": "USD/CAD at 1.4057 supported by widening macro divergence as softer Canadian CPI (June) contrasts with sustained US data outperformance (USD CESI +48 vs CAD -3). Fed 3.75% vs BoC 2.25% creates a +150bp carry advantage for USD. CAD COT LF net short -93,515 (long% 20.6%) is approaching historical extremes, suggesting the move is well-telegraphed but fundamentally backed by the +1.28% real rate spread favoring USD.",
+      "title": "USD/JPY — Geopolitical Tension + Carry + Vol",
+      "text": "USD/JPY at 162.46 holding above the 160.00 intervention threshold as Trump-Iran escalation drives USD demand. 275bp Fed-BoJ carry sustains the bid despite a -1.40 moderate put skew in 25d risk reversals. JPY safe-haven function remains impaired (z=-1.98σ vs VIX), meaning carry dominates until VIX exceeds 25.",
       "evidence": [
-        "USD/CAD: 1.4057",
-        "USD CESI: +48",
-        "CAD COT Long%: 20.6%",
-        "Real Rate Spread: 1.28%"
+        "USD/JPY: 162.46",
+        "Fed 3.75% vs BoJ 1.0%: +275bp",
+        "USD/JPY vs VIX z-score: -1.98σ"
       ],
+      "watch level": "160.00 psychological support and BoJ verbal intervention",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:02",
+      "time": "21:07",
       "priority": "warning",
-      "title": "GBP/USD — Technical Breakdown + Vol Premium + COT",
-      "text": "GBP/USD at 1.3417 testing downside targets after breaking the 200-hour moving average. Despite GBP COT LF net long +28,278, the options market is pricing significant protection with a 25d RR of -0.67 (put skew) and an elevated VRP of +4.5% (IV 11.0% vs HV30 6.5%). Negative GBP CESI (-7) suggests data disappointment is eroding the SONIA-SOFR carry advantage (-11bp), increasing long-unwind risk.",
+      "title": "EUR/USD — Positioning + Vol + CESI",
+      "text": "EUR/USD at 1.1416 under pressure as CESI net -16 (persistent data misses) aligns with COT LF net short -74,637. IV at 7.1% vs HV30 at 4.7% creates a +2.4% VRP, signaling elevated hedging demand ahead of the July 23 ECB meeting. 150bp USD carry advantage limits upside potential.",
       "evidence": [
-        "GBP/USD: 1.3417",
-        "VRP: +4.5%",
-        "GBP COT LF Net: +28,278",
-        "GBP CESI: -7"
+        "EUR COT LF net: -74,637",
+        "EUR CESI net: -16",
+        "EUR/USD VRP: +2.4%"
       ],
+      "watch level": "ECB policy decision July 23",
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:58",
+      "time": "21:02",
       "priority": "info",
-      "title": "AUD/CHF — Retail vs Institutional Divergence",
-      "text": "AUD/CHF at 0.5675 exhibits extreme retail/institutional divergence with retail 92% short while RBA 4.35% vs SNB 0.0% maintains a +435bp carry premium. AUD COT LF net long +21,946 confirms institutional support for the carry trade. High VRP of +5.0% in AUD/USD suggests the market is paying for protection, but the carry-to-vol ratio remains attractive for AUD crosses while VIX is in normal territory.",
+      "title": "AUD/CHF — Retail Sentiment Extreme + Carry",
+      "text": "AUD/CHF retail sentiment at 93% short (extreme) diverges from the +435bp carry advantage favoring AUD. Retail is aggressively fading the RBA-SNB policy gap; contrarian logic suggests a continuation of the AUD bid as retail capitulation risk rises. AUD/USD at 0.7001.",
       "evidence": [
-        "AUD/CHF Retail: 92% Short",
-        "AUD/CHF Carry: +435bp",
-        "AUD COT LF Net: +21,946"
+        "AUD/CHF retail: 93% short",
+        "RBA 4.35% vs SNB 0.0%: +435bp",
+        "AUD/USD: 0.7001"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "15:52",
-      "priority": "info",
-      "title": "EUR/USD — Volatility Premium + CESI Weakness",
-      "text": "EUR/USD at 1.1417 remains under pressure as EUR CESI (-16) reflects persistent data misses relative to the US. Fed 3.75% vs ECB 2.25% provides a +150bp carry advantage to USD. Options market shows elevated hedging demand with a VRP of +2.4% (IV 7.1% vs HV30 4.7%) and a -0.44 25d RR put skew, signaling institutional preference for downside protection ahead of the July 23 ECB meeting.",
-      "evidence": [
-        "EUR/USD: 1.1417",
-        "EUR CESI: -16",
-        "VRP: +2.4%",
-        "25d RR: -0.44"
-      ],
+      "watch level": "RBA meeting August 11",
       "_source": "gemini:gemini-3-flash-preview"
     }
   ]
