@@ -1,9 +1,9 @@
 {
-  "updated_utc": "2026-07-20T21:01:26.829738+00:00",
-  "updated_label": "21:01 UTC",
-  "total": 51,
-  "total_high": 32,
-  "total_med": 7,
+  "updated_utc": "2026-07-20T21:05:09.393624+00:00",
+  "updated_label": "21:05 UTC",
+  "total": 52,
+  "total_high": 35,
+  "total_med": 8,
   "sources_active": [
     "ActionForex",
     "BabyPips",
@@ -14,11 +14,15 @@
     "ForexLive",
     "InvestMacro",
     "InvestingLive",
+    "NewsData CHF",
+    "NewsData EUR",
+    "NewsData JPY",
+    "NewsData NZD",
     "RTT News"
   ],
   "lang_counts": {
     "es": 0,
-    "en": 51
+    "en": 52
   },
   "articles": [
     {
@@ -566,6 +570,22 @@
       "recent": true
     },
     {
+      "id": "217cedb2feed",
+      "cur": "EUR",
+      "impact": "high",
+      "title": "Euro: Energy and spreads shape near-term path – ING",
+      "expand": "ING’s Chris Turner highlights that with Brent above $90, EUR/USD might normally trade below 1.14, but tighter correlation between energy and short-dated Euro swap rates is offering support.",
+      "source": "NewsData EUR",
+      "link": "https://www.fxstreet.com/news/euro-energy-and-spreads-shape-near-term-path-ing-202607200904",
+      "time": "09:04",
+      "ts": 1784538272000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Jul",
+      "datetime": "2026-07-20T09:04:32+00:00",
+      "recent": true
+    },
+    {
       "id": "4e201d2565c0",
       "cur": "GBP",
       "impact": "high",
@@ -579,6 +599,38 @@
       "lang": "en",
       "date": "20 Jul",
       "datetime": "2026-07-20T09:00:00+00:00",
+      "recent": true
+    },
+    {
+      "id": "f53bac94c9da",
+      "cur": "EUR",
+      "impact": "low",
+      "title": "Production in construction up by 0.4% in the euro area and by 0.3% in the EU",
+      "expand": "In May 2026, compared with April 2026, seasonally adjusted production in construction increased by 0.4% in the euro area and by 0.3% in the EU, according to first estimates from Eurostat, the statistical office of the European Union. In April 2026, production in construction grew by 0.1% in the e...",
+      "source": "NewsData EUR",
+      "link": "https://ec.europa.eu/eurostat/product?code=4-20072026-ap",
+      "time": "09:00",
+      "ts": 1784538000000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Jul",
+      "datetime": "2026-07-20T09:00:00+00:00",
+      "recent": true
+    },
+    {
+      "id": "fe7a31657283",
+      "cur": "CHF",
+      "impact": "low",
+      "title": "Swiss Franc remains on the front foot against USD as traders eyes geopolitics, Fed bets",
+      "expand": "The USD/CHF pair turns lower for the second straight day following an intraday uptick to the 0.8100 neighborhood and touches a fresh daily low during the first half of the European session on Monday.",
+      "source": "NewsData CHF",
+      "link": "https://www.fxstreet.com/news/swiss-franc-remains-on-the-front-foot-against-usd-as-traders-eyes-geopolitics-fed-bets-202607200855",
+      "time": "08:55",
+      "ts": 1784537747000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Jul",
+      "datetime": "2026-07-20T08:55:47+00:00",
       "recent": true
     },
     {
@@ -614,6 +666,22 @@
       "recent": true
     },
     {
+      "id": "defe429410dc",
+      "cur": "JPY",
+      "impact": "high",
+      "title": "British Pound Rebounds Against Japanese Yen as UK Data-Heavy Week Begins",
+      "expand": "BitcoinWorld British Pound Rebounds Against Japanese Yen as UK Data-Heavy Week Begins The British Pound (GBP) edged higher against the Japanese Yen (JPY) on Monday, marking a modest rebound as currency markets brace for a week packed with high-impact UK economic data releases. The move comes after a period of relative weakness for the Pound, with traders now focusing on upcoming figures on employment, inflation, and GDP [...] This post British Pound Rebounds Against Japanese Yen as UK Data-Heavy Week Begins first appeared on BitcoinWorld .",
+      "source": "NewsData JPY",
+      "link": "https://bitcoinworld.co.in/british-pound-rebounds-against-japanese-yen-uk-data-week/",
+      "time": "08:20",
+      "ts": 1784535610000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Jul",
+      "datetime": "2026-07-20T08:20:10+00:00",
+      "recent": true
+    },
+    {
       "id": "e6687ddeb071",
       "cur": "EUR",
       "impact": "high",
@@ -630,19 +698,35 @@
       "recent": true
     },
     {
-      "id": "691440accb77",
-      "cur": "AUD",
-      "impact": "low",
-      "title": "Chart Art: AUD/CAD Rebounds From Range Support",
-      "expand": "AUD/CAD bounced sharply from range support and is testing the Pivot Point, with bulls eyeing moving averages and mid-range resistance.",
-      "source": "BabyPips",
-      "link": "https://www.babypips.com/trading/chart-art-forex-audcad-rebounds-from-range-support-2026-07-20",
-      "time": "05:19",
-      "ts": 1784524740000,
+      "id": "45056f77f631",
+      "cur": "JPY",
+      "impact": "med",
+      "title": "USD/JPY Weekly Outlook: Coiling Beneath Multi-Decade Highs",
+      "expand": "Market Analysis by covering: US Dollar Japanese Yen, Brent Oil Futures. Read 's Market Analysis on Investing.com NG.",
+      "source": "NewsData JPY",
+      "link": "https://ng.investing.com/analysis/usdjpy-weekly-outlook-coiling-beneath-multidecade-highs-217923",
+      "time": "07:57",
+      "ts": 1784534220000,
       "featured": false,
       "lang": "en",
       "date": "20 Jul",
-      "datetime": "2026-07-20T05:19:00+00:00",
+      "datetime": "2026-07-20T07:57:00+00:00",
+      "recent": true
+    },
+    {
+      "id": "6e5d28bf97db",
+      "cur": "NZD",
+      "impact": "high",
+      "title": "Inflation tipped to reach two-year high",
+      "expand": "Households are still facing higher fuel, electricity and gas, and food prices. Image: RNZ Gyles Beckford of RNZ Inflation is set to hit its highest level in two years, driven by the spike in fuel prices caused by the Middle East war, backing the prospect of more interest rate hikes by the Reserve Bank of New Zealand.",
+      "source": "NewsData NZD",
+      "link": "https://www.odt.co.nz/business/inflation-tipped-reach-two-year-high-rnz",
+      "time": "06:10",
+      "ts": 1784527853000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Jul",
+      "datetime": "2026-07-20T06:10:53+00:00",
       "recent": true
     },
     {
@@ -659,22 +743,6 @@
       "lang": "en",
       "date": "20 Jul",
       "datetime": "2026-07-20T04:04:00+00:00",
-      "recent": true
-    },
-    {
-      "id": "335b36cf6d7a",
-      "cur": "EUR",
-      "impact": "low",
-      "title": "ICYMI - France orders ISPs to block Polymarket after prediction market ban ignored",
-      "expand": "The move underscores growing regulatory unease with prediction markets across Europe, with France joining Germany, Italy and Spain in restricting or blocking access to platforms like Polymarket. For an increasingly mainstream and fast-growing product, tighter enforcement in a major European market signals that regulators are prepared to escalate from transaction bans to full site blocks when compliance falls short, a precedent other jurisdictions weighing similar rules will likely watch closely. It also adds to a string of integrity concerns around prediction markets, including the hacking of ...",
-      "source": "ForexLive",
-      "link": "https://investinglive.com/news/icymi-france-orders-isps-to-block-polymarket-after-prediction-market-ban-ignored/",
-      "time": "21:49",
-      "ts": 1784497742000,
-      "featured": false,
-      "lang": "en",
-      "date": "19 Jul",
-      "datetime": "2026-07-19T21:49:02+00:00",
       "recent": true
     },
     {
@@ -726,22 +794,6 @@
       "recent": false
     },
     {
-      "id": "5e5414ec5e77",
-      "cur": "AUD",
-      "impact": "low",
-      "title": "The AUDUSD and NZDUSD are moving lower as risk-off/USD buying/technicals.",
-      "expand": "Generally speaking, the AUDUSD and NZDUSD are considered risk-sensitive currency pairs. When investor sentiment deteriorates—such as during stock market selloffs—both currencies tend to come under pressure against the U.S. dollar. That risk-off theme is evident today. S P 500 futures are down nearly 100 points, Dow futures are lower by around 600 points, and Nasdaq futures are also off by roughly 600 points ahead of the opening bell. We'll see whether those losses hold or begin to stabilize once cash trading gets underway. The weaker risk tone has pushed both the AUDUSD and NZDUSD lower, trimm...",
-      "source": "InvestingLive",
-      "link": "https://investinglive.com/technical-analysis/the-audusd-and-nzdusd-are-moving-lower-as-risk-off-usd-buying-technicals-all-help/",
-      "time": "13:28",
-      "ts": 1784294908000,
-      "featured": false,
-      "lang": "en",
-      "date": "17 Jul",
-      "datetime": "2026-07-17T13:28:28+00:00",
-      "recent": false
-    },
-    {
       "id": "16eaa3b77097",
       "cur": "JPY",
       "impact": "high",
@@ -771,38 +823,6 @@
       "lang": "en",
       "date": "17 Jul",
       "datetime": "2026-07-17T09:08:34+00:00",
-      "recent": false
-    },
-    {
-      "id": "e5ec9fb96a37",
-      "cur": "EUR",
-      "impact": "low",
-      "title": "European Economic News Preview: Eurozone Final Inflation Data Due",
-      "expand": "Final inflation and current account from the euro area are the top economic news due on Friday. At 3.00 am ET, Statistics Austria publishes Austria's final inflation figures for June. In the meantime, the Czech Statistical Office releases producer prices data.",
-      "source": "RTT News",
-      "link": "https://www.rttnews.com/story.aspx?Id=3667863",
-      "time": "05:42",
-      "ts": 1784266932000,
-      "featured": false,
-      "lang": "en",
-      "date": "17 Jul",
-      "datetime": "2026-07-17T05:42:12+00:00",
-      "recent": false
-    },
-    {
-      "id": "81c133748aa6",
-      "cur": "EUR",
-      "impact": "low",
-      "title": "Chart Art: EUR/USD Rally Runs Into a Triple Resistance Wall",
-      "expand": "EUR/USD has clawed up, but it’s now running into a key resistance zone. Will the bears defend this zone and push the pair back lower?",
-      "source": "BabyPips",
-      "link": "https://www.babypips.com/trading/chart-art-forex-eurusd-rally-runs-into-a-triple-resistance-wall-2026-07-17",
-      "time": "03:03",
-      "ts": 1784257380000,
-      "featured": false,
-      "lang": "en",
-      "date": "17 Jul",
-      "datetime": "2026-07-17T03:03:00+00:00",
       "recent": false
     },
     {
