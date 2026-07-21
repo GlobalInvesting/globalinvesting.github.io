@@ -1,118 +1,33 @@
 {
-  "lastUpdate": "2026-07-20T21:38:29Z",
-  "generatedAt": "2026-07-20T21:38:29Z",
+  "lastUpdate": "2026-07-21T07:53:57Z",
+  "generatedAt": "2026-07-21T07:53:57Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-20",
-  "rangeTo": "2026-07-20",
-  "totalEvents": 3987,
+  "rangeFrom": "2025-07-21",
+  "rangeTo": "2026-07-21",
+  "totalEvents": 3992,
   "currencyCounts": {
-    "NZD": 127,
+    "NZD": 126,
     "USD": 1264,
     "CAD": 316,
-    "EUR": 877,
-    "GBP": 466,
-    "AUD": 287,
-    "CHF": 166,
-    "JPY": 250,
+    "EUR": 879,
+    "GBP": 469,
+    "AUD": 286,
+    "CHF": 167,
+    "JPY": 251,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2120,
-    "high": 1639,
+    "medium": 2121,
+    "high": 1643,
     "low": 228
   },
   "surpriseStats": {
-    "CHF/balance of trade": {
-      "n": 4,
-      "mean": 0.825,
-      "std": 1.839157
-    },
-    "EUR/balance of trade": {
-      "n": 11,
-      "mean": -15209.398909,
-      "std": 50439.031222
-    },
-    "EUR/zew economic sentiment index": {
-      "n": 4,
-      "mean": 6.875,
-      "std": 16.018401
-    },
-    "GBP/employment change": {
-      "n": 4,
-      "mean": 37.75,
-      "std": 16.640813
-    },
-    "GBP/average earnings incl. bonus": {
-      "n": 4,
-      "mean": 0.325,
-      "std": 0.095743
-    },
-    "GBP/unemployment rate": {
-      "n": 4,
-      "mean": 0.1,
-      "std": 0.163299
-    },
-    "JPY/exports yoy": {
-      "n": 4,
-      "mean": 1.95,
-      "std": 2.367136
-    },
-    "JPY/balance of trade": {
-      "n": 4,
-      "mean": 66.1,
-      "std": 343.66667
-    },
-    "USD/retail sales ex gas/autos mom": {
-      "n": 5,
-      "mean": 0.06,
-      "std": 0.219089
-    },
-    "USD/retail sales control group mom": {
-      "n": 5,
-      "mean": 0.24,
-      "std": 0.194936
-    },
-    "USD/retail sales yoy": {
-      "n": 5,
-      "mean": 1.8,
-      "std": 1.197915
-    },
-    "USD/retail sales mom": {
-      "n": 5,
-      "mean": 0.22,
-      "std": 0.204939
-    },
-    "USD/retail sales ex autos mom": {
-      "n": 5,
-      "mean": 0.22,
-      "std": 0.228035
-    },
-    "USD/business inventories mom": {
-      "n": 5,
-      "mean": 0.04,
-      "std": 0.054772
-    },
-    "USD/pending home sales mom": {
-      "n": 5,
-      "mean": 0.58,
-      "std": 3.257606
-    },
-    "USD/pending home sales yoy": {
-      "n": 5,
-      "mean": 0.58,
-      "std": 2.668708
-    },
-    "USD/api crude oil stock change": {
-      "n": 12,
-      "mean": -2.648667,
-      "std": 2.640098
-    },
     "CAD/new housing price index mom": {
       "n": 4,
       "mean": -0.3,
@@ -332,6 +247,11 @@
       "n": 3,
       "mean": 0.466667,
       "std": 3.69098
+    },
+    "USD/api crude oil stock change": {
+      "n": 11,
+      "mean": -2.580364,
+      "std": 2.757816
     },
     "AUD/inflation rate yoy": {
       "n": 4,
@@ -818,6 +738,11 @@
       "mean": 0.7,
       "std": 4.666905
     },
+    "EUR/balance of trade": {
+      "n": 10,
+      "mean": -16730.2888,
+      "std": 52900.86855
+    },
     "NOK/norges bank interest rate decision": {
       "n": 2,
       "mean": 0.125,
@@ -1003,6 +928,11 @@
       "mean": 7.666667,
       "std": 0.57735
     },
+    "EUR/zew economic sentiment index": {
+      "n": 3,
+      "mean": 14.766667,
+      "std": 3.348632
+    },
     "JPY/current account": {
       "n": 3,
       "mean": -550298.110667,
@@ -1113,14 +1043,44 @@
       "mean": 2.625,
       "std": 5.38354
     },
+    "USD/retail sales mom": {
+      "n": 4,
+      "mean": 0.2,
+      "std": 0.23094
+    },
+    "USD/retail sales ex gas/autos mom": {
+      "n": 4,
+      "mean": 0.125,
+      "std": 0.189297
+    },
     "USD/export prices mom": {
       "n": 4,
       "mean": 0.55,
       "std": 1.109054
     },
+    "USD/retail sales control group mom": {
+      "n": 4,
+      "mean": 0.175,
+      "std": 0.15
+    },
+    "USD/retail sales yoy": {
+      "n": 4,
+      "mean": 1.85,
+      "std": 1.377195
+    },
+    "USD/retail sales ex autos mom": {
+      "n": 4,
+      "mean": 0.15,
+      "std": 0.191485
+    },
     "USD/import prices mom": {
       "n": 4,
       "mean": 0.925,
+      "std": 0.05
+    },
+    "USD/business inventories mom": {
+      "n": 4,
+      "mean": 0.025,
       "std": 0.05
     },
     "CAD/housing starts": {
@@ -1198,10 +1158,45 @@
       "mean": 0.075,
       "std": 0.15
     },
+    "GBP/employment change": {
+      "n": 4,
+      "mean": 38.25,
+      "std": 17.538054
+    },
+    "GBP/unemployment rate": {
+      "n": 4,
+      "mean": 0.05,
+      "std": 0.1
+    },
+    "GBP/average earnings incl. bonus": {
+      "n": 4,
+      "mean": 0.225,
+      "std": 0.287228
+    },
+    "USD/pending home sales mom": {
+      "n": 4,
+      "mean": 0.375,
+      "std": 3.724133
+    },
+    "USD/pending home sales yoy": {
+      "n": 4,
+      "mean": 1.175,
+      "std": 2.671298
+    },
     "EUR/ppi yoy": {
       "n": 2,
       "mean": -0.05,
       "std": 0.353553
+    },
+    "JPY/balance of trade": {
+      "n": 3,
+      "mean": 234.466667,
+      "std": 84.119934
+    },
+    "JPY/exports yoy": {
+      "n": 3,
+      "mean": 2.366667,
+      "std": 2.713546
     },
     "JPY/machinery orders mom": {
       "n": 4,
@@ -1237,6 +1232,11 @@
       "n": 2,
       "mean": 0.0,
       "std": 0.0
+    },
+    "CHF/balance of trade": {
+      "n": 4,
+      "mean": 1.25,
+      "std": 1.063015
     },
     "GBP/dmp 1y cpi expectations": {
       "n": 2,
@@ -1320,18 +1320,6 @@
     }
   },
   "events": [
-    {
-      "currency": "NZD",
-      "event": "Inflation Rate QoQ",
-      "dateISO": "2025-07-20",
-      "hourUTC": "22:45",
-      "actual": "0.5%",
-      "forecast": "0.6",
-      "previous": "0.9",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
     {
       "currency": "NZD",
       "event": "Balance of Trade",
@@ -45889,32 +45877,6 @@
     {
       "date": "29 Jun",
       "dateISO": "2026-06-29",
-      "timeUTC": "00:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB Forum on Central Banking",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
-      "timeUTC": "05:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Housing Starts YoY",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "31.8%",
-      "previous": "11.4%"
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
       "timeUTC": "07:00",
       "country": "EUR",
       "currency": "EUR",
@@ -46136,19 +46098,6 @@
     {
       "date": "29 Jun",
       "dateISO": "2026-06-29",
-      "timeUTC": "11:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Kent Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
       "timeUTC": "14:30",
       "country": "USD",
       "currency": "USD",
@@ -46158,19 +46107,6 @@
       "actual": "0.0",
       "forecast": "2.0",
       "previous": "0.4"
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
-      "timeUTC": "17:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "29 Jun",
@@ -49652,9 +49588,139 @@
       "flag": "🇳🇿",
       "event": "New Zealand Inflation Rate QoQ",
       "impact": "medium",
-      "actual": null,
+      "actual": "1.5%",
       "forecast": "1.4%",
       "previous": "0.9%"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "06:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Balance of Trade",
+      "impact": "medium",
+      "actual": "CHF3.8B",
+      "forecast": "CHF3.9B",
+      "previous": "CHF5.5B"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Average Earnings incl. Bonus (3Mo/Yr)",
+      "impact": "medium",
+      "actual": "4.3%",
+      "forecast": "4.5%",
+      "previous": "4.4%"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Employment Change",
+      "impact": "high",
+      "actual": "147.0K",
+      "forecast": "85.0K",
+      "previous": "99.0K"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Unemployment Rate",
+      "impact": "high",
+      "actual": "4.9%",
+      "forecast": "5.0%",
+      "previous": "4.9%"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Greece Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "&#8364;51.0B",
+      "previous": "&#8364;-1.389B"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "&#8364;-4.7B",
+      "previous": "&#8364;-5.2B"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ZEW Economic Sentiment Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "11.2",
+      "previous": "9.5"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany ZEW Economic Sentiment Index",
+      "impact": "high",
+      "actual": null,
+      "forecast": "18.0",
+      "previous": "10.5"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Exports YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "18.6%",
+      "previous": "17.0%"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Balance of Trade",
+      "impact": "high",
+      "actual": null,
+      "forecast": "&#165;-120.0B",
+      "previous": "&#165;-378.7B"
     }
   ]
 }
