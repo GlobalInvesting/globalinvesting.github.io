@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-07-21T02:10:32Z",
+  "generated_at": "2026-07-21T09:07:44Z",
   "signals": [
     {
-      "time": "02:10",
+      "time": "09:07",
       "priority": "critical",
-      "title": "NZD/USD — TIER-1 CPI Surprise + COT Divergence",
-      "text": "NZD/USD trades at 0.5869 following a significant Q2 CPI beat of 4.1% y/y vs 4.0% expected, reinforcing the RBNZ's hawkish stance. This macro catalyst directly contradicts the extreme speculative positioning where COT LF net is short -29,582 (long% at a mere 15.2%). The combination of a hotter-than-expected inflation print and a crowded short position creates a high-conviction short-squeeze regime. Price has already cleared the SMA20/50/200 cluster (0.5723–0.5822), confirming a technical breakout. Institutional desks are likely to cover shorts as the RBNZ hike bias intensifies ahead of the September meeting. Risk: RBNZ officials downplay the CPI beat in upcoming speeches, stalling the squeeze momentum.",
+      "title": "USD/JPY — Geopolitical Risk + Carry + Options Skew",
+      "text": "USD/JPY trades at 162.68, holding firmly above its SMA20/50/200 cluster (162.05/160.62/157.46). The pair is underpinned by a +261bp SOIS carry advantage for the USD, while headlines confirm a de facto closure of the Strait of Hormuz, driving crude prices higher and supporting USD demand. Despite the bullish spot trend, the 25d risk reversal at -1.40 (Saxo) reveals a moderate put skew, signaling that the options market is aggressively pricing protection against a JPY snapback or BoJ intervention. COT data shows a crowded JPY net short of -105,238 contracts, leaving the pair highly vulnerable to a disorderly unwind if geopolitical tensions trigger a flight to safety. Carry remains the dominant driver while VIX sits at 17.5, but intervention risk rises sharply on any extension beyond current levels. Risk: VIX breaks above 25, activating JPY safe-haven flows and forcing a carry liquidation.",
       "evidence": [
-        "NZD Q2 CPI: 4.1% (exp 4.0%)",
-        "COT LF Net: -29,582 (15.2% Long)",
-        "NZD/USD: 0.5869"
+        "USD/JPY: 162.68",
+        "SOFR 3.59% vs TONA 0.98%: +261bp",
+        "USD/JPY 25d RR: -1.40"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:07",
+      "time": "09:04",
       "priority": "warning",
-      "title": "NZD/CHF — G10 Bilateral Theme + Carry",
-      "text": "NZD/CHF is the primary beneficiary of the current G10 divergence, with NZD averaging +0.621% outperformance while CHF lags at -0.222% (0.843% spread). The pair is supported by a massive +250bp carry advantage (RBNZ 2.5% vs SNB 0.0%) and a widening real rate differential of +0.04% (NZD -0.58% vs CHF -0.62%). While VIX at 18.6 indicates normal volatility, the bear steepener regime in US yields typically supports carry-seeking flows into high-beta G10 names like NZD. Retail sentiment is extremely short NZD/CHF at 87%, providing a contrarian tailwind as institutional demand for NZD carry persists. Risk: A spike in VIX above 25 triggers a safe-haven CHF bid, rapidly compressing the carry spread.",
+      "title": "NZD/USD — COT vs OIS Divergence + CPI Catalyst",
+      "text": "NZD/USD has gathered strength to 0.5860, clearing its SMA20/50/200 cluster (0.5729/0.5804/0.5823) following a CPI inflation beat that bolsters RBNZ hike bets. This hawkish fundamental shift directly contradicts the extreme speculative positioning, where COT LF net shorts sit at -29,582 (only 15.2% long). Retail sentiment is also heavily skewed with 73% short, creating a high-conviction setup for a short-squeeze as specs are forced to cover into the RBNZ's hawkish bias. While the USD maintains a +125bp nominal carry advantage, the NZD real rate of -0.58% is set to tighten if inflation persistence forces the RBNZ to act on its hiking bias. The pair's technical position above all major SMAs confirms the bullish momentum shift. Risk: RBNZ holds and signals a peak in rates, validating the existing spec short.",
       "evidence": [
-        "G10 spread: 0.843%",
-        "NZD/CHF Carry: +250bp",
-        "Retail Sentiment: 87% Short"
+        "NZD COT LF net: -29,582",
+        "NZD/USD: 0.5860",
+        "NZD Long%: 15.2%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:05",
+      "time": "09:02",
       "priority": "warning",
-      "title": "USD/JPY — Intervention Risk + Options Skew",
-      "text": "USD/JPY is testing 162.51, holding firmly above its SMA20/50/200 cluster (157.41–162.00). Despite a dominant +275bp Fed-BoJ carry advantage, the options market is pricing in significant downside protection with a 25d Risk Reversal of -1.40 (moderate put skew). This reflects institutional hedging against BoJ intervention risk as the pair extends into territory that previously triggered verbal warnings. COT data shows specs remain heavily short JPY (lev_net -105,238), leaving the pair vulnerable to a disorderly unwind if the BoJ acts or shifts its bias at the July 31 meeting. Risk: US 10Y yields climb toward 5.0%, overwhelming intervention fears and driving the pair toward 165.00.",
+      "title": "EUR/USD — Positioning + Vol + CESI Divergence",
+      "text": "EUR/USD trades at 1.1426, hovering just above its SMA20 (1.1416) but remaining capped by the SMA50 at 1.1526. The options market is pricing an elevated vol premium with IV at 7.1% vs HV30 at 4.7%, a +2.5% VRP that suggests significant hedging demand ahead of the ECB meeting on 23 July. This caution is supported by a strong negative Economic Surprise Index (CESI) of -17 for the Eurozone, indicating persistent data misses relative to the US CESI of +48. COT data shows specs are net short EUR (-74,637), aligning with the +140bp SOFR-ESTR carry advantage favoring the USD. The combination of poor data and a restrictive US real rate (+1.47%) suggests EUR/USD upside remains structurally limited. Risk: ECB delivers a hawkish surprise on 23 July, forcing a re-evaluation of the carry deficit.",
       "evidence": [
-        "USD/JPY: 162.51",
-        "25d RR: -1.40 (Saxo)",
-        "JPY COT LF Net: -105,238"
+        "EUR/USD VRP: +2.5%",
+        "SOFR 3.59% vs €STR 2.19%: +140bp",
+        "EUR CESI: -17"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:02",
-      "priority": "warning",
-      "title": "EUR/USD — Volatility Premium + CESI Divergence",
-      "text": "EUR/USD trades at 1.1418, pinned near its SMA20 (1.1417) as the market prepares for the July 23 ECB meeting. The pair exhibits a notable Vol Risk Premium (VRP) of +2.5%, with IV at 7.1% vs HV30 at 4.7%, signaling that the options market is paying up for protection ahead of potential hawkish ECB surprises. However, the Economic Surprise Index (CESI) for EUR shows a strong negative bias (net -17), suggesting realized data continues to disappoint relative to the US (CESI +48). This fundamental divergence, combined with a +150bp USD carry advantage, keeps upside capped despite the elevated vol premium. ECB holds at 2.25%.",
-      "evidence": [
-        "EUR VRP: +2.5% (IV 7.1% / HV30 4.7%)",
-        "EUR CESI: -17 vs USD: +48",
-        "USD/EUR Carry: +150bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "01:55",
+      "time": "08:58",
       "priority": "info",
-      "title": "AUD/USD — Technical Support + Volatility Regime",
-      "text": "AUD/USD is holding at 0.7009, supported by the SMA20 at 0.6941 but facing resistance from the SMA50 at 0.7051. The pair carries an elevated VRP of +4.9% (IV 11.5% vs HV30 6.6%), indicating the options market is pricing in significantly more movement than has been realized over the past month. While the RBA's hold at 4.35% provides a -60bp carry advantage over the Fed, the strong negative CESI for AUD (-13) acts as a persistent headwind. The 25d Risk Reversal at -0.80 shows a moderate put skew, suggesting traders are more concerned about downside breaks than chasing a recovery. Risk: A sustained break below the 0.6941 SMA20 support level.",
+      "title": "AUD/CHF — Carry + Retail Divergence",
+      "text": "AUD/CHF is supported by a massive +435bp carry premium (RBA 4.35% vs SNB 0.0%), keeping the cross bid despite a strong negative CESI for AUD (-13). Retail sentiment has reached an extreme 93% short, fading the carry-driven move, which typically serves as a contrarian indicator for further upside. The pair is currently benefiting from a 'normal' volatility regime (VIX 17.5), allowing carry-seeking flows to dominate the SNB's accommodative real rate of -0.62%. However, the AUD/USD technical position above its SMA20 but below its SMA50 suggests the broader AUD recovery is not yet synchronized across all pairs. Carry remains the primary driver for the CHF cross until a shift in global risk appetite occurs. Risk: VIX spikes above 25, triggering a rapid compression of the AUD/CHF carry spread.",
       "evidence": [
-        "AUD/USD: 0.7009",
-        "VRP: +4.9%",
-        "25d RR: -0.80"
+        "AUD/CHF Carry: +435bp",
+        "AUD/CHF Retail: 93% Short",
+        "VIX: 17.5"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
