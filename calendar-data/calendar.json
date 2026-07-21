@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-21T07:53:57Z",
-  "generatedAt": "2026-07-21T07:53:57Z",
+  "lastUpdate": "2026-07-21T11:21:47Z",
+  "generatedAt": "2026-07-21T11:21:47Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -929,9 +929,9 @@
       "std": 0.57735
     },
     "EUR/zew economic sentiment index": {
-      "n": 3,
-      "mean": 14.766667,
-      "std": 3.348632
+      "n": 4,
+      "mean": 14.125,
+      "std": 3.020348
     },
     "JPY/current account": {
       "n": 3,
@@ -1268,6 +1268,11 @@
       "mean": 0.02,
       "std": 0.0
     },
+    "EUR/germany zew economic sentiment index": {
+      "n": 2,
+      "mean": 12.4,
+      "std": 5.798276
+    },
     "NZD/gdp growth rate yoy": {
       "n": 2,
       "mean": 0.4,
@@ -1302,6 +1307,11 @@
       "n": 2,
       "mean": 3.6,
       "std": 0.0
+    },
+    "EUR/spain balance of trade": {
+      "n": 2,
+      "mean": -3.12,
+      "std": 0.59397
     },
     "USD/current account": {
       "n": 2,
@@ -49653,7 +49663,7 @@
       "flag": "🇪🇺",
       "event": "Greece Current Account",
       "impact": "medium",
-      "actual": null,
+      "actual": "&#8364;-0.96B",
       "forecast": "&#8364;51.0B",
       "previous": "&#8364;-1.389B"
     },
@@ -49666,7 +49676,7 @@
       "flag": "🇪🇺",
       "event": "Spain Balance of Trade",
       "impact": "medium",
-      "actual": null,
+      "actual": "&#8364;-8.24B",
       "forecast": "&#8364;-4.7B",
       "previous": "&#8364;-5.2B"
     },
@@ -49679,7 +49689,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area ZEW Economic Sentiment Index",
       "impact": "medium",
-      "actual": null,
+      "actual": "23.4",
       "forecast": "11.2",
       "previous": "9.5"
     },
@@ -49692,7 +49702,7 @@
       "flag": "🇪🇺",
       "event": "Germany ZEW Economic Sentiment Index",
       "impact": "high",
-      "actual": null,
+      "actual": "26.3",
       "forecast": "18.0",
       "previous": "10.5"
     },
