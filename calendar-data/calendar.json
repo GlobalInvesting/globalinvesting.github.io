@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-21T15:19:23Z",
-  "generatedAt": "2026-07-21T15:19:23Z",
+  "lastUpdate": "2026-07-21T21:37:30Z",
+  "generatedAt": "2026-07-21T21:37:30Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,10 +9,10 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-21",
   "rangeTo": "2026-07-21",
-  "totalEvents": 3993,
+  "totalEvents": 3994,
   "currencyCounts": {
     "NZD": 126,
-    "USD": 1265,
+    "USD": 1266,
     "CAD": 316,
     "EUR": 879,
     "GBP": 469,
@@ -23,7 +23,7 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2121,
+    "medium": 2122,
     "high": 1644,
     "low": 228
   },
@@ -249,9 +249,9 @@
       "std": 3.69098
     },
     "USD/api crude oil stock change": {
-      "n": 11,
-      "mean": -2.580364,
-      "std": 2.757816
+      "n": 12,
+      "mean": -2.023417,
+      "std": 3.261352
     },
     "AUD/inflation rate yoy": {
       "n": 4,
@@ -49717,7 +49717,20 @@
       "impact": "high",
       "actual": "16.5K",
       "forecast": null,
-      "previous": "19.75K"
+      "previous": "19.25K"
+    },
+    {
+      "date": "21 Jul",
+      "dateISO": "2026-07-21",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States API Crude Oil Stock Change",
+      "impact": "medium",
+      "actual": "2.603M",
+      "forecast": "-1.5M",
+      "previous": "-0.056M"
     },
     {
       "date": "21 Jul",
