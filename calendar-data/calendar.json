@@ -1,24 +1,24 @@
 {
-  "lastUpdate": "2026-07-21T21:37:30Z",
-  "generatedAt": "2026-07-21T21:37:30Z",
+  "lastUpdate": "2026-07-22T07:53:47Z",
+  "generatedAt": "2026-07-22T07:53:47Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-21",
-  "rangeTo": "2026-07-21",
+  "rangeFrom": "2025-07-22",
+  "rangeTo": "2026-07-22",
   "totalEvents": 3994,
   "currencyCounts": {
-    "NZD": 126,
     "USD": 1266,
     "CAD": 316,
-    "EUR": 879,
-    "GBP": 469,
-    "AUD": 286,
+    "EUR": 878,
+    "GBP": 472,
+    "AUD": 285,
     "CHF": 167,
     "JPY": 251,
+    "NZD": 125,
     "SEK": 153,
     "NOK": 81
   },
@@ -28,51 +28,6 @@
     "low": 228
   },
   "surpriseStats": {
-    "CAD/new housing price index mom": {
-      "n": 4,
-      "mean": -0.3,
-      "std": 0.11547
-    },
-    "EUR/consumer confidence": {
-      "n": 12,
-      "mean": -1.9,
-      "std": 6.707391
-    },
-    "GBP/core inflation rate yoy": {
-      "n": 4,
-      "mean": -0.1,
-      "std": 0.0
-    },
-    "GBP/inflation rate yoy": {
-      "n": 4,
-      "mean": -0.15,
-      "std": 0.1
-    },
-    "GBP/inflation rate mom": {
-      "n": 4,
-      "mean": -0.125,
-      "std": 0.15
-    },
-    "SEK/employed persons": {
-      "n": 3,
-      "mean": 0.001667,
-      "std": 0.070812
-    },
-    "SEK/unemployment rate": {
-      "n": 3,
-      "mean": -0.366667,
-      "std": 1.101514
-    },
-    "USD/eia crude oil stocks change": {
-      "n": 15,
-      "mean": -1.226067,
-      "std": 3.21253
-    },
-    "USD/eia gasoline stocks change": {
-      "n": 15,
-      "mean": -0.0438,
-      "std": 2.059333
-    },
     "EUR/new car registrations yoy": {
       "n": 3,
       "mean": 1.966667,
@@ -142,6 +97,11 @@
       "n": 4,
       "mean": -0.25,
       "std": 0.519615
+    },
+    "EUR/consumer confidence": {
+      "n": 11,
+      "mean": -0.890909,
+      "std": 6.003908
     },
     "EUR/ifo business climate": {
       "n": 3,
@@ -417,6 +377,16 @@
       "n": 5,
       "mean": -0.0756,
       "std": 0.171822
+    },
+    "USD/eia gasoline stocks change": {
+      "n": 14,
+      "mean": 0.172357,
+      "std": 1.952512
+    },
+    "USD/eia crude oil stocks change": {
+      "n": 14,
+      "mean": -1.536857,
+      "std": 3.09094
     },
     "USD/fed interest rate decision": {
       "n": 3,
@@ -1158,6 +1128,11 @@
       "mean": 0.075,
       "std": 0.15
     },
+    "CAD/new housing price index mom": {
+      "n": 3,
+      "mean": -0.266667,
+      "std": 0.11547
+    },
     "GBP/employment change": {
       "n": 4,
       "mean": 38.25,
@@ -1188,15 +1163,30 @@
       "mean": -0.05,
       "std": 0.353553
     },
+    "GBP/inflation rate yoy": {
+      "n": 4,
+      "mean": -0.175,
+      "std": 0.05
+    },
+    "GBP/inflation rate mom": {
+      "n": 4,
+      "mean": -0.15,
+      "std": 0.1
+    },
+    "GBP/core inflation rate yoy": {
+      "n": 4,
+      "mean": -0.05,
+      "std": 0.1
+    },
     "JPY/balance of trade": {
-      "n": 3,
-      "mean": 234.466667,
-      "std": 84.119934
+      "n": 4,
+      "mean": 104.125,
+      "std": 269.579752
     },
     "JPY/exports yoy": {
-      "n": 3,
-      "mean": 2.366667,
-      "std": 2.713546
+      "n": 4,
+      "mean": 1.95,
+      "std": 2.367136
     },
     "JPY/machinery orders mom": {
       "n": 4,
@@ -1222,6 +1212,16 @@
       "n": 3,
       "mean": -5.166667,
       "std": 26.789052
+    },
+    "SEK/unemployment rate": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 1.272792
+    },
+    "SEK/employed persons": {
+      "n": 2,
+      "mean": 0.0325,
+      "std": 0.065761
     },
     "USD/philadelphia fed manufacturing index": {
       "n": 4,
@@ -1330,18 +1330,6 @@
     }
   },
   "events": [
-    {
-      "currency": "NZD",
-      "event": "Balance of Trade",
-      "dateISO": "2025-07-21",
-      "hourUTC": "22:45",
-      "actual": "NZ$0.142B",
-      "forecast": "1.03",
-      "previous": "1.082",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
     {
       "currency": "USD",
       "event": "API Crude Oil Stock Change",
@@ -46147,19 +46135,6 @@
     {
       "date": "30 Jun",
       "dateISO": "2026-06-30",
-      "timeUTC": "00:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB Forum on Central Banking",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "30 Jun",
-      "dateISO": "2026-06-30",
       "timeUTC": "01:00",
       "country": "NZD",
       "currency": "NZD",
@@ -46169,19 +46144,6 @@
       "actual": "36.6",
       "forecast": "11.0",
       "previous": "10.0"
-    },
-    {
-      "date": "30 Jun",
-      "dateISO": "2026-06-30",
-      "timeUTC": "01:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Meeting Minutes",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "30 Jun",
@@ -49741,9 +49703,9 @@
       "flag": "🇯🇵",
       "event": "Japan Exports YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "19.3%",
       "forecast": "18.6%",
-      "previous": "17.0%"
+      "previous": "16.8%"
     },
     {
       "date": "21 Jul",
@@ -49754,9 +49716,48 @@
       "flag": "🇯🇵",
       "event": "Japan Balance of Trade",
       "impact": "high",
-      "actual": null,
+      "actual": "&#165;-406.9B",
       "forecast": "&#165;-120.0B",
-      "previous": "&#165;-378.7B"
+      "previous": "&#165;-391.8B"
+    },
+    {
+      "date": "22 Jul",
+      "dateISO": "2026-07-22",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": "2.6%",
+      "forecast": "2.5%",
+      "previous": "2.6%"
+    },
+    {
+      "date": "22 Jul",
+      "dateISO": "2026-07-22",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Inflation Rate MoM",
+      "impact": "medium",
+      "actual": "0.1%",
+      "forecast": "0.1%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "22 Jul",
+      "dateISO": "2026-07-22",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Inflation Rate YoY",
+      "impact": "high",
+      "actual": "2.6%",
+      "forecast": "2.7%",
+      "previous": "2.8%"
     }
   ]
 }
