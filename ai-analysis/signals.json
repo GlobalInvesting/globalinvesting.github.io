@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-07-22T09:06:09Z",
+  "generated_at": "2026-07-22T15:58:41Z",
   "signals": [
     {
-      "time": "09:05",
+      "time": "15:56",
       "priority": "critical",
-      "title": "USD/CHF — Geopolitical Shock + Carry Divergence",
-      "text": "USD/CHF trades at 0.8118 following reports that Iran struck US military facilities in Jordan and Bahrain. While the 375bp Fed-SNB carry advantage structurally supports USD/CHF, the acute geopolitical escalation triggers immediate safe-haven demand for the Franc. The pair is currently holding above its SMA20/50/200 cluster (0.8080/0.7982/0.7918), which serves as the primary technical floor. SNB's 0.00% policy rate and -0.62% real rate maintain CHF as the premier funding currency, but safe-haven flows typically override carry logic during active military engagements. VIX at 17.5 suggests cross-asset stress is not yet at a full 'risk-off' regime (VIX > 25), meaning the CHF bid may remain localized to geopolitical headlines. Risk: De-escalation headlines trigger a rapid snap-back toward 0.8200 as the 375bp carry advantage reasserts dominance.",
+      "title": "USD/JPY — Geopolitical Risk + Carry + Options Skew",
+      "text": "USD/JPY trades at 163.1, holding firmly above its SMA20/50/200 cluster (162.13/160.73/157.52) as geopolitical tensions escalate. President Trump’s warnings regarding Iran have driven WTI oil up 2.21% to $86.2, providing a structural bid to the dollar while the 275bp Fed-BoJ OIS carry advantage (3.57% vs 0.98%) remains the primary driver. Despite hawkish BoJ signals, the Yen struggles near four-decade lows, and the 25d RR at -1.45 indicates the options market is paying a moderate premium for downside protection against intervention rather than chasing the carry move. JPY COT LF net short at -105,238 confirms a heavily crowded carry trade that is vulnerable to a disorderly unwind if VIX clears 25. Retail sentiment is 84% short, diverging from the institutional carry bid and suggesting a squeeze if 163.50 resistance breaks. Risk: Direct BoJ intervention or a VIX spike above 25 triggers a rapid carry liquidation.",
       "evidence": [
-        "Headline: Iran struck US military facilities",
-        "USD/CHF carry: +375bp",
-        "USD/CHF: 0.8118"
+        "USD/JPY: 163.1",
+        "OIS Carry: +275bp",
+        "25d RR: -1.45"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:02",
+      "time": "15:52",
       "priority": "warning",
-      "title": "GBP/USD — G10 Bilateral Theme + Positioning",
-      "text": "GBP/USD trades at 1.3373, pinned near its SMA50 (1.3375) as the British Pound emerges as the G10 laggard this week. The G10 scorecard shows a 0.879% spread between the leading USD and lagging GBP, driven by a moderate negative CESI bias for the UK (-5 net misses) vs a strong positive bias for the US (+47 net beats). COT data shows speculators remain net long GBP (+28,278), creating a positioning overhang as the currency underperforms its peers. The 0bp OIS carry differential (SOFR 3.57% vs SONIA 3.73%) provides no yield cushion for the Pound against the Greenback's data-backed momentum. A sustained break below the SMA20/50 cluster at 1.3351/1.3375 would signal a deeper correction toward the SMA200 at 1.3401. Risk: BoE meeting on 30 July delivers a hawkish surprise that forces a re-accumulation of GBP longs.",
+      "title": "GBP/USD — G10 Bilateral Theme + CESI Divergence",
+      "text": "GBP/USD trades at 1.3376, pinned near its SMA50 (1.3375) as the pair emerges as the primary G10 bilateral theme. The USD is the week's G10 leader (+0.397% avg) while GBP is the laggard (-0.409% avg), creating a 0.807% spread that signals a clear trend divergence. This weakness is fundamentally supported by the Economic Surprise Index (CESI), where the UK shows a net -5 score (moderate negative bias) against a dominant +49 net score for the US. While the nominal OIS carry is neutral at 0bp, the real rate differential favors the USD (+1.47% vs +0.78%), making the Greenback the more attractive restrictive play. Speculative positioning remains net long GBP (+28,278), posing a long-unwind risk if the pair closes below the SMA20/50 cluster. Risk: A hawkish surprise from the BoE on July 30 forces a repositioning of the current spec long.",
       "evidence": [
-        "GBP 1W avg: -0.503% (n=4)",
-        "G10 spread: 0.879%",
-        "USD CESI: +47 beats"
+        "G10 spread: 0.807%",
+        "USD CESI: +49",
+        "GBP 1W avg: -0.409% (n=4)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:00",
+      "time": "15:48",
       "priority": "warning",
-      "title": "USD/JPY — BoJ Policy Shift + Options Skew",
-      "text": "USD/JPY is testing 162.97, holding above its SMA20 (162.13) despite intensifying verbal intervention and hawkish BoJ signaling. Bloomberg reports the BoJ is open to a faster rate hike pace as Yen weakness adds to price risk, directly challenging the 275bp Fed-BoJ carry advantage. The options market is pricing significant downside protection, with the 25d Risk Reversal at -1.42 (moderate put skew) and a 3.6-point Vol Risk Premium (IV 7.2% vs HV30 3.6%). Retail sentiment is at a 84% short extreme, diverging from the COT LF net short of -105,238, suggesting a highly crowded trade vulnerable to a policy-induced squeeze. A break below the SMA20 at 162.13 would confirm the options market's bearish bias and target the 160.00 handle. Risk: BoJ holds steady on 31 July, allowing the 275bp carry to. toward 165.00.",
+      "title": "EUR/USD — Volatility Premium + CESI Underperformance",
+      "text": "EUR/USD is trading at 1.1413, positioned below its SMA20/50/200 downward-sloping cluster, confirming a bearish technical regime. The options market is pricing an elevated volatility risk premium (VRP) of +2.5%, with IV at 7.1% vs HV30 at 4.7%, signaling high demand for protection ahead of tomorrow's ECB meeting. Fundamental pressure is mounting as the EUR CESI shows a net -17 score, reflecting persistent data misses compared to the US data outperformance. The 150bp OIS carry advantage (Fed 3.75% vs ECB 2.18%) continues to favor the USD, while COT LF net short at -74,637 shows institutions are already positioned for further downside. A failure to reclaim the SMA20 at 1.1417 keeps the focus on the 1.1350 support level. Risk: ECB shifts to a more aggressive hiking stance on July 23, contradicting the current 'Hold' market bias.",
       "evidence": [
-        "USD/JPY 25d RR: -1.42",
-        "USD/JPY VRP: +3.6%",
-        "JPY COT LF net: -105,238"
+        "EUR/USD VRP: +2.5%",
+        "EUR CESI: -17",
+        "OIS Carry: +150bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "08:55",
+      "time": "15:45",
       "priority": "info",
-      "title": "NZD/USD — COT vs OIS Divergence + Geopolitics",
-      "text": "NZD/USD trades at 0.5819, struggling to maintain its position above the SMA200 (0.5823) as Middle East tensions offset RBNZ hawkishness. COT data shows a heavy speculative net short of -29,582 (15.2% long), which directly contradicts the RBNZ's hiking stance and -0.58% accommodative real rate. RBNZ holds at 2.5%. The CESI for NZD is neutral (+1), providing little fundamental support to counter the broader 'flight to safety' into the USD. If geopolitical tensions ease, the crowded spec short is at risk of a squeeze back toward 0.5900. Risk: RBNZ signals a pause in the hiking cycle, validating the existing speculative short position.",
+      "title": "AUD/CHF — Retail Sentiment Extreme + Carry Divergence",
+      "text": "AUD/CHF is currently testing the 0.5693 level, supported by a massive +435bp carry premium (RBA 4.35% vs SNB 0.0%). Retail sentiment has reached an extreme 92% short position, which represents a significant contrarian divergence from the institutional carry-seeking trend. While the SNB remains on hold with a -0.62% real rate, the RBA's restrictive +0.39% real rate and hawkish bias provide a fundamental floor for the pair. The AUD/USD 25d RR at -0.71 suggests some caution in the broader AUD complex, but the CHF's status as the second-weakest G10 currency this week (-0.309% avg) limits its recovery potential. This retail extreme often precedes a final capitulation squeeze higher before any meaningful reversal. Risk: A sharp move to risk-off (VIX > 25) triggers a safe-haven CHF bid that overrides the carry advantage.",
       "evidence": [
-        "NZD COT LF net: -29,582",
-        "NZD/USD carry: +125bp favors USD",
-        "NZD/USD: 0.5819"
+        "Retail Sentiment: 92% Short",
+        "AUD/CHF Carry: +435bp",
+        "CHF 1W avg: -0.309% (n=6)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
