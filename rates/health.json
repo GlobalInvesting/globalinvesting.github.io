@@ -1,5 +1,5 @@
 {
-  "runTimestamp": "2026-07-22T19:44:23.801951Z",
+  "runTimestamp": "2026-07-22T22:04:45.826037Z",
   "runDate": "2026-07-22",
   "frankfurterOk": true,
   "currencies": {
@@ -11,10 +11,10 @@
       "issues": []
     },
     "EUR": {
-      "status": "ok",
-      "rate": "2.4",
-      "source": "ECB-SDMX",
-      "date": "2026-06-17",
+      "status": "fallback",
+      "rate": "2.40",
+      "source": "ECB-SDMX (merged history)",
+      "date": "2026-07-01",
       "issues": []
     },
     "GBP": {
@@ -25,10 +25,10 @@
       "issues": []
     },
     "JPY": {
-      "status": "ok",
-      "rate": "1",
-      "source": "BIS-CBPOL",
-      "date": "2026-06-01",
+      "status": "fallback",
+      "rate": "1.0",
+      "source": "BIS-CBPOL (merged history)",
+      "date": "2026-07-01",
       "issues": []
     },
     "CAD": {
@@ -39,10 +39,10 @@
       "issues": []
     },
     "AUD": {
-      "status": "ok",
+      "status": "fallback",
       "rate": "4.35",
-      "source": "RBA-HTML",
-      "date": "2026-06-17",
+      "source": "RBA-HTML (merged history)",
+      "date": "2026-07-01",
       "issues": []
     },
     "CHF": {
@@ -53,28 +53,30 @@
       "issues": []
     },
     "NZD": {
-      "status": "ok",
+      "status": "cached",
       "rate": "2.5",
-      "source": "ff-calendar-actual",
+      "source": "cached-file",
       "date": "2026-07-08",
       "issues": []
     },
     "NOK": {
-      "status": "ok",
+      "status": "fallback",
       "rate": "4.25",
-      "source": "BIS-CBPOL",
-      "date": "2026-06-01",
+      "source": "BIS-CBPOL (merged history)",
+      "date": "2026-07-01",
       "issues": []
     },
     "SEK": {
-      "status": "ok",
+      "status": "fallback",
       "rate": "1.75",
-      "source": "BIS-CBPOL",
-      "date": "2026-06-01",
+      "source": "BIS-CBPOL (merged history)",
+      "date": "2026-07-01",
       "issues": []
     }
   },
   "issues": [],
-  "warnings": [],
-  "overallStatus": "ok"
+  "warnings": [
+    "NZD: kept cached 2026-07-08 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source"
+  ],
+  "overallStatus": "degraded_cached"
 }
