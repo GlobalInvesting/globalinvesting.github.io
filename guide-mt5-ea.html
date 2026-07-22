@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MT5 Expert Advisor for FX Analytics: Setup Guide</title>
-<meta name="description" content="Install and configure the Global Investing MT5 Expert Advisor: a native forex dashboard with COT positioning, CB bias, carry ranking, calendar and AI narrative.">
+<meta name="description" content="Install and configure the Global Investing MT5 Expert Advisor: a native forex dashboard with COT positioning, CB bias, Sharpe-adjusted carry trade ranking with unwind-risk flags, calendar and AI narrative.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-mt5-ea.html">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://globalinvesting.github.io/guide-mt5-ea.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
 <meta property="og:title" content="MetaTrader 5 Expert Advisor for FX Analytics: Setup &amp; Feature Guide — Global Investing">
-<meta property="og:description" content="Install and configure the Global Investing FX Terminal MT5 Expert Advisor — a native MetaTrader 5 forex dashboard with COT positioning, CB rate bias, carry ranking, economic calendar, and AI narrative.">
+<meta property="og:description" content="Install and configure the Global Investing FX Terminal MT5 Expert Advisor — a native MetaTrader 5 forex dashboard with COT positioning, CB rate bias, Sharpe-adjusted carry trade ranking with unwind-risk flags, economic calendar, and AI narrative.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="MetaTrader 5 Expert Advisor for FX Analytics: Setup &amp; Feature Guide — Global Investing">
-<meta name="twitter:description" content="Native MT5 forex dashboard EA: COT positioning, CB rate bias, carry ranking, economic calendar, and AI narrative inside your MetaTrader 5 charts. Setup guide and panel overview.">
+<meta name="twitter:description" content="Native MT5 forex dashboard EA: COT positioning, CB rate bias, Sharpe-adjusted carry trade ranking with unwind-risk flags, economic calendar, and AI narrative inside your MetaTrader 5 charts. Setup guide and panel overview.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -199,7 +199,7 @@ a { color: inherit; text-decoration: none; }
 
 </style>
 <meta property="article:published_time" content="2026-06-20T00:00:00Z">
-<meta property="article:modified_time" content="2026-07-11T00:00:00Z">
+<meta property="article:modified_time" content="2026-07-22T00:00:00Z">
 <meta property="article:section" content="Guides">
 <script type="application/ld+json">
 {
@@ -288,7 +288,7 @@ a { color: inherit; text-decoration: none; }
     }
   ],
   "datePublished": "2026-06-20T00:00:00Z",
-  "dateModified": "2026-07-11T00:00:00Z",
+  "dateModified": "2026-07-22T00:00:00Z",
   "author": {
     "@type": "Person",
     "name": "Santiago Plá Casuriaga",
@@ -310,7 +310,7 @@ a { color: inherit; text-decoration: none; }
     "@type": "WebPage",
     "@id": "https://globalinvesting.github.io/guide-mt5-ea.html"
   },
-  "keywords": "metatrader 5 expert advisor, mt5 forex dashboard, mt5 ea forex analytics, mt5 cot indicator, mt5 economic calendar expert advisor, mt5 analytical tools"
+  "keywords": "metatrader 5 expert advisor, mt5 forex dashboard, mt5 ea forex analytics, mt5 cot indicator, mt5 economic calendar expert advisor, mt5 analytical tools, carry trade indicator mt5, yen carry trade unwind, japan carry trade risk, carry trade unwind indicator, currency carry trade mt5"
 }
 </script>
 <script type="application/ld+json">
@@ -374,6 +374,22 @@ a { color: inherit; text-decoration: none; }
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Yes. The EA runs inside MetaTrader 5 regardless of broker, since it does not place trades. Panels that reference swap rates or open positions (such as the Carry Monitor) read live values directly from your broker's own MT5 feed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the Carry Monitor flag yen carry trade unwind risk?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Carry Monitor does not read nominal swap points on their own, since a wide swap can look identical whether the underlying pair is calm or already unwinding. It annualizes each pair's live broker swap and divides by its trailing 30-day realized volatility, producing a Sharpe-adjusted carry score. When a funding-currency pair such as a JPY cross shows elevated volatility against a shrinking or negative Sharpe-adjusted carry, that combination is the same pattern institutional desks associate with a carry trade unwind, and the panel ranks it accordingly rather than showing a flat swap figure."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a carry trade unwind, and can the MT5 EA warn me about one?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A carry trade unwind is a rapid reversal of positions built to collect interest-rate differential (commonly funded in yen), typically triggered by a spike in volatility or a shift in central bank policy expectations that erases the trade's risk-adjusted return. The EA does not predict the trigger event itself, but its Carry Monitor, CB Rates & Bias, and Volatility panels update from the same live data on the same chart, so a volatility spike alongside a deteriorating carry ranking and a shift in policy bias is visible together rather than requiring three separate tools."
       }
     },
     {
@@ -544,7 +560,8 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="carry-panel">
       <h3 style="text-transform:none;font-size:15px;border-bottom:none;padding-bottom:0;margin-bottom:10px;">Carry Monitor</h3>
-      <p>Because the EA runs inside your own MT5 terminal, the Carry Monitor reads your broker's actual live swap rates rather than a generic estimate — annualized and then adjusted for each pair's trailing 30-day realized volatility, following the same Sharpe-adjusted carry convention used by institutional carry trade monitors. A high nominal swap in a high-volatility regime is flagged differently from the same swap in a calm one.</p>
+      <p>Because the EA runs inside your own MT5 terminal, the Carry Monitor reads your broker's actual live swap rates rather than a generic estimate — annualized and then adjusted for each pair's trailing 30-day realized volatility, following the same Sharpe-adjusted carry convention used by institutional carry trade monitors. A high nominal swap in a high-volatility regime is flagged differently from the same swap in a calm one, which is the same distinction that separates an intact carry trade from one at risk of unwinding.</p>
+      <p>This matters most on JPY funding pairs, where periods of low realized volatility can mask a large duration of accumulated carry positioning. When volatility rises against a shrinking Sharpe-adjusted score, that shift shows up on the panel as a ranking change rather than a silent swap figure — a live view of the same setup that has historically preceded past yen carry trade unwind episodes, without the panel making any predictive claim about timing.</p>
       <div class="scr-hero-wrap">
         <div class="scr-hero scr-hero-contain">
           <img src="assets/screenshot-ea-carry.png" alt="Carry Monitor panel rendered natively inside the MT5 Expert Advisor dashboard, showing long and short swap points, annualized carry percent, 30-day volatility, Sharpe ratio, and long/short signal per pair" width="379" height="333" loading="lazy">
