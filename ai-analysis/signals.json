@@ -1,53 +1,53 @@
 {
-  "generated_at": "2026-07-22T15:58:41Z",
+  "generated_at": "2026-07-22T21:11:22Z",
   "signals": [
     {
-      "time": "15:56",
+      "time": "21:05",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Risk + Carry + Options Skew",
-      "text": "USD/JPY trades at 163.1, holding firmly above its SMA20/50/200 cluster (162.13/160.73/157.52) as geopolitical tensions escalate. President Trump’s warnings regarding Iran have driven WTI oil up 2.21% to $86.2, providing a structural bid to the dollar while the 275bp Fed-BoJ OIS carry advantage (3.57% vs 0.98%) remains the primary driver. Despite hawkish BoJ signals, the Yen struggles near four-decade lows, and the 25d RR at -1.45 indicates the options market is paying a moderate premium for downside protection against intervention rather than chasing the carry move. JPY COT LF net short at -105,238 confirms a heavily crowded carry trade that is vulnerable to a disorderly unwind if VIX clears 25. Retail sentiment is 84% short, diverging from the institutional carry bid and suggesting a squeeze if 163.50 resistance breaks. Risk: Direct BoJ intervention or a VIX spike above 25 triggers a rapid carry liquidation.",
+      "title": "USD/JPY — Geopolitical Risk + Carry + Intervention Threat",
+      "text": "USD/JPY trades at 163.09, holding above its SMA20/50/200 cluster with the SMA20 at 162.13 and SMA50 at 160.73. High-impact headlines confirm broadening Iranian threats to energy infrastructure and shipping, driving WTI oil up 2.47% to $86.4 and keeping markets on edge. Despite these geopolitical tensions, the massive +259bp SOFR-TONA carry advantage continues to support the pair, as the VIX remains at 16.6, indicating normal volatility where carry-first framing dominates safe-haven flows. However, with the spot rate at 163.09, the pair is well above the 160.00 level that historically triggers verbal and physical BoJ intervention, meaning intervention risk rises exponentially on any further extension. Speculative positioning remains heavily short JPY with COT LF net short at -105,238, while retail sentiment shows an 83% short bias, leaving the market highly vulnerable to a rapid squeeze if the BoJ acts. Risk: BoJ intervenes directly or delivers a hawkish surprise at the July 31 meeting, forcing a disorderly unwind of JPY shorts toward the SMA50.",
       "evidence": [
-        "USD/JPY: 163.1",
-        "OIS Carry: +275bp",
-        "25d RR: -1.45"
+        "USD/JPY Spot: 163.09",
+        "SOFR vs TONA: +259bp",
+        "JPY COT LF net: -105,238"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "15:52",
+      "time": "21:01",
       "priority": "warning",
-      "title": "GBP/USD — G10 Bilateral Theme + CESI Divergence",
-      "text": "GBP/USD trades at 1.3376, pinned near its SMA50 (1.3375) as the pair emerges as the primary G10 bilateral theme. The USD is the week's G10 leader (+0.397% avg) while GBP is the laggard (-0.409% avg), creating a 0.807% spread that signals a clear trend divergence. This weakness is fundamentally supported by the Economic Surprise Index (CESI), where the UK shows a net -5 score (moderate negative bias) against a dominant +49 net score for the US. While the nominal OIS carry is neutral at 0bp, the real rate differential favors the USD (+1.47% vs +0.78%), making the Greenback the more attractive restrictive play. Speculative positioning remains net long GBP (+28,278), posing a long-unwind risk if the pair closes below the SMA20/50 cluster. Risk: A hawkish surprise from the BoE on July 30 forces a repositioning of the current spec long.",
+      "title": "EUR/USD — ECB Decision + Volatility Premium + Technical Resistance",
+      "text": "EUR/USD trades at 1.1410, pinned below its daily SMA20 of 1.1417 and SMA50 of 1.1519 ahead of tomorrow's ECB policy decision. The options market is pricing in significant defensive positioning, with EUR/USD ATM IV at 7.1% vs HV30 at 4.7%, generating an elevated Volatility Risk Premium (VRP) of +2.5%. This elevated premium indicates strong hedging demand rather than directional conviction, as the 25d Risk Reversal shows a mild put skew of -0.44. Speculators are already positioned for weakness with EUR COT LF net short at -74,637, which aligns with a highly negative EUR Economic Surprise Index (CESI) of -17 net misses. While the ECB is widely expected to hold its policy rate at 2.40%, any hawkish rhetoric contrasting with the Fed's 3.75% rate could spark a short-covering rally, though the structural +135bp carry advantage favoring the USD limits sustained upside. Risk: ECB delivers an unexpectedly dovish hold or signals imminent cuts, validating the spec short and driving spot below 1.1350.",
       "evidence": [
-        "G10 spread: 0.807%",
-        "USD CESI: +49",
-        "GBP 1W avg: -0.409% (n=4)"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "15:48",
-      "priority": "warning",
-      "title": "EUR/USD — Volatility Premium + CESI Underperformance",
-      "text": "EUR/USD is trading at 1.1413, positioned below its SMA20/50/200 downward-sloping cluster, confirming a bearish technical regime. The options market is pricing an elevated volatility risk premium (VRP) of +2.5%, with IV at 7.1% vs HV30 at 4.7%, signaling high demand for protection ahead of tomorrow's ECB meeting. Fundamental pressure is mounting as the EUR CESI shows a net -17 score, reflecting persistent data misses compared to the US data outperformance. The 150bp OIS carry advantage (Fed 3.75% vs ECB 2.18%) continues to favor the USD, while COT LF net short at -74,637 shows institutions are already positioned for further downside. A failure to reclaim the SMA20 at 1.1417 keeps the focus on the 1.1350 support level. Risk: ECB shifts to a more aggressive hiking stance on July 23, contradicting the current 'Hold' market bias.",
-      "evidence": [
+        "EUR/USD Spot: 1.1410",
         "EUR/USD VRP: +2.5%",
-        "EUR CESI: -17",
-        "OIS Carry: +150bp"
+        "EUR COT LF net: -74,637"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
     },
     {
-      "time": "15:45",
-      "priority": "info",
-      "title": "AUD/CHF — Retail Sentiment Extreme + Carry Divergence",
-      "text": "AUD/CHF is currently testing the 0.5693 level, supported by a massive +435bp carry premium (RBA 4.35% vs SNB 0.0%). Retail sentiment has reached an extreme 92% short position, which represents a significant contrarian divergence from the institutional carry-seeking trend. While the SNB remains on hold with a -0.62% real rate, the RBA's restrictive +0.39% real rate and hawkish bias provide a fundamental floor for the pair. The AUD/USD 25d RR at -0.71 suggests some caution in the broader AUD complex, but the CHF's status as the second-weakest G10 currency this week (-0.309% avg) limits its recovery potential. This retail extreme often precedes a final capitulation squeeze higher before any meaningful reversal. Risk: A sharp move to risk-off (VIX > 25) triggers a safe-haven CHF bid that overrides the carry advantage.",
+      "time": "20:57",
+      "priority": "warning",
+      "title": "AUD/USD — COT vs CESI Divergence + Volatility Premium",
+      "text": "AUD/USD trades at 0.6999, holding just above its SMA20 of 0.6945 but capped by the SMA50 at 0.7041. Speculative positioning remains net long with COT LF net long at +21,946 (63.2% long), representing a bullish institutional bias. However, this positioning directly contradicts a severely deteriorating domestic data trend, with the AUD Economic Surprise Index (CESI) showing a strong negative extreme of -13 net misses. This divergence between bullish positioning and bearish data surprises creates a high-unwind risk for AUD longs, especially ahead of the upcoming Australian labor market report. The options market is actively pricing this risk, with AUD/USD IV at 11.9% vs HV30 at 6.5%, yielding an elevated Volatility Risk Premium of +5.4% as traders pay up for downside protection. Risk: Australian employment data beats expectations significantly, validating the RBA's hawkish bias and forcing a squeeze back above the SMA50.",
       "evidence": [
-        "Retail Sentiment: 92% Short",
-        "AUD/CHF Carry: +435bp",
-        "CHF 1W avg: -0.309% (n=6)"
+        "AUD/USD Spot: 0.6999",
+        "AUD CESI: -13",
+        "AUD/USD VRP: +5.4%"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "gemini:gemini-3.5-flash"
+    },
+    {
+      "time": "20:52",
+      "priority": "info",
+      "title": "USD/CAD vs WTI Oil — Cross-Asset Correlation Break",
+      "text": "The correlation between USD/CAD and WTI Oil has broken significantly, with the current correlation at -0.936 vs its 252-day historical norm of -0.013, representing a z-score of -1.80σ. Typically, USD/CAD and oil share a weak relationship, but the recent geopolitical escalation in the Middle East has driven WTI oil up 2.47% to $86.4, forcing a tight, highly negative intraday link. USD/CAD trades at 1.4082, holding below its SMA20 of 1.4149 but well above its SMA50 of 1.3998. Speculators are heavily short CAD with COT LF net short at -93,515, which has limited CAD's ability to fully capitalize on rising crude prices despite the massive oil rally. The +150bp USD/CAD carry advantage (Fed 3.75% vs BoC 2.25%) continues to anchor the pair's structural bid, preventing a deeper selloff. Risk: Geopolitical tensions ease and oil prices rapidly mean-revert, removing the CAD support and driving USD/CAD back above the SMA20.",
+      "evidence": [
+        "USD/CAD vs WTI Corr: -0.936",
+        "WTI Oil: $86.4",
+        "CAD COT LF net: -93,515"
+      ],
+      "_source": "gemini:gemini-3.5-flash"
     }
   ]
 }
