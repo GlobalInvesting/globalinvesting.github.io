@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-22T11:23:58Z",
-  "generatedAt": "2026-07-22T11:23:58Z",
+  "lastUpdate": "2026-07-22T15:18:51Z",
+  "generatedAt": "2026-07-22T15:18:51Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,9 +9,9 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-22",
   "rangeTo": "2026-07-22",
-  "totalEvents": 3995,
+  "totalEvents": 3997,
   "currencyCounts": {
-    "USD": 1267,
+    "USD": 1269,
     "CAD": 316,
     "EUR": 878,
     "GBP": 472,
@@ -23,7 +23,7 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2123,
+    "medium": 2125,
     "high": 1644,
     "low": 228
   },
@@ -379,14 +379,14 @@
       "std": 0.171822
     },
     "USD/eia gasoline stocks change": {
-      "n": 14,
-      "mean": 0.172357,
-      "std": 1.952512
+      "n": 15,
+      "mean": 0.314533,
+      "std": 1.96041
     },
     "USD/eia crude oil stocks change": {
-      "n": 14,
-      "mean": -1.536857,
-      "std": 3.09094
+      "n": 15,
+      "mean": -1.217,
+      "std": 3.225851
     },
     "USD/fed interest rate decision": {
       "n": 3,
@@ -49768,9 +49768,35 @@
       "flag": "🇺🇸",
       "event": "United States MBA 30-Year Mortgage Rate",
       "impact": "medium",
-      "actual": "6.69",
+      "actual": "6.69%",
       "forecast": null,
-      "previous": "6.65"
+      "previous": "6.65%"
+    },
+    {
+      "date": "22 Jul",
+      "dateISO": "2026-07-22",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "0.765M",
+      "forecast": "-1.54M",
+      "previous": "-1.533M"
+    },
+    {
+      "date": "22 Jul",
+      "dateISO": "2026-07-22",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "2.011M",
+      "forecast": "-1.25M",
+      "previous": "-1.693M"
     }
   ]
 }
