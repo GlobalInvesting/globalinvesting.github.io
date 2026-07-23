@@ -1,6 +1,6 @@
 {
-  "runTimestamp": "2026-07-22T22:04:45.826037Z",
-  "runDate": "2026-07-22",
+  "runTimestamp": "2026-07-23T06:15:10.140061Z",
+  "runDate": "2026-07-23",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
@@ -11,9 +11,9 @@
       "issues": []
     },
     "EUR": {
-      "status": "fallback",
+      "status": "cached",
       "rate": "2.40",
-      "source": "ECB-SDMX (merged history)",
+      "source": "cached-file",
       "date": "2026-07-01",
       "issues": []
     },
@@ -25,9 +25,9 @@
       "issues": []
     },
     "JPY": {
-      "status": "fallback",
+      "status": "cached",
       "rate": "1.0",
-      "source": "BIS-CBPOL (merged history)",
+      "source": "cached-file",
       "date": "2026-07-01",
       "issues": []
     },
@@ -39,9 +39,9 @@
       "issues": []
     },
     "AUD": {
-      "status": "fallback",
+      "status": "cached",
       "rate": "4.35",
-      "source": "RBA-HTML (merged history)",
+      "source": "cached-file",
       "date": "2026-07-01",
       "issues": []
     },
@@ -49,34 +49,38 @@
       "status": "ok",
       "rate": "0.00",
       "source": "SNB-scraping",
-      "date": "2026-07-22",
+      "date": "2026-07-23",
       "issues": []
     },
     "NZD": {
-      "status": "cached",
-      "rate": "2.5",
-      "source": "cached-file",
-      "date": "2026-07-08",
-      "issues": []
-    },
-    "NOK": {
       "status": "fallback",
-      "rate": "4.25",
+      "rate": "2.5",
       "source": "BIS-CBPOL (merged history)",
       "date": "2026-07-01",
       "issues": []
     },
+    "NOK": {
+      "status": "cached",
+      "rate": "4.25",
+      "source": "cached-file",
+      "date": "2026-07-01",
+      "issues": []
+    },
     "SEK": {
-      "status": "fallback",
+      "status": "cached",
       "rate": "1.75",
-      "source": "BIS-CBPOL (merged history)",
+      "source": "cached-file",
       "date": "2026-07-01",
       "issues": []
     }
   },
   "issues": [],
   "warnings": [
-    "NZD: kept cached 2026-07-08 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source"
+    "EUR: kept cached 2026-07-01 value over older ECB-SDMX candidate (2026-06-17) \u2014 likely a laggy fallback source",
+    "JPY: kept cached 2026-07-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source",
+    "AUD: kept cached 2026-07-01 value over older RBA-HTML candidate (2026-06-17) \u2014 likely a laggy fallback source",
+    "NOK: kept cached 2026-07-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source",
+    "SEK: kept cached 2026-07-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source"
   ],
   "overallStatus": "degraded_cached"
 }
