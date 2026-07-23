@@ -1,88 +1,33 @@
 {
-  "lastUpdate": "2026-07-22T21:34:19Z",
-  "generatedAt": "2026-07-22T21:34:19Z",
+  "lastUpdate": "2026-07-23T07:55:49Z",
+  "generatedAt": "2026-07-23T07:55:49Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook RSS",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-07-22",
-  "rangeTo": "2026-07-22",
-  "totalEvents": 3997,
+  "rangeFrom": "2025-07-23",
+  "rangeTo": "2026-07-23",
+  "totalEvents": 4008,
   "currencyCounts": {
-    "USD": 1269,
-    "CAD": 316,
-    "EUR": 878,
-    "GBP": 472,
-    "AUD": 285,
+    "CAD": 318,
+    "EUR": 881,
+    "USD": 1268,
+    "GBP": 474,
+    "AUD": 288,
     "CHF": 167,
-    "JPY": 251,
+    "JPY": 253,
     "NZD": 125,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2125,
-    "high": 1644,
+    "medium": 2129,
+    "high": 1651,
     "low": 228
   },
   "surpriseStats": {
-    "EUR/new car registrations yoy": {
-      "n": 3,
-      "mean": 1.966667,
-      "std": 4.461315
-    },
-    "EUR/business confidence": {
-      "n": 6,
-      "mean": 0.383333,
-      "std": 1.028429
-    },
-    "GBP/cbi industrial trends orders": {
-      "n": 4,
-      "mean": -7.25,
-      "std": 4.272002
-    },
-    "GBP/gfk consumer confidence": {
-      "n": 4,
-      "mean": 1.5,
-      "std": 2.516611
-    },
-    "JPY/core inflation rate yoy": {
-      "n": 4,
-      "mean": -0.075,
-      "std": 0.15
-    },
-    "JPY/inflation rate yoy": {
-      "n": 4,
-      "mean": -0.15,
-      "std": 0.173205
-    },
-    "NOK/unemployment rate": {
-      "n": 2,
-      "mean": 0.25,
-      "std": 0.353553
-    },
-    "USD/continuing jobless claims": {
-      "n": 16,
-      "mean": 0.375,
-      "std": 17.05237
-    },
-    "USD/initial jobless claims": {
-      "n": 16,
-      "mean": 1.4375,
-      "std": 9.612275
-    },
-    "USD/jobless claims 4-week average": {
-      "n": 16,
-      "mean": 1.34375,
-      "std": 4.501736
-    },
-    "USD/chicago fed national activity index": {
-      "n": 4,
-      "mean": -0.1,
-      "std": 0.369865
-    },
     "CAD/retail sales mom": {
       "n": 4,
       "mean": 0.375,
@@ -262,6 +207,11 @@
       "n": 5,
       "mean": -0.08,
       "std": 0.164317
+    },
+    "EUR/business confidence": {
+      "n": 5,
+      "mean": 0.26,
+      "std": 1.099091
     },
     "EUR/economic sentiment": {
       "n": 3,
@@ -477,6 +427,21 @@
       "n": 3,
       "mean": 2.0,
       "std": 34.504492
+    },
+    "USD/initial jobless claims": {
+      "n": 15,
+      "mean": 1.666667,
+      "std": 9.904304
+    },
+    "USD/jobless claims 4-week average": {
+      "n": 15,
+      "mean": 0.883333,
+      "std": 4.25196
+    },
+    "USD/continuing jobless claims": {
+      "n": 15,
+      "mean": 0.466667,
+      "std": 17.646799
     },
     "USD/core pce price index mom": {
       "n": 4,
@@ -1204,14 +1169,34 @@
       "std": 0.538315
     },
     "AUD/unemployment rate": {
-      "n": 3,
-      "mean": -0.066667,
-      "std": 0.11547
+      "n": 4,
+      "mean": -0.05,
+      "std": 0.1
     },
     "AUD/employment change": {
+      "n": 4,
+      "mean": 11.45,
+      "std": 39.78555
+    },
+    "GBP/cbi industrial trends orders": {
       "n": 3,
-      "mean": -5.166667,
-      "std": 26.789052
+      "mean": -7.0,
+      "std": 5.196152
+    },
+    "GBP/gfk consumer confidence": {
+      "n": 3,
+      "mean": 2.333333,
+      "std": 2.309401
+    },
+    "JPY/inflation rate yoy": {
+      "n": 3,
+      "mean": -0.2,
+      "std": 0.173205
+    },
+    "JPY/core inflation rate yoy": {
+      "n": 3,
+      "mean": -0.1,
+      "std": 0.173205
     },
     "SEK/unemployment rate": {
       "n": 2,
@@ -1227,6 +1212,16 @@
       "n": 4,
       "mean": 2.65,
       "std": 19.297755
+    },
+    "USD/chicago fed national activity index": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.381051
+    },
+    "EUR/new car registrations yoy": {
+      "n": 2,
+      "mean": -0.55,
+      "std": 1.343503
     },
     "NZD/rbnz interest rate decision": {
       "n": 2,
@@ -1303,10 +1298,25 @@
       "mean": -0.15,
       "std": 0.212132
     },
+    "EUR/netherlands consumer confidence": {
+      "n": 2,
+      "mean": 4.5,
+      "std": 0.707107
+    },
     "CHF/current account": {
       "n": 2,
       "mean": 3.6,
       "std": 0.0
+    },
+    "EUR/european union new car registrations yoy": {
+      "n": 2,
+      "mean": 2.05,
+      "std": 2.333452
+    },
+    "EUR/france business confidence": {
+      "n": 2,
+      "mean": -0.5,
+      "std": 0.707107
     },
     "EUR/spain balance of trade": {
       "n": 2,
@@ -1330,18 +1340,6 @@
     }
   },
   "events": [
-    {
-      "currency": "USD",
-      "event": "API Crude Oil Stock Change",
-      "dateISO": "2025-07-22",
-      "hourUTC": "20:30",
-      "actual": "-0.577M",
-      "forecast": "",
-      "previous": "0.84",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
     {
       "currency": "CAD",
       "event": "New Housing Price Index MoM",
@@ -46629,19 +46627,6 @@
     {
       "date": "1 Jul",
       "dateISO": "2026-07-01",
-      "timeUTC": "00:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB Forum on Central Banking",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "1 Jul",
-      "dateISO": "2026-07-01",
       "timeUTC": "01:30",
       "country": "AUD",
       "currency": "AUD",
@@ -46664,19 +46649,6 @@
       "actual": "2.8%",
       "forecast": "-0.2%",
       "previous": "-0.4%"
-    },
-    {
-      "date": "1 Jul",
-      "dateISO": "2026-07-01",
-      "timeUTC": "04:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Netherlands Inflation Rate YoY",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "3.6%",
-      "previous": "3.5%"
     },
     {
       "date": "1 Jul",
@@ -46755,19 +46727,6 @@
       "actual": "54.3",
       "forecast": "56.5",
       "previous": "57.3"
-    },
-    {
-      "date": "1 Jul",
-      "dateISO": "2026-07-01",
-      "timeUTC": "07:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Austria Unemployment Rate",
-      "impact": "high",
-      "actual": null,
-      "forecast": "6.9%",
-      "previous": "7.1%"
     },
     {
       "date": "1 Jul",
@@ -46898,58 +46857,6 @@
       "actual": "98.0K",
       "forecast": "113.0K",
       "previous": "122.0K"
-    },
-    {
-      "date": "1 Jul",
-      "dateISO": "2026-07-01",
-      "timeUTC": "13:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada BoC Gov Macklem Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "1 Jul",
-      "dateISO": "2026-07-01",
-      "timeUTC": "13:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "1 Jul",
-      "dateISO": "2026-07-01",
-      "timeUTC": "13:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom BoE Gov Bailey Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "1 Jul",
-      "dateISO": "2026-07-01",
-      "timeUTC": "13:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Chair Warsh Speech",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "1 Jul",
@@ -49797,6 +49704,253 @@
       "actual": "2.011M",
       "forecast": "-1.25M",
       "previous": "-1.693M"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Unemployment Rate",
+      "impact": "high",
+      "actual": "4.4%",
+      "forecast": "4.4%",
+      "previous": "4.4%"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Full Time Employment Chg",
+      "impact": "medium",
+      "actual": "29.3K",
+      "forecast": null,
+      "previous": "7.2K"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Employment Change",
+      "impact": "high",
+      "actual": "76.3K",
+      "forecast": "15.0K",
+      "previous": "43.9K"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "04:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "European Union New Car Registrations YoY",
+      "impact": "medium",
+      "actual": "13.6%",
+      "forecast": "9.9%",
+      "previous": "3.2%"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "04:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Netherlands Consumer Confidence",
+      "impact": "medium",
+      "actual": "-35.0",
+      "forecast": "-40.0",
+      "previous": "-39.0"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Business Confidence",
+      "impact": "medium",
+      "actual": "101.0",
+      "forecast": "101.0",
+      "previous": "100.0"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "10:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom CBI Industrial Trends Orders",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-40.0",
+      "previous": "-45.0"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "10:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom CBI Business Optimism Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-40.0",
+      "previous": "-65.0"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB Interest Rate Decision",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.4%",
+      "previous": "2.4%"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Deposit Facility Rate",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.25%",
+      "previous": "2.25%"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Retail Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.0%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Retail Sales YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.5%",
+      "previous": "3.7%"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Retail Sales Ex Autos MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.4%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Chicago Fed National Activity Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.14",
+      "previous": "-0.1"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB Press Conference",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "14:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-16.8",
+      "previous": "-17.7"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "23:01",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Gfk Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-21.0",
+      "previous": "-23.0"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.7",
+      "previous": "1.5"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.6%",
+      "previous": "1.4%"
     }
   ]
 }
