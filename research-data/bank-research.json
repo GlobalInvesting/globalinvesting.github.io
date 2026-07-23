@@ -1,12 +1,100 @@
 {
-  "updated_utc": "2026-07-23T10:35:34.812510+00:00",
-  "updated_label": "10:35 UTC",
-  "total": 16,
+  "updated_utc": "2026-07-23T14:33:33.895933+00:00",
+  "updated_label": "14:33 UTC",
+  "total": 24,
   "sources": [
     "CME",
+    "ING",
     "Saxo"
   ],
   "items": [
+    {
+      "id": "edc0beef092d",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Lagarde’s comments at the press conference clearly point to September rate hike",
+      "excerpt": "EUROPE: Our take-away from the press conference: the European Central Bank has again turned more hawkish, suggesting that a September rate hike is almost a done…",
+      "author": "",
+      "url": "https://think.ing.com/articles/lagardes-comments-at-press-conference-clearly-point-to-september-rate-hike/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784813940000,
+      "published": "2026-07-23T13:39:00+00:00"
+    },
+    {
+      "id": "c445583c1397",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Central Bank of Turkey stays on hold, citing geopolitics",
+      "excerpt": "TURKEY: Turkey's central bank kept the policy rate unchanged, maintaining a cautious stance amid heightened geopolitical uncertainty and lingering inflation risks as oil prices rise…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/the-turkish-central-bank-remained-on-hold-citing-geopolitical-developments/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784808000000,
+      "published": "2026-07-23T12:00:00+00:00"
+    },
+    {
+      "id": "46f63156f221",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "ECB keeps interest rates on hold, avoids rattling markets",
+      "excerpt": "EUROPE: The ECB has kept interest rates on hold. Yet, with energy prices soaring, and assuming the June hike was not only an insurance move, a hike in September looks almost like a done…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/ecb-rate-decision-jul26/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784806380000,
+      "published": "2026-07-23T11:33:00+00:00"
+    },
+    {
+      "id": "693eaf893306",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Rates Spark: ECB ready to hike, just not today",
+      "excerpt": "The ECB should keep the policy rate at 2.25%, but we do see a September hike as likely, especially as oil prices are moving higher again. One could argue for a front-loaded hike today, but over previous years the ECB has always fully telegraphed any policy moves in advance. And with no hikes priced in by markets, deviating from this strategy seems…",
+      "author": "",
+      "url": "https://think.ing.com/articles/rates-spark-ecb-ready-to-hike-just-not-today/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784788920000,
+      "published": "2026-07-23T06:42:00+00:00"
+    },
+    {
+      "id": "5e09387782d9",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "FX Daily",
+      "title": "FX Daily: Can the ECB break the euro’s low-volatility torpor?",
+      "excerpt": "The ECB should keep rates on hold today, but we think policymakers will focus on preserving the hawkish market pricing. We suspect the now familiar post-meeting media leak will signal a September rate hike. That may keep EUR/USD supported from a rate perspective, delaying a break lower. In Australia, blowout jobs numbers are helping the bullish AUD…",
+      "author": "",
+      "url": "https://think.ing.com/articles/fx-daily-can-the-ecb-break-the-euros-low-volatility-torpor/",
+      "currencies": [
+        "USD",
+        "EUR",
+        "AUD"
+      ],
+      "pairs": [
+        "EUR/USD"
+      ],
+      "category": "macro",
+      "ts": 1784788860000,
+      "published": "2026-07-23T06:41:00+00:00"
+    },
     {
       "id": "09d615bb15ce",
       "bank": "Saxo",
@@ -26,6 +114,26 @@
       "category": "macro",
       "ts": 1784787840000,
       "published": "2026-07-23T06:24:00+00:00"
+    },
+    {
+      "id": "fa0f49983ec0",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Sterling’s rally is not built to last",
+      "excerpt": "Sterling’s rally has been driven more by positioning, carry and potentially some M A flows than by a lasting improvement in UK fundamentals. With UK short-dated rates likely to drift lower and fiscal risks set to return ahead of the autumn, we expect sterling to hand back recent gains. Our central view remains for EUR/GBP to rise towards 0.88 by…",
+      "author": "",
+      "url": "https://think.ing.com/articles/sterlings-rally-not-built-to-last/",
+      "currencies": [
+        "EUR",
+        "GBP"
+      ],
+      "pairs": [
+        "EUR/GBP"
+      ],
+      "category": "trade_idea",
+      "ts": 1784787180000,
+      "published": "2026-07-23T06:13:00+00:00"
     },
     {
       "id": "c4bb0338ef72",
@@ -61,6 +169,38 @@
       "category": "macro",
       "ts": 1784732901000,
       "published": "2026-07-22T15:08:21+00:00"
+    },
+    {
+      "id": "0dfcc38d5025",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "A new round of tariff woes: disturbing but not disruptive (for now)",
+      "excerpt": "TRADE: Just when it seemed the summer break was within reach, a new round of trade tensions is already looming. August is increasingly shaping up to be another summer month dominated by trade disputes and tariff…",
+      "author": "",
+      "url": "https://think.ing.com/articles/a-new-round-of-tariff-woes-disturbing-but-not-disruptive-for-now/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784729280000,
+      "published": "2026-07-22T14:08:00+00:00"
+    },
+    {
+      "id": "6b55327cd6f5",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Investment lifts Polish second-quarter growth despite consumption slowdown",
+      "excerpt": "CENTRAL AND EASTERN EUROPE: Despite stronger-than-expected growth in June, second-quarter retail sales growth was slower than in 1Q26, pointing to a moderation in private consumption growth. Nevertheless, robust fixed investment growth more than offset weaker consumption spending, lifting GDP growth to around 3.8% YoY in the second quarter from 3.5% YoY in the…",
+      "author": "",
+      "url": "https://think.ing.com/articles/polands-2q26-gdp-growth-likely-improved-as-investment-outweighed-a-slowdown-in-consumption/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1784713140000,
+      "published": "2026-07-22T09:39:00+00:00"
     },
     {
       "id": "9280b28440e5",
