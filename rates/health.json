@@ -1,5 +1,5 @@
 {
-  "runTimestamp": "2026-07-23T06:15:10.140061Z",
+  "runTimestamp": "2026-07-23T06:29:46.255729Z",
   "runDate": "2026-07-23",
   "frankfurterOk": true,
   "currencies": {
@@ -53,9 +53,9 @@
       "issues": []
     },
     "NZD": {
-      "status": "fallback",
+      "status": "cached",
       "rate": "2.5",
-      "source": "BIS-CBPOL (merged history)",
+      "source": "cached-file",
       "date": "2026-07-01",
       "issues": []
     },
@@ -76,11 +76,7 @@
   },
   "issues": [],
   "warnings": [
-    "EUR: kept cached 2026-07-01 value over older ECB-SDMX candidate (2026-06-17) \u2014 likely a laggy fallback source",
-    "JPY: kept cached 2026-07-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source",
-    "AUD: kept cached 2026-07-01 value over older RBA-HTML candidate (2026-06-17) \u2014 likely a laggy fallback source",
-    "NOK: kept cached 2026-07-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source",
-    "SEK: kept cached 2026-07-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source"
+    "NZD: kept cached 2026-07-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source"
   ],
   "overallStatus": "degraded_cached"
 }
