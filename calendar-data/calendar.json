@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-23T11:22:44Z",
-  "generatedAt": "2026-07-23T11:22:44Z",
+  "lastUpdate": "2026-07-23T15:29:19Z",
+  "generatedAt": "2026-07-23T15:29:19Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-23",
   "rangeTo": "2026-07-23",
-  "totalEvents": 4008,
+  "totalEvents": 4012,
   "currencyCounts": {
-    "CAD": 318,
+    "CAD": 319,
     "EUR": 881,
-    "USD": 1268,
+    "USD": 1271,
     "GBP": 474,
     "AUD": 288,
     "CHF": 167,
@@ -24,29 +24,29 @@
   },
   "impactCounts": {
     "medium": 2129,
-    "high": 1651,
+    "high": 1655,
     "low": 228
   },
   "surpriseStats": {
     "CAD/retail sales mom": {
-      "n": 4,
-      "mean": 0.375,
-      "std": 0.4272
+      "n": 6,
+      "mean": 0.25,
+      "std": 0.383406
     },
     "CAD/retail sales yoy": {
-      "n": 4,
-      "mean": 1.5,
-      "std": 0.844591
+      "n": 5,
+      "mean": 1.68,
+      "std": 0.834865
     },
     "CAD/retail sales ex autos mom": {
-      "n": 4,
-      "mean": -0.25,
-      "std": 0.519615
+      "n": 5,
+      "mean": -0.24,
+      "std": 0.450555
     },
     "EUR/consumer confidence": {
-      "n": 11,
-      "mean": -0.890909,
-      "std": 6.003908
+      "n": 12,
+      "mean": -0.741667,
+      "std": 5.747799
     },
     "EUR/ifo business climate": {
       "n": 3,
@@ -374,12 +374,12 @@
       "std": 0.152753
     },
     "EUR/ecb interest rate decision": {
-      "n": 3,
+      "n": 4,
       "mean": 0.0,
       "std": 0.0
     },
     "EUR/deposit facility rate": {
-      "n": 3,
+      "n": 4,
       "mean": 0.0,
       "std": 0.0
     },
@@ -429,19 +429,19 @@
       "std": 34.504492
     },
     "USD/initial jobless claims": {
-      "n": 15,
-      "mean": 1.666667,
-      "std": 9.904304
+      "n": 16,
+      "mean": 3.125,
+      "std": 11.206397
     },
     "USD/jobless claims 4-week average": {
-      "n": 15,
-      "mean": 0.883333,
-      "std": 4.25196
+      "n": 16,
+      "mean": 1.171875,
+      "std": 4.266848
     },
     "USD/continuing jobless claims": {
-      "n": 15,
-      "mean": 0.466667,
-      "std": 17.646799
+      "n": 16,
+      "mean": 1.25,
+      "std": 17.333974
     },
     "USD/core pce price index mom": {
       "n": 4,
@@ -1214,9 +1214,9 @@
       "std": 19.297755
     },
     "USD/chicago fed national activity index": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.381051
+      "n": 4,
+      "mean": -0.04,
+      "std": 0.321248
     },
     "EUR/new car registrations yoy": {
       "n": 2,
@@ -49818,7 +49818,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area ECB Interest Rate Decision",
       "impact": "high",
-      "actual": null,
+      "actual": "2.4%",
       "forecast": "2.4%",
       "previous": "2.4%"
     },
@@ -49831,7 +49831,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area Deposit Facility Rate",
       "impact": "high",
-      "actual": null,
+      "actual": "2.25%",
       "forecast": "2.25%",
       "previous": "2.25%"
     },
@@ -49844,9 +49844,22 @@
       "flag": "🇨🇦",
       "event": "Canada Retail Sales MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "1.0%",
       "forecast": "1.0%",
-      "previous": "0.5%"
+      "previous": "0.4%"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Retail Sales MoM",
+      "impact": "high",
+      "actual": "0.4%",
+      "forecast": "0.4%",
+      "previous": "1.0%"
     },
     {
       "date": "23 Jul",
@@ -49857,9 +49870,9 @@
       "flag": "🇨🇦",
       "event": "Canada Retail Sales YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "5.9%",
       "forecast": "3.5%",
-      "previous": "3.7%"
+      "previous": "3.6%"
     },
     {
       "date": "23 Jul",
@@ -49870,9 +49883,22 @@
       "flag": "🇨🇦",
       "event": "Canada Retail Sales Ex Autos MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "1.2%",
       "forecast": "1.4%",
-      "previous": "0.1%"
+      "previous": "0.0%"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Jobless Claims 4-week Average",
+      "impact": "high",
+      "actual": "207.5K",
+      "forecast": "213.0K",
+      "previous": "214.75K"
     },
     {
       "date": "23 Jul",
@@ -49883,9 +49909,35 @@
       "flag": "🇺🇸",
       "event": "United States Chicago Fed National Activity Index",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.02",
       "forecast": "0.14",
-      "previous": "-0.1"
+      "previous": "-0.19"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": "187.0K",
+      "forecast": "212.0K",
+      "previous": "209.0K"
+    },
+    {
+      "date": "23 Jul",
+      "dateISO": "2026-07-23",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "high",
+      "actual": "1796.0K",
+      "forecast": "1809.0K",
+      "previous": "1798.0K"
     },
     {
       "date": "23 Jul",
@@ -49909,7 +49961,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area Consumer Confidence",
       "impact": "medium",
-      "actual": null,
+      "actual": "-15.9",
       "forecast": "-16.8",
       "previous": "-17.7"
     },
