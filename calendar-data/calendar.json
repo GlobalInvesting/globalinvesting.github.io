@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-24T11:15:37Z",
-  "generatedAt": "2026-07-24T11:15:37Z",
+  "lastUpdate": "2026-07-24T15:10:54Z",
+  "generatedAt": "2026-07-24T15:10:54Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -534,14 +534,14 @@
       "std": 2.902298
     },
     "USD/new home sales mom": {
-      "n": 4,
-      "mean": -4.6,
-      "std": 7.244308
+      "n": 5,
+      "mean": -4.04,
+      "std": 6.3975
     },
     "USD/new home sales": {
-      "n": 4,
-      "mean": -0.03575,
-      "std": 0.040893
+      "n": 5,
+      "mean": -0.025,
+      "std": 0.042802
     },
     "USD/ism services pmi": {
       "n": 3,
@@ -1044,9 +1044,9 @@
       "std": 0.15
     },
     "CAD/new housing price index mom": {
-      "n": 3,
-      "mean": -0.266667,
-      "std": 0.11547
+      "n": 4,
+      "mean": -0.175,
+      "std": 0.206155
     },
     "GBP/employment change": {
       "n": 4,
@@ -1337,6 +1337,11 @@
       "n": 2,
       "mean": 0.95,
       "std": 1.767767
+    },
+    "CAD/manufacturing sales mom": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.070711
     }
   },
   "events": [
@@ -50007,7 +50012,7 @@
       "flag": "🇨🇦",
       "event": "Canada New Housing Price Index MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.1%",
       "forecast": "-0.2%",
       "previous": "-0.3%"
     },
@@ -50020,7 +50025,7 @@
       "flag": "🇨🇦",
       "event": "Canada Manufacturing Sales MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.1%",
       "forecast": "-0.2%",
       "previous": "1.3%"
     },
@@ -50033,9 +50038,9 @@
       "flag": "🇺🇸",
       "event": "United States New Home Sales MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "1.6%",
       "forecast": "3.4%",
-      "previous": "-7.3%"
+      "previous": "-4.3%"
     },
     {
       "date": "24 Jul",
@@ -50046,9 +50051,9 @@
       "flag": "🇺🇸",
       "event": "United States New Home Sales",
       "impact": "high",
-      "actual": null,
+      "actual": "0.628M",
       "forecast": "0.61M",
-      "previous": "0.58M"
+      "previous": "0.618M"
     }
   ]
 }
