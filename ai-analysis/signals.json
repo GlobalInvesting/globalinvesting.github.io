@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-07-23T21:06:10Z",
+  "generated_at": "2026-07-24T02:12:13Z",
   "signals": [
     {
-      "time": "21:05",
+      "time": "02:11",
       "priority": "critical",
-      "title": "GBP/USD — G10 Bilateral Theme + Geopolitical Shock",
-      "text": "GBP/USD trades at 1.3316, slumping as the Greenback captures a flight-to-safety bid following Houthi tanker attacks in the Red Sea. The USD leads G10 performance with a +0.803% average gain while GBP lags at -0.608%, creating a massive 1.411% spread that underscores a dominant bilateral theme. The move is reinforced by a bear-flattener yield curve regime as Brent crude prices surge above $100, resetting Fed hike expectations. While the 12bp carry advantage slightly favors GBP (SONIA 3.73% vs SOFR 3.61%), the 0.78% UK real rate is being outpaced by the 1.47% US real rate, favoring the USD in a high-inflation environment. Price has now breached the SMA20/50 cluster at 1.3362/1.3372, transitioning the technical posture to a bearish bias. Risk: De-escalation in the Gulf prompts a sharp reversal of the safety bid and a return to the neutral nominal carry baseline.",
+      "title": "GBP/USD — G10 Bilateral Theme + Geopolitical Risk",
+      "text": "GBP/USD trades at 1.3319, pressured by a dominant USD outperformance theme as the G10 spread reaches a critical 1.317% gap. The greenback finds fresh bids following Houthi tanker attacks and rising oil prices, triggering a 'risk-off' USD demand that contrasts with the moderate negative bias in UK economic data (CESI net -7). While GBP/USD holds slightly above its SMA20 at 1.3362, the technical posture remains fragile below the SMA200 at 1.3400. Speculative positioning is currently net long +28,278 (64.8%), suggesting a crowded trade vulnerable to further liquidation if geopolitical tensions escalate. The neutral OIS carry differential (Fed 3.75% vs BoE 3.75%) offers no structural support for the pair. Watch for a close below 1.3310 to signal a test of the SMA50 cluster. Risk: A de-escalation in Middle East tensions or a hawkish BoE hold on July 30 triggers a short-squeeze in GBP.",
       "evidence": [
-        "USD 1W avg: +0.803% (n=7)",
-        "GBP 1W avg: -0.608% (n=4)",
-        "G10 spread: 1.411%"
+        "USD 1W avg: +0.743% (n=7)",
+        "GBP 1W avg: -0.574% (n=4)",
+        "G10 spread: 1.317%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:02",
+      "time": "02:08",
       "priority": "critical",
-      "title": "USD/JPY — Positioning + Carry + Intervention Risk",
-      "text": "USD/JPY trades at 163.87, well above the 160.00 psychological level and the SMA20/50/200 cluster (162.20/160.84/157.58). A 275bp Fed-BoJ carry differential provides a structural bid that specimen shorts are failing to break, with COT LF net short at -105,238. Despite this crowding, the options market is pricing in heavy protection against a JPY rally, with a 1M 25d RR skew of -1.36 and a 3.4% Vol Risk Premium (IV 7.2% vs HV30 3.8%). Retail traders are aggressively fading the move with 75% short positioning, creating a classic institutional-retail divergence. While JPY's safe-haven function is currently impaired (corr vs VIX at -0.098), the extreme price level at 163+ and upcoming Tokyo inflation data Friday increase the probability of BoJ verbal or physical intervention. Risk: BoJ remains passive despite 160+ levels, allowing the carry-driven momentum to target 165.00.",
+      "title": "USD/JPY — Intervention Risk + Positioning + Vol",
+      "text": "USD/JPY trades at 163.78, remaining well above the 160.00 level that previously triggered BoJ verbal warnings and now testing the readiness of FinMin Katayama for 'decisive action.' Despite JPY headline inflation jumping to 1.7%, the BoJ is expected to hold rates at 1.0% next week, maintaining a massive +264bp OIS carry advantage for the USD. The options market shows a moderate put skew with 25d RR at -1.36 (Saxo), signaling that institutional players are paying a premium for downside protection despite the spot trend. Speculative shorts are heavily crowded at net -105,238 (LF long% 28.0%), creating an asymmetric risk profile for a disorderly unwind if intervention occurs. Volatility is rising with IV at 7.2% vs HV30 at 3.8%, reflecting a +3.5% VRP as markets price in tail risks. BoJ holds at 1.0%.",
       "evidence": [
-        "JPY COT LF net: -105,238",
         "USD/JPY 25d RR: -1.36",
-        "Retail USD/JPY: 75% short"
+        "JPY COT LF net short: -105,238",
+        "USD/JPY VRP: +3.5%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:00",
+      "time": "02:05",
       "priority": "warning",
-      "title": "EUR/USD — Positioning + Options + CESI Divergence",
-      "text": "EUR/USD trades at 1.1375, testing the recent low as it remains pinned below its entire SMA cluster (SMA20 at 1.1420). The pair faces a significant fundamental headwind with a -41 CESI net score, indicating persistent Eurozone data misses compared to the +29 USD beat rate. Speculative positioning is heavily skewed short at -74,637 (33.3% long), yet the options market remains cautious with an elevated 2.5% VRP (IV 7.1% vs HV30 4.6%). This volatility premium suggests the market is paying for protection against a further breakdown toward 1.1350 rather than buying the dip. The 135bp carry advantage (Fed 3.75% vs ECB 2.4%) structurally favors the USD, especially as energy price spikes weigh on the Eurozone trade balance. Risk: ECB pivot to a more aggressive hiking stance at the September 10 meeting to combat energy-led inflation.",
+      "title": "EUR/USD — Positioning + Economic Surprise + Vol",
+      "text": "EUR/USD trades at 1.1387, positioned below its SMA20/50/200 cluster (1.1420 to 1.1642) in a bearish technical alignment. The pair faces persistent headwinds from a 'Strong Negative' economic surprise index (CESI net -41), indicating Eurozone data is consistently missing forecasts compared to the 'Strong Positive' USD print (+29). Speculative positioning has shifted into a net short of -74,637 (long% 33.3%), aligning with the +144bp OIS carry advantage favoring the USD. FX options are pricing an elevated premium with IV at 7.1% vs HV30 of 4.5%, suggesting the market is hedging for a break lower rather than a mean-reversion move. The mild put skew in 25d RR (-0.40) confirms a slight directional bias toward further EUR weakness. Risk: A hawkish ECB surprise on Sept 10 or an unexpected cooling in US CPI narrows the real rate differential (+1.47% USD vs +0.16% EUR).",
       "evidence": [
         "EUR CESI net: -41",
-        "EUR COT LF net: -74,637",
-        "EUR/USD VRP: +2.5%"
+        "EUR COT LF net short: -74,637",
+        "EUR/USD VRP: +2.6%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:57",
-      "priority": "warning",
-      "title": "AUD/USD — Positioning + Volatility + Retail Divergence",
-      "text": "AUD/USD is trading at 0.6970, holding above the SMA20 (0.6950) but remains capped by the SMA50 (0.7036). COT speculators are net long +21,946, a bullish stance that is now under pressure as risk aversion sweeps through the G10. The options market is pricing in extreme fear with an AUD/USD VRP of +6.9% (IV 12.9% vs HV30 6.0%), the second-highest in the G10, as the -0.66 put skew signals demand for downside protection. A retail divergence is developing with 59% of retail shorting the pair against the institutional long, though this is overshadowed by the strong negative CESI trend (-14). While the 74bp OIS carry premium (AONIA 4.35% vs SOFR 3.61%) supports the AUD, it is being neutralized by the flight to USD. Risk: RBA adopts a dovish tone at the August 11 meeting, removing the carry support and triggering a long unwind toward 0.6896.",
-      "evidence": [
-        "AUD COT LF net: +21,946",
-        "AUD/USD VRP: +6.9%",
-        "AUD CESI net: -14"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "20:52",
+      "time": "02:00",
       "priority": "info",
-      "title": "CAD/JPY — Retail Extreme + Carry Divergence",
-      "text": "CAD/JPY intraday price action shows a 0.47% gain to 116.321, fueled by the 6.22% surge in WTI oil prices toward $92.2. Retail sentiment has hit an extreme with 91% of traders short, positioning for a reversal that has yet to materialize. This contrarian signal is reinforced by a 125bp carry advantage (BoC 2.25% vs BoJ 1.0%), though USD/CAD vs WTI oil shows a major correlation break (z = -1.66σ), suggesting the Loonie is not capturing the full energy tailwind due to broader USD strength. Technically, CAD sits in a neutral SMA posture while JPY remains the G10 underperformer. The 116.00 level now serves as immediate support. Risk: A sudden cooling in oil prices or BoJ intervention rumors triggers a sharp retail-led short squeeze on the JPY cross.",
+      "title": "AUD/USD — Carry vs Sentiment + Vol",
+      "text": "AUD/USD trades at 0.6978, supported by a -73bp OIS carry premium (favoring AUD) and a restrictive real policy rate of +0.39%. Retail sentiment shows a 59% short bias, but the critical signal emerges from the options market where the VRP is at an extreme +7.1% (IV 13.1% vs HV30 6.0%), the highest in the G10 space. This suggests massive demand for AUD downside protection despite the RBA's hawkish bias and speculative net long positioning (+21,946). The pair is currently holding above its SMA20 (0.6950) but below the SMA50 (0.7036), indicating a lack of directional momentum. The strong negative economic surprise index for Australia (CESI -14) acts as a persistent drag. Risk: A break of the SMA20 at 0.6950 triggers a liquidation of the spec long and a spike in realized volatility.",
       "evidence": [
-        "Retail CAD/JPY: 91% short",
-        "CAD/JPY Carry: +125bp",
-        "WTI Oil: $92.2 (+6.22%)"
+        "AUD/USD VRP: +7.1%",
+        "AUD/USD OIS Carry: -73bp",
+        "AUD COT LF net long: +21,946"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
