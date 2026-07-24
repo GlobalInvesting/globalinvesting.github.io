@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-24T07:53:10Z",
-  "generatedAt": "2026-07-24T07:53:10Z",
+  "lastUpdate": "2026-07-24T11:15:37Z",
+  "generatedAt": "2026-07-24T11:15:37Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1224,9 +1224,9 @@
       "std": 1.063015
     },
     "GBP/dmp 1y cpi expectations": {
-      "n": 2,
-      "mean": -0.45,
-      "std": 0.070711
+      "n": 3,
+      "mean": -0.366667,
+      "std": 0.152753
     },
     "AUD/consumer inflation expectations": {
       "n": 2,
@@ -1322,6 +1322,11 @@
       "n": 2,
       "mean": -1.35,
       "std": 0.353553
+    },
+    "EUR/ecb consumer inflation expectations": {
+      "n": 2,
+      "mean": -0.55,
+      "std": 0.212132
     },
     "AUD/private house approvals mom": {
       "n": 2,
@@ -49976,7 +49981,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area ECB Consumer Inflation Expectations",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.0%",
       "forecast": "3.7%",
       "previous": "3.5%"
     },
@@ -49989,7 +49994,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom DMP 1Y CPI Expectations",
       "impact": "high",
-      "actual": null,
+      "actual": "3.0%",
       "forecast": "3.2%",
       "previous": "3.3%"
     },
