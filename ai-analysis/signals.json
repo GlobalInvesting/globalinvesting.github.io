@@ -1,67 +1,68 @@
 {
-  "generated_at": "2026-07-24T15:52:04Z",
+  "generated_at": "2026-07-24T21:05:05Z",
   "signals": [
     {
-      "time": "15:51",
+      "time": "18:08",
       "priority": "critical",
-      "title": "USD/CHF — G10 Bilateral Theme + Cross-Asset Risk",
-      "text": "USD/CHF trades at 0.8167, maintaining its position above the SMA20/50/200 cluster (0.8085/0.7996/0.7920). The pair serves as the primary vehicle for the current G10 bilateral theme, with the USD outperforming the G10 average by +0.638% while CHF laggards at -0.481%. A massive 375bp Fed-SNB carry advantage (Fed 3.75% vs SNB 0.0%) provides the structural bid, while a +1.47% USD real rate vs -0.62% CHF real rate confirms the fundamental divergence. Despite wider Middle East war headlines, the lack of acute risk-off sentiment (VIX 17.7) prevents a CHF safe-haven bid from compressing the carry spread. Options market pricing shows extreme complacency with a +6.4% VRP (IV 12.2% vs HV30 5.8%), suggesting the move is unhedged. Risk: VIX breaks above 25, triggering a rapid unwinding of the 375bp carry trade and a return toward the SMA20 at 0.8085.",
+      "title": "USD/CHF — G10 Bilateral Theme + Trump Tariff Risk",
+      "text": "Trump's weekend threats regarding EU auto tariffs and retaliation against EU fines drive safe-haven USD demand against the G10 laggard CHF. This bilateral theme is underpinned by a massive +375bp OIS carry advantage for the USD and a restrictive +1.47% real rate vs CHF's accommodative -0.62%. The next Fed meeting (mkt: 100% hold priced) on 29 Jul is the catalyst for confirming this yield dominance.",
       "evidence": [
-        "USD 1W avg: +0.638% (n=7)",
-        "CHF 1W avg: -0.481% (n=6)",
-        "G10 spread: 1.119%",
+        "USD 1W avg: +0.765% (n=7)",
+        "CHF 1W avg: -0.497% (n=6)",
+        "G10 spread: 1.262%",
         "USD/CHF carry: +375bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:48",
+      "time": "19:28",
       "priority": "warning",
-      "title": "USD/JPY — Carry + COT/Retail Divergence",
-      "text": "USD/JPY at 163.73 is consolidating just below its recent multi-decade highs, holding firmly above the SMA20 at 162.30. The pair is underpinned by a 275bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 1.0%), though technicals show consolidation ahead of the July 31 BoJ meeting. A significant positioning divergence is active: COT LF net short is extreme at -105,238 (28% long) while retail sentiment is 80% short, indicating both specs and retail are heavily fading the upside. Options markets remain wary with a -1.48 25d RR put skew, signalling that institutional desks are paying for downside protection against potential BoJ intervention. The positive CESI for JPY (+10) vs USD (+29) suggests domestic data is supporting JPY, even as the carry trade remains the dominant flow. Risk: BoJ delivers a surprise hawkish shift on July 31, triggering a massive short squeeze of the crowded JPY short position.",
+      "title": "USD/JPY — JPY COT Short Squeeze Risk",
+      "text": "JPY COT net short -105.2k (28% long) creates significant squeeze risk if the 163.79 resistance fails, despite the +264bp OIS carry favoring USD. While the pair remains in a technical uptrend above all major SMAs, the positive JPY CESI (+10) suggests domestic data is outperforming, providing fundamental fuel for an unwind. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for resolving the carry vs. positioning conflict.",
       "evidence": [
-        "USD/JPY carry: +275bp",
-        "JPY COT LF net: -105,238",
-        "USD/JPY Retail: 80% short",
-        "USD/JPY 25d RR: -1.48"
+        "JPY COT net short -105.2k",
+        "USD/JPY OIS carry +264bp",
+        "JPY CESI: +10",
+        "Retail: 80% short USD/JPY"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:46",
+      "time": "18:08",
       "priority": "warning",
-      "title": "EUR/USD — Positioning + Economic Surprise Divergence",
-      "text": "EUR/USD trades at 1.1390, remaining technically heavy below its entire SMA cluster (SMA20 1.142 to SMA200 1.164). COT positioning shows specs are net short EUR (-74,637) with only 33.3% long, a view reinforced by a stark Economic Surprise Index (CESI) divergence where the US is at +29 beats vs the Eurozone's -43 misses. While the ECB bias remains hawkish for September, a 135bp carry deficit (Fed 3.75% vs ECB 2.4%) continues to favor the Greenback. Options markets are pricing a +2.6% VRP, indicating that realized volatility is significantly lower than implied, suggesting a slow-grind lower rather than a volatile breakdown. The 25d RR shows a mild -0.49 put skew, confirming the market remains biased toward EUR weakness in the medium term. Risk: ECB explicitly commits to a 50bp September hike, closing the real rate gap and forcing a cover of the COT short position.",
+      "title": "EUR/USD — CESI Negative Divergence + Tariff Pressure",
+      "text": "EUR COT net short -74.6k and a deeply negative CESI (-43) signal persistent fundamental weakness as Trump tariff rhetoric targets the EU. The 1.1375 Friday close sits below all major SMAs, while the +144bp OIS carry advantage for USD further incentivizes the downside. The next Fed meeting (mkt: 100% hold priced) on 29 Jul is the catalyst for a potential break toward the 1.1200 handle.",
       "evidence": [
-        "EUR COT LF net: -74,637",
-        "EUR CESI: -43 misses",
-        "EUR/USD carry: +135bp",
-        "VRP: +2.6%"
+        "EUR CESI: -43",
+        "EUR COT net short -74.6k",
+        "EUR/USD OIS carry +144bp favors USD",
+        "Position: below SMA20/50/200"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:43",
-      "priority": "warning",
-      "title": "AUD/USD — Positioning vs Data Divergence",
-      "text": "AUD/USD at 0.6995 is caught between bullish speculative positioning and deteriorating fundamental data. COT LF net long is at +21,946 (63.2% long), yet the pair faces a strong negative CESI (-14 misses), suggesting the currency is failing to live up to market expectations. Despite a 60bp carry advantage for the AUD (RBA 4.35% vs Fed 3.75%), the pair is struggling to hold above its SMA50 at 0.7031. Options volatility is at an extreme with a +6.5% VRP (IV 12.5% vs HV30 6.0%) and a moderate -0.90 25d RR put skew, indicating that while specs are long in futures, the options market is aggressively hedging for a downside reversal. This conflict between long spec positioning and bearish options/data metrics creates an asymmetric risk profile to the downside. Risk: RBA shifts to a dovish hold at the August 11 meeting, invalidating the carry-support thesis.",
-      "evidence": [
-        "AUD COT LF net: +21,946",
-        "AUD CESI: -14 misses",
-        "AUD/USD VRP: +6.5%",
-        "AUD/USD 25d RR: -0.90"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "15:40",
+      "time": "17:40",
       "priority": "info",
-      "title": "USD/CAD — Correlation Break + Technical Levels",
-      "text": "USD/CAD at 1.4081 has broken its historical relationship with energy markets, with its correlation to WTI Oil collapsing to -0.925 (z = -1.59σ) compared to a near-zero norm. While Oil has dropped -4.57% today to $88.0, USDCAD remains sidelined, holding below its SMA20 (1.4136) but above its SMA50 (1.4013). This decoupling suggests that the 150bp USD carry advantage (Fed 3.75% vs BoC 2.25%) and general USD strength (DXY 101.31) are currently more influential than commodity flows. Speculative positioning is heavily short CAD at -93,515 (20.6% long), yet the pair has failed to extend higher, suggesting a period of distribution. Watch the 1.4000 psychological support level for signs of a deeper correction if the USD-centric theme pauses. Risk: A sudden spike in Oil prices above $95/bbl restores the traditional correlation and triggers CAD short-covering.",
+      "title": "AUD/USD — Carry Support vs. Negative Data Flow",
+      "text": "AUD COT net long +21.9k (63% long) is vulnerable to a washout as AUD CESI (-14) highlights persistent data misses, keeping the pair stuck near 0.6983. The -73bp OIS carry advantage for AUD provides a structural floor, but the neutral retail bias suggests no immediate contrarian catalyst. The next RBA meeting (mkt: 21% hike priced) on 11 Aug determines if the current hike bias can withstand deteriorating economic surprises.",
       "evidence": [
-        "USD/CAD vs WTI Corr: -0.925 (z=-1.59σ)",
-        "CAD COT LF net: -93,515",
-        "USD/CAD carry: +150bp"
+        "AUD COT net long +21.9k",
+        "AUD CESI: -14",
+        "AUD/USD OIS carry -73bp (favors AUD)",
+        "AUD/USD IV 13.1% vs HV30 6.0%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "16:31",
+      "priority": "info",
+      "title": "GBP/USD — Positioning Crowding + Geopolitical Risk",
+      "text": "GBP COT net long +28.2k (64.8% long) creates downside risk as the pair trades below its SMA200 (1.34) following a 1.19% weekly decline. While the -11bp OIS carry is nearly neutral, upcoming shipping security talks in London and soft oil prices introduce idiosyncratic volatility. The next BoE meeting (mkt: 100% hold priced) on 30 Jul is the catalyst for confirming the current hold bias and clearing the long-positioning overhang.",
+      "evidence": [
+        "GBP COT net long +28.2k",
+        "GBP/USD 1W: -1.19%",
+        "Position: below SMA20/50/200",
+        "OIS carry: -11bp (favors GBP)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
