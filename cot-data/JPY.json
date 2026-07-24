@@ -1,23 +1,15 @@
 {
-  "netPosition": -105238,
-  "longPositions": 66955,
-  "shortPositions": 172193,
+  "netPosition": -114030,
+  "longPositions": 65418,
+  "shortPositions": 179448,
   "positionCategory": "Leveraged Funds (speculative)",
-  "assetManagerNet": -51166,
-  "assetManagerLong": 77332,
-  "assetManagerShort": 128498,
-  "dealerNet": 101986,
-  "dealerLong": 121729,
-  "dealerShort": 19743,
+  "assetManagerNet": -77443,
+  "assetManagerLong": 74194,
+  "assetManagerShort": 151637,
+  "dealerNet": 146832,
+  "dealerLong": 160602,
+  "dealerShort": 13770,
   "history": [
-    {
-      "weekEnding": "2025-07-22",
-      "levNet": -11571,
-      "levLong": 35390,
-      "levShort": 46961,
-      "assetManagerNet": 72326,
-      "dealerNet": -161273
-    },
     {
       "weekEnding": "2025-07-29",
       "levNet": -31280,
@@ -425,12 +417,20 @@
       "levShort": 172193,
       "assetManagerNet": -51166,
       "dealerNet": 101986
+    },
+    {
+      "weekEnding": "2026-07-21",
+      "levNet": -114030,
+      "levLong": 65418,
+      "levShort": 179448,
+      "assetManagerNet": -77443,
+      "dealerNet": 146832
     }
   ],
   "sourceType": "options_futures_combined",
   "source": "CFTC Official",
   "sourceUrl": "https://www.cftc.gov/dea/options/financial_lof.htm",
-  "reportDate": "2026-07-20",
-  "lastUpdate": "2026-07-20",
-  "weekEnding": "2026-07-14"
+  "reportDate": "2026-07-24",
+  "lastUpdate": "2026-07-24",
+  "weekEnding": "2026-07-21"
 }
