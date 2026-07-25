@@ -38,6 +38,47 @@
   transition:color .1s,background .1s;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
 #cot-m-close:hover { color:var(--text);background:var(--bg3); }
+
+/* ── Currency switcher (in-modal, no need to close/reopen) ─────────────────── */
+#cot-m-title-row { display:flex;align-items:center;gap:5px; }
+.cot-ccy-arrow {
+  background:none;border:none;color:var(--text3,#4e5c70);font-size:11px;
+  cursor:pointer;padding:2px 4px;border-radius:3px;line-height:1;
+  transition:color .1s,background .1s;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+}
+.cot-ccy-arrow:hover { color:var(--text);background:var(--bg3); }
+.cot-ccy-arrow:disabled { opacity:.3;cursor:default; }
+.cot-ccy-arrow:disabled:hover { background:none;color:var(--text3,#4e5c70); }
+#cot-ccy-switch { position:relative;display:inline-flex; }
+#cot-ccy-chip {
+  background:var(--bg3,#151b26);border:1px solid var(--border,#252d3d);border-radius:4px;
+  color:var(--text);font-size:13px;font-weight:600;padding:1px 7px;cursor:pointer;
+  font-family:var(--font-ui,'Inter',-apple-system,sans-serif);letter-spacing:-.01em;
+  display:inline-flex;align-items:center;gap:4px;transition:border-color .1s,background .1s;
+}
+#cot-ccy-chip:hover { border-color:var(--blue);background:var(--bg2); }
+#cot-ccy-chip::after {
+  content:'';width:0;height:0;margin-left:1px;
+  border-left:3.5px solid transparent;border-right:3.5px solid transparent;
+  border-top:4px solid var(--text3,#4e5c70);
+}
+#cot-ccy-dd {
+  display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:20;
+  background:var(--bg2);border:1px solid var(--border,#252d3d);border-radius:5px;
+  box-shadow:0 6px 18px rgba(0,0,0,.4);padding:4px;min-width:64px;
+  grid-template-columns:repeat(2,1fr);gap:2px;
+}
+#cot-ccy-dd.open { display:grid; }
+.cot-ccy-dd-item {
+  background:none;border:none;color:var(--text2);font-size:11px;font-weight:600;
+  padding:5px 6px;border-radius:3px;cursor:pointer;text-align:center;
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  transition:color .1s,background .1s;
+}
+.cot-ccy-dd-item:hover { color:var(--text);background:var(--bg3); }
+.cot-ccy-dd-item.on { color:var(--blue);background:var(--bg3); }
+.cot-ccy-dd-item:disabled { opacity:.3;cursor:default; }
+.cot-ccy-dd-item:disabled:hover { background:none;color:var(--text2); }
 #cot-m-metrics {
   display:grid;grid-template-columns:repeat(6,1fr);
   border-bottom:1px solid var(--border,#252d3d);
@@ -613,7 +654,8 @@ function _cotEnsureLWLib() {
   return _cotLwLibPromise;
 }
 
-function openCOTModal(ccy,data){
+function openCOTModal(ccy,data,opts){
+  const _preserveTab = opts && opts.preserveTab;
   closeCOTModal();
   const history=Array.isArray(data.history)?[...data.history]:[];
   const net=data.netPosition||0,long_=data.longPositions||0,short_=data.shortPositions||0;
@@ -642,13 +684,33 @@ function openCOTModal(ccy,data){
   const amData=history.map(h=>h.assetManagerNet??null);
   const ddData=history.map(h=>h.dealerNet??null);
 
+  // Currency switcher — cycles/picks from whatever is already cached in COT_DATA_STORE,
+  // so switching never triggers a re-fetch. G10_CCYS order kept canonical; filtered to
+  // currencies that actually have data loaded (a failed fetch for one ccy shouldn't
+  // produce a dead entry in the switcher).
+  const _store=window.COT_DATA_STORE||{};
+  const _order=(typeof G10_CCYS!=='undefined'?G10_CCYS:['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK']);
+  const _avail=_order.filter(c=>_store[c]);
+  const _idx=_avail.indexOf(ccy);
+
   const bd=document.createElement('div');
   bd.id='cot-bd';
   bd.innerHTML=`
 <div id="cot-modal">
   <div id="cot-m-hd">
     <div>
-      <div id="cot-m-title">CFTC Positioning · ${ccy} · Leveraged Funds</div>
+      <div id="cot-m-title-row">
+        <span>CFTC Positioning ·</span>
+        <button class="cot-ccy-arrow" onclick="cotCycleCcy(-1)" aria-label="Previous currency" title="Previous (←)" ${_idx<=0?'disabled':''}>‹</button>
+        <div id="cot-ccy-switch">
+          <button id="cot-ccy-chip" onclick="cotToggleCcyDropdown(event)" aria-haspopup="listbox" aria-expanded="false" title="Switch currency">${ccy}</button>
+          <div id="cot-ccy-dd" role="listbox" aria-label="Select currency">
+            ${_avail.map(c=>`<button class="cot-ccy-dd-item ${c===ccy?'on':''}" role="option" aria-selected="${c===ccy}" onclick="cotSwitchCcy('${c}')">${c}</button>`).join('')}
+          </div>
+        </div>
+        <button class="cot-ccy-arrow" onclick="cotCycleCcy(1)" aria-label="Next currency" title="Next (→)" ${_idx===-1||_idx>=_avail.length-1?'disabled':''}>›</button>
+        <span>· Leveraged Funds</span>
+      </div>
       <div id="cot-m-sub">week ending ${weekEnd} · ${nWks}w history · CFTC TFF Disaggregated · Options+Futures Combined</div>
     </div>
     <button id="cot-m-close" onclick="closeCOTModal()" aria-label="Close">✕</button>
@@ -872,10 +934,61 @@ function openCOTModal(ccy,data){
     }).join('');
   }
 
-  bd.addEventListener('click',e=>{if(e.target===bd)closeCOTModal();});
-  const esc=e=>{if(e.key==='Escape')closeCOTModal();};
+  bd.addEventListener('click',e=>{
+    if(e.target===bd)closeCOTModal();
+    // click outside the switcher closes the dropdown without closing the modal
+    const dd=document.getElementById('cot-ccy-dd');
+    if(dd&&dd.classList.contains('open')&&!e.target.closest('#cot-ccy-switch')){dd.classList.remove('open');document.getElementById('cot-ccy-chip')?.setAttribute('aria-expanded','false');}
+  });
+  const esc=e=>{
+    const dd=document.getElementById('cot-ccy-dd');
+    if(e.key==='Escape'){
+      if(dd&&dd.classList.contains('open')){dd.classList.remove('open');document.getElementById('cot-ccy-chip')?.setAttribute('aria-expanded','false');return;}
+      closeCOTModal();return;
+    }
+    if(e.key==='ArrowLeft')cotCycleCcy(-1);
+    if(e.key==='ArrowRight')cotCycleCcy(1);
+  };
   document.addEventListener('keydown',esc);bd._esc=esc;
   bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy,history};
+  bd._ccy=ccy;bd._availCcys=_avail;
+
+  // Restore whichever tab was active before switching currency (better UX than
+  // Bloomberg/Eikon, which reset to the default view on instrument change).
+  if(_preserveTab&&_preserveTab!=='overview'){
+    const tabEl=document.querySelector(`.cot-tab[data-tab="${_preserveTab}"]`);
+    if(tabEl)cotTab(tabEl,_preserveTab);
+  }
+}
+
+// Switch to a specific currency, keeping the modal open and the active tab intact.
+function cotSwitchCcy(newCcy){
+  const bd=document.getElementById('cot-bd');
+  if(!bd||newCcy===bd._ccy)return;
+  const data=window.COT_DATA_STORE&&window.COT_DATA_STORE[newCcy];
+  if(!data)return;
+  const activeTabEl=document.querySelector('.cot-tab.on');
+  const activeTab=activeTabEl?activeTabEl.getAttribute('data-tab'):'overview';
+  openCOTModal(newCcy,data,{preserveTab:activeTab});
+}
+
+// Cycle to the previous (-1) or next (+1) currency in the switcher's G10 order.
+function cotCycleCcy(dir){
+  const bd=document.getElementById('cot-bd');
+  if(!bd||!bd._availCcys)return;
+  const idx=bd._availCcys.indexOf(bd._ccy);
+  const next=idx+dir;
+  if(next<0||next>=bd._availCcys.length)return;
+  cotSwitchCcy(bd._availCcys[next]);
+}
+
+function cotToggleCcyDropdown(e){
+  e.stopPropagation();
+  const dd=document.getElementById('cot-ccy-dd');
+  const chip=document.getElementById('cot-ccy-chip');
+  if(!dd)return;
+  const open=dd.classList.toggle('open');
+  chip?.setAttribute('aria-expanded',open?'true':'false');
 }
 
 function cotTab(el,tabId){
@@ -956,6 +1069,7 @@ function closeCOTModal(){
 }
 
 window.openCOTModal=openCOTModal;window.closeCOTModal=closeCOTModal;window.cotTab=cotTab;
+window.cotSwitchCcy=cotSwitchCcy;window.cotCycleCcy=cotCycleCcy;window.cotToggleCcyDropdown=cotToggleCcyDropdown;
 
 // ── Theme-change listener — rebuild LWC charts when dark↔MT5 switches ────────
 // Charts are built once with _built=true flag and LWC series colors are fixed at
