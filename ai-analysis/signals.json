@@ -18,11 +18,11 @@
       "time": "19:28",
       "priority": "warning",
       "title": "USD/JPY — JPY COT Short Squeeze Risk",
-      "text": "JPY COT net short -105.2k (28% long) creates significant squeeze risk if the 163.79 resistance fails, despite the +264bp OIS carry favoring USD. While the pair remains in a technical uptrend above all major SMAs, the positive JPY CESI (+10) suggests domestic data is outperforming, providing fundamental fuel for an unwind. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for resolving the carry vs. positioning conflict.",
+      "text": "JPY COT net short -105.2k (28% long) creates significant squeeze risk if the 163.79 resistance fails, despite the +264bp OIS carry favoring USD. While the pair remains in a technical uptrend above all major SMAs, the positive JPY ESI (+12.4) suggests domestic data is outperforming, providing fundamental fuel for an unwind. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for resolving the carry vs. positioning conflict.",
       "evidence": [
         "JPY COT net short -105.2k",
         "USD/JPY OIS carry +264bp",
-        "JPY CESI: +10",
+        "JPY ESI: +12.4",
         "Retail: 80% short USD/JPY"
       ],
       "_source": "gemini:gemini-3-flash-preview"
@@ -30,10 +30,10 @@
     {
       "time": "18:08",
       "priority": "warning",
-      "title": "EUR/USD — CESI Negative Divergence + Tariff Pressure",
-      "text": "EUR COT net short -74.6k and a deeply negative CESI (-43) signal persistent fundamental weakness as Trump tariff rhetoric targets the EU. The 1.1375 Friday close sits below all major SMAs, while the +144bp OIS carry advantage for USD further incentivizes the downside. The next Fed meeting (mkt: 100% hold priced) on 29 Jul is the catalyst for a potential break toward the 1.1200 handle.",
+      "title": "EUR/USD — ESI Negative Divergence + Tariff Pressure",
+      "text": "EUR COT net short -74.6k and a negative ESI (-14.8) signal persistent fundamental weakness as Trump tariff rhetoric targets the EU. The 1.1375 Friday close sits below all major SMAs, while the +144bp OIS carry advantage for USD further incentivizes the downside. The next Fed meeting (mkt: 100% hold priced) on 29 Jul is the catalyst for a potential break toward the 1.1200 handle.",
       "evidence": [
-        "EUR CESI: -43",
+        "EUR ESI: -14.8",
         "EUR COT net short -74.6k",
         "EUR/USD OIS carry +144bp favors USD",
         "Position: below SMA20/50/200"
@@ -43,11 +43,11 @@
     {
       "time": "17:40",
       "priority": "info",
-      "title": "AUD/USD — Carry Support vs. Negative Data Flow",
-      "text": "AUD COT net long +21.9k (63% long) is vulnerable to a washout as AUD CESI (-14) highlights persistent data misses, keeping the pair stuck near 0.6983. The -73bp OIS carry advantage for AUD provides a structural floor, but the neutral retail bias suggests no immediate contrarian catalyst. The next RBA meeting (mkt: 21% hike priced) on 11 Aug determines if the current hike bias can withstand deteriorating economic surprises.",
+      "title": "AUD/USD — Carry Support Amid Near-Neutral Data Flow",
+      "text": "AUD COT net long +21.9k (63% long) is vulnerable to a washout, though the near-neutral AUD ESI (+2.0) — lifted by last week's strong employment beats — no longer shows the persistent-miss pattern it did previously, leaving the pair stuck near 0.6983 without a clear data-driven catalyst either way. The -73bp OIS carry advantage for AUD provides a structural floor, but the neutral retail bias suggests no immediate contrarian catalyst. The next RBA meeting (mkt: 21% hike priced) on 11 Aug determines if the current hike bias can withstand the next batch of releases.",
       "evidence": [
         "AUD COT net long +21.9k",
-        "AUD CESI: -14",
+        "AUD ESI: +2.0",
         "AUD/USD OIS carry -73bp (favors AUD)",
         "AUD/USD IV 13.1% vs HV30 6.0%"
       ],
