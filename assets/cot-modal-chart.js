@@ -1,3 +1,4 @@
+// COT MODAL CHART  v2.5 — in-modal currency switcher (chip + prev/next arrows + arrow-key cycling)
 // COT MODAL CHART  v2.4 — fix .cu/.cd specificity in cot-tbl; fix Net Position left-axis regression
 // COT MODAL CHART  v2.0 — LightweightCharts v5 (replaces Chart.js)
 // File: assets/cot-modal-chart.js
