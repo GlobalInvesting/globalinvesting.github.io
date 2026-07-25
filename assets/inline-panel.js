@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
-// INLINE PANEL SYSTEM  v1.3.1
+// INLINE PANEL SYSTEM  v1.3.2 — fix openCOTModal interceptor dropping the 3rd (opts) arg,
+//   which silently broke the COT currency-switcher's tab-preservation (v8.71.0)
 // File: assets/inline-panel.js
 //
 //   LEFT center  (#split-upper):  Carry Trade · Heatmap
@@ -305,9 +306,9 @@
   // ═══════════════════════════════════════════════════════════════════
   var _origOpenCOT = window.openCOTModal;
 
-  window.openCOTModal = function(ccy, data) {
+  window.openCOTModal = function(ccy, data, opts) {
     var panels = _ensureSplit();
-    if (!panels) { _origOpenCOT && _origOpenCOT(ccy, data); return; }
+    if (!panels) { _origOpenCOT && _origOpenCOT(ccy, data, opts); return; }
 
     var body = _makeShell(panels.lower, 'COT Positioning · ' + (ccy || ''), function() {
       _restore('cot-bd', 'cot-m-close',
@@ -318,7 +319,7 @@
     var bdPre = document.getElementById('cot-bd');
     if (bdPre) bdPre.style.display = 'none';
 
-    _origOpenCOT && _origOpenCOT(ccy, data);
+    _origOpenCOT && _origOpenCOT(ccy, data, opts);
 
     // #cot-bd needs an explicit flex:1;min-height:0 here (6th arg) — without
     // it, #cot-bd stays 'display:block' with NO definite height of its own,
