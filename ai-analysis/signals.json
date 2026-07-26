@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-07-25T20:54:15Z",
+  "generated_at": "2026-07-26T20:59:21Z",
   "signals": [
     {
-      "time": "21:51",
+      "time": "20:43",
       "priority": "critical",
-      "title": "USD/CHF — G10 Bilateral Theme + Weekend Tariff Escalation",
-      "text": "Trump's weekend threat of Section 301 tariffs on the EU drives safe-haven demand into the Greenback while the Franc remains the G10 laggard. The 1.260% G10 performance spread favors USD upside as markets absorb the war premium and tariff risks. The next Fed meeting (mkt: 100% hold priced) on 29 July is the primary catalyst for confirming this USD dominance against the CHF yield disadvantage.",
+      "title": "USD/JPY — Geopolitical De-escalation + Yield Advantage",
+      "text": "The US-Iran pause in strikes and fruitful Oman talks provide a risk-on tailwind for the dollar toward the 164.0 level as safe-haven demand recedes. USD/JPY maintains a +266bp OIS carry advantage and remains above all major SMAs (20, 50, 200), while JPY COT net short -114k positions leave the pair vulnerable only to a sharp risk-off reversal. The next BoJ meeting (mkt: 100% hold priced) on 31 Jul is the catalyst for determining if the current yield gap begins to compress.",
       "evidence": [
-        "USD 1W avg: +0.763% (n=7)",
-        "CHF 1W avg: -0.8177% (n=6)",
-        "G10 spread: 1.260%"
+        "USD/JPY close 163.6",
+        "JPY COT net short -114,030",
+        "USD/JPY OIS carry +266bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "21:51",
+      "priority": "warning",
+      "title": "GBP/USD — G10 Bilateral Theme + Monetary Divergence",
+      "text": "The 1.005% G10 performance spread between leader USD and laggard GBP pressures the pair toward Friday's 1.3347 close as UK yields lose momentum. GBP COT net long +33.8k (66% long) creates an unwind risk if the pair sustains its position below the 200-day SMA (1.3399). The BoE meeting on 30 Jul is the catalyst for verifying if the hold bias can withstand the recent underperformance.",
+      "evidence": [
+        "USD 1W avg: +0.559% (n=7)",
+        "GBP 1W avg: -0.445% (n=4)",
+        "G10 spread: 1.005%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "20:09",
+      "priority": "warning",
+      "title": "EUR/USD — ESI Disappointment + Crowded Shorts",
+      "text": "The negative ESI of -14.7 highlights sustained Eurozone data misses, keeping the pair heavy below the SMA20 (1.1419) despite a potential relief bounce on geopolitical easing. EUR COT net short -80.6k (32% long) suggests bearish sentiment is heavily priced, but the 146bp OIS carry disadvantage vs USD limits recovery potential. The next ECB meeting (mkt: 61% hike priced) on 10 Sep determines if the hiking cycle can persist against deteriorating data.",
+      "evidence": [
+        "EUR ESI: -14.7",
+        "EUR COT net short -80,570",
+        "EUR/USD OIS carry -146bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
       "time": "19:44",
-      "priority": "critical",
-      "title": "USD/JPY — Geopolitical Risk + COT Squeeze",
-      "text": "JPY COT net short -114k (26.7% long) creates short-squeeze risk (USD/JPY downside if shorts cover) as the closure of the Strait of Hormuz and $92 WTI oil trigger global risk-off flows. Despite the +266bp OIS carry advantage for USD, JPY's positive ESI (+13.5) and the Nikkei's 2.73% Friday slide signal a move toward the SMA20 at 162.41. The next BoJ meeting (mkt: 100% hold priced) on 31 July serves as the definitive catalyst for JPY's recovery path.",
-      "evidence": [
-        "JPY COT net short: -114,030",
-        "WTI Oil: $89.3 (-3.12%)",
-        "USD/JPY OIS carry: +266bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "18:08",
       "priority": "warning",
-      "title": "EUR/USD — Tariff Risk + ESI Underperformance",
-      "text": "EUR COT net short -80.5k reinforces a bearish bias as Trump targets the EU with new tariff threats while the Eurozone ESI remains at a strong negative -15.0. Weak relative data and persistent misses limit the impact of the ECB's hiking bias, keeping the pair pinned below the SMA200 (1.1639). The ECB meeting on 10 September is the catalyst for any shift in this bearish structural trend.",
+      "title": "USD/CAD — COT Positioning vs Crude Correlation Break",
+      "text": "CAD COT net short -99.8k (18.8% long) represents extreme bearish crowding, yet the -1.63σ correlation break with WTI oil prevents a clean rally above 1.4100. While the 137bp OIS carry advantage favors the dollar, the extreme retail short bias (69%) suggests a contrarian risk of CAD strength if oil supply fears re-emerge. The next BoC meeting (mkt: 100% hold priced) on 9 Sep is the catalyst for resolving the current neutral data trend.",
       "evidence": [
-        "EUR ESI: -15.0 (Strong Negative)",
-        "EUR COT net short: -80,570",
-        "Friday close: 1.1375"
+        "CAD COT net short -99,823",
+        "USD/CAD vs WTI corr z=-1.63σ",
+        "USD/CAD close 1.4077"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "19:28",
-      "priority": "warning",
-      "title": "GBP/USD — Carry Compression + BoE Event Risk",
-      "text": "GBP COT net long +33.8k (66.3% long) faces liquidation risk as the -9bp OIS carry disadvantage and weekend risk-off sentiment weigh on the pound. The pair closed Friday at 1.3321, positioned below all major SMAs (20, 50, 200), signaling technical exhaustion. The BoE meeting on 30 July is the catalyst for determining if the current hold bias can sustain the crowded long positioning.",
-      "evidence": [
-        "GBP COT net long: +33,812",
-        "GBP/USD OIS carry: -9bp",
-        "GBP 1W avg: -0.464%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "17:40",
+      "time": "20:55",
       "priority": "info",
-      "title": "AUD/USD — Crowded Long Unwind Risk",
-      "text": "AUD COT net long +20.5k (62.8% long) creates downside risk if the pair breaks its tight 8-day range support at 0.6961. While the +71bp OIS carry advantage and RBA hike bias (11 Aug) provide a floor, an extreme retail short bias in AUD/CHF (96%) suggests professional longs is likely to be vulnerable to a broader risk-off flush. The next RBA meeting (mkt: 21% hike priced) on 11 August determines the longevity of the AUD yield advantage.",
+      "title": "AUD/USD — Carry Advantage + Retail Extreme",
+      "text": "AUD/USD remains supported by a +71bp OIS carry advantage and positive ESI (+4.3), though the 0.7000 handle serves as psychological resistance. Extreme retail positioning in AUD crosses, including 96% short in AUD/CHF, indicates a high risk of a short-squeeze in Sydney trade. The next RBA meeting (mkt: 21% hike priced) on 11 Aug provides the catalyst to confirm the current hike bias.",
       "evidence": [
-        "AUD COT net long: +20,521",
-        "AUD/USD OIS carry: +71bp",
-        "AUD/USD IV: 13.4% vs HV30: 6.0%"
+        "AUD/USD OIS carry +71bp",
+        "AUD COT net long +20,521",
+        "AUD/CHF retail 96% short"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
