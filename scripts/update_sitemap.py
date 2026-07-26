@@ -76,6 +76,13 @@ PAGES = [
         "changefreq": "monthly",
     },
     {
+        "loc": "/guide-fundamental-analysis.html",
+        "file": "guide-fundamental-analysis.html",
+        "deps": [],
+        "priority": "0.8",
+        "changefreq": "monthly",
+    },
+    {
         "loc": "/guide-economic-surprises.html",
         "file": "guide-economic-surprises.html",
         "deps": ["economic-data/surprises.json"],
@@ -113,6 +120,13 @@ PAGES = [
     {
         "loc": "/guide-csi-indicator.html",
         "file": "guide-csi-indicator.html",
+        "deps": [],
+        "priority": "0.7",
+        "changefreq": "monthly",
+    },
+    {
+        "loc": "/guide-monte-carlo-simulator.html",
+        "file": "guide-monte-carlo-simulator.html",
         "deps": [],
         "priority": "0.7",
         "changefreq": "monthly",
