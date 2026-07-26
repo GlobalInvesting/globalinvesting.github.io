@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-26T15:35:26Z",
+  "updated": "2026-07-26T15:40:26Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,10 +35,10 @@
       "pct1w_date": "2026-07-17"
     },
     "gold": {
-      "close": 4055.8926,
+      "close": 4055.9548,
       "prev_close": 4056.0113,
-      "chg": -0.1187,
-      "pct": -0.0029,
+      "chg": -0.0565,
+      "pct": -0.0014,
       "source": "twelve_data",
       "high": 4085.2,
       "low": 4024.0,
@@ -199,35 +199,35 @@
       "pct1w_date": "2026-07-17"
     },
     "btc": {
-      "close": 64697.99,
+      "close": 64745.33,
       "prev_close": 64310.72,
-      "chg": 387.27,
-      "pct": 0.6022,
-      "high": 64711.785,
+      "chg": 434.61,
+      "pct": 0.6758,
+      "high": 64758.004,
       "low": 64237.535,
       "open": 64310.72,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1785080124,
+      "market_time": 1785080420,
       "source": "yfinance",
-      "pct1w": 1.2497,
+      "pct1w": 1.3237,
       "pct1w_date": "2026-07-17"
     },
     "eth": {
-      "close": 1906.46,
+      "close": 1912.68,
       "prev_close": 1873.2323,
-      "chg": 33.2277,
-      "pct": 1.7738,
-      "high": 1905.6019,
+      "chg": 39.4477,
+      "pct": 2.1059,
+      "high": 1914.0067,
       "low": 1873.2323,
       "open": 1873.2323,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1785080123,
+      "market_time": 1785080418,
       "source": "yfinance",
-      "pct1w": 3.5563,
+      "pct1w": 3.8942,
       "pct1w_date": "2026-07-17"
     },
     "nasdaq": {
@@ -939,8 +939,8 @@
       "prev_close": 58.054,
       "chg": 0.852,
       "pct": 1.4676,
-      "high": 59.29,
-      "low": 57.36,
+      "high": null,
+      "low": null,
       "open": 57.92,
       "bid": 58.11,
       "ask": 58.885,
@@ -955,8 +955,8 @@
       "prev_close": 100.69,
       "chg": -3.91,
       "pct": -3.8832,
-      "high": 101.16,
-      "low": 95.14,
+      "high": null,
+      "low": null,
       "open": 100.91,
       "bid": 98.22,
       "ask": 100.8,
@@ -1510,7 +1510,7 @@
     {
       "a": "AUD/USD",
       "b": "Gold",
-      "corr30": 0.385,
+      "corr30": 0.384,
       "n30": 30,
       "corr": 0.892,
       "n": 60,
@@ -1740,7 +1740,7 @@
         0.411,
         0.411,
         0.363,
-        0.385
+        0.384
       ],
       "hist_dates": [
         "2025-09-18",
