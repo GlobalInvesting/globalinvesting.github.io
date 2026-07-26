@@ -269,6 +269,36 @@
     </image:image>
   </url>
   <url>
+    <loc>https://globalinvesting.github.io/guide-fundamental-analysis.html</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-cb-rates-panel.png</image:loc>
+      <image:caption>Central Bank Rates panel showing current policy rate and trend direction for the Fed, ECB, BoE, BoJ, RBA, SNB, BoC, RBNZ, Norges Bank, and Riksbank</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-cb-rate-expectations.png</image:loc>
+      <image:caption>CB Rate Expectations panel showing bank, next meeting date, OIS-implied bias (hold/hike/cut with probability), and implied rate for the major central banks</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-cot.png</image:loc>
+      <image:caption>CFTC COT Leveraged Funds positioning panel showing net percent institutional positioning by currency</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-esi-panel.png</image:loc>
+      <image:caption>Economic Surprise Index panel ranking G10 currencies by whether recent data has beaten or missed consensus forecasts</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-risk-monitor.png</image:loc>
+      <image:caption>Cross-Asset Risk Monitor panel showing the current risk-on/risk-off regime and its implication for carry and funding-currency flows</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-ea-composite.png</image:loc>
+      <image:caption>Composite Score panel rendered natively inside the MT5 Expert Advisor dashboard, showing the six-factor blended score bar and CB bias label per currency</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://globalinvesting.github.io/guide-economic-surprises.html</loc>
     <lastmod>2026-07-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -330,6 +360,16 @@
     <image:image>
       <image:loc>https://globalinvesting.github.io/assets/screenshot-csi.png</image:loc>
       <image:caption>CSI Currency Strength indicator panel overlay on a USDCAD H1 chart in MetaTrader 5, showing per-currency index and strength bars for USD, JPY, GBP, EUR, CAD, CHF, NZD, AUD</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guide-monte-carlo-simulator.html</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-monte-carlo-equity.png</image:loc>
+      <image:caption>Monte Carlo Equity Projection indicator on an MT5 chart, showing a bootstrap-simulated percentile equity cone (p5/p25/p50/p75/p95) over the account equity curve, with a full risk metrics strip below covering account history, projected returns, drawdown and risk, and probabilities</image:caption>
     </image:image>
   </url>
   <url>
