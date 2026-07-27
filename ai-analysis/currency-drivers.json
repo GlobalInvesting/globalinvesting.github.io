@@ -1,88 +1,119 @@
 {
-  "generated_at": "2026-07-24T08:13:48Z",
+  "generated_at": "2026-07-27T09:37:54Z",
   "drivers": {
-    "EUR": {},
-    "GBP": {},
+    "EUR": {
+      "EUR/USD": "EUR/USD trades near 1.1413 as markets weigh the ECB's decision to hold rates at 2.4% on June 11, 2026, against a 61% OIS-priced probability of a September hike. President Christine Lagarde and official Magnus Kocher have noted a lack of second-round inflation effects, yet hawkish commentary from Peter Kazimir suggests at least one more hike is necessary to combat energy price spikes. Intraday price action is heavily influenced by OCBC noting Fed communication as the key driver for the USD path while the Fed remains on hold. The Eurozone Economic Surprise Index at -41 highlights significant fundamental underperformance relative to the U.S",
+      "EUR/GBP": "The pair remains sensitive to the contrast between a potential ECB holds at 2.4%. While the ECB mulls an energy-driven rate hike, GBP is supported by economist warnings that higher oil prices will lift UK factory inflation, potentially keeping the BoE restrictive. EUR LF net short positioning of -80.6k contrasts with GBP COT LF long +33.8k, creating a technical headwind for the cross. Markets are currently balancing weak UK manufacturing data against the persistent core CPI of 2.6% that keeps the BoE on hold",
+      "EUR/JPY": "EUR/JPY remains elevated as the BoJ holds at 1.0%. JPY COT LF short -114.0k continues to provide a structural tailwind for the cross as the carry trade remains intact despite Finance Minister Satsuki Katayama's warnings of \"decisive action.\" Recent yen weakness past 163.24 has triggered intervention alerts, but the 146bp OIS carry premium continues to favor the Euro. Governor Kazuo Ueda's potential for future hawkish communication is being weighed against immediate energy-led inflation pressures in the Eurozone",
+      "EUR/AUD": "EUR/AUD faces pressure as the RBA holds at 4.35%. The AUD is supported by a strong labor market and a --195bp OIS carry premium, while the ECB is coming off a hold at 2.4%. Although ECB's Kazimir sees one more hike as necessary due to oil shocks, the RBA's real policy rate of +0.39% provides a superior yield backdrop. EUR LF net short -80.6k positioning further suggests limited upside for the cross in the current regime",
+      "EUR/CAD": "EUR/CAD reflects significant divergence as the BoC remains on hold at 9.0% while the ECB holds at 2.4%. The Canadian dollar is under severe pressure following President Trump’s decision not to extend the USMCA, leading to CAD COT LF short -99.8k, the highest among majors. While the ECB mulls energy-driven inflation, CAD is grappling with 14-month lows and a decade-long trade renegotiation timeline. These bearish CAD fundamentals are countered by a significant OIS carry advantage over the Euro's 2.4% rate",
+      "EUR/CHF": "EUR/CHF is navigating a period of range-bound trade with both the ECB and SNB on hold in their most recent meetings. While ECB officials like Peter Kazimir warn that an oil shock could require further tightening, the SNB is expected to remain on hold at its September 24 meeting. Swiss industrial resilience, highlighted by record semiconductor order intakes at VAT Group, provides some fundamental support for the Franc. ECB holds at 2.4%.",
+      "EUR/NZD": "The cross is pressured by the RBNZ’s hawkish stance, with a hike priced in at 98% probability for the September 2 meeting. New Zealand's hotter-than-expected CPI print has reinforced the case for RBNZ tightening, even as the ECB contemplates a 61% chance of a September move. NZD COT LF short -31.6k provides a potential short-covering catalyst against the EUR LF net short -80.6k position. Despite the ECB's focus on energy price spikes, the RBNZ's sectoral factor model showing core inflation at 2.7% maintains a relative hawkish advantage for the Kiwi"
+    },
+    "GBP": {
+      "GBP/USD": "GBP/USD is trading in a narrow range as investors balance a headline CPI slowdown to 2.6% against persistent core pressures that keep the BoE on hold. Intraday direction is dictated by Fed communication as the key path for the USD according to OCBC, with the Fed expected to hold on July 29. GBP COT LF long +33.8k reflects a bullish bias despite fiscal risks and rising 10-year gilt yields capping upside. Market sentiment was briefly supported by the pause in U.S. bombing campaigns in Iran, which saw GBP rise toward $1.3353 as oil prices dropped",
+      "GBP/JPY": "GBP/JPY is underpinned by a significant carry differential as the BoE stays on hold while the BoJ remains at 1.0%. JPY COT LF short -114.0k continues to anchor yen weakness, which saw the currency breach 163.24 recently. While UK manufacturing orders remain weak, economists at Pantheon warn that higher oil prices will lift factory inflation, supporting the BoE's restrictive stance. BoJ holds at 1.0%.",
+      "EUR/GBP": "The EUR/GBP cross remains pressured by the contrast between a hawkish-leaning BoE and an ECB holds at 2.4%. EUR LF net short -80.6k and GBP COT LF long +33.8k suggest a technical bias toward further pound strength. While ECB’s Kazimir has called for another rate hike to combat oil shocks, the BoE's focus on core inflation and rising gilt yields provides a more stable floor for GBP. Investors are currently weighing a potential September ECB hike against the UK's persistent factory inflation risks",
+      "GBP/AUD": "GBP/AUD is caught between two hawkish central banks, with the BoE on hold and an RBA hike priced in for August. The Australian dollar is supported by a strong labor market and a restrictive real policy rate, which challenges the GBP COT LF long +33.8k positioning. Recent UK retail sales rebounds have offered some support to the pound, but the RBA’s -73bp OIS carry premium remains a significant factor. Markets are monitoring the impact of oil price volatility on both factory inflation in the UK and resource demand in Australia",
+      "GBP/CAD": "GBP/CAD is trading near recent highs as the Canadian dollar suffers from CAD COT LF short -99.8k following USMCA termination fears. The BoE's hold stance at 30 July is viewed as relatively hawkish compared to a BoC that is grappling with new trade tariffs and a decade-long renegotiation cycle. GBP COT LF long +33.8k further emphasizes the divergence between the two currencies. While UK economists warn of oil-driven factory inflation, the CAD remains the most shorted major currency due to the \"loonie's\" soft fundamental backdrop",
+      "GBP/CHF": "GBP/CHF remains supported by the BoE’s cautious hold and the GBP COT LF long +33.8k positioning. The SNB is expected to remain on hold through its September 24 meeting, providing little yield competition for the pound. While Swiss industrial data from firms like VAT Group show record order intakes, the carry-neutral regime with VIX at 17.6 limits significant safe-haven flows into the Franc. Investors are looking toward the BoE's July 30 meeting for further guidance on how persistent core inflation will affect the rate path",
+      "GBP/NZD": "The pair is facing downward pressure as a hike is priced in for the RBNZ with 98% probability on September 2. This hawkish New Zealand outlook, supported by a hot CPI print, outweighs the BoE's hold stance. NZD COT LF short -31.6k and GBP COT LF long +33.8k create a complex positioning landscape as markets navigate New Zealand's negative real rates. UK economists' warnings on factory inflation are being weighed against the RBNZ's sectoral model showing core inflation at 2.7% y/y"
+    },
     "JPY": {
-      "USD/JPY": "USD/JPY is trading at 163.78, testing the 160.00 level that previously triggered verbal warnings as markets wait for Finance Minister Satsuki Katayama to take \"decisive action.\" JPY COT LF short positioning is at an extreme -105.2k, while the BoJ is expected to hold rates at 1.0% on July 31 despite a jump in headline inflation to 1.7%. The US Dollar Index is simultaneously being lifted by higher yields and focus on the July 29 FOMC, creating a fraught environment not seen in 40 years. BoJ holds at 1.0%.",
-      "EUR/JPY": "EUR/JPY is supported by the JPY COT LF short extreme of -105.2k and the JPY's status as an energy-importing laggard as Brent oil tops $100. ECB holds at 2.4%. EUR LF net short positioning of -74.6k provides a counterweight to the euro's gains, but the yen's vulnerability to oil price shocks remains the primary driver. Technical levels above 163.00 are being closely watched for potential intervention from Japanese authorities to stabilize the currency",
-      "GBP/JPY": "GBP/JPY is trading with a steady bid as UK retail sales and GDP resilience support the pound while the yen remains near multi-decade lows. JPY COT LF short positioning at -105.2k and the BoJ's expected hold at 1.0% on July 31 keep the yen under pressure. The Bank of England’s caution regarding sticky core inflation and a 2.6% CPI reading provides a stark contrast to the BoJ's ultra-low borrowing costs. Rising oil prices continue to hurt the JPY more severely than the GBP, as market participants await signs of intervention near the 163.00 handle",
-      "AUD/JPY": "AUD/JPY is benefiting from a massive upside surprise in Australian employment data, which has solidified the AUD as a G10 leader. JPY COT LF short positioning of -105.2k and the BoJ’s hold at 1.0% contrast with the RBA's 4.35% stance and a priced-in 21% hike probability for August. The carry trade remains intact as the VIX sits at 18.9, favoring the high-yielding AUD over the JPY, which is struggling with energy import costs. Japanese Finance Minister Katayama’s intervention warnings are the only significant headwind for the pair as it pushes above historical levels",
-      "CAD/JPY": "CAD/JPY is influenced by two extreme COT positions: CAD LF net short -93.5k and JPY LF net short -105.2k. While both central banks are expected to hold rates at their next meetings, the yen is more vulnerable to the recent surge in Brent oil toward $100 per barrel. The Bank of Canada’s 2.25% rate provides a carry advantage over the BoJ’s 1.0%, though the CAD has recently seen a correlation break with crude prices. Japanese officials remain on high alert for intervention as the yen's weakness persists against all major peers",
-      "CHF/JPY": "CHF/JPY remains in a range-bound framing as the VIX below 20 limits safe-haven demand for both currencies. JPY COT LF short positioning at -105.2k is the dominant technical factor, while the BoJ is expected to remain on hold at 1.0% on July 31. The SNB is also on hold for its September 24 meeting, but the Swiss franc has been a relative laggard in the G10 space recently. Without a significant spike in volatility, the yen's weakness driven by energy import costs remains the path of least resistance in this cross",
-      "NZD/JPY": "NZD/JPY is a primary beneficiary of policy divergence, with a 98% hike probability priced in for the RBNZ on September 2 against a BoJ hold on July 31. JPY COT LF short positioning at -105.2k and the yen's 40-year lows create a strong upward bias for the high-conviction Kiwi. The RBNZ's inflation model at 2.7% reinforces a restrictive stance that attracts carry-seeking investors. As long as the VIX remains at 18.9, the NZD's yields and the BoJ's stationary policy should continue to support the pair, barring Japanese intervention"
+      "USD/JPY": "USD/JPY trades around 163.51, holding above its major moving average clusters following a naval mine blast in the Strait of Hormuz. Despite the geopolitical shock, the 275bp Fed-BoJ carry differential remains the primary driver, with JPY COT LF short -114.0k reflecting extreme bearish sentiment. Finance Minister Satsuki Katayama has stated Japan is ready to take \"decisive action\" after the yen hit 163.24, its weakest since 1986. Intraday, OCBC highlights Fed communication as the key path for the USD as the Fed remains on hold",
+      "EUR/JPY": "EUR/JPY is supported by JPY COT LF short -114.0k and the ECB's potential September hike, which is currently priced at 61%. The yen remains near four-decade lows, and EUR LF net short -80.6k positioning has not been enough to offset the BoJ's 1.0% policy rate hold. While Governor Kazuo Ueda may signal more rate hikes as price pressures build, the immediate energy price spike is fueling ECB hawkishness. Technical intervention levels remain a concern for traders as the pair tests multi-decade highs",
+      "GBP/JPY": "GBP/JPY is bolstered by GBP COT LF long +33.8k and the Bank of England's hold stance, which contrasts with the BoJ's slow policy normalization. The yen's slide past 163 has raised intervention alerts, yet the carry trade remains dominant given the JPY COT LF short -114.0k position. Pantheon economists note that higher oil prices will lift UK factory inflation, potentially keeping the BoE restrictive for longer. Markets are currently watching for any \"decisive action\" from Japanese authorities following the breach of 1986 lows",
+      "AUD/JPY": "AUD/JPY is supported by an RBA hike priced in for August 11 and a strong Australian labor market report. JPY COT LF short -114.0k and the RBA's restrictive 4.35% rate provide a significant carry advantage over the BoJ’s 1.0%. BoJ holds at 1.0%. The pair remains sensitive to geopolitical risks in the Strait of Hormuz, though the VIX at 17.6 suggests a carry-neutral regime",
+      "CAD/JPY": "CAD/JPY is underperforming as CAD COT LF short -99.8k weighs on the cross following the USMCA termination. The yen also remains weak, with JPY COT LF short -114.0k and the BoJ on hold, creating a battle of the underperformers. While the yen hit a four-decade low near 163.24, the Canadian dollar has reached a 14-month low due to trade tariff fears. The BoC's hold at 9.0% provides a massive nominal carry, but fundamental trade headwinds for the loonie are capping gains",
+      "CHF/JPY": "CHF/JPY remains in a carry-neutral range as the VIX at 17.6 indicates marginal safe-haven demand for either currency. The BoJ is on hold at 1.0% while the SNB is also on hold, with JPY COT LF short -114.0k being the dominant positioning feature. Swiss economic resilience is supported by record semiconductor orders at VAT Group, but the yen is more sensitive to oil price spikes and US Treasury yields. Traders are monitoring the BoJ's hawkish communication for any signs of a shift that could narrow the yield gap",
+      "NZD/JPY": "NZD/JPY sees a hike priced in for the RBNZ at 98% probability, which provides a strong fundamental backdrop against the BoJ's hold. JPY COT LF short -114.0k and NZD COT LF short -31.6k suggest that the yen remains the more vulnerable of the two in a carry-seeking environment. New Zealand’s hotter-than-expected CPI print has reinforced the RBNZ’s hawkish path, even as Governor Ueda mulls more hikes for Japan. The breach of 163.24 in USD/JPY has kept the entire yen complex on intervention alert"
     },
     "AUD": {
-      "AUD/USD": "AUD/USD is trading at 0.6978, supported by an extreme employment surprise of 76.3k jobs and a -73bp OIS carry premium favoring the AUD. While the RBA is on hold at 4.35%, the market has priced in a 21% hike probability for the August 11 meeting following the \"jobs shocker.\" Intraday strength is being checked by the US Dollar Index, which is rising on higher yields and FOMC anticipation for July 29 per MUFG. Retail sentiment is currently 59% short, while the options market shows a high Volatility Risk Premium, indicating traders are hedging for significant moves",
-      "EUR/AUD": "EUR/AUD is under pressure as the Australian dollar dominates G10 performance following its labor market outperformance. EUR LF net short positioning at -74.6k and a negative economic surprise index for the Eurozone contrast with the RBA's restrictive real policy rate of +0.39%. Although the ECB is priced for a 61% hike in September, the immediate focus is on the RBA's potential to tighten further after adding 76.3k jobs. The pair has seen the AUD breach the 0.7000 level against the USD, exerting downward pressure on the EUR/AUD cross",
-      "GBP/AUD": "GBP/AUD is trending lower as the pound's cautious stance from the BoE is outpaced by the AUD's massive employment data surprise. The RBA's 4.35% rate and a 21% hike probability for August create a hawkish backdrop that the BoE’s hold at 30 July cannot match. While UK core inflation remains sticky, the sheer magnitude of the Australian jobs beat has shifted bilateral divergence in favor of the Aussie. Sterling is currently hampered by a moderate negative bias in UK economic data, making it less attractive than the leading AUD",
-      "AUD/JPY": "AUD/JPY is being driven by the JPY COT LF short extreme of -105.2k and the AUD's status as a G10 leader after adding 76.3k jobs. The BoJ is expected to hold at 1.0% on July 31, while the RBA's hike probability for August has risen to 21% following the labor data shock. The pair remains well above the 163.00 level on the JPY side, keeping intervention concerns from FinMin Katayama at the forefront. With a VIX of 18.9, the carry trade favoring the high-yielding AUD remains fundamentally supported against the import-dependent yen",
-      "AUD/CAD": "AUD/CAD is influenced by the CAD COT LF short extreme of -93.5k and the RBA’s hawkish momentum following the employment upside surprise. The Bank of Canada is on hold at 2.25% and is currently experiencing a correlation break with rising oil prices, while the AUD is fueled by a 76.3k jobs beat. RBA holds at 4.35%. The AUD's restrictive real policy rate of +0.39% continues to make it a preferred currency over the lagging Loonie",
-      "AUD/CHF": "AUD/CHF is seeing significant bilateral divergence as the AUD leads the G10 while the CHF is a primary laggard. The RBA's 4.35% rate and the recent employment shock contrast with an SNB that remains on hold and a franc that is failing to attract safe-haven flows. With a VIX of 18.9, the carry-neutral framing for the CHF makes it an unattractive counter-currency to the high-conviction AUD. The pair is supported by the AUD's breach of key levels and a retail sentiment that remains skeptical of the Aussie's rally",
-      "AUD/NZD": "AUD/NZD is caught in a battle of hawks, as both the RBA holds at 4.35%. The pair previously hit multi-year highs but recently experienced a large decline as RBNZ hawkishness intensified and Australian data prior to the jobs shock was soft. The RBNZ’s inflation model at 2.7% remains unchanged, supporting a restrictive trajectory that matches the RBA’s own tightening odds. This cross remains a high-volatility play as traders weigh the RBA's massive 76.3k employment beat against the RBNZ's near-certain September hike"
+      "AUD/USD": "AUD/USD is testing the 0.7003 level, supported by a strong labor market and an RBA hike priced in for August 11. The pair benefits from a -71bp OIS carry premium favoring the AUD, while OCBC notes that Fed communication remains the key path for the USD. Technicals show the pair positioned above its SMA20 and SMA200, though capped by the SMA50 at 0.7027. Market sentiment is buoyed by a pause in U.S. bombing campaigns in Iran, which has boosted global investor confidence and commodity currencies",
+      "EUR/AUD": "EUR/AUD is pressured by the RBA’s hawkish stance and EUR LF net short -80.6k positioning. RBA holds at 4.35%. The AUD is finding support from a restrictive real policy rate of +0.39%, while the Euro faces headwinds from a -41 Citigroup Economic Surprise Index. Hawkish ECB comments from Kazimir regarding oil shocks are currently being overshadowed by the RBA’s immediate yield advantage",
+      "GBP/AUD": "GBP/AUD is navigating a tight range as GBP COT LF long +33.8k meets a strong AUD labor market. The RBA's 4.35% rate and hike priced in for August provide a challenge to the pound, which is on hold until the July 30 meeting. While UK factory inflation is expected to rise due to higher oil prices, the AUD's carry premium remains a dominant factor. Both currencies benefited from the easing of Middle East tensions, but the AUD's -73bp OIS carry premium gives it a marginal edge",
+      "AUD/JPY": "AUD/JPY remains supported as JPY COT LF short -114.0k and the RBA's hike priced in for August drive the carry trade. The yen is pinned near four-decade lows past 163.24, putting markets on intervention alert despite a VIX of 17.6 suggesting a stable volatility regime. Governor Ueda is set to keep BoJ rates steady but may signal future hikes as price pressures build from robust global AI demand. The AUD continues to benefit from a restrictive real policy rate and strong domestic data",
+      "AUD/CAD": "AUD/CAD is trending higher as CAD COT LF short -99.8k weighs heavily on the loonie following the USMCA decision. The RBA's potential hike in August contrasts with a BoC on hold, while the Canadian dollar grapples with a decade-long trade renegotiation timeline. AUD is supported by a strong labor market and a +0.39% real policy rate, providing a stark contrast to CAD's soft fundamental backdrop. Retail sentiment remains skewed short on AUD, but the OIS carry premium favoring the AUD remains intact",
+      "AUD/CHF": "AUD/CHF is supported by the RBA's hawkish bias and an SNB on hold through September. The carry-neutral framing for the Swiss franc, given a VIX of 17.6, limits haven demand while the AUD benefits from an RBA hike priced in. Swiss firms like VAT Group report record order intakes, but the yield advantage lies clearly with the Australian dollar's 4.35% rate. The pair is testing key resistance levels as the RBA's restrictive policy continues to attract yield-seeking flows",
+      "AUD/NZD": "AUD/NZD is a battle of hawkish central banks, with an RBNZ hike priced in at 98% for September and an RBA hike priced in for August. NZD COT LF short -31.6k and a hot CPI print have supported the Kiwi, while the AUD is buoyed by its own strong labor data. The pair is testing the 0.5850 region as markets weigh New Zealand's negative real rate of -1.56% against the RBA's +0.39%. Both currencies are currently benefiting from improved risk sentiment following the pause in US-Iran hostilities"
     },
     "CAD": {
-      "USD/CAD": "USD/CAD is trading below 1.4100 but maintains a bullish outlook as the US Dollar Index rises on higher yields and FOMC focus per MUFG. The CAD COT LF short positioning is at an extreme -93.5k, and the currency is notably failing to benefit from Brent oil's rise to $90 amid Gulf tensions. The Bank of Canada is on hold at 2.25% at its September 9 meeting, while safe-haven demand for the greenback is bolstered by Secretary Rubio's warnings on Iran. Market focus remains on whether the USD can sustain its gains against a CAD that is decoupled from its traditional energy drivers",
-      "EUR/CAD": "EUR/CAD is influenced by extreme positioning with CAD LF net short at -93.5k and EUR LF net short at -74.6k. ECB holds at 2.4%. The Canadian dollar is struggling with a correlation break from oil, failing to capture the energy rally despite escalating geopolitical risks in the Middle East. Meanwhile, the euro faces its own headwinds from a negative economic surprise index, leaving the pair in a volatile cross-current of central bank holds and extreme sentiment data",
-      "GBP/CAD": "GBP/CAD is trading with a focus on the CAD COT LF short extreme of -93.5k and the Bank of England's cautious hold stance for its July 30 meeting. While UK GDP has shown resilience and core inflation remains sticky, the CAD is not reflecting the support of $90 Brent oil due to a correlation break. The BoC is on hold at 2.25% as it monitors Gulf tensions and geopolitical supply risks. Sterling's political clarity following cabinet changes and the BoE's cautiousness provide a slight edge over the lagging Canadian dollar",
-      "AUD/CAD": "AUD/CAD is a story of divergence as the AUD leads the G10 after a 76.3k employment beat, while CAD LF net short positioning sits at an extreme -93.5k. The RBA's August hike probability has ticked up to 21%, contrasting with a Bank of Canada that is on hold at 2.25%. The Canadian dollar's failure to rally with oil prices further weakens its position against the high-yielding Aussie. The AUD's restrictive real policy rate of +0.39% provides a fundamental advantage in this cross, as CAD remains caught in a technical and correlation slump",
-      "CAD/JPY": "CAD/JPY is defined by two extreme net short positions: CAD at -93.5k and JPY at -105.2k, creating a volatile environment for the cross. Both the BoC and BoJ are on hold for their upcoming meetings, but the yen remains under significant pressure as a major energy importer with Brent oil near $100. Finance Minister Katayama has signaled \"decisive action\" as the yen breaches 163.00, while the CAD struggles to capitalize on the same energy tailwinds. The pair is likely to remain range-bound as both currencies compete for the bottom of the G10 performance table",
-      "CAD/CHF": "CAD/CHF remains influenced by the CAD COT LF short extreme of -93.5k and an SNB that is firmly on hold until late September. The Swiss franc is underperforming in the G10 despite Middle East geopolitical tensions, as the VIX remains below 20 and prevents significant safe-haven inflows. The Canadian dollar is also underperforming, having broken its correlation with rising crude oil prices. This pair is currently a matchup of two G10 laggards, with CAD sensitive to geopolitical energy risks and CHF driven by carry-neutral flows",
-      "NZD/CAD": "NZD/CAD is strongly favored by the RBNZ's 98% hike probability for September 2, while the BoC remains on hold at 2.25%. The CAD COT LF short extreme of -93.5k underscores the bearish sentiment for the Loonie, which is failing to track the $90 Brent oil price. The RBNZ’s inflation model at 2.7% reinforces its restrictive policy, providing a clear path for NZD outperformance against the lagging CAD. Technical support for the Kiwi above the 0.5800 level against the USD further reinforces the bullish trend in this cross"
+      "USD/CAD": "USD/CAD is trading near its highest levels in 14 months as the market reacts to the USMCA non-extension and new trade tariffs. CAD COT LF short -99.8k reflects extreme bearish sentiment, while OCBC highlights Fed communication as the key driver for the USD with the Fed on hold. Brent oil prices surpassing $100 per barrel due to Houthi tanker attacks would normally support the CAD, but trade fears are currently dominant. The pair remains in a volatile range as traders navigate the Fed's blackout period and decade-long trade renegotiation prospects",
+      "EUR/CAD": "EUR/CAD has moved higher as the Euro's 61% September hike probability meets a CAD under pressure from a -99.8k LF net short position. The termination of the USMCA and the decade-long timeline for trade renegotiation have severely weakened the Canadian dollar. ECB holds at 2.4%. EUR LF net short -80.6k is the primary technical counterweight to the loonie's fundamental weakness",
+      "GBP/CAD": "GBP/CAD is bolstered by GBP COT LF long +33.8k and the severe fundamental headwinds facing the Canadian dollar. The BoC is on hold at 9.0%, but the currency is reeling from CAD COT LF short -99.8k after President Trump’s USMCA decision. While UK manufacturing orders are weak, the BoE's cautious hold and the prospect of oil-driven factory inflation are supporting the pound. The loonie reached a 14-month low recently, and trade renegotiation fears continue to cap any potential recovery",
+      "AUD/CAD": "AUD/CAD is trending higher as an RBA holds at 4.35%. The Canadian dollar remains the most shorted major currency due to USMCA termination and new tariffs. The AUD is finding support from a strong labor market and a restrictive real policy rate of +0.39%. Although oil prices are fluctuating due to Middle East tensions, the CAD’s traditional correlation with energy is being overshadowed by structural trade risks",
+      "CAD/JPY": "CAD/JPY is caught between two weak currencies, with JPY COT LF short -114.0k and CAD COT LF short -99.8k. The yen hit a four-decade low of 163.24 recently, while the CAD reached a 14-month low on trade concerns. BoJ holds at 1.0%. However, Finance Minister Katayama’s intervention warnings and the BoJ's potential for hawkish communication are keeping the yen complex on edge",
+      "CAD/CHF": "CAD/CHF is pressured by CAD COT LF short -99.8k and the ongoing trade uncertainty following the USMCA decision. The Swiss franc remains steady with the SNB on hold and VIX at 17.6, while the loonie faces new tariffs and a long renegotiation cycle. Although VAT Group reported record semiconductor orders, the primary driver for this pair is the Canadian dollar’s soft fundamental backdrop. The pair is testing multi-month lows as speculators increase their bearish bets on the CAD to extreme levels",
+      "NZD/CAD": "NZD/CAD is supported by a hike priced in for the RBNZ at 98% probability on September 2. The Canadian dollar remains under pressure with CAD COT LF short -99.8k and trade renegotiation fears stemming from the USMCA termination. NZD COT LF short -31.6k is significant but less extreme than the loonie's positioning. Despite New Zealand's negative real rate, the RBNZ's hawkish path and a hotter-than-expected CPI print provide a superior fundamental outlook to the tariff-stricken CAD"
     },
     "CHF": {
-      "USD/CHF": "USD/CHF is trading with buyers in control above key moving averages as the US Dollar Index is lifted by higher yields and FOMC focus per MUFG. The SNB is on hold for its September 24 meeting, and the franc has failed to attract safe-haven bids despite Iranian strikes, as the VIX remains at 18.9. US Secretary Rubio's hawkish rhetoric on Iran adds to the safe-haven allure of the dollar rather than the franc in the current environment. The pair's momentum is sustained by the USD's outperformance theme and the franc's status as a G10 laggard",
-      "EUR/CHF": "EUR/CHF is moving on the ECB's July 23 hold and a September hike probability of 61%, while the SNB remains on hold until late September. EUR LF net short positioning at -74.6k is a factor, but the franc's failure to capture safe-haven flows keeps the euro relatively supported. Swiss corporate earnings from VAT and Bystronic show a record semiconductor backlog, yet this has not translated into CHF strength. The pair is operating in a carry-neutral framing with the VIX below 20, keeping moves contained within recent ranges",
-      "GBP/CHF": "GBP/CHF is finding support from UK GDP resilience and sticky core inflation, which keeps the BoE cautious as it heads toward a July 30 hold. The Swiss franc is a weekly G10 laggard, underperforming despite geopolitical instability in the Middle East. Political clarity in the UK and upgrades to growth forecasts provide sterling with a fundamental advantage over the stationary SNB policy. In a sub-20 VIX regime, the franc's carry drag limits its demand against the resilient British pound",
-      "AUD/CHF": "AUD/CHF is driven by a significant bilateral divergence as the AUD leads the G10 space following a massive 76.3k employment beat. The RBA is on hold at 4.35% with a 21% hike probability for August, while the SNB is stationary and the franc is failing to attract flows. The AUD's restrictive real policy rate of +0.39% and a carry premium make it highly attractive against the CHF. This pair reflects a clear risk-on/carry-favoring environment as the VIX remains at 18.9 and the AUD breaches key technical levels",
-      "CAD/CHF": "CAD/CHF is a pairing of two G10 laggards, with the CAD COT LF short at an extreme -93.5k and the CHF failing to gain on geopolitical risks. The Bank of Canada is on hold at 2.25%, and the SNB is on hold until September, leaving the pair without a clear central bank driver. CAD is currently decoupled from the rise in oil prices to $90, while CHF is being framed as carry-neutral in a moderate volatility environment. The pair remains sensitive to any shift in energy markets or a significant spike in the VIX that might revive franc demand",
-      "CHF/JPY": "CHF/JPY is influenced by the JPY COT LF short extreme of -105.2k and a BoJ that is expected to hold rates at 1.0% on July 31. Both the SNB and BoJ are currently on hold, but the yen is under more pressure due to its vulnerability to rising energy import costs as Brent tops $100. Finance Minister Katayama's readiness for \"decisive action\" is the main hurdle for further JPY weakness. In the absence of high market volatility (VIX 18.9), the yen remains the weaker of the two safe-haven peers",
-      "NZD/CHF": "NZD/CHF is supported by a 98% hike probability for the RBNZ on September 2, providing a sharp contrast to the SNB's hold stance. The New Zealand dollar is maintaining its restrictive trajectory with an inflation model at 2.7%, while the franc is underperforming on a weekly basis. High-conviction Kiwi strength is being fueled by carry-seeking demand in a VIX 18.9 environment. The franc's inability to capture safe-haven flows from Middle East tensions leaves it exposed to the RBNZ's hawkish policy divergence"
+      "USD/CHF": "USD/CHF has traded to its highest level since June 2025 as the dollar draws haven demand from Middle East tensions and $100 Brent oil. Intraday, OCBC points to Fed communication as the key path for the USD, with the Fed expected to hold at its upcoming meeting. The SNB is also on hold, and with VIX at 17.6, the Swiss franc is seeing only marginal safe-haven demand. Swiss industrial strength is evidenced by VAT Group's 40% sequential rise in order intake, but the USD remains the dominant force",
+      "EUR/CHF": "EUR/CHF is range-bound as both the ECB and SNB remain on hold at 2.4% and their respective rates. EUR LF net short -80.6k positioning and the ECB's 61% probability of a September hike are the main drivers. While the SNB is not expected to move until September 24, the ECB's Kazimir has warned that an oil shock could necessitate further tightening. Swiss semiconductor and medical technology resilience provide a floor for the CHF, while the EuroZone's weak Economic Surprise Index of -41 weighs on the single currency",
+      "GBP/CHF": "GBP/CHF is supported by GBP COT LF long +33.8k and the BoE’s hold stance ahead of the July 30 meeting. The SNB's hold through September 24 and a VIX of 17.6 limit the upside for the Franc in a carry-neutral environment. UK factory inflation is expected to rise due to higher oil prices, potentially forcing the BoE to stay restrictive for longer. Swiss corporate data from VAT Group shows record orders, but the yield and positioning advantage remains with the pound",
+      "AUD/CHF": "AUD/CHF is testing higher as an RBA holds at 4.35%. The pair is supported by a restrictive real policy rate of +0.39% in Australia and a strong labor market. Swiss economic data is robust, with VAT Group's semiconductor orders up 121 million, but the carry differential favors the AUD. VIX at 17.6 suggests that volatility is not high enough to trigger significant safe-haven flows into the CHF",
+      "CAD/CHF": "CAD/CHF is trading under pressure due to CAD COT LF short -99.8k and the USMCA non-extension. The SNB's hold stance and the Swiss franc's steady performance provide a stable counter to the loonie's fundamental deterioration. Canada is facing a decade-long trade renegotiation cycle and new tariffs, which has pushed the CAD to 14-month lows. Despite record order intake in the Swiss semiconductor sector, the pair is primarily being driven by the extreme bearishness surrounding the Canadian dollar",
+      "CHF/JPY": "CHF/JPY remains elevated as JPY COT LF short -114.0k continues to drive yen weakness. The yen recently breached the 163.24 level, while the Swiss franc remains steady with the SNB on hold and the VIX at 17.6. Finance Minister Katayama has warned of \"decisive action\" for the yen, but the BoJ's 1.0% rate hold keeps the carry trade active. Swiss economic resilience, highlighted by VAT Group results, provides a solid fundamental base for the Franc compared to the BoJ's mounting inflationary pressures",
+      "NZD/CHF": "NZD/CHF has a hike priced in for the RBNZ at 98% probability, which is a major hawkish signal compared to the SNB on hold. NZD COT LF short -31.6k and a hot CPI print have pushed the Kiwi higher, despite a negative real rate of -1.56%. The Swiss franc is navigating geopolitical uncertainty, but with VIX below 20, haven demand is marginal. Markets are balancing the RBNZ's sectoral inflation model against the SNB's neutral stance ahead of their respective September meetings"
     },
     "NZD": {
-      "NZD/USD": "NZD/USD is supported above 0.5800 by a high-conviction RBNZ hawkish bias, with a 98% hike probability priced in for September 2. The US Dollar Index is simultaneously being lifted by MUFG's cited FOMC focus and higher yields, creating a tug-of-war for the pair. The RBNZ's inflation model for Q2 2026 remains unchanged at 2.7%, reinforcing a restrictive stance that keeps the Kiwi resilient. While safe-haven USD bids are active due to Gulf tensions, the NZD’s own policy trajectory provides a solid floor at its 50% midpoint target",
-      "EUR/NZD": "EUR/NZD faces headwinds as the RBNZ’s 98% hike probability for September outpaces the ECB's 61% hike probability. EUR LF net short positioning at -74.6k and the ECB's July 23 hold decision have left the euro vulnerable to the Kiwi's hawkish trajectory. The RBNZ remains committed to a restrictive policy with an inflation model showing 2.7% y/y, contrasting with the Eurozone's negative economic surprise index. Despite the ECB monitoring geopolitical \"worry lists,\" the NZD is currently the more aggressive central bank play in this cross",
-      "GBP/NZD": "GBP/NZD is pressured by the divergence between a cautious Bank of England, expected to hold on July 30, and an RBNZ priced for a near-certain hike in September. While UK GDP resilience and sticky core inflation provide some sterling support, they are overshadowed by the RBNZ's 2.7% inflation model and hawkish commitment. The Kiwi is currently finding support at technical midpoints, benefiting from the BoE's neutral stance. The pair remains sensitive to the RBNZ's upcoming meeting where a 98% hike probability is already baked into market expectations",
-      "AUD/NZD": "AUD/NZD is a matchup of the two most hawkish central banks in the G10, with RBNZ hike odds at 98% and RBA hike odds at 21%. The pair has historically seen large declines when the RBNZ signals aggressive tightening, though the AUD has recently been bolstered by a 76.3k employment surprise. The RBNZ's inflation model remains at 2.7% y/y, which anchors the Kiwi's strength even as the Aussie tries to reclaim its lead. This cross remains highly sensitive to the relative pace of tightening as both central banks maintain restrictive real policy rates",
-      "NZD/JPY": "NZD/JPY is a primary carry trade beneficiary with a 98% hike probability for the RBNZ and an expected hold for the BoJ at 1.0%. JPY COT LF short positioning at -105.2k and the yen's 40-year lows against the USD provide a strong fundamental tailwind for the Kiwi. Japanese officials are on high alert for intervention as the yen breaches 163.00, but the NZD's yields remain a significant draw for investors in a VIX 18.9 environment. The RBNZ's hawkish inflation outlook ensures the Kiwi remains a top choice for carry-seeking market participants",
-      "NZD/CAD": "NZD/CAD is influenced by the CAD COT LF short extreme of -93.5k and the RBNZ's high hike probability of 98%. The Bank of Canada is on hold at 2.25% and is failing to track the rally in oil prices to $90, while the NZD is supported by its own restrictive inflation model at 2.7%. This policy divergence favors the Kiwi as the CAD remains caught between geopolitical risks and a correlation break. The pair is likely to see continued NZD strength as the RBNZ heads toward its September 2 meeting with a near-certain hike priced in",
-      "NZD/CHF": "NZD/CHF is supported by the RBNZ's hawkish trajectory and the Swiss franc's status as a weekly G10 laggard. With a 98% hike probability for the RBNZ and the SNB firmly on hold, the policy gap is widening in favor of the Kiwi. The franc is not attracting safe-haven flows despite Iranian strikes, as the VIX remains below 20 and carry-neutral framing dominates. NZD/CHF remains a preferred way to play RBNZ hawkishness against a stationary and underperforming Swiss currency"
+      "NZD/USD": "NZD/USD is struggling at the SMA50 resistance of 0.5796 despite a hike being priced in for the RBNZ at 98% probability. The pair is supported by a strong positive Economic Surprise Index of +22.2 for New Zealand, though a negative real rate of -1.56% remains a drag. Intraday price action is linked to OCBC's assessment that Fed communication is key for the USD path as the Fed stays on hold. NZD COT LF short -31.6k positioning suggests potential for a squeeze if data continues to outperform",
+      "EUR/NZD": "EUR/NZD is pressured by the RBNZ’s hawkish stance, with a hike priced in at 98% probability for the September 2 meeting. ECB holds at 2.4%. EUR LF net short -80.6k and NZD COT LF short -31.6k show both currencies are being sold, but the Kiwi has a relative data advantage. The RBNZ’s sectoral model shows core inflation at 2.7%, providing a firm baseline for policy",
+      "GBP/NZD": "GBP/NZD is trending lower as the market prepares for a near-certain RBNZ holds at 2.5%. GBP COT LF long +33.8k is facing a challenge from the RBNZ's 98% hike probability, which has been reinforced by recent New Zealand CPI data. While BoE caution remains due to persistent core inflation in the UK, the RBNZ’s hawkish path is more immediate. NZD COT LF short -31.6k could provide fuel for a Kiwi rally if the BoE maintains its hold stance on July 30",
+      "AUD/NZD": "AUD/NZD is a cross of two hawkish central banks, with both the RBA holds at 4.35%. The RBNZ’s hike is priced in with 98% probability following a hotter-than-expected CPI print, while the RBA's hike is priced in for August 11. NZD COT LF short -31.6k positioning is being weighed against the AUD's restrictive real policy rate of +0.39%. The pair is seeing some volatility as markets compare New Zealand's 4.06% inflation expectations against Australia's strong labor market",
+      "NZD/JPY": "NZD/JPY is supported by the RBNZ's hike priced in at 98% and the JPY COT LF short -114.0k positioning. BoJ holds at 1.0%. New Zealand's hot CPI and strong Economic Surprise Index provide a sharp contrast to the BoJ's struggle with yen volatility and intervention risks. The pair remains a favorite for carry seekers, given the widening policy divergence expected in September",
+      "NZD/CAD": "NZD/CAD is sharply higher as the CAD suffers from CAD COT LF short -99.8k and trade renegotiation fears. A hike is priced in for the RBNZ with 98% probability, while the BoC is on hold and facing tariffs from the USMCA termination. NZD COT LF short -31.6k is significantly less extreme than the CAD's bearish positioning. The \"loonie\" remains at a 14-month low, and the RBNZ’s hawkish inflation outlook provides a strong tailwind for the Kiwi in this cross",
+      "NZD/CHF": "NZD/CHF is supported by the RBNZ's 98% hike probability and a neutral SNB on hold. NZD COT LF short -31.6k and a hot CPI print are the primary catalysts for the Kiwi, while the Franc is steady in a carry-neutral regime with VIX at 17.6. Although Swiss firms like VAT Group show record order intakes, the yield advantage of a potential RBNZ move to 2.5% or higher is the dominant factor. The pair remains sensitive to New Zealand's real rate deficit, but the immediate policy path favors the NZD"
     },
     "USD": {
-      "EUR/USD": "EUR/USD trades at 1.1387, weighed down by the US Dollar Index being lifted by higher yields and FOMC focus per MUFG. ECB holds at 2.4%. Bearish technical alignment below the SMA20/50/200 cluster at 1.1420-1.1642 persists as traders look toward the July 29 Fed meeting. EUR LF net short positioning of -74.6k further complicates the recovery for the single currency against a resilient greenback",
-      "GBP/USD": "GBP/USD is pressured at 1.3319 as the greenback finds fresh bids from Houthi tanker attacks and rising oil prices, triggering risk-off demand. The US Dollar Index is firming on better-than-expected GDP data and FOMC anticipation, while the BoE is expected to hold rates on July 30. Despite UK GDP growth exceeding expectations and a cautious BoE monitoring sticky core inflation, the G10 spread has reached a critical 1.317% gap favoring the USD. Political clarity in the UK has not been enough to offset the dominant USD outperformance theme in the current geopolitical climate",
-      "USD/JPY": "USD/JPY is trading at 163.78, remaining well above the 160.00 level that previously triggered Japanese intervention and now testing FinMin Katayama’s readiness for \"decisive action.\" JPY COT LF short positioning is at an extreme -105.2k, while the BoJ is expected to hold rates at 1.0% on July 31. Higher US yields and the Fed's capacity to maintain restrictive policy are lifting the dollar as Japanese headline inflation jumps to 1.7%. BoJ holds at 1.0%.",
-      "AUD/USD": "AUD/USD is trading at 0.6978, where AUD strength from a 76.3k jobs surprise is meeting resistance from a firmer US dollar. The US Dollar Index is being supported by FOMC focus and higher yields, even as the RBA’s August hike probability has reached 21%. AUD is benefiting from a -73bp OIS carry premium and a restrictive real policy rate, but retail sentiment is 59% short at these levels. The options market shows an extreme Volatility Risk Premium of +7.1%, suggesting high uncertainty as the pair tests significant psychological levels",
-      "USD/CAD": "USD/CAD remains on a bullish footing above key support, even as the CAD COT LF short extreme of -93.5k persists. The greenback is near a one-week high as markets grapple with Gulf tensions and Secretary Rubio's warnings on Iran, while the BoC remains on hold at 2.25%. CAD is currently failing to benefit from $90 Brent oil due to a correlation break, leaving it vulnerable to USD strength. MUFG notes that higher yields and the upcoming FOMC meeting are the primary drivers lifting the DXY against the lagging Canadian dollar",
-      "USD/CHF": "USD/CHF is trending higher as buyers stay in control above key moving averages, supported by MUFG's analysis of higher yields lifting the dollar. The SNB is on hold until late September, and the Swiss franc is underperforming as a G10 laggard despite geopolitical turmoil in the Middle East. With the VIX at 18.9, the franc is not seeing the safe-haven flows typical of higher volatility regimes. The US dollar is benefiting more from safe-haven demand and a hawkish Fed outlook than the stationary Swiss currency",
-      "NZD/USD": "NZD/USD has moved back below its 200-hour moving average as the US Dollar Index gains strength, though the Kiwi finds support at its 50% midpoint target. The RBNZ is priced for a 98% hike on September 2, keeping the pair resilient against a broader USD bid driven by FOMC focus and Middle East tensions. While Brent oil topping $100 adds to global risk aversion, the NZD’s own hawkish inflation model at 2.7% provides a fundamental offset to greenback strength. The pair remains a focal point for central bank divergence as the Fed prepares for its July 29 meeting"
+      "EUR/USD": "EUR/USD trades near 1.1413, pinned below its SMA20 as the Eurozone Economic Surprise Index at -41 signals ongoing underperformance. The ECB's recent hold at 2.4% is being weighed against a 61% probability of a September hike, while OCBC notes Fed communication is the primary driver for the USD path. Brent oil prices surpassing $100 and Houthi tanker attacks have bolstered the dollar's haven status. EUR LF net short -80.6k positioning reflects the cautious sentiment toward the single currency as it struggles against U.S. yields",
+      "GBP/USD": "GBP/USD is navigating a narrow range near 1.3353 as investors balance the BoE's hold stance against the Fed's own pause. The pound rose as oil prices dropped following the pause in U.S. bombing in Iran, which improved global investor sentiment. GBP COT LF long +33.8k provides a bullish technical base, although rising gilt yields and fiscal risks are capping further gains. OCBC identifies Fed communication as the critical intraday catalyst for the pair's trajectory ahead of the July 29 meeting",
+      "USD/JPY": "USD/JPY remains elevated at 163.51, holding above its major moving average clusters despite a naval mine blast in the Strait of Hormuz. The 275bp Fed-BoJ carry differential continues to anchor the pair's upside while JPY COT LF short -114.0k remains extreme. Finance Minister Satsuki Katayama's warning of \"decisive action\" on forex after the yen hit 163.24 has kept markets on edge for intervention. OCBC highlights Fed communication as the key path for the USD, maintaining the focus on the U.S. rate outlook",
+      "AUD/USD": "AUD/USD is testing 0.7003, supported by a -71bp OIS carry premium favoring the AUD and a hike priced in for the RBA in August. The pair is positioned above its SMA20 and SMA200, benefiting from a strong Australian labor market and a restrictive real policy rate. OCBC notes that Fed communication will steer the USD path, while global sentiment has been lifted by the de-escalation of U.S.-Iran tensions. Despite the Fed being on hold, the AUD's relative hawkishness is providing a technical floor for the pair",
+      "USD/CAD": "USD/CAD has hit 14-month highs as CAD COT LF short -99.8k reflects the fallout from the USMCA termination. The U.S. dollar is drawing haven demand from $100 Brent oil and Middle East tensions, while the Canadian dollar is weighed down by new trade tariffs. While the Fed is on hold, OCBC notes their communication remains the key driver for the greenback. The pair is navigating a period of high volatility as Canada enters a decade-long trade renegotiation cycle",
+      "USD/CHF": "USD/CHF has climbed to its highest level since June 2025, driven by the dollar's strength and a carry-neutral Swiss franc with the VIX at 17.6. The Fed is on hold, but its communication is seen as the key path for the currency according to OCBC. The SNB also remains on hold, and the Swiss franc is seeing marginal safe-haven demand despite geopolitical uncertainty. Record order intake at VAT Group highlights Swiss industrial strength, but it has not been enough to offset the broader U.S. dollar bid",
+      "NZD/USD": "NZD/USD trades at 0.5799, struggling with SMA50 resistance despite a hike being priced in for the RBNZ with 98% probability. New Zealand's strong Economic Surprise Index of +22.2 is being countered by a negative real rate of -1.56%, while OCBC notes Fed communication as the primary USD driver. NZD COT LF short -31.6k positioning suggests the potential for a technical squeeze on further positive data surprises. Markets are looking toward the September RBNZ meeting for a confirmed move away from the current 2.5% rate"
     }
   },
   "driver_sources": {
+    "EUR": [
+      {
+        "title": "British Pound: UK Economists Warns Higher Oil Prices Will Lift Factory Inflation - Exchange Rates Org UK",
+        "url": "https://www.exchangerates.org.uk/news/46594/2026-07-23-british-pound-uk-economists-warns-higher-oil-prices-will-lift-factory-inflation.html"
+      },
+      {
+        "title": "Traders see September rate hike as European Central Bank mulls energy price spike - CNBC",
+        "url": "https://www.cnbc.com/2026/07/23/interest-rate-hike-iran-european-central-bank.html"
+      },
+      {
+        "title": "Gold prices continue to hold key support as ECB leaves interest rates unchanged - KITCO",
+        "url": "https://www.kitco.com/news/article/2026-07-23/gold-prices-continue-hold-key-support-ecb-leaves-interest-rates-unchanged"
+      }
+    ],
+    "GBP": [
+      {
+        "title": "Dollar pulls back as US-Iran attacks pause, oil drops - CNBC",
+        "url": "https://www.cnbc.com/2026/07/27/dollar-pulls-back-as-us-iran-attacks-pause-oil-drops.html"
+      },
+      {
+        "title": "British Pound: UK Economists Warns Higher Oil Prices Will Lift Factory Inflation - Exchange Rates Org UK",
+        "url": "https://www.exchangerates.org.uk/news/46594/2026-07-23-british-pound-uk-economists-warns-higher-oil-prices-will-lift-factory-inflation.html"
+      }
+    ],
     "JPY": [
+      {
+        "title": "Bank of Japan to signal more rate hikes as price pressures build - Reuters",
+        "url": "https://www.reuters.com/world/asia-pacific/bank-japan-signal-more-rate-hikes-price-pressures-build-2026-07-27/"
+      },
       {
         "title": "US warns against excessive yen volatility, calls for BOJ rate hikes - Reuters",
         "url": "https://www.reuters.com/world/asia-pacific/us-warns-against-excessive-yen-volatility-calls-boj-rate-hikes-2026-07-23/"
-      },
-      {
-        "title": "Japan ready to take decisive action on forex, finance minister says - Reuters",
-        "url": "https://www.reuters.com/world/asia-pacific/japan-ready-take-decisive-action-forex-finance-minister-says-2026-07-24/"
-      },
-      {
-        "title": "Dollar-yen tension hasn't been this fraught in 40 years - Axios",
-        "url": "https://www.axios.com/2026/07/22/japan-yen-dollar-rates"
       },
       {
         "title": "Yen slides past 163, raising intervention alert - CNBC",
         "url": "https://www.cnbc.com/2026/07/22/yen-slides-past-163-raising-intervention-alert.html"
       }
     ],
-    "AUD": [
-      {
-        "title": "Dollar firmer as US-Iran conflict intensifies, Brent hits $90 - CNBC",
-        "url": "https://www.cnbc.com/2026/07/20/dollar-firmer-as-us-iran-conflict-intensifies-brent-hits-90.html"
-      }
-    ],
+    "AUD": [],
     "CAD": [
       {
         "title": "Dollar near one-week high as markets grapple with Gulf tensions - CNBC",
@@ -93,103 +124,91 @@
       {
         "title": "VAT Media Release on Half-year 2026 Results - TradingView",
         "url": "https://www.tradingview.com/news/eqs:4647e70b8094b:0-vat-media-release-on-half-year-2026-results/"
-      },
-      {
-        "title": "Bystronic accelerates transformation amid structural market changes - TradingView",
-        "url": "https://www.tradingview.com/news/eqs:dbc319cd4094b:0-bystronic-accelerates-transformation-amid-structural-market-changes/"
       }
     ],
     "NZD": [
       {
-        "title": "AUD/NZD experiences the largest single-day decline since 2022 on divergent drivers",
-        "url": "https://investinglive.com/forex/audnzd-experiences-the-largest-single-day-decline-since-2022-on-divergent-drivers-20260527"
-      },
-      {
-        "title": "EUR/USD Forecast, News and Analysis (Euro and US Dollar)",
-        "url": "https://www.fxstreet.com/currencies/eurusd"
-      },
-      {
-        "title": "The Most Commonly Traded Forex Pairs in 2024 | Saxo",
-        "url": "https://www.home.saxo/learn/guides/forex/the-most-commonly-traded-forex-pairs"
+        "title": "Yen slides past 163, raising intervention alert - CNBC",
+        "url": "https://www.cnbc.com/2026/07/22/yen-slides-past-163-raising-intervention-alert.html"
       }
     ],
     "USD": [
       {
-        "title": "US warns against excessive yen volatility, calls for BOJ rate hikes - Reuters",
-        "url": "https://www.reuters.com/world/asia-pacific/us-warns-against-excessive-yen-volatility-calls-boj-rate-hikes-2026-07-23/"
+        "title": "Gold prices this morning, July 27, 2026: Continue to rise sharply. - Vietnam.vn",
+        "url": "https://www.vietnam.vn/en/gia-vang-sang-nay-27-7-2026-tiep-tuc-tang-manh"
       },
       {
-        "title": "Dollar near one-week high as markets grapple with Gulf tensions - CNBC",
-        "url": "https://www.cnbc.com/amp/2026/07/21/dollar-near-one-week-high-as-markets-grapple-with-gulf-tensions.html"
+        "title": "Oil prices sink 5% and Asian shares gain as Chinese chipmaker CXMT soars in Shanghai trading debut - The Sun Chronicle",
+        "url": "https://www.thesunchronicle.com/business/oil-prices-sink-5-and-asian-shares-gain-as-chinese-chipmaker-cxmt-soars-in-shanghai/article_fb62c972-4783-57fa-a274-bb197e5f2fb8.html"
       },
       {
-        "title": "Shares skid in Asia in sell-off of AI-related shares as Brent oil tops $100 per barrel - AP News",
-        "url": "https://apnews.com/article/stocks-markets-tariffs-oil-trump-ai-0b9c3b2aa5ca83eb391c1388efe03c97"
+        "title": "Oil prices sink 4% while Asian shares gain as Chinese chipmaker CXMT soars in Shanghai trading debut - AP News",
+        "url": "https://apnews.com/article/stocks-oil-rates-markets-cxmt-2b81f0e01bb318ae8d4281964f89f2f1"
       },
       {
-        "title": "Shares skid in Asia in sell-off of AI-related shares as Brent oil tops $100 per barrel - The Sun Chronicle",
-        "url": "https://www.thesunchronicle.com/business/shares-skid-in-asia-in-sell-off-of-ai-related-shares-as-brent-oil-tops/article_3805c176-fd68-54d3-85d8-855d8a93f3ea.html"
+        "title": "British Pound: UK Economists Warns Higher Oil Prices Will Lift Factory Inflation - Exchange Rates Org UK",
+        "url": "https://www.exchangerates.org.uk/news/46594/2026-07-23-british-pound-uk-economists-warns-higher-oil-prices-will-lift-factory-inflation.html"
       }
     ]
   },
   "_inputs_snap": {
     "USD": {
-      "cot_we": "2026-07-14",
-      "rate_updated": "2026-07-24",
+      "cot_we": "2026-07-21",
+      "rate_updated": "2026-07-26",
       "bias": "hold",
       "bias_updated": "2026-07-23"
     },
     "EUR": {
-      "cot_we": "2026-07-14",
-      "rate_updated": "2026-07-24",
+      "cot_we": "2026-07-21",
+      "rate_updated": "2026-07-26",
       "bias": "hike",
       "bias_updated": "2026-07-23"
     },
     "GBP": {
-      "cot_we": "2026-07-14",
-      "rate_updated": "2026-07-24",
+      "cot_we": "2026-07-21",
+      "rate_updated": "2026-07-26",
       "bias": "hold",
       "bias_updated": "2026-07-23"
     },
     "JPY": {
-      "cot_we": "2026-07-14",
-      "rate_updated": "2026-07-24",
+      "cot_we": "2026-07-21",
+      "rate_updated": "2026-07-26",
       "bias": "hold",
       "bias_updated": "2026-07-23"
     },
     "AUD": {
-      "cot_we": "2026-07-14",
-      "rate_updated": "2026-07-24",
+      "cot_we": "2026-07-21",
+      "rate_updated": "2026-07-26",
       "bias": "hike",
       "bias_updated": "2026-07-23"
     },
     "CAD": {
-      "cot_we": "2026-07-14",
-      "rate_updated": "2026-07-24",
+      "cot_we": "2026-07-21",
+      "rate_updated": "2026-07-26",
       "bias": "hold",
       "bias_updated": "2026-07-23"
     },
     "CHF": {
-      "cot_we": "2026-07-14",
-      "rate_updated": "2026-07-24",
+      "cot_we": "2026-07-21",
+      "rate_updated": "2026-07-26",
       "bias": "hold",
       "bias_updated": "2026-07-23"
     },
     "NZD": {
-      "cot_we": "2026-07-14",
-      "rate_updated": "2026-07-24",
+      "cot_we": "2026-07-21",
+      "rate_updated": "2026-07-26",
       "bias": "hike",
       "bias_updated": "2026-07-23"
     },
     "NOK": {
       "cot_we": null,
-      "rate_updated": "2026-07-24",
+      "rate_updated": "2026-07-26",
       "bias": "hike",
       "bias_updated": "2026-07-23"
     },
     "SEK": {
       "cot_we": null,
-      "rate_updated": "2026-07-24",
+      "rate_updated": "2026-07-26",
       "bias": "hold",
       "bias_updated": "2026-07-23"
     }
