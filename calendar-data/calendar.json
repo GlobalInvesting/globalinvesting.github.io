@@ -9,21 +9,21 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-28",
   "rangeTo": "2026-07-27",
-  "totalEvents": 3998,
+  "totalEvents": 3690,
   "currencyCounts": {
-    "GBP": 473,
+    "GBP": 429,
     "USD": 1263,
-    "EUR": 873,
-    "AUD": 289,
-    "CAD": 318,
-    "CHF": 168,
-    "JPY": 254,
-    "NZD": 126,
+    "EUR": 829,
+    "AUD": 245,
+    "CAD": 274,
+    "CHF": 124,
+    "JPY": 210,
+    "NZD": 82,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2126,
+    "medium": 1818,
     "high": 1644,
     "low": 228
   },
@@ -9521,42 +9521,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-10-13",
-      "hourUTC": "08:00",
-      "actual": "63%",
-      "forecast": "",
-      "previous": "32.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-10-13",
-      "hourUTC": "08:00",
-      "actual": "14%",
-      "forecast": "",
-      "previous": "18.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-10-13",
-      "hourUTC": "08:00",
-      "actual": "65%",
-      "forecast": "",
-      "previous": "76.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Wholesale Prices YoY",
       "dateISO": "2025-10-13",
@@ -9581,30 +9545,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-10-13",
-      "hourUTC": "08:00",
-      "actual": "51%",
-      "forecast": "",
-      "previous": "46.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-10-13",
-      "hourUTC": "08:00",
-      "actual": "40%",
-      "forecast": "",
-      "previous": "52.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "GBP",
       "event": "BRC Retail Sales Monitor YoY",
       "dateISO": "2025-10-13",
@@ -9614,30 +9554,6 @@
       "previous": "2.9",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-10-13",
-      "hourUTC": "08:00",
-      "actual": "28%",
-      "forecast": "",
-      "previous": "33.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-10-13",
-      "hourUTC": "08:00",
-      "actual": "82%",
-      "forecast": "",
-      "previous": "68.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -10001,42 +9917,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-10-20",
-      "hourUTC": "08:00",
-      "actual": "60%",
-      "forecast": "",
-      "previous": "63.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-10-20",
-      "hourUTC": "08:00",
-      "actual": "15%",
-      "forecast": "",
-      "previous": "14.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-10-20",
-      "hourUTC": "08:00",
-      "actual": "90%",
-      "forecast": "",
-      "previous": "65.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "PPI YoY",
       "dateISO": "2025-10-20",
@@ -10044,54 +9924,6 @@
       "actual": "-1.7%",
       "forecast": "-1.9",
       "previous": "-2.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-10-20",
-      "hourUTC": "08:00",
-      "actual": "36%",
-      "forecast": "",
-      "previous": "51.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-10-20",
-      "hourUTC": "08:00",
-      "actual": "32%",
-      "forecast": "",
-      "previous": "40.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-10-20",
-      "hourUTC": "08:00",
-      "actual": "47%",
-      "forecast": "",
-      "previous": "28.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-10-20",
-      "hourUTC": "08:00",
-      "actual": "81%",
-      "forecast": "",
-      "previous": "82.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -10626,54 +10458,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-10-27",
-      "hourUTC": "08:00",
-      "actual": "47%",
-      "forecast": "",
-      "previous": "60.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-10-27",
-      "hourUTC": "08:00",
-      "actual": "24%",
-      "forecast": "",
-      "previous": "15.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-10-27",
-      "hourUTC": "08:00",
-      "actual": "82%",
-      "forecast": "",
-      "previous": "90.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-10-27",
-      "hourUTC": "08:00",
-      "actual": "41%",
-      "forecast": "",
-      "previous": "36.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Ifo Business Climate",
       "dateISO": "2025-10-27",
@@ -10687,48 +10471,12 @@
     },
     {
       "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-10-27",
-      "hourUTC": "08:00",
-      "actual": "42%",
-      "forecast": "",
-      "previous": "32.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
       "event": "CBI Distributive Trades",
       "dateISO": "2025-10-27",
       "hourUTC": "11:00",
       "actual": "-27",
       "forecast": "-27.0",
       "previous": "-29.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-10-27",
-      "hourUTC": "08:00",
-      "actual": "31%",
-      "forecast": "",
-      "previous": "47.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-10-27",
-      "hourUTC": "08:00",
-      "actual": "74%",
-      "forecast": "",
-      "previous": "81.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -11658,30 +11406,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-11-03",
-      "hourUTC": "08:00",
-      "actual": "41%",
-      "forecast": "",
-      "previous": "47.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-11-03",
-      "hourUTC": "08:00",
-      "actual": "25%",
-      "forecast": "",
-      "previous": "24.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Inflation Rate YoY",
       "dateISO": "2025-11-03",
@@ -11689,18 +11413,6 @@
       "actual": "0.1%",
       "forecast": "0.3",
       "previous": "0.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-11-03",
-      "hourUTC": "08:00",
-      "actual": "59%",
-      "forecast": "",
-      "previous": "82.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -11719,18 +11431,6 @@
     },
     {
       "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-11-03",
-      "hourUTC": "08:00",
-      "actual": "58%",
-      "forecast": "",
-      "previous": "41.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
       "event": "Unemployment Rate",
       "dateISO": "2025-11-03",
       "hourUTC": "09:10",
@@ -11739,42 +11439,6 @@
       "previous": "7.0",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-11-03",
-      "hourUTC": "08:00",
-      "actual": "76%",
-      "forecast": "",
-      "previous": "42.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-11-03",
-      "hourUTC": "08:00",
-      "actual": "31%",
-      "forecast": "",
-      "previous": "31.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-11-03",
-      "hourUTC": "08:00",
-      "actual": "81%",
-      "forecast": "",
-      "previous": "74.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -12271,18 +11935,6 @@
     },
     {
       "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-11-10",
-      "hourUTC": "08:00",
-      "actual": "46%",
-      "forecast": "",
-      "previous": "41.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "AUD",
       "event": "Westpac Consumer Confidence Change",
       "dateISO": "2025-11-10",
       "hourUTC": "23:30",
@@ -12306,66 +11958,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-11-10",
-      "hourUTC": "08:00",
-      "actual": "47%",
-      "forecast": "",
-      "previous": "25.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-11-10",
-      "hourUTC": "08:00",
-      "actual": "63%",
-      "forecast": "",
-      "previous": "59.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-11-10",
-      "hourUTC": "08:00",
-      "actual": "32%",
-      "forecast": "",
-      "previous": "58.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-11-10",
-      "hourUTC": "08:00",
-      "actual": "61%",
-      "forecast": "",
-      "previous": "76.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-11-10",
-      "hourUTC": "08:00",
-      "actual": "32%",
-      "forecast": "",
-      "previous": "31.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "JPY",
       "event": "Current Account",
       "dateISO": "2025-11-10",
@@ -12373,18 +11965,6 @@
       "actual": "¥4483B",
       "forecast": "2468.0",
       "previous": "3701.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-11-10",
-      "hourUTC": "08:00",
-      "actual": "91%",
-      "forecast": "",
-      "previous": "81.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -12834,30 +12414,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-11-17",
-      "hourUTC": "08:00",
-      "actual": "53%",
-      "forecast": "",
-      "previous": "46.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-11-17",
-      "hourUTC": "08:00",
-      "actual": "40%",
-      "forecast": "",
-      "previous": "47.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CAD",
       "event": "Inflation Rate MoM",
       "dateISO": "2025-11-17",
@@ -12937,66 +12493,6 @@
       "actual": "-0.5%",
       "forecast": "0.3",
       "previous": "0.1",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-11-17",
-      "hourUTC": "08:00",
-      "actual": "89%",
-      "forecast": "",
-      "previous": "63.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-11-17",
-      "hourUTC": "08:00",
-      "actual": "30%",
-      "forecast": "",
-      "previous": "32.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-11-17",
-      "hourUTC": "08:00",
-      "actual": "59%",
-      "forecast": "",
-      "previous": "61.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-11-17",
-      "hourUTC": "08:00",
-      "actual": "28%",
-      "forecast": "",
-      "previous": "32.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-11-17",
-      "hourUTC": "08:00",
-      "actual": "77%",
-      "forecast": "",
-      "previous": "91.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -13699,54 +13195,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-11-24",
-      "hourUTC": "08:00",
-      "actual": "72%",
-      "forecast": "",
-      "previous": "53.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-11-24",
-      "hourUTC": "08:00",
-      "actual": "21%",
-      "forecast": "",
-      "previous": "40.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-11-24",
-      "hourUTC": "08:00",
-      "actual": "54%",
-      "forecast": "",
-      "previous": "89.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-11-24",
-      "hourUTC": "08:00",
-      "actual": "53%",
-      "forecast": "",
-      "previous": "30.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Ifo Business Climate",
       "dateISO": "2025-11-24",
@@ -13756,42 +13204,6 @@
       "previous": "88.4",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-11-24",
-      "hourUTC": "08:00",
-      "actual": "59%",
-      "forecast": "",
-      "previous": "59.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-11-24",
-      "hourUTC": "08:00",
-      "actual": "21%",
-      "forecast": "",
-      "previous": "28.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-11-24",
-      "hourUTC": "08:00",
-      "actual": "85%",
-      "forecast": "",
-      "previous": "77.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -14719,30 +14131,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-12-01",
-      "hourUTC": "08:00",
-      "actual": "13%",
-      "forecast": "",
-      "previous": "72.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-12-01",
-      "hourUTC": "08:00",
-      "actual": "66%",
-      "forecast": "",
-      "previous": "21.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Retail Sales MoM",
       "dateISO": "2025-12-01",
@@ -14767,18 +14155,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-12-01",
-      "hourUTC": "08:00",
-      "actual": "67%",
-      "forecast": "",
-      "previous": "54.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Unemployment Rate",
       "dateISO": "2025-12-01",
@@ -14788,30 +14164,6 @@
       "previous": "7.2",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-12-01",
-      "hourUTC": "08:00",
-      "actual": "27%",
-      "forecast": "",
-      "previous": "53.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-12-01",
-      "hourUTC": "08:00",
-      "actual": "47%",
-      "forecast": "",
-      "previous": "59.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -14846,30 +14198,6 @@
       "actual": "65.02K",
       "forecast": "64.2",
       "previous": "65.65",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-12-01",
-      "hourUTC": "08:00",
-      "actual": "33%",
-      "forecast": "",
-      "previous": "21.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-12-01",
-      "hourUTC": "08:00",
-      "actual": "36%",
-      "forecast": "",
-      "previous": "85.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -15644,30 +14972,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-12-08",
-      "hourUTC": "08:00",
-      "actual": "10%",
-      "forecast": "",
-      "previous": "13.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-12-08",
-      "hourUTC": "08:00",
-      "actual": "81%",
-      "forecast": "",
-      "previous": "66.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Consumer Confidence",
       "dateISO": "2025-12-08",
@@ -15680,18 +14984,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-12-08",
-      "hourUTC": "08:00",
-      "actual": "71%",
-      "forecast": "",
-      "previous": "67.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Industrial Production MoM",
       "dateISO": "2025-12-08",
@@ -15699,54 +14991,6 @@
       "actual": "1.8%",
       "forecast": "-0.4",
       "previous": "1.1",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-12-08",
-      "hourUTC": "08:00",
-      "actual": "35%",
-      "forecast": "",
-      "previous": "27.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-12-08",
-      "hourUTC": "08:00",
-      "actual": "44%",
-      "forecast": "",
-      "previous": "47.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-12-08",
-      "hourUTC": "08:00",
-      "actual": "32%",
-      "forecast": "",
-      "previous": "33.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-12-08",
-      "hourUTC": "08:00",
-      "actual": "32%",
-      "forecast": "",
-      "previous": "36.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -16209,18 +15453,6 @@
     },
     {
       "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-12-15",
-      "hourUTC": "08:00",
-      "actual": "7%",
-      "forecast": "",
-      "previous": "10.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "AUD",
       "event": "Westpac Consumer Confidence Index",
       "dateISO": "2025-12-15",
       "hourUTC": "23:30",
@@ -16241,18 +15473,6 @@
       "previous": "12.8",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-12-15",
-      "hourUTC": "08:00",
-      "actual": "68%",
-      "forecast": "",
-      "previous": "81.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -16328,18 +15548,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-12-15",
-      "hourUTC": "08:00",
-      "actual": "90%",
-      "forecast": "",
-      "previous": "71.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Wholesale Prices MoM",
       "dateISO": "2025-12-15",
@@ -16365,60 +15573,12 @@
     },
     {
       "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-12-15",
-      "hourUTC": "08:00",
-      "actual": "22%",
-      "forecast": "",
-      "previous": "35.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
       "event": "Industrial Production MoM",
       "dateISO": "2025-12-15",
       "hourUTC": "10:00",
       "actual": "0.8%",
       "forecast": "0.8",
       "previous": "0.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-12-15",
-      "hourUTC": "08:00",
-      "actual": "43%",
-      "forecast": "",
-      "previous": "44.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-12-15",
-      "hourUTC": "08:00",
-      "actual": "58%",
-      "forecast": "",
-      "previous": "32.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-12-15",
-      "hourUTC": "08:00",
-      "actual": "28%",
-      "forecast": "",
-      "previous": "32.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -17385,54 +16545,6 @@
       "previous": null
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-12-22",
-      "hourUTC": "08:00",
-      "actual": "14%",
-      "forecast": "",
-      "previous": "7.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-12-22",
-      "hourUTC": "08:00",
-      "actual": "76%",
-      "forecast": "",
-      "previous": "68.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-12-22",
-      "hourUTC": "08:00",
-      "actual": "89%",
-      "forecast": "",
-      "previous": "90.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-12-22",
-      "hourUTC": "08:00",
-      "actual": "22%",
-      "forecast": "",
-      "previous": "22.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Balance of Trade",
       "dateISO": "2025-12-22",
@@ -17452,42 +16564,6 @@
       "actual": "-£12.1B",
       "forecast": "-21.3",
       "previous": "-21.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-12-22",
-      "hourUTC": "08:00",
-      "actual": "48%",
-      "forecast": "",
-      "previous": "43.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-12-22",
-      "hourUTC": "08:00",
-      "actual": "19%",
-      "forecast": "",
-      "previous": "58.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-12-22",
-      "hourUTC": "08:00",
-      "actual": "45%",
-      "forecast": "",
-      "previous": "28.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -17745,54 +16821,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2025-12-29",
-      "hourUTC": "08:00",
-      "actual": "5%",
-      "forecast": "",
-      "previous": "14.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2025-12-29",
-      "hourUTC": "08:00",
-      "actual": "81%",
-      "forecast": "",
-      "previous": "76.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2025-12-29",
-      "hourUTC": "08:00",
-      "actual": "92%",
-      "forecast": "",
-      "previous": "89.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2025-12-29",
-      "hourUTC": "08:00",
-      "actual": "18%",
-      "forecast": "",
-      "previous": "22.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Unemployment Benefit Claims",
       "dateISO": "2025-12-29",
@@ -17800,42 +16828,6 @@
       "actual": "-21.5K",
       "forecast": "45.0",
       "previous": "68.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2025-12-29",
-      "hourUTC": "08:00",
-      "actual": "36%",
-      "forecast": "",
-      "previous": "48.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2025-12-29",
-      "hourUTC": "08:00",
-      "actual": "33%",
-      "forecast": "",
-      "previous": "19.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2025-12-29",
-      "hourUTC": "08:00",
-      "actual": "19%",
-      "forecast": "",
-      "previous": "45.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -18117,30 +17109,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-01-05",
-      "hourUTC": "08:00",
-      "actual": "9%",
-      "forecast": "",
-      "previous": "5.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-01-05",
-      "hourUTC": "08:00",
-      "actual": "76%",
-      "forecast": "",
-      "previous": "81.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Retail Sales MoM",
       "dateISO": "2026-01-05",
@@ -18166,18 +17134,6 @@
     },
     {
       "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-01-05",
-      "hourUTC": "08:00",
-      "actual": "86%",
-      "forecast": "",
-      "previous": "92.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
       "event": "procure.ch Manufacturing PMI",
       "dateISO": "2026-01-05",
       "hourUTC": "08:30",
@@ -18198,30 +17154,6 @@
       "previous": "-18.8",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-01-05",
-      "hourUTC": "08:00",
-      "actual": "49%",
-      "forecast": "",
-      "previous": "18.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-01-05",
-      "hourUTC": "08:00",
-      "actual": "53%",
-      "forecast": "",
-      "previous": "36.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -18256,30 +17188,6 @@
       "actual": "£4.49B",
       "forecast": "4.5",
       "previous": "4.16",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-01-05",
-      "hourUTC": "08:00",
-      "actual": "28%",
-      "forecast": "",
-      "previous": "33.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-01-05",
-      "hourUTC": "08:00",
-      "actual": "59%",
-      "forecast": "",
-      "previous": "19.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -19342,18 +18250,6 @@
     },
     {
       "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-01-12",
-      "hourUTC": "08:00",
-      "actual": "18%",
-      "forecast": "",
-      "previous": "9.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "AUD",
       "event": "Westpac Consumer Confidence Index",
       "dateISO": "2026-01-12",
       "hourUTC": "23:30",
@@ -19377,18 +18273,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-01-12",
-      "hourUTC": "08:00",
-      "actual": "46%",
-      "forecast": "",
-      "previous": "76.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Consumer Confidence",
       "dateISO": "2026-01-12",
@@ -19401,54 +18285,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-01-12",
-      "hourUTC": "08:00",
-      "actual": "74%",
-      "forecast": "",
-      "previous": "86.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-01-12",
-      "hourUTC": "08:00",
-      "actual": "48%",
-      "forecast": "",
-      "previous": "49.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-01-12",
-      "hourUTC": "08:00",
-      "actual": "53%",
-      "forecast": "",
-      "previous": "53.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-01-12",
-      "hourUTC": "08:00",
-      "actual": "20%",
-      "forecast": "",
-      "previous": "28.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "JPY",
       "event": "Current Account",
       "dateISO": "2026-01-12",
@@ -19456,18 +18292,6 @@
       "actual": "¥3674B",
       "forecast": "3594.0",
       "previous": "2834.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-01-12",
-      "hourUTC": "08:00",
-      "actual": "63%",
-      "forecast": "",
-      "previous": "59.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -20110,30 +18934,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-01-19",
-      "hourUTC": "08:00",
-      "actual": "12%",
-      "forecast": "",
-      "previous": "18.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-01-19",
-      "hourUTC": "08:00",
-      "actual": "31%",
-      "forecast": "",
-      "previous": "46.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CAD",
       "event": "Inflation Rate YoY",
       "dateISO": "2026-01-19",
@@ -20194,30 +18994,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-01-19",
-      "hourUTC": "08:00",
-      "actual": "75%",
-      "forecast": "",
-      "previous": "74.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-01-19",
-      "hourUTC": "08:00",
-      "actual": "50%",
-      "forecast": "",
-      "previous": "48.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "CPI",
       "dateISO": "2026-01-19",
@@ -20227,42 +19003,6 @@
       "previous": "129.33",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-01-19",
-      "hourUTC": "08:00",
-      "actual": "55%",
-      "forecast": "",
-      "previous": "53.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-01-19",
-      "hourUTC": "08:00",
-      "actual": "42%",
-      "forecast": "",
-      "previous": "20.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-01-19",
-      "hourUTC": "08:00",
-      "actual": "52%",
-      "forecast": "",
-      "previous": "63.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -20904,54 +19644,6 @@
       "previous": null
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-01-26",
-      "hourUTC": "08:00",
-      "actual": "4%",
-      "forecast": "",
-      "previous": "12.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-01-26",
-      "hourUTC": "08:00",
-      "actual": "83%",
-      "forecast": "",
-      "previous": "31.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-01-26",
-      "hourUTC": "08:00",
-      "actual": "91%",
-      "forecast": "",
-      "previous": "75.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-01-26",
-      "hourUTC": "08:00",
-      "actual": "19%",
-      "forecast": "",
-      "previous": "50.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Ifo Business Climate",
       "dateISO": "2026-01-26",
@@ -20961,42 +19653,6 @@
       "previous": "87.6",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-01-26",
-      "hourUTC": "08:00",
-      "actual": "18%",
-      "forecast": "",
-      "previous": "55.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-01-26",
-      "hourUTC": "08:00",
-      "actual": "62%",
-      "forecast": "",
-      "previous": "42.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-01-26",
-      "hourUTC": "08:00",
-      "actual": "6%",
-      "forecast": "",
-      "previous": "52.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -21972,30 +20628,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-02-02",
-      "hourUTC": "08:00",
-      "actual": "12%",
-      "forecast": "",
-      "previous": "4.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-02-02",
-      "hourUTC": "08:00",
-      "actual": "74%",
-      "forecast": "",
-      "previous": "83.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Retail Sales YoY",
       "dateISO": "2026-02-02",
@@ -22017,18 +20649,6 @@
       "previous": "-0.1",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-02-02",
-      "hourUTC": "08:00",
-      "actual": "87%",
-      "forecast": "",
-      "previous": "91.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -22069,18 +20689,6 @@
     },
     {
       "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-02-02",
-      "hourUTC": "08:00",
-      "actual": "39%",
-      "forecast": "",
-      "previous": "19.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
       "event": "Unemployment Rate",
       "dateISO": "2026-02-02",
       "hourUTC": "09:20",
@@ -22111,42 +20719,6 @@
       "actual": "1%",
       "forecast": "0.7",
       "previous": "0.6",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-02-02",
-      "hourUTC": "08:00",
-      "actual": "37%",
-      "forecast": "",
-      "previous": "18.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-02-02",
-      "hourUTC": "08:00",
-      "actual": "46%",
-      "forecast": "",
-      "previous": "62.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-02-02",
-      "hourUTC": "08:00",
-      "actual": "20%",
-      "forecast": "",
-      "previous": "6.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -22777,18 +21349,6 @@
     },
     {
       "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-02-09",
-      "hourUTC": "08:00",
-      "actual": "14%",
-      "forecast": "",
-      "previous": "12.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "AUD",
       "event": "Westpac Consumer Confidence Index",
       "dateISO": "2026-02-09",
       "hourUTC": "23:30",
@@ -22812,18 +21372,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-02-09",
-      "hourUTC": "08:00",
-      "actual": "70%",
-      "forecast": "",
-      "previous": "74.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Consumer Confidence",
       "dateISO": "2026-02-09",
@@ -22831,66 +21379,6 @@
       "actual": "-30",
       "forecast": "-30.0",
       "previous": "-31.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-02-09",
-      "hourUTC": "08:00",
-      "actual": "84%",
-      "forecast": "",
-      "previous": "87.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-02-09",
-      "hourUTC": "08:00",
-      "actual": "42%",
-      "forecast": "",
-      "previous": "39.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-02-09",
-      "hourUTC": "08:00",
-      "actual": "48%",
-      "forecast": "",
-      "previous": "37.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-02-09",
-      "hourUTC": "08:00",
-      "actual": "23%",
-      "forecast": "",
-      "previous": "46.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-02-09",
-      "hourUTC": "08:00",
-      "actual": "46%",
-      "forecast": "",
-      "previous": "20.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -23628,30 +22116,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-02-16",
-      "hourUTC": "08:00",
-      "actual": "13%",
-      "forecast": "",
-      "previous": "14.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-02-16",
-      "hourUTC": "08:00",
-      "actual": "70%",
-      "forecast": "",
-      "previous": "70.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CAD",
       "event": "Housing Starts",
       "dateISO": "2026-02-16",
@@ -23676,30 +22140,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-02-16",
-      "hourUTC": "08:00",
-      "actual": "89%",
-      "forecast": "",
-      "previous": "84.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-02-16",
-      "hourUTC": "08:00",
-      "actual": "38%",
-      "forecast": "",
-      "previous": "42.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Industrial Production MoM",
       "dateISO": "2026-02-16",
@@ -23707,42 +22147,6 @@
       "actual": "-1.4%",
       "forecast": "-1.5",
       "previous": "0.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-02-16",
-      "hourUTC": "08:00",
-      "actual": "49%",
-      "forecast": "",
-      "previous": "48.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-02-16",
-      "hourUTC": "08:00",
-      "actual": "48%",
-      "forecast": "",
-      "previous": "23.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-02-16",
-      "hourUTC": "08:00",
-      "actual": "39%",
-      "forecast": "",
-      "previous": "46.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -24770,54 +23174,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-02-23",
-      "hourUTC": "08:00",
-      "actual": "13%",
-      "forecast": "",
-      "previous": "13.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-02-23",
-      "hourUTC": "08:00",
-      "actual": "63%",
-      "forecast": "",
-      "previous": "70.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-02-23",
-      "hourUTC": "08:00",
-      "actual": "86%",
-      "forecast": "",
-      "previous": "89.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-02-23",
-      "hourUTC": "08:00",
-      "actual": "42%",
-      "forecast": "",
-      "previous": "38.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Ifo Business Climate",
       "dateISO": "2026-02-23",
@@ -24827,42 +23183,6 @@
       "previous": "87.6",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-02-23",
-      "hourUTC": "08:00",
-      "actual": "48%",
-      "forecast": "",
-      "previous": "49.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-02-23",
-      "hourUTC": "08:00",
-      "actual": "35%",
-      "forecast": "",
-      "previous": "48.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-02-23",
-      "hourUTC": "08:00",
-      "actual": "44%",
-      "forecast": "",
-      "previous": "39.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -25659,30 +23979,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-03-02",
-      "hourUTC": "08:00",
-      "actual": "13%",
-      "forecast": "",
-      "previous": "13.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-03-02",
-      "hourUTC": "08:00",
-      "actual": "72%",
-      "forecast": "",
-      "previous": "63.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Retail Sales MoM",
       "dateISO": "2026-03-02",
@@ -25704,18 +24000,6 @@
       "previous": "2.8",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-03-02",
-      "hourUTC": "08:00",
-      "actual": "90%",
-      "forecast": "",
-      "previous": "86.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -25752,18 +24036,6 @@
       "previous": "2.5",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-03-02",
-      "hourUTC": "08:00",
-      "actual": "48%",
-      "forecast": "",
-      "previous": "42.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -25828,18 +24100,6 @@
     },
     {
       "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-03-02",
-      "hourUTC": "08:00",
-      "actual": "48%",
-      "forecast": "",
-      "previous": "48.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
       "event": "Mortgage Lending",
       "dateISO": "2026-03-02",
       "hourUTC": "09:30",
@@ -25876,18 +24136,6 @@
     },
     {
       "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-03-02",
-      "hourUTC": "08:00",
-      "actual": "35%",
-      "forecast": "",
-      "previous": "35.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
       "event": "Unemployment Rate",
       "dateISO": "2026-03-02",
       "hourUTC": "23:30",
@@ -25906,18 +24154,6 @@
       "actual": "6.5%",
       "forecast": "3.0",
       "previous": "2.9",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-03-02",
-      "hourUTC": "08:00",
-      "actual": "51%",
-      "forecast": "",
-      "previous": "44.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -26741,18 +24977,6 @@
     },
     {
       "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-03-09",
-      "hourUTC": "08:00",
-      "actual": "16%",
-      "forecast": "",
-      "previous": "13.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "AUD",
       "event": "Westpac Consumer Confidence Change",
       "dateISO": "2026-03-09",
       "hourUTC": "23:30",
@@ -26776,18 +25000,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-03-09",
-      "hourUTC": "08:00",
-      "actual": "82%",
-      "forecast": "",
-      "previous": "72.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Consumer Confidence",
       "dateISO": "2026-03-09",
@@ -26795,18 +25007,6 @@
       "actual": "-30",
       "forecast": "-29.0",
       "previous": "-30.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-03-09",
-      "hourUTC": "08:00",
-      "actual": "81%",
-      "forecast": "",
-      "previous": "90.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -26836,30 +25036,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-03-09",
-      "hourUTC": "08:00",
-      "actual": "72%",
-      "forecast": "",
-      "previous": "48.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-03-09",
-      "hourUTC": "08:00",
-      "actual": "54%",
-      "forecast": "",
-      "previous": "48.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "JPY",
       "event": "Current Account",
       "dateISO": "2026-03-09",
@@ -26867,18 +25043,6 @@
       "actual": "¥941.6B",
       "forecast": "960.0",
       "previous": "728.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-03-09",
-      "hourUTC": "08:00",
-      "actual": "28%",
-      "forecast": "",
-      "previous": "35.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -26941,18 +25105,6 @@
       "previous": "-7.8%",
       "impact": "low",
       "importance": 1,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-03-09",
-      "hourUTC": "08:00",
-      "actual": "54%",
-      "forecast": "",
-      "previous": "51.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -27930,30 +26082,6 @@
       "previous": null
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-03-16",
-      "hourUTC": "08:00",
-      "actual": "37%",
-      "forecast": "",
-      "previous": "16.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-03-16",
-      "hourUTC": "08:00",
-      "actual": "53%",
-      "forecast": "",
-      "previous": "82.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CAD",
       "event": "Housing Starts",
       "dateISO": "2026-03-16",
@@ -28038,54 +26166,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-03-16",
-      "hourUTC": "08:00",
-      "actual": "66%",
-      "forecast": "",
-      "previous": "81.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-03-16",
-      "hourUTC": "08:00",
-      "actual": "72%",
-      "forecast": "",
-      "previous": "72.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-03-16",
-      "hourUTC": "08:00",
-      "actual": "67%",
-      "forecast": "",
-      "previous": "54.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-03-16",
-      "hourUTC": "08:00",
-      "actual": "21%",
-      "forecast": "",
-      "previous": "28.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "NOK",
       "event": "Balance of Trade(Feb)",
       "dateISO": "2026-03-16",
@@ -28107,18 +26187,6 @@
       "previous": null,
       "impact": "low",
       "importance": 1,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-03-16",
-      "hourUTC": "08:00",
-      "actual": "79%",
-      "forecast": "",
-      "previous": "54.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -28879,42 +26947,6 @@
       "previous": null
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-03-23",
-      "hourUTC": "08:00",
-      "actual": "29%",
-      "forecast": "",
-      "previous": "37.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-03-23",
-      "hourUTC": "08:00",
-      "actual": "52%",
-      "forecast": "",
-      "previous": "53.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-03-23",
-      "hourUTC": "08:00",
-      "actual": "69%",
-      "forecast": "",
-      "previous": "66.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Consumer Confidence",
       "dateISO": "2026-03-23",
@@ -28928,48 +26960,12 @@
     },
     {
       "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-03-23",
-      "hourUTC": "08:00",
-      "actual": "60%",
-      "forecast": "",
-      "previous": "72.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
       "event": "Balance of Trade",
       "dateISO": "2026-03-23",
       "hourUTC": "09:00",
       "actual": "-€4B",
       "forecast": "-6.4",
       "previous": "-5.57",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-03-23",
-      "hourUTC": "08:00",
-      "actual": "62%",
-      "forecast": "",
-      "previous": "67.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-03-23",
-      "hourUTC": "08:00",
-      "actual": "20%",
-      "forecast": "",
-      "previous": "21.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -29008,18 +27004,6 @@
       "previous": "4.5%",
       "impact": "low",
       "importance": 1,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-03-23",
-      "hourUTC": "08:00",
-      "actual": "76%",
-      "forecast": "",
-      "previous": "79.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -29684,30 +27668,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-03-30",
-      "hourUTC": "08:00",
-      "actual": "46%",
-      "forecast": "",
-      "previous": "29.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-03-30",
-      "hourUTC": "08:00",
-      "actual": "28%",
-      "forecast": "",
-      "previous": "52.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "KOF Leading Indicators",
       "dateISO": "2026-03-30",
@@ -29715,18 +27675,6 @@
       "actual": "96.1",
       "forecast": "102.0",
       "previous": "103.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-03-30",
-      "hourUTC": "08:00",
-      "actual": "59%",
-      "forecast": "",
-      "previous": "69.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -29901,18 +27849,6 @@
     },
     {
       "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-03-30",
-      "hourUTC": "08:00",
-      "actual": "64%",
-      "forecast": "",
-      "previous": "60.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
       "event": "Economic Sentiment",
       "dateISO": "2026-03-30",
       "hourUTC": "09:00",
@@ -29961,18 +27897,6 @@
     },
     {
       "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-03-30",
-      "hourUTC": "08:00",
-      "actual": "68%",
-      "forecast": "",
-      "previous": "62.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
       "event": "Mortgage Approvals",
       "dateISO": "2026-03-30",
       "hourUTC": "08:30",
@@ -30009,18 +27933,6 @@
     },
     {
       "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-03-30",
-      "hourUTC": "08:00",
-      "actual": "33%",
-      "forecast": "",
-      "previous": "20.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
       "event": "Unemployment Rate",
       "dateISO": "2026-03-30",
       "hourUTC": "23:30",
@@ -30051,18 +27963,6 @@
       "actual": "-2.1%",
       "forecast": "-2.1",
       "previous": "4.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-03-30",
-      "hourUTC": "08:00",
-      "actual": "86%",
-      "forecast": "",
-      "previous": "76.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -30872,42 +28772,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-04-06",
-      "hourUTC": "08:00",
-      "actual": "27%",
-      "forecast": "",
-      "previous": "46.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-04-06",
-      "hourUTC": "08:00",
-      "actual": "23%",
-      "forecast": "",
-      "previous": "28.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-04-06",
-      "hourUTC": "08:00",
-      "actual": "59%",
-      "forecast": "",
-      "previous": "59.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Unemployment Change",
       "dateISO": "2026-04-06",
@@ -30917,42 +28781,6 @@
       "previous": "3.6",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-04-06",
-      "hourUTC": "08:00",
-      "actual": "45%",
-      "forecast": "",
-      "previous": "64.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-04-06",
-      "hourUTC": "08:00",
-      "actual": "62%",
-      "forecast": "",
-      "previous": "68.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-04-06",
-      "hourUTC": "08:00",
-      "actual": "38%",
-      "forecast": "",
-      "previous": "33.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -30975,18 +28803,6 @@
       "actual": "-1.8%",
       "forecast": "-0.7",
       "previous": "-1.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-04-06",
-      "hourUTC": "08:00",
-      "actual": "84%",
-      "forecast": "",
-      "previous": "86.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -31892,66 +29708,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-04-13",
-      "hourUTC": "08:00",
-      "actual": "18%",
-      "forecast": "",
-      "previous": "27.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-04-13",
-      "hourUTC": "08:00",
-      "actual": "43%",
-      "forecast": "",
-      "previous": "23.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-04-13",
-      "hourUTC": "08:00",
-      "actual": "75%",
-      "forecast": "",
-      "previous": "59.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-04-13",
-      "hourUTC": "08:00",
-      "actual": "27%",
-      "forecast": "",
-      "previous": "45.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-04-13",
-      "hourUTC": "08:00",
-      "actual": "48%",
-      "forecast": "",
-      "previous": "62.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "GBP",
       "event": "BRC Retail Sales Monitor YoY",
       "dateISO": "2026-04-13",
@@ -31964,18 +29720,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-04-13",
-      "hourUTC": "08:00",
-      "actual": "32%",
-      "forecast": "",
-      "previous": "38.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "NOK",
       "event": "NTB Auction",
       "dateISO": "2026-04-13",
@@ -31985,18 +29729,6 @@
       "previous": null,
       "impact": "low",
       "importance": 1,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-04-13",
-      "hourUTC": "08:00",
-      "actual": "62%",
-      "forecast": "",
-      "previous": "84.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -32650,30 +30382,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-04-20",
-      "hourUTC": "08:00",
-      "actual": "17%",
-      "forecast": "",
-      "previous": "18.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-04-20",
-      "hourUTC": "08:00",
-      "actual": "76%",
-      "forecast": "",
-      "previous": "43.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CAD",
       "event": "Inflation Rate YoY",
       "dateISO": "2026-04-20",
@@ -32746,18 +30454,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-04-20",
-      "hourUTC": "08:00",
-      "actual": "81%",
-      "forecast": "",
-      "previous": "75.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "PPI YoY",
       "dateISO": "2026-04-20",
@@ -32765,54 +30461,6 @@
       "actual": "-0.2%",
       "forecast": "-1.8",
       "previous": "-3.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-04-20",
-      "hourUTC": "08:00",
-      "actual": "30%",
-      "forecast": "",
-      "previous": "27.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-04-20",
-      "hourUTC": "08:00",
-      "actual": "42%",
-      "forecast": "",
-      "previous": "48.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-04-20",
-      "hourUTC": "08:00",
-      "actual": "30%",
-      "forecast": "",
-      "previous": "32.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-04-20",
-      "hourUTC": "08:00",
-      "actual": "40%",
-      "forecast": "",
-      "previous": "62.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -33539,42 +31187,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-04-27",
-      "hourUTC": "08:00",
-      "actual": "10%",
-      "forecast": "",
-      "previous": "17.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-04-27",
-      "hourUTC": "08:00",
-      "actual": "79%",
-      "forecast": "",
-      "previous": "76.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-04-27",
-      "hourUTC": "08:00",
-      "actual": "80%",
-      "forecast": "",
-      "previous": "81.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "GfK Consumer Confidence",
       "dateISO": "2026-04-27",
@@ -33587,30 +31199,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-04-27",
-      "hourUTC": "08:00",
-      "actual": "28%",
-      "forecast": "",
-      "previous": "30.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-04-27",
-      "hourUTC": "08:00",
-      "actual": "44%",
-      "forecast": "",
-      "previous": "42.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "GBP",
       "event": "CBI Distributive Trades",
       "dateISO": "2026-04-27",
@@ -33618,18 +31206,6 @@
       "actual": "-68",
       "forecast": "-48.0",
       "previous": "-52.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-04-27",
-      "hourUTC": "08:00",
-      "actual": "37%",
-      "forecast": "",
-      "previous": "30.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -33668,18 +31244,6 @@
       "previous": null,
       "impact": "low",
       "importance": 1,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-04-27",
-      "hourUTC": "08:00",
-      "actual": "37%",
-      "forecast": "",
-      "previous": "40.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -35147,30 +32711,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-05-04",
-      "hourUTC": "08:00",
-      "actual": "10%",
-      "forecast": "",
-      "previous": "10.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-05-04",
-      "hourUTC": "08:00",
-      "actual": "81%",
-      "forecast": "",
-      "previous": "79.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "procure.ch Manufacturing PMI",
       "dateISO": "2026-05-04",
@@ -35183,18 +32723,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-05-04",
-      "hourUTC": "08:00",
-      "actual": "82%",
-      "forecast": "",
-      "previous": "80.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Unemployment Rate",
       "dateISO": "2026-05-04",
@@ -35204,54 +32732,6 @@
       "previous": "7.5",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-05-04",
-      "hourUTC": "08:00",
-      "actual": "37%",
-      "forecast": "",
-      "previous": "28.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-05-04",
-      "hourUTC": "08:00",
-      "actual": "30%",
-      "forecast": "",
-      "previous": "44.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-05-04",
-      "hourUTC": "08:00",
-      "actual": "47%",
-      "forecast": "",
-      "previous": "37.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-05-04",
-      "hourUTC": "08:00",
-      "actual": "38%",
-      "forecast": "",
-      "previous": "37.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -36143,66 +33623,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-05-11",
-      "hourUTC": "08:00",
-      "actual": "12%",
-      "forecast": "",
-      "previous": "10.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-05-11",
-      "hourUTC": "08:00",
-      "actual": "56%",
-      "forecast": "",
-      "previous": "81.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-05-11",
-      "hourUTC": "08:00",
-      "actual": "84%",
-      "forecast": "",
-      "previous": "82.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-05-11",
-      "hourUTC": "08:00",
-      "actual": "34%",
-      "forecast": "",
-      "previous": "37.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-05-11",
-      "hourUTC": "08:00",
-      "actual": "47%",
-      "forecast": "",
-      "previous": "30.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "GBP",
       "event": "BRC Retail Sales Monitor YoY",
       "dateISO": "2026-05-11",
@@ -36212,18 +33632,6 @@
       "previous": "3.1",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-05-11",
-      "hourUTC": "08:00",
-      "actual": "42%",
-      "forecast": "",
-      "previous": "47.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -36320,18 +33728,6 @@
       "previous": "4.09%",
       "impact": "low",
       "importance": 1,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-05-11",
-      "hourUTC": "08:00",
-      "actual": "32%",
-      "forecast": "",
-      "previous": "38.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -37080,30 +34476,6 @@
       "previous": null
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-05-18",
-      "hourUTC": "08:00",
-      "actual": "39%",
-      "forecast": "",
-      "previous": "12.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-05-18",
-      "hourUTC": "08:00",
-      "actual": "40%",
-      "forecast": "",
-      "previous": "56.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "GDP Growth Rate QoQ",
       "dateISO": "2026-05-18",
@@ -37116,18 +34488,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-05-18",
-      "hourUTC": "08:00",
-      "actual": "69%",
-      "forecast": "",
-      "previous": "84.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Balance of Trade",
       "dateISO": "2026-05-18",
@@ -37135,42 +34495,6 @@
       "actual": "€4.709B",
       "forecast": "5.2",
       "previous": "4.983",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-05-18",
-      "hourUTC": "08:00",
-      "actual": "65%",
-      "forecast": "",
-      "previous": "34.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-05-18",
-      "hourUTC": "08:00",
-      "actual": "66%",
-      "forecast": "",
-      "previous": "47.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-05-18",
-      "hourUTC": "08:00",
-      "actual": "27%",
-      "forecast": "",
-      "previous": "42.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -37197,18 +34521,6 @@
       "previous": "0.2",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-05-18",
-      "hourUTC": "08:00",
-      "actual": "87%",
-      "forecast": "",
-      "previous": "32.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -38038,90 +35350,6 @@
       "previous": "49.8",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-05-25",
-      "hourUTC": "08:00",
-      "actual": "28%",
-      "forecast": "",
-      "previous": "39.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-05-25",
-      "hourUTC": "08:00",
-      "actual": "23%",
-      "forecast": "",
-      "previous": "40.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-05-25",
-      "hourUTC": "08:00",
-      "actual": "76%",
-      "forecast": "",
-      "previous": "69.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-05-25",
-      "hourUTC": "08:00",
-      "actual": "63%",
-      "forecast": "",
-      "previous": "65.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-05-25",
-      "hourUTC": "08:00",
-      "actual": "37%",
-      "forecast": "",
-      "previous": "66.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-05-25",
-      "hourUTC": "08:00",
-      "actual": "22%",
-      "forecast": "",
-      "previous": "27.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-05-25",
-      "hourUTC": "08:00",
-      "actual": "62%",
-      "forecast": "",
-      "previous": "87.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -39362,30 +36590,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-06-01",
-      "hourUTC": "08:00",
-      "actual": "21%",
-      "forecast": "",
-      "previous": "28.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-06-01",
-      "hourUTC": "08:00",
-      "actual": "26%",
-      "forecast": "",
-      "previous": "23.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CHF",
       "event": "Retail Sales YoY",
       "dateISO": "2026-06-01",
@@ -39434,18 +36638,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-06-01",
-      "hourUTC": "08:00",
-      "actual": "82%",
-      "forecast": "",
-      "previous": "76.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Retail Sales MoM",
       "dateISO": "2026-06-01",
@@ -39482,18 +36674,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-06-01",
-      "hourUTC": "08:00",
-      "actual": "47%",
-      "forecast": "",
-      "previous": "63.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "GBP",
       "event": "Nationwide Housing Prices MoM",
       "dateISO": "2026-06-01",
@@ -39518,30 +36698,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-06-01",
-      "hourUTC": "08:00",
-      "actual": "36%",
-      "forecast": "",
-      "previous": "37.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-06-01",
-      "hourUTC": "08:00",
-      "actual": "26%",
-      "forecast": "",
-      "previous": "22.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "NOK",
       "event": "NTB Auction",
       "dateISO": "2026-06-01",
@@ -39551,18 +36707,6 @@
       "previous": "4.36%",
       "impact": "low",
       "importance": 1,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-06-01",
-      "hourUTC": "08:00",
-      "actual": "19%",
-      "forecast": "",
-      "previous": "62.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -40467,42 +37611,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-06-08",
-      "hourUTC": "08:00",
-      "actual": "50%",
-      "forecast": "",
-      "previous": "21.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-06-08",
-      "hourUTC": "08:00",
-      "actual": "14%",
-      "forecast": "",
-      "previous": "26.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-06-08",
-      "hourUTC": "08:00",
-      "actual": "52%",
-      "forecast": "",
-      "previous": "82.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Factory Orders MoM",
       "dateISO": "2026-06-08",
@@ -40510,30 +37618,6 @@
       "actual": "-3.8%",
       "forecast": "-1.2",
       "previous": "4.5",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-06-08",
-      "hourUTC": "08:00",
-      "actual": "64%",
-      "forecast": "",
-      "previous": "47.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-06-08",
-      "hourUTC": "08:00",
-      "actual": "60%",
-      "forecast": "",
-      "previous": "36.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -40548,30 +37632,6 @@
       "previous": "-3.4",
       "impact": "high",
       "importance": 3,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-06-08",
-      "hourUTC": "08:00",
-      "actual": "17%",
-      "forecast": "",
-      "previous": "26.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-06-08",
-      "hourUTC": "08:00",
-      "actual": "91%",
-      "forecast": "",
-      "previous": "19.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -41731,30 +38791,6 @@
       "previous": "44.8"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-06-15",
-      "hourUTC": "08:00",
-      "actual": "31%",
-      "forecast": "",
-      "previous": "50.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-06-15",
-      "hourUTC": "08:00",
-      "actual": "9%",
-      "forecast": "",
-      "previous": "14.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CAD",
       "event": "Housing Starts",
       "dateISO": "2026-06-15",
@@ -41774,18 +38810,6 @@
       "actual": "-38",
       "forecast": "-38.0",
       "previous": "-40.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-06-15",
-      "hourUTC": "08:00",
-      "actual": "56%",
-      "forecast": "",
-      "previous": "52.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -41828,48 +38852,12 @@
     },
     {
       "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-06-15",
-      "hourUTC": "08:00",
-      "actual": "48%",
-      "forecast": "",
-      "previous": "64.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
       "event": "Industrial Production MoM",
       "dateISO": "2026-06-15",
       "hourUTC": "09:00",
       "actual": "0.1%",
       "forecast": "0.3",
       "previous": "0.4",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-06-15",
-      "hourUTC": "08:00",
-      "actual": "41%",
-      "forecast": "",
-      "previous": "60.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-06-15",
-      "hourUTC": "08:00",
-      "actual": "16%",
-      "forecast": "",
-      "previous": "17.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -41896,18 +38884,6 @@
       "previous": null,
       "impact": "low",
       "importance": 1,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-06-15",
-      "hourUTC": "08:00",
-      "actual": "77%",
-      "forecast": "",
-      "previous": "91.0",
-      "impact": "medium",
-      "importance": 2,
       "source": "Myfxbook"
     },
     {
@@ -42013,45 +38989,6 @@
       "date": "15 Jun",
       "dateISO": "2026-06-15",
       "timeUTC": "08:00",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia Myfxbook AUDUSD Sentiment",
-      "impact": "medium",
-      "actual": "31.0%",
-      "forecast": null,
-      "previous": "50.0%"
-    },
-    {
-      "date": "15 Jun",
-      "dateISO": "2026-06-15",
-      "timeUTC": "08:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada Myfxbook USDCAD Sentiment",
-      "impact": "medium",
-      "actual": "9.0%",
-      "forecast": null,
-      "previous": "14.0%"
-    },
-    {
-      "date": "15 Jun",
-      "dateISO": "2026-06-15",
-      "timeUTC": "08:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland Myfxbook USDCHF Sentiment",
-      "impact": "medium",
-      "actual": "56.0%",
-      "forecast": null,
-      "previous": "52.0%"
-    },
-    {
-      "date": "15 Jun",
-      "dateISO": "2026-06-15",
-      "timeUTC": "08:00",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
@@ -42060,58 +38997,6 @@
       "actual": "&#8364;4.293B",
       "forecast": "&#8364;5.19B",
       "previous": "&#8364;4.813B"
-    },
-    {
-      "date": "15 Jun",
-      "dateISO": "2026-06-15",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "European Union Myfxbook EURUSD Sentiment",
-      "impact": "medium",
-      "actual": "48.0%",
-      "forecast": null,
-      "previous": "64.0%"
-    },
-    {
-      "date": "15 Jun",
-      "dateISO": "2026-06-15",
-      "timeUTC": "08:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
-      "impact": "medium",
-      "actual": "41.0%",
-      "forecast": null,
-      "previous": "60.0%"
-    },
-    {
-      "date": "15 Jun",
-      "dateISO": "2026-06-15",
-      "timeUTC": "08:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Myfxbook USDJPY Sentiment",
-      "impact": "medium",
-      "actual": "16.0%",
-      "forecast": null,
-      "previous": "17.0%"
-    },
-    {
-      "date": "15 Jun",
-      "dateISO": "2026-06-15",
-      "timeUTC": "08:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "New Zealand Myfxbook NZDUSD Sentiment",
-      "impact": "medium",
-      "actual": "77.0%",
-      "forecast": null,
-      "previous": "91.0%"
     },
     {
       "date": "15 Jun",
@@ -43829,30 +40714,6 @@
       "previous": "3.4%"
     },
     {
-      "currency": "AUD",
-      "event": "Myfxbook AUDUSD Sentiment",
-      "dateISO": "2026-06-22",
-      "hourUTC": "08:00",
-      "actual": "42%",
-      "forecast": "",
-      "previous": "31.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "CAD",
-      "event": "Myfxbook USDCAD Sentiment",
-      "dateISO": "2026-06-22",
-      "hourUTC": "08:00",
-      "actual": "5%",
-      "forecast": "",
-      "previous": "9.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "CAD",
       "event": "CPI Common YoY",
       "dateISO": "2026-06-22",
@@ -43925,18 +40786,6 @@
       "source": "Myfxbook"
     },
     {
-      "currency": "CHF",
-      "event": "Myfxbook USDCHF Sentiment",
-      "dateISO": "2026-06-22",
-      "hourUTC": "08:00",
-      "actual": "42%",
-      "forecast": "",
-      "previous": "56.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
       "currency": "EUR",
       "event": "Consumer Confidence",
       "dateISO": "2026-06-22",
@@ -43944,54 +40793,6 @@
       "actual": "-39",
       "forecast": "-43.0",
       "previous": "-46.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "EUR",
-      "event": "Myfxbook EURUSD Sentiment",
-      "dateISO": "2026-06-22",
-      "hourUTC": "08:00",
-      "actual": "61%",
-      "forecast": "",
-      "previous": "48.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "GBP",
-      "event": "Myfxbook GBPUSD Sentiment",
-      "dateISO": "2026-06-22",
-      "hourUTC": "08:00",
-      "actual": "58%",
-      "forecast": "",
-      "previous": "41.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "JPY",
-      "event": "Myfxbook USDJPY Sentiment",
-      "dateISO": "2026-06-22",
-      "hourUTC": "08:00",
-      "actual": "16%",
-      "forecast": "",
-      "previous": "16.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook"
-    },
-    {
-      "currency": "NZD",
-      "event": "Myfxbook NZDUSD Sentiment",
-      "dateISO": "2026-06-22",
-      "hourUTC": "08:00",
-      "actual": "94%",
-      "forecast": "",
-      "previous": "77.0",
       "impact": "medium",
       "importance": 2,
       "source": "Myfxbook"
@@ -44008,97 +40809,6 @@
       "actual": "-39.0",
       "forecast": "-43.0",
       "previous": "-46.0"
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
-      "timeUTC": "08:00",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia Myfxbook AUDUSD Sentiment",
-      "impact": "medium",
-      "actual": "42.0%",
-      "forecast": null,
-      "previous": "31.0%"
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
-      "timeUTC": "08:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada Myfxbook USDCAD Sentiment",
-      "impact": "medium",
-      "actual": "5.0%",
-      "forecast": null,
-      "previous": "9.0%"
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
-      "timeUTC": "08:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland Myfxbook USDCHF Sentiment",
-      "impact": "medium",
-      "actual": "42.0%",
-      "forecast": null,
-      "previous": "56.0%"
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "European Union Myfxbook EURUSD Sentiment",
-      "impact": "medium",
-      "actual": "61.0%",
-      "forecast": null,
-      "previous": "48.0%"
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
-      "timeUTC": "08:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
-      "impact": "medium",
-      "actual": "58.0%",
-      "forecast": null,
-      "previous": "41.0%"
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
-      "timeUTC": "08:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Myfxbook USDJPY Sentiment",
-      "impact": "medium",
-      "actual": "16.0%",
-      "forecast": null,
-      "previous": "16.0%"
-    },
-    {
-      "date": "22 Jun",
-      "dateISO": "2026-06-22",
-      "timeUTC": "08:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "New Zealand Myfxbook NZDUSD Sentiment",
-      "impact": "medium",
-      "actual": "94.0%",
-      "forecast": null,
-      "previous": "77.0%"
     },
     {
       "date": "22 Jun",
@@ -45510,97 +42220,6 @@
     {
       "date": "29 Jun",
       "dateISO": "2026-06-29",
-      "timeUTC": "08:00",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia Myfxbook AUDUSD Sentiment",
-      "impact": "medium",
-      "actual": "72.0%",
-      "forecast": null,
-      "previous": "42.0%"
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
-      "timeUTC": "08:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada Myfxbook USDCAD Sentiment",
-      "impact": "medium",
-      "actual": "8.0%",
-      "forecast": null,
-      "previous": "5.0%"
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
-      "timeUTC": "08:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland Myfxbook USDCHF Sentiment",
-      "impact": "medium",
-      "actual": "35.0%",
-      "forecast": null,
-      "previous": "42.0%"
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "European Union Myfxbook EURUSD Sentiment",
-      "impact": "medium",
-      "actual": "61.0%",
-      "forecast": null,
-      "previous": "61.0%"
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
-      "timeUTC": "08:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
-      "impact": "medium",
-      "actual": "55.0%",
-      "forecast": null,
-      "previous": "58.0%"
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
-      "timeUTC": "08:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Myfxbook USDJPY Sentiment",
-      "impact": "medium",
-      "actual": "22.0%",
-      "forecast": null,
-      "previous": "16.0%"
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
-      "timeUTC": "08:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "New Zealand Myfxbook NZDUSD Sentiment",
-      "impact": "medium",
-      "actual": "95.0%",
-      "forecast": null,
-      "previous": "94.0%"
-    },
-    {
-      "date": "29 Jun",
-      "dateISO": "2026-06-29",
       "timeUTC": "08:30",
       "country": "GBP",
       "currency": "GBP",
@@ -46810,97 +43429,6 @@
     {
       "date": "6 Jul",
       "dateISO": "2026-07-06",
-      "timeUTC": "08:00",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia Myfxbook AUDUSD Sentiment",
-      "impact": "medium",
-      "actual": "52.0%",
-      "forecast": null,
-      "previous": "72.0%"
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
-      "timeUTC": "08:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada Myfxbook USDCAD Sentiment",
-      "impact": "medium",
-      "actual": "7.0%",
-      "forecast": null,
-      "previous": "8.0%"
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
-      "timeUTC": "08:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland Myfxbook USDCHF Sentiment",
-      "impact": "medium",
-      "actual": "51.0%",
-      "forecast": null,
-      "previous": "35.0%"
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "European Union Myfxbook EURUSD Sentiment",
-      "impact": "medium",
-      "actual": "58.0%",
-      "forecast": null,
-      "previous": "61.0%"
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
-      "timeUTC": "08:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
-      "impact": "medium",
-      "actual": "29.0%",
-      "forecast": null,
-      "previous": "55.0%"
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
-      "timeUTC": "08:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Myfxbook USDJPY Sentiment",
-      "impact": "medium",
-      "actual": "18.0%",
-      "forecast": null,
-      "previous": "22.0%"
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
-      "timeUTC": "08:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "New Zealand Myfxbook NZDUSD Sentiment",
-      "impact": "medium",
-      "actual": "76.0%",
-      "forecast": null,
-      "previous": "95.0%"
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
       "timeUTC": "09:00",
       "country": "EUR",
       "currency": "EUR",
@@ -47612,97 +44140,6 @@
       "actual": null,
       "forecast": "-35.0",
       "previous": "-38.0"
-    },
-    {
-      "date": "13 Jul",
-      "dateISO": "2026-07-13",
-      "timeUTC": "08:00",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia Myfxbook AUDUSD Sentiment",
-      "impact": "medium",
-      "actual": "44.0%",
-      "forecast": null,
-      "previous": "52.0%"
-    },
-    {
-      "date": "13 Jul",
-      "dateISO": "2026-07-13",
-      "timeUTC": "08:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada Myfxbook USDCAD Sentiment",
-      "impact": "medium",
-      "actual": "20.0%",
-      "forecast": null,
-      "previous": "7.0%"
-    },
-    {
-      "date": "13 Jul",
-      "dateISO": "2026-07-13",
-      "timeUTC": "08:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland Myfxbook USDCHF Sentiment",
-      "impact": "medium",
-      "actual": "40.0%",
-      "forecast": null,
-      "previous": "51.0%"
-    },
-    {
-      "date": "13 Jul",
-      "dateISO": "2026-07-13",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "European Union Myfxbook EURUSD Sentiment",
-      "impact": "medium",
-      "actual": "62.0%",
-      "forecast": null,
-      "previous": "58.0%"
-    },
-    {
-      "date": "13 Jul",
-      "dateISO": "2026-07-13",
-      "timeUTC": "08:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
-      "impact": "medium",
-      "actual": "34.0%",
-      "forecast": null,
-      "previous": "29.0%"
-    },
-    {
-      "date": "13 Jul",
-      "dateISO": "2026-07-13",
-      "timeUTC": "08:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Myfxbook USDJPY Sentiment",
-      "impact": "medium",
-      "actual": "25.0%",
-      "forecast": null,
-      "previous": "18.0%"
-    },
-    {
-      "date": "13 Jul",
-      "dateISO": "2026-07-13",
-      "timeUTC": "08:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "New Zealand Myfxbook NZDUSD Sentiment",
-      "impact": "medium",
-      "actual": "50.0%",
-      "forecast": null,
-      "previous": "76.0%"
     },
     {
       "date": "13 Jul",
@@ -48838,97 +45275,6 @@
     {
       "date": "20 Jul",
       "dateISO": "2026-07-20",
-      "timeUTC": "08:00",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia Myfxbook AUDUSD Sentiment",
-      "impact": "medium",
-      "actual": "33.0%",
-      "forecast": null,
-      "previous": "44.0%"
-    },
-    {
-      "date": "20 Jul",
-      "dateISO": "2026-07-20",
-      "timeUTC": "08:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada Myfxbook USDCAD Sentiment",
-      "impact": "medium",
-      "actual": "43.0%",
-      "forecast": null,
-      "previous": "20.0%"
-    },
-    {
-      "date": "20 Jul",
-      "dateISO": "2026-07-20",
-      "timeUTC": "08:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland Myfxbook USDCHF Sentiment",
-      "impact": "medium",
-      "actual": "46.0%",
-      "forecast": null,
-      "previous": "40.0%"
-    },
-    {
-      "date": "20 Jul",
-      "dateISO": "2026-07-20",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "European Union Myfxbook EURUSD Sentiment",
-      "impact": "medium",
-      "actual": "57.0%",
-      "forecast": null,
-      "previous": "62.0%"
-    },
-    {
-      "date": "20 Jul",
-      "dateISO": "2026-07-20",
-      "timeUTC": "08:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
-      "impact": "medium",
-      "actual": "44.0%",
-      "forecast": null,
-      "previous": "34.0%"
-    },
-    {
-      "date": "20 Jul",
-      "dateISO": "2026-07-20",
-      "timeUTC": "08:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Myfxbook USDJPY Sentiment",
-      "impact": "medium",
-      "actual": "20.0%",
-      "forecast": null,
-      "previous": "25.0%"
-    },
-    {
-      "date": "20 Jul",
-      "dateISO": "2026-07-20",
-      "timeUTC": "08:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "New Zealand Myfxbook NZDUSD Sentiment",
-      "impact": "medium",
-      "actual": "29.0%",
-      "forecast": null,
-      "previous": "50.0%"
-    },
-    {
-      "date": "20 Jul",
-      "dateISO": "2026-07-20",
       "timeUTC": "12:30",
       "country": "CAD",
       "currency": "CAD",
@@ -49684,45 +46030,6 @@
       "date": "27 Jul",
       "dateISO": "2026-07-27",
       "timeUTC": "08:00",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia Myfxbook AUDUSD Sentiment",
-      "impact": "medium",
-      "actual": "33.0%",
-      "forecast": null,
-      "previous": "33.0%"
-    },
-    {
-      "date": "27 Jul",
-      "dateISO": "2026-07-27",
-      "timeUTC": "08:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada Myfxbook USDCAD Sentiment",
-      "impact": "medium",
-      "actual": "31.0%",
-      "forecast": null,
-      "previous": "43.0%"
-    },
-    {
-      "date": "27 Jul",
-      "dateISO": "2026-07-27",
-      "timeUTC": "08:00",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland Myfxbook USDCHF Sentiment",
-      "impact": "medium",
-      "actual": "35.0%",
-      "forecast": null,
-      "previous": "46.0%"
-    },
-    {
-      "date": "27 Jul",
-      "dateISO": "2026-07-27",
-      "timeUTC": "08:00",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
@@ -49731,58 +46038,6 @@
       "actual": "86.6",
       "forecast": "86.0",
       "previous": "85.7"
-    },
-    {
-      "date": "27 Jul",
-      "dateISO": "2026-07-27",
-      "timeUTC": "08:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "European Union Myfxbook EURUSD Sentiment",
-      "impact": "medium",
-      "actual": "54.0%",
-      "forecast": null,
-      "previous": "57.0%"
-    },
-    {
-      "date": "27 Jul",
-      "dateISO": "2026-07-27",
-      "timeUTC": "08:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
-      "impact": "medium",
-      "actual": "54.0%",
-      "forecast": null,
-      "previous": "44.0%"
-    },
-    {
-      "date": "27 Jul",
-      "dateISO": "2026-07-27",
-      "timeUTC": "08:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Myfxbook USDJPY Sentiment",
-      "impact": "medium",
-      "actual": "15.0%",
-      "forecast": null,
-      "previous": "20.0%"
-    },
-    {
-      "date": "27 Jul",
-      "dateISO": "2026-07-27",
-      "timeUTC": "08:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "New Zealand Myfxbook NZDUSD Sentiment",
-      "impact": "medium",
-      "actual": "65.0%",
-      "forecast": null,
-      "previous": "29.0%"
     },
     {
       "date": "27 Jul",
