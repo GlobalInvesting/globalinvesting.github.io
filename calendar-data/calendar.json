@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-26T21:23:55Z",
-  "generatedAt": "2026-07-26T21:23:55Z",
+  "lastUpdate": "2026-07-27T08:53:30Z",
+  "generatedAt": "2026-07-27T08:53:30Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,51 +8,26 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-07-28",
-  "rangeTo": "2026-07-24",
-  "totalEvents": 3984,
+  "rangeTo": "2026-07-27",
+  "totalEvents": 3998,
   "currencyCounts": {
-    "GBP": 471,
-    "USD": 1259,
-    "EUR": 871,
-    "AUD": 288,
-    "CAD": 316,
-    "CHF": 167,
-    "JPY": 253,
-    "NZD": 125,
+    "GBP": 473,
+    "USD": 1263,
+    "EUR": 873,
+    "AUD": 289,
+    "CAD": 318,
+    "CHF": 168,
+    "JPY": 254,
+    "NZD": 126,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 2116,
-    "high": 1640,
+    "medium": 2126,
+    "high": 1644,
     "low": 228
   },
   "surpriseStats": {
-    "EUR/gfk consumer confidence": {
-      "n": 3,
-      "mean": -0.4,
-      "std": 4.132796
-    },
-    "GBP/cbi distributive trades": {
-      "n": 4,
-      "mean": -8.0,
-      "std": 15.033296
-    },
-    "JPY/unemployment rate": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 0.152753
-    },
-    "NOK/loan growth yoy": {
-      "n": 2,
-      "mean": -0.05,
-      "std": 0.070711
-    },
-    "USD/dallas fed manufacturing index": {
-      "n": 3,
-      "mean": -0.7,
-      "std": 1.835756
-    },
     "EUR/unemployment rate": {
       "n": 10,
       "mean": -0.133,
@@ -1178,6 +1153,11 @@
       "mean": -0.225,
       "std": 0.518813
     },
+    "EUR/gfk consumer confidence": {
+      "n": 2,
+      "mean": 1.3,
+      "std": 4.101219
+    },
     "EUR/ifo business climate": {
       "n": 2,
       "mean": 0.35,
@@ -1203,10 +1183,20 @@
       "mean": 1.1,
       "std": 1.086278
     },
+    "GBP/cbi distributive trades": {
+      "n": 3,
+      "mean": -4.0,
+      "std": 15.588457
+    },
     "USD/chicago fed national activity index": {
       "n": 4,
       "mean": -0.04,
       "std": 0.321248
+    },
+    "USD/dallas fed manufacturing index": {
+      "n": 2,
+      "mean": -0.3,
+      "std": 2.404163
     },
     "EUR/new car registrations yoy": {
       "n": 2,
@@ -1217,6 +1207,11 @@
       "n": 2,
       "mean": 0.0,
       "std": 0.0
+    },
+    "JPY/unemployment rate": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 0.141421
     },
     "CHF/balance of trade": {
       "n": 4,
@@ -1317,6 +1312,11 @@
       "n": 2,
       "mean": -9.3,
       "std": 0.0
+    },
+    "EUR/germany ifo business climate": {
+      "n": 2,
+      "mean": 0.3,
+      "std": 0.424264
     },
     "EUR/germany gfk consumer confidence": {
       "n": 2,
@@ -49679,6 +49679,188 @@
       "actual": "0.628M",
       "forecast": "0.61M",
       "previous": "0.618M"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "08:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Myfxbook AUDUSD Sentiment",
+      "impact": "medium",
+      "actual": "33.0%",
+      "forecast": null,
+      "previous": "33.0%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "08:00",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Myfxbook USDCAD Sentiment",
+      "impact": "medium",
+      "actual": "31.0%",
+      "forecast": null,
+      "previous": "43.0%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "08:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Myfxbook USDCHF Sentiment",
+      "impact": "medium",
+      "actual": "35.0%",
+      "forecast": null,
+      "previous": "46.0%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Ifo Business Climate",
+      "impact": "high",
+      "actual": "86.6",
+      "forecast": "86.0",
+      "previous": "85.6"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "European Union Myfxbook EURUSD Sentiment",
+      "impact": "medium",
+      "actual": "54.0%",
+      "forecast": null,
+      "previous": "57.0%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "08:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Myfxbook GBPUSD Sentiment",
+      "impact": "medium",
+      "actual": "54.0%",
+      "forecast": null,
+      "previous": "44.0%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "08:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Myfxbook USDJPY Sentiment",
+      "impact": "medium",
+      "actual": "15.0%",
+      "forecast": null,
+      "previous": "20.0%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "08:00",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Myfxbook NZDUSD Sentiment",
+      "impact": "medium",
+      "actual": "65.0%",
+      "forecast": null,
+      "previous": "29.0%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "10:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom CBI Distributive Trades",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-45.0",
+      "previous": "-54.0"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Durable Goods Orders ex Defense MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.0%",
+      "previous": "-4.6%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Durable Goods Orders MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.5%",
+      "previous": "-4.5%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Durable Goods Orders Ex Transp MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.8%",
+      "previous": "1.3%"
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "14:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada BoC Market Participants Survey",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "27 Jul",
+      "dateISO": "2026-07-27",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Dallas Fed Manufacturing Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-1.0",
+      "previous": "0.0"
     }
   ]
 }
