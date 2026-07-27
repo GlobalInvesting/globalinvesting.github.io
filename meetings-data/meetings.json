@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-07-23",
+  "lastUpdate": "2026-07-27",
   "meetings": {
     "USD": {
       "nextMeeting": "29 Jul",
@@ -28,7 +28,7 @@
       "bias": "hold",
       "biasSource": "CME 30-day Fed Funds futures (SOFR-implied)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -60,10 +60,10 @@
       "bias": "hike",
       "biasSource": "cbonds OIS €STR curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
-      "hikeProb": 61,
-      "fwdRate": 2.5525
+      "hikeProb": 54,
+      "fwdRate": 2.535
     },
     "GBP": {
       "nextMeeting": "30 Jul",
@@ -92,7 +92,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS SONIA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -124,7 +124,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS TONA curve + BoJ API daily spot",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 1.0
@@ -156,10 +156,10 @@
       "bias": "hike",
       "biasSource": "ASX 30-day Interbank Cash Rate Futures",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
-      "hikeProb": 21,
-      "fwdRate": 4.4025
+      "hikeProb": 32,
+      "fwdRate": 4.43
     },
     "CAD": {
       "nextMeeting": "9 Sep",
@@ -190,7 +190,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS CORRA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.25
@@ -214,7 +214,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS SARON curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 0.0
@@ -244,10 +244,10 @@
       "bias": "hike",
       "biasSource": "cbonds OIS NZIONA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
-      "hikeProb": 98,
-      "fwdRate": 2.745
+      "hikeProb": 99,
+      "fwdRate": 2.7475
     },
     "NOK": {
       "nextMeeting": "13 Aug",
@@ -276,10 +276,10 @@
       "bias": "hike",
       "biasSource": "cbonds OIS NOWA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
-      "hikeProb": 49,
-      "fwdRate": 4.3725
+      "hikeProb": 54,
+      "fwdRate": 4.385
     },
     "SEK": {
       "nextMeeting": "25 Aug",
@@ -308,7 +308,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS STINA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-07-23",
+      "biasUpdated": "2026-07-27",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 1.75
