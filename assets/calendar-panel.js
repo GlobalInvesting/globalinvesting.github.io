@@ -445,6 +445,17 @@
         }
       }
 
+      // Myfxbook "Sentiment" pseudo-events (e.g. "European Union Myfxbook EURUSD
+      // Sentiment") are Myfxbook's own retail-positioning product, not an official
+      // macro release — no real consensus forecast, tagged impact="medium" so they
+      // pass the impact filter cleanly. fetch_ff_calendar.py v3.35 stops fetching
+      // new ones, but ff_calendar.json's 21-day history window can still carry
+      // already-fetched entries from before that fix, and calendar.json's history
+      // is longer still — filter client-side too so the panel is clean immediately,
+      // not just once the data files fully roll off. Mirrors NOISE_KW's 'myfxbook'
+      // keyword in dashboard.js / econ-surprises-modal.js (ESI scoring exclusion).
+      events = events.filter(ev => !((ev.title || ev.event || '').toLowerCase().includes('myfxbook')));
+
       // Client-side cross-day dedup: remove phantom "upcoming" entries that duplicate
       // an already-released event within the prior 7 days (same title+currency+timeUTC).
       // Mirrors Step 2e in fetch_ff_calendar.py; handles stale JSON cached before
