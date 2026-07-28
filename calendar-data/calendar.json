@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-28T07:58:53Z",
-  "generatedAt": "2026-07-28T07:58:53Z",
+  "lastUpdate": "2026-07-28T11:32:50Z",
+  "generatedAt": "2026-07-28T11:32:50Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1322,6 +1322,11 @@
       "n": 2,
       "mean": -0.55,
       "std": 0.212132
+    },
+    "EUR/france unemployment benefit claims": {
+      "n": 2,
+      "mean": -9.2,
+      "std": 25.880108
     },
     "EUR/spain retail sales mom": {
       "n": 2,
@@ -46144,9 +46149,9 @@
       "flag": "🇪🇺",
       "event": "France Unemployment Benefit Claims",
       "impact": "medium",
-      "actual": null,
-      "forecast": "15.0",
-      "previous": "15.5"
+      "actual": "5.9K",
+      "forecast": "15.0K",
+      "previous": "15.5K"
     },
     {
       "date": "28 Jul",
@@ -46171,7 +46176,7 @@
       "event": "United States Goods Trade Balance",
       "impact": "high",
       "actual": null,
-      "forecast": "$-101.3B",
+      "forecast": "$-100.0B",
       "previous": "$-105.9B"
     },
     {
@@ -46210,7 +46215,7 @@
       "event": "United States CB Consumer Confidence",
       "impact": "medium",
       "actual": null,
-      "forecast": "92.2",
+      "forecast": "92.3",
       "previous": "91.2"
     }
   ]
