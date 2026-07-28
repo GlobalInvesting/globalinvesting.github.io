@@ -1,5 +1,5 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.2.0
+ * GlobalInvesting FX Terminal — License Auth Module  v1.2.1
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
  *
  * Flow:
@@ -249,7 +249,9 @@
       on MQL5 Market. Enter the activation key shown in your MT5 terminal to unlock all panels.
     </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.85;margin-top:-10px;">
-      Opened a verified TMGM account instead? <a href="contact.html">Contact us</a> to receive your access link &mdash; no MT5 key required.
+      Opened a verified TMGM account instead? As our referral partner, TMGM account holders get full
+      web terminal access too &mdash; <a href="contact.html">contact us</a> for your access link, no MT5
+      key required.
     </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-8px;">
       New here? <a href="access.html">See the full walkthrough &amp; pricing &rarr;</a>
