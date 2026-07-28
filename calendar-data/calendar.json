@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-27T21:34:57Z",
-  "generatedAt": "2026-07-27T21:34:57Z",
+  "lastUpdate": "2026-07-28T07:58:53Z",
+  "generatedAt": "2026-07-28T07:58:53Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,14 +8,14 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-07-28",
-  "rangeTo": "2026-07-27",
-  "totalEvents": 3690,
+  "rangeTo": "2026-07-28",
+  "totalEvents": 3697,
   "currencyCounts": {
     "GBP": 429,
-    "USD": 1263,
-    "EUR": 829,
-    "AUD": 245,
-    "CAD": 274,
+    "USD": 1267,
+    "EUR": 833,
+    "AUD": 246,
+    "CAD": 272,
     "CHF": 124,
     "JPY": 210,
     "NZD": 82,
@@ -23,56 +23,11 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1818,
-    "high": 1644,
+    "medium": 1821,
+    "high": 1648,
     "low": 228
   },
   "surpriseStats": {
-    "EUR/unemployment rate": {
-      "n": 10,
-      "mean": -0.133,
-      "std": 0.41015
-    },
-    "EUR/retail sales mom": {
-      "n": 9,
-      "mean": -0.144444,
-      "std": 0.928858
-    },
-    "EUR/retail sales yoy": {
-      "n": 10,
-      "mean": -0.13,
-      "std": 1.691843
-    },
-    "EUR/unemployment benefit claims": {
-      "n": 3,
-      "mean": -4.7,
-      "std": 32.093146
-    },
-    "JPY/boj interest rate decision": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "SEK/balance of trade": {
-      "n": 2,
-      "mean": -5.6,
-      "std": 8.626703
-    },
-    "USD/s&p/case-shiller home price yoy": {
-      "n": 2,
-      "mean": -0.2,
-      "std": 0.0
-    },
-    "USD/cb consumer confidence": {
-      "n": 3,
-      "mean": 0.466667,
-      "std": 3.69098
-    },
-    "USD/api crude oil stock change": {
-      "n": 12,
-      "mean": -2.023417,
-      "std": 3.261352
-    },
     "AUD/inflation rate yoy": {
       "n": 4,
       "mean": -0.3,
@@ -137,6 +92,11 @@
       "n": 3,
       "mean": -0.266667,
       "std": 1.674316
+    },
+    "EUR/unemployment rate": {
+      "n": 9,
+      "mean": -0.033333,
+      "std": 0.278388
     },
     "JPY/retail sales yoy": {
       "n": 3,
@@ -272,6 +232,16 @@
       "n": 3,
       "mean": 1.666667,
       "std": 1.527525
+    },
+    "EUR/retail sales mom": {
+      "n": 8,
+      "mean": -0.25,
+      "std": 0.933503
+    },
+    "EUR/retail sales yoy": {
+      "n": 9,
+      "mean": -0.211111,
+      "std": 1.773728
     },
     "EUR/unemployed persons": {
       "n": 2,
@@ -527,6 +497,11 @@
       "n": 3,
       "mean": 0.352667,
       "std": 0.359607
+    },
+    "USD/api crude oil stock change": {
+      "n": 11,
+      "mean": -2.017364,
+      "std": 3.420464
     },
     "CAD/ivey pmi s.a": {
       "n": 3,
@@ -1193,6 +1168,11 @@
       "mean": -0.04,
       "std": 0.321248
     },
+    "USD/cb consumer confidence": {
+      "n": 2,
+      "mean": -1.2,
+      "std": 3.252691
+    },
     "USD/dallas fed manufacturing index": {
       "n": 3,
       "mean": 0.566667,
@@ -1212,6 +1192,11 @@
       "n": 2,
       "mean": 0.1,
       "std": 0.141421
+    },
+    "EUR/unemployment benefit claims": {
+      "n": 2,
+      "mean": 2.25,
+      "std": 42.072853
     },
     "CHF/balance of trade": {
       "n": 4,
@@ -1242,6 +1227,11 @@
       "n": 2,
       "mean": -0.302,
       "std": 0.841457
+    },
+    "JPY/boj interest rate decision": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
     },
     "NZD/current account": {
       "n": 2,
@@ -1323,10 +1313,25 @@
       "mean": -1.35,
       "std": 0.353553
     },
+    "EUR/france consumer confidence": {
+      "n": 2,
+      "mean": 1.0,
+      "std": 0.0
+    },
     "EUR/ecb consumer inflation expectations": {
       "n": 2,
       "mean": -0.55,
       "std": 0.212132
+    },
+    "EUR/spain retail sales mom": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 0.707107
+    },
+    "EUR/spain retail sales yoy": {
+      "n": 2,
+      "mean": -0.25,
+      "std": 0.494975
     },
     "AUD/private house approvals mom": {
       "n": 2,
@@ -43468,58 +43473,6 @@
     {
       "date": "6 Jul",
       "dateISO": "2026-07-06",
-      "timeUTC": "14:30",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada BoC Business Outlook Survey",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
-      "timeUTC": "14:30",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada BoC Survey of Consumer Expectations",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
-      "timeUTC": "15:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Waller Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
-      "timeUTC": "16:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "6 Jul",
-      "dateISO": "2026-07-06",
       "timeUTC": "23:30",
       "country": "JPY",
       "currency": "JPY",
@@ -46116,6 +46069,149 @@
       "actual": "1.3",
       "forecast": "-1.0",
       "previous": "0.0"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "03:05",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Gov Bullock Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Consumer Confidence",
+      "impact": "medium",
+      "actual": "86.0",
+      "forecast": "85.0",
+      "previous": "84.0"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Unemployment Rate",
+      "impact": "high",
+      "actual": "9.87%",
+      "forecast": "10.7%",
+      "previous": "10.83%"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Retail Sales MoM",
+      "impact": "high",
+      "actual": "0.3%",
+      "forecast": "-0.3%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Retail Sales YoY",
+      "impact": "high",
+      "actual": "0.5%",
+      "forecast": "1.1%",
+      "previous": "1.3%"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Unemployment Benefit Claims",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "15.0",
+      "previous": "15.5"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Wholesale Inventories MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Goods Trade Balance",
+      "impact": "high",
+      "actual": null,
+      "forecast": "$-101.3B",
+      "previous": "$-105.9B"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Inventories Ex Autos MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "13:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States S&#38;P/Case-Shiller Home Price YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.3%",
+      "previous": "1.1%"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States CB Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "92.2",
+      "previous": "91.2"
     }
   ]
 }
