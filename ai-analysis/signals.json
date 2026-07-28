@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-07-28T02:05:03Z",
+  "generated_at": "2026-07-28T09:14:56Z",
   "signals": [
     {
-      "time": "02:04",
+      "time": "09:13",
       "priority": "critical",
-      "title": "USD/JPY — Carry + Options Skew + Retail Divergence",
-      "text": "USD/JPY trades at 163.77, maintaining a robust profile above its SMA20/50/200 cluster following the end of Gulf War hostilities. A +275bp USD carry advantage (SOFR 3.64% vs TONA 0.98%) remains the structural anchor, while the VIX at 18.7 (normal volatility) fails to trigger safe-haven JPY demand. Despite the price strength, the 25d Risk Reversal at -1.54 reveals a strong put skew, indicating institutional desks are paying a premium for downside protection against potential BoJ intervention. Retail sentiment has reached an extreme 86% short, directly diverging from the COT LF net short of -114,030, suggesting retail is fading the move while institutions remain short JPY. This setup creates a high-conviction carry environment with tail-risk protection being actively sought via options. Risk: BoJ delivers a hawkish surprise at the July 31 meeting, compressing the 266bp OIS differential.",
+      "title": "USD/JPY — Fed Bias + BoJ Intervention Risk + Options Skew",
+      "text": "USD/JPY trades at 163.82, firmly above its SMA20/50/200 cluster following hawkish Fed expectations and Trump tariff headlines. The 275bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 1.0%) remains the primary driver, though it now faces extreme institutional and retail pushback. COT LF net short JPY at -114,030 and retail sentiment at 86% short suggest a heavily crowded carry trade vulnerable to a squeeze. This positioning is met by a strong 25d risk reversal at -1.54 (Saxo), indicating the options market is paying a significant premium for JPY calls to hedge a potential BoJ intervention. While the pair is technically bullish, the combination of extreme short positioning and intervention risk at these multi-year highs creates an asymmetric downside profile. Risk: The Fed delivers a hawkish hold and the BoJ remains passive on July 31, allowing the carry trade to grind higher.",
       "evidence": [
-        "OIS USD/JPY: +266bp",
-        "USD/JPY 25d RR: -1.54",
-        "Retail Sentiment: 86% Short"
+        "USD/JPY Carry: +275bp",
+        "JPY COT LF net: -114,030",
+        "USD/JPY 25d RR: -1.54"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:00",
-      "priority": "critical",
-      "title": "AUD/USD — COT vs CB Divergence + Inflation Risk",
-      "text": "AUD/USD trades at 0.6992, holding above its SMA20 (0.6957) as markets position for high-impact Australian CPI data. RBA holds at 4.35%. This positioning aligns with a -71bp carry advantage for the AUD (AONIA 4.35% vs SOFR 3.64%), making AUD a preferred G10 carry destination. However, the AUD 25d Risk Reversal at -0.86 shows a moderate put skew, suggesting the options market is hedging against a potential CPI miss that would invalidate the RBA's hiking bias. Price remains contained below the SMA50 at 0.7027, which serves as the primary technical ceiling ahead of Governor Bullock's upcoming speech. Risk: Australian CPI misses expectations, forcing a rapid unwind of the speculative net long.",
-      "evidence": [
-        "AUD COT LF net: +20,521",
-        "AUD/USD IV: 13.5% vs HV30: 6.0%",
-        "AUD/USD SMA50: 0.7027"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "01:58",
+      "time": "09:10",
       "priority": "warning",
-      "title": "NZD/USD — Positioning Extreme + Real Rate Divergence",
-      "text": "NZD/USD at 0.5770 continues to trade near its monthly lows despite a hawkish RBNZ policy bias and a cycle of data outperformance (ESI +22.2). COT LF positioning has reached a bearish extreme with net short -31,649 (only 12.0% long), while the RBNZ real rate of -1.56% remains the most accommodative in the G10. This negative real rate explains the speculative appetite for shorts despite the nominal 2.5% rate. The pair is currently testing support just above the SMA20 (0.5759), with the +125bp USD carry advantage (SOFR 3.64% vs OCR 2.50%) providing a persistent headwind for the Kiwi. The combination of extreme speculative shorting and positive economic surprises creates an asymmetric setup for a squeeze if RBNZ rhetoric hardens. Risk: RBNZ signals a shift away from its hiking bias, validating the extreme spec short.",
+      "title": "USD/CAD — COT Positioning + Retail Divergence + Oil Shock",
+      "text": "USD/CAD holds at 1.4111, just below the SMA20 level of 1.4127, as conflicting signals emerge. Speculative positioning is extremely stretched with COT LF net short CAD at -99,823 (18.8% long), while retail traders are 72% short the pair, fading the recent USD strength. This institutional-retail alignment on CAD weakness occurs alongside a sharp -2.75% intraday drop in WTI Oil to $80.3, which typically pressures the Loonie. However, the correlation between USD/CAD and WTI is currently broken (z = -1.51σ), suggesting the pair is following Fed-driven USD demand rather than energy fundamentals. The 150bp Fed-BoC carry advantage favors USD, but the extreme short positioning in CAD suggests limited room for further downside without fresh catalysts. Risk: A rebound in WTI oil prices or a dovish Fed shift triggers a massive short-covering rally in CAD.",
       "evidence": [
-        "NZD COT LF long%: 12.0%",
-        "NZD ESI: +22.2",
-        "USD/NZD Carry: +125bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "01:55",
-      "priority": "warning",
-      "title": "EUR/USD — Volatility Premium + ESI Divergence",
-      "text": "EUR/USD at 1.1377 remains pressured below its SMA20/50/200 cluster, reflecting a moderate negative bias in the Economic Surprise Index (ESI -12.6). The +145bp carry spread (SOFR 3.64% vs ESTR 2.19%) favors the USD, which is supported by a restrictive +1.47% real rate compared to the EUR's +0.16%. Options markets are pricing an elevated vol risk premium (VRP) of +2.5%, with IV at 7.1% vs HV30 at 4.5%, suggesting heightened demand for protection ahead of the July 29 FOMC meeting. COT LF net shorts at -80,570 confirm that institutional positioning is already aligned with the fundamental downside, leaving the pair vulnerable to a consolidation phase rather than a fresh breakdown. A sustained close above the SMA20 at 1.1419 is required to shift the immediate bearish technical bias. Risk: FOMC delivers a dovish hold, triggering a short-covering rally toward 1.1500.",
-      "evidence": [
-        "EUR/USD VRP: +2.5%",
-        "EUR ESI: -12.6",
-        "EUR COT LF net: -80,570"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "01:52",
-      "priority": "info",
-      "title": "USD/CAD — Correlation Break + Carry Advantage",
-      "text": "USD/CAD is trading at 1.4120, currently exhibiting a significant correlation break against WTI Oil (corr -0.916 vs norm +0.022, z = -1.56σ). While WTI is down -0.84% session-to-date at $81.9, the CAD is failing to track oil price action, instead being driven by the +150bp USD carry advantage (Fed 3.75% vs BoC 2.25%). COT LF positioning remains heavily net short CAD (-99,823, 18.8% long), indicating a crowded trade that has successfully faded recent CAD strength. Price is currently holding below the SMA20 (1.4131) but remains well above the SMA200 (1.3849), confirming the long-term bullish trend for the pair. The divergence from oil suggest that the interest rate differential is the primary driver in the current regime. Risk: A sharp reversal in oil prices above $85/bbl forces a CAD short-covering event.",
-      "evidence": [
-        "USD/CAD vs WTI z-score: -1.56σ",
         "CAD COT LF long%: 18.8%",
-        "USD/CAD Carry: +150bp"
+        "USD/CAD Retail: 72% short",
+        "WTI Oil: $80.3 (-2.75%)"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "09:07",
+      "priority": "warning",
+      "title": "GBP/USD — Vol Risk Premium + BoE Hold + Positioning",
+      "text": "GBP/USD trades at 1.3295, positioned below its SMA20/50/200 cluster at 1.3367/1.3399. The options market is pricing in significant event risk ahead of the July 30 BoE meeting, with 1M ATM IV at 11.0% vs HV30 of 6.5%, creating a massive +4.5% Vol Risk Premium. While the Fed-BoE carry is neutral at 0bp, GBP retains a net long COT position of +33,812, contrasting with the negative technical posture. Real policy rates show the BoE at +0.78% vs the Fed's +1.47%, providing a structural tailwind for the Dollar in a 'higher for longer' environment. The elevated VRP indicates that traders are paying up for protection, likely against a dovish pivot or a break of recent support levels. Risk: BoE surprises with a hawkish stance or higher inflation forecasts, forcing a repricing of the neutral carry.",
+      "evidence": [
+        "GBP/USD VRP: +4.5%",
+        "GBP COT LF net: +33,812",
+        "Fed-BoE Carry: 0bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "09:03",
+      "priority": "info",
+      "title": "EUR/USD — ESI Divergence + ECB Hike Bias",
+      "text": "EUR/USD is trading at 1.1371, remaining in a bearish technical posture below all major daily SMAs (SMA200 at 1.1637). The pair faces a persistent 135bp carry disadvantage (Fed 3.75% vs ECB 2.4%) which continues to weigh on spot prices. Fundamental data remains a headwind as the EUR Economic Surprise Index (ESI) sits at -10.1, reflecting a moderate negative bias in Eurozone data releases. Despite the ECB's hiking stance, the market remains focused on the restrictive US real rate of +1.47% vs the Eurozone's +0.16%. Speculative positioning remains net short (LF net -80,570), showing little appetite to fade the current trend despite the ECB's hawkish forward bias. Risk: A surprise beat in Eurozone CPI data shifts the ESI positive and forces a reduction in spec shorts.",
+      "evidence": [
+        "EUR ESI: -10.1",
+        "EUR/USD Carry: +135bp (USD)",
+        "EUR COT LF net: -80,570"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
