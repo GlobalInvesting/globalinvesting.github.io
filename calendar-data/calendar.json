@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-28T15:39:57Z",
-  "generatedAt": "2026-07-28T15:39:57Z",
+  "lastUpdate": "2026-07-28T21:35:35Z",
+  "generatedAt": "2026-07-28T21:35:35Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,10 +9,10 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-28",
   "rangeTo": "2026-07-28",
-  "totalEvents": 3698,
+  "totalEvents": 3699,
   "currencyCounts": {
     "GBP": 429,
-    "USD": 1268,
+    "USD": 1269,
     "EUR": 833,
     "AUD": 246,
     "CAD": 272,
@@ -23,7 +23,7 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1821,
+    "medium": 1822,
     "high": 1649,
     "low": 228
   },
@@ -499,9 +499,9 @@
       "std": 0.359607
     },
     "USD/api crude oil stock change": {
-      "n": 11,
-      "mean": -2.017364,
-      "std": 3.420464
+      "n": 12,
+      "mean": -1.36625,
+      "std": 3.965269
     },
     "CAD/ivey pmi s.a": {
       "n": 3,
@@ -46235,6 +46235,19 @@
       "actual": "90.8",
       "forecast": "92.3",
       "previous": "92.2"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States API Crude Oil Stock Change",
+      "impact": "medium",
+      "actual": "3.296M",
+      "forecast": "-2.5M",
+      "previous": "2.603M"
     }
   ]
 }
