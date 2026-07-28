@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-28T11:32:50Z",
-  "generatedAt": "2026-07-28T11:32:50Z",
+  "lastUpdate": "2026-07-28T15:39:57Z",
+  "generatedAt": "2026-07-28T15:39:57Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,10 +9,10 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-28",
   "rangeTo": "2026-07-28",
-  "totalEvents": 3697,
+  "totalEvents": 3698,
   "currencyCounts": {
     "GBP": 429,
-    "USD": 1267,
+    "USD": 1268,
     "EUR": 833,
     "AUD": 246,
     "CAD": 272,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "medium": 1821,
-    "high": 1648,
+    "high": 1649,
     "low": 228
   },
   "surpriseStats": {
@@ -174,19 +174,19 @@
       "std": 3.12378
     },
     "USD/goods trade balance": {
-      "n": 4,
-      "mean": -9.5925,
-      "std": 13.099398
+      "n": 5,
+      "mean": -7.974,
+      "std": 11.907703
     },
     "USD/wholesale inventories mom": {
-      "n": 4,
-      "mean": 0.275,
-      "std": 0.492443
+      "n": 5,
+      "mean": 0.24,
+      "std": 0.43359
     },
     "USD/retail inventories ex autos mom": {
-      "n": 4,
-      "mean": 0.425,
-      "std": 0.189297
+      "n": 5,
+      "mean": 0.24,
+      "std": 0.444972
     },
     "USD/housing starts mom": {
       "n": 5,
@@ -1169,9 +1169,9 @@
       "std": 0.321248
     },
     "USD/cb consumer confidence": {
-      "n": 2,
-      "mean": -1.2,
-      "std": 3.252691
+      "n": 3,
+      "mean": -1.3,
+      "std": 2.306513
     },
     "USD/dallas fed manufacturing index": {
       "n": 3,
@@ -1337,6 +1337,11 @@
       "n": 2,
       "mean": -0.25,
       "std": 0.494975
+    },
+    "USD/s&#38;p/case-shiller home price yoy": {
+      "n": 2,
+      "mean": 0.25,
+      "std": 0.070711
     },
     "AUD/private house approvals mom": {
       "n": 2,
@@ -46156,15 +46161,28 @@
     {
       "date": "28 Jul",
       "dateISO": "2026-07-28",
+      "timeUTC": "12:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States ADP Employment Change Weekly",
+      "impact": "high",
+      "actual": "15.0K",
+      "forecast": null,
+      "previous": "16.25K"
+    },
+    {
+      "date": "28 Jul",
+      "dateISO": "2026-07-28",
       "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "United States Wholesale Inventories MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "0.2%",
-      "previous": "0.1%"
+      "previous": "0.3%"
     },
     {
       "date": "28 Jul",
@@ -46175,9 +46193,9 @@
       "flag": "🇺🇸",
       "event": "United States Goods Trade Balance",
       "impact": "high",
-      "actual": null,
+      "actual": "$-101.5B",
       "forecast": "$-100.0B",
-      "previous": "$-105.9B"
+      "previous": "$-105.89B"
     },
     {
       "date": "28 Jul",
@@ -46188,9 +46206,9 @@
       "flag": "🇺🇸",
       "event": "United States Retail Inventories Ex Autos MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.2%",
       "forecast": "0.3%",
-      "previous": "0.3%"
+      "previous": "0.2%"
     },
     {
       "date": "28 Jul",
@@ -46201,9 +46219,9 @@
       "flag": "🇺🇸",
       "event": "United States S&#38;P/Case-Shiller Home Price YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "1.6%",
       "forecast": "1.3%",
-      "previous": "1.1%"
+      "previous": "1.2%"
     },
     {
       "date": "28 Jul",
@@ -46214,9 +46232,9 @@
       "flag": "🇺🇸",
       "event": "United States CB Consumer Confidence",
       "impact": "medium",
-      "actual": null,
+      "actual": "90.8",
       "forecast": "92.3",
-      "previous": "91.2"
+      "previous": "92.2"
     }
   ]
 }
