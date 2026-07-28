@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-07-28T16:17:53Z",
+  "generated_at": "2026-07-28T21:10:04Z",
   "signals": [
     {
-      "time": "16:17",
+      "time": "21:09",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitics + Carry + Vol",
-      "text": "USD/JPY trades at 163.67, holding above its SMA20/50/200 cluster following headlines that a U.S.–Iran deal is within reach. This shift in risk appetite triggers a sharp 5.02% sell-off in WTI oil and a retreat in gold, removing the immediate safe-haven floor for the Yen. A 275bp Fed-BoJ carry advantage (3.75% vs 1.0%) remains the structural anchor, while JPY COT LF net shorts at -114,030 show speculators remain heavily positioned for further weakness. The 25d Risk Reversal at -1.49 indicates the options market is still paying a premium for downside protection despite the spot bid, likely reflecting BoJ meeting risk on July 31. USD/JPY vs US 10Y correlation has broken to +0.475 (z=+1.65σ), suggesting the pair is now driven more by headline risk-on flows than traditional yield spreads. Risk: BoJ delivers a hawkish surprise on July 31, triggering a disorderly unwind of the crowded spec short.",
+      "title": "USD/JPY — Geopolitical Tension + Carry + Options",
+      "text": "USD/JPY at 163.78 remains supported by a +275bp Fed-BoJ carry advantage while Middle East tensions escalate. Netanyahu's confirmation of unavoidable strikes on Iranian nuclear facilities and Iran's threats to the Strait of Hormuz create a volatile backdrop where carry dominates until VIX clears 25. The pair holds above the SMA20/50/200 cluster (162.5/161.15/157.78), but the 25d Risk Reversal at -1.49 (Saxo) indicates a moderate put skew as institutional players hedge against a JPY safe-haven spike or BoJ intervention. CFTC COT data shows a heavy LF net short of -114,030, leaving the carry trade vulnerable to a disorderly unwind if geopolitical headlines trigger a broad risk-off regime. Implication: The trend remains bullish on carry, but the options market is paying for protection against a sharp reversal. Risk: A VIX break above 25 triggers a flight to safety, collapsing the 275bp carry bid.",
       "evidence": [
-        "USD/JPY carry: +275bp",
-        "JPY COT LF net: -114,030",
-        "USD/JPY 25d RR: -1.49"
+        "Fed 3.75% vs BoJ 1.0% — +275bp",
+        "USD/JPY 25d RR: -1.49",
+        "JPY COT LF net: -114,030"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:14",
+      "time": "21:05",
       "priority": "warning",
-      "title": "NZD/USD — Positioning + ESI + CB Divergence",
-      "text": "NZD/USD trades at 0.5799, supported by a strong positive Economic Surprise Index (ESI) of +22.2, contrasting with the negative EUR ESI of -9.5. RBNZ holds at 2.5%. While the nominal carry favors the USD by 125bp, the real policy rate differential is narrower, with NZD real rates at -1.56% vs USD at +1.47%. Price has cleared the SMA20 at 0.5765, signaling a shift in intraday momentum that challenges the crowded institutional short. The RBNZ hike bias provides a fundamental floor that speculators are currently ignoring at their peril. Risk: RBNZ pivots to a hold stance at the September 2 meeting, validating the existing spec short.",
+      "title": "EUR/USD — Macro Divergence + ESI + Vol",
+      "text": "EUR/USD trades at 1.1399, positioned below its SMA20/50/200 cluster (1.1417/1.1496/1.1637) as technical resistance thickens. The +135bp USD carry advantage (Fed 3.75% vs ECB 2.4%) is reinforced by a negative Economic Surprise Index (ESI) for the Eurozone at -9.5, contrasting with a neutral USD reading. Options markets show a notable vol risk premium (VRP) of +2.5%, with IV at 7.1% vs HV30 at 4.5%, signaling elevated demand for protection despite the pair's recent range-bound 1M performance of +0.32%. COT positioning remains heavily net short for EUR at -80,570, suggesting that speculators are already positioned for further downside. Implication: Weakening data and carry disadvantage keep the EUR structurally heavy below 1.1417. Risk: A hawkish ECB surprise at the next meeting on 10 Sep forces a short-squeeze toward the SMA50.",
       "evidence": [
-        "NZD COT long%: 12.0%",
-        "NZD ESI: +22.2",
-        "NZD/USD: 0.5799"
+        "USD/EUR Spread: +135bp",
+        "Eurozone ESI: -9.5",
+        "EUR COT LF net: -80,570"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:12",
+      "time": "21:02",
       "priority": "warning",
-      "title": "AUD/USD — Volatility + Retail Divergence",
-      "text": "AUD/USD is testing the 0.6988 level, supported by a 60bp carry advantage for the AUD (RBA 4.35% vs Fed 3.75%) and a hawkish stance from Governor Bullock. Volatility pricing is extreme, with AUD/USD IV at 14.7% vs HV30 of 6.0%, resulting in a massive +8.7% Vol Risk Premium (VRP). Retail sentiment is 65% short, diverging from the COT LF net long position of +20,521, which historically favors further upside as retail fades the institutional trend. Technicals show the pair holding above its SMA20 (0.6962) and SMA200 (0.6904), though the SMA50 at 0.7024 acts as immediate resistance. High VRP suggests the market is pricing in a significant move around upcoming RBA and Fed volatility. Risk: RBA shifts to a neutral bias at the August 11 meeting, eroding the AUD carry premium.",
+      "title": "AUD/USD — COT vs OIS Divergence + Retail",
+      "text": "AUD/USD at 0.6981 is testing the SMA20 at 0.6962 while holding below the SMA50 at 0.7024. COT LF net long +20,521 aligns with a hawkish RBA bias, but retail sentiment is 66% short, creating a moderate institutional vs retail divergence. While the OIS carry favors AUD by 60bp over the Fed, the 25d Risk Reversal at -0.81 shows that the options market is pricing in downside protection rather than chasing the +1.17% 1M gain. The AUD/USD vs US 10Y correlation break (z=+1.66σ in USD/JPY and general USD volatility) suggests idiosyncratic AUD strength is fighting broader USD resilience ahead of the Fed. Implication: Bullish positioning is meeting heavy retail fading and options-based caution, limiting upside potential beyond 0.7024. Risk: Fed signals a shift to a more restrictive stance on 29 Jul, erasing the 60bp AUD carry benefit.",
       "evidence": [
-        "AUD/USD VRP: +8.7%",
+        "RBA 4.35% vs Fed 3.75% — 60bp",
         "AUD COT LF net: +20,521",
-        "Retail Sentiment: 65% short"
+        "AUD/USD Retail: 66% Short"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:07",
+      "time": "20:58",
       "priority": "info",
-      "title": "EUR/USD — Volatility + Technicals",
-      "text": "EUR/USD trades at 1.1405, remaining stuck in a bearish technical posture below its SMA20, SMA50, and SMA200 cluster (1.1417–1.1637). Options markets show an elevated Vol Risk Premium (VRP) of +2.5%, with IV at 7.1% vs HV30 at 4.6%, indicating that traders are paying up for protection ahead of the September 10 ECB meeting. Despite the ECB's hiking bias, the 135bp nominal carry disadvantage against the USD (ECB 2.4% vs Fed 3.75%) limits upside potential. COT LF net shorts at -80,570 align with the negative ESI of -9.5, confirming that both data and positioning are weighted against the Euro. A sustained break above the SMA20 at 1.1417 is required to neutralize the immediate bearish outlook. Risk: ECB signals a pause in September, further widening the policy divergence with the Fed.",
+      "title": "USD/CHF — Volatility Extreme + ESI",
+      "text": "USD/CHF at 0.8177 is currently exhibiting extreme volatility pricing with an IV of 27.3% against an HV30 of only 5.8%, resulting in a massive +21.5% Vol Risk Premium. This extreme premium suggests the options market is bracing for a significant shock despite a massive +375bp Fed-SNB carry advantage that structurally supports the pair. Swiss ESI at +27.0 shows the domestic economy is significantly outperforming expectations, providing a fundamental floor for the Franc despite its -0.62% real rate accommodative stance. The pair sits above its SMA20 (0.8095) and SMA50 (0.8009), confirming a bullish technical trend supported by the yield gap. Implication: Carry is extremely expensive to hedge, suggesting professional participants are wary of a rapid CHF safe-haven reversal. Risk: A de-escalation in Middle East headlines triggers a collapse in CHF volatility and a resumption of the carry-driven USD bid.",
       "evidence": [
-        "EUR/USD VRP: +2.5%",
-        "EUR ESI: -9.5",
-        "USD/EUR carry: +135bp"
+        "USD/CHF VRP: +21.5%",
+        "Fed 3.75% vs SNB 0.0% — +375bp",
+        "Swiss ESI: +27.0"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "20:55",
+      "priority": "info",
+      "title": "USD/CAD — Correlation Break + Retail Bias",
+      "text": "USD/CAD at 1.4101 is trading in a regime defined by a significant correlation break against WTI Oil (z=-1.50σ), where the pair is failing to respond to the -4.18% drop in crude prices. The +150bp USD carry advantage (Fed 3.75% vs BoC 2.25%) remains the dominant driver, keeping the pair above its SMA50 (1.4028) despite being just below the SMA20 (1.4127). Retail sentiment is 70% short, fading the +0.11% weekly gain, while COT positioning shows a crowded spec short of -99,823 for the CAD. This combination suggests a squeeze higher if the 1.4127 resistance is breached. Implication: Carry-driven USD strength is overriding the negative oil catalyst, leaving the pair bid. Risk: A rebound in WTI crude toward $83/bbl restores the historical correlation and drags the pair toward 1.4000.",
+      "evidence": [
+        "USD/CAD vs WTI Corr: -0.916 (z=-1.50σ)",
+        "Fed 3.75% vs BoC 2.25% — +150bp",
+        "CAD COT LF net: -99,823"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
