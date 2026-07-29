@@ -40,7 +40,7 @@ The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — li
 - CIP-adjusted 30-day forward rate per currency pair
 
 ### Institutional Positioning
-- CFTC Commitments of Traders — Leveraged Funds net positioning (Disaggregated TFF, Options+Futures Combined), updated weekly
+- CFTC Commitments of Traders — Leveraged Funds net positioning (Traders in Financial Futures / TFF, Options+Futures Combined), updated weekly
 - 52-week positioning history with momentum scoring
 
 ### Macro Analytics
