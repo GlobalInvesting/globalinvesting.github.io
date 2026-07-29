@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-29T08:04:02Z",
-  "generatedAt": "2026-07-29T08:04:02Z",
+  "lastUpdate": "2026-07-29T11:38:02Z",
+  "generatedAt": "2026-07-29T11:38:02Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-29",
   "rangeTo": "2026-07-29",
-  "totalEvents": 3713,
+  "totalEvents": 3714,
   "currencyCounts": {
     "EUR": 834,
     "GBP": 431,
-    "USD": 1270,
+    "USD": 1271,
     "AUD": 256,
     "CAD": 272,
     "CHF": 124,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "high": 1659,
-    "medium": 1826,
+    "medium": 1827,
     "low": 228
   },
   "surpriseStats": {
@@ -224,19 +224,19 @@
       "std": 1.0
     },
     "GBP/boe consumer credit": {
-      "n": 3,
-      "mean": 0.038667,
-      "std": 0.156308
+      "n": 4,
+      "mean": 0.05575,
+      "std": 0.13212
     },
     "GBP/mortgage approvals": {
-      "n": 3,
-      "mean": 0.36,
-      "std": 6.115791
+      "n": 4,
+      "mean": 0.545,
+      "std": 5.007211
     },
     "GBP/mortgage lending": {
-      "n": 3,
-      "mean": -0.396667,
-      "std": 2.037089
+      "n": 4,
+      "mean": 0.6475,
+      "std": 2.669761
     },
     "USD/ism manufacturing pmi": {
       "n": 3,
@@ -1297,6 +1297,11 @@
       "n": 2,
       "mean": 1.5,
       "std": 2.12132
+    },
+    "EUR/greece unemployment rate": {
+      "n": 2,
+      "mean": 0.55,
+      "std": 1.343503
     },
     "EUR/spain consumer confidence": {
       "n": 2,
@@ -46238,7 +46243,7 @@
       "impact": "high",
       "actual": "0.3%",
       "forecast": "0.3%",
-      "previous": "0.4%"
+      "previous": "0.9%"
     },
     {
       "date": "29 Jul",
@@ -46251,7 +46256,7 @@
       "impact": "high",
       "actual": "3.7%",
       "forecast": "3.7%",
-      "previous": "3.6%"
+      "previous": "3.5%"
     },
     {
       "date": "29 Jul",
@@ -46301,9 +46306,9 @@
       "flag": "🇬🇧",
       "event": "United Kingdom BoE Consumer Credit",
       "impact": "medium",
-      "actual": null,
+      "actual": "&#163;1.807B",
       "forecast": "&#163;1.7B",
-      "previous": "&#163;1.662B"
+      "previous": "&#163;1.723B"
     },
     {
       "date": "29 Jul",
@@ -46314,9 +46319,9 @@
       "flag": "🇬🇧",
       "event": "United Kingdom Mortgage Lending",
       "impact": "medium",
-      "actual": null,
+      "actual": "&#163;7.73B",
       "forecast": "&#163;3.95B",
-      "previous": "&#163;2.89B"
+      "previous": "&#163;3.27B"
     },
     {
       "date": "29 Jul",
@@ -46327,9 +46332,9 @@
       "flag": "🇬🇧",
       "event": "United Kingdom Mortgage Approvals",
       "impact": "medium",
-      "actual": null,
+      "actual": "58.2K",
       "forecast": "57.1K",
-      "previous": "56.21K"
+      "previous": "56.57K"
     },
     {
       "date": "29 Jul",
@@ -46340,9 +46345,22 @@
       "flag": "🇪🇺",
       "event": "Greece Unemployment Rate",
       "impact": "high",
-      "actual": null,
-      "forecast": "7.6",
-      "previous": "8.1"
+      "actual": "8.0%",
+      "forecast": "7.6%",
+      "previous": "7.8%"
+    },
+    {
+      "date": "29 Jul",
+      "dateISO": "2026-07-29",
+      "timeUTC": "11:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States MBA 30-Year Mortgage Rate",
+      "impact": "medium",
+      "actual": "6.76",
+      "forecast": null,
+      "previous": "6.69"
     },
     {
       "date": "29 Jul",
