@@ -46,7 +46,7 @@ The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — li
 ### Macro Analytics
 - Economic Surprise Index — CESI-style normalized surprise for all 10 G10 currencies, 90-day rolling window, beat-rate scaled [−100, +100] per Citi convention
 - US Treasury yield curve (3M · 2Y · 5Y · 10Y · 30Y)
-- Cross-asset risk monitor (SPX · Gold · WTI · BTC · DXY · Nikkei · Stoxx) with stress scoring
+- Cross-asset risk monitor (SPX · Gold · WTI · BTC · DXY · Nikkei · Stoxx) with stress scoring, plus US HY/IG credit spreads (ICE BofA OAS) and 20-day spread-direction tracking
 - Carry Trade Ranking — G10 carry-to-vol for all 45 pairs with real rate breakdown and sustainability assessment
 - Economic Matrix — latest GDP, CPI, unemployment, industrial production, business confidence, retail sales, current account, and trade balance for all 10 G10 economies, alongside 10-year sovereign yield and central bank policy rate, sourced from the live economic calendar
 
