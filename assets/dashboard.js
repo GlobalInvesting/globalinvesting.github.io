@@ -3539,11 +3539,10 @@ function _lwUpdateTodayBar() {
     if (_lwActiveUpdateHeader) {
       _lwActiveUpdateHeader(_liveBar, null, (_rt.pct != null) ? { pct: _rt.pct, chg: _rt.chg } : null);
     }
-    // Re-project the trend-line/swing overlay: a live tick can widen the
-    // autoscaled price range without firing subscribeVisibleTimeRangeChange,
-    // which would otherwise leave the SVG diagonal stale against the new axis.
-    // (Fib levels don't need this -- createPriceLine already tracks the axis
-    // itself, see _syncFibPriceLines.)
+    // Re-project all drawings (trend line, Fibonacci, rectangle): a live tick
+    // can widen the autoscaled price range without firing
+    // subscribeVisibleTimeRangeChange, which would otherwise leave the SVG
+    // overlay stale against the new axis.
     if (window._lwRenderDrawings) window._lwRenderDrawings();
     return;
   }
@@ -4452,13 +4451,24 @@ async function _renderLWChart(ohlcId, label) {
   }
   _applyMarkers();
 
-  // ── Drawing Tools — Trend Line & Fibonacci Retracement ──────────────────────
-  // Industry-standard UX (TradingView/Bloomberg): pick a tool from the "Draw"
-  // menu, click the first anchor point, click the second — the drawing commits.
-  // Persisted per symbol+timeframe (a line drawn on EUR/USD H1 shouldn't show up
-  // on GBP/USD or on the Daily chart). Rendered as an SVG overlay synced to the
-  // chart via timeToCoordinate/priceToCoordinate on every pan/zoom, same pattern
-  // as the CB meeting-markers overlay just above.
+  // ── Drawing Tools — Trend Line, Fibonacci Retracement, Rectangle ────────────
+  // Industry-standard UX (TradingView/Bloomberg/MT5): pick a tool from the
+  // "Draw" menu, then press-and-drag on the chart — the shape follows the
+  // cursor live and commits on release. Persisted per symbol+timeframe (a line
+  // drawn on EUR/USD H1 doesn't show up on GBP/USD or the Daily chart).
+  // Rendered as an SVG overlay synced to the chart via
+  // timeToCoordinate/priceToCoordinate on every pan/zoom and on every live
+  // tick, same pattern as the CB meeting-markers overlay just above.
+  //
+  // BUGFIX (2026-07-29): Fibonacci levels previously rendered via the native
+  // `series.createPriceLine()` API to solve a label-collision bug — but native
+  // price lines always span the *entire* chart width with no way to bound
+  // them, which is what produced the "Fibonacci spans the whole chart"
+  // complaint. Reverted to hand-drawn SVG lines, but bounded strictly between
+  // the two x-coordinates the user actually dragged (xLeft..xRight) instead of
+  // stretching to the chart edge — the box's width is now literally whatever
+  // width the user defines by dragging, and the level labels sit just past
+  // the right edge of that box rather than colliding with the price axis.
   const _DRAW_LS_KEY = 'gi_drawings';
   const _drawSymKey  = `${ohlcId}_${_lwActiveTf}`;
   if (typeof window._lwDrawings === 'undefined') {
@@ -4473,10 +4483,15 @@ async function _renderLWChart(ohlcId, label) {
     return window._lwDrawings[_drawSymKey];
   }
 
-  let _drawMode      = null; // null | 'trend' | 'fib'
-  let _drawPending    = null; // first clicked {time, price}, awaiting the second click
-  let _drawOverlay    = null; // SVG overlay element
-  let _drawRafId      = null;
+  let _drawMode      = null;  // null | 'trend' | 'fib' | 'rect'
+  let _drawAnchor    = null;  // {time, price} — drag-start point
+  let _drawLiveEnd   = null;  // {time, price} — live drag-end point, updated on every move
+  let _isDragging    = false;
+  let _lastCrosshair = null;  // most recent subscribeCrosshairMove param (gives us drag coords)
+  let _drawOverlay   = null;  // SVG overlay element
+  let _drawRafId     = null;
+
+  const _DRAW_COLORS = { trend: 'rgba(79,127,255,0.9)', fib: 'rgba(255,193,7,0.9)', rect: 'rgba(126,211,138,0.9)' };
 
   // Standard Fibonacci retracement ratios (TradingView/MT default set)
   const FIB_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
@@ -4487,74 +4502,80 @@ async function _renderLWChart(ohlcId, label) {
     try { chartDiv.style.cursor = _drawMode ? 'crosshair' : ''; } catch(_) {}
   }
 
-  function _renderDrawings() {
-    if (_drawRafId) cancelAnimationFrame(_drawRafId);
-    _drawRafId = requestAnimationFrame(() => {
-      _drawRafId = null;
-      if (!_drawOverlay || !_lwChart) return;
-      const ts = _lwChart.timeScale();
-      let svg = '';
-      _curDrawings().forEach(d => {
-        try {
-          const x1 = ts.timeToCoordinate(d.p1.time), x2 = ts.timeToCoordinate(d.p2.time);
-          const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
-          if (x1 == null || x2 == null || y1 == null || y2 == null) return;
-          const col = d.color || 'rgba(79,127,255,0.9)';
-          // Both Trend Line and the Fibonacci swing itself are diagonal — the
-          // Fibonacci retracement LEVELS are handled separately below via native
-          // price lines (see _syncFibPriceLines), not drawn here.
-          svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1.5" ${d.type === 'fib' ? 'stroke-dasharray="4,3" opacity="0.6"' : ''}/>`;
-          svg += `<circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="3" fill="${col}"/>`;
-          svg += `<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3" fill="${col}"/>`;
-        } catch(_) {}
+  // Toggle chart panning/zooming off while the user is actively dragging out a
+  // shape (otherwise a press-drag on the canvas would pan the chart instead of
+  // drawing). Restored the instant the drag ends.
+  const _panScrollOpts  = { mouseWheel: true, pressedMouseMove: true,  horzTouchDrag: true,  vertTouchDrag: false };
+  const _panScaleOpts   = { mouseWheel: true, pinch: true,  axisPressedMouseMove: { time: true,  price: true  } };
+  const _noPanScrollOpts = { mouseWheel: true, pressedMouseMove: false, horzTouchDrag: false, vertTouchDrag: false };
+  const _noPanScaleOpts  = { mouseWheel: true, pinch: false, axisPressedMouseMove: { time: false, price: false } };
+  function _setChartPannable(enabled) {
+    try {
+      _lwChart.applyOptions({
+        handleScroll: enabled ? _panScrollOpts : _noPanScrollOpts,
+        handleScale:  enabled ? _panScaleOpts  : _noPanScaleOpts,
       });
-      _drawOverlay.innerHTML = svg;
-    });
+    } catch(_) {}
   }
 
-  // ── Fibonacci retracement levels — rendered as native price lines ───────────
-  // Previously each level was a hand-drawn <line>+<text> spanning the full chart
-  // width, recomputed on every pan/zoom — expensive, and the text sat wherever
-  // math placed it, so it visibly collided with the native price-scale labels
-  // (and the live price tag) exactly as flagged. `series.createPriceLine()` is
-  // the native Lightweight Charts mechanism for this: the library renders the
-  // line and its axis label itself, in the same lane as every other price-scale
-  // label, and keeps it correctly positioned on every redraw — including when
-  // the price scale autoscales from a live tick — with zero polling from us.
-  const _fibPriceLines = new Map(); // drawing id -> [priceLine, ...]
-
-  function _syncFibPriceLines() {
-    const cur = _curDrawings();
-    const curFibIds = new Set(cur.filter(d => d.type === 'fib').map(d => d.id));
-    for (const [id, lines] of _fibPriceLines) {
-      if (!curFibIds.has(id)) {
-        lines.forEach(pl => { try { candleSeries.removePriceLine(pl); } catch(_) {} });
-        _fibPriceLines.delete(id);
-      }
-    }
-    cur.filter(d => d.type === 'fib').forEach(d => {
-      if (_fibPriceLines.has(d.id)) return;
+  // Builds the SVG markup for one drawing (or a live in-progress preview).
+  function _svgForDrawing(d, isPreview) {
+    const ts = _lwChart.timeScale();
+    const x1 = ts.timeToCoordinate(d.p1.time), x2 = ts.timeToCoordinate(d.p2.time);
+    const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
+    if (x1 == null || x2 == null || y1 == null || y2 == null) return '';
+    const col = d.color || _DRAW_COLORS[d.type] || _DRAW_COLORS.trend;
+    const previewDash = isPreview ? ' stroke-dasharray="3,3"' : '';
+    let svg = '';
+    if (d.type === 'trend') {
+      svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1.5"${previewDash}/>`;
+      svg += `<circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="3" fill="${col}"/>`;
+      svg += `<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3" fill="${col}"/>`;
+    } else if (d.type === 'rect') {
+      const rx = Math.min(x1, x2), ry = Math.min(y1, y2);
+      const rw = Math.abs(x2 - x1), rh = Math.abs(y2 - y1);
+      const fillCol = col.replace(/[\d.]+\)$/, '0.14)');
+      svg += `<rect x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}" fill="${fillCol}" stroke="${col}" stroke-width="1.25"${previewDash}/>`;
+    } else if (d.type === 'fib') {
+      // Diagonal swing guide (dashed, low-opacity — the levels below are the point).
+      svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4,3" opacity="0.55"/>`;
       // Convention: 0% sits at the swing point the user dragged FROM, 100% at
       // the point dragged TO — matches the TradingView/MT5 Fibonacci tool.
       const drawnHighFirst = d.p1.price >= d.p2.price;
       const priceHigh = Math.max(d.p1.price, d.p2.price);
       const priceLow  = Math.min(d.p1.price, d.p2.price);
-      const range = priceHigh - priceLow;
-      const col = d.color || 'rgba(255,193,7,0.9)';
-      const lines = FIB_LEVELS.map(lv => {
+      const range = priceHigh - priceLow || 1e-9;
+      // Bounded to the width the user actually dragged — NOT the chart edge.
+      const xLeft  = Math.min(x1, x2);
+      const xRight = Math.max(x1, x2);
+      FIB_LEVELS.forEach(lv => {
         const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
+        const y = candleSeries.priceToCoordinate(lvPrice);
+        if (y == null) return;
+        const isAnchor = (lv === 0 || lv === 1);
+        svg += `<line x1="${xLeft.toFixed(1)}" y1="${y.toFixed(1)}" x2="${xRight.toFixed(1)}" y2="${y.toFixed(1)}" `
+             + `stroke="${col}" stroke-width="1" ${isAnchor ? '' : 'stroke-dasharray="2,2"'} opacity="0.9"${previewDash}/>`;
+        svg += `<text x="${(xRight + 4).toFixed(1)}" y="${(y - 2).toFixed(1)}" text-anchor="start" `
+             + `font-size="9" font-family="var(--font-ui,sans-serif)" fill="${col}">`
+             + `${(lv * 100).toFixed(1)}% \u2013 ${lvPrice.toFixed(dec)}</text>`;
+      });
+    }
+    return svg;
+  }
+
+  function _renderDrawings() {
+    if (_drawRafId) cancelAnimationFrame(_drawRafId);
+    _drawRafId = requestAnimationFrame(() => {
+      _drawRafId = null;
+      if (!_drawOverlay || !_lwChart) return;
+      let svg = '';
+      _curDrawings().forEach(d => { try { svg += _svgForDrawing(d, false); } catch(_) {} });
+      if (_isDragging && _drawAnchor && _drawLiveEnd) {
         try {
-          return candleSeries.createPriceLine({
-            price: lvPrice,
-            color: col,
-            lineWidth: 1,
-            lineStyle: (lv === 0 || lv === 1) ? 0 : 1, // solid at the anchors, dotted for internal levels
-            axisLabelVisible: true,
-            title: `Fib ${(lv * 100).toFixed(1)}%`,
-          });
-        } catch(_) { return null; }
-      }).filter(Boolean);
-      _fibPriceLines.set(d.id, lines);
+          svg += _svgForDrawing({ type: _drawMode, p1: _drawAnchor, p2: _drawLiveEnd, color: _DRAW_COLORS[_drawMode] }, true);
+        } catch(_) {}
+      }
+      _drawOverlay.innerHTML = svg;
     });
   }
 
@@ -4566,13 +4587,10 @@ async function _renderLWChart(ohlcId, label) {
     chartDiv.appendChild(_drawOverlay);
   }
   _renderDrawings();
-  _syncFibPriceLines();
   _lwChart.timeScale().subscribeVisibleTimeRangeChange(_renderDrawings);
-  // Expose for real-time redraw from _lwUpdateTodayBar() — the trend-line/swing
-  // diagonal needs re-projecting whenever a live tick shifts the price scale's
-  // autoscaled range, which doesn't fire a visible-time-range-change event on
-  // its own (the fib LEVELS don't need this — native price lines already track
-  // the axis in true real time with no help from us).
+  // Expose for real-time redraw from _lwUpdateTodayBar() — every shape needs
+  // re-projecting whenever a live tick shifts the price scale's autoscaled
+  // range, which doesn't fire a visible-time-range-change event on its own.
   window._lwRenderDrawings = _renderDrawings;
 
   // Distance from a point to a line segment (for click-to-delete hit testing)
@@ -4595,56 +4613,115 @@ async function _renderLWChart(ohlcId, label) {
       if (x1 == null || x2 == null || y1 == null || y2 == null) continue;
       if (d.type === 'trend') {
         if (_ptSegDist(x, y, x1, y1, x2, y2) < 6) return i;
+      } else if (d.type === 'rect') {
+        const rx1 = Math.min(x1, x2) - 4, rx2 = Math.max(x1, x2) + 4;
+        const ry1 = Math.min(y1, y2) - 4, ry2 = Math.max(y1, y2) + 4;
+        if (x >= rx1 && x <= rx2 && y >= ry1 && y <= ry2) return i;
       } else if (d.type === 'fib') {
+        if (_ptSegDist(x, y, x1, y1, x2, y2) < 6) return i; // the diagonal swing guide itself
         const drawnHighFirst = d.p1.price >= d.p2.price;
         const priceHigh = Math.max(d.p1.price, d.p2.price), priceLow = Math.min(d.p1.price, d.p2.price);
-        const range = priceHigh - priceLow;
-        const xLeft = Math.min(x1, x2);
+        const range = priceHigh - priceLow || 1e-9;
+        const xLeft = Math.min(x1, x2) - 4, xRight = Math.max(x1, x2) + 4;
         for (const lv of FIB_LEVELS) {
           const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
           const ly = candleSeries.priceToCoordinate(lvPrice);
-          if (ly != null && x >= xLeft && Math.abs(y - ly) < 5) return i;
+          if (ly != null && x >= xLeft && x <= xRight && Math.abs(y - ly) < 5) return i;
         }
       }
     }
     return -1;
   }
 
-  // Chart click: placing a drawing point in draw mode, or click-to-delete a
-  // drawing when not in draw mode (avoids needing a separate selection UI).
-  function _onChartClick(param) {
-    if (!param.point) return;
-    const ts = _lwChart.timeScale();
-    const time = param.time != null ? param.time : ts.coordinateToTime(param.point.x);
-    if (time == null) return;
+  function _cancelDrawMode() {
+    _drawMode = null; _drawAnchor = null; _drawLiveEnd = null; _isDragging = false;
+    _setChartPannable(true);
+    _updateDrawBtnState();
+    _renderDrawings();
+  }
+
+  // Track the live cursor position in chart coordinates (time/price) via LWC's
+  // own crosshair subscription — this guarantees coordinates that are already
+  // consistent with timeToCoordinate/priceToCoordinate, rather than converting
+  // raw DOM pixel offsets ourselves.
+  _lwChart.subscribeCrosshairMove(param => {
+    _lastCrosshair = param;
+    if (!_isDragging || !param || !param.point || param.time == null) return;
     const price = candleSeries.coordinateToPrice(param.point.y);
     if (price == null) return;
-    if (_drawMode) {
-      if (!_drawPending) {
-        _drawPending = { time, price };
-      } else {
-        _curDrawings().push({
-          id: 'dr_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-          type: _drawMode,
-          p1: _drawPending,
-          p2: { time, price },
-          color: _drawMode === 'fib' ? 'rgba(255,193,7,0.9)' : 'rgba(79,127,255,0.9)',
-        });
-        _saveDrawings();
-        _syncFibPriceLines();
-        _drawPending = null;
-        _drawMode = null;
-        _updateDrawBtnState();
-        _renderDrawings();
-      }
-    } else {
-      const idx = _hitTestDrawing(param.point.x, param.point.y);
-      if (idx >= 0) {
-        _curDrawings().splice(idx, 1);
-        _saveDrawings();
-        _syncFibPriceLines();
-        _renderDrawings();
-      }
+    _drawLiveEnd = { time: param.time, price };
+    _renderDrawings();
+  });
+
+  // Press-and-drag to draw: pointerdown arms the anchor, pointerup (anywhere,
+  // even released outside the chart) commits the shape — the same click-drag
+  // convention as TradingView/MT5. A plain click-to-delete still works when no
+  // tool is armed (handled separately below via subscribeClick).
+  chartDiv.addEventListener('pointerdown', e => {
+    if (!_drawMode) return;
+    if (!_lastCrosshair || !_lastCrosshair.point || _lastCrosshair.time == null) return;
+    const price = candleSeries.coordinateToPrice(_lastCrosshair.point.y);
+    if (price == null) return;
+    _drawAnchor  = { time: _lastCrosshair.time, price };
+    _drawLiveEnd = { time: _lastCrosshair.time, price };
+    _isDragging  = true;
+    _setChartPannable(false);
+    try { e.preventDefault(); } catch(_) {}
+  });
+
+  // Global pointerup: a single de-duplicated document-level listener so a drag
+  // released outside the chart bounds still commits, and so re-rendering the
+  // chart (symbol/timeframe switch) doesn't accumulate stale listeners.
+  if (window._lwDrawDocPointerUp) document.removeEventListener('pointerup', window._lwDrawDocPointerUp);
+  window._lwDrawDocPointerUp = function() {
+    if (!_isDragging) return;
+    _isDragging = false;
+    _setChartPannable(true);
+    const anchor = _drawAnchor;
+    const end = _drawLiveEnd;
+    _drawAnchor = null; _drawLiveEnd = null;
+    if (!anchor || !end) { _renderDrawings(); return; }
+    // Require a minimum on-screen drag distance so an accidental single
+    // click doesn't commit a zero-size shape — the tool just stays armed.
+    try {
+      const ts = _lwChart.timeScale();
+      const ax = ts.timeToCoordinate(anchor.time), ay = candleSeries.priceToCoordinate(anchor.price);
+      const bx = ts.timeToCoordinate(end.time),    by = candleSeries.priceToCoordinate(end.price);
+      const dist = (ax != null && ay != null && bx != null && by != null) ? Math.hypot(bx - ax, by - ay) : 0;
+      if (dist < 8) { _renderDrawings(); return; }
+    } catch(_) {}
+    _curDrawings().push({
+      id: 'dr_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      type: _drawMode,
+      p1: anchor,
+      p2: end,
+      color: _DRAW_COLORS[_drawMode],
+    });
+    _saveDrawings();
+    _drawMode = null;
+    _updateDrawBtnState();
+    _renderDrawings();
+  };
+  document.addEventListener('pointerup', window._lwDrawDocPointerUp);
+
+  // Esc cancels an armed (or mid-drag) tool without drawing anything —
+  // same de-duplication approach as the pointerup listener above.
+  if (window._lwDrawEscHandler) document.removeEventListener('keydown', window._lwDrawEscHandler);
+  window._lwDrawEscHandler = function(e) { if (e.key === 'Escape' && _drawMode) _cancelDrawMode(); };
+  document.addEventListener('keydown', window._lwDrawEscHandler);
+
+  // Chart click: click-to-delete a drawing when no tool is armed. Creation now
+  // happens via press-and-drag above, so clicks are ignored while a tool is
+  // armed (that click is either the drag's own release, already handled by
+  // pointerup, or a too-short tap that pointerup already discarded).
+  function _onChartClick(param) {
+    if (_drawMode) return;
+    if (!param.point) return;
+    const idx = _hitTestDrawing(param.point.x, param.point.y);
+    if (idx >= 0) {
+      _curDrawings().splice(idx, 1);
+      _saveDrawings();
+      _renderDrawings();
     }
   }
   _lwChart.subscribeClick(_onChartClick);
@@ -4683,17 +4760,19 @@ async function _renderLWChart(ohlcId, label) {
       row.addEventListener('click', e => { e.stopPropagation(); onClick(); _closeDrawDropdown(); });
       pop.appendChild(row);
     }
-    _addOption('Trend Line', 'Click two points on the chart', () => {
-      _drawMode = 'trend'; _drawPending = null; _updateDrawBtnState();
+    _addOption('Trend Line', 'Click and drag on the chart', () => {
+      _drawMode = 'trend'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState();
     });
-    _addOption('Fibonacci Retracement', 'Click the swing start, then the swing end', () => {
-      _drawMode = 'fib'; _drawPending = null; _updateDrawBtnState();
+    _addOption('Fibonacci Retracement', 'Drag from the swing start to the swing end', () => {
+      _drawMode = 'fib'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState();
+    });
+    _addOption('Rectangle', 'Drag to mark a price/time zone', () => {
+      _drawMode = 'rect'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState();
     });
     if (_curDrawings().length > 0) {
       _addOption('Clear All Drawings', `Remove ${_curDrawings().length} drawing(s) on this chart`, () => {
         window._lwDrawings[_drawSymKey] = [];
         _saveDrawings();
-        _syncFibPriceLines();
         _renderDrawings();
       });
     }
