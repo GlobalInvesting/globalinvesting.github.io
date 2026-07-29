@@ -3539,10 +3539,11 @@ function _lwUpdateTodayBar() {
     if (_lwActiveUpdateHeader) {
       _lwActiveUpdateHeader(_liveBar, null, (_rt.pct != null) ? { pct: _rt.pct, chg: _rt.chg } : null);
     }
-    // Re-project all drawings (trend line, Fibonacci, rectangle): a live tick
-    // can widen the autoscaled price range without firing
-    // subscribeVisibleTimeRangeChange, which would otherwise leave the SVG
-    // overlay stale against the new axis.
+    // Re-project the trend-line/swing overlay: a live tick can widen the
+    // autoscaled price range without firing subscribeVisibleTimeRangeChange,
+    // which would otherwise leave the SVG diagonal stale against the new axis.
+    // (Fib levels don't need this -- createPriceLine already tracks the axis
+    // itself, see _syncFibPriceLines.)
     if (window._lwRenderDrawings) window._lwRenderDrawings();
     return;
   }
@@ -4487,7 +4488,6 @@ async function _renderLWChart(ohlcId, label) {
   let _drawAnchor    = null;  // {time, price} — drag-start point
   let _drawLiveEnd   = null;  // {time, price} — live drag-end point, updated on every move
   let _isDragging    = false;
-  let _lastCrosshair = null;  // most recent subscribeCrosshairMove param (gives us drag coords)
   let _drawOverlay   = null;  // SVG overlay element
   let _drawRafId     = null;
 
@@ -4640,45 +4640,76 @@ async function _renderLWChart(ohlcId, label) {
     _renderDrawings();
   }
 
-  // Track the live cursor position in chart coordinates (time/price) via LWC's
-  // own crosshair subscription — this guarantees coordinates that are already
-  // consistent with timeToCoordinate/priceToCoordinate, rather than converting
-  // raw DOM pixel offsets ourselves.
-  _lwChart.subscribeCrosshairMove(param => {
-    _lastCrosshair = param;
-    if (!_isDragging || !param || !param.point || param.time == null) return;
-    const price = candleSeries.coordinateToPrice(param.point.y);
-    if (price == null) return;
-    _drawLiveEnd = { time: param.time, price };
-    _renderDrawings();
-  });
+  // Convert a raw pointer-event client position into chart {time, price}.
+  // BUGFIX (2026-07-29): the previous version sourced drag coordinates from
+  // `subscribeCrosshairMove`, but LWC's own pan-handling latches onto a
+  // pressed-mouse-move gesture at the moment `pointerdown` reaches its
+  // internal (target-phase) listener -- which fires *before* our own
+  // bubble-phase listener on `chartDiv` could disable panning -- and while
+  // that internal pan/drag state is active, `crosshairMove` stops firing.
+  // The result: the anchor and the drag-end point were both taken from the
+  // same single (pre-drag) crosshair reading, so every drawing committed
+  // with p1 === p2 (zero-length) — visible as a single collapsed dot for a
+  // Trend Line, a stack of overlapping labels for Fibonacci (all 7 levels
+  // at the same price), and literally nothing for a Rectangle (0×0 box).
+  // It only ever looked like it "worked" after leaving and re-entering the
+  // chart because that generates a fresh crosshairMove call once panning
+  // (mistakenly already active) released control.
+  // Fixed two ways: (1) coordinates are now computed directly from the
+  // pointer event's own clientX/clientY against chartDiv's bounding rect —
+  // no dependency on crosshairMove firing at all; (2) `pointerdown` is
+  // registered on the CAPTURE phase, so panning is disabled before LWC's
+  // own target-phase handler ever sees the event.
+  function _drawPointToTP(clientX, clientY) {
+    try {
+      const rect = chartDiv.getBoundingClientRect();
+      const x = clientX - rect.left, y = clientY - rect.top;
+      const time  = _lwChart.timeScale().coordinateToTime(x);
+      const price = candleSeries.coordinateToPrice(y);
+      if (time == null || price == null) return null;
+      return { time, price };
+    } catch(_) { return null; }
+  }
 
-  // Press-and-drag to draw: pointerdown arms the anchor, pointerup (anywhere,
-  // even released outside the chart) commits the shape — the same click-drag
-  // convention as TradingView/MT5. A plain click-to-delete still works when no
-  // tool is armed (handled separately below via subscribeClick).
+  // Press-and-drag to draw: pointerdown arms the anchor, pointermove updates
+  // the live preview continuously, pointerup (anywhere, even released outside
+  // the chart) commits the shape — the same click-drag convention as
+  // TradingView/MT5. A plain click-to-delete still works when no tool is
+  // armed (handled separately below via subscribeClick).
   chartDiv.addEventListener('pointerdown', e => {
     if (!_drawMode) return;
-    if (!_lastCrosshair || !_lastCrosshair.point || _lastCrosshair.time == null) return;
-    const price = candleSeries.coordinateToPrice(_lastCrosshair.point.y);
-    if (price == null) return;
-    _drawAnchor  = { time: _lastCrosshair.time, price };
-    _drawLiveEnd = { time: _lastCrosshair.time, price };
+    const pt = _drawPointToTP(e.clientX, e.clientY);
+    if (!pt) return;
+    _drawAnchor  = pt;
+    _drawLiveEnd = pt;
     _isDragging  = true;
-    _setChartPannable(false);
+    _setChartPannable(false); // must run before this event reaches LWC's own handler — see capture:true below
     try { e.preventDefault(); } catch(_) {}
-  });
+  }, true); // capture phase — runs ahead of LWC's own mousedown/pan handling
+
+  // Global pointermove: de-duplicated document-level listener (same reasoning
+  // as pointerup below) so the preview keeps updating even if the pointer
+  // briefly leaves the chart bounds mid-drag.
+  if (window._lwDrawDocPointerMove) document.removeEventListener('pointermove', window._lwDrawDocPointerMove);
+  window._lwDrawDocPointerMove = function(e) {
+    if (!_isDragging) return;
+    const pt = _drawPointToTP(e.clientX, e.clientY);
+    if (!pt) return;
+    _drawLiveEnd = pt;
+    _renderDrawings();
+  };
+  document.addEventListener('pointermove', window._lwDrawDocPointerMove);
 
   // Global pointerup: a single de-duplicated document-level listener so a drag
   // released outside the chart bounds still commits, and so re-rendering the
   // chart (symbol/timeframe switch) doesn't accumulate stale listeners.
   if (window._lwDrawDocPointerUp) document.removeEventListener('pointerup', window._lwDrawDocPointerUp);
-  window._lwDrawDocPointerUp = function() {
+  window._lwDrawDocPointerUp = function(e) {
     if (!_isDragging) return;
     _isDragging = false;
     _setChartPannable(true);
     const anchor = _drawAnchor;
-    const end = _drawLiveEnd;
+    const end = _drawPointToTP(e.clientX, e.clientY) || _drawLiveEnd;
     _drawAnchor = null; _drawLiveEnd = null;
     if (!anchor || !end) { _renderDrawings(); return; }
     // Require a minimum on-screen drag distance so an accidental single
