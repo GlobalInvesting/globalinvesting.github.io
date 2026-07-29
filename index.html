@@ -1011,10 +1011,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </div>
         </div>
         <div class="panel" id="section-risk" style="border-bottom:none;" role="region" aria-label="Risk Monitor">
-          <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub" id="risk-panel-sub">Volatility &amp; regime · HV 10/30/60d</span></div>
+          <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub" id="risk-panel-sub">Volatility, credit &amp; regime · HV 10/30/60d</span></div>
           <div class="risk-grid">
             <div class="risk-cell" style="cursor:pointer;" title="Click: chart"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
             <div class="risk-cell" style="cursor:pointer;" title="Click: chart"><div class="risk-lbl">MOVE Index</div><div class="risk-val" id="risk-move">—</div><div class="risk-sub" id="risk-move-sub">Bond vol</div></div>
+            <div class="risk-cell"><div class="risk-lbl">US HY OAS</div><div class="risk-val" id="risk-hyoas">—</div><div class="risk-sub" id="risk-hyoas-sub">Loading…</div></div>
+            <div class="risk-cell"><div class="risk-lbl">US IG OAS</div><div class="risk-val" id="risk-igoas">—</div><div class="risk-sub" id="risk-igoas-sub">Loading…</div></div>
             <div class="risk-cell"><div class="risk-lbl">EUR/USD HV 30d</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Hist. volatility</div></div>
             <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px" aria-live="assertive" aria-label="Regime">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
           </div>
@@ -1025,6 +1027,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <tbody id="risk-indicators-tbody">
                 <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
                 <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
+                <tr><td>HY OAS 20d Δ</td><td id="ri-hyoas-delta">—</td><td id="ri-hyoas-delta-sig" class="flat">—</td></tr>
                 <tr><td>USD/JPY vs VIX 60d</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
                 <tr><td>DXY vs SPX 60d</td><td id="ri-dxy-spx">—</td><td id="ri-dxy-spx-sig" class="flat">—</td></tr>
                 <tr><td>Gold vs DXY 60d</td><td id="ri-gold-dxy">—</td><td id="ri-gold-dxy-sig" class="flat">—</td></tr>
