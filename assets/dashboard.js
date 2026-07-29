@@ -5267,6 +5267,20 @@ async function _renderLWChart(ohlcId, label) {
   const _LS_IND   = 'gi_ind_state';   // { id: bool }
   const _LS_PARAMS = 'gi_ind_params'; // { id: { param: val } }
   const _LS_MA    = 'gi_ma_list';     // [ { uid, type, period, color, lineWidth, lineStyle } ]
+  const _LS_LEVELS = 'gi_ind_levels'; // { id: [v0, v1, ...] } — user-edited oscillator reference levels
+
+  // Default reference-level values per oscillator, in on-screen (ascending or
+  // logical) order — the single source of truth both _calcIndData() (via
+  // _mkRefs below) and the Levels edit UI read from. Editing a level in the
+  // Indicators ▾ dropdown overrides the matching index in window._lwIndLevels;
+  // an override array is only honored if its length matches the defaults
+  // (protects against stale localStorage from an older indicator version).
+  const _IND_LEVEL_DEFAULTS = {
+    rsi:[30,50,70], stoch:[20,50,80], cci:[-100,0,100], willr:[-80,-50,-20],
+    mfi:[20,50,80], uo:[30,50,70], chop:[38.2,61.8],
+    macd:[0], roc:[0], mom:[0], ao:[0], trix:[0], dpo:[0], cmf:[0],
+    adx:[25], aroon:[50],
+  };
 
   const _DEFAULT_MA_LIST = [
     { uid:'ma_sma20',  type:'SMA', period:20,  color:'#2196f3', lineWidth:1, lineStyle:0 },
@@ -5283,11 +5297,26 @@ async function _renderLWChart(ohlcId, label) {
   if (typeof window._lwIndState  === 'undefined') window._lwIndState  = _lsGet(_LS_IND,    {});
   if (typeof window._lwIndParams === 'undefined') window._lwIndParams = _lsGet(_LS_PARAMS,  {});
   if (typeof window._lwMaList    === 'undefined') window._lwMaList    = _lsGet(_LS_MA,      _DEFAULT_MA_LIST);
+  if (typeof window._lwIndLevels === 'undefined') window._lwIndLevels = _lsGet(_LS_LEVELS,  {});
 
   // Save helpers — call after any mutation
   function _saveIndState()  { _lsSet(_LS_IND,    window._lwIndState);  }
   function _saveIndParams() { _lsSet(_LS_PARAMS,  window._lwIndParams); }
   function _saveMaList()    { _lsSet(_LS_MA,      window._lwMaList);    }
+  function _saveIndLevels() { _lsSet(_LS_LEVELS,  window._lwIndLevels); }
+
+  // Effective reference levels for an indicator: user override (if present
+  // and the right length) else the built-in defaults.
+  function _iLevels(id) {
+    const defaults = _IND_LEVEL_DEFAULTS[id] || [];
+    const ov = window._lwIndLevels[id];
+    return (Array.isArray(ov) && ov.length === defaults.length) ? ov : defaults.slice();
+  }
+  // Builds a refs[] array (as consumed by _addRefLines) from the indicator's
+  // current effective levels, paired positionally with the given colors.
+  function _mkRefs(id, colors) {
+    return _iLevels(id).map((v, i) => ({ v, color: colors[i] }));
+  }
 
   const _maSeries = {}; // uid → series object
   // Active pane indices — keyed by indicator id, reset each render (chart destroyed)
@@ -5436,7 +5465,7 @@ async function _renderLWChart(ohlcId, label) {
         const avgG=_iRMA(gains,n), avgL=_iRMA(losses,n);
         const data=avgG.map((g,i)=>{const l=avgL[i];const rs=l===0?Infinity:g/l;return{time:bars[i+1].time,value:parseFloat((l===0?100:100-100/(1+rs)).toFixed(2))};});
         return [{data,color:_iC(id,0),lineWidth:1,label:`RSI(${n})`,
-          refs:[{v:30,color:'rgba(158,161,170,0.35)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(158,161,170,0.35)'}]}];
+          refs:_mkRefs(id,['rgba(158,161,170,0.35)','rgba(120,123,134,0.2)','rgba(158,161,170,0.35)'])}];
       }
       case 'stoch': {
         const { k:kPer, d:dPer, smooth } = p;
@@ -5451,7 +5480,7 @@ async function _renderLWChart(ohlcId, label) {
         const kData=sK.map((v,i)=>({time:bars[off+i+smooth-1].time,value:parseFloat(v.toFixed(2))}));
         const dData=sD.map((v,i)=>({time:bars[off+i+smooth-1+dPer-1].time,value:parseFloat(v.toFixed(2))}));
         return [
-          {data:kData,color:_iC(id,0),lineWidth:1,label:`%K(${kPer},${smooth})`,refs:[{v:20,color:'rgba(158,161,170,0.35)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(158,161,170,0.35)'}]},
+          {data:kData,color:_iC(id,0),lineWidth:1,label:`%K(${kPer},${smooth})`,refs:_mkRefs(id,['rgba(158,161,170,0.35)','rgba(120,123,134,0.2)','rgba(158,161,170,0.35)'])},
           {data:dData,color:_iC(id,1),lineWidth:1,label:`%D(${dPer})`},
         ];
       }
@@ -5472,7 +5501,7 @@ async function _renderLWChart(ohlcId, label) {
           const hBase=_iC(id,0);histD.push({time:bars[i].time,value:parseFloat(h.toFixed(6)),color:h>=0?hBase:'rgba(239,83,80,0.7)'});
         }
         return [
-          {data:histD,color:_iC(id,0),lineWidth:0,label:'Hist',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]},
+          {data:histD,color:_iC(id,0),lineWidth:0,label:'Hist',histogram:true,refs:_mkRefs(id,['rgba(120,123,134,0.2)'])},
           {data:macdD,color:_iC(id,1),lineWidth:1,label:`MACD(${fast},${slow})`},
           {data:sigD, color:_iC(id,2),lineWidth:1,label:`Sig(${sig})`},
         ];
@@ -5487,7 +5516,7 @@ async function _renderLWChart(ohlcId, label) {
           return{time:bars[i+n-1].time,value:parseFloat((meanDev===0?0:(tp[i+n-1]-avg)/(0.015*meanDev)).toFixed(2))};
         });
         return [{data,color:_iC(id,0),lineWidth:1,label:`CCI(${n})`,
-          refs:[{v:-100,color:'rgba(158,161,170,0.35)'},{v:0,color:'rgba(120,123,134,0.2)'},{v:100,color:'rgba(158,161,170,0.35)'}]}];
+          refs:_mkRefs(id,['rgba(158,161,170,0.35)','rgba(120,123,134,0.2)','rgba(158,161,170,0.35)'])}];
       }
       case 'willr': {
         const n = p.period;
@@ -5498,17 +5527,17 @@ async function _renderLWChart(ohlcId, label) {
           data.push({time:bars[i].time,value:parseFloat((h===l?-50:((h-bars[i].close)/(h-l))*-100).toFixed(2))});
         }
         return [{data,color:_iC(id,0),lineWidth:1,label:`%R(${n})`,
-          refs:[{v:-80,color:'rgba(158,161,170,0.35)'},{v:-50,color:'rgba(120,123,134,0.2)'},{v:-20,color:'rgba(158,161,170,0.35)'}]}];
+          refs:_mkRefs(id,['rgba(158,161,170,0.35)','rgba(120,123,134,0.2)','rgba(158,161,170,0.35)'])}];
       }
       case 'roc': {
         const n = p.period;
         const data=bars.slice(n).map((b,i)=>({time:b.time,value:parseFloat(((b.close-bars[i].close)/bars[i].close*100).toFixed(4))}));
-        return [{data,color:_iC(id,0),lineWidth:1,label:`ROC(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`ROC(${n})`,refs:_mkRefs(id,['rgba(120,123,134,0.3)'])}];
       }
       case 'mom': {
         const n = p.period;
         const data=bars.slice(n).map((b,i)=>({time:b.time,value:parseFloat((b.close-bars[i].close).toFixed(dec))}));
-        return [{data,color:_iC(id,0),lineWidth:1,label:`Mom(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`Mom(${n})`,refs:_mkRefs(id,['rgba(120,123,134,0.3)'])}];
       }
       case 'mfi': {
         const n = p.period;
@@ -5524,7 +5553,7 @@ async function _renderLWChart(ohlcId, label) {
           data.push({time:bars[i].time,value:parseFloat((nmf===0?100:100-100/(1+pmf/nmf)).toFixed(2))});
         }
         return [{data,color:_iC(id,0),lineWidth:1,label:`MFI(${n})`,
-          refs:[{v:20,color:'rgba(158,161,170,0.35)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(158,161,170,0.35)'}]}];
+          refs:_mkRefs(id,['rgba(158,161,170,0.35)','rgba(120,123,134,0.2)','rgba(158,161,170,0.35)'])}];
       }
       case 'ao': {
         const midAO=bars.map(b=>(b.high+b.low)/2);
@@ -5535,13 +5564,13 @@ async function _renderLWChart(ohlcId, label) {
           const prev=i>0?s5[i+(34-5)-1]-s34[i-1]:ao;
           const aoBase=_iC(id,0);return{time:bars[off+i].time,value:parseFloat(ao.toFixed(6)),color:ao>=prev?aoBase:'rgba(239,83,80,0.7)'};
         });
-        return [{data,color:_iC(id,0),lineWidth:0,label:'AO',histogram:true,refs:[{v:0,color:'rgba(120,123,134,0.2)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:0,label:'AO',histogram:true,refs:_mkRefs(id,['rgba(120,123,134,0.2)'])}];
       }
       case 'trix': {
         const n = p.period;
         const e1=_iEMA(closes,n),e2=_iEMA(e1,n),e3=_iEMA(e2,n);
         const data=e3.slice(1).map((v,i)=>({time:bars[bars.length-e3.length+i+1].time,value:parseFloat(((v-e3[i])/e3[i]*100).toFixed(6))}));
-        return [{data,color:_iC(id,0),lineWidth:1,label:`TRIX(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`TRIX(${n})`,refs:_mkRefs(id,['rgba(120,123,134,0.3)'])}];
       }
       case 'dpo': {
         const n = p.period; const disp=Math.floor(n/2)+1;
@@ -5551,7 +5580,7 @@ async function _renderLWChart(ohlcId, label) {
           if(barIdx<0) return null;
           return{time:bars[i+n-1].time,value:parseFloat((closes[barIdx]-v).toFixed(dec))};
         }).filter(Boolean);
-        return [{data,color:_iC(id,0),lineWidth:1,label:`DPO(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`DPO(${n})`,refs:_mkRefs(id,['rgba(120,123,134,0.3)'])}];
       }
       case 'uo': {
         const data=[];
@@ -5565,7 +5594,7 @@ async function _renderLWChart(ohlcId, label) {
           data.push({time:bars[i].time,value:parseFloat((100*(4*(bp7/tr7)+2*(bp14/tr14)+(bp28/tr28))/7).toFixed(2))});
         }
         return [{data,color:_iC(id,0),lineWidth:1,label:'UO(7,14,28)',
-          refs:[{v:30,color:'rgba(158,161,170,0.35)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(158,161,170,0.35)'}]}];
+          refs:_mkRefs(id,['rgba(158,161,170,0.35)','rgba(120,123,134,0.2)','rgba(158,161,170,0.35)'])}];
       }
       case 'atr': {
         const n = p.period;
@@ -5588,7 +5617,7 @@ async function _renderLWChart(ohlcId, label) {
         const adx=_iRMA(dx,n);
         const off=bars.length-adx.length;
         return [
-          {data:adx.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,0),lineWidth:1,label:`ADX(${n})`,refs:[{v:25,color:'rgba(158,161,170,0.35)'}]},
+          {data:adx.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,0),lineWidth:1,label:`ADX(${n})`,refs:_mkRefs(id,['rgba(158,161,170,0.35)'])},
           {data:pDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,1),lineWidth:1,label:'+DI'},
           {data:mDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,2),lineWidth:1,label:'-DI'},
         ];
@@ -5604,7 +5633,7 @@ async function _renderLWChart(ohlcId, label) {
           dn.push({time:bars[i].time,value:parseFloat(((loIdx/n)*100).toFixed(2))});
         }
         return [
-          {data:up,color:_iC(id,0),lineWidth:1,label:`Aroon Up(${n})`,refs:[{v:50,color:'rgba(120,123,134,0.2)'}]},
+          {data:up,color:_iC(id,0),lineWidth:1,label:`Aroon Up(${n})`,refs:_mkRefs(id,['rgba(120,123,134,0.2)'])},
           {data:dn,color:_iC(id,1),lineWidth:1,label:`Aroon Down`},
         ];
       }
@@ -5619,7 +5648,7 @@ async function _renderLWChart(ohlcId, label) {
           data.push({time:bars[i].time,value:parseFloat((hl===0?100:(100*Math.log10(atrSum/hl)/Math.log10(n))).toFixed(2))});
         }
         return [{data,color:_iC(id,0),lineWidth:1,label:`Chop(${n})`,
-          refs:[{v:38.2,color:'rgba(38,166,154,0.3)'},{v:61.8,color:'rgba(158,161,170,0.35)'}]}];
+          refs:_mkRefs(id,['rgba(38,166,154,0.3)','rgba(158,161,170,0.35)'])}];
       }
       case 'obv': {
         let obv=0;
@@ -5638,7 +5667,7 @@ async function _renderLWChart(ohlcId, label) {
           const mfvSum=mfv.slice(i-n+1,i+1).reduce((s,v)=>s+v,0);
           data.push({time:bars[i].time,value:parseFloat((volSum===0?0:mfvSum/volSum).toFixed(4))});
         }
-        return [{data,color:_iC(id,0),lineWidth:1,label:`CMF(${n})`,refs:[{v:0,color:'rgba(120,123,134,0.3)'}]}];
+        return [{data,color:_iC(id,0),lineWidth:1,label:`CMF(${n})`,refs:_mkRefs(id,['rgba(120,123,134,0.3)'])}];
       }
       default: return [];
     }
@@ -5657,21 +5686,22 @@ async function _renderLWChart(ohlcId, label) {
     paneEl.appendChild(el);
   }
 
-  function _addRefLines(paneIndex, refs, barData, n) {
-    if (!refs || paneIndex === null) return;
+  function _addRefLines(paneIndex, refs, ownerSeries) {
+    if (!refs || paneIndex === null || !ownerSeries) return;
+    const lines = [];
     refs.forEach(ref => {
       try {
-        const s = _lwChart.addSeries(LWC.LineSeries, {
-          color: ref.color, lineWidth: 1, lineStyle: 2,
-          priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
-          priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
-        }, paneIndex);
-        s.setData(barData.map(b => ({ time: b.time, value: ref.v })).slice(-n));
-        // Track ref-line series so they are removed when the indicator is destroyed
-        if (!_indRefSeries[paneIndex]) _indRefSeries[paneIndex] = [];
-        _indRefSeries[paneIndex].push(s);
+        const pl = ownerSeries.createPriceLine({
+          price: ref.v, color: ref.color, lineWidth: 1, lineStyle: 2,
+          axisLabelVisible: false, title: '',
+        });
+        lines.push(pl);
       } catch(_) {}
     });
+    // Track { ownerSeries, lines } so they can be removed via removePriceLine()
+    // when the indicator is destroyed — native price lines belong to the
+    // series that created them, not the pane, so the owner must be kept too.
+    _indRefSeries[paneIndex] = { ownerSeries, lines };
   }
 
   // ── MA series management ─────────────────────────────────────────────────────
@@ -5763,9 +5793,12 @@ async function _renderLWChart(ohlcId, label) {
             } catch(_) {}
           }
 
-          // Reference lines — only for first series in a sub-pane
+          // Reference lines — only for first series in a sub-pane. Native
+          // price lines (see _addRefLines) always span the full pane width,
+          // so they never lag behind the last bar the way a data-bound line
+          // series could.
           if (!isOverlay && si === 0 && s.refs) {
-            _addRefLines(paneIndex, s.refs, bars, s.data.length + 10);
+            _addRefLines(paneIndex, s.refs, series);
           }
         } catch(serErr) { console.warn('[LW] series error for', id, serErr); }
       });
@@ -5797,9 +5830,9 @@ async function _renderLWChart(ohlcId, label) {
 
     // Remove ref lines for oscillator panes
     if (!isOverlay && _indPaneIndex[id] != null) {
-      const refs = _indRefSeries[_indPaneIndex[id]];
-      if (refs) {
-        refs.forEach(s => { try { _lwChart.removeSeries(s); } catch(_) {} });
+      const refEntry = _indRefSeries[_indPaneIndex[id]];
+      if (refEntry) {
+        refEntry.lines.forEach(pl => { try { refEntry.ownerSeries.removePriceLine(pl); } catch(_) {} });
         _indRefSeries[_indPaneIndex[id]] = null;
       }
       // Remove the pane itself if it still exists and is empty
@@ -6107,7 +6140,8 @@ async function _renderLWChart(ohlcId, label) {
         const isOn = !!window._lwIndState[cfg.id];
         const hasParams = cfg.paramDefs.length > 0;
         const hasColors = cfg.colors.length > 0;
-        const expandable = isOn && (hasParams || hasColors);
+        const hasLevels = !!_IND_LEVEL_DEFAULTS[cfg.id];
+        const expandable = isOn && (hasParams || hasColors || hasLevels);
 
         // ── Main toggle row ────────────────────────────────────
         const row = document.createElement('div');
@@ -6174,6 +6208,43 @@ async function _renderLWChart(ohlcId, label) {
             lbl.appendChild(inp);
             paramRow.appendChild(lbl);
           });
+
+          // Reference levels (e.g. RSI's 30/50/70 overbought/oversold/mid
+          // lines) — editable per industry convention (TradingView/MT5 both
+          // expose these under the indicator's Levels settings). Rendered as
+          // one small numeric input per level, in the same left-to-right
+          // order the lines are defined in _IND_LEVEL_DEFAULTS.
+          if (hasLevels) {
+            const levels = _iLevels(cfg.id);
+            levels.forEach((lv, li) => {
+              const llbl = document.createElement('label');
+              llbl.style.cssText = 'display:flex;align-items:center;gap:3px;color:#6b7280;font-size:9px;font-weight:600;letter-spacing:.03em;';
+              llbl.textContent = levels.length > 1 ? `Lv${li + 1}` : 'Level';
+
+              const linp = document.createElement('input');
+              linp.type = 'number';
+              linp.value = lv;
+              linp.step = 'any';
+              linp.title = 'Reference level — drawn as a dashed line across the full pane';
+              linp.style.cssText = 'width:46px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px;font-size:10px;text-align:center;';
+              linp.addEventListener('click', e => e.stopPropagation());
+              linp.addEventListener('change', e => {
+                e.stopPropagation();
+                const raw = parseFloat(e.target.value);
+                if (isNaN(raw)) return;
+                const next = _iLevels(cfg.id);
+                next[li] = raw;
+                window._lwIndLevels[cfg.id] = next;
+                _saveIndLevels();
+                if (window._lwIndState[cfg.id]) {
+                  _destroyIndicatorPane(cfg.id);
+                  _buildIndicatorPane(cfg.id);
+                }
+              });
+              llbl.appendChild(linp);
+              paramRow.appendChild(llbl);
+            });
+          }
 
           // Color swatches (with series labels from catalogue)
           const seriesLabels = {
