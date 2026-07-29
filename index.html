@@ -1159,7 +1159,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- COT POSITIONING — from cot-data/*.json -->
     <div class="panel" id="section-positioning">
-      <div class="panel-head"><span class="panel-title">CFTC Positioning — Leveraged Funds</span><span class="panel-sub" id="cot-date-sub">Disaggregated TFF · net contracts · weekly · source: CFTC.gov</span><div class="export-btns" aria-label="Export COT data"><button class="export-btn" id="export-cot-csv" title="Export COT data as CSV">CSV</button><button class="export-btn" id="export-cot-json" title="Export COT data as JSON">JSON</button></div></div>
+      <div class="panel-head"><span class="panel-title">CFTC Positioning — Leveraged Funds</span><span class="panel-sub" id="cot-date-sub">TFF · net contracts · weekly · source: CFTC.gov</span><div class="export-btns" aria-label="Export COT data"><button class="export-btn" id="export-cot-csv" title="Export COT data as CSV">CSV</button><button class="export-btn" id="export-cot-json" title="Export COT data as JSON">JSON</button></div></div>
       <div style="padding:6px 10px;">
         <div class="cot-scroll-wrap">
         <div class="cot-header" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);margin-bottom:4px;">
@@ -1815,13 +1815,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.2" defer></script>
-<script src="assets/dashboard.js?v=8.41.1" defer></script>
+<script src="assets/dashboard.js?v=8.41.2" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
      Falls back to yfinance quotes.json polling if the Worker is unavailable. -->
 <script src="assets/fx-websocket.js?v=1.0.0" defer></script>
-<script src="assets/cot-modal-chart.js?v=7.91.0" defer></script>
+<script src="assets/cot-modal-chart.js?v=7.91.1" defer></script>
 <script src="assets/cb-rates-modal.js?v=8.0.2" defer></script>
 <script src="assets/real-carry-modal.js?v=2.7.6" defer></script>
 <script src="assets/corr-modal.js?v=2.2.0" defer></script>
