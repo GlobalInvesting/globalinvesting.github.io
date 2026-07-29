@@ -3993,7 +3993,9 @@ async function _renderLWChart(ohlcId, label) {
   wrap.style.marginBottom = '0';
 
   const chartDiv = document.createElement('div');
-  chartDiv.style.cssText = 'width:100%;height:100%;';
+  // touch-action:none — see fix note in CHANGELOG v8.76.0 ("mobile drawing
+  // tools committing the shape only after leaving the chart area").
+  chartDiv.style.cssText = 'width:100%;height:100%;touch-action:none;';
   wrap.appendChild(chartDiv);
 
   // Enable pointer events for LW chart interactivity (zoom, pan, crosshair)
@@ -5100,7 +5102,15 @@ async function _renderLWChart(ohlcId, label) {
     }
     pop.addEventListener('click',     e => e.stopPropagation());
     pop.addEventListener('mousedown', e => e.stopPropagation());
-    setTimeout(() => { document.addEventListener('mousedown', _closeDrawDropdown, { once: true }); }, 0);
+    // Same guard as the Indicators dropdown (see note there) — don't let a
+    // mousedown on the toggle button itself close-then-immediately-reopen.
+    setTimeout(() => {
+      document.addEventListener('mousedown', function _outsideClose(e) {
+        const b = document.getElementById('lw-draw-btn');
+        if (b && b.contains(e.target)) return;
+        _closeDrawDropdown();
+      }, { once: true });
+    }, 0);
   }
 
   // Attach dropdown handler — clone to clear prior listeners (same pattern as Indicators button)
@@ -6241,9 +6251,18 @@ async function _renderLWChart(ohlcId, label) {
     pop.addEventListener('click',     e => e.stopPropagation());
     pop.addEventListener('mousedown', e => e.stopPropagation());
 
-    // Close when user clicks/mousedowns outside the popup
+    // Close when user clicks/mousedowns outside the popup — but not when the
+    // mousedown target is the toggle button itself. mousedown fires before
+    // click, so without this guard a tap on the button while the dropdown is
+    // open would close it here first and then the button's own click handler
+    // (which calls _openIndDropdown, i.e. toggle) would immediately reopen
+    // it — the dropdown could never be closed by tapping the button again.
     setTimeout(() => {
-      document.addEventListener('mousedown', _closeIndDropdown, { once: true });
+      document.addEventListener('mousedown', function _outsideClose(e) {
+        const b = document.getElementById('lw-ind-btn');
+        if (b && b.contains(e.target)) return; // let the button's own click toggle handle it
+        _closeIndDropdown();
+      }, { once: true });
     }, 0);
   }
 
@@ -8733,6 +8752,51 @@ async function loadAIRegime() {
 
 // RICH AI NARRATIVE — build from ai-analysis/index.json + live data
 // ═══════════════════════════════════════════════════════════════════
+// ── Narrative mobile clamp/toggle ───────────────────────────────────────────
+// Long AI narrative paragraphs (4-5 sentences) pushed the whole page down on
+// mobile with no way to collapse them. #narrative-text is CSS-clamped to 3
+// lines only inside the @media(max-width:900px) block; this just measures
+// whether the current text actually overflows that clamp and shows/hides the
+// toggle button accordingly, so short narratives never get a pointless
+// "Show more". Called after every narrative-text update and on resize.
+function _syncNarrativeClamp() {
+  const el  = document.getElementById('narrative-text');
+  const btn = document.getElementById('narr-more-btn');
+  if (!el || !btn) return;
+  if (window.innerWidth > 900) {
+    // Desktop never clamps — make sure a stale expanded/show state from a
+    // narrower viewport doesn't leak in (e.g. resizing up from mobile).
+    el.classList.remove('narr-expanded');
+    btn.classList.remove('show');
+    return;
+  }
+  el.classList.remove('narr-expanded');
+  btn.textContent = 'Show more';
+  btn.setAttribute('aria-expanded', 'false');
+  btn.classList.remove('show');
+  requestAnimationFrame(() => {
+    if (el.scrollHeight > el.clientHeight + 2) btn.classList.add('show');
+  });
+}
+
+(function _attachNarrMoreBtn() {
+  const btn = document.getElementById('narr-more-btn');
+  if (!btn || btn._wired) return;
+  btn._wired = true;
+  btn.addEventListener('click', () => {
+    const el = document.getElementById('narrative-text');
+    if (!el) return;
+    const expanded = el.classList.toggle('narr-expanded');
+    btn.textContent = expanded ? 'Show less' : 'Show more';
+    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  });
+  let _narrResizeT = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(_narrResizeT);
+    _narrResizeT = setTimeout(_syncNarrativeClamp, 150);
+  });
+})();
+
 async function buildRichNarrative() {
   try {
     // Fetch AI narrative base
@@ -8841,6 +8905,7 @@ async function buildRichNarrative() {
     // renderRiskData() — always live VIX stress score. Never written here.
     const el = document.getElementById('narrative-text');
     if (el && finalNarrative) el.textContent = finalNarrative;
+    _syncNarrativeClamp();
 
     // Also load signals (moved here from fetchAIData to keep AI logic together)
     try {
