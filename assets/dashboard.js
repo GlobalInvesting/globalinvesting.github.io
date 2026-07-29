@@ -2307,9 +2307,12 @@ async function fetchRiskData() {
       if (d.bond2y  != null && !isNaN(d.bond2y)  && d.bond2y > 0)  byId.us2y  = repo(d.bond2y);
       if (d.bond5y  != null && !isNaN(d.bond5y)  && d.bond5y > 0)  byId.us5y  = repo(d.bond5y);
       // Credit spreads — USD-only (global USD credit market), from update_extended_data.py v14.0
-      if (d.hyOas != null && !isNaN(d.hyOas) && d.hyOas > 0)        byId.hyOas = repo(d.hyOas);
-      if (d.igOas != null && !isNaN(d.igOas) && d.igOas > 0)        byId.igOas = repo(d.igOas);
-      if (d.hyOasDelta20d != null && !isNaN(d.hyOasDelta20d))       byId.hyOasDelta20d = d.hyOasDelta20d;
+      // NOTE: script stores hyOas/igOas/hyOasDelta20d in percentage points (e.g. 2.81 = 2.81%,
+      // confirmed against the 2026-07-28 workflow_dispatch run: "HY OAS: 2.81%"/"IG OAS: 0.81%").
+      // Convert to basis points here (×100) since the panel and its thresholds are bp-denominated.
+      if (d.hyOas != null && !isNaN(d.hyOas) && d.hyOas > 0)        byId.hyOas = repo(d.hyOas * 100);
+      if (d.igOas != null && !isNaN(d.igOas) && d.igOas > 0)        byId.igOas = repo(d.igOas * 100);
+      if (d.hyOasDelta20d != null && !isNaN(d.hyOasDelta20d))       byId.hyOasDelta20d = d.hyOasDelta20d * 100;
     }
     if (eurExt?.data?.bond10y != null) byId.de10y = { close: eurExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
     if (jpyExt?.data?.bond10y != null) byId.jp10y = { close: jpyExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
