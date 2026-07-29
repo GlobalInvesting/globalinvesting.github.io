@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-07-29T09:19:01Z",
+  "generated_at": "2026-07-29T16:00:40Z",
   "signals": [
     {
-      "time": "09:18",
+      "time": "16:00",
       "priority": "critical",
-      "title": "USD — FOMC Decision + Yield Curve Regime",
-      "text": "The FOMC announces its latest interest rate decision today, July 29, with markets broadly expecting a hold at 3.75%. Despite the expected hold, the 2s10s yield curve sits in a bull steepener regime at +29.4bp, typically signaling recession pricing and cross-asset stress. US 10Y yields have retreated to 4.604% while the DXY holds at 101.33, positioned above its SMA20/50/200 cluster (101.06/100.43/99.14). COT speculative positioning shows a light net short of -1,948, suggesting the market is not positioned for a hawkish surprise. Any hawkish dissent or guidance keeping rates elevated for longer introduces upside risk for the DXY toward the next psychological resistance. Risk: A dovish pivot or clear signal of upcoming cuts accelerates the bull steepener and undercuts DXY support at the SMA20.",
+      "title": "USD — FOMC Decision + Yield Curve + Positioning",
+      "text": "The Federal Reserve enters its July 29 decision with the market priced for a hold at 3.75%, yet desk focus remains on a potential hawkish shift as US 10Y yields climb to 4.645%. The yield curve is currently in a bear steepener regime (2s10s at +33.5bp), a combination that typically reinforces USD strength through higher long-term rate attraction. Speculative positioning shows a slight net short of -1,948 contracts (47.2% long), suggesting the market is not yet fully positioned for a hawkish surprise. DXY at 101.45 remains technically supported, trading above its SMA20/50/200 cluster (SMA20 at 101.06). A hawkish hold today likely forces a coverage of those spec shorts and pushes DXY toward the next psychological resistance. Risk: A dovish pivot or emphasis on downside economic risks triggers a sharp USD sell-off toward SMA50.",
       "evidence": [
-        "Fed Rate: 3.75%",
-        "2s10s Spread: +29.4bp",
-        "DXY SMA20: 101.06"
+        "Fed Rate: 3.75% (HOLD)",
+        "US 10Y: 4.645%",
+        "USD COT net: -1,948"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:15",
-      "priority": "critical",
-      "title": "AUD/USD — CPI Miss + ESI Divergence",
-      "text": "AUD/USD trades at 0.6946, testing its SMA20 support at 0.6965 following softer-than-expected Australia CPI data. This data miss aligns with a strong negative Economic Surprise Index (ESI) of -21.2, suggesting a persistent trend of Australian data underperforming expectations. While the RBA holds a nominal carry advantage at 4.35% vs the Fed's 3.75% (-60bp AUD premium), the real policy rate remains deeply accommodative at -1.15% due to high inflation expectations. Speculative positioning is currently net long +20,521, creating a liquidation risk as the soft CPI data tempers hike odds. A sustained break below the SMA20 reopens the SMA200 level at 0.6906. RBA holds at 4.35%.",
+      "time": "15:57",
+      "priority": "warning",
+      "title": "USD/JPY — Positioning + Options + Carry",
+      "text": "USD/JPY is testing 163.85 ahead of the July 31 BoJ meeting, with a significant +266bp OIS carry advantage (SOFR 3.64% vs TONA 0.98%) sustaining the bid. Despite this carry support, the options market is pricing in heavy downside protection as seen in the 25d Risk Reversal at -1.55, signaling institutional fear of BoJ intervention or a hawkish surprise. CFTC data shows JPY net shorts remain extreme at -114,030 (26.7% long), creating an asymmetric risk profile where any hawkish BoJ shift is likely to trigger a massive short-covering rally in JPY. Price is currently extended above the SMA20/50/200 cluster, with the SMA20 at 162.57 acting as the first major technical floor. Risk: BoJ holds current policy and ignores FX weakness, validating the carry trade and pushing USD/JPY toward 165.00.",
+      "evidence": [
+        "USD/JPY 25d RR: -1.55",
+        "JPY COT net: -114,030",
+        "USD/JPY carry: +266bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "15:55",
+      "priority": "warning",
+      "title": "AUD/USD — ESI Divergence + Volatility + Retail",
+      "text": "AUD/USD trades at 0.6930, pressured by a stark divergence between bullish speculative positioning and deteriorating economic fundamentals. AUD speculative net longs sit at +20,521 (62.8% long), while the Economic Surprise Index (ESI) has plunged to -21.2, reflecting persistent data misses. The options market is pricing in significant tail risk with a +8.5% Vol Risk Premium (IV 14.9% vs HV30 6.4%), the highest in the G10 space. Retail sentiment is currently 61% short, fading the institutional long, which often precedes a flush of the crowded spec position. A break below the SMA200 at 0.6906 would confirm a bearish shift and likely accelerate the liquidation of long positions. Risk: A surprise hawkish hold from the RBA on Aug 11 or a sudden commodities rally invalidates the bearish fundamental read.",
       "evidence": [
         "AUD ESI: -21.2",
-        "AUD/USD SMA20: 0.6965",
-        "AUD COT LF Net: +20,521"
+        "AUD/USD VRP: +8.5%",
+        "AUD COT net: +20,521"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:13",
-      "priority": "warning",
-      "title": "USD/JPY — Carry vs Options Skew + Vol",
-      "text": "USD/JPY trades at 163.53, supported by a significant +275bp Fed-BoJ carry differential despite the BoJ's hiking stance. However, the options market shows rising caution with a 25d Risk Reversal of -1.49, indicating a moderate put skew as traders pay for protection against JPY strength. This is coupled with an elevated Vol Risk Premium (VRP) of +3.4%, as 1M ATM IV at 7.2% remains well above the realized HV30 of 3.8%. COT data shows specs are heavily net short JPY (-114,030), leaving the pair vulnerable to a sharp unwind if the next BoJ meeting (mkt: 100% hold priced) on July 31 delivers a hawkish surprise. Price remains technically bullish, holding above the SMA20 at 162.57. Risk: BoJ holds without hawkish guidance, allowing the carry trade to extend toward 165.00.",
-      "evidence": [
-        "USD/JPY Carry: +275bp",
-        "USD/JPY 25d RR: -1.49",
-        "JPY COT LF Net: -114,030"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "09:10",
-      "priority": "warning",
-      "title": "GBP/USD — Positioning + Vol Premium",
-      "text": "GBP/USD is trading at 1.3305, currently positioned below its SMA20/50/200 cluster (1.3377/1.3365/1.3398). The options market is pricing a high degree of uncertainty ahead of the July 30 BoE meeting, with a significant VRP of +4.5% (IV 11.0% vs HV30 6.5%). Speculative positioning remains net long +33,812 (66.3% long), which contrasts with a mildly accommodative real policy rate of -0.13%. BoE holds at 3.75%. Retail sentiment at 65% long aligns with the institutional long, increasing the risk of a synchronized washout. Risk: BoE signals a surprise hike, triggering a sharp move back through the SMA cluster.",
-      "evidence": [
-        "GBP VRP: +4.5%",
-        "GBP COT LF Net: +33,812",
-        "GBP Real Rate: -0.13%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "09:05",
+      "time": "15:52",
       "priority": "info",
-      "title": "USD/CAD — Correlation Break + Positioning",
-      "text": "USD/CAD is trading at 1.4097, showing a significant correlation break against WTI Oil (corr -0.915 vs norm -0.021, z = -1.55σ). While WTI oil rose 3.57% to $82.1, the expected CAD strength has been muted by a heavy COT speculative net short in CAD of -99,823 (only 18.8% long). The pair is currently holding below its SMA20 at 1.4122 but remains supported by a +150bp carry advantage in favor of the USD. Retail sentiment is 70% short, fading the recent move, which typically serves as a contrarian signal for further USD/CAD upside. Watch for the correlation to normalize or for oil price exhaustion to trigger a fresh bid in the pair. Risk: Oil prices break above $85, forcing a CAD short-covering rally that overrides the carry disadvantage.",
+      "title": "USD/CAD — Technicals + Oil + Retail Sentiment",
+      "text": "USD/CAD at 1.4088 is testing the lower bound of its recent range as WTI Oil surges +6.50% intraday to $84.4. The pair's correlation to oil has broken significantly (z = -1.55σ), with the -0.914 correlation suggesting the pair is now hyper-sensitive to energy price swings. Retail sentiment is currently 71% short, which aligns with the heavy spec short position of -99,823 contracts, indicating a lack of contrarian tension and a unified bearish bias toward the pair. Price is currently holding below its SMA20 (1.4122) but remains above the SMA50 (1.4035), creating a tight technical compression zone. Continued oil strength likely forces a test of the 1.4035 level. Risk: An escalation in Middle East sanctions monetization targets, as hinted in recent headlines, is likely to introduce broader USD safe-haven bids that override the oil correlation.",
       "evidence": [
-        "USD/CAD vs WTI Corr: -0.915",
-        "CAD COT LF Net: -99,823",
-        "USD/CAD Carry: +150bp"
+        "WTI Oil: $84.4 (+6.5%)",
+        "USD/CAD vs WTI: -0.914 (z=-1.55σ)",
+        "CAD COT net: -99,823"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
