@@ -3527,9 +3527,16 @@ function _lwUpdateTodayBar() {
       _lwCandleSeries.update(_isLA ? { time: _blockTs, value: _c } : _liveBar);
     } catch(_) {}
 
-    // Sync chart header % with RT data
-    if (_lwActiveUpdateHeader && _rt.pct != null && _lwActivePrevCloseMap) {
-      _lwActiveUpdateHeader(_liveBar, null, { pct: _rt.pct, chg: _rt.chg });
+    // Sync chart header % with RT data.
+    // BUGFIX (2026-07-29): this was previously gated on `_rt.pct != null`, but
+    // _lwCandleSeries.update(_liveBar) above runs unconditionally on every tick.
+    // Any tick where the feed delivered a valid `close` without a `pct` (briefly
+    // missing % field, not a stale connection) updated the plotted candle but
+    // left the O/H/L/C header text frozen at its last value — the header could
+    // show a High far below what the candle was visibly drawing. The header
+    // always needs the fresh bar; only the %/change override is conditional.
+    if (_lwActiveUpdateHeader) {
+      _lwActiveUpdateHeader(_liveBar, null, (_rt.pct != null) ? { pct: _rt.pct, chg: _rt.chg } : null);
     }
     return;
   }
@@ -4436,6 +4443,241 @@ async function _renderLWChart(ohlcId, label) {
     _cbBtn.setAttribute('aria-pressed', window._lwShowCb ? 'true' : 'false');
   }
   _applyMarkers();
+
+  // ── Drawing Tools — Trend Line & Fibonacci Retracement ──────────────────────
+  // Industry-standard UX (TradingView/Bloomberg): pick a tool from the "Draw"
+  // menu, click the first anchor point, click the second — the drawing commits.
+  // Persisted per symbol+timeframe (a line drawn on EUR/USD H1 shouldn't show up
+  // on GBP/USD or on the Daily chart). Rendered as an SVG overlay synced to the
+  // chart via timeToCoordinate/priceToCoordinate on every pan/zoom, same pattern
+  // as the CB meeting-markers overlay just above.
+  const _DRAW_LS_KEY = 'gi_drawings';
+  const _drawSymKey  = `${ohlcId}_${_lwActiveTf}`;
+  if (typeof window._lwDrawings === 'undefined') {
+    try { const v = localStorage.getItem(_DRAW_LS_KEY); window._lwDrawings = v ? JSON.parse(v) : {}; }
+    catch(_) { window._lwDrawings = {}; }
+  }
+  function _saveDrawings() {
+    try { localStorage.setItem(_DRAW_LS_KEY, JSON.stringify(window._lwDrawings)); } catch(_) {}
+  }
+  function _curDrawings() {
+    if (!window._lwDrawings[_drawSymKey]) window._lwDrawings[_drawSymKey] = [];
+    return window._lwDrawings[_drawSymKey];
+  }
+
+  let _drawMode      = null; // null | 'trend' | 'fib'
+  let _drawPending    = null; // first clicked {time, price}, awaiting the second click
+  let _drawOverlay    = null; // SVG overlay element
+  let _drawRafId      = null;
+
+  // Standard Fibonacci retracement ratios (TradingView/MT default set)
+  const FIB_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+
+  function _updateDrawBtnState() {
+    const b = document.getElementById('lw-draw-btn');
+    if (b) b.classList.toggle('on', !!_drawMode);
+    try { chartDiv.style.cursor = _drawMode ? 'crosshair' : ''; } catch(_) {}
+  }
+
+  function _renderDrawings() {
+    if (_drawRafId) cancelAnimationFrame(_drawRafId);
+    _drawRafId = requestAnimationFrame(() => {
+      _drawRafId = null;
+      if (!_drawOverlay || !_lwChart) return;
+      const ts = _lwChart.timeScale();
+      const chartW = chartDiv.offsetWidth;
+      let svg = '';
+      _curDrawings().forEach(d => {
+        try {
+          const x1 = ts.timeToCoordinate(d.p1.time), x2 = ts.timeToCoordinate(d.p2.time);
+          const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
+          if (x1 == null || x2 == null || y1 == null || y2 == null) return;
+          const col = d.color || 'rgba(79,127,255,0.9)';
+          if (d.type === 'trend') {
+            svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1.5"/>`;
+            svg += `<circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="3" fill="${col}"/>`;
+            svg += `<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3" fill="${col}"/>`;
+          } else if (d.type === 'fib') {
+            // Convention: 0% sits at the swing point the user dragged FROM, 100%
+            // at the point dragged TO — matches TradingView/MT5 Fibonacci tool.
+            const drawnHighFirst = d.p1.price >= d.p2.price;
+            const priceHigh = Math.max(d.p1.price, d.p2.price);
+            const priceLow  = Math.min(d.p1.price, d.p2.price);
+            const range = priceHigh - priceLow;
+            const xLeft = Math.min(x1, x2);
+            FIB_LEVELS.forEach(lv => {
+              const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
+              const y = candleSeries.priceToCoordinate(lvPrice);
+              if (y == null) return;
+              const isAnchor = (lv === 0 || lv === 1);
+              svg += `<line x1="${xLeft.toFixed(1)}" y1="${y.toFixed(1)}" x2="${chartW}" y2="${y.toFixed(1)}" `
+                   + `stroke="${col}" stroke-width="1" ${isAnchor ? '' : 'stroke-dasharray="2,2"'} opacity="0.85"/>`;
+              svg += `<text x="${(chartW - 4).toFixed(1)}" y="${(y - 2).toFixed(1)}" text-anchor="end" `
+                   + `font-size="9" font-family="var(--font-ui,sans-serif)" fill="${col}">`
+                   + `${(lv * 100).toFixed(1)}% \u2013 ${lvPrice.toFixed(dec)}</text>`;
+            });
+          }
+        } catch(_) {}
+      });
+      _drawOverlay.innerHTML = svg;
+    });
+  }
+
+  if (!_drawOverlay) {
+    _drawOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    _drawOverlay.id = 'lw-draw-overlay';
+    _drawOverlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3;overflow:visible;';
+    chartDiv.style.position = 'relative';
+    chartDiv.appendChild(_drawOverlay);
+  }
+  _renderDrawings();
+  _lwChart.timeScale().subscribeVisibleTimeRangeChange(_renderDrawings);
+
+  // Distance from a point to a line segment (for click-to-delete hit testing)
+  function _ptSegDist(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const len2 = dx * dx + dy * dy;
+    if (len2 === 0) return Math.hypot(px - x1, py - y1);
+    let t = ((px - x1) * dx + (py - y1) * dy) / len2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+  }
+
+  function _hitTestDrawing(x, y) {
+    const ts = _lwChart.timeScale();
+    const arr = _curDrawings();
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const d = arr[i];
+      const x1 = ts.timeToCoordinate(d.p1.time), x2 = ts.timeToCoordinate(d.p2.time);
+      const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
+      if (x1 == null || x2 == null || y1 == null || y2 == null) continue;
+      if (d.type === 'trend') {
+        if (_ptSegDist(x, y, x1, y1, x2, y2) < 6) return i;
+      } else if (d.type === 'fib') {
+        const drawnHighFirst = d.p1.price >= d.p2.price;
+        const priceHigh = Math.max(d.p1.price, d.p2.price), priceLow = Math.min(d.p1.price, d.p2.price);
+        const range = priceHigh - priceLow;
+        const xLeft = Math.min(x1, x2);
+        for (const lv of FIB_LEVELS) {
+          const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
+          const ly = candleSeries.priceToCoordinate(lvPrice);
+          if (ly != null && x >= xLeft && Math.abs(y - ly) < 5) return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  // Chart click: placing a drawing point in draw mode, or click-to-delete a
+  // drawing when not in draw mode (avoids needing a separate selection UI).
+  function _onChartClick(param) {
+    if (!param.point) return;
+    const ts = _lwChart.timeScale();
+    const time = param.time != null ? param.time : ts.coordinateToTime(param.point.x);
+    if (time == null) return;
+    const price = candleSeries.coordinateToPrice(param.point.y);
+    if (price == null) return;
+    if (_drawMode) {
+      if (!_drawPending) {
+        _drawPending = { time, price };
+      } else {
+        _curDrawings().push({
+          id: 'dr_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          type: _drawMode,
+          p1: _drawPending,
+          p2: { time, price },
+          color: _drawMode === 'fib' ? 'rgba(255,193,7,0.9)' : 'rgba(79,127,255,0.9)',
+        });
+        _saveDrawings();
+        _drawPending = null;
+        _drawMode = null;
+        _updateDrawBtnState();
+        _renderDrawings();
+      }
+    } else {
+      const idx = _hitTestDrawing(param.point.x, param.point.y);
+      if (idx >= 0) {
+        _curDrawings().splice(idx, 1);
+        _saveDrawings();
+        _renderDrawings();
+      }
+    }
+  }
+  _lwChart.subscribeClick(_onChartClick);
+
+  // Draw menu — mirrors the Indicators dropdown UX pattern for consistency
+  let _drawDropdownOpen = false;
+  function _closeDrawDropdown() {
+    const p = document.getElementById('_lw-draw-dropdown');
+    if (p) p.remove();
+    _drawDropdownOpen = false;
+    const b = document.getElementById('lw-draw-btn');
+    if (b) b.setAttribute('aria-expanded', 'false');
+  }
+  function _openDrawDropdown() {
+    if (_drawDropdownOpen) { _closeDrawDropdown(); return; }
+    _closeDrawDropdown();
+    _drawDropdownOpen = true;
+    const btn = document.getElementById('lw-draw-btn');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+
+    const pop = document.createElement('div');
+    pop.id = '_lw-draw-dropdown';
+    pop.style.cssText = [
+      'position:fixed;z-index:9999;background:var(--head-bg);border:1px solid var(--border);',
+      'border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,.7);',
+      'font-size:11px;font-family:var(--font-ui,sans-serif);min-width:210px;',
+    ].join('');
+
+    function _addOption(label, desc, onClick) {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;flex-direction:column;padding:7px 12px;cursor:pointer;border-bottom:1px solid rgba(42,46,57,0.3);';
+      row.innerHTML = `<div style="color:var(--text);font-weight:600;font-size:11px">${label}</div>`
+                     + `<div style="color:var(--text3);font-size:9px;margin-top:1px">${desc}</div>`;
+      row.addEventListener('mouseenter', () => row.style.background = 'rgba(255,255,255,0.04)');
+      row.addEventListener('mouseleave', () => row.style.background = 'transparent');
+      row.addEventListener('click', e => { e.stopPropagation(); onClick(); _closeDrawDropdown(); });
+      pop.appendChild(row);
+    }
+    _addOption('Trend Line', 'Click two points on the chart', () => {
+      _drawMode = 'trend'; _drawPending = null; _updateDrawBtnState();
+    });
+    _addOption('Fibonacci Retracement', 'Click the swing start, then the swing end', () => {
+      _drawMode = 'fib'; _drawPending = null; _updateDrawBtnState();
+    });
+    if (_curDrawings().length > 0) {
+      _addOption('Clear All Drawings', `Remove ${_curDrawings().length} drawing(s) on this chart`, () => {
+        window._lwDrawings[_drawSymKey] = [];
+        _saveDrawings();
+        _renderDrawings();
+      });
+    }
+
+    document.body.appendChild(pop);
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      const popW = pop.offsetWidth || 210;
+      let left = rect.left;
+      if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+      const popH = pop.offsetHeight || 130;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const top = spaceBelow >= popH + 8 ? rect.bottom + 4 : rect.top - popH - 4;
+      pop.style.top  = Math.max(8, top) + 'px';
+      pop.style.left = Math.max(8, left) + 'px';
+    }
+    pop.addEventListener('click',     e => e.stopPropagation());
+    pop.addEventListener('mousedown', e => e.stopPropagation());
+    setTimeout(() => { document.addEventListener('mousedown', _closeDrawDropdown, { once: true }); }, 0);
+  }
+
+  // Attach dropdown handler — clone to clear prior listeners (same pattern as Indicators button)
+  (function _attachDrawBtn() {
+    const btn = document.getElementById('lw-draw-btn');
+    if (!btn) return;
+    const fresh = btn.cloneNode(true);
+    btn.parentNode.replaceChild(fresh, btn);
+    fresh.addEventListener('click', e => { e.stopPropagation(); _openDrawDropdown(); });
+  })();
 
   // ── Full Indicator Library — Bloomberg/Eikon/TradingView standard set ───────
   // Indicators are rendered in separate sub-panes (oscillators) or overlaid on
