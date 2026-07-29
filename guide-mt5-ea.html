@@ -395,7 +395,7 @@ a { color: inherit; text-decoration: none; }
       "name": "What is the difference between the MT5 EA and the web terminal?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Both share the same underlying data pipelines for CB bias, COT, carry, sentiment, and news. The MT5 EA adds account-specific panels not possible in a browser — live broker swap rates, an open positions panel, and native MT5 popup and mobile push alerts. The web terminal adds panels not present in the EA, such as the Cross-Asset Risk Monitor, the yield curve, and the derivatives suite. A single subscription unlocks both."
+        "text": "Both share the same underlying data pipelines for CB bias, COT, carry, sentiment, and news. The Economic Surprise Index is the exception — the EA scores it from MT5's own native calendar, the web terminal from Myfxbook RSS, so readings for the same currency can diverge between the two. The MT5 EA adds account-specific panels not possible in a browser — live broker swap rates, an open positions panel, and native MT5 popup and mobile push alerts. The web terminal adds panels not present in the EA, such as the Cross-Asset Risk Monitor, the yield curve, and the derivatives suite. A single subscription unlocks both."
       }
     }
   ]
@@ -636,7 +636,7 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="vs-web">
       <h2>EA vs. Web Terminal</h2>
-      <p>The MT5 EA and the companion web terminal at <a href="https://globalinvesting.github.io/">globalinvesting.github.io</a> share the same underlying data for CB bias, COT, carry, sentiment, and news — so the core read on positioning and policy expectations is consistent whichever you have open. Each layer then adds capabilities the other cannot:</p>
+      <p>The MT5 EA and the companion web terminal at <a href="https://globalinvesting.github.io/">globalinvesting.github.io</a> share the same underlying data for CB bias, COT, carry, sentiment, and news — so the core read on positioning and policy expectations is consistent whichever you have open. The Economic Surprise Index is the one exception: the EA scores it from MT5's own native calendar feed, while the web terminal scores it from Myfxbook RSS — two independent calendar providers with different event coverage, so ESI readings for the same currency (particularly NOK and SEK, where either feed's coverage is thin) can genuinely diverge between the two platforms rather than reflect a discrepancy to reconcile. Each layer then adds capabilities the other cannot:</p>
       <ul>
         <li><strong>MT5 EA only:</strong> live broker swap rates, an open positions panel reading your actual account, MT5 native economic calendar, and MT5 popup / mobile push alerts.</li>
         <li><strong>Web terminal only:</strong> full OHLC price chart history, the US Treasury yield curve, the derivatives suite (25-delta risk reversals, CIP-implied forwards, ECB fixings, DTCC OTC volume), and the Cross-Asset Risk Monitor.</li>
@@ -670,7 +670,7 @@ a { color: inherit; text-decoration: none; }
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · MT5 EXPERT ADVISOR</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.1.3</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v8.72.7</span></div>
 </footer>
 
 
