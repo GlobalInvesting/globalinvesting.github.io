@@ -712,7 +712,7 @@ function openCOTModal(ccy,data,opts){
         <button class="cot-ccy-arrow" onclick="cotCycleCcy(1)" aria-label="Next currency" title="Next (→)" ${_idx===-1||_idx>=_avail.length-1?'disabled':''}>›</button>
         <span>· Leveraged Funds</span>
       </div>
-      <div id="cot-m-sub">week ending ${weekEnd} · ${nWks}w history · CFTC TFF Disaggregated · Options+Futures Combined</div>
+      <div id="cot-m-sub">week ending ${weekEnd} · ${nWks}w history · CFTC TFF · Options+Futures Combined</div>
     </div>
     <button id="cot-m-close" onclick="closeCOTModal()" aria-label="Close">✕</button>
   </div>

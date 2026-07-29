@@ -897,7 +897,7 @@ async function fetchCBRates() {
 // ═══════════════════════════════════════════════════════════════════
 // TradingView COT chart symbols — CFTC Traders in Financial Futures (TFF) report
 // COT3 prefix = Financial/TFF report · suffix _FO_LMP_L = Futures+Options Combined · Leveraged Funds · Long
-// This matches the panel data source: CFTC Disaggregated TFF · Leveraged Funds · Options+Futures Combined
+// This matches the panel data source: CFTC TFF (Traders in Financial Futures) · Leveraged Funds · Options+Futures Combined
 // Codes: EUR=099741, GBP=096742, JPY=097741, AUD=232741,
 //        CAD=090741, CHF=092741, NZD=112741, USD=098662 (US Dollar Index futures)
 const COT_TV_SYMBOLS = {
@@ -946,7 +946,7 @@ async function fetchCOTData() {
   // Timestamp label — "CFTC · week ending 2026-03-28 · updated Sat 04 Apr · loaded HH:MM TZ · N days ago"
   const latest = results[0];
   const weekEnd = latest.weekEnding || latest.reportDate || '';
-  let updLabel = 'Disaggregated TFF · Leveraged Funds · week ending ' + weekEnd;
+  let updLabel = 'TFF · Leveraged Funds · week ending ' + weekEnd;
   if (latest.lastUpdate) {
     try {
       const d = new Date(latest.lastUpdate);
@@ -1078,7 +1078,7 @@ async function fetchCOTData() {
       + '<div class="cot-short-fill" style="width:' + (100 - longPct) + '%"></div>'
       + '</div>'
       + '<span class="cot-pct ' + cls + '">' + longPct + '%</span>'
-      + '<span class="cot-net ' + cls + '" title="LF net contracts (longs minus shorts). Positive = net long speculative positioning; negative = net short. Primary directional signal from CFTC Disaggregated TFF report.">' + netStr + '</span>'
+      + '<span class="cot-net ' + cls + '" title="LF net contracts (longs minus shorts). Positive = net long speculative positioning; negative = net short. Primary directional signal from CFTC TFF report.">' + netStr + '</span>'
       + wowHtml
       + divHtml
       + pctOIHtml
@@ -2263,7 +2263,7 @@ function attachRiskMonitorTooltips() {
   const skewHead = document.querySelector('table[aria-label="COT-derived directional positioning bias per pair"] thead tr');
   if (skewHead) attachRiskTip(skewHead,
     'Positioning Bias — ETF IV + COT + 25d RR',
-    'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) — nearest expiry ≥4 days. ETF IV is the closest free proxy for OTC interbank implied vol (not publicly available). COT bias from CFTC Disaggregated TFF · Leveraged Funds · Options+Futures Combined. 25-delta Risk Reversal from Saxo Bank public options page (1M tenor, indicative mid) — positive = calls bid over puts (upside skew on base currency); negative = puts bid (downside protection dominant).',
+    'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) — nearest expiry ≥4 days. ETF IV is the closest free proxy for OTC interbank implied vol (not publicly available). COT bias from CFTC TFF · Leveraged Funds · Options+Futures Combined. 25-delta Risk Reversal from Saxo Bank public options page (1M tenor, indicative mid) — positive = calls bid over puts (upside skew on base currency); negative = puts bid (downside protection dominant).',
     'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels. RR from Saxo is indicative mid-market, updated during European hours; treat as directional context, not a tradeable quote. Direction signal always comes from Leveraged Funds net positioning (most reactive speculative category in CFTC data).'
   );
   // skew-tbody may be absent (Positioning Bias panel removed) — safe to skip
@@ -6780,7 +6780,7 @@ async function updatePairDetail(tvSym) {
             ${isCross ? `<div class="pd-cell pd-cell--wide pd-section-lbl" style="${addTopBorder ? 'border-top:1px solid var(--border);margin-top:2px;' : ''}">COT ${ccy}</div>` : ''}
             <div class="pd-cell fx-tip"
               data-tip-title="CFTC Leveraged Funds Net${isCross ? ` · ${ccy}` : ''}"
-              data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Speculative / trend-following positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
+              data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Speculative / trend-following positioning. Source: CFTC TFF report.${crossNote}"
               data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded.">
               <div class="pd-lbl">LF Net</div>
               <div class="pd-val ${cls(net)}">${fmtNet(net)}</div>
@@ -6794,7 +6794,7 @@ async function updatePairDetail(tvSym) {
             </div>
             <div class="pd-cell fx-tip"
               data-tip-title="CFTC Asset Managers Net${isCross ? ` · ${ccy}` : ''}"
-              data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Structural / longer-term positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
+              data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Structural / longer-term positioning. Source: CFTC TFF report.${crossNote}"
               data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze.">
               <div class="pd-lbl">AM Net</div>
               <div class="pd-val ${cls(amNet)}">${fmtNet(amNet)}</div>
@@ -7784,7 +7784,7 @@ async function fetchFedExpectations() {
 //   FXE → EUR/USD  FXB → GBP/USD  FXY → USD/JPY  FXA → AUD/USD
 //   When available: shows ATM IV column + IV Rank (when ≥4w history) or COT bias fallback.
 //
-// SOURCE 2 — COT (always loaded): CFTC Disaggregated TFF · Leveraged Funds net positioning.
+// SOURCE 2 — COT (always loaded): CFTC TFF (Traders in Financial Futures) · Leveraged Funds net positioning.
 //   Used as directional bias proxy and fallback when ETF IV is unavailable.
 //
 // SOURCE 3 — 25d Risk Reversal (supplemental): Saxo Bank public options page · 1M tenor.
@@ -7978,7 +7978,7 @@ async function fetchOptionSkew() {
         const td0BodyCot  = pairTipCot?.body || '';
         const td0ExCot    = pairTipCot?.ex   || '';
         const td12Title   = 'COT Directional Skew · ' + p.pair;
-        const td12Body    = 'est. via COT — no CBOE/CME volatility index available for this pair. Derived from CFTC Leveraged Funds net positioning (Disaggregated TFF · Options+Futures Combined). Net = current week; 4W = net ~4 weeks ago (real CFTC history, v7.88.0).';
+        const td12Body    = 'est. via COT — no CBOE/CME volatility index available for this pair. Derived from CFTC Leveraged Funds net positioning (TFF · Options+Futures Combined). Net = current week; 4W = net ~4 weeks ago (real CFTC history, v7.88.0).';
         const td3TitleCot = p.pair + ' — Directional Bias';
         const td3BodyCot  = pairTipCot?.body || '';
         const td3ExCot    = pairTipCot?.ex   || '';
