@@ -5048,7 +5048,7 @@ async function _renderLWChart(ohlcId, label) {
     pop.style.cssText = [
       'position:fixed;z-index:9999;background:var(--head-bg);border:1px solid var(--border);',
       'border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,.7);',
-      'font-size:11px;font-family:var(--font-ui,sans-serif);min-width:210px;',
+      'font-size:11px;font-family:var(--font-ui,sans-serif);min-width:210px;max-width:260px;',
     ].join('');
 
     function _addOption(label, desc, onClick) {
