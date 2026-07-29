@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-29T11:38:02Z",
-  "generatedAt": "2026-07-29T11:38:02Z",
+  "lastUpdate": "2026-07-29T15:27:07Z",
+  "generatedAt": "2026-07-29T15:27:07Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-29",
   "rangeTo": "2026-07-29",
-  "totalEvents": 3714,
+  "totalEvents": 3716,
   "currencyCounts": {
     "EUR": 834,
     "GBP": 431,
-    "USD": 1271,
+    "USD": 1273,
     "AUD": 256,
     "CAD": 272,
     "CHF": 124,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "high": 1659,
-    "medium": 1827,
+    "medium": 1829,
     "low": 228
   },
   "surpriseStats": {
@@ -379,14 +379,14 @@
       "std": 13.228757
     },
     "USD/eia gasoline stocks change": {
-      "n": 14,
-      "mean": 0.620929,
-      "std": 1.619366
+      "n": 15,
+      "mean": 0.626667,
+      "std": 1.560618
     },
     "USD/eia crude oil stocks change": {
-      "n": 14,
-      "mean": -0.873,
-      "std": 3.048771
+      "n": 15,
+      "mean": -1.205933,
+      "std": 3.208387
     },
     "AUD/balance of trade": {
       "n": 3,
@@ -46358,9 +46358,35 @@
       "flag": "🇺🇸",
       "event": "United States MBA 30-Year Mortgage Rate",
       "impact": "medium",
-      "actual": "6.76",
+      "actual": "6.76%",
       "forecast": null,
-      "previous": "6.69"
+      "previous": "6.69%"
+    },
+    {
+      "date": "29 Jul",
+      "dateISO": "2026-07-29",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "0.007M",
+      "forecast": "-0.7M",
+      "previous": "0.765M"
+    },
+    {
+      "date": "29 Jul",
+      "dateISO": "2026-07-29",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "-7.167M",
+      "forecast": "-1.3M",
+      "previous": "2.011M"
     },
     {
       "date": "29 Jul",
