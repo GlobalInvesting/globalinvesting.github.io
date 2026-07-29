@@ -2165,8 +2165,24 @@ function attachRiskMonitorTooltips() {
     'MOVE > 120 signals bond stress that typically spills into FX. USD pairs become erratic when MOVE is elevated because rate expectations are unstable.'
   );
 
+  // ── US HY OAS ────────────────────────────────────────────────────
+  const hyOasCell = document.querySelector('#section-risk .risk-cell:nth-child(3)');
+  if (hyOasCell) attachRiskTip(hyOasCell,
+    'US HY OAS — ICE BofA High Yield Option-Adjusted Spread',
+    'The extra yield below-investment-grade (BB+/Ba1 and lower) US corporate bonds pay over Treasuries, adjusted for embedded call options. The standard institutional gauge of corporate credit-market stress — a distinct risk-off channel from equity vol (VIX) or bond vol (MOVE), and one that has historically led both into genuine credit events.',
+    'Below ~350bp is the historically tight zone seen in calm, risk-on markets. Sustained widening past ~500bp has coincided with credit-stress episodes (2015 energy HY, March 2020). Level alone can lag — pair with the HY OAS 20d Δ row below to catch the direction of travel.'
+  );
+
+  // ── US IG OAS ────────────────────────────────────────────────────
+  const igOasCell = document.querySelector('#section-risk .risk-cell:nth-child(4)');
+  if (igOasCell) attachRiskTip(igOasCell,
+    'US IG OAS — ICE BofA Investment Grade Option-Adjusted Spread',
+    'The extra yield investment-grade (BBB-/Baa3 and higher) US corporate bonds pay over Treasuries, adjusted for embedded call options. The companion series to HY OAS — moves in IG confirm whether credit stress is broad-based or confined to junk-rated issuers.',
+    'Below ~100bp is a historically tight reading (bottom-decile territory in the post-2009 era). Widening past ~150bp signals credit conditions tightening even for higher-quality issuers, typically alongside a rising HY-IG differential.'
+  );
+
   // ── EUR/USD HV 30d ───────────────────────────────────────────────
-  const hvCell = document.querySelector('#section-risk .risk-cell:nth-child(3)');
+  const hvCell = document.querySelector('#section-risk .risk-cell:nth-child(5)');
   if (hvCell) attachRiskTip(hvCell,
     'EUR/USD Historical Volatility (30d)',
     'Realized volatility of EUR/USD over the past 30 days, calculated from daily log returns. Not a forecast — it measures what actually happened. Useful for sizing positions.',
@@ -2174,7 +2190,7 @@ function attachRiskMonitorTooltips() {
   );
 
   // ── Regime ───────────────────────────────────────────────────────
-  const regCell = document.querySelector('#section-risk .risk-cell:nth-child(4)');
+  const regCell = document.querySelector('#section-risk .risk-cell:nth-child(6)');
   if (regCell) attachRiskTip(regCell,
     'Market Regime',
     'Composite live assessment: VIX level (primary driver), yield curve shape, gold intraday demand (>2% = stress signal), S&P 500 daily move (< -1.5% = stress), MOVE index (>100 = elevated per BofA/ICE), AUD/JPY intraday move (the canonical cross-asset risk barometer — sharp selloff >-1.5% = risk-off signal), and USD/JPY (yen safe-haven bid). Updates in real time.',
@@ -2193,6 +2209,11 @@ function attachRiskMonitorTooltips() {
       title: 'Gold / SPX Ratio',
       body:  'Price of gold divided by the S&P 500 level. Rising ratio = investors moving from risk assets to safe havens. Falling ratio = risk appetite dominant.',
       ex:    'Ratio > 0.8 and rising historically aligns with USD strength (safe-haven flows), JPY appreciation, and commodity currency weakness.'
+    },
+    {
+      title: 'HY OAS 20-day Change',
+      body:  'Change in the ICE BofA US High Yield Option-Adjusted Spread over the last ~20 trading days. Captures direction, not just level — spreads can be historically tight yet still be widening, which the level alone would miss.',
+      ex:    'Widening (positive Δ) while equities are calm is often an early credit-market warning that leads risk-off moves in FX by weeks. Narrowing confirms improving risk appetite alongside a low VIX.'
     },
     {
       title: 'USD/JPY vs VIX — 60d Correlation',
@@ -2285,6 +2306,10 @@ async function fetchRiskData() {
       if (d.bond10y != null && !isNaN(d.bond10y))                   byId.us10y = repo(d.bond10y);
       if (d.bond2y  != null && !isNaN(d.bond2y)  && d.bond2y > 0)  byId.us2y  = repo(d.bond2y);
       if (d.bond5y  != null && !isNaN(d.bond5y)  && d.bond5y > 0)  byId.us5y  = repo(d.bond5y);
+      // Credit spreads — USD-only (global USD credit market), from update_extended_data.py v14.0
+      if (d.hyOas != null && !isNaN(d.hyOas) && d.hyOas > 0)        byId.hyOas = repo(d.hyOas);
+      if (d.igOas != null && !isNaN(d.igOas) && d.igOas > 0)        byId.igOas = repo(d.igOas);
+      if (d.hyOasDelta20d != null && !isNaN(d.hyOasDelta20d))       byId.hyOasDelta20d = d.hyOasDelta20d;
     }
     if (eurExt?.data?.bond10y != null) byId.de10y = { close: eurExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
     if (jpyExt?.data?.bond10y != null) byId.jp10y = { close: jpyExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
@@ -2408,6 +2433,47 @@ async function renderRiskData(byId) {
       setEl('risk-move', '—', 'risk-val');
       setEl('risk-move-sub', 'ICE BofA · unavailable');
     }
+  }
+
+  // US HY OAS — ICE BofA High Yield Option-Adjusted Spread (FRED BAMLH0A0HYM2)
+  // Thresholds: <350bp = historically tight/low-stress zone; >500bp = widely-cited
+  // credit-stress threshold (2015 energy HY, March 2020 both crossed it decisively).
+  if (byId.hyOas) {
+    const hy = byId.hyOas.close;
+    const cls = hy > 500 ? 'risk-val down' : hy > 350 ? 'risk-val warning' : 'risk-val up';
+    setEl('risk-hyoas', Math.round(hy) + ' bp', cls);
+    const signal = hy > 500 ? 'Wide' : hy > 350 ? 'Moderate' : 'Tight';
+    setEl('risk-hyoas-sub', signal + ' · ICE BofA');
+  } else {
+    setEl('risk-hyoas', '—', 'risk-val');
+    setEl('risk-hyoas-sub', 'ICE BofA · unavailable');
+  }
+
+  // US IG OAS — ICE BofA Investment Grade Option-Adjusted Spread (FRED BAMLC0A0CM)
+  // Thresholds: <100bp = tight (bottom-decile post-2009 territory); >150bp = widening.
+  if (byId.igOas) {
+    const ig = byId.igOas.close;
+    const cls = ig > 150 ? 'risk-val down' : ig > 100 ? 'risk-val warning' : 'risk-val up';
+    setEl('risk-igoas', Math.round(ig) + ' bp', cls);
+    const signal = ig > 150 ? 'Wide' : ig > 100 ? 'Moderate' : 'Tight';
+    setEl('risk-igoas-sub', signal + ' · ICE BofA');
+  } else {
+    setEl('risk-igoas', '—', 'risk-val');
+    setEl('risk-igoas-sub', 'ICE BofA · unavailable');
+  }
+
+  // HY OAS 20d Δ — Risk Indicators table row (direction of travel, not just level)
+  if (byId.hyOasDelta20d != null) {
+    const delta = byId.hyOasDelta20d;
+    const bp = Math.round(delta);
+    const sign = bp >= 0 ? '+' : '';
+    setEl('ri-hyoas-delta', sign + bp + 'bp');
+    const sig = bp > 15 ? 'Widening (risk-off)' : bp < -15 ? 'Narrowing (risk-on)' : 'Stable';
+    const cls = bp > 15 ? 'down' : bp < -15 ? 'up' : 'flat';
+    setEl('ri-hyoas-delta-sig', sig, cls);
+  } else {
+    setEl('ri-hyoas-delta', '—');
+    setEl('ri-hyoas-delta-sig', 'No data', 'flat');
   }
 
   // EUR/USD HV 30d — primary source: HV30 computed by fetch_intraday_quotes.py
