@@ -3157,6 +3157,7 @@ function _destroyLWChart() {
   _lwPeriodOpen = null;
   _lwPeriodHigh = null;
   _lwPeriodLow  = null;
+  window._lwRenderDrawings = null;
 }
 
 // Compute MA(n) over close prices
@@ -3538,6 +3539,12 @@ function _lwUpdateTodayBar() {
     if (_lwActiveUpdateHeader) {
       _lwActiveUpdateHeader(_liveBar, null, (_rt.pct != null) ? { pct: _rt.pct, chg: _rt.chg } : null);
     }
+    // Re-project the trend-line/swing overlay: a live tick can widen the
+    // autoscaled price range without firing subscribeVisibleTimeRangeChange,
+    // which would otherwise leave the SVG diagonal stale against the new axis.
+    // (Fib levels don't need this -- createPriceLine already tracks the axis
+    // itself, see _syncFibPriceLines.)
+    if (window._lwRenderDrawings) window._lwRenderDrawings();
     return;
   }
 
@@ -3564,6 +3571,7 @@ function _lwUpdateTodayBar() {
       _lwActiveUpdateHeader(bar, null, null);
     }
   }
+  if (window._lwRenderDrawings) window._lwRenderDrawings();
 }
 
 // Apply a date-range window to the active LW chart.
@@ -4485,7 +4493,6 @@ async function _renderLWChart(ohlcId, label) {
       _drawRafId = null;
       if (!_drawOverlay || !_lwChart) return;
       const ts = _lwChart.timeScale();
-      const chartW = chartDiv.offsetWidth;
       let svg = '';
       _curDrawings().forEach(d => {
         try {
@@ -4493,33 +4500,61 @@ async function _renderLWChart(ohlcId, label) {
           const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
           if (x1 == null || x2 == null || y1 == null || y2 == null) return;
           const col = d.color || 'rgba(79,127,255,0.9)';
-          if (d.type === 'trend') {
-            svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1.5"/>`;
-            svg += `<circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="3" fill="${col}"/>`;
-            svg += `<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3" fill="${col}"/>`;
-          } else if (d.type === 'fib') {
-            // Convention: 0% sits at the swing point the user dragged FROM, 100%
-            // at the point dragged TO — matches TradingView/MT5 Fibonacci tool.
-            const drawnHighFirst = d.p1.price >= d.p2.price;
-            const priceHigh = Math.max(d.p1.price, d.p2.price);
-            const priceLow  = Math.min(d.p1.price, d.p2.price);
-            const range = priceHigh - priceLow;
-            const xLeft = Math.min(x1, x2);
-            FIB_LEVELS.forEach(lv => {
-              const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
-              const y = candleSeries.priceToCoordinate(lvPrice);
-              if (y == null) return;
-              const isAnchor = (lv === 0 || lv === 1);
-              svg += `<line x1="${xLeft.toFixed(1)}" y1="${y.toFixed(1)}" x2="${chartW}" y2="${y.toFixed(1)}" `
-                   + `stroke="${col}" stroke-width="1" ${isAnchor ? '' : 'stroke-dasharray="2,2"'} opacity="0.85"/>`;
-              svg += `<text x="${(chartW - 4).toFixed(1)}" y="${(y - 2).toFixed(1)}" text-anchor="end" `
-                   + `font-size="9" font-family="var(--font-ui,sans-serif)" fill="${col}">`
-                   + `${(lv * 100).toFixed(1)}% \u2013 ${lvPrice.toFixed(dec)}</text>`;
-            });
-          }
+          // Both Trend Line and the Fibonacci swing itself are diagonal — the
+          // Fibonacci retracement LEVELS are handled separately below via native
+          // price lines (see _syncFibPriceLines), not drawn here.
+          svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1.5" ${d.type === 'fib' ? 'stroke-dasharray="4,3" opacity="0.6"' : ''}/>`;
+          svg += `<circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="3" fill="${col}"/>`;
+          svg += `<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3" fill="${col}"/>`;
         } catch(_) {}
       });
       _drawOverlay.innerHTML = svg;
+    });
+  }
+
+  // ── Fibonacci retracement levels — rendered as native price lines ───────────
+  // Previously each level was a hand-drawn <line>+<text> spanning the full chart
+  // width, recomputed on every pan/zoom — expensive, and the text sat wherever
+  // math placed it, so it visibly collided with the native price-scale labels
+  // (and the live price tag) exactly as flagged. `series.createPriceLine()` is
+  // the native Lightweight Charts mechanism for this: the library renders the
+  // line and its axis label itself, in the same lane as every other price-scale
+  // label, and keeps it correctly positioned on every redraw — including when
+  // the price scale autoscales from a live tick — with zero polling from us.
+  const _fibPriceLines = new Map(); // drawing id -> [priceLine, ...]
+
+  function _syncFibPriceLines() {
+    const cur = _curDrawings();
+    const curFibIds = new Set(cur.filter(d => d.type === 'fib').map(d => d.id));
+    for (const [id, lines] of _fibPriceLines) {
+      if (!curFibIds.has(id)) {
+        lines.forEach(pl => { try { candleSeries.removePriceLine(pl); } catch(_) {} });
+        _fibPriceLines.delete(id);
+      }
+    }
+    cur.filter(d => d.type === 'fib').forEach(d => {
+      if (_fibPriceLines.has(d.id)) return;
+      // Convention: 0% sits at the swing point the user dragged FROM, 100% at
+      // the point dragged TO — matches the TradingView/MT5 Fibonacci tool.
+      const drawnHighFirst = d.p1.price >= d.p2.price;
+      const priceHigh = Math.max(d.p1.price, d.p2.price);
+      const priceLow  = Math.min(d.p1.price, d.p2.price);
+      const range = priceHigh - priceLow;
+      const col = d.color || 'rgba(255,193,7,0.9)';
+      const lines = FIB_LEVELS.map(lv => {
+        const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
+        try {
+          return candleSeries.createPriceLine({
+            price: lvPrice,
+            color: col,
+            lineWidth: 1,
+            lineStyle: (lv === 0 || lv === 1) ? 0 : 1, // solid at the anchors, dotted for internal levels
+            axisLabelVisible: true,
+            title: `Fib ${(lv * 100).toFixed(1)}%`,
+          });
+        } catch(_) { return null; }
+      }).filter(Boolean);
+      _fibPriceLines.set(d.id, lines);
     });
   }
 
@@ -4531,7 +4566,14 @@ async function _renderLWChart(ohlcId, label) {
     chartDiv.appendChild(_drawOverlay);
   }
   _renderDrawings();
+  _syncFibPriceLines();
   _lwChart.timeScale().subscribeVisibleTimeRangeChange(_renderDrawings);
+  // Expose for real-time redraw from _lwUpdateTodayBar() — the trend-line/swing
+  // diagonal needs re-projecting whenever a live tick shifts the price scale's
+  // autoscaled range, which doesn't fire a visible-time-range-change event on
+  // its own (the fib LEVELS don't need this — native price lines already track
+  // the axis in true real time with no help from us).
+  window._lwRenderDrawings = _renderDrawings;
 
   // Distance from a point to a line segment (for click-to-delete hit testing)
   function _ptSegDist(px, py, x1, y1, x2, y2) {
@@ -4589,6 +4631,7 @@ async function _renderLWChart(ohlcId, label) {
           color: _drawMode === 'fib' ? 'rgba(255,193,7,0.9)' : 'rgba(79,127,255,0.9)',
         });
         _saveDrawings();
+        _syncFibPriceLines();
         _drawPending = null;
         _drawMode = null;
         _updateDrawBtnState();
@@ -4599,6 +4642,7 @@ async function _renderLWChart(ohlcId, label) {
       if (idx >= 0) {
         _curDrawings().splice(idx, 1);
         _saveDrawings();
+        _syncFibPriceLines();
         _renderDrawings();
       }
     }
@@ -4649,6 +4693,7 @@ async function _renderLWChart(ohlcId, label) {
       _addOption('Clear All Drawings', `Remove ${_curDrawings().length} drawing(s) on this chart`, () => {
         window._lwDrawings[_drawSymKey] = [];
         _saveDrawings();
+        _syncFibPriceLines();
         _renderDrawings();
       });
     }
