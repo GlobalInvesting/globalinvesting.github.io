@@ -4008,7 +4008,8 @@ async function _renderLWChart(ohlcId, label) {
     : { top: 0.10, bottom: 0.08 };
 
   _lwChart = LWC.createChart(chartDiv, {
-    layout:      { background: { color: _themeColor('--bg') }, textColor: _themeColor('--text'), attributionLogo: false },
+    layout:      { background: { color: _themeColor('--bg') }, textColor: _themeColor('--text'), attributionLogo: false,
+                   panes: { separatorColor: _themeColorAlpha('--border', 0.6), separatorHoverColor: _themeColorAlpha('--text2', 0.25), enableResize: true } },
     grid:        { vertLines: { color: _themeColorAlpha('--border', 0.5) }, horzLines: { color: _themeColorAlpha('--border', 0.5) } },
     crosshair:   { mode: LWC.CrosshairMode.Normal,
                    vertLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') },
@@ -4554,25 +4555,25 @@ async function _renderLWChart(ohlcId, label) {
     { id:'psar',     group:'Overlays',        label:'Parabolic SAR',     desc:'Parabolic SAR',                                          type:'overlay',    defaultParams:{ step:0.02, max:0.2 },          paramDefs:[{key:'step',label:'Step',type:'float',min:0.001,max:0.1,step:0.001},{key:'max',label:'Max AF',type:'float',min:0.01,max:0.5,step:0.01}], colors:['#f44336'] },
     { id:'ichimoku', group:'Overlays',        label:'Ichimoku Cloud',    desc:'Ichimoku Kinko Hyo · 9/26/52',                          type:'overlay',    defaultParams:{},                              paramDefs:[], colors:['#26a69a','#ef5350','rgba(38,166,154,0.3)','rgba(239,83,80,0.3)','rgba(120,123,134,0.4)'] },
     // ── Oscillators ───────────────────────────────────────────────────────────
-    { id:'rsi',      group:'Oscillators',     label:'RSI',               desc:'Relative Strength Index',                                type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#9c27b0'] },
+    { id:'rsi',      group:'Oscillators',     label:'RSI',               desc:'Relative Strength Index',                                type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#64b5f6'] },
     { id:'stoch',    group:'Oscillators',     label:'Stochastic',        desc:'Stochastic Oscillator',                                  type:'oscillator', defaultParams:{ k:14, d:3, smooth:3 },         paramDefs:[{key:'k',label:'%K',type:'int',min:1,max:100,step:1},{key:'smooth',label:'Smooth',type:'int',min:1,max:20,step:1},{key:'d',label:'%D',type:'int',min:1,max:20,step:1}], colors:['#2196f3','#ff9800'] },
     { id:'macd',     group:'Oscillators',     label:'MACD',              desc:'MACD',                                                   type:'oscillator', defaultParams:{ fast:12, slow:26, signal:9 },  paramDefs:[{key:'fast',label:'Fast',type:'int',min:2,max:100,step:1},{key:'slow',label:'Slow',type:'int',min:2,max:200,step:1},{key:'signal',label:'Signal',type:'int',min:1,max:50,step:1}], colors:['#26a69a','#2196f3','#ff9800'], histoIdx:[0] },
-    { id:'cci',      group:'Oscillators',     label:'CCI',               desc:'Commodity Channel Index',                                type:'oscillator', defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#00bcd4'] },
-    { id:'willr',    group:'Oscillators',     label:'Williams %R',       desc:'Williams %R',                                            type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#ff5722'] },
+    { id:'cci',      group:'Oscillators',     label:'CCI',               desc:'Commodity Channel Index',                                type:'oscillator', defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#64b5f6'] },
+    { id:'willr',    group:'Oscillators',     label:'Williams %R',       desc:'Williams %R',                                            type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#64b5f6'] },
     { id:'roc',      group:'Oscillators',     label:'ROC',               desc:'Rate of Change',                                         type:'oscillator', defaultParams:{ period:12 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#4caf50'] },
     { id:'mom',      group:'Oscillators',     label:'Momentum',          desc:'Momentum',                                               type:'oscillator', defaultParams:{ period:10 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#9c27b0'] },
     { id:'mfi',      group:'Oscillators',     label:'MFI',               desc:'Money Flow Index (uses volume)',                         type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#03a9f4'] },
     { id:'ao',       group:'Oscillators',     label:'Awesome Oscillator',desc:'Awesome Oscillator · 5/34',                              type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#26a69a'], histoIdx:[0] },
-    { id:'trix',     group:'Oscillators',     label:'TRIX',              desc:'Triple Smoothed EMA',                                    type:'oscillator', defaultParams:{ period:18 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#673ab7'] },
-    { id:'dpo',      group:'Oscillators',     label:'DPO',               desc:'Detrended Price Oscillator',                             type:'oscillator', defaultParams:{ period:21 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#ff9800'] },
-    { id:'uo',       group:'Oscillators',     label:'Ultimate Osc.',     desc:'Ultimate Oscillator · 7/14/28',                          type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#8bc34a'] },
+    { id:'trix',     group:'Oscillators',     label:'TRIX',              desc:'Triple Smoothed EMA',                                    type:'oscillator', defaultParams:{ period:18 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#64b5f6'] },
+    { id:'dpo',      group:'Oscillators',     label:'DPO',               desc:'Detrended Price Oscillator',                             type:'oscillator', defaultParams:{ period:21 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#64b5f6'] },
+    { id:'uo',       group:'Oscillators',     label:'Ultimate Osc.',     desc:'Ultimate Oscillator · 7/14/28',                          type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#64b5f6'] },
     // ── Volatility ────────────────────────────────────────────────────────────
-    { id:'atr',      group:'Volatility',      label:'ATR',               desc:'Average True Range',                                     type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#ff9800'] },
-    { id:'adx',      group:'Volatility',      label:'ADX / DMI',         desc:'Average Directional Index + DI±',                        type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#f44336','#26a69a','#ef5350'] },
+    { id:'atr',      group:'Volatility',      label:'ATR',               desc:'Average True Range',                                     type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#64b5f6'] },
+    { id:'adx',      group:'Volatility',      label:'ADX / DMI',         desc:'Average Directional Index + DI±',                        type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#64b5f6','#26a69a','#ef5350'] },
     { id:'aroon',    group:'Volatility',      label:'Aroon',             desc:'Aroon Up/Down',                                          type:'oscillator', defaultParams:{ period:25 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#26a69a','#ef5350'] },
-    { id:'chop',     group:'Volatility',      label:'Choppiness',        desc:'Choppiness Index',                                       type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#607d8b'] },
+    { id:'chop',     group:'Volatility',      label:'Choppiness',        desc:'Choppiness Index',                                       type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#64b5f6'] },
     // ── Volume ────────────────────────────────────────────────────────────────
-    { id:'obv',      group:'Volume',          label:'OBV',               desc:'On-Balance Volume',                                      type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#3f51b5'] },
+    { id:'obv',      group:'Volume',          label:'OBV',               desc:'On-Balance Volume',                                      type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#64b5f6'] },
     { id:'cmf',      group:'Volume',          label:'CMF',               desc:'Chaikin Money Flow',                                     type:'oscillator', defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#00acc1'] },
   ];
 
@@ -4638,9 +4639,24 @@ async function _renderLWChart(ohlcId, label) {
         return [];
       }
       case 'vwap': {
+        // BUG FIX (2026-07-29): this previously accumulated cumTPV/cumV across the
+        // ENTIRE loaded bars array with no reset, so on any chart holding more than
+        // one session (which is every timeframe except a single intraday day) the
+        // running average degenerates into what looks like an extremely long-period
+        // moving average — flat and unresponsive — instead of a daily VWAP. This is
+        // also why it looked visibly wrong switching to H1: more bars accumulate
+        // before the average can move, making the flattening more obvious.
+        // Fix: reset the cumulative sums at every UTC calendar-day boundary, matching
+        // the indicator's own catalogue description ("VWAP · daily sessions").
+        // bar.time is a unix timestamp (seconds) — see loader comments above.
         const typicals = bars.map((b, i) => ({ t: b.time, tp: (b.high+b.low+b.close)/3, v: vols[i] }));
-        let cumTPV = 0, cumV = 0;
-        const data = typicals.map(({ t, tp, v }) => { cumTPV += tp*v; cumV += v; return { time:t, value: cumV>0 ? cumTPV/cumV : tp }; });
+        let cumTPV = 0, cumV = 0, curDay = null;
+        const data = typicals.map(({ t, tp, v }) => {
+          const day = Math.floor(t / 86400); // UTC calendar day index
+          if (day !== curDay) { curDay = day; cumTPV = 0; cumV = 0; }
+          cumTPV += tp*v; cumV += v;
+          return { time:t, value: cumV>0 ? cumTPV/cumV : tp };
+        });
         return [{ data, color:_iC(id,0), lineWidth:1, label:'VWAP', dashed:true }];
       }
       case 'bb': {
@@ -4735,7 +4751,7 @@ async function _renderLWChart(ohlcId, label) {
         const avgG=_iRMA(gains,n), avgL=_iRMA(losses,n);
         const data=avgG.map((g,i)=>{const l=avgL[i];const rs=l===0?Infinity:g/l;return{time:bars[i+1].time,value:parseFloat((l===0?100:100-100/(1+rs)).toFixed(2))};});
         return [{data,color:_iC(id,0),lineWidth:1,label:`RSI(${n})`,
-          refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}]}];
+          refs:[{v:30,color:'rgba(158,161,170,0.35)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(158,161,170,0.35)'}]}];
       }
       case 'stoch': {
         const { k:kPer, d:dPer, smooth } = p;
@@ -4750,7 +4766,7 @@ async function _renderLWChart(ohlcId, label) {
         const kData=sK.map((v,i)=>({time:bars[off+i+smooth-1].time,value:parseFloat(v.toFixed(2))}));
         const dData=sD.map((v,i)=>({time:bars[off+i+smooth-1+dPer-1].time,value:parseFloat(v.toFixed(2))}));
         return [
-          {data:kData,color:_iC(id,0),lineWidth:1,label:`%K(${kPer},${smooth})`,refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}]},
+          {data:kData,color:_iC(id,0),lineWidth:1,label:`%K(${kPer},${smooth})`,refs:[{v:20,color:'rgba(158,161,170,0.35)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(158,161,170,0.35)'}]},
           {data:dData,color:_iC(id,1),lineWidth:1,label:`%D(${dPer})`},
         ];
       }
@@ -4786,7 +4802,7 @@ async function _renderLWChart(ohlcId, label) {
           return{time:bars[i+n-1].time,value:parseFloat((meanDev===0?0:(tp[i+n-1]-avg)/(0.015*meanDev)).toFixed(2))};
         });
         return [{data,color:_iC(id,0),lineWidth:1,label:`CCI(${n})`,
-          refs:[{v:-100,color:'rgba(239,83,80,0.3)'},{v:0,color:'rgba(120,123,134,0.2)'},{v:100,color:'rgba(239,83,80,0.3)'}]}];
+          refs:[{v:-100,color:'rgba(158,161,170,0.35)'},{v:0,color:'rgba(120,123,134,0.2)'},{v:100,color:'rgba(158,161,170,0.35)'}]}];
       }
       case 'willr': {
         const n = p.period;
@@ -4797,7 +4813,7 @@ async function _renderLWChart(ohlcId, label) {
           data.push({time:bars[i].time,value:parseFloat((h===l?-50:((h-bars[i].close)/(h-l))*-100).toFixed(2))});
         }
         return [{data,color:_iC(id,0),lineWidth:1,label:`%R(${n})`,
-          refs:[{v:-80,color:'rgba(239,83,80,0.3)'},{v:-50,color:'rgba(120,123,134,0.2)'},{v:-20,color:'rgba(239,83,80,0.3)'}]}];
+          refs:[{v:-80,color:'rgba(158,161,170,0.35)'},{v:-50,color:'rgba(120,123,134,0.2)'},{v:-20,color:'rgba(158,161,170,0.35)'}]}];
       }
       case 'roc': {
         const n = p.period;
@@ -4823,7 +4839,7 @@ async function _renderLWChart(ohlcId, label) {
           data.push({time:bars[i].time,value:parseFloat((nmf===0?100:100-100/(1+pmf/nmf)).toFixed(2))});
         }
         return [{data,color:_iC(id,0),lineWidth:1,label:`MFI(${n})`,
-          refs:[{v:20,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(239,83,80,0.3)'}]}];
+          refs:[{v:20,color:'rgba(158,161,170,0.35)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:80,color:'rgba(158,161,170,0.35)'}]}];
       }
       case 'ao': {
         const midAO=bars.map(b=>(b.high+b.low)/2);
@@ -4864,7 +4880,7 @@ async function _renderLWChart(ohlcId, label) {
           data.push({time:bars[i].time,value:parseFloat((100*(4*(bp7/tr7)+2*(bp14/tr14)+(bp28/tr28))/7).toFixed(2))});
         }
         return [{data,color:_iC(id,0),lineWidth:1,label:'UO(7,14,28)',
-          refs:[{v:30,color:'rgba(239,83,80,0.3)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(239,83,80,0.3)'}]}];
+          refs:[{v:30,color:'rgba(158,161,170,0.35)'},{v:50,color:'rgba(120,123,134,0.2)'},{v:70,color:'rgba(158,161,170,0.35)'}]}];
       }
       case 'atr': {
         const n = p.period;
@@ -4887,7 +4903,7 @@ async function _renderLWChart(ohlcId, label) {
         const adx=_iRMA(dx,n);
         const off=bars.length-adx.length;
         return [
-          {data:adx.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,0),lineWidth:1,label:`ADX(${n})`,refs:[{v:25,color:'rgba(239,83,80,0.3)'}]},
+          {data:adx.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,0),lineWidth:1,label:`ADX(${n})`,refs:[{v:25,color:'rgba(158,161,170,0.35)'}]},
           {data:pDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,1),lineWidth:1,label:'+DI'},
           {data:mDI.map((v,i)=>({time:bars[off+i].time,value:parseFloat(v.toFixed(2))})),color:_iC(id,2),lineWidth:1,label:'-DI'},
         ];
@@ -4918,7 +4934,7 @@ async function _renderLWChart(ohlcId, label) {
           data.push({time:bars[i].time,value:parseFloat((hl===0?100:(100*Math.log10(atrSum/hl)/Math.log10(n))).toFixed(2))});
         }
         return [{data,color:_iC(id,0),lineWidth:1,label:`Chop(${n})`,
-          refs:[{v:38.2,color:'rgba(38,166,154,0.3)'},{v:61.8,color:'rgba(239,83,80,0.3)'}]}];
+          refs:[{v:38.2,color:'rgba(38,166,154,0.3)'},{v:61.8,color:'rgba(158,161,170,0.35)'}]}];
       }
       case 'obv': {
         let obv=0;
@@ -5186,7 +5202,7 @@ async function _renderLWChart(ohlcId, label) {
     if (btn) btn.setAttribute('aria-expanded', 'false');
   }
 
-  function _openIndDropdown() {
+  function _openIndDropdown(preserveScrollTop) {
     if (_indDropdownOpen) { _closeIndDropdown(); return; }
     _closeIndDropdown();
     _indDropdownOpen = true;
@@ -5232,7 +5248,7 @@ async function _renderLWChart(ohlcId, label) {
       _buildMaSeries(newMa);
       _renderIndPills();
       _updateIndBtn();
-      pop.remove(); _indDropdownOpen = false; _openIndDropdown();
+      { const _st = pop.scrollTop; pop.remove(); _indDropdownOpen = false; _openIndDropdown(_st); }
     });
     maHeader.appendChild(addMaBtn);
     pop.appendChild(maHeader);
@@ -5317,7 +5333,7 @@ async function _renderLWChart(ohlcId, label) {
 
       // Line width selector
       const widthSelect = document.createElement('select');
-      widthSelect.style.cssText = 'background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;width:36px;';
+      widthSelect.style.cssText = 'background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px;font-size:10px;cursor:pointer;flex-shrink:0;width:50px;';
       [1,2,3].forEach(w => {
         const opt = document.createElement('option');
         opt.value = w; opt.textContent = w + 'px';
@@ -5345,7 +5361,7 @@ async function _renderLWChart(ohlcId, label) {
         _saveMaList();
         _destroyMaSeries(ma.uid);
         _renderIndPills(); _updateIndBtn();
-        pop.remove(); _indDropdownOpen = false; _openIndDropdown();
+        { const _st = pop.scrollTop; pop.remove(); _indDropdownOpen = false; _openIndDropdown(_st); }
       });
       row.appendChild(rmBtn);
 
@@ -5435,7 +5451,7 @@ async function _renderLWChart(ohlcId, label) {
           _saveIndState();
           if (window._lwIndState[cfg.id]) { _buildIndicatorPane(cfg.id); } else { _destroyIndicatorPane(cfg.id); }
           _renderIndPills(); _updateIndBtn();
-          pop.remove(); _indDropdownOpen = false; _openIndDropdown();
+          { const _st = pop.scrollTop; pop.remove(); _indDropdownOpen = false; _openIndDropdown(_st); }
         });
 
         pop.appendChild(row);
@@ -5521,14 +5537,29 @@ async function _renderLWChart(ohlcId, label) {
 
     document.body.appendChild(pop);
 
+    // Restore prior scroll position when this open() call is a rebuild triggered
+    // by a toggle/param click inside the panel (see call sites below) — without
+    // this, every click on an indicator row re-created `pop` from scratch and it
+    // always mounted at scrollTop 0, so the list visibly jumped to the top.
+    if (preserveScrollTop != null) pop.scrollTop = preserveScrollTop;
+
     // Position below the button
     if (btn) {
       const rect = btn.getBoundingClientRect();
       const popH = Math.min(520, pop.scrollHeight || 450);
       const spaceBelow = window.innerHeight - rect.bottom;
       const top = spaceBelow >= 80 ? rect.bottom + 4 : rect.top - popH - 4;
+      // Clamp horizontally to the viewport — previously this only enforced an
+      // 8px left margin, so on mobile (where the "Indicators" button sits near
+      // the right edge of the toolbar) the panel's min-width:300px pushed its
+      // right side past the viewport with no way to reach it (nothing scrolls
+      // the fixed-position panel horizontally). Pull it back in from the right
+      // as well, same 8px margin.
+      const popW = pop.offsetWidth || 300;
+      let left = rect.left;
+      if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
       pop.style.top  = Math.max(8, top) + 'px';
-      pop.style.left = Math.max(8, rect.left) + 'px';
+      pop.style.left = Math.max(8, left) + 'px';
     }
 
     // Stop ALL clicks inside the popup from bubbling to document
