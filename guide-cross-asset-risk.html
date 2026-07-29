@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cross-Asset Risk Monitor Guide: VIX, MOVE &amp; FX Impact</title>
-<meta name="description" content="VIX above 18 unwinds carry trades and lifts JPY, CHF. How VIX, MOVE, gold and yield spreads combine into a RISK-ON/RISK-OFF score, and which pairs to watch.">
+<meta name="description" content="VIX above 18 unwinds carry trades and lifts JPY, CHF. How VIX, MOVE, gold, credit spreads and yield spreads combine into a RISK-ON/RISK-OFF score, and which pairs to watch.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-cross-asset-risk.html">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://globalinvesting.github.io/guide-cross-asset-risk.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
 <meta property="og:title" content="Cross-Asset Risk Monitor Guide: VIX, MOVE, Yield Spreads and FX Impact — Global Investing">
-<meta property="og:description" content="VIX above 18 unwinds carry trades and drives JPY and CHF higher. Learn how VIX, MOVE Index, gold, SPX, and yield spreads combine into a single RISK-ON / RISK-OFF score — and which currency pairs to focus on in each regime.">
+<meta property="og:description" content="VIX above 18 unwinds carry trades and drives JPY and CHF higher. Learn how VIX, MOVE Index, gold, SPX, credit spreads, and yield spreads combine into a single RISK-ON / RISK-OFF score — and which currency pairs to focus on in each regime.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Cross-Asset Risk Monitor Guide: VIX, MOVE, Yield Spreads and FX Impact — Global Investing">
-<meta name="twitter:description" content="How VIX, MOVE index, gold, SPX, and yield spreads drive FX regime changes — and how to use the Cross-Asset Risk Monitor panel to read the current RISK-ON / RISK-OFF environment.">
+<meta name="twitter:description" content="How VIX, MOVE index, gold, SPX, credit spreads, and yield spreads drive FX regime changes — and how to use the Cross-Asset Risk Monitor panel to read the current RISK-ON / RISK-OFF environment.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -191,7 +191,7 @@ a { color: inherit; text-decoration: none; }
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": "Cross-Asset Risk Monitor Guide: VIX, MOVE, Yield Spreads and FX Impact",
-  "description": "How cross-asset signals — VIX, MOVE index, gold, SPX, and yield curve — drive FX regime changes. How to use the Cross-Asset Risk Monitor panel to read the current RISK-ON / RISK-OFF environment.",
+  "description": "How cross-asset signals — VIX, MOVE index, gold, SPX, credit spreads, and yield curve — drive FX regime changes. How to use the Cross-Asset Risk Monitor panel to read the current RISK-ON / RISK-OFF environment.",
   "image": "https://globalinvesting.github.io/og-image.png",
   "datePublished": "2026-01-20T00:00:00Z",
   "dateModified": "2026-07-11T00:00:00Z",
@@ -279,7 +279,7 @@ a { color: inherit; text-decoration: none; }
       "name": "How is the cross-asset risk score calculated in the terminal?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The cross-asset risk score is a point-based composite: VIX above 30 adds 3 points; VIX 25–30 adds 2 points; VIX 18–25 adds 1 point; VIX below 18 adds 0. Each of the following adds 1 additional point when triggered: yield curve inverted (10Y below 3M), gold up more than 2% intraday, SPX down more than 1.5% intraday, MOVE index above 100, AUD/JPY down more than 1.5% intraday, and USD/JPY down more than 1% combined with AUD/JPY down more than 0.5% (yen safe-haven bid confirmed by AUD/JPY weakness). Total score maps to a regime label: 0 = RISK-ON, 1 = MIXED, 2–3 = CAUTION, 4 or above = RISK-OFF. The maximum possible score is 9."
+        "text": "The cross-asset risk score is a point-based composite: VIX above 30 adds 3 points; VIX 25–30 adds 2 points; VIX 18–25 adds 1 point; VIX below 18 adds 0. Each of the following adds 1 additional point when triggered: yield curve inverted (10Y below 3M), gold up more than 2% intraday, SPX down more than 1.5% intraday, MOVE index above 100, AUD/JPY down more than 1.5% intraday, USD/JPY down more than 1% combined with AUD/JPY down more than 0.5% (yen safe-haven bid confirmed by AUD/JPY weakness), and HY OAS 20-day change widening more than 15bp (credit-spread stress). Total score maps to a regime label: 0 = RISK-ON, 1 = MIXED, 2–3 = CAUTION, 4 or above = RISK-OFF. The maximum possible score is 10."
       }
     }
   ]
@@ -359,6 +359,7 @@ a { color: inherit; text-decoration: none; }
     <a class="toc-item" href="#scoring-model">Scoring Model</a>
     <a class="toc-item" href="#vix">VIX — Equity Volatility</a>
     <a class="toc-item" href="#move">MOVE Index — Bond Vol</a>
+    <a class="toc-item" href="#credit">Credit Spreads — HY/IG OAS</a>
     <a class="toc-item" href="#iv">EUR/USD HV 30d</a>
     <a class="toc-item" href="#gold">Gold as Risk Signal</a>
     <a class="toc-item" href="#flows">Asset Flow Logic</a>
@@ -482,7 +483,7 @@ a { color: inherit; text-decoration: none; }
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:22px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">RISK MONITOR</span>
-          <span style="font-size:9.5px;color:var(--text3);">Volatility &amp; regime</span>
+          <span style="font-size:9.5px;color:var(--text3);">Volatility, credit &amp; regime</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
           <div style="padding:12px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
@@ -494,6 +495,16 @@ a { color: inherit; text-decoration: none; }
             <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">MOVE INDEX</div>
             <div style="font-size:22px;font-weight:700;color:var(--orange);font-family:var(--font-mono);">108</div>
             <div style="font-size:10px;color:var(--text2);margin-top:3px;">↑ +3.2 · Elevated · ICE BofA</div>
+          </div>
+          <div style="padding:12px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">US HY OAS</div>
+            <div style="font-size:22px;font-weight:700;color:var(--text);font-family:var(--font-mono);">281 bp</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:3px;">Tight · ICE BofA</div>
+          </div>
+          <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">US IG OAS</div>
+            <div style="font-size:22px;font-weight:700;color:var(--text);font-family:var(--font-mono);">81 bp</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:3px;">Tight · ICE BofA</div>
           </div>
           <div style="padding:12px 14px;border-right:1px solid var(--border);">
             <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">EUR/USD HV 30D</div>
@@ -507,13 +518,14 @@ a { color: inherit; text-decoration: none; }
           </div>
         </div>
         <div style="padding:4px 12px 0;border-top:1px solid var(--border);overflow-x:auto;">
-          <table aria-label="Cross-asset risk indicators — MOVE, HV, regime" style="width:100%;border-collapse:collapse;font-size:10px;">
+          <table aria-label="Cross-asset risk indicators — MOVE, credit, HV, regime" style="width:100%;border-collapse:collapse;font-size:10px;">
             <thead><tr style="color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:.05em;">
               <th scope="col" style="text-align:left;padding:4px 0;">Indicator</th><th scope="col" style="padding:4px 6px;">Value</th><th scope="col" style="padding:4px 6px;">Signal</th>
             </tr></thead>
             <tbody>
               <tr style="border-top:1px solid var(--border);"><td style="padding:5px 0;color:var(--text2);">US–EU Spread 10Y</td><td style="padding:5px 6px;color:var(--text2);text-align:center;font-family:var(--font-mono);">+186bp</td><td style="padding:5px 6px;color:var(--text2);text-align:center;">USD+</td></tr>
               <tr style="border-top:1px solid var(--border);"><td style="padding:5px 0;color:var(--text2);">Gold / SPX ratio</td><td style="padding:5px 6px;color:var(--text2);text-align:center;font-family:var(--font-mono);">0.74%</td><td style="padding:5px 6px;color:var(--down);text-align:center;">Risk-off</td></tr>
+              <tr style="border-top:1px solid var(--border);"><td style="padding:5px 0;color:var(--text2);">HY OAS 20d Δ</td><td style="padding:5px 6px;color:var(--text2);text-align:center;font-family:var(--font-mono);">−14bp</td><td style="padding:5px 6px;color:var(--up);text-align:center;">Narrowing (risk-on)</td></tr>
               <tr style="border-top:1px solid var(--border);"><td style="padding:5px 0;color:var(--text2);">USD/JPY vs VIX 60d</td><td style="padding:5px 6px;color:var(--text2);text-align:center;font-family:var(--font-mono);">−0.71</td><td style="padding:5px 6px;color:var(--down);text-align:center;">Correlated</td></tr>
               <tr style="border-top:1px solid var(--border);"><td style="padding:5px 0;color:var(--text2);">DXY vs SPX 60d</td><td style="padding:5px 6px;color:var(--text2);text-align:center;font-family:var(--font-mono);">−0.73</td><td style="padding:5px 6px;color:var(--text3);text-align:center;">Normal</td></tr>
               <tr style="border-top:1px solid var(--border);"><td style="padding:5px 0;color:var(--text2);">Gold vs DXY 60d</td><td style="padding:5px 6px;color:var(--text2);text-align:center;font-family:var(--font-mono);">−0.51</td><td style="padding:5px 6px;color:var(--text3);text-align:center;">Normal</td></tr>
@@ -521,6 +533,8 @@ a { color: inherit; text-decoration: none; }
           </table>
         </div>
       </div>
+
+      <p style="margin-top:-6px;font-size:12.5px;color:var(--text2);">Illustrative values above — the live panel updates in real time. Note the HY OAS 20d Δ and the HY/IG OAS levels can point in different directions at once (a spread can be historically tight in level terms while actively widening in direction), which is exactly why both the level and the 20-day change are shown separately rather than collapsed into one number.</p>
 
       <p>The Risk Monitor panel shows three volatility gauges plus five derived indicators that, together, characterize the type and severity of market stress (if any). Understanding all simultaneously is more valuable than reading any one in isolation.</p>
       <p>The two correlation rows at the bottom of the table are regime-diagnostic: <strong>DXY vs SPX 60d</strong> normally runs negative (USD weakens in risk-on environments). When it turns positive, it signals USD funding stress — both USD and equities moving together, which historically precedes sharp risk-off moves. <strong>Gold vs DXY 60d</strong> normally runs negative. When it turns positive, it means both safe havens are rallying simultaneously — typically inflation-driven or geopolitical, rather than the usual USD-strength-suppresses-gold relationship. Hover over any row for a tooltip explaining the signal context.</p>
@@ -540,6 +554,7 @@ a { color: inherit; text-decoration: none; }
           <tr><td>MOVE index</td><td>&gt; 100</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+1</td><td>Bond market stress — BofA/ICE "elevated" boundary</td></tr>
           <tr><td>AUD/JPY intraday</td><td>&lt; −1.5%</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+1</td><td>Canonical cross-asset risk barometer (JPM, Deutsche Bank, Bloomberg) — threshold calibrated to exclude routine CB-divergence noise</td></tr>
           <tr><td>USD/JPY + AUD/JPY combo</td><td>USD/JPY &lt; −1.0% <em>and</em> AUD/JPY &lt; −0.5%</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+1</td><td>Yen safe-haven bid confirmed by AUD/JPY weakness — avoids double-counting pure USD moves</td></tr>
+          <tr><td>HY OAS 20d Δ</td><td>&gt; +15bp (widening)</td><td style="text-align:center;font-family:var(--font-mono);color:var(--down);">+1</td><td>Credit-spread widening — the "silent killer" leading signal (credit stress precedes equity vol, e.g. 2007). Direction, not level, since OAS updates daily and can sit historically tight while still widening</td></tr>
         </tbody>
       </table>
       <table class="threshold-table" style="margin-top:10px;" aria-label="Regime score to label mapping">
@@ -551,7 +566,7 @@ a { color: inherit; text-decoration: none; }
           <tr><td style="font-family:var(--font-mono);">≥ 4</td><td><strong style="color:var(--down);">RISK-OFF</strong></td><td>Red — acute stress, safe-haven bid dominant</td></tr>
         </tbody>
       </table>
-      <p style="margin-top:14px;font-size:14.3px;color:var(--text2);">Maximum possible score is 9 (VIX &gt; 30 contributes 3 of these points, all other factors 1 each). The VIX component dominates intentionally — equity volatility remains the single fastest and most liquid signal of a risk regime shift. The other six factors act as confirming signals; a RISK-OFF reading on VIX alone can be upgraded by corroborating bond, gold, equity, curve, or AUD/JPY signals.</p>
+      <p style="margin-top:14px;font-size:14.3px;color:var(--text2);">Maximum possible score is 10 (VIX &gt; 30 contributes 3 of these points, all other factors 1 each). The VIX component dominates intentionally — equity volatility remains the single fastest and most liquid signal of a risk regime shift. The other seven factors act as confirming signals; a RISK-OFF reading on VIX alone can be upgraded by corroborating bond, gold, equity, curve, credit, or AUD/JPY signals. The credit factor (HY OAS 20d Δ) is the newest addition, following the same precedent set by the Kansas City Fed's RORO Index and Gilchrist &amp; Zakrajšek (2012) — institutional cross-asset risk composites treat credit spreads as a standard leg alongside equity and bond volatility, not an optional extra.</p>
     </div>
 
     <div class="guide-section" id="vix">
@@ -594,6 +609,34 @@ a { color: inherit; text-decoration: none; }
         <span class="flow-label">Both high</span>
         <span class="flow-desc" style="color:var(--text2);">Simultaneous stress in equities and bonds. The most severe scenario. USD dominates as the global liquidity currency. All other major currencies under pressure.</span>
       </div>
+    </div>
+
+    <div class="guide-section" id="credit">
+      <h2>Credit Spreads — HY/IG OAS</h2>
+      <p>The <strong>ICE BofA US High Yield</strong> (HY) and <strong>US Investment Grade</strong> (IG) Option-Adjusted Spreads (OAS) measure the extra yield corporate bonds pay over Treasuries, adjusted for embedded call options — HY for below-investment-grade issuers (BB+/Ba1 and lower), IG for investment-grade issuers (BBB-/Baa3 and higher). Together they are the standard institutional gauge of corporate credit-market stress: a distinct risk channel from equity volatility (VIX) or bond volatility (MOVE), and one that has historically <em>led</em> both into genuine credit events rather than following them.</p>
+      <p>Credit spreads are not a niche addition to cross-asset risk frameworks — they are a standard leg of them. The Kansas City Fed's Risk-On/Risk-Off (RORO) Index explicitly combines credit spreads with equity volatility, funding conditions, and FX/gold into a single score, and the underlying research (Gilchrist &amp; Zakrajšek, 2012, <em>American Economic Review</em>) finds that credit spreads drive the majority of the capital-flow effect in stress episodes — in some studies, more predictive of EM FX flows than VIX alone. CBOE and S&amp;P's "credit VIX" indices formalize the same point: credit volatility is its own dimension, not something equity vol already captures.</p>
+      <div class="callout callout-orange">
+        <div class="callout-label">Reading the level</div>
+        HY OAS below ~350bp is the historically tight zone typical of calm, risk-on markets; sustained widening past ~500bp has coincided with genuine credit-stress episodes (2015 energy HY, March 2020). IG OAS below ~100bp is tight — bottom-decile territory in the post-2009 era; widening past ~150bp signals credit conditions tightening even for higher-quality issuers.
+      </div>
+      <h3>The "Silent Killer" Pattern — Level vs. Direction</h3>
+      <p>OAS updates daily, not intraday, and can sit in a historically tight zone while still actively widening — practitioners call this divergence the "silent killer": VIX and equities stay calm while credit quietly deteriorates, a pattern that preceded the 2007 credit crisis by months. The level alone misses this; the 20-day <em>direction</em> catches it. That's why the terminal shows both: HY OAS and IG OAS as levels in the Risk Monitor grid, and <strong>HY OAS 20d Δ</strong> as a separate derived row in the indicator table below it, following the same logic as the Gold/SPX and DXY/SPX correlation rows.</p>
+      <div class="flow-row">
+        <span class="flow-arrow" style="color:var(--down);">↑</span>
+        <span class="flow-label">HY OAS widening</span>
+        <span class="flow-desc" style="color:var(--text2);">VIX calm → Credit market pricing risk that equities haven't priced yet. Early warning, not confirmation — worth monitoring for whether equity vol catches up in the following sessions.</span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-arrow" style="color:var(--down);">↑↑</span>
+        <span class="flow-label">HY OAS widening + VIX rising together</span>
+        <span class="flow-desc" style="color:var(--text2);">Confirmed cross-asset stress — credit and equity vol moving in the same direction is the higher-conviction signal. USD and JPY/CHF safe-haven bid typically strengthens.</span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-arrow" style="color:var(--up);">↓</span>
+        <span class="flow-label">HY OAS narrowing</span>
+        <span class="flow-desc" style="color:var(--text2);">Improving risk appetite alongside a low VIX confirms — rather than merely coincides with — a genuine risk-on regime, since credit and equity markets are reading the same environment.</span>
+      </div>
+      <p>The terminal's stress-scoring model adds +1 point when HY OAS 20d Δ widens more than +15bp — see the Stress Scoring Model table above. Only the direction is scored, not the absolute level, since the level moves slowly relative to the intraday factors (VIX, gold, SPX) the rest of the score is built from.</p>
     </div>
 
     <div class="guide-section" id="iv">
