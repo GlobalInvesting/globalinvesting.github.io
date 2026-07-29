@@ -2193,8 +2193,8 @@ function attachRiskMonitorTooltips() {
   const regCell = document.querySelector('#section-risk .risk-cell:nth-child(6)');
   if (regCell) attachRiskTip(regCell,
     'Market Regime',
-    'Composite live assessment: VIX level (primary driver), yield curve shape, gold intraday demand (>2% = stress signal), S&P 500 daily move (< -1.5% = stress), MOVE index (>100 = elevated per BofA/ICE), AUD/JPY intraday move (the canonical cross-asset risk barometer — sharp selloff >-1.5% = risk-off signal), and USD/JPY (yen safe-haven bid). Updates in real time.',
-    'RISK-ON: VIX <18, no stress signals active. MIXED: 1 stress factor (e.g. VIX 18–25). CAUTION: 2–3 factors. RISK-OFF: 4+ factors — high stress, USD/JPY/CHF bid, equities sold. Note: AUD/USD and NZD/USD falling modestly in isolation is normal when CBs diverge (RBA/RBNZ cuts) — AUD/JPY captures risk sentiment more cleanly.'
+    'Composite live assessment: VIX level (primary driver), yield curve shape, gold intraday demand (>2% = stress signal), S&P 500 daily move (< -1.5% = stress), MOVE index (>100 = elevated per BofA/ICE), AUD/JPY intraday move (the canonical cross-asset risk barometer — sharp selloff >-1.5% = risk-off signal), USD/JPY (yen safe-haven bid), and HY OAS 20-day change (>+15bp widening = credit-market stress, often leads equity vol). Updates in real time.',
+    'RISK-ON: VIX <18, no stress signals active. MIXED: 1 stress factor (e.g. VIX 18–25, or credit spreads widening while VIX stays calm). CAUTION: 2–3 factors. RISK-OFF: 4+ factors — high stress, USD/JPY/CHF bid, equities sold. Note: AUD/USD and NZD/USD falling modestly in isolation is normal when CBs diverge (RBA/RBNZ cuts) — AUD/JPY captures risk sentiment more cleanly.'
   );
 
   // ── Risk Indicators table rows ───────────────────────────────────
@@ -2212,7 +2212,7 @@ function attachRiskMonitorTooltips() {
     },
     {
       title: 'HY OAS 20-day Change',
-      body:  'Change in the ICE BofA US High Yield Option-Adjusted Spread over the last ~20 trading days. Captures direction, not just level — spreads can be historically tight yet still be widening, which the level alone would miss.',
+      body:  'Change in the ICE BofA US High Yield Option-Adjusted Spread over the last ~20 trading days. Captures direction, not just level — spreads can be historically tight yet still be widening, which the level alone would miss. Widening >15bp feeds into the Regime score above as a stress point.',
       ex:    'Widening (positive Δ) while equities are calm is often an early credit-market warning that leads risk-off moves in FX by weeks. Narrowing confirms improving risk appetite alongside a low VIX.'
     },
     {
@@ -2650,6 +2650,13 @@ async function renderRiskData(byId) {
     // USD/JPY falling sharply (>-1%) = yen safe-haven bid = confirms risk-off.
     // Only add if AUD/JPY also weak to avoid double-counting pure USD moves.
     if (byId.usdjpy && byId.usdjpy.pct < -1.0 && byId.audjpy && byId.audjpy.pct < -0.5) stressScore += 1;
+    // HY OAS 20d Δ widening (>15bp) = credit-spread stress — the "silent killer" leading
+    // signal (credit stress precedes equity vol, e.g. 2007). Direction, not level: OAS
+    // updates daily (not intraday) and can sit historically tight while still widening.
+    // Industry precedent: KC Fed RORO Index, Gilchrist-Zakrajšek (2012) — credit spreads
+    // are a standard leg of cross-asset risk-regime composites, often as/more predictive
+    // than VIX alone. Added v8.72.0.
+    if (byId.hyOasDelta20d != null && byId.hyOasDelta20d > 15) stressScore += 1;
 
     let regime, regimeSub;
     if (stressScore >= 4)      { regime = 'RISK-OFF'; regimeSub = `High stress · VIX ${vix.toFixed(1)}`; }

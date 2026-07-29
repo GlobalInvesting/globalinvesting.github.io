@@ -202,7 +202,7 @@ test('cross with missing leg → null', () => {
 
 // ─── 4. Stress scoring / regime ──────────────────────────────────────────────
 
-function computeStressScore({ vix, isInverted, goldPct, spxPct, move }) {
+function computeStressScore({ vix, isInverted, goldPct, spxPct, move, hyOasDelta20d = 0 }) {
   let score = 0;
   if (vix > 30)      score += 3;
   else if (vix > 25) score += 2;
@@ -211,6 +211,7 @@ function computeStressScore({ vix, isInverted, goldPct, spxPct, move }) {
   if (goldPct > 1.0) score += 1;
   if (spxPct < -0.5) score += 1;
   if (move > 120)    score += 1;
+  if (hyOasDelta20d > 15) score += 1;
   return score;
 }
 
@@ -297,10 +298,34 @@ test('Gold 1.01% → +1 score', () => {
   expect(s).toBe(1);
 });
 
-test('All factors max → score 7 → RISK-OFF', () => {
-  const s = computeStressScore({ vix: 35, isInverted: true, goldPct: 4, spxPct: -2, move: 160 });
-  expect(s).toBe(7);
+test('All factors max → score 8 → RISK-OFF (incl. HY OAS 20d Δ +40bp)', () => {
+  const s = computeStressScore({ vix: 35, isInverted: true, goldPct: 4, spxPct: -2, move: 160, hyOasDelta20d: 40 });
+  expect(s).toBe(8);
   expect(scoreToRegime(s)).toBe('RISK-OFF');
+});
+
+test('HY OAS 20d Δ +15bp exactly → no score (boundary: >15 triggers)', () => {
+  const s = computeStressScore({ vix: 15, isInverted: false, goldPct: 0, spxPct: 0, move: 80, hyOasDelta20d: 15 });
+  expect(s).toBe(0);
+  expect(scoreToRegime(s)).toBe('RISK-ON');
+});
+
+test('HY OAS 20d Δ +15.01bp → +1 score (just above threshold)', () => {
+  const s = computeStressScore({ vix: 15, isInverted: false, goldPct: 0, spxPct: 0, move: 80, hyOasDelta20d: 15.01 });
+  expect(s).toBe(1);
+  expect(scoreToRegime(s)).toBe('MIXED');
+});
+
+test('HY OAS 20d Δ narrowing (-30bp) → no score (only widening counts)', () => {
+  const s = computeStressScore({ vix: 15, isInverted: false, goldPct: 0, spxPct: 0, move: 80, hyOasDelta20d: -30 });
+  expect(s).toBe(0);
+  expect(scoreToRegime(s)).toBe('RISK-ON');
+});
+
+test('HY OAS 20d Δ +40bp alone (calm VIX/equity) → MIXED (score 1, "silent killer" credit-only stress)', () => {
+  const s = computeStressScore({ vix: 15, isInverted: false, goldPct: 0, spxPct: 0, move: 80, hyOasDelta20d: 40 });
+  expect(s).toBe(1);
+  expect(scoreToRegime(s)).toBe('MIXED');
 });
 
 // ─── 5. localizeSignalTime ───────────────────────────────────────────────────
