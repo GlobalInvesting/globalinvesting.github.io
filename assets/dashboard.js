@@ -4484,14 +4484,42 @@ async function _renderLWChart(ohlcId, label) {
     return window._lwDrawings[_drawSymKey];
   }
 
-  let _drawMode      = null;  // null | 'trend' | 'fib' | 'rect'
-  let _drawAnchor    = null;  // {time, price} — drag-start point
-  let _drawLiveEnd   = null;  // {time, price} — live drag-end point, updated on every move
-  let _isDragging    = false;
+  let _drawMode      = null;  // null | 'trend' | 'fib' | 'rect'  (creation tool armed)
+  let _drawAnchor    = null;  // {time, price} — drag-start point (creation)
+  let _drawLiveEnd   = null;  // {time, price} — live drag-end point, updated on every move (creation)
+  let _isDragging    = false; // true while creating a new shape
   let _drawOverlay   = null;  // SVG overlay element
   let _drawRafId     = null;
 
+  // Selection / move / resize state — industry-standard interaction (TradingView/
+  // MT5/Bloomberg): a plain click SELECTS an object (never deletes it), dragging
+  // its body MOVES it, dragging an endpoint handle RESIZES it. Deletion and color
+  // live in a floating toolbar shown above the selection, never on click.
+  let _selectedIdx   = -1;    // index into _curDrawings() of the selected object, or -1
+  let _dragMode      = null;  // null | 'move' | 'resize-p1' | 'resize-p2'
+  let _dragStartPx   = null;  // {x, y} pixel position where the move-drag started
+  let _dragOrigP1    = null;  // baseline p1 at move-drag start (for delta translation)
+  let _dragOrigP2    = null;  // baseline p2 at move-drag start
+  let _drawToolbarEl = null;  // floating color/delete toolbar DOM node
+  const _HANDLE_R    = 8;     // px hit-radius for endpoint resize handles
+
+  // Remove any toolbar left over from a previous render pass (symbol/timeframe
+  // switch) — selection state resets to -1 on every rebuild of this block, so a
+  // stale toolbar node would otherwise be orphaned with no owner to hide it.
+  (function _cleanupStaleToolbar() {
+    const stale = document.getElementById('_lw-draw-toolbar');
+    if (stale) stale.remove();
+  })();
+
   const _DRAW_COLORS = { trend: 'rgba(79,127,255,0.9)', fib: 'rgba(255,193,7,0.9)', rect: 'rgba(126,211,138,0.9)' };
+  const _SWATCH_COLORS = [
+    'rgba(79,127,255,0.9)',   // blue
+    'rgba(255,193,7,0.9)',    // amber
+    'rgba(126,211,138,0.9)',  // green
+    'rgba(255,99,99,0.9)',    // red
+    'rgba(186,133,255,0.9)',  // purple
+    'rgba(235,235,235,0.9)',  // white/gray
+  ];
 
   // Standard Fibonacci retracement ratios (TradingView/MT default set)
   const FIB_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
@@ -4519,23 +4547,29 @@ async function _renderLWChart(ohlcId, label) {
   }
 
   // Builds the SVG markup for one drawing (or a live in-progress preview).
-  function _svgForDrawing(d, isPreview) {
+  // isSelected adds a soft outer glow so the active selection reads clearly
+  // against the busy chart background — the actual grab handles are drawn
+  // separately by _svgHandles so they stay on top of everything.
+  function _svgForDrawing(d, isPreview, isSelected) {
     const ts = _lwChart.timeScale();
     const x1 = ts.timeToCoordinate(d.p1.time), x2 = ts.timeToCoordinate(d.p2.time);
     const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
     if (x1 == null || x2 == null || y1 == null || y2 == null) return '';
     const col = d.color || _DRAW_COLORS[d.type] || _DRAW_COLORS.trend;
     const previewDash = isPreview ? ' stroke-dasharray="3,3"' : '';
+    const selW = isSelected ? 1 : 0; // extra stroke-width added when selected
     let svg = '';
     if (d.type === 'trend') {
-      svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1.5"${previewDash}/>`;
+      if (isSelected) svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#fff" stroke-width="5" opacity="0.18"/>`;
+      svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="${(1.5 + selW).toFixed(1)}"${previewDash}/>`;
       svg += `<circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="3" fill="${col}"/>`;
       svg += `<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3" fill="${col}"/>`;
     } else if (d.type === 'rect') {
       const rx = Math.min(x1, x2), ry = Math.min(y1, y2);
       const rw = Math.abs(x2 - x1), rh = Math.abs(y2 - y1);
       const fillCol = col.replace(/[\d.]+\)$/, '0.14)');
-      svg += `<rect x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}" fill="${fillCol}" stroke="${col}" stroke-width="1.25"${previewDash}/>`;
+      if (isSelected) svg += `<rect x="${(rx-2).toFixed(1)}" y="${(ry-2).toFixed(1)}" width="${(rw+4).toFixed(1)}" height="${(rh+4).toFixed(1)}" fill="none" stroke="#fff" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>`;
+      svg += `<rect x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}" fill="${fillCol}" stroke="${col}" stroke-width="${(1.25 + selW).toFixed(2)}"${previewDash}/>`;
     } else if (d.type === 'fib') {
       // Diagonal swing guide (dashed, low-opacity — the levels below are the point).
       svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4,3" opacity="0.55"/>`;
@@ -4563,19 +4597,42 @@ async function _renderLWChart(ohlcId, label) {
     return svg;
   }
 
+  // Two square grab handles at p1/p2 for the selected object — dragging either
+  // one reshapes that endpoint (resize); dragging the shape body between them
+  // moves the whole object. Drawn last so they stay visually on top.
+  function _svgHandles(d) {
+    if (!d) return '';
+    const ts = _lwChart.timeScale();
+    const x1 = ts.timeToCoordinate(d.p1.time), y1 = candleSeries.priceToCoordinate(d.p1.price);
+    const x2 = ts.timeToCoordinate(d.p2.time), y2 = candleSeries.priceToCoordinate(d.p2.price);
+    if (x1 == null || y1 == null || x2 == null || y2 == null) return '';
+    const hs = 5;
+    let svg = '';
+    [[x1, y1], [x2, y2]].forEach(([hx, hy]) => {
+      svg += `<rect x="${(hx - hs).toFixed(1)}" y="${(hy - hs).toFixed(1)}" width="${hs * 2}" height="${hs * 2}" `
+           + `fill="var(--bg,#131722)" stroke="#ffffff" stroke-width="1.5" rx="1.5"/>`;
+    });
+    return svg;
+  }
+
   function _renderDrawings() {
     if (_drawRafId) cancelAnimationFrame(_drawRafId);
     _drawRafId = requestAnimationFrame(() => {
       _drawRafId = null;
       if (!_drawOverlay || !_lwChart) return;
       let svg = '';
-      _curDrawings().forEach(d => { try { svg += _svgForDrawing(d, false); } catch(_) {} });
+      const arr = _curDrawings();
+      arr.forEach((d, i) => { try { svg += _svgForDrawing(d, false, i === _selectedIdx); } catch(_) {} });
       if (_isDragging && _drawAnchor && _drawLiveEnd) {
         try {
-          svg += _svgForDrawing({ type: _drawMode, p1: _drawAnchor, p2: _drawLiveEnd, color: _DRAW_COLORS[_drawMode] }, true);
+          svg += _svgForDrawing({ type: _drawMode, p1: _drawAnchor, p2: _drawLiveEnd, color: _DRAW_COLORS[_drawMode] }, true, false);
         } catch(_) {}
       }
+      if (_selectedIdx >= 0 && arr[_selectedIdx] && !_isDragging) {
+        try { svg += _svgHandles(arr[_selectedIdx]); } catch(_) {}
+      }
       _drawOverlay.innerHTML = svg;
+      if (_selectedIdx >= 0) _positionDrawToolbar();
     });
   }
 
@@ -4633,6 +4690,128 @@ async function _renderLWChart(ohlcId, label) {
     return -1;
   }
 
+  // Which endpoint handle (if any) of the given drawing sits under x,y —
+  // checked before body hit-testing so a resize grab always wins over a move.
+  function _hitTestHandle(idx, x, y) {
+    const d = _curDrawings()[idx];
+    if (!d) return null;
+    const ts = _lwChart.timeScale();
+    const x1 = ts.timeToCoordinate(d.p1.time), y1 = candleSeries.priceToCoordinate(d.p1.price);
+    const x2 = ts.timeToCoordinate(d.p2.time), y2 = candleSeries.priceToCoordinate(d.p2.price);
+    if (x1 != null && y1 != null && Math.hypot(x - x1, y - y1) <= _HANDLE_R) return 'p1';
+    if (x2 != null && y2 != null && Math.hypot(x - x2, y - y2) <= _HANDLE_R) return 'p2';
+    return null;
+  }
+
+  // ── Floating selection toolbar — color swatches + delete. Shown above the
+  // selected object (below it if there's no room above), never as a click
+  // action on the object itself, per industry convention. ────────────────────
+  function _hideDrawToolbar() {
+    if (_drawToolbarEl) { _drawToolbarEl.remove(); _drawToolbarEl = null; }
+  }
+
+  function _positionDrawToolbar() {
+    if (!_drawToolbarEl || _selectedIdx < 0) return;
+    const d = _curDrawings()[_selectedIdx];
+    if (!d) return;
+    const ts = _lwChart.timeScale();
+    const x1 = ts.timeToCoordinate(d.p1.time), y1 = candleSeries.priceToCoordinate(d.p1.price);
+    const x2 = ts.timeToCoordinate(d.p2.time), y2 = candleSeries.priceToCoordinate(d.p2.price);
+    if (x1 == null || y1 == null || x2 == null || y2 == null) return;
+    const rect = chartDiv.getBoundingClientRect();
+    const midX = (x1 + x2) / 2;
+    const topY = Math.min(y1, y2);
+    const bottomY = Math.max(y1, y2);
+    const barW = _drawToolbarEl.offsetWidth || 200;
+    const barH = _drawToolbarEl.offsetHeight || 32;
+    let top = rect.top + topY - barH - 10;
+    if (top < 8) top = rect.top + bottomY + 10; // flip below if no room above
+    let left = rect.left + midX - barW / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - barW - 8));
+    _drawToolbarEl.style.left = left + 'px';
+    _drawToolbarEl.style.top  = top + 'px';
+  }
+
+  function _showDrawToolbar() {
+    _hideDrawToolbar();
+    if (_selectedIdx < 0) return;
+    const d = _curDrawings()[_selectedIdx];
+    if (!d) return;
+
+    const bar = document.createElement('div');
+    bar.id = '_lw-draw-toolbar';
+    bar.style.cssText = [
+      'position:fixed;z-index:9999;display:flex;align-items:center;gap:6px;',
+      'background:var(--head-bg);border:1px solid var(--border);border-radius:6px;',
+      'box-shadow:0 8px 32px rgba(0,0,0,.7);padding:5px 7px;',
+    ].join('');
+
+    _SWATCH_COLORS.forEach(c => {
+      const sw = document.createElement('button');
+      sw.type = 'button';
+      sw.title = 'Color';
+      sw.style.cssText = 'width:14px;height:14px;border-radius:50%;cursor:pointer;padding:0;'
+        + `background:${c};border:1px solid rgba(255,255,255,0.25);`
+        + (d.color === c ? 'outline:2px solid var(--text,#e8e8e8);outline-offset:1px;' : '');
+      sw.addEventListener('click', e => {
+        e.stopPropagation();
+        d.color = c;
+        _saveDrawings();
+        _renderDrawings();
+        _showDrawToolbar();
+      });
+      bar.appendChild(sw);
+    });
+
+    // Custom color — native color picker so any exact shade is available,
+    // not just the six presets.
+    const customWrap = document.createElement('label');
+    customWrap.title = 'Custom color';
+    customWrap.style.cssText = 'width:14px;height:14px;border-radius:50%;border:1px dashed var(--text3);'
+      + 'position:relative;display:inline-block;cursor:pointer;overflow:hidden;';
+    const customInput = document.createElement('input');
+    customInput.type = 'color';
+    customInput.style.cssText = 'position:absolute;inset:-4px;width:22px;height:22px;border:none;padding:0;cursor:pointer;opacity:0;';
+    customInput.addEventListener('input', e => {
+      const hex = e.target.value;
+      const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+      d.color = `rgba(${r},${g},${b},0.9)`;
+      _saveDrawings();
+      _renderDrawings();
+    });
+    customWrap.appendChild(customInput);
+    bar.appendChild(customWrap);
+
+    const divider = document.createElement('div');
+    divider.style.cssText = 'width:1px;height:16px;background:var(--border);margin:0 2px;';
+    bar.appendChild(divider);
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.title = 'Delete';
+    del.style.cssText = 'width:20px;height:20px;border:none;background:transparent;color:var(--text3);'
+      + 'cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px;';
+    del.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-.87 13.14A2 2 0 0 1 16.14 21H7.86a2 2 0 0 1-1.99-1.86L5 6"/></svg>';
+    del.addEventListener('mouseenter', () => { del.style.background = 'rgba(255,99,99,0.15)'; del.style.color = '#ff6363'; });
+    del.addEventListener('mouseleave', () => { del.style.background = 'transparent'; del.style.color = 'var(--text3)'; });
+    del.addEventListener('click', e => {
+      e.stopPropagation();
+      _curDrawings().splice(_selectedIdx, 1);
+      _selectedIdx = -1;
+      _saveDrawings();
+      _renderDrawings();
+      _hideDrawToolbar();
+    });
+    bar.appendChild(del);
+
+    bar.addEventListener('mousedown', e => e.stopPropagation());
+    bar.addEventListener('click', e => e.stopPropagation());
+
+    document.body.appendChild(bar);
+    _drawToolbarEl = bar;
+    _positionDrawToolbar();
+  }
+
   function _cancelDrawMode() {
     _drawMode = null; _drawAnchor = null; _drawLiveEnd = null; _isDragging = false;
     _setChartPannable(true);
@@ -4660,12 +4839,18 @@ async function _renderLWChart(ohlcId, label) {
   // no dependency on crosshairMove firing at all; (2) `pointerdown` is
   // registered on the CAPTURE phase, so panning is disabled before LWC's
   // own target-phase handler ever sees the event.
-  function _drawPointToTP(clientX, clientY) {
+  function _clientToPixel(clientX, clientY) {
     try {
       const rect = chartDiv.getBoundingClientRect();
-      const x = clientX - rect.left, y = clientY - rect.top;
-      const time  = _lwChart.timeScale().coordinateToTime(x);
-      const price = candleSeries.coordinateToPrice(y);
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    } catch(_) { return null; }
+  }
+  function _drawPointToTP(clientX, clientY) {
+    const px = _clientToPixel(clientX, clientY);
+    if (!px) return null;
+    try {
+      const time  = _lwChart.timeScale().coordinateToTime(px.x);
+      const price = candleSeries.coordinateToPrice(px.y);
       if (time == null || price == null) return null;
       return { time, price };
     } catch(_) { return null; }
@@ -4674,17 +4859,58 @@ async function _renderLWChart(ohlcId, label) {
   // Press-and-drag to draw: pointerdown arms the anchor, pointermove updates
   // the live preview continuously, pointerup (anywhere, even released outside
   // the chart) commits the shape — the same click-drag convention as
-  // TradingView/MT5. A plain click-to-delete still works when no tool is
-  // armed (handled separately below via subscribeClick).
+  // TradingView/MT5. When no tool is armed, this same pointerdown handler
+  // instead drives selection/move/resize of an existing object (see below) —
+  // a plain click never deletes anything.
   chartDiv.addEventListener('pointerdown', e => {
-    if (!_drawMode) return;
-    const pt = _drawPointToTP(e.clientX, e.clientY);
-    if (!pt) return;
-    _drawAnchor  = pt;
-    _drawLiveEnd = pt;
-    _isDragging  = true;
-    _setChartPannable(false); // must run before this event reaches LWC's own handler — see capture:true below
-    try { e.preventDefault(); } catch(_) {}
+    if (_drawMode) {
+      const pt = _drawPointToTP(e.clientX, e.clientY);
+      if (!pt) return;
+      _drawAnchor  = pt;
+      _drawLiveEnd = pt;
+      _isDragging  = true;
+      _setChartPannable(false); // must run before this event reaches LWC's own handler — see capture:true below
+      try { e.preventDefault(); } catch(_) {}
+      return;
+    }
+
+    // No tool armed: this is a selection / move / resize gesture, not creation.
+    const px = _clientToPixel(e.clientX, e.clientY);
+    if (!px) return;
+    const arr = _curDrawings();
+
+    // A handle on the current selection always wins over a body/move grab.
+    if (_selectedIdx >= 0 && arr[_selectedIdx]) {
+      const handle = _hitTestHandle(_selectedIdx, px.x, px.y);
+      if (handle) {
+        _dragMode = 'resize-' + handle;
+        _setChartPannable(false);
+        try { e.preventDefault(); } catch(_) {}
+        return;
+      }
+    }
+
+    const hitIdx = _hitTestDrawing(px.x, px.y);
+    if (hitIdx >= 0) {
+      // Select (switching selection if a different object was hit) and arm a
+      // move-drag in the same gesture — a plain click with no movement simply
+      // leaves the object selected, matching TradingView/MT5 behavior.
+      _selectedIdx = hitIdx;
+      _dragMode    = 'move';
+      _dragStartPx = px;
+      _dragOrigP1  = { time: arr[hitIdx].p1.time, price: arr[hitIdx].p1.price };
+      _dragOrigP2  = { time: arr[hitIdx].p2.time, price: arr[hitIdx].p2.price };
+      _setChartPannable(false);
+      _renderDrawings();
+      _showDrawToolbar();
+      try { e.preventDefault(); } catch(_) {}
+    } else if (_selectedIdx >= 0) {
+      // Clicked empty space — deselect and let the click behave normally
+      // (chart panning is untouched, since we never disabled it here).
+      _selectedIdx = -1;
+      _renderDrawings();
+      _hideDrawToolbar();
+    }
   }, true); // capture phase — runs ahead of LWC's own mousedown/pan handling
 
   // Global pointermove: de-duplicated document-level listener (same reasoning
@@ -4692,11 +4918,38 @@ async function _renderLWChart(ohlcId, label) {
   // briefly leaves the chart bounds mid-drag.
   if (window._lwDrawDocPointerMove) document.removeEventListener('pointermove', window._lwDrawDocPointerMove);
   window._lwDrawDocPointerMove = function(e) {
-    if (!_isDragging) return;
-    const pt = _drawPointToTP(e.clientX, e.clientY);
-    if (!pt) return;
-    _drawLiveEnd = pt;
-    _renderDrawings();
+    if (_isDragging) {
+      const pt = _drawPointToTP(e.clientX, e.clientY);
+      if (!pt) return;
+      _drawLiveEnd = pt;
+      _renderDrawings();
+      return;
+    }
+    if (!_dragMode || _selectedIdx < 0) return;
+    const d = _curDrawings()[_selectedIdx];
+    if (!d) { _dragMode = null; return; }
+    const ts = _lwChart.timeScale();
+    if (_dragMode === 'move') {
+      const px = _clientToPixel(e.clientX, e.clientY);
+      if (!px || !_dragStartPx || !_dragOrigP1 || !_dragOrigP2) return;
+      // Translate in pixel space, then convert back — avoids arithmetic on
+      // BusinessDay time objects (D1/W1/MN), which aren't numeric.
+      const ox1 = ts.timeToCoordinate(_dragOrigP1.time), oy1 = candleSeries.priceToCoordinate(_dragOrigP1.price);
+      const ox2 = ts.timeToCoordinate(_dragOrigP2.time), oy2 = candleSeries.priceToCoordinate(_dragOrigP2.price);
+      if (ox1 == null || oy1 == null || ox2 == null || oy2 == null) return;
+      const dx = px.x - _dragStartPx.x, dy = px.y - _dragStartPx.y;
+      const nt1 = ts.coordinateToTime(ox1 + dx), np1 = candleSeries.coordinateToPrice(oy1 + dy);
+      const nt2 = ts.coordinateToTime(ox2 + dx), np2 = candleSeries.coordinateToPrice(oy2 + dy);
+      if (nt1 == null || np1 == null || nt2 == null || np2 == null) return;
+      d.p1 = { time: nt1, price: np1 };
+      d.p2 = { time: nt2, price: np2 };
+      _renderDrawings();
+    } else if (_dragMode === 'resize-p1' || _dragMode === 'resize-p2') {
+      const pt = _drawPointToTP(e.clientX, e.clientY);
+      if (!pt) return;
+      if (_dragMode === 'resize-p1') d.p1 = pt; else d.p2 = pt;
+      _renderDrawings();
+    }
   };
   document.addEventListener('pointermove', window._lwDrawDocPointerMove);
 
@@ -4705,6 +4958,15 @@ async function _renderLWChart(ohlcId, label) {
   // chart (symbol/timeframe switch) doesn't accumulate stale listeners.
   if (window._lwDrawDocPointerUp) document.removeEventListener('pointerup', window._lwDrawDocPointerUp);
   window._lwDrawDocPointerUp = function(e) {
+    if (_dragMode) {
+      _dragMode = null;
+      _dragStartPx = null; _dragOrigP1 = null; _dragOrigP2 = null;
+      _setChartPannable(true);
+      _saveDrawings();
+      _renderDrawings();
+      if (_selectedIdx >= 0) _positionDrawToolbar();
+      return;
+    }
     if (!_isDragging) return;
     _isDragging = false;
     _setChartPannable(true);
@@ -4738,24 +5000,30 @@ async function _renderLWChart(ohlcId, label) {
   // Esc cancels an armed (or mid-drag) tool without drawing anything —
   // same de-duplication approach as the pointerup listener above.
   if (window._lwDrawEscHandler) document.removeEventListener('keydown', window._lwDrawEscHandler);
-  window._lwDrawEscHandler = function(e) { if (e.key === 'Escape' && _drawMode) _cancelDrawMode(); };
-  document.addEventListener('keydown', window._lwDrawEscHandler);
-
-  // Chart click: click-to-delete a drawing when no tool is armed. Creation now
-  // happens via press-and-drag above, so clicks are ignored while a tool is
-  // armed (that click is either the drag's own release, already handled by
-  // pointerup, or a too-short tap that pointerup already discarded).
-  function _onChartClick(param) {
-    if (_drawMode) return;
-    if (!param.point) return;
-    const idx = _hitTestDrawing(param.point.x, param.point.y);
-    if (idx >= 0) {
-      _curDrawings().splice(idx, 1);
+  window._lwDrawEscHandler = function(e) {
+    if (e.key === 'Escape') {
+      if (_drawMode) { _cancelDrawMode(); return; }
+      if (_selectedIdx >= 0) { _selectedIdx = -1; _renderDrawings(); _hideDrawToolbar(); }
+      return;
+    }
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (_selectedIdx < 0) return;
+      // Don't hijack the key while the user is typing somewhere else on the page.
+      const tag = (e.target && e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) return;
+      _curDrawings().splice(_selectedIdx, 1);
+      _selectedIdx = -1;
       _saveDrawings();
       _renderDrawings();
+      _hideDrawToolbar();
     }
-  }
-  _lwChart.subscribeClick(_onChartClick);
+  };
+  document.addEventListener('keydown', window._lwDrawEscHandler);
+
+  // Selection now lives entirely in the pointerdown handler above (which also
+  // covers move/resize); a plain chart click never deletes a drawing anymore —
+  // deletion is only available via the floating toolbar's trash icon or the
+  // Delete/Backspace key above.
 
   // Draw menu — mirrors the Indicators dropdown UX pattern for consistency
   let _drawDropdownOpen = false;
@@ -4792,21 +5060,31 @@ async function _renderLWChart(ohlcId, label) {
       pop.appendChild(row);
     }
     _addOption('Trend Line', 'Click and drag on the chart', () => {
-      _drawMode = 'trend'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState();
+      _selectedIdx = -1; _hideDrawToolbar();
+      _drawMode = 'trend'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState(); _renderDrawings();
     });
     _addOption('Fibonacci Retracement', 'Drag from the swing start to the swing end', () => {
-      _drawMode = 'fib'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState();
+      _selectedIdx = -1; _hideDrawToolbar();
+      _drawMode = 'fib'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState(); _renderDrawings();
     });
     _addOption('Rectangle', 'Drag to mark a price/time zone', () => {
-      _drawMode = 'rect'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState();
+      _selectedIdx = -1; _hideDrawToolbar();
+      _drawMode = 'rect'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState(); _renderDrawings();
     });
     if (_curDrawings().length > 0) {
       _addOption('Clear All Drawings', `Remove ${_curDrawings().length} drawing(s) on this chart`, () => {
         window._lwDrawings[_drawSymKey] = [];
+        _selectedIdx = -1;
+        _hideDrawToolbar();
         _saveDrawings();
         _renderDrawings();
       });
     }
+
+    const footer = document.createElement('div');
+    footer.style.cssText = 'padding:6px 12px;color:var(--text3);font-size:9px;line-height:1.4;border-top:1px solid rgba(42,46,57,0.3);';
+    footer.textContent = 'Click a drawing to select it. Drag its body to move, drag an endpoint to resize. Color and delete appear in a toolbar above the selection.';
+    pop.appendChild(footer);
 
     document.body.appendChild(pop);
     if (btn) {
