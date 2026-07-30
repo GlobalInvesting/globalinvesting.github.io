@@ -3064,7 +3064,22 @@ const _OHLC_FULL_NAMES = {
   silver:'Silver Futures', brent:'Crude Oil Brent Futures',
   dax:'DAX Performance Index', ftse:'FTSE 100 Index',
   hsi:'Hang Seng Index', dji:'Dow Jones Industrial Average',
+  usdnok:'U.S. Dollar / Norwegian Krone', usdsek:'U.S. Dollar / Swedish Krona',
+  eurnok:'Euro / Norwegian Krone', eursek:'Euro / Swedish Krona',
+  move:'ICE BofA MOVE Index',
+  hyoas:'ICE BofA US High Yield Index OAS', igoas:'ICE BofA US Corporate Index OAS',
 };
+
+// Symbols with no genuine intraday range — a single daily print from the source
+// (FRED for us10y/hyoas/igoas), so any "candle"/"bar" would be a synthetic flat-body
+// construction (open=prior close, high/low=min/max(open,close)), not real price action.
+// Matches the existing TradingView-fallback convention (_LINE_STYLE_SYMS below) — Area
+// is forced regardless of the user's globally-persisted chart-type selection, and the
+// Candle/Bar buttons are disabled while one of these is the active symbol.
+const _AREA_ONLY_IDS = new Set(['us10y', 'hyoas', 'igoas']);
+function _effectiveChartType(ohlcId) {
+  return _AREA_ONLY_IDS.has(ohlcId) ? 'area' : (window._lwChartType || 'candle');
+}
 
 const _TV_TO_OHLC = {
   'FX_IDC:EURUSD': 'eurusd',  'FX_IDC:USDJPY': 'usdjpy',
@@ -3543,7 +3558,7 @@ function _lwUpdateTodayBar() {
 
     const _liveBar = { time: _blockTs, open: _o, high: _h2, low: _l2, close: _c };
     try {
-      const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
+      const _isLA = (_effectiveChartType(_lwActiveOhlcId) === 'line' || _effectiveChartType(_lwActiveOhlcId) === 'area');
       _lwCandleSeries.update(_isLA ? { time: _blockTs, value: _c } : _liveBar);
     } catch(_) {}
 
@@ -3572,7 +3587,7 @@ function _lwUpdateTodayBar() {
   if (!bar) return;
   try {
     // Line/Area series use {time, value} -- not OHLC format
-    const isLineArea = (window._lwChartType === 'line' || window._lwChartType === 'area');
+    const isLineArea = (_effectiveChartType(_lwActiveOhlcId) === 'line' || _effectiveChartType(_lwActiveOhlcId) === 'area');
     _lwCandleSeries.update(isLineArea ? { time: bar.time, value: bar.close } : bar);
   } catch(_) {}
 
@@ -4122,11 +4137,22 @@ async function _renderLWChart(ohlcId, label) {
   // zero reference). State persisted in window._lwChartType across symbol switches.
   if (typeof window._lwChartType === 'undefined') window._lwChartType = 'candle';
 
+  // Symbols in _AREA_ONLY_IDS (us10y, hyoas, igoas) have no genuine intraday range —
+  // force Area regardless of the globally-persisted selection, and disable Candle/Bar
+  // so the buttons can't produce a synthetic flat-body "candle" from a single daily print.
+  const _isAreaOnlyId = _AREA_ONLY_IDS.has(ohlcId);
+  const _chartType = _effectiveChartType(ohlcId);
+
   // Sync TYPE button state on render
   document.querySelectorAll('[data-chart-type]').forEach(btn => {
-    const isActive = btn.dataset.chartType === window._lwChartType;
+    const _isCandleOrBar = (btn.dataset.chartType === 'candle' || btn.dataset.chartType === 'bar');
+    const isActive = btn.dataset.chartType === _chartType;
     btn.classList.toggle('sel', isActive);
     btn.classList.remove('on');
+    btn.disabled = _isAreaOnlyId && _isCandleOrBar;
+    btn.title = (_isAreaOnlyId && _isCandleOrBar)
+      ? 'Not available — this series has one print per day, no intraday range'
+      : '';
   });
 
   // Helper: convert OHLC bars to close-only for line/area
@@ -4135,7 +4161,7 @@ async function _renderLWChart(ohlcId, label) {
   let candleSeries;
   const _priceFormat = { type: 'price', precision: dec, minMove };
 
-  if (window._lwChartType === 'bar') {
+  if (_chartType === 'bar') {
     // Bar (OHLC) series — same data as candlestick, different visual
     if (typeof LWC.BarSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.BarSeries, {
@@ -4150,7 +4176,7 @@ async function _renderLWChart(ohlcId, label) {
       });
     }
     candleSeries.setData(bars);
-  } else if (window._lwChartType === 'line') {
+  } else if (_chartType === 'line') {
     // Line series — close prices only
     if (typeof LWC.LineSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.LineSeries, {
@@ -4163,7 +4189,7 @@ async function _renderLWChart(ohlcId, label) {
       candleSeries = _lwChart.addLineSeries({ color: _themeColor('--chart-line'), lineWidth: 2, priceFormat: _priceFormat });
     }
     candleSeries.setData(closeBars);
-  } else if (window._lwChartType === 'area') {
+  } else if (_chartType === 'area') {
     // Area series — close prices with gradient fill
     if (typeof LWC.AreaSeries !== 'undefined') {
       candleSeries = _lwChart.addSeries(LWC.AreaSeries, {
@@ -4198,7 +4224,7 @@ async function _renderLWChart(ohlcId, label) {
   }
   // Expose to module scope so gi-theme-change listener can recolor on theme switch
   window._candleSeries = candleSeries;
-  window._candleSeriesType = window._lwChartType || 'candle';
+  window._candleSeriesType = _chartType;
 
   // ── Store last completed bar close for H1/H4 live-bar open (Bloomberg standard) ──
   // Bloomberg H1 open = first real tick of that hour = close of the last completed H1 bar.
@@ -4338,7 +4364,7 @@ async function _renderLWChart(ohlcId, label) {
     todayBar = _lwBuildTodayBar(ohlcId);
     if (todayBar) {
       try {
-        const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
+        const _isLA = (_chartType === 'line' || _chartType === 'area');
         candleSeries.update(_isLA ? { time: todayBar.time, value: todayBar.close } : todayBar);
       } catch(_) {}
     }
@@ -6553,7 +6579,7 @@ async function _renderLWChart(ohlcId, label) {
         isUp = _pctForDir != null ? _pctForDir >= 0 : (bar.close != null && bar.close >= (bar.open ?? bar.close));
       }
       const ohlcColor = isUp ? _themeColor('--up') : _themeColor('--down');
-      const _isOHLCType = (window._lwChartType === 'candle' || window._lwChartType === 'bar');
+      const _isOHLCType = (_effectiveChartType(ohlcId) === 'candle' || _effectiveChartType(ohlcId) === 'bar');
       // Hide O/H/L labels for Line/Area — only Close is meaningful
       const _ohlcWrap = document.getElementById('lw-hdr-ohlc-wrap');
       if (_ohlcWrap) _ohlcWrap.style.display = _isOHLCType ? '' : 'none';
@@ -6924,15 +6950,16 @@ document.getElementById('lw-cb-btn')?.addEventListener('click', function() {
 // Chart type persists across symbol switches via window._lwChartType.
 document.getElementById('lw-range-bar')?.addEventListener('click', function(e) {
   const typeBtn = e.target.closest('[data-chart-type]');
-  if (!typeBtn) return;
+  if (!typeBtn || typeBtn.disabled) return;
   window._lwChartType = typeBtn.dataset.chartType;
   document.querySelectorAll('[data-chart-type]').forEach(b => {
     b.classList.toggle('sel', b === typeBtn);
     b.classList.remove('on');
   });
   // Immediately show/hide OHLC header — no need to wait for chart re-render
+  const _effType = _effectiveChartType(_lwActiveOhlcId);
   const _ohlcWrap = document.getElementById('lw-hdr-ohlc-wrap');
-  if (_ohlcWrap) _ohlcWrap.style.display = (window._lwChartType === 'candle' || window._lwChartType === 'bar') ? '' : 'none';
+  if (_ohlcWrap) _ohlcWrap.style.display = (_effType === 'candle' || _effType === 'bar') ? '' : 'none';
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
