@@ -2313,6 +2313,7 @@ async function fetchRiskData() {
       if (d.hyOas != null && !isNaN(d.hyOas) && d.hyOas > 0)        byId.hyOas = repo(d.hyOas * 100);
       if (d.igOas != null && !isNaN(d.igOas) && d.igOas > 0)        byId.igOas = repo(d.igOas * 100);
       if (d.hyOasDelta20d != null && !isNaN(d.hyOasDelta20d))       byId.hyOasDelta20d = d.hyOasDelta20d * 100;
+      if (d.igOasDelta20d != null && !isNaN(d.igOasDelta20d))       byId.igOasDelta20d = d.igOasDelta20d * 100;
     }
     if (eurExt?.data?.bond10y != null) byId.de10y = { close: eurExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
     if (jpyExt?.data?.bond10y != null) byId.jp10y = { close: jpyExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
@@ -2446,7 +2447,14 @@ async function renderRiskData(byId) {
     const cls = hy > 500 ? 'risk-val down' : hy > 350 ? 'risk-val warning' : 'risk-val up';
     setEl('risk-hyoas', Math.round(hy) + ' bp', cls);
     const signal = hy > 500 ? 'Wide' : hy > 350 ? 'Moderate' : 'Tight';
-    setEl('risk-hyoas-sub', signal + ' · ICE BofA');
+    if (byId.hyOasDelta20d != null) {
+      const d = byId.hyOasDelta20d;
+      const arrow = d > 0 ? '▲' : d < 0 ? '▼' : '→';
+      const dStr = (d >= 0 ? ' +' : ' ') + Math.round(d) + 'bp';
+      setEl('risk-hyoas-sub', arrow + dStr + ' · ' + signal + ' · ICE BofA');
+    } else {
+      setEl('risk-hyoas-sub', signal + ' · ICE BofA');
+    }
   } else {
     setEl('risk-hyoas', '—', 'risk-val');
     setEl('risk-hyoas-sub', 'ICE BofA · unavailable');
@@ -2459,7 +2467,14 @@ async function renderRiskData(byId) {
     const cls = ig > 150 ? 'risk-val down' : ig > 100 ? 'risk-val warning' : 'risk-val up';
     setEl('risk-igoas', Math.round(ig) + ' bp', cls);
     const signal = ig > 150 ? 'Wide' : ig > 100 ? 'Moderate' : 'Tight';
-    setEl('risk-igoas-sub', signal + ' · ICE BofA');
+    if (byId.igOasDelta20d != null) {
+      const d = byId.igOasDelta20d;
+      const arrow = d > 0 ? '▲' : d < 0 ? '▼' : '→';
+      const dStr = (d >= 0 ? ' +' : ' ') + Math.round(d) + 'bp';
+      setEl('risk-igoas-sub', arrow + dStr + ' · ' + signal + ' · ICE BofA');
+    } else {
+      setEl('risk-igoas-sub', signal + ' · ICE BofA');
+    }
   } else {
     setEl('risk-igoas', '—', 'risk-val');
     setEl('risk-igoas-sub', 'ICE BofA · unavailable');
@@ -6798,7 +6813,8 @@ function _loadTVWidgetFallback(sym) {
   const script = document.createElement('script');
   script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
   script.async = true;
-  const chartStyle = sym === 'FRED:DGS10' ? '3' : '1';
+  const _LINE_STYLE_SYMS = new Set(['FRED:DGS10', 'FRED:BAMLH0A0HYM2', 'FRED:BAMLC0A0CM']);
+  const chartStyle = _LINE_STYLE_SYMS.has(sym) ? '3' : '1';
   script.text = JSON.stringify({
     allow_symbol_change:false, calendar:false, details:true,
     hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:false,
@@ -7405,6 +7421,16 @@ document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('cl
 // ── Risk Monitor MOVE cell: click to open chart ──
 document.getElementById('risk-move')?.closest('.risk-cell')?.addEventListener('click', () => {
   loadTVChart('TVC:MOVE');
+});
+
+// ── Risk Monitor US HY OAS cell: click to open chart ──
+document.getElementById('risk-hyoas')?.closest('.risk-cell')?.addEventListener('click', () => {
+  loadTVChart('FRED:BAMLH0A0HYM2');
+});
+
+// ── Risk Monitor US IG OAS cell: click to open chart ──
+document.getElementById('risk-igoas')?.closest('.risk-cell')?.addEventListener('click', () => {
+  loadTVChart('FRED:BAMLC0A0CM');
 });
 
 // ═══════════════════════════════════════════════════════════════════
