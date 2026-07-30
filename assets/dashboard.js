@@ -4622,8 +4622,22 @@ async function _renderLWChart(ohlcId, label) {
       svg += `<circle cx="${x1.toFixed(1)}" cy="${y1.toFixed(1)}" r="3" fill="${col}"/>`;
       svg += `<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3" fill="${col}"/>`;
     } else if (d.type === 'rect') {
-      const rx = Math.min(x1, x2), ry = Math.min(y1, y2);
-      const rw = Math.abs(x2 - x1), rh = Math.abs(y2 - y1);
+      // Minimum on-screen size: a rectangle drawn on a fine timeframe (e.g. a
+      // 9-day box on D1) can collapse to a sub-pixel sliver when viewed on a
+      // much coarser one (a single W1 bar ≈ 7 days, a single MN bar ≈ 30 —
+      // 9 real days can be a fraction of one bar's pixel width there). An SVG
+      // <rect> with width or height rounding to 0 doesn't render AT ALL per
+      // spec — not even its stroke — so the shape would silently vanish
+      // exactly the way Santiago reported on W1/MN. TradingView/MT5 never let
+      // a drawn object disappear this way; they keep at least a visible
+      // sliver. Fix: clamp both dimensions to a 2px floor, expanding outward
+      // from the shape's own center so it stays anchored at the same
+      // real-world midpoint rather than snapping to one edge.
+      const MIN_DIM = 2;
+      let rx = Math.min(x1, x2), ry = Math.min(y1, y2);
+      let rw = Math.abs(x2 - x1), rh = Math.abs(y2 - y1);
+      if (rw < MIN_DIM) { const cx = (x1 + x2) / 2; rx = cx - MIN_DIM / 2; rw = MIN_DIM; }
+      if (rh < MIN_DIM) { const cy = (y1 + y2) / 2; ry = cy - MIN_DIM / 2; rh = MIN_DIM; }
       const fillCol = col.replace(/[\d.]+\)$/, '0.14)');
       if (isSelected) svg += `<rect x="${(rx-2).toFixed(1)}" y="${(ry-2).toFixed(1)}" width="${(rw+4).toFixed(1)}" height="${(rh+4).toFixed(1)}" fill="none" stroke="#fff" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>`;
       svg += `<rect x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}" fill="${fillCol}" stroke="${col}" stroke-width="${(1.25 + selW).toFixed(2)}"${previewDash}/>`;
@@ -4687,7 +4701,29 @@ async function _renderLWChart(ohlcId, label) {
       // EURUSD) and time-axis height can vary slightly with font metrics.
       try {
         const rightW = _lwChart.priceScale('right').width() || 0;
-        const botH   = _lwChart.timeScale().height() || 0;
+        let botH   = _lwChart.timeScale().height() || 0;
+        // Every drawing type (trend/fib/rect) is anchored exclusively to the
+        // MAIN price series (candleSeries, pane 0) — none of them can ever be
+        // attached to an oscillator sub-pane (RSI, MACD, Stochastic, etc.).
+        // The old clip-path only excluded the right price-scale ribbon and
+        // the bottom time-axis strip from the WHOLE chartDiv, which spans
+        // every pane stacked together once an indicator is active. A shape
+        // whose price fell outside pane 0's own autoscaled range (a real
+        // possibility once a shape can be viewed on a timeframe/zoom far
+        // from where it was drawn — see _epochToXInterpolated above) simply
+        // kept extending straight through pane 0's bottom edge into
+        // whatever sub-pane sat below it, which is what Santiago's H1/H4
+        // screenshots showed: a rectangle spilling into the oscillator's
+        // plot area. Fix: also clip at pane 0's own bottom edge whenever
+        // more than one pane exists, using its actual HTMLElement height
+        // (the ground-truth pixel height, not an assumption about layout).
+        const panes = _lwChart.panes();
+        if (panes && panes.length > 1) {
+          const mainPaneEl = panes[0].getHTMLElement && panes[0].getHTMLElement();
+          const overlayH   = chartDiv.clientHeight || 0;
+          const mainPaneH  = mainPaneEl ? mainPaneEl.clientHeight : 0;
+          if (overlayH > 0 && mainPaneH > 0) botH = Math.max(botH, overlayH - mainPaneH);
+        }
         _drawOverlay.style.clipPath = `inset(0 ${rightW}px ${botH}px 0)`;
       } catch(_) {}
       let svg = '';
