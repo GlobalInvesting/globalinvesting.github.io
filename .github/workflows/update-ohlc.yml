@@ -1,4 +1,4 @@
-name: Update OHLC Chart Data — v2.0 (private scripts)
+name: Update OHLC Chart Data — v2.1 (private scripts)
 
 # Downloads OHLC bars for all chart symbols via yfinance and writes JSON files
 # to THIS (public) repo under ohlc-data/:
@@ -43,6 +43,18 @@ name: Update OHLC Chart Data — v2.0 (private scripts)
 # ai-analysis/technical-levels.json — determinístico (SMA20/50/200), sin API keys.
 # Corre SOLO en los runs autoritativos de D1 (01:30 UTC Tue-Sat) para no recalcular
 # en cada intraday run de 30 min; las medias móviles solo cambian con el cierre diario.
+#
+# Credit spread OHLC (v2.1): fetch_credit_spreads.py (mismo repo privado, mismo
+# checkout) escribe ohlc-data/hyoas.json e ohlc-data/igoas.json a partir de FRED
+# (BAMLH0A0HYM2 / BAMLC0A0CM, requiere FRED_API_KEY) — mismo formato de bar que
+# usa fetch_ohlc.py para los símbolos de yfinance, así _renderLWChart() en
+# dashboard.js los lee por el mismo código sin distinguir la fuente. Corre SOLO
+# en el run D1 de cierre (01:30 UTC Tue-Sat), igual que calculate_technical_levels.py:
+# FRED publica estas series una vez por día hábil (con lag), así que repetir el
+# fetch en cada tick intraday de 30 min sería un request idéntico sin dato nuevo.
+# D1 completo se REEMPLAZA en cada corrida (sin merge incremental) — mismo criterio
+# que todos los demás símbolos de fetch_ohlc.py: un fetch completo a FRED es
+# gratis/no medido, así que no hay motivo de costo para tratarlo distinto.
 
 on:
   schedule:
@@ -96,6 +108,13 @@ jobs:
         env:
           SITE_DIR: .
         run: python3 private-scripts/fetch_ohlc.py
+
+      - name: Fetch credit spread OHLC — FRED HY/IG OAS (D1 finalization run only)
+        if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
+        env:
+          SITE_DIR: .
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python3 private-scripts/fetch_credit_spreads.py
 
       - name: Calculate technical levels (D1 finalization run only)
         if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
