@@ -4502,8 +4502,10 @@ async function _renderLWChart(ohlcId, label) {
   // ── Drawing Tools — Trend Line, Fibonacci Retracement, Rectangle ────────────
   // Industry-standard UX (TradingView/Bloomberg/MT5): pick a tool from the
   // "Draw" menu, then press-and-drag on the chart — the shape follows the
-  // cursor live and commits on release. Persisted per symbol+timeframe (a line
-  // drawn on EUR/USD H1 doesn't show up on GBP/USD or the Daily chart).
+  // cursor live and commits on release. Persisted per symbol + timeframe-group (a
+  // line drawn on EUR/USD doesn't show up on GBP/USD; a line drawn on EUR/USD D1
+  // also shows on W1/MN since they share the same date-string bar format — see
+  // the timeframe-group key below).
   // Rendered as an SVG overlay synced to the chart via
   // timeToCoordinate/priceToCoordinate on every pan/zoom and on every live
   // tick, same pattern as the CB meeting-markers overlay just above.
@@ -4517,8 +4519,20 @@ async function _renderLWChart(ohlcId, label) {
   // stretching to the chart edge — the box's width is now literally whatever
   // width the user defines by dragging, and the level labels sit just past
   // the right edge of that box rather than colliding with the price axis.
-  const _DRAW_LS_KEY = 'gi_drawings';
-  const _drawSymKey  = `${ohlcId}_${_lwActiveTf}`;
+  // Persisted per symbol + timeframe-*group*, not the exact timeframe — matches
+  // TradingView/MT5 convention: an object drawn on a chart persists when you change
+  // the interval, as long as the underlying bar time format is compatible. D1/W1/MN
+  // share the same 'YYYY-MM-DD' business-day bar format (see _jsonPath resolution
+  // above), so a trend line drawn on D1 still projects correctly via
+  // timeToCoordinate() on W1/MN. H1/H4 share unix-timestamp bars instead — a
+  // different time type lightweight-charts can't reconcile with the date-string
+  // group, so those two form their own group. Cross-group (e.g. D1 -> H1) isn't
+  // attempted: timeToCoordinate() would just return null for a mismatched time
+  // type and the shape silently wouldn't render, so grouping only what's actually
+  // compatible avoids relying on that fallback.
+  const _DRAW_LS_KEY  = 'gi_drawings';
+  const _drawTfGroup  = (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') ? 'intraday' : 'eod';
+  const _drawSymKey   = `${ohlcId}_${_drawTfGroup}`;
   if (typeof window._lwDrawings === 'undefined') {
     try { const v = localStorage.getItem(_DRAW_LS_KEY); window._lwDrawings = v ? JSON.parse(v) : {}; }
     catch(_) { window._lwDrawings = {}; }
