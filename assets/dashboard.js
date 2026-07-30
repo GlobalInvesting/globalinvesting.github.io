@@ -4554,7 +4554,7 @@ async function _renderLWChart(ohlcId, label) {
   // separately by _svgHandles so they stay on top of everything.
   function _svgForDrawing(d, isPreview, isSelected) {
     const ts = _lwChart.timeScale();
-    const x1 = ts.timeToCoordinate(d.p1.time), x2 = ts.timeToCoordinate(d.p2.time);
+    const x1 = _xForPoint(ts, d.p1), x2 = _xForPoint(ts, d.p2);
     const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
     if (x1 == null || x2 == null || y1 == null || y2 == null) return '';
     const col = d.color || _DRAW_COLORS[d.type] || _DRAW_COLORS.trend;
@@ -4605,8 +4605,8 @@ async function _renderLWChart(ohlcId, label) {
   function _svgHandles(d) {
     if (!d) return '';
     const ts = _lwChart.timeScale();
-    const x1 = ts.timeToCoordinate(d.p1.time), y1 = candleSeries.priceToCoordinate(d.p1.price);
-    const x2 = ts.timeToCoordinate(d.p2.time), y2 = candleSeries.priceToCoordinate(d.p2.price);
+    const x1 = _xForPoint(ts, d.p1), y1 = candleSeries.priceToCoordinate(d.p1.price);
+    const x2 = _xForPoint(ts, d.p2), y2 = candleSeries.priceToCoordinate(d.p2.price);
     if (x1 == null || y1 == null || x2 == null || y2 == null) return '';
     const hs = 5;
     let svg = '';
@@ -4667,7 +4667,7 @@ async function _renderLWChart(ohlcId, label) {
     const arr = _curDrawings();
     for (let i = arr.length - 1; i >= 0; i--) {
       const d = arr[i];
-      const x1 = ts.timeToCoordinate(d.p1.time), x2 = ts.timeToCoordinate(d.p2.time);
+      const x1 = _xForPoint(ts, d.p1), x2 = _xForPoint(ts, d.p2);
       const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
       if (x1 == null || x2 == null || y1 == null || y2 == null) continue;
       if (d.type === 'trend') {
@@ -4698,8 +4698,8 @@ async function _renderLWChart(ohlcId, label) {
     const d = _curDrawings()[idx];
     if (!d) return null;
     const ts = _lwChart.timeScale();
-    const x1 = ts.timeToCoordinate(d.p1.time), y1 = candleSeries.priceToCoordinate(d.p1.price);
-    const x2 = ts.timeToCoordinate(d.p2.time), y2 = candleSeries.priceToCoordinate(d.p2.price);
+    const x1 = _xForPoint(ts, d.p1), y1 = candleSeries.priceToCoordinate(d.p1.price);
+    const x2 = _xForPoint(ts, d.p2), y2 = candleSeries.priceToCoordinate(d.p2.price);
     if (x1 != null && y1 != null && Math.hypot(x - x1, y - y1) <= _HANDLE_R) return 'p1';
     if (x2 != null && y2 != null && Math.hypot(x - x2, y - y2) <= _HANDLE_R) return 'p2';
     return null;
@@ -4717,8 +4717,8 @@ async function _renderLWChart(ohlcId, label) {
     const d = _curDrawings()[_selectedIdx];
     if (!d) return;
     const ts = _lwChart.timeScale();
-    const x1 = ts.timeToCoordinate(d.p1.time), y1 = candleSeries.priceToCoordinate(d.p1.price);
-    const x2 = ts.timeToCoordinate(d.p2.time), y2 = candleSeries.priceToCoordinate(d.p2.price);
+    const x1 = _xForPoint(ts, d.p1), y1 = candleSeries.priceToCoordinate(d.p1.price);
+    const x2 = _xForPoint(ts, d.p2), y2 = candleSeries.priceToCoordinate(d.p2.price);
     if (x1 == null || y1 == null || x2 == null || y2 == null) return;
     const rect = chartDiv.getBoundingClientRect();
     const midX = (x1 + x2) / 2;
@@ -4847,14 +4847,88 @@ async function _renderLWChart(ohlcId, label) {
       return { x: clientX - rect.left, y: clientY - rect.top };
     } catch(_) { return null; }
   }
+  // Extrapolates a synthetic bar time for a logical index beyond the last
+  // real (or live today-) bar — e.g. index 3 bars past the last candle.
+  // H1/H4 bars carry a plain UTCTimestamp (seconds), so stepping forward is
+  // just adding whole intervals. D1/W1/MN bars carry a 'YYYY-MM-DD' string
+  // (see _lwLoadChart's W1/MN aggregation and the D1 JSON itself), so we
+  // step with real date arithmetic instead — D1 skips Sat/Sun since FX
+  // doesn't trade those days, matching how the next *real* D1 bar would
+  // actually land.
+  function _extrapolateTimeForIndex(data, lastIdx, targetIdx) {
+    const stepsAhead = targetIdx - lastIdx;
+    if (stepsAhead <= 0) return null;
+    const lastTime = data[lastIdx].time;
+    if (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') {
+      const stepSec = _lwActiveTf === 'H1' ? 3600 : 14400;
+      return lastTime + stepsAhead * stepSec;
+    }
+    if (typeof lastTime !== 'string') return null; // guard: unexpected shape
+    let d = new Date(lastTime + 'T00:00:00Z');
+    for (let i = 0; i < stepsAhead; i++) {
+      if (_lwActiveTf === 'MN') {
+        d.setUTCMonth(d.getUTCMonth() + 1);
+      } else if (_lwActiveTf === 'W1') {
+        d.setUTCDate(d.getUTCDate() + 7);
+      } else {
+        do { d.setUTCDate(d.getUTCDate() + 1); } while (d.getUTCDay() === 0 || d.getUTCDay() === 6);
+      }
+    }
+    return d.toISOString().slice(0, 10);
+  }
+
+  // Resolves a pixel x-coordinate to a chart time, extending past the last
+  // real bar. LWC's own coordinateToTime() only resolves coordinates that
+  // land on an actual data point (plus a short internally-extrapolated
+  // stretch inside the rightOffset margin) and returns null past that —
+  // which is what silently blocked drawing/moving objects to the right of
+  // "now". TradingView/MT5/Bloomberg all allow free drawing into that empty
+  // future space, so when coordinateToTime comes back null we fall back to
+  // coordinateToLogical() (which is defined continuously, with no data-range
+  // limit) and derive a synthetic time from it. The absolute logical index is
+  // kept on the point (futureIndex) so it stays pinned to that exact future
+  // slot even as new real bars arrive and fill in behind it.
+  function _resolveTimeAt(ts, x) {
+    const time = ts.coordinateToTime(x);
+    if (time != null) return { time };
+    try {
+      const logical = ts.coordinateToLogical(x);
+      if (logical == null) return null;
+      const data = candleSeries.data();
+      if (!data || !data.length) return null;
+      const lastIdx = data.length - 1;
+      const futureIndex = Math.round(logical);
+      if (futureIndex <= lastIdx) return null;
+      const t = _extrapolateTimeForIndex(data, lastIdx, futureIndex);
+      if (t == null) return null;
+      return { time: t, futureIndex };
+    } catch(_) { return null; }
+  }
+
+  // Mirror of _resolveTimeAt for rendering: converts a stored point back to
+  // an x-coordinate. Tries the normal time-based lookup first (covers the
+  // common case, and the case where a future point's slot has since been
+  // filled by a real bar); falls back to logicalToCoordinate() — which, like
+  // coordinateToLogical() above, extrapolates continuously past the data
+  // range — for points still out in undrawn future space.
+  function _xForPoint(ts, pt) {
+    if (!pt) return null;
+    const x = ts.timeToCoordinate(pt.time);
+    if (x != null) return x;
+    if (pt.futureIndex != null) { try { return ts.logicalToCoordinate(pt.futureIndex); } catch(_) { return null; } }
+    return null;
+  }
+
   function _drawPointToTP(clientX, clientY) {
     const px = _clientToPixel(clientX, clientY);
     if (!px) return null;
     try {
-      const time  = _lwChart.timeScale().coordinateToTime(px.x);
+      const ts    = _lwChart.timeScale();
       const price = candleSeries.coordinateToPrice(px.y);
-      if (time == null || price == null) return null;
-      return { time, price };
+      if (price == null) return null;
+      const r = _resolveTimeAt(ts, px.x);
+      if (!r) return null;
+      return { time: r.time, price, futureIndex: r.futureIndex };
     } catch(_) { return null; }
   }
 
@@ -4900,8 +4974,8 @@ async function _renderLWChart(ohlcId, label) {
       _selectedIdx = hitIdx;
       _dragMode    = 'move';
       _dragStartPx = px;
-      _dragOrigP1  = { time: arr[hitIdx].p1.time, price: arr[hitIdx].p1.price };
-      _dragOrigP2  = { time: arr[hitIdx].p2.time, price: arr[hitIdx].p2.price };
+      _dragOrigP1  = { time: arr[hitIdx].p1.time, price: arr[hitIdx].p1.price, futureIndex: arr[hitIdx].p1.futureIndex };
+      _dragOrigP2  = { time: arr[hitIdx].p2.time, price: arr[hitIdx].p2.price, futureIndex: arr[hitIdx].p2.futureIndex };
       _setChartPannable(false);
       _renderDrawings();
       _showDrawToolbar();
@@ -4935,16 +5009,19 @@ async function _renderLWChart(ohlcId, label) {
       const px = _clientToPixel(e.clientX, e.clientY);
       if (!px || !_dragStartPx || !_dragOrigP1 || !_dragOrigP2) return;
       // Translate in pixel space, then convert back — avoids arithmetic on
-      // BusinessDay time objects (D1/W1/MN), which aren't numeric.
-      const ox1 = ts.timeToCoordinate(_dragOrigP1.time), oy1 = candleSeries.priceToCoordinate(_dragOrigP1.price);
-      const ox2 = ts.timeToCoordinate(_dragOrigP2.time), oy2 = candleSeries.priceToCoordinate(_dragOrigP2.price);
+      // BusinessDay time objects (D1/W1/MN), which aren't numeric. _xForPoint/
+      // _resolveTimeAt (see above _drawPointToTP) extend this past the last
+      // real bar so a shape can be dragged freely into future/empty space,
+      // same as TradingView/MT5/Bloomberg.
+      const ox1 = _xForPoint(ts, _dragOrigP1), oy1 = candleSeries.priceToCoordinate(_dragOrigP1.price);
+      const ox2 = _xForPoint(ts, _dragOrigP2), oy2 = candleSeries.priceToCoordinate(_dragOrigP2.price);
       if (ox1 == null || oy1 == null || ox2 == null || oy2 == null) return;
       const dx = px.x - _dragStartPx.x, dy = px.y - _dragStartPx.y;
-      const nt1 = ts.coordinateToTime(ox1 + dx), np1 = candleSeries.coordinateToPrice(oy1 + dy);
-      const nt2 = ts.coordinateToTime(ox2 + dx), np2 = candleSeries.coordinateToPrice(oy2 + dy);
-      if (nt1 == null || np1 == null || nt2 == null || np2 == null) return;
-      d.p1 = { time: nt1, price: np1 };
-      d.p2 = { time: nt2, price: np2 };
+      const r1 = _resolveTimeAt(ts, ox1 + dx), np1 = candleSeries.coordinateToPrice(oy1 + dy);
+      const r2 = _resolveTimeAt(ts, ox2 + dx), np2 = candleSeries.coordinateToPrice(oy2 + dy);
+      if (!r1 || !r2 || np1 == null || np2 == null) return;
+      d.p1 = { time: r1.time, price: np1, futureIndex: r1.futureIndex };
+      d.p2 = { time: r2.time, price: np2, futureIndex: r2.futureIndex };
       _renderDrawings();
     } else if (_dragMode === 'resize-p1' || _dragMode === 'resize-p2') {
       const pt = _drawPointToTP(e.clientX, e.clientY);
@@ -4980,8 +5057,8 @@ async function _renderLWChart(ohlcId, label) {
     // click doesn't commit a zero-size shape — the tool just stays armed.
     try {
       const ts = _lwChart.timeScale();
-      const ax = ts.timeToCoordinate(anchor.time), ay = candleSeries.priceToCoordinate(anchor.price);
-      const bx = ts.timeToCoordinate(end.time),    by = candleSeries.priceToCoordinate(end.price);
+      const ax = _xForPoint(ts, anchor), ay = candleSeries.priceToCoordinate(anchor.price);
+      const bx = _xForPoint(ts, end),    by = candleSeries.priceToCoordinate(end.price);
       const dist = (ax != null && ay != null && bx != null && by != null) ? Math.hypot(bx - ax, by - ay) : 0;
       if (dist < 8) { _renderDrawings(); return; }
     } catch(_) {}
@@ -5018,6 +5095,61 @@ async function _renderLWChart(ohlcId, label) {
       _saveDrawings();
       _renderDrawings();
       _hideDrawToolbar();
+      return;
+    }
+    // Ctrl+C / Cmd+C — copy the selected object (TradingView/MT5 convention:
+    // objects support the same clipboard shortcuts as any other on-screen
+    // element). Stored on window so it survives symbol/timeframe switches,
+    // matching MT5's object clipboard behaviour.
+    if ((e.key === 'c' || e.key === 'C') && (e.ctrlKey || e.metaKey)) {
+      if (_selectedIdx < 0) return;
+      const tag = (e.target && e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) return;
+      const d = _curDrawings()[_selectedIdx];
+      if (!d) return;
+      window._lwDrawClipboard = JSON.parse(JSON.stringify(d));
+      e.preventDefault();
+      return;
+    }
+    // Ctrl+V / Cmd+V — paste the last copied object. Nudged by a fixed pixel
+    // offset (down-right) so the duplicate doesn't land exactly on top of the
+    // original and look like nothing happened — same convention as pasting a
+    // duplicate shape in PowerPoint/Illustrator, or an object in MT5. Works
+    // into future/empty space too via the same _resolveTimeAt fallback used
+    // for drawing and moving.
+    if ((e.key === 'v' || e.key === 'V') && (e.ctrlKey || e.metaKey)) {
+      if (!window._lwDrawClipboard) return;
+      const tag = (e.target && e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) return;
+      const src = window._lwDrawClipboard;
+      const ts  = _lwChart.timeScale();
+      const PASTE_OFFSET_PX = 24;
+      let p1 = { time: src.p1.time, price: src.p1.price, futureIndex: src.p1.futureIndex };
+      let p2 = { time: src.p2.time, price: src.p2.price, futureIndex: src.p2.futureIndex };
+      const x1 = _xForPoint(ts, src.p1), y1 = candleSeries.priceToCoordinate(src.p1.price);
+      const x2 = _xForPoint(ts, src.p2), y2 = candleSeries.priceToCoordinate(src.p2.price);
+      if (x1 != null && y1 != null && x2 != null && y2 != null) {
+        const r1 = _resolveTimeAt(ts, x1 + PASTE_OFFSET_PX);
+        const r2 = _resolveTimeAt(ts, x2 + PASTE_OFFSET_PX);
+        const np1 = candleSeries.coordinateToPrice(y1 + PASTE_OFFSET_PX);
+        const np2 = candleSeries.coordinateToPrice(y2 + PASTE_OFFSET_PX);
+        if (r1 && r2 && np1 != null && np2 != null) {
+          p1 = { time: r1.time, price: np1, futureIndex: r1.futureIndex };
+          p2 = { time: r2.time, price: np2, futureIndex: r2.futureIndex };
+        }
+      }
+      const copy = {
+        id: 'dr_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        type: src.type,
+        p1, p2,
+        color: src.color,
+      };
+      _curDrawings().push(copy);
+      _selectedIdx = _curDrawings().length - 1;
+      _saveDrawings();
+      _renderDrawings();
+      _showDrawToolbar();
+      e.preventDefault();
     }
   };
   document.addEventListener('keydown', window._lwDrawEscHandler);
@@ -5085,7 +5217,7 @@ async function _renderLWChart(ohlcId, label) {
 
     const footer = document.createElement('div');
     footer.style.cssText = 'padding:6px 12px;color:var(--text3);font-size:9px;line-height:1.4;border-top:1px solid rgba(42,46,57,0.3);';
-    footer.textContent = 'Click a drawing to select it. Drag its body to move, drag an endpoint to resize. Color and delete appear in a toolbar above the selection.';
+    footer.textContent = 'Click a drawing to select it. Drag its body to move, drag an endpoint to resize. Color and delete appear in a toolbar above the selection. Ctrl+C / Ctrl+V copies and pastes it.';
     pop.appendChild(footer);
 
     document.body.appendChild(pop);
