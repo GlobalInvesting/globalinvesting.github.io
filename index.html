@@ -359,6 +359,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .lw-tb-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
 .lw-tb-btn.on{color:var(--text);border-color:var(--accent)}
 .lw-tb-btn.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.lw-tb-btn:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
 .lw-tb-sep{width:1px;height:14px;background:var(--border2);margin:0 6px;flex-shrink:0}
 #lw-range-bar::-webkit-scrollbar,#lw-range-bar div::-webkit-scrollbar{display:none}
 .lw-tf-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em;white-space:nowrap}
@@ -1826,7 +1827,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.2" defer></script>
-<script src="assets/dashboard.js?v=8.86.0" defer></script>
+<script src="assets/dashboard.js?v=8.86.3" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
