@@ -4502,13 +4502,13 @@ async function _renderLWChart(ohlcId, label) {
   // ── Drawing Tools — Trend Line, Fibonacci Retracement, Rectangle ────────────
   // Industry-standard UX (TradingView/Bloomberg/MT5): pick a tool from the
   // "Draw" menu, then press-and-drag on the chart — the shape follows the
-  // cursor live and commits on release. Persisted per symbol + timeframe-group (a
-  // line drawn on EUR/USD doesn't show up on GBP/USD; a line drawn on EUR/USD D1
-  // also shows on W1/MN since they share the same date-string bar format — see
-  // the timeframe-group key below).
-  // Rendered as an SVG overlay synced to the chart via
-  // timeToCoordinate/priceToCoordinate on every pan/zoom and on every live
-  // tick, same pattern as the CB meeting-markers overlay just above.
+  // cursor live and commits on release. Persisted per symbol only (a line
+  // drawn on EUR/USD doesn't show up on GBP/USD) — and, as of the fix below,
+  // shows at the same real-world time/price on EVERY timeframe (D1, W1, MN,
+  // H1, H4), not just the one it was drawn on. Rendered as an SVG overlay
+  // synced to the chart via timeToCoordinate/priceToCoordinate on every
+  // pan/zoom and on every live tick, same pattern as the CB meeting-markers
+  // overlay just above.
   //
   // BUGFIX (2026-07-29): Fibonacci levels previously rendered via the native
   // `series.createPriceLine()` API to solve a label-collision bug — but native
@@ -4519,20 +4519,16 @@ async function _renderLWChart(ohlcId, label) {
   // stretching to the chart edge — the box's width is now literally whatever
   // width the user defines by dragging, and the level labels sit just past
   // the right edge of that box rather than colliding with the price axis.
-  // Persisted per symbol + timeframe-*group*, not the exact timeframe — matches
-  // TradingView/MT5 convention: an object drawn on a chart persists when you change
-  // the interval, as long as the underlying bar time format is compatible. D1/W1/MN
-  // share the same 'YYYY-MM-DD' business-day bar format (see _jsonPath resolution
-  // above), so a trend line drawn on D1 still projects correctly via
-  // timeToCoordinate() on W1/MN. H1/H4 share unix-timestamp bars instead — a
-  // different time type lightweight-charts can't reconcile with the date-string
-  // group, so those two form their own group. Cross-group (e.g. D1 -> H1) isn't
-  // attempted: timeToCoordinate() would just return null for a mismatched time
-  // type and the shape silently wouldn't render, so grouping only what's actually
-  // compatible avoids relying on that fallback.
+  //
+  // BUGFIX (2026-07-30): points are stored as universal unix-epoch time (see
+  // _timeToEpoch/_epochToActiveTime above _resolveTimeAt/_xForPoint) instead of
+  // whatever raw format the timeframe active at draw-time happened to use
+  // ('YYYY-MM-DD' string for D1/W1/MN, unix seconds for H1/H4). That's what makes
+  // a single object project onto every timeframe's series at the correct
+  // real-world coordinate, so storage no longer needs to be split per
+  // timeframe (or timeframe-group) at all — one array per symbol.
   const _DRAW_LS_KEY  = 'gi_drawings';
-  const _drawTfGroup  = (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') ? 'intraday' : 'eod';
-  const _drawSymKey   = `${ohlcId}_${_drawTfGroup}`;
+  const _drawSymKey   = ohlcId;
   if (typeof window._lwDrawings === 'undefined') {
     try { const v = localStorage.getItem(_DRAW_LS_KEY); window._lwDrawings = v ? JSON.parse(v) : {}; }
     catch(_) { window._lwDrawings = {}; }
@@ -4960,9 +4956,30 @@ async function _renderLWChart(ohlcId, label) {
   // limit) and derive a synthetic time from it. The absolute logical index is
   // kept on the point (futureIndex) so it stays pinned to that exact future
   // slot even as new real bars arrive and fill in behind it.
+  // ── Universal drawing-point time ────────────────────────────────────────────
+  // A drawing's {time, price} points are stored as unix epoch seconds (UTC),
+  // independent of whatever timeframe was active when the point was created.
+  // D1/W1/MN bars use 'YYYY-MM-DD' business-day strings; H1/H4 bars use unix
+  // seconds directly — timeToCoordinate() only accepts whichever format the
+  // ACTIVE chart's series was built with, so every read/write converts through
+  // this pair of helpers. This is what lets one object (trend line, Fib,
+  // rectangle) show at the same real-world time/price on every timeframe —
+  // D1, W1, MN, H1, H4 — not just the group it was originally drawn on.
+  function _timeToEpoch(t) {
+    if (t == null) return null;
+    if (typeof t === 'number') return t; // H1/H4: already unix seconds
+    if (typeof t === 'string') { const ms = Date.parse(t + 'T00:00:00Z'); return Number.isNaN(ms) ? null : Math.floor(ms / 1000); }
+    return null;
+  }
+  function _epochToActiveTime(epochSec) {
+    if (epochSec == null) return null;
+    if (_lwActiveTf === 'H1' || _lwActiveTf === 'H4') return epochSec;
+    return new Date(epochSec * 1000).toISOString().slice(0, 10);
+  }
+
   function _resolveTimeAt(ts, x) {
     const time = ts.coordinateToTime(x);
-    if (time != null) return { time };
+    if (time != null) return { time: _timeToEpoch(time) };
     try {
       const logical = ts.coordinateToLogical(x);
       if (logical == null) return null;
@@ -4973,7 +4990,10 @@ async function _renderLWChart(ohlcId, label) {
       if (futureIndex <= lastIdx) return null;
       const t = _extrapolateTimeForIndex(data, lastIdx, futureIndex);
       if (t == null) return null;
-      return { time: t, futureIndex };
+      // futureIndex is a logical bar-count position, meaningful only on the
+      // timeframe it was created on (bar density differs across TFs) — kept
+      // as a same-session fallback only; see _xForPoint.
+      return { time: _timeToEpoch(t), futureIndex };
     } catch(_) { return null; }
   }
 
@@ -4982,10 +5002,14 @@ async function _renderLWChart(ohlcId, label) {
   // common case, and the case where a future point's slot has since been
   // filled by a real bar); falls back to logicalToCoordinate() — which, like
   // coordinateToLogical() above, extrapolates continuously past the data
-  // range — for points still out in undrawn future space.
+  // range — for points still out in undrawn future space. That fallback only
+  // makes sense on the same timeframe the point was created on (futureIndex
+  // is a bar-count position, not a real-world time), so a future-space point
+  // viewed on a different timeframe simply won't render until a real bar
+  // catches up to it — a rare edge case, not the normal drawn-on-real-history case.
   function _xForPoint(ts, pt) {
     if (!pt) return null;
-    const x = ts.timeToCoordinate(pt.time);
+    const x = ts.timeToCoordinate(_epochToActiveTime(pt.time));
     if (x != null) return x;
     if (pt.futureIndex != null) { try { return ts.logicalToCoordinate(pt.futureIndex); } catch(_) { return null; } }
     return null;
