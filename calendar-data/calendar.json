@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-30T07:53:34Z",
-  "generatedAt": "2026-07-30T07:53:34Z",
+  "lastUpdate": "2026-07-30T11:27:25Z",
+  "generatedAt": "2026-07-30T11:27:25Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-30",
   "rangeTo": "2026-07-30",
-  "totalEvents": 3754,
+  "totalEvents": 3755,
   "currencyCounts": {
     "NZD": 83,
     "AUD": 257,
-    "EUR": 861,
+    "EUR": 862,
     "CHF": 125,
     "USD": 1273,
     "CAD": 272,
@@ -23,7 +23,7 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1841,
+    "medium": 1842,
     "high": 1685,
     "low": 228
   },
@@ -89,9 +89,9 @@
       "std": 2.971532
     },
     "EUR/unemployment rate": {
-      "n": 7,
-      "mean": 0.057143,
-      "std": 0.198806
+      "n": 8,
+      "mean": 0.0375,
+      "std": 0.192261
     },
     "USD/factory orders mom": {
       "n": 3,
@@ -954,9 +954,9 @@
       "std": 1.343503
     },
     "EUR/economic sentiment": {
-      "n": 2,
-      "mean": 0.7,
-      "std": 0.0
+      "n": 3,
+      "mean": 0.766667,
+      "std": 0.11547
     },
     "USD/personal income mom": {
       "n": 3,
@@ -1179,24 +1179,24 @@
       "std": 0.0
     },
     "GBP/boe interest rate decision": {
-      "n": 2,
+      "n": 3,
       "mean": 0.0,
       "std": 0.0
     },
     "GBP/boe mpc vote cut": {
-      "n": 2,
+      "n": 3,
       "mean": 0.0,
       "std": 0.0
     },
     "GBP/boe mpc vote hike": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
+      "n": 3,
+      "mean": 3.333333,
+      "std": 5.773503
     },
     "GBP/boe mpc vote unchanged": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
+      "n": 3,
+      "mean": -3.333333,
+      "std": 5.773503
     },
     "USD/net long-term tic flows": {
       "n": 3,
@@ -1283,6 +1283,16 @@
       "mean": -0.25,
       "std": 0.494975
     },
+    "EUR/consumer inflation expectations": {
+      "n": 2,
+      "mean": -7.85,
+      "std": 0.212132
+    },
+    "EUR/spain business confidence": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.282843
+    },
     "USD/s&#38;p/case-shiller home price yoy": {
       "n": 2,
       "mean": 0.25,
@@ -1297,6 +1307,11 @@
       "n": 2,
       "mean": 0.55,
       "std": 1.343503
+    },
+    "EUR/italy unemployment rate": {
+      "n": 2,
+      "mean": -0.25,
+      "std": 0.494975
     },
     "EUR/spain consumer confidence": {
       "n": 2,
@@ -46370,7 +46385,7 @@
       "impact": "medium",
       "actual": "0.4%",
       "forecast": "0.2%",
-      "previous": "0.2%"
+      "previous": "0.3%"
     },
     {
       "date": "30 Jul",
@@ -46381,9 +46396,9 @@
       "flag": "🇪🇺",
       "event": "Germany Brandenburg CPI YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.7%",
       "forecast": null,
-      "previous": "2.4"
+      "previous": "2.4%"
     },
     {
       "date": "30 Jul",
@@ -46394,9 +46409,9 @@
       "flag": "🇪🇺",
       "event": "Germany Bavaria CPI YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.8%",
       "forecast": null,
-      "previous": "2.5"
+      "previous": "2.5%"
     },
     {
       "date": "30 Jul",
@@ -46407,7 +46422,7 @@
       "flag": "🇪🇺",
       "event": "Germany Bavaria CPI MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.6%",
       "forecast": null,
       "previous": "-0.2%"
     },
@@ -46420,9 +46435,9 @@
       "flag": "🇪🇺",
       "event": "Germany Saxony CPI YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.8%",
       "forecast": null,
-      "previous": "2.3"
+      "previous": "2.3%"
     },
     {
       "date": "30 Jul",
@@ -46433,7 +46448,7 @@
       "flag": "🇪🇺",
       "event": "Germany Brandenburg CPI MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.7%",
       "forecast": null,
       "previous": "-0.2%"
     },
@@ -46446,7 +46461,7 @@
       "flag": "🇪🇺",
       "event": "Germany Saxony CPI MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.7%",
       "forecast": null,
       "previous": "-0.3%"
     },
@@ -46459,9 +46474,9 @@
       "flag": "🇪🇺",
       "event": "Germany North Rhine Westphalia CPI YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.7%",
       "forecast": null,
-      "previous": "2.1"
+      "previous": "2.1%"
     },
     {
       "date": "30 Jul",
@@ -46472,7 +46487,7 @@
       "flag": "🇪🇺",
       "event": "Germany North Rhine Westphalia CPI MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.9%",
       "forecast": null,
       "previous": "-0.4%"
     },
@@ -46485,7 +46500,7 @@
       "flag": "🇪🇺",
       "event": "Germany Baden Wuerttemberg CPI MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.8%",
       "forecast": null,
       "previous": "-0.2%"
     },
@@ -46498,9 +46513,9 @@
       "flag": "🇪🇺",
       "event": "Germany Baden Wuerttemberg CPI YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.5%",
       "forecast": null,
-      "previous": "2.1"
+      "previous": "2.1%"
     },
     {
       "date": "30 Jul",
@@ -46511,9 +46526,9 @@
       "flag": "🇪🇺",
       "event": "Germany Hesse CPI YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.7%",
       "forecast": null,
-      "previous": "2.3"
+      "previous": "2.3%"
     },
     {
       "date": "30 Jul",
@@ -46524,7 +46539,7 @@
       "flag": "🇪🇺",
       "event": "Germany Hesse CPI MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.7%",
       "forecast": null,
       "previous": "-0.2%"
     },
@@ -46537,9 +46552,9 @@
       "flag": "🇪🇺",
       "event": "Germany GDP Growth Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "0.9%",
       "forecast": "0.6%",
-      "previous": "0.4%"
+      "previous": "0.7%"
     },
     {
       "date": "30 Jul",
@@ -46550,9 +46565,9 @@
       "flag": "🇪🇺",
       "event": "Germany GDP Growth Rate QoQ",
       "impact": "high",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.1%",
-      "previous": "0.3%"
+      "previous": "0.4%"
     },
     {
       "date": "30 Jul",
@@ -46563,7 +46578,7 @@
       "flag": "🇪🇺",
       "event": "Italy GDP Growth Rate QoQ",
       "impact": "high",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.1%",
       "previous": "0.3%"
     },
@@ -46576,7 +46591,7 @@
       "flag": "🇪🇺",
       "event": "Italy GDP Growth Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "1.0%",
       "forecast": "0.7%",
       "previous": "0.8%"
     },
@@ -46589,7 +46604,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area Consumer Inflation Expectations",
       "impact": "medium",
-      "actual": null,
+      "actual": "30.3",
       "forecast": "38.0",
       "previous": "34.0"
     },
@@ -46602,9 +46617,9 @@
       "flag": "🇪🇺",
       "event": "Euro Area GDP Growth Rate QoQ",
       "impact": "high",
-      "actual": null,
+      "actual": "0.4%",
       "forecast": "0.2%",
-      "previous": "-0.2%"
+      "previous": "0.0%"
     },
     {
       "date": "30 Jul",
@@ -46615,9 +46630,9 @@
       "flag": "🇪🇺",
       "event": "Euro Area GDP Growth Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "1.0%",
       "forecast": "0.5%",
-      "previous": "0.3%"
+      "previous": "0.5%"
     },
     {
       "date": "30 Jul",
@@ -46628,9 +46643,9 @@
       "flag": "🇪🇺",
       "event": "Euro Area Unemployment Rate",
       "impact": "high",
-      "actual": null,
+      "actual": "6.3%",
       "forecast": "6.2%",
-      "previous": "6.2%"
+      "previous": "6.3%"
     },
     {
       "date": "30 Jul",
@@ -46641,9 +46656,9 @@
       "flag": "🇪🇺",
       "event": "Euro Area Economic Sentiment",
       "impact": "medium",
-      "actual": null,
+      "actual": "96.9",
       "forecast": "96.0",
-      "previous": "95.0"
+      "previous": "95.4"
     },
     {
       "date": "30 Jul",
@@ -46654,9 +46669,9 @@
       "flag": "🇪🇺",
       "event": "Italy Unemployment Rate",
       "impact": "high",
-      "actual": null,
+      "actual": "5.7%",
       "forecast": "5.1%",
-      "previous": "5.0%"
+      "previous": "5.3%"
     },
     {
       "date": "30 Jul",
@@ -46675,12 +46690,25 @@
       "date": "30 Jul",
       "dateISO": "2026-07-30",
       "timeUTC": "11:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Business Confidence",
+      "impact": "medium",
+      "actual": "-2.6",
+      "forecast": "-2.7",
+      "previous": "-2.4"
+    },
+    {
+      "date": "30 Jul",
+      "dateISO": "2026-07-30",
+      "timeUTC": "11:00",
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "United Kingdom BoE MPC Vote Unchanged",
       "impact": "medium",
-      "actual": null,
+      "actual": "69.0",
       "forecast": "79.0",
       "previous": "79.0"
     },
@@ -46706,7 +46734,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom BoE MPC Vote Hike",
       "impact": "medium",
-      "actual": null,
+      "actual": "39.0",
       "forecast": "29.0",
       "previous": "29.0"
     },
@@ -46719,7 +46747,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom BoE MPC Vote Cut",
       "impact": "medium",
-      "actual": null,
+      "actual": "9.0",
       "forecast": "9.0",
       "previous": "9.0"
     },
@@ -46745,7 +46773,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom BoE Interest Rate Decision",
       "impact": "high",
-      "actual": null,
+      "actual": "3.75%",
       "forecast": "3.75%",
       "previous": "3.75%"
     },
