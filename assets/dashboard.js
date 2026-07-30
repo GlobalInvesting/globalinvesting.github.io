@@ -5092,11 +5092,34 @@ async function _renderLWChart(ohlcId, label) {
   // to real time regardless of the active series' bar spacing: binary-search
   // the active series' own bars (converted to epoch via _timeToEpoch, so it
   // works whether the active series uses 'YYYY-MM-DD' strings or unix
-  // seconds) for the two bars bracketing the target epoch, then use
-  // logicalToCoordinate() — which, unlike timeToCoordinate(), is defined
-  // continuously between and beyond bars — on the fractional logical index
-  // between them. A direct timeToCoordinate() call is still tried first as a
-  // fast path for the common exact-match case.
+  // seconds) for the two bars bracketing the target epoch, then interpolate
+  // BETWEEN THEIR PIXEL COORDINATES. A direct timeToCoordinate() call is
+  // still tried first as a fast path for the common exact-match case.
+  //
+  // v8.86.11 CORRECTION: the original version of this function passed a
+  // fractional logical index (e.g. 150.57) straight into logicalToCoordinate()
+  // on the assumption that it's defined continuously between bars, matching
+  // its own doc comment. It is NOT, in this library version — its internal
+  // implementation guards on Number.isInteger() and returns a bare 0 (not
+  // null, not an error) for any non-integer input. That is the actual,
+  // confirmed (via browser console) reason W1/MN drawings rendered at x=0:
+  // every fallback call here was silently coerced to zero. Root-caused by
+  // reading lightweight-charts' own source (TimeScale.qt / logicalToCoordinate)
+  // and confirmed against live browser output showing x1=x2=0 exactly on
+  // both W1 and MN while y1/y2 varied normally.
+  // Fix: only ever pass INTEGER logical indices to logicalToCoordinate()
+  // (always valid), and do the fractional interpolation ourselves in pixel
+  // space — which is equivalent given bar spacing is uniform in pixels
+  // between any two adjacent bars, and correct even when it's the two
+  // bars flanking a boundary bar (index 0 or n-1) used for extrapolation.
+  function _logicalToX(ts, logicalInt) {
+    return ts.logicalToCoordinate(logicalInt);
+  }
+  function _interpX(ts, loIdx, hiIdx, frac) {
+    const xLo = _logicalToX(ts, loIdx), xHi = _logicalToX(ts, hiIdx);
+    if (xLo == null || xHi == null) return null;
+    return xLo + (xHi - xLo) * frac;
+  }
   function _epochToXInterpolated(ts, epochSec) {
     if (epochSec == null) return null;
     const direct = ts.timeToCoordinate(_epochToActiveTime(epochSec));
@@ -5111,13 +5134,13 @@ async function _renderLWChart(ohlcId, label) {
         const e1 = _timeToEpoch(data[1].time);
         const step = e1 - e0;
         if (!step) return null;
-        return ts.logicalToCoordinate(0 - (e0 - epochSec) / step);
+        return _interpX(ts, 0, 1, -(e0 - epochSec) / step);
       }
       if (epochSec >= eN) {
         const eNm1 = _timeToEpoch(data[n - 2].time);
         const step = eN - eNm1;
-        if (!step) return ts.logicalToCoordinate(n - 1);
-        return ts.logicalToCoordinate((n - 1) + (epochSec - eN) / step);
+        if (!step) return _logicalToX(ts, n - 1);
+        return _interpX(ts, n - 2, n - 1, 1 + (epochSec - eN) / step);
       }
       let lo = 0, hi = n - 1;
       while (hi - lo > 1) {
@@ -5126,7 +5149,7 @@ async function _renderLWChart(ohlcId, label) {
       }
       const eLo = _timeToEpoch(data[lo].time), eHi = _timeToEpoch(data[hi].time);
       const frac = eHi > eLo ? (epochSec - eLo) / (eHi - eLo) : 0;
-      return ts.logicalToCoordinate(lo + frac);
+      return _interpX(ts, lo, hi, frac);
     } catch (_) { return null; }
   }
 
