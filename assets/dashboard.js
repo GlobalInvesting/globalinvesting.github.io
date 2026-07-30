@@ -4997,19 +4997,71 @@ async function _renderLWChart(ohlcId, label) {
     } catch(_) { return null; }
   }
 
+  // ── Epoch → x-coordinate, interpolated across bar spacing ──────────────────
+  // timeToCoordinate() only resolves a Time that exactly matches an existing
+  // bar on the ACTIVE series. That's fine when a point is read back on the
+  // same timeframe it was drawn on (D1 epoch → D1 has a bar at that exact
+  // date), but breaks the moment the active timeframe has different bar
+  // density/placement — a W1 bar is stamped on one specific weekday, an H4
+  // bar every 4 hours, so a D1-drawn epoch almost never lands on an exact W1
+  // or H4 bar time, and timeToCoordinate() silently returns null (no error —
+  // the shape just doesn't render). This is the actual reason drawings still
+  // vanished across timeframes after v8.86.5's storage fix.
+  // Fix, matching how TradingView/Bloomberg-style terminals anchor a drawing
+  // to real time regardless of the active series' bar spacing: binary-search
+  // the active series' own bars (converted to epoch via _timeToEpoch, so it
+  // works whether the active series uses 'YYYY-MM-DD' strings or unix
+  // seconds) for the two bars bracketing the target epoch, then use
+  // logicalToCoordinate() — which, unlike timeToCoordinate(), is defined
+  // continuously between and beyond bars — on the fractional logical index
+  // between them. A direct timeToCoordinate() call is still tried first as a
+  // fast path for the common exact-match case.
+  function _epochToXInterpolated(ts, epochSec) {
+    if (epochSec == null) return null;
+    const direct = ts.timeToCoordinate(_epochToActiveTime(epochSec));
+    if (direct != null) return direct;
+    try {
+      const data = candleSeries.data();
+      if (!data || data.length < 2) return null;
+      const n = data.length;
+      const e0 = _timeToEpoch(data[0].time);
+      const eN = _timeToEpoch(data[n - 1].time);
+      if (epochSec <= e0) {
+        const e1 = _timeToEpoch(data[1].time);
+        const step = e1 - e0;
+        if (!step) return null;
+        return ts.logicalToCoordinate(0 - (e0 - epochSec) / step);
+      }
+      if (epochSec >= eN) {
+        const eNm1 = _timeToEpoch(data[n - 2].time);
+        const step = eN - eNm1;
+        if (!step) return ts.logicalToCoordinate(n - 1);
+        return ts.logicalToCoordinate((n - 1) + (epochSec - eN) / step);
+      }
+      let lo = 0, hi = n - 1;
+      while (hi - lo > 1) {
+        const mid = (lo + hi) >> 1;
+        if (_timeToEpoch(data[mid].time) <= epochSec) lo = mid; else hi = mid;
+      }
+      const eLo = _timeToEpoch(data[lo].time), eHi = _timeToEpoch(data[hi].time);
+      const frac = eHi > eLo ? (epochSec - eLo) / (eHi - eLo) : 0;
+      return ts.logicalToCoordinate(lo + frac);
+    } catch (_) { return null; }
+  }
+
   // Mirror of _resolveTimeAt for rendering: converts a stored point back to
-  // an x-coordinate. Tries the normal time-based lookup first (covers the
-  // common case, and the case where a future point's slot has since been
-  // filled by a real bar); falls back to logicalToCoordinate() — which, like
-  // coordinateToLogical() above, extrapolates continuously past the data
-  // range — for points still out in undrawn future space. That fallback only
-  // makes sense on the same timeframe the point was created on (futureIndex
-  // is a bar-count position, not a real-world time), so a future-space point
-  // viewed on a different timeframe simply won't render until a real bar
-  // catches up to it — a rare edge case, not the normal drawn-on-real-history case.
+  // an x-coordinate via _epochToXInterpolated (covers the common case, the
+  // cross-timeframe case, and the case where a future point's slot has since
+  // been filled by a real bar); falls back to raw logicalToCoordinate() on
+  // futureIndex for points still out in undrawn future space beyond the last
+  // bar on either side. That fallback only makes sense on the same timeframe
+  // the point was created on (futureIndex is a bar-count position, not a
+  // real-world time), so a future-space point viewed on a different
+  // timeframe simply won't render until a real bar catches up to it on that
+  // timeframe too — a rare edge case, not the normal drawn-on-real-history case.
   function _xForPoint(ts, pt) {
     if (!pt) return null;
-    const x = ts.timeToCoordinate(_epochToActiveTime(pt.time));
+    const x = _epochToXInterpolated(ts, pt.time);
     if (x != null) return x;
     if (pt.futureIndex != null) { try { return ts.logicalToCoordinate(pt.futureIndex); } catch(_) { return null; } }
     return null;
