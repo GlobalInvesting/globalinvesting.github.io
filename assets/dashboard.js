@@ -3119,6 +3119,9 @@ const _TV_TO_OHLC = {
   'CBOE:VIX':             'vix',
   'FRED:VIXCLS':          'vix',
   'TVC:MOVE':             'move',
+  // Credit spreads
+  'FRED:BAMLH0A0HYM2':    'hyoas',
+  'FRED:BAMLC0A0CM':      'igoas',
 };
 
 // Human-readable labels for the chart source footer
@@ -3127,6 +3130,7 @@ const _OHLC_LABELS = {
   spx: '^GSPC', nasdaq: '^NDX', nikkei: '^N225', stoxx: '^STOXX50E',
   eth: 'ETH-USD', dxy: 'DX-Y.NYB', vix: '^VIX', move: '^MOVE',
   silver: 'SI=F', brent: 'BZ=F', dax: '^GDAXI', ftse: '^FTSE', hsi: '^HSI', dji: '^DJI',
+  hyoas: 'BAMLH0A0HYM2', igoas: 'BAMLC0A0CM',
 };
 
 // Active LW chart instance — destroyed before each new render
@@ -3349,7 +3353,7 @@ function _lwBuildTodayBar(ohlcId) {
                 gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
                 audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
                 gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3,
-                silver:2,brent:2,dax:2,ftse:2,hsi:2,dji:2 }[ohlcId] ?? 5;
+                silver:2,brent:2,dax:2,ftse:2,hsi:2,dji:2,hyoas:0,igoas:0 }[ohlcId] ?? 5;
   const c = parseFloat(q.close.toFixed(dec));
   // Candle open convention:
   //   FX pairs  → prev_close (open = last bar's close, consistent with Yahoo daily FX data
@@ -4022,7 +4026,7 @@ async function _renderLWChart(ohlcId, label) {
                 gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
                 audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
                 gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3,
-                silver:2,brent:2,dax:2,ftse:2,hsi:2,dji:2 }[ohlcId] ?? 5;
+                silver:2,brent:2,dax:2,ftse:2,hsi:2,dji:2,hyoas:0,igoas:0 }[ohlcId] ?? 5;
   // minMove must match the precision: 5dp → 0.00001, 4dp → 0.0001, 3dp → 0.001, 2dp → 0.01
   const minMove = parseFloat((1 / Math.pow(10, dec)).toFixed(dec));
 
