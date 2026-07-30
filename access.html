@@ -167,6 +167,19 @@ a { color: inherit; text-decoration: none; }
 .panel-feature-row.reverse { grid-template-columns: 340px 1fr; }
 .panel-feature-row.reverse .panel-feature-text { order: 2; }
 .panel-feature-row.reverse .panel-feature-img { order: 1; }
+/* Wide-img modifier: for panels whose screenshot is landscape (e.g. the Price
+   Chart, 688×399) rather than the portrait/square crops the other panel rows
+   use. At the standard 340px column those landscape shots render ~197px
+   tall — visibly smaller than the surrounding sections despite covering just
+   as much ground. Widening the image column (text stays capped at 460px via
+   .panel-feature-desc below, so this doesn't crowd the copy) brings it back
+   to a comparable visual weight. */
+.panel-feature-row.wide-img { grid-template-columns: 1fr 460px; }
+.panel-feature-row.wide-img.reverse { grid-template-columns: 460px 1fr; }
+@media (max-width: 900px) {
+  .panel-feature-row.wide-img, .panel-feature-row.wide-img.reverse { grid-template-columns: 1fr; gap: 20px; }
+  .panel-feature-row.wide-img.reverse .panel-feature-text, .panel-feature-row.wide-img.reverse .panel-feature-img { order: initial; }
+}
 .panel-feature-img { justify-self: center; }
 .panel-feature-img .scr-hero { margin-bottom: 0; }
 .panel-feature-desc { font-size: 13.5px; color: var(--text2); line-height: 1.8; max-width: 460px; }
@@ -789,7 +802,7 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
 
-      <div class="panel-feature-row reverse">
+      <div class="panel-feature-row reverse wide-img">
         <div class="panel-feature-img">
           <div class="scr-hero-wrap">
             <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Interactive Price Chart in the Global Investing web terminal, showing EUR/USD candlesticks with EMA overlays, drawn support/resistance zones and a trend line, and an RSI sub-pane">
