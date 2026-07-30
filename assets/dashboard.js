@@ -4707,6 +4707,7 @@ async function _renderLWChart(ohlcId, label) {
     _drawRafId = requestAnimationFrame(() => {
       _drawRafId = null;
       if (!_drawOverlay || !_lwChart) return;
+      if (window._lwDebugDraw) console.warn('[lw-draw] _renderDrawings ran on', _lwActiveTf, 'count:', _curDrawings().length);
       // Clip the overlay so drawings tuck UNDER the price-scale ribbon (right)
       // and the time-axis strip (bottom) instead of painting on top of them —
       // the overlay is a plain absolutely-positioned SVG sibling spanning the
@@ -4744,7 +4745,17 @@ async function _renderLWChart(ohlcId, label) {
       } catch(_) {}
       let svg = '';
       const arr = _curDrawings();
-      arr.forEach((d, i) => { try { svg += _svgForDrawing(d, false, i === _selectedIdx); } catch(_) {} });
+      arr.forEach((d, i) => {
+        try { svg += _svgForDrawing(d, false, i === _selectedIdx); }
+        catch(err) {
+          // v8.86.9: was a silent catch(_){} — swallowed any exception thrown
+          // inside _svgForDrawing (as opposed to a clean null-coordinate
+          // return), which meant the v8.86.8 null-coordinate diagnostic could
+          // never fire for that case. Surface it the same way so the real
+          // failure (if it's a thrown error, not a null) is visible.
+          if (window._lwDebugDraw) console.error('[lw-draw] _svgForDrawing threw on', _lwActiveTf, d.type, err);
+        }
+      });
       if (_isDragging && _drawAnchor && _drawLiveEnd) {
         try {
           svg += _svgForDrawing({ type: _drawMode, p1: _drawAnchor, p2: _drawLiveEnd, color: _DRAW_COLORS[_drawMode] }, true, false);
