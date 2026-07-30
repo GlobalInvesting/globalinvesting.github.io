@@ -4611,6 +4611,22 @@ async function _renderLWChart(ohlcId, label) {
     const ts = _lwChart.timeScale();
     const x1 = _xForPoint(ts, d.p1), x2 = _xForPoint(ts, d.p2);
     const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
+    // ── Temporary diagnostic (v8.86.8) ──────────────────────────────────────
+    // Enable with `window._lwDebugDraw = true` in the browser console, then
+    // switch timeframe — logs exactly which coordinate came back null for a
+    // drawing that fails to render, on which TF, so the real cause (vs. a
+    // guess) can be confirmed from actual browser/library behavior instead
+    // of a reimplemented probe. Remove once W1/MN root cause is nailed down.
+    if (window._lwDebugDraw && (x1 == null || x2 == null || y1 == null || y2 == null)) {
+      console.warn('[lw-draw] vanished on', _lwActiveTf, {
+        type: d.type,
+        p1: d.p1, p2: d.p2,
+        x1, x2, y1, y2,
+        dataLen: (candleSeries.data() || []).length,
+        firstBar: (candleSeries.data() || [])[0]?.time,
+        lastBar: (candleSeries.data() || []).slice(-1)[0]?.time,
+      });
+    }
     if (x1 == null || x2 == null || y1 == null || y2 == null) return '';
     const col = d.color || _DRAW_COLORS[d.type] || _DRAW_COLORS.trend;
     const previewDash = isPreview ? ' stroke-dasharray="3,3"' : '';
