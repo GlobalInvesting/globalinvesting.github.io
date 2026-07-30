@@ -5451,8 +5451,11 @@ async function _renderLWChart(ohlcId, label) {
   }
 
   const _maSeries = {}; // uid → series object
-  // Active pane indices — keyed by indicator id, reset each render (chart destroyed)
+  // Active pane indices — keyed by indicator id, reset each render (chart destroyed).
+  // Exposed on window (below) so the top-level fullscreen/resize handlers — which
+  // live outside this closure — can re-apply pane heights after chart.resize().
   const _indPaneIndex = {}; // id → pane index number (oscillators only)
+  window._indPaneIndex = _indPaneIndex;
   window._indSeries = {}; const _indSeries = window._indSeries;
   const _indRefSeries = {}; // paneIndex → array of ref-line series
 
@@ -6700,7 +6703,7 @@ async function _renderLWChart(ohlcId, label) {
     _lwResizeObs = new ResizeObserver(entries => {
       for (const e of entries) {
         const { width, height } = e.contentRect;
-        if (_lwChart && width > 0 && height > 0) _lwChart.resize(width, height);
+        if (_lwChart && width > 0 && height > 0) { _lwChart.resize(width, height); _lwReapplyPaneHeights(); _lwReprojectDrawings(); }
       }
     });
     _lwResizeObs.observe(chartDiv);
@@ -12987,7 +12990,7 @@ function _repaintAfterExclusivePanelClosed() {
       const _chartWrap = document.getElementById('tv-chart-wrap');
       if (typeof _lwChart !== 'undefined' && _lwChart && _chartWrap) {
         const w = _chartWrap.offsetWidth, h = _chartWrap.offsetHeight;
-        if (w > 0 && h > 0) try { _lwChart.resize(w, h); } catch(_) {}
+        if (w > 0 && h > 0) try { _lwChart.resize(w, h); _lwReapplyPaneHeights(); _lwReprojectDrawings(); } catch(_) {}
       }
       // Sidebar liquidity canvas — same repaint-after-restore pattern.
       if (typeof drawLiquidityChart === 'function') drawLiquidityChart();
@@ -13707,6 +13710,43 @@ let _lwFsOriginalParent = null;
 let _lwFsOriginalNext   = null;
 let _lwFsOriginalHeight = null;
 
+// Oscillator sub-panes (RSI, MACD, Stochastic, etc.) are given a fixed pixel
+// height via pane.setHeight(80 or 90) when built — see _buildIndicatorPane.
+// Lightweight Charts does NOT treat that as a hard floor across a chart.resize():
+// a large total-height change (e.g. leaving fullscreen, ~900px tall → ~290px)
+// proportionally rescales every pane, including ones with an explicit
+// setHeight() — a known library limitation (tradingview/lightweight-charts#1847).
+// The result was exactly what was reported: after exiting fullscreen the
+// oscillator strip (and, by the same proportional math, the main price pane)
+// came back squashed/misproportioned instead of respecting its intended 80/90px.
+// Re-applying setHeight() right after every resize() restores the fixed
+// heights the same way _buildIndicatorPane originally set them.
+function _lwReapplyPaneHeights() {
+  if (!_lwChart || !window._indPaneIndex) return;
+  try {
+    const panes = _lwChart.panes();
+    Object.keys(window._indPaneIndex).forEach(id => {
+      const idx = window._indPaneIndex[id];
+      if (idx == null) return;
+      const paneH = (id === 'macd' || id === 'adx') ? 90 : 80;
+      panes[idx]?.setHeight(paneH);
+    });
+  } catch(_) {}
+}
+
+// Companion fix for the other half of the same symptom: the drawing overlay
+// (trend lines, rectangles, Fib guides — see _renderDrawings) only
+// re-projects on timeScale().subscribeVisibleTimeRangeChange, i.e. pan/zoom.
+// A resize() can shrink or grow the main pane's price-scale mapping (its
+// pixel height changed) with the visible *time* range completely unchanged,
+// so that listener never fires and every drawing is left rendered at its
+// pre-resize pixel position — reading as shapes "shifted" relative to the
+// candles they were anchored to. Re-running the reproject right after
+// resize keeps drawings pinned to their actual price/time coordinates.
+function _lwReprojectDrawings() {
+  if (typeof window._lwRenderDrawings === 'function') window._lwRenderDrawings();
+}
+
 function _lwOpenFullscreen() {
   const overlay   = document.getElementById('lw-fullscreen-overlay');
   const inner     = document.getElementById('lw-fullscreen-inner');
@@ -13744,7 +13784,9 @@ function _lwOpenFullscreen() {
       // pushing the time axis off the bottom edge.
       const w = chartWrap.offsetWidth  || inner.offsetWidth;
       const h = chartWrap.offsetHeight || inner.offsetHeight;
-      if (w > 0 && h > 0) _lwChart.resize(w, h);
+      // forceRepaint:true — paint immediately instead of on the next tick, so
+      // there's no single frame at the old (pre-fullscreen) canvas size.
+      if (w > 0 && h > 0) { _lwChart.resize(w, h, true); _lwReapplyPaneHeights(); _lwReprojectDrawings(); }
     }
   }));
 }
@@ -13777,7 +13819,14 @@ function _lwCloseFullscreen() {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     if (_lwChart && chartWrap) {
       const w = chartWrap.offsetWidth, h = chartWrap.offsetHeight;
-      if (w > 0 && h > 0) _lwChart.resize(w, h);
+      // forceRepaint:true (immediate paint) + _lwReapplyPaneHeights() — without
+      // this the chart came back from fullscreen with panes proportionally
+      // rescaled from the ~900px fullscreen height down to ~290px, squashing
+      // the oscillator strip; _lwReprojectDrawings() re-pins every drawing to
+      // its real price/time coordinates, since resize() alone doesn't fire
+      // the visible-time-range event the overlay normally redraws on. See
+      // _lwReapplyPaneHeights() above for detail.
+      if (w > 0 && h > 0) { _lwChart.resize(w, h, true); _lwReapplyPaneHeights(); _lwReprojectDrawings(); }
     }
   }));
 
