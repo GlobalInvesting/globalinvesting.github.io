@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-30T12:01:06Z",
+  "generated_at": "2026-07-30T12:31:07Z",
   "source": "Myfxbook RSS",
   "holidays": [],
   "events": [
@@ -2783,8 +2783,8 @@
       "impact": "high",
       "forecast": "3.3%",
       "previous": "3.4%",
-      "actual": null,
-      "released": false
+      "actual": "3.3%",
+      "released": true
     },
     {
       "title": "United States Personal Income MoM",
@@ -2794,8 +2794,19 @@
       "impact": "high",
       "forecast": "0.3%",
       "previous": "0.7%",
-      "actual": null,
-      "released": false
+      "actual": "0.2%",
+      "released": true
+    },
+    {
+      "title": "United States Jobless Claims 4-week Average",
+      "currency": "USD",
+      "dateISO": "2026-07-30",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "210.0K",
+      "previous": "207.75K",
+      "actual": "202.75K",
+      "released": true
     },
     {
       "title": "United States GDP Growth Rate QoQ",
@@ -2805,8 +2816,8 @@
       "impact": "high",
       "forecast": "2.1%",
       "previous": "2.1%",
-      "actual": null,
-      "released": false
+      "actual": "1.5%",
+      "released": true
     },
     {
       "title": "United States GDP Price Index QoQ",
@@ -2816,8 +2827,8 @@
       "impact": "medium",
       "forecast": "3.6%",
       "previous": "3.6%",
-      "actual": null,
-      "released": false
+      "actual": "6.3%",
+      "released": true
     },
     {
       "title": "United States PCE Price Index YoY",
@@ -2827,8 +2838,8 @@
       "impact": "medium",
       "forecast": "3.7%",
       "previous": "4.1%",
-      "actual": null,
-      "released": false
+      "actual": "3.7%",
+      "released": true
     },
     {
       "title": "United States Core PCE Price Index MoM",
@@ -2838,8 +2849,8 @@
       "impact": "high",
       "forecast": "0.2%",
       "previous": "0.3%",
-      "actual": null,
-      "released": false
+      "actual": "0.1%",
+      "released": true
     },
     {
       "title": "United States Personal Spending MoM",
@@ -2848,9 +2859,9 @@
       "timeUTC": "12:30",
       "impact": "high",
       "forecast": "0.3%",
-      "previous": "0.7%",
-      "actual": null,
-      "released": false
+      "previous": "0.9%",
+      "actual": "0.3%",
+      "released": true
     },
     {
       "title": "United States PCE Price Index MoM",
@@ -2859,9 +2870,31 @@
       "timeUTC": "12:30",
       "impact": "medium",
       "forecast": "-0.1%",
-      "previous": "0.4%",
-      "actual": null,
-      "released": false
+      "previous": "0.5%",
+      "actual": "-0.1%",
+      "released": true
+    },
+    {
+      "title": "United States Initial Jobless Claims",
+      "currency": "USD",
+      "dateISO": "2026-07-30",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "200.0K",
+      "previous": "188.0K",
+      "actual": "197.0K",
+      "released": true
+    },
+    {
+      "title": "United States Continuing Jobless Claims",
+      "currency": "USD",
+      "dateISO": "2026-07-30",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "1800.0K",
+      "previous": "1789.0K",
+      "actual": "1782.0K",
+      "released": true
     },
     {
       "title": "United Kingdom BoE Gov Bailey Speech",
