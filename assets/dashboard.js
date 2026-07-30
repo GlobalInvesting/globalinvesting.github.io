@@ -4622,6 +4622,19 @@ async function _renderLWChart(ohlcId, label) {
     _drawRafId = requestAnimationFrame(() => {
       _drawRafId = null;
       if (!_drawOverlay || !_lwChart) return;
+      // Clip the overlay so drawings tuck UNDER the price-scale ribbon (right)
+      // and the time-axis strip (bottom) instead of painting on top of them —
+      // the overlay is a plain absolutely-positioned SVG sibling spanning the
+      // full chartDiv, so without this a trend line/rectangle dragged into
+      // that space visually sat above the price labels. Queried fresh on
+      // every render since price-scale width isn't fixed — it grows with the
+      // digit count of the current symbol's price format (e.g. USDJPY vs
+      // EURUSD) and time-axis height can vary slightly with font metrics.
+      try {
+        const rightW = _lwChart.priceScale('right').width() || 0;
+        const botH   = _lwChart.timeScale().height() || 0;
+        _drawOverlay.style.clipPath = `inset(0 ${rightW}px ${botH}px 0)`;
+      } catch(_) {}
       let svg = '';
       const arr = _curDrawings();
       arr.forEach((d, i) => { try { svg += _svgForDrawing(d, false, i === _selectedIdx); } catch(_) {} });
