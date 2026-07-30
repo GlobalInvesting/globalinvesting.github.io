@@ -4611,12 +4611,24 @@ async function _renderLWChart(ohlcId, label) {
     const ts = _lwChart.timeScale();
     const x1 = _xForPoint(ts, d.p1), x2 = _xForPoint(ts, d.p2);
     const y1 = candleSeries.priceToCoordinate(d.p1.price), y2 = candleSeries.priceToCoordinate(d.p2.price);
-    // ── Temporary diagnostic (v8.86.8) ──────────────────────────────────────
-    // Enable with `window._lwDebugDraw = true` in the browser console, then
-    // switch timeframe — logs exactly which coordinate came back null for a
-    // drawing that fails to render, on which TF, so the real cause (vs. a
-    // guess) can be confirmed from actual browser/library behavior instead
-    // of a reimplemented probe. Remove once W1/MN root cause is nailed down.
+    // ── Temporary diagnostic (v8.86.10) ─────────────────────────────────────
+    // v8.86.8/9 only logged the null-coordinate and thrown-exception cases —
+    // neither fired on W1/MN, which means _svgForDrawing IS completing with
+    // non-null numeric coordinates. So log the actual numbers now (not just
+    // "is it null") to see whether they're just wildly wrong / off-screen,
+    // or something else (clip-path, color) is hiding an otherwise-correct
+    // shape. Remove once root cause is confirmed.
+    if (window._lwDebugDraw) {
+      const _key = _lwActiveTf + '|' + d.type + '|' + x1 + '|' + x2 + '|' + y1 + '|' + y2;
+      if (window._lwDebugLastKey !== _key) {
+        window._lwDebugLastKey = _key;
+        console.warn('[lw-draw] coords on', _lwActiveTf, {
+          type: d.type, x1, x2, y1, y2,
+          clipPath: _drawOverlay ? _drawOverlay.style.clipPath : null,
+          chartDivW: chartDiv.clientWidth, chartDivH: chartDiv.clientHeight,
+        });
+      }
+    }
     if (window._lwDebugDraw && (x1 == null || x2 == null || y1 == null || y2 == null)) {
       console.warn('[lw-draw] vanished on', _lwActiveTf, {
         type: d.type,
@@ -4707,7 +4719,13 @@ async function _renderLWChart(ohlcId, label) {
     _drawRafId = requestAnimationFrame(() => {
       _drawRafId = null;
       if (!_drawOverlay || !_lwChart) return;
-      if (window._lwDebugDraw) console.warn('[lw-draw] _renderDrawings ran on', _lwActiveTf, 'count:', _curDrawings().length);
+      if (window._lwDebugDraw) {
+        const _rKey = 'run|' + _lwActiveTf + '|' + _curDrawings().length;
+        if (window._lwDebugLastRunKey !== _rKey) {
+          window._lwDebugLastRunKey = _rKey;
+          console.warn('[lw-draw] _renderDrawings ran on', _lwActiveTf, 'count:', _curDrawings().length);
+        }
+      }
       // Clip the overlay so drawings tuck UNDER the price-scale ribbon (right)
       // and the time-axis strip (bottom) instead of painting on top of them —
       // the overlay is a plain absolutely-positioned SVG sibling spanning the
