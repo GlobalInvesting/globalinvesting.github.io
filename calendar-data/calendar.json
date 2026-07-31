@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-31T08:14:58Z",
-  "generatedAt": "2026-07-31T08:14:58Z",
+  "lastUpdate": "2026-07-31T11:37:01Z",
+  "generatedAt": "2026-07-31T11:37:01Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -699,9 +699,9 @@
       "std": 0.1
     },
     "EUR/cpi": {
-      "n": 6,
-      "mean": -0.08,
-      "std": 0.123612
+      "n": 7,
+      "mean": -0.065714,
+      "std": 0.119004
     },
     "NZD/balance of trade": {
       "n": 4,
@@ -999,14 +999,14 @@
       "std": 0.9
     },
     "EUR/inflation rate mom": {
-      "n": 3,
-      "mean": -0.2,
-      "std": 0.1
+      "n": 4,
+      "mean": -0.15,
+      "std": 0.129099
     },
     "EUR/inflation rate yoy": {
-      "n": 3,
-      "mean": -0.133333,
-      "std": 0.057735
+      "n": 4,
+      "mean": -0.1,
+      "std": 0.08165
     },
     "CHF/kof leading indicators": {
       "n": 3,
@@ -1094,9 +1094,9 @@
       "std": 5.627442
     },
     "EUR/core inflation rate yoy": {
-      "n": 2,
-      "mean": -0.05,
-      "std": 0.212132
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.173205
     },
     "GBP/dmp 1y cpi expectations": {
       "n": 3,
@@ -1332,6 +1332,21 @@
       "n": 2,
       "mean": -2.54,
       "std": 0.169706
+    },
+    "EUR/italy inflation rate mom": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.0
+    },
+    "EUR/italy inflation rate yoy": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.070711
+    },
+    "EUR/greece retail sales yoy": {
+      "n": 2,
+      "mean": 0.6,
+      "std": 4.525483
     },
     "EUR/germany inflation rate mom": {
       "n": 2,
@@ -46892,7 +46907,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area Inflation Rate MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.2%",
       "previous": "-0.1%"
     },
@@ -46905,7 +46920,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area Core Inflation Rate YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "2.5%",
       "forecast": "2.4%",
       "previous": "2.4%"
     },
@@ -46918,7 +46933,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.9%",
       "forecast": "2.9%",
       "previous": "2.8%"
     },
@@ -46931,7 +46946,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area CPI",
       "impact": "high",
-      "actual": null,
+      "actual": "103.22",
       "forecast": "103.2",
       "previous": "103.02"
     },
@@ -46944,7 +46959,7 @@
       "flag": "🇪🇺",
       "event": "Greece Retail Sales YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "6.8%",
       "forecast": "3.0%",
       "previous": "-0.1%"
     },
@@ -46957,7 +46972,7 @@
       "flag": "🇪🇺",
       "event": "Italy Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.8%",
       "forecast": "2.8%",
       "previous": "3.0%"
     },
@@ -46970,7 +46985,7 @@
       "flag": "🇪🇺",
       "event": "Italy Inflation Rate MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.3%",
       "previous": "0.0%"
     },
