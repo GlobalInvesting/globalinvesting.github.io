@@ -1,55 +1,51 @@
 {
-  "generated_at": "2026-07-31T09:22:13Z",
+  "generated_at": "2026-07-31T16:15:45Z",
   "signals": [
     {
-      "time": "09:21",
+      "time": "16:15",
       "priority": "critical",
-      "title": "USD/JPY — G10 Bilateral Theme + Carry Unwind",
-      "text": "USD/JPY trades at 159.53, having broken decisively below its SMA20/50 cluster at 161.34/162.53. The G10 Currency Strength Scorecard confirms a massive bilateral divergence with JPY outperforming (+1.661%) and USD lagging (-1.375%), creating a 3.036% spread that signals a major regime shift. Despite a 275bp OIS carry advantage for USD, the pair is collapsing as specs (COT JPY net short -114,030) are forced to cover ahead of the BoJ meeting. Options markets are pricing in further downside protection with a moderate put skew (25d RR -1.38) and negative VRP (-0.6%), suggesting realized volatility is outpacing option premiums. JPY safe-haven function is engaging as the bear steepener in the US yield curve (+44.3bp 2s10s) signals growth concerns. Risk: BoJ delivers a dovish hold, allowing the 275bp carry advantage to reassert control and squeeze the pair back toward 161.00.",
+      "title": "USD/JPY — G10 Bilateral Theme + BoJ Intervention",
+      "text": "USD/JPY trades at 159.26, having broken sharply below its SMA20 (162.53) and SMA50 (161.34) following suspected Japanese intervention and a hawkish BoJ hold at 1.0%. The G10 scorecard confirms a dominant bilateral theme with JPY outperforming peers by +1.906% while the USD laggard average sits at -1.322%, creating a massive 3.228% spread. Despite a +275bp Fed-BoJ carry advantage supporting the USD, the options market is pricing aggressive downside protection with a strong 25d risk reversal of -2.53. COT data shows specs remain heavily net short JPY (lev_net -114,030), suggesting the current move is being fueled by a disorderly short-covering unwind. The pair now tests the SMA200 at 157.93 as the next major structural floor. Risk: Fed adopts a surprisingly hawkish tone in upcoming communications, reigniting the carry trade bid and stalling the JPY recovery.",
       "evidence": [
-        "JPY 1W avg: +1.661% (n=7)",
-        "USD 1W avg: -1.375% (n=7)",
-        "G10 spread: 3.036%",
-        "USD/JPY OIS Carry: +267bp"
+        "JPY 1W avg: +1.906% (n=7)",
+        "USD 1W avg: -1.322% (n=7)",
+        "G10 spread: 3.228%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:18",
+      "time": "16:12",
       "priority": "warning",
-      "title": "EUR/USD — CPI Headline + Positioning + Vol",
-      "text": "EUR/USD trades at 1.1518 following Eurozone Core CPI unexpectedly accelerating to 2.5%, which reinforces ECB hawkishness and a potential September hike. This headline surprise coincides with a technical breakout above the SMA20/50 cluster (1.1424/1.1487), though the pair remains below the SMA200 at 1.1635. Speculative positioning (COT) remains heavily net short at -80,570 (32.4% long), creating a significant short-squeeze runway if the ECB's hawkish bias persists. The options market is already pricing this risk with a 2.7-point Vol Risk Premium (IV 7.1% vs HV30 4.4%), indicating high demand for upside protection. While the 135bp USD carry advantage remains a structural headwind, the ESI (+9.7) suggests Eurozone data momentum is diverging favorably from the neutral US trend. Risk: Geopolitical escalation in the Middle East triggers broad USD safe-haven demand, overriding the CPI-driven ECB repricing.",
+      "title": "NZD/USD — COT vs OIS Divergence + ESI",
+      "text": "NZD/USD is trading at 0.5878, maintaining a bullish position above its SMA20/50/200 cluster (0.5786–0.5826) after a +1.80% weekly gain. RBNZ holds at 2.5%. This speculative positioning is further challenged by a strong positive Economic Surprise Index (ESI) of +30.6, indicating that New Zealand macro data is consistently beating expectations. The combination of restrictive data and a hawkish central bank stance creates an asymmetric short-squeeze risk toward 0.6000 if specs begin to capitulate. The negative real rate of -1.56% remains a headwind for long-term holders but does not offset the immediate technical and data-driven momentum. Risk: RBNZ signals a pause at the September 2nd meeting, validating the existing speculative short thesis.",
       "evidence": [
-        "EZ Core CPI: 2.5% (Actual) vs 2.4% (Exp)",
-        "EUR COT lev_net: -80,570",
-        "EUR/USD VRP: +2.7%",
-        "USD/EUR Carry: +135bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "09:15",
-      "priority": "warning",
-      "title": "NZD/USD — ESI Outperformance + Retail Divergence",
-      "text": "NZD/USD is trading at 0.5883, maintaining its position above the SMA20/50/200 cluster (0.5786/0.5826) after a strong 1W gain of +1.89%. The pair is supported by a significant Economic Surprise Index (ESI) lead of +30.6, the second-highest in the G10, confirming that real-world data is outperforming RBNZ's accommodative real rate of -1.56%. A clear multi-layer divergence is forming: COT specs are heavily net short (-31,649, only 12% long), while retail sentiment has reached a 62% short bias. RBNZ holds at 2.5%. The 125bp USD carry advantage remains the primary obstacle to a sustained break above 0.6000. Risk: US NFP surprise reinforces the Fed's 'higher for longer' stance, revitalizing the USD carry bid.",
-      "evidence": [
+        "NZD COT lev_net: -31,649",
         "NZD ESI: +30.6",
-        "NZD COT Long%: 12.0%",
-        "NZD/USD 1W: +1.89%",
-        "USD/NZD Carry: +125bp"
+        "NZD/USD: 0.5878"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:12",
-      "priority": "info",
-      "title": "GBP/USD — Carry Neutrality + Volatility Premium",
-      "text": "GBP/USD holds at 1.3459, positioned above its entire SMA cluster (SMA200 at 1.3399), as the BoE holds at 3.75%. The OIS carry differential is effectively neutral (-8bp favors GBP), removing the usual USD-centric carry pressure seen elsewhere in G10. Speculative positioning is moderately long (lev_net +33,812), but the options market is expressing extreme caution with a +5.0% Vol Risk Premium (IV 11.0% vs HV30 6.0%). This high VRP suggests traders are paying a significant premium for protection against a sharp move, likely reflecting uncertainty around the recent BoE communication and high UK 10Y yields at 5.08%. The bear steepener in US yields provides a backdrop of general USD fragility that benefits GBP in a carry-neutral environment. Risk: A break below the SMA200 at 1.3399 triggers a liquidation of the spec long position.",
+      "time": "16:10",
+      "priority": "warning",
+      "title": "USD/CAD — Data Surprise + Technical Resistance",
+      "text": "USD/CAD is holding at 1.4028, reversing recent declines as it tests the SMA50 resistance at 1.4046. While the Fed-BoC carry differential of +150bp structurally favors the USD, recent Canadian GDP data has outpaced forecasts, prompting analysts to lower BoC rate cut expectations. This shift is reflected in the positive Canadian ESI (+5.6) and a restrictive real rate of +0.17%. COT positioning shows a crowded spec short in CAD (lev_net -99,823), leaving the pair vulnerable to further downside if USD strength continues to fade across the G10 complex. A sustained break below the SMA50 and 1.4000 psychological level would signal a shift in the medium-term regime. Risk: US 10Y yields, currently at 4.735%, continue to climb, providing enough USD support to overcome the improving Canadian macro outlook.",
       "evidence": [
-        "GBP/USD VRP: +5.0%",
-        "GBP/USD OIS Carry: -8bp",
-        "UK 10Y Yield: 5.08%",
-        "GBP COT lev_net: +33,812"
+        "USD/CAD SMA50: 1.4046",
+        "CAD COT lev_net: -99,823",
+        "Fed-BoC OIS Spread: +134bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "16:05",
+      "priority": "info",
+      "title": "AUD/USD — Positioning + Volatility + Retail",
+      "text": "AUD/USD trades at 0.7025, supported by its SMA20 (0.6974) and a 70bp carry advantage over the USD via the RBA's 4.35% policy rate. The options market is pricing in significant tail risk with an elevated Vol Risk Premium (VRP) of +6.1%, as IV (12.5%) significantly exceeds HV30 (6.4%). Retail sentiment shows a strong 76% short bias, diverging from the COT leveraged fund net long position of +20,521. This institutional vs. retail divergence typically favors further upside, as retail traders continue to unsuccessfully fade the established bullish trend. The RBA's hiking bias and positive real rate of +0.39% provide a fundamental floor for the pair. Risk: A sharp contraction in WTI oil or broader commodity prices undercuts the AUD's terms-of-trade advantage.",
+      "evidence": [
+        "AUD/USD Retail: 76% Short",
+        "AUD VRP: +6.1%",
+        "RBA-Fed OIS Spread: +70bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
