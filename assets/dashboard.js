@@ -12800,6 +12800,24 @@ async function renderEconSurprises() {
       // Pure decay-weighted beat/miss (CESI convention)
       idx100 = s.wTotal > 0 ? ((s.wBeats - s.wMisses) / s.wTotal) * 100 : 0;
     }
+    // ── Confidence shrinkage (v8.87.0) ────────────────────────────────────
+    // Parallel fix to ComputeESI() v3.347 in the MT5 EA (Global_Investing_
+    // FX_Terminal.mq5): the bar itself was already scaled against a FIXED
+    // ±100 range (halfPct below), not against the locally-observed max on
+    // screen, so the EA's bar-scaling bug never existed here. But idx100 had
+    // no penalty for thin sample support — a currency with N=1 that happened
+    // to beat consensus could show idx100=+100, the same full-conviction bar
+    // as a currency backed by dozens of independent releases. Reused the
+    // s.total counter (already computed above for the N column) rather than
+    // introducing a second counter — CONFIDENCE_MIN_N mirrors the existing
+    // lowConf threshold a few lines below, so a currency only reaches full
+    // (1.0) confidence once its N clears the same bar this panel already
+    // uses to decide whether N itself is trustworthy enough to display at
+    // full brightness.
+    const CONFIDENCE_MIN_N = 15;
+    const confidence = Math.min(1, s.total / CONFIDENCE_MIN_N);
+    idx100 *= confidence;
+
     // Bar: max half-width = 50% of container (the zero line is at 50%)
     const halfPct = Math.min(Math.abs(idx100), 100) / 2; // 0–50%
     const positive = idx100 >= 0;
