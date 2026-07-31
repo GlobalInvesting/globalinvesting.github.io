@@ -438,7 +438,8 @@
   let _sessionCtxIsWeekend = false; // true when session-context.json was generated in closed-market mode
 
   // CSI state
-  let _csiData       = null;  // { dates: [...], series: { EUR: [...], GBP: [...], ... } }
+  let _csiData       = null;  // { dates: [...], series: { EUR: [...], GBP: [...], ... } } — CLOSED sessions only (ohlc-data/*.json)
+  let _csiDataLive   = null;  // same shape as _csiData, with one extra live in-progress-session point per ccy appended
   let _csiChart      = null;  // LWC chart instance
   let _csiPeriodDays = 63;    // default 3M
   let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for focal-line styling
@@ -1514,10 +1515,88 @@
     return { dates, series };
   }
 
+  // ── Live in-progress-session point (mirrors dashboard.js _lwBuildTodayBar) ──
+  // _loadCSIData() only ever returns CLOSED daily sessions: ohlc-data/*.json is
+  // written by fetch_ohlc.py, which by design strips the in-progress today-bar
+  // before writing (see that script's own header comment) so a candle with
+  // truncated H/L wicks never persists. The main price chart compensates for
+  // this via _lwBuildTodayBar()/_lwUpdateTodayBar() in dashboard.js, sourced
+  // live from STOOQ_RT_CACHE — the CSI chart had no equivalent, so its most
+  // recent day lagged behind the 1W Strength tile and heatmap (both read the
+  // same STOOQ_RT_CACHE) until the OHLC workflow's next session-close run
+  // (~21:00-22:30 UTC).
+  //
+  // This derives one extra point per currency for the session currently in
+  // progress, using the exact same per-pair sign convention and log-return
+  // math as _loadCSIData() above (Math.log(close/prevClose) * sign, averaged
+  // across each currency's participating pairs) so the live point is
+  // numerically consistent with the historical series, not just visually
+  // appended to it.
+
+  // FX session-open date convention (21:00 UTC boundary) — same rule
+  // _lwBuildTodayBar()'s isFxBar branch uses in dashboard.js: a bar forming
+  // at/after 21:00 UTC belongs to the session fetch_ohlc.py will date
+  // tomorrow.
+  function _csiLiveDateStr() {
+    const now = new Date();
+    if (now.getUTCHours() >= 21) {
+      const tomorrow = new Date(now);
+      tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+      return tomorrow.toISOString().slice(0, 10);
+    }
+    return now.toISOString().slice(0, 10);
+  }
+
+  // Returns { dates, series } with a live point appended to each currency's
+  // series, or the plain historical _csiData when there's nothing live to
+  // add (market closed, no rtCache yet, or the OHLC workflow has already
+  // closed out today's session and the historical series already has it).
+  function _computeCSILiveView() {
+    if (!_csiData) return null;
+    if (isMarketWeekend() || !_rtCache) return _csiData;
+
+    const { dates, series } = _csiData;
+    const liveDate     = _csiLiveDateStr();
+    const lastHistDate = dates.length ? dates[dates.length - 1] : null;
+    if (liveDate === lastHistDate) return _csiData;  // already closed out and in the JSON — nothing to append
+
+    // Per-currency live return: average the signed log-return across each
+    // currency's participating pairs, using STOOQ_RT_CACHE's close/prev_close
+    // — the same fields _lwBuildTodayBar() reads for the main chart's live bar.
+    const liveRet = {};
+    CCY_ORDER.forEach(ccy => {
+      const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
+      let sum = 0, cnt = 0;
+      myPairs.forEach(p => {
+        const d = _rtCache[p.id];
+        if (!d || !d.close || !d.prev_close || d.close <= 0 || d.prev_close <= 0) return;
+        const ret = Math.log(d.close / d.prev_close) * p.sign;
+        sum += (p.base === ccy ? ret : -ret);
+        cnt++;
+      });
+      liveRet[ccy] = cnt > 0 ? (sum / cnt) : null;
+    });
+
+    const liveSeries = {};
+    let anyLive = false;
+    CCY_ORDER.forEach(ccy => {
+      const hist = series[ccy] || [];
+      if (liveRet[ccy] == null) { liveSeries[ccy] = hist; return; }
+      const lastVal = hist.length ? hist[hist.length - 1].value : 0;
+      const liveVal = parseFloat((lastVal + liveRet[ccy] * 100).toFixed(4));
+      liveSeries[ccy] = hist.concat([{ time: liveDate, value: liveVal }]);
+      anyLive = true;
+    });
+
+    if (!anyLive) return _csiData;  // rtCache present but no usable pair data yet (e.g. right at session open)
+    return { dates: dates.concat([liveDate]), series: liveSeries };
+  }
+
   // Render or update the LWC chart with the current period
   function _renderCSIChart(ccy) {
     const LWC = window.LightweightCharts;
     if (!LWC || !_csiData) return;
+    const csiView = _csiDataLive || _csiData;
 
     const wrap      = document.getElementById('hm-csi-wrap');
     const chartEl   = document.getElementById('hm-csi-chart');
@@ -1525,7 +1604,7 @@
     if (!wrap || !chartEl) return;
 
     // Determine date slice
-    const allDates  = _csiData.dates;
+    const allDates  = csiView.dates;
     let startIdx    = 0;
     if (_csiPeriodDays > 0) {
       startIdx = Math.max(0, allDates.length - _csiPeriodDays);
@@ -1575,7 +1654,7 @@
 
     CCY_ORDER.forEach(c => {
       const isFocus = c === ccy;
-      const allPts = _csiData.series[c];
+      const allPts = csiView.series[c];
       const sliceIdx = allPts.findIndex(pt => pt.time >= cutoffDate);
       const baseVal  = sliceIdx >= 0 ? allPts[sliceIdx].value : 0;
       const raw = (sliceIdx >= 0 ? allPts.slice(sliceIdx) : allPts)
@@ -1653,10 +1732,11 @@
   function _updateCSILegend(ccy, cutoffDate) {
     const legendEl = document.getElementById('hm-csi-legend');
     if (!legendEl || !_csiData) return;
+    const csiView = _csiDataLive || _csiData;
 
     // Get final value for each ccy in the current period — rebased to 0 at period start
     const vals = CCY_ORDER.map(c => {
-      const allPts   = _csiData.series[c];
+      const allPts   = csiView.series[c];
       const sliceIdx = allPts.findIndex(pt => pt.time >= cutoffDate);
       if (sliceIdx < 0) return { ccy: c, val: null, change: null };
       const baseVal  = allPts[sliceIdx].value;
@@ -1684,14 +1764,15 @@
     const statsEl = document.getElementById('hm-csi-stats');
     const titleEl = document.getElementById('hm-csi-stats-title');
     if (!statsEl || !_csiData) return;
+    const csiView = _csiDataLive || _csiData;
 
-    const allDates = _csiData.dates;
+    const allDates = csiView.dates;
     let startIdx   = 0;
     if (_csiPeriodDays > 0) startIdx = Math.max(0, allDates.length - _csiPeriodDays);
     const cutoffDate = allDates[startIdx];
 
     const rows = CCY_ORDER.map(c => {
-      const allPts   = _csiData.series[c];
+      const allPts   = csiView.series[c];
       const sliceIdx = allPts.findIndex(pt => pt.time >= cutoffDate);
       if (sliceIdx < 0) return { ccy: c, val: null, min: null, max: null, range: null };
       const baseVal = allPts[sliceIdx].value;
@@ -1763,10 +1844,7 @@
 
     if (loadingEl) loadingEl.style.display = 'none';
 
-    const allDates  = _csiData.dates;
-    let startIdx    = 0;
-    if (_csiPeriodDays > 0) startIdx = Math.max(0, allDates.length - _csiPeriodDays);
-    const cutoffDate = allDates[startIdx];
+    _csiDataLive = _computeCSILiveView();
 
     _renderCSIChart(ccy);
     _renderCSIStats(ccy);
@@ -1825,6 +1903,7 @@
     _csiPeriodDays = days;
     document.querySelectorAll('.hm-csi-pbtn').forEach(b => b.classList.toggle('on', b === btn));
     if (_csiData && _ccy) {
+      _csiDataLive = _computeCSILiveView();
       _renderCSIChart(_ccy);
       _renderCSIStats(_ccy);
     }
@@ -2126,6 +2205,38 @@
     }
   }
 
+  // ── _updateCSILiveBar — flash-free in-place update for the CSI tab ─────────────
+  // Recomputes the live in-progress-session point and pushes it onto each
+  // already-rendered LWC series via .update() (adds if newer, replaces if same
+  // date — LWC's standard incremental-update behavior), instead of tearing down
+  // and rebuilding the whole chart on every RT tick the way _renderCSIChart()
+  // does for period changes / tab switches.
+  function _updateCSILiveBar() {
+    if (!_csiChart || !_csiData || !_ccy) return;
+
+    _csiDataLive = _computeCSILiveView();
+    const csiView = _csiDataLive || _csiData;
+
+    const allDates = csiView.dates;
+    let startIdx = 0;
+    if (_csiPeriodDays > 0) startIdx = Math.max(0, allDates.length - _csiPeriodDays);
+    const cutoffDate = allDates[startIdx];
+
+    CCY_ORDER.forEach(c => {
+      const ls = _csiSeriesMap[c];
+      const allPts = csiView.series[c];
+      if (!ls || !allPts || !allPts.length) return;
+      const sliceIdx = allPts.findIndex(pt => pt.time >= cutoffDate);
+      if (sliceIdx < 0) return;
+      const baseVal = allPts[sliceIdx].value;
+      const lastPt  = allPts[allPts.length - 1];
+      ls.update({ time: lastPt.time, value: parseFloat((lastPt.value - baseVal).toFixed(4)) });
+    });
+
+    _updateCSILegend(_ccy, cutoffDate);
+    _renderCSIStats(_ccy);
+  }
+
     // ── _hmRefreshIfOpen — called by dashboard.js populateHeatmap() on every RT update ──
   // Refreshes whichever tab is currently active without closing/reopening the modal.
   // Only runs when the modal is actually visible — no-op otherwise.
@@ -2155,8 +2266,12 @@
     } else if (tabId === 'correlations') {
       // In-place update — only cell values/classes, no table rebuild
       _updateCorrelationsRT(_ccy, _strengths, _rtCache);
+    } else if (tabId === 'csi') {
+      // In-place update — pushes/refreshes only the live in-progress-session
+      // point on each existing LWC series (no chart teardown/rebuild, so no
+      // flash), same intent as dashboard.js's _lwUpdateTodayBar().
+      _updateCSILiveBar();
     }
-    // CSI tab uses historical OHLC data only — no RT refresh needed
   };
 
 })();
