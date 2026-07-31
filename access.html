@@ -1127,9 +1127,13 @@ a { color: inherit; text-decoration: none; }
       lbImg.src = img.dataset.src || img.src;
       lbImg.alt = img.alt;
       // Caption: showcase-slide carries its own data-caption; for scr-hero the next sibling is .scr-meta;
-      // for scr-item it's .scr-item-meta inside same parent; for feat-card-thumb it's .feat-card-body (title + desc)
+      // for scr-item, .scr-item-meta is a child of el itself (sibling of .scr-item-frame) — NOT inside
+      // el.parentElement (the .scr-grid row, which holds multiple scr-items side by side). Querying the
+      // parent made querySelector always return the row's FIRST caption, regardless of which item was
+      // clicked. For feat-card-thumb it's .feat-card-body (title + desc), still looked up via parentElement
+      // as a fallback since that markup currently has no live instances to verify against.
       const metaHero = el.nextElementSibling;
-      const metaItem = el.parentElement && el.parentElement.querySelector('.scr-item-meta, .feat-card-body');
+      const metaItem = el.querySelector('.scr-item-meta, .feat-card-body') || (el.parentElement && el.parentElement.querySelector('.scr-item-meta, .feat-card-body'));
       const capEl = (metaHero && metaHero.classList.contains('scr-meta')) ? metaHero : metaItem;
       lbCap.textContent = el.dataset.caption || (capEl ? capEl.textContent.trim() : (el.getAttribute('aria-label') || ''));
       lb.classList.add('open');
