@@ -1,3 +1,4 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.2.4 — CSI chart: ResizeObserver keeps chart width in sync with container (was fixed at creation-time offsetWidth, so a browser resize while the modal was open left the chart clipped/misaligned)
 // CURRENCY STRENGTH HEATMAP MODAL  v2.2 — audit fixes: tooltipEl bug, keyframes, tab a11y, labels
 // CURRENCY STRENGTH HEATMAP MODAL  v1.1.0
 // File: assets/heatmap-modal.js
@@ -441,6 +442,7 @@
   let _csiData       = null;  // { dates: [...], series: { EUR: [...], GBP: [...], ... } } — CLOSED sessions only (ohlc-data/*.json)
   let _csiDataLive   = null;  // same shape as _csiData, with one extra live in-progress-session point per ccy appended
   let _csiChart      = null;  // LWC chart instance
+  let _csiResizeObs  = null;  // ResizeObserver keeping _csiChart width in sync with #hm-csi-wrap
   let _csiPeriodDays = 63;    // default 3M
   let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for focal-line styling
   let _csiInited     = false;
@@ -1612,6 +1614,10 @@
     const cutoffDate = allDates[startIdx];
 
     // Destroy old chart if it exists
+    if (_csiResizeObs) {
+      try { _csiResizeObs.disconnect(); } catch(e) {}
+      _csiResizeObs = null;
+    }
     if (_csiChart) {
       try { _csiChart.remove(); } catch(e) {}
       _csiChart = null;
@@ -1651,6 +1657,22 @@
       width: wrap.offsetWidth,
       height: 280,
     });
+
+    // Keep chart width in sync with its container — without this, a browser
+    // resize (or the panel becoming visible after a layout shift) leaves the
+    // chart frozen at whatever width `wrap.offsetWidth` happened to be at
+    // creation time, which can visually clip or misalign the plotted lines.
+    // Mirrors the ResizeObserver pattern already used for the main chart in
+    // dashboard.js (_lwResizeObs).
+    if (typeof ResizeObserver !== 'undefined') {
+      _csiResizeObs = new ResizeObserver(entries => {
+        const cr = entries[0] && entries[0].contentRect;
+        if (!cr || !_csiChart) return;
+        const w = Math.floor(cr.width);
+        if (w > 0) { try { _csiChart.applyOptions({ width: w }); } catch(e) {} }
+      });
+      _csiResizeObs.observe(wrap);
+    }
 
     CCY_ORDER.forEach(c => {
       const isFocus = c === ccy;
@@ -1914,6 +1936,7 @@
     if (bd) bd.style.display = 'none';
     document.removeEventListener('keydown', _onKey);
     // Destroy chart so it re-renders at correct size on next open
+    if (_csiResizeObs) { try { _csiResizeObs.disconnect(); } catch(e) {} _csiResizeObs = null; }
     if (_csiChart) { try { _csiChart.remove(); } catch(e) {} _csiChart = null; }
   };
 
