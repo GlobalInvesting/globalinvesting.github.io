@@ -1443,8 +1443,16 @@
   // and accumulate into the CSI series.
   async function _loadCSIData() {
     const pairIds = PAIR_DEFS.map(p => p.id);
+    // Cache-buster (?_=Date.now()) — matches the pattern already used by the
+    // other fetches in this file (currency-drivers.json, currency-catalysts.json,
+    // session-context.json, below). Without it, this was the only fetch in the
+    // file relying on default browser/CDN HTTP caching, which could serve a
+    // stale ohlc-data/{pair}.json — e.g. missing a same-day rally — while the
+    // 1W Strength tile and heatmap (sourced from the cache-busted
+    // intraday-data/quotes.json) already reflected it. Same staleness class as
+    // documented in GUIDELINES.md re: GitHub Pages/CDN caching.
     const fetches = pairIds.map(id =>
-      fetch('./ohlc-data/' + id + '.json')
+      fetch('./ohlc-data/' + id + '.json?_=' + Date.now())
         .then(r => r.ok ? r.json() : [])
         .catch(() => [])
     );
