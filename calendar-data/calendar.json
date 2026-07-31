@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-07-31T11:37:01Z",
-  "generatedAt": "2026-07-31T11:37:01Z",
+  "lastUpdate": "2026-07-31T15:33:48Z",
+  "generatedAt": "2026-07-31T15:33:48Z",
   "fetchMode": "Myfxbook RSS via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,13 +9,13 @@
   "fetchErrors": [],
   "rangeFrom": "2025-07-31",
   "rangeTo": "2026-07-31",
-  "totalEvents": 3756,
+  "totalEvents": 3757,
   "currencyCounts": {
     "AUD": 250,
     "JPY": 216,
     "CHF": 126,
     "EUR": 869,
-    "CAD": 272,
+    "CAD": 273,
     "USD": 1270,
     "GBP": 437,
     "NZD": 82,
@@ -23,7 +23,7 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1843,
+    "medium": 1844,
     "high": 1685,
     "low": 228
   },
@@ -354,9 +354,9 @@
       "std": 0.173205
     },
     "USD/michigan consumer sentiment": {
-      "n": 7,
-      "mean": 0.5,
-      "std": 2.594224
+      "n": 8,
+      "mean": 0.5875,
+      "std": 2.414502
     },
     "NOK/ppi yoy": {
       "n": 2,
@@ -1019,9 +1019,9 @@
       "std": 42.072853
     },
     "CAD/gdp mom": {
-      "n": 2,
-      "mean": 0.25,
-      "std": 0.353553
+      "n": 4,
+      "mean": 0.15,
+      "std": 0.238048
     },
     "USD/goods trade balance": {
       "n": 4,
@@ -1039,9 +1039,9 @@
       "std": 0.419325
     },
     "USD/chicago pmi": {
-      "n": 2,
-      "mean": 5.4,
-      "std": 9.616652
+      "n": 3,
+      "mean": 4.133333,
+      "std": 7.145162
     },
     "GBP/nationwide housing prices mom": {
       "n": 3,
@@ -46857,7 +46857,7 @@
       "impact": "medium",
       "actual": "2.993M",
       "forecast": "2.989M",
-      "previous": "2.984M"
+      "previous": "2.987M"
     },
     {
       "date": "31 Jul",
@@ -46961,7 +46961,7 @@
       "impact": "high",
       "actual": "6.8%",
       "forecast": "3.0%",
-      "previous": "-0.1%"
+      "previous": "-0.3%"
     },
     {
       "date": "31 Jul",
@@ -46998,9 +46998,22 @@
       "flag": "🇨🇦",
       "event": "Canada GDP MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.2%",
       "previous": "0.1%"
+    },
+    {
+      "date": "31 Jul",
+      "dateISO": "2026-07-31",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada GDP MoM",
+      "impact": "medium",
+      "actual": "0.3%",
+      "forecast": "0.2%",
+      "previous": "0.6%"
     },
     {
       "date": "31 Jul",
@@ -47011,7 +47024,7 @@
       "flag": "🇺🇸",
       "event": "United States Employment Cost - Benefits QoQ",
       "impact": "medium",
-      "actual": null,
+      "actual": "1.0%",
       "forecast": "1.1%",
       "previous": "1.2%"
     },
@@ -47024,7 +47037,7 @@
       "flag": "🇺🇸",
       "event": "United States Employment Cost - Wages QoQ",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.9%",
       "forecast": "0.7%",
       "previous": "0.8%"
     },
@@ -47037,7 +47050,7 @@
       "flag": "🇺🇸",
       "event": "United States Employment Cost Index QoQ",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.9%",
       "forecast": "0.8%",
       "previous": "0.9%"
     },
@@ -47050,7 +47063,7 @@
       "flag": "🇺🇸",
       "event": "United States Chicago PMI",
       "impact": "medium",
-      "actual": null,
+      "actual": "57.6",
       "forecast": "56.0",
       "previous": "56.7"
     },
@@ -47063,7 +47076,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan Consumer Sentiment",
       "impact": "high",
-      "actual": null,
+      "actual": "55.2",
       "forecast": "54.0",
       "previous": "49.5"
     }
