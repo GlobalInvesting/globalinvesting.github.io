@@ -385,8 +385,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cal-fullscreen-overlay.cal-fs-active{display:flex}
 #cal-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 #cal-fullscreen-overlay.cal-fs-active #section-tvcalendar{flex:1!important;height:100%!important;min-height:0!important;border-bottom:none!important;max-width:1180px;width:100%;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+#cal-fullscreen-overlay.cal-fs-active #section-tvcalendar.cal-fs-split{max-width:2200px}
 #cal-fullscreen-overlay.cal-fs-active #cal-events-body{max-height:none!important}
 #cal-fullscreen-overlay.cal-fs-active #cal-fs-btn{display:none!important}
+/* Wide-monitor two-column layout (fullscreen only, >=1400px viewport) — see
+   shouldSplitCalColumns()/relayoutCalendar() in calendar-panel.js. Splits the
+   chronological event list into two side-by-side columns instead of leaving
+   a large dead margin on ultra-wide monitors once the table width is capped. */
+.cal-events-cols{display:flex;height:100%;align-items:stretch}
+.cal-col-wrap{flex:1;min-width:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.cal-col-wrap+.cal-col-wrap{border-left:1px solid var(--border)}
+.cal-col-header{display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);position:sticky;top:0;z-index:1}
+.cal-col-header span{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.cal-col-header span.cal-th-num{text-align:right}
+#cal-events-body.cal-cols-active,#cal-events-body:has(.cal-col-wrap){overflow:hidden}
 #cal-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #cal-fs-close:hover{border-color:var(--down);color:var(--down)}
 #lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:var(--bg);border-bottom:1px solid var(--border);min-height:26px;flex-wrap:wrap;overflow:hidden}
@@ -1003,7 +1015,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
       <!-- Column headers -->
-      <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
+      <div id="cal-static-col-header" style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
         <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
         <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
         <span style="font-size:9px;color:var(--text3);">·</span>
