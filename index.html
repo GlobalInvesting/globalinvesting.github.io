@@ -384,7 +384,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cal-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
 #cal-fullscreen-overlay.cal-fs-active{display:flex}
 #cal-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
-#cal-fullscreen-overlay.cal-fs-active #section-tvcalendar{flex:1!important;height:100%!important;min-height:0!important;border-bottom:none!important}
+#cal-fullscreen-overlay.cal-fs-active #section-tvcalendar{flex:1!important;height:100%!important;min-height:0!important;border-bottom:none!important;max-width:1180px;width:100%;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
 #cal-fullscreen-overlay.cal-fs-active #cal-events-body{max-height:none!important}
 #cal-fullscreen-overlay.cal-fs-active #cal-fs-btn{display:none!important}
 #cal-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
@@ -1898,8 +1898,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   </div>
   <!-- Fullscreen calendar overlay — Economic Calendar panel DOM is moved here on open, restored on close -->
   <div id="cal-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen economic calendar">
-    <div class="lw-fs-toolbar">
-      <span style="padding:0 10px;font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;">Economic Calendar</span>
+    <div class="lw-fs-toolbar" style="justify-content:flex-end;">
       <button id="cal-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
     </div>
     <div id="cal-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
