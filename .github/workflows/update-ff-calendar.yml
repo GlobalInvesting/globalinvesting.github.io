@@ -176,15 +176,18 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: pip install requests --break-system-packages
 
-      - name: Fetch economic calendar (Myfxbook actuals + ForexFactory forward, v3.39)
+      - name: Fetch economic calendar (Myfxbook actuals + ForexFactory forward, v3.40)
         # v3.38: this step runs a hybrid fetch — Myfxbook RSS remains the sole
         # source for today and all past days (actuals path, unchanged), while
         # ForexFactory's public weekly JSON (nfs.faireconomy.media) fills days
-        # after today, gated internally to :00/:30 ticks to respect FF's rate
-        # limit. v3.39: a manual workflow_dispatch run always bypasses that
-        # tick gate — the script reads GITHUB_EVENT_NAME, which GitHub Actions
-        # already exposes to every step by default (no explicit env: needed
-        # here). See fetch_ff_calendar.py module docstring for the full design.
+        # after today, gated internally to :00/:30 ticks. v3.39: a manual
+        # workflow_dispatch run always bypasses that tick gate — the script
+        # reads GITHUB_EVENT_NAME, which GitHub Actions already exposes to
+        # every step by default (no explicit env: needed here). v3.40: the
+        # ForexFactory forward fetch now makes 1 request (thisweek.json only)
+        # — nextweek.json was removed after being confirmed to 404 (no public
+        # "next week" export exists). Coverage is the rest of the current
+        # calendar week only. See fetch_ff_calendar.py module docstring.
         if: steps.gate.outputs.run == 'true'
         env:
           CF_PAYLOAD_TOKEN: ${{ secrets.CF_PAYLOAD_TOKEN }}
