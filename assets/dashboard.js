@@ -5648,6 +5648,13 @@ async function _renderLWChart(ohlcId, label) {
   // look up its period key and plot that period's levels (derived from the
   // PRIOR period's aggregate H/L/C) — bars in the first period on file are
   // skipped since there is no prior period to derive levels from.
+  // Industry-standard pivot display (TradingView/MT5) draws each period's
+  // levels as its OWN isolated horizontal segment — a new day gets a new
+  // flat line, not a continuation of yesterday's. A whitespace (time-only,
+  // no value) point is inserted at every period boundary so Lightweight
+  // Charts stops connecting one period's segment to the next with a
+  // straight line; without it, every level renders as one single polyline
+  // threaded across the entire chart.
   function _calcPivotSeries(bars, unit, id, dec) {
     const periods = _iAggregatePeriods(bars, unit);
     if (periods.length < 2) return [];
@@ -5657,11 +5664,18 @@ async function _renderLWChart(ohlcId, label) {
     }
     const fields = ['R3','R2','R1','PP','S1','S2','S3'];
     const out = {}; fields.forEach(f => out[f] = []);
-    bars.forEach(b => {
-      const lv = levelsByKey[_iPivotPeriodKey(b.time, unit)];
-      if (!lv) return;
-      fields.forEach(f => out[f].push({ time: b.time, value: parseFloat(lv[f].toFixed(dec)) }));
-    });
+    let curKey = null;
+    for (let i = 0; i < bars.length; i++) {
+      const key = _iPivotPeriodKey(bars[i].time, unit);
+      const lv = levelsByKey[key];
+      if (!lv) continue; // first period on file: no prior H/L/C to derive levels from
+      if (curKey !== null && key !== curKey) {
+        const gapTime = bars[i-1].time + Math.max(1, Math.round((bars[i].time - bars[i-1].time) / 2));
+        fields.forEach(f => out[f].push({ time: gapTime }));
+      }
+      fields.forEach(f => out[f].push({ time: bars[i].time, value: parseFloat(lv[f].toFixed(dec)) }));
+      curKey = key;
+    }
     const unitLabel = unit === 'D' ? 'D' : (unit === 'W' ? 'W' : 'M');
     return fields.map((f, i) => ({
       data: out[f], color: _iC(id, i), lineWidth: 1, dashed: f === 'PP',
@@ -5931,7 +5945,7 @@ async function _renderLWChart(ohlcId, label) {
         const { period:n, mult } = p;
         const tr  = _iTR(bars);
         const atr = _iRMA(tr, n); // same length/index alignment as bars — see Keltner above
-        let upBand = null, dnBand = null, trend = 1;
+        let upBand = null, dnBand = null, trend = 1, lastTrend = null;
         const upData = [], downData = [];
         for (let i = 0; i < bars.length; i++) {
           const hl2  = (bars[i].high + bars[i].low) / 2;
@@ -5947,9 +5961,22 @@ async function _renderLWChart(ohlcId, label) {
             else if (trend === 1 && bars[i].close < prevUp) trend = -1;
             upBand = newUp; dnBand = newDn;
           }
+          // On a flip, the series that just went inactive gets a whitespace
+          // point (time-only, no value) right at the flip boundary. Without
+          // this, Lightweight Charts bridges each series' last pre-flip
+          // point straight to its next post-re-flip point with a plain
+          // connecting line — since both bands sit only a couple ATRs from
+          // price, that bridge line reads as a filled channel band instead
+          // of the intended single flip-color line.
+          if (lastTrend !== null && trend !== lastTrend) {
+            const gapTime = bars[i-1].time + Math.max(1, Math.round((bars[i].time - bars[i-1].time) / 2));
+            if (trend === 1) downData.push({ time: gapTime });
+            else             upData.push({ time: gapTime });
+          }
           const val = trend === 1 ? upBand : dnBand;
           const point = { time: bars[i].time, value: parseFloat(val.toFixed(dec)) };
           if (trend === 1) upData.push(point); else downData.push(point);
+          lastTrend = trend;
         }
         return [
           { data: upData,   color:_iC(id,0), lineWidth:2, label:`Supertrend(${n},${mult})` },
