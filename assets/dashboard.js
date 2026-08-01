@@ -5602,7 +5602,15 @@ async function _renderLWChart(ohlcId, label) {
   // 'D' uses a simple UTC calendar-day boundary (matches the existing VWAP
   // session-reset convention above); 'W' uses ISO week numbering (Mon-Sun);
   // 'M' uses UTC calendar month.
-  function _iPivotPeriodKey(t, unit) {
+  function _iPivotPeriodKey(rawT, unit) {
+    // bar.time is a 'YYYY-MM-DD' business-day string on D1/W1/MN and a plain
+    // unix-seconds number on H1/H4 (see the "Universal drawing-point time"
+    // note above) — always normalize through _timeToEpoch first. Skipping
+    // this made `t * 1000` silently produce NaN for every D1/W1/MN bar
+    // (string * number = NaN → Invalid Date), so every bar fell into the
+    // same "NaN" period key and pivots rendered as one flat line for the
+    // entire chart instead of per-day/week/month segments.
+    const t = _timeToEpoch(rawT);
     const d = new Date(t * 1000);
     if (unit === 'D') return Math.floor(t / 86400);
     if (unit === 'M') return d.getUTCFullYear() * 12 + d.getUTCMonth();
@@ -5618,19 +5626,20 @@ async function _renderLWChart(ohlcId, label) {
     return dt.getUTCFullYear() * 100 + weekNum;
   }
   // Aggregates bars into period buckets, one entry per distinct period in
-  // chronological order: { key, high, low, close }.
+  // chronological order: { key, high, low, close, count }.
   function _iAggregatePeriods(bars, unit) {
     const periods = [];
     let cur = null;
     bars.forEach(b => {
       const key = _iPivotPeriodKey(b.time, unit);
       if (!cur || cur.key !== key) {
-        cur = { key, high: b.high, low: b.low, close: b.close };
+        cur = { key, high: b.high, low: b.low, close: b.close, count: 1 };
         periods.push(cur);
       } else {
         cur.high = Math.max(cur.high, b.high);
         cur.low = Math.min(cur.low, b.low);
         cur.close = b.close; // most recent close seen so far in this period
+        cur.count++;
       }
     });
     return periods;
@@ -5651,16 +5660,15 @@ async function _renderLWChart(ohlcId, label) {
   // Industry-standard pivot display (TradingView/MT5) draws each period's
   // levels as its OWN isolated horizontal segment — a new day gets a new
   // flat line, not a continuation of yesterday's. A whitespace (time-only,
-  // no value) point is inserted at every period boundary so Lightweight
-  // Charts stops connecting one period's segment to the next with a
-  // straight line; without it, every level renders as one single polyline
-  // threaded across the entire chart.
+  // no value) point breaks the line at a period boundary so Lightweight
+  // Charts stops connecting one period's segment to the next.
   function _calcPivotSeries(bars, unit, id, dec) {
     const periods = _iAggregatePeriods(bars, unit);
     if (periods.length < 2) return [];
-    const levelsByKey = {};
+    const levelsByKey = {}, countByKey = {};
     for (let i = 1; i < periods.length; i++) {
       levelsByKey[periods[i].key] = _iPivotLevels(periods[i-1].high, periods[i-1].low, periods[i-1].close);
+      countByKey[periods[i].key] = periods[i].count;
     }
     const fields = ['R3','R2','R1','PP','S1','S2','S3'];
     const out = {}; fields.forEach(f => out[f] = []);
@@ -5669,9 +5677,24 @@ async function _renderLWChart(ohlcId, label) {
       const key = _iPivotPeriodKey(bars[i].time, unit);
       const lv = levelsByKey[key];
       if (!lv) continue; // first period on file: no prior H/L/C to derive levels from
-      if (curKey !== null && key !== curKey) {
-        const gapTime = bars[i-1].time + Math.max(1, Math.round((bars[i].time - bars[i-1].time) / 2));
-        fields.forEach(f => out[f].push({ time: gapTime }));
+      // The break is placed on THIS bar's own existing time slot — there is
+      // no arithmetic on bar.time here (it's a 'YYYY-MM-DD' string on
+      // D1/W1/MN and a plain number on H1/H4; adding a number to that
+      // string silently concatenates into a garbage time value instead of
+      // throwing, corrupting every later series' time ordering), so the
+      // only type-safe place for a whitespace point is a bar we're willing
+      // to give up entirely. That's only safe when the incoming period has
+      // more than one bar left to still show its flat level afterward —
+      // e.g. Daily pivots viewed ON a Daily chart have exactly one bar per
+      // period, so gapping there would silently drop every other value.
+      // Those stay directly connected: a single thin one-bar-wide diagonal
+      // at the transition, not the original bug (a flat line spanning the
+      // whole chart, which was actually _iPivotPeriodKey returning the same
+      // NaN key for every bar — fixed separately above).
+      if (curKey !== null && key !== curKey && countByKey[key] > 1) {
+        fields.forEach(f => out[f].push({ time: bars[i].time }));
+        curKey = key;
+        continue;
       }
       fields.forEach(f => out[f].push({ time: bars[i].time, value: parseFloat(lv[f].toFixed(dec)) }));
       curKey = key;
@@ -5962,16 +5985,19 @@ async function _renderLWChart(ohlcId, label) {
             upBand = newUp; dnBand = newDn;
           }
           // On a flip, the series that just went inactive gets a whitespace
-          // point (time-only, no value) right at the flip boundary. Without
-          // this, Lightweight Charts bridges each series' last pre-flip
-          // point straight to its next post-re-flip point with a plain
-          // connecting line — since both bands sit only a couple ATRs from
-          // price, that bridge line reads as a filled channel band instead
-          // of the intended single flip-color line.
+          // point (time-only, no value) using THIS bar's own existing time —
+          // no arithmetic on bar.time, which is a 'YYYY-MM-DD' string on
+          // D1/W1/MN and a plain number on H1/H4; adding a number to that
+          // string silently concatenates into a garbage time value instead
+          // of throwing, corrupting the whole series' time ordering.
+          // Without the break at all, Lightweight Charts bridges each
+          // series' last pre-flip point straight to its next post-re-flip
+          // point with a plain connecting line — since both bands sit only
+          // a couple ATRs from price, that bridge line reads as a filled
+          // channel band instead of the intended single flip-color line.
           if (lastTrend !== null && trend !== lastTrend) {
-            const gapTime = bars[i-1].time + Math.max(1, Math.round((bars[i].time - bars[i-1].time) / 2));
-            if (trend === 1) downData.push({ time: gapTime });
-            else             upData.push({ time: gapTime });
+            if (trend === 1) downData.push({ time: bars[i].time });
+            else             upData.push({ time: bars[i].time });
           }
           const val = trend === 1 ? upBand : dnBand;
           const point = { time: bars[i].time, value: parseFloat(val.toFixed(dec)) };
