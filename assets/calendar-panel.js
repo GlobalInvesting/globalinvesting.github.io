@@ -43,6 +43,13 @@
   const G8_CURRENCIES      = new Set(['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']);
   const IMPACTS = new Set(['medium','high']);
 
+  // Cache of the last successful fetch — lets relayoutCalendar() re-render
+  // (e.g. switching between 1 and 2 columns on fullscreen open/close/resize)
+  // without a network round-trip.
+  let _lastEvents   = null;
+  let _lastSource   = null;
+  let _lastHolidays = null;
+
   const IMPACT_DOT = {
     high:   { color: 'var(--down)',   label: 'High'   },
     medium: { color: 'var(--orange)', label: 'Medium' },
@@ -278,13 +285,13 @@
     });
 
     const today = todayISO();
-    let html = '';
+    const groups = [];
 
     Array.from(allDates).sort().forEach(dateISO => {
       const dayEvs  = byDate[dateISO] || [];
       const dayHols = holidayByDate[dateISO] || [];
       const isToday = dateISO === today;
-      html += `<div class="cal-date-row" data-date="${dateISO}"${isToday ? ' data-today="1"' : ''}>${formatDate(dateISO)}</div>`;
+      let gHtml = `<div class="cal-date-row" data-date="${dateISO}"${isToday ? ' data-today="1"' : ''}>${formatDate(dateISO)}</div>`;
 
       // ── Holiday rows ────────────────────────────────────────────────────────
       // One row per holiday entry, shown at the top of the day above economic
@@ -298,7 +305,7 @@
           : '';
         const holTitle  = hol.title || 'Bank Holiday';
         const tooltipTx = `${holTitle} — ${ccy} market closed`;
-        html += `<div class="cal-event-row cal-holiday-row" title="${tooltipTx}">` +
+        gHtml += `<div class="cal-event-row cal-holiday-row" title="${tooltipTx}">` +
           `<div class="cal-col cal-time">All Day</div>` +
           `<div class="cal-col cal-ccy">${flagHtml}<span style="font-size:10px;">${ccy}</span></div>` +
           `<div class="cal-col cal-impact"><span class="cal-dot" style="background:var(--text3);" title="Market holiday"></span></div>` +
@@ -348,7 +355,7 @@
         const localTime = toLocalTime(ev.dateISO, ev.timeUTC);
         const upcomingAttr = (!isPast) ? ' data-upcoming="1"' : '';
 
-        html += `<div class="cal-event-row${dimmed ? ' cal-released' : ''}"${upcomingAttr}>
+        gHtml += `<div class="cal-event-row${dimmed ? ' cal-released' : ''}"${upcomingAttr}>
   <div class="cal-col cal-time">${localTime}</div>
   <div class="cal-col cal-ccy">${flagHtml}${ev.currency}</div>
   <div class="cal-col cal-impact"><span class="cal-dot" style="background:${dot.color}" title="${dot.label} impact"></span></div>
@@ -358,7 +365,52 @@
   <div class="cal-col cal-num">${previousHtml}</div>
 </div>`;
       });
+
+      groups.push({ dateISO, html: gHtml, rowCount: 1 + dayHols.length + dayEvs.length });
     });
+
+    // ── Column layout: 1 (docked / narrow fullscreen) or 2 (wide fullscreen) ──
+    // Wide monitors in fullscreen have room to show two chronological columns
+    // side by side instead of one list stretched edge-to-edge with a big gap
+    // between the event text and the actual/forecast/previous numbers — same
+    // idea as a newspaper stock table flowing top-to-bottom, left column then
+    // right column, rather than one over-wide row.
+    const splitCols = shouldSplitCalColumns() && groups.length > 1;
+    container.classList.toggle('cal-cols-active', splitCols);
+    const staticHdr = document.getElementById('cal-static-col-header');
+    if (staticHdr) staticHdr.style.display = splitCols ? 'none' : '';
+    document.getElementById('section-tvcalendar')?.classList.toggle('cal-fs-split', splitCols);
+
+    let html;
+    if (splitCols) {
+      const totalRows = groups.reduce((s, g) => s + g.rowCount, 0);
+      let acc = 0, splitAt = groups.length;
+      for (let i = 0; i < groups.length; i++) {
+        const prevAcc = acc;
+        acc += groups[i].rowCount;
+        if (acc >= totalRows / 2) {
+          // Whichever side of this group is closer to an even 50/50 split wins —
+          // taking the first group that merely crosses the midpoint (instead of
+          // comparing before/after) can produce badly lopsided columns when one
+          // date has far more events than its neighbors (e.g. an FOMC day).
+          const diffAfter  = Math.abs(acc - totalRows / 2);
+          const diffBefore = Math.abs(prevAcc - totalRows / 2);
+          splitAt = (diffBefore <= diffAfter) ? i : i + 1;
+          break;
+        }
+      }
+      if (splitAt <= 0) splitAt = 1;                           // never leave column 1 empty
+      if (splitAt >= groups.length) splitAt = Math.ceil(groups.length / 2); // never leave column 2 empty
+      const colHdr  = buildCalColHeaderHtml();
+      const col1Html = groups.slice(0, splitAt).map(g => g.html).join('');
+      const col2Html = groups.slice(splitAt).map(g => g.html).join('');
+      html = `<div class="cal-events-cols">` +
+        `<div class="cal-col-wrap">${colHdr}${col1Html}</div>` +
+        `<div class="cal-col-wrap">${colHdr}${col2Html}</div>` +
+        `</div>`;
+    } else {
+      html = groups.map(g => g.html).join('');
+    }
 
     // ── Scroll position preservation ──────────────────────────────────────
     // Capture scroll state BEFORE innerHTML wipe so re-renders can restore it.
@@ -366,13 +418,22 @@
     // On first render  → smart-scroll to today / first upcoming (see below).
     // On re-renders    → restore the user's exact scrollTop so manual navigation
     //   is never interrupted by the 5-min interval or visibilitychange refresh.
-    const isFirstRender  = container.dataset.calInitialized !== '1';
-    const savedScrollTop = isFirstRender ? 0 : container.scrollTop;
+    // In 2-column mode there are two independent scroll containers (one per
+    // .cal-col-wrap) instead of one, so scroll state is captured/restored as
+    // an array; a layout-mode change (e.g. resizing across the breakpoint)
+    // can leave a saved index unmatched, which just falls back to scrollTop 0
+    // for that container rather than breaking anything.
+    const isFirstRender     = container.dataset.calInitialized !== '1';
+    const scrollRootsBefore = container.querySelectorAll('.cal-col-wrap');
+    const savedScrollTops   = isFirstRender
+      ? []
+      : (scrollRootsBefore.length ? Array.from(scrollRootsBefore).map(r => r.scrollTop) : [container.scrollTop]);
 
     container.innerHTML = html;
 
     // ── Scroll logic ──────────────────────────────────────────────────────
-    // Uses direct scrollTop on cal-events-body (the overflow:auto container),
+    // Uses direct scrollTop on the relevant scroll container (cal-events-body,
+    // or whichever .cal-col-wrap holds the target row in 2-column mode) —
     // NOT scrollIntoView which would scroll the outer #rightpanel instead.
     //
     // First-render priority order:
@@ -383,39 +444,48 @@
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const todayRow      = container.querySelector('[data-today="1"]');
       const firstUpcoming = container.querySelector('[data-upcoming="1"]');
+      const scrollRootFor = el => (el && el.closest('.cal-col-wrap')) || container;
 
       if (!isFirstRender) {
         // Re-render (5-min refresh or tab focus regain) — restore user's position.
         // Row layout is stable between refreshes (actuals fill in but no rows are
         // inserted above existing ones), so pixel-level scrollTop is reliable.
-        container.scrollTop = savedScrollTop;
+        const roots = container.querySelectorAll('.cal-col-wrap');
+        if (roots.length) {
+          roots.forEach((r, i) => { r.scrollTop = savedScrollTops[i] || 0; });
+        } else {
+          container.scrollTop = savedScrollTops[0] || 0;
+        }
       } else {
         // First render — smart-scroll to the most relevant date.
         if (todayRow) {
-          scrollCalTo(container, todayRow);
+          scrollCalTo(scrollRootFor(todayRow), todayRow);
         } else if (firstUpcoming) {
           const prev = firstUpcoming.previousElementSibling;
           const target = (prev && prev.classList.contains('cal-date-row')) ? prev : firstUpcoming;
-          scrollCalTo(container, target);
+          scrollCalTo(scrollRootFor(firstUpcoming), target);
         } else {
           // Find first future date row
           const allDateRows = container.querySelectorAll('.cal-date-row[data-date]');
           let scrolled = false;
           for (const row of allDateRows) {
             if (row.dataset.date > today) {
-              scrollCalTo(container, row);
+              scrollCalTo(scrollRootFor(row), row);
               scrolled = true;
               break;
             }
           }
-          if (!scrolled) container.scrollTop = 0;
+          if (!scrolled) {
+            const roots = container.querySelectorAll('.cal-col-wrap');
+            if (roots.length) roots.forEach(r => { r.scrollTop = 0; }); else container.scrollTop = 0;
+          }
         }
         // Mark initialized so future re-renders take the restore path.
         container.dataset.calInitialized = '1';
       }
 
       // Setup "Next event" jump button
-      setupNextEventButton(container, firstUpcoming);
+      setupNextEventButton(scrollRootFor(firstUpcoming), firstUpcoming);
     }));
 
     if (sourceEl) {
@@ -482,6 +552,7 @@
         return !prior.some(d => { const diff = (evMs - new Date(d).getTime()) / 86400000; return diff > 0 && diff <= 7; });
       });
 
+      _lastEvents = events; _lastSource = source; _lastHolidays = holidays;
       buildPanel(events, source, holidays);
     } catch {
       const c = document.getElementById('cal-events-body');
@@ -493,6 +564,33 @@
   // (_lwOpenFullscreen/_lwCloseFullscreen) but with no chart-resize step needed. ──
   let _calFsOriginalParent = null;
   let _calFsOriginalNext   = null;
+
+  // Wide-monitor two-column layout — see the grouping/assembly logic in
+  // buildPanel(). Only active in fullscreen; docked panel (180px tall,
+  // narrow right-column width) stays single-column regardless of viewport.
+  function shouldSplitCalColumns() {
+    const overlay = document.getElementById('cal-fullscreen-overlay');
+    return !!(overlay && overlay.classList.contains('cal-fs-active') && window.innerWidth >= 1400);
+  }
+
+  function buildCalColHeaderHtml() {
+    return `<div class="cal-col-header">` +
+      `<span>${tzLabel()}</span>` +
+      `<span>Ccy</span>` +
+      `<span>·</span>` +
+      `<span>Event</span>` +
+      `<span class="cal-th-num">Actual</span>` +
+      `<span class="cal-th-num">Forecast</span>` +
+      `<span class="cal-th-num">Previous</span>` +
+      `</div>`;
+  }
+
+  // Re-render from cache — used when the column layout needs to change
+  // (fullscreen open/close, or a resize crossing the 1400px breakpoint while
+  // fullscreen is open) without waiting for the next 2-min data poll.
+  function relayoutCalendar() {
+    if (_lastEvents) buildPanel(_lastEvents, _lastSource, _lastHolidays);
+  }
 
   function openCalFullscreen() {
     const overlay = document.getElementById('cal-fullscreen-overlay');
@@ -507,6 +605,7 @@
     inner.appendChild(panel);
     overlay.classList.add('cal-fs-active');
     document.body.style.overflow = 'hidden';
+    relayoutCalendar();
   }
 
   function closeCalFullscreen() {
@@ -522,7 +621,18 @@
     }
     _calFsOriginalParent = null;
     _calFsOriginalNext   = null;
+    relayoutCalendar();
   }
+
+  // Debounced resize — only matters while fullscreen is open (relayoutCalendar
+  // is a no-op cost otherwise beyond the early-return checks it performs).
+  let _calResizeTimer = null;
+  window.addEventListener('resize', function () {
+    const overlay = document.getElementById('cal-fullscreen-overlay');
+    if (!overlay || !overlay.classList.contains('cal-fs-active')) return;
+    clearTimeout(_calResizeTimer);
+    _calResizeTimer = setTimeout(relayoutCalendar, 150);
+  });
 
   document.getElementById('cal-fs-btn')?.addEventListener('click', openCalFullscreen);
   document.getElementById('cal-fs-close')?.addEventListener('click', closeCalFullscreen);
