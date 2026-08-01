@@ -176,12 +176,15 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: pip install requests --break-system-packages
 
-      - name: Fetch economic calendar (Myfxbook actuals + ForexFactory forward, v3.38)
-        # v3.38: this step now runs a hybrid fetch — Myfxbook RSS remains the sole
+      - name: Fetch economic calendar (Myfxbook actuals + ForexFactory forward, v3.39)
+        # v3.38: this step runs a hybrid fetch — Myfxbook RSS remains the sole
         # source for today and all past days (actuals path, unchanged), while
         # ForexFactory's public weekly JSON (nfs.faireconomy.media) fills days
         # after today, gated internally to :00/:30 ticks to respect FF's rate
-        # limit. See fetch_ff_calendar.py module docstring for the full design.
+        # limit. v3.39: a manual workflow_dispatch run always bypasses that
+        # tick gate — the script reads GITHUB_EVENT_NAME, which GitHub Actions
+        # already exposes to every step by default (no explicit env: needed
+        # here). See fetch_ff_calendar.py module docstring for the full design.
         if: steps.gate.outputs.run == 'true'
         env:
           CF_PAYLOAD_TOKEN: ${{ secrets.CF_PAYLOAD_TOKEN }}
@@ -211,6 +214,15 @@ jobs:
           print(f'  Source: {cal.get(\"source\",\"?\")}')
           print(f'  Total events: {len(events)} | with actuals: {len(released_all)}')
           print(f'  Today ({today}): {len(today_evs)} events | {len(released_today)} released')
+          # v3.38 hybrid diagnostic: pre-v3.38 carried-forward events have no
+          # 'vendor' field yet (defaults to myfxbook, the sole pre-v3.38 source).
+          mfb_evs = [e for e in events if e.get('vendor', 'myfxbook') == 'myfxbook']
+          ff_evs = [e for e in events if e.get('vendor') == 'forexfactory']
+          forward_evs = [e for e in events if e['dateISO'] > today]
+          print(f'  By vendor: myfxbook={len(mfb_evs)} forexfactory={len(ff_evs)}')
+          print(f'  Forward-looking (dateISO > today): {len(forward_evs)} events '
+                f'({len([e for e in forward_evs if e.get(\"vendor\")==\"forexfactory\"])} forexfactory, '
+                f'{len([e for e in forward_evs if e.get(\"vendor\",\"myfxbook\")==\"myfxbook\"])} myfxbook carry-over)')
           for e in high_today:
               status = e.get('actual') or 'pending'
               print(f'    {e[\"timeUTC\"]} [{e[\"currency\"]}] {e[\"title\"]} | actual={status} est={e.get(\"forecast\",\"—\")}')
