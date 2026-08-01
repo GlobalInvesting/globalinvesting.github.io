@@ -176,7 +176,12 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: pip install requests --break-system-packages
 
-      - name: Fetch economic calendar (ForexFactory)
+      - name: Fetch economic calendar (Myfxbook actuals + ForexFactory forward, v3.38)
+        # v3.38: this step now runs a hybrid fetch — Myfxbook RSS remains the sole
+        # source for today and all past days (actuals path, unchanged), while
+        # ForexFactory's public weekly JSON (nfs.faireconomy.media) fills days
+        # after today, gated internally to :00/:30 ticks to respect FF's rate
+        # limit. See fetch_ff_calendar.py module docstring for the full design.
         if: steps.gate.outputs.run == 'true'
         env:
           CF_PAYLOAD_TOKEN: ${{ secrets.CF_PAYLOAD_TOKEN }}
