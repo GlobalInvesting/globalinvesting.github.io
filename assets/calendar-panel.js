@@ -1,5 +1,5 @@
 /**
- * calendar-panel.js v1.4 — Native economic calendar renderer
+ * calendar-panel.js v1.7 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
@@ -29,6 +29,13 @@
  *   Found live 2026-07-15: workflow run committed 4 new actuals, panel still showed "—" 23min
  *   later. Now appends a minute-bucketed cache-buster (mirrors the existing pattern on
  *   ./intraday-data/quotes.json) so each poll hits a URL the CDN hasn't served before.
+ * v1.7 (2026-08-01): Added a fullscreen toggle button (#cal-fs-btn) matching the Price
+ *   Chart's existing fullscreen pattern (#lw-fs-btn in dashboard.js). Same DOM-lift
+ *   approach — #section-tvcalendar is moved into #cal-fullscreen-overlay on open and
+ *   restored to its original position on close — but without any chart-resize logic,
+ *   since this panel is a plain scrollable list. The 330px inline max-height on
+ *   #cal-events-body is overridden via the .cal-fs-active CSS rule in index.html so the
+ *   full viewport height is used while fullscreen.
  */
 (function () {
   'use strict';
@@ -481,6 +488,49 @@
       if (c) c.innerHTML = '<div style="padding:12px 10px;color:var(--text3);font-size:11px;">Calendar unavailable.</div>';
     }
   }
+
+  // ── Fullscreen toggle — DOM-lift, mirrors dashboard.js's chart fullscreen
+  // (_lwOpenFullscreen/_lwCloseFullscreen) but with no chart-resize step needed. ──
+  let _calFsOriginalParent = null;
+  let _calFsOriginalNext   = null;
+
+  function openCalFullscreen() {
+    const overlay = document.getElementById('cal-fullscreen-overlay');
+    const inner   = document.getElementById('cal-fullscreen-inner');
+    const panel   = document.getElementById('section-tvcalendar');
+    if (!overlay || !inner || !panel) return;
+    if (overlay.classList.contains('cal-fs-active')) return;
+
+    _calFsOriginalParent = panel.parentNode;
+    _calFsOriginalNext   = panel.nextSibling;
+
+    inner.appendChild(panel);
+    overlay.classList.add('cal-fs-active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCalFullscreen() {
+    const overlay = document.getElementById('cal-fullscreen-overlay');
+    const panel   = document.getElementById('section-tvcalendar');
+    if (!overlay || !overlay.classList.contains('cal-fs-active')) return;
+
+    overlay.classList.remove('cal-fs-active');
+    document.body.style.overflow = '';
+
+    if (_calFsOriginalParent && panel) {
+      _calFsOriginalParent.insertBefore(panel, _calFsOriginalNext);
+    }
+    _calFsOriginalParent = null;
+    _calFsOriginalNext   = null;
+  }
+
+  document.getElementById('cal-fs-btn')?.addEventListener('click', openCalFullscreen);
+  document.getElementById('cal-fs-close')?.addEventListener('click', closeCalFullscreen);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('cal-fullscreen-overlay')?.classList.contains('cal-fs-active')) {
+      closeCalFullscreen();
+    }
+  });
 
   // Refresh every 5 minutes so actuals appear shortly after each release
   setInterval(fetchEconomicCalendar, 2 * 60 * 1000);
