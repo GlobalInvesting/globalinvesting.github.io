@@ -374,11 +374,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #lw-fullscreen-overlay.lw-fs-active{display:flex}
 #lw-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 #lw-fullscreen-overlay.lw-fs-active #tv-chart-wrap{flex:1!important;height:100%!important;min-height:0!important}
-#lw-fs-toolbar{display:flex;align-items:stretch;justify-content:space-between;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow:hidden}
-#lw-fs-toolbar::-webkit-scrollbar{display:none}
+.lw-fs-toolbar{display:flex;align-items:stretch;justify-content:space-between;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow:hidden}
+.lw-fs-toolbar::-webkit-scrollbar{display:none}
 #lw-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #lw-fs-close:hover{border-color:var(--down);color:var(--down)}
 #lw-fullscreen-overlay.lw-fs-active #lw-fs-btn{display:none!important}
+/* Economic Calendar fullscreen overlay — same DOM-lift pattern as the chart's
+   #lw-fullscreen-overlay, but no chart-resize logic needed (plain scrollable list). */
+#cal-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
+#cal-fullscreen-overlay.cal-fs-active{display:flex}
+#cal-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+#cal-fullscreen-overlay.cal-fs-active #section-tvcalendar{flex:1!important;height:100%!important;min-height:0!important;border-bottom:none!important}
+#cal-fullscreen-overlay.cal-fs-active #cal-events-body{max-height:none!important}
+#cal-fullscreen-overlay.cal-fs-active #cal-fs-btn{display:none!important}
+#cal-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
+#cal-fs-close:hover{border-color:var(--down);color:var(--down)}
 #lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:var(--bg);border-bottom:1px solid var(--border);min-height:26px;flex-wrap:wrap;overflow:hidden}
 #lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
 #lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--font-mono,monospace)}
@@ -987,7 +997,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
       <div class="panel-head">
         <span class="panel-title">Economic Calendar</span>
-        <span class="panel-sub" id="cal-panel-sub">ForexFactory · G10 major currencies · medium &amp; high impact</span>
+        <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+          <span class="panel-sub" id="cal-panel-sub">ForexFactory · G10 major currencies · medium &amp; high impact</span>
+          <button class="lw-tb-btn" id="cal-fs-btn" aria-label="Toggle fullscreen calendar" title="Fullscreen (Esc to exit)" style="flex-shrink:0;">&#x26F6;</button>
+        </div>
       </div>
       <!-- Column headers -->
       <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
@@ -1869,11 +1882,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
 
-<script src="assets/calendar-panel.js?v=1.6.0" defer></script>
+<script src="assets/calendar-panel.js?v=1.7.0" defer></script>
 <script src="assets/econ-matrix.js?v=1.0.5" defer></script>
   <!-- Fullscreen chart overlay — chart panel DOM is moved here on open, restored on close -->
   <div id="lw-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen chart">
-    <div id="lw-fs-toolbar">
+    <div class="lw-fs-toolbar">
       <div id="lw-fs-tab-outer" style="flex:1;display:flex;align-items:stretch;overflow:hidden;min-width:0;">
         <button id="lw-fs-tabs-prev" aria-label="Scroll left" style="display:none;flex-shrink:0;width:22px;background:var(--bg2);border:none;border-right:1px solid var(--border);color:var(--text3);cursor:pointer;font-size:13px;align-items:center;justify-content:center;">&#8249;</button>
         <div id="lw-fs-tabs" role="tablist" aria-label="Chart symbol selector" style="flex:1;display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;gap:0;min-width:0;"></div>
@@ -1882,6 +1895,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <button id="lw-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
     </div>
     <div id="lw-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
+  </div>
+  <!-- Fullscreen calendar overlay — Economic Calendar panel DOM is moved here on open, restored on close -->
+  <div id="cal-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen economic calendar">
+    <div class="lw-fs-toolbar">
+      <span style="padding:0 10px;font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;">Economic Calendar</span>
+      <button id="cal-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
+    </div>
+    <div id="cal-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
   </div>
   <!-- GI Theme Manager moved to assets/dashboard.js (v8.41.0) -->
 </body>
