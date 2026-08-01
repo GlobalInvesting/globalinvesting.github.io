@@ -5595,6 +5595,80 @@ async function _renderLWChart(ohlcId, label) {
       return Math.max(b.high - b.low, Math.abs(b.high - pc), Math.abs(b.low - pc));
     });
   }
+  // ── Pivot Points helpers ────────────────────────────────────────────────────
+  // Groups bars into calendar day/ISO-week/month buckets so each period's
+  // classic pivot levels can be computed from the PRIOR period's H/L/C (the
+  // standard convention — a day's pivots are derived from yesterday's range).
+  // 'D' uses a simple UTC calendar-day boundary (matches the existing VWAP
+  // session-reset convention above); 'W' uses ISO week numbering (Mon-Sun);
+  // 'M' uses UTC calendar month.
+  function _iPivotPeriodKey(t, unit) {
+    const d = new Date(t * 1000);
+    if (unit === 'D') return Math.floor(t / 86400);
+    if (unit === 'M') return d.getUTCFullYear() * 12 + d.getUTCMonth();
+    // ISO week: shift to the Thursday of the same week, then count weeks from
+    // that year's first Thursday — the standard ISO-8601 week algorithm.
+    const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    const dayNum = (dt.getUTCDay() + 6) % 7; // Mon=0..Sun=6
+    dt.setUTCDate(dt.getUTCDate() - dayNum + 3);
+    const firstThursday = new Date(Date.UTC(dt.getUTCFullYear(), 0, 4));
+    const ftDayNum = (firstThursday.getUTCDay() + 6) % 7;
+    firstThursday.setUTCDate(firstThursday.getUTCDate() - ftDayNum + 3);
+    const weekNum = 1 + Math.round((dt - firstThursday) / (7 * 86400000));
+    return dt.getUTCFullYear() * 100 + weekNum;
+  }
+  // Aggregates bars into period buckets, one entry per distinct period in
+  // chronological order: { key, high, low, close }.
+  function _iAggregatePeriods(bars, unit) {
+    const periods = [];
+    let cur = null;
+    bars.forEach(b => {
+      const key = _iPivotPeriodKey(b.time, unit);
+      if (!cur || cur.key !== key) {
+        cur = { key, high: b.high, low: b.low, close: b.close };
+        periods.push(cur);
+      } else {
+        cur.high = Math.max(cur.high, b.high);
+        cur.low = Math.min(cur.low, b.low);
+        cur.close = b.close; // most recent close seen so far in this period
+      }
+    });
+    return periods;
+  }
+  // Classic (floor trader) pivot formula.
+  function _iPivotLevels(H, L, C) {
+    const PP = (H + L + C) / 3;
+    return {
+      R3: H + 2 * (PP - L), R2: PP + (H - L), R1: 2 * PP - L,
+      PP,
+      S1: 2 * PP - H, S2: PP - (H - L), S3: L - 2 * (H - PP),
+    };
+  }
+  // Builds the 7-series overlay data for a pivot indicator: for every bar,
+  // look up its period key and plot that period's levels (derived from the
+  // PRIOR period's aggregate H/L/C) — bars in the first period on file are
+  // skipped since there is no prior period to derive levels from.
+  function _calcPivotSeries(bars, unit, id, dec) {
+    const periods = _iAggregatePeriods(bars, unit);
+    if (periods.length < 2) return [];
+    const levelsByKey = {};
+    for (let i = 1; i < periods.length; i++) {
+      levelsByKey[periods[i].key] = _iPivotLevels(periods[i-1].high, periods[i-1].low, periods[i-1].close);
+    }
+    const fields = ['R3','R2','R1','PP','S1','S2','S3'];
+    const out = {}; fields.forEach(f => out[f] = []);
+    bars.forEach(b => {
+      const lv = levelsByKey[_iPivotPeriodKey(b.time, unit)];
+      if (!lv) return;
+      fields.forEach(f => out[f].push({ time: b.time, value: parseFloat(lv[f].toFixed(dec)) }));
+    });
+    const unitLabel = unit === 'D' ? 'D' : (unit === 'W' ? 'W' : 'M');
+    return fields.map((f, i) => ({
+      data: out[f], color: _iC(id, i), lineWidth: 1, dashed: f === 'PP',
+      label: `${unitLabel} ${f}`,
+    }));
+  }
+
   // Align a calculated array (shorter) to bars — pad = bars.length - arr.length
   // No offset param: the array's own length determines the correct alignment automatically.
   function _iAlign(arr, bars) {
@@ -5623,6 +5697,10 @@ async function _renderLWChart(ohlcId, label) {
     { id:'donchian', group:'Overlays',        label:'Donchian Channel',  desc:'Donchian Channel',                                       type:'overlay',    defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:500,step:1}], colors:['rgba(156,39,176,0.8)','rgba(156,39,176,0.8)','rgba(156,39,176,0.4)'] },
     { id:'psar',     group:'Overlays',        label:'Parabolic SAR',     desc:'Parabolic SAR',                                          type:'overlay',    defaultParams:{ step:0.02, max:0.2 },          paramDefs:[{key:'step',label:'Step',type:'float',min:0.001,max:0.1,step:0.001},{key:'max',label:'Max AF',type:'float',min:0.01,max:0.5,step:0.01}], colors:['#f44336'] },
     { id:'ichimoku', group:'Overlays',        label:'Ichimoku Cloud',    desc:'Ichimoku Kinko Hyo · 9/26/52',                          type:'overlay',    defaultParams:{},                              paramDefs:[], colors:['#26a69a','#ef5350','rgba(38,166,154,0.3)','rgba(239,83,80,0.3)','rgba(120,123,134,0.4)'] },
+    { id:'supertrend', group:'Overlays',      label:'Supertrend',       desc:'ATR-based trend-following overlay — flips support/resistance on trend change', type:'overlay', defaultParams:{ period:10, mult:3 }, paramDefs:[{key:'period',label:'ATR Period',type:'int',min:1,max:100,step:1},{key:'mult',label:'Multiplier',type:'float',min:0.5,max:10,step:0.1}], colors:['#26a69a','#ef5350'] },
+    { id:'pivotd',   group:'Overlays',        label:'Pivot Points (Daily)',   desc:'Classic pivot, R1-R3 / S1-S3 — computed from the prior day\'s H/L/C', type:'overlay', defaultParams:{}, paramDefs:[], colors:['#ef5350','#ff7043','#ffab91','#9e9e9e','#a5d6a7','#66bb6a','#26a69a'] },
+    { id:'pivotw',   group:'Overlays',        label:'Pivot Points (Weekly)',  desc:'Classic pivot, R1-R3 / S1-S3 — computed from the prior week\'s H/L/C', type:'overlay', defaultParams:{}, paramDefs:[], colors:['#ef5350','#ff7043','#ffab91','#9e9e9e','#a5d6a7','#66bb6a','#26a69a'] },
+    { id:'pivotm',   group:'Overlays',        label:'Pivot Points (Monthly)', desc:'Classic pivot, R1-R3 / S1-S3 — computed from the prior month\'s H/L/C', type:'overlay', defaultParams:{}, paramDefs:[], colors:['#ef5350','#ff7043','#ffab91','#9e9e9e','#a5d6a7','#66bb6a','#26a69a'] },
     // ── Oscillators ───────────────────────────────────────────────────────────
     { id:'rsi',      group:'Oscillators',     label:'RSI',               desc:'Relative Strength Index',                                type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#64b5f6'] },
     { id:'stoch',    group:'Oscillators',     label:'Stochastic',        desc:'Stochastic Oscillator',                                  type:'oscillator', defaultParams:{ k:14, d:3, smooth:3 },         paramDefs:[{key:'k',label:'%K',type:'int',min:1,max:100,step:1},{key:'smooth',label:'Smooth',type:'int',min:1,max:20,step:1},{key:'d',label:'%D',type:'int',min:1,max:20,step:1}], colors:['#2196f3','#ff9800'] },
@@ -5844,6 +5922,43 @@ async function _renderLWChart(ohlcId, label) {
           { data:cl,    color:_iC(id,4), lineWidth:1, label:'Chikou', dashed:true },
         ];
       }
+      case 'supertrend': {
+        // Standard ATR-based flip line (matches the widely-used reference
+        // implementation): two candidate bands (up = support candidate,
+        // dn = resistance candidate) are each "ratcheted" — they can only
+        // move in the trend's favor while the trend holds — and the trend
+        // flips when price closes through the OPPOSITE band's prior value.
+        const { period:n, mult } = p;
+        const tr  = _iTR(bars);
+        const atr = _iRMA(tr, n); // same length/index alignment as bars — see Keltner above
+        let upBand = null, dnBand = null, trend = 1;
+        const upData = [], downData = [];
+        for (let i = 0; i < bars.length; i++) {
+          const hl2  = (bars[i].high + bars[i].low) / 2;
+          const rawUp = hl2 - mult * atr[i];
+          const rawDn = hl2 + mult * atr[i];
+          if (i === 0) {
+            upBand = rawUp; dnBand = rawDn; trend = 1;
+          } else {
+            const prevUp = upBand, prevDn = dnBand;
+            const newUp = (bars[i-1].close > prevUp) ? Math.max(rawUp, prevUp) : rawUp;
+            const newDn = (bars[i-1].close < prevDn) ? Math.min(rawDn, prevDn) : rawDn;
+            if (trend === -1 && bars[i].close > prevDn) trend = 1;
+            else if (trend === 1 && bars[i].close < prevUp) trend = -1;
+            upBand = newUp; dnBand = newDn;
+          }
+          const val = trend === 1 ? upBand : dnBand;
+          const point = { time: bars[i].time, value: parseFloat(val.toFixed(dec)) };
+          if (trend === 1) upData.push(point); else downData.push(point);
+        }
+        return [
+          { data: upData,   color:_iC(id,0), lineWidth:2, label:`Supertrend(${n},${mult})` },
+          { data: downData, color:_iC(id,1), lineWidth:2, label:`Supertrend(${n},${mult})` },
+        ];
+      }
+      case 'pivotd': return _calcPivotSeries(bars, 'D', id, dec);
+      case 'pivotw': return _calcPivotSeries(bars, 'W', id, dec);
+      case 'pivotm': return _calcPivotSeries(bars, 'M', id, dec);
       // ── Oscillators ─────────────────────────────────────────────────────────
       case 'rsi': {
         const n = p.period;
