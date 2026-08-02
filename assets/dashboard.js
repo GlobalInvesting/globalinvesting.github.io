@@ -5722,16 +5722,33 @@ async function _renderLWChart(ohlcId, label) {
       curKey = key;
     }
     const unitLabel = unit === 'D' ? 'D' : (unit === 'W' ? 'W' : 'M');
+    // Segment starts: the first real (non-whitespace) point of every
+    // isolated flat run — i.e. the very first output point, plus every
+    // point that immediately follows a whitespace break. This is what lets
+    // the inline label overlay (see _drawPivotLabels) place a tag at the
+    // START of each period's own segment, matching TradingView's
+    // Pivot-Points-Standard placement — not a single tag at the chart's
+    // last value on the price axis (tried in v8.90.3, reverted here: it
+    // only identifies the CURRENT segment, not any historical one, and
+    // Santiago flagged it as not matching the industry-standard placement).
+    const segStartsByField = {};
+    fields.forEach(f => {
+      const arr = out[f];
+      const starts = [];
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].value === undefined) continue;
+        const prev = arr[i - 1];
+        if (i === 0 || !prev || prev.value === undefined) {
+          starts.push({ time: arr[i].time, value: arr[i].value });
+        }
+      }
+      segStartsByField[f] = starts;
+    });
     return fields.map((f, i) => ({
       data: out[f], color: _iC(id, i), lineWidth: 1, dashed: f === 'PP',
       label: `${unitLabel} ${f}`,
-      // `title` drives a native Lightweight Charts price-axis tag (see
-      // _buildIndicatorPane) so each of the 7 overlapping levels identifies
-      // itself directly on the right-hand axis — the standard TradingView/
-      // MT5 convention for pivot displays — rather than only being
-      // distinguishable by seven similar-toned line colors, which is what
-      // Santiago flagged as missing.
       title: `${unitLabel}${f}`,
+      segStarts: segStartsByField[f],
     }));
   }
 
@@ -6270,6 +6287,59 @@ async function _renderLWChart(ohlcId, label) {
     paneEl.appendChild(el);
   }
 
+  // ── Pivot per-segment inline labels — TradingView-standard placement ──
+  // Unlike the CB-meeting overlay (one date → one static label), a pivot
+  // indicator needs a small text tag at the START of EVERY period segment
+  // (R3..S3 × every day/week/month on file), not just the latest one.
+  // Reuses the same SVG-overlay-synced-to-timeScale pattern as _drawCbLines
+  // above: a transparent, pointer-events:none SVG sits over the chart div
+  // and is redrawn from time/price coordinates on every pan/zoom.
+  let _pivotLabelOverlay = null;
+  const _pivotLabelData = {}; // indicator id → [{ time, value, color, text }]
+
+  function _drawPivotLabels() {
+    if (!_pivotLabelOverlay || !_lwChart) return;
+    const ts = _lwChart.timeScale();
+    let svgContent = '';
+    Object.values(_pivotLabelData).forEach(entries => {
+      entries.forEach(e => {
+        try {
+          const x = ts.timeToCoordinate(e.time);
+          const y = candleSeries.priceToCoordinate(e.value);
+          if (x == null || y == null || x < 0 || x > chartDiv.offsetWidth) return;
+          svgContent += `<text x="${(x + 3).toFixed(1)}" y="${(y - 3).toFixed(1)}" `
+            + `font-size="9" font-family="var(--font-mono,monospace)" fill="${e.color}" `
+            + `font-weight="700">${e.text}</text>`;
+        } catch(_) {}
+      });
+    });
+    _pivotLabelOverlay.innerHTML = svgContent;
+  }
+  function _ensurePivotLabelOverlay() {
+    if (_pivotLabelOverlay) return;
+    _pivotLabelOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    _pivotLabelOverlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible;';
+    chartDiv.style.position = 'relative';
+    chartDiv.appendChild(_pivotLabelOverlay);
+    _lwChart.timeScale().subscribeVisibleTimeRangeChange(_drawPivotLabels);
+  }
+  // Registers/clears one indicator id's label entries and redraws. Called
+  // with an empty seriesList to clear (indicator destroyed or toggled off).
+  function _setPivotLabels(id, seriesList) {
+    const withSeg = (seriesList || []).filter(s => s.segStarts && s.segStarts.length);
+    if (withSeg.length === 0) { delete _pivotLabelData[id]; }
+    else {
+      _pivotLabelData[id] = [];
+      withSeg.forEach(s => {
+        s.segStarts.forEach(pt => {
+          _pivotLabelData[id].push({ time: pt.time, value: pt.value, color: s.color, text: s.title });
+        });
+      });
+    }
+    _ensurePivotLabelOverlay();
+    _drawPivotLabels();
+  }
+
   function _addRefLines(paneIndex, refs, ownerSeries) {
     if (!refs || paneIndex === null || !ownerSeries) return;
     const lines = [];
@@ -6362,12 +6432,7 @@ async function _renderLWChart(ohlcId, label) {
             series = _lwChart.addSeries(LWC.LineSeries, {
               color: s.color, lineWidth: s.lineWidth || 1,
               lineStyle: s.dashed ? 2 : 0,
-              title: s.title || undefined,
-              // Series that carry an explicit `title` (currently: Pivot
-              // Points' R3-S3 levels) need their own always-on axis label to
-              // be identifiable — falls back to the prior si===0-only
-              // behavior for indicators that don't set `title`.
-              priceLineVisible: false, lastValueVisible: s.title ? true : si === 0, crosshairMarkerVisible: false,
+              priceLineVisible: false, lastValueVisible: si === 0, crosshairMarkerVisible: false,
               priceFormat: { type: 'price', precision: (isOverlay ? dec : 2), minMove: (isOverlay ? minMove : 0.01) },
             }, paneIndex);
           }
@@ -6402,12 +6467,23 @@ async function _renderLWChart(ohlcId, label) {
           }
         } catch(_) {}
       }
+
+      // Inline per-segment labels (Pivot Points only — see _setPivotLabels).
+      // No-op for any indicator whose series don't carry `segStarts`.
+      _setPivotLabels(id, seriesList);
     } catch(e) { console.warn('[LW] indicator build error for', id, e); }
   }
 
   function _destroyIndicatorPane(id) {
     const cfg = _IND_CATALOGUE.find(c => c.id === id);
     const isOverlay = cfg && cfg.type === 'overlay';
+
+    // Clear any inline pivot segment labels for this id (no-op for
+    // non-pivot ids). Done unconditionally here, not only inside
+    // _buildIndicatorPane's success path, so a rebuild that ends up with an
+    // empty seriesList (e.g. a period pivot blocked by _pivotTfOk on the
+    // current timeframe) doesn't leave stale labels from a prior timeframe.
+    _setPivotLabels(id, []);
 
     // Remove all series for this indicator (works for both overlays and oscillators)
     if (_indSeries[id]) {
