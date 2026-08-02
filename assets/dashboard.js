@@ -12676,6 +12676,7 @@ const G8_YIELD_MAP = {
   nz: { file: 'NZD', label: 'New Zealand', subtitle: 'NEW ZEALAND · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond10y', label: '10Y NZGB' }] },
   no: { file: 'NOK', label: 'Norway',   subtitle: 'NORWAY · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond2y', label: '2Y NGB' }, { k: 'bond10y', label: '10Y NGB' }] },
   se: { file: 'SEK', label: 'Sweden',   subtitle: 'SWEDEN · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond2y', label: '2Y SGB' }, { k: 'bond10y', label: '10Y SGB' }] },
+  ch: { file: 'CHF', label: 'Switzerland', subtitle: 'SWITZERLAND · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond2y', label: '2Y Conf.' }, { k: 'bond10y', label: '10Y Conf.' }] },
 };
 
 async function renderG8YieldPane(cty) {
@@ -12736,6 +12737,7 @@ async function renderSovereignSpreads() {
     { code: 'nz', file: 'NZD', label: 'NZ' },
     { code: 'no', file: 'NOK', label: 'NO' },
     { code: 'se', file: 'SEK', label: 'SE' },
+    { code: 'ch', file: 'CHF', label: 'CH' },
   ];
 
   // Load US first
