@@ -343,8 +343,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #main::-webkit-scrollbar-track{background:transparent}
 #main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 #narrative{background:var(--bg2);border-bottom:1px solid var(--border);padding:7px 10px;display:flex;gap:10px;align-items:flex-start;flex-shrink:0;height:auto}
-.narr-more-btn{display:none;background:none;border:none;color:var(--accent);font-size:10px;font-family:var(--font-ui,sans-serif);font-weight:600;cursor:pointer;padding:1px 0 0;text-align:left;align-self:flex-start}
-.narr-more-btn:hover{text-decoration:underline}
 .panel{border-bottom:1px solid var(--border)}
 .panel-head{background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between}
 .panel-title{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em}
@@ -463,13 +461,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #layout{display:flex;flex-direction:column;height:auto;overflow:visible}
 #main{overflow-y:visible;overflow-x:hidden}
 #narrative{height:auto;flex-direction:column;gap:6px}
-/* Long AI narrative paragraphs pushed the whole page down on mobile — clamp
-   to 3 lines by default, with a toggle. Button only becomes visible (JS adds
-   .show) when the text actually overflows the clamp, so short narratives
-   never show a pointless "Show more". */
-#narrative-text{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-#narrative-text.narr-expanded{-webkit-line-clamp:unset;display:block;overflow:visible}
-.narr-more-btn.show{display:inline-block}
 #split-layout-btn{display:none!important}
 #split-tip{display:none!important}
 #split-drag-handle{display:none!important}
@@ -758,7 +749,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="narrative" role="region" aria-label="Market Narrative" aria-live="polite" aria-atomic="false">
       <div class="narr-label">Narrative</div>
       <div class="narr-text" id="narrative-text" aria-label="Narrative text">Loading market narrative…</div>
-      <button class="narr-more-btn" id="narr-more-btn" type="button" aria-expanded="false" aria-controls="narrative-text">Show more</button>
       <div class="narr-meta" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
         <div class="narr-regime" id="narrative-regime">—</div>
         <button class="narr-share-btn" id="narr-share-btn" onclick="shareNarrative()" title="Share narrative" aria-label="Share market narrative">
@@ -1858,14 +1848,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.2" defer></script>
-<script src="assets/dashboard.js?v=8.90.9" defer></script>
+<script src="assets/dashboard.js?v=8.90.13" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
      Falls back to yfinance quotes.json polling if the Worker is unavailable. -->
 <script src="assets/fx-websocket.js?v=1.0.0" defer></script>
 <script src="assets/cot-modal-chart.js?v=7.91.1" defer></script>
-<script src="assets/cb-rates-modal.js?v=8.0.3" defer></script>
+<script src="assets/cb-rates-modal.js?v=8.0.4" defer></script>
 <script src="assets/real-carry-modal.js?v=2.7.6" defer></script>
 <script src="assets/corr-modal.js?v=2.2.0" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
