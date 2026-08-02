@@ -1,6 +1,19 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.4 — Market Commentary fills remaining panel height
+// YIELD CURVE MODAL  v2.5 — #ycm-bd now actually stretches in the real
+//   (inline-panel.js) render path, so the v2.4 min-height:100% fix has a
+//   definite parent height to resolve against.
 // Fluid layout, terminal CSS variables throughout.
+// v2.5 (2026-08-02): v2.4 gave #ycm-modal `min-height:100%`, but in the
+//   actual production path this modal is transplanted by inline-panel.js
+//   into a flex-column `body` container, with inline-panel.js overriding
+//   #ycm-bd to `position:static` (the absolute/top/bottom rule below only
+//   ever applies in a legacy fallback that isn't normally reached). A plain
+//   flex child with no flex-grow doesn't stretch along the main axis just
+//   because its container has room — #ycm-bd kept its own intrinsic content
+//   height regardless, leaving #ycm-modal's `min-height:100%` with nothing
+//   definite to resolve against, so v2.4 alone likely didn't fix the actual
+//   symptom. Added `flex:1;min-height:0` to `#ycm-bd` so it now genuinely
+//   claims the available vertical space inside inline-panel.js's body.
 // v2.4 (2026-08-02): #ycm-modal had height:auto with no floor, so whenever
 //   its actual content (strip + fixed 240px chart + tenor table + a
 //   3-article commentary block capped at max-height:220px) was shorter than
@@ -43,6 +56,12 @@
   border-left:1px solid var(--border2)!important;
   scrollbar-width:thin;
   scrollbar-color:var(--border2) transparent;
+  /* flex/min-height only matter when inline-panel.js overrides position to
+     static and transplants this into its flex-column "body" container (the
+     actual production path) — harmless no-ops in the absolute fallback
+     above, since out-of-flow positioned elements ignore flex properties. */
+  flex:1;
+  min-height:0;
 }
 #ycm-bd::-webkit-scrollbar { width:3px; }
 #ycm-bd::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }

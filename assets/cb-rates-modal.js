@@ -1,5 +1,28 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CB RATES MODAL  v2.4 — Fix: chart height grows on each Decisions→Rate Chart tab-switch
+// CB RATES MODAL  v2.5 — Fix: Market Commentary capped well below available
+//   panel height, leaving unused space (same symptom as yc-modal v2.4/v2.5)
+// v2.5 (2026-08-02): Santiago reported the same "black space that could show
+//   more news" symptom already fixed in yc-modal. Root cause here has two
+//   parts: (1) #cbr-bd, like #ycm-bd, is transplanted by inline-panel.js into
+//   a flex-column `body` without ever being given flex-grow, so it kept its
+//   own intrinsic content height instead of stretching to fill the available
+//   panel — #cbr-modal's inline height:100% (already set by _transplant())
+//   had no definite parent height to resolve against. Fixed the same way as
+//   yc-modal: added flex:1;min-height:0 to #cbr-bd.
+//   (2) UNLIKE yc-modal, this modal's Rate Chart tab has a flex:1 chart area
+//   whose pixel height is measured once and cached (_cbrDims()/bd._chartH,
+//   see the v2.4 note below) specifically to avoid an infinite-grow bug, and
+//   the tab body is deliberately overflow-y:hidden so everything fits without
+//   scrolling. Making .cbr-ps-wrap flex:1 (yc-modal's approach) would compete
+//   with the chart's own flex:1 for the same space and risk shrinking the
+//   chart below its cached height (visual overflow, not just a cosmetic
+//   regression) — a materially different risk than in yc-modal, so it wasn't
+//   applied here. Instead: .cbr-ps-wrap's cap raised 220px → 340px (a bounded
+//   increase, no flex competition with the chart) and its own overflow-y:auto
+//   kept as a safety net if content still exceeds that. Article cap raised
+//   3 → 6 (same rationale as yc-modal) so the larger cap is filled with real
+//   commentary instead of staying mostly empty.
+// v2.4 (2026-06-15): Fix infinite chart height grow on Decisions→Rate Chart tab-switch
 // Fluid layout, terminal CSS variables throughout.
 // v2.2 (2026-06-15): CB News tab added (superseded by v2.3).
 // v2.3 (2026-06-15): Tab approach replaced with inline Policy Summary block.
@@ -16,7 +39,7 @@
   if(document.getElementById('cbr-modal-css'))return;
   const s=document.createElement('style');s.id='cbr-modal-css';
   s.textContent=`
-#cbr-bd{display:block!important;}
+#cbr-bd{display:block!important;flex:1;min-height:0;}
 #cbr-modal{
   width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
   border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;
@@ -75,7 +98,7 @@
 .cbr-ctx-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono);}
 .cbr-ctx-val{font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text);}
 .cbr-next-fwd{display:grid;grid-template-columns:1fr 1fr;flex-shrink:0;border-top:1px solid var(--border,#252d3d);}
-.cbr-ps-wrap{flex-shrink:0;border-top:1px solid var(--border,#252d3d);overflow-y:auto;max-height:220px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;background:var(--bg);}
+.cbr-ps-wrap{flex-shrink:0;border-top:1px solid var(--border,#252d3d);overflow-y:auto;max-height:340px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;background:var(--bg);}
 .cbr-ps-wrap::-webkit-scrollbar{width:3px!important;}
 .cbr-ps-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
 .cbr-ps-hdr{display:flex;align-items:center;justify-content:space-between;padding:5px 14px 4px;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;}
@@ -528,7 +551,7 @@ async function _cbrLoadPolicySummary(ccy, bankShort){
         return CB_KW.some(k=>combined.includes(k));
       })
       .sort((a,b)=>(b.ts||0)-(a.ts||0))
-      .slice(0,3);
+      .slice(0,6);
 
     const updLabel=j.updated_label||'';
 
