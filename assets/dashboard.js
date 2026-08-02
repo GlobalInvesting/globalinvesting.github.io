@@ -5602,6 +5602,22 @@ async function _renderLWChart(ohlcId, label) {
   // 'D' uses a simple UTC calendar-day boundary (matches the existing VWAP
   // session-reset convention above); 'W' uses ISO week numbering (Mon-Sun);
   // 'M' uses UTC calendar month.
+  // A period pivot (Daily/Weekly/Monthly) can only be drawn as isolated
+  // per-period flat segments when the chart's own bar granularity is
+  // strictly finer than that period. When it isn't (e.g. Daily Pivot viewed
+  // on a Daily chart), EVERY bar is its own period, so there is no bar left
+  // to sacrifice for a whitespace break without losing the period's only
+  // data point — the result is every bar's differing level connected
+  // straight to the next, i.e. the continuous diagonal zigzag Santiago
+  // flagged (screenshot on an AUD/USD D1 chart with Daily Pivot on).
+  // Matches the standard MT5/TradingView convention of only exposing a
+  // period pivot on timeframes below that period.
+  const _PIVOT_TF_RANK = { H1: 0, H4: 1, D1: 2, W1: 3, MN: 4 };
+  const _PIVOT_MAX_TF  = { D: 1, W: 2, M: 3 }; // max allowed rank = strictly finer than the period
+  function _pivotTfOk(unit) {
+    const rank = _PIVOT_TF_RANK[_lwActiveTf];
+    return rank !== undefined && rank <= _PIVOT_MAX_TF[unit];
+  }
   function _iPivotPeriodKey(rawT, unit) {
     // bar.time is a 'YYYY-MM-DD' business-day string on D1/W1/MN and a plain
     // unix-seconds number on H1/H4 (see the "Universal drawing-point time"
@@ -5663,6 +5679,12 @@ async function _renderLWChart(ohlcId, label) {
   // no value) point breaks the line at a period boundary so Lightweight
   // Charts stops connecting one period's segment to the next.
   function _calcPivotSeries(bars, unit, id, dec) {
+    // See _pivotTfOk above: a period pivot needs bars strictly finer than
+    // its own period to render as isolated segments at all. Returning empty
+    // here (instead of the previous single-bar-per-period zigzag) is the
+    // same "no meaningful line to draw" outcome _buildIndicatorPane already
+    // handles silently for empty series lists.
+    if (!_pivotTfOk(unit)) return [];
     const periods = _iAggregatePeriods(bars, unit);
     if (periods.length < 2) return [];
     const levelsByKey = {}, countByKey = {};
@@ -5703,6 +5725,13 @@ async function _renderLWChart(ohlcId, label) {
     return fields.map((f, i) => ({
       data: out[f], color: _iC(id, i), lineWidth: 1, dashed: f === 'PP',
       label: `${unitLabel} ${f}`,
+      // `title` drives a native Lightweight Charts price-axis tag (see
+      // _buildIndicatorPane) so each of the 7 overlapping levels identifies
+      // itself directly on the right-hand axis — the standard TradingView/
+      // MT5 convention for pivot displays — rather than only being
+      // distinguishable by seven similar-toned line colors, which is what
+      // Santiago flagged as missing.
+      title: `${unitLabel}${f}`,
     }));
   }
 
@@ -6333,7 +6362,12 @@ async function _renderLWChart(ohlcId, label) {
             series = _lwChart.addSeries(LWC.LineSeries, {
               color: s.color, lineWidth: s.lineWidth || 1,
               lineStyle: s.dashed ? 2 : 0,
-              priceLineVisible: false, lastValueVisible: si === 0, crosshairMarkerVisible: false,
+              title: s.title || undefined,
+              // Series that carry an explicit `title` (currently: Pivot
+              // Points' R3-S3 levels) need their own always-on axis label to
+              // be identifiable — falls back to the prior si===0-only
+              // behavior for indicators that don't set `title`.
+              priceLineVisible: false, lastValueVisible: s.title ? true : si === 0, crosshairMarkerVisible: false,
               priceFormat: { type: 'price', precision: (isOverlay ? dec : 2), minMove: (isOverlay ? minMove : 0.01) },
             }, paneIndex);
           }
@@ -6692,7 +6726,19 @@ async function _renderLWChart(ohlcId, label) {
       pop.appendChild(header);
 
       items.forEach(cfg => {
-        const isOn = !!window._lwIndState[cfg.id];
+        // Period pivots (Daily/Weekly/Monthly) can't render meaningfully
+        // once the chart's own timeframe is at or above their period — see
+        // _pivotTfOk. Disable the row instead of letting the user turn on
+        // an indicator that will silently draw nothing (or, before this
+        // fix, the corrupted zigzag).
+        const _pivotUnit = { pivotd: 'D', pivotw: 'W', pivotm: 'M' }[cfg.id];
+        const tfBlocked = !!_pivotUnit && !_pivotTfOk(_pivotUnit);
+        const _PIVOT_TF_HINT = {
+          D: 'Not available — Daily Pivots require an intraday timeframe (H1 or H4)',
+          W: 'Not available — Weekly Pivots require H1, H4, or D1',
+          M: 'Not available — Monthly Pivots require H1, H4, D1, or W1',
+        };
+        const isOn = !!window._lwIndState[cfg.id] && !tfBlocked;
         const hasParams = cfg.paramDefs.length > 0;
         const hasColors = cfg.colors.length > 0;
         const hasLevels = !!_IND_LEVEL_DEFAULTS[cfg.id];
@@ -6700,8 +6746,9 @@ async function _renderLWChart(ohlcId, label) {
 
         // ── Main toggle row ────────────────────────────────────
         const row = document.createElement('div');
-        row.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;background:${isOn?'rgba(79,127,255,0.08)':'transparent'};border-bottom:${expandable?'none':'1px solid rgba(42,46,57,0.3)'};`;
-        row.addEventListener('mouseenter', () => { if (!isOn) row.style.background='rgba(255,255,255,0.04)'; });
+        row.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:${tfBlocked?'not-allowed':'pointer'};opacity:${tfBlocked?'0.45':'1'};background:${isOn?'rgba(79,127,255,0.08)':'transparent'};border-bottom:${expandable?'none':'1px solid rgba(42,46,57,0.3)'};`;
+        if (tfBlocked) row.title = _PIVOT_TF_HINT[_pivotUnit];
+        row.addEventListener('mouseenter', () => { if (!isOn && !tfBlocked) row.style.background='rgba(255,255,255,0.04)'; });
         row.addEventListener('mouseleave', () => { row.style.background=isOn?'rgba(79,127,255,0.08)':'transparent'; });
 
         // Checkbox
@@ -6721,6 +6768,7 @@ async function _renderLWChart(ohlcId, label) {
         // Toggle click
         row.addEventListener('click', e => {
           e.stopPropagation();
+          if (tfBlocked) return;
           window._lwIndState[cfg.id] = !window._lwIndState[cfg.id];
           _saveIndState();
           if (window._lwIndState[cfg.id]) { _buildIndicatorPane(cfg.id); } else { _destroyIndicatorPane(cfg.id); }
