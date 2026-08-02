@@ -1,6 +1,19 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.3 — chart no longer flex:1 (unbounded growth)
+// YIELD CURVE MODAL  v2.4 — Market Commentary fills remaining panel height
 // Fluid layout, terminal CSS variables throughout.
+// v2.4 (2026-08-02): #ycm-modal had height:auto with no floor, so whenever
+//   its actual content (strip + fixed 240px chart + tenor table + a
+//   3-article commentary block capped at max-height:220px) was shorter than
+//   #ycm-bd's full panel height, the leftover space below the modal was
+//   just bare #ycm-bd background — same color as everything else, so it
+//   read as a dead black gap rather than as "more commentary available."
+//   Fixed by giving #ycm-modal min-height:100% (so it always fills the
+//   panel, growing beyond it and letting #ycm-bd scroll if content is
+//   taller) and changing .ycm-ps-wrap from a flex-shrink:0/max-height:220px
+//   internally-scrolling box to flex:1 (no cap), so it actually claims the
+//   freed-up space. Article cap raised 3 → 6 so that space gets used by
+//   real commentary instead of staying visually empty when more matching
+//   articles exist.
 // v2.3 (2026-08-01): #ycm-chart-wrap was flex:1 with no cap, so in the
 //   full-#main inline-panel context (split layout off) — where the
 //   container's height is nearly the full viewport — the chart expanded
@@ -36,7 +49,7 @@
 /* #main needs position:relative to contain the absolute modal */
 #main { position:relative; }
 #ycm-modal {
-  width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
+  width:100%!important;max-width:none!important;height:auto!important;min-height:100%!important;max-height:none!important;
   border-radius:0!important;border:none!important;box-shadow:none!important;animation:none!important;
   background:var(--bg)!important;position:static!important;
   font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text);
@@ -77,9 +90,7 @@
 #ycm-table tr:hover td { background:rgba(255,255,255,.02); }
 #ycm-table td.up { color:var(--up); }
 #ycm-table td.down { color:var(--down); }
-.ycm-ps-wrap{flex-shrink:0;border-top:1px solid var(--border2);overflow-y:auto;max-height:220px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;background:var(--bg);}
-.ycm-ps-wrap::-webkit-scrollbar{width:3px!important;}
-.ycm-ps-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.ycm-ps-wrap{flex:1;min-height:120px;border-top:1px solid var(--border2);background:var(--bg);}
 .ycm-ps-hdr{display:flex;align-items:center;justify-content:space-between;padding:5px 14px 4px;border-bottom:1px solid var(--border2);flex-shrink:0;}
 .ycm-ps-hdr-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;font-family:var(--font-mono);}
 .ycm-ps-hdr-src{font-size:8px;color:var(--text2);font-family:var(--font-mono);}
@@ -238,7 +249,7 @@ async function _ycLoadPolicySummary(){
         return YC_KW.some(k=>combined.includes(k));
       })
       .sort((a,b)=>(b.ts||0)-(a.ts||0))
-      .slice(0,3);
+      .slice(0,6);
 
     const updLabel=j.updated_label||'';
 
