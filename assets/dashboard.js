@@ -248,7 +248,7 @@ function updateSessions(h) {
   });
 
   setEl('session-label', activeLabel + (isWeekend ? '' : ' SESSION'));
-  setEl('session-status', activeLabel + (isWeekend ? ' · CLOSED' : ' · ACTIVE'));
+  setEl('session-status', isWeekend ? activeLabel : (activeLabel + ' · ACTIVE'));
 }
 
 setInterval(updateClock, 1000);

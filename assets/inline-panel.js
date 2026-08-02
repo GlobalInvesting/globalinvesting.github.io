@@ -1,6 +1,16 @@
 // ═══════════════════════════════════════════════════════════════════
-// INLINE PANEL SYSTEM  v1.3.2 — fix openCOTModal interceptor dropping the 3rd (opts) arg,
-//   which silently broke the COT currency-switcher's tab-preservation (v8.71.0)
+// INLINE PANEL SYSTEM  v1.4.2 — stop force-enabling split-layout on modal
+//   open. _ensureSplit() (renamed _getInlinePanelTargets()) used to add
+//   the split-layout class + persist it to localStorage every time any of
+//   these modals opened, silently overriding a user's explicit choice to
+//   keep the layout unsplit. Now: if split is already active (user turned
+//   it on), route into the existing left/right panes as before; if not,
+//   render the panel across the full #main area instead of switching
+//   layouts. Also fixed _makeShell()'s panel-replacement teardown, which
+//   used to .remove() a previous panel wholesale instead of running its
+//   own close handler — losing transplanted content (e.g. rcm-bd, cbr-bd)
+//   instead of restoring it. More exposed now that multiple modal types
+//   can share the same #main target when split is off.
 // File: assets/inline-panel.js
 //
 //   LEFT center  (#split-upper):  Carry Trade · Heatmap
@@ -15,30 +25,32 @@
 (function () {
   'use strict';
 
-  var LS_KEY  = 'gi_split_layout';
   var IP_ATTR = 'data-inline-panel';
   var HIDDEN_ATTR = 'data-ip-hidden';
 
-  // ── Ensure split-layout is active ─────────────────────────────────
-  function _ensureSplit() {
+  // ── Resolve target panes for inline content ────────────────────────
+  // Split-layout must only ever be active because the user turned it on
+  // with #split-layout-btn — never as a side-effect of opening a panel.
+  // Previously this force-enabled split-layout (and persisted that to
+  // localStorage) every time ANY of these modals opened, silently
+  // overriding a user's explicit choice to keep the layout unsplit.
+  //
+  // When split is already active (user's choice), route into the existing
+  // left/right panes exactly as before. When it isn't, render the panel
+  // across the full central area (#main) instead of switching layouts out
+  // from under the user.
+  function _getInlinePanelTargets() {
     var main  = document.getElementById('main');
     var upper = document.getElementById('split-upper');
     var lower = document.getElementById('split-lower');
     if (!main || !upper || !lower) return null;
 
-    if (!main.classList.contains('split-layout')) {
-      var btn    = document.getElementById('split-layout-btn');
-      var handle = document.getElementById('split-drag-handle');
-
-      main.classList.add('split-layout');
-      if (btn)    { btn.classList.add('active'); btn.setAttribute('aria-pressed','true'); }
-      if (handle) handle.style.display = '';
-      upper.style.width = '55%';
-      upper.style.flex  = 'none';
-
-      try { localStorage.setItem(LS_KEY, JSON.stringify({ active: true, leftPct: 55 })); } catch(e) {}
+    if (main.classList.contains('split-layout')) {
+      return { upper: upper, lower: lower };
     }
-    return { upper: upper, lower: lower };
+    // Split inactive: both "panes" resolve to the full central area so the
+    // panel takes over the whole width instead of forcing a 55/45 split.
+    return { upper: main, lower: main };
   }
 
   // ── Hide existing children of target, return restore function ─────
@@ -61,9 +73,16 @@
 
   // ── Create inline shell ────────────────────────────────────────────
   function _makeShell(target, title, onClose) {
-    // Remove any existing inline panel in this target first
+    // Tear down any existing inline panel in this target first — via its
+    // own close handler when one was recorded, not a raw DOM removal.
+    // A blind .remove() would delete transplanted content (e.g. rcm-bd,
+    // cbr-bd) along with the shell instead of restoring it to document.body,
+    // permanently losing that modal's DOM node.
     var old = target.querySelector('[' + IP_ATTR + ']');
-    if (old) old.remove();
+    if (old) {
+      if (typeof old._ipOnClose === 'function') old._ipOnClose();
+      else old.remove();
+    }
     // Restore any previously hidden children
     Array.from(target.querySelectorAll('[' + HIDDEN_ATTR + ']')).forEach(function(el) {
       el.style.display = '';
@@ -110,6 +129,7 @@
       if (e.key === 'Escape') _doClose();
     };
     document.addEventListener('keydown', _ipEscHandler, { capture: true });
+    wrap._ipOnClose = _doClose;
 
     hd.appendChild(titleEl);
     hd.appendChild(closeBtn);
@@ -174,7 +194,7 @@
   var _origOpenRCM = window.openRealCarryModal;
 
   window.openRealCarryModal = function(longCcy, shortCcy) {
-    var panels = _ensureSplit();
+    var panels = _getInlinePanelTargets();
     if (!panels) { _origOpenRCM && _origOpenRCM(longCcy, shortCcy); return; }
 
     var label = (longCcy && shortCcy) ? longCcy + '/' + shortCcy : 'G10 currencies';
@@ -202,7 +222,7 @@
   var _origOpenHM = window.openHeatmapModal;
 
   window.openHeatmapModal = function(ccy, strengths, rtCache) {
-    var panels = _ensureSplit();
+    var panels = _getInlinePanelTargets();
     if (!panels) { _origOpenHM && _origOpenHM(ccy, strengths, rtCache); return; }
 
     var body = _makeShell(panels.upper, 'Currency Strength · ' + (ccy || ''), function() {
@@ -228,7 +248,7 @@
   var _origOpenCorr = window.openCorrModal;
 
   window.openCorrModal = function(corrObj) {
-    var panels = _ensureSplit();
+    var panels = _getInlinePanelTargets();
     if (!panels) { _origOpenCorr && _origOpenCorr(corrObj); return; }
 
     var a = corrObj ? corrObj.a : '';
@@ -265,7 +285,7 @@
   var _origOpenCBR = window.openCBRatesModal;
 
   window.openCBRatesModal = function(ccy, obs, bankInfo, meetingData) {
-    var panels = _ensureSplit();
+    var panels = _getInlinePanelTargets();
     if (!panels) { _origOpenCBR && _origOpenCBR(ccy, obs, bankInfo, meetingData); return; }
 
     var body = _makeShell(panels.lower, 'CB Rates · ' + (ccy || ''), function() {
@@ -307,7 +327,7 @@
   var _origOpenCOT = window.openCOTModal;
 
   window.openCOTModal = function(ccy, data, opts) {
-    var panels = _ensureSplit();
+    var panels = _getInlinePanelTargets();
     if (!panels) { _origOpenCOT && _origOpenCOT(ccy, data, opts); return; }
 
     var body = _makeShell(panels.lower, 'COT Positioning · ' + (ccy || ''), function() {
@@ -351,7 +371,7 @@
   var _origOpenYC = window.openYCModal;
 
   window.openYCModal = function(tenorData) {
-    var panels = _ensureSplit();
+    var panels = _getInlinePanelTargets();
     if (!panels) { _origOpenYC && _origOpenYC(tenorData); return; }
 
     var body = _makeShell(panels.lower, 'Yield Curve · US Treasury', function() {
@@ -386,7 +406,7 @@
   var _origOpenESM = window.openEconSurprisesModal;
 
   window.openEconSurprisesModal = function(ccy) {
-    var panels = _ensureSplit();
+    var panels = _getInlinePanelTargets();
     if (!panels) { _origOpenESM && _origOpenESM(ccy); return; }
 
     var body = _makeShell(panels.lower, 'Economic Surprises \u00b7 ' + (ccy || '8 major currencies'), function() {
@@ -419,6 +439,6 @@
   };
 
   window._showInlinePanel   = _makeShell;
-  window._ensureInlineSplit = _ensureSplit;
+  window._ensureInlineSplit = _getInlinePanelTargets;
 
 })();

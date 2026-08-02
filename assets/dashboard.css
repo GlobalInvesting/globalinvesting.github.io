@@ -1374,9 +1374,15 @@
       padding: 3px 4px;
     }
 
-    /* Footer: wrap cleanly */
-    #statusbar { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
-    #statusbar .footer-copy { position: static; transform: none; width: 100%; order: 10; text-align: center; }
+    /* Footer: align into a 2-column grid instead of a ragged flex-wrap so
+       row 2 (SESSION/LOCAL) lines up under row 1 (DATA/DELAY). */
+    #statusbar {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4px 10px; font-size: 9px; padding: 4px 8px;
+      height: auto; position: relative;
+    }
+    #statusbar > div:first-child { max-width: none; }
+    #statusbar .footer-copy { grid-column: 1 / -1; position: static; transform: none; order: 10; text-align: center; }
 
     /* COT panel: fit all 8 cols within mobile viewport (overflow-x:hidden on #main prevents scroll) */
     .cot-scroll-wrap {
