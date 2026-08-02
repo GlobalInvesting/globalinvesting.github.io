@@ -1107,6 +1107,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="rates-ctab"        data-cty="nz"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">NZ</button>
         <button class="rates-ctab"        data-cty="no"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">NO</button>
         <button class="rates-ctab"        data-cty="se"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">SE</button>
+        <button class="rates-ctab"        data-cty="ch"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">CH</button>
         <button class="rates-ctab"        data-cty="spreads" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--accent);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Spreads</button>
       </div>
 
@@ -1161,6 +1162,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div id="rates-pane-se" class="rates-country-pane" style="display:none;padding:6px 10px;">
         <div id="rates-g8-content-se" style="color:var(--text3);font-size:11px;">Loading SE yields…</div>
       </div>
+      <div id="rates-pane-ch" class="rates-country-pane" style="display:none;padding:6px 10px;">
+        <div id="rates-g8-content-ch" style="color:var(--text3);font-size:11px;">Loading CH yields…</div>
+      </div>
 
       <!-- Sovereign Spreads pane -->
       <div id="rates-pane-spreads" class="rates-country-pane" style="display:none;padding:6px 10px 2px;">
@@ -1184,6 +1188,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <tr><td>New Zealand</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
             <tr><td>Norway</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
             <tr><td>Sweden</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Switzerland</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
           </tbody>
         </table>
         <div style="font-size:9px;color:var(--text3);margin-top:4px;">Daily sovereign yield pipeline · FRED · ECB · BOE</div>
@@ -1848,7 +1853,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.2" defer></script>
-<script src="assets/dashboard.js?v=8.90.13" defer></script>
+<script src="assets/dashboard.js?v=8.90.14" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
