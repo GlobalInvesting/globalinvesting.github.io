@@ -51,6 +51,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write   # necesario para disparar deploy-pages.yml (ver step "Trigger Pages deploy")
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -75,6 +76,7 @@ jobs:
         run: python3 scripts/update_sitemap.py
 
       - name: Commit and push (if changed)
+        id: push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -92,15 +94,27 @@ jobs:
             git add sitemap.xml
             if git diff --quiet && git diff --staged --quiet; then
               echo "sitemap.xml unchanged — skipping commit."
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             git commit -m "sitemap: update lastmod dates ${TIMESTAMP}"
             if git push origin main; then
               echo "✅ Push succeeded on attempt $i."
+              echo "pushed=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
             sleep $((i * 2))
           done
           echo "⚠️  All push attempts exhausted — sitemap will update on next run."
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
           exit 0
+
+      - name: Trigger Pages deploy
+        # Pushes made with the default GITHUB_TOKEN do NOT trigger other on:push
+        # workflows (GitHub's loop-prevention rule) — dispatch deploy-pages.yml
+        # explicitly, only when this run actually pushed new data.
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main

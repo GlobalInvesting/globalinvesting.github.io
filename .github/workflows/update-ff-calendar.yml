@@ -233,11 +233,13 @@ jobs:
           fi
 
       - name: Commit and push (only if actuals/forecasts changed)
+        id: push
         if: steps.gate.outputs.run == 'true'
         run: |
           CHANGED=$(cat /tmp/cal_changed 2>/dev/null || echo "0")
           if [ "${CHANGED}" != "1" ]; then
             echo "No new actuals or forecasts — skipping commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -258,18 +260,30 @@ jobs:
             git add calendar-data/ff_calendar.json
             if git diff --quiet && git diff --staged --quiet; then
               echo "No changes vs remote HEAD — skipping commit (race condition resolved)."
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             git commit -m "Calendar ${TIMESTAMP} [${SOURCE}] — ${HIGH} high-impact, ${RELEASED} with actuals"
             if git push origin main; then
               echo "✅ Push succeeded on attempt $i."
+              echo "pushed=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
             sleep $((i * 2))
           done
           echo "⚠️  All push attempts exhausted — data refreshes on next scheduled run."
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
           exit 0
+
+      - name: Trigger Pages deploy
+        # Pushes made with the default GITHUB_TOKEN do NOT trigger other on:push
+        # workflows (GitHub's loop-prevention rule) — dispatch deploy-pages.yml
+        # explicitly, only when this run actually pushed new calendar data.
+        if: steps.gate.outputs.run == 'true' && steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
 
       - name: Dispatch cb-rate-decision if interest rate actual detected
         # v5.3: When ff_calendar.json is updated with a released high-impact

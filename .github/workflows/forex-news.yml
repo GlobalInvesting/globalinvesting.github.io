@@ -47,6 +47,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write   # necesario para disparar deploy-pages.yml (ver step "Trigger Pages deploy")
 
 jobs:
   fetch-news:
@@ -105,6 +106,7 @@ jobs:
         run: python3 private-scripts/fetch_news.py
 
       - name: Commit updated news data
+        id: push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -120,15 +122,27 @@ jobs:
             git add news-data/news.json
             if git diff --staged --quiet; then
               echo "Sin cambios vs remote HEAD — skipping commit."
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             git commit -m "chore: fetch news [${TIMESTAMP}]"
             if git push origin main; then
               echo "✅ Push succeeded on attempt $i."
+              echo "pushed=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             echo "Push rechazado (intento $i) — reintentando en $((i * 2))s..."
             sleep $((i * 2))
           done
           echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
           exit 0
+
+      - name: Trigger Pages deploy
+        # Pushes made with the default GITHUB_TOKEN do NOT trigger other on:push
+        # workflows (GitHub's loop-prevention rule) — dispatch deploy-pages.yml
+        # explicitly, only when this run actually pushed new data.
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
