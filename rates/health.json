@@ -1,5 +1,5 @@
 {
-  "runTimestamp": "2026-08-02T01:07:55.103487Z",
+  "runTimestamp": "2026-08-02T10:02:46.648051Z",
   "runDate": "2026-08-02",
   "frankfurterOk": true,
   "currencies": {
@@ -75,16 +75,6 @@
     }
   },
   "issues": [],
-  "warnings": [
-    "JPY: kept cached 2026-08-01 value over older ff-calendar-actual candidate (2026-07-31) \u2014 likely a laggy fallback source",
-    "USD: kept cached 2026-08-01 value over older NYFed-EFFR candidate (2026-07-30) \u2014 likely a laggy fallback source",
-    "EUR: kept cached 2026-08-01 value over older ECB-SDMX candidate (2026-06-17) \u2014 likely a laggy fallback source",
-    "GBP: kept cached 2026-08-01 value over older BoE-CSV candidate (2026-07-30) \u2014 likely a laggy fallback source",
-    "CAD: kept cached 2026-08-01 value over older BoC-Valet candidate (2026-07-24) \u2014 likely a laggy fallback source",
-    "AUD: kept cached 2026-08-01 value over older RBA-HTML candidate (2026-06-17) \u2014 likely a laggy fallback source",
-    "NZD: kept cached 2026-08-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source",
-    "NOK: kept cached 2026-08-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source",
-    "SEK: kept cached 2026-08-01 value over older BIS-CBPOL candidate (2026-06-01) \u2014 likely a laggy fallback source"
-  ],
-  "overallStatus": "degraded_cached"
+  "warnings": [],
+  "overallStatus": "ok"
 }
