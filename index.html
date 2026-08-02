@@ -436,6 +436,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #main.split-layout #narrative .narr-meta{position:absolute;right:10px;top:50%;transform:translateY(-50%);flex-direction:column-reverse;align-items:center;gap:0}
 #main.split-layout #narrative .narr-share-btn{height:0;overflow:hidden;margin:0;padding:0;border:none;opacity:0;pointer-events:none;transition:height .18s,opacity .18s}
 #main.split-layout #narrative:hover .narr-share-btn,#main.split-layout #narrative:focus-within .narr-share-btn{height:22px;overflow:visible;opacity:1;pointer-events:auto;margin-bottom:4px;border:1px solid transparent}
+/* Economic Matrix: height:440px (inline, on #section-econmap) is tuned for
+   the split layout's narrower right column. Outside of split, this panel
+   sits directly above Alerts & Market Signals in a single full-width
+   column, and the fixed height leaves a dead gap below the 10-row G10
+   table. Let it size to its content instead whenever split isn't active. */
+#main:not(.split-layout) #section-econmap{height:auto!important}
 /* drag handle — vertical bar between left and right */
 .split-drag-handle{width:2px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .15s;position:relative;height:100%}
 .split-drag-handle:hover,.split-drag-handle.dragging{background:var(--accent)}
@@ -1852,7 +1858,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.0.2" defer></script>
-<script src="assets/dashboard.js?v=8.90.7" defer></script>
+<script src="assets/dashboard.js?v=8.90.8" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
@@ -1870,7 +1876,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <script src="assets/layout-resizer.js?v=1.0.0" defer></script>
 <script src="assets/feed.js?v=1.0.0" defer></script>
 <script src="assets/share.js?v=1.0.0" defer></script>
-<script src="assets/inline-panel.js?v=1.4.1" defer></script>
+<script src="assets/inline-panel.js?v=1.4.2" defer></script>
 
 <div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
