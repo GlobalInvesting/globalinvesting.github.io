@@ -5722,27 +5722,26 @@ async function _renderLWChart(ohlcId, label) {
       curKey = key;
     }
     const unitLabel = unit === 'D' ? 'D' : (unit === 'W' ? 'W' : 'M');
-    // Segment starts: the first real (non-whitespace) point of every
-    // isolated flat run — i.e. the very first output point, plus every
-    // point that immediately follows a whitespace break. This is what lets
-    // the inline label overlay (see _drawPivotLabels) place a tag at the
-    // START of each period's own segment, matching TradingView's
-    // Pivot-Points-Standard placement — not a single tag at the chart's
-    // last value on the price axis (tried in v8.90.3, reverted here: it
-    // only identifies the CURRENT segment, not any historical one, and
-    // Santiago flagged it as not matching the industry-standard placement).
+    // Segment start: the first real (non-whitespace) point of the LATEST
+    // (current) period run only — i.e. only the most recent flat segment
+    // on the right side of the chart gets a tag, one per level. v8.90.4
+    // tagged every historical segment (matching TradingView's per-segment
+    // placement literally), but with 7 levels × many periods on screen at
+    // once that reads as noise rather than signal — Santiago asked for a
+    // single current-value tag per line instead, so only the last start
+    // point is kept here.
     const segStartsByField = {};
     fields.forEach(f => {
       const arr = out[f];
-      const starts = [];
+      let lastStart = null;
       for (let i = 0; i < arr.length; i++) {
         if (arr[i].value === undefined) continue;
         const prev = arr[i - 1];
         if (i === 0 || !prev || prev.value === undefined) {
-          starts.push({ time: arr[i].time, value: arr[i].value });
+          lastStart = { time: arr[i].time, value: arr[i].value };
         }
       }
-      segStartsByField[f] = starts;
+      segStartsByField[f] = lastStart ? [lastStart] : [];
     });
     return fields.map((f, i) => ({
       data: out[f], color: _iC(id, i), lineWidth: 1, dashed: f === 'PP',
@@ -6014,8 +6013,28 @@ async function _renderLWChart(ohlcId, label) {
         const { period:n, mult } = p;
         const tr  = _iTR(bars);
         const atr = _iRMA(tr, n); // same length/index alignment as bars — see Keltner above
-        let upBand = null, dnBand = null, trend = 1, lastTrend = null;
-        const upData = [], downData = [];
+        let upBand = null, dnBand = null, trend = 1;
+        // ROOT CAUSE OF THE "CHANNEL" BUG (found after ruling out both the
+        // calculation and Service Worker caching — the trend-gated math was
+        // always correct and byte-identical to what shipped): this used to
+        // be TWO series (up/down) with a single time-only "whitespace"
+        // point dropped in at each flip to try to create a gap. Lightweight
+        // Charts' line series does NOT actually render a visual break for
+        // whitespace data — per the library's own maintainer (GitHub issue
+        // #700): "Whitespace doesn't mean gap actually right now. It means
+        // there is no value for a series." The renderer still draws a
+        // straight connecting stroke between the nearest two REAL points on
+        // either side of any whitespace, no matter how many whitespace
+        // entries sit between them. So every multi-week inactive stretch
+        // was silently bridged by a straight line from the old segment's
+        // last point to the new segment's first point — which, stacked
+        // across dozens of flips, is exactly the solid "channel" reported.
+        // Fix: build ONE independent LineSeries per contiguous trend run
+        // (below, in _buildIndicatorPane) instead of relying on whitespace.
+        // Separate series objects can never bridge each other, so this is
+        // the only mechanism this library actually supports for true gaps.
+        const segments = [];
+        let current = null;
         for (let i = 0; i < bars.length; i++) {
           const hl2  = (bars[i].high + bars[i].low) / 2;
           const rawUp = hl2 - mult * atr[i];
@@ -6030,30 +6049,24 @@ async function _renderLWChart(ohlcId, label) {
             else if (trend === 1 && bars[i].close < prevUp) trend = -1;
             upBand = newUp; dnBand = newDn;
           }
-          // On a flip, the series that just went inactive gets a whitespace
-          // point (time-only, no value) using THIS bar's own existing time —
-          // no arithmetic on bar.time, which is a 'YYYY-MM-DD' string on
-          // D1/W1/MN and a plain number on H1/H4; adding a number to that
-          // string silently concatenates into a garbage time value instead
-          // of throwing, corrupting the whole series' time ordering.
-          // Without the break at all, Lightweight Charts bridges each
-          // series' last pre-flip point straight to its next post-re-flip
-          // point with a plain connecting line — since both bands sit only
-          // a couple ATRs from price, that bridge line reads as a filled
-          // channel band instead of the intended single flip-color line.
-          if (lastTrend !== null && trend !== lastTrend) {
-            if (trend === 1) downData.push({ time: bars[i].time });
-            else             upData.push({ time: bars[i].time });
-          }
           const val = trend === 1 ? upBand : dnBand;
           const point = { time: bars[i].time, value: parseFloat(val.toFixed(dec)) };
-          if (trend === 1) upData.push(point); else downData.push(point);
-          lastTrend = trend;
+          if (!current || current.trend !== trend) {
+            current = { trend, points: [] };
+            segments.push(current);
+          }
+          current.points.push(point);
         }
-        return [
-          { data: upData,   color:_iC(id,0), lineWidth:2, label:`Supertrend(${n},${mult})` },
-          { data: downData, color:_iC(id,1), lineWidth:2, label:`Supertrend(${n},${mult})` },
-        ];
+        return segments.map((seg, si) => ({
+          data: seg.points,
+          color: _iC(id, seg.trend === 1 ? 0 : 1),
+          lineWidth: 2,
+          label: `Supertrend(${n},${mult})`,
+          // Only the most recent (current) run gets the right-axis value
+          // tag — matching Bloomberg/TradingView convention — so turning
+          // this on doesn't spam one tag per historical flip.
+          lastValueVisible: si === segments.length - 1,
+        }));
       }
       case 'pivotd': return _calcPivotSeries(bars, 'D', id, dec);
       case 'pivotw': return _calcPivotSeries(bars, 'W', id, dec);
@@ -6432,7 +6445,9 @@ async function _renderLWChart(ohlcId, label) {
             series = _lwChart.addSeries(LWC.LineSeries, {
               color: s.color, lineWidth: s.lineWidth || 1,
               lineStyle: s.dashed ? 2 : 0,
-              priceLineVisible: false, lastValueVisible: si === 0, crosshairMarkerVisible: false,
+              priceLineVisible: false,
+              lastValueVisible: s.lastValueVisible !== undefined ? s.lastValueVisible : si === 0,
+              crosshairMarkerVisible: false,
               priceFormat: { type: 'price', precision: (isOverlay ? dec : 2), minMove: (isOverlay ? minMove : 0.01) },
             }, paneIndex);
           }
