@@ -4455,19 +4455,35 @@ async function _renderLWChart(ohlcId, label) {
                            CHF:'rgba(156,204,101,0.85)', NZD:'rgba(0,230,118,0.85)' };
       // dateMap: date → [{cb, color}]
       const dateMap = {};
+      // Sorted list of actual bar dates, used to snap a meeting date onto the
+      // bar that covers it. bars[] is already chronological.
+      const barTimesSorted = bars.map(b => b.time);
       relevantCBs.forEach(cb => {
         const cbMtg = mtgData.meetings[cb];
         if (!cbMtg?.allMeetings) return;
         const color = _CB_COLORS[cb] || 'rgba(144,150,160,0.8)';
         cbMtg.allMeetings.forEach(dateStr => {
           if (dateStr < firstDate || dateStr > lastDate) return;
-          let targetDate = dateStr;
-          if (!barDates.has(dateStr)) {
+          let targetDate = barDates.has(dateStr) ? dateStr : null;
+          if (!targetDate) {
+            // D1 weekend/holiday case: meeting fell on a non-trading day —
+            // try the next calendar day (matches a Monday after a Fri/Sat/Sun date).
             const d = new Date(dateStr + 'T12:00:00Z');
             d.setDate(d.getDate() + 1);
             const next = d.toISOString().slice(0, 10);
-            if (barDates.has(next)) targetDate = next; else return;
+            if (barDates.has(next)) targetDate = next;
           }
+          if (!targetDate) {
+            // W1/MN case (and any D1 gap the +1-day shift didn't catch): bars
+            // are keyed by period start (ISO Monday / first-of-month — see
+            // W1/MN aggregation above), so an exact-date match essentially
+            // never exists. Snap to the last bar whose date is <= the meeting
+            // date, i.e. the bar for the period that actually contains it.
+            for (let i = barTimesSorted.length - 1; i >= 0; i--) {
+              if (barTimesSorted[i] <= dateStr) { targetDate = barTimesSorted[i]; break; }
+            }
+          }
+          if (!targetDate) return;
           if (!dateMap[targetDate]) dateMap[targetDate] = [];
           // Avoid dupe CBs on same date
           if (!dateMap[targetDate].find(e => e.cb === cb)) {
@@ -5773,7 +5789,7 @@ async function _renderLWChart(ohlcId, label) {
   const _IND_CATALOGUE = [
     // ── Overlays ──────────────────────────────────────────────────────────────
     { id:'ma',       group:'Moving Averages', label:'Moving Average',    desc:'Add configurable MAs (SMA/EMA/WMA/HMA/DEMA/TEMA/VWMA)', type:'overlay',    defaultParams:{},                              paramDefs:[], colors:[] },
-    { id:'vwap',     group:'Overlays',        label:'VWAP',              desc:'Volume-Weighted Avg Price (daily sessions)',             type:'overlay',    defaultParams:{},                              paramDefs:[], colors:['#ff5722'] },
+    { id:'vwap',     group:'Overlays',        label:'VWAP',              desc:'Volume-Weighted Avg Price (daily sessions)',             type:'overlay',    defaultParams:{},                              paramDefs:[], colors:['#ff5722'], volRequired:true },
     { id:'bb',       group:'Overlays',        label:'Bollinger Bands',   desc:'Bollinger Bands',                                        type:'overlay',    defaultParams:{ period:20, mult:2 },           paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:500,step:1},{key:'mult',label:'Mult',type:'float',min:0.1,max:10,step:0.1}], colors:['rgba(33,150,243,0.5)','rgba(33,150,243,0.9)','rgba(33,150,243,0.9)'] },
     { id:'keltner',  group:'Overlays',        label:'Keltner Channel',   desc:'Keltner Channel',                                        type:'overlay',    defaultParams:{ period:20, mult:1.5 },         paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:500,step:1},{key:'mult',label:'Mult',type:'float',min:0.1,max:10,step:0.1}], colors:['rgba(255,152,0,0.5)','rgba(255,152,0,0.9)','rgba(255,152,0,0.9)'] },
     { id:'donchian', group:'Overlays',        label:'Donchian Channel',  desc:'Donchian Channel',                                       type:'overlay',    defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:500,step:1}], colors:['rgba(156,39,176,0.8)','rgba(156,39,176,0.8)','rgba(156,39,176,0.4)'] },
@@ -5791,7 +5807,7 @@ async function _renderLWChart(ohlcId, label) {
     { id:'willr',    group:'Oscillators',     label:'Williams %R',       desc:'Williams %R',                                            type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#64b5f6'] },
     { id:'roc',      group:'Oscillators',     label:'ROC',               desc:'Rate of Change',                                         type:'oscillator', defaultParams:{ period:12 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#4caf50'] },
     { id:'mom',      group:'Oscillators',     label:'Momentum',          desc:'Momentum',                                               type:'oscillator', defaultParams:{ period:10 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:1,max:200,step:1}], colors:['#9c27b0'] },
-    { id:'mfi',      group:'Oscillators',     label:'MFI',               desc:'Money Flow Index (uses volume)',                         type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#03a9f4'] },
+    { id:'mfi',      group:'Oscillators',     label:'MFI',               desc:'Money Flow Index (uses volume)',                         type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#03a9f4'], volRequired:true },
     { id:'ao',       group:'Oscillators',     label:'Awesome Oscillator',desc:'Awesome Oscillator · 5/34',                              type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#26a69a'], histoIdx:[0] },
     { id:'trix',     group:'Oscillators',     label:'TRIX',              desc:'Triple Smoothed EMA',                                    type:'oscillator', defaultParams:{ period:18 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#64b5f6'] },
     { id:'dpo',      group:'Oscillators',     label:'DPO',               desc:'Detrended Price Oscillator',                             type:'oscillator', defaultParams:{ period:21 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#64b5f6'] },
@@ -5802,8 +5818,8 @@ async function _renderLWChart(ohlcId, label) {
     { id:'aroon',    group:'Volatility',      label:'Aroon',             desc:'Aroon Up/Down',                                          type:'oscillator', defaultParams:{ period:25 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:200,step:1}], colors:['#26a69a','#ef5350'] },
     { id:'chop',     group:'Volatility',      label:'Choppiness',        desc:'Choppiness Index',                                       type:'oscillator', defaultParams:{ period:14 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#64b5f6'] },
     // ── Volume ────────────────────────────────────────────────────────────────
-    { id:'obv',      group:'Volume',          label:'OBV',               desc:'On-Balance Volume',                                      type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#64b5f6'] },
-    { id:'cmf',      group:'Volume',          label:'CMF',               desc:'Chaikin Money Flow',                                     type:'oscillator', defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#00acc1'] },
+    { id:'obv',      group:'Volume',          label:'OBV',               desc:'On-Balance Volume',                                      type:'oscillator', defaultParams:{},                              paramDefs:[], colors:['#64b5f6'], volRequired:true },
+    { id:'cmf',      group:'Volume',          label:'CMF',               desc:'Chaikin Money Flow',                                     type:'oscillator', defaultParams:{ period:20 },                   paramDefs:[{key:'period',label:'Period',type:'int',min:2,max:100,step:1}], colors:['#00acc1'], volRequired:true },
   ];
 
   // ── Active indicator state (persists across symbol switches) ─────────────────
@@ -5892,6 +5908,14 @@ async function _renderLWChart(ohlcId, label) {
     const lows   = bars.map(b => b.low);
     const vols   = bars.map(b => b.volume || 0);
     const p      = _iP(id); // effective params (defaults + user overrides)
+
+    // Volume-based indicators (OBV, CMF, MFI, VWAP) produce a flat/degenerate
+    // series when every bar's volume is 0 — matches the dropdown row being
+    // disabled for symbols with no volume data (see volRequired in the
+    // catalogue). Bail out here too so a symbol switch away from a
+    // volume-having symbol can't leave a stale flat pane on-screen.
+    const _cfgVolReq = (_IND_CATALOGUE.find(c => c.id === id) || {}).volRequired;
+    if (_cfgVolReq && !hasVolume) return [];
 
     switch (id) {
       case 'ma': {
@@ -6435,9 +6459,15 @@ async function _renderLWChart(ohlcId, label) {
               priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
             }, paneIndex);
           } else if (s.markers) {
-            // Point series (e.g. PSAR) — LineSeries with lineWidth:0
+            // Point series (e.g. PSAR) — dots only, no connecting line.
+            // BUG FIX: `lineWidth: 0` does NOT hide the line — LWC's LineWidth
+            // type is a union clamped to 1|2|3|4, so 0 silently falls back to
+            // a visible 1px stroke, which is why PSAR rendered as a solid
+            // curve instead of discrete dots. The actual API for a dots-only
+            // series is `lineVisible: false` + `pointMarkersVisible: true`.
             series = _lwChart.addSeries(LWC.LineSeries, {
-              color: s.color, lineWidth: 0,
+              color: s.color, lineVisible: false,
+              pointMarkersVisible: true, pointMarkersRadius: 2,
               priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: true,
               priceFormat: { type: 'price', precision: dec, minMove },
             }, paneIndex);
@@ -6823,12 +6853,18 @@ async function _renderLWChart(ohlcId, label) {
         // an indicator that will silently draw nothing (or, before this
         // fix, the corrupted zigzag).
         const _pivotUnit = { pivotd: 'D', pivotw: 'W', pivotm: 'M' }[cfg.id];
-        const tfBlocked = !!_pivotUnit && !_pivotTfOk(_pivotUnit);
+        const pivotBlocked = !!_pivotUnit && !_pivotTfOk(_pivotUnit);
         const _PIVOT_TF_HINT = {
           D: 'Not available — Daily Pivots require an intraday timeframe (H1 or H4)',
           W: 'Not available — Weekly Pivots require H1, H4, or D1',
           M: 'Not available — Monthly Pivots require H1, H4, D1, or W1',
         };
+        // Volume-based indicators (OBV, CMF, MFI, VWAP) render degenerate/flat
+        // output on symbols with no real volume data (all fall back to 0),
+        // per _calcIndData's `b.volume||0` handling — disable the row instead
+        // of letting the user turn on an indicator that draws a meaningless flat line.
+        const volBlocked = !!cfg.volRequired && !hasVolume;
+        const tfBlocked = pivotBlocked || volBlocked;
         const isOn = !!window._lwIndState[cfg.id] && !tfBlocked;
         const hasParams = cfg.paramDefs.length > 0;
         const hasColors = cfg.colors.length > 0;
@@ -6838,7 +6874,8 @@ async function _renderLWChart(ohlcId, label) {
         // ── Main toggle row ────────────────────────────────────
         const row = document.createElement('div');
         row.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:${tfBlocked?'not-allowed':'pointer'};opacity:${tfBlocked?'0.45':'1'};background:${isOn?'rgba(79,127,255,0.08)':'transparent'};border-bottom:${expandable?'none':'1px solid rgba(42,46,57,0.3)'};`;
-        if (tfBlocked) row.title = _PIVOT_TF_HINT[_pivotUnit];
+        if (volBlocked) row.title = 'Not available — this symbol has no volume data';
+        else if (pivotBlocked) row.title = _PIVOT_TF_HINT[_pivotUnit];
         row.addEventListener('mouseenter', () => { if (!isOn && !tfBlocked) row.style.background='rgba(255,255,255,0.04)'; });
         row.addEventListener('mouseleave', () => { row.style.background=isOn?'rgba(79,127,255,0.08)':'transparent'; });
 
