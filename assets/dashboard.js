@@ -7655,6 +7655,29 @@ async function buildInlineDetail(tvSym, container) {
     carryDiff = meta?.cross ? cbBase - cbQuote : (invert ? cbBase - cbQuote : cbQuote - cbBase);
   }
 
+  // Sovereign bond yield spread — ΔY = Yield(base) − Yield(quote), same base/quote sign
+  // convention as carryDiff above. 2Y preferred (short-end, best proxy for near-term
+  // rate-expectations divergence); falls back to 10Y with an explicit tenor label when
+  // either leg lacks 2Y coverage (JPY/NZD/NOK/SEK — see GUIDELINES.md). Never silently
+  // mixes tenors. Mirrors updatePairDetail() exactly — same BOND_YIELD_CACHE, same fallback.
+  const bondBase  = base  ? (BOND_YIELD_CACHE[base]  || null) : null;
+  const bondQuote = quote ? (BOND_YIELD_CACHE[quote] || null) : null;
+  let bondTenor = null, bondDiff = null;
+  if (bondBase && bondQuote) {
+    const pick = (tenor) => (bondBase[tenor] != null && bondQuote[tenor] != null)
+      ? bondBase[tenor] - bondQuote[tenor] : null;
+    const y2diff = pick('y2');
+    if (y2diff != null) {
+      bondTenor = '2Y'; bondDiff = y2diff;
+    } else {
+      const y10diff = pick('y10');
+      if (y10diff != null) { bondTenor = '10Y'; bondDiff = y10diff; }
+    }
+    if (bondDiff != null && !meta?.cross) {
+      bondDiff = invert ? bondDiff : -bondDiff;
+    }
+  }
+
   // RR — use pairId (ISO convention) not base+quote (PAIRS internal field)
   // base/quote in PAIRS represent commodity/money ccy, not ISO order.
   // e.g. usdjpy → base='JPY',quote='USD' → base+quote='JPYUSD' ≠ rr.json key 'USDJPY'.
@@ -7737,13 +7760,16 @@ async function buildInlineDetail(tvSym, container) {
       </div>
 
       <div class="pd-inline-group">
-        <div class="pd-inline-group-lbl">Price</div>
+        <div class="pd-inline-group-lbl">Price &amp; Spreads</div>
         <div class="pd-inline-metrics">
           <div class="pd-inline-metric fx-tip" data-tip-title="1-Week Change" data-tip-body="Weekly % change vs prior Friday close.">
             <div class="pd-inline-lbl">1W Chg</div><div class="pd-inline-val ${cls(pct1w)}">${fmtP(pct1w)}</div>
           </div>
           <div class="pd-inline-metric fx-tip" data-tip-title="Carry Differential" data-tip-body="OIS/overnight rate differential (OIS preferred; falls back to CB policy rate). Positive = carry favours long base currency." data-tip-ex="Long the higher-yielding currency, short the lower-yielding currency. OIS reflects actual overnight funding cost; CB policy rate is the ceiling.">
             <div class="pd-inline-lbl">Carry</div><div class="pd-inline-val ${clsI(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2) + '%' : '—'}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="${bondTenor || '2Y'} Sovereign Bond Spread" data-tip-body="ΔY = Yield(${base || 'base'}) − Yield(${quote || 'quote'}) at the ${bondTenor || '2Y'} tenor. Short-end (2Y) yield differentials are the primary driver of sustained FX direction — they track near-term rate-expectations divergence more closely than 10Y, which reflects longer-run growth/inflation premia and duration flows.${bondTenor === '10Y' ? ' 2Y unavailable for one or both legs — showing 10Y as fallback.' : ''} Source: extended-data sovereign yield pipeline (FRED/ECB/BOE/BOC/SNB/DBnomics)." data-tip-ex="A rising ${bondTenor || '2Y'} spread in the base currency's favour has historically preceded sustained appreciation — it signals the market pricing in a widening policy-rate gap before central banks act.">
+            <div class="pd-inline-lbl">${bondTenor || '2Y'} Spread</div><div class="pd-inline-val ${clsI(bondDiff)}">${bondDiff != null ? (bondDiff >= 0 ? '+' : '') + (bondDiff * 100).toFixed(0) + ' bp' : '—'}</div>
           </div>
           <div class="pd-inline-metric fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated avg daily range in pips from HV 30d. Useful for stop/target sizing.">
             <div class="pd-inline-lbl">ADR</div><div class="pd-inline-val">${adr != null ? adr + ' pip' : '—'}</div>
