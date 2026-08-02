@@ -8008,6 +8008,20 @@ document.getElementById('risk-igoas')?.closest('.risk-cell')?.addEventListener('
 // ═══════════════════════════════════════════════════════════════════
 const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding, prevOI, wowNetChange, totalOI, levNetPctOI }
 const RR_DATA_CACHE  = {};   // rrKey (e.g. 'EURUSD') → { rr25d: number } — populated by fetchOptionSkew()
+const BOND_YIELD_CACHE = {}; // ccy → { y10: number|null, y2: number|null } — extended-data/{CCY}.json, file name == ccy code
+
+(async function prefetchBondYields() {
+  const CCYS = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
+  await Promise.all(CCYS.map(async ccy => {
+    try {
+      const r = await fetch('./extended-data/' + ccy + '.json');
+      if (!r.ok) return;
+      const j = await r.json();
+      const d = j?.data ?? j;
+      BOND_YIELD_CACHE[ccy] = { y10: d?.bond10y ?? null, y2: d?.bond2y ?? null };
+    } catch {}
+  }));
+})();
 
 (async function prefetchCOT() {
   const CCYS = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
@@ -8212,6 +8226,29 @@ async function updatePairDetail(tvSym) {
     }
   }
 
+  // Sovereign bond yield spread — ΔY = Yield(base) − Yield(quote), same base/quote
+  // sign convention as carryDiff above. 2Y preferred (short-end, best proxy for near-term
+  // rate-expectations divergence — the primary FX driver per RBA/BIS research); falls back
+  // to 10Y with an explicit tenor label when either leg lacks 2Y coverage (JPY/NZD/NOK/SEK
+  // currently have no free live 2Y source — see GUIDELINES.md). Never silently mixes tenors.
+  const bondBase  = base  ? (BOND_YIELD_CACHE[base]  || null) : null;
+  const bondQuote = quote ? (BOND_YIELD_CACHE[quote] || null) : null;
+  let bondTenor = null, bondDiff = null;
+  if (bondBase && bondQuote) {
+    const pick = (tenor) => (bondBase[tenor] != null && bondQuote[tenor] != null)
+      ? bondBase[tenor] - bondQuote[tenor] : null;
+    const y2diff = pick('y2');
+    if (y2diff != null) {
+      bondTenor = '2Y'; bondDiff = y2diff;
+    } else {
+      const y10diff = pick('y10');
+      if (y10diff != null) { bondTenor = '10Y'; bondDiff = y10diff; }
+    }
+    if (bondDiff != null && meta && !meta.cross) {
+      bondDiff = invert ? bondDiff : -bondDiff;
+    }
+  }
+
   const fmtPct = v => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
   const fmtNet = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
   const cls    = v => v == null ? '' : v > 0 ? 'pd-up' : v < 0 ? 'pd-dn' : '';
@@ -8286,10 +8323,11 @@ async function updatePairDetail(tvSym) {
     </div>
 
     <div class="pd-section">
-      <div class="pd-section-lbl">Price</div>
+      <div class="pd-section-lbl">Price &amp; Spreads</div>
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="1-Week Change" data-tip-body="Weekly % change vs prior Friday close. Source: FX performance cache."><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Carry Differential" data-tip-body="OIS overnight rate differential (SOFR/€STR/SONIA/TONA/CORRA/SARON — institutional overnight benchmarks). Falls back to CB policy rate when OIS data unavailable. Positive = base currency yields more, carry favours long." data-tip-ex="Positive carry = the long leg earns more than it costs to fund the short. OIS reflects actual overnight funding cost — more accurate than CB policy rate for carry calculations. Carry is most reliable as a persistent trend signal; it can reverse quickly on policy surprises."><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="${bondTenor || '2Y'} Sovereign Bond Spread" data-tip-body="ΔY = Yield(${base || 'base'}) − Yield(${quote || 'quote'}) at the ${bondTenor || '2Y'} tenor. Short-end (2Y) yield differentials are the primary driver of sustained FX direction — they track near-term rate-expectations divergence more closely than 10Y, which reflects longer-run growth/inflation premia and duration flows.${bondTenor === '10Y' ? ' 2Y unavailable for one or both legs — showing 10Y as fallback.' : ''} Source: extended-data sovereign yield pipeline (FRED/ECB/BOE/BOC/SNB/DBnomics)." data-tip-ex="A rising ${bondTenor || '2Y'} spread in the base currency's favour has historically preceded sustained appreciation — it signals the market pricing in a widening policy-rate gap before central banks act."><div class="pd-lbl">${bondTenor || '2Y'} Spread</div><div class="pd-val ${cls(bondDiff)}">${bondDiff != null ? (bondDiff >= 0 ? '+' : '') + (bondDiff * 100).toFixed(0)+' bp' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated average daily range in pips, derived from HV 30d: close × (HV / √252). Indicates typical intraday movement — useful for stop and target sizing." data-tip-ex="ADR of 85 pip on EUR/USD means the pair moves ~85 pip on an average day."><div class="pd-lbl">ADR</div><div class="pd-val">${adr != null ? adr + ' pip' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="${base || 'Base'} Policy Rate" data-tip-body="${base || 'Base'} central bank policy rate (annualised). Source: CB rates cache."><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
       </div>
