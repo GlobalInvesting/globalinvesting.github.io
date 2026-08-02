@@ -13769,6 +13769,12 @@ function initExclusivePanelNav() {
   var WL_KEY = 'gi_watchlist';
 
   // Map user-entered symbol to intraday quotes key
+  // FIX-WL-5: this whitelist had drifted out of sync with the site's canonical
+  // 32-pair G10 FX catalogue (heatmap-modal.js's PAIR_DEFS), silently rejecting
+  // valid pairs that already have full price + chart data (e.g. AUD/CHF,
+  // USD/SEK, USD/NOK, EUR/NZD) — the "symbol not found" bug. Kept in sync with
+  // PAIR_DEFS' 32 pairs + XAU/XAG. Not extended to crypto (BTC/ETH): those are
+  // cross-asset context quotes only, not a supported FX product on this platform.
   var SYMBOL_MAP = {
     'EURUSD': 'EURUSD', 'GBPUSD': 'GBPUSD', 'USDJPY': 'USDJPY',
     'AUDUSD': 'AUDUSD', 'USDCAD': 'USDCAD', 'USDCHF': 'USDCHF',
@@ -13777,8 +13783,17 @@ function initExclusivePanelNav() {
     'EURCHF': 'EURCHF', 'EURCAD': 'EURCAD', 'GBPCHF': 'GBPCHF',
     'GBPCAD': 'GBPCAD', 'GBPAUD': 'GBPAUD', 'CADJPY': 'CADJPY',
     'CHFJPY': 'CHFJPY', 'NZDJPY': 'NZDJPY', 'AUDNZD': 'AUDNZD',
+    'EURNZD': 'EURNZD', 'GBPNZD': 'GBPNZD', 'AUDCHF': 'AUDCHF',
+    'AUDCAD': 'AUDCAD', 'NZDCHF': 'NZDCHF', 'NZDCAD': 'NZDCAD',
+    'CADCHF': 'CADCHF', 'USDNOK': 'USDNOK', 'USDSEK': 'USDSEK',
+    'EURNOK': 'EURNOK', 'EURSEK': 'EURSEK',
     'XAUUSD': 'XAUUSD', 'XAGUSD': 'XAGUSD',
   };
+
+  // FIX-WL-5: quotes.json stores metals under 'gold'/'silver', not 'xauusd'/
+  // 'xagusd' — a straight sym.toLowerCase() lookup for those two always
+  // missed, so XAU/XAG rows could be added but their price never loaded.
+  var QUOTE_KEY_ALIAS = { 'XAUUSD': 'gold', 'XAGUSD': 'silver' };
 
   // Map watchlist symbol to TradingView FX_IDC symbol used by loadTVChart / sidebar handler.
   // XAUUSD and XAGUSD use the same FX_IDC prefix — loadTVChart will fall back to TV widget
@@ -13836,7 +13851,8 @@ function initExclusivePanelNav() {
     // a re-render after a short delay rather than showing — permanently.
     var quotesReady = Object.keys(quotes).length > 0;
     tbody.innerHTML = list.map(function (sym) {
-      var q = quotes[sym.toLowerCase()] || quotes[sym] || {};
+      var qKey = (QUOTE_KEY_ALIAS[sym] || sym).toLowerCase();
+      var q = quotes[qKey] || {};
       var price = (q.close != null) ? String(q.close) : (quotesReady ? '—' : '···');
       var chg = (q.pct != null) ? q.pct : null;
       var chgStr = (chg != null) ? ((chg >= 0 ? '+' : '') + chg.toFixed(2) + '%') : (quotesReady ? '—' : '···');
