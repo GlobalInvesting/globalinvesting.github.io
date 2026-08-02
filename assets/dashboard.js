@@ -12758,12 +12758,14 @@ async function renderSovereignSpreads() {
       const cty10y = _extData?.bond10y ?? null;
       const cty2y  = _extData?.bond2y  ?? null;
 
-      // Normalise: extended-data stores some yields as 0.04 (4%) and some as 4.0
-      const norm = v => v != null ? (v < 1 ? v * 100 : v) : null;
-      const n10 = norm(cty10y);
-      const n2  = norm(cty2y);
-      const us10 = norm(us10y);
-      const us2  = norm(us2y);
+      // extended-data always stores yields already as percent (e.g. 4.745 = 4.745%).
+      // No fraction->percent conversion here: CHF legitimately trades under 1%
+      // (e.g. 0.31 = 0.31%), and a "<1 means fraction" heuristic misreads that
+      // as 0.0031 -> *100 -> 31.00%. See CHANGELOG for the incident this fixed.
+      const n10 = cty10y;
+      const n2  = cty2y;
+      const us10 = us10y;
+      const us2  = us2y;
 
       // Country flag + label
       if (tds[0]) { tds[0].innerHTML = `<span class="fi fi-${c.code}" style="margin-right:4px;border-radius:1px;vertical-align:middle;"></span><span>${c.label}</span>`; }
@@ -12784,7 +12786,7 @@ async function renderSovereignSpreads() {
 
       // 2Y-10Y curve slope
       if (tds[4]) {
-        const slope = (n2 != null && n10 != null) ? n10 - n2 : null;
+        const slope = (n2 != null && n10 != null) ? (n10 - n2) * 100 : null; // pct-pts -> bp
         if (slope != null) {
           tds[4].textContent = (slope >= 0 ? '+' : '') + slope.toFixed(0) + ' bp';
           tds[4].style.color = slope < 0 ? 'var(--down)' : slope > 50 ? 'var(--up)' : 'var(--text2)';
