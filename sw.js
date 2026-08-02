@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.21.0';
+const CACHE_VERSION = 'gi-v8.90.4';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -19,11 +19,38 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 // NOTE: index.html is intentionally excluded — it is handled via
 // network-first so the browser always gets the latest entry point
 // (and therefore the latest asset query-string versions).
+//
+// KEEP IN SYNC WITH index.html ON EVERY DEPLOY. This list was stuck at
+// v8.21.0 for many releases, including a filename (`dashboard-v2.css`)
+// that had since been renamed to `dashboard.css` — cache.addAll() is
+// all-or-nothing, so that one 404 silently failed the ENTIRE install()
+// every time, and because CACHE_VERSION never changed either, the
+// activate handler never had a version bump to trigger deleting
+// whatever static cache HAD successfully installed the last time this
+// worker's install() actually succeeded — i.e. any returning client
+// could still be served that old cached shell indefinitely, however
+// many versions ago it was. Bumping CACHE_VERSION here forces every
+// client to drop old caches on next activation regardless of the exact
+// prior failure mode.
 const STATIC_PRECACHE = [
-  '/assets/dashboard-v2.css?v=8.21.0',
-  '/assets/dashboard.js?v=8.21.0',
-  '/assets/yc-modal.js?v=7.74.41',
+  '/assets/dashboard.css?v=8.23.1',
+  '/assets/dashboard.js?v=8.90.4',
+  '/assets/gi-auth.js?v=1.0.2',
   '/assets/fx-websocket.js?v=1.0.0',
+  '/assets/cot-modal-chart.js?v=7.91.1',
+  '/assets/cb-rates-modal.js?v=8.0.2',
+  '/assets/real-carry-modal.js?v=2.7.6',
+  '/assets/corr-modal.js?v=2.2.0',
+  '/assets/yc-modal.js?v=8.8.1',
+  '/assets/heatmap-modal.js?v=2.2.4',
+  '/assets/econ-surprises-modal.js?v=1.3.9',
+  '/assets/onboarding.js?v=7.89.10',
+  '/assets/layout-resizer.js?v=1.0.0',
+  '/assets/feed.js?v=1.0.0',
+  '/assets/share.js?v=1.0.0',
+  '/assets/inline-panel.js?v=1.4.1',
+  '/assets/calendar-panel.js?v=1.7.0',
+  '/assets/econ-matrix.js?v=1.0.5',
   '/assets/gdpr.js',
   '/assets/sw-register.js',
   '/favicon.ico',
