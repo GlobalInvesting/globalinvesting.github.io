@@ -9566,51 +9566,6 @@ async function loadAIRegime() {
 
 // RICH AI NARRATIVE — build from ai-analysis/index.json + live data
 // ═══════════════════════════════════════════════════════════════════
-// ── Narrative mobile clamp/toggle ───────────────────────────────────────────
-// Long AI narrative paragraphs (4-5 sentences) pushed the whole page down on
-// mobile with no way to collapse them. #narrative-text is CSS-clamped to 3
-// lines only inside the @media(max-width:900px) block; this just measures
-// whether the current text actually overflows that clamp and shows/hides the
-// toggle button accordingly, so short narratives never get a pointless
-// "Show more". Called after every narrative-text update and on resize.
-function _syncNarrativeClamp() {
-  const el  = document.getElementById('narrative-text');
-  const btn = document.getElementById('narr-more-btn');
-  if (!el || !btn) return;
-  if (window.innerWidth > 900) {
-    // Desktop never clamps — make sure a stale expanded/show state from a
-    // narrower viewport doesn't leak in (e.g. resizing up from mobile).
-    el.classList.remove('narr-expanded');
-    btn.classList.remove('show');
-    return;
-  }
-  el.classList.remove('narr-expanded');
-  btn.textContent = 'Show more';
-  btn.setAttribute('aria-expanded', 'false');
-  btn.classList.remove('show');
-  requestAnimationFrame(() => {
-    if (el.scrollHeight > el.clientHeight + 2) btn.classList.add('show');
-  });
-}
-
-(function _attachNarrMoreBtn() {
-  const btn = document.getElementById('narr-more-btn');
-  if (!btn || btn._wired) return;
-  btn._wired = true;
-  btn.addEventListener('click', () => {
-    const el = document.getElementById('narrative-text');
-    if (!el) return;
-    const expanded = el.classList.toggle('narr-expanded');
-    btn.textContent = expanded ? 'Show less' : 'Show more';
-    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-  });
-  let _narrResizeT = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(_narrResizeT);
-    _narrResizeT = setTimeout(_syncNarrativeClamp, 150);
-  });
-})();
-
 async function buildRichNarrative() {
   try {
     // Fetch AI narrative base
@@ -9719,7 +9674,6 @@ async function buildRichNarrative() {
     // renderRiskData() — always live VIX stress score. Never written here.
     const el = document.getElementById('narrative-text');
     if (el && finalNarrative) el.textContent = finalNarrative;
-    _syncNarrativeClamp();
 
     // Also load signals (moved here from fetchAIData to keep AI logic together)
     try {
@@ -11809,6 +11763,17 @@ function toggleAlertsPopover() {
       var isActive = main.classList.contains('split-layout');
       applyState(!isActive, 55);
       try { localStorage.setItem(LS_KEY, JSON.stringify({active:!isActive, leftPct:55})); } catch(e){}
+      // Toggling split-layout is a class change, not a real window resize, so
+      // it never fires the 'resize' listener that normally redraws the yield
+      // curve canvas (see drawYieldCurve, which reads clientWidth). Left
+      // un-redrawn, the canvas stays at whatever width it had under the
+      // previous layout — most visibly, turning split OFF still shows the
+      // narrow/compact chart from when split was ON. Reuse the same
+      // double-rAF repaint helper already used elsewhere for this exact
+      // class of stale-canvas-after-layout-change bug.
+      if (typeof _repaintAfterExclusivePanelClosed === 'function') {
+        _repaintAfterExclusivePanelClosed();
+      }
     });
   }
 

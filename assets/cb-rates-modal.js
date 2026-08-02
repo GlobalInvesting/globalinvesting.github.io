@@ -1,27 +1,28 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CB RATES MODAL  v2.5 — Fix: Market Commentary capped well below available
-//   panel height, leaving unused space (same symptom as yc-modal v2.4/v2.5)
-// v2.5 (2026-08-02): Santiago reported the same "black space that could show
-//   more news" symptom already fixed in yc-modal. Root cause here has two
-//   parts: (1) #cbr-bd, like #ycm-bd, is transplanted by inline-panel.js into
-//   a flex-column `body` without ever being given flex-grow, so it kept its
-//   own intrinsic content height instead of stretching to fill the available
-//   panel — #cbr-modal's inline height:100% (already set by _transplant())
-//   had no definite parent height to resolve against. Fixed the same way as
-//   yc-modal: added flex:1;min-height:0 to #cbr-bd.
-//   (2) UNLIKE yc-modal, this modal's Rate Chart tab has a flex:1 chart area
-//   whose pixel height is measured once and cached (_cbrDims()/bd._chartH,
-//   see the v2.4 note below) specifically to avoid an infinite-grow bug, and
-//   the tab body is deliberately overflow-y:hidden so everything fits without
-//   scrolling. Making .cbr-ps-wrap flex:1 (yc-modal's approach) would compete
-//   with the chart's own flex:1 for the same space and risk shrinking the
-//   chart below its cached height (visual overflow, not just a cosmetic
-//   regression) — a materially different risk than in yc-modal, so it wasn't
-//   applied here. Instead: .cbr-ps-wrap's cap raised 220px → 340px (a bounded
-//   increase, no flex competition with the chart) and its own overflow-y:auto
-//   kept as a safety net if content still exceeds that. Article cap raised
-//   3 → 6 (same rationale as yc-modal) so the larger cap is filled with real
-//   commentary instead of staying mostly empty.
+// CB RATES MODAL  v2.6 — Fix: Rate Chart grew oversized after the v2.5 fix
+// v2.6 (2026-08-02): Santiago reported the chart taking up far more room than
+//   before, right after v2.5. Root cause: v2.5's #cbr-bd{flex:1;min-height:0}
+//   fix worked as intended — #cbr-bd now genuinely stretches inside
+//   inline-panel.js's flex-column body — but that gave #cbr-modal's inline
+//   height:100% (set by _transplant()) a much larger real height to resolve
+//   against than before, which flowed down the flex chain (#cbr-m-body →
+//   #cbr-p-chart → .cbr-cw.fill, all flex:1) and inflated the chart's own
+//   flex:1 sizing well past its previous size — the same growth mechanism
+//   the v2.5 fix intentionally avoided giving to .cbr-ps-wrap, but the chart
+//   container itself was still flex:1 and absorbed it instead.
+//   Fix: .cbr-cw.fill switched from flex:1 to a fixed height:240px (matching
+//   yc-modal's #ycm-chart-wrap fix), so it no longer grows with the now-taller
+//   panel. With the chart fixed, .cbr-ps-wrap can safely take flex:1 for the
+//   freed-up space (the competition risk noted in v2.5 no longer applies,
+//   since the chart isn't flex:1 anymore) — same outcome as yc-modal, reached
+//   by the same fixed-chart-height route instead of a bounded max-height cap.
+//   _cbrDims() simplified accordingly: no more panelH measurement or
+//   bd._chartH caching — the chart is just always 240px on desktop.
+// v2.5 (2026-08-02): Fixed Market Commentary capped well below available
+//   panel height, leaving unused space (same symptom as yc-modal v2.4/v2.5).
+//   Added #cbr-bd{flex:1;min-height:0}; raised .cbr-ps-wrap cap 220px→340px
+//   and article cap slice(0,3)→slice(0,6). (Superseded above — .cbr-ps-wrap
+//   is flex:1 now, not capped.)
 // v2.4 (2026-06-15): Fix infinite chart height grow on Decisions→Rate Chart tab-switch
 // Fluid layout, terminal CSS variables throughout.
 // v2.2 (2026-06-15): CB News tab added (superseded by v2.3).
@@ -76,7 +77,7 @@
 #cbr-p-decisions.on::-webkit-scrollbar{width:3px!important;}
 #cbr-p-decisions.on::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
 .cbr-cw{background:var(--bg);border:none;border-radius:0;padding:0;margin-bottom:0;display:flex;flex-direction:column;}
-.cbr-cw.fill{flex:1;min-height:0;}
+.cbr-cw.fill{height:240px;flex-shrink:0;}
 .cbr-ct{display:none;}
 .cbr-chart-area{flex:1;min-height:0;height:100%;position:relative;}
 .cbr-lw-wrap{width:100%;height:100%;min-height:220px;position:relative;}
@@ -98,7 +99,7 @@
 .cbr-ctx-lbl{font-size:8px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-family:var(--font-mono);}
 .cbr-ctx-val{font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--text);}
 .cbr-next-fwd{display:grid;grid-template-columns:1fr 1fr;flex-shrink:0;border-top:1px solid var(--border,#252d3d);}
-.cbr-ps-wrap{flex-shrink:0;border-top:1px solid var(--border,#252d3d);overflow-y:auto;max-height:340px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;background:var(--bg);}
+.cbr-ps-wrap{flex:1;min-height:120px;border-top:1px solid var(--border,#252d3d);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent;background:var(--bg);}
 .cbr-ps-wrap::-webkit-scrollbar{width:3px!important;}
 .cbr-ps-wrap::-webkit-scrollbar-thumb{background:var(--border2,#2e3a50);border-radius:2px;}
 .cbr-ps-hdr{display:flex;align-items:center;justify-content:space-between;padding:5px 14px 4px;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0;}
@@ -301,67 +302,19 @@ function _attachCBRTooltip(container,lwChart,mainSeries,fwdSeries,decisions){
 
 function _cbrDims(){
   const modal=document.getElementById('cbr-modal');
-  if(!modal)return{w:600,h:300};
+  if(!modal)return{w:600,h:240};
 
   // Width is always safe to compute from the modal.
   const w=Math.max(modal.offsetWidth-28,200);
 
-  // Mobile: use fixed chart height to avoid any measurement loop.
+  // Mobile: smaller fixed chart height (unchanged from before).
   if(window.innerWidth<=600) return{w,h:220};
 
-  // Height strategy — two-phase to avoid infinite-grow circular dependency.
-  //
-  // THE PROBLEM: the modal has height:auto, so modal.offsetHeight includes
-  // the chart container's own explicit px height (cbr-lw-wrap style.height).
-  // Every rebuild reads a taller modal → computes larger h → sets taller
-  // container → modal grows again → next rebuild taller still → infinite grow.
-  // Zeroing container.style.height before measuring doesn't fully solve this
-  // because cbr-p-chart uses flex:1 in a height:auto modal — it collapses to
-  // just its flex-shrink:0 children, making panelH ≈ fixed-child-sum, so
-  // h = panelH - fixed-children ≈ 0 → clamped to 180 → same loop.
-  //
-  // FIX: the FIRST open measures the available height from the panel wrapper
-  // that contains the CB rates section. That measurement is done BEFORE any
-  // chart px height has been set, so the modal is at its natural content
-  // height (minus the chart). The result is stored on bd._chartH.
-  // All subsequent calls (tab-switch rebuilds) return the cached value
-  // directly — no re-measurement, no circular dependency.
-  const bd=document.getElementById('cbr-bd');
-  if(bd?._chartH){return{w,h:bd._chartH};}
-
-  // First open: chart container has no explicit height yet, so zeroing it
-  // is a no-op. We measure the section that wraps the CB rates inline panel
-  // (the sidebar panel section), subtract the modal's non-chart elements,
-  // and fall back to a generous fixed height if measurement is unreliable.
-  //
-  // Read from the nearest scrollable ancestor that has a known px height —
-  // typically the inline-panel's content area. Use the chart panel's
-  // own offsetHeight only if it is non-zero (i.e. set by the flex chain
-  // before the first rAF).
-  const chartPanel=document.getElementById('cbr-p-chart');
-  let panelH=chartPanel?chartPanel.offsetHeight:0;
-
-  // If flex hasn't resolved yet (panelH===0), fall back to the inline-panel
-  // section height via closest scrollable ancestor, then subtract headers.
-  if(panelH<10){
-    const sect=bd.closest('.panel-section')||bd.parentElement;
-    const sectH=sect?sect.clientHeight:0;
-    const hd=document.getElementById('cbr-m-hd');
-    const met=document.getElementById('cbr-m-metrics');
-    const tabs=document.getElementById('cbr-m-tabs');
-    panelH=sectH-(hd?hd.offsetHeight:0)-(met?met.offsetHeight:0)-(tabs?tabs.offsetHeight:0);
-  }
-
-  const infoBar=chartPanel?.querySelector('.cbr-next-fwd');
-  const ctxWrap=chartPanel?.querySelector('.cbr-ctx-wrap');
-  const psWrap=chartPanel?.querySelector('.cbr-ps-wrap');
-  const infoH=infoBar?infoBar.offsetHeight:0;
-  const ctxH=ctxWrap?ctxWrap.offsetHeight:0;
-  const psH=psWrap?psWrap.offsetHeight:0;
-  const padH=12;
-
-  const h=Math.max(panelH-infoH-ctxH-psH-padH,180);
-  return{w,h};
+  // Desktop: .cbr-cw.fill is now a fixed 240px box (see CSS above), not
+  // flex:1, so there is no panel height to measure and no circular-
+  // dependency/infinite-grow risk left to guard against — the chart is
+  // simply always 240px tall, matching yc-modal's fixed-height chart.
+  return{w,h:240};
 }
 
 function _buildCBRChart(data){
@@ -370,10 +323,6 @@ function _buildCBRChart(data){
   _destroyCBRChart();
   const parent=container.parentElement;
   const{w:initW,h:initH}=_cbrDims();
-  // Cache the measured height on bd so tab-switch rebuilds reuse it
-  // without re-measuring (re-measurement causes infinite grow — see _cbrDims).
-  const bd=document.getElementById('cbr-bd');
-  if(bd&&!bd._chartH)bd._chartH=initH;
   // Set explicit px height on the wrapper so LWC measures it correctly
   // regardless of whether the flex chain has resolved yet.
   container.style.width=initW+'px';
