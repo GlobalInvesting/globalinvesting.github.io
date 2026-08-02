@@ -1,6 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.2 — Market Commentary section added
+// YIELD CURVE MODAL  v2.3 — chart no longer flex:1 (unbounded growth)
 // Fluid layout, terminal CSS variables throughout.
+// v2.3 (2026-08-01): #ycm-chart-wrap was flex:1 with no cap, so in the
+//   full-#main inline-panel context (split layout off) — where the
+//   container's height is nearly the full viewport — the chart expanded
+//   to fill almost the entire panel, pushing the Tenor table and Market
+//   Commentary out of view below the fold. Fixed height:240px instead;
+//   #ycm-canvas-wrap's flex:1 fills whatever's left inside that fixed box.
 // v2.2 (2026-06-20): Market Commentary block added below the tenor table.
 //   Renders below #ycm-table-wrap. Fetches news-data/news.json, filters by
 //   topic keywords (Treasury/yield-curve terminology, not currency tag — see
@@ -53,7 +59,7 @@
 .ycm-m-val.up { color:var(--up); } .ycm-m-val.down { color:var(--down); }
 .ycm-m-chg { font-size:8px;margin-top:1px;font-family:var(--font-mono);color:var(--text2); }
 .ycm-m-chg.up { color:var(--up); } .ycm-m-chg.down { color:var(--down); }
-#ycm-chart-wrap { flex:1;position:relative;padding:8px 14px 4px;display:flex;flex-direction:column;min-height:200px;background:var(--bg); }
+#ycm-chart-wrap { height:240px;flex-shrink:0;position:relative;padding:8px 14px 4px;display:flex;flex-direction:column;background:var(--bg); }
 #ycm-legend { display:flex;gap:14px;margin-bottom:8px;flex-shrink:0;flex-wrap:wrap; }
 .ycm-leg-item { display:flex;align-items:center;gap:4px;font-size:8.5px;color:var(--text2);font-family:var(--font-mono); }
 .ycm-leg-dot  { width:16px;height:2px;border-radius:1px;flex-shrink:0; }
