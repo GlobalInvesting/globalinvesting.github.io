@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T12:00:37Z",
+  "generated_at": "2026-08-03T00:00:43Z",
   "source": "Myfxbook · ForexFactory",
   "holidays": [],
   "events": [
@@ -3062,19 +3062,79 @@
       "released": true
     },
     {
-      "title": "CPI m/m",
+      "title": "Germany Retail Sales YoY",
+      "currency": "EUR",
+      "dateISO": "2026-08-03",
+      "timeUTC": "06:00",
+      "impact": "high",
+      "forecast": "-0.7",
+      "previous": "1.8",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Germany Retail Sales MoM",
+      "currency": "EUR",
+      "dateISO": "2026-08-03",
+      "timeUTC": "06:00",
+      "impact": "high",
+      "forecast": "-0.5%",
+      "previous": "1.1%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Switzerland Inflation Rate YoY",
       "currency": "CHF",
       "dateISO": "2026-08-03",
       "timeUTC": "06:30",
       "impact": "medium",
-      "forecast": "-0.1%",
-      "previous": "0.0%",
+      "forecast": "0.5%",
+      "previous": "0.5%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "ISM Manufacturing PMI",
+      "title": "Switzerland procure.ch Manufacturing PMI",
+      "currency": "CHF",
+      "dateISO": "2026-08-03",
+      "timeUTC": "07:30",
+      "impact": "high",
+      "forecast": "54.5",
+      "previous": "54.3",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Austria Unemployment Rate",
+      "currency": "EUR",
+      "dateISO": "2026-08-03",
+      "timeUTC": "07:30",
+      "impact": "high",
+      "forecast": "6.8%",
+      "previous": "6.9%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States ISM Manufacturing Employment",
+      "currency": "USD",
+      "dateISO": "2026-08-03",
+      "timeUTC": "14:00",
+      "impact": "medium",
+      "forecast": "49.8",
+      "previous": "49.7",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States ISM Manufacturing PMI",
       "currency": "USD",
       "dateISO": "2026-08-03",
       "timeUTC": "14:00",
@@ -3083,19 +3143,7 @@
       "previous": "53.3",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
-    },
-    {
-      "title": "ISM Manufacturing Prices",
-      "currency": "USD",
-      "dateISO": "2026-08-03",
-      "timeUTC": "14:00",
-      "impact": "medium",
-      "forecast": "70.0",
-      "previous": "73.0",
-      "actual": null,
-      "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
       "title": "JOLTS Job Openings",
