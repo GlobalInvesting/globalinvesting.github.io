@@ -15,15 +15,28 @@
   // ── Build popover DOM once ───────────────────────────────────────────────
 
   function positionPopover(container) {
-    const btn  = document.getElementById('rss-btn');
-    const rect = btn ? btn.getBoundingClientRect() : null;
-    const GAP  = 8;
+    const btn    = document.getElementById('rss-btn');
+    const rect   = btn ? btn.getBoundingClientRect() : null;
+    const GAP    = 8;
+    const MARGIN = 8; // minimum gap kept from either viewport edge
+    // Matches the CSS 'max-width:calc(100vw - 16px)' rule in buildPopover —
+    // computed here (not measured via offsetWidth) because this function also
+    // runs while the popover is still display:none (see toggleRssPopover),
+    // where offsetWidth would read 0 and defeat the clamp below.
+    const W = Math.min(260, window.innerWidth - MARGIN * 2);
+    let right = rect ? (window.innerWidth - rect.right) : 16;
+    // Clamp: on mobile the RSS button sits near the left edge of a narrow
+    // status bar — a naive right-anchored offset then pushes most of the
+    // 260px-wide popover off-screen to the left, with the cut-off content
+    // unreachable (confirmed bug, mobile only). Keep the popover's left edge
+    // at or past MARGIN regardless of where the button is positioned.
+    const maxRight = window.innerWidth - MARGIN - W;
+    right = Math.max(MARGIN, Math.min(right, maxRight));
+    container.style.right = right + 'px';
     if (rect) {
       container.style.bottom = (window.innerHeight - rect.top + GAP) + 'px';
-      container.style.right  = (window.innerWidth  - rect.right)     + 'px';
     } else {
       container.style.bottom = '36px';
-      container.style.right  = '16px';
     }
   }
 

@@ -4557,7 +4557,7 @@ async function _renderLWChart(ohlcId, label) {
     return window._lwDrawings[_drawSymKey];
   }
 
-  let _drawMode      = null;  // null | 'trend' | 'fib' | 'rect'  (creation tool armed)
+  let _drawMode      = null;  // null | 'trend' | 'fib' | 'fibext' | 'rect'  (creation tool armed)
   let _drawAnchor    = null;  // {time, price} — drag-start point (creation)
   let _drawLiveEnd   = null;  // {time, price} — live drag-end point, updated on every move (creation)
   let _isDragging    = false; // true while creating a new shape
@@ -4584,7 +4584,7 @@ async function _renderLWChart(ohlcId, label) {
     if (stale) stale.remove();
   })();
 
-  const _DRAW_COLORS = { trend: 'rgba(79,127,255,0.9)', fib: 'rgba(255,193,7,0.9)', rect: 'rgba(126,211,138,0.9)' };
+  const _DRAW_COLORS = { trend: 'rgba(79,127,255,0.9)', fib: 'rgba(255,193,7,0.9)', fibext: 'rgba(0,191,165,0.9)', rect: 'rgba(126,211,138,0.9)' };
   const _SWATCH_COLORS = [
     'rgba(79,127,255,0.9)',   // blue
     'rgba(255,193,7,0.9)',    // amber
@@ -4596,6 +4596,19 @@ async function _renderLWChart(ohlcId, label) {
 
   // Standard Fibonacci retracement ratios (TradingView/MT default set)
   const FIB_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+
+  // Standard Fibonacci extension ratios (2-point variant — projects
+  // continuation targets beyond the drawn swing, same convention as
+  // TradingView's "Fib Extension" tool and the 127.2/161.8/200/261.8%
+  // levels commonly quoted as extension targets in institutional research).
+  // This is the 2-point tool: 0% and 100% sit on the dragged swing exactly
+  // like Fibonacci Retracement, and the levels past 100% project outward in
+  // the same direction as the swing. A 3-point "trend-based" extension
+  // (swing start → swing end → retracement end) is a materially bigger
+  // feature — separate creation flow, a third handle, extended selection/
+  // resize/serialization — and is not implemented here; flagged as a
+  // possible follow-up if Santiago wants full Bloomberg/MT5 parity.
+  const FIB_EXT_LEVELS = [0, 0.382, 0.618, 1, 1.272, 1.618, 2, 2.618];
 
   function _updateDrawBtnState() {
     const b = document.getElementById('lw-draw-btn');
@@ -4685,7 +4698,7 @@ async function _renderLWChart(ohlcId, label) {
       const fillCol = col.replace(/[\d.]+\)$/, '0.14)');
       if (isSelected) svg += `<rect x="${(rx-2).toFixed(1)}" y="${(ry-2).toFixed(1)}" width="${(rw+4).toFixed(1)}" height="${(rh+4).toFixed(1)}" fill="none" stroke="#fff" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>`;
       svg += `<rect x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}" fill="${fillCol}" stroke="${col}" stroke-width="${(1.25 + selW).toFixed(2)}"${previewDash}/>`;
-    } else if (d.type === 'fib') {
+    } else if (d.type === 'fib' || d.type === 'fibext') {
       // Diagonal swing guide (dashed, low-opacity — the levels below are the point).
       svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4,3" opacity="0.55"/>`;
       // Convention: 0% sits at the swing point the user dragged FROM, 100% at
@@ -4697,7 +4710,8 @@ async function _renderLWChart(ohlcId, label) {
       // Bounded to the width the user actually dragged — NOT the chart edge.
       const xLeft  = Math.min(x1, x2);
       const xRight = Math.max(x1, x2);
-      FIB_LEVELS.forEach(lv => {
+      const levels = d.type === 'fibext' ? FIB_EXT_LEVELS : FIB_LEVELS;
+      levels.forEach(lv => {
         const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
         const y = candleSeries.priceToCoordinate(lvPrice);
         if (y == null) return;
@@ -4841,13 +4855,14 @@ async function _renderLWChart(ohlcId, label) {
         const rx1 = Math.min(x1, x2) - 4, rx2 = Math.max(x1, x2) + 4;
         const ry1 = Math.min(y1, y2) - 4, ry2 = Math.max(y1, y2) + 4;
         if (x >= rx1 && x <= rx2 && y >= ry1 && y <= ry2) return i;
-      } else if (d.type === 'fib') {
+      } else if (d.type === 'fib' || d.type === 'fibext') {
         if (_ptSegDist(x, y, x1, y1, x2, y2) < 6) return i; // the diagonal swing guide itself
         const drawnHighFirst = d.p1.price >= d.p2.price;
         const priceHigh = Math.max(d.p1.price, d.p2.price), priceLow = Math.min(d.p1.price, d.p2.price);
         const range = priceHigh - priceLow || 1e-9;
         const xLeft = Math.min(x1, x2) - 4, xRight = Math.max(x1, x2) + 4;
-        for (const lv of FIB_LEVELS) {
+        const levels = d.type === 'fibext' ? FIB_EXT_LEVELS : FIB_LEVELS;
+        for (const lv of levels) {
           const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
           const ly = candleSeries.priceToCoordinate(lvPrice);
           if (ly != null && x >= xLeft && x <= xRight && Math.abs(y - ly) < 5) return i;
@@ -5468,6 +5483,10 @@ async function _renderLWChart(ohlcId, label) {
     _addOption('Fibonacci Retracement', 'Drag from the swing start to the swing end', () => {
       _selectedIdx = -1; _hideDrawToolbar();
       _drawMode = 'fib'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState(); _renderDrawings();
+    });
+    _addOption('Fibonacci Extension', 'Drag from the swing start to the swing end — projects 127.2/161.8/200/261.8% continuation targets', () => {
+      _selectedIdx = -1; _hideDrawToolbar();
+      _drawMode = 'fibext'; _drawAnchor = null; _drawLiveEnd = null; _updateDrawBtnState(); _renderDrawings();
     });
     _addOption('Rectangle', 'Drag to mark a price/time zone', () => {
       _selectedIdx = -1; _hideDrawToolbar();
