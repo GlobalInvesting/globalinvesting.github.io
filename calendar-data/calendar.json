@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-03T12:40:32Z",
-  "generatedAt": "2026-08-03T12:40:32Z",
+  "lastUpdate": "2026-08-03T15:59:04Z",
+  "generatedAt": "2026-08-03T15:59:04Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1049,14 +1049,14 @@
       "std": 3.066486
     },
     "USD/ism manufacturing employment": {
-      "n": 2,
-      "mean": 1.35,
-      "std": 0.919239
+      "n": 3,
+      "mean": 1.9,
+      "std": 1.153256
     },
     "USD/ism manufacturing pmi": {
-      "n": 2,
-      "mean": 0.15,
-      "std": 1.202082
+      "n": 3,
+      "mean": 0.633333,
+      "std": 1.193035
     },
     "AUD/building permits mom": {
       "n": 3,
@@ -46361,6 +46361,19 @@
     {
       "date": "3 Aug",
       "dateISO": "2026-08-03",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Austria Unemployment Rate",
+      "impact": "high",
+      "actual": "6.9%",
+      "forecast": "6.8%",
+      "previous": "6.9%"
+    },
+    {
+      "date": "3 Aug",
+      "dateISO": "2026-08-03",
       "timeUTC": "07:30",
       "country": "CHF",
       "currency": "CHF",
@@ -46374,26 +46387,13 @@
     {
       "date": "3 Aug",
       "dateISO": "2026-08-03",
-      "timeUTC": "07:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Austria Unemployment Rate",
-      "impact": "high",
-      "actual": "6.9%",
-      "forecast": "6.8%",
-      "previous": "6.9%"
-    },
-    {
-      "date": "3 Aug",
-      "dateISO": "2026-08-03",
       "timeUTC": "14:00",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "United States ISM Manufacturing Employment",
       "impact": "medium",
-      "actual": null,
+      "actual": "52.8",
       "forecast": "49.8",
       "previous": "49.7"
     },
@@ -46406,7 +46406,7 @@
       "flag": "🇺🇸",
       "event": "United States ISM Manufacturing PMI",
       "impact": "high",
-      "actual": null,
+      "actual": "55.6",
       "forecast": "54.0",
       "previous": "53.3"
     },
