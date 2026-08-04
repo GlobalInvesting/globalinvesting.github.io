@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-08-04T02:02:50Z",
+  "generated_at": "2026-08-04T09:18:04Z",
   "signals": [
     {
-      "time": "02:02",
+      "time": "09:17",
       "priority": "critical",
-      "title": "AUD/USD — G10 Scorecard + TIER-1 News + Vol",
-      "text": "AUD/USD trades at 0.7016, holding above its SMA20/50/200 cluster following a massive TIER-1 beat in Australian household spending (+0.8% vs +0.2% expected) and strong Job Ads data. This domestic outperformance surfaces as the G10 scorecard shows a -60bp carry disadvantage for AUD vs USD, yet AUD/USD remains resilient. Options markets are pricing significant tail-risk with a +9.1% Vol Risk Premium (IV 15.7% vs HV30 6.6%), signaling that protection against an AUD breakout is becoming expensive. COT LF net long +23,616 (64.1% long) aligns with the hawkish RBA bias, while retail remains 64% short, providing a contrarian tailwind for further upside. RBA holds at 4.35%. Risk: A reversal in global risk-on sentiment (VIX > 20) forces a carry-led liquidation of AUD longs.",
+      "title": "CHF/JPY — G10 Bilateral Theme + Carry",
+      "text": "CHF/JPY is under significant pressure as JPY marks a dominant +1.594% average weekly outperformance across the G10, while CHF lags at -0.711%. The resulting 2.304% G10 spread establishes a critical bilateral theme driven by a shift in safe-haven preferences and a -100bp carry disadvantage for CHF (SNB 0.0% vs BoJ 1.0%). While JPY COT LF net short remains large at -124,575, the JPY Economic Surprise Index (ESI) of +22.9 supports the currency's recovery against a weak CHF backdrop. JPY real rates at -0.70% remain less accommodative than NZD or CHF, further supporting the JPY bid in a consolidating market. Risk-off flows are clearly favoring JPY over CHF as the MOVE index retreats to 80.5. Risk: A sharp spike in the VIX above 25 that triggers a broader CHF safe-haven catch-up trade.",
       "evidence": [
-        "AUD household spending: +0.8% (beat)",
-        "AUD/USD VRP: +9.1%",
-        "USD/AUD carry: -60bp"
+        "JPY 1W avg: +1.594% (n=7)",
+        "CHF 1W avg: -0.711% (n=6)",
+        "G10 spread: 2.304%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "02:00",
-      "priority": "critical",
-      "title": "CAD/JPY — G10 Bilateral Theme + Geopolitical Risk",
-      "text": "CAD/JPY trades at 112.202 as the G10 bilateral theme reaches a critical spread of 2.534%, driven by JPY outperformance (+1.797%) and CAD weakness (-0.737%). While a +125bp OIS carry premium favors CAD, geopolitical tensions in the Strait of Hormuz—with Iran rejecting second corridors and threatening military force—are driving haven demand for JPY. JPY's performance is further supported by a strong ESI (+22.9), contrasting with the market's heavy COT LF net short of -124,575. This positioning leaves the pair highly vulnerable to a disorderly short-squeeze if geopolitical threats escalate. USD/JPY remains comfortably below its SMA20/50/200 cluster at 157.59, confirming the broad yen strength. Risk: De-escalation in the Middle East restores focus to the 125bp carry advantage, stalling the JPY bid.",
-      "evidence": [
-        "G10 spread (JPY/CAD): 2.534%",
-        "JPY 1W avg: +1.797% (n=7)",
-        "CAD 1W avg: -0.737% (n=3)"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "01:57",
+      "time": "09:14",
       "priority": "warning",
-      "title": "USD/JPY — Options Skew + Carry + Retail Divergence",
-      "text": "USD/JPY at 157.59 continues to trade with a heavy downside bias in the options market, where the 25d RR at -3.19 shows a strong put skew despite a massive +275bp Fed-BoJ carry advantage. The volatility regime remains unusual with a negative VRP of -1.1% (IV 7.2% vs HV30 8.3%), suggesting the options market is complacent regarding the scale of recent realized moves. Speculative positioning (COT) remains significantly net short JPY (-124,575), but retail traders are currently 72% long USD/JPY, creating a sharp institutional-vs-retail divergence. With price currently below the SMA20 (162.34) and SMA50 (161.31), the technical trend is firmly bearish. Risk: A break back above the 160.00 psychological level invalidates the bearish momentum and triggers retail capitulation.",
+      "title": "USD/JPY — Positioning + Options + Vol",
+      "text": "USD/JPY trades at 157.87, testing the SMA200 at 157.97 after a sustained move below its SMA20/50 cluster. The options market signals aggressive downside hedging with a 25d Risk Reversal of -3.19, a strong put skew that aligns with a negative Vol Risk Premium (VRP) of -1.1% (IV 7.2% vs HV30 8.3%). This negative VRP suggests the market is underpricing potential realized volatility despite the pair's 1.44% weekly decline. While a 275bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 1.0%) structurally supports the pair, the heavy LF spec short of -124,575 is vulnerable to further deleveraging if 157.00 fails. Risk: Intervention threats or a hawkish shift at the next BoJ meeting (mkt: 100% hold priced) accelerate the spec short squeeze.",
       "evidence": [
-        "USD/JPY 25d RR: -3.19 (Saxo)",
+        "USD/JPY 25d RR: -3.19",
         "USD/JPY VRP: -1.1%",
-        "USD/JPY retail: 72% long"
+        "JPY COT LF net: -124,575"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:54",
+      "time": "09:12",
       "priority": "warning",
-      "title": "NZD/USD — COT-OIS Divergence + ESI",
-      "text": "NZD/USD trades at 0.5869, currently positioned above its SMA20/50/200 cluster following a period of sustained data beats reflected in its ESI of +33.4. RBNZ holds at 2.5%. This crowded speculative short is at risk of a squeeze if upcoming data confirms the need for further RBNZ tightening, especially as the real policy rate remains accommodative at -1.56%. Retail sentiment is also 66% short, aligning with the contrarian bullish signal from the institutional short-squeeze setup. Watch the 0.5826 level (SMA200) as key support. Risk: RBNZ shifts to a neutral bias, validating the speculative short positioning.",
+      "title": "NZD/USD — RBNZ + COT Positioning",
+      "text": "NZD/USD trades at 0.5871, holding above its SMA20/50/200 cluster (0.5803/0.5792/0.5827) as markets position for upcoming Q2 jobs data. Despite an RBNZ hiking stance (2.5% rate) and a strong positive ESI of +33.4, COT LF positioning remains net short -30,606 with an extreme long% of only 9.7%. This heavy spec short positioning contrasts with the RBNZ's tightening bias and recent 3.12% monthly gain, creating a high-conviction short-squeeze setup if employment data confirms the need for further hikes. The carry deficit of 125bp against the USD remains the primary headwind for long extensions. Risk: Q2 jobs data misses expectations, validating the crowded spec short and breaking the SMA cluster support.",
       "evidence": [
-        "NZD COT LF net: -30,606",
+        "NZD COT long%: 9.7%",
         "NZD ESI: +33.4",
-        "NZD real rate: -1.56%"
+        "NZD/USD 1M: +3.12%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:48",
-      "priority": "info",
-      "title": "USD/CHF — Volatility Risk Premium Extreme",
-      "text": "USD/CHF trades at 0.8098, characterized by an extreme Vol Risk Premium of +18.8% (IV 25.1% vs HV30 6.3%). This massive gap indicates the options market is paying a significant premium for tail-risk protection compared to actual realized price action. While the +375bp Fed-SNB carry differential remains the widest in the G10 space, the Swiss Franc is seeing renewed interest due to Middle East headlines and its safe-haven status. Technically, the pair is holding below its SMA20 (0.8106) but above its SMA50/200. COT positioning shows a modest net short in CHF of -11,635, which does not yet reflect an extreme. Risk: A return to 'normal volatility' leads to a rapid collapse in IV, favoring a carry-led USD/CHF recovery.",
+      "time": "09:09",
+      "priority": "warning",
+      "title": "GBP/USD — Volatility Premium + Technicals",
+      "text": "GBP/USD trades at 1.3441, maintaining a position above its SMA20/50/200 cluster (1.3396/1.3364/1.34). The options market is pricing a massive volatility premium with a VRP of +4.8%, as ATM IV of 11.0% significantly exceeds realized HV30 of 6.2%. This elevated premium suggests heavy institutional hedging ahead of US Non-Farm Payrolls, despite a neutral 0bp carry differential (Fed 3.75% vs BoE 3.75%). COT data shows specs are already net long +36,661 (67.3% long), suggesting the trend is well-understood but expensive to protect. Risk: A hawkish Fed surprise at the next meeting on 16 Sep that collapses the GBP/USD technical floor.",
       "evidence": [
-        "USD/CHF VRP: +18.8%",
-        "USD/CHF IV: 25.1%",
-        "USD/CHF HV30: 6.3%"
+        "GBP/USD VRP: +4.8%",
+        "GBP COT LF net: +36,661",
+        "Fed 3.75% vs BoE 3.75%: 0bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "09:05",
+      "priority": "info",
+      "title": "NZD/CHF — Retail Divergence Extreme",
+      "text": "NZD/CHF retail sentiment has reached an extreme 85% short reading, directly fading the pair's 3.12% monthly appreciation in the underlying NZD/USD cross. This retail extreme develops while the NZD ESI remains strongly positive at +33.4, suggesting retail traders are prematurely fading institutional momentum driven by RBNZ hiking expectations. With a +250bp carry premium favoring NZD (RBNZ 2.5% vs SNB 0.0%), the cost of carry further penalizes the retail short position. This divergence typically precedes a 'stop-out' rally as retail capitulates. Risk: A broader shift to risk-off sentiment (VIX > 25) that triggers a safe-haven CHF bid, validating the retail short bias.",
+      "evidence": [
+        "NZD/CHF Retail: 85% short",
+        "NZD/CHF Carry: +250bp",
+        "NZD ESI: +33.4"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
