@@ -1,85 +1,8 @@
 {
-  "generated_at": "2026-08-03T22:32:47Z",
+  "generated_at": "2026-08-04T00:00:44Z",
   "source": "Myfxbook · ForexFactory",
   "holidays": [],
   "events": [
-    {
-      "title": "Finland Current Account",
-      "currency": "EUR",
-      "dateISO": "2026-07-13",
-      "timeUTC": "05:00",
-      "impact": "medium",
-      "forecast": "€-1.6B",
-      "previous": "€-2.3B",
-      "actual": "€-0.6B",
-      "released": true
-    },
-    {
-      "title": "Switzerland Consumer Confidence",
-      "currency": "CHF",
-      "dateISO": "2026-07-13",
-      "timeUTC": "07:00",
-      "impact": "medium",
-      "forecast": "-35.0",
-      "previous": "-38.0",
-      "actual": null,
-      "released": false
-    },
-    {
-      "title": "United States Fed Bowman Speech",
-      "currency": "USD",
-      "dateISO": "2026-07-13",
-      "timeUTC": "09:25",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": true
-    },
-    {
-      "title": "Germany Current Account",
-      "currency": "EUR",
-      "dateISO": "2026-07-13",
-      "timeUTC": "12:30",
-      "impact": "medium",
-      "forecast": "€15.1B",
-      "previous": "€16.6B",
-      "actual": "€10.4B",
-      "released": true
-    },
-    {
-      "title": "United States Fed Waller Speech",
-      "currency": "USD",
-      "dateISO": "2026-07-13",
-      "timeUTC": "16:30",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": true
-    },
-    {
-      "title": "United States Monthly Budget Statement",
-      "currency": "USD",
-      "dateISO": "2026-07-13",
-      "timeUTC": "18:00",
-      "impact": "medium",
-      "forecast": "$-132.8B",
-      "previous": "$-293.0B",
-      "actual": "$-120.0B",
-      "released": true
-    },
-    {
-      "title": "United Kingdom BRC Retail Sales Monitor YoY",
-      "currency": "GBP",
-      "dateISO": "2026-07-13",
-      "timeUTC": "23:01",
-      "impact": "high",
-      "forecast": "2.9%",
-      "previous": "3.4%",
-      "actual": "1.7%",
-      "released": true
-    },
     {
       "title": "Australia Westpac Consumer Confidence Index",
       "currency": "AUD",
@@ -3146,19 +3069,115 @@
       "vendor": "myfxbook"
     },
     {
-      "title": "JOLTS Job Openings",
+      "title": "Spain Unemployment Change",
+      "currency": "EUR",
+      "dateISO": "2026-08-04",
+      "timeUTC": "07:00",
+      "impact": "high",
+      "forecast": "-20.3K",
+      "previous": "-28.7K",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Italy Retail Sales YoY",
+      "currency": "EUR",
+      "dateISO": "2026-08-04",
+      "timeUTC": "08:00",
+      "impact": "high",
+      "forecast": "1.4",
+      "previous": "2.2",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Italy Retail Sales MoM",
+      "currency": "EUR",
+      "dateISO": "2026-08-04",
+      "timeUTC": "08:00",
+      "impact": "high",
+      "forecast": "0.1%",
+      "previous": "0.2%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Canada Balance of Trade",
+      "currency": "CAD",
+      "dateISO": "2026-08-04",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "C$3.0B",
+      "previous": "C$4.24B",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Balance of Trade",
+      "currency": "USD",
+      "dateISO": "2026-08-04",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "$-73.0B",
+      "previous": "$-77.6B",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Imports",
+      "currency": "USD",
+      "dateISO": "2026-08-04",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "$385.0B",
+      "previous": "$395.3B",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Exports",
+      "currency": "USD",
+      "dateISO": "2026-08-04",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "$312.0B",
+      "previous": "$317.7B",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Factory Orders MoM",
       "currency": "USD",
       "dateISO": "2026-08-04",
       "timeUTC": "14:00",
       "impact": "medium",
-      "forecast": "7.44M",
-      "previous": "7.59M",
+      "forecast": "0.2%",
+      "previous": "-1.3%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "Employment Change q/q",
+      "title": "United States JOLTs Job Openings",
+      "currency": "USD",
+      "dateISO": "2026-08-04",
+      "timeUTC": "14:00",
+      "impact": "high",
+      "forecast": "7.45M",
+      "previous": "7.594M",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "New Zealand Employment Change QoQ",
       "currency": "NZD",
       "dateISO": "2026-08-04",
       "timeUTC": "22:45",
@@ -3167,10 +3186,10 @@
       "previous": "0.2%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "Unemployment Rate",
+      "title": "New Zealand Unemployment Rate",
       "currency": "NZD",
       "dateISO": "2026-08-04",
       "timeUTC": "22:45",
@@ -3179,7 +3198,31 @@
       "previous": "5.3%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Australia Ai Group Industry Index",
+      "currency": "AUD",
+      "dateISO": "2026-08-04",
+      "timeUTC": "23:00",
+      "impact": "medium",
+      "forecast": "-27.0",
+      "previous": "-30.0",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Japan BoJ Monetary Policy Meeting Minutes",
+      "currency": "JPY",
+      "dateISO": "2026-08-04",
+      "timeUTC": "23:50",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
     },
     {
       "title": "ADP Non-Farm Employment Change",
