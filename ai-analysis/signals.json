@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-08-04T09:18:04Z",
+  "generated_at": "2026-08-04T16:25:51Z",
   "signals": [
     {
-      "time": "09:17",
+      "time": "16:25",
       "priority": "critical",
-      "title": "CHF/JPY — G10 Bilateral Theme + Carry",
-      "text": "CHF/JPY is under significant pressure as JPY marks a dominant +1.594% average weekly outperformance across the G10, while CHF lags at -0.711%. The resulting 2.304% G10 spread establishes a critical bilateral theme driven by a shift in safe-haven preferences and a -100bp carry disadvantage for CHF (SNB 0.0% vs BoJ 1.0%). While JPY COT LF net short remains large at -124,575, the JPY Economic Surprise Index (ESI) of +22.9 supports the currency's recovery against a weak CHF backdrop. JPY real rates at -0.70% remain less accommodative than NZD or CHF, further supporting the JPY bid in a consolidating market. Risk-off flows are clearly favoring JPY over CHF as the MOVE index retreats to 80.5. Risk: A sharp spike in the VIX above 25 that triggers a broader CHF safe-haven catch-up trade.",
+      "title": "CAD/JPY — G10 Bilateral Theme + Geopolitical",
+      "text": "CAD/JPY trades under pressure as the yen dominates the G10 scorecard while the Canadian dollar laggards the peer group. Iran-Oman negotiations regarding the Strait of Hormuz shipping corridor and potential mine-clearing concessions are driving a sharp -5.39% drop in WTI oil to $76.0, directly undermining CAD's terms of trade. JPY 1W avg outperformance of +1.786% reflects a massive 2.794% spread over CAD's -1.008% decline, signaling a major thematic shift in the crosses. Despite a 125bp carry advantage for CAD/JPY, the 25d RR at -2.71 for EUR/JPY and -2.76 for USD/JPY confirms an aggressive institutional move into JPY protection. USD/JPY has already broken below its SMA200 at 157.97, confirming a structural shift in the yen's favor. Risk: Breakdown in Strait of Hormuz negotiations sparks a crude reversal and CAD recovery.",
       "evidence": [
-        "JPY 1W avg: +1.594% (n=7)",
-        "CHF 1W avg: -0.711% (n=6)",
-        "G10 spread: 2.304%"
+        "JPY 1W avg: +1.786% (n=7)",
+        "CAD 1W avg: -1.008% (n=3)",
+        "G10 spread: 2.794%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:14",
+      "time": "16:21",
       "priority": "warning",
-      "title": "USD/JPY — Positioning + Options + Vol",
-      "text": "USD/JPY trades at 157.87, testing the SMA200 at 157.97 after a sustained move below its SMA20/50 cluster. The options market signals aggressive downside hedging with a 25d Risk Reversal of -3.19, a strong put skew that aligns with a negative Vol Risk Premium (VRP) of -1.1% (IV 7.2% vs HV30 8.3%). This negative VRP suggests the market is underpricing potential realized volatility despite the pair's 1.44% weekly decline. While a 275bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 1.0%) structurally supports the pair, the heavy LF spec short of -124,575 is vulnerable to further deleveraging if 157.00 fails. Risk: Intervention threats or a hawkish shift at the next BoJ meeting (mkt: 100% hold priced) accelerate the spec short squeeze.",
+      "title": "NZD/USD — COT vs OIS Divergence + ESI",
+      "text": "NZD/USD trades at 0.5889, holding firmly above its SMA200 (0.5827) and SMA20/50 cluster. RBNZ holds at 2.5%. The real rate for NZD at -1.56% is the most accommodative in the G10, yet the market is pricing a hawkish shift with the RBNZ meeting on 2 September acting as a major catalyst. If data continues to beat, the crowded spec short faces an asymmetric squeeze risk toward 0.6000. Risk: RBNZ pivots to a hold stance or inflation expectations drop sharply, validating the current spec short.",
       "evidence": [
-        "USD/JPY 25d RR: -3.19",
-        "USD/JPY VRP: -1.1%",
-        "JPY COT LF net: -124,575"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "09:12",
-      "priority": "warning",
-      "title": "NZD/USD — RBNZ + COT Positioning",
-      "text": "NZD/USD trades at 0.5871, holding above its SMA20/50/200 cluster (0.5803/0.5792/0.5827) as markets position for upcoming Q2 jobs data. Despite an RBNZ hiking stance (2.5% rate) and a strong positive ESI of +33.4, COT LF positioning remains net short -30,606 with an extreme long% of only 9.7%. This heavy spec short positioning contrasts with the RBNZ's tightening bias and recent 3.12% monthly gain, creating a high-conviction short-squeeze setup if employment data confirms the need for further hikes. The carry deficit of 125bp against the USD remains the primary headwind for long extensions. Risk: Q2 jobs data misses expectations, validating the crowded spec short and breaking the SMA cluster support.",
-      "evidence": [
-        "NZD COT long%: 9.7%",
+        "NZD COT LF net: -30,606",
         "NZD ESI: +33.4",
-        "NZD/USD 1M: +3.12%"
+        "NZD/USD: 0.5889"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:09",
+      "time": "16:18",
       "priority": "warning",
-      "title": "GBP/USD — Volatility Premium + Technicals",
-      "text": "GBP/USD trades at 1.3441, maintaining a position above its SMA20/50/200 cluster (1.3396/1.3364/1.34). The options market is pricing a massive volatility premium with a VRP of +4.8%, as ATM IV of 11.0% significantly exceeds realized HV30 of 6.2%. This elevated premium suggests heavy institutional hedging ahead of US Non-Farm Payrolls, despite a neutral 0bp carry differential (Fed 3.75% vs BoE 3.75%). COT data shows specs are already net long +36,661 (67.3% long), suggesting the trend is well-understood but expensive to protect. Risk: A hawkish Fed surprise at the next meeting on 16 Sep that collapses the GBP/USD technical floor.",
+      "title": "EUR/USD — Volatility + Carry + Headline",
+      "text": "EUR/USD holds at 1.1525, supported by the SMA20 (1.1432) and SMA50 (1.1483) cluster as Hormuz reopening hopes dampen USD safe-haven appeal. The options market is pricing an elevated vol risk premium with ATM IV at 7.1% vs HV30 of 4.4%, a 2.7-point spread signaling high demand for protection above realized moves. This hedging activity occurs despite a +135bp carry advantage for the USD, as traders focus on the ECB's hawkish hike bias for the 10 September meeting. COT LF net short of -92,930 remains a headwind for the trend, but the combination of positive ESI and shifting geopolitical risk keeps the pair bid. Risk: Deterioration in US-Iran relations forces a return to USD safe-haven flows.",
       "evidence": [
-        "GBP/USD VRP: +4.8%",
-        "GBP COT LF net: +36,661",
-        "Fed 3.75% vs BoE 3.75%: 0bp"
+        "EUR/USD VRP: +2.7%",
+        "USD/EUR carry: +135bp",
+        "ECB Market Bias: Hike"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "09:05",
+      "time": "16:15",
       "priority": "info",
-      "title": "NZD/CHF — Retail Divergence Extreme",
-      "text": "NZD/CHF retail sentiment has reached an extreme 85% short reading, directly fading the pair's 3.12% monthly appreciation in the underlying NZD/USD cross. This retail extreme develops while the NZD ESI remains strongly positive at +33.4, suggesting retail traders are prematurely fading institutional momentum driven by RBNZ hiking expectations. With a +250bp carry premium favoring NZD (RBNZ 2.5% vs SNB 0.0%), the cost of carry further penalizes the retail short position. This divergence typically precedes a 'stop-out' rally as retail capitulates. Risk: A broader shift to risk-off sentiment (VIX > 25) that triggers a safe-haven CHF bid, validating the retail short bias.",
+      "title": "USD/NOK — Retail Sentiment Extreme",
+      "text": "USD/NOK retail sentiment has reached a total extreme at 100% long, positioning for a reversal as the pair trades at 9.537. This retail position directly fades the fundamental backdrop of a restrictive NOK real rate of +1.51% and a strong positive Economic Surprise Index (+34.4) for the krone. Technically, USD/NOK is positioned below its SMA20, 50, and 200, confirming a bearish trend that retail is unsuccessfully trying to catch. With the Norges Bank maintaining a hiking bias for its 13 August meeting, retail long capitulation is likely to accelerate the move lower. Risk: A significant miss in upcoming Norwegian inflation data allows Norges Bank to pivot to a hold, rescuing retail longs.",
       "evidence": [
-        "NZD/CHF Retail: 85% short",
-        "NZD/CHF Carry: +250bp",
-        "NZD ESI: +33.4"
+        "Retail Sentiment: 100% Long",
+        "NOK ESI: +34.4",
+        "USD/NOK: below SMA20/50/200"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
