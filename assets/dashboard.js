@@ -7679,11 +7679,16 @@ async function buildInlineDetail(tvSym, container) {
   // rate-expectations divergence); falls back to 10Y with an explicit tenor label when
   // either leg lacks 2Y coverage (JPY/NZD/NOK/SEK — see GUIDELINES.md). Never silently
   // mixes tenors. Mirrors updatePairDetail() exactly — same BOND_YIELD_CACHE, same fallback.
+  // FIX-36 (v8.98.0): pick('y2') now also excludes a leg whose y2Stale flag is
+  // set (backend-confirmed >90d-old cached value, e.g. CHF/EUR when SNB/ECB
+  // feeds stop publishing) — falls through to the 10Y tenor instead of
+  // building a spread on a year-old yield. See CHANGELOG.
   const bondBase  = base  ? (BOND_YIELD_CACHE[base]  || null) : null;
   const bondQuote = quote ? (BOND_YIELD_CACHE[quote] || null) : null;
   let bondTenor = null, bondDiff = null;
   if (bondBase && bondQuote) {
-    const pick = (tenor) => (bondBase[tenor] != null && bondQuote[tenor] != null)
+    const pick = (tenor) => (bondBase[tenor] != null && bondQuote[tenor] != null
+      && !(tenor === 'y2' && (bondBase.y2Stale || bondQuote.y2Stale)))
       ? bondBase[tenor] - bondQuote[tenor] : null;
     const y2diff = pick('y2');
     if (y2diff != null) {
@@ -8063,7 +8068,16 @@ const BOND_YIELD_CACHE = {}; // ccy → { y10: number|null, y2: number|null } �
       if (!r.ok) return;
       const j = await r.json();
       const d = j?.data ?? j;
-      BOND_YIELD_CACHE[ccy] = { y10: d?.bond10y ?? null, y2: d?.bond2y ?? null };
+      // y2Stale: fetch_bond_yields.py (FIX-36, v2.9.9) labels a cached bond2y
+      // 'stale-cached' once it's >90d old and no live source is available
+      // (e.g. CHF/EUR when SNB/ECB feeds stop publishing). Carried through
+      // here so every downstream consumer of y2 can exclude it from spreads
+      // instead of silently building a signal on a year-old yield.
+      BOND_YIELD_CACHE[ccy] = {
+        y10: d?.bond10y ?? null,
+        y2: d?.bond2y ?? null,
+        y2Stale: j?.sources?.bond2y === 'stale-cached',
+      };
     } catch {}
   }));
 })();
@@ -8276,11 +8290,14 @@ async function updatePairDetail(tvSym) {
   // rate-expectations divergence — the primary FX driver per RBA/BIS research); falls back
   // to 10Y with an explicit tenor label when either leg lacks 2Y coverage (JPY/NZD/NOK/SEK
   // currently have no free live 2Y source — see GUIDELINES.md). Never silently mixes tenors.
+  // FIX-36 (v8.98.0): pick('y2') excludes a leg whose y2Stale flag is set — see
+  // the identical fix in the analogous block above (row-badge spread calc).
   const bondBase  = base  ? (BOND_YIELD_CACHE[base]  || null) : null;
   const bondQuote = quote ? (BOND_YIELD_CACHE[quote] || null) : null;
   let bondTenor = null, bondDiff = null;
   if (bondBase && bondQuote) {
-    const pick = (tenor) => (bondBase[tenor] != null && bondQuote[tenor] != null)
+    const pick = (tenor) => (bondBase[tenor] != null && bondQuote[tenor] != null
+      && !(tenor === 'y2' && (bondBase.y2Stale || bondQuote.y2Stale)))
       ? bondBase[tenor] - bondQuote[tenor] : null;
     const y2diff = pick('y2');
     if (y2diff != null) {
@@ -12840,6 +12857,13 @@ async function renderSovereignSpreads() {
       const _extData = ext?.data ?? ext;
       const cty10y = _extData?.bond10y ?? null;
       const cty2y  = _extData?.bond2y  ?? null;
+      // FIX-36 (v8.98.0): fetch_bond_yields.py (v2.9.9) labels a cached bond2y
+      // 'stale-cached' once it's >90d old with no live source available (e.g.
+      // CHF/EUR when SNB/ECB feeds stop publishing). This is the table Santiago
+      // flagged with the CHF +39bp Curve reading built on a 368-day-old 2Y —
+      // stale2y below excludes that value from the slope calc and flags the
+      // raw 2Y cell instead of presenting it as a normal live print.
+      const stale2y = ext?.sources?.bond2y === 'stale-cached';
 
       // extended-data always stores yields already as percent (e.g. 4.745 = 4.745%).
       // No fraction->percent conversion here: CHF legitimately trades under 1%
@@ -12864,17 +12888,30 @@ async function renderSovereignSpreads() {
         } else { tds[2].textContent = '—'; }
       }
 
-      // 2Y
-      if (tds[3]) { tds[3].textContent = n2 != null ? n2.toFixed(2) + '%' : '—'; }
+      // 2Y — stale2y values are still shown (they're real, just old) but styled
+      // as such rather than presented as a normal live print.
+      if (tds[3]) {
+        tds[3].textContent = n2 != null ? n2.toFixed(2) + '%' : '—';
+        tds[3].style.color = stale2y ? 'var(--text3)' : '';
+        tds[3].title = stale2y
+          ? `Stale — no fresh 2Y source available this run (cached ${ext?.dates?.bond2y || 'unknown date'})`
+          : '';
+      }
 
-      // 2Y-10Y curve slope
+      // 2Y-10Y curve slope — excluded when the 2Y leg is stale-cached, since a
+      // slope built on a year-old 2Y against a fresh 10Y is not a real reading
+      // of today's curve shape.
       if (tds[4]) {
-        const slope = (n2 != null && n10 != null) ? (n10 - n2) * 100 : null; // pct-pts -> bp
+        const slope = (n2 != null && n10 != null && !stale2y) ? (n10 - n2) * 100 : null; // pct-pts -> bp
         if (slope != null) {
           tds[4].textContent = (slope >= 0 ? '+' : '') + slope.toFixed(0) + ' bp';
           tds[4].style.color = slope < 0 ? 'var(--down)' : slope > 50 ? 'var(--up)' : 'var(--text2)';
           tds[4].title = slope < 0 ? 'Inverted curve' : slope < 25 ? 'Flat curve' : 'Normal curve';
-        } else { tds[4].textContent = '—'; }
+        } else {
+          tds[4].textContent = '—';
+          tds[4].style.color = '';
+          tds[4].title = stale2y ? '2Y is stale-cached — slope excluded to avoid a false reading' : '';
+        }
       }
     } catch {
       tds.forEach((td, i) => { if (i > 0) td.textContent = '—'; });
