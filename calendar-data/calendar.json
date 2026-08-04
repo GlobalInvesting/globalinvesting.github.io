@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-04T07:59:58Z",
-  "generatedAt": "2026-08-04T07:59:58Z",
+  "lastUpdate": "2026-08-04T11:36:52Z",
+  "generatedAt": "2026-08-04T11:36:52Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1392,6 +1392,16 @@
       "n": 2,
       "mean": -0.25,
       "std": 0.494975
+    },
+    "EUR/italy retail sales mom": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.212132
+    },
+    "EUR/italy retail sales yoy": {
+      "n": 2,
+      "mean": 1.05,
+      "std": 0.919239
     },
     "EUR/spain consumer confidence": {
       "n": 2,
@@ -46398,9 +46408,9 @@
       "flag": "🇪🇺",
       "event": "Italy Retail Sales YoY",
       "impact": "high",
-      "actual": null,
-      "forecast": "1.4",
-      "previous": "2.2"
+      "actual": "3.1%",
+      "forecast": "1.4%",
+      "previous": "2.2%"
     },
     {
       "date": "4 Aug",
@@ -46411,7 +46421,7 @@
       "flag": "🇪🇺",
       "event": "Italy Retail Sales MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "-0.1%",
       "forecast": "0.1%",
       "previous": "0.2%"
     },
@@ -46490,7 +46500,7 @@
       "event": "United States JOLTs Job Openings",
       "impact": "high",
       "actual": null,
-      "forecast": "7.45M",
+      "forecast": "7.4M",
       "previous": "7.594M"
     },
     {
@@ -46503,7 +46513,7 @@
       "event": "New Zealand Employment Change QoQ",
       "impact": "high",
       "actual": null,
-      "forecast": "0.1%",
+      "forecast": "0.2%",
       "previous": "0.2%"
     },
     {
