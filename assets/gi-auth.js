@@ -261,8 +261,8 @@
       on MQL5 Market. Enter the activation key shown in your MT5 terminal to unlock all panels.
     </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.85;margin-top:-10px;">
-      Opened a verified account with Vantage or TMGM instead? As our referral partner, account holders
-      at either broker get full web terminal access too &mdash; <a href="contact.html">contact us</a>
+      Opened a verified account with one of our partner brokers instead? As our referral partner,
+      account holders get full web terminal access too &mdash; <a href="contact.html">contact us</a>
       for your access link, no MT5 key required.
     </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-8px;">
