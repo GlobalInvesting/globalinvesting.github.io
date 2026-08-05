@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-08-05T16:14:14Z",
+  "generated_at": "2026-08-05T21:10:40Z",
   "signals": [
     {
-      "time": "16:13",
+      "time": "21:10",
       "priority": "critical",
-      "title": "CAD/JPY — G10 Bilateral Theme + Geopolitical Hopes",
-      "text": "CAD/JPY trades at 112.428 amid a massive G10 performance gap. JPY is the week's clear leader, up 1.538% (n=7), while CAD lags at -0.653% (n=3), creating a 2.191% spread. This JPY outperformance is fundamentally at odds with the carry deficit, as CAD holds a 125bp advantage over JPY. The move is accelerated by a 50-50 chance of a Strait of Hormuz deal and US sanctions relief for Iran, which removes the oil supply risk premium and weighs on CAD while lifting JPY sentiment. JPY ESI at +22.9 confirms a strong positive data surprise trend supporting the bid. Technically, USD/JPY has fallen below its SMA20/50/200 cluster (161.88/161.25/158.0), signaling a major trend shift. Risk: Hormuz deal negotiations collapse, reviving the oil supply risk premium and reversing CAD weakness.",
+      "title": "CAD/JPY — G10 Bilateral Theme + Hormuz De-escalation",
+      "text": "CAD/JPY trades at 112.517 as the JPY continues its dominant G10 outperformance, while CAD lags the complex. The G10 scorecard shows a massive 2.031% spread between the leader (JPY) and laggard (CAD) over the last week. JPY strength is underpinned by a sustained positive Economic Surprise Index (ESI) of +22.9, contrasting with the JPY COT LF net short of -124,575 which suggests significant room for further short-covering. Meanwhile, WTI oil remains under pressure at $75.0 as regional diplomats meet in Amman to discuss de-escalating Strait of Hormuz tensions, stripping away the geopolitical risk premium that typically supports the loonie. The pair remains technically vulnerable after a sustained break below the JPY-based SMA20/50 cluster. Implication: CAD weakness and JPY short-unwinding are the primary G10 drivers, keeping the cross heavy until oil or geopolitical narratives shift. Risk: Hormuz de-escalation talks fail, sparking an oil spike that restores CAD demand.",
       "evidence": [
-        "JPY 1W avg: +1.538% (n=7)",
-        "CAD 1W avg: -0.653% (n=3)",
-        "G10 spread: 2.191%"
+        "JPY 1W avg: +1.444% (n=7)",
+        "CAD 1W avg: -0.587% (n=3)",
+        "G10 spread: 2.031%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:09",
+      "time": "21:07",
       "priority": "critical",
-      "title": "USD/JPY — Positioning + Volatility + Options Skew",
-      "text": "USD/JPY at 157.62 shows an extreme dislocation between carry and sentiment. While the 275bp Fed-BoJ OIS spread still heavily favors USD, the options market is pricing in aggressive downside protection with a 25d Risk Reversal of -2.40—a strong put skew. CFTC data shows JPY specs remain net short -124,575, leaving the pair vulnerable to a massive short-squeeze as price trades below the SMA200 at 158.0. Negative VRP of -1.1% (IV 7.2% vs HV30 8.3%) suggests the options market is underpricing the realized volatility of this move, creating an asymmetric setup for further downside. The JPY real rate of -0.70% remains accommodative, yet the pair continues to ignore carry in favor of safe-haven flows and geopolitical de-escalation. Risk: US 10Y yields spike back above 4.80%, reasserting carry dominance and stalling the JPY recovery.",
+      "title": "USD/JPY — Fed Rhetoric + Options Skew + Vol Divergence",
+      "text": "USD/JPY is trading at 157.72, holding below the SMA200 at 158.0 and significantly below the SMA20/50 cluster at 161.25/161.88. Fed Governor Cook's recent warnings that rate hikes remain possible if disinflation stalls provides a hawkish fundamental floor, yet the options market is pricing aggressive downside protection. The 25d Risk Reversal (RR) shows a strong -2.40 put skew, the most extreme in the G10 space, indicating institutional demand for USD/JPY downside hedges despite the 275bp OIS carry advantage for the USD. This creates a volatility divergence: USD/JPY IV at 7.2% is currently sitting 1.1% below its 30-day realized volatility (HV30=8.3%), suggesting the options market is currently underpricing potential breakout risk. Implication: The combination of extreme put skew and negative VRP suggests a market primed for a sharp move if technical resistance at 158.00 holds. Risk: A daily close back above the 158.00 SMA200 level invalidates the bearish momentum.",
       "evidence": [
         "USD/JPY 25d RR: -2.40",
-        "JPY COT LF net: -124,575",
-        "USD/JPY VRP: -1.1%"
+        "USD/JPY VRP: -1.1%",
+        "USD/JPY carry: +275bp"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "16:05",
+      "time": "21:05",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + ESI",
-      "text": "NZD/USD trades at 0.5881, comfortably above its SMA20/50/200 cluster at 0.5814/0.5793/0.5827. RBNZ holds at 2.5%. This data outperformance contradicts the heavy speculative short, creating a high-conviction squeeze setup as price holds above long-term moving averages. Despite a -1.56% negative real rate, the OCR-overnight at 2.50% vs Fed SOFR at 3.65% presents a 115bp carry disadvantage that specs are fading too aggressively. If the RBNZ delivers a hawkish surprise on September 2, the crowded short will be forced to cover into an uptrend. Risk: RBNZ pivots to neutral on September 2, validating the spec short position.",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ Hike Bias",
+      "text": "NZD/USD at 0.5889 continues to hold above its SMA20/50/200 cluster (range 0.5793–0.5827), reflecting underlying technical strength. RBNZ holds at 2.5%. The NZD Economic Surprise Index (ESI) is the strongest in the G10 at +24.4, providing fundamental validation for the RBNZ's hawkishness that specs have yet to price in. Retail sentiment is also heavily skewed, with 76% of traders short, creating a high-conviction setup for a contrarian short-squeeze. Implication: The heavy spec short is fundamentally misaligned with the RBNZ's hiking cycle and positive data surprises, risking a rapid unwind toward 0.6000. Risk: The RBNZ shifts to a neutral stance at the September 2nd meeting, validating the speculative short.",
       "evidence": [
-        "NZD COT long%: 9.7%",
+        "NZD COT LF net: -30,606",
         "NZD ESI: +24.4",
-        "NZD/USD: 0.5881"
+        "NZD/USD Retail: 76% short"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "15:58",
-      "priority": "info",
-      "title": "AUD/USD — Volatility + Retail Sentiment Divergence",
-      "text": "AUD/USD at 0.7054 is testing its SMA20/50 cluster at 0.6986/0.7007. Options demand is significantly elevated with an IV of 11.3% against an HV30 of 6.2%, resulting in a +5.0% Vol Risk Premium. Retail sentiment is 75% short, diverging from the COT LF net long of +23,616. This institutional-retail divergence typically supports further upside as retail traders unsuccessfully fade the trend. The 70bp AONIA-SOFR carry advantage in favor of AUD provides structural support, even as AUD ESI shows persistent data misses at -15.5. The market is currently valuing the carry and institutional positioning over the weakening domestic data. Risk: A close below the SMA50 at 0.7007 would invalidate the bullish retail-divergence thesis.",
+      "time": "21:01",
+      "priority": "warning",
+      "title": "AUD/USD — ESI Divergence + Options Vol Premium",
+      "text": "AUD/USD trades at 0.7059, positioned above its SMA20/50/200 cluster, but faces building fundamental headwinds. The AUD Economic Surprise Index (ESI) is currently the weakest in the G10 at -15.5, indicating persistent data misses that contradict the current price strength and the +23,616 COT LF net long position. This fundamental decay is reflected in the options market, where AUD/USD IV of 11.2% carries a massive 4.9% premium over realized volatility (HV30=6.3%). This elevated VRP suggests that while the spot price is bid, the market is paying significantly for protection against a reversal. Implication: The data-positioning divergence suggests the AUD rally is overextended, with the high vol premium signaling a lack of institutional conviction in further upside. Risk: RBA delivers a hawkish surprise on August 11, justifying the current positioning and spot levels.",
       "evidence": [
-        "AUD/USD VRP: +5.0%",
-        "Retail: 75% short",
+        "AUD ESI: -15.5",
+        "AUD/USD VRP: +4.9%",
         "AUD COT LF net: +23,616"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "20:55",
+      "priority": "info",
+      "title": "USD/CHF — Safe-Haven Flow + Volatility Extreme",
+      "text": "USD/CHF is trading at 0.8065, testing the SMA50 support level at 0.8039 after failing to hold the SMA20. Despite a massive +375bp OIS carry advantage for the USD, the pair is under pressure as the Swiss Franc gains on disappointing US economic data and safe-haven flows related to Middle East tensions. The USD/CHF volatility landscape is extreme, with IV at 28.5% against an HV30 of only 6.4%, resulting in a massive +22.1% Vol Risk Premium. This suggests that the options market is pricing in a 'tail risk' event far beyond current realized price action, likely reflecting geopolitical intervention or sudden SNB policy shifts. Implication: Carry is being ignored in favor of defensive CHF positioning; the pair remains at the mercy of geopolitical headlines until the vol premium compresses. Risk: A definitive de-escalation in the Strait of Hormuz leads to a rapid carry-trade restoration, targeting 0.8200.",
+      "evidence": [
+        "USD/CHF VRP: +22.1%",
+        "USD/CHF carry: +375bp",
+        "USD/CHF close: 0.8065"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
