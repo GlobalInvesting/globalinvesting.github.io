@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.90.17';
+const CACHE_VERSION = 'gi-v8.98.1';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -34,7 +34,7 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 // prior failure mode.
 const STATIC_PRECACHE = [
   '/assets/dashboard.css?v=8.23.1',
-  '/assets/dashboard.js?v=8.90.17',
+  '/assets/dashboard.js?v=8.98.1',
   '/assets/gi-auth.js?v=1.0.2',
   '/assets/fx-websocket.js?v=1.0.0',
   '/assets/cot-modal-chart.js?v=7.91.1',
@@ -43,13 +43,13 @@ const STATIC_PRECACHE = [
   '/assets/corr-modal.js?v=2.2.0',
   '/assets/yc-modal.js?v=8.8.4',
   '/assets/heatmap-modal.js?v=2.2.4',
-  '/assets/econ-surprises-modal.js?v=1.3.9',
+  '/assets/econ-surprises-modal.js?v=1.3.10',
   '/assets/onboarding.js?v=7.89.10',
   '/assets/layout-resizer.js?v=1.0.0',
   '/assets/feed.js?v=1.0.0',
   '/assets/share.js?v=1.0.0',
   '/assets/inline-panel.js?v=1.4.2',
-  '/assets/calendar-panel.js?v=1.7.0',
+  '/assets/calendar-panel.js?v=1.9.0',
   '/assets/econ-matrix.js?v=1.0.5',
   '/assets/gdpr.js',
   '/assets/sw-register.js',
