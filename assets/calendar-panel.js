@@ -46,6 +46,15 @@
  *   econ-surprises-modal.js, INVERSE_EVENTS in fetch_economic_calendar.py, which this
  *   file had never implemented) and sign-correct the beat/miss check for matching
  *   titles before assigning the up/down class.
+ * v1.9 (2026-08-04): Audited all 4 inverse-keyword lists against the full year of G10
+ *   events already in calendar-data/calendar.json (690 unique titles) instead of a
+ *   fresh manual export. Found one substring gap: "unemployment" doesn't match
+ *   "Unemployed Persons" (EUR/Germany monthly, NOK) — 15 real occurrences over the
+ *   past year, all mis-colored the same way as the NZD case above. Added "unemployed"
+ *   to CAL_INVERSE_KW (and the three sibling lists). No other gaps found in the
+ *   dataset — checked for bankruptcies/redundancies/layoffs/defaults/delinquencies
+ *   (none appear in the G10 title set) and confirmed diffusion-style indices (Ai
+ *   Group Industry/Manufacturing/Construction Index) are correctly non-inverse.
  */
 (function () {
   'use strict';
@@ -75,7 +84,9 @@
   // negative surprise but was rendering green before this fix.
   // Must stay in sync with INVERSE_KW in dashboard.js, _ESM_INVERSE_KW in
   // econ-surprises-modal.js, and INVERSE_EVENTS in fetch_economic_calendar.py.
-  const CAL_INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit'];
+  // v8.100.7: added "unemployed" — "Unemployed Persons" (EUR/Germany, NOK) is not a
+  // substring match of "unemployment". See dashboard.js INVERSE_KW comment.
+  const CAL_INVERSE_KW = ['unemployment', 'unemployed', 'jobless', 'claims', 'deficit'];
 
   // Browser timezone offset label e.g. "GMT-3"
   function tzLabel() {

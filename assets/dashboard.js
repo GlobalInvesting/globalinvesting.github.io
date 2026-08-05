@@ -13010,7 +13010,12 @@ const NOISE_KW = [
 // v8.100.6: calendar-panel.js's Actual-column coloring (CAL_INVERSE_KW) had never
 // implemented this concept at all — any change here must now also be evaluated for
 // calendar-panel.js, not just econ-surprises-modal.js and fetch_economic_calendar.py.
-const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit'];
+// v8.100.7: added "unemployed" — "unemployment" is NOT a substring of "unemployed"
+// (differ after "employ-": "-ment" vs "-ed"), so "Unemployed Persons" (EUR/Germany
+// monthly, NOK) silently missed inversion. Confirmed against a full year of G10
+// calendar.json: 15 occurrences, all mis-colored; no other inverse-indicator gaps
+// found across the 690 unique event titles in that dataset.
+const INVERSE_KW = ['unemployment', 'unemployed', 'jobless', 'claims', 'deficit'];
 
 async function renderEconSurprises() {
   const tbody = document.getElementById('econ-surprise-tbody');

@@ -243,7 +243,9 @@ const _ESM_G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
 // correctly excludes. No inversion needed for a signed balance. Must stay in sync
 // with INVERSE_KW in dashboard.js, INVERSE_EVENTS in fetch_economic_calendar.py, and
 // (as of v8.100.6) CAL_INVERSE_KW in calendar-panel.js.
-const _ESM_INVERSE_KW = ['unemployment','jobless','claims','deficit'];
+// v8.100.7: added "unemployed" — see dashboard.js INVERSE_KW comment for rationale
+// ("Unemployed Persons" is not a substring match of "unemployment").
+const _ESM_INVERSE_KW = ['unemployment','unemployed','jobless','claims','deficit'];
 
 // _canonEsi — shared global defined in dashboard.js (loads before this file).
 // _ESM_CCY_PFXS removed: _CCY_PFXS in dashboard.js is the single source of truth.
