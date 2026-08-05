@@ -1,1 +1,24 @@
-{"data":{"bond10y":4.627,"bond2y":4.25,"bond5y":4.333,"vix":16.5,"hyOas":2.84,"hyOasDelta20d":0.09,"igOas":0.8,"igOasDelta20d":0.05,"inflationExpectations":2.24,"bond2y_prev":4.28},"dates":{"bond10y":"2026-08-04","bond2y":"2026-08-03","bond5y":"2026-08-04","vix":"2026-08-04","hyOas":"2026-07-30","igOas":"2026-07-30","inflationExpectations":"2026-07-29","bond2y_prev":"2026-07-31"}}
+{
+  "lastUpdate": "2026-08-05",
+  "source": "FX/VIX/OAS: Frankfurter, FRED \u2014 v14.3 (bond10y/bond2y/bond5y AND inflationExpectations preserved from disk, not fetched \u2014 bonds owned by globalinvesting-scripts/fetch_bond_yields.py, inflationExpectations by the private-scripts weekly job)",
+  "data": {
+    "bond10y": 4.627,
+    "bond2y": 4.25,
+    "bond5y": 4.333,
+    "vix": 15.86,
+    "hyOas": 2.78,
+    "hyOasDelta20d": 0.06,
+    "igOas": 0.78,
+    "igOasDelta20d": 0.03,
+    "inflationExpectations": 2.24
+  },
+  "dates": {
+    "bond10y": "2026-08-04",
+    "bond2y": "2026-08-03",
+    "bond5y": "2026-08-04",
+    "vix": "2026-08-03",
+    "hyOas": "2026-08-03",
+    "igOas": "2026-08-03",
+    "inflationExpectations": "2026-07-29"
+  }
+}
