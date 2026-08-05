@@ -241,7 +241,8 @@ const _ESM_G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
 // v8.27.0: "trade balance" removed — Trade Balance is a SIGNED net level (deficit
 // negative, surplus positive), same as Current Account which this list already
 // correctly excludes. No inversion needed for a signed balance. Must stay in sync
-// with INVERSE_KW in dashboard.js and INVERSE_EVENTS in fetch_economic_calendar.py.
+// with INVERSE_KW in dashboard.js, INVERSE_EVENTS in fetch_economic_calendar.py, and
+// (as of v8.100.6) CAL_INVERSE_KW in calendar-panel.js.
 const _ESM_INVERSE_KW = ['unemployment','jobless','claims','deficit'];
 
 // _canonEsi — shared global defined in dashboard.js (loads before this file).

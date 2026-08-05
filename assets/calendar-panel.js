@@ -36,6 +36,16 @@
  *   since this panel is a plain scrollable list. The 330px inline max-height on
  *   #cal-events-body is overridden via the .cal-fs-active CSS rule in index.html so the
  *   full viewport height is used while fullscreen.
+ * v1.8 (2026-08-04): BUG FIX — Actual-column coloring never accounted for inverse
+ *   indicators (Unemployment Rate, Jobless Claims, deficit-type levels), where a higher
+ *   actual than forecast is a negative surprise. The naive `actualN > forecastN ? up :
+ *   down` comparison painted any numerically larger actual green, even when it meant
+ *   worse economic news. Found live: NZD Unemployment Rate (Q2) printed 5.6% vs. a 5.4%
+ *   forecast/previous — a negative surprise (unemployment rising) — and rendered green.
+ *   Added CAL_INVERSE_KW (mirrors INVERSE_KW in dashboard.js, _ESM_INVERSE_KW in
+ *   econ-surprises-modal.js, INVERSE_EVENTS in fetch_economic_calendar.py, which this
+ *   file had never implemented) and sign-correct the beat/miss check for matching
+ *   titles before assigning the up/down class.
  */
 (function () {
   'use strict';
@@ -56,6 +66,16 @@
   };
 
   const FLAG = { USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz' };
+
+  // Indicators where a higher actual than forecast is BAD news (rising unemployment,
+  // rising jobless claims, a wider deficit) and must render as "down" (red), not "up"
+  // (green). Without this, the naive actualN > forecastN comparison below paints a
+  // worse-than-expected print green just because the number itself is numerically
+  // larger — e.g. NZD Unemployment Rate printing 5.6% vs. 5.4% forecast/previous is a
+  // negative surprise but was rendering green before this fix.
+  // Must stay in sync with INVERSE_KW in dashboard.js, _ESM_INVERSE_KW in
+  // econ-surprises-modal.js, and INVERSE_EVENTS in fetch_economic_calendar.py.
+  const CAL_INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit'];
 
   // Browser timezone offset label e.g. "GMT-3"
   function tzLabel() {
@@ -331,9 +351,12 @@
           const stripNum  = s => s.replace(/&#\d+;/g, '').replace(/[%,KMBT\s]/gi, '');
           const actualN   = parseFloat(stripNum(String(ev.actual)));
           const forecastN = parseFloat(stripNum(String(forecastRaw || ev.previous || '')));
+          const evTitle   = (ev.title || '').toLowerCase();
+          const isInverse = CAL_INVERSE_KW.some(kw => evTitle.includes(kw));
           let cls = '';
           if (!isNaN(actualN) && !isNaN(forecastN) && actualN !== forecastN) {
-            cls = actualN > forecastN ? ' class="up"' : ' class="down"';
+            const beat = isInverse ? actualN < forecastN : actualN > forecastN;
+            cls = beat ? ' class="up"' : ' class="down"';
           }
           actualHtml = `<span${cls}>${ev.actual}</span>`;
         }

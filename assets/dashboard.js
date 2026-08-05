@@ -13007,6 +13007,9 @@ const NOISE_KW = [
 // smaller deficit / bigger surplus than expected — the good direction — with no
 // inversion needed. Confirmed against calendar.json: 36/36 Trade Balance prints
 // (GBP/USD) are negative-signed, matching the same convention as Current Account.
+// v8.100.6: calendar-panel.js's Actual-column coloring (CAL_INVERSE_KW) had never
+// implemented this concept at all — any change here must now also be evaluated for
+// calendar-panel.js, not just econ-surprises-modal.js and fetch_economic_calendar.py.
 const INVERSE_KW = ['unemployment', 'jobless', 'claims', 'deficit'];
 
 async function renderEconSurprises() {
