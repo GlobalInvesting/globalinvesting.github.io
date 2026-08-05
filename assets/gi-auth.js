@@ -1,6 +1,18 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.2.1
+ * GlobalInvesting FX Terminal — License Auth Module  v1.3.0
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.3.0 (2026-08-05): activation modal's broker copy updated from
+ *   TMGM-only to "TMGM or Vantage" — GlobalInvesting became an IB of
+ *   Vantage Global Limited alongside the existing TMGM partnership.
+ *   No functional/JWT change: the license worker's /admin/grant and
+ *   /validate flows were already broker-agnostic (account+server, where
+ *   server is the MT5 broker server name, was never checked against a
+ *   specific broker) — see GUIDELINES.md → "License worker — audit trail
+ *   & error visibility". Also fixed a pre-existing cache-buster drift:
+ *   index.html and sw.js were still pinned to ?v=1.0.2 despite this file's
+ *   own header already reading v1.2.1 before this change — same drift
+ *   class documented for calendar-panel.js/sw.js in CHANGELOG v8.100.7.
  *
  * Flow:
  *   1. On load, check localStorage/sessionStorage for a valid JWT
@@ -249,9 +261,9 @@
       on MQL5 Market. Enter the activation key shown in your MT5 terminal to unlock all panels.
     </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.85;margin-top:-10px;">
-      Opened a verified TMGM account instead? As our referral partner, TMGM account holders get full
-      web terminal access too &mdash; <a href="contact.html">contact us</a> for your access link, no MT5
-      key required.
+      Opened a verified account with Vantage or TMGM instead? As our referral partner, account holders
+      at either broker get full web terminal access too &mdash; <a href="contact.html">contact us</a>
+      for your access link, no MT5 key required.
     </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-8px;">
       New here? <a href="access.html">See the full walkthrough &amp; pricing &rarr;</a>
