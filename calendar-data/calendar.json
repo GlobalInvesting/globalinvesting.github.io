@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-05T11:35:16Z",
-  "generatedAt": "2026-08-05T11:35:16Z",
+  "lastUpdate": "2026-08-05T15:33:56Z",
+  "generatedAt": "2026-08-05T15:33:56Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-05",
   "rangeTo": "2026-08-07",
-  "totalEvents": 3714,
+  "totalEvents": 3716,
   "currencyCounts": {
     "EUR": 849,
     "CAD": 275,
-    "USD": 1256,
+    "USD": 1258,
     "NZD": 84,
     "AUD": 248,
     "GBP": 434,
@@ -23,7 +23,7 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1824,
+    "medium": 1826,
     "high": 1662,
     "low": 228
   },
@@ -374,14 +374,14 @@
       "std": 0.493288
     },
     "USD/eia gasoline stocks change": {
-      "n": 14,
-      "mean": 0.700286,
-      "std": 1.592271
+      "n": 15,
+      "mean": 0.630733,
+      "std": 1.557818
     },
     "USD/eia crude oil stocks change": {
-      "n": 14,
-      "mean": -1.3625,
-      "std": 3.269494
+      "n": 15,
+      "mean": -1.0064,
+      "std": 3.439209
     },
     "GBP/rics house price balance": {
       "n": 3,
@@ -1029,9 +1029,9 @@
       "std": 0.776745
     },
     "USD/adp employment change": {
-      "n": 2,
-      "mean": -5.0,
-      "std": 14.142136
+      "n": 3,
+      "mean": -12.0,
+      "std": 15.716234
     },
     "USD/factory orders mom": {
       "n": 3,
@@ -1039,9 +1039,9 @@
       "std": 0.51316
     },
     "USD/ism services pmi": {
-      "n": 2,
-      "mean": 0.35,
-      "std": 0.494975
+      "n": 3,
+      "mean": 0.1,
+      "std": 0.556776
     },
     "CHF/inflation rate yoy": {
       "n": 3,
@@ -46454,9 +46454,9 @@
       "flag": "🇺🇸",
       "event": "United States MBA 30-Year Mortgage Rate",
       "impact": "medium",
-      "actual": "6.81",
+      "actual": "6.81%",
       "forecast": null,
-      "previous": "6.76"
+      "previous": "6.76%"
     },
     {
       "date": "5 Aug",
@@ -46467,9 +46467,9 @@
       "flag": "🇺🇸",
       "event": "United States ADP Employment Change",
       "impact": "high",
-      "actual": null,
+      "actual": "44.0K",
       "forecast": "70.0K",
-      "previous": "98.0K"
+      "previous": "95.0K"
     },
     {
       "date": "5 Aug",
@@ -46480,9 +46480,35 @@
       "flag": "🇺🇸",
       "event": "United States ISM Services PMI",
       "impact": "high",
-      "actual": null,
+      "actual": "54.1",
       "forecast": "54.5",
       "previous": "54.0"
+    },
+    {
+      "date": "5 Aug",
+      "dateISO": "2026-08-05",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "-1.643M",
+      "forecast": "-1.3M",
+      "previous": "0.007M"
+    },
+    {
+      "date": "5 Aug",
+      "dateISO": "2026-08-05",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "2.479M",
+      "forecast": "-1.5M",
+      "previous": "-7.167M"
     },
     {
       "date": "5 Aug",
