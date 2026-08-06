@@ -7614,6 +7614,7 @@ async function buildInlineDetail(tvSym, container) {
   };
   const USD_IV = {};
   let atmIv = null;
+  let atmIvRank = null;
   try {
     const intra = await loadIntradayQuotes();
     const etfIv = intra?.fx_etf_iv || {};
@@ -7628,6 +7629,7 @@ async function buildInlineDetail(tvSym, container) {
     const ivEntry = etfIv[pairId];
     if (ivEntry?.iv != null) {
       atmIv = ivEntry.iv;
+      atmIvRank = ivEntry.iv_rank ?? null;
     } else if (pairId && meta?.cross) {
       const ivA = USD_IV[base] ?? null, ivB = USD_IV[quote] ?? null;
       if (ivA != null && ivB != null) {
@@ -7745,7 +7747,12 @@ async function buildInlineDetail(tvSym, container) {
   const cls   = v => v == null ? '' : v > 0 ? 'pd-up' : v < 0 ? 'pd-dn' : '';
   const clsI  = v => v == null ? '' : v > 0 ? 'pd-up' : v < 0 ? 'pd-dn' : '';
   const fmtV  = (v, suffix='') => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + suffix;
-  const ivCls = v => v == null ? '' : v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';
+  const ivCls = v => {
+    if (v == null) return '';
+    if (atmIvRank != null) return atmIvRank > 70 ? 'pd-dn' : atmIvRank < 30 ? 'pd-up' : '';
+    return v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';
+  };
+  const hvCls = v => v == null ? '' : v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';
 
   // COT summary tag — for crosses show both component currencies
   let cotTag = '—';
@@ -7807,10 +7814,10 @@ async function buildInlineDetail(tvSym, container) {
       <div class="pd-inline-group">
         <div class="pd-inline-group-lbl">Volatility</div>
         <div class="pd-inline-metrics">
-          <div class="pd-inline-metric fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised volatility, annualised — how much the pair has actually moved. Low HV = quiet market; high HV = volatile market. Color = same cost-of-hedging scale as ATM IV: green ≤7% (quiet), red >12% (volatile). Not a directional signal.">
-            <div class="pd-inline-lbl">HV 30d</div><div class="pd-inline-val ${ivCls(hv30)}">${hv30 != null ? hv30.toFixed(1) + '%' : '—'}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised volatility, annualised — how much the pair has actually moved. Low HV = quiet market; high HV = volatile market. No 52-week percentile is computed for realised vol, so color uses a fixed band: green ≤7% (quiet), red >12% (volatile). Not a directional signal.">
+            <div class="pd-inline-lbl">HV 30d</div><div class="pd-inline-val ${hvCls(hv30)}">${hv30 != null ? hv30.toFixed(1) + '%' : '—'}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="ATM Implied Volatility" data-tip-body="ATM IV from CBOE/CME FX Volatility Indexes (^EUVIX, ^BPVIX, ^JYVIX, ^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark proxy for OTC interbank IV. Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal.">
+          <div class="pd-inline-metric fx-tip" data-tip-title="ATM Implied Volatility" data-tip-body="ATM IV from CBOE/CME FX Volatility Indexes (^EUVIX, ^BPVIX, ^JYVIX, ^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark proxy for OTC interbank IV. ${atmIvRank != null ? 'Color = IV Rank vs 52-week range: green rank&lt;30 (historically cheap), red rank&gt;70 (historically expensive).' : 'Color = cost of hedging: green ≤7% (cheap), red >12% (expensive) — fixed band; IV Rank not yet available (needs ≥4 weeks history).'} Not a directional signal.">
             <div class="pd-inline-lbl">ATM IV</div><div class="pd-inline-val ${ivCls(atmIv)}">${atmIv != null ? atmIv.toFixed(1) + '%' : '—'}</div>
           </div>
           <div class="pd-inline-metric fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol — the volatility risk premium (VRP). Positive = options pricing in more than recent realised moves (expensive, red). Negative = options cheap vs realised (green). IV running above HV is the market's normal state, since option sellers demand a premium — a negative spread is comparatively rare. Not a directional signal.">
@@ -8194,6 +8201,7 @@ async function updatePairDetail(tvSym) {
   };
   const USD_IV = {}; // non-USD ccy → IV%
   let atmIv = null;
+  let atmIvRank = null;
   let nzdProxy = false;
   try {
     const intra = await loadIntradayQuotes();
@@ -8216,6 +8224,7 @@ async function updatePairDetail(tvSym) {
     const ivEntry = etfIv[pairId];
     if (ivEntry?.iv != null) {
       atmIv = ivEntry.iv;
+      atmIvRank = ivEntry.iv_rank ?? null;
     } else if (pairId && meta?.cross) {
       // Synthesise cross IV from component USD-pair IVs
       const ivA = USD_IV[base]  ?? null;
@@ -8398,8 +8407,8 @@ async function updatePairDetail(tvSym) {
     <div class="pd-section">
       <div class="pd-section-lbl">Volatility</div>
       <div class="pd-grid">
-        <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market. Color = same cost-of-hedging scale as ATM IV: green ≤7% (quiet), red >12% (volatile). Not a directional signal."><div class="pd-lbl">HV 30d</div><div class="pd-val ${hv30 != null ? (hv30 > 12 ? 'pd-dn' : hv30 > 7 ? '' : 'pd-up') : ''}">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair CBOE/CME vol index values via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD CBOE/CME vol index (^AUDVIX) × 1.08 (long-run NZD/AUD realised vol ratio). No dedicated CBOE/CME NZD vol index exists — treat as directional context only.' : 'ATM implied vol from CBOE/CME FX Volatility Index (^EUVIX/^BPVIX/^JYVIX/^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark for FX options pricing. CHF/CAD: CME futures options or CBOE ETF fallback.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market. No 52-week percentile is computed for realised vol, so color uses a fixed band: green ≤7% (quiet), red >12% (volatile). Not a directional signal."><div class="pd-lbl">HV 30d</div><div class="pd-val ${hv30 != null ? (hv30 > 12 ? 'pd-dn' : hv30 > 7 ? '' : 'pd-up') : ''}">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair CBOE/CME vol index values via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD CBOE/CME vol index (^AUDVIX) × 1.08 (long-run NZD/AUD realised vol ratio). No dedicated CBOE/CME NZD vol index exists — treat as directional context only.' : 'ATM implied vol from CBOE/CME FX Volatility Index (^EUVIX/^BPVIX/^JYVIX/^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark for FX options pricing. CHF/CAD: CME futures options or CBOE ETF fallback.'} ${atmIvRank != null ? 'Color = IV Rank vs 52-week range: green rank&lt;30 (historically cheap), red rank&gt;70 (historically expensive).' : 'Color = cost of hedging: green ≤7% (cheap), red >12% (expensive) — fixed band; IV Rank not available for this pair (synthesised/proxy or &lt;4 weeks history).'} Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIvRank != null ? (atmIvRank > 70 ? 'pd-dn' : atmIvRank < 30 ? 'pd-up' : '') : (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up')) : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol — the volatility risk premium (VRP). Positive = options are expensive relative to recent moves (market pricing in a premium). Negative = options are cheap vs realised. IV running above HV is the market's normal state, since option sellers demand a premium — a negative spread is comparatively rare. Not a directional signal." data-tip-ex="IV−HV > +3% historically indicates options are pricing in a premium above recent realised moves — hedging costs are elevated relative to actual market movement. A persistently negative VRP (rare) has historically preceded vol-expansion events, as it signals options are underpricing risk relative to what's actually happening."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(hv30 - atmIv) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="25-delta Risk Reversal (1M) · Saxo Bank" data-tip-body="25d RR = 25d call IV minus 25d put IV. Positive = calls bid over puts — market skewed for upside on ${rrBase}. Negative = puts bid — downside protection dominant. Source: Saxo Bank public options page, 1M tenor, indicative mid-market. Updated during European hours." data-tip-ex="RR is a directional skew signal, not a vol-level signal. A strongly negative RR alongside high ATM IV = market pricing in both expensive hedging AND downside risk — historically a high-conviction bearish setup."><div class="pd-lbl">25d RR</div><div class="pd-val ${rrVal != null ? cls(rrVal) : ''}">${rrVal != null ? (rrVal >= 0 ? '+' : '') + rrVal.toFixed(2) : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Dynamically adjusted for current volatility conditions — wider during high-vol sessions and around news events. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in the Asian session and around data releases."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
