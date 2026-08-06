@@ -48,6 +48,7 @@ The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — li
 - US Treasury yield curve (3M · 2Y · 5Y · 10Y · 30Y)
 - Cross-asset risk monitor (SPX · Gold · WTI · BTC · DXY · Nikkei · Stoxx) with stress scoring, plus US HY/IG credit spreads (ICE BofA OAS) and 20-day spread-direction tracking
 - Carry Trade Ranking — G10 carry-to-vol for all 45 pairs with real rate breakdown and sustainability assessment
+- Volatility Leaderboard — top 5 of all 28 G10 pairs ranked by current ATM implied volatility (direct CBOE/CME FX Volatility Index for USD majors, triangulated for crosses), surfacing where options-market-priced movement is highest right now
 - Economic Matrix — latest GDP, CPI, unemployment, industrial production, business confidence, retail sales, current account, and trade balance for all 10 G10 economies, alongside 10-year sovereign yield and central bank policy rate, sourced from the live economic calendar
 
 ### Derivatives & Flow
