@@ -163,6 +163,24 @@ function openYCModal(tenorData) {
   const shape = _ycShape(tenorData);
   const shapeColors = { Inverted: 'var(--down)', Flat: 'var(--orange)', Normal: 'var(--up)', Steep: 'var(--chart-line)' };
   const shapeCol = shapeColors[shape] || 'var(--text2)';
+  const shapeTips = {
+    Inverted: {
+      title: 'Curve Shape: Inverted',
+      body: '10Y\u20132Y spread is negative \u2014 short-term rates exceed long-term rates. Historically the most reliable recession signal: every US recession in the past 50 years was preceded by a 2Y/10Y inversion. Lag from inversion to recession has ranged 6\u201324 months, and the signal has produced occasional false positives \u2014 treat as a probability signal, not a timing tool.'
+    },
+    Flat: {
+      title: 'Curve Shape: Flat',
+      body: '10Y\u20132Y spread is within \u00b120bp of zero. Usually a transition zone \u2014 either the late stage of a Fed tightening cycle, with inversion close behind, or the early stage of a post-inversion steepening. The direction of change over the following weeks matters more than the flat reading itself.'
+    },
+    Normal: {
+      title: 'Curve Shape: Normal',
+      body: '10Y\u20132Y spread is modestly positive (20\u201350bp) \u2014 the textbook upward-sloping curve, reflecting the standard term premium investors demand for holding longer maturities. Consistent with steady growth expectations and no acute recession signal from the 2Y/10Y spread.'
+    },
+    Steep: {
+      title: 'Curve Shape: Steep',
+      body: '10Y\u20132Y spread exceeds 50bp. Common early in an economic recovery, as the Fed holds or cuts short rates while the long end prices in growth (\u201cbull steepening\u201d). Can also reflect rising inflation or fiscal risk premium pushing up long yields (\u201cbear steepening\u201d) \u2014 check whether the move is driven by falling short yields or rising long yields to tell which.'
+    }
+  };
   const labels    = tenorData.map(t => t.label);
   const todayVals = tenorData.map(t => t.close);
   const priorVals = tenorData.map(t => t.prev_close);
@@ -213,7 +231,7 @@ function openYCModal(tenorData) {
     <div id="ycm-legend">
       <div class="ycm-leg-item"><div class="ycm-leg-dot" style="background:var(--chart-line);height:2px;"></div>Today</div>
       <div class="ycm-leg-item"><div class="ycm-leg-dot dashed" style="color:var(--text2);"></div>Prior close</div>
-      ${shape ? `<div class="ycm-leg-item" style="margin-left:auto;color:${shapeCol};font-weight:600;">${shape}</div>` : ''}
+      ${shape ? `<div class="ycm-leg-item fx-tip" data-tip-title="${shapeTips[shape]?.title || shape}" data-tip-body="${shapeTips[shape]?.body || ''}" style="margin-left:auto;color:${shapeCol};font-weight:600;cursor:help;">${shape}</div>` : ''}
     </div>
     <div id="ycm-canvas-wrap"><canvas id="ycm-canvas"></canvas></div>
   </div>
@@ -229,6 +247,12 @@ function openYCModal(tenorData) {
 </div>`;
 
   (document.getElementById('main') || document.body).appendChild(bd);
+  bd.querySelectorAll('.fx-tip').forEach(cell => {
+    const title = cell.dataset.tipTitle || '';
+    const body  = cell.dataset.tipBody  || '';
+    if (!title && !body) return;
+    if (typeof attachRiskTip === 'function') attachRiskTip(cell, title, body, '');
+  });
   bd.addEventListener('click', e => { if (e.target === bd) closeYCModal(); });
   document.addEventListener('keydown', _ycKeydown);
   // Scroll modal into view on mobile — same double-rAF pattern as heatmap-modal and cb-rates-modal
