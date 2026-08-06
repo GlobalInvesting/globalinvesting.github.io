@@ -596,6 +596,110 @@ test('known EUR/USD–DXY anti-correlation scenario', () => {
   expect(r).toBeLessThan(-0.9); // strongly negative
 });
 
+// ─── 10. squarifyTreemap (Volatility Leaderboard) ─────────────────────────────
+
+function squarifyTreemap(items, x, y, w, h) {
+  const positive = items.filter(d => d.value > 0);
+  const total = positive.reduce((s, d) => s + d.value, 0);
+  if (total <= 0 || w <= 0 || h <= 0) return [];
+  const scale = (w * h) / total;
+  const scaled = positive.map(d => ({ ...d, area: d.value * scale }));
+  const rects = [];
+  let remaining = scaled;
+  let rx = x, ry = y, rw = w, rh = h;
+
+  const worstRatio = (row, side) => {
+    const sum = row.reduce((s, r) => s + r.area, 0);
+    let max = -Infinity, min = Infinity;
+    for (const r of row) { if (r.area > max) max = r.area; if (r.area < min) min = r.area; }
+    const side2 = side * side, sum2 = sum * sum;
+    return Math.max((side2 * max) / sum2, sum2 / (side2 * min));
+  };
+
+  while (remaining.length) {
+    const vertical = rw >= rh;
+    const side = vertical ? rh : rw;
+    let row = [remaining[0]];
+    let bestWorst = worstRatio(row, side);
+    let i = 1;
+    while (i < remaining.length) {
+      const testRow = row.concat([remaining[i]]);
+      const testWorst = worstRatio(testRow, side);
+      if (testWorst <= bestWorst) { row = testRow; bestWorst = testWorst; i++; }
+      else break;
+    }
+    const rowSum = row.reduce((s, r) => s + r.area, 0);
+    if (vertical) {
+      const stripW = rowSum / rh;
+      let cy = ry;
+      for (const r of row) {
+        const itemH = r.area / stripW;
+        rects.push({ ...r, x: rx, y: cy, w: stripW, h: itemH });
+        cy += itemH;
+      }
+      rx += stripW; rw -= stripW;
+    } else {
+      const stripH = rowSum / rw;
+      let cx = rx;
+      for (const r of row) {
+        const itemW = r.area / stripH;
+        rects.push({ ...r, x: cx, y: ry, w: itemW, h: stripH });
+        cx += itemW;
+      }
+      ry += stripH; rh -= stripH;
+    }
+    remaining = remaining.slice(row.length);
+  }
+  return rects;
+}
+
+console.log('\n── 10. squarifyTreemap ──');
+
+test('total tile area equals container area', () => {
+  const items = [{ value: 29.5 }, { value: 29.4 }, { value: 28.5 }, { value: 28.2 }, { value: 27.3 }];
+  const rects = squarifyTreemap(items, 0, 0, 300, 112);
+  const sumArea = rects.reduce((s, r) => s + r.w * r.h, 0);
+  expect(sumArea).toBeCloseTo(300 * 112, 4);
+});
+
+test('larger value gets a larger tile', () => {
+  const items = [{ id: 'big', value: 45 }, { id: 'small', value: 8 }];
+  const rects = squarifyTreemap(items, 0, 0, 200, 100);
+  const big = rects.find(r => r.id === 'big');
+  const small = rects.find(r => r.id === 'small');
+  expect(big.w * big.h > small.w * small.h).toBe(true);
+});
+
+test('equal values produce equal-area tiles', () => {
+  const items = [{ value: 10 }, { value: 10 }, { value: 10 }];
+  const rects = squarifyTreemap(items, 0, 0, 210, 100);
+  const areas = rects.map(r => r.w * r.h);
+  expect(areas[0]).toBeCloseTo(areas[1], 2);
+  expect(areas[1]).toBeCloseTo(areas[2], 2);
+});
+
+test('single item fills the entire container', () => {
+  const rects = squarifyTreemap([{ value: 42 }], 0, 0, 150, 90);
+  expect(rects.length).toBe(1);
+  expect(rects[0].w).toBeCloseTo(150, 4);
+  expect(rects[0].h).toBeCloseTo(90, 4);
+});
+
+test('empty input returns no rects', () => {
+  expect(squarifyTreemap([], 0, 0, 100, 100).length).toBe(0);
+});
+
+test('zero/negative values are excluded, not laid out as empty tiles', () => {
+  const items = [{ id: 'ok', value: 10 }, { id: 'bad', value: 0 }, { id: 'neg', value: -5 }];
+  const rects = squarifyTreemap(items, 0, 0, 100, 50);
+  expect(rects.length).toBe(1);
+  expect(rects[0].id).toBe('ok');
+});
+
+test('degenerate container (zero width) returns no rects', () => {
+  expect(squarifyTreemap([{ value: 10 }], 0, 0, 0, 50).length).toBe(0);
+});
+
 // ─── Summary ─────────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(50)}`);
 console.log(`Results: ${_passed} passed, ${_failed} failed`);

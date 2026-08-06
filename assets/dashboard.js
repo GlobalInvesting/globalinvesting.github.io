@@ -8919,6 +8919,69 @@ async function fetchCarryRanking() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// Squarified treemap layout (Bruls/Huizing/van Wijk). Used by the
+// Volatility Leaderboard so tile AREA — not bar length — encodes magnitude.
+// Pure geometry helper: takes items with a numeric `value` plus a pixel
+// rect, returns the same items augmented with x/y/w/h (px) rectangles whose
+// areas are proportional to `value` and whose aspect ratios are kept as
+// close to square as the data allows. Covered by dashboard.test.js.
+// ═══════════════════════════════════════════════════════════════════
+function squarifyTreemap(items, x, y, w, h) {
+  const positive = items.filter(d => d.value > 0);
+  const total = positive.reduce((s, d) => s + d.value, 0);
+  if (total <= 0 || w <= 0 || h <= 0) return [];
+  const scale = (w * h) / total;
+  const scaled = positive.map(d => ({ ...d, area: d.value * scale }));
+  const rects = [];
+  let remaining = scaled;
+  let rx = x, ry = y, rw = w, rh = h;
+
+  const worstRatio = (row, side) => {
+    const sum = row.reduce((s, r) => s + r.area, 0);
+    let max = -Infinity, min = Infinity;
+    for (const r of row) { if (r.area > max) max = r.area; if (r.area < min) min = r.area; }
+    const side2 = side * side, sum2 = sum * sum;
+    return Math.max((side2 * max) / sum2, sum2 / (side2 * min));
+  };
+
+  while (remaining.length) {
+    const vertical = rw >= rh; // strip spans the full SHORT side of what's left
+    const side = vertical ? rh : rw;
+    let row = [remaining[0]];
+    let bestWorst = worstRatio(row, side);
+    let i = 1;
+    while (i < remaining.length) {
+      const testRow = row.concat([remaining[i]]);
+      const testWorst = worstRatio(testRow, side);
+      if (testWorst <= bestWorst) { row = testRow; bestWorst = testWorst; i++; }
+      else break;
+    }
+    const rowSum = row.reduce((s, r) => s + r.area, 0);
+    if (vertical) {
+      const stripW = rowSum / rh;
+      let cy = ry;
+      for (const r of row) {
+        const itemH = r.area / stripW;
+        rects.push({ ...r, x: rx, y: cy, w: stripW, h: itemH });
+        cy += itemH;
+      }
+      rx += stripW; rw -= stripW;
+    } else {
+      const stripH = rowSum / rw;
+      let cx = rx;
+      for (const r of row) {
+        const itemW = r.area / stripH;
+        rects.push({ ...r, x: cx, y: ry, w: itemW, h: stripH });
+        cx += itemW;
+      }
+      ry += stripH; rh -= stripH;
+    }
+    remaining = remaining.slice(row.length);
+  }
+  return rects;
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // VOLATILITY LEADERBOARD — "trade the volatility, not the pair"
 // Ranks all 28 G10 pairs by current ATM implied volatility (direct CBOE/CME
 // FX Volatility Index for the 6 USD majors; triangulated for the 21 crosses;
@@ -8927,8 +8990,10 @@ async function fetchCarryRanking() {
 // where the options market is currently pricing the most movement, i.e.
 // where a catalyst (data print, sentiment shift) is most likely playing out
 // right now, independent of which pair the trader habitually watches.
-// Row shows IV Rank (percentile vs 52-week range) when available for that
-// pair, since "most volatile" and "unusually volatile for this pair" are
+// Rendered as a treemap (v8.103.0) — tile AREA is ATM IV, the panel's own
+// ranking criterion, so size does the job a bar used to do. Each tile also
+// shows IV Rank (percentile vs 52-week range) when available for that pair,
+// since "most volatile" and "unusually volatile for this pair" are
 // different reads — both are surfaced rather than collapsed into one.
 // ═══════════════════════════════════════════════════════════════════
 async function fetchVolLeaderboard() {
@@ -8986,7 +9051,7 @@ async function fetchVolLeaderboard() {
 
     rows.sort((a, b) => b.atmIv - a.atmIv);
     const top = rows.slice(0, 5);
-    const maxIv = Math.max(...top.map(r => r.atmIv), 0.01);
+    _volLbTopCache = top; // re-laid-out on resize without a refetch
 
     // Header tooltip — explains the ranking methodology, attached once
     const sbHead = container.closest('.sb-section')?.querySelector('.sb-head');
@@ -8994,7 +9059,7 @@ async function fetchVolLeaderboard() {
       sbHead._volLbTipAttached = true;
       sbHead.style.cursor = 'help';
       const tipTitle = 'Volatility Leaderboard';
-      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. Bar and % show the raw level (where the action is today); the chip on the right shows IV Rank — the percentile vs the pair\u2019s own 52-week range — for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). ~est = triangulated cross with no rank of its own. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
+      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. Tile size is ATM IV itself (bigger tile = more current movement priced in, not a bar length); the small line inside each tile shows IV Rank — the percentile vs the pair\u2019s own 52-week range — for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). Tile shade tracks the same size metric and carries no separate meaning. ~est = triangulated cross with no rank of its own. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
       const tipEx    = 'Principle: the best opportunity today may not be your usual pair — it\u2019s wherever a data print or sentiment catalyst is driving implied vol higher. Best used as a starting-market filter, not a standalone entry signal.';
       sbHead.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('fx-tt');
@@ -9012,39 +9077,71 @@ async function fetchVolLeaderboard() {
       });
     }
 
-    container.innerHTML = top.map((r, idx) => {
-      const sym = 'FX_IDC:' + r.id.toUpperCase();
-      const barPct = Math.max(Math.round((r.atmIv / maxIv) * 100), 4);
-      const tipRank = r.ivRank != null ? ` · IV Rank ${r.ivRank.toFixed(0)}` : '';
-      const tip = `${r.label} · ATM IV ${r.atmIv.toFixed(1)}%${tipRank}${r.estimated ? ' (triangulated)' : ''} — Click for chart · detail`;
-      // Hybrid row: magnitude bar answers "most volatile right now" (the
-      // Medrow ranking question, unchanged); the percentile chip answers the
-      // separate question "is that high/low FOR THIS PAIR" — informational
-      // only, deliberately neutral (no green/red). This panel's own selection
-      // criterion IS "high right now", so a cheap/expensive semaphore here
-      // would misread as a buy/sell warning — that reading belongs to the
-      // pair-detail ATM IV field (ivCls() in buildInlineDetail), which speaks
-      // to an options trader deciding whether to buy or sell premium and
-      // correctly keeps its green<30/red>70 semaphore. Two different
-      // questions, two different color rules — same underlying IV Rank number.
-      const chipLabel = r.ivRank != null ? r.ivRank.toFixed(0) + '%ile' : '~est';
-      return `<div class="vol-lb-row" data-sym="${sym}" title="${tip}">
-        <span class="cr-rank">${idx + 1}</span>
-        <span class="cr-pair">${r.label}</span>
-        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
-        <span class="cr-diff">${r.atmIv.toFixed(1)}%</span>
-        <span class="vol-lb-chip">${chipLabel}</span>
-      </div>`;
-    }).join('');
+    renderVolTreemap(container);
 
-    container.querySelectorAll('.vol-lb-row[data-sym]').forEach(row => {
-      row.addEventListener('click', () => loadTVChart(row.dataset.sym));
-    });
+    // Re-lay-out (not re-fetch) on width changes — sidebar can be resized
+    // 120px–320px (see dashboard.css comment), and a treemap's rectangles,
+    // unlike a row list, depend on the container's actual aspect ratio.
+    if (typeof ResizeObserver !== 'undefined' && !container._volLbRO) {
+      let debounce = null;
+      container._volLbRO = new ResizeObserver(() => {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => renderVolTreemap(container), 80);
+      });
+      container._volLbRO.observe(container);
+    }
 
   } catch (e) {
     console.warn('[VolLeaderboard]', e);
     if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
   }
+}
+
+// Cache of the last-fetched top-5 rows, so a container resize can re-lay-out
+// the treemap without hitting loadIntradayQuotes() again.
+let _volLbTopCache = [];
+
+// Renders the current _volLbTopCache into `container` as a squarified
+// treemap. Tile AREA is ATM IV (the panel's ranking criterion); tile shade
+// is a single-hue intensity ramp over that same value — redundant with area,
+// not a second signal, and never a cheap/expensive semaphore (see the
+// tooltip body above and CHANGELOG v8.102.3 for why that distinction
+// matters on this specific panel).
+function renderVolTreemap(container) {
+  const top = _volLbTopCache;
+  if (!container || !top.length) return;
+
+  container.className = 'vol-lb-treemap';
+  const w = container.clientWidth || 240;
+  const h = 112;
+  const GAP = 3;
+  const maxIv = Math.max(...top.map(r => r.atmIv), 0.01);
+
+  const rects = squarifyTreemap(top.map(r => ({ ...r, value: r.atmIv })), 0, 0, w, h);
+
+  container.innerHTML = rects.map((r, idx) => {
+    const sym = 'FX_IDC:' + r.id.toUpperCase();
+    const tipRank = r.ivRank != null ? ` · IV Rank ${r.ivRank.toFixed(0)}` : '';
+    const tip = `${r.label} · ATM IV ${r.atmIv.toFixed(1)}%${tipRank}${r.estimated ? ' (triangulated)' : ''} — Click for chart · detail`;
+    const chipLabel = r.ivRank != null ? r.ivRank.toFixed(0) + '%ile' : '~est';
+    // Shade intensity ramps with rank, not with the raw value directly, so
+    // the darkest tile is always the top mover regardless of how close the
+    // top-5 values are to each other (they're often within 1-2 vol points).
+    const alpha = (0.16 + (r.atmIv / maxIv) * 0.34).toFixed(2);
+    const tileW = Math.max(r.w - GAP, 0), tileH = Math.max(r.h - GAP, 0);
+    const showChip = tileW >= 46 && tileH >= 30;
+    const showVal  = tileW >= 30 && tileH >= 18;
+    return `<div class="vol-lb-tile" data-sym="${sym}" title="${tip}"
+        style="left:${(r.x + GAP / 2).toFixed(1)}px; top:${(r.y + GAP / 2).toFixed(1)}px; width:${tileW.toFixed(1)}px; height:${tileH.toFixed(1)}px; background:rgba(38,166,154,${alpha});">
+        <span class="vlt-pair">${r.label}</span>
+        ${showVal ? `<span class="vlt-val">${r.atmIv.toFixed(1)}%</span>` : ''}
+        ${showChip ? `<span class="vlt-chip">${chipLabel}</span>` : ''}
+      </div>`;
+  }).join('');
+
+  container.querySelectorAll('.vol-lb-tile[data-sym]').forEach(tile => {
+    tile.addEventListener('click', () => loadTVChart(tile.dataset.sym));
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
