@@ -8994,7 +8994,7 @@ async function fetchVolLeaderboard() {
       sbHead._volLbTipAttached = true;
       sbHead.style.cursor = 'help';
       const tipTitle = 'Volatility Leaderboard';
-      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. Bar and % show the raw level (where the action is today); the chip on the right shows IV Rank — the percentile vs the pair\u2019s own 52-week range — so you can see whether that level is high for the market or just high for that specific pair. Green chip = historically cheap (rank<30), red = historically expensive (rank>70), ~est = triangulated cross with no rank of its own. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
+      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. Bar and % show the raw level (where the action is today); the chip on the right shows IV Rank — the percentile vs the pair\u2019s own 52-week range — for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). ~est = triangulated cross with no rank of its own. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
       const tipEx    = 'Principle: the best opportunity today may not be your usual pair — it\u2019s wherever a data print or sentiment catalyst is driving implied vol higher. Best used as a starting-market filter, not a standalone entry signal.';
       sbHead.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('fx-tt');
@@ -9019,20 +9019,21 @@ async function fetchVolLeaderboard() {
       const tip = `${r.label} · ATM IV ${r.atmIv.toFixed(1)}%${tipRank}${r.estimated ? ' (triangulated)' : ''} — Click for chart · detail`;
       // Hybrid row: magnitude bar answers "most volatile right now" (the
       // Medrow ranking question, unchanged); the percentile chip answers the
-      // separate question "is that high/low FOR THIS PAIR", using the same
-      // rank thresholds as ivCls() in buildInlineDetail (pair-detail panel) —
-      // green <30 (historically cheap), red >70 (historically expensive),
-      // neutral 30-70, dim "~est" when no rank exists (triangulated crosses).
-      // Matches the Bloomberg CVOL / ORATS convention of showing raw level and
-      // percentile-rank together in the same row rather than either alone.
-      const chipCls   = r.ivRank == null ? 'rank-est' : r.ivRank > 70 ? 'rank-high' : r.ivRank < 30 ? 'rank-low' : 'rank-mid';
+      // separate question "is that high/low FOR THIS PAIR" — informational
+      // only, deliberately neutral (no green/red). This panel's own selection
+      // criterion IS "high right now", so a cheap/expensive semaphore here
+      // would misread as a buy/sell warning — that reading belongs to the
+      // pair-detail ATM IV field (ivCls() in buildInlineDetail), which speaks
+      // to an options trader deciding whether to buy or sell premium and
+      // correctly keeps its green<30/red>70 semaphore. Two different
+      // questions, two different color rules — same underlying IV Rank number.
       const chipLabel = r.ivRank != null ? r.ivRank.toFixed(0) + '%ile' : '~est';
       return `<div class="vol-lb-row" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
         <span class="cr-pair">${r.label}</span>
         <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
         <span class="cr-diff">${r.atmIv.toFixed(1)}%</span>
-        <span class="vol-lb-chip ${chipCls}">${chipLabel}</span>
+        <span class="vol-lb-chip">${chipLabel}</span>
       </div>`;
     }).join('');
 
