@@ -9105,29 +9105,36 @@ async function fetchVolLeaderboard() {
 // the treemap without hitting loadIntradayQuotes() again.
 let _volLbTopCache = [];
 
-// Rank → treemap weight, geometric decay (halves each place). Deliberately
-// NOT the raw ATM IV value — see v8.103.1 CHANGELOG entry. The top-5 pairs
-// are typically within a couple of vol points of each other, so an area
-// literally proportional to ATM IV renders as five near-identical tiles
-// (confirmed against production data after v8.103.0 shipped). Ranking by
-// POSITION instead keeps the panel's actual point — "this one, then this
-// one, then this one" — legible regardless of how tight the underlying
-// numbers are. Exact ATM IV and IV Rank are never hidden: both are printed
-// as text on every tile that has room for them.
+// Rank → treemap weight. NOT the raw ATM IV value — see v8.103.1 CHANGELOG
+// entry: the top-5 pairs are typically within a couple of vol points of
+// each other, so an area literally proportional to ATM IV renders as five
+// near-identical tiles. These specific percentages (58/21/10/6/5) reproduce
+// the proportions of the treemap mock Santiago approved — not an arbitrary
+// decay curve — so tile 1 is always dominant and tiles 4-5 land as a
+// stacked pair on the right, same structure as the mock, at the sidebar's
+// typical width. Exact ATM IV and IV Rank are never hidden: both are
+// printed as text on every tile that has room for them.
+const VOL_LB_RANK_WEIGHT = [58, 21, 10, 6, 5];
 function rankTreemapWeight(idx) {
-  return Math.pow(2, 4 - Math.min(idx, 4));
+  return VOL_LB_RANK_WEIGHT[Math.min(idx, VOL_LB_RANK_WEIGHT.length - 1)];
 }
 
-// Rank → tile shade alpha, linear step down. Same rank-not-raw-value logic
-// as rankTreemapWeight() — shade must stay visually distinct even when the
-// underlying ATM IV values barely differ.
-function rankTileAlpha(idx) {
-  return Math.max(0.55 - idx * 0.10, 0.15);
+// Rank → tile color class (see .vol-lb-tile.vlt-r1..r5 in dashboard.css).
+// Fixed hex tints per rank, not a computed rgba/alpha ramp — same pattern
+// already used for MT5 heatmap cells (`.h-s-up`/`.h-up`/etc.) rather than
+// the general --up/--down variables, because this is a purpose-built
+// magnitude gradient, not a semantic color. Values match the approved mock
+// exactly (darkest green = rank 1, near-black-green = rank 5) rather than
+// an alpha blend that read as visually flat once the top-5 IVs were close
+// together (the bug fixed in v8.103.1 turned out to still look flat after
+// the fix — computed alpha steps are visually subtler than fixed tints).
+function rankTileClass(idx) {
+  return 'vlt-r' + (Math.min(idx, 4) + 1);
 }
 
 // Renders the current _volLbTopCache into `container` as a squarified
 // treemap. Tile area and shade both rank-encode ATM IV (see
-// rankTreemapWeight/rankTileAlpha above) — redundant with each other, not
+// rankTreemapWeight/rankTileClass above) — redundant with each other, not
 // two separate signals, and never a cheap/expensive semaphore (see the
 // tooltip body above and CHANGELOG v8.102.3 for why that distinction
 // matters on this specific panel).
@@ -9137,7 +9144,11 @@ function renderVolTreemap(container) {
 
   container.className = 'vol-lb-treemap';
   const w = container.clientWidth || 240;
-  const h = 112;
+  const h = 140; // taller than the old 5-row block (v8.103.0's 112px) —
+                  // needed so the two smallest tiles lay out as a stacked
+                  // pair (mock's structure) instead of two unreadably thin
+                  // side-by-side slivers; see squarify's own aspect-ratio
+                  // logic, unchanged, in squarifyTreemap() above.
   const GAP = 3;
 
   const rects = squarifyTreemap(
@@ -9150,15 +9161,31 @@ function renderVolTreemap(container) {
     const tipRank = r.ivRank != null ? ` · IV Rank ${r.ivRank.toFixed(0)}` : '';
     const tip = `${r.label} · ATM IV ${r.atmIv.toFixed(1)}%${tipRank}${r.estimated ? ' (triangulated)' : ''} — Click for chart · detail`;
     const chipLabel = r.ivRank != null ? r.ivRank.toFixed(0) + '%ile' : '~est';
-    const alpha = rankTileAlpha(idx).toFixed(2);
     const tileW = Math.max(r.w - GAP, 0), tileH = Math.max(r.h - GAP, 0);
-    const showChip = tileW >= 46 && tileH >= 30;
-    const showVal  = tileW >= 30 && tileH >= 18;
-    return `<div class="vol-lb-tile" data-sym="${sym}" title="${tip}"
-        style="left:${(r.x + GAP / 2).toFixed(1)}px; top:${(r.y + GAP / 2).toFixed(1)}px; width:${tileW.toFixed(1)}px; height:${tileH.toFixed(1)}px; background:rgba(38,166,154,${alpha});">
-        <span class="vlt-pair">${r.label}</span>
-        ${showVal ? `<span class="vlt-val">${r.atmIv.toFixed(1)}%</span>` : ''}
-        ${showChip ? `<span class="vlt-chip">${chipLabel}</span>` : ''}
+
+    // Three display tiers by available height — never a clipped label.
+    // A tile either gets room to show its pair+value cleanly or it shows
+    // nothing but its background (hover still surfaces the full tooltip
+    // and the tile stays clickable). This replaces the old ellipsis
+    // truncation, which produced unreadable fragments like "AUD/…".
+    const canShowAnything = tileW >= 38 && tileH >= 16;
+    const stacked = tileH >= 45;                          // pair + value each on their own line
+    const showChip = stacked && tileW >= 48 && tileH >= 48;
+
+    let body = '';
+    if (canShowAnything && stacked) {
+      body = `<span class="vlt-pair">${r.label}</span>
+        <span class="vlt-val">${r.atmIv.toFixed(1)}%</span>
+        ${showChip ? `<span class="vlt-chip">${chipLabel}</span>` : ''}`;
+    } else if (canShowAnything) {
+      // Compact tiles: label + value combined on a single centered line,
+      // matching the approved mock's small-tile treatment exactly.
+      body = `<span class="vlt-combo">${r.label} ${r.atmIv.toFixed(1)}%</span>`;
+    }
+
+    return `<div class="vol-lb-tile ${rankTileClass(idx)}${stacked ? '' : ' vlt-compact'}" data-sym="${sym}" title="${tip}"
+        style="left:${(r.x + GAP / 2).toFixed(1)}px; top:${(r.y + GAP / 2).toFixed(1)}px; width:${tileW.toFixed(1)}px; height:${tileH.toFixed(1)}px;">
+        ${body}
       </div>`;
   }).join('');
 

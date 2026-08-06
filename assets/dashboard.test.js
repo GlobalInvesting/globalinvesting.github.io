@@ -700,41 +700,81 @@ test('degenerate container (zero width) returns no rects', () => {
   expect(squarifyTreemap([{ value: 10 }], 0, 0, 0, 50).length).toBe(0);
 });
 
-// ─── 11. rankTreemapWeight / rankTileAlpha (Volatility Leaderboard) ───────────
+// ─── 11. rankTreemapWeight / rankTileClass (Volatility Leaderboard) ───────────
+// Mirrors the v8.103.2 mock-matched fixed weights + fixed rank tint classes
+// in dashboard.js (rankTreemapWeight / rankTileClass) — not the earlier
+// geometric-decay + computed-alpha approach these tests covered pre-v8.103.2.
 
+const VOL_LB_RANK_WEIGHT = [58, 21, 10, 6, 5];
 function rankTreemapWeight(idx) {
-  return Math.pow(2, 4 - Math.min(idx, 4));
+  return VOL_LB_RANK_WEIGHT[Math.min(idx, VOL_LB_RANK_WEIGHT.length - 1)];
 }
-function rankTileAlpha(idx) {
-  return Math.max(0.55 - idx * 0.10, 0.15);
+function rankTileClass(idx) {
+  return 'vlt-r' + (Math.min(idx, 4) + 1);
 }
 
-console.log('\n── 11. rankTreemapWeight / rankTileAlpha ──');
+console.log('\n── 11. rankTreemapWeight / rankTileClass ──');
 
 test('rank weight strictly decreases with rank', () => {
   const w = [0, 1, 2, 3, 4].map(rankTreemapWeight);
   for (let i = 1; i < w.length; i++) expect(w[i] < w[i - 1]).toBe(true);
 });
 
-test('rank weight halves each place (geometric decay)', () => {
-  expect(rankTreemapWeight(0)).toBe(16);
-  expect(rankTreemapWeight(1)).toBe(8);
-  expect(rankTreemapWeight(4)).toBe(1);
+test('rank weight matches the approved mock proportions exactly', () => {
+  expect(rankTreemapWeight(0)).toBe(58);
+  expect(rankTreemapWeight(1)).toBe(21);
+  expect(rankTreemapWeight(2)).toBe(10);
+  expect(rankTreemapWeight(3)).toBe(6);
+  expect(rankTreemapWeight(4)).toBe(5);
 });
 
 test('rank weight is clamped beyond index 4 (never zero/negative)', () => {
-  expect(rankTreemapWeight(5)).toBe(1);
-  expect(rankTreemapWeight(99)).toBe(1);
+  expect(rankTreemapWeight(5)).toBe(5);
+  expect(rankTreemapWeight(99)).toBe(5);
 });
 
-test('rank alpha strictly decreases with rank', () => {
-  const a = [0, 1, 2, 3, 4].map(rankTileAlpha);
-  for (let i = 1; i < a.length; i++) expect(a[i] < a[i - 1]).toBe(true);
+test('rank tile class maps rank 0-4 to vlt-r1..vlt-r5', () => {
+  expect(rankTileClass(0)).toBe('vlt-r1');
+  expect(rankTileClass(1)).toBe('vlt-r2');
+  expect(rankTileClass(2)).toBe('vlt-r3');
+  expect(rankTileClass(3)).toBe('vlt-r4');
+  expect(rankTileClass(4)).toBe('vlt-r5');
 });
 
-test('rank alpha never drops below the visibility floor', () => {
-  expect(rankTileAlpha(4)).toBeCloseTo(0.15, 4);
-  expect(rankTileAlpha(50)).toBeCloseTo(0.15, 4);
+test('rank tile class is clamped beyond index 4 (stays vlt-r5, never undefined)', () => {
+  expect(rankTileClass(5)).toBe('vlt-r5');
+  expect(rankTileClass(99)).toBe('vlt-r5');
+});
+
+// ─── 11b. Treemap tile display tiers — never a clipped label ──────────────
+// Mirrors the stacked / compact / hidden decision in renderVolTreemap():
+// a tile shows its full pair+value, a single combined line, or nothing —
+// never an ellipsis-truncated fragment like "AUD/…".
+
+function tileDisplayTier(tileW, tileH) {
+  const canShowAnything = tileW >= 38 && tileH >= 16;
+  if (!canShowAnything) return 'hidden';
+  return tileH >= 45 ? 'stacked' : 'compact';
+}
+
+console.log('\n── 11b. Treemap tile display tiers ──');
+
+test('tall wide tile → stacked (pair + value on separate lines)', () => {
+  expect(tileDisplayTier(151, 140)).toBe('stacked');
+});
+
+test('short but wide-enough tile → compact single combined line', () => {
+  expect(tileDisplayTier(57, 32)).toBe('compact');
+});
+
+test('tile too small in either dimension → hidden, not truncated', () => {
+  expect(tileDisplayTier(20, 30)).toBe('hidden');
+  expect(tileDisplayTier(50, 10)).toBe('hidden');
+});
+
+test('tier boundary is on tileH, not tileW — a narrow tall tile still stacks', () => {
+  expect(tileDisplayTier(40, 46)).toBe('stacked');
+  expect(tileDisplayTier(40, 44)).toBe('compact');
 });
 
 // ─── Summary ─────────────────────────────────────────────────────────────────

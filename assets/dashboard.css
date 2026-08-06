@@ -972,19 +972,43 @@
   .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
   .cr-diff { font-family:var(--font-mono); font-size:9.5px; text-align:right; white-space:nowrap; }
 
-  /* ── VOLATILITY LEADERBOARD — treemap: tile area = ATM IV magnitude ──
+  /* ── VOLATILITY LEADERBOARD — treemap: tile area = rank, not raw ATM IV ──
      Structurally distinct from Carry Trade Ranking's row+bar list (Bloomberg
      CVOL / sector-heatmap pattern rather than a Top-N table). Tile shade is a
-     single-hue intensity ramp keyed to the *same* magnitude the area already
-     encodes — redundant, not directional — so it stays consistent with the
-     panel's earlier no-semaphore decision (v8.102.3): a bigger/brighter tile
-     answers "where's the action", never "cheap/expensive". */
-  .vol-lb-treemap { position:relative; width:100%; height:112px; overflow:hidden; }
-  .vol-lb-tile { position:absolute; box-sizing:border-box; border-radius:3px; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end; padding:4px 5px; cursor:pointer; font-family:var(--font-mono); transition:filter .1s; }
-  .vol-lb-tile:hover { filter:brightness(1.22); }
-  .vlt-pair { font-size:9.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:.01em; }
-  .vlt-val { font-size:11px; font-weight:700; color:var(--text); }
-  .vlt-chip { font-size:7.5px; color:var(--text2); margin-top:1px; white-space:nowrap; }
+     FIXED per-rank tint (not a computed alpha ramp — see rankTileClass() in
+     dashboard.js for why) reproducing the exact hex values from Santiago's
+     approved mock (#0f4d42 → #062a22, rank 1 → rank 5), so it stays
+     consistent with the panel's earlier no-semaphore decision (v8.102.3):
+     a bigger/darker-green tile answers "where's the action", never
+     "cheap/expensive" — there is no red/amber anywhere in this ramp.
+     Content is centered (not bottom-anchored) to match the mock; a label
+     is either shown whole or not at all — never clipped with an ellipsis,
+     since a truncated "AUD/…" fragment is worse than no label. */
+  .vol-lb-treemap { position:relative; width:100%; height:140px; overflow:hidden; }
+  .vol-lb-tile { position:absolute; box-sizing:border-box; border-radius:3px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:2px; padding:4px 6px; cursor:pointer; font-family:var(--font-mono); transition:filter .1s; }
+  .vol-lb-tile:hover { filter:brightness(1.18); }
+  .vol-lb-tile.vlt-compact { flex-direction:row; gap:0; padding:2px 5px; }
+
+  /* Fixed rank tints — bespoke magnitude gradient, same pattern as the MT5
+     heatmap cell overrides above (hardcoded hex, not --up/--down tokens). */
+  .vol-lb-tile.vlt-r1 { background:#0f4d42; }
+  .vol-lb-tile.vlt-r2 { background:#0d443a; }
+  .vol-lb-tile.vlt-r3 { background:#0a3a32; }
+  .vol-lb-tile.vlt-r4 { background:#083128; }
+  .vol-lb-tile.vlt-r5 { background:#062a22; }
+
+  .vlt-pair { font-weight:700; color:#e1f5ee; letter-spacing:.01em; line-height:1.2; white-space:nowrap; }
+  .vlt-val  { font-weight:600; color:#9fe1cb; line-height:1.2; white-space:nowrap; }
+  .vlt-chip { font-size:7.5px; color:#9fe1cb; opacity:.72; margin-top:1px; white-space:nowrap; }
+  .vlt-combo { font-weight:700; color:#e1f5ee; white-space:nowrap; }
+
+  /* Font size steps by rank — matches the mock's rank-correlated sizing
+     (biggest tile reads largest). Only applies to stacked (non-compact)
+     tiles; compact tiles use .vlt-combo's own size below. */
+  .vlt-r1 .vlt-pair { font-size:12px; } .vlt-r1 .vlt-val { font-size:10.5px; }
+  .vlt-r2 .vlt-pair { font-size:10.5px; } .vlt-r2 .vlt-val { font-size:9.5px; }
+  .vlt-r3 .vlt-pair { font-size:9px; } .vlt-r3 .vlt-val { font-size:8px; }
+  .vlt-compact .vlt-combo { font-size:7.5px; }
 
   /* ── CARRY TRADE RANKING v2 (index2 / dashboard2.js) ─────────── */
   /* Shared grid definition — hdr and rows must always use identical columns so
