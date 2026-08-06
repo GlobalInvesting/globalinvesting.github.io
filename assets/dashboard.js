@@ -8919,69 +8919,6 @@ async function fetchCarryRanking() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// Squarified treemap layout (Bruls/Huizing/van Wijk). Used by the
-// Volatility Leaderboard so tile AREA — not bar length — encodes magnitude.
-// Pure geometry helper: takes items with a numeric `value` plus a pixel
-// rect, returns the same items augmented with x/y/w/h (px) rectangles whose
-// areas are proportional to `value` and whose aspect ratios are kept as
-// close to square as the data allows. Covered by dashboard.test.js.
-// ═══════════════════════════════════════════════════════════════════
-function squarifyTreemap(items, x, y, w, h) {
-  const positive = items.filter(d => d.value > 0);
-  const total = positive.reduce((s, d) => s + d.value, 0);
-  if (total <= 0 || w <= 0 || h <= 0) return [];
-  const scale = (w * h) / total;
-  const scaled = positive.map(d => ({ ...d, area: d.value * scale }));
-  const rects = [];
-  let remaining = scaled;
-  let rx = x, ry = y, rw = w, rh = h;
-
-  const worstRatio = (row, side) => {
-    const sum = row.reduce((s, r) => s + r.area, 0);
-    let max = -Infinity, min = Infinity;
-    for (const r of row) { if (r.area > max) max = r.area; if (r.area < min) min = r.area; }
-    const side2 = side * side, sum2 = sum * sum;
-    return Math.max((side2 * max) / sum2, sum2 / (side2 * min));
-  };
-
-  while (remaining.length) {
-    const vertical = rw >= rh; // strip spans the full SHORT side of what's left
-    const side = vertical ? rh : rw;
-    let row = [remaining[0]];
-    let bestWorst = worstRatio(row, side);
-    let i = 1;
-    while (i < remaining.length) {
-      const testRow = row.concat([remaining[i]]);
-      const testWorst = worstRatio(testRow, side);
-      if (testWorst <= bestWorst) { row = testRow; bestWorst = testWorst; i++; }
-      else break;
-    }
-    const rowSum = row.reduce((s, r) => s + r.area, 0);
-    if (vertical) {
-      const stripW = rowSum / rh;
-      let cy = ry;
-      for (const r of row) {
-        const itemH = r.area / stripW;
-        rects.push({ ...r, x: rx, y: cy, w: stripW, h: itemH });
-        cy += itemH;
-      }
-      rx += stripW; rw -= stripW;
-    } else {
-      const stripH = rowSum / rw;
-      let cx = rx;
-      for (const r of row) {
-        const itemW = r.area / stripH;
-        rects.push({ ...r, x: cx, y: ry, w: itemW, h: stripH });
-        cx += itemW;
-      }
-      ry += stripH; rh -= stripH;
-    }
-    remaining = remaining.slice(row.length);
-  }
-  return rects;
-}
-
-// ═══════════════════════════════════════════════════════════════════
 // VOLATILITY LEADERBOARD — "trade the volatility, not the pair"
 // Ranks all 28 G10 pairs by current ATM implied volatility (direct CBOE/CME
 // FX Volatility Index for the 6 USD majors; triangulated for the 21 crosses;
@@ -8990,15 +8927,14 @@ function squarifyTreemap(items, x, y, w, h) {
 // where the options market is currently pricing the most movement, i.e.
 // where a catalyst (data print, sentiment shift) is most likely playing out
 // right now, independent of which pair the trader habitually watches.
-// Rendered as a treemap (v8.103.0, rank-weighted since v8.103.1) — tile size
-// ranks the top 5 by ATM IV, from most volatile (largest) to least
-// (smallest), rather than encoding the raw percentage gap between them (see
-// rankTreemapWeight() below for why: the top 5 are usually within a couple
-// of vol points of each other, and a literally-proportional area rendered
-// as five near-identical tiles in production). Each tile also shows IV Rank
-// (percentile vs 52-week range) when available for that pair, since "most
-// volatile" and "unusually volatile for this pair" are different reads —
-// both are surfaced rather than collapsed into one.
+// Rendered as a strip plot (v8.104.0) — all 5 pairs sit on one shared ATM IV
+// axis, dot position is the actual value (not rank-encoded, unlike the
+// treemap this replaces: v8.103.0-4). Santiago tried the treemap, decided
+// against it, and asked for the strip-plot alternative from the original
+// mock-comparison instead — see declutterLabels() below for how its label-
+// overlap problem (the top 5 are usually within ~2 vol points of each
+// other, so labels at their true x-position collide) is solved without
+// moving the dots off their true value.
 // ═══════════════════════════════════════════════════════════════════
 async function fetchVolLeaderboard() {
   const container = document.getElementById('vol-leaderboard-rows');
@@ -9063,7 +8999,7 @@ async function fetchVolLeaderboard() {
       sbHead._volLbTipAttached = true;
       sbHead.style.cursor = 'help';
       const tipTitle = 'Volatility Leaderboard';
-      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. Tile size ranks the top 5 from most volatile (largest) to least (smallest) — by POSITION, not literally by the percentage gap between them, since the top 5 are often within a couple of vol points of each other; exact ATM IV is printed on each tile. The small line inside each tile shows IV Rank — the percentile vs the pair\u2019s own 52-week range — for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). Tile shade is a matching rank-based ramp and carries no separate meaning. ~est = triangulated cross with no rank of its own. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
+      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. The top 5 are plotted as dots on one shared ATM IV axis — dot position is the actual value, not a rank encoding, so the real spread (or lack of one) between pairs is visible at a glance. Pair labels are what usually need to move to stay readable when two dots sit close together; a thin connector line ties a relabeled pair back to its true dot whenever that happens, so the dot itself never moves off its real value. The small number under each label is IV Rank — the percentile vs the pair\u2019s own 52-week range — for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). ~est = triangulated cross with no rank of its own. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
       const tipEx    = 'Principle: the best opportunity today may not be your usual pair — it\u2019s wherever a data print or sentiment catalyst is driving implied vol higher. Best used as a starting-market filter, not a standalone entry signal.';
       sbHead.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('fx-tt');
@@ -9081,16 +9017,17 @@ async function fetchVolLeaderboard() {
       });
     }
 
-    renderVolTreemap(container);
+    renderVolStrip(container);
 
     // Re-lay-out (not re-fetch) on width changes — sidebar can be resized
-    // 120px–320px (see dashboard.css comment), and a treemap's rectangles,
-    // unlike a row list, depend on the container's actual aspect ratio.
+    // 120px–320px (see dashboard.css comment), and both the value→x scale
+    // and the label decluttering depend on the container's actual pixel
+    // width.
     if (typeof ResizeObserver !== 'undefined' && !container._volLbRO) {
       let debounce = null;
       container._volLbRO = new ResizeObserver(() => {
         clearTimeout(debounce);
-        debounce = setTimeout(() => renderVolTreemap(container), 80);
+        debounce = setTimeout(() => renderVolStrip(container), 80);
       });
       container._volLbRO.observe(container);
     }
@@ -9102,102 +9039,124 @@ async function fetchVolLeaderboard() {
 }
 
 // Cache of the last-fetched top-5 rows, so a container resize can re-lay-out
-// the treemap without hitting loadIntradayQuotes() again.
+// the strip plot without hitting loadIntradayQuotes() again.
 let _volLbTopCache = [];
 
-// Rank → treemap weight. NOT the raw ATM IV value — see v8.103.1 CHANGELOG
-// entry: the top-5 pairs are typically within a couple of vol points of
-// each other, so an area literally proportional to ATM IV renders as five
-// near-identical tiles. These specific percentages (58/21/10/6/5) reproduce
-// the proportions of the treemap mock Santiago approved — not an arbitrary
-// decay curve — so tile 1 is always dominant and tiles 4-5 land as a
-// stacked pair on the right, same structure as the mock, at the sidebar's
-// typical width. Exact ATM IV and IV Rank are never hidden: both are
-// printed as text on every tile that has room for them.
-const VOL_LB_RANK_WEIGHT = [58, 21, 10, 6, 5];
-function rankTreemapWeight(idx) {
-  return VOL_LB_RANK_WEIGHT[Math.min(idx, VOL_LB_RANK_WEIGHT.length - 1)];
+// ── Label-overlap resolution (pool-adjacent-violators / "gapped isotonic
+// regression") ──────────────────────────────────────────────────────────
+// Standard technique for decluttering labels along a shared axis: given
+// each label's IDEAL x-position (sorted ascending) and a minimum required
+// gap, find adjusted positions that (a) preserve left-to-right order,
+// (b) never sit closer than minGap apart, and (c) minimize total squared
+// displacement from the ideal positions — so a label only moves as far as
+// it has to, and a tight cluster spreads out evenly rather than all
+// bunching toward one end. Solved by shifting each ideal position by
+// i*minGap, running isotonic regression (PAVA) to make that shifted
+// sequence non-decreasing, then shifting back.
+function _pava(values) {
+  const blocks = [];
+  for (const v of values) {
+    let block = { sum: v, count: 1, mean: v };
+    blocks.push(block);
+    while (blocks.length > 1 && blocks[blocks.length - 2].mean > blocks[blocks.length - 1].mean) {
+      const b2 = blocks.pop();
+      const b1 = blocks.pop();
+      const sum = b1.sum + b2.sum, count = b1.count + b2.count;
+      blocks.push({ sum, count, mean: sum / count });
+    }
+  }
+  const out = [];
+  for (const b of blocks) for (let k = 0; k < b.count; k++) out.push(b.mean);
+  return out;
+}
+function declutterLabels(xs, minGap) {
+  const shifted = xs.map((x, i) => x - i * minGap);
+  const fitted = _pava(shifted);
+  return fitted.map((v, i) => v + i * minGap);
 }
 
-// Rank → tile color class (see .vol-lb-tile.vlt-r1..r5 in dashboard.css).
-// Fixed hex tints per rank, not a computed rgba/alpha ramp — same pattern
-// already used for MT5 heatmap cells (`.h-s-up`/`.h-up`/etc.) rather than
-// the general --up/--down variables, because this is a purpose-built
-// magnitude gradient, not a semantic color. Values match the approved mock
-// exactly (darkest green = rank 1, near-black-green = rank 5) rather than
-// an alpha blend that read as visually flat once the top-5 IVs were close
-// together (the bug fixed in v8.103.1 turned out to still look flat after
-// the fix — computed alpha steps are visually subtler than fixed tints).
-function rankTileClass(idx) {
-  return 'vlt-r' + (Math.min(idx, 4) + 1);
-}
-
-// Renders the current _volLbTopCache into `container` as a squarified
-// treemap. Tile area and shade both rank-encode ATM IV (see
-// rankTreemapWeight/rankTileClass above) — redundant with each other, not
-// two separate signals, and never a cheap/expensive semaphore (see the
-// tooltip body above and CHANGELOG v8.102.3 for why that distinction
-// matters on this specific panel).
-function renderVolTreemap(container) {
+// Renders the current _volLbTopCache into `container` as a strip plot: one
+// shared ATM IV axis, dots at their true value position, pair labels
+// decluttered off that axis only as far as needed to stay non-overlapping
+// (declutterLabels above), connected back to their dot with a thin leader
+// line whenever they moved.
+function renderVolStrip(container) {
   const top = _volLbTopCache;
   if (!container || !top.length) return;
 
-  container.className = 'vol-lb-treemap';
+  container.className = 'vol-lb-strip';
   const w = container.clientWidth || 240;
-  // 140px (v8.103.0-2) was taller than it needed to be — it was compensating
-  // for the old single-combined-line small-tile rendering, which needed
-  // extra height to avoid text overflow. Now that mini tiles use a tight
-  // two-line layout (v8.103.3) instead, 125px is tall enough to keep both
-  // rank-4/5 tiles as a legible stacked pair across the sidebar's typical
-  // 180-300px width range, while sitting closer to the mock's flatter,
-  // more landscape aspect ratio instead of the squarer look Santiago
-  // flagged. Verified against squarifyTreemap() output at every width in
-  // that range before landing on this number, not eyeballed.
-  const h = 125;
-  const GAP = 3;
 
-  const rects = squarifyTreemap(
-    top.map((r, idx) => ({ ...r, value: rankTreemapWeight(idx) })),
-    0, 0, w, h
-  );
+  // Domain scales to whatever the live top-5 actually spans (the original
+  // mock's fixed 25-30% band doesn't generalize — ATM IV regimes shift),
+  // padded so the extreme dots aren't flush against the edge, then rounded
+  // to a clean 0.5-step so the axis ticks read naturally.
+  const vals = top.map(r => r.atmIv);
+  const dataMin = Math.min(...vals), dataMax = Math.max(...vals);
+  const span = Math.max(dataMax - dataMin, 0.5);
+  const pad = Math.max(span * 0.35, 0.4);
+  let lo = Math.floor((dataMin - pad) * 2) / 2;
+  let hi = Math.ceil((dataMax + pad) * 2) / 2;
+  if (hi - lo < 1) hi += 1;
 
-  container.innerHTML = rects.map((r, idx) => {
+  const AXIS_PAD = 6;                        // horizontal inset so end dots aren't clipped
+  const usableW = Math.max(w - AXIS_PAD * 2, 40);
+  const toX = v => AXIS_PAD + ((v - lo) / (hi - lo)) * usableW;
+
+  // Every pair label here is a fixed "XXX/YYY" 7-character shape, so a
+  // single measured constant is accurate enough — no canvas text
+  // measurement needed for a fixed-format string at a fixed font-size.
+  const LABEL_W_PX = 40;
+  const MIN_GAP = LABEL_W_PX + 6;
+
+  const sorted = top.map(r => ({ ...r, x: toX(r.atmIv) })).sort((a, b) => a.x - b.x);
+  const declutteredX = declutterLabels(sorted.map(r => r.x), MIN_GAP);
+  // If 5 labels genuinely can't fit MIN_GAP apart within the container at
+  // all, PAVA still keeps them evenly spread but the group as a whole may
+  // spill past an edge — re-center that group back inside the container
+  // rather than letting a label render off-screen.
+  const minX = declutteredX[0], maxX = declutteredX[declutteredX.length - 1];
+  const overflowL = Math.max(AXIS_PAD - minX, 0);
+  const overflowR = Math.max(maxX - (w - AXIS_PAD), 0);
+  const shift = overflowL > 0 ? overflowL : (overflowR > 0 ? -overflowR : 0);
+  const items = sorted.map((r, i) => ({ ...r, labelX: declutteredX[i] + shift }));
+
+  const LABEL_Y = 1, LABEL_H = 11, AXIS_Y = LABEL_Y + LABEL_H + 6, VAL_Y = AXIS_Y + 8;
+  const plotH = VAL_Y + 12;
+
+  const dotsHtml = items.map(r => {
     const sym = 'FX_IDC:' + r.id.toUpperCase();
     const tipRank = r.ivRank != null ? ` · IV Rank ${r.ivRank.toFixed(0)}` : '';
     const tip = `${r.label} · ATM IV ${r.atmIv.toFixed(1)}%${tipRank}${r.estimated ? ' (triangulated)' : ''} — Click for chart · detail`;
-    const chipLabel = r.ivRank != null ? r.ivRank.toFixed(0) + '%ile' : '~est';
-    const tileW = Math.max(r.w - GAP, 0), tileH = Math.max(r.h - GAP, 0);
-
-    // Three display tiers by available height — never a clipped label.
-    // A tile either gets room to show its pair+value cleanly (as two short
-    // lines, each individually short enough to fit even a narrow tile) or
-    // it shows nothing but its background (hover still surfaces the full
-    // tooltip and the tile stays clickable). Two lines instead of one
-    // combined line: a single "AUD/CHF 28.2%" string is too wide for the
-    // production tile sizes even at a tiny font (confirmed — it was
-    // overflowing the tile and getting center-cropped by the tile's own
-    // overflow:hidden into unreadable fragments like "UD/CHF 28.2" /
-    // "HF/JPY 27.3"), whereas "AUD/CHF" and "28.2%" each fit narrow tiles
-    // comfortably on their own line.
-    const canShowAnything = tileW >= 30 && tileH >= 20;
-    const full = tileH >= 45;                              // pair + value + optional chip, larger font
-    const showChip = full && tileW >= 48 && tileH >= 48;
-
-    let body = '';
-    if (canShowAnything) {
-      body = `<span class="vlt-pair">${r.label}</span>
-        <span class="vlt-val">${r.atmIv.toFixed(1)}%</span>
-        ${showChip ? `<span class="vlt-chip">${chipLabel}</span>` : ''}`;
+    const moved = Math.abs(r.labelX - r.x) > 1;
+    let leader = '';
+    if (moved) {
+      const x1 = r.labelX, y1 = LABEL_Y + LABEL_H, x2 = r.x, y2 = AXIS_Y;
+      const dx = x2 - x1, dy = y2 - y1;
+      const len = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+      leader = `<div class="vs-leader" style="left:${x1.toFixed(1)}px; top:${y1.toFixed(1)}px; width:${len.toFixed(1)}px; transform:rotate(${angle.toFixed(2)}deg);"></div>`;
     }
-
-    return `<div class="vol-lb-tile ${rankTileClass(idx)}${full ? '' : ' vlt-mini'}" data-sym="${sym}" title="${tip}"
-        style="left:${(r.x + GAP / 2).toFixed(1)}px; top:${(r.y + GAP / 2).toFixed(1)}px; width:${tileW.toFixed(1)}px; height:${tileH.toFixed(1)}px;">
-        ${body}
-      </div>`;
+    return `
+      ${leader}
+      <div class="vs-label" style="left:${r.labelX.toFixed(1)}px; top:${LABEL_Y}px;">${r.label}</div>
+      <div class="vs-item" data-sym="${sym}" title="${tip}" style="left:${r.x.toFixed(1)}px; top:${AXIS_Y}px;"><div class="vs-dot"></div></div>
+      <div class="vs-val" style="left:${r.labelX.toFixed(1)}px; top:${VAL_Y}px;">${r.atmIv.toFixed(1)}%</div>`;
   }).join('');
 
-  container.querySelectorAll('.vol-lb-tile[data-sym]').forEach(tile => {
-    tile.addEventListener('click', () => loadTVChart(tile.dataset.sym));
+  container.innerHTML = `
+    <div class="vs-plot" style="height:${plotH}px;">
+      <div class="vs-axis" style="top:${AXIS_Y}px;"></div>
+      ${dotsHtml}
+    </div>
+    <div class="vs-ticks">
+      <span>${lo.toFixed(1)}%</span>
+      <span>${((lo + hi) / 2).toFixed(1)}%</span>
+      <span>${hi.toFixed(1)}%</span>
+    </div>`;
+
+  container.querySelectorAll('.vs-item[data-sym]').forEach(el => {
+    el.addEventListener('click', () => loadTVChart(el.dataset.sym));
   });
 }
 

@@ -972,51 +972,30 @@
   .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
   .cr-diff { font-family:var(--font-mono); font-size:9.5px; text-align:right; white-space:nowrap; }
 
-  /* ── VOLATILITY LEADERBOARD — treemap: tile area = rank, not raw ATM IV ──
-     Structurally distinct from Carry Trade Ranking's row+bar list (Bloomberg
-     CVOL / sector-heatmap pattern rather than a Top-N table). Tile shade is a
-     FIXED per-rank tint (not a computed alpha ramp — see rankTileClass() in
-     dashboard.js for why) reproducing the exact hex values from Santiago's
-     approved mock (#0f4d42 → #062a22, rank 1 → rank 5), so it stays
-     consistent with the panel's earlier no-semaphore decision (v8.102.3):
-     a bigger/darker-green tile answers "where's the action", never
-     "cheap/expensive" — there is no red/amber anywhere in this ramp.
-     Content is centered (not bottom-anchored) to match the mock; a label
-     is either shown whole or not at all — never clipped with an ellipsis,
-     since a truncated "AUD/…" fragment is worse than no label. */
-  .vol-lb-treemap { position:relative; width:100%; height:125px; overflow:hidden; }
-  .vol-lb-tile { position:absolute; box-sizing:border-box; border-radius:3px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:2px; padding:4px 6px; cursor:pointer; font-family:var(--font-mono); transition:filter .1s; }
-  .vol-lb-tile:hover { filter:brightness(1.18); }
-  /* Small tiles: same two-line pair/value structure as full tiles, just a
-     tighter font — NOT a single combined "PAIR VALUE%" line, which overflowed
-     narrow production tiles and got center-cropped by overflow:hidden into
-     unreadable fragments (e.g. "UD/CHF 28.2"). Two short lines each fit a
-     narrow tile on their own. */
-  .vol-lb-tile.vlt-mini { padding:2px 3px; gap:0; }
-
-  /* Fixed rank tints — bespoke magnitude gradient, same pattern as the MT5
-     heatmap cell overrides above (hardcoded hex, not --up/--down tokens). */
-  .vol-lb-tile.vlt-r1 { background:#0f4d42; }
-  .vol-lb-tile.vlt-r2 { background:#0d443a; }
-  .vol-lb-tile.vlt-r3 { background:#0a3a32; }
-  .vol-lb-tile.vlt-r4 { background:#083128; }
-  .vol-lb-tile.vlt-r5 { background:#062a22; }
-
-  .vlt-pair { font-weight:700; color:#e1f5ee; letter-spacing:.01em; line-height:1.2; white-space:nowrap; }
-  .vlt-val  { font-weight:600; color:#9fe1cb; line-height:1.2; white-space:nowrap; }
-  .vlt-chip { font-size:7.5px; color:#9fe1cb; opacity:.72; margin-top:1px; white-space:nowrap; }
-
-  /* Font size steps by rank — matches the mock's rank-correlated sizing
-     (biggest tile reads largest). Only applies to full (non-mini) tiles. */
-  .vlt-r1 .vlt-pair { font-size:12px; } .vlt-r1 .vlt-val { font-size:10.5px; }
-  .vlt-r2 .vlt-pair { font-size:10.5px; } .vlt-r2 .vlt-val { font-size:9.5px; }
-  .vlt-r3 .vlt-pair { font-size:9px; } .vlt-r3 .vlt-val { font-size:8px; }
-  /* Mini tiles override rank-based sizing with one small fixed size — these
-     are always the two smallest-area tiles regardless of rank class, and
-     need to be tiny enough that even a 7-character pair like "CHF/JPY"
-     never approaches the tile's actual pixel width. */
-  .vlt-mini .vlt-pair { font-size:7px; }
-  .vlt-mini .vlt-val { font-size:6.5px; }
+  /* ── VOLATILITY LEADERBOARD — strip plot (v8.104.0) ──────────────
+     Replaces the treemap (v8.103.0-4, Santiago decided against it). All 5
+     pairs sit on one shared ATM IV axis; dot position is the actual value,
+     never rank-encoded. Pair labels are decluttered off the axis only as
+     far as needed to stay non-overlapping (declutterLabels()/_pava() in
+     dashboard.js — pool-adjacent-violators / gapped isotonic regression),
+     with a thin leader line back to the true dot whenever a label moved.
+     Every element below is positioned purely via inline left/top/transform
+     written by renderVolStrip() — this block exists to turn those into
+     actual positioned elements (position:absolute needs a
+     position:relative ancestor, which .vs-plot provides) and to supply
+     color/type. Before this CSS existed the JS's left/top/transform had no
+     effect at all (position defaults to static), which is exactly the
+     "AUD/A...CHFUSD/...CHF" collapsed-text bug Santiago flagged. */
+  .vol-lb-strip { font-family:var(--font-mono); }
+  .vs-plot { position:relative; width:100%; }
+  .vs-axis { position:absolute; left:0; right:0; height:1px; background:var(--border); }
+  .vs-item { position:absolute; transform:translateX(-50%); cursor:pointer; padding:4px; margin:-4px; }
+  .vs-dot { width:7px; height:7px; border-radius:50%; background:var(--up); transition:transform .1s, filter .1s; }
+  .vs-item:hover .vs-dot { transform:scale(1.35); filter:brightness(1.2); }
+  .vs-leader { position:absolute; height:1px; background:var(--border2); transform-origin:0 50%; opacity:.8; }
+  .vs-label { position:absolute; transform:translateX(-50%); font-weight:700; font-size:8px; color:var(--text); letter-spacing:.01em; line-height:1; white-space:nowrap; text-align:center; }
+  .vs-val { position:absolute; transform:translateX(-50%); font-weight:600; font-size:8px; color:var(--text2); line-height:1; white-space:nowrap; text-align:center; }
+  .vs-ticks { display:flex; justify-content:space-between; font-size:7.5px; color:var(--text3); margin-top:3px; padding:0 6px; }
 
   /* ── CARRY TRADE RANKING v2 (index2 / dashboard2.js) ─────────── */
   /* Shared grid definition — hdr and rows must always use identical columns so

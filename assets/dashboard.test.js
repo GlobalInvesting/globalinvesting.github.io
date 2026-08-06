@@ -596,188 +596,87 @@ test('known EUR/USD–DXY anti-correlation scenario', () => {
   expect(r).toBeLessThan(-0.9); // strongly negative
 });
 
-// ─── 10. squarifyTreemap (Volatility Leaderboard) ─────────────────────────────
+// ─── 10. declutterLabels / _pava (Volatility Leaderboard strip plot) ──────────
+// Mirrors dashboard.js's collision-avoidance for the strip plot that
+// replaced the treemap (v8.104.0): given each label's ideal x-position
+// (sorted ascending) and a minimum required gap, find adjusted positions
+// that (a) preserve left-to-right order, (b) never sit closer than minGap
+// apart, (c) minimize total squared displacement from the ideal positions —
+// solved via pool-adjacent-violators (PAVA) on the minGap-shifted sequence.
 
-function squarifyTreemap(items, x, y, w, h) {
-  const positive = items.filter(d => d.value > 0);
-  const total = positive.reduce((s, d) => s + d.value, 0);
-  if (total <= 0 || w <= 0 || h <= 0) return [];
-  const scale = (w * h) / total;
-  const scaled = positive.map(d => ({ ...d, area: d.value * scale }));
-  const rects = [];
-  let remaining = scaled;
-  let rx = x, ry = y, rw = w, rh = h;
-
-  const worstRatio = (row, side) => {
-    const sum = row.reduce((s, r) => s + r.area, 0);
-    let max = -Infinity, min = Infinity;
-    for (const r of row) { if (r.area > max) max = r.area; if (r.area < min) min = r.area; }
-    const side2 = side * side, sum2 = sum * sum;
-    return Math.max((side2 * max) / sum2, sum2 / (side2 * min));
-  };
-
-  while (remaining.length) {
-    const vertical = rw >= rh;
-    const side = vertical ? rh : rw;
-    let row = [remaining[0]];
-    let bestWorst = worstRatio(row, side);
-    let i = 1;
-    while (i < remaining.length) {
-      const testRow = row.concat([remaining[i]]);
-      const testWorst = worstRatio(testRow, side);
-      if (testWorst <= bestWorst) { row = testRow; bestWorst = testWorst; i++; }
-      else break;
+function _pava(values) {
+  const blocks = [];
+  for (const v of values) {
+    let block = { sum: v, count: 1, mean: v };
+    blocks.push(block);
+    while (blocks.length > 1 && blocks[blocks.length - 2].mean > blocks[blocks.length - 1].mean) {
+      const b2 = blocks.pop();
+      const b1 = blocks.pop();
+      const sum = b1.sum + b2.sum, count = b1.count + b2.count;
+      blocks.push({ sum, count, mean: sum / count });
     }
-    const rowSum = row.reduce((s, r) => s + r.area, 0);
-    if (vertical) {
-      const stripW = rowSum / rh;
-      let cy = ry;
-      for (const r of row) {
-        const itemH = r.area / stripW;
-        rects.push({ ...r, x: rx, y: cy, w: stripW, h: itemH });
-        cy += itemH;
-      }
-      rx += stripW; rw -= stripW;
-    } else {
-      const stripH = rowSum / rw;
-      let cx = rx;
-      for (const r of row) {
-        const itemW = r.area / stripH;
-        rects.push({ ...r, x: cx, y: ry, w: itemW, h: stripH });
-        cx += itemW;
-      }
-      ry += stripH; rh -= stripH;
-    }
-    remaining = remaining.slice(row.length);
   }
-  return rects;
+  const out = [];
+  for (const b of blocks) for (let k = 0; k < b.count; k++) out.push(b.mean);
+  return out;
+}
+function declutterLabels(xs, minGap) {
+  const shifted = xs.map((x, i) => x - i * minGap);
+  const fitted = _pava(shifted);
+  return fitted.map((v, i) => v + i * minGap);
 }
 
-console.log('\n── 10. squarifyTreemap ──');
+console.log('\n── 10. declutterLabels / _pava ──');
 
-test('total tile area equals container area', () => {
-  const items = [{ value: 29.5 }, { value: 29.4 }, { value: 28.5 }, { value: 28.2 }, { value: 27.3 }];
-  const rects = squarifyTreemap(items, 0, 0, 300, 112);
-  const sumArea = rects.reduce((s, r) => s + r.w * r.h, 0);
-  expect(sumArea).toBeCloseTo(300 * 112, 4);
+test('already-spaced values pass through unchanged', () => {
+  const xs = [10, 60, 110, 160, 210];
+  const out = declutterLabels(xs, 46);
+  xs.forEach((x, i) => expect(out[i]).toBeCloseTo(x, 4));
 });
 
-test('larger value gets a larger tile', () => {
-  const items = [{ id: 'big', value: 45 }, { id: 'small', value: 8 }];
-  const rects = squarifyTreemap(items, 0, 0, 200, 100);
-  const big = rects.find(r => r.id === 'big');
-  const small = rects.find(r => r.id === 'small');
-  expect(big.w * big.h > small.w * small.h).toBe(true);
+test('tightly clustered values are pushed to exactly minGap apart', () => {
+  const xs = [100, 101, 102, 103, 104];
+  const out = declutterLabels(xs, 46);
+  for (let i = 1; i < out.length; i++) {
+    expect(out[i] - out[i - 1]).toBeCloseTo(46, 4);
+  }
 });
 
-test('equal values produce equal-area tiles', () => {
-  const items = [{ value: 10 }, { value: 10 }, { value: 10 }];
-  const rects = squarifyTreemap(items, 0, 0, 210, 100);
-  const areas = rects.map(r => r.w * r.h);
-  expect(areas[0]).toBeCloseTo(areas[1], 2);
-  expect(areas[1]).toBeCloseTo(areas[2], 2);
+test('order is always preserved, even under a tight cluster', () => {
+  const xs = [50, 52, 53, 55, 58];
+  const out = declutterLabels(xs, 46);
+  for (let i = 1; i < out.length; i++) expect(out[i] > out[i - 1]).toBe(true);
 });
 
-test('single item fills the entire container', () => {
-  const rects = squarifyTreemap([{ value: 42 }], 0, 0, 150, 90);
-  expect(rects.length).toBe(1);
-  expect(rects[0].w).toBeCloseTo(150, 4);
-  expect(rects[0].h).toBeCloseTo(90, 4);
+test('a symmetric cluster spreads out evenly around its own mean, not toward one end', () => {
+  const xs = [98, 99, 100, 101, 102]; // symmetric around 100
+  const out = declutterLabels(xs, 20);
+  const meanIn = xs.reduce((a, b) => a + b) / xs.length;
+  const meanOut = out.reduce((a, b) => a + b) / out.length;
+  expect(meanOut).toBeCloseTo(meanIn, 4);
 });
 
-test('empty input returns no rects', () => {
-  expect(squarifyTreemap([], 0, 0, 100, 100).length).toBe(0);
+test('two values already exactly minGap apart are untouched', () => {
+  const out = declutterLabels([100, 146], 46);
+  expect(out[0]).toBeCloseTo(100, 4);
+  expect(out[1]).toBeCloseTo(146, 4);
 });
 
-test('zero/negative values are excluded, not laid out as empty tiles', () => {
-  const items = [{ id: 'ok', value: 10 }, { id: 'bad', value: 0 }, { id: 'neg', value: -5 }];
-  const rects = squarifyTreemap(items, 0, 0, 100, 50);
-  expect(rects.length).toBe(1);
-  expect(rects[0].id).toBe('ok');
+test('a partial overlap (only some pairs too close) only moves the crowded ones', () => {
+  const xs = [0, 100, 110, 120, 300]; // pairs 1-2, 2-3 crowded; 0 and 300 isolated
+  const out = declutterLabels(xs, 30);
+  expect(out[0]).toBeCloseTo(0, 4);
+  expect(out[4]).toBeCloseTo(300, 4);
+  expect(out[2] - out[1]).toBeCloseTo(30, 4);
+  expect(out[3] - out[2]).toBeCloseTo(30, 4);
 });
 
-test('degenerate container (zero width) returns no rects', () => {
-  expect(squarifyTreemap([{ value: 10 }], 0, 0, 0, 50).length).toBe(0);
+test('single value is returned unchanged', () => {
+  expect(declutterLabels([77], 46)[0]).toBeCloseTo(77, 4);
 });
 
-// ─── 11. rankTreemapWeight / rankTileClass (Volatility Leaderboard) ───────────
-// Mirrors the v8.103.2 mock-matched fixed weights + fixed rank tint classes
-// in dashboard.js (rankTreemapWeight / rankTileClass) — not the earlier
-// geometric-decay + computed-alpha approach these tests covered pre-v8.103.2.
-
-const VOL_LB_RANK_WEIGHT = [58, 21, 10, 6, 5];
-function rankTreemapWeight(idx) {
-  return VOL_LB_RANK_WEIGHT[Math.min(idx, VOL_LB_RANK_WEIGHT.length - 1)];
-}
-function rankTileClass(idx) {
-  return 'vlt-r' + (Math.min(idx, 4) + 1);
-}
-
-console.log('\n── 11. rankTreemapWeight / rankTileClass ──');
-
-test('rank weight strictly decreases with rank', () => {
-  const w = [0, 1, 2, 3, 4].map(rankTreemapWeight);
-  for (let i = 1; i < w.length; i++) expect(w[i] < w[i - 1]).toBe(true);
-});
-
-test('rank weight matches the approved mock proportions exactly', () => {
-  expect(rankTreemapWeight(0)).toBe(58);
-  expect(rankTreemapWeight(1)).toBe(21);
-  expect(rankTreemapWeight(2)).toBe(10);
-  expect(rankTreemapWeight(3)).toBe(6);
-  expect(rankTreemapWeight(4)).toBe(5);
-});
-
-test('rank weight is clamped beyond index 4 (never zero/negative)', () => {
-  expect(rankTreemapWeight(5)).toBe(5);
-  expect(rankTreemapWeight(99)).toBe(5);
-});
-
-test('rank tile class maps rank 0-4 to vlt-r1..vlt-r5', () => {
-  expect(rankTileClass(0)).toBe('vlt-r1');
-  expect(rankTileClass(1)).toBe('vlt-r2');
-  expect(rankTileClass(2)).toBe('vlt-r3');
-  expect(rankTileClass(3)).toBe('vlt-r4');
-  expect(rankTileClass(4)).toBe('vlt-r5');
-});
-
-test('rank tile class is clamped beyond index 4 (stays vlt-r5, never undefined)', () => {
-  expect(rankTileClass(5)).toBe('vlt-r5');
-  expect(rankTileClass(99)).toBe('vlt-r5');
-});
-
-// ─── 11b. Treemap tile display tiers — never a clipped label ──────────────
-// Mirrors the full / mini / hidden decision in renderVolTreemap(): a tile
-// shows its pair+value as two lines (full-size or mini font), or nothing —
-// never a single combined "PAIR VALUE%" line, which was found to overflow
-// narrow production tiles and get center-cropped into unreadable fragments
-// like "UD/CHF 28.2" — and never an ellipsis-truncated fragment either.
-
-function tileDisplayTier(tileW, tileH) {
-  const canShowAnything = tileW >= 30 && tileH >= 20;
-  if (!canShowAnything) return 'hidden';
-  return tileH >= 45 ? 'full' : 'mini';
-}
-
-console.log('\n── 11b. Treemap tile display tiers ──');
-
-test('tall wide tile → full (larger font, pair + value, chip if room)', () => {
-  expect(tileDisplayTier(151, 140)).toBe('full');
-});
-
-test('short but wide-enough tile → mini (smaller font, still two lines)', () => {
-  expect(tileDisplayTier(54, 32)).toBe('mini');
-  expect(tileDisplayTier(54, 29)).toBe('mini');
-});
-
-test('tile too small in either dimension → hidden, not truncated', () => {
-  expect(tileDisplayTier(15, 30)).toBe('hidden');
-  expect(tileDisplayTier(50, 10)).toBe('hidden');
-});
-
-test('tier boundary is on tileH, not tileW — a narrow tall tile still gets full size', () => {
-  expect(tileDisplayTier(32, 46)).toBe('full');
-  expect(tileDisplayTier(32, 44)).toBe('mini');
+test('empty input returns no positions', () => {
+  expect(declutterLabels([], 46).length).toBe(0);
 });
 
 // ─── Summary ─────────────────────────────────────────────────────────────────
