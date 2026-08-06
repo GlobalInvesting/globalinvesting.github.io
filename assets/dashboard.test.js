@@ -700,6 +700,43 @@ test('degenerate container (zero width) returns no rects', () => {
   expect(squarifyTreemap([{ value: 10 }], 0, 0, 0, 50).length).toBe(0);
 });
 
+// ─── 11. rankTreemapWeight / rankTileAlpha (Volatility Leaderboard) ───────────
+
+function rankTreemapWeight(idx) {
+  return Math.pow(2, 4 - Math.min(idx, 4));
+}
+function rankTileAlpha(idx) {
+  return Math.max(0.55 - idx * 0.10, 0.15);
+}
+
+console.log('\n── 11. rankTreemapWeight / rankTileAlpha ──');
+
+test('rank weight strictly decreases with rank', () => {
+  const w = [0, 1, 2, 3, 4].map(rankTreemapWeight);
+  for (let i = 1; i < w.length; i++) expect(w[i] < w[i - 1]).toBe(true);
+});
+
+test('rank weight halves each place (geometric decay)', () => {
+  expect(rankTreemapWeight(0)).toBe(16);
+  expect(rankTreemapWeight(1)).toBe(8);
+  expect(rankTreemapWeight(4)).toBe(1);
+});
+
+test('rank weight is clamped beyond index 4 (never zero/negative)', () => {
+  expect(rankTreemapWeight(5)).toBe(1);
+  expect(rankTreemapWeight(99)).toBe(1);
+});
+
+test('rank alpha strictly decreases with rank', () => {
+  const a = [0, 1, 2, 3, 4].map(rankTileAlpha);
+  for (let i = 1; i < a.length; i++) expect(a[i] < a[i - 1]).toBe(true);
+});
+
+test('rank alpha never drops below the visibility floor', () => {
+  expect(rankTileAlpha(4)).toBeCloseTo(0.15, 4);
+  expect(rankTileAlpha(50)).toBeCloseTo(0.15, 4);
+});
+
 // ─── Summary ─────────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(50)}`);
 console.log(`Results: ${_passed} passed, ${_failed} failed`);

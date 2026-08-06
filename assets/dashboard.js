@@ -8990,11 +8990,15 @@ function squarifyTreemap(items, x, y, w, h) {
 // where the options market is currently pricing the most movement, i.e.
 // where a catalyst (data print, sentiment shift) is most likely playing out
 // right now, independent of which pair the trader habitually watches.
-// Rendered as a treemap (v8.103.0) — tile AREA is ATM IV, the panel's own
-// ranking criterion, so size does the job a bar used to do. Each tile also
-// shows IV Rank (percentile vs 52-week range) when available for that pair,
-// since "most volatile" and "unusually volatile for this pair" are
-// different reads — both are surfaced rather than collapsed into one.
+// Rendered as a treemap (v8.103.0, rank-weighted since v8.103.1) — tile size
+// ranks the top 5 by ATM IV, from most volatile (largest) to least
+// (smallest), rather than encoding the raw percentage gap between them (see
+// rankTreemapWeight() below for why: the top 5 are usually within a couple
+// of vol points of each other, and a literally-proportional area rendered
+// as five near-identical tiles in production). Each tile also shows IV Rank
+// (percentile vs 52-week range) when available for that pair, since "most
+// volatile" and "unusually volatile for this pair" are different reads —
+// both are surfaced rather than collapsed into one.
 // ═══════════════════════════════════════════════════════════════════
 async function fetchVolLeaderboard() {
   const container = document.getElementById('vol-leaderboard-rows');
@@ -9059,7 +9063,7 @@ async function fetchVolLeaderboard() {
       sbHead._volLbTipAttached = true;
       sbHead.style.cursor = 'help';
       const tipTitle = 'Volatility Leaderboard';
-      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. Tile size is ATM IV itself (bigger tile = more current movement priced in, not a bar length); the small line inside each tile shows IV Rank — the percentile vs the pair\u2019s own 52-week range — for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). Tile shade tracks the same size metric and carries no separate meaning. ~est = triangulated cross with no rank of its own. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
+      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. Tile size ranks the top 5 from most volatile (largest) to least (smallest) — by POSITION, not literally by the percentage gap between them, since the top 5 are often within a couple of vol points of each other; exact ATM IV is printed on each tile. The small line inside each tile shows IV Rank — the percentile vs the pair\u2019s own 52-week range — for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). Tile shade is a matching rank-based ramp and carries no separate meaning. ~est = triangulated cross with no rank of its own. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
       const tipEx    = 'Principle: the best opportunity today may not be your usual pair — it\u2019s wherever a data print or sentiment catalyst is driving implied vol higher. Best used as a starting-market filter, not a standalone entry signal.';
       sbHead.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('fx-tt');
@@ -9101,10 +9105,30 @@ async function fetchVolLeaderboard() {
 // the treemap without hitting loadIntradayQuotes() again.
 let _volLbTopCache = [];
 
+// Rank → treemap weight, geometric decay (halves each place). Deliberately
+// NOT the raw ATM IV value — see v8.103.1 CHANGELOG entry. The top-5 pairs
+// are typically within a couple of vol points of each other, so an area
+// literally proportional to ATM IV renders as five near-identical tiles
+// (confirmed against production data after v8.103.0 shipped). Ranking by
+// POSITION instead keeps the panel's actual point — "this one, then this
+// one, then this one" — legible regardless of how tight the underlying
+// numbers are. Exact ATM IV and IV Rank are never hidden: both are printed
+// as text on every tile that has room for them.
+function rankTreemapWeight(idx) {
+  return Math.pow(2, 4 - Math.min(idx, 4));
+}
+
+// Rank → tile shade alpha, linear step down. Same rank-not-raw-value logic
+// as rankTreemapWeight() — shade must stay visually distinct even when the
+// underlying ATM IV values barely differ.
+function rankTileAlpha(idx) {
+  return Math.max(0.55 - idx * 0.10, 0.15);
+}
+
 // Renders the current _volLbTopCache into `container` as a squarified
-// treemap. Tile AREA is ATM IV (the panel's ranking criterion); tile shade
-// is a single-hue intensity ramp over that same value — redundant with area,
-// not a second signal, and never a cheap/expensive semaphore (see the
+// treemap. Tile area and shade both rank-encode ATM IV (see
+// rankTreemapWeight/rankTileAlpha above) — redundant with each other, not
+// two separate signals, and never a cheap/expensive semaphore (see the
 // tooltip body above and CHANGELOG v8.102.3 for why that distinction
 // matters on this specific panel).
 function renderVolTreemap(container) {
@@ -9115,19 +9139,18 @@ function renderVolTreemap(container) {
   const w = container.clientWidth || 240;
   const h = 112;
   const GAP = 3;
-  const maxIv = Math.max(...top.map(r => r.atmIv), 0.01);
 
-  const rects = squarifyTreemap(top.map(r => ({ ...r, value: r.atmIv })), 0, 0, w, h);
+  const rects = squarifyTreemap(
+    top.map((r, idx) => ({ ...r, value: rankTreemapWeight(idx) })),
+    0, 0, w, h
+  );
 
   container.innerHTML = rects.map((r, idx) => {
     const sym = 'FX_IDC:' + r.id.toUpperCase();
     const tipRank = r.ivRank != null ? ` · IV Rank ${r.ivRank.toFixed(0)}` : '';
     const tip = `${r.label} · ATM IV ${r.atmIv.toFixed(1)}%${tipRank}${r.estimated ? ' (triangulated)' : ''} — Click for chart · detail`;
     const chipLabel = r.ivRank != null ? r.ivRank.toFixed(0) + '%ile' : '~est';
-    // Shade intensity ramps with rank, not with the raw value directly, so
-    // the darkest tile is always the top mover regardless of how close the
-    // top-5 values are to each other (they're often within 1-2 vol points).
-    const alpha = (0.16 + (r.atmIv / maxIv) * 0.34).toFixed(2);
+    const alpha = rankTileAlpha(idx).toFixed(2);
     const tileW = Math.max(r.w - GAP, 0), tileH = Math.max(r.h - GAP, 0);
     const showChip = tileW >= 46 && tileH >= 30;
     const showVal  = tileW >= 30 && tileH >= 18;
@@ -9143,6 +9166,7 @@ function renderVolTreemap(container) {
     tile.addEventListener('click', () => loadTVChart(tile.dataset.sym));
   });
 }
+
 
 // ═══════════════════════════════════════════════════════════════════
 // CARRY TRADE SIDEBAR — from rates/*.json + extended-data/*.json
