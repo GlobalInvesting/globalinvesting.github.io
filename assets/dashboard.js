@@ -8927,14 +8927,14 @@ async function fetchCarryRanking() {
 // where the options market is currently pricing the most movement, i.e.
 // where a catalyst (data print, sentiment shift) is most likely playing out
 // right now, independent of which pair the trader habitually watches.
-// Rendered as a strip plot (v8.104.0) — all 5 pairs sit on one shared ATM IV
-// axis, dot position is the actual value (not rank-encoded, unlike the
-// treemap this replaces: v8.103.0-4). Santiago tried the treemap, decided
-// against it, and asked for the strip-plot alternative from the original
-// mock-comparison instead — see declutterLabels() below for how its label-
-// overlap problem (the top 5 are usually within ~2 vol points of each
-// other, so labels at their true x-position collide) is solved without
-// moving the dots off their true value.
+// Rendered as a ranked list (v8.104.1) — rank · pair · magnitude bar ·
+// value, the same row+bar structure as Carry Trade Ranking below it
+// (Bloomberg/Refinitiv Top-N convention). Two earlier designs were tried
+// and rejected at the sidebar's typical 180-300px width: a treemap
+// (v8.103.0-4, tile area = rank) and a strip plot (v8.104.0, dots on one
+// shared axis with decluttered labels) — both needed 5 seven-character
+// pair labels to share a single line or axis, which doesn't fit that width
+// without cramming. A vertically stacked list has no such constraint.
 // ═══════════════════════════════════════════════════════════════════
 async function fetchVolLeaderboard() {
   const container = document.getElementById('vol-leaderboard-rows');
@@ -8999,7 +8999,7 @@ async function fetchVolLeaderboard() {
       sbHead._volLbTipAttached = true;
       sbHead.style.cursor = 'help';
       const tipTitle = 'Volatility Leaderboard';
-      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. The top 5 are plotted as dots on one shared ATM IV axis — dot position is the actual value, not a rank encoding, so the real spread (or lack of one) between pairs is visible at a glance. Pair labels are what usually need to move to stay readable when two dots sit close together; a thin connector line ties a relabeled pair back to its true dot whenever that happens, so the dot itself never moves off its real value. The small number under each label is IV Rank — the percentile vs the pair\u2019s own 52-week range — for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). ~est = triangulated cross with no rank of its own. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
+      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. Shows the top 5, ranked highest to lowest, with a bar scaled to this group\u2019s own spread (not a fixed 0-100 scale) so the real gap — or lack of one — between them is visible at a glance. Hover any row for IV Rank, the percentile vs the pair\u2019s own 52-week range, shown for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). ~ prefix = triangulated cross value, not a direct market quote. NOK/SEK excluded — no CBOE/CME vol index exists for either.';
       const tipEx    = 'Principle: the best opportunity today may not be your usual pair — it\u2019s wherever a data print or sentiment catalyst is driving implied vol higher. Best used as a starting-market filter, not a standalone entry signal.';
       sbHead.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('fx-tt');
@@ -9017,20 +9017,7 @@ async function fetchVolLeaderboard() {
       });
     }
 
-    renderVolStrip(container);
-
-    // Re-lay-out (not re-fetch) on width changes — sidebar can be resized
-    // 120px–320px (see dashboard.css comment), and both the value→x scale
-    // and the label decluttering depend on the container's actual pixel
-    // width.
-    if (typeof ResizeObserver !== 'undefined' && !container._volLbRO) {
-      let debounce = null;
-      container._volLbRO = new ResizeObserver(() => {
-        clearTimeout(debounce);
-        debounce = setTimeout(() => renderVolStrip(container), 80);
-      });
-      container._volLbRO.observe(container);
-    }
+    renderVolRankList(container);
 
   } catch (e) {
     console.warn('[VolLeaderboard]', e);
@@ -9038,125 +9025,58 @@ async function fetchVolLeaderboard() {
   }
 }
 
-// Cache of the last-fetched top-5 rows, so a container resize can re-lay-out
-// the strip plot without hitting loadIntradayQuotes() again.
+// Cache of the last-fetched top-5 rows. No longer used for resize-driven
+// re-layout (the ranked list below is CSS-fluid — bar widths are
+// percentages, so a container resize needs no JS at all) — kept only so a
+// future re-render trigger doesn't need to re-fetch loadIntradayQuotes().
 let _volLbTopCache = [];
 
-// ── Label-overlap resolution (pool-adjacent-violators / "gapped isotonic
-// regression") ──────────────────────────────────────────────────────────
-// Standard technique for decluttering labels along a shared axis: given
-// each label's IDEAL x-position (sorted ascending) and a minimum required
-// gap, find adjusted positions that (a) preserve left-to-right order,
-// (b) never sit closer than minGap apart, and (c) minimize total squared
-// displacement from the ideal positions — so a label only moves as far as
-// it has to, and a tight cluster spreads out evenly rather than all
-// bunching toward one end. Solved by shifting each ideal position by
-// i*minGap, running isotonic regression (PAVA) to make that shifted
-// sequence non-decreasing, then shifting back.
-function _pava(values) {
-  const blocks = [];
-  for (const v of values) {
-    let block = { sum: v, count: 1, mean: v };
-    blocks.push(block);
-    while (blocks.length > 1 && blocks[blocks.length - 2].mean > blocks[blocks.length - 1].mean) {
-      const b2 = blocks.pop();
-      const b1 = blocks.pop();
-      const sum = b1.sum + b2.sum, count = b1.count + b2.count;
-      blocks.push({ sum, count, mean: sum / count });
-    }
-  }
-  const out = [];
-  for (const b of blocks) for (let k = 0; k < b.count; k++) out.push(b.mean);
-  return out;
-}
-function declutterLabels(xs, minGap) {
-  const shifted = xs.map((x, i) => x - i * minGap);
-  const fitted = _pava(shifted);
-  return fitted.map((v, i) => v + i * minGap);
-}
-
-// Renders the current _volLbTopCache into `container` as a strip plot: one
-// shared ATM IV axis, dots at their true value position, pair labels
-// decluttered off that axis only as far as needed to stay non-overlapping
-// (declutterLabels above), connected back to their dot with a thin leader
-// line whenever they moved.
-function renderVolStrip(container) {
+// Renders the current _volLbTopCache as a ranked list: rank · pair ·
+// magnitude bar · value — the same row+bar structure as Carry Trade
+// Ranking directly below this panel in the sidebar (see .carry-rank-row in
+// dashboard.js), which is itself the Bloomberg/Refinitiv Top-N convention.
+// Replaces both the treemap (v8.103.0-4) and the strip plot (v8.104.0):
+// neither had room for 5 seven-character pair labels at the sidebar's
+// typical 180-300px width without cramming or overlap — a vertically
+// stacked list has no such constraint, since it only ever needs to fit one
+// label per row, not five sharing one line or one shared axis.
+function renderVolRankList(container) {
   const top = _volLbTopCache;
   if (!container || !top.length) return;
 
-  container.className = 'vol-lb-strip';
-  const w = container.clientWidth || 240;
+  container.className = 'vol-lb-rows';
 
-  // Domain scales to whatever the live top-5 actually spans (the original
-  // mock's fixed 25-30% band doesn't generalize — ATM IV regimes shift),
-  // padded so the extreme dots aren't flush against the edge, then rounded
-  // to a clean 0.5-step so the axis ticks read naturally.
+  // Bar length is proportional to this top-5 group's OWN min-max span, not
+  // a fixed 0-100 scale — the top 5 are usually within a couple of vol
+  // points of each other (same reasoning as the treemap's rank-weight
+  // decision, v8.103.1), so a literal 0-100% scale would render five
+  // nearly-identical full-width bars. Floored at 15% so the lowest-ranked
+  // bar is never invisible.
   const vals = top.map(r => r.atmIv);
-  const dataMin = Math.min(...vals), dataMax = Math.max(...vals);
-  const span = Math.max(dataMax - dataMin, 0.5);
-  const pad = Math.max(span * 0.35, 0.4);
-  let lo = Math.floor((dataMin - pad) * 2) / 2;
-  let hi = Math.ceil((dataMax + pad) * 2) / 2;
-  if (hi - lo < 1) hi += 1;
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const span = max - min;
 
-  const AXIS_PAD = 6;                        // horizontal inset so end dots aren't clipped
-  const usableW = Math.max(w - AXIS_PAD * 2, 40);
-  const toX = v => AXIS_PAD + ((v - lo) / (hi - lo)) * usableW;
-
-  // Every pair label here is a fixed "XXX/YYY" 7-character shape, so a
-  // single measured constant is accurate enough — no canvas text
-  // measurement needed for a fixed-format string at a fixed font-size.
-  const LABEL_W_PX = 40;
-  const MIN_GAP = LABEL_W_PX + 6;
-
-  const sorted = top.map(r => ({ ...r, x: toX(r.atmIv) })).sort((a, b) => a.x - b.x);
-  const declutteredX = declutterLabels(sorted.map(r => r.x), MIN_GAP);
-  // If 5 labels genuinely can't fit MIN_GAP apart within the container at
-  // all, PAVA still keeps them evenly spread but the group as a whole may
-  // spill past an edge — re-center that group back inside the container
-  // rather than letting a label render off-screen.
-  const minX = declutteredX[0], maxX = declutteredX[declutteredX.length - 1];
-  const overflowL = Math.max(AXIS_PAD - minX, 0);
-  const overflowR = Math.max(maxX - (w - AXIS_PAD), 0);
-  const shift = overflowL > 0 ? overflowL : (overflowR > 0 ? -overflowR : 0);
-  const items = sorted.map((r, i) => ({ ...r, labelX: declutteredX[i] + shift }));
-
-  const LABEL_Y = 1, LABEL_H = 11, AXIS_Y = LABEL_Y + LABEL_H + 6, VAL_Y = AXIS_Y + 8;
-  const plotH = VAL_Y + 12;
-
-  const dotsHtml = items.map(r => {
+  container.innerHTML = top.map((r, idx) => {
     const sym = 'FX_IDC:' + r.id.toUpperCase();
     const tipRank = r.ivRank != null ? ` · IV Rank ${r.ivRank.toFixed(0)}` : '';
     const tip = `${r.label} · ATM IV ${r.atmIv.toFixed(1)}%${tipRank}${r.estimated ? ' (triangulated)' : ''} — Click for chart · detail`;
-    const moved = Math.abs(r.labelX - r.x) > 1;
-    let leader = '';
-    if (moved) {
-      const x1 = r.labelX, y1 = LABEL_Y + LABEL_H, x2 = r.x, y2 = AXIS_Y;
-      const dx = x2 - x1, dy = y2 - y1;
-      const len = Math.sqrt(dx * dx + dy * dy);
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      leader = `<div class="vs-leader" style="left:${x1.toFixed(1)}px; top:${y1.toFixed(1)}px; width:${len.toFixed(1)}px; transform:rotate(${angle.toFixed(2)}deg);"></div>`;
-    }
-    return `
-      ${leader}
-      <div class="vs-label" style="left:${r.labelX.toFixed(1)}px; top:${LABEL_Y}px;">${r.label}</div>
-      <div class="vs-item" data-sym="${sym}" title="${tip}" style="left:${r.x.toFixed(1)}px; top:${AXIS_Y}px;"><div class="vs-dot"></div></div>
-      <div class="vs-val" style="left:${r.labelX.toFixed(1)}px; top:${VAL_Y}px;">${r.atmIv.toFixed(1)}%</div>`;
+    const pct = span > 0 ? 15 + ((r.atmIv - min) / span) * 85 : 100;
+    // Estimated (triangulated cross) values carry a visible "~" label, not
+    // just a hover tooltip — required for any derived/non-live value
+    // (GUIDELINES "Data integrity"), same convention already used by the
+    // CB trend fallback (`~ Cut/Hold/Hike`).
+    const valStr = (r.estimated ? '~' : '') + r.atmIv.toFixed(1) + '%';
+
+    return `<div class="vol-lb-row" data-sym="${sym}" title="${tip}">
+      <span class="vlr-rank">${idx + 1}</span>
+      <span class="vlr-pair">${r.label}</span>
+      <div class="vlr-bar-wrap"><div class="vlr-bar" style="width:${pct}%"></div></div>
+      <span class="vlr-val">${valStr}</span>
+    </div>`;
   }).join('');
 
-  container.innerHTML = `
-    <div class="vs-plot" style="height:${plotH}px;">
-      <div class="vs-axis" style="top:${AXIS_Y}px;"></div>
-      ${dotsHtml}
-    </div>
-    <div class="vs-ticks">
-      <span>${lo.toFixed(1)}%</span>
-      <span>${((lo + hi) / 2).toFixed(1)}%</span>
-      <span>${hi.toFixed(1)}%</span>
-    </div>`;
-
-  container.querySelectorAll('.vs-item[data-sym]').forEach(el => {
-    el.addEventListener('click', () => loadTVChart(el.dataset.sym));
+  container.querySelectorAll('.vol-lb-row[data-sym]').forEach(row => {
+    row.addEventListener('click', () => loadTVChart(row.dataset.sym));
   });
 }
 

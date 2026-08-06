@@ -596,87 +596,46 @@ test('known EUR/USD–DXY anti-correlation scenario', () => {
   expect(r).toBeLessThan(-0.9); // strongly negative
 });
 
-// ─── 10. declutterLabels / _pava (Volatility Leaderboard strip plot) ──────────
-// Mirrors dashboard.js's collision-avoidance for the strip plot that
-// replaced the treemap (v8.104.0): given each label's ideal x-position
-// (sorted ascending) and a minimum required gap, find adjusted positions
-// that (a) preserve left-to-right order, (b) never sit closer than minGap
-// apart, (c) minimize total squared displacement from the ideal positions —
-// solved via pool-adjacent-violators (PAVA) on the minGap-shifted sequence.
+// ─── 10. Volatility Leaderboard bar-percentage scaling ────────────────────
+// Mirrors the pct calculation in renderVolRankList(): bar length is
+// proportional to the top-5 group's OWN min-max span (not a fixed 0-100
+// scale), floored at 15% so the lowest-ranked bar is never invisible —
+// same reasoning as the treemap's rank-weight decision (v8.103.1), the top
+// 5 ATM IVs are usually within a couple of vol points of each other, so a
+// literal 0-100% scale would render five nearly-identical full bars.
 
-function _pava(values) {
-  const blocks = [];
-  for (const v of values) {
-    let block = { sum: v, count: 1, mean: v };
-    blocks.push(block);
-    while (blocks.length > 1 && blocks[blocks.length - 2].mean > blocks[blocks.length - 1].mean) {
-      const b2 = blocks.pop();
-      const b1 = blocks.pop();
-      const sum = b1.sum + b2.sum, count = b1.count + b2.count;
-      blocks.push({ sum, count, mean: sum / count });
-    }
-  }
-  const out = [];
-  for (const b of blocks) for (let k = 0; k < b.count; k++) out.push(b.mean);
-  return out;
-}
-function declutterLabels(xs, minGap) {
-  const shifted = xs.map((x, i) => x - i * minGap);
-  const fitted = _pava(shifted);
-  return fitted.map((v, i) => v + i * minGap);
+function volLbBarPct(value, min, max) {
+  const span = max - min;
+  return span > 0 ? 15 + ((value - min) / span) * 85 : 100;
 }
 
-console.log('\n── 10. declutterLabels / _pava ──');
+console.log('\n── 10. Volatility Leaderboard bar-percentage scaling ──');
 
-test('already-spaced values pass through unchanged', () => {
-  const xs = [10, 60, 110, 160, 210];
-  const out = declutterLabels(xs, 46);
-  xs.forEach((x, i) => expect(out[i]).toBeCloseTo(x, 4));
+test('highest value in the group gets a full 100% bar', () => {
+  expect(volLbBarPct(29.5, 27.3, 29.5)).toBeCloseTo(100, 4);
 });
 
-test('tightly clustered values are pushed to exactly minGap apart', () => {
-  const xs = [100, 101, 102, 103, 104];
-  const out = declutterLabels(xs, 46);
-  for (let i = 1; i < out.length; i++) {
-    expect(out[i] - out[i - 1]).toBeCloseTo(46, 4);
-  }
+test('lowest value in the group gets the 15% floor, never invisible', () => {
+  expect(volLbBarPct(27.3, 27.3, 29.5)).toBeCloseTo(15, 4);
 });
 
-test('order is always preserved, even under a tight cluster', () => {
-  const xs = [50, 52, 53, 55, 58];
-  const out = declutterLabels(xs, 46);
-  for (let i = 1; i < out.length; i++) expect(out[i] > out[i - 1]).toBe(true);
+test('a mid-span value lands proportionally between the floor and 100%', () => {
+  // 28.4 sits exactly halfway of a 27.3–29.5 span
+  expect(volLbBarPct(28.4, 27.3, 29.5)).toBeCloseTo(15 + 0.5 * 85, 4);
 });
 
-test('a symmetric cluster spreads out evenly around its own mean, not toward one end', () => {
-  const xs = [98, 99, 100, 101, 102]; // symmetric around 100
-  const out = declutterLabels(xs, 20);
-  const meanIn = xs.reduce((a, b) => a + b) / xs.length;
-  const meanOut = out.reduce((a, b) => a + b) / out.length;
-  expect(meanOut).toBeCloseTo(meanIn, 4);
+test('all-equal values (zero span) render every bar at 100%, not divide-by-zero', () => {
+  expect(volLbBarPct(28.0, 28.0, 28.0)).toBe(100);
 });
 
-test('two values already exactly minGap apart are untouched', () => {
-  const out = declutterLabels([100, 146], 46);
-  expect(out[0]).toBeCloseTo(100, 4);
-  expect(out[1]).toBeCloseTo(146, 4);
-});
-
-test('a partial overlap (only some pairs too close) only moves the crowded ones', () => {
-  const xs = [0, 100, 110, 120, 300]; // pairs 1-2, 2-3 crowded; 0 and 300 isolated
-  const out = declutterLabels(xs, 30);
-  expect(out[0]).toBeCloseTo(0, 4);
-  expect(out[4]).toBeCloseTo(300, 4);
-  expect(out[2] - out[1]).toBeCloseTo(30, 4);
-  expect(out[3] - out[2]).toBeCloseTo(30, 4);
-});
-
-test('single value is returned unchanged', () => {
-  expect(declutterLabels([77], 46)[0]).toBeCloseTo(77, 4);
-});
-
-test('empty input returns no positions', () => {
-  expect(declutterLabels([], 46).length).toBe(0);
+test('bar percentage never exceeds 100 and never drops below the 15 floor', () => {
+  const vals = [27.3, 28.2, 28.5, 29.4, 29.5];
+  const min = Math.min(...vals), max = Math.max(...vals);
+  vals.forEach(v => {
+    const pct = volLbBarPct(v, min, max);
+    expect(pct < 100 || pct === 100).toBe(true);
+    expect(pct > 15 || pct === 15).toBe(true);
+  });
 });
 
 // ─── Summary ─────────────────────────────────────────────────────────────────

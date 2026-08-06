@@ -972,30 +972,25 @@
   .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
   .cr-diff { font-family:var(--font-mono); font-size:9.5px; text-align:right; white-space:nowrap; }
 
-  /* ── VOLATILITY LEADERBOARD — strip plot (v8.104.0) ──────────────
-     Replaces the treemap (v8.103.0-4, Santiago decided against it). All 5
-     pairs sit on one shared ATM IV axis; dot position is the actual value,
-     never rank-encoded. Pair labels are decluttered off the axis only as
-     far as needed to stay non-overlapping (declutterLabels()/_pava() in
-     dashboard.js — pool-adjacent-violators / gapped isotonic regression),
-     with a thin leader line back to the true dot whenever a label moved.
-     Every element below is positioned purely via inline left/top/transform
-     written by renderVolStrip() — this block exists to turn those into
-     actual positioned elements (position:absolute needs a
-     position:relative ancestor, which .vs-plot provides) and to supply
-     color/type. Before this CSS existed the JS's left/top/transform had no
-     effect at all (position defaults to static), which is exactly the
-     "AUD/A...CHFUSD/...CHF" collapsed-text bug Santiago flagged. */
-  .vol-lb-strip { font-family:var(--font-mono); }
-  .vs-plot { position:relative; width:100%; }
-  .vs-axis { position:absolute; left:0; right:0; height:1px; background:var(--border); }
-  .vs-item { position:absolute; transform:translateX(-50%); cursor:pointer; padding:4px; margin:-4px; }
-  .vs-dot { width:7px; height:7px; border-radius:50%; background:var(--up); transition:transform .1s, filter .1s; }
-  .vs-item:hover .vs-dot { transform:scale(1.35); filter:brightness(1.2); }
-  .vs-leader { position:absolute; height:1px; background:var(--border2); transform-origin:0 50%; opacity:.8; }
-  .vs-label { position:absolute; transform:translateX(-50%); font-weight:700; font-size:8px; color:var(--text); letter-spacing:.01em; line-height:1; white-space:nowrap; text-align:center; }
-  .vs-val { position:absolute; transform:translateX(-50%); font-weight:600; font-size:8px; color:var(--text2); line-height:1; white-space:nowrap; text-align:center; }
-  .vs-ticks { display:flex; justify-content:space-between; font-size:7.5px; color:var(--text3); margin-top:3px; padding:0 6px; }
+  /* ── VOLATILITY LEADERBOARD — ranked list (v8.104.1) ──────────────
+     Same row+bar structure as Carry Trade Ranking directly below it
+     (.carry-rank-row above) — deliberately reused rather than a new
+     visual language, both for sidebar consistency and because it's the
+     Bloomberg/Refinitiv Top-N convention. Replaces the treemap
+     (v8.103.0-4) and the strip plot (v8.104.0): neither fit 5
+     seven-character pair labels into the sidebar's typical 180-300px
+     width without cramming or overlap; a vertically stacked list has no
+     such constraint. Bar color uses var(--up) (not a hardcoded hex) so it
+     themes correctly under [data-theme="mt5"], same reasoning as the strip
+     plot's .vs-dot before it. */
+  .vol-lb-row { display:grid; grid-template-columns:10px 46px 1fr 34px; align-items:center; gap:6px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-mono); cursor:pointer; transition:background .1s; }
+  .vol-lb-row:hover { background:var(--bg3); }
+  .vol-lb-row:last-child { border-bottom:none; }
+  .vlr-rank { font-size:9px; color:var(--text3); text-align:left; }
+  .vlr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; font-size:10px; }
+  .vlr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; min-width:8px; }
+  .vlr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.85; max-width:100%; }
+  .vlr-val { font-size:9.5px; color:var(--text); text-align:right; white-space:nowrap; }
 
   /* ── CARRY TRADE RANKING v2 (index2 / dashboard2.js) ─────────── */
   /* Shared grid definition — hdr and rows must always use identical columns so
