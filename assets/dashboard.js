@@ -9144,11 +9144,16 @@ function renderVolTreemap(container) {
 
   container.className = 'vol-lb-treemap';
   const w = container.clientWidth || 240;
-  const h = 140; // taller than the old 5-row block (v8.103.0's 112px) —
-                  // needed so the two smallest tiles lay out as a stacked
-                  // pair (mock's structure) instead of two unreadably thin
-                  // side-by-side slivers; see squarify's own aspect-ratio
-                  // logic, unchanged, in squarifyTreemap() above.
+  // 140px (v8.103.0-2) was taller than it needed to be — it was compensating
+  // for the old single-combined-line small-tile rendering, which needed
+  // extra height to avoid text overflow. Now that mini tiles use a tight
+  // two-line layout (v8.103.3) instead, 125px is tall enough to keep both
+  // rank-4/5 tiles as a legible stacked pair across the sidebar's typical
+  // 180-300px width range, while sitting closer to the mock's flatter,
+  // more landscape aspect ratio instead of the squarer look Santiago
+  // flagged. Verified against squarifyTreemap() output at every width in
+  // that range before landing on this number, not eyeballed.
+  const h = 125;
   const GAP = 3;
 
   const rects = squarifyTreemap(

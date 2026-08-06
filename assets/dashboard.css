@@ -984,7 +984,7 @@
      Content is centered (not bottom-anchored) to match the mock; a label
      is either shown whole or not at all — never clipped with an ellipsis,
      since a truncated "AUD/…" fragment is worse than no label. */
-  .vol-lb-treemap { position:relative; width:100%; height:140px; overflow:hidden; }
+  .vol-lb-treemap { position:relative; width:100%; height:125px; overflow:hidden; }
   .vol-lb-tile { position:absolute; box-sizing:border-box; border-radius:3px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:2px; padding:4px 6px; cursor:pointer; font-family:var(--font-mono); transition:filter .1s; }
   .vol-lb-tile:hover { filter:brightness(1.18); }
   /* Small tiles: same two-line pair/value structure as full tiles, just a
