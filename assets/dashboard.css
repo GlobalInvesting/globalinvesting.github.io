@@ -987,7 +987,12 @@
   .vol-lb-treemap { position:relative; width:100%; height:140px; overflow:hidden; }
   .vol-lb-tile { position:absolute; box-sizing:border-box; border-radius:3px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:2px; padding:4px 6px; cursor:pointer; font-family:var(--font-mono); transition:filter .1s; }
   .vol-lb-tile:hover { filter:brightness(1.18); }
-  .vol-lb-tile.vlt-compact { flex-direction:row; gap:0; padding:2px 5px; }
+  /* Small tiles: same two-line pair/value structure as full tiles, just a
+     tighter font — NOT a single combined "PAIR VALUE%" line, which overflowed
+     narrow production tiles and got center-cropped by overflow:hidden into
+     unreadable fragments (e.g. "UD/CHF 28.2"). Two short lines each fit a
+     narrow tile on their own. */
+  .vol-lb-tile.vlt-mini { padding:2px 3px; gap:0; }
 
   /* Fixed rank tints — bespoke magnitude gradient, same pattern as the MT5
      heatmap cell overrides above (hardcoded hex, not --up/--down tokens). */
@@ -1000,15 +1005,18 @@
   .vlt-pair { font-weight:700; color:#e1f5ee; letter-spacing:.01em; line-height:1.2; white-space:nowrap; }
   .vlt-val  { font-weight:600; color:#9fe1cb; line-height:1.2; white-space:nowrap; }
   .vlt-chip { font-size:7.5px; color:#9fe1cb; opacity:.72; margin-top:1px; white-space:nowrap; }
-  .vlt-combo { font-weight:700; color:#e1f5ee; white-space:nowrap; }
 
   /* Font size steps by rank — matches the mock's rank-correlated sizing
-     (biggest tile reads largest). Only applies to stacked (non-compact)
-     tiles; compact tiles use .vlt-combo's own size below. */
+     (biggest tile reads largest). Only applies to full (non-mini) tiles. */
   .vlt-r1 .vlt-pair { font-size:12px; } .vlt-r1 .vlt-val { font-size:10.5px; }
   .vlt-r2 .vlt-pair { font-size:10.5px; } .vlt-r2 .vlt-val { font-size:9.5px; }
   .vlt-r3 .vlt-pair { font-size:9px; } .vlt-r3 .vlt-val { font-size:8px; }
-  .vlt-compact .vlt-combo { font-size:7.5px; }
+  /* Mini tiles override rank-based sizing with one small fixed size — these
+     are always the two smallest-area tiles regardless of rank class, and
+     need to be tiny enough that even a 7-character pair like "CHF/JPY"
+     never approaches the tile's actual pixel width. */
+  .vlt-mini .vlt-pair { font-size:7px; }
+  .vlt-mini .vlt-val { font-size:6.5px; }
 
   /* ── CARRY TRADE RANKING v2 (index2 / dashboard2.js) ─────────── */
   /* Shared grid definition — hdr and rows must always use identical columns so

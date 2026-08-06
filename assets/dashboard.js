@@ -9164,26 +9164,28 @@ function renderVolTreemap(container) {
     const tileW = Math.max(r.w - GAP, 0), tileH = Math.max(r.h - GAP, 0);
 
     // Three display tiers by available height — never a clipped label.
-    // A tile either gets room to show its pair+value cleanly or it shows
-    // nothing but its background (hover still surfaces the full tooltip
-    // and the tile stays clickable). This replaces the old ellipsis
-    // truncation, which produced unreadable fragments like "AUD/…".
-    const canShowAnything = tileW >= 38 && tileH >= 16;
-    const stacked = tileH >= 45;                          // pair + value each on their own line
-    const showChip = stacked && tileW >= 48 && tileH >= 48;
+    // A tile either gets room to show its pair+value cleanly (as two short
+    // lines, each individually short enough to fit even a narrow tile) or
+    // it shows nothing but its background (hover still surfaces the full
+    // tooltip and the tile stays clickable). Two lines instead of one
+    // combined line: a single "AUD/CHF 28.2%" string is too wide for the
+    // production tile sizes even at a tiny font (confirmed — it was
+    // overflowing the tile and getting center-cropped by the tile's own
+    // overflow:hidden into unreadable fragments like "UD/CHF 28.2" /
+    // "HF/JPY 27.3"), whereas "AUD/CHF" and "28.2%" each fit narrow tiles
+    // comfortably on their own line.
+    const canShowAnything = tileW >= 30 && tileH >= 20;
+    const full = tileH >= 45;                              // pair + value + optional chip, larger font
+    const showChip = full && tileW >= 48 && tileH >= 48;
 
     let body = '';
-    if (canShowAnything && stacked) {
+    if (canShowAnything) {
       body = `<span class="vlt-pair">${r.label}</span>
         <span class="vlt-val">${r.atmIv.toFixed(1)}%</span>
         ${showChip ? `<span class="vlt-chip">${chipLabel}</span>` : ''}`;
-    } else if (canShowAnything) {
-      // Compact tiles: label + value combined on a single centered line,
-      // matching the approved mock's small-tile treatment exactly.
-      body = `<span class="vlt-combo">${r.label} ${r.atmIv.toFixed(1)}%</span>`;
     }
 
-    return `<div class="vol-lb-tile ${rankTileClass(idx)}${stacked ? '' : ' vlt-compact'}" data-sym="${sym}" title="${tip}"
+    return `<div class="vol-lb-tile ${rankTileClass(idx)}${full ? '' : ' vlt-mini'}" data-sym="${sym}" title="${tip}"
         style="left:${(r.x + GAP / 2).toFixed(1)}px; top:${(r.y + GAP / 2).toFixed(1)}px; width:${tileW.toFixed(1)}px; height:${tileH.toFixed(1)}px;">
         ${body}
       </div>`;

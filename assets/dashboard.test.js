@@ -747,34 +747,37 @@ test('rank tile class is clamped beyond index 4 (stays vlt-r5, never undefined)'
 });
 
 // ─── 11b. Treemap tile display tiers — never a clipped label ──────────────
-// Mirrors the stacked / compact / hidden decision in renderVolTreemap():
-// a tile shows its full pair+value, a single combined line, or nothing —
-// never an ellipsis-truncated fragment like "AUD/…".
+// Mirrors the full / mini / hidden decision in renderVolTreemap(): a tile
+// shows its pair+value as two lines (full-size or mini font), or nothing —
+// never a single combined "PAIR VALUE%" line, which was found to overflow
+// narrow production tiles and get center-cropped into unreadable fragments
+// like "UD/CHF 28.2" — and never an ellipsis-truncated fragment either.
 
 function tileDisplayTier(tileW, tileH) {
-  const canShowAnything = tileW >= 38 && tileH >= 16;
+  const canShowAnything = tileW >= 30 && tileH >= 20;
   if (!canShowAnything) return 'hidden';
-  return tileH >= 45 ? 'stacked' : 'compact';
+  return tileH >= 45 ? 'full' : 'mini';
 }
 
 console.log('\n── 11b. Treemap tile display tiers ──');
 
-test('tall wide tile → stacked (pair + value on separate lines)', () => {
-  expect(tileDisplayTier(151, 140)).toBe('stacked');
+test('tall wide tile → full (larger font, pair + value, chip if room)', () => {
+  expect(tileDisplayTier(151, 140)).toBe('full');
 });
 
-test('short but wide-enough tile → compact single combined line', () => {
-  expect(tileDisplayTier(57, 32)).toBe('compact');
+test('short but wide-enough tile → mini (smaller font, still two lines)', () => {
+  expect(tileDisplayTier(54, 32)).toBe('mini');
+  expect(tileDisplayTier(54, 29)).toBe('mini');
 });
 
 test('tile too small in either dimension → hidden, not truncated', () => {
-  expect(tileDisplayTier(20, 30)).toBe('hidden');
+  expect(tileDisplayTier(15, 30)).toBe('hidden');
   expect(tileDisplayTier(50, 10)).toBe('hidden');
 });
 
-test('tier boundary is on tileH, not tileW — a narrow tall tile still stacks', () => {
-  expect(tileDisplayTier(40, 46)).toBe('stacked');
-  expect(tileDisplayTier(40, 44)).toBe('compact');
+test('tier boundary is on tileH, not tileW — a narrow tall tile still gets full size', () => {
+  expect(tileDisplayTier(32, 46)).toBe('full');
+  expect(tileDisplayTier(32, 44)).toBe('mini');
 });
 
 // ─── Summary ─────────────────────────────────────────────────────────────────
