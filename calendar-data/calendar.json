@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-06T07:59:47Z",
-  "generatedAt": "2026-08-06T07:59:47Z",
+  "lastUpdate": "2026-08-06T11:38:47Z",
+  "generatedAt": "2026-08-06T11:38:47Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -764,14 +764,14 @@
       "std": 1.343503
     },
     "EUR/retail sales mom": {
-      "n": 5,
-      "mean": -0.3,
-      "std": 0.514782
+      "n": 6,
+      "mean": -0.316667,
+      "std": 0.462241
     },
     "EUR/retail sales yoy": {
-      "n": 6,
-      "mean": -0.35,
-      "std": 1.56812
+      "n": 7,
+      "mean": -0.342857,
+      "std": 1.431616
     },
     "EUR/economic sentiment": {
       "n": 3,
@@ -1382,6 +1382,11 @@
       "n": 2,
       "mean": 1.75,
       "std": 1.484924
+    },
+    "EUR/italy industrial production mom": {
+      "n": 2,
+      "mean": -0.7,
+      "std": 0.848528
     },
     "CAD/manufacturing sales mom": {
       "n": 2,
@@ -46345,9 +46350,9 @@
       "flag": "🇨🇭",
       "event": "Switzerland Unemployment Rate",
       "impact": "high",
-      "actual": "3.0",
-      "forecast": "2.9",
-      "previous": "2.9"
+      "actual": "3.0%",
+      "forecast": "2.9%",
+      "previous": "2.9%"
     },
     {
       "date": "6 Aug",
@@ -46358,7 +46363,7 @@
       "flag": "🇪🇺",
       "event": "Italy Industrial Production MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-1.0%",
       "forecast": "0.3%",
       "previous": "-0.3%"
     },
@@ -46371,9 +46376,9 @@
       "flag": "🇪🇺",
       "event": "Euro Area Retail Sales YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "0.7%",
       "forecast": "1.0%",
-      "previous": "1.6%"
+      "previous": "1.9%"
     },
     {
       "date": "6 Aug",
@@ -46384,9 +46389,9 @@
       "flag": "🇪🇺",
       "event": "Euro Area Retail Sales MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "-0.3%",
       "forecast": "0.1%",
-      "previous": "0.2%"
+      "previous": "0.4%"
     },
     {
       "date": "6 Aug",
