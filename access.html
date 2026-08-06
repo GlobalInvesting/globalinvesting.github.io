@@ -289,6 +289,24 @@ a { color: inherit; text-decoration: none; }
 .sub-link { font-family: var(--font-mono); font-size: 9.5px; color: var(--blue); letter-spacing: .06em; font-weight: 700; text-transform: uppercase; }
 .sub-link:hover { color: #7fa4ff; }
 
+/* ── Consolidated partner-broker card (v8.104.2) ────────────────────
+   Vantage and TMGM previously had two full sub-cards with identical body
+   copy — same description, same "30 days" structure, same disclaimer —
+   just a different broker name and URL. Shared copy now lives once in the
+   card body; the two brokers sit side by side as their own clickable
+   tiles below it, each keeping its own data-url/aria-label (the whole
+   outer .sub-card can no longer be a single click target since it now
+   points at two different destinations). */
+.sub-card-brokers { cursor: default; }
+.sub-card-brokers:hover { border-color: var(--border2); }
+.sub-broker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0 24px 22px; }
+.sub-broker-opt { background: var(--bg3); border: 1px solid var(--border2); border-radius: 4px; padding: 16px 18px 18px; cursor: pointer; transition: border-color .2s; }
+.sub-broker-opt:hover { border-color: #3a5acc; }
+.sbo-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.sbo-name { font-size: 15px; font-weight: 700; color: #e8edf8; }
+.sbo-badge { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text2); background: rgba(255,255,255,.05); border: 1px solid var(--border2); padding: 2px 7px; border-radius: 2px; white-space: nowrap; }
+.sbo-note { font-size: 11px; color: var(--text3); line-height: 1.5; margin-bottom: 14px; }
+
 /* COMPANION TOOLS — list + large detail panel (separate from Additional Coverage showcase: own classes/JS, own CTAs) */
 .companion-showcase { display: grid; grid-template-columns: 230px 1fr; gap: 28px; align-items: start; margin-top: 28px; }
 .companion-tabs { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--bg2); }
@@ -355,6 +373,7 @@ a { color: inherit; text-decoration: none; }
   .scr-grid, .scr-grid-3 { grid-template-columns: 1fr; }
   .sub-card-body { grid-template-columns: 1fr; }
   .sub-price-col { text-align: left; }
+  .sub-broker-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
   #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
@@ -968,41 +987,37 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
     </div>
-    <div class="sub-card" data-url="https://www.vantagemarkets.com/open-live-account/?affid=MzIzNzE5ODEOTg&invitecode=kKdzg2VS" role="link" tabindex="0" aria-label="Open a Vantage account for web terminal access">
+    <div class="sub-card sub-card-brokers">
       <div class="sub-card-head">
         <span class="sub-card-tag">Partner Broker</span>
-        <span class="sub-card-tagline">Vantage &middot; Verified Account</span>
+        <span class="sub-card-tagline">Vantage &amp; TMGM &middot; Verified Account</span>
       </div>
       <div class="sub-card-body">
         <div>
-          <div class="sub-card-title">Web Terminal via Vantage</div>
+          <div class="sub-card-title">Web Terminal via a Partner Broker</div>
           <div class="sub-card-subtitle">Full Web Terminal Access &middot; No EA Rental Required</div>
-          <div class="sub-card-desc">Open and verify a live trading account with Vantage through the link below to unlock full web terminal access — every panel, no MT5 EA purchase needed. Access is granted for 30 days and renews while the account remains active.</div>
+          <div class="sub-card-desc">Open and verify a live trading account with either partner broker below to unlock full web terminal access — every panel, no MT5 EA purchase needed. Access is granted for 30 days and renews while the account remains active.</div>
         </div>
         <div class="sub-price-col">
           <div class="sub-price-from">Included with</div>
           <div class="sub-price-val">30 days</div>
-          <div class="sub-price-mo">verified Vantage account</div>
-          <a href="https://www.vantagemarkets.com/open-live-account/?affid=MzIzNzE5ODEOTg&invitecode=kKdzg2VS" target="_blank" rel="noopener noreferrer" class="sub-link" onclick="event.stopPropagation()">Open a Vantage account &#8594;</a>
+          <div class="sub-price-mo">verified broker account</div>
         </div>
       </div>
-    </div>
-    <div class="sub-card" data-url="https://portal.tmgm.com/register?r_code=IB1510589870B" role="link" tabindex="0" aria-label="Open a TMGM account for web terminal access">
-      <div class="sub-card-head">
-        <span class="sub-card-tag">Partner Broker</span>
-        <span class="sub-card-tagline">TMGM &middot; Verified Account</span>
-      </div>
-      <div class="sub-card-body">
-        <div>
-          <div class="sub-card-title">Web Terminal via TMGM</div>
-          <div class="sub-card-subtitle">Full Web Terminal Access &middot; No EA Rental Required</div>
-          <div class="sub-card-desc">Open and verify a live trading account with TMGM through the link below to unlock full web terminal access — every panel, no MT5 EA purchase needed. Access is granted for 30 days and renews while the account remains active.</div>
+      <div class="sub-broker-grid">
+        <div class="sub-broker-opt" data-url="https://www.vantagemarkets.com/open-live-account/?affid=MzIzNzE5ODEOTg&invitecode=kKdzg2VS" role="link" tabindex="0" aria-label="Open a Vantage account for web terminal access">
+          <div class="sbo-top">
+            <span class="sbo-name">Vantage</span>
+            <span class="sbo-badge">Open account &#8594;</span>
+          </div>
+          <div class="sbo-note">Regulated multi-asset broker &middot; fast MT5 execution.</div>
         </div>
-        <div class="sub-price-col">
-          <div class="sub-price-from">Included with</div>
-          <div class="sub-price-val">30 days</div>
-          <div class="sub-price-mo">verified TMGM account</div>
-          <a href="https://portal.tmgm.com/register?r_code=IB1510589870B" target="_blank" rel="noopener noreferrer" class="sub-link" onclick="event.stopPropagation()">Open a TMGM account &#8594;</a>
+        <div class="sub-broker-opt" data-url="https://portal.tmgm.com/register?r_code=IB1510589870B" role="link" tabindex="0" aria-label="Open a TMGM account for web terminal access">
+          <div class="sbo-top">
+            <span class="sbo-name">TMGM</span>
+            <span class="sbo-badge">Open account &#8594;</span>
+          </div>
+          <div class="sbo-note">Regulated multi-asset broker &middot; fast MT5 execution.</div>
         </div>
       </div>
     </div>
@@ -1140,7 +1155,7 @@ a { color: inherit; text-decoration: none; }
   if (hpc) hpc.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.open('https://www.mql5.com/en/market/product/180326','_blank'); } });
 
   // Sub cards — click + keyboard, generalized via data-url (supports any number of cards)
-  document.querySelectorAll('.sub-card[data-url]').forEach(card => {
+  document.querySelectorAll('.sub-card[data-url], .sub-broker-opt[data-url]').forEach(card => {
     const url = card.dataset.url;
     card.addEventListener('click', () => window.open(url, '_blank'));
     card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.open(url, '_blank'); } });
