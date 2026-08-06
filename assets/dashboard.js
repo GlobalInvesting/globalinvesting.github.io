@@ -8919,6 +8919,125 @@ async function fetchCarryRanking() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// VOLATILITY LEADERBOARD — "trade the volatility, not the pair"
+// Ranks all 28 G10 pairs by current ATM implied volatility (direct CBOE/CME
+// FX Volatility Index for the 6 USD majors; triangulated for the 21 crosses;
+// NOK/SEK excluded — no CBOE/CME vol index and no free institutional-grade
+// substitute, see GUIDELINES "Data integrity"). Shows the top 5 — the pairs
+// where the options market is currently pricing the most movement, i.e.
+// where a catalyst (data print, sentiment shift) is most likely playing out
+// right now, independent of which pair the trader habitually watches.
+// Row shows IV Rank (percentile vs 52-week range) when available for that
+// pair, since "most volatile" and "unusually volatile for this pair" are
+// different reads — both are surfaced rather than collapsed into one.
+// ═══════════════════════════════════════════════════════════════════
+async function fetchVolLeaderboard() {
+  const container = document.getElementById('vol-leaderboard-rows');
+  if (!container) return;
+
+  const CROSS_IV_RHO = {
+    'eurgbp':0.65,'eurjpy':0.55,'eurchf':0.60,'eurcad':0.40,'euraud':0.35,'eurnzd':0.30,
+    'gbpjpy':0.45,'gbpchf':0.55,'gbpcad':0.30,'gbpaud':0.25,'gbpnzd':0.20,
+    'audjpy':0.40,'audnzd':0.55,'audchf':0.30,'audcad':0.50,
+    'cadjpy':0.35,'cadchf':0.25,'chfjpy':0.40,'nzdjpy':0.35,'nzdcad':0.45,'nzdchf':0.20,
+  };
+
+  try {
+    const intra = await loadIntradayQuotes();
+    const etfIv = intra?.fx_etf_iv || {};
+
+    // Build USD_IV map from direct ETF option data (same pattern as pair-detail)
+    const USD_IV = {};
+    for (const [pid, entry] of Object.entries(etfIv)) {
+      if (entry?.iv == null) continue;
+      const p = PAIRS.find(x => x.id === pid);
+      if (!p) continue;
+      const nonUsd = p.base !== 'USD' ? p.base : p.quote;
+      USD_IV[nonUsd] = entry.iv;
+    }
+    // NZD proxy — no dedicated CBOE/CME NZD vol index
+    if (USD_IV['AUD'] != null && USD_IV['NZD'] == null) USD_IV['NZD'] = Math.round(USD_IV['AUD'] * 1.08 * 10) / 10;
+
+    const rows = [];
+    for (const p of PAIRS) {
+      const ivEntry = etfIv[p.id];
+      let atmIv = null, ivRank = null, estimated = false;
+      if (ivEntry?.iv != null) {
+        atmIv = ivEntry.iv;
+        ivRank = ivEntry.iv_rank ?? null;
+      } else if (p.cross) {
+        const ivA = USD_IV[p.base] ?? null, ivB = USD_IV[p.quote] ?? null;
+        if (ivA != null && ivB != null) {
+          const rho = CROSS_IV_RHO[p.id] ?? 0.40;
+          atmIv = Math.round(Math.sqrt(ivA * ivA + ivB * ivB - 2 * rho * ivA * ivB) * 10) / 10;
+          estimated = true;
+        }
+      }
+      // NOK/SEK: no direct or derivable IV — correctly excluded, not fabricated
+      if (atmIv == null) continue;
+      const label = p.label || (p.id.slice(0, 3).toUpperCase() + '/' + p.id.slice(3).toUpperCase());
+      rows.push({ id: p.id, label, atmIv, ivRank, estimated });
+    }
+
+    if (!rows.length) {
+      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Vol data unavailable</div>';
+      return;
+    }
+
+    rows.sort((a, b) => b.atmIv - a.atmIv);
+    const top = rows.slice(0, 5);
+    const maxIv = Math.max(...top.map(r => r.atmIv), 0.01);
+
+    // Header tooltip — explains the ranking methodology, attached once
+    const sbHead = container.closest('.sb-section')?.querySelector('.sb-head');
+    if (sbHead && !sbHead._volLbTipAttached) {
+      sbHead._volLbTipAttached = true;
+      sbHead.style.cursor = 'help';
+      const tipTitle = 'Volatility Leaderboard';
+      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — direct CBOE/CME FX Volatility Index for the 6 USD majors, triangulated for crosses. Shows where the options market is pricing the most movement right now, independent of habit or preferred pair. NOK/SEK excluded — no CBOE/CME vol index exists for either. IV Rank (when shown) is the percentile vs the pair\u2019s own 52-week range.';
+      const tipEx    = 'Principle: the best opportunity today may not be your usual pair — it\u2019s wherever a data print or sentiment catalyst is driving implied vol higher. Best used as a starting-market filter, not a standalone entry signal.';
+      sbHead.addEventListener('mouseenter', ev => {
+        const tt = document.getElementById('fx-tt');
+        if (!tt) return;
+        document.getElementById('fx-tt-title').textContent = tipTitle;
+        document.getElementById('fx-tt-body').textContent  = tipBody;
+        const exEl = document.getElementById('fx-tt-ex');
+        exEl.textContent = tipEx; exEl.style.display = 'block';
+        tt.style.display = 'block';
+        requestAnimationFrame(() => window._fxTTPos && window._fxTTPos(ev.clientX, ev.clientY));
+      });
+      sbHead.addEventListener('mouseleave', () => {
+        const tt = document.getElementById('fx-tt');
+        if (tt) tt.style.display = 'none';
+      });
+    }
+
+    container.innerHTML = top.map((r, idx) => {
+      const sym = 'FX_IDC:' + r.id.toUpperCase();
+      const barPct = Math.max(Math.round((r.atmIv / maxIv) * 100), 4);
+      const rankStr = r.ivRank != null ? 'Rnk ' + r.ivRank.toFixed(0) : (r.estimated ? '~est' : '');
+      const tipRank = r.ivRank != null ? ` · IV Rank ${r.ivRank.toFixed(0)}` : '';
+      const tip = `${r.label} · ATM IV ${r.atmIv.toFixed(1)}%${tipRank}${r.estimated ? ' (triangulated)' : ''} — Click for chart · detail`;
+      return `<div class="carry-rank-row" data-sym="${sym}" title="${tip}">
+        <span class="cr-rank">${idx + 1}</span>
+        <span class="cr-pair">${r.label}</span>
+        <span class="cr-spread">${rankStr}</span>
+        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
+        <span class="cr-diff">${r.atmIv.toFixed(1)}%</span>
+      </div>`;
+    }).join('');
+
+    container.querySelectorAll('.carry-rank-row[data-sym]').forEach(row => {
+      row.addEventListener('click', () => loadTVChart(row.dataset.sym));
+    });
+
+  } catch (e) {
+    console.warn('[VolLeaderboard]', e);
+    if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // CARRY TRADE SIDEBAR — from rates/*.json + extended-data/*.json
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCarryData() {
@@ -10051,6 +10170,7 @@ async function boot() {
 
   // Static repo data — all parallel, fast (same GitHub Pages origin)
   fetchCBRates().then(() => fetchCarryRanking());   // ranking needs rates populated first
+  fetchVolLeaderboard();
   fetchCOTData();
   fetchFedExpectations();
   fetchOptionSkew().then(() => attachRiskMonitorTooltips());
@@ -10568,7 +10688,7 @@ window.addEventListener('resize', drawLiquidityChart);
 })();
 
 // Risk + Cross-Asset run in parallel every 2 min — same as boot() — no chaining
-setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes(); fetchOptionSkew().then(() => attachRiskMonitorTooltips()); }, 2 * 60 * 1000);
+setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes(); fetchOptionSkew().then(() => attachRiskMonitorTooltips()); fetchVolLeaderboard(); }, 2 * 60 * 1000);
 setInterval(fetchCarryData,    30 * 60 * 1000);
 setInterval(fetchCarryRanking, 30 * 60 * 1000);
 // Refresh sentiment every 30 seconds
