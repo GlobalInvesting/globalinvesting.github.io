@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.102.2';
+const CACHE_VERSION = 'gi-v8.102.3';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -33,8 +33,8 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 // client to drop old caches on next activation regardless of the exact
 // prior failure mode.
 const STATIC_PRECACHE = [
-  '/assets/dashboard.css?v=8.23.2',
-  '/assets/dashboard.js?v=8.98.6',
+  '/assets/dashboard.css?v=8.23.3',
+  '/assets/dashboard.js?v=8.98.7',
   '/assets/gi-auth.js?v=1.3.0',
   '/assets/fx-websocket.js?v=1.0.0',
   '/assets/cot-modal-chart.js?v=7.91.1',
