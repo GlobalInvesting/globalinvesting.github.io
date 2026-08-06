@@ -972,6 +972,16 @@
   .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
   .cr-diff { font-family:var(--font-mono); font-size:9.5px; text-align:right; white-space:nowrap; }
 
+  /* ── VOLATILITY LEADERBOARD — hybrid row: magnitude bar + IV Rank chip ── */
+  .vol-lb-row { display:grid; grid-template-columns:10px 46px 1fr 34px 40px; align-items:center; gap:4px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
+  .vol-lb-row:hover { background:var(--bg3); }
+  .vol-lb-row:last-child { border-bottom:none; }
+  .vol-lb-chip { font-family:var(--font-mono); font-size:8px; text-align:center; padding:1px 4px; border-radius:3px; white-space:nowrap; }
+  .vol-lb-chip.rank-low  { background:rgba(38,166,154,.15); color:var(--up); }
+  .vol-lb-chip.rank-high { background:rgba(239,83,80,.15); color:var(--down); }
+  .vol-lb-chip.rank-mid  { background:var(--bg3); color:var(--text2); }
+  .vol-lb-chip.rank-est  { background:var(--bg3); color:var(--text3); }
+
   /* ── CARRY TRADE RANKING v2 (index2 / dashboard2.js) ─────────── */
   /* Shared grid definition — hdr and rows must always use identical columns so
      headers track content at every sidebar width (120px–320px).
