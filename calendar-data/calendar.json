@@ -1,163 +1,33 @@
 {
-  "lastUpdate": "2026-08-06T11:38:47Z",
-  "generatedAt": "2026-08-06T11:38:47Z",
-  "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
+  "lastUpdate": "2026-08-07T00:56:03Z",
+  "generatedAt": "2026-08-07T00:56:03Z",
+  "fetchMode": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable) via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
-  "source": "Myfxbook · ForexFactory",
+  "source": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable)",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-08-06",
+  "rangeFrom": "2025-08-07",
   "rangeTo": "2026-08-07",
-  "totalEvents": 3709,
+  "totalEvents": 3698,
   "currencyCounts": {
+    "AUD": 247,
     "EUR": 852,
-    "USD": 1250,
-    "AUD": 249,
-    "GBP": 433,
+    "GBP": 432,
     "CHF": 122,
-    "CAD": 272,
-    "JPY": 215,
+    "USD": 1245,
+    "CAD": 274,
+    "JPY": 210,
     "NZD": 82,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1821,
-    "high": 1660,
+    "high": 1658,
+    "medium": 1812,
     "low": 228
   },
   "surpriseStats": {
-    "NOK/manufacturing production mom": {
-      "n": 2,
-      "mean": 0.65,
-      "std": 1.06066
-    },
-    "SEK/industrial production yoy": {
-      "n": 2,
-      "mean": 2.65,
-      "std": 2.616295
-    },
-    "SEK/new orders yoy": {
-      "n": 2,
-      "mean": 0.4,
-      "std": 12.586501
-    },
-    "SEK/household consumption mom": {
-      "n": 2,
-      "mean": -0.15,
-      "std": 1.767767
-    },
-    "SEK/construction output yoy": {
-      "n": 2,
-      "mean": 1.3,
-      "std": 7.778175
-    },
-    "SEK/industrial production mom": {
-      "n": 2,
-      "mean": 0.3,
-      "std": 4.242641
-    },
-    "SEK/household consumption yoy": {
-      "n": 2,
-      "mean": 0.15,
-      "std": 4.030509
-    },
-    "EUR/balance of trade": {
-      "n": 9,
-      "mean": -2.398667,
-      "std": 3.38643
-    },
-    "EUR/industrial production mom": {
-      "n": 9,
-      "mean": -0.077778,
-      "std": 0.540319
-    },
-    "EUR/exports mom": {
-      "n": 2,
-      "mean": 1.7,
-      "std": 0.707107
-    },
-    "GBP/halifax house price index yoy": {
-      "n": 3,
-      "mean": -0.133333,
-      "std": 0.404145
-    },
-    "GBP/halifax house price index mom": {
-      "n": 3,
-      "mean": -0.033333,
-      "std": 0.152753
-    },
-    "CHF/consumer confidence": {
-      "n": 4,
-      "mean": 1.25,
-      "std": 3.201562
-    },
-    "CAD/employment change": {
-      "n": 3,
-      "mean": 17.833333,
-      "std": 55.975203
-    },
-    "CAD/part time employment chg": {
-      "n": 3,
-      "mean": -7.9,
-      "std": 35.101709
-    },
-    "CAD/unemployment rate": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 0.251661
-    },
-    "CAD/full time employment chg": {
-      "n": 3,
-      "mean": 23.3,
-      "std": 92.091748
-    },
-    "CAD/participation rate": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.264575
-    },
-    "USD/non farm payrolls": {
-      "n": 3,
-      "mean": 29.0,
-      "std": 73.020545
-    },
-    "USD/average hourly earnings mom": {
-      "n": 3,
-      "mean": -0.033333,
-      "std": 0.057735
-    },
-    "USD/unemployment rate": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 0.057735
-    },
-    "USD/average hourly earnings yoy": {
-      "n": 3,
-      "mean": -0.066667,
-      "std": 0.11547
-    },
-    "USD/nonfarm payrolls private": {
-      "n": 3,
-      "mean": 7.333333,
-      "std": 59.534304
-    },
-    "USD/u-6 unemployment rate": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 0.23094
-    },
-    "USD/participation rate": {
-      "n": 3,
-      "mean": -0.0,
-      "std": 0.173205
-    },
-    "USD/michigan consumer sentiment": {
-      "n": 8,
-      "mean": 0.5875,
-      "std": 2.414502
-    },
     "NOK/ppi yoy": {
       "n": 2,
       "mean": 1.6,
@@ -212,6 +82,11 @@
       "n": 3,
       "mean": 7.666667,
       "std": 0.57735
+    },
+    "EUR/industrial production mom": {
+      "n": 8,
+      "mean": 0.0625,
+      "std": 0.362284
     },
     "EUR/zew economic sentiment index": {
       "n": 4,
@@ -447,6 +322,11 @@
       "n": 4,
       "mean": -0.025,
       "std": 0.287228
+    },
+    "EUR/balance of trade": {
+      "n": 8,
+      "mean": -2.186,
+      "std": 3.555417
     },
     "USD/nahb housing market index": {
       "n": 4,
@@ -697,6 +577,11 @@
       "n": 4,
       "mean": -0.225,
       "std": 0.518813
+    },
+    "USD/michigan consumer sentiment": {
+      "n": 7,
+      "mean": 0.857143,
+      "std": 2.474441
     },
     "GBP/cbi distributive trades": {
       "n": 4,
@@ -1028,10 +913,80 @@
       "mean": 0.0,
       "std": 0.173205
     },
+    "GBP/halifax house price index yoy": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.565685
+    },
+    "GBP/halifax house price index mom": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.212132
+    },
     "GBP/dmp 1y cpi expectations": {
       "n": 3,
       "mean": -0.366667,
       "std": 0.152753
+    },
+    "CAD/part time employment chg": {
+      "n": 2,
+      "mean": -25.35,
+      "std": 25.243712
+    },
+    "CAD/employment change": {
+      "n": 2,
+      "mean": 43.1,
+      "std": 49.356053
+    },
+    "CAD/full time employment chg": {
+      "n": 2,
+      "mean": 67.3,
+      "std": 73.114841
+    },
+    "CAD/unemployment rate": {
+      "n": 2,
+      "mean": 0.2,
+      "std": 0.141421
+    },
+    "CAD/participation rate": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.070711
+    },
+    "USD/nonfarm payrolls private": {
+      "n": 2,
+      "mean": -13.0,
+      "std": 67.882251
+    },
+    "USD/participation rate": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.212132
+    },
+    "USD/non farm payrolls": {
+      "n": 2,
+      "mean": 17.0,
+      "std": 98.994949
+    },
+    "USD/unemployment rate": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.070711
+    },
+    "USD/average hourly earnings mom": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "USD/u-6 unemployment rate": {
+      "n": 2,
+      "mean": 0.2,
+      "std": 0.0
+    },
+    "USD/average hourly earnings yoy": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
     },
     "CAD/ivey pmi s.a": {
       "n": 2,
@@ -1087,6 +1042,11 @@
       "n": 2,
       "mean": -1.3,
       "std": 0.141421
+    },
+    "CHF/consumer confidence": {
+      "n": 3,
+      "mean": -0.333333,
+      "std": 0.57735
     },
     "EUR/italy balance of trade": {
       "n": 2,
@@ -1395,90 +1355,6 @@
     }
   },
   "events": [
-    {
-      "currency": "EUR",
-      "event": "Factory Orders MoM",
-      "dateISO": "2025-08-06",
-      "actual": "-1%",
-      "forecast": "1.0",
-      "previous": "-0.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "EUR",
-      "event": "Industrial Production MoM",
-      "dateISO": "2025-08-06",
-      "actual": "0.2%",
-      "forecast": "0.1",
-      "previous": "-0.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "08:00"
-    },
-    {
-      "currency": "EUR",
-      "event": "Retail Sales YoY",
-      "dateISO": "2025-08-06",
-      "actual": "3.1%",
-      "forecast": "2.6",
-      "previous": "1.9",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "09:00"
-    },
-    {
-      "currency": "EUR",
-      "event": "Retail Sales MoM",
-      "dateISO": "2025-08-06",
-      "actual": "0.3%",
-      "forecast": "0.4",
-      "previous": "-0.3",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "09:00"
-    },
-    {
-      "currency": "USD",
-      "event": "MBA 30-Year Mortgage Rate",
-      "dateISO": "2025-08-06",
-      "actual": "6.77%",
-      "forecast": "",
-      "previous": "6.83",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "11:00"
-    },
-    {
-      "currency": "USD",
-      "event": "EIA Gasoline Stocks Change",
-      "dateISO": "2025-08-06",
-      "actual": "-1.323M",
-      "forecast": "-1.0",
-      "previous": "-2.724",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "14:30"
-    },
-    {
-      "currency": "USD",
-      "event": "EIA Crude Oil Stocks Change",
-      "dateISO": "2025-08-06",
-      "actual": "-3.029M",
-      "forecast": "-1.1",
-      "previous": "7.698",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "14:30"
-    },
     {
       "currency": "AUD",
       "event": "Balance of Trade",
@@ -43042,19 +42918,6 @@
     {
       "date": "16 Jul",
       "dateISO": "2026-07-16",
-      "timeUTC": "07:30",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "Switzerland SNB Monetary Policy Meeting Minutes",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "16 Jul",
-      "dateISO": "2026-07-16",
       "timeUTC": "09:00",
       "country": "EUR",
       "currency": "EUR",
@@ -43259,32 +43122,6 @@
       "actual": "34.0",
       "forecast": "35.0",
       "previous": "36.0"
-    },
-    {
-      "date": "16 Jul",
-      "dateISO": "2026-07-16",
-      "timeUTC": "16:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Logan Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "16 Jul",
-      "dateISO": "2026-07-16",
-      "timeUTC": "23:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Jefferson Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "17 Jul",
@@ -44030,19 +43867,6 @@
     {
       "date": "23 Jul",
       "dateISO": "2026-07-23",
-      "timeUTC": "12:45",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB Press Conference",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "23 Jul",
-      "dateISO": "2026-07-23",
       "timeUTC": "14:00",
       "country": "EUR",
       "currency": "EUR",
@@ -44304,19 +44128,6 @@
       "date": "27 Jul",
       "dateISO": "2026-07-27",
       "timeUTC": "14:30",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada BoC Market Participants Survey",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "27 Jul",
-      "dateISO": "2026-07-27",
-      "timeUTC": "14:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
@@ -44325,19 +44136,6 @@
       "actual": "1.3",
       "forecast": "-1.0",
       "previous": "0.0"
-    },
-    {
-      "date": "28 Jul",
-      "dateISO": "2026-07-28",
-      "timeUTC": "03:05",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Gov Bullock Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "28 Jul",
@@ -44715,32 +44513,6 @@
       "actual": "3.75%",
       "forecast": "3.75%",
       "previous": "3.75%"
-    },
-    {
-      "date": "29 Jul",
-      "dateISO": "2026-07-29",
-      "timeUTC": "18:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Press Conference",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "29 Jul",
-      "dateISO": "2026-07-29",
-      "timeUTC": "22:40",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Hunter Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "30 Jul",
@@ -45200,19 +44972,6 @@
     {
       "date": "30 Jul",
       "dateISO": "2026-07-30",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Spain Business Confidence",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "-2.7",
-      "previous": "-2.4"
-    },
-    {
-      "date": "30 Jul",
-      "dateISO": "2026-07-30",
       "timeUTC": "11:00",
       "country": "EUR",
       "currency": "EUR",
@@ -45243,19 +45002,6 @@
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
-      "event": "United Kingdom BoE Monetary Policy Report",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "30 Jul",
-      "dateISO": "2026-07-30",
-      "timeUTC": "11:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
       "event": "United Kingdom BoE MPC Vote Hike",
       "impact": "medium",
       "actual": "39.0",
@@ -45274,19 +45020,6 @@
       "actual": "9.0",
       "forecast": "9.0",
       "previous": "9.0"
-    },
-    {
-      "date": "30 Jul",
-      "dateISO": "2026-07-30",
-      "timeUTC": "11:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom MPC Meeting Minutes",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "30 Jul",
@@ -45473,19 +45206,6 @@
     {
       "date": "30 Jul",
       "dateISO": "2026-07-30",
-      "timeUTC": "13:15",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom BoE Gov Bailey Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "30 Jul",
-      "dateISO": "2026-07-30",
       "timeUTC": "23:30",
       "country": "JPY",
       "currency": "JPY",
@@ -45525,19 +45245,6 @@
     {
       "date": "31 Jul",
       "dateISO": "2026-07-31",
-      "timeUTC": "00:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan BoJ Gov Ueda Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "31 Jul",
-      "dateISO": "2026-07-31",
       "timeUTC": "01:30",
       "country": "AUD",
       "currency": "AUD",
@@ -45560,19 +45267,6 @@
       "actual": "1.0%",
       "forecast": "1.0%",
       "previous": "1.0%"
-    },
-    {
-      "date": "31 Jul",
-      "dateISO": "2026-07-31",
-      "timeUTC": "03:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan BoJ Quarterly Outlook Report",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "31 Jul",
@@ -46186,19 +45880,6 @@
       "previous": "-30.0"
     },
     {
-      "date": "4 Aug",
-      "dateISO": "2026-08-04",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan BoJ Monetary Policy Meeting Minutes",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
       "date": "5 Aug",
       "dateISO": "2026-08-05",
       "timeUTC": "06:45",
@@ -46275,32 +45956,6 @@
       "actual": "2.479M",
       "forecast": "-1.5M",
       "previous": "-7.167M"
-    },
-    {
-      "date": "5 Aug",
-      "dateISO": "2026-08-05",
-      "timeUTC": "20:05",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Cook Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "5 Aug",
-      "dateISO": "2026-08-05",
-      "timeUTC": "20:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "President Trump Speaks",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "6 Aug",
@@ -46394,69 +46049,121 @@
       "previous": "0.4%"
     },
     {
-      "date": "6 Aug",
-      "dateISO": "2026-08-06",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Nonfarm Productivity QoQ",
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "05:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Unemployment Rate",
       "impact": "medium",
       "actual": null,
-      "forecast": "0.6%",
-      "previous": "0.3%"
+      "forecast": "8.2%",
+      "previous": "8.1%"
     },
     {
-      "date": "6 Aug",
-      "dateISO": "2026-08-06",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Unit Labour Costs QoQ",
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Industrial Production MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "2.1%",
-      "previous": "1.8%"
+      "forecast": "0.1%",
+      "previous": "0.9%"
     },
     {
-      "date": "6 Aug",
-      "dateISO": "2026-08-06",
-      "timeUTC": "21:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Musalem Speech",
-      "impact": "medium",
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Balance of Trade",
+      "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "€17.4B",
+      "previous": "€19.1B"
     },
     {
-      "date": "6 Aug",
-      "dateISO": "2026-08-06",
-      "timeUTC": "23:30",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Household Spending YoY",
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Exports MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "1.0%",
-      "previous": "-0.4%"
+      "forecast": "0.2%",
+      "previous": "0.9%"
     },
     {
-      "date": "6 Aug",
-      "dateISO": "2026-08-06",
-      "timeUTC": "23:30",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Household Spending MoM",
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Halifax House Price Index YoY",
       "impact": "medium",
       "actual": null,
-      "forecast": "-3.1%",
-      "previous": "3.7%"
+      "forecast": "0.4%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Halifax House Price Index MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.1%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "€-6.5B",
+      "previous": "€-6.9B"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-2.4",
+      "previous": "-0.1"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-34.0",
+      "previous": "-36.0"
     },
     {
       "date": "7 Aug",
@@ -46465,10 +46172,10 @@
       "country": "CAD",
       "currency": "CAD",
       "flag": "🇨🇦",
-      "event": "Employment Change",
+      "event": "Canada Employment Change",
       "impact": "high",
       "actual": null,
-      "forecast": "17.8K",
+      "forecast": "15.0K",
       "previous": "18.2K"
     },
     {
@@ -46478,7 +46185,7 @@
       "country": "CAD",
       "currency": "CAD",
       "flag": "🇨🇦",
-      "event": "Unemployment Rate",
+      "event": "Canada Unemployment Rate",
       "impact": "high",
       "actual": null,
       "forecast": "6.5%",
@@ -46488,11 +46195,76 @@
       "date": "7 Aug",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Participation Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "65.1%",
+      "previous": "65.0%"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Full Time Employment Chg",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "21.0K",
+      "previous": "0.6K"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Part Time Employment Chg",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "4.0K",
+      "previous": "17.5K"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Average Hourly Earnings m/m",
+      "event": "United States U-6 Unemployment Rate",
       "impact": "high",
+      "actual": null,
+      "forecast": "7.9%",
+      "previous": "7.9%"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Average Hourly Earnings YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.5%",
+      "previous": "3.5%"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Average Hourly Earnings MoM",
+      "impact": "medium",
       "actual": null,
       "forecast": "0.3%",
       "previous": "0.3%"
@@ -46504,11 +46276,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Non-Farm Employment Change",
-      "impact": "high",
+      "event": "United States Participation Rate",
+      "impact": "medium",
       "actual": null,
-      "forecast": "85K",
-      "previous": "57K"
+      "forecast": "61.6%",
+      "previous": "61.5%"
     },
     {
       "date": "7 Aug",
@@ -46517,7 +46289,33 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Unemployment Rate",
+      "event": "United States Non Farm Payrolls",
+      "impact": "high",
+      "actual": null,
+      "forecast": "80.0K",
+      "previous": "57.0K"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Nonfarm Payrolls Private",
+      "impact": "high",
+      "actual": null,
+      "forecast": "78.0K",
+      "previous": "49.0K"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Unemployment Rate",
       "impact": "high",
       "actual": null,
       "forecast": "4.2%",
@@ -46530,11 +46328,37 @@
       "country": "CAD",
       "currency": "CAD",
       "flag": "🇨🇦",
-      "event": "Ivey PMI",
+      "event": "Canada Ivey PMI s.a",
+      "impact": "high",
+      "actual": null,
+      "forecast": "55.5",
+      "previous": "56.2"
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Barkin Speech",
       "impact": "medium",
       "actual": null,
-      "forecast": "55.4",
-      "previous": "56.2"
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "7 Aug",
+      "dateISO": "2026-08-07",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Consumer Inflation Expectations",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.8%",
+      "previous": "3.7%"
     }
   ]
 }
