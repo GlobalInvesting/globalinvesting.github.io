@@ -1,3 +1,5 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.3.3 — CSI chart: added "Interval" / "Range" group labels above the TF and period button rows (Santiago's pick, Bloomberg-style) so the two rows read as distinct controls instead of duplicate-looking buttons (both rows can show "1D"/"1W" text since they answer different questions — interval vs. lookback)
+// CURRENCY STRENGTH HEATMAP MODAL  v2.3.2 — CSI chart: fixed _updateCSILiveBar() still rebasing the live RT point against a bar-count cutoff (missed in v2.3.1's calendar-day migration), which snapped every currency's most recent point to a wildly different baseline than the rest of the series on every RT tick — visible as all CSI lines jumping/converging together at the chart's right edge
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.1 — CSI chart: TF+period controls merged into one row with uniform button sizing; TF buttons moved off the shared .lw-tf-btn class onto their own .hm-csi-btn (was cross-contaminating with the main chart's global TF-button selector); period presets switched from an assumed bar-count to real calendar-day cutoffs (bar-count drifted for H1/H4/W1 depending on incidental weekend placement in the trailing window)
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.0 — CSI chart: added H1/H4/1D/1W timeframe selector (reuses main chart's intraday ohlc-data/h1|h4 sources; 1W is a telescoping downsample of the daily series, no new data source needed); fixed tooltip showing raw unix seconds for intraday TFs
 // CURRENCY STRENGTH HEATMAP MODAL  v2.2.4 — CSI chart: ResizeObserver keeps chart width in sync with container (was fixed at creation-time offsetWidth, so a browser resize while the modal was open left the chart clipped/misaligned)
@@ -284,8 +286,16 @@
    switching the main chart's timeframe was silently re-highlighting the
    CSI modal's TF buttons underneath it, out of sync with the CSI panel's
    own _csiTf state. A dedicated class makes the two selectors fully
-   independent. */
-#hm-csi-controls { display:flex;align-items:center;gap:5px;margin-bottom:10px;flex-wrap:wrap; }
+   independent.
+   Group labels ("Interval" / "Range", 2026-08-07 — Santiago's pick from
+   the Bloomberg-style-label option): the TF row (candle interval: H1/H4/
+   D1/W1) and the period row (lookback range: e.g. 1D/1W/2W/1M) can share
+   literal button text (both can show "1D" or "1W") since they answer two
+   different questions, which read as duplicate/confusing buttons without
+   a caption distinguishing the two groups. */
+#hm-csi-controls { display:flex;align-items:flex-end;gap:10px;margin-bottom:10px;flex-wrap:wrap; }
+.hm-csi-group { display:flex;flex-direction:column;gap:3px; }
+.hm-csi-group-label { font-size:8px;letter-spacing:.07em;text-transform:uppercase;color:var(--text2);opacity:.55; }
 #hm-csi-tf,#hm-csi-period { display:flex;gap:2px; }
 .hm-csi-sep { width:1px;align-self:stretch;background:var(--border2);margin:0 1px; }
 #hm-csi-wrap,.csi-wrap {
@@ -745,19 +755,25 @@
       <div class="hm-cw">
         <div class="hm-ct" id="hm-csi-title">CURRENCY STRENGTH INDEX · ACCUMULATED % RETURN · DAILY OHLC</div>
         <div id="hm-csi-controls">
-          <div id="hm-csi-tf">
-            <button class="hm-csi-btn"    data-tf="H1" onclick="csiSetTf(this,'H1')" title="1 Hour">H1</button>
-            <button class="hm-csi-btn"    data-tf="H4" onclick="csiSetTf(this,'H4')" title="4 Hours">H4</button>
-            <button class="hm-csi-btn on" data-tf="D1" onclick="csiSetTf(this,'D1')" title="Daily">1D</button>
-            <button class="hm-csi-btn"    data-tf="W1" onclick="csiSetTf(this,'W1')" title="Weekly">1W</button>
+          <div class="hm-csi-group">
+            <div class="hm-csi-group-label">Interval</div>
+            <div id="hm-csi-tf">
+              <button class="hm-csi-btn"    data-tf="H1" onclick="csiSetTf(this,'H1')" title="1 Hour">H1</button>
+              <button class="hm-csi-btn"    data-tf="H4" onclick="csiSetTf(this,'H4')" title="4 Hours">H4</button>
+              <button class="hm-csi-btn on" data-tf="D1" onclick="csiSetTf(this,'D1')" title="Daily">1D</button>
+              <button class="hm-csi-btn"    data-tf="W1" onclick="csiSetTf(this,'W1')" title="Weekly">1W</button>
+            </div>
           </div>
           <div class="hm-csi-sep"></div>
-          <div id="hm-csi-period">
-            <button class="hm-csi-btn" data-days="30"  onclick="csiPeriod(this,30)">1M</button>
-            <button class="hm-csi-btn on" data-days="91"  onclick="csiPeriod(this,91)">3M</button>
-            <button class="hm-csi-btn" data-days="182" onclick="csiPeriod(this,182)">6M</button>
-            <button class="hm-csi-btn" data-days="365" onclick="csiPeriod(this,365)">1Y</button>
-            <button class="hm-csi-btn" data-days="0"   onclick="csiPeriod(this,0)">All</button>
+          <div class="hm-csi-group">
+            <div class="hm-csi-group-label">Range</div>
+            <div id="hm-csi-period">
+              <button class="hm-csi-btn" data-days="30"  onclick="csiPeriod(this,30)">1M</button>
+              <button class="hm-csi-btn on" data-days="91"  onclick="csiPeriod(this,91)">3M</button>
+              <button class="hm-csi-btn" data-days="182" onclick="csiPeriod(this,182)">6M</button>
+              <button class="hm-csi-btn" data-days="365" onclick="csiPeriod(this,365)">1Y</button>
+              <button class="hm-csi-btn" data-days="0"   onclick="csiPeriod(this,0)">All</button>
+            </div>
           </div>
         </div>
         <div id="hm-csi-wrap">
@@ -2466,10 +2482,26 @@
     _csiDataLive = _computeCSILiveView();
     const csiView = _csiDataLive || _csiData;
 
-    const allDates = csiView.dates;
-    let startIdx = 0;
-    if (_csiPeriodDays > 0) startIdx = Math.max(0, allDates.length - _csiPeriodDays);
-    const cutoffDate = allDates[startIdx];
+    // BUG FIX (2026-08-07): this cutoff used to be computed as
+    // `allDates.length - _csiPeriodDays`, i.e. treating _csiPeriodDays as a
+    // BAR-COUNT offset into the array — the exact bar-count model that was
+    // deliberately replaced everywhere else (_renderCSIChart, _renderCSIStats)
+    // by the calendar-day _csiCutoffDate() cutoff earlier in this same
+    // 2026-08-07 session. This function was missed in that migration, so on
+    // every RT tick it rebased the LIVE point against a baseline only
+    // _csiPeriodDays BARS back (e.g. 7 bars = 7 hours on H1) while every
+    // other point already on the chart was rebased against the true
+    // _csiCutoffDate() baseline (e.g. 7 CALENDAR days = ~120 H1 bars back).
+    // Those two baselines differ by however much the series moved over that
+    // gap, so the live point snapped to a value on a totally different
+    // footing from its neighbors every time a tick came in — visible as all
+    // currencies' lines jumping/converging together at the most recent bar.
+    // Fix: use the exact same _csiCutoffDate()-based cutoff and baseVal
+    // lookup as _renderCSIChart, so the live-updated point stays on the same
+    // footing as the rest of the series.
+    const allDates   = csiView.dates;
+    const lastDate    = allDates.length ? allDates[allDates.length - 1] : null;
+    const cutoffDate  = _csiPeriodDays > 0 ? _csiCutoffDate(lastDate, _csiPeriodDays) : (allDates.length ? allDates[0] : null);
 
     CCY_ORDER.forEach(c => {
       const ls = _csiSeriesMap[c];
