@@ -1,5 +1,5 @@
 /**
- * calendar-panel.js v1.7 — Native economic calendar renderer
+ * calendar-panel.js v1.10 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
@@ -55,6 +55,18 @@
  *   dataset — checked for bankruptcies/redundancies/layoffs/defaults/delinquencies
  *   (none appear in the G10 title set) and confirmed diffusion-style indices (Ai
  *   Group Industry/Manufacturing/Construction Index) are correctly non-inverse.
+ * v1.10 (2026-08-07): BUG FIX — the panel subtitle rendered the raw `source` field
+ *   from ff_calendar.json verbatim, which can legitimately carry backend/pipeline
+ *   detail for troubleshooting (e.g. calendar-watcher.js's direct-commit fallback
+ *   label "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub
+ *   Actions unavailable)"). That detail is useful in the raw JSON — it's how the
+ *   2026-08-06/07 history-truncation incident was diagnosed — but it has no
+ *   business appearing in the terminal UI; Bloomberg/Refinitiv don't expose their
+ *   data-delivery mechanics to the user, only the data provider itself. New
+ *   `cleanSourceLabel()` strips any trailing parenthetical before display,
+ *   handling this case and any future one following the same "Label (pipeline
+ *   detail)" convention used elsewhere in the Worker (e.g. quotes.json's
+ *   DIRECT_COMMIT_SOURCE_LABEL). Found live from Santiago's screenshot.
  */
 (function () {
   'use strict';
@@ -246,8 +258,25 @@
     requestAnimationFrame(() => requestAnimationFrame(updateBtnVisibility));
   }
 
+  // Institutional-facing source labels never mention backend/pipeline internals
+  // (Worker, direct-commit, GitHub Actions, etc.) — Bloomberg/Refinitiv don't
+  // expose their data-delivery mechanics in the terminal UI, only the data
+  // provider itself. The raw `source` field in ff_calendar.json legitimately
+  // carries that extra detail (useful for troubleshooting — it's how the
+  // 2026-08-06/07 truncation incident was diagnosed), so it isn't stripped at
+  // the source; display just always routes through this sanitizer first.
+  // v1.10: strips any trailing parenthetical annotation. Handles today's one
+  // offender (calendar-watcher.js's direct-commit fallback label) and any
+  // future one following the same "Label (pipeline detail)" convention used
+  // elsewhere in this Worker (e.g. DIRECT_COMMIT_SOURCE_LABEL for quotes.json).
+  function cleanSourceLabel(raw) {
+    if (!raw) return 'Myfxbook · ForexFactory';
+    const stripped = String(raw).replace(/\s*\([^)]*\)\s*$/, '').trim();
+    return stripped || 'Myfxbook · ForexFactory';
+  }
+
   function buildPanel(events, source, holidays) {
-    source   = source   || 'ForexFactory';
+    source   = cleanSourceLabel(source);
     holidays = holidays || [];
     const container = document.getElementById('cal-events-body');
     const sourceEl  = document.getElementById('cal-panel-sub');
