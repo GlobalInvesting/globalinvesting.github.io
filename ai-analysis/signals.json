@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-08-07T20:42:00Z",
+  "generated_at": "2026-08-07T23:02:43Z",
   "signals": [
     {
-      "time": "20:41",
+      "time": "22:18",
       "priority": "critical",
-      "title": "USD/JPY — G10 Bilateral Theme + NFP Miss + Geopolitical Catalyst",
-      "text": "USD/JPY trades at 157.82, breaking below its SMA20/50 cluster as the dollar index drops to a 7-week low under 100.00. US July non-farm payrolls surprised at -23K vs +80K expected, triggering a bull steepener in the US yield curve with the 2Y yield plunging -59bp. The JPY 1W avg outperformance of +1.242% (n=7) makes it the G10 leader, while CHF lags at -0.756%, creating a critical 1.998% G10 spread. Despite a 275bp Fed-BoJ OIS carry advantage for USD, soft US labor data and easing Hormuz geopolitical tensions are forcing a rapid carry unwind. Options markets confirm the downside bias with a strong USD/JPY 25d RR put skew of -2.20, while retail remains 71% long, providing a contrarian signal for further weakness. Fed holds at 3.75%.",
+      "title": "CHF/JPY — G10 Bilateral Theme + JPY Momentum Outperformance",
+      "text": "JPY's 1W average performance of +1.252% (n=7) against CHF's -0.735% (n=6) creates a 1.987% G10 leader-laggard spread, driving CHF/JPY downside into the open. The JPY strength is reinforced by a positive ESI of +16.1 and a significant USD/JPY put skew (RR -2.20), while CHF remains the G10 laggard despite its mildly accommodative real rate of -0.45%. The next BoJ meeting (mkt: 100% hold priced) is the catalyst for confirming whether this JPY momentum can overcome the 266bp US-JPY OIS carry disadvantage.",
       "evidence": [
-        "US NFP: -23K vs +80K exp",
-        "JPY 1W avg: +1.242% (n=7)",
-        "USD/JPY 25d RR: -2.20"
+        "JPY 1W avg: +1.252% (n=7)",
+        "CHF 1W avg: -0.735% (n=6)",
+        "G10 spread: 1.987%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:38",
+      "time": "20:10",
+      "priority": "critical",
+      "title": "USD/CAD — NFP Shock + Bull Steepener Regime",
+      "text": "The USD/CAD Friday close of 1.3936 faces downside pressure toward the SMA200 (1.3852) after a negative US payrolls shock (-23K) triggered a bull steepener regime (+48bp 2s10s spread). Crowded CAD shorts (lev_net -102.3k) face significant squeeze risk as US Treasury yields collapse and the US ESI falls to -6.7. The next BoC meeting (mkt: 100% hold priced) on 9 Sep determines if the +133bp OIS carry advantage for USD can hold against this positioning unwind.",
+      "evidence": [
+        "CAD COT net short -102,309",
+        "US NFP -23K vs +80K expected",
+        "US 2Y yield 1D change: -0.59%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "19:34",
       "priority": "warning",
-      "title": "AUD/USD — Carry + Positioning + Vol",
-      "text": "AUD/USD trades at 0.7069, holding above the SMA20/50/200 cluster following a 1.90% gain over the last month. The pair benefits from a -71bp OIS carry premium favoring the AUD (RBA 4.35% vs Fed 3.75%), which remains a primary driver in a low-VIX (14.9) environment. COT LF net positioning is +23,616 (long% 64.1%), while retail traders are 78% short, suggesting institutional vs retail divergence that typically supports trend extension. Options pricing reflects caution with an AUD/USD VRP of +2.9% (IV 9.0% vs HV30 6.1%), indicating that while the carry trade is bid, markets are paying a significant premium for downside protection. The RBA's restrictive real rate of +0.60% vs the Fed's +1.56% narrows the restrictive gap as US yields retreat. Risk: RBA shifts to a dovish stance at the August 11 meeting, eroding the carry advantage.",
+      "title": "AUD/USD — Crowded Long Positioning Risk",
+      "text": "AUD COT LF net long +37,990 (72% long) creates a crowded-long unwind risk despite the Friday close at 0.7071 above all major SMAs. RBA holds at 4.35%. The next RBA meeting (mkt: 100% hold priced) on 11 Aug is the catalyst for resolving this positioning tension.",
       "evidence": [
-        "AUD/USD OIS Carry: -71bp",
-        "AUD/USD VRP: +2.9%",
-        "AUD COT LF Net: +23,616"
+        "AUD COT net long +37,990",
+        "AUD ESI: -11.1",
+        "AUD/USD IV 9.0% vs HV30 6.1% (VRP +2.9%)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:35",
+      "time": "22:58",
       "priority": "warning",
-      "title": "NZD/USD — ESI Outperformance + CB Bias Divergence",
-      "text": "NZD/USD trades at 0.5893, maintaining its position above the SMA20/50/200 cluster at 0.5829. The New Zealand Economic Surprise Index (ESI) is the highest in the G10 at +24.4, reflecting sustained data beats that contrast with the US ESI of -6.4. Speculative positioning remains extreme with COT LF net short -30,606 (9.7% long), which creates a significant short-squeeze risk as RBNZ remains in a 'HIKING' stance with a 2.5% policy rate. While the nominal USD/NZD carry favors USD by +125bp, the NZD real rate is deeply accommodative at -1.56%, suggesting that any hawkish shift from the RBNZ to combat inflation is likely to trigger an aggressive spec cover. Retail sentiment is 76% short, further aligning with a contrarian bullish bias for the pair. Risk: NZD/USD daily close below the 0.5829 SMA cluster nullifies the bullish technical setup.",
+      "title": "USD/NOK — Retail Sentiment Extreme + ESI Divergence",
+      "text": "USD/NOK 100% retail long positioning signals an extreme contrarian reversal risk toward the Friday close of 9.497. The Norges Bank (4.25%) maintains a restrictive real rate of +1.51%, creating a hawkish divergence against the Fed's easing bias following the NFP miss. The next NOK meeting on 13 Aug is the catalyst for determining if the pair can sustain its position below the SMA200 (9.706).",
       "evidence": [
-        "NZD ESI: +24.4",
-        "NZD COT long%: 9.7%",
-        "RBNZ Bias: HIKING"
+        "Retail Sentiment: 100% Long",
+        "NOK Real Rate: +1.51%",
+        "USD ESI: -6.7"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:30",
+      "time": "19:33",
       "priority": "info",
-      "title": "USD/CAD — Employment Divergence + Correlation Break",
-      "text": "USD/CAD trades at 1.3952, positioned below its SMA20/50 cluster of 1.4066/68. The pair is reacting to a sharp divergence in labor data as Canada added +75.1K jobs vs expectations of +15K, occurring simultaneously with the -23K US payroll miss. This fundamental divergence is testing the 133bp OIS carry advantage held by the USD (Fed 3.75% vs BoC 2.31%). Speculative positioning is heavily short CAD (COT LF net -103,684), leaving the pair sensitive to further positive CAD data surprises that could force an unwind toward the SMA200 at 1.3852. Notably, the USD/CAD vs WTI Oil correlation has weakened to a z-score of -1.14σ, indicating that CAD is currently trading more on employment and rate differentials than traditional energy price moves. Risk: WTI Oil prices fall below $70, re-establishing the traditional link and supporting USD/CAD regardless of labor data.",
+      "title": "EUR/USD — ECB Hike Bias vs Negative COT Skew",
+      "text": "EUR/USD closed Friday at 1.1562 with an ECB hike bias providing support, yet the lev_net short -73,049 (66% short) indicates a massive specimen short-squeeze setup is active. The +146bp OIS carry advantage for USD is narrowing as US inflation expectations (2.19%) are tested by the recent payrolls miss. The next ECB meeting (mkt: 53% hike priced) on 10 Sep determines if the positive EUR ESI (+7.2) can force an unwind of these speculative shorts.",
       "evidence": [
-        "Canada Employment: +75.1K",
-        "CAD COT LF Net: -103,684",
-        "USD/CAD SMA200: 1.3852"
+        "EUR COT net short -73,049",
+        "EUR/USD IV 7.1% vs HV30 4.3%",
+        "EUR ESI: +7.2"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
