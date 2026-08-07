@@ -2061,6 +2061,58 @@ a:focus-visible,
 /* Empty state */
 .rs-empty { padding:20px 14px;color:var(--text3);font-size:11px; }
 
+/* ─── NEWS DISPLAY DENSITY TOGGLE (v8.100.0) ────────────────────────────────
+   Expanded (default): current always-visible-excerpt layout, unchanged.
+   Compact: one line per item (source · time · cur-tag · title inline), no
+   excerpt — matches Bloomberg TOP<GO> scan density. Single class toggle on
+   #section-news collapses .ns-art-body/.rs-art-body across all three
+   sub-panels (News/Research/Analysis) — no per-item JS changes needed. */
+#ns-density-toggle {
+  margin-left: auto;
+  display: flex;
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ns-density-btn {
+  font-size: 9px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--text2);
+  background: transparent;
+  border: none;
+  padding: 2px 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.ns-density-btn:first-child { border-right: 1px solid var(--border2); }
+.ns-density-btn:hover { background: var(--bg3); color: var(--text); }
+.ns-density-active { background: var(--accent) !important; color: #fff !important; }
+
+#section-news.ns-compact .ns-article,
+#section-news.ns-compact .rs-article {
+  padding: 4px 14px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+#section-news.ns-compact .ns-art-body,
+#section-news.ns-compact .rs-art-body {
+  display: none;
+}
+#section-news.ns-compact .ns-art-meta,
+#section-news.ns-compact .rs-art-meta {
+  margin-bottom: 0;
+  display: inline-flex;
+}
+#section-news.ns-compact .ns-art-title,
+#section-news.ns-compact .rs-art-title {
+  margin-bottom: 0;
+  margin-left: 6px;
+  display: inline;
+}
+
 
 /* ─── Per-section scrollable feeds ───────────────────────────────────────────
    Each sub-panel shows ~6-8 rows then scrolls internally.

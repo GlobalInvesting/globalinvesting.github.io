@@ -11939,6 +11939,9 @@ function initAlerts() {
   // Init signal notification button state from localStorage
   updateSignalNotifBtn();
 
+  // Init News panel display density (expanded/compact) from localStorage
+  _newsLoadDensity();
+
   // Close popover when clicking outside — bubble phase so button onclick fires first
   document.addEventListener('click', e => {
     const anchor = document.getElementById('alerts-anchor');
@@ -13589,6 +13592,37 @@ async function loadOISRatesCache() {
 let _newsAllItems = [];
 let _newsMeta     = {};
 let _newsFilter   = { cur: 'ALL', impact: 'ALL' };
+
+// ── Display density — expanded (excerpt always visible, v8.8.2 default) vs.
+// compact (one line per item, no excerpt — Bloomberg TOP<GO> scan density).
+// Storage: localStorage key 'gi_news_density' → 'expanded' | 'compact' (default: 'expanded').
+// Applied via a single CSS class toggle on #section-news — collapses .ns-art-body/
+// .rs-art-body across all three sub-panels (News/Research/Analysis) at once,
+// no changes needed to _buildNsItem() or the Research inline article builder.
+const NEWS_DENSITY_KEY = 'gi_news_density';
+let _newsDensity = 'expanded';
+
+function _newsLoadDensity() {
+  try { _newsDensity = localStorage.getItem(NEWS_DENSITY_KEY) || 'expanded'; } catch { _newsDensity = 'expanded'; }
+  if (_newsDensity !== 'compact' && _newsDensity !== 'expanded') _newsDensity = 'expanded';
+  _newsApplyDensity();
+}
+
+function _newsApplyDensity() {
+  const section = document.getElementById('section-news');
+  if (section) section.classList.toggle('ns-compact', _newsDensity === 'compact');
+  document.querySelectorAll('.ns-density-btn').forEach(function(btn) {
+    btn.classList.toggle('ns-density-active', btn.dataset.density === _newsDensity);
+  });
+}
+
+function _newsSetDensity(mode) {
+  if (mode !== 'compact' && mode !== 'expanded') return;
+  _newsDensity = mode;
+  try { localStorage.setItem(NEWS_DENSITY_KEY, mode); } catch {}
+  _newsApplyDensity();
+}
+window._newsSetDensity = _newsSetDensity;
 
 // Sources classified as TA/market analysis — rendered in Analysis sub-panel
 // (renamed from "Trading" — aligns with Bloomberg/Reuters/Risk.net terminology)
