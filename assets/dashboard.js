@@ -4701,8 +4701,6 @@ async function _renderLWChart(ohlcId, label) {
     } else if (d.type === 'fib' || d.type === 'fibext') {
       // Diagonal swing guide (dashed, low-opacity — the levels below are the point).
       svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4,3" opacity="0.55"/>`;
-      // Convention: 0% sits at the swing point the user dragged FROM, 100% at
-      // the point dragged TO — matches the TradingView/MT5 Fibonacci tool.
       const drawnHighFirst = d.p1.price >= d.p2.price;
       const priceHigh = Math.max(d.p1.price, d.p2.price);
       const priceLow  = Math.min(d.p1.price, d.p2.price);
@@ -4711,8 +4709,25 @@ async function _renderLWChart(ohlcId, label) {
       const xLeft  = Math.min(x1, x2);
       const xRight = Math.max(x1, x2);
       const levels = d.type === 'fibext' ? FIB_EXT_LEVELS : FIB_LEVELS;
+      // BUGFIX (2026-08-07): Fibonacci Retracement had 0%/100% swapped.
+      // Verified against TradingView/MT5's actual behavior: when you drag
+      // from the swing low to the swing high, 0% lands at the point you
+      // dragged TO (the most recent extreme, i.e. the high) and 100% at the
+      // point you dragged FROM (i.e. the low) — NOT the other way around,
+      // which is what the previous formula produced. That inversion is what
+      // put 61.8%/78.6% near the top of an up-swing instead of near the
+      // bottom, where traders expect the "golden pocket" to sit.
+      // Fibonacci Extension intentionally keeps the OLDER from=0%/to=100%
+      // anchor, since it's a distinct convention: levels past 100% are
+      // meant to keep projecting outward beyond the TO point, in the same
+      // direction as the drawn swing (a continuation target, not a
+      // retracement zone) — flipping it would send extensions backward
+      // past the FROM point instead.
+      const isRetracement = d.type === 'fib';
       levels.forEach(lv => {
-        const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
+        const lvPrice = isRetracement
+          ? (d.p2.price + lv * (d.p1.price - d.p2.price))
+          : (drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range));
         const y = candleSeries.priceToCoordinate(lvPrice);
         if (y == null) return;
         const isAnchor = (lv === 0 || lv === 1);
@@ -4862,8 +4877,14 @@ async function _renderLWChart(ohlcId, label) {
         const range = priceHigh - priceLow || 1e-9;
         const xLeft = Math.min(x1, x2) - 4, xRight = Math.max(x1, x2) + 4;
         const levels = d.type === 'fibext' ? FIB_EXT_LEVELS : FIB_LEVELS;
+        // Mirrors the retracement/extension anchor split in _svgForDrawing —
+        // hit-testing must use the same 0%/100% convention as the render,
+        // or clicking a visible level line would miss it.
+        const isRetracement = d.type === 'fib';
         for (const lv of levels) {
-          const lvPrice = drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range);
+          const lvPrice = isRetracement
+            ? (d.p2.price + lv * (d.p1.price - d.p2.price))
+            : (drawnHighFirst ? (priceHigh - lv * range) : (priceLow + lv * range));
           const ly = candleSeries.priceToCoordinate(lvPrice);
           if (ly != null && x >= xLeft && x <= xRight && Math.abs(y - ly) < 5) return i;
         }

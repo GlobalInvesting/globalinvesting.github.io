@@ -1,3 +1,4 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.3.0 — CSI chart: added H1/H4/1D/1W timeframe selector (reuses main chart's intraday ohlc-data/h1|h4 sources; 1W is a telescoping downsample of the daily series, no new data source needed); fixed tooltip showing raw unix seconds for intraday TFs
 // CURRENCY STRENGTH HEATMAP MODAL  v2.2.4 — CSI chart: ResizeObserver keeps chart width in sync with container (was fixed at creation-time offsetWidth, so a browser resize while the modal was open left the chart clipped/misaligned)
 // CURRENCY STRENGTH HEATMAP MODAL  v2.2 — audit fixes: tooltipEl bug, keyframes, tab a11y, labels
 // CURRENCY STRENGTH HEATMAP MODAL  v1.1.0
@@ -443,9 +444,31 @@
   let _csiDataLive   = null;  // same shape as _csiData, with one extra live in-progress-session point per ccy appended
   let _csiChart      = null;  // LWC chart instance
   let _csiResizeObs  = null;  // ResizeObserver keeping _csiChart width in sync with #hm-csi-wrap
-  let _csiPeriodDays = 63;    // default 3M
+  let _csiTf         = 'D1';  // H1 | H4 | D1 | W1 — bar/return granularity feeding the accumulated-% line (2026-08-07)
+  let _csiPeriodDays = 63;    // default 3M — actually a bar-count into the *currently loaded* _csiTf's series, not literal calendar days (name kept for backward compat with existing csiPeriod() call sites)
   let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for focal-line styling
   let _csiInited     = false;
+
+  // ── CSI timeframe selector — H1 · H4 · 1D · 1W (2026-08-07) ────────────────
+  // Mirrors the main chart's own H1/H4/D1/W1 timeframe system (dashboard.js
+  // _TF_RANGE_SETS) for consistency, but the CSI panel is a cumulative
+  // accumulated-% LINE chart, not candles, so "period" here is a bar COUNT
+  // into whichever _csiTf's series is currently loaded, not a literal
+  // calendar-day span. Bar counts below are derived from the same
+  // bars-per-calendar-day ratios dashboard.js already uses when converting a
+  // day-span into a bar count (H1≈17 bars/day, H4≈4.25 bars/day, W1=1
+  // bar/7 days), applied to the equivalent day-span dashboard.js shows for
+  // that timeframe, so the presets line up with what "1W", "1M", etc. mean
+  // elsewhere in the terminal.
+  const _CSI_TF_PERIODS = {
+    H1: [{ n: 17,  label: '1D' }, { n: 85,  label: '1W' }, { n: 238, label: '2W' }, { n: 510, label: '1M' }, { n: 0, label: 'All' }],
+    H4: [{ n: 60,  label: '2W' }, { n: 128, label: '1M' }, { n: 387, label: '3M' }, { n: 774, label: '6M' }, { n: 0, label: 'All' }],
+    D1: [{ n: 21,  label: '1M' }, { n: 63,  label: '3M' }, { n: 126, label: '6M' }, { n: 252, label: '1Y' }, { n: 0, label: 'All' }],
+    W1: [{ n: 26,  label: '6M' }, { n: 52,  label: '1Y' }, { n: 104, label: '2Y' }, { n: 156, label: '3Y' }, { n: 0, label: 'All' }],
+  };
+  // Default selected period per TF (index into the array above via matching n).
+  const _CSI_TF_DEFAULT_N = { H1: 85, H4: 128, D1: 63, W1: 52 };
+  const _CSI_TF_TITLE     = { H1: 'H1', H4: 'H4', D1: 'DAILY', W1: 'WEEKLY' };
 
   // Fetch currency-drivers.json once per page load (lazy, on first modal open).
   // Falls back silently — the drivers note is additive, never blocking.
@@ -683,6 +706,12 @@
     <div class="hm-panel" id="hm-p-csi">
       <div class="hm-cw">
         <div class="hm-ct" id="hm-csi-title">CURRENCY STRENGTH INDEX · ACCUMULATED % RETURN · DAILY OHLC</div>
+        <div id="hm-csi-tf" style="display:flex;gap:2px;margin-bottom:6px;">
+          <button class="lw-tf-btn"     data-tf="H1" onclick="csiSetTf(this,'H1')" title="1 Hour">H1</button>
+          <button class="lw-tf-btn"     data-tf="H4" onclick="csiSetTf(this,'H4')" title="4 Hours">H4</button>
+          <button class="lw-tf-btn sel" data-tf="D1" onclick="csiSetTf(this,'D1')" title="Daily">1D</button>
+          <button class="lw-tf-btn"     data-tf="W1" onclick="csiSetTf(this,'W1')" title="Weekly">1W</button>
+        </div>
         <div id="hm-csi-period">
           <button class="hm-csi-pbtn" data-days="21"  onclick="csiPeriod(this,21)">1M</button>
           <button class="hm-csi-pbtn on" data-days="63"  onclick="csiPeriod(this,63)">3M</button>
@@ -1444,8 +1473,26 @@
 
   // Load all 28 OHLC files in parallel, compute per-currency daily log-returns
   // and accumulate into the CSI series.
-  async function _loadCSIData() {
+  // ── CSI TF → data source (2026-08-07) ───────────────────────────────────
+  // H1/H4 reuse the exact same intraday OHLC files the main price chart
+  // already fetches for those timeframes (ohlc-data/h1|h4/{pair}.json,
+  // unix-second bar times) — see dashboard.js _isIntradayTf. D1 is the
+  // original daily source (ohlc-data/{pair}.json, 'YYYY-MM-DD' bar times).
+  // W1 has no separate source file: it reuses the D1 daily bars and the
+  // resulting cumulative series is downsampled to one point per ISO week
+  // in _resampleCSIWeekly() below — mathematically equivalent to computing
+  // returns from weekly closes directly, since the cumulative log-return
+  // sum telescopes (see that function's comment for the proof).
+  function _csiBasePathForTf(tf) {
+    if (tf === 'H1') return './ohlc-data/h1/';
+    if (tf === 'H4') return './ohlc-data/h4/';
+    return './ohlc-data/'; // D1 and W1 both source daily bars
+  }
+
+  async function _loadCSIData(tf) {
+    tf = tf || 'D1';
     const pairIds = PAIR_DEFS.map(p => p.id);
+    const basePath = _csiBasePathForTf(tf);
     // Cache-buster (?_=Date.now()) — matches the pattern already used by the
     // other fetches in this file (currency-drivers.json, currency-catalysts.json,
     // session-context.json, below). Without it, this was the only fetch in the
@@ -1455,7 +1502,7 @@
     // intraday-data/quotes.json) already reflected it. Same staleness class as
     // documented in GUIDELINES.md re: GitHub Pages/CDN caching.
     const fetches = pairIds.map(id =>
-      fetch('./ohlc-data/' + id + '.json?_=' + Date.now())
+      fetch(basePath + id + '.json?_=' + Date.now())
         .then(r => r.ok ? r.json() : [])
         .catch(() => [])
     );
@@ -1463,6 +1510,8 @@
 
     // Build a date-keyed map of log-returns for each pair
     // pairRet[id][date] = log(close/prevClose) * sign * (base=ccy ? +1 : -1)
+    // "date" here is whatever the source bar's time field is — a
+    // 'YYYY-MM-DD' string for D1/W1, a unix-second number for H1/H4.
     const pairRet = {};
     const allDates = new Set();
 
@@ -1478,8 +1527,12 @@
       }
     });
 
-    // Sort dates
-    const dates = [...allDates].sort();
+    // Sort dates — explicit comparator rather than the default .sort()
+    // (which stringifies). It happens to give the right order for same-
+    // length unix-second numbers too, but that's coincidence, not a
+    // guarantee, so this is correct for both the D1/W1 string dates and
+    // the H1/H4 numeric ones on purpose rather than by luck.
+    const dates = [...allDates].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
     // For each ccy and each date: average log-return across its 7 pairs
     // (sign-corrected so positive always = this ccy strengthened)
@@ -1514,7 +1567,51 @@
       });
     });
 
+    if (tf === 'W1') return _resampleCSIWeekly({ dates, series });
     return { dates, series };
+  }
+
+  // ── _resampleCSIWeekly — downsample the daily CSI series to one point per
+  // ISO week (2026-08-07) ──────────────────────────────────────────────────
+  // Keeps only the LAST daily point in each Mon–Sun week, labeled by that
+  // week's Monday. This is mathematically identical to computing the series
+  // directly from weekly closes: the CSI series is a running SUM of daily
+  // log-returns, and a sum telescopes — cum(week N's last day) already
+  // equals the sum of every daily return up to and including that week, the
+  // same number you'd get log-ing (week N close / series-start close)
+  // directly. So no separate weekly ohlc-data source is needed; this is a
+  // pure downsample, not a re-derivation.
+  function _resampleCSIWeekly(daily) {
+    const { dates, series } = daily;
+    if (!dates.length) return daily;
+
+    function isoMonday(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00Z');
+      const dow = d.getUTCDay() || 7; // Sun(0) -> 7, so Mon=1..Sun=7
+      if (dow !== 1) d.setUTCDate(d.getUTCDate() - (dow - 1));
+      return d.toISOString().slice(0, 10);
+    }
+
+    // Last index in `dates` for each ISO week, in chronological order
+    // (dates is already sorted ascending, so Map insertion/iteration order
+    // stays chronological as later same-week dates simply overwrite it).
+    const lastIdxForWeek = new Map();
+    dates.forEach((date, i) => lastIdxForWeek.set(isoMonday(date), i));
+
+    const weekKeys = [...lastIdxForWeek.keys()];
+    const wSeries  = {};
+    CCY_ORDER.forEach(ccy => {
+      const allPts = series[ccy];
+      if (!allPts) { wSeries[ccy] = []; return; }
+      wSeries[ccy] = weekKeys
+        .map(wk => {
+          const pt = allPts[lastIdxForWeek.get(wk)];
+          return pt ? { time: wk, value: pt.value } : null;
+        })
+        .filter(Boolean);
+    });
+
+    return { dates: weekKeys, series: wSeries };
   }
 
   // ── Live in-progress-session point (mirrors dashboard.js _lwBuildTodayBar) ──
@@ -1555,6 +1652,16 @@
   // closed out today's session and the historical series already has it).
   function _computeCSILiveView() {
     if (!_csiData) return null;
+    // Scope boundary (2026-08-07): the live in-progress-session point below
+    // is built specifically from STOOQ_RT_CACHE's daily close/prev_close
+    // fields and a 21:00-UTC daily-session-boundary rule — it has no
+    // equivalent for H1/H4 intraday bars or W1's resampled weekly bars, so
+    // it's skipped for any TF other than D1. Those TFs still show fully
+    // up-to-date data as of the last completed bar; they just don't get the
+    // extra "session still in progress" point D1 gets. A live intraday
+    // point is a materially different feature (would need its own
+    // resolution-aware boundary logic) — flagged as a possible follow-up.
+    if (_csiTf !== 'D1') return _csiData;
     if (isMarketWeekend() || !_rtCache) return _csiData;
 
     const { dates, series } = _csiData;
@@ -1650,7 +1757,7 @@
       },
       timeScale: {
         borderColor: 'rgba(255,255,255,.08)',
-        timeVisible: false,
+        timeVisible: (_csiTf === 'H1' || _csiTf === 'H4'), // intraday TFs need hour granularity on the axis, or repeated same-day bars all show an identical date label
         fixLeftEdge: true,
         fixRightEdge: true,
       },
@@ -1711,7 +1818,25 @@
     }
 
     // Bloomberg-style multi-series crosshair tooltip
-    _csiChart.subscribeCrosshairMove(param => {
+  // Bloomberg-style multi-series crosshair tooltip
+  // param.time's shape depends on what Time type fed the series: a plain
+  // 'YYYY-MM-DD' string for D1/W1 (LWC may normalize this to a
+  // {year,month,day} BusinessDay object depending on version — handled
+  // below), or a raw unix-second number for H1/H4 (2026-08-07 — previously
+  // this concatenated param.time directly into the tooltip, which would
+  // have shown a raw epoch number like "1786068000" once H1/H4 existed).
+  function _csiFormatTooltipTime(t) {
+    if (typeof t === 'number') {
+      const d = new Date(t * 1000);
+      return d.toISOString().slice(0, 10) + ' ' + d.toISOString().slice(11, 16) + ' UTC';
+    }
+    if (t && typeof t === 'object' && t.year) {
+      return t.year + '-' + String(t.month).padStart(2, '0') + '-' + String(t.day).padStart(2, '0');
+    }
+    return String(t);
+  }
+
+  _csiChart.subscribeCrosshairMove(param => {
       if (!param || !param.time || !tooltipEl) {
         if (tooltipEl) tooltipEl.style.display = 'none';
         return;
@@ -1724,7 +1849,7 @@
       if (!rows.length) { tooltipEl.style.display = 'none'; return; }
 
       tooltipEl.innerHTML =
-        '<div class="hm-csi-tt-date">' + param.time + '</div>' +
+        '<div class="hm-csi-tt-date">' + _csiFormatTooltipTime(param.time) + '</div>' +
         rows.map(r => {
           const cls = r.val > 0 ? 'up' : r.val < 0 ? 'down' : 'flat';
           const dot = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + CSI_COLORS[r.ccy] + ';margin-right:5px;"></span>';
@@ -1808,8 +1933,8 @@
       };
     }).sort((a, b) => (b.val ?? -99) - (a.val ?? -99));
 
-    const periodLabel = _csiPeriodDays === 21 ? '1M' : _csiPeriodDays === 63 ? '3M' :
-                        _csiPeriodDays === 126 ? '6M' : _csiPeriodDays === 252 ? '1Y' : 'All';
+    const _periodPreset = (_CSI_TF_PERIODS[_csiTf] || _CSI_TF_PERIODS.D1).find(p => p.n === _csiPeriodDays);
+    const periodLabel = _periodPreset ? _periodPreset.label : 'All';
     if (titleEl) titleEl.textContent = 'CSI SNAPSHOT · ' + periodLabel + ' · ACCUMULATED RETURN';
 
     statsEl.innerHTML = '<table class="hm-tbl" aria-label="CSI period statistics">' +
@@ -1836,7 +1961,7 @@
       }).join('') +
       '</tbody></table>' +
       '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
-      'Daily OHLC history · 32-pair G10 composite CSI · Accum. Return = total from period start · Drawdown/Peak = lowest/highest CSI value within period</div>';
+      (_CSI_TF_TITLE[_csiTf] || 'DAILY') + ' OHLC history · 32-pair G10 composite CSI · Accum. Return = total from period start · Drawdown/Peak = lowest/highest CSI value within period</div>';
   }
 
   async function populateCSI(ccy) {
@@ -1857,7 +1982,7 @@
       }
 
       try {
-        _csiData = await _loadCSIData();
+        _csiData = await _loadCSIData(_csiTf);
       } catch(e) {
         if (loadingEl) loadingEl.textContent = 'Failed to load OHLC data';
         return;
@@ -1929,6 +2054,59 @@
       _renderCSIChart(_ccy);
       _renderCSIStats(_ccy);
     }
+  };
+
+  // Rebuilds the #hm-csi-period button row for the given TF's preset set
+  // (see _CSI_TF_PERIODS) — each TF has its own bar-count presets since a
+  // "1M" period means a different number of bars on H1 vs D1 vs W1.
+  function _renderCSIPeriodBtns(tf) {
+    const wrap = document.getElementById('hm-csi-period');
+    if (!wrap) return;
+    const presets = _CSI_TF_PERIODS[tf] || _CSI_TF_PERIODS.D1;
+    wrap.innerHTML = presets.map(p =>
+      '<button class="hm-csi-pbtn' + (p.n === _csiPeriodDays ? ' on' : '') + '" data-days="' + p.n + '" '
+      + 'onclick="csiPeriod(this,' + p.n + ')">' + p.label + '</button>'
+    ).join('');
+  }
+
+  // ── csiSetTf — switch the CSI chart's bar/return granularity ───────────────
+  // Reloads _csiData from the TF-appropriate source (see _loadCSIData) and
+  // resets the period-button row to that TF's own presets. Deliberately does
+  // NOT try to preserve the previously-selected period across a TF switch —
+  // a "63" period means 3M on D1 but only ~9 trading hours on H1, so keeping
+  // the raw number would silently change what the user is looking at; jumping
+  // to that TF's own sensible default is safer.
+  window.csiSetTf = function(btn, tf) {
+    if (_csiTf === tf) return;
+    _csiTf = tf;
+    document.querySelectorAll('#hm-csi-tf .lw-tf-btn').forEach(b => b.classList.toggle('sel', b === btn));
+    _csiPeriodDays = _CSI_TF_DEFAULT_N[tf] != null ? _CSI_TF_DEFAULT_N[tf] : 63;
+    _renderCSIPeriodBtns(tf);
+
+    const titleEl = document.getElementById('hm-csi-title');
+    if (titleEl) titleEl.textContent = 'CURRENCY STRENGTH INDEX · ACCUMULATED % RETURN · ' + (_CSI_TF_TITLE[tf] || 'DAILY') + ' OHLC';
+
+    if (!_ccy) return;
+    const loadingEl = document.getElementById('hm-csi-loading');
+    const chartEl   = document.getElementById('hm-csi-chart');
+    if (loadingEl) { loadingEl.style.display = 'flex'; loadingEl.textContent = 'Loading OHLC data…'; }
+    if (chartEl) chartEl.style.display = 'none';
+
+    _loadCSIData(tf).then(data => {
+      // Stale-response guard: if the user clicked a different TF again
+      // before this fetch resolved, drop this result — _csiTf has already
+      // moved on and applying it now would show the wrong granularity.
+      if (_csiTf !== tf) return;
+      _csiData = data;
+      _csiDataLive = _computeCSILiveView();
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (chartEl) chartEl.style.display = '';
+      _renderCSIChart(_ccy);
+      _renderCSIStats(_ccy);
+    }).catch(() => {
+      if (_csiTf !== tf) return;
+      if (loadingEl) loadingEl.textContent = 'Failed to load OHLC data';
+    });
   };
 
   window.closeHeatmapModal = function() {
