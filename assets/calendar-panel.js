@@ -1,5 +1,5 @@
 /**
- * calendar-panel.js v1.11 — Native economic calendar renderer
+ * calendar-panel.js v1.12 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
@@ -91,6 +91,21 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
+ * v1.12 (2026-08-07): BUG FIX — Actual-column beat/miss coloring silently
+ *   never applied to any currency-amount event (Balance of Trade, Imports,
+ *   Exports, Current Account, etc.). The local `stripNum` only removed %,
+ *   commas, K/M/B/T and whitespace — it left leading currency symbols
+ *   ($, C$, A$, €, ¥...) in place, so `parseFloat("C$3.86B")` (after strip:
+ *   "C$3.86") returned NaN, the `!isNaN` guard failed, and `cls` stayed ''.
+ *   Found live from Santiago's screenshots: Canada/US/Australia Balance of
+ *   Trade, US Imports/Exports all rendering with no green/red despite a
+ *   clear actual-vs-forecast beat or miss. Same bug class dashboard.js's
+ *   `_parseNum()` and fetch_economic_calendar.py's `_parse_num()` already
+ *   fixed for ESI scoring — confirmed those two (and econ-surprises-modal.js)
+ *   were unaffected, since they already strip-to-digits-and-restore-sign
+ *   rather than pattern-excluding known suffixes. New module-scope
+ *   `_calParseNum()` ports that same correct strategy here; this was purely
+ *   a display bug isolated to this panel's own separate implementation.
  */
 (function () {
   'use strict';
@@ -123,6 +138,28 @@
   // v8.100.7: added "unemployed" — "Unemployed Persons" (EUR/Germany, NOK) is not a
   // substring match of "unemployment". See dashboard.js INVERSE_KW comment.
   const CAL_INVERSE_KW = ['unemployment', 'unemployed', 'jobless', 'claims', 'deficit'];
+
+  // ── Numeric parser for macro actual/forecast values ─────────────────────
+  // parseFloat() alone fails on currency-symbol-prefixed strings such as
+  // "$-226.8B", "A$1.791B", "C$3.86B", "¥3907B", "-€5.2B" — the leading
+  // symbol makes parseFloat return NaN before it ever reaches the digits,
+  // so every Balance of Trade / Imports / Exports / Current Account row
+  // silently lost its Actual-column beat/miss coloring (no exception, no
+  // console warning — cls just stayed '' and the span rendered uncolored).
+  // Same bug class already fixed in dashboard.js's _parseNum() and
+  // fetch_economic_calendar.py's _parse_num() for ESI scoring — this panel
+  // had its own separate, cruder `stripNum` (%, comma, K/M/B/T only, no
+  // currency symbols) that never got the same fix. Ports the same
+  // strip-to-digits-and-restore-sign strategy so behavior matches exactly.
+  // Display-only: does not touch ESI scoring, which was already correct.
+  const _calParseNum = s => {
+    if (s == null || s === '') return NaN;
+    const str = String(s).replace(/,/g, '');
+    const neg = str.includes('-');
+    const digits = str.replace(/[^\d.]/g, '');
+    const n = parseFloat(digits);
+    return isNaN(n) ? NaN : (neg ? -n : n);
+  };
 
   // Browser timezone offset label e.g. "GMT-3"
   function tzLabel() {
@@ -412,9 +449,8 @@
         let actualHtml = '<span style="color:var(--text3)">—</span>';
         if (isReleased && ev.actual != null) {
           const forecastRaw = ev.forecast ? String(ev.forecast).replace(/\*$/, '') : null;
-          const stripNum  = s => s.replace(/&#\d+;/g, '').replace(/[%,KMBT\s]/gi, '');
-          const actualN   = parseFloat(stripNum(String(ev.actual)));
-          const forecastN = parseFloat(stripNum(String(forecastRaw || ev.previous || '')));
+          const actualN   = _calParseNum(ev.actual);
+          const forecastN = _calParseNum(forecastRaw || ev.previous || '');
           const evTitle   = (ev.title || '').toLowerCase();
           const isInverse = CAL_INVERSE_KW.some(kw => evTitle.includes(kw));
           let cls = '';
