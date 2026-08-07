@@ -279,8 +279,8 @@
 /* Single-row TF + period control bar (2026-08-07). CSI has its own
    .hm-csi-btn class (TF and period buttons alike) instead of reusing the
    main chart's .lw-tf-btn — that sharing previously caused a cross-
-   contamination bug: dashboard.js's TF click handler toggles `.sel` on
-   *every* `.lw-tf-btn` in the document (unscoped querySelectorAll), so
+   contamination bug: dashboard.js's TF click handler toggles .sel on
+   *every* .lw-tf-btn in the document (unscoped querySelectorAll), so
    switching the main chart's timeframe was silently re-highlighting the
    CSI modal's TF buttons underneath it, out of sync with the CSI panel's
    own _csiTf state. A dedicated class makes the two selectors fully
