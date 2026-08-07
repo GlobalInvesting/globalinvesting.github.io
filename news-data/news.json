@@ -1,8 +1,8 @@
 {
-  "updated_utc": "2026-08-07T12:01:29.680904+00:00",
-  "updated_label": "12:01 UTC",
+  "updated_utc": "2026-08-07T12:05:20.892483+00:00",
+  "updated_label": "12:05 UTC",
   "total": 52,
-  "total_high": 32,
+  "total_high": 34,
   "total_med": 16,
   "sources_active": [
     "ActionForex",
@@ -14,6 +14,10 @@
     "InvestMacro",
     "InvestingLive",
     "Nasdaq FX",
+    "NewsData CHF",
+    "NewsData EUR",
+    "NewsData JPY",
+    "NewsData NZD",
     "Nikkei Asia",
     "RTT News"
   ],
@@ -30,12 +34,12 @@
       "expand": "",
       "source": "Nikkei Asia",
       "link": "https://asia.nikkei.com/spotlight/iran-tensions/iran-war/how-the-us-iran-war-has-redrawn-asia-s-energy-map",
-      "time": "12:01",
-      "ts": 1786104099196,
+      "time": "12:05",
+      "ts": 1786104352990,
       "featured": true,
       "lang": "en",
       "date": "07 Aug",
-      "datetime": "2026-08-07T12:01:39.196723+00:00",
+      "datetime": "2026-08-07T12:05:52.990532+00:00",
       "recent": true
     },
     {
@@ -247,22 +251,6 @@
       "recent": true
     },
     {
-      "id": "ba1d8e818cce",
-      "cur": "CHF",
-      "impact": "low",
-      "title": "Swiss Franc: Funding currency weakness extends – OCBC",
-      "expand": "OCBC’s Sim Moh Siong and Christopher Wong note the Swiss Franc (CHF) remains under pressure as carry trade funding demand grows and recent Japanese Yen (JPY) intervention reinforces CHF’s role as a preferred funding currency.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/swiss-franc-funding-currency-weakness-extends-ocbc-202608070921",
-      "time": "09:21",
-      "ts": 1786094463000,
-      "featured": false,
-      "lang": "en",
-      "date": "07 Aug",
-      "datetime": "2026-08-07T09:21:03+00:00",
-      "recent": true
-    },
-    {
       "id": "2bdb3a0e21e6",
       "cur": "NZD",
       "impact": "high",
@@ -375,6 +363,54 @@
       "recent": true
     },
     {
+      "id": "d2f20d94af47",
+      "cur": "EUR",
+      "impact": "high",
+      "title": "US Treasury Sold Euros to Back the Yen — and the ECB Found Out After the Fact",
+      "expand": "The US Treasury sold euros last week to prop up the Japanese yen. Not dollars. Euros. And the European Central Bank didn’t hear about it until it was alrea",
+      "source": "NewsData EUR",
+      "link": "https://www.newsbreak.com/news/4815552593469-us-treasury-sold-euros-to-back-the-yen-and-the-ecb-found-out-after-the-fact",
+      "time": "00:00",
+      "ts": 1786060800000,
+      "featured": false,
+      "lang": "en",
+      "date": "07 Aug",
+      "datetime": "2026-08-07T00:00:00+00:00",
+      "recent": true
+    },
+    {
+      "id": "c6d577793741",
+      "cur": "JPY",
+      "impact": "high",
+      "title": "Invesco CurrencyShares JPY Trust Q2 Net Loss $425K; Assets Down",
+      "expand": "Invesco CurrencyShares Japanese Yen Trust reported a net comprehensive loss of $425,087 for the three months ended June 30, 2026, and $901,630 for the six months ended June 30, 2026. Total assets decreased to $429.26 million from $475.30 million at the end of 2025. The Japanese Yen experienced negative performance in Q2 and year-to-date 2026 due to higher U.S. interest rates and strong USD demand, despite the Bank of Japan raising its policy rate.",
+      "source": "NewsData JPY",
+      "link": "https://www.stockwatch.live/us/news/invesco-currencyshares-jpy-trust-q2-net-loss-425k-assets-down-b63ca844-8ae6-4e85-9eea-87507f99e710",
+      "time": "00:00",
+      "ts": 1786060800000,
+      "featured": false,
+      "lang": "en",
+      "date": "07 Aug",
+      "datetime": "2026-08-07T00:00:00+00:00",
+      "recent": true
+    },
+    {
+      "id": "0228fb331171",
+      "cur": "CHF",
+      "impact": "med",
+      "title": "Invesco Swiss Franc Trust Q2 Net Loss $(677K)",
+      "expand": "Invesco CurrencyShares Swiss Franc Trust reported a net comprehensive loss of $(677,067) for the second quarter of 2026, worsening from a loss of $(427,048) in the same period last year. Basic and diluted earnings per share stood at $(0.15). For the six months ended June 30, 2026, the net comprehensive loss was $(1,356,903). Despite the losses, total assets increased to $432.1 million, reflecting an increase in redeemable capital shares.",
+      "source": "NewsData CHF",
+      "link": "https://www.stockwatch.live/us/news/invesco-swiss-franc-trust-q2-net-loss-677k-f4dd79cb-fb0e-4a10-a30b-14438bd52166",
+      "time": "00:00",
+      "ts": 1786060800000,
+      "featured": false,
+      "lang": "en",
+      "date": "07 Aug",
+      "datetime": "2026-08-07T00:00:00+00:00",
+      "recent": true
+    },
+    {
       "id": "eeebbb795af4",
       "cur": "JPY",
       "impact": "high",
@@ -391,6 +427,22 @@
       "recent": true
     },
     {
+      "id": "1b571b01ce33",
+      "cur": "CHF",
+      "impact": "med",
+      "title": "USD/CHF Forecast: Bulls Eye Further Gains Above 0.8100 as Technical Setup Strengthens",
+      "expand": "BitcoinWorld USD/CHF Forecast: Bulls Eye Further Gains Above 0.8100 as Technical Setup Strengthens The USD/CHF pair is positioned to extend its advance beyond the 0.8100 level, supported by a constructive technical outlook that has drawn attention from currency traders. As of the latest session, the pair trades near 0.8080, having held firm above key moving averages, with momentum indicators pointing to continued upside pressure. Technical Setup Points to [...] This post USD/CHF Forecast: Bulls Eye Further Gains Above 0.8100 as Technical Setup Strengthens first appeared on BitcoinWorld .",
+      "source": "NewsData CHF",
+      "link": "https://bitcoinworld.co.in/usd-chf-forecast-gains-above-08100/",
+      "time": "23:35",
+      "ts": 1786059311000,
+      "featured": false,
+      "lang": "en",
+      "date": "06 Aug",
+      "datetime": "2026-08-06T23:35:11+00:00",
+      "recent": true
+    },
+    {
       "id": "97e83811acc8",
       "cur": "AUD",
       "impact": "high",
@@ -404,6 +456,22 @@
       "lang": "en",
       "date": "06 Aug",
       "datetime": "2026-08-06T23:19:11+00:00",
+      "recent": true
+    },
+    {
+      "id": "1e6c78cb677e",
+      "cur": "NZD",
+      "impact": "med",
+      "title": "New Zealand Dollar Drops as US Dollar Firms on Strong Jobs Data",
+      "expand": "BitcoinWorld New Zealand Dollar Drops as US Dollar Firms on Strong Jobs Data The New Zealand Dollar (NZD) weakened against the US Dollar (USD) on Tuesday, as the greenback gained momentum following stronger-than-expected US employment data that reinforced expectations of a more gradual Federal Reserve rate-cutting cycle. Why the New Zealand Dollar Is Falling The NZD/USD pair traded lower, reflecting a broader shift in market sentiment toward the [...] This post New Zealand Dollar Drops as US Dollar Firms on Strong Jobs Data first appeared on BitcoinWorld .",
+      "source": "NewsData NZD",
+      "link": "https://bitcoinworld.co.in/new-zealand-dollar-drops-us-dollar-firms/",
+      "time": "21:45",
+      "ts": 1786052711000,
+      "featured": false,
+      "lang": "en",
+      "date": "06 Aug",
+      "datetime": "2026-08-06T21:45:11+00:00",
       "recent": true
     },
     {
@@ -452,22 +520,6 @@
       "lang": "en",
       "date": "06 Aug",
       "datetime": "2026-08-06T14:33:51+00:00",
-      "recent": true
-    },
-    {
-      "id": "decab9010dcc",
-      "cur": "CHF",
-      "impact": "low",
-      "title": "The USDCHF tested a key target earlier today and found willing buyers. What next technically?",
-      "expand": "On Tuesday, in my USDCHF post, I wrote : \"For sellers to strengthen their grip, they need to push below the swing support between 0.8060 and 0.8070, and then break the 38.2% retracement of the rally from the late-May low to last week's high at 0.80491.\" In trading today, the pair tested that 0.8060–0.8070 support zone and found willing buyers. The low reached 0.8061 before rebounding sharply. That recovery has now lifted the price back above the 100-hour moving average (blue line on the chart above), currently at 0.80878. Reclaiming that level shifts the short-term bias modestly back in favor ...",
-      "source": "InvestingLive",
-      "link": "https://investinglive.com/technical-analysis/the-usdchf-tested-a-key-target-earlier-today-and-found-willing-buyers-what-next-technically/",
-      "time": "13:44",
-      "ts": 1786023882000,
-      "featured": false,
-      "lang": "en",
-      "date": "06 Aug",
-      "datetime": "2026-08-06T13:44:42+00:00",
       "recent": true
     },
     {
@@ -679,22 +731,6 @@
       "recent": false
     },
     {
-      "id": "5c7e7a52fe78",
-      "cur": "JPY",
-      "impact": "med",
-      "title": "Japan’s Wage Cycle Keeps Improving as Real Pay Rises for Sixth Month",
-      "expand": "Japan&#8217;s wage growth remained robust in June, reinforcing the Bank of Japan&#8217;s case for continued policy normalization. Real wages rose 1.6% y/y, matching May&#8217;s upwardly revised gain and marking a sixth consecutive monthly increase, the longest positive streak since 2021. More notably, nominal cash earnings climbed 3.4%, extending a run of monthly increases above 3% [&#8230;] The post Japan&#8217;s Wage Cycle Keeps Improving as Real Pay Rises for Sixth Month appeared first on ActionForex .",
-      "source": "ActionForex",
-      "link": "https://www.actionforex.com/live-comments/649588-japans-wage-cycle-keeps-improving-as-real-pay-rises-for-sixth-month/",
-      "time": "03:11",
-      "ts": 1785899480000,
-      "featured": false,
-      "lang": "en",
-      "date": "05 Aug",
-      "datetime": "2026-08-05T03:11:20+00:00",
-      "recent": false
-    },
-    {
       "id": "15a6188a373a",
       "cur": "NZD",
       "impact": "high",
@@ -775,22 +811,6 @@
       "recent": false
     },
     {
-      "id": "4a96872701fa",
-      "cur": "CAD",
-      "impact": "med",
-      "title": "Canada’s Trade Surplus Widens, Though Weaker Loonie Boosts Headline",
-      "expand": "Canada recorded its fourth consecutive monthly merchandise trade surplus in June, with exports and imports both reaching record levels. Exports rose 0.4% m/m to CAD 77.5B, while imports edged up 0.2% to CAD 73.6B, allowing the trade surplus to widen modestly from CAD 3.7B to CAD 3.9B. The latest figures extend a strong run for [&#8230;] The post Canada&#8217;s Trade Surplus Widens, Though Weaker Loonie Boosts Headline appeared first on ActionForex .",
-      "source": "ActionForex",
-      "link": "https://www.actionforex.com/live-comments/649528-canadas-trade-surplus-widens-though-weaker-loonie-boosts-headline/",
-      "time": "12:41",
-      "ts": 1785847291000,
-      "featured": false,
-      "lang": "en",
-      "date": "04 Aug",
-      "datetime": "2026-08-04T12:41:31+00:00",
-      "recent": false
-    },
-    {
       "id": "f0e0c08cd35e",
       "cur": "GBP",
       "impact": "low",
@@ -820,22 +840,6 @@
       "lang": "en",
       "date": "04 Aug",
       "datetime": "2026-08-04T05:18:26+00:00",
-      "recent": false
-    },
-    {
-      "id": "e31d44f343c9",
-      "cur": "AUD",
-      "impact": "med",
-      "title": "Australian Dollar Price Forecast: AUD/USD reaches a crossroads at 0.7000",
-      "expand": "Directional bias: Neutral to bullish above 0.6900, although repeated difficulty clearing 0.7000 leaves the pair exposed to another rejection.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/analysis/australian-dollar-price-forecast-aud-usd-reaches-a-crossroads-at-07000-202608031738",
-      "time": "17:38",
-      "ts": 1785778689000,
-      "featured": false,
-      "lang": "en",
-      "date": "03 Aug",
-      "datetime": "2026-08-03T17:38:09+00:00",
       "recent": false
     },
     {
