@@ -1,3 +1,5 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.4.0 — CSI chart: replaced the two-row Interval+Range control (added earlier this session) with a single industry-standard range selector (1D/1W/1M/3M/6M/1Y/All), each mapping internally to both a lookback and an auto-selected OHLC resolution — confirmed against TradingView's own docs and CSM-specific tools (FXSSI, MarketMilk), which all expose exactly one range control, never two. Also: added chart.timeScale().fitContent() after loading series data, which was missing entirely — without it LWC used a fixed bar-spacing default instead of stretching the loaded range to fill the chart width, so ranges with few bars left visible empty space and chart width looked inconsistent across timeframes
+// CURRENCY STRENGTH HEATMAP MODAL  v2.3.4 — CSI chart: normalize each currency's daily return by ACTUAL per-date pair coverage instead of a fixed pair count, so a legitimately-missing bar for one pair (e.g. fetch_ohlc.py's flat-bar guard dropping a degenerate O=H=L=C bar) no longer systematically understates that currency's move for that one bar
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.3 — CSI chart: added "Interval" / "Range" group labels above the TF and period button rows (Santiago's pick, Bloomberg-style) so the two rows read as distinct controls instead of duplicate-looking buttons (both rows can show "1D"/"1W" text since they answer different questions — interval vs. lookback)
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.2 — CSI chart: fixed _updateCSILiveBar() still rebasing the live RT point against a bar-count cutoff (missed in v2.3.1's calendar-day migration), which snapped every currency's most recent point to a wildly different baseline than the rest of the series on every RT tick — visible as all CSI lines jumping/converging together at the chart's right edge
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.1 — CSI chart: TF+period controls merged into one row with uniform button sizing; TF buttons moved off the shared .lw-tf-btn class onto their own .hm-csi-btn (was cross-contaminating with the main chart's global TF-button selector); period presets switched from an assumed bar-count to real calendar-day cutoffs (bar-count drifted for H1/H4/W1 depending on incidental weekend placement in the trailing window)
@@ -278,26 +280,14 @@
 .driver-note { font-size:10px;color:var(--text2);margin-top:3px;line-height:1.5; }
 
 /* ── CSI chart ── */
-/* Single-row TF + period control bar (2026-08-07). CSI has its own
-   .hm-csi-btn class (TF and period buttons alike) instead of reusing the
-   main chart's .lw-tf-btn — that sharing previously caused a cross-
-   contamination bug: dashboard.js's TF click handler toggles .sel on
-   *every* .lw-tf-btn in the document (unscoped querySelectorAll), so
-   switching the main chart's timeframe was silently re-highlighting the
-   CSI modal's TF buttons underneath it, out of sync with the CSI panel's
-   own _csiTf state. A dedicated class makes the two selectors fully
-   independent.
-   Group labels ("Interval" / "Range", 2026-08-07 — Santiago's pick from
-   the Bloomberg-style-label option): the TF row (candle interval: H1/H4/
-   D1/W1) and the period row (lookback range: e.g. 1D/1W/2W/1M) can share
-   literal button text (both can show "1D" or "1W") since they answer two
-   different questions, which read as duplicate/confusing buttons without
-   a caption distinguishing the two groups. */
-#hm-csi-controls { display:flex;align-items:flex-end;gap:10px;margin-bottom:10px;flex-wrap:wrap; }
-.hm-csi-group { display:flex;flex-direction:column;gap:3px; }
-.hm-csi-group-label { font-size:8px;letter-spacing:.07em;text-transform:uppercase;color:var(--text2);opacity:.55; }
-#hm-csi-tf,#hm-csi-period { display:flex;gap:2px; }
-.hm-csi-sep { width:1px;align-self:stretch;background:var(--border2);margin:0 1px; }
+/* Single range-selector row (2026-08-07 redesign, replacing an earlier
+   same-day two-row Interval+Range design). Industry-standard chart range
+   bars (TradingView, Google/Yahoo Finance-style, and CSM-specific tools
+   like FXSSI) expose exactly ONE user-facing control — the lookback range
+   — and pick bar resolution automatically underneath; see the
+   _CSI_RANGE_CONFIG comment in the script block below for the full
+   rationale and the range→resolution mapping. */
+#hm-csi-controls { display:flex;align-items:center;gap:2px;margin-bottom:10px;flex-wrap:wrap; }
 #hm-csi-wrap,.csi-wrap {
   position:relative;height:280px;
   background:var(--bg);border-radius:4px;overflow:hidden;
@@ -468,40 +458,51 @@
   let _csiDataLive   = null;  // same shape as _csiData, with one extra live in-progress-session point per ccy appended
   let _csiChart      = null;  // LWC chart instance
   let _csiResizeObs  = null;  // ResizeObserver keeping _csiChart width in sync with #hm-csi-wrap
-  let _csiTf         = 'D1';  // H1 | H4 | D1 | W1 — bar/return granularity feeding the accumulated-% line (2026-08-07)
-  let _csiPeriodDays = 91;    // default 3M — literal calendar days back from the series' last date (see _csiCutoffDate)
+  let _csiTf         = 'D1';  // H1 | H4 | D1 | W1 — bar/return granularity feeding the accumulated-% line. Derived from _csiRange via _CSI_RANGE_CONFIG (2026-08-07) — not a separately user-facing control, see below.
+  let _csiPeriodDays = 91;    // default 3M — literal calendar days back from the series' last date (see _csiCutoffDate). Derived from _csiRange.
+  let _csiRange      = '3M';  // the ONE user-facing control (2026-08-07 redesign) — see _CSI_RANGE_CONFIG
   let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for focal-line styling
   let _csiInited     = false;
 
-  // ── CSI timeframe selector — H1 · H4 · 1D · 1W (2026-08-07) ────────────────
-  // FIX (2026-08-07): the period presets below used to be expressed as a
-  // fixed BAR COUNT (e.g. "1W" on H1 = 85 bars), derived from an assumed
-  // bars-per-calendar-day ratio (17/day for H1, 4.25/day for H4 — the same
-  // ratio dashboard.js's _lwSetRange uses). That works for dashboard.js
-  // because it only ever scrolls the viewport over one already-loaded
-  // instrument's own bar sequence (an approximate zoom — a little off
-  // doesn't move the data). The CSI series is different: it's built from
-  // the UNION of bar timestamps across all 32 pairs, and the actual bar
-  // density right at "now" varies with whether the trailing window happens
-  // to include a weekend (FX is closed ~48h/week) — so a fixed bar count
-  // could span anywhere from ~3.5 real days to ~7 real days depending on
-  // exactly when you looked, i.e. the labeled period ("1W") frequently
-  // didn't match what was actually on screen, and the start point drifted
-  // with no relation to the button the user clicked.
+  // ── CSI range selector — single control, industry-standard (2026-08-07) ───
+  // Earlier same-day iterations of this panel exposed TWO controls: an
+  // "Interval" row (H1/H4/1D/1W bar granularity) and a "Range" row
+  // (lookback period). Santiago flagged that this doesn't match how range
+  // selectors actually work anywhere in the industry — confirmed against
+  // TradingView's own docs: "When users switch a time frame... The chart
+  // resolution changes. The bars scale horizontally to cover the entire
+  // requested date/time range" (Time-Scale docs) — i.e. every reference
+  // implementation (TradingView, Google/Yahoo Finance-style range bars, and
+  // CSM-specific tools like FXSSI) exposes exactly ONE control (the range),
+  // and picks bar resolution automatically underneath so the chart stays
+  // readable. Two independent controls that can both show "1D"/"1W" text
+  // for two different questions (candle interval vs. lookback) is not a
+  // pattern used anywhere Santiago or I could find.
   //
-  // Fix: periods are now literal CALENDAR DAYS, resolved against the
-  // series' own last date via _csiCutoffDate() (real date-math cutoff, not
-  // a bar-count offset) — the same approach Bloomberg/TradingView range
-  // buttons use. This is exact regardless of local bar density.
-  const _CSI_TF_PERIODS = {
-    H1: [{ days: 1,   label: '1D' }, { days: 7,   label: '1W' }, { days: 14,  label: '2W' }, { days: 30,  label: '1M' }, { days: 0, label: 'All' }],
-    H4: [{ days: 14,  label: '2W' }, { days: 30,  label: '1M' }, { days: 91,  label: '3M' }, { days: 182, label: '6M' }, { days: 0, label: 'All' }],
-    D1: [{ days: 30,  label: '1M' }, { days: 91,  label: '3M' }, { days: 182, label: '6M' }, { days: 365, label: '1Y' }, { days: 0, label: 'All' }],
-    W1: [{ days: 182, label: '6M' }, { days: 365, label: '1Y' }, { days: 730, label: '2Y' }, { days: 1095,label: '3Y' }, { days: 0, label: 'All' }],
-  };
-  // Default selected period per TF (must match one `days` value in the array above).
-  const _CSI_TF_DEFAULT_DAYS = { H1: 7, H4: 30, D1: 91, W1: 365 };
-  const _CSI_TF_TITLE     = { H1: 'H1', H4: 'H4', D1: 'DAILY', W1: 'WEEKLY' };
+  // Fix: back to a single #hm-csi-controls row. Each range button maps to
+  // BOTH a lookback (`days`, calendar days via _csiCutoffDate — unchanged
+  // from the earlier v2.3.1 fix) and the OHLC resolution needed to render
+  // it readably (`tf`) — chosen so every range shows on the order of
+  // 25-260 bars, never a handful of dots or thousands of overlapping ones:
+  //   1D/1W  → H1 (hourly)     ~24 / ~120 bars
+  //   1M     → H4 (4-hourly)   ~180 bars
+  //   3M/6M/1Y → D1 (daily)    ~65 / ~130 / ~260 bars
+  //   All    → W1 (weekly)     full history, still readable
+  // `_csiTf`/`_csiPeriodDays` remain as internal derived state (read by
+  // _csiCutoffDate, _renderCSIChart, _renderCSIStats, _updateCSILiveBar —
+  // none of that logic needed to change) — they're just no longer set by
+  // two independent user clicks, only by csiSetRange() picking one config
+  // entry as a unit.
+  const _CSI_RANGE_CONFIG = [
+    { key: '1D', label: '1D', tf: 'H1', days: 1   },
+    { key: '1W', label: '1W', tf: 'H1', days: 7   },
+    { key: '1M', label: '1M', tf: 'H4', days: 30  },
+    { key: '3M', label: '3M', tf: 'D1', days: 91  },
+    { key: '6M', label: '6M', tf: 'D1', days: 182 },
+    { key: '1Y', label: '1Y', tf: 'D1', days: 365 },
+    { key: 'All',label: 'All',tf: 'W1', days: 0   },
+  ];
+  const _CSI_TF_TITLE = { H1: 'H1', H4: 'H4', D1: 'DAILY', W1: 'WEEKLY' };
 
   // Resolve a period-button "days" value into an actual cutoff — the first
   // date/timestamp that should be INCLUDED in the visible window — anchored
@@ -755,26 +756,13 @@
       <div class="hm-cw">
         <div class="hm-ct" id="hm-csi-title">CURRENCY STRENGTH INDEX · ACCUMULATED % RETURN · DAILY OHLC</div>
         <div id="hm-csi-controls">
-          <div class="hm-csi-group">
-            <div class="hm-csi-group-label">Interval</div>
-            <div id="hm-csi-tf">
-              <button class="hm-csi-btn"    data-tf="H1" onclick="csiSetTf(this,'H1')" title="1 Hour">H1</button>
-              <button class="hm-csi-btn"    data-tf="H4" onclick="csiSetTf(this,'H4')" title="4 Hours">H4</button>
-              <button class="hm-csi-btn on" data-tf="D1" onclick="csiSetTf(this,'D1')" title="Daily">1D</button>
-              <button class="hm-csi-btn"    data-tf="W1" onclick="csiSetTf(this,'W1')" title="Weekly">1W</button>
-            </div>
-          </div>
-          <div class="hm-csi-sep"></div>
-          <div class="hm-csi-group">
-            <div class="hm-csi-group-label">Range</div>
-            <div id="hm-csi-period">
-              <button class="hm-csi-btn" data-days="30"  onclick="csiPeriod(this,30)">1M</button>
-              <button class="hm-csi-btn on" data-days="91"  onclick="csiPeriod(this,91)">3M</button>
-              <button class="hm-csi-btn" data-days="182" onclick="csiPeriod(this,182)">6M</button>
-              <button class="hm-csi-btn" data-days="365" onclick="csiPeriod(this,365)">1Y</button>
-              <button class="hm-csi-btn" data-days="0"   onclick="csiPeriod(this,0)">All</button>
-            </div>
-          </div>
+          <button class="hm-csi-btn" data-range="1D"  onclick="csiSetRange(this,'1D')"  title="1 Day, hourly">1D</button>
+          <button class="hm-csi-btn" data-range="1W"  onclick="csiSetRange(this,'1W')"  title="1 Week, hourly">1W</button>
+          <button class="hm-csi-btn" data-range="1M"  onclick="csiSetRange(this,'1M')"  title="1 Month, 4-hourly">1M</button>
+          <button class="hm-csi-btn on" data-range="3M"  onclick="csiSetRange(this,'3M')"  title="3 Months, daily">3M</button>
+          <button class="hm-csi-btn" data-range="6M"  onclick="csiSetRange(this,'6M')"  title="6 Months, daily">6M</button>
+          <button class="hm-csi-btn" data-range="1Y"  onclick="csiSetRange(this,'1Y')"  title="1 Year, daily">1Y</button>
+          <button class="hm-csi-btn" data-range="All" onclick="csiSetRange(this,'All')" title="Full history, weekly">All</button>
         </div>
         <div id="hm-csi-wrap">
           <div id="hm-csi-loading">Loading OHLC data…</div>
@@ -1591,10 +1579,14 @@
     // the H1/H4 numeric ones on purpose rather than by luck.
     const dates = [...allDates].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
-    // For each ccy and each date: average log-return across its 7 pairs
-    // (sign-corrected so positive always = this ccy strengthened)
+    // For each ccy and each date: average log-return across its participating
+    // pairs (sign-corrected so positive always = this ccy strengthened).
+    // Also track COVERAGE (how many of that ccy's pairs actually reported a
+    // bar for this exact date) alongside the sum — see normalization fix
+    // below (2026-08-07).
     const ccyDailyRet = {};
-    CCY_ORDER.forEach(ccy => { ccyDailyRet[ccy] = {}; });
+    const ccyDailyCov = {};
+    CCY_ORDER.forEach(ccy => { ccyDailyRet[ccy] = {}; ccyDailyCov[ccy] = {}; });
 
     dates.forEach(date => {
       PAIR_DEFS.forEach(p => {
@@ -1603,22 +1595,38 @@
         // base ccy gets +ret, quote ccy gets -ret
         if (ccyDailyRet[p.base]) {
           ccyDailyRet[p.base][date] = (ccyDailyRet[p.base][date] || 0) + ret;
+          ccyDailyCov[p.base][date] = (ccyDailyCov[p.base][date] || 0) + 1;
         }
         if (ccyDailyRet[p.quote]) {
           ccyDailyRet[p.quote][date] = (ccyDailyRet[p.quote][date] || 0) - ret;
+          ccyDailyCov[p.quote][date] = (ccyDailyCov[p.quote][date] || 0) + 1;
         }
       });
     });
 
-    // Normalize by number of pairs each ccy participates in (7 for G10 majors, varies for NOK/SEK per PAIR_DEFS)
-    // then accumulate to get the CSI series
+    // Normalize by ACTUAL per-date coverage, not the fixed full pair count
+    // (2026-08-07 fix). Previously divided by `pairsForCcy` (e.g. 9 for
+    // USD) unconditionally. That's correct when all 9 pairs reported a bar
+    // for a given date, but on any date where one pair's bar was legitimately
+    // missing — e.g. fetch_ohlc.py's flat-bar guard (`o==h==l==c`) correctly
+    // dropping a degenerate O=H=L=C bar yfinance occasionally returns for a
+    // symbol's most recent in-progress hour — dividing the remaining 8
+    // pairs' summed return by the full count of 9 systematically understated
+    // that ccy's move for that one bar (biased toward zero, not just noisier).
+    // Dividing by the pair count that ACTUALLY contributed each date is the
+    // unbiased estimator: it's identical to the old behavior on every date
+    // with full coverage (the overwhelming majority of history — cov ===
+    // pairsForCcy there) and only changes the rare partial-coverage bar to a
+    // correct per-pair average instead of a diluted one. `cov` is guaranteed
+    // >=1 whenever `sum` is non-null (see the accumulation loop above), so no
+    // divide-by-zero risk.
     const series = {};
     CCY_ORDER.forEach(ccy => {
-      const pairsForCcy = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy).length;
       let cum = 0;
       series[ccy] = dates.map(date => {
         const sum = ccyDailyRet[ccy][date];
-        if (sum != null) cum += sum / pairsForCcy;
+        const cov = ccyDailyCov[ccy][date];
+        if (sum != null && cov) cum += sum / cov;
         // Convert to % (×100) for display
         return { time: date, value: parseFloat((cum * 100).toFixed(4)) };
       });
@@ -1861,6 +1869,16 @@
       _csiSeriesMap[c] = ls;
     });
 
+    // FIX (2026-08-07): without this, Lightweight Charts falls back to its
+    // default fixed bar-spacing (~6px) instead of stretching the loaded
+    // range to fill the container — so a range with few bars (e.g. "1D" on
+    // H1, ~24 bars) left visible empty space instead of spanning the full
+    // chart width, while the width itself looked inconsistent switching
+    // between ranges with very different bar counts. fitContent() sizes bar
+    // spacing so the currently-loaded data always fills the available width,
+    // for every range.
+    _csiChart.timeScale().fitContent();
+
     // Zero baseline
     const firstSeries = _csiSeriesMap[CCY_ORDER[0]];
     if (firstSeries) {
@@ -1989,8 +2007,7 @@
       };
     }).sort((a, b) => (b.val ?? -99) - (a.val ?? -99));
 
-    const _periodPreset = (_CSI_TF_PERIODS[_csiTf] || _CSI_TF_PERIODS.D1).find(p => p.days === _csiPeriodDays);
-    const periodLabel = _periodPreset ? _periodPreset.label : 'All';
+    const periodLabel = _csiRange;
     if (titleEl) titleEl.textContent = 'CSI SNAPSHOT · ' + periodLabel + ' · ACCUMULATED RETURN';
 
     statsEl.innerHTML = '<table class="hm-tbl" aria-label="CSI period statistics">' +
@@ -2102,65 +2119,50 @@
     document.getElementById('hm-close').focus();
   };
 
-  window.csiPeriod = function(btn, days) {
-    _csiPeriodDays = days;
-    // Scoped to #hm-csi-period only — the TF row now uses the same
-    // .hm-csi-btn class (2026-08-07 unified sizing), so an unscoped
-    // querySelectorAll('.hm-csi-btn') here would also strip the 'on' state
-    // off the currently-selected TF button.
-    document.querySelectorAll('#hm-csi-period .hm-csi-btn').forEach(b => b.classList.toggle('on', b === btn));
-    if (_csiData && _ccy) {
+  // ── csiSetRange — the ONE user-facing CSI control (2026-08-07 redesign) ────
+  // Replaces the earlier same-day csiSetTf()/csiPeriod()/_renderCSIPeriodBtns()
+  // trio (two independent controls) with a single range switch. Looks up both
+  // the lookback (`days`) and the resolution (`tf`) from one _CSI_RANGE_CONFIG
+  // entry, so picking "1D" always means exactly one thing.
+  // Only re-fetches OHLC data when the resolution actually changes (e.g. 1D→1W
+  // both use H1 — switching between them just re-slices/re-renders already-
+  // loaded data; 1W→1M changes H1→H4 and needs a real fetch).
+  window.csiSetRange = function(btn, rangeKey) {
+    if (_csiRange === rangeKey) return;
+    const cfg = _CSI_RANGE_CONFIG.find(r => r.key === rangeKey);
+    if (!cfg) return;
+    _csiRange = rangeKey;
+    const tfChanged = _csiTf !== cfg.tf;
+    _csiTf = cfg.tf;
+    _csiPeriodDays = cfg.days;
+
+    document.querySelectorAll('#hm-csi-controls .hm-csi-btn').forEach(b => b.classList.toggle('on', b === btn));
+
+    const titleEl = document.getElementById('hm-csi-title');
+    if (titleEl) titleEl.textContent = 'CURRENCY STRENGTH INDEX · ACCUMULATED % RETURN · ' + (_CSI_TF_TITLE[cfg.tf] || 'DAILY') + ' OHLC';
+
+    if (!_ccy) return;
+
+    if (!tfChanged) {
+      // Same underlying resolution already loaded (e.g. 1D <-> 1W, both H1;
+      // or 3M <-> 6M <-> 1Y, all D1) — just re-slice at the new cutoff and
+      // re-render, no need to hit the network again.
       _csiDataLive = _computeCSILiveView();
       _renderCSIChart(_ccy);
       _renderCSIStats(_ccy);
+      return;
     }
-  };
 
-  // Rebuilds the #hm-csi-period button row for the given TF's preset set
-  // (see _CSI_TF_PERIODS) — each TF has its own calendar-day presets since
-  // a "1M" period is scoped differently depending on how far back it's
-  // useful to look at that granularity.
-  function _renderCSIPeriodBtns(tf) {
-    const wrap = document.getElementById('hm-csi-period');
-    if (!wrap) return;
-    const presets = _CSI_TF_PERIODS[tf] || _CSI_TF_PERIODS.D1;
-    wrap.innerHTML = presets.map(p =>
-      '<button class="hm-csi-btn' + (p.days === _csiPeriodDays ? ' on' : '') + '" data-days="' + p.days + '" '
-      + 'onclick="csiPeriod(this,' + p.days + ')">' + p.label + '</button>'
-    ).join('');
-  }
-
-  // ── csiSetTf — switch the CSI chart's bar/return granularity ───────────────
-  // Reloads _csiData from the TF-appropriate source (see _loadCSIData) and
-  // resets the period-button row to that TF's own presets. Deliberately does
-  // NOT try to preserve the previously-selected period across a TF switch —
-  // "91 days" means 3M on D1 but 91 days of H1 bars is a much busier chart,
-  // so keeping the raw number would silently change what the user is
-  // looking at; jumping to that TF's own sensible default is safer.
-  window.csiSetTf = function(btn, tf) {
-    if (_csiTf === tf) return;
-    _csiTf = tf;
-    // Scoped to #hm-csi-tf — CSI's TF buttons have their own .hm-csi-btn
-    // class now (2026-08-07), no longer .lw-tf-btn, so this can never be
-    // affected by (or affect) the main chart's own TF selector.
-    document.querySelectorAll('#hm-csi-tf .hm-csi-btn').forEach(b => b.classList.toggle('on', b === btn));
-    _csiPeriodDays = _CSI_TF_DEFAULT_DAYS[tf] != null ? _CSI_TF_DEFAULT_DAYS[tf] : 91;
-    _renderCSIPeriodBtns(tf);
-
-    const titleEl = document.getElementById('hm-csi-title');
-    if (titleEl) titleEl.textContent = 'CURRENCY STRENGTH INDEX · ACCUMULATED % RETURN · ' + (_CSI_TF_TITLE[tf] || 'DAILY') + ' OHLC';
-
-    if (!_ccy) return;
     const loadingEl = document.getElementById('hm-csi-loading');
     const chartEl   = document.getElementById('hm-csi-chart');
     if (loadingEl) { loadingEl.style.display = 'flex'; loadingEl.textContent = 'Loading OHLC data…'; }
     if (chartEl) chartEl.style.display = 'none';
 
-    _loadCSIData(tf).then(data => {
-      // Stale-response guard: if the user clicked a different TF again
-      // before this fetch resolved, drop this result — _csiTf has already
-      // moved on and applying it now would show the wrong granularity.
-      if (_csiTf !== tf) return;
+    _loadCSIData(cfg.tf).then(data => {
+      // Stale-response guard: if the user clicked a different range again
+      // before this fetch resolved, drop this result — _csiRange has
+      // already moved on and applying it now would show the wrong data.
+      if (_csiRange !== rangeKey) return;
       _csiData = data;
       _csiDataLive = _computeCSILiveView();
       if (loadingEl) loadingEl.style.display = 'none';
@@ -2168,7 +2170,7 @@
       _renderCSIChart(_ccy);
       _renderCSIStats(_ccy);
     }).catch(() => {
-      if (_csiTf !== tf) return;
+      if (_csiRange !== rangeKey) return;
       if (loadingEl) loadingEl.textContent = 'Failed to load OHLC data';
     });
   };
