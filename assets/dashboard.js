@@ -13726,6 +13726,7 @@ function _buildNsItem(item, containerEl) {
   // ── Title — clickable headline when a safe link is available ──
   const titleEl = document.createElement('div');
   titleEl.className = 'ns-art-title';
+  titleEl.title = headline; // full text on hover — compact mode truncates with ellipsis
   if (safeLink) {
     const a = document.createElement('a');
     a.href = safeLink;
@@ -15012,6 +15013,7 @@ function renderResearchSection(items, meta) {
     // Title — clickable headline when a safe link is available
     const titleEl = document.createElement('div');
     titleEl.className = 'rs-art-title';
+    titleEl.title = displayTitle; // full text on hover — compact mode truncates with ellipsis
     if (safeUrl) {
       const a = document.createElement('a');
       a.href = safeUrl;
