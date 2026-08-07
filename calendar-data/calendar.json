@@ -1,10 +1,10 @@
 {
-  "lastUpdate": "2026-08-07T06:43:36Z",
-  "generatedAt": "2026-08-07T06:43:36Z",
-  "fetchMode": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable) via ff_calendar.json",
+  "lastUpdate": "2026-08-07T10:23:46Z",
+  "generatedAt": "2026-08-07T10:23:46Z",
+  "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
-  "source": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable)",
+  "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-08-07",
@@ -1044,8 +1044,8 @@
       "std": 0.141421
     },
     "CHF/consumer confidence": {
-      "n": 3,
-      "mean": -0.333333,
+      "n": 4,
+      "mean": -0.5,
       "std": 0.57735
     },
     "EUR/italy balance of trade": {
@@ -1347,6 +1347,16 @@
       "n": 2,
       "mean": 0.4,
       "std": 0.424264
+    },
+    "EUR/france balance of trade": {
+      "n": 2,
+      "mean": -0.5,
+      "std": 1.697056
+    },
+    "EUR/france current account": {
+      "n": 2,
+      "mean": 1.35,
+      "std": 0.494975
     },
     "EUR/germany balance of trade": {
       "n": 2,
@@ -46373,7 +46383,7 @@
       "impact": "medium",
       "actual": "0.2%",
       "forecast": "0.1%",
-      "previous": "0.9%"
+      "previous": "0.7%"
     },
     {
       "date": "7 Aug",
@@ -46386,7 +46396,7 @@
       "impact": "high",
       "actual": "€15.4B",
       "forecast": "€17.4B",
-      "previous": "€19.1B"
+      "previous": "€19.3B"
     },
     {
       "date": "7 Aug",
@@ -46399,7 +46409,7 @@
       "impact": "medium",
       "actual": "0.9%",
       "forecast": "0.2%",
-      "previous": "0.9%"
+      "previous": "1.1%"
     },
     {
       "date": "7 Aug",
@@ -46436,9 +46446,9 @@
       "flag": "🇪🇺",
       "event": "France Balance of Trade",
       "impact": "medium",
-      "actual": null,
+      "actual": "€-5.8B",
       "forecast": "€-6.5B",
-      "previous": "€-6.9B"
+      "previous": "€-7.7B"
     },
     {
       "date": "7 Aug",
@@ -46449,9 +46459,9 @@
       "flag": "🇪🇺",
       "event": "France Current Account",
       "impact": "medium",
-      "actual": null,
-      "forecast": "-2.4",
-      "previous": "-0.1"
+      "actual": "€-1.4B",
+      "forecast": "€-2.4B",
+      "previous": "€-1.2B"
     },
     {
       "date": "7 Aug",
@@ -46462,7 +46472,7 @@
       "flag": "🇨🇭",
       "event": "Switzerland Consumer Confidence",
       "impact": "medium",
-      "actual": null,
+      "actual": "-35.0",
       "forecast": "-34.0",
       "previous": "-36.0"
     },
