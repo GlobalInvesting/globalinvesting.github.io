@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.104.5';
+const CACHE_VERSION = 'gi-v8.104.7';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -42,7 +42,7 @@ const STATIC_PRECACHE = [
   '/assets/real-carry-modal.js?v=2.7.6',
   '/assets/corr-modal.js?v=2.2.0',
   '/assets/yc-modal.js?v=8.8.4',
-  '/assets/heatmap-modal.js?v=2.3.1',
+  '/assets/heatmap-modal.js?v=2.3.3',
   '/assets/econ-surprises-modal.js?v=1.3.10',
   '/assets/onboarding.js?v=7.89.10',
   '/assets/layout-resizer.js?v=1.0.0',
