@@ -1,9 +1,9 @@
 {
-  "updated_utc": "2026-08-07T21:01:26.042200+00:00",
-  "updated_label": "21:01 UTC",
+  "updated_utc": "2026-08-07T21:05:57.970389+00:00",
+  "updated_label": "21:05 UTC",
   "total": 52,
-  "total_high": 33,
-  "total_med": 15,
+  "total_high": 35,
+  "total_med": 14,
   "sources_active": [
     "ActionForex",
     "BabyPips",
@@ -13,6 +13,9 @@
     "InvestMacro",
     "InvestingLive",
     "Nasdaq FX",
+    "NewsData CHF",
+    "NewsData EUR",
+    "NewsData NZD",
     "RTT News"
   ],
   "lang_counts": {
@@ -20,22 +23,6 @@
     "en": 52
   },
   "articles": [
-    {
-      "id": "541131076ace",
-      "cur": "USD",
-      "impact": "high",
-      "title": "Stocks Supported as Fed Rate Hike Fears Ease",
-      "expand": "The S P 500 Index ($SPX ) (SPY ) today is up +0.61%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.25%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.00%. September E-mini S P futures (ESU26 ) are up +0.66%, and September E-mini Nasdaq futures...",
-      "source": "Nasdaq FX",
-      "link": "https://www.nasdaq.com/articles/stocks-supported-fed-rate-hike-fears-ease",
-      "time": "20:58",
-      "ts": 1786136315000,
-      "featured": true,
-      "lang": "en",
-      "date": "07 Aug",
-      "datetime": "2026-08-07T20:58:35+00:00",
-      "recent": true
-    },
     {
       "id": "dd6b8b01ae7b",
       "cur": "USD",
@@ -60,6 +47,22 @@
       "expand": "September WTI crude oil (CLU26 ) closed up +0.89 (+1.15%) on Friday, and September RBOB gasoline (RBU26 ) closed up +0.0468 (+1.59%). Crude oil and gasoline prices settled higher on Friday, supported by a decline in the dollar ($DXY ) to a 7-week low. Also, uncertainty regarding a proposed plan...",
       "source": "Nasdaq FX",
       "link": "https://www.nasdaq.com/articles/uncertainty-over-reopening-strait-hormuz-lifts-crude-prices",
+      "time": "20:49",
+      "ts": 1786135744000,
+      "featured": true,
+      "lang": "en",
+      "date": "07 Aug",
+      "datetime": "2026-08-07T20:49:04+00:00",
+      "recent": true
+    },
+    {
+      "id": "541131076ace",
+      "cur": "USD",
+      "impact": "high",
+      "title": "Stocks Supported as Fed Rate Hike Fears Ease",
+      "expand": "The S P 500 Index ($SPX ) (SPY ) today is up +0.61%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.25%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.00%. September E-mini S P futures (ESU26 ) are up +0.66%, and September E-mini Nasdaq futures...",
+      "source": "Nasdaq FX",
+      "link": "https://www.nasdaq.com/articles/stocks-supported-fed-rate-hike-fears-ease",
       "time": "20:49",
       "ts": 1786135744000,
       "featured": true,
@@ -245,22 +248,6 @@
       "recent": true
     },
     {
-      "id": "70e8212767ba",
-      "cur": "NZD",
-      "impact": "low",
-      "title": "New Zealand Dollar advances as US labor market weakness pressures USD",
-      "expand": "NZD/USD trades around 0.5890 on Friday at the time of writing, up 0.36% on the day.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/new-zealand-dollar-advances-as-us-labor-market-weakness-pressures-the-usd-202608071603",
-      "time": "16:03",
-      "ts": 1786118630000,
-      "featured": false,
-      "lang": "en",
-      "date": "07 Aug",
-      "datetime": "2026-08-07T16:03:50+00:00",
-      "recent": true
-    },
-    {
       "id": "a770fcf64ba8",
       "cur": "CAD",
       "impact": "med",
@@ -370,6 +357,70 @@
       "lang": "en",
       "date": "07 Aug",
       "datetime": "2026-08-07T12:48:16+00:00",
+      "recent": true
+    },
+    {
+      "id": "4bb0a3d39f0b",
+      "cur": "EUR",
+      "impact": "high",
+      "title": "From oil to electrons: lessons from the 1970s energy crises",
+      "expand": "The European Central Bank (ECB) is the central bank of the European Union countries which have adopted the euro. Our main task is to maintain price stability in the euro area and so preserve the purchasing power of the single currency.",
+      "source": "NewsData EUR",
+      "link": "https://zpravy.kurzy.cz/870694-from-oil-to-electrons-lessons-from-the-1970s-energy-crises/",
+      "time": "09:00",
+      "ts": 1786093200000,
+      "featured": false,
+      "lang": "en",
+      "date": "07 Aug",
+      "datetime": "2026-08-07T09:00:00+00:00",
+      "recent": true
+    },
+    {
+      "id": "410b5e62d6ed",
+      "cur": "EUR",
+      "impact": "med",
+      "title": "Eurozone Retail Sales Miss Forecasts, But Broader Economy Holds Up",
+      "expand": "BitcoinWorld Eurozone Retail Sales Miss Forecasts, But Broader Economy Holds Up Eurozone retail sales fell short of market expectations in the latest monthly reading, but the broader economy continues to show resilience, according to analysts. The data, released on [Date of release, e.g., July 5, 2025], revealed a [percentage change] month-on-month change, versus the [percentage] forecast, underscoring the uneven nature of the region’s recovery. What the [...] This post Eurozone Retail Sales Miss Forecasts, But Broader Economy Holds Up first appeared on BitcoinWorld .",
+      "source": "NewsData EUR",
+      "link": "https://bitcoinworld.co.in/eurozone-retail-sales-miss-forecasts-broader-economy-holds-up/",
+      "time": "08:55",
+      "ts": 1786092910000,
+      "featured": false,
+      "lang": "en",
+      "date": "07 Aug",
+      "datetime": "2026-08-07T08:55:10+00:00",
+      "recent": true
+    },
+    {
+      "id": "504d217688be",
+      "cur": "CHF",
+      "impact": "low",
+      "title": "Swiss Franc Rises Amid Uncertainty Over Hormuz Reopening",
+      "expand": "BRUSSELS (dpa-AFX) - The safe-haven currency, the Swiss franc strengthened against other major currencies in the European session on Friday, as European stock markets traded lower with AI spending...",
+      "source": "NewsData CHF",
+      "link": "https://www.finanznachrichten.de/nachrichten-2026-08/69247460-swiss-franc-rises-amid-uncertainty-over-hormuz-reopening-020.htm",
+      "time": "08:18",
+      "ts": 1786090680000,
+      "featured": false,
+      "lang": "en",
+      "date": "07 Aug",
+      "datetime": "2026-08-07T08:18:00+00:00",
+      "recent": true
+    },
+    {
+      "id": "c48cd7a22596",
+      "cur": "NZD",
+      "impact": "high",
+      "title": "Australia, NZ dollars pause for cues on US, RBA rate outlooks",
+      "expand": "SYDNEY: The Australian and New Zealand dollars stood still on Friday ahead of a US jobs report that could shift the dial on the chance of a rate hike there, while bonds suffered a setback as oil prices rebounded. Investors were also looking ahead to a board meeting of the Reserve Bank of Australia on August 11, widely expected to see rates held at 4.35% but also reiterate a warning that further tightening might be needed. All 37 analysts polled by Reuters tip a steady outcome, while 27 expected no increase for the rest of the year either. The central bank has hiked three times since February i...",
+      "source": "NewsData NZD",
+      "link": "https://www.brecorder.com/news/40433735/australia-nz-dollars-pause-for-cues-on-us-rba-rate-outlooks",
+      "time": "07:38",
+      "ts": 1786088321000,
+      "featured": false,
+      "lang": "en",
+      "date": "07 Aug",
+      "datetime": "2026-08-07T07:38:41+00:00",
       "recent": true
     },
     {
@@ -661,22 +712,6 @@
       "recent": false
     },
     {
-      "id": "3cd90b96e528",
-      "cur": "EUR",
-      "impact": "med",
-      "title": "EURUSD tests the week's high and looks toward the 100 day MA/other resistance targets",
-      "expand": "The EURUSD bias remains tilted to the upside after yesterday's pullback stalled in the swing area between 1.1498 and 1.1506. Buyers defended that support zone, the price held above the rising 100-hour moving average, and the pair went on to close higher. Today's advance has extended that momentum, with the EURUSD up 0.22% and trading near the session high at 1.1557, just shy of Monday's high at 1.1558. A break above that high would give buyers another small victory, but the technical road becomes much more challenging from there. The 100-day moving average at 1.15686 is the next major hurdle, ...",
-      "source": "InvestingLive",
-      "link": "https://investinglive.com/technical-analysis/eurusd-tests-the-week-s-high-and-looks-toward-the-100-day-ma-other-resistance-targets/",
-      "time": "15:19",
-      "ts": 1785943177000,
-      "featured": false,
-      "lang": "en",
-      "date": "05 Aug",
-      "datetime": "2026-08-05T15:19:37+00:00",
-      "recent": false
-    },
-    {
       "id": "f94abe0ee33d",
       "cur": "JPY",
       "impact": "med",
@@ -789,22 +824,6 @@
       "recent": false
     },
     {
-      "id": "45629f202aec",
-      "cur": "CAD",
-      "impact": "med",
-      "title": "USDCAD has had an up and down trading day today, but buyers are trying to make a play",
-      "expand": "The USDCAD has spent the day yo-yoing between support and resistance, with price action largely confined between the 100-hour and 200-hour moving averages. Support has been defined by the 100-hour moving average, currently at 1.4037, while resistance has been anchored by the 200-hour moving average near 1.4066. The latest push higher has finally carried the pair above the 200-hour moving average, giving buyers an opportunity to break free from today's choppy, back-and-forth trading. The key now is whether they can hold above that level. If they do, the technical picture becomes more constructi...",
-      "source": "InvestingLive",
-      "link": "https://investinglive.com/technical-analysis/usdcad-has-had-an-up-and-down-trading-day-today-but-buyers-are-trying-to-make-a-play/",
-      "time": "15:44",
-      "ts": 1785858273000,
-      "featured": false,
-      "lang": "en",
-      "date": "04 Aug",
-      "datetime": "2026-08-04T15:44:33+00:00",
-      "recent": false
-    },
-    {
       "id": "7797bdb7dd69",
       "cur": "JPY",
       "impact": "high",
@@ -818,22 +837,6 @@
       "lang": "en",
       "date": "04 Aug",
       "datetime": "2026-08-04T15:06:32+00:00",
-      "recent": false
-    },
-    {
-      "id": "4306637c19e0",
-      "cur": "CHF",
-      "impact": "low",
-      "title": "USDCHF backs off from swing and MA resistance. Sellers remain in control",
-      "expand": "The USDCHF has moved lower today after sellers successfully defended a key resistance zone yesterday between 0.8108 and 0.8120, an area reinforced by the falling 100-hour moving average (now at 0.81043, slightly lower than yesterday). The inability to break above those technical barriers on both days kept sellers more in control in the short term at least, with downside momentum accelerating in the early North American session to a low of 0.8082. That move keeps the near-term bias tilted to the downside and buyers on the defensive, but the broader battle for control is far from settled. For se...",
-      "source": "InvestingLive",
-      "link": "https://investinglive.com/technical-analysis/usdchf-backs-off-from-swing-and-ma-resistance-sellers-remain-in-control/",
-      "time": "13:31",
-      "ts": 1785850270000,
-      "featured": false,
-      "lang": "en",
-      "date": "04 Aug",
-      "datetime": "2026-08-04T13:31:10+00:00",
       "recent": false
     },
     {
