@@ -14281,7 +14281,15 @@ document.getElementById('lw-range-bar')?.addEventListener('click', e => {
   _lwActiveTf   = newTf;
   _lwActiveDays = _TF_DEFAULT_DAYS[newTf] ?? 91;
   _lwClearCompare(); // compare series has different timestamps on different TFs
-  document.querySelectorAll('.lw-tf-btn').forEach(b => b.classList.toggle('sel', b.dataset.tf === newTf));
+  // Scoped to #lw-range-bar (2026-08-07 fix): this used to be an unscoped
+  // document.querySelectorAll('.lw-tf-btn'), which also matched the CSI
+  // panel's timeframe buttons (heatmap-modal.js reused the same class) once
+  // that panel had been built — so switching the main chart's TF silently
+  // re-highlighted the CSI modal's TF row underneath it, out of sync with
+  // its own _csiTf state. The CSI panel now has its own .hm-csi-btn class
+  // instead, but this stays scoped as a hard guarantee against any future
+  // widget reusing .lw-tf-btn and hitting the same cross-contamination.
+  document.querySelectorAll('#lw-range-bar .lw-tf-btn').forEach(b => b.classList.toggle('sel', b.dataset.tf === newTf));
   _lwUpdateRangeBtns();
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });

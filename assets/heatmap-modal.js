@@ -1,3 +1,4 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.3.1 — CSI chart: TF+period controls merged into one row with uniform button sizing; TF buttons moved off the shared .lw-tf-btn class onto their own .hm-csi-btn (was cross-contaminating with the main chart's global TF-button selector); period presets switched from an assumed bar-count to real calendar-day cutoffs (bar-count drifted for H1/H4/W1 depending on incidental weekend placement in the trailing window)
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.0 — CSI chart: added H1/H4/1D/1W timeframe selector (reuses main chart's intraday ohlc-data/h1|h4 sources; 1W is a telescoping downsample of the daily series, no new data source needed); fixed tooltip showing raw unix seconds for intraday TFs
 // CURRENCY STRENGTH HEATMAP MODAL  v2.2.4 — CSI chart: ResizeObserver keeps chart width in sync with container (was fixed at creation-time offsetWidth, so a browser resize while the modal was open left the chart clipped/misaligned)
 // CURRENCY STRENGTH HEATMAP MODAL  v2.2 — audit fixes: tooltipEl bug, keyframes, tab a11y, labels
@@ -275,22 +276,35 @@
 .driver-note { font-size:10px;color:var(--text2);margin-top:3px;line-height:1.5; }
 
 /* ── CSI chart ── */
-#hm-csi-period,.csi-controls { display:flex;gap:3px;margin-bottom:10px; }
+/* Single-row TF + period control bar (2026-08-07). CSI has its own
+   .hm-csi-btn class (TF and period buttons alike) instead of reusing the
+   main chart's .lw-tf-btn — that sharing previously caused a cross-
+   contamination bug: dashboard.js's TF click handler toggles `.sel` on
+   *every* `.lw-tf-btn` in the document (unscoped querySelectorAll), so
+   switching the main chart's timeframe was silently re-highlighting the
+   CSI modal's TF buttons underneath it, out of sync with the CSI panel's
+   own _csiTf state. A dedicated class makes the two selectors fully
+   independent. */
+#hm-csi-controls { display:flex;align-items:center;gap:5px;margin-bottom:10px;flex-wrap:wrap; }
+#hm-csi-tf,#hm-csi-period { display:flex;gap:2px; }
+.hm-csi-sep { width:1px;align-self:stretch;background:var(--border2);margin:0 1px; }
 #hm-csi-wrap,.csi-wrap {
   position:relative;height:280px;
   background:var(--bg);border-radius:4px;overflow:hidden;
   margin-bottom:10px;
 }
 #hm-csi-chart,.csi-canvas-placeholder { width:100%;height:100%; }
-.hm-csi-pbtn,.csi-pbtn {
+.hm-csi-btn,.hm-csi-pbtn,.csi-pbtn {
   font-size:10px;padding:3px 9px;border-radius:3px;
   border:1px solid var(--border2);
   background:none;color:var(--text2);cursor:pointer;
   font-family:var(--font-mono,monospace);
   transition:background .1s,color .1s,border-color .1s;
+  white-space:nowrap;
+  line-height:1.4;
 }
-.hm-csi-pbtn:hover,.csi-pbtn:hover { background:rgba(255,255,255,.05);color:var(--text); }
-.hm-csi-pbtn.on,.csi-pbtn.on {
+.hm-csi-btn:hover,.hm-csi-pbtn:hover,.csi-pbtn:hover { background:rgba(255,255,255,.05);color:var(--text); }
+.hm-csi-btn.on,.hm-csi-pbtn.on,.csi-pbtn.on {
   background:rgba(56,139,253,.15);
   border-color:rgba(56,139,253,.35);
   color:var(--blue);
@@ -445,30 +459,54 @@
   let _csiChart      = null;  // LWC chart instance
   let _csiResizeObs  = null;  // ResizeObserver keeping _csiChart width in sync with #hm-csi-wrap
   let _csiTf         = 'D1';  // H1 | H4 | D1 | W1 — bar/return granularity feeding the accumulated-% line (2026-08-07)
-  let _csiPeriodDays = 63;    // default 3M — actually a bar-count into the *currently loaded* _csiTf's series, not literal calendar days (name kept for backward compat with existing csiPeriod() call sites)
+  let _csiPeriodDays = 91;    // default 3M — literal calendar days back from the series' last date (see _csiCutoffDate)
   let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for focal-line styling
   let _csiInited     = false;
 
   // ── CSI timeframe selector — H1 · H4 · 1D · 1W (2026-08-07) ────────────────
-  // Mirrors the main chart's own H1/H4/D1/W1 timeframe system (dashboard.js
-  // _TF_RANGE_SETS) for consistency, but the CSI panel is a cumulative
-  // accumulated-% LINE chart, not candles, so "period" here is a bar COUNT
-  // into whichever _csiTf's series is currently loaded, not a literal
-  // calendar-day span. Bar counts below are derived from the same
-  // bars-per-calendar-day ratios dashboard.js already uses when converting a
-  // day-span into a bar count (H1≈17 bars/day, H4≈4.25 bars/day, W1=1
-  // bar/7 days), applied to the equivalent day-span dashboard.js shows for
-  // that timeframe, so the presets line up with what "1W", "1M", etc. mean
-  // elsewhere in the terminal.
+  // FIX (2026-08-07): the period presets below used to be expressed as a
+  // fixed BAR COUNT (e.g. "1W" on H1 = 85 bars), derived from an assumed
+  // bars-per-calendar-day ratio (17/day for H1, 4.25/day for H4 — the same
+  // ratio dashboard.js's _lwSetRange uses). That works for dashboard.js
+  // because it only ever scrolls the viewport over one already-loaded
+  // instrument's own bar sequence (an approximate zoom — a little off
+  // doesn't move the data). The CSI series is different: it's built from
+  // the UNION of bar timestamps across all 32 pairs, and the actual bar
+  // density right at "now" varies with whether the trailing window happens
+  // to include a weekend (FX is closed ~48h/week) — so a fixed bar count
+  // could span anywhere from ~3.5 real days to ~7 real days depending on
+  // exactly when you looked, i.e. the labeled period ("1W") frequently
+  // didn't match what was actually on screen, and the start point drifted
+  // with no relation to the button the user clicked.
+  //
+  // Fix: periods are now literal CALENDAR DAYS, resolved against the
+  // series' own last date via _csiCutoffDate() (real date-math cutoff, not
+  // a bar-count offset) — the same approach Bloomberg/TradingView range
+  // buttons use. This is exact regardless of local bar density.
   const _CSI_TF_PERIODS = {
-    H1: [{ n: 17,  label: '1D' }, { n: 85,  label: '1W' }, { n: 238, label: '2W' }, { n: 510, label: '1M' }, { n: 0, label: 'All' }],
-    H4: [{ n: 60,  label: '2W' }, { n: 128, label: '1M' }, { n: 387, label: '3M' }, { n: 774, label: '6M' }, { n: 0, label: 'All' }],
-    D1: [{ n: 21,  label: '1M' }, { n: 63,  label: '3M' }, { n: 126, label: '6M' }, { n: 252, label: '1Y' }, { n: 0, label: 'All' }],
-    W1: [{ n: 26,  label: '6M' }, { n: 52,  label: '1Y' }, { n: 104, label: '2Y' }, { n: 156, label: '3Y' }, { n: 0, label: 'All' }],
+    H1: [{ days: 1,   label: '1D' }, { days: 7,   label: '1W' }, { days: 14,  label: '2W' }, { days: 30,  label: '1M' }, { days: 0, label: 'All' }],
+    H4: [{ days: 14,  label: '2W' }, { days: 30,  label: '1M' }, { days: 91,  label: '3M' }, { days: 182, label: '6M' }, { days: 0, label: 'All' }],
+    D1: [{ days: 30,  label: '1M' }, { days: 91,  label: '3M' }, { days: 182, label: '6M' }, { days: 365, label: '1Y' }, { days: 0, label: 'All' }],
+    W1: [{ days: 182, label: '6M' }, { days: 365, label: '1Y' }, { days: 730, label: '2Y' }, { days: 1095,label: '3Y' }, { days: 0, label: 'All' }],
   };
-  // Default selected period per TF (index into the array above via matching n).
-  const _CSI_TF_DEFAULT_N = { H1: 85, H4: 128, D1: 63, W1: 52 };
+  // Default selected period per TF (must match one `days` value in the array above).
+  const _CSI_TF_DEFAULT_DAYS = { H1: 7, H4: 30, D1: 91, W1: 365 };
   const _CSI_TF_TITLE     = { H1: 'H1', H4: 'H4', D1: 'DAILY', W1: 'WEEKLY' };
+
+  // Resolve a period-button "days" value into an actual cutoff — the first
+  // date/timestamp that should be INCLUDED in the visible window — anchored
+  // to the series' own last date (not "today", since the series may lag by
+  // one closed session). Returns null for days<=0 (means "show everything").
+  // Handles both date-string series ('YYYY-MM-DD', for D1/W1) and
+  // unix-second-number series (H1/H4) since _loadCSIData's `time` field
+  // type depends on tf.
+  function _csiCutoffDate(lastDate, days) {
+    if (!days || days <= 0 || lastDate == null) return null;
+    if (typeof lastDate === 'number') return lastDate - days * 86400;
+    const d = new Date(lastDate + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() - days);
+    return d.toISOString().slice(0, 10);
+  }
 
   // Fetch currency-drivers.json once per page load (lazy, on first modal open).
   // Falls back silently — the drivers note is additive, never blocking.
@@ -706,18 +744,21 @@
     <div class="hm-panel" id="hm-p-csi">
       <div class="hm-cw">
         <div class="hm-ct" id="hm-csi-title">CURRENCY STRENGTH INDEX · ACCUMULATED % RETURN · DAILY OHLC</div>
-        <div id="hm-csi-tf" style="display:flex;gap:2px;margin-bottom:6px;">
-          <button class="lw-tf-btn"     data-tf="H1" onclick="csiSetTf(this,'H1')" title="1 Hour">H1</button>
-          <button class="lw-tf-btn"     data-tf="H4" onclick="csiSetTf(this,'H4')" title="4 Hours">H4</button>
-          <button class="lw-tf-btn sel" data-tf="D1" onclick="csiSetTf(this,'D1')" title="Daily">1D</button>
-          <button class="lw-tf-btn"     data-tf="W1" onclick="csiSetTf(this,'W1')" title="Weekly">1W</button>
-        </div>
-        <div id="hm-csi-period">
-          <button class="hm-csi-pbtn" data-days="21"  onclick="csiPeriod(this,21)">1M</button>
-          <button class="hm-csi-pbtn on" data-days="63"  onclick="csiPeriod(this,63)">3M</button>
-          <button class="hm-csi-pbtn" data-days="126" onclick="csiPeriod(this,126)">6M</button>
-          <button class="hm-csi-pbtn" data-days="252" onclick="csiPeriod(this,252)">1Y</button>
-          <button class="hm-csi-pbtn" data-days="0"   onclick="csiPeriod(this,0)">All</button>
+        <div id="hm-csi-controls">
+          <div id="hm-csi-tf">
+            <button class="hm-csi-btn"    data-tf="H1" onclick="csiSetTf(this,'H1')" title="1 Hour">H1</button>
+            <button class="hm-csi-btn"    data-tf="H4" onclick="csiSetTf(this,'H4')" title="4 Hours">H4</button>
+            <button class="hm-csi-btn on" data-tf="D1" onclick="csiSetTf(this,'D1')" title="Daily">1D</button>
+            <button class="hm-csi-btn"    data-tf="W1" onclick="csiSetTf(this,'W1')" title="Weekly">1W</button>
+          </div>
+          <div class="hm-csi-sep"></div>
+          <div id="hm-csi-period">
+            <button class="hm-csi-btn" data-days="30"  onclick="csiPeriod(this,30)">1M</button>
+            <button class="hm-csi-btn on" data-days="91"  onclick="csiPeriod(this,91)">3M</button>
+            <button class="hm-csi-btn" data-days="182" onclick="csiPeriod(this,182)">6M</button>
+            <button class="hm-csi-btn" data-days="365" onclick="csiPeriod(this,365)">1Y</button>
+            <button class="hm-csi-btn" data-days="0"   onclick="csiPeriod(this,0)">All</button>
+          </div>
         </div>
         <div id="hm-csi-wrap">
           <div id="hm-csi-loading">Loading OHLC data…</div>
@@ -1712,13 +1753,13 @@
     const tooltipEl = document.getElementById('hm-csi-tooltip');
     if (!wrap || !chartEl) return;
 
-    // Determine date slice
+    // Determine date slice — real calendar-day cutoff anchored to the
+    // series' own last date (see _csiCutoffDate; 2026-08-07 fix, replaces
+    // the old bar-count offset that made the visible start point drift for
+    // H1/H4/W1 depending on incidental weekend placement).
     const allDates  = csiView.dates;
-    let startIdx    = 0;
-    if (_csiPeriodDays > 0) {
-      startIdx = Math.max(0, allDates.length - _csiPeriodDays);
-    }
-    const cutoffDate = allDates[startIdx];
+    const lastDate  = allDates.length ? allDates[allDates.length - 1] : null;
+    const cutoffDate = _csiPeriodDays > 0 ? _csiCutoffDate(lastDate, _csiPeriodDays) : (allDates.length ? allDates[0] : null);
 
     // Destroy old chart if it exists
     if (_csiResizeObs) {
@@ -1913,10 +1954,9 @@
     if (!statsEl || !_csiData) return;
     const csiView = _csiDataLive || _csiData;
 
-    const allDates = csiView.dates;
-    let startIdx   = 0;
-    if (_csiPeriodDays > 0) startIdx = Math.max(0, allDates.length - _csiPeriodDays);
-    const cutoffDate = allDates[startIdx];
+    const allDates  = csiView.dates;
+    const lastDate  = allDates.length ? allDates[allDates.length - 1] : null;
+    const cutoffDate = _csiPeriodDays > 0 ? _csiCutoffDate(lastDate, _csiPeriodDays) : (allDates.length ? allDates[0] : null);
 
     const rows = CCY_ORDER.map(c => {
       const allPts   = csiView.series[c];
@@ -1933,7 +1973,7 @@
       };
     }).sort((a, b) => (b.val ?? -99) - (a.val ?? -99));
 
-    const _periodPreset = (_CSI_TF_PERIODS[_csiTf] || _CSI_TF_PERIODS.D1).find(p => p.n === _csiPeriodDays);
+    const _periodPreset = (_CSI_TF_PERIODS[_csiTf] || _CSI_TF_PERIODS.D1).find(p => p.days === _csiPeriodDays);
     const periodLabel = _periodPreset ? _periodPreset.label : 'All';
     if (titleEl) titleEl.textContent = 'CSI SNAPSHOT · ' + periodLabel + ' · ACCUMULATED RETURN';
 
@@ -2048,7 +2088,11 @@
 
   window.csiPeriod = function(btn, days) {
     _csiPeriodDays = days;
-    document.querySelectorAll('.hm-csi-pbtn').forEach(b => b.classList.toggle('on', b === btn));
+    // Scoped to #hm-csi-period only — the TF row now uses the same
+    // .hm-csi-btn class (2026-08-07 unified sizing), so an unscoped
+    // querySelectorAll('.hm-csi-btn') here would also strip the 'on' state
+    // off the currently-selected TF button.
+    document.querySelectorAll('#hm-csi-period .hm-csi-btn').forEach(b => b.classList.toggle('on', b === btn));
     if (_csiData && _ccy) {
       _csiDataLive = _computeCSILiveView();
       _renderCSIChart(_ccy);
@@ -2057,15 +2101,16 @@
   };
 
   // Rebuilds the #hm-csi-period button row for the given TF's preset set
-  // (see _CSI_TF_PERIODS) — each TF has its own bar-count presets since a
-  // "1M" period means a different number of bars on H1 vs D1 vs W1.
+  // (see _CSI_TF_PERIODS) — each TF has its own calendar-day presets since
+  // a "1M" period is scoped differently depending on how far back it's
+  // useful to look at that granularity.
   function _renderCSIPeriodBtns(tf) {
     const wrap = document.getElementById('hm-csi-period');
     if (!wrap) return;
     const presets = _CSI_TF_PERIODS[tf] || _CSI_TF_PERIODS.D1;
     wrap.innerHTML = presets.map(p =>
-      '<button class="hm-csi-pbtn' + (p.n === _csiPeriodDays ? ' on' : '') + '" data-days="' + p.n + '" '
-      + 'onclick="csiPeriod(this,' + p.n + ')">' + p.label + '</button>'
+      '<button class="hm-csi-btn' + (p.days === _csiPeriodDays ? ' on' : '') + '" data-days="' + p.days + '" '
+      + 'onclick="csiPeriod(this,' + p.days + ')">' + p.label + '</button>'
     ).join('');
   }
 
@@ -2073,14 +2118,17 @@
   // Reloads _csiData from the TF-appropriate source (see _loadCSIData) and
   // resets the period-button row to that TF's own presets. Deliberately does
   // NOT try to preserve the previously-selected period across a TF switch —
-  // a "63" period means 3M on D1 but only ~9 trading hours on H1, so keeping
-  // the raw number would silently change what the user is looking at; jumping
-  // to that TF's own sensible default is safer.
+  // "91 days" means 3M on D1 but 91 days of H1 bars is a much busier chart,
+  // so keeping the raw number would silently change what the user is
+  // looking at; jumping to that TF's own sensible default is safer.
   window.csiSetTf = function(btn, tf) {
     if (_csiTf === tf) return;
     _csiTf = tf;
-    document.querySelectorAll('#hm-csi-tf .lw-tf-btn').forEach(b => b.classList.toggle('sel', b === btn));
-    _csiPeriodDays = _CSI_TF_DEFAULT_N[tf] != null ? _CSI_TF_DEFAULT_N[tf] : 63;
+    // Scoped to #hm-csi-tf — CSI's TF buttons have their own .hm-csi-btn
+    // class now (2026-08-07), no longer .lw-tf-btn, so this can never be
+    // affected by (or affect) the main chart's own TF selector.
+    document.querySelectorAll('#hm-csi-tf .hm-csi-btn').forEach(b => b.classList.toggle('on', b === btn));
+    _csiPeriodDays = _CSI_TF_DEFAULT_DAYS[tf] != null ? _CSI_TF_DEFAULT_DAYS[tf] : 91;
     _renderCSIPeriodBtns(tf);
 
     const titleEl = document.getElementById('hm-csi-title');
