@@ -1,460 +1,271 @@
 {
-  "generated_at": "2026-08-07T00:00:22Z",
-  "source": "Myfxbook RSS",
+  "generated_at": "2026-08-07T00:46:06.003Z",
+  "source": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable)",
   "holidays": [],
   "events": [
     {
-      "currency": "AUD",
-      "impact": "high",
-      "title": "Australia Balance of Trade",
-      "actual": "A$1.929B",
-      "forecast": "A$-1.1B",
-      "previous": "A$-2.367B",
-      "dateISO": "2026-08-06",
-      "timeUTC": "01:30",
-      "released": true
-    },
-    {
-      "currency": "AUD",
-      "impact": "medium",
-      "title": "Australia Private House Approvals MoM",
-      "actual": "0.4%",
-      "forecast": "0.4%",
-      "previous": "2.4%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "01:30",
-      "released": true
-    },
-    {
       "currency": "EUR",
       "impact": "medium",
-      "title": "Germany Factory Orders MoM",
-      "actual": "3.1%",
-      "forecast": "0.3%",
-      "previous": "0.3%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "06:00",
-      "released": true
-    },
-    {
-      "currency": "CHF",
-      "impact": "high",
-      "title": "Switzerland Unemployment Rate",
-      "actual": "3.0%",
-      "forecast": "2.9%",
-      "previous": "2.9%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "07:00",
-      "released": true
-    },
-    {
-      "currency": "EUR",
-      "impact": "medium",
-      "title": "Italy Industrial Production MoM",
-      "actual": "-1.0%",
-      "forecast": "0.3%",
-      "previous": "-0.3%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "08:00",
-      "released": true
-    },
-    {
-      "currency": "EUR",
-      "impact": "high",
-      "title": "Euro Area Retail Sales YoY",
-      "actual": "0.7%",
-      "forecast": "1.0%",
-      "previous": "1.9%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "09:00",
-      "released": true
-    },
-    {
-      "currency": "EUR",
-      "impact": "high",
-      "title": "Euro Area Retail Sales MoM",
-      "actual": "-0.3%",
-      "forecast": "0.1%",
-      "previous": "0.4%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "09:00",
-      "released": true
-    },
-    {
-      "currency": "USD",
-      "impact": "high",
-      "title": "United States Jobless Claims 4-week Average",
-      "actual": "198.75K",
-      "forecast": "198.0K",
-      "previous": "203.25K",
-      "dateISO": "2026-08-06",
-      "timeUTC": "12:30",
-      "released": true
-    },
-    {
-      "currency": "USD",
-      "impact": "medium",
-      "title": "United States Nonfarm Productivity QoQ",
-      "actual": "1.4%",
-      "forecast": "0.6%",
-      "previous": "0.8%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "12:30",
-      "released": true
-    },
-    {
-      "currency": "USD",
-      "impact": "medium",
-      "title": "United States Unit Labour Costs QoQ",
-      "actual": "1.3%",
-      "forecast": "2.1%",
-      "previous": "1.3%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "12:30",
-      "released": true
-    },
-    {
-      "currency": "USD",
-      "impact": "high",
-      "title": "United States Continuing Jobless Claims",
-      "actual": "1801.0K",
-      "forecast": "1790.0K",
-      "previous": "1777.0K",
-      "dateISO": "2026-08-06",
-      "timeUTC": "12:30",
-      "released": true
-    },
-    {
-      "currency": "USD",
-      "impact": "high",
-      "title": "United States Initial Jobless Claims",
-      "actual": "199.0K",
-      "forecast": "202.0K",
-      "previous": "198.0K",
-      "dateISO": "2026-08-06",
-      "timeUTC": "12:30",
-      "released": true
-    },
-    {
-      "currency": "USD",
-      "impact": "medium",
-      "title": "United States Fed Musalem Speech",
-      "actual": null,
-      "forecast": null,
-      "previous": null,
-      "dateISO": "2026-08-06",
-      "timeUTC": "21:30",
-      "released": true
-    },
-    {
-      "currency": "JPY",
-      "impact": "medium",
-      "title": "Japan Household Spending YoY",
-      "actual": "-3.3%",
-      "forecast": "1.0%",
-      "previous": "-0.4%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "23:30",
-      "released": true
-    },
-    {
-      "currency": "JPY",
-      "impact": "medium",
-      "title": "Japan Household Spending MoM",
-      "actual": "-6.4%",
-      "forecast": "-3.1%",
-      "previous": "3.7%",
-      "dateISO": "2026-08-06",
-      "timeUTC": "23:30",
-      "released": true
-    },
-    {
       "title": "France Unemployment Rate",
-      "currency": "EUR",
-      "dateISO": "2026-08-07",
-      "timeUTC": "05:30",
-      "impact": "medium",
+      "actual": null,
       "forecast": "8.2%",
       "previous": "8.1%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
+      "dateISO": "2026-08-07",
+      "timeUTC": "05:30",
+      "released": false
     },
     {
-      "title": "Germany Industrial Production MoM",
       "currency": "EUR",
-      "dateISO": "2026-08-07",
-      "timeUTC": "06:00",
       "impact": "medium",
+      "title": "Germany Industrial Production MoM",
+      "actual": null,
       "forecast": "0.1%",
       "previous": "0.9%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "Germany Balance of Trade",
-      "currency": "EUR",
       "dateISO": "2026-08-07",
       "timeUTC": "06:00",
+      "released": false
+    },
+    {
+      "currency": "EUR",
       "impact": "high",
+      "title": "Germany Balance of Trade",
+      "actual": null,
       "forecast": "€17.4B",
       "previous": "€19.1B",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "Germany Exports MoM",
-      "currency": "EUR",
       "dateISO": "2026-08-07",
       "timeUTC": "06:00",
+      "released": false
+    },
+    {
+      "currency": "EUR",
       "impact": "medium",
+      "title": "Germany Exports MoM",
+      "actual": null,
       "forecast": "0.2%",
       "previous": "0.9%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United Kingdom Halifax House Price Index YoY",
-      "currency": "GBP",
       "dateISO": "2026-08-07",
       "timeUTC": "06:00",
+      "released": false
+    },
+    {
+      "currency": "GBP",
       "impact": "medium",
+      "title": "United Kingdom Halifax House Price Index YoY",
+      "actual": null,
       "forecast": "0.4%",
       "previous": "0.6%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United Kingdom Halifax House Price Index MoM",
-      "currency": "GBP",
       "dateISO": "2026-08-07",
       "timeUTC": "06:00",
+      "released": false
+    },
+    {
+      "currency": "GBP",
       "impact": "medium",
+      "title": "United Kingdom Halifax House Price Index MoM",
+      "actual": null,
       "forecast": "0.1%",
       "previous": "0.2%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
+      "dateISO": "2026-08-07",
+      "timeUTC": "06:00",
+      "released": false
     },
     {
-      "title": "France Balance of Trade",
       "currency": "EUR",
-      "dateISO": "2026-08-07",
-      "timeUTC": "06:45",
       "impact": "medium",
+      "title": "France Balance of Trade",
+      "actual": null,
       "forecast": "€-6.5B",
       "previous": "€-6.9B",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "France Current Account",
-      "currency": "EUR",
       "dateISO": "2026-08-07",
       "timeUTC": "06:45",
+      "released": false
+    },
+    {
+      "currency": "EUR",
       "impact": "medium",
+      "title": "France Current Account",
+      "actual": null,
       "forecast": "-2.4",
       "previous": "-0.1",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
+      "dateISO": "2026-08-07",
+      "timeUTC": "06:45",
+      "released": false
     },
     {
-      "title": "Switzerland Consumer Confidence",
       "currency": "CHF",
-      "dateISO": "2026-08-07",
-      "timeUTC": "07:00",
       "impact": "medium",
+      "title": "Switzerland Consumer Confidence",
+      "actual": null,
       "forecast": "-34.0",
       "previous": "-36.0",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
+      "dateISO": "2026-08-07",
+      "timeUTC": "07:00",
+      "released": false
     },
     {
-      "title": "Canada Employment Change",
       "currency": "CAD",
-      "dateISO": "2026-08-07",
-      "timeUTC": "12:30",
       "impact": "high",
+      "title": "Canada Employment Change",
+      "actual": null,
       "forecast": "15.0K",
       "previous": "18.2K",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "Canada Unemployment Rate",
-      "currency": "CAD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "CAD",
       "impact": "high",
+      "title": "Canada Unemployment Rate",
+      "actual": null,
       "forecast": "6.5%",
       "previous": "6.5%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "Canada Participation Rate",
-      "currency": "CAD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "CAD",
       "impact": "medium",
+      "title": "Canada Participation Rate",
+      "actual": null,
       "forecast": "65.1%",
       "previous": "65.0%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "Canada Full Time Employment Chg",
-      "currency": "CAD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "CAD",
       "impact": "medium",
+      "title": "Canada Full Time Employment Chg",
+      "actual": null,
       "forecast": "21.0K",
       "previous": "0.6K",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "Canada Part Time Employment Chg",
-      "currency": "CAD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "CAD",
       "impact": "medium",
+      "title": "Canada Part Time Employment Chg",
+      "actual": null,
       "forecast": "4.0K",
       "previous": "17.5K",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United States U-6 Unemployment Rate",
-      "currency": "USD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "USD",
       "impact": "high",
+      "title": "United States U-6 Unemployment Rate",
+      "actual": null,
       "forecast": "7.9%",
       "previous": "7.9%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United States Average Hourly Earnings YoY",
-      "currency": "USD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "USD",
       "impact": "medium",
+      "title": "United States Average Hourly Earnings YoY",
+      "actual": null,
       "forecast": "3.5%",
       "previous": "3.5%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United States Average Hourly Earnings MoM",
-      "currency": "USD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "USD",
       "impact": "medium",
+      "title": "United States Average Hourly Earnings MoM",
+      "actual": null,
       "forecast": "0.3%",
       "previous": "0.3%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United States Participation Rate",
-      "currency": "USD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "USD",
       "impact": "medium",
+      "title": "United States Participation Rate",
+      "actual": null,
       "forecast": "61.6%",
       "previous": "61.5%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United States Non Farm Payrolls",
-      "currency": "USD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "USD",
       "impact": "high",
+      "title": "United States Non Farm Payrolls",
+      "actual": null,
       "forecast": "80.0K",
       "previous": "57.0K",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United States Nonfarm Payrolls Private",
-      "currency": "USD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "USD",
       "impact": "high",
+      "title": "United States Nonfarm Payrolls Private",
+      "actual": null,
       "forecast": "78.0K",
       "previous": "49.0K",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United States Unemployment Rate",
-      "currency": "USD",
       "dateISO": "2026-08-07",
       "timeUTC": "12:30",
+      "released": false
+    },
+    {
+      "currency": "USD",
       "impact": "high",
+      "title": "United States Unemployment Rate",
+      "actual": null,
       "forecast": "4.2%",
       "previous": "4.2%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
+      "dateISO": "2026-08-07",
+      "timeUTC": "12:30",
+      "released": false
     },
     {
-      "title": "Canada Ivey PMI s.a",
       "currency": "CAD",
-      "dateISO": "2026-08-07",
-      "timeUTC": "14:00",
       "impact": "high",
+      "title": "Canada Ivey PMI s.a",
+      "actual": null,
       "forecast": "55.5",
       "previous": "56.2",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United States Fed Barkin Speech",
-      "currency": "USD",
       "dateISO": "2026-08-07",
       "timeUTC": "14:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
+      "released": false
     },
     {
-      "title": "United States Consumer Inflation Expectations",
       "currency": "USD",
-      "dateISO": "2026-08-07",
-      "timeUTC": "15:00",
       "impact": "medium",
+      "title": "United States Fed Barkin Speech",
+      "actual": null,
+      "forecast": null,
+      "previous": null,
+      "dateISO": "2026-08-07",
+      "timeUTC": "14:00",
+      "released": false
+    },
+    {
+      "currency": "USD",
+      "impact": "medium",
+      "title": "United States Consumer Inflation Expectations",
+      "actual": null,
       "forecast": "3.8%",
       "previous": "3.7%",
-      "actual": null,
-      "released": false,
-      "vendor": "myfxbook"
+      "dateISO": "2026-08-07",
+      "timeUTC": "15:00",
+      "released": false
     }
   ]
 }
