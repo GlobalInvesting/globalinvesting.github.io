@@ -1,5 +1,5 @@
 /**
- * calendar-panel.js v1.10 — Native economic calendar renderer
+ * calendar-panel.js v1.11 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
@@ -67,6 +67,30 @@
  *   handling this case and any future one following the same "Label (pipeline
  *   detail)" convention used elsewhere in the Worker (e.g. quotes.json's
  *   DIRECT_COMMIT_SOURCE_LABEL). Found live from Santiago's screenshot.
+ * v1.11 (2026-08-07): TWO BUG FIXES, both surfaced by the same incident.
+ *   (1) Duplicate timezone label: the panel subtitle already ends in
+ *   `tzLabel()` (e.g. "· GMT-3") AND the column-header row's time column
+ *   (#cal-th-time) shows the same `tzLabel()` directly below it — Santiago
+ *   flagged this as redundant on screen. Removed the trailing tzLabel() from
+ *   the subtitle; the column header is the correct single place for it since
+ *   it labels what the time column itself means.
+ *   (2) Missing historical events: `fetchEconomicCalendar()`'s source-fallback
+ *   loop picked ff_calendar.json whenever it had ANY events and never checked
+ *   whether that data actually carried history — so the 2026-08-06/07
+ *   truncation incident (ff_calendar.json collapsed to a single day) silently
+ *   won the fallback race forever, even though calendar.json still had a full
+ *   year of history sitting right there. ff_calendar.json can never self-heal
+ *   this on its own (its own Step 2 merge reads its own prior content — see
+ *   calendar-watcher.js v5.27 CHANGELOG entry), so a client-side guard is the
+ *   only thing that stops a repeat of this from going unnoticed again.
+ *   fetchEconomicCalendar() now fetches both files, and if ff_calendar.json
+ *   covers fewer than 2 distinct past dates, fills in calendar.json's older
+ *   events (deduped by currency+date+time+title) instead of dropping them.
+ *   Events are also normalized to always have `.title` (calendar.json's
+ *   native schema uses `.event`, not `.title` — previously only the dedup
+ *   filters guarded against this with `ev.title || ev.event`, but the actual
+ *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
+ *   fallback would have rendered blank event names even after fix (1) above).
  */
 (function () {
   'use strict';
@@ -552,7 +576,9 @@
     }));
 
     if (sourceEl) {
-      sourceEl.textContent = `${source} · G10 currencies · medium & high impact · ${tzLabel()}`;
+      // No trailing tzLabel() here — the column-header time cell just below
+      // (#cal-th-time) already shows it, right above the time values it labels.
+      sourceEl.textContent = `${source} · G10 currencies · medium & high impact`;
     }
     const thTime = document.getElementById('cal-th-time');
     if (thTime) thTime.textContent = tzLabel();
@@ -560,9 +586,6 @@
 
   async function fetchEconomicCalendar() {
     try {
-      let events = [];
-      let holidays = [];
-      let source = 'ForexFactory';
       // Cache-bust: GitHub Pages serves via a CDN (Fastly) that can hold an edge
       // copy of the same URL for several minutes independent of the browser's own
       // cache. `cache: 'no-store'` only controls the browser's local cache — it
@@ -572,17 +595,41 @@
       // hasn't served before, so a fresh commit is picked up within one cycle
       // instead of waiting out the CDN's TTL.
       const _cb = '?_=' + Math.floor(Date.now() / 120000);
-      for (const path of ['./calendar-data/ff_calendar.json' + _cb, './calendar-data/calendar.json' + _cb]) {
-        const res = await fetch(path, { cache: 'no-store' }).catch(() => null);
-        if (!res?.ok) continue;
-        const j = await res.json();
-        if (j?.events?.length) {
-          events = j.events;
-          source = j.source || source;
-          // holidays only exist in ff_calendar.json (top-level field)
-          if (Array.isArray(j.holidays)) holidays = j.holidays;
-          break;
-        }
+      const [ffRes, calRes] = await Promise.all([
+        fetch('./calendar-data/ff_calendar.json' + _cb, { cache: 'no-store' }).catch(() => null),
+        fetch('./calendar-data/calendar.json' + _cb, { cache: 'no-store' }).catch(() => null)
+      ]);
+      const ffJson  = ffRes?.ok  ? await ffRes.json().catch(() => null)  : null;
+      const calJson = calRes?.ok ? await calRes.json().catch(() => null) : null;
+
+      // calendar.json's native schema (fetch_economic_calendar.py) uses `.event`,
+      // not `.title` — normalize once here so every downstream consumer (dedup
+      // filters and buildPanel's row renderer alike) can rely on `.title` always
+      // being present, whichever file an event came from.
+      const normalize = ev => { if (ev.title == null && ev.event != null) ev.title = ev.event; return ev; };
+      const ffEvents  = (ffJson?.events  || []).map(normalize);
+      const calEvents = (calJson?.events || []).map(normalize);
+
+      let events   = ffEvents;
+      let source   = ffJson?.source || calJson?.source || 'ForexFactory';
+      // holidays only exist in ff_calendar.json (top-level field)
+      let holidays = Array.isArray(ffJson?.holidays) ? ffJson.holidays : [];
+
+      // Coverage guard against a repeat of the 2026-08-06/07 truncation incident:
+      // ff_calendar.json is meant to carry a ~21-day rolling history, but a
+      // direct-commit fallback write once collapsed it to a single day — and
+      // because its own history comes from merging against its own prior content,
+      // it can never recover that lost history on its own. If ff_calendar.json's
+      // events don't reach back at least 2 distinct days before today, treat it
+      // as truncated and backfill older days from calendar.json (deduped by
+      // currency+date+time+title) instead of silently showing only today.
+      const todayISO = new Date().toISOString().slice(0, 10);
+      const ffPastDates = new Set(ffEvents.filter(e => e.dateISO < todayISO).map(e => e.dateISO));
+      if (ffPastDates.size < 2 && calEvents.length) {
+        const seen = new Set(ffEvents.map(e => `${e.currency}|${e.dateISO}|${e.timeUTC || e.hourUTC || ''}|${e.title}`));
+        const fill = calEvents.filter(e => !seen.has(`${e.currency}|${e.dateISO}|${e.timeUTC || e.hourUTC || ''}|${e.title}`));
+        events = ffEvents.concat(fill);
+        if (!ffEvents.length) source = calJson?.source || source;
       }
 
       // Myfxbook "Sentiment" pseudo-events (e.g. "European Union Myfxbook EURUSD
