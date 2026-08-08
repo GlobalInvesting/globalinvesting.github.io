@@ -91,6 +91,22 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
+ * v1.17-TEST (2026-08-08): Two follow-ups from Santiago's review of the
+ *   v1.16-TEST screenshot:
+ *   (1) REMOVED the FOMC voting-member tag entirely — deleted
+ *       FOMC_VOTERS_2026 and _fomcVoterTag(). Santiago flagged that a
+ *       hardcoded voter roster requiring manual updates (the annual Jan 1
+ *       rotation, plus any Board confirmation changes) isn't worth
+ *       maintaining. Nothing else in this file read that tag.
+ *   (2) Week nav + impact filter moved out of their own separate toolbar
+ *       row (added in v1.16-TEST) into the existing column-header row,
+ *       positioned directly to the left of the currency filter — same
+ *       #cal-static-col-header bar the currency filter already lives in,
+ *       instead of a whole extra row. #cal-toolbar now travels as a pair
+ *       with #cal-ccy-filter through the wide-fullscreen split-column
+ *       relocation (always inserted immediately before it, whichever
+ *       parent it currently lives in) rather than duplicating that
+ *       branch's logic.
  * v1.16-TEST (2026-08-08): "Implement everything, industry-standard" round —
  *   Santiago asked for all viable items from the v1.15-TEST idea list, with
  *   anything cramped for row space moved into the new click-through history
@@ -466,70 +482,6 @@
     return null;
   }
 
-  // ── [TEST v1.16] FOMC voting-member tag ──────────────────────────────────
-  // Bloomberg/Refinitiv flag whether a Fed speaker is a current FOMC voter —
-  // a non-voter's remarks still matter but carry less direct near-term
-  // policy weight. Scoped to the Fed ONLY: of the G10 central banks this
-  // calendar covers, the FOMC is the one with a structural voting/non-voting
-  // split (7 Governors + NY Fed always vote; 4 of the other 11 regional
-  // presidents rotate onto a vote each year). The ECB Governing Council, BoE
-  // MPC, BoC Governing Council, RBA Board, SNB Governing Board, RBNZ MPC,
-  // Norges Bank committee and Riksbank Executive Board all have their full
-  // monetary-policy body vote at every meeting — there's no non-voting
-  // subset to flag, so no tag is shown for those speakers (not an omission).
-  //
-  // Snapshot sourced from federalreserve.gov/monetarypolicy/fomc.htm
-  // (page's own "Last Update: July 29, 2026") — 2026 rotating seats: Cleveland
-  // (Hammack), Dallas (Logan), Philadelphia (Paulson), Minneapolis (Kashkari)
-  // vote; Boston, Chicago, Kansas City, St. Louis, Richmond, San Francisco,
-  // Atlanta do not. Board of Governors + NY Fed always vote. This is a
-  // dated snapshot, not a live feed — the rotation changes every Jan 1 and
-  // Board seats can change with a confirmation at any time; re-verify
-  // against the same source (same method as the NOK/threshold and inverse-
-  // keyword audits already logged in GUIDELINES.md) before relying on this
-  // for a full year, and definitely re-check every January.
-  const FOMC_VOTERS_2026 = {
-    // Board of Governors — always voting
-    warsh:    { voting: true, role: 'Fed Chair' },
-    jefferson:{ voting: true, role: 'Fed Vice Chair' },
-    bowman:   { voting: true, role: 'Fed Vice Chair for Supervision' },
-    barr:     { voting: true, role: 'Fed Governor' },
-    cook:     { voting: true, role: 'Fed Governor' },
-    waller:   { voting: true, role: 'Fed Governor' },
-    powell:   { voting: true, role: 'Fed Governor' },
-    // NY Fed — permanent voter
-    williams: { voting: true, role: 'NY Fed President (permanent voter)' },
-    // Rotating regional presidents — VOTING in 2026
-    hammack:  { voting: true, role: 'Cleveland Fed President' },
-    logan:    { voting: true, role: 'Dallas Fed President' },
-    paulson:  { voting: true, role: 'Philadelphia Fed President' },
-    kashkari: { voting: true, role: 'Minneapolis Fed President' },
-    // Rotating regional presidents — NON-voting in 2026
-    collins:  { voting: false, role: 'Boston Fed President' },
-    goolsbee: { voting: false, role: 'Chicago Fed President' },
-    schmid:   { voting: false, role: 'Kansas City Fed President' },
-    musalem:  { voting: false, role: 'St. Louis Fed President' },
-    barkin:   { voting: false, role: 'Richmond Fed President' },
-    daly:     { voting: false, role: 'San Francisco Fed President' },
-    venable:  { voting: false, role: 'Atlanta Fed Interim President' },
-  };
-  function _fomcVoterTag(currency, title) {
-    if (currency !== 'USD') return '';
-    const canon = _calCanonTitle(title); // e.g. "fed barkin speech"
-    const m = canon.match(/^fed\s+([a-z]+)\s+speech$/);
-    if (!m) return '';
-    const info = FOMC_VOTERS_2026[m[1]];
-    if (!info) return ''; // unrecognized name — say nothing rather than guess
-    const cls  = info.voting ? 'up' : '';
-    const style = info.voting
-      ? 'color:var(--up);font-size:8px;cursor:help;font-weight:700;'
-      : 'color:var(--text3);font-size:8px;cursor:help;';
-    const label = info.voting ? 'V' : 'nv';
-    const tip = `${info.role} — ${info.voting ? 'current FOMC voter' : 'non-voter this year'} ` +
-      `(2026 rotation, federalreserve.gov as of Jul 2026 — verify if relying on this after a rotation change).`;
-    return ` <sup style="${style}" title="${_escAttr(tip)}">${label}</sup>`;
-  }
-
   // ── [TEST v1.14] Live / next-release highlight ───────────────────────────
   // Bloomberg-style: the single next high-impact event due within a short
   // forward window gets a highlighted row + a live countdown in place of its
@@ -767,8 +719,8 @@
 
   // ── [TEST v1.16] Historical drill-down modal ─────────────────────────────
   // Click an event title (any event, not just methodology-matched ones) to
-  // open a modal with: methodology blurb, cadence tag, FOMC voter info when
-  // relevant, and the last up to 8 releases of that exact series (from the
+  // open a modal with: methodology blurb, cadence tag, and the last up to
+  // 8 releases of that exact series (from the
   // full-year history — see buildSeriesIndex()) with the same beat/miss
   // coloring as the main row. Deliberately a click-through, not another
   // inline badge — Santiago flagged that per-row space is tight (this is
@@ -1382,8 +1334,7 @@
         // object back up by index without re-serializing it into the DOM.
         const methodText  = _calMethodologyFor(ev.title);
         const histIdx     = _calRenderIndex.push(ev) - 1;
-        const fomcTag      = _fomcVoterTag(ev.currency, ev.title); // [TEST v1.16]
-        const titleInner  = `${ev.title}${fomcTag}`;
+        const titleInner  = ev.title;
         const titleCellHtml = methodText
           ? `<div class="cal-col cal-title" data-cal-tip="1" data-cal-tip-title="${_escAttr(ev.title)}" data-cal-tip-body="${_escAttr(methodText)}" data-cal-hist-idx="${histIdx}" style="cursor:pointer;">${titleInner}</div>`
           : `<div class="cal-col cal-title" title="${_escAttr(ev.title)}" data-cal-hist-idx="${histIdx}" style="cursor:pointer;">${titleInner}</div>`;
@@ -1448,9 +1399,13 @@
       } else if (staticHdr) {
         if (ccyBox.parentNode !== staticHdr) {
           // [TEST v1.13.3] Insert BEFORE the Actual header span (i.e. right
-          // after Event), matching the grid-column order in index-test.html —
-          // appendChild would put it back after Previous and reintroduce the
-          // 1fr/fixed-column misalignment this version fixed.
+          // after Event/toolbar), matching the grid-column order in
+          // index-test.html — appendChild would put it back after Previous
+          // and reintroduce the 1fr/fixed-column misalignment this version
+          // fixed. [TEST v1.17] Still index 4 here: when BOTH #cal-toolbar
+          // and #cal-ccy-filter have been relocated away (split mode), only
+          // the original 7 static spans remain (Local, Ccy, ·, Event,
+          // Actual, Forecast, Previous), so Actual is still children[4].
           const actualSpan = staticHdr.children[4] || null; // 0:Local 1:Ccy 2:· 3:Event 4:Actual
           staticHdr.insertBefore(ccyBox, actualSpan);
         }
@@ -1458,6 +1413,31 @@
         ccyBox.style.borderRight = '1px solid var(--border2)';
         ccyBox.style.padding     = '0 8px';
         ccyBox.style.marginRight = '4px';
+      }
+    }
+
+    // [TEST v1.17] Week nav + impact filter toolbar — moved out of its own
+    // separate row (v1.16-TEST) per Santiago's feedback, into the column
+    // header row, directly to the left of the currency filter. Rather than
+    // duplicating the splitCols/staticHdr branching above, this always
+    // inserts #cal-toolbar immediately before #cal-ccy-filter's CURRENT
+    // parent (already resolved by the block above, whichever mode is
+    // active), so the two controls travel together as a pair in both the
+    // docked header and the wide-fullscreen split-column relocation.
+    const toolBox = document.getElementById('cal-toolbar');
+    if (toolBox && ccyBox && ccyBox.parentNode) {
+      const targetParent = ccyBox.parentNode;
+      if (toolBox.parentNode !== targetParent || toolBox.nextSibling !== ccyBox) {
+        targetParent.insertBefore(toolBox, ccyBox);
+      }
+      if (splitCols) {
+        toolBox.style.borderRight = 'none';
+        toolBox.style.padding     = '0';
+        toolBox.style.marginRight = '4px';
+      } else {
+        toolBox.style.borderRight = '1px solid var(--border2)';
+        toolBox.style.padding     = '0 8px';
+        toolBox.style.marginRight = '2px';
       }
     }
 
