@@ -1,7 +1,22 @@
 /**
- * calendar-panel.js v1.19.6 — Native economic calendar renderer
+ * calendar-panel.js v1.19.7 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.7 (2026-08-08): REAL FIX — chart X-axis clipping was never a
+ *   canvas/DPR/height issue (all of v1.19.4-v1.19.6 were chasing the wrong
+ *   cause). A pixel-level crop of Santiago's screenshot showed only the
+ *   comma glyph's descender being clipped ("Jan 9, '26" losing its comma),
+ *   not the whole label. Built a byte-identical repro of the chart (real
+ *   lightweight-charts 5.0.7 + real theme CSS, headless Chromium
+ *   screenshotted at deviceScaleFactor 2) to confirm: the comma rendered
+ *   fine there, ruling out the v1.19.6 DPR/backing-store theory (that
+ *   causes blur on HiDPI, not hard clipping). Root cause is LWC's
+ *   time-axis row height leaving no headroom for a descender, which is
+ *   font-metric-dependent per OS/browser. Fix: `_calFmtDateISO()` no
+ *   longer emits a comma ("Jan 9, '26" -> "Jan 9 '26") — no digit, capitalized
+ *   month abbreviation, or apostrophe has a descender, so there's nothing
+ *   left to clip regardless of font/DPR. See full note at `_calFmtDateISO`.
  *
  * v1.19.6 (2026-08-08): FIX, diagnostic-confirmed this time — chart X-axis
  *   clipping. Santiago ran a devtools dump at my request instead of another
@@ -1057,15 +1072,37 @@
 
   const _CAL_MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function _calFmtDateISO(iso) {
-    // "2026-08-07" -> "Aug 7, '26" — always carries the year, since a
+    // "2026-08-07" -> "Aug 7 '26" — always carries the year, since a
     // release history commonly spans a year boundary (this modal shows up
     // to 8 releases, which for a monthly series is 8 months back) and the
     // bare "Aug"/"mar" month-only labels LWC defaults to for sub-year
     // ranges don't disambiguate Aug 2025 from Aug 2026.
+    //
+    // NO COMMA (v1.19.7): pixel-level inspection of Santiago's screenshot
+    // (cropped + upscaled 6x) showed the clipping was never "half of every
+    // label" as the v1.19.4-v1.19.6 screenshots-only diagnoses assumed —
+    // it was specifically the comma glyph's descender being sliced off
+    // ("Jan 9, '26" rendering as "Jan 9 '26" with a stray clipped mark).
+    // Confirmed by building a byte-identical repro (real lightweight-charts
+    // 5.0.7, real theme CSS/vars, headless Chromium screenshotted at
+    // deviceScaleFactor 2) in a Node/Playwright harness: the comma rendered
+    // fine there, which rules out the v1.19.6 DPR/backing-store theory
+    // outright (a 1x-vs-2x backing store causes blur on a HiDPI screen, not
+    // hard clipping — that diagnosis was wrong). The real cause is LWC's
+    // time-axis row height being sized without headroom for a descender,
+    // which only bites depending on which system font actually resolves at
+    // draw time (font-metric-dependent, so it didn't reproduce in this
+    // sandbox's font stack even though the DPR-mismatch pattern itself did).
+    // Rather than chase LWC's internal row-height allocation across
+    // browsers/OSes/fonts, this removes the only descending glyph the
+    // formatter ever emits — no digit, month abbreviation (always
+    // capitalized, e.g. "Jan"/"Aug"), or apostrophe has a descender, so
+    // once the comma is gone there is structurally nothing left to clip,
+    // regardless of font or DPR.
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
     if (!m) return iso;
     const mon = _CAL_MONTH_ABBR[parseInt(m[2], 10) - 1] || m[2];
-    return `${mon} ${parseInt(m[3], 10)}, '${m[1].slice(2)}`;
+    return `${mon} ${parseInt(m[3], 10)} '${m[1].slice(2)}`;
   }
 
   function _calRenderHistChart(seriesArr, isInverse) {
