@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GlobalInvesting — Calendar TEST harness (v1.18-TEST)</title>
+<title>GlobalInvesting — Calendar TEST harness (v1.19-TEST)</title>
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers) — same link as production index.html.
      Missing this was the cause of the mismatched font in the previous version. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +36,7 @@
 <body>
 <div id="test-wrap">
   <div id="test-banner">
-    <b>Sandbox — calendar-panel-test.js (v1.18-TEST)</b><br>
+    <b>Sandbox — calendar-panel-test.js (v1.19-TEST)</b><br>
     Archivo de prueba, no conectado a producción. Datos reales de <code>calendar-data/</code>
     (copia local). Cambios: filtro de divisa, filtro de impacto (High only) y navegación
     semanal integrados en la fila de columnas, modal de historial (últimos 8 prints +
@@ -57,6 +57,37 @@
       </div>
     </div>
 
+    <!-- [TEST v1.19] Filter row — week nav + impact filter + currency filter,
+         on its OWN row above the column-header grid. v1.17-TEST had merged
+         these into #cal-static-col-header as two extra grid tracks
+         (`auto auto`), which looked fine at the panel's normal docked width
+         but broke down as the panel got narrower: those two "auto" tracks
+         can't shrink below their content's natural width, so they started
+         eating into the 1fr Event column and, past a point, pushed the
+         fixed 58px Actual/Forecast/Previous columns out of alignment with
+         the data rows below them. A plain flex row with wrap:wrap has no
+         such failure mode — it just wraps onto a second line instead of
+         corrupting the grid beneath it. #cal-toolbar and #cal-ccy-filter
+         are relocated together into #cal-panel-head-actions in
+         wide-fullscreen split-column mode, same as before — see
+         calendar-panel-test.js. -->
+    <div id="cal-filter-row" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);">
+      <span id="cal-toolbar" style="display:flex;align-items:center;gap:6px;padding-right:8px;margin-right:2px;border-right:1px solid var(--border2);">
+        <span id="cal-week-nav" style="display:flex;align-items:center;gap:3px;" role="group" aria-label="Week navigation"></span>
+        <span id="cal-impact-filter" style="display:flex;align-items:center;gap:3px;" role="group" aria-label="Impact filter"></span>
+      </span>
+      <!-- [TEST v1.13.3] Currency filter — populated by setupCcyFilterUI(),
+           same visual pattern as #corr-window-btns (Cross-Asset Correlations
+           30d/60d/90d). Relocated by buildPanel() into #cal-panel-head-actions
+           when the wide-fullscreen 2-column layout hides this row, so the
+           filter never disappears — see calendar-panel-test.js. Only a
+           single divider (border-right on #cal-toolbar, above) separates the
+           two control groups — a border on BOTH the left edge here and the
+           right edge of #cal-toolbar previously drew two 1px lines a few
+           pixels apart instead of one. -->
+      <span id="cal-ccy-filter" style="display:flex;align-items:center;gap:2px;" role="group" aria-label="Currency filter"></span>
+    </div>
+
     <!-- Column headers — [TEST v1.13.3] byte-identical to production's pure
          CSS-grid header (display:grid;grid-template-columns:52px 52px 18px
          1fr 58px 58px 58px). The v1.13.2 version appended the button-group
@@ -70,36 +101,15 @@
          regardless of where 1fr lands, so as long as the SAME set of
          fixed-width tracks sits to their right as in the data rows (i.e.
          nothing after Previous), they land in the same pixel position.
-         [TEST v1.17] Added a second "auto" track for #cal-toolbar
-         (week nav + impact filter), positioned directly to the left of
-         #cal-ccy-filter — moved down out of its own separate row per
-         Santiago's feedback, into the same slot pattern the currency
-         filter already uses. -->
-    <div id="cal-static-col-header" style="display:grid;grid-template-columns:52px 52px 18px 1fr auto auto 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
+         [TEST v1.19] The two "auto" tracks (#cal-toolbar / #cal-ccy-filter)
+         added in v1.17-TEST are gone again — both now live in the new
+         #cal-filter-row above instead, so this grid is back to the original
+         7-track production layout. -->
+    <div id="cal-static-col-header" style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
       <span style="font-size:9px;color:var(--text3);">&middot;</span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
-      <!-- [TEST v1.17] Week nav + impact filter — sits between Event and
-           the currency filter (to its left, per Santiago). Populated by
-           setupWeekNavUI() / setupImpactFilterUI(); relocates together
-           with #cal-ccy-filter (always inserted immediately before it) in
-           buildPanel() when the wide-fullscreen 2-column layout hides this
-           whole bar — see calendar-panel-test.js. Empty markup here, same
-           "no-op if container missing" safety as the currency filter. -->
-      <span id="cal-toolbar" style="display:flex;align-items:center;gap:6px;padding:0 8px;margin-right:2px;border-right:1px solid var(--border2);">
-        <span id="cal-week-nav" style="display:flex;align-items:center;gap:3px;" role="group" aria-label="Week navigation"></span>
-        <span id="cal-impact-filter" style="display:flex;align-items:center;gap:3px;" role="group" aria-label="Impact filter"></span>
-      </span>
-      <!-- [TEST v1.13.3] Currency filter — populated by setupCcyFilterUI(),
-           same visual pattern as #corr-window-btns (Cross-Asset Correlations
-           30d/60d/90d). Sits between Event and Actual (not after Previous —
-           see note above) so it never pushes the numeric headers out of
-           alignment with their columns. Relocated by buildPanel() into
-           #cal-panel-head-actions when the wide-fullscreen 2-column layout
-           hides this whole bar, so the filter never disappears — see
-           calendar-panel-test.js. -->
-      <span id="cal-ccy-filter" style="display:flex;align-items:center;gap:2px;justify-content:center;padding:0 8px;margin-right:4px;border-left:1px solid var(--border2);border-right:1px solid var(--border2);" role="group" aria-label="Currency filter"></span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
