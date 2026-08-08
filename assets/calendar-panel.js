@@ -1,7 +1,21 @@
 /**
- * calendar-panel.js v1.19.9 — Native economic calendar renderer
+ * calendar-panel.js v1.19.10 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.10 (2026-08-08): FIX — history-modal chart's axis clipping persisted
+ *   after v1.19.9 (confirmed by Santiago on a fresh screenshot taken well
+ *   after that deploy, on a different event's chart, ruling out the
+ *   transitional-frame theory that justified removing the v1.19.6 resize).
+ *   A repeat diagnostic dump found the axis canvas clean at rest again and
+ *   ruled out every CSS ancestor overflow — but every canvas in the chart
+ *   had a 1x backing store on a devicePixelRatio=2 screen. `createChart()`
+ *   only reads `window.devicePixelRatio` once, synchronously, right after
+ *   the container's `display:none → ''` toggle — a moment where DPR isn't
+ *   guaranteed settled. Added `autoSize: true` so LWC's own ResizeObserver-
+ *   driven sizing (continuous, not one-shot) owns canvas scaling instead;
+ *   `width`/`height` kept only as the documented ResizeObserver-failure
+ *   fallback. See _calRenderHistChart.
  *
  * v1.19.9 (2026-08-08): REMOVED a no-longer-justified RAF resize — v1.19.6's
  *   requestAnimationFrame'd `chart.resize(w, 190, true)` was added on a live
@@ -1177,6 +1191,12 @@
 
     const rect = container.getBoundingClientRect();
     const chart = LWC.createChart(container, {
+      // autoSize (v1.19.10): width/height below are now only the
+      // ResizeObserver-failure fallback, not the primary sizing path. See
+      // the v1.19.10 changelog note below _calRenderHistChart for why this
+      // replaces the plain width/height-only creation that v1.19.9 left in
+      // place after removing the v1.19.6 manual resize.
+      autoSize: true,
       width: Math.round(rect.width) || container.offsetWidth || 380,
       height: 190,
       layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontSize: 9, attributionLogo: false },
@@ -1209,26 +1229,40 @@
 
     chart.timeScale().fitContent();
 
-    // REMOVED (v1.19.9): v1.19.6 added a requestAnimationFrame'd
-    // chart.resize(w, 190, true) here based on a live dump showing the axis
-    // canvas's backing store (342x24) numerically equal to its CSS size
-    // (342px/24px) despite devicePixelRatio=2. v1.19.7/8 chased (and ruled
-    // out) glyph-specific clipping instead, and a follow-up diagnostic
-    // dump — full row-by-row pixel brightness of the actual axis canvas —
-    // proved the canvas itself was rendering with zero clipping at rest:
-    // text occupied rows 8-16 of a 24-row canvas, with clean untouched
-    // margin on both sides, nothing touching row 0 or row 23. So the
-    // DPR/backing-store pattern was confirmed (again) to be normal LWC v5
-    // behavior, not a bug — it doesn't hard-clip, it just means the canvas
-    // renders at 1x and gets upscaled by the compositor on a HiDPI screen.
-    // With clipping ruled out at rest, this resize call had no remaining
-    // justification, and became a liability instead: it forces a second
-    // layout/redraw pass one animation frame after the chart's already-
-    // correct initial paint, which on a slower device (Santiago's dump was
-    // captured via Edge Android remote debugging) can produce a visible
-    // transitional frame — a plausible source for a screenshot catching
-    // mis-rendered text that isn't present in steady state. Removed
-    // outright rather than patched again.
+    // REMOVED (v1.19.9), REPLACED (v1.19.10): v1.19.6 added a
+    // requestAnimationFrame'd chart.resize(w, 190, true) here based on a
+    // live dump showing the axis canvas's backing store (342x24) numerically
+    // equal to its CSS size (342px/24px) despite devicePixelRatio=2. v1.19.7/8
+    // chased (and ruled out) glyph-specific clipping instead, and a follow-up
+    // diagnostic dump — full row-by-row pixel brightness of the actual axis
+    // canvas — proved the canvas itself was rendering with zero clipping at
+    // rest for that event. v1.19.9 removed the resize call as an unjustified
+    // liability (it forced a second layout/redraw pass that could produce a
+    // bad transitional frame on a slow device).
+    //
+    // Santiago then confirmed, on a fresh screenshot taken well after v1.19.9
+    // was live (so not a transitional-frame artifact), that a DIFFERENT
+    // event's chart (DXY avg daily range) still showed a hard-edged clip —
+    // and a repeat diagnostic dump against that specific chart again showed
+    // the axis canvas clean at rest (rows 8-16 of 24, margin both sides) AND
+    // ruled out every CSS ancestor (no overflow clipping anywhere in the
+    // #cal-hist-chart → #cal-hist-modal chain). The one remaining fact both
+    // dumps shared: attrW/attrH == cssW/cssH on every canvas in the chart,
+    // i.e. a 1x backing store on a devicePixelRatio=2 screen. That mismatch
+    // is consistent with LWC reading window.devicePixelRatio exactly once,
+    // synchronously, inside createChart() above — which runs immediately
+    // after container.style.display toggles from 'none', a moment where the
+    // page's effective DPR isn't guaranteed to have settled yet. Without
+    // autoSize, nothing ever revisits that reading afterward, so a canvas
+    // created in that narrow window stays permanently mis-scaled — a 1x
+    // bitmap upscaled by the compositor to fill a 2x box can misregister the
+    // last row or two of a densely-packed text row like the time axis,
+    // which reads as a hard clip rather than the DPR-mismatch pattern (soft
+    // "the whole line" clipping) I'd have expected. `autoSize: true` (added
+    // just above) hands sizing to LWC's own ResizeObserver-driven pipeline
+    // instead, which re-evaluates continuously rather than once — the
+    // `width`/`height` above are kept only as the documented
+    // ResizeObserver-failure fallback.
 
     // Hover tooltip — date (with year) + actual + forecast for the point
     // under the cursor. Same positioning/styling pattern as
