@@ -1,7 +1,30 @@
 /**
- * calendar-panel.js v1.19.0 — Native economic calendar renderer
+ * calendar-panel.js v1.19.1 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.1 (2026-08-08): Two follow-ups from Santiago's screenshots after the
+ *   v1.19.0 production promotion:
+ *   (1) STRUCTURAL — filter-row divider replaced with space-between layout.
+ *       `#cal-toolbar` (week nav + impact filter) and `#cal-ccy-filter` no
+ *       longer sit side-by-side separated by a border. DOM order flipped —
+ *       currency filter first (left), toolbar second (right) — and
+ *       `#cal-filter-row` now uses `justify-content:space-between`, so the
+ *       gap lands in the middle of the bar instead of being marked by a
+ *       divider line. Border-right removed from `#cal-toolbar` in both the
+ *       docked and wide-fullscreen split-column layouts (was already `none`
+ *       in split mode; now also `none` docked). The relocation logic that
+ *       moves both groups into `#cal-panel-head-actions` in split mode keeps
+ *       the same left-to-right order (currency, then toolbar).
+ *   (2) FIX — history-modal chart X-axis dates still clipped after the
+ *       v1.18.0 attempt (110→130px + tickMarkFormatter). Santiago's
+ *       follow-up screenshot showed the bottom tick-label row still cut off.
+ *       Chart height increased again, 130→156px (container CSS and the LWC
+ *       `createChart` option kept in sync), and `rightPriceScale`'s
+ *       `scaleMargins` tightened from 0.15/0.15 to 0.12/0.12 so the price
+ *       series claims a little less of the taller total, leaving the time
+ *       axis strip more room to render a full, unclipped line of text
+ *       regardless of how LWC internally apportions the two panes.
  *
  * v1.1 (2026-06-09): Display window filter — show only yesterday through +14 days.
  * v1.2 (2026-06-09): Client-side cross-day dedup — mirrors Step 2e of fetch_ff_calendar.py
@@ -904,10 +927,10 @@
     const rect = container.getBoundingClientRect();
     const chart = LWC.createChart(container, {
       width: Math.round(rect.width) || container.offsetWidth || 380,
-      height: 130,
+      height: 156,
       layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontSize: 9, attributionLogo: false },
       grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
-      rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.15, bottom: 0.15 } },
+      rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.12 } },
       timeScale: {
         borderVisible: false, fixRightEdge: true, fixLeftEdge: true, rightOffset: 2,
         tickMarkFormatter: (time) => _calFmtDateISO(typeof time === 'string' ? time : ''),
@@ -1059,7 +1082,7 @@
       }
       #cal-hist-modal .ch-chart-legend { display:flex;align-items:center;gap:4px;font-size:9px;text-transform:none;letter-spacing:0; }
       #cal-hist-modal .ch-chart-swatch { display:inline-block;width:8px;height:2px; }
-      #cal-hist-chart { height:130px;position:relative; }
+      #cal-hist-chart { height:156px;position:relative; }
       .ch-chart-tooltip {
         position:absolute;display:none;pointer-events:none;
         background:var(--bg2,#1e222d);border:1px solid var(--border2);
@@ -1682,25 +1705,25 @@
       }
     }
 
-    // [v1.19.0] Week nav + impact filter toolbar — travels as a pair with
+    // [v1.19.1] Week nav + impact filter toolbar — travels as a pair with
     // #cal-ccy-filter, same rationale as before: always inserted immediately
-    // before #cal-ccy-filter's CURRENT parent (already resolved above),
-    // rather than duplicating the splitCols/filterRow branching.
+    // AFTER #cal-ccy-filter's CURRENT parent (already resolved above),
+    // rather than duplicating the splitCols/filterRow branching. Order
+    // flipped from v1.19.0 (toolbar-then-currency) to currency-then-toolbar
+    // per Santiago's review: no visible divider between the two groups —
+    // #cal-filter-row uses justify-content:space-between instead, so the
+    // currency filter sits flush left, the toolbar sits flush right, and the
+    // gap lands in the middle rather than being marked by a border.
     const toolBox = document.getElementById('cal-toolbar');
     if (toolBox && ccyBox && ccyBox.parentNode) {
       const targetParent = ccyBox.parentNode;
-      if (toolBox.parentNode !== targetParent || toolBox.nextSibling !== ccyBox) {
-        targetParent.insertBefore(toolBox, ccyBox);
+      if (toolBox.parentNode !== targetParent || toolBox.previousSibling !== ccyBox) {
+        targetParent.insertBefore(toolBox, ccyBox.nextSibling);
       }
-      if (splitCols) {
-        toolBox.style.borderRight = 'none';
-        toolBox.style.padding     = '0';
-        toolBox.style.marginRight = '4px';
-      } else {
-        toolBox.style.borderRight = '1px solid var(--border2)';
-        toolBox.style.padding     = '0 8px 0 0';
-        toolBox.style.marginRight = '2px';
-      }
+      toolBox.style.borderRight = 'none';
+      toolBox.style.padding     = '0';
+      toolBox.style.marginRight = '0';
+      toolBox.style.marginLeft  = splitCols ? '4px' : '0';
     }
 
     // #cal-filter-row has nothing left in it once both groups relocate to
