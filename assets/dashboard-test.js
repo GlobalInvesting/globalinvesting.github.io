@@ -10075,8 +10075,7 @@ async function buildRichNarrative() {
                 return `<div class="a-card ${sevCls}${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
                   <div class="a-card-head">
                     <span class="a-pair">${titleParts.pair}</span>
-                    <span class="a-badge">${titleParts.badge}</span>
-                    <span class="a-card-time">${localTime}</span>
+                    <span class="a-badge">Regime: ${titleParts.badge} · ${localTime}</span>
                   </div>
                   ${footerParts.body ? `<div class="a-desc">${footerParts.body}</div>` : ''}
                   <div class="a-foot">
