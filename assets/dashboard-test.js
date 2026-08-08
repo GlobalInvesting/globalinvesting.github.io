@@ -10055,6 +10055,7 @@ async function buildRichNarrative() {
             }
 
             container.innerHTML = signals.map(s => {
+              const sevCls = s.priority === 'critical' ? 'a-sev-crit' : s.priority === 'warning' ? 'a-sev-warn' : 'a-sev-info';
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
               const localTime = localizeSignalTime(s.time);
               const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
@@ -10067,22 +10068,18 @@ async function buildRichNarrative() {
               const footerParts = parseFooter(s.text);
 
               if (titleParts && footerParts) {
-                // Reverted to production's original left-column layout —
-                // a-time + a-dot, exactly as the plain .alert-row always had.
-                // The P1/P2/P3 badge and the merged "Regime: X · time" badge
-                // didn't land after a few rounds of iteration; back to the
-                // simplest, most familiar pattern.
+                // Severity is a thin underline beneath the pair name, colored
+                // by priority — quieter than a badge or dot, and time is back
+                // to living inside the Regime badge (no separate .a-time here).
                 // Evidence chips are intentionally NOT rendered in this structured
                 // card — the mockup keeps the card clean (body + three-clause
                 // footer only). The underlying data isn't lost: it's still on the
                 // native title="" tooltip, available on hover.
                 return `<div class="alert-row" ${evTooltip ? `title="${evTooltip}"` : ''}>
-                  <span class="a-time">${localTime}</span>
-                  <span class="a-dot ${dotCls}"></span>
                   <div class="a-text">
                     <div class="a-head">
-                      <span class="a-pair">${titleParts.pair}</span>
-                      <span class="a-badge">Regime: ${titleParts.badge}</span>
+                      <span class="a-pair ${sevCls}">${titleParts.pair}</span>
+                      <span class="a-badge">Regime: ${titleParts.badge} · ${localTime}</span>
                     </div>
                     <span class="a-desc">${footerParts.body}</span>
                     <div class="a-foot">
