@@ -1,9 +1,28 @@
 /**
- * calendar-panel.js v1.19.15 — Native economic calendar renderer
+ * calendar-panel.js v1.19.16 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
- * v1.19.15 (2026-08-08): FIX — v1.19.14's requestAnimationFrame fix for the
+ * v1.19.16 (2026-08-08): FIX — v1.19.15's fontFamily fix didn't resolve it
+ *   either. Rather than propose a thirteenth resize/DPR/font theory, pulled
+ *   the actual axis-canvas bitmaps directly (canvas.toBlob(), not a
+ *   screenshot) from both this chart and corr-modal.js's (a chart that's
+ *   never shown this issue) and compared them side by side at identical
+ *   zoom. Both are structurally identical: 1x backing store, same font,
+ *   same 9px size — that pattern was never the bug. The real difference is
+ *   label length: this chart's custom tick formatter shows a full "Jan 9
+ *   2026" (day+month+year, ~10 characters); corr-modal.js shows "Jun 26"
+ *   (~6 characters). At a 9px line height, more characters packed into
+ *   comparable label width leaves less room per glyph, reading as denser/
+ *   blockier — not a rendering defect, a legibility limit of cramming that
+ *   much text that small. Santiago asked to keep the day visible rather
+ *   than shorten the format, so fixed the other side of the trade-off
+ *   instead: bumped fontSize from 9 to 10, matching econ-surprises-modal.js
+ *   and cot-modal-chart.js's precedent (neither of which has ever shown
+ *   this issue either) — giving each glyph more vertical resolution without
+ *   dropping any information from the label.
+ *
+ * v1.19.15 (2026-08-08): FIX (did not resolve it — see v1.19.16 above) —
  *   ResizeObserver cascade didn't change the visual result either. Stepped
  *   back from resize/DPR theories entirely and rechecked the four LWC chart
  *   configs side by side for anything unrelated to sizing. Found it: this
@@ -1290,7 +1309,7 @@
     const chart = LWC.createChart(container, {
       width: Math.round(rect.width) || container.offsetWidth || 380,
       height: 190,
-      layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontFamily: "'JetBrains Mono','Courier New',monospace", fontSize: 9, attributionLogo: false },
+      layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontFamily: "'JetBrains Mono','Courier New',monospace", fontSize: 10, attributionLogo: false },
       grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.10, bottom: 0.10 } },
       timeScale: {
