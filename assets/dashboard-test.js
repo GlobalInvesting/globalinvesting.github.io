@@ -10071,7 +10071,11 @@ async function buildRichNarrative() {
                 // no separate box/border/background. Pair name stays plain
                 // production text color; only the dot carries severity.
                 // Time merged into the Regime badge (no separate .a-time here).
-                return `<div class="alert-row${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
+                // Evidence chips are intentionally NOT rendered in this structured
+                // card — the mockup keeps the card clean (body + three-clause
+                // footer only). The underlying data isn't lost: it's still on the
+                // native title="" tooltip, available on hover.
+                return `<div class="alert-row" ${evTooltip ? `title="${evTooltip}"` : ''}>
                   <span class="a-dot ${dotCls}"></span>
                   <div class="a-text">
                     <div class="a-head">
@@ -10084,7 +10088,6 @@ async function buildRichNarrative() {
                       <div class="a-foot-line"><span class="a-foot-lbl">Catalyst:</span> ${footerParts.catalyst}</div>
                       <div class="a-foot-line"><span class="a-foot-lbl">Risk:</span> ${footerParts.risk}</div>
                     </div>
-                    ${evHtml}
                   </div>
                 </div>`;
               }
