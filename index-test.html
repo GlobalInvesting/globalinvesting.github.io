@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GlobalInvesting — Calendar TEST harness (v1.13-TEST)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
+<!-- [TEST harness] index.html's calendar CSS (.cal-event-row, .cal-col, .cal-dot,
+     etc.) lives in an INLINE <style> block inside index.html itself, not in
+     dashboard.css — that's why the first version of this harness rendered
+     everything stacked with no grid columns. Extracted verbatim (unmodified,
+     same :root vars + same .cal-* rules) into its own file so this harness
+     matches production layout exactly without duplicating index.html's whole
+     <head>. Load order matters: this must come before dashboard.css so that
+     later, more specific dashboard.css rules (if any overlap) still win. -->
+<link rel="stylesheet" href="assets/inline-index-styles.css">
 <link rel="stylesheet" href="assets/dashboard.css">
 <style>
   /* Minimal page chrome — NOT part of the terminal, just to host the panel
