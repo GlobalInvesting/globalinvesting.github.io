@@ -10056,6 +10056,7 @@ async function buildRichNarrative() {
 
             container.innerHTML = signals.map(s => {
               const sevCls = s.priority === 'critical' ? 'a-sev-crit' : s.priority === 'warning' ? 'a-sev-warn' : 'a-sev-info';
+              const sevLabel = s.priority === 'critical' ? 'P1' : s.priority === 'warning' ? 'P2' : 'P3';
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
               const localTime = localizeSignalTime(s.time);
               const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
@@ -10068,9 +10069,10 @@ async function buildRichNarrative() {
               const footerParts = parseFooter(s.text);
 
               if (titleParts && footerParts) {
-                // Severity is a thin underline beneath the pair name, colored
-                // by priority — quieter than a badge or dot, and time is back
-                // to living inside the Regime badge (no separate .a-time here).
+                // Priority is a tinted text badge (P1/P2/P3) — numeric tier reads
+                // as technical/institutional rather than alarmist, and stays
+                // WCAG 1.4.1-compliant (legible without perceiving color). Time
+                // lives inside the Regime badge (no separate .a-time here).
                 // Evidence chips are intentionally NOT rendered in this structured
                 // card — the mockup keeps the card clean (body + three-clause
                 // footer only). The underlying data isn't lost: it's still on the
@@ -10078,7 +10080,7 @@ async function buildRichNarrative() {
                 return `<div class="alert-row" ${evTooltip ? `title="${evTooltip}"` : ''}>
                   <div class="a-text">
                     <div class="a-head">
-                      <span class="a-pair ${sevCls}">${titleParts.pair}</span>
+                      <span class="a-name"><span class="a-sev ${sevCls}">${sevLabel}</span><span class="a-pair">${titleParts.pair}</span></span>
                       <span class="a-badge">Regime: ${titleParts.badge} · ${localTime}</span>
                     </div>
                     <span class="a-desc">${footerParts.body}</span>
