@@ -10056,7 +10056,7 @@ async function buildRichNarrative() {
 
             container.innerHTML = signals.map(s => {
               const sevCls = s.priority === 'critical' ? 'a-sev-crit' : s.priority === 'warning' ? 'a-sev-warn' : 'a-sev-info';
-              const sevLabel = s.priority === 'critical' ? 'P1' : s.priority === 'warning' ? 'P2' : 'P3';
+              const sevLabel = s.priority === 'critical' ? 'high' : s.priority === 'warning' ? 'med' : 'low';
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
               const localTime = localizeSignalTime(s.time);
               const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
