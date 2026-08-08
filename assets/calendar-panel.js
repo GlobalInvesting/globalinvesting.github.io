@@ -1,7 +1,34 @@
 /**
- * calendar-panel.js v1.19.5 — Native economic calendar renderer
+ * calendar-panel.js v1.19.6 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.6 (2026-08-08): FIX, diagnostic-confirmed this time — chart X-axis
+ *   clipping. Santiago ran a devtools dump at my request instead of another
+ *   screenshot, which ruled out the v1.19.5 hypothesis outright
+ *   (`modal.scrollHeight === modal.clientHeight`, 584 === 584 — nothing was
+ *   being cut by the modal's `max-height`) and revealed the real cause:
+ *   every canvas LWC created inside `#cal-hist-chart` had a backing store
+ *   equal to its CSS pixel size instead of scaled by `devicePixelRatio`
+ *   (the browser reported DPR=2; the time-axis canvas was 342x24 physical
+ *   pixels for a 342x24 CSS-px display box, when it needed 684x48). LWC's
+ *   draw calls use DPR-scaled coordinates internally, so content sized for
+ *   a 2x canvas was being drawn onto a 1x backing store and hard-clipped at
+ *   its edge — exactly the "bottom half of every axis label sliced off"
+ *   symptom across all three prior screenshots, and unrelated to any of the
+ *   CSS height/max-height theories those attempts were built on. Likely
+ *   mechanism: `createChart()` allocates each canvas's backing store
+ *   synchronously, before the container's first real paint after the
+ *   `display:none -> ''` toggle in `openHistModal()` — layout reads
+ *   (`getBoundingClientRect`) are accurate same-tick, but canvas DPR
+ *   allocation apparently isn't settled yet at that point. Fix: an explicit
+ *   `chart.resize(width, 190, true)` call on the next animation frame
+ *   (after a real paint has happened), guarded against the modal having
+ *   been closed/reopened in the meantime via the existing `_calHistChart`
+ *   identity check. Not independently confirmed visually this session
+ *   (still no Chromium egress here), but for the first time this fix is
+ *   built directly on a live measurement from Santiago's own browser rather
+ *   than another guess from a screenshot.
  *
  * v1.19.5 (2026-08-08): FOURTH attempt at the chart X-axis clipping —
  *   different diagnosis this time, on desktop where the v1.19.4 mobile
@@ -1123,6 +1150,32 @@
     forecastSeries.setData(pts.map(p => ({ time: p.time, value: p.forecast })));
 
     chart.timeScale().fitContent();
+
+    // DIAGNOSTIC-CONFIRMED FIX (v1.19.6): live devtools dump from Santiago's
+    // browser (DPR=2) showed every canvas LWC created here had a backing
+    // store equal to its CSS pixel size (e.g. the time-axis canvas: 342x24
+    // both as `canvas.width/height` AND as `canvas.style.width/height`),
+    // instead of the 684x48 physical pixels a DPR=2 screen needs. LWC's
+    // internal draw calls use DPR-scaled coordinates, so content meant for
+    // a 2x-sized canvas was being drawn onto a 1x-sized backing store and
+    // hard-clipped at its edge — exactly the "bottom half of every axis
+    // label sliced off" symptom from all three prior screenshots. This
+    // wasn't a CSS height problem (ruled out by `modal.scrollHeight ===
+    // modal.clientHeight`, confirming nothing was being cut by overflow).
+    // The likely mechanism: `createChart()` allocates each canvas's backing
+    // store synchronously, before the container's first real paint after
+    // the `display:none -> ''` toggle a few lines up in openHistModal() —
+    // `getBoundingClientRect()` reads are accurate same-tick (layout is
+    // synchronous), but the canvas's DPR-aware allocation apparently isn't
+    // settled yet at that point. Forcing an explicit resize with
+    // `forceRepaint=true` on the next animation frame — after a real paint
+    // has happened — makes LWC reallocate the backing stores against the
+    // correct, now-settled devicePixelRatio.
+    requestAnimationFrame(() => {
+      if (_calHistChart !== chart) return; // modal closed/reopened before this frame ran
+      const w = container.clientWidth || Math.round(rect.width) || 380;
+      try { chart.resize(w, 190, true); } catch (_) {}
+    });
 
     // Hover tooltip — date (with year) + actual + forecast for the point
     // under the cursor. Same positioning/styling pattern as
