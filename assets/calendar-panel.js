@@ -1,7 +1,25 @@
 /**
- * calendar-panel.js v1.19.8 — Native economic calendar renderer
+ * calendar-panel.js v1.19.9 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.9 (2026-08-08): REMOVED a no-longer-justified RAF resize — v1.19.6's
+ *   requestAnimationFrame'd `chart.resize(w, 190, true)` was added on a live
+ *   dump showing the axis canvas's backing store (342x24) numerically equal
+ *   to its CSS size despite devicePixelRatio=2. v1.19.7/8 chased (and ruled
+ *   out) glyph-specific clipping instead, and a follow-up diagnostic dump —
+ *   full row-by-row pixel brightness of the actual axis canvas — proved the
+ *   canvas itself renders with zero clipping at rest: text occupied rows
+ *   8-16 of a 24-row canvas, clean margin on both sides, nothing touching
+ *   row 0 or row 23. So the DPR/backing-store pattern was confirmed (again)
+ *   to be normal LWC v5 behavior, not a bug. With clipping ruled out at
+ *   rest, the resize call had no remaining justification and became a
+ *   liability: it forces a second layout/redraw pass one frame after the
+ *   chart's already-correct initial paint, which on a slower device
+ *   (Santiago's dump was captured via Edge Android remote debugging) can
+ *   produce a visible transitional frame — a plausible source for a
+ *   screenshot catching mis-rendered text not present in steady state.
+ *   Removed outright rather than patched again. See _calRenderHistChart.
  *
  * v1.19.8 (2026-08-08): FOLLOW-UP FIX — v1.19.7 removed the comma after
  *   confirming (via pixel crop) it was clipped at the bottom by descender.
@@ -1191,31 +1209,26 @@
 
     chart.timeScale().fitContent();
 
-    // DIAGNOSTIC-CONFIRMED FIX (v1.19.6): live devtools dump from Santiago's
-    // browser (DPR=2) showed every canvas LWC created here had a backing
-    // store equal to its CSS pixel size (e.g. the time-axis canvas: 342x24
-    // both as `canvas.width/height` AND as `canvas.style.width/height`),
-    // instead of the 684x48 physical pixels a DPR=2 screen needs. LWC's
-    // internal draw calls use DPR-scaled coordinates, so content meant for
-    // a 2x-sized canvas was being drawn onto a 1x-sized backing store and
-    // hard-clipped at its edge — exactly the "bottom half of every axis
-    // label sliced off" symptom from all three prior screenshots. This
-    // wasn't a CSS height problem (ruled out by `modal.scrollHeight ===
-    // modal.clientHeight`, confirming nothing was being cut by overflow).
-    // The likely mechanism: `createChart()` allocates each canvas's backing
-    // store synchronously, before the container's first real paint after
-    // the `display:none -> ''` toggle a few lines up in openHistModal() —
-    // `getBoundingClientRect()` reads are accurate same-tick (layout is
-    // synchronous), but the canvas's DPR-aware allocation apparently isn't
-    // settled yet at that point. Forcing an explicit resize with
-    // `forceRepaint=true` on the next animation frame — after a real paint
-    // has happened — makes LWC reallocate the backing stores against the
-    // correct, now-settled devicePixelRatio.
-    requestAnimationFrame(() => {
-      if (_calHistChart !== chart) return; // modal closed/reopened before this frame ran
-      const w = container.clientWidth || Math.round(rect.width) || 380;
-      try { chart.resize(w, 190, true); } catch (_) {}
-    });
+    // REMOVED (v1.19.9): v1.19.6 added a requestAnimationFrame'd
+    // chart.resize(w, 190, true) here based on a live dump showing the axis
+    // canvas's backing store (342x24) numerically equal to its CSS size
+    // (342px/24px) despite devicePixelRatio=2. v1.19.7/8 chased (and ruled
+    // out) glyph-specific clipping instead, and a follow-up diagnostic
+    // dump — full row-by-row pixel brightness of the actual axis canvas —
+    // proved the canvas itself was rendering with zero clipping at rest:
+    // text occupied rows 8-16 of a 24-row canvas, with clean untouched
+    // margin on both sides, nothing touching row 0 or row 23. So the
+    // DPR/backing-store pattern was confirmed (again) to be normal LWC v5
+    // behavior, not a bug — it doesn't hard-clip, it just means the canvas
+    // renders at 1x and gets upscaled by the compositor on a HiDPI screen.
+    // With clipping ruled out at rest, this resize call had no remaining
+    // justification, and became a liability instead: it forces a second
+    // layout/redraw pass one animation frame after the chart's already-
+    // correct initial paint, which on a slower device (Santiago's dump was
+    // captured via Edge Android remote debugging) can produce a visible
+    // transitional frame — a plausible source for a screenshot catching
+    // mis-rendered text that isn't present in steady state. Removed
+    // outright rather than patched again.
 
     // Hover tooltip — date (with year) + actual + forecast for the point
     // under the cursor. Same positioning/styling pattern as
