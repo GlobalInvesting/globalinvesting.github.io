@@ -1,7 +1,24 @@
 /**
- * calendar-panel.js v1.19.1 — Native economic calendar renderer
+ * calendar-panel.js v1.19.2 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.2 (2026-08-08): BUG FIX — history-modal chart hover tooltip colored
+ *   actual-vs-forecast beats/misses the same way for every event, ignoring
+ *   `isInverse` (the same flag the print table above it already uses via
+ *   `_calBeatClass()`). For an inverse indicator — e.g. the U-6 Unemployment
+ *   Rate screenshot Santiago sent, 7.9% actual vs. 7.7% forecast — a higher
+ *   actual is worse, but the tooltip still showed "+0.20 vs. forecast" in
+ *   green (beat color) instead of red (miss color), directly contradicting
+ *   the "Inverse indicator" note and the correctly-red table row for the
+ *   same date sitting right above the chart. `_calRenderHistChart()` now
+ *   takes an `isInverse` parameter (threaded through from the same
+ *   `openHistModal()` computation the table already uses) and applies the
+ *   identical beat/miss rule the table uses: `isInverse ? diff < 0 : diff >
+ *   0`. Tooltip also appends "(inverse)" after the delta line so the
+ *   direction flip is visible without having to scroll up to the note.
+ *   Applies to every inverse-keyword-matched event (`CAL_INVERSE_KW`:
+ *   unemployment, unemployed, jobless, claims, deficit), not just this one.
  *
  * v1.19.1 (2026-08-08): Two follow-ups from Santiago's screenshots after the
  *   v1.19.0 production promotion:
@@ -894,7 +911,7 @@
     return `${mon} ${parseInt(m[3], 10)}, '${m[1].slice(2)}`;
   }
 
-  function _calRenderHistChart(seriesArr) {
+  function _calRenderHistChart(seriesArr, isInverse) {
     const LWC = window.LightweightCharts;
     const container = document.getElementById('cal-hist-chart');
     if (!LWC || !container) return;
@@ -976,12 +993,20 @@
       const p = byTime[param.time];
       if (!p) { tip.style.display = 'none'; return; }
       const diff = p.actual - p.forecast;
-      const col  = diff === 0 ? _text2 : (diff > 0 ? '#26a69a' : '#ef5350');
+      // Same beat/miss rule as _calBeatClass() (used for the table rows
+      // above): for an inverse indicator (unemployment, jobless claims,
+      // etc.) a HIGHER actual than forecast is the miss, not the beat, so
+      // the color has to flip with `isInverse` too — previously this
+      // always colored diff>0 green regardless of the indicator's
+      // direction, which showed a 7.9%-vs-7.7% unemployment miss (worse)
+      // in the same green used for a genuine beat.
+      const beat = diff === 0 ? null : (isInverse ? diff < 0 : diff > 0);
+      const col  = beat === null ? _text2 : (beat ? '#26a69a' : '#ef5350');
       tip.innerHTML = `
         <div style="color:var(--text2,#9096a0);margin-bottom:3px;">${_calFmtDateISO(param.time)}</div>
         <div><span style="color:#2596ff;">Actual</span> ${p.actual}</div>
         <div><span style="color:rgba(144,150,160,0.9);">Forecast</span> ${p.forecast}</div>
-        <div style="color:${col};margin-top:2px;">${diff >= 0 ? '+' : ''}${diff.toFixed(2)} vs. forecast</div>
+        <div style="color:${col};margin-top:2px;">${diff >= 0 ? '+' : ''}${diff.toFixed(2)} vs. forecast${isInverse ? ' (inverse)' : ''}</div>
       `;
       tip.style.display = 'block';
       const cW = container.clientWidth || 380;
@@ -1180,7 +1205,7 @@
       _calEnsureLWC().then(() => {
         if (openToken !== _calHistOpenToken || overlay.style.display !== 'flex') return;
         if (chartWrap) chartWrap.style.display = '';
-        _calRenderHistChart(seriesArr);
+        _calRenderHistChart(seriesArr, isInverse);
       }).catch(() => { if (chartWrap) chartWrap.style.display = 'none'; });
     } else {
       _calDestroyHistChart();
