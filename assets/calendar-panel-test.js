@@ -91,9 +91,31 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
- * v1.14-TEST (2026-08-08): SANDBOX — Three "medium effort" enhancements from
+ * v1.15-TEST (2026-08-08): Follow-up per Santiago's review of v1.14-TEST:
+ *   (1) REMOVED the ESI contribution badge entirely — Santiago judged it
+ *       added more visual noise than value on the row. Deleted
+ *       esiContribBadge(), _calCanonEsi(), _CAL_CCY_PFXS, CAL_ESI_NOISE_KW,
+ *       CAL_ESI_DECAY_LAMBDA, _lastSurpriseStats, and the surpriseStats
+ *       fetch/store step in fetchEconomicCalendar() — nothing else in this
+ *       file read that field. The live-countdown highlight and methodology
+ *       tooltip from v1.14-TEST are unaffected and unchanged.
+ *   (2) Synthetic live-countdown fixture: real data rarely has a qualifying
+ *       high-impact event sitting inside the countdown window at the exact
+ *       moment someone opens the sandbox to look at it, so testing the
+ *       feature meant waiting for a real release or scripting a one-off
+ *       fixture in a throwaway test harness. Added an opt-in, in-page
+ *       fixture instead — append `?calDebugLive=1` to index-test.html's URL
+ *       and a clearly-labeled "[TEST FIXTURE] Non-Farm Payrolls" event is
+ *       injected 20 minutes out, seeded once per page load so it counts
+ *       down in real time and crosses from the "soon" tier into the
+ *       pulsing "imminent" tier ~5 minutes after load — same behavior a
+ *       real event would show. No-op with the flag absent; never touches
+ *       any fetched JSON. See getSyntheticLiveEvent() / calDebugLiveEnabled().
+ * v1.14-TEST (2026-08-08): SANDBOX — Two "medium effort" enhancements from
  *   Santiago's original Bloomberg/Refinitiv gap-analysis, built on top of the
- *   v1.13.x currency-filter work (still unshipped to production):
+ *   v1.13.x currency-filter work (still unshipped to production). [A third,
+ *   an ESI contribution badge, shipped in this version too but was removed
+ *   in v1.15-TEST — see above; left out of this list accordingly.]
  *   (1) Live/next-release highlight: the single soonest unreleased
  *       high-impact event due within the next 3h gets a highlighted row and
  *       its clock time is swapped for a live countdown (ticks every 20s,
@@ -101,18 +123,7 @@
  *       a stronger pulsing tier. Tooltip on the countdown still shows the
  *       actual local time. Scoped to `filtered`, so it respects whatever
  *       currency is isolated.
- *   (2) ESI contribution badge: a small superscript next to Actual (e.g.
- *       "+1.2" / "-0.8", up/down colored) showing this event's approximate
- *       decay+impact-weighted pull on that currency's 90d Economic Surprise
- *       Index — z-score-normalized when the series has ≥5 history points in
- *       calendar.json's `surpriseStats`, direction-only otherwise. Explicitly
- *       NOT a replica of econ-surprises-modal.js's exact idx100 blend (that
- *       needs the full window's aggregate weights) — a self-contained,
- *       same-sign, same-shape proxy sized for a single-row badge, with the
- *       approximation stated plainly in its own tooltip. No new fetch:
- *       reuses `surpriseStats`, already present in calendar.json, which this
- *       file already fetches for the history-truncation guard (v1.11).
- *   (3) Event methodology tooltip: hovering a matched event title (dashed
+ *   (2) Event methodology tooltip: hovering a matched event title (dashed
  *       underline cue, same visual convention as the ATM IV tooltips
  *       Santiago referenced) shows what it measures and why FX desks watch
  *       it. ~25 G10 headline-release patterns; unmatched titles keep the
@@ -121,11 +132,13 @@
  *       attachRiskTip, since this sandbox harness doesn't load dashboard.js
  *       — delegated listeners bound once on #cal-events-body, not per-row,
  *       so re-renders never re-attach or leak handlers.
- *   All three verified via the same jsdom + Chromium smoke-test harness used
+ *   Both verified via the same jsdom + Chromium smoke-test harness used
  *   for the v1.13.x rounds (docked / narrow-fullscreen / wide-fullscreen-
  *   split), plus a synthetic near-term high-impact fixture event to exercise
  *   the live-countdown path (production data rarely has one sitting exactly
- *   inside the 3h/15m windows at any given moment the harness happens to run).
+ *   inside the 3h/15m windows at any given moment the harness happens to run;
+ *   this fixture only lived in the ad-hoc test harness at the time — v1.15-TEST
+ *   above makes an equivalent fixture a permanent, opt-in part of the sandbox).
  * v1.13.3-TEST (2026-08-08): Santiago caught a real misalignment in the
  *   v1.13.2 screenshot — Actual/Forecast/Previous no longer sat directly
  *   above their own data columns. Cause: v1.13.2 appended the button-group
@@ -304,104 +317,10 @@
     return 'mild';
   }
 
-  // ── [TEST v1.14] Per-event ESI contribution badge ───────────────────────
-  // Santiago already computes a 90d decay-weighted Economic Surprise Index
-  // per currency (econ-surprises-modal.js / dashboard.js renderEconSurprises()).
-  // Neither ForexFactory nor Myfxbook show how much any single release moved
-  // that index — this surfaces a lightweight, badge-sized proxy for that,
-  // right on the row, without exposing the internal aggregation pipeline
-  // (only the resulting number + a plain-language tooltip).
-  //
-  // NOT a replica of the exact idx100 blend formula in econ-surprises-modal.js
-  // (that requires the full 90d window's aggregate weights to normalize
-  // correctly). This is a per-event, self-contained proxy: decay+impact
-  // weight × (z-score if the series has ≥5 history points with std>0, else
-  // a plain ±1 beat/miss direction) — same inputs, same shape, same sign
-  // convention, but not divided by the aggregate window total. Good enough
-  // to answer "did this print help or hurt, and roughly how much" at a
-  // glance; not good enough to sum badges across a day and reproduce the
-  // panel's own ESI number exactly. Documented the same way _surpriseTier's
-  // placeholder thresholds are above.
-  //
-  // Canonical series key + noise filter + decay constant are copied (not
-  // imported — this file has no module system) from _canonEsi/NOISE_KW/
-  // DECAY_LAMBDA in dashboard.js and _ESM_* in econ-surprises-modal.js.
-  // Must stay in sync with those three if the ESI methodology changes.
-  const _CAL_CCY_PFXS = ['united states ', 'euro area ', 'united kingdom ', 'japan ',
-    'australia ', 'canada ', 'switzerland ', 'new zealand ', 'norway ', 'sweden '];
-  function _calCanonEsi(t) {
-    let s = t.replace(/\s*\([^)]*\)/g, '').trim();
-    for (const p of _CAL_CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
-    return s;
-  }
-  const CAL_ESI_NOISE_KW = [
-    'cftc', 'baker hughes', 'rig count', 'auction', 'api weekly',
-    'milk auction', "fed's balance sheet", 'reserve balances',
-    'redbook', 'ibd/tipp', 'tips auction', 'note auction', 'bond auction',
-    'gilt auction', 'jgb auction', 'obligaciones', 'speculative net',
-    'nc net position', 'crude oil inventories', 'crude oil imports',
-    'distillate', 'gasoline inventorie', 'gasoline production',
-    'refinery', 'heating oil', 'natural gas storage',
-    'foreign bonds buying', 'foreign investments in japanese',
-    'foreign bond investment', 'foreign investment in japan',
-    'm2 money', 'm3 money', 'm4 money', 'reserve assets total',
-    'cb leading index', 'atlanta fed gdpnow', 'ny fed', 'cleveland cpi',
-    'ibd', '3-month bill', '4-week bill', '52-week bill',
-    '4-week average', '4-week avg',
-    'tic net', 'net long-term tic', 'total net tic',
-    'interest rate projection', 'eia crude oil', 'eia crude', 'myfxbook',
-  ];
-  const CAL_ESI_DECAY_LAMBDA = Math.LN2 / 45; // half-life 45d, mirrors DECAY_LAMBDA
-
-  // Populated from calendar.json's `surpriseStats` field each fetch (see
-  // fetchEconomicCalendar()) — {n, mean, std} per "CCY/canonical title" key,
-  // computed server-side by fetch_economic_calendar.py. Same field
-  // dashboard.js reads into window._ECON_SURPRISE_STATS. Kept as its own
-  // module var here (not the shared window global) so this file never
-  // depends on dashboard.js having loaded first.
-  let _lastSurpriseStats = {};
-
   function _escAttr(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
       .replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
-  // actualN/forecastN/isInverse/beat are passed in already computed by the
-  // caller (buildPanel's Actual-column block computes the exact same values
-  // one line above where this is called — no point recomputing).
-  function esiContribBadge(ev, actualN, forecastN, isInverse, beat, nowMs) {
-    if (isNaN(actualN) || isNaN(forecastN) || actualN === forecastN) return '';
-    const evTitleLower = (ev.title || '').toLowerCase();
-    if (CAL_ESI_NOISE_KW.some(kw => evTitleLower.includes(kw))) return '';
-    if (!['medium', 'high'].includes(ev.impact)) return '';
-
-    const canon    = _calCanonEsi(evTitleLower);
-    const statsKey = `${ev.currency}/${canon}`;
-    const stats    = _lastSurpriseStats[statsKey];
-    const useZ     = stats && stats.n >= 5 && stats.std > 0;
-
-    const rawSurprise = actualN - forecastN;
-    const surprise     = isInverse ? -rawSurprise : rawSurprise;
-
-    const [eh, em] = (ev.timeUTC || '00:00').split(':').map(Number);
-    const evMs = Date.UTC(+ev.dateISO.slice(0,4), +ev.dateISO.slice(5,7)-1, +ev.dateISO.slice(8,10), eh, em);
-    const ageDays    = Math.max(0, (nowMs - evMs) / 86400000);
-    const impactMult = ev.impact === 'high' ? 1.0 : 0.5;
-    const w          = Math.exp(-CAL_ESI_DECAY_LAMBDA * ageDays) * impactMult;
-
-    const contrib = useZ ? ((surprise - stats.mean) / stats.std) * w : (beat ? 1 : -1) * w;
-    const rounded = Math.round(contrib * 10) / 10;
-    if (Math.abs(rounded) < 0.1) return '';
-
-    const sign = rounded > 0 ? '+' : '';
-    const cls  = rounded > 0 ? 'up' : 'down';
-    const methodNote = useZ
-      ? 'normalized against this series\u2019 own historical surprise distribution'
-      : 'direction-only — not enough history yet for this series to normalize';
-    const tip = `Approx. contribution to ${ev.currency}\u2019s 90d Economic Surprise Index ` +
-      `(decay + impact weighted, ${methodNote}). Reference proxy, not the exact panel calculation.`;
-    return ` <sup class="${cls}" style="font-size:7px;cursor:help;" title="${_escAttr(tip)}">${sign}${rounded.toFixed(1)}</sup>`;
   }
 
   // ── [TEST v1.14] Live / next-release highlight ───────────────────────────
@@ -468,6 +387,36 @@
     });
   }
 
+  // ── [TEST v1.15] Synthetic live-countdown fixture ────────────────────────
+  // Real data rarely has a qualifying high-impact event sitting inside the
+  // 3h/15m live-countdown window at the exact moment someone opens this
+  // sandbox to check the feature. Opt-in only — append ?calDebugLive=1 to
+  // index-test.html's URL — injects one clearly-labeled fake event so the
+  // countdown/highlight can be exercised on demand, independent of the
+  // real-world clock. Never runs without the query flag, never touches any
+  // fetched JSON, and the title is prefixed "[TEST FIXTURE]" so it can't be
+  // mistaken for a real release in a screenshot. Target time is seeded once
+  // per page load (20m out) rather than recomputed every 2-min poll, so it
+  // actually counts down in real time and crosses from the "soon" tier into
+  // the "imminent" pulsing tier ~5 minutes after load, same as a real event
+  // would — reload the page to re-seed another 20m window.
+  let _syntheticTargetMs = null;
+  function getSyntheticLiveEvent(nowMs) {
+    if (_syntheticTargetMs == null) _syntheticTargetMs = nowMs + 20 * 60 * 1000;
+    const d = new Date(_syntheticTargetMs);
+    return {
+      dateISO: d.toISOString().slice(0, 10),
+      timeUTC: d.toISOString().slice(11, 16),
+      currency: 'USD', impact: 'high',
+      title: '[TEST FIXTURE] Non-Farm Payrolls',
+      forecast: '180K', previous: '175K', actual: null,
+    };
+  }
+  function calDebugLiveEnabled() {
+    try { return new URLSearchParams(location.search).get('calDebugLive') === '1'; }
+    catch { return false; }
+  }
+
   // ── [TEST v1.14] Event methodology tooltips ──────────────────────────────
   // Same pattern Santiago asked to reuse from the ATM IV tooltips: a clean,
   // named, plain-language explanation on hover — what the release measures
@@ -475,7 +424,7 @@
   // is product copy, not sourced from any fetched document, so it carries
   // no citation obligation). Matched by keyword against the canonical title
   // (case-insensitive substring, first match wins — same convention as
-  // CAL_INVERSE_KW/CAL_ESI_NOISE_KW above). Not exhaustive — G10 headline
+  // CAL_INVERSE_KW above). Not exhaustive — G10 headline
   // releases only; anything unmatched falls back to the plain event-name
   // tooltip that was already there.
   const CAL_METHODOLOGY = [
@@ -953,7 +902,6 @@
           const isInverse = CAL_INVERSE_KW.some(kw => evTitle.includes(kw));
           let cls = '';
           let styleAttr = '';
-          let esiHtml = '';
           if (!isNaN(actualN) && !isNaN(forecastN) && actualN !== forecastN) {
             const beat = isInverse ? actualN < forecastN : actualN > forecastN;
             cls = beat ? ' class="up"' : ' class="down"';
@@ -963,11 +911,8 @@
             const tier = _surpriseTier(actualN, forecastN);
             if (tier === 'moderate') styleAttr = ' style="font-weight:600;"';
             if (tier === 'strong')   styleAttr = ` style="font-weight:700;background:${beat ? 'rgba(38,166,154,.14)' : 'rgba(239,83,80,.14)'};border-radius:2px;padding:0 3px;"`;
-            // [TEST v1.14] ESI contribution badge — reuses actualN/forecastN/
-            // isInverse/beat this block already computed, no recompute.
-            esiHtml = esiContribBadge(ev, actualN, forecastN, isInverse, beat, nowMs);
           }
-          actualHtml = `<span${cls}${styleAttr}>${ev.actual}</span>${esiHtml}`;
+          actualHtml = `<span${cls}${styleAttr}>${ev.actual}</span>`;
         }
 
         // Derived forecast (suffixed "*"): render in muted color with tooltip
@@ -1281,11 +1226,6 @@
       const ffJson  = ffRes?.ok  ? await ffRes.json().catch(() => null)  : null;
       const calJson = calRes?.ok ? await calRes.json().catch(() => null) : null;
 
-      // [TEST v1.14] surpriseStats only exists on calendar.json — keep the
-      // last known copy if this poll's calendar.json fetch fails, rather
-      // than blanking out every ESI badge on a transient network hiccup.
-      if (calJson?.surpriseStats) _lastSurpriseStats = calJson.surpriseStats;
-
       // calendar.json's native schema (fetch_economic_calendar.py) uses `.event`,
       // not `.title` — normalize once here so every downstream consumer (dedup
       // filters and buildPanel's row renderer alike) can rely on `.title` always
@@ -1345,6 +1285,10 @@
         const evMs = new Date(ev.dateISO).getTime();
         return !prior.some(d => { const diff = (evMs - new Date(d).getTime()) / 86400000; return diff > 0 && diff <= 7; });
       });
+
+      // [TEST v1.15] Opt-in synthetic fixture for the live-countdown feature —
+      // see getSyntheticLiveEvent() above. No-op unless ?calDebugLive=1.
+      if (calDebugLiveEnabled()) events = [getSyntheticLiveEvent(Date.now())].concat(events);
 
       _lastEvents = events; _lastSource = source; _lastHolidays = holidays;
       buildPanel(events, source, holidays);
