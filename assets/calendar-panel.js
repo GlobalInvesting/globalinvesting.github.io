@@ -1,9 +1,28 @@
 /**
- * calendar-panel.js v1.19.12 — Native economic calendar renderer
+ * calendar-panel.js v1.19.13 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
- * v1.19.12 (2026-08-08): FIX — v1.19.11's ResizeObserver + staggered-timeout
+ * v1.19.13 (2026-08-08): DEBUG — v1.19.12's `resize(w, 190, true)` did not
+ *   fix the axis clipping either (confirmed via a deployment-verification
+ *   diagnostic that this time proved v1.19.12 genuinely was running, ruling
+ *   out caching as the reason it "didn't work"). Checked LWC's own docs for
+ *   what `forceRepaint` actually does: it only controls *when* the resize
+ *   happens (synchronous vs. deferred to next frame) — it says nothing
+ *   about forcing a backing-store reallocation when width/height are
+ *   numerically unchanged from the chart's current size, which is the
+ *   actual situation on every one of `applyHistResize`'s calls (the modal's
+ *   container never changes size on its own). So v1.19.11 and v1.19.12 were
+ *   almost certainly doing the same no-op, just synchronously vs. deferred.
+ *   Rather than ship an eleventh blind guess and wait another full
+ *   deploy+cache cycle to find out, added `window.__calHistDebug` (chart
+ *   instance + axis-canvas pixel-dimension helper) so the DPR/backing-store
+ *   hypothesis can be tested interactively from devtools — e.g. resizing to
+ *   a genuinely different width to see whether *that* corrects the backing
+ *   store, isolating whether the no-op-on-unchanged-size theory is right
+ *   before writing the real fix. Remove this hook once closed.
+ *
+ * v1.19.12 (2026-08-08): FIX (did not resolve it — see v1.19.13 above) —
  *   structure was correct, but it called `chart.applyOptions({width,
  *   height})`, which didn't fix anything: the modal container's width never
  *   actually changes between chart creation and these later calls, so LWC's
@@ -1251,6 +1270,18 @@
       handleScroll: false, handleScale: false,
     });
     _calHistChart = chart;
+
+    // TEMP DEBUG HOOK (v1.19.13) — lets Santiago test resize/DPR hypotheses
+    // live from devtools without a redeploy cycle per attempt. Remove once
+    // the axis-clipping bug is confirmed fixed and closed.
+    window.__calHistDebug = {
+      chart, container,
+      axisCanvas: () => [...container.querySelectorAll('canvas')].filter(c => c.height < 40).sort((a,b) => b.width - a.width)[0],
+      dump: () => {
+        const c = window.__calHistDebug.axisCanvas();
+        return c ? { attrW: c.width, attrH: c.height, cssW: c.style.width, cssH: c.style.height, dpr: window.devicePixelRatio } : null;
+      },
+    };
 
     const actualSeries = chart.addSeries(LWC.LineSeries, {
       color: '#2596ff', lineWidth: 2, priceLineVisible: false, lastValueVisible: false,
