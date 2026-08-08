@@ -10033,17 +10033,64 @@ async function buildRichNarrative() {
                 });
               } catch { return timeStr; }
             }
+            // Rule 10 (engine SIGNALS_SYSTEM): title format is "PAIR — Setup Name"
+            // (em dash, spaces either side). The Setup Name is NOT a fixed frontend
+            // taxonomy — it's whatever the LLM named the setup that cycle, generated
+            // in the same pass as the body text, so it can't drift out of context.
+            function parseTitle(title) {
+              if (!title) return null;
+              const parts = title.split(' — ');
+              if (parts.length !== 2 || !parts[0].trim() || !parts[1].trim()) return null;
+              return { pair: parts[0].trim(), badge: parts[1].trim() };
+            }
+            // Rule 14: text must close with "Trade bias: ... Catalyst: ... Risk: ..."
+            // in that order. Split the intro/body from the three labeled clauses.
+            const FOOTER_RE = /Trade bias:\s*([\s\S]+?)\s*Catalyst:\s*([\s\S]+?)\s*Risk:\s*([\s\S]+)$/;
+            function parseFooter(text) {
+              if (!text) return null;
+              const m = text.match(FOOTER_RE);
+              if (!m) return null;
+              const body = text.slice(0, m.index).trim();
+              return { body, bias: m[1].trim(), catalyst: m[2].trim(), risk: m[3].trim() };
+            }
+
             container.innerHTML = signals.map(s => {
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
               const localTime = localizeSignalTime(s.time);
-              // evidence[]: "LABEL: VALUE" strings set by the engine for data traceability.
-              // Rendered as a collapsible row below the signal text — hidden by default,
-              // toggled by clicking the signal row. Tooltip on the row shows all evidence inline.
               const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
               const evTooltip = ev.length ? ev.join(' · ') : '';
               const evHtml = ev.length
                 ? `<div class="a-evidence" aria-label="Signal data sources">${ev.map(e => `<span class="a-ev-chip">${e}</span>`).join('')}</div>`
                 : '';
+
+              const titleParts = parseTitle(s.title);
+              const footerParts = parseFooter(s.text);
+
+              if (titleParts && footerParts) {
+                // Same flat .alert-row — just structured text inside .a-text,
+                // no separate box/border/background. Pair name stays plain
+                // production text color; only the dot carries severity.
+                // Time merged into the Regime badge (no separate .a-time here).
+                return `<div class="alert-row${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
+                  <span class="a-dot ${dotCls}"></span>
+                  <div class="a-text">
+                    <div class="a-head">
+                      <span class="a-pair">${titleParts.pair}</span>
+                      <span class="a-badge">Regime: ${titleParts.badge} · ${localTime}</span>
+                    </div>
+                    <span class="a-desc">${footerParts.body}</span>
+                    <div class="a-foot">
+                      <div class="a-foot-line"><span class="a-foot-lbl">Trade bias:</span> ${footerParts.bias}</div>
+                      <div class="a-foot-line"><span class="a-foot-lbl">Catalyst:</span> ${footerParts.catalyst}</div>
+                      <div class="a-foot-line"><span class="a-foot-lbl">Risk:</span> ${footerParts.risk}</div>
+                    </div>
+                    ${evHtml}
+                  </div>
+                </div>`;
+              }
+
+              // Fallback — unchanged from production, for signals without the
+              // Rule 10/14 shape (e.g. legacy fetch_intraday_quotes.py entries).
               return `<div class="alert-row${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
                 <span class="a-time">${localTime}</span>
                 <span class="a-dot ${dotCls}"></span>
