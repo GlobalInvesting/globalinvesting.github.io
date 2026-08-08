@@ -10057,7 +10057,7 @@ async function buildRichNarrative() {
             container.innerHTML = signals.map(s => {
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
               const sevCls = s.priority === 'critical' ? 'a-sev-crit' : s.priority === 'warning' ? 'a-sev-warn' : 'a-sev-info';
-              const sevLabel = s.priority === 'critical' ? 'high' : s.priority === 'warning' ? 'med' : 'low';
+              const sevWord = s.priority === 'critical' ? 'high priority' : s.priority === 'warning' ? 'medium priority' : 'low priority';
               const localTime = localizeSignalTime(s.time);
               const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
               const evTooltip = ev.length ? ev.join(' · ') : '';
@@ -10080,10 +10080,13 @@ async function buildRichNarrative() {
                 // card — the mockup keeps the card clean (body + three-clause
                 // footer only). The underlying data isn't lost: it's still on the
                 // native title="" tooltip, available on hover.
+                // Priority is a plain dot here (per Santiago's request) — text-only
+                // fallback lives in aria-label, since a color-only dot fails WCAG
+                // 1.4.1 for sighted colorblind users (flagged, not blocking).
                 return `<div class="alert-row" ${evTooltip ? `title="${evTooltip}"` : ''}>
                   <div class="a-text">
                     <div class="a-head">
-                      <span class="a-name"><span class="a-sev ${sevCls}">${sevLabel}</span><span class="a-pair">${titleParts.pair}</span></span>
+                      <span class="a-name"><span class="a-sev-dot ${sevCls}" aria-label="${sevWord}"></span><span class="a-pair">${titleParts.pair}</span></span>
                       <span class="a-badge">Regime: ${titleParts.badge} · ${localTime}</span>
                     </div>
                     <span class="a-desc">${footerParts.body}</span>
