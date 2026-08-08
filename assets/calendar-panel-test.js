@@ -91,6 +91,53 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
+ * v1.16-TEST (2026-08-08): "Implement everything, industry-standard" round —
+ *   Santiago asked for all viable items from the v1.15-TEST idea list, with
+ *   anything cramped for row space moved into the new click-through history
+ *   modal rather than another inline badge. Implemented 6 of 7:
+ *   (1) Historical reaction per pair — reference-pair (per CAL_REF_PAIR)
+ *       avg daily OHLC range on this series' past release days vs. its
+ *       typical day, surfaced in the history modal with an explicit
+ *       daily-bar-proxy caveat (no intraday post-release timestamp data
+ *       exists in this project's fetched sources — stated as a real gap,
+ *       not silently approximated as more precise than it is).
+ *   (2) Surprise history drill-down — click any event title to open a
+ *       modal (openHistModal()) with the methodology blurb, cadence tag,
+ *       FOMC voter tag when relevant, and the last up to 8 actual/forecast
+ *       prints from a new full-year series index (buildSeriesIndex(),
+ *       sourced from calendar.json's ~3720-event/year history — NOT the
+ *       ~21-day ff_calendar.json window used for the main row list).
+ *   (3) FOMC voting-member tag — small "V"/"nv" superscript next to Fed
+ *       speaker names only (_fomcVoterTag()); scoped to the Fed because
+ *       it's the only G10 central bank in this calendar with a structural
+ *       voting/non-voting split. Dated 2026-rotation snapshot, documented
+ *       inline with the source and a re-verify-in-January note.
+ *   (4) High-impact-only filter — second, independent toggle alongside
+ *       the currency isolate (passesImpactFilter(), #cal-impact-filter),
+ *       persisted the same way via localStorage.
+ *   (5) Cadence tag ("Weekly"/"Monthly"/etc.) — data-driven from the
+ *       actual gap variance between a series' own past release dates
+ *       (inferCadence()), not a maintained keyword list, per the
+ *       already-documented drift risk with keyword lists in this codebase.
+ *       Needs ≥3 prior releases and low gap variance or shows nothing.
+ *   (6) Week navigation — Prev/Next shift the whole -3d/+14d window by
+ *       ±7 days (_calWeekOffsetDays, #cal-week-nav); not persisted, same
+ *       "always resets to now" convention as a real terminal's paging.
+ *       Live-countdown highlight and the empty-window ForexFactory-outage
+ *       fallback are scoped to stop applying once paged away from the
+ *       real current window (offset 0) — neither means anything otherwise.
+ *   SKIPPED: consensus range (Surv(H)/Surv(L) + contributor count) — this
+ *       project's calendar schema (ff_calendar.json / calendar.json) only
+ *       ever carries a single point forecast, never a survey distribution;
+ *       no available data source provides one, so implementing it would
+ *       mean fabricating a range, which the project's data-integrity rules
+ *       (GUIDELINES.md — no invented/estimated data without labeling as
+ *       such, and no source exists here to label it against) rule out.
+ *   BUGFIX during this pass: the prior edit session ended before
+ *       setupImpactFilterUI()/setupWeekNavUI() were actually written (only
+ *       their call sites landed) and before fetchEconomicCalendar() was
+ *       wired to populate _lastFullHistory/_seriesIndex from calendar.json
+ *       — both would have thrown/rendered empty on first load. Added here.
  * v1.15-TEST (2026-08-08): Follow-up per Santiago's review of v1.14-TEST:
  *   (1) REMOVED the ESI contribution badge entirely — Santiago judged it
  *       added more visual noise than value on the row. Deleted
@@ -250,12 +297,50 @@
   }
   let _ccyFilter = loadCcyFilter(); // string (single ccy) or null (all)
 
+  // ── [TEST v1.16] Impact filter (High only) ───────────────────────────────
+  // Second, independent filter alongside the currency isolate — narrows the
+  // already-fetched, already G8+medium/high-filtered dataset down to just
+  // high-impact events. Persisted the same way as the currency filter.
+  const CAL_IMPACT_FILTER_KEY = 'gi_cal_impact_filter';
+  function loadImpactFilter() {
+    try { return localStorage.getItem(CAL_IMPACT_FILTER_KEY) === '1'; } catch { return false; }
+  }
+  function saveImpactFilter(v) {
+    try {
+      if (v) localStorage.setItem(CAL_IMPACT_FILTER_KEY, '1');
+      else localStorage.removeItem(CAL_IMPACT_FILTER_KEY);
+    } catch {}
+  }
+  let _impactHighOnly = loadImpactFilter();
+  function passesImpactFilter(ev) {
+    return IMPACTS.has(ev.impact) && (!_impactHighOnly || ev.impact === 'high');
+  }
+
+  // ── [TEST v1.16] Week navigation ──────────────────────────────────────────
+  // Shifts the whole -3d/+14d display window by ±7 days per click. Not
+  // persisted (resets to the current window on reload) — same convention as
+  // a Bloomberg calendar paging forward/back without "remembering" where you
+  // left off. offset 0 is always the real current window.
+  let _calWeekOffsetDays = 0;
+
   // Cache of the last successful fetch — lets relayoutCalendar() re-render
   // (e.g. switching between 1 and 2 columns on fullscreen open/close/resize)
   // without a network round-trip.
   let _lastEvents   = null;
   let _lastSource   = null;
   let _lastHolidays = null;
+
+  // ── [TEST v1.16] Full-year history index (for cadence + drill-down modal) ──
+  // ff_calendar.json's own window is only ~21 days — nowhere near enough to
+  // detect a monthly/quarterly cadence or show "last 8 prints" for anything
+  // but a weekly series. calendar.json separately carries a full rolling
+  // year (confirmed: 3720 events / ~690 unique titles as of this session) —
+  // that's the dataset these two features need, independent of whichever
+  // file `events`/`filtered` ends up using for the main render list. Kept as
+  // its own module var, refreshed every fetch, never merged into `events`.
+  let _lastFullHistory = [];
+  let _seriesIndex     = {};
+
 
   const IMPACT_DOT = {
     high:   { color: 'var(--down)',   label: 'High'   },
@@ -321,6 +406,128 @@
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
       .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // ── [TEST v1.16] Series canonicalization + history index ────────────────
+  // Shared by the cadence tag and the historical drill-down modal (and
+  // previously by the now-removed ESI badge — this is a leaner version with
+  // no ESI-specific noise list, just the country-prefix strip needed so
+  // "United States Non Farm Payrolls" and a hypothetical bare "Non Farm
+  // Payrolls" key the same series).
+  const _CAL_CCY_PFXS = ['united states ', 'euro area ', 'united kingdom ', 'japan ',
+    'australia ', 'canada ', 'switzerland ', 'new zealand ', 'norway ', 'sweden '];
+  function _calCanonTitle(t) {
+    let s = (t || '').toLowerCase().replace(/\s*\([^)]*\)/g, '').trim();
+    for (const p of _CAL_CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
+    return s;
+  }
+  function _calSeriesKey(ev) { return `${ev.currency}/${_calCanonTitle(ev.title)}`; }
+
+  // Builds { "USD/non farm payrolls": [{dateISO,timeUTC,actual,forecast,previous}, ...] }
+  // sorted oldest→newest, from the full-year history — only entries that
+  // actually printed (actual present) count as a "release" for cadence/
+  // history purposes.
+  function buildSeriesIndex(fullHistory) {
+    const idx = {};
+    fullHistory.forEach(ev => {
+      if (ev.actual == null || ev.actual === '' || ev.actual === '-') return;
+      const key = _calSeriesKey(ev);
+      (idx[key] = idx[key] || []).push({
+        dateISO: ev.dateISO, timeUTC: ev.timeUTC,
+        actual: ev.actual, forecast: ev.forecast, previous: ev.previous,
+      });
+    });
+    Object.values(idx).forEach(arr => arr.sort((a, b) => a.dateISO < b.dateISO ? -1 : (a.dateISO > b.dateISO ? 1 : 0)));
+    return idx;
+  }
+
+  // Data-driven cadence label — deliberately NOT a maintained keyword list
+  // (this codebase already has a documented failure mode where keyword
+  // lists drift out of sync across files/updates). Instead, look at the
+  // actual gaps between this series' own past release dates: low variance
+  // → real fixed cadence, bucketed by the mean gap. High variance (e.g. ad
+  // hoc central-bank speeches, one-off reports) → no tag, since a "cadence"
+  // label would be misleading. Needs ≥3 prior releases to say anything.
+  function inferCadence(seriesArr) {
+    if (!seriesArr || seriesArr.length < 3) return null;
+    const dates = seriesArr.map(e => Date.parse(e.dateISO + 'T00:00:00Z'));
+    const gaps = [];
+    for (let i = 1; i < dates.length; i++) gaps.push((dates[i] - dates[i - 1]) / 86400000);
+    const mean = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+    if (mean <= 0) return null;
+    const variance = gaps.reduce((a, b) => a + (b - mean) * (b - mean), 0) / gaps.length;
+    const cv = Math.sqrt(variance) / mean; // coefficient of variation
+    if (cv > 0.35) return null; // irregular — don't mislabel
+    if (mean <= 10)  return 'Weekly';
+    if (mean <= 40)  return 'Monthly';
+    if (mean <= 100) return 'Quarterly';
+    if (mean <= 200) return 'Semi-Annual';
+    if (mean <= 400) return 'Annual';
+    return null;
+  }
+
+  // ── [TEST v1.16] FOMC voting-member tag ──────────────────────────────────
+  // Bloomberg/Refinitiv flag whether a Fed speaker is a current FOMC voter —
+  // a non-voter's remarks still matter but carry less direct near-term
+  // policy weight. Scoped to the Fed ONLY: of the G10 central banks this
+  // calendar covers, the FOMC is the one with a structural voting/non-voting
+  // split (7 Governors + NY Fed always vote; 4 of the other 11 regional
+  // presidents rotate onto a vote each year). The ECB Governing Council, BoE
+  // MPC, BoC Governing Council, RBA Board, SNB Governing Board, RBNZ MPC,
+  // Norges Bank committee and Riksbank Executive Board all have their full
+  // monetary-policy body vote at every meeting — there's no non-voting
+  // subset to flag, so no tag is shown for those speakers (not an omission).
+  //
+  // Snapshot sourced from federalreserve.gov/monetarypolicy/fomc.htm
+  // (page's own "Last Update: July 29, 2026") — 2026 rotating seats: Cleveland
+  // (Hammack), Dallas (Logan), Philadelphia (Paulson), Minneapolis (Kashkari)
+  // vote; Boston, Chicago, Kansas City, St. Louis, Richmond, San Francisco,
+  // Atlanta do not. Board of Governors + NY Fed always vote. This is a
+  // dated snapshot, not a live feed — the rotation changes every Jan 1 and
+  // Board seats can change with a confirmation at any time; re-verify
+  // against the same source (same method as the NOK/threshold and inverse-
+  // keyword audits already logged in GUIDELINES.md) before relying on this
+  // for a full year, and definitely re-check every January.
+  const FOMC_VOTERS_2026 = {
+    // Board of Governors — always voting
+    warsh:    { voting: true, role: 'Fed Chair' },
+    jefferson:{ voting: true, role: 'Fed Vice Chair' },
+    bowman:   { voting: true, role: 'Fed Vice Chair for Supervision' },
+    barr:     { voting: true, role: 'Fed Governor' },
+    cook:     { voting: true, role: 'Fed Governor' },
+    waller:   { voting: true, role: 'Fed Governor' },
+    powell:   { voting: true, role: 'Fed Governor' },
+    // NY Fed — permanent voter
+    williams: { voting: true, role: 'NY Fed President (permanent voter)' },
+    // Rotating regional presidents — VOTING in 2026
+    hammack:  { voting: true, role: 'Cleveland Fed President' },
+    logan:    { voting: true, role: 'Dallas Fed President' },
+    paulson:  { voting: true, role: 'Philadelphia Fed President' },
+    kashkari: { voting: true, role: 'Minneapolis Fed President' },
+    // Rotating regional presidents — NON-voting in 2026
+    collins:  { voting: false, role: 'Boston Fed President' },
+    goolsbee: { voting: false, role: 'Chicago Fed President' },
+    schmid:   { voting: false, role: 'Kansas City Fed President' },
+    musalem:  { voting: false, role: 'St. Louis Fed President' },
+    barkin:   { voting: false, role: 'Richmond Fed President' },
+    daly:     { voting: false, role: 'San Francisco Fed President' },
+    venable:  { voting: false, role: 'Atlanta Fed Interim President' },
+  };
+  function _fomcVoterTag(currency, title) {
+    if (currency !== 'USD') return '';
+    const canon = _calCanonTitle(title); // e.g. "fed barkin speech"
+    const m = canon.match(/^fed\s+([a-z]+)\s+speech$/);
+    if (!m) return '';
+    const info = FOMC_VOTERS_2026[m[1]];
+    if (!info) return ''; // unrecognized name — say nothing rather than guess
+    const cls  = info.voting ? 'up' : '';
+    const style = info.voting
+      ? 'color:var(--up);font-size:8px;cursor:help;font-weight:700;'
+      : 'color:var(--text3);font-size:8px;cursor:help;';
+    const label = info.voting ? 'V' : 'nv';
+    const tip = `${info.role} — ${info.voting ? 'current FOMC voter' : 'non-voter this year'} ` +
+      `(2026 rotation, federalreserve.gov as of Jul 2026 — verify if relying on this after a rotation change).`;
+    return ` <sup style="${style}" title="${_escAttr(tip)}">${label}</sup>`;
   }
 
   // ── [TEST v1.14] Live / next-release highlight ───────────────────────────
@@ -558,6 +765,209 @@
     }, { passive: true });
   }
 
+  // ── [TEST v1.16] Historical drill-down modal ─────────────────────────────
+  // Click an event title (any event, not just methodology-matched ones) to
+  // open a modal with: methodology blurb, cadence tag, FOMC voter info when
+  // relevant, and the last up to 8 releases of that exact series (from the
+  // full-year history — see buildSeriesIndex()) with the same beat/miss
+  // coloring as the main row. Deliberately a click-through, not another
+  // inline badge — Santiago flagged that per-row space is tight (this is
+  // also why the earlier ESI contribution badge was dropped), so anything
+  // beyond a 1-2 character marker belongs behind a click, not in the row.
+  //
+  // Also surfaces a coarse "reference pair" daily-move context: average
+  // daily range on this series' past release days vs. this pair's typical
+  // daily range, using the OHLC files already on disk (ohlc-data/*.json).
+  // IMPORTANT CAVEAT stated in the UI itself, not just here: these are DAILY
+  // bars, not intraday — this cannot isolate the specific minutes right
+  // after the release from the rest of that day's news. It's a same-day
+  // volatility-context proxy ("does this release tend to coincide with a
+  // bigger-than-usual day for this pair"), not a measured post-release
+  // reaction. A true post-release-window reaction metric would need
+  // intraday bars timestamped against the release time, which isn't in any
+  // data source this project currently fetches — flagged as a gap, not
+  // silently approximated as more precise than it is.
+  const CAL_REF_PAIR = { USD:'dxy', EUR:'eurusd', GBP:'gbpusd', JPY:'usdjpy',
+    AUD:'audusd', CAD:'usdcad', CHF:'usdchf', NZD:'nzdusd' };
+  function _pairMoveUnit(pairKey) {
+    if (pairKey === 'dxy')    return { div: 1,      unit: 'pts',  dp: 2 };
+    if (pairKey === 'usdjpy') return { div: 0.01,    unit: 'pips', dp: 0 };
+    return                         { div: 0.0001,  unit: 'pips', dp: 0 };
+  }
+  const _ohlcCache = {};
+  async function fetchRefPairOHLC(ccy) {
+    const pairKey = CAL_REF_PAIR[ccy];
+    if (!pairKey) return null;
+    if (_ohlcCache[pairKey]) return _ohlcCache[pairKey];
+    try {
+      const res = await fetch(`./ohlc-data/${pairKey}.json`, { cache: 'no-store' });
+      if (!res.ok) return null;
+      const data = await res.json();
+      _ohlcCache[pairKey] = data;
+      return data;
+    } catch { return null; }
+  }
+  function computeReleaseDayMove(bars, releaseDatesISO, unit) {
+    if (!bars || !bars.length) return null;
+    const byDate = {};
+    bars.forEach(b => { byDate[b.time] = b; });
+    const allRanges = bars
+      .map(b => (b.high - b.low) / unit.div)
+      .filter(n => isFinite(n) && n >= 0);
+    if (!allRanges.length) return null;
+    const overallAvg = allRanges.reduce((a, b) => a + b, 0) / allRanges.length;
+    const relBars = releaseDatesISO.map(d => byDate[d]).filter(Boolean);
+    if (relBars.length < 2) return null; // not enough overlap with available OHLC history to mean anything
+    const relRanges = relBars.map(b => (b.high - b.low) / unit.div);
+    const relAvg = relRanges.reduce((a, b) => a + b, 0) / relRanges.length;
+    return { relAvg, overallAvg, n: relRanges.length, unit: unit.unit, dp: unit.dp };
+  }
+
+  function _calBeatClass(actualN, forecastN, isInverse) {
+    if (isNaN(actualN) || isNaN(forecastN) || actualN === forecastN) return '';
+    const beat = isInverse ? actualN < forecastN : actualN > forecastN;
+    return beat ? 'up' : 'down';
+  }
+
+  function ensureHistModal() {
+    if (document.getElementById('cal-hist-style')) return;
+    const s = document.createElement('style');
+    s.id = 'cal-hist-style';
+    s.textContent = `
+      #cal-hist-overlay {
+        position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100000;
+        display:none;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;
+      }
+      #cal-hist-modal {
+        background:var(--bg2, var(--bg3));border:1px solid var(--border2);border-radius:6px;
+        width:min(420px, 100%);max-height:min(560px, 90vh);overflow-y:auto;
+        font-family:var(--font-ui);color:var(--text);box-sizing:border-box;
+      }
+      #cal-hist-modal .ch-head {
+        display:flex;align-items:center;justify-content:space-between;gap:8px;
+        padding:10px 12px;border-bottom:1px solid var(--border2);position:sticky;top:0;
+        background:var(--bg2, var(--bg3));
+      }
+      #cal-hist-modal .ch-title { font-size:12px;font-weight:700;color:#fff; }
+      #cal-hist-modal .ch-close {
+        background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;
+      }
+      #cal-hist-modal .ch-body { padding:10px 12px;font-size:11px;line-height:1.55;color:var(--text2); }
+      #cal-hist-modal .ch-tag {
+        display:inline-block;font-size:8px;padding:1px 5px;border-radius:2px;margin-right:4px;
+        background:var(--bg3);border:1px solid var(--border2);color:var(--text3);
+      }
+      #cal-hist-modal table { width:100%;border-collapse:collapse;margin-top:8px;font-size:10px; }
+      #cal-hist-modal th { text-align:right;color:var(--text3);font-weight:400;font-size:9px;padding:3px 4px;text-transform:uppercase;letter-spacing:.03em; }
+      #cal-hist-modal th:first-child, #cal-hist-modal td:first-child { text-align:left; }
+      #cal-hist-modal td { text-align:right;padding:3px 4px;border-top:1px solid var(--border2); }
+      #cal-hist-modal td.up { color:var(--up); }
+      #cal-hist-modal td.down { color:var(--down); }
+      #cal-hist-modal .ch-move { margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3); }
+    `;
+    document.head.appendChild(s);
+    const overlay = document.createElement('div');
+    overlay.id = 'cal-hist-overlay';
+    overlay.innerHTML = `<div id="cal-hist-modal" role="dialog" aria-modal="true" aria-labelledby="cal-hist-title">
+      <div class="ch-head">
+        <span class="ch-title" id="cal-hist-title"></span>
+        <button type="button" class="ch-close" id="cal-hist-close" aria-label="Close">&#x2715;</button>
+      </div>
+      <div class="ch-body" id="cal-hist-body"></div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const close = () => { overlay.style.display = 'none'; };
+    document.getElementById('cal-hist-close').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay.style.display === 'flex') close();
+    });
+  }
+
+  function openHistModal(ev) {
+    ensureHistModal();
+    const overlay = document.getElementById('cal-hist-overlay');
+    const titleEl = document.getElementById('cal-hist-title');
+    const bodyEl  = document.getElementById('cal-hist-body');
+    if (!overlay || !titleEl || !bodyEl) return;
+
+    const flag = FLAG[ev.currency] || '';
+    const flagHtml = flag ? `<span class="fi fi-${flag}" style="margin-right:4px;font-size:10px;"></span>` : '';
+    titleEl.innerHTML = `${flagHtml}${_escAttr(ev.currency)} \u00b7 ${_escAttr(ev.title)}`;
+
+    const methodText = _calMethodologyFor(ev.title);
+    const key         = _calSeriesKey(ev);
+    const seriesArr   = _seriesIndex[key] || [];
+    const cadence     = inferCadence(seriesArr);
+    const evTitleLower = (ev.title || '').toLowerCase();
+    const isInverse   = CAL_INVERSE_KW.some(kw => evTitleLower.includes(kw));
+
+    let html = '';
+    if (methodText) html += `<div>${_escAttr(methodText)}</div>`;
+    if (cadence) html += `<div style="margin-top:6px;"><span class="ch-tag">${cadence}</span></div>`;
+    if (isInverse) html += `<div style="margin-top:6px;color:var(--text3);font-style:italic;">Inverse indicator — a higher actual than forecast is colored as a miss, not a beat.</div>`;
+
+    const last8 = seriesArr.slice(-8).reverse();
+    if (last8.length) {
+      html += `<table><thead><tr>
+        <th>Date</th><th>Actual</th><th>Forecast</th><th>Previous</th>
+      </tr></thead><tbody>`;
+      last8.forEach(h => {
+        const actualN   = _calParseNum(h.actual);
+        const forecastN = _calParseNum(h.forecast ? String(h.forecast).replace(/\*$/, '') : (h.previous || ''));
+        const cls = _calBeatClass(actualN, forecastN, isInverse);
+        html += `<tr>
+          <td>${_escAttr(h.dateISO)}</td>
+          <td class="${cls}">${_escAttr(h.actual)}</td>
+          <td>${_escAttr(h.forecast || '\u2014')}</td>
+          <td>${_escAttr(h.previous || '\u2014')}</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+    } else {
+      html += `<div style="margin-top:8px;color:var(--text3);">No prior actual/forecast history for this event in the last year.</div>`;
+    }
+
+    html += `<div class="ch-move" id="cal-hist-move">Loading reference-pair context\u2026</div>`;
+
+    bodyEl.innerHTML = html;
+    overlay.style.display = 'flex';
+
+    // Reference-pair daily-move context — fetched lazily, only on modal
+    // open, and cached per pair for the rest of the session.
+    const pairKey = CAL_REF_PAIR[ev.currency];
+    const moveEl  = document.getElementById('cal-hist-move');
+    if (!pairKey || last8.length < 2) {
+      if (moveEl) moveEl.textContent = '';
+    } else {
+      fetchRefPairOHLC(ev.currency).then(bars => {
+        const el = document.getElementById('cal-hist-move');
+        if (!el) return;
+        const unit = _pairMoveUnit(pairKey);
+        const releaseDates = seriesArr.map(h => h.dateISO);
+        const move = computeReleaseDayMove(bars, releaseDates, unit);
+        if (!move) { el.textContent = ''; return; }
+        el.innerHTML = `${pairKey.toUpperCase()} avg daily range on this series\u2019 release days ` +
+          `(${move.n} obs.): <b style="color:var(--text2);">${move.relAvg.toFixed(move.dp)} ${move.unit}</b> ` +
+          `vs. <b style="color:var(--text2);">${move.overallAvg.toFixed(move.dp)} ${move.unit}</b> typical day. ` +
+          `Daily-bar proxy, not an intraday post-release reaction measurement.`;
+      });
+    }
+  }
+
+  function setupHistModalDelegation(container) {
+    if (!container || container.dataset.calHistInit === '1') return;
+    container.dataset.calHistInit = '1';
+    container.addEventListener('click', e => {
+      const el = e.target.closest('.cal-col.cal-title[data-cal-hist-idx]');
+      if (!el) return;
+      const idx = Number(el.dataset.calHistIdx);
+      const ev = _calRenderIndex[idx];
+      if (ev) openHistModal(ev);
+    });
+  }
+  let _calRenderIndex = []; // reset each buildPanel() call — see there
+
   // ── [TEST v1.13] Revision index ─────────────────────────────────────────
   // Bloomberg/Refinitiv mark a "previous" value with a small revision flag
   // when it doesn't match what was actually printed last time that same
@@ -778,8 +1188,12 @@
     if (!container) return;
     ensureLiveStyles();          // [TEST v1.14]
     ensureMethodologyTooltip();  // [TEST v1.14]
+    ensureHistModal();           // [TEST v1.16]
+    _calRenderIndex = [];        // [TEST v1.16] reset per render — see setupHistModalDelegation()
 
-    // Display window: 3 days back through 14 days ahead.
+    // Display window: 3 days back through 14 days ahead, shifted by
+    // [TEST v1.16] _calWeekOffsetDays (±7 per Prev/Next week click; 0 = the
+    // real current window, same default as before week navigation existed).
     // ff_calendar.json carries 21 days of history for actuals backfill.
     // Industry standard (Bloomberg, Refinitiv Eikon): economic calendar panels
     // show 2–3 prior sessions alongside the current day and forward events.
@@ -787,14 +1201,14 @@
     // Monday morning and covers overnight JPY/AUD releases that display under
     // the prior local date for users in UTC-ahead timezones.
     const _now       = new Date();
-    const nowMs      = _now.getTime(); // [TEST v1.14] shared by live-highlight + ESI badge weighting
-    const _lookback  = new Date(_now); _lookback.setDate(_now.getDate() - 3);
-    const _maxAhead  = new Date(_now); _maxAhead.setDate(_now.getDate() + 14);
+    const nowMs      = _now.getTime(); // [TEST v1.14] shared by live-highlight weighting
+    const _lookback  = new Date(_now); _lookback.setDate(_now.getDate() - 3 + _calWeekOffsetDays);
+    const _maxAhead  = new Date(_now); _maxAhead.setDate(_now.getDate() + 14 + _calWeekOffsetDays);
     const _yISO = _lookback.toISOString().slice(0, 10);
     const _mISO = _maxAhead.toISOString().slice(0, 10);
 
     let filtered = events.filter(ev =>
-      G8_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact) &&
+      G8_CURRENCIES.has(ev.currency) && passesImpactFilter(ev) &&      // [TEST v1.16] impact filter
       (_ccyFilter == null || ev.currency === _ccyFilter) &&         // [TEST v1.13] currency filter
       ev.dateISO >= _yISO && ev.dateISO <= _mISO
     );
@@ -804,17 +1218,22 @@
     // filter still counts as "the last known actual" for detection.
     const revIdx = buildRevisionIndex(events);
 
-    // [TEST v1.14] Next high-impact release due soon — scoped to `filtered`
-    // so it respects whatever currency the user has isolated.
-    const liveTarget = findNextHighImpactEvent(filtered, nowMs);
+    // [TEST v1.14] Next high-impact release due soon — scoped to `filtered`,
+    // so it respects whatever currency is isolated, and [TEST v1.16] only
+    // computed for the real current window (offset 0) — "next release"
+    // doesn't mean anything while paged into a past/future week.
+    const liveTarget = _calWeekOffsetDays === 0 ? findNextHighImpactEvent(filtered, nowMs) : null;
 
     // Fallback (v3.30): if the pipeline hasn't run for a day or more (e.g. a quiet
     // weekend with no qualifying RSS events), the strict [yesterday, +14d] window can
     // be entirely empty even though the file has recent, valid data. Rather than show
     // "No events available", fall back to the most recent events on file within the
     // G8/impact filter, anchored to the latest available date.
-    if (!filtered.length) {
-      const g8 = events.filter(ev => G8_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact));
+    // [TEST v1.16] Only applies at offset 0 — this fallback exists for pipeline
+    // staleness on the real current window, not to backfill a legitimately
+    // quiet week the user paged into with Prev/Next.
+    if (!filtered.length && _calWeekOffsetDays === 0) {
+      const g8 = events.filter(ev => G8_CURRENCIES.has(ev.currency) && passesImpactFilter(ev));
       if (g8.length) {
         const latestISO = g8.reduce((max, ev) => ev.dateISO > max ? ev.dateISO : max, g8[0].dateISO);
         const fallbackFrom = new Date(latestISO + 'T00:00:00Z');
@@ -954,10 +1373,20 @@
         // [TEST v1.14] Methodology tooltip — only attached when a known
         // pattern matches; unmatched titles keep the plain native tooltip
         // that was already there.
-        const methodText = _calMethodologyFor(ev.title);
+        // [TEST v1.16] Every title cell also gets a data-cal-hist-idx hook
+        // (click → historical drill-down modal), regardless of whether a
+        // methodology pattern matched — the modal is useful even without a
+        // methodology blurb (still shows history/cadence/reference-pair
+        // context). _calRenderIndex is reset at the top of buildPanel() and
+        // grown in render order so the click handler can look the exact `ev`
+        // object back up by index without re-serializing it into the DOM.
+        const methodText  = _calMethodologyFor(ev.title);
+        const histIdx     = _calRenderIndex.push(ev) - 1;
+        const fomcTag      = _fomcVoterTag(ev.currency, ev.title); // [TEST v1.16]
+        const titleInner  = `${ev.title}${fomcTag}`;
         const titleCellHtml = methodText
-          ? `<div class="cal-col cal-title" data-cal-tip="1" data-cal-tip-title="${_escAttr(ev.title)}" data-cal-tip-body="${_escAttr(methodText)}">${ev.title}</div>`
-          : `<div class="cal-col cal-title" title="${_escAttr(ev.title)}">${ev.title}</div>`;
+          ? `<div class="cal-col cal-title" data-cal-tip="1" data-cal-tip-title="${_escAttr(ev.title)}" data-cal-tip-body="${_escAttr(methodText)}" data-cal-hist-idx="${histIdx}" style="cursor:pointer;">${titleInner}</div>`
+          : `<div class="cal-col cal-title" title="${_escAttr(ev.title)}" data-cal-hist-idx="${histIdx}" style="cursor:pointer;">${titleInner}</div>`;
 
         gHtml += `<div class="cal-event-row${dimmed ? ' cal-released' : ''}${liveClass}"${upcomingAttr}>
   <div class="cal-col cal-time">${timeCellHtml}</div>
@@ -1148,7 +1577,10 @@
     if (thTime) thTime.textContent = tzLabel();
 
     setupCcyFilterUI(); // [TEST v1.13]
+    setupImpactFilterUI(); // [TEST v1.16]
+    setupWeekNavUI(); // [TEST v1.16]
     setupMethodologyTooltipDelegation(container); // [TEST v1.14] — delegated, no-op after first call
+    setupHistModalDelegation(container); // [TEST v1.16] — delegated, no-op after first call
     tickLiveCountdown(); // [TEST v1.14] — paint the correct value immediately, don't wait for the 20s tick
   }
 
@@ -1208,6 +1640,94 @@
     if (allBtn) allBtn.style.color = (_ccyFilter == null) ? '#fff' : 'var(--text3)';
   }
 
+  // ── [TEST v1.16] Impact filter (High only) buttons ──────────────────────
+  // Renders into #cal-impact-filter, same button styling as the currency
+  // filter above (isolate-style single toggle rather than a group, since
+  // there's only one meaningful extra state: "High only" on/off — the
+  // baseline is already medium+high, matching the currency filter's
+  // convention of styling the ACTIVE state white and inactive text3).
+  function setupImpactFilterUI() {
+    const box = document.getElementById('cal-impact-filter');
+    if (!box) return;
+
+    const btnStyle = active =>
+      `font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);` +
+      `color:${active ? '#fff' : 'var(--text3)'};border-radius:2px;cursor:pointer;line-height:1.4;`;
+
+    if (box.dataset.calImpactInit !== '1') {
+      box.dataset.calImpactInit = '1';
+      box.innerHTML =
+        `<button type="button" id="cal-impact-high" style="${btnStyle(_impactHighOnly)}" ` +
+        `title="Show only high-impact events">High only</button>`;
+
+      box.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn || btn.id !== 'cal-impact-high') return;
+        _impactHighOnly = !_impactHighOnly;
+        saveImpactFilter(_impactHighOnly);
+        updateImpactFilterButtonStates();
+        relayoutCalendar();
+      });
+    } else {
+      updateImpactFilterButtonStates();
+    }
+  }
+
+  function updateImpactFilterButtonStates() {
+    const btn = document.getElementById('cal-impact-high');
+    if (btn) btn.style.color = _impactHighOnly ? '#fff' : 'var(--text3)';
+  }
+
+  // ── [TEST v1.16] Week navigation (Prev / This week / Next) ──────────────
+  // Renders into #cal-week-nav. Not persisted (see _calWeekOffsetDays note
+  // above) — always resets to the real current window on reload, same as a
+  // Bloomberg/Refinitiv calendar paging forward/back without "remembering"
+  // where you left off. Middle button shows the current offset and, when
+  // not on the real current window, doubles as a one-click reset to it.
+  function setupWeekNavUI() {
+    const box = document.getElementById('cal-week-nav');
+    if (!box) return;
+
+    const btnStyle = () =>
+      `font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);` +
+      `color:var(--text3);border-radius:2px;cursor:pointer;line-height:1.4;`;
+
+    if (box.dataset.calWeekInit !== '1') {
+      box.dataset.calWeekInit = '1';
+      box.innerHTML =
+        `<button type="button" id="cal-week-prev" style="${btnStyle()}" title="Previous week" aria-label="Previous week">&#8249;</button>` +
+        `<button type="button" id="cal-week-label" style="${btnStyle()}"></button>` +
+        `<button type="button" id="cal-week-next" style="${btnStyle()}" title="Next week" aria-label="Next week">&#8250;</button>`;
+
+      box.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        if (btn.id === 'cal-week-prev') _calWeekOffsetDays -= 7;
+        else if (btn.id === 'cal-week-next') _calWeekOffsetDays += 7;
+        else if (btn.id === 'cal-week-label') _calWeekOffsetDays = 0; // reset shortcut
+        else return;
+        updateWeekNavUI();
+        relayoutCalendar();
+      });
+    }
+    updateWeekNavUI(); // paint the label on first build too, not just on later re-renders
+  }
+
+  function weekNavLabel() {
+    if (_calWeekOffsetDays === 0) return 'This week';
+    const wk = _calWeekOffsetDays / 7;
+    return wk > 0 ? `Week +${wk}` : `Week ${wk}`;
+  }
+
+  function updateWeekNavUI() {
+    const label = document.getElementById('cal-week-label');
+    if (!label) return;
+    label.textContent = weekNavLabel();
+    const atCurrent = _calWeekOffsetDays === 0;
+    label.style.color  = atCurrent ? 'var(--text3)' : '#fff';
+    label.title         = atCurrent ? '' : 'Back to current window';
+  }
+
   async function fetchEconomicCalendar() {
     try {
       // Cache-bust: GitHub Pages serves via a CDN (Fastly) that can hold an edge
@@ -1233,6 +1753,16 @@
       const normalize = ev => { if (ev.title == null && ev.event != null) ev.title = ev.event; return ev; };
       const ffEvents  = (ffJson?.events  || []).map(normalize);
       const calEvents = (calJson?.events || []).map(normalize);
+
+      // [TEST v1.16] calendar.json already carries a full rolling year (see
+      // buildSeriesIndex() note above) — this is the ONLY place that data is
+      // fetched, so wire it into the module-scope history/series-index vars
+      // here, independent of whichever file `events` below ends up using for
+      // the main render list. Missed in the original v1.16 edit pass (caught
+      // when the cadence tag and history modal were rendering empty for
+      // every event, even ones with plenty of real prior releases).
+      _lastFullHistory = calEvents;
+      _seriesIndex     = buildSeriesIndex(calEvents);
 
       let events   = ffEvents;
       let source   = ffJson?.source || calJson?.source || 'ForexFactory';
