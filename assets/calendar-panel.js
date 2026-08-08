@@ -1,9 +1,28 @@
 /**
- * calendar-panel.js v1.19.11 — Native economic calendar renderer
+ * calendar-panel.js v1.19.12 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
- * v1.19.11 (2026-08-08): FIX — v1.19.10's `autoSize: true` was reverted.
+ * v1.19.12 (2026-08-08): FIX — v1.19.11's ResizeObserver + staggered-timeout
+ *   structure was correct, but it called `chart.applyOptions({width,
+ *   height})`, which didn't fix anything: the modal container's width never
+ *   actually changes between chart creation and these later calls, so LWC's
+ *   internal diffing almost certainly treated it as a no-op. Nearest-
+ *   neighbor (unsmoothed) zoom into Santiago's screenshot settled the
+ *   question this whole thread kept circling: the axis labels were never
+ *   hard-clipped — no rectangular edge, nothing overlapping (checked and
+ *   ruled out a border/element sitting over the text too). They're blocky
+ *   and pixelated — the unmistakable signature of a low-res canvas bitmap
+ *   being upscaled 2x by the compositor to fill a devicePixelRatio=2 box,
+ *   matching the 1x-backing-store-equals-CSS-size pattern confirmed twice by
+ *   console dumps. Switched `applyHistResize()` to
+ *   `chart.resize(w, 190, true)` — the third argument (forceRepaint) exists
+ *   specifically to force real canvas reallocation even when width/height
+ *   are numerically unchanged, unlike applyOptions()'s diffed update. This
+ *   is what v1.19.6 originally used before v1.19.9 removed it on a mistaken
+ *   read of a since-superseded diagnostic. See applyHistResize.
+ *
+ * v1.19.11 (2026-08-08): FIX (superseded by v1.19.12, see above) — reverted
  *   Santiago asked why calendar-panel.js was the only LWC-based chart in the
  *   frontend showing this clipping and suggested comparing against the
  *   others instead of guessing further. econ-surprises-modal.js,
@@ -1280,17 +1299,27 @@
     // right after creation, to reallocate the canvas backing store against
     // whatever `devicePixelRatio` has actually settled to by then.
     // Resize — mirrors econ-surprises-modal.js / cot-modal-chart.js /
-    // corr-modal.js: re-reads real container dimensions and pushes them into
-    // the chart via applyOptions(), which also gives LWC a fresh chance to
-    // reallocate the canvas backing store against the current
-    // devicePixelRatio. Guarded on _calHistChart so a stale closure over a
-    // since-destroyed chart/container (e.g. modal closed before a staggered
-    // timeout fires) doesn't throw or resurrect a removed chart.
+    // corr-modal.js's ResizeObserver + staggered-timeout structure, but uses
+    // chart.resize(w, h, true) rather than applyOptions({width, height}).
+    // v1.19.11 used applyOptions() and still didn't fix the visual bug —
+    // root cause turned out to be a real DPR mismatch (confirmed twice via
+    // console dump: every canvas's backing store == its CSS size despite
+    // devicePixelRatio=2), and applyOptions() is very likely a no-op here:
+    // the modal's container width never actually changes between chart
+    // creation and these later calls, so LWC's internal diffing has nothing
+    // to react to. resize()'s third argument (forceRepaint) exists
+    // specifically to bypass that diffing and force real reallocation even
+    // when width/height are numerically unchanged — which is what v1.19.6
+    // originally used before v1.19.9 removed it. Nearest-neighbor pixel
+    // inspection of Santiago's screenshot confirmed the text was never
+    // actually clipped (no hard edge, no overlapping border/element) — it's
+    // blocky/pixelated, the visual signature of a low-res canvas bitmap
+    // being upscaled 2x by the compositor, consistent with this diagnosis.
     const applyHistResize = () => {
       if (!_calHistChart) return;
       const r = container.getBoundingClientRect();
       const w = Math.round(r.width) || container.offsetWidth || 380;
-      if (w > 0) { try { _calHistChart.applyOptions({ width: w, height: 190 }); } catch (_) {} }
+      if (w > 0) { try { _calHistChart.resize(w, 190, true); } catch (_) {} }
     };
     if (window.ResizeObserver) {
       _calHistRo = new ResizeObserver(() => applyHistResize());
