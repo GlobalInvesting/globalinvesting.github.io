@@ -1,9 +1,24 @@
 /**
- * calendar-panel.js v1.19.14 — Native economic calendar renderer
+ * calendar-panel.js v1.19.15 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
- * v1.19.14 (2026-08-08): FIX — the v1.19.13 debug hook let Santiago test
+ * v1.19.15 (2026-08-08): FIX — v1.19.14's requestAnimationFrame fix for the
+ *   ResizeObserver cascade didn't change the visual result either. Stepped
+ *   back from resize/DPR theories entirely and rechecked the four LWC chart
+ *   configs side by side for anything unrelated to sizing. Found it: this
+ *   file is the only one of the four that never sets `fontFamily` in
+ *   `layout`. econ-surprises-modal.js, cot-modal-chart.js, and
+ *   corr-modal.js — the three unaffected charts — all explicitly set it to
+ *   `'JetBrains Mono','Courier New',monospace` (a webfont actually loaded
+ *   on the page, confirmed via document.fonts in an earlier diagnostic
+ *   dump). Without it, LWC falls back to its own built-in default font
+ *   stack, which may not be installed on Santiago's Android device,
+ *   forcing a further OS-level substitution — plausibly one with worse
+ *   small-size hinting than the explicitly-loaded monospace font the other
+ *   three force. Added the same explicit fontFamily here.
+ *
+ * v1.19.14 (2026-08-08): FIX (did not resolve it — see v1.19.15 above) —
  *   live, without a redeploy: calling `chart.resize(origWidth + 50, 190,
  *   true)` from the console didn't grow the canvas, it collapsed it to
  *   36px. That's the ResizeObserver antipattern — resizing the very element
@@ -1275,7 +1290,7 @@
     const chart = LWC.createChart(container, {
       width: Math.round(rect.width) || container.offsetWidth || 380,
       height: 190,
-      layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontSize: 9, attributionLogo: false },
+      layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontFamily: "'JetBrains Mono','Courier New',monospace", fontSize: 9, attributionLogo: false },
       grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.10, bottom: 0.10 } },
       timeScale: {
