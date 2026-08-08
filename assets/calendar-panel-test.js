@@ -91,6 +91,23 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
+ * v1.13.2-TEST (2026-08-08): Follow-up per Santiago's review of v1.13.1-TEST —
+ *   two problems, both in the harness/markup, not the filter logic itself:
+ *   (a) The header bar did NOT look identical to production. v1.13.1 rebuilt
+ *       #cal-static-col-header as a flex wrapper (grid div + button group)
+ *       instead of keeping production's own single `display:grid;
+ *       grid-template-columns:52px 52px 18px 1fr 58px 58px 58px` rule — an
+ *       extra nesting level that changed how "Event"'s 1fr track and the
+ *       trailing number columns actually rendered. Reverted to the exact
+ *       production grid in index-test.html, with only one appended `auto`
+ *       track at the end for the button group — this file's rendering logic
+ *       is unaffected, the fix is markup-only.
+ *   (b) In wide-fullscreen 2-column mode (shouldSplitCalColumns()),
+ *       #cal-static-col-header — the only place the filter buttons lived —
+ *       is hidden entirely (production behavior, untouched). buildPanel()
+ *       now relocates the existing #cal-ccy-filter node into
+ *       #cal-panel-head-actions (next to the panel title) whenever splitCols
+ *       is true, and moves it back when not, so it's never simply gone.
  * v1.13.1-TEST (2026-08-08): Follow-up per Santiago's review of v1.13-TEST:
  *   (a) Currency filter changed from multi-select-with-removal to ISOLATE
  *       semantics (click a currency → show ONLY it; click again/All → show
@@ -633,9 +650,47 @@
     // right column, rather than one over-wide row.
     const splitCols = shouldSplitCalColumns() && groups.length > 1;
     container.classList.toggle('cal-cols-active', splitCols);
+    // [TEST v1.13.2] `? 'none' : ''` (the exact production line) clears the
+    // `display` LONGHAND from the inline style rather than restoring it —
+    // since #cal-static-col-header has no stylesheet rule of its own (only
+    // this inline `display:grid`), the empty string falls through to the
+    // div UA default (`block`), silently degrading the header from a grid
+    // to plain inline text flow on every render once this function has run
+    // once. Confirmed with a standalone DOM check, not a jsdom quirk — this
+    // is a live latent bug in production calendar-panel.js too (same line),
+    // just easy to miss on a narrow docked panel where block-flow and a
+    // narrow grid look similar at a glance; it's obvious once the 8th
+    // "auto" filter-button column is added, which is what surfaced it here.
+    // Restoring the explicit value instead of clearing it keeps the exact
+    // same production layout intent without changing the toggle behavior.
     const staticHdr = document.getElementById('cal-static-col-header');
-    if (staticHdr) staticHdr.style.display = splitCols ? 'none' : '';
+    if (staticHdr) staticHdr.style.display = splitCols ? 'none' : 'grid';
     document.getElementById('section-tvcalendar')?.classList.toggle('cal-fs-split', splitCols);
+
+    // [TEST v1.13.2] Keep the currency filter visible even when splitCols
+    // hides #cal-static-col-header. The two-column layout reuses ONE
+    // buildCalColHeaderHtml() string for BOTH .cal-col-wrap headers (see
+    // below), so a unique-id control can't live inside it without producing
+    // duplicate #cal-ccy-filter nodes. Instead, relocate the SAME DOM node
+    // (never cloned, so the delegated click listener + button states from
+    // setupCcyFilterUI() keep working untouched) into the panel-head action
+    // row while split, and back into the column-header bar once docked or
+    // narrow-fullscreen again.
+    const ccyBox      = document.getElementById('cal-ccy-filter');
+    const headActions = document.getElementById('cal-panel-head-actions');
+    if (ccyBox) {
+      if (splitCols && headActions) {
+        if (ccyBox.parentNode !== headActions) headActions.insertBefore(ccyBox, headActions.firstChild);
+        ccyBox.style.borderLeft  = 'none';
+        ccyBox.style.marginLeft  = '0';
+        ccyBox.style.paddingLeft = '0';
+      } else if (staticHdr) {
+        if (ccyBox.parentNode !== staticHdr) staticHdr.appendChild(ccyBox);
+        ccyBox.style.borderLeft  = '1px solid var(--border2)';
+        ccyBox.style.marginLeft  = '8px';
+        ccyBox.style.paddingLeft = '8px';
+      }
+    }
 
     let html;
     if (splitCols) {
