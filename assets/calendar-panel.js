@@ -1,7 +1,19 @@
 /**
- * calendar-panel.js v1.12 — Native economic calendar renderer
+ * calendar-panel.js v1.12.1 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.12.1 (2026-08-08): BUG FIX — #cal-static-col-header's `display:grid` was
+ *   getting clobbered to the div UA default (`block`) after the first
+ *   buildPanel() render, on every load. `staticHdr.style.display = splitCols
+ *   ? 'none' : ''` clears the inline `display` longhand instead of restoring
+ *   it, and this element has no stylesheet rule of its own to fall back to —
+ *   only the inline `display:grid` set once in index.html's raw markup,
+ *   which JS then immediately overwrote. Now explicitly restores `'grid'`
+ *   instead of clearing to `''`. Found while building a sandboxed
+ *   currency-filter enhancement to this same header (unreleased, tracked
+ *   separately) — this fix is isolated to the display-toggle line only, no
+ *   other logic touched.
  *
  * v1.1 (2026-06-09): Display window filter — show only yesterday through +14 days.
  * v1.2 (2026-06-09): Client-side cross-day dedup — mirrors Step 2e of fetch_ff_calendar.py
@@ -501,7 +513,20 @@
     const splitCols = shouldSplitCalColumns() && groups.length > 1;
     container.classList.toggle('cal-cols-active', splitCols);
     const staticHdr = document.getElementById('cal-static-col-header');
-    if (staticHdr) staticHdr.style.display = splitCols ? 'none' : '';
+    // v1.13: was `splitCols ? 'none' : ''`. Clearing `display` (not setting
+    // it) removes the LONGHAND from the inline style rather than restoring
+    // it — #cal-static-col-header has no stylesheet rule of its own (only
+    // this inline `display:grid` in index.html), so the empty string fell
+    // through to the div UA default (`block`), silently degrading the
+    // header from its 7-column grid to plain inline text flow after the
+    // very first render, on every load. Confirmed with a standalone DOM
+    // check, not a rendering-engine quirk. Easy to miss on the narrow
+    // 180px-tall docked panel (block-flow and a narrow grid look similar at
+    // a glance); surfaced while adding a currency-filter column to this
+    // same header in the sandbox build. Restoring the explicit value
+    // instead of clearing it keeps the exact same toggle behavior with the
+    // grid actually intact.
+    if (staticHdr) staticHdr.style.display = splitCols ? 'none' : 'grid';
     document.getElementById('section-tvcalendar')?.classList.toggle('cal-fs-split', splitCols);
 
     let html;

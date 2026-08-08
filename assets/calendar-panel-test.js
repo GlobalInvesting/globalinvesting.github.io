@@ -91,6 +91,22 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
+ * v1.13.3-TEST (2026-08-08): Santiago caught a real misalignment in the
+ *   v1.13.2 screenshot — Actual/Forecast/Previous no longer sat directly
+ *   above their own data columns. Cause: v1.13.2 appended the button-group
+ *   "auto" grid track AFTER the three trailing 58px columns. Grid tracks are
+ *   per-row, and the data rows below (.cal-event-row, in inline-index-styles.css)
+ *   still use the original 7-column grid with no button track — so the
+ *   header's own 1fr (Event) track ate the button group's width out of ITS
+ *   available space while the data rows' Event track didn't, leaving the
+ *   header's trailing 58px columns start ~button-width px to the left of
+ *   where the data's Actual/Forecast/Previous actually are. Fix: moved the
+ *   "auto" track (and the #cal-ccy-filter span) between Event and Actual —
+ *   fixed-width tracks stay pixel-locked to the right edge regardless of
+ *   where 1fr sits, so as long as nothing new sits to the right of Previous,
+ *   alignment holds. buildPanel()'s relocation logic updated to insert
+ *   (not append) at that same position when moving the node back from
+ *   #cal-panel-head-actions.
  * v1.13.2-TEST (2026-08-08): Follow-up per Santiago's review of v1.13.1-TEST —
  *   two problems, both in the harness/markup, not the filter logic itself:
  *   (a) The header bar did NOT look identical to production. v1.13.1 rebuilt
@@ -682,13 +698,22 @@
       if (splitCols && headActions) {
         if (ccyBox.parentNode !== headActions) headActions.insertBefore(ccyBox, headActions.firstChild);
         ccyBox.style.borderLeft  = 'none';
-        ccyBox.style.marginLeft  = '0';
-        ccyBox.style.paddingLeft = '0';
+        ccyBox.style.borderRight = 'none';
+        ccyBox.style.padding     = '0';
+        ccyBox.style.marginRight = '0';
       } else if (staticHdr) {
-        if (ccyBox.parentNode !== staticHdr) staticHdr.appendChild(ccyBox);
+        if (ccyBox.parentNode !== staticHdr) {
+          // [TEST v1.13.3] Insert BEFORE the Actual header span (i.e. right
+          // after Event), matching the grid-column order in index-test.html —
+          // appendChild would put it back after Previous and reintroduce the
+          // 1fr/fixed-column misalignment this version fixed.
+          const actualSpan = staticHdr.children[4] || null; // 0:Local 1:Ccy 2:· 3:Event 4:Actual
+          staticHdr.insertBefore(ccyBox, actualSpan);
+        }
         ccyBox.style.borderLeft  = '1px solid var(--border2)';
-        ccyBox.style.marginLeft  = '8px';
-        ccyBox.style.paddingLeft = '8px';
+        ccyBox.style.borderRight = '1px solid var(--border2)';
+        ccyBox.style.padding     = '0 8px';
+        ccyBox.style.marginRight = '4px';
       }
     }
 
