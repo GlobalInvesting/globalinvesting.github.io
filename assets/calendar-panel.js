@@ -1,7 +1,37 @@
 /**
- * calendar-panel.js v1.19.4 — Native economic calendar renderer
+ * calendar-panel.js v1.19.5 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.5 (2026-08-08): FOURTH attempt at the chart X-axis clipping —
+ *   different diagnosis this time, on desktop where the v1.19.4 mobile
+ *   fixes don't apply. The three previous attempts (110→130→156→190px)
+ *   all grew `#cal-hist-chart` itself, on the assumption LWC's internal
+ *   time-axis pane was competing with the price pane for room inside that
+ *   height. That assumption was likely wrong: LWC reserves the time-axis
+ *   label row automatically, outside the price pane's `scaleMargins` — it
+ *   isn't something those margins trade off against. Adding up the modal's
+ *   actual content for a typical event (sticky head ~34px + methodology
+ *   text ~30px + cadence tag ~26px + 8-row table ~170px + chart-wrap
+ *   ~212px + reference-pair move line ~32px + body padding 20px) lands
+ *   right around 520-560px — i.e. almost exactly at the modal's own hard
+ *   `max-height:min(560px, 90vh)` cap. On a normal desktop window (90vh
+ *   comfortably above 560), that 560px ceiling is what was actually
+ *   clipping content, at whatever row/element happened to fall on that
+ *   boundary for a given event's text length — which after three rounds of
+ *   growing the chart, kept being the chart's own axis row, since the axis
+ *   is the last thing rendered before `.ch-move`. That's why more chart
+ *   height alone didn't help: it doesn't move the ceiling, only what's
+ *   sitting at it. `max-height` raised 560px→680px (still capped by 90vh
+ *   on genuinely short/laptop-sized viewports) so a typical event's full
+ *   content fits without hitting the scroll boundary at all. Mirrored in
+ *   the `max-width:480px` mobile tier (was 560px there too, now matches at
+ *   680px capped by `92dvh`/`92vh`). Modal remains scrollable regardless
+ *   (`overflow-y:auto` unchanged) as a safety net for unusually long
+ *   methodology text. Not independently confirmed visually this session —
+ *   same environment limitation as prior attempts — but this is a
+ *   different root-cause hypothesis from the three that didn't work, not a
+ *   repeat of the same fix.
  *
  * v1.19.4 (2026-08-08): BUG FIX — history modal (#cal-hist-modal) broken on
  *   mobile. Root cause found in dashboard.css, not this file: the global
@@ -1195,7 +1225,7 @@
       }
       #cal-hist-modal {
         background:var(--bg2, var(--bg3));border:1px solid var(--border2);border-radius:6px;
-        width:min(420px, 100%);max-height:min(560px, 90vh);overflow-y:auto;
+        width:min(420px, 100%);max-height:min(680px, 90vh);overflow-y:auto;
         font-family:var(--font-ui);color:var(--text);box-sizing:border-box;
       }
       /* Defensive fallback, independent of dashboard.css: this table must
@@ -1209,7 +1239,7 @@
       #cal-hist-modal table { min-width:0; }
       @media (max-width: 480px) {
         #cal-hist-overlay { padding:8px; }
-        #cal-hist-modal { max-height:min(560px, 92dvh, 92vh); }
+        #cal-hist-modal { max-height:min(680px, 92dvh, 92vh); }
         #cal-hist-modal th, #cal-hist-modal td { padding:3px 3px;font-size:9px; }
       }
       #cal-hist-modal .ch-head {
