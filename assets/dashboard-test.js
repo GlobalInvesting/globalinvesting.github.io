@@ -10057,7 +10057,7 @@ async function buildRichNarrative() {
             container.innerHTML = signals.map(s => {
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
               const sevCls = s.priority === 'critical' ? 'a-sev-crit' : s.priority === 'warning' ? 'a-sev-warn' : 'a-sev-info';
-              const sevLabel = s.priority === 'critical' ? 'CRIT' : s.priority === 'warning' ? 'WARN' : 'INFO';
+              const sevLabel = s.priority === 'critical' ? 'high' : s.priority === 'warning' ? 'med' : 'low';
               const localTime = localizeSignalTime(s.time);
               const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
               const evTooltip = ev.length ? ev.join(' · ') : '';
@@ -10072,7 +10072,7 @@ async function buildRichNarrative() {
                 // Same flat .alert-row — just structured text inside .a-text,
                 // no separate box/border/background. Pair name stays plain
                 // production text color. Severity is carried by a text badge
-                // (CRIT/WARN/INFO, tinted background) instead of a color-only
+                // (high/med/low, tinted background) instead of a color-only
                 // dot — WCAG 1.4.1 (Use of Color): severity must still be
                 // legible if the badge's color can't be perceived.
                 // Time merged into the Regime badge (no separate .a-time here).

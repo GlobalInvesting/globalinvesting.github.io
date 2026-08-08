@@ -796,7 +796,7 @@
      color-only dot — WCAG 1.4.1: severity must read even if color can't be
      perceived. Tint = 14% alpha of the severity hex over the row background,
      label text = the solid severity hex, both at 8.5px/700/mono. */
-  .a-sev { font-size: 8.5px; font-weight: 700; letter-spacing: .03em; font-family: var(--font-mono); padding: 2px 5px; border-radius: 2px; }
+  .a-sev { font-size: 8.5px; font-weight: 600; font-family: var(--font-mono); padding: 2px 5px; border-radius: 2px; }
   .a-sev-crit { background: rgba(239,83,80,.14); color: var(--down); }
   .a-sev-warn { background: rgba(246,148,28,.14); color: var(--orange); }
   .a-sev-info { background: rgba(79,127,255,.14); color: var(--accent); }
