@@ -31,7 +31,6 @@
     padding:8px 12px; margin-bottom:14px; font-size:11px; color:var(--text2);
   }
   #test-banner b { color:var(--orange); }
-  #cal-ccy-filter { padding:4px 8px; border-bottom:1px solid var(--border); background:var(--head-bg); }
 </style>
 </head>
 <body>
@@ -46,30 +45,37 @@
   <div id="section-tvcalendar" style="border:1px solid var(--border);display:flex;flex-direction:column;height:420px;flex-shrink:0;">
     <div class="panel-head">
       <span class="panel-title">Economic Calendar</span>
-      <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+      <!-- id added [TEST v1.13.2] — same wrapper as production, only now a
+           stable hook so calendar-panel-test.js can relocate #cal-ccy-filter
+           here in wide-fullscreen split-column mode (see note below). -->
+      <div id="cal-panel-head-actions" style="display:flex;align-items:center;gap:6px;min-width:0;">
         <span class="panel-sub" id="cal-panel-sub">ForexFactory · G10 major currencies · medium &amp; high impact</span>
         <button class="lw-tb-btn" id="cal-fs-btn" aria-label="Toggle fullscreen calendar" title="Fullscreen (Esc to exit)" style="flex-shrink:0;">&#x26F6;</button>
       </div>
     </div>
 
-    <!-- Column headers — [TEST v1.13] restructured to flex so the currency
-         filter buttons can sit flush-right on this same row (previously a
-         separate row above it). Inner grid keeps the exact same column
-         widths as production; only a flex-shrink:0 button group was added
-         after it. -->
-    <div id="cal-static-col-header" style="display:flex;align-items:center;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
-      <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;flex:1;min-width:0;">
-        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
-        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
-        <span style="font-size:9px;color:var(--text3);">&middot;</span>
-        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
-        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
-        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
-        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
-      </div>
-      <!-- [TEST v1.13] Currency filter — populated by setupCcyFilterUI(), same
-           visual pattern as #corr-window-btns (Cross-Asset Correlations 30d/60d/90d). -->
-      <span id="cal-ccy-filter" style="display:flex;align-items:center;gap:2px;flex-shrink:0;margin-left:8px;" role="group" aria-label="Currency filter"></span>
+    <!-- Column headers — [TEST v1.13.2] byte-identical to production's pure
+         CSS-grid header (display:grid;grid-template-columns:52px 52px 18px
+         1fr 58px 58px 58px) — the v1.13/v1.13.1 flex-wrapper rewrite is
+         reverted, that's what made this row render differently from
+         production. The ONLY change from production is one appended "auto"
+         grid track at the end to hold the currency-filter button group, so
+         it sits flush-right on this exact bar without touching the width or
+         spacing of the 7 existing columns. -->
+    <div id="cal-static-col-header" style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px auto;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
+      <span style="font-size:9px;color:var(--text3);">&middot;</span>
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
+      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
+      <!-- [TEST v1.13.2] Currency filter — populated by setupCcyFilterUI(),
+           same visual pattern as #corr-window-btns (Cross-Asset Correlations
+           30d/60d/90d). Relocated by buildPanel() into #cal-panel-head-actions
+           when the wide-fullscreen 2-column layout hides this whole bar, so
+           the filter never disappears — see calendar-panel-test.js. -->
+      <span id="cal-ccy-filter" style="display:flex;align-items:center;gap:2px;justify-content:flex-end;padding-left:8px;margin-left:8px;border-left:1px solid var(--border2);" role="group" aria-label="Currency filter"></span>
     </div>
 
     <!-- Scrollable events body -->
