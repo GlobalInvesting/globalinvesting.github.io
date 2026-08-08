@@ -1,9 +1,29 @@
 /**
- * calendar-panel.js v1.19.13 — Native economic calendar renderer
+ * calendar-panel.js v1.19.14 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
- * v1.19.13 (2026-08-08): DEBUG — v1.19.12's `resize(w, 190, true)` did not
+ * v1.19.14 (2026-08-08): FIX — the v1.19.13 debug hook let Santiago test
+ *   live, without a redeploy: calling `chart.resize(origWidth + 50, 190,
+ *   true)` from the console didn't grow the canvas, it collapsed it to
+ *   36px. That's the ResizeObserver antipattern — resizing the very element
+ *   you're observing, synchronously, inside its own callback, when that
+ *   element has no fixed CSS width (`#cal-hist-chart` doesn't), can
+ *   re-trigger the observer mid-reflow and cascade to a garbage value
+ *   before layout settles. Compared against econ-surprises-modal.js and
+ *   corr-modal.js again, more carefully this time: both wrap their actual
+ *   resize call in `requestAnimationFrame()`. v1.19.11 copied their
+ *   ResizeObserver + staggered-timeout structure but dropped that rAF
+ *   wrapper, calling `applyHistResize()` synchronously instead — the one
+ *   piece of the reference pattern that specifically exists to prevent this
+ *   exact cascade. Restored it. This is also the most likely explanation
+ *   for why the axis stayed persistently blocky/pixelated through v1.19.9–
+ *   v1.19.13: every ResizeObserver firing (including from our own code)
+ *   could have been re-triggering a synchronous resize loop that never let
+ *   the canvas settle at a stable, correctly-scaled size. See
+ *   applyHistResize.
+ *
+ * v1.19.13 (2026-08-08): DEBUG (superseded, see v1.19.14 above) — added
  *   fix the axis clipping either (confirmed via a deployment-verification
  *   diagnostic that this time proved v1.19.12 genuinely was running, ruling
  *   out caching as the reason it "didn't work"). Checked LWC's own docs for
@@ -1332,25 +1352,29 @@
     // Resize — mirrors econ-surprises-modal.js / cot-modal-chart.js /
     // corr-modal.js's ResizeObserver + staggered-timeout structure, but uses
     // chart.resize(w, h, true) rather than applyOptions({width, height}).
-    // v1.19.11 used applyOptions() and still didn't fix the visual bug —
-    // root cause turned out to be a real DPR mismatch (confirmed twice via
-    // console dump: every canvas's backing store == its CSS size despite
-    // devicePixelRatio=2), and applyOptions() is very likely a no-op here:
-    // the modal's container width never actually changes between chart
-    // creation and these later calls, so LWC's internal diffing has nothing
-    // to react to. resize()'s third argument (forceRepaint) exists
-    // specifically to bypass that diffing and force real reallocation even
-    // when width/height are numerically unchanged — which is what v1.19.6
-    // originally used before v1.19.9 removed it. Nearest-neighbor pixel
-    // inspection of Santiago's screenshot confirmed the text was never
-    // actually clipped (no hard edge, no overlapping border/element) — it's
-    // blocky/pixelated, the visual signature of a low-res canvas bitmap
-    // being upscaled 2x by the compositor, consistent with this diagnosis.
+    // v1.19.11 used applyOptions(), v1.19.12 switched to resize(...,true) —
+    // neither fixed it. The live console test (v1.19.13's __calHistDebug
+    // hook) exposed why: manually calling chart.resize(origWidth+50, ...)
+    // didn't grow the canvas — it collapsed to 36px. That's the classic
+    // ResizeObserver antipattern: this callback resizes the very element
+    // it's observing (#cal-hist-chart has no fixed CSS width, so changing
+    // the canvases inside it can change its own measured size), which can
+    // re-trigger the observer mid-reflow and cascade to a garbage value
+    // before anything settles. econ-surprises-modal.js and corr-modal.js —
+    // the two working references this fix was modeled on — both wrap their
+    // actual resize call in requestAnimationFrame() specifically to avoid
+    // this: it defers the measurement+resize to the next paint, after the
+    // browser has already settled the current layout, instead of reacting
+    // synchronously inside the observer's own callback. This file copied
+    // their ResizeObserver+staggered-timeout structure but dropped that
+    // rAF wrapper — restoring it here.
     const applyHistResize = () => {
-      if (!_calHistChart) return;
-      const r = container.getBoundingClientRect();
-      const w = Math.round(r.width) || container.offsetWidth || 380;
-      if (w > 0) { try { _calHistChart.resize(w, 190, true); } catch (_) {} }
+      requestAnimationFrame(() => {
+        if (!_calHistChart) return;
+        const r = container.getBoundingClientRect();
+        const w = Math.round(r.width) || container.offsetWidth || 380;
+        if (w > 0) { try { _calHistChart.resize(w, 190, true); } catch (_) {} }
+      });
     };
     if (window.ResizeObserver) {
       _calHistRo = new ResizeObserver(() => applyHistResize());
