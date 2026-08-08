@@ -786,20 +786,15 @@
      Pair name stays production's plain --text (matches the old .a-text
      strong) — only the existing .a-dot carries the severity color, same
      as it always has. "Regime: X" badge is the parsed Rule 10 Setup Name,
-     never a separate frontend taxonomy. */
+     never a separate frontend taxonomy.
+     Severity indicator: after trying a text badge (CRIT/WARN, then
+     high/med/low, then P1/P2/P3), reverted to production's original
+     .a-time + .a-dot left column — see .a-time/.a-dot/.a-crit/.a-warn/
+     .a-info near the top of the ALERTS block. */
   .a-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .a-badge { color: var(--text3); font-size: 9.5px; font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .a-head { min-width: 0; }
-  .a-name { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .a-pair { color: var(--text); font-weight: 600; }
-  /* Severity badge (tinted background + short text label) replaces the old
-     color-only dot — WCAG 1.4.1: severity must read even if color can't be
-     perceived. Tint = 14% alpha of the severity hex over the row background,
-     label text = the solid severity hex, both at 8.5px/700/mono. */
-  .a-sev { font-size: 8.5px; font-weight: 600; font-family: var(--font-mono); padding: 2px 5px; border-radius: 2px; }
-  .a-sev-crit { background: rgba(239,83,80,.14); color: var(--down); }
-  .a-sev-warn { background: rgba(246,148,28,.14); color: var(--orange); }
-  .a-sev-info { background: rgba(79,127,255,.14); color: var(--accent); }
+  .a-pair { color: var(--text); font-weight: 600; flex-shrink: 0; }
   /* Body reads brighter than the footer (--text, not --text2) so the desk-note
      narrative stands out from the scannable Trade bias/Catalyst/Risk stance
      lines beneath it — matches the reference mockup's tonal hierarchy. */

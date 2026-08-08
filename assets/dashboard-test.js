@@ -10056,8 +10056,6 @@ async function buildRichNarrative() {
 
             container.innerHTML = signals.map(s => {
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
-              const sevCls = s.priority === 'critical' ? 'a-sev-crit' : s.priority === 'warning' ? 'a-sev-warn' : 'a-sev-info';
-              const sevLabel = s.priority === 'critical' ? 'P1' : s.priority === 'warning' ? 'P2' : 'P3';
               const localTime = localizeSignalTime(s.time);
               const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
               const evTooltip = ev.length ? ev.join(' · ') : '';
@@ -10069,25 +10067,22 @@ async function buildRichNarrative() {
               const footerParts = parseFooter(s.text);
 
               if (titleParts && footerParts) {
-                // Same flat .alert-row — just structured text inside .a-text,
-                // no separate box/border/background. Pair name stays plain
-                // production text color. Severity is carried by a text badge
-                // (high/med/low, tinted background) instead of a color-only
-                // dot — WCAG 1.4.1 (Use of Color): severity must still be
-                // legible if the badge's color can't be perceived.
-                // Time merged into the Regime badge (no separate .a-time here).
+                // Reverted to production's original left-column layout —
+                // a-time + a-dot, exactly as the plain .alert-row always had.
+                // The P1/P2/P3 badge and the merged "Regime: X · time" badge
+                // didn't land after a few rounds of iteration; back to the
+                // simplest, most familiar pattern.
                 // Evidence chips are intentionally NOT rendered in this structured
                 // card — the mockup keeps the card clean (body + three-clause
                 // footer only). The underlying data isn't lost: it's still on the
                 // native title="" tooltip, available on hover.
-                // Priority is a tinted text badge (P1/P2/P3) — numeric tier reads
-                // as technical/institutional rather than alarmist, and stays
-                // WCAG 1.4.1-compliant (legible without perceiving color).
                 return `<div class="alert-row" ${evTooltip ? `title="${evTooltip}"` : ''}>
+                  <span class="a-time">${localTime}</span>
+                  <span class="a-dot ${dotCls}"></span>
                   <div class="a-text">
                     <div class="a-head">
-                      <span class="a-name"><span class="a-sev ${sevCls}">${sevLabel}</span><span class="a-pair">${titleParts.pair}</span></span>
-                      <span class="a-badge">Regime: ${titleParts.badge} · ${localTime}</span>
+                      <span class="a-pair">${titleParts.pair}</span>
+                      <span class="a-badge">Regime: ${titleParts.badge}</span>
                     </div>
                     <span class="a-desc">${footerParts.body}</span>
                     <div class="a-foot">
