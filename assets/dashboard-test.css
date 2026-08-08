@@ -786,10 +786,10 @@
      "Regime: X" badge is the parsed Rule 10 Setup Name, never a separate
      frontend taxonomy.
      Severity indicator: after trying high/med/low text, the original
-     .a-time + .a-dot column, and an underline under the pair name, now a
-     single-digit tinted badge (1/2/3, no "P" prefix) — most compact so far,
-     purely numeric so it reads as a tier, not a verdict. Tint = 14% alpha
-     of the severity hex, label text = the solid severity hex. */
+     .a-time + .a-dot column, an underline under the pair name, and a plain
+     numeric tier (1/2/3), now the most compact so far — a single-letter
+     H/M/L badge (risk-matrix/audit-log shorthand). Tint = 14% alpha of the
+     severity hex, label text = the solid severity hex. */
   .a-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .a-badge { color: var(--text3); font-size: 9.5px; font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .a-head { min-width: 0; }
