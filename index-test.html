@@ -54,28 +54,36 @@
       </div>
     </div>
 
-    <!-- Column headers — [TEST v1.13.2] byte-identical to production's pure
+    <!-- Column headers — [TEST v1.13.3] byte-identical to production's pure
          CSS-grid header (display:grid;grid-template-columns:52px 52px 18px
-         1fr 58px 58px 58px) — the v1.13/v1.13.1 flex-wrapper rewrite is
-         reverted, that's what made this row render differently from
-         production. The ONLY change from production is one appended "auto"
-         grid track at the end to hold the currency-filter button group, so
-         it sits flush-right on this exact bar without touching the width or
-         spacing of the 7 existing columns. -->
-    <div id="cal-static-col-header" style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px auto;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
+         1fr 58px 58px 58px). The v1.13.2 version appended the button-group
+         "auto" track AFTER the three trailing 58px columns — that shifted
+         this row's own 1fr (Event) computation by the button group's width,
+         so Actual/Forecast/Previous no longer sat above the same-named data
+         columns below (grid-template-columns is per-row; the data rows
+         still use the unmodified 7-column .cal-event-row grid, with no
+         button track to subtract). Moving the "auto" track between Event
+         and Actual fixes it: the three trailing 58px columns are fixed-width
+         regardless of where 1fr lands, so as long as the SAME set of
+         fixed-width tracks sits to their right as in the data rows (i.e.
+         nothing after Previous), they land in the same pixel position. -->
+    <div id="cal-static-col-header" style="display:grid;grid-template-columns:52px 52px 18px 1fr auto 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
       <span style="font-size:9px;color:var(--text3);">&middot;</span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
+      <!-- [TEST v1.13.3] Currency filter — populated by setupCcyFilterUI(),
+           same visual pattern as #corr-window-btns (Cross-Asset Correlations
+           30d/60d/90d). Sits between Event and Actual (not after Previous —
+           see note above) so it never pushes the numeric headers out of
+           alignment with their columns. Relocated by buildPanel() into
+           #cal-panel-head-actions when the wide-fullscreen 2-column layout
+           hides this whole bar, so the filter never disappears — see
+           calendar-panel-test.js. -->
+      <span id="cal-ccy-filter" style="display:flex;align-items:center;gap:2px;justify-content:center;padding:0 8px;margin-right:4px;border-left:1px solid var(--border2);border-right:1px solid var(--border2);" role="group" aria-label="Currency filter"></span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
-      <!-- [TEST v1.13.2] Currency filter — populated by setupCcyFilterUI(),
-           same visual pattern as #corr-window-btns (Cross-Asset Correlations
-           30d/60d/90d). Relocated by buildPanel() into #cal-panel-head-actions
-           when the wide-fullscreen 2-column layout hides this whole bar, so
-           the filter never disappears — see calendar-panel-test.js. -->
-      <span id="cal-ccy-filter" style="display:flex;align-items:center;gap:2px;justify-content:flex-end;padding-left:8px;margin-left:8px;border-left:1px solid var(--border2);" role="group" aria-label="Currency filter"></span>
     </div>
 
     <!-- Scrollable events body -->
