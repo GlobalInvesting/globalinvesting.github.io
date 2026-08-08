@@ -91,6 +91,43 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
+ * v1.19-TEST (2026-08-08): Five fixes from Santiago's screenshots of the
+ *   v1.18-TEST chart + toolbar:
+ *   (1) Chart background now matches the MODAL's background token
+ *       (var(--bg2, var(--bg3)), same as #cal-hist-modal itself), not the
+ *       page background (--bg) — those two differ in this theme, which is
+ *       why the chart previously rendered as a visibly different-colored
+ *       box floating inside the modal.
+ *   (2) Chart height 110→130 and explicit `tickMarkFormatter` added so the
+ *       bottom axis always renders "Mon D, 'YY" — addresses both the
+ *       cut-off axis labels and the missing year in one change.
+ *   (3) NEW hover tooltip (`.ch-chart-tooltip`, same positioning/flip
+ *       pattern as econ-surprises-modal.js's `.esm-lw-tooltip`) — shows
+ *       date-with-year, actual, forecast, and the beat/miss delta for the
+ *       point under the cursor. Previously hovering only surfaced LWC's
+ *       default price-axis crosshair label, which carries neither the date
+ *       nor both series.
+ *   (4) FIXED double divider between "High only" and the currency filter —
+ *       `#cal-toolbar` had `border-right` AND `#cal-ccy-filter` had
+ *       `border-left` on the touching edge, drawing two 1px lines a few
+ *       pixels apart instead of one. `#cal-ccy-filter`'s left border
+ *       removed; the single divider is `#cal-toolbar`'s right border.
+ *   (5) STRUCTURAL — `#cal-toolbar` + `#cal-ccy-filter` moved OFF the
+ *       `#cal-static-col-header` grid (where v1.17-TEST had put them as two
+ *       extra `auto` tracks) into a new `#cal-filter-row`, a plain flex row
+ *       (wrap:wrap) sitting above the column-header grid. The `auto` tracks
+ *       couldn't shrink below their content's natural width, so as the
+ *       panel got narrower they started eating into the `1fr` Event column
+ *       and eventually pushed the fixed 58px Actual/Forecast/Previous
+ *       columns out of alignment with the data rows beneath — Santiago
+ *       flagged this as an approaching-narrow-width failure mode, not yet
+ *       an active bug at the panel's normal docked width. A flex row just
+ *       wraps onto a second line instead; it can't corrupt a grid it's no
+ *       longer part of. `#cal-static-col-header`'s `grid-template-columns`
+ *       reverted to the original 7-track production layout. Relocation
+ *       into `#cal-panel-head-actions` for wide-fullscreen split-column
+ *       mode unchanged in spirit — just targets `#cal-filter-row` instead
+ *       of the grid header as the "docked" parent.
  * v1.18-TEST (2026-08-08): Two follow-ups from Santiago's review of the
  *   history modal's DXY reference-pair line (screenshot showed "0.58 pts
  *   vs. 0.58 pts"):
@@ -803,8 +840,23 @@
 
   let _calHistChart = null;
   let _calHistOpenToken = 0;
+  let _calHistResizeApply = null;
   function _calDestroyHistChart() {
+    if (_calHistResizeApply) { window.removeEventListener('resize', _calHistResizeApply); _calHistResizeApply = null; }
     if (_calHistChart) { try { _calHistChart.remove(); } catch (_) {} _calHistChart = null; }
+  }
+
+  const _CAL_MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function _calFmtDateISO(iso) {
+    // "2026-08-07" -> "Aug 7, '26" — always carries the year, since a
+    // release history commonly spans a year boundary (this modal shows up
+    // to 8 releases, which for a monthly series is 8 months back) and the
+    // bare "Aug"/"mar" month-only labels LWC defaults to for sub-year
+    // ranges don't disambiguate Aug 2025 from Aug 2026.
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+    if (!m) return iso;
+    const mon = _CAL_MONTH_ABBR[parseInt(m[2], 10) - 1] || m[2];
+    return `${mon} ${parseInt(m[3], 10)}, '${m[1].slice(2)}`;
   }
 
   function _calRenderHistChart(seriesArr) {
@@ -826,19 +878,28 @@
     if (pts.length < 2) { container.style.display = 'none'; return; }
     container.style.display = '';
 
-    const _bg    = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()     || '#131722';
-    const _text2 = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim()  || '#9096a0';
-    const _brd   = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#2a2e39';
-    const _brd2  = getComputedStyle(document.documentElement).getPropertyValue('--bg3').trim()    || '#2a2e39';
+    // Match the MODAL's own background (var(--bg2, var(--bg3)) — see
+    // #cal-hist-modal above), not the page background (--bg). Those two
+    // tokens differ in this theme, which is why the chart previously
+    // rendered as a visibly different-colored box floating inside the modal.
+    const _cs    = getComputedStyle(document.documentElement);
+    const _bg2   = _cs.getPropertyValue('--bg2').trim();
+    const _bg3   = _cs.getPropertyValue('--bg3').trim();
+    const _bg    = _bg2 || _bg3 || '#1e222d';
+    const _text2 = _cs.getPropertyValue('--text2').trim() || '#9096a0';
+    const _brd2  = _cs.getPropertyValue('--bg3').trim() || '#2a2e39';
 
     const rect = container.getBoundingClientRect();
     const chart = LWC.createChart(container, {
       width: Math.round(rect.width) || container.offsetWidth || 380,
-      height: 110,
+      height: 130,
       layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontSize: 9, attributionLogo: false },
       grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
       rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.15, bottom: 0.15 } },
-      timeScale: { borderVisible: false, fixRightEdge: true },
+      timeScale: {
+        borderVisible: false, fixRightEdge: true, fixLeftEdge: true, rightOffset: 2,
+        tickMarkFormatter: (time) => _calFmtDateISO(typeof time === 'string' ? time : ''),
+      },
       crosshair: {
         mode: LWC.CrosshairMode?.Normal ?? 1,
         vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
@@ -861,6 +922,53 @@
     forecastSeries.setData(pts.map(p => ({ time: p.time, value: p.forecast })));
 
     chart.timeScale().fitContent();
+
+    // Hover tooltip — date (with year) + actual + forecast for the point
+    // under the cursor. Same positioning/styling pattern as
+    // econ-surprises-modal.js's .esm-lw-tooltip (flips side/above-below to
+    // stay inside the container). Previously there was no tooltip at all —
+    // the only thing that showed on hover was LWC's default price-axis
+    // crosshair label, which carries neither the date nor both series.
+    container.style.position = 'relative';
+    const tip = document.createElement('div');
+    tip.className = 'ch-chart-tooltip';
+    container.appendChild(tip);
+    const byTime = {};
+    pts.forEach(p => { byTime[p.time] = p; });
+    const TW = 150, TM = 10;
+    chart.subscribeCrosshairMove(param => {
+      if (!param?.point || !param.time) { tip.style.display = 'none'; return; }
+      const p = byTime[param.time];
+      if (!p) { tip.style.display = 'none'; return; }
+      const diff = p.actual - p.forecast;
+      const col  = diff === 0 ? _text2 : (diff > 0 ? '#26a69a' : '#ef5350');
+      tip.innerHTML = `
+        <div style="color:var(--text2,#9096a0);margin-bottom:3px;">${_calFmtDateISO(param.time)}</div>
+        <div><span style="color:#2596ff;">Actual</span> ${p.actual}</div>
+        <div><span style="color:rgba(144,150,160,0.9);">Forecast</span> ${p.forecast}</div>
+        <div style="color:${col};margin-top:2px;">${diff >= 0 ? '+' : ''}${diff.toFixed(2)} vs. forecast</div>
+      `;
+      tip.style.display = 'block';
+      const cW = container.clientWidth || 380;
+      const cx = param.point.x, cy = param.point.y;
+      const th = tip.offsetHeight || 60;
+      const tx = (cx + TM + TW <= cW - 4) ? cx + TM : cx - TM - TW;
+      const ty = (cy - th - TM >= 4) ? cy - th - TM : cy + TM;
+      tip.style.left = Math.max(0, tx) + 'px';
+      tip.style.top  = Math.max(0, ty) + 'px';
+    });
+
+    // Resize — mirrors econ-surprises-modal.js's rationale: without removing
+    // this listener on destroy, each modal reopen leaks one, and a stale
+    // closure over a since-cleared `container` would call
+    // chart.applyOptions({ width: 0 }) on the next resize event.
+    const applyResize = () => {
+      if (!_calHistChart) return;
+      const w = container.clientWidth;
+      if (w > 0) _calHistChart.applyOptions({ width: w });
+    };
+    _calHistResizeApply = applyResize;
+    window.addEventListener('resize', applyResize);
   }
   const _ohlcCache = {};
   async function fetchRefPairOHLC(ccy) {
@@ -939,7 +1047,15 @@
       }
       #cal-hist-modal .ch-chart-legend { display:flex;align-items:center;gap:4px;font-size:9px;text-transform:none;letter-spacing:0; }
       #cal-hist-modal .ch-chart-swatch { display:inline-block;width:8px;height:2px; }
-      #cal-hist-chart { height:110px; }
+      #cal-hist-chart { height:130px;position:relative; }
+      .ch-chart-tooltip {
+        position:absolute;display:none;pointer-events:none;
+        background:var(--bg2,#1e222d);border:1px solid var(--border2);
+        border-radius:4px;padding:6px 8px;font-size:9px;line-height:1.6;
+        font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+        color:var(--text,#d1d4dc);z-index:50;
+        box-shadow:0 4px 16px rgba(0,0,0,.45);white-space:nowrap;
+      }
     `;
     document.head.appendChild(s);
     const overlay = document.createElement('div');
@@ -1528,52 +1644,36 @@
     if (staticHdr) staticHdr.style.display = splitCols ? 'none' : 'grid';
     document.getElementById('section-tvcalendar')?.classList.toggle('cal-fs-split', splitCols);
 
-    // [TEST v1.13.2] Keep the currency filter visible even when splitCols
-    // hides #cal-static-col-header. The two-column layout reuses ONE
-    // buildCalColHeaderHtml() string for BOTH .cal-col-wrap headers (see
-    // below), so a unique-id control can't live inside it without producing
-    // duplicate #cal-ccy-filter nodes. Instead, relocate the SAME DOM node
-    // (never cloned, so the delegated click listener + button states from
+    // [TEST v1.19] Keep the currency filter visible even when splitCols
+    // hides #cal-filter-row (see below). The two-column layout reuses ONE
+    // buildCalColHeaderHtml() string for BOTH .cal-col-wrap headers, so a
+    // unique-id control can't live inside it without producing duplicate
+    // #cal-ccy-filter nodes. Instead, relocate the SAME DOM node (never
+    // cloned, so the delegated click listener + button states from
     // setupCcyFilterUI() keep working untouched) into the panel-head action
-    // row while split, and back into the column-header bar once docked or
+    // row while split, and back into #cal-filter-row once docked or
     // narrow-fullscreen again.
     const ccyBox      = document.getElementById('cal-ccy-filter');
     const headActions = document.getElementById('cal-panel-head-actions');
+    const filterRow   = document.getElementById('cal-filter-row');
     if (ccyBox) {
       if (splitCols && headActions) {
         if (ccyBox.parentNode !== headActions) headActions.insertBefore(ccyBox, headActions.firstChild);
         ccyBox.style.borderLeft  = 'none';
-        ccyBox.style.borderRight = 'none';
         ccyBox.style.padding     = '0';
         ccyBox.style.marginRight = '0';
-      } else if (staticHdr) {
-        if (ccyBox.parentNode !== staticHdr) {
-          // [TEST v1.13.3] Insert BEFORE the Actual header span (i.e. right
-          // after Event/toolbar), matching the grid-column order in
-          // index-test.html — appendChild would put it back after Previous
-          // and reintroduce the 1fr/fixed-column misalignment this version
-          // fixed. [TEST v1.17] Still index 4 here: when BOTH #cal-toolbar
-          // and #cal-ccy-filter have been relocated away (split mode), only
-          // the original 7 static spans remain (Local, Ccy, ·, Event,
-          // Actual, Forecast, Previous), so Actual is still children[4].
-          const actualSpan = staticHdr.children[4] || null; // 0:Local 1:Ccy 2:· 3:Event 4:Actual
-          staticHdr.insertBefore(ccyBox, actualSpan);
-        }
-        ccyBox.style.borderLeft  = '1px solid var(--border2)';
-        ccyBox.style.borderRight = '1px solid var(--border2)';
-        ccyBox.style.padding     = '0 8px';
-        ccyBox.style.marginRight = '4px';
+      } else if (filterRow) {
+        if (ccyBox.parentNode !== filterRow) filterRow.appendChild(ccyBox);
+        ccyBox.style.borderLeft  = 'none';
+        ccyBox.style.padding     = '0';
+        ccyBox.style.marginRight = '0';
       }
     }
 
-    // [TEST v1.17] Week nav + impact filter toolbar — moved out of its own
-    // separate row (v1.16-TEST) per Santiago's feedback, into the column
-    // header row, directly to the left of the currency filter. Rather than
-    // duplicating the splitCols/staticHdr branching above, this always
-    // inserts #cal-toolbar immediately before #cal-ccy-filter's CURRENT
-    // parent (already resolved by the block above, whichever mode is
-    // active), so the two controls travel together as a pair in both the
-    // docked header and the wide-fullscreen split-column relocation.
+    // [TEST v1.19] Week nav + impact filter toolbar — travels as a pair with
+    // #cal-ccy-filter, same rationale as before: always inserted immediately
+    // before #cal-ccy-filter's CURRENT parent (already resolved above),
+    // rather than duplicating the splitCols/filterRow branching.
     const toolBox = document.getElementById('cal-toolbar');
     if (toolBox && ccyBox && ccyBox.parentNode) {
       const targetParent = ccyBox.parentNode;
@@ -1586,10 +1686,15 @@
         toolBox.style.marginRight = '4px';
       } else {
         toolBox.style.borderRight = '1px solid var(--border2)';
-        toolBox.style.padding     = '0 8px';
+        toolBox.style.padding     = '0 8px 0 0';
         toolBox.style.marginRight = '2px';
       }
     }
+
+    // #cal-filter-row has nothing left in it once both groups relocate to
+    // #cal-panel-head-actions in split mode — hide it so its border doesn't
+    // draw as an empty strip.
+    if (filterRow) filterRow.style.display = splitCols ? 'none' : 'flex';
 
     let html;
     if (splitCols) {
