@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GlobalInvesting — Calendar TEST harness (v1.13-TEST)</title>
+<!-- Fonts: Inter (UI) + JetBrains Mono (numbers) — same link as production index.html.
+     Missing this was the cause of the mismatched font in the previous version. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
 <!-- [TEST harness] index.html's calendar CSS (.cal-event-row, .cal-col, .cal-dot,
      etc.) lives in an INLINE <style> block inside index.html itself, not in
@@ -47,18 +52,24 @@
       </div>
     </div>
 
-    <!-- [TEST v1.13] Currency filter pills -->
-    <div id="cal-ccy-filter"></div>
-
-    <!-- Column headers -->
-    <div id="cal-static-col-header" style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
-      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
-      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
-      <span style="font-size:9px;color:var(--text3);">&middot;</span>
-      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
-      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
-      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
-      <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
+    <!-- Column headers — [TEST v1.13] restructured to flex so the currency
+         filter buttons can sit flush-right on this same row (previously a
+         separate row above it). Inner grid keeps the exact same column
+         widths as production; only a flex-shrink:0 button group was added
+         after it. -->
+    <div id="cal-static-col-header" style="display:flex;align-items:center;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
+      <div style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;flex:1;min-width:0;">
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;" id="cal-th-time">Local</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Ccy</span>
+        <span style="font-size:9px;color:var(--text3);">&middot;</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Event</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Actual</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
+        <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
+      </div>
+      <!-- [TEST v1.13] Currency filter — populated by setupCcyFilterUI(), same
+           visual pattern as #corr-window-btns (Cross-Asset Correlations 30d/60d/90d). -->
+      <span id="cal-ccy-filter" style="display:flex;align-items:center;gap:2px;flex-shrink:0;margin-left:8px;" role="group" aria-label="Currency filter"></span>
     </div>
 
     <!-- Scrollable events body -->
