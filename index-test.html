@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GlobalInvesting — Calendar TEST harness (v1.13-TEST)</title>
+<title>GlobalInvesting — Calendar TEST harness (v1.16-TEST)</title>
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers) — same link as production index.html.
      Missing this was the cause of the mismatched font in the previous version. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,9 +36,11 @@
 <body>
 <div id="test-wrap">
   <div id="test-banner">
-    <b>Sandbox — calendar-panel-test.js (v1.13-TEST)</b><br>
+    <b>Sandbox — calendar-panel-test.js (v1.16-TEST)</b><br>
     Archivo de prueba, no conectado a producción. Datos reales de <code>calendar-data/</code>
-    (copia local). Cambios: filtro de divisa, marca de revisión (R), color por magnitud de sorpresa.
+    (copia local). Cambios: filtro de divisa, filtro de impacto (High only), navegación
+    semanal, modal de historial (últimos 8 prints + cadencia + contexto de par de referencia),
+    tag de votante FOMC, marca de revisión (R), color por magnitud de sorpresa.
   </div>
 
   <!-- ECONOMIC CALENDAR — same markup as production index.html#section-tvcalendar -->
@@ -52,6 +54,21 @@
         <span class="panel-sub" id="cal-panel-sub">ForexFactory · G10 major currencies · medium &amp; high impact</span>
         <button class="lw-tb-btn" id="cal-fs-btn" aria-label="Toggle fullscreen calendar" title="Fullscreen (Esc to exit)" style="flex-shrink:0;">&#x26F6;</button>
       </div>
+    </div>
+
+    <!-- [TEST v1.16] Toolbar row — week navigation (left) + high-impact-only
+         toggle (right). Kept as its own row rather than crammed into
+         #cal-panel-head-actions (already holding the panel-sub label +
+         fullscreen button) or into #cal-static-col-header (already holding
+         the currency filter between Event and Actual) — both are already
+         tight at the panel's real docked width. Populated by
+         setupWeekNavUI() / setupImpactFilterUI() in calendar-panel-test.js;
+         empty markup here, same "no-op if container missing" safety as the
+         currency filter, so this file stays safe to diff against
+         production calendar-panel.js. -->
+    <div id="cal-toolbar" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
+      <span id="cal-week-nav" style="display:flex;align-items:center;gap:3px;" role="group" aria-label="Week navigation"></span>
+      <span id="cal-impact-filter" style="display:flex;align-items:center;gap:3px;" role="group" aria-label="Impact filter"></span>
     </div>
 
     <!-- Column headers — [TEST v1.13.3] byte-identical to production's pure
