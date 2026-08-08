@@ -1,9 +1,28 @@
 /**
- * calendar-panel.js v1.19.10 — Native economic calendar renderer
+ * calendar-panel.js v1.19.11 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
- * v1.19.10 (2026-08-08): FIX — history-modal chart's axis clipping persisted
+ * v1.19.11 (2026-08-08): FIX — v1.19.10's `autoSize: true` was reverted.
+ *   Santiago asked why calendar-panel.js was the only LWC-based chart in the
+ *   frontend showing this clipping and suggested comparing against the
+ *   others instead of guessing further. econ-surprises-modal.js,
+ *   cot-modal-chart.js, and corr-modal.js — three other modal charts with
+ *   date axes — are all unaffected, and none of them use `autoSize`
+ *   (dashboard.js has an explicit comment against it: "can mis-size before
+ *   first paint"). All three instead use a `ResizeObserver` on the chart
+ *   container plus several staggered `setTimeout` calls (60/250/600ms) that
+ *   re-apply real `width`/`height` via `chart.applyOptions()` shortly after
+ *   creation — giving LWC several automatic chances to reallocate the canvas
+ *   backing store against whatever `devicePixelRatio` has actually settled
+ *   to by then. calendar-panel.js only had a bare `window.resize` listener,
+ *   which does nothing unless the user manually resizes the browser —
+ *   never automatically, right after modal-open, when a not-yet-settled DPR
+ *   would actually need correcting. Adopted the same ResizeObserver +
+ *   staggered-reapply pattern used by the other three. See
+ *   _calRenderHistChart / applyHistResize / _calDestroyHistChart.
+ *
+ * v1.19.10 (2026-08-08): FIX (superseded by v1.19.11, see above) — added
  *   after v1.19.9 (confirmed by Santiago on a fresh screenshot taken well
  *   after that deploy, on a different event's chart, ruling out the
  *   transitional-frame theory that justified removing the v1.19.6 resize).
@@ -1107,7 +1126,12 @@
   let _calHistChart = null;
   let _calHistOpenToken = 0;
   let _calHistResizeApply = null;
+  let _calHistRo = null;
+  let _calHistTimers = [];
   function _calDestroyHistChart() {
+    _calHistTimers.forEach(id => clearTimeout(id));
+    _calHistTimers = [];
+    if (_calHistRo) { try { _calHistRo.disconnect(); } catch (_) {} _calHistRo = null; }
     if (_calHistResizeApply) { window.removeEventListener('resize', _calHistResizeApply); _calHistResizeApply = null; }
     if (_calHistChart) { try { _calHistChart.remove(); } catch (_) {} _calHistChart = null; }
   }
@@ -1191,12 +1215,6 @@
 
     const rect = container.getBoundingClientRect();
     const chart = LWC.createChart(container, {
-      // autoSize (v1.19.10): width/height below are now only the
-      // ResizeObserver-failure fallback, not the primary sizing path. See
-      // the v1.19.10 changelog note below _calRenderHistChart for why this
-      // replaces the plain width/height-only creation that v1.19.9 left in
-      // place after removing the v1.19.6 manual resize.
-      autoSize: true,
       width: Math.round(rect.width) || container.offsetWidth || 380,
       height: 190,
       layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontSize: 9, attributionLogo: false },
@@ -1229,40 +1247,60 @@
 
     chart.timeScale().fitContent();
 
-    // REMOVED (v1.19.9), REPLACED (v1.19.10): v1.19.6 added a
-    // requestAnimationFrame'd chart.resize(w, 190, true) here based on a
-    // live dump showing the axis canvas's backing store (342x24) numerically
-    // equal to its CSS size (342px/24px) despite devicePixelRatio=2. v1.19.7/8
-    // chased (and ruled out) glyph-specific clipping instead, and a follow-up
-    // diagnostic dump — full row-by-row pixel brightness of the actual axis
-    // canvas — proved the canvas itself was rendering with zero clipping at
-    // rest for that event. v1.19.9 removed the resize call as an unjustified
-    // liability (it forced a second layout/redraw pass that could produce a
-    // bad transitional frame on a slow device).
+    // v1.19.6 added a requestAnimationFrame'd chart.resize(w, 190, true) here
+    // based on a live dump showing the axis canvas's backing store (342x24)
+    // numerically equal to its CSS size (342px/24px) despite
+    // devicePixelRatio=2. v1.19.7/8 chased (and ruled out) glyph-specific
+    // clipping instead, and a follow-up diagnostic dump — full row-by-row
+    // pixel brightness of the actual axis canvas — proved the canvas itself
+    // was rendering with zero clipping at rest for that event. v1.19.9
+    // removed the resize call as an unjustified liability.
     //
     // Santiago then confirmed, on a fresh screenshot taken well after v1.19.9
     // was live (so not a transitional-frame artifact), that a DIFFERENT
     // event's chart (DXY avg daily range) still showed a hard-edged clip —
     // and a repeat diagnostic dump against that specific chart again showed
-    // the axis canvas clean at rest (rows 8-16 of 24, margin both sides) AND
-    // ruled out every CSS ancestor (no overflow clipping anywhere in the
-    // #cal-hist-chart → #cal-hist-modal chain). The one remaining fact both
-    // dumps shared: attrW/attrH == cssW/cssH on every canvas in the chart,
-    // i.e. a 1x backing store on a devicePixelRatio=2 screen. That mismatch
-    // is consistent with LWC reading window.devicePixelRatio exactly once,
-    // synchronously, inside createChart() above — which runs immediately
-    // after container.style.display toggles from 'none', a moment where the
-    // page's effective DPR isn't guaranteed to have settled yet. Without
-    // autoSize, nothing ever revisits that reading afterward, so a canvas
-    // created in that narrow window stays permanently mis-scaled — a 1x
-    // bitmap upscaled by the compositor to fill a 2x box can misregister the
-    // last row or two of a densely-packed text row like the time axis,
-    // which reads as a hard clip rather than the DPR-mismatch pattern (soft
-    // "the whole line" clipping) I'd have expected. `autoSize: true` (added
-    // just above) hands sizing to LWC's own ResizeObserver-driven pipeline
-    // instead, which re-evaluates continuously rather than once — the
-    // `width`/`height` above are kept only as the documented
-    // ResizeObserver-failure fallback.
+    // the axis canvas clean at rest AND ruled out every CSS ancestor. v1.19.10
+    // tried `autoSize: true`, reasoning LWC read `window.devicePixelRatio`
+    // once at creation time in a not-yet-settled moment. Santiago pointed out
+    // this codebase already has an answer for exactly this class of bug:
+    // econ-surprises-modal.js, cot-modal-chart.js, and corr-modal.js — three
+    // other LWC-based modal charts with date axes, all unaffected by this
+    // clipping — none of them use `autoSize` (dashboard.js's own comment
+    // warns it "can mis-size before first paint"). Instead all three use a
+    // `ResizeObserver` on the container PLUS several staggered `setTimeout`
+    // calls (60ms/200-250ms/500-600ms) that re-apply real `width`/`height` via
+    // `chart.applyOptions()` shortly after creation. This file only had a
+    // bare `window.addEventListener('resize', ...)` (added below, further
+    // down) — which does nothing unless the user manually resizes the
+    // browser window, so it could never correct a canvas mis-sized against a
+    // not-yet-settled DPR at modal-open time. Adopting the same
+    // ResizeObserver + staggered-reapply pattern used by the other three
+    // modals (v1.19.11) gives LWC several automatic chances, in the seconds
+    // right after creation, to reallocate the canvas backing store against
+    // whatever `devicePixelRatio` has actually settled to by then.
+    // Resize — mirrors econ-surprises-modal.js / cot-modal-chart.js /
+    // corr-modal.js: re-reads real container dimensions and pushes them into
+    // the chart via applyOptions(), which also gives LWC a fresh chance to
+    // reallocate the canvas backing store against the current
+    // devicePixelRatio. Guarded on _calHistChart so a stale closure over a
+    // since-destroyed chart/container (e.g. modal closed before a staggered
+    // timeout fires) doesn't throw or resurrect a removed chart.
+    const applyHistResize = () => {
+      if (!_calHistChart) return;
+      const r = container.getBoundingClientRect();
+      const w = Math.round(r.width) || container.offsetWidth || 380;
+      if (w > 0) { try { _calHistChart.applyOptions({ width: w, height: 190 }); } catch (_) {} }
+    };
+    if (window.ResizeObserver) {
+      _calHistRo = new ResizeObserver(() => applyHistResize());
+      _calHistRo.observe(container);
+    }
+    _calHistTimers = [
+      setTimeout(applyHistResize, 60),
+      setTimeout(applyHistResize, 250),
+      setTimeout(applyHistResize, 600),
+    ];
 
     // Hover tooltip — date (with year) + actual + forecast for the point
     // under the cursor. Same positioning/styling pattern as
@@ -1307,17 +1345,11 @@
       tip.style.top  = Math.max(0, ty) + 'px';
     });
 
-    // Resize — mirrors econ-surprises-modal.js's rationale: without removing
-    // this listener on destroy, each modal reopen leaks one, and a stale
-    // closure over a since-cleared `container` would call
-    // chart.applyOptions({ width: 0 }) on the next resize event.
-    const applyResize = () => {
-      if (!_calHistChart) return;
-      const w = container.clientWidth;
-      if (w > 0) _calHistChart.applyOptions({ width: w });
-    };
-    _calHistResizeApply = applyResize;
-    window.addEventListener('resize', applyResize);
+    // Window resize listener kept alongside the ResizeObserver above — belt-
+    // and-suspenders, matching econ-surprises-modal.js/cot-modal-chart.js/
+    // corr-modal.js, which all keep both rather than relying on just one.
+    _calHistResizeApply = applyHistResize;
+    window.addEventListener('resize', applyHistResize);
   }
   const _ohlcCache = {};
   async function fetchRefPairOHLC(ccy) {
