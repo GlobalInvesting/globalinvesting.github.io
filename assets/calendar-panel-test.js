@@ -91,6 +91,15 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
+ * v1.13.1-TEST (2026-08-08): Follow-up per Santiago's review of v1.13-TEST:
+ *   (a) Currency filter changed from multi-select-with-removal to ISOLATE
+ *       semantics (click a currency → show ONLY it; click again/All → show
+ *       all), and moved from its own pill row to the right edge of the
+ *       column-header bar, restyled to match #corr-window-btns (Cross-Asset
+ *       Correlations' 30d/60d/90d buttons) instead of rounded flag pills.
+ *   (b) Font mismatch in the harness was NOT a bug in this file — index.html
+ *       loads Inter/JetBrains Mono via a Google Fonts <link> that
+ *       index-test.html was missing; fixed there, not here.
  * v1.13-TEST (2026-08-08): SANDBOX — Three "quick win" enhancements requested by
  *   Santiago to move the panel closer to Bloomberg/Refinitiv conventions, built on
  *   an isolated test copy (calendar-panel-test.js / index-test.html) so production
@@ -136,20 +145,29 @@
   // ── [TEST v1.13] Currency filter state ──────────────────────────────────
   // Persisted client-side only (localStorage) — narrows what's rendered from
   // the same already-fetched, already-server-filtered (G8 + medium/high
-  // impact) dataset. An empty/missing stored value means "show all".
+  // impact) dataset.
+  // v1.13.1: changed from multi-select-with-removal (clicking a currency
+  // hid it) to ISOLATE semantics (clicking a currency shows ONLY that
+  // currency; clicking it again — or "All" — restores all). Matches how
+  // Santiago actually wanted to use it and how #corr-window-btns' 30d/60d/90d
+  // group behaves (single active selection, not a multi-toggle).
+  // null = "show all" (default / initial state).
   const CAL_CCY_FILTER_KEY = 'gi_cal_ccy_filter';
   function loadCcyFilter() {
     try {
       const raw = localStorage.getItem(CAL_CCY_FILTER_KEY);
-      if (!raw) return new Set(G8_LIST);
-      const arr = JSON.parse(raw).filter(c => G8_CURRENCIES.has(c));
-      return new Set(arr.length ? arr : G8_LIST);
-    } catch { return new Set(G8_LIST); }
+      if (!raw) return null;
+      const v = JSON.parse(raw);
+      return (typeof v === 'string' && G8_CURRENCIES.has(v)) ? v : null;
+    } catch { return null; }
   }
-  function saveCcyFilter(set) {
-    try { localStorage.setItem(CAL_CCY_FILTER_KEY, JSON.stringify(Array.from(set))); } catch {}
+  function saveCcyFilter(v) {
+    try {
+      if (v == null) localStorage.removeItem(CAL_CCY_FILTER_KEY);
+      else localStorage.setItem(CAL_CCY_FILTER_KEY, JSON.stringify(v));
+    } catch {}
   }
-  let _ccyFilter = loadCcyFilter();
+  let _ccyFilter = loadCcyFilter(); // string (single ccy) or null (all)
 
   // Cache of the last successful fetch — lets relayoutCalendar() re-render
   // (e.g. switching between 1 and 2 columns on fullscreen open/close/resize)
@@ -452,8 +470,8 @@
 
     let filtered = events.filter(ev =>
       G8_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact) &&
-      ev.dateISO >= _yISO && ev.dateISO <= _mISO &&
-      _ccyFilter.has(ev.currency)                                  // [TEST v1.13] currency pills
+      (_ccyFilter == null || ev.currency === _ccyFilter) &&         // [TEST v1.13] currency filter
+      ev.dateISO >= _yISO && ev.dateISO <= _mISO
     );
 
     // [TEST v1.13] Revision index — built from the FULL unfiltered dataset
@@ -737,51 +755,60 @@
     setupCcyFilterUI(); // [TEST v1.13]
   }
 
-  // ── [TEST v1.13] Currency filter pills ──────────────────────────────────
-  // Renders once into #cal-ccy-filter (present in index-test.html only —
-  // no-op harmlessly if the container doesn't exist, so this file stays
-  // safe to diff against production calendar-panel.js). Toggling a pill
-  // updates _ccyFilter, persists it, and re-renders from the cached
-  // last-fetched events (no network round-trip needed).
+  // ── [TEST v1.13] Currency filter buttons ────────────────────────────────
+  // Renders once into #cal-ccy-filter (present in index-test.html, flush
+  // right on the column-header row — same visual slot as #corr-window-btns
+  // in the Cross-Asset Correlations panel). No-op harmlessly if the
+  // container doesn't exist, so this file stays safe to diff against
+  // production calendar-panel.js.
+  // Style copied verbatim from index.html's #corr-btn-30/60/90 (dark bg3
+  // pill, border2 border, text3/white text toggle) rather than the flag-icon
+  // pills from v1.13.0 — isolate semantics: clicking a currency shows ONLY
+  // that currency; clicking the active one again (or "All") restores all.
   function setupCcyFilterUI() {
     const box = document.getElementById('cal-ccy-filter');
-    if (!box || box.dataset.calCcyInit === '1') return;
-    box.dataset.calCcyInit = '1';
-    box.innerHTML = G8_LIST.map(ccy => {
-      const flag = FLAG[ccy] || '';
-      const active = _ccyFilter.has(ccy);
-      return `<button type="button" class="cal-ccy-pill${active ? ' active' : ''}" data-ccy="${ccy}"
-        style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;margin:0 3px 3px 0;
-        font-size:9px;font-family:var(--font-ui);border-radius:10px;cursor:pointer;
-        border:1px solid ${active ? 'var(--accent)' : 'var(--border2)'};
-        background:${active ? 'rgba(79,127,255,.14)' : 'transparent'};
-        color:${active ? 'var(--text)' : 'var(--text3)'};">
-        <span class="fi fi-${flag}" style="font-size:8px;"></span>${ccy}</button>`;
-    }).join('') + `<button type="button" id="cal-ccy-all" style="margin-left:4px;padding:2px 6px;
-        font-size:9px;font-family:var(--font-ui);border-radius:10px;cursor:pointer;
-        border:1px solid var(--border2);background:transparent;color:var(--text3);">All</button>`;
+    if (!box) return;
 
-    box.querySelectorAll('.cal-ccy-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
+    const btnStyle = active =>
+      `font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);` +
+      `color:${active ? '#fff' : 'var(--text3)'};border-radius:2px;cursor:pointer;line-height:1.4;`;
+
+    if (box.dataset.calCcyInit !== '1') {
+      box.dataset.calCcyInit = '1';
+      box.innerHTML =
+        G8_LIST.map(ccy =>
+          `<button type="button" class="cal-ccy-btn" data-ccy="${ccy}" style="${btnStyle(_ccyFilter === ccy)}">${ccy}</button>`
+        ).join('') +
+        `<button type="button" id="cal-ccy-all" style="${btnStyle(_ccyFilter == null)}">All</button>`;
+
+      box.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
         const ccy = btn.dataset.ccy;
-        if (_ccyFilter.has(ccy)) {
-          if (_ccyFilter.size > 1) _ccyFilter.delete(ccy); // never allow an empty filter
+        if (btn.id === 'cal-ccy-all') {
+          _ccyFilter = null;
+        } else if (_ccyFilter === ccy) {
+          _ccyFilter = null; // clicking the already-active currency clears the filter
         } else {
-          _ccyFilter.add(ccy);
+          _ccyFilter = ccy;  // isolate: show ONLY this currency
         }
         saveCcyFilter(_ccyFilter);
-        box.dataset.calCcyInit = '0'; // force pill re-render on next call
-        setupCcyFilterUI();
+        updateCcyFilterButtonStates();
         relayoutCalendar();
       });
+    } else {
+      updateCcyFilterButtonStates();
+    }
+  }
+
+  function updateCcyFilterButtonStates() {
+    const box = document.getElementById('cal-ccy-filter');
+    if (!box) return;
+    box.querySelectorAll('.cal-ccy-btn').forEach(b => {
+      b.style.color = (_ccyFilter === b.dataset.ccy) ? '#fff' : 'var(--text3)';
     });
-    document.getElementById('cal-ccy-all')?.addEventListener('click', () => {
-      _ccyFilter = new Set(G8_LIST);
-      saveCcyFilter(_ccyFilter);
-      box.dataset.calCcyInit = '0';
-      setupCcyFilterUI();
-      relayoutCalendar();
-    });
+    const allBtn = document.getElementById('cal-ccy-all');
+    if (allBtn) allBtn.style.color = (_ccyFilter == null) ? '#fff' : 'var(--text3)';
   }
 
   async function fetchEconomicCalendar() {
