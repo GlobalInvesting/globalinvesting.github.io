@@ -1,7 +1,82 @@
 /**
- * calendar-panel.js v1.19.2 — Native economic calendar renderer
+ * calendar-panel.js v1.19.4 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.4 (2026-08-08): BUG FIX — history modal (#cal-hist-modal) broken on
+ *   mobile. Root cause found in dashboard.css, not this file: the global
+ *   mobile rule `table { min-width: 480px; }` (added for the FX pairs
+ *   table, meant to force horizontal scroll on a table with many columns)
+ *   has no selector scoping, so it also applied to `#cal-hist-modal table`
+ *   on every viewport ≤900px — i.e. effectively every phone. The modal
+ *   itself is capped at `width:min(420px, 100%)` and never grew to match,
+ *   so the 480px-wide table overflowed the dialog's border sideways. That
+ *   read as clipped/truncated text (e.g. "Previous" header reduced to a
+ *   sliver, title cut) in Santiago's screenshot — it wasn't text clipping,
+ *   it was the table physically wider than the box it sat in. Fixed with a
+ *   scoped override in dashboard.css (`#cal-hist-modal table { min-width:
+ *   unset !important; width:100% !important; }`), mirroring the existing
+ *   `#rightpanel table` exclusion already in that same media block. Also
+ *   hardened locally in this file (independent of dashboard.css, in case
+ *   the two are ever deployed out of sync): `.ch-body { overflow-x:auto }`
+ *   as a safety net, plus a `max-width:480px` tier that trims overlay
+ *   padding (16px→8px, more usable width on small phones), tightens
+ *   table cell padding/font a notch, and switches `max-height` to prefer
+ *   `92dvh` (falls back to `92vh` on browsers without `dvh` support) so
+ *   the modal sizes against the real visible viewport rather than the
+ *   layout viewport some mobile browsers report before the address bar
+ *   collapses.
+ *
+ * v1.19.3 (2026-08-08): Three issues from Santiago's review — two real bugs,
+ *   one more attempt at the still-unresolved chart X-axis clipping:
+ *   (1) BUG FIX — some events with data showed no chart at all. Root cause:
+ *       LWC's setData() requires strictly ascending, UNIQUE time values;
+ *       when the source logs the same release twice under two title
+ *       spellings for the same date (found live: CHF "Consumer Confidence"
+ *       and "Switzerland Consumer Confidence" both dated 2026-06-15 —
+ *       apparently a mid-year title-format change upstream that never got
+ *       deduped at the source), `_calCanonTitle()` correctly merges both
+ *       rows into one series for the table, but the chart then had two
+ *       points on the same date and setData() threw, silently aborting the
+ *       whole chart render (axes from createChart() still showed — hence
+ *       "grid but no line", not a blank box). `_calRenderHistChart()` now
+ *       dedupes by `dateISO` (keeping the last-ingested entry per date)
+ *       before building chart points. The table is untouched — it still
+ *       shows both raw rows as-is; this is a display-layer resilience fix,
+ *       not a fix to the underlying duplicate — see "Flagged, not fixed"
+ *       below.
+ *   (2) BUG FIX — some events with an obvious real cadence (e.g. USD
+ *       Nonfarm Payrolls Private) showed no frequency tag. `inferCadence()`
+ *       used mean/stdev (coefficient of variation); a single one-off gap —
+ *       either a genuine reporting delay from a year back, or the same
+ *       duplicate-date issue as (1) producing a near-zero gap — was enough
+ *       to blow the 0.35 CV cutoff on its own, since mean and variance are
+ *       both outlier-sensitive. Switched to median gap + median absolute
+ *       deviation (MAD), which barely moves for one outlier either
+ *       direction. Verified against the real NFP Private series (11
+ *       releases, one 76-day gap from a delayed report): old algorithm →
+ *       null, new algorithm → "Monthly" (median 28d, relative MAD 0.16).
+ *   (3) FOLLOW-UP (third attempt) — chart X-axis dates still clipped after
+ *       110→130 (v1.18.0) and 130→156 (v1.19.1). Height increased again,
+ *       156→190, `scaleMargins` tightened 0.12/0.12→0.10/0.10, and
+ *       `.ch-chart-wrap` given 4px `padding-bottom` as extra headroom
+ *       against the modal's own scroll boundary. No CSS `overflow:hidden`
+ *       was found anywhere in the chain from `#cal-hist-chart` up to the
+ *       scrollable `#cal-hist-modal`, so this still isn't a confirmed root
+ *       cause, just a more generous version of the same fix that hasn't
+ *       fully worked twice already — flagged below for Santiago to inspect
+ *       directly (computed height / devtools) rather than iterate blind
+ *       again.
+ *
+ * FLAGGED, NOT FIXED — data pipeline: same-date duplicate under two title
+ *   spellings (see (1) above) is a real dedup gap in the source data,
+ *   outside this file's scope. `fetch_ff_calendar.py` (or wherever the
+ *   underlying calendar.json is written) should dedupe by
+ *   currency+canonical-title+date, not by raw title string, so a mid-series
+ *   title-format change can't produce two rows for one release. Worth
+ *   grepping calendar.json for other same-date duplicates across titles —
+ *   CHF Consumer Confidence was found by inspection, not an exhaustive
+ *   check.
  *
  * v1.19.2 (2026-08-08): BUG FIX — history-modal chart hover tooltip colored
  *   actual-vs-forecast beats/misses the same way for every event, ignoring
@@ -578,24 +653,49 @@
   // (this codebase already has a documented failure mode where keyword
   // lists drift out of sync across files/updates). Instead, look at the
   // actual gaps between this series' own past release dates: low variance
-  // → real fixed cadence, bucketed by the mean gap. High variance (e.g. ad
+  // → real fixed cadence, bucketed by the median gap. High variance (e.g. ad
   // hoc central-bank speeches, one-off reports) → no tag, since a "cadence"
   // label would be misleading. Needs ≥3 prior releases to say anything.
+  //
+  // v1.19.3: switched from mean/stdev (coefficient of variation) to
+  // median/MAD (median absolute deviation). Found live: USD Nonfarm
+  // Payrolls Private — genuinely monthly (7 of 8 recent gaps land in
+  // 23–36 days) — showed no "Monthly" tag at all. Cause: one 76-day gap a
+  // year back (a real reporting delay, not a data bug) was enough on its
+  // own to blow the mean/stdev-based coefficient of variation past the 0.35
+  // cutoff, since a single outlier disproportionately drags both the mean
+  // and the variance. A second, unrelated failure mode shares the same
+  // root: a duplicate same-date entry in the source data (e.g. CHF Consumer
+  // Confidence logged twice for 2026-06-15 under two title spellings — see
+  // the chart-dedup note in _calRenderHistChart()) produces a near-zero gap
+  // that has the same distorting effect. Median/MAD is robust to either: a
+  // single outlier gap (large or ~zero) barely moves the median, and MAD
+  // (median of |gap − median gap|) doesn't square the deviation the way
+  // variance does, so it isn't dominated by that one gap either.
   function inferCadence(seriesArr) {
     if (!seriesArr || seriesArr.length < 3) return null;
     const dates = seriesArr.map(e => Date.parse(e.dateISO + 'T00:00:00Z'));
     const gaps = [];
     for (let i = 1; i < dates.length; i++) gaps.push((dates[i] - dates[i - 1]) / 86400000);
-    const mean = gaps.reduce((a, b) => a + b, 0) / gaps.length;
-    if (mean <= 0) return null;
-    const variance = gaps.reduce((a, b) => a + (b - mean) * (b - mean), 0) / gaps.length;
-    const cv = Math.sqrt(variance) / mean; // coefficient of variation
-    if (cv > 0.35) return null; // irregular — don't mislabel
-    if (mean <= 10)  return 'Weekly';
-    if (mean <= 40)  return 'Monthly';
-    if (mean <= 100) return 'Quarterly';
-    if (mean <= 200) return 'Semi-Annual';
-    if (mean <= 400) return 'Annual';
+    const sorted = gaps.slice().sort((a, b) => a - b);
+    const median = n => {
+      const mid = Math.floor(n.length / 2);
+      return n.length % 2 ? n[mid] : (n[mid - 1] + n[mid]) / 2;
+    };
+    const gapMedian = median(sorted);
+    if (gapMedian <= 0) return null;
+    const absDevs = gaps.map(g => Math.abs(g - gapMedian)).sort((a, b) => a - b);
+    const mad = median(absDevs);
+    // Normalized MAD relative to the median gap — same role as the old CV,
+    // just outlier-robust. Threshold kept generous (0.5) since MAD is
+    // already a smaller number than stdev for the same spread.
+    const relMad = mad / gapMedian;
+    if (relMad > 0.5) return null; // still genuinely irregular — don't mislabel
+    if (gapMedian <= 10)  return 'Weekly';
+    if (gapMedian <= 40)  return 'Monthly';
+    if (gapMedian <= 100) return 'Quarterly';
+    if (gapMedian <= 200) return 'Semi-Annual';
+    if (gapMedian <= 400) return 'Annual';
     return null;
   }
 
@@ -917,10 +1017,29 @@
     if (!LWC || !container) return;
     _calDestroyHistChart();
 
+    // Defensive dedup by dateISO before charting. LWC requires strictly
+    // ascending, UNIQUE time values in setData() — two points sharing the
+    // same date throw synchronously and abort the whole render (chart shell
+    // + axes still show, from createChart() above, but no lines at all).
+    // Real cause found live: the source occasionally logs the same release
+    // twice under two title spellings for the same date (e.g. "Consumer
+    // Confidence" and "Switzerland Consumer Confidence" both dated
+    // 2026-06-15 — a title-format change mid-year that _calCanonTitle()
+    // correctly merges into one series, but the underlying duplicate row
+    // was never deduped upstream). This is a data-pipeline gap, not
+    // something to silently paper over in the table (still shows both rows
+    // as-is, since that's the raw truth), but the chart can't plot two
+    // points on one x-value regardless of cause — keep the LAST occurrence
+    // per date (array is ascending, so "last" = the most recently
+    // ingested/reformatted version of that date's release).
+    const byDateDedup = new Map();
+    seriesArr.forEach(h => byDateDedup.set(h.dateISO, h));
+    const dedupedArr = Array.from(byDateDedup.values());
+
     // Ascending (oldest→newest, left-to-right) — seriesArr is already sorted
     // ascending by buildSeriesIndex(); last8 in the caller was reversed for
     // the table's newest-first display, so this re-slices independently.
-    const pts = seriesArr.slice(-8)
+    const pts = dedupedArr.slice(-8)
       .map(h => ({
         time: h.dateISO,
         actual: _calParseNum(h.actual),
@@ -944,10 +1063,10 @@
     const rect = container.getBoundingClientRect();
     const chart = LWC.createChart(container, {
       width: Math.round(rect.width) || container.offsetWidth || 380,
-      height: 156,
+      height: 190,
       layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontSize: 9, attributionLogo: false },
       grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
-      rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.12, bottom: 0.12 } },
+      rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.10, bottom: 0.10 } },
       timeScale: {
         borderVisible: false, fixRightEdge: true, fixLeftEdge: true, rightOffset: 2,
         tickMarkFormatter: (time) => _calFmtDateISO(typeof time === 'string' ? time : ''),
@@ -1079,6 +1198,20 @@
         width:min(420px, 100%);max-height:min(560px, 90vh);overflow-y:auto;
         font-family:var(--font-ui);color:var(--text);box-sizing:border-box;
       }
+      /* Defensive fallback, independent of dashboard.css: this table must
+         never be allowed to force itself wider than the modal (see the
+         min-width:480px leak fixed in dashboard.css's mobile block — this
+         mirrors that fix locally so the file is self-contained if the two
+         are ever deployed out of sync). If content ever does need more
+         room than a phone screen offers, scroll horizontally inside the
+         body rather than silently overflowing the dialog's border. */
+      #cal-hist-modal .ch-body { overflow-x:auto; }
+      #cal-hist-modal table { min-width:0; }
+      @media (max-width: 480px) {
+        #cal-hist-overlay { padding:8px; }
+        #cal-hist-modal { max-height:min(560px, 92dvh, 92vh); }
+        #cal-hist-modal th, #cal-hist-modal td { padding:3px 3px;font-size:9px; }
+      }
       #cal-hist-modal .ch-head {
         display:flex;align-items:center;justify-content:space-between;gap:8px;
         padding:10px 12px;border-bottom:1px solid var(--border2);position:sticky;top:0;
@@ -1100,14 +1233,14 @@
       #cal-hist-modal td.up { color:var(--up); }
       #cal-hist-modal td.down { color:var(--down); }
       #cal-hist-modal .ch-move { margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3); }
-      #cal-hist-modal .ch-chart-wrap { margin-top:10px;padding-top:8px;border-top:1px solid var(--border2); }
+      #cal-hist-modal .ch-chart-wrap { margin-top:10px;padding-top:8px;padding-bottom:4px;border-top:1px solid var(--border2); }
       #cal-hist-modal .ch-chart-title {
         font-size:9px;text-transform:uppercase;letter-spacing:.03em;color:var(--text3);margin-bottom:4px;
         display:flex;align-items:center;gap:10px;
       }
       #cal-hist-modal .ch-chart-legend { display:flex;align-items:center;gap:4px;font-size:9px;text-transform:none;letter-spacing:0; }
       #cal-hist-modal .ch-chart-swatch { display:inline-block;width:8px;height:2px; }
-      #cal-hist-chart { height:156px;position:relative; }
+      #cal-hist-chart { height:190px;position:relative; }
       .ch-chart-tooltip {
         position:absolute;display:none;pointer-events:none;
         background:var(--bg2,#1e222d);border:1px solid var(--border2);

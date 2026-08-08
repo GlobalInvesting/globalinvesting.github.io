@@ -1300,6 +1300,14 @@
     .fx-pairs-table table, #fx-pairs-tbody { min-width: 480px; }
     /* Right panel tables must NOT get that min-width — they're in a narrow column */
     #rightpanel table { min-width: unset !important; width: 100% !important; }
+    /* Calendar history modal table must NOT get that min-width either — it's
+       inside a centered dialog capped at ~420px (see #cal-hist-modal in
+       calendar-panel.js), not a full-width panel. The blanket `table {
+       min-width:480px }` rule above forced this 4-column table wider than
+       its own modal, which overflowed the dialog's rounded/bordered edge
+       on any viewport ≤900px (i.e. effectively every phone) — the modal
+       itself never resized, so this read as "cut off" text/columns. */
+    #cal-hist-modal table { min-width: unset !important; width: 100% !important; }
     #rightpanel td, #rightpanel th { font-size: 10px !important; padding: 2px 4px !important; }
     /* Indicator + Spread tables in main panel: no min-width, fit container width */
     table:has(#risk-indicators-tbody),
