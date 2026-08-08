@@ -1,7 +1,17 @@
 /**
- * calendar-panel.js v1.19.7 — Native economic calendar renderer
+ * calendar-panel.js v1.19.8 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.8 (2026-08-08): FOLLOW-UP FIX — v1.19.7 removed the comma after
+ *   confirming (via pixel crop) it was clipped at the bottom by descender.
+ *   Santiago's next screenshot showed "Jan 7 '26" still clipped — this time
+ *   the apostrophe cut off at the TOP, same row-height-too-tight cause from
+ *   the other direction (apostrophes commonly sit near/above cap-height).
+ *   `_calFmtDateISO()` now drops the 2-digit-year-with-apostrophe shorthand
+ *   entirely for the full 4-digit year ("Jan 9 2026") — built only from
+ *   digits + capitalized month abbreviations, the one glyph set confirmed
+ *   clean (top and bottom) across both screenshots. See _calFmtDateISO.
  *
  * v1.19.7 (2026-08-08): REAL FIX — chart X-axis clipping was never a
  *   canvas/DPR/height issue (all of v1.19.4-v1.19.6 were chasing the wrong
@@ -1078,31 +1088,24 @@
     // bare "Aug"/"mar" month-only labels LWC defaults to for sub-year
     // ranges don't disambiguate Aug 2025 from Aug 2026.
     //
-    // NO COMMA (v1.19.7): pixel-level inspection of Santiago's screenshot
-    // (cropped + upscaled 6x) showed the clipping was never "half of every
-    // label" as the v1.19.4-v1.19.6 screenshots-only diagnoses assumed —
-    // it was specifically the comma glyph's descender being sliced off
-    // ("Jan 9, '26" rendering as "Jan 9 '26" with a stray clipped mark).
-    // Confirmed by building a byte-identical repro (real lightweight-charts
-    // 5.0.7, real theme CSS/vars, headless Chromium screenshotted at
-    // deviceScaleFactor 2) in a Node/Playwright harness: the comma rendered
-    // fine there, which rules out the v1.19.6 DPR/backing-store theory
-    // outright (a 1x-vs-2x backing store causes blur on a HiDPI screen, not
-    // hard clipping — that diagnosis was wrong). The real cause is LWC's
-    // time-axis row height being sized without headroom for a descender,
-    // which only bites depending on which system font actually resolves at
-    // draw time (font-metric-dependent, so it didn't reproduce in this
-    // sandbox's font stack even though the DPR-mismatch pattern itself did).
-    // Rather than chase LWC's internal row-height allocation across
-    // browsers/OSes/fonts, this removes the only descending glyph the
-    // formatter ever emits — no digit, month abbreviation (always
-    // capitalized, e.g. "Jan"/"Aug"), or apostrophe has a descender, so
-    // once the comma is gone there is structurally nothing left to clip,
-    // regardless of font or DPR.
+    // NO COMMA, NO APOSTROPHE (v1.19.8): v1.19.7 removed the comma after
+    // pixel-inspecting a clipped "Jan 9, '26" and confirming the comma's
+    // descender was the cause. Santiago's next screenshot showed the label
+    // ("Jan 7 '26") STILL clipped — this time the apostrophe cut off at the
+    // TOP. Same root cause from the other direction: an apostrophe glyph
+    // commonly sits high (near/above cap-height, sometimes into the
+    // ascender zone depending on the font), and LWC's time-axis row height
+    // has no headroom above cap-height either, not just below baseline.
+    // Digits and capitalized month abbreviations ("Jan", "Aug") are the
+    // only glyphs confirmed (via both screenshots) to render with zero
+    // clipping, so this drops the 2-digit-year shorthand entirely in favor
+    // of the full 4-digit year — same disambiguating information, built
+    // only from the already-proven-safe glyph set (digits + caps), so
+    // there is nothing left, top or bottom, for LWC's row to clip.
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
     if (!m) return iso;
     const mon = _CAL_MONTH_ABBR[parseInt(m[2], 10) - 1] || m[2];
-    return `${mon} ${parseInt(m[3], 10)} '${m[1].slice(2)}`;
+    return `${mon} ${parseInt(m[3], 10)} ${m[1]}`;
   }
 
   function _calRenderHistChart(seriesArr, isInverse) {
