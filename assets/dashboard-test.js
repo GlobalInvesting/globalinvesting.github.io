@@ -10056,8 +10056,7 @@ async function buildRichNarrative() {
 
             container.innerHTML = signals.map(s => {
               const sevCls = s.priority === 'critical' ? 'a-sev-crit' : s.priority === 'warning' ? 'a-sev-warn' : 'a-sev-info';
-              const sevTitle = s.priority === 'critical' ? 'High priority' : s.priority === 'warning' ? 'Medium priority' : 'Low priority';
-              const sevLabel = `<span class="a-sev-bar"></span><span class="a-sev-bar"></span><span class="a-sev-bar"></span>`;
+              const sevLabel = s.priority === 'critical' ? 'HIGH' : s.priority === 'warning' ? 'MED' : 'LOW';
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
               const localTime = localizeSignalTime(s.time);
               const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
@@ -10070,11 +10069,11 @@ async function buildRichNarrative() {
               const footerParts = parseFooter(s.text);
 
               if (titleParts && footerParts) {
-                // Priority is a three-bar intensity indicator (FXStreet-style
-                // volatility bars) — 1/2/3 bars filled by color, non-color cue
-                // via bar count keeps it WCAG 1.4.1-compliant. aria-label/title
-                // carry the High/Medium/Low text for screen readers and hover.
-                // Time lives inside the Regime badge (no separate .a-time here).
+                // Priority is a tinted text badge (HIGH/MED/LOW, 7.5px) — full
+                // words read clearer than a bare letter while staying compact,
+                // and text alone keeps it WCAG 1.4.1-compliant (legible without
+                // perceiving color). Time lives inside the Regime badge (no
+                // separate .a-time here).
                 // Evidence chips are intentionally NOT rendered in this structured
                 // card — the mockup keeps the card clean (body + three-clause
                 // footer only). The underlying data isn't lost: it's still on the
@@ -10082,7 +10081,7 @@ async function buildRichNarrative() {
                 return `<div class="alert-row" ${evTooltip ? `title="${evTooltip}"` : ''}>
                   <div class="a-text">
                     <div class="a-head">
-                      <span class="a-name"><span class="a-sev ${sevCls}" role="img" aria-label="${sevTitle}" title="${sevTitle}">${sevLabel}</span><span class="a-pair">${titleParts.pair}</span></span>
+                      <span class="a-name"><span class="a-sev ${sevCls}">${sevLabel}</span><span class="a-pair">${titleParts.pair}</span></span>
                       <span class="a-badge">Regime: ${titleParts.badge} · ${localTime}</span>
                     </div>
                     <span class="a-desc">${footerParts.body}</span>

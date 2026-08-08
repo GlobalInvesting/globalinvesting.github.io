@@ -795,15 +795,10 @@
   .a-head { min-width: 0; }
   .a-name { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .a-pair { color: var(--text); font-weight: 600; }
-  .a-sev { display: inline-flex; align-items: flex-end; gap: 1px; }
-  .a-sev-bar { width: 3px; border-radius: 1px; background: var(--border2); }
-  .a-sev-bar:nth-child(1) { height: 5px; }
-  .a-sev-bar:nth-child(2) { height: 8px; }
-  .a-sev-bar:nth-child(3) { height: 11px; }
-  .a-sev-crit .a-sev-bar { background: var(--down); }
-  .a-sev-warn .a-sev-bar:nth-child(1),
-  .a-sev-warn .a-sev-bar:nth-child(2) { background: var(--orange); }
-  .a-sev-info .a-sev-bar:nth-child(1) { background: var(--accent); }
+  .a-sev { font-size: 7.5px; font-weight: 700; font-family: var(--font-mono); letter-spacing: .03em; padding: 2px 5px; border-radius: 2px; }
+  .a-sev-crit { background: rgba(239,83,80,.14); color: var(--down); }
+  .a-sev-warn { background: rgba(246,148,28,.14); color: var(--orange); }
+  .a-sev-info { background: rgba(79,127,255,.14); color: var(--accent); }
   /* Body reads brighter than the footer (--text, not --text2) so the desk-note
      narrative stands out from the scannable Trade bias/Catalyst/Risk stance
      lines beneath it — matches the reference mockup's tonal hierarchy. */
