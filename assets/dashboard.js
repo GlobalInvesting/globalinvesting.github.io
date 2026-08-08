@@ -10034,8 +10034,7 @@ async function buildRichNarrative() {
               } catch { return timeStr; }
             }
             container.innerHTML = signals.map(s => {
-              const sev = s.priority === 'critical' ? 'crit' : s.priority === 'warning' ? 'warn' : 'info';
-              const dotCls = 'a-' + sev;
+              const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
               const localTime = localizeSignalTime(s.time);
               // evidence[]: "LABEL: VALUE" strings set by the engine for data traceability.
               // Rendered as a collapsible row below the signal text — hidden by default,
@@ -10045,43 +10044,10 @@ async function buildRichNarrative() {
               const evHtml = ev.length
                 ? `<div class="a-evidence" aria-label="Signal data sources">${ev.map(e => `<span class="a-ev-chip">${e}</span>`).join('')}</div>`
                 : '';
-
-              // Title: SIGNALS_SYSTEM Rule 10 emits "PAIR — Setup Name" for signals that
-              // collapse into a named condition (e.g. "AUD/USD — Crowded Long"). Split on
-              // the em dash to render pair + setup badge separately in the card header.
-              // Falls back to the full title with no badge when no em dash is present.
-              const title   = s.title || '';
-              const dashIdx = title.indexOf('—');
-              const pair    = (dashIdx >= 0 ? title.slice(0, dashIdx) : title).trim();
-              const setup   = dashIdx >= 0 ? title.slice(dashIdx + 1).trim() : '';
-
-              // Footer: SIGNALS_SYSTEM Rule 14 mandates a trailing "Trade bias: ... .
-              // Catalyst: ... . Risk: ... ." footer as the final three sentences of
-              // `text`. Parse it into labeled lines; falls back to plain body text
-              // (no footer block rendered) if a signal doesn't carry it.
-              const text        = s.text || '';
-              const footerMatch = text.match(/Trade bias:\s*([\s\S]*?)\s*Catalyst:\s*([\s\S]*?)\s*Risk:\s*([\s\S]*)$/i);
-              const body        = footerMatch ? text.slice(0, footerMatch.index).trim() : text;
-              const footerHtml  = footerMatch
-                ? `<div class="a-footer">
-                     <div><span class="a-footer-lbl">Trade bias:</span> ${footerMatch[1].trim()}</div>
-                     <div><span class="a-footer-lbl">Catalyst:</span> ${footerMatch[2].trim()}</div>
-                     <div><span class="a-footer-lbl">Risk:</span> ${footerMatch[3].trim()}</div>
-                   </div>`
-                : '';
-
-              return `<div class="alert-row alert-row-card sev-${sev}${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
+              return `<div class="alert-row${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
                 <span class="a-time">${localTime}</span>
                 <span class="a-dot ${dotCls}"></span>
-                <div class="a-body-wrap">
-                  <div class="a-head">
-                    <span class="a-pair">${pair}</span>
-                    ${setup ? `<span class="a-setup">${setup}</span>` : ''}
-                  </div>
-                  <div class="a-text">${body}</div>
-                  ${footerHtml}
-                  ${evHtml}
-                </div>
+                <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}${evHtml}</div>
               </div>`;
             }).join('');
 
