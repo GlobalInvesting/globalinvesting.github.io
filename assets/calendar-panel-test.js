@@ -91,6 +91,34 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
+ * v1.18-TEST (2026-08-08): Two follow-ups from Santiago's review of the
+ *   history modal's DXY reference-pair line (screenshot showed "0.58 pts
+ *   vs. 0.58 pts"):
+ *   (1) NEW — actual-vs-forecast history chart. Added to the history modal
+ *       below the print table: solid line = actual, dashed line = forecast,
+ *       last up to 8 releases, ascending left-to-right. Trading
+ *       Economics/Investing.com both carry this as a standard element of
+ *       their event-history views, which is what Santiago referenced.
+ *       Reuses the exact loader/theming/destroy pattern already established
+ *       in econ-surprises-modal.js (own guarded `_calEnsureLWC()` — this
+ *       file has no other script tag on the page to piggyback on, since
+ *       index-test.html loads only calendar-panel-test.js). Chart is
+ *       destroyed on modal close and re-guarded with a monotonic open-token
+ *       so a slow CDN load can't paint into a modal the user already
+ *       navigated away from (the overlay/table DOM nodes are a reused
+ *       singleton, not recreated per open, so a naive "did the title
+ *       change" check doesn't work here).
+ *   (2) INVESTIGATED, not a bug — the "0.58 pts vs. 0.58 pts" match.
+ *       Verified independently against DXY's on-disk OHLC (773 daily bars):
+ *       NFP release-day avg range is 0.581, all-days avg is 0.585 — a real
+ *       ~0.6% difference that both happened to round to the same 2dp value.
+ *       `_pairMoveUnit()`'s dxy case bumped from dp:2 to dp:3 so the two
+ *       numbers stop looking identical when they aren't. Separately: "pts"
+ *       for USD vs "pips" for the other seven currencies is intentional,
+ *       not an inconsistency to standardize away — DXY is a weighted basket
+ *       index, not a currency pair, and is quoted in index points on every
+ *       real venue (ICE, Bloomberg), never pips. Applying pips uniformly
+ *       would itself be the non-standard choice.
  * v1.17-TEST (2026-08-08): Two follow-ups from Santiago's review of the
  *   v1.16-TEST screenshot:
  *   (1) REMOVED the FOMC voting-member tag entirely — deleted
@@ -742,9 +770,97 @@
   const CAL_REF_PAIR = { USD:'dxy', EUR:'eurusd', GBP:'gbpusd', JPY:'usdjpy',
     AUD:'audusd', CAD:'usdcad', CHF:'usdchf', NZD:'nzdusd' };
   function _pairMoveUnit(pairKey) {
-    if (pairKey === 'dxy')    return { div: 1,      unit: 'pts',  dp: 2 };
+    // dp:3 for DXY (was 2) — at 2dp, release-day and typical-day averages
+    // frequently round to the same display value (e.g. 0.581 vs 0.585 both
+    // showed "0.58 pts"), which reads as a bug even when the underlying
+    // numbers genuinely differ. USD intentionally stays in index "pts", not
+    // "pips" — DXY is a weighted basket index, not a currency pair, and
+    // industry venues (Bloomberg/ICE) quote it in points, never pips.
+    if (pairKey === 'dxy')    return { div: 1,      unit: 'pts',  dp: 3 };
     if (pairKey === 'usdjpy') return { div: 0.01,    unit: 'pips', dp: 0 };
     return                         { div: 0.0001,  unit: 'pips', dp: 0 };
+  }
+
+  // ── [TEST v1.18] Actual-vs-forecast history chart (LWC) ─────────────────
+  // Santiago asked whether an actual-vs-forecast chart in the history modal
+  // is industry standard — it is (Trading Economics / Investing.com both
+  // show one). Reuses the same loader/theming pattern already established
+  // in econ-surprises-modal.js / cot-modal-chart.js: guarded loader (no-op
+  // if LWC is already on the page), CSS-var theming, destroy-before-rebuild.
+  let _calHistLwcPromise = null;
+  function _calEnsureLWC() {
+    if (window.LightweightCharts) return Promise.resolve();
+    if (_calHistLwcPromise) return _calHistLwcPromise;
+    _calHistLwcPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
+      s.onload  = resolve;
+      s.onerror = () => { _calHistLwcPromise = null; reject(new Error('LWC load failed')); };
+      document.head.appendChild(s);
+    });
+    return _calHistLwcPromise;
+  }
+
+  let _calHistChart = null;
+  let _calHistOpenToken = 0;
+  function _calDestroyHistChart() {
+    if (_calHistChart) { try { _calHistChart.remove(); } catch (_) {} _calHistChart = null; }
+  }
+
+  function _calRenderHistChart(seriesArr) {
+    const LWC = window.LightweightCharts;
+    const container = document.getElementById('cal-hist-chart');
+    if (!LWC || !container) return;
+    _calDestroyHistChart();
+
+    // Ascending (oldest→newest, left-to-right) — seriesArr is already sorted
+    // ascending by buildSeriesIndex(); last8 in the caller was reversed for
+    // the table's newest-first display, so this re-slices independently.
+    const pts = seriesArr.slice(-8)
+      .map(h => ({
+        time: h.dateISO,
+        actual: _calParseNum(h.actual),
+        forecast: _calParseNum(h.forecast ? String(h.forecast).replace(/\*$/, '') : (h.previous || '')),
+      }))
+      .filter(p => isFinite(p.actual) && isFinite(p.forecast));
+    if (pts.length < 2) { container.style.display = 'none'; return; }
+    container.style.display = '';
+
+    const _bg    = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()     || '#131722';
+    const _text2 = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim()  || '#9096a0';
+    const _brd   = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#2a2e39';
+    const _brd2  = getComputedStyle(document.documentElement).getPropertyValue('--bg3').trim()    || '#2a2e39';
+
+    const rect = container.getBoundingClientRect();
+    const chart = LWC.createChart(container, {
+      width: Math.round(rect.width) || container.offsetWidth || 380,
+      height: 110,
+      layout: { background: { type: 'solid', color: _bg }, textColor: _text2, fontSize: 9, attributionLogo: false },
+      grid: { vertLines: { visible: false }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
+      rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.15, bottom: 0.15 } },
+      timeScale: { borderVisible: false, fixRightEdge: true },
+      crosshair: {
+        mode: LWC.CrosshairMode?.Normal ?? 1,
+        vertLine: { color: 'rgba(255,255,255,0.2)', style: 2, labelVisible: false },
+        horzLine: { color: 'rgba(255,255,255,0.15)', style: 2, labelVisible: true, labelBackgroundColor: _brd2 },
+      },
+      handleScroll: false, handleScale: false,
+    });
+    _calHistChart = chart;
+
+    const actualSeries = chart.addSeries(LWC.LineSeries, {
+      color: '#2596ff', lineWidth: 2, priceLineVisible: false, lastValueVisible: false,
+      crosshairMarkerVisible: true, crosshairMarkerRadius: 3,
+    });
+    actualSeries.setData(pts.map(p => ({ time: p.time, value: p.actual })));
+
+    const forecastSeries = chart.addSeries(LWC.LineSeries, {
+      color: 'rgba(144,150,160,0.85)', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false,
+      crosshairMarkerVisible: true, crosshairMarkerRadius: 3,
+    });
+    forecastSeries.setData(pts.map(p => ({ time: p.time, value: p.forecast })));
+
+    chart.timeScale().fitContent();
   }
   const _ohlcCache = {};
   async function fetchRefPairOHLC(ccy) {
@@ -816,6 +932,14 @@
       #cal-hist-modal td.up { color:var(--up); }
       #cal-hist-modal td.down { color:var(--down); }
       #cal-hist-modal .ch-move { margin-top:10px;padding-top:8px;border-top:1px solid var(--border2);font-size:10px;color:var(--text3); }
+      #cal-hist-modal .ch-chart-wrap { margin-top:10px;padding-top:8px;border-top:1px solid var(--border2); }
+      #cal-hist-modal .ch-chart-title {
+        font-size:9px;text-transform:uppercase;letter-spacing:.03em;color:var(--text3);margin-bottom:4px;
+        display:flex;align-items:center;gap:10px;
+      }
+      #cal-hist-modal .ch-chart-legend { display:flex;align-items:center;gap:4px;font-size:9px;text-transform:none;letter-spacing:0; }
+      #cal-hist-modal .ch-chart-swatch { display:inline-block;width:8px;height:2px; }
+      #cal-hist-chart { height:110px; }
     `;
     document.head.appendChild(s);
     const overlay = document.createElement('div');
@@ -828,7 +952,7 @@
       <div class="ch-body" id="cal-hist-body"></div>
     </div>`;
     document.body.appendChild(overlay);
-    const close = () => { overlay.style.display = 'none'; };
+    const close = () => { overlay.style.display = 'none'; _calHistOpenToken++; _calDestroyHistChart(); };
     document.getElementById('cal-hist-close').addEventListener('click', close);
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
     document.addEventListener('keydown', e => {
@@ -880,10 +1004,36 @@
       html += `<div style="margin-top:8px;color:var(--text3);">No prior actual/forecast history for this event in the last year.</div>`;
     }
 
+    if (last8.length >= 2) {
+      html += `<div class="ch-chart-wrap" id="cal-hist-chart-wrap" style="display:none;">
+        <div class="ch-chart-title">Actual vs. forecast
+          <span class="ch-chart-legend"><span class="ch-chart-swatch" style="background:#2596ff;"></span>Actual</span>
+          <span class="ch-chart-legend"><span class="ch-chart-swatch" style="background:rgba(144,150,160,0.85);border-top:1px dashed rgba(144,150,160,0.85);height:0;"></span>Forecast</span>
+        </div>
+        <div id="cal-hist-chart"></div>
+      </div>`;
+    }
+
     html += `<div class="ch-move" id="cal-hist-move">Loading reference-pair context\u2026</div>`;
 
     bodyEl.innerHTML = html;
     overlay.style.display = 'flex';
+
+    if (last8.length >= 2) {
+      // Monotonic token guards against a slow LWC load resolving after the
+      // user has already closed the modal or opened a different event —
+      // titleEl/textContent comparisons don't work here since the modal's
+      // DOM nodes are reused (singleton overlay), not recreated per open.
+      const openToken = ++_calHistOpenToken;
+      const chartWrap = document.getElementById('cal-hist-chart-wrap');
+      _calEnsureLWC().then(() => {
+        if (openToken !== _calHistOpenToken || overlay.style.display !== 'flex') return;
+        if (chartWrap) chartWrap.style.display = '';
+        _calRenderHistChart(seriesArr);
+      }).catch(() => { if (chartWrap) chartWrap.style.display = 'none'; });
+    } else {
+      _calDestroyHistChart();
+    }
 
     // Reference-pair daily-move context — fetched lazily, only on modal
     // open, and cached per pair for the rest of the session.
