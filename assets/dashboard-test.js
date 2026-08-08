@@ -10097,15 +10097,9 @@ async function buildRichNarrative() {
                 <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}${evHtml}</div>
               </div>`;
             }).join('');
-
-            // Toggle evidence chips on row click (expand/collapse)
-            container.querySelectorAll('.a-has-ev').forEach(row => {
-              row.style.cursor = 'pointer';
-              row.addEventListener('click', () => {
-                const evEl = row.querySelector('.a-evidence');
-                if (evEl) evEl.classList.toggle('a-evidence-open');
-              });
-            });
+            // Evidence chips render inline and always visible (no collapse/expand —
+            // a prior click-to-toggle affordance was removed since it gave the false
+            // impression the chips were hidden by default when they were not).
           }
           if (sub) {
             const now = new Date();

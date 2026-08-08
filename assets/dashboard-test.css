@@ -791,7 +791,10 @@
   .a-badge { color: var(--text3); font-size: 9.5px; font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .a-head { min-width: 0; }
   .a-pair { color: var(--text); font-weight: 600; flex-shrink: 0; }
-  .a-desc { display: block; margin: 4px 0 6px; }
+  /* Body reads brighter than the footer (--text, not --text2) so the desk-note
+     narrative stands out from the scannable Trade bias/Catalyst/Risk stance
+     lines beneath it — matches the reference mockup's tonal hierarchy. */
+  .a-desc { display: block; margin: 4px 0 6px; color: var(--text); }
   .a-foot { border-top: 1px solid var(--border2); padding-top: 6px; margin-top: 2px; font-size: 10.5px; line-height: 1.7; }
   .a-foot-line { color: var(--text2); }
   .a-foot-lbl { color: var(--text3); }
