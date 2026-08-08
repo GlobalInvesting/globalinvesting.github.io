@@ -91,6 +91,41 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
+ * v1.14-TEST (2026-08-08): SANDBOX — Three "medium effort" enhancements from
+ *   Santiago's original Bloomberg/Refinitiv gap-analysis, built on top of the
+ *   v1.13.x currency-filter work (still unshipped to production):
+ *   (1) Live/next-release highlight: the single soonest unreleased
+ *       high-impact event due within the next 3h gets a highlighted row and
+ *       its clock time is swapped for a live countdown (ticks every 20s,
+ *       independent of the 2-min data poll); inside 15m the row switches to
+ *       a stronger pulsing tier. Tooltip on the countdown still shows the
+ *       actual local time. Scoped to `filtered`, so it respects whatever
+ *       currency is isolated.
+ *   (2) ESI contribution badge: a small superscript next to Actual (e.g.
+ *       "+1.2" / "-0.8", up/down colored) showing this event's approximate
+ *       decay+impact-weighted pull on that currency's 90d Economic Surprise
+ *       Index — z-score-normalized when the series has ≥5 history points in
+ *       calendar.json's `surpriseStats`, direction-only otherwise. Explicitly
+ *       NOT a replica of econ-surprises-modal.js's exact idx100 blend (that
+ *       needs the full window's aggregate weights) — a self-contained,
+ *       same-sign, same-shape proxy sized for a single-row badge, with the
+ *       approximation stated plainly in its own tooltip. No new fetch:
+ *       reuses `surpriseStats`, already present in calendar.json, which this
+ *       file already fetches for the history-truncation guard (v1.11).
+ *   (3) Event methodology tooltip: hovering a matched event title (dashed
+ *       underline cue, same visual convention as the ATM IV tooltips
+ *       Santiago referenced) shows what it measures and why FX desks watch
+ *       it. ~25 G10 headline-release patterns; unmatched titles keep the
+ *       plain native tooltip that was already there. Self-contained tooltip
+ *       widget (own #cal-tt id) rather than reusing dashboard.js's
+ *       attachRiskTip, since this sandbox harness doesn't load dashboard.js
+ *       — delegated listeners bound once on #cal-events-body, not per-row,
+ *       so re-renders never re-attach or leak handlers.
+ *   All three verified via the same jsdom + Chromium smoke-test harness used
+ *   for the v1.13.x rounds (docked / narrow-fullscreen / wide-fullscreen-
+ *   split), plus a synthetic near-term high-impact fixture event to exercise
+ *   the live-countdown path (production data rarely has one sitting exactly
+ *   inside the 3h/15m windows at any given moment the harness happens to run).
  * v1.13.3-TEST (2026-08-08): Santiago caught a real misalignment in the
  *   v1.13.2 screenshot — Actual/Forecast/Previous no longer sat directly
  *   above their own data columns. Cause: v1.13.2 appended the button-group
@@ -267,6 +302,311 @@
     if (rel >= 0.20) return 'strong';
     if (rel >= 0.08) return 'moderate';
     return 'mild';
+  }
+
+  // ── [TEST v1.14] Per-event ESI contribution badge ───────────────────────
+  // Santiago already computes a 90d decay-weighted Economic Surprise Index
+  // per currency (econ-surprises-modal.js / dashboard.js renderEconSurprises()).
+  // Neither ForexFactory nor Myfxbook show how much any single release moved
+  // that index — this surfaces a lightweight, badge-sized proxy for that,
+  // right on the row, without exposing the internal aggregation pipeline
+  // (only the resulting number + a plain-language tooltip).
+  //
+  // NOT a replica of the exact idx100 blend formula in econ-surprises-modal.js
+  // (that requires the full 90d window's aggregate weights to normalize
+  // correctly). This is a per-event, self-contained proxy: decay+impact
+  // weight × (z-score if the series has ≥5 history points with std>0, else
+  // a plain ±1 beat/miss direction) — same inputs, same shape, same sign
+  // convention, but not divided by the aggregate window total. Good enough
+  // to answer "did this print help or hurt, and roughly how much" at a
+  // glance; not good enough to sum badges across a day and reproduce the
+  // panel's own ESI number exactly. Documented the same way _surpriseTier's
+  // placeholder thresholds are above.
+  //
+  // Canonical series key + noise filter + decay constant are copied (not
+  // imported — this file has no module system) from _canonEsi/NOISE_KW/
+  // DECAY_LAMBDA in dashboard.js and _ESM_* in econ-surprises-modal.js.
+  // Must stay in sync with those three if the ESI methodology changes.
+  const _CAL_CCY_PFXS = ['united states ', 'euro area ', 'united kingdom ', 'japan ',
+    'australia ', 'canada ', 'switzerland ', 'new zealand ', 'norway ', 'sweden '];
+  function _calCanonEsi(t) {
+    let s = t.replace(/\s*\([^)]*\)/g, '').trim();
+    for (const p of _CAL_CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
+    return s;
+  }
+  const CAL_ESI_NOISE_KW = [
+    'cftc', 'baker hughes', 'rig count', 'auction', 'api weekly',
+    'milk auction', "fed's balance sheet", 'reserve balances',
+    'redbook', 'ibd/tipp', 'tips auction', 'note auction', 'bond auction',
+    'gilt auction', 'jgb auction', 'obligaciones', 'speculative net',
+    'nc net position', 'crude oil inventories', 'crude oil imports',
+    'distillate', 'gasoline inventorie', 'gasoline production',
+    'refinery', 'heating oil', 'natural gas storage',
+    'foreign bonds buying', 'foreign investments in japanese',
+    'foreign bond investment', 'foreign investment in japan',
+    'm2 money', 'm3 money', 'm4 money', 'reserve assets total',
+    'cb leading index', 'atlanta fed gdpnow', 'ny fed', 'cleveland cpi',
+    'ibd', '3-month bill', '4-week bill', '52-week bill',
+    '4-week average', '4-week avg',
+    'tic net', 'net long-term tic', 'total net tic',
+    'interest rate projection', 'eia crude oil', 'eia crude', 'myfxbook',
+  ];
+  const CAL_ESI_DECAY_LAMBDA = Math.LN2 / 45; // half-life 45d, mirrors DECAY_LAMBDA
+
+  // Populated from calendar.json's `surpriseStats` field each fetch (see
+  // fetchEconomicCalendar()) — {n, mean, std} per "CCY/canonical title" key,
+  // computed server-side by fetch_economic_calendar.py. Same field
+  // dashboard.js reads into window._ECON_SURPRISE_STATS. Kept as its own
+  // module var here (not the shared window global) so this file never
+  // depends on dashboard.js having loaded first.
+  let _lastSurpriseStats = {};
+
+  function _escAttr(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // actualN/forecastN/isInverse/beat are passed in already computed by the
+  // caller (buildPanel's Actual-column block computes the exact same values
+  // one line above where this is called — no point recomputing).
+  function esiContribBadge(ev, actualN, forecastN, isInverse, beat, nowMs) {
+    if (isNaN(actualN) || isNaN(forecastN) || actualN === forecastN) return '';
+    const evTitleLower = (ev.title || '').toLowerCase();
+    if (CAL_ESI_NOISE_KW.some(kw => evTitleLower.includes(kw))) return '';
+    if (!['medium', 'high'].includes(ev.impact)) return '';
+
+    const canon    = _calCanonEsi(evTitleLower);
+    const statsKey = `${ev.currency}/${canon}`;
+    const stats    = _lastSurpriseStats[statsKey];
+    const useZ     = stats && stats.n >= 5 && stats.std > 0;
+
+    const rawSurprise = actualN - forecastN;
+    const surprise     = isInverse ? -rawSurprise : rawSurprise;
+
+    const [eh, em] = (ev.timeUTC || '00:00').split(':').map(Number);
+    const evMs = Date.UTC(+ev.dateISO.slice(0,4), +ev.dateISO.slice(5,7)-1, +ev.dateISO.slice(8,10), eh, em);
+    const ageDays    = Math.max(0, (nowMs - evMs) / 86400000);
+    const impactMult = ev.impact === 'high' ? 1.0 : 0.5;
+    const w          = Math.exp(-CAL_ESI_DECAY_LAMBDA * ageDays) * impactMult;
+
+    const contrib = useZ ? ((surprise - stats.mean) / stats.std) * w : (beat ? 1 : -1) * w;
+    const rounded = Math.round(contrib * 10) / 10;
+    if (Math.abs(rounded) < 0.1) return '';
+
+    const sign = rounded > 0 ? '+' : '';
+    const cls  = rounded > 0 ? 'up' : 'down';
+    const methodNote = useZ
+      ? 'normalized against this series\u2019 own historical surprise distribution'
+      : 'direction-only — not enough history yet for this series to normalize';
+    const tip = `Approx. contribution to ${ev.currency}\u2019s 90d Economic Surprise Index ` +
+      `(decay + impact weighted, ${methodNote}). Reference proxy, not the exact panel calculation.`;
+    return ` <sup class="${cls}" style="font-size:7px;cursor:help;" title="${_escAttr(tip)}">${sign}${rounded.toFixed(1)}</sup>`;
+  }
+
+  // ── [TEST v1.14] Live / next-release highlight ───────────────────────────
+  // Bloomberg-style: the single next high-impact event due within a short
+  // forward window gets a highlighted row + a live countdown in place of its
+  // clock time, so the user doesn't have to scan the whole list to see
+  // what's about to print. Only ever one target at a time (the soonest),
+  // scoped to whatever's currently visible (respects the currency filter and
+  // display window) — matches "resalta la fila que está por publicarse en
+  // los próximos minutos" rather than highlighting everything due today.
+  const CAL_LIVE_WINDOW_MS     = 3  * 60 * 60 * 1000; // highlight if due within 3h
+  const CAL_LIVE_IMMINENT_MS   = 15 * 60 * 1000;       // pulsing tier if due within 15m
+
+  function findNextHighImpactEvent(filtered, nowMs) {
+    let best = null;
+    filtered.forEach(ev => {
+      if (ev.impact !== 'high') return;
+      const isReleased = !!(ev.actual && ev.actual !== '' && ev.actual !== '-');
+      if (isReleased) return;
+      const [h, m] = (ev.timeUTC || '23:59').split(':').map(Number);
+      const evMs = Date.UTC(+ev.dateISO.slice(0,4), +ev.dateISO.slice(5,7)-1, +ev.dateISO.slice(8,10), h, m);
+      const delta = evMs - nowMs;
+      if (delta <= 0 || delta > CAL_LIVE_WINDOW_MS) return;
+      if (!best || evMs < best.evMs) best = { ev, evMs };
+    });
+    return best;
+  }
+
+  function fmtCountdown(ms) {
+    if (ms <= 0) return 'now';
+    const totalMin = Math.round(ms / 60000);
+    if (totalMin < 1) return '<1m';
+    if (totalMin < 60) return totalMin + 'm';
+    const h = Math.floor(totalMin / 60), m = totalMin % 60;
+    return h + 'h' + (m ? ' ' + m + 'm' : '');
+  }
+
+  // One-time <style> injection (mirrors dashboard.js's attachRiskTip /
+  // ticker-exact pattern) — pulsing dot + soft row tint, no new stylesheet
+  // file needed for a sandbox-only feature.
+  function ensureLiveStyles() {
+    if (document.getElementById('cal-live-style')) return;
+    const s = document.createElement('style');
+    s.id = 'cal-live-style';
+    s.textContent = `
+      @keyframes calLivePulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+      .cal-event-row.cal-live-soon     { background: rgba(255,167,38,.06); }
+      .cal-event-row.cal-live-soon:hover { background: rgba(255,167,38,.12); }
+      .cal-event-row.cal-live-imminent { background: rgba(239,83,80,.10); }
+      .cal-event-row.cal-live-imminent:hover { background: rgba(239,83,80,.16); }
+      .cal-live-countdown { animation: calLivePulse 1.1s ease-in-out infinite; color: var(--down); }
+    `;
+    document.head.appendChild(s);
+  }
+
+  // Ticks every 20s, independent of the 2-min data poll — just updates the
+  // countdown text of whatever's currently tagged data-live-ms, so the timer
+  // counts down smoothly instead of jumping in 2-min steps.
+  function tickLiveCountdown() {
+    document.querySelectorAll('[data-live-ms]').forEach(el => {
+      const target = Number(el.dataset.liveMs);
+      if (!target) return;
+      el.textContent = fmtCountdown(target - Date.now());
+    });
+  }
+
+  // ── [TEST v1.14] Event methodology tooltips ──────────────────────────────
+  // Same pattern Santiago asked to reuse from the ATM IV tooltips: a clean,
+  // named, plain-language explanation on hover — what the release measures
+  // and why FX desks watch it — with no backend/pipeline attribution (this
+  // is product copy, not sourced from any fetched document, so it carries
+  // no citation obligation). Matched by keyword against the canonical title
+  // (case-insensitive substring, first match wins — same convention as
+  // CAL_INVERSE_KW/CAL_ESI_NOISE_KW above). Not exhaustive — G10 headline
+  // releases only; anything unmatched falls back to the plain event-name
+  // tooltip that was already there.
+  const CAL_METHODOLOGY = [
+    { kw: ['non-farm payrolls', 'nonfarm payrolls', 'employment change'],
+      text: 'Net change in jobs outside farming, private households, and nonprofits. The single most-watched US labor print — a big beat/miss can move every USD pair within seconds of release.' },
+    { kw: ['unemployment rate'],
+      text: 'Share of the labor force that is jobless and actively looking for work. A rising rate is a negative surprise for the currency even though the headline number is numerically larger.' },
+    { kw: ['average hourly earnings', 'wage price index', 'labour cost index', 'labor cost index'],
+      text: 'Wage growth over the period. Central banks watch this as a leading indicator of sticky, demand-driven inflation — hot wage growth tends to firm up rate-hike expectations.' },
+    { kw: ['initial jobless claims', 'continuing jobless claims', 'jobless claims'],
+      text: 'Weekly count of new (or ongoing) unemployment benefit filings. A high-frequency, low-noise read on labor-market health between the monthly jobs reports.' },
+    { kw: ['adp employment'],
+      text: "Private-sector payrolls processor ADP's own employment estimate, released two days ahead of official Non-Farm Payrolls. Treated as an imperfect early read, not a reliable predictor of the NFP print." },
+    { kw: ['cpi', 'consumer price index', 'inflation rate'],
+      text: 'Headline consumer price inflation. Directly feeds central bank rate decisions — a hot print usually firms up hawkish rate expectations and supports the currency, and vice versa.' },
+    { kw: ['core inflation', 'core cpi', 'core pce', 'pce price index'],
+      text: 'Inflation excluding volatile food and energy prices. Central banks weight this more heavily than headline CPI when setting policy, since it better reflects underlying price pressure.' },
+    { kw: ['ppi', 'producer price index'],
+      text: "Prices received by producers at the factory gate. A leading indicator for consumer inflation a month or two out, since producer cost pressure tends to pass through to retail prices." },
+    { kw: ['gdp'],
+      text: 'Gross Domestic Product — the broadest measure of economic output. Quarterly growth (or contraction) versus consensus shapes the market\u2019s view of the whole economic cycle, not just one sector.' },
+    { kw: ['retail sales'],
+      text: 'Change in consumer spending at the retail level. Consumption drives the majority of GDP in most G10 economies, so this is a fast, monthly proxy for overall demand.' },
+    { kw: ['ism manufacturing', 'ism services', 'ism non-manufacturing'],
+      text: 'Institute for Supply Management survey of purchasing managers. Above 50 = sector expanding, below 50 = contracting. One of the earliest-available reads on the current month\u2019s activity.' },
+    { kw: ['manufacturing pmi', 'services pmi', 'composite pmi', 'flash pmi'],
+      text: 'Purchasing Managers\u2019 Index survey. Above 50 = sector expanding, below 50 = contracting — a timely, forward-looking gauge of business activity ahead of harder monthly data.' },
+    { kw: ['interest rate decision', 'rate decision', 'cash rate', 'official cash rate', 'refinancing rate', 'ocr'],
+      text: "Central bank policy rate announcement. Directly sets the currency's carry/funding cost — the decision itself usually matters less than the accompanying guidance on the path ahead." },
+    { kw: ['fomc statement', 'fomc minutes', 'fomc press conference', 'monetary policy statement', 'monetary policy report', 'rate statement'],
+      text: 'Central bank\u2019s own account of its policy discussion and forward guidance. Markets parse the language itself for hints on the future rate path, independent of the rate decision.' },
+    { kw: ['balance of trade', 'trade balance'],
+      text: 'Exports minus imports of goods and services. A signed net level, not a rate — a widening deficit or narrowing surplus can pressure the currency via the current-account channel.' },
+    { kw: ['current account'],
+      text: 'Broadest measure of a country\u2019s transactions with the rest of the world (trade plus income and transfers). Persistent deficits can weigh on a currency\u2019s longer-term valuation.' },
+    { kw: ['industrial production', 'manufacturing production'],
+      text: 'Output of factories, mines, and utilities. A real-activity read that complements survey-based PMI data with actual production volumes.' },
+    { kw: ['durable goods', 'factory orders', 'core durable goods'],
+      text: 'New orders for goods meant to last three years or more (autos, machinery, aircraft). A forward-looking proxy for business investment appetite.' },
+    { kw: ['building permits', 'housing starts'],
+      text: 'New residential construction authorized (permits) or begun (starts). An early-cycle housing indicator that feeds into broader growth and employment expectations.' },
+    { kw: ['existing home sales', 'new home sales', 'pending home sales', 'home sales'],
+      text: 'Volume of homes sold. Tracks the health of the housing market and, by extension, consumer wealth and willingness to spend.' },
+    { kw: ['consumer confidence', 'consumer sentiment', 'michigan'],
+      text: 'Survey of household attitudes toward current and expected economic conditions. A sentiment leading-indicator for future consumer spending.' },
+    { kw: ['zew'],
+      text: 'ZEW Institute survey of financial analysts\u2019 economic expectations for the next six months. A closely watched early-cycle sentiment gauge for the Eurozone/Germany.' },
+    { kw: ['ifo'],
+      text: 'Ifo Institute survey of German businesses on current conditions and expectations. One of the most-watched single-country business-climate indicators in the Eurozone.' },
+    { kw: ['gdt price index', 'global dairy trade'],
+      text: "Global Dairy Trade auction price index. Dairy is one of New Zealand's largest export categories, so this auction result is a direct NZD terms-of-trade signal." },
+    { kw: ['housing price index', 'house price index', 'home price index'],
+      text: 'Change in residential property prices. A wealth-effect and financial-stability indicator that central banks monitor alongside credit growth.' },
+    { kw: ['claimant count'],
+      text: 'UK measure of people claiming unemployment-related benefits. The UK\u2019s closest equivalent to the US jobless-claims series for tracking labor-market momentum between official unemployment reports.' },
+  ];
+  function _calMethodologyFor(title) {
+    const t = (title || '').toLowerCase();
+    for (const entry of CAL_METHODOLOGY) {
+      if (entry.kw.some(k => t.includes(k))) return entry.text;
+    }
+    return '';
+  }
+
+  // Self-contained tooltip (this file has no dependency on dashboard.js
+  // being loaded — the sandbox harness doesn't load it — so a scoped copy
+  // of attachRiskTip's visual pattern lives here under its own #cal-tt id
+  // rather than reusing window.attachRiskTip). Delegated listeners, bound
+  // once on the scroll container, so re-renders never need to re-attach
+  // per-row handlers or leak listeners.
+  function ensureMethodologyTooltip() {
+    if (document.getElementById('cal-tt-style')) return;
+    const s = document.createElement('style');
+    s.id = 'cal-tt-style';
+    s.textContent = `
+      #cal-tt {
+        position:fixed;z-index:99999;width:min(240px, calc(100vw - 24px));
+        background:var(--bg3);border:1px solid var(--border2);border-radius:4px;
+        padding:9px 11px;font-size:11px;color:var(--text);line-height:1.55;
+        pointer-events:none;display:none;font-family:var(--font-ui);box-sizing:border-box;
+      }
+      #cal-tt .tt-title { font-weight:700;font-size:11px;color:#fff;margin-bottom:3px; }
+      .cal-col.cal-title[data-cal-tip] { border-bottom:1px dashed rgba(255,255,255,0.2); cursor:help; }
+    `;
+    document.head.appendChild(s);
+    const ttEl = document.createElement('div');
+    ttEl.id = 'cal-tt';
+    ttEl.innerHTML = '<div class="tt-title" id="cal-tt-title"></div><div id="cal-tt-body"></div>';
+    document.body.appendChild(ttEl);
+    document.addEventListener('mousemove', ev => {
+      const tt = document.getElementById('cal-tt');
+      if (tt && tt.style.display === 'block') _calTTPos(ev.clientX, ev.clientY);
+    });
+  }
+  function _calTTPos(cx, cy) {
+    const tt = document.getElementById('cal-tt');
+    if (!tt) return;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const ttW = Math.min(240, vw - 24);
+    const ttH = tt.offsetHeight || 90;
+    const PAD = 8;
+    let x = cx + 14, y = cy + 14;
+    if (x + ttW > vw - PAD) x = cx - ttW - 8;
+    if (x < PAD) x = PAD;
+    if (y + ttH > vh - PAD) y = cy - ttH - 8;
+    if (y < PAD) y = PAD;
+    tt.style.left = x + 'px'; tt.style.top = y + 'px';
+  }
+  function setupMethodologyTooltipDelegation(container) {
+    if (!container || container.dataset.calTipInit === '1') return;
+    container.dataset.calTipInit = '1';
+    const show = (el, cx, cy) => {
+      const tt = document.getElementById('cal-tt');
+      if (!tt) return;
+      document.getElementById('cal-tt-title').textContent = el.dataset.calTipTitle || '';
+      document.getElementById('cal-tt-body').textContent  = el.dataset.calTipBody  || '';
+      tt.style.display = 'block';
+      requestAnimationFrame(() => _calTTPos(cx, cy));
+    };
+    const hide = () => { const tt = document.getElementById('cal-tt'); if (tt) tt.style.display = 'none'; };
+    container.addEventListener('mouseover', e => {
+      const el = e.target.closest('.cal-col.cal-title[data-cal-tip]');
+      if (el) show(el, e.clientX, e.clientY);
+    });
+    container.addEventListener('mouseout', e => {
+      if (e.target.closest('.cal-col.cal-title[data-cal-tip]')) hide();
+    });
+    container.addEventListener('touchstart', e => {
+      const el = e.target.closest('.cal-col.cal-title[data-cal-tip]');
+      if (el) { e.stopPropagation(); const t = e.touches[0]; show(el, t.clientX, t.clientY); }
+    }, { passive: true });
   }
 
   // ── [TEST v1.13] Revision index ─────────────────────────────────────────
@@ -487,6 +827,8 @@
     const container = document.getElementById('cal-events-body');
     const sourceEl  = document.getElementById('cal-panel-sub');
     if (!container) return;
+    ensureLiveStyles();          // [TEST v1.14]
+    ensureMethodologyTooltip();  // [TEST v1.14]
 
     // Display window: 3 days back through 14 days ahead.
     // ff_calendar.json carries 21 days of history for actuals backfill.
@@ -496,6 +838,7 @@
     // Monday morning and covers overnight JPY/AUD releases that display under
     // the prior local date for users in UTC-ahead timezones.
     const _now       = new Date();
+    const nowMs      = _now.getTime(); // [TEST v1.14] shared by live-highlight + ESI badge weighting
     const _lookback  = new Date(_now); _lookback.setDate(_now.getDate() - 3);
     const _maxAhead  = new Date(_now); _maxAhead.setDate(_now.getDate() + 14);
     const _yISO = _lookback.toISOString().slice(0, 10);
@@ -511,6 +854,10 @@
     // (not `filtered`) so history outside the display window / currency
     // filter still counts as "the last known actual" for detection.
     const revIdx = buildRevisionIndex(events);
+
+    // [TEST v1.14] Next high-impact release due soon — scoped to `filtered`
+    // so it respects whatever currency the user has isolated.
+    const liveTarget = findNextHighImpactEvent(filtered, nowMs);
 
     // Fallback (v3.30): if the pipeline hasn't run for a day or more (e.g. a quiet
     // weekend with no qualifying RSS events), the strict [yesterday, +14d] window can
@@ -606,6 +953,7 @@
           const isInverse = CAL_INVERSE_KW.some(kw => evTitle.includes(kw));
           let cls = '';
           let styleAttr = '';
+          let esiHtml = '';
           if (!isNaN(actualN) && !isNaN(forecastN) && actualN !== forecastN) {
             const beat = isInverse ? actualN < forecastN : actualN > forecastN;
             cls = beat ? ' class="up"' : ' class="down"';
@@ -615,8 +963,11 @@
             const tier = _surpriseTier(actualN, forecastN);
             if (tier === 'moderate') styleAttr = ' style="font-weight:600;"';
             if (tier === 'strong')   styleAttr = ` style="font-weight:700;background:${beat ? 'rgba(38,166,154,.14)' : 'rgba(239,83,80,.14)'};border-radius:2px;padding:0 3px;"`;
+            // [TEST v1.14] ESI contribution badge — reuses actualN/forecastN/
+            // isInverse/beat this block already computed, no recompute.
+            esiHtml = esiContribBadge(ev, actualN, forecastN, isInverse, beat, nowMs);
           }
-          actualHtml = `<span${cls}${styleAttr}>${ev.actual}</span>`;
+          actualHtml = `<span${cls}${styleAttr}>${ev.actual}</span>${esiHtml}`;
         }
 
         // Derived forecast (suffixed "*"): render in muted color with tooltip
@@ -644,11 +995,30 @@
         const localTime = toLocalTime(ev.dateISO, ev.timeUTC);
         const upcomingAttr = (!isPast) ? ' data-upcoming="1"' : '';
 
-        gHtml += `<div class="cal-event-row${dimmed ? ' cal-released' : ''}"${upcomingAttr}>
-  <div class="cal-col cal-time">${localTime}</div>
+        // [TEST v1.14] Live/next-release highlight — at most one row per render.
+        const isLiveTarget = !!(liveTarget && liveTarget.ev === ev);
+        let liveClass = '';
+        let timeCellHtml = localTime;
+        if (isLiveTarget) {
+          const delta = liveTarget.evMs - nowMs;
+          liveClass = delta <= CAL_LIVE_IMMINENT_MS ? ' cal-live-imminent' : ' cal-live-soon';
+          timeCellHtml = `<span class="cal-live-countdown" data-live-ms="${liveTarget.evMs}" ` +
+            `title="${localTime} local \u2014 next high-impact release">${fmtCountdown(delta)}</span>`;
+        }
+
+        // [TEST v1.14] Methodology tooltip — only attached when a known
+        // pattern matches; unmatched titles keep the plain native tooltip
+        // that was already there.
+        const methodText = _calMethodologyFor(ev.title);
+        const titleCellHtml = methodText
+          ? `<div class="cal-col cal-title" data-cal-tip="1" data-cal-tip-title="${_escAttr(ev.title)}" data-cal-tip-body="${_escAttr(methodText)}">${ev.title}</div>`
+          : `<div class="cal-col cal-title" title="${_escAttr(ev.title)}">${ev.title}</div>`;
+
+        gHtml += `<div class="cal-event-row${dimmed ? ' cal-released' : ''}${liveClass}"${upcomingAttr}>
+  <div class="cal-col cal-time">${timeCellHtml}</div>
   <div class="cal-col cal-ccy">${flagHtml}${ev.currency}</div>
   <div class="cal-col cal-impact"><span class="cal-dot" style="background:${dot.color}" title="${dot.label} impact"></span></div>
-  <div class="cal-col cal-title" title="${ev.title}">${ev.title}</div>
+  ${titleCellHtml}
   <div class="cal-col cal-num">${actualHtml}</div>
   <div class="cal-col cal-num">${forecastHtml}</div>
   <div class="cal-col cal-num">${previousHtml}</div>
@@ -833,6 +1203,8 @@
     if (thTime) thTime.textContent = tzLabel();
 
     setupCcyFilterUI(); // [TEST v1.13]
+    setupMethodologyTooltipDelegation(container); // [TEST v1.14] — delegated, no-op after first call
+    tickLiveCountdown(); // [TEST v1.14] — paint the correct value immediately, don't wait for the 20s tick
   }
 
   // ── [TEST v1.13] Currency filter buttons ────────────────────────────────
@@ -908,6 +1280,11 @@
       ]);
       const ffJson  = ffRes?.ok  ? await ffRes.json().catch(() => null)  : null;
       const calJson = calRes?.ok ? await calRes.json().catch(() => null) : null;
+
+      // [TEST v1.14] surpriseStats only exists on calendar.json — keep the
+      // last known copy if this poll's calendar.json fetch fails, rather
+      // than blanking out every ESI badge on a transient network hiccup.
+      if (calJson?.surpriseStats) _lastSurpriseStats = calJson.surpriseStats;
 
       // calendar.json's native schema (fetch_economic_calendar.py) uses `.event`,
       // not `.title` — normalize once here so every downstream consumer (dedup
@@ -1058,6 +1435,11 @@
       closeCalFullscreen();
     }
   });
+
+  // [TEST v1.14] Smooth countdown — independent of the 2-min data poll, so
+  // the live-target timer counts down every 20s instead of jumping in 2-min
+  // steps. Cheap no-op when nothing is tagged data-live-ms.
+  setInterval(tickLiveCountdown, 20 * 1000);
 
   // Refresh every 5 minutes so actuals appear shortly after each release
   setInterval(fetchEconomicCalendar, 2 * 60 * 1000);
