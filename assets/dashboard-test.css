@@ -785,16 +785,17 @@
      other .alert-row, separated only by the row's own border-bottom.
      "Regime: X" badge is the parsed Rule 10 Setup Name, never a separate
      frontend taxonomy.
-     Severity indicator: after trying an underline under the pair name and the
-     original .a-time + .a-dot column, back to a tinted badge — high/med/low
-     (risk-desk vocabulary, smaller/quieter than the earlier attempt), tint =
-     14% alpha of the severity hex, label text = the solid severity hex. */
+     Severity indicator: after trying high/med/low text, the original
+     .a-time + .a-dot column, and an underline under the pair name, now a
+     single-digit tinted badge (1/2/3, no "P" prefix) — most compact so far,
+     purely numeric so it reads as a tier, not a verdict. Tint = 14% alpha
+     of the severity hex, label text = the solid severity hex. */
   .a-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .a-badge { color: var(--text3); font-size: 9.5px; font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .a-head { min-width: 0; }
   .a-name { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .a-pair { color: var(--text); font-weight: 600; }
-  .a-sev { font-size: 7.5px; font-weight: 600; font-family: var(--font-mono); padding: 2px 5px; border-radius: 2px; }
+  .a-sev { font-size: 8.5px; font-weight: 700; font-family: var(--font-mono); padding: 2px 6px; border-radius: 2px; }
   .a-sev-crit { background: rgba(239,83,80,.14); color: var(--down); }
   .a-sev-warn { background: rgba(246,148,28,.14); color: var(--orange); }
   .a-sev-info { background: rgba(79,127,255,.14); color: var(--accent); }
