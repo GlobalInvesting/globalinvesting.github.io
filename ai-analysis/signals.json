@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-08-07T23:02:43Z",
+  "generated_at": "2026-08-08T20:31:22Z",
   "signals": [
     {
-      "time": "22:18",
+      "time": "20:53",
       "priority": "critical",
-      "title": "CHF/JPY — G10 Bilateral Theme + JPY Momentum Outperformance",
-      "text": "JPY's 1W average performance of +1.252% (n=7) against CHF's -0.735% (n=6) creates a 1.987% G10 leader-laggard spread, driving CHF/JPY downside into the open. The JPY strength is reinforced by a positive ESI of +16.1 and a significant USD/JPY put skew (RR -2.20), while CHF remains the G10 laggard despite its mildly accommodative real rate of -0.45%. The next BoJ meeting (mkt: 100% hold priced) is the catalyst for confirming whether this JPY momentum can overcome the 266bp US-JPY OIS carry disadvantage.",
+      "title": "USD/JPY — Hormuz Escalation + Bull Steepener",
+      "text": "Geopolitical tension in the Strait of Hormuz and a US bull steepener regime (+41bp 2s10s) drive JPY safe-haven demand toward the 157.00 level. JPY COT net short -63.6k creates short-squeeze risk (USD/JPY downside if shorts cover) as USD/JPY trades below its SMA200 (158.07) amid a -2.20 risk reversal downside skew. The next BoJ meeting (mkt: 100% hold priced) is the catalyst for confirming whether domestic data outperformance (ESI +16.1) justifies a hawkish shift.",
+      "evidence": [
+        "JPY COT net short -63.6k",
+        "USD/JPY RR: -2.20 (strong put skew)",
+        "Bull Steepener: 2s10s spread +41.0bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "19:50",
+      "priority": "critical",
+      "title": "CHF/JPY — G10 Bilateral Theme + Safe Haven Divergence",
+      "text": "JPY outperformance (+1.252%) vs CHF weakness (-0.704%) creates a 1.956% G10 spread that targets JPY strength in the cross. JPY is capturing safe-haven flows from the Hormuz shipping crisis while CHF lags with a -11.6 ESI and a mildly accommodative real rate of -0.45%. The next BoJ meeting (mkt: 100% hold priced) on 18 Sep determines if this bilateral momentum persists against the JPY carry disadvantage.",
       "evidence": [
         "JPY 1W avg: +1.252% (n=7)",
-        "CHF 1W avg: -0.735% (n=6)",
-        "G10 spread: 1.987%"
+        "CHF 1W avg: -0.704% (n=6)",
+        "G10 spread: 1.956%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:10",
-      "priority": "critical",
-      "title": "USD/CAD — NFP Shock + Bull Steepener Regime",
-      "text": "The USD/CAD Friday close of 1.3936 faces downside pressure toward the SMA200 (1.3852) after a negative US payrolls shock (-23K) triggered a bull steepener regime (+48bp 2s10s spread). Crowded CAD shorts (lev_net -102.3k) face significant squeeze risk as US Treasury yields collapse and the US ESI falls to -6.7. The next BoC meeting (mkt: 100% hold priced) on 9 Sep determines if the +133bp OIS carry advantage for USD can hold against this positioning unwind.",
-      "evidence": [
-        "CAD COT net short -102,309",
-        "US NFP -23K vs +80K expected",
-        "US 2Y yield 1D change: -0.59%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "19:34",
+      "time": "20:53",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Positioning Risk",
-      "text": "AUD COT LF net long +37,990 (72% long) creates a crowded-long unwind risk despite the Friday close at 0.7071 above all major SMAs. RBA holds at 4.35%. The next RBA meeting (mkt: 100% hold priced) on 11 Aug is the catalyst for resolving this positioning tension.",
+      "title": "AUD/USD — Crowded Long Unwind Risk",
+      "text": "AUD COT LF long +37.9k (72.1% long) creates a crowded-long unwind risk despite the pair closing at 0.7071 above all major SMAs. While the +70bp OIS carry advantage favors AUD, a negative ESI of -11.1 and the RBA's hold bias limit further upside potential. The next RBA meeting (mkt: 100% hold priced) on 11 Aug is the catalyst for resolving the tension between bullish positioning and deteriorating data surprises.",
       "evidence": [
-        "AUD COT net long +37,990",
-        "AUD ESI: -11.1",
-        "AUD/USD IV 9.0% vs HV30 6.1% (VRP +2.9%)"
+        "AUD COT long +37.9k (72.1% long)",
+        "AUD ESI: -11.1 (moderate negative bias)",
+        "AONIA vs SOFR: -70bp carry favor AUD"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "22:58",
+      "time": "12:07",
       "priority": "warning",
-      "title": "USD/NOK — Retail Sentiment Extreme + ESI Divergence",
-      "text": "USD/NOK 100% retail long positioning signals an extreme contrarian reversal risk toward the Friday close of 9.497. The Norges Bank (4.25%) maintains a restrictive real rate of +1.51%, creating a hawkish divergence against the Fed's easing bias following the NFP miss. The next NOK meeting on 13 Aug is the catalyst for determining if the pair can sustain its position below the SMA200 (9.706).",
+      "title": "EUR/USD — ECB Hike Bias vs Negative COT Sentiment",
+      "text": "EUR/USD closed at 1.1562 with an ECB hike bias providing support, yet a heavy EUR COT net short of -73.0k (34% long) keeps the pair capped below the SMA200 of 1.1633. The SOFR/ESTR +146bp carry advantage for USD remains a persistent headwind for sustained EUR recovery despite recent soft US payrolls. The next ECB meeting (mkt: 53% hike priced) on 10 Sep determines if the hawkish bias can force a COT short-covering rally.",
       "evidence": [
-        "Retail Sentiment: 100% Long",
-        "NOK Real Rate: +1.51%",
-        "USD ESI: -6.7"
+        "EUR COT net short -73.0k",
+        "OIS Carry: +146bp favors USD",
+        "EUR/USD SMA200: 1.1633"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "19:33",
+      "time": "20:53",
       "priority": "info",
-      "title": "EUR/USD — ECB Hike Bias vs Negative COT Skew",
-      "text": "EUR/USD closed Friday at 1.1562 with an ECB hike bias providing support, yet the lev_net short -73,049 (66% short) indicates a massive specimen short-squeeze setup is active. The +146bp OIS carry advantage for USD is narrowing as US inflation expectations (2.19%) are tested by the recent payrolls miss. The next ECB meeting (mkt: 53% hike priced) on 10 Sep determines if the positive EUR ESI (+7.2) can force an unwind of these speculative shorts.",
+      "title": "NZD/USD — ESI Outperformance vs Positioning Extremes",
+      "text": "NZD's G10-leading ESI of +24.4 signals sustained data outperformance that contradicts the extreme net short COT positioning of -30.7k (only 9.7% long). RBNZ holds at 2.5%. The next RBNZ meeting (mkt: 100% hike priced) on 2 Sep is the catalyst for validating this fundamental divergence.",
       "evidence": [
-        "EUR COT net short -73,049",
-        "EUR/USD IV 7.1% vs HV30 4.3%",
-        "EUR ESI: +7.2"
+        "NZD ESI: +24.4 (strong positive)",
+        "NZD COT net short -30.7k (9.7% long)",
+        "NZD/USD 1M: +3.40%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
