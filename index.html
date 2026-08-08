@@ -1027,15 +1027,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
            row wraps onto a second line instead. #cal-toolbar and #cal-ccy-filter
            are relocated together into #cal-panel-head-actions in wide-fullscreen
            split-column mode — see calendar-panel.js. -->
-      <div id="cal-filter-row" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);">
-        <span id="cal-toolbar" style="display:flex;align-items:center;gap:6px;padding-right:8px;margin-right:2px;border-right:1px solid var(--border2);">
+      <!-- v1.19.1: currency filter on the left, week-nav+impact toolbar on
+           the right, no border divider — #cal-filter-row uses
+           justify-content:space-between so the gap lands in the middle.
+           JS (buildPanel()) keeps this order and the no-divider styling in
+           sync on every render / relocation into #cal-panel-head-actions. -->
+      <div id="cal-filter-row" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);">
+        <span id="cal-ccy-filter" style="display:flex;align-items:center;gap:2px;" role="group" aria-label="Currency filter"></span>
+        <span id="cal-toolbar" style="display:flex;align-items:center;gap:6px;">
           <span id="cal-week-nav" style="display:flex;align-items:center;gap:3px;" role="group" aria-label="Week navigation"></span>
           <span id="cal-impact-filter" style="display:flex;align-items:center;gap:3px;" role="group" aria-label="Impact filter"></span>
         </span>
-        <!-- Currency filter — populated by setupCcyFilterUI(). Only a single
-             divider (border-right on #cal-toolbar, above) separates the two
-             control groups. -->
-        <span id="cal-ccy-filter" style="display:flex;align-items:center;gap:2px;" role="group" aria-label="Currency filter"></span>
       </div>
       <!-- Column headers -->
       <div id="cal-static-col-header" style="display:grid;grid-template-columns:52px 52px 18px 1fr 58px 58px 58px;padding:2px 8px;border-bottom:1px solid var(--border);background:var(--head-bg);flex-shrink:0;">
@@ -1926,7 +1928,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
 
-<script src="assets/calendar-panel.js?v=1.19.0" defer></script>
+<script src="assets/calendar-panel.js?v=1.19.1" defer></script>
 <script src="assets/econ-matrix.js?v=1.0.5" defer></script>
   <!-- Fullscreen chart overlay — chart panel DOM is moved here on open, restored on close -->
   <div id="lw-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen chart">
