@@ -1749,7 +1749,7 @@ function renderSentiment(pairs, sourceLabel, general) {
 
   // ── Compact table header ──
   container.innerHTML = `
-    <div style="display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px 3px;background:var(--head-bg);border-bottom:1px solid var(--border2);position:sticky;top:0;z-index:1;">
+    <div style="display:grid;grid-template-columns:58px 1fr 38px 38px 12px 52px;align-items:center;gap:0;padding:3px 8px 3px;background:var(--head-bg);border-bottom:1px solid var(--border2);position:sticky;top:0;z-index:5;">
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);">Pair</span>
       <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);">Long / Short</span>
       <span style="font-size:9px;color:var(--up);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-ui);text-align:right;">L%</span>
@@ -1830,7 +1830,19 @@ function renderSentiment(pairs, sourceLabel, general) {
     let tickEl = null;
     if (tickPct !== null) {
       tickEl = document.createElement('div');
-      tickEl.style.cssText = `position:absolute;top:-3px;width:2px;height:12px;background:#fff;opacity:.9;border-radius:1px;left:${tickPct}%;transform:translateX(-1px);z-index:2;cursor:help;`;
+      // No z-index here (was z-index:2) — this element's 12px height with
+      // top:-3px on a 6px bar (overflow:visible) deliberately pokes 3px
+      // above its own row's bar as a "current price" wick. That's fine in
+      // isolation, but z-index:2 put it above the sticky header's z-index:1
+      // in the stacking order, so as a row scrolled to sit just beneath the
+      // sticky header, its tick's overflow rendered ON TOP of the header's
+      // solid background instead of being covered by it — a stray white
+      // line floating above the table. DOM append order already places
+      // this element after the two colored fill divs in the same barDiv,
+      // which is enough to paint it above them without an explicit
+      // z-index; removing it lets the sticky header's z-index (bumped
+      // below) win as intended.
+      tickEl.style.cssText = `position:absolute;top:-3px;width:2px;height:12px;background:#fff;opacity:.9;border-radius:1px;left:${tickPct}%;transform:translateX(-1px);cursor:help;`;
       barDiv.appendChild(tickEl);
     }
 
