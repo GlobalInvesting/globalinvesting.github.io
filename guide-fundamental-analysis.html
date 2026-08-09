@@ -596,6 +596,15 @@ a { color: inherit; text-decoration: none; }
           </tr>
         </tbody>
       </table>
+      <h3 id="alerts-signals" style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:28px 0 14px;scroll-margin-top:52px;">Alerts &amp; Market Signals: the Synthesis, Automated Per Pair</h3>
+      <p>The web terminal's Alerts &amp; Market Signals panel packages this same cross-checking process into a per-pair, AI-generated read, refreshed four times daily (00:00, 06:30, 14:30, 20:00 UTC, plus a Friday 22:30 UTC refresh once the week's COT report lands). Each card states a setup label, a body paragraph tying the relevant pillars together, and closes with a mandatory three-line footer — <strong style="color:var(--text);">Trade bias / Catalyst / Risk</strong> — matching the structure of an institutional desk note rather than a plain narrative summary.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-alerts-signals.png" alt="Alerts & Market Signals panel showing three AI-generated cards — USD/JPY JPY Short-Squeeze Setup, CHF/JPY Geopolitical Risk Premium, AUD/USD Crowded Long — each with a regime badge, body paragraph, and Trade bias/Catalyst/Risk footer" width="729" height="477" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>Live signals, showing a conflicting-pillar resolution.</strong> The USD/JPY card above is a concrete instance of the "Data surprise vs. risk regime conflict" row in the table: JPY strength is framed as a geopolitical risk premium rather than a safe-haven bid, since VIX at 14.9 sits below the threshold where broad safe-haven flows typically apply — carry-first framing governs the read instead.</p>
+      </div>
+      <p>The Risk clause in each footer is the automated version of the "what would invalidate this" check an institutional desk applies before sizing a position — e.g. the CHF/JPY card's risk condition above ("Hormuz tensions de-escalate, removing the geopolitical risk premium") states the specific scenario that would flip the setup, not just a restatement of it. These signals describe market conditions; they are never an instruction to take a specific action. Full panel mechanics — priority dots, browser notifications, and the shorter weekend pre-open format — are covered in the <a href="guide-dashboard.html#alerts">Alerts &amp; Market Signals section of the Dashboard guide</a>.</p>
       <h3 id="ea-composite" style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:28px 0 14px;scroll-margin-top:52px;">The EA's Composite Score</h3>
       <p>The MT5 Expert Advisor packages this same cross-checking process into a single number, rather than requiring a manual review of each pillar in turn. Its Composite Score panel blends CB bias, COT positioning, carry, and the Economic Surprise Index — all four pillars covered above — together with two additional factors not discussed in this guide, price momentum and retail sentiment, into one per-currency reading on a &plusmn;10 scale.</p>
       <div class="scr-hero-wrap">
@@ -639,6 +648,7 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--text);">Economic Surprise Index</strong> — decay-weighted beat/miss scoring across all G10 currencies.</li>
         <li><strong style="color:var(--text);">Cross-Asset Risk Monitor</strong> — current risk-on/risk-off regime classification and its implication for carry.</li>
         <li><strong style="color:var(--text);">AI Market Narrative</strong> — a synthesis of the four panels above, refreshed at each major session transition, so the current read is stated in plain language rather than requiring the reader to cross-reference every panel manually.</li>
+        <li><strong style="color:var(--text);">Alerts &amp; Market Signals panel</strong> — the same four-pillar synthesis applied per pair rather than market-wide, generated as a structured card with a Trade bias/Catalyst/Risk footer; see <a href="#synthesis">Reading the Signals Together</a> above for how to interpret conflicting pillars.</li>
       </ul>
       <p>The same data is available in the browser-based web terminal and natively inside MetaTrader 5 through the companion Expert Advisor — see the <a href="guide-mt5-ea.html">MetaTrader 5 EA guide</a> for the native MT5 panel layout.</p>
     </div>
