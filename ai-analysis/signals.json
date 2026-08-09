@@ -1,64 +1,63 @@
 {
-  "_note": "MANUAL PREVIEW — not a live Gemini/Groq run. Source: ai-analysis/signals.json generated_at 2026-08-08T20:53:22Z, reformatted by hand a second time to show how SIGNALS_SYSTEM v8.117.0 (Rule 3 CONFIRMED-INTERVENTION FRAMING + Rule 10 causal-driver check before 'Momentum Leader'/'Safe-Haven Leader') would restructure the prior v8.115.0 preview. Two changes vs. the previous preview: (1) 'CHF/JPY — Safe-Haven Leader' renamed to 'CHF/JPY — Geopolitical Risk Premium' and its body reframed — VIX sits at 14.9 (risk-on), which invalidates safe-haven framing under Rule 3's regime-conditional test even before v8.117.0; the driver is TIER-1 GEOPOLITICAL (Strait of Hormuz headlines), not a flight to safety, so Rule 10's causal-driver check now names that specifically instead of defaulting to the generic label. (2) 'USD/JPY — JPY Short-Squeeze Setup' body reframed the same way — 'safe-haven demand' language replaced with the carry-first + geopolitical-risk-premium framing Rule 3 requires in a risk-on regime. Note: this cycle's underlying news-data/news.json DOES contain confirmed-intervention headlines further down the feed ('ECB kept out of loop on historic US-Japan yen intervention', 'BofA cuts year end dollar/yen forecast to 149 after intervention') — but build_context()'s high_impact[:8] window is filled by higher-ranked Hormuz/NFP items this cycle, so those don't reach the model and Rule 3's new CONFIRMED-INTERVENTION branch isn't triggered here. Its worked example lives in SIGNALS_SYSTEM Rule 3 itself. Exact wording from a real Gemini run will differ.",
-  "generated_at": "2026-08-08T20:53:22Z",
+  "generated_at": "2026-08-09T20:33:47Z",
   "signals": [
     {
-      "time": "20:53",
+      "time": "21:00",
       "priority": "critical",
-      "title": "USD/JPY — JPY Short-Squeeze Setup",
-      "text": "USD/JPY trades below its SMA200 (158.07) near 157.00, with Strait of Hormuz shipping-risk headlines layering a geopolitical risk premium onto the pair rather than driving a safe-haven bid — VIX at 14.9 is a risk-on print, below the threshold where safe-haven flows apply, so carry-first framing governs. A US bull steepener regime (+41bp 2s10s) and JPY COT net short -63.6k set up a squeeze read: the pair is pricing geopolitical risk on top of an already-crowded short, not a flight to JPY safety. Domestic data outperformance (ESI +16.1) reinforces the case for JPY strength even without a risk-off catalyst. Trade bias: Bearish USD/JPY; JPY short-squeeze risk builds below SMA200 on crowded positioning, not safe-haven flow. Catalyst: BoJ meeting — 100% hold priced. Risk: Hormuz tensions de-escalate, removing the geopolitical risk premium and unwinding the JPY short squeeze.",
+      "title": "CHF/JPY — G10 Bilateral Theme + Yield Disadvantage",
+      "text": "CHF/JPY downside pressure intensifies as JPY leads G10 performance (+1.218%) while CHF lags (-0.687%), creating a significant 1.904% bilateral spread. JPY's outperformance is supported by a positive ESI (+17.8) and sustained bull-steepening in the US yield curve, which historically favors JPY as a funding currency unwind destination. The next BoJ meeting (mkt: 100% hold priced) remains the catalyst for resolving the yield gap against the current JPY momentum.",
       "evidence": [
-        "JPY COT net short -63.6k",
-        "USD/JPY RR: -2.20 (strong put skew)",
-        "VIX: 14.9 (risk-on print — below the safe-haven threshold)"
+        "JPY 1W avg: +1.218% (n=7)",
+        "CHF 1W avg: -0.687% (n=6)",
+        "G10 spread: 1.904%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "19:50",
-      "priority": "critical",
-      "title": "CHF/JPY — Geopolitical Risk Premium",
-      "text": "JPY outperformance (+1.252%) vs CHF weakness (-0.704%) creates a 1.956% G10 spread favoring the cross lower. The driver is Strait of Hormuz shipping-risk headlines layering a geopolitical risk premium onto JPY, not safe-haven demand — VIX sits at 14.9, a risk-on print, well below levels historically associated with broad safe-haven flows. CHF lags on its own weaker footing, with a -11.6 ESI and a mildly accommodative real rate of -0.45% offering no competing bid. Trade bias: Bearish CHF/JPY; JPY geopolitical risk premium outweighs a data-soft CHF. Catalyst: BoJ meeting 18 Sep — 100% hold priced. Risk: Hormuz tensions de-escalate and the risk premium unwinds, closing the G10 spread.",
-      "evidence": [
-        "JPY 1W avg: +1.252% (n=7)",
-        "CHF 1W avg: -0.704% (n=6)",
-        "VIX: 14.9 (risk-on print — below the safe-haven threshold)"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "20:53",
+      "time": "21:00",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long",
-      "text": "AUD COT LF long +37.9k (72.1% long) creates crowded-long unwind risk despite the pair closing at 0.7071 above all major SMAs. The +70bp OIS carry advantage favors AUD, but a negative ESI of -11.1 and the RBA's hold bias limit further upside. Trade bias: Long AUD/USD; crowded positioning and softening data cap near-term upside. Catalyst: RBA meeting 11 Aug — 100% hold priced. Risk: crowded long unwinds on a soft domestic print, testing support at the SMA cluster below spot.",
+      "title": "AUD/USD — Crowded Long Unwind Risk",
+      "text": "AUD COT LF long +37.9k (72.1% long) creates significant downside risk if the pair fails to hold above the SMA200 at 0.6925 following China's cooling July CPI data. While AUD benefits from a -70bp OIS carry advantage over the USD, a negative ESI (-11.1) suggests domestic data is underperforming expectations. The next RBA meeting (mkt: 100% hold priced) on 11 Aug is the catalyst for confirming if the current hold bias can withstand softening Chinese demand.",
       "evidence": [
-        "AUD COT long +37.9k (72.1% long)",
-        "AUD ESI: -11.1 (moderate negative bias)",
-        "AONIA vs SOFR: -70bp carry favor AUD"
+        "AUD COT LF long +37.9k (72.1% long)",
+        "AUD/USD OIS carry: -70bp",
+        "AUD ESI: -11.1"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "12:07",
+      "time": "21:00",
       "priority": "warning",
-      "title": "EUR/USD — COT vs ECB Divergence",
-      "text": "EUR/USD closed at 1.1562 with an ECB hike bias providing support, yet a heavy EUR COT net short of -73.0k (34% long) keeps the pair capped below the SMA200 of 1.1633. The SOFR/ESTR +146bp carry advantage for USD remains a persistent headwind for sustained EUR recovery despite recent soft US payrolls. Trade bias: Long EUR/USD; crowded spec short vulnerable to an ECB hawkish confirmation. Catalyst: ECB meeting 10 Sep — hike 53% priced. Risk: ECB holds and reaffirms the current stance, removing the squeeze setup and validating the existing EUR short.",
+      "title": "USD/JPY — Put Skew + Squeeze Risk",
+      "text": "USD/JPY closed Friday at 157.82 with a JPY COT short of -63.6k reinforcing a potential short-squeeze risk as the pair trades below its SMA20, SMA50, and SMA200. Options markets show a strong put skew (RR -2.20), indicating elevated hedging demand for JPY strength despite the +267bp OIS carry advantage favoring the USD. The BoJ Summary of Opinions on Monday is the catalyst for gauging the sustainability of JPY's recent recovery.",
       "evidence": [
-        "EUR COT net short -73.0k",
-        "OIS Carry: +146bp favors USD",
-        "EUR/USD SMA200: 1.1633"
+        "JPY COT net short -63,633",
+        "USD/JPY 25d RR: -2.20",
+        "USD/JPY price below SMA20/50/200"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:53",
+      "time": "21:00",
       "priority": "info",
-      "title": "NZD/USD — COT vs OIS Divergence",
-      "text": "NZD's G10-leading ESI of +24.4 signals sustained data outperformance that contradicts the extreme net short COT positioning of -30.7k (only 9.7% long). RBNZ holds at 2.5%, with the market now pricing a hike at the next meeting. Trade bias: Long NZD/USD; crowded spec short vulnerable to a hawkish RBNZ confirmation. Catalyst: RBNZ meeting 2 Sep — hike 100% priced. Risk: ESI outperformance fades, validating the existing crowded short instead of forcing a squeeze.",
+      "title": "EUR/USD — Crowded Short Short-Squeeze",
+      "text": "EUR/USD upside momentum toward 1.1633 (SMA200) is supported by a crowded EUR COT short position of -73.0k (only 34% long). The market is pricing a restrictive ECB (real rate +0.13%) against a softening US labor outlook following the weak NFP report, though the +146bp OIS carry advantage still favors the USD. The next ECB meeting (mkt: 53% hike priced) on 10 Sep is the catalyst for confirming the hike bias that supports recent Euro gains.",
       "evidence": [
-        "NZD ESI: +24.4 (strong positive)",
-        "NZD COT net short -30.7k (9.7% long)",
-        "NZD/USD 1M: +3.40%"
+        "EUR COT net short -73,049",
+        "EUR real rate: +0.13%",
+        "EUR/USD OIS carry: +146bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "21:00",
+      "priority": "info",
+      "title": "NZD/USD — ESI Divergence Setup",
+      "text": "NZD/USD shows a divergence between the extreme NZD COT net short of -30.7k (9.7% long) and a leading G10 ESI of +24.4. This creates significant short-squeeze potential toward the 0.6000 level as sustained data beats conflict with pessimistic speculator positioning. The RBNZ hike bias and accommodative real rate of -1.56% will be tested at the next RBNZ meeting (mkt: 100% hike priced) on 2 Sep.",
+      "evidence": [
+        "NZD COT net short -30,785 (9.7% long)",
+        "NZD ESI: +24.4",
+        "NZD real rate: -1.56%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
