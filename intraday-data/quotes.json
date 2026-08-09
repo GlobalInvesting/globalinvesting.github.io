@@ -1,7 +1,23 @@
 {
-  "updated": "2026-08-09T08:30:27Z",
+  "updated": "2026-08-09T08:35:27Z",
   "source": "mixed",
   "quotes": {
+    "vix": {
+      "close": 14.9,
+      "prev_close": 15.15,
+      "chg": -0.25,
+      "pct": -1.6502,
+      "high": 15.36,
+      "low": 14.77,
+      "open": 15.3,
+      "bid": null,
+      "ask": null,
+      "market_state": "CLOSED",
+      "market_time": 1786133701,
+      "source": "yfinance",
+      "pct1w": -6.8168,
+      "pct1w_date": "2026-07-31"
+    },
     "spx": {
       "close": 7757.64,
       "prev_close": 7709.96,
@@ -19,10 +35,10 @@
       "pct1w_date": "2026-07-31"
     },
     "gold": {
-      "close": 4342.2324,
+      "close": 4342.3182,
       "prev_close": 4342.2367,
-      "chg": -0.0043,
-      "pct": -0.0001,
+      "chg": 0.0815,
+      "pct": 0.0019,
       "source": "twelve_data",
       "high": 4432.3,
       "low": 4288.0,
@@ -183,35 +199,35 @@
       "pct1w": null
     },
     "btc": {
-      "close": 64837.82,
+      "close": 64841.44,
       "prev_close": 64908.484,
-      "chg": -70.664,
-      "pct": -0.1089,
-      "high": 65713.91,
-      "low": 64182.797,
+      "chg": -67.044,
+      "pct": -0.1033,
+      "high": 64951.035,
+      "low": 64703.703,
       "open": 64908.484,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1786264229,
+      "market_time": 1786264521,
       "source": "yfinance",
-      "pct1w": 3.2223,
+      "pct1w": 3.2281,
       "pct1w_date": "2026-07-31"
     },
     "eth": {
-      "close": 1920.0,
+      "close": 1919.87,
       "prev_close": 1915.4414,
-      "chg": 4.5586,
-      "pct": 0.238,
+      "chg": 4.4286,
+      "pct": 0.2312,
       "high": 1907.2332,
       "low": 1858.5846,
       "open": 1915.4414,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1786264226,
+      "market_time": 1786264522,
       "source": "yfinance",
-      "pct1w": 3.2066,
+      "pct1w": 3.1996,
       "pct1w_date": "2026-07-31"
     },
     "nasdaq": {
@@ -940,7 +956,7 @@
       "chg": 1.06,
       "pct": 1.285,
       "high": 84.39,
-      "low": 81.51,
+      "low": 81.5,
       "open": 83.33,
       "bid": 80.61,
       "ask": 85.0,
@@ -997,15 +1013,6 @@
       "source": "yfinance",
       "pct1w": 2.9568,
       "pct1w_date": "2026-07-31"
-    },
-    "vix": {
-      "close": 15.15,
-      "prev_close": 15.15,
-      "chg": 0,
-      "pct": 0,
-      "source": "repo",
-      "stale": true,
-      "sourceDate": "2026-08-06"
     }
   },
   "hv30": {
