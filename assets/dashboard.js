@@ -3383,16 +3383,29 @@ function _lwBuildTodayBar(ohlcId) {
                 silver:2,brent:2,dax:2,ftse:2,hsi:2,dji:2,hyoas:0,igoas:0 }[ohlcId] ?? 5;
   const c = parseFloat(q.close.toFixed(dec));
   // Candle open convention:
-  //   FX pairs  → prev_close (open = last bar's close, consistent with Yahoo daily FX data
-  //               convention; ensures candle color always matches the pct sign)
+  //   FX pairs  → prev_bar.close (open = the previous session's REAL close, self-computed
+  //               every 5 min from 1H bars over the exact 21:00 UTC boundary — see
+  //               fetch_fx_prev_session in fetch_intraday_quotes.py). Falls back to Yahoo's
+  //               regularMarketPreviousClose (q.prev_close) only if prev_bar is missing.
   //   Non-FX    → regularMarketOpen (exchanges have a real session open; use it so the
   //               candle body reflects intraday movement, as TradingView does for BTC/SPX)
   let o;
   if (isFxBar) {
-    // FX: anchor candle body to prev_close so green/red == pct direction
-    o = q.prev_close != null && q.prev_close > 0
-      ? parseFloat(q.prev_close.toFixed(dec))
-      : (q.open != null && q.open > 0 ? parseFloat(q.open.toFixed(dec)) : c);
+    // FX: anchor candle body to the last COMPLETED session's close so green/red == pct
+    // direction. v8.117.16 fix: previously anchored to q.prev_close (Yahoo's
+    // regularMarketPreviousClose), which can lag for hours after each 21:00 UTC session
+    // rollover before Yahoo's own pipeline catches up — producing an oversized/wrong
+    // body on the freshly-opened bar that self-corrected only once Yahoo's field updated
+    // ("goes away a few hours later"). q.prev_bar.close is already computed independently
+    // every 5-min cycle via direct 1H-bar aggregation over our own 21:00 UTC boundary
+    // (fetch_fx_prev_session — previously wired into quotes.json only for gap-window
+    // historical-bar injection, never used to anchor the LIVE today-bar). It is correct
+    // from the instant the new session opens, with no lag window.
+    o = q.prev_bar && q.prev_bar.close != null && q.prev_bar.close > 0
+      ? parseFloat(q.prev_bar.close.toFixed(dec))
+      : (q.prev_close != null && q.prev_close > 0
+          ? parseFloat(q.prev_close.toFixed(dec))
+          : (q.open != null && q.open > 0 ? parseFloat(q.open.toFixed(dec)) : c));
   } else {
     // Non-FX: use the real session open (regularMarketOpen)
     o = q.open != null && q.open > 0
