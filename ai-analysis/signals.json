@@ -10,7 +10,7 @@
       "evidence": [
         "JPY COT net short -63.6k",
         "USD/JPY RR: -2.20 (strong put skew)",
-        "VIX: 14.9 (risk-on — rules out safe-haven framing, Rule 3)"
+        "VIX: 14.9 (risk-on print — below the safe-haven threshold)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
@@ -18,11 +18,11 @@
       "time": "19:50",
       "priority": "critical",
       "title": "CHF/JPY — Geopolitical Risk Premium",
-      "text": "JPY outperformance (+1.252%) vs CHF weakness (-0.704%) creates a 1.956% G10 spread favoring the cross lower. The driver is Strait of Hormuz shipping-risk headlines layering a geopolitical risk premium onto JPY, not safe-haven demand — VIX sits at 14.9, a risk-on print that rules out safe-haven framing under SIGNALS_SYSTEM Rule 3's regime-conditional test (safe-haven requires VIX > 25). CHF lags on its own weaker footing, with a -11.6 ESI and a mildly accommodative real rate of -0.45% offering no competing bid. Trade bias: Bearish CHF/JPY; JPY geopolitical risk premium outweighs a data-soft CHF. Catalyst: BoJ meeting 18 Sep — 100% hold priced. Risk: Hormuz tensions de-escalate and the risk premium unwinds, closing the G10 spread.",
+      "text": "JPY outperformance (+1.252%) vs CHF weakness (-0.704%) creates a 1.956% G10 spread favoring the cross lower. The driver is Strait of Hormuz shipping-risk headlines layering a geopolitical risk premium onto JPY, not safe-haven demand — VIX sits at 14.9, a risk-on print, well below levels historically associated with broad safe-haven flows. CHF lags on its own weaker footing, with a -11.6 ESI and a mildly accommodative real rate of -0.45% offering no competing bid. Trade bias: Bearish CHF/JPY; JPY geopolitical risk premium outweighs a data-soft CHF. Catalyst: BoJ meeting 18 Sep — 100% hold priced. Risk: Hormuz tensions de-escalate and the risk premium unwinds, closing the G10 spread.",
       "evidence": [
         "JPY 1W avg: +1.252% (n=7)",
         "CHF 1W avg: -0.704% (n=6)",
-        "VIX: 14.9 (risk-on — rules out safe-haven framing, Rule 3)"
+        "VIX: 14.9 (risk-on print — below the safe-haven threshold)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
