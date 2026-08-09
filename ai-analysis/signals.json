@@ -1,28 +1,28 @@
 {
-  "_note": "MANUAL PREVIEW — not a live Gemini/Groq run. Source: ai-analysis/signals.json generated_at 2026-08-08T20:31:22Z, reformatted by hand to show how SIGNALS_SYSTEM v8.115.0 (Trade bias / Catalyst / Risk footer) would restructure the existing text. Exact wording from a real run will differ.",
-  "generated_at": "2026-08-08T20:31:22Z",
+  "_note": "MANUAL PREVIEW — not a live Gemini/Groq run. Source: ai-analysis/signals.json generated_at 2026-08-08T20:53:22Z, reformatted by hand a second time to show how SIGNALS_SYSTEM v8.117.0 (Rule 3 CONFIRMED-INTERVENTION FRAMING + Rule 10 causal-driver check before 'Momentum Leader'/'Safe-Haven Leader') would restructure the prior v8.115.0 preview. Two changes vs. the previous preview: (1) 'CHF/JPY — Safe-Haven Leader' renamed to 'CHF/JPY — Geopolitical Risk Premium' and its body reframed — VIX sits at 14.9 (risk-on), which invalidates safe-haven framing under Rule 3's regime-conditional test even before v8.117.0; the driver is TIER-1 GEOPOLITICAL (Strait of Hormuz headlines), not a flight to safety, so Rule 10's causal-driver check now names that specifically instead of defaulting to the generic label. (2) 'USD/JPY — JPY Short-Squeeze Setup' body reframed the same way — 'safe-haven demand' language replaced with the carry-first + geopolitical-risk-premium framing Rule 3 requires in a risk-on regime. Note: this cycle's underlying news-data/news.json DOES contain confirmed-intervention headlines further down the feed ('ECB kept out of loop on historic US-Japan yen intervention', 'BofA cuts year end dollar/yen forecast to 149 after intervention') — but build_context()'s high_impact[:8] window is filled by higher-ranked Hormuz/NFP items this cycle, so those don't reach the model and Rule 3's new CONFIRMED-INTERVENTION branch isn't triggered here. Its worked example lives in SIGNALS_SYSTEM Rule 3 itself. Exact wording from a real Gemini run will differ.",
+  "generated_at": "2026-08-08T20:53:22Z",
   "signals": [
     {
       "time": "20:53",
       "priority": "critical",
       "title": "USD/JPY — JPY Short-Squeeze Setup",
-      "text": "Geopolitical tension in the Strait of Hormuz and a US bull steepener regime (+41bp 2s10s) drive JPY safe-haven demand toward the 157.00 level. JPY COT net short -63.6k creates short-squeeze risk as USD/JPY trades below its SMA200 (158.07) amid a -2.20 risk reversal downside skew, with domestic data outperformance (ESI +16.1) reinforcing the case for JPY strength. Trade bias: Bearish USD/JPY; JPY short-squeeze risk builds below SMA200. Catalyst: BoJ meeting — 100% hold priced. Risk: Hormuz tensions de-escalate, unwinding the safe-haven bid and the JPY short squeeze.",
+      "text": "USD/JPY trades below its SMA200 (158.07) near 157.00, with Strait of Hormuz shipping-risk headlines (TIER-1 GEOPOLITICAL) introducing intervention risk rather than a safe-haven bid — VIX at 14.9 is a risk-on print, below the threshold where safe-haven flows apply, so carry-first framing governs. A US bull steepener regime (+41bp 2s10s) and JPY COT net short -63.6k set up a squeeze read: the pair is pricing geopolitical-driven intervention risk on top of an already-crowded short, not a flight to JPY safety. Domestic data outperformance (ESI +16.1) reinforces the case for JPY strength even without a risk-off catalyst. Trade bias: Bearish USD/JPY; JPY short-squeeze risk builds below SMA200 on crowded positioning, not safe-haven flow. Catalyst: BoJ meeting — 100% hold priced. Risk: Hormuz tensions de-escalate, removing the geopolitical risk premium and unwinding the JPY short squeeze.",
       "evidence": [
         "JPY COT net short -63.6k",
         "USD/JPY RR: -2.20 (strong put skew)",
-        "Bull Steepener: 2s10s spread +41.0bp"
+        "VIX: 14.9 (risk-on — rules out safe-haven framing, Rule 3)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
       "time": "19:50",
       "priority": "critical",
-      "title": "CHF/JPY — Safe-Haven Leader",
-      "text": "JPY outperformance (+1.252%) vs CHF weakness (-0.704%) creates a 1.956% G10 spread favoring the cross lower. JPY is capturing safe-haven flows from the Hormuz shipping crisis while CHF lags with a -11.6 ESI and a mildly accommodative real rate of -0.45%. Trade bias: Bearish CHF/JPY; JPY safe-haven leadership dominant. Catalyst: BoJ meeting 18 Sep — 100% hold priced. Risk: Hormuz tensions de-escalate and the safe-haven JPY bid fades, closing the G10 spread.",
+      "title": "CHF/JPY — Geopolitical Risk Premium",
+      "text": "JPY outperformance (+1.252%) vs CHF weakness (-0.704%) creates a 1.956% G10 spread favoring the cross lower. The driver is Strait of Hormuz shipping-risk headlines layering a geopolitical risk premium onto JPY, not safe-haven demand — VIX sits at 14.9, a risk-on print that rules out safe-haven framing under SIGNALS_SYSTEM Rule 3's regime-conditional test (safe-haven requires VIX > 25). CHF lags on its own weaker footing, with a -11.6 ESI and a mildly accommodative real rate of -0.45% offering no competing bid. Trade bias: Bearish CHF/JPY; JPY geopolitical risk premium outweighs a data-soft CHF. Catalyst: BoJ meeting 18 Sep — 100% hold priced. Risk: Hormuz tensions de-escalate and the risk premium unwinds, closing the G10 spread.",
       "evidence": [
         "JPY 1W avg: +1.252% (n=7)",
         "CHF 1W avg: -0.704% (n=6)",
-        "G10 spread: 1.956%"
+        "VIX: 14.9 (risk-on — rules out safe-haven framing, Rule 3)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
