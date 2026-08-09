@@ -1043,7 +1043,7 @@
   // releases only; anything unmatched falls back to the plain event-name
   // tooltip that was already there.
   const CAL_METHODOLOGY = [
-    { kw: ['non-farm payrolls', 'nonfarm payrolls', 'employment change'],
+    { kw: ['non-farm payrolls', 'nonfarm payrolls', 'non farm payrolls', 'employment change'],
       text: 'Net change in jobs outside farming, private households, and nonprofits. The single most-watched US labor print — a big beat/miss can move every USD pair within seconds of release.' },
     { kw: ['unemployment rate'],
       text: 'Share of the labor force that is jobless and actively looking for work. A rising rate is a negative surprise for the currency even though the headline number is numerically larger.' },
