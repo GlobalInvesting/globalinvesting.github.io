@@ -1007,14 +1007,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="split-lower">
       <div id="split-lower-right">
 
-    <!-- ECONOMIC CALENDAR — native panel, Finnhub data, terminal colors -->
+    <!-- ECONOMIC CALENDAR — native panel, terminal colors -->
     <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:180px;flex-shrink:0;">
       <div class="panel-head">
         <span class="panel-title">Economic Calendar</span>
         <!-- id added v1.13.2 — stable hook so calendar-panel.js can relocate
              #cal-ccy-filter here in wide-fullscreen split-column mode. -->
         <div id="cal-panel-head-actions" style="display:flex;align-items:center;gap:6px;min-width:0;">
-          <span class="panel-sub" id="cal-panel-sub">ForexFactory · G10 major currencies · medium &amp; high impact</span>
+          <span class="panel-sub" id="cal-panel-sub">G10 currencies · medium &amp; high impact</span>
           <button class="lw-tb-btn" id="cal-fs-btn" aria-label="Toggle fullscreen calendar" title="Fullscreen (Esc to exit)" style="flex-shrink:0;">&#x26F6;</button>
         </div>
       </div>
@@ -1892,7 +1892,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
      in assets/fx-websocket.js, 3) uncommenting the line below.
      Falls back to yfinance quotes.json polling if the Worker is unavailable. -->
 <script src="assets/fx-websocket.js?v=1.0.0" defer></script>
-<script src="assets/cot-modal-chart.js?v=7.91.1" defer></script>
+<script src="assets/cot-modal-chart.js?v=7.91.2" defer></script>
 <script src="assets/cb-rates-modal.js?v=8.0.4" defer></script>
 <script src="assets/real-carry-modal.js?v=2.7.6" defer></script>
 <script src="assets/corr-modal.js?v=2.2.0" defer></script>
@@ -1928,7 +1928,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
 
-<script src="assets/calendar-panel.js?v=1.19.16" defer></script>
+<script src="assets/calendar-panel.js?v=1.19.17" defer></script>
 <script src="assets/econ-matrix.js?v=1.0.5" defer></script>
   <!-- Fullscreen chart overlay — chart panel DOM is moved here on open, restored on close -->
   <div id="lw-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen chart">
