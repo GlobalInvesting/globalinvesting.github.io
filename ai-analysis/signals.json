@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-08-09T20:33:47Z",
+  "generated_at": "2026-08-09T22:18:37Z",
   "signals": [
     {
-      "time": "21:00",
+      "time": "22:18",
       "priority": "critical",
-      "title": "CHF/JPY — G10 Bilateral Theme + Yield Disadvantage",
-      "text": "CHF/JPY downside pressure intensifies as JPY leads G10 performance (+1.218%) while CHF lags (-0.687%), creating a significant 1.904% bilateral spread. JPY's outperformance is supported by a positive ESI (+17.8) and sustained bull-steepening in the US yield curve, which historically favors JPY as a funding currency unwind destination. The next BoJ meeting (mkt: 100% hold priced) remains the catalyst for resolving the yield gap against the current JPY momentum.",
+      "title": "CHF/JPY — G10 Bilateral Theme + Strait of Hormuz Risk",
+      "text": "CHF/JPY trades at 127.35 (implied) as JPY outperforms G10 peers by +1.230% while CHF lags by -0.789%, creating a significant 2.019% performance spread. The pair faces a carry disadvantage of -100bp (SNB 0.0% vs BoJ 1.0%), yet JPY remains bid following Tier-1 geopolitical headlines regarding shipping route disruptions in the Strait of Hormuz. Despite the low VIX at 14.9, the specific commodity-linked supply risk is driving JPY outperformance ahead of the BoJ Summary of Opinions. JPY ESI at +17.8 confirms the currency is supported by a sustained run of data beats relative to expectations. Trade bias: Bearish CHF/JPY; JPY outperformance theme persists on geopolitical friction. Catalyst: BoJ Summary of Opinions release Monday. Risk: Oman-mediated shipping deal resolves Hormuz tension, removing the JPY-specific risk bid.",
       "evidence": [
-        "JPY 1W avg: +1.218% (n=7)",
-        "CHF 1W avg: -0.687% (n=6)",
-        "G10 spread: 1.904%"
+        "JPY 1W avg: +1.230% (n=7)",
+        "CHF 1W avg: -0.789% (n=6)",
+        "G10 spread: 2.019%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "21:00",
+      "time": "22:15",
+      "priority": "critical",
+      "title": "USD/JPY — Options Complacency + Technical Breakdown",
+      "text": "USD/JPY at 157.84 has collapsed through its SMA20/50/200 cluster (161.24, 161.17, 158.07), marking a significant regime shift. While a 275bp Fed-BoJ carry advantage remains, the options market is pricing in downside protection with a strong 25d risk reversal (RR) of -2.20. The negative VRP of -1.3% (IV 7.2% vs HV30 8.5%) suggests that despite the sharp spot move, the options market remains unusually complacent, leaving room for a vol-led spike if the liquidation extends. COT LF net short position of -63,633 remains a significant unwind risk if 158.00 fails to recapture. Trade bias: Bearish USD/JPY; technical break below the SMA cluster targets deeper retracement. Catalyst: US CPI Wednesday. Risk: US 10Y yields rebound sharply above 4.75%, restoring the carry-driven bid.",
+      "evidence": [
+        "USD/JPY RR: -2.20",
+        "JPY VRP: -1.3% (IV 7.2% vs HV30 8.5%)",
+        "SMA200: 158.07"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "22:12",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Unwind Risk",
-      "text": "AUD COT LF long +37.9k (72.1% long) creates significant downside risk if the pair fails to hold above the SMA200 at 0.6925 following China's cooling July CPI data. While AUD benefits from a -70bp OIS carry advantage over the USD, a negative ESI (-11.1) suggests domestic data is underperforming expectations. The next RBA meeting (mkt: 100% hold priced) on 11 Aug is the catalyst for confirming if the current hold bias can withstand softening Chinese demand.",
+      "title": "NZD/USD — ESI Outperformance vs Crowded Short",
+      "text": "NZD/USD at 0.5894 is holding above its SMA20/50/200 cluster (0.5836, 0.5790, 0.5829), confirming a bullish technical posture. The pair is supported by a strong positive Economic Surprise Index (ESI) of +24.4, the highest in the G10, reflecting a sustained period of data beats. This fundamental strength contrasts sharply with COT positioning, where LF net remains short -30,785 (long% at an extreme 9.7%). This creates an asymmetric short-squeeze setup if upcoming RBNZ signaling remains hawkish, especially as retail sentiment is already 76% short. Trade bias: Bullish NZD/USD; data outperformance targets a squeeze of crowded speculative shorts. Catalyst: RBNZ meeting 2 Sep — hike bias intact. Risk: RBNZ pivots to a neutral stance, validating the existing short positioning.",
       "evidence": [
-        "AUD COT LF long +37.9k (72.1% long)",
-        "AUD/USD OIS carry: -70bp",
-        "AUD ESI: -11.1"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "21:00",
-      "priority": "warning",
-      "title": "USD/JPY — Put Skew + Squeeze Risk",
-      "text": "USD/JPY closed Friday at 157.82 with a JPY COT short of -63.6k reinforcing a potential short-squeeze risk as the pair trades below its SMA20, SMA50, and SMA200. Options markets show a strong put skew (RR -2.20), indicating elevated hedging demand for JPY strength despite the +267bp OIS carry advantage favoring the USD. The BoJ Summary of Opinions on Monday is the catalyst for gauging the sustainability of JPY's recent recovery.",
-      "evidence": [
-        "JPY COT net short -63,633",
-        "USD/JPY 25d RR: -2.20",
-        "USD/JPY price below SMA20/50/200"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "21:00",
-      "priority": "info",
-      "title": "EUR/USD — Crowded Short Short-Squeeze",
-      "text": "EUR/USD upside momentum toward 1.1633 (SMA200) is supported by a crowded EUR COT short position of -73.0k (only 34% long). The market is pricing a restrictive ECB (real rate +0.13%) against a softening US labor outlook following the weak NFP report, though the +146bp OIS carry advantage still favors the USD. The next ECB meeting (mkt: 53% hike priced) on 10 Sep is the catalyst for confirming the hike bias that supports recent Euro gains.",
-      "evidence": [
-        "EUR COT net short -73,049",
-        "EUR real rate: +0.13%",
-        "EUR/USD OIS carry: +146bp"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "21:00",
-      "priority": "info",
-      "title": "NZD/USD — ESI Divergence Setup",
-      "text": "NZD/USD shows a divergence between the extreme NZD COT net short of -30.7k (9.7% long) and a leading G10 ESI of +24.4. This creates significant short-squeeze potential toward the 0.6000 level as sustained data beats conflict with pessimistic speculator positioning. The RBNZ hike bias and accommodative real rate of -1.56% will be tested at the next RBNZ meeting (mkt: 100% hike priced) on 2 Sep.",
-      "evidence": [
-        "NZD COT net short -30,785 (9.7% long)",
         "NZD ESI: +24.4",
-        "NZD real rate: -1.56%"
+        "NZD COT LF net: -30,785 (9.7% long)",
+        "Retail: 76% short"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "22:08",
+      "priority": "warning",
+      "title": "GBP/USD — Vol Risk Premium + Rate Outlook",
+      "text": "GBP/USD trades at 1.3490, maintaining a position above the SMA20/50/200 cluster centered near 1.3412. The options market is pricing in significant tail-risk with an elevated Vol Risk Premium (VRP) of +4.9% (IV 11.0% vs HV30 6.1%), the highest in the G10 space. This suggests traders are paying a heavy premium for protection ahead of Wednesday's US CPI data. While Fed-BoE carry is currently neutral at 0bp, the COT LF net long of +39,039 (70.1% long) indicates that the market is already positioned for GBP resilience. Trade bias: Neutral GBP/USD; elevated vol premium makes new long entries expensive near current levels. Catalyst: US CPI Wednesday. Risk: Sharp drop in US CPI validates Fed hold, driving Cable through 1.3600 on USD weakness.",
+      "evidence": [
+        "GBP/USD VRP: +4.9% (IV 11.0% vs HV30 6.1%)",
+        "GBP COT LF net: +39,039",
+        "Fed vs BoE carry: 0bp"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "22:03",
+      "priority": "info",
+      "title": "USD/NOK — Retail Sentiment Extreme",
+      "text": "USD/NOK is currently trading at 9.497, positioned below its SMA20/50/200 cluster (9.602, 9.629, 9.706). Retail sentiment has reached a absolute extreme of 100% long, suggesting a complete absence of retail sellers at these levels. This extreme typically serves as a contrarian indicator for a continuation of the downward trend, particularly as the Norges Bank maintains a restrictive real rate of +1.51%. The negative ESI of -6.4 for the USD further supports a weaker USD backdrop. Trade bias: Bearish USD/NOK; contrarian to 100% retail long positioning. Catalyst: Norges Bank meeting 13 Aug — hike bias priced. Risk: WTI Oil breaks below $75.0, removing the NOK's primary commodity support.",
+      "evidence": [
+        "Retail USD/NOK: 100% long",
+        "NOK Real Rate: +1.51%",
+        "USD ESI: -6.4"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
