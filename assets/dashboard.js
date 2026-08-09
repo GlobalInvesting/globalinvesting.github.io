@@ -9886,7 +9886,7 @@ async function fetchOptionSkew() {
 // ═══════════════════════════════════════════════════════════════════
 async function loadAIRegime() {
   try {
-    const res = await fetch('./ai-analysis/index.json');
+    const res = await fetch('./ai-analysis/index.json', { cache: 'no-store' });
     if (!res.ok) return;
     const d = await res.json();
     // Store generated_at so buildRichNarrative can compute staleness
@@ -9900,7 +9900,7 @@ async function buildRichNarrative() {
   try {
     // Fetch AI narrative base
     const [narRes, newsRes] = await Promise.all([
-      fetch('./ai-analysis/index.json'),
+      fetch('./ai-analysis/index.json', { cache: 'no-store' }),
       fetch('./news-data/news.json'),
     ]);
 
@@ -10007,7 +10007,7 @@ async function buildRichNarrative() {
 
     // Also load signals (moved here from fetchAIData to keep AI logic together)
     try {
-      const sigR = await fetch('./ai-analysis/signals.json');
+      const sigR = await fetch('./ai-analysis/signals.json', { cache: 'no-store' });
       if (sigR.ok) {
         const _sigRaw = await sigR.json();
         // signals.json may be a bare array (written by fetch_intraday_quotes.py) or
