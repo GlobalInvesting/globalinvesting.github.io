@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-09T07:00:37Z",
+  "updated": "2026-08-09T07:05:27Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,10 +35,10 @@
       "pct1w_date": "2026-07-31"
     },
     "gold": {
-      "close": 4342.3581,
+      "close": 4342.3399,
       "prev_close": 4342.2367,
-      "chg": 0.1214,
-      "pct": 0.0028,
+      "chg": 0.1032,
+      "pct": 0.0024,
       "source": "twelve_data",
       "high": 4432.3,
       "low": 4288.0,
@@ -52,7 +52,7 @@
       "chg": 0.89,
       "pct": 1.1515,
       "high": 78.77,
-      "low": 76.54,
+      "low": 76.53,
       "open": 78.17,
       "bid": 77.08,
       "ask": 77.16,
@@ -144,12 +144,12 @@
     },
     "us2y": {
       "close": 4.25,
-      "prev_close": 4.18,
-      "chg": 0.07,
-      "pct": 1.6746,
+      "prev_close": 3.732,
+      "chg": -0.022,
+      "pct": -0.5895,
       "source": "fred_dgs2",
       "sourceDate": "2026-08-06",
-      "prevSourceDate": "2026-08-05"
+      "prevSourceDate": null
     },
     "us5y": {
       "close": 4.362,
@@ -199,35 +199,35 @@
       "pct1w": null
     },
     "btc": {
-      "close": 64794.21,
+      "close": 64789.98,
       "prev_close": 64908.484,
-      "chg": -114.274,
-      "pct": -0.1761,
-      "high": 64951.035,
-      "low": 64703.703,
+      "chg": -118.504,
+      "pct": -0.1826,
+      "high": 65713.91,
+      "low": 64182.797,
       "open": 64908.484,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1786258840,
+      "market_time": 1786259123,
       "source": "yfinance",
-      "pct1w": 3.1529,
+      "pct1w": 3.1462,
       "pct1w_date": "2026-07-31"
     },
     "eth": {
-      "close": 1917.51,
+      "close": 1917.32,
       "prev_close": 1915.4414,
-      "chg": 2.0686,
-      "pct": 0.108,
-      "high": 1918.2054,
-      "low": 1911.455,
+      "chg": 1.8786,
+      "pct": 0.0981,
+      "high": 1907.2332,
+      "low": 1858.5846,
       "open": 1915.4414,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1786258834,
+      "market_time": 1786259124,
       "source": "yfinance",
-      "pct1w": 3.0728,
+      "pct1w": 3.0626,
       "pct1w_date": "2026-07-31"
     },
     "nasdaq": {
@@ -939,7 +939,7 @@
       "prev_close": 61.606,
       "chg": 1.893,
       "pct": 3.0728,
-      "high": 65.48,
+      "high": 65.37,
       "low": 61.42,
       "open": 61.855,
       "bid": 63.565,
