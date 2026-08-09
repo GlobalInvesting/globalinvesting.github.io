@@ -1,3 +1,9 @@
+// COT MODAL CHART  v2.6 — spot-close chart decimal precision fixed for inverted
+//   pairs (JPY/NOK/SEK): was hardcoded to 2 decimals assuming direct-quote
+//   magnitude, but _fetchCOTSpot inverts these three to CCY/USD (JPY/USD
+//   ~0.0064, NOK & SEK/USD ~0.10), so 2 decimals rounded every close to the
+//   same "0.01"/"0.10" — axis and tooltip showed one repeated value instead
+//   of the real range. Now derives decimals from the data's own magnitude.
 // COT MODAL CHART  v2.5 — in-modal currency switcher (chip + prev/next arrows + arrow-key cycling)
 // COT MODAL CHART  v2.4 — fix .cu/.cd specificity in cot-tbl; fix Net Position left-axis regression
 // COT MODAL CHART  v2.0 — LightweightCharts v5 (replaces Chart.js)
@@ -562,7 +568,14 @@ function _buildSpotChart(container, spotData, ccy) {
   const LWC = window.LightweightCharts; if (!LWC || !container || !spotData?.length) return null;
   const W = container.offsetWidth || 600, H = container.offsetHeight || container.parentElement?.offsetHeight || 140;
   const opts = _lwOpts(W, H);
-  const _dec = ['JPY','NOK','SEK'].includes(ccy) ? 2 : 4;
+  // Decimal precision by data magnitude, not a hardcoded ccy list: JPY/NOK/SEK are
+  // inverted to CCY/USD by _fetchCOTSpot (see _COT_SPOT.inv above), which puts them
+  // one to two orders of magnitude below the direct-quote pairs (JPY/USD ~0.0064,
+  // NOK & SEK/USD ~0.10, vs. EUR/USD ~1.15). A fixed 2-decimal precision for that
+  // trio rounds every JPY close to 0.01 and every NOK/SEK close to 0.10 — the axis
+  // and tooltip then show one repeated value instead of the actual daily range.
+  const _maxAbs = spotData.reduce((m, p) => Math.max(m, Math.abs(p.value || 0)), 0);
+  const _dec = (_maxAbs > 0 && _maxAbs < 0.02) ? 5 : 4;
   opts.localization = { priceFormatter: v => v != null ? v.toFixed(_dec) : '—' };
   const chart = LWC.createChart(container, opts);
   _cotLwCharts.push(chart);

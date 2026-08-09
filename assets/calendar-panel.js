@@ -1,7 +1,21 @@
 /**
- * calendar-panel.js v1.19.16 — Native economic calendar renderer
+ * calendar-panel.js v1.19.17 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.17 (2026-08-09): Panel subtitle no longer names the underlying data
+ *   vendor. Was `${source} · G10 currencies · medium & high impact` (e.g.
+ *   "Myfxbook · ForexFactory · G10 currencies..."); now just "G10 currencies
+ *   · medium & high impact" — matches about.html's Data Sources table, which
+ *   never named a vendor for the Economic Calendar row either. Santiago's
+ *   call: institutional terminals (Bloomberg, Refinitiv) don't disclose their
+ *   calendar data provider in the live UI, only the coverage. The `source`
+ *   field itself is untouched in ff_calendar.json/calendar.json and still
+ *   flows through cleanSourceLabel() and _lastSource for internal use — this
+ *   is a display-only change, not a data-pipeline change. index.html's static
+ *   default subtitle updated to match (was "ForexFactory · G10 major
+ *   currencies..."); guide-dashboard.html's Economic Calendar section updated
+ *   to describe the panel the same way.
  *
  * v1.19.16 (2026-08-08): FIX — v1.19.15's fontFamily fix didn't resolve it
  *   either. Rather than propose a thirteenth resize/DPR/font theory, pulled
@@ -2319,7 +2333,12 @@
     if (sourceEl) {
       // No trailing tzLabel() here — the column-header time cell just below
       // (#cal-th-time) already shows it, right above the time values it labels.
-      sourceEl.textContent = `${source} · G10 currencies · medium & high impact`;
+      // [this session] Vendor name dropped from the subtitle entirely — Bloomberg/
+      // Refinitiv don't disclose their calendar data provider in the terminal UI,
+      // only the coverage (currencies, impact tiers). Matches about.html's existing
+      // "Economic Calendar | G10 currencies · medium & high impact events" row,
+      // which never named a vendor either.
+      sourceEl.textContent = `G10 currencies · medium & high impact`;
     }
     const thTime = document.getElementById('cal-th-time');
     if (thTime) thTime.textContent = tzLabel();
