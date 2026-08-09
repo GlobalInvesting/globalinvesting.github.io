@@ -252,7 +252,7 @@
   const MODAL_HTML = `
 <div id="${MODAL_ID}" role="dialog" aria-modal="true" aria-label="Activate terminal access">
   <div id="gi-auth-box">
-    <h2>GI&gt;&nbsp; ACTIVATE TERMINAL</h2>
+    <h2>ACTIVATE TERMINAL</h2>
     <p class="gi-auth-sub">
       Full access is included with the
       <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener">
