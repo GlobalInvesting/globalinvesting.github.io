@@ -708,16 +708,32 @@ a { color: inherit; text-decoration: none; }
         <p class="scr-meta"><strong>The Carry Trade — Top Pairs ranking.</strong> The top 10 candidates across all 45 G10 combinations, ranked by real carry.</p>
       </div>
       <p style="font-size:12px;color:var(--text2);margin:4px 0 16px;">The right column shows <strong>real carry</strong> (nominal OIS spread minus inflation differential) — the primary ranking value. The middle column shows the <strong>nominal OIS spread</strong> as reference context. Color coding: <span style="color:var(--up);">green</span> = real carry &ge;+0.5% (positive after inflation), neutral = 0%&ndash;0.5%, <span style="color:var(--text3);">dim</span> = negative real carry (inflation erodes nominal spread). Note: this is inflation-adjusted carry, not Covered Interest Parity (CIP) — no FX forward adjustment is applied.</p>
+      <h3>Volatility Leaderboard</h3>
+      <p>Ranks all 28 G10 pairs by current ATM implied volatility and shows the <strong>top 5</strong> — the pairs where the options market is currently pricing the most movement, independent of which pair you habitually watch. The 6 USD majors are sourced directly from an institutional-grade options market (CBOE/CME FX Volatility Index, PHLX World Currency Options, Saxo Bank, or CME futures/ETF, whichever is live for that pair); the 21 cross pairs are triangulated from their two component majors' implied vol and an estimated correlation. NOK and SEK are excluded — no CBOE/CME volatility index exists for either, and no institutional-grade free substitute is available.</p>
+      <p>Each row shows: rank, pair, a magnitude bar scaled to this group's own spread (not a fixed 0–100 scale, so the real gap between the top 5 is visible at a glance), and the ATM IV value. A <code style="font-family:var(--font-mono);font-size:11px;">~</code> prefix marks a triangulated cross value rather than a direct market quote. Hovering a row shows IV Rank — the percentile against the pair's own 52-week range — shown for context only, since this panel already selects for "currently high," not for "cheap vs. expensive." Hovering the panel header shows the full ranking methodology as a tooltip.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-vol-leaderboard.png" alt="Volatility Leaderboard panel showing the top 5 G10 pairs ranked by ATM implied volatility, each with a magnitude bar and IV percentage" width="472" height="227" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The Volatility Leaderboard.</strong> Top 5 by ATM IV, ranked highest to lowest, bar scaled to the group's own spread.</p>
+      </div>
+      <div class="callout callout-green">
+        <div class="callout-label">Good to know</div>
+        <strong>Tip:</strong> Use this panel as a starting-market filter, not a standalone entry signal — the best opportunity today may not be your usual pair, but wherever a data print or sentiment catalyst is currently driving implied vol higher.
+      </div>
     </div>
 
     <div class="guide-section" id="econ-calendar">
       <h2>Economic Calendar</h2>
-      <p>A native Economic Calendar panel in the main content column, showing G10 medium- and high-impact events. The primary source is <strong>Myfxbook</strong> (RSS feed, with an HTML fallback for faster actuals), monitored continuously so actuals typically appear within minutes of publication. Columns: local time (your browser timezone), currency flag, impact dot (red = high, orange = medium), event name, actual result with beat/miss coloring, consensus forecast, and previous reading. The source label reflects the active feed, e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">Myfxbook RSS · G10 currencies · medium &amp; high impact</span>. The panel auto-scrolls to today or the next upcoming event on load. A floating pill button appears when upcoming events are off-screen, with an adaptive arrow pointing toward them.</p>
+      <p>A native Economic Calendar panel in the main content column, showing G10 medium- and high-impact events. Dual-sourced — <strong>ForexFactory</strong> (schedule/actuals feed) with <strong>Myfxbook</strong> as a secondary actuals source for faster prints — labeled in the panel subtitle as <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">Myfxbook · ForexFactory · G10 currencies · medium &amp; high impact</span>. Columns: local time (your browser timezone, labeled once in the column header — e.g. "GMT-3" — not repeated elsewhere), currency flag, impact dot (red = high, orange = medium), event name, actual result with beat/miss coloring, consensus forecast, and previous reading. Beat/miss direction correctly inverts for indicators where a lower print is the positive outcome (e.g. Unemployment Rate, Unemployed Persons). The panel auto-scrolls to today or the next upcoming event on load. A floating pill button appears when upcoming events are off-screen, with an adaptive arrow pointing toward them.</p>
+      <p>The single soonest unreleased high-impact event due within the next 3 hours gets a highlighted row, with its clock time replaced by a live countdown that ticks independently of the panel's regular data refresh; inside the final 15 minutes the row switches to a stronger pulsing highlight. Hovering the countdown still shows the actual scheduled local time.</p>
+      <p>Hovering an event title with a dashed underline opens a methodology tooltip explaining what that release measures and why FX desks watch it (covers the standard G10 headline releases — NFP, CPI, rate decisions, PMIs, and similar). Clicking any event title opens a detail modal with an actual-vs-forecast history chart over the trailing prints, the next scheduled release date with consensus forecast, and a scrollable release history table. When a released event's Previous value has since been revised from what was originally recorded, a small superscript "R" appears next to it with a tooltip showing the old value → the revised one. Actual/forecast surprise coloring is tiered by magnitude (mild / moderate / strong relative deviation) rather than a flat beat/miss binary.</p>
+      <p>A currency filter — the G8 flags at the right edge of the column header — isolates the calendar to a single currency; click again (or "All") to restore the full G10 set. The filter persists across sessions via local storage.</p>
       <div class="scr-hero-wrap">
         <div class="scr-hero scr-hero-contain">
           <img src="assets/screenshot-economic-calendar.png" alt="Economic Calendar panel showing Myfxbook RSS as the source, G10 currency flags, event names, actual vs forecast vs previous values with beat/miss coloring" width="809" height="246" loading="lazy">
         </div>
-        <p class="scr-meta"><strong>The Economic Calendar panel.</strong> Local time, currency, impact dot, event, and actual/forecast/previous — sourced from Myfxbook.</p>
+        <p class="scr-meta"><strong>The Economic Calendar panel.</strong> Local time, currency, impact dot, event, and actual/forecast/previous — sourced from ForexFactory and Myfxbook. <em>Screenshot predates the live-countdown, methodology tooltip, revision marker, and currency-filter features described above — pending a recapture against current production.</em></p>
       </div>
       <p>On <strong>bank holidays</strong>, one or more dedicated holiday rows appear at the top of the affected day — one row per market closure. Each row shows the currency flag, 3-letter code (e.g. <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">🇺🇸 USD</span>), the holiday title (e.g. "Memorial Day"), and "All Day" in the time column. A tooltip on hover shows the full label: "<em>Memorial Day — USD market closed</em>". This makes it immediately visible why quotes for Gold, SPX, WTI, and USD pairs may be frozen on those days.</p>
     </div>
@@ -825,21 +841,21 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="alerts">
       <h2>Alerts &amp; Market Signals</h2>
-      <p>The final section of the main panel shows AI-generated market signals, updated 4× daily alongside the narrative (00:00, 06:30, 14:30, 20:00 UTC). Each signal includes:</p>
+      <p>The final section of the main panel shows AI-generated market signals, updated 4× daily alongside the narrative (00:00, 06:30, 14:30, 20:00 UTC), plus an extra Friday 22:30 UTC refresh once the week's COT report is in. Each structured signal card shows:</p>
       <ul style="list-style:none;padding:0;margin-bottom:14px;">
         <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Priority dot</strong> — a colored indicator: <span style="color:var(--down);">red = critical</span>, <span style="color:var(--orange);">amber = warning</span>, <span style="color:var(--blue);">blue = informational</span></li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Timestamp</strong> — time of the last update cycle, converted to your local timezone</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Title</strong> — a short label identifying the pair or theme</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Text</strong> — the rationale: cross-referencing logic across rate differentials, COT positioning, and price action</li>
-        <li style="padding:6px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Evidence chips</strong> — click any signal row to expand the data points that triggered it (e.g. "VIX: 24.1", "EUR/USD: 1.1505")</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Pair &amp; badge</strong> — the pair and a short regime/setup label (e.g. "EUR/USD — Crowded Long"), with the update timestamp alongside it, converted to your local timezone</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Body</strong> — the cross-referencing rationale: rate differentials, COT positioning, and price action tying the setup together</li>
+        <li style="padding:6px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Trade bias / Catalyst / Risk</strong> — a mandatory three-line footer closing every signal, matching the structure institutional desk notes use: the current stance, the event that could move it, and the condition that would invalidate it. These are descriptive of market conditions, never an instruction to take a specific action.</li>
       </ul>
+      <p style="font-size:12px;color:var(--text2);margin:-6px 0 14px;">A small minority of signals — the weekend pre-open format — use a shorter, compressed 2–3 sentence read without the Trade bias/Catalyst/Risk footer; these fall back to a plain single-paragraph card with the priority dot, timestamp, title, and text laid out in one line.</p>
       <h3>Signal Notifications</h3>
       <p>A bell icon button in the panel header lets you opt into browser notifications for new AI signals. When enabled, the button turns blue and the browser will notify you each time the signal set updates with new content — one notification per update cycle, summarising the count by priority. The preference is saved in your browser's local storage. To disable, click the bell again. If your browser has blocked notifications for this site, the button shows a red "blocked" state — re-enable notifications in your browser's site settings to use this feature.</p>
       <div class="scr-hero-wrap">
         <div class="scr-hero scr-hero-contain">
           <img src="assets/screenshot-alerts-signals.png" alt="Alerts & Market Signals panel showing AI-generated entries combining COT positioning, OIS-implied central bank bias, carry, and options skew, each with a priority dot, timestamp, title, and supporting data chips" width="897" height="621" loading="lazy">
         </div>
-        <p class="scr-meta"><strong>The Alerts &amp; Signals panel.</strong> Priority dot, timestamp, title, and text per entry, matching the live signals feed.</p>
+        <p class="scr-meta"><strong>The Alerts &amp; Signals panel.</strong> Priority dot, pair/badge, body, and the Trade bias/Catalyst/Risk footer per entry, matching the live signals feed. <em>Screenshot predates the structured card format described above — pending a recapture against current production.</em></p>
       </div>
       <h3>Price &amp; Advanced Alerts</h3>
       <p>Configurable alerts are available via the <strong>alerts</strong> button in the status bar at the bottom of the screen. An alert type selector lets you choose from six categories:</p>
@@ -869,7 +885,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <div class="callout">
         <div class="callout-label">Note</div>
-        <strong>Important:</strong> These signals are informational context, not trade recommendations. Confidence labels reflect internal cross-factor alignment, not a probability of directional outcome. Always apply your own analysis and risk management before acting on any market signal.
+        <strong>Important:</strong> These signals are informational context, not trade recommendations. The Trade bias/Catalyst/Risk footer states a market stance and its conditions, never an instruction to act. Always apply your own analysis and risk management before acting on any market signal.
       </div>
     </div>
 
