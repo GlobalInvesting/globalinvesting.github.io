@@ -13572,8 +13572,13 @@ async function renderEconSurprises() {
     const srcEl = document.getElementById('econ-surprise-source');
     if (!srcEl) return;
     const windowSuffix = widenedCcys.size > 0 ? '90d/180d rolling' : '90d rolling';
+    // [this session] Vendor name dropped, matching the Economic Calendar panel's
+    // fix in calendar-panel.js v1.19.17 — Bloomberg/Refinitiv don't disclose their
+    // data provider in the terminal UI. `calSource` itself is untouched upstream
+    // (still populated from calj.source/ffj.source for any future internal use);
+    // this is a display-only change, same reasoning as the calendar fix.
     srcEl.textContent = calSource
-      ? `${calSource} · actual vs consensus · ${windowSuffix}`
+      ? `Actual vs consensus · ${windowSuffix}`
       : 'Calendar data unavailable';
   })();
 
