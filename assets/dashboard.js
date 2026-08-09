@@ -13568,18 +13568,27 @@ async function renderEconSurprises() {
   });
 
   // ── Source label (written here so widenedCcys is fully populated) ──────
+  // [this session] The header subtitle (static HTML, "Actual vs consensus
+  // forecast · G10 major currencies · 90d rolling") already states the
+  // panel's standing methodology. Repeating that same text in the footer
+  // is redundant per Bloomberg/Refinitiv convention (a panel states its
+  // methodology once). This footer is now reserved for state that the
+  // header can't express: an unavailable feed, or an adaptive-window widen
+  // triggered by sparse 90d coverage. When neither condition applies, the
+  // line is cleared and collapsed so no empty gap is left under the table.
   (function _writeSourceLabel() {
     const srcEl = document.getElementById('econ-surprise-source');
     if (!srcEl) return;
-    const windowSuffix = widenedCcys.size > 0 ? '90d/180d rolling' : '90d rolling';
-    // [this session] Vendor name dropped, matching the Economic Calendar panel's
-    // fix in calendar-panel.js v1.19.17 — Bloomberg/Refinitiv don't disclose their
-    // data provider in the terminal UI. `calSource` itself is untouched upstream
-    // (still populated from calj.source/ffj.source for any future internal use);
-    // this is a display-only change, same reasoning as the calendar fix.
-    srcEl.textContent = calSource
-      ? `Actual vs consensus · ${windowSuffix}`
-      : 'Calendar data unavailable';
+    if (!calSource) {
+      srcEl.textContent = 'Calendar data unavailable';
+      srcEl.style.display = '';
+    } else if (widenedCcys.size > 0) {
+      srcEl.textContent = 'Window extended to 180d for sparse-coverage currencies';
+      srcEl.style.display = '';
+    } else {
+      srcEl.textContent = '';
+      srcEl.style.display = 'none';
+    }
   })();
 
   // ── Keyboard activation for clickable rows (Enter / Space) ──────────────
