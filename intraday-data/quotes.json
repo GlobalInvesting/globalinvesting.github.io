@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-09T09:25:26Z",
+  "updated": "2026-08-09T09:30:32Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,20 +35,16 @@
       "pct1w_date": "2026-07-31"
     },
     "gold": {
-      "close": 4399.7,
-      "prev_close": 4299.6,
-      "chg": 100.1,
-      "pct": 2.3281,
+      "close": 4342.2408,
+      "prev_close": 4342.2367,
+      "chg": 0.0041,
+      "pct": 0.0001,
+      "source": "twelve_data",
       "high": 4432.3,
       "low": 4288.0,
       "open": 4298.3,
-      "bid": 4399.9,
-      "ask": 4410.8,
       "market_state": "REGULAR",
-      "market_time": 1786136395,
-      "source": "yfinance",
-      "pct1w": 8.6587,
-      "pct1w_date": "2026-07-31"
+      "market_time": 1786136395
     },
     "wti": {
       "close": 78.18,
@@ -203,35 +199,35 @@
       "pct1w": null
     },
     "btc": {
-      "close": 64780.99,
+      "close": 64761.81,
       "prev_close": 64908.484,
-      "chg": -127.494,
-      "pct": -0.1964,
+      "chg": -146.674,
+      "pct": -0.226,
       "high": 64951.035,
       "low": 64703.703,
       "open": 64908.484,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1786267520,
+      "market_time": 1786267827,
       "source": "yfinance",
-      "pct1w": 3.1319,
+      "pct1w": 3.1013,
       "pct1w_date": "2026-07-31"
     },
     "eth": {
-      "close": 1912.73,
+      "close": 1912.79,
       "prev_close": 1915.4414,
-      "chg": -2.7114,
-      "pct": -0.1416,
+      "chg": -2.6514,
+      "pct": -0.1384,
       "high": 1907.2332,
       "low": 1858.5846,
       "open": 1915.4414,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1786267522,
+      "market_time": 1786267828,
       "source": "yfinance",
-      "pct1w": 2.8158,
+      "pct1w": 2.819,
       "pct1w_date": "2026-07-31"
     },
     "nasdaq": {
@@ -943,7 +939,7 @@
       "prev_close": 61.606,
       "chg": 1.893,
       "pct": 3.0728,
-      "high": 65.37,
+      "high": 65.48,
       "low": 61.42,
       "open": 61.855,
       "bid": 63.565,
