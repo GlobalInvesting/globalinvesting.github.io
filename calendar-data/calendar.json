@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-09T20:59:14Z",
-  "generatedAt": "2026-08-09T20:59:14Z",
+  "lastUpdate": "2026-08-10T06:50:33Z",
+  "generatedAt": "2026-08-10T06:50:33Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,10 +9,10 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-11",
   "rangeTo": "2026-08-14",
-  "totalEvents": 3714,
+  "totalEvents": 3715,
   "currencyCounts": {
     "EUR": 850,
-    "GBP": 430,
+    "GBP": 431,
     "AUD": 253,
     "USD": 1261,
     "NZD": 83,
@@ -24,60 +24,10 @@
   },
   "impactCounts": {
     "medium": 1822,
-    "high": 1664,
+    "high": 1665,
     "low": 228
   },
   "surpriseStats": {
-    "NOK/ppi yoy": {
-      "n": 2,
-      "mean": 1.6,
-      "std": 5.091169
-    },
-    "NOK/core inflation rate mom": {
-      "n": 2,
-      "mean": 0.1,
-      "std": 0.141421
-    },
-    "NOK/core inflation rate yoy": {
-      "n": 2,
-      "mean": 0.1,
-      "std": 0.141421
-    },
-    "NOK/inflation rate yoy": {
-      "n": 2,
-      "mean": -0.1,
-      "std": 0.141421
-    },
-    "NOK/inflation rate mom": {
-      "n": 2,
-      "mean": -0.15,
-      "std": 0.070711
-    },
-    "USD/existing home sales mom": {
-      "n": 3,
-      "mean": -0.766667,
-      "std": 3.06159
-    },
-    "USD/existing home sales": {
-      "n": 3,
-      "mean": -0.013333,
-      "std": 0.105987
-    },
-    "GBP/brc retail sales monitor yoy": {
-      "n": 3,
-      "mean": -0.866667,
-      "std": 3.511885
-    },
-    "JPY/household spending yoy": {
-      "n": 4,
-      "mean": -0.7,
-      "std": 2.857738
-    },
-    "JPY/household spending mom": {
-      "n": 4,
-      "mean": -0.525,
-      "std": 2.538208
-    },
     "AUD/nab business confidence": {
       "n": 3,
       "mean": 7.666667,
@@ -134,9 +84,9 @@
       "std": 4.110343
     },
     "JPY/current account": {
-      "n": 3,
-      "mean": -848.110667,
-      "std": 2831.276805
+      "n": 4,
+      "mean": -783.333,
+      "std": 2315.355296
     },
     "SEK/inflation rate yoy": {
       "n": 3,
@@ -913,6 +863,16 @@
       "mean": 0.0,
       "std": 0.173205
     },
+    "JPY/household spending yoy": {
+      "n": 3,
+      "mean": -0.4,
+      "std": 3.421988
+    },
+    "JPY/household spending mom": {
+      "n": 3,
+      "mean": -0.066667,
+      "std": 2.89885
+    },
     "GBP/halifax house price index yoy": {
       "n": 3,
       "mean": -0.166667,
@@ -993,6 +953,11 @@
       "mean": -0.033333,
       "std": 3.066486
     },
+    "GBP/brc retail sales monitor yoy": {
+      "n": 2,
+      "mean": 0.8,
+      "std": 2.828427
+    },
     "CAD/balance of trade": {
       "n": 3,
       "mean": 0.773333,
@@ -1012,6 +977,16 @@
       "n": 3,
       "mean": 0.266667,
       "std": 0.602771
+    },
+    "USD/existing home sales mom": {
+      "n": 2,
+      "mean": -0.2,
+      "std": 4.101219
+    },
+    "USD/existing home sales": {
+      "n": 2,
+      "mean": -0.005,
+      "std": 0.148492
     },
     "CAD/boc interest rate decision": {
       "n": 2,
@@ -46362,7 +46337,7 @@
       "flag": "🇯🇵",
       "event": "Japan Current Account",
       "impact": "medium",
-      "actual": null,
+      "actual": "¥923.0B",
       "forecast": "¥1512.0B",
       "previous": "¥3968.0B"
     },
@@ -46378,6 +46353,19 @@
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "10 Aug",
+      "dateISO": "2026-08-10",
+      "timeUTC": "23:01",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom BRC Retail Sales Monitor YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.5%",
+      "previous": "1.7%"
     },
     {
       "date": "11 Aug",
