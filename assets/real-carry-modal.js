@@ -517,8 +517,16 @@ function _rcmRenderBreakdown() {
     const ieFmt  = ie  ? ie.val.toFixed(2) + '%' : '—';
     const rrFmt  = _rcmRrFmt(rr);
     const ieClass = _rcmClassifyIESource(ie?.source);
+    // v8.x: source tags (this / NOMINAL's SOFR-or-policy tag) and signal chips
+    // (OIS BIAS's HOLD/HIKE) are two different UI categories — a source tag says
+    // "where this number came from", a chip says "act on this". Bordered-pill
+    // styling belongs to signal chips; source tags across every column should
+    // share one plain-superscript convention so the row reads as one register.
+    // This was a bordered pill (mismatched with NOMINAL's plain tag) until
+    // Santiago flagged the inconsistency — restyled to match nomSrcTag exactly,
+    // same color logic (accent = forward-looking, text3 = proxy fallback).
     const ieBadge = ie != null && ieClass.tag
-      ? `<span style="font-size:7px;font-weight:700;letter-spacing:0.3px;margin-left:4px;padding:1px 3px;border-radius:2px;vertical-align:middle;${ieClass.kind === 'cpi' ? 'color:var(--text3);border:1px solid var(--border2);' : 'color:var(--up,#26a69a);border:1px solid var(--up,#26a69a);'}" title="${ieClass.title}">${ieClass.tag}</span>`
+      ? `<span style="font-size:8px;color:${ieClass.kind === 'cpi' ? 'var(--text3)' : 'var(--accent,#26a69a)'};margin-left:3px;vertical-align:super;" title="${ieClass.title}">${ieClass.tag}</span>`
       : '';
     const srcTitle = `${ie?.source || _RCM_IE_SRC[ccy] || ''}${ie?.date ? ' · ' + ie.date : ''}`;
 
