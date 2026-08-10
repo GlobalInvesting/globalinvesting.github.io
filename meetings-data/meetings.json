@@ -25,13 +25,13 @@
         "9 Dec"
       ],
       "source": "federalreserve.gov",
-      "bias": "hold",
-      "biasSource": "FRED SOFR vs. EFFR spread (same-day proxy)",
-      "biasMethod": "spread",
+      "bias": "cut",
+      "biasSource": "CME 30-Day Fed Funds futures, meeting-bracketed",
+      "biasMethod": "ois",
       "biasUpdated": "2026-08-10",
-      "cutProb": 0,
+      "cutProb": 44,
       "hikeProb": 0,
-      "fwdRate": 3.75
+      "fwdRate": 3.64
     },
     "EUR": {
       "nextMeeting": "10 Sep",
@@ -58,12 +58,12 @@
       ],
       "source": "ecb.europa.eu",
       "bias": "hike",
-      "biasSource": "cbonds OIS €STR curve, meeting-bracketed forward",
+      "biasSource": "CME 1-Month ESTR futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-10",
       "cutProb": 0,
-      "hikeProb": 54,
-      "fwdRate": 2.385
+      "hikeProb": 100,
+      "fwdRate": 2.5
     },
     "GBP": {
       "nextMeeting": "17 Sep",
@@ -89,13 +89,13 @@
         "17 Dec"
       ],
       "source": "bankofengland.co.uk",
-      "bias": "hold",
-      "biasSource": "cbonds OIS SONIA curve, meeting-bracketed forward",
+      "bias": "hike",
+      "biasSource": "ICE 1-Month SONIA futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-10",
       "cutProb": 0,
-      "hikeProb": 0,
-      "fwdRate": 3.75
+      "hikeProb": 13,
+      "fwdRate": 3.7825
     },
     "JPY": {
       "nextMeeting": "18 Sep",
