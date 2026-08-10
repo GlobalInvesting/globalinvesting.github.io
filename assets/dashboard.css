@@ -2161,29 +2161,41 @@ a:focus-visible,
 }
 
 
-/* ─── Per-section scrollable feeds ───────────────────────────────────────────
-   Each sub-panel shows ~6-8 rows then scrolls internally.
-   Row height ~33px → 6 rows ≈ 200px, 8 rows ≈ 264px.
-   intel-scroll becomes just a flex column, no scrolling itself.
+/* ─── Unified scroll for the 3 stacked sub-panels ────────────────────────────
+   v8.117.18 fix: each sub-panel feed previously had its own fixed max-height
+   (News/Analysis 225px, Research 240px) with independent overflow-y:auto,
+   while #intel-scroll itself was overflow:hidden. That only fully used the
+   available vertical space when the 3 heads + 3 capped feeds summed to
+   exactly #intel-scroll's flex-grown height — on any taller viewport/panel
+   the leftover space sat empty below the last sub-panel (Analysis), clipped
+   by overflow:hidden, and rendered as a dead black gap instead of showing
+   more of that panel's actual items (e.g. Analysis showing 2 of 11 items
+   with blank space below instead of a real scroll). It also silently broke
+   the .intel-sub-head position:sticky headers, since sticky only pins
+   relative to a scrolling ancestor — #intel-scroll never scrolled, so the
+   headers had no scroll container to stick within.
+   Fix: #intel-scroll is now the single scroll container (this also makes
+   the sticky headers documented above actually function). The 3 feed divs
+   no longer cap their own height or scroll independently — they take their
+   natural content height, so all available vertical space renders real
+   articles instead of empty space, and the whole News panel scrolls as one
+   continuous list with pinned section headers.
    ─────────────────────────────────────────────────────────────────────────── */
-#intel-scroll { display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden; }
-/* News/Analysis rows: compact headline-only ~32px → 7 rows ≈ 225px */
-#news-section-feed,
-#trading-section-feed {
-  max-height: 225px;
+#intel-scroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
+}
+.thin-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--border2) transparent;
-  flex-shrink: 0;
 }
-/* Research rows: compact headline ~34px → 7 rows ≈ 240px */
-#research-section-feed {
-  max-height: 240px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border2) transparent;
-  flex-shrink: 0;
-}
+.thin-scroll::-webkit-scrollbar { width: 3px; }
+.thin-scroll::-webkit-scrollbar-track { background: transparent; }
+.thin-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
 /* ─── INTEL PANEL — sub-section dividers (News / Research / Trading) ──────────
    Three stacked sub-panels inside #section-news, separated by sticky headers.
