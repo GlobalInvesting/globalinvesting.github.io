@@ -14013,7 +14013,24 @@ function _setExclusivePanel(targetId) {
   if (!splitLowerRight) return;
   Array.from(splitLowerRight.children).forEach(el => {
     if (_EXCLUSIVE_PANEL_IDS.includes(el.id)) {
-      el.style.display = (el.id === targetId) ? '' : 'none';
+      if (el.id === targetId) {
+        // v8.117.19 FIX: `el.style.display = ''` clears the inline `display`
+        // property entirely and falls back to the UA default (`block` for a
+        // <div>) — it does NOT restore the element's original shown-state
+        // display, exactly the failure mode the v8.21.6 comment above
+        // already diagnosed for this function's sibling-restore branch, but
+        // left unfixed here for the exclusive panel itself. #section-news's
+        // HTML declares `display:none;flex-direction:column;height:100%` —
+        // it needs `display:flex` when shown, or `flex-direction`/`height:
+        // 100%` do nothing and its #intel-scroll child's `flex:1` sizing (and
+        // everything nested under it) has no real parent height to grow
+        // into, collapsing to ~0px regardless of #intel-scroll's own CSS.
+        // #section-derivatives has no `flex-direction` in its inline style,
+        // so falling back to block via '' is correct for it — left as-is.
+        el.style.display = (el.id === 'section-news') ? 'flex' : '';
+      } else {
+        el.style.display = 'none';
+      }
     } else {
       el.style.display = targetId ? 'none' : (_origSiblingDisplay.get(el) || '');
     }

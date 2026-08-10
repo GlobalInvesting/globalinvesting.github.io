@@ -2162,31 +2162,40 @@ a:focus-visible,
 
 
 /* ─── Proportional split for the 3 stacked sub-panels ────────────────────────
-   v8.117.18 fix, revised: each sub-panel feed originally had its own fixed
-   max-height in px (News/Analysis 225px, Research 240px) with independent
-   overflow-y:auto, while #intel-scroll was overflow:hidden. That only fully
-   used the available vertical space when the 3 heads + 3 capped feeds summed
-   to exactly #intel-scroll's flex-grown height — on a taller viewport/panel
-   the leftover space sat empty below the last sub-panel (Analysis), clipped
-   by overflow:hidden, showing as a dead black gap instead of more of that
-   panel's actual items (e.g. Analysis showing 2 of 11 items with blank
-   space below instead of a real scroll).
-   First attempt made #intel-scroll itself the single scroll container
-   instead — that fixed the dead space but let News (routinely 30+ items,
-   first in DOM order) dominate the visible area, pushing Research/Analysis
-   out of view until scrolling well past News. Reverted: the 3 sub-panels
-   need to stay simultaneously visible, each a fair share of the panel.
-   Fix: #intel-scroll stays overflow:hidden (not itself a scroll container);
-   the 3 feed divs each get flex:1 (equal thirds of #intel-scroll's actual
-   height, whatever that is on the current viewport — no more hardcoded px
-   caps that can under- or over-shoot) plus their own overflow-y:auto, so
-   each sub-panel independently scrolls only if its own share of items
-   exceeds its allotted third. This uses 100% of the panel's height with no
-   dead space, and keeps News/Research/Analysis equally visible at once.
+   v8.117.18 fix, revised twice: each sub-panel feed originally had its own
+   fixed max-height in px (News/Analysis 225px, Research 240px) with
+   independent overflow-y:auto, while #intel-scroll was overflow:hidden.
+   That only fully used the available vertical space when the 3 heads + 3
+   capped feeds summed to exactly #intel-scroll's flex-grown height — on a
+   taller viewport/panel the leftover space sat empty below the last
+   sub-panel (Analysis), clipped by overflow:hidden, showing as a dead black
+   gap instead of more of that panel's actual items.
+   Attempt 1: made #intel-scroll the single scroll container with the 3
+   feeds at natural height. Fixed the dead space, but let News (routinely
+   30+ items, first in DOM order) dominate the visible area — reverted.
+   Attempt 2: kept #intel-scroll overflow:hidden and gave the 3 feeds
+   `flex:1 1 0` (equal thirds) via nested flexbox. In testing this collapsed
+   unpredictably — the first two sections rendered at ~0 height and the
+   third expanded to fill 100% of the remaining space instead of an even
+   three-way split, a known nested-flex edge case (equal flex-basis:0 items
+   inside an overflow:hidden flex column don't always distribute evenly
+   when combined with independently-scrolling overflow-y:auto children and
+   interleaved non-flex siblings like #rs-filter-bar) — reverted.
+   Fix (final): switched #intel-scroll from flexbox to CSS Grid. Grid's `fr`
+   unit distributes remaining space deterministically regardless of sibling
+   content/overflow quirks, which nested flex was clearly not doing here.
+   `grid-template-rows` lists the 7 real children in DOM order: News header
+   (auto) / News feed (1fr) / Research header (auto) / Research filter bar
+   (auto) / Research feed (1fr) / Analysis header (auto) / Analysis feed
+   (1fr) — the 3 `minmax(0,1fr)` tracks always get exactly equal shares of
+   whatever height is left over after the 4 auto tracks, with `minmax(0,…)`
+   preventing any one track's content from forcing the row taller than its
+   fair share. Each feed keeps its own overflow-y:auto to scroll internally
+   if its share of items exceeds its allotted third.
    ─────────────────────────────────────────────────────────────────────────── */
 #intel-scroll {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto minmax(0,1fr) auto auto minmax(0,1fr) auto minmax(0,1fr);
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -2194,7 +2203,6 @@ a:focus-visible,
 #news-section-feed,
 #research-section-feed,
 #trading-section-feed {
-  flex: 1 1 0;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
