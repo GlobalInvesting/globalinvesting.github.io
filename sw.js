@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.114.28';
+const CACHE_VERSION = 'gi-v8.114.29';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -39,7 +39,7 @@ const STATIC_PRECACHE = [
   '/assets/fx-websocket.js?v=1.0.0',
   '/assets/cot-modal-chart.js?v=7.91.2',
   '/assets/cb-rates-modal.js?v=8.0.4',
-  '/assets/real-carry-modal.js?v=2.7.7',
+  '/assets/real-carry-modal.js?v=2.7.8',
   '/assets/corr-modal.js?v=2.2.0',
   '/assets/yc-modal.js?v=8.8.5',
   '/assets/heatmap-modal.js?v=2.4.0',
