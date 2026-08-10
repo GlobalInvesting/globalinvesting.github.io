@@ -1,13 +1,29 @@
 {
-  "updated_utc": "2026-08-10T02:35:24.535585+00:00",
-  "updated_label": "02:35 UTC",
-  "total": 23,
+  "updated_utc": "2026-08-10T05:44:48.263947+00:00",
+  "updated_label": "05:44 UTC",
+  "total": 31,
   "sources": [
     "BIS",
     "CME",
+    "ING",
     "Saxo"
   ],
   "items": [
+    {
+      "id": "2497d2535d03",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Is China’s reflation trend running out of steam?",
+      "excerpt": "ASIA/PACIFIC: China’s CPI inflation cooled to a 6-month low in July, marking a third straight month of negative month-on-month prices, while PPI inflation also decelerated from June's peak. Though energy is volatile in the short run, the persistent drag from food and rental costs will decide if China's reflation trend…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/is-chinas-reflation-story-running-out-of-steam/",
+      "currencies": [],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1786327500000,
+      "published": "2026-08-10T02:05:00+00:00"
+    },
     {
       "id": "84e0321b3201",
       "bank": "CME",
@@ -44,6 +60,70 @@
       "published": "2026-08-07T21:00:52+00:00"
     },
     {
+      "id": "66fdfd2145f4",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Surprise US job weakness casts serious doubt on Fed rate hikes",
+      "excerpt": "NORTH AMERICA: The US lost jobs in July and while the unemployment rate fell, it was for bad reasons. Rate hike expectations have declined, but there is a lot happening before the 16 September FOMC…",
+      "author": "",
+      "url": "https://think.ing.com/articles/surprise-job-weakness-casts-serious-doubt-on-fed-rate-hikes/",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1786110900000,
+      "published": "2026-08-07T13:55:00+00:00"
+    },
+    {
+      "id": "c9a68a4f2a80",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Monitoring Turkey: Geopolitical relief to support disinflation",
+      "excerpt": "TURKEY: July data reinforced the downtrend in annual inflation, with risks from energy prices and geopolitics easing. Meanwhile, rising reserves and easing Gulf tensions are bringing the timing of the Central Bank of Turkey's liquidity easing into sharper…",
+      "author": "",
+      "url": "https://think.ing.com/articles/monitoring-turkey-geopolitical-relief-to-supports-disinflation/",
+      "currencies": [],
+      "pairs": [],
+      "category": "technical",
+      "ts": 1786110600000,
+      "published": "2026-08-07T13:50:00+00:00"
+    },
+    {
+      "id": "e423738ec508",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "CEE & CCA week ahead: Polish GDP and inflation, and Romania rate decision",
+      "excerpt": "CENTRAL AND EASTERN EUROPE: We expect the National Bank of Romania to leave rates unchanged on 10 August, extending the pause in place since August 2024. The week will also bring inflation data from across the CEE and CCA…",
+      "author": "",
+      "url": "https://think.ing.com/articles/cee-cca-week-ahead/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1786102200000,
+      "published": "2026-08-07T11:30:00+00:00"
+    },
+    {
+      "id": "03895f553123",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "THINK Ahead: This is what’s really keeping central banks up at night",
+      "excerpt": "What if the supply shocks just keep on coming? From semiconductors to hot weather, there's no shortage of potential risks. Yet against a backdrop of a cooler jobs market, James Smith argues the case for a fresh inflation wave is far from…",
+      "author": "",
+      "url": "https://think.ing.com/opinions/think-ahead-this-is-whats-really-keeping-central-banks-up-at-night/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1786098720000,
+      "published": "2026-08-07T10:32:00+00:00"
+    },
+    {
       "id": "27b71d093492",
       "bank": "Saxo",
       "bank_full": "Saxo Bank (SaxoStrats) — Articles",
@@ -60,6 +140,40 @@
       "category": "trade_idea",
       "ts": 1786095000000,
       "published": "2026-08-07T09:30:00+00:00"
+    },
+    {
+      "id": "7a48ccc9c44e",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "FX Daily",
+      "title": "FX Daily: High-stakes payrolls",
+      "excerpt": "Kevin Warsh’s ambiguity at the July FOMC means data releases like today’s payrolls carry greater risks of an outsized market reaction. Our call (70k) is close to consensus (80k), with only a tick higher in unemployment to 4.3%, which could drive a small dollar drop. We are still looking at no Fed cuts and dollar softening going…",
+      "author": "",
+      "url": "https://think.ing.com/articles/fx-daily-high-stakes-payrolls/",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1786085100000,
+      "published": "2026-08-07T06:45:00+00:00"
+    },
+    {
+      "id": "8b7799ad0841",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Rates Spark: More guidance from jobs data than the Fed",
+      "excerpt": "The Fed is leaving markets guessing on rates, with a September hike still a close call. This turns the focus to today’s US jobs report, while resilient risk sentiment and elevated real yields keep long-end rates under…",
+      "author": "",
+      "url": "https://think.ing.com/articles/rates-spark-more-guidance-from-the-jobs-data-than-from-the-fed/",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1786084080000,
+      "published": "2026-08-07T06:28:00+00:00"
     },
     {
       "id": "068c33cfe2aa",
@@ -79,6 +193,23 @@
       "category": "technical",
       "ts": 1786082460000,
       "published": "2026-08-07T06:01:00+00:00"
+    },
+    {
+      "id": "449736fc58d3",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "German industry shows surprising resilience in June",
+      "excerpt": "EUROPE: Despite higher energy prices and the war in the Middle East, German industry continued its modest cyclical rebound, with an improvement in June. However, whether this rebound can really translate into a structural and sustainable recovery remains a different…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/germanys-industrial-outlook-improves/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1786081740000,
+      "published": "2026-08-07T05:49:00+00:00"
     },
     {
       "id": "e336bfd4d464",
