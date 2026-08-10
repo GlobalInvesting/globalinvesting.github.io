@@ -25,13 +25,13 @@
         "9 Dec"
       ],
       "source": "federalreserve.gov",
-      "bias": "cut",
+      "bias": "hold",
       "biasSource": "CME 30-Day Fed Funds futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-10",
-      "cutProb": 44,
+      "cutProb": 0,
       "hikeProb": 0,
-      "fwdRate": 3.64
+      "fwdRate": 3.75
     },
     "EUR": {
       "nextMeeting": "10 Sep",
@@ -89,13 +89,13 @@
         "17 Dec"
       ],
       "source": "bankofengland.co.uk",
-      "bias": "hike",
+      "bias": "hold",
       "biasSource": "ICE 1-Month SONIA futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-10",
       "cutProb": 0,
-      "hikeProb": 13,
-      "fwdRate": 3.7825
+      "hikeProb": 0,
+      "fwdRate": 3.75
     },
     "JPY": {
       "nextMeeting": "18 Sep",
@@ -187,13 +187,13 @@
         "9 Dec"
       ],
       "source": "bankofcanada.ca",
-      "bias": "hike",
+      "bias": "hold",
       "biasSource": "Barchart CORRA 1-Month futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-10",
       "cutProb": 0,
-      "hikeProb": 22,
-      "fwdRate": 2.305
+      "hikeProb": 0,
+      "fwdRate": 2.25
     },
     "CHF": {
       "nextMeeting": "24 Sep",
