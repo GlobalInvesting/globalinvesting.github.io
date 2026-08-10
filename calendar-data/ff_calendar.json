@@ -1,8 +1,107 @@
 {
-  "generated_at": "2026-08-10T19:04:25Z",
-  "source": "Myfxbook · ForexFactory",
+  "generated_at": "2026-08-10T19:26:54.357Z",
+  "source": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable)",
   "holidays": [],
   "events": [
+    {
+      "currency": "AUD",
+      "impact": "medium",
+      "title": "Australia Myfxbook AUDUSD Sentiment",
+      "actual": "22.0%",
+      "forecast": null,
+      "previous": "27.0%",
+      "dateISO": "2026-08-10",
+      "timeUTC": "08:00",
+      "released": true
+    },
+    {
+      "currency": "CAD",
+      "impact": "medium",
+      "title": "Canada Myfxbook USDCAD Sentiment",
+      "actual": "55.0%",
+      "forecast": null,
+      "previous": "36.0%",
+      "dateISO": "2026-08-10",
+      "timeUTC": "08:00",
+      "released": true
+    },
+    {
+      "currency": "CHF",
+      "impact": "medium",
+      "title": "Switzerland Myfxbook USDCHF Sentiment",
+      "actual": "58.0%",
+      "forecast": null,
+      "previous": "58.0%",
+      "dateISO": "2026-08-10",
+      "timeUTC": "08:00",
+      "released": true
+    },
+    {
+      "currency": "EUR",
+      "impact": "medium",
+      "title": "European Union Myfxbook EURUSD Sentiment",
+      "actual": "39.0%",
+      "forecast": null,
+      "previous": "42.0%",
+      "dateISO": "2026-08-10",
+      "timeUTC": "08:00",
+      "released": true
+    },
+    {
+      "currency": "GBP",
+      "impact": "medium",
+      "title": "United Kingdom Myfxbook GBPUSD Sentiment",
+      "actual": "33.0%",
+      "forecast": null,
+      "previous": "32.0%",
+      "dateISO": "2026-08-10",
+      "timeUTC": "08:00",
+      "released": true
+    },
+    {
+      "currency": "JPY",
+      "impact": "medium",
+      "title": "Japan Myfxbook USDJPY Sentiment",
+      "actual": "62.0%",
+      "forecast": null,
+      "previous": "78.0%",
+      "dateISO": "2026-08-10",
+      "timeUTC": "08:00",
+      "released": true
+    },
+    {
+      "currency": "NZD",
+      "impact": "medium",
+      "title": "New Zealand Myfxbook NZDUSD Sentiment",
+      "actual": "24.0%",
+      "forecast": null,
+      "previous": "26.0%",
+      "dateISO": "2026-08-10",
+      "timeUTC": "08:00",
+      "released": true
+    },
+    {
+      "currency": "USD",
+      "impact": "medium",
+      "title": "United States Fed Hammack Speech",
+      "actual": null,
+      "forecast": null,
+      "previous": null,
+      "dateISO": "2026-08-10",
+      "timeUTC": "19:00",
+      "released": true
+    },
+    {
+      "currency": "GBP",
+      "impact": "high",
+      "title": "United Kingdom BRC Retail Sales Monitor YoY",
+      "actual": null,
+      "forecast": "1.5%",
+      "previous": "1.7%",
+      "dateISO": "2026-08-10",
+      "timeUTC": "23:01",
+      "released": false
+    },
     {
       "title": "Germany PPI YoY",
       "currency": "EUR",
@@ -2943,107 +3042,6 @@
       "previous": null,
       "actual": null,
       "released": true,
-      "vendor": "myfxbook"
-    },
-    {
-      "currency": "AUD",
-      "impact": "medium",
-      "title": "Australia Myfxbook AUDUSD Sentiment",
-      "actual": "22.0%",
-      "forecast": null,
-      "previous": "27.0%",
-      "dateISO": "2026-08-10",
-      "timeUTC": "08:00",
-      "released": true
-    },
-    {
-      "currency": "CAD",
-      "impact": "medium",
-      "title": "Canada Myfxbook USDCAD Sentiment",
-      "actual": "55.0%",
-      "forecast": null,
-      "previous": "36.0%",
-      "dateISO": "2026-08-10",
-      "timeUTC": "08:00",
-      "released": true
-    },
-    {
-      "currency": "CHF",
-      "impact": "medium",
-      "title": "Switzerland Myfxbook USDCHF Sentiment",
-      "actual": "58.0%",
-      "forecast": null,
-      "previous": "58.0%",
-      "dateISO": "2026-08-10",
-      "timeUTC": "08:00",
-      "released": true
-    },
-    {
-      "currency": "EUR",
-      "impact": "medium",
-      "title": "European Union Myfxbook EURUSD Sentiment",
-      "actual": "39.0%",
-      "forecast": null,
-      "previous": "42.0%",
-      "dateISO": "2026-08-10",
-      "timeUTC": "08:00",
-      "released": true
-    },
-    {
-      "currency": "GBP",
-      "impact": "medium",
-      "title": "United Kingdom Myfxbook GBPUSD Sentiment",
-      "actual": "33.0%",
-      "forecast": null,
-      "previous": "32.0%",
-      "dateISO": "2026-08-10",
-      "timeUTC": "08:00",
-      "released": true
-    },
-    {
-      "currency": "JPY",
-      "impact": "medium",
-      "title": "Japan Myfxbook USDJPY Sentiment",
-      "actual": "62.0%",
-      "forecast": null,
-      "previous": "78.0%",
-      "dateISO": "2026-08-10",
-      "timeUTC": "08:00",
-      "released": true
-    },
-    {
-      "currency": "NZD",
-      "impact": "medium",
-      "title": "New Zealand Myfxbook NZDUSD Sentiment",
-      "actual": "24.0%",
-      "forecast": null,
-      "previous": "26.0%",
-      "dateISO": "2026-08-10",
-      "timeUTC": "08:00",
-      "released": true
-    },
-    {
-      "title": "United States Fed Hammack Speech",
-      "currency": "USD",
-      "dateISO": "2026-08-10",
-      "timeUTC": "19:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": true,
-      "vendor": "myfxbook"
-    },
-    {
-      "title": "United Kingdom BRC Retail Sales Monitor YoY",
-      "currency": "GBP",
-      "dateISO": "2026-08-10",
-      "timeUTC": "23:01",
-      "impact": "high",
-      "forecast": "1.5%",
-      "previous": "1.7%",
-      "actual": null,
-      "released": false,
       "vendor": "myfxbook"
     },
     {
