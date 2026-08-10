@@ -1,6 +1,19 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.3.0
+ * GlobalInvesting FX Terminal — License Auth Module  v1.4.0
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.4.0 (2026-08-10): pingSession() now reads the /session/ping response
+ *   status instead of only using .catch() for network errors. A 403 means
+ *   the license worker has revoked this (account, server) pair (new
+ *   revoked_accounts table + isRevoked() in worker.js, GI_admin_dashboard's
+ *   "Revoke" button) — handleRevocation() clears the stored JWT, stops the
+ *   ping timer, and re-shows the activation gate so the terminal locks
+ *   without waiting for a hard refresh. A 401 (malformed/expired token) is
+ *   treated the same way defensively, though isJWTValid()'s own exp check
+ *   should normally catch that case first. Still best-effort in the sense
+ *   that a network error or a tab that's already closed can't be reached —
+ *   see the "Revocation" section in worker.js's header docblock for the
+ *   known propagation-delay limit this does NOT solve.
  *
  * v1.3.0 (2026-08-05): activation modal's broker copy updated from
  *   TMGM-only to "TMGM or Vantage" — GlobalInvesting became an IB of
@@ -362,7 +375,29 @@
         'Authorization': `Bearer ${token}`,
         'X-Session-Id':  getOrCreateSessionId(),
       },
-    }).catch(() => {}); // best-effort — must never disrupt the terminal
+    }).then(res => {
+      // 401/403 here means the worker rejected this token outright — most
+      // commonly a revocation (see isRevoked() in worker.js), possibly an
+      // expired/malformed token isJWTValid() didn't catch. Distinct from a
+      // network failure (caught below), which must NOT lock the user out.
+      if (res && (res.status === 401 || res.status === 403)) handleRevocation();
+    }).catch(() => {}); // network errors are best-effort — must never disrupt the terminal
+  }
+
+  // Fired when the worker rejects an active session's token (see pingSession
+  // above). Clears local state and re-locks the terminal — the person sees
+  // the same activation modal as a first-time visitor, rather than the
+  // terminal silently continuing to render with revoked access.
+  function handleRevocation() {
+    if (sessionPingTimer) { clearInterval(sessionPingTimer); sessionPingTimer = null; }
+    try { sessionStorage.removeItem(JWT_KEY); } catch {}
+    try { localStorage.removeItem(JWT_KEY); }   catch {}
+    window.GI_AUTH.isActive = false;
+    document.getElementById('gi-renew-banner')?.classList.remove('visible');
+    applyGates();
+    showModal();
+    const statusEl = document.getElementById('gi-auth-status');
+    if (statusEl) setStatus(statusEl, 'Your access to this terminal has been revoked. Contact support if you believe this is an error.', 'err');
   }
 
   function startSessionPing(token) {
