@@ -255,8 +255,14 @@ const _RCM_G8 = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'NOK', 
 const _RCM_CB = { USD: 'Fed', EUR: 'ECB', GBP: 'BoE', JPY: 'BoJ', AUD: 'RBA', CAD: 'BoC', CHF: 'SNB', NZD: 'RBNZ', NOK: 'NB', SEK: 'Riksbank' };
 const _RCM_FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CAD: 'ca', CHF: 'ch', NZD: 'nz', NOK: 'no', SEK: 'se' };
 
-// Inflation expectation source labels — shown in the source column for transparency
-// Sources reflect update-inflation-expectations.yml v5.0 (forward-looking cascade)
+// Inflation expectation source labels — FALLBACK ONLY (v8.x). The real, per-run
+// source is now read dynamically from extended-data/{CCY}.json's
+// data.inflationExpectationsSource field (written by fetch_inflation_expectations.py
+// v5.6+), since a currency can silently drop to a lower cascade fallback tier on
+// any given run and this static table has no way of reflecting that. This table
+// is only used when that field is absent (e.g. a file written by an older script
+// version) — assumes every currency is on its documented primary source, which
+// will be wrong whenever a fallback fired.
 const _RCM_IE_SRC = {
   USD: 'FRED T5YIE · 5Y TIPS breakeven',
   EUR: 'FRED T5YIFR · EUR 5Y5Y swap',
@@ -372,8 +378,14 @@ async function _rcmFetchData() {
         const d = extResults[i];
         const ie = d?.data?.inflationExpectations;
         const ieDate = d?.dates?.inflationExpectations;
+        // v8.x: server now persists which cascade tier actually resolved this
+        // run (fetch_inflation_expectations.py v5.6). Prefer this over the
+        // static _RCM_IE_SRC table, which assumes every currency is always
+        // on its primary source and goes silently stale whenever a currency
+        // falls back to a lower tier.
+        const ieSrc = d?.data?.inflationExpectationsSource || null;
         if (ie != null) {
-          inflExp[ccy] = { val: ie, date: ieDate || null, live: false };
+          inflExp[ccy] = { val: ie, date: ieDate || null, live: false, source: ieSrc };
         }
       });
 
@@ -482,7 +494,7 @@ function _rcmRenderBreakdown() {
     const isLive = ie?.live
       ? `<span class="rcm-live-dot" title="Market-implied (FRED breakeven)"></span>`
       : '';
-    const srcTitle = `${_RCM_IE_SRC[ccy] || ''}${ie?.date ? ' · ' + ie.date : ''}`;
+    const srcTitle = `${ie?.source || _RCM_IE_SRC[ccy] || ''}${ie?.date ? ' · ' + ie.date : ''}`;
 
     // OIS source indicator — shows benchmark name (SOFR/€STR/…) or 'policy' as fallback
     const nomSrc    = nomEntry?.source || 'policy';
@@ -787,7 +799,7 @@ function _rcmRenderPairDetail(baseCcy, quoteCcy) {
   </div>
   ${sustainText ? `<div class="rcm-sustain ${sustainCls}">${sustainText}</div>` : ''}
   <div class="rcm-src-note" style="padding:8px 14px;font-size:8.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);line-height:1.6;border-top:1px solid var(--border2);">
-    Infl. Exp. source — ${highCcy}: ${_RCM_IE_SRC[highCcy] || '—'} · ${lowCcy}: ${_RCM_IE_SRC[lowCcy] || '—'}<br>
+    Infl. Exp. source — ${highCcy}: ${d.inflExp[highCcy]?.source || _RCM_IE_SRC[highCcy] || '—'} · ${lowCcy}: ${d.inflExp[lowCcy]?.source || _RCM_IE_SRC[lowCcy] || '—'}<br>
     Real carry/vol = |real spread| / HV30 (30-day realised vol, annualised)
   </div>
   </div>`;
