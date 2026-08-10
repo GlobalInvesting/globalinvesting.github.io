@@ -41,7 +41,6 @@
 /* ── Animations ── */
 @keyframes rcm-fi{from{opacity:0}to{opacity:1}}
 @keyframes rcm-su{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
-@keyframes rcm-pulse{0%,100%{opacity:1}50%{opacity:.35}}
 /* ── Backdrop ── */
 #rcm-bd{position:fixed!important;inset:0!important;z-index:9200;display:flex!important;flex-direction:column;overflow:hidden;background:var(--bg);}
 /* ── Modal shell ── */
@@ -118,9 +117,6 @@
 .rcm-bias-hike{background:rgba(38,166,154,.15);color:var(--up,#26a69a);border:1px solid rgba(38,166,154,.30);}
 .rcm-bias-cut{background:rgba(239,83,80,.12);color:var(--down,#ef5350);border:1px solid rgba(239,83,80,.25);}
 .rcm-bias-hold{background:rgba(122,135,153,.10);color:var(--text2);border:1px solid rgba(122,135,153,.20);}
-
-/* ── Live dot ── */
-.rcm-live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--up,#26a69a);margin-left:3px;vertical-align:middle;animation:rcm-pulse 2s ease-in-out infinite;}
 
 /* ── Pair detail ── */
 .rcm-pd-header{padding:10px 14px 9px;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3,#4e5c70);display:flex;align-items:center;gap:6px;flex-shrink:0;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);}
@@ -276,6 +272,31 @@ const _RCM_IE_SRC = {
   SEK: 'SCB CPIF YoY · Statistics Sweden (Riksbank target)',
 };
 
+// v8.x — classify each currency's actual per-run inflation-expectation source into
+// forward-looking (market breakeven / survey — comparable to what a real-rate calc
+// wants) vs backward-looking CPI proxy (realized inflation, an adaptive-expectations
+// approximation used only when no forward source resolves). This replaces the
+// always-false `live` flag (dead code since the FRED CORS live-upgrade was removed
+// in v8.3.6 — see the comment block below) as the basis for any "is this forward or
+// proxy" UI signal, and is computed from the real per-run source string
+// (fetch_inflation_expectations.py v5.6's `inflationExpectationsSource`) rather than
+// a static per-currency assumption — the same class of staleness the per-row source
+// label (`_RCM_IE_SRC` fallback) was fixed for.
+function _rcmClassifyIESource(source) {
+  if (!source) return { kind: 'unknown', tag: '', title: 'Source unknown' };
+  const s = source.toLowerCase();
+  if (s.includes('breakeven')) {
+    return { kind: 'breakeven', tag: 'FWD', title: `Market-implied forward breakeven — ${source}` };
+  }
+  if (s.includes('survey')) {
+    return { kind: 'survey', tag: 'FWD', title: `Forward-looking survey — ${source}` };
+  }
+  // IMF/OECD/FRED-index-YoY/World Bank CPI YoY — realized inflation, not a forward
+  // expectation; used as an adaptive-expectations proxy when no breakeven/survey
+  // is available or resolves this run.
+  return { kind: 'cpi', tag: 'CPI', title: `Realized CPI YoY (backward-looking proxy) — ${source}` };
+}
+
 // ── State ───────────────────────────────────────────────────────────────────
 let _rcmData = null;           // cached computed data
 let _rcmFetchPromise = null;   // in-flight promise — prevents duplicate concurrent fetches
@@ -371,8 +392,7 @@ async function _rcmFetchData() {
         }
       });
 
-      // Parse inflation expectations from extended-data (all 8 currencies including USD/EUR)
-      // USD/EUR will be upgraded with live FRED values in Phase 2 if available.
+      // Parse inflation expectations from extended-data (all 10 G10 currencies)
       const inflExp = {};
       extKeys.forEach((ccy, i) => {
         const d = extResults[i];
@@ -382,10 +402,15 @@ async function _rcmFetchData() {
         // run (fetch_inflation_expectations.py v5.6). Prefer this over the
         // static _RCM_IE_SRC table, which assumes every currency is always
         // on its primary source and goes silently stale whenever a currency
-        // falls back to a lower tier.
+        // falls back to a lower tier. Forward-vs-proxy classification is
+        // derived from this `source` string via `_rcmClassifyIESource()` —
+        // there is no separate `live` flag anymore (the old one was hardcoded
+        // false everywhere it was set, dead code since the FRED CORS
+        // live-upgrade was removed in v8.3.6, and silently defeated every UI
+        // element gated on it — see the FWD/CPI badge and header tile fixes).
         const ieSrc = d?.data?.inflationExpectationsSource || null;
         if (ie != null) {
-          inflExp[ccy] = { val: ie, date: ieDate || null, live: false, source: ieSrc };
+          inflExp[ccy] = { val: ie, date: ieDate || null, source: ieSrc };
         }
       });
 
@@ -491,8 +516,9 @@ function _rcmRenderBreakdown() {
     const nomFmt = nom != null ? nom.toFixed(2) + '%' : '—';
     const ieFmt  = ie  ? ie.val.toFixed(2) + '%' : '—';
     const rrFmt  = _rcmRrFmt(rr);
-    const isLive = ie?.live
-      ? `<span class="rcm-live-dot" title="Market-implied (FRED breakeven)"></span>`
+    const ieClass = _rcmClassifyIESource(ie?.source);
+    const ieBadge = ie != null && ieClass.tag
+      ? `<span style="font-size:7px;font-weight:700;letter-spacing:0.3px;margin-left:4px;padding:1px 3px;border-radius:2px;vertical-align:middle;${ieClass.kind === 'cpi' ? 'color:var(--text3);border:1px solid var(--border2);' : 'color:var(--up,#26a69a);border:1px solid var(--up,#26a69a);'}" title="${ieClass.title}">${ieClass.tag}</span>`
       : '';
     const srcTitle = `${ie?.source || _RCM_IE_SRC[ccy] || ''}${ie?.date ? ' · ' + ie.date : ''}`;
 
@@ -517,7 +543,7 @@ function _rcmRenderBreakdown() {
         <span style="color:var(--text3);font-size:9px;margin-left:4px;">${ccy}</span>
       </td>
       <td title="${nomTitle}">${nomFmt}${nomSrcTag}</td>
-      <td title="${srcTitle}">${ieFmt}${isLive}</td>
+      <td title="${srcTitle}">${ieFmt}${ieBadge}</td>
       <td class="${rrCls}" style="font-weight:700;">${rrFmt}</td>
       <td style="text-align:right;">${_rcmBiasChip(bias)}</td>
     </tr>`;
@@ -528,13 +554,24 @@ function _rcmRenderBreakdown() {
   const fallbackNote = policyFallbacks.length
     ? ` ${policyFallbacks.join('/')} nominal: CB policy rate (OIS data unavailable).`
     : '';
-  const liveNote = 'Nominal rate: OIS overnight benchmark (SOFR/€STR/SONIA/TONA/AONIA/CORRA/SARON/OCR) — institutional overnight rate standard.' + fallbackNote + ' · ' +
-    'USD/EUR infl.exp: FRED 5Y breakeven (market-implied, daily). ' +
-    'GBP: BOE SDIE household survey 2Y-ahead. CAD: FRED 5Y breakeven. NZD: RBNZ survey 2Y-ahead. ' +
-    'JPY/AUD/CHF: CPI YoY (IMF SDMX 3.0, weekly). ' +
-    'NOK: SSB headline CPI YoY (Statistics Norway). SEK: SCB CPIF YoY (Riksbank target measure). ' +
+  // v8.x: which currencies actually resolved to the CPI-proxy fallback tier THIS RUN
+  // (as opposed to their documented primary breakeven/survey source), computed live
+  // from each currency's real per-run source string rather than a static per-currency
+  // table. Replaces the old hardcoded sentence ("GBP: BOE SDIE survey", "NZD: RBNZ
+  // survey", etc.) which stated intended primaries as settled fact — GBP/NZD's
+  // surveys and the IMF/OECD/FRED/World Bank fallback chain each currency can walk
+  // change run to run (RBNZ/BOE bot-challenge blocks are common, see GUIDELINES.md),
+  // so that static sentence went stale in exactly the way _RCM_IE_SRC's per-row
+  // fallback table did — fixed there via fetch_inflation_expectations.py v5.6's
+  // dynamic source label; fixed here by deriving the footnote from the same field.
+  const cpiProxyCcys = _RCM_G8.filter(c => _rcmClassifyIESource(d.inflExp[c]?.source).kind === 'cpi');
+  const proxyNote = cpiProxyCcys.length
+    ? ` This run: ${cpiProxyCcys.join('/')} resolved to realized CPI YoY (backward-looking proxy) rather than a forward breakeven/survey — hover a row's Infl. Exp. cell (or its FWD/CPI badge) for the exact source used.`
+    : ' This run: all currencies resolved to a forward-looking market breakeven or survey.';
+  const liveNote = 'Nominal rate: OIS overnight benchmark (SOFR/€STR/SONIA/TONA/AONIA/CORRA/SARON/OCR) — institutional overnight rate standard.' + fallbackNote + ' ' +
+    'Infl. Exp. methodology: market-implied breakeven where liquid (USD/EUR/CAD), forward-looking survey where published (GBP/NZD), falling back to realized CPI YoY (IMF SDMX → OECD → FRED index → World Bank, in that order) elsewhere or whenever the primary source is unavailable.' + proxyNote + ' ' +
     'Real rate = Nominal OIS − Inflation Expectation. OIS Bias reflects forward market consensus at next CB meeting. ' +
-    'Note: real carry ≠ CIP — no FX forward adjustment applied.';
+    'Note: real carry ≠ CIP — no FX forward adjustment applied. Nominal tenor (overnight) and inflation-expectation tenor (0–5Y depending on which source resolved) are not matched — a precision caveat on the real-rate figure, not a data error.';
 
   return `<div class="rcm-cw" style="flex:1;min-height:0;overflow:auto;">
     <table class="rcm-tbl" aria-label="Real rate carry ranking by currency">
@@ -870,10 +907,19 @@ function _rcmUpdateMetrics() {
     elSpread.querySelector('.rcm-mm-sub').textContent = `${best}−${worst} spread`;
   }
   if (elSrc) {
-    const usdFresh = d.inflExp['USD']?.live;
+    // v8.x: was gated on `d.inflExp['USD']?.live`, a flag hardcoded false everywhere
+    // it's set (dead code since the FRED CORS live-upgrade was removed in v8.3.6) —
+    // so this tile always rendered the pessimistic "IMF · OECD / CPI proxy · weekly"
+    // branch even on runs where USD/EUR/CAD were genuinely on live market breakevens.
+    // Now derived from the real per-currency source classification, same as the
+    // per-row FWD/CPI badges and the footnote below.
+    const classes = _RCM_G8.map(c => _rcmClassifyIESource(d.inflExp[c]?.source).kind);
+    const fwdCount = classes.filter(k => k === 'breakeven' || k === 'survey').length;
     elSrc.querySelector('.rcm-mm-lbl').textContent = 'Infl. Exp.';
-    elSrc.querySelector('.rcm-mm-val').textContent = usdFresh ? 'FRED · IMF' : 'IMF · OECD';
-    elSrc.querySelector('.rcm-mm-sub').textContent = usdFresh ? 'USD/EUR: live breakeven' : 'CPI proxy · weekly';
+    elSrc.querySelector('.rcm-mm-val').textContent = `${fwdCount} / ${_RCM_G8.length} FWD`;
+    elSrc.querySelector('.rcm-mm-sub').textContent = fwdCount === _RCM_G8.length
+      ? 'All market/survey-implied'
+      : `${_RCM_G8.length - fwdCount} on CPI proxy this run`;
   }
 
   const elPos = document.getElementById('rcm-mm-positive');
