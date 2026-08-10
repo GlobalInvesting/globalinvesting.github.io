@@ -187,13 +187,13 @@
         "9 Dec"
       ],
       "source": "bankofcanada.ca",
-      "bias": "cut",
-      "biasSource": "Montreal Exchange COA CORRA futures, meeting-bracketed",
+      "bias": "hike",
+      "biasSource": "Barchart CORRA 1-Month futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-10",
-      "cutProb": 100,
-      "hikeProb": 0,
-      "fwdRate": 2.0
+      "cutProb": 0,
+      "hikeProb": 22,
+      "fwdRate": 2.305
     },
     "CHF": {
       "nextMeeting": "24 Sep",
