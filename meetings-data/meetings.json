@@ -126,8 +126,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-08-11",
       "cutProb": 0,
-      "hikeProb": 49,
-      "fwdRate": 1.1225
+      "hikeProb": 50,
+      "fwdRate": 1.125
     },
     "AUD": {
       "nextMeeting": "29 Sep",
@@ -241,13 +241,13 @@
         "9 Dec"
       ],
       "source": "rbnz.govt.nz",
-      "bias": "hike",
+      "bias": "hold",
       "biasSource": "cbonds OIS NZIONA curve, meeting-bracketed forward",
-      "biasMethod": "ois",
+      "biasMethod": "spread",
       "biasUpdated": "2026-08-11",
       "cutProb": 0,
-      "hikeProb": 90,
-      "fwdRate": 2.725
+      "hikeProb": 0,
+      "fwdRate": 2.5
     },
     "NOK": {
       "nextMeeting": "13 Aug",
