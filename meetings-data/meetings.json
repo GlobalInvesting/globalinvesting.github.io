@@ -25,13 +25,13 @@
         "9 Dec"
       ],
       "source": "federalreserve.gov",
-      "bias": "cut",
+      "bias": "hold",
       "biasSource": "CME 30-Day Fed Funds futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-11",
-      "cutProb": 52,
+      "cutProb": 0,
       "hikeProb": 0,
-      "fwdRate": 3.62
+      "fwdRate": 3.75
     },
     "EUR": {
       "nextMeeting": "10 Sep",
@@ -243,11 +243,11 @@
       "source": "rbnz.govt.nz",
       "bias": "hold",
       "biasSource": "cbonds OIS NZIONA curve, meeting-bracketed forward",
-      "biasMethod": "spread",
+      "biasMethod": "heuristic",
       "biasUpdated": "2026-08-11",
-      "cutProb": 0,
-      "hikeProb": 0,
-      "fwdRate": 2.5
+      "cutProb": null,
+      "hikeProb": null,
+      "fwdRate": null
     },
     "NOK": {
       "nextMeeting": "13 Aug",
