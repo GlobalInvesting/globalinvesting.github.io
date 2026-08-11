@@ -1,13 +1,13 @@
 {
-  "runTimestamp": "2026-08-10T09:39:25.150547Z",
-  "runDate": "2026-08-10",
+  "runTimestamp": "2026-08-11T04:31:37.777538Z",
+  "runDate": "2026-08-11",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
       "status": "ok",
       "rate": "3.75",
       "source": "NYFed-EFFR",
-      "date": "2026-08-06",
+      "date": "2026-08-07",
       "issues": []
     },
     "EUR": {
@@ -32,24 +32,24 @@
       "issues": []
     },
     "CAD": {
-      "status": "cached",
+      "status": "ok",
       "rate": "2.25",
-      "source": "cached-file",
-      "date": "2026-08-01",
+      "source": "BoC-Valet",
+      "date": "2026-08-03",
       "issues": []
     },
     "AUD": {
-      "status": "cached",
+      "status": "ok",
       "rate": "4.35",
-      "source": "cached-file",
-      "date": "2026-08-01",
+      "source": "ff-calendar-actual",
+      "date": "2026-08-11",
       "issues": []
     },
     "CHF": {
       "status": "ok",
       "rate": "0.00",
       "source": "SNB-scraping",
-      "date": "2026-08-10",
+      "date": "2026-08-11",
       "issues": []
     },
     "NZD": {
