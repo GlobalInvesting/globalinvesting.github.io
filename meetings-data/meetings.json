@@ -61,9 +61,9 @@
       "biasSource": "CME 1-Month ESTR futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-11",
-      "cutProb": 0.0,
-      "hikeProb": 90.0,
-      "fwdRate": 2.475
+      "cutProb": 0,
+      "hikeProb": 66,
+      "fwdRate": 2.415
     },
     "GBP": {
       "nextMeeting": "17 Sep",
@@ -126,8 +126,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-08-11",
       "cutProb": 0,
-      "hikeProb": 50,
-      "fwdRate": 1.125
+      "hikeProb": 49,
+      "fwdRate": 1.1225
     },
     "AUD": {
       "nextMeeting": "29 Sep",
@@ -241,13 +241,13 @@
         "9 Dec"
       ],
       "source": "rbnz.govt.nz",
-      "bias": "hold",
+      "bias": "hike",
       "biasSource": "cbonds OIS NZIONA curve, meeting-bracketed forward",
-      "biasMethod": "heuristic",
+      "biasMethod": "ois",
       "biasUpdated": "2026-08-11",
-      "cutProb": null,
-      "hikeProb": null,
-      "fwdRate": null
+      "cutProb": 0,
+      "hikeProb": 90,
+      "fwdRate": 2.725
     },
     "NOK": {
       "nextMeeting": "13 Aug",
@@ -275,7 +275,7 @@
       "source": "norges-bank.no",
       "bias": "hold",
       "biasSource": "cbonds OIS NOWA curve, meeting-bracketed forward",
-      "biasMethod": "spread",
+      "biasMethod": "ois",
       "biasUpdated": "2026-08-11",
       "cutProb": 0,
       "hikeProb": 0,
@@ -309,9 +309,9 @@
       "biasSource": "cbonds OIS SWESTR curve, meeting-bracketed forward",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-11",
-      "cutProb": 15,
+      "cutProb": 0,
       "hikeProb": 0,
-      "fwdRate": 1.7125
+      "fwdRate": 1.75
     }
   }
 }
