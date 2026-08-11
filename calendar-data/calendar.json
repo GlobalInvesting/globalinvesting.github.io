@@ -1,20 +1,20 @@
 {
-  "lastUpdate": "2026-08-10T21:09:18Z",
-  "generatedAt": "2026-08-10T21:09:18Z",
-  "fetchMode": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable) via ff_calendar.json",
+  "lastUpdate": "2026-08-11T06:13:22Z",
+  "generatedAt": "2026-08-11T06:13:22Z",
+  "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
-  "source": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable)",
+  "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-08-11",
   "rangeTo": "2026-08-14",
-  "totalEvents": 3718,
+  "totalEvents": 3721,
   "currencyCounts": {
-    "EUR": 850,
+    "EUR": 851,
     "GBP": 431,
-    "AUD": 253,
-    "USD": 1262,
+    "AUD": 252,
+    "USD": 1265,
     "NZD": 85,
     "JPY": 214,
     "CHF": 120,
@@ -23,71 +23,11 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1825,
-    "high": 1665,
+    "medium": 1827,
+    "high": 1666,
     "low": 228
   },
   "surpriseStats": {
-    "AUD/nab business confidence": {
-      "n": 3,
-      "mean": 7.666667,
-      "std": 0.57735
-    },
-    "EUR/industrial production mom": {
-      "n": 8,
-      "mean": 0.0625,
-      "std": 0.362284
-    },
-    "EUR/zew economic sentiment index": {
-      "n": 4,
-      "mean": 14.125,
-      "std": 3.020348
-    },
-    "USD/inflation rate yoy": {
-      "n": 3,
-      "mean": -0.066667,
-      "std": 0.208167
-    },
-    "USD/core inflation rate mom": {
-      "n": 3,
-      "mean": -0.066667,
-      "std": 0.152753
-    },
-    "USD/cpi": {
-      "n": 3,
-      "mean": -0.006667,
-      "std": 0.735142
-    },
-    "USD/cpi s.a": {
-      "n": 3,
-      "mean": -0.215333,
-      "std": 1.059813
-    },
-    "USD/inflation rate mom": {
-      "n": 3,
-      "mean": -0.1,
-      "std": 0.173205
-    },
-    "USD/core inflation rate yoy": {
-      "n": 3,
-      "mean": -0.033333,
-      "std": 0.152753
-    },
-    "USD/monthly budget statement": {
-      "n": 3,
-      "mean": -94.975,
-      "std": 171.487629
-    },
-    "USD/api crude oil stock change": {
-      "n": 12,
-      "mean": -0.53375,
-      "std": 4.110343
-    },
-    "JPY/current account": {
-      "n": 4,
-      "mean": -783.333,
-      "std": 2315.355296
-    },
     "SEK/inflation rate yoy": {
       "n": 3,
       "mean": 0.1,
@@ -127,6 +67,11 @@
       "n": 2,
       "mean": 0.0,
       "std": 0.0
+    },
+    "EUR/industrial production mom": {
+      "n": 7,
+      "mean": 0.0,
+      "std": 0.341565
     },
     "EUR/employment change yoy": {
       "n": 2,
@@ -362,6 +307,11 @@
       "n": 4,
       "mean": 1.175,
       "std": 2.671298
+    },
+    "USD/api crude oil stock change": {
+      "n": 11,
+      "mean": -0.533364,
+      "std": 4.310963
     },
     "EUR/ppi yoy": {
       "n": 2,
@@ -953,10 +903,20 @@
       "mean": -0.033333,
       "std": 3.066486
     },
+    "JPY/current account": {
+      "n": 3,
+      "mean": -1312.110667,
+      "std": 2522.631621
+    },
     "GBP/brc retail sales monitor yoy": {
-      "n": 2,
-      "mean": 0.8,
-      "std": 2.828427
+      "n": 3,
+      "mean": 0.366667,
+      "std": 2.136196
+    },
+    "AUD/nab business confidence": {
+      "n": 3,
+      "mean": 5.0,
+      "std": 4.358899
     },
     "CAD/balance of trade": {
       "n": 3,
@@ -988,10 +948,45 @@
       "mean": -0.005,
       "std": 0.148492
     },
+    "USD/cpi s.a": {
+      "n": 2,
+      "mean": -0.5765,
+      "std": 1.20986
+    },
+    "USD/inflation rate yoy": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.212132
+    },
+    "USD/cpi": {
+      "n": 2,
+      "mean": -0.37,
+      "std": 0.537401
+    },
+    "USD/core inflation rate mom": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.070711
+    },
+    "USD/core inflation rate yoy": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.141421
+    },
+    "USD/inflation rate mom": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.212132
+    },
     "CAD/boc interest rate decision": {
       "n": 2,
       "mean": 0.0,
       "std": 0.0
+    },
+    "USD/monthly budget statement": {
+      "n": 2,
+      "mean": -139.9625,
+      "std": 216.038799
     },
     "AUD/consumer inflation expectations": {
       "n": 2,
@@ -1034,9 +1029,14 @@
       "std": 0.0
     },
     "AUD/rba interest rate decision": {
-      "n": 2,
+      "n": 3,
       "mean": 0.0,
       "std": 0.0
+    },
+    "EUR/zew economic sentiment index": {
+      "n": 3,
+      "mean": 15.2,
+      "std": 2.598076
     },
     "EUR/germany zew economic sentiment index": {
       "n": 2,
@@ -46402,48 +46402,35 @@
       "flag": "🇬🇧",
       "event": "United Kingdom BRC Retail Sales Monitor YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "1.0%",
       "forecast": "1.5%",
       "previous": "1.7%"
     },
     {
       "date": "11 Aug",
       "dateISO": "2026-08-11",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia NAB Business Confidence",
+      "impact": "high",
+      "actual": "-6.0",
+      "forecast": "-6.0",
+      "previous": "-6.0"
+    },
+    {
+      "date": "11 Aug",
+      "dateISO": "2026-08-11",
       "timeUTC": "04:30",
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
-      "event": "Cash Rate",
+      "event": "Australia RBA Interest Rate Decision",
       "impact": "high",
-      "actual": null,
+      "actual": "4.35%",
       "forecast": "4.35%",
       "previous": "4.35%"
-    },
-    {
-      "date": "11 Aug",
-      "dateISO": "2026-08-11",
-      "timeUTC": "04:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "RBA Monetary Policy Statement",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "11 Aug",
-      "dateISO": "2026-08-11",
-      "timeUTC": "04:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "RBA Rate Statement",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "11 Aug",
@@ -46452,11 +46439,63 @@
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
-      "event": "RBA Press Conference",
-      "impact": "high",
+      "event": "Australia RBA Press Conference",
+      "impact": "medium",
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "11 Aug",
+      "dateISO": "2026-08-11",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Italy Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "€4.74B",
+      "previous": "€4.793B"
+    },
+    {
+      "date": "11 Aug",
+      "dateISO": "2026-08-11",
+      "timeUTC": "12:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States ADP Employment Change Weekly",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "15.0K"
+    },
+    {
+      "date": "11 Aug",
+      "dateISO": "2026-08-11",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Existing Home Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-0.7%",
+      "previous": "-2.4%"
+    },
+    {
+      "date": "11 Aug",
+      "dateISO": "2026-08-11",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Existing Home Sales",
+      "impact": "high",
+      "actual": null,
+      "forecast": "4.04M",
+      "previous": "4.09M"
     },
     {
       "date": "12 Aug",
@@ -46585,7 +46624,7 @@
       "event": "Unemployment Claims",
       "impact": "medium",
       "actual": null,
-      "forecast": "202K",
+      "forecast": "203K",
       "previous": "199K"
     },
     {
@@ -46637,7 +46676,7 @@
       "event": "Prelim UoM Consumer Sentiment",
       "impact": "medium",
       "actual": null,
-      "forecast": "54.4",
+      "forecast": "54.7",
       "previous": "54.4"
     },
     {
