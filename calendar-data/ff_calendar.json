@@ -1,96 +1,8 @@
 {
-  "generated_at": "2026-08-10T23:02:40Z",
+  "generated_at": "2026-08-11T00:01:11Z",
   "source": "Myfxbook · ForexFactory",
   "holidays": [],
   "events": [
-    {
-      "title": "Germany PPI YoY",
-      "currency": "EUR",
-      "dateISO": "2026-07-20",
-      "timeUTC": "06:00",
-      "impact": "medium",
-      "forecast": "1.8%",
-      "previous": "2.2%",
-      "actual": "1.8%",
-      "released": true
-    },
-    {
-      "title": "Canada CPI Median YoY",
-      "currency": "CAD",
-      "dateISO": "2026-07-20",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "2.1%",
-      "previous": "2.1%",
-      "actual": "1.9%",
-      "released": true
-    },
-    {
-      "title": "Canada Core Inflation Rate YoY",
-      "currency": "CAD",
-      "dateISO": "2026-07-20",
-      "timeUTC": "12:30",
-      "impact": "medium",
-      "forecast": "2.2%",
-      "previous": "2.2%",
-      "actual": "2.1%",
-      "released": true
-    },
-    {
-      "title": "Canada CPI Trimmed-Mean YoY",
-      "currency": "CAD",
-      "dateISO": "2026-07-20",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "2.0%",
-      "previous": "2.0%",
-      "actual": "1.8%",
-      "released": true
-    },
-    {
-      "title": "Canada Inflation Rate YoY",
-      "currency": "CAD",
-      "dateISO": "2026-07-20",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "2.9%",
-      "previous": "3.2%",
-      "actual": "2.8%",
-      "released": true
-    },
-    {
-      "title": "Canada Inflation Rate MoM",
-      "currency": "CAD",
-      "dateISO": "2026-07-20",
-      "timeUTC": "12:30",
-      "impact": "medium",
-      "forecast": "-0.2%",
-      "previous": "1.0%",
-      "actual": "-0.4%",
-      "released": true
-    },
-    {
-      "title": "Canada CPI Common YoY",
-      "currency": "CAD",
-      "dateISO": "2026-07-20",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "2.6%",
-      "previous": "2.7%",
-      "actual": "2.6%",
-      "released": true
-    },
-    {
-      "title": "New Zealand Inflation Rate QoQ",
-      "currency": "NZD",
-      "dateISO": "2026-07-20",
-      "timeUTC": "22:45",
-      "impact": "medium",
-      "forecast": "1.4%",
-      "previous": "0.9%",
-      "actual": "1.5%",
-      "released": true
-    },
     {
       "title": "Switzerland Balance of Trade",
       "currency": "CHF",
@@ -3047,7 +2959,19 @@
       "vendor": "myfxbook"
     },
     {
-      "title": "Cash Rate",
+      "title": "Australia NAB Business Confidence",
+      "currency": "AUD",
+      "dateISO": "2026-08-11",
+      "timeUTC": "01:30",
+      "impact": "high",
+      "forecast": "-6.0",
+      "previous": "-5.0",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Australia RBA Interest Rate Decision",
       "currency": "AUD",
       "dateISO": "2026-08-11",
       "timeUTC": "04:30",
@@ -3056,43 +2980,67 @@
       "previous": "4.35%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "RBA Monetary Policy Statement",
-      "currency": "AUD",
-      "dateISO": "2026-08-11",
-      "timeUTC": "04:30",
-      "impact": "high",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false,
-      "vendor": "forexfactory"
-    },
-    {
-      "title": "RBA Rate Statement",
-      "currency": "AUD",
-      "dateISO": "2026-08-11",
-      "timeUTC": "04:30",
-      "impact": "high",
-      "forecast": null,
-      "previous": null,
-      "actual": null,
-      "released": false,
-      "vendor": "forexfactory"
-    },
-    {
-      "title": "RBA Press Conference",
+      "title": "Australia RBA Press Conference",
       "currency": "AUD",
       "dateISO": "2026-08-11",
       "timeUTC": "05:30",
-      "impact": "high",
+      "impact": "medium",
       "forecast": null,
       "previous": null,
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Italy Balance of Trade",
+      "currency": "EUR",
+      "dateISO": "2026-08-11",
+      "timeUTC": "08:00",
+      "impact": "medium",
+      "forecast": "€4.74B",
+      "previous": "€4.793B",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States ADP Employment Change Weekly",
+      "currency": "USD",
+      "dateISO": "2026-08-11",
+      "timeUTC": "12:15",
+      "impact": "high",
+      "forecast": null,
+      "previous": "15.0K",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Existing Home Sales MoM",
+      "currency": "USD",
+      "dateISO": "2026-08-11",
+      "timeUTC": "14:00",
+      "impact": "high",
+      "forecast": "-0.7%",
+      "previous": "-2.4%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Existing Home Sales",
+      "currency": "USD",
+      "dateISO": "2026-08-11",
+      "timeUTC": "14:00",
+      "impact": "high",
+      "forecast": "4.04M",
+      "previous": "4.09M",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
     },
     {
       "title": "Core CPI m/m",
