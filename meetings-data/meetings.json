@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-08-10",
+  "lastUpdate": "2026-08-11",
   "meetings": {
     "USD": {
       "nextMeeting": "16 Sep",
@@ -28,7 +28,7 @@
       "bias": "hold",
       "biasSource": "CME 30-Day Fed Funds futures, meeting-bracketed",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -60,7 +60,7 @@
       "bias": "hike",
       "biasSource": "CME 1-Month ESTR futures, meeting-bracketed",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
       "hikeProb": 100,
       "fwdRate": 2.5
@@ -92,7 +92,7 @@
       "bias": "hold",
       "biasSource": "ICE 1-Month SONIA futures, meeting-bracketed",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.75
@@ -124,10 +124,10 @@
       "bias": "hike",
       "biasSource": "cbonds OIS TONA curve + BoJ API daily spot",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
-      "hikeProb": 51,
-      "fwdRate": 1.1275
+      "hikeProb": 49,
+      "fwdRate": 1.1225
     },
     "AUD": {
       "nextMeeting": "11 Aug",
@@ -156,7 +156,7 @@
       "bias": "hold",
       "biasSource": "ASX 30-day Interbank Cash Rate Futures",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 4.35
@@ -190,7 +190,7 @@
       "bias": "hold",
       "biasSource": "Barchart CORRA 1-Month futures, meeting-bracketed",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.25
@@ -214,7 +214,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS SARON curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 0.0
@@ -244,10 +244,10 @@
       "bias": "hike",
       "biasSource": "cbonds OIS NZIONA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
-      "hikeProb": 93,
-      "fwdRate": 2.7325
+      "hikeProb": 91,
+      "fwdRate": 2.7275
     },
     "NOK": {
       "nextMeeting": "13 Aug",
@@ -276,7 +276,7 @@
       "bias": "hold",
       "biasSource": "cbonds OIS NOWA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 4.25
@@ -306,9 +306,9 @@
       ],
       "source": "riksbank.se",
       "bias": "hold",
-      "biasSource": "cbonds OIS STINA curve, meeting-bracketed forward",
+      "biasSource": "cbonds OIS SWESTR curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-08-10",
+      "biasUpdated": "2026-08-11",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 1.75
