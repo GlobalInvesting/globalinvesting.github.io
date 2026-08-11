@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-11T14:33:55Z",
-  "generatedAt": "2026-08-11T14:33:55Z",
+  "lastUpdate": "2026-08-11T21:11:13Z",
+  "generatedAt": "2026-08-11T21:11:13Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,12 +9,12 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-11",
   "rangeTo": "2026-08-14",
-  "totalEvents": 3721,
+  "totalEvents": 3722,
   "currencyCounts": {
     "EUR": 851,
     "GBP": 431,
     "AUD": 252,
-    "USD": 1265,
+    "USD": 1266,
     "NZD": 85,
     "JPY": 214,
     "CHF": 120,
@@ -23,7 +23,7 @@
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1827,
+    "medium": 1828,
     "high": 1666,
     "low": 228
   },
@@ -309,9 +309,9 @@
       "std": 2.671298
     },
     "USD/api crude oil stock change": {
-      "n": 11,
-      "mean": -0.533364,
-      "std": 4.310963
+      "n": 12,
+      "mean": 0.30875,
+      "std": 5.040315
     },
     "EUR/ppi yoy": {
       "n": 2,
@@ -46496,6 +46496,19 @@
       "actual": "4.06M",
       "forecast": "4.05M",
       "previous": "4.13M"
+    },
+    {
+      "date": "11 Aug",
+      "dateISO": "2026-08-11",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States API Crude Oil Stock Change",
+      "impact": "medium",
+      "actual": "9.072M",
+      "forecast": "-0.5M",
+      "previous": "2.69M"
     },
     {
       "date": "12 Aug",
