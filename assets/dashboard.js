@@ -710,6 +710,12 @@ function populateHeatmap() {
   // Store strengths in a module-level variable so the modal can read them
   // without embedding JSON in an HTML attribute (which breaks on double-quotes).
   window._hmStrengths = strengths;
+  // Whether this pass used the live 32-pair composite (rtAvailable) or the
+  // cruder ECB-daily-rates fallback (v8.131.0) — exposed so consumers like
+  // gi-overview.js can wait for the real composite instead of rendering
+  // the fallback estimate and then visibly jumping to a different number a
+  // few seconds later once enough Finnhub ticks arrive.
+  window._hmStrengthsLive = rtAvailable;
   // Per-currency direct-pair count, structural (independent of live data
   // availability) — matches heatmap-modal.js's `PAIR_DEFS.filter(p => p.base
   // === ccy || p.quote === ccy).length` exactly, so the tooltip never drifts

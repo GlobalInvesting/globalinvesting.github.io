@@ -1,6 +1,29 @@
 /**
- * GlobalInvesting FX Terminal — Market Overview module  v1.2.0
+ * GlobalInvesting FX Terminal — Market Overview module  v1.3.0
  * assets/gi-overview.js — include AFTER dashboard.js and gi-auth.js in index.html
+ *
+ * v1.3.0 (2026-08-12): Three items reported by Santiago against the live
+ *   Overview:
+ *   1. Bias-card/CSI values visibly changed a few seconds after page load.
+ *      Root cause: dashboard.js's populateHeatmap() only uses the real
+ *      32-pair live composite once enough Finnhub ticks have cached
+ *      (`rtAvailable`, ≥21/32 pairs) — before that it silently falls back
+ *      to a much cruder ECB-daily-rates estimate, which this module was
+ *      rendering immediately, then swapping out once the live composite
+ *      arrived. Fix: dashboard.js (v8.101.0) now also exposes
+ *      `window._hmStrengthsLive`; `pollHeatmapStrengths()` waits for it
+ *      before its first render, only falling back to the ECB estimate if
+ *      live data still hasn't shown up after the existing 15s budget —
+ *      same "never show nothing forever" guarantee as before, just no
+ *      longer showing a number that's about to change moments later.
+ *   2. Added country flags (`.fi fi-xx`, flag-icons — the same library and
+ *      class pattern already used by the CB Rates / CB Expectations panels,
+ *      not emoji) to the four bias cards.
+ *   3. The footer's rss / alerts / ?shortcuts buttons (and version tag) had
+ *      no reason to be interactive on the Overview snapshot — they now
+ *      live inside `#gi-footer-actions`, hidden by default in index.html
+ *      and shown by showTerminal() / hidden by showOverview(), same
+ *      lifecycle as `#gi-terminal-view` itself.
  *
  * v1.2.0 (2026-08-12): Closing the activation modal (gi-auth.js v1.6.0's new
  *   close button / Escape / backdrop click) without activating left the
@@ -121,6 +144,10 @@
     document.getElementById('gi-overview')?.style.setProperty('display', 'none');
     const tv = document.getElementById('gi-terminal-view');
     if (tv) tv.style.display = '';
+    // rss / alerts / ?shortcuts (and the version tag) are terminal features
+    // with nothing to act on from the Overview snapshot — only shown once
+    // the visitor is actually inside the full terminal (v8.131.0).
+    document.getElementById('gi-footer-actions')?.style.setProperty('display', 'flex');
     stopOverviewSync();
     maybeAnnounceTerminalEntry();
   }
@@ -129,6 +156,7 @@
     document.getElementById('gi-overview')?.style.removeProperty('display');
     const tv = document.getElementById('gi-terminal-view');
     if (tv) tv.style.display = 'none';
+    document.getElementById('gi-footer-actions')?.style.setProperty('display', 'none');
     // Resume the live bias/CSI/narrative sync that stopOverviewSync()
     // paused when the terminal was revealed — otherwise a visitor bounced
     // back here (gi-auth.js's hideModal(), v1.7.0) would see the Overview
@@ -201,6 +229,10 @@
   const BIAS_CCYS = ['USD', 'EUR', 'GBP', 'JPY'];
   const CSI_CCYS  = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF']; // matches mock's 7-currency strip
 
+  // flag-icons (already loaded globally, see index.html <link> — same CSS
+  // class pattern used by the CB Rates / CB Expectations panels' .fi spans).
+  const CCY_FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CAD: 'ca', CHF: 'ch' };
+
   function tagFor(pct) {
     if (pct > 0.15) return { cls: 'up', label: 'Strong' };
     if (pct < -0.15) return { cls: 'down', label: 'Weak' };
@@ -217,8 +249,9 @@
       if (pct === undefined) return '';
       const t = tagFor(pct);
       const sign = pct >= 0 ? '+' : '';
+      const flag = CCY_FLAG[ccy];
       return `<div class="gi-ov-bias-card" data-ccy="${ccy}">
-        <div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">${ccy}</span><span class="gi-ov-bias-tag ${t.cls}">${t.label}</span></div>
+        <div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">${flag ? `<span class="fi fi-${flag}" style="margin-right:6px;border-radius:2px;"></span>` : ''}${ccy}</span><span class="gi-ov-bias-tag ${t.cls}">${t.label}</span></div>
         <div class="gi-ov-bias-pct">${sign}${pct.toFixed(2)}%</div>
       </div>`;
     }).join('');
@@ -257,13 +290,35 @@
     function tick() {
       attempts++;
       const strengths = window._hmStrengths;
-      if (strengths && strengths.length) {
+      const haveData = strengths && strengths.length;
+      // v8.131.0: dashboard.js's populateHeatmap() computes the real 32-pair
+      // live composite only once enough Finnhub ticks have cached
+      // (window._hmStrengthsLive) — until then it silently uses a much
+      // cruder ECB-daily-rates fallback instead. Rendering that fallback
+      // immediately, then swapping to the live numbers a few seconds later,
+      // is exactly the "values look wrong, then change to the real ones"
+      // flash Santiago reported. Once genuinely live (gotFirst), keep
+      // re-rendering on every tick regardless — rtAvailable does not flip
+      // back to false once the composite has enough pairs cached.
+      if (haveData && (gotFirst || window._hmStrengthsLive === true)) {
         renderBiasRow(strengths);
         renderCsiStrip(strengths);
         gotFirst = true;
       } else if (!gotFirst && attempts >= POLL_MAX_ATTEMPTS) {
-        _hmSyncTimer = null; // leave the "Loading…" skeleton — no fabricated fallback numbers
-        return;
+        if (haveData) {
+          // Live composite never arrived within budget (thin-liquidity
+          // window, WS hiccup, etc.) — render the fallback estimate rather
+          // than leave the Overview on "Loading…" forever. dashboard.js's
+          // own Currency Strength Heatmap panel is already showing this
+          // same fallback figure at this point, so this isn't a new number,
+          // just not hiding one that's already live elsewhere in the page.
+          renderBiasRow(strengths);
+          renderCsiStrip(strengths);
+          gotFirst = true;
+        } else {
+          _hmSyncTimer = null; // leave the "Loading…" skeleton — no fabricated fallback numbers
+          return;
+        }
       }
       _hmSyncTimer = setTimeout(tick, gotFirst ? SYNC_MS : POLL_MS);
     }
