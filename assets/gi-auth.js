@@ -1,6 +1,19 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.5.0
+ * GlobalInvesting FX Terminal — License Auth Module  v1.6.0
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.6.0 (2026-08-12): The activation modal had no way to close except
+ *   reloading the page — no close button, no backdrop click, no Escape key;
+ *   hideModal() was only ever called from activate()'s success path.
+ *   Reported by Santiago against the new Overview snapshot (v8.129.0): a
+ *   visitor clicking a locked-preview card sees the modal with no way back
+ *   short of a hard refresh. Added an "×" close button in the modal header,
+ *   plus click-on-backdrop and Escape-key handlers, all calling the
+ *   existing hideModal() — no change to the activation flow itself.
+ *   Deliberately allowed in every state, including the revocation message
+ *   (handleRevocation() still sets a clear "access revoked" status text
+ *   first; closing the modal afterward doesn't undo the revocation, it
+ *   just lets the person stop looking at it).
  *
  * v1.5.0 (2026-08-12): Removed the full-page showModal() call from the
  *   initial window 'load' handler — the terminal no longer blocks the
@@ -119,6 +132,7 @@
 }
 #gi-auth-modal.visible { display: flex; }
 #gi-auth-box {
+  position: relative;
   background: var(--bg2, #141414);
   border: 1px solid var(--border, #323232);
   border-top: 2px solid var(--blue,#4f7fff);
@@ -127,6 +141,20 @@
   max-width: 92vw;
   box-shadow: 0 24px 64px rgba(0,0,0,0.7);
 }
+#gi-auth-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text3, #727272);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: color 0.15s;
+}
+#gi-auth-close:hover, #gi-auth-close:focus { color: var(--text, #E8E4DC); }
 #gi-auth-box h2 {
   margin: 0 0 4px;
   font-size: 14px;
@@ -288,6 +316,7 @@
   const MODAL_HTML = `
 <div id="${MODAL_ID}" role="dialog" aria-modal="true" aria-label="Activate terminal access">
   <div id="gi-auth-box">
+    <button id="gi-auth-close" type="button" aria-label="Close">&times;</button>
     <h2>ACTIVATE TERMINAL</h2>
     <p class="gi-auth-sub">
       Full access is included with the
@@ -569,6 +598,21 @@
     document.getElementById('gi-auth-activate')
       ?.addEventListener('click', activate);
 
+    // Close affordances (v1.6.0) — button, backdrop click, Escape. Allowed
+    // in every state, including after handleRevocation() sets its "access
+    // revoked" status text; closing doesn't undo the revocation, it just
+    // lets the person stop looking at the modal instead of being forced to
+    // reload the page.
+    document.getElementById('gi-auth-close')
+      ?.addEventListener('click', hideModal);
+    document.getElementById(MODAL_ID)
+      ?.addEventListener('click', e => { if (e.target.id === MODAL_ID) hideModal(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById(MODAL_ID)?.classList.contains('visible')) {
+        hideModal();
+      }
+    });
+
     ['gi-inp-key', 'gi-inp-account', 'gi-inp-server'].forEach(id =>
       document.getElementById(id)
         ?.addEventListener('keydown', e => { if (e.key === 'Enter') activate(); })
@@ -634,6 +678,7 @@
   window.GI_AUTH = {
     isActive:   false,
     showModal:  () => showModal(),
+    hideModal:  () => hideModal(),
     applyGates: () => applyGates(),
     unlock:     () => unlockPremiumPanels(),
   };

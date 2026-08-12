@@ -1,6 +1,13 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.10 — production build
+ * v7.89.11 — production build
+ *
+ * Changes vs v7.89.10:
+ *   - Gated init() on window.giOnTerminalShown() (gi-overview.js v1.1.0)
+ *     instead of raw DOMContentLoaded+DELAY_MS — see full explanation in
+ *     the init() section below. Fixes the tour appearing while the visitor
+ *     is still on the Market Overview snapshot, before the terminal itself
+ *     is even visible.
  *
  * Changes vs v7.89.9:
  *   - BUG FIX: Economic Calendar step targeted 'section-tvcalendar-top', an ID that
@@ -763,13 +770,34 @@
   }
 
   /* ─── init ───────────────────────────────────────────────────────────── */
-  function init() {
+  // v7.89.11 (2026-08-12): gated on window.giOnTerminalShown() (gi-overview.js
+  // v1.1.0) — this tour's steps all target elements inside #gi-terminal-view
+  // (FX Pairs, Economic Calendar, COT panel, etc.), which since v8.129.0 stay
+  // display:none behind the Market Overview snapshot until the visitor either
+  // has a valid license already or clicks "Open full terminal". The old
+  // DOMContentLoaded+DELAY_MS trigger fired regardless, so first-time
+  // visitors saw the tour pointing at a hidden terminal while still on the
+  // Overview page (reported by Santiago with a screenshot). giOnTerminalShown
+  // resolves immediately for returning active users (terminal visible from
+  // load) and otherwise waits for the actual Overview→terminal transition,
+  // whenever that happens.
+  function startAfterDelay() {
     if (!shouldShow()) return;
     injectStyles();
     setTimeout(function () {
       if (!shouldShow()) return;
       buildOverlay();
     }, DELAY_MS);
+  }
+
+  function init() {
+    if (window.giOnTerminalShown) {
+      window.giOnTerminalShown(startAfterDelay);
+    } else {
+      // Fallback for any page that doesn't load gi-overview.js (e.g. a
+      // cached old asset bundle) — behave exactly as before.
+      startAfterDelay();
+    }
   }
 
   if (document.readyState === 'loading') {

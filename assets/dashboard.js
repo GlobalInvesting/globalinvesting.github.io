@@ -12300,6 +12300,11 @@ function toggleAlertsPopover() {
 // "SET ALERT" button: requests notification permission, adds a REGIME→RISK-OFF
 // alert, opens the alerts popover briefly so the user sees it was added, then
 // dismisses the tooltip.
+// v8.100.9 (2026-08-12): giOnboardInit() now gates on window.giOnTerminalShown()
+// instead of firing straight off DOMContentLoaded — see the function itself
+// for the full explanation. Was appearing while the visitor was still on the
+// Market Overview snapshot (index.html v8.129.0), pointing at an alerts bell
+// that lives inside the still-hidden #gi-terminal-view.
 
 const GI_OB_KEY = 'gi_ob_done';
 
@@ -12371,26 +12376,46 @@ async function giOnboardActivate() {
 }
 
 function giOnboardInit() {
-  if (!giOnboardShouldShow()) return;
-  // Delay 4s — let the terminal finish loading data so it doesn't compete visually
-  setTimeout(() => {
-    if (!giOnboardShouldShow()) return; // re-check in case state changed during load
-    const el = document.getElementById('gi-onboard');
-    if (!el) return;
-    el.style.opacity = '0';
-    el.style.display = 'block';
-    // Fade in
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        el.style.transition = 'opacity .35s ease';
-        el.style.opacity = '1';
-      });
-    });
-    // Auto-dismiss after 18s if user ignores it (non-intrusive)
+  function attemptShow() {
+    if (!giOnboardShouldShow()) return;
+    // Delay 4s after entering the terminal — let the terminal finish
+    // loading data so it doesn't compete visually with the panels
+    // rendering in.
     setTimeout(() => {
-      if (el.style.display !== 'none') giOnboardDismiss();
-    }, 18000);
-  }, 4000);
+      if (!giOnboardShouldShow()) return; // re-check in case state changed during load
+      const el = document.getElementById('gi-onboard');
+      if (!el) return;
+      el.style.opacity = '0';
+      el.style.display = 'block';
+      // Fade in
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          el.style.transition = 'opacity .35s ease';
+          el.style.opacity = '1';
+        });
+      });
+      // Auto-dismiss after 18s if user ignores it (non-intrusive)
+      setTimeout(() => {
+        if (el.style.display !== 'none') giOnboardDismiss();
+      }, 18000);
+    }, 4000);
+  }
+
+  // v8.100.9: gated on window.giOnTerminalShown() (gi-overview.js v1.1.0) —
+  // this tooltip points at the alerts bell inside #gi-terminal-view, which
+  // since v8.129.0 stays hidden behind the Market Overview snapshot until
+  // the visitor enters the terminal. The old raw-DOMContentLoaded trigger
+  // fired regardless, so it could appear while still on the Overview page
+  // (reported by Santiago with a screenshot). Resolves immediately for
+  // returning active users (terminal visible from load); otherwise waits
+  // for the actual Overview→terminal transition.
+  if (window.giOnTerminalShown) {
+    window.giOnTerminalShown(attemptShow);
+  } else {
+    // Fallback for any page that doesn't load gi-overview.js — behave
+    // exactly as before.
+    attemptShow();
+  }
 }
 
 // Hook into DOMContentLoaded — dashboard.js is deferred so DOM is ready
