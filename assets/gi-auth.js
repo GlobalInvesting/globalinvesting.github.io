@@ -1,6 +1,25 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.7.1
+ * GlobalInvesting FX Terminal — License Auth Module  v1.7.2
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.7.2 (2026-08-12): Follow-up to v1.7.1's incomplete broker-access
+ *   scroll-target fix. Santiago's original v1.4.0 fix already documented
+ *   the intent — point "See the full walkthrough & pricing" at the
+ *   Vantage/TMGM broker cards, not the page top — but both this link and
+ *   a same-named "Broker access" pill on the Overview (index.html) still
+ *   pointed at `access.html#sub-heading`, the *section* title above BOTH
+ *   pricing cards (the featured EA card sits first), not the broker card
+ *   itself. access.html's own hero CTA got a proper `#broker-access`
+ *   anchor id in the prior session's access.html changes; these two
+ *   external entry points into the same page were missed and still
+ *   landed on the section top — on tall desktop viewports enough of the
+ *   page was visible that the broker card was still partly in view, so it
+ *   read as "working," but on mobile and smaller desktop viewports the
+ *   featured EA card filled the screen instead, with the broker card
+ *   scrolled out of view below the fold.
+ *   Fix: repointed this modal's link to `access.html#broker-access`
+ *   (index.html's Overview pill fixed in the same pass — see its own
+ *   inline history). No JS behavior change, plain href fix.
  *
  * v1.7.1 (2026-08-12): GUIDELINES.md compliance fix reported by Santiago —
  *   the PREMIUM_SECTIONS gate overlay's lock icon (.gi-gate-icon) was
@@ -374,7 +393,7 @@
       for your access link, no MT5 key required.
     </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-8px;">
-      New here? <a href="access.html#sub-heading">See the full walkthrough &amp; pricing &rarr;</a>
+      New here? <a href="access.html#broker-access">See the full walkthrough &amp; pricing &rarr;</a>
     </p>
 
     <label for="gi-inp-key">Activation Key (from MT5 terminal top bar)</label>
