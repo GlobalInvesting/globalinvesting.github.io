@@ -554,7 +554,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   .gi-ov-locked-line { height: 7px; border-radius: 3px; background: var(--bg3); margin-bottom: 6px; }
   .gi-ov-locked-line.w60 { width: 60%; } .gi-ov-locked-line.w80 { width: 80%; } .gi-ov-locked-line.w40 { width: 40%; }
   .gi-ov-lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; background: rgba(19,23,34,.35); }
-  .gi-ov-lock-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text2); }
+  .gi-ov-lock-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; color: var(--text2); }
   .gi-ov-lock-text { font-size: 10px; color: var(--text2); font-weight: 600; text-align: center; padding: 0 8px; }
   .gi-ov-cta { margin-top: 26px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
   .gi-ov-cta-copy { font-size: 12.5px; color: var(--text); line-height: 1.5; max-width: 640px; }
@@ -723,21 +723,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div class="gi-ov-locked-title">COT Positioning</div>
           <div class="gi-ov-locked-line w80"></div><div class="gi-ov-locked-line w60"></div><div class="gi-ov-locked-line w40"></div>
         </div>
-        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon">&#128274;</div><div class="gi-ov-lock-text">Institutional positioning breakdown</div></div>
+        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div><div class="gi-ov-lock-text">Institutional positioning breakdown</div></div>
       </div>
       <div class="gi-ov-locked-card" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()" role="button" tabindex="0">
         <div class="gi-ov-locked-inner">
           <div class="gi-ov-locked-title">OIS Rate Curves</div>
           <div class="gi-ov-locked-line w60"></div><div class="gi-ov-locked-line w80"></div><div class="gi-ov-locked-line w40"></div>
         </div>
-        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon">&#128274;</div><div class="gi-ov-lock-text">Central bank meeting-dated pricing</div></div>
+        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div><div class="gi-ov-lock-text">Central bank meeting-dated pricing</div></div>
       </div>
       <div class="gi-ov-locked-card" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()" role="button" tabindex="0">
         <div class="gi-ov-locked-inner">
           <div class="gi-ov-locked-title">Cross-Asset Risk</div>
           <div class="gi-ov-locked-line w40"></div><div class="gi-ov-locked-line w80"></div><div class="gi-ov-locked-line w60"></div>
         </div>
-        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon">&#128274;</div><div class="gi-ov-lock-text">Correlations, options analytics, IRM</div></div>
+        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div><div class="gi-ov-lock-text">Correlations, options analytics, risk regime</div></div>
       </div>
     </div>
 
@@ -2017,7 +2017,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/gi-auth.js?v=1.7.0" defer></script>
+<script src="assets/gi-auth.js?v=1.7.1" defer></script>
 <script src="assets/dashboard.js?v=8.101.0" defer></script>
 <script src="assets/gi-overview.js?v=1.3.0" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
