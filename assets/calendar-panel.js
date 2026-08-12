@@ -1,7 +1,26 @@
 /**
- * calendar-panel.js v1.19.17 — Native economic calendar renderer
+ * calendar-panel.js v1.19.18 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.18 (2026-08-11): FIX — drill-down modal showed "No prior
+ *   actual/forecast history for this event in the last year" for USD Core
+ *   PPI m/m, Retail Sales m/m, and Core Retail Sales m/m despite each having
+ *   a full year of Myfxbook-sourced history on file. Root cause: the v3.38
+ *   hybrid architecture's forward-looking days come from ForexFactory's own
+ *   JSON, titled with slash notation ("Core PPI m/m"); Myfxbook (today + all
+ *   history) titles the identical indicator with concatenated notation
+ *   ("Core PPI MoM"). `_calCanonTitle()`/`_calSeriesKey()` treated these as
+ *   two unrelated series. Fix: normalise m/m|y/y|q/q → mom|yoy|qoq before
+ *   country-prefix stripping. Separately, two indicators use genuinely
+ *   different names across vendors (not just notation) — added a small,
+ *   manually-verified `_CAL_VENDOR_ALIASES` map for those (Core Retail Sales
+ *   ↔ Retail Sales Ex Autos; UK Prelim GDP ↔ GDP Growth Rate QoQ). Left
+ *   NZD "Inflation Expectations q/q" (FF) unmerged with Myfxbook's "Business
+ *   Inflation Expectations" — these may be two distinct RBNZ/ANZ surveys,
+ *   not confirmed as the same release, so not aliased per Guard 8. Must stay
+ *   in sync with _canonEsi in dashboard.js and compute_surprise_stats() in
+ *   fetch_economic_calendar.py (engine repo).
  *
  * v1.19.17 (2026-08-09): Panel subtitle no longer names the underlying data
  *   vendor. Was `${source} · G10 currencies · medium & high impact` (e.g.
@@ -878,9 +897,45 @@
   // Payrolls" key the same series).
   const _CAL_CCY_PFXS = ['united states ', 'euro area ', 'united kingdom ', 'japan ',
     'australia ', 'canada ', 'switzerland ', 'new zealand ', 'norway ', 'sweden '];
+  // [v1.19.18] Two vendors, two vocabularies for the same indicator. FF sometimes
+  // uses a different name entirely for an indicator Myfxbook already has a year
+  // of history for — not just a notation difference (that's the mom/yoy/qoq
+  // normalisation below). Verified manually against both vendors' own definitions
+  // before adding — an incorrect pairing here would silently blend two different
+  // indicators' history into one series (Guard 8: never merge without a real
+  // source check). Only pairs confirmed to be the same underlying release are
+  // listed; anything uncertain is left unmerged on purpose. Applied AFTER
+  // mom/yoy/qoq normalisation and country-prefix stripping, so keys are bare
+  // canonical form. Must stay in sync with _canonEsi in dashboard.js and
+  // compute_surprise_stats() in fetch_economic_calendar.py (engine repo).
+  const _CAL_VENDOR_ALIASES = {
+    // FF "Core Retail Sales m/m" == Myfxbook "Retail Sales Ex Autos MoM" —
+    // "core" retail sales is the standard industry term for ex-autos.
+    'core retail sales mom': 'retail sales ex autos mom',
+    // FF "Prelim GDP q/q" (UK) == Myfxbook "GDP Growth Rate QoQ" — both are
+    // the UK's preliminary quarterly GDP print, just named differently.
+    'prelim gdp qoq': 'gdp growth rate qoq',
+  };
   function _calCanonTitle(t) {
     let s = (t || '').toLowerCase().replace(/\s*\([^)]*\)/g, '').trim();
+    // [v1.19.18] Normalise ForexFactory's slash-notation unit suffixes to
+    // Myfxbook's concatenated form BEFORE country-prefix stripping. Root
+    // cause: the v3.38 hybrid architecture (fetch_ff_calendar.py) sources
+    // forward-looking days from ForexFactory's own JSON, which titles events
+    // "Core PPI m/m" / "Retail Sales m/m" — Myfxbook (today + all history)
+    // titles the identical indicator "Core PPI MoM" / "United States Retail
+    // Sales MoM". Without this, every ForexFactory-sourced forward event keys
+    // to a series _seriesIndex has never heard of, so its drill-down modal
+    // always shows "No prior actual/forecast history" even for indicators
+    // with a full year on file — confirmed live for USD Core PPI m/m, Retail
+    // Sales m/m, Core Retail Sales m/m (Santiago, 2026-08-11). Same
+    // normalisation _title_keywords() already applies in fetch_ff_calendar.py
+    // for its own (unrelated) fuzzy-dedup pass — reused here for the series
+    // key instead. Must stay in sync with _canonEsi in dashboard.js and
+    // compute_surprise_stats() in fetch_economic_calendar.py (engine repo).
+    s = s.replace(/\bm\/m\b/g, 'mom').replace(/\by\/y\b/g, 'yoy').replace(/\bq\/q\b/g, 'qoq');
     for (const p of _CAL_CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
+    if (_CAL_VENDOR_ALIASES[s]) s = _CAL_VENDOR_ALIASES[s];
     return s;
   }
   function _calSeriesKey(ev) { return `${ev.currency}/${_calCanonTitle(ev.title)}`; }

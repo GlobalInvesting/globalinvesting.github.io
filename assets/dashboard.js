@@ -13238,9 +13238,28 @@ async function renderSovereignSpreads() {
 // and _canonEsi in econ-surprises-modal.js.
 const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
   'australia ','canada ','switzerland ','new zealand ','norway ','sweden '];
+// [v8.127.0] Manually-verified cross-vendor title aliases — see
+// calendar-panel.js's _CAL_VENDOR_ALIASES (v1.19.18) for the full rationale
+// and Guard 8 note. Must stay in sync with that map and with
+// compute_surprise_stats() in fetch_economic_calendar.py (engine repo).
+const _ESI_VENDOR_ALIASES = {
+  'core retail sales mom': 'retail sales ex autos mom',
+  'prelim gdp qoq': 'gdp growth rate qoq',
+};
 const _canonEsi = t => {
   let s = t.replace(/\s*\([^)]*\)/g,'').trim();
+  // [v8.126.0] Normalise ForexFactory's slash-notation unit suffixes ("m/m",
+  // "y/y", "q/q") to Myfxbook's concatenated form ("MoM"/"YoY"/"QoQ") before
+  // country-prefix stripping — same fix and same root cause as
+  // calendar-panel.js's _calCanonTitle() (v1.19.16): ForexFactory-sourced
+  // forward events (v3.38 hybrid architecture) never matched Myfxbook-titled
+  // history, fragmenting the ESI baseline the same way it fragmented the
+  // drill-down modal. `t` here is already lowercased by every caller, but the
+  // regex is written case-insensitively regardless so this function is safe
+  // to call directly in the future without relying on that convention.
+  s = s.replace(/\bm\/m\b/gi, 'mom').replace(/\by\/y\b/gi, 'yoy').replace(/\bq\/q\b/gi, 'qoq');
   for (const p of _CCY_PFXS) { if (s.startsWith(p)) { s = s.slice(p.length); break; } }
+  if (_ESI_VENDOR_ALIASES[s]) s = _ESI_VENDOR_ALIASES[s];
   return s;
 };
 
