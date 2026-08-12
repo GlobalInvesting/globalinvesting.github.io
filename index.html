@@ -514,6 +514,61 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   #sent-rows::-webkit-scrollbar { width: 3px; }
   #sent-rows::-webkit-scrollbar-track { background: transparent; }
   #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ── MARKET OVERVIEW (v8.129.0) ── shown by default, above #gi-terminal-view.
+     Reuses the same --bg/--bg2/--blue/--up/--down palette as the terminal
+     (not the darker satellite-page palette — this section is part of the
+     terminal experience, not a satellite page). Async-content elements
+     (#gi-ov-bias-row, #gi-ov-csi-strip, .gi-ov-narrative-box) get explicit
+     min-height here so their skeleton→populated swap causes no layout shift. */
+  #gi-overview { background: var(--bg); }
+  .gi-ov-inner { max-width: 1040px; margin: 0 auto; padding: 26px 20px 40px; }
+  .gi-ov-head { margin-bottom: 22px; }
+  .gi-ov-eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); font-weight: 600; margin-bottom: 6px; }
+  .gi-ov-title { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .gi-ov-sub { font-size: 13px; color: var(--text2); }
+  .gi-ov-bias-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; min-height: 78px; }
+  .gi-ov-bias-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+  .gi-ov-bias-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .gi-ov-bias-ccy { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .03em; }
+  .gi-ov-bias-tag { font-size: 9px; font-weight: 700; letter-spacing: .03em; padding: 2px 7px; border-radius: 3px; text-transform: uppercase; background: rgba(120,123,134,.15); color: var(--text2); }
+  .gi-ov-bias-tag.up { background: rgba(38,166,154,.15); color: var(--up); }
+  .gi-ov-bias-tag.down { background: rgba(239,83,80,.15); color: var(--down); }
+  .gi-ov-bias-pct { font-size: 16px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+  .gi-ov-section-title { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text3); margin: 24px 0 8px; display: flex; align-items: center; justify-content: space-between; }
+  .gi-ov-section-note { font-size: 10px; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--text3); }
+  .gi-ov-csi-strip { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 14px; min-height: 96px; display: flex; align-items: flex-end; gap: 10px; }
+  .gi-ov-csi-loading { color: var(--text3); font-size: 11px; }
+  .gi-ov-csi-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 70px; }
+  .gi-ov-csi-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 2px; }
+  .gi-ov-csi-lbl { font-size: 10px; color: var(--text2); margin-top: 5px; font-weight: 600; }
+  .gi-ov-narrative-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; min-height: 76px; }
+  .gi-ov-narrative-tag { font-size: 10px; color: var(--text3); font-weight: 600; margin-bottom: 6px; }
+  .gi-ov-narrative-fade { position: relative; max-height: 56px; overflow: hidden; }
+  .gi-ov-narrative-fade::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30px; background: linear-gradient(to bottom, rgba(30,34,45,0), var(--bg2)); }
+  .gi-ov-narrative-text { font-size: 12.5px; line-height: 1.6; color: var(--text); }
+  .gi-ov-locked-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .gi-ov-locked-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 14px; position: relative; overflow: hidden; cursor: pointer; min-height: 90px; }
+  .gi-ov-locked-inner { filter: blur(3px); opacity: .45; pointer-events: none; }
+  .gi-ov-locked-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 9px; }
+  .gi-ov-locked-line { height: 7px; border-radius: 3px; background: var(--bg3); margin-bottom: 6px; }
+  .gi-ov-locked-line.w60 { width: 60%; } .gi-ov-locked-line.w80 { width: 80%; } .gi-ov-locked-line.w40 { width: 40%; }
+  .gi-ov-lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; background: rgba(19,23,34,.35); }
+  .gi-ov-lock-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text2); }
+  .gi-ov-lock-text { font-size: 10px; color: var(--text2); font-weight: 600; text-align: center; padding: 0 8px; }
+  .gi-ov-cta { margin-top: 26px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+  .gi-ov-cta-copy { font-size: 12.5px; color: var(--text); line-height: 1.5; max-width: 640px; }
+  .gi-ov-cta-copy strong { color: var(--text); font-weight: 600; }
+  .gi-ov-cta-actions { display: flex; gap: 10px; flex-shrink: 0; }
+  .gi-ov-pill { font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: 8px 16px; border-radius: 5px; border: 1px solid var(--border2); color: var(--text); background: transparent; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; cursor: pointer; font-family: var(--font-ui); }
+  .gi-ov-pill:hover { border-color: var(--blue); color: var(--blue); }
+  .gi-ov-pill-filled { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .gi-ov-pill-filled:hover { color: #fff; opacity: .9; }
+  @media (max-width: 720px) {
+    .gi-ov-bias-row { grid-template-columns: repeat(2,1fr); }
+    .gi-ov-locked-row { grid-template-columns: 1fr; }
+    .gi-ov-cta { flex-direction: column; align-items: flex-start; }
+  }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
@@ -626,6 +681,77 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
   </div>
 </header>
+
+<!-- MARKET OVERVIEW — shown by default to first-time visitors. No account
+     required to see this section. All values below are read from data the
+     terminal already fetches/computes (window._hmStrengths from
+     populateHeatmap(), #narrative-text from buildRichNarrative()) — this
+     section deliberately has no independent fetch/compute logic of its own,
+     per GUIDELINES.md's "two independent parsers of the same feed silently
+     drift" principle. See gi-overview.js for the population logic and
+     CHANGELOG.md v8.129.0 for the full context. -->
+<section id="gi-overview" aria-label="Market overview">
+  <div class="gi-ov-inner">
+    <div class="gi-ov-head">
+      <div class="gi-ov-eyebrow">Market overview &middot; updated continuously</div>
+      <h1 class="gi-ov-title">What's driving FX today</h1>
+      <p class="gi-ov-sub">A daily snapshot of currency bias, strength, and market narrative. No account required.</p>
+    </div>
+
+    <div class="gi-ov-bias-row" id="gi-ov-bias-row">
+      <div class="gi-ov-bias-card" data-ccy="USD"><div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">USD</span><span class="gi-ov-bias-tag">&mdash;</span></div><div class="gi-ov-bias-pct">&mdash;</div></div>
+      <div class="gi-ov-bias-card" data-ccy="EUR"><div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">EUR</span><span class="gi-ov-bias-tag">&mdash;</span></div><div class="gi-ov-bias-pct">&mdash;</div></div>
+      <div class="gi-ov-bias-card" data-ccy="GBP"><div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">GBP</span><span class="gi-ov-bias-tag">&mdash;</span></div><div class="gi-ov-bias-pct">&mdash;</div></div>
+      <div class="gi-ov-bias-card" data-ccy="JPY"><div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">JPY</span><span class="gi-ov-bias-tag">&mdash;</span></div><div class="gi-ov-bias-pct">&mdash;</div></div>
+    </div>
+
+    <div class="gi-ov-section-title">Currency Strength &mdash; G10 snapshot</div>
+    <div class="gi-ov-csi-strip" id="gi-ov-csi-strip">
+      <div class="gi-ov-csi-loading">Loading&hellip;</div>
+    </div>
+
+    <div class="gi-ov-section-title">AI market narrative <span class="gi-ov-section-note">Updated 4x daily</span></div>
+    <div class="gi-ov-narrative-box">
+      <div class="gi-ov-narrative-tag" id="gi-ov-narrative-tag">Desk note</div>
+      <div class="gi-ov-narrative-fade"><div class="gi-ov-narrative-text" id="gi-ov-narrative-text">Loading&hellip;</div></div>
+    </div>
+
+    <div class="gi-ov-section-title">Full terminal <span class="gi-ov-section-note">Included with broker account or EA</span></div>
+    <div class="gi-ov-locked-row">
+      <div class="gi-ov-locked-card" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()" role="button" tabindex="0">
+        <div class="gi-ov-locked-inner">
+          <div class="gi-ov-locked-title">COT Positioning</div>
+          <div class="gi-ov-locked-line w80"></div><div class="gi-ov-locked-line w60"></div><div class="gi-ov-locked-line w40"></div>
+        </div>
+        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon">&#128274;</div><div class="gi-ov-lock-text">Institutional positioning breakdown</div></div>
+      </div>
+      <div class="gi-ov-locked-card" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()" role="button" tabindex="0">
+        <div class="gi-ov-locked-inner">
+          <div class="gi-ov-locked-title">OIS Rate Curves</div>
+          <div class="gi-ov-locked-line w60"></div><div class="gi-ov-locked-line w80"></div><div class="gi-ov-locked-line w40"></div>
+        </div>
+        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon">&#128274;</div><div class="gi-ov-lock-text">Central bank meeting-dated pricing</div></div>
+      </div>
+      <div class="gi-ov-locked-card" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()" role="button" tabindex="0">
+        <div class="gi-ov-locked-inner">
+          <div class="gi-ov-locked-title">Cross-Asset Risk</div>
+          <div class="gi-ov-locked-line w40"></div><div class="gi-ov-locked-line w80"></div><div class="gi-ov-locked-line w60"></div>
+        </div>
+        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon">&#128274;</div><div class="gi-ov-lock-text">Correlations, options analytics, IRM</div></div>
+      </div>
+    </div>
+
+    <div class="gi-ov-cta">
+      <div class="gi-ov-cta-copy"><strong>This is a snapshot.</strong> The full terminal adds COT positioning, OIS-implied rate curves, cross-asset correlations, options analytics, and derivatives risk &mdash; included with a verified partner broker account, or with the MT5 EA.</div>
+      <div class="gi-ov-cta-actions">
+        <a class="gi-ov-pill" href="access.html#sub-heading">Broker access</a>
+        <button class="gi-ov-pill gi-ov-pill-filled" id="gi-ov-open-terminal">Open full terminal</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="gi-terminal-view" style="display:none;">
 
 <!-- QUOTE BAR — populated by Frankfurter + open-proxy for XAU/BTC -->
 <div id="tv-ticker-wrap">
@@ -1727,6 +1853,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 </div>
 
+</div><!-- /#gi-terminal-view -->
+
 <!-- STATUS BAR / FOOTER -->
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB · CFTC · YF · TV</span></div>
@@ -1885,8 +2013,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/gi-auth.js?v=1.3.1" defer></script>
+<script src="assets/gi-auth.js?v=1.5.0" defer></script>
 <script src="assets/dashboard.js?v=8.100.8" defer></script>
+<script src="assets/gi-overview.js?v=1.0.0" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
