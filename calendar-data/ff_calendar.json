@@ -1,140 +1,8 @@
 {
-  "generated_at": "2026-08-11T22:32:41Z",
+  "generated_at": "2026-08-12T00:01:11Z",
   "source": "Myfxbook · ForexFactory",
   "holidays": [],
   "events": [
-    {
-      "title": "Switzerland Balance of Trade",
-      "currency": "CHF",
-      "dateISO": "2026-07-21",
-      "timeUTC": "06:00",
-      "impact": "medium",
-      "forecast": "CHF3.9B",
-      "previous": "CHF5.5B",
-      "actual": "CHF3.8B",
-      "released": true
-    },
-    {
-      "title": "United Kingdom Average Earnings incl. Bonus (3Mo/Yr)",
-      "currency": "GBP",
-      "dateISO": "2026-07-21",
-      "timeUTC": "06:00",
-      "impact": "medium",
-      "forecast": "4.5%",
-      "previous": "4.4%",
-      "actual": "4.3%",
-      "released": true
-    },
-    {
-      "title": "United Kingdom Employment Change",
-      "currency": "GBP",
-      "dateISO": "2026-07-21",
-      "timeUTC": "06:00",
-      "impact": "high",
-      "forecast": "85.0K",
-      "previous": "99.0K",
-      "actual": "147.0K",
-      "released": true
-    },
-    {
-      "title": "United Kingdom Unemployment Rate",
-      "currency": "GBP",
-      "dateISO": "2026-07-21",
-      "timeUTC": "06:00",
-      "impact": "high",
-      "forecast": "5.0%",
-      "previous": "4.9%",
-      "actual": "4.9%",
-      "released": true
-    },
-    {
-      "title": "Greece Current Account",
-      "currency": "EUR",
-      "dateISO": "2026-07-21",
-      "timeUTC": "08:00",
-      "impact": "medium",
-      "forecast": "€51.0B",
-      "previous": "€-1.389B",
-      "actual": "€-0.96B",
-      "released": true
-    },
-    {
-      "title": "Spain Balance of Trade",
-      "currency": "EUR",
-      "dateISO": "2026-07-21",
-      "timeUTC": "08:00",
-      "impact": "medium",
-      "forecast": "€-4.7B",
-      "previous": "€-5.2B",
-      "actual": "€-8.24B",
-      "released": true
-    },
-    {
-      "title": "Euro Area ZEW Economic Sentiment Index",
-      "currency": "EUR",
-      "dateISO": "2026-07-21",
-      "timeUTC": "09:00",
-      "impact": "medium",
-      "forecast": "11.2",
-      "previous": "9.5",
-      "actual": "23.4",
-      "released": true
-    },
-    {
-      "title": "Germany ZEW Economic Sentiment Index",
-      "currency": "EUR",
-      "dateISO": "2026-07-21",
-      "timeUTC": "09:00",
-      "impact": "high",
-      "forecast": "18.0",
-      "previous": "10.5",
-      "actual": "26.3",
-      "released": true
-    },
-    {
-      "title": "United States ADP Employment Change Weekly",
-      "currency": "USD",
-      "dateISO": "2026-07-21",
-      "timeUTC": "12:15",
-      "impact": "high",
-      "forecast": null,
-      "previous": "19.25K",
-      "actual": "16.5K",
-      "released": true
-    },
-    {
-      "title": "United States API Crude Oil Stock Change",
-      "currency": "USD",
-      "dateISO": "2026-07-21",
-      "timeUTC": "20:30",
-      "impact": "medium",
-      "forecast": "-1.5M",
-      "previous": "-0.056M",
-      "actual": "2.603M",
-      "released": true
-    },
-    {
-      "title": "Japan Exports YoY",
-      "currency": "JPY",
-      "dateISO": "2026-07-21",
-      "timeUTC": "23:50",
-      "impact": "medium",
-      "forecast": "18.6%",
-      "previous": "16.8%",
-      "actual": "19.3%",
-      "released": true
-    },
-    {
-      "title": "Japan Balance of Trade",
-      "currency": "JPY",
-      "dateISO": "2026-07-21",
-      "timeUTC": "23:50",
-      "impact": "high",
-      "forecast": "¥-120.0B",
-      "previous": "¥-391.8B",
-      "actual": "¥-406.9B",
-      "released": true
-    },
     {
       "title": "United Kingdom Core Inflation Rate YoY",
       "currency": "GBP",
@@ -3055,19 +2923,43 @@
       "vendor": "myfxbook"
     },
     {
-      "title": "Core CPI m/m",
-      "currency": "USD",
+      "title": "Finland Current Account",
+      "currency": "EUR",
       "dateISO": "2026-08-12",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "0.2%",
-      "previous": "0.0%",
+      "timeUTC": "05:00",
+      "impact": "medium",
+      "forecast": "€-0.4B",
+      "previous": "€-0.6B",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "Core CPI y/y",
+      "title": "Japan Machine Tool Orders YoY",
+      "currency": "JPY",
+      "dateISO": "2026-08-12",
+      "timeUTC": "06:00",
+      "impact": "medium",
+      "forecast": "42.0%",
+      "previous": "52.8%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Germany Current Account",
+      "currency": "EUR",
+      "dateISO": "2026-08-12",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "16.2",
+      "previous": "10.4",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Core Inflation Rate YoY",
       "currency": "USD",
       "dateISO": "2026-08-12",
       "timeUTC": "12:30",
@@ -3076,10 +2968,22 @@
       "previous": "2.6%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "CPI m/m",
+      "title": "United States Core Inflation Rate MoM",
+      "currency": "USD",
+      "dateISO": "2026-08-12",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "0.2%",
+      "previous": "0.0%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Inflation Rate MoM",
       "currency": "USD",
       "dateISO": "2026-08-12",
       "timeUTC": "12:30",
@@ -3088,10 +2992,22 @@
       "previous": "-0.4%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "CPI y/y",
+      "title": "United States CPI",
+      "currency": "USD",
+      "dateISO": "2026-08-12",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "334.03",
+      "previous": "333.95",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Inflation Rate YoY",
       "currency": "USD",
       "dateISO": "2026-08-12",
       "timeUTC": "12:30",
@@ -3100,7 +3016,43 @@
       "previous": "3.5%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States CPI s.a",
+      "currency": "USD",
+      "dateISO": "2026-08-12",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "332.6",
+      "previous": "332.568",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Monthly Budget Statement",
+      "currency": "USD",
+      "dateISO": "2026-08-12",
+      "timeUTC": "18:00",
+      "impact": "medium",
+      "forecast": "$-346.0B",
+      "previous": "$-120.0B",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United Kingdom RICS House Price Balance",
+      "currency": "GBP",
+      "dateISO": "2026-08-12",
+      "timeUTC": "23:01",
+      "impact": "medium",
+      "forecast": "-31.0%",
+      "previous": "-33.0%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
     },
     {
       "title": "Inflation Expectations q/q",
