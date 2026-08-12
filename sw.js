@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.114.31';
+const CACHE_VERSION = 'gi-v8.114.32';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -34,9 +34,9 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 // prior failure mode.
 const STATIC_PRECACHE = [
   '/assets/dashboard.css?v=8.23.15',
-  '/assets/dashboard.js?v=8.100.9',
+  '/assets/dashboard.js?v=8.101.0',
   '/assets/gi-auth.js?v=1.7.0',
-  '/assets/gi-overview.js?v=1.2.0',
+  '/assets/gi-overview.js?v=1.3.0',
   '/assets/fx-websocket.js?v=1.0.0',
   '/assets/cot-modal-chart.js?v=7.91.2',
   '/assets/cb-rates-modal.js?v=8.0.4',
