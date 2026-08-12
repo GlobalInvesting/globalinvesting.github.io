@@ -1,6 +1,33 @@
 /**
- * GlobalInvesting FX Terminal — Market Overview module  v1.1.0
+ * GlobalInvesting FX Terminal — Market Overview module  v1.2.0
  * assets/gi-overview.js — include AFTER dashboard.js and gi-auth.js in index.html
+ *
+ * v1.2.0 (2026-08-12): Closing the activation modal (gi-auth.js v1.6.0's new
+ *   close button / Escape / backdrop click) without activating left the
+ *   visitor standing inside a fully interactive terminal — reported by
+ *   Santiago as a serious bug: "si cierro el modal queda con la terminal
+ *   completa funcional. Eso no puede pasar." Root cause: "Open full
+ *   terminal" was always calling showTerminal() unconditionally — the
+ *   modal was never an actual gate on #gi-terminal-view, just a blurred
+ *   overlay drawn on top of a terminal that was already fully revealed
+ *   (with only the pre-existing PREMIUM_SECTIONS individually locked, the
+ *   v8.128.0 "some panels open" model). As long as the modal had no close
+ *   affordance this was invisible — v1.6.0's close button exposed it.
+ *   Fix, matching Santiago's own suggested direction ("volver a overview
+ *   si se cierra"): exposed window.giShowOverview(), which re-hides
+ *   #gi-terminal-view and resumes the Overview's live bias/CSI/narrative
+ *   sync. gi-auth.js's hideModal() (v1.7.0) now calls it whenever the
+ *   modal closes while GI_AUTH.isActive is still false, so a non-activated
+ *   visitor closing the gate always lands back on the free snapshot, never
+ *   on a semi-open terminal. Active users dismissing the renewal-reminder
+ *   modal are unaffected (isActive stays true throughout).
+ *   Also fixed a related ordering bug in the "Open full terminal" handler:
+ *   it called showTerminal() (which internally fires
+ *   maybeAnnounceTerminalEntry(), the Quick-Tour/alert-tooltip trigger)
+ *   BEFORE showModal() had added the 'visible' class the entry-check reads
+ *   — so the tour could start firing behind a modal that wasn't visible
+ *   yet, on the very same click. Reordered to showModal() then
+ *   showTerminal().
  *
  * v1.1.0 (2026-08-12): Four fixes reported by Santiago against the live
  * v1.0.0 build (screenshots + reload comparisons):
@@ -102,7 +129,21 @@
     document.getElementById('gi-overview')?.style.removeProperty('display');
     const tv = document.getElementById('gi-terminal-view');
     if (tv) tv.style.display = 'none';
+    // Resume the live bias/CSI/narrative sync that stopOverviewSync()
+    // paused when the terminal was revealed — otherwise a visitor bounced
+    // back here (gi-auth.js's hideModal(), v1.7.0) would see the Overview
+    // frozen on whatever it last showed before they clicked through.
+    // Guarded so re-entering an already-running poller doesn't spin a
+    // second timer.
+    if (!_hmSyncTimer)   pollHeatmapStrengths();
+    if (!_narrSyncTimer) pollNarrative();
   }
+
+  // Exposed synchronously (same reasoning as window.giOnTerminalShown above)
+  // so gi-auth.js's hideModal() can call it regardless of script load order
+  // — it only ever runs later, at user-interaction time, by which point
+  // this IIFE has always already executed.
+  window.giShowOverview = showOverview;
 
   function initToggle() {
     // Returning user with a still-valid license token skips the snapshot —
@@ -118,11 +159,14 @@
       // pre-v8.128.0 flow — terminal revealed *behind* the full-page
       // activation modal (blurred backdrop), not freely browsable first.
       // A visitor who is already active never reaches this branch (handled
-      // above), so showModal() here always means "not yet activated".
+      // above), so this always means "not yet activated".
+      // v1.2.0: modal shown FIRST, terminal revealed second (reversed from
+      // v1.1.0) — showTerminal() ends by calling maybeAnnounceTerminalEntry(),
+      // which reads the modal's 'visible' class to decide whether the tour
+      // may start; calling it before showModal() added that class let the
+      // tour fire a frame early, behind a modal that wasn't shown yet.
+      window.GI_AUTH && window.GI_AUTH.showModal();
       showTerminal();
-      if (!(window.GI_AUTH && window.GI_AUTH.isActive)) {
-        window.GI_AUTH && window.GI_AUTH.showModal();
-      }
     });
 
     // If the user activates from a locked-preview card on the Overview
@@ -142,12 +186,14 @@
       }
     }, 500);
 
-    // The activation modal can also be dismissed WITHOUT activating (its own
-    // new close button / Escape / backdrop click, gi-auth.js v1.6.0) while
-    // the terminal is already revealed underneath (per-panel gates from
-    // applyGates() still in place) — that's still "entering the terminal"
-    // for tour/onboarding purposes, so keep watching independently of
-    // whether activation ever completes.
+    // Dismissing the modal WITHOUT activating (its close button / Escape /
+    // backdrop click, gi-auth.js) now bounces back to the Overview instead
+    // of leaving the terminal exposed underneath (v1.2.0, see header) — so
+    // this poll only ever observes a genuine, unobstructed terminal entry:
+    // either a successful activation, or a returning visitor who already
+    // had a valid license. Kept as a poll (not a direct call from the
+    // activate() success path) so it also covers that returning-visitor
+    // case, which never goes through activate() at all.
     watchTerminalEntry();
   }
 

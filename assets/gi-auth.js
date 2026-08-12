@@ -1,6 +1,32 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.6.0
+ * GlobalInvesting FX Terminal — License Auth Module  v1.7.0
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.7.0 (2026-08-12): Serious bug reported by Santiago the same day v1.6.0
+ *   shipped its close button: "si cierro el modal queda con la terminal
+ *   completa funcional. Eso no puede pasar." Root cause: the "Open full
+ *   terminal" entry point (gi-overview.js) always called showTerminal()
+ *   unconditionally — the modal was never an actual gate on
+ *   #gi-terminal-view, just a blurred overlay drawn on top of a terminal
+ *   that was already fully revealed underneath (with only the pre-existing
+ *   PREMIUM_SECTIONS individually locked — the v8.128.0 "some panels open"
+ *   model, intentional for OTHER entry paths but not for this one, per
+ *   Santiago's v8.130.0-session request). As long as the modal had no way
+ *   to close except reloading, this was invisible; v1.6.0's close button
+ *   exposed it — closing without activating simply revealed the terminal
+ *   that had already been sitting there the whole time.
+ *   Fix, matching Santiago's own suggested direction ("volver a overview
+ *   si se cierra"): hideModal() now calls window.giShowOverview() (new in
+ *   gi-overview.js v1.2.0) whenever it runs while GI_AUTH.isActive is
+ *   still false — re-hiding the terminal and returning to the free
+ *   Overview snapshot. This covers all three close paths (×, Escape,
+ *   backdrop click) plus handleRevocation()'s showModal(), since a
+ *   revoked session also has isActive === false by the time its modal can
+ *   be closed. Active users are unaffected — e.g. dismissing the
+ *   renewal-reminder modal (isActive stays true; the license just expires
+ *   soon, it hasn't yet) leaves them exactly where they were, as before.
+ *   See gi-overview.js v1.2.0 header for the companion fix to a related
+ *   ordering bug in the "Open full terminal" click handler.
  *
  * v1.6.0 (2026-08-12): The activation modal had no way to close except
  *   reloading the page — no close button, no backdrop click, no Escape key;
@@ -505,6 +531,16 @@
 
   function hideModal() {
     document.getElementById(MODAL_ID)?.classList.remove('visible');
+    // v1.7.0: closing the gate must never leave a non-activated visitor
+    // standing inside the (partially-gated) terminal — see header
+    // changelog. Bounce back to the Overview snapshot in that case.
+    // Active users are unaffected (e.g. dismissing the renewal-reminder
+    // modal, or the brief 'Activated. Loading terminal…' pause before this
+    // function's own setTimeout call in activate()'s success path, by
+    // which point isActive is already true).
+    if (!window.GI_AUTH.isActive && typeof window.giShowOverview === 'function') {
+      window.giShowOverview();
+    }
   }
 
   // ── Activate ───────────────────────────────────────────────────────────────
