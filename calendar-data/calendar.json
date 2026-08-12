@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-12T01:08:55Z",
-  "generatedAt": "2026-08-12T01:08:55Z",
+  "lastUpdate": "2026-08-12T06:52:09Z",
+  "generatedAt": "2026-08-12T06:52:09Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1328,10 +1328,20 @@
       "mean": 0.95,
       "std": 0.353553
     },
+    "JPY/machine tool orders yoy": {
+      "n": 2,
+      "mean": 11.9,
+      "std": 4.949747
+    },
     "EUR/italy industrial production mom": {
       "n": 2,
       "mean": -0.7,
       "std": 0.848528
+    },
+    "EUR/finland current account": {
+      "n": 2,
+      "mean": 2.1,
+      "std": 1.555635
     },
     "CAD/manufacturing sales mom": {
       "n": 2,
@@ -46475,9 +46485,9 @@
       "flag": "🇪🇺",
       "event": "Finland Current Account",
       "impact": "medium",
-      "actual": null,
+      "actual": "€2.8B",
       "forecast": "€-0.4B",
-      "previous": "€-0.6B"
+      "previous": "€-0.4B"
     },
     {
       "date": "12 Aug",
@@ -46488,7 +46498,7 @@
       "flag": "🇯🇵",
       "event": "Japan Machine Tool Orders YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "50.4%",
       "forecast": "42.0%",
       "previous": "52.8%"
     },
