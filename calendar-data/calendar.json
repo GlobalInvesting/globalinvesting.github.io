@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-12T10:33:05Z",
-  "generatedAt": "2026-08-12T10:33:05Z",
+  "lastUpdate": "2026-08-12T14:33:50Z",
+  "generatedAt": "2026-08-12T14:33:50Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,12 +9,12 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-12",
   "rangeTo": "2026-08-14",
-  "totalEvents": 3727,
+  "totalEvents": 3731,
   "currencyCounts": {
     "AUD": 252,
     "GBP": 431,
-    "EUR": 852,
-    "USD": 1269,
+    "EUR": 853,
+    "USD": 1272,
     "NZD": 85,
     "JPY": 215,
     "CHF": 120,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "high": 1667,
-    "medium": 1832,
+    "medium": 1836,
     "low": 228
   },
   "surpriseStats": {
@@ -264,14 +264,14 @@
       "std": 0.119004
     },
     "USD/eia gasoline stocks change": {
-      "n": 14,
-      "mean": 0.763929,
-      "std": 1.525414
+      "n": 15,
+      "mean": 0.728467,
+      "std": 1.476328
     },
     "USD/eia crude oil stocks change": {
-      "n": 14,
-      "mean": -0.920714,
-      "std": 3.552381
+      "n": 15,
+      "mean": 0.395467,
+      "std": 6.140278
     },
     "NZD/balance of trade": {
       "n": 4,
@@ -914,34 +914,34 @@
       "std": 0.105357
     },
     "USD/cpi s.a": {
-      "n": 2,
-      "mean": -0.5765,
-      "std": 1.20986
+      "n": 3,
+      "mean": -0.314333,
+      "std": 0.968542
     },
     "USD/inflation rate yoy": {
-      "n": 2,
-      "mean": -0.15,
-      "std": 0.212132
+      "n": 3,
+      "mean": -0.1,
+      "std": 0.173205
     },
     "USD/cpi": {
-      "n": 2,
-      "mean": -0.37,
-      "std": 0.537401
+      "n": 3,
+      "mean": -0.27,
+      "std": 0.417612
     },
     "USD/core inflation rate mom": {
-      "n": 2,
-      "mean": -0.15,
-      "std": 0.070711
+      "n": 3,
+      "mean": -0.1,
+      "std": 0.1
     },
     "USD/core inflation rate yoy": {
-      "n": 2,
-      "mean": -0.1,
-      "std": 0.141421
+      "n": 3,
+      "mean": -0.066667,
+      "std": 0.11547
     },
     "USD/inflation rate mom": {
-      "n": 2,
-      "mean": -0.15,
-      "std": 0.212132
+      "n": 3,
+      "mean": -0.1,
+      "std": 0.173205
     },
     "CAD/boc interest rate decision": {
       "n": 2,
@@ -1342,6 +1342,11 @@
       "n": 2,
       "mean": 2.1,
       "std": 1.555635
+    },
+    "EUR/germany current account": {
+      "n": 3,
+      "mean": 0.3,
+      "std": 4.330127
     },
     "CAD/manufacturing sales mom": {
       "n": 2,
@@ -46505,13 +46510,39 @@
     {
       "date": "12 Aug",
       "dateISO": "2026-08-12",
+      "timeUTC": "10:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Current Account",
+      "impact": "medium",
+      "actual": "€19.0B",
+      "forecast": "€16.2B",
+      "previous": "€9.0B"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "11:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States MBA 30-Year Mortgage Rate",
+      "impact": "medium",
+      "actual": "6.77%",
+      "forecast": null,
+      "previous": "6.81%"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
       "timeUTC": "12:30",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Germany Current Account",
       "impact": "medium",
-      "actual": null,
+      "actual": "19.0",
       "forecast": "16.2",
       "previous": "10.4"
     },
@@ -46524,7 +46555,7 @@
       "flag": "🇺🇸",
       "event": "United States Core Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.5%",
       "forecast": "2.5%",
       "previous": "2.6%"
     },
@@ -46537,7 +46568,7 @@
       "flag": "🇺🇸",
       "event": "United States Core Inflation Rate MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.2%",
       "previous": "0.0%"
     },
@@ -46550,7 +46581,7 @@
       "flag": "🇺🇸",
       "event": "United States Inflation Rate MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.1%",
       "forecast": "0.1%",
       "previous": "-0.4%"
     },
@@ -46563,7 +46594,7 @@
       "flag": "🇺🇸",
       "event": "United States CPI",
       "impact": "high",
-      "actual": null,
+      "actual": "333.92",
       "forecast": "333.99",
       "previous": "333.95"
     },
@@ -46576,7 +46607,7 @@
       "flag": "🇺🇸",
       "event": "United States Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "3.4%",
       "forecast": "3.4%",
       "previous": "3.5%"
     },
@@ -46589,9 +46620,35 @@
       "flag": "🇺🇸",
       "event": "United States CPI s.a",
       "impact": "high",
-      "actual": null,
+      "actual": "332.81",
       "forecast": "332.6",
-      "previous": "332.568"
+      "previous": "332.57"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "-0.968M",
+      "forecast": "-1.2M",
+      "previous": "-1.643M"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "17.422M",
+      "forecast": "-1.4M",
+      "previous": "2.479M"
     },
     {
       "date": "12 Aug",
