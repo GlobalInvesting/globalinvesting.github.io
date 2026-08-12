@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-12T21:45:32Z",
+  "updated_at": "2026-08-12T23:39:58Z",
   "source": "yfinance daily closes via ohlc-data/*.json (fetch_ohlc.py) \u00b7 SMA20/50/200",
   "levels": {
     "USD": {
@@ -7,7 +7,7 @@
       "close": 99.98,
       "sma20": 100.5,
       "sma50": 100.6,
-      "sma200": 99.18,
+      "sma200": 99.17,
       "position": "below_sma20_below_sma50_above_sma200",
       "asof": "2026-08-12"
     },
@@ -16,7 +16,7 @@
       "close": 1.1529,
       "sma20": 1.1474,
       "sma50": 1.147,
-      "sma200": 1.1633,
+      "sma200": 1.1634,
       "position": "above_sma20_above_sma50_below_sma200",
       "asof": "2026-08-12"
     },
@@ -43,23 +43,23 @@
       "close": 0.7066,
       "sma20": 0.7016,
       "sma50": 0.6994,
-      "sma200": 0.6933,
+      "sma200": 0.6934,
       "position": "above_sma20_above_sma50_above_sma200",
       "asof": "2026-08-12"
     },
     "CAD": {
       "pair": "USD/CAD",
-      "close": 1.3938,
+      "close": 1.3946,
       "sma20": 1.4033,
       "sma50": 1.4075,
-      "sma200": 1.385,
+      "sma200": 1.3849,
       "position": "below_sma20_below_sma50_above_sma200",
       "asof": "2026-08-12"
     },
     "CHF": {
       "pair": "USD/CHF",
-      "close": 0.8128,
-      "sma20": 0.8114,
+      "close": 0.8138,
+      "sma20": 0.8115,
       "sma50": 0.8068,
       "sma200": 0.7928,
       "position": "above_sma20_above_sma50_above_sma200",
@@ -67,7 +67,7 @@
     },
     "NZD": {
       "pair": "NZD/USD",
-      "close": 0.586,
+      "close": 0.5861,
       "sma20": 0.5846,
       "sma50": 0.5788,
       "sma200": 0.5832,
@@ -76,7 +76,7 @@
     },
     "NOK": {
       "pair": "USD/NOK",
-      "close": 9.487,
+      "close": 9.499,
       "sma20": 9.57,
       "sma50": 9.641,
       "sma200": 9.695,
@@ -85,9 +85,9 @@
     },
     "SEK": {
       "pair": "USD/SEK",
-      "close": 9.573,
+      "close": 9.585,
       "sma20": 9.601,
-      "sma50": 9.594,
+      "sma50": 9.595,
       "sma200": 9.341,
       "position": "below_sma20_below_sma50_above_sma200",
       "asof": "2026-08-12"
