@@ -1,108 +1,33 @@
 {
-  "lastUpdate": "2026-08-11T21:11:13Z",
-  "generatedAt": "2026-08-11T21:11:13Z",
+  "lastUpdate": "2026-08-12T01:08:55Z",
+  "generatedAt": "2026-08-12T01:08:55Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-08-11",
+  "rangeFrom": "2025-08-12",
   "rangeTo": "2026-08-14",
-  "totalEvents": 3722,
+  "totalEvents": 3727,
   "currencyCounts": {
-    "EUR": 851,
-    "GBP": 431,
     "AUD": 252,
-    "USD": 1266,
+    "GBP": 431,
+    "EUR": 852,
+    "USD": 1269,
     "NZD": 85,
-    "JPY": 214,
+    "JPY": 215,
     "CHF": 120,
     "CAD": 269,
     "SEK": 153,
     "NOK": 81
   },
   "impactCounts": {
-    "medium": 1828,
-    "high": 1666,
+    "high": 1667,
+    "medium": 1832,
     "low": 228
   },
   "surpriseStats": {
-    "SEK/inflation rate yoy": {
-      "n": 3,
-      "mean": 0.1,
-      "std": 0.173205
-    },
-    "SEK/cpif yoy": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 0.11547
-    },
-    "SEK/cpif mom": {
-      "n": 3,
-      "mean": 0.1,
-      "std": 0.173205
-    },
-    "SEK/inflation rate mom": {
-      "n": 3,
-      "mean": 0.1,
-      "std": 0.173205
-    },
-    "EUR/unemployment rate": {
-      "n": 7,
-      "mean": 0.057143,
-      "std": 0.198806
-    },
-    "EUR/wholesale prices mom": {
-      "n": 2,
-      "mean": -0.2,
-      "std": 1.697056
-    },
-    "EUR/wholesale prices yoy": {
-      "n": 2,
-      "mean": -0.3,
-      "std": 1.979899
-    },
-    "EUR/employment change qoq": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "EUR/industrial production mom": {
-      "n": 7,
-      "mean": 0.0,
-      "std": 0.341565
-    },
-    "EUR/employment change yoy": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "USD/core ppi mom": {
-      "n": 4,
-      "mean": 0.075,
-      "std": 0.419325
-    },
-    "USD/ppi mom": {
-      "n": 4,
-      "mean": 0.35,
-      "std": 0.493288
-    },
-    "USD/eia gasoline stocks change": {
-      "n": 15,
-      "mean": 0.630733,
-      "std": 1.557818
-    },
-    "USD/eia crude oil stocks change": {
-      "n": 15,
-      "mean": -1.0064,
-      "std": 3.439209
-    },
-    "GBP/rics house price balance": {
-      "n": 3,
-      "mean": -5.0,
-      "std": 3.464102
-    },
     "GBP/goods trade balance": {
       "n": 4,
       "mean": -2.345,
@@ -338,6 +263,16 @@
       "mean": -0.065714,
       "std": 0.119004
     },
+    "USD/eia gasoline stocks change": {
+      "n": 14,
+      "mean": 0.763929,
+      "std": 1.525414
+    },
+    "USD/eia crude oil stocks change": {
+      "n": 14,
+      "mean": -0.920714,
+      "std": 3.552381
+    },
     "NZD/balance of trade": {
       "n": 4,
       "mean": 0.14,
@@ -382,6 +317,11 @@
       "n": 2,
       "mean": 0.0325,
       "std": 0.065761
+    },
+    "EUR/unemployment rate": {
+      "n": 6,
+      "mean": 0.116667,
+      "std": 0.132916
     },
     "GBP/cbi industrial trends orders": {
       "n": 4,
@@ -803,6 +743,26 @@
       "mean": -0.732667,
       "std": 4.170854
     },
+    "SEK/inflation rate yoy": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
+    },
+    "SEK/inflation rate mom": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
+    },
+    "SEK/cpif mom": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
+    },
+    "SEK/cpif yoy": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 0.141421
+    },
     "CHF/inflation rate yoy": {
       "n": 3,
       "mean": -0.066667,
@@ -832,6 +792,11 @@
       "n": 3,
       "mean": -0.066667,
       "std": 0.152753
+    },
+    "EUR/industrial production mom": {
+      "n": 6,
+      "mean": 0.016667,
+      "std": 0.371035
     },
     "GBP/dmp 1y cpi expectations": {
       "n": 3,
@@ -988,6 +953,11 @@
       "mean": -139.9625,
       "std": 216.038799
     },
+    "GBP/rics house price balance": {
+      "n": 2,
+      "mean": -3.0,
+      "std": 0.0
+    },
     "AUD/consumer inflation expectations": {
       "n": 2,
       "mean": -0.9,
@@ -1002,6 +972,16 @@
       "n": 3,
       "mean": 0.0,
       "std": 0.0
+    },
+    "USD/ppi mom": {
+      "n": 3,
+      "mean": 0.166667,
+      "std": 0.404145
+    },
+    "USD/core ppi mom": {
+      "n": 3,
+      "mean": -0.133333,
+      "std": 0.057735
     },
     "EUR/germany wholesale prices yoy": {
       "n": 2,
@@ -1360,30 +1340,6 @@
     }
   },
   "events": [
-    {
-      "currency": "EUR",
-      "event": "Balance of Trade",
-      "dateISO": "2025-08-11",
-      "actual": "€5.409B",
-      "forecast": "7.12",
-      "previous": "6.103",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "09:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "BRC Retail Sales Monitor YoY",
-      "dateISO": "2025-08-11",
-      "actual": "1.8%",
-      "forecast": "2.1",
-      "previous": "2.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "23:01"
-    },
     {
       "currency": "AUD",
       "event": "NAB Business Confidence",
@@ -46513,15 +46469,41 @@
     {
       "date": "12 Aug",
       "dateISO": "2026-08-12",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Core CPI m/m",
-      "impact": "high",
+      "timeUTC": "05:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Finland Current Account",
+      "impact": "medium",
       "actual": null,
-      "forecast": "0.2%",
-      "previous": "0.0%"
+      "forecast": "€-0.4B",
+      "previous": "€-0.6B"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "06:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Machine Tool Orders YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "42.0%",
+      "previous": "52.8%"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "12:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "16.2",
+      "previous": "10.4"
     },
     {
       "date": "12 Aug",
@@ -46530,7 +46512,7 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Core CPI y/y",
+      "event": "United States Core Inflation Rate YoY",
       "impact": "high",
       "actual": null,
       "forecast": "2.5%",
@@ -46543,7 +46525,20 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "CPI m/m",
+      "event": "United States Core Inflation Rate MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.0%"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Inflation Rate MoM",
       "impact": "high",
       "actual": null,
       "forecast": "0.1%",
@@ -46556,11 +46551,63 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "CPI y/y",
+      "event": "United States CPI",
+      "impact": "high",
+      "actual": null,
+      "forecast": "334.03",
+      "previous": "333.95"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Inflation Rate YoY",
       "impact": "high",
       "actual": null,
       "forecast": "3.4%",
       "previous": "3.5%"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States CPI s.a",
+      "impact": "high",
+      "actual": null,
+      "forecast": "332.6",
+      "previous": "332.568"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "18:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Monthly Budget Statement",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "$-346.0B",
+      "previous": "$-120.0B"
+    },
+    {
+      "date": "12 Aug",
+      "dateISO": "2026-08-12",
+      "timeUTC": "23:01",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom RICS House Price Balance",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-31.0%",
+      "previous": "-33.0%"
     },
     {
       "date": "13 Aug",
@@ -46585,7 +46632,7 @@
       "event": "GDP m/m",
       "impact": "high",
       "actual": null,
-      "forecast": "-0.1%",
+      "forecast": "0.0%",
       "previous": "0.1%"
     },
     {
@@ -46637,7 +46684,7 @@
       "event": "Unemployment Claims",
       "impact": "medium",
       "actual": null,
-      "forecast": "203K",
+      "forecast": "202K",
       "previous": "199K"
     },
     {
