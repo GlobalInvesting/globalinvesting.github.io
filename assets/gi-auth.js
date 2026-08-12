@@ -1,6 +1,23 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.7.0
+ * GlobalInvesting FX Terminal — License Auth Module  v1.7.1
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.7.1 (2026-08-12): GUIDELINES.md compliance fix reported by Santiago —
+ *   the PREMIUM_SECTIONS gate overlay's lock icon (.gi-gate-icon) was
+ *   rendering the literal 🔒 emoji (&#128274;), which read as an odd
+ *   orange/yellow glyph rather than a neutral lock and violates
+ *   GUIDELINES.md's "no emojis in any HTML" rule outright. Replaced with a
+ *   monochrome inline SVG padlock (currentColor stroke, matches the
+ *   existing --blue icon color at 0.65 opacity). .gi-gate-icon no longer
+ *   needs font-size (was sizing a text glyph); added line-height:0 so the
+ *   SVG doesn't pick up extra inline-box height. Companion fix to the same
+ *   emoji issue on the Overview's locked-preview cards, made in index.html
+ *   this same session — see index.html's inline <style> comment history
+ *   for that half of the fix and the "Correlations, options analytics,
+ *   IRM" → "risk regime" copy correction (IRM/"Institutional Risk Manager"
+ *   is the MT5 EA's standalone indicator product name, not a web-terminal
+ *   panel — the locked-preview card was describing the Cross-Asset Risk
+ *   panel and had no business naming an unrelated EA product there).
  *
  * v1.7.0 (2026-08-12): Serious bug reported by Santiago the same day v1.6.0
  *   shipped its close button: "si cierro el modal queda con la terminal
@@ -268,7 +285,7 @@
   z-index: 100;
   gap: 10px;
 }
-.gi-gate-icon { font-size: 22px; color: var(--blue,#4f7fff); opacity: 0.65; }
+.gi-gate-icon { color: var(--blue,#4f7fff); opacity: 0.65; line-height: 0; }
 .gi-gate-msg {
   font-family: var(--font-ui, 'Consolas', monospace);
   font-size: 11px;
@@ -611,7 +628,7 @@
       const ov = document.createElement('div');
       ov.className = 'gi-gate-overlay';
       ov.innerHTML =
-        '<div class="gi-gate-icon">&#128274;</div>' +
+        '<div class="gi-gate-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>' +
         '<div class="gi-gate-msg">Premium \u2014 included with EA rental or a verified TMGM/Vantage account</div>' +
         '<button class="gi-gate-btn" onclick="window.GI_AUTH.showModal()">Activate Access</button>';
       el.appendChild(ov);
