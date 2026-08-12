@@ -808,6 +808,21 @@
   // substring match of "unemployment". See dashboard.js INVERSE_KW comment.
   const CAL_INVERSE_KW = ['unemployment', 'unemployed', 'jobless', 'claims', 'deficit'];
 
+  // ── [v1.19.15] Rate-decision keyword list ────────────────────────────
+  // Single source of truth for "is this a central-bank policy-rate event" —
+  // was previously only inlined once, inside CAL_METHODOLOGY's own kw array
+  // (see below), with no other caller able to reuse it. Hoisted out so
+  // _calRenderHistChart can key off the same list to render the
+  // actual/forecast history chart as a step (stairstep) line for these
+  // events instead of a straight-line interpolation — a policy rate is
+  // constant between meetings then jumps discretely on the decision date, so
+  // a straight diagonal line between two prints (as every other numeric
+  // series correctly uses) implies a gradual drift that never happened. This
+  // is the industry-standard convention (Bloomberg/Refinitiv rate-path
+  // charts are always stepped, never interpolated). CAL_METHODOLOGY's entry
+  // below now references this array instead of its own inline copy.
+  const CAL_RATE_KW = ['interest rate decision', 'rate decision', 'cash rate', 'official cash rate', 'refinancing rate', 'ocr'];
+
   // ── Numeric parser for macro actual/forecast values ─────────────────────
   // parseFloat() alone fails on currency-symbol-prefixed strings such as
   // "$-226.8B", "A$1.791B", "C$3.86B", "¥3907B", "-€5.2B" — the leading
@@ -1043,8 +1058,10 @@
   // releases only; anything unmatched falls back to the plain event-name
   // tooltip that was already there.
   const CAL_METHODOLOGY = [
+    { kw: ['nonfarm payrolls private', 'private nonfarm payrolls', 'nonfarm employment private', 'private payrolls'],
+      text: 'Private-sector change in nonfarm jobs — the same net-jobs concept as headline payrolls, but with government employment stripped out. Watched as a cleaner read on private hiring momentum, since public-sector swings (elections, furloughs, census hiring) can distort the headline number without reflecting the private economy.' },
     { kw: ['non-farm payrolls', 'nonfarm payrolls', 'non farm payrolls', 'employment change'],
-      text: 'Net change in jobs outside farming, private households, and nonprofits. The single most-watched US labor print — a big beat/miss can move every USD pair within seconds of release.' },
+      text: 'Net change in jobs outside farming, private households, and nonprofits — includes both private and government employment. The single most-watched US labor print — a big beat/miss can move every USD pair within seconds of release.' },
     { kw: ['unemployment rate'],
       text: 'Share of the labor force that is jobless and actively looking for work. A rising rate is a negative surprise for the currency even though the headline number is numerically larger.' },
     { kw: ['average hourly earnings', 'wage price index', 'labour cost index', 'labor cost index'],
@@ -1067,7 +1084,7 @@
       text: 'Institute for Supply Management survey of purchasing managers. Above 50 = sector expanding, below 50 = contracting. One of the earliest-available reads on the current month\u2019s activity.' },
     { kw: ['manufacturing pmi', 'services pmi', 'composite pmi', 'flash pmi'],
       text: 'Purchasing Managers\u2019 Index survey. Above 50 = sector expanding, below 50 = contracting — a timely, forward-looking gauge of business activity ahead of harder monthly data.' },
-    { kw: ['interest rate decision', 'rate decision', 'cash rate', 'official cash rate', 'refinancing rate', 'ocr'],
+    { kw: CAL_RATE_KW,
       text: "Central bank policy rate announcement. Directly sets the currency's carry/funding cost — the decision itself usually matters less than the accompanying guidance on the path ahead." },
     { kw: ['fomc statement', 'fomc minutes', 'fomc press conference', 'monetary policy statement', 'monetary policy report', 'rate statement'],
       text: 'Central bank\u2019s own account of its policy discussion and forward guidance. Markets parse the language itself for hints on the future rate path, independent of the rate decision.' },
@@ -1270,7 +1287,7 @@
     return `${mon} ${parseInt(m[3], 10)} ${m[1]}`;
   }
 
-  function _calRenderHistChart(seriesArr, isInverse) {
+  function _calRenderHistChart(seriesArr, isInverse, isRateEvent) {
     const LWC = window.LightweightCharts;
     const container = document.getElementById('cal-hist-chart');
     if (!LWC || !container) return;
@@ -1351,15 +1368,27 @@
       },
     };
 
+    // [v1.19.15] Central-bank rate decisions: a policy rate is constant
+    // between meetings then jumps discretely on the decision date — a
+    // straight diagonal line between two prints (LWC's default) implies a
+    // gradual drift that never happened. Bloomberg/Refinitiv rate-path charts
+    // are always stepped, never interpolated; match that convention here.
+    // LWC.LineType.WithSteps === 1 — fall back to the literal in case the
+    // enum isn't exposed on this LWC build (mirrors the `?? 1` pattern
+    // already used for CrosshairMode above).
+    const _rateLineType = isRateEvent ? (LWC.LineType?.WithSteps ?? 1) : undefined;
+
     const actualSeries = chart.addSeries(LWC.LineSeries, {
       color: '#2596ff', lineWidth: 2, priceLineVisible: false, lastValueVisible: false,
       crosshairMarkerVisible: true, crosshairMarkerRadius: 3,
+      ...(isRateEvent ? { lineType: _rateLineType } : {}),
     });
     actualSeries.setData(pts.map(p => ({ time: p.time, value: p.actual })));
 
     const forecastSeries = chart.addSeries(LWC.LineSeries, {
       color: 'rgba(144,150,160,0.85)', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false,
       crosshairMarkerVisible: true, crosshairMarkerRadius: 3,
+      ...(isRateEvent ? { lineType: _rateLineType } : {}),
     });
     forecastSeries.setData(pts.map(p => ({ time: p.time, value: p.forecast })));
 
@@ -1620,6 +1649,9 @@
     const cadence     = inferCadence(seriesArr);
     const evTitleLower = (ev.title || '').toLowerCase();
     const isInverse   = CAL_INVERSE_KW.some(kw => evTitleLower.includes(kw));
+    // [v1.19.15] Central-bank rate decisions render the actual/forecast
+    // history chart as a step line (see CAL_RATE_KW definition + chart below).
+    const isRateEvent = CAL_RATE_KW.some(kw => evTitleLower.includes(kw));
 
     let html = '';
     if (methodText) html += `<div>${_escAttr(methodText)}</div>`;
@@ -1672,7 +1704,7 @@
       _calEnsureLWC().then(() => {
         if (openToken !== _calHistOpenToken || overlay.style.display !== 'flex') return;
         if (chartWrap) chartWrap.style.display = '';
-        _calRenderHistChart(seriesArr, isInverse);
+        _calRenderHistChart(seriesArr, isInverse, isRateEvent);
       }).catch(() => { if (chartWrap) chartWrap.style.display = 'none'; });
     } else {
       _calDestroyHistChart();
