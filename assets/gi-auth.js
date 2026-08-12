@@ -1,6 +1,29 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.4.0
+ * GlobalInvesting FX Terminal — License Auth Module  v1.5.0
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.5.0 (2026-08-12): Removed the full-page showModal() call from the
+ *   initial window 'load' handler — the terminal no longer blocks the
+ *   entire viewport behind a modal + backdrop blur on first visit.
+ *   applyGates() (unchanged) still runs on load and continues to gate
+ *   PREMIUM_SECTIONS individually via the existing per-panel
+ *   .gi-gate-overlay + "Activate Access" button, which already calls
+ *   window.GI_AUTH.showModal(). Non-premium areas (quote bar, sidebar,
+ *   FX Pairs, CSI, charts) were never in PREMIUM_SECTIONS and were only
+ *   ever blocked by the full-page modal — they are now interactive
+ *   immediately, matching the "some panels open, some locked" model
+ *   agreed with Santiago over showing nothing until activation. The
+ *   full-page showModal() is UNCHANGED for two other call sites, both
+ *   intentional: (1) handleRevocation() — a previously-active session
+ *   being cut off should get a clear, unmissable message, not a quiet
+ *   reversion to locked panels; (2) any .gi-gate-btn's onclick, i.e. the
+ *   user explicitly asking to activate. Also fixed the per-panel gate
+ *   overlay's copy (was "verified TMGM account", stale since v1.3.0 added
+ *   Vantage as a second broker partner) and pointed the modal's "See the
+ *   full walkthrough & pricing" link at access.html#sub-heading (the
+ *   Vantage/TMGM broker-access section) instead of the page top, so a
+ *   user who clicks through from a locked panel lands directly on the two
+ *   broker cards rather than having to scroll to find them.
  *
  * v1.4.0 (2026-08-10): pingSession() now reads the /session/ping response
  *   status instead of only using .catch() for network errors. A 403 means
@@ -279,7 +302,7 @@
       for your access link, no MT5 key required.
     </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-8px;">
-      New here? <a href="access.html">See the full walkthrough &amp; pricing &rarr;</a>
+      New here? <a href="access.html#sub-heading">See the full walkthrough &amp; pricing &rarr;</a>
     </p>
 
     <label for="gi-inp-key">Activation Key (from MT5 terminal top bar)</label>
@@ -524,7 +547,7 @@
       ov.className = 'gi-gate-overlay';
       ov.innerHTML =
         '<div class="gi-gate-icon">&#128274;</div>' +
-        '<div class="gi-gate-msg">Premium \u2014 included with EA rental or verified TMGM account</div>' +
+        '<div class="gi-gate-msg">Premium \u2014 included with EA rental or a verified TMGM/Vantage account</div>' +
         '<button class="gi-gate-btn" onclick="window.GI_AUTH.showModal()">Activate Access</button>';
       el.appendChild(ov);
     });
@@ -623,8 +646,14 @@
 
   window.addEventListener('load', () => {
     setTimeout(() => {
+      // v1.5.0: showModal() intentionally removed from this path — a
+      // first-time visitor should land on an interactive terminal, not a
+      // full-page activation gate. applyGates() alone still locks
+      // PREMIUM_SECTIONS individually; each locked panel's own
+      // "Activate Access" button calls window.GI_AUTH.showModal() when the
+      // user actually wants to unlock it. See header changelog (v1.5.0)
+      // for the two call sites where showModal() still fires automatically.
       if (!window.GI_AUTH.isActive) {
-        showModal();
         applyGates();
       }
     }, 400);
