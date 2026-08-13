@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-08-12T20:46:01Z",
+  "generated_at": "2026-08-13T01:28:07Z",
   "signals": [
     {
-      "time": "20:45",
+      "time": "01:27",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Blockade + G10 Laggard",
-      "text": "USD/JPY is trading at 159.42, holding just below the SMA20/50 cluster at 160.93/161.15. The Strait of Hormuz remains blocked with no clear timeline for reopening, a TIER-1 geopolitical shock that typically supports JPY safe-haven demand, yet the currency remains the G10 laggard with a -0.763% weekly average performance. A 275bp Fed-BoJ OIS carry differential continues to anchor the pair's bid, while the options market reflects growing anxiety via a strong -2.16 25d risk reversal. This creates a sharp divergence: the 275bp carry advantage favors the USD, but a -1.5% VRP and the blocked waterway suggest the JPY is under-priced for a volatility spike. Trade bias: Long USD/JPY; carry dominance persists while VIX remains below 25. Catalyst: next BoJ meeting (mkt: 48% hike priced) — hike bias active. Risk: VIX breaks above 25, triggering a disorderly unwind of the -63,633 COT spec short position.",
+      "title": "CAD/JPY — G10 Bilateral Theme + Carry",
+      "text": "CAD/JPY trades at 114.28 as the strongest G10 bilateral theme of the week, characterized by a 1.415% performance spread between the leading Loonie and lagging Yen. This divergence is fundamentally supported by a +125bp OIS carry advantage for CAD (CORRA 2.27% vs TONA 0.98%) and a bullish Economic Surprise Index (ESI) of +11.6 for Canada against a cooling US backdrop. While the BoC is on hold at 2.25%, the pair remains technically supported as USD/CAD trades below its SMA20/50 cluster (1.4033/1.4075), signaling broad CAD strength. The JPY remains under pressure as the G10 laggard despite elevated producer price inflation at 7.2%, as markets focus on the carry disadvantage. Trade bias: Long CAD/JPY; carry-positive divergence supported by superior CAD data surprises. Catalyst: BoC meeting 9 Sep — hold priced. Risk: Sharp rise in VIX above 25 triggers a carry unwind, favoring the JPY.",
       "evidence": [
-        "JPY 1W avg: -0.763% (n=7)",
-        "USD/JPY 25d RR: -2.16",
-        "Fed-BoJ OIS: +275bp"
+        "CAD 1W avg: +0.696% (n=3)",
+        "JPY 1W avg: -0.719% (n=7)",
+        "G10 spread: 1.415%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:42",
-      "priority": "critical",
-      "title": "CAD/JPY — G10 Bilateral Theme + Commodity Support",
-      "text": "CAD/JPY represents the extreme G10 bilateral theme as CAD outperforms (avg +0.723%) while JPY lags (avg -0.763%), creating a 1.485% spread. This strength in the Loonie aligns with a positive ESI of +12.0 and restrictive real policy rates of +0.15%, contrasting with JPY's accommodative -0.70% real rate. Despite the Strait of Hormuz blockade, JPY weakness persists as the carry-funding currency of choice, providing a 125bp OIS carry advantage to CAD. The pair benefits from CAD's resilience in a 'bull steepener' yield curve regime where growth-linked currencies with positive data surprises find buyers. Trade bias: Bullish CAD/JPY; divergence between top and bottom G10 performers remains intact. Catalyst: BoC meeting 9 Sep — 100% hold priced. Risk: JPY safe-haven bid finally engages on sustained energy supply fears, compressing the 1.485% spread.",
-      "evidence": [
-        "CAD 1W avg: +0.723% (n=3)",
-        "JPY 1W avg: -0.763% (n=7)",
-        "G10 spread: 1.485%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "20:40",
+      "time": "01:24",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence",
-      "text": "NZD/USD is trading at 0.5861, positioned above its SMA20/50/200 cluster (0.5846/0.5788/0.5831). RBNZ holds at 2.5%. This negative positioning against a hawkish central bank creates an asymmetric short-squeeze risk if upcoming inflation expectations data surprises to the upside. While the Fed-RBNZ OIS spread of +125bp favors the USD, the crowded spec short in NZD lacks a fundamental catalyst for further expansion given the RBNZ's outlier status as the only G10 bank actively hiking. Trade bias: Long NZD/USD; asymmetric squeeze potential against crowded speculative shorts. Catalyst: RBNZ inflation expectations release 13 Aug. Risk: NZD inflation data misses significantly, validating the record spec short and breaking the SMA200 support.",
+      "title": "USD/JPY — Options Skew vs Realized Vol Divergence",
+      "text": "USD/JPY at 159.30 is testing the lower bounds of its recent range, positioned below its SMA20 at 160.80 and SMA50 at 161.14. The options market is signaling high alert with a 25d risk reversal (RR) of -2.16, the most aggressive put skew in the G10 space, indicating heavy demand for downside protection. This extreme skew exists despite a negative Vol Risk Premium (VRP) of -1.5%, where implied volatility (7.2%) sits below realized volatility (8.7%), suggesting a potential mispricing of tail risk. Speculative positioning remains heavily short JPY (LF net -63,633), creating a massive squeeze potential if the spot breaks below the SMA200 at 158.15. The +266bp OIS carry advantage continues to support the pair on a nominal basis, but the options market is clearly paying for protection against a carry liquidation. Trade bias: Bearish USD/JPY; extreme options skew signals downside hedging despite positive carry. Catalyst: BoJ meeting 18 Sep — hike bias active. Risk: Price holds above 160.00 and carry demand resurfaces, forcing the options protection to be unwound.",
       "evidence": [
-        "NZD COT LF net: -30,785 (9.7% long)",
-        "NZD ESI: +24.9",
-        "NZD/USD: 0.5861"
+        "USDJPY 25d RR: -2.16",
+        "JPY LF net short: -63,633",
+        "USD/JPY VRP: -1.5% (IV 7.2% vs HV 8.7%)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:37",
+      "time": "01:22",
       "priority": "warning",
-      "title": "GBP/USD — Elevated Vol Premium + Real Rate Support",
-      "text": "GBP/USD at 1.3493 is testing the upper bounds of its SMA20/50/200 cluster, all of which reside between 1.3368 and 1.3425. The options market is pricing a significant risk premium with 1M IV at 11.0% vs HV30 of 6.0%, a +5.0% VRP that reflects aggressive hedging for Sterling downside. This hedging occurs despite a neutral 0bp OIS carry differential and a restrictive GBP real rate of +0.93% which supports the currency fundamentally. Speculative positioning remains net long (+39,039), but the high vol premium suggests institutional desks are paying up for protection rather than adding to spot exposure at these levels. Trade bias: Neutral GBP/USD; elevated vol premium suggests range-bound price action despite bullish technicals. Catalyst: next BoE meeting (mkt: 100% hold priced) — market bias Hold. Risk: Sharp compression in the VRP alongside a break of 1.3500 re-engages trend followers.",
+      "title": "AUD/USD — RBA Hawkishness vs Crowded Positioning",
+      "text": "AUD/USD trades at 0.7062, maintaining its position above the SMA20/50/200 cluster (0.6934–0.7016) following hawkish commentary from Assistant Governor Kent. Kent flagged upside inflation risks and signaled that further hikes remain possible, supporting the AUD real rate of +0.60%. However, speculative positioning is now nearing an extreme with COT LF net longs at +37,990 (72.1% long), which is likely to cap the immediate upside. Retail sentiment is currently 80% short, providing a contrarian tailwind as retail fades the institutional long trend. The -71bp OIS carry premium in favor of AUD versus the USD (AONIA 4.35% vs SOFR 3.64%) continues to attract yield-seeking flows as US CPI cooling reduces Fed hike bets. Trade bias: Bullish AUD/USD; supported by RBA hawkishness and retail divergence, though crowded spec longs warrant caution. Catalyst: RBA meeting 29 Sep — hold priced. Risk: Broad risk-off sentiment causes a liquidation of the crowded speculative long position.",
       "evidence": [
-        "GBP/USD VRP: +5.0%",
-        "GBP real rate: +0.93%",
-        "GBP COT LF net: +39,039"
+        "AUD COT long%: 72.1%",
+        "AUD/USD Retail: 80% short",
+        "AUD real rate: +0.60%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:30",
+      "time": "01:15",
       "priority": "info",
-      "title": "USD/NOK — Retail Extreme + Monetary Divergence",
-      "text": "USD/NOK is currently at 9.487, trading well below its SMA20/50/200 cluster (9.578-9.699). Retail sentiment has reached a 100% long extreme, an absolute contrarian signal that typically precedes further downside when institutional flows are absent. This retail positioning fades the Norges Bank's restrictive +1.51% real rate, which is currently the highest in the G10 alongside the USD. With WTI oil at $82.9 and the Strait of Hormuz blockade threatening global supply, the NOK is finding relative support despite its lack of G10 scorecard momentum. Trade bias: Bearish USD/NOK; contrarian to 100% retail long positioning while below key SMAs. Catalyst: Norges Bank meeting 13 Aug — market bias Hold. Risk: A sudden de-escalation in the Persian Gulf lowers oil prices and triggers a retail-led USD/NOK short squeeze.",
+      "title": "GBP/USD — Elevated Volatility Premium",
+      "text": "GBP/USD is trading at 1.3499, holding above its SMA20/50/200 cluster (1.3369–1.3423) despite a neutral OIS carry differential (0bp). The options market is pricing in a significant risk premium with 1M ATM implied volatility at 11.0% against a realized HV30 of only 6.0%, resulting in a massive +5.0% Vol Risk Premium (VRP). This suggests traders are paying a steep premium for protection, potentially due to the restrictive real interest rate of +0.93% and upcoming BoE uncertainty. Speculative positioning is moderately long (lev_net +39,039), and the pair remains in a technical uptrend. Given the low VIX environment (14.6), the high GBP vol premium reflects idiosyncratic currency risk rather than broad market stress. Trade bias: Neutral/range GBP/USD; high vol premium makes directional bets expensive relative to realized movement. Catalyst: BoE meeting 17 Sep. Risk: Sharp compression in VRP if realized volatility catches up to implied pricing.",
       "evidence": [
-        "Retail USD/NOK: 100% Long",
-        "NOK real rate: +1.51%",
-        "USD/NOK SMA20: 9.578"
+        "GBP/USD VRP: +5.0% (IV 11.0% vs HV 6.0%)",
+        "GBP real rate: +0.93%",
+        "GBP/USD: 1.3499"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
