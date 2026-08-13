@@ -25,13 +25,13 @@
         "9 Dec"
       ],
       "source": "federalreserve.gov",
-      "bias": "hold",
+      "bias": "cut",
       "biasSource": "CME 30-Day Fed Funds futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-08-13",
-      "cutProb": 0,
+      "cutProb": 68,
       "hikeProb": 0,
-      "fwdRate": 3.63
+      "fwdRate": 3.58
     },
     "EUR": {
       "nextMeeting": "10 Sep",
@@ -193,7 +193,7 @@
       "biasUpdated": "2026-08-13",
       "cutProb": 0,
       "hikeProb": 0,
-      "fwdRate": 2.3
+      "fwdRate": 2.28
     },
     "CHF": {
       "nextMeeting": "24 Sep",
