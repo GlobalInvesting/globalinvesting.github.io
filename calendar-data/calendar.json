@@ -1,21 +1,21 @@
 {
-  "lastUpdate": "2026-08-12T21:10:28Z",
-  "generatedAt": "2026-08-12T21:10:28Z",
+  "lastUpdate": "2026-08-13T06:55:04Z",
+  "generatedAt": "2026-08-13T06:55:04Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-08-12",
+  "rangeFrom": "2025-08-13",
   "rangeTo": "2026-08-14",
-  "totalEvents": 3731,
+  "totalEvents": 3728,
   "currencyCounts": {
-    "AUD": 252,
-    "GBP": 431,
+    "AUD": 251,
     "EUR": 853,
-    "USD": 1272,
-    "NZD": 85,
+    "USD": 1265,
+    "GBP": 435,
+    "NZD": 86,
     "JPY": 215,
     "CHF": 120,
     "CAD": 269,
@@ -23,106 +23,11 @@
     "NOK": 81
   },
   "impactCounts": {
-    "high": 1667,
-    "medium": 1836,
+    "medium": 1840,
+    "high": 1660,
     "low": 228
   },
   "surpriseStats": {
-    "GBP/goods trade balance": {
-      "n": 4,
-      "mean": -2.345,
-      "std": 5.155609
-    },
-    "GBP/industrial production mom": {
-      "n": 4,
-      "mean": -0.125,
-      "std": 0.206155
-    },
-    "GBP/gdp 3-month avg": {
-      "n": 4,
-      "mean": 0.05,
-      "std": 0.1
-    },
-    "GBP/goods trade balance non-eu": {
-      "n": 4,
-      "mean": -2.55875,
-      "std": 3.622422
-    },
-    "GBP/manufacturing production mom": {
-      "n": 4,
-      "mean": 0.725,
-      "std": 0.471699
-    },
-    "GBP/gdp mom": {
-      "n": 4,
-      "mean": 0.125,
-      "std": 0.25
-    },
-    "EUR/consumer confidence": {
-      "n": 9,
-      "mean": 1.177778,
-      "std": 3.764232
-    },
-    "USD/retail sales mom": {
-      "n": 4,
-      "mean": 0.2,
-      "std": 0.23094
-    },
-    "USD/retail sales ex gas/autos mom": {
-      "n": 4,
-      "mean": 0.125,
-      "std": 0.189297
-    },
-    "USD/export prices mom": {
-      "n": 4,
-      "mean": 0.55,
-      "std": 1.109054
-    },
-    "USD/retail sales control group mom": {
-      "n": 4,
-      "mean": 0.175,
-      "std": 0.15
-    },
-    "USD/retail sales yoy": {
-      "n": 4,
-      "mean": 1.85,
-      "std": 1.377195
-    },
-    "USD/jobless claims 4-week average": {
-      "n": 16,
-      "mean": 0.4375,
-      "std": 3.222964
-    },
-    "USD/retail sales ex autos mom": {
-      "n": 4,
-      "mean": 0.15,
-      "std": 0.191485
-    },
-    "USD/import prices mom": {
-      "n": 4,
-      "mean": 0.925,
-      "std": 0.05
-    },
-    "USD/continuing jobless claims": {
-      "n": 16,
-      "mean": -2.625,
-      "std": 12.873099
-    },
-    "USD/initial jobless claims": {
-      "n": 16,
-      "mean": 1.5625,
-      "std": 9.3735
-    },
-    "USD/business inventories mom": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.05
-    },
-    "NZD/business nz pmi": {
-      "n": 4,
-      "mean": 2.625,
-      "std": 5.38354
-    },
     "NOK/balance of trade": {
       "n": 2,
       "mean": -24.85,
@@ -318,6 +223,11 @@
       "mean": 0.0325,
       "std": 0.065761
     },
+    "EUR/consumer confidence": {
+      "n": 8,
+      "mean": 0.2375,
+      "std": 2.664549
+    },
     "EUR/unemployment rate": {
       "n": 6,
       "mean": 0.116667,
@@ -327,6 +237,21 @@
       "n": 4,
       "mean": -6.5,
       "std": 4.358899
+    },
+    "USD/continuing jobless claims": {
+      "n": 15,
+      "mean": -3.333333,
+      "std": 12.998168
+    },
+    "USD/jobless claims 4-week average": {
+      "n": 15,
+      "mean": 0.483333,
+      "std": 3.330683
+    },
+    "USD/initial jobless claims": {
+      "n": 15,
+      "mean": 2.066667,
+      "std": 9.475281
     },
     "USD/building permits": {
       "n": 4,
@@ -954,9 +879,9 @@
       "std": 155.907126
     },
     "GBP/rics house price balance": {
-      "n": 2,
-      "mean": -3.0,
-      "std": 0.0
+      "n": 3,
+      "mean": -1.666667,
+      "std": 2.309401
     },
     "AUD/consumer inflation expectations": {
       "n": 2,
@@ -982,6 +907,41 @@
       "n": 3,
       "mean": -0.133333,
       "std": 0.057735
+    },
+    "NZD/business nz pmi": {
+      "n": 3,
+      "mean": 3.5,
+      "std": 6.235383
+    },
+    "GBP/gdp 3-month avg": {
+      "n": 4,
+      "mean": 0.05,
+      "std": 0.1
+    },
+    "GBP/goods trade balance": {
+      "n": 4,
+      "mean": -1.1675,
+      "std": 4.101076
+    },
+    "GBP/industrial production mom": {
+      "n": 4,
+      "mean": -0.225,
+      "std": 0.15
+    },
+    "GBP/manufacturing production mom": {
+      "n": 4,
+      "mean": 0.3,
+      "std": 0.424264
+    },
+    "GBP/goods trade balance non-eu": {
+      "n": 4,
+      "mean": -1.2975,
+      "std": 2.693515
+    },
+    "GBP/gdp mom": {
+      "n": 4,
+      "mean": 0.075,
+      "std": 0.15
     },
     "EUR/germany wholesale prices yoy": {
       "n": 2,
@@ -1023,9 +983,49 @@
       "mean": 12.4,
       "std": 5.798276
     },
+    "USD/import prices mom": {
+      "n": 3,
+      "mean": 0.933333,
+      "std": 0.057735
+    },
+    "USD/export prices mom": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.173205
+    },
     "NZD/current account": {
       "n": 2,
       "mean": 0.02,
+      "std": 0.0
+    },
+    "USD/retail sales ex autos mom": {
+      "n": 3,
+      "mean": 0.166667,
+      "std": 0.23094
+    },
+    "USD/retail sales mom": {
+      "n": 3,
+      "mean": 0.266667,
+      "std": 0.23094
+    },
+    "USD/retail sales control group mom": {
+      "n": 3,
+      "mean": 0.2,
+      "std": 0.173205
+    },
+    "USD/retail sales yoy": {
+      "n": 3,
+      "mean": 1.933333,
+      "std": 1.674316
+    },
+    "USD/retail sales ex gas/autos mom": {
+      "n": 3,
+      "mean": 0.033333,
+      "std": 0.057735
+    },
+    "USD/business inventories mom": {
+      "n": 3,
+      "mean": 0.0,
       "std": 0.0
     },
     "USD/fed interest rate decision": {
@@ -1355,174 +1355,6 @@
     }
   },
   "events": [
-    {
-      "currency": "AUD",
-      "event": "NAB Business Confidence",
-      "dateISO": "2025-08-12",
-      "actual": "7",
-      "forecast": "3.0",
-      "previous": "5.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "01:30"
-    },
-    {
-      "currency": "AUD",
-      "event": "RBA Interest Rate Decision",
-      "dateISO": "2025-08-12",
-      "actual": "3.6%",
-      "forecast": "3.6",
-      "previous": "3.85",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "04:30"
-    },
-    {
-      "currency": "GBP",
-      "event": "Employment Change",
-      "dateISO": "2025-08-12",
-      "actual": "238K",
-      "forecast": "65.0",
-      "previous": "134.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "Average Earnings incl. Bonus (3Mo/Yr)",
-      "dateISO": "2025-08-12",
-      "actual": "4.6%",
-      "forecast": "4.7",
-      "previous": "5.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "Unemployment Rate",
-      "dateISO": "2025-08-12",
-      "actual": "4.7%",
-      "forecast": "4.7",
-      "previous": "4.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "EUR",
-      "event": "ZEW Economic Sentiment Index",
-      "dateISO": "2025-08-12",
-      "actual": "25.1",
-      "forecast": "28.1",
-      "previous": "36.1",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "09:00"
-    },
-    {
-      "currency": "USD",
-      "event": "Inflation Rate YoY",
-      "dateISO": "2025-08-12",
-      "actual": "2.7%",
-      "forecast": "2.8",
-      "previous": "2.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "Core Inflation Rate MoM",
-      "dateISO": "2025-08-12",
-      "actual": "0.3%",
-      "forecast": "0.3",
-      "previous": "0.2",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "CPI",
-      "dateISO": "2025-08-12",
-      "actual": "323.05",
-      "forecast": "323.2",
-      "previous": "322.56",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "Inflation Rate MoM",
-      "dateISO": "2025-08-12",
-      "actual": "0.2%",
-      "forecast": "0.2",
-      "previous": "0.3",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "CPI s.a",
-      "dateISO": "2025-08-12",
-      "actual": "322.13",
-      "forecast": "322.1",
-      "previous": "321.5",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "Core Inflation Rate YoY",
-      "dateISO": "2025-08-12",
-      "actual": "3.1%",
-      "forecast": "3.0",
-      "previous": "2.9",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "Monthly Budget Statement",
-      "dateISO": "2025-08-12",
-      "actual": "-$291B",
-      "forecast": "-215.0",
-      "previous": "27.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "18:00"
-    },
-    {
-      "currency": "USD",
-      "event": "API Crude Oil Stock Change",
-      "dateISO": "2025-08-12",
-      "actual": "1.5M",
-      "forecast": "-0.8",
-      "previous": "-4.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "20:30"
-    },
     {
       "currency": "AUD",
       "event": "Home Loans QoQ",
@@ -46672,9 +46504,22 @@
       "flag": "🇬🇧",
       "event": "United Kingdom RICS House Price Balance",
       "impact": "medium",
-      "actual": null,
+      "actual": "-30.0%",
       "forecast": "-31.0%",
       "previous": "-33.0%"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "00:15",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Kent Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "13 Aug",
@@ -46683,10 +46528,10 @@
       "country": "NZD",
       "currency": "NZD",
       "flag": "🇳🇿",
-      "event": "Inflation Expectations q/q",
+      "event": "New Zealand Business Inflation Expectations",
       "impact": "medium",
-      "actual": null,
-      "forecast": null,
+      "actual": "2.34%",
+      "forecast": "2.7%",
       "previous": "2.53%"
     },
     {
@@ -46696,11 +46541,11 @@
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
-      "event": "GDP m/m",
+      "event": "United Kingdom GDP MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "0.0%",
-      "previous": "0.1%"
+      "previous": "0.0%"
     },
     {
       "date": "13 Aug",
@@ -46709,24 +46554,128 @@
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
-      "event": "Prelim GDP q/q",
+      "event": "United Kingdom Manufacturing Production MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.5%",
+      "forecast": "-0.2%",
+      "previous": "-0.2%"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Goods Trade Balance Non-EU",
+      "impact": "high",
+      "actual": "-10.45",
+      "forecast": "-9.3",
+      "previous": "-9.58"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom GDP Growth Rate QoQ",
+      "impact": "high",
+      "actual": "0.4%",
       "forecast": "0.4%",
       "previous": "0.6%"
     },
     {
       "date": "13 Aug",
       "dateISO": "2026-08-13",
-      "timeUTC": "12:30",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom GDP Growth Rate YoY",
+      "impact": "high",
+      "actual": "1.2%",
+      "forecast": "1.1%",
+      "previous": "0.9%"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Goods Trade Balance",
+      "impact": "high",
+      "actual": "£-23.01B",
+      "forecast": "£-20.5B",
+      "previous": "£-21.08B"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Industrial Production MoM",
+      "impact": "medium",
+      "actual": "-0.2%",
+      "forecast": "0.1%",
+      "previous": "-0.7%"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom GDP 3-Month Avg",
+      "impact": "medium",
+      "actual": "0.4%",
+      "forecast": "0.4%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Business Investment QoQ",
+      "impact": "medium",
+      "actual": "1.7%",
+      "forecast": "-0.5%",
+      "previous": "0.9%"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Industrial Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.1%",
+      "previous": "-0.2%"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "12:15",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Core PPI m/m",
-      "impact": "high",
+      "event": "United States Fed Hammack Speech",
+      "impact": "medium",
       "actual": null,
-      "forecast": "0.3%",
-      "previous": "0.2%"
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "13 Aug",
@@ -46735,7 +46684,7 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "PPI m/m",
+      "event": "United States PPI MoM",
       "impact": "high",
       "actual": null,
       "forecast": "0.2%",
@@ -46748,11 +46697,37 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Unemployment Claims",
+      "event": "United States Core PPI MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "202K",
-      "previous": "199K"
+      "forecast": "0.3%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "12:40",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Barkin Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "22:30",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Business NZ PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "58.4",
+      "previous": "59.7"
     },
     {
       "date": "13 Aug",
@@ -46761,7 +46736,7 @@
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
-      "event": "RBA Gov Bullock Speaks",
+      "event": "Australia RBA Gov Bullock Speech",
       "impact": "medium",
       "actual": null,
       "forecast": null,
