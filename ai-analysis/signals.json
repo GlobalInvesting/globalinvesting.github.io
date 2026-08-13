@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-08-13T01:28:07Z",
+  "generated_at": "2026-08-13T07:59:28Z",
   "signals": [
     {
-      "time": "01:27",
+      "time": "07:59",
       "priority": "critical",
-      "title": "CAD/JPY — G10 Bilateral Theme + Carry",
-      "text": "CAD/JPY trades at 114.28 as the strongest G10 bilateral theme of the week, characterized by a 1.415% performance spread between the leading Loonie and lagging Yen. This divergence is fundamentally supported by a +125bp OIS carry advantage for CAD (CORRA 2.27% vs TONA 0.98%) and a bullish Economic Surprise Index (ESI) of +11.6 for Canada against a cooling US backdrop. While the BoC is on hold at 2.25%, the pair remains technically supported as USD/CAD trades below its SMA20/50 cluster (1.4033/1.4075), signaling broad CAD strength. The JPY remains under pressure as the G10 laggard despite elevated producer price inflation at 7.2%, as markets focus on the carry disadvantage. Trade bias: Long CAD/JPY; carry-positive divergence supported by superior CAD data surprises. Catalyst: BoC meeting 9 Sep — hold priced. Risk: Sharp rise in VIX above 25 triggers a carry unwind, favoring the JPY.",
+      "title": "USD/JPY — Geopolitical Tension + Options Skew",
+      "text": "USD/JPY trades at 159.34, currently holding below its SMA20/50 cluster near 160.79-161.13. Head of Iran's paramilitary Basij has claimed the Strait of Hormuz is under Iran's control, introducing a significant geopolitical risk layer to the pair. Despite a 266bp OIS carry advantage for the USD, the options market is aggressively hedging for downside with the 1-month 25d risk reversal at -2.16, a strong put skew. Speculative positioning remains heavily net short JPY at -63,633 contracts, creating a high-conviction environment for a short squeeze if geopolitical escalation triggers a flight to safety. While VIX at 14.7 currently reflects low volatility, any spike above 25 would likely catalyze a rapid carry unwind toward the SMA200 at 158.15. Trade bias: Bearish USD/JPY; geopolitical risk outweighs carry advantage. Catalyst: next BoJ meeting (mkt: 57% hike priced) 18 Sep — hike bias intact. Risk: Geopolitical tensions de-escalate and USD/JPY resumes its grind toward the 160.00 intervention watch level.",
       "evidence": [
-        "CAD 1W avg: +0.696% (n=3)",
-        "JPY 1W avg: -0.719% (n=7)",
-        "G10 spread: 1.415%"
+        "25d RR: -2.16 (Strong Put Skew)",
+        "JPY COT LF net: -63,633",
+        "Headlines: Strait of Hormuz Geopolitical Risk"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:24",
+      "time": "07:56",
+      "priority": "critical",
+      "title": "CAD/JPY — G10 Bilateral Theme + Commodity Divergence",
+      "text": "CAD/JPY represents the dominant G10 bilateral theme this week with a 1.263% performance spread. CAD leads the G10 with a +0.632% weekly average despite a -1.55% intraday drop in WTI oil, while JPY laggards at -0.631% across 7 pairs. This divergence is supported by a +125bp OIS carry advantage favoring the CAD over JPY. COT data shows CAD speculative positioning at a net short extreme of -102,309 (15.9% long), while JPY is also heavily short at -63,633. The CAD outperformance amid weak oil prices and crowded shorts suggests a structural repricing or short-covering flow is underway. USD/CAD technicals confirm the CAD bid, with the pair trading at 1.3952, well below its SMA20/50 cluster. Trade bias: Long CAD/JPY; bilateral G10 theme strength persists. Catalyst: BoC meeting 9 Sep — 100% hold priced. Risk: WTI oil falls below $80, dragging CAD lower and compressing the G10 performance spread.",
+      "evidence": [
+        "CAD 1W avg: +0.632% (n=3)",
+        "JPY 1W avg: -0.631% (n=7)",
+        "G10 spread: 1.263%"
+      ],
+      "_source": "gemini:gemini-3-flash-preview"
+    },
+    {
+      "time": "07:54",
       "priority": "warning",
-      "title": "USD/JPY — Options Skew vs Realized Vol Divergence",
-      "text": "USD/JPY at 159.30 is testing the lower bounds of its recent range, positioned below its SMA20 at 160.80 and SMA50 at 161.14. The options market is signaling high alert with a 25d risk reversal (RR) of -2.16, the most aggressive put skew in the G10 space, indicating heavy demand for downside protection. This extreme skew exists despite a negative Vol Risk Premium (VRP) of -1.5%, where implied volatility (7.2%) sits below realized volatility (8.7%), suggesting a potential mispricing of tail risk. Speculative positioning remains heavily short JPY (LF net -63,633), creating a massive squeeze potential if the spot breaks below the SMA200 at 158.15. The +266bp OIS carry advantage continues to support the pair on a nominal basis, but the options market is clearly paying for protection against a carry liquidation. Trade bias: Bearish USD/JPY; extreme options skew signals downside hedging despite positive carry. Catalyst: BoJ meeting 18 Sep — hike bias active. Risk: Price holds above 160.00 and carry demand resurfaces, forcing the options protection to be unwound.",
+      "title": "GBP/USD — COT-OIS Alignment + Vol Premium",
+      "text": "GBP/USD trades at 1.3485, positioned above its SMA20/50/200 cluster (1.3369-1.3423). Speculative positioning is heavily net long at +39,039 (70.1% long), aligning with a restrictive real policy rate of +0.93%. The options market is pricing in significant protection with an 11.0% ATM IV against a 6.0% realized HV30, resulting in a notable +5.0% Vol Risk Premium. This elevated premium suggests institutional desks are paying up for tails rather than following a simple momentum trade. While the nominal Fed-BoE spread is neutral at 0bp, the GBP's 1W G10 outperformance (+0.372%) confirms the currency remains a preferred long. Continued gains are likely to test the 1.3500 handle if US data remains moderately negative (ESI -10.4). Trade bias: Bullish GBP/USD; supported by real rates and positive technical posture. Catalyst: next BoE meeting (mkt: 100% hold priced) 17 Sep. Risk: UK GDP slowdown headlines intensify, causing a liquidation of the crowded +39k spec long.",
       "evidence": [
-        "USDJPY 25d RR: -2.16",
-        "JPY LF net short: -63,633",
-        "USD/JPY VRP: -1.5% (IV 7.2% vs HV 8.7%)"
+        "GBP COT LF net: +39,039",
+        "VRP: +5.0% (IV 11.0% vs HV30 6.0%)",
+        "GBP Real Rate: +0.93%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "01:22",
+      "time": "07:51",
       "priority": "warning",
-      "title": "AUD/USD — RBA Hawkishness vs Crowded Positioning",
-      "text": "AUD/USD trades at 0.7062, maintaining its position above the SMA20/50/200 cluster (0.6934–0.7016) following hawkish commentary from Assistant Governor Kent. Kent flagged upside inflation risks and signaled that further hikes remain possible, supporting the AUD real rate of +0.60%. However, speculative positioning is now nearing an extreme with COT LF net longs at +37,990 (72.1% long), which is likely to cap the immediate upside. Retail sentiment is currently 80% short, providing a contrarian tailwind as retail fades the institutional long trend. The -71bp OIS carry premium in favor of AUD versus the USD (AONIA 4.35% vs SOFR 3.64%) continues to attract yield-seeking flows as US CPI cooling reduces Fed hike bets. Trade bias: Bullish AUD/USD; supported by RBA hawkishness and retail divergence, though crowded spec longs warrant caution. Catalyst: RBA meeting 29 Sep — hold priced. Risk: Broad risk-off sentiment causes a liquidation of the crowded speculative long position.",
+      "title": "AUD/USD — Positioning vs Retail Divergence",
+      "text": "AUD/USD at 0.7052 is holding above its SMA cluster, currently underpinned by a -71bp OIS carry premium against the USD. COT data reveals institutional bulls are in control with a +37,990 net long position (72.1% long). This contrasts sharply with retail sentiment, where 78% of traders are short, creating a classic institutional-vs-retail divergence. While the AUD Economic Surprise Index (ESI) is currently negative at -10.4, the technical position remains bullish as long as the pair holds above the SMA20 at 0.7016. Retail fading of the institutional trend often precedes further upside extension as retail shorts are forced to cover. Watch for a break of the recent high to confirm trend continuation. Trade bias: Long AUD/USD; contrarian retail short bias supports the institutional long. Catalyst: RBA meeting 29 Sep — 100% hold priced. Risk: Global risk-off sentiment shifts VIX above 20, favoring the USD's restrictive real rate of +1.52%.",
       "evidence": [
-        "AUD COT long%: 72.1%",
-        "AUD/USD Retail: 80% short",
-        "AUD real rate: +0.60%"
-      ],
-      "_source": "gemini:gemini-3-flash-preview"
-    },
-    {
-      "time": "01:15",
-      "priority": "info",
-      "title": "GBP/USD — Elevated Volatility Premium",
-      "text": "GBP/USD is trading at 1.3499, holding above its SMA20/50/200 cluster (1.3369–1.3423) despite a neutral OIS carry differential (0bp). The options market is pricing in a significant risk premium with 1M ATM implied volatility at 11.0% against a realized HV30 of only 6.0%, resulting in a massive +5.0% Vol Risk Premium (VRP). This suggests traders are paying a steep premium for protection, potentially due to the restrictive real interest rate of +0.93% and upcoming BoE uncertainty. Speculative positioning is moderately long (lev_net +39,039), and the pair remains in a technical uptrend. Given the low VIX environment (14.6), the high GBP vol premium reflects idiosyncratic currency risk rather than broad market stress. Trade bias: Neutral/range GBP/USD; high vol premium makes directional bets expensive relative to realized movement. Catalyst: BoE meeting 17 Sep. Risk: Sharp compression in VRP if realized volatility catches up to implied pricing.",
-      "evidence": [
-        "GBP/USD VRP: +5.0% (IV 11.0% vs HV 6.0%)",
-        "GBP real rate: +0.93%",
-        "GBP/USD: 1.3499"
+        "AUD COT LF net: +37,990",
+        "Retail Sentiment: 78% Short",
+        "AUD/USD OIS carry: -71bp (favors AUD)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
