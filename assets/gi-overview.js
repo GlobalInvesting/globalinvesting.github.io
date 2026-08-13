@@ -1,6 +1,28 @@
 /**
- * GlobalInvesting FX Terminal — Market Overview module  v1.3.0
+ * GlobalInvesting FX Terminal — Market Overview module  v1.3.1
  * assets/gi-overview.js — include AFTER dashboard.js and gi-auth.js in index.html
+ *
+ * v1.3.1 (2026-08-13): Reported by Santiago — every currency in the
+ *   Overview's "Currency Strength — G10 Snapshot" strip rendering flat gray
+ *   since the prior day, while the Currency Strength Heatmap panel (same
+ *   underlying window._hmStrengths) showed a normal green/red spread.
+ *   Root cause: renderCsiStrip()'s bar color reused tagFor()'s ±0.15%
+ *   "Strong/Weak" label threshold — appropriate for a text label, far too
+ *   wide for a color fill — so on any day where every G10 currency stayed
+ *   inside ±0.15% (i.e. most days), every bar defaulted to flat gray.
+ *   dashboard.js's populateHeatmap() uses a genuinely different, tighter
+ *   ±0.05%/±0.15% two-tier scheme for the heatmap's own cell shading
+ *   (h-up/h-s-up, h-down/h-s-down) — a second silently-diverged methodology
+ *   for the same feed, the exact "two independent parsers/methodologies of
+ *   one feed drift" pattern GUIDELINES.md warns against. Fix: new
+ *   csiColor(pct) mirrors dashboard.js's exact ±0.05/±0.15 breakpoints
+ *   (single source of truth) instead of borrowing tagFor()'s unrelated
+ *   label threshold, with the ±0.05-0.15% "mild" band getting a dimmed
+ *   tint of --up/--down via color-mix() rather than going fully gray —
+ *   matching the intent of the heatmap's own mild-vs-strong shading,
+ *   adapted to a bar's solid fill. tagFor() itself (bias-card Strong/Weak/
+ *   Neutral text labels) is untouched — that threshold is a legitimate,
+ *   separate design choice, not the bug.
  *
  * v1.3.0 (2026-08-12): Three items reported by Santiago against the live
  *   Overview:
@@ -239,6 +261,32 @@
     return { cls: '', label: 'Neutral' };
   }
 
+  // v1.3.1: CSI strip bar color — was reusing tagFor()'s ±0.15% "Strong/Weak"
+  // label threshold, so on any normal/quiet day (every G10 currency inside
+  // ±0.15%) every single bar rendered flat gray (var(--text2)), while the
+  // Currency Strength Heatmap panel right below it — reading the exact same
+  // window._hmStrengths — showed a normal green/red spread. Root cause: the
+  // heatmap's populateHeatmap() (dashboard.js) uses a genuinely different,
+  // tighter methodology — a 2-tier ±0.05%/±0.15% scheme (h-up/h-s-up,
+  // h-down/h-s-down) with only the ±0.05% band itself rendering flat — and
+  // this module had never been aligned to it, a second silently-diverged
+  // "methodology" for the same feed (GUIDELINES.md: two independent
+  // parsers/methodologies of one feed drift). Reported by Santiago:
+  // Overview showing every currency gray since the prior day.
+  // Fix: mirror dashboard.js's exact ±0.05/±0.15 breakpoints (single source
+  // of truth, not a third invented scheme), with the ±0.05-0.15% "mild"
+  // band getting a dimmed tint of --up/--down (via color-mix) instead of
+  // going fully gray — matching the intent of the heatmap's own h-up/h-down
+  // (mild) vs h-s-up/h-s-down (strong) two-tier shading, adapted to a bar's
+  // solid-fill context rather than a cell's background tint.
+  function csiColor(pct) {
+    if (pct > 0.15) return 'var(--up)';
+    if (pct > 0.05) return 'color-mix(in srgb, var(--up) 55%, var(--text2) 45%)';
+    if (pct < -0.15) return 'var(--down)';
+    if (pct < -0.05) return 'color-mix(in srgb, var(--down) 55%, var(--text2) 45%)';
+    return 'var(--text2)';
+  }
+
   function renderBiasRow(strengths) {
     const row = document.getElementById('gi-ov-bias-row');
     if (!row) return;
@@ -265,8 +313,7 @@
     const maxAbs = Math.max(0.05, ...CSI_CCYS.map(c => Math.abs(byCcy[c] || 0)));
     strip.innerHTML = CSI_CCYS.map(ccy => {
       const pct = byCcy[ccy] || 0;
-      const t = tagFor(pct);
-      const color = t.cls === 'up' ? 'var(--up)' : t.cls === 'down' ? 'var(--down)' : 'var(--text2)';
+      const color = csiColor(pct);
       const heightPct = Math.max(8, Math.round((Math.abs(pct) / maxAbs) * 100));
       return `<div class="gi-ov-csi-col">
         <div class="gi-ov-csi-bar" style="height:${heightPct}%;background:${color};"></div>
