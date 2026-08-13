@@ -1,6 +1,17 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.7.2
+ * GlobalInvesting FX Terminal — License Auth Module  v1.7.3
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.7.3 (2026-08-12): Reverted per Santiago's explicit instruction — the
+ *   "See the full walkthrough & pricing" modal link now points at plain
+ *   `access.html` (no anchor), not `access.html#broker-access` as landed in
+ *   v1.7.2. v1.7.2's own intent (skip past the featured EA card straight to
+ *   the broker cards) is superseded by this direction; the link now lands
+ *   at the top of access.html like a normal page link. No JS behavior
+ *   change, plain href fix. NOTE: index.html's own "Broker access" Overview
+ *   pill still points at `access.html#broker-access` (fixed in v8.133.2,
+ *   untouched here) — not in scope for this change, flag to Santiago if the
+ *   same reversion should apply there too.
  *
  * v1.7.2 (2026-08-12): Follow-up to v1.7.1's incomplete broker-access
  *   scroll-target fix. Santiago's original v1.4.0 fix already documented
@@ -393,7 +404,7 @@
       for your access link, no MT5 key required.
     </p>
     <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-8px;">
-      New here? <a href="access.html#broker-access">See the full walkthrough &amp; pricing &rarr;</a>
+      New here? <a href="access.html">See the full walkthrough &amp; pricing &rarr;</a>
     </p>
 
     <label for="gi-inp-key">Activation Key (from MT5 terminal top bar)</label>
