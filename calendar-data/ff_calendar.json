@@ -1,74 +1,8 @@
 {
-  "generated_at": "2026-08-12T23:05:06Z",
+  "generated_at": "2026-08-13T00:01:03Z",
   "source": "Myfxbook · ForexFactory",
   "holidays": [],
   "events": [
-    {
-      "title": "United Kingdom Core Inflation Rate YoY",
-      "currency": "GBP",
-      "dateISO": "2026-07-22",
-      "timeUTC": "06:00",
-      "impact": "medium",
-      "forecast": "2.5%",
-      "previous": "2.6%",
-      "actual": "2.6%",
-      "released": true
-    },
-    {
-      "title": "United Kingdom Inflation Rate MoM",
-      "currency": "GBP",
-      "dateISO": "2026-07-22",
-      "timeUTC": "06:00",
-      "impact": "medium",
-      "forecast": "0.1%",
-      "previous": "0.2%",
-      "actual": "0.1%",
-      "released": true
-    },
-    {
-      "title": "United Kingdom Inflation Rate YoY",
-      "currency": "GBP",
-      "dateISO": "2026-07-22",
-      "timeUTC": "06:00",
-      "impact": "high",
-      "forecast": "2.7%",
-      "previous": "2.8%",
-      "actual": "2.6%",
-      "released": true
-    },
-    {
-      "title": "United States MBA 30-Year Mortgage Rate",
-      "currency": "USD",
-      "dateISO": "2026-07-22",
-      "timeUTC": "11:00",
-      "impact": "medium",
-      "forecast": null,
-      "previous": "6.65%",
-      "actual": "6.69%",
-      "released": true
-    },
-    {
-      "title": "United States EIA Gasoline Stocks Change",
-      "currency": "USD",
-      "dateISO": "2026-07-22",
-      "timeUTC": "14:30",
-      "impact": "medium",
-      "forecast": "-1.54M",
-      "previous": "-1.533M",
-      "actual": "0.765M",
-      "released": true
-    },
-    {
-      "title": "United States EIA Crude Oil Stocks Change",
-      "currency": "USD",
-      "dateISO": "2026-07-22",
-      "timeUTC": "14:30",
-      "impact": "medium",
-      "forecast": "-1.25M",
-      "previous": "-1.693M",
-      "actual": "2.011M",
-      "released": true
-    },
     {
       "title": "Australia Unemployment Rate",
       "currency": "AUD",
@@ -3103,19 +3037,31 @@
       "vendor": "myfxbook"
     },
     {
-      "title": "Inflation Expectations q/q",
+      "title": "Australia RBA Kent Speech",
+      "currency": "AUD",
+      "dateISO": "2026-08-13",
+      "timeUTC": "00:15",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "New Zealand Business Inflation Expectations",
       "currency": "NZD",
       "dateISO": "2026-08-13",
       "timeUTC": "03:00",
       "impact": "medium",
-      "forecast": null,
+      "forecast": "2.7%",
       "previous": "2.53%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "GDP m/m",
+      "title": "United Kingdom GDP MoM",
       "currency": "GBP",
       "dateISO": "2026-08-13",
       "timeUTC": "06:00",
@@ -3124,34 +3070,142 @@
       "previous": "0.1%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "Prelim GDP q/q",
+      "title": "United Kingdom Manufacturing Production MoM",
+      "currency": "GBP",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "impact": "medium",
+      "forecast": "-0.2%",
+      "previous": "0.1%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United Kingdom Goods Trade Balance Non-EU",
+      "currency": "GBP",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "impact": "high",
+      "forecast": "-9.3",
+      "previous": "-7.14",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United Kingdom GDP Growth Rate QoQ",
+      "currency": "GBP",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "impact": "high",
+      "forecast": "0.4%",
+      "previous": "0.6%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United Kingdom GDP Growth Rate YoY",
+      "currency": "GBP",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "impact": "high",
+      "forecast": "1.1%",
+      "previous": "0.9%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United Kingdom Goods Trade Balance",
+      "currency": "GBP",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "impact": "high",
+      "forecast": "£-20.5B",
+      "previous": "£-18.66B",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United Kingdom Industrial Production MoM",
+      "currency": "GBP",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "impact": "medium",
+      "forecast": "0.1%",
+      "previous": "-0.5%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United Kingdom GDP 3-Month Avg",
       "currency": "GBP",
       "dateISO": "2026-08-13",
       "timeUTC": "06:00",
       "impact": "medium",
       "forecast": "0.4%",
-      "previous": "0.6%",
+      "previous": "0.7%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "Core PPI m/m",
+      "title": "United Kingdom Business Investment QoQ",
+      "currency": "GBP",
+      "dateISO": "2026-08-13",
+      "timeUTC": "06:00",
+      "impact": "medium",
+      "forecast": "-0.5%",
+      "previous": "0.9%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Norway Norges Bank Interest Rate Decision",
+      "currency": "NOK",
+      "dateISO": "2026-08-13",
+      "timeUTC": "08:00",
+      "impact": "high",
+      "forecast": "4.25%",
+      "previous": "4.25%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Euro Area Industrial Production MoM",
+      "currency": "EUR",
+      "dateISO": "2026-08-13",
+      "timeUTC": "09:00",
+      "impact": "medium",
+      "forecast": "-0.1%",
+      "previous": "-0.2%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Fed Hammack Speech",
       "currency": "USD",
       "dateISO": "2026-08-13",
-      "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "0.3%",
-      "previous": "0.2%",
+      "timeUTC": "12:15",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "PPI m/m",
+      "title": "United States PPI MoM",
       "currency": "USD",
       "dateISO": "2026-08-13",
       "timeUTC": "12:30",
@@ -3160,22 +3214,46 @@
       "previous": "-0.3%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "Unemployment Claims",
+      "title": "United States Core PPI MoM",
       "currency": "USD",
       "dateISO": "2026-08-13",
       "timeUTC": "12:30",
       "impact": "medium",
-      "forecast": "202K",
-      "previous": "199K",
+      "forecast": "0.3%",
+      "previous": "0.2%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "RBA Gov Bullock Speaks",
+      "title": "United States Fed Barkin Speech",
+      "currency": "USD",
+      "dateISO": "2026-08-13",
+      "timeUTC": "12:40",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "New Zealand Business NZ PMI",
+      "currency": "NZD",
+      "dateISO": "2026-08-13",
+      "timeUTC": "22:30",
+      "impact": "medium",
+      "forecast": "58.4",
+      "previous": "59.7",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Australia RBA Gov Bullock Speech",
       "currency": "AUD",
       "dateISO": "2026-08-13",
       "timeUTC": "23:30",
@@ -3184,7 +3262,7 @@
       "previous": null,
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
       "title": "Core Retail Sales m/m",
