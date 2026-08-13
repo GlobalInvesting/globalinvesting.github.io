@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-13T10:34:07Z",
-  "generatedAt": "2026-08-13T10:34:07Z",
+  "lastUpdate": "2026-08-13T14:34:37Z",
+  "generatedAt": "2026-08-13T14:34:37Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-13",
   "rangeTo": "2026-08-14",
-  "totalEvents": 3728,
+  "totalEvents": 3731,
   "currencyCounts": {
     "AUD": 251,
     "EUR": 853,
-    "USD": 1265,
+    "USD": 1268,
     "GBP": 435,
     "NZD": 86,
     "JPY": 215,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "medium": 1840,
-    "high": 1660,
+    "high": 1663,
     "low": 228
   },
   "surpriseStats": {
@@ -239,19 +239,19 @@
       "std": 4.358899
     },
     "USD/continuing jobless claims": {
-      "n": 15,
-      "mean": -3.333333,
-      "std": 12.998168
+      "n": 16,
+      "mean": -1.6875,
+      "std": 14.178475
     },
     "USD/jobless claims 4-week average": {
-      "n": 15,
-      "mean": 0.483333,
-      "std": 3.330683
+      "n": 16,
+      "mean": 0.328125,
+      "std": 3.277091
     },
     "USD/initial jobless claims": {
-      "n": 15,
-      "mean": 2.066667,
-      "std": 9.475281
+      "n": 16,
+      "mean": 1.5,
+      "std": 9.430447
     },
     "USD/building permits": {
       "n": 4,
@@ -899,14 +899,14 @@
       "std": 0.0
     },
     "USD/ppi mom": {
-      "n": 3,
-      "mean": 0.166667,
-      "std": 0.404145
+      "n": 4,
+      "mean": 0.075,
+      "std": 0.377492
     },
     "USD/core ppi mom": {
-      "n": 3,
-      "mean": -0.133333,
-      "std": 0.057735
+      "n": 4,
+      "mean": -0.125,
+      "std": 0.05
     },
     "NZD/business nz pmi": {
       "n": 3,
@@ -46684,11 +46684,24 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
+      "event": "United States Jobless Claims 4-week Average",
+      "impact": "high",
+      "actual": "199.0K",
+      "forecast": "197.0K",
+      "previous": "199.0K"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
       "event": "United States PPI MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.0%",
       "forecast": "0.2%",
-      "previous": "-0.3%"
+      "previous": "-0.1%"
     },
     {
       "date": "13 Aug",
@@ -46699,9 +46712,35 @@
       "flag": "🇺🇸",
       "event": "United States Core PPI MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.3%",
-      "previous": "0.2%"
+      "previous": "0.4%"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "high",
+      "actual": "1777.0K",
+      "forecast": "1800.0K",
+      "previous": "1799.0K"
+    },
+    {
+      "date": "13 Aug",
+      "dateISO": "2026-08-13",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": "209.0K",
+      "forecast": "202.0K",
+      "previous": "200.0K"
     },
     {
       "date": "13 Aug",
