@@ -837,6 +837,16 @@
   #rightpanel {
     background: var(--bg2); border-left: 1px solid var(--border);
     overflow-y: auto; font-size: 11px; display: flex; flex-direction: column;
+    /* v8.135.5: bottom safety margin so the last row of whichever panel ends
+       up last in the sidebar (currently Economic Surprise Index, SEK row)
+       doesn't sit flush against — or behind — #statusbar, a position:fixed
+       22px bar. #layout's height is calc(100vh - 92px)/calc(100dvh - 92px);
+       any small mismatch between that hardcoded figure and the real header/
+       footer heights leaves zero scroll room to clear the fixed footer.
+       26px = statusbar's own 22px height + 4px clearance, chosen so this
+       protects any panel, not just ESI specifically, if content order ever
+       changes. See GUIDELINES.md ESI/rightpanel scroll-clearance entry. */
+    padding-bottom: 26px;
   }
   #rightpanel::-webkit-scrollbar { width: 3px; }
   #rightpanel::-webkit-scrollbar-thumb { background: var(--border2); }
