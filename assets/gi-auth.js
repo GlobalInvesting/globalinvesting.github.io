@@ -1,6 +1,21 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.7.3
+ * GlobalInvesting FX Terminal — License Auth Module  v1.7.4
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.7.4 (2026-08-13): Reported by Santiago — on mobile the activation modal
+ *   "ocupa toda la pantalla y no se ve el botón X para cerrarlo." Root cause:
+ *   #gi-auth-modal (the backdrop) had no height cap or overflow handling and
+ *   simply vertically-centered #gi-auth-box regardless of viewport height —
+ *   on a phone, the box's natural content height (form + broker-walkthrough
+ *   copy + hint block) routinely exceeds the viewport, so centering pushed
+ *   the box's own top — where the close button lives, position:absolute
+ *   top:10px relative to the box, not the viewport — above the visible top
+ *   edge, with no scroll available to reach it. Fix: below 640px, the
+ *   backdrop switches from centered to top-anchored + scrollable
+ *   (align-items:flex-start; overflow-y:auto), so the box always starts
+ *   flush with the viewport top (close button immediately visible) and any
+ *   remaining content scrolls via the backdrop. Desktop layout (≥640px)
+ *   unchanged.
  *
  * v1.7.3 (2026-08-12): Reverted per Santiago's explicit instruction — the
  *   "See the full walkthrough & pricing" modal link now points at plain
@@ -382,6 +397,35 @@
   padding: 0;
   line-height: 1;
   flex-shrink: 0;
+}
+
+/* v1.7.4: mobile — the modal previously only ever centered #gi-auth-box
+   vertically with no height cap and no scroll on the outer #gi-auth-modal
+   backdrop. On a phone viewport the box's natural content height (form +
+   broker-walkthrough copy + hint block) regularly exceeds the visible
+   viewport; since the backdrop had no overflow handling, the excess simply
+   rendered off-screen above/below the fold with no way to reach it — most
+   visibly, the box's own top (where #gi-auth-close lives, position:absolute
+   top:10px *within the box*, not the viewport) got centered above the top
+   edge of the screen, so the close button was invisible and unreachable.
+   Reported by Santiago: "en mobile ocupa toda la pantalla y no se ve el
+   botón X para cerrarlo." Fix: below 640px, switch the backdrop from
+   vertically-centered to top-anchored + scrollable, so the box always
+   starts flush with the top of the viewport (close button immediately
+   visible, no centering overflow) and any content taller than the
+   viewport scrolls via the backdrop itself rather than being clipped. */
+@media (max-width: 640px) {
+  #gi-auth-modal {
+    align-items: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 14px 0 32px;
+  }
+  #gi-auth-box {
+    width: 100%;
+    max-width: 94vw;
+    margin: 0 auto;
+  }
 }
 `;
 

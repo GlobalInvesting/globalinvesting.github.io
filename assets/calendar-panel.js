@@ -1,7 +1,20 @@
 /**
- * calendar-panel.js v1.19.18 — Native economic calendar renderer
+ * calendar-panel.js v1.19.19 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.19 (2026-08-13): Reported by Santiago — NOK and SEK never appeared
+ *   in the Economic Calendar panel or its currency filter buttons, despite
+ *   the panel's own header already saying "G10 currencies · medium & high
+ *   impact." Root cause: this file's own `G8_CURRENCIES`/`G8_LIST` (the
+ *   event filter and the filter-button source list) and its local `FLAG`
+ *   map were still hardcoded to the original 8 currencies — never extended
+ *   when the rest of the pipeline (fetch_ff_calendar.py, calendar-watcher.js)
+ *   moved to G10. Fix: renamed to `G10_CURRENCIES`/`G10_LIST`, added
+ *   NOK/SEK to both and to `FLAG` (fi-no/fi-se, already used elsewhere on
+ *   the site e.g. CB Rate Expectations). See CHANGELOG.md v8.135.3 for the
+ *   companion fetch_economic_calendar.py fix (scripts repo) that was
+ *   silently dropping NOK/SEK events from calendar.json on every run.
  *
  * v1.19.18 (2026-08-11): FIX — drill-down modal showed "No prior
  *   actual/forecast history for this event in the last year" for USD Core
@@ -732,8 +745,8 @@
 (function () {
   'use strict';
 
-  const G8_CURRENCIES      = new Set(['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']);
-  const G8_LIST             = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+  const G10_CURRENCIES     = new Set(['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK']);
+  const G10_LIST            = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
   const IMPACTS = new Set(['medium','high']);
 
   // ── [v1.13.0] Currency filter state ──────────────────────────────────
@@ -752,7 +765,7 @@
       const raw = localStorage.getItem(CAL_CCY_FILTER_KEY);
       if (!raw) return null;
       const v = JSON.parse(raw);
-      return (typeof v === 'string' && G8_CURRENCIES.has(v)) ? v : null;
+      return (typeof v === 'string' && G10_CURRENCIES.has(v)) ? v : null;
     } catch { return null; }
   }
   function saveCcyFilter(v) {
@@ -813,7 +826,7 @@
     medium: { color: 'var(--orange)', label: 'Medium' },
   };
 
-  const FLAG = { USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz' };
+  const FLAG = { USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz', NOK:'no', SEK:'se' };
 
   // Indicators where a higher actual than forecast is BAD news (rising unemployment,
   // rising jobless claims, a wider deficit) and must render as "down" (red), not "up"
@@ -2040,7 +2053,7 @@
     const _mISO = _maxAhead.toISOString().slice(0, 10);
 
     let filtered = events.filter(ev =>
-      G8_CURRENCIES.has(ev.currency) && passesImpactFilter(ev) &&      // [v1.16.0] impact filter
+      G10_CURRENCIES.has(ev.currency) && passesImpactFilter(ev) &&      // [v1.16.0] impact filter
       (_ccyFilter == null || ev.currency === _ccyFilter) &&         // [v1.13.0] currency filter
       ev.dateISO >= _yISO && ev.dateISO <= _mISO
     );
@@ -2065,13 +2078,13 @@
     // staleness on the real current window, not to backfill a legitimately
     // quiet week the user paged into with Prev/Next.
     if (!filtered.length && _calWeekOffsetDays === 0) {
-      const g8 = events.filter(ev => G8_CURRENCIES.has(ev.currency) && passesImpactFilter(ev));
-      if (g8.length) {
-        const latestISO = g8.reduce((max, ev) => ev.dateISO > max ? ev.dateISO : max, g8[0].dateISO);
+      const g10 = events.filter(ev => G10_CURRENCIES.has(ev.currency) && passesImpactFilter(ev));
+      if (g10.length) {
+        const latestISO = g10.reduce((max, ev) => ev.dateISO > max ? ev.dateISO : max, g10[0].dateISO);
         const fallbackFrom = new Date(latestISO + 'T00:00:00Z');
         fallbackFrom.setUTCDate(fallbackFrom.getUTCDate() - 3);
         const fallbackFromISO = fallbackFrom.toISOString().slice(0, 10);
-        filtered = g8.filter(ev => ev.dateISO >= fallbackFromISO && ev.dateISO <= latestISO);
+        filtered = g10.filter(ev => ev.dateISO >= fallbackFromISO && ev.dateISO <= latestISO);
       }
     }
 
@@ -2459,7 +2472,7 @@
     if (box.dataset.calCcyInit !== '1') {
       box.dataset.calCcyInit = '1';
       box.innerHTML =
-        G8_LIST.map(ccy =>
+        G10_LIST.map(ccy =>
           `<button type="button" class="cal-ccy-btn" data-ccy="${ccy}" style="${btnStyle(_ccyFilter === ccy)}">${ccy}</button>`
         ).join('') +
         `<button type="button" id="cal-ccy-all" style="${btnStyle(_ccyFilter == null)}">All</button>`;
