@@ -27,11 +27,11 @@
       "source": "federalreserve.gov",
       "bias": "hold",
       "biasSource": "CME 30-Day Fed Funds futures, meeting-bracketed",
-      "biasMethod": "ois",
+      "biasMethod": "spread",
       "biasUpdated": "2026-08-14",
       "cutProb": 0,
       "hikeProb": 0,
-      "fwdRate": 3.63
+      "fwdRate": 3.75
     },
     "EUR": {
       "nextMeeting": "10 Sep",
@@ -62,8 +62,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-08-14",
       "cutProb": 0,
-      "hikeProb": 68,
-      "fwdRate": 2.42
+      "hikeProb": 72,
+      "fwdRate": 2.43
     },
     "GBP": {
       "nextMeeting": "17 Sep",
@@ -126,8 +126,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-08-14",
       "cutProb": 0,
-      "hikeProb": 56,
-      "fwdRate": 1.14
+      "hikeProb": 62,
+      "fwdRate": 1.155
     },
     "AUD": {
       "nextMeeting": "29 Sep",
@@ -278,8 +278,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-08-14",
       "cutProb": 0,
-      "hikeProb": 71,
-      "fwdRate": 4.4275
+      "hikeProb": 69,
+      "fwdRate": 4.4225
     },
     "SEK": {
       "nextMeeting": "25 Aug",
