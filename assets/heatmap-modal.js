@@ -1,3 +1,11 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.6.1 — Currency switcher layout fix (Santiago,
+//   screenshot): the ‹/› arrows previously flanked the chip (‹ [USD▾] ›), so the
+//   left arrow sat immediately after the flag, ahead of the currency chip itself —
+//   read oddly, like it belonged to the flag rather than to the switcher. Reordered
+//   to [flag] [USD▾ chip] [‹›] — text: chip stays right after the flag, both arrows
+//   now grouped together to its right as a single control. Purely a DOM-order/CSS
+//   change (#hm-ccy-arrows wraps the two buttons with a tight 1px gap) — no change
+//   to hmCycleCcy/hmToggleCcyDropdown/hmPivotCcy logic, ID lookups unaffected.
 // CURRENCY STRENGTH HEATMAP MODAL  v2.6.0 — Session tab follow-up (Santiago,
 //   screenshots): (1) fixed the Market Commentary block flickering — it was
 //   re-fetching and re-rendering (loading spinner → articles) on every
@@ -100,6 +108,7 @@
 .hm-ccy-arrow:hover { color:var(--text);background:var(--bg3); }
 .hm-ccy-arrow:disabled { opacity:.3;cursor:default; }
 .hm-ccy-arrow:disabled:hover { background:none;color:var(--text3,#4e5c70); }
+#hm-ccy-arrows { display:inline-flex;gap:1px; }
 #hm-ccy-switch { position:relative;display:inline-flex; }
 #hm-ccy-chip {
   background:var(--bg3,#151b26);border:1px solid var(--border,#252d3d);border-radius:4px;
@@ -730,12 +739,14 @@
   <div id="hm-hd">
     <div id="hm-hd-left">
       <div id="hm-title-row">
-        <button class="hm-ccy-arrow" id="hm-ccy-prev" onclick="hmCycleCcy(-1)" aria-label="Previous currency" title="Previous (←)">‹</button>
         <div id="hm-ccy-switch">
           <button id="hm-ccy-chip" onclick="hmToggleCcyDropdown(event)" aria-haspopup="listbox" aria-expanded="false" title="Switch currency"></button>
           <div id="hm-ccy-dd" role="listbox" aria-label="Select currency"></div>
         </div>
-        <button class="hm-ccy-arrow" id="hm-ccy-next" onclick="hmCycleCcy(1)" aria-label="Next currency" title="Next (→)">›</button>
+        <div id="hm-ccy-arrows">
+          <button class="hm-ccy-arrow" id="hm-ccy-prev" onclick="hmCycleCcy(-1)" aria-label="Previous currency" title="Previous (←)">‹</button>
+          <button class="hm-ccy-arrow" id="hm-ccy-next" onclick="hmCycleCcy(1)" aria-label="Next currency" title="Next (→)">›</button>
+        </div>
         <div id="hm-title"></div>
       </div>
       <div id="hm-sub">G10 composite · 32 pairs · Delayed ~5min</div>
@@ -2306,7 +2317,7 @@
     if (!flagSpan) {
       flagSpan = document.createElement('span');
       flagSpan.style.cssText = 'border-radius:2px;font-size:15px;vertical-align:middle;flex-shrink:0;';
-      titleRow.insertBefore(flagSpan, titleRow.firstChild); // flag leads the row: [flag][‹][chip][›] — text
+      titleRow.insertBefore(flagSpan, titleRow.firstChild); // flag leads the row: [flag][chip][‹›] — text
     }
     flagSpan.className = `fi fi-${meta.flag}`;
   }
