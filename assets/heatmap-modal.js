@@ -1046,6 +1046,47 @@
     return h >= sess.utcEnd ? 'past' : 'upcoming';
   }
 
+  // Returns the fraction [0,1] of how far the CURRENT trading window has
+  // progressed for an active session — minute-resolution, handles the
+  // midnight-crossing Sydney window. Meaningless (but harmless) for a
+  // session that isn't currently active; callers only use this for 'active'.
+  function getSessionProgress(sess) {
+    const now    = new Date();
+    const nowMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+    let startMin = sess.utcStart * 60;
+    let endMin   = sess.utcEnd   * 60;
+    if (endMin <= startMin) endMin += 24 * 60; // crosses midnight (Sydney)
+    let elapsedMin = nowMin - startMin;
+    if (elapsedMin < 0) elapsedMin += 24 * 60; // wrap: now is past midnight, before startMin numerically
+    const durationMin = endMin - startMin;
+    return Math.max(0, Math.min(1, elapsedMin / durationMin));
+  }
+
+  // Reorders SESSIONS into a chronological-narrative sequence — past sessions
+  // first (oldest to most recent), then the currently active session(s), then
+  // upcoming sessions — instead of the fixed Sydney→Tokyo→London→New York
+  // cycle order. Fixed order breaks down as a reading order once a session
+  // has wrapped past midnight: e.g. once Sydney reopens for a new day while
+  // Tokyo/London/New York show as CLOSED from the *previous* cycle, listing
+  // Sydney first makes the closed sessions below it read as upcoming/future
+  // rather than the history that already happened. Bloomberg/Eikon session
+  // panels read left-to-right as a timeline (what already happened → what's
+  // live now → what's next); this keeps the bars and the AI session notes
+  // consistent with that convention. Relative order within each group is
+  // preserved from the fixed cycle. Weekend: no active/past distinction
+  // (all bars are last-close), so the fixed order is left untouched.
+  function getOrderedSessions() {
+    if (isMarketWeekend()) return SESSIONS;
+    const past = [], active = [], upcoming = [];
+    SESSIONS.forEach(s => {
+      const state = getBarSessionState(s);
+      if (state === 'active') active.push(s);
+      else if (state === 'past') past.push(s);
+      else upcoming.push(s);
+    });
+    return past.concat(active, upcoming);
+  }
+
   function populateSession(ccy, rtCache) {
     const tzAbbr   = localTzAbbr();
     const weekend  = isMarketWeekend();
@@ -1074,7 +1115,7 @@
 
     // Session bar data: active and past sessions show the day composite (honest label).
     // Upcoming sessions show no bar — Bloomberg/Eikon do not fabricate forward values.
-    const sessionData = SESSIONS.map(sess => {
+    const sessionData = getOrderedSessions().map(sess => {
       const barState = getBarSessionState(sess);
       const showBar  = barState === 'active' || barState === 'past';
       // All shown sessions display the same day composite — this is transparent about
@@ -1119,12 +1160,15 @@
       } else {
         const fill = document.createElement('div');
         fill.className = 'sess-fill';
-        // Active: full-width bar at 75% opacity (live session — result in progress)
-        // Past: dimmed bar — closed session result (Bloomberg convention)
-        // Weekend: all bars dimmed (last-close convention)
-        const isActive = s.barState === 'active' && !weekend;
-        const dimBar   = !isActive;
-        fill.style.cssText = 'width:100%;background:' + barClr +
+        // Active: bar fills proportionally to elapsed time within the session
+        // window — matches the MT5 EA's on-chart session indicator (live
+        // session, result still in progress). Past: full-width dimmed bar —
+        // closed session, final result (Bloomberg convention). Weekend: all
+        // bars full-width dimmed (last-close convention).
+        const isActive  = s.barState === 'active' && !weekend;
+        const dimBar    = !isActive;
+        const fillWidth = isActive ? (getSessionProgress(s) * 100).toFixed(1) + '%' : '100%';
+        fill.style.cssText = 'width:' + fillWidth + ';background:' + barClr +
           (dimBar ? ';opacity:.30' : ';opacity:.70');
         track.appendChild(fill);
         val.className = 'sess-val ' + (compositePos ? 'up' : 'down');
@@ -1223,7 +1267,11 @@
       //   CLOSED chip   — muted gray on its own line above note (result is historical fact)
       //   UPCOMING chip — amber, session not yet open; AI note suppressed to prevent
       //                   outlook text from reading as accomplished result
-      const sessOrder = ['Sydney', 'Tokyo', 'London', 'New York'];
+      // Order matches the bars above: past → active → upcoming (see
+      // getOrderedSessions()), not the fixed Sydney→Tokyo→London→New York
+      // cycle — keeps closed sessions from a prior cycle reading as future
+      // notes once a new session (e.g. Sydney) has reopened.
+      const sessOrder = getOrderedSessions().map(s => s.name);
       notes.innerHTML = sessOrder.map(sName => {
         const sess  = SESSIONS.find(s => s.name === sName);
         const state = getBarSessionState(sess);
