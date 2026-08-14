@@ -1,3 +1,15 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.6.0 — Session tab follow-up (Santiago,
+//   screenshots): (1) fixed the Market Commentary block flickering — it was
+//   re-fetching and re-rendering (loading spinner → articles) on every
+//   Finnhub RT tick via _hmRefreshIfOpen's populateSession() call, even
+//   though news doesn't change tick-to-tick; now gated by a _hmNewsCcy
+//   currency-tracking guard so it only re-runs on an actual currency change.
+//   (2) capped Market Commentary at 3 articles (was 6). (3) added an in-modal
+//   currency switcher (‹ NZD ▾ ›, dropdown + prev/next arrows + ArrowLeft/
+//   ArrowRight keys) to the header, mirroring cot-modal-chart.js's existing
+//   switcher — wired through the existing hmPivotCcy() pivot path so Session/
+//   CSI only re-render when their tab is actually visible, same lazy pattern
+//   hmTab() already uses.
 // CURRENCY STRENGTH HEATMAP MODAL  v2.5.0 — Session tab: added a Market Commentary
 //   fill block below Session Context, same shape/source as cb-rates-modal.js's
 //   _cbrLoadPolicySummary() (news-data/news.json, filtered to the modal's active
@@ -67,7 +79,7 @@
 #hm-hd-left { display:flex;flex-direction:column;gap:2px; }
 
 
-#hm-title-row { display:flex;align-items:center;gap:7px; }
+#hm-title-row { display:flex;align-items:center;gap:5px; }
 #hm-title { font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em;line-height:1.2;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
 #hm-title .fi { border-radius:2px;font-size:16px; }
 #hm-sub { font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2);letter-spacing:.02em;margin-top:1px; }
@@ -77,6 +89,45 @@
   transition:color .1s,background .1s;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
 #hm-close:hover { color:var(--text);background:var(--bg3); }
+
+/* Currency switcher (in-modal, no need to close/reopen) — same pattern as
+   cot-modal-chart.js's #cot-ccy-switch, namespaced hm- for this file. */
+.hm-ccy-arrow {
+  background:none;border:none;color:var(--text3,#4e5c70);font-size:11px;
+  cursor:pointer;padding:2px 4px;border-radius:3px;line-height:1;flex-shrink:0;
+  transition:color .1s,background .1s;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+}
+.hm-ccy-arrow:hover { color:var(--text);background:var(--bg3); }
+.hm-ccy-arrow:disabled { opacity:.3;cursor:default; }
+.hm-ccy-arrow:disabled:hover { background:none;color:var(--text3,#4e5c70); }
+#hm-ccy-switch { position:relative;display:inline-flex; }
+#hm-ccy-chip {
+  background:var(--bg3,#151b26);border:1px solid var(--border,#252d3d);border-radius:4px;
+  color:var(--text);font-size:13px;font-weight:600;padding:1px 7px;cursor:pointer;
+  font-family:var(--font-ui,'Inter',-apple-system,sans-serif);letter-spacing:-.01em;
+  display:inline-flex;align-items:center;gap:4px;transition:border-color .1s,background .1s;
+}
+#hm-ccy-chip:hover { border-color:var(--blue);background:var(--bg2); }
+#hm-ccy-chip::after {
+  content:'';width:0;height:0;margin-left:1px;
+  border-left:3.5px solid transparent;border-right:3.5px solid transparent;
+  border-top:4px solid var(--text3,#4e5c70);
+}
+#hm-ccy-dd {
+  display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:20;
+  background:var(--bg2);border:1px solid var(--border,#252d3d);border-radius:5px;
+  box-shadow:0 6px 18px rgba(0,0,0,.4);padding:4px;min-width:64px;
+  grid-template-columns:repeat(2,1fr);gap:2px;
+}
+#hm-ccy-dd.open { display:grid; }
+.hm-ccy-dd-item {
+  background:none;border:none;color:var(--text2);font-size:11px;font-weight:600;
+  padding:5px 6px;border-radius:3px;cursor:pointer;text-align:center;
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  transition:color .1s,background .1s;
+}
+.hm-ccy-dd-item:hover { color:var(--text);background:var(--bg3); }
+.hm-ccy-dd-item.on { color:var(--blue);background:var(--bg3); }
 
 /* ── Metrics strip ── */
 #hm-metrics {
@@ -679,6 +730,12 @@
   <div id="hm-hd">
     <div id="hm-hd-left">
       <div id="hm-title-row">
+        <button class="hm-ccy-arrow" id="hm-ccy-prev" onclick="hmCycleCcy(-1)" aria-label="Previous currency" title="Previous (←)">‹</button>
+        <div id="hm-ccy-switch">
+          <button id="hm-ccy-chip" onclick="hmToggleCcyDropdown(event)" aria-haspopup="listbox" aria-expanded="false" title="Switch currency"></button>
+          <div id="hm-ccy-dd" role="listbox" aria-label="Select currency"></div>
+        </div>
+        <button class="hm-ccy-arrow" id="hm-ccy-next" onclick="hmCycleCcy(1)" aria-label="Next currency" title="Next (→)">›</button>
         <div id="hm-title"></div>
       </div>
       <div id="hm-sub">G10 composite · 32 pairs · Delayed ~5min</div>
@@ -819,12 +876,23 @@
     document.body.appendChild(el);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.scrollIntoView({behavior:'smooth',block:'start'}); }));
     document.getElementById('hm-close').addEventListener('click', closeHeatmapModal);
-    el.addEventListener('click', function(e) { if (e.target === el) closeHeatmapModal(); });
+    el.addEventListener('click', function(e) {
+      if (e.target === el) { closeHeatmapModal(); return; }
+      // Click outside the currency switcher closes its dropdown without closing the modal
+      if (!e.target.closest('#hm-ccy-switch')) _hmCloseCcyDropdown();
+    });
     document.addEventListener('keydown', _onKey);
   }
 
   function _onKey(e) {
-    if (e.key === 'Escape') closeHeatmapModal();
+    if (e.key === 'Escape') {
+      const dd = document.getElementById('hm-ccy-dd');
+      if (dd && dd.classList.contains('open')) { _hmCloseCcyDropdown(); return; }
+      closeHeatmapModal();
+      return;
+    }
+    if (e.key === 'ArrowLeft')  { window.hmCycleCcy(-1); return; }
+    if (e.key === 'ArrowRight') { window.hmCycleCcy(1); return; }
   }
 
   // ── Populate ─────────────────────────────────────────────────────────────
@@ -1122,13 +1190,24 @@
     return past.concat(active, upcoming);
   }
 
-  // Session tab — Market Commentary fill block (v2.5.0). Same source and shape
+  // Session tab — Market Commentary fill block (v2.6.0). Same source and shape
   // as cb-rates-modal.js's _cbrLoadPolicySummary(): fetches news-data/news.json,
   // filters to this currency's articles, renders title + expand paragraph for
-  // up to 6. Unlike the CB modal it doesn't filter by CB_KW — this tab is about
-  // the currency generally, not central-bank policy specifically. Lazy-fetched
-  // on every populateSession() call (ccy switch or tab activation), non-blocking.
+  // up to 3. Unlike the CB modal it doesn't filter by CB_KW — this tab is about
+  // the currency generally, not central-bank policy specifically.
+  //
+  // v2.6.0 fix: _hmRefreshIfOpen calls populateSession() on every Finnhub RT
+  // tick while the Session tab is active (intentionally — see that function's
+  // own "flash-free" comment), which previously called this function on every
+  // tick too, replacing the wrap's innerHTML with a loading spinner and then
+  // the same articles over and over — the visible flicker Santiago reported.
+  // News doesn't change tick-to-tick, so this now only fetches/re-renders when
+  // the currency actually changes (tracked via _hmNewsCcy); repeat calls for
+  // the same currency are a no-op.
+  let _hmNewsCcy = null;
   async function _hmLoadSessionNews(ccy) {
+    if (ccy === _hmNewsCcy) return; // same currency already loaded/loading — skip, no flicker
+    _hmNewsCcy = ccy;
     const wrap = document.getElementById('hm-sess-news');
     if (!wrap) return;
     wrap.innerHTML = '<div class="hm-news-loading">Loading market commentary…</div>';
@@ -1136,6 +1215,7 @@
       const res = await fetch('./news-data/news.json', { cache: 'no-store' }).catch(() => null);
       if (!res || !res.ok) throw new Error('fetch failed');
       const j = await res.json();
+      if (ccy !== _hmNewsCcy) return; // stale response guard — ccy moved on again while this was in flight
       const articles = (j.articles || [])
         .filter(a => {
           if (a.cur !== ccy) return false;
@@ -1143,7 +1223,7 @@
           return exp.length >= 80;
         })
         .sort((a, b) => (b.ts || 0) - (a.ts || 0))
-        .slice(0, 6);
+        .slice(0, 3);
 
       if (!articles.length) {
         wrap.innerHTML = '<div class="hm-news-empty">No ' + ccy + ' commentary available.</div>';
@@ -1171,6 +1251,7 @@
           '</div>';
       }).join('');
     } catch (e) {
+      if (ccy !== _hmNewsCcy) return;
       wrap.innerHTML = '<div class="hm-news-empty">Market commentary unavailable.</div>';
     }
   }
@@ -2209,6 +2290,70 @@
     _renderCSIStats(ccy);
   }
 
+  // ── Currency switcher (Session tab request, v2.6.0) — mirrors cot-modal-chart.js's
+  // cotCycleCcy/cotToggleCcyDropdown/cotSwitchCcy trio, driven off _strengths (already
+  // holds all 10 G10 currencies passed in from dashboard.js's window._hmStrengths, no
+  // separate data store needed the way COT's per-currency lazy-fetch cache requires).
+  const _G10_ORDER = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'NOK', 'SEK'];
+  let _hmAvailCcys = [];
+
+  function _hmSetTitle(ccy) {
+    const meta = CCY_META[ccy] || { flag: 'un', full: ccy };
+    const titleRow = document.getElementById('hm-title-row');
+    const titleEl  = document.getElementById('hm-title');
+    titleEl.textContent = `\u2014 ${meta.full} Strength`;
+    let flagSpan = titleRow.querySelector('.fi');
+    if (!flagSpan) {
+      flagSpan = document.createElement('span');
+      flagSpan.style.cssText = 'border-radius:2px;font-size:15px;vertical-align:middle;flex-shrink:0;';
+      titleRow.insertBefore(flagSpan, titleRow.firstChild); // flag leads the row: [flag][‹][chip][›] — text
+    }
+    flagSpan.className = `fi fi-${meta.flag}`;
+  }
+
+  function _hmUpdateCcySwitcher(ccy) {
+    const avail = _G10_ORDER.filter(c => (_strengths || []).some(s => s.ccy === c));
+    _hmAvailCcys = avail.length ? avail : [ccy];
+    const idx = _hmAvailCcys.indexOf(ccy);
+    const chip = document.getElementById('hm-ccy-chip');
+    const dd   = document.getElementById('hm-ccy-dd');
+    const prev = document.getElementById('hm-ccy-prev');
+    const next = document.getElementById('hm-ccy-next');
+    if (chip) chip.textContent = ccy;
+    if (dd) {
+      dd.innerHTML = _hmAvailCcys.map(c =>
+        `<button class="hm-ccy-dd-item ${c === ccy ? 'on' : ''}" role="option" aria-selected="${c === ccy}" onclick="hmPivotCcy('${c}')">${c}</button>`
+      ).join('');
+    }
+    if (prev) prev.disabled = idx <= 0;
+    if (next) next.disabled = idx === -1 || idx >= _hmAvailCcys.length - 1;
+  }
+
+  window.hmCycleCcy = function(dir) {
+    if (!_hmAvailCcys.length || !_ccy) return;
+    const idx = _hmAvailCcys.indexOf(_ccy);
+    const nextIdx = idx + dir;
+    if (nextIdx < 0 || nextIdx >= _hmAvailCcys.length) return;
+    hmPivotCcy(_hmAvailCcys[nextIdx]);
+  };
+
+  window.hmToggleCcyDropdown = function(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('hm-ccy-dd');
+    const chip = document.getElementById('hm-ccy-chip');
+    if (!dd) return;
+    const open = dd.classList.toggle('open');
+    if (chip) chip.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+
+  function _hmCloseCcyDropdown() {
+    const dd = document.getElementById('hm-ccy-dd');
+    if (dd && dd.classList.contains('open')) {
+      dd.classList.remove('open');
+      document.getElementById('hm-ccy-chip')?.setAttribute('aria-expanded', 'false');
+    }
+  }
+
   // ── Public API ─────────────────────────────────────────────────────────────
 
   window.openHeatmapModal = function(ccy, strengths, rtCache) {
@@ -2218,21 +2363,8 @@
 
     buildModal();
 
-    // Set title with flag — Proposal A: flag in hm-title-row, text in hm-title
-    const meta  = CCY_META[ccy] || { flag: 'un', full: ccy };
-    const titleEl = document.getElementById('hm-title');
-    const titleRow = document.getElementById('hm-title-row');
-    titleEl.textContent = `${ccy} — ${meta.full} Strength`;
-    // Insert flag before title text if not already present
-    if (!titleRow.querySelector('.fi')) {
-      const flagSpan = document.createElement('span');
-      flagSpan.className = `fi fi-${meta.flag}`;
-      flagSpan.style.cssText = 'border-radius:2px;font-size:15px;vertical-align:middle;flex-shrink:0;';
-      titleRow.insertBefore(flagSpan, titleEl);
-    } else {
-      const flagSpan = titleRow.querySelector('.fi');
-      flagSpan.className = `fi fi-${meta.flag}`;
-    }
+    _hmSetTitle(ccy);
+    _hmUpdateCcySwitcher(ccy);
 
     // Reset to first tab
     document.querySelectorAll('.hm-tab').forEach(t => {
@@ -2257,6 +2389,7 @@
     bd.style.display = 'flex';
     document.getElementById('hm-close').focus();
   };
+
 
   // ── csiSetRange — the ONE user-facing CSI control (2026-08-07 redesign) ────
   // Replaces the earlier same-day csiSetTf()/csiPeriod()/_renderCSIPeriodBtns()
@@ -2351,20 +2484,19 @@
     if (!newCcy || newCcy === _ccy || !_strengths || !_rtCache) return;
     _ccy = newCcy;
 
-    const meta = CCY_META[newCcy] || { flag: 'un', full: newCcy };
-    const titleEl = document.getElementById('hm-title');
-    const titleRow = document.getElementById('hm-title-row');
-    titleEl.textContent = `${newCcy} — ${meta.full} Strength`;
-    const flagSpan = titleRow.querySelector('.fi');
-    if (flagSpan) flagSpan.className = `fi fi-${meta.flag}`;
+    _hmSetTitle(newCcy);
+    _hmUpdateCcySwitcher(newCcy);
+    _hmCloseCcyDropdown();
 
     populateMetrics(newCcy, _strengths, _rtCache);
     populateBreakdown(newCcy, _strengths, _rtCache, true);
     populateMacroDrivers(newCcy); // persistent block — must follow the pivot too, not just the active tab
     populateCorrelations(newCcy, _strengths, _rtCache);
-    // CSI has its own chart canvas that needs a visible container to size correctly,
-    // so only refresh it when that tab is actually the one on screen — matching the
-    // lazy-populate pattern hmTab() already uses for session/correlations/csi.
+    // Session and CSI each have their own chart/canvas or fetch cost, so only
+    // refresh them when that tab is actually the one on screen — matching the
+    // lazy-populate pattern hmTab() already uses on first switch.
+    const sessionPanel = document.getElementById('hm-p-session');
+    if (sessionPanel && sessionPanel.classList.contains('on')) populateSession(newCcy, _rtCache);
     const csiPanel = document.getElementById('hm-p-csi');
     if (csiPanel && csiPanel.classList.contains('on')) populateCSI(newCcy);
   };
