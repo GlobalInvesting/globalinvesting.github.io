@@ -1,5 +1,48 @@
 /**
- * econ-matrix.js v2.0.0 — Native Economic Matrix panel
+ * econ-matrix.js v2.1.0 — Native Economic Matrix panel
+ *
+ * ── v2.1.0 (2026-08-14) — GDP column: fixed GBP QoQ omission, tagged USD's
+ *    SAAR convention ──────────────────────────────────────────────────────
+ * Prompted by a follow-up question from Santiago after v2.0.0 shipped: is it
+ * industry-standard for the GDP column to show different periodicities
+ * (QoQ/MoM/YoY) across different currency rows? Investigation found three
+ * distinct things bundled under that one question:
+ *   (1) GBP bug: the CATS.GBP.gdp prefix list was `['GDP MoM']` only — it
+ *       never included the QoQ title at all, even though the UK's ONS DOES
+ *       publish a quarterly GDP figure, released the SAME DAY as the
+ *       monthly print 3 of every 4 months (confirmed in calendar.json:
+ *       "United Kingdom GDP Growth Rate QoQ" and "...GDP MoM" both dated
+ *       2026-08-13). This contradicted the column's own documented policy
+ *       ("QoQ where published") and meant the cell could never show the
+ *       quarterly headline even on a release day. Fixed by adding
+ *       'GDP Growth Rate QoQ' ahead of 'GDP MoM' in the prefix list —
+ *       findLatestGeneric()'s existing same-date tie-break now resolves to
+ *       QoQ on release days, and falls back to MoM (the freshest real data)
+ *       in the two in-between months, same as it always did.
+ *   (2) CAD reviewed and left as-is: its quarterly print is genuinely stale
+ *       (last Q1 2026, from 2026-05-29) relative to the monthly print
+ *       (2026-07-31), so the existing freshest-date selection already
+ *       surfaces the right cell — not a bug, no change needed.
+ *   (3) Bigger institutional-comparability issue, found during this
+ *       investigation (not what was asked, but material to "industry
+ *       standard"): USD's matched GDP title, "GDP Growth Rate QoQ", is by
+ *       the BEA's own convention already seasonally-adjusted ANNUALIZED
+ *       (SAAR) — the familiar "grew at an annualized pace of X%" figure.
+ *       Every other currency's "GDP Growth Rate QoQ" is the raw,
+ *       non-annualized quarterly change. Both were tagged identically as
+ *       "QoQ" in the per-cell subtext, which would read as directly
+ *       comparable magnitudes when they are not (US 1.5% SAAR vs EA 0.4%
+ *       raw QoQ implies the US grew ~4x faster than it actually did in
+ *       comparable terms — the non-annualized equivalent is ~0.37%, in
+ *       line with the EA print). Fixed by special-casing periodLabel() for
+ *       gdp/USD/qoq to render "QoQ SAAR" instead of "QoQ" — every other
+ *       cell's tag is unaffected. Column tooltip updated to disclose this
+ *       explicitly rather than relying on the reader to already know US
+ *       GDP convention.
+ * Not changed: CHF's gdp list still prioritizes YoY over its QoQ Flash —
+ * this wasn't part of what was asked and needs its own verification pass
+ * before touching (see "On the horizon" in CHANGELOG.md).
+ *
  *
  * Replaces the third-party TradingView Economic Map widget (tv-economic-map.js)
  * with a native table in the style of an institutional regional economic matrix
@@ -149,7 +192,7 @@
   const FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CHF: 'ch', CAD: 'ca', NZD: 'nz', NOK: 'no', SEK: 'se' };
 
   const COLUMNS = [
-    { key: 'gdp',     label: 'GDP',       title: 'Latest GDP growth rate \u2014 QoQ where published, YoY otherwise (see subtext on each cell for the period actually shown)' },
+    { key: 'gdp',     label: 'GDP',       title: 'Latest GDP growth rate \u2014 QoQ where published, YoY otherwise, falling back to the freshest monthly print for GBP/CAD between quarterly releases (see subtext on each cell for the period actually shown). Note: USD\u2019s QoQ is seasonally-adjusted ANNUALIZED (SAAR) per BEA convention \u2014 tagged \u201cQoQ SAAR\u201d, not directly comparable in magnitude to the raw non-annualized QoQ shown for other currencies.' },
     { key: 'cpi',     label: 'CPI YoY',   title: 'Latest headline CPI / inflation rate, year-on-year' },
     { key: 'cpimom',  label: 'CPI MoM',   title: 'Latest headline CPI / inflation rate, month-on-month \u2014 can reveal a trend reversal the YoY figure masks via base effects' },
     { key: 'core',    label: 'Core CPI',  title: 'Latest core/underlying inflation, year-on-year \u2014 excludes volatile food & energy components; the measure central banks weight most heavily. AUD shows the RBA Trimmed Mean CPI, Australia\u2019s standard core-equivalent.' },
@@ -215,7 +258,12 @@
       pce:   ['PCE Price Index YoY'],
     },
     GBP: {
-      gdp:   ['GDP MoM'],
+      // GDP: QoQ is the UK's headline growth figure and IS published — ONS
+      // bundles it into the same release as the monthly print 3 of every 4
+      // months (see v2.1.0 note above). Listed first so the same-day tie
+      // resolves to QoQ; MoM is still what's freshest in the two
+      // in-between months and remains the correct fallback there.
+      gdp:   ['GDP Growth Rate QoQ', 'GDP MoM'],
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
@@ -359,8 +407,16 @@
   // where a currency has no QoQ release). Detected from the event's own
   // title text, not asserted independently, so it can never drift out of
   // sync with what was actually matched.
-  function periodLabel(title) {
+  // v2.1.0: USD's "GDP Growth Rate QoQ" title is, by the BEA's own reporting
+  // convention, already seasonally-adjusted ANNUALIZED (SAAR) — unlike every
+  // other currency's "GDP Growth Rate QoQ", which is the raw, non-annualized
+  // quarterly change. Tagging both identically as "QoQ" would silently make
+  // US growth look ~4x stronger than an equivalent EA/UK/JPY print in the
+  // same column. Flagged only for gdp/USD/qoq — every other cell's title
+  // already carries an unambiguous, correctly-scaled period tag.
+  function periodLabel(title, ccy, colKey) {
     const t = title.toLowerCase();
+    if (colKey === 'gdp' && ccy === 'USD' && t.indexOf('qoq') !== -1) return 'QoQ SAAR';
     if (t.indexOf('qoq') !== -1) return 'QoQ';
     if (t.indexOf('yoy') !== -1) return 'YoY';
     if (t.indexOf('mom') !== -1) return 'MoM';
@@ -554,13 +610,13 @@
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
-  function cellHTML(ev, gapKey) {
+  function cellHTML(ev, gapKey, ccy) {
     if (!ev) {
       const title = (gapKey && GAP_TITLE[gapKey]) || 'No data available';
       return '<td class="flat" title="' + title.replace(/"/g, '&quot;') + '">\u2014</td>';
     }
     const cls = trendClass(ev.actual, ev.previous);
-    const period = periodLabel(ev.event);
+    const period = periodLabel(ev.event, ccy, gapKey);
     const ref = refLabel(ev);
     const sub = (period ? period + ' \u00b7 ' : '') + ref;
     const title = ev.event + ' \u00b7 ' + ev.dateISO + (ev.previous != null ? ' \u00b7 prev ' + ev.previous : '');
@@ -574,7 +630,7 @@
     const flag = FLAG[ccy] ? '<span class="fi fi-' + FLAG[ccy] + '" style="margin-right:5px;border-radius:2px;"></span>' : '';
     let html = '<tr><td style="white-space:nowrap;">' + flag + '<span style="font-size:10px;">' + ccy + '</span></td>';
     COLUMNS.forEach(col => {
-      html += cellHTML(calRow[col.key], col.key);
+      html += cellHTML(calRow[col.key], col.key, ccy);
     });
     if (y10) {
       html += '<td class="flat" title="10Y \u00b7 as of ' + (y10.date || '\u2014') + '">' + y10.value.toFixed(2) + '%</td>';
