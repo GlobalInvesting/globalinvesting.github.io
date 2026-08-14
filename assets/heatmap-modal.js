@@ -1,3 +1,20 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.6.3 — Currency switcher: arrows flanking
+//   the chip (Santiago, session request, referencing the original ‹ NZD ▾ ›
+//   spec): reverted from v2.6.1/v2.6.2's grouped-arrow layouts back to one
+//   arrow on each side of the chip — [flag] — text ‹ [chip] ›. #hm-ccy-arrows
+//   wrapper removed; #hm-ccy-prev now sits directly before #hm-ccy-switch and
+//   #hm-ccy-next directly after it, both still plain flex children of
+//   #hm-title-row (existing 5px gap). Pure DOM-order/CSS change — IDs
+//   unchanged, hmCycleCcy/hmToggleCcyDropdown/hmPivotCcy/_hmUpdateCcySwitcher
+//   all look up #hm-ccy-prev/#hm-ccy-next/#hm-ccy-chip/#hm-ccy-dd by ID.
+//   Also: Session tab Market Commentary article body now clamped to 2 lines
+//   (`-webkit-line-clamp:2` on .hm-news-art-body, matching Santiago's "dos
+//   líneas máximo" request) — the existing 400-char/sentence-boundary cut in
+//   _hmLoadSessionNews() is a length safeguard, not a line-count one, so long
+//   paragraphs were still running 4-5 visual lines. .hm-news-wrap was already
+//   flex:1/overflow-y:auto (same scroll pattern as cb-rates-modal.js's
+//   .cbr-ps-wrap); with bodies now clamped to 2 lines, ~2 articles fit in the
+//   .hm-cw's existing 140px min-height before the 3rd needs that scroll.
 // CURRENCY STRENGTH HEATMAP MODAL  v2.6.2 — Currency switcher layout fix #2
 //   (Santiago, screenshot): v2.6.1 moved the arrows next to the chip but kept
 //   the chip immediately after the flag, ahead of the full-name text — still
@@ -116,7 +133,6 @@
 .hm-ccy-arrow:hover { color:var(--text);background:var(--bg3); }
 .hm-ccy-arrow:disabled { opacity:.3;cursor:default; }
 .hm-ccy-arrow:disabled:hover { background:none;color:var(--text3,#4e5c70); }
-#hm-ccy-arrows { display:inline-flex;gap:1px; }
 #hm-ccy-switch { position:relative;display:inline-flex; }
 #hm-ccy-chip {
   background:var(--bg3,#151b26);border:1px solid var(--border,#252d3d);border-radius:4px;
@@ -248,7 +264,7 @@
 .hm-news-art-title { font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:4px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
 .hm-news-art-title a { color:inherit;text-decoration:none; }
 .hm-news-art-title a:hover { text-decoration:underline;text-decoration-color:var(--text2); }
-.hm-news-art-body { font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+.hm-news-art-body { font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
 .hm-news-loading, .hm-news-empty { padding:14px 0;font-size:10px;color:var(--text2);font-family:var(--font-mono); }
 
 /* Section label */
@@ -748,14 +764,12 @@
     <div id="hm-hd-left">
       <div id="hm-title-row">
         <div id="hm-title"></div>
-        <div id="hm-ccy-arrows">
-          <button class="hm-ccy-arrow" id="hm-ccy-prev" onclick="hmCycleCcy(-1)" aria-label="Previous currency" title="Previous (←)">‹</button>
-          <button class="hm-ccy-arrow" id="hm-ccy-next" onclick="hmCycleCcy(1)" aria-label="Next currency" title="Next (→)">›</button>
-        </div>
+        <button class="hm-ccy-arrow" id="hm-ccy-prev" onclick="hmCycleCcy(-1)" aria-label="Previous currency" title="Previous (←)">‹</button>
         <div id="hm-ccy-switch">
           <button id="hm-ccy-chip" onclick="hmToggleCcyDropdown(event)" aria-haspopup="listbox" aria-expanded="false" title="Switch currency"></button>
           <div id="hm-ccy-dd" role="listbox" aria-label="Select currency"></div>
         </div>
+        <button class="hm-ccy-arrow" id="hm-ccy-next" onclick="hmCycleCcy(1)" aria-label="Next currency" title="Next (→)">›</button>
       </div>
       <div id="hm-sub">G10 composite · 32 pairs · Delayed ~5min</div>
     </div>
@@ -2325,7 +2339,7 @@
     if (!flagSpan) {
       flagSpan = document.createElement('span');
       flagSpan.style.cssText = 'border-radius:2px;font-size:15px;vertical-align:middle;flex-shrink:0;';
-      titleRow.insertBefore(flagSpan, titleRow.firstChild); // flag leads the row: [flag][chip][‹›] — text
+      titleRow.insertBefore(flagSpan, titleRow.firstChild); // flag leads the row: [flag] — text ‹ [chip] ›
     }
     flagSpan.className = `fi fi-${meta.flag}`;
   }
