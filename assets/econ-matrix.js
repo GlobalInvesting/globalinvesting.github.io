@@ -1,5 +1,40 @@
 /**
- * econ-matrix.js v2.2.2 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.3 — Native Economic Matrix panel
+ *
+ * ── v2.2.3 (2026-08-14) — Full gap sweep: CHF PPI, JPY CPI MoM, AUD Retail
+ *    Sales were the same pipeline bug as v2.2.2's PPI fix, not source gaps ──
+ * Prompted by Santiago asking for a complete sweep of every "—" cell in the
+ * matrix after the v2.2.2 PPI fix shipped. Rather than trust each field's
+ * existing "confirmed gap" comment, every one was re-verified against LIVE
+ * Myfxbook pages (not calendar.json — see the GUIDELINES.md rule from
+ * v8.144.0 on why a derived-file gap check doesn't prove source absence).
+ * Three more fields turned out to be the identical impact-filter bug:
+ *   - CHF ppi: v2.2.2 had already found the real title ("Producer & Import
+ *     Prices YoY/MoM") while investigating the "ppi" substring fix, but
+ *     never gave it its own upgrade entry — so it stayed unreachable even
+ *     though the title was known. Confirmed live at myfxbook.com/forex-
+ *     economic-calendar/switzerland/producer-import-prices-yoy|mom. Fixed
+ *     upstream (fetch_ff_calendar.py v3.44, calendar-watcher.js v5.30) and
+ *     wired here: ppi: ['Producer & Import Prices YoY', 'Producer & Import
+ *     Prices MoM'].
+ *   - JPY cpimom: "Inflation Rate MoM" has a live Myfxbook page (japan/
+ *     inflation-rate-mom) — YoY already worked because Myfxbook tags it
+ *     medium+, MoM is tagged Low and was silently dropped. Fixed upstream,
+ *     wired here: cpimom: ['Inflation Rate MoM'].
+ *   - AUD rtl: "Retail Sales MoM" has a live Myfxbook page (australia/
+ *     retail-sales-mom) — every other G10 currency's retail sales is
+ *     already medium+; AUD's alone is Low. Fixed upstream, wired here:
+ *     rtl: ['Retail Sales MoM'].
+ * All three upstream substring additions were checked against the full live
+ * title corpus for accidental collisions before shipping — none found (see
+ * fetch_ff_calendar.py v3.44 header for the corpus check).
+ * NOT changed (re-investigated, left as-is): NZD ppi — re-confirmed no
+ * Myfxbook page exists for NZ producer prices under any title, genuine gap.
+ * SEK core (CPIF excluding Energy) — the underlying data is real (Riksbank/
+ * SCB actively publish it, confirmed via search), but no Myfxbook calendar
+ * page could be located for it in this pass; left as a documented gap
+ * rather than wiring an unverified title. Flagged for a follow-up pass with
+ * direct Myfxbook access if Santiago wants it chased further.
  *
  * ── v2.2.2 (2026-08-14) — GBP/JPY/CAD PPI: fixed pipeline bug misdiagnosed
  *    as a source gap in v2.2.0 ──────────────────────────────────────────
@@ -375,7 +410,12 @@
     JPY: {
       gdp:   ['GDP Growth Rate QoQ Final', 'GDP Growth Rate QoQ Prel', 'GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate YoY'],
-      cpimom:[],
+      // v2.2.3: NOT a genuine gap — same pipeline bug as ppi below. Myfxbook's
+      // real title is bare "Inflation Rate MoM" (live page confirmed:
+      // japan/inflation-rate-mom) — tagged Low impact while YoY is medium+,
+      // so MoM was silently dropped. Fixed upstream in fetch_ff_calendar.py
+      // v3.44 / calendar-watcher.js v5.30.
+      cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
       // v2.2.2: NOT a genuine gap \u2014 same pipeline bug as GBP above.
       // Myfxbook's real title is bare "PPI YoY"/"PPI MoM" (canon() strips
@@ -402,7 +442,13 @@
       unemp: ['Unemployment Rate'],
       prod:  ['Ai Group Industry Index'], // Ai Group Performance of Manufacturing \u2014 published monthly by Ai Group Australia
       conf:  ['NAB Business Confidence'],
-      rtl:   [], // confirmed gap \u2014 not currently tracked in source feed
+      // v2.2.3: NOT a genuine gap \u2014 same pipeline bug as JPY cpimom above.
+      // Myfxbook's real title is bare "Retail Sales MoM" (live page confirmed:
+      // australia/retail-sales-mom) \u2014 tagged Low impact while every other
+      // G10 currency's retail sales is medium+, so AUD's alone was silently
+      // dropped. Fixed upstream in fetch_ff_calendar.py v3.44 /
+      // calendar-watcher.js v5.30.
+      rtl:   ['Retail Sales MoM'],
       ca:    ['Current Account'], // ABS BOP quarterly \u2014 injected by fetch_supplementary_indicators.py
       trade: ['Balance of Trade'],
       pce:   [],
@@ -437,7 +483,16 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:[], // confirmed gap \u2014 no MoM headline release in current source
       core:  [], // confirmed gap \u2014 no core/underlying measure in current source
-      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
+      // v2.2.3: NOT a genuine gap \u2014 same pipeline bug as GBP/JPY/CAD (v2.2.2)
+      // above. Myfxbook's real title is "Producer & Import Prices YoY/MoM"
+      // (live page confirmed: switzerland/producer-import-prices-yoy|mom) \u2014
+      // this was already known in v2.2.2 while investigating the "ppi"
+      // substring fix, but never got its own upgrade entry so it stayed
+      // unreachable. Fixed upstream in fetch_ff_calendar.py v3.44 /
+      // calendar-watcher.js v5.30 (new "producer & import prices" entry).
+      // Relies on canon()'s existing "Switzerland " prefix stripping \u2014 no
+      // new stripping logic needed.
+      ppi:   ['Producer & Import Prices YoY', 'Producer & Import Prices MoM'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['procure.ch Manufacturing PMI'],
