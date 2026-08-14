@@ -1,5 +1,26 @@
 /**
- * econ-matrix.js v2.2.1 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.2 — Native Economic Matrix panel
+ *
+ * ── v2.2.2 (2026-08-14) — GBP/JPY/CAD PPI: fixed pipeline bug misdiagnosed
+ *    as a source gap in v2.2.0 ──────────────────────────────────────────
+ * v2.2.0 documented GBP/JPY/CHF/CAD/NZD as "confirmed genuine gaps — no
+ * PPI release in the current source." Re-audited against live Myfxbook
+ * pages per currency (not assumed): three of the five were wrong — the
+ * releases exist, but fetch_ff_calendar.py's/calendar-watcher.js's
+ * IMPACT_UPGRADES table only matched the literal phrase "producer price
+ * index", which never appears in Myfxbook's actual titles (always the
+ * short form: "PPI YoY", "United Kingdom PPI Output YoY", "Canada PPI
+ * MoM"). Myfxbook tags GBP/JPY/CAD's PPI Low impact, so all three were
+ * silently dropped by the pipeline's impact filter before ever reaching
+ * calendar.json — USD/EUR/AUD/NOK/SEK only ever worked because Myfxbook
+ * already tags those medium/high directly, which masked the bug. Fixed
+ * upstream (fetch_ff_calendar.py v3.43, calendar-watcher.js v5.29, engine
+ * repo) and wired the real titles here: GBP → ['PPI Output YoY', 'PPI
+ * Output MoM'], JPY/CAD → ['PPI YoY', 'PPI MoM']. CHF and NZD verified
+ * as genuine gaps — CHF's real title ("Producer & Import Prices YoY")
+ * doesn't match either the old or new impact-upgrade entry, and NZD has no
+ * PPI/producer-price page on Myfxbook at all — both left as-is (empty
+ * array, GAP_TITLE stands). See CHANGELOG.md v8.144.0.
  *
  * ── v2.2.1 (2026-08-14) — CRITICAL: fixed index.html column desync caused
  *    by v2.2.0's new PPI column ─────────────────────────────────────────
@@ -332,7 +353,17 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
-      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
+      // v2.2.2: NOT a genuine gap \u2014 was a pipeline bug, not a missing source.
+      // Myfxbook's real title is "PPI Output YoY"/"PPI Output MoM" (UK's PPI
+      // has separate Output/Input series; "Output" is the headline one, same
+      // convention BoE/ONS coverage uses). fetch_ff_calendar.py/calendar-
+      // watcher.js's impact-upgrade table only matched the literal phrase
+      // "producer price index", which never appears in Myfxbook's actual
+      // titles \u2014 GBP's PPI (Myfxbook-tagged Low impact) was silently
+      // dropped before it ever reached calendar.json. Fixed upstream in
+      // fetch_ff_calendar.py v3.43 / calendar-watcher.js v5.29; wiring the
+      // real title here now that the source will actually carry it.
+      ppi:   ['PPI Output YoY', 'PPI Output MoM'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
       conf:  ['S&P Global Manufacturing PMI', 'CBI Industrial Trends Orders'],
@@ -346,7 +377,11 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:[],
       core:  ['Core Inflation Rate YoY'],
-      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
+      // v2.2.2: NOT a genuine gap \u2014 same pipeline bug as GBP above.
+      // Myfxbook's real title is bare "PPI YoY"/"PPI MoM" (canon() strips
+      // any "Japan " prefix drift the same way it does elsewhere). Fixed
+      // upstream in fetch_ff_calendar.py v3.43 / calendar-watcher.js v5.29.
+      ppi:   ['PPI YoY', 'PPI MoM'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
@@ -377,7 +412,12 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
-      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
+      // v2.2.2: NOT a genuine gap \u2014 same pipeline bug as GBP/JPY above.
+      // Myfxbook's real title is bare "PPI YoY"/"PPI MoM" (StatCan's IPPI;
+      // canon() strips any "Canada " prefix drift the same way it does
+      // elsewhere). Fixed upstream in fetch_ff_calendar.py v3.43 /
+      // calendar-watcher.js v5.29.
+      ppi:   ['PPI YoY', 'PPI MoM'],
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Sales MoM', 'Manufacturing Sales YoY'], // StatCan via FRED (MoM) or OECD MEI (YoY fallback) \u2014 injected by fetch_supplementary_indicators.py
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
