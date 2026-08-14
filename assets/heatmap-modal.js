@@ -1,3 +1,13 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.6.4 — Market Commentary follow-up
+//   (Santiago, screenshot): the 2-line clamp from v2.6.3 was wrong — he never
+//   wanted the article text cut, just fewer visible at once with a scroll to
+//   reach the older ones (same idea as cb-rates-modal.js's .cbr-ps-wrap).
+//   Reverted -webkit-line-clamp on .hm-news-art-body (full text again, still
+//   subject to the existing 400-char/sentence-boundary safeguard in
+//   _hmLoadSessionNews()). Instead added max-height:210px (~2 full articles)
+//   to .hm-news-wrap, on top of its existing flex:1/overflow-y:auto — box now
+//   shows ~2 articles and scrolls to reveal the 3rd (older) one. Article
+//   fetch cap unchanged at 3 (v2.6.0).
 // CURRENCY STRENGTH HEATMAP MODAL  v2.6.3 — Currency switcher: arrows flanking
 //   the chip (Santiago, session request, referencing the original ‹ NZD ▾ ›
 //   spec): reverted from v2.6.1/v2.6.2's grouped-arrow layouts back to one
@@ -253,7 +263,7 @@
    column flex so it absorbs whatever vertical space the fixed-height session
    grid + AI notes above it don't use, instead of leaving it empty on tall
    viewports. Same reason correlations' first .hm-cw is flex:1 (line ~745). */
-.hm-news-wrap { flex:1;min-height:0;overflow-y:auto;margin-top:8px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
+.hm-news-wrap { flex:1;min-height:0;max-height:210px;overflow-y:auto;margin-top:8px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
 .hm-news-wrap::-webkit-scrollbar { width:3px!important; }
 .hm-news-wrap::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
 .hm-news-article { padding:8px 0;border-bottom:1px solid rgba(54,60,78,.35); }
@@ -264,7 +274,7 @@
 .hm-news-art-title { font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:4px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
 .hm-news-art-title a { color:inherit;text-decoration:none; }
 .hm-news-art-title a:hover { text-decoration:underline;text-decoration-color:var(--text2); }
-.hm-news-art-body { font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+.hm-news-art-body { font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
 .hm-news-loading, .hm-news-empty { padding:14px 0;font-size:10px;color:var(--text2);font-family:var(--font-mono); }
 
 /* Section label */
