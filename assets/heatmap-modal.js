@@ -1,3 +1,13 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.5.0 — Session tab: added a Market Commentary
+//   fill block below Session Context, same shape/source as cb-rates-modal.js's
+//   _cbrLoadPolicySummary() (news-data/news.json, filtered to the modal's active
+//   currency via `cur`, up to 6 articles). Reported by Santiago (screenshots):
+//   on tall/large screens the Session tab left visible empty space below Session
+//   Context, since neither of its two .hm-cw cards grow to fill .hm-panel.on's
+//   flex column. Third .hm-cw card takes flex:1 (same pattern already used by
+//   Rel. Strength's first .hm-cw, and by .cbr-ps-wrap in cb-rates-modal.js) so it
+//   absorbs the leftover vertical space instead of leaving it blank. Not filtered
+//   by CB_KW like the CB modal's version — this tab covers the currency generally.
 // CURRENCY STRENGTH HEATMAP MODAL  v2.4.0 — CSI chart: replaced the two-row Interval+Range control (added earlier this session) with a single industry-standard range selector (1D/1W/1M/3M/6M/1Y/All), each mapping internally to both a lookback and an auto-selected OHLC resolution — confirmed against TradingView's own docs and CSM-specific tools (FXSSI, MarketMilk), which all expose exactly one range control, never two. Also: added chart.timeScale().fitContent() after loading series data, which was missing entirely — without it LWC used a fixed bar-spacing default instead of stretching the loaded range to fill the chart width, so ranges with few bars left visible empty space and chart width looked inconsistent across timeframes
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.4 — CSI chart: normalize each currency's daily return by ACTUAL per-date pair coverage instead of a fixed pair count, so a legitimately-missing bar for one pair (e.g. fetch_ohlc.py's flat-bar guard dropping a degenerate O=H=L=C bar) no longer systematically understates that currency's move for that one bar
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.3 — CSI chart: added "Interval" / "Range" group labels above the TF and period button rows (Santiago's pick, Bloomberg-style) so the two rows read as distinct controls instead of duplicate-looking buttons (both rows can show "1D"/"1W" text since they answer different questions — interval vs. lookback)
@@ -153,6 +163,25 @@
 .hm-cw:last-child { border-bottom:none; }
 .hm-cw::-webkit-scrollbar { height:3px; }
 .hm-cw::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
+
+/* Session tab — Market Commentary fill block (v2.5.0). Mirrors cb-rates-modal's
+   .cbr-ps-wrap fill pattern: this card takes flex:1 inside .hm-panel.on's
+   column flex so it absorbs whatever vertical space the fixed-height session
+   grid + AI notes above it don't use, instead of leaving it empty on tall
+   viewports. Same reason correlations' first .hm-cw is flex:1 (line ~745). */
+.hm-news-wrap { flex:1;min-height:0;overflow-y:auto;margin-top:8px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
+.hm-news-wrap::-webkit-scrollbar { width:3px!important; }
+.hm-news-wrap::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
+.hm-news-article { padding:8px 0;border-bottom:1px solid rgba(54,60,78,.35); }
+.hm-news-article:last-child { border-bottom:none; }
+.hm-news-art-meta { display:flex;align-items:center;gap:6px;margin-bottom:4px; }
+.hm-news-art-source { font-size:8px;font-weight:600;color:var(--blue,#4f7fff);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em; }
+.hm-news-art-time { font-size:8px;color:var(--text2);font-family:var(--font-mono); }
+.hm-news-art-title { font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:4px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+.hm-news-art-title a { color:inherit;text-decoration:none; }
+.hm-news-art-title a:hover { text-decoration:underline;text-decoration-color:var(--text2); }
+.hm-news-art-body { font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
+.hm-news-loading, .hm-news-empty { padding:14px 0;font-size:10px;color:var(--text2);font-family:var(--font-mono); }
 
 /* Section label */
 .hm-ct {
@@ -740,6 +769,12 @@
         <div class="hm-ct">SESSION CONTEXT</div>
         <div id="hm-sess-notes" style="font-size:11px;color:var(--text2,#787b86);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.7;"></div>
       </div>
+      <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:140px;">
+        <div class="hm-ct" id="hm-sess-news-title">MARKET COMMENTARY</div>
+        <div id="hm-sess-news" class="hm-news-wrap">
+          <div class="hm-news-loading">Loading market commentary…</div>
+        </div>
+      </div>
     </div>
     <div class="hm-panel" id="hm-p-correlations">
       <div class="hm-cw" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
@@ -1087,11 +1122,67 @@
     return past.concat(active, upcoming);
   }
 
+  // Session tab — Market Commentary fill block (v2.5.0). Same source and shape
+  // as cb-rates-modal.js's _cbrLoadPolicySummary(): fetches news-data/news.json,
+  // filters to this currency's articles, renders title + expand paragraph for
+  // up to 6. Unlike the CB modal it doesn't filter by CB_KW — this tab is about
+  // the currency generally, not central-bank policy specifically. Lazy-fetched
+  // on every populateSession() call (ccy switch or tab activation), non-blocking.
+  async function _hmLoadSessionNews(ccy) {
+    const wrap = document.getElementById('hm-sess-news');
+    if (!wrap) return;
+    wrap.innerHTML = '<div class="hm-news-loading">Loading market commentary…</div>';
+    try {
+      const res = await fetch('./news-data/news.json', { cache: 'no-store' }).catch(() => null);
+      if (!res || !res.ok) throw new Error('fetch failed');
+      const j = await res.json();
+      const articles = (j.articles || [])
+        .filter(a => {
+          if (a.cur !== ccy) return false;
+          const exp = (a.expand || '').replace(/<[^>]+>/g, '').trim();
+          return exp.length >= 80;
+        })
+        .sort((a, b) => (b.ts || 0) - (a.ts || 0))
+        .slice(0, 6);
+
+      if (!articles.length) {
+        wrap.innerHTML = '<div class="hm-news-empty">No ' + ccy + ' commentary available.</div>';
+        return;
+      }
+
+      wrap.innerHTML = articles.map(a => {
+        const timeStr = [a.date, a.time].filter(Boolean).join(' \u00b7 ');
+        let body = (a.expand || '').replace(/&#\d+;/g, '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+        if (body.length > 400) {
+          const cut = body.slice(0, 400);
+          const lastPeriod = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
+          body = (lastPeriod > 150 ? cut.slice(0, lastPeriod + 1) : cut) + '\u2026';
+        }
+        const titleHtml = a.link
+          ? '<a href="' + a.link + '" target="_blank" rel="noopener noreferrer">' + (a.title || '') + '</a>'
+          : (a.title || '');
+        return '<div class="hm-news-article">' +
+          '<div class="hm-news-art-meta">' +
+          '<span class="hm-news-art-source">' + (a.source || '') + '</span>' +
+          '<span class="hm-news-art-time">' + timeStr + '</span>' +
+          '</div>' +
+          '<div class="hm-news-art-title">' + titleHtml + '</div>' +
+          '<div class="hm-news-art-body">' + body + '</div>' +
+          '</div>';
+      }).join('');
+    } catch (e) {
+      wrap.innerHTML = '<div class="hm-news-empty">Market commentary unavailable.</div>';
+    }
+  }
+
   function populateSession(ccy, rtCache) {
     const tzAbbr   = localTzAbbr();
     const weekend  = isMarketWeekend();
     document.getElementById('hm-sess-title').textContent =
       ccy + ' INTRADAY COMPOSITE · SESSION WINDOW STATUS · ' + tzAbbr;
+    const newsTitleEl = document.getElementById('hm-sess-news-title');
+    if (newsTitleEl) newsTitleEl.textContent = 'MARKET COMMENTARY \u00b7 ' + ccy;
+    _hmLoadSessionNews(ccy); // fill-space block below Session Context — non-blocking
 
     const myPairs      = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
     const activeSessions = getActiveSessions();   // empty Set on weekends
