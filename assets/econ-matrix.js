@@ -1,5 +1,22 @@
 /**
- * econ-matrix.js v2.2.0 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.1 — Native Economic Matrix panel
+ *
+ * ── v2.2.1 (2026-08-14) — CRITICAL: fixed index.html column desync caused
+ *    by v2.2.0's new PPI column ─────────────────────────────────────────
+ * v2.2.0 added 'ppi' to COLUMNS (11 → 12 categories) but index.html's
+ * <thead> and 10 skeleton <tbody> rows were never updated to add the
+ * matching PPI <th>/<td> — a step this file cannot enforce on its own, since
+ * rowHTML() builds cells purely by iterating COLUMNS in order with no
+ * awareness of what index.html's static markup declares. Effect: every
+ * column from PPI onward rendered shifted one position left of its header —
+ * PCE data appeared under the "10Y Yld" header (confirmed by a client
+ * screenshot showing a "United States PCE Price Index YoY" tooltip on that
+ * cell), the real 10Y yield appeared under "CB Rate", and CB Rate itself was
+ * pushed off the end of the table. Reported by Santiago from a live
+ * screenshot. Fixed in index.html only (no logic in this file was wrong) —
+ * see CHANGELOG.md v8.143.0 for the full incident and the new GUIDELINES.md
+ * rule requiring COLUMNS-array changes and index.html's thead/skeleton rows
+ * to be edited in the same change.
  *
  * ── v2.2.0 (2026-08-14) — closing out remaining industry-standard gaps:
  *    CHF GDP dead title, EUR Bus Cond gap resolved, new PPI column ────────
@@ -230,6 +247,13 @@
   const CCY_ORDER = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CHF', 'CAD', 'NZD', 'NOK', 'SEK'];
   const FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CHF: 'ch', CAD: 'ca', NZD: 'nz', NOK: 'no', SEK: 'se' };
 
+  // ⚠ COLUMNS length/order is NOT self-enforcing against index.html. Adding,
+  // removing, or reordering an entry here means index.html's Economic
+  // Matrix <thead> (<th scope="col">) AND all 10 skeleton <tbody> rows'
+  // <td class="flat">—</td> placeholders must be edited in the SAME change,
+  // in the same order, or every column from the edit point onward silently
+  // renders shifted under the wrong header (see v2.2.1 incident above —
+  // this exact bug shipped with v2.2.0's PPI column).
   const COLUMNS = [
     { key: 'gdp',     label: 'GDP',       title: 'Latest GDP growth rate \u2014 QoQ where published, YoY otherwise, falling back to the freshest monthly print for GBP/CAD between quarterly releases (see subtext on each cell for the period actually shown). Note: USD\u2019s QoQ is seasonally-adjusted ANNUALIZED (SAAR) per BEA convention \u2014 tagged \u201cQoQ SAAR\u201d, not directly comparable in magnitude to the raw non-annualized QoQ shown for other currencies.' },
     { key: 'cpi',     label: 'CPI YoY',   title: 'Latest headline CPI / inflation rate, year-on-year' },
