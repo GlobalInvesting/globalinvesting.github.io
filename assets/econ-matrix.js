@@ -1,6 +1,18 @@
 /**
- * econ-matrix.js v2.2.4 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.5 — Native Economic Matrix panel
  *
+ * ── v2.2.5 (2026-08-14) — CHF CPI MoM: same wiring-gap pattern as v2.2.4's
+ *    NZD PPI fix. CATS.CHF.cpimom was hardcoded to [] under a stale
+ *    "no MoM headline release in current source" comment that was never
+ *    re-verified — FSO publishes MoM alongside YoY every release and a live
+ *    Myfxbook page exists. Wired to ['Inflation Rate MoM']; one-time value
+ *    backfilled via backfill_supplementary_events.py v1.2 (FSO-cited) since
+ *    Myfxbook RSS's rolling ~24h window means the live pipeline can't
+ *    retroactively pull in a release that already passed. CAD PPI YoY/MoM
+ *    and NZD PPI Output QoQ (already correctly wired since v2.2.2/v2.2.4)
+ *    got the same one-time backfill treatment for the same reason — see
+ *    backfill_supplementary_events.py v1.2 for full citations on all three.
+ * ──────────────────────────────────────────────────────────────────────────
  * ── v2.2.4 (2026-08-14) — NZD PPI: wiring gap, not a source gap; upstream fix
  *    (v3.43) had already covered it but econ-matrix.js's CATS list was never
  *    updated to match. SEK core (CPIF ex Energy) re-confirmed as a genuine
@@ -510,7 +522,15 @@
       // in this feed), same outcome as before but for the right reason.
       gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
       cpi:   ['Inflation Rate YoY'],
-      cpimom:[], // confirmed gap \u2014 no MoM headline release in current source
+      // v2.2.5: NOT a genuine gap \u2014 the prior "no MoM headline release in
+      // current source" comment was never re-verified against live Myfxbook.
+      // FSO publishes MoM alongside YoY every release, and a live page
+      // exists (myfxbook.com/forex-economic-calendar/switzerland/
+      // inflation-rate-mom). One-time backfilled via
+      // backfill_supplementary_events.py v1.2 (FSO-cited); live pipeline
+      // will pick up future releases automatically \u2014 canon()'s existing
+      // "Switzerland " prefix stripping needs no new logic.
+      cpimom:['Inflation Rate MoM'],
       core:  [], // confirmed gap \u2014 no core/underlying measure in current source
       // v2.2.3: NOT a genuine gap \u2014 same pipeline bug as GBP/JPY/CAD (v2.2.2)
       // above. Myfxbook's real title is "Producer & Import Prices YoY/MoM"
