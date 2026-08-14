@@ -1,3 +1,11 @@
+// CURRENCY STRENGTH HEATMAP MODAL  v2.6.2 — Currency switcher layout fix #2
+//   (Santiago, screenshot): v2.6.1 moved the arrows next to the chip but kept
+//   the chip immediately after the flag, ahead of the full-name text — still
+//   not what was asked for. Correct order: [flag] — full name text [‹›] [chip].
+//   Reordered #hm-title-row's children (title text, then arrows, then the
+//   switcher) so the flag+name reads first as the primary label, with the
+//   picker (arrows + chip) trailing it as a secondary control. Pure DOM-order
+//   change again — no logic touched, all lookups are by ID.
 // CURRENCY STRENGTH HEATMAP MODAL  v2.6.1 — Currency switcher layout fix (Santiago,
 //   screenshot): the ‹/› arrows previously flanked the chip (‹ [USD▾] ›), so the
 //   left arrow sat immediately after the flag, ahead of the currency chip itself —
@@ -739,15 +747,15 @@
   <div id="hm-hd">
     <div id="hm-hd-left">
       <div id="hm-title-row">
-        <div id="hm-ccy-switch">
-          <button id="hm-ccy-chip" onclick="hmToggleCcyDropdown(event)" aria-haspopup="listbox" aria-expanded="false" title="Switch currency"></button>
-          <div id="hm-ccy-dd" role="listbox" aria-label="Select currency"></div>
-        </div>
+        <div id="hm-title"></div>
         <div id="hm-ccy-arrows">
           <button class="hm-ccy-arrow" id="hm-ccy-prev" onclick="hmCycleCcy(-1)" aria-label="Previous currency" title="Previous (←)">‹</button>
           <button class="hm-ccy-arrow" id="hm-ccy-next" onclick="hmCycleCcy(1)" aria-label="Next currency" title="Next (→)">›</button>
         </div>
-        <div id="hm-title"></div>
+        <div id="hm-ccy-switch">
+          <button id="hm-ccy-chip" onclick="hmToggleCcyDropdown(event)" aria-haspopup="listbox" aria-expanded="false" title="Switch currency"></button>
+          <div id="hm-ccy-dd" role="listbox" aria-label="Select currency"></div>
+        </div>
       </div>
       <div id="hm-sub">G10 composite · 32 pairs · Delayed ~5min</div>
     </div>
