@@ -1954,7 +1954,7 @@ a:focus-visible,
   overflow: auto;
 }
 .econmx-table {
-  min-width: 760px;
+  min-width: 1180px;
 }
 .econmx-table th,
 .econmx-table td {
@@ -1963,6 +1963,24 @@ a:focus-visible,
 .econmx-table td:first-child {
   font-family: var(--font-ui);
   font-weight: 600;
+}
+/* [v2.0.0] Per-cell reference period + date subtext (client-requested — see
+   econ-matrix.js header comment). Kept small and muted so it reads as
+   metadata, not a second data point, and doesn't compete with the value. */
+.econmx-table td {
+  vertical-align: middle;
+  line-height: 1.25;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.econmx-val {
+  font-variant-numeric: tabular-nums;
+}
+.econmx-ref {
+  font-size: 9px;
+  color: var(--text2);
+  font-weight: 400;
+  margin-top: 1px;
 }
 .es-bar-wrap {
   position: relative;

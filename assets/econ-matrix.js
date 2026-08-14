@@ -1,13 +1,85 @@
 /**
- * econ-matrix.js v1.0.5 — Native Economic Matrix panel
+ * econ-matrix.js v2.0.0 — Native Economic Matrix panel
  *
  * Replaces the third-party TradingView Economic Map widget (tv-economic-map.js)
  * with a native table in the style of an institutional regional economic matrix
  * (e.g. Bloomberg ECMX), built entirely from data the terminal already fetches
  * elsewhere — no new backend script or workflow required.
  *
+ * ── v2.0.0 (2026-08-14) — institutional-user data-accuracy audit ──────────
+ * Prompted by a client (Dimitrius, via Santiago) flagging: (1) USD CPI YoY
+ * showing a stale 4.2% print instead of the then-current 3.4%; (2) AUD CPI
+ * showing "102.03" — an index level in points, not a %-rate; (3) no MoM
+ * alongside YoY, and no visible reference date per cell; (4) no core/PCE
+ * measure. Investigation (see CHANGELOG v8.140.0) found the root cause was
+ * NOT stale source data — calendar.json already carried the correct latest
+ * prints — but a title-matching bug in `findLatest()`:
+ *   - Myfxbook titles the SAME release inconsistently: sometimes bare
+ *     ("Inflation Rate YoY"), sometimes country-prefixed ("United States
+ *     Inflation Rate YoY"). The old CATS prefix lists only covered a few
+ *     observed variants per currency, so on any date where the upstream
+ *     title format drifted, `findLatest()` silently fell through to an
+ *     older event that happened to match a listed variant — this is what
+ *     surfaced the stale-looking 4.2% (a real June print, just not the
+ *     latest one).
+ *   - AUD CPI: "Australia CPI" (the raw index, e.g. 102.03) and "Australia
+ *     Inflation Rate YoY" (the %, e.g. 3.8%) are two DIFFERENT releases that
+ *     print on the SAME day. The old code had no way to prefer one over the
+ *     other when both matched on the same date, so it non-deterministically
+ *     picked whichever appeared later in the day's insertion order — the
+ *     index level, on this occasion.
+ *   - EUR bare "Business Confidence" was found to silently interleave THREE
+ *     unrelated national surveys (three different value ranges — ~87-89,
+ *     ~96-105, and negative ~-3 to -6 — with no country field to
+ *     disambiguate) under one identical title. This was already a latent
+ *     bug, not something the client reported, caught during this audit.
+ * Fix (see below): (1) country-prefix canonicalisation before matching, so
+ * "United States X" and bare "X" key to the same series regardless of which
+ * form Myfxbook used that day; (2) EUR is matched WITHOUT canonicalisation,
+ * against explicit "Euro Area " literal prefixes only — this is a
+ * deliberate asymmetry, not an oversight, because EUR is the one currency
+ * where stripping the country prefix would blend in member-state prints
+ * (Germany, France, Italy...); (3) strict prefix match (exact, or with a
+ * trailing "(" for parenthetical month/quarter suffixes) instead of loose
+ * startsWith, so "CPI" never matches "CPI Trimmed-Mean"; (4) deterministic
+ * same-day tie-break — the FIRST prefix in a category's list that has a
+ * match on the single most-recent date wins, so prefix order is now a real,
+ * documented priority ranking, not an accident of iteration order; (5)
+ * dropped "Australia CPI" from the AUD cpi prefix list entirely — the index
+ * level has no place in a %-rate column; (6) EUR "Bus Cond" is left blank
+ * with an explanatory tooltip rather than showing an unverifiable blend of
+ * three surveys (see GUIDELINES.md "Data integrity" — never display a value
+ * that isn't reliably attributable to a single named release).
+ *
+ * New in v2.0.0, per client request:
+ *   - CPI MoM added alongside CPI YoY (a YoY figure can mask a recent trend
+ *     reversal from base effects — e.g. an energy spike 12 months ago still
+ *     weighing on the annual figure without reflecting current conditions).
+ *   - Core CPI YoY added — central banks weight core more than headline,
+ *     since headline is dominated by volatile/seasonal food & energy.
+ *     AUD uses the RBA Trimmed Mean CPI as its core-equivalent (see RBA's
+ *     own published rationale: trimming extreme price moves gives a
+ *     cleaner read on persistent underlying inflation — this is the
+ *     standard cross-market substitute for "core CPI" in AUD, since
+ *     Australia doesn't publish an ex-food-and-energy core CPI the way the
+ *     US/UK/EA do). CHF/NZD/SEK have no core measure in the current feed —
+ *     left blank with a tooltip rather than guessed at.
+ *   - PCE YoY added as a currency-specific column, populated for USD only
+ *     (the Fed's preferred inflation gauge) — blank for all other
+ *     currencies with a tooltip explaining PCE is a US-specific series;
+ *     other central banks target CPI/HICP-based measures instead (e.g. the
+ *     RBA's Trimmed Mean, already shown in the Core CPI column, or the
+ *     ECB's HICP, already the basis of the EUR CPI columns here).
+ *   - Every calendar-derived cell now shows its reference period + date as
+ *     a small subtext line under the value (e.g. "YoY · 12 Aug"), so YoY
+ *     and QoQ/MoM prints are never visually ambiguous (NZD CPI, for
+ *     instance, is quarterly-only and now reads "QoQ · 20 Jul" rather than
+ *     a bare "1.5%" that could be mistaken for an annual figure) and
+ *     staleness is visible at a glance without opening the tooltip.
+ *
  * Column sourcing:
- *   GDP, CPI, Unemp, Ind Prod, Bus Cond, Rtl Sales, Cur Acct, Trade Bal
+ *   GDP, CPI YoY, CPI MoM, Core CPI, Unemp, Ind Prod, Bus Cond, Rtl Sales,
+ *   Cur Acct, Trade Bal, PCE
  *     → calendar-data/calendar.json — latest "actual" print per category per
  *       currency. This file carries ~1yr of history with real released actuals
  *       (unlike economic-data/{CCY}.json, disabled in v7.24.1 for staleness —
@@ -23,7 +95,7 @@
  *       panel never disagrees with the CB Rates table elsewhere on the page.
  *
  * Documented deviations from the Bloomberg ECMX column set (see CHANGELOG
- * v8.23.0 for full rationale):
+ * v8.23.0 for full rationale, extended in v8.140.0):
  *   - "Bud %GDP" (fiscal budget balance) has no recurring calendar release
  *     outside the US in the current source, so the column is replaced with
  *     Trade Balance, which the calendar carries for all 10 currencies and is
@@ -35,18 +107,30 @@
  *     manufacture false precision. Trend coloring still works (see below).
  *
  * Cells are intentionally left blank ("—") where the underlying release does
- * not exist in the current source for that currency:
+ * not exist in the current source for that currency, or where the source
+ * data cannot be reliably attributed to a single named release:
  *   - Ind Prod: AUD, NZD, CAD — none of the three publishes a standalone
  *     industrial production series in this feed.
+ *   - Rtl Sales: AUD — not currently tracked in the source feed (a feed gap,
+ *     the ABS does publish retail trade figures).
  *   - Cur Acct: EUR, AUD — not currently tracked in the source feed for
  *     these two (a feed gap, not a "doesn't exist" fact — both the ECB and
  *     the ABS do publish a current account series).
+ *   - Core CPI: CHF, NZD, SEK — no core/underlying-inflation release in the
+ *     current source for these three.
+ *   - PCE: every currency except USD — PCE is a US-specific series (see
+ *     above); this is a genuine "doesn't exist for this economy" fact, not
+ *     a feed gap.
+ *   - Bus Cond: EUR — the only source title ("Business Confidence") mixes at
+ *     least three different unlabeled national surveys under one identical
+ *     title, with no country field to disambiguate (see v2.0.0 note above).
+ *     Rather than show a value that could be any of the three, this cell is
+ *     left blank pending a per-country data-pipeline fix.
  *
- * Bus Cond fallback — these three currencies have no Manufacturing PMI in
- * the current source, so the column falls back to each economy's standard
+ * Bus Cond fallback — these currencies have no Manufacturing PMI in the
+ * current source, so the column falls back to each economy's standard
  * business/industrial confidence survey instead (per the column definition
  * above):
- *   - EUR: Business Confidence (Eurozone business climate survey)
  *   - GBP: CBI Industrial Trends Orders (CBI manufacturing orders survey)
  *   - JPY: Tankan Large Manufacturers Index (BoJ's quarterly tankan survey —
  *     the benchmark Japanese manufacturer-sentiment gauge)
@@ -65,132 +149,242 @@
   const FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CHF: 'ch', CAD: 'ca', NZD: 'nz', NOK: 'no', SEK: 'se' };
 
   const COLUMNS = [
-    { key: 'gdp',   label: 'GDP',       title: 'Latest GDP growth rate — native release cadence per economy' },
-    { key: 'cpi',   label: 'CPI',       title: 'Latest CPI / inflation rate, year-on-year' },
-    { key: 'unemp', label: 'Unemp',     title: 'Latest unemployment rate' },
-    { key: 'prod',  label: 'Ind Prod',  title: 'Latest industrial / manufacturing production change' },
-    { key: 'conf',  label: 'Bus Cond',  title: 'Latest manufacturing PMI, or the economy\u2019s standard business/industrial confidence survey where no PMI is published' },
-    { key: 'rtl',   label: 'Rtl Sales', title: 'Latest retail sales change' },
-    { key: 'ca',    label: 'Cur Acct',  title: 'Latest current account, native reporting units (see GUIDELINES — not normalized to %GDP)' },
-    { key: 'trade', label: 'Trade Bal', title: 'Latest trade balance, native reporting units' },
+    { key: 'gdp',     label: 'GDP',       title: 'Latest GDP growth rate \u2014 QoQ where published, YoY otherwise (see subtext on each cell for the period actually shown)' },
+    { key: 'cpi',     label: 'CPI YoY',   title: 'Latest headline CPI / inflation rate, year-on-year' },
+    { key: 'cpimom',  label: 'CPI MoM',   title: 'Latest headline CPI / inflation rate, month-on-month \u2014 can reveal a trend reversal the YoY figure masks via base effects' },
+    { key: 'core',    label: 'Core CPI',  title: 'Latest core/underlying inflation, year-on-year \u2014 excludes volatile food & energy components; the measure central banks weight most heavily. AUD shows the RBA Trimmed Mean CPI, Australia\u2019s standard core-equivalent.' },
+    { key: 'unemp',   label: 'Unemp',     title: 'Latest unemployment rate' },
+    { key: 'prod',    label: 'Ind Prod',  title: 'Latest industrial / manufacturing production change' },
+    { key: 'conf',    label: 'Bus Cond',  title: 'Latest manufacturing PMI, or the economy\u2019s standard business/industrial confidence survey where no PMI is published' },
+    { key: 'rtl',     label: 'Rtl Sales', title: 'Latest retail sales change' },
+    { key: 'ca',      label: 'Cur Acct',  title: 'Latest current account, native reporting units (see GUIDELINES \u2014 not normalized to %GDP)' },
+    { key: 'trade',   label: 'Trade Bal', title: 'Latest trade balance, native reporting units' },
+    { key: 'pce',     label: 'PCE YoY',   title: 'Latest PCE Price Index, year-on-year \u2014 the U.S. Federal Reserve\u2019s preferred inflation gauge. US-specific; other economies target CPI/HICP-based measures shown in the CPI/Core CPI columns instead.' },
   ];
 
-  // Union of accepted ForexFactory/Myfxbook event-name prefixes per category,
-  // per currency. Prefix match (startsWith) tolerates month-suffix variants
-  // such as "(Mar)" or "(Q1)" appended by the upstream feed. Empty array =
-  // confirmed gap for that currency (see header comment) — renders "—".
+  // Country-name prefixes Myfxbook/ForexFactory sometimes (not always)
+  // prepend to an otherwise-bare event title, e.g. "United States Inflation
+  // Rate YoY" vs bare "Inflation Rate YoY" for the identical release. Used to
+  // canonicalise BEFORE matching so title-format drift on any given day never
+  // causes findLatest() to silently fall back to an older event (see v2.0.0
+  // note above \u2014 this was the actual root cause of the reported stale-CPI
+  // symptom). Deliberately mirrors calendar-panel.js's `_CAL_CCY_PFXS` so the
+  // two independent matchers stay conceptually in sync; EUR is excluded on
+  // purpose (see EUR handling below).
+  const CCY_PFXS = {
+    USD: 'united states ', GBP: 'united kingdom ', JPY: 'japan ', AUD: 'australia ',
+    CAD: 'canada ', CHF: 'switzerland ', NZD: 'new zealand ', NOK: 'norway ', SEK: 'sweden ',
+  };
+  function canon(ccy, title) {
+    const pfx = CCY_PFXS[ccy];
+    if (pfx && title.toLowerCase().indexOf(pfx) === 0) return title.slice(pfx.length);
+    return title;
+  }
+
+  // Strict prefix match: exact title match, or prefix immediately followed by
+  // a parenthetical suffix such as "(Apr)" / "(Q1)" that NOK/SEK titles carry.
+  // Deliberately NOT a loose startsWith \u2014 "CPI" must never match "CPI
+  // Trimmed-Mean" or "CPIF", and "Inflation Rate YoY" must never match
+  // "Inflation Rate YoY Flash" (a different, preliminary release).
+  function strictMatch(title, prefix) {
+    if (title.length < prefix.length || title.slice(0, prefix.length) !== prefix) return false;
+    const rest = title.slice(prefix.length);
+    return rest === '' || rest.charAt(0) === '(';
+  }
+
+  // Union of accepted ForexFactory/Myfxbook event-title prefixes per
+  // category, per currency, in bare (country-prefix-stripped) canonical
+  // form \u2014 except EUR, which is matched separately (see findLatestEUR).
+  // Order is a real priority ranking: for a same-day tie between two
+  // prefixes in one category, the prefix listed FIRST wins (see AUD cpi \u2014
+  // deliberately does NOT include "CPI", which is the raw index level in
+  // points, not a rate; see v2.0.0 note above). Empty array = confirmed gap
+  // for that currency (see header comment) \u2014 renders "\u2014".
   const CATS = {
     USD: {
-      gdp:   ['GDP (QoQ)', 'GDP Growth Rate QoQ', 'United States GDP Growth Rate QoQ'],
-      cpi:   ['Inflation Rate YoY', 'CPI (YoY)', 'CPI y/y'],
+      gdp:   ['GDP Growth Rate QoQ'],
+      cpi:   ['Inflation Rate YoY'],
+      cpimom:['Inflation Rate MoM'],
+      core:  ['Core Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Industrial Production MoM', 'United States Industrial Production MoM', 'Industrial Production (MoM)'],
+      prod:  ['Industrial Production MoM'],
       conf:  ['ISM Manufacturing PMI'],
-      rtl:   ['Retail Sales MoM', 'United States Retail Sales MoM', 'Retail Sales (MoM)'],
-      ca:    ['Current Account', 'United States Current Account'],
-      trade: ['Trade Balance', 'Balance of Trade', 'Goods Trade Balance', 'United States Goods Trade Balance'],
-    },
-    EUR: {
-      gdp:   ['Gross Domestic Product s.a (QoQ)', 'GDP (QoQ)', 'GDP Growth Rate QoQ'],
-      cpi:   ['Inflation Rate YoY Flash', 'CPI (YoY)', 'Consumer Price Index (YoY)', 'Inflation Rate YoY'],
-      unemp: ['Unemployment Rate'],
-      prod:  ['Industrial Production MoM', 'Euro Area Industrial Production MoM', 'Industrial Production (MoM)'],
-      conf:  ['HCOB Eurozone Manufacturing PMI', 'HCOB Manufacturing PMI Flash', 'Business Confidence'],
-      rtl:   ['Retail Sales (MoM)', 'Retail Sales MoM'],
-      ca:    ['Current Account'], // ECB BP6 monthly — injected by fetch_supplementary_indicators.py
-      trade: ['Balance of Trade', 'Trade Balance EU', 'Euro Area Balance of Trade'],
+      rtl:   ['Retail Sales MoM'],
+      ca:    ['Current Account'],
+      trade: ['Balance of Trade', 'Goods Trade Balance'],
+      pce:   ['PCE Price Index YoY'],
     },
     GBP: {
-      gdp:   ['GDP MoM', 'United Kingdom GDP MoM'],
-      cpi:   ['Inflation Rate YoY', 'CPI (YoY)', 'United Kingdom Inflation Rate YoY'],
-      unemp: ['Unemployment Rate', 'United Kingdom Unemployment Rate'],
-      prod:  ['Industrial Production MoM', 'United Kingdom Industrial Production MoM', 'Industrial Production (MoM)'],
+      gdp:   ['GDP MoM'],
+      cpi:   ['Inflation Rate YoY'],
+      cpimom:['Inflation Rate MoM'],
+      core:  ['Core Inflation Rate YoY'],
+      unemp: ['Unemployment Rate'],
+      prod:  ['Industrial Production MoM'],
       conf:  ['S&P Global Manufacturing PMI', 'CBI Industrial Trends Orders'],
-      rtl:   ['Retail Sales MoM', 'United Kingdom Retail Sales MoM'],
+      rtl:   ['Retail Sales MoM'],
       ca:    ['Current Account'],
-      trade: ['Trade Balance', 'Goods Trade Balance', 'United Kingdom Goods Trade Balance'],
+      trade: ['Goods Trade Balance', 'Balance of Trade'],
+      pce:   [],
     },
     JPY: {
-      gdp:   ['GDP Growth Rate QoQ Final', 'GDP Growth Rate QoQ Prel', 'GDP (QoQ)', 'GDP Growth Rate QoQ'],
-      cpi:   ['National Core CPI (YoY)', 'Inflation Rate YoY', 'Core Inflation Rate YoY', 'Japan Inflation Rate YoY'],
+      gdp:   ['GDP Growth Rate QoQ Final', 'GDP Growth Rate QoQ Prel', 'GDP Growth Rate QoQ'],
+      cpi:   ['Inflation Rate YoY'],
+      cpimom:[],
+      core:  ['Core Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Industrial Production (MoM)', 'Industrial Production MoM Prel', 'Industrial Production MoM'],
+      prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
-      rtl:   ['Retail Sales YoY', 'Retail Sales (QoQ)'],
+      rtl:   ['Retail Sales YoY'],
       ca:    ['Current Account'],
-      trade: ['Balance of Trade', 'Trade Balance', 'Japan Balance of Trade'],
+      trade: ['Balance of Trade'],
+      pce:   [],
     },
     AUD: {
       gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
-      cpi:   ['Australia CPI', 'Inflation Rate YoY', 'Australia Inflation Rate YoY'],
-      unemp: ['Australia Unemployment Rate', 'Unemployment Rate'],
-      prod:  ['Ai Group Industry Index'], // Ai Group Performance of Manufacturing — published monthly by Ai Group Australia
+      // Deliberately excludes "CPI" \u2014 that title is the raw index level in
+      // points (e.g. 102.03), not a %-rate. See v2.0.0 note above.
+      cpi:   ['Inflation Rate YoY'],
+      cpimom:['Inflation Rate MoM'],
+      // RBA Trimmed Mean CPI is AUD's standard core-equivalent (see column def).
+      core:  ['RBA Trimmed Mean CPI YoY', 'Quarterly RBA Trimmed Mean CPI YoY'],
+      unemp: ['Unemployment Rate'],
+      prod:  ['Ai Group Industry Index'], // Ai Group Performance of Manufacturing \u2014 published monthly by Ai Group Australia
       conf:  ['NAB Business Confidence'],
-      rtl:   ['Retail Sales (QoQ)', 'Retail Sales MoM'],
-      ca:    ['Current Account'], // ABS BOP quarterly — injected by fetch_supplementary_indicators.py
-      trade: ['Balance of Trade', 'Trade Balance'],
+      rtl:   [], // confirmed gap \u2014 not currently tracked in source feed
+      ca:    ['Current Account'], // ABS BOP quarterly \u2014 injected by fetch_supplementary_indicators.py
+      trade: ['Balance of Trade'],
+      pce:   [],
     },
     CAD: {
-      gdp:   ['GDP Growth Rate Annualized', 'GDP MoM'],
-      cpi:   ['Canada Inflation Rate YoY', 'Inflation Rate YoY'],
+      gdp:   ['GDP MoM', 'GDP Growth Rate Annualized'],
+      cpi:   ['Inflation Rate YoY'],
+      cpimom:['Inflation Rate MoM'],
+      core:  ['Core Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Manufacturing Sales MoM', 'Manufacturing Sales YoY'], // StatCan via FRED (MoM) or OECD MEI (YoY fallback) — injected by fetch_supplementary_indicators.py
+      prod:  ['Manufacturing Sales MoM', 'Manufacturing Sales YoY'], // StatCan via FRED (MoM) or OECD MEI (YoY fallback) \u2014 injected by fetch_supplementary_indicators.py
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
-      rtl:   ['Retail Sales MoM', 'Canada Retail Sales MoM', 'Retail Sales MoM Final'],
+      rtl:   ['Retail Sales MoM', 'Retail Sales MoM Final', 'Retail Sales Ex Autos MoM'],
       ca:    ['Current Account'],
-      trade: ['Balance of Trade', 'Trade Balance'],
+      trade: ['Balance of Trade'],
+      pce:   [],
     },
     CHF: {
       gdp:   ['GDP Growth Rate YoY', 'GDP Growth Rate QoQ Flash'],
       cpi:   ['Inflation Rate YoY'],
+      cpimom:[], // confirmed gap \u2014 no MoM headline release in current source
+      core:  [], // confirmed gap \u2014 no core/underlying measure in current source
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['procure.ch Manufacturing PMI'],
       rtl:   ['Retail Sales YoY'],
-      ca:    ['Switzerland Current Account', 'Current Account'],
-      trade: ['Balance of Trade', 'Switzerland Balance of Trade', 'Trade Balance'],
+      ca:    ['Current Account'],
+      trade: ['Balance of Trade'],
+      pce:   [],
     },
     NZD: {
-      gdp:   ['New Zealand GDP Growth Rate QoQ', 'Gross Domestic Product (QoQ)', 'New Zealand GDP Growth Rate YoY', 'GDP Growth Rate QoQ'],
-      cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly) CPI under this title
+      gdp:   ['GDP Growth Rate QoQ'],
+      cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly/annual) CPI under this title \u2014 see subtext "QoQ" tag
+      cpimom:[], // confirmed gap \u2014 NZ does not publish a monthly CPI
+      core:  [], // confirmed gap \u2014 no core/underlying measure in current source
       unemp: ['Unemployment Rate'],
-      prod:  ['Manufacturing Sales YoY'], // OECD MEI / Stats NZ — injected by fetch_supplementary_indicators.py
-      conf:  ['New Zealand Business NZ PMI', 'Business NZ PMI'],
-      rtl:   ['Retail Sales (QoQ)', 'Retail Sales QoQ'],
-      ca:    ['New Zealand Current Account', 'Current Account'],
-      trade: ['Balance of Trade', 'New Zealand Balance of Trade', 'Trade Balance NZD (MoM)'],
+      prod:  ['Manufacturing Sales YoY'], // OECD MEI / Stats NZ \u2014 injected by fetch_supplementary_indicators.py
+      conf:  ['Business NZ PMI'],
+      rtl:   ['Retail Sales QoQ'],
+      ca:    ['Current Account'],
+      trade: ['Balance of Trade'],
+      pce:   [],
     },
     SEK: {
       gdp:   ['GDP Growth Rate QoQ'],
       cpi:   ['CPIF YoY'],
+      cpimom:['CPIF MoM'],
+      core:  [], // confirmed gap \u2014 CPIF (already the Riksbank's target measure) is shown as headline; no separate ex-CPIF core in current source
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['Swedbank Manufacturing PMI'],
       rtl:   ['Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
+      pce:   [],
     },
     NOK: {
       gdp:   ['GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate YoY'],
+      cpimom:['Inflation Rate MoM'],
+      core:  ['Core Inflation Rate YoY'],
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Production MoM'],
       conf:  ['Industrial Confidence'],
       rtl:   ['Retail Sales MoM'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
+      pce:   [],
     },
+  };
+
+  // EUR is matched WITHOUT country-prefix stripping, against explicit
+  // "Euro Area " literal prefixes only \u2014 deliberate asymmetry vs. the other
+  // nine currencies (see v2.0.0 note above: stripping "Euro Area " would let
+  // member-state prints for Germany/France/Italy/etc. leak into the EA
+  // aggregate column). conf is intentionally empty \u2014 see header comment on
+  // the "Business Confidence" contamination finding.
+  const CATS_EUR = {
+    gdp:   ['Euro Area GDP Growth Rate QoQ'],
+    cpi:   ['Euro Area Inflation Rate YoY'],
+    cpimom:['Euro Area Inflation Rate MoM'],
+    core:  ['Euro Area Core Inflation Rate YoY'],
+    unemp: ['Euro Area Unemployment Rate'],
+    prod:  ['Euro Area Industrial Production MoM'],
+    conf:  [], // confirmed data-integrity gap \u2014 see header comment
+    rtl:   ['Euro Area Retail Sales MoM'],
+    ca:    ['Euro Area Current Account'],
+    trade: ['Euro Area Balance of Trade'],
+    pce:   [],
   };
 
   const GAP_TITLE = {
     prod: 'Not published as a standalone release in the current source for this currency',
     ca:   'Not currently tracked in the source feed for this currency',
+    rtl:  'Not currently tracked in the source feed for this currency',
+    core: 'No core/underlying inflation release in the current source for this currency',
+    cpimom: 'No monthly headline CPI release in the current source for this currency',
+    pce:  'PCE is a U.S.-specific series (the Fed\u2019s preferred inflation gauge) \u2014 not published for this economy. See the CPI / Core CPI columns for this currency\u2019s targeted measure.',
+    conf: 'The only source title for this release mixes multiple unlabeled national surveys with no way to disambiguate \u2014 left blank rather than shown unreliably (see GUIDELINES.md Data integrity)',
   };
 
-  // ── Value parsing — sign-aware, unit-agnostic ──────────────────────────────
+  // ── Period-label detection \u2014 for the per-cell reference-date subtext ──────
+  // Purely a display convenience so YoY/QoQ/MoM/Annualized prints are never
+  // visually ambiguous (e.g. NZD CPI is QoQ-only; several GDP prints are YoY
+  // where a currency has no QoQ release). Detected from the event's own
+  // title text, not asserted independently, so it can never drift out of
+  // sync with what was actually matched.
+  function periodLabel(title) {
+    const t = title.toLowerCase();
+    if (t.indexOf('qoq') !== -1) return 'QoQ';
+    if (t.indexOf('yoy') !== -1) return 'YoY';
+    if (t.indexOf('mom') !== -1) return 'MoM';
+    if (t.indexOf('annualized') !== -1) return 'Annualized';
+    if (t.indexOf('3-month avg') !== -1) return '3M Avg';
+    return '';
+  }
+
+  // Formats a dateISO ('YYYY-MM-DD') as 'DD Mon' for the subtext line, or
+  // extracts a parenthetical month/quarter tag ("(Apr)"/"(Q1)") from the
+  // NOK/SEK title style when present, since that's the vendor's own stated
+  // reference period and is more precise than the release/print date.
+  function refLabel(ev) {
+    const m = /\(([^)]+)\)\s*$/.exec(ev.event);
+    if (m) return m[1];
+    const d = new Date(ev.dateISO + 'T00:00:00Z');
+    if (isNaN(d)) return ev.dateISO;
+    return d.toLocaleDateString('en', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+  }
+
+  // ── Value parsing \u2014 sign-aware, unit-agnostic ──────────────────────────────
   // Calendar "actual"/"previous" strings carry inconsistent prefixes (none,
   // "$", "CHF", "NZ$", "-SEK", ...) and suffixes ("%", "B"). We only need a
-  // signed numeric value to compute trend direction for coloring — the cell
+  // signed numeric value to compute trend direction for coloring \u2014 the cell
   // itself always displays the original string verbatim, so no precision is
   // invented and no unit conversion is attempted.
   function parseNum(s) {
@@ -215,14 +409,66 @@
   }
 
   // ── Build latest-actual index from calendar-data/calendar.json ────────────
-  function findLatest(eventsByCcy, ccy, prefixes) {
+  // Deterministic same-day tie-break: finds the single most-recent date on
+  // which ANY listed prefix matches, then returns the match for the
+  // FIRST prefix (in priority order) that hit on that date \u2014 so a same-day
+  // clash between two different releases (e.g. AUD's index-level "CPI" vs.
+  // its "Inflation Rate YoY" on the same print day) always resolves to the
+  // category's documented priority, not iteration-order luck.
+  // NOTE: a scheduled-but-not-yet-printed release carries `actual: null` in
+  // the feed (e.g. the NZD Business NZ PMI for the day this file shipped —
+  // dated, but not released yet). Both functions below only consider events
+  // that have actually printed, so a pending release never masks the last
+  // real reading — otherwise "latest by date" would return an empty cell for
+  // a currency that in fact has a perfectly good recent print available.
+  function findLatestGeneric(ccy, byCcy, prefixes) {
     if (!prefixes || !prefixes.length) return null;
-    const list = eventsByCcy[ccy];
+    const list = byCcy[ccy];
     if (!list) return null;
-    for (let i = list.length - 1; i >= 0; i--) {
-      const ev = list[i];
+    let bestDate = null;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].actual == null || list[i].actual === '') continue;
+      const c = canon(ccy, list[i].event);
       for (let j = 0; j < prefixes.length; j++) {
-        if (ev.event.indexOf(prefixes[j]) === 0) return ev;
+        if (strictMatch(c, prefixes[j])) {
+          if (bestDate === null || list[i].dateISO > bestDate) bestDate = list[i].dateISO;
+          break;
+        }
+      }
+    }
+    if (bestDate === null) return null;
+    for (let j = 0; j < prefixes.length; j++) {
+      for (let i = 0; i < list.length; i++) {
+        if (list[i].dateISO === bestDate && list[i].actual != null && list[i].actual !== '' &&
+            strictMatch(canon(ccy, list[i].event), prefixes[j])) {
+          return list[i];
+        }
+      }
+    }
+    return null;
+  }
+
+  function findLatestEUR(byCcy, prefixes) {
+    if (!prefixes || !prefixes.length) return null;
+    const list = byCcy.EUR;
+    if (!list) return null;
+    let bestDate = null;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].actual == null || list[i].actual === '') continue;
+      for (let j = 0; j < prefixes.length; j++) {
+        if (strictMatch(list[i].event, prefixes[j])) {
+          if (bestDate === null || list[i].dateISO > bestDate) bestDate = list[i].dateISO;
+          break;
+        }
+      }
+    }
+    if (bestDate === null) return null;
+    for (let j = 0; j < prefixes.length; j++) {
+      for (let i = 0; i < list.length; i++) {
+        if (list[i].dateISO === bestDate && list[i].actual != null && list[i].actual !== '' &&
+            strictMatch(list[i].event, prefixes[j])) {
+          return list[i];
+        }
       }
     }
     return null;
@@ -245,18 +491,18 @@
     const out = {};
     CCY_ORDER.forEach(ccy => {
       out[ccy] = {};
-      const cats = CATS[ccy] || {};
+      const cats = ccy === 'EUR' ? CATS_EUR : (CATS[ccy] || {});
       COLUMNS.forEach(col => {
-        if (col.key === 'ca' || col.key === 'trade') return; // handled below too, same path
-      });
-      Object.keys(cats).forEach(catKey => {
-        out[ccy][catKey] = findLatest(byCcy, ccy, cats[catKey]);
+        const prefixes = cats[col.key];
+        out[ccy][col.key] = ccy === 'EUR'
+          ? findLatestEUR(byCcy, prefixes)
+          : findLatestGeneric(ccy, byCcy, prefixes);
       });
     });
     return { byCategory: out, lastUpdate: data.lastUpdate || null };
   }
 
-  // ── 10Y yield — extended-data/{CCY}.json, same field as yc-modal.js ────────
+  // ── 10Y yield \u2014 extended-data/{CCY}.json, same field as yc-modal.js ────────
   async function load10y(ccy) {
     const ext = await fetch('./extended-data/' + ccy + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
     const v = ext && ext.data && ext.data.bond10y;
@@ -265,7 +511,7 @@
     return { value: v, date };
   }
 
-  // ── CB policy rate — reuse window._STATE_cbRates + computeCBTrend ─────────
+  // ── CB policy rate \u2014 reuse window._STATE_cbRates + computeCBTrend ─────────
   function waitForCBRates(timeoutMs) {
     return new Promise(resolve => {
       const start = Date.now();
@@ -311,21 +557,24 @@
   function cellHTML(ev, gapKey) {
     if (!ev) {
       const title = (gapKey && GAP_TITLE[gapKey]) || 'No data available';
-      return '<td class="flat" title="' + title + '">\u2014</td>';
+      return '<td class="flat" title="' + title.replace(/"/g, '&quot;') + '">\u2014</td>';
     }
     const cls = trendClass(ev.actual, ev.previous);
+    const period = periodLabel(ev.event);
+    const ref = refLabel(ev);
+    const sub = (period ? period + ' \u00b7 ' : '') + ref;
     const title = ev.event + ' \u00b7 ' + ev.dateISO + (ev.previous != null ? ' \u00b7 prev ' + ev.previous : '');
-    return '<td' + (cls ? ' class="' + cls + '"' : '') + ' title="' + title.replace(/"/g, '&quot;') + '">' + (ev.actual != null ? ev.actual : '\u2014') + '</td>';
+    return '<td' + (cls ? ' class="' + cls + '"' : '') + ' title="' + title.replace(/"/g, '&quot;') + '">' +
+      '<div class="econmx-val">' + (ev.actual != null ? ev.actual : '\u2014') + '</div>' +
+      '<div class="econmx-ref">' + sub + '</div>' +
+      '</td>';
   }
 
   function rowHTML(ccy, calRow, y10, cb) {
     const flag = FLAG[ccy] ? '<span class="fi fi-' + FLAG[ccy] + '" style="margin-right:5px;border-radius:2px;"></span>' : '';
     let html = '<tr><td style="white-space:nowrap;">' + flag + '<span style="font-size:10px;">' + ccy + '</span></td>';
     COLUMNS.forEach(col => {
-      if (col.key === 'ca' || col.key === 'trade' || col.key === 'gdp' || col.key === 'cpi' ||
-          col.key === 'unemp' || col.key === 'prod' || col.key === 'conf' || col.key === 'rtl') {
-        html += cellHTML(calRow[col.key], col.key);
-      }
+      html += cellHTML(calRow[col.key], col.key);
     });
     if (y10) {
       html += '<td class="flat" title="10Y \u00b7 as of ' + (y10.date || '\u2014') + '">' + y10.value.toFixed(2) + '%</td>';
