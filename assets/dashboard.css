@@ -1964,6 +1964,25 @@ a:focus-visible,
   font-family: var(--font-ui);
   font-weight: 600;
 }
+/* [v2.3.0] Sticky first column (Ccy + flag) — keeps the reference currency
+   visible while horizontally scrolling the matrix on narrow viewports.
+   z-index: 2 keeps it above ordinary cells scrolling underneath; the header
+   cell needs its own rule since <th>/<td> don't share specificity, and gets
+   z-index: 3 so it also stays above the sticky body cells (thead itself
+   isn't sticky vertically here — only horizontal stickiness was requested).
+   Background must be opaque (var(--bg), matching .econmx-wrap's own
+   background) or scrolled-under cell content would show through. */
+.econmx-table th:first-child,
+.econmx-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--bg);
+  box-shadow: 1px 0 0 var(--border);
+}
+.econmx-table thead th:first-child {
+  z-index: 3;
+}
 /* [v2.0.0] Per-cell reference period + date subtext (client-requested — see
    econ-matrix.js header comment). Kept small and muted so it reads as
    metadata, not a second data point, and doesn't compete with the value. */

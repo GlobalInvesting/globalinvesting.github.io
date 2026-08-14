@@ -1,6 +1,29 @@
 /**
- * econ-matrix.js v2.2.5 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.6 — Native Economic Matrix panel
  *
+ * ── v2.2.6 (2026-08-14) — CHF/NZD Core CPI wired to a new non-Myfxbook
+ *    source (Trading Economics, unvalidated pending a live run) ──────────
+ * Wired CATS.CHF.core and CATS.NZD.core to ['Core Inflation Rate YoY'],
+ * fed by the new fetch_te_core_inflation.py (globalinvesting-scripts repo)
+ * rather than Myfxbook, since no Myfxbook page exists for either (re-
+ * confirmed this session). IMPORTANT: NZD's series is Trading Economics'
+ * own "Core Inflation Rate" (RBNZ-sourced, ex-gasoline) \u2014 explicitly NOT
+ * the RBNZ Sectoral Factor Model figure quoted in financial press (2.7%
+ * YoY Q2 2026 vs this series' ~3.2% YoY) \u2014 see fetch_te_core_inflation.py
+ * header for the full distinction; do not conflate the two in copy. Both
+ * wirings are UNVALIDATED as of this version: the fetcher's live
+ * guest:guest access could not be tested from the session's sandbox
+ * (no network path to tradingeconomics.com) \u2014 run it manually once before
+ * scheduling it in a workflow. Until then, or if guest access turns out
+ * not to cover these indicators, both cells simply render blank, same as
+ * before this change \u2014 no regression risk either way.
+ * SEK core (CPIF ex Energy) investigated in the same pass \u2014 no equivalent
+ * Trading Economics indicator found either, left unwired, still a
+ * documented genuine gap (v2.2.4 finding stands).
+ * AUD rtl investigated per Santiago's report of a still-blank cell despite
+ * v2.2.3's fix \u2014 confirmed NOT a wiring bug: the live Myfxbook page itself
+ * (australia/retail-sales-mom) has no observation newer than 2025-07-31.
+ * No code change; CATS.AUD.rtl stays as wired in v2.2.3.
  * ── v2.2.5 (2026-08-14) — CHF CPI MoM: same wiring-gap pattern as v2.2.4's
  *    NZD PPI fix. CATS.CHF.cpimom was hardcoded to [] under a stale
  *    "no MoM headline release in current source" comment that was never
@@ -531,7 +554,15 @@
       // will pick up future releases automatically \u2014 canon()'s existing
       // "Switzerland " prefix stripping needs no new logic.
       cpimom:['Inflation Rate MoM'],
-      core:  [], // confirmed gap \u2014 no core/underlying measure in current source
+      // v2.2.6: no Myfxbook page exists for this (re-confirmed) \u2014 wired to a
+      // new non-Myfxbook source instead of left blank. Trading Economics
+      // "Switzerland Core Inflation Rate" (FSO-sourced), fetched by
+      // fetch_te_core_inflation.py v1.0. UNVALIDATED as of v2.2.6 \u2014 that
+      // script's live guest:guest access was never confirmed to actually
+      // return this indicator (see its header). If it never populates a
+      // matching event, this cell simply stays blank, same as before \u2014 see
+      // fetch_te_core_inflation.py's header before assuming it's broken.
+      core:  ['Core Inflation Rate YoY'],
       // v2.2.3: NOT a genuine gap \u2014 same pipeline bug as GBP/JPY/CAD (v2.2.2)
       // above. Myfxbook's real title is "Producer & Import Prices YoY/MoM"
       // (live page confirmed: switzerland/producer-import-prices-yoy|mom) \u2014
@@ -554,7 +585,18 @@
       gdp:   ['GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly/annual) CPI under this title \u2014 see subtext "QoQ" tag
       cpimom:[], // confirmed gap \u2014 NZ does not publish a monthly CPI
-      core:  [], // confirmed gap \u2014 no core/underlying measure in current source
+      // v2.2.6: no Myfxbook page exists for this (re-confirmed) \u2014 wired to
+      // Trading Economics "New Zealand Core Inflation Rate" (NZCIR,
+      // RBNZ-sourced, ex-gasoline), via fetch_te_core_inflation.py v1.0.
+      // \u26a0\ufe0f THIS IS NOT THE RBNZ SECTORAL FACTOR MODEL quoted in financial
+      // press after each CPI release (that reading was 2.7% YoY Q2 2026) \u2014
+      // TE's NZCIR is a different, older ex-fuel core measure (~3.2% YoY
+      // Q4 2025 at time of writing). Do not relabel this as "Sectoral
+      // Factor Model" anywhere \u2014 see fetch_te_core_inflation.py header for
+      // the full explanation. UNVALIDATED as of v2.2.6 \u2014 live guest:guest
+      // access for this indicator was never confirmed; if the fetcher
+      // never populates a matching event this cell just stays blank.
+      core:  ['Core Inflation Rate YoY'],
       // v2.2.4: NOT a genuine gap \u2014 live Myfxbook page confirmed at
       // myfxbook.com/forex-economic-calendar/new-zealand/ppi-output-qoq
       // (quarterly, Low impact, Source: Statistics New Zealand). The upstream
