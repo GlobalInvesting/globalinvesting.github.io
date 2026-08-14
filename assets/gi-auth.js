@@ -1,6 +1,32 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.7.4
+ * GlobalInvesting FX Terminal — License Auth Module  v1.7.5
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.7.5 (2026-08-14): Reported by Santiago (screenshot) — the free Overview
+ *   snapshot briefly flashed before the full terminal appeared, for every
+ *   visitor including ones with a fully-valid, already-active license.
+ *   Root cause: gi-overview.js's initToggle() decides overview-vs-terminal
+ *   by reading window.GI_AUTH.isActive, but that's only set once this
+ *   file's `defer`red init() runs — which happens after the browser has
+ *   already parsed and painted the body's static markup (#gi-overview
+ *   visible, #gi-terminal-view display:none are the no-JS defaults). Fixed
+ *   with a new synchronous inline guard script at the very top of
+ *   index.html's <head> (runs before any deferred script, before first
+ *   paint) that re-checks the same JWT_KEY/isJWTValid() logic and sets
+ *   data-gi-preauth="1" on <html> if still valid; a matching CSS override
+ *   in index.html's critical <style> block hides #gi-overview / shows
+ *   #gi-terminal-view before the browser ever paints the snapshot. This
+ *   file's own isActive check and gi-overview.js's showTerminal() still run
+ *   normally afterward — unchanged, and idempotent when the guard already
+ *   guessed correctly.
+ *   handleRevocation() now also clears data-gi-preauth the moment a token
+ *   is found invalid — otherwise the attribute's !important CSS override
+ *   would still be sitting on <html> the next time the visitor closes the
+ *   activation modal without reactivating, fighting showOverview()'s own
+ *   inline-style attempt to hide the terminal and reintroducing the exact
+ *   "closing the modal leaves the full terminal open" bug fixed in
+ *   v1.7.0/gi-overview.js v1.2.0. See index.html's guard-script comment and
+ *   gi-overview.js's showOverview() for the matching defensive clear.
  *
  * v1.7.4 (2026-08-13): Reported by Santiago — on mobile the activation modal
  *   "ocupa toda la pantalla y no se ve el botón X para cerrarlo." Root cause:
@@ -562,6 +588,16 @@
     try { sessionStorage.removeItem(JWT_KEY); } catch {}
     try { localStorage.removeItem(JWT_KEY); }   catch {}
     window.GI_AUTH.isActive = false;
+    // v8.139.0: clear the pre-auth flash guard's attribute (index.html's
+    // inline <head> script) the moment a token is known-invalid. That
+    // attribute drives a !important CSS override that force-shows
+    // #gi-terminal-view — if left set, it would fight showOverview()'s own
+    // inline-style attempt to hide the terminal the next time the visitor
+    // closes the modal without reactivating (gi-overview.js's hideModal()
+    // path, v1.7.0), reintroducing the exact "closing the modal leaves the
+    // full terminal open" bug v1.7.0 fixed. See gi-overview.js's
+    // showOverview() for the matching defensive clear on that side.
+    document.documentElement.removeAttribute('data-gi-preauth');
     document.getElementById('gi-renew-banner')?.classList.remove('visible');
     applyGates();
     showModal();

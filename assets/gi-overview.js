@@ -1,6 +1,21 @@
 /**
- * GlobalInvesting FX Terminal — Market Overview module  v1.3.1
+ * GlobalInvesting FX Terminal — Market Overview module  v1.3.2
  * assets/gi-overview.js — include AFTER dashboard.js and gi-auth.js in index.html
+ *
+ * v1.3.2 (2026-08-14): Companion fix to gi-auth.js v1.7.5's pre-auth flash
+ *   guard (see that file's own changelog entry for the full root-cause
+ *   writeup — index.html now sets data-gi-preauth="1" on <html> via a
+ *   synchronous inline <head> script, before first paint, so a returning
+ *   active user's browser never paints the Overview snapshot at all). This
+ *   file's own logic (initToggle(), showTerminal()) is otherwise unchanged
+ *   and remains the authoritative source of truth once gi-auth.js's real
+ *   isActive check runs. Only change here: showOverview() now clears
+ *   data-gi-preauth as its first action, before touching any inline
+ *   display style — that attribute drives a !important CSS override that
+ *   force-shows #gi-terminal-view, and if left set here it would silently
+ *   fight this function's own inline-style write two lines below,
+ *   reintroducing the "closing the modal without activating leaves the
+ *   full terminal open" bug fixed in v1.2.0/v1.7.0.
  *
  * v1.3.1 (2026-08-13): Reported by Santiago — every currency in the
  *   Overview's "Currency Strength — G10 Snapshot" strip rendering flat gray
@@ -175,6 +190,17 @@
   }
 
   function showOverview() {
+    // v8.139.0: clear index.html's inline pre-auth flash-guard attribute
+    // before touching inline display styles below. That attribute drives a
+    // !important CSS override (html[data-gi-preauth="1"] #gi-terminal-view
+    // { display:block !important }) meant only to survive the first paint
+    // for a returning active user — if still set here, it would silently
+    // fight the two inline-style writes immediately below and keep the
+    // terminal visible, reintroducing the exact "closing the modal without
+    // activating leaves the full terminal open" bug fixed in v1.7.0/v1.2.0
+    // (see gi-auth.js's handleRevocation() for the matching defensive
+    // clear on that call path).
+    document.documentElement.removeAttribute('data-gi-preauth');
     document.getElementById('gi-overview')?.style.removeProperty('display');
     const tv = document.getElementById('gi-terminal-view');
     if (tv) tv.style.display = 'none';
