@@ -1,5 +1,34 @@
 /**
- * econ-matrix.js v2.2.3 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.4 — Native Economic Matrix panel
+ *
+ * ── v2.2.4 (2026-08-14) — NZD PPI: wiring gap, not a source gap; upstream fix
+ *    (v3.43) had already covered it but econ-matrix.js's CATS list was never
+ *    updated to match. SEK core (CPIF ex Energy) re-confirmed as a genuine
+ *    gap ──────────────────────────────────────────────────────────────────
+ * Continues the gap sweep started in v2.2.3, per Santiago's request to chase
+ * the two items that pass explicitly deferred (NZD ppi, SEK core).
+ *   - NZD ppi: re-checked live against myfxbook.com/forex-economic-calendar/
+ *     new-zealand — found a live page for "PPI Output QoQ" (Low impact,
+ *     quarterly, Source: Statistics New Zealand) that v2.2.3's sweep missed.
+ *     Crucially, the upstream impact-filter fix that would let this event
+ *     through (_IMPACT_UPGRADES's "ppi" substring, fetch_ff_calendar.py
+ *     v3.43) was ALREADY shipped before this sweep — this was never an
+ *     upstream gap, only a downstream wiring miss in econ-matrix.js's own
+ *     CATS.NZD.ppi list, which stayed `[]` after the source-side fix landed.
+ *     Wired: ppi: ['PPI Output QoQ']. A second live page also exists under
+ *     "PPI Input QoQ" — deliberately not wired, since Input measures what
+ *     producers pay (not what they receive) and is a distinct series, not an
+ *     alternate cadence of Output — every other currency's ppi column is the
+ *     output/producer-price concept.
+ *   - SEK core (CPIF Excluding Energy): re-checked against the full live
+ *     Sweden Myfxbook calendar listing (checked through its ~Sep 2026
+ *     horizon) — no calendar page exists under any title for this series.
+ *     The underlying data is real (Riksbank/SCB publish it, confirmed via
+ *     search) but Myfxbook doesn't carry a page for it. Re-confirmed genuine
+ *     gap, left as `[]`.
+ * No upstream (fetch_ff_calendar.py / calendar-watcher.js) changes needed
+ * this pass — NZD PPI only needed the matrix-side wiring, not a new
+ * _IMPACT_UPGRADES entry.
  *
  * ── v2.2.3 (2026-08-14) — Full gap sweep: CHF PPI, JPY CPI MoM, AUD Retail
  *    Sales were the same pipeline bug as v2.2.2's PPI fix, not source gaps ──
@@ -506,7 +535,19 @@
       cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly/annual) CPI under this title \u2014 see subtext "QoQ" tag
       cpimom:[], // confirmed gap \u2014 NZ does not publish a monthly CPI
       core:  [], // confirmed gap \u2014 no core/underlying measure in current source
-      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
+      // v2.2.4: NOT a genuine gap \u2014 live Myfxbook page confirmed at
+      // myfxbook.com/forex-economic-calendar/new-zealand/ppi-output-qoq
+      // (quarterly, Low impact, Source: Statistics New Zealand). The upstream
+      // \"ppi\" substring in _IMPACT_UPGRADES (fetch_ff_calendar.py v3.43)
+      // already covers this title and has since v3.43 shipped \u2014 this cell
+      // was left blank purely because econ-matrix.js's own CATS list was
+      // never updated to match, even after the upstream fix. A live Myfxbook
+      // page for NZ also exists under \"PPI Input QoQ\" (what producers pay
+      // for inputs) \u2014 deliberately NOT wired here: it is a distinct series
+      // from Output PPI, not an alternate cadence of the same series (unlike
+      // CHF's YoY/MoM pair), and every other currency's ppi column reports
+      // the output/producer-price concept, not an input-cost index.
+      ppi:   ['PPI Output QoQ'],
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Sales YoY'], // OECD MEI / Stats NZ \u2014 injected by fetch_supplementary_indicators.py
       conf:  ['Business NZ PMI'],
@@ -519,7 +560,15 @@
       gdp:   ['GDP Growth Rate QoQ'],
       cpi:   ['CPIF YoY'],
       cpimom:['CPIF MoM'],
-      core:  [], // confirmed gap \u2014 CPIF (already the Riksbank's target measure) is shown as headline; no separate ex-CPIF core in current source
+      // Re-confirmed genuine gap (v2.2.4 sweep): full live Sweden calendar
+      // listing (myfxbook.com/forex-economic-calendar/sweden, checked through
+      // its Sep 2026 horizon) carries CPIF YoY/MoM (headline) and Inflation
+      // Rate YoY/MoM but no separate \"CPIF Excluding Energy\" / core title
+      // under any name. The series itself is real and actively published by
+      // Riksbank/SCB (confirmed via search) \u2014 Myfxbook simply doesn't carry
+      // a calendar page for it. Left blank rather than wiring an unverified
+      // title.
+      core:  [],
       ppi:   ['PPI YoY', 'PPI MoM'], // both published; YoY preferred per column policy
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
