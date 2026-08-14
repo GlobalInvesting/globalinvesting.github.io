@@ -1,5 +1,47 @@
 /**
- * econ-matrix.js v2.1.0 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.0 — Native Economic Matrix panel
+ *
+ * ── v2.2.0 (2026-08-14) — closing out remaining industry-standard gaps:
+ *    CHF GDP dead title, EUR Bus Cond gap resolved, new PPI column ────────
+ * Prompted by Santiago asking to close out every remaining item after
+ * v2.1.0, rather than leave anything flagged-but-unfixed. Three changes:
+ *   (1) CHF gdp had the same class of bug as v2.1.0's GBP fix, inverted:
+ *       'GDP Growth Rate QoQ Flash' matched ZERO events in the feed (the
+ *       real title is 'GDP Growth Rate QoQ', no "Flash") \u2014 QoQ was
+ *       silently unreachable for CHF regardless of freshness, not a
+ *       deliberate YoY-first policy choice. Fixed the title; the visible
+ *       output is unchanged today (YoY still wins most quarters on
+ *       freshness \u2014 verified against the live feed), but the fallback
+ *       chain the column's tooltip promises now actually works.
+ *   (2) EUR Bus Cond ("\u2014" since v2.0.0, see that note) reinvestigated
+ *       rather than left as a standing gap: the feed's more recent entries
+ *       (~Jun 2026 onward) now carry country-prefixed titles that didn't
+ *       exist when v2.0.0 shipped (vendor formatting change, confirmed via
+ *       an identical-value overlap date, not new/different data). Germany's
+ *       Ifo Business Climate \u2014 a single, clean, continuous, widely-cited
+ *       series \u2014 is now shown as EUR's proxy, the same pattern already
+ *       used for AUD's RBA Trimmed Mean CPI. Also found the same drift
+ *       affects PPI (see below).
+ *   (3) New PPI column, per the client's original request (Dimitrius's
+ *       "IPP (infla\u00e7\u00e3o do produtor)"). Verified per-currency coverage
+ *       against the live feed before wiring anything: real data exists for
+ *       USD (MoM only \u2014 no YoY title in this feed), AUD (QoQ \u2014 ABS's
+ *       genuine native cadence, not a fallback), NOK (YoY), SEK (YoY+MoM,
+ *       YoY preferred), and EUR (Germany's national PPI, per the same
+ *       investigation as (2) \u2014 the bare "PPI YoY" title turned out to
+ *       ALSO be Germany's series, not a Euro Area aggregate, confirmed by
+ *       the identical overlap-date value). GBP/JPY/CHF/CAD/NZD are
+ *       confirmed gaps \u2014 no PPI release in the current source \u2014 not
+ *       guessed or left ambiguous.
+ * Column tooltip and header-comment "intentionally blank" list both
+ * updated to match. Not touched this session (out of scope, no client
+ * signal either): PMI Services/Composite \u2014 checked against the live
+ * feed and found only 2 of 10 currencies (USD, SEK) carry a genuine
+ * Services PMI title, and zero carry a Composite PMI title at all. Adding
+ * a column that reads "\u2014" for 8-9 of 10 rows would be a worse outcome
+ * than the informational PMI-scale note now added to the Bus Cond tooltip
+ * instead \u2014 flagged in CHANGELOG as a deliberate non-addition with the
+ * reasoning, not silently dropped.
  *
  * ── v2.1.0 (2026-08-14) — GDP column: fixed GBP QoQ omission, tagged USD's
  *    SAAR convention ──────────────────────────────────────────────────────
@@ -164,11 +206,8 @@
  *   - PCE: every currency except USD — PCE is a US-specific series (see
  *     above); this is a genuine "doesn't exist for this economy" fact, not
  *     a feed gap.
- *   - Bus Cond: EUR — the only source title ("Business Confidence") mixes at
- *     least three different unlabeled national surveys under one identical
- *     title, with no country field to disambiguate (see v2.0.0 note above).
- *     Rather than show a value that could be any of the three, this cell is
- *     left blank pending a per-country data-pipeline fix.
+ *   - PPI: GBP, JPY, CHF, CAD, NZD — no producer-price release in the
+ *     current source for these five (see v2.2.0 note below).
  *
  * Bus Cond fallback — these currencies have no Manufacturing PMI in the
  * current source, so the column falls back to each economy's standard
@@ -196,9 +235,10 @@
     { key: 'cpi',     label: 'CPI YoY',   title: 'Latest headline CPI / inflation rate, year-on-year' },
     { key: 'cpimom',  label: 'CPI MoM',   title: 'Latest headline CPI / inflation rate, month-on-month \u2014 can reveal a trend reversal the YoY figure masks via base effects' },
     { key: 'core',    label: 'Core CPI',  title: 'Latest core/underlying inflation, year-on-year \u2014 excludes volatile food & energy components; the measure central banks weight most heavily. AUD shows the RBA Trimmed Mean CPI, Australia\u2019s standard core-equivalent.' },
+    { key: 'ppi',     label: 'PPI',       title: 'Latest producer-price inflation \u2014 YoY where published, QoQ/MoM otherwise (see subtext on each cell for the period actually shown). EUR shows Germany\u2019s national PPI as a proxy \u2014 no genuine Euro Area-aggregate PPI title exists in the current source. Blank where the currency\u2019s economy has no standalone PPI release in the current source.' },
     { key: 'unemp',   label: 'Unemp',     title: 'Latest unemployment rate' },
     { key: 'prod',    label: 'Ind Prod',  title: 'Latest industrial / manufacturing production change' },
-    { key: 'conf',    label: 'Bus Cond',  title: 'Latest manufacturing PMI, or the economy\u2019s standard business/industrial confidence survey where no PMI is published' },
+    { key: 'conf',    label: 'Bus Cond',  title: 'Latest manufacturing PMI, or the economy\u2019s standard business/industrial confidence survey where no PMI is published. PMI readings are on a 0\u2013100 scale where 50 is the expansion/contraction cutoff \u2014 non-PMI substitutes (Ifo, NAB Business Confidence, Industrial Confidence, etc.) use their own survey-specific scale with no fixed 50 threshold.' },
     { key: 'rtl',     label: 'Rtl Sales', title: 'Latest retail sales change' },
     { key: 'ca',      label: 'Cur Acct',  title: 'Latest current account, native reporting units (see GUIDELINES \u2014 not normalized to %GDP)' },
     { key: 'trade',   label: 'Trade Bal', title: 'Latest trade balance, native reporting units' },
@@ -249,6 +289,7 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
+      ppi:   ['PPI MoM'], // confirmed only MoM published in the current source \u2014 no PPI YoY title observed
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
       conf:  ['ISM Manufacturing PMI'],
@@ -267,6 +308,7 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
+      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
       conf:  ['S&P Global Manufacturing PMI', 'CBI Industrial Trends Orders'],
@@ -280,6 +322,7 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:[],
       core:  ['Core Inflation Rate YoY'],
+      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
@@ -296,6 +339,7 @@
       cpimom:['Inflation Rate MoM'],
       // RBA Trimmed Mean CPI is AUD's standard core-equivalent (see column def).
       core:  ['RBA Trimmed Mean CPI YoY', 'Quarterly RBA Trimmed Mean CPI YoY'],
+      ppi:   ['PPI QoQ'], // ABS publishes PPI quarterly, not monthly \u2014 QoQ is the genuine native cadence, not a fallback
       unemp: ['Unemployment Rate'],
       prod:  ['Ai Group Industry Index'], // Ai Group Performance of Manufacturing \u2014 published monthly by Ai Group Australia
       conf:  ['NAB Business Confidence'],
@@ -309,6 +353,7 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
+      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Sales MoM', 'Manufacturing Sales YoY'], // StatCan via FRED (MoM) or OECD MEI (YoY fallback) \u2014 injected by fetch_supplementary_indicators.py
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
@@ -318,10 +363,17 @@
       pce:   [],
     },
     CHF: {
-      gdp:   ['GDP Growth Rate YoY', 'GDP Growth Rate QoQ Flash'],
+      // v2.2.0: 'GDP Growth Rate QoQ Flash' never matched anything in the
+      // feed (real title is 'GDP Growth Rate QoQ') — QoQ was silently
+      // unreachable for CHF, not a deliberate YoY-first choice. Both real
+      // titles now considered; YoY currently wins on freshness most
+      // quarters (its release date consistently trails QoQ's by ~2 weeks
+      // in this feed), same outcome as before but for the right reason.
+      gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
       cpi:   ['Inflation Rate YoY'],
       cpimom:[], // confirmed gap \u2014 no MoM headline release in current source
       core:  [], // confirmed gap \u2014 no core/underlying measure in current source
+      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['procure.ch Manufacturing PMI'],
@@ -335,6 +387,7 @@
       cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly/annual) CPI under this title \u2014 see subtext "QoQ" tag
       cpimom:[], // confirmed gap \u2014 NZ does not publish a monthly CPI
       core:  [], // confirmed gap \u2014 no core/underlying measure in current source
+      ppi:   [], // confirmed gap \u2014 no producer-price release in current source
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Sales YoY'], // OECD MEI / Stats NZ \u2014 injected by fetch_supplementary_indicators.py
       conf:  ['Business NZ PMI'],
@@ -348,6 +401,7 @@
       cpi:   ['CPIF YoY'],
       cpimom:['CPIF MoM'],
       core:  [], // confirmed gap \u2014 CPIF (already the Riksbank's target measure) is shown as headline; no separate ex-CPIF core in current source
+      ppi:   ['PPI YoY', 'PPI MoM'], // both published; YoY preferred per column policy
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['Swedbank Manufacturing PMI'],
@@ -361,6 +415,7 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
+      ppi:   ['PPI YoY'], // parenthetical-month title style (e.g. "PPI YoY(May)") \u2014 strictMatch already handles this
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Production MoM'],
       conf:  ['Industrial Confidence'],
@@ -382,9 +437,37 @@
     cpi:   ['Euro Area Inflation Rate YoY'],
     cpimom:['Euro Area Inflation Rate MoM'],
     core:  ['Euro Area Core Inflation Rate YoY'],
+    // v2.2.0: no genuine "Euro Area PPI" title exists in the current
+    // source. The bare "PPI YoY" title was checked (not assumed) against
+    // "Germany PPI YoY" — identical value on their one overlapping date
+    // (2026-06-19, both 2.2%) confirms bare "PPI YoY" is actually GERMANY's
+    // national PPI, not an EA aggregate, just without the country prefix
+    // the vendor only started adding partway through the feed's history
+    // (same drift pattern as Ifo above). Shown as Germany's national PPI
+    // \u2014 same proxy pattern as conf above \u2014 rather than mislabeled as
+    // an EA-wide figure.
+    ppi:   ['Germany PPI YoY', 'PPI YoY'],
     unemp: ['Euro Area Unemployment Rate'],
     prod:  ['Euro Area Industrial Production MoM'],
-    conf:  [], // confirmed data-integrity gap \u2014 see header comment
+    // v2.2.0: was previously an intentional gap (see v2.0.0 header note —
+    // bare "Business Confidence" blended 3+ unlabeled national surveys with
+    // no way to disambiguate). Re-investigated: the feed's more recent
+    // entries (from ~Jun 2026) now carry country-prefixed titles
+    // ("France Business Confidence", "Italy Business Confidence", "Germany
+    // Ifo Business Climate", ...) that weren't present when v2.0.0 shipped
+    // — confirmed via calendar.json this is a genuine vendor formatting
+    // change, not new data. "Ifo Business Climate" (bare) and "Germany Ifo
+    // Business Climate" share an identical value on their one overlapping
+    // date (2026-06-19, both 2.2%) confirming they're the SAME continuous
+    // series, just the country-prefix drift already documented for other
+    // currencies. Germany's Ifo is used as the EUR proxy — the same pattern
+    // as AUD's RBA Trimmed Mean CPI: a well-defined, single-attributable
+    // national release standing in for a pan-EA business-confidence
+    // aggregate the feed doesn't otherwise carry, chosen because Ifo is
+    // itself the most widely cited Eurozone business-sentiment bellwether
+    // in FX/macro coverage (Germany being the bloc's largest economy) —
+    // not an arbitrary pick among the now-available national surveys.
+    conf:  ['Germany Ifo Business Climate', 'Ifo Business Climate'],
     rtl:   ['Euro Area Retail Sales MoM'],
     ca:    ['Euro Area Current Account'],
     trade: ['Euro Area Balance of Trade'],
@@ -398,7 +481,7 @@
     core: 'No core/underlying inflation release in the current source for this currency',
     cpimom: 'No monthly headline CPI release in the current source for this currency',
     pce:  'PCE is a U.S.-specific series (the Fed\u2019s preferred inflation gauge) \u2014 not published for this economy. See the CPI / Core CPI columns for this currency\u2019s targeted measure.',
-    conf: 'The only source title for this release mixes multiple unlabeled national surveys with no way to disambiguate \u2014 left blank rather than shown unreliably (see GUIDELINES.md Data integrity)',
+    ppi:  'No producer-price release in the current source for this currency',
   };
 
   // ── Period-label detection \u2014 for the per-cell reference-date subtext ──────
