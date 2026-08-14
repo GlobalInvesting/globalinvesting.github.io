@@ -1,6 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Pre-auth flash guard (v8.139.0) — MUST be the very first thing in <head>,
+     before any stylesheet or deferred script. Runs synchronously during
+     head-parsing, i.e. before #gi-overview / #gi-terminal-view even exist in
+     the DOM, so a returning visitor with a still-valid license token never
+     gets a first paint of the free Overview snapshot before the full
+     terminal swaps in. Without this, the swap only happens once gi-auth.js /
+     gi-overview.js's `defer`red scripts execute — which is after the browser
+     has already parsed and painted the body (#gi-overview visible,
+     #gi-terminal-view display:none are the static, no-JS defaults) — so
+     every visitor, including fully-activated ones, saw the snapshot flash
+     for one frame before the terminal appeared (reported by Santiago,
+     screenshot, 2026-08-13).
+     This performs the SAME check as gi-auth.js's isJWTValid()/JWT_KEY — kept
+     as a small, self-contained, inline duplicate on purpose: an anti-flash
+     guard has to run before any external script loads, so it cannot import
+     gi-auth.js's function. If gi-auth.js's JWT_KEY or isJWTValid() logic
+     ever changes, this block must be updated to match (GUIDELINES.md's rule
+     on duplicated parsing logic silently drifting applies here). It sets
+     data-gi-preauth="1" on <html>; the matching CSS override lives in the
+     critical inline <style> block below. This is a pure pre-paint guess to
+     avoid the flash, not a replacement for gi-auth.js's real check —
+     gi-auth.js/gi-overview.js still run their own authoritative isActive
+     check and showTerminal() normally afterward (idempotent if this guard
+     already guessed right; corrects itself in the rare case a token expired
+     between requests). -->
+<script>
+(function () {
+  try {
+    var raw = null;
+    try { raw = sessionStorage.getItem('gi_license_token'); } catch (e) {}
+    if (!raw) { try { raw = localStorage.getItem('gi_license_token'); } catch (e) {} }
+    if (!raw) return;
+    var parts = raw.split('.');
+    if (parts.length !== 3) return;
+    var payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (payload && payload.exp && payload.exp > Math.floor(Date.now() / 1000)) {
+      document.documentElement.setAttribute('data-gi-preauth', '1');
+    }
+  } catch (e) {}
+})();
+</script>
 <!-- Google Analytics — consent-first (GDPR/ePrivacy compliant)
      analytics_storage defaults to 'denied'; gdpr.js upgrades to 'granted' on accept.
      gtag.js loads immediately so the library is ready, but no data is sent until consent.
@@ -569,6 +610,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     .gi-ov-locked-row { grid-template-columns: 1fr; }
     .gi-ov-cta { flex-direction: column; align-items: flex-start; }
   }
+
+  /* Pre-auth flash guard (v8.139.0) — consumes data-gi-preauth set by the
+     inline guard script at the very top of <head>. !important is required
+     because #gi-terminal-view and #gi-footer-actions are hidden via an
+     inline style="display:none" attribute (higher specificity than any
+     selector-based rule); this is the one deliberate exception to normal
+     specificity hygiene on this page, scoped tightly to these three
+     elements. gi-overview.js's showTerminal() (unchanged) still runs
+     normally afterward and remains the authoritative source of truth. */
+  html[data-gi-preauth="1"] #gi-overview      { display: none !important; }
+  html[data-gi-preauth="1"] #gi-terminal-view { display: block !important; }
+  html[data-gi-preauth="1"] #gi-footer-actions { display: flex !important; }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
@@ -2015,9 +2068,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/gi-auth.js?v=1.7.4" defer></script>
+<script src="assets/gi-auth.js?v=1.7.5" defer></script>
 <script src="assets/dashboard.js?v=8.101.0" defer></script>
-<script src="assets/gi-overview.js?v=1.3.1" defer></script>
+<script src="assets/gi-overview.js?v=1.3.2" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
