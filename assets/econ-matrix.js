@@ -1,5 +1,21 @@
 /**
- * econ-matrix.js v2.2.7 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.8 — Native Economic Matrix panel
+ *
+ * ── v2.2.8 (2026-08-15) — 10Y Yld / CB Rate cells given the same
+ *    value+subtext structure as every other column ──────────────────────
+ * Santiago flagged that 10Y Yld and CB Rate were the only two columns
+ * without a date/period line under the value, breaking the pattern every
+ * other column follows. Root cause: rowHTML() built those two cells with
+ * a bare '<td>{value}%</td>' (date only in the title tooltip) instead of
+ * cellHTML()'s '<div class="econmx-val">/<div class="econmx-ref">'
+ * two-line structure used everywhere else. Fixed by giving both cells that
+ * same structure, with a new fmtDateShort() helper reused from refLabel()'s
+ * 'DD Mon' date format so the subtext reads identically to the calendar-
+ * driven columns ("10Y · 30 Jul", "Policy · 05 Aug"). No CSS change needed
+ * — .econmx-val/.econmx-ref are already generic rules, not scoped to
+ * calendar cells specifically. Purely a rendering fix: load10y()/getCBRate()
+ * and their underlying sources are untouched, no data or trend-coloring
+ * regression risk.
  *
  * ── v2.2.7 (2026-08-14) — SEK Core CPI wired; corrects a wrong "no TE
  *    equivalent" gap note; CHF/NZD fetcher live-validated ──────────
@@ -898,6 +914,20 @@
     return { byCategory: out, lastUpdate: data.lastUpdate || null };
   }
 
+  // Formats a plain 'YYYY-MM-DD' (or any Date-parseable) string as 'DD Mon'
+  // for the 10Y Yld / CB Rate subtext line \u2014 same 'DD Mon' shape as
+  // refLabel() below uses for the calendar-driven columns, so all 16
+  // columns share one visual subtext pattern. Unlike refLabel(), this has
+  // no parenthetical-tag case to check (10y/CB rate dates never carry one)
+  // and tolerates an already-short/unparseable string by returning it as-is
+  // rather than showing nothing.
+  function fmtDateShort(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(dateStr) ? dateStr + 'T00:00:00Z' : dateStr);
+    if (isNaN(d)) return dateStr;
+    return d.toLocaleDateString('en', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+  }
+
   // ── 10Y yield \u2014 extended-data/{CCY}.json, same field as yc-modal.js ────────
   async function load10y(ccy) {
     const ext = await fetch('./extended-data/' + ccy + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
@@ -973,13 +1003,23 @@
       html += cellHTML(calRow[col.key], col.key, ccy);
     });
     if (y10) {
-      html += '<td class="flat" title="10Y \u00b7 as of ' + (y10.date || '\u2014') + '">' + y10.value.toFixed(2) + '%</td>';
+      const y10ref = fmtDateShort(y10.date);
+      const y10sub = y10ref ? ('10Y \u00b7 ' + y10ref) : '10Y';
+      html += '<td class="flat" title="10Y \u00b7 as of ' + (y10.date || '\u2014') + '">' +
+        '<div class="econmx-val">' + y10.value.toFixed(2) + '%</div>' +
+        '<div class="econmx-ref">' + y10sub + '</div>' +
+        '</td>';
     } else {
       html += '<td class="flat" title="No data available">\u2014</td>';
     }
     if (cb) {
       const cls = cb.trend === 'up' ? 'up' : cb.trend === 'down' ? 'down' : 'flat';
-      html += '<td class="' + cls + '" title="CB policy rate \u00b7 as of ' + (cb.date || '\u2014') + '">' + cb.rate.toFixed(2) + '%</td>';
+      const cbref = fmtDateShort(cb.date);
+      const cbsub = cbref ? ('Policy \u00b7 ' + cbref) : 'Policy';
+      html += '<td class="' + cls + '" title="CB policy rate \u00b7 as of ' + (cb.date || '\u2014') + '">' +
+        '<div class="econmx-val">' + cb.rate.toFixed(2) + '%</div>' +
+        '<div class="econmx-ref">' + cbsub + '</div>' +
+        '</td>';
     } else {
       html += '<td class="flat" title="No data available">\u2014</td>';
     }
