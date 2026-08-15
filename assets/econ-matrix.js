@@ -1,5 +1,16 @@
 /**
- * econ-matrix.js v2.2.8 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.9 — Native Economic Matrix panel
+ *
+ * ── v2.2.9 (2026-08-15) — dropped redundant "10Y"/"Policy" prefix from the
+ *    10Y Yld / CB Rate subtext ─────────────────────────────────────────────
+ * Santiago flagged two things about v2.2.8's fix: (1) the "Policy" word in
+ * the CB Rate subtext is unnecessary — the column header already says
+ * "CB RATE"; (2) "10Y · 30 Jul" repeats "10Y", which the column header
+ * ("10Y YLD") already states, unlike the calendar-driven columns where the
+ * event name genuinely varies row to row. Both cells now show just the
+ * date ("30 Jul", "05 Aug") in econmx-ref, nothing else. fmtDateShort()
+ * itself is untouched — only the two literal prefix strings in rowHTML()
+ * were removed.
  *
  * ── v2.2.8 (2026-08-15) — 10Y Yld / CB Rate cells given the same
  *    value+subtext structure as every other column ──────────────────────
@@ -1004,7 +1015,7 @@
     });
     if (y10) {
       const y10ref = fmtDateShort(y10.date);
-      const y10sub = y10ref ? ('10Y \u00b7 ' + y10ref) : '10Y';
+      const y10sub = y10ref || '\u2014';
       html += '<td class="flat" title="10Y \u00b7 as of ' + (y10.date || '\u2014') + '">' +
         '<div class="econmx-val">' + y10.value.toFixed(2) + '%</div>' +
         '<div class="econmx-ref">' + y10sub + '</div>' +
@@ -1015,7 +1026,7 @@
     if (cb) {
       const cls = cb.trend === 'up' ? 'up' : cb.trend === 'down' ? 'down' : 'flat';
       const cbref = fmtDateShort(cb.date);
-      const cbsub = cbref ? ('Policy \u00b7 ' + cbref) : 'Policy';
+      const cbsub = cbref || '\u2014';
       html += '<td class="' + cls + '" title="CB policy rate \u00b7 as of ' + (cb.date || '\u2014') + '">' +
         '<div class="econmx-val">' + cb.rate.toFixed(2) + '%</div>' +
         '<div class="econmx-ref">' + cbsub + '</div>' +
