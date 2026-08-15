@@ -1,6 +1,14 @@
 /**
- * GlobalInvesting FX Terminal — Market Overview module  v1.3.2
+ * GlobalInvesting FX Terminal — Market Overview module  v1.4.0
  * assets/gi-overview.js — include AFTER dashboard.js and gi-auth.js in index.html
+ *
+ * v1.4.0 (2026-08-15): Desk Briefing layout (index.html v8.155.0) —
+ *   renderBiasRow()'s template updated to match the new hero-column bias
+ *   card layout (ccy/tag/pct as three direct flex children instead of
+ *   ccy+tag nested together above a separate pct row below). This function
+ *   fully overwrites #gi-ov-bias-row's innerHTML on every populate, so the
+ *   static skeleton markup in index.html and this template must be kept in
+ *   sync by hand — no shared source. See CHANGELOG.md v8.155.0.
  *
  * v1.3.2 (2026-08-14): Companion fix to gi-auth.js v1.7.5's pre-auth flash
  *   guard (see that file's own changelog entry for the full root-cause
@@ -325,8 +333,9 @@
       const sign = pct >= 0 ? '+' : '';
       const flag = CCY_FLAG[ccy];
       return `<div class="gi-ov-bias-card" data-ccy="${ccy}">
-        <div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">${flag ? `<span class="fi fi-${flag}" style="margin-right:6px;border-radius:2px;"></span>` : ''}${ccy}</span><span class="gi-ov-bias-tag ${t.cls}">${t.label}</span></div>
-        <div class="gi-ov-bias-pct">${sign}${pct.toFixed(2)}%</div>
+        <span class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">${flag ? `<span class="fi fi-${flag}" style="margin-right:6px;border-radius:2px;"></span>` : ''}${ccy}</span></span>
+        <span class="gi-ov-bias-tag ${t.cls}">${t.label}</span>
+        <span class="gi-ov-bias-pct">${sign}${pct.toFixed(2)}%</span>
       </div>`;
     }).join('');
   }
