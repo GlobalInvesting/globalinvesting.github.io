@@ -1,6 +1,13 @@
 /**
- * GlobalInvesting FX Terminal — Market Overview module  v1.4.0
+ * GlobalInvesting FX Terminal — Market Overview module  v1.4.1
  * assets/gi-overview.js — include AFTER dashboard.js and gi-auth.js in index.html
+ *
+ * v1.4.1 (2026-08-15): Reverted renderBiasRow()'s v1.4.0 template change
+ *   (three-child flex-row card, built for the v8.155.0 Desk Briefing hero)
+ *   back to the original two-row card markup — Santiago reverted the
+ *   Desk Briefing layout in index.html back to the original stacked
+ *   layout, keeping only the "Read full note" link. See CHANGELOG.md
+ *   v8.156.0.
  *
  * v1.4.0 (2026-08-15): Desk Briefing layout (index.html v8.155.0) —
  *   renderBiasRow()'s template updated to match the new hero-column bias
@@ -333,9 +340,8 @@
       const sign = pct >= 0 ? '+' : '';
       const flag = CCY_FLAG[ccy];
       return `<div class="gi-ov-bias-card" data-ccy="${ccy}">
-        <span class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">${flag ? `<span class="fi fi-${flag}" style="margin-right:6px;border-radius:2px;"></span>` : ''}${ccy}</span></span>
-        <span class="gi-ov-bias-tag ${t.cls}">${t.label}</span>
-        <span class="gi-ov-bias-pct">${sign}${pct.toFixed(2)}%</span>
+        <div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy">${flag ? `<span class="fi fi-${flag}" style="margin-right:6px;border-radius:2px;"></span>` : ''}${ccy}</span><span class="gi-ov-bias-tag ${t.cls}">${t.label}</span></div>
+        <div class="gi-ov-bias-pct">${sign}${pct.toFixed(2)}%</div>
       </div>`;
     }).join('');
   }
