@@ -1,5 +1,24 @@
 /**
- * econ-matrix.js v2.2.6 — Native Economic Matrix panel
+ * econ-matrix.js v2.2.7 — Native Economic Matrix panel
+ *
+ * ── v2.2.7 (2026-08-14) — SEK Core CPI wired; corrects a wrong "no TE
+ *    equivalent" gap note; CHF/NZD fetcher live-validated ──────────
+ * CATS.SEK.core wired to ['Core Inflation Rate YoY'], same source and
+ * event title as CHF/NZD. v2.2.6's SEK note was wrong: it only checked
+ * Myfxbook (correctly finding no page there) and concluded no TE
+ * equivalent existed either, without actually checking TE. TE does carry
+ * this series (tradingeconomics.com/sweden/core-inflation-rate, labelled
+ * "CPIF excl. Energy YoY" \u2014 a different display name than CHF/NZD's
+ * pages use, which is likely why the earlier pass missed it). Confirmed
+ * server-rendered and live-scraped successfully this session \u2014 see
+ * fetch_te_core_inflation.py v3.0, which now generalizes the row-label
+ * match per currency instead of assuming "Core Inflation Rate" is
+ * universal.
+ * CHF/NZD's own fetcher wiring (v2.2.6, UNVALIDATED at the time) is now
+ * confirmed working end-to-end: the guest:guest API path it was built
+ * against returned HTTP 410 (live-tested this session), so the fetcher
+ * was rewritten to scrape the public page directly instead \u2014 both cells
+ * populated successfully via a production GH Actions run this session.
  *
  * ── v2.2.6 (2026-08-14) — CHF/NZD Core CPI wired to a new non-Myfxbook
  *    source (Trading Economics, unvalidated pending a live run) ──────────
@@ -23,6 +42,7 @@
  * AUD rtl investigated per Santiago's report of a still-blank cell despite
  * v2.2.3's fix \u2014 confirmed NOT a wiring bug: the live Myfxbook page itself
  * (australia/retail-sales-mom) has no observation newer than 2025-07-31.
+
  * No code change; CATS.AUD.rtl stays as wired in v2.2.3.
  * ── v2.2.5 (2026-08-14) — CHF CPI MoM: same wiring-gap pattern as v2.2.4's
  *    NZD PPI fix. CATS.CHF.cpimom was hardcoded to [] under a stale
@@ -622,15 +642,22 @@
       gdp:   ['GDP Growth Rate QoQ'],
       cpi:   ['CPIF YoY'],
       cpimom:['CPIF MoM'],
-      // Re-confirmed genuine gap (v2.2.4 sweep): full live Sweden calendar
-      // listing (myfxbook.com/forex-economic-calendar/sweden, checked through
-      // its Sep 2026 horizon) carries CPIF YoY/MoM (headline) and Inflation
-      // Rate YoY/MoM but no separate \"CPIF Excluding Energy\" / core title
-      // under any name. The series itself is real and actively published by
-      // Riksbank/SCB (confirmed via search) \u2014 Myfxbook simply doesn't carry
-      // a calendar page for it. Left blank rather than wiring an unverified
-      // title.
-      core:  [],
+      // CORRECTION (v2.2.7, 2026-08-14): v2.2.4's "genuine gap" note below
+      // was checking the wrong source. Myfxbook indeed has no calendar page
+      // for this series, but Trading Economics does \u2014 tradingeconomics.com/
+      // sweden/core-inflation-rate, labelled "CPIF excl. Energy YoY" (TE's
+      // own display name, not "Core Inflation Rate" like CHF/NZD's pages).
+      // Confirmed server-rendered and live-scraped successfully the same
+      // session this was caught \u2014 see fetch_te_core_inflation.py v3.0.
+      // Original v2.2.4 note preserved below for the historical record of
+      // what was actually checked (Myfxbook) and why it looked like a gap.
+      //
+      // v2.2.4 (superseded): full live Sweden calendar listing
+      // (myfxbook.com/forex-economic-calendar/sweden, checked through its
+      // Sep 2026 horizon) carries CPIF YoY/MoM (headline) and Inflation Rate
+      // YoY/MoM but no separate \"CPIF Excluding Energy\" / core title under
+      // any name on Myfxbook specifically.
+      core:  ['Core Inflation Rate YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'], // both published; YoY preferred per column policy
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
