@@ -1,7 +1,23 @@
 {
-  "updated": "2026-08-15T07:10:26Z",
+  "updated": "2026-08-15T07:14:52Z",
   "source": "mixed",
   "quotes": {
+    "vix": {
+      "close": 14.25,
+      "prev_close": 14.63,
+      "chg": -0.38,
+      "pct": -2.5974,
+      "high": 14.72,
+      "low": 14.18,
+      "open": 14.64,
+      "bid": null,
+      "ask": null,
+      "market_state": "CLOSED",
+      "market_time": 1786738500,
+      "source": "yfinance",
+      "pct1w": -4.3624,
+      "pct1w_date": "2026-08-07"
+    },
     "spx": {
       "close": 7785.76,
       "prev_close": 7798.99,
@@ -99,19 +115,19 @@
       "pct1w_date": "2026-08-07"
     },
     "dxy": {
-      "close": 99.636,
-      "prev_close": 99.667,
-      "chg": -0.031,
-      "pct": -0.0311,
+      "close": 99.67,
+      "prev_close": 99.96,
+      "chg": -0.29,
+      "pct": -0.2901,
       "high": 99.936,
       "low": 99.475,
       "open": 99.926,
       "bid": null,
       "ask": null,
       "market_state": "CLOSED",
-      "market_time": 1786741199,
+      "market_time": 1786679940,
       "source": "yfinance",
-      "pct1w": 0.0361,
+      "pct1w": 0.0703,
       "pct1w_date": "2026-08-07"
     },
     "us3m": {
@@ -187,35 +203,35 @@
       "pct1w": null
     },
     "btc": {
-      "close": 63009.01,
+      "close": 63061.77,
       "prev_close": 62977.613,
-      "chg": 31.397,
-      "pct": 0.0499,
+      "chg": 84.157,
+      "pct": 0.1336,
       "high": 65713.91,
       "low": 64182.797,
       "open": 62977.613,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1786777830,
+      "market_time": 1786778091,
       "source": "yfinance",
-      "pct1w": -2.8841,
+      "pct1w": -2.8027,
       "pct1w_date": "2026-08-07"
     },
     "eth": {
-      "close": 1879.75,
+      "close": 1880.7,
       "prev_close": 1880.3744,
-      "chg": -0.6244,
-      "pct": -0.0332,
+      "chg": 0.3256,
+      "pct": 0.0173,
       "high": 1907.2332,
       "low": 1858.5846,
       "open": 1880.3744,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1786777824,
+      "market_time": 1786778093,
       "source": "yfinance",
-      "pct1w": -1.7525,
+      "pct1w": -1.7028,
       "pct1w_date": "2026-08-07"
     },
     "nasdaq": {
@@ -235,19 +251,19 @@
       "pct1w_date": "2026-08-07"
     },
     "ftse": {
-      "close": 10750.1,
-      "prev_close": 10772.7,
-      "chg": -22.6,
-      "pct": -0.2098,
+      "close": 10750.11,
+      "prev_close": 10772.67,
+      "chg": -22.56,
+      "pct": -0.2094,
       "high": 10789.71,
       "low": 10723.66,
       "open": 10772.54,
       "bid": null,
       "ask": null,
       "market_state": "CLOSED",
-      "market_time": 1786721400,
+      "market_time": 1786721730,
       "source": "yfinance",
-      "pct1w": -1.3852,
+      "pct1w": -1.3851,
       "pct1w_date": "2026-08-07"
     },
     "asx": {
@@ -261,7 +277,7 @@
       "bid": null,
       "ask": null,
       "market_state": "CLOSED",
-      "market_time": 1786687920,
+      "market_time": 1786691265,
       "source": "yfinance",
       "pct1w": -1.602,
       "pct1w_date": "2026-08-07"
@@ -1257,17 +1273,17 @@
       }
     },
     "dax": {
-      "close": 26440.3,
-      "prev_close": 26299.7,
-      "chg": 140.6,
-      "pct": 0.5346,
+      "close": 26440.31,
+      "prev_close": 26299.74,
+      "chg": 140.57,
+      "pct": 0.5345,
       "high": 26541.34,
       "low": 26404.95,
       "open": 26445.99,
       "bid": null,
       "ask": null,
       "market_state": "CLOSED",
-      "market_time": 1786721400,
+      "market_time": 1786723200,
       "source": "yfinance",
       "pct1w": 0.4592,
       "pct1w_date": "2026-08-07",
@@ -1280,19 +1296,19 @@
       }
     },
     "hsi": {
-      "close": 25116.8,
+      "close": 25116.85,
       "prev_close": 25396.5,
-      "chg": -279.7,
-      "pct": -1.1013,
+      "chg": -279.65,
+      "pct": -1.1011,
       "high": 25311.86,
       "low": 25089.14,
       "open": 25219.15,
       "bid": null,
       "ask": null,
       "market_state": "CLOSED",
-      "market_time": 1786695000,
+      "market_time": 1786694936,
       "source": "yfinance",
-      "pct1w": -2.1475,
+      "pct1w": -2.1473,
       "pct1w_date": "2026-08-07",
       "prev_bar": {
         "time": "2026-08-14",
@@ -1324,15 +1340,6 @@
         "low": 53673.46875,
         "close": 53733.51172
       }
-    },
-    "vix": {
-      "close": 14.63,
-      "prev_close": 14.63,
-      "chg": 0,
-      "pct": 0,
-      "source": "repo",
-      "stale": true,
-      "sourceDate": "2026-08-13"
     }
   },
   "hv30": {
