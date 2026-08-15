@@ -1,5 +1,51 @@
 /**
- * econ-matrix.js v2.2.9 — Native Economic Matrix panel
+ * econ-matrix.js v2.3.0 — Native Economic Matrix panel
+ *
+ * ── v2.3.0 (2026-08-15) — CB Rate subtext date fixed (was always "01 Aug"
+ *    for every currency); Unemp column colored as an inverted indicator ──
+ * Two issues Santiago flagged after reviewing a live screenshot:
+ *
+ * (1) CB RATE subtext showed the same day-of-month ("Aug 01") for every
+ *     single currency, every session — not a rendering bug (fmtDateShort()
+ *     itself is correct, proven by the 10Y column using it fine) but a
+ *     data-shape mismatch: `getCBRate()`'s date came straight from
+ *     `rates/{CCY}.json` observations[0].date, and that file is a FRED-style
+ *     MONTHLY series where every observation is stamped to the 1st of its
+ *     month by construction (confirmed directly: rates/USD.json's most
+ *     recent three observations are 2026-08-01 / 07-01 / 06-01, not real
+ *     decision dates) — so "Aug 01" wasn't wrong data, it was real monthly-
+ *     bucket data mislabeled with day-level precision it doesn't have.
+ *     Fix: `getCBRate()` now also resolves the actual last-meeting date
+ *     from `meetings-data/meetings.json`'s per-currency `allMeetings` (real
+ *     ISO decision dates, e.g. USD's 2026-07-29 FOMC date) — the most
+ *     recent entry not after today — and uses THAT for the subtext instead.
+ *     This is the same file `cbrates-modal.js`'s click-through already
+ *     reads (`window._STATE_meetings`), so it's reused here the same way
+ *     `_STATE_cbRates` already is, with an independent fetch fallback if
+ *     that global isn't populated yet. Falls back to the old obs[0].date
+ *     behavior only if no meeting data exists for a currency at all.
+ *
+ * (2) Unemp column reused the generic `trendClass()` (actual > previous →
+ *     'up' → var(--up), green) with no inversion — meaning a RISING
+ *     unemployment rate rendered green, the same color as rising GDP,
+ *     exactly backwards from every other panel in this app. This app
+ *     already has one audited, canonical "inverse indicator" keyword list
+ *     for this exact problem — `CAL_INVERSE_KW` in calendar-panel.js
+ *     (mirrored as `INVERSE_KW` in dashboard.js and `_ESM_INVERSE_KW` in
+ *     econ-surprises-modal.js): `['unemployment', 'unemployed', 'jobless',
+ *     'claims', 'deficit']` — but econ-matrix.js never adopted it; it was
+ *     built independently and this gap was never audited against it until
+ *     now. Added the same list here (`MX_INVERSE_KW`) and `trendClass()`
+ *     now takes the cell's event title, flipping up/down to down/up when
+ *     it matches. Audited every other column's underlying event titles
+ *     against this list: GDP/CPI/Core CPI/PPI/Ind Prod/Bus Cond/Rtl Sales/
+ *     PCE none match (correct as non-inverted). Cur Acct / Trade Bal titles
+ *     ("Current Account", "Trade Balance") also don't literally contain
+ *     "deficit" so aren't auto-flagged by this list — their sign is already
+ *     baked into the value itself (a worsening balance prints a more
+ *     negative number, which parseNum() already reads correctly as "down"),
+ *     so no separate inversion is needed there; only Unemp was actually
+ *     affected in this file.
  *
  * ── v2.2.9 (2026-08-15) — dropped redundant "10Y"/"Policy" prefix from the
  *    10Y Yld / CB Rate subtext ─────────────────────────────────────────────
@@ -823,11 +869,22 @@
     return neg ? -v : v;
   }
 
-  function trendClass(actual, previous) {
+  // Same canonical list as calendar-panel.js's CAL_INVERSE_KW / dashboard.js's
+  // INVERSE_KW / econ-surprises-modal.js's _ESM_INVERSE_KW — an indicator
+  // whose title matches one of these reads "worse" when it goes up (rising
+  // unemployment, more jobless claims, a wider deficit), so its up/down
+  // coloring must be flipped relative to every other column. See v2.3.0
+  // module header note for the audit of which of this file's columns are
+  // actually affected (only Unemp, as of this file's current COLUMNS list).
+  const MX_INVERSE_KW = ['unemployment', 'unemployed', 'jobless', 'claims', 'deficit'];
+
+  function trendClass(actual, previous, eventTitle) {
     const a = parseNum(actual), p = parseNum(previous);
     if (a == null || p == null) return '';
-    if (a > p) return 'up';
-    if (a < p) return 'down';
+    const titleLower = (eventTitle || '').toLowerCase();
+    const inverse = MX_INVERSE_KW.some(kw => titleLower.indexOf(kw) !== -1);
+    if (a > p) return inverse ? 'down' : 'up';
+    if (a < p) return inverse ? 'up' : 'down';
     return 'flat';
   }
 
@@ -973,12 +1030,52 @@
     return 'flat';
   }
 
+  // rates/{CCY}.json is a FRED-style MONTHLY series — every observation is
+  // stamped to the 1st of its month by construction, never a real decision
+  // date (confirmed: rates/USD.json's latest three rows are 2026-08-01 /
+  // 07-01 / 06-01). meetings-data/meetings.json's per-currency `allMeetings`
+  // carries the actual ISO decision dates instead; this resolves the most
+  // recent one not after today, i.e. the last meeting that could plausibly
+  // have set the currently-displayed rate. Reuses window._STATE_meetings
+  // (populated by dashboard.js) the same way waitForCBRates() reuses
+  // _STATE_cbRates, with an independent fetch fallback.
+  function waitForMeetings(timeoutMs) {
+    return new Promise(resolve => {
+      const start = Date.now();
+      (function poll() {
+        if (window._STATE_meetings && window._STATE_meetings.meetings) {
+          resolve(window._STATE_meetings.meetings);
+        } else if (Date.now() - start > timeoutMs) {
+          resolve((window._STATE_meetings && window._STATE_meetings.meetings) || null);
+        } else {
+          setTimeout(poll, 200);
+        }
+      }());
+    });
+  }
+
+  async function lastMeetingDate(ccy) {
+    let meetings = await waitForMeetings(1500);
+    if (!meetings) {
+      const data = await fetch('./meetings-data/meetings.json').then(r => r.ok ? r.json() : null).catch(() => null);
+      meetings = data && data.meetings;
+    }
+    const rec = meetings && meetings[ccy];
+    const all = rec && rec.allMeetings;
+    if (!all || !all.length) return null;
+    const todayISO = new Date().toISOString().slice(0, 10);
+    const past = all.filter(d => d <= todayISO);
+    if (!past.length) return null;
+    return past[past.length - 1]; // allMeetings is chronological; last past entry = most recent
+  }
+
   async function getCBRate(ccy) {
     const store = await waitForCBRates(3000);
     const rec = store && store[ccy.toLowerCase()];
+    const meetingDate = await lastMeetingDate(ccy);
     if (rec && rec.rate != null) {
       const trend = (typeof window.computeCBTrend === 'function') ? window.computeCBTrend(rec.obs) : simpleTrend(rec.obs);
-      return { rate: rec.rate, date: rec.date, trend };
+      return { rate: rec.rate, date: meetingDate || rec.date, trend };
     }
     // Fallback: independent fetch if STATE never populated (e.g. CB Rates
     // panel failed to load before this one came into view).
@@ -987,7 +1084,7 @@
     if (!obs || !obs.length) return null;
     const rate = parseFloat(obs[0].value);
     if (isNaN(rate)) return null;
-    return { rate, date: obs[0].date, trend: simpleTrend(obs) };
+    return { rate, date: meetingDate || obs[0].date, trend: simpleTrend(obs) };
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -996,7 +1093,7 @@
       const title = (gapKey && GAP_TITLE[gapKey]) || 'No data available';
       return '<td class="flat" title="' + title.replace(/"/g, '&quot;') + '">\u2014</td>';
     }
-    const cls = trendClass(ev.actual, ev.previous);
+    const cls = trendClass(ev.actual, ev.previous, ev.event);
     const period = periodLabel(ev.event, ccy, gapKey);
     const ref = refLabel(ev);
     const sub = (period ? period + ' \u00b7 ' : '') + ref;
