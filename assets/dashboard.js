@@ -945,9 +945,23 @@ function fmtOI(n) {
 // labeling commodity rows "LF"/"AM"/"TFF" would misstate the actual source.
 function _cotReportMeta(rec) {
   if (rec && rec.assetClass === 'commodity') {
-    return { report: 'Disaggregated', primaryLabel: 'Managed Money', primaryAbbr: 'MM', secondaryLabel: 'Swap Dealers', secondaryAbbr: 'SD' };
+    return {
+      report: 'Disaggregated',
+      primaryLabel: 'Managed Money', primaryAbbr: 'MM',
+      secondaryLabel: 'Swap Dealers', secondaryAbbr: 'SD',
+      // v8.161.1 — tertiary (dealer/hedger) slot, added so cot-modal-chart.js
+      // can derive its "Dealers" row/legend labels from this same helper
+      // instead of hardcoding "LF"/"AM"/"Leveraged Funds" (see that file's
+      // v2.7 header note and CHANGELOG v8.161.1).
+      tertiaryLabel: 'Producer/Merchant', tertiaryAbbr: 'PM',
+    };
   }
-  return { report: 'TFF', primaryLabel: 'Leveraged Funds', primaryAbbr: 'LF', secondaryLabel: 'Asset Manager', secondaryAbbr: 'AM' };
+  return {
+    report: 'TFF',
+    primaryLabel: 'Leveraged Funds', primaryAbbr: 'LF',
+    secondaryLabel: 'Asset Manager', secondaryAbbr: 'AM',
+    tertiaryLabel: 'Dealers', tertiaryAbbr: 'DD',
+  };
 }
 
 // Builds the "CFTC · week ending … · updated … · loaded … · Nd lag" label

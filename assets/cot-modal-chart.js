@@ -1,3 +1,9 @@
+// COT MODAL CHART  v2.7 — report-family labels (LF/AM/DD vs MM/SD/PM) now derived
+//   from _cotReportMeta() (dashboard.js) instead of hardcoded everywhere, so this
+//   modal no longer mislabels Commodities-tab (Gold/Silver/Copper/WTI) rows as
+//   "LF"/"AM" — threaded through header, metrics, key-metrics accordion,
+//   participant table, all three tab titles/legends, and the OI/Participants
+//   chart tooltips (_buildOIChart/_buildParticipantsChart now take a meta param).
 // COT MODAL CHART  v2.6 — spot-close chart decimal precision fixed for inverted
 //   pairs (JPY/NOK/SEK): was hardcoded to 2 decimals assuming direct-quote
 //   magnitude, but _fetchCOTSpot inverts these three to CCY/USD (JPY/USD
@@ -519,7 +525,8 @@ function _lwResize(container,lwChart){
 }
 
 // ── Chart builders ────────────────────────────────────────────────────────────
-function _buildNetChart(container, dates, netData, ccy) {
+function _buildNetChart(container, dates, netData, ccy, meta) {
+  meta = meta || { primaryAbbr: 'LF' };
   const LWC = window.LightweightCharts; if (!LWC || !container) return null;
   const W = container.offsetWidth || 600, H = container.offsetHeight || container.parentElement?.offsetHeight || 280;
   const opts = _lwOpts(W, H);
@@ -536,12 +543,13 @@ function _buildNetChart(container, dates, netData, ccy) {
     const v = param.seriesData.get(hist); if (!v) return null;
     const col = v.value >= 0 ? _cotTC('--up', '#26a69a') : _cotTC('--down', '#ef5350');
     return `<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${typeof param.time === 'string' ? param.time : ''}</div>` +
-      `<div>${ccy} LF Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
+      `<div>${ccy} ${meta.primaryAbbr} Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
   });
   return chart;
 }
 
-function _buildOIChart(container, dates, oiData, ccy) {
+function _buildOIChart(container, dates, oiData, ccy, meta) {
+  meta = meta || { primaryAbbr: 'LF' };
   const LWC = window.LightweightCharts; if (!LWC || !container) return null;
   const W = container.offsetWidth || 600, H = container.offsetHeight || container.parentElement?.offsetHeight || 160;
   const chart = LWC.createChart(container, _lwOpts(W, H));
@@ -557,7 +565,7 @@ function _buildOIChart(container, dates, oiData, ccy) {
   _mkTooltip(container, chart, () => oiS, param => {
     const v = param.seriesData.get(oiS); if (!v) return null;
     return `<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${typeof param.time === 'string' ? param.time : ''}</div>` +
-      `<div>LF OI &nbsp;<span style="color:var(--blue,#4f7fff);font-weight:700">${Math.round(v.value).toLocaleString()}</span></div>`;
+      `<div>${meta.primaryAbbr} OI &nbsp;<span style="color:var(--blue,#4f7fff);font-weight:700">${Math.round(v.value).toLocaleString()}</span></div>`;
   });
   return chart;
 }
@@ -616,7 +624,8 @@ function _buildSplitChart(container,dates,lngData,shrtData,ccy){
   return chart;
 }
 
-function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy){
+function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy,meta){
+  meta = meta || { primaryAbbr:'LF', secondaryAbbr:'AM', tertiaryAbbr:'DD', primaryLabel:'Leveraged Funds', secondaryLabel:'Asset Managers', tertiaryLabel:'Dealers' };
   const LWC=window.LightweightCharts;if(!LWC||!container)return null;
   const W=container.offsetWidth||600,H=container.offsetHeight||280;
   const chart=LWC.createChart(container,_lwOpts(W,H));_cotLwCharts.push(chart);
@@ -635,7 +644,7 @@ function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy){
   chart.timeScale().fitContent();_lwResize(container,chart);
   const legendEl=container.parentElement?.querySelector('#cot-part-legend');
   if(legendEl){
-    legendEl.innerHTML=[['Leveraged Funds',_bl],['Asset Managers',_or],['Dealers',_dn]].map(([lbl,col])=>
+    legendEl.innerHTML=[[meta.primaryLabel,_bl],[meta.secondaryLabel,_or],[meta.tertiaryLabel,_dn]].map(([lbl,col])=>
       `<span style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:18px;height:2px;background:${col};border-radius:1px"></span><span>${lbl}</span></span>`
     ).join('');
   }
@@ -644,9 +653,9 @@ function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy){
     const mon=typeof param.time==='string'?param.time.slice(0,7):'';
     const _b=_cotTC('--blue','#4f7fff'),_o=_cotTC('--orange','#ff9800'),_d=_cotTC('--down','#ef5350');
     let html=`<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${mon}</div>`;
-    html+=`<div style="color:${_b}">LF &nbsp;&nbsp;${_cotFmt(lf.value)}</div>`;
-    if(amS){const av=param.seriesData.get(amS);if(av)html+=`<div style="color:${_o}">AM &nbsp;&nbsp;${_cotFmt(av.value)}</div>`;}
-    if(ddS){const dv=param.seriesData.get(ddS);if(dv)html+=`<div style="color:${_d}">DD &nbsp;&nbsp;${_cotFmt(dv.value)}</div>`;}
+    html+=`<div style="color:${_b}">${meta.primaryAbbr} &nbsp;&nbsp;${_cotFmt(lf.value)}</div>`;
+    if(amS){const av=param.seriesData.get(amS);if(av)html+=`<div style="color:${_o}">${meta.secondaryAbbr} &nbsp;&nbsp;${_cotFmt(av.value)}</div>`;}
+    if(ddS){const dv=param.seriesData.get(ddS);if(dv)html+=`<div style="color:${_d}">${meta.tertiaryAbbr} &nbsp;&nbsp;${_cotFmt(dv.value)}</div>`;}
     return html;
   });
   return chart;
@@ -671,6 +680,15 @@ function _cotEnsureLWLib() {
 function openCOTModal(ccy,data,opts){
   const _preserveTab = opts && opts.preserveTab;
   closeCOTModal();
+  // v2.7 — report-family meta (Leveraged Funds/Asset Manager/Dealers for the
+  // TFF report used by FX & Indices vs Managed Money/Swap Dealers/Producer-
+  // Merchant for the Disaggregated report used by Commodities). Reuses
+  // dashboard.js's _cotReportMeta() rather than a second hardcoded copy, so
+  // this modal never mislabels commodity rows "LF"/"AM" again the way it did
+  // pre-v8.161.1 — see that CHANGELOG entry's "Scope note".
+  const meta = (typeof _cotReportMeta === 'function')
+    ? _cotReportMeta(data)
+    : { report:'TFF', primaryLabel:'Leveraged Funds', primaryAbbr:'LF', secondaryLabel:'Asset Manager', secondaryAbbr:'AM', tertiaryLabel:'Dealers', tertiaryAbbr:'DD' };
   const history=Array.isArray(data.history)?[...data.history]:[];
   const net=data.netPosition||0,long_=data.longPositions||0,short_=data.shortPositions||0;
   const total=long_+short_,lPct=total>0?Math.round(long_/total*100):50;
@@ -723,14 +741,14 @@ function openCOTModal(ccy,data,opts){
           </div>
         </div>
         <button class="cot-ccy-arrow" onclick="cotCycleCcy(1)" aria-label="Next currency" title="Next (→)" ${_idx===-1||_idx>=_avail.length-1?'disabled':''}>›</button>
-        <span>· Leveraged Funds</span>
+        <span>· ${meta.primaryLabel}</span>
       </div>
-      <div id="cot-m-sub">week ending ${weekEnd} · ${nWks}w history · CFTC TFF · Options+Futures Combined</div>
+      <div id="cot-m-sub">week ending ${weekEnd} · ${nWks}w history · CFTC ${meta.report} · Options+Futures Combined</div>
     </div>
     <button id="cot-m-close" onclick="closeCOTModal()" aria-label="Close">✕</button>
   </div>
   <div id="cot-m-metrics">
-    <div class="cot-mm"><div class="cot-mm-lbl">Net LF</div><div class="cot-mm-val ${_cotCls(net)}">${_cotFmt(net)}</div><div class="cot-mm-sub">contracts</div></div>
+    <div class="cot-mm"><div class="cot-mm-lbl">Net ${meta.primaryAbbr}</div><div class="cot-mm-val ${_cotCls(net)}">${_cotFmt(net)}</div><div class="cot-mm-sub">contracts</div></div>
     <div class="cot-mm"><div class="cot-mm-lbl">Long %</div><div class="cot-mm-val ${_cotCls(lPct-50)}">${lPct}%</div><div class="cot-mm-sub">of own OI</div></div>
     <div class="cot-mm"><div class="cot-mm-lbl">WoW Delta</div><div class="cot-mm-val ${_cotCls(wow)}">${_cotFmt(wow)}</div><div class="cot-mm-sub">weekly change</div></div>
     <div class="cot-mm"><div class="cot-mm-lbl">Net%OI</div><div class="cot-mm-val ${_cotCls(netPctOI)}">${netPctStr}</div><div class="cot-mm-sub">normalised</div></div>
@@ -783,7 +801,7 @@ function openCOTModal(ccy,data,opts){
         ${wow!=null&&wow>0?'<span class="cot-kfv-badge cot-badge-l">BUYING</span>':wow!=null&&wow<0?'<span class="cot-kfv-badge cot-badge-s">SELLING</span>':''}
       </div>
       <div class="cot-kfv">
-        <span class="cot-kfv-key">Crowd Alignment (LF + AM)</span>
+        <span class="cot-kfv-key">Crowd Alignment (${meta.primaryAbbr} + ${meta.secondaryAbbr})</span>
         <span class="cot-kfv-val ${aligned?_cotCls(net):'cn'}">${aligned?(net>0?'Both Long':'Both Short'):'Diverging'}</span>
         ${isCrowded?'<span class="cot-kfv-badge cot-badge-w">CROWDED</span>':aligned?'<span class="cot-kfv-badge cot-badge-l">ALIGNED</span>':'<span class="cot-kfv-badge cot-badge-n">MIXED</span>'}
       </div>
@@ -812,9 +830,9 @@ function openCOTModal(ccy,data,opts){
             <span class="cot-kfv-badge ${badgeCls}">${dir}</span>
           </div>`;
         };
-        return pRow('Leveraged Funds', net) +
-               pRow('Asset Managers', amNet) +
-               pRow('Dealers / Intermediaries', ddNet);
+        return pRow(meta.primaryLabel, net) +
+               pRow(meta.secondaryLabel, amNet) +
+               pRow(meta.tertiaryLabel, ddNet);
       })()}
 
       <!-- SECTION: 52-WEEK RANGE -->
@@ -839,7 +857,7 @@ function openCOTModal(ccy,data,opts){
       <!-- SECTION: 12-WEEK TREND -->
       <div class="cot-ov-sec">
         <span class="cot-ov-sec-lbl">12-Week Net Trend</span>
-        <span class="cot-ov-sec-note">Leveraged Funds · weekly snapshot</span>
+        <span class="cot-ov-sec-note">${meta.primaryLabel} · weekly snapshot</span>
       </div>
       <div class="cot-ov-spark-row">
         <div class="cot-ov-spark-top">
@@ -853,12 +871,12 @@ function openCOTModal(ccy,data,opts){
     </div>
     <div id="p-net" class="cot-panel">
       <div class="cot-cw" style="flex:3;min-height:0;display:flex;flex-direction:column;">
-        <div class="cot-ct">NET POSITION · LEVERAGED FUNDS · WEEKLY CONTRACTS</div>
+        <div class="cot-ct">NET POSITION · ${meta.primaryLabel.toUpperCase()} · WEEKLY CONTRACTS</div>
         <div id="cot-net-legend">
           <div class="cot-nl-items">
             <span class="cot-nl-item">
               <span class="cot-nl-dot" style="background:var(--up);opacity:.82"></span>
-              <span>LF Net</span>
+              <span>${meta.primaryAbbr} Net</span>
             </span>
           </div>
         </div>
@@ -872,34 +890,40 @@ function openCOTModal(ccy,data,opts){
     </div>
     <div id="p-split" class="cot-panel">
       <div class="cot-cw" style="flex:3;min-height:0;display:flex;flex-direction:column;">
-        <div class="cot-ct">LONGS VS SHORTS · LEVERAGED FUNDS · CONTRACTS</div>
+        <div class="cot-ct">LONGS VS SHORTS · ${meta.primaryLabel.toUpperCase()} · CONTRACTS</div>
         <div class="cot-chart-area" style="flex:1;min-height:0;"><div class="cot-lw-wrap" id="cot-lw-split"></div></div>
       </div>
       <div class="cot-cw cot-oi-section" style="flex:2;min-height:0;display:flex;flex-direction:column;">
-        <div class="cot-ct">LF OPEN INTEREST · LEVERAGED FUNDS · CONTRACTS</div>
-        <div class="cot-oi-note">Total contracts held by Leveraged Funds (longs + shorts). Rising OI = growing participation. Declining OI = de-risking.</div>
+        <div class="cot-ct">${meta.primaryAbbr} OPEN INTEREST · ${meta.primaryLabel.toUpperCase()} · CONTRACTS</div>
+        <div class="cot-oi-note">Total contracts held by ${meta.primaryLabel} (longs + shorts). Rising OI = growing participation. Declining OI = de-risking.</div>
         <div class="cot-chart-area" style="flex:1;min-height:0;margin-top:6px;"><div class="cot-lw-wrap" id="cot-lw-oi"></div></div>
       </div>
     </div>
     <div id="p-participants" class="cot-panel">
       <div class="cot-cw">
-        <div class="cot-ct">LF vs AM vs DEALER · NET BY CATEGORY</div>
+        <div class="cot-ct">${meta.primaryAbbr} vs ${meta.secondaryAbbr} vs ${meta.tertiaryAbbr} · NET BY CATEGORY</div>
         <div id="cot-part-legend" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:8px;font-size:10px;font-family:${_monoF};color:#8b949e"></div>
         <div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-part"></div></div>
       </div>
       <div class="cot-cw"><div style="font-size:10px;color:var(--text3,#6e7681);font-family:${_monoF};line-height:1.7">
+        ${data.assetClass === 'commodity' ? `
+        <strong style="color:#8b949e">MM (Managed Money):</strong> Hedge funds and CTAs. Primary speculative momentum signal.<br>
+        <strong style="color:#8b949e">SD (Swap Dealers):</strong> Banks and swap dealers hedging OTC/index exposure. Confluence with MM = stronger signal.<br>
+        <strong style="color:#8b949e">PM (Producer/Merchant):</strong> Commercial hedgers (producers, processors, users). Typically contra-positioned to speculators. Useful contrarian signal.
+        ` : `
         <strong style="color:#8b949e">LF (Leveraged Funds):</strong> Hedge funds and CTAs. Primary speculative momentum signal.<br>
         <strong style="color:#8b949e">AM (Asset Managers):</strong> Mutual funds and pensions. Slow trend-followers. Confluence with LF = stronger signal.<br>
         <strong style="color:#8b949e">DD (Dealers):</strong> Market-makers. Typically contra-positioned to speculators. Useful contrarian signal.
+        `}
       </div></div>
       <div class="cot-cw">
         <div class="cot-ct">PARTICIPANT BREAKDOWN · WEEK ENDING ${weekEnd}</div>
         <table class="cot-tbl">
           <thead><tr><th>Category</th><th>Long</th><th>Short</th><th>Net</th><th>Long%</th><th>WoW Δ</th></tr></thead>
           <tbody>
-            ${_cotPartRow('Leveraged Funds',long_,short_,net,wow)}
-            ${_cotPartRow('Asset Managers',amLong_,amShort_,amNet,amWow)}
-            ${_cotPartRow('Dealers',ddLong_,ddShort_,ddNet,ddWow)}
+            ${_cotPartRow(meta.primaryLabel,long_,short_,net,wow)}
+            ${_cotPartRow(meta.secondaryLabel,amLong_,amShort_,amNet,amWow)}
+            ${_cotPartRow(meta.tertiaryLabel,ddLong_,ddShort_,ddNet,ddWow)}
           </tbody>
         </table>
       </div>
@@ -909,7 +933,7 @@ function openCOTModal(ccy,data,opts){
         <div class="cot-ct">WEEKLY HISTORY · ${nWks} WEEKS</div>
         <div style="overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent">
           <table class="cot-tbl"><thead><tr>
-            <th>Week</th><th>Net LF</th><th>WoW Δ</th><th>Longs</th><th>Shorts</th><th>Long%</th><th>Net%OI</th><th>AM Net</th><th>Dealer</th>
+            <th>Week</th><th>Net ${meta.primaryAbbr}</th><th>WoW Δ</th><th>Longs</th><th>Shorts</th><th>Long%</th><th>Net%OI</th><th>${meta.secondaryAbbr} Net</th><th>${meta.tertiaryAbbr}</th>
           </tr></thead><tbody id="cot-hist-body"></tbody></table>
         </div>
       </div>
@@ -964,7 +988,7 @@ function openCOTModal(ccy,data,opts){
     if(e.key==='ArrowRight')cotCycleCcy(1);
   };
   document.addEventListener('keydown',esc);bd._esc=esc;
-  bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy,history};
+  bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy,history,meta};
   bd._ccy=ccy;bd._availCcys=_avail;
 
   // Restore whichever tab was active before switching currency (better UX than
@@ -1026,7 +1050,7 @@ function cotTab(el,tabId){
         // Kick off async fetch immediately so it overlaps with the 150ms wait
         const spotPromise=_fetchCOTSpot(d.ccy);
         setTimeout(()=>requestAnimationFrame(()=>{
-          if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}
+          if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy,d.meta);}
           if(ws&&!ws._built){
             ws._built=true;
             spotPromise.then(spotData=>{
@@ -1057,7 +1081,7 @@ function cotTab(el,tabId){
           if(wo&&!wo._built){
             wo._built=true;
             const oiData=d.lngData.map((l,i)=>(l??0)+(d.shrtData[i]??0));
-            _buildOIChart(wo,d.dates,oiData,d.ccy);
+            _buildOIChart(wo,d.dates,oiData,d.ccy,d.meta);
           }
           setTimeout(()=>{[w,wo].forEach(el=>{if(el&&el._lwResize)el._lwResize();});},250);
         }),150);
@@ -1066,7 +1090,7 @@ function cotTab(el,tabId){
         if(wo&&wo._lwResize)wo._lwResize();
       }
     }
-    if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}else if(w&&w._lwResize)w._lwResize();}
+    if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy,d.meta);}else if(w&&w._lwResize)w._lwResize();}
     if(tabId==='overview'){ /* sparkline is inline SVG — no build needed */ }
     setTimeout(()=>{['cot-lw-net','cot-lw-spot','cot-lw-split','cot-lw-oi','cot-lw-part'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
   }));
