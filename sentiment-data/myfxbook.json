@@ -1,10 +1,11 @@
 {
-  "updated": "2026-08-16T17:38:32Z",
+  "updated": "2026-08-16T17:49:47Z",
   "source": "myfxbook",
   "apiBlocked": false,
   "pairs": [
     {
       "sym": "EUR/USD",
+      "assetClass": "fx",
       "long": 35,
       "short": 65,
       "longVol": 6011.46,
@@ -17,6 +18,7 @@
     },
     {
       "sym": "GBP/USD",
+      "assetClass": "fx",
       "long": 25,
       "short": 75,
       "longVol": 1571.52,
@@ -29,6 +31,7 @@
     },
     {
       "sym": "USD/JPY",
+      "assetClass": "fx",
       "long": 48,
       "short": 52,
       "longVol": 1016.24,
@@ -41,6 +44,7 @@
     },
     {
       "sym": "AUD/USD",
+      "assetClass": "fx",
       "long": 20,
       "short": 80,
       "longVol": 424.42,
@@ -53,6 +57,7 @@
     },
     {
       "sym": "USD/CAD",
+      "assetClass": "fx",
       "long": 64,
       "short": 36,
       "longVol": 2915.52,
@@ -65,6 +70,7 @@
     },
     {
       "sym": "USD/CHF",
+      "assetClass": "fx",
       "long": 52,
       "short": 48,
       "longVol": 772.86,
@@ -77,6 +83,7 @@
     },
     {
       "sym": "NZD/USD",
+      "assetClass": "fx",
       "long": 32,
       "short": 68,
       "longVol": 378.85,
@@ -89,6 +96,7 @@
     },
     {
       "sym": "EUR/GBP",
+      "assetClass": "fx",
       "long": 57,
       "short": 43,
       "longVol": 834.76,
@@ -101,6 +109,7 @@
     },
     {
       "sym": "EUR/JPY",
+      "assetClass": "fx",
       "long": 18,
       "short": 82,
       "longVol": 224.78,
@@ -113,6 +122,7 @@
     },
     {
       "sym": "GBP/JPY",
+      "assetClass": "fx",
       "long": 11,
       "short": 89,
       "longVol": 252.73,
@@ -125,6 +135,7 @@
     },
     {
       "sym": "EUR/AUD",
+      "assetClass": "fx",
       "long": 76,
       "short": 24,
       "longVol": 700.21,
@@ -137,6 +148,7 @@
     },
     {
       "sym": "EUR/CAD",
+      "assetClass": "fx",
       "long": 72,
       "short": 28,
       "longVol": 855.1,
@@ -149,6 +161,7 @@
     },
     {
       "sym": "EUR/CHF",
+      "assetClass": "fx",
       "long": 10,
       "short": 90,
       "longVol": 115.48,
@@ -161,6 +174,7 @@
     },
     {
       "sym": "EUR/NZD",
+      "assetClass": "fx",
       "long": 68,
       "short": 32,
       "longVol": 355.24,
@@ -173,6 +187,7 @@
     },
     {
       "sym": "AUD/JPY",
+      "assetClass": "fx",
       "long": 18,
       "short": 82,
       "longVol": 124.44,
@@ -185,6 +200,7 @@
     },
     {
       "sym": "AUD/CAD",
+      "assetClass": "fx",
       "long": 46,
       "short": 54,
       "longVol": 2646.08,
@@ -197,6 +213,7 @@
     },
     {
       "sym": "AUD/CHF",
+      "assetClass": "fx",
       "long": 8,
       "short": 92,
       "longVol": 139.63,
@@ -209,6 +226,7 @@
     },
     {
       "sym": "AUD/NZD",
+      "assetClass": "fx",
       "long": 28,
       "short": 72,
       "longVol": 941.35,
@@ -221,6 +239,7 @@
     },
     {
       "sym": "GBP/CHF",
+      "assetClass": "fx",
       "long": 14,
       "short": 86,
       "longVol": 87.57,
@@ -233,6 +252,7 @@
     },
     {
       "sym": "GBP/AUD",
+      "assetClass": "fx",
       "long": 56,
       "short": 44,
       "longVol": 162.62,
@@ -245,6 +265,7 @@
     },
     {
       "sym": "GBP/CAD",
+      "assetClass": "fx",
       "long": 52,
       "short": 48,
       "longVol": 197.19,
@@ -257,6 +278,7 @@
     },
     {
       "sym": "GBP/NZD",
+      "assetClass": "fx",
       "long": 49,
       "short": 51,
       "longVol": 288.48,
@@ -269,6 +291,7 @@
     },
     {
       "sym": "CHF/JPY",
+      "assetClass": "fx",
       "long": 43,
       "short": 57,
       "longVol": 189.46,
@@ -281,6 +304,7 @@
     },
     {
       "sym": "CAD/JPY",
+      "assetClass": "fx",
       "long": 29,
       "short": 71,
       "longVol": 97.33,
@@ -293,6 +317,7 @@
     },
     {
       "sym": "USD/NOK",
+      "assetClass": "fx",
       "long": 100,
       "short": 0,
       "longVol": 0.78,
@@ -305,6 +330,7 @@
     },
     {
       "sym": "USD/SEK",
+      "assetClass": "fx",
       "long": 100,
       "short": 0,
       "longVol": 2.79,
@@ -317,6 +343,7 @@
     },
     {
       "sym": "EUR/NOK",
+      "assetClass": "fx",
       "long": 0,
       "short": 100,
       "longVol": 0.0,
@@ -329,6 +356,7 @@
     },
     {
       "sym": "EUR/SEK",
+      "assetClass": "fx",
       "long": 10,
       "short": 90,
       "longVol": 0.23,
@@ -341,6 +369,7 @@
     },
     {
       "sym": "NZD/CAD",
+      "assetClass": "fx",
       "long": 76,
       "short": 24,
       "longVol": 990.5,
@@ -353,6 +382,7 @@
     },
     {
       "sym": "NZD/JPY",
+      "assetClass": "fx",
       "long": 42,
       "short": 58,
       "longVol": 93.88,
@@ -365,6 +395,7 @@
     },
     {
       "sym": "NZD/CHF",
+      "assetClass": "fx",
       "long": 16,
       "short": 84,
       "longVol": 223.0,
@@ -377,6 +408,7 @@
     },
     {
       "sym": "CAD/CHF",
+      "assetClass": "fx",
       "long": 39,
       "short": 61,
       "longVol": 393.63,
@@ -389,6 +421,7 @@
     },
     {
       "sym": "GBP/NOK",
+      "assetClass": "fx",
       "long": 100,
       "short": 0,
       "longVol": 0.01,
@@ -401,6 +434,7 @@
     },
     {
       "sym": "GBP/SEK",
+      "assetClass": "fx",
       "long": 100,
       "short": 0,
       "longVol": 0.36,
@@ -413,6 +447,7 @@
     },
     {
       "sym": "NOK/JPY",
+      "assetClass": "fx",
       "long": 2,
       "short": 98,
       "longVol": 0.02,
@@ -425,6 +460,7 @@
     },
     {
       "sym": "SEK/JPY",
+      "assetClass": "fx",
       "long": 51,
       "short": 49,
       "longVol": 0.29,
@@ -437,6 +473,7 @@
     },
     {
       "sym": "NOK/SEK",
+      "assetClass": "fx",
       "long": 88,
       "short": 12,
       "longVol": 0.96,
@@ -446,6 +483,32 @@
       "totalPos": 87,
       "avgLongPx": 1.0085,
       "avgShortPx": 1.003
+    },
+    {
+      "sym": "XAU/USD",
+      "assetClass": "metal",
+      "long": 46,
+      "short": 54,
+      "longVol": 820.23,
+      "shortVol": 955.4,
+      "longPos": 7870,
+      "shortPos": 7141,
+      "totalPos": 15011,
+      "avgLongPx": 4509.0462,
+      "avgShortPx": 4165.1854
+    },
+    {
+      "sym": "XAG/USD",
+      "assetClass": "metal",
+      "long": 53,
+      "short": 47,
+      "longVol": 149.84,
+      "shortVol": 133.38,
+      "longPos": 803,
+      "shortPos": 439,
+      "totalPos": 1242,
+      "avgLongPx": 76.8019,
+      "avgShortPx": 59.1343
     }
   ],
   "general": {
