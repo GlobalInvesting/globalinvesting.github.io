@@ -1429,6 +1429,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div id="cot-asset-tabs" role="tablist" aria-label="Select asset class" style="display:flex;gap:2px;padding:4px 8px 0;border-bottom:1px solid var(--border);">
         <button class="rates-ctab active" data-asset="fx"      role="tab" aria-selected="true"  style="padding:2px 7px;font-size:10px;font-weight:600;border:none;border-radius:3px;background:var(--accent);color:#fff;cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">FX</button>
         <button class="rates-ctab"        data-asset="indices" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Indices</button>
+        <button class="rates-ctab"        data-asset="commodities" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Commodities</button>
       </div>
       <div style="padding:6px 10px;">
         <div class="cot-scroll-wrap">
@@ -2106,7 +2107,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.101.2" defer></script>
+<script src="assets/dashboard.js?v=8.101.3" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
