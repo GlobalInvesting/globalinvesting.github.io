@@ -936,11 +936,26 @@ function fmtOI(n) {
   return n.toString();
 }
 
+// Report-family label + abbreviations, derived from the record's own
+// assetClass/positionCategory fields rather than a literal string — v8.161.0.
+// FX/Indices come from CFTC's TFF report (primary signal: Leveraged Funds,
+// secondary: Asset Manager). Commodities come from the Disaggregated report,
+// a different report family whose primary signal is Managed Money (the
+// hedge-fund/CTA analog of Leveraged Funds) and secondary is Swap Dealers —
+// labeling commodity rows "LF"/"AM"/"TFF" would misstate the actual source.
+function _cotReportMeta(rec) {
+  if (rec && rec.assetClass === 'commodity') {
+    return { report: 'Disaggregated', primaryLabel: 'Managed Money', primaryAbbr: 'MM', secondaryLabel: 'Swap Dealers', secondaryAbbr: 'SD' };
+  }
+  return { report: 'TFF', primaryLabel: 'Leveraged Funds', primaryAbbr: 'LF', secondaryLabel: 'Asset Manager', secondaryAbbr: 'AM' };
+}
+
 // Builds the "CFTC · week ending … · updated … · loaded … · Nd lag" label
-// used by both the FX and Indices COT tabs.
+// used by the FX, Indices, and Commodities COT tabs.
 function _buildCOTUpdateLabel(latest) {
+  const meta = _cotReportMeta(latest);
   const weekEnd = latest.weekEnding || latest.reportDate || '';
-  let updLabel = 'TFF · Leveraged Funds · week ending ' + weekEnd;
+  let updLabel = meta.report + ' · ' + meta.primaryLabel + ' · week ending ' + weekEnd;
   if (latest.lastUpdate) {
     try {
       const d = new Date(latest.lastUpdate);
@@ -990,6 +1005,7 @@ function _renderCOTRows(results, symMap, dataStoreKey) {
   results.forEach(d => { window[dataStoreKey][d.ccy] = d; });
 
   container.innerHTML = results.map(d => {
+    const meta = _cotReportMeta(d);
     const net   = d.netPosition || 0;
     const long  = d.longPositions || 0;
     const short = d.shortPositions || 0;
@@ -998,7 +1014,7 @@ function _renderCOTRows(results, symMap, dataStoreKey) {
     const cls   = net > 0 ? 'up' : net < 0 ? 'down' : 'flat';
     const netStr = (net >= 0 ? '+' : '') + net.toLocaleString();
 
-    // LF vs AM divergence dot — filled = aligned, hollow = diverge
+    // Primary vs secondary category divergence dot — filled = aligned, hollow = diverge
     const amNet = d.assetManagerNet;
     let divHtml = '';
     if (amNet != null) {
@@ -1006,9 +1022,9 @@ function _renderCOTRows(results, symMap, dataStoreKey) {
       const amDir = amNet > 0 ? 1 : amNet < 0 ? -1 : 0;
       if (lfDir !== 0 && amDir !== 0) {
         if (lfDir === amDir) {
-          divHtml = '<span class="cot-div aligned" title="LF + AM aligned — ' + (lfDir > 0 ? 'both net long' : 'both net short') + '">●</span>';
+          divHtml = '<span class="cot-div aligned" title="' + meta.primaryAbbr + ' + ' + meta.secondaryAbbr + ' aligned — ' + (lfDir > 0 ? 'both net long' : 'both net short') + '">●</span>';
         } else {
-          divHtml = '<span class="cot-div diverge" title="LF/AM diverge — LF ' + (net > 0 ? 'long' : 'short') + ' · AM ' + (amNet > 0 ? 'long' : 'short') + '">○</span>';
+          divHtml = '<span class="cot-div diverge" title="' + meta.primaryAbbr + '/' + meta.secondaryAbbr + ' diverge — ' + meta.primaryAbbr + ' ' + (net > 0 ? 'long' : 'short') + ' · ' + meta.secondaryAbbr + ' ' + (amNet > 0 ? 'long' : 'short') + '">○</span>';
         }
       }
     }
@@ -1044,10 +1060,10 @@ function _renderCOTRows(results, symMap, dataStoreKey) {
       const wowStr = (wow > 0 ? '+' : '') + (Math.abs(wow) >= 1000
         ? Math.round(wow / 1000) + 'k'
         : wow.toLocaleString());
-      wowHtml = '<span class="cot-wow ' + wowCls + '" title="Week-over-week change in LF net contracts. Positive = specs adding longs/covering shorts. Negative = specs adding shorts/reducing longs.">' + wowStr + '</span>';
+      wowHtml = '<span class="cot-wow ' + wowCls + '" title="Week-over-week change in ' + meta.primaryAbbr + ' net contracts. Positive = specs adding longs/covering shorts. Negative = specs adding shorts/reducing longs.">' + wowStr + '</span>';
     }
 
-    // Net as % of LF OI — read from root if present, else derive from current long+short.
+    // Net as % of primary-category OI — read from root if present, else derive from current long+short.
     let pctOI = d.levNetPctOI ?? null;
     if (pctOI == null && oi > 0) {
       pctOI = Math.round(net / oi * 1000) / 10; // one decimal
@@ -1056,7 +1072,7 @@ function _renderCOTRows(results, symMap, dataStoreKey) {
     if (pctOI != null) {
       const pctCls = pctOI > 0 ? 'up' : pctOI < 0 ? 'down' : 'flat';
       const pctStr = (pctOI > 0 ? '+' : '') + pctOI.toFixed(1) + '%';
-      pctOIHtml = '<span class="cot-pcoi ' + pctCls + '" title="LF net as % of LF Open Interest. Normalised across currencies — comparable regardless of contract size differences.">' + pctStr + '</span>';
+      pctOIHtml = '<span class="cot-pcoi ' + pctCls + '" title="' + meta.primaryAbbr + ' net as % of ' + meta.primaryAbbr + ' Open Interest. Normalised across ' + (d.assetClass === 'commodity' ? 'commodities' : 'currencies') + ' — comparable regardless of contract size differences.">' + pctStr + '</span>';
     }
 
     // TradingView COT chart symbol for row click
@@ -1069,11 +1085,11 @@ function _renderCOTRows(results, symMap, dataStoreKey) {
       + '<div class="cot-short-fill" style="width:' + (100 - longPct) + '%"></div>'
       + '</div>'
       + '<span class="cot-pct ' + cls + '">' + longPct + '%</span>'
-      + '<span class="cot-net ' + cls + '" title="LF net contracts (longs minus shorts). Positive = net long speculative positioning; negative = net short. Primary directional signal from CFTC TFF report.">' + netStr + '</span>'
+      + '<span class="cot-net ' + cls + '" title="' + meta.primaryAbbr + ' net contracts (longs minus shorts). Positive = net long speculative positioning; negative = net short. Primary directional signal from CFTC ' + meta.report + ' report.">' + netStr + '</span>'
       + wowHtml
       + divHtml
       + pctOIHtml
-      + '<span class="cot-oi" title="LF Open Interest: ' + oi.toLocaleString() + ' contracts (long + short). Rising OI signals new money; falling OI signals liquidation.">' + oiArrow + oiStr + '</span>'
+      + '<span class="cot-oi" title="' + meta.primaryAbbr + ' Open Interest: ' + oi.toLocaleString() + ' contracts (long + short). Rising OI signals new money; falling OI signals liquidation.">' + oiArrow + oiStr + '</span>'
       + '</div>';
   }).join('');
 
@@ -1151,7 +1167,43 @@ async function fetchCOTIndicesData() {
   _renderCOTRows(results, {}, 'COT_DATA_STORE_INDICES');
 }
 
-// ── COT panel asset-class tabs (FX / Indices) ──
+// Commodity COT data — cot-data/commodities/{XAU,XAG,COPPER,WTI}.json, written
+// by update-cot-cftc-all.yml's Disaggregated-report leg (v8.161.0). Deliberately
+// scoped to FX-relevant commodities: Gold/Silver (safe-haven, USD/JPY proxy),
+// Copper ("Dr. Copper", AUD/China-demand proxy), WTI Crude Oil (CAD/NOK
+// petrocurrency correlation). Lazy-fetched on first click of the "Commodities"
+// tab; cached in window._cotCommoditiesResults afterwards. Same non-fatal
+// "not yet published" pattern as the Indices tab if the workflow hasn't run.
+const COT_COMMODITIES = ['XAU', 'XAG', 'COPPER', 'WTI'];
+
+async function fetchCOTCommoditiesData() {
+  const container = document.getElementById('cot-rows');
+  const subEl = document.getElementById('cot-date-sub');
+  if (container) container.innerHTML = '<div class="cot-row" style="color:var(--text3);"><span>Loading commodity positioning data…</span></div>';
+
+  const promises = COT_COMMODITIES.map(async sym => {
+    try {
+      const r = await fetch('./cot-data/commodities/' + sym + '.json');
+      if (!r.ok) return null;
+      const data = await r.json();
+      return { ccy: sym, ...data };
+    } catch { return null; }
+  });
+
+  const results = (await Promise.all(promises)).filter(Boolean);
+  window._cotCommoditiesResults = results;
+
+  if (!results.length) {
+    if (container) container.innerHTML = '<div class="cot-row" style="color:var(--text3);"><span>Commodity positioning data not yet published — pending next CFTC Disaggregated run.</span></div>';
+    if (subEl) subEl.innerHTML = 'Disaggregated · Managed Money · Gold / Silver / Copper / WTI futures';
+    return;
+  }
+
+  if (subEl) subEl.innerHTML = _buildCOTUpdateLabel(results[0]);
+  _renderCOTRows(results, {}, 'COT_DATA_STORE_COMMODITIES');
+}
+
+// ── COT panel asset-class tabs (FX / Indices / Commodities) ──
 function initCOTAssetTabs() {
   const tabBar = document.getElementById('cot-asset-tabs');
   if (!tabBar) return;
@@ -1191,6 +1243,18 @@ function initCOTAssetTabs() {
         }
       } else {
         fetchCOTIndicesData();
+      }
+    } else if (asset === 'commodities') {
+      if (window._cotCommoditiesResults) {
+        const subEl = document.getElementById('cot-date-sub');
+        if (window._cotCommoditiesResults.length) {
+          if (subEl) subEl.innerHTML = _buildCOTUpdateLabel(window._cotCommoditiesResults[0]);
+          _renderCOTRows(window._cotCommoditiesResults.slice(), {}, 'COT_DATA_STORE_COMMODITIES');
+        } else {
+          fetchCOTCommoditiesData();
+        }
+      } else {
+        fetchCOTCommoditiesData();
       }
     }
   });
@@ -2188,11 +2252,21 @@ function _setSentimentSource(pairs, sourceLabel, general) {
   _renderSentimentForActiveTab();
 }
 
+// data-asset button values vs. the assetClass strings the fetchers actually
+// write are not 1:1 (button says "metals" for UI-label pluralization,
+// fetch_myfxbook_sentiment.py v8.160.0 writes the singular "metal" per pair)
+// — v8.160.4 incident: comparing them directly with === silently matched
+// zero rows every time, so the Metals tab always rendered as "unavailable"
+// even though the data was present. Normalize through this map instead of
+// relying on the button/data string matching the JSON field verbatim.
+const SENT_ASSET_CLASS_MAP = { fx: 'fx', metals: 'metal' };
+
 function _renderSentimentForActiveTab() {
   const pairs = window._sentAllPairs || [];
   const asset = window._sentActiveAsset || 'fx';
-  const filtered = pairs.filter(p => (p.assetClass || 'fx') === asset);
-  if (asset === 'metals' && !filtered.length) {
+  const targetClass = SENT_ASSET_CLASS_MAP[asset] || asset;
+  const filtered = pairs.filter(p => (p.assetClass || 'fx') === targetClass);
+  if (asset !== 'fx' && !filtered.length) {
     const container = document.getElementById('sent-rows');
     if (container) container.innerHTML = '<div style="color:var(--text3);font-size:11px;padding:8px 0;">Metals sentiment unavailable from the current source.</div>';
     return;
