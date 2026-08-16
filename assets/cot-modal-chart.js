@@ -1,3 +1,13 @@
+// COT MODAL CHART  v2.8 — Daily Spot Close now covers Commodities/Indices tabs,
+//   not just FX: _COT_SPOT extended with XAU→gold.json, XAG→silver.json,
+//   WTI→wti.json, SPX→spx.json, DJ30→dji.json, NAS100→nasdaq.json (same
+//   ohlc-data/ files dashboard.js's own charts already fetch — no new data
+//   source added). COPPER has no matching ohlc-data file and is left showing
+//   "Spot data unavailable" rather than a fabricated source. Title/tooltip label
+//   is now asset-class aware (_cotSpotLabel()) — "XAU"/"WTI"/"SPX" for
+//   commodities/indices vs "EUR/USD" for FX — and the spot chart's decimal
+//   precision now also covers the commodities/indices magnitude range
+//   (≥3 → 2dp) alongside the existing FX-pair tiers.
 // COT MODAL CHART  v2.7 — report-family labels (LF/AM/DD vs MM/SD/PM) now derived
 //   from _cotReportMeta() (dashboard.js) instead of hardcoded everywhere, so this
 //   modal no longer mislabels Commodities-tab (Gold/Silver/Copper/WTI) rows as
@@ -431,8 +441,15 @@ function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded) {
 }
 
 // ── Spot price helpers (for Net Position overlay) ─────────────────────────────
-// ohlc-data pair filename + inversion flag for each COT currency
+// ohlc-data filename + inversion flag for each COT symbol. Same ohlc-data/
+// files dashboard.js's own charts already read (yfinance-sourced) — v2.8
+// extends this from FX-only to also cover the Commodities/Indices COT tabs,
+// reusing gold.json/silver.json/wti.json/spx.json/dji.json/nasdaq.json rather
+// than adding a new fetch. COPPER has no matching ohlc-data file (not one of
+// dashboard.js's tracked instruments) — left out on purpose so the panel
+// honestly reports "Spot data unavailable" instead of fabricating a source.
 const _COT_SPOT = {
+  // FX (COT_DATA_STORE) — value expressed as CCY/USD
   AUD: { file: 'audusd', inv: false },
   EUR: { file: 'eurusd', inv: false },
   GBP: { file: 'gbpusd', inv: false },
@@ -442,10 +459,19 @@ const _COT_SPOT = {
   NZD: { file: 'nzdusd', inv: false },
   NOK: { file: 'usdnok', inv: true  },
   SEK: { file: 'usdsek', inv: true  },
+  // Commodities (COT_DATA_STORE_COMMODITIES) — value is the outright futures close
+  XAU:  { file: 'gold',   inv: false },
+  XAG:  { file: 'silver', inv: false },
+  WTI:  { file: 'wti',    inv: false },
+  // Indices (COT_DATA_STORE_INDICES) — value is the outright futures close
+  SPX:    { file: 'spx',     inv: false },
+  DJ30:   { file: 'dji',     inv: false },
+  NAS100: { file: 'nasdaq',  inv: false },
 };
 
 // Fetch daily closes from local ohlc-data/ (yfinance — same source as dashboard charts)
-// Returns [{time:'YYYY-MM-DD', value:n}] expressed as CCY/USD strength
+// Returns [{time:'YYYY-MM-DD', value:n}] — CCY/USD for FX, outright futures
+// close for commodities/indices (see _COT_SPOT above).
 async function _fetchCOTSpot(ccy) {
   const cfg = _COT_SPOT[ccy];
   if (!cfg) return null;
@@ -457,6 +483,13 @@ async function _fetchCOTSpot(ccy) {
       .map(r => (r.time && r.close) ? { time: r.time, value: cfg.inv ? 1 / r.close : r.close } : null)
       .filter(Boolean);
   } catch (_) { return null; }
+}
+
+// Display label for the spot chart's title/tooltip: FX pairs read "EUR/USD",
+// commodities/indices read just the symbol ("XAU", "WTI", "SPX") since they're
+// outright futures closes, not currency pairs against USD.
+function _cotSpotLabel(ccy, assetClass) {
+  return assetClass === 'commodity' || assetClass === 'equityIndex' ? ccy : ccy + '/USD';
 }
 
 
@@ -572,18 +605,21 @@ function _buildOIChart(container, dates, oiData, ccy, meta) {
 
 
 
-function _buildSpotChart(container, spotData, ccy) {
+function _buildSpotChart(container, spotData, label) {
   const LWC = window.LightweightCharts; if (!LWC || !container || !spotData?.length) return null;
   const W = container.offsetWidth || 600, H = container.offsetHeight || container.parentElement?.offsetHeight || 140;
   const opts = _lwOpts(W, H);
-  // Decimal precision by data magnitude, not a hardcoded ccy list: JPY/NOK/SEK are
-  // inverted to CCY/USD by _fetchCOTSpot (see _COT_SPOT.inv above), which puts them
-  // one to two orders of magnitude below the direct-quote pairs (JPY/USD ~0.0064,
-  // NOK & SEK/USD ~0.10, vs. EUR/USD ~1.15). A fixed 2-decimal precision for that
-  // trio rounds every JPY close to 0.01 and every NOK/SEK close to 0.10 — the axis
-  // and tooltip then show one repeated value instead of the actual daily range.
+  // Decimal precision by data magnitude, not a hardcoded ccy/assetClass list:
+  // JPY/NOK/SEK are inverted to CCY/USD by _fetchCOTSpot (see _COT_SPOT.inv
+  // above), which puts them one to two orders of magnitude below the
+  // direct-quote FX pairs (JPY/USD ~0.0064, NOK & SEK/USD ~0.10, vs.
+  // EUR/USD ~1.15) — a fixed 2-decimal precision for that trio rounds every
+  // close to a single repeated value. Commodities/indices (v2.8) sit at the
+  // opposite extreme (WTI ~82, gold ~4,437, SPX ~7,786, DJ30 ~53,732) where
+  // 4 decimals is noise, not precision — 2 decimals covers outright futures
+  // closes the same way a Bloomberg/Eikon ticker would display them.
   const _maxAbs = spotData.reduce((m, p) => Math.max(m, Math.abs(p.value || 0)), 0);
-  const _dec = (_maxAbs > 0 && _maxAbs < 0.02) ? 5 : 4;
+  const _dec = _maxAbs >= 3 ? 2 : (_maxAbs >= 0.02 ? 4 : 5);
   opts.localization = { priceFormatter: v => v != null ? v.toFixed(_dec) : '—' };
   const chart = LWC.createChart(container, opts);
   _cotLwCharts.push(chart);
@@ -598,7 +634,7 @@ function _buildSpotChart(container, spotData, ccy) {
   _mkTooltip(container, chart, () => spotS, param => {
     const v = param.seriesData.get(spotS); if (!v) return null;
     return `<div style="font-size:9px;color:var(--text3,#6e7681);margin-bottom:4px;">${typeof param.time === 'string' ? param.time : ''}</div>` +
-      `<div>${ccy}/USD &nbsp;<span style="color:${_bl};font-weight:700">${v.value.toFixed(_dec)}</span></div>`;
+      `<div>${label} &nbsp;<span style="color:${_bl};font-weight:700">${v.value.toFixed(_dec)}</span></div>`;
   });
   return chart;
 }
@@ -1001,7 +1037,7 @@ function openCOTModal(ccy,data,opts){
     if(e.key==='ArrowRight')cotCycleCcy(1);
   };
   document.addEventListener('keydown',esc);bd._esc=esc;
-  bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy,history,meta};
+  bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy,history,meta,assetClass:_assetClass};
   bd._ccy=ccy;bd._availCcys=_avail;bd._assetClass=_assetClass;
 
   // Restore whichever tab was active before switching currency (better UX than
@@ -1068,7 +1104,8 @@ function cotTab(el,tabId){
         // Build both charts together after flex heights settle (same pattern as split tab)
         const statusEl=document.getElementById('cot-net-price-status');
         const titleEl=document.getElementById('cot-spot-ct');
-        if(titleEl)titleEl.textContent=d.ccy+'/USD · DAILY SPOT CLOSE';
+        const spotLabel=_cotSpotLabel(d.ccy,d.assetClass);
+        if(titleEl)titleEl.textContent=spotLabel+' · DAILY SPOT CLOSE';
         // Kick off async fetch immediately so it overlaps with the 150ms wait
         const spotPromise=_fetchCOTSpot(d.ccy);
         setTimeout(()=>requestAnimationFrame(()=>{
@@ -1079,7 +1116,7 @@ function cotTab(el,tabId){
               const filtered=(spotData||[]).filter(p=>p.time>=d.dates[0]);
               if(filtered.length){
                 if(statusEl)statusEl.textContent='';
-                _buildSpotChart(ws,filtered,d.ccy);
+                _buildSpotChart(ws,filtered,spotLabel);
               } else {
                 if(statusEl)statusEl.textContent='Spot data unavailable';
                 ws._built=false;
