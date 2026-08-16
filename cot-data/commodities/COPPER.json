@@ -4,7 +4,7 @@
   "shortPositions": 14929,
   "positionCategory": "Managed Money (speculative)",
   "secondaryCategory": "Swap Dealers",
-  "tertiaryCategory": "Producer/Merchant/Processor/User (commercial hedgers)",
+  "tertiaryCategory": "Producer/Merchant",
   "assetClass": "commodity",
   "displayName": "Copper",
   "assetManagerNet": 5198,
@@ -13,7 +13,17 @@
   "dealerNet": -96745,
   "dealerLong": 32040,
   "dealerShort": 128785,
+  "wowNetChange": 3084,
+  "levNetPctOI": 73.0,
   "history": [
+    {
+      "weekEnding": "2025-08-19",
+      "levNet": 25105,
+      "levLong": 38395,
+      "levShort": 13290,
+      "assetManagerNet": 13739,
+      "dealerNet": -50592
+    },
     {
       "weekEnding": "2025-08-26",
       "levNet": 27637,
@@ -416,14 +426,6 @@
     },
     {
       "weekEnding": "2026-08-11",
-      "levNet": 80880,
-      "levLong": 95809,
-      "levShort": 14929,
-      "assetManagerNet": 5198,
-      "dealerNet": -96745
-    },
-    {
-      "weekEnding": "2026-08-16",
       "levNet": 80880,
       "levLong": 95809,
       "levShort": 14929,
