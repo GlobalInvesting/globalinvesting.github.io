@@ -4,7 +4,7 @@
   "shortPositions": 14929,
   "positionCategory": "Managed Money (speculative)",
   "secondaryCategory": "Swap Dealers",
-  "tertiaryCategory": "Producer/Merchant",
+  "tertiaryCategory": "Producer/Merchant/Processor/User (commercial hedgers)",
   "assetClass": "commodity",
   "displayName": "Copper",
   "assetManagerNet": 5198,
@@ -13,17 +13,7 @@
   "dealerNet": -96745,
   "dealerLong": 32040,
   "dealerShort": 128785,
-  "wowNetChange": 61624,
-  "levNetPctOI": 73.0,
   "history": [
-    {
-      "weekEnding": "2021-02-16",
-      "levNet": 87312,
-      "levLong": 118463,
-      "levShort": 31151,
-      "assetManagerNet": 23405,
-      "dealerNet": null
-    },
     {
       "weekEnding": "2021-02-23",
       "levNet": 70531,
@@ -425,6 +415,14 @@
       "dealerNet": null
     },
     {
+      "weekEnding": "2026-08-11",
+      "levNet": 80880,
+      "levLong": 95809,
+      "levShort": 14929,
+      "assetManagerNet": 5198,
+      "dealerNet": -96745
+    },
+    {
       "weekEnding": "2026-08-16",
       "levNet": 80880,
       "levLong": 95809,
@@ -438,5 +436,5 @@
   "sourceUrl": "https://www.cftc.gov/dea/options/other_lof.htm",
   "reportDate": "2026-08-16",
   "lastUpdate": "2026-08-16",
-  "weekEnding": "2026-08-16"
+  "weekEnding": "2026-08-11"
 }
