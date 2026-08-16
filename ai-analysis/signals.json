@@ -1,63 +1,63 @@
 {
-  "generated_at": "2026-08-15T20:23:15Z",
+  "generated_at": "2026-08-16T20:23:09Z",
   "signals": [
     {
-      "time": "21:01",
+      "time": "21:00",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical Risk + Strait of Hormuz Escalation",
-      "text": "Trump's declaration of the Strait of Hormuz as U.S. territory and subsequent Iranian threats create a massive safe-haven bid for JPY into the Sydney open. This geopolitical shock targets a rapid unwind of the JPY COT net short of -59.5k as the pair closed Friday at 159.31, below its SMA20 and SMA50. The escalation overrides the 264bp USD/JPY OIS carry advantage as markets price in maritime passage disruptions. Trade bias: Bearish USD/JPY on safe-haven JPY demand. Catalyst: Sydney open at 21:00 UTC. Risk: De-escalation headlines or unexpected Fed hawkishness.",
+      "text": "Trump's declaration of intent to claim the Strait of Hormuz as U.S. territory alongside projectile strikes on a bulk carrier drives an immediate safe-haven bid for the JPY. Despite a +264bp OIS carry advantage for USD, the JPY COT short position of -59.5k (pctl 73) faces squeeze risk as volatility rises from the Friday close of 159.27. Geopolitical escalation typically triggers JPY repatriation, overriding the 1.51% US real rate restrictive advantage. Trade bias: Bearish USD/JPY into the Sydney open; safe-haven demand outweighs carry. Catalyst: Sydney/Tokyo market open on 16 Aug. Risk: De-escalation headlines or a sudden rise in US 10Y yields above 4.75%.",
       "evidence": [
-        "Trump: Pretty soon will be declaring Strait of Hormuz territory of the US",
-        "JPY COT net short -59.5k (35.3% long)",
-        "USD/JPY closed 159.31 (below SMA20/50)"
+        "Trump headline: Hormuz as US territory",
+        "UKMTO report: Bulk carrier hit by projectile",
+        "USD/JPY Friday close: 159.27"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "23:35",
+      "time": "21:00",
       "priority": "critical",
-      "title": "CAD/JPY — G10 Bilateral Theme + Energy Supply Risk",
-      "text": "CAD emerges as the G10 leader with a 1W average of +1.079% (n=3) while JPY lags at -1.018% (n=7), creating a 2.097% spread that favors the cross. Crude oil's 1.42% Friday gain and Hormuz transit threats bolster the CAD/JPY +125bp carry advantage as CAD ESI (+10.3) outperforms JPY. The risk of a safe-haven JPY squeeze remains the primary headwind to this otherwise dominant trend. Trade bias: Bullish CAD/JPY on energy-linked CAD strength. Catalyst: Sydney open at 21:00 UTC. Risk: JPY safe-haven spike on Strait of Hormuz military escalation.",
+      "title": "CAD/JPY — G10 Bilateral Theme + Monetary Divergence",
+      "text": "CAD emerges as the G10 leader with a 1W average of +1.052% while JPY lags at -0.974%, creating a strong bilateral spread of 2.026%. The CAD/JPY pair is supported by a +125bp carry advantage and a positive ESI of +10.3, though safe-haven JPY demand following weekend geopolitical events is likely to test this trend. Leveraged funds are net short CAD -92.4k (pctl 12), suggesting any further CAD outperformance is likely to trigger a violent short-covering rally. Trade bias: Bullish CAD/JPY on a 1W momentum basis; divergence in data surprises supports CAD. Catalyst: Sydney/Tokyo open on 16 Aug. Risk: Broad risk-off sentiment favoring JPY safe-haven flows due to Hormuz escalation.",
       "evidence": [
-        "CAD 1W avg: +1.079% (n=3)",
-        "JPY 1W avg: -1.018% (n=7)",
-        "G10 spread: 2.097%"
+        "CAD 1W avg: +1.052% (n=3)",
+        "JPY 1W avg: -0.974% (n=7)",
+        "G10 spread: 2.026%"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "20:20",
+      "time": "20:22",
       "priority": "warning",
-      "title": "AUD/USD — Crowded COT Long + Negative ESI Friction",
-      "text": "AUD COT LF net long +45.7k (74.6% long) creates significant crowded-long unwind risk if global risk sentiment sours over Middle East tensions. While AUD/USD closed Friday at 0.7087 with a +73bp OIS carry advantage, the negative AUD ESI (-11.1) suggests data is already disappointing relative to the restrictive +0.55% real rate. The upcoming RBNZ meeting on 2 Sep may also drag on the AUD via regional proxy sentiment. Trade bias: Bearish AUD/USD on positioning unwind. Catalyst: Sydney open at 21:00 UTC. Risk: AUD/USD breaks above 0.7100 on broader USD weakness.",
+      "title": "AUD/USD — Positioning Risk + Contrarian Sentiment",
+      "text": "AUD COT LF net long +45.7k (74.6% long) sits at a 75th percentile, creating a crowded-long risk as AUD/USD closed Friday at 0.7092. Retail sentiment is extremely short at 80%, providing a contrarian bid, but the -11.1 ESI indicates domestic data is failing to meet expectations. The 73bp OIS carry advantage for AUD provides a buffer, but the pair's position above all major SMAs leaves it vulnerable to profit-taking. Trade bias: Neutral/Bearish AUD/USD; crowded spec longs and poor economic surprises cap upside. Catalyst: Sydney open on 16 Aug. Risk: Sudden hawkish shift in RBA expectations or a break above the SMA200 at 0.6939 reinforcing momentum.",
       "evidence": [
-        "AUD COT net long +45.7k (74.6% long)",
-        "AUD ESI: -11.1 (negative bias)",
-        "AUD/USD OIS carry: +73bp favoring AUD"
+        "AUD COT LF long +45.7k (74.6% long)",
+        "Retail Sentiment: 80% Short",
+        "AUD ESI: -11.1"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
-      "time": "19:39",
+      "time": "20:22",
       "priority": "warning",
-      "title": "GBP/USD — Retail Extreme + Divergent Options Skew",
-      "text": "GBP/USD retail sentiment is at a strong 75% short extreme, providing a contrarian bullish signal for a pair already trading above all major SMAs (20/50/200). GBP COT net long +42.7k (71.9% long) aligns with this trend, though the elevated +5.0% Vol Risk Premium (IV 11.0% vs HV 6.0%) indicates heavy demand for downside protection. The neutral -11bp OIS carry differential makes the pair highly sensitive to the upcoming UK inflation data. Trade bias: Bullish GBP/USD on contrarian retail signals. Catalyst: Sydney open at 21:00 UTC. Risk: UK inflation miss triggers a pullback below SMA200 (1.3416).",
+      "title": "GBP/USD — Crowded Longs + Hedging Demand",
+      "text": "GBP COT LF net long +42.7k (pctl 90, z=+1.23) represents an extreme bullish consensus that creates significant downside risk if momentum stalls at 1.3533. Elevated options hedging demand is visible in the GBP/USD VRP of +5.0% (IV 11.0% vs HV30 6.0%), suggesting professionals are paying a high premium for protection against a GBP pullback. While the +1.15% real rate is restrictive, the 75% retail short bias warns that the path of least resistance remains higher until speculative longs liquidate. Trade bias: Bearish GBP/USD; extreme COT positioning and high VRP signal a potential exhaustion point. Catalyst: Sydney open on 16 Aug. Risk: UK inflation data beat or continued DXY weakness toward the 99.17 SMA200 level.",
       "evidence": [
-        "GBP Retail Sentiment: 75% short",
-        "GBP COT net long +42.7k",
-        "GBP/USD VRP: +5.0%"
+        "GBP COT LF pctl: 90 (Extreme Long)",
+        "VRP: +5.0% (IV 11.0% / HV 6.0%)",
+        "Retail Sentiment: 75% Short"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     },
     {
       "time": "20:22",
       "priority": "info",
-      "title": "NZD/USD — Yield Advantage Compression",
-      "text": "NZD/USD closed at 0.5894 as a net short COT position of -34.031k (only 6% long) sets up a squeeze ahead of the RBNZ meeting on 2 Sep. NZD maintains the most accommodative real rate in the G10 at -1.56%, yet recent data beats (ESI +9.6) support the RBNZ's hiking bias. A USD/NZD carry disadvantage of +125bp (OIS) limits the upside unless USD breakdown risk materializes. Trade bias: Bullish NZD/USD on short-squeeze risk. Catalyst: RBNZ meeting on 2 Sep. Risk: NZD/USD falls below SMA20 (0.5849).",
+      "title": "NZD/USD — Carry Compression",
+      "text": "NZD/USD closed at 0.5891 with the RBNZ holds at 2.5%. Speculative positioning is extremely short at -34.0k (pctl 2, z=-2.00), which sets up a massive short-squeeze potential if the Sept 2nd meeting delivers a hawkish outcome. Positive ESI (+9.6) confirms that New Zealand data is outperforming, providing a fundamental floor against the 125bp USD carry advantage. Trade bias: Bullish NZD/USD; extreme COT shorts and positive data surprises favor a squeeze higher. Catalyst: next RBNZ meeting (mkt: 85% hike priced) on 2 Sep. Risk: Broad USD strength driven by a failure of the DXY to break below 99.64.",
       "evidence": [
-        "NZD COT net short -34,031 (6% long)",
+        "NZD COT LF net: -34,031 (pctl 2)",
         "NZD ESI: +9.6",
-        "NZD real rate: -1.56%"
+        "RBNZ Rate: 2.5% (Hiking)"
       ],
       "_source": "gemini:gemini-3-flash-preview"
     }
