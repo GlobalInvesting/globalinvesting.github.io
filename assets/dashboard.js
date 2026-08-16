@@ -14538,9 +14538,18 @@ function initExclusivePanelNav() {
   var QUOTE_KEY_ALIAS = { 'XAUUSD': 'gold', 'XAGUSD': 'silver' };
 
   // Map watchlist symbol to TradingView FX_IDC symbol used by loadTVChart / sidebar handler.
-  // XAUUSD and XAGUSD use the same FX_IDC prefix — loadTVChart will fall back to TV widget
-  // if no OHLC file exists, which is the correct behaviour for commodities.
+  // FIX-WL-6 (v8.161.3): XAUUSD/XAGUSD were previously given the same generic
+  // FX_IDC: prefix as FX pairs — but _TV_TO_OHLC (dashboard.js) only recognises
+  // OANDA:XAUUSD/OANDA:XAGUSD as the keys that resolve to the Gold/Silver Futures
+  // LW chart. FX_IDC:XAUUSD/FX_IDC:XAGUSD matched no _TV_TO_OHLC entry, so every
+  // watchlist click on a metals row silently fell through to the TradingView
+  // widget fallback — the same incident already fixed for Retail FX Positioning's
+  // renderSentiment() (see RETAIL_SENT_METAL_TV_SYM). The comment previously here
+  // documented that fallback as "correct behaviour for commodities" — it was not;
+  // XAU/XAG have live OHLC data and should open the LW chart like every other
+  // watchlist symbol, with TradingView only as a true last-resort fallback.
   var TV_SYM_PREFIX = 'FX_IDC:';
+  var METAL_TV_SYM = { 'XAUUSD': 'OANDA:XAUUSD', 'XAGUSD': 'OANDA:XAGUSD' };
 
   // FIX-WL-4: In-memory fallback for environments where localStorage is blocked
   // (Privacy Badger, Tracking Prevention, Safari ITP, etc.).
@@ -14599,7 +14608,7 @@ function initExclusivePanelNav() {
       var chg = (q.pct != null) ? q.pct : null;
       var chgStr = (chg != null) ? ((chg >= 0 ? '+' : '') + chg.toFixed(2) + '%') : (quotesReady ? '—' : '···');
       var chgColor = (chg == null) ? 'var(--text3)' : (chg >= 0 ? 'var(--up)' : 'var(--down)');
-      var tvSym = TV_SYM_PREFIX + sym;
+      var tvSym = METAL_TV_SYM[sym] || (TV_SYM_PREFIX + sym);
       // data-sym makes this row compatible with the sidebar's delegated click handler
       // (line ~5650) which calls loadTVChart() + toggleSidebarDetail() automatically.
       // cursor:pointer and title match Crosses row conventions.
