@@ -3627,6 +3627,22 @@ function _lwBuildTodayBar(ohlcId) {
                 gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3,
                 silver:2,brent:2,dax:2,ftse:2,hsi:2,dji:2,hyoas:0,igoas:0 }[ohlcId] ?? 5;
   const c = parseFloat(q.close.toFixed(dec));
+  // Plausibility guard (defense-in-depth, v8.101.8/v8.101.9): an FX anchor
+  // candidate (open source or session H/L) more than 2% away from the live
+  // close is treated as unusable rather than trusted at face value — this is
+  // what actually deformed the Sunday-reopen candle every week (root cause:
+  // fetch_fx_prev_session() bailing out over the weekend, see
+  // fetch_intraday_quotes.py v3.18). The root cause is fixed there; this
+  // guard is a second, independent line of defense so that any OTHER stale/
+  // wrong single-field anchor (e.g. a future yfinance hiccup) can't
+  // reproduce the same deformed-body symptom silently. Hoisted to function
+  // scope (v8.101.9 — was a `const` declared inside the open-anchor
+  // `if (isFxBar)` block, out of scope for the separate session-H/L
+  // `if (isFxBar)` block below, throwing "ReferenceError: _isPlausibleAnchor
+  // is not defined" and taking down _lwBuildTodayBar/_renderLWChart entirely
+  // for every FX pair — silently falling back to the TradingView iframe
+  // widget instead of the native LWC chart).
+  const _isPlausibleAnchor = (v) => v != null && v > 0 && Math.abs(v - c) / c <= 0.02;
   // Candle open convention:
   //   FX pairs  → prev_bar.close (open = the previous session's REAL close, self-computed
   //               every 5 min from 1H bars over the exact 21:00 UTC boundary — see
@@ -3646,15 +3662,6 @@ function _lwBuildTodayBar(ohlcId) {
     // (fetch_fx_prev_session — previously wired into quotes.json only for gap-window
     // historical-bar injection, never used to anchor the LIVE today-bar). It is correct
     // from the instant the new session opens, with no lag window.
-    // Plausibility guard (defense-in-depth, v8.101.8): an anchor candidate more
-    // than 2% away from the live close is treated as unusable rather than
-    // trusted at face value — this is what actually deformed the Sunday-reopen
-    // candle every week (root cause: fetch_fx_prev_session() bailing out over
-    // the weekend, see fetch_intraday_quotes.py v3.18). The root cause is fixed
-    // there; this guard is a second, independent line of defense so that any
-    // OTHER stale/wrong single-field anchor (e.g. a future yfinance hiccup)
-    // can't reproduce the same deformed-body symptom silently.
-    const _isPlausibleAnchor = (v) => v != null && v > 0 && Math.abs(v - c) / c <= 0.02;
     o = _isPlausibleAnchor(q.prev_bar && q.prev_bar.close)
       ? parseFloat(q.prev_bar.close.toFixed(dec))
       : (_isPlausibleAnchor(q.prev_close)
