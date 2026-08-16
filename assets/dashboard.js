@@ -936,21 +936,9 @@ function fmtOI(n) {
   return n.toString();
 }
 
-async function fetchCOTData() {
-  const promises = COT_CURRENCIES.map(async ccy => {
-    try {
-      const r = await fetch('./cot-data/' + ccy + '.json');
-      if (!r.ok) return null;
-      const data = await r.json();
-      return { ccy, ...data };
-    } catch { return null; }
-  });
-
-  const results = (await Promise.all(promises)).filter(Boolean);
-  if (!results.length) return;
-
-  // Timestamp label — "CFTC · week ending 2026-03-28 · updated Sat 04 Apr · loaded HH:MM TZ · N days ago"
-  const latest = results[0];
+// Builds the "CFTC · week ending … · updated … · loaded … · Nd lag" label
+// used by both the FX and Indices COT tabs.
+function _buildCOTUpdateLabel(latest) {
   const weekEnd = latest.weekEnding || latest.reportDate || '';
   let updLabel = 'TFF · Leveraged Funds · week ending ' + weekEnd;
   if (latest.lastUpdate) {
@@ -961,37 +949,34 @@ async function fetchCOTData() {
       }
     } catch {}
   }
-  // Add local load timestamp so traders know data freshness in their timezone
   const _cotNow = new Date();
   const _cotHHMM = _cotNow.getHours().toString().padStart(2,'0') + ':' + _cotNow.getMinutes().toString().padStart(2,'0');
   const _cotTZ = _cotNow.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
   updLabel += ' · loaded ' + _cotHHMM + ' ' + _cotTZ;
 
-  // ── Lag indicator: days since week-ending date ──────────────────────────────
-  // COT data has a structural lag: CFTC reports Tuesday positions on Friday,
-  // terminal updates Saturday. Show the lag visually so traders can judge staleness.
   let lagHtml = '';
   if (weekEnd) {
     try {
       const msPerDay = 86400000;
       const lagDays  = Math.floor((_cotNow.getTime() - new Date(weekEnd + 'T00:00:00Z').getTime()) / msPerDay);
       if (lagDays >= 0) {
-        // Freshness: ≤7d = green (just published), ≤14d = amber (one cycle old), >14d = red (stale)
         const lagColor = lagDays <= 7 ? 'var(--up)' : lagDays <= 14 ? '#c8952a' : 'var(--down)';
         const lagDot   = lagDays <= 7 ? '●' : lagDays <= 14 ? '◐' : '○';
         lagHtml = ` · <span title="Days since week-ending date · CFTC publishes Fri, terminal updates Sat" style="color:${lagColor};font-variant-numeric:tabular-nums;">${lagDot} ${lagDays}d lag</span>`;
       }
     } catch {}
   }
+  return updLabel + lagHtml;
+}
 
-  const subEl = document.getElementById('cot-date-sub');
-  if (subEl) subEl.innerHTML = updLabel + lagHtml;
-
+// Renders COT rows (FX currencies or equity indices) into #cot-rows and wires
+// row-click → modal. Shared by fetchCOTData() (FX tab) and fetchCOTIndicesData()
+// (Indices tab) so both tabs use identical row markup/behavior.
+function _renderCOTRows(results, symMap, dataStoreKey) {
   const container = document.getElementById('cot-rows');
   if (!container) return;
 
   // Sort rows by Long% descending — industry standard for COT panels
-  // Most bullishly positioned currencies appear at the top for quick scanning
   results.sort((a, b) => {
     const totalA = (a.longPositions || 0) + (a.shortPositions || 0);
     const totalB = (b.longPositions || 0) + (b.shortPositions || 0);
@@ -1001,8 +986,8 @@ async function fetchCOTData() {
   });
 
   // Expose full COT data for the modal chart
-  window.COT_DATA_STORE = window.COT_DATA_STORE || {};
-  results.forEach(d => { window.COT_DATA_STORE[d.ccy] = d; });
+  window[dataStoreKey] = window[dataStoreKey] || {};
+  results.forEach(d => { window[dataStoreKey][d.ccy] = d; });
 
   container.innerHTML = results.map(d => {
     const net   = d.netPosition || 0;
@@ -1075,7 +1060,7 @@ async function fetchCOTData() {
     }
 
     // TradingView COT chart symbol for row click
-    const tvSym = COT_TV_SYMBOLS[d.ccy] || '';
+    const tvSym = (symMap && symMap[d.ccy]) || '';
 
     return '<div class="cot-row" style="cursor:pointer;" data-sym="' + tvSym + '" data-ccy="' + d.ccy + '" title="Click to open ' + d.ccy + ' COT positioning detail">'
       + '<span class="cot-sym">' + d.ccy + '</span>'
@@ -1096,7 +1081,7 @@ async function fetchCOTData() {
   container.querySelectorAll('.cot-row[data-sym]').forEach(row => {
     row.addEventListener('click', () => {
       const ccy  = row.dataset.ccy;
-      const data = window.COT_DATA_STORE && window.COT_DATA_STORE[ccy];
+      const data = window[dataStoreKey] && window[dataStoreKey][ccy];
       if (ccy && data && typeof window.openCOTModal === 'function') {
         window.openCOTModal(ccy, data);
       } else {
@@ -1104,6 +1089,110 @@ async function fetchCOTData() {
         if (sym) loadCOTChart(sym);
       }
     });
+  });
+}
+
+async function fetchCOTData() {
+  const promises = COT_CURRENCIES.map(async ccy => {
+    try {
+      const r = await fetch('./cot-data/' + ccy + '.json');
+      if (!r.ok) return null;
+      const data = await r.json();
+      return { ccy, ...data };
+    } catch { return null; }
+  });
+
+  const results = (await Promise.all(promises)).filter(Boolean);
+  if (!results.length) return;
+
+  // Cache raw results so the asset-class tab switcher can restore this tab
+  // instantly without re-fetching when the user flips back from Indices.
+  window._cotFXResults = results;
+
+  const subEl = document.getElementById('cot-date-sub');
+  if (subEl && (!window._cotActiveAsset || window._cotActiveAsset === 'fx')) {
+    subEl.innerHTML = _buildCOTUpdateLabel(results[0]);
+  }
+
+  if (!window._cotActiveAsset || window._cotActiveAsset === 'fx') {
+    _renderCOTRows(results, COT_TV_SYMBOLS, 'COT_DATA_STORE');
+  }
+}
+
+// Equity-index COT data — cot-data/indices/{SPX,NAS100,DJ30}.json, written by
+// update-cot-cftc-all.yml's Indices loop (v8.160.0). Lazy-fetched on first
+// click of the "Indices" tab; cached in window._cotIndicesResults afterwards.
+const COT_INDICES = ['SPX', 'NAS100', 'DJ30'];
+
+async function fetchCOTIndicesData() {
+  const container = document.getElementById('cot-rows');
+  const subEl = document.getElementById('cot-date-sub');
+  if (container) container.innerHTML = '<div class="cot-row" style="color:var(--text3);"><span>Loading index positioning data…</span></div>';
+
+  const promises = COT_INDICES.map(async sym => {
+    try {
+      const r = await fetch('./cot-data/indices/' + sym + '.json');
+      if (!r.ok) return null;
+      const data = await r.json();
+      return { ccy: sym, ...data };
+    } catch { return null; }
+  });
+
+  const results = (await Promise.all(promises)).filter(Boolean);
+  window._cotIndicesResults = results;
+
+  if (!results.length) {
+    if (container) container.innerHTML = '<div class="cot-row" style="color:var(--text3);"><span>Index positioning data not yet published — pending next CFTC TFF run.</span></div>';
+    if (subEl) subEl.innerHTML = 'TFF · Leveraged Funds · S&amp;P 500 / Nasdaq-100 / DJIA futures';
+    return;
+  }
+
+  if (subEl) subEl.innerHTML = _buildCOTUpdateLabel(results[0]);
+  _renderCOTRows(results, {}, 'COT_DATA_STORE_INDICES');
+}
+
+// ── COT panel asset-class tabs (FX / Indices) ──
+function initCOTAssetTabs() {
+  const tabBar = document.getElementById('cot-asset-tabs');
+  if (!tabBar) return;
+  window._cotActiveAsset = 'fx';
+  tabBar.addEventListener('click', e => {
+    const btn = e.target.closest('.rates-ctab');
+    if (!btn) return;
+    const asset = btn.dataset.asset;
+    if (asset === window._cotActiveAsset) return;
+    window._cotActiveAsset = asset;
+
+    tabBar.querySelectorAll('.rates-ctab').forEach(b => {
+      const isActive = b === btn;
+      b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      b.style.background = isActive ? 'var(--accent)' : 'none';
+      b.style.color = isActive ? '#fff' : 'var(--text2)';
+      b.style.border = isActive ? 'none' : '1px solid var(--border2)';
+      b.style.fontWeight = isActive ? '600' : '400';
+    });
+
+    if (asset === 'fx') {
+      const subEl = document.getElementById('cot-date-sub');
+      if (window._cotFXResults && window._cotFXResults.length) {
+        if (subEl) subEl.innerHTML = _buildCOTUpdateLabel(window._cotFXResults[0]);
+        _renderCOTRows(window._cotFXResults.slice(), COT_TV_SYMBOLS, 'COT_DATA_STORE');
+      } else {
+        fetchCOTData();
+      }
+    } else if (asset === 'indices') {
+      if (window._cotIndicesResults) {
+        const subEl = document.getElementById('cot-date-sub');
+        if (window._cotIndicesResults.length) {
+          if (subEl) subEl.innerHTML = _buildCOTUpdateLabel(window._cotIndicesResults[0]);
+          _renderCOTRows(window._cotIndicesResults.slice(), {}, 'COT_DATA_STORE_INDICES');
+        } else {
+          fetchCOTIndicesData();
+        }
+      } else {
+        fetchCOTIndicesData();
+      }
+    }
   });
 }
 
@@ -2035,6 +2124,7 @@ async function fetchSentiment() {
           shortPos: p.shortPos  || 0,
           avgL:     p.avgLongPx || 0,
           avgS:     p.avgShortPx|| 0,
+          assetClass: p.assetClass || 'fx',
         }));
         const ageLabel = ageMin < 60
           ? Math.round(ageMin) + 'min ago'
@@ -2052,7 +2142,7 @@ async function fetchSentiment() {
             avgS: p.avgS || 0,
           };
         });
-        renderSentiment(pairs, 'Myfxbook · ' + ageLabel, general);
+        _setSentimentSource(pairs, 'Myfxbook · ' + ageLabel, general);
         return;
       }
     }
@@ -2071,8 +2161,12 @@ async function fetchSentiment() {
           sym:  (d.instrument||d.sym||'').replace('_','/'),
           buy:  Math.round(d.longVolume || d.buy || 50),
           sell: Math.round(d.shortVolume || d.sell || 50),
+          assetClass: 'fx',
         })).filter(d=>d.sym);
-        if (mapped.length) { renderSentiment(mapped, 'Retail \u00b7 live'); return; }
+        // Dukascopy doesn't publish metals sentiment — carry over any Metals
+        // rows already cached from Myfxbook so switching tabs doesn't blank out.
+        const cachedMetals = (window._sentAllPairs || []).filter(p => p.assetClass === 'metal');
+        if (mapped.length) { _setSentimentSource(mapped.concat(cachedMetals), 'Retail \u00b7 live'); return; }
       }
     }
   } catch {}
@@ -2081,7 +2175,54 @@ async function fetchSentiment() {
   // COT data is intentionally excluded from this fallback pipeline:
   // it belongs to its own dedicated section in the terminal and has
   // different semantics (speculative positioning, weekly) vs retail sentiment.
-  renderSentiment(SENTIMENT_FALLBACK, 'Static fallback · live feeds unavailable');
+  const fallbackPairs = SENTIMENT_FALLBACK.map(p => ({ ...p, assetClass: 'fx' }));
+  _setSentimentSource(fallbackPairs, 'Static fallback · live feeds unavailable');
+}
+
+// Caches the full (FX+Metals) pair set from whichever source just resolved,
+// then renders whichever asset class is currently active in #sent-asset-tabs.
+function _setSentimentSource(pairs, sourceLabel, general) {
+  window._sentAllPairs    = pairs;
+  window._sentSourceLabel = sourceLabel;
+  window._sentGeneral     = general || null;
+  _renderSentimentForActiveTab();
+}
+
+function _renderSentimentForActiveTab() {
+  const pairs = window._sentAllPairs || [];
+  const asset = window._sentActiveAsset || 'fx';
+  const filtered = pairs.filter(p => (p.assetClass || 'fx') === asset);
+  if (asset === 'metals' && !filtered.length) {
+    const container = document.getElementById('sent-rows');
+    if (container) container.innerHTML = '<div style="color:var(--text3);font-size:11px;padding:8px 0;">Metals sentiment unavailable from the current source.</div>';
+    return;
+  }
+  renderSentiment(filtered, window._sentSourceLabel, window._sentGeneral);
+}
+
+// ── Retail sentiment panel asset-class tabs (FX / Metals) ──
+function initSentimentAssetTabs() {
+  const tabBar = document.getElementById('sent-asset-tabs');
+  if (!tabBar) return;
+  window._sentActiveAsset = 'fx';
+  tabBar.addEventListener('click', e => {
+    const btn = e.target.closest('.rates-ctab');
+    if (!btn) return;
+    const asset = btn.dataset.asset;
+    if (asset === window._sentActiveAsset) return;
+    window._sentActiveAsset = asset;
+
+    tabBar.querySelectorAll('.rates-ctab').forEach(b => {
+      const isActive = b === btn;
+      b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      b.style.background = isActive ? 'var(--accent)' : 'none';
+      b.style.color = isActive ? '#fff' : 'var(--text2)';
+      b.style.border = isActive ? 'none' : '1px solid var(--border2)';
+      b.style.fontWeight = isActive ? '600' : '400';
+    });
+
+    _renderSentimentForActiveTab();
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -14196,6 +14337,8 @@ function initExclusivePanelNav() {
 (function bootNewFeatures() {
   const run = async () => {
     initG8RatesTabs();
+    initCOTAssetTabs();
+    initSentimentAssetTabs();
     initExclusivePanelNav();
 
     // Load CB policy rates, OIS benchmark rates, and intraday quotes in parallel.
