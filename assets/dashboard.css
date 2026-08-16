@@ -679,7 +679,7 @@
   /* COT */
   .cot-header {
     display: grid;
-    grid-template-columns: 48px 1fr 42px 64px 52px 14px 46px 68px;
+    grid-template-columns: 58px 1fr 42px 64px 52px 14px 46px 68px;
     align-items: center; gap: 8px;
     padding: 3px 0 4px 0;
     border-bottom: 1px solid var(--border2);
@@ -687,7 +687,7 @@
   }
   .cot-row {
     display: grid;
-    grid-template-columns: 48px 1fr 42px 64px 52px 14px 46px 68px;
+    grid-template-columns: 58px 1fr 42px 64px 52px 14px 46px 68px;
     align-items: center; gap: 8px;
     padding: 3px 0; border-bottom: 1px solid var(--border);
     cursor: pointer; transition: background .1s;
@@ -695,11 +695,12 @@
   .cot-row:hover { background: var(--bg3); }
   .cot-row:last-child { border-bottom: none; }
   /* overflow:hidden + ellipsis is a safety net, not the primary fix — the
-     48px track above is sized for the longest symbol currently shown
-     (NAS100/COPPER/NATGAS, 6 chars). Ellipsis just prevents a future
-     longer symbol from bleeding into the Long/Short bar column instead
-     of silently overlapping it (v8.160.4 incident: "NAS100" at the old
-     36px currency-code-only width visually overlapped .cot-bar-outer). */
+     58px track above (widened from 48px in v8.161.2 — "COPPER" was still
+     clipping to "COPP…" at 48px, confirmed by screenshot) is sized for the
+     longest symbol currently shown (NAS100/COPPER/NATGAS, 6 chars). Ellipsis
+     just prevents a future longer symbol from bleeding into the Long/Short
+     bar column instead of silently overlapping it (v8.160.4 incident: "NAS100"
+     at the old 36px currency-code-only width visually overlapped .cot-bar-outer). */
   .cot-sym { font-weight: 700; color: #fff; font-family: var(--font-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* Contained horizontal scroll when #rightpanel is resized narrower than the grid's
      fixed-column total (378px) — matches institutional dense-grid convention: scroll
@@ -710,7 +711,7 @@
   .cot-scroll-wrap { overflow-x: auto; }
   .cot-scroll-wrap::-webkit-scrollbar { height: 3px; }
   .cot-scroll-wrap::-webkit-scrollbar-thumb { background: var(--border2); }
-  .cot-header, .cot-row { min-width: 426px; }
+  .cot-header, .cot-row { min-width: 436px; }
   .cot-bar-outer { height: 10px; min-width: 36px; background: var(--bg3); position: relative; overflow: hidden; }
   .cot-long-fill  { position: absolute; left: 0;  top: 0; height: 100%; background: var(--up);   opacity: .75; }
   .cot-short-fill { position: absolute; right: 0; top: 0; height: 100%; background: var(--down); opacity: .75; }
@@ -1460,7 +1461,9 @@
     }
     .cot-header,
     .cot-row {
-      grid-template-columns: 38px 60px 30px 48px 40px 10px 40px 52px;
+      /* First column widened 38px → 44px in v8.161.2 alongside the desktop
+         fix — "COPPER" (6 chars) was clipping here too at the smaller track. */
+      grid-template-columns: 44px 60px 30px 48px 40px 10px 40px 52px;
       gap: 4px;
       min-width: 0;
     }

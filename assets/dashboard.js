@@ -1801,6 +1801,11 @@ const COT_SENTIMENT_CACHE = {};
 // Retail sentiment cache — populated by fetchSentiment() from myfxbook.json
 // keyed by normalised sym e.g. "EUR/USD" → { longPct, shortPct, longPos, shortPos, avgL, avgS }
 const RETAIL_SENTIMENT_CACHE = {};
+// Retail FX Positioning: metals rows (myfxbook sym 'XAU/USD'/'XAG/USD') must map
+// to the OANDA: TradingView symbols that _TV_TO_OHLC recognises as 'gold'/'silver',
+// not the generic FX_IDC: prefix used for currency pairs — see loadTVChart() call
+// site below in renderSentiment() for the incident this fixes.
+const RETAIL_SENT_METAL_TV_SYM = { 'XAU/USD': 'OANDA:XAUUSD', 'XAG/USD': 'OANDA:XAGUSD' };
 // Static sentiment fallback (last resort only)
 const SENTIMENT_FALLBACK = [
   { sym:'EUR/USD', buy:56, sell:44 }, { sym:'GBP/USD', buy:51, sell:49 },
@@ -1963,7 +1968,12 @@ function renderSentiment(pairs, sourceLabel, general) {
     }
 
     const distSign = distPct !== null && distPct >= 0 ? '+' : '';
-    const tvSym = 'FX_IDC:' + p.sym.replace('/', '');
+    // Metals rows need the OANDA: prefix to match _TV_TO_OHLC's 'gold'/'silver'
+    // entries and load the Gold/Silver Futures LW chart. The generic FX_IDC:
+    // prefix used for currency pairs below has no _TV_TO_OHLC entry for XAUUSD/
+    // XAGUSD, so it was silently falling through to the TradingView widget
+    // fallback for every Retail FX Positioning click on a metals row.
+    const tvSym = RETAIL_SENT_METAL_TV_SYM[p.sym] || ('FX_IDC:' + p.sym.replace('/', ''));
 
     // ── Compact single-row layout ──
     const row = document.createElement('div');
