@@ -716,12 +716,25 @@ function openCOTModal(ccy,data,opts){
   const amData=history.map(h=>h.assetManagerNet??null);
   const ddData=history.map(h=>h.dealerNet??null);
 
-  // Currency switcher — cycles/picks from whatever is already cached in COT_DATA_STORE,
-  // so switching never triggers a re-fetch. G10_CCYS order kept canonical; filtered to
-  // currencies that actually have data loaded (a failed fetch for one ccy shouldn't
-  // produce a dead entry in the switcher).
-  const _store=window.COT_DATA_STORE||{};
-  const _order=(typeof G10_CCYS!=='undefined'?G10_CCYS:['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK']);
+  // Currency/symbol switcher — cycles/picks from whatever is already cached in the
+  // matching store, so switching never triggers a re-fetch.
+  // FIX (v8.161.4): this always read window.COT_DATA_STORE (FX only) with the G10_CCYS
+  // order, regardless of what asset class the modal was actually showing — so opening
+  // the switcher on a commodity (XAU) or index (DJ30) row listed FX currencies that
+  // don't even exist in that store, instead of sibling commodities/indices. The three
+  // tabs (FX/Indices/Commodities) each populate their own store
+  // (COT_DATA_STORE / COT_DATA_STORE_INDICES / COT_DATA_STORE_COMMODITIES, see
+  // dashboard.js _renderCOTRows call sites) — the switcher must pick the store+order
+  // matching data.assetClass, not assume FX every time.
+  const _assetClass=data.assetClass||'currency';
+  const _storeByClass={
+    commodity:   {store:window.COT_DATA_STORE_COMMODITIES, order:(typeof COT_COMMODITIES!=='undefined'?COT_COMMODITIES:['XAU','XAG','COPPER','WTI'])},
+    equityIndex: {store:window.COT_DATA_STORE_INDICES,      order:(typeof COT_INDICES!=='undefined'?COT_INDICES:['SPX','NAS100','DJ30'])},
+    currency:    {store:window.COT_DATA_STORE,              order:(typeof G10_CCYS!=='undefined'?G10_CCYS:['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'])},
+  };
+  const _sel=_storeByClass[_assetClass]||_storeByClass.currency;
+  const _store=_sel.store||{};
+  const _order=_sel.order;
   const _avail=_order.filter(c=>_store[c]);
   const _idx=_avail.indexOf(ccy);
 
@@ -989,7 +1002,7 @@ function openCOTModal(ccy,data,opts){
   };
   document.addEventListener('keydown',esc);bd._esc=esc;
   bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy,history,meta};
-  bd._ccy=ccy;bd._availCcys=_avail;
+  bd._ccy=ccy;bd._availCcys=_avail;bd._assetClass=_assetClass;
 
   // Restore whichever tab was active before switching currency (better UX than
   // Bloomberg/Eikon, which reset to the default view on instrument change).
@@ -1003,7 +1016,16 @@ function openCOTModal(ccy,data,opts){
 function cotSwitchCcy(newCcy){
   const bd=document.getElementById('cot-bd');
   if(!bd||newCcy===bd._ccy)return;
-  const data=window.COT_DATA_STORE&&window.COT_DATA_STORE[newCcy];
+  // FIX (v8.161.4): must read from the same store the switcher list was built from
+  // (COT_DATA_STORE_COMMODITIES / _INDICES / plain FX), not always FX — see
+  // openCOTModal's _storeByClass for the matching lookup this mirrors.
+  const _storeMap={
+    commodity:   window.COT_DATA_STORE_COMMODITIES,
+    equityIndex: window.COT_DATA_STORE_INDICES,
+    currency:    window.COT_DATA_STORE,
+  };
+  const _newStore=_storeMap[bd._assetClass||'currency']||window.COT_DATA_STORE;
+  const data=_newStore&&_newStore[newCcy];
   if(!data)return;
   const activeTabEl=document.querySelector('.cot-tab.on');
   const activeTab=activeTabEl?activeTabEl.getAttribute('data-tab'):'overview';
