@@ -3646,11 +3646,20 @@ function _lwBuildTodayBar(ohlcId) {
     // (fetch_fx_prev_session — previously wired into quotes.json only for gap-window
     // historical-bar injection, never used to anchor the LIVE today-bar). It is correct
     // from the instant the new session opens, with no lag window.
-    o = q.prev_bar && q.prev_bar.close != null && q.prev_bar.close > 0
+    // Plausibility guard (defense-in-depth, v8.101.8): an anchor candidate more
+    // than 2% away from the live close is treated as unusable rather than
+    // trusted at face value — this is what actually deformed the Sunday-reopen
+    // candle every week (root cause: fetch_fx_prev_session() bailing out over
+    // the weekend, see fetch_intraday_quotes.py v3.18). The root cause is fixed
+    // there; this guard is a second, independent line of defense so that any
+    // OTHER stale/wrong single-field anchor (e.g. a future yfinance hiccup)
+    // can't reproduce the same deformed-body symptom silently.
+    const _isPlausibleAnchor = (v) => v != null && v > 0 && Math.abs(v - c) / c <= 0.02;
+    o = _isPlausibleAnchor(q.prev_bar && q.prev_bar.close)
       ? parseFloat(q.prev_bar.close.toFixed(dec))
-      : (q.prev_close != null && q.prev_close > 0
+      : (_isPlausibleAnchor(q.prev_close)
           ? parseFloat(q.prev_close.toFixed(dec))
-          : (q.open != null && q.open > 0 ? parseFloat(q.open.toFixed(dec)) : c));
+          : (_isPlausibleAnchor(q.open) ? parseFloat(q.open.toFixed(dec)) : c));
   } else {
     // Non-FX: use the real session open (regularMarketOpen)
     o = q.open != null && q.open > 0
@@ -3665,8 +3674,7 @@ function _lwBuildTodayBar(ohlcId) {
     // through the early hours of Monday UTC until real intraday ticks accumulate).
     // If session H/L are unavailable (e.g. at session open when 0 bars have been
     // aggregated yet), fall back to the o/c range only — never to stale dayH/dayL.
-    if (q.session_high != null && q.session_high > 0 &&
-        q.session_low  != null && q.session_low  > 0) {
+    if (_isPlausibleAnchor(q.session_high) && _isPlausibleAnchor(q.session_low)) {
       h = parseFloat(q.session_high.toFixed(dec));
       l = parseFloat(q.session_low.toFixed(dec));
     } else {
