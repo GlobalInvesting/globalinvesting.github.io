@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.161.11';
+const CACHE_VERSION = 'gi-v8.163.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -34,7 +34,7 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 // prior failure mode.
 const STATIC_PRECACHE = [
   '/assets/dashboard.css?v=8.23.18',
-  '/assets/dashboard.js?v=8.101.9',
+  '/assets/dashboard.js?v=8.102.0',
   '/assets/gi-auth.js?v=1.7.5',
   '/assets/gi-overview.js?v=1.4.1',
   '/assets/fx-websocket.js?v=1.0.0',
@@ -51,7 +51,7 @@ const STATIC_PRECACHE = [
   '/assets/share.js?v=1.0.0',
   '/assets/inline-panel.js?v=1.4.2',
   '/assets/calendar-panel.js?v=1.19.19',
-  '/assets/econ-matrix.js?v=2.3.0',
+  '/assets/econ-matrix.js?v=2.4.0',
   '/assets/gdpr.js',
   '/assets/sw-register.js',
   '/favicon.ico',
