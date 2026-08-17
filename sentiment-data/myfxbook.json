@@ -1,7 +1,7 @@
 {
-  "updated": "2026-08-17T19:46:02Z",
+  "updated": "2026-08-17T20:47:39Z",
   "source": "myfxbook",
-  "apiBlocked": false,
+  "apiBlocked": true,
   "pairs": [
     {
       "sym": "EUR/USD",
@@ -520,5 +520,6 @@
     "averageDeposit": "82,123.70",
     "averageAccountProfit": "98,623.28",
     "averageAccountLoss": "-64,470.91"
-  }
+  },
+  "blockReason": "Network error on login: The read operation timed out"
 }
