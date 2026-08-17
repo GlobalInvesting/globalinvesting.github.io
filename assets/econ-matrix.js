@@ -1,6 +1,11 @@
 /**
- * econ-matrix.js v2.3.0 — Native Economic Matrix panel
+ * econ-matrix.js v2.4.0 — Native Economic Matrix panel
  *
+ * ── v2.4.0 (2026-08-16) — Live polling: panel used to fetch calendar.json
+ *    once (on first scroll-into-view) and never again, so a new actual
+ *    required a full page reload to appear. Now re-fetches calendar.json
+ *    every 3 min (matching calendar-panel.js's cadence) and re-renders with
+ *    cached 10Y/CB values — see GUIDELINES.md/CHANGELOG.md v8.163.0.
  * ── v2.3.0 (2026-08-15) — CB Rate subtext date fixed (was always "01 Aug"
  *    for every currency); Unemp column colored as an inverted indicator ──
  * Two issues Santiago flagged after reviewing a live screenshot:
@@ -1135,54 +1140,102 @@
     return html;
   }
 
-  let _loaded = false;
+  // v2.4.0 \u2014 live polling. Previously loadEconMatrix() was gated by a
+  // permanent `_loaded` flag, so the panel only ever fetched once (on first
+  // scroll-into-view) and never again \u2014 a page reload was the only way to
+  // see a new actual (see GUIDELINES.md / CHANGELOG.md v8.163.0 for the
+  // incident this fixes). calendar.json itself now refreshes near-real-time
+  // upstream (v8.162.0's repository_dispatch bridge, ~2\u20134 min end-to-end),
+  // so the panel re-fetches it on the same cadence. 10Y yields and CB policy
+  // rates change far less often (daily / on rate decisions, the latter
+  // already pushed live via the separate cb-rate-decision dispatch), so the
+  // periodic refresh only re-fetches calendar.json and re-renders with the
+  // cached y10/cb values \u2014 kept intentionally light, not a full re-fetch
+  // of every column's source on every tick.
+  const ECONMX_POLL_MS = 3 * 60 * 1000; // matches calendar-panel.js's cadence
 
-  async function loadEconMatrix() {
-    if (_loaded) return;
-    _loaded = true;
+  let _loading = false;
+  let _y10Cache = null;
+  let _cbCache  = null;
 
+  function renderMatrix(cal, y10All, cbAll) {
     const tbody = document.getElementById('econmx-tbody');
     const sub   = document.getElementById('econmx-sub');
+    if (!cal) {
+      if (sub) sub.textContent = 'Economic Calendar \u00b7 data unavailable';
+      return;
+    }
 
+    const rows = CCY_ORDER.map((ccy, i) => rowHTML(ccy, cal.byCategory[ccy] || {}, y10All[i], cbAll[i]));
+    if (tbody) tbody.innerHTML = rows.join('');
+
+    if (sub) {
+      let label = 'Economic Calendar \u00b7 latest actuals \u00b7 G10';
+      if (cal.lastUpdate) {
+        const d = new Date(cal.lastUpdate);
+        if (!isNaN(d)) label += ' \u00b7 updated ' + d.toLocaleDateString('en', { day: '2-digit', month: 'short' });
+      }
+      sub.textContent = label;
+    }
+  }
+
+  // Full load \u2014 fetches calendar.json + every 10Y/CB source. Runs once,
+  // on first visibility, and caches y10/cb for subsequent light refreshes.
+  async function loadEconMatrix() {
+    if (_loading) return;
+    _loading = true;
+    const sub = document.getElementById('econmx-sub');
     try {
       const [cal, y10All, cbAll] = await Promise.all([
         loadCalendarData(),
         Promise.all(CCY_ORDER.map(load10y)),
         Promise.all(CCY_ORDER.map(getCBRate)),
       ]);
-
-      if (!cal) {
-        if (sub) sub.textContent = 'Economic Calendar \u00b7 data unavailable';
-        return;
-      }
-
-      const rows = CCY_ORDER.map((ccy, i) => rowHTML(ccy, cal.byCategory[ccy] || {}, y10All[i], cbAll[i]));
-      if (tbody) tbody.innerHTML = rows.join('');
-
-      if (sub) {
-        let label = 'Economic Calendar \u00b7 latest actuals \u00b7 G10';
-        if (cal.lastUpdate) {
-          const d = new Date(cal.lastUpdate);
-          if (!isNaN(d)) label += ' \u00b7 updated ' + d.toLocaleDateString('en', { day: '2-digit', month: 'short' });
-        }
-        sub.textContent = label;
-      }
+      _y10Cache = y10All;
+      _cbCache  = cbAll;
+      renderMatrix(cal, y10All, cbAll);
     } catch (e) {
       if (sub) sub.textContent = 'Economic Calendar \u00b7 data unavailable';
+    } finally {
+      _loading = false;
+    }
+  }
+
+  // Light refresh \u2014 re-fetches only calendar.json (single small file,
+  // already `cache:'no-store'`) and re-renders against the cached y10/cb
+  // values from the last full load. Skipped if the first full load hasn't
+  // completed yet, or if a load is already in flight.
+  async function refreshCalendarOnly() {
+    if (_loading || !_y10Cache || !_cbCache) return;
+    _loading = true;
+    try {
+      const cal = await loadCalendarData();
+      if (cal) renderMatrix(cal, _y10Cache, _cbCache);
+    } catch (e) {
+      // Silent \u2014 keep showing the last good render rather than blanking
+      // a working panel over a transient background-refresh failure.
+    } finally {
+      _loading = false;
     }
   }
 
   function attach() {
     const section = document.getElementById('section-econmap');
     if (!section) return;
-    if (typeof IntersectionObserver === 'undefined') {
+
+    function start() {
       loadEconMatrix();
+      setInterval(refreshCalendarOnly, ECONMX_POLL_MS);
+    }
+
+    if (typeof IntersectionObserver === 'undefined') {
+      start();
       return;
     }
     const io = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          loadEconMatrix();
+          start();
           io.unobserve(entry.target);
         }
       });

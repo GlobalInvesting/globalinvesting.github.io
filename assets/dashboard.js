@@ -14496,6 +14496,18 @@ function initExclusivePanelNav() {
       await renderCIPForwards();
       await renderRRInFXTable();
     }, 5 * 60 * 1000);
+
+    // v8.163.0: renderEconSurprises() (inline ESI sidebar table) was only
+    // ever called once, in the Promise.all above at boot — no interval
+    // refreshed it afterward, so a new economic actual never showed up
+    // without a full page reload, even though calendar.json itself now
+    // updates near-real-time upstream (v8.162.0's repository_dispatch
+    // bridge). renderEconSurprises() is idempotent (fetches fresh and
+    // resets its own dedup guard each call) so it's safe to re-run on an
+    // interval. 3-min cadence matches econ-matrix.js's polling and
+    // calendar-panel.js's existing Economic Calendar refresh, since all
+    // three now read from the same near-real-time calendar.json chain.
+    setInterval(renderEconSurprises, 3 * 60 * 1000);
   };
 
   if (document.readyState === 'loading') {
