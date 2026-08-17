@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-08-16T23:58:48.691Z",
-  "source": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable)",
+  "generated_at": "2026-08-17T00:01:04Z",
+  "source": "Myfxbook · ForexFactory",
   "holidays": [],
   "events": [
-    {
-      "currency": "JPY",
-      "impact": "medium",
-      "title": "Japan GDP Growth Annualized",
-      "actual": "1.1%",
-      "forecast": "2.0%",
-      "previous": "1.8%",
-      "dateISO": "2026-08-16",
-      "timeUTC": "23:50",
-      "released": true
-    },
-    {
-      "currency": "JPY",
-      "impact": "high",
-      "title": "Japan GDP Growth Rate QoQ",
-      "actual": "0.3%",
-      "forecast": "0.5%",
-      "previous": "0.5%",
-      "dateISO": "2026-08-16",
-      "timeUTC": "23:50",
-      "released": true
-    },
     {
       "title": "Germany Ifo Business Climate",
       "currency": "EUR",
@@ -3236,19 +3214,41 @@
       "vendor": "myfxbook"
     },
     {
-      "title": "CPI m/m",
+      "currency": "JPY",
+      "impact": "medium",
+      "title": "Japan GDP Growth Annualized",
+      "actual": "1.1%",
+      "forecast": "2.0%",
+      "previous": "1.8%",
+      "dateISO": "2026-08-16",
+      "timeUTC": "23:50",
+      "released": true
+    },
+    {
+      "currency": "JPY",
+      "impact": "high",
+      "title": "Japan GDP Growth Rate QoQ",
+      "actual": "0.3%",
+      "forecast": "0.5%",
+      "previous": "0.5%",
+      "dateISO": "2026-08-16",
+      "timeUTC": "23:50",
+      "released": true
+    },
+    {
+      "title": "Canada Core Inflation Rate YoY",
       "currency": "CAD",
       "dateISO": "2026-08-17",
       "timeUTC": "12:30",
-      "impact": "high",
-      "forecast": "0.4%",
-      "previous": "-0.4%",
+      "impact": "medium",
+      "forecast": "2.2%",
+      "previous": "2.1%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "Median CPI y/y",
+      "title": "Canada CPI Median YoY",
       "currency": "CAD",
       "dateISO": "2026-08-17",
       "timeUTC": "12:30",
@@ -3257,10 +3257,58 @@
       "previous": "1.9%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "Trimmed CPI y/y",
+      "title": "Canada CPI Common YoY",
+      "currency": "CAD",
+      "dateISO": "2026-08-17",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "2.5%",
+      "previous": "2.6%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Canada Inflation Rate YoY",
+      "currency": "CAD",
+      "dateISO": "2026-08-17",
+      "timeUTC": "12:30",
+      "impact": "high",
+      "forecast": "2.9%",
+      "previous": "2.8%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Canada Inflation Rate MoM",
+      "currency": "CAD",
+      "dateISO": "2026-08-17",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "0.5%",
+      "previous": "-0.4%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Canada Core Inflation Rate MoM",
+      "currency": "CAD",
+      "dateISO": "2026-08-17",
+      "timeUTC": "12:30",
+      "impact": "medium",
+      "forecast": "0.2%",
+      "previous": "0.1%",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Canada CPI Trimmed-Mean YoY",
       "currency": "CAD",
       "dateISO": "2026-08-17",
       "timeUTC": "12:30",
@@ -3269,19 +3317,43 @@
       "previous": "1.8%",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
     },
     {
-      "title": "Common CPI y/y",
-      "currency": "CAD",
+      "title": "United States NY Empire State Manufacturing Index",
+      "currency": "USD",
       "dateISO": "2026-08-17",
       "timeUTC": "12:30",
-      "impact": "medium",
-      "forecast": "2.5%",
-      "previous": "2.6%",
+      "impact": "high",
+      "forecast": "10.2",
+      "previous": "15.6",
       "actual": null,
       "released": false,
-      "vendor": "forexfactory"
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States NAHB Housing Market Index",
+      "currency": "USD",
+      "dateISO": "2026-08-17",
+      "timeUTC": "14:00",
+      "impact": "medium",
+      "forecast": "33.0",
+      "previous": "34.0",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States Net Long-term TIC Flows",
+      "currency": "USD",
+      "dateISO": "2026-08-17",
+      "timeUTC": "20:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "232.7",
+      "actual": null,
+      "released": false,
+      "vendor": "myfxbook"
     },
     {
       "title": "Claimant Count Change",
