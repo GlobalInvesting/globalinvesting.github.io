@@ -1302,9 +1302,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <thead>
             <tr style="display:table;width:100%;table-layout:fixed;">
               <th style="text-align:left;font-size:9px;" scope="col">Instrument</th>
-              <th style="font-size:9px;text-align:right;" scope="col" title="1-day Historical VaR at 95% confidence. Loss not exceeded on 95% of trading days.">VaR 95%</th>
+              <th style="font-size:9px;text-align:right;" scope="col" title="1-day Historical VaR at 95% confidence. Loss not exceeded on 95% of trading days. Green ≤0.5% (calm); red >1.0% (elevated) — risk magnitude, not price direction.">VaR 95%</th>
               <th style="font-size:9px;text-align:right;" scope="col" title="Expected Shortfall (CVaR): mean loss in the worst 5% of days. Always ≥ VaR.">CVaR 95%</th>
-              <th style="font-size:9px;text-align:right;" scope="col" title="CVaR ÷ VaR ratio. Above 2.0 = fat tails present in this instrument.">ES/VaR</th>
+              <th style="font-size:9px;text-align:right;" scope="col" title="CVaR ÷ VaR ratio. Green ≤1.5x (typical); red >2.0x = fat tails present in this instrument.">ES/VaR</th>
               <th style="font-size:9px;text-align:right;" scope="col" title="Number of daily returns used in the VaR calculation (target: 252 trading days = 1 year).">Days</th>
             </tr>
           </thead>
