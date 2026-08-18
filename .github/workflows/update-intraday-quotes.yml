@@ -1,69 +1,44 @@
-name: Update Intraday Quotes — v1.6 (Twelve Data + Alpha Vantage)
+name: Update Intraday Quotes — v1.7
 
-# TRIGGER STRATEGY — v1.5
+# TRIGGER STRATEGY
 #
 # GitHub Actions' native cron (schedule) is NOT reliable for short intervals:
 # in practice it skips runs under GitHub system load.
 #
-# Solution: cron-job.org (free) acts as an external clock and dispatches this
-# workflow exactly every 5 minutes via HTTP POST to the repository_dispatch endpoint.
-#
-# FLOW:
-#   cron-job.org (every 5 min)
-#     → POST https://api.github.com/repos/<owner>/<repo>/dispatches
-#     → event_type: "trigger-intraday-quotes"
-#     → This workflow runs ✅
+# Solution: an external clock service dispatches this workflow exactly every
+# 5 minutes via HTTP POST to the repository_dispatch endpoint (setup detail
+# and provider name kept in the private engine repo's ops runbook, not here —
+# see GUIDELINES.md "Public workflow files must not name data/infra vendors").
 #
 # GitHub's schedule is kept as a SAFETY NET (fallback),
-# but running only every 5 min — so if cron-job.org fails, the max gap is 5 min.
+# but running only every 5 min — so if the external clock fails, the max gap is 5 min.
 #
 # ✅ Average job duration: ~30 sec → no overlap risk at a 5-min interval.
-#
-# ONE-TIME SETUP REQUIRED:
-#   1. Create a Personal Access Token (PAT) on GitHub:
-#      → GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
-#      → Permissions: "Actions" = Read and Write  (or "workflows" + "contents")
-#      → Save the token as secret CRONJOB_PAT in this repo
-#
-#   2. Create a job at https://cron-job.org with:
-#      → URL:    https://api.github.com/repos/<OWNER>/<REPO>/dispatches
-#      → Method: POST
-#      → Headers:
-#            Authorization: Bearer <your-PAT>
-#            Accept: application/vnd.github+json
-#            Content-Type: application/json
-#            X-GitHub-Api-Version: 2022-11-28
-#      → Body:   {"event_type":"trigger-intraday-quotes"}
-#      → Schedule: every 5 minutes
-#
-# ✅ cron-job.org free tier: up to 60 jobs, runs every 1 min minimum — more than enough.
-# ✅ yfinance has no formal rate limit. Twelve Data fallback: < 10 calls/day of the free tier (800/day).
-#
-# API usage estimate (24/7 at 5 min):
-#   288 runs/day × 1 batch yfinance call = 288 yfinance calls (no formal limit) ✅
-#   Twelve Data: gold fallback only → estimated < 10 calls/day ✅
+# ✅ Primary quote source has no formal rate limit at this call volume; the
+#    secondary (gold-only) fallback source runs well within its free-tier quota.
 #
 # fetch_intraday_quotes.py lives in the private globalinvesting-scripts repo
 # (explicit checkout via SCRIPTS_PAT) to protect the fetcher's proprietary logic
-# and API keys (Twelve Data, Alpha Vantage). Actions minutes are consumed
-# in this public repo → unlimited and at no cost.
+# and API keys. Actions minutes are consumed in this public repo → unlimited
+# and at no cost — this is also why the orchestration file itself must live
+# here rather than in the private repo.
 
 on:
   repository_dispatch:
-    types: [trigger-intraday-quotes]   # ← dispatched by cron-job.org every 5 min exactly
+    types: [trigger-intraday-quotes]   # ← dispatched by the external clock every 5 min exactly
 
-  # schedule: SAFETY NET (v7.58.6) — only kicks in when cron-job.org is down.
+  # schedule: SAFETY NET (v7.58.6) — only kicks in when the external dispatcher is down.
   #
   # History:
-  #   v7.14.4: schedule removed because GitHub's cron collided with cron-job.org
+  #   v7.14.4: schedule removed because GitHub's cron collided with the external dispatch
   #            → two simultaneous runs → git rebase failed → repeated failure emails.
   #   v7.14.5: exit 1 on push replaced with exit 0. Simultaneous runs no longer cause failures.
   #   v7.58.6: schedule restored as fallback. The push-loop + concurrency:
   #            cancel-in-progress:false already serializes simultaneous runs without errors.
-  #            If cron-job.org goes down (expired PAT, suspended account, etc.), quotes.json
-  #            freezes indefinitely — the dashboard shows stale data forever.
-  #            GitHub's schedule covers that gap: at most ~15 min of stale data
-  #            instead of hours or days. Doesn't send failure emails (exit 0 in the push-loop).
+  #            If the external dispatcher goes down, quotes.json freezes indefinitely —
+  #            the dashboard shows stale data forever. GitHub's schedule covers that gap:
+  #            at most ~15 min of stale data instead of hours or days. Doesn't send
+  #            failure emails (exit 0 in the push-loop).
   #
   # Frequency: */5 is the minimum GitHub allows. In practice it runs every 5–15 min
   # under load, which is acceptable as a fallback (not as the primary clock).
@@ -71,7 +46,7 @@ on:
   # but fetch_intraday_quotes.py writes weekend data with no real changes —
   # the push-loop detects "No changes vs remote HEAD" and exits 0 without a commit.
   schedule:
-    - cron: '*/5 * * * *'             # fallback: runs every 5 min if cron-job.org goes down
+    - cron: '*/5 * * * *'             # fallback: runs every 5 min if the external dispatcher goes down
 
   workflow_dispatch:                   # manual trigger from the GitHub UI
 
@@ -141,7 +116,7 @@ jobs:
           #   4. Push.  If rejected, another run beat us in the window — loop.
           #
           # Exit 0 on all paths: a push collision is not a real failure.
-          # The next cron-job.org dispatch (≤5 min) will carry fresh data.
+          # The next dispatch from the external clock (≤5 min) will carry fresh data.
           # Exiting with non-zero would trigger GitHub failure emails on every
           # concurrent-run collision, which is the problem this block fixes.
 

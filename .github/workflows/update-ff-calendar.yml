@@ -3,9 +3,9 @@ name: Update ForexFactory Calendar
 # TWO-TIER TRIGGER ARCHITECTURE (v5.0)
 #
 # TIER 1 — Cloudflare Worker (primary, ~2–3 min latency):
-#   cf-worker/calendar-watcher.js polls ForexFactory public JSON every 6 minutes.
-#   When actuals/forecasts change it fires a repository_dispatch event
-#   (event_type: "calendar-data-changed") which triggers this workflow
+#   cf-worker/calendar-watcher.js polls the calendar source's public JSON every
+#   6 minutes. When actuals/forecasts change it fires a repository_dispatch
+#   event (event_type: "calendar-data-changed") which triggers this workflow
 #   immediately — bypassing the 5-min GitHub cron minimum entirely.
 #   Setup: see cf-worker/README.md
 #
@@ -18,8 +18,6 @@ name: Update ForexFactory Calendar
 # END-TO-END LATENCY:
 #   Normal (CF Worker active):   ~2–3 min
 #   Fallback (cron only):        ~5–15 min during windows; ~30 min off-peak
-#   Bloomberg Terminal:          <1 sec (paid proprietary feed — not achievable
-#                                with free REST APIs regardless of architecture)
 #
 # KEY DESIGN: smart commit — the Python script compares new actuals/forecasts
 # against the previous ff_calendar.json and writes a /tmp/cal_changed flag.

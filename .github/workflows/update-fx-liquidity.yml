@@ -1,4 +1,4 @@
-name: Update FX Liquidity Profile — v2.0 (private scripts)
+name: Update FX Liquidity Profile — v2.1 (private scripts)
 
 # ESTRATEGIA DE TRIGGER
 #
@@ -8,22 +8,23 @@ name: Update FX Liquidity Profile — v2.0 (private scripts)
 #
 # Adicionalmente: workflow_dispatch para test manual.
 #
-# DURACIÓN ESTIMADA: ~45 seg (5 pares × 35d × 1h = ~840 filas por par, yfinance batch)
+# DURACIÓN ESTIMADA: ~45 seg (5 pares × 35d × 1h = ~840 filas por par, fetch en batch)
 # Sin riesgo de solapamiento a 1h de intervalo.
 #
 # PLACEMENT: script fetch_fx_liquidity.py vive en el repo privado globalinvesting-scripts
 # (checkout explícito vía SCRIPTS_PAT). Los minutos de Actions se consumen en este
 # repo público → ilimitados y sin costo.
 #
-# TRIGGER STRATEGY (v2.1): cron-job.org dispatch primario + GH schedule fallback.
-# GitHub's native cron puede saltear ejecuciones bajo carga del sistema — cron-job.org
-# actúa como reloj externo confiable, disparando cada hora en punto vía repository_dispatch.
-# Setup: job en cron-job.org → POST https://api.github.com/repos/GlobalInvesting/globalinvesting.github.io/dispatches
-# con header Authorization: Bearer <CRONJOB_PAT>, body {"event_type":"trigger-fx-liquidity"}, cada hora.
+# TRIGGER STRATEGY: dispatch de un reloj externo (primario) + GH schedule fallback.
+# GitHub's native cron puede saltear ejecuciones bajo carga del sistema — el reloj
+# externo actúa como respaldo confiable, disparando cada hora en punto vía
+# repository_dispatch. Detalle de setup y proveedor en el runbook privado del
+# repo engine, no acá — ver GUIDELINES.md "Public workflow files must not name
+# data/infra vendors".
 
 on:
   repository_dispatch:
-    types: [trigger-fx-liquidity]   # ← dispatched by cron-job.org, hourly
+    types: [trigger-fx-liquidity]   # ← dispatched by the external clock, hourly
 
   schedule:
     # Fallback — cada hora, todos los días. El script maneja fins de semana internamente

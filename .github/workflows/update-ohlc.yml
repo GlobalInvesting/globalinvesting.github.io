@@ -1,6 +1,6 @@
-name: Update OHLC Chart Data — v2.1 (private scripts)
+name: Update OHLC Chart Data — v2.2 (private scripts)
 
-# Downloads OHLC bars for all chart symbols via yfinance and writes JSON files
+# Downloads OHLC bars for all chart symbols and writes JSON files
 # to THIS (public) repo under ohlc-data/:
 #
 #   ohlc-data/{id}.json       — Daily (D1) bars, ~3 years, ~38 symbols
@@ -11,19 +11,19 @@ name: Update OHLC Chart Data — v2.1 (private scripts)
 #           EuroStoxx 50, ETH/USD, DXY — all rendered via Lightweight Charts.
 #
 # D1 files are REPLACED on every run — repo size stays fixed.
-# H1/H4 files cover 720-day yfinance limit; also replaced on every run.
+# H1/H4 files cover a 720-day history-source limit; also replaced on every run.
 #
 # Schedule:
 #   Mon–Fri :02 and :32 (twice per hour) — Intraday run during the FX week.
-#     Runs 2 minutes after each 30-min mark, once H1 bars have finalized in yfinance.
+#     Runs 2 minutes after each 30-min mark, once the H1 bar source has finalized.
 #     Halves the max JSON staleness to ~30 minutes (vs ~60 min with the old :30 cron).
-#     bar closes at :00 → finalized in yfinance by :02. Bar closes at :30 → finalized by :32.
+#     bar closes at :00 → finalized upstream by :02. Bar closes at :30 → finalized by :32.
 #     dashboard.js fetches these JSON files directly — gap between last completed bar
 #     and the live partial bar (WebSocket) is at most ~30 min instead of ~60 min.
 #     Public repo = unlimited GitHub Actions minutes — zero cost impact.
 #
 #   Tue–Sat 01:30 UTC — Retained for FX session finalization. The last H1 bar of
-#     each session (20:00–21:00 UTC) has a yfinance finalization lag of up to ~1h.
+#     each session (20:00–21:00 UTC) has a source finalization lag of up to ~1h.
 #     The 01:30 UTC run ensures D1 FX bars (built from 1H aggregation) use fully
 #     finalized H/L/C values. Also serves as the authoritative daily D1 write.
 #
@@ -45,16 +45,17 @@ name: Update OHLC Chart Data — v2.1 (private scripts)
 # en cada intraday run de 30 min; las medias móviles solo cambian con el cierre diario.
 #
 # Credit spread OHLC (v2.1): fetch_credit_spreads.py (mismo repo privado, mismo
-# checkout) escribe ohlc-data/hyoas.json e ohlc-data/igoas.json a partir de FRED
-# (BAMLH0A0HYM2 / BAMLC0A0CM, requiere FRED_API_KEY) — mismo formato de bar que
-# usa fetch_ohlc.py para los símbolos de yfinance, así _renderLWChart() en
-# dashboard.js los lee por el mismo código sin distinguir la fuente. Corre SOLO
-# en el run D1 de cierre (01:30 UTC Tue-Sat), igual que calculate_technical_levels.py:
-# FRED publica estas series una vez por día hábil (con lag), así que repetir el
-# fetch en cada tick intraday de 30 min sería un request idéntico sin dato nuevo.
-# D1 completo se REEMPLAZA en cada corrida (sin merge incremental) — mismo criterio
-# que todos los demás símbolos de fetch_ohlc.py: un fetch completo a FRED es
-# gratis/no medido, así que no hay motivo de costo para tratarlo distinto.
+# checkout) escribe ohlc-data/hyoas.json e ohlc-data/igoas.json a partir de una
+# fuente de credit-spread pública (series HY/IG OAS, requiere FRED_API_KEY) —
+# mismo formato de bar que usa fetch_ohlc.py para los demás símbolos, así
+# _renderLWChart() en dashboard.js los lee por el mismo código sin distinguir
+# la fuente. Corre SOLO en el run D1 de cierre (01:30 UTC Tue-Sat), igual que
+# calculate_technical_levels.py: la fuente publica estas series una vez por día
+# hábil (con lag), así que repetir el fetch en cada tick intraday de 30 min
+# sería un request idéntico sin dato nuevo. D1 completo se REEMPLAZA en cada
+# corrida (sin merge incremental) — mismo criterio que todos los demás símbolos
+# de fetch_ohlc.py: un fetch completo es gratis/no medido, así que no hay
+# motivo de costo para tratarlo distinto.
 
 on:
   schedule:
@@ -110,7 +111,7 @@ jobs:
           SITE_DIR: .
         run: python3 private-scripts/fetch_ohlc.py
 
-      - name: Fetch credit spread OHLC — FRED HY/IG OAS (D1 finalization run only)
+      - name: Fetch credit spread OHLC — HY/IG OAS (D1 finalization run only)
         if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
         env:
           SITE_DIR: .
