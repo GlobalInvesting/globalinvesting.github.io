@@ -1,6 +1,26 @@
 /**
- * econ-matrix.js v2.4.0 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.0 — Native Economic Matrix panel
  *
+ * ── v2.5.0 (2026-08-17) — 10Y Yld / CB Rate went stale for the life of the
+ *    session: v2.4.0's periodic refresh only re-fetched calendar.json and
+ *    re-rendered against a `_y10Cache`/`_cbCache` snapshot taken once at
+ *    first scroll-into-view — reasoned at the time that policy/yield data
+ *    "changes far less often" than calendar actuals. False for 10Y specifically:
+ *    `extended-data/{CCY}.json` bond10y is written daily by
+ *    `fetch_bond_yields.py`, so any tab left open across that daily update
+ *    (or open when a fix like the AUD/CAD orphaned-bond10y-field one landed)
+ *    kept showing the pre-fix value indefinitely — confirmed live: Santiago's
+ *    screenshot showed AUD 4.83%/CAD 3.59%/NOK 4.20% while the underlying
+ *    `extended-data/*.json` already had fresh AUD 5.05% (18 Aug)/CAD 3.72%
+ *    (17 Aug)/NOK 4.40% (17 Aug) from the v2.10.2 fix — the panel simply
+ *    never re-asked. Fixed: the periodic refresh now re-fetches 10Y (cheap,
+ *    ten small JSON files) and recomputes CB Rate (no fetch — `getCBRate()`
+ *    already reads live `window._STATE_cbRates`, kept via dashboard.js's own
+ *    5-min `health.json` sentinel poll; only the econ-matrix.js snapshot of
+ *    it was stale) on every tick, same as calendar.json. `load10y()` also
+ *    picked up `{cache:'no-store'}` to match `loadCalendarData()`, so the
+ *    browser/SW HTTP cache can't hand back a stale copy inside the 3-min
+ *    window either. See GUIDELINES.md/CHANGELOG.md v8.154.3.
  * ── v2.4.0 (2026-08-16) — Live polling: panel used to fetch calendar.json
  *    once (on first scroll-into-view) and never again, so a new actual
  *    required a full page reload to appear. Now re-fetches calendar.json
@@ -1002,8 +1022,13 @@
   }
 
   // ── 10Y yield \u2014 extended-data/{CCY}.json, same field as yc-modal.js ────────
+  // {cache:'no-store'} added in v2.5.0 to match loadCalendarData() below \u2014
+  // bond10y is written daily (fetch_bond_yields.py) and this fetch is now
+  // re-run every ECONMX_POLL_MS tick, so a stale HTTP-cached copy could
+  // otherwise re-serve the exact same value the periodic refresh exists to
+  // replace. See CHANGELOG.md v8.154.3.
   async function load10y(ccy) {
-    const ext = await fetch('./extended-data/' + ccy + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
+    const ext = await fetch('./extended-data/' + ccy + '.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null);
     const v = ext && ext.data && ext.data.bond10y;
     if (v == null || isNaN(v)) return null;
     const date = (ext.dates && ext.dates.bond10y) || '';
@@ -1147,11 +1172,14 @@
   // incident this fixes). calendar.json itself now refreshes near-real-time
   // upstream (v8.162.0's repository_dispatch bridge, ~2\u20134 min end-to-end),
   // so the panel re-fetches it on the same cadence. 10Y yields and CB policy
-  // rates change far less often (daily / on rate decisions, the latter
-  // already pushed live via the separate cb-rate-decision dispatch), so the
-  // periodic refresh only re-fetches calendar.json and re-renders with the
-  // cached y10/cb values \u2014 kept intentionally light, not a full re-fetch
-  // of every column's source on every tick.
+  // v2.5.0: the periodic refresh now re-fetches calendar.json, 10Y yield
+  // (extended-data/{CCY}.json \u2014 written daily, ten small files, cheap to
+  // re-ask every tick) and recomputes CB Rate (no network cost \u2014 reads the
+  // live window._STATE_cbRates that dashboard.js's own 5-min health.json
+  // sentinel already keeps fresh) every tick, instead of freezing y10/cb at
+  // whatever they were on first scroll-into-view. See CHANGELOG.md v8.154.3
+  // for the live incident (stale AUD/CAD/NOK 10Y shown after a same-day
+  // backend fix) this replaced the old "cache forever" comment/behavior for.
   const ECONMX_POLL_MS = 3 * 60 * 1000; // matches calendar-panel.js's cadence
 
   let _loading = false;
@@ -1201,15 +1229,23 @@
     }
   }
 
-  // Light refresh \u2014 re-fetches only calendar.json (single small file,
-  // already `cache:'no-store'`) and re-renders against the cached y10/cb
-  // values from the last full load. Skipped if the first full load hasn't
-  // completed yet, or if a load is already in flight.
-  async function refreshCalendarOnly() {
+  // Light refresh \u2014 re-fetches calendar.json, 10Y yield, and CB Rate every
+  // tick (v2.5.0; previously only calendar.json, leaving y10/cb frozen at
+  // their first-load values for the rest of the session \u2014 see CHANGELOG.md
+  // v8.154.3). Still skipped if the first full load hasn't completed yet, or
+  // if a load is already in flight. On a failed re-fetch, falls back to the
+  // last good y10/cb snapshot rather than blanking the panel.
+  async function refreshPanel() {
     if (_loading || !_y10Cache || !_cbCache) return;
     _loading = true;
     try {
-      const cal = await loadCalendarData();
+      const [cal, y10All, cbAll] = await Promise.all([
+        loadCalendarData(),
+        Promise.all(CCY_ORDER.map(load10y)),
+        Promise.all(CCY_ORDER.map(getCBRate)),
+      ]);
+      if (y10All.some(v => v != null)) _y10Cache = y10All;
+      if (cbAll.some(v => v != null)) _cbCache = cbAll;
       if (cal) renderMatrix(cal, _y10Cache, _cbCache);
     } catch (e) {
       // Silent \u2014 keep showing the last good render rather than blanking
@@ -1225,7 +1261,7 @@
 
     function start() {
       loadEconMatrix();
-      setInterval(refreshCalendarOnly, ECONMX_POLL_MS);
+      setInterval(refreshPanel, ECONMX_POLL_MS);
     }
 
     if (typeof IntersectionObserver === 'undefined') {
