@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-18T12:00:55Z",
-  "generatedAt": "2026-08-18T12:00:55Z",
+  "lastUpdate": "2026-08-18T12:15:50Z",
+  "generatedAt": "2026-08-18T12:15:50Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,12 +9,12 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-18",
   "rangeTo": "2026-08-21",
-  "totalEvents": 3753,
+  "totalEvents": 3754,
   "currencyCounts": {
     "CHF": 125,
     "EUR": 856,
     "CAD": 268,
-    "USD": 1269,
+    "USD": 1270,
     "AUD": 254,
     "JPY": 220,
     "NZD": 88,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "medium": 1859,
-    "high": 1666,
+    "high": 1667,
     "low": 228
   },
   "surpriseStats": {
@@ -899,9 +899,9 @@
       "std": 0.60677
     },
     "CAD/housing starts": {
-      "n": 3,
-      "mean": -2.133333,
-      "std": 14.606962
+      "n": 4,
+      "mean": -6.325,
+      "std": 14.578151
     },
     "USD/ny empire state manufacturing index": {
       "n": 4,
@@ -46790,9 +46790,22 @@
       "flag": "🇨🇦",
       "event": "Canada Housing Starts",
       "impact": "medium",
-      "actual": null,
+      "actual": "229.1K",
       "forecast": "248.0K",
-      "previous": "239.0K"
+      "previous": "240.8K"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "12:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States ADP Employment Change Weekly",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "8.25K"
     },
     {
       "date": "18 Aug",
