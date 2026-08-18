@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-17T22:31:06Z",
-  "generatedAt": "2026-08-17T22:31:06Z",
+  "lastUpdate": "2026-08-18T00:01:05Z",
+  "generatedAt": "2026-08-18T00:01:05Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,105 +9,25 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-18",
   "rangeTo": "2026-08-21",
-  "totalEvents": 3732,
+  "totalEvents": 3753,
   "currencyCounts": {
     "CHF": 125,
-    "EUR": 851,
+    "EUR": 856,
     "CAD": 268,
-    "USD": 1260,
-    "AUD": 252,
-    "JPY": 218,
-    "NZD": 86,
-    "GBP": 434,
+    "USD": 1269,
+    "AUD": 254,
+    "JPY": 220,
+    "NZD": 88,
+    "GBP": 435,
     "SEK": 155,
     "NOK": 83
   },
   "impactCounts": {
-    "medium": 1843,
-    "high": 1661,
+    "medium": 1859,
+    "high": 1666,
     "low": 228
   },
   "surpriseStats": {
-    "AUD/westpac consumer confidence index": {
-      "n": 3,
-      "mean": 1.233333,
-      "std": 2.600641
-    },
-    "AUD/westpac consumer confidence change": {
-      "n": 3,
-      "mean": 1.5,
-      "std": 3.15119
-    },
-    "GBP/employment change": {
-      "n": 4,
-      "mean": 38.25,
-      "std": 17.538054
-    },
-    "GBP/unemployment rate": {
-      "n": 4,
-      "mean": 0.05,
-      "std": 0.1
-    },
-    "GBP/average earnings incl. bonus": {
-      "n": 4,
-      "mean": 0.225,
-      "std": 0.287228
-    },
-    "EUR/balance of trade": {
-      "n": 8,
-      "mean": -0.774625,
-      "std": 5.8348
-    },
-    "CAD/inflation rate mom": {
-      "n": 5,
-      "mean": -0.0,
-      "std": 0.234521
-    },
-    "CAD/core inflation rate yoy": {
-      "n": 5,
-      "mean": -0.1,
-      "std": 0.234521
-    },
-    "CAD/cpi median yoy": {
-      "n": 5,
-      "mean": -0.04,
-      "std": 0.114018
-    },
-    "CAD/cpi trimmed-mean yoy": {
-      "n": 5,
-      "mean": -0.04,
-      "std": 0.114018
-    },
-    "CAD/inflation rate yoy": {
-      "n": 5,
-      "mean": 0.02,
-      "std": 0.216795
-    },
-    "CAD/cpi common yoy": {
-      "n": 5,
-      "mean": 0.1,
-      "std": 0.141421
-    },
-    "CAD/new housing price index mom": {
-      "n": 4,
-      "mean": -0.175,
-      "std": 0.206155
-    },
-    "USD/pending home sales mom": {
-      "n": 4,
-      "mean": 0.375,
-      "std": 3.724133
-    },
-    "USD/pending home sales yoy": {
-      "n": 4,
-      "mean": 1.175,
-      "std": 2.671298
-    },
-    "USD/api crude oil stock change": {
-      "n": 12,
-      "mean": 0.30875,
-      "std": 5.040315
-    },
     "EUR/ppi yoy": {
       "n": 2,
       "mean": -0.05,
@@ -613,6 +533,11 @@
       "mean": 0.330333,
       "std": 0.390769
     },
+    "USD/api crude oil stock change": {
+      "n": 11,
+      "mean": 0.855,
+      "std": 4.899645
+    },
     "AUD/ai group industry index": {
       "n": 3,
       "mean": -3.133333,
@@ -687,6 +612,11 @@
       "n": 3,
       "mean": -0.066667,
       "std": 0.152753
+    },
+    "EUR/balance of trade": {
+      "n": 7,
+      "mean": -1.056714,
+      "std": 6.243104
     },
     "EUR/industrial production mom": {
       "n": 7,
@@ -792,6 +722,16 @@
       "n": 3,
       "mean": 0.366667,
       "std": 2.136196
+    },
+    "AUD/westpac consumer confidence index": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 1.909188
+    },
+    "AUD/westpac consumer confidence change": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 2.333452
     },
     "AUD/nab business confidence": {
       "n": 3,
@@ -1013,6 +953,11 @@
       "mean": 0.02,
       "std": 0.0
     },
+    "CAD/new housing price index mom": {
+      "n": 3,
+      "mean": -0.1,
+      "std": 0.173205
+    },
     "USD/retail sales ex autos mom": {
       "n": 4,
       "mean": 0.0,
@@ -1038,10 +983,20 @@
       "mean": -0.1,
       "std": 0.270801
     },
+    "USD/pending home sales mom": {
+      "n": 3,
+      "mean": 0.366667,
+      "std": 4.561067
+    },
     "USD/business inventories mom": {
       "n": 4,
       "mean": -0.025,
       "std": 0.05
+    },
+    "USD/pending home sales yoy": {
+      "n": 3,
+      "mean": 0.333333,
+      "std": 2.540341
     },
     "USD/fed interest rate decision": {
       "n": 3,
@@ -1067,6 +1022,21 @@
       "n": 2,
       "mean": 0.0,
       "std": 0.0
+    },
+    "GBP/employment change": {
+      "n": 3,
+      "mean": 37.333333,
+      "std": 21.36196
+    },
+    "GBP/unemployment rate": {
+      "n": 3,
+      "mean": 0.1,
+      "std": 0.0
+    },
+    "GBP/average earnings incl. bonus": {
+      "n": 3,
+      "mean": 0.2,
+      "std": 0.34641
     },
     "CHF/snb interest rate decision": {
       "n": 2,
@@ -1107,6 +1077,36 @@
       "n": 2,
       "mean": 4.5,
       "std": 0.707107
+    },
+    "CAD/cpi common yoy": {
+      "n": 4,
+      "mean": 0.15,
+      "std": 0.1
+    },
+    "CAD/cpi median yoy": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.125831
+    },
+    "CAD/core inflation rate yoy": {
+      "n": 4,
+      "mean": -0.0,
+      "std": 0.08165
+    },
+    "CAD/inflation rate mom": {
+      "n": 4,
+      "mean": 0.075,
+      "std": 0.189297
+    },
+    "CAD/cpi trimmed-mean yoy": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.125831
+    },
+    "CAD/inflation rate yoy": {
+      "n": 4,
+      "mean": 0.1,
+      "std": 0.141421
     },
     "EUR/european union new car registrations yoy": {
       "n": 2,
@@ -42913,19 +42913,6 @@
       "date": "27 Jul",
       "dateISO": "2026-07-27",
       "timeUTC": "14:30",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Canada BoC Market Participants Survey",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "27 Jul",
-      "dateISO": "2026-07-27",
-      "timeUTC": "14:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
@@ -46667,15 +46654,28 @@
     {
       "date": "18 Aug",
       "dateISO": "2026-08-18",
-      "timeUTC": "06:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "Claimant Count Change",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Westpac Consumer Confidence Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "81.7",
+      "previous": "83.9"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Westpac Consumer Confidence Change",
       "impact": "high",
       "actual": null,
-      "forecast": "16.5K",
-      "previous": "6.7K"
+      "forecast": "-2.6%",
+      "previous": "4.1%"
     },
     {
       "date": "18 Aug",
@@ -46684,11 +46684,284 @@
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
-      "event": "Average Earnings Index 3m/y",
+      "event": "United Kingdom Average Earnings incl. Bonus (3Mo/Yr)",
       "impact": "medium",
       "actual": null,
-      "forecast": "4.0%",
+      "forecast": "4.1%",
       "previous": "4.3%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Employment Change",
+      "impact": "high",
+      "actual": null,
+      "forecast": "200.0K",
+      "previous": "147.0K"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Unemployment Rate",
+      "impact": "high",
+      "actual": null,
+      "forecast": "4.8%",
+      "previous": "4.9%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Balance of Trade",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "€-6.3B",
+      "previous": "€-8.24B"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ZEW Economic Sentiment Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "25.4",
+      "previous": "23.4"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany ZEW Economic Sentiment Index",
+      "impact": "high",
+      "actual": null,
+      "forecast": "30.0",
+      "previous": "26.3"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Portugal PPI MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "0.8%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Portugal PPI YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "5.4%",
+      "previous": "5.0%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "12:15",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Housing Starts",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "248.0K",
+      "previous": "239.0K"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Building Permits MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.2%",
+      "previous": "-2.6%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Housing Starts MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-4.7%",
+      "previous": "19.0%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Housing Starts",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.35M",
+      "previous": "1.427M"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Building Permits",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.37M",
+      "previous": "1.374M"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Import Prices MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.1%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Export Prices MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "-0.6%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "13:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Industrial Production MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Pending Home Sales MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "-5.4%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Pending Home Sales YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.4%",
+      "previous": "-0.3%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand PPI Output QoQ",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.4%",
+      "previous": "0.8%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "22:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand PPI Input QoQ",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "1.4%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Machinery Orders YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "10.8%",
+      "previous": "-1.9%"
+    },
+    {
+      "date": "18 Aug",
+      "dateISO": "2026-08-18",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Machinery Orders MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "7.8%",
+      "previous": "-12.4%"
     },
     {
       "date": "19 Aug",
