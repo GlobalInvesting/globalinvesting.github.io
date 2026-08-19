@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-19T00:00:28Z",
+  "generated_at": "2026-08-19T03:22:33Z",
   "source": "Myfxbook · ForexFactory",
   "holidays": [],
   "events": [
@@ -3537,16 +3537,28 @@
       "vendor": "myfxbook"
     },
     {
-      "title": "Wage Price Index q/q",
+      "title": "Australia Wage Price Index YoY",
+      "currency": "AUD",
+      "dateISO": "2026-08-19",
+      "timeUTC": "01:30",
+      "impact": "medium",
+      "forecast": "3.2%",
+      "previous": "3.2%",
+      "actual": "3.2%",
+      "released": true,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "Australia Wage Price Index QoQ",
       "currency": "AUD",
       "dateISO": "2026-08-19",
       "timeUTC": "01:30",
       "impact": "medium",
       "forecast": "0.8%",
       "previous": "0.8%",
-      "actual": null,
-      "released": false,
-      "vendor": "forexfactory"
+      "actual": "0.8%",
+      "released": true,
+      "vendor": "myfxbook"
     },
     {
       "title": "Australia RBA Hauser Speech",
@@ -3557,7 +3569,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "released": false,
+      "released": true,
       "vendor": "myfxbook"
     },
     {
