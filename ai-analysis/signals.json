@@ -1,53 +1,53 @@
 {
-  "generated_at": "2026-08-18T20:25:07Z",
+  "generated_at": "2026-08-19T00:57:14Z",
   "signals": [
     {
-      "time": "20:24",
+      "time": "00:56",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Risk + Options Complacency",
-      "text": "USD/JPY at 159.65 is testing the 160.00 threshold as geopolitical jitters in the Strait of Hormuz drive a mild safe-haven bid for the greenback. While the Fed 3.75% vs BoJ 1.0% policy spread provides a 275bp carry advantage for the USD, the pair is trading below its SMA20 at 160.34 and SMA50 at 161.09. Options markets show a notable volatility risk premium (VRP) of -1.3%, with IV at 7.2% sitting below realized volatility of 8.5%, signaling unusual complacency despite rising Middle East tensions. The 25d risk reversal at -1.96 confirms a strong put skew, indicating that while the spot remains bid, the options market is aggressively paying for downside protection. A sustained break above 160.00 remains the key level previously associated with Japanese intervention warnings. Trade bias: Long USD/JPY; carry advantage persists but intervention risk limits upside above 160.00. Catalyst: FOMC Minutes on Wednesday. Risk: VIX breaks above 25, triggering a disorderly carry unwind as safe-haven JPY flows dominate.",
+      "title": "AUD/USD — Geopolitical Risk + Retail Extreme",
+      "text": "AUD/USD trades at 0.7082, reversing recent gains as TIER-1 geopolitical headlines regarding Iran risks lift the US Dollar's safe-haven appeal ahead of FOMC minutes. The pair remains technically supported above its SMA20/50/200 cluster (0.7034/0.6996/0.6945), but commodity selling pressure noted by CME Group research adds a secondary headwind. Speculative positioning via COT LF remains net long (+45,727), while retail sentiment has reached a 82% short extreme. This institutional vs. retail divergence typically suggests a late-trend squeeze environment, though the immediate geopolitical shock is forcing a temporary AUD pullback. Trade bias: Bullish AUD/USD, pending stabilization above SMA20 after the geopolitical flush. Catalyst: FOMC Minutes release later today. Risk: Escalation in the Strait of Hormuz triggers a broad VIX spike above 25, forcing a disorderly unwind of AUD longs.",
       "evidence": [
-        "USD/JPY: 159.65",
-        "USD/JPY 25d RR: -1.96 (Strong Put Skew)",
-        "USD/JPY VRP: -1.3% (IV 7.2% vs HV30 8.5%)"
+        "AUD/USD: 0.7082",
+        "Retail: 82% Short",
+        "Headline: Iran risks lift USD"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "engine-ai-primary"
     },
     {
-      "time": "20:20",
+      "time": "00:53",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence",
-      "text": "NZD/USD trades at 0.5873, holding above its SMA20/50/200 cluster (0.5852, 0.5791, 0.5836), suggesting a bullish technical setup. However, COT LF net positioning is extremely short at -34,031, marking the 2nd percentile of its 52-week range (z = -2.00). This crowded spec short is in direct conflict with a hawkish RBNZ stance (2.5% rate, bias to hike) and a positive Economic Surprise Index (ESI) of +6.2. RBNZ holds at 2.5%. This setup represents an asymmetric squeeze risk where specs is likely to be forced to cover if data continues to beat expectations. Trade bias: Bullish NZD/USD; technical support and crowded spec shorts favor an upside squeeze. Catalyst: RBNZ meeting 2 Sep — hiking bias active. Risk: RBNZ pivots to a hold, validating the current spec short position.",
+      "title": "USD/JPY — Carry vs Options Skew Divergence",
+      "text": "USD/JPY is holding at 159.43, remaining below its SMA20/50 resistance cluster (160.17/161.07) as intervention risks at the 160.00 handle persist. While a +268bp SOFR-TONA carry differential fundamentally supports the USD bid, the options market is signaling heavy downside protection demand. The 25d Risk Reversal (RR) has reached a strong -1.96 put skew, marking a significant divergence from the carry-positive backdrop. Additionally, the USD/JPY vs VIX correlation has flipped to +0.405 (z=+1.53σ), indicating that JPY's traditional safe-haven function is currently impaired. Trade bias: Neutral/range USD/JPY, capped by intervention risk at 160.00. Catalyst: BoJ Takaichi headlines and next policy meeting. Risk: A confirmed break above 160.00 without MoF intervention is likely to trigger a fast carry-led squeeze toward 162.",
       "evidence": [
-        "NZD COT LF Net: -34,031 (pctl 2, z -2.0)",
-        "NZD ESI: +6.2",
-        "NZD Real Rate: -1.56%"
+        "USD/JPY: 159.43",
+        "25d RR: -1.96 (Put Skew)",
+        "Carry: +268bp (Favors USD)"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "engine-ai-primary"
     },
     {
-      "time": "20:17",
+      "time": "00:51",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Retail Divergence",
-      "text": "AUD/USD is trading at 0.7086, maintaining its position above the SMA200 at 0.6942. The RBA at 4.35% vs Fed 3.75% provides a -60bp carry advantage for the AUD, supporting the current uptrend. COT LF positioning is net long +45,727, while retail sentiment has reached a strong 83% short extreme. This institutional vs retail divergence suggests a high-conviction trend where retail is unsuccessfully fading the move. However, AUD data has been disappointing with an ESI of -6.3, creating a risk of trend exhaustion if macro fundamentals do not improve to match the crowded positioning. Trade bias: Long AUD/USD; institutional bid remains intact against retail fading. Catalyst: next RBA meeting (mkt: 100% hold priced) 29 Sep — 4.35% on hold. Risk: A break below the SMA20 at 0.703 would signal a shift in momentum and potential long liquidation.",
+      "title": "NZD/USD — COT vs ESI Divergence",
+      "text": "NZD/USD is trading at 0.5866, sitting just above its SMA20 (0.5854) and SMA200 (0.5837) support levels. COT LF positioning shows a crowded net short of -34,031, placing it at the 2nd percentile of its 52-week range (z=-2.00). This extreme bearish positioning contradicts the improving fundamental data, with the NZD Economic Surprise Index (ESI) currently at +12.6, indicating a moderate positive bias in realized data. With the RBNZ still in a hiking cycle and a 2.5% policy rate, the disconnect between spec shorts and data outperformance creates an asymmetric short-squeeze risk. Trade bias: Long NZD/USD, targeting an unwind of crowded spec shorts. Catalyst: RBNZ meeting 2 Sep — hike bias remains. Risk: A break below the SMA200 at 0.5837 invalidates the technical floor and validates the spec short.",
       "evidence": [
-        "AUD/USD Retail: 83% Short",
-        "AUD COT LF Net: +45,727 (long% 74.6%)",
-        "AUD/USD Carry: -60bp (favors AUD)"
+        "NZD COT LF: -34,031 (Pctl 2)",
+        "NZD ESI: +12.6",
+        "NZD/USD: 0.5866"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "engine-ai-primary"
     },
     {
-      "time": "20:12",
+      "time": "00:48",
       "priority": "info",
       "title": "GBP/USD — Elevated Volatility Premium",
-      "text": "GBP/USD trades at 1.3531, supported by a neutral Fed-BoE carry spread (both at 3.75%) and a restrictive real rate of +1.15%. Technicals are firmly bullish with price holding above the SMA20/50/200 cluster (1.3433, 1.3378, 1.3418). The options market is pricing in significant protection, with the GBP/USD VRP at +5.0% (IV 11.0% vs HV30 6.0%), the highest premium in the G10. This indicates strong hedging demand ahead of the upcoming UK CPI release and FOMC minutes. Speculative positioning is leaning long (pctl 90, z +1.23), which is likely to cap immediate upside if inflation data fails to surprise hawkishly. Trade bias: Bullish GBP/USD; technical trend is supported by restrictive real rates but high vol premium suggests near-term caution. Catalyst: UK CPI on Wednesday. Risk: UK CPI miss triggers an unwind of the crowded GBP spec longs toward the 1.3433 support.",
+      "text": "GBP/USD is trading at 1.3533, positioned above all major moving averages following a steady 1-month climb of +0.65%. Despite the bullish price action, the options market is pricing in significant uncertainty with an IV of 11.0% against an HV30 of 5.8%, resulting in a substantial +5.2% Vol Risk Premium (VRP). This elevated premium suggests that institutions are paying up for protection rather than chasing the spot move higher. COT data shows LF net longs are becoming crowded at the 90th percentile (z=+1.23), confirming a heavy speculative consensus that may struggle to find new buyers at these levels. Trade bias: Neutral GBP/USD, high hedging costs limit attractive entry for new longs. Catalyst: UK CPI release. Risk: UK CPI beat re-ignites hike pricing, forcing a continuation despite high vol premiums.",
       "evidence": [
-        "GBP/USD VRP: +5.0% (IV 11.0% vs HV30 6.0%)",
-        "GBP COT LF Net: +42,722 (pctl 90, z +1.23)",
-        "GBP/USD SMA20 Support: 1.3433"
+        "GBP/USD: 1.3533",
+        "VRP: +5.2% (IV 11.0% / HV30 5.8%)",
+        "GBP COT LF Pctl: 90"
       ],
-      "_source": "gemini:gemini-3-flash-preview"
+      "_source": "engine-ai-primary"
     }
   ]
 }
