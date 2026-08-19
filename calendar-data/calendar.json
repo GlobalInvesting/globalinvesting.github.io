@@ -1,93 +1,33 @@
 {
-  "lastUpdate": "2026-08-18T23:50:54Z",
-  "generatedAt": "2026-08-18T23:50:54Z",
+  "lastUpdate": "2026-08-19T00:00:52Z",
+  "generatedAt": "2026-08-19T00:00:52Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-08-18",
+  "rangeFrom": "2025-08-19",
   "rangeTo": "2026-08-21",
-  "totalEvents": 3756,
+  "totalEvents": 3772,
   "currencyCounts": {
-    "CHF": 125,
-    "EUR": 856,
-    "CAD": 268,
-    "USD": 1272,
     "AUD": 254,
-    "JPY": 220,
+    "CAD": 267,
+    "USD": 1271,
+    "JPY": 222,
     "NZD": 88,
-    "GBP": 435,
+    "EUR": 863,
+    "GBP": 444,
+    "CHF": 125,
     "SEK": 155,
     "NOK": 83
   },
   "impactCounts": {
-    "medium": 1861,
-    "high": 1667,
+    "medium": 1875,
+    "high": 1669,
     "low": 228
   },
   "surpriseStats": {
-    "EUR/ppi yoy": {
-      "n": 2,
-      "mean": -0.05,
-      "std": 0.353553
-    },
-    "GBP/inflation rate yoy": {
-      "n": 4,
-      "mean": -0.175,
-      "std": 0.05
-    },
-    "GBP/inflation rate mom": {
-      "n": 4,
-      "mean": -0.15,
-      "std": 0.1
-    },
-    "GBP/core inflation rate yoy": {
-      "n": 4,
-      "mean": -0.05,
-      "std": 0.1
-    },
-    "EUR/cpi": {
-      "n": 7,
-      "mean": -0.065714,
-      "std": 0.119004
-    },
-    "USD/eia gasoline stocks change": {
-      "n": 15,
-      "mean": 0.728467,
-      "std": 1.476328
-    },
-    "USD/eia crude oil stocks change": {
-      "n": 15,
-      "mean": 0.395467,
-      "std": 6.140278
-    },
-    "NZD/balance of trade": {
-      "n": 4,
-      "mean": 0.14,
-      "std": 0.538315
-    },
-    "JPY/balance of trade": {
-      "n": 4,
-      "mean": 104.125,
-      "std": 269.579752
-    },
-    "JPY/exports yoy": {
-      "n": 4,
-      "mean": 1.95,
-      "std": 2.367136
-    },
-    "JPY/machinery orders mom": {
-      "n": 5,
-      "mean": 1.6,
-      "std": 6.734612
-    },
-    "JPY/machinery orders yoy": {
-      "n": 5,
-      "mean": 1.06,
-      "std": 9.110049
-    },
     "AUD/unemployment rate": {
       "n": 4,
       "mean": -0.05,
@@ -383,6 +323,16 @@
       "mean": -0.0375,
       "std": 0.03743
     },
+    "USD/eia gasoline stocks change": {
+      "n": 14,
+      "mean": 0.741071,
+      "std": 1.53122
+    },
+    "USD/eia crude oil stocks change": {
+      "n": 14,
+      "mean": 0.778286,
+      "std": 6.183518
+    },
     "JPY/unemployment rate": {
       "n": 3,
       "mean": 0.066667,
@@ -527,6 +477,11 @@
       "n": 3,
       "mean": 0.0,
       "std": 0.173205
+    },
+    "EUR/cpi": {
+      "n": 6,
+      "mean": -0.075,
+      "std": 0.127554
     },
     "USD/jolts job openings": {
       "n": 3,
@@ -953,6 +908,41 @@
       "mean": 0.02,
       "std": 0.0
     },
+    "JPY/balance of trade": {
+      "n": 3,
+      "mean": 28.3,
+      "std": 272.971207
+    },
+    "JPY/exports yoy": {
+      "n": 3,
+      "mean": 0.766667,
+      "std": 0.057735
+    },
+    "JPY/machinery orders yoy": {
+      "n": 4,
+      "mean": 0.975,
+      "std": 10.517089
+    },
+    "JPY/machinery orders mom": {
+      "n": 4,
+      "mean": 2.325,
+      "std": 7.547792
+    },
+    "GBP/core inflation rate yoy": {
+      "n": 3,
+      "mean": -0.033333,
+      "std": 0.11547
+    },
+    "GBP/inflation rate yoy": {
+      "n": 3,
+      "mean": -0.166667,
+      "std": 0.057735
+    },
+    "GBP/inflation rate mom": {
+      "n": 3,
+      "mean": -0.133333,
+      "std": 0.11547
+    },
     "CAD/new housing price index mom": {
       "n": 3,
       "mean": -0.1,
@@ -1067,6 +1057,11 @@
       "n": 4,
       "mean": 45.55,
       "std": 39.563409
+    },
+    "NZD/balance of trade": {
+      "n": 3,
+      "mean": -0.126667,
+      "std": 0.089489
     },
     "EUR/germany ppi yoy": {
       "n": 2,
@@ -1375,54 +1370,6 @@
     }
   },
   "events": [
-    {
-      "currency": "CHF",
-      "event": "Industrial Production YoY",
-      "dateISO": "2025-08-18",
-      "actual": "-0.1%",
-      "forecast": "-2.3",
-      "previous": "8.9",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:30"
-    },
-    {
-      "currency": "EUR",
-      "event": "Balance of Trade",
-      "dateISO": "2025-08-18",
-      "actual": "-€3.59B",
-      "forecast": "-5.8",
-      "previous": "-2.54",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "07:40"
-    },
-    {
-      "currency": "CAD",
-      "event": "Housing Starts",
-      "dateISO": "2025-08-18",
-      "actual": "294.1K",
-      "forecast": "265.0",
-      "previous": "283.5",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "12:15"
-    },
-    {
-      "currency": "USD",
-      "event": "NAHB Housing Market Index",
-      "dateISO": "2025-08-18",
-      "actual": "32",
-      "forecast": "34.0",
-      "previous": "33.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "14:00"
-    },
     {
       "currency": "AUD",
       "event": "Westpac Consumer Confidence Index",
@@ -42925,19 +42872,6 @@
     {
       "date": "28 Jul",
       "dateISO": "2026-07-28",
-      "timeUTC": "03:05",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Gov Bullock Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "28 Jul",
-      "dateISO": "2026-07-28",
       "timeUTC": "06:45",
       "country": "EUR",
       "currency": "EUR",
@@ -47018,24 +46952,11 @@
     {
       "date": "19 Aug",
       "dateISO": "2026-08-19",
-      "timeUTC": "06:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "CPI y/y",
-      "impact": "high",
-      "actual": null,
-      "forecast": "2.9%",
-      "previous": "2.6%"
-    },
-    {
-      "date": "19 Aug",
-      "dateISO": "2026-08-19",
-      "timeUTC": "07:10",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB President Lagarde Speaks",
+      "timeUTC": "02:45",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Hauser Speech",
       "impact": "medium",
       "actual": null,
       "forecast": null,
@@ -47044,15 +46965,301 @@
     {
       "date": "19 Aug",
       "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom PPI Output YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.2%",
+      "previous": "3.5%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom PPI Input MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.0%",
+      "previous": "-2.0%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom PPI Output MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.0%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.9%",
+      "previous": "2.6%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Core Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.1%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Core Inflation Rate YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.5%",
+      "previous": "2.6%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom PPI Core Output YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.7%",
+      "previous": "2.6%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom PPI Core Output MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom PPI Input YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "6.6%",
+      "previous": "7.3%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "06:30",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Industrial Production YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-4.7%",
+      "previous": "-7.1%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Austria Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.1%",
+      "previous": "0.0%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Austria Harmonised Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.4%",
+      "previous": "0.0%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "07:10",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB President Lagarde Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Current Account s.a",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "€22.1B",
+      "previous": "€25.1B"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "€32.0B",
+      "previous": "€-6.2B"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Italy Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "€2680.0M",
+      "previous": "€594.0M"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.8%",
+      "previous": "-0.1%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area CPI",
+      "impact": "high",
+      "actual": null,
+      "forecast": "103.22",
+      "previous": "103.02"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "10:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Portugal Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "€295.0M",
+      "previous": "€-632.82M"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
       "timeUTC": "18:00",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "FOMC Meeting Minutes",
+      "event": "United States FOMC Minutes",
       "impact": "high",
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Balance of Trade",
+      "impact": "high",
+      "actual": null,
+      "forecast": "¥-680.0B",
+      "previous": "¥-406.9B"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Exports YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "19.9%",
+      "previous": "19.3%"
     },
     {
       "date": "20 Aug",
