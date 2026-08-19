@@ -1331,6 +1331,41 @@
     #news-feed-items { max-height: 300px !important; }
     tv-economic-map { min-height: 260px !important; }
 
+    /* Intel panel (News tab: News/Research/Analysis sub-panels) — huge empty
+       gaps reported by Santiago (screenshots, 2026-08-19). #intel-scroll's
+       desktop layout (see the v8.117.18 comment above its rule in this file)
+       is a CSS Grid with three `minmax(0,1fr)` tracks giving News/Research/
+       Analysis an exact equal-thirds split of #intel-scroll's height — which
+       only works because #layout is `display:grid` with a real, viewport-
+       bound `calc(100vh - 92px)` height on desktop. On mobile #layout
+       switches to a flex column with `height:auto` (see the "Layout: stack…"
+       rule above), so #main/#split-lower/#intel-scroll have no definite
+       height for the grid to distribute — each 1fr track still tried to
+       claim an equal third of whatever stray height resulted, leaving mostly
+       empty space below any sub-panel with just a few items. Same root cause
+       as every other fixed/grid-height panel in this file that already gets
+       an auto-height override for mobile (Cross-Asset/Risk, News+Econ map,
+       Sessions+Spreads, TV Calendar) — this one was simply missed when
+       v8.117.18 shipped, since that fix was tested on desktop only. Fix:
+       drop the Grid on mobile, let all three sub-panels stack at their real
+       natural content height and scroll as part of the normal page flow. */
+    #intel-scroll {
+      display: block !important;
+      height: auto !important;
+      flex: none !important;
+      min-height: 0 !important;
+      overflow: visible !important;
+    }
+    #news-section-feed, #research-section-feed, #trading-section-feed {
+      overflow-y: visible !important;
+      max-height: none !important;
+    }
+    /* Sub-panel headers were sticky within #intel-scroll's own internal
+       scroll (desktop). With the whole page scrolling instead on mobile,
+       sticky-to-viewport would compete with #topbar (also top:0, higher
+       z-index) for the same spot — disable rather than risk the overlap. */
+    .intel-sub-head { position: static !important; }
+
     /* Market Sessions + Spreads: stack */
     div[style*="grid-template-columns:1fr 1fr;border-bottom"] { display: flex !important; flex-direction: column !important; }
 
