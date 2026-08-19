@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-19T00:00:52Z",
-  "generatedAt": "2026-08-19T00:00:52Z",
+  "lastUpdate": "2026-08-19T03:22:59Z",
+  "generatedAt": "2026-08-19T03:22:59Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,9 +9,9 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-19",
   "rangeTo": "2026-08-21",
-  "totalEvents": 3772,
+  "totalEvents": 3773,
   "currencyCounts": {
-    "AUD": 254,
+    "AUD": 255,
     "CAD": 267,
     "USD": 1271,
     "JPY": 222,
@@ -23,7 +23,7 @@
     "NOK": 83
   },
   "impactCounts": {
-    "medium": 1875,
+    "medium": 1876,
     "high": 1669,
     "low": 228
   },
@@ -46943,9 +46943,22 @@
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
-      "event": "Wage Price Index q/q",
+      "event": "Australia Wage Price Index YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.2%",
+      "forecast": "3.2%",
+      "previous": "3.2%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Wage Price Index QoQ",
+      "impact": "medium",
+      "actual": "0.8%",
       "forecast": "0.8%",
       "previous": "0.8%"
     },
