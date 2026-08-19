@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-19T14:02:16Z",
-  "generatedAt": "2026-08-19T14:02:16Z",
+  "lastUpdate": "2026-08-19T14:31:20Z",
+  "generatedAt": "2026-08-19T14:31:20Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-19",
   "rangeTo": "2026-08-21",
-  "totalEvents": 3774,
+  "totalEvents": 3776,
   "currencyCounts": {
     "AUD": 255,
     "CAD": 267,
-    "USD": 1272,
+    "USD": 1274,
     "JPY": 222,
     "NZD": 88,
     "EUR": 863,
@@ -23,7 +23,7 @@
     "NOK": 83
   },
   "impactCounts": {
-    "medium": 1877,
+    "medium": 1879,
     "high": 1669,
     "low": 228
   },
@@ -329,14 +329,14 @@
       "std": 0.03743
     },
     "USD/eia gasoline stocks change": {
-      "n": 14,
-      "mean": 0.741071,
-      "std": 1.53122
+      "n": 15,
+      "mean": 0.817533,
+      "std": 1.504945
     },
     "USD/eia crude oil stocks change": {
-      "n": 14,
-      "mean": 0.778286,
-      "std": 6.183518
+      "n": 15,
+      "mean": 1.060067,
+      "std": 6.057703
     },
     "JPY/unemployment rate": {
       "n": 3,
@@ -47282,6 +47282,32 @@
       "actual": "6.77%",
       "forecast": null,
       "previous": "6.77%"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "0.688M",
+      "forecast": "-1.2M",
+      "previous": "-0.968M"
+    },
+    {
+      "date": "19 Aug",
+      "dateISO": "2026-08-19",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "4.405M",
+      "forecast": "-0.6M",
+      "previous": "17.422M"
     },
     {
       "date": "19 Aug",
