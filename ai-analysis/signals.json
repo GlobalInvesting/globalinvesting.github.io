@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-08-19T07:12:55Z",
+  "generated_at": "2026-08-19T15:00:28Z",
   "signals": [
     {
-      "time": "07:12",
+      "time": "15:00",
       "priority": "critical",
-      "title": "GBP/USD — UK CPI Surprise + Positioning",
-      "text": "GBP/USD trades at 1.3553, holding firmly above its SMA20/50/200 cluster following a TIER-1 inflation print. UK headline CPI accelerated to 2.9% y/y in July, matching consensus but rising from the previous 2.6%, which cements the BoE’s mildly restrictive real rate of +1.15%. Speculative positioning remains crowded with COT LF net long at +42,722 (pctl 90, z +1.23), yet the 4W delta of +14,444 shows institutions are still adding to the pound despite the high percentile. Options markets reflect significant hedging demand with a +5.1% Vol Risk Premium (IV 11.0% vs HV30 5.9%), suggesting traders are paying up for protection as the pair tests new highs. The combination of sticky inflation and sustained institutional bidding supports a continuation of the bullish trend toward 1.3600. Trade bias: Long GBP/USD; momentum remains supported by inflation data and institutional flow. Catalyst: FOMC Minutes this evening. Risk: Services inflation deceleration leads to a dovish BoE repricing, triggering an unwind of the crowded long.",
+      "title": "USD/CHF — G10 Bilateral Theme + Bull Flattener",
+      "text": "The USD/CHF pair at 0.8012 anchors a significant G10 bilateral theme as the US Dollar continues its broad descent while the Swiss Franc leads the board. The 1.743% weekly spread between the leader (CHF) and laggard (USD) reflects an aggressive rotation out of the dollar, supported by a bull flattener regime in the US Treasury curve where 10Y yields have dropped to 4.645%. Fed holds at 3.75%. CHF strength remains dominant despite an accommodative -0.40% real policy rate, as institutional flows favor the currency amidst Middle East supply-chain headlines. Trade bias: Bearish USD/CHF; momentum favors CHF strength while DXY remains below its 100.26 SMA20 resistance. Catalyst: FOMC Minutes release tonight. Risk: Spread compresses below 1.20% if Fed minutes reveal a hawkish split that stabilizes US yields.",
       "evidence": [
-        "UK CPI: 2.9% y/y",
-        "GBP COT LF net: +42,722 (pctl 90)",
-        "GBP/USD VRP: +5.1%"
+        "CHF 1W avg: +0.715% (n=6)",
+        "USD 1W avg: -1.028% (n=7)",
+        "G10 spread: 1.743%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "07:08",
+      "time": "14:57",
+      "priority": "critical",
+      "title": "AUD/USD — Hawkish RBA Re-Pricing + Commodities",
+      "text": "AUD/USD is testing 0.7122 following TIER-1 headlines confirming the RBA holds at 4.35%. The RBA at 4.35% vs Fed 3.75% provides a -60bp carry advantage to the AUD, which is further bolstered by three consecutive sessions of rising oil prices. Leveraged funds are already net long +45,727 contracts (pctl 75), and while this is not yet at historical extremes, the 4W delta of +23,781 shows an accelerating institutional bid. Retail sentiment remains 78% short, providing a contrarian tailwind as the pair holds firmly above its SMA20/50/200 cluster (0.7034-0.6945). Trade bias: Long AUD/USD; supported by hawkish RBA bias and commodity price recovery. Catalyst: Next RBA meeting on 29 Sep — hold priced but hawkish rhetoric expected. Risk: Sharp reversal in crude oil prices below $80/bbl invalidating the commodity-linked bid.",
+      "evidence": [
+        "AUD/USD: 0.7122",
+        "RBA 4.35% vs Fed 3.75% — -60bp",
+        "Retail: 78% Short"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "14:55",
       "priority": "warning",
-      "title": "USD/JPY — Carry vs Options Skew Divergence",
-      "text": "USD/JPY is trading at 159.18, below its SMA20 (160.16) and SMA50 (161.07), as hawkish BoJ bets begin to weigh on the pair. While a 275bp Fed-BoJ carry differential fundamentally favors the USD, the options market is signaling heavy downside protection with a strong 25d Risk Reversal skew of -1.96. Speculative positioning remains net short JPY at -59,526, but the WoW delta of +4,107 indicates a shift toward covering those shorts as the September 18 BoJ meeting approaches. VIX at 15.8 suggests cross-asset stress is currently contained, yet the negative VRP of -1.2% in USD/JPY (IV 7.2% vs HV30 8.4%) warns of unusual complacency that often precedes a volatility spike. A sustained break below 159.00 would confirm the options market's bearish bias and likely accelerate a carry unwind. Trade bias: Bearish USD/JPY, contrarian to nominal carry and aligned with options skew. Catalyst: next BoJ meeting (mkt: 60% hike priced). Risk: US 10Y yields rebound toward 5.0%, re-establishing the carry dominance over policy speculation.",
+      "title": "USD/JPY — Options Skew vs Carry Crowding",
+      "text": "USD/JPY at 158.34 is exhibiting a growing divergence between the spot carry trade and the options market. While the 268bp SOFR-TONA carry differential fundamentally supports the USD, the 1M 25d Risk Reversal has shifted to a strong -1.93 put skew, indicating heavy institutional demand for downside protection. This hedging activity comes as JPY Leveraged Fund shorts saw a massive 4W delta of +45,712, suggesting spec short-covering is well underway. The JPY also faces unique technical pressure with Takaichi’s 2027 BOJ appointments looming, which is likely to accelerate the pace of rate hikes beyond current market pricing. Trade bias: Neutral/range USD/JPY; strong downside options hedging counters the carry advantage. Catalyst: next BoJ meeting (mkt: 61% hike priced) 18 Sep — hike bias active. Risk: VIX breaks above 25, triggering a disorderly unwind of the JPY carry trade.",
       "evidence": [
-        "USD/JPY 25d RR: -1.96",
-        "USD/JPY VRP: -1.2%",
-        "Fed-BoJ Carry: +275bp"
+        "25d RR (USDJPY): -1.93",
+        "USD/JPY carry: +268bp",
+        "JPY LF WoW delta: +4,107"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "07:05",
+      "time": "14:52",
       "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence",
-      "text": "NZD/USD at 0.5876 continues to trade above its SMA20/50/200 cluster, recently reclaiming the SMA200 at 0.5837. This price strength contradicts an extreme speculative short position, with COT LF net at -34,031, sitting at the 2nd percentile of its 52-week range (z -2.00). The RBNZ is currently the only G10 central bank in an active hiking cycle with a policy rate of 2.5%, yet it maintains a deeply accommodative real rate of -1.56% due to high inflation expectations. This setup creates an asymmetric short-squeeze risk; if NZ data continues to stabilize (ESI +12.6), specs will be forced to cover into the September 2 meeting. The institutional short is now at a multi-month extreme while price refuses to make fresh lows, a classic signal of trend exhaustion. Trade bias: Long NZD/USD, targeting a squeeze of crowded speculative shorts. Catalyst: RBNZ meeting 2 Sep — Hike bias priced. Risk: RBNZ signals a pause in the hiking cycle, validating the large speculative short position.",
+      "title": "GBP/USD — Inflation Surprise + Vol Risk Premium",
+      "text": "GBP/USD trades at 1.3610 after UK July inflation rose to 2.9%, matching forecasts but highlighting the persistent 0.85% restrictive real rate maintained by the BoE. Options markets are pricing in significant uncertainty, with GBP/USD 1M ATM IV at 11.0% vs a realized HV30 of 5.9%, creating an elevated +5.1% Vol Risk Premium. This high VRP suggests the market is paying a steep premium for protection, likely due to the FOMC minutes risk and the UK's rising inflation profile. Technically, the pair is positioned above its SMA20/50/200 cluster at 1.3441/1.3381/1.342, confirming a bullish structural trend. Trade bias: Bullish GBP/USD; supported by restrictive real rates and technical SMA support. Catalyst: BoE meeting 17 Sep — hold priced. Risk: Negative ESI trend for GBP (-6.3) deepens, suggesting macroeconomic data is beginning to miss even as inflation remains high.",
       "evidence": [
-        "NZD COT LF net: -34,031 (pctl 2)",
-        "NZD ESI: +12.6",
-        "NZD/USD SMA200: 0.5837"
+        "UK Inflation: 2.9%",
+        "GBP/USD VRP: +5.1%",
+        "GBP 10Y Yield: 5.08%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:58",
+      "time": "14:48",
       "priority": "info",
-      "title": "EUR/CHF — Retail Sentiment Extreme",
-      "text": "EUR/CHF is holding at 0.9399, supported by a significant 240bp carry advantage for the EUR (ECB 2.4% vs SNB 0.0%). Retail sentiment has reached a contrarian extreme with community outlook data showing 91% of traders are short the cross, fading the recent EUR strength. Speculative positioning for the CHF is already at a 52-week low (pctl 4, z -2.08), suggesting institutional appetite for the Franc is minimal despite its safe-haven status. With the ESI for the Eurozone remaining positive at +7.8 while Swiss data underperforms at -6.0, the macro backdrop favors continued EUR/CHF upside. The retail extreme suggests a lack of liquidity on the short side, which typically leads to further price appreciation as retail stops are hunted. Trade bias: Bullish EUR/CHF, contrarian to retail extreme and supported by carry. Catalyst: ECB meeting 10 Sep. Risk: Sudden risk-off regime (VIX > 25) triggers a flight to the Swiss Franc, overriding the carry differential.",
+      "title": "EUR/USD — Volatility Hedging vs Stagnant Positioning",
+      "text": "EUR/USD at 1.1666 continues to grind higher, yet speculative positioning remains near historical lows with a 52-week percentile of 8 and a z-score of -2.17. The 25d Risk Reversal at +0.06 is nearly neutral, showing that the options market is not yet chasing the spot move with call demand. However, a notable +2.4% Vol Risk Premium (IV 7.1% vs HV30 4.7%) indicates that market participants are actively hedging against an increase in realized volatility rather than betting on a direction. The pair is currently trading below its SMA200 at 1.1633, suggesting that recent gains are approaching a long-term structural resistance level. Trade bias: Neutral EUR/USD; positioning and options skew do not support a sustained breakout above 1.17. Catalyst: ECB meeting 10 Sep — hike bias active. Risk: EUR ESI (index +8.9) continues to outperform, forcing a spec short-squeeze toward the 1.18 level.",
       "evidence": [
-        "Retail Sentiment: 91% Short",
-        "EUR/CHF Carry: +240bp",
-        "CHF COT pctl: 4"
+        "EUR LF Pctl(52w): 8",
+        "EUR/USD VRP: +2.4%",
+        "EUR/USD SMA200: 1.1633"
       ],
       "_source": "engine-ai-primary"
     }
