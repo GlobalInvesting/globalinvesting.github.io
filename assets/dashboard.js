@@ -14785,21 +14785,64 @@ document.getElementById('lw-range-bar')?.addEventListener('click', e => {
 // COMPARE OVERLAY — normalised % change LineSeries on secondary price scale
 // =============================================================================
 
+// MOBILE FIX (Santiago report, 2026-08-19): "+ Compare" did nothing on mobile.
+// Root cause — #lw-cmp-dropdown was left as static HTML nested inside
+// #lw-range-bar's row-1 div, which has `overflow-x:auto` + WebKit's
+// `-webkit-overflow-scrolling:touch` (needed for iOS momentum-scroll on that
+// horizontally-scrollable toolbar). Switching the dropdown to
+// `position:fixed` via JS is normally enough to escape an ancestor's overflow
+// clipping — but `-webkit-overflow-scrolling:touch` is a well-known WebKit/iOS
+// exception: it forces the whole subtree (including `position:fixed`
+// descendants) into the container's own scrolling compositor layer, so the
+// dropdown stayed clipped to the toolbar's row bounds and effectively
+// invisible/untappable on iOS Safari/Chrome-iOS, while working fine on
+// desktop (no touch/overflow quirk there) and even Android in some cases —
+// consistent with Santiago not flagging any other browser.
+// The Indicators (_lw-ind-dropdown) and Draw (_lw-draw-dropdown) popups never
+// hit this because they're `document.createElement`'d and
+// `document.body.appendChild()`'d fresh on every open — never a descendant of
+// the scrollable toolbar row to begin with. Fix: reparent #lw-cmp-dropdown to
+// <body> once (appendChild on an already-attached node just moves it, so this
+// is idempotent — safe to run on every open), same pattern already proven for
+// the other two chart dropdowns. Also added viewport clamping (both dropdowns'
+// existing "min-width pushes it off the right/bottom edge on mobile" fix,
+// mirrored here) since a body-level fixed element can now legitimately be
+// positioned by any button anywhere in the toolbar, not just one that happens
+// to sit at the row's visible right edge.
+(function _lwCmpDropdownToBody() {
+  const dd = document.getElementById('lw-cmp-dropdown');
+  if (dd && dd.parentElement !== document.body) document.body.appendChild(dd);
+})();
+
 // Toggle compare dropdown open/close
 document.getElementById('lw-cmp-btn')?.addEventListener('click', function(e) {
   e.stopPropagation();
   const dd = document.getElementById('lw-cmp-dropdown');
   if (!dd) return;
+  if (dd.parentElement !== document.body) document.body.appendChild(dd); // safety net
   const open = dd.style.display === 'none' || !dd.style.display;
   if (open) {
-    // Position with fixed coords to escape any overflow:hidden ancestor
+    // Position with fixed coords to escape any overflow:hidden/scrolling ancestor
     const rect = this.getBoundingClientRect();
     dd.style.position  = 'fixed';
-    dd.style.top       = (rect.bottom + 4) + 'px';
-    dd.style.right     = (window.innerWidth - rect.right) + 'px';
-    dd.style.left      = 'auto';
     dd.style.zIndex    = '9100';
     dd.style.display   = 'block';
+    // Measure after display:block so offsetWidth/offsetHeight are real.
+    const ddW = dd.offsetWidth  || 175;
+    const ddH = dd.offsetHeight || 260;
+    // Horizontal: prefer right-aligned under the button, clamp into viewport
+    // with an 8px margin on both edges (same margin the Indicators dropdown
+    // fix already uses) so it's reachable regardless of where the button sits
+    // in the horizontally-scrolled toolbar.
+    let left = rect.right - ddW;
+    if (left < 8) left = 8;
+    if (left + ddW > window.innerWidth - 8) left = window.innerWidth - ddW - 8;
+    // Vertical: flip above the button if there isn't room below.
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const top = spaceBelow >= 80 ? rect.bottom + 4 : Math.max(8, rect.top - ddH - 4);
+    dd.style.left  = left + 'px';
+    dd.style.right = 'auto';
+    dd.style.top   = top + 'px';
   } else {
     dd.style.display = 'none';
   }

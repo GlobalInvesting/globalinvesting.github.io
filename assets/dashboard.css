@@ -1263,8 +1263,20 @@
     }
     #news-ticker { display: none; }
 
-    /* Layout: stack sidebar → main → right panel vertically */
+    /* Layout: stack main → right panel → sidebar vertically.
+       DOM order is sidebar/main/rightpanel (desktop 3-col layout), so on mobile
+       (where #layout collapses to a flex column and visual order otherwise just
+       follows DOM order) the sidebar's FX Liquidity/Crosses/Carry/Vol/Watchlist
+       stack used to render ABOVE the narrative+chart — Santiago flagged this via
+       screenshot: on load, mobile showed the sidebar stack first and had to
+       scroll past all of it to reach the narrative and chart. `order` reverses
+       the visual stack without touching DOM/JS wiring (no ids moved, no event
+       listeners re-bound) — main (narrative+chart+tab content) first, rightpanel
+       second, sidebar last. See CHANGELOG.md for the full entry. */
     #layout { display: flex; flex-direction: column; height: auto; overflow: visible; }
+    #main      { order: 1; }
+    #rightpanel { order: 2; }
+    #sidebar   { order: 3; }
 
     /* Sidebar: horizontal scrollable strip at top */
     #sidebar {
