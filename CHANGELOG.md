@@ -1,3 +1,170 @@
+## v8.166.3 (2026-08-19) — Mobile: huge empty gaps in the News tab (News/Research/Analysis sub-panels) fixed — desktop's equal-thirds CSS Grid had no real height to distribute on mobile
+
+### Santiago flagged
+Three screenshots on the News tab (mobile): a single headline followed by a large empty dark area before Research's header appeared; an empty area above Research's first note; an empty area above the Central Bank Rates table (the next section after News in the mobile stacking order, per v8.166.2's reorder). All three turned out to be different scroll positions through one continuous gap, not three separate bugs.
+
+### Frontend — assets/dashboard.css
+- **Root cause:** `#intel-scroll` (holds the News/Research/Analysis sub-panels inside `#section-news`) uses a CSS Grid on desktop — `grid-template-rows: auto minmax(0,1fr) auto auto minmax(0,1fr) auto minmax(0,1fr)` — giving the three feeds an exact equal-thirds split (see the existing v8.117.18 comment directly above the rule for the full history of that design). This only produces a *sensible* equal split because `#layout` is `display:grid` with a real, viewport-bound `calc(100vh - 92px)` height on desktop. On mobile, `#layout` switches to a flex column with `height:auto` (the "Layout: stack…" rule from v8.166.2 and earlier) — so `#main`/`#split-lower`/`#intel-scroll` have no definite height left to distribute, yet the grid's `minmax(0,1fr)` tracks and each feed's own `overflow-y:auto` still tried to enforce an equal one-third share of whatever near-zero height resulted — visually, any sub-panel with only a couple of items reserved a full third of the (effectively arbitrary) computed height, mostly empty below its actual content. Exactly the same class of bug as every other fixed/grid-height panel in this file that already gets a mobile auto-height override (Cross-Asset/Risk, News+Econ map widget, Sessions+Spreads, TV Calendar) — this one was simply missed because v8.117.18 was tested on desktop only.
+- **Fix:** inside the existing `max-width: 900px` block, `#intel-scroll` drops the Grid entirely on mobile (`display:block; height:auto; flex:none; min-height:0; overflow:visible`), the three feed containers get `overflow-y:visible; max-height:none` (no more internal per-feed scroll box), and `.intel-sub-head` (the sticky sub-panel dividers) gets `position:static` since sticking to the viewport would otherwise compete with `#topbar` for the same `top:0` spot once the whole page — not `#intel-scroll` — is the scroll container. All three sub-panels now stack at their real natural content height and scroll as part of the normal mobile page flow, matching how every other panel on this page already behaves on mobile.
+- Cache-buster: `assets/dashboard.css?v=8.23.18` → `?v=8.166.3` in `index.html`; `sw.js` `CACHE_VERSION` `gi-v8.166.2` → `gi-v8.166.3`.
+
+### Gate run this session
+CSS-only change — brace balance checked programmatically (678 open / 678 close, matched). `node dashboard.test.js` re-run for safety since the same file ships together with `dashboard.js` — 85/85 passed, unchanged (no JS touched this session).
+
+---
+
+## v8.166.2 (2026-08-19) — Mobile: Overview stack reordered (narrative+chart first, sidebar panels last) and "+ Compare" chart overlay fixed (was fully non-functional on mobile)
+
+### Santiago flagged
+Two mobile-only issues via screenshots: (1) on load, the Overview tab showed the FX Liquidity / Crosses / Carry Trade Ranking / Watchlist sidebar stack *above* the narrative and price chart, forcing a scroll past all of it to reach the content that matters first; (2) the chart's "+ Compare" overlay button did nothing when tapped on mobile.
+
+### Frontend — assets/dashboard.css
+- **Mobile stacking order fixed:** `#layout`'s three children (`#sidebar`, `#main`, `#rightpanel`) are DOM-ordered sidebar → main → rightpanel for the desktop 3-column layout; on mobile, `#layout` collapses to `flex-direction: column` and previously just followed that DOM order, putting the sidebar stack first. Added `order: 1` (`#main`), `order: 2` (`#rightpanel`), `order: 3` (`#sidebar`) inside the existing `max-width: 900px` block — pure CSS `order`, no DOM/JS changes, so no ids moved and no event listeners needed re-binding. New visual order: narrative + chart (+ any other Overview-tab content in `#main`) → right panel data → sidebar panels, matching what Santiago asked for.
+
+### Frontend — assets/dashboard.js
+- **"+ Compare" button non-functional on mobile — root cause found and fixed:** `#lw-cmp-dropdown` was left as static HTML nested inside `#lw-range-bar`'s row-1 div, which has `overflow-x:auto` plus `-webkit-overflow-scrolling:touch` (needed for iOS momentum-scroll on that horizontally-scrollable toolbar). Switching the dropdown to `position:fixed` via JS on open is normally enough to escape an ancestor's overflow clipping — but `-webkit-overflow-scrolling:touch` is a documented WebKit/iOS exception: it forces the whole subtree, `position:fixed` descendants included, into the container's own scrolling compositor layer, so the dropdown stayed clipped to the toolbar row's bounds and was effectively invisible/untappable on iOS Safari and Chrome-iOS, while working normally on desktop (no touch/overflow quirk there). The codebase already had the correct pattern for this exact class of bug: the Indicators (`_lw-ind-dropdown`) and Draw (`_lw-draw-dropdown`) popups are `document.createElement`'d and `document.body.appendChild()`'d fresh on every open, so they're never a descendant of the scrollable toolbar row in the first place — confirmed by re-reading their code, which also already carries a "clamp into viewport" mobile fix of its own from a prior session. Applied the same body-reparent pattern to `#lw-cmp-dropdown` (idempotent — `appendChild` on an already-attached node just moves it, so it's safe to also re-run on every open as a safety net) and added the matching viewport-clamped positioning (horizontal 8px-margin clamp both edges, vertical flip-above-button when there isn't room below) — needed now that a body-level fixed dropdown can be opened from a button anywhere along the scrolled toolbar, not just one that happens to sit at the row's visible right edge.
+- Cache-buster: `assets/dashboard.js?v=8.102.0` → `?v=8.166.2` in `index.html`.
+
+### Engine — sw.js *(site repo, listed here per the single-CHANGELOG convention)*
+- `CACHE_VERSION`: `gi-v8.154.3` → `gi-v8.166.2` (forces every client's Service Worker to fetch the new `dashboard.js`/`dashboard.css` rather than serve a stale cached copy — the cache had not been bumped since v8.154.3, several sessions behind the currently-shipped dashboard.js version even before today's change).
+
+### Gate run this session
+`node --check dashboard.js` (OK). `node dashboard.test.js` — 85/85 passed, unchanged.
+
+### Not investigated this session
+Whether the Indicators/Draw dropdowns' own "clamp into viewport" fix (referenced above, already in the codebase) fully covers every toolbar-button position on mobile, or whether the Compare dropdown's new clamp logic diverges from theirs in some edge case (e.g. extremely narrow viewports under ~320px) — both use the same 8px-margin approach but were written independently in this and a prior session; worth a side-by-side pass if either turns out to still misbehave live.
+
+---
+
+## v8.166.1 (2026-08-19) — AUD "Wage Price Index q/q" actual stuck at "—" 30+ min after release, fixed at the root cause (Myfxbook Low-impact filter), mirrored across both calendar parsers
+
+### Santiago flagged
+Live screenshots: AUD Wage Price Index q/q released at 22:30 GMT-3, still showing no Actual in the terminal's Economic Calendar panel more than 30 minutes later, while a second screenshot (MQL5's calendar, sourced from Myfxbook) showed the release had genuinely happened — Actual 0.8% = Consensus 0.8% = Previous 0.8%, tagged **LOW** impact.
+
+### Root cause
+Myfxbook RSS tags "Wage Price Index" **Low** impact (verified live against `myfxbook.com/forex-economic-calendar/australia/wage-price-index-qoq`), and it was missing from the `_IMPACT_UPGRADES` allow-list in **both** independent parsers of the feed — the exact same failure mode as the v3.43/v3.44 PPI, Retail Sales MoM, and Inflation Rate MoM fixes.
+
+Traced why a row existed at all: `fetch_forexfactory_forward()` had forward-filled it from ForexFactory's own JSON export (FF classifies it medium, not low) while the event was still a future day — `vendor: "forexfactory"`, `forecast/previous` populated, `actual: null`. Once the event's date became "today," that forward-fill path stops touching it by design (its own docstring: *"today and earlier are Myfxbook's job — never overridden here"*), handing the actual update over exclusively to Myfxbook RSS — which then silently dropped it on every poll, fast Worker path and slow GitHub Actions cron alike, because of the missing upgrade entry. Confirmed live in the site repo's own `calendar-data/ff_calendar.json`: the entry sat at `"actual": null, "released": false` well past the release time.
+
+### Fixed
+- **`fetch_ff_calendar.py`** (scripts repo) v3.44 → v3.45 — added `"wage price index"` to `_IMPACT_UPGRADES`. Corpus-checked against the live 309-title `ff_calendar.json`: the only other "wage"-containing title, `"United States Employment Cost - Wages QoQ"`, does not contain the `"wage price index"` substring — zero collision.
+- **`calendar-watcher.js`** (Cloudflare Worker, private `globalinvesting-scripts` repo) v5.33 → v5.33.1 — same entry added to its `IMPACT_UPGRADES` mirror, per the "two independent parsers of the same feed silently drift" rule. Build-version identifiers (`/` status endpoint's `version` field, poll-start log line) bumped to match; per-request `User-Agent` strings intentionally left at `5.33` (cosmetic, not functional — not touched to keep the diff reviewable).
+
+### Gate run this session
+`python3 -m py_compile fetch_ff_calendar.py` (OK). `node --check calendar-watcher.js` (OK).
+
+### Flagged, not fixed this session
+"Wage Price Index **y/y**" (AUD) has no entry anywhere in `ff_calendar.json` — only the q/q variant was ever forward-filled by ForexFactory's export. Unconfirmed whether FF's own JSON classifies the y/y variant below medium (excluding it from `fetch_forexfactory_forward()`) or whether this is a separate wiring gap — needs a live check against FF's raw JSON before any fix is attempted, per the "no equivalent source conclusions must be documented" rule. Today's `_IMPACT_UPGRADES` fix does **not** cover this, since forward-fill and Myfxbook-RSS title matching are independent code paths.
+
+### Also flagged (pre-existing, unrelated to this fix)
+`GUIDELINES.md`'s footer cites `v8.166.0` as current, but this `CHANGELOG.md`'s prior top entry was `v8.155.1` — an 11-version gap with no corresponding entries in this file. Per the existing "a CHANGELOG entry is not evidence a fix reached the repo" rule (v8.161.5), the reverse gap here means several GUIDELINES-only rule bumps (`v8.156.0`–`v8.166.0`) reference sessions whose CHANGELOG entries never made it into this file's export. Not investigated further this session — flagged for Santiago to reconcile from his own session history, since neither zip in this export contains the missing entries.
+
+---
+
+## v8.155.1 (2026-08-18) — Public workflow YAML no longer names data/infra vendors in comments — full setup detail moved to a new private ops runbook
+
+### Santiago flagged
+Pointed out that `globalinvesting.github.io`'s public `.github/workflows/*.yml` files reveal internal implementation detail — the `update-intraday-quotes.yml` shown as an example named Twelve Data, Alpha Vantage, and cron-job.org directly, with a full step-by-step PAT/cron-job.org setup runbook and specific rate-limit numbers, all sitting in a public repo. Asked how to resolve it.
+
+### Constraint confirmed before making any change
+GitHub Actions requires workflow files to live in the repo whose events trigger them — these can't simply move to a private repo, and moving them would also lose this project's unlimited free Actions minutes (the whole reason the public repo hosts them). So the `.yml` files themselves, their triggers, and their schedules must stay public; only the surrounding prose was in scope.
+
+### Audit — all 7 public workflow files
+| File | Vendor mentions before |
+|---|---|
+| `update-intraday-quotes.yml` | 17 (worst) |
+| `forex-news.yml` | 11 |
+| `update-ff-calendar.yml` | 6 |
+| `update-fx-liquidity.yml` | 6 |
+| `update-ohlc.yml` | 7 |
+| `update-sitemap.yml` | 3 |
+| `deploy-pages.yml` | 0 — no change needed |
+
+### Fixed — 6 workflow files
+Genericized every vendor/dispatch-service name in comments and step names: "cron-job.org" → "the external clock service" / "the external dispatcher"; "Twelve Data" → "the primary/fallback quote source"; "FRED" → "a credit-spread source"; "yfinance" → dropped from prose (kept only where functionally required, e.g. `pip install yfinance`). Removed the full PAT-creation + cron-job.org account-setup walkthrough and the internal "Bloomberg Terminal: <1 sec" competitive-benchmark aside from `update-ff-calendar.yml`'s latency comment. Version bumps: `update-intraday-quotes.yml` v1.6→v1.7, `update-fx-liquidity.yml` v2.0→v2.1, `update-ohlc.yml` v2.1→v2.2.
+
+### New — `globalinvesting-engine/docs/ops-runbook.md` (private)
+Holds everything stripped out of the public comments: the full cron-job.org setup steps, the active job table (workflow → event_type → frequency), and a per-workflow vendor/API breakdown. This is now the source of truth for "which vendor does what" — the public `.yml` comments only explain what a maintainer needs to safely edit the trigger/schedule.
+
+### Explicitly NOT fixed this session (catalogued in the runbook's "Known residual leaks" section, not silently dropped)
+- **`update-ff-calendar.yml`** — ForexFactory/Myfxbook names are baked in past comment level: the workflow's own name, step names, the committed public data filename (`calendar-data/ff_calendar.json`), and a `"vendor": "forexfactory"`/`"myfxbook"` field inside that publicly-served JSON itself. Fixing this needs a coordinated rename across this workflow, `fetch_ff_calendar.py` (private scripts repo), and every frontend consumer (`dashboard.js`, `econ-matrix.js`, `calendar-panel.js`) — too large a blast radius to fold into a comment-cleanup pass without its own dedicated session.
+- **`env:` block secret names** (`TWELVE_DATA_API_KEY`, `ALPHA_VANTAGE_API_KEY`, `FINNHUB_API_KEY`, `NEWSDATA_API_KEY`, `FRED_API_KEY`) still reveal vendors as literal strings — the secret *value* isn't exposed, only its name. Renaming a live GitHub Secret requires a Santiago-side change in repo Settings, coordinated with every script reading `os.environ[...]` under the old name.
+- **`pip install yfinance ...` lines** — fixable via a private `requirements.txt` (`pip install -r private-scripts/requirements.txt`), not done here to keep this diff reviewable.
+- **Private repo/org names** (`GlobalInvesting/globalinvesting-scripts`, `GlobalInvesting/globalinvesting-engine`) in `curl`/checkout calls — functionally required in the API call itself, not decorative; low actual risk since both target repos are private.
+
+### Gate run this session
+`python3 -c "import yaml; yaml.safe_load(...)"` on all 7 edited/reviewed workflow files (OK). No `.yml`-specific unit test exists in `test_all_scripts.py` to run against.
+
+---
+
+## v8.155.0 (2026-08-18) — narrative.json/signals.json/catalysts.json no longer reveal the AI vendor/model in public JSON — `_source`/`source_model` now use fixed aliases
+
+### Santiago flagged
+Pasted a live `narrative.json` and `signals.json` sample and pointed out `"_source": "gemini"` / `"_source": "gemini:gemini-3-flash-preview"` — these files are served as public static files on GitHub Pages, so the AI vendor and model name were directly visible to anyone fetching the raw JSON, not just in logs. Confirmed `catalysts.json`'s `source_model` field had the same issue ("gemini", plus "groq-internal-data" for the fallback tier — which also named the vendor). Requested: keep an internal alias for primary-vs-fallback distinction, but never reveal which vendor is which.
+
+### Backend — scripts/generate_narrative_signals.py
+- **Root cause:** four independent write sites across two cascade functions each hardcoded a literal vendor string: `generate_narrative_via_gemini()` (`result["_source"] = "gemini"`), `generate_signals_via_gemini()` (`_sig["_source"] = f"gemini:{_sig_model}"` — this one leaked the specific model tier too, under a comment that incorrectly said it was "so logs show source model", when the field actually ships straight into the public `signals.json`), and the catalysts cascade's two branches (`source_model = "gemini"` / `"groq-internal-data"`). Groq's narrative/signals fallback path was already fine by omission — it never set `_source` at all — but that's incidental, not a designed convention, so it wasn't relied on.
+- **Fixed:** added two module-level constants, `SOURCE_ALIAS_PRIMARY = "engine-ai-primary"` and `SOURCE_ALIAS_FALLBACK = "engine-ai-fallback"`, documented as the *only* place a vendor name may appear anywhere near the public-output path. All four write sites now use one of these instead of a literal string. Also fixed the one comparison depending on the old literal (`elif source_model == "gemini" and sources:` → `== SOURCE_ALIAS_PRIMARY`), which would have silently broken (always taking the `else: _ccy_sources = []` branch, dropping Gemini's own grounded-search sources whenever Tavily wasn't available) had it been missed.
+- The actual vendor/model/key-index detail Santiago may still want for debugging stays exactly where it already was — `print()` lines in CI Actions logs, never published — so no diagnostic capability was lost, only the public-JSON leak.
+- Confirmed via `grep` that no other write site in the file assigns `_source`/`source_model` outside these four (`ast.parse`/`py_compile` clean).
+- Frontend audited: `assets/*.js`/`index.html` never reference either field — this was pure unused leakage, zero UI risk in changing it.
+- Gate run this session: `python3 -m py_compile` + `ast.parse` on `generate_narrative_signals.py` (OK). `scripts/tests/test_all_scripts.py`'s only "source"-named test (`test_source_se_preserva_exacto`) covers an unrelated CB-rate-provenance field (`fetch_rates.make_result()`'s `source`, e.g. "RBA-HTML") — not touched, not affected.
+
+---
+
+## v8.154.5 (2026-08-18) — VaR/CVaR panel header tooltips now state the green/red thresholds (was undocumented in the tooltip, unlike the IV panel's identical convention)
+
+### Frontend — index.html
+- Santiago asked whether the VaR 95% / ES/VaR column colors should explain what red vs. green means, following industry convention. Confirmed the coloring already follows the same Bloomberg EQS-style "cheap/expensive" magnitude semaphore this project documents elsewhere (`_ivSourceLabel` tooltip: "Green ≤7% (cheap vol); red >12% (expensive)") — just never stated the thresholds in the VaR/ES-VaR tooltips themselves.
+- `VaR 95%` header tooltip: added "Green ≤0.5% (calm); red >1.0% (elevated) — risk magnitude, not price direction" — the explicit "not price direction" clause disambiguates from this site's more common up/down (gain/loss) use of the same green/red classes elsewhere, since this column reuses those classes for a risk-level reading instead.
+- `ES/VaR` header tooltip: added "Green ≤1.5x (typical); red >2.0x" ahead of the existing fat-tails explanation, matching the exact threshold values already implemented in `renderVarCvarPanel()`'s `ratioCls` logic (`assets/dashboard.js`, unchanged this session).
+- No JS logic changed — thresholds already matched the code; only the tooltip copy was out of sync with the IV panel's established documentation pattern. No cache-buster needed (inline `title` attribute text in `index.html`, not a linked/versioned asset).
+- Gate run this session: div-tag balance on `index.html` (OK, 534/534).
+
+---
+
+## v8.154.4 (2026-08-18) — Real Rate Carry Analysis: NZD Infl. Exp. "4.06% · 2026-06-01" investigated — confirmed correct and current, not stale; no code change
+
+### Investigated — Santiago's question (screenshot: Real Rate Carry Analysis, NZD/RBNZ row, "4.06% CPI" tooltip "OECD CPI YoY (NZL) · 2026-06-01")
+- **Value confirmed correct, live-checked against Stats NZ:** NZ's June 2026 quarter CPI YoY is 4.1% (released 2026-07-21) — the OECD-sourced 4.06% is within rounding/vintage tolerance. This is the most recent print available; the next release (September 2026 quarter) isn't due until October 2026, so "June" is genuinely current, not a stale fallback that failed to refresh.
+- **"2026-06-01" looks stale but isn't** — same false-alarm pattern as the NOK/SEK bond-yield "Jun 01" dates flagged and closed out in v8.153.2: OECD SDMX dates quarterly observations to the quarter's first month, not the release date.
+- **Confirmed NZD's deliberate exclusion from the v5.8 calendar-CPI fallback tier (`fetch_inflation_expectations.py`) is correct, not a gap.** `calendar-data/calendar.json` has no NZD headline "Inflation Rate YoY" event at all — only "Inflation Rate QoQ" (1.5%, 20 Jul) and "Core Inflation Rate YoY" (3.2%). Wiring the calendar tier for NZD would silently feed a QoQ print into a column compared against an annualized OIS rate — the exact reporting-basis mismatch GUIDELINES already prohibits (v8.140.0 rule). RBNZ's own forward-looking 2Y survey (the intended primary) remains unreachable from GitHub Actions runners (documented ASN-level block) — OECD is the correct current fallback.
+- Live-checked `econ-matrix.js` v2.5.0's own NZD CPI YoY cell against the current `calendar.json` (same investigation): `periodLabel()` correctly resolves to "QoQ · 20 Jul" for that cell today, not "YoY" — if the screenshot showed "YoY," it predates the v2.5.0 caching fix landing in the browser tab, not a labeling bug in current code.
+- **No code changed this session** — both panels' current behavior is correct as designed.
+
+---
+
+## v8.154.3 (2026-08-17) — Frontend root cause found for "AUD/NOK/CAD 10Y still stale": econ-matrix.js was caching 10Y/CB Rate forever after first load, never re-fetching — backend data was already correct
+
+### Investigated — "why haven't the AUD/NOK/CAD 10Y fixes from v8.154.2 shown up on the frontend"
+- **Backend confirmed already fixed and fresh.** Diffed the new zip export's `extended-data/*.json` directly: AUD `bond10y: 5.05` (dated 2026-08-18), CAD `bond10y: 3.72` (2026-08-17), NOK `bond10y: 4.4` (2026-08-17) — all consistent with the v2.10.2 `fetch_bond_yields.py` fix and its live production run. This is not the bug.
+- **Real root cause: `econ-matrix.js`'s own caching, unrelated to the backend fix.** v2.4.0 (2026-08-16, v8.163.0) fetches 10Y yield and CB Rate exactly once, on first scroll-into-view, then freezes them in `_y10Cache`/`_cbCache` for the rest of the page session — its periodic 3-min refresh only re-fetches `calendar.json`. The v2.4.0 rationale ("rates change far less often than calendar actuals") is wrong specifically for 10Y: `extended-data/{CCY}.json` bond10y is written **daily**. Any tab left open past a day's bond-yield run — or open at the moment the AUD/CAD orphaned-field fix landed — keeps showing the pre-fix value indefinitely, with no error and no visible staleness indicator, which exactly matches Santiago's screenshot (AUD 4.83%/CAD 3.59%/NOK 4.20%) against the already-fresh backend values above.
+
+### Frontend — assets/econ-matrix.js (v2.4.0 → v2.5.0) / index.html / sw.js
+- **Fixed:** the periodic refresh (`refreshCalendarOnly` renamed `refreshPanel`) now re-fetches `calendar.json` **and** 10Y (`Promise.all(CCY_ORDER.map(load10y))` — ten small JSON files, cheap) **and** recomputes CB Rate (`Promise.all(CCY_ORDER.map(getCBRate))` — no network cost, `getCBRate()` already reads the live `window._STATE_cbRates` that dashboard.js's own 5-min `health.json` sentinel poll keeps fresh; only the econ-matrix.js snapshot of it was stale) on every tick, replacing the fixed `_y10Cache`/`_cbCache` values. A failed re-fetch falls back to the last good snapshot rather than blanking the panel.
+- `load10y()` also got `{cache:'no-store'}` (matching `loadCalendarData()`) so the browser/SW HTTP cache can't hand back a stale copy inside the 3-min window either.
+- Cache-busters bumped: `index.html`, `sw.js` → `assets/econ-matrix.js?v=2.5.0`; `sw.js` `CACHE_VERSION` → `gi-v8.154.3`.
+- Gate run this session: `node --check` on `econ-matrix.js`/`sw.js` (OK), div-tag balance on `index.html` (OK, 383/383). No existing unit-test file covers `econ-matrix.js` specifically (no `econ-matrix.test.js` found) — not run against a live browser this session; Santiago should confirm on next load that AUD/CAD/NOK 10Y match the `extended-data/*.json` values above, then again ~3 min later without a manual reload to confirm the periodic refresh itself is picking up any subsequent daily update.
+
+---
+
+## v8.154.2 (2026-08-17) — Economic Matrix gaps investigated: NZD CPI MoM confirmed correct (NZ has no monthly CPI), NZD Ind Prod confirmed a known pending gap; AUD/CAD 10Y yield "orphaned field" bug fixed
+
+### Investigated — Santiago's three reports (screenshot: Economic Matrix, NZD CPI MoM blank, NZD Ind Prod blank, AUD/NOK 10Y "Jun 01", CAD 10Y "Jul 30")
+
+- **NZD CPI MoM — confirmed correct, not a bug.** `econ-matrix.js`'s `cpimom:[]` for NZD already documents this (`// confirmed gap — NZ does not publish a monthly CPI`). Live-checked against Stats NZ and TradingEconomics: New Zealand is still the only OECD country reporting inflation quarterly only — Stats NZ's own monthly-CPI rollout doesn't begin until July 2027. TE's `/new-zealand/inflation-rate-mom` page exists but is not evidence of a genuine monthly release; correctly left blank.
+- **NZD Ind Prod — confirmed a real, already-documented gap, not fixed this session.** `econ-matrix.js`'s `prod: ['Manufacturing Sales YoY']` for NZD has been silently dead since `backfill_supplementary_events.py`'s 2026-08-14 incident: v1.0's hardcoded NZD Manufacturing Sales YoY value was found wrong (wrong metric — QoQ value shown under a YoY-titled event) and was **removed** rather than re-guessed, per GUIDELINES' standing "an unverifiable value must not be displayed" rule. The `econ-matrix.js` comment crediting `fetch_supplementary_indicators.py` is now stale — that script doesn't exist (folded into `backfill_supplementary_events.py`, which does not currently backfill this series). Santiago's linked TE `/new-zealand/industrial-production` page is a **genuinely different, quarterly, Stats NZ-sourced series** from the removed Manufacturing Sales YoY — worth considering as the real replacement, but needs its own primary-source-cited backfill entry (same discipline as the incident fix) before being wired in, not a blind swap.
+- **AUD/CAD 10Y bond yield staleness — root-caused and fixed; NOK not fixed, needs a live diagnostic.**
+
+### Scripts — fetch_bond_yields.py (v2.10.1 → v2.10.2) / update-bond-yields.yml
+- **AUD.bond10y was an orphaned field, not a dual-writer conflict as v2.10.0 believed.** `update_extended_data.py`'s v14.3 fix (2026-08-02) had already removed its own bond10y/bond2y/bond5y writes for every currency — 13 days *before* v2.10.0 (2026-08-15) declined to wire AUD.bond10y here on the assumption that script still owned it. Nobody was writing the field for at least those 13 days. Fixed: `fetch_aud_2y()` now also writes bond10y (TE daily → DBnomics RBA/F2.1/FCMYGBAG10 monthly fallback), reusing the exact helpers already proven for bond2y.
+- **CAD.bond10y had never had a writer at all** — `fetch_cad_2y()` was accurately "bond2y only" since inception. Fixed: added TE daily → FRED IRLTLT01CAM156N monthly fallback.
+- **NOK.bond10y not fixed this session.** Its TE-first cascade and v2.10.1's regex rewrite were only diagnostic-confirmed against captured offline text (tradingeconomics.com unreachable from this sandbox), never against a live production run — and it's still serving the stale FRED-OECD-MEI fallback today, meaning TE is still missing for NOK in production for a reason the offline capture couldn't catch. Needs the next scheduled run's NOK `[DIAG]` log, not a guess.
+- `update-bond-yields.yml`'s summary step was only echoing USD/EUR/GBP/JPY/NOK/SEK — silently hiding AUD/CAD/NZD/CHF, exactly the currencies most worth eyeballing for this bug class. Now loops all 10.
+- Gate run this session: `python3 -m py_compile fetch_bond_yields.py` (OK). **Not confirmed against a live GitHub Actions run** — sandbox has no network access to TE/DBnomics/FRED. Santiago should verify the next scheduled run shows fresh AUD/CAD 10Y dates, and check NOK's `[DIAG]` output specifically.
+
+---
+
 ## v8.154.1 (2026-08-15) — Volatility Leaderboard "all GBP top 5" investigated: confirmed real market data + correct triangulation, not a bug — added a methodology-comparability caveat to the tooltip
 
 ### Frontend — assets/dashboard.js (v8.101.0 → v8.101.1) / sw.js
