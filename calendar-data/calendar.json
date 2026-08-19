@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-19T05:54:42Z",
-  "generatedAt": "2026-08-19T05:54:42Z",
+  "lastUpdate": "2026-08-19T06:01:17Z",
+  "generatedAt": "2026-08-19T06:01:17Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -929,18 +929,18 @@
       "std": 7.547792
     },
     "GBP/core inflation rate yoy": {
-      "n": 3,
-      "mean": -0.033333,
+      "n": 4,
+      "mean": 0.0,
       "std": 0.11547
     },
     "GBP/inflation rate yoy": {
-      "n": 3,
-      "mean": -0.166667,
-      "std": 0.057735
+      "n": 4,
+      "mean": -0.125,
+      "std": 0.095743
     },
     "GBP/inflation rate mom": {
-      "n": 3,
-      "mean": -0.133333,
+      "n": 4,
+      "mean": -0.1,
       "std": 0.11547
     },
     "CAD/new housing price index mom": {
@@ -1367,6 +1367,16 @@
       "n": 3,
       "mean": 0.166667,
       "std": 0.057735
+    },
+    "GBP/ppi output yoy": {
+      "n": 2,
+      "mean": -0.3,
+      "std": 0.282843
+    },
+    "GBP/ppi output mom": {
+      "n": 2,
+      "mean": -0.2,
+      "std": 0.282843
     }
   },
   "events": [
@@ -46984,7 +46994,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom PPI Output YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.1%",
       "forecast": "3.2%",
       "previous": "3.5%"
     },
@@ -46997,7 +47007,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom Inflation Rate MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "0.3%",
       "previous": "0.1%"
     },
@@ -47010,9 +47020,9 @@
       "flag": "🇬🇧",
       "event": "United Kingdom PPI Input MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-1.7%",
       "forecast": "0.0%",
-      "previous": "-2.0%"
+      "previous": "-1.9%"
     },
     {
       "date": "19 Aug",
@@ -47023,9 +47033,9 @@
       "flag": "🇬🇧",
       "event": "United Kingdom PPI Output MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.2%",
-      "previous": "0.0%"
+      "previous": "-0.1%"
     },
     {
       "date": "19 Aug",
@@ -47036,7 +47046,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom Inflation Rate YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "2.9%",
       "forecast": "2.9%",
       "previous": "2.6%"
     },
@@ -47049,7 +47059,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom Core Inflation Rate MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.1%",
       "previous": "0.3%"
     },
@@ -47062,7 +47072,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom Core Inflation Rate YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "2.6%",
       "forecast": "2.5%",
       "previous": "2.6%"
     },
@@ -47075,7 +47085,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom PPI Core Output YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "2.8%",
       "forecast": "2.7%",
       "previous": "2.6%"
     },
@@ -47088,7 +47098,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom PPI Core Output MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.6%",
       "forecast": "0.5%",
       "previous": "0.5%"
     },
@@ -47101,9 +47111,9 @@
       "flag": "🇬🇧",
       "event": "United Kingdom PPI Input YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "4.9%",
       "forecast": "6.6%",
-      "previous": "7.3%"
+      "previous": "7.4%"
     },
     {
       "date": "19 Aug",
