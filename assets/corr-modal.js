@@ -1,6 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CORRELATION MODAL  v2.3  — inline-panel edition
+// CORRELATION MODAL  v2.4  — inline-panel edition
 // Fluid layout, terminal CSS variables throughout.
+// v2.4: consumes fetch_intraday_quotes.py v3.20's Fisher z-transform fields —
+// chart's ±1.5σ/±2.5σ bands now read explicit band15hi/lo, band25hi/lo (pre-
+// computed server-side in Fisher space, mapped back to correlation space) via
+// _cmDrawChart's new `bands` param, replacing the old norm±1.5*std client-side
+// math; "252d norm" legend/strip now discloses n_indep (honest non-overlapping
+// sample count); pairs-signal neutral copy updated to ±1.5σ to match the
+// raised server-side threshold. No layout/CSS change.
 // v2.3: added an industry-standard pairs-trade signal (hedge-ratio spread
 // z-score — spread_z/signal/beta from fetch_intraday_quotes.py) below the
 // existing z-score signal row. No other structural or aesthetic change —
@@ -125,7 +132,7 @@ function _cmPairsSignalHtml(corrObj) {
       '<div class="cm-psig-note">Underlying correlation too weak this window for a stable hedge ratio \u2014 no directional read.</div></div>';
   }
   const dirCls = signal === 'neutral' ? 'neutral' : (signal === 'short_a_long_b' ? 'short' : 'long');
-  const dirText = signal === 'neutral' ? 'No stretch \u2014 spread within \u00b11\u03c3'
+  const dirText = signal === 'neutral' ? 'No stretch \u2014 spread within \u00b11.5\u03c3'
     : signal === 'short_a_long_b' ? 'Short ' + a + ' \u00b7 Long ' + b
     : 'Long ' + a + ' \u00b7 Short ' + b;
   const zTxt = spread_z != null ? (spread_z >= 0 ? '+' : '') + spread_z.toFixed(2) + '\u03c3' : '\u2014';
@@ -137,7 +144,7 @@ function _cmPairsSignalHtml(corrObj) {
 }
 
 
-function _cmDrawChart(container, history, histDates, norm, std) {
+function _cmDrawChart(container, history, histDates, norm, bands) {
   if (!container || !window.LightweightCharts || !history || !history.length) return;
   if (_cmChart) { try { _cmChart.remove(); } catch (_) {} _cmChart = null; }
   const LWC = window.LightweightCharts;
@@ -164,8 +171,13 @@ function _cmDrawChart(container, history, histDates, norm, std) {
   if (norm != null) {
     const normSer = _cmChart.addSeries(LWC.LineSeries, { color: 'rgba(209,212,220,.4)', lineWidth: 1, lineStyle: 2, lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false, priceFormat: { type: 'custom', formatter: fmt } });
     normSer.setData(hLine(norm));
-    if (std != null) {
-      [[norm + 1.5 * std, 'rgba(246,148,28,.7)'], [norm - 1.5 * std, 'rgba(246,148,28,.7)'], [norm + 2.5 * std, 'rgba(239,83,80,.7)'], [norm - 2.5 * std, 'rgba(239,83,80,.7)']].forEach(([val, color]) => {
+    // Band lines come pre-computed server-side in Fisher (arctanh) space and mapped back
+    // via tanh() for display (fetch_correlations() v3.20) — do NOT re-derive them here by
+    // adding/subtracting a std in raw correlation space, which reintroduces the compressed/
+    // non-normal-near-±1 bias the Fisher transform exists to fix.
+    if (bands && bands.hi15 != null) {
+      [[bands.hi15, 'rgba(246,148,28,.7)'], [bands.lo15, 'rgba(246,148,28,.7)'], [bands.hi25, 'rgba(239,83,80,.7)'], [bands.lo25, 'rgba(239,83,80,.7)']].forEach(([val, color]) => {
+        if (val == null) return;
         const ser = _cmChart.addSeries(LWC.LineSeries, { color, lineWidth: 1, lineStyle: 2, lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false, priceFormat: { type: 'custom', formatter: fmt } });
         ser.setData(hLine(val));
       });
@@ -210,7 +222,9 @@ function _cmDrawChart(container, history, histDates, norm, std) {
 
 function openCorrModal(corrObj) {
   closeCorrModal();
-  const { a, b, corr30, corr, corr90, norm, z_score, std, n30, n, n90, history, hist_dates } = corrObj;
+  const { a, b, corr30, corr, corr90, norm, z_score, n30, n, n90, history, hist_dates,
+          n_indep, band15hi, band15lo, band25hi, band25lo } = corrObj;
+  const bands = { hi15: band15hi, lo15: band15lo, hi25: band25hi, lo25: band25lo };
   const absZ = z_score != null ? Math.abs(z_score) : null;
   let sigCls = '', sigTag = '', sigTxt = '';
   if (absZ != null) {
@@ -287,15 +301,15 @@ function openCorrModal(corrObj) {
         '<div class="cm-metric"><div class="cm-m-lbl">30d</div><div class="cm-m-val ' + _cmCls(corr30) + '">' + _cmFmt(corr30) + '</div><div class="cm-m-sub">' + (n30 != null ? n30 + ' sess.' : '\u2014') + '</div></div>' +
         '<div class="cm-metric"><div class="cm-m-lbl">60d</div><div class="cm-m-val ' + _cmCls(corr) + '">' + _cmFmt(corr) + '</div><div class="cm-m-sub">' + (n != null ? n + ' sess.' : '\u2014') + '</div></div>' +
         '<div class="cm-metric"><div class="cm-m-lbl">90d</div><div class="cm-m-val ' + _cmCls(corr90) + '">' + _cmFmt(corr90) + '</div><div class="cm-m-sub">' + (n90 != null ? n90 + ' sess.' : '\u2014') + '</div></div>' +
-        '<div class="cm-metric"><div class="cm-m-lbl">Norm</div><div class="cm-m-val ' + _cmCls(norm) + '">' + _cmFmt(norm) + '</div><div class="cm-m-sub">252d avg</div></div>' +
+        '<div class="cm-metric"><div class="cm-m-lbl">Norm</div><div class="cm-m-val ' + _cmCls(norm) + '">' + _cmFmt(norm) + '</div><div class="cm-m-sub">252d avg' + (n_indep != null ? ' \u00b7 ~' + n_indep + ' indep.' : '') + '</div></div>' +
         '<div class="cm-metric"><div class="cm-m-lbl">Z-Score</div><div class="cm-m-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</div><div class="cm-m-sub">30d vs norm</div></div>' +
       '</div>' +
       '<div id="cm-body">' +
         '<div id="cm-chart-wrap"><div id="cm-lwc-container"></div><div id="cm-tooltip"></div></div>' +
         '<div id="cm-legend">' +
           '<div class="cm-leg-item"><div class="cm-leg-swatch solid-blue"></div>30d</div>' +
-          '<div class="cm-leg-item"><div class="cm-leg-swatch dash-white"></div>252d norm (' + _cmFmt(norm) + ')</div>' +
-          (std != null ? '<div class="cm-leg-item"><div class="cm-leg-swatch dash-amber"></div>\u00b11.5\u03c3</div><div class="cm-leg-item"><div class="cm-leg-swatch dash-red"></div>\u00b12.5\u03c3</div>' : '') +
+          '<div class="cm-leg-item"><div class="cm-leg-swatch dash-white"></div>252d norm (' + _cmFmt(norm) + (n_indep != null ? ' \u00b7 ~' + n_indep + ' indep. samples' : '') + ')</div>' +
+          (band15hi != null ? '<div class="cm-leg-item"><div class="cm-leg-swatch dash-amber"></div>\u00b11.5\u03c3</div><div class="cm-leg-item"><div class="cm-leg-swatch dash-red"></div>\u00b12.5\u03c3</div>' : '') +
         '</div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">Regime</span><span class="cm-regime-val ' + regimeCls + '">' + regimeLabel + ' &thinsp;· ' + _cmFmt(corr30) + '</span></div>' +
         '<div class="cm-regime-row"><span class="cm-regime-key">Trend</span><span class="cm-regime-val">' + trendHtml + '</span></div>' +
@@ -314,11 +328,11 @@ function openCorrModal(corrObj) {
   document.addEventListener('keydown', _cmKeydown);
   const container = document.getElementById('cm-lwc-container');
   if (window.LightweightCharts) {
-    requestAnimationFrame(() => _cmDrawChart(container, hist, dates, norm, std));
+    requestAnimationFrame(() => _cmDrawChart(container, hist, dates, norm, bands));
   } else {
     const t0 = Date.now();
     const poll = setInterval(() => {
-      if (window.LightweightCharts || Date.now() - t0 > 8000) { clearInterval(poll); if (window.LightweightCharts) _cmDrawChart(container, hist, dates, norm, std); }
+      if (window.LightweightCharts || Date.now() - t0 > 8000) { clearInterval(poll); if (window.LightweightCharts) _cmDrawChart(container, hist, dates, norm, bands); }
     }, 120);
   }
 }
