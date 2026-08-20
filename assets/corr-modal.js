@@ -1,6 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CORRELATION MODAL  v2.2  — inline-panel edition
+// CORRELATION MODAL  v2.3  — inline-panel edition
 // Fluid layout, terminal CSS variables throughout.
+// v2.3: renamed to "Correlations" (title no longer per-pair); added Cross
+// asset / Matrix tabs; 30d/60d/90d window buttons moved beneath the tab bar
+// and now drive both tabs; added a G10 currency correlation matrix tab
+// (client-side, mirrors the EA's DrawCorrelation()); added a hedge-ratio
+// spread z-score pairs-trade signal to the Cross asset tab (spread_z/signal/
+// beta from fetch_intraday_quotes.py fetch_correlations()).
 // ═══════════════════════════════════════════════════════════════════════════
 (function () {
   if (document.getElementById('cm2-modal-css')) return;
@@ -82,6 +88,36 @@
 .cm-related-val { font-size:10px;font-weight:600;font-family:var(--font-mono);color:var(--text); }
 .cm-related-val.up   { color:var(--up); }
 .cm-related-val.down { color:var(--down); }
+#cm-tabs { display:flex;gap:2px;padding:8px 14px 0;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0; }
+.cm-tab { flex:0 0 auto;font-size:10.5px;font-family:var(--font-ui,sans-serif);padding:6px 12px;background:transparent;border:1px solid transparent;border-bottom:none;color:var(--text3,#4e5c70);cursor:pointer;border-radius:3px 3px 0 0;transition:color .1s,background .1s; }
+.cm-tab:hover { color:var(--text2); }
+.cm-tab.active { background:var(--bg);border-color:var(--border,#252d3d);border-bottom:2px solid var(--blue);color:var(--text); }
+#cm-window-btns { display:flex;align-items:center;justify-content:flex-end;gap:2px;padding:6px 14px;background:var(--bg2);border-bottom:1px solid var(--border,#252d3d);flex-shrink:0; }
+.cm-win-btn { font-size:8px;padding:2px 6px;background:var(--bg3);border:1px solid var(--border2,#363c4e);color:var(--text3,#4e5c70);border-radius:2px;cursor:pointer;line-height:1.4;font-family:var(--font-mono); }
+.cm-win-btn.active { color:#fff;border-color:var(--blue); }
+.cm-pair-hd { padding:10px 14px 2px; }
+#cm-pair-title { font-size:12px;font-weight:600;color:var(--text); }
+#cm-pair-sub { font-size:9px;color:var(--text2);margin-top:1px;font-family:var(--font-mono); }
+.cm-metric.win-active { background:var(--bg2);box-shadow:inset 0 2px 0 var(--blue); }
+.cm-psig { display:flex;flex-direction:column;gap:3px;margin:8px 14px;padding:8px 10px;background:var(--bg2);border:1px solid var(--border,#252d3d);border-left:3px solid var(--blue);border-radius:0 4px 4px 0; }
+.cm-psig-hd { display:flex;align-items:center;justify-content:space-between; }
+.cm-psig-tag { font-size:8.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--blue); }
+.cm-psig-meta { font-size:8px;color:var(--text3,#4e5c70);font-family:var(--font-mono); }
+.cm-psig-dir { font-size:11px;font-weight:600;color:var(--text);font-family:var(--font-mono); }
+.cm-psig-note { font-size:9px;color:var(--text2);line-height:1.5; }
+.cm-psig.short { border-left-color:var(--down); }
+.cm-psig.short .cm-psig-tag { color:var(--down); }
+.cm-psig.long { border-left-color:var(--up); }
+.cm-psig.long .cm-psig-tag { color:var(--up); }
+.cm-psig.neutral, .cm-psig.pending { border-left-color:var(--text3,#4e5c70); }
+.cm-psig.neutral .cm-psig-tag, .cm-psig.pending .cm-psig-tag { color:var(--text3,#4e5c70); }
+#cm-matrix-wrap { padding:10px 14px 14px; }
+#cm-matrix-sub { font-size:9px;color:var(--text2);margin-bottom:8px;font-family:var(--font-mono); }
+.cm-mtx-table { border-collapse:collapse;width:100%;table-layout:fixed; }
+.cm-mtx-table td,.cm-mtx-table th { text-align:center;font-size:9px;font-family:var(--font-mono);padding:0; }
+.cm-mtx-hd { color:var(--text3,#4e5c70);padding-bottom:4px!important;font-weight:400; }
+.cm-mtx-lbl { text-align:left!important;color:var(--blue);padding:0 4px 0 0!important;font-weight:600;width:26px; }
+.cm-mtx-cell { height:26px;border:1px solid var(--border,#252d3d); }
 `;
   document.head.appendChild(s);
 })();
@@ -164,8 +200,171 @@ function _cmDrawChart(container, history, histDates, norm, std) {
   setTimeout(applySize, 60); setTimeout(applySize, 250);
 }
 
-function openCorrModal(corrObj) {
-  closeCorrModal();
+// ── Tab / window-selector state (shared by Cross asset + Matrix tabs) ───────
+let _cmActiveTab = 'cross';
+let _cmWindow = 60;
+let _cmCurrentObj = null;
+
+// ── G10 currency matrix — client-side, mirrors the EA's DrawCorrelation() ──
+// Same symbol set/order/labels as CORR_SYMS_X / CORR_LABELS_X in the EA, and
+// the same compact "value * 10" display + banded heat coloring. Computed from
+// the same daily ohlc-data/*.json files the chart already uses — no new
+// backend endpoint needed, matching the EA's own live-computed matrix.
+const _CM_MTX_SYMS = [
+  { id: 'eurusd', label: 'EUR' }, { id: 'gbpusd', label: 'GBP' }, { id: 'usdjpy', label: 'JPY' },
+  { id: 'audusd', label: 'AUD' }, { id: 'usdcad', label: 'CAD' }, { id: 'usdchf', label: 'CHF' },
+  { id: 'nzdusd', label: 'NZD' }, { id: 'usdnok', label: 'NOK' }, { id: 'usdsek', label: 'SEK' },
+  { id: 'dxy',    label: 'DXY' },
+];
+let _cmMtxRaw = null;
+let _cmMtxLoading = null;
+function _cmLoadMatrixSeries() {
+  if (_cmMtxRaw) return Promise.resolve(_cmMtxRaw);
+  if (_cmMtxLoading) return _cmMtxLoading;
+  _cmMtxLoading = Promise.all(_CM_MTX_SYMS.map(s =>
+    fetch('./ohlc-data/' + s.id + '.json', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : [])
+      .catch(() => [])
+      .then(bars => [s.id, Array.isArray(bars) ? bars : []])
+  )).then(pairs => {
+    const out = {};
+    pairs.forEach(([id, bars]) => { out[id] = bars; });
+    _cmMtxRaw = out;
+    return out;
+  });
+  return _cmMtxLoading;
+}
+function _cmPearsonArr(x, y) {
+  const n = Math.min(x.length, y.length);
+  if (n < 10) return null;
+  const xs = x.slice(-n), ys = y.slice(-n);
+  const mx = xs.reduce((s, v) => s + v, 0) / n, my = ys.reduce((s, v) => s + v, 0) / n;
+  let num = 0, dx = 0, dy = 0;
+  for (let i = 0; i < n; i++) { const a = xs[i] - mx, b = ys[i] - my; num += a * b; dx += a * a; dy += b * b; }
+  if (dx === 0 || dy === 0) return null;
+  return num / Math.sqrt(dx * dy);
+}
+function _cmComputeMatrix(raw, windowDays) {
+  const bySym = {};
+  _CM_MTX_SYMS.forEach(s => {
+    const m = new Map();
+    (raw[s.id] || []).forEach(bar => { if (bar && bar.time != null && bar.close != null) m.set(bar.time, bar.close); });
+    bySym[s.id] = m;
+  });
+  let commonDates = null;
+  _CM_MTX_SYMS.forEach(s => {
+    const ds = new Set(bySym[s.id].keys());
+    commonDates = commonDates ? new Set([...commonDates].filter(d => ds.has(d))) : ds;
+  });
+  const sortedDates = Array.from(commonDates || []).sort();
+  const useDates = sortedDates.slice(-(windowDays + 1));
+  if (useDates.length < 15) return null;
+
+  const returns = {};
+  _CM_MTX_SYMS.forEach(s => {
+    const closes = useDates.map(d => bySym[s.id].get(d));
+    const r = [];
+    for (let i = 1; i < closes.length; i++) if (closes[i - 1] > 0 && closes[i] > 0) r.push(Math.log(closes[i] / closes[i - 1]));
+    returns[s.id] = r;
+  });
+  const n = _CM_MTX_SYMS.length;
+  const matrix = [];
+  for (let i = 0; i < n; i++) {
+    matrix.push([]);
+    for (let j = 0; j < n; j++) matrix[i].push(i === j ? 1 : _cmPearsonArr(returns[_CM_MTX_SYMS[i].id], returns[_CM_MTX_SYMS[j].id]));
+  }
+  return { matrix, n: useDates.length - 1 };
+}
+function _cmMtxBg(v) {
+  if (v == null) return 'var(--bg2)';
+  if (v >= 0.70) return 'rgba(38,166,91,.32)';
+  if (v >= 0.30) return 'rgba(38,166,91,.15)';
+  if (v >= -0.30) return 'var(--bg2)';
+  if (v >= -0.70) return 'rgba(239,83,80,.15)';
+  return 'rgba(239,83,80,.32)';
+}
+function _cmMtxFg(v) { if (v == null) return 'var(--text3)'; if (v >= 0.30) return 'var(--up)'; if (v <= -0.30) return 'var(--down)'; return 'var(--text2)'; }
+
+async function _cmRenderMatrixBody() {
+  const tabBody = document.getElementById('cm-tab-body');
+  if (!tabBody) return;
+  tabBody.innerHTML = '<div id="cm-matrix-wrap"><div id="cm-matrix-sub">Loading G10 correlation matrix\u2026</div></div>';
+  const raw = await _cmLoadMatrixSeries();
+  if (_cmActiveTab !== 'matrix' || !document.getElementById('cm-tab-body')) return; // tab/modal changed meanwhile
+  const result = _cmComputeMatrix(raw, _cmWindow);
+  const mw = document.getElementById('cm-matrix-wrap');
+  if (!mw) return;
+  if (!result) { mw.innerHTML = '<div id="cm-matrix-sub">Not enough overlapping daily history to compute the matrix.</div>'; return; }
+  const { matrix, n } = result;
+  let html = '<div id="cm-matrix-sub">G10 currency correlation matrix \u00b7 log-return Pearson \u00b7 ' + _cmWindow + 'd (' + n + ' sess.)</div>';
+  html += '<table class="cm-mtx-table" aria-label="G10 currency correlation matrix"><tr><th class="cm-mtx-hd"></th>' +
+    _CM_MTX_SYMS.map(s => '<th class="cm-mtx-hd">' + s.label + '</th>').join('') + '</tr>';
+  _CM_MTX_SYMS.forEach((s, i) => {
+    html += '<tr><td class="cm-mtx-lbl">' + s.label + '</td>' +
+      _CM_MTX_SYMS.map((s2, j) => {
+        const v = matrix[i][j], isDiag = i === j;
+        const txt = isDiag ? '\u2014' : (v == null ? '\u2014' : (v * 10).toFixed(1));
+        const title = isDiag ? s.label : (v == null ? 'Insufficient data' : (s.label + '/' + s2.label + ': ' + (v >= 0 ? '+' : '') + v.toFixed(2)));
+        return '<td class="cm-mtx-cell" style="background:' + (isDiag ? 'var(--bg2)' : _cmMtxBg(v)) + ';color:' + (isDiag ? 'var(--text3)' : _cmMtxFg(v)) + ';" title="' + title + '">' + txt + '</td>';
+      }).join('') + '</tr>';
+  });
+  html += '</table>';
+  mw.innerHTML = html;
+}
+
+// ── Pairs-trade signal — hedge-ratio spread z-score, computed server-side ──
+// (fetch_intraday_quotes.py fetch_correlations(), spread_z/signal/beta fields).
+// `signal` is undefined on cached data from before this feature shipped (not
+// yet re-fetched), null when the underlying correlation was too weak this
+// window for a stable hedge ratio, or one of 'long_a_short_b'/'short_a_long_b'/
+// 'neutral' once computed. Handle all three states rather than assuming data.
+function _cmPairsSignalHtml(corrObj) {
+  const { a, b, signal, spread_z, beta } = corrObj;
+  if (typeof signal === 'undefined') {
+    return '<div class="cm-psig pending"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">pending</span></div>' +
+      '<div class="cm-psig-note">Not available for this pair yet \u2014 lands with the next scheduled data refresh.</div></div>';
+  }
+  if (signal == null) {
+    return '<div class="cm-psig neutral"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">60d hedge-ratio spread</span></div>' +
+      '<div class="cm-psig-note">Underlying correlation too weak this window for a stable hedge ratio \u2014 no directional read.</div></div>';
+  }
+  const dirCls = signal === 'neutral' ? 'neutral' : (signal === 'short_a_long_b' ? 'short' : 'long');
+  const dirText = signal === 'neutral' ? 'No stretch \u2014 spread within \u00b11\u03c3'
+    : signal === 'short_a_long_b' ? 'Short ' + a + ' \u00b7 Long ' + b
+    : 'Long ' + a + ' \u00b7 Short ' + b;
+  const zTxt = spread_z != null ? (spread_z >= 0 ? '+' : '') + spread_z.toFixed(2) + '\u03c3' : '\u2014';
+  const note = signal === 'neutral'
+    ? 'The hedge-ratio-adjusted spread between the two legs is tracking within its normal range \u2014 no mean-reversion edge currently.'
+    : 'The hedge-ratio-adjusted spread (beta ' + (beta != null ? beta.toFixed(2) : '\u2014') + ') is stretched ' + zTxt + ' vs its own 60d norm \u2014 ' + (signal === 'short_a_long_b' ? a : b) + ' has run ahead of what the pair\u2019s usual co-movement implies. Mean-reversion read, not investment advice.';
+  return '<div class="cm-psig ' + dirCls + '"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">60d hedge-ratio spread \u00b7 ' + zTxt + '</span></div>' +
+    '<div class="cm-psig-dir">' + dirText + '</div><div class="cm-psig-note">' + note + '</div></div>';
+}
+
+function _cmSetTab(tab) {
+  if (tab === _cmActiveTab) return;
+  _cmActiveTab = tab;
+  const crossBtn = document.getElementById('cm-tab-cross'), matrixBtn = document.getElementById('cm-tab-matrix');
+  crossBtn?.classList.toggle('active', tab === 'cross');
+  matrixBtn?.classList.toggle('active', tab === 'matrix');
+  crossBtn?.setAttribute('aria-selected', tab === 'cross' ? 'true' : 'false');
+  matrixBtn?.setAttribute('aria-selected', tab === 'matrix' ? 'true' : 'false');
+  if (_cmChart) { try { _cmChart.remove(); } catch (_) {} _cmChart = null; }
+  if (tab === 'cross') _cmRenderCrossAssetBody(_cmCurrentObj);
+  else _cmRenderMatrixBody();
+}
+function _cmSetWindow(w) {
+  if (w === _cmWindow) return;
+  _cmWindow = w;
+  document.querySelectorAll('.cm-win-btn').forEach(btn => btn.classList.toggle('active', +btn.dataset.w === w));
+  if (_cmActiveTab === 'cross') _cmRenderCrossAssetBody(_cmCurrentObj);
+  else _cmRenderMatrixBody();
+}
+window._cmSetTab = _cmSetTab;
+window._cmSetWindow = _cmSetWindow;
+
+function _cmRenderCrossAssetBody(corrObj) {
+  const tabBody = document.getElementById('cm-tab-body');
+  if (!tabBody) return;
   const { a, b, corr30, corr, corr90, norm, z_score, std, n30, n, n90, history, hist_dates } = corrObj;
   const absZ = z_score != null ? Math.abs(z_score) : null;
   let sigCls = '', sigTag = '', sigTxt = '';
@@ -186,10 +385,13 @@ function openCorrModal(corrObj) {
   const hist = Array.isArray(history) ? history : [];
   const dates = Array.isArray(hist_dates) ? hist_dates : [];
 
-  // Regime label — qualitative description of current 30d correlation
+  // Regime label — qualitative description of the SELECTED window's correlation
+  // (30d/60d/90d, via the window buttons) rather than always 30d, so the
+  // buttons actually change what "Regime" reports.
+  const selCorr = _cmWindow === 30 ? corr30 : _cmWindow === 90 ? corr90 : corr;
   let regimeLabel = '\u2014', regimeCls = '';
-  if (corr30 != null) {
-    const v = corr30;
+  if (selCorr != null) {
+    const v = selCorr;
     if      (v >=  0.70) { regimeLabel = 'Strong positive'; regimeCls = 'up'; }
     else if (v >=  0.40) { regimeLabel = 'Moderate positive'; regimeCls = 'up'; }
     else if (v >=  0.10) { regimeLabel = 'Weak positive'; regimeCls = ''; }
@@ -210,6 +412,7 @@ function openCorrModal(corrObj) {
   }
   let dateRangeLabel = '';
   if (dates.length >= 2) dateRangeLabel = ' \u00b7 ' + _cmFmtDate(dates[0]) + ' \u2013 ' + _cmFmtDate(dates[dates.length - 1]);
+  const psigHtml = _cmPairsSignalHtml(corrObj);
 
   // Related correlations — other cached pairs sharing an instrument with this one (a or b).
   // Cross-asset confluence check: a Bloomberg CORR matrix reduced to "what else moves with this pair right now".
@@ -225,47 +428,37 @@ function openCorrModal(corrObj) {
       related.map(r => '<div class="cm-related-row"><span class="cm-related-key">' + r.label + '</span><span class="cm-related-val ' + _cmCls(r.val) + '">' + _cmFmt(r.val) + '</span></div>').join('')
     : '';
 
-  const bd = document.createElement('div');
-  bd.id = 'cm-bd';
-  bd.setAttribute('role', 'dialog');
-  bd.setAttribute('aria-modal', 'true');
-  bd.setAttribute('aria-label', 'Correlation: ' + a + ' vs ' + b);
+  // Metric strip cell class picks up win-active when it matches the shared window selector,
+  // so the 30/60/90 buttons visibly tie back to which cell is "live" for Regime/Trend below.
+  const winCls = (w) => w === _cmWindow ? ' win-active' : '';
 
-  bd.innerHTML =
-    '<div id="cm-modal">' +
-      '<div id="cm-hd">' +
-        '<div><div id="cm-title">' + a + ' <span style="color:var(--text2);font-weight:400">vs</span> ' + b + '</div>' +
-        '<div id="cm-sub">Rolling Pearson \u00b7 252-day history</div></div>' +
-        '<button id="cm-close" onclick="closeCorrModal()" aria-label="Close">\u00d7</button>' +
-      '</div>' +
-      '<div id="cm-strip">' +
-        '<div class="cm-metric"><div class="cm-m-lbl">30d</div><div class="cm-m-val ' + _cmCls(corr30) + '">' + _cmFmt(corr30) + '</div><div class="cm-m-sub">' + (n30 != null ? n30 + ' sess.' : '\u2014') + '</div></div>' +
-        '<div class="cm-metric"><div class="cm-m-lbl">60d</div><div class="cm-m-val ' + _cmCls(corr) + '">' + _cmFmt(corr) + '</div><div class="cm-m-sub">' + (n != null ? n + ' sess.' : '\u2014') + '</div></div>' +
-        '<div class="cm-metric"><div class="cm-m-lbl">90d</div><div class="cm-m-val ' + _cmCls(corr90) + '">' + _cmFmt(corr90) + '</div><div class="cm-m-sub">' + (n90 != null ? n90 + ' sess.' : '\u2014') + '</div></div>' +
-        '<div class="cm-metric"><div class="cm-m-lbl">Norm</div><div class="cm-m-val ' + _cmCls(norm) + '">' + _cmFmt(norm) + '</div><div class="cm-m-sub">252d avg</div></div>' +
-        '<div class="cm-metric"><div class="cm-m-lbl">Z-Score</div><div class="cm-m-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</div><div class="cm-m-sub">30d vs norm</div></div>' +
-      '</div>' +
-      '<div id="cm-body">' +
-        '<div id="cm-chart-wrap"><div id="cm-lwc-container"></div><div id="cm-tooltip"></div></div>' +
-        '<div id="cm-legend">' +
-          '<div class="cm-leg-item"><div class="cm-leg-swatch solid-blue"></div>30d</div>' +
-          '<div class="cm-leg-item"><div class="cm-leg-swatch dash-white"></div>252d norm (' + _cmFmt(norm) + ')</div>' +
-          (std != null ? '<div class="cm-leg-item"><div class="cm-leg-swatch dash-amber"></div>\u00b11.5\u03c3</div><div class="cm-leg-item"><div class="cm-leg-swatch dash-red"></div>\u00b12.5\u03c3</div>' : '') +
-        '</div>' +
-        '<div class="cm-regime-row"><span class="cm-regime-key">Regime</span><span class="cm-regime-val ' + regimeCls + '">' + regimeLabel + ' &thinsp;· ' + _cmFmt(corr30) + '</span></div>' +
-        '<div class="cm-regime-row"><span class="cm-regime-key">Trend</span><span class="cm-regime-val">' + trendHtml + '</span></div>' +
-        '<div class="cm-regime-row"><span class="cm-regime-key">30d vs norm</span><span class="cm-regime-val ' + (normDelta != null ? _cmZcls(z_score) : '') + '">' + (normDelta != null ? _cmFmt(normDelta) : '\u2014') + '</span></div>' +
-        '<div class="cm-regime-row"><span class="cm-regime-key">Z-score</span><span class="cm-regime-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</span></div>' +
-        '<div class="cm-regime-row"><span class="cm-regime-key">252d range</span><span class="cm-regime-val">' + rangeHtml + '</span></div>' +
-        (sigTxt ? '<div class="cm-signal ' + sigCls + '"><span class="cm-signal-tag">' + sigTag + '</span><span class="cm-signal-body">' + sigTxt + '</span></div>' : '') +
-        relatedHtml +
-      '</div>' +
-    '</div>';
+  tabBody.innerHTML =
+    '<div class="cm-pair-hd">' +
+      '<div id="cm-pair-title">' + a + ' <span style="color:var(--text2);font-weight:400">vs</span> ' + b + '</div>' +
+      '<div id="cm-pair-sub">Rolling Pearson \u00b7 252-day history' + dateRangeLabel + '</div>' +
+    '</div>' +
+    '<div id="cm-strip">' +
+      '<div class="cm-metric' + winCls(30) + '"><div class="cm-m-lbl">30d</div><div class="cm-m-val ' + _cmCls(corr30) + '">' + _cmFmt(corr30) + '</div><div class="cm-m-sub">' + (n30 != null ? n30 + ' sess.' : '\u2014') + '</div></div>' +
+      '<div class="cm-metric' + winCls(60) + '"><div class="cm-m-lbl">60d</div><div class="cm-m-val ' + _cmCls(corr) + '">' + _cmFmt(corr) + '</div><div class="cm-m-sub">' + (n != null ? n + ' sess.' : '\u2014') + '</div></div>' +
+      '<div class="cm-metric' + winCls(90) + '"><div class="cm-m-lbl">90d</div><div class="cm-m-val ' + _cmCls(corr90) + '">' + _cmFmt(corr90) + '</div><div class="cm-m-sub">' + (n90 != null ? n90 + ' sess.' : '\u2014') + '</div></div>' +
+      '<div class="cm-metric"><div class="cm-m-lbl">Norm</div><div class="cm-m-val ' + _cmCls(norm) + '">' + _cmFmt(norm) + '</div><div class="cm-m-sub">252d avg</div></div>' +
+      '<div class="cm-metric"><div class="cm-m-lbl">Z-Score</div><div class="cm-m-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</div><div class="cm-m-sub">30d vs norm</div></div>' +
+    '</div>' +
+    '<div id="cm-chart-wrap"><div id="cm-lwc-container"></div><div id="cm-tooltip"></div></div>' +
+    '<div id="cm-legend">' +
+      '<div class="cm-leg-item"><div class="cm-leg-swatch solid-blue"></div>30d</div>' +
+      '<div class="cm-leg-item"><div class="cm-leg-swatch dash-white"></div>252d norm (' + _cmFmt(norm) + ')</div>' +
+      (std != null ? '<div class="cm-leg-item"><div class="cm-leg-swatch dash-amber"></div>\u00b11.5\u03c3</div><div class="cm-leg-item"><div class="cm-leg-swatch dash-red"></div>\u00b12.5\u03c3</div>' : '') +
+    '</div>' +
+    (sigTxt ? '<div class="cm-signal ' + sigCls + '"><span class="cm-signal-tag">' + sigTag + '</span><span class="cm-signal-body">' + sigTxt + '</span></div>' : '') +
+    psigHtml +
+    '<div class="cm-regime-row"><span class="cm-regime-key">Regime</span><span class="cm-regime-val ' + regimeCls + '">' + regimeLabel + ' &thinsp;· ' + _cmFmt(selCorr) + '</span></div>' +
+    '<div class="cm-regime-row"><span class="cm-regime-key">Trend</span><span class="cm-regime-val">' + trendHtml + '</span></div>' +
+    '<div class="cm-regime-row"><span class="cm-regime-key">30d vs norm</span><span class="cm-regime-val ' + (normDelta != null ? _cmZcls(z_score) : '') + '">' + (normDelta != null ? _cmFmt(normDelta) : '\u2014') + '</span></div>' +
+    '<div class="cm-regime-row"><span class="cm-regime-key">Z-score</span><span class="cm-regime-val ' + _cmZcls(z_score) + '">' + (z_score != null ? (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3' : '\u2014') + '</span></div>' +
+    '<div class="cm-regime-row"><span class="cm-regime-key">252d range</span><span class="cm-regime-val">' + rangeHtml + '</span></div>' +
+    relatedHtml;
 
-  document.body.appendChild(bd);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{ bd.scrollIntoView({behavior:'smooth',block:'start'}); }));
-  bd.addEventListener('click', e => { if (e.target === bd) closeCorrModal(); });
-  document.addEventListener('keydown', _cmKeydown);
   const container = document.getElementById('cm-lwc-container');
   if (window.LightweightCharts) {
     requestAnimationFrame(() => _cmDrawChart(container, hist, dates, norm, std));
@@ -275,6 +468,43 @@ function openCorrModal(corrObj) {
       if (window.LightweightCharts || Date.now() - t0 > 8000) { clearInterval(poll); if (window.LightweightCharts) _cmDrawChart(container, hist, dates, norm, std); }
     }, 120);
   }
+}
+
+// ── Modal shell — title is always "Correlations" (no longer per-pair), with
+// Cross asset / Matrix tabs and a shared 30d/60d/90d window selector beneath
+// the tab bar. Tab content renders into #cm-tab-body via _cmRenderCrossAssetBody()
+// / _cmRenderMatrixBody(); this function only builds the static chrome once per open.
+function openCorrModal(corrObj) {
+  _cmCurrentObj = corrObj;
+  _cmActiveTab = 'cross'; // always open on Cross asset, regardless of which tab was active last time
+
+  const bd = document.createElement('div');
+  bd.id = 'cm-bd';
+  bd.setAttribute('role', 'dialog');
+  bd.setAttribute('aria-modal', 'true');
+  bd.setAttribute('aria-label', 'Correlations');
+
+  bd.innerHTML =
+    '<div id="cm-modal">' +
+      '<div id="cm-hd">' +
+        '<div id="cm-title">Correlations</div>' +
+        '<button id="cm-close" onclick="closeCorrModal()" aria-label="Close">\u00d7</button>' +
+      '</div>' +
+      '<div id="cm-tabs" role="tablist" aria-label="Correlation view">' +
+        '<button id="cm-tab-cross" class="cm-tab active" role="tab" aria-selected="true" onclick="_cmSetTab(\'cross\')">Cross asset</button>' +
+        '<button id="cm-tab-matrix" class="cm-tab" role="tab" aria-selected="false" onclick="_cmSetTab(\'matrix\')">Matrix</button>' +
+      '</div>' +
+      '<div id="cm-window-btns" role="group" aria-label="Correlation window">' +
+        [30, 60, 90].map(w => '<button class="cm-win-btn' + (w === _cmWindow ? ' active' : '') + '" data-w="' + w + '" onclick="_cmSetWindow(' + w + ')">' + w + 'd</button>').join('') +
+      '</div>' +
+      '<div id="cm-body"><div id="cm-tab-body"></div></div>' +
+    '</div>';
+
+  document.body.appendChild(bd);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ bd.scrollIntoView({behavior:'smooth',block:'start'}); }));
+  bd.addEventListener('click', e => { if (e.target === bd) closeCorrModal(); });
+  document.addEventListener('keydown', _cmKeydown);
+  _cmRenderCrossAssetBody(corrObj);
 }
 function _cmKeydown(e) { if (e.key === 'Escape') closeCorrModal(); }
 function closeCorrModal() {
