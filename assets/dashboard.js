@@ -14283,6 +14283,12 @@ function renderNewsSection(items, meta) {
       });
     }
   }
+
+  // Wide-monitor two-column layout (Intel Fullscreen only, see
+  // _intelApplyColumnSplit() near openIntelFullscreen() below) — applied
+  // after every fresh render of both feeds this function owns.
+  _intelApplyColumnSplit('news-section-feed');
+  _intelApplyColumnSplit('trading-section-feed');
 }
 
 function _newsSetFilter(type, value) {
@@ -14353,6 +14359,69 @@ function _intelFsSetTab(tab) {
 }
 window._intelFsSetTab = _intelFsSetTab;
 
+// ── Wide-monitor two-column layout (v8.171.0) ───────────────────────────────
+// Mirrors calendar-panel.js's shouldSplitCalColumns()/.cal-col-wrap pattern
+// exactly — same reasoning: capping fullscreen content to a readable
+// max-width (v8.170.0, ~880px here) is correct for line length, but on a
+// genuinely wide monitor it leaves large empty gutters on both sides that
+// a single centered column can't use. The calendar's fix is two real,
+// independently-scrolling DOM columns (newspaper flow: read column 1
+// top-to-bottom, then column 2) rather than CSS `column-count` — multi-col
+// CSS doesn't scroll correctly against a growing list inside a
+// fixed-height, overflow:auto container, since the browser sizes columns
+// to fit one "page" instead of flowing content down predictably. Same
+// 1400px breakpoint as the calendar, for one consistent "is this a wide
+// monitor" threshold across the app rather than a second independently-
+// tuned number.
+function shouldSplitIntelColumns() {
+  const overlay = document.getElementById('intel-fullscreen-overlay');
+  return !!(overlay && overlay.classList.contains('intel-fs-active') && window.innerWidth >= 1400);
+}
+
+// Called right after a render function (renderNewsSection/
+// renderResearchSection) has freshly rebuilt containerId's children as one
+// flat top-to-bottom flow — never called on an already-split container, so
+// this always starts from flat content and doesn't need to detect/undo a
+// prior split state itself.
+function _intelApplyColumnSplit(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.classList.remove('intel-cols-active');
+  if (!shouldSplitIntelColumns()) return;
+  const items = Array.from(container.children);
+  if (items.length < 2) return; // not worth splitting 0-1 items (incl. the empty-state div)
+  const mid  = Math.ceil(items.length / 2);
+  const colA = document.createElement('div');
+  colA.className = 'intel-col-wrap';
+  const colB = document.createElement('div');
+  colB.className = 'intel-col-wrap';
+  items.slice(0, mid).forEach(function (el) { colA.appendChild(el); }); // appendChild MOVES, not clones
+  items.slice(mid).forEach(function (el) { colB.appendChild(el); });
+  container.appendChild(colA);
+  container.appendChild(colB);
+  container.classList.add('intel-cols-active');
+}
+window._intelApplyColumnSplit = _intelApplyColumnSplit;
+
+// Re-derives all three feeds' column layout without waiting for their next
+// data-driven render — needed on fullscreen open/close (the breakpoint
+// check's own input, .intel-fs-active, just changed) and on a resize that
+// crosses the 1400px breakpoint while fullscreen is already open.
+function _intelRelayoutColumns() {
+  ['news-section-feed', 'research-section-feed', 'trading-section-feed'].forEach(_intelApplyColumnSplit);
+}
+window._intelRelayoutColumns = _intelRelayoutColumns;
+
+let _intelResizeRaf = null;
+function _intelOnResize() {
+  if (!document.getElementById('intel-fullscreen-overlay')?.classList.contains('intel-fs-active')) return;
+  if (_intelResizeRaf) return;
+  _intelResizeRaf = requestAnimationFrame(function () {
+    _intelResizeRaf = null;
+    _intelRelayoutColumns();
+  });
+}
+
 function openIntelFullscreen() {
   const overlay    = document.getElementById('intel-fullscreen-overlay');
   const inner      = document.getElementById('intel-fullscreen-inner');
@@ -14376,6 +14445,7 @@ function openIntelFullscreen() {
   overlay.classList.add('intel-fs-active');
   document.body.style.overflow = 'hidden';
   _intelFsSetTab('news'); // always opens on News, per Santiago's choice
+  _intelRelayoutColumns(); // re-check the 1400px breakpoint now that .intel-fs-active is set
 }
 
 function closeIntelFullscreen() {
@@ -14397,6 +14467,7 @@ function closeIntelFullscreen() {
   _intelFsOriginalScrollNext   = null;
   _intelFsOriginalFilterParent = null;
   _intelFsOriginalFilterNext   = null;
+  _intelRelayoutColumns(); // flatten back to one column — docked view is never split, any width
 }
 
 function _intelFsWireUp() {
@@ -14410,6 +14481,7 @@ function _intelFsWireUp() {
       closeIntelFullscreen();
     }
   });
+  window.addEventListener('resize', _intelOnResize);
 }
 // dashboard.js is deferred so the DOM is already parsed by the time this
 // runs — DOMContentLoaded may have already fired (same pattern used
@@ -15614,6 +15686,7 @@ function renderResearchSection(items, meta) {
     empty.className = 'rs-empty';
     empty.textContent = 'No research notes match current filter.';
     feed.appendChild(empty);
+    _intelApplyColumnSplit('research-section-feed');
     return;
   }
 
@@ -15719,6 +15792,10 @@ function renderResearchSection(items, meta) {
 
     feed.appendChild(wrap);
   });
+
+  // Wide-monitor two-column layout (Intel Fullscreen only) — see
+  // _intelApplyColumnSplit() near openIntelFullscreen() below.
+  _intelApplyColumnSplit('research-section-feed');
 }
 
 function _researchSetFilter(type, value) {
