@@ -658,47 +658,152 @@ function initCorrAssetTabs() {
   });
 }
 
-// ── Correlation Matrix fullscreen — DOM-lift, same pattern as
-// openCalFullscreen()/closeCalFullscreen() in calendar-panel.js: #corr-matrix-wrap
-// is moved into #corr-mtx-fullscreen-inner on open, restored to its original
-// spot inside the Cross-Asset Correlations sidebar panel on close. No resize/
-// column-split logic needed — the table is a plain fixed-layout grid. ──
-let _corrMtxFsOriginalParent = null;
-let _corrMtxFsOriginalNext   = null;
+// ── Pair×Pair Correlation Matrix fullscreen — content-swap, not a DOM-lift.
+// Santiago's spec: the docked "Matrix" tab (#corr-matrix-wrap, currency x
+// currency, _corrMtxCcys) stays exactly as-is — the sidebar panel is too
+// small to fit a 32x32 pairs grid. The expand button instead opens a
+// fullscreen overlay that builds an independent Par×Par matrix (Mataf-style:
+// every tracked FX pair vs every other, raw Pearson on log-returns, not the
+// per-currency composite the docked Matrix tab uses) with a Daily/4h/Hourly
+// timeframe selector.
+//
+// Data: Daily reuses the existing ohlc-data/{pair}.json D1 closes
+// (_corrMtxLoadPairData()'s cache). 4h/Hourly read ohlc-data/h4/{pair}.json
+// and ohlc-data/h1/{pair}.json — already written every run by fetch_ohlc.py's
+// build_intraday_ohlc() for all 32 pairs (verified this session — no new
+// fetcher needed, correcting the prior session's assumption that intraday
+// granularity was unavailable). 15min/5min (Mataf also offers these) are
+// NOT available anywhere in the pipeline — flagged as a known gap in the
+// footnote rather than silently omitted or promised.
+//
+// Lookback window: a fixed ~60-period-equivalent per timeframe (60 daily
+// closes / 360 4h bars / 1440 hourly bars — roughly 60 trading days at each
+// granularity's typical bar density), independent of the docked panel's
+// 30d/60d/90d toggle (hidden behind the fullscreen overlay, not reachable
+// while it's open). Not a Santiago-specified number — flagged to him as an
+// assumption, adjustable later if he wants a different default or a
+// selector of its own.
+const CORR_PAIRS_TF_CONFIG = {
+  daily: { dir: '',   bars: 60   },
+  '4h':  { dir: 'h4/', bars: 360  },
+  '1h':  { dir: 'h1/', bars: 1440 },
+};
+
+let _corrPairsActiveTf = 'daily';
+const _corrPairsCloseCache = {}; // tf -> { pairId: [close, ...] } | Promise
+
+async function _corrPairsLoadCloses(tf) {
+  if (_corrPairsCloseCache[tf] && !(_corrPairsCloseCache[tf] instanceof Promise)) {
+    return _corrPairsCloseCache[tf];
+  }
+  if (_corrPairsCloseCache[tf] instanceof Promise) return _corrPairsCloseCache[tf];
+
+  const dir = CORR_PAIRS_TF_CONFIG[tf].dir;
+  const promise = (async () => {
+    const out = {};
+    await Promise.all(CORR_MTX_PAIRS.map(async ([id]) => {
+      try {
+        const r = await fetch('./ohlc-data/' + dir + id + '.json');
+        if (!r.ok) return;
+        const bars = await r.json();
+        if (Array.isArray(bars) && bars.length > 1) {
+          out[id] = bars.map(b => b.close).filter(c => typeof c === 'number');
+        }
+      } catch (e) { /* pair unavailable at this timeframe — matrix cells using it stay blank */ }
+    }));
+    _corrPairsCloseCache[tf] = out;
+    return out;
+  })();
+  _corrPairsCloseCache[tf] = promise;
+  return promise;
+}
+
+// Last-`nBars` log-return series from a closes array, oldest→newest.
+// Returns null if there isn't even enough data for _pearsonCorr's own
+// 5-point floor once trimmed to nBars.
+function _corrPairsLogReturns(closes, nBars) {
+  if (!closes || closes.length < 6) return null;
+  const slice = closes.slice(-(nBars + 1));
+  if (slice.length < 6) return null;
+  const rets = [];
+  for (let i = 1; i < slice.length; i++) rets.push(Math.log(slice[i] / slice[i - 1]));
+  return rets;
+}
+
+async function renderCorrPairsMatrix(tf) {
+  const inner = document.getElementById('corr-mtx-fullscreen-inner');
+  if (!inner) return;
+  inner.innerHTML = '<div style="color:var(--text3);font-size:11px;padding:8px 2px;">Loading…</div>';
+
+  const closes = await _corrPairsLoadCloses(tf);
+  const cfg = CORR_PAIRS_TF_CONFIG[tf];
+  const rets = {};
+  CORR_MTX_PAIRS.forEach(([id]) => {
+    rets[id] = _corrPairsLogReturns(closes[id], cfg.bars);
+  });
+
+  const labels = CORR_MTX_PAIRS.map(([id, base, quote]) => [id, (base + quote)]);
+
+  let html = '<table id="corr-pairs-fs-table" aria-label="Pair correlation matrix"><thead><tr><th></th>' +
+    labels.map(([, lbl]) => `<th scope="col">${lbl}</th>`).join('') + '</tr></thead><tbody>';
+
+  labels.forEach(([rowId, rowLbl]) => {
+    html += `<tr><th scope="row">${rowLbl}</th>`;
+    labels.forEach(([colId]) => {
+      if (rowId === colId) {
+        html += `<td style="background:var(--bg2);color:var(--text3);">—</td>`;
+        return;
+      }
+      const a = rets[rowId], b = rets[colId];
+      const v = (a && b) ? _pearsonCorr(a, b) : null;
+      const s = _corrMtxCellStyle(v);
+      html += `<td title="${rowLbl}/${labels.find(l => l[0] === colId)[1]}${v == null ? ' (insufficient data)' : ': ' + (v >= 0 ? '+' : '') + v.toFixed(2)}" style="background:${s.bg};color:${s.color};">${s.txt}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>' +
+    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · 15min/5min not yet available (no intraday fetcher at that granularity)</div>`;
+
+  inner.innerHTML = html;
+}
+
+function _corrPairsSetTf(tf) {
+  if (tf === _corrPairsActiveTf) return;
+  _corrPairsActiveTf = tf;
+  ['daily', '4h', '1h'].forEach(t => {
+    const btn = document.getElementById('corr-pairs-tf-' + t);
+    if (!btn) return;
+    const active = t === tf;
+    btn.classList.toggle('intel-fs-tab-active', active);
+    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  renderCorrPairsMatrix(tf);
+}
 
 function openCorrMtxFullscreen() {
   const overlay = document.getElementById('corr-mtx-fullscreen-overlay');
-  const inner   = document.getElementById('corr-mtx-fullscreen-inner');
-  const wrap    = document.getElementById('corr-matrix-wrap');
-  if (!overlay || !inner || !wrap) return;
+  if (!overlay) return;
   if (overlay.classList.contains('corr-mtx-fs-active')) return;
 
-  _corrMtxFsOriginalParent = wrap.parentNode;
-  _corrMtxFsOriginalNext   = wrap.nextSibling;
-
-  inner.appendChild(wrap);
   overlay.classList.add('corr-mtx-fs-active');
   document.body.style.overflow = 'hidden';
+  renderCorrPairsMatrix(_corrPairsActiveTf);
 }
 
 function closeCorrMtxFullscreen() {
   const overlay = document.getElementById('corr-mtx-fullscreen-overlay');
-  const wrap    = document.getElementById('corr-matrix-wrap');
   if (!overlay || !overlay.classList.contains('corr-mtx-fs-active')) return;
 
   overlay.classList.remove('corr-mtx-fs-active');
   document.body.style.overflow = '';
-
-  if (_corrMtxFsOriginalParent && wrap) {
-    _corrMtxFsOriginalParent.insertBefore(wrap, _corrMtxFsOriginalNext);
-  }
-  _corrMtxFsOriginalParent = null;
-  _corrMtxFsOriginalNext   = null;
 }
 
 function _corrMtxFsWireUp() {
   document.getElementById('corr-mtx-fs-btn')?.addEventListener('click', openCorrMtxFullscreen);
   document.getElementById('corr-mtx-fs-close')?.addEventListener('click', closeCorrMtxFullscreen);
+  ['daily', '4h', '1h'].forEach(t => {
+    document.getElementById('corr-pairs-tf-' + t)?.addEventListener('click', () => _corrPairsSetTf(t));
+  });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && document.getElementById('corr-mtx-fullscreen-overlay')?.classList.contains('corr-mtx-fs-active')) {
       closeCorrMtxFullscreen();
@@ -14602,7 +14707,15 @@ let _intelFsActiveTab = 'news'; // default tab on open — News is the most rece
 function _intelFsSetTab(tab) {
   if (!['news', 'research', 'analysis'].includes(tab)) return;
   _intelFsActiveTab = tab;
-  document.querySelectorAll('.intel-fs-tab').forEach(function (btn) {
+  // Scoped to #intel-fullscreen-overlay: .intel-fs-tab is a shared visual
+  // class reused by the unrelated Correlations Pairs-matrix timeframe tabs
+  // (#corr-mtx-fullscreen-overlay). An unscoped querySelectorAll here would
+  // also match those Daily/4h/Hourly buttons — their dataset.tab is always
+  // undefined so they'd never gain intel-fs-tab-active, but they WOULD get
+  // it silently stripped off (via the toggle() below) any time this runs,
+  // desyncing their visual state from _corrPairsActiveTf until the next
+  // click. See v8.184.0 CHANGELOG entry.
+  document.querySelectorAll('#intel-fullscreen-overlay .intel-fs-tab').forEach(function (btn) {
     btn.classList.toggle('intel-fs-tab-active', btn.dataset.tab === tab);
     btn.setAttribute('aria-selected', btn.dataset.tab === tab ? 'true' : 'false');
   });
@@ -14726,7 +14839,11 @@ function closeIntelFullscreen() {
 function _intelFsWireUp() {
   document.getElementById('intel-fs-btn')?.addEventListener('click', openIntelFullscreen);
   document.getElementById('intel-fs-close')?.addEventListener('click', closeIntelFullscreen);
-  document.querySelectorAll('.intel-fs-tab').forEach(function (btn) {
+  // Scoped to #intel-fullscreen-overlay — see the matching comment in
+  // _intelFsSetTab(). Without this scope, the Pairs-matrix timeframe
+  // buttons (also .intel-fs-tab, different overlay) would each get a
+  // second, harmless-but-wasteful click listener wired here too.
+  document.querySelectorAll('#intel-fullscreen-overlay .intel-fs-tab').forEach(function (btn) {
     btn.addEventListener('click', function () { _intelFsSetTab(btn.dataset.tab); });
   });
   document.addEventListener('keydown', function (e) {
