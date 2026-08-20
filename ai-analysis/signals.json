@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-08-20T15:03:48Z",
+  "generated_at": "2026-08-20T20:29:28Z",
   "signals": [
     {
-      "time": "15:02",
+      "time": "20:29",
       "priority": "critical",
-      "title": "USD/CHF — G10 Bilateral Theme + Intervention",
-      "text": "USD/CHF trades at 0.7987, having collapsed through its SMA20/50 cluster at 0.8112/0.8081. The US Treasury’s unexpected decision to double and pull forward bond buybacks has triggered a 'Bessent Put' in the long end, forcing a broad USD liquidation across G10 pairs. CHF 1W average performance is +0.975% vs USD -1.172%, creating a massive 2.146% G10 spread that anchors the current regime. Despite the 375bp nominal carry disadvantage for CHF, the market is prioritizing the policy-driven USD downside as the US Treasury steps into the bond market. This intervention-driven repricing is confirmed by institutional desks at ING and Saxo, who view the move as a signal of willingness to cap US yields. Trade bias: Bearish USD/CHF; USD underperformance dominates carry considerations. Catalyst: next SNB meeting — hold at 0.00% priced. Risk: Treasury buyback effects prove short-lived and the 375bp carry differential reasserts dominance.",
+      "title": "USD/CHF — G10 Bilateral Theme + Fed-SNB Carry",
+      "text": "The USD/CHF pair at 0.8007 represents the most extreme divergence in the G10 scorecard, with the USD lagging its peers by -1.038% while CHF leads at +0.805%. This 1.842% weekly spread develops despite a massive +375bp nominal carry advantage for the USD, as Fed 3.75% vs SNB 0.00% fails to attract buyers amidst broader USD weakness. Technically, the pair is trading below its SMA20 at 0.8112 and SMA50 at 0.8081, confirming a strong bearish momentum that ignores the carry premium. While US Treasury buyback news has introduced volatility, the USD remains under pressure as the market digests recent yield shifts and Treasury auction results. Trade bias: Bearish USD/CHF; bearish momentum overrides the structural carry advantage. Catalyst: next SNB meeting — hold priced. Risk: DXY recovers back toward the SMA20/50 cluster near 100.14, signaling a broad USD reversal.",
       "evidence": [
-        "CHF 1W avg: +0.975% (n=6)",
-        "USD 1W avg: -1.172% (n=7)",
-        "G10 spread: 2.146%"
+        "G10 spread: 1.842%",
+        "USD/CHF carry: +375bp",
+        "USD/CHF SMA20: 0.8112"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "14:58",
+      "time": "20:24",
       "priority": "warning",
-      "title": "USD/JPY — Options Skew + Carry + Geopolitical Tension",
-      "text": "USD/JPY at 158.73 is trading below its SMA20/50/200 cluster (159.91/161.03/158.28), marking a significant breakdown in technical structure. The options market is pricing in aggressive downside protection with 25d RR at -2.02, a strong put skew that aligns with a VRP of -1.3%—indicating an unusual supply-side thinness in options protection. While a 275bp Fed-BoJ carry advantage technically supports USD, the correlation with VIX has turned positive (+0.436 vs norm +0.097, z=+1.63σ), signaling that JPY is no longer functioning as a safe haven and is instead tracking volatility-driven carry unwinds. Rising geopolitical tension following Iran's vow to defend national interests against US sanctions introduces fresh volatility that typically favors JPY strength via the carry-unwind mechanism. Trade bias: Bearish USD/JPY; technical breakdown and options skew favor further downside. Catalyst: next BoJ meeting — hike bias priced. Risk: USD/JPY recovers SMA200 at 158.28 and carry demand resumes on yield stabilization.",
+      "title": "NZD/USD — ESI + RBNZ Hike Bias",
+      "text": "NZD/USD at 0.5944 shows strong bullish momentum, advancing for a second consecutive day as RBNZ rate hike expectations strengthen ahead of the September 2nd meeting. The NZD ESI index at +12.6 confirms that domestic data is outperforming expectations, providing a fundamental tailwind even as COT LF net short of -34,031 (pctl 2, z -2.00) remains at extreme levels. This positioning creates a significant short-squeeze risk, as specs are caught short against a hawkish RBNZ policy bias and improving macro data. The pair is holding firmly above its SMA200 at 0.5838, which now acts as a structural floor for the move higher. Trade bias: Bullish NZD/USD; extreme spec shorts face a squeeze on hawkish RBNZ pricing. Catalyst: RBNZ meeting 2 Sep — hike priced. Risk: RBNZ pivot to a hold stance removes the squeeze catalyst.",
       "evidence": [
-        "USD/JPY 25d RR: -2.02 (strong put skew)",
-        "VRP: -1.3% (IV below realized)",
-        "USD/JPY carry: +275bp (favors USD)"
+        "NZD ESI: +12.6",
+        "NZD COT pctl: 2",
+        "NZD/USD SMA200: 0.5838"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "14:55",
+      "time": "20:21",
       "priority": "warning",
-      "title": "AUD/USD — COT vs Retail Divergence + ESI",
-      "text": "AUD/USD is holding at 0.7124, supported by its position above the SMA20/50/200 cluster (0.7041/0.6999/0.6948). We observe a significant divergence as retail sentiment hits an 85% short extreme while institutional COT Leveraged Funds remain net long (+45,727). This institutional-retail split occurs as Australia's 10Y yield offers a +40bp premium over the US 10Y, providing a structural carry tailwind for the AUD. However, the AUD ESI at -10.3 reflects a moderate negative bias in domestic data that contradicts the bullish positioning. This combination suggests a 'crowded long' risk if US data continues to surprise to the upside, potentially triggering an institutional unwind against the retail short. Trade bias: Neutral AUD/USD; institutional longs vs retail short extreme creates a standoff. Catalyst: RBA meeting 29 Sep — hold at 4.35% priced. Risk: AUD/USD closes below SMA20 (0.7041), signaling institutional capitulation.",
+      "title": "USD/JPY — Options Skew + Vol Divergence",
+      "text": "USD/JPY at 159.13 is exhibiting a notable divergence between spot price action and the options market, with the 25d risk reversal (RR) showing a strong put skew of -2.02. This extreme options demand for downside protection coincides with a negative VRP of -1.2%, where ATM IV at 7.2% sits below realized vol of 8.4%, suggesting a market that is underpricing potential volatility shocks despite paying for downside tails. While the +275bp Fed-BoJ carry differential remains the primary driver for spot bids, the options market is clearly hedging for a sharp reversal ahead of Japanese CPI data. The pair remains technically vulnerable while trading below its SMA20 (159.91) and SMA50 (161.03) clusters. Trade bias: Neutral USD/JPY; options skew signals heavy hedging against the carry-trade consensus. Catalyst: Japan CPI release Friday Aug 21. Risk: Strong CPI print triggers a disorderly carry unwind through the SMA200 at 158.28.",
       "evidence": [
-        "AUD COT LF net: +45,727 (long)",
-        "Retail: 85% short (extreme)",
-        "AUD ESI: -10.3 (moderate negative)"
+        "USDJPY 25d RR: -2.02",
+        "USDJPY VRP: -1.2%",
+        "USD/JPY carry: +275bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "14:50",
+      "time": "20:16",
       "priority": "info",
-      "title": "EUR/USD — Volatility Premium + Yield Spread",
-      "text": "EUR/USD trades at 1.1686, sustained by a bearish bear steepener regime in the US curve and a -139bp Bund-UST 10Y spread. The pair exhibits an elevated Vol Risk Premium of +2.3%, with ATM IV at 7.1% vs HV30 at 4.8%, signaling that the options market is paying up for protection ahead of next month's ECB meeting. This hedging demand persists despite a 135bp nominal carry disadvantage for the Euro. ECB holds at 2.4%. Trade bias: Long EUR/USD; hedging demand and policy repricing favor the Euro. Catalyst: ECB meeting 10 Sep — hike bias priced. Risk: US CPI surprise re-establishes the 'higher-for-longer' Fed narrative, crushing the current USD liquidation.",
+      "title": "AUD/USD — Retail Divergence + Technical Resistance",
+      "text": "AUD/USD at 0.7114 is currently facing a retail sentiment extreme, with 85% of retail traders holding short positions. This retail bias directly diverges from COT LF positioning, which is net long +45,727, suggesting institutional players are comfortably positioned for further upside while retail fades the move. The pair is supported by a -70bp carry premium in favor of the AUD (SOFR 3.65% vs AONIA 4.35%), and price action remains constructive above the SMA20 at 0.7041. While ESI remains moderately negative at -10.3, the technical structure and institutional-retail divergence support a 'buy-the-dip' regime. Trade bias: Bullish AUD/USD, contrarian to retail extreme. Catalyst: Australian Flash PMI data release. Risk: A break below the SMA50 at 0.6999 invalidates the immediate bullish structure.",
       "evidence": [
-        "EUR/USD VRP: +2.3% (IV 7.1% vs HV30 4.8%)",
-        "Bund-UST 10Y spread: -139bp",
-        "ECB real rate: +0.07%"
+        "AUD/USD Retail: 85% short",
+        "AUD COT LF: +45,727",
+        "AUD/USD carry: -70bp"
       ],
       "_source": "engine-ai-primary"
     }
