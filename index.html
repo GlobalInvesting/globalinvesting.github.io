@@ -452,6 +452,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .intel-fs-tab{background:transparent;border:none;border-right:1px solid var(--border);color:var(--text3);font-size:11px;font-family:var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.05em;padding:0 16px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 .intel-fs-tab:hover{color:var(--text2)}
 .intel-fs-tab.intel-fs-tab-active{color:#fff;background:var(--accent)}
+/* v8.169.0: #intel-fs-close had no rule at all (only #lw-fs-close/#cal-fs-close
+   did), so it fell back to the browser's default button chrome — a solid
+   white box with black text, clashing with the dark chrome every other
+   fullscreen exit button uses. Same rule as its two siblings. */
+#intel-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
+#intel-fs-close:hover{border-color:var(--down);color:var(--down)}
 /* Fullscreen-only: #intel-scroll and its 3 .intel-group wrappers switch from
    the compact view's CSS Grid (dashboard.css) to a tabbed flex layout — only
    the active group renders, at full available height, with its own filter
@@ -665,7 +671,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.168.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.169.0">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -1800,6 +1806,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <button class="ns-density-btn ns-density-active" data-density="expanded" onclick="window._newsSetDensity('expanded')">Expanded</button>
           <button class="ns-density-btn" data-density="compact" onclick="window._newsSetDensity('compact')">Compact</button>
         </div>
+        <div id="ns-fontsize-toggle" role="group" aria-label="News text size">
+          <button class="ns-fontsize-btn" id="ns-fontsize-dec" aria-label="Decrease text size" title="Smaller text" onclick="window._newsFontSizeAdjust(-1)">A&#8722;</button>
+          <button class="ns-fontsize-btn" id="ns-fontsize-inc" aria-label="Increase text size" title="Larger text" onclick="window._newsFontSizeAdjust(1)">A+</button>
+        </div>
         <button class="lw-tb-btn" id="intel-fs-btn" aria-label="Toggle fullscreen News/Research/Analysis" title="Fullscreen (Esc to exit)" style="flex-shrink:0;margin-left:auto;">&#x26F6;</button>
       </div>
 
@@ -2149,7 +2159,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.168.0" defer></script>
+<script src="assets/dashboard.js?v=8.169.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
