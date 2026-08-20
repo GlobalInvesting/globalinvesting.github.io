@@ -525,6 +525,30 @@ const CORR_MTX_PAIRS = [
 let _corrMtxPairCloses = null; // { pairId: [close, ...] } — raw D1 closes, most-recent-last
 let _corrMtxLoadPromise = null;
 
+// Fetches all 32 pair files (or 32 h1/h4 files) in parallel via Promise.all.
+// A single transient failure mid-batch (GitHub Pages/browser connection-limit
+// hiccup on 32 simultaneous requests — the actual cause behind CHF/JPY
+// showing blank in the Hourly tab on a live run, confirmed: the file itself
+// was never missing or short server-side, live-refetched 12,081 clean bars
+// the same minute) silently drops that one pair with no retry anywhere in
+// the loop, unlike every other data path in this app (fetch_intraday_quotes.py
+// / fetch_ohlc.py, etc.) which already retries transient fetch failures.
+// This closes that gap client-side too.
+async function _fetchWithRetry(url, attempts = 3, delayMs = 400) {
+  let lastErr = null;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) return r;
+      lastErr = new Error('HTTP ' + r.status);
+    } catch (e) {
+      lastErr = e;
+    }
+    if (i < attempts - 1) await new Promise(res => setTimeout(res, delayMs * (i + 1)));
+  }
+  throw lastErr;
+}
+
 async function _corrMtxLoadPairData() {
   if (_corrMtxPairCloses) return _corrMtxPairCloses;
   if (_corrMtxLoadPromise) return _corrMtxLoadPromise;
@@ -532,13 +556,12 @@ async function _corrMtxLoadPairData() {
     const out = {};
     await Promise.all(CORR_MTX_PAIRS.map(async ([id]) => {
       try {
-        const r = await fetch('./ohlc-data/' + id + '.json');
-        if (!r.ok) return;
+        const r = await _fetchWithRetry('./ohlc-data/' + id + '.json');
         const bars = await r.json();
         if (Array.isArray(bars) && bars.length > 1) {
           out[id] = bars.map(b => b.close).filter(c => typeof c === 'number');
         }
-      } catch (e) { /* pair unavailable — matrix cells using it stay blank */ }
+      } catch (e) { /* pair unavailable after retries — matrix cells using it stay blank */ }
     }));
     _corrMtxPairCloses = out;
     return out;
@@ -603,12 +626,19 @@ async function renderCorrMatrix() {
   const pairCloses = await _corrMtxLoadPairData();
   const composite = _corrMtxBuildCcyReturns(pairCloses, _corrWindow);
 
-  let html = '<tr><td></td>' + CORR_MTX_CCYS.map(c =>
-    `<th scope="col" style="font-size:8.5px;font-family:var(--font-mono);color:var(--text3);font-weight:400;text-align:center;padding:0 0 3px;">${c}</th>`
+  // NOTE: header/row-label <th> cells must carry the same explicit
+  // background+border as the value <td> cells below (var(--bg2)/var(--border)
+  // instead of "unset"). Without it, the browser's UA default table-cell
+  // border/background shows through on hover repaint — the gray square
+  // Santiago flagged to the left of "USD" was exactly this: the corner <td>
+  // and the row-label <th> were the only two cells in the table with no
+  // background/border declared at all.
+  let html = '<tr><td style="background:var(--bg2);border:1px solid var(--border);"></td>' + CORR_MTX_CCYS.map(c =>
+    `<th scope="col" style="font-size:8.5px;font-family:var(--font-mono);color:var(--text3);font-weight:400;text-align:center;padding:0 0 3px;background:var(--bg2);border:1px solid var(--border);">${c}</th>`
   ).join('') + '</tr>';
 
   CORR_MTX_CCYS.forEach(rowCcy => {
-    html += `<tr><th scope="row" style="font-size:8.5px;font-family:var(--font-mono);color:var(--accent);font-weight:600;text-align:left;padding:0 4px 0 0;">${rowCcy}</th>`;
+    html += `<tr><th scope="row" style="font-size:8.5px;font-family:var(--font-mono);color:var(--accent);font-weight:600;text-align:left;padding:0 4px 0 0;background:var(--bg2);border:1px solid var(--border);">${rowCcy}</th>`;
     CORR_MTX_CCYS.forEach(colCcy => {
       if (rowCcy === colCcy) {
         html += `<td style="height:20px;text-align:center;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-size:8.5px;font-family:var(--font-mono);">—</td>`;
@@ -703,13 +733,12 @@ async function _corrPairsLoadCloses(tf) {
     const out = {};
     await Promise.all(CORR_MTX_PAIRS.map(async ([id]) => {
       try {
-        const r = await fetch('./ohlc-data/' + dir + id + '.json');
-        if (!r.ok) return;
+        const r = await _fetchWithRetry('./ohlc-data/' + dir + id + '.json');
         const bars = await r.json();
         if (Array.isArray(bars) && bars.length > 1) {
           out[id] = bars.map(b => b.close).filter(c => typeof c === 'number');
         }
-      } catch (e) { /* pair unavailable at this timeframe — matrix cells using it stay blank */ }
+      } catch (e) { /* pair unavailable after retries at this timeframe — matrix cells using it stay blank */ }
     }));
     _corrPairsCloseCache[tf] = out;
     return out;
@@ -730,6 +759,61 @@ function _corrPairsLogReturns(closes, nBars) {
   return rets;
 }
 
+// Builds a full pairwise Pearson map ({id: {otherId: corr|null}}) from a
+// {id: returns[]} dict — the shared input both _pairsClusterOrder() and the
+// table renderer below need, computed once per render instead of twice.
+function _pairsCorrMap(ids, retsById) {
+  const map = {};
+  ids.forEach(id => { map[id] = {}; });
+  for (let i = 0; i < ids.length; i++) {
+    for (let j = i + 1; j < ids.length; j++) {
+      const a = retsById[ids[i]], b = retsById[ids[j]];
+      const v = (a && b) ? _pearsonCorr(a, b) : null;
+      map[ids[i]][ids[j]] = v;
+      map[ids[j]][ids[i]] = v;
+    }
+  }
+  return map;
+}
+
+// Mataf-style row/column ordering: correlated pairs cluster together
+// (strongly positive on one side, strongly negative on the other) instead of
+// the fixed alphabetical/base-currency order the grid used before. This is
+// the same principle behind seaborn.clustermap / corrplot's hierarchical
+// "hclust" reordering, simplified here to a greedy nearest-neighbor chain
+// (full dendrogram clustering is overkill for a fixed ~32-pair grid that
+// re-renders on every timeframe switch): start from the pair with the
+// lowest average correlation to everything else (reads naturally as one
+// edge of the grid), then repeatedly append whichever unplaced pair
+// correlates most strongly with the pair just placed. A pair with no valid
+// correlation at all (fetch failure at this timeframe) is never preferred
+// over a real value, so it settles at an edge instead of breaking the chain.
+function _pairsClusterOrder(ids, corrMap) {
+  if (ids.length <= 2) return ids.slice();
+  const avgCorr = {};
+  ids.forEach(id => {
+    const vals = ids.filter(o => o !== id).map(o => corrMap[id][o]).filter(v => v != null);
+    avgCorr[id] = vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : 0;
+  });
+  const remaining = new Set(ids);
+  const start = ids.reduce((best, id) => (avgCorr[id] < avgCorr[best] ? id : best), ids[0]);
+  const order = [start];
+  remaining.delete(start);
+  while (remaining.size) {
+    const last = order[order.length - 1];
+    let next = null, bestV = -Infinity;
+    remaining.forEach(id => {
+      const v = corrMap[last][id];
+      const score = v == null ? -1 : v;
+      if (score > bestV) { bestV = score; next = id; }
+    });
+    if (next == null) next = remaining.values().next().value;
+    order.push(next);
+    remaining.delete(next);
+  }
+  return order;
+}
+
 async function renderCorrPairsMatrix(tf) {
   const inner = document.getElementById('corr-mtx-fullscreen-inner');
   if (!inner) return;
@@ -742,27 +826,33 @@ async function renderCorrPairsMatrix(tf) {
     rets[id] = _corrPairsLogReturns(closes[id], cfg.bars);
   });
 
-  const labels = CORR_MTX_PAIRS.map(([id, base, quote]) => [id, (base + quote)]);
+  const ids = CORR_MTX_PAIRS.map(([id]) => id);
+  const lblById = {};
+  CORR_MTX_PAIRS.forEach(([id, base, quote]) => { lblById[id] = base + quote; });
+  const corrMap = _pairsCorrMap(ids, rets);
+  const orderedIds = _pairsClusterOrder(ids, corrMap);
 
-  let html = '<table id="corr-pairs-fs-table" aria-label="Pair correlation matrix"><thead><tr><th></th>' +
-    labels.map(([, lbl]) => `<th scope="col">${lbl}</th>`).join('') + '</tr></thead><tbody>';
+  // Column headers run vertical (CSS writing-mode) rather than horizontal —
+  // same layout technique Mataf's own matrix uses to fit a 32-wide grid
+  // legibly, and the reason the header row can stay narrow (see CSS).
+  let html = '<table id="corr-pairs-fs-table" aria-label="Pair correlation matrix, clustered by correlation"><thead><tr><th></th>' +
+    orderedIds.map(id => `<th scope="col"><span>${lblById[id]}</span></th>`).join('') + '</tr></thead><tbody>';
 
-  labels.forEach(([rowId, rowLbl]) => {
-    html += `<tr><th scope="row">${rowLbl}</th>`;
-    labels.forEach(([colId]) => {
+  orderedIds.forEach(rowId => {
+    html += `<tr><th scope="row">${lblById[rowId]}</th>`;
+    orderedIds.forEach(colId => {
       if (rowId === colId) {
         html += `<td style="background:var(--bg2);color:var(--text3);">—</td>`;
         return;
       }
-      const a = rets[rowId], b = rets[colId];
-      const v = (a && b) ? _pearsonCorr(a, b) : null;
+      const v = corrMap[rowId][colId];
       const s = _corrMtxCellStyle(v);
-      html += `<td title="${rowLbl}/${labels.find(l => l[0] === colId)[1]}${v == null ? ' (insufficient data)' : ': ' + (v >= 0 ? '+' : '') + v.toFixed(2)}" style="background:${s.bg};color:${s.color};">${s.txt}</td>`;
+      html += `<td title="${lblById[rowId]}/${lblById[colId]}${v == null ? ' (insufficient data)' : ': ' + (v >= 0 ? '+' : '') + v.toFixed(2)}" style="background:${s.bg};color:${s.color};">${s.txt}</td>`;
     });
     html += '</tr>';
   });
   html += '</tbody></table>' +
-    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · 15min/5min not yet available (no intraday fetcher at that granularity)</div>`;
+    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by correlation clustering (most-correlated pairs adjacent), not alphabetical · 15min/5min not yet available (no intraday fetcher at that granularity)</div>`;
 
   inner.innerHTML = html;
 }
