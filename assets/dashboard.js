@@ -14234,11 +14234,132 @@ function _newsSetFilter(type, value) {
     btn.classList.toggle('ns-pill-active', btn.dataset.val === value);
   });
   renderNewsSection();
-  // Apply same currency filter to research sub-panel if it has data
-  if (_researchAllItems.length && type === 'cur') {
+  // Apply same currency filter to research sub-panel if it has data — but
+  // only in the compact/stacked view, where all three sub-panels are visible
+  // together and a single shared currency filter reads as one control over
+  // the whole scan. Skipped while Intel Fullscreen (v8.167.x) is open: each
+  // tab owns its own filter there by design, so switching News's currency
+  // pill must not silently change what the Research tab shows when the user
+  // switches to it.
+  const intelFsOverlay = document.getElementById('intel-fullscreen-overlay');
+  const inIntelFullscreen = !!(intelFsOverlay && intelFsOverlay.classList.contains('intel-fs-active'));
+  if (_researchAllItems.length && type === 'cur' && !inIntelFullscreen) {
     _researchFilter.cur = value;
     renderResearchSection();
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INTEL FULLSCREEN — News/Research/Analysis as tabs (v8.167.x)
+// ═══════════════════════════════════════════════════════════════════
+// Compact/docked #section-news shows all three sub-panels stacked at once
+// (good for scanning across feeds). Fullscreen switches to a dedicated
+// reading mode instead: one sub-panel at a time, each getting the full
+// available height and its own filter bar — matches the Bloomberg NI /
+// Refinitiv Eikon News Monitor pattern of category tabs in a maximized news
+// view, and mirrors this app's own existing fullscreen pattern for the
+// Economic Calendar (calendar-panel.js's cal-fs-btn/cal-fullscreen-overlay)
+// and the price chart (dashboard.js's lw-fs-btn/lw-fullscreen-overlay).
+//
+// DOM-lift approach, same as those two: #intel-scroll (holding the three
+// .intel-group wrappers) is appended into #intel-fullscreen-inner on open
+// and restored to its original position on close. #ns-filter-bar is lifted
+// separately, into #intel-group-news specifically — in the compact view it
+// lives outside #intel-scroll as a sticky bar shared visually across all
+// three stacked sub-panels, but in fullscreen (per Santiago's "own filters
+// per tab" choice) it belongs to the News tab alone, sitting directly under
+// the News header the same way #rs-filter-bar already sits under Research's.
+// Neither .intel-group wrapper exists as a layout box in the compact view —
+// they're `display:contents` there — so #intel-scroll's existing CSS Grid
+// (grid-template-rows listing the 7 real children in DOM order, see
+// dashboard.css v8.117.18) keeps working completely unchanged when not
+// fullscreen; the wrappers only become real flex boxes, and #ns-filter-bar
+// only gets reparented, while #intel-fullscreen-overlay.intel-fs-active.
+let _intelFsOriginalScrollParent = null;
+let _intelFsOriginalScrollNext   = null;
+let _intelFsOriginalFilterParent = null;
+let _intelFsOriginalFilterNext   = null;
+let _intelFsActiveTab = 'news'; // default tab on open — News is the most recent/time-sensitive feed
+
+function _intelFsSetTab(tab) {
+  if (!['news', 'research', 'analysis'].includes(tab)) return;
+  _intelFsActiveTab = tab;
+  document.querySelectorAll('.intel-fs-tab').forEach(function (btn) {
+    btn.classList.toggle('intel-fs-tab-active', btn.dataset.tab === tab);
+    btn.setAttribute('aria-selected', btn.dataset.tab === tab ? 'true' : 'false');
+  });
+  document.querySelectorAll('.intel-group').forEach(function (grp) {
+    grp.classList.toggle('intel-group-active', grp.id === 'intel-group-' + tab);
+  });
+}
+window._intelFsSetTab = _intelFsSetTab;
+
+function openIntelFullscreen() {
+  const overlay    = document.getElementById('intel-fullscreen-overlay');
+  const inner      = document.getElementById('intel-fullscreen-inner');
+  const scroll     = document.getElementById('intel-scroll');
+  const filterBar  = document.getElementById('ns-filter-bar');
+  const newsGroup  = document.getElementById('intel-group-news');
+  if (!overlay || !inner || !scroll || !newsGroup) return;
+  if (overlay.classList.contains('intel-fs-active')) return;
+
+  _intelFsOriginalScrollParent = scroll.parentNode;
+  _intelFsOriginalScrollNext   = scroll.nextSibling;
+  inner.appendChild(scroll);
+
+  if (filterBar) {
+    _intelFsOriginalFilterParent = filterBar.parentNode;
+    _intelFsOriginalFilterNext   = filterBar.nextSibling;
+    const newsHead = newsGroup.querySelector('.intel-sub-head');
+    newsGroup.insertBefore(filterBar, newsHead ? newsHead.nextSibling : newsGroup.firstChild);
+  }
+
+  overlay.classList.add('intel-fs-active');
+  document.body.style.overflow = 'hidden';
+  _intelFsSetTab('news'); // always opens on News, per Santiago's choice
+}
+
+function closeIntelFullscreen() {
+  const overlay = document.getElementById('intel-fullscreen-overlay');
+  const scroll  = document.getElementById('intel-scroll');
+  const filterBar = document.getElementById('ns-filter-bar');
+  if (!overlay || !overlay.classList.contains('intel-fs-active')) return;
+
+  overlay.classList.remove('intel-fs-active');
+  document.body.style.overflow = '';
+
+  if (_intelFsOriginalScrollParent && scroll) {
+    _intelFsOriginalScrollParent.insertBefore(scroll, _intelFsOriginalScrollNext);
+  }
+  if (_intelFsOriginalFilterParent && filterBar) {
+    _intelFsOriginalFilterParent.insertBefore(filterBar, _intelFsOriginalFilterNext);
+  }
+  _intelFsOriginalScrollParent = null;
+  _intelFsOriginalScrollNext   = null;
+  _intelFsOriginalFilterParent = null;
+  _intelFsOriginalFilterNext   = null;
+}
+
+function _intelFsWireUp() {
+  document.getElementById('intel-fs-btn')?.addEventListener('click', openIntelFullscreen);
+  document.getElementById('intel-fs-close')?.addEventListener('click', closeIntelFullscreen);
+  document.querySelectorAll('.intel-fs-tab').forEach(function (btn) {
+    btn.addEventListener('click', function () { _intelFsSetTab(btn.dataset.tab); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('intel-fullscreen-overlay')?.classList.contains('intel-fs-active')) {
+      closeIntelFullscreen();
+    }
+  });
+}
+// dashboard.js is deferred so the DOM is already parsed by the time this
+// runs — DOMContentLoaded may have already fired (same pattern used
+// elsewhere in this file, e.g. giOnboardInit above), so check readyState
+// rather than blindly waiting on an event that may never come.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _intelFsWireUp);
+} else {
+  _intelFsWireUp();
 }
 
 // ═══════════════════════════════════════════════════════════════════

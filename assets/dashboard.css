@@ -2322,6 +2322,18 @@ a:focus-visible,
 #research-section-feed::-webkit-scrollbar-thumb,
 #trading-section-feed::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
+/* ─── Intel Fullscreen — News/Research/Analysis as tabs (v8.167.x) ───────────
+   .intel-group wraps each of the 3 sub-panels (News/Research/Analysis) inside
+   #intel-scroll. display:contents makes the wrapper invisible to the box
+   model/CSS Grid above — #intel-scroll's grid-template-rows (7 real children:
+   News head/feed, Research head/filter/feed, Analysis head/feed) keeps
+   distributing space exactly as it did before these wrappers existed, so the
+   compact/stacked view is pixel-identical to pre-v8.167.x. Only inside
+   #intel-fullscreen-overlay.intel-fs-active (see rules further down, and
+   openIntelFullscreen()/_intelFsSetTab() in dashboard.js) does a .intel-group
+   become a real flex box — one shown at a time as the active tab pane. */
+.intel-group { display: contents; }
+
 /* ─── INTEL PANEL — sub-section dividers (News / Research / Trading) ──────────
    Three stacked sub-panels inside #section-news, separated by sticky headers.
    Pattern: Bloomberg Intelligence terminal section dividers.
