@@ -509,7 +509,16 @@ async function populateCorrelations() {
 // already documents as "G10 composite · 32 pairs" — reused here as the pair
 // list for building a synthetic per-currency return series, since no
 // pre-computed currency-index time series exists in any data/*.json output.
-const CORR_MTX_CCYS = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
+// Order follows the BIS 2022 Triennial Central Bank Survey's per-currency
+// turnover ranking (net-net, % of total turnover, each side of a trade
+// counted): USD 194 > EUR 183 > JPY 168 > GBP 142 > AUD 125 > CAD 122 >
+// CHF 114 > SEK 66 > NOK 54 > NZD 31 (non-G10 currencies in the same
+// ranking — CNY/HKD/SGD/KRW — excluded, this app's G10 set only). This is
+// the same convention Bloomberg/Refinitiv desk screens use for G10 currency
+// ordering — corrected from the prior placeholder order (which had GBP
+// ahead of JPY and NZD ahead of SEK/NOK, both backwards vs turnover) after
+// Santiago asked whether the panel matched industry convention.
+const CORR_MTX_CCYS = ['USD','EUR','JPY','GBP','AUD','CAD','CHF','SEK','NOK','NZD'];
 // [ohlcId, base, quote] — same 32 pairs as the G10 composite heatmap.
 const CORR_MTX_PAIRS = [
   ['eurusd','EUR','USD'], ['gbpusd','GBP','USD'], ['usdjpy','USD','JPY'], ['audusd','AUD','USD'],
@@ -652,6 +661,43 @@ async function renderCorrMatrix() {
     html += '</tr>';
   });
   table.innerHTML = html;
+}
+
+// Row/column highlight on hover for the docked currency×currency Matrix —
+// hovering a data cell highlights BOTH its row header and its column
+// header (not just the single cell, which already had a title tooltip but
+// no visual link back to which two currencies it represents). Delegated on
+// the table element itself, wired once at init — safe across re-renders
+// since renderCorrMatrix() only replaces the table's innerHTML, never the
+// table node the listener is attached to. Header cells here carry their
+// background/color as inline styles (not a CSS class), so the highlight is
+// applied/reverted the same way — via inline style, cached per-cell on
+// first hover — rather than a CSS class, which a same-specificity inline
+// style would otherwise silently outrank.
+function _corrMtxWireHover() {
+  const table = document.getElementById('corr-matrix-table');
+  if (!table || table.dataset.hoverWired) return;
+  table.dataset.hoverWired = '1';
+  const applyHl = (td, on) => {
+    if (!td || td.tagName !== 'TD') return;
+    const tr = td.parentElement;
+    if (!tr || tr.rowIndex === 0) return; // header row has no data cells to react to
+    const rowTh = tr.cells[0];
+    const colTh = table.rows[0]?.cells[td.cellIndex];
+    [rowTh, colTh].forEach(th => {
+      if (!th || th.tagName !== 'TH') return;
+      if (on) {
+        if (th.dataset._hlBg === undefined) { th.dataset._hlBg = th.style.background; th.dataset._hlFg = th.style.color; }
+        th.style.background = 'var(--bg3)';
+        th.style.color = '#fff';
+      } else if (th.dataset._hlBg !== undefined) {
+        th.style.background = th.dataset._hlBg;
+        th.style.color = th.dataset._hlFg;
+      }
+    });
+  };
+  table.addEventListener('mouseover', e => applyHl(e.target.closest('td'), true));
+  table.addEventListener('mouseout', e => applyHl(e.target.closest('td'), false));
 }
 
 function initCorrAssetTabs() {
@@ -837,11 +883,15 @@ async function renderCorrPairsMatrix(tf) {
   // introduced; see GUIDELINES.md v8.186.0). The table itself is full-width
   // (CSS table-layout:fixed) so all 32 columns fit without horizontal
   // scroll on a normal desktop viewport regardless of header orientation.
-  let html = '<table id="corr-pairs-fs-table" aria-label="Pair correlation matrix, clustered by correlation"><thead><tr><th></th>' +
-    orderedIds.map(id => `<th scope="col">${lblById[id]}</th>`).join('') + '</tr></thead><tbody>';
+  // Header/row-label cells wrap their text in an inner <div> — the sticky
+  // positioning lives on that div (see index.html CSS), not on the <th>
+  // itself, which is the fix for the "row labels float near the top on
+  // scroll" bug. See the CSS comment above #corr-pairs-fs-table for why.
+  let html = '<table id="corr-pairs-fs-table" aria-label="Pair correlation matrix, clustered by correlation"><thead><tr><th><div></div></th>' +
+    orderedIds.map(id => `<th scope="col"><div>${lblById[id]}</div></th>`).join('') + '</tr></thead><tbody>';
 
   orderedIds.forEach(rowId => {
-    html += `<tr><th scope="row">${lblById[rowId]}</th>`;
+    html += `<tr><th scope="row"><div>${lblById[rowId]}</div></th>`;
     orderedIds.forEach(colId => {
       if (rowId === colId) {
         html += `<td style="background:var(--bg2);color:var(--text3);">—</td>`;
@@ -857,6 +907,35 @@ async function renderCorrPairsMatrix(tf) {
     `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by correlation clustering (most-correlated pairs adjacent), not alphabetical · 15min/5min not yet available (no intraday fetcher at that granularity)</div>`;
 
   inner.innerHTML = html;
+}
+
+// Row/column highlight on hover for the fullscreen Pairs matrix — same
+// affordance as _corrMtxWireHover() above for the docked Matrix tab.
+// Delegated on #corr-mtx-fullscreen-inner (the stable container div, wired
+// once at init) rather than on #corr-pairs-fs-table itself, because
+// renderCorrPairsMatrix() rebuilds the whole <table> node — including its
+// id — on every render/timeframe switch, which would silently detach a
+// listener bound directly to the table. Uses classList (not inline style
+// like the docked version) since these header cells' styling is entirely
+// CSS-class/selector driven, not inline — see th.corr-hl>div in index.html.
+function _corrPairsWireHover() {
+  const inner = document.getElementById('corr-mtx-fullscreen-inner');
+  if (!inner || inner.dataset.hoverWired) return;
+  inner.dataset.hoverWired = '1';
+  const applyHl = (td, on) => {
+    if (!td || td.tagName !== 'TD') return;
+    const table = td.closest('#corr-pairs-fs-table');
+    if (!table) return;
+    const tr = td.parentElement;
+    if (!tr || tr.rowIndex === 0) return;
+    const rowTh = tr.cells[0];
+    const colTh = table.rows[0]?.cells[td.cellIndex];
+    [rowTh, colTh].forEach(th => {
+      if (th && th.tagName === 'TH') th.classList.toggle('corr-hl', on);
+    });
+  };
+  inner.addEventListener('mouseover', e => applyHl(e.target.closest('td'), true));
+  inner.addEventListener('mouseout', e => applyHl(e.target.closest('td'), false));
 }
 
 function _corrPairsSetTf(tf) {
@@ -891,6 +970,7 @@ function closeCorrMtxFullscreen() {
 }
 
 function _corrMtxFsWireUp() {
+  _corrPairsWireHover();
   document.getElementById('corr-mtx-fs-btn')?.addEventListener('click', openCorrMtxFullscreen);
   document.getElementById('corr-mtx-fs-close')?.addEventListener('click', closeCorrMtxFullscreen);
   ['daily', '4h', '1h'].forEach(t => {
@@ -15166,6 +15246,7 @@ function initExclusivePanelNav() {
     initG8RatesTabs();
     initCOTAssetTabs();
     initCorrAssetTabs();
+    _corrMtxWireHover();
     _corrMtxFsWireUp();
     initSentimentAssetTabs();
     initExclusivePanelNav();
