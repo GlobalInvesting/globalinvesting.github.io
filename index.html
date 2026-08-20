@@ -440,6 +440,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cal-events-body.cal-cols-active,#cal-events-body:has(.cal-col-wrap){overflow:hidden}
 #cal-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #cal-fs-close:hover{border-color:var(--down);color:var(--down)}
+/* Correlation Matrix fullscreen overlay — same DOM-lift pattern as
+   #cal-fullscreen-overlay above: #corr-matrix-wrap is moved into
+   #corr-mtx-fullscreen-inner on open, restored to its original spot inside
+   the Cross-Asset Correlations sidebar panel on close — see
+   openCorrMtxFullscreen()/closeCorrMtxFullscreen() in dashboard.js. */
+#corr-mtx-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
+#corr-mtx-fullscreen-overlay.corr-mtx-fs-active{display:flex}
+#corr-mtx-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+#corr-mtx-fullscreen-overlay.corr-mtx-fs-active #corr-matrix-wrap{flex:1!important;min-height:0!important;overflow:auto!important;display:block!important;max-width:900px;width:100%;margin:0 auto;padding:16px 20px!important;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+#corr-mtx-fullscreen-overlay.corr-mtx-fs-active #corr-matrix-table td,
+#corr-mtx-fullscreen-overlay.corr-mtx-fs-active #corr-matrix-table th{height:32px!important;font-size:12px!important}
+#corr-mtx-fullscreen-overlay.corr-mtx-fs-active #corr-mtx-fs-btn{display:none!important}
+#corr-mtx-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
+#corr-mtx-fs-close:hover{border-color:var(--down);color:var(--down)}
 /* Intel Fullscreen — News/Research/Analysis as tabs (v8.167.x). Same DOM-lift
    pattern as #cal-fullscreen-overlay above: #intel-scroll (holding the 3
    .intel-group wrappers, see dashboard.css) is moved into #intel-fullscreen-inner
@@ -1978,7 +1992,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div style="padding:2px 6px 5px;font-size:9px;color:var(--text3);">Rolling Pearson · 30d / 60d / 90d · vs norm = z-score vs 252d</div>
     </div>
     <div id="corr-matrix-wrap" style="display:none;padding:2px 6px 6px;">
-      <div style="font-size:8.5px;color:var(--text3);font-family:var(--font-mono);padding-bottom:4px;">G10 currency correlation matrix</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:4px;">
+        <span style="font-size:8.5px;color:var(--text3);font-family:var(--font-mono);">G10 currency correlation matrix</span>
+        <button class="lw-tb-btn" id="corr-mtx-fs-btn" aria-label="Toggle fullscreen currency correlation matrix" title="Fullscreen (Esc to exit)" style="flex-shrink:0;">&#x26F6;</button>
+      </div>
       <table id="corr-matrix-table" style="table-layout:fixed;width:100%;border-collapse:collapse;" aria-label="G10 currency correlation matrix"></table>
       <div style="padding:4px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · composite currency return vs each G10 pair &times;100 · 30d/60d/90d</div>
     </div>
@@ -2202,7 +2219,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.178.0" defer></script>
+<script src="assets/dashboard.js?v=8.179.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
@@ -2265,6 +2282,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <button id="cal-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
     </div>
     <div id="cal-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
+  </div>
+  <!-- Fullscreen Correlation Matrix overlay — #corr-matrix-wrap is moved here on open, restored on close -->
+  <div id="corr-mtx-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen G10 currency correlation matrix">
+    <div class="lw-fs-toolbar" style="justify-content:flex-end;">
+      <button id="corr-mtx-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
+    </div>
+    <div id="corr-mtx-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
   </div>
   <!-- Fullscreen News/Research/Analysis overlay (v8.167.x) — #intel-scroll is
        moved here on open, restored to #section-news on close. See
