@@ -451,41 +451,53 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    the grid fills the fullscreen overlay with no horizontal scrollbar on a
    normal desktop viewport — only the label column gets an explicit width,
    every other column shares the remainder equally. Below ~700px (small
-   screens/mobile) that same math produces unreadably thin cells, so a media
-   query below falls back to fixed pixel widths with horizontal scroll
-   instead, same as before.
-   Sticky positioning is applied to an inner <div> inside each header cell,
-   NOT to the <th>/<td> itself. Putting position:sticky directly on table
-   cells that need to freeze on BOTH axes at once (a sticky top row AND a
-   sticky left column, in the same table) is a known cross-browser rendering
-   trap — v8.186.0's row-height-matching fix narrowed the bug but did not
-   close it; Santiago still saw the first data row render as a floating
-   ghost above the real header on scroll. Wrapping each sticky cell's
-   content in its own block-level <div> and putting position:sticky on that
-   div instead (a standard workaround for exactly this "frozen header +
-   frozen column" combination) gives the sticky positioning its own,
-   unambiguous box to anchor to, independent of the table's own row/column
-   layout algorithm — this is what actually fixed it. */
+   screens/mobile) a media query below switches to fixed pixel widths with
+   horizontal scroll instead, since even-split columns get unreadably thin.
+   v8.189.0: reverted the "sticky on an inner wrapper element" workaround
+   from v8.186.0 — it never actually fixed the floating-row bug (only masked it
+   for some scroll positions) because the real cause was elsewhere: the
+   scrolling container (#corr-mtx-fullscreen-inner) itself had 16px/20px of
+   padding. position:sticky's containing block is the PADDING BOX of the
+   nearest scrolling ancestor, so a sticky child's "top:0" is anchored 16px
+   below the actual visible top of the scrollport while that padding is
+   still in view — table rows scrolling underneath render inside that gap,
+   which is exactly the "content visible above the frozen header" artifact
+   Santiago kept seeing regardless of which element the sticky rule was on.
+   Fix: the scrolling container now has zero padding (position:sticky's
+   reference point is flush with the real top edge), and the 16px/20px of
+   breathing room moved to #corr-pairs-fs-wrap, a plain non-scrolling div
+   INSIDE the scroll container — its padding scrolls away normally with the
+   rest of the content instead of permanently offsetting the sticky anchor.
+   position:sticky is applied directly to the header cells themselves (no
+   wrapper div needed once the padding cause is fixed) — the standard,
+   well-supported pattern for a frozen header row + frozen left column in
+   the same table, given border-collapse:separate (already set) and an
+   explicit background on every sticky cell so scrolled rows can't show
+   through. */
+#corr-pairs-fs-wrap{padding:16px 20px 20px;}
 #corr-pairs-fs-table{border-collapse:separate;border-spacing:0;font-family:var(--font-mono);font-size:9px;width:100%;table-layout:fixed;}
 #corr-pairs-fs-table th,#corr-pairs-fs-table td{height:22px;text-align:center;border:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0;}
 #corr-pairs-fs-table th:first-child,#corr-pairs-fs-table td:first-child{width:58px;}
-#corr-pairs-fs-table thead th{padding:0;z-index:2;position:relative;}
-#corr-pairs-fs-table thead th>div{position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;font-size:8px;height:22px;line-height:22px;}
-#corr-pairs-fs-table tbody th{padding:0;z-index:1;position:relative;text-align:left;}
-#corr-pairs-fs-table tbody th>div{position:sticky;left:0;background:var(--bg);color:var(--accent);font-weight:600;text-align:left;padding:0 4px 0 3px;font-size:8.5px;height:22px;line-height:22px;}
-#corr-pairs-fs-table thead th:first-child{z-index:3;}
-#corr-pairs-fs-table thead th:first-child>div{position:sticky;left:0;top:0;}
+#corr-pairs-fs-table thead th{position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;font-size:8px;z-index:2;}
+#corr-pairs-fs-table tbody th{position:sticky;left:0;background:var(--bg);color:var(--text3);font-weight:600;text-align:left;padding:0 4px 0 3px;font-size:8.5px;z-index:1;}
+#corr-pairs-fs-table thead th:first-child{left:0;top:0;z-index:3;}
 /* Row/column highlight on hover — highlights BOTH the row header and the
    column header for whichever cell is under the cursor (wired in
    dashboard.js via _corrPairsWireHover()), not just the single hovered
    cell — needed on a 32x32 grid where it's easy to lose track of which
    row/column a cell belongs to once you've scrolled. */
 #corr-pairs-fs-table td:hover{outline:1px solid var(--accent);outline-offset:-1px;}
-#corr-pairs-fs-table th.corr-hl>div{background:var(--bg3);color:#fff;}
+#corr-pairs-fs-table th.corr-hl{background:var(--bg3);color:#fff;}
 @media (max-width:700px){
   #corr-pairs-fs-table{table-layout:auto;width:auto;min-width:100%;font-size:10px;}
   #corr-pairs-fs-table th,#corr-pairs-fs-table td{width:26px;}
   #corr-pairs-fs-table th:first-child,#corr-pairs-fs-table td:first-child{width:50px;}
+  /* Header row + label column stay frozen on small/mobile screens too —
+     the sticky rules above are already unconditional (not desktop-only),
+     this just confirms the fallback fixed-width layout doesn't fight them:
+     with 32 columns and no room to show them all at once on a phone,
+     keeping both axes' labels pinned while scrolling is what actually
+     makes the grid usable at this size, matching Santiago's request. */
 }
 #corr-mtx-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #corr-mtx-fs-close:hover{border-color:var(--down);color:var(--down)}
@@ -2254,7 +2266,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.184.0" defer></script>
+<script src="assets/dashboard.js?v=8.185.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
@@ -2332,7 +2344,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
       <button id="corr-mtx-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
     </div>
-    <div id="corr-mtx-fullscreen-inner" style="flex:1;min-height:0;overflow:auto;padding:16px 20px;"></div>
+    <div id="corr-mtx-fullscreen-inner" style="flex:1;min-height:0;overflow:auto;padding:0;"></div>
   </div>
   <!-- Fullscreen News/Research/Analysis overlay (v8.167.x) — #intel-scroll is
        moved here on open, restored to #section-news on close. See
