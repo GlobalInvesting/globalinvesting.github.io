@@ -658,6 +658,54 @@ function initCorrAssetTabs() {
   });
 }
 
+// ── Correlation Matrix fullscreen — DOM-lift, same pattern as
+// openCalFullscreen()/closeCalFullscreen() in calendar-panel.js: #corr-matrix-wrap
+// is moved into #corr-mtx-fullscreen-inner on open, restored to its original
+// spot inside the Cross-Asset Correlations sidebar panel on close. No resize/
+// column-split logic needed — the table is a plain fixed-layout grid. ──
+let _corrMtxFsOriginalParent = null;
+let _corrMtxFsOriginalNext   = null;
+
+function openCorrMtxFullscreen() {
+  const overlay = document.getElementById('corr-mtx-fullscreen-overlay');
+  const inner   = document.getElementById('corr-mtx-fullscreen-inner');
+  const wrap    = document.getElementById('corr-matrix-wrap');
+  if (!overlay || !inner || !wrap) return;
+  if (overlay.classList.contains('corr-mtx-fs-active')) return;
+
+  _corrMtxFsOriginalParent = wrap.parentNode;
+  _corrMtxFsOriginalNext   = wrap.nextSibling;
+
+  inner.appendChild(wrap);
+  overlay.classList.add('corr-mtx-fs-active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCorrMtxFullscreen() {
+  const overlay = document.getElementById('corr-mtx-fullscreen-overlay');
+  const wrap    = document.getElementById('corr-matrix-wrap');
+  if (!overlay || !overlay.classList.contains('corr-mtx-fs-active')) return;
+
+  overlay.classList.remove('corr-mtx-fs-active');
+  document.body.style.overflow = '';
+
+  if (_corrMtxFsOriginalParent && wrap) {
+    _corrMtxFsOriginalParent.insertBefore(wrap, _corrMtxFsOriginalNext);
+  }
+  _corrMtxFsOriginalParent = null;
+  _corrMtxFsOriginalNext   = null;
+}
+
+function _corrMtxFsWireUp() {
+  document.getElementById('corr-mtx-fs-btn')?.addEventListener('click', openCorrMtxFullscreen);
+  document.getElementById('corr-mtx-fs-close')?.addEventListener('click', closeCorrMtxFullscreen);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('corr-mtx-fullscreen-overlay')?.classList.contains('corr-mtx-fs-active')) {
+      closeCorrMtxFullscreen();
+    }
+  });
+}
+
 async function loadFxPerfData() {
   // 1W CHG is now sourced directly from quotes.json (pct1w field per FX pair),
   // calculated by fetch_intraday_quotes.py using the prior-Friday-close convention.
@@ -14909,6 +14957,7 @@ function initExclusivePanelNav() {
     initG8RatesTabs();
     initCOTAssetTabs();
     initCorrAssetTabs();
+    _corrMtxFsWireUp();
     initSentimentAssetTabs();
     initExclusivePanelNav();
 
