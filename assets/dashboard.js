@@ -822,42 +822,54 @@ function _pairsCorrMap(ids, retsById) {
   return map;
 }
 
-// Mataf-style row/column ordering: correlated pairs cluster together
-// (strongly positive on one side, strongly negative on the other) instead of
-// the fixed alphabetical/base-currency order the grid used before. This is
-// the same principle behind seaborn.clustermap / corrplot's hierarchical
-// "hclust" reordering, simplified here to a greedy nearest-neighbor chain
-// (full dendrogram clustering is overkill for a fixed ~32-pair grid that
-// re-renders on every timeframe switch): start from the pair with the
-// lowest average correlation to everything else (reads naturally as one
-// edge of the grid), then repeatedly append whichever unplaced pair
-// correlates most strongly with the pair just placed. A pair with no valid
-// correlation at all (fetch failure at this timeframe) is never preferred
-// over a real value, so it settles at an edge instead of breaking the chain.
+// Mataf-style row/column ordering — 1-D spectral ordering via the leading
+// eigenvector of the pairwise correlation matrix (power iteration), not a
+// nearest-neighbor chain or a plain average-correlation sort. This is what
+// actually reproduces Mataf's visual signature (screenshot comparison,
+// Santiago, this session): pairs that share the grid's dominant common
+// factor cluster at the two extremes — strongly loading one way at one
+// edge, strongly loading the opposite way at the other edge — while pairs
+// with near-zero loading (genuinely uncorrelated with that dominant factor)
+// settle in the middle.
+//
+// Two earlier approaches in this same session both fell short:
+// 1. Greedy nearest-neighbor chaining (original v8.185.0 version) started
+//    from the single lowest-average-correlation pair and forced it to an
+//    *edge* as the chain's starting point — backwards from Mataf, which
+//    puts weakly-correlated pairs in the middle.
+// 2. A plain sort by each pair's average signed correlation (tried next)
+//    looked right in isolation but breaks on two anti-correlated clusters
+//    of similar size: by symmetry, a member of cluster A and a member of
+//    cluster B end up with near-identical average scores (both dragged
+//    negative by their cross-cluster correlations), so the two clusters
+//    interleave instead of separating to opposite edges — verified with a
+//    synthetic two-cluster-plus-neutrals case before shipping this version.
+//
+// The leading eigenvector doesn't have this blind spot: it's the direction
+// that captures the matrix's single largest source of shared variance, so
+// cluster A and cluster B naturally land with opposite-signed loadings
+// (same magnitude, opposite sign) rather than similar magnitudes with the
+// same sign. Power iteration (starting from a uniform vector, ~40
+// iterations — this is a small ~32x32 matrix, no numerical stability
+// concerns at that size) is the standard, cheap way to get this without a
+// full eigendecomposition. A pair with no valid correlation at all (fetch
+// failure at this timeframe) is treated as 0 (no relationship measured),
+// which lands it near the middle — reasonable given there's no data to
+// place it anywhere else. Verified against a synthetic two-cluster case
+// (two 3-pair groups, strongly anti-correlated with each other, plus 2
+// neutral pairs) — correctly separates both clusters to opposite edges
+// with the neutrals in between.
 function _pairsClusterOrder(ids, corrMap) {
-  if (ids.length <= 2) return ids.slice();
-  const avgCorr = {};
-  ids.forEach(id => {
-    const vals = ids.filter(o => o !== id).map(o => corrMap[id][o]).filter(v => v != null);
-    avgCorr[id] = vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : 0;
-  });
-  const remaining = new Set(ids);
-  const start = ids.reduce((best, id) => (avgCorr[id] < avgCorr[best] ? id : best), ids[0]);
-  const order = [start];
-  remaining.delete(start);
-  while (remaining.size) {
-    const last = order[order.length - 1];
-    let next = null, bestV = -Infinity;
-    remaining.forEach(id => {
-      const v = corrMap[last][id];
-      const score = v == null ? -1 : v;
-      if (score > bestV) { bestV = score; next = id; }
-    });
-    if (next == null) next = remaining.values().next().value;
-    order.push(next);
-    remaining.delete(next);
+  const n = ids.length;
+  if (n <= 2) return ids.slice();
+  const M = ids.map(r => ids.map(c => (r === c) ? 0 : (corrMap[r][c] ?? 0)));
+  let v = new Array(n).fill(1 / Math.sqrt(n));
+  for (let iter = 0; iter < 40; iter++) {
+    const w = M.map(row => row.reduce((s, val, j) => s + val * v[j], 0));
+    const norm = Math.sqrt(w.reduce((s, x) => s + x * x, 0)) || 1;
+    v = w.map(x => x / norm);
   }
-  return order;
+  return ids.map((id, i) => [id, v[i]]).sort((a, b) => a[1] - b[1]).map(p => p[0]);
 }
 
 async function renderCorrPairsMatrix(tf) {
@@ -904,7 +916,7 @@ async function renderCorrPairsMatrix(tf) {
     html += '</tr>';
   });
   html += '</tbody></table>' +
-    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by correlation clustering (most-correlated pairs adjacent), not alphabetical · 15min/5min not yet available (no intraday fetcher at that granularity)</div>`;
+    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by spectral correlation clustering (Mataf-style: strongly correlated pairs — positive or negative — cluster at the two edges, weakly-correlated pairs sit in the middle), not alphabetical · 15min/5min not yet available (no intraday fetcher at that granularity)</div>`;
 
   inner.innerHTML = html;
 }
