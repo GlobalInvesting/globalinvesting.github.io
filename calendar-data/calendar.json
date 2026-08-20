@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-20T11:54:00Z",
-  "generatedAt": "2026-08-20T11:54:00Z",
+  "lastUpdate": "2026-08-20T12:31:18Z",
+  "generatedAt": "2026-08-20T12:31:18Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,12 +9,12 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-20",
   "rangeTo": "2026-08-21",
-  "totalEvents": 3775,
+  "totalEvents": 3778,
   "currencyCounts": {
     "NZD": 89,
     "EUR": 868,
     "GBP": 446,
-    "USD": 1267,
+    "USD": 1270,
     "CAD": 265,
     "CHF": 126,
     "JPY": 221,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "medium": 1884,
-    "high": 1663,
+    "high": 1666,
     "low": 228
   },
   "surpriseStats": {
@@ -174,9 +174,9 @@
       "std": 0.11547
     },
     "USD/jobless claims 4-week average": {
-      "n": 15,
-      "mean": 0.316667,
-      "std": 3.391779
+      "n": 16,
+      "mean": 0.046875,
+      "std": 3.449902
     },
     "USD/personal income mom": {
       "n": 4,
@@ -229,14 +229,14 @@
       "std": 0.05
     },
     "USD/continuing jobless claims": {
-      "n": 15,
-      "mean": -2.333333,
-      "std": 14.430457
+      "n": 16,
+      "mean": -2.75,
+      "std": 14.040418
     },
     "USD/initial jobless claims": {
-      "n": 15,
-      "mean": 1.533333,
-      "std": 9.760464
+      "n": 16,
+      "mean": 1.6875,
+      "std": 9.449647
     },
     "USD/personal spending mom": {
       "n": 4,
@@ -904,9 +904,9 @@
       "std": 0.11547
     },
     "CAD/new housing price index mom": {
-      "n": 3,
+      "n": 4,
       "mean": -0.1,
-      "std": 0.173205
+      "std": 0.141421
     },
     "USD/retail sales ex autos mom": {
       "n": 4,
@@ -1014,9 +1014,9 @@
       "std": 5.773503
     },
     "USD/philadelphia fed manufacturing index": {
-      "n": 3,
-      "mean": 9.666667,
-      "std": 16.223543
+      "n": 4,
+      "mean": 12.85,
+      "std": 14.697052
     },
     "USD/net long-term tic flows": {
       "n": 4,
@@ -47290,7 +47290,7 @@
       "flag": "🇨🇦",
       "event": "Canada New Housing Price Index MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.1%",
       "forecast": "0.0%",
       "previous": "-0.1%"
     },
@@ -47303,7 +47303,7 @@
       "flag": "🇨🇦",
       "event": "Canada PPI YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "12.4%",
       "forecast": "12.0%",
       "previous": "12.4%"
     },
@@ -47316,7 +47316,7 @@
       "flag": "🇨🇦",
       "event": "Canada PPI MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.6%",
       "forecast": "-0.4%",
       "previous": "-1.4%"
     },
@@ -47327,11 +47327,50 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": "206.0K",
+      "forecast": "210.0K",
+      "previous": "212.0K"
+    },
+    {
+      "date": "20 Aug",
+      "dateISO": "2026-08-20",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "high",
+      "actual": "1799.0K",
+      "forecast": "1790.0K",
+      "previous": "1781.0K"
+    },
+    {
+      "date": "20 Aug",
+      "dateISO": "2026-08-20",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
       "event": "United States Philadelphia Fed Manufacturing Index",
       "impact": "medium",
-      "actual": null,
+      "actual": "47.4",
       "forecast": "25.0",
       "previous": "41.4"
+    },
+    {
+      "date": "20 Aug",
+      "dateISO": "2026-08-20",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Jobless Claims 4-week Average",
+      "impact": "high",
+      "actual": "204.0",
+      "forecast": "200.0",
+      "previous": "199.75"
     },
     {
       "date": "20 Aug",
