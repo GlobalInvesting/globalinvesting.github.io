@@ -738,8 +738,8 @@ function initCorrAssetTabs() {
 // Santiago's spec: the docked "Matrix" tab (#corr-matrix-wrap, currency x
 // currency, _corrMtxCcys) stays exactly as-is — the sidebar panel is too
 // small to fit a 32x32 pairs grid. The expand button instead opens a
-// fullscreen overlay that builds an independent Par×Par matrix (Mataf-style:
-// every tracked FX pair vs every other, raw Pearson on log-returns, not the
+// fullscreen overlay that builds an independent Par×Par matrix (every
+// tracked FX pair vs every other, raw Pearson on log-returns, not the
 // per-currency composite the docked Matrix tab uses) with a Daily/4h/Hourly
 // timeframe selector.
 //
@@ -748,9 +748,9 @@ function initCorrAssetTabs() {
 // and ohlc-data/h1/{pair}.json — already written every run by fetch_ohlc.py's
 // build_intraday_ohlc() for all 32 pairs (verified this session — no new
 // fetcher needed, correcting the prior session's assumption that intraday
-// granularity was unavailable). 15min/5min (Mataf also offers these) are
-// NOT available anywhere in the pipeline. v8.189.0: dropped the matching
-// caveat from the on-screen footnote at Santiago's request (unnecessary
+// granularity was unavailable). 15min/5min are NOT available anywhere in
+// the pipeline. v8.189.0: dropped the matching caveat from the on-screen
+// footnote at Santiago's request (unnecessary
 // detail for the end user) — the gap itself is unchanged, just no longer
 // called out in the UI; this comment is the only place it's noted now.
 //
@@ -824,10 +824,10 @@ function _pairsCorrMap(ids, retsById) {
   return map;
 }
 
-// Mataf-style row/column ordering — 1-D spectral ordering via the leading
-// eigenvector of the pairwise correlation matrix (power iteration), not a
-// nearest-neighbor chain or a plain average-correlation sort. This is what
-// actually reproduces Mataf's visual signature (screenshot comparison,
+// 1-D spectral ordering via the leading eigenvector of the pairwise
+// correlation matrix (power iteration), not a nearest-neighbor chain or a
+// plain average-correlation sort. This is what actually reproduces the
+// target visual pattern (screenshot comparison against a competitor tool,
 // Santiago, this session): pairs that share the grid's dominant common
 // factor cluster at the two extremes — strongly loading one way at one
 // edge, strongly loading the opposite way at the other edge — while pairs
@@ -837,8 +837,8 @@ function _pairsCorrMap(ids, retsById) {
 // Two earlier approaches in this same session both fell short:
 // 1. Greedy nearest-neighbor chaining (original v8.185.0 version) started
 //    from the single lowest-average-correlation pair and forced it to an
-//    *edge* as the chain's starting point — backwards from Mataf, which
-//    puts weakly-correlated pairs in the middle.
+//    *edge* as the chain's starting point — backwards from the target
+//    layout, which puts weakly-correlated pairs in the middle.
 // 2. A plain sort by each pair's average signed correlation (tried next)
 //    looked right in isolation but breaks on two anti-correlated clusters
 //    of similar size: by symmetry, a member of cluster A and a member of
@@ -923,7 +923,7 @@ async function renderCorrPairsMatrix(tf) {
     html += '</tr>';
   });
   html += '</tbody></table>' +
-    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by spectral correlation clustering (Mataf-style: strongly correlated pairs — positive or negative — cluster at the two edges, weakly-correlated pairs sit in the middle), not alphabetical</div></div>`;
+    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by spectral seriation — pairs sorted by their loading on the correlation matrix's leading eigenvector, so the most strongly correlated pairs (positive or negative) cluster at the two edges and weakly-correlated pairs sit in the middle — not alphabetical</div></div>`;
 
   inner.innerHTML = html;
 }
