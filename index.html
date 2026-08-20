@@ -440,18 +440,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cal-events-body.cal-cols-active,#cal-events-body:has(.cal-col-wrap){overflow:hidden}
 #cal-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #cal-fs-close:hover{border-color:var(--down);color:var(--down)}
-/* Correlation Matrix fullscreen overlay — same DOM-lift pattern as
-   #cal-fullscreen-overlay above: #corr-matrix-wrap is moved into
-   #corr-mtx-fullscreen-inner on open, restored to its original spot inside
-   the Cross-Asset Correlations sidebar panel on close — see
-   openCorrMtxFullscreen()/closeCorrMtxFullscreen() in dashboard.js. */
+/* Pair×Pair Correlation Matrix fullscreen overlay — content-swap, not a
+   DOM-lift: #corr-matrix-wrap (docked, currency x currency) never moves;
+   this overlay builds its own 32x32 pairs table independently. See
+   renderCorrPairsMatrix()/openCorrMtxFullscreen() in dashboard.js. */
 #corr-mtx-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
 #corr-mtx-fullscreen-overlay.corr-mtx-fs-active{display:flex}
-#corr-mtx-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
-#corr-mtx-fullscreen-overlay.corr-mtx-fs-active #corr-matrix-wrap{flex:1!important;min-height:0!important;overflow:auto!important;display:block!important;max-width:900px;width:100%;margin:0 auto;padding:16px 20px!important;border-left:1px solid var(--border);border-right:1px solid var(--border)}
-#corr-mtx-fullscreen-overlay.corr-mtx-fs-active #corr-matrix-table td,
-#corr-mtx-fullscreen-overlay.corr-mtx-fs-active #corr-matrix-table th{height:32px!important;font-size:12px!important}
-#corr-mtx-fullscreen-overlay.corr-mtx-fs-active #corr-mtx-fs-btn{display:none!important}
+#corr-pairs-fs-table{border-collapse:separate;border-spacing:0;font-family:var(--font-mono);font-size:10px;margin:0 auto}
+#corr-pairs-fs-table th,#corr-pairs-fs-table td{height:22px;width:38px;text-align:center;border:1px solid var(--border);white-space:nowrap;padding:0}
+#corr-pairs-fs-table thead th{position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:2;padding:0 2px;font-size:9px;}
+#corr-pairs-fs-table tbody th{position:sticky;left:0;background:var(--bg);color:var(--accent);font-weight:600;text-align:left;padding:0 6px 0 2px;z-index:1;font-size:9px;}
+#corr-pairs-fs-table thead th:first-child{position:sticky;left:0;top:0;z-index:3;background:var(--bg)}
 #corr-mtx-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #corr-mtx-fs-close:hover{border-color:var(--down);color:var(--down)}
 /* Intel Fullscreen — News/Research/Analysis as tabs (v8.167.x). Same DOM-lift
@@ -2219,7 +2218,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.179.0" defer></script>
+<script src="assets/dashboard.js?v=8.180.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
@@ -2283,12 +2282,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
     <div id="cal-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
   </div>
-  <!-- Fullscreen Correlation Matrix overlay — #corr-matrix-wrap is moved here on open, restored on close -->
-  <div id="corr-mtx-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen G10 currency correlation matrix">
-    <div class="lw-fs-toolbar" style="justify-content:flex-end;">
+  <!-- Fullscreen Pair×Pair Correlation Matrix overlay — content is built fresh
+       here by renderCorrPairsMatrix(), independent of the small docked
+       currency×currency Matrix tab (#corr-matrix-wrap never moves — the
+       32x32 pairs grid needs real screen space the sidebar panel doesn't
+       have, so this is a content swap, not a DOM-lift of the docked view). -->
+  <div id="corr-mtx-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen pair correlation matrix">
+    <div class="lw-fs-toolbar">
+      <div role="tablist" aria-label="Correlation matrix timeframe" style="flex:1;display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;min-width:0;">
+        <button class="intel-fs-tab intel-fs-tab-active" id="corr-pairs-tf-daily" data-tf="daily" role="tab" aria-selected="true">Daily</button>
+        <button class="intel-fs-tab" id="corr-pairs-tf-4h" data-tf="4h" role="tab" aria-selected="false">4 Hours</button>
+        <button class="intel-fs-tab" id="corr-pairs-tf-1h" data-tf="1h" role="tab" aria-selected="false">Hourly</button>
+      </div>
       <button id="corr-mtx-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
     </div>
-    <div id="corr-mtx-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
+    <div id="corr-mtx-fullscreen-inner" style="flex:1;min-height:0;overflow:auto;padding:16px 20px;"></div>
   </div>
   <!-- Fullscreen News/Research/Analysis overlay (v8.167.x) — #intel-scroll is
        moved here on open, restored to #section-news on close. See
