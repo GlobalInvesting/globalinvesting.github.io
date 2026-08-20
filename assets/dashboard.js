@@ -3449,6 +3449,12 @@ function _destroyLWChart() {
   _lwPeriodHigh = null;
   _lwPeriodLow  = null;
   window._lwRenderDrawings = null;
+  // Compare series belong to the chart instance being destroyed — clear the
+  // runtime map only. window._lwCompareList (the persisted "what to compare"
+  // list) is untouched here, same as window._lwIndState for indicators, so
+  // _renderLWChart's restore pass (see COMPARE OVERLAY section) can re-add
+  // matching series to the new chart once it's built.
+  _lwCompareSeriesMap = {};
 }
 
 // Compute MA(n) over close prices
@@ -3947,8 +3953,25 @@ function _lwDefaultD1Days() { return (window.innerWidth <= 900) ? 91 : 182; }
 
 let _lwActiveDays = _lwDefaultD1Days(); // default: 3M (mobile) / 6M (desktop), calendar days
 let _lwActiveTf   = 'D1'; // active timeframe: H1 | H4 | D1 | W1 | MN
-let _lwCompareSeries = null;  // LineSeries for compare overlay
-let _lwCompareId     = null;  // ohlcId of the compared symbol
+// Compare overlay state (v8.172.0: multi-slot, persisted — see the COMPARE
+// OVERLAY section below for the full rationale). _lwCompareSeriesMap is
+// runtime-only (uid -> LWC series object), reset to {} every time the chart
+// is destroyed/rebuilt (_destroyLWChart below) since a destroyed chart's own
+// series objects can't be reused. window._lwCompareList is the *persisted*
+// "what should be compared" list — survives symbol switches, timeframe
+// switches, and leaving/returning to the chart, exactly like the indicator
+// engine's window._lwIndState further down this file — and is what actually
+// gets re-applied on every fresh _renderLWChart() call.
+let _lwCompareSeriesMap = {};
+const _LS_COMPARE = 'gi_compare_list'; // [ { uid, cmpId, cmpLabel, cmpType } ]
+function _lsGetCompare() {
+  try { const v = localStorage.getItem(_LS_COMPARE); return v ? JSON.parse(v) : []; }
+  catch(_e) { return []; }
+}
+function _lsSetCompare(list) {
+  try { localStorage.setItem(_LS_COMPARE, JSON.stringify(list)); } catch(_e) {}
+}
+if (typeof window._lwCompareList === 'undefined') window._lwCompareList = _lsGetCompare();
 // Fullscreen: DOM-lift vars are declared in the FS block below
 
 // Institutional standard: the open of a live H1/H4 partial bar = close of the last
@@ -6881,6 +6904,30 @@ async function _renderLWChart(ohlcId, label) {
       _indPaneIndex[id] = null;
     }
   }
+
+  // Re-apply any persisted compare overlays for this freshly-built chart —
+  // same "survives a full chart rebuild" pattern as the indicator engine
+  // just above. Previously compare had zero persistence at all: leaving and
+  // returning to the chart (or even just switching timeframe, which also
+  // destroys+rebuilds the LW chart instance) silently dropped every compare
+  // series while its pill stayed on-screen — reading as "still comparing"
+  // when nothing was actually drawn. _lwLoadCompare is defined further down
+  // this file as a top-level function (module-scope _lwChart/_lwCandleSeries/
+  // _lwCompareSeriesMap, already set by this point in this function).
+  (window._lwCompareList || []).slice().forEach(function (entry) {
+    if (entry.cmpType === 'ohlc' && entry.cmpId === ohlcId) {
+      // Can't compare a symbol with itself (same guard as the dropdown
+      // click handler) — this entry stays in the persisted list (it's a
+      // valid compare against any *other* symbol), just not drawn on this
+      // particular chart. Clear its now-stale pill so it doesn't read as
+      // active with nothing behind it.
+      document.querySelectorAll('.lw-cmp-pill').forEach(function (p) {
+        if (p.dataset.uid === entry.uid) p.remove();
+      });
+      return;
+    }
+    _lwLoadCompare(entry.cmpId, entry.cmpLabel, entry.cmpType, true);
+  });
 
   // Build all currently-active indicators on this chart render
   _IND_CATALOGUE.forEach(cfg => {
@@ -15019,7 +15066,14 @@ document.getElementById('lw-range-bar')?.addEventListener('click', e => {
   if (!newTf || newTf === _lwActiveTf) return;
   _lwActiveTf   = newTf;
   _lwActiveDays = _TF_DEFAULT_DAYS[newTf] ?? 91;
-  _lwClearCompare(); // compare series has different timestamps on different TFs
+  // v8.172.0: no longer clears compare here — _renderLWChart() below now
+  // destroys the chart (wiping the old TF's compare series with it, via
+  // _destroyLWChart's _lwCompareSeriesMap reset) and re-applies every
+  // persisted compare entry fresh against the new _lwActiveTf, so the
+  // reloaded overlay already has the right TF's data with no separate clear
+  // step needed — same fix that makes compare survive leaving/returning to
+  // the chart also covers a TF switch, since both go through the same
+  // destroy+rebuild path.
   // Scoped to #lw-range-bar (2026-08-07 fix): this used to be an unscoped
   // document.querySelectorAll('.lw-tf-btn'), which also matched the CSI
   // panel's timeframe buttons (heatmap-modal.js reused the same class) once
@@ -15118,32 +15172,68 @@ document.getElementById('lw-cmp-dropdown')?.addEventListener('click', e => {
   // For ohlc: prevent comparing a symbol with itself; for cot/rate: always allow
   if (cmpType === 'ohlc' && cmpId === _lwActiveOhlcId) return;
   const uid = cmpType + ':' + cmpId;
-  if (uid === _lwCompareId) { _lwClearCompare(); return; }
+  // v8.172.0: toggle OFF only this exact symbol if it's already being
+  // compared — every other active compare overlay is left untouched.
+  // Previously _lwLoadCompare() unconditionally cleared the single active
+  // slot before adding the new one, so picking a second symbol silently
+  // erased the first — compare now supports any number of simultaneous
+  // overlays, matching TradingView/Bloomberg's multi-compare convention,
+  // removed only via its own pill (or re-clicking its own dropdown row).
+  if (_lwCompareSeriesMap[uid]) { _lwClearCompareOne(uid); return; }
   _lwLoadCompare(cmpId, item.textContent.trim(), cmpType);
   document.getElementById('lw-cmp-dropdown').style.display = 'none';
 });
 
-function _lwClearCompare() {
-  if (_lwCompareSeries && _lwChart) {
-    try { _lwChart.removeSeries(_lwCompareSeries); } catch(_e) {}
+// Removes ONE compare overlay by uid ("<type>:<id>") — its series (if the
+// chart still has one), its pill, and its dropdown active-state. Unless
+// `keepPersisted` is passed (used only by the self-compare skip in
+// _renderLWChart's restore pass), the entry is also dropped from
+// window._lwCompareList + localStorage, so a user-initiated removal via the
+// pill's × actually stays removed on the next chart rebuild instead of
+// silently coming back.
+function _lwClearCompareOne(uid, keepPersisted) {
+  const series = _lwCompareSeriesMap[uid];
+  if (series && _lwChart) { try { _lwChart.removeSeries(series); } catch(_e) {} }
+  delete _lwCompareSeriesMap[uid];
+  document.querySelectorAll('.lw-cmp-pill').forEach(function (p) {
+    if (p.dataset.uid === uid) p.remove();
+  });
+  const entry = (window._lwCompareList || []).find(function (e) { return e.uid === uid; });
+  const uType = entry ? entry.cmpType : uid.slice(0, uid.indexOf(':'));
+  const uId   = entry ? entry.cmpId   : uid.slice(uid.indexOf(':') + 1);
+  document.querySelectorAll('.lw-cmp-item').forEach(function (i) {
+    if ((i.dataset.cmptype || 'ohlc') === uType && i.dataset.cmpid === uId) i.classList.remove('active');
+  });
+  if (!keepPersisted) {
+    window._lwCompareList = (window._lwCompareList || []).filter(function (e) { return e.uid !== uid; });
+    _lsSetCompare(window._lwCompareList);
   }
-  _lwCompareSeries = null;
-  _lwCompareId     = null;
-  document.querySelectorAll('.lw-cmp-item').forEach(i => i.classList.remove('active'));
-  document.getElementById('lw-cmp-pill')?.remove();
 }
 
-async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
+async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
   if (!_lwChart || !_lwCandleSeries) return;
-  _lwClearCompare();
   const LWC = window.LightweightCharts;
   const uid = cmpType + ':' + cmpId;
+  if (_lwCompareSeriesMap[uid]) return; // already active — callers guard this, but stay idempotent
 
-  // ── Colour per type ────────────────────────────────────────────────────────
-  const CMP_COLOR = cmpType === 'cot'  ? '#9c27b0'                // purple for COT
-                  : cmpType === 'rate' ? _themeColor('--up')      // up color for CB rate
-                  : cmpType === 'esi'  ? _themeColor('--chart-line')    // blue for ESI
-                  :                     _themeColor('--orange');   // orange for price overlay
+  // ── Colour per type, cycling within-type (v8.172.0) ──────────────────────
+  // Compare could only ever hold one overlay before, so one fixed colour per
+  // type was enough. Now that multiple overlays of the same type can be
+  // active together (e.g. two OHLC price comparisons), reusing one identical
+  // colour for both would make them indistinguishable on the chart — each
+  // type gets a small palette instead, and the Nth active overlay of a given
+  // type takes the Nth colour in that type's palette, so the ordering stays
+  // predictable session to session.
+  const CMP_PALETTES = {
+    cot:  ['#9c27b0', '#ce93d8', '#6a1b9a'],
+    rate: [_themeColor('--up'), '#66bb6a', '#00897b'],
+    esi:  [_themeColor('--chart-line'), '#4fc3f7', '#1565c0'],
+    ohlc: [_themeColor('--orange'), '#ffb74d', '#e65100'],
+  };
+  const palette = CMP_PALETTES[cmpType] || CMP_PALETTES.ohlc;
+  const sameTypeCount = Object.keys(_lwCompareSeriesMap)
+    .filter(function (k) { return k.indexOf(cmpType + ':') === 0; }).length;
+  const CMP_COLOR = palette[sameTypeCount % palette.length];
 
   try {
     let seriesData = [];
@@ -15353,7 +15443,7 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
 
     // ── Render series ──────────────────────────────────────────────────────
     // All types use LineSeries: ohlc → % change, cot → net contracts, rate → step-line, esi → index
-    _lwCompareSeries = LWC.LineSeries
+    const cmpSeries = LWC.LineSeries
       ? _lwChart.addSeries(LWC.LineSeries, {
           color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
           priceScaleId: 'cmp', priceFormat,
@@ -15401,26 +15491,52 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc') {
       });
     } catch(_e) {}
 
-    _lwCompareSeries.setData(seriesData);
-    _lwCompareId = uid;
+    cmpSeries.setData(seriesData);
+    _lwCompareSeriesMap[uid] = cmpSeries;
 
     document.querySelectorAll('.lw-cmp-item').forEach(i =>
       i.classList.toggle('active',
         (i.dataset.cmptype || 'ohlc') === cmpType && i.dataset.cmpid === cmpId));
 
-    // Add pill
+    // Add pill — one per active compare (data-uid keyed, not a singleton id
+    // — v8.172.0). Skipped if a pill for this exact uid already exists,
+    // which happens on the restore pass after a chart rebuild: the pill
+    // survived the rebuild untouched (it lives outside the chart's own DOM
+    // subtree), only its underlying series needed re-attaching above.
     const indPills = document.getElementById('lw-ind-pills');
-    if (indPills) {
+    if (indPills && !Array.from(document.querySelectorAll('.lw-cmp-pill')).some(function (p) { return p.dataset.uid === uid; })) {
       const pill = document.createElement('span');
-      pill.id = 'lw-cmp-pill';
       pill.className = 'lw-cmp-pill';
+      pill.dataset.uid = uid;
       pill.title = 'Remove compare overlay';
       pill.innerHTML = `<span style="width:8px;height:2px;background:${CMP_COLOR};display:inline-block;border-radius:1px;"></span> ${cmpLabel} ×`;
-      pill.addEventListener('click', _lwClearCompare);
+      pill.addEventListener('click', function () { _lwClearCompareOne(uid); });
       indPills.parentNode.insertBefore(pill, indPills);
+    }
+
+    // Persist — unless this call is itself the "re-apply the persisted list
+    // on chart rebuild" pass (fromRestore), in which case the entry is
+    // already in window._lwCompareList and re-adding it would duplicate it.
+    if (!fromRestore) {
+      window._lwCompareList = (window._lwCompareList || []).filter(function (e) { return e.uid !== uid; });
+      window._lwCompareList.push({ uid: uid, cmpId: cmpId, cmpLabel: cmpLabel, cmpType: cmpType });
+      _lsSetCompare(window._lwCompareList);
     }
   } catch(err) {
     console.warn('[lw-compare] Failed to load compare data:', err.message);
+    if (fromRestore) {
+      // The persisted symbol's data is no longer loadable (e.g. the
+      // instrument was removed/renamed) — drop the dead entry instead of
+      // leaving a permanently broken pill + a failing re-fetch attempt on
+      // every future chart render, and clear any stale pill left over from
+      // before this render (it would otherwise read as "still comparing"
+      // with nothing behind it, the exact bug this session set out to fix).
+      window._lwCompareList = (window._lwCompareList || []).filter(function (e) { return e.uid !== uid; });
+      _lsSetCompare(window._lwCompareList);
+      document.querySelectorAll('.lw-cmp-pill').forEach(function (p) {
+        if (p.dataset.uid === uid) p.remove();
+      });
+    }
   }
 }
 
