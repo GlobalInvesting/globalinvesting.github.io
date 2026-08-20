@@ -454,16 +454,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    screens/mobile) that same math produces unreadably thin cells, so a media
    query below falls back to fixed pixel widths with horizontal scroll
    instead, same as before.
-   Row height is uniform (22px) across thead/tbody — a taller thead (a
-   previous vertical-header version used 62px) is what caused the sticky
-   corner/row-header cells to visually detach from the header row on
-   scroll; keeping every row the same height avoids that class of bug. */
+   Sticky positioning is applied to an inner <div> inside each header cell,
+   NOT to the <th>/<td> itself. Putting position:sticky directly on table
+   cells that need to freeze on BOTH axes at once (a sticky top row AND a
+   sticky left column, in the same table) is a known cross-browser rendering
+   trap — v8.186.0's row-height-matching fix narrowed the bug but did not
+   close it; Santiago still saw the first data row render as a floating
+   ghost above the real header on scroll. Wrapping each sticky cell's
+   content in its own block-level <div> and putting position:sticky on that
+   div instead (a standard workaround for exactly this "frozen header +
+   frozen column" combination) gives the sticky positioning its own,
+   unambiguous box to anchor to, independent of the table's own row/column
+   layout algorithm — this is what actually fixed it. */
 #corr-pairs-fs-table{border-collapse:separate;border-spacing:0;font-family:var(--font-mono);font-size:9px;width:100%;table-layout:fixed;}
 #corr-pairs-fs-table th,#corr-pairs-fs-table td{height:22px;text-align:center;border:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0;}
 #corr-pairs-fs-table th:first-child,#corr-pairs-fs-table td:first-child{width:58px;}
-#corr-pairs-fs-table thead th{position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:2;font-size:8px;}
-#corr-pairs-fs-table tbody th{position:sticky;left:0;background:var(--bg);color:var(--accent);font-weight:600;text-align:left;padding:0 4px 0 3px;z-index:1;font-size:8.5px;}
-#corr-pairs-fs-table thead th:first-child{position:sticky;left:0;top:0;z-index:3;}
+#corr-pairs-fs-table thead th{padding:0;z-index:2;position:relative;}
+#corr-pairs-fs-table thead th>div{position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;font-size:8px;height:22px;line-height:22px;}
+#corr-pairs-fs-table tbody th{padding:0;z-index:1;position:relative;text-align:left;}
+#corr-pairs-fs-table tbody th>div{position:sticky;left:0;background:var(--bg);color:var(--accent);font-weight:600;text-align:left;padding:0 4px 0 3px;font-size:8.5px;height:22px;line-height:22px;}
+#corr-pairs-fs-table thead th:first-child{z-index:3;}
+#corr-pairs-fs-table thead th:first-child>div{position:sticky;left:0;top:0;}
+/* Row/column highlight on hover — highlights BOTH the row header and the
+   column header for whichever cell is under the cursor (wired in
+   dashboard.js via _corrPairsWireHover()), not just the single hovered
+   cell — needed on a 32x32 grid where it's easy to lose track of which
+   row/column a cell belongs to once you've scrolled. */
+#corr-pairs-fs-table td:hover{outline:1px solid var(--accent);outline-offset:-1px;}
+#corr-pairs-fs-table th.corr-hl>div{background:var(--bg3);color:#fff;}
 @media (max-width:700px){
   #corr-pairs-fs-table{table-layout:auto;width:auto;min-width:100%;font-size:10px;}
   #corr-pairs-fs-table th,#corr-pairs-fs-table td{width:26px;}
@@ -2236,7 +2254,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.182.0" defer></script>
+<script src="assets/dashboard.js?v=8.183.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
