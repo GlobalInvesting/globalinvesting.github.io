@@ -468,7 +468,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    under Research's. */
 #intel-fullscreen-overlay.intel-fs-active #intel-scroll{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
 #intel-fullscreen-overlay.intel-fs-active .intel-group{display:none;flex-direction:column;min-height:0;overflow:hidden}
-#intel-fullscreen-overlay.intel-fs-active .intel-group.intel-group-active{display:flex;flex:1}
+/* v8.170.0: capped + centered, same pattern as #section-tvcalendar above
+   (max-width, width:100%, margin:0 auto, left/right border) — without it,
+   article excerpts stretched edge-to-edge on wide monitors, producing
+   unreadably long lines (180+ characters on a 1920px+ screen in Santiago's
+   test). 880px targets a ~90-100 char line at the default 10px article
+   font — comfortable prose measure — while still leaving room for the
+   currency/source filter pills above it to sit on one row without
+   wrapping at common desktop widths. Narrower than the calendar's 1180px
+   deliberately: the calendar shows dense tabular/numeric columns that
+   benefit from more horizontal room, News shows prose excerpts that don't. */
+#intel-fullscreen-overlay.intel-fs-active .intel-group.intel-group-active{display:flex;flex:1;max-width:880px;width:100%;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
 #intel-fullscreen-overlay.intel-fs-active .intel-group #ns-filter-bar,
 #intel-fullscreen-overlay.intel-fs-active .intel-group #rs-filter-bar{flex-shrink:0}
 #intel-fullscreen-overlay.intel-fs-active .intel-group #news-section-feed,
@@ -671,7 +681,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.169.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.170.0">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -1810,7 +1820,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <button class="ns-fontsize-btn" id="ns-fontsize-dec" aria-label="Decrease text size" title="Smaller text" onclick="window._newsFontSizeAdjust(-1)">A&#8722;</button>
           <button class="ns-fontsize-btn" id="ns-fontsize-inc" aria-label="Increase text size" title="Larger text" onclick="window._newsFontSizeAdjust(1)">A+</button>
         </div>
-        <button class="lw-tb-btn" id="intel-fs-btn" aria-label="Toggle fullscreen News/Research/Analysis" title="Fullscreen (Esc to exit)" style="flex-shrink:0;margin-left:auto;">&#x26F6;</button>
+        <button class="lw-tb-btn" id="intel-fs-btn" aria-label="Toggle fullscreen News/Research/Analysis" title="Fullscreen (Esc to exit)" style="flex-shrink:0;">&#x26F6;</button>
       </div>
 
       <!-- ── Scrollable container for all 3 sub-panels stacked ── -->
@@ -2159,7 +2169,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.169.0" defer></script>
+<script src="assets/dashboard.js?v=8.170.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
