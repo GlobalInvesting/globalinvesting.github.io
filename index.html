@@ -446,17 +446,29 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    renderCorrPairsMatrix()/openCorrMtxFullscreen() in dashboard.js. */
 #corr-mtx-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
 #corr-mtx-fullscreen-overlay.corr-mtx-fs-active{display:flex}
-/* Mataf-style layout: column headers run vertical (bottom-to-top) instead
-   of horizontal — the same technique the reference tool uses to fit a
-   32-wide grid legibly. This is what lets cell width drop from 38px to
-   22px (headers no longer need to be as wide as the longest pair label),
-   which is the real width saving versus the old horizontal-header version. */
-#corr-pairs-fs-table{border-collapse:separate;border-spacing:0;font-family:var(--font-mono);font-size:10px;margin:0 auto}
-#corr-pairs-fs-table th,#corr-pairs-fs-table td{height:22px;width:22px;text-align:center;border:1px solid var(--border);white-space:nowrap;padding:0}
-#corr-pairs-fs-table thead th{position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:2;padding:0;font-size:8.5px;height:62px;vertical-align:bottom;}
-#corr-pairs-fs-table thead th span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;padding-bottom:3px;}
-#corr-pairs-fs-table tbody th{position:sticky;left:0;background:var(--bg);color:var(--accent);font-weight:600;text-align:left;padding:0 6px 0 2px;z-index:1;font-size:9px;width:auto;}
-#corr-pairs-fs-table thead th:first-child{position:sticky;left:0;top:0;z-index:3;background:var(--bg);width:auto;}
+/* Full-width layout: table-layout:fixed + width:100% lets the browser split
+   the available width evenly across all 32 pair columns automatically, so
+   the grid fills the fullscreen overlay with no horizontal scrollbar on a
+   normal desktop viewport — only the label column gets an explicit width,
+   every other column shares the remainder equally. Below ~700px (small
+   screens/mobile) that same math produces unreadably thin cells, so a media
+   query below falls back to fixed pixel widths with horizontal scroll
+   instead, same as before.
+   Row height is uniform (22px) across thead/tbody — a taller thead (a
+   previous vertical-header version used 62px) is what caused the sticky
+   corner/row-header cells to visually detach from the header row on
+   scroll; keeping every row the same height avoids that class of bug. */
+#corr-pairs-fs-table{border-collapse:separate;border-spacing:0;font-family:var(--font-mono);font-size:9px;width:100%;table-layout:fixed;}
+#corr-pairs-fs-table th,#corr-pairs-fs-table td{height:22px;text-align:center;border:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0;}
+#corr-pairs-fs-table th:first-child,#corr-pairs-fs-table td:first-child{width:58px;}
+#corr-pairs-fs-table thead th{position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:2;font-size:8px;}
+#corr-pairs-fs-table tbody th{position:sticky;left:0;background:var(--bg);color:var(--accent);font-weight:600;text-align:left;padding:0 4px 0 3px;z-index:1;font-size:8.5px;}
+#corr-pairs-fs-table thead th:first-child{position:sticky;left:0;top:0;z-index:3;}
+@media (max-width:700px){
+  #corr-pairs-fs-table{table-layout:auto;width:auto;min-width:100%;font-size:10px;}
+  #corr-pairs-fs-table th,#corr-pairs-fs-table td{width:26px;}
+  #corr-pairs-fs-table th:first-child,#corr-pairs-fs-table td:first-child{width:50px;}
+}
 #corr-mtx-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #corr-mtx-fs-close:hover{border-color:var(--down);color:var(--down)}
 /* Intel Fullscreen — News/Research/Analysis as tabs (v8.167.x). Same DOM-lift
@@ -2224,7 +2236,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.181.0" defer></script>
+<script src="assets/dashboard.js?v=8.182.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
