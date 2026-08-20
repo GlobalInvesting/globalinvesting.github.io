@@ -1,5 +1,20 @@
 /**
- * econ-matrix.js v2.5.0 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.1 — Native Economic Matrix panel
+ *
+ * ── v2.5.1 (2026-08-19) — ECONMX_POLL_MS 3min → 90s. Backend latency audit
+ *    (this session) found the client-side poll was the single heaviest link
+ *    in the end-to-end publish→display chain (up to 3min of a ~9-13min
+ *    worst-case total) and, unlike the upstream calendar-watcher.js CF Worker
+ *    poll (external Myfxbook source, already at its sane floor), carries
+ *    effectively no rate-limit risk — this panel only re-reads GlobalInvesting's
+ *    own calendar.json off GitHub Pages/CDN, built to serve exactly this kind
+ *    of frequent cheap polling. Lowered to 90s to shave ~1.5min off the
+ *    worst case without touching any third-party-facing cadence. Synced with
+ *    the equivalent change in calendar-panel.js's fetchEconomicCalendar
+ *    interval this same session so both panels refresh calendar.json on the
+ *    same cadence again (previously 3min here vs 2min there — a drift left
+ *    over from calendar-panel.js's own v1.3 2026-06-10 reduction that was
+ *    never mirrored here).
  *
  * ── v2.5.0 (2026-08-17) — 10Y Yld / CB Rate went stale for the life of the
  *    session: v2.4.0's periodic refresh only re-fetched calendar.json and
@@ -1180,7 +1195,7 @@
   // whatever they were on first scroll-into-view. See CHANGELOG.md v8.154.3
   // for the live incident (stale AUD/CAD/NOK 10Y shown after a same-day
   // backend fix) this replaced the old "cache forever" comment/behavior for.
-  const ECONMX_POLL_MS = 3 * 60 * 1000; // matches calendar-panel.js's cadence
+  const ECONMX_POLL_MS = 90 * 1000; // v2.5.1: 3min → 90s, matches calendar-panel.js's cadence
 
   let _loading = false;
   let _y10Cache = null;

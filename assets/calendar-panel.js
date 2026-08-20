@@ -1,7 +1,16 @@
 /**
- * calendar-panel.js v1.19.19 — Native economic calendar renderer
+ * calendar-panel.js v1.19.20 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.20 (2026-08-19): fetchEconomicCalendar poll interval 2min → 90s, as
+ *   part of the same-session backend latency audit that also lowered
+ *   econ-matrix.js's ECONMX_POLL_MS (was drifted to 3min there vs 2min here
+ *   since this file's own v1.3 2026-06-10 reduction — never mirrored). This
+ *   file's own calendar.json read carries no third-party rate-limit exposure
+ *   (GitHub Pages/CDN, same-origin static file), unlike the upstream
+ *   calendar-watcher.js CF Worker poll against Myfxbook, which stays as-is.
+ *   Both panels now poll calendar.json on the same 90s cadence again.
  *
  * v1.19.19 (2026-08-13): Reported by Santiago — NOK and SEK never appeared
  *   in the Economic Calendar panel or its currency filter buttons, despite
@@ -2783,7 +2792,7 @@
   setInterval(tickLiveCountdown, 20 * 1000);
 
   // Refresh every 5 minutes so actuals appear shortly after each release
-  setInterval(fetchEconomicCalendar, 2 * 60 * 1000);
+  setInterval(fetchEconomicCalendar, 90 * 1000); // v1.19.20: 2min → 90s, matches econ-matrix.js's ECONMX_POLL_MS
 
   // Also refresh immediately when the tab regains focus (user returns to terminal)
   document.addEventListener('visibilitychange', function () {
