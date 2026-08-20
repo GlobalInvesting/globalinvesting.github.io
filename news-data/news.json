@@ -1,9 +1,9 @@
 {
-  "updated_utc": "2026-08-20T16:01:13.830434+00:00",
-  "updated_label": "16:01 UTC",
+  "updated_utc": "2026-08-20T16:05:51.265113+00:00",
+  "updated_label": "16:05 UTC",
   "total": 52,
-  "total_high": 37,
-  "total_med": 12,
+  "total_high": 40,
+  "total_med": 10,
   "sources_active": [
     "ActionForex",
     "BabyPips",
@@ -14,7 +14,9 @@
     "InvestMacro",
     "InvestingLive",
     "MarketPulse",
-    "RTT News",
+    "NewsData EUR",
+    "NewsData JPY",
+    "NewsData NZD",
     "Riksbank"
   ],
   "lang_counts": {
@@ -311,22 +313,6 @@
       "recent": true
     },
     {
-      "id": "7c4f5272243d",
-      "cur": "CAD",
-      "impact": "low",
-      "title": "Canadian Dollar: Upside focus into 1.35–1.37 against US Dollar – Scotiabank",
-      "expand": "Scotiabank strategists Shaun Osborne and Eric Theoret highlight that USD/CAD is under pressure as broad US Dollar (USD) weakness combines with tentative progress on a US-Canada trade deal.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/canadian-dollar-upside-focus-into-135-137-against-us-dollar-scotiabank-202608201330",
-      "time": "13:30",
-      "ts": 1787232655000,
-      "featured": false,
-      "lang": "en",
-      "date": "20 Aug",
-      "datetime": "2026-08-20T13:30:55+00:00",
-      "recent": true
-    },
-    {
       "id": "9a311f2137dd",
       "cur": "AUD",
       "impact": "med",
@@ -407,6 +393,22 @@
       "recent": true
     },
     {
+      "id": "cd3c65ebd492",
+      "cur": "EUR",
+      "impact": "high",
+      "title": "Will Lagarde exit the ECB early amid rate hikes and French elections?",
+      "expand": "Leadership change at the European Central Bank must be well-planned to minimise market risk",
+      "source": "NewsData EUR",
+      "link": "https://www.businesstimes.com.sg/opinion-features/will-lagarde-exit-ecb-early-amid-rate-hikes-and-french-elections",
+      "time": "04:00",
+      "ts": 1787198400000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Aug",
+      "datetime": "2026-08-20T04:00:00+00:00",
+      "recent": true
+    },
+    {
       "id": "b4499d32666b",
       "cur": "GBP",
       "impact": "high",
@@ -420,6 +422,54 @@
       "lang": "en",
       "date": "20 Aug",
       "datetime": "2026-08-20T03:38:00+00:00",
+      "recent": true
+    },
+    {
+      "id": "f8b75bcc9ccd",
+      "cur": "JPY",
+      "impact": "med",
+      "title": "Yen Weakens as Japan’s Trade Deficit Widens on Rising Import Costs",
+      "expand": "BitcoinWorld Yen Weakens as Japan’s Trade Deficit Widens on Rising Import Costs The Japanese yen remains under pressure as Japan’s trade deficit widens and import costs escalate, reflecting persistent economic headwinds. As of the latest data, the deficit has expanded due to higher energy and commodity prices, while the yen’s depreciation has amplified the cost of imports, creating a challenging cycle for the world’s third-largest economy. Trade [...] This post Yen Weakens as Japan’s Trade Deficit Widens on Rising Import Costs first appeared on BitcoinWorld .",
+      "source": "NewsData JPY",
+      "link": "https://bitcoinworld.co.in/yen-weakens-trade-deficit-import-costs/",
+      "time": "03:35",
+      "ts": 1787196911000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Aug",
+      "datetime": "2026-08-20T03:35:11+00:00",
+      "recent": true
+    },
+    {
+      "id": "b41f55e4a183",
+      "cur": "NZD",
+      "impact": "high",
+      "title": "NZD/USD Edges Higher Toward 0.5950 After China Holds Loan Prime Rates",
+      "expand": "BitcoinWorld NZD/USD Edges Higher Toward 0.5950 After China Holds Loan Prime Rates The New Zealand Dollar (NZD) strengthened against the US Dollar (USD) on Tuesday, with the NZD/USD pair trading near the 0.5950 level after China’s central bank held its benchmark loan prime rates (LPR) steady for August, a decision that was widely anticipated by market economists. China’s decision to maintain its one-year and five-year loan prime [...] This post NZD/USD Edges Higher Toward 0.5950 After China Holds Loan Prime Rates first appeared on BitcoinWorld .",
+      "source": "NewsData NZD",
+      "link": "https://bitcoinworld.co.in/nzd-usd-china-holds-loan-prime-rates-august/",
+      "time": "03:05",
+      "ts": 1787195112000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Aug",
+      "datetime": "2026-08-20T03:05:12+00:00",
+      "recent": true
+    },
+    {
+      "id": "b9dfd44c4d4b",
+      "cur": "NZD",
+      "impact": "high",
+      "title": "New Zealand Dollar gathers strength to near 0.5950 after China holds loan rates steady in August",
+      "expand": "The NZD/USD pair gains momentum to near 0.5950 during the Asian trading hours on Thursday. The pair holds near a two-and-a-half-month high, bolstered by hawkish Reserve Bank of New Zealand (RBNZ) tone and softer US inflation data.",
+      "source": "NewsData NZD",
+      "link": "https://www.fxstreet.com/news/new-zealand-dollar-gathers-strength-to-near-05950-after-china-holds-loan-rates-steady-in-august-202608200238",
+      "time": "02:38",
+      "ts": 1787193486000,
+      "featured": false,
+      "lang": "en",
+      "date": "20 Aug",
+      "datetime": "2026-08-20T02:38:06+00:00",
       "recent": true
     },
     {
@@ -500,22 +550,6 @@
       "lang": "en",
       "date": "19 Aug",
       "datetime": "2026-08-19T14:50:09+00:00",
-      "recent": false
-    },
-    {
-      "id": "27044a9c28c0",
-      "cur": "JPY",
-      "impact": "med",
-      "title": "USD/JPY Remains Range-Bound: What Comes Next?",
-      "expand": "By Analytical Department RoboForex USD/JPY held around 159.53, with the Japanese yen trading sideways for more than a week. The currency has lost approximately half of the gains made following the joint intervention by Tokyo and Washington at the end of July. Pressure on the yen persists due to a wide interest rate differential, rising [&#8230;]",
-      "source": "InvestMacro",
-      "link": "https://investmacro.com/2026/08/usd-jpy-remains-range-bound-what-comes-next/",
-      "time": "14:49",
-      "ts": 1787150940000,
-      "featured": false,
-      "lang": "en",
-      "date": "19 Aug",
-      "datetime": "2026-08-19T14:49:00+00:00",
       "recent": false
     },
     {
@@ -695,22 +729,6 @@
       "recent": false
     },
     {
-      "id": "1af2ef07e2fd",
-      "cur": "EUR",
-      "impact": "med",
-      "title": "German Economic Sentiment Hits 6-Month High",
-      "expand": "German economic confidence rose to a six-month high in August driven by good company results and robust exports, survey results from the Mannheim-based Centre for European Economic Research, or ZEW, showed Tuesday. The ZEW indicator of economic sentiment advanced to 34.2 in August from 26.3 in July. This was the highest score since February and also better than forecast of 30.1.",
-      "source": "RTT News",
-      "link": "https://www.rttnews.com/story.aspx?Id=3681484",
-      "time": "10:36",
-      "ts": 1787049379000,
-      "featured": false,
-      "lang": "en",
-      "date": "18 Aug",
-      "datetime": "2026-08-18T10:36:19+00:00",
-      "recent": false
-    },
-    {
       "id": "10f6627c69e4",
       "cur": "EUR",
       "impact": "high",
@@ -740,22 +758,6 @@
       "lang": "en",
       "date": "18 Aug",
       "datetime": "2026-08-18T10:01:13+00:00",
-      "recent": false
-    },
-    {
-      "id": "4b74af8c7e79",
-      "cur": "EUR",
-      "impact": "med",
-      "title": "Germany ZEW Sentiment Strengthens to 34.2 as Current Conditions Improve",
-      "expand": "German investor sentiment improved further in August, with ZEW Economic Sentiment rising from 26.3 to 34.2, above 30.1 consensus. Current Situation Index also strengthened sharply from -77.6 to -61.1, much better than -68.8 expected. ZEW attributed improvement to solid quarterly corporate results, strong recent exports and support from federal infrastructure programs, although current-condition reading remains [&#8230;] The post Germany ZEW Sentiment Strengthens to 34.2 as Current Conditions Improve appeared first on ActionForex .",
-      "source": "ActionForex",
-      "link": "https://www.actionforex.com/live-comments/650980-germany-zew-sentiment-strengthens-to-34-2-as-current-conditions-improve/",
-      "time": "09:12",
-      "ts": 1787044325000,
-      "featured": false,
-      "lang": "en",
-      "date": "18 Aug",
-      "datetime": "2026-08-18T09:12:05+00:00",
       "recent": false
     },
     {
