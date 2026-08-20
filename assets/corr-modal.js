@@ -1,6 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CORRELATION MODAL  v2.4  — inline-panel edition
+// CORRELATION MODAL  v2.5  — inline-panel edition
 // Fluid layout, terminal CSS variables throughout.
+// v2.5: consumes fetch_intraday_quotes.py v3.21's Engle-Granger cointegration
+// gate — the pairs signal's stability check is no longer a bare |corr|>=0.30
+// proxy, it's a real Engle-Granger test on 60d log-price levels (coint_p <
+// 0.05). New `coint_p` field surfaced in the pairs-signal meta line and its
+// "no signal" state copy updated to say why in cointegration terms, not
+// correlation terms. No layout/CSS change.
 // v2.4: consumes fetch_intraday_quotes.py v3.20's Fisher z-transform fields —
 // chart's ±1.5σ/±2.5σ bands now read explicit band15hi/lo, band25hi/lo (pre-
 // computed server-side in Fisher space, mapped back to correlation space) via
@@ -116,30 +122,33 @@ function _cmParseDate(iso) { if (!iso || typeof iso !== 'string') return null; c
 function _cmFmtDate(iso) { if (!iso) return ''; try { const d = new Date(iso + 'T12:00:00Z'); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); } catch (_) { return iso; } }
 
 // ── Pairs-trade signal — hedge-ratio spread z-score, computed server-side ──
-// (fetch_intraday_quotes.py fetch_correlations(), spread_z/signal/beta fields).
-// `signal` is undefined on cached data from before this feature shipped (not
-// yet re-fetched), null when the underlying correlation was too weak this
-// window for a stable hedge ratio, or one of 'long_a_short_b'/'short_a_long_b'/
-// 'neutral' once computed. Handle all three states rather than assuming data.
+// (fetch_intraday_quotes.py fetch_correlations(), spread_z/signal/beta/
+// coint_p fields). `signal` is undefined on cached data from before this
+// feature shipped (not yet re-fetched), null when the pair failed the
+// Engle-Granger cointegration gate this window (coint_p missing or >= 0.05 —
+// v2.5, was a bare |corr|>=0.30 proxy before), or one of
+// 'long_a_short_b'/'short_a_long_b'/'neutral' once computed. Handle all
+// three states rather than assuming data.
 function _cmPairsSignalHtml(corrObj) {
-  const { a, b, signal, spread_z, beta } = corrObj;
+  const { a, b, signal, spread_z, beta, coint_p } = corrObj;
   if (typeof signal === 'undefined') {
     return '<div class="cm-psig pending"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">pending</span></div>' +
       '<div class="cm-psig-note">Not available for this pair yet \u2014 lands with the next scheduled data refresh.</div></div>';
   }
   if (signal == null) {
     return '<div class="cm-psig neutral"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">60d hedge-ratio spread</span></div>' +
-      '<div class="cm-psig-note">Underlying correlation too weak this window for a stable hedge ratio \u2014 no directional read.</div></div>';
+      '<div class="cm-psig-note">Legs aren\u2019t cointegrated this window (Engle-Granger' + (coint_p != null ? ', p=' + coint_p.toFixed(2) : '') + ') \u2014 no statistically stable spread to trade a reversion against.</div></div>';
   }
   const dirCls = signal === 'neutral' ? 'neutral' : (signal === 'short_a_long_b' ? 'short' : 'long');
   const dirText = signal === 'neutral' ? 'No stretch \u2014 spread within \u00b11.5\u03c3'
     : signal === 'short_a_long_b' ? 'Short ' + a + ' \u00b7 Long ' + b
     : 'Long ' + a + ' \u00b7 Short ' + b;
   const zTxt = spread_z != null ? (spread_z >= 0 ? '+' : '') + spread_z.toFixed(2) + '\u03c3' : '\u2014';
+  const coTxt = coint_p != null ? ' \u00b7 coint. p=' + coint_p.toFixed(2) : '';
   const note = signal === 'neutral'
     ? 'The hedge-ratio-adjusted spread between the two legs is tracking within its normal range \u2014 no mean-reversion edge currently.'
-    : 'The hedge-ratio-adjusted spread (beta ' + (beta != null ? beta.toFixed(2) : '\u2014') + ') is stretched ' + zTxt + ' vs its own 60d norm \u2014 ' + (signal === 'short_a_long_b' ? a : b) + ' has run ahead of what the pair\u2019s usual co-movement implies. Mean-reversion read, not investment advice.';
-  return '<div class="cm-psig ' + dirCls + '"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">60d hedge-ratio spread \u00b7 ' + zTxt + '</span></div>' +
+    : 'The hedge-ratio-adjusted spread (beta ' + (beta != null ? beta.toFixed(2) : '\u2014') + ') is stretched ' + zTxt + ' vs its own 60d norm \u2014 ' + (signal === 'short_a_long_b' ? a : b) + ' has run ahead of what the pair\u2019s usual co-movement implies. Legs are Engle-Granger cointegrated this window' + (coint_p != null ? ' (p=' + coint_p.toFixed(2) + ')' : '') + '. Mean-reversion read, not investment advice.';
+  return '<div class="cm-psig ' + dirCls + '"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">60d hedge-ratio spread \u00b7 ' + zTxt + coTxt + '</span></div>' +
     '<div class="cm-psig-dir">' + dirText + '</div><div class="cm-psig-note">' + note + '</div></div>';
 }
 
