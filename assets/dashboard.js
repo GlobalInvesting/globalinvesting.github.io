@@ -481,7 +481,7 @@ async function populateCorrelations() {
         const absZ = Math.abs(z);
         const normSign = c.norm >= 0 ? '+' : '';
         let badgeCls, badgeLabel;
-        if (absZ >= 2.5)      { badgeCls = 'down'; badgeLabel = '⚠ break'; }
+        if (absZ >= 2.5)      { badgeCls = 'down'; badgeLabel = '● break'; }
         else if (absZ >= 1.5) { badgeCls = 'warn'; badgeLabel = '~ stretched'; }
         else                  { badgeCls = 'flat'; badgeLabel = '● normal'; }
         const title = `Norm (252d): ${normSign}${c.norm.toFixed(2)} · Z-score: ${z >= 0 ? '+' : ''}${z.toFixed(2)}σ`;
