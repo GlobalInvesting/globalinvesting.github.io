@@ -832,11 +832,13 @@ async function renderCorrPairsMatrix(tf) {
   const corrMap = _pairsCorrMap(ids, rets);
   const orderedIds = _pairsClusterOrder(ids, corrMap);
 
-  // Column headers run vertical (CSS writing-mode) rather than horizontal —
-  // same layout technique Mataf's own matrix uses to fit a 32-wide grid
-  // legibly, and the reason the header row can stay narrow (see CSS).
+  // Column headers stay horizontal — a vertical/rotated-text version was
+  // tried and reverted (Santiago flagged a sticky-positioning regression it
+  // introduced; see GUIDELINES.md v8.186.0). The table itself is full-width
+  // (CSS table-layout:fixed) so all 32 columns fit without horizontal
+  // scroll on a normal desktop viewport regardless of header orientation.
   let html = '<table id="corr-pairs-fs-table" aria-label="Pair correlation matrix, clustered by correlation"><thead><tr><th></th>' +
-    orderedIds.map(id => `<th scope="col"><span>${lblById[id]}</span></th>`).join('') + '</tr></thead><tbody>';
+    orderedIds.map(id => `<th scope="col">${lblById[id]}</th>`).join('') + '</tr></thead><tbody>';
 
   orderedIds.forEach(rowId => {
     html += `<tr><th scope="row">${lblById[rowId]}</th>`;
