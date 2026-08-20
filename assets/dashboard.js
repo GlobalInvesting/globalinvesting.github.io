@@ -629,19 +629,20 @@ function initCorrAssetTabs() {
   if (!tabBar) return;
   window._corrActiveView = 'cross';
   tabBar.addEventListener('click', e => {
-    const btn = e.target.closest('.rates-ctab');
+    const btn = e.target.closest('.corr-view-tab');
     if (!btn) return;
     const view = btn.dataset.view;
     if (view === window._corrActiveView) return;
     window._corrActiveView = view;
 
-    tabBar.querySelectorAll('.rates-ctab').forEach(b => {
+    // Same active-state convention as the 30d/60d/90d window buttons right
+    // below this bar: background/border stay fixed, only text color swaps
+    // (text3 -> #fff on active) — not the larger rates-ctab pill treatment.
+    tabBar.querySelectorAll('.corr-view-tab').forEach(b => {
       const isActive = b === btn;
       b.setAttribute('aria-selected', isActive ? 'true' : 'false');
-      b.style.background = isActive ? 'var(--accent)' : 'none';
-      b.style.color = isActive ? '#fff' : 'var(--text2)';
-      b.style.border = isActive ? 'none' : '1px solid var(--border2)';
-      b.style.fontWeight = isActive ? '600' : '400';
+      b.style.color = isActive ? '#fff' : 'var(--text3)';
+      b.classList.toggle('active', isActive);
     });
 
     const crossWrap = document.getElementById('corr-cross-wrap');
