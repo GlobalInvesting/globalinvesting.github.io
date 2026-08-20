@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-08-19T20:29:06Z",
+  "generated_at": "2026-08-20T00:56:56Z",
   "signals": [
     {
-      "time": "20:28",
+      "time": "00:56",
       "priority": "critical",
-      "title": "USD/CHF — G10 Bilateral Theme + Treasury Buybacks",
-      "text": "The USD slumps to 0.7974 following a surprise US Treasury announcement to ramp up bond buybacks and boost long-term purchases, a move intended to steady markets that has instead triggered a broad dollar retreat. This driver aligns with the G10 scorecard where USD is the week's laggard at -1.147% (n=7 pairs) while CHF leads at +1.230% (n=6 pairs), creating a critical spread of 2.377%. Despite a massive +375bp Fed-SNB carry advantage for the dollar, the pair is trading below its SMA20 of 0.8120 as the market prioritizes the Treasury’s liquidity injection over yield. Real rates further highlight the divergence, with the USD at +1.48% restrictive vs CHF at -0.40% accommodative, suggesting the current move is a policy-forced liquidity repricing. Trade bias: Bearish USD/CHF; aggressive momentum overrides the carry advantage in the near-term. Catalyst: SNB meeting 24 Sep — 0.00% hold priced. Risk: US Treasury reverses the buyback stance or yields surge, restoring the carry-driven bid.",
+      "title": "USD/CHF — G10 Bilateral Theme + Liquidity Shock",
+      "text": "The US Dollar is the weakest G10 currency this week, falling -1.078% on average across seven pairs as the US Treasury announces plans to double bond buybacks and boost liquidity. This fiscal shift has triggered a sharp USD sell-off, with USD/CHF falling to 0.7989 and testing its SMA200 at 0.7930. The G10 spread between CHF (the week's leader at +1.003%) and USD has widened to a critical 2.081%, marking a dominant bilateral theme. While the 375bp Fed-SNB carry advantage remains the largest in the G10 space, the liquidity-driven USD tumble is overriding carry support as VIX remains low at 14.9. A sustained break below the SMA200 at 0.7930 would signal a regime shift for the pair. Trade bias: Bearish USD/CHF; fiscal liquidity surge overrides the structural carry advantage. Catalyst: US Treasury buyback execution updates. Risk: S&P 500 reversal triggers a flight to USD liquidity, closing the G10 spread.",
       "evidence": [
-        "CHF 1W avg: +1.230% (n=6)",
-        "USD 1W avg: -1.147% (n=7)",
-        "G10 spread: 2.377%"
+        "CHF 1W avg: +1.003% (n=6)",
+        "USD 1W avg: -1.078% (n=7)",
+        "G10 spread: 2.081%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:25",
+      "time": "00:53",
       "priority": "warning",
-      "title": "USD/JPY — Carry vs Options Skew Divergence",
-      "text": "USD/JPY has retreated to 158.18, breaking below its SMA200 of 158.26 as the greenback faces broad pressure. While the pair maintains a significant +268bp SOFR-TONA carry advantage, the options market is pricing in heavy tail-risk protection with a strong 25d risk reversal (RR) of -1.93. This strong put skew contradicts a neutral-to-positive COT positioning context where JPY shorts have been covering (WoW +4,107 delta), suggesting institutional hedging for a deeper correction is accelerating. The correlation between USD/JPY and VIX has shifted to +0.426 (z=+1.65σ), signaling that the JPY is currently not trading as a traditional safe-haven but is instead reacting to the USD liquidity shock. Trade bias: Neutral/Bearish USD/JPY; technical breakdown below the SMA200 targets 156.50. Catalyst: next BoJ meeting (mkt: 61% hike priced) — hike bias active. Risk: Price recaptures 159.60 (prior close), neutralizing the immediate downside options-led pressure.",
+      "title": "USD/JPY — Positioning + Options Skew + ESI Divergence",
+      "text": "USD/JPY is trading at 158.38, holding below its SMA20/50/200 cluster following the US Treasury liquidity headline. Speculative positioning remains net short JPY at -59,526, but the WoW delta of +4,107 and 4W delta of +45,712 confirm a rapid short-covering trend is underway. The options market is aggressively pricing downside protection, with 25d risk reversals at -1.93 showing a strong put skew that aligns with JPY outperformance. This positioning shift is supported by Japan's ESI of +16.5, which contrasts sharply with the persistent misses in US data (ESI -15.5). The 267bp OIS carry advantage for USD is currently insufficient to halt the JPY recovery as the Fed-BoJ policy divergence narrows. Trade bias: Bearish USD/JPY; short-covering momentum and options skew favor further JPY strength. Catalyst: Japan National CPI report. Risk: USD/JPY holds above the SMA200 at 158.28, triggering a retail-led bounce from 74% long levels.",
       "evidence": [
         "USD/JPY 25d RR: -1.93",
-        "USD/JPY OIS Spread: +268bp",
-        "USD/JPY vs VIX z-score: +1.65σ"
+        "JPY COT 4W delta: +45,712",
+        "US ESI: -15.5 vs JPY ESI: +16.5"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:23",
+      "time": "00:51",
       "priority": "warning",
-      "title": "AUD/USD — COT Flow + Retail Divergence",
-      "text": "AUD/USD holds at 0.7126, remaining well above its SMA cluster (20/50/200) at 0.7034/0.6996/0.6945. Leveraged funds have increased net long positions to +45,727 (WoW +7,737), showing institutional conviction in the trend despite a moderate ESI of -3.8. This institutional long-bias is met by extreme retail sentiment, where 86% of retail traders are short, creating a classic contrarian divergence that often precedes further upside extensions as retail stops are hunted. However, the AUD 10Y spread vs US 10Y is narrow at +34bp, and the RBA 4.35% vs Fed 3.75% carry premium of 60bp remains the primary structural support. Trade bias: Long AUD/USD; retail extreme short positioning suggests the path of least resistance remains higher. Catalyst: RBA meeting 29 Sep — hold at 4.35% priced. Risk: Commodities decline sharply, eroding the AUD's growth-linked support base.",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD/USD has climbed to 0.7119, trading well above its SMA20/50/200 cluster as the Treasury-driven USD weakness benefits high-beta currencies. Leveraged funds are net long AUD +45,727, and while this is not yet at a 52-week extreme (pctl 75), the retail market has moved to an 86% extreme short position. This creates a classic institutional vs retail divergence, where retail traders are aggressively fading the uptrend while speculators continue to add (WoW +7,737). The 70bp carry premium for AUD via AONIA-SOFR supports the bid, provided the US liquidity shock continues to suppress USD demand. Retail capitulation risk rises if price extends toward 0.7200, potentially fueling a short-squeeze extension. Trade bias: Long AUD/USD; retail extreme short provides contrarian support for trend continuation. Catalyst: RBA meeting 29 Sep — hold priced. Risk: Broad risk-off sentiment returns, forcing an unwind of the crowded spec long.",
       "evidence": [
+        "AUD Retail: 86% Short",
         "AUD COT LF Net: +45,727",
-        "Retail AUD/USD: 86% short",
-        "AUD/USD OIS Spread: -69bp"
+        "AUD/USD SMA200: 0.6948"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:20",
+      "time": "00:48",
       "priority": "info",
-      "title": "GBP/USD — Elevated Volatility Risk Premium",
-      "text": "GBP/USD trades at 1.3604, positioned above its SMA20/50/200 cluster at 1.3441, 1.3381, and 1.3420 respectively. The options market is pricing in significant uncertainty with a 1M ATM implied volatility (IV) of 11.0% against a realized volatility (HV30) of 5.9%. This results in a substantial Vol Risk Premium (VRP) of +5.1%, indicating that traders are paying a high premium for protection despite the current bullish trend and neutral carry (Fed 3.75% vs BoE 3.75%). Speculative positioning is crowded with a COT pctl(52w) of 90 and a z-score of +1.23, suggesting that the pair is vulnerable to a 'buy the rumor, sell the fact' reaction if the USD stabilizes. Trade bias: Neutral GBP/USD; high vol premium makes new long entries expensive at current levels. Catalyst: BoE meeting 17 Sep — hold priced. Risk: A break below the 1.3441 SMA20 support triggers a larger unwind of the crowded spec long.",
+      "title": "GBP/USD — Elevated Vol Premium + Real Rate Support",
+      "text": "GBP/USD is trading at its highest level since May at 1.3599, supported by a mildly restrictive real policy rate of +0.85%. Options markets are pricing in significant uncertainty, with GBP/USD IV at 11.0% vs HV30 of 5.9%, creating a massive +5.1% volatility risk premium. This suggests the market is paying a high premium for protection despite the pair trading above its SMA20/50/200 technical cluster. The SONIA-SOFR OIS spread is nearly flat at -8bp, making the pair less of a carry play and more of a liquidity and macro divergence play following the Treasury's move. Speculative long positioning is becoming crowded (pctl 90, z +1.23), which is likely to limit immediate upside without a fresh catalyst. Trade bias: Bullish GBP/USD; supported by real rates and US liquidity shift, though vol premium suggests caution. Catalyst: next BoE meeting (mkt: 100% hold priced). Risk: GBP/USD fails to hold the 1.3600 handle, triggering a profit-taking move toward SMA20 support at 1.3453.",
       "evidence": [
         "GBP/USD VRP: +5.1%",
-        "GBP COT LF pctl(52w): 90",
-        "GBP/USD IV: 11.0% vs HV30: 5.9%"
+        "GBP Real Rate: +0.85%",
+        "GBP COT pctl(52w): 90"
       ],
       "_source": "engine-ai-primary"
     }
