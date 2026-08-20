@@ -762,7 +762,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.172.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.191.0">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -1693,6 +1693,41 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
+    <!-- FX FAIR VALUE (v8.191.0) — rate-differential + risk-sentiment model,
+         rolling 60D regression once fair-value-data/{pair}.json has enough
+         daily history (log-fair-value-inputs.yml, globalinvesting-scripts).
+         Until then, shows today's real inputs + an accumulation progress
+         bar rather than a fabricated z-score — see GUIDELINES.md
+         "No fabricated regression history" and dashboard.js renderFairValue(). -->
+    <div id="section-fair-value" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);">
+      <div class="panel-head">
+        <span class="panel-title">FX Fair Value</span>
+        <span class="panel-sub" id="fv-sub">Rate differential + risk sentiment · 60D rolling regression</span>
+      </div>
+      <div id="fv-accumulating" style="padding:14px 16px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
+        Accumulating daily history — <span id="fv-progress-text">0/60d</span>
+        <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:6px;overflow:hidden;">
+          <div id="fv-progress-bar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;"></div>
+        </div>
+        <div style="margin-top:8px;color:var(--text3);">Today's inputs are logged and real (not simulated); the z-score/fair-value estimate appears once the rolling window has enough daily observations to regress against.</div>
+      </div>
+      <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:280px;overflow-y:auto;">
+        <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, and risk-sentiment inputs for 32 tracked pairs">
+          <thead>
+            <tr>
+              <th scope="col" style="text-align:left;">Pair</th>
+              <th scope="col">Spot</th>
+              <th scope="col" title="Base 10Y yield minus quote 10Y yield, from extended-data/{CCY}.json">Rate Diff</th>
+              <th scope="col" title="Cross-Asset Risk composite score for that day (same formula as the Regime badge)">Risk Score</th>
+              <th scope="col">History</th>
+            </tr>
+          </thead>
+          <tbody id="fv-tbody"></tbody>
+        </table>
+      </div>
+      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">not investment advice</div>
+    </div>
+
     <!-- ALERTS & MARKET SIGNALS (AI-powered from ai-analysis/signals.json) -->
     <div class="panel" id="section-macro">
       <div class="panel-head">
@@ -2266,7 +2301,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.186.0" defer></script>
+<script src="assets/dashboard.js?v=8.191.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
