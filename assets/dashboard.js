@@ -443,6 +443,9 @@ function setCorrWindow(w) {
   if (th) th.textContent = w + 'd';
   // Re-render with cached data
   populateCorrelations();
+  // If the Matrix tab is active, recompute it for the new window too
+  // (shared window selector — see initCorrAssetTabs()).
+  if (window._corrActiveView === 'matrix') renderCorrMatrix();
 }
 
 async function populateCorrelations() {
@@ -498,6 +501,160 @@ async function populateCorrelations() {
   } catch (e) {
     console.warn('[Correlations] Failed to load:', e);
   }
+}
+
+// ── Cross-Asset Correlations panel: Cross Asset / Matrix tabs ──
+// Matrix tab: G10 currency correlation grid, computed client-side from the
+// same 32-pair ohlc-data/*.json set the heatmap composite (populateHeatmap())
+// already documents as "G10 composite · 32 pairs" — reused here as the pair
+// list for building a synthetic per-currency return series, since no
+// pre-computed currency-index time series exists in any data/*.json output.
+const CORR_MTX_CCYS = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
+// [ohlcId, base, quote] — same 32 pairs as the G10 composite heatmap.
+const CORR_MTX_PAIRS = [
+  ['eurusd','EUR','USD'], ['gbpusd','GBP','USD'], ['usdjpy','USD','JPY'], ['audusd','AUD','USD'],
+  ['usdcad','USD','CAD'], ['usdchf','USD','CHF'], ['nzdusd','NZD','USD'], ['usdnok','USD','NOK'],
+  ['usdsek','USD','SEK'], ['eurgbp','EUR','GBP'], ['eurjpy','EUR','JPY'], ['euraud','EUR','AUD'],
+  ['eurcad','EUR','CAD'], ['eurchf','EUR','CHF'], ['eurnzd','EUR','NZD'], ['eurnok','EUR','NOK'],
+  ['eursek','EUR','SEK'], ['gbpjpy','GBP','JPY'], ['gbpaud','GBP','AUD'], ['gbpcad','GBP','CAD'],
+  ['gbpchf','GBP','CHF'], ['gbpnzd','GBP','NZD'], ['audjpy','AUD','JPY'], ['audcad','AUD','CAD'],
+  ['audchf','AUD','CHF'], ['audnzd','AUD','NZD'], ['cadchf','CAD','CHF'], ['cadjpy','CAD','JPY'],
+  ['chfjpy','CHF','JPY'], ['nzdcad','NZD','CAD'], ['nzdchf','NZD','CHF'], ['nzdjpy','NZD','JPY']
+];
+
+let _corrMtxPairCloses = null; // { pairId: [close, ...] } — raw D1 closes, most-recent-last
+let _corrMtxLoadPromise = null;
+
+async function _corrMtxLoadPairData() {
+  if (_corrMtxPairCloses) return _corrMtxPairCloses;
+  if (_corrMtxLoadPromise) return _corrMtxLoadPromise;
+  _corrMtxLoadPromise = (async () => {
+    const out = {};
+    await Promise.all(CORR_MTX_PAIRS.map(async ([id]) => {
+      try {
+        const r = await fetch('./ohlc-data/' + id + '.json');
+        if (!r.ok) return;
+        const bars = await r.json();
+        if (Array.isArray(bars) && bars.length > 1) {
+          out[id] = bars.map(b => b.close).filter(c => typeof c === 'number');
+        }
+      } catch (e) { /* pair unavailable — matrix cells using it stay blank */ }
+    }));
+    _corrMtxPairCloses = out;
+    return out;
+  })();
+  return _corrMtxLoadPromise;
+}
+
+function _pearsonCorr(a, b) {
+  const n = Math.min(a.length, b.length);
+  if (n < 5) return null;
+  a = a.slice(-n); b = b.slice(-n);
+  const ma = a.reduce((s, x) => s + x, 0) / n, mb = b.reduce((s, x) => s + x, 0) / n;
+  let num = 0, da = 0, db = 0;
+  for (let i = 0; i < n; i++) { const xa = a[i] - ma, xb = b[i] - mb; num += xa * xb; da += xa * xa; db += xb * xb; }
+  if (da === 0 || db === 0) return null;
+  return num / Math.sqrt(da * db);
+}
+
+// Builds a composite daily log-return series per G10 currency: every pair
+// containing that currency contributes its log-return (sign-flipped when the
+// currency is the quote leg), averaged across all contributing pairs per day.
+function _corrMtxBuildCcyReturns(pairCloses, windowDays) {
+  const ccyRets = {}; // ccy -> array of arrays (one per contributing pair)
+  CORR_MTX_CCYS.forEach(c => ccyRets[c] = []);
+  CORR_MTX_PAIRS.forEach(([id, base, quote]) => {
+    const closes = pairCloses[id];
+    if (!closes || closes.length < windowDays + 2) return;
+    const slice = closes.slice(-(windowDays + 1));
+    const rets = [];
+    for (let i = 1; i < slice.length; i++) rets.push(Math.log(slice[i] / slice[i - 1]));
+    ccyRets[base].push(rets);
+    ccyRets[quote].push(rets.map(v => -v));
+  });
+  const composite = {};
+  CORR_MTX_CCYS.forEach(c => {
+    const series = ccyRets[c];
+    if (!series.length) { composite[c] = null; return; }
+    const len = Math.min(...series.map(s => s.length));
+    const avg = [];
+    for (let i = 0; i < len; i++) {
+      let sum = 0;
+      series.forEach(s => sum += s[s.length - len + i]);
+      avg.push(sum / series.length);
+    }
+    composite[c] = avg;
+  });
+  return composite;
+}
+
+function _corrMtxCellStyle(v) {
+  if (v == null) return { bg: 'var(--bg2)', color: 'var(--text3)', txt: '—' };
+  const a = Math.min(Math.abs(v), 1);
+  const txt = (v * 100).toFixed(0);
+  if (v >= 0) return { bg: `rgba(38,166,154,${(a * 0.35).toFixed(2)})`, color: 'var(--up)', txt };
+  return { bg: `rgba(239,83,80,${(a * 0.35).toFixed(2)})`, color: 'var(--down)', txt };
+}
+
+async function renderCorrMatrix() {
+  const table = document.getElementById('corr-matrix-table');
+  if (!table) return;
+  table.innerHTML = '<tr><td style="color:var(--text3);font-size:9px;padding:6px 2px;">Loading…</td></tr>';
+  const pairCloses = await _corrMtxLoadPairData();
+  const composite = _corrMtxBuildCcyReturns(pairCloses, _corrWindow);
+
+  let html = '<tr><td></td>' + CORR_MTX_CCYS.map(c =>
+    `<th scope="col" style="font-size:8.5px;font-family:var(--font-mono);color:var(--text3);font-weight:400;text-align:center;padding:0 0 3px;">${c}</th>`
+  ).join('') + '</tr>';
+
+  CORR_MTX_CCYS.forEach(rowCcy => {
+    html += `<tr><th scope="row" style="font-size:8.5px;font-family:var(--font-mono);color:var(--accent);font-weight:600;text-align:left;padding:0 4px 0 0;">${rowCcy}</th>`;
+    CORR_MTX_CCYS.forEach(colCcy => {
+      if (rowCcy === colCcy) {
+        html += `<td style="height:20px;text-align:center;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-size:8.5px;font-family:var(--font-mono);">—</td>`;
+        return;
+      }
+      const a = composite[rowCcy], b = composite[colCcy];
+      const v = (a && b) ? _pearsonCorr(a, b) : null;
+      const s = _corrMtxCellStyle(v);
+      html += `<td title="${rowCcy}/${colCcy} · ${_corrWindow}d Pearson${v == null ? ' (insufficient data)' : ': ' + (v >= 0 ? '+' : '') + v.toFixed(2)}" style="height:20px;text-align:center;border:1px solid var(--border);background:${s.bg};color:${s.color};font-size:8.5px;font-family:var(--font-mono);">${s.txt}</td>`;
+    });
+    html += '</tr>';
+  });
+  table.innerHTML = html;
+}
+
+function initCorrAssetTabs() {
+  const tabBar = document.getElementById('corr-asset-tabs');
+  if (!tabBar) return;
+  window._corrActiveView = 'cross';
+  tabBar.addEventListener('click', e => {
+    const btn = e.target.closest('.rates-ctab');
+    if (!btn) return;
+    const view = btn.dataset.view;
+    if (view === window._corrActiveView) return;
+    window._corrActiveView = view;
+
+    tabBar.querySelectorAll('.rates-ctab').forEach(b => {
+      const isActive = b === btn;
+      b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      b.style.background = isActive ? 'var(--accent)' : 'none';
+      b.style.color = isActive ? '#fff' : 'var(--text2)';
+      b.style.border = isActive ? 'none' : '1px solid var(--border2)';
+      b.style.fontWeight = isActive ? '600' : '400';
+    });
+
+    const crossWrap = document.getElementById('corr-cross-wrap');
+    const matrixWrap = document.getElementById('corr-matrix-wrap');
+    if (view === 'matrix') {
+      if (crossWrap) crossWrap.style.display = 'none';
+      if (matrixWrap) matrixWrap.style.display = '';
+      renderCorrMatrix();
+    } else {
+      if (crossWrap) crossWrap.style.display = '';
+      if (matrixWrap) matrixWrap.style.display = 'none';
+    }
+  });
 }
 
 async function loadFxPerfData() {
@@ -14750,6 +14907,7 @@ function initExclusivePanelNav() {
   const run = async () => {
     initG8RatesTabs();
     initCOTAssetTabs();
+    initCorrAssetTabs();
     initSentimentAssetTabs();
     initExclusivePanelNav();
 
