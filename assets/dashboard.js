@@ -647,7 +647,7 @@ async function renderCorrMatrix() {
   ).join('') + '</tr>';
 
   CORR_MTX_CCYS.forEach(rowCcy => {
-    html += `<tr><th scope="row" style="font-size:8.5px;font-family:var(--font-mono);color:var(--accent);font-weight:600;text-align:left;padding:0 4px 0 0;background:var(--bg2);border:1px solid var(--border);">${rowCcy}</th>`;
+    html += `<tr><th scope="row" style="font-size:8.5px;font-family:var(--font-mono);color:var(--text3);font-weight:600;text-align:left;padding:0 4px 0 0;background:var(--bg2);border:1px solid var(--border);">${rowCcy}</th>`;
     CORR_MTX_CCYS.forEach(colCcy => {
       if (rowCcy === colCcy) {
         html += `<td style="height:20px;text-align:center;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-size:8.5px;font-family:var(--font-mono);">—</td>`;
@@ -749,8 +749,10 @@ function initCorrAssetTabs() {
 // build_intraday_ohlc() for all 32 pairs (verified this session — no new
 // fetcher needed, correcting the prior session's assumption that intraday
 // granularity was unavailable). 15min/5min (Mataf also offers these) are
-// NOT available anywhere in the pipeline — flagged as a known gap in the
-// footnote rather than silently omitted or promised.
+// NOT available anywhere in the pipeline. v8.189.0: dropped the matching
+// caveat from the on-screen footnote at Santiago's request (unnecessary
+// detail for the end user) — the gap itself is unchanged, just no longer
+// called out in the UI; this comment is the only place it's noted now.
 //
 // Lookback window: a fixed ~60-period-equivalent per timeframe (60 daily
 // closes / 360 4h bars / 1440 hourly bars — roughly 60 trading days at each
@@ -895,15 +897,20 @@ async function renderCorrPairsMatrix(tf) {
   // introduced; see GUIDELINES.md v8.186.0). The table itself is full-width
   // (CSS table-layout:fixed) so all 32 columns fit without horizontal
   // scroll on a normal desktop viewport regardless of header orientation.
-  // Header/row-label cells wrap their text in an inner <div> — the sticky
-  // positioning lives on that div (see index.html CSS), not on the <th>
-  // itself, which is the fix for the "row labels float near the top on
-  // scroll" bug. See the CSS comment above #corr-pairs-fs-table for why.
-  let html = '<table id="corr-pairs-fs-table" aria-label="Pair correlation matrix, clustered by correlation"><thead><tr><th><div></div></th>' +
-    orderedIds.map(id => `<th scope="col"><div>${lblById[id]}</div></th>`).join('') + '</tr></thead><tbody>';
+  // Header/row-label cells are plain <th> — position:sticky is applied
+  // directly to them (see index.html CSS). The earlier "sticky on an inner
+  // <div>" wrapper (v8.186.0) is gone; it wasn't the actual fix for the
+  // "row labels float near the top on scroll" bug (root cause was the
+  // scroll container's own padding — see the CSS comment above
+  // #corr-pairs-fs-table), so the extra div was unnecessary complexity.
+  // The whole table is wrapped in #corr-pairs-fs-wrap, a non-scrolling div
+  // that carries the visual padding — see that same CSS comment for why it
+  // has to live there and not on the scroll container itself.
+  let html = '<div id="corr-pairs-fs-wrap"><table id="corr-pairs-fs-table" aria-label="Pair correlation matrix, clustered by correlation"><thead><tr><th></th>' +
+    orderedIds.map(id => `<th scope="col">${lblById[id]}</th>`).join('') + '</tr></thead><tbody>';
 
   orderedIds.forEach(rowId => {
-    html += `<tr><th scope="row"><div>${lblById[rowId]}</div></th>`;
+    html += `<tr><th scope="row">${lblById[rowId]}</th>`;
     orderedIds.forEach(colId => {
       if (rowId === colId) {
         html += `<td style="background:var(--bg2);color:var(--text3);">—</td>`;
@@ -916,7 +923,7 @@ async function renderCorrPairsMatrix(tf) {
     html += '</tr>';
   });
   html += '</tbody></table>' +
-    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by spectral correlation clustering (Mataf-style: strongly correlated pairs — positive or negative — cluster at the two edges, weakly-correlated pairs sit in the middle), not alphabetical · 15min/5min not yet available (no intraday fetcher at that granularity)</div>`;
+    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by spectral correlation clustering (Mataf-style: strongly correlated pairs — positive or negative — cluster at the two edges, weakly-correlated pairs sit in the middle), not alphabetical</div></div>`;
 
   inner.innerHTML = html;
 }
