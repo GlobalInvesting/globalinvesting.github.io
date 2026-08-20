@@ -2203,7 +2203,11 @@ a:focus-visible,
    Compact: one line per item (source · time · cur-tag · title inline), no
    excerpt — matches Bloomberg TOP<GO> scan density. Single class toggle on
    #section-news collapses .ns-art-body/.rs-art-body across all three
-   sub-panels (News/Research/Analysis) — no per-item JS changes needed. */
+   sub-panels (News/Research/Analysis) — no per-item JS changes needed.
+   v8.169.0: also matched on #intel-scroll.ns-compact — see the comment on
+   _newsApplyDensity() in dashboard.js for why #section-news alone stopped
+   being enough once Intel Fullscreen (v8.167.x) started DOM-lifting
+   #intel-scroll outside #section-news. */
 #ns-density-toggle {
   margin-left: auto;
   display: flex;
@@ -2226,9 +2230,13 @@ a:focus-visible,
 .ns-density-btn:first-child { border-right: 1px solid var(--border2); }
 .ns-density-btn:hover { background: var(--bg3); color: var(--text); }
 .ns-density-active { background: var(--accent) !important; color: #fff !important; }
+.ns-density-btn:disabled { opacity: .35; cursor: default; }
+.ns-density-btn:disabled:hover { background: transparent; color: var(--text2); }
 
 #section-news.ns-compact .ns-article,
-#section-news.ns-compact .rs-article {
+#section-news.ns-compact .rs-article,
+#intel-scroll.ns-compact .ns-article,
+#intel-scroll.ns-compact .rs-article {
   padding: 4px 14px;
   display: flex;
   align-items: center;
@@ -2236,17 +2244,23 @@ a:focus-visible,
   overflow: hidden;
 }
 #section-news.ns-compact .ns-art-body,
-#section-news.ns-compact .rs-art-body {
+#section-news.ns-compact .rs-art-body,
+#intel-scroll.ns-compact .ns-art-body,
+#intel-scroll.ns-compact .rs-art-body {
   display: none;
 }
 #section-news.ns-compact .ns-art-meta,
-#section-news.ns-compact .rs-art-meta {
+#section-news.ns-compact .rs-art-meta,
+#intel-scroll.ns-compact .ns-art-meta,
+#intel-scroll.ns-compact .rs-art-meta {
   margin-bottom: 0;
   display: inline-flex;
   flex-shrink: 0;
 }
 #section-news.ns-compact .ns-art-title,
-#section-news.ns-compact .rs-art-title {
+#section-news.ns-compact .rs-art-title,
+#intel-scroll.ns-compact .ns-art-title,
+#intel-scroll.ns-compact .rs-art-title {
   margin-bottom: 0;
   margin-left: 6px;
   flex: 1 1 auto;
@@ -2256,11 +2270,63 @@ a:focus-visible,
   text-overflow: ellipsis;
 }
 #section-news.ns-compact .ns-art-title a,
-#section-news.ns-compact .rs-art-title a {
+#section-news.ns-compact .rs-art-title a,
+#intel-scroll.ns-compact .ns-art-title a,
+#intel-scroll.ns-compact .rs-art-title a {
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ─── NEWS TEXT SIZE (A-/A+) TOGGLE (v8.169.0) ──────────────────────────────
+   Institutional terminals (Bloomberg NI, Eikon News Monitor) all expose a
+   reader-controlled text-size step for news bodies — WCAG 2.1 AA (1.4.4,
+   Resize Text) also expects user-adjustable text short of relying on
+   browser zoom alone. 4 fixed steps rather than free continuous sizing,
+   same "few discrete states, not a slider" pattern as the density toggle
+   above. Step 1 (10px) is the pre-existing default — no visual change for
+   anyone who never touches the control. Scoped to both #section-news and
+   #intel-scroll for the same DOM-lift reason as .ns-compact above, since
+   #ns-filter-bar (and this control inside it) is shared/reused unmodified
+   between the compact view and Intel Fullscreen. */
+#ns-fontsize-toggle {
+  display: flex;
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ns-fontsize-btn {
+  font-size: 10px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--text2);
+  background: transparent;
+  border: none;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.ns-fontsize-btn:first-child { border-right: 1px solid var(--border2); }
+.ns-fontsize-btn:hover:not(:disabled) { background: var(--bg3); color: var(--text); }
+.ns-fontsize-btn:disabled { opacity: .35; cursor: default; }
+
+#section-news.ns-fontsize-0 .ns-art-title, #section-news.ns-fontsize-0 .rs-art-title,
+#intel-scroll.ns-fontsize-0 .ns-art-title, #intel-scroll.ns-fontsize-0 .rs-art-title,
+#section-news.ns-fontsize-0 .ns-art-body,  #section-news.ns-fontsize-0 .rs-art-body,
+#intel-scroll.ns-fontsize-0 .ns-art-body,  #intel-scroll.ns-fontsize-0 .rs-art-body {
+  font-size: 9px;
+}
+#section-news.ns-fontsize-2 .ns-art-title, #section-news.ns-fontsize-2 .rs-art-title,
+#intel-scroll.ns-fontsize-2 .ns-art-title, #intel-scroll.ns-fontsize-2 .rs-art-title,
+#section-news.ns-fontsize-2 .ns-art-body,  #section-news.ns-fontsize-2 .rs-art-body,
+#intel-scroll.ns-fontsize-2 .ns-art-body,  #intel-scroll.ns-fontsize-2 .rs-art-body {
+  font-size: 12px;
+}
+#section-news.ns-fontsize-3 .ns-art-title, #section-news.ns-fontsize-3 .rs-art-title,
+#intel-scroll.ns-fontsize-3 .ns-art-title, #intel-scroll.ns-fontsize-3 .rs-art-title,
+#section-news.ns-fontsize-3 .ns-art-body,  #section-news.ns-fontsize-3 .rs-art-body,
+#intel-scroll.ns-fontsize-3 .ns-art-body,  #intel-scroll.ns-fontsize-3 .rs-art-body {
+  font-size: 14px;
 }
 
 

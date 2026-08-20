@@ -12296,6 +12296,9 @@ function initAlerts() {
   // Init News panel display density (expanded/compact) from localStorage
   _newsLoadDensity();
 
+  // Init News panel text size (A-/A+, 4 steps) from localStorage
+  _newsLoadFontSize();
+
   // Close popover when clicking outside — bubble phase so button onclick fires first
   document.addEventListener('click', e => {
     const anchor = document.getElementById('alerts-anchor');
@@ -14021,8 +14024,22 @@ function _newsLoadDensity() {
 }
 
 function _newsApplyDensity() {
+  // v8.169.0 FIX: the compact/expanded CSS rules were scoped to
+  // `#section-news.ns-compact …` only. That worked fine in the stacked
+  // (compact/docked) view, where #intel-scroll is a real descendant of
+  // #section-news — but openIntelFullscreen() (v8.167.x) DOM-lifts
+  // #intel-scroll out into #intel-fullscreen-inner, a sibling overlay
+  // OUTSIDE #section-news. Once in fullscreen, .ns-article/.rs-article are
+  // no longer descendants of #section-news at all, so the class toggle on
+  // #section-news had nothing left to select — the buttons flipped their
+  // own active state correctly but the layout never changed. Fixed by
+  // toggling the same class on #intel-scroll too (the element that actually
+  // moves and stays a real ancestor of the articles in both contexts) and
+  // matching it in CSS — see #intel-scroll.ns-compact rules below.
   const section = document.getElementById('section-news');
+  const scroll  = document.getElementById('intel-scroll');
   if (section) section.classList.toggle('ns-compact', _newsDensity === 'compact');
+  if (scroll)  scroll.classList.toggle('ns-compact', _newsDensity === 'compact');
   document.querySelectorAll('.ns-density-btn').forEach(function(btn) {
     btn.classList.toggle('ns-density-active', btn.dataset.density === _newsDensity);
   });
@@ -14035,6 +14052,48 @@ function _newsSetDensity(mode) {
   _newsApplyDensity();
 }
 window._newsSetDensity = _newsSetDensity;
+
+// ── Text size (A-/A+) — 4 discrete steps, index 0..3 → 9px/10px/12px/14px.
+// Storage: localStorage key 'gi_news_fontsize' → '0'..'3' (default: '1',
+// i.e. the pre-existing 10px baseline, so nobody sees a change unless they
+// press the control). Applied the same way as density: a single CSS class
+// toggle (.ns-fontsize-0/2/3 — step 1 has no override, it's the base CSS
+// value already) on #section-news AND #intel-scroll, so the control keeps
+// working whether #intel-scroll is docked or DOM-lifted into fullscreen.
+const NEWS_FONTSIZE_KEY = 'gi_news_fontsize';
+const NEWS_FONTSIZE_STEPS = [9, 10, 12, 14];
+let _newsFontSizeIdx = 1;
+
+function _newsLoadFontSize() {
+  try {
+    const raw = parseInt(localStorage.getItem(NEWS_FONTSIZE_KEY), 10);
+    _newsFontSizeIdx = Number.isInteger(raw) && raw >= 0 && raw < NEWS_FONTSIZE_STEPS.length ? raw : 1;
+  } catch { _newsFontSizeIdx = 1; }
+  _newsApplyFontSize();
+}
+
+function _newsApplyFontSize() {
+  const section = document.getElementById('section-news');
+  const scroll  = document.getElementById('intel-scroll');
+  [section, scroll].forEach(function (el) {
+    if (!el) return;
+    for (let i = 0; i < NEWS_FONTSIZE_STEPS.length; i++) el.classList.remove('ns-fontsize-' + i);
+    el.classList.add('ns-fontsize-' + _newsFontSizeIdx);
+  });
+  const dec = document.getElementById('ns-fontsize-dec');
+  const inc = document.getElementById('ns-fontsize-inc');
+  if (dec) dec.disabled = _newsFontSizeIdx === 0;
+  if (inc) inc.disabled = _newsFontSizeIdx === NEWS_FONTSIZE_STEPS.length - 1;
+}
+
+function _newsFontSizeAdjust(delta) {
+  const next = _newsFontSizeIdx + delta;
+  if (next < 0 || next >= NEWS_FONTSIZE_STEPS.length) return;
+  _newsFontSizeIdx = next;
+  try { localStorage.setItem(NEWS_FONTSIZE_KEY, String(_newsFontSizeIdx)); } catch {}
+  _newsApplyFontSize();
+}
+window._newsFontSizeAdjust = _newsFontSizeAdjust;
 
 // Sources classified as TA/market analysis — rendered in Analysis sub-panel
 // (renamed from "Trading" — aligns with Bloomberg/Reuters/Risk.net terminology)
