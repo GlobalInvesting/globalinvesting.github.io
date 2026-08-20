@@ -1942,10 +1942,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </tbody>
     </table>
 
-    <div class="sb-head" style="margin-top:2px;">Cross-Asset Correlations</div>
-    <div id="corr-asset-tabs" style="display:flex;gap:2px;padding:2px 6px;" role="tablist" aria-label="Correlation view">
-      <button class="rates-ctab active" data-view="cross" role="tab" aria-selected="true"  style="padding:2px 7px;font-size:10px;font-weight:600;border:none;border-radius:3px;background:var(--accent);color:#fff;cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Cross Asset</button>
-      <button class="rates-ctab"        data-view="matrix" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Matrix</button>
+    <div class="sb-head" style="margin-top:2px;display:flex;align-items:center;justify-content:space-between;">
+      <span>Correlations</span>
+      <span id="corr-asset-tabs" style="display:flex;gap:2px;" role="tablist" aria-label="Correlation view">
+        <button id="corr-tab-cross"  class="corr-view-tab active" data-view="cross"  role="tab" aria-selected="true"  style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:#fff;border-radius:2px;cursor:pointer;line-height:1.4;">Cross Asset</button>
+        <button id="corr-tab-matrix" class="corr-view-tab"        data-view="matrix" role="tab" aria-selected="false" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;line-height:1.4;">Matrix</button>
+      </span>
     </div>
     <div style="display:flex;align-items:center;justify-content:flex-end;padding:2px 6px;">
       <span id="corr-window-btns" style="display:flex;gap:2px;" role="group" aria-label="Correlation window">
@@ -2200,7 +2202,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.174.0" defer></script>
+<script src="assets/dashboard.js?v=8.175.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
