@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-20T07:31:16Z",
-  "generatedAt": "2026-08-20T07:31:16Z",
+  "lastUpdate": "2026-08-20T07:58:14Z",
+  "generatedAt": "2026-08-20T07:58:14Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1382,6 +1382,11 @@
       "n": 2,
       "mean": -445.62,
       "std": 216.091832
+    },
+    "EUR/greece current account": {
+      "n": 2,
+      "mean": -26.4815,
+      "std": 36.03204
     },
     "GBP/ppi output yoy": {
       "n": 2,
@@ -47246,7 +47251,7 @@
       "flag": "🇪🇺",
       "event": "Greece Current Account",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.603",
       "forecast": "0.4",
       "previous": "-0.96"
     },
