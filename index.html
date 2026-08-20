@@ -440,6 +440,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cal-events-body.cal-cols-active,#cal-events-body:has(.cal-col-wrap){overflow:hidden}
 #cal-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #cal-fs-close:hover{border-color:var(--down);color:var(--down)}
+/* Intel Fullscreen — News/Research/Analysis as tabs (v8.167.x). Same DOM-lift
+   pattern as #cal-fullscreen-overlay above: #intel-scroll (holding the 3
+   .intel-group wrappers, see dashboard.css) is moved into #intel-fullscreen-inner
+   on open, restored to its original spot in #section-news on close — see
+   openIntelFullscreen()/closeIntelFullscreen() in dashboard.js. */
+#intel-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
+#intel-fullscreen-overlay.intel-fs-active{display:flex}
+#intel-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+#intel-fullscreen-overlay.intel-fs-active #intel-fs-btn{display:none!important}
+.intel-fs-tab{background:transparent;border:none;border-right:1px solid var(--border);color:var(--text3);font-size:11px;font-family:var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.05em;padding:0 16px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
+.intel-fs-tab:hover{color:var(--text2)}
+.intel-fs-tab.intel-fs-tab-active{color:#fff;background:var(--accent)}
+/* Fullscreen-only: #intel-scroll and its 3 .intel-group wrappers switch from
+   the compact view's CSS Grid (dashboard.css) to a tabbed flex layout — only
+   the active group renders, at full available height, with its own filter
+   bar (if any) pinned above its own independently-scrolling feed. #ns-filter-bar
+   is DOM-lifted into #intel-group-news here (own currency filter per tab,
+   rather than one shared across all three — Santiago's choice) so it sits
+   directly under the News header the same way #rs-filter-bar already sits
+   under Research's. */
+#intel-fullscreen-overlay.intel-fs-active #intel-scroll{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+#intel-fullscreen-overlay.intel-fs-active .intel-group{display:none;flex-direction:column;min-height:0;overflow:hidden}
+#intel-fullscreen-overlay.intel-fs-active .intel-group.intel-group-active{display:flex;flex:1}
+#intel-fullscreen-overlay.intel-fs-active .intel-group #ns-filter-bar,
+#intel-fullscreen-overlay.intel-fs-active .intel-group #rs-filter-bar{flex-shrink:0}
+#intel-fullscreen-overlay.intel-fs-active .intel-group #news-section-feed,
+#intel-fullscreen-overlay.intel-fs-active .intel-group #research-section-feed,
+#intel-fullscreen-overlay.intel-fs-active .intel-group #trading-section-feed{flex:1;min-height:0}
 #lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:var(--bg);border-bottom:1px solid var(--border);min-height:26px;flex-wrap:wrap;overflow:hidden}
 #lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
 #lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--font-mono,monospace)}
@@ -637,7 +665,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.166.3">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.168.0">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -1772,12 +1800,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <button class="ns-density-btn ns-density-active" data-density="expanded" onclick="window._newsSetDensity('expanded')">Expanded</button>
           <button class="ns-density-btn" data-density="compact" onclick="window._newsSetDensity('compact')">Compact</button>
         </div>
+        <button class="lw-tb-btn" id="intel-fs-btn" aria-label="Toggle fullscreen News/Research/Analysis" title="Fullscreen (Esc to exit)" style="flex-shrink:0;margin-left:auto;">&#x26F6;</button>
       </div>
 
       <!-- ── Scrollable container for all 3 sub-panels stacked ── -->
       <div id="intel-scroll" class="thin-scroll">
 
+        <!-- v8.167.x: .intel-group wrappers are display:contents in the compact
+             view (see dashboard.css), so #intel-scroll's existing CSS Grid
+             (7 real children in DOM order) renders identically to before —
+             these only become real flex boxes, one shown at a time as a tab
+             pane, inside Intel Fullscreen (#intel-fs-btn). See
+             openIntelFullscreen()/_intelFsSetTab() in dashboard.js. -->
+
         <!-- ─── SUB-PANEL 1: NEWS — CB & macro headlines ─────────────────────── -->
+        <div id="intel-group-news" class="intel-group">
         <div class="intel-sub-head">
           <div class="intel-sub-title">
             <span class="intel-sub-label">News</span>
@@ -1788,8 +1825,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div id="news-section-feed">
           <div style="padding:14px;color:var(--text3);font-size:11px;">Loading news&hellip;</div>
         </div>
+        </div><!-- /#intel-group-news -->
 
         <!-- ─── SUB-PANEL 2: RESEARCH — institutional bank notes ──────────────── -->
+        <div id="intel-group-research" class="intel-group">
         <div class="intel-sub-head intel-sub-head--research">
           <div class="intel-sub-title">
             <span class="intel-sub-label">Research</span>
@@ -1817,8 +1856,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div id="research-section-feed">
           <div style="padding:14px;color:var(--text3);font-size:11px;">Loading research&hellip;</div>
         </div>
+        </div><!-- /#intel-group-research -->
 
         <!-- ─── SUB-PANEL 3: TRADING — TA & retail analysis ───────────────────── -->
+        <div id="intel-group-analysis" class="intel-group">
         <div class="intel-sub-head intel-sub-head--trading">
           <div class="intel-sub-title">
             <span class="intel-sub-label">Analysis</span>
@@ -1829,6 +1870,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div id="trading-section-feed">
           <div style="padding:14px;color:var(--text3);font-size:11px;">Loading&hellip;</div>
         </div>
+        </div><!-- /#intel-group-analysis -->
 
       </div><!-- /#intel-scroll -->
     </div><!-- /#section-news -->
@@ -2107,7 +2149,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.166.2" defer></script>
+<script src="assets/dashboard.js?v=8.168.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
@@ -2170,6 +2212,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <button id="cal-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
     </div>
     <div id="cal-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
+  </div>
+  <!-- Fullscreen News/Research/Analysis overlay (v8.167.x) — #intel-scroll is
+       moved here on open, restored to #section-news on close. See
+       openIntelFullscreen()/closeIntelFullscreen() in dashboard.js. -->
+  <div id="intel-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen News, Research and Analysis">
+    <div class="lw-fs-toolbar">
+      <div role="tablist" aria-label="News section selector" style="flex:1;display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;min-width:0;">
+        <button class="intel-fs-tab intel-fs-tab-active" data-tab="news" role="tab" aria-selected="true">News</button>
+        <button class="intel-fs-tab" data-tab="research" role="tab" aria-selected="false">Research</button>
+        <button class="intel-fs-tab" data-tab="analysis" role="tab" aria-selected="false">Analysis</button>
+      </div>
+      <button id="intel-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
+    </div>
+    <div id="intel-fullscreen-inner" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
   </div>
   <!-- GI Theme Manager moved to assets/dashboard.js (v8.41.0) -->
 </body>
