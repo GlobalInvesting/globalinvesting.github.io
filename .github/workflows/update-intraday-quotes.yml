@@ -83,7 +83,14 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install yfinance requests --break-system-packages
+        # statsmodels (pinned — see engine repo's scripts/requirements.txt for the
+        # same "don't leave a version unpinned" convention) added in v3.21 for the
+        # correlations pairs-signal's Engle-Granger cointegration test
+        # (statsmodels.tsa.stattools.coint). fetch_intraday_quotes.py degrades to
+        # "no pairs signal" if this install is ever missing/broken — it will not
+        # crash the quotes.json build — but must still ship in the same change as
+        # any code that imports it (see GUIDELINES.md).
+        run: pip install yfinance requests statsmodels==0.14.6 --break-system-packages
 
       - name: Create output directory
         run: mkdir -p intraday-data
