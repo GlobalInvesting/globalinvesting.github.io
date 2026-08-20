@@ -88,6 +88,71 @@ const PAIRS = [
   { id:'nzdchf', base:'NZD', quote:'CHF', cross:['NZD','CHF'], dec:5 },
 ];
 
+// ── FX Fair Value (v8.191.0) ──────────────────────────────────────────────
+// Reads fair-value-data/{pair}.json (written daily by log_fair_value_inputs.py
+// in globalinvesting-scripts — see log-fair-value-inputs.yml). Each file is an
+// array of real {date, spot, rate_diff, stress} rows, oldest → newest, one per
+// day the workflow has run. No client-side estimation of missing days: below
+// FV_MIN_ROWS the panel shows an accumulation progress bar instead of a
+// z-score, per Santiago's explicit "don't fabricate regression history"
+// decision (2026-08-20) — see GUIDELINES.md § Data integrity.
+const FV_MIN_ROWS = 60;
+
+async function renderFairValue() {
+  const accWrap = document.getElementById('fv-accumulating');
+  const tblWrap = document.getElementById('fv-wrap');
+  const tbody   = document.getElementById('fv-tbody');
+  if (!accWrap || !tblWrap || !tbody) return;
+
+  const results = await Promise.all(PAIRS.map(async p => {
+    try {
+      const r = await _fetchWithRetry('./fair-value-data/' + p.id + '.json');
+      if (!r || !r.ok) return { pair: p, rows: [] };
+      const rows = await r.json();
+      return { pair: p, rows: Array.isArray(rows) ? rows : [] };
+    } catch {
+      return { pair: p, rows: [] };
+    }
+  }));
+
+  const maxRows = results.reduce((m, x) => Math.max(m, x.rows.length), 0);
+
+  if (maxRows < FV_MIN_ROWS) {
+    accWrap.style.display = '';
+    tblWrap.style.display = 'none';
+    const pct = Math.min(100, Math.round((maxRows / FV_MIN_ROWS) * 100));
+    setEl('fv-progress-text', `${maxRows}/${FV_MIN_ROWS}d`);
+    const bar = document.getElementById('fv-progress-bar');
+    if (bar) bar.style.width = pct + '%';
+    return;
+  }
+
+  // Enough history exists for a real rolling regression — z-score/fair-value
+  // computation lands in a follow-up pass; for now, show the real latest
+  // inputs (spot / rate differential / risk score) plus history depth per
+  // pair, still with zero fabricated numbers.
+  accWrap.style.display = 'none';
+  tblWrap.style.display = '';
+
+  let html = '';
+  results.forEach(({ pair, rows }) => {
+    if (!rows.length) return;
+    const last = rows[rows.length - 1];
+    const spotTxt = last.spot != null ? last.spot.toFixed(pair.dec) : '—';
+    const rdTxt   = last.rate_diff != null ? (last.rate_diff >= 0 ? '+' : '') + last.rate_diff.toFixed(2) : '—';
+    const rdColor = last.rate_diff == null ? 'var(--text3)' : (last.rate_diff >= 0 ? 'var(--up)' : 'var(--down)');
+    const stTxt   = last.stress != null ? last.stress.toFixed(0) : '—';
+    html += `<tr>
+      <td>${pair.label || (pair.base + '/' + pair.quote)}</td>
+      <td>${spotTxt}</td>
+      <td style="color:${rdColor};">${rdTxt}</td>
+      <td>${stTxt}</td>
+      <td style="color:var(--text3);">${rows.length}d</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
 // CB rate config
 const CB_CONFIG = [
   { id:'usd', file:'USD', label:'Fed (US)' },
@@ -11161,6 +11226,7 @@ async function boot() {
   fetchRiskData();
   fetchCrossAssetData();
   fetchCommodityQuotes();
+  renderFairValue();
   // AI narrative full build (non-blocking, fills narrative text).
   // Chain a post-resolve scroll reset: injecting the full narrative text expands
   // #narrative's height, which can cause the browser to scroll #main down to

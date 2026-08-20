@@ -2057,6 +2057,35 @@ a:focus-visible,
   font-weight: 400;
   margin-top: 1px;
 }
+/* ── FX Fair Value (v8.191.0) ── */
+#fv-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  text-align: right;
+  color: var(--text2);
+  font-weight: 400;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  z-index: 1;
+}
+#fv-table th:first-child { text-align: left; }
+#fv-table td {
+  padding: 4px 8px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+#fv-table td:first-child {
+  text-align: left;
+  color: var(--accent);
+  font-weight: 500;
+}
+#fv-table tr:hover td { background: var(--bg2); }
+#fv-progress-text { color: var(--text); font-variant-numeric: tabular-nums; }
 .es-bar-wrap {
   position: relative;
   height: 6px;
