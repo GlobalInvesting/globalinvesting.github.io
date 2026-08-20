@@ -1,8 +1,8 @@
 {
-  "updated_utc": "2026-08-20T12:10:46.778188+00:00",
-  "updated_label": "12:10 UTC",
+  "updated_utc": "2026-08-20T12:20:48.900072+00:00",
+  "updated_label": "12:20 UTC",
   "total": 52,
-  "total_high": 43,
+  "total_high": 44,
   "total_med": 5,
   "sources_active": [
     "ActionForex",
@@ -16,6 +16,7 @@
     "Marc to Market",
     "MarketPulse",
     "Nasdaq FX",
+    "RTT News",
     "Riksbank"
   ],
   "lang_counts": {
@@ -23,6 +24,22 @@
     "en": 52
   },
   "articles": [
+    {
+      "id": "56adc6efacfe",
+      "cur": "JPY",
+      "impact": "high",
+      "title": "British Pound gains as Japanese Yen struggles despite hawkish BoJ outlook",
+      "expand": "GBP/JPY edges higher on Thursday, reversing all the losses recorded on the previous day. The move is largely driven by broad Japanese Yen (JPY) weakness rather than any major positive development for the British Pound (GBP), with a sparse economic calendar offering little fresh impetus.",
+      "source": "FXStreet",
+      "link": "https://www.fxstreet.com/news/british-pound-gains-as-japanese-yen-struggles-despite-hawkish-boj-outlook-202608201213",
+      "time": "12:13",
+      "ts": 1787228037000,
+      "featured": true,
+      "lang": "en",
+      "date": "20 Aug",
+      "datetime": "2026-08-20T12:13:57+00:00",
+      "recent": true
+    },
     {
       "id": "877af3618d17",
       "cur": "SEK",
@@ -190,7 +207,7 @@
       "title": "Banks borrow £126.1bln in BoE short-term repo operation",
       "expand": "",
       "source": "FinancialJuice",
-      "link": "https://www.financialjuice.com/News/9729230/Banks-borrow-1261bln-in-BoE-short-term-repo-operation.aspx?xy=rss",
+      "link": "https://www.financialjuice.com/News/9729230/Banks-borrow-1261bln-in-BoE-short-term-repo-operation.aspx",
       "time": "09:45",
       "ts": 1787219118000,
       "featured": true,
@@ -238,7 +255,7 @@
       "title": "ING: The EUR - FJElite",
       "expand": "EUR/USD broke higher yesterday on the US Treasury news, which could usher in a slightly more encouraging, or at least stable, investment environment. Ever-higher natural gas prices in Europe remain a worry, but investors are thinking about another bearish dollar leg emerging, with EUR/USD playing its part. Behind the scenes, foreigners are also buying a lot of eurozone debt and equities. Data released by the European Central Bank yesterday showed that foreigners have bought around €l.ltr of eurozone securities over the last 12 months. And June saw the largest ever monthly purchases of debt at ...",
       "source": "FinancialJuice",
-      "link": "https://www.financialjuice.com/News/9729154/ING-The-EUR---FJElite.aspx?xy=rss",
+      "link": "https://www.financialjuice.com/News/9729154/ING-The-EUR---FJElite.aspx",
       "time": "08:53",
       "ts": 1787216022000,
       "featured": true,
@@ -254,7 +271,7 @@
       "title": "ING: The USD - FJElite",
       "expand": "While increasing liquidity buy-back operations by $2bn might seem like rearranging deckchairs on the Titanic given the US national debt of $40tr, yesterday's intervention by the US Treasury has been warmly greeted by investors around the world. As ING's Padhraic Garvey writes, this unscheduled announcement tells us the Treasury's displeasure with the recent sell-off at the long end of the bond market. Clearly, a more structural solution such as fiscal consolidation is required for a more sustainable recovery in the bond market, but news that the US Treasury is going to be more vigilant about t...",
       "source": "FinancialJuice",
-      "link": "https://www.financialjuice.com/News/9729153/ING-The-USD---FJElite.aspx?xy=rss",
+      "link": "https://www.financialjuice.com/News/9729153/ING-The-USD---FJElite.aspx",
       "time": "08:53",
       "ts": 1787215982000,
       "featured": true,
@@ -280,51 +297,19 @@
       "recent": true
     },
     {
-      "id": "ed291dcfcdb4",
-      "cur": "EUR",
-      "impact": "med",
-      "title": "EUR/USD Price Forecast: Doubling US bond-buying plan opens way for 1.1800",
-      "expand": "The Euro (EUR) posts a fresh three-month high at around 1.1693 against the US Dollar (USD) during the European trading session on Thursday.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/eur-usd-price-forecast-doubling-us-bond-buying-plan-opens-way-for-11800-202608200815",
-      "time": "08:15",
-      "ts": 1787213737000,
-      "featured": false,
-      "lang": "en",
-      "date": "20 Aug",
-      "datetime": "2026-08-20T08:15:37+00:00",
-      "recent": true
-    },
-    {
       "id": "dbea56992e0b",
       "cur": "USD",
       "impact": "high",
       "title": "Europe Sentiment: US Treasury Reins In Borrowing Costs - FJElite",
       "expand": "",
       "source": "FinancialJuice",
-      "link": "https://www.financialjuice.com/News/9729108/Europe-Sentiment-US-Treasury-Reins-In-Borrowing-Costs---FJElite.aspx?xy=rss",
+      "link": "https://www.financialjuice.com/News/9729108/Europe-Sentiment-US-Treasury-Reins-In-Borrowing-Costs---FJElite.aspx",
       "time": "08:12",
       "ts": 1787213535000,
       "featured": true,
       "lang": "en",
       "date": "20 Aug",
       "datetime": "2026-08-20T08:12:15+00:00",
-      "recent": true
-    },
-    {
-      "id": "ff11109d45c2",
-      "cur": "JPY",
-      "impact": "low",
-      "title": "Japanese Yen: Bullish bias within broad range against US Dollar – UOB",
-      "expand": "United Overseas Bank’s Quek Ser Leang and Lee Sue Ann highlight that USD/JPY dropped sharply to around 158.00, eroding the previous upside bias.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/japanese-yen-bullish-bias-within-broad-range-against-us-dollar-uob-202608200811",
-      "time": "08:11",
-      "ts": 1787213487000,
-      "featured": false,
-      "lang": "en",
-      "date": "20 Aug",
-      "datetime": "2026-08-20T08:11:27+00:00",
       "recent": true
     },
     {
@@ -709,6 +694,22 @@
       "lang": "en",
       "date": "18 Aug",
       "datetime": "2026-08-18T12:20:00+00:00",
+      "recent": false
+    },
+    {
+      "id": "1af2ef07e2fd",
+      "cur": "EUR",
+      "impact": "med",
+      "title": "German Economic Sentiment Hits 6-Month High",
+      "expand": "German economic confidence rose to a six-month high in August driven by good company results and robust exports, survey results from the Mannheim-based Centre for European Economic Research, or ZEW, showed Tuesday. The ZEW indicator of economic sentiment advanced to 34.2 in August from 26.3 in July. This was the highest score since February and also better than forecast of 30.1.",
+      "source": "RTT News",
+      "link": "https://www.rttnews.com/story.aspx?Id=3681484",
+      "time": "10:36",
+      "ts": 1787049379000,
+      "featured": false,
+      "lang": "en",
+      "date": "18 Aug",
+      "datetime": "2026-08-18T10:36:19+00:00",
       "recent": false
     },
     {
