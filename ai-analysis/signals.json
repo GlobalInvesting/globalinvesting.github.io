@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-08-21T20:27:04Z",
+  "generated_at": "2026-08-21T22:48:01Z",
   "signals": [
     {
-      "time": "20:26",
+      "time": "22:14",
       "priority": "critical",
-      "title": "NZD/USD — G10 Bilateral Theme + Geopolitical Support",
-      "text": "NZD/USD at 0.5981 trades as the clear G10 leader with a 1W average performance of +1.361% across 4 pairs, while the USD remains the primary laggard at -1.316%. The resulting 2.676% G10 spread marks a significant bilateral theme as the NZD extends its rally on fading Fed-hike expectations. This strength comes despite a crowded NZD speculative short, where COT LF net remains at -34,031 (pctl 2, z -2.00), creating a severe asymmetric squeeze risk as the pair holds above its SMA20/50/200 cluster. Geopolitical headlines regarding the Strait of Hormuz layer a premium onto commodity-linked currencies like NZD as broader risk-on sentiment persists with the VIX at 15.2. The real rate differential of -1.56% for NZD vs +1.48% for USD suggests the move is driven by technical unwinds and softening USD demand rather than yield advantage. Trade bias: Bullish NZD/USD, driven by a G10 bilateral theme and short-squeeze momentum. Catalyst: RBNZ meeting 2 Sep — 2.50% hold priced. Risk: Broad risk-off shift with VIX > 25 triggers an unwind of commodity-linked currency bids.",
+      "title": "NZD/USD — G10 Bilateral Theme + ESI Divergence",
+      "text": "NZD 1W avg +1.343% (n=4) vs USD -1.331% (n=7) produces a 2.674% G10 spread as fading Fed-hike bets and a surprise Treasury buyback weigh on the dollar. The NZD/USD close at 0.5982 is supported by a strong ESI divergence (NZD +5.1 vs USD -15.1) and negative real rate differentials favor the carry-unwind bid. The Sydney open is the catalyst for testing resistance at the 0.6000 psychological handle. Trade bias: Bullish NZD/USD into the open. Catalyst: Sydney/Tokyo open. Risk: Recovery in US Treasury yields reverses the dollar's downward momentum.",
       "evidence": [
-        "NZD 1W avg: +1.361% (n=4)",
-        "USD 1W avg: -1.316% (n=7)",
-        "G10 spread: 2.676%"
+        "NZD 1W avg: +1.343% (n=4)",
+        "USD 1W avg: -1.331% (n=7)",
+        "G10 spread: 2.674%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:21",
+      "time": "17:47",
       "priority": "warning",
-      "title": "USD/JPY — Options Complacency vs Intervention Risk",
-      "text": "USD/JPY at 158.99 trades below its SMA20 (159.67) and SMA50 (161.01), testing the critical 160.00 psychological ceiling that has historically triggered Japanese policy response. Despite the proximity to this barrier, the options market shows unusual complacency with a 25d risk reversal of -1.96, signaling a strong put skew as traders pay for downside protection while IV at 7.2% remains below HV30 at 8.8%. The 264bp OIS carry advantage for USD keeps the pair structurally bid, but a correlation break with VIX (z=+2.10σ) suggests the JPY is no longer functioning as a standard safe haven in this regime. This disconnect increases the risk of a sharp, policy-driven correction if verbal warnings escalate near 160.00. Trade bias: Neutral USD/JPY, carry-supported but capped by intervention risk at 160.00. Catalyst: next BoJ meeting (mkt: 50% hike priced) on 18 Sep — hike bias remains active. Risk: Sustained break above 160.00 triggers confirmed MoF/BoJ intervention.",
+      "title": "EUR/USD — Geopolitical Risk + Sentiment Skew",
+      "text": "Geopolitical escalation in the Strait of Hormuz and weakening Ifo sentiment in Germany create downside risk for EUR/USD despite its Friday close at 1.1678. EUR COT lev_net -76,035 (10th percentile) reflects extreme short positioning, but the 143bp OIS carry advantage for USD and bearish German growth outlook limit upside potential. The next ECB meeting (mkt: 96.0% hike priced) determines if the hike bias can offset geopolitical safe-haven flows into the dollar. Trade bias: Bearish EUR/USD toward 1.1634 (SMA200). Catalyst: Ifo Business Climate Index release. Risk: De-escalation in Middle East tensions triggers a short-squeeze in crowded EUR shorts.",
       "evidence": [
-        "USD/JPY RR: -1.96",
-        "VRP: -1.6% (complacency)",
-        "Fed-BoJ OIS Spread: +264bp"
+        "EUR COT pctl(52w): 10",
+        "EUR/USD OIS carry: -143bp",
+        "Ifo sentiment weakening headline"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:18",
+      "time": "18:00",
       "priority": "warning",
-      "title": "GBP/USD — COT Extreme + Elevated Vol Premium",
-      "text": "GBP/USD at 1.3647 maintains a bullish posture above all major moving averages, supported by a resilient UK growth outlook recently highlighted by Deutsche Bank. However, speculative positioning has reached a crowded pctl(52w) of 90 with LF net long at +42,722, signaling limited room for fresh buyers at these levels. The options market is pricing in significant tail-risk with an IV of 11.0% vs HV30 of 6.0%, resulting in a substantial +5.0% Vol Risk Premium. This elevated hedging demand suggests institutional desks are buying protection against a potential trend exhaustion despite the strong underlying data. Trade bias: Neutral/Range GBP/USD, late-trend positioning caution at multi-month highs. Catalyst: next BoE meeting (mkt: 100% hold priced) on 17 Sep — market bias on hold. Risk: Speculative long liquidation triggers a move back toward the SMA20 at 1.3468.",
+      "title": "AUD/USD — Crowded Long Risk + Retail Extremes",
+      "text": "AUD COT LF long +49,749 (75% long) and 90% retail short sentiment create a volatile setup for the 0.7175 Friday close. While the 73bp OIS carry advantage favors AUD, the -10.3 ESI indicates persistent data misses that may undermine the RBA's hold-bias. The next RBA meeting (mkt: 100% hold priced) on 29 Sep is the definitive catalyst for this rate-sensitive pair. Trade bias: Neutral/Bearish AUD/USD on exhaustion. Catalyst: Sydney open. Risk: AUD/USD breaks and holds above 0.7200, forcing a retail short-cover rally.",
       "evidence": [
-        "GBP COT LF net pctl: 90 (crowded)",
-        "GBP/USD VRP: +5.0%",
-        "Fed 3.75% vs BoE 3.75% — 0bp carry"
+        "AUD COT lev_net: +49,749",
+        "Retail sentiment: 90% short",
+        "AUD ESI: -10.3"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:13",
+      "time": "17:08",
       "priority": "info",
-      "title": "AUD/USD — Retail Divergence + Commodity Bid",
-      "text": "AUD/USD at 0.7175 is benefiting from a broadening commodity rally as noted by Saxo Bank, with Gold trading up +2.26% at $4,675. The pair is supported by a 60bp carry advantage for the AUD (Fed 3.75% vs RBA 4.35%) and holds firmly above its SMA20/50/200 cluster. A notable divergence is emerging as retail sentiment reaches a 90% extreme short, fading the institutional move while COT LF net long (+45,727) remains in a healthy 75th percentile range. This setup typically leads to retail capitulation, providing additional fuel for the extension of the current bullish trend. Trade bias: Long AUD/USD, contrarian to extreme retail short positioning. Catalyst: Next RBA meeting on 29 Sep — 4.35% hold priced. Risk: Decline in commodity prices (Gold/Iron Ore) undermines the AUD's fundamental support.",
+      "title": "USD/JPY — Options Skew + Yield Curve Regime",
+      "text": "USD/JPY closed Friday at 158.86 with a strong options put skew (RR -1.96) signaling elevated hedging demand for JPY strength despite a 264bp OIS carry disadvantage. The US 10Y bear steepener regime (2s10s +54.8bp) normally supports USD/JPY, but a correlation break (z=+2.10σ) suggests the pair is decoupling from safe-haven norms. The next BoJ meeting (mkt: 50% hike priced) on 18 Sep is the catalyst for resolving the yield gap tension. Trade bias: Bearish USD/JPY toward SMA200 at 158.33. Catalyst: Tokyo open. Risk: US 10Y yield surges above 4.80% re-establishing the carry-trade bid.",
       "evidence": [
-        "Retail: 90% Short (Extreme)",
-        "AUD COT LF net pctl: 75",
-        "RBA 4.35% vs Fed 3.75% — +60bp"
+        "USD/JPY 25d RR: -1.96",
+        "US-JP 10Y yield gap: 192bp",
+        "USD/JPY vs VIX z-score: +2.10σ"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "16:38",
+      "priority": "info",
+      "title": "USD/CAD — ESI Alignment + Crowded Short",
+      "text": "CAD COT LF net short -89,836 (13th percentile) creates significant squeeze risk for the 1.3763 Friday close as Canadian data continues to outperform (ESI +27.3). TD Securities notes tariff deals are unlikely to accelerate hikes, maintaining the 136bp OIS carry advantage for the USD. The next BoC meeting (mkt: 100% hold priced) on 9 Sep is the catalyst for resolving the divergence between strong data and cautious policy. Trade bias: Bearish USD/CAD. Catalyst: Tokyo open. Risk: WTI oil falls below $85/bbl, weakening CAD support.",
+      "evidence": [
+        "CAD COT pctl(52w): 13",
+        "CAD ESI: +27.3",
+        "USD/CAD OIS carry: +136bp"
       ],
       "_source": "engine-ai-primary"
     }
