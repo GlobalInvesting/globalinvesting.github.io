@@ -131,6 +131,20 @@ jobs:
           SITE_DIR: .
         run: python3 private-scripts/calculate_technical_levels.py
 
+      - name: Create seasonality-data directory (D1 finalization run only)
+        if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
+        run: mkdir -p seasonality-data
+
+      - name: Compute seasonality (D1 finalization run only, beta)
+        # Only meaningful right after ohlc-data D1 bars actually refresh —
+        # same gate as calculate_technical_levels.py above. Feeds the beta
+        # Seasonality panel (index-beta.html / dashboard-beta.js), not yet
+        # linked from production — see compute_seasonality.py header.
+        if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
+        env:
+          SITE_DIR: .
+        run: python3 private-scripts/compute_seasonality.py
+
       - name: Display summary
         if: always()
         run: |
@@ -173,6 +187,9 @@ jobs:
             mkdir -p /tmp/ai_analysis_fresh
             cp ai-analysis/technical-levels.json /tmp/ai_analysis_fresh/
           fi
+          if [ -d seasonality-data ] && [ "$(ls -A seasonality-data 2>/dev/null)" ]; then
+            cp -r seasonality-data/ /tmp/seasonality_fresh/
+          fi
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
 
           for i in 1 2 3 4 5; do
@@ -185,6 +202,11 @@ jobs:
               mkdir -p ai-analysis
               cp /tmp/ai_analysis_fresh/technical-levels.json ai-analysis/
               git add ai-analysis/technical-levels.json
+            fi
+            if [ -d /tmp/seasonality_fresh ]; then
+              mkdir -p seasonality-data
+              cp -r /tmp/seasonality_fresh/. seasonality-data/
+              git add seasonality-data/
             fi
             if git diff --quiet && git diff --staged --quiet; then
               echo "No changes vs remote HEAD — skipping commit."
