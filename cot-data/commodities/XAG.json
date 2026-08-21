@@ -1,27 +1,19 @@
 {
-  "netPosition": 10312,
-  "longPositions": 18983,
-  "shortPositions": 8671,
+  "netPosition": 10768,
+  "longPositions": 18581,
+  "shortPositions": 7813,
   "positionCategory": "Managed Money (speculative)",
   "secondaryCategory": "Swap Dealers",
   "tertiaryCategory": "Producer/Merchant/Processor/User (commercial hedgers)",
   "assetClass": "commodity",
   "displayName": "Silver",
-  "assetManagerNet": -26650,
-  "assetManagerLong": 23041,
-  "assetManagerShort": 49691,
-  "dealerNet": -15895,
-  "dealerLong": 5832,
-  "dealerShort": 21727,
+  "assetManagerNet": -27254,
+  "assetManagerLong": 23052,
+  "assetManagerShort": 50306,
+  "dealerNet": -16031,
+  "dealerLong": 6059,
+  "dealerShort": 22090,
   "history": [
-    {
-      "weekEnding": "2025-08-19",
-      "levNet": 28787,
-      "levLong": 44716,
-      "levShort": 15929,
-      "assetManagerNet": -42816,
-      "dealerNet": -21549
-    },
     {
       "weekEnding": "2025-08-26",
       "levNet": 34205,
@@ -429,12 +421,20 @@
       "levShort": 8671,
       "assetManagerNet": -26650,
       "dealerNet": -15895
+    },
+    {
+      "weekEnding": "2026-08-18",
+      "levNet": 10768,
+      "levLong": 18581,
+      "levShort": 7813,
+      "assetManagerNet": -27254,
+      "dealerNet": -16031
     }
   ],
   "sourceType": "options_futures_combined",
   "source": "CFTC Official",
   "sourceUrl": "https://www.cftc.gov/dea/options/other_lof.htm",
-  "reportDate": "2026-08-17",
-  "lastUpdate": "2026-08-17",
-  "weekEnding": "2026-08-11"
+  "reportDate": "2026-08-21",
+  "lastUpdate": "2026-08-21",
+  "weekEnding": "2026-08-18"
 }
