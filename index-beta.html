@@ -1223,7 +1223,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
              pattern as #tv-ticker/#tv-pair-tabs (see addWheelScroll() in dashboard-beta.js),
              since this row can now overflow with the Seasonality button added. -->
         <div style="display:flex;align-items:center;gap:2px;border-top:1px solid var(--border2,#2a2e39);overflow:hidden;">
-          <button class="lw-tb-btn" id="lw-tb-row2-prev" aria-label="Scroll toolbar left" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-right:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;">&#8249;</button>
+          <button class="lw-tb-btn" id="lw-tb-row2-prev" aria-label="Scroll toolbar left" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-right:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;background:var(--bg2);align-items:center;justify-content:center;font-size:12px;color:var(--text2);">&#8249;</button>
           <div id="lw-tb-row2" style="display:flex;align-items:center;gap:2px;padding:1px 6px 2px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;min-width:0;">
           <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">TYPE</span>
           <button class="lw-tb-btn sel" id="lw-type-candle" data-chart-type="candle" aria-label="Candlestick chart" title="Candlestick" style="flex-shrink:0;">Candle</button>
@@ -1245,7 +1245,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </button>
           <div id="lw-ind-pills" style="display:inline-flex;align-items:center;gap:3px;flex-shrink:0;flex-wrap:nowrap;"></div>
           </div>
-          <button class="lw-tb-btn" id="lw-tb-row2-next" aria-label="Scroll toolbar right" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-left:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;">&#8250;</button>
+          <button class="lw-tb-btn" id="lw-tb-row2-next" aria-label="Scroll toolbar right" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-left:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;background:var(--bg2);align-items:center;justify-content:center;font-size:12px;color:var(--text2);">&#8250;</button>
         </div>
       </div>
 
@@ -1253,23 +1253,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
            _sznInit()/_sznOpen() in dashboard-beta.js and compute_seasonality.py
            for the data pipeline. Monthly-granularity model — see that script's
            header for why this ships without a day-level or Weekly view yet. -->
-      <div id="szn-panel" style="display:none;margin:6px 8px 0;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <div style="font-size:11px;color:var(--text);font-weight:500;" id="szn-title">Seasonality &middot; Monthly &middot; 10y lookback</div>
-          <button id="szn-close" aria-label="Close Seasonality panel" style="background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px;">&times;</button>
+      <div id="szn-panel" style="display:none;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+        <div class="panel-head">
+          <span style="display:flex;align-items:baseline;min-width:0;overflow:hidden;">
+            <span class="panel-title" style="flex-shrink:0;">Seasonality</span>
+            <span class="panel-sub" id="szn-title">Monthly &middot; 10y lookback</span>
+          </span>
+          <button id="szn-close" aria-label="Close Seasonality panel" style="background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px;flex-shrink:0;">&times;</button>
         </div>
-        <div id="szn-chart" style="width:100%;height:130px;"></div>
-        <div id="szn-months" style="display:flex;gap:1px;font-size:8.5px;color:var(--text3);margin:2px 0 10px;"></div>
-        <div style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
-          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Strongest recurring windows</div>
-          <table id="szn-windows-table" style="width:100%;border-collapse:collapse;font-size:10.5px;">
-            <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;">Win rate</td><td style="text-align:right;">Avg ret</td><td style="text-align:right;">Sharpe</td></tr></thead>
-            <tbody id="szn-windows-tbody"></tbody>
-          </table>
-        </div>
-        <div style="display:flex;gap:6px;align-items:flex-start;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:6px 8px;">
-          <span style="font-size:13px;color:var(--accent);flex-shrink:0;line-height:1.1;" aria-hidden="true">&#9432;</span>
-          <div id="szn-insight" style="font-size:10.5px;color:var(--text2);line-height:1.5;">Loading seasonality data&hellip;</div>
+        <div style="padding:10px 12px;">
+          <div id="szn-chart" style="width:100%;height:130px;"></div>
+          <div id="szn-months" style="display:flex;gap:1px;font-size:8.5px;color:var(--text3);margin:2px 0 10px;"></div>
+          <div style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Strongest recurring windows</div>
+            <table id="szn-windows-table" style="width:100%;border-collapse:collapse;font-size:10.5px;">
+              <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;">Win rate</td><td style="text-align:right;">Avg ret</td><td style="text-align:right;">Sharpe</td></tr></thead>
+              <tbody id="szn-windows-tbody"></tbody>
+            </table>
+          </div>
+          <div style="display:flex;gap:6px;align-items:flex-start;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:6px 8px;">
+            <span style="font-size:13px;color:var(--accent);flex-shrink:0;line-height:1.1;" aria-hidden="true">&#9432;</span>
+            <div id="szn-insight" style="font-size:10.5px;color:var(--text2);line-height:1.5;">Loading seasonality data&hellip;</div>
+          </div>
         </div>
       </div>
       <!-- Symbol legend bar — shown only when LW chart is active -->
@@ -1481,12 +1486,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
            Santiago's reply to Dool (2026-08-21) for why this ships as a labeled
            research/beta block rather than a signal. See renderDollarSmile() in
            dashboard-beta.js. -->
-      <div style="padding:4px 8px 6px;">
-        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
-            <div style="font-size:11px;color:var(--text);font-weight:500;">Dollar Smile &middot; USD vs risk regime, beta</div>
-            <div style="font-size:9px;color:var(--text3);">DXY daily return &middot; bucketed by live regime</div>
-          </div>
+      <div style="border-top:1px solid var(--border);">
+        <div class="panel-head">
+          <span style="display:flex;align-items:baseline;min-width:0;overflow:hidden;">
+            <span class="panel-title" style="flex-shrink:0;">Dollar Smile</span>
+            <span class="panel-sub">USD vs risk regime &middot; beta</span>
+          </span>
+          <span class="panel-sub" style="margin-left:8px;">DXY daily return &middot; bucketed by live regime</span>
+        </div>
+        <div style="padding:10px 12px;">
           <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Research / beta view &mdash; no official reference methodology (Stephen Jen, 2007)</div>
           <div id="dsmile-chart" style="width:100%;height:120px;"></div>
           <div style="display:flex;gap:6px;align-items:flex-start;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:6px 8px;margin-top:6px;">
@@ -2358,7 +2366,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.194.0" defer></script>
+<script src="assets/dashboard-beta.js?v=8.194.2" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
