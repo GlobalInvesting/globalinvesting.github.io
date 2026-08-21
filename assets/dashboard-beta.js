@@ -16181,19 +16181,27 @@ function _lwOpenFullscreen() {
   const overlay   = document.getElementById('lw-fullscreen-overlay');
   const inner     = document.getElementById('lw-fullscreen-inner');
   const rangeBar  = document.getElementById('lw-range-bar');
+  const sznPanel  = document.getElementById('szn-panel');
   const chartHdr  = document.getElementById('lw-chart-header');
   const chartWrap = document.getElementById('tv-chart-wrap');
   if (!overlay || !inner || !chartWrap || _chartMode !== 'lw') return;
   if (overlay.classList.contains('lw-fs-active')) return;
 
   // Store anchor: the element immediately BEFORE rangeBar so we can
-  // restore the full block (rangeBar→chartHdr→chartWrap) in one shot.
+  // restore the full block (rangeBar→sznPanel→chartHdr→chartWrap) in one shot.
   _lwFsOriginalParent = rangeBar ? rangeBar.parentNode : chartWrap.parentNode;
   _lwFsOriginalNext   = chartWrap.nextSibling;     // element AFTER chartWrap
   _lwFsOriginalHeight = chartWrap.style.height;
 
-  // Lift all three elements into the fullscreen inner container
+  // Lift all elements into the fullscreen inner container. szn-panel is a
+  // DOM sibling of rangeBar (not nested inside it — see index-beta.html),
+  // so it was previously left behind: the Seasonality button lives inside
+  // rangeBar and got lifted, but toggling it just flipped display:block on
+  // a panel still sitting in the page underneath this overlay (z-index
+  // 9000, position:fixed, covers the viewport) — invisible. Lifting it
+  // here alongside the rest fixes that.
   if (rangeBar)  inner.appendChild(rangeBar);
+  if (sznPanel)  inner.appendChild(sznPanel);
   if (chartHdr)  inner.appendChild(chartHdr);
   inner.appendChild(chartWrap);
 
@@ -16218,6 +16226,10 @@ function _lwOpenFullscreen() {
       // there's no single frame at the old (pre-fullscreen) canvas size.
       if (w > 0 && h > 0) { _lwChart.resize(w, h, true); _lwReapplyPaneHeights(); _lwReprojectDrawings(); }
     }
+    // Seasonality's LWC chart also needs an explicit resize after the DOM
+    // move — it's a separate chart instance from the price chart and
+    // won't pick up the new (wider) fullscreen width on its own.
+    if (typeof window._sznResizeChart === 'function') window._sznResizeChart();
   }));
 }
 
@@ -16225,6 +16237,7 @@ function _lwCloseFullscreen() {
   const overlay   = document.getElementById('lw-fullscreen-overlay');
   const inner     = document.getElementById('lw-fullscreen-inner');
   const rangeBar  = document.getElementById('lw-range-bar');
+  const sznPanel  = document.getElementById('szn-panel');
   const chartHdr  = document.getElementById('lw-chart-header');
   const chartWrap = document.getElementById('tv-chart-wrap');
   if (!overlay || !overlay.classList.contains('lw-fs-active')) return;
@@ -16232,10 +16245,11 @@ function _lwCloseFullscreen() {
   overlay.classList.remove('lw-fs-active');
   document.body.style.overflow = '';
 
-  // Restore all three elements before the stored next-sibling reference.
+  // Restore all elements before the stored next-sibling reference.
   // insertBefore with a null ref appends to end, which is also correct.
   if (_lwFsOriginalParent) {
     if (rangeBar)  _lwFsOriginalParent.insertBefore(rangeBar,  _lwFsOriginalNext);
+    if (sznPanel)  _lwFsOriginalParent.insertBefore(sznPanel,  _lwFsOriginalNext);
     if (chartHdr)  _lwFsOriginalParent.insertBefore(chartHdr,  _lwFsOriginalNext);
     if (chartWrap) _lwFsOriginalParent.insertBefore(chartWrap, _lwFsOriginalNext);
   }
@@ -16258,6 +16272,7 @@ function _lwCloseFullscreen() {
       // _lwReapplyPaneHeights() above for detail.
       if (w > 0 && h > 0) { _lwChart.resize(w, h, true); _lwReapplyPaneHeights(); _lwReprojectDrawings(); }
     }
+    if (typeof window._sznResizeChart === 'function') window._sznResizeChart();
   }));
 
   _lwFsOriginalParent = null;
@@ -16648,6 +16663,17 @@ window.addEventListener('gi-theme-change', function() {
 
   async function _sznRenderChart(curve) {
     const el = document.getElementById('szn-chart');
+    // LWC is not a global — every other chart in this file (Price Chart,
+    // etc.) pulls it from window.LightweightCharts locally. This IIFE
+    // never did, so `typeof LWC === 'undefined'` was always true and the
+    // chart silently no-op'd on every open. Same fix as the other call
+    // sites: resolve it from window, and ensure the library is actually
+    // loaded (Price Chart lazy-loads it via _ensureLWLib(); if this panel
+    // is opened before that resolves, load it here too).
+    if (typeof window._ensureLWLib === 'function') {
+      try { await window._ensureLWLib(); } catch (_) {}
+    }
+    const LWC = window.LightweightCharts;
     if (!el || typeof LWC === 'undefined') return;
     _sznDestroyChart();
     el.innerHTML = '';
@@ -16738,7 +16764,7 @@ window.addEventListener('gi-theme-change', function() {
     const monthsRow = document.getElementById('szn-months');
 
     if (!pair || !SZN_PAIRS.has(pair)) {
-      if (title) title.textContent = 'Seasonality \u00b7 Monthly \u00b7 10y lookback';
+      if (title) title.textContent = 'Monthly \u00b7 10y lookback';
       if (insight) insight.textContent = 'Seasonality is available for FX pairs only \u2014 select one on the Price Chart above.';
       if (tbody) tbody.innerHTML = '';
       if (monthsRow) monthsRow.innerHTML = '';
@@ -16748,7 +16774,7 @@ window.addEventListener('gi-theme-change', function() {
     }
     if (pair === _sznLoadedPair) return; // already showing this pair
 
-    if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Seasonality \u00b7 Monthly \u00b7 10y lookback`;
+    if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Monthly \u00b7 10y lookback`;
     if (insight) insight.textContent = 'Loading seasonality data\u2026';
 
     try {
@@ -16759,7 +16785,7 @@ window.addEventListener('gi-theme-change', function() {
       _sznRenderMonthLabels(data.curve);
       _sznRenderWindows(data.windows);
       _sznRenderInsight(data, pair);
-      if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Seasonality \u00b7 Monthly \u00b7 ${data.years}y lookback`;
+      if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Monthly \u00b7 ${data.years}y lookback`;
       _sznLoadedPair = pair;
     } catch (e) {
       // A missing file means the pair didn't clear MIN_YEARS in
@@ -16788,6 +16814,15 @@ window.addEventListener('gi-theme-change', function() {
   // changes without this IIFE needing to be defined before that function.
   window._sznOnSymbolChange = function (ohlcId) {
     if (_sznOpen) _sznLoad(ohlcId);
+  };
+
+  // Exposed so _lwOpenFullscreen()/_lwCloseFullscreen() can force this
+  // chart to re-measure its container after moving it in/out of the
+  // fullscreen overlay (a DOM move doesn't fire a window 'resize' event).
+  window._sznResizeChart = function () {
+    if (!_sznChart) return;
+    const el = document.getElementById('szn-chart');
+    if (el) _sznChart.applyOptions({ width: el.clientWidth || 580 });
   };
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -16828,7 +16863,25 @@ window.addEventListener('gi-theme-change', function() {
   }
   row.addEventListener('scroll', updateArrows, { passive: true });
   window.addEventListener('resize', updateArrows);
-  setTimeout(updateArrows, 200);
+
+  // The single setTimeout(200) below isn't enough on its own: #lw-ind-pills
+  // (EMA 50/EMA 20 etc.) and #lw-ind-btn's own overlay pills get appended
+  // to this same row asynchronously, after the chart's indicator data has
+  // loaded — which can land well after 200ms and after this row's initial
+  // scrollWidth was already measured as "no overflow". Nothing was
+  // listening for that later width change, so the right arrow only ever
+  // appeared once the user manually scrolled (which fires 'scroll' and
+  // re-runs updateArrows for the first time). Fix: watch the row itself
+  // for content/size changes and re-check on every one of them.
+  const mo = new MutationObserver(() => updateArrows());
+  mo.observe(row, { childList: true, subtree: true, characterData: true });
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => updateArrows());
+    ro.observe(row);
+  }
+  // Belt-and-suspenders for browsers/timing where neither observer fires
+  // in time (e.g. font swap changing button widths after paint).
+  [0, 200, 800, 2000].forEach(ms => setTimeout(updateArrows, ms));
 
   btnPrev.addEventListener('click', () => row.scrollBy({ left: -160, behavior: 'smooth' }));
   btnNext.addEventListener('click', () => row.scrollBy({ left: 160, behavior: 'smooth' }));
@@ -16890,40 +16943,59 @@ async function renderDollarSmile() {
 }
 
 function _dsmileRenderSVG(el, regimes, stats, currentRegime) {
-  const W = 620, H = 130, padL = 40, padR = 40, midY = 65, ampY = 40;
+  // Layout: fixed bands so the value labels can never collide with the
+  // regime-name row, regardless of how extreme a single-sample average
+  // is. curveTop/curveBottom bound where a point may ever be plotted;
+  // rowLabelY (regime names) sits safely below that band with a fixed
+  // gap, and the value label is placed at a fixed offset above its own
+  // point — both quantities are now independent of amplitude.
+  const W = 620, H = 130, padL = 40, padR = 40;
+  const curveTop = 22, curveBottom = 78, midY = (curveTop + curveBottom) / 2, ampY = (curveBottom - curveTop) / 2;
+  const rowLabelY = 108, valueLabelGap = 12;
   const xs = regimes.map((_, i) => padL + i * ((W - padL - padR) / (regimes.length - 1)));
 
-  // Only plot buckets that have at least 1 sample; scale y within the
-  // observed range (or a flat midline if only one bucket has data yet —
-  // avoids drawing a misleadingly dramatic curve off a single point).
-  const readyVals = regimes.map((r, i) => stats[r].avg).filter(v => v !== null);
+  // Only buckets with enough real samples (stats[r].ready) drive the
+  // curve's shape and its scale — a 1- or 2-day average is noise, not a
+  // stat, per MIN_SAMPLES above. Buckets that aren't ready yet are always
+  // plotted flat at the midline with a hollow marker, exactly like
+  // buckets with zero samples, so a single early data point can never
+  // amplify the curve or push a point/label out of its band (this is
+  // what the original comment intended but the code didn't enforce).
+  const readyVals = regimes.map(r => stats[r].ready ? stats[r].avg : null).filter(v => v !== null);
   const maxAbs = readyVals.length ? Math.max(0.05, ...readyVals.map(Math.abs)) : 0.3;
-  function yFor(avg) {
-    if (avg === null) return midY;
-    return midY - (avg / maxAbs) * ampY;
+  function yFor(r) {
+    if (!stats[r].ready || stats[r].avg === null) return midY;
+    const raw = midY - (stats[r].avg / maxAbs) * ampY;
+    return Math.min(curveBottom, Math.max(curveTop, raw)); // hard clamp — belt and suspenders
   }
 
-  const pts = regimes.map((r, i) => ({ x: xs[i], y: yFor(stats[r].avg), r, isCurrent: r === currentRegime }));
+  const pts = regimes.map((r, i) => ({ x: xs[i], y: yFor(r), r, isCurrent: r === currentRegime }));
   const pathD = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
 
-  const up = _themeColor('--up'), down = _themeColor('--down'), text3 = _themeColor('--text3'),
+  const up = _themeColor('--up'), text3 = _themeColor('--text3'),
         accent = _themeColor('--accent'), bg = _themeColor('--bg');
 
   const circles = pts.map(p => {
-    const known = stats[p.r].avg !== null;
-    const color = !known ? text3 : (p.isCurrent ? up : text3);
+    const ready = stats[p.r].ready;
+    const color = !ready ? text3 : (p.isCurrent ? up : text3);
     const r = p.isCurrent ? 4.5 : 3;
-    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${color}"${p.isCurrent ? ` stroke="${bg}" stroke-width="2"` : ''}></circle>`;
+    const hollow = !ready ? ` fill="${bg}" stroke="${text3}" stroke-width="1.3"` : ` fill="${color}"${p.isCurrent ? ` stroke="${bg}" stroke-width="2"` : ''}`;
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}"${hollow}></circle>`;
   }).join('');
 
   const labels = pts.map(p => {
-    const known = stats[p.r].avg !== null;
-    const valTxt = known ? `${stats[p.r].avg >= 0 ? '+' : ''}${stats[p.r].avg.toFixed(2)}%` : `n=${stats[p.r].n}`;
-    const valColor = !known ? text3 : (p.isCurrent ? up : text3);
+    const ready = stats[p.r].ready;
+    const valTxt = ready ? `${stats[p.r].avg >= 0 ? '+' : ''}${stats[p.r].avg.toFixed(2)}%` : `n=${stats[p.r].n}`;
+    const valColor = !ready ? text3 : (p.isCurrent ? up : text3);
     const currentTag = p.isCurrent ? ' \u25cf actual' : '';
+    // Fixed offset above the point, not above wherever the point landed —
+    // p.y is already clamped to [curveTop, curveBottom], so this label
+    // never gets closer than (curveTop - valueLabelGap) to the top edge
+    // or crosses into the rowLabelY row below.
+    const valueY = Math.max(12, p.y - valueLabelGap);
     return `
-      <text x="${p.x.toFixed(1)}" y="95" font-size="9.5" fill="${text3}" text-anchor="middle">${p.r}${currentTag}</text>
-      <text x="${p.x.toFixed(1)}" y="${(p.y - 10).toFixed(1)}" font-size="9.5" fill="${valColor}" text-anchor="middle">${valTxt}</text>`;
+      <text x="${p.x.toFixed(1)}" y="${rowLabelY}" font-size="9.5" fill="${text3}" text-anchor="middle">${p.r}${currentTag}</text>
+      <text x="${p.x.toFixed(1)}" y="${valueY.toFixed(1)}" font-size="9.5" fill="${valColor}" text-anchor="middle">${valTxt}</text>`;
   }).join('');
 
   el.innerHTML = `
