@@ -1,88 +1,33 @@
 {
-  "lastUpdate": "2026-08-20T23:52:08Z",
-  "generatedAt": "2026-08-20T23:52:08Z",
+  "lastUpdate": "2026-08-21T00:01:07Z",
+  "generatedAt": "2026-08-21T00:01:07Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-08-20",
+  "rangeFrom": "2025-08-21",
   "rangeTo": "2026-08-21",
-  "totalEvents": 3778,
+  "totalEvents": 3775,
   "currencyCounts": {
-    "NZD": 89,
-    "EUR": 868,
-    "GBP": 446,
-    "USD": 1270,
-    "CAD": 265,
+    "EUR": 870,
     "CHF": 126,
+    "GBP": 443,
+    "USD": 1267,
     "JPY": 221,
+    "CAD": 268,
+    "NZD": 87,
     "AUD": 254,
     "SEK": 156,
     "NOK": 83
   },
   "impactCounts": {
-    "medium": 1884,
-    "high": 1666,
+    "medium": 1877,
+    "high": 1670,
     "low": 228
   },
   "surpriseStats": {
-    "EUR/gfk consumer confidence": {
-      "n": 2,
-      "mean": 1.3,
-      "std": 4.101219
-    },
-    "GBP/retail sales mom": {
-      "n": 4,
-      "mean": 0.5,
-      "std": 0.848528
-    },
-    "GBP/retail sales yoy": {
-      "n": 4,
-      "mean": 0.8,
-      "std": 1.428286
-    },
-    "GBP/retail sales ex fuel mom": {
-      "n": 4,
-      "mean": 0.75,
-      "std": 0.655744
-    },
-    "GBP/retail sales ex fuel yoy": {
-      "n": 4,
-      "mean": 1.1,
-      "std": 1.086278
-    },
-    "EUR/business confidence": {
-      "n": 4,
-      "mean": 0.35,
-      "std": 1.247664
-    },
-    "EUR/ifo business climate": {
-      "n": 2,
-      "mean": 0.35,
-      "std": 0.494975
-    },
-    "CAD/retail sales mom": {
-      "n": 4,
-      "mean": 0.425,
-      "std": 0.340343
-    },
-    "CAD/retail sales yoy": {
-      "n": 4,
-      "mean": 1.475,
-      "std": 0.805709
-    },
-    "CAD/retail sales ex autos mom": {
-      "n": 4,
-      "mean": -0.225,
-      "std": 0.518813
-    },
-    "USD/michigan consumer sentiment": {
-      "n": 8,
-      "mean": 0.3125,
-      "std": 2.760661
-    },
     "GBP/cbi distributive trades": {
       "n": 4,
       "mean": 1.75,
@@ -167,6 +112,11 @@
       "n": 7,
       "mean": -0.342857,
       "std": 1.431616
+    },
+    "EUR/business confidence": {
+      "n": 3,
+      "mean": -0.2,
+      "std": 0.72111
     },
     "EUR/economic sentiment": {
       "n": 3,
@@ -768,6 +718,11 @@
       "mean": 0.075,
       "std": 0.15
     },
+    "USD/michigan consumer sentiment": {
+      "n": 7,
+      "mean": 0.842857,
+      "std": 2.503236
+    },
     "EUR/germany wholesale prices yoy": {
       "n": 3,
       "mean": -1.033333,
@@ -1047,6 +1002,41 @@
       "n": 3,
       "mean": 0.0,
       "std": 0.3
+    },
+    "GBP/retail sales mom": {
+      "n": 3,
+      "mean": 0.9,
+      "std": 0.34641
+    },
+    "GBP/retail sales yoy": {
+      "n": 3,
+      "mean": 1.5,
+      "std": 0.34641
+    },
+    "GBP/retail sales ex fuel mom": {
+      "n": 3,
+      "mean": 1.033333,
+      "std": 0.404145
+    },
+    "GBP/retail sales ex fuel yoy": {
+      "n": 3,
+      "mean": 1.6,
+      "std": 0.519615
+    },
+    "CAD/retail sales ex autos mom": {
+      "n": 3,
+      "mean": -0.466667,
+      "std": 0.23094
+    },
+    "CAD/retail sales mom": {
+      "n": 3,
+      "mean": 0.466667,
+      "std": 0.404145
+    },
+    "CAD/retail sales yoy": {
+      "n": 3,
+      "mean": 1.333333,
+      "std": 0.92376
     },
     "EUR/netherlands consumer confidence": {
       "n": 2,
@@ -1405,138 +1395,6 @@
     }
   },
   "events": [
-    {
-      "currency": "NZD",
-      "event": "RBNZ Interest Rate Decision",
-      "dateISO": "2025-08-20",
-      "actual": "3%",
-      "forecast": "3.0",
-      "previous": "3.25",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "02:00"
-    },
-    {
-      "currency": "EUR",
-      "event": "PPI YoY",
-      "dateISO": "2025-08-20",
-      "actual": "-1.5%",
-      "forecast": "-1.3",
-      "previous": "-1.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "Inflation Rate MoM",
-      "dateISO": "2025-08-20",
-      "actual": "0.1%",
-      "forecast": "-0.1",
-      "previous": "0.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "Core Inflation Rate YoY",
-      "dateISO": "2025-08-20",
-      "actual": "3.8%",
-      "forecast": "3.7",
-      "previous": "3.7",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "Inflation Rate YoY",
-      "dateISO": "2025-08-20",
-      "actual": "3.8%",
-      "forecast": "3.7",
-      "previous": "3.6",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "EUR",
-      "event": "CPI",
-      "dateISO": "2025-08-20",
-      "actual": "129.12",
-      "forecast": "129.1",
-      "previous": "129.1",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "09:00"
-    },
-    {
-      "currency": "USD",
-      "event": "MBA 30-Year Mortgage Rate",
-      "dateISO": "2025-08-20",
-      "actual": "6.68%",
-      "forecast": "",
-      "previous": "6.67",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "11:00"
-    },
-    {
-      "currency": "CAD",
-      "event": "New Housing Price Index MoM",
-      "dateISO": "2025-08-20",
-      "actual": "-0.1%",
-      "forecast": "0.1",
-      "previous": "-0.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "EIA Gasoline Stocks Change",
-      "dateISO": "2025-08-20",
-      "actual": "-2.72M",
-      "forecast": "-0.8",
-      "previous": "-0.792",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "14:30"
-    },
-    {
-      "currency": "USD",
-      "event": "EIA Crude Oil Stocks Change",
-      "dateISO": "2025-08-20",
-      "actual": "-6.014M",
-      "forecast": "-1.3",
-      "previous": "3.036",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "14:30"
-    },
-    {
-      "currency": "NZD",
-      "event": "Balance of Trade",
-      "dateISO": "2025-08-20",
-      "actual": "-NZ$0.578B",
-      "forecast": "0.07",
-      "previous": "0.203",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "22:45"
-    },
     {
       "currency": "EUR",
       "event": "Unemployment Rate",
@@ -43560,19 +43418,6 @@
     {
       "date": "30 Jul",
       "dateISO": "2026-07-30",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Spain Business Confidence",
-      "impact": "medium",
-      "actual": null,
-      "forecast": "-2.7",
-      "previous": "-2.4"
-    },
-    {
-      "date": "30 Jul",
-      "dateISO": "2026-07-30",
       "timeUTC": "11:00",
       "country": "EUR",
       "currency": "EUR",
@@ -43603,19 +43448,6 @@
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
-      "event": "United Kingdom BoE Monetary Policy Report",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "30 Jul",
-      "dateISO": "2026-07-30",
-      "timeUTC": "11:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
       "event": "United Kingdom BoE MPC Vote Hike",
       "impact": "medium",
       "actual": "39.0",
@@ -43634,19 +43466,6 @@
       "actual": "9.0",
       "forecast": "9.0",
       "previous": "9.0"
-    },
-    {
-      "date": "30 Jul",
-      "dateISO": "2026-07-30",
-      "timeUTC": "11:00",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom MPC Meeting Minutes",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "30 Jul",
@@ -43829,19 +43648,6 @@
       "actual": "1782.0K",
       "forecast": "1800.0K",
       "previous": "1789.0K"
-    },
-    {
-      "date": "30 Jul",
-      "dateISO": "2026-07-30",
-      "timeUTC": "13:15",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom BoE Gov Bailey Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "30 Jul",
@@ -47445,15 +47251,80 @@
     {
       "date": "21 Aug",
       "dateISO": "2026-08-21",
+      "timeUTC": "04:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Netherlands Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-36.0",
+      "previous": "-35.0"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
       "timeUTC": "06:00",
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
-      "event": "Retail Sales m/m",
-      "impact": "medium",
+      "event": "United Kingdom Retail Sales YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.2%",
+      "previous": "4.2%"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Retail Sales MoM",
+      "impact": "high",
       "actual": null,
       "forecast": "-0.5%",
       "previous": "1.0%"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Retail Sales ex Fuel YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.3%",
+      "previous": "5.4%"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Retail Sales ex Fuel MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-0.5%",
+      "previous": "1.1%"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Business Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "101.0",
+      "previous": "101.0"
     },
     {
       "date": "21 Aug",
@@ -47510,6 +47381,19 @@
     {
       "date": "21 Aug",
       "dateISO": "2026-08-21",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB Consumer Inflation Expectations",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.8%",
+      "previous": "3.0%"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
       "timeUTC": "08:30",
       "country": "GBP",
       "currency": "GBP",
@@ -47532,6 +47416,84 @@
       "actual": null,
       "forecast": "51.8",
       "previous": "51.8"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro area Negotiated Wage Growth",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.5",
+      "previous": "2.46"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Retail Sales Ex Autos MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.4%",
+      "previous": "1.2%"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Retail Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-0.5%",
+      "previous": "1.0%"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Retail Sales YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.1",
+      "previous": "5.9"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "14:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-16.3",
+      "previous": "-15.9"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "14:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Senior Loan Officer Survey",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     }
   ]
 }
