@@ -16684,15 +16684,32 @@ window.addEventListener('gi-theme-change', function() {
       rightPriceScale: { borderColor: _themeColor('--border'), minimumWidth: 50 },
       timeScale: { visible: false, borderVisible: false },
       handleScroll: false, handleScale: false,
-      crosshair: { mode: LWC.CrosshairMode.Normal },
+      // Explicit crosshair theming — without vertLine/horzLine colors set,
+      // LWC falls back to its own library-default gray (line + label
+      // background), which reads as an out-of-place gray box against this
+      // theme on hover. The main Price Chart already themes this (see
+      // _lwChart's own `crosshair:` block above); this panel's chart is a
+      // separate LWC instance and needs the same treatment explicitly.
+      crosshair: {
+        mode: LWC.CrosshairMode.Normal,
+        vertLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') },
+        horzLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') },
+      },
       localization: { priceFormatter: v => v.toFixed(2) + '%' },
       width: el.clientWidth || 580,
       height: 120,
     });
 
+    // Line/fill color: was `--down` (red) — no basis for that on a chart
+    // that isn't showing a directional loss/decline; every other single-
+    // series chart in this file (Price Chart's Area mode, Rates & Yield
+    // Curve's 10Y chart, etc.) uses the dedicated `--chart-line` blue for
+    // a neutral historical series, which is also the industry-standard
+    // convention for a non-directional seasonal/statistical curve like
+    // this one (EquityClock, Seasonax). Switched to match.
     const seriesOpts = {
-      lineColor: _themeColor('--down'), lineWidth: 1.6,
-      topColor: _themeColorAlpha('--down', 0.10), bottomColor: _themeColorAlpha('--down', 0.01),
+      lineColor: _themeColor('--chart-line'), lineWidth: 1.6,
+      topColor: _themeColorAlpha('--chart-line', 0.10), bottomColor: _themeColorAlpha('--chart-line', 0.01),
       priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: true,
     };
     _sznSeries = (typeof LWC.AreaSeries !== 'undefined')
@@ -16827,10 +16844,26 @@ window.addEventListener('gi-theme-change', function() {
   // Exposed so _lwOpenFullscreen()/_lwCloseFullscreen() can force this
   // chart to re-measure its container after moving it in/out of the
   // fullscreen overlay (a DOM move doesn't fire a window 'resize' event).
+  //
+  // Was `_sznChart.applyOptions({ width })` — this updates the chart's
+  // config but, unlike the main Price Chart's own fullscreen-resize path
+  // (_lwChart.resize(w, h, true)), doesn't reliably force the canvas
+  // itself to repaint at the new size, nor does it touch the time scale.
+  // Net effect matching what Santiago saw: entering fullscreen widened
+  // #szn-chart's container, but the chart kept rendering at its old
+  // (pre-fullscreen) pixel width — visible as the curve confined to a
+  // narrow strip instead of spanning the new, much wider panel. Switched
+  // to the same `.resize(width, height, forceRepaint)` call the Price
+  // Chart uses, plus `timeScale().fitContent()` to re-spread the 13-point
+  // curve across the full new width (resize() alone repaints the canvas
+  // at the new size but keeps the same visible logical range).
   window._sznResizeChart = function () {
     if (!_sznChart) return;
     const el = document.getElementById('szn-chart');
-    if (el) _sznChart.applyOptions({ width: el.clientWidth || 580 });
+    if (!el) return;
+    const w = el.clientWidth || 580;
+    _sznChart.resize(w, 120, true);
+    _sznChart.timeScale().fitContent();
   };
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -16838,12 +16871,7 @@ window.addEventListener('gi-theme-change', function() {
     const closeBtn = document.getElementById('szn-close');
     if (btn) btn.addEventListener('click', () => _sznToggle());
     if (closeBtn) closeBtn.addEventListener('click', () => _sznToggle(false));
-    window.addEventListener('resize', () => {
-      if (_sznChart) {
-        const el = document.getElementById('szn-chart');
-        if (el) _sznChart.applyOptions({ width: el.clientWidth || 580 });
-      }
-    });
+    window.addEventListener('resize', () => window._sznResizeChart());
   });
 })();
 
