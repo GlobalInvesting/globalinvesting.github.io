@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-21T23:00:41Z",
+  "updated": "2026-08-21T23:03:18Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,10 +35,10 @@
       "pct1w_date": "2026-08-14"
     },
     "gold": {
-      "close": 4608.2854,
+      "close": 4608.2599,
       "prev_close": 4603.9213,
-      "chg": 4.3641,
-      "pct": 0.0948,
+      "chg": 4.3386,
+      "pct": 0.0942,
       "source": "twelve_data",
       "high": 4690.4,
       "low": 4565.5,
@@ -200,35 +200,35 @@
       "pct1w_date": "2026-08-14"
     },
     "btc": {
-      "close": 78360.68,
+      "close": 78448.97,
       "prev_close": 73013.0,
-      "chg": 5347.68,
-      "pct": 7.3243,
+      "chg": 5435.97,
+      "pct": 7.4452,
       "high": 65713.91,
       "low": 64182.797,
       "open": 73013.0,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1787353251,
+      "market_time": 1787353401,
       "source": "yfinance",
-      "pct1w": 24.4302,
+      "pct1w": 24.5704,
       "pct1w_date": "2026-08-14"
     },
     "eth": {
-      "close": 2517.59,
+      "close": 2525.1,
       "prev_close": 2326.6013,
-      "chg": 190.9887,
-      "pct": 8.2089,
+      "chg": 198.4987,
+      "pct": 8.5317,
       "high": 1907.2332,
       "low": 1858.5846,
       "open": 2326.6013,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1787353255,
+      "market_time": 1787353400,
       "source": "yfinance",
-      "pct1w": 33.8681,
+      "pct1w": 34.2674,
       "pct1w_date": "2026-08-14"
     },
     "nasdaq": {
@@ -478,7 +478,7 @@
       "bid": 0.58903,
       "ask": 0.58938,
       "market_state": "CLOSED",
-      "market_time": 1787353195,
+      "market_time": 1787353315,
       "source": "yfinance",
       "pct1w": 2.0974,
       "pct1w_date": "2026-08-14",
@@ -491,8 +491,8 @@
         "low": 0.59407,
         "close": 0.59801
       },
-      "hv30": 7.7,
-      "hv10": 7.98,
+      "hv30": 7.55,
+      "hv10": 7.25,
       "pct1m": 2.3509,
       "pct1m_date": "2026-07-20"
     },
@@ -884,7 +884,7 @@
       "bid": 93.884,
       "ask": 93.894,
       "market_state": "CLOSED",
-      "market_time": 1787353195,
+      "market_time": 1787353315,
       "source": "yfinance",
       "pct1w": 1.7896,
       "pct1w_date": "2026-08-14",
@@ -897,8 +897,8 @@
         "low": 94.439,
         "close": 95.001
       },
-      "hv30": 7.48,
-      "hv10": 7.21,
+      "hv30": 7.04,
+      "hv10": 6.17,
       "pct1m": 0.1043,
       "pct1m_date": "2026-07-20"
     },
@@ -1344,7 +1344,7 @@
     "audusd": 6.41,
     "usdchf": 8.41,
     "usdcad": 4.21,
-    "nzdusd": 7.7,
+    "nzdusd": 7.55,
     "eurgbp": 3.19,
     "eurjpy": 7.31,
     "eurchf": 4.5,
@@ -1358,7 +1358,7 @@
     "audchf": 6.62,
     "cadjpy": 8.8,
     "chfjpy": 8.1,
-    "nzdjpy": 7.48,
+    "nzdjpy": 7.04,
     "eurnzd": 4.7,
     "gbpaud": 4.88,
     "gbpnzd": 4.45,
@@ -4675,14 +4675,14 @@
     {
       "a": "NZD/USD",
       "b": "NZX 50",
-      "corr30": 0.377,
+      "corr30": 0.367,
       "n30": 30,
-      "corr": 0.084,
+      "corr": 0.078,
       "n": 60,
-      "corr90": -0.312,
+      "corr90": -0.318,
       "n90": 90,
       "norm": -0.103,
-      "z_score": 0.94,
+      "z_score": 0.91,
       "std": 0.5337,
       "n_indep": 8,
       "band15hi": 0.603,
@@ -4911,7 +4911,7 @@
         0.268,
         0.294,
         0.269,
-        0.377
+        0.367
       ],
       "hist_dates": [
         "2025-10-01",
@@ -5140,7 +5140,7 @@
       "spread_z": null,
       "signal": null,
       "beta": null,
-      "coint_p": 0.7474
+      "coint_p": 0.7001
     },
     {
       "a": "EUR/USD",
