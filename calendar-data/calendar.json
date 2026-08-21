@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-21T10:01:24Z",
-  "generatedAt": "2026-08-21T10:01:24Z",
+  "lastUpdate": "2026-08-21T12:31:10Z",
+  "generatedAt": "2026-08-21T12:31:10Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,14 +9,14 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-21",
   "rangeTo": "2026-08-21",
-  "totalEvents": 3775,
+  "totalEvents": 3776,
   "currencyCounts": {
     "EUR": 870,
     "CHF": 126,
     "GBP": 443,
     "USD": 1267,
     "JPY": 221,
-    "CAD": 268,
+    "CAD": 269,
     "NZD": 87,
     "AUD": 254,
     "SEK": 156,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "medium": 1877,
-    "high": 1670,
+    "high": 1671,
     "low": 228
   },
   "surpriseStats": {
@@ -1024,19 +1024,19 @@
       "std": 1.367479
     },
     "CAD/retail sales ex autos mom": {
-      "n": 3,
-      "mean": -0.466667,
-      "std": 0.23094
+      "n": 4,
+      "mean": -0.325,
+      "std": 0.340343
     },
     "CAD/retail sales mom": {
-      "n": 3,
-      "mean": 0.466667,
-      "std": 0.404145
+      "n": 5,
+      "mean": 0.26,
+      "std": 0.439318
     },
     "CAD/retail sales yoy": {
-      "n": 3,
-      "mean": 1.333333,
-      "std": 0.92376
+      "n": 4,
+      "mean": 2.225,
+      "std": 1.936276
     },
     "EUR/netherlands consumer confidence": {
       "n": 3,
@@ -47439,7 +47439,7 @@
       "flag": "🇨🇦",
       "event": "Canada Retail Sales Ex Autos MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.5%",
       "forecast": "0.4%",
       "previous": "1.2%"
     },
@@ -47452,8 +47452,21 @@
       "flag": "🇨🇦",
       "event": "Canada Retail Sales MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "-0.8%",
       "forecast": "-0.5%",
+      "previous": "1.0%"
+    },
+    {
+      "date": "21 Aug",
+      "dateISO": "2026-08-21",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Retail Sales MoM",
+      "impact": "high",
+      "actual": "0.6%",
+      "forecast": "0.4%",
       "previous": "1.0%"
     },
     {
@@ -47465,7 +47478,7 @@
       "flag": "🇨🇦",
       "event": "Canada Retail Sales YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "8.0",
       "forecast": "3.1",
       "previous": "5.9"
     },
