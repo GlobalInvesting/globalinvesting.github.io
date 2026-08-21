@@ -16727,38 +16727,54 @@ window.addEventListener('gi-theme-change', function() {
       ? _sznChart.addSeries(LWC.AreaSeries, seriesOpts)
       : _sznChart.addAreaSeries(seriesOpts);
 
-    // Synthetic sequential dates — only relative order matters (the real
-    // x-axis is hidden and #szn-months renders the actual month labels
-    // below the chart instead), but LWC's setData() requires *strictly
-    // ascending* time values or the series silently fails to render (the
-    // crosshair/hover marker still works independently, which is why
-    // hovering showed a single point with no visible line/area).
-    // Root cause of the previous attempt: `Math.min(12, i+1)` clamps the
-    // month to 12 once i reaches 11, but the day still alternates via
-    // `1 + (i % 2) * 14` — so i=11 produced "2025-12-15" and i=12 produced
-    // "2025-12-01", a date that goes *backward*. curve always has exactly
-    // 13 points (index 0 baseline + 12 months, see compute_seasonality.py
-    // _build_curve()), so this collision was guaranteed on every pair, not
-    // an edge case. Fixed by deriving each date from a real Date object,
-    // advancing a fixed number of days per point — strictly increasing by
-    // construction, independent of curve.length or month/day arithmetic.
-    const spaced = curve.map((pt, i) => {
-      const d = new Date(Date.UTC(2025, 0, 1 + i * 14)); // 14d apart; 12*14=168d still lands in 2025
+    // v8.195.0 — curve is now day-of-year (367 points: index 0 = pre-
+    // Jan-1 baseline, then a real {month,day} for every calendar day of
+    // a reference leap year — see compute_seasonality.py's
+    // _build_daily_curve()). Unlike the old 13-point synthetic-date
+    // scheme (spaced 14 days apart purely to satisfy LWC's strictly-
+    // ascending-time requirement), every point here already carries a
+    // REAL calendar date, so no synthetic spacing is needed — a genuine
+    // Date.UTC(refYear, month-1, day) walk is ascending by construction
+    // for every day of the year, including Feb 29 in the leap reference
+    // year used here (2024). The baseline point (month:0, day:0) is
+    // placed one day before Jan 1 of that same reference year so it
+    // still sorts strictly before the first real point.
+    const REF_YEAR = 2024; // leap year — accommodates the Feb 29 point
+    const pts = curve.map(pt => {
+      const d = (pt.month === 0)
+        ? new Date(Date.UTC(REF_YEAR - 1, 11, 31)) // baseline: Dec 31 of the prior year
+        : new Date(Date.UTC(REF_YEAR, pt.month - 1, pt.day));
       return {
         time: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`,
         value: pt.cum_pct,
       };
     });
-    _sznSeries.setData(spaced);
+    _sznSeries.setData(pts);
     _sznChart.timeScale().fitContent();
   }
+
+  const _SZN_MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   function _sznRenderMonthLabels(curve) {
     const row = document.getElementById('szn-months');
     if (!row) return;
-    // curve[0] is the Jan-1 zero baseline point — the 12 real months are curve[1..12]
-    const months = curve.slice(1).map(p => p.label);
-    row.innerHTML = months.map(m => `<span style="flex:1;text-align:center;">${m}</span>`).join('');
+    // v8.195.0 — curve is now 367 day-of-year points instead of 13
+    // monthly ones, so a label can no longer be emitted 1:1 per curve
+    // point (that would print 366 labels). Instead, derive one label
+    // per calendar month from the point where day===1 (every month has
+    // exactly one such point in the 367-point curve), and size each
+    // label's flex-basis proportionally to how many days that month
+    // actually spans in the curve — so the label row still lines up
+    // approximately under the chart's real (non-uniform, since months
+    // have 28-31 days) time axis below, rather than 12 equal-width
+    // slots implying every month is the same length.
+    const monthStarts = [];
+    curve.forEach((p, i) => { if (p.month >= 1 && p.day === 1) monthStarts.push({ month: p.month, idx: i }); });
+    row.innerHTML = monthStarts.map((m, i) => {
+      const nextIdx = (i + 1 < monthStarts.length) ? monthStarts[i + 1].idx : curve.length;
+      const span = nextIdx - m.idx; // days in this month, from the actual curve
+      return `<span style="flex:${span} 0 0;text-align:center;">${_SZN_MONTH_LABELS[m.month - 1]}</span>`;
+    }).join('');
   }
 
   function _sznRenderWindows(windows) {
@@ -16790,7 +16806,7 @@ window.addEventListener('gi-theme-change', function() {
     }
     const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const dirWord = top.dir === 'Short' ? 'weakness' : 'strength';
-    insight.textContent = `${label} showed ${dirWord} in ${top.win_rate}% of the last ${top.n_years} years between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}%). Not a predictive signal \u2014 a historical statistical tendency, monthly granularity, over ${data.years}y of stored daily closes.`;
+    insight.textContent = `${label} showed ${dirWord} in ${top.win_rate}% of the last ${top.n_years} years between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}%). Not a predictive signal \u2014 a historical statistical tendency. Windows above use monthly granularity; the chart uses day-of-year granularity. Over ${data.years}y of stored daily closes.`;
   }
 
   async function _sznLoad(pair) {
@@ -16800,7 +16816,7 @@ window.addEventListener('gi-theme-change', function() {
     const monthsRow = document.getElementById('szn-months');
 
     if (!pair || !SZN_PAIRS.has(pair)) {
-      if (title) title.textContent = 'Monthly \u00b7 10y lookback';
+      if (title) title.textContent = 'Daily \u00b7 10y lookback';
       if (insight) insight.textContent = 'Seasonality is available for FX pairs only \u2014 select one on the Price Chart above.';
       if (tbody) tbody.innerHTML = '';
       if (monthsRow) monthsRow.innerHTML = '';
@@ -16810,7 +16826,7 @@ window.addEventListener('gi-theme-change', function() {
     }
     if (pair === _sznLoadedPair) return; // already showing this pair
 
-    if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Monthly \u00b7 10y lookback`;
+    if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Daily \u00b7 10y lookback`;
     if (insight) insight.textContent = 'Loading seasonality data\u2026';
 
     try {
@@ -16821,7 +16837,7 @@ window.addEventListener('gi-theme-change', function() {
       _sznRenderMonthLabels(data.curve);
       _sznRenderWindows(data.windows);
       _sznRenderInsight(data, pair);
-      if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Monthly \u00b7 ${data.years}y lookback`;
+      if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Daily \u00b7 ${data.years}y lookback`;
       _sznLoadedPair = pair;
     } catch (e) {
       // A missing file means the pair didn't clear MIN_YEARS in
