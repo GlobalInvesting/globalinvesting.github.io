@@ -1,17 +1,23 @@
-name: Update OHLC Chart Data — v2.2 (private scripts)
+name: Update OHLC Chart Data — v2.3 (private scripts)
 
 # Downloads OHLC bars for all chart symbols and writes JSON files
 # to THIS (public) repo under ohlc-data/:
 #
-#   ohlc-data/{id}.json       — Daily (D1) bars, ~3 years, ~38 symbols
+#   ohlc-data/{id}.json       — Daily (D1) bars, ~10 years, ~38 symbols
 #   ohlc-data/h1/{id}.json    — Hourly (H1) bars, ~720 days, unix timestamps
 #   ohlc-data/h4/{id}.json    — 4-Hour (H4) bars, ~720 days, unix timestamps
 #
 # Symbols: 28 FX pairs + Gold, WTI, BTC, US10Y + S&P 500, Nasdaq, Nikkei,
 #           EuroStoxx 50, ETH/USD, DXY — all rendered via Lightweight Charts.
 #
-# D1 files are REPLACED on every run — repo size stays fixed.
-# H1/H4 files cover a 720-day history-source limit; also replaced on every run.
+# D1 files are REPLACED (not merged) whenever they do refresh — repo size
+# stays fixed. As of v1.14/v2.3, D1 only actually refreshes on the 01:30 UTC
+# finalization run, the weekend crypto run, and manual dispatch — the
+# twice-hourly intraday cron skips D1 entirely (OHLC_FULL_REFRESH=false) and
+# only rebuilds H1/H4, since D1's deep history barely changes intraday and
+# today's live bar is re-injected separately by dashboard.js from
+# quotes.json. See fetch_ohlc.py v1.14 header for the full rationale.
+# H1/H4 files cover a 720-day history-source limit; replaced on every run.
 #
 # Schedule:
 #   Mon–Fri :02 and :32 (twice per hour) — Intraday run during the FX week.
@@ -109,6 +115,7 @@ jobs:
       - name: Fetch OHLC data
         env:
           SITE_DIR: .
+          OHLC_FULL_REFRESH: ${{ github.event.schedule != '2,32 * * * 1-5' }}
         run: python3 private-scripts/fetch_ohlc.py
 
       - name: Fetch credit spread OHLC — HY/IG OAS (D1 finalization run only)
