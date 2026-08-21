@@ -16679,7 +16679,18 @@ window.addEventListener('gi-theme-change', function() {
     el.innerHTML = '';
 
     _sznChart = LWC.createChart(el, {
-      layout: { background: { color: 'transparent' }, textColor: _themeColor('--text'), attributionLogo: false },
+      // Was `background: { color: 'transparent' }` — LWC's canvas paint
+      // doesn't reliably render a true transparent backdrop once the pane
+      // actually has content to draw (grid lines, series); in practice it
+      // fell back to a lighter internal default gray-blue, visible as a
+      // "gray box" filling the whole plot area regardless of hover (this
+      // was already there before any mouse interaction — confirmed against
+      // a screenshot with the cursor away from the chart). The main Price
+      // Chart never relies on 'transparent' for exactly this reason — it
+      // sets its background explicitly to the real backdrop color
+      // (`--bg`, the same color `body`/`#szn-panel` actually paint behind
+      // it). Matched that here instead of trusting 'transparent'.
+      layout: { background: { color: _themeColor('--bg') }, textColor: _themeColor('--text'), attributionLogo: false },
       grid: { vertLines: { visible: false }, horzLines: { color: _themeColorAlpha('--border', 0.5) } },
       rightPriceScale: { borderColor: _themeColor('--border'), minimumWidth: 50 },
       timeScale: { visible: false, borderVisible: false },
@@ -16779,7 +16790,7 @@ window.addEventListener('gi-theme-change', function() {
     }
     const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const dirWord = top.dir === 'Short' ? 'weakness' : 'strength';
-    insight.textContent = `${label} showed ${dirWord} in ${top.win_rate}% of the last ${top.years} years between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}%). Not a predictive signal \u2014 a historical statistical tendency, monthly granularity, over ${data.years}y of stored daily closes.`;
+    insight.textContent = `${label} showed ${dirWord} in ${top.win_rate}% of the last ${top.n_years} years between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}%). Not a predictive signal \u2014 a historical statistical tendency, monthly granularity, over ${data.years}y of stored daily closes.`;
   }
 
   async function _sznLoad(pair) {
