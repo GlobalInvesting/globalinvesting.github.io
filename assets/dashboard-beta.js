@@ -16699,20 +16699,28 @@ window.addEventListener('gi-theme-change', function() {
       ? _sznChart.addSeries(LWC.AreaSeries, seriesOpts)
       : _sznChart.addAreaSeries(seriesOpts);
 
-    // Synthetic sequential dates — one non-leap-year calendar (2025), since
-    // only relative spacing/order matters; the real x-axis is hidden and
-    // #szn-months renders the actual month labels below the chart instead.
-    const data = curve.map((pt, i) => ({
-      time: `2025-${String(pt.month + 1 > 12 ? 12 : Math.max(1, pt.month)).padStart(2, '0')}-01`,
-      value: pt.cum_pct,
-    }));
-    // Guard against duplicate/out-of-order synthetic dates (curve[0] is
-    // month:0 → Jan 1, curve[1] is month:1 → also Jan since +1 clamped) —
-    // just space them out evenly instead, order is all LWC needs here.
-    const spaced = curve.map((pt, i) => ({
-      time: `2025-${String(Math.min(12, i + 1)).padStart(2, '0')}-${String(1 + (i % 2) * 14).padStart(2, '0')}`,
-      value: pt.cum_pct,
-    }));
+    // Synthetic sequential dates — only relative order matters (the real
+    // x-axis is hidden and #szn-months renders the actual month labels
+    // below the chart instead), but LWC's setData() requires *strictly
+    // ascending* time values or the series silently fails to render (the
+    // crosshair/hover marker still works independently, which is why
+    // hovering showed a single point with no visible line/area).
+    // Root cause of the previous attempt: `Math.min(12, i+1)` clamps the
+    // month to 12 once i reaches 11, but the day still alternates via
+    // `1 + (i % 2) * 14` — so i=11 produced "2025-12-15" and i=12 produced
+    // "2025-12-01", a date that goes *backward*. curve always has exactly
+    // 13 points (index 0 baseline + 12 months, see compute_seasonality.py
+    // _build_curve()), so this collision was guaranteed on every pair, not
+    // an edge case. Fixed by deriving each date from a real Date object,
+    // advancing a fixed number of days per point — strictly increasing by
+    // construction, independent of curve.length or month/day arithmetic.
+    const spaced = curve.map((pt, i) => {
+      const d = new Date(Date.UTC(2025, 0, 1 + i * 14)); // 14d apart; 12*14=168d still lands in 2025
+      return {
+        time: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`,
+        value: pt.cum_pct,
+      };
+    });
     _sznSeries.setData(spaced);
     _sznChart.timeScale().fitContent();
   }
