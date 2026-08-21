@@ -1,0 +1,214 @@
+name: Update OHLC Chart Data — v2.3 (private scripts)
+
+# Downloads OHLC bars for all chart symbols and writes JSON files
+# to THIS (public) repo under ohlc-data/:
+#
+#   ohlc-data/{id}.json       — Daily (D1) bars, ~10 years, ~38 symbols
+#   ohlc-data/h1/{id}.json    — Hourly (H1) bars, ~720 days, unix timestamps
+#   ohlc-data/h4/{id}.json    — 4-Hour (H4) bars, ~720 days, unix timestamps
+#
+# Symbols: 28 FX pairs + Gold, WTI, BTC, US10Y + S&P 500, Nasdaq, Nikkei,
+#           EuroStoxx 50, ETH/USD, DXY — all rendered via Lightweight Charts.
+#
+# D1 files are REPLACED (not merged) whenever they do refresh — repo size
+# stays fixed. As of v1.14/v2.3, D1 only actually refreshes on the 01:30 UTC
+# finalization run, the weekend crypto run, and manual dispatch — the
+# twice-hourly intraday cron skips D1 entirely (OHLC_FULL_REFRESH=false) and
+# only rebuilds H1/H4, since D1's deep history barely changes intraday and
+# today's live bar is re-injected separately by dashboard.js from
+# quotes.json. See fetch_ohlc.py v1.14 header for the full rationale.
+# H1/H4 files cover a 720-day history-source limit; replaced on every run.
+#
+# Schedule:
+#   Mon–Fri :02 and :32 (twice per hour) — Intraday run during the FX week.
+#     Runs 2 minutes after each 30-min mark, once the H1 bar source has finalized.
+#     Halves the max JSON staleness to ~30 minutes (vs ~60 min with the old :30 cron).
+#     bar closes at :00 → finalized upstream by :02. Bar closes at :30 → finalized by :32.
+#     dashboard.js fetches these JSON files directly — gap between last completed bar
+#     and the live partial bar (WebSocket) is at most ~30 min instead of ~60 min.
+#     Public repo = unlimited GitHub Actions minutes — zero cost impact.
+#
+#   Tue–Sat 01:30 UTC — Retained for FX session finalization. The last H1 bar of
+#     each session (20:00–21:00 UTC) has a source finalization lag of up to ~1h.
+#     The 01:30 UTC run ensures D1 FX bars (built from 1H aggregation) use fully
+#     finalized H/L/C values. Also serves as the authoritative daily D1 write.
+#
+#   Sat–Sun 23:30 UTC — Crypto weekend run. BTC and ETH trade 24/7; without a
+#     weekend run the Friday script would write a partial Saturday bar (~22.5h) that
+#     persists all weekend with truncated H/L wicks. The 23:30 UTC timing ensures
+#     the UTC calendar day (00:00–24:00 UTC) is nearly complete before
+#     fetch_ohlc.py strips the in-progress today-bar and writes the final JSON.
+#     All non-crypto symbols are also refreshed (no-op cost — same script).
+#
+# Placement: script fetch_ohlc.py vive en el repo privado globalinvesting-scripts
+# (checkout explícito vía SCRIPTS_PAT). Los minutos de Actions se consumen en este
+# repo público → ilimitados y sin costo. Sin API keys adicionales requeridas.
+#
+# Technical levels (v8.57.2): calculate_technical_levels.py (mismo repo privado,
+# mismo checkout) lee ohlc-data/*.json ya escrito por fetch_ohlc.py y escribe
+# ai-analysis/technical-levels.json — determinístico (SMA20/50/200), sin API keys.
+# Corre SOLO en los runs autoritativos de D1 (01:30 UTC Tue-Sat) para no recalcular
+# en cada intraday run de 30 min; las medias móviles solo cambian con el cierre diario.
+#
+# Credit spread OHLC (v2.1): fetch_credit_spreads.py (mismo repo privado, mismo
+# checkout) escribe ohlc-data/hyoas.json e ohlc-data/igoas.json a partir de una
+# fuente de credit-spread pública (series HY/IG OAS, requiere FRED_API_KEY) —
+# mismo formato de bar que usa fetch_ohlc.py para los demás símbolos, así
+# _renderLWChart() en dashboard.js los lee por el mismo código sin distinguir
+# la fuente. Corre SOLO en el run D1 de cierre (01:30 UTC Tue-Sat), igual que
+# calculate_technical_levels.py: la fuente publica estas series una vez por día
+# hábil (con lag), así que repetir el fetch en cada tick intraday de 30 min
+# sería un request idéntico sin dato nuevo. D1 completo se REEMPLAZA en cada
+# corrida (sin merge incremental) — mismo criterio que todos los demás símbolos
+# de fetch_ohlc.py: un fetch completo es gratis/no medido, así que no hay
+# motivo de costo para tratarlo distinto.
+
+on:
+  schedule:
+    - cron: '2,32 * * * 1-5'  # every :02 and :32 Mon–Fri UTC — H1/H4 gap ≤ 30 min during FX week
+    - cron: '30 1 * * 2-6'    # 01:30 UTC Tue–Sat — retained for FX session finalization (full D1 bars)
+    - cron: '30 23 * * 0,6'   # 23:30 UTC Sat–Sun  — crypto weekend bars (BTC, ETH trade 24/7)
+  workflow_dispatch:             # manual trigger for backfill / testing
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+
+concurrency:
+  group: update-ohlc
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write   # necesario para disparar deploy-pages.yml (ver step "Trigger Pages deploy")
+
+jobs:
+  update-ohlc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v4
+
+      - name: Checkout private scripts
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting-scripts
+          token: ${{ secrets.SCRIPTS_PAT }}
+          path: private-scripts
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance --break-system-packages
+
+      - name: Create output directories
+        run: mkdir -p ohlc-data ohlc-data/h1 ohlc-data/h4
+
+      - name: Create ai-analysis directory (D1 finalization run only)
+        if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
+        run: mkdir -p ai-analysis
+
+      - name: Fetch OHLC data
+        env:
+          SITE_DIR: .
+          OHLC_FULL_REFRESH: ${{ github.event.schedule != '2,32 * * * 1-5' }}
+        run: python3 private-scripts/fetch_ohlc.py
+
+      - name: Fetch credit spread OHLC — HY/IG OAS (D1 finalization run only)
+        if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
+        env:
+          SITE_DIR: .
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python3 private-scripts/fetch_credit_spreads.py
+
+      - name: Calculate technical levels (D1 finalization run only)
+        if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
+        env:
+          SITE_DIR: .
+        run: python3 private-scripts/calculate_technical_levels.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          if [ -f ohlc-data/meta.json ]; then
+            echo "════════════════════════════════════════"
+            echo "   OHLC UPDATE SUMMARY"
+            echo "════════════════════════════════════════"
+            python3 -c "
+          import json, os
+          with open('ohlc-data/meta.json') as f:
+              m = json.load(f)
+          print(f'  Updated   : {m[\"updated_at\"]}')
+          print(f'  D1 symbols: {m[\"symbol_count\"]} written')
+          print(f'  Period    : {m[\"period\"]} / {m[\"interval\"]}')
+          if m['errors']:
+              print(f'  Errors    : {len(m[\"errors\"])} failed: {m[\"errors\"]}')
+          else:
+              print('  Errors    : none')
+          total = 0
+          for root, dirs, files in os.walk('ohlc-data'):
+              for f in files:
+                  if f.endswith('.json') and f != 'meta.json':
+                      total += os.path.getsize(os.path.join(root, f))
+          h1_count = len([f for f in os.listdir('ohlc-data/h1') if f.endswith('.json')]) if os.path.isdir('ohlc-data/h1') else 0
+          h4_count = len([f for f in os.listdir('ohlc-data/h4') if f.endswith('.json')]) if os.path.isdir('ohlc-data/h4') else 0
+          print(f'  H1 files  : {h1_count}')
+          print(f'  H4 files  : {h4_count}')
+          print(f'  Total size: {total // 1024} KB raw')
+          "
+          fi
+
+      - name: Commit and push
+        id: push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp -r ohlc-data/ /tmp/ohlc_fresh/
+          if [ -f ai-analysis/technical-levels.json ]; then
+            mkdir -p /tmp/ai_analysis_fresh
+            cp ai-analysis/technical-levels.json /tmp/ai_analysis_fresh/
+          fi
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp -r /tmp/ohlc_fresh/. ohlc-data/
+            git add ohlc-data/
+            if [ -f /tmp/ai_analysis_fresh/technical-levels.json ]; then
+              mkdir -p ai-analysis
+              cp /tmp/ai_analysis_fresh/technical-levels.json ai-analysis/
+              git add ai-analysis/technical-levels.json
+            fi
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git commit -m "data: ohlc update [${TIMESTAMP}]"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              echo "pushed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Trigger Pages deploy
+        # Pushes made with the default GITHUB_TOKEN do NOT trigger other on:push
+        # workflows (GitHub's loop-prevention rule) — dispatch deploy-pages.yml
+        # explicitly, only when this run actually pushed new data.
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
