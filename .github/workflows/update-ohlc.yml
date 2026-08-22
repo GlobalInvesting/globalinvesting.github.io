@@ -103,7 +103,11 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install yfinance --break-system-packages
+        # scipy added v8.197.0 for compute_seasonality.py's window
+        # significance t-test (scipy.stats.ttest_1samp) — see that
+        # file's header and GUIDELINES.md's "new runtime dependency
+        # must ship with its CI installer" rule.
+        run: pip install yfinance scipy --break-system-packages
 
       - name: Create output directories
         run: mkdir -p ohlc-data ohlc-data/h1 ohlc-data/h4
