@@ -16882,7 +16882,7 @@ window.addEventListener('gi-theme-change', function() {
       const valTxt = (monthPct >= 0 ? '+' : '') + monthPct.toFixed(1) + '%';
       return `<span style="flex:${span} 0 0;text-align:center;display:flex;flex-direction:column;line-height:1.3;">
         <span>${_SZN_MONTH_LABELS[m.month - 1]}</span>
-        <span style="font-size:8px;color:${color};" title="Descriptive average net move in ${_SZN_MONTH_LABELS[m.month - 1]} across the full lookback \u2014 not significance-tested, unlike the windows table above.">${valTxt}</span>
+        <span style="font-size:8px;color:${color};" title="Descriptive average net move in ${_SZN_MONTH_LABELS[m.month - 1]} across the full lookback \u2014 not significance-tested, unlike the windows table below.">${valTxt}</span>
       </span>`;
     }).join('');
   }
@@ -17243,13 +17243,28 @@ function _dsmileRenderInsight(el, regimes, stats, currentRegime, totalRows) {
 // GROWTH-REGIME AXIS (v2) — Stephen Jen's ORIGINAL Dollar Smile axis:
 // USD real GDP YoY vs. the equal-weighted rest of the G10, not the
 // market-stress proxy the block above uses. Data: growth-differential-
-// data/history.json, fully rebuilt each run by fetch_growth_differential.py
-// (idempotent full recompute, not a daily append — GDP data revises; see
-// that script's header for why this differs from the Dollar Smile/Fair
-// Value accumulation pattern). Quarterly cadence — every quarter in the
-// backfilled history already has a real value, so there is no
-// "accumulating" state here the way the daily stress axis needs one.
+// data/history.json, fully rebuilt each run (idempotent full recompute,
+// not a daily append — GDP data revises, so a stale cached differential
+// computed from a since-revised print would silently go wrong). Quarterly
+// cadence — every quarter in the backfilled history already has a real
+// value, so there is no "accumulating" state here the way the daily
+// stress axis needs one.
+//
+// v8.201.0: regime keys (USD-OUTPERFORMING/INLINE/USD-UNDERPERFORMING)
+// are internal identifiers only now — display uses _GROWTHDIFF_LABELS
+// below (Title Case, not ALL CAPS) since this is prose-context data, not
+// a short state badge like the Dollar Smile's RISK-ON/OFF (Santiago
+// feedback, 2026-08-22: reads as shouting in a table cell). Also
+// compacted the insight from a 4-sentence paragraph to one line + hover
+// tooltip (same pattern as the Dollar Smile fix above), and stripped an
+// internal repo filename that had leaked into a user-facing tooltip.
 // ═══════════════════════════════════════════════════════════════════
+const _GROWTHDIFF_LABELS = {
+  'USD-OUTPERFORMING': 'USD Outperforming',
+  'INLINE': 'Inline',
+  'USD-UNDERPERFORMING': 'USD Underperforming',
+};
+
 async function renderGrowthDifferential() {
   const tbody = document.getElementById('growthdiff-tbody');
   const insightEl = document.getElementById('growthdiff-insight');
@@ -17263,7 +17278,7 @@ async function renderGrowthDifferential() {
     doc = await res.json();
     if (!doc || !Array.isArray(doc.quarters) || !doc.quarters.length) throw new Error('malformed history.json');
   } catch (e) {
-    if (insightEl) insightEl.textContent = 'Growth differential data unavailable right now \u2014 fetch_growth_differential.py may not have run yet.';
+    if (insightEl) insightEl.textContent = 'Growth differential data unavailable right now.';
     if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="padding:4px;color:var(--text3);">No data yet.</td></tr>';
     if (currentEl) currentEl.textContent = '';
     return;
@@ -17275,7 +17290,11 @@ async function renderGrowthDifferential() {
 
   if (currentEl && cur) {
     const diffTxt = `${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp`;
-    currentEl.textContent = `${cur.quarter}: ${cur.regime} (${diffTxt})`;
+    // "Latest available" rather than implying this is the current calendar
+    // quarter — real GDP prints ~1 quarter after quarter-end, so the most
+    // recent reading is necessarily a quarter or more behind today's date.
+    // Full explanation lives in the panel-title tooltip, not repeated here.
+    currentEl.textContent = `Latest available: ${cur.quarter} \u2014 ${_GROWTHDIFF_LABELS[cur.regime] || cur.regime} (${diffTxt})`;
   }
 
   tbody.innerHTML = REGIMES.map(r => {
@@ -17285,7 +17304,7 @@ async function renderGrowthDifferential() {
       ? `\u2014 (n=${s.n_dxy || 0})`
       : `${s.avg_dxy_qret >= 0 ? '+' : ''}${s.avg_dxy_qret.toFixed(2)}% (n=${s.n_dxy})`;
     const rowStyle = isCurrent ? ` style="color:var(--up);"` : '';
-    return `<tr${rowStyle}><td style="padding:2px 4px;">${r}${isCurrent ? ' \u25cf' : ''}</td>` +
+    return `<tr${rowStyle}><td style="padding:2px 4px;">${_GROWTHDIFF_LABELS[r] || r}${isCurrent ? ' \u25cf' : ''}</td>` +
            `<td style="padding:2px 4px;">${s.n}</td>` +
            `<td style="padding:2px 4px;">${avgTxt}</td></tr>`;
   }).join('');
@@ -17293,10 +17312,12 @@ async function renderGrowthDifferential() {
   if (insightEl) {
     const totalQ = doc.quarters.length;
     const first = doc.quarters[0].quarter, last = doc.quarters[doc.quarters.length - 1].quarter;
+    const regimeLabel = cur ? (_GROWTHDIFF_LABELS[cur.regime] || cur.regime) : '';
     const curTxt = cur
-      ? `USD ${cur.usd_yoy >= 0 ? '+' : ''}${cur.usd_yoy.toFixed(1)}% YoY vs. G9 avg ${cur.g9_avg_yoy >= 0 ? '+' : ''}${cur.g9_avg_yoy.toFixed(1)}% YoY (diff ${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp)`
+      ? `USD ${cur.usd_yoy >= 0 ? '+' : ''}${cur.usd_yoy.toFixed(1)}% vs G9 ${cur.g9_avg_yoy >= 0 ? '+' : ''}${cur.g9_avg_yoy.toFixed(1)}% YoY (${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp)`
       : 'no current reading';
-    insightEl.innerHTML = `Latest quarter (${cur ? cur.quarter : '\u2014'}): ${curTxt} \u2014 <span style="color:var(--up);">${cur ? cur.regime : ''}</span>. ` +
+    insightEl.innerHTML = `${last}: ${curTxt} \u00b7 <span style="color:var(--up);">${regimeLabel}</span>`;
+    insightEl.title = `Latest quarter with published GDP (${cur ? cur.quarter : '\u2014'}): ${curTxt} \u2014 ${regimeLabel}. ` +
       `Real GDP YoY, ${totalQ} quarters (${first} \u2192 ${last}), all 10 G10 currencies from FRED \u2014 not a market-stress proxy like the smile above. ` +
       `G9 comparison is equal-weighted, not BIS-turnover-weighted \u2014 a simplification, same spirit as the Fair Value panel's disclosed simplified-BEER caveat. ` +
       `Real GDP prints ~1 quarter after quarter-end, so a live regime reading lags by construction \u2014 this shows what DXY did in the SAME quarter as the growth reading, a historical tendency, not a lagged trading signal.`;
