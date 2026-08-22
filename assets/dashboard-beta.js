@@ -17299,7 +17299,7 @@ function _dsmileRenderInsight(el, doc, cur, stats) {
   const first = doc.quarters[0].quarter, last = doc.quarters[doc.quarters.length - 1].quarter;
   el.title = `Latest quarter with published GDP (${cur ? cur.quarter : '\u2014'}): ${curTxt} \u2014 ${regimeLabel}. ` +
     `Real GDP YoY, ${totalQ} quarters (${first} \u2192 ${last}), all 10 G10 currencies from FRED. ` +
-    `G9 comparison is equal-weighted, not BIS-turnover-weighted \u2014 a disclosed simplification, same spirit as the Fair Value panel's simplified-BEER caveat. ` +
+    `G9 comparison is equal-weighted, not BIS-turnover-weighted \u2014 a disclosed simplification. ` +
     `Real GDP prints ~1 quarter after quarter-end, so a live regime reading lags by construction \u2014 this shows what DXY did in the SAME quarter as the growth reading: a historical tendency, not a lagged trading signal. ` +
     `Note: the buckets' avg DXY q/q returns below are not currently a textbook U-shaped smile (roughly monotonic across Underperforming\u2192Inline\u2192Outperforming rather than higher at both extremes) \u2014 stated as observed, not assumed.`;
 }
