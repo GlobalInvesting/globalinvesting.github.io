@@ -1263,9 +1263,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <button id="szn-close" aria-label="Close Seasonality panel" style="background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px;flex-shrink:0;">&times;</button>
         </div>
         <div style="padding:10px 12px;">
-          <div id="szn-chart" style="width:100%;height:130px;"></div>
-          <div id="szn-months" style="display:flex;gap:1px;font-size:8.5px;color:var(--text3);margin:2px 0 10px;"></div>
-          <div style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
+          <div id="szn-chart-section">
+            <div id="szn-chart" style="width:100%;height:130px;"></div>
+            <div id="szn-months" style="display:flex;gap:1px;font-size:8.5px;color:var(--text3);margin:2px 0 10px;"></div>
+          </div>
+          <div id="szn-windows-section" style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
             <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Strongest recurring windows (monthly)</div>
             <table id="szn-windows-table" style="width:100%;border-collapse:collapse;font-size:10.5px;">
               <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;">Win rate</td><td style="text-align:right;">Avg ret</td><td style="text-align:right;">Sharpe</td></tr></thead>
@@ -2367,7 +2369,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.196.0" defer></script>
+<script src="assets/dashboard-beta.js?v=8.196.1" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
