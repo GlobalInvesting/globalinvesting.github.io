@@ -88,7 +88,7 @@ const PAIRS = [
   { id:'nzdchf', base:'NZD', quote:'CHF', cross:['NZD','CHF'], dec:5 },
 ];
 
-// ── FX Fair Value (v8.191.0) ──────────────────────────────────────────────
+// ── FX Fair Value (v8.191.0, regression added v8.197.0) ───────────────────
 // Reads fair-value-data/{pair}.json (written daily by log_fair_value_inputs.py
 // in globalinvesting-scripts — see log-fair-value-inputs.yml). Each file is an
 // array of real {date, spot, rate_diff, stress} rows, oldest → newest, one per
@@ -96,7 +96,61 @@ const PAIRS = [
 // FV_MIN_ROWS the panel shows an accumulation progress bar instead of a
 // z-score, per Santiago's explicit "don't fabricate regression history"
 // decision (2026-08-20) — see GUIDELINES.md § Data integrity.
+//
+// This file duplicates dashboard.js's PAIRS/renderFairValue/_fvRegress
+// (same "no shared-module pattern in this repo" reasoning documented
+// elsewhere — dashboard-beta.js is a full fork, not an include) — keep
+// both in sync whenever one changes, per the standing pattern for this file.
 const FV_MIN_ROWS = 60;
+const FV_ROLLING_WINDOW = 60;
+
+// OLS regression: spot ~ intercept + b1*rate_diff + b2*stress — see
+// dashboard.js's _fvRegress()/_solve3x3() for the full explanatory comment.
+function _fvRegress(rows) {
+  const usable = rows.filter(r => r && r.spot != null && r.rate_diff != null && r.stress != null);
+  if (usable.length < 4) return null;
+
+  const n = usable.length;
+  let Sxx = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  let Sxy = [0, 0, 0];
+  usable.forEach(r => {
+    const x = [1, r.rate_diff, r.stress];
+    for (let i = 0; i < 3; i++) {
+      Sxy[i] += x[i] * r.spot;
+      for (let j = 0; j < 3; j++) Sxx[i][j] += x[i] * x[j];
+    }
+  });
+
+  const beta = _solve3x3(Sxx, Sxy);
+  if (!beta) return null;
+
+  const fitted = usable.map(r => beta[0] + beta[1] * r.rate_diff + beta[2] * r.stress);
+  const residuals = usable.map((r, i) => r.spot - fitted[i]);
+  const residMean = residuals.reduce((a, b) => a + b, 0) / n;
+  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / (n - 3);
+  const residStd = residVar > 0 ? Math.sqrt(residVar) : 0;
+
+  return { beta, n, residStd, usable };
+}
+
+function _solve3x3(A, b) {
+  const M = A.map((row, i) => [...row, b[i]]);
+  const EPS = 1e-9;
+  for (let col = 0; col < 3; col++) {
+    let pivot = col;
+    for (let r = col + 1; r < 3; r++) {
+      if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot = r;
+    }
+    if (Math.abs(M[pivot][col]) < EPS) return null;
+    [M[col], M[pivot]] = [M[pivot], M[col]];
+    for (let r = 0; r < 3; r++) {
+      if (r === col) continue;
+      const factor = M[r][col] / M[col][col];
+      for (let c = col; c < 4; c++) M[r][c] -= factor * M[col][c];
+    }
+  }
+  return [M[0][3] / M[0][0], M[1][3] / M[1][1], M[2][3] / M[2][2]];
+}
 
 async function renderFairValue() {
   const accWrap = document.getElementById('fv-accumulating');
@@ -127,10 +181,9 @@ async function renderFairValue() {
     return;
   }
 
-  // Enough history exists for a real rolling regression — z-score/fair-value
-  // computation lands in a follow-up pass; for now, show the real latest
-  // inputs (spot / rate differential / risk score) plus history depth per
-  // pair, still with zero fabricated numbers.
+  // Enough history exists for a real rolling regression (v8.197.0) — see
+  // _fvRegress() above. Each pair independently gates on its OWN row count
+  // and its OWN regression succeeding (not singular).
   accWrap.style.display = 'none';
   tblWrap.style.display = '';
 
@@ -142,11 +195,27 @@ async function renderFairValue() {
     const rdTxt   = last.rate_diff != null ? (last.rate_diff >= 0 ? '+' : '') + last.rate_diff.toFixed(2) : '—';
     const rdColor = last.rate_diff == null ? 'var(--text3)' : (last.rate_diff >= 0 ? 'var(--up)' : 'var(--down)');
     const stTxt   = last.stress != null ? last.stress.toFixed(0) : '—';
+
+    let fvTxt = '—', zTxt = '—', zColor = 'var(--text3)';
+    if (rows.length >= FV_MIN_ROWS) {
+      const windowRows = rows.slice(-FV_ROLLING_WINDOW);
+      const reg = _fvRegress(windowRows);
+      if (reg && reg.residStd > 0 && last.rate_diff != null && last.stress != null) {
+        const fairValue = reg.beta[0] + reg.beta[1] * last.rate_diff + reg.beta[2] * last.stress;
+        const z = (last.spot - fairValue) / reg.residStd;
+        fvTxt = fairValue.toFixed(pair.dec);
+        zTxt = (z >= 0 ? '+' : '') + z.toFixed(2) + '\u03c3';
+        zColor = Math.abs(z) < 1 ? 'var(--text3)' : (z > 0 ? 'var(--down)' : 'var(--up)');
+      }
+    }
+
     html += `<tr>
       <td>${pair.label || (pair.base + '/' + pair.quote)}</td>
       <td>${spotTxt}</td>
       <td style="color:${rdColor};">${rdTxt}</td>
       <td>${stTxt}</td>
+      <td>${fvTxt}</td>
+      <td style="color:${zColor};">${zTxt}</td>
       <td style="color:var(--text3);">${rows.length}d</td>
     </tr>`;
   });
@@ -16787,11 +16856,19 @@ window.addEventListener('gi-theme-change', function() {
     }).join('');
   }
 
+  // v3.0 (2026-08-21 industry-standard audit): win_rate demoted from primary
+  // gate/sort key to context-only column — Seasonax's own published
+  // methodology treats hit rate as the LEAST significant of its reported
+  // stats. The real gate is now a one-sample t-test p-value (computed
+  // server-side in compute_seasonality.py), and avg_return is now shown
+  // alongside std_dev rather than alone, since dispersion is part of the
+  // story. Windows are also now guaranteed non-overlapping (server-side
+  // dedup) so this table can no longer show the same pattern 2-3 times.
   function _sznRenderWindows(windows) {
     const tbody = document.getElementById('szn-windows-tbody');
     if (!tbody) return;
     if (!windows || !windows.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text3);padding:4px 0;">No window cleared the 70% win-rate bar for this pair.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text3);padding:4px 0;">No window reached statistical significance (p&lt;0.05) for this pair over the available history.</td></tr>';
       return;
     }
     const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -16799,9 +16876,9 @@ window.addEventListener('gi-theme-change', function() {
       <tr style="color:var(--text);border-top:1px solid var(--border2);">
         <td style="padding:3px 0;">${M[w.start_month - 1]} \u2192 ${M[w.end_month - 1]}</td>
         <td style="text-align:right;color:${w.dir === 'Short' ? 'var(--down)' : 'var(--up)'};">${w.dir}</td>
-        <td style="text-align:right;">${w.win_rate}%</td>
-        <td style="text-align:right;color:${w.avg_return < 0 ? 'var(--down)' : 'var(--up)'};">${w.avg_return > 0 ? '+' : ''}${w.avg_return}%</td>
-        <td style="text-align:right;">${w.sharpe != null ? w.sharpe : '\u2014'}</td>
+        <td style="text-align:right;color:${w.avg_return < 0 ? 'var(--down)' : 'var(--up)'};">${w.avg_return > 0 ? '+' : ''}${w.avg_return}% \u00b1 ${w.std_dev != null ? w.std_dev : '\u2014'}%</td>
+        <td style="text-align:right;color:var(--text3);">${w.win_rate}%</td>
+        <td style="text-align:right;">${w.p_value != null ? w.p_value : '\u2014'}</td>
       </tr>`).join('');
   }
 
@@ -16811,12 +16888,12 @@ window.addEventListener('gi-theme-change', function() {
     const top = data.windows && data.windows[0];
     const label = _sznPairLabel(pair);
     if (!top) {
-      insight.textContent = `${label} has ${data.years} years of history but no window with a win rate \u226570% over that period \u2014 no strong recurring seasonal pattern found.`;
+      insight.textContent = `${label} has ${data.years} years of history but no window reached statistical significance (p<0.05, one-sample t-test) over that period \u2014 no strong recurring seasonal pattern found.`;
       return;
     }
     const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const dirWord = top.dir === 'Short' ? 'weakness' : 'strength';
-    insight.textContent = `${label} showed ${dirWord} in ${top.win_rate}% of the last ${top.n_years} years between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}%). Not a predictive signal \u2014 a historical statistical tendency. Windows above use monthly granularity; the chart uses day-of-year granularity. Over ${data.years}y of stored daily closes.`;
+    insight.textContent = `${label} showed ${dirWord} between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} across the last ${top.n_years} years (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, p=${top.p_value}; held in ${top.win_rate}% of qualifying years). Not a predictive signal \u2014 a historical statistical tendency, and ${data.years}y of history is well short of the 15-25y sample size seasonality research typically recommends. Windows above use monthly granularity; the chart uses day-of-year granularity.`;
   }
 
   async function _sznLoad(pair) {
@@ -17100,11 +17177,23 @@ function _dsmileRenderInsight(el, regimes, stats, currentRegime, totalRows) {
     ? `${cur.avg >= 0 ? '+' : ''}${cur.avg.toFixed(2)}% avg (n=${cur.n})`
     : `accumulating \u2014 ${cur ? cur.n : 0}/${10} days logged`;
 
+  // v2.0 (2026-08-21 industry-standard audit): Stephen Jen's original Dollar
+  // Smile thesis is anchored on relative growth differentials (US vs. rest-
+  // of-world economic outperformance), not a market-stress classifier. Our
+  // RISK-ON/RISK-OFF regime label is a VIX/MOVE/gold/SPX/AUDJPY/USDJPY/HY-OAS
+  // stress proxy, which can diverge from Jen's framework (e.g. a synchronized
+  // global growth upswing can show as "RISK-ON" here with no US growth
+  // outperformance behind it, a case the original thesis would not predict
+  // dollar strength for). This was previously only documented in code
+  // comments, not disclosed in the UI itself \u2014 now stated explicitly below
+  // so the block reads as a labeled proxy, not a direct implementation.
+  const proxyCaveat = 'Uses a market-stress regime proxy (VIX/MOVE/gold/SPX/AUDJPY/USDJPY/HY-OAS), not Stephen Jen\u2019s original growth-differential framework \u2014 the two can disagree, e.g. in a globally-synchronized growth upswing with no US outperformance.';
+
   let body;
   if (readyCount === regimes.length) {
-    body = `Current regime: <span style="color:var(--up);">${currentRegime}</span> (${curTxt}). Historically DXY tends toward a positive average daily return at both risk-cycle extremes (RISK-OFF and RISK-ON) and weaker in the intermediate regimes \u2014 the classic "smile" pattern. Sample accumulated since the regime classifier went into production (${totalRows} day${totalRows === 1 ? '' : 's'} logged); not a long-run backtest.`;
+    body = `Current regime: <span style="color:var(--up);">${currentRegime}</span> (${curTxt}). Historically DXY tends toward a positive average daily return at both risk-cycle extremes (RISK-OFF and RISK-ON) and weaker in the intermediate regimes \u2014 the classic "smile" pattern. Sample accumulated since the regime classifier went into production (${totalRows} day${totalRows === 1 ? '' : 's'} logged); not a long-run backtest. ${proxyCaveat}`;
   } else {
-    body = `Current regime: <span style="color:var(--up);">${currentRegime}</span> (${curTxt}). Still accumulating history \u2014 ${readyCount} of ${regimes.length} regime buckets have enough logged days (10+) to show a real average; the rest need more days at that regime before the smile curve is meaningful. Logged once daily, starting from when this feature shipped \u2014 not a backtest.`;
+    body = `Current regime: <span style="color:var(--up);">${currentRegime}</span> (${curTxt}). Still accumulating history \u2014 ${readyCount} of ${regimes.length} regime buckets have enough logged days (10+) to show a real average; the rest need more days at that regime before the smile curve is meaningful. Logged once daily, starting from when this feature shipped \u2014 not a backtest. ${proxyCaveat}`;
   }
   el.innerHTML = body;
 }

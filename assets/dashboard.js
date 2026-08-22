@@ -88,7 +88,7 @@ const PAIRS = [
   { id:'nzdchf', base:'NZD', quote:'CHF', cross:['NZD','CHF'], dec:5 },
 ];
 
-// ── FX Fair Value (v8.191.0) ──────────────────────────────────────────────
+// ── FX Fair Value (v8.191.0, regression added v8.197.0) ───────────────────
 // Reads fair-value-data/{pair}.json (written daily by log_fair_value_inputs.py
 // in globalinvesting-scripts — see log-fair-value-inputs.yml). Each file is an
 // array of real {date, spot, rate_diff, stress} rows, oldest → newest, one per
@@ -97,6 +97,76 @@ const PAIRS = [
 // z-score, per Santiago's explicit "don't fabricate regression history"
 // decision (2026-08-20) — see GUIDELINES.md § Data integrity.
 const FV_MIN_ROWS = 60;
+// Rolling window matches the panel's own "60D rolling regression" subtitle —
+// once more than FV_ROLLING_WINDOW real rows exist, the regression refits on
+// only the most recent window rather than the whole growing history, so the
+// fair-value estimate tracks the current regime instead of averaging over
+// years of stale relationships (same rolling-window principle as any BEER-
+// style desk model). Below that count, it uses every row available.
+const FV_ROLLING_WINDOW = 60;
+
+// ── OLS regression: spot ~ intercept + b1*rate_diff + b2*stress ───────────
+// A lightweight BEER-style (Behavioral Equilibrium Exchange Rate) model:
+// spot regressed on the real rate differential and a risk-sentiment score,
+// solved via the 3x3 normal-equations system (X^T X) beta = X^T y, closed
+// form via Gaussian elimination — no matrix library needed for 3 unknowns.
+// This is a deliberately lighter-weight version of an academic BEER model
+// (which typically also includes ToT, NFA, productivity differentials) —
+// labeled as such in the panel footnote, not presented as the full model.
+//
+// Returns null if there are fewer than 4 usable rows (need more data points
+// than free parameters to get a meaningful residual std) or the input
+// matrix is singular (e.g. rate_diff or stress is constant across the
+// whole window — no variation to regress against).
+function _fvRegress(rows) {
+  const usable = rows.filter(r => r && r.spot != null && r.rate_diff != null && r.stress != null);
+  if (usable.length < 4) return null;
+
+  const n = usable.length;
+  // X columns: [1, rate_diff, stress], y: spot
+  let Sxx = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  let Sxy = [0, 0, 0];
+  usable.forEach(r => {
+    const x = [1, r.rate_diff, r.stress];
+    for (let i = 0; i < 3; i++) {
+      Sxy[i] += x[i] * r.spot;
+      for (let j = 0; j < 3; j++) Sxx[i][j] += x[i] * x[j];
+    }
+  });
+
+  const beta = _solve3x3(Sxx, Sxy);
+  if (!beta) return null; // singular — no variation in an input to regress against
+
+  const fitted = usable.map(r => beta[0] + beta[1] * r.rate_diff + beta[2] * r.stress);
+  const residuals = usable.map((r, i) => r.spot - fitted[i]);
+  const residMean = residuals.reduce((a, b) => a + b, 0) / n;
+  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / (n - 3); // 3 fitted params
+  const residStd = residVar > 0 ? Math.sqrt(residVar) : 0;
+
+  return { beta, n, residStd, usable };
+}
+
+// Solves the 3x3 linear system A·x = b via Gaussian elimination with
+// partial pivoting. Returns null if A is singular (no pivot above a small
+// epsilon can be found) rather than dividing by ~0 and returning garbage.
+function _solve3x3(A, b) {
+  const M = A.map((row, i) => [...row, b[i]]);
+  const EPS = 1e-9;
+  for (let col = 0; col < 3; col++) {
+    let pivot = col;
+    for (let r = col + 1; r < 3; r++) {
+      if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot = r;
+    }
+    if (Math.abs(M[pivot][col]) < EPS) return null; // singular
+    [M[col], M[pivot]] = [M[pivot], M[col]];
+    for (let r = 0; r < 3; r++) {
+      if (r === col) continue;
+      const factor = M[r][col] / M[col][col];
+      for (let c = col; c < 4; c++) M[r][c] -= factor * M[col][c];
+    }
+  }
+  return [M[0][3] / M[0][0], M[1][3] / M[1][1], M[2][3] / M[2][2]];
+}
 
 async function renderFairValue() {
   const accWrap = document.getElementById('fv-accumulating');
@@ -127,10 +197,12 @@ async function renderFairValue() {
     return;
   }
 
-  // Enough history exists for a real rolling regression — z-score/fair-value
-  // computation lands in a follow-up pass; for now, show the real latest
-  // inputs (spot / rate differential / risk score) plus history depth per
-  // pair, still with zero fabricated numbers.
+  // Enough history exists for a real rolling regression (v8.197.0) — see
+  // _fvRegress() above. Each pair independently gates on its OWN row count
+  // and its OWN regression succeeding (not singular) — a pair with fewer
+  // than FV_MIN_ROWS rows, or with degenerate input (e.g. rate_diff pinned
+  // flat all window), falls back to the raw-inputs row rather than showing
+  // a fabricated or garbage z-score.
   accWrap.style.display = 'none';
   tblWrap.style.display = '';
 
@@ -142,11 +214,30 @@ async function renderFairValue() {
     const rdTxt   = last.rate_diff != null ? (last.rate_diff >= 0 ? '+' : '') + last.rate_diff.toFixed(2) : '—';
     const rdColor = last.rate_diff == null ? 'var(--text3)' : (last.rate_diff >= 0 ? 'var(--up)' : 'var(--down)');
     const stTxt   = last.stress != null ? last.stress.toFixed(0) : '—';
+
+    let fvTxt = '—', zTxt = '—', zColor = 'var(--text3)';
+    if (rows.length >= FV_MIN_ROWS) {
+      const windowRows = rows.slice(-FV_ROLLING_WINDOW);
+      const reg = _fvRegress(windowRows);
+      if (reg && reg.residStd > 0 && last.rate_diff != null && last.stress != null) {
+        const fairValue = reg.beta[0] + reg.beta[1] * last.rate_diff + reg.beta[2] * last.stress;
+        const z = (last.spot - fairValue) / reg.residStd;
+        fvTxt = fairValue.toFixed(pair.dec);
+        zTxt = (z >= 0 ? '+' : '') + z.toFixed(2) + '\u03c3';
+        // Spot ABOVE the regression fair value = rich/overvalued vs. the model
+        // (shown as 'down' color — same convention as the rest of the terminal
+        // uses for "expect mean reversion downward"); spot BELOW = cheap.
+        zColor = Math.abs(z) < 1 ? 'var(--text3)' : (z > 0 ? 'var(--down)' : 'var(--up)');
+      }
+    }
+
     html += `<tr>
       <td>${pair.label || (pair.base + '/' + pair.quote)}</td>
       <td>${spotTxt}</td>
       <td style="color:${rdColor};">${rdTxt}</td>
       <td>${stTxt}</td>
+      <td>${fvTxt}</td>
+      <td style="color:${zColor};">${zTxt}</td>
       <td style="color:var(--text3);">${rows.length}d</td>
     </tr>`;
   });

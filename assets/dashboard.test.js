@@ -570,6 +570,89 @@ test('pearson: EUR/USD vs DXY — expected inverse relationship in sample data',
 });
 
 // ═══════════════════════════════════════════════════════════════════
+// FX Fair Value regression — mirrored from assets/dashboard.js's
+// _solve3x3() / _fvRegress() (v8.197.0)
+// ═══════════════════════════════════════════════════════════════════
+function _solve3x3(A, b) {
+  const M = A.map((row, i) => [...row, b[i]]);
+  const EPS = 1e-9;
+  for (let col = 0; col < 3; col++) {
+    let pivot = col;
+    for (let r = col + 1; r < 3; r++) {
+      if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot = r;
+    }
+    if (Math.abs(M[pivot][col]) < EPS) return null;
+    [M[col], M[pivot]] = [M[pivot], M[col]];
+    for (let r = 0; r < 3; r++) {
+      if (r === col) continue;
+      const factor = M[r][col] / M[col][col];
+      for (let c = col; c < 4; c++) M[r][c] -= factor * M[col][c];
+    }
+  }
+  return [M[0][3] / M[0][0], M[1][3] / M[1][1], M[2][3] / M[2][2]];
+}
+function _fvRegress(rows) {
+  const usable = rows.filter(r => r && r.spot != null && r.rate_diff != null && r.stress != null);
+  if (usable.length < 4) return null;
+  const n = usable.length;
+  let Sxx = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  let Sxy = [0, 0, 0];
+  usable.forEach(r => {
+    const x = [1, r.rate_diff, r.stress];
+    for (let i = 0; i < 3; i++) {
+      Sxy[i] += x[i] * r.spot;
+      for (let j = 0; j < 3; j++) Sxx[i][j] += x[i] * x[j];
+    }
+  });
+  const beta = _solve3x3(Sxx, Sxy);
+  if (!beta) return null;
+  const fitted = usable.map(r => beta[0] + beta[1] * r.rate_diff + beta[2] * r.stress);
+  const residuals = usable.map((r, i) => r.spot - fitted[i]);
+  const residMean = residuals.reduce((a, b) => a + b, 0) / n;
+  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / (n - 3);
+  const residStd = residVar > 0 ? Math.sqrt(residVar) : 0;
+  return { beta, n, residStd, usable };
+}
+
+test('_fvRegress: recovers known linear coefficients from synthetic data', () => {
+  const rows = [];
+  for (let i = 0; i < 60; i++) {
+    const rate_diff = Math.sin(i / 5) * 2;
+    const stress = Math.cos(i / 7) * 30 + 20;
+    const noise = ((i * 37) % 13 - 6) * 0.0005;
+    rows.push({ date: `d${i}`, spot: 1.10 + 0.01 * rate_diff - 0.002 * stress + noise, rate_diff, stress });
+  }
+  const reg = _fvRegress(rows);
+  assert.ok(reg, 'regression should succeed with 60 varied rows');
+  assert.ok(Math.abs(reg.beta[0] - 1.10) < 0.01, `intercept off: ${reg.beta[0]}`);
+  assert.ok(Math.abs(reg.beta[1] - 0.01) < 0.01, `rate_diff coef off: ${reg.beta[1]}`);
+  assert.ok(Math.abs(reg.beta[2] - (-0.002)) < 0.001, `stress coef off: ${reg.beta[2]}`);
+  assert.ok(reg.residStd > 0 && reg.residStd < 0.01, `residStd out of expected range: ${reg.residStd}`);
+});
+test('_fvRegress: singular input (constant regressor) → null, not garbage', () => {
+  const rows = Array.from({ length: 60 }, (_, i) => ({ date: `d${i}`, spot: 1.10 + i * 0.0001, rate_diff: 1.0, stress: 20 }));
+  assert.strictEqual(_fvRegress(rows), null);
+});
+test('_fvRegress: fewer than 4 usable rows → null', () => {
+  const rows = [{ spot: 1.1, rate_diff: 1, stress: 20 }, { spot: 1.11, rate_diff: 1.1, stress: 21 }];
+  assert.strictEqual(_fvRegress(rows), null);
+});
+test('_fvRegress: rows missing a required field are excluded from the usable set', () => {
+  // stress deliberately non-collinear with rate_diff/index (5, 12, 3, 18) so
+  // the remaining 4-row system isn't singular purely from this test's own setup.
+  const rows = [
+    { spot: 1.10, rate_diff: 1.0, stress: 5 },
+    { spot: 1.11, rate_diff: null, stress: 21 }, // excluded
+    { spot: 1.12, rate_diff: 1.2, stress: 12 },
+    { spot: 1.13, rate_diff: 1.3, stress: 3 },
+    { spot: 1.14, rate_diff: 1.4, stress: 18 },
+  ];
+  const reg = _fvRegress(rows);
+  assert.ok(reg, 'regression should succeed on the 4 remaining valid rows');
+  assert.strictEqual(reg.n, 4);
+});
+
+// ═══════════════════════════════════════════════════════════════════
 // Summary
 // ═══════════════════════════════════════════════════════════════════
 console.log(`\n${'─'.repeat(60)}`);
