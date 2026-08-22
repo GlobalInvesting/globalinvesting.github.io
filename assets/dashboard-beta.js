@@ -88,14 +88,16 @@ const PAIRS = [
   { id:'nzdchf', base:'NZD', quote:'CHF', cross:['NZD','CHF'], dec:5 },
 ];
 
-// ── FX Fair Value (v8.191.0, regression added v8.197.0) ───────────────────
+// ── FX Fair Value (v8.191.0, regression added v8.197.0, generalized to a
+// 5-variable BEER model v8.200.0) ──────────────────────────────────────────
 // Reads fair-value-data/{pair}.json (written daily by log_fair_value_inputs.py
 // in globalinvesting-scripts — see log-fair-value-inputs.yml). Each file is an
-// array of real {date, spot, rate_diff, stress} rows, oldest → newest, one per
-// day the workflow has run. No client-side estimation of missing days: below
-// FV_MIN_ROWS the panel shows an accumulation progress bar instead of a
-// z-score, per Santiago's explicit "don't fabricate regression history"
-// decision (2026-08-20) — see GUIDELINES.md § Data integrity.
+// array of real {date, spot, rate_diff, stress, ca_diff, tb_diff} rows,
+// oldest → newest, one per day the workflow has run. No client-side
+// estimation of missing days: below FV_MIN_ROWS the panel shows an
+// accumulation progress bar instead of a z-score, per Santiago's explicit
+// "don't fabricate regression history" decision (2026-08-20) — see
+// GUIDELINES.md § Data integrity.
 //
 // This file duplicates dashboard.js's PAIRS/renderFairValue/_fvRegress
 // (same "no shared-module pattern in this repo" reasoning documented
@@ -104,52 +106,59 @@ const PAIRS = [
 const FV_MIN_ROWS = 60;
 const FV_ROLLING_WINDOW = 60;
 
-// OLS regression: spot ~ intercept + b1*rate_diff + b2*stress — see
-// dashboard.js's _fvRegress()/_solve3x3() for the full explanatory comment.
+// Feature columns beyond the intercept — see dashboard.js's FV_FEATURE_KEYS
+// for the full explanation of ca_diff/tb_diff (GDP-normalized Current
+// Account / Trade Balance differentials, added v8.200.0).
+const FV_FEATURE_KEYS = ['rate_diff', 'stress', 'ca_diff', 'tb_diff'];
+
+// OLS regression: spot ~ intercept + Σ βᵢ·featureᵢ — see dashboard.js's
+// _fvRegress()/_solveLinearSystem() for the full explanatory comment.
 function _fvRegress(rows) {
-  const usable = rows.filter(r => r && r.spot != null && r.rate_diff != null && r.stress != null);
-  if (usable.length < 4) return null;
+  const usable = rows.filter(r => r && r.spot != null && FV_FEATURE_KEYS.every(k => r[k] != null));
+  const k = FV_FEATURE_KEYS.length + 1; // +1 for the intercept
+  if (usable.length < k * 2) return null;
 
   const n = usable.length;
-  let Sxx = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-  let Sxy = [0, 0, 0];
+  let Sxx = Array.from({ length: k }, () => new Array(k).fill(0));
+  let Sxy = new Array(k).fill(0);
   usable.forEach(r => {
-    const x = [1, r.rate_diff, r.stress];
-    for (let i = 0; i < 3; i++) {
+    const x = [1, ...FV_FEATURE_KEYS.map(key => r[key])];
+    for (let i = 0; i < k; i++) {
       Sxy[i] += x[i] * r.spot;
-      for (let j = 0; j < 3; j++) Sxx[i][j] += x[i] * x[j];
+      for (let j = 0; j < k; j++) Sxx[i][j] += x[i] * x[j];
     }
   });
 
-  const beta = _solve3x3(Sxx, Sxy);
+  const beta = _solveLinearSystem(Sxx, Sxy);
   if (!beta) return null;
 
-  const fitted = usable.map(r => beta[0] + beta[1] * r.rate_diff + beta[2] * r.stress);
+  const fitted = usable.map(r => beta[0] + FV_FEATURE_KEYS.reduce((s, key, i) => s + beta[i + 1] * r[key], 0));
   const residuals = usable.map((r, i) => r.spot - fitted[i]);
   const residMean = residuals.reduce((a, b) => a + b, 0) / n;
-  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / (n - 3);
+  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / (n - k);
   const residStd = residVar > 0 ? Math.sqrt(residVar) : 0;
 
   return { beta, n, residStd, usable };
 }
 
-function _solve3x3(A, b) {
+function _solveLinearSystem(A, b) {
+  const k = A.length;
   const M = A.map((row, i) => [...row, b[i]]);
   const EPS = 1e-9;
-  for (let col = 0; col < 3; col++) {
+  for (let col = 0; col < k; col++) {
     let pivot = col;
-    for (let r = col + 1; r < 3; r++) {
+    for (let r = col + 1; r < k; r++) {
       if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot = r;
     }
     if (Math.abs(M[pivot][col]) < EPS) return null;
     [M[col], M[pivot]] = [M[pivot], M[col]];
-    for (let r = 0; r < 3; r++) {
+    for (let r = 0; r < k; r++) {
       if (r === col) continue;
       const factor = M[r][col] / M[col][col];
-      for (let c = col; c < 4; c++) M[r][c] -= factor * M[col][c];
+      for (let c = col; c < k + 1; c++) M[r][c] -= factor * M[col][c];
     }
   }
-  return [M[0][3] / M[0][0], M[1][3] / M[1][1], M[2][3] / M[2][2]];
+  return M.map((row, i) => row[k] / row[i]);
 }
 
 async function renderFairValue() {
@@ -200,8 +209,9 @@ async function renderFairValue() {
     if (rows.length >= FV_MIN_ROWS) {
       const windowRows = rows.slice(-FV_ROLLING_WINDOW);
       const reg = _fvRegress(windowRows);
-      if (reg && reg.residStd > 0 && last.rate_diff != null && last.stress != null) {
-        const fairValue = reg.beta[0] + reg.beta[1] * last.rate_diff + reg.beta[2] * last.stress;
+      const lastHasAllFeatures = FV_FEATURE_KEYS.every(k => last[k] != null);
+      if (reg && reg.residStd > 0 && lastHasAllFeatures) {
+        const fairValue = reg.beta[0] + FV_FEATURE_KEYS.reduce((s, k, i) => s + reg.beta[i + 1] * last[k], 0);
         const z = (last.spot - fairValue) / reg.residStd;
         fvTxt = fairValue.toFixed(pair.dec);
         zTxt = (z >= 0 ? '+' : '') + z.toFixed(2) + '\u03c3';
@@ -16835,6 +16845,18 @@ window.addEventListener('gi-theme-change', function() {
 
   const _SZN_MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+  // v8.200.0: below each month label, show that month's own average
+  // cumulative move (end-of-month cum_pct minus start-of-month cum_pct,
+  // from the SAME additive day-of-year curve already fetched — no new
+  // backend field, no new request). This is deliberately descriptive-only
+  // (no win_rate, no p-value, no MIN_YEARS gate) — it does NOT feed or
+  // relax the windows table's t-test significance gate above; the two are
+  // independent, same "descriptive month-average alongside a stricter
+  // significance-gated table" pattern used by reference tools like
+  // EquityClock, just rendered as a compact strip instead of a second full
+  // table (Santiago: a second table would take too much vertical space —
+  // 2026-08-22 session). Colored red/green by sign so the density reads at
+  // a glance without needing to parse numbers.
   function _sznRenderMonthLabels(curve) {
     const row = document.getElementById('szn-months');
     if (!row) return;
@@ -16853,7 +16875,15 @@ window.addEventListener('gi-theme-change', function() {
     row.innerHTML = monthStarts.map((m, i) => {
       const nextIdx = (i + 1 < monthStarts.length) ? monthStarts[i + 1].idx : curve.length;
       const span = nextIdx - m.idx; // days in this month, from the actual curve
-      return `<span style="flex:${span} 0 0;text-align:center;">${_SZN_MONTH_LABELS[m.month - 1]}</span>`;
+      const startPct = curve[m.idx].cum_pct;
+      const endPct = (nextIdx < curve.length) ? curve[nextIdx].cum_pct : curve[curve.length - 1].cum_pct;
+      const monthPct = endPct - startPct;
+      const color = Math.abs(monthPct) < 0.05 ? 'var(--text3)' : (monthPct > 0 ? 'var(--up)' : 'var(--down)');
+      const valTxt = (monthPct >= 0 ? '+' : '') + monthPct.toFixed(1) + '%';
+      return `<span style="flex:${span} 0 0;text-align:center;display:flex;flex-direction:column;line-height:1.3;">
+        <span>${_SZN_MONTH_LABELS[m.month - 1]}</span>
+        <span style="font-size:8px;color:${color};" title="Descriptive average net move in ${_SZN_MONTH_LABELS[m.month - 1]} across the full lookback \u2014 not significance-tested, unlike the windows table above.">${valTxt}</span>
+      </span>`;
     }).join('');
   }
 
@@ -17183,33 +17213,30 @@ function _dsmileRenderSVG(el, regimes, stats, currentRegime) {
     </svg>`;
 }
 
+// v8.200.0: this insight was a 3-4 sentence paragraph that pushed the
+// panel's vertical footprint well past the chart above it (Santiago
+// feedback, 2026-08-22) — compacted to one line, with the full
+// methodology/caveat text moved to a hover tooltip (title attribute) on
+// the same element rather than dropped, so the disclosure the v2.0
+// industry-standard audit added is still one hover away, not deleted.
 function _dsmileRenderInsight(el, regimes, stats, currentRegime, totalRows) {
   if (!el) return;
   const readyCount = regimes.filter(r => stats[r].ready).length;
   const cur = stats[currentRegime];
   const curTxt = cur && cur.avg !== null
     ? `${cur.avg >= 0 ? '+' : ''}${cur.avg.toFixed(2)}% avg (n=${cur.n})`
-    : `accumulating \u2014 ${cur ? cur.n : 0}/${10} days logged`;
+    : `accumulating \u2014 ${cur ? cur.n : 0}/10d`;
 
-  // v2.0 (2026-08-21 industry-standard audit): Stephen Jen's original Dollar
-  // Smile thesis is anchored on relative growth differentials (US vs. rest-
-  // of-world economic outperformance), not a market-stress classifier. Our
-  // RISK-ON/RISK-OFF regime label is a VIX/MOVE/gold/SPX/AUDJPY/USDJPY/HY-OAS
-  // stress proxy, which can diverge from Jen's framework (e.g. a synchronized
-  // global growth upswing can show as "RISK-ON" here with no US growth
-  // outperformance behind it, a case the original thesis would not predict
-  // dollar strength for). This was previously only documented in code
-  // comments, not disclosed in the UI itself \u2014 now stated explicitly below
-  // so the block reads as a labeled proxy, not a direct implementation.
+  // Full methodology/proxy-caveat text — unchanged content from v2.0, now
+  // living in the title tooltip instead of always-visible body text.
   const proxyCaveat = 'Uses a market-stress regime proxy (VIX/MOVE/gold/SPX/AUDJPY/USDJPY/HY-OAS), not Stephen Jen\u2019s original growth-differential framework \u2014 the two can disagree, e.g. in a globally-synchronized growth upswing with no US outperformance.';
+  const fullTitle = readyCount === regimes.length
+    ? `Historically DXY tends toward a positive average daily return at both risk-cycle extremes (RISK-OFF and RISK-ON) and weaker in the intermediate regimes \u2014 the classic "smile" pattern. Sample accumulated since the regime classifier went into production (${totalRows} day${totalRows === 1 ? '' : 's'} logged); not a long-run backtest. ${proxyCaveat}`
+    : `Still accumulating history \u2014 ${readyCount} of ${regimes.length} regime buckets have enough logged days (10+) to show a real average; the rest need more days at that regime before the smile curve is meaningful. Logged once daily, starting from when this feature shipped \u2014 not a backtest. ${proxyCaveat}`;
 
-  let body;
-  if (readyCount === regimes.length) {
-    body = `Current regime: <span style="color:var(--up);">${currentRegime}</span> (${curTxt}). Historically DXY tends toward a positive average daily return at both risk-cycle extremes (RISK-OFF and RISK-ON) and weaker in the intermediate regimes \u2014 the classic "smile" pattern. Sample accumulated since the regime classifier went into production (${totalRows} day${totalRows === 1 ? '' : 's'} logged); not a long-run backtest. ${proxyCaveat}`;
-  } else {
-    body = `Current regime: <span style="color:var(--up);">${currentRegime}</span> (${curTxt}). Still accumulating history \u2014 ${readyCount} of ${regimes.length} regime buckets have enough logged days (10+) to show a real average; the rest need more days at that regime before the smile curve is meaningful. Logged once daily, starting from when this feature shipped \u2014 not a backtest. ${proxyCaveat}`;
-  }
-  el.innerHTML = body;
+  const shortStatus = readyCount === regimes.length ? 'smile curve ready' : `accumulating \u2014 ${readyCount}/${regimes.length} buckets ready`;
+  el.innerHTML = `Current regime: <span style="color:var(--up);">${currentRegime}</span> (${curTxt}) \u00b7 ${shortStatus}`;
+  el.title = fullTitle;
 }
 
 // ═══════════════════════════════════════════════════════════════════
