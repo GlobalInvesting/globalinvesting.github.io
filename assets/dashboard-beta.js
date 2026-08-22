@@ -11304,6 +11304,7 @@ async function boot() {
   fetchCommodityQuotes();
   renderFairValue();
   renderDollarSmile(); // beta — see dollar-smile-data/history.json + log_dollar_smile_inputs.py
+  renderGrowthDifferential(); // beta v2 — see growth-differential-data/history.json + fetch_growth_differential.py
   // AI narrative full build (non-blocking, fills narrative text).
   // Chain a post-resolve scroll reset: injecting the full narrative text expands
   // #narrative's height, which can cause the browser to scroll #main down to
@@ -16893,7 +16894,20 @@ window.addEventListener('gi-theme-change', function() {
     }
     const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const dirWord = top.dir === 'Short' ? 'weakness' : 'strength';
-    insight.textContent = `${label} showed ${dirWord} between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} across the last ${top.n_years} years (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, p=${top.p_value}; held in ${top.win_rate}% of qualifying years). Not a predictive signal \u2014 a historical statistical tendency, and ${data.years}y of history is well short of the 15-25y sample size seasonality research typically recommends. Windows above use monthly granularity; the chart uses day-of-year granularity.`;
+    // Sample-size caveat is conditional on the pair's REAL data.years (not
+    // assumed) \u2014 fetch_ohlc.py v1.15 widened PERIOD 10y->20y specifically
+    // to close this gap, but real yfinance/CFD depth still varies per pair,
+    // so this must keep reading the live value rather than asserting a fixed
+    // "well short" claim now that some pairs can clear 15y+.
+    let sampleNote;
+    if (data.years < 15) {
+      sampleNote = `${data.years}y of history is well short of the 15-25y sample size seasonality research typically recommends`;
+    } else if (data.years <= 25) {
+      sampleNote = `${data.years}y of history is within the 15-25y sample size seasonality research typically recommends`;
+    } else {
+      sampleNote = `${data.years}y of history exceeds the 15-25y sample size seasonality research typically recommends`;
+    }
+    insight.textContent = `${label} showed ${dirWord} between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} across the last ${top.n_years} years (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, p=${top.p_value}; held in ${top.win_rate}% of qualifying years). Not a predictive signal \u2014 a historical statistical tendency, and ${sampleNote}. Windows above use monthly granularity; the chart uses day-of-year granularity.`;
   }
 
   async function _sznLoad(pair) {
@@ -17196,4 +17210,68 @@ function _dsmileRenderInsight(el, regimes, stats, currentRegime, totalRows) {
     body = `Current regime: <span style="color:var(--up);">${currentRegime}</span> (${curTxt}). Still accumulating history \u2014 ${readyCount} of ${regimes.length} regime buckets have enough logged days (10+) to show a real average; the rest need more days at that regime before the smile curve is meaningful. Logged once daily, starting from when this feature shipped \u2014 not a backtest. ${proxyCaveat}`;
   }
   el.innerHTML = body;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// GROWTH-REGIME AXIS (v2) — Stephen Jen's ORIGINAL Dollar Smile axis:
+// USD real GDP YoY vs. the equal-weighted rest of the G10, not the
+// market-stress proxy the block above uses. Data: growth-differential-
+// data/history.json, fully rebuilt each run by fetch_growth_differential.py
+// (idempotent full recompute, not a daily append — GDP data revises; see
+// that script's header for why this differs from the Dollar Smile/Fair
+// Value accumulation pattern). Quarterly cadence — every quarter in the
+// backfilled history already has a real value, so there is no
+// "accumulating" state here the way the daily stress axis needs one.
+// ═══════════════════════════════════════════════════════════════════
+async function renderGrowthDifferential() {
+  const tbody = document.getElementById('growthdiff-tbody');
+  const insightEl = document.getElementById('growthdiff-insight');
+  const currentEl = document.getElementById('growthdiff-current');
+  if (!tbody) return; // beta-only element, not present outside index-beta.html
+
+  let doc;
+  try {
+    const res = await fetch('./growth-differential-data/history.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    doc = await res.json();
+    if (!doc || !Array.isArray(doc.quarters) || !doc.quarters.length) throw new Error('malformed history.json');
+  } catch (e) {
+    if (insightEl) insightEl.textContent = 'Growth differential data unavailable right now \u2014 fetch_growth_differential.py may not have run yet.';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="padding:4px;color:var(--text3);">No data yet.</td></tr>';
+    if (currentEl) currentEl.textContent = '';
+    return;
+  }
+
+  const REGIMES = ['USD-OUTPERFORMING', 'INLINE', 'USD-UNDERPERFORMING'];
+  const cur = doc.current;
+  const stats = doc.regime_stats || {};
+
+  if (currentEl && cur) {
+    const diffTxt = `${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp`;
+    currentEl.textContent = `${cur.quarter}: ${cur.regime} (${diffTxt})`;
+  }
+
+  tbody.innerHTML = REGIMES.map(r => {
+    const s = stats[r] || { n: 0, avg_dxy_qret: null, n_dxy: 0 };
+    const isCurrent = cur && cur.regime === r;
+    const avgTxt = s.avg_dxy_qret === null
+      ? `\u2014 (n=${s.n_dxy || 0})`
+      : `${s.avg_dxy_qret >= 0 ? '+' : ''}${s.avg_dxy_qret.toFixed(2)}% (n=${s.n_dxy})`;
+    const rowStyle = isCurrent ? ` style="color:var(--up);"` : '';
+    return `<tr${rowStyle}><td style="padding:2px 4px;">${r}${isCurrent ? ' \u25cf' : ''}</td>` +
+           `<td style="padding:2px 4px;">${s.n}</td>` +
+           `<td style="padding:2px 4px;">${avgTxt}</td></tr>`;
+  }).join('');
+
+  if (insightEl) {
+    const totalQ = doc.quarters.length;
+    const first = doc.quarters[0].quarter, last = doc.quarters[doc.quarters.length - 1].quarter;
+    const curTxt = cur
+      ? `USD ${cur.usd_yoy >= 0 ? '+' : ''}${cur.usd_yoy.toFixed(1)}% YoY vs. G9 avg ${cur.g9_avg_yoy >= 0 ? '+' : ''}${cur.g9_avg_yoy.toFixed(1)}% YoY (diff ${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp)`
+      : 'no current reading';
+    insightEl.innerHTML = `Latest quarter (${cur ? cur.quarter : '\u2014'}): ${curTxt} \u2014 <span style="color:var(--up);">${cur ? cur.regime : ''}</span>. ` +
+      `Real GDP YoY, ${totalQ} quarters (${first} \u2192 ${last}), all 10 G10 currencies from FRED \u2014 not a market-stress proxy like the smile above. ` +
+      `G9 comparison is equal-weighted, not BIS-turnover-weighted \u2014 a simplification, same spirit as the Fair Value panel's disclosed simplified-BEER caveat. ` +
+      `Real GDP prints ~1 quarter after quarter-end, so a live regime reading lags by construction \u2014 this shows what DXY did in the SAME quarter as the growth reading, a historical tendency, not a lagged trading signal.`;
+  }
 }
