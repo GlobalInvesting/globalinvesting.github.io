@@ -16362,6 +16362,21 @@ function _lwOpenFullscreen() {
       // there's no single frame at the old (pre-fullscreen) canvas size.
       if (w > 0 && h > 0) { _lwChart.resize(w, h, true); _lwReapplyPaneHeights(); _lwReprojectDrawings(); }
     }
+    // v8.222.0 — #szn-panel joined this DOM-lift in v8.221.0 (fixing the
+    // panel being invisible), but its own LWC chart instance (#szn-chart,
+    // a separate chart from _lwChart) was never told to re-measure. LWC
+    // sizes a chart's canvas once at createChart() time and does not
+    // auto-track its container's width on a plain DOM move/resize — so
+    // #szn-chart kept painting at its old, narrow docked-panel pixel
+    // width inside the much wider fullscreen overlay, reading as a small
+    // chart stranded in the top-left with empty space around it (the grid
+    // row below it, #szn-months, uses percentage/fr-based CSS sizing so
+    // it already reflows correctly with no JS call needed — only the
+    // canvas-based chart itself required this). window._sznResizeChart()
+    // already exists for exactly this class of problem (same helper the
+    // window 'resize' listener and the Chart/Monthly Avg tab switch both
+    // use) — just was never wired into this DOM-lift path.
+    if (typeof window._sznResizeChart === 'function') window._sznResizeChart();
   }));
 }
 
@@ -16414,6 +16429,12 @@ function _lwCloseFullscreen() {
       // _lwReapplyPaneHeights() above for detail.
       if (w > 0 && h > 0) { _lwChart.resize(w, h, true); _lwReapplyPaneHeights(); _lwReprojectDrawings(); }
     }
+    // v8.222.0 — mirror of the open-side fix above: #szn-chart's canvas
+    // needs the same explicit re-measure coming back down from fullscreen
+    // width to the docked panel width, or it stays stuck at the wide
+    // fullscreen pixel size (clipped/overflowing) if the panel was open
+    // when the user exited fullscreen.
+    if (typeof window._sznResizeChart === 'function') window._sznResizeChart();
   }));
 
   _lwFsOriginalParent = null;
