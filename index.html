@@ -1693,12 +1693,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
-    <!-- FX FAIR VALUE (v8.191.0) — rate-differential + risk-sentiment model,
-         rolling 60D regression once fair-value-data/{pair}.json has enough
-         daily history (log-fair-value-inputs.yml, globalinvesting-scripts).
-         Until then, shows today's real inputs + an accumulation progress
-         bar rather than a fabricated z-score — see GUIDELINES.md
-         "No fabricated regression history" and dashboard.js renderFairValue(). -->
+    <!-- FX FAIR VALUE (v8.191.0 logger; regression added v8.197.0) — a
+         lightweight BEER-style (Behavioral Equilibrium Exchange Rate) model:
+         spot regressed on rate differential + risk-sentiment score, rolling
+         60D window, once fair-value-data/{pair}.json has enough daily
+         history (log-fair-value-inputs.yml, globalinvesting-scripts). Until
+         a pair clears FV_MIN_ROWS, it shows today's real inputs + an
+         accumulation progress bar rather than a fabricated z-score — see
+         GUIDELINES.md "No fabricated regression history" and
+         dashboard.js's _fvRegress()/renderFairValue(). -->
     <div id="section-fair-value" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);">
       <div class="panel-head">
         <span class="panel-title">FX Fair Value</span>
@@ -1712,20 +1715,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="margin-top:8px;color:var(--text3);">Today's inputs are logged and real (not simulated); the z-score/fair-value estimate appears once the rolling window has enough daily observations to regress against.</div>
       </div>
       <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:280px;overflow-y:auto;">
-        <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, and risk-sentiment inputs for 32 tracked pairs">
+        <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, risk-sentiment inputs, regression fair value, and z-score deviation for 32 tracked pairs">
           <thead>
             <tr>
               <th scope="col" style="text-align:left;">Pair</th>
               <th scope="col">Spot</th>
               <th scope="col" title="Base 10Y yield minus quote 10Y yield, from extended-data/{CCY}.json">Rate Diff</th>
               <th scope="col" title="Cross-Asset Risk composite score for that day (same formula as the Regime badge)">Risk Score</th>
+              <th scope="col" title="Regression estimate: spot as predicted by today's rate differential + risk score, fit on the trailing 60D window">Fair Value</th>
+              <th scope="col" title="How many residual standard deviations spot sits from the regression fair value over the trailing window — not a trade signal, a statistical deviation measure">Z-score</th>
               <th scope="col">History</th>
             </tr>
           </thead>
           <tbody id="fv-tbody"></tbody>
         </table>
       </div>
-      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">not investment advice</div>
+      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">Simplified BEER-style model (rate differential + risk score only — not the full set of variables an academic BEER model uses, e.g. terms of trade, NFA, productivity differentials) · statistical deviation, not investment advice</div>
     </div>
 
     <!-- ALERTS & MARKET SIGNALS (AI-powered from ai-analysis/signals.json) -->
@@ -2301,7 +2306,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.191.0" defer></script>
+<script src="assets/dashboard.js?v=8.197.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL

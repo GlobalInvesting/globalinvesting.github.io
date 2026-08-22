@@ -1268,9 +1268,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <div id="szn-months" style="display:flex;gap:1px;font-size:8.5px;color:var(--text3);margin:2px 0 10px;"></div>
           </div>
           <div id="szn-windows-section" style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
-            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Strongest recurring windows (monthly)</div>
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Statistically significant recurring windows (monthly, p&lt;0.05, non-overlapping)</div>
             <table id="szn-windows-table" style="width:100%;border-collapse:collapse;font-size:10.5px;">
-              <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;">Win rate</td><td style="text-align:right;">Avg ret</td><td style="text-align:right;">Sharpe</td></tr></thead>
+              <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;" title="Average return divided by its standard deviation across qualifying years">Avg ret ± Std dev</td><td style="text-align:right;" title="Win rate is shown for context only — it is not the significance test used to select this window">Win rate</td><td style="text-align:right;" title="One-sample t-test p-value, H0: true mean window return is zero">p-value</td></tr></thead>
               <tbody id="szn-windows-tbody"></tbody>
             </table>
           </div>
@@ -1762,11 +1762,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <!-- FX FAIR VALUE (v8.191.0) — rate-differential + risk-sentiment model,
-         rolling 60D regression once fair-value-data/{pair}.json has enough
-         daily history (log-fair-value-inputs.yml, globalinvesting-scripts).
+         rolling 60D regression (added v8.197.0) once fair-value-data/{pair}.json
+         has enough daily history (log-fair-value-inputs.yml, globalinvesting-scripts).
          Until then, shows today's real inputs + an accumulation progress
          bar rather than a fabricated z-score — see GUIDELINES.md
-         "No fabricated regression history" and dashboard.js renderFairValue(). -->
+         "No fabricated regression history" and dashboard-beta.js's
+         _fvRegress()/renderFairValue(). -->
     <div id="section-fair-value" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);">
       <div class="panel-head">
         <span class="panel-title">FX Fair Value</span>
@@ -1780,20 +1781,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="margin-top:8px;color:var(--text3);">Today's inputs are logged and real (not simulated); the z-score/fair-value estimate appears once the rolling window has enough daily observations to regress against.</div>
       </div>
       <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:280px;overflow-y:auto;">
-        <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, and risk-sentiment inputs for 32 tracked pairs">
+        <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, risk-sentiment inputs, regression fair value, and z-score deviation for 32 tracked pairs">
           <thead>
             <tr>
               <th scope="col" style="text-align:left;">Pair</th>
               <th scope="col">Spot</th>
               <th scope="col" title="Base 10Y yield minus quote 10Y yield, from extended-data/{CCY}.json">Rate Diff</th>
               <th scope="col" title="Cross-Asset Risk composite score for that day (same formula as the Regime badge)">Risk Score</th>
+              <th scope="col" title="Regression estimate: spot as predicted by today's rate differential + risk score, fit on the trailing 60D window">Fair Value</th>
+              <th scope="col" title="How many residual standard deviations spot sits from the regression fair value over the trailing window — not a trade signal, a statistical deviation measure">Z-score</th>
               <th scope="col">History</th>
             </tr>
           </thead>
           <tbody id="fv-tbody"></tbody>
         </table>
       </div>
-      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">not investment advice</div>
+      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">Simplified BEER-style model (rate differential + risk score only — not the full set of variables an academic BEER model uses, e.g. terms of trade, NFA, productivity differentials) · statistical deviation, not investment advice</div>
     </div>
 
     <!-- ALERTS & MARKET SIGNALS (AI-powered from ai-analysis/signals.json) -->
@@ -2369,7 +2372,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.196.1" defer></script>
+<script src="assets/dashboard-beta.js?v=8.197.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
