@@ -16256,6 +16256,20 @@ function _lwReprojectDrawings() {
   if (typeof window._lwRenderDrawings === 'function') window._lwRenderDrawings();
 }
 
+// Shared re-measure step for any change that alters #tv-chart-wrap's
+// available height/width WITHOUT firing a window 'resize' event — a
+// DOM-lift (fullscreen open/close) is one case, already handled inline in
+// _lwOpenFullscreen()/_lwCloseFullscreen(); toggling a sibling panel
+// (Seasonality) that shares the same flex column is another, added here
+// specifically so _sznToggle() can call one shared, tested code path
+// instead of a third inline copy of the same three-call sequence.
+window._lwResizeAfterLayoutChange = function () {
+  const chartWrap = document.getElementById('tv-chart-wrap');
+  if (!_lwChart || !chartWrap) return;
+  const w = chartWrap.offsetWidth, h = chartWrap.offsetHeight;
+  if (w > 0 && h > 0) { _lwChart.resize(w, h, true); _lwReapplyPaneHeights(); _lwReprojectDrawings(); }
+};
+
 function _lwOpenFullscreen() {
   const overlay   = document.getElementById('lw-fullscreen-overlay');
   const inner     = document.getElementById('lw-fullscreen-inner');
@@ -16386,7 +16400,16 @@ function _lwFsPopulateTabs() {
     fsTabs.appendChild(btn);
   });
 
-  // Wire ‹ › scroll buttons (same logic as tv-tabs-prev/next in main toolbar)
+  // Wire ‹ › scroll buttons (same logic as tv-tabs-prev/next in main toolbar).
+  // Hardened to match the lw-tb-row1/row2 pattern: a single setTimeout(50)
+  // measures scrollWidth/clientWidth once, right after this function rebuilds
+  // fsTabs' innerHTML from scratch every open — if that measurement lands
+  // before the fullscreen overlay's display:none -> flex transition has
+  // actually reflowed (36 buttons, real layout work, on a slower device/
+  // frame), clientWidth can read as its old (or 0) value and the arrows
+  // never show even though real overflow exists — same class of bug already
+  // fixed for Row 2 (async width changes needing more than one measurement
+  // point). Also now re-checks on window resize, which it never did before.
   if (fsOuter) {
     const prevBtn = fsOuter.querySelector('#lw-fs-tabs-prev');
     const nextBtn = fsOuter.querySelector('#lw-fs-tabs-next');
@@ -16398,7 +16421,8 @@ function _lwFsPopulateTabs() {
     if (prevBtn) prevBtn.onclick = () => { fsTabs.scrollBy({ left: -160, behavior: 'smooth' }); setTimeout(updateArrows, 320); };
     if (nextBtn) nextBtn.onclick = () => { fsTabs.scrollBy({ left:  160, behavior: 'smooth' }); setTimeout(updateArrows, 320); };
     fsTabs.addEventListener('scroll', updateArrows, { passive: true });
-    setTimeout(updateArrows, 50);
+    window.addEventListener('resize', updateArrows);
+    [0, 50, 200, 800].forEach(ms => setTimeout(updateArrows, ms));
   }
 }
 
@@ -17035,6 +17059,22 @@ window.addEventListener('gi-theme-change', function() {
     if (btn) btn.setAttribute('aria-expanded', String(_sznOpen));
     if (btn) btn.classList.toggle('on', _sznOpen);
     if (_sznOpen) _sznLoad(window._sznActiveOhlcId);
+    // Toggling this panel adds/removes a whole block of vertical space
+    // above the price chart (#tv-chart-wrap has flex:1 inside the fullscreen
+    // overlay's #lw-fullscreen-inner, so its CSS box does shrink/grow
+    // correctly) — but the LWC canvas itself was drawn at the OLD pixel
+    // height and never gets told to repaint at the new one, since neither
+    // display:block/none nor a flex-basis change fires a 'resize' event.
+    // Symptom Santiago saw: opening Seasonality inside the fullscreen chart
+    // overlay left the price chart candles rendered at their pre-toggle
+    // (taller) height, now overflowing/clipped by the shrunk container —
+    // reading as "the chart got cut in half", including its time axis at
+    // the bottom. Same forceRepaint:true + pane/drawing re-sync already
+    // used by _lwOpenFullscreen()/_lwCloseFullscreen() after their own
+    // DOM-lift resizes.
+    if (typeof window._lwResizeAfterLayoutChange === 'function') {
+      requestAnimationFrame(() => requestAnimationFrame(window._lwResizeAfterLayoutChange));
+    }
   }
 
   // Exposed so _renderLWChart's single call site can notify us of symbol
@@ -17119,6 +17159,51 @@ window.addEventListener('gi-theme-change', function() {
   }
   // Belt-and-suspenders for browsers/timing where neither observer fires
   // in time (e.g. font swap changing button widths after paint).
+  [0, 200, 800, 2000].forEach(ms => setTimeout(updateArrows, ms));
+
+  btnPrev.addEventListener('click', () => row.scrollBy({ left: -160, behavior: 'smooth' }));
+  btnNext.addEventListener('click', () => row.scrollBy({ left: 160, behavior: 'smooth' }));
+})();
+
+// ── Row 1 toolbar scroll arrows (beta) — same gap as Row 2 had before its
+//    own fix: overflow-x:auto with zero affordance that it can scroll.
+//    Row 1 (TF/Range/+Compare/Fullscreen) is the one Santiago flagged —
+//    it's also the row that gets lifted (via #lw-range-bar) into the
+//    fullscreen chart overlay, where the narrower available width made
+//    +Compare/Fullscreen silently scroll out of reach. Identical
+//    prev/next pattern to the Row 2 IIFE directly above. ──────────────
+(function () {
+  const row = document.getElementById('lw-tb-row1');
+  const btnPrev = document.getElementById('lw-tb-row1-prev');
+  const btnNext = document.getElementById('lw-tb-row1-next');
+  if (!row || !btnPrev || !btnNext) return;
+
+  row.addEventListener('wheel', function (e) {
+    if (e.deltaY === 0) return;
+    e.preventDefault();
+    row.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  function updateArrows() {
+    const atStart = row.scrollLeft <= 2;
+    const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
+    btnPrev.style.display = atStart ? 'none' : 'flex';
+    btnNext.style.display = atEnd ? 'none' : 'flex';
+  }
+  row.addEventListener('scroll', updateArrows, { passive: true });
+  window.addEventListener('resize', updateArrows);
+
+  // Same reasoning as Row 2's own comment: content here doesn't change
+  // asynchronously the way indicator pills do, but the row's available
+  // width DOES change the moment fullscreen opens/closes (DOM-lift into
+  // #lw-fullscreen-inner) — a ResizeObserver catches that without needing
+  // this IIFE to know anything about _lwOpenFullscreen().
+  const mo = new MutationObserver(() => updateArrows());
+  mo.observe(row, { childList: true, subtree: true, characterData: true });
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => updateArrows());
+    ro.observe(row);
+  }
   [0, 200, 800, 2000].forEach(ms => setTimeout(updateArrows, ms));
 
   btnPrev.addEventListener('click', () => row.scrollBy({ left: -160, behavior: 'smooth' }));
@@ -17220,7 +17305,18 @@ async function renderDollarSmile() {
   _growthdiffRenderTable(tbody, rawStats, cur);
 }
 
-function _dsmileRenderSVG(el, regimes, stats, currentRegime) {
+// fmtOpts lets callers override how point-label values are displayed
+// without touching the curve's actual plotting math (yFor()/maxAbs still
+// operate on the raw stats[r].avg value in its native unit regardless).
+// Needed because this renderer is shared by the Growth tab (quarterly GDP
+// differences, ~0.3-0.5%, where 2-decimal % reads fine) and the Stress
+// tab (daily DXY returns, ~0.0008-0.0166%) — at the Growth tab's default
+// 2-decimal % precision, two of Stress's three buckets rounded to a flat
+// "+0.00%", silently erasing the real (rising-with-VIX) signal the whole
+// tab exists to show. Stress now calls this with mult:100/unit:'bps',
+// the unit a desk would actually use for return differences this small.
+function _dsmileRenderSVG(el, regimes, stats, currentRegime, fmtOpts) {
+  const fmt = Object.assign({ decimals: 2, mult: 1, unit: '%' }, fmtOpts || {});
   // Layout: fixed bands so the value labels can never collide with the
   // regime-name row, regardless of how extreme an average is. curveTop/
   // curveBottom bound where a point may ever be plotted; rowLabelY
@@ -17260,7 +17356,8 @@ function _dsmileRenderSVG(el, regimes, stats, currentRegime) {
 
   const labels = pts.map(p => {
     const ready = stats[p.r].ready;
-    const valTxt = ready ? `${stats[p.r].avg >= 0 ? '+' : ''}${stats[p.r].avg.toFixed(2)}%` : `n=${stats[p.r].n}`;
+    const dispVal = ready ? stats[p.r].avg * fmt.mult : null;
+    const valTxt = ready ? `${dispVal >= 0 ? '+' : ''}${dispVal.toFixed(fmt.decimals)}${fmt.unit}` : `n=${stats[p.r].n}`;
     const valColor = !ready ? text3 : (p.isCurrent ? up : text3);
     const currentTag = p.isCurrent ? ' \u25cf latest' : '';
     const rowLabel = _GROWTHDIFF_LABELS[p.r] || p.r;
@@ -17428,7 +17525,7 @@ async function renderDollarSmileStress() {
   const currentVix = vixBars[vixBars.length - 1];
   const currentRegimeKey = currentVix && currentVix.close != null ? _dsmileStressRegimeFor(currentVix.close) : null;
 
-  _dsmileRenderSVG(chartEl, _DSMILE_STRESS_REGIMES, stats, currentRegimeKey);
+  _dsmileRenderSVG(chartEl, _DSMILE_STRESS_REGIMES, stats, currentRegimeKey, { decimals: 2, mult: 100, unit: 'bps' });
 
   if (insightEl) {
     const totalDays = _DSMILE_STRESS_REGIMES.reduce((s, r) => s + stats[r].n, 0);
@@ -17441,7 +17538,12 @@ async function renderDollarSmileStress() {
     tbody.innerHTML = _DSMILE_STRESS_REGIMES.map(r => {
       const s = stats[r];
       const isCurrent = r === currentRegimeKey;
-      const avgTxt = s.avg === null ? `\u2014 (n=${s.n})` : `${s.avg >= 0 ? '+' : ''}${s.avg.toFixed(3)}% (n=${s.n})`;
+      // Same unit fix as the chart above (bps, not %) — 3-decimal % here
+      // technically had the real precision, but "+0.001%" reads as
+      // effectively zero at a glance; bps is the unit a desk would use
+      // for daily return differences this small.
+      const avgBps = s.avg === null ? null : s.avg * 100;
+      const avgTxt = avgBps === null ? `\u2014 (n=${s.n})` : `${avgBps >= 0 ? '+' : ''}${avgBps.toFixed(2)}bps (n=${s.n})`;
       const rowStyle = isCurrent ? ` style="color:var(--up);"` : '';
       return `<tr${rowStyle}><td style="padding:2px 4px;">${r}${isCurrent ? ' \u25cf' : ''}</td>` +
              `<td style="padding:2px 4px;">${s.n}</td>` +
