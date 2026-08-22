@@ -16824,12 +16824,16 @@ window.addEventListener('gi-theme-change', function() {
     const title = document.getElementById('szn-title');
     const tbody = document.getElementById('szn-windows-tbody');
     const monthsRow = document.getElementById('szn-months');
+    const chartSection = document.getElementById('szn-chart-section');
+    const windowsSection = document.getElementById('szn-windows-section');
 
     if (!pair || !SZN_PAIRS.has(pair)) {
       if (title) title.textContent = 'Daily \u00b7 10y lookback';
       if (insight) insight.textContent = 'Seasonality isn\u2019t available for this symbol \u2014 select an FX pair, metal, index, or other supported instrument on the Price Chart above.';
       if (tbody) tbody.innerHTML = '';
       if (monthsRow) monthsRow.innerHTML = '';
+      if (chartSection) chartSection.style.display = 'none';
+      if (windowsSection) windowsSection.style.display = 'none';
       _sznDestroyChart();
       _sznLoadedPair = null;
       return;
@@ -16838,6 +16842,10 @@ window.addEventListener('gi-theme-change', function() {
 
     if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Daily \u00b7 10y lookback`;
     if (insight) insight.textContent = 'Loading seasonality data\u2026';
+    // Reset to visible before the fetch — a prior pair may have hit the
+    // catch branch below and hidden these; this pair might succeed.
+    if (chartSection) chartSection.style.display = '';
+    if (windowsSection) windowsSection.style.display = '';
 
     try {
       const res = await fetch(`./seasonality-data/${pair}.json`, { cache: 'no-store' });
@@ -16851,11 +16859,15 @@ window.addEventListener('gi-theme-change', function() {
       _sznLoadedPair = pair;
     } catch (e) {
       // A missing file means the pair didn't clear MIN_YEARS in
-      // compute_seasonality.py (or hasn't run yet for this pair) — say so
-      // plainly rather than showing a blank/broken panel.
+      // compute_seasonality.py (or hasn't run yet for this pair) — same
+      // "nothing to show" treatment as an unsupported symbol: hide the
+      // empty chart/table shell rather than leaving a blank black box
+      // and an empty table above the one line of real text.
       if (insight) insight.textContent = `No seasonality data yet for ${_sznPairLabel(pair)} \u2014 needs at least 5 years of stored daily history.`;
       if (tbody) tbody.innerHTML = '';
       if (monthsRow) monthsRow.innerHTML = '';
+      if (chartSection) chartSection.style.display = 'none';
+      if (windowsSection) windowsSection.style.display = 'none';
       _sznDestroyChart();
       _sznLoadedPair = null;
     }
