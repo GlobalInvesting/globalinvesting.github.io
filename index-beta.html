@@ -1531,27 +1531,29 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </table>
       </div>
       <!-- Dollar Smile Panel (beta) — full width, below VaR/CVaR.
-           v4 (2026-08-22): reduced to Stephen Jen's ORIGINAL growth-
-           differential framework only (US real GDP YoY vs. the rest of the
-           G10) — the Stress (VIX) and Rate Diff tabs added in v8.205.0 were
-           removed per Santiago's explicit instruction: this panel now shows
-           only the one lens the published thesis is actually anchored on,
-           not a set of independently-invented regime views living under one
-           title. No tab chrome needed with a single view. Data:
+           v5 (2026-08-22): regime scheme changed from a pure growth-
+           differential 3-way split to growth differential + a genuine
+           crisis/risk-off check (max quarterly VIX close >= 30 overrides
+           the growth differential, matching Jen's own left-tail logic —
+           see fetch_growth_differential.py v2.0.0 module docstring for
+           the full reasoning; Santiago caught that the old scheme's chart
+           didn't show a U-shape and this is the root-cause fix, not a
+           second independent tab like the removed v8.205.0 Stress tab).
+           Still one lens, no tab chrome. Data:
            growth-differential-data/history.json (fetch_growth_differential.py,
            full idempotent recompute each run — GDP revises, so this is never
            a daily append). See renderDollarSmile() in dashboard-beta.js. -->
       <div style="border-top:1px solid var(--border);">
         <div class="panel-head">
           <span style="display:flex;align-items:baseline;min-width:0;overflow:hidden;">
-            <span class="panel-title" style="flex-shrink:0;" title="Dollar Smile (Stephen Jen &amp; Fatih Yilmaz, 2001): USD tends to strengthen at both extremes of a cycle and underperform in the calm/inline middle. Jen's original thesis is anchored on relative growth (US vs. rest-of-world) — that is the single lens shown below, not a blended score across growth, risk-sentiment, and rate differentials, since no published formula combines those into one number.">Dollar Smile</span>
+            <span class="panel-title" style="flex-shrink:0;" title="Dollar Smile (Stephen Jen &amp; Fatih Yilmaz, 2001): USD tends to strengthen in a genuine global risk-off/crisis regime (safe-haven flows, left tail) and when US growth significantly outperforms the rest of the G10 (yield/growth appeal, right tail), and underperform in the calm middle where capital drifts to higher-yielding markets elsewhere. Regime below = growth differential (FRED, quarterly) with a real VIX-based crisis check overriding it for the left tail — not a blended score, and not the same as merely 'US grew slower than the G9 average'.">Dollar Smile</span>
             <span class="panel-sub">USD vs regime &middot; beta</span>
           </span>
           <span class="panel-sub" id="dsmile-current" style="margin-left:8px;">&mdash;</span>
         </div>
         <div style="padding:10px 12px;">
 
-          <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Research / beta view &mdash; no official reference methodology (Stephen Jen, 2007) &middot; real GDP YoY, quarterly, all 10 G10 currencies from FRED</div>
+          <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Research / beta view &mdash; no official reference methodology (Stephen Jen, 2007) &middot; real GDP YoY (FRED, quarterly, all 10 G10 currencies) + VIX-based crisis check (max daily close per quarter &ge; 30)</div>
           <div id="dsmile-chart" style="width:100%;height:120px;"></div>
           <div id="dsmile-insight" style="font-size:10.5px;color:var(--text2);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px;" title="Hover for the full methodology note">Loading Dollar Smile data&hellip;</div>
           <div style="border-top:1px solid var(--border2);margin-top:10px;padding-top:8px;">
@@ -2438,7 +2440,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.213.0" defer></script>
+<script src="assets/dashboard-beta.js?v=8.214.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
