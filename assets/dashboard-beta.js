@@ -17596,9 +17596,12 @@ function _dsmileRenderSVG(el, regimes, stats, currentRegime, fmtOpts) {
     </svg>`;
 }
 
-// One-line status + hover tooltip for the full methodology note (same
-// compaction pattern used elsewhere in this file — Santiago feedback,
-// 2026-08-22, on the prior 3-4 sentence paragraph).
+// One-line status + short hover tooltip (methodology in brief, then what
+// it means for a trader) — v8.216.0 shortened from a 4-sentence paragraph
+// per Santiago's feedback that it read too long for a tooltip; the fuller
+// methodology disclosure lives in the static line above the chart
+// (index-beta.html) and the panel-title tooltip, so this one only needs
+// to orient a reader who hasn't seen those.
 function _dsmileRenderInsight(el, doc, cur, stats) {
   if (!el) return;
   const regimeLabel = cur ? (_GROWTHDIFF_LABELS[cur.regime] || cur.regime) : '\u2014';
@@ -17608,13 +17611,8 @@ function _dsmileRenderInsight(el, doc, cur, stats) {
 
   el.innerHTML = `${cur ? cur.quarter : '\u2014'}: ${curTxt} \u00b7 <span style="color:var(--up);">${regimeLabel}</span>`;
 
-  const totalQ = doc.quarters.length;
-  const first = doc.quarters[0].quarter, last = doc.quarters[doc.quarters.length - 1].quarter;
-  el.title = `Latest quarter with published GDP (${cur ? cur.quarter : '\u2014'}): ${curTxt} \u2014 ${regimeLabel}. ` +
-    `Real GDP YoY, ${totalQ} quarters (${first} \u2192 ${last}), all 10 G10 currencies from FRED. ` +
-    `G9 comparison is equal-weighted, not BIS-turnover-weighted \u2014 a disclosed simplification. ` +
-    `Real GDP prints ~1 quarter after quarter-end, so a live regime reading lags by construction \u2014 this shows what DXY did in the SAME quarter as the growth reading: a historical tendency, not a lagged trading signal. ` +
-    `Regime = growth differential AND a genuine crisis check: Global Risk-Off overrides the other two whenever that quarter's max VIX close hit 40+ (independent sources' own \u201ccrisis\u201d language, not merely \u201celevated\u201d), regardless of where US growth ranked that quarter \u2014 not merely "US grew slower than the G9 average", which is Calm/Muddling Through instead. See growthdiff-tbody below for the actual avg DXY q/q return per bucket \u2014 stated as observed, not assumed to form a textbook U shape.`;
+  el.title = `Regime = real GDP YoY differential (USD vs G9, FRED) with a VIX\u226540 crisis override \u2014 a genuine panic quarter is Global Risk-Off regardless of growth. ` +
+    `Table below shows DXY's historical q/q return by regime, same quarter as the GDP reading (which lags ~1 quarter on release): context on dollar behavior by macro backdrop, not a trade signal.`;
 }
 
 function _growthdiffRenderTable(tbody, rawStats, cur, dxyStartYear) {
