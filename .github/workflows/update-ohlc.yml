@@ -139,11 +139,11 @@ jobs:
         if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
         run: mkdir -p seasonality-data
 
-      - name: Compute seasonality (D1 finalization run only, beta)
+      - name: Compute seasonality (D1 finalization run only)
         # Only meaningful right after ohlc-data D1 bars actually refresh —
-        # same gate as calculate_technical_levels.py above. Feeds the beta
-        # Seasonality panel (index-beta.html / dashboard-beta.js), not yet
-        # linked from production — see compute_seasonality.py header.
+        # same gate as calculate_technical_levels.py above. Feeds the
+        # production Seasonality panel (index.html / dashboard.js, promoted
+        # from beta in v8.219.0) — see compute_seasonality.py header.
         if: github.event.schedule == '30 1 * * 2-6' || github.event_name == 'workflow_dispatch'
         env:
           SITE_DIR: .
